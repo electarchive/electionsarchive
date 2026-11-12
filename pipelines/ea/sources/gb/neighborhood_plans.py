@@ -25,6 +25,11 @@ PAGES = {
     ),
     "E07000084": "https://www.basingstoke.gov.uk/NP-referendum-results",
 }
+HTML = (
+    "/declaration-result-poll-clapham-cum-newby-neighbourhood-plan-area",
+    "-declaration-result-poll",
+    "-neighbourhood-planning-referendum-results-15-december-2022",
+)
 CONTEXT = {
     "residential": (
         "A neighborhood planning referendum under Schedule 4B of the Town and Country Planning Act 1990 and the "
@@ -45,7 +50,7 @@ WITHIN = (
 
 
 def is_page(url: str) -> bool:
-    return url in PAGES.values() or "/w/" in url or url.startswith(STRATFORD_PAGES)
+    return url in PAGES.values() or "/w/" in url or url.startswith(STRATFORD_PAGES) or url.endswith(HTML)
 
 
 def fetch() -> None:
