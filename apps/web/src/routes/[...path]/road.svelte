@@ -10,8 +10,8 @@
   import Preview from "./preview.svelte";
 
   type Cycle = Awaited<
-    Extract<PageServerData, { kind: "contest" }>["body"]
-  >["cycle"];
+    Extract<PageServerData, { kind: "contest" }>["sections"]["cycle"]
+  >;
 
   const {
     rounds,
@@ -22,8 +22,8 @@
     isBelow = false,
   }: {
     rounds: Awaited<
-      Extract<PageServerData, { kind: "contest" }>["body"]
-    >["rounds"];
+      Extract<PageServerData, { kind: "contest" }>["sections"]["rounds"]
+    >;
     cycle: Pick<Cycle, "primaries" | "general">;
     after?: Array<{
       id: string;

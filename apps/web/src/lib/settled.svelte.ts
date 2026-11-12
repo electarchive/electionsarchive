@@ -37,18 +37,27 @@ export function latest<T>(read: () => T | Promise<T>, key: () => string) {
       land(null);
     });
   });
+  const isReady = $derived.by(() => {
+    const from = read();
+    return (
+      !(from instanceof Promise) ||
+      (found != null && (found.from === from || found.key === key()))
+    );
+  });
   const current = $derived.by((): T | null => {
     const from = read();
-    if (!(from instanceof Promise)) {
-      return from;
-    }
-    return found != null && (found.from === from || found.key === key())
-      ? found.value
-      : null;
+    return !(from instanceof Promise)
+      ? from
+      : isReady && found != null
+        ? found.value
+        : null;
   });
   return {
     get current() {
       return current;
+    },
+    get isReady() {
+      return isReady;
     },
   };
 }

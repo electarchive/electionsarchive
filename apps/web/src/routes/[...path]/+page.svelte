@@ -244,6 +244,7 @@
         unit={data.unit}
         head={data.head}
         body={data.body}
+        sections={data.sections}
         shapes={data.shapes}
         sameDay={data.sameDay}
         primed={data.primed}

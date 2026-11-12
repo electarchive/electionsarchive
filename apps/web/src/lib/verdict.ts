@@ -11,9 +11,11 @@ import { shown } from "#lib/measure.js";
 import { m } from "#lib/paraglide/messages.js";
 import { getLocale } from "#lib/paraglide/runtime.js";
 
-type Page = Awaited<
-  Extract<Awaited<ReturnType<typeof archive>>, { kind: "contest" }>["body"]
+type Contest = Extract<
+  Awaited<ReturnType<typeof archive>>,
+  { kind: "contest" }
 >;
+type Page = Awaited<Contest["body"]>;
 
 const named = (row: {
   label: string;
@@ -385,7 +387,10 @@ function summarize(contest: Page["contest"]) {
     : lede;
 }
 
-export function comeback(contest: Page["contest"], rounds: Page["rounds"]) {
+export function comeback(
+  contest: Page["contest"],
+  rounds: Awaited<Contest["sections"]["rounds"]>,
+) {
   if (contest.current == null || isQuestion(contest)) {
     return null;
   }

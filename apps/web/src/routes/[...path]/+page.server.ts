@@ -579,7 +579,7 @@ export const load: PageServerLoad = async ({
               .catch(() => null),
             "preload",
           );
-    const [streamed, talk] = await Promise.all([
+    const [streamed, sections, talk] = await Promise.all([
       stream(
         {
           body,
@@ -592,12 +592,17 @@ export const load: PageServerLoad = async ({
         },
         { budget },
       ),
+      stream(data.sections, { budget }),
       talkLink(data.id),
     ]);
-    if (Object.values(streamed).some((value) => value instanceof Promise)) {
+    if (
+      [...Object.values(streamed), ...Object.values(sections)].some(
+        (value) => value instanceof Promise,
+      )
+    ) {
       setHeaders({ "cache-control": "private, no-cache" });
     }
-    return { ...data, ...streamed, talk };
+    return { ...data, ...streamed, sections, talk };
   }
   if (data.kind === "election") {
     const asked = params.path
