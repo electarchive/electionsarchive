@@ -4,7 +4,7 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "stray_names"
-VERSION = "9"
+VERSION = "10"
 FUSION = "a fusion ballot line, kept on the option's ballot label; merging the label into the party carried it over"
 DROPS = [
     ("us", "Republican Party", "Republican/Democratic", FUSION),
@@ -147,4 +147,21 @@ def emit() -> Path:
             )
             if not twin:
                 cs.add("name", entity_id=entity, text=text.strip(), lang=lang, kind=kind, is_preferred=False)
+        staged = {str(row["name_id"]) for row in cs.rows.get("name_drop", [])}
+        for name, entity, text, reason, writer in conn.execute(
+            """select distinct on (n.id) n.id, n.entity_id, n.text, d.reason, c.pipeline
+               from name n
+               join changeset c on c.id = n.changeset_id and c.pipeline <> 'identity'
+               join name_drop d on d.entity_id = n.entity_id and d.text = n.text
+               join changeset dc on dc.id = d.changeset_id and dc.pipeline <> c.pipeline
+               where not exists (select from name o join changeset oc on oc.id = o.changeset_id
+                                 where o.entity_id = n.entity_id and o.text = n.text and o.id <> n.id
+                                   and oc.pipeline <> c.pipeline)
+                 and exists (select from name o where o.entity_id = n.entity_id and o.text <> n.text)
+               order by n.id, d.recorded_from desc"""
+        ).fetchall():
+            if str(name) not in staged:
+                cs.add(
+                    "name_drop", name_id=name, entity_id=entity, text=text, reason=f"{reason} ({writer} added it again)"
+                )
         return cs.write()
