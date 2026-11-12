@@ -39,9 +39,20 @@ POLLING_PLACES = {
     year: f"{TSE}eleitorado_locais_votacao/eleitorado_local_votacao_{year}.zip"
     for year in (2010, 2014, 2018, 2022, 2026)
 }
-SECTIONS = {key: f"{TSE}votacao_secao/votacao_secao_2026_{key}.zip" for key in ("BR", *UFS)}
-SECTION_DETAIL = f"{TSE}detalhe_votacao_secao/detalhe_votacao_secao_2026.zip"
-SECTION_OFFICES = ("1", "3", "5", "6", "7", "8")
+SECTION_YEARS = (2018, 2026)
+SECTIONS = {
+    year: {key: f"{TSE}votacao_secao/votacao_secao_{year}_{key}.zip" for key in ("BR", *UFS)} for year in SECTION_YEARS
+}
+SECTION_DETAIL = {year: f"{TSE}detalhe_votacao_secao/detalhe_votacao_secao_{year}.zip" for year in SECTION_YEARS}
+SECTION_NAMES = {
+    "1": "president",
+    "3": "governors",
+    "5": "senators",
+    "6": "federal deputies",
+    "7": "state deputies",
+    "8": "district deputies",
+}
+SECTION_OFFICES = {2018: ("1", "3", "5"), 2026: ("1", "3", "5", "6", "7", "8")}
 COUNTRIES = {
     "BOSNIAEHERZ": "BIH",
     "BRAZZAVILLE": "COG",
@@ -116,7 +127,8 @@ DROPPED = {
     "2018:1:5:MT": (
         "The electoral court's regenerated files leave out Selma Arruda, elected to one of Mato Grosso's two seats and "
         "removed by the Superior Electoral Court in December 2019; a supplementary election filled her seat in "
-        "November 2020. Her votes are missing here."
+        "November 2020. The court's municipal totals leave her votes out; the polling-section results list them, and "
+        "they count as annulled votes."
     )
 }
 SENATORS = {1994: 2, 1998: 1, 2002: 2, 2006: 1, 2010: 2, 2014: 1, 2018: 2, 2022: 1, 2026: 2}
@@ -166,7 +178,12 @@ EXCESS = (
 
 
 def fetch() -> None:
-    for url in [*FILES.values(), *POLLING_PLACES.values(), *SECTIONS.values(), SECTION_DETAIL]:
+    for url in [
+        *FILES.values(),
+        *POLLING_PLACES.values(),
+        *(url for year in SECTION_YEARS for url in SECTIONS[year].values()),
+        *SECTION_DETAIL.values(),
+    ]:
         raw.fetch(SOURCE, url, suffix=".zip")
 
     def get(path: str) -> bytes:
@@ -538,7 +555,8 @@ def parse() -> None:
     )
     excess.write_parquet(PARSED / "excess.parquet")
     del frames, candidates, votes, legends, detail, places
-    sections()
+    for year in SECTION_YEARS:
+        sections(year)
 
 
 def unpack(url: str, suffix: str = ".csv") -> list[Path]:
@@ -552,23 +570,23 @@ def unpack(url: str, suffix: str = ".csv") -> list[Path]:
     return paths
 
 
-def sections() -> None:
+def sections(year: int) -> None:
     municipality = pl.col("CD_MUNICIPIO").str.zfill(5)
     section = pl.concat_str(
         municipality, pl.col("NR_ZONA").cast(pl.Int64), pl.col("NR_SECAO").cast(pl.Int64), separator=":"
     )
     contest = pl.concat_str(
-        pl.lit("2026"),
+        pl.lit(str(year)),
         "NR_TURNO",
         "CD_CARGO",
         pl.when(pl.col("CD_CARGO") == "1").then(pl.lit("BR")).otherwise(pl.col("SG_UF")),
         separator=":",
     )
-    wanted = (pl.col("CD_TIPO_ELEICAO") == "2") & pl.col("CD_CARGO").is_in(SECTION_OFFICES)
+    wanted = (pl.col("CD_TIPO_ELEICAO") == "2") & pl.col("CD_CARGO").is_in(SECTION_OFFICES[year])
     parts: list[Path] = []
-    for key, url in SECTIONS.items():
+    for key, url in SECTIONS[year].items():
         for path in unpack(url):
-            parts.append(PARSED / f"tally_{key}.parquet")
+            parts.append(PARSED / f"tally_{year}_{key}.parquet")
             pl.scan_csv(path, separator=";", infer_schema=False).filter(wanted).select(
                 contest=contest,
                 municipality=municipality,
@@ -581,7 +599,7 @@ def sections() -> None:
     kind = (
         pl.when(pl.col("choice") == "95")
         .then(pl.lit("blank"))
-        .when(pl.col("choice") == "96")
+        .when(pl.col("choice").is_in(["96", "97"]))
         .then(pl.lit("null"))
         .when(pl.col("candidate") == "-3")
         .then(pl.lit("legend"))
@@ -608,12 +626,14 @@ def sections() -> None:
         "blank": "QT_VOTOS_BRANCOS",
         "null": "QT_VOTOS_NULOS",
         "legend": "QT_VOTOS_LEGENDA",
+        "separate": "QT_VOTOS_ANULADOS_APU_SEP",
     }
     frames: list[pl.DataFrame] = []
-    for path in unpack(SECTION_DETAIL, "_BRASIL.csv"):
+    for path in unpack(SECTION_DETAIL[year], "_BRASIL.csv"):
+        frame = pl.scan_csv(path, separator=";", infer_schema=False)
+        present = frame.collect_schema().names()
         frames.append(
-            pl.scan_csv(path, separator=";", infer_schema=False)
-            .filter(wanted)
+            frame.filter(wanted)
             .select(
                 contest=contest,
                 uf=pl.col("SG_UF"),
@@ -622,8 +642,11 @@ def sections() -> None:
                 zone=pl.col("NR_ZONA").cast(pl.Int64),
                 number=pl.col("NR_SECAO").cast(pl.Int64),
                 section=section,
-                **{field: pl.col(column).cast(pl.Int64) for field, column in counts.items()},
-                opened=pl.col("ST_SECAO_INSTALADA") == "Sim",
+                **{
+                    field: pl.col(column).cast(pl.Int64) if column in present else pl.lit(0, pl.Int64)
+                    for field, column in counts.items()
+                },
+                opened=pl.col("ST_SECAO_INSTALADA") != "Não",
                 annulled=pl.col("ST_SECAO_ANULADA") == "Sim",
             )
             .collect()
@@ -634,7 +657,7 @@ def sections() -> None:
         raise ValueError("a section's detail repeats")
 
     keys = ["contest", "section", "kind"]
-    expected = sheet.unpivot(
+    expected = sheet.with_columns(null=pl.col("null") + pl.col("separate")).unpivot(
         on=["nominal", "blank", "null", "legend"], index=["contest", "section"], variable_name="kind", value_name="sum"
     )
     summed = tally.group_by(keys).agg(pl.col("votes").sum()).collect(engine="streaming")
@@ -679,7 +702,7 @@ def sections() -> None:
     absent = void_legends.join(held, on=["contest", "choice"], how="anti")
     if absent.height:
         named = (
-            legends.filter(pl.col("contest").str.starts_with("2026:"))
+            legends.filter(pl.col("contest").str.starts_with(f"{year}:"))
             .unique("party_number")
             .select("party_number", "party_abbreviation", "party_label")
         )
@@ -697,7 +720,7 @@ def sections() -> None:
             )
         )
         if filler.height != absent.height:
-            raise ValueError(f"legend votes for parties with no 2026 name: {absent}")
+            raise ValueError(f"legend votes for parties with no {year} name: {absent}")
         pl.concat([legends, filler]).write_parquet(PARSED / "legends.parquet")
     if mismatched.height or unmatched.height:
         raise ValueError(f"section votes differ from the section details: {mismatched.head(5)} {unmatched.head(5)}")
@@ -721,26 +744,40 @@ def sections() -> None:
     )
     measures = ["registered", "voters", "blank", "null"]
     totals = sheet.group_by("contest", "municipality").agg(pl.col(measures).sum())
+    known = pl.read_parquet(PARSED / "candidates.parquet").filter(
+        (pl.col("outcome").fill_null("") != "disqualified") | ~pl.col("contest").is_in(scope)
+    )
+    missing = rolled.select("contest", "candidate").unique().join(known, on=["contest", "candidate"], how="anti")
+    rejected = (
+        rolled.join(missing, on=["contest", "candidate"], how="semi")
+        .group_by("contest", "municipality")
+        .agg(rejected=pl.col("votes").sum())
+    )
     apart = (
         detail.filter(pl.col("contest").is_in(scope))
         .select("contest", "municipality", *measures)
         .join(totals, on=["contest", "municipality"], how="full", coalesce=True, suffix="_sections")
+        .join(rejected, on=["contest", "municipality"], how="left")
+        .with_columns(rejected=pl.col("rejected").fill_null(0))
         .filter(
             pl.any_horizontal(
-                pl.col(field).fill_null(-1) != pl.col(f"{field}_sections").fill_null(-1) for field in measures
+                pl.col(field).fill_null(-1) != pl.col(f"{field}_sections").fill_null(-1)
+                for field in measures
+                if field != "null"
             )
+            | ~(pl.col("null") - pl.col("null_sections")).is_between(0, pl.col("rejected"))
         )
     )
-    known = pl.read_parquet(PARSED / "candidates.parquet").filter(pl.col("outcome").fill_null("") != "disqualified")
-    missing = rolled.select("contest", "candidate").unique().join(known, on=["contest", "candidate"], how="anti")
     differ = differ.join(missing, on=["contest", "candidate"], how="anti")
     if differ.height or apart.height:
-        raise ValueError(f"section sums differ from the municipal totals: {differ.head(10)} {apart.head(10)}")
-    full = scan(2026, "roster")
+        raise ValueError(
+            f"section sums differ from the municipal totals: {differ.head(10)} {apart.select('contest', 'municipality', *(pl.col(field) - pl.col(f'{field}_sections') for field in measures)).head(10)}"
+        )
+    full = scan(year, "roster")
     extra = (
         describe(
             full.filter(pl.col("SQ_CANDIDATO").is_in(missing["candidate"].implode())),
-            2026,
+            year,
             full.select("SQ_CANDIDATO", "DT_NASCIMENTO", "DS_GENERO").unique("SQ_CANDIDATO").collect(),
         )
         .join(missing, on=["contest", "candidate"], how="semi")
@@ -800,7 +837,7 @@ def sections() -> None:
     ).with_columns(pl.col("measure").cast(pl.Int16))
 
     registry: list[pl.DataFrame] = []
-    with zipfile.ZipFile(raw.cached(SOURCE, POLLING_PLACES[2026]).path) as archive:
+    with zipfile.ZipFile(raw.cached(SOURCE, POLLING_PLACES[year]).path) as archive:
         for member in archive.namelist():
             if member.endswith(".csv"):
                 registry.append(
@@ -835,13 +872,13 @@ def sections() -> None:
         .join(points, on="section", how="left")
         .sort("section")
     )
-    units.write_parquet(PARSED / "sections.parquet")
-    values.sink_parquet(PARSED / "section_values.parquet")
+    units.write_parquet(PARSED / f"sections_{year}.parquet")
+    values.sink_parquet(PARSED / f"section_values_{year}.parquet")
     for path in parts:
         path.unlink()
     sheet.filter(~pl.col("opened") | pl.col("annulled")).select(
         "contest", "section", "opened", "annulled"
-    ).write_parquet(PARSED / "section_events.parquet")
+    ).write_parquet(PARSED / f"section_events_{year}.parquet")
 
 
 def party_key(number: str, abbreviation: str, year: int) -> str:
@@ -855,11 +892,18 @@ def emit() -> Path:
     detail = pl.read_parquet(PARSED / "detail.parquet")
     places = pl.read_parquet(PARSED / "places.parquet")
     excess = dict(pl.read_parquet(PARSED / "excess.parquet").iter_rows())
-    section_units = pl.read_parquet(PARSED / "sections.parquet")
-    offices = os.environ.get("BR_SECTION_OFFICES", ",".join(SECTION_OFFICES)).split(",")
-    section_values = pl.scan_parquet(PARSED / "section_values.parquet")
-    section_events = pl.read_parquet(PARSED / "section_events.parquet")
-    by_section = set(section_values.select(pl.col("contest").unique()).collect()["contest"])
+    section_year = int(os.environ.get("BR_SECTION_YEAR", SECTION_YEARS[-1]))
+    section_units = pl.read_parquet(PARSED / f"sections_{section_year}.parquet")
+    offices = os.environ.get("BR_SECTION_OFFICES", ",".join(SECTION_OFFICES[section_year])).split(",")
+    section_values = pl.scan_parquet(PARSED / f"section_values_{section_year}.parquet")
+    section_events = pl.read_parquet(PARSED / f"section_events_{section_year}.parquet")
+    by_section = {
+        contest
+        for year in SECTION_YEARS
+        for contest in pl.scan_parquet(PARSED / f"section_values_{year}.parquet")
+        .select(pl.col("contest").unique())
+        .collect()["contest"]
+    }
     states = os.environ.get("BR_SECTION_STATES", ",".join(["BR", *UFS])).split(",")
     section_values = section_values.filter(
         pl.col("contest").str.split(":").list.get(2).is_in(offices)
@@ -871,8 +915,8 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary=(
-                "Brazil's general elections from 1994 to 2026 by municipality, and in 2026 by polling section for "
-                "president, governors, senators, and deputies"
+                f"Brazil's general elections from 1994 to 2026 by municipality, and in {section_year} by polling "
+                f"section for {', '.join(SECTION_NAMES[office] for office in offices)}"
             ),
             polity="BR",
         )
@@ -906,8 +950,8 @@ def emit() -> Path:
                 )
                 for file in ("roster",) if kind == "candidates" else ("candidates", "parties", "detail"):
                     cs.artifact(raw.cached(SOURCE, FILES[(year, file)]), source)
-        for url in [*SECTIONS.values(), SECTION_DETAIL, POLLING_PLACES[2026]]:
-            cs.artifact(raw.cached(SOURCE, url), results[2026])
+        for url in [*SECTIONS[section_year].values(), SECTION_DETAIL[section_year], POLLING_PLACES[section_year]]:
+            cs.artifact(raw.cached(SOURCE, url), results[section_year])
         feed = None
         if votes.filter(pl.col("contest").str.starts_with("2026:2:")).height:
             feed = cs.source("Tribunal Superior Eleitoral", "Resultados - 2026, 2º turno")
@@ -1096,7 +1140,7 @@ def emit() -> Path:
         for code, section in conn.execute(
             """select code, id from reporting_unit
                where scheme_code = 'br.secao' and kind = 'abroad_mission' and valid_from < %s""",
-            [dates["2026:1"]],
+            [dates[f"{section_year}:1"]],
         ).fetchall():
             if code.split(":")[0] in countries:
                 cs.add(
@@ -1107,7 +1151,8 @@ def emit() -> Path:
                     method="source_code",
                 )
 
-        opened, closed = dates["2026:1"], dates["2026:2"] + timedelta(days=1)
+        opened = dates[f"{section_year}:1"]
+        closed = dates[f"{section_year}:2"] + timedelta(days=1)
         section_ids = {code: str(cs.unit("br.secao", code, opened)) for code in section_units["section"]}
         section_id = pl.col("section").replace_strict(section_ids)
         abroad_section = pl.col("uf") == "ZZ"
