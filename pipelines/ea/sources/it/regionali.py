@@ -190,6 +190,20 @@ LIST_PART = (
     "These are the votes for the provincial lists, which share out most of the council's seats; the rest went to the "
     "regional list or coalition of the winning candidate for president, so seats by list are not shown."
 )
+LIST_SEATS = (
+    "Seats are the candidates the open data marks as elected, counted by the list they were elected from. Lists "
+    "without votes here are regional lists, each headed by a candidate for president: the winning one's seats "
+    "include the majority bonus, and a losing one's seat went to its head. A president or runner-up who sits on the "
+    "council without being elected from a list is not counted."
+)
+ELECTED_AS = {
+    "FEDERAZIONE DEI VERDI": "FED.DEI VERDI",
+    "LEGA NORD-BASTA ?URO": "LEGA NORD-BASTA €URO",
+    "CENTRO DEMOCRATICO - ALTRI": "CENTRO DEMOCRATICO ¿ ALTRI",
+    "COMUNITA' DEMOCRATICHE - PARTITO DEMOCRATICO": "COMUNITA' DEMOCRATICHE - PARTITO DEMOCRA",
+    "CHIAMPARINO PER IL PIEMONTE DEL SI'": "CHIAMPARINO PER IL PIEMONTE DEL SÌ",
+    "IO RESTO IN CALABRIA CON PIPPO CALLIPO PRESIDENTE": "IO RESTO IN CALABRIA CON CALLIPO",
+}
 LISTINO = (
     "In 1995 each voter could also choose a regional list headed by a candidate for president, and the head of the "
     "winning regional list was then elected president by the council, so no winner is marked here. Candidates' "
@@ -276,7 +290,7 @@ COUNTS = ("registered", "voters", "blank", "null", "contested")
 RESULTS = re.compile(
     r"(?i)^(regionali-\d{8}\.(txt|csv|xlsx)|scrutini[-_]\d{8}\.txt|[^/]*scrutini\.(csv|xlsx)|liste&candidati_\d{8}\.txt)$"
 )
-PREFERENCES = re.compile(r"^Preferenze_Regionali(19[789]\d)\.txt$")
+PREFERENCES = re.compile(r"^Preferenze_Regionali\d+\.txt$")
 
 
 def person_name(row: dict[str, str]) -> tuple[str, str]:
@@ -434,13 +448,16 @@ def parse() -> None:
                 frame = pl.read_csv(io.StringIO(text), separator=";", infer_schema_length=0, quote_char='"')
                 frame = frame.rename({column: column.strip().upper() for column in frame.columns})
                 region = "REGIONE" if "REGIONE" in frame.columns else "ENTE1"
+                where = next(c for c in ("CIRCOSCR", "PROVINCIA", "ENTE2") if c in frame.columns)
                 seats.append(
-                    frame.filter(pl.col("CODTIPOELETTO") == "E")
+                    frame.filter(pl.col("CODTIPOELETTO").str.strip_chars() == "E")
                     .select(
+                        pl.col("COGNOME", "NOME", "DATANASCITA", where).str.strip_chars(),
                         day=pl.lit(day),
                         region=pl.col(region).str.strip_chars().str.to_uppercase().replace_strict(REGIONS),
-                        list=pl.col("DESCRLISTA").str.strip_chars(),
+                        list=pl.col("DESCRLISTA").str.strip_chars().replace(ELECTED_AS),
                     )
+                    .unique()
                     .group_by("day", "region", "list")
                     .agg(seats=pl.len())
                 )
@@ -469,7 +486,7 @@ def emit() -> Path:
     totals = accounting.group_by("day", "region").agg(pl.all().exclude("day", "region").sum())
     list_totals = lists.group_by("day", "region", "list").agg(pl.col("list_votes").sum())
     elected = seats.filter(
-        pl.col("day").dt.year() < 1995, pl.col("seats").sum().over("day", "region").is_in(COUNCIL_SIZES)
+        (pl.col("day").dt.year() >= 1995) | pl.col("seats").sum().over("day", "region").is_in(COUNCIL_SIZES)
     )
     with connect() as conn:
         cs = Changeset(
@@ -636,7 +653,7 @@ def emit() -> Path:
                 if own is not None:
                     notes = [own.counted, own.allocated]
                 elif day.year >= 1995:
-                    notes.append(LIST_PART)
+                    notes.append(LIST_PART if size is None else LIST_SEATS)
                 elif size is not None:
                     notes.append(SEATS_NOTE)
                 else:
@@ -644,9 +661,23 @@ def emit() -> Path:
                 cs.add("note", entity_id=contest, kind="context", body_md=" ".join(notes))
                 list_set = result_set(f"{code}:{day}:list", election, contest, source)
                 seats_by_list = dict(won.select("list", "seats").iter_rows()) if own is None else own.seats
+                counted = list_totals.filter(pl.col("day") == day, pl.col("region") == code)
+                regional_lists = sorted(set(seats_by_list) - set(counted["list"]))
+                if regional_lists and (own is not None or day.year < 1995):
+                    raise ValueError(f"{code} {day}: seats for lists without votes: {regional_lists}")
+                for label_ in regional_lists:
+                    option = cs.key(f"{SOURCE}.option", f"{code}:{day}:regional:{label_}")
+                    cs.add(
+                        "contest_option",
+                        id=option,
+                        contest_id=contest,
+                        kind="list",
+                        party_id=party_of(label_, day, {}),
+                        ballot_label=label_,
+                    )
+                    cs.add("outcome", result_set_id=list_set, option_id=option, kind="won", seats=seats_by_list[label_])
                 for label_, votes in (
-                    list_totals.filter(pl.col("day") == day, pl.col("region") == code)
-                    .sort("list_votes", "list", descending=[True, False])
+                    counted.sort("list_votes", "list", descending=[True, False])
                     .select("list", "list_votes")
                     .iter_rows()
                 ):
@@ -664,7 +695,7 @@ def emit() -> Path:
                         cs.add(
                             "outcome", result_set_id=list_set, option_id=option, kind="won", seats=seats_by_list[label_]
                         )
-                if size is not None and own is None:
+                if size is not None and own is None and day.year < 1995:
                     following = next((other for other in days if other > day), None)
                     cs.add("body_size", body_id=body, seats=size, valid_from=day, valid_to=following)
                 running = candidates.filter(pl.col("day") == day, pl.col("region") == code).sort(
