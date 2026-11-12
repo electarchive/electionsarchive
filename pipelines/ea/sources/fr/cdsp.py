@@ -324,13 +324,48 @@ NUANCE_FIXES = {
     }
 }
 VOTE_FIXES = {
-    (2012, 1, "1403"): {"LETEURTRE CLAUDE": 15656, "ANNOOT CHRISTINE": 272},
+    (2012, 1, "1403"): {
+        "MUSSLE CHRISTOPHE": 272,
+        "LETEURTRE CLAUDE": 15656,
+        "ANNOOT CHRISTINE": 1063,
+        "LIMAL CHRISTIAN": 0,
+    },
+    (2012, 1, "4903"): {
+        "BENARD NATHALIE": 1029,
+        "BERNARD CLAUDE": 459,
+    },
+    (2012, 1, "5105"): {
+        "MONDOT DAMIEN": 176,
+        "MAYANCE NATHALIE": 1387,
+        "BITTERLIN CATHERINE": 178,
+        "MELIN CLAUDE": 154,
+        "ROMA LOUIS": 296,
+        "PROCQUEZ CHRISTIAN": 0,
+    },
+    (2012, 1, "5919"): {
+        "BOUCOT JACKY": 334,
+        "ADAMS RAYMOND": 225,
+        "LEFEBVRE MICHEL": 10137,
+        "MARCHAND MARIE-CLAUDE": 1067,
+        "HERBOMEL MANUEL": 361,
+        "CAPRON OLIVIER": 6185,
+        "PACHOLSKI MONIQUE": 0,
+        "THOMES SERGE": 730,
+        "DRICI DJEMAÏ": 387,
+    },
     (2012, 1, "6709"): {
-        "STURNI CLAUDE": 14042,
-        "THOMAS NICOLE": 11906,
+        "DELAYE JEAN-MICHEL": 229,
+        "DIZDAREVIC GEORGES": 124,
+        "CLAUS JEAN-MARC": 888,
         "CHABOD CLARISSE": 9196,
-        "LUDWIG FRANÇOIS": 0,
-        "DIARI MOUNIR": 229,
+        "WERCKMANN FRANÇOISE": 1211,
+        "THOMAS NICOLE": 11906,
+        "MARKERT ARNAUD": 447,
+        "STURNI CLAUDE": 14042,
+        "ALTHERR JEAN-CLAUDE": 8437,
+        "LUDWIG FRANÇOIS": 467,
+        "DIARI MOUNIR": 75,
+        "MEYER BENOÎT": 0,
     },
     (2012, 1, "6905"): {
         "BUGNI JIM": 143,
@@ -346,12 +381,34 @@ VOTE_FIXES = {
         "COCHET PHILIPPE": 23486,
         "EKOBE ELEAZARD": 0,
     },
-    (2012, 1, "9209"): {"GUEANT CLAUDE": 10978, "SOLERE THIERRY": 9709, "CRETEGNY GUILLAUME": 1691},
+    (2012, 1, "9209"): {
+        "JANISSET HÉLÈNE": 37,
+        "KHALIL MINA": 28,
+        "PINEAU DOROTHÉE": 1691,
+        "GUEANT CLAUDE": 10978,
+        "MARCEL JULIEN": 1076,
+        "SOLERE THIERRY": 9709,
+        "CRETEGNY GUILLAUME": 0,
+    },
+    (2012, 1, "9307"): {
+        "XARDEL DAVID": 711,
+        "COUËDIC MARC": 211,
+    },
+    (2012, 1, "9309"): {
+        "AMZEL GEORGES": 687,
+    },
+}
+ACCOUNTING_FIXES = {
+    (2012, 1, "9307"): {VALID: 35414, INVALID: 606},
+    (2012, 1, "9309"): {VOTERS: 33192, VALID: 32566, INVALID: 626},
+}
+EXTRA_CANDIDATES = {
+    (2012, 1, "7508"): [("HILLEREAU", "LILIANE", "F", "DIV", 23, 74)],
 }
 RELABELS = {
     (1993, 2, "2901", "RAINERO PIERO"): ("POIGNANT", "BERNARD", "SOC"),
 }
-CORRECTED = {key[:3] for key in (*VOTE_FIXES, *RELABELS)}
+CORRECTED = {key[:3] for key in (*VOTE_FIXES, *ACCOUNTING_FIXES, *EXTRA_CANDIDATES, *RELABELS)}
 NOTES = {
     "legi": (
         "Results by constituency, compiled by the Banque de données socio-politiques in Grenoble and Sciences Po's "
@@ -619,7 +676,21 @@ def parse() -> None:
                 elected=pl.lit(None, pl.Boolean),
             )
         )
-    values = pl.concat(accounting)
+    fixed = pl.DataFrame(
+        [
+            (year, number, circ, measure, value)
+            for (year, number, circ), fix in ACCOUNTING_FIXES.items()
+            for measure, value in fix.items()
+        ],
+        schema={"year": pl.Int32, "round": pl.Int32, "circ": pl.String, "measure": pl.Int16, "fixed": pl.Int64},
+        orient="row",
+    )
+    values = (
+        pl.concat(accounting)
+        .join(fixed, on=["year", "round", "circ", "measure"], how="left")
+        .with_columns(value=pl.coalesce("fixed", "value"))
+        .drop("fixed")
+    )
     standing = pl.concat(options, how="diagonal")
     fixes = pl.DataFrame(
         [
@@ -638,6 +709,42 @@ def parse() -> None:
         .with_columns(votes=pl.coalesce("fixed", "votes"))
         .drop("fixed")
     )
+    extras = pl.DataFrame(
+        [
+            (
+                "legi",
+                year,
+                number,
+                circ[:2],
+                circ,
+                f"{surname} {forename}",
+                slot,
+                votes,
+                sex,
+                surname,
+                forename,
+                nuance,
+            )
+            for (year, number, circ), people in EXTRA_CANDIDATES.items()
+            for surname, forename, sex, nuance, slot, votes in people
+        ],
+        schema={
+            "kind": pl.String,
+            "year": pl.Int32,
+            "round": pl.Int32,
+            "dept": pl.String,
+            "circ": pl.String,
+            "label": pl.String,
+            "slot": pl.Int32,
+            "votes": pl.Int64,
+            "sex": pl.String,
+            "surname": pl.String,
+            "forename": pl.String,
+            "nuance": pl.String,
+        },
+        orient="row",
+    )
+    standing = pl.concat([standing, extras], how="diagonal")
     for (year, number, circ, label), (surname, forename, nuance) in RELABELS.items():
         hit = (
             (pl.col("year") == year)
