@@ -1,0 +1,20 @@
+{
+  "year": 1992,
+  "day": "1992-11-03",
+  "polity": "US-LA",
+  "publisher": "Louisiana Secretary of State",
+  "title": "General Election Returns, November 3, 1992",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706945_0380/micro_IA40706945_0380.pdf",
+    "item": "https://archive.org/details/micro_IA40706945_0380"
+  },
+  "raw_source": "us.sri",
+  "offices": {
+    "president": "Presidential electors (President and Vice President), general election of November 3, 1992, parish recapitulation in the election proclamation"
+  },
+  "leaves": [
+    4,
+    5
+  ]
+}
