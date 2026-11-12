@@ -1,0 +1,733 @@
+{
+  "polity": "US-IN",
+  "publisher": "Indiana Secretary of State",
+  "title": "Year Book of the State of Indiana 1944, Secretary of State: general election returns, November 7, 1944",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/in-election-rpt/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/in-election-rpt"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1944,
+      "chamber": "president",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "IN",
+      "district": null
+    },
+    "senate": {
+      "year": 1944,
+      "chamber": "senate",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "IN",
+      "district": null
+    },
+    "house1": {
+      "year": 1944,
+      "chamber": "house",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "IN",
+      "district": 1
+    },
+    "house2": {
+      "year": 1944,
+      "chamber": "house",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "IN",
+      "district": 2
+    },
+    "house3": {
+      "year": 1944,
+      "chamber": "house",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "IN",
+      "district": 3
+    },
+    "house4": {
+      "year": 1944,
+      "chamber": "house",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "IN",
+      "district": 4
+    },
+    "house5": {
+      "year": 1944,
+      "chamber": "house",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "IN",
+      "district": 5
+    },
+    "house6": {
+      "year": 1944,
+      "chamber": "house",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "IN",
+      "district": 6
+    },
+    "house7": {
+      "year": 1944,
+      "chamber": "house",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "IN",
+      "district": 7
+    },
+    "house8": {
+      "year": 1944,
+      "chamber": "house",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "IN",
+      "district": 8
+    },
+    "house9": {
+      "year": 1944,
+      "chamber": "house",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "IN",
+      "district": 9
+    },
+    "house10": {
+      "year": 1944,
+      "chamber": "house",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "IN",
+      "district": 10
+    },
+    "house11": {
+      "year": 1944,
+      "chamber": "house",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "IN",
+      "district": 11
+    },
+    "governor": {
+      "year": 1944,
+      "chamber": "governor",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "IN",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 34,
+      "id": "34-0",
+      "columns": [
+        {
+          "label": "Republican Ticket for Presidential Electors for Dewey and Bricker",
+          "contest": "president",
+          "candidate": "Thomas E. Dewey (Republican)"
+        },
+        {
+          "label": "Democrat Ticket for Presidential Electors for Roosevelt and Truman",
+          "contest": "president",
+          "candidate": "Franklin D. Roosevelt (Democratic)"
+        },
+        {
+          "label": "Prohibition Ticket for Presidential Electors for Watson and Johnson",
+          "contest": "president",
+          "candidate": "Prohibition"
+        },
+        {
+          "label": "Socialist Ticket for Presidential Electors for Thomas and Hoopes",
+          "contest": "president",
+          "candidate": "Norman Thomas (Socialist)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.12,
+        0.081,
+        0.851,
+        1.0
+      ],
+      "hint": "Read only the table headed '1. PRESIDENTIAL ELECTORS AT LARGE'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.173
+      ]
+    },
+    {
+      "page": 35,
+      "id": "35-0",
+      "columns": [
+        {
+          "label": "Republican Ticket for Presidential Electors for Dewey and Bricker",
+          "contest": "president",
+          "candidate": "Thomas E. Dewey (Republican)"
+        },
+        {
+          "label": "Democrat Ticket for Presidential Electors for Roosevelt and Truman",
+          "contest": "president",
+          "candidate": "Franklin D. Roosevelt (Democratic)"
+        },
+        {
+          "label": "Prohibition Ticket for Presidential Electors for Watson and Johnson",
+          "contest": "president",
+          "candidate": "Prohibition"
+        },
+        {
+          "label": "Socialist Ticket for Presidential Electors for Thomas and Hoopes",
+          "contest": "president",
+          "candidate": "Norman Thomas (Socialist)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.151,
+        0.239,
+        0.875,
+        0.508
+      ],
+      "hint": "Read only the table headed '1. PRESIDENTIAL ELECTORS AT LARGE\u2014Continued'; ignore any other table visible in the image."
+    },
+    {
+      "page": 36,
+      "id": "36-0",
+      "columns": [
+        {
+          "label": "Homer E. Capehart, Rep.",
+          "contest": "senate",
+          "candidate": "Homer E. Capehart"
+        },
+        {
+          "label": "Henry F. Schricker, Dem.",
+          "contest": "senate",
+          "candidate": "Henry F. Schricker"
+        },
+        {
+          "label": "George W. Holston, Pro.",
+          "contest": "senate",
+          "candidate": "George W. Holston"
+        },
+        {
+          "label": "Mirto B. Tomsich, Soc.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.134,
+        0.095,
+        0.855,
+        1.0
+      ],
+      "hint": "Read only the table headed '2. UNITED STATES SENATOR (LONG TERM)'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.0718
+      ]
+    },
+    {
+      "page": 37,
+      "id": "37-0",
+      "columns": [
+        {
+          "label": "Homer E. Capehart, Rep.",
+          "contest": "senate",
+          "candidate": "Homer E. Capehart"
+        },
+        {
+          "label": "Henry F. Schricker, Dem.",
+          "contest": "senate",
+          "candidate": "Henry F. Schricker"
+        },
+        {
+          "label": "George W. Holston, Pro.",
+          "contest": "senate",
+          "candidate": "George W. Holston"
+        },
+        {
+          "label": "Mirio B. Tomsich, Soc.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.142,
+        0.173,
+        0.863,
+        0.389
+      ],
+      "hint": "Read only the table headed '2. UNITED STATES SENATOR (LONG TERM)\u2014Continued'; ignore any other table visible in the image."
+    },
+    {
+      "page": 38,
+      "id": "38-0",
+      "columns": [
+        {
+          "label": "William E. Jenner, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Cornelius O'Brien, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Carl W. Thompson, Pro.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.134,
+        0.078,
+        0.859,
+        1.0
+      ],
+      "hint": "Read only the table headed '2. UNITED STATES SENATOR (SHORT TERM)'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.1009
+      ]
+    },
+    {
+      "page": 39,
+      "id": "39-0",
+      "columns": [
+        {
+          "label": "William E. Jenner, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Cornelius O'Brien, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Carl W. Thompson, Pro.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.145,
+        0.181,
+        0.869,
+        0.396
+      ],
+      "hint": "Read only the table headed '2. UNITED STATES SENATOR (SHORT TERM)\u2014Continued'; ignore any other table visible in the image."
+    },
+    {
+      "page": 40,
+      "id": "40-0",
+      "columns": [
+        {
+          "label": "Otto G. Fifield, Rep.",
+          "contest": "house1",
+          "candidate": "Otto G. Fifield"
+        },
+        {
+          "label": "Ray J. Madden, Dem.",
+          "contest": "house1",
+          "candidate": "Ray J. Madden"
+        },
+        {
+          "label": "J. Ralston Miller, Pro.",
+          "contest": "house1",
+          "candidate": "J. Ralston Miller"
+        },
+        {
+          "label": "Arthur B. Frame, Soc. L.",
+          "contest": "house1",
+          "candidate": "Arthur B. Frame"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.136,
+        0.109,
+        0.859,
+        0.227
+      ],
+      "hint": "Read only the table headed 'First District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 40,
+      "id": "40-1",
+      "columns": [
+        {
+          "label": "Charles A. Halleck, Rep.",
+          "contest": "house2",
+          "candidate": "Charles A. Halleck"
+        },
+        {
+          "label": "James O. Cox, Dem.",
+          "contest": "house2",
+          "candidate": "James Otis Cox"
+        },
+        {
+          "label": "Root, John W. Pro.",
+          "contest": "house2",
+          "candidate": "John W. Root"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.138,
+        0.219,
+        0.866,
+        0.501
+      ],
+      "hint": "Read only the table headed 'Second District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 40,
+      "id": "40-2",
+      "columns": [
+        {
+          "label": "Robert A. Grant, Rep.",
+          "contest": "house3",
+          "candidate": "Robert A. Grant"
+        },
+        {
+          "label": "Marshall A. Kizer, Dem.",
+          "contest": "house3",
+          "candidate": "Marshall F. Kizer"
+        },
+        {
+          "label": "Granville B. Leeke, Pro.",
+          "contest": "house3",
+          "candidate": "Granville B. Leeke"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.141,
+        0.493,
+        0.867,
+        0.697
+      ],
+      "hint": "Read only the table headed 'Third District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 40,
+      "id": "40-3",
+      "columns": [
+        {
+          "label": "George W. Gillie, Rep.",
+          "contest": "house4",
+          "candidate": "George W. Gillie"
+        },
+        {
+          "label": "Robert W. Bushee, Dem.",
+          "contest": "house4",
+          "candidate": "Robert W. Bushee"
+        },
+        {
+          "label": "James Dawson, Pro.",
+          "contest": "house4",
+          "candidate": "J. M. Dawson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.145,
+        0.689,
+        0.871,
+        0.892
+      ],
+      "hint": "Read only the table headed 'Fourth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 41,
+      "id": "41-0",
+      "columns": [
+        {
+          "label": "Forest A. Harness, Rep.",
+          "contest": "house5",
+          "candidate": "Forest A. Harness"
+        },
+        {
+          "label": "Bennett H. Rockey, Dem.",
+          "contest": "house5",
+          "candidate": "Bennett H. Rockey"
+        },
+        {
+          "label": "J. A. Huffman, Pro.",
+          "contest": "house5",
+          "candidate": "Jasper A. Huffman"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.143,
+        0.094,
+        0.861,
+        0.324
+      ],
+      "hint": "Read only the table headed 'Fifth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 41,
+      "id": "41-1",
+      "columns": [
+        {
+          "label": "Noble J. Johnson, Rep.",
+          "contest": "house6",
+          "candidate": "Noble J. Johnson"
+        },
+        {
+          "label": "Otis G. Jamison, Dem.",
+          "contest": "house6",
+          "candidate": "Olis G. Jamison"
+        },
+        {
+          "label": "Pliny Cox, Pro.",
+          "contest": "house6",
+          "candidate": "Pliny Cox"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.144,
+        0.316,
+        0.861,
+        0.585
+      ],
+      "hint": "Read only the table headed 'Sixth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 41,
+      "id": "41-2",
+      "columns": [
+        {
+          "label": "Gerald W. Landis, Rep.",
+          "contest": "house7",
+          "candidate": "Gerald W. Landis"
+        },
+        {
+          "label": "Arthur H. Greenwood, Dem.",
+          "contest": "house7",
+          "candidate": "Arthur H. Greenwood"
+        },
+        {
+          "label": "G. Manson Mood, Pro.",
+          "contest": "house7",
+          "candidate": "C. Manson Mood"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.145,
+        0.577,
+        0.861,
+        0.816
+      ],
+      "hint": "Read only the table headed 'Seventh District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 42,
+      "id": "42-0",
+      "columns": [
+        {
+          "label": "Charles M. LaFollette Rep.",
+          "contest": "house8",
+          "candidate": "Charles N. LaFollette"
+        },
+        {
+          "label": "Charles J. Eichel, Dem.",
+          "contest": "house8",
+          "candidate": "Charles J. Eichel"
+        },
+        {
+          "label": "C. Dana Malpass, Pro.",
+          "contest": "house8",
+          "candidate": "C. Dana Malpass"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.129,
+        0.109,
+        0.853,
+        0.322
+      ],
+      "hint": "Read only the table headed 'Eighth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 42,
+      "id": "42-1",
+      "columns": [
+        {
+          "label": "Earl Wilson, Rep.",
+          "contest": "house9",
+          "candidate": "Earl Wilson"
+        },
+        {
+          "label": "George W. Elliott, Dem.",
+          "contest": "house9",
+          "candidate": "George W. Elliott"
+        },
+        {
+          "label": "Garnett Jewell, Pro.",
+          "contest": "house9",
+          "candidate": "Garnett Jewell"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.129,
+        0.314,
+        0.851,
+        0.582
+      ],
+      "hint": "Read only the table headed 'Ninth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 42,
+      "id": "42-2",
+      "columns": [
+        {
+          "label": "Raymond S. Springer, Rep.",
+          "contest": "house10",
+          "candidate": "Raymond S. Springer"
+        },
+        {
+          "label": "Sidney E. Baker, Dem.",
+          "contest": "house10",
+          "candidate": "Sidney E. Baker"
+        },
+        {
+          "label": "Eugene S. Lewis, Pro.",
+          "contest": "house10",
+          "candidate": "Eugene S. Lewis"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.128,
+        0.574,
+        0.851,
+        0.8
+      ],
+      "hint": "Read only the table headed 'Tenth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 42,
+      "id": "42-3",
+      "columns": [
+        {
+          "label": "Judson L. Stark, Rep.",
+          "contest": "house11",
+          "candidate": "Judson L. Stark"
+        },
+        {
+          "label": "Louis Ludlow, Dem.",
+          "contest": "house11",
+          "candidate": "Louis Ludlow"
+        },
+        {
+          "label": "Ralph Ernest Webber Pro.",
+          "contest": "house11",
+          "candidate": "Ralph E. Webber"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.128,
+        0.792,
+        0.851,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Eleventh District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 43,
+      "id": "43-0",
+      "columns": [
+        {
+          "label": "Ralph F. Gates, Rep.",
+          "contest": "governor",
+          "candidate": "Ralph F. Gates"
+        },
+        {
+          "label": "Samuel D. Jackson, Dem.",
+          "contest": "governor",
+          "candidate": "Samuel D. Jackson"
+        },
+        {
+          "label": "Waldo E. Yeater, Pro.",
+          "contest": "governor",
+          "candidate": "Waldo E. Yeater"
+        },
+        {
+          "label": "William Rabe, Sr., Soc.",
+          "contest": "governor",
+          "candidate": "William Rabe"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.151,
+        0.083,
+        0.874,
+        1.0
+      ],
+      "hint": "Read only the table headed '3. GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.1036
+      ]
+    },
+    {
+      "page": 44,
+      "id": "44-0",
+      "columns": [
+        {
+          "label": "Ralph F. Gates, Rep.",
+          "contest": "governor",
+          "candidate": "Ralph F. Gates"
+        },
+        {
+          "label": "Samuel D. Jackson, Dem.",
+          "contest": "governor",
+          "candidate": "Samuel D. Jackson"
+        },
+        {
+          "label": "Waldo E. Yeater, Pro.",
+          "contest": "governor",
+          "candidate": "Waldo E. Yeater"
+        },
+        {
+          "label": "William Rabe, Sr., Soc.",
+          "contest": "governor",
+          "candidate": "William Rabe"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.129,
+        0.103,
+        0.858,
+        0.426
+      ],
+      "hint": "Read only the table headed '3. GOVERNOR\u2014Continued'; ignore any other table visible in the image."
+    }
+  ]
+}
