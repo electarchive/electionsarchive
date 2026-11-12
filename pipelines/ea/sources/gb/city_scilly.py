@@ -59,6 +59,29 @@ RESULTS_CAPTURES = (
     ("20250928061907", "elections-results"),
     ("20260814070845", "elections-results"),
 )
+HISTORY_PAGES = (
+    ("20161011142051", "http://www.cityoflondon.gov.uk/about-the-city/elections-and-wards/Pages/election.aspx"),
+    ("20171223181623", "https://www.cityoflondon.gov.uk/about-the-city/voting-elections/Pages/results.aspx"),
+    ("20191016091131", "https://www.cityoflondon.gov.uk/about-the-city/voting-elections/Pages/results.aspx"),
+)
+WARDS_FROM = date(2013, 3, 21)
+DAY_FIXES = {
+    ("E05009307", date(2017, 8, 7)): (
+        date(2019, 8, 6),
+        (
+            "The aldermanic results PDF dates this election 7 August 2017; the results page captured in 2019 dates it "
+            "Tuesday 6 August 2019, which fits the six-year term from Charles Bowman's election on 7 May 2013. The "
+            "page's date is used."
+        ),
+    ),
+    ("E05009305", date(2017, 2, 9)): (
+        date(2017, 2, 8),
+        (
+            "The results page captured in 2017 dates this election Wednesday 9 February 2017, but 9 February 2017 was "
+            "a Thursday; the aldermanic results PDF gives 8 February 2017, which is used."
+        ),
+    ),
+}
 CITY_CODE = "E09000001"
 CITY_WARDS = (
     ("E05009288", "Aldersgate", "aldersgate"),
@@ -316,6 +339,9 @@ def fetch() -> None:
     raw.fetch(SOURCE, ALDERMEN_ARCHIVE + ALDERMEN_PDF, suffix=".pdf")
     for stamp, path in RESULTS_CAPTURES:
         raw.fetch(SOURCE, results_capture(stamp, path), suffix=".html")
+        time.sleep(1.2)
+    for stamp, url in HISTORY_PAGES:
+        raw.fetch(SOURCE, f"https://web.archive.org/web/{stamp}if_/{url}", suffix=".html")
         time.sleep(1.2)
     for url, suffix, _ in SCILLY_PAGES.values():
         raw.fetch(SOURCE, url, suffix=suffix)
@@ -732,6 +758,194 @@ def aldermen_rows() -> list[dict[str, object]]:
     return out
 
 
+HISTORY_PARTIES = ("The Labour Party Candidate", "Labour Party", "Social Democratic Party", "Independent")
+HISTORY_LINE = re.compile(r"(.+?)[\s\-–:]*(\d+)(?: votes?)?( \(E\))?(?:<|/li>)?")
+HISTORY_END = re.compile(r"^(City-wide|Lord Mayor|Sheriffs|Page Content (?:[4-9]|1\d)$|On \w+day \d)")
+
+
+def history_lines(path: Path) -> list[str]:
+    text = path.read_text(errors="ignore")
+    text = re.sub(r"(?s)<script.*?</script>|<style.*?</style>|</?(?:strong|b|em|i|span|font|u)\b[^>]*>", "", text)
+    text = html.unescape(re.sub(r"<[^>]+>", "\n", text)).replace("\xa0", " ").replace("\u200b", "")
+    out: list[str] = []
+    for line in (" ".join(line.split()) for line in text.splitlines()):
+        if not line:
+            continue
+        if out and re.fullmatch(r"[-–]?\s*[\d.]+\s*%?|%|votes?(?: \(E\))?", line):
+            out[-1] = f"{out[-1]} {line}" if line != "%" else out[-1] + "%"
+        else:
+            out.append(line)
+    return out
+
+
+def history_name(head: str) -> tuple[str, str, str]:
+    head = head.strip(" -–:")
+    party = ""
+    if ":" in head:
+        head, party = (part.strip(" -–") for part in head.split(":", 1))
+    else:
+        for known in HISTORY_PARTIES:
+            if head.endswith(known) and ", " in head[: -len(known)]:
+                head, party = head[: -len(known)].strip(" -–"), known
+                break
+    surname, sep, given = head.partition(", ")
+    if not sep or not given or not surname[:1].isupper() or re.search(r"\d", head):
+        raise ValueError(f"history name {head!r}")
+    surname = re.sub(r"\s+-", "-", surname)
+    given = re.sub(r"^(?:Lady|Sir|Dr) ", "", given)
+    return proper(surname) if surname.isupper() else surname, given, party
+
+
+def history_rows(stamp: str, url: str) -> list[dict[str, object]]:
+    page = f"https://web.archive.org/web/{stamp}if_/{url}"
+    lines = history_lines(raw.cached(SOURCE, page).path)
+    blocks: list[dict[str, object]] = []
+    section: str | None = None
+    for line in lines:
+        if line == "Aldermanic":
+            section = "alderman"
+        elif line.startswith("Common Councilman By-elections"):
+            section = "by"
+        elif HISTORY_END.match(line):
+            section = None
+        elif section is None:
+            continue
+        elif line.startswith("Ward of "):
+            ward = ward_of(line.split(" - ")[0].removeprefix("Ward of "))
+            if ward is None:
+                raise ValueError(f"{page}: ward {line!r}")
+            blocks.append({"kind": section, "ward": ward, "day": None, "lines": []})
+        elif blocks and blocks[-1]["kind"] == section:
+            block_lines = blocks[-1]["lines"]
+            assert isinstance(block_lines, list)
+            block_lines.append(line)
+    out: list[dict[str, object]] = []
+    for block in blocks:
+        block_lines = block["lines"]
+        ward = block["ward"]
+        assert isinstance(block_lines, list) and isinstance(ward, tuple)
+        found = next((m for line in block_lines if (m := DATE.search(line.replace("/", " ")))), None)
+        if found is None:
+            raise ValueError(f"{page}: {ward[1]} has no date")
+        day = datetime.strptime(found.group(1), "%d %B %Y").date()
+        if day < WARDS_FROM:
+            continue
+        candidates: list[tuple[str, str, str, str, int | None, bool]] = []
+        spoilt = ballots = cast = None
+        turnout = None
+        statement = ""
+        uncontested = any("uncontested" in line.lower() for line in block_lines)
+        after_colon = False
+        for line in block_lines:
+            if m := re.fullmatch(r"Total spoilt votes\s*[-–]?\s*(\d+)", line):
+                spoilt = int(m.group(1))
+            elif m := re.fullmatch(
+                r"Number of ballot papers (?:verified and counted|counted and verified)\s*[-–]?\s*(\d+)", line
+            ):
+                ballots = int(m.group(1))
+            elif m := re.fullmatch(r"Total votes cast\s*[-–]?\s*(\d+)", line):
+                cast = int(m.group(1))
+            elif m := re.fullmatch(r"Turnout\s*[-–]?\s*([\d.]+)\s*%?", line):
+                turnout = float(m.group(1))
+            elif re.match(
+                r"(?:\([a-e]\) )?(?:Want of|Voting for|Writing|Being unmarked|Rejected in part|Number of)", line
+            ):
+                continue
+            elif "elected" in line and not line.startswith(("A poll", "At a", "At Wardmote")):
+                statement = line
+                if uncontested and ", " in line.split(" was ")[0]:
+                    surname, given, party = history_name(line.split(" was ")[0])
+                    candidates.append((line.split(" was ")[0], surname, given, party, None, True))
+            elif after_colon and uncontested and ", " in line:
+                surname, given, party = history_name(line)
+                candidates.append((line, surname, given, party, None, True))
+            elif not uncontested and ", " in line and (m := HISTORY_LINE.fullmatch(line)):
+                surname, given, party = history_name(m.group(1))
+                candidates.append((line, surname, given, party, int(m.group(2)), m.group(3) is not None))
+            after_colon = line.endswith(":") and "elected" in line
+        if not candidates:
+            if uncontested:
+                out.append({"kind": block["kind"], "day": day, "ward_code": ward[0], "ward": ward[1], "missing": True})
+                continue
+            raise ValueError(f"{page}: {ward[1]} {day} has no candidates")
+        if not uncontested:
+            if not any(flag for *_, flag in candidates):
+                top = max(votes or 0 for *_, votes, _ in candidates)
+                candidates = [(*c[:5], c[4] == top) for c in candidates]
+            winners = [c for c in candidates if c[5]]
+            top = max(votes or 0 for *_, votes, _ in candidates)
+            if len(winners) != 1 or winners[0][4] != top or [c[4] for c in candidates].count(top) != 1:
+                raise ValueError(f"{page}: {ward[1]} {day} winner")
+            if winners[0][1].upper() not in statement.upper():
+                raise ValueError(f"{page}: {ward[1]} {day} statement {statement!r}")
+            total = sum(c[4] or 0 for c in candidates)
+            if ballots is None and cast is not None and spoilt is not None and cast == total + spoilt:
+                ballots = cast
+        for number, (printed, surname, given, party, votes, elected) in enumerate(candidates, start=1):
+            out.append(
+                {
+                    "kind": block["kind"],
+                    "day": day,
+                    "ward_code": ward[0],
+                    "ward": ward[1],
+                    "number": number,
+                    "printed": printed,
+                    "surname": surname,
+                    "given": given,
+                    "party": party,
+                    "votes": votes,
+                    "elected": elected,
+                    "uncontested": uncontested,
+                    "turnout": turnout,
+                    "ballots": ballots,
+                    "spoilt": spoilt,
+                    "page": page,
+                }
+            )
+    return out
+
+
+def day_fix(row: dict[str, object]) -> tuple[date, str] | None:
+    day = row["day"]
+    return DAY_FIXES.get((str(row["ward_code"]), day)) if isinstance(day, date) else None
+
+
+def extra_rows() -> list[dict[str, object]]:
+    rows = aldermen_rows() + web_rows()
+    for row in rows:
+        fix = day_fix(row)
+        if fix:
+            row["day"], row["caveat"] = fix
+    held: dict[tuple[object, object, object], list[object]] = {}
+    for row in rows:
+        held.setdefault((row["kind"], row["day"], row["ward_code"]), []).append(row["votes"])
+    added: dict[tuple[object, object, object], list[dict[str, object]]] = {}
+    for stamp, url in HISTORY_PAGES:
+        found: dict[tuple[object, object, object], list[dict[str, object]]] = {}
+        for row in history_rows(stamp, url):
+            fix = day_fix(row)
+            if fix:
+                row["day"] = fix[0]
+            found.setdefault((row["kind"], row["day"], row["ward_code"]), []).append(row)
+        for key, lines in found.items():
+            if lines[0].get("missing"):
+                if key not in held and key not in added:
+                    raise ValueError(f"{key}: uncontested winner named without a surname, and not held elsewhere")
+                continue
+            votes = [line["votes"] for line in lines]
+            known = held.get(key) or ([line["votes"] for line in added[key]] if key in added else None)
+            if known is not None:
+                if sorted(known, key=str) != sorted(votes, key=str):
+                    raise ValueError(f"{key}: {known} against {votes} from {url}")
+                continue
+            added[key] = lines
+    for lines in added.values():
+        rows += lines
+    for row in rows:
+        row.setdefault("caveat", None)
+    return rows
+
+
 def parse() -> None:
     rows: list[dict[str, object]] = []
     for day, (url, archive, _) in CITY_NOTICES.items():
@@ -833,7 +1047,7 @@ def parse() -> None:
                 raise ValueError(f"{ward[0]}: tie at the cut")
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.write_parquet(PARSED / "city.parquet")
-    extra = pl.DataFrame(aldermen_rows() + web_rows(), infer_schema_length=None)
+    extra = pl.DataFrame(extra_rows(), infer_schema_length=None)
     extra.write_parquet(PARSED / "extra.parquet")
     print(extra.group_by("kind", "day").agg(pl.col("ward").unique().sort(), pl.len()).sort("kind", "day"))
     print(frame.group_by("day", "uncontested").agg(pl.len(), pl.col("elected").sum()).sort("day", "uncontested"))
@@ -1095,9 +1309,12 @@ def emit() -> Path:
 
         extra = pl.read_parquet(PARSED / "extra.parquet")
         offices: set[str] = set()
+        staged_contests: set[str] = set()
+        staged_elections: set[str] = set()
         for (kind, day), held in extra.group_by("kind", "day", maintain_order=True):
             aldermanic = kind == "alderman"
             election = cs.key("gb.election", f"{day}:{'aldermanic' if aldermanic else 'by'}:{CITY_CODE}")
+            staged_elections.add(f"{day}:{'aldermanic' if aldermanic else 'by'}:{CITY_CODE}")
             when = f"{day.day} {day:%B} {day.year}"
             cs.add(
                 "election",
@@ -1136,6 +1353,7 @@ def emit() -> Path:
                 area, unit = ward_entities(code, label)
                 tacit = bool(lines["uncontested"][0])
                 contest_key = f"{day}:{'aldermanic' if aldermanic else 'by'}:{code}"
+                staged_contests.add(contest_key)
                 contest = cs.key("gb.contest", contest_key)
                 fields: dict[str, object] = {}
                 if aldermanic:
@@ -1189,10 +1407,13 @@ def emit() -> Path:
                         entity_id=result_set,
                         kind="caveat",
                         body_md=(
-                            f"The page prints {ballots:,} ballot papers counted and verified and {spoilt:,} spoilt votes. "
+                            f"The page prints {ballots:,} ballot papers counted and verified and "
+                            f"{'no total of spoilt votes' if spoilt is None else f'{spoilt:,} spoilt votes'}. "
                             f"The candidates' votes total {votes_sum:,}, so the ballot-paper count is not stored."
                         ),
                     )
+                if lines["caveat"][0] is not None:
+                    cs.add("note", entity_id=result_set, kind="caveat", body_md=lines["caveat"][0])
                 if "Social Democratic Party" in lines["party"].to_list():
                     cs.add("note", entity_id=result_set, kind="caveat", body_md=SDP_NOTE)
                 for line in lines.iter_rows(named=True):
@@ -1250,6 +1471,30 @@ def emit() -> Path:
                             flags=flags,
                             value=value,
                         )
+
+        stale_reason = (
+            "The Corporation's own pages date this election differently from the earlier load, so the contest is "
+            "now held under its corrected date."
+        )
+        ward_codes = [code for code, *_ in CITY_WARDS]
+        for scheme, value, entity in conn.execute(
+            """select x.scheme, x.value, x.entity_id from external_id x join entity e on e.id = x.entity_id
+               where e.retired_by is null and (
+                 (x.scheme = 'gb.contest' and x.value ~ '^\\d{4}-\\d\\d-\\d\\d:(aldermanic|by):' and split_part(x.value, ':', 3) = any(%s))
+                 or (x.scheme = 'gb.election' and x.value ~ ':(aldermanic|by):' and split_part(x.value, ':', 3) = %s)
+                 or x.scheme = 'gb.city_scilly.person')""",
+            [ward_codes, CITY_CODE],
+        ).fetchall():
+            if (
+                (scheme == "gb.contest" and value not in staged_contests)
+                or (scheme == "gb.election" and value not in staged_elections)
+                or (
+                    scheme == "gb.city_scilly.person"
+                    and re.match(r"\d{4}-\d\d-\d\d:(aldermanic|by):", value)
+                    and value.rsplit(":", 1)[0] not in staged_contests
+                )
+            ):
+                cs.add("entity_retirement", entity_id=entity, reason=stale_reason)
 
         scilly_polity = cs.key("gb.polity", SCILLY_CODE)
         scilly_body = cs.key("gb.body", SCILLY_CODE)
