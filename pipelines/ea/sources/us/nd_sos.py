@@ -32,6 +32,8 @@ FILES = {
     1904: "1904-pres-congress-gov",
     1910: "1910-general",
     1912: "1912-11-05-general",
+    1914: "1914-11-03-general",
+    1916: "1916-11-07-general",
     1918: "1918-11-05-general",
     1920: "1920-11-02-general",
     1922: "1922-11-07-general",
@@ -69,6 +71,8 @@ DAYS = {
     1904: date(1904, 11, 8),
     1910: date(1910, 11, 8),
     1912: date(1912, 11, 5),
+    1914: date(1914, 11, 3),
+    1916: date(1916, 11, 7),
     1918: date(1918, 11, 5),
     1920: date(1920, 11, 2),
     1922: date(1922, 11, 7),
@@ -998,6 +1002,14 @@ ERRATA = {
     (1906, "D. C. Greenleaf"),
     (1906, "A. J. Evans"),
     (1906, "Arthur LeSueur"),
+    (1914, "C. O. Jorgenson"),
+    (1914, "C. H. Starke"),
+    (1914, "Dorr Carroll"),
+    (1914, "W. C. Taylor"),
+    (1914, "J. P. Reed"),
+    (1914, "W. H. Stutsman"),
+    (1914, "O. Greenland"),
+    (1914, "Wm. Loughland"),
 }
 READ_1944 = {("wells", 32): 1386, ("grant", 35): 1606}
 TYPOS = {"mclntosh": "mcintosh", "poster": "foster"}
@@ -1163,6 +1175,31 @@ def blue_book(codes: dict[str, str]) -> list[dict[str, object]]:
     return [
         {
             "day": BLUE_BOOKS[year][0],
+            "office": office,
+            "code": party,
+            "candidate": candidate,
+            "county": codes[plain(county)],
+            "votes": votes,
+        }
+        for year, office, candidate, party, county, votes in counted.select(
+            "year", "office", "candidate", "party", "county", "votes"
+        ).iter_rows()
+    ]
+
+
+def abstract_reads(codes: dict[str, str]) -> list[dict[str, object]]:
+    frame = pl.read_csv(Path(__file__).with_name("nd_abstract_reads.tsv"), separator="\t", infer_schema_length=None)
+    totals = frame.filter(pl.col("county") == "Total")
+    counted = frame.filter(pl.col("county") != "Total")
+    for year, candidate, printed in totals.select("year", "candidate", "votes").iter_rows():
+        found = counted.filter((pl.col("year") == year) & (pl.col("candidate") == candidate))["votes"].sum()
+        if found != printed:
+            if abs(found - printed) > max(20, printed // 100) and (year, candidate) not in ERRATA:
+                raise ValueError(f"{year} {candidate}: counties sum to {found}, the abstract prints {printed}")
+            print(f"{year} {candidate}: counties sum to {found}, printed total {printed}")
+    return [
+        {
+            "day": DAYS[year],
             "office": office,
             "code": party,
             "candidate": candidate,
@@ -1436,6 +1473,7 @@ def parse() -> None:
             )
     for year in PAGES:
         rows.extend(abstract(year, codes))
+    rows.extend(abstract_reads(codes))
     rows.extend(blue_book(codes))
     PARSED.mkdir(parents=True, exist_ok=True)
     pl.DataFrame(rows, infer_schema_length=None).write_parquet(PARSED / "lines.parquet")
