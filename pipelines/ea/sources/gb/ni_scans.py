@@ -177,7 +177,7 @@ def submit() -> None:
             params = MessageCreateParamsNonStreaming(
                 model="claude-haiku-5-5",
                 max_tokens=16000,
-                thinking={"type": "between_tools"},
+                thinking={"type": "adaptive"},
                 messages=[{"role": "user", "content": content}],
             )
             if label.endswith("-high"):
