@@ -2401,9 +2401,46 @@ def single_county(conn: Connection, frame: pl.DataFrame) -> pl.DataFrame:
     )
 
 
+def squash(name: str) -> str:
+    return re.sub(r"[^a-z]", "", name.lower())
+
+
+def contest_names(conn: Connection, pipeline: str) -> list[tuple[object, str, frozenset[str], list[object]]]:
+    return [
+        (contest, fips, frozenset(squash(name) for name in names), candidacies)
+        for contest, fips, names, candidacies in conn.execute(
+            """select co.id, substr(x.value, 15, 5), array_agg(coalesce(ca.ballot_name, pn.text)), array_agg(ca.id)
+               from external_id x join contest co on co.id = x.entity_id
+               join changeset cs on cs.id = co.changeset_id and cs.pipeline = %s
+               join entity ce on ce.id = co.id and ce.retired_by is null
+               join contest_option o on o.contest_id = co.id join candidacy ca on ca.option_id = o.id
+               join entity e on e.id = ca.id and e.retired_by is null
+               left join name pn on pn.entity_id = ca.person_id and pn.is_preferred and pn.lang = 'en'
+               where x.scheme = 'us.contest' and x.value like %s
+               group by co.id, x.value""",
+            [pipeline, f"{DAY}:CA:%"],
+        ).fetchall()
+    ]
+
+
+def held_by_local(conn: Connection, frame: pl.DataFrame) -> pl.DataFrame:
+    held = {(fips, names) for _, fips, names, _ in contest_names(conn, local_2026.SOURCE)}
+    fips_of = {name: fips for fips, name in COUNTIES.items()}
+    twins = {
+        key
+        for key, group in frame.group_by("county", "district", "seat")
+        if (fips_of.get(key[0]), frozenset(squash(name) for name in group["name"])) in held
+    }
+    return frame.filter(
+        ~pl.struct("county", "district", "seat").map_elements(
+            lambda row: (row["county"], row["district"], row["seat"]) in twins, return_dtype=pl.Boolean
+        )
+    )
+
+
 def emit() -> Path:
     with connect() as conn:
-        frame = single_county(conn, pl.read_parquet(PARSED / "candidates.parquet"))
+        frame = held_by_local(conn, single_county(conn, pl.read_parquet(PARSED / "candidates.parquet")))
         cs = Changeset(
             conn,
             pipeline=SOURCE,
@@ -2452,4 +2489,11 @@ def emit() -> Path:
         )
         kept = govcand.races(conn, cs, SOURCE, "CA", DAY, frame, UUID(int=0), "06")
         print(f"{kept} candidates")
+        held = {(fips, names) for _, fips, names, _ in contest_names(conn, local_2026.SOURCE)}
+        for contest, fips, names, candidacies in contest_names(conn, SOURCE):
+            if (fips, names) in held:
+                reason = "This race is also held under the county registrar's own contest from the local-contests load."
+                for candidacy in candidacies:
+                    cs.add("entity_retirement", entity_id=candidacy, reason=reason)
+                cs.add("entity_retirement", entity_id=contest, reason=reason)
         return cs.write()

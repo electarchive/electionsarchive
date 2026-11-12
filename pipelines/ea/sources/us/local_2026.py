@@ -12674,6 +12674,20 @@ def emit_state(frame: pl.DataFrame, state: str, snapshot: Snapshot, offices: Off
     )
     tails = sorted(set(frame["template"]))
     with connect() as conn:
+        tails = sorted(
+            {
+                *tails,
+                *(
+                    tail
+                    for (tail,) in conn.execute(
+                        """select regexp_replace(x.value, '^[0-9-]+:', '') from external_id x
+                           join changeset c on c.id = x.changeset_id and c.pipeline = 'us.ca_june_2026'
+                           where x.scheme = 'us.contest' and regexp_replace(x.value, '^[0-9-]+:', '') = any(%s)""",
+                        [sorted(set(frame["tail"]))],
+                    ).fetchall()
+                ),
+            }
+        )
         cs = Changeset(
             conn,
             pipeline=SOURCE,
@@ -13074,7 +13088,7 @@ def emit_state(frame: pl.DataFrame, state: str, snapshot: Snapshot, offices: Off
                 )
                 created.add(tail)
                 known[tail] = []
-            elif template != tail and template in templates:
+            elif template != tail and tail not in templates and template in templates:
                 if (ending := re.search(r":unexpired(-\d{4})?$", tail)) and tail[: ending.start()] in templates:
                     template = tail[: ending.start()]
                 base = list(templates[template])
