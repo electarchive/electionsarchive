@@ -221,6 +221,11 @@ LA_RACE = re.compile(
 )
 NC_CONTEST = re.compile(r"US SENATE|NC GOVERNOR|US HOUSE OF REPRESENTATIVES DISTRICT (\d+)")
 AR_CONTEST = re.compile(r"U\.S\. Senate|Governor|U\.S\. Congress District (\d+)")
+AR_TITLE = re.compile(
+    r"(?i)^(?:(?:State\s+)?(?:Representative|Rep\.?|Senator|Sen\.?)|Justice of the Peace|J\s?P|Director|Board Member"
+    r"|Constable|Dr\.?)\s+(\S+\s+\S)"
+)
+AR_TRAILER = re.compile(r"\s+-\s+\D+$|\s+(?:J P|JUSTICE OF THE PEACE|(?:[A-Z]+\s+)?CIRCUIT CLERK)$")
 AR_HEADERS = {"User-Agent": "Mozilla/5.0", "Origin": "https://arkansas.tally-enr.com"}
 OK_BASE = "https://results.okelections.gov/OKERS/enrapi/"
 OK_HEADERS = {
@@ -1392,7 +1397,9 @@ def rows(state: str, url: str, path: Path, urls: dict[str, Path]):
             places = contest.get("Locations") or {contest.get("DistrictID") or "": contest}
             for fips, location in places.items():
                 for choice in [*location["Choices"], *location["WriteinChoices"]]:
-                    named = re.fullmatch(r"([A-Z]{3}) (.+)", choice["Name"])
+                    named = re.fullmatch(r"([A-Z]{3}) (.+)", choice["Name"]) or re.fullmatch(
+                        r"([DRIL]) ([A-Z][A-Z .'-]+)", choice["Name"]
+                    )
                     yield {
                         "office": "other"
                         if found is None
@@ -1485,6 +1492,8 @@ def plan(
                 pl.col("candidate")
                 .str.replace(r"^(?:Mayor|Council Member|Councilman|Councilwoman)\s+", "")
                 .str.replace(r",\s*Mayor$|\s+\(Mayor\)$", "")
+                .str.replace(AR_TITLE.pattern, "$1")
+                .str.replace(AR_TRAILER.pattern, "")
             )
             .otherwise(pl.col("candidate"))
         )
