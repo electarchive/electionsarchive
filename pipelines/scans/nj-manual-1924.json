@@ -1,0 +1,588 @@
+{
+  "polity": "US-NJ",
+  "publisher": "New Jersey Legislature",
+  "title": "Manual of the Legislature of New Jersey, 1925: election returns, 1924",
+  "license": "Public record",
+  "file": {
+    "url": "https://babel.hathitrust.org/cgi/pt?id=uiug.30112110806004",
+    "item": "https://babel.hathitrust.org/cgi/pt?id=uiug.30112110806004"
+  },
+  "raw_source": "us.county_volumes",
+  "contests": {
+    "president": {
+      "year": 1924,
+      "chamber": "president",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "NJ",
+      "district": null
+    },
+    "senate": {
+      "year": 1924,
+      "chamber": "senate",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "NJ",
+      "district": null
+    },
+    "house1": {
+      "year": 1924,
+      "chamber": "house",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "NJ",
+      "district": 1
+    },
+    "house2": {
+      "year": 1924,
+      "chamber": "house",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "NJ",
+      "district": 2
+    },
+    "house3": {
+      "year": 1924,
+      "chamber": "house",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "NJ",
+      "district": 3
+    },
+    "house4": {
+      "year": 1924,
+      "chamber": "house",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "NJ",
+      "district": 4
+    },
+    "house5": {
+      "year": 1924,
+      "chamber": "house",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "NJ",
+      "district": 5
+    },
+    "house6": {
+      "year": 1924,
+      "chamber": "house",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "NJ",
+      "district": 6
+    },
+    "house7": {
+      "year": 1924,
+      "chamber": "house",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "NJ",
+      "district": 7
+    },
+    "house8": {
+      "year": 1924,
+      "chamber": "house",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "NJ",
+      "district": 8
+    },
+    "house9": {
+      "year": 1924,
+      "chamber": "house",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "NJ",
+      "district": 9
+    },
+    "house10": {
+      "year": 1924,
+      "chamber": "house",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "NJ",
+      "district": 10
+    },
+    "house11": {
+      "year": 1924,
+      "chamber": "house",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "NJ",
+      "district": 11
+    },
+    "house12": {
+      "year": 1924,
+      "chamber": "house",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "NJ",
+      "district": 12
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "columns": [
+        {
+          "label": "Dem.",
+          "contest": "president",
+          "candidate": "John W. Davis (Democratic)"
+        },
+        {
+          "label": "Rep.",
+          "contest": "president",
+          "candidate": "Calvin Coolidge (Republican)"
+        },
+        {
+          "label": "Socialist",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Progressive",
+          "contest": "president",
+          "candidate": "Robert La Follette (Progressive)"
+        },
+        {
+          "label": "Commonwealth Land",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Workers'",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "National Prohibition",
+          "contest": "president",
+          "candidate": "Herman Faris (Prohibition)"
+        },
+        {
+          "label": "American",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.212,
+        0.106,
+        0.898,
+        0.539
+      ],
+      "hint": "Read only the table headed 'AVERAGE PRESIDENT AND VICE PRESIDENT ELECTORAL VOTE\u20141924.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Donnelly, Dem.",
+          "contest": "senate",
+          "candidate": "Frederick W. Donnelly"
+        },
+        {
+          "label": "Edge, Rep.",
+          "contest": "senate",
+          "candidate": "Walter E. Edge"
+        },
+        {
+          "label": "Record, Prog.",
+          "contest": "senate",
+          "candidate": "George L. Record"
+        },
+        {
+          "label": "Loew, Commonwealth",
+          "contest": "senate",
+          "candidate": "Loew"
+        },
+        {
+          "label": "Vollgraf, Workers",
+          "contest": "senate",
+          "candidate": "Vollgraf"
+        },
+        {
+          "label": "Butterworth, Soc. Labor",
+          "contest": "senate",
+          "candidate": "Butterworth"
+        },
+        {
+          "label": "Day\u2014Nat Pro. (Name written on ballot)",
+          "contest": "senate",
+          "candidate": "Day"
+        },
+        {
+          "label": "Plurality Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality Rep.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.17,
+        0.18,
+        0.93,
+        0.9
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR ELECTION\u20141924.'; ignore any other table visible in the image.",
+      "turn": 270
+    },
+    {
+      "page": 3,
+      "id": "3-h1",
+      "columns": [
+        {
+          "label": "Irving, Dem.",
+          "contest": "house1",
+          "candidate": "Robert A. Irving"
+        },
+        {
+          "label": "Patterson, Jr., Rep.",
+          "contest": "house1",
+          "candidate": "Francis F. Patterson, jr."
+        },
+        {
+          "label": "Harkins, Prog.",
+          "contest": "house1",
+          "candidate": "Harkins"
+        }
+      ],
+      "orientation": "counties_across",
+      "crop": [
+        0.2,
+        0.1247,
+        0.9,
+        0.1825
+      ],
+      "hint": "Read only the block headed 'First District'; ignore any other block visible in the image. Its last column is the Total."
+    },
+    {
+      "page": 3,
+      "id": "3-h2",
+      "columns": [
+        {
+          "label": "Stevens, Dem.",
+          "contest": "house2",
+          "candidate": "Charles S. Stevens"
+        },
+        {
+          "label": "Bacharach, Rep.",
+          "contest": "house2",
+          "candidate": "Isaac Bacharach"
+        }
+      ],
+      "orientation": "counties_across",
+      "crop": [
+        0.2,
+        0.1825,
+        0.9,
+        0.2423
+      ],
+      "hint": "Read only the block headed 'Second District'; ignore any other block visible in the image. Its last column is the Total."
+    },
+    {
+      "page": 3,
+      "id": "3-h3",
+      "columns": [
+        {
+          "label": "Geran, Dem.",
+          "contest": "house3",
+          "candidate": "Elmer H. Geran"
+        },
+        {
+          "label": "Appleby, Rep.",
+          "contest": "house3",
+          "candidate": "T. Frank Appleby"
+        }
+      ],
+      "orientation": "counties_across",
+      "crop": [
+        0.2,
+        0.2423,
+        0.9,
+        0.2894
+      ],
+      "hint": "Read only the block headed 'Third District'; ignore any other block visible in the image. Its last column is the Total."
+    },
+    {
+      "page": 3,
+      "id": "3-h4",
+      "columns": [
+        {
+          "label": "Browne, Dem.",
+          "contest": "house4",
+          "candidate": "Charles Browne"
+        },
+        {
+          "label": "Eaton, Rep.",
+          "contest": "house4",
+          "candidate": "Charles A. Eaton"
+        }
+      ],
+      "orientation": "counties_across",
+      "crop": [
+        0.2,
+        0.2894,
+        0.9,
+        0.3371
+      ],
+      "hint": "Read only the block headed 'Fourth District'; ignore any other block visible in the image. Its last column is the Total."
+    },
+    {
+      "page": 3,
+      "id": "3-h5",
+      "columns": [
+        {
+          "label": "Sayre, Dem.",
+          "contest": "house5",
+          "candidate": "Monell Sayre"
+        },
+        {
+          "label": "Ackerman, Rep.",
+          "contest": "house5",
+          "candidate": "Ernest R. Ackerman"
+        }
+      ],
+      "orientation": "counties_across",
+      "crop": [
+        0.2,
+        0.3371,
+        0.9,
+        0.3842
+      ],
+      "hint": "Read only the block headed 'Fifth District'; ignore any other block visible in the image. Its last column is the Total."
+    },
+    {
+      "page": 3,
+      "id": "3-h6",
+      "columns": [
+        {
+          "label": "Holley, Dem.",
+          "contest": "house6",
+          "candidate": "Alfred T. Holley"
+        },
+        {
+          "label": "Perkins, Rep.",
+          "contest": "house6",
+          "candidate": "Randolph Perkins"
+        },
+        {
+          "label": "Krafft, Prog.",
+          "contest": "house6",
+          "candidate": "Krafft"
+        }
+      ],
+      "orientation": "counties_across",
+      "crop": [
+        0.2,
+        0.3842,
+        0.9,
+        0.4426
+      ],
+      "hint": "Read only the block headed 'Sixth District'; ignore any other block visible in the image. Its last column is the Total."
+    },
+    {
+      "page": 3,
+      "id": "3-h7",
+      "columns": [
+        {
+          "label": "Callahan, Dem.",
+          "contest": "house7",
+          "candidate": "Andrew J. Callahan"
+        },
+        {
+          "label": "Segar, Rep.",
+          "contest": "house7",
+          "candidate": "George N. Seger"
+        },
+        {
+          "label": "Hubschmitt, Soc.-La Follette",
+          "contest": "house7",
+          "candidate": "Hubschmitt"
+        },
+        {
+          "label": "Santhouse, Soc.-Lab.",
+          "contest": "house7",
+          "candidate": "Santhouse"
+        }
+      ],
+      "orientation": "counties_across",
+      "crop": [
+        0.2,
+        0.4426,
+        0.9,
+        0.5139
+      ],
+      "hint": "Read only the block headed 'Seventh District'; ignore any other block visible in the image. Its last column is the Total."
+    },
+    {
+      "page": 3,
+      "id": "3-h8",
+      "columns": [
+        {
+          "label": "McNulty, Dem.",
+          "contest": "house8",
+          "candidate": "Frank J. McNulty"
+        },
+        {
+          "label": "Taylor, Rep.",
+          "contest": "house8",
+          "candidate": "Herbert W. Taylor"
+        }
+      ],
+      "orientation": "counties_across",
+      "crop": [
+        0.2,
+        0.5139,
+        0.9,
+        0.5624
+      ],
+      "hint": "Read only the block headed 'Eighth District'; ignore any other block visible in the image. Its last column is the Total."
+    },
+    {
+      "page": 3,
+      "id": "3-h9",
+      "columns": [
+        {
+          "label": "Minahan, Dem.",
+          "contest": "house9",
+          "candidate": "Daniel F. Minahan"
+        },
+        {
+          "label": "Fort, Rep.",
+          "contest": "house9",
+          "candidate": "Franklin W. Fort"
+        },
+        {
+          "label": "Frenchman, La Follette-Prog.",
+          "contest": "house9",
+          "candidate": "Frenchman"
+        }
+      ],
+      "orientation": "counties_across",
+      "crop": [
+        0.2,
+        0.5624,
+        0.9,
+        0.6208
+      ],
+      "hint": "Read only the block headed 'Ninth District'; ignore any other block visible in the image. Its last column is the Total."
+    },
+    {
+      "page": 3,
+      "id": "3-h10",
+      "columns": [
+        {
+          "label": "Greenwood, Dem.",
+          "contest": "house10",
+          "candidate": "Moses Greenwood"
+        },
+        {
+          "label": "Lehlbach, Rep.",
+          "contest": "house10",
+          "candidate": "Frederick R. Lehlbach"
+        },
+        {
+          "label": "Pollack, Prog.",
+          "contest": "house10",
+          "candidate": "Pollack"
+        }
+      ],
+      "orientation": "counties_across",
+      "crop": [
+        0.2,
+        0.6208,
+        0.9,
+        0.68
+      ],
+      "hint": "Read only the block headed 'Tenth District'; ignore any other block visible in the image. Its last column is the Total."
+    },
+    {
+      "page": 3,
+      "id": "3-h11",
+      "columns": [
+        {
+          "label": "Auf Der Heide, Dem.",
+          "contest": "house11",
+          "candidate": "Oscar L. Auf der Heide"
+        },
+        {
+          "label": "Gardner, Rep.",
+          "contest": "house11",
+          "candidate": "John F. Gardner"
+        },
+        {
+          "label": "Tallman, Soc.",
+          "contest": "house11",
+          "candidate": "Tallman"
+        },
+        {
+          "label": "Steiner, Worker",
+          "contest": "house11",
+          "candidate": "Steiner"
+        }
+      ],
+      "orientation": "counties_across",
+      "crop": [
+        0.2,
+        0.68,
+        0.9,
+        0.7491
+      ],
+      "hint": "Read only the block headed 'Eleventh District'; ignore any other block visible in the image. Its last column is the Total."
+    },
+    {
+      "page": 3,
+      "id": "3-h12",
+      "columns": [
+        {
+          "label": "Norton, Dem.",
+          "contest": "house12",
+          "candidate": "Mary T. Norton"
+        },
+        {
+          "label": "Story, Rep.",
+          "contest": "house12",
+          "candidate": "Douglas D. T. Story"
+        },
+        {
+          "label": "Sidler, Ind.",
+          "contest": "house12",
+          "candidate": "Sidler"
+        },
+        {
+          "label": "Blohm, Worker",
+          "contest": "house12",
+          "candidate": "Blohm"
+        },
+        {
+          "label": "Ambry, War Veteran",
+          "contest": "house12",
+          "candidate": "Ambry"
+        }
+      ],
+      "orientation": "counties_across",
+      "crop": [
+        0.2,
+        0.7491,
+        0.9,
+        0.8375
+      ],
+      "hint": "Read only the block headed 'Twelfth District'; ignore any other block visible in the image. Its last column is the Total."
+    }
+  ],
+  "unit_codes": {
+    "Pas.": "34031",
+    "Passaic": "34031"
+  }
+}
