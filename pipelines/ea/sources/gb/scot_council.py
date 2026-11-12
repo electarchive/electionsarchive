@@ -1,5 +1,6 @@
 import io
 import json
+import os
 import re
 import struct
 import subprocess
@@ -56,6 +57,8 @@ def stage_url(member: str, name: str, url: str) -> str:
 
 
 def fetch() -> None:
+    if "SCOT_BY" in os.environ:
+        return fetch_by()
     for url, suffix in ((EMB, ".xlsx"), (INDEX, ".html"), (BUNDLE, ".zip")):
         raw.fetch(SOURCE, url, suffix=suffix)
     path = raw.cached(SOURCE, BUNDLE).path
@@ -127,7 +130,106 @@ def ward_key(text: str) -> str:
     return re.sub(r" ward$", "", re.sub(r"^ward \d+ ?", "", fold(text)))
 
 
+def unwrap(lines: list[str]) -> list[str]:
+    merged: list[str] = []
+    for line in lines:
+        filled = [index for index in range(len(merged) - 1, -1, -1) if merged[index].strip()][:2]
+        if (
+            filled
+            and line.strip()
+            and not line[0].isspace()
+            and re.search(NUMBER + r"\s*$", line.rstrip()) is None
+            and merged[filled[0]][:1].isspace()
+            and re.fullmatch(
+                r"\s*(?:" + NUMBER + r"\s+)*" + NUMBER + r"(?:\s+(?:Elected|Excluded))?\s*", merged[filled[0]]
+            )
+        ):
+            numbers = merged.pop(filled[0]).strip()
+            fields = re.split(r"\s{2,}", line.strip())
+            if (
+                len(filled) > 1
+                and merged[filled[1]][:1].isspace()
+                and re.search(r"\d|Candidate|Affiliation", merged[filled[1]]) is None
+            ):
+                fields[1:] = [" ".join([merged.pop(filled[1]).strip(), *fields[1:]])]
+            merged.append("  ".join([*fields, numbers]))
+            continue
+        merged.append(line)
+    return merged
+
+
+def read_stages(
+    text: str,
+) -> tuple[
+    dict[str, Decimal],
+    list[tuple[int, str, Decimal, str | None]],
+    dict[int, Decimal],
+    set[str],
+    list[str],
+    dict[str, str],
+]:
+    facts = {
+        key: Decimal(found.group(1).replace(",", ""))
+        for key, pattern in (
+            ("valid", r"Total Number of Valid Votes\s+(" + NUMBER + ")"),
+            ("seats", r"Positions to be Filled\s+(" + NUMBER + ")"),
+            ("quota", r"Quota\s+(" + NUMBER + ")"),
+        )
+        if (found := re.search(pattern, text)) is not None
+    }
+    stage = 0
+    rows: list[tuple[int, str, Decimal, str | None]] = []
+    exhausted: dict[int, Decimal] = {}
+    dropped: set[str] = set()
+    odd = []
+    affiliations: dict[str, str] = {}
+    lines = unwrap(text.splitlines())
+    for index, line in enumerate(lines):
+        if (found := re.match(r"\s*Stage (\d+)\s*$", line)) is not None:
+            stage = int(found.group(1))
+            continue
+        if (
+            stage == 1
+            and rows
+            and index
+            and lines[index - 1].strip()
+            and re.fullmatch(r"\s{20,}\S.*", line)
+            and not re.search(r"\d|Total|Votes", line)
+        ):
+            affiliations[rows[-1][1]] = f"{affiliations.get(rows[-1][1], '')} {line.strip()}".strip()
+            continue
+        if stage == 0 or not line.strip() or line[0].isspace():
+            continue
+        if (found := re.match(r"Exclusion of (.+?)(?:\s{2,}|$)", line)) is not None:
+            dropped.add(name_key(found.group(1)))
+            continue
+        if re.match(r"(Surplus of|Report Name|Transfer of|Total\s)", line):
+            continue
+        status_found = re.search(r"\s(Elected|Excluded)$", line.rstrip())
+        outcome = status_found.group(1) if status_found else None
+        fields = re.split(r"\s{2,}", line.rstrip()[: status_found.start()] if status_found else line.strip())
+        numbers = []
+        while fields and re.fullmatch(NUMBER, fields[-1]):
+            numbers.insert(0, fields.pop())
+        if not numbers and fields and rows and rows[-1][0] == stage:
+            rows[-1] = (stage, f"{rows[-1][1]} {fields[0]}", rows[-1][2], rows[-1][3])
+            continue
+        if not numbers or not fields:
+            odd.append(line.strip())
+            continue
+        value = Decimal(numbers[-1].replace(",", ""))
+        if fields[0].startswith("Non-transferable votes"):
+            exhausted[stage] = exhausted.get(stage, Decimal(0)) + value
+            continue
+        rows.append((stage, fields[0], value, outcome))
+        if stage == 1 and len(fields) > 1:
+            affiliations[fields[0]] = fields[1]
+    return facts, rows, exhausted, dropped, odd, affiliations
+
+
 def parse() -> None:
+    if "SCOT_BY" in os.environ:
+        return parse_by()
     emb = pl.read_excel(raw.cached(SOURCE, EMB).path, sheet_name="RawDetails", engine="calamine")
     features = [
         feature
@@ -179,48 +281,7 @@ def parse() -> None:
         text = subprocess.run(
             ["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True
         ).stdout
-        facts = {
-            key: Decimal(found.group(1).replace(",", ""))
-            for key, pattern in (
-                ("valid", r"Total Number of Valid Votes\s+(" + NUMBER + ")"),
-                ("seats", r"Positions to be Filled\s+(" + NUMBER + ")"),
-                ("quota", r"Quota\s+(" + NUMBER + ")"),
-            )
-            if (found := re.search(pattern, text)) is not None
-        }
-        stage = 0
-        rows: list[tuple[int, str, Decimal, str | None]] = []
-        exhausted: dict[int, Decimal] = {}
-        dropped: set[str] = set()
-        odd = []
-        for line in text.splitlines():
-            if (found := re.match(r"\s*Stage (\d+)\s*$", line)) is not None:
-                stage = int(found.group(1))
-                continue
-            if stage == 0 or not line.strip() or line[0].isspace():
-                continue
-            if (found := re.match(r"Exclusion of (.+?)(?:\s{2,}|$)", line)) is not None:
-                dropped.add(name_key(found.group(1)))
-                continue
-            if re.match(r"(Surplus of|Report Name|Transfer of)", line):
-                continue
-            status_found = re.search(r"\s(Elected|Excluded)$", line.rstrip())
-            outcome = status_found.group(1) if status_found else None
-            fields = re.split(r"\s{2,}", line.rstrip()[: status_found.start()] if status_found else line.strip())
-            numbers = []
-            while fields and re.fullmatch(NUMBER, fields[-1]):
-                numbers.insert(0, fields.pop())
-            if not numbers and fields and rows and rows[-1][0] == stage:
-                rows[-1] = (stage, f"{rows[-1][1]} {fields[0]}", rows[-1][2], rows[-1][3])
-                continue
-            if not numbers or not fields:
-                odd.append(line.strip())
-                continue
-            value = Decimal(numbers[-1].replace(",", ""))
-            if fields[0].startswith("Non-transferable votes"):
-                exhausted[stage] = exhausted.get(stage, Decimal(0)) + value
-                continue
-            rows.append((stage, fields[0], value, outcome))
+        facts, rows, exhausted, dropped, odd, _ = read_stages(text)
         names = [label for number, label, _, _ in rows if number == 1]
         found_emb = [
             key
@@ -440,7 +501,31 @@ VOTES, REGISTERED, BALLOTS, VALID, INVALID, EXHAUSTED, QUOTA = 1, 2, 3, 4, 5, 21
 OGL = "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
 
 
+def party_of(cs: Changeset, parties: dict[str, UUID], label: str | None) -> UUID | None:
+    if label is None or label == "Independent" or label in umit.NOT_PARTIES:
+        return None
+    key = scottish_parliament.PARTY_KEYS.get(label.lower()) or umit.ALIASES.get(label) or slug(label)
+    if key not in parties:
+        if key in umit.EXISTING:
+            parties[key] = cs.key(*umit.EXISTING[key])
+        else:
+            parties[key] = cs.key("gb.party", key)
+            if parties[key] in cs.minted:
+                cs.add("party", id=parties[key], kind="party", polity_id=cs.polity("GB"))
+                cs.add(
+                    "name",
+                    entity_id=parties[key],
+                    text=umit.NAMES.get(key, label),
+                    lang="en",
+                    kind="official",
+                    is_preferred=True,
+                )
+    return parties[key]
+
+
 def emit() -> Path:
+    if "SCOT_BY" in os.environ:
+        return emit_by()
     units = pl.read_parquet(PARSED / "units.parquet").filter(pl.col("status") == "loaded")
     totals = pl.read_parquet(PARSED / "totals.parquet")
     shapes = {code: (geom, point) for code, geom, point in pl.read_parquet(PARSED / "shapes.parquet").rows()}
@@ -474,27 +559,12 @@ def emit() -> Path:
         def name(entity: UUID, text: str) -> None:
             cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
 
-        gb = cs.polity("GB")
         scotland = cs.polity("GB-SCT")
         country = cs.area("gb.country", "SCT", DAY)
         system = cs.key("gb.electoral_system", "stv")
         if cs.minted & {country, system}:
             raise ValueError("publish gb.umit and the stv electoral system first")
         parties: dict[str, UUID] = {}
-
-        def party_of(label: str | None) -> UUID | None:
-            if label is None or label == "Independent" or label in umit.NOT_PARTIES:
-                return None
-            key = scottish_parliament.PARTY_KEYS.get(label.lower()) or umit.ALIASES.get(label) or slug(label)
-            if key not in parties:
-                if key in umit.EXISTING:
-                    parties[key] = cs.key(*umit.EXISTING[key])
-                else:
-                    parties[key] = cs.key("gb.party", key)
-                    if parties[key] in cs.minted:
-                        cs.add("party", id=parties[key], kind="party", polity_id=gb)
-                        name(parties[key], umit.NAMES.get(key, label))
-            return parties[key]
 
         emb_source = cs.source("Electoral Management Board for Scotland", "Local Government Elections 2022 - Results")
         cs.add(
@@ -752,7 +822,7 @@ def emit() -> Path:
                 .unique(maintain_order=True, subset=["number"])
                 .iter_rows(named=True)
             ):
-                owner = party_of(candidate["party"])
+                owner = party_of(cs, parties, candidate["party"])
                 full = " ".join(
                     spellings.get(
                         word.lower(),
@@ -827,4 +897,380 @@ def emit() -> Path:
             is None
         ):
             raise ValueError("the gb.ward 2022 boundary set is missing")
+        return cs.write()
+
+
+BY_ELECTIONS = Path(__file__).with_name("scot_by_elections.tsv")
+BY = PARSED / "by"
+RECODED = {"S12000015": "S12000047", "S12000024": "S12000048", "S12000044": "S12000050", "S12000046": "S12000049"}
+DESCRIPTIONS = (
+    (r"independent green voice", "Independent Green Voice"),
+    (r"scottish national|\bsnp\b", "Scottish National Party"),
+    (r"conservative", "Scottish Conservative and Unionist Party"),
+    (r"liberal democrat", "Scottish Liberal Democrats"),
+    (r"labour", "Scottish Labour Party"),
+    (r"green", "Scottish Green Party"),
+    (r"^alba", "Alba Party"),
+    (r"scottish family", "Scottish Family Party"),
+    (r"libertarian", "Scottish Libertarian Party"),
+    (r"trade unionist and socialist|\btusc\b", "Scottish Trade Unionist and Socialist Coalition"),
+    (r"independence for scotland", "Independence for Scotland Party"),
+    (r"uk independence|\bukip\b", "UK Independence Party"),
+    (r"scottish socialist", "Scottish Socialist Party"),
+    (r"^reform ?uk", "Reform UK"),
+    (r"^restore britain", "Restore Britain"),
+    (r"alliance for democracy and freedom", "Alliance for Democracy and Freedom"),
+    (r"edinburgh and east lothian people", "Edinburgh & East Lothian People"),
+    (r"progressive change north lanarkshire", "Progressive Change North Lanarkshire"),
+    (r"freedom alliance", "Freedom Alliance- Integrity, Society, Economy"),
+    (r"sovereignty", "Sovereignty"),
+    (r"vanguard", "Vanguard Party"),
+    (r"social democratic", "Social Democratic Party"),
+    (r"communist party", "Communist Party of Britain"),
+    (r"workers party", "Workers Party of Britain"),
+    (r"british unionist", "British Unionist Party"),
+    (r"^independent$|^$", "Independent"),
+)
+
+
+def national(description: str | None) -> str | None:
+    text = fold(description or "")
+    return next((label for pattern, label in DESCRIPTIONS if re.search(pattern, text)), None)
+
+
+def pdf_text(path: Path) -> str:
+    return subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True).stdout
+
+
+def declares(text: str, label: str, votes: Decimal) -> bool:
+    lines = text.splitlines()
+    return any(
+        Decimal(number.replace(",", "")) == votes
+        for index, line in enumerate(lines)
+        if re.match(rf"\s*{re.escape(label)}(\s|$)", line, re.IGNORECASE)
+        for number in re.findall(r"\d[\d,]*", " ".join(lines[max(index - 1, 0) : index + 2]))
+    )
+
+
+def fetch_by() -> None:
+    for row in pl.read_csv(BY_ELECTIONS, separator="\t", infer_schema=False).iter_rows(named=True):
+        for url in (row["stages"], row["declaration"]):
+            if url is None:
+                continue
+            try:
+                raw.cached(SOURCE, url)
+            except LookupError:
+                try:
+                    raw.fetch(SOURCE, url, suffix=".pdf")
+                except httpx.HTTPError as error:
+                    print(f"{row['ballot']}: {url}: {error}")
+                time.sleep(1)
+
+
+def parse_by() -> None:
+    wards = {
+        row["ballot"]: row
+        for path in sorted((DATA / "parsed" / "gb.dc_local" / "by").glob("*-wards.parquet"))
+        for row in pl.read_parquet(path).filter(pl.col("territory") == "SCT").iter_rows(named=True)
+    }
+    units: list[dict[str, str | int | date | None]] = []
+    totals: list[dict[str, str | int | bool | None]] = []
+    for row in pl.read_csv(BY_ELECTIONS, separator="\t", infer_schema=False).iter_rows(named=True):
+        ward = wards[row["ballot"]]
+        key = f"{ward['day']}:local:{ward['ward_code']}:by"
+        unit: dict[str, str | int | date | None] = {
+            "key": key,
+            "ballot": row["ballot"],
+            "day": ward["day"],
+            "council_code": RECODED.get(ward["la_code"], ward["la_code"]),
+            "ward_code": ward["ward_code"],
+            "ward_name": ward["ons_name"],
+            "stages": row["stages"],
+            "declaration": row["declaration"],
+        }
+        units.append(unit)
+        if row["stages"] is None:
+            unit["status"] = row["note"] or "no stage report"
+            continue
+        stages_text = pdf_text(raw.cached(SOURCE, row["stages"]).path)
+        facts, rows, exhausted, dropped, odd, affiliations = read_stages(stages_text)
+        declared = pdf_text(raw.cached(SOURCE, row["declaration"]).path) if row["declaration"] else ""
+        counts: dict[str, int | None] = {}
+        for name, pattern in (
+            ("electorate", r"electorate was ([\d,]+)"),
+            ("ballots", r"ballot papers received was ([\d,]+)"),
+            ("invalid", r"[Tt]here\s+were\s+([\d,]+)\s+rejected"),
+        ):
+            found = re.search(pattern, declared)
+            counts[name] = int(found.group(1).replace(",", "")) if found else None
+        if (found := re.search(r"There\s+was\s+1\s+rejected", declared)) is not None:
+            counts["invalid"] = 1
+        if counts["ballots"] is None and (
+            found := re.search(r"Total number of Ballot Papers Received\s+([\d,]+)", stages_text)
+        ):
+            counts["ballots"] = int(found.group(1).replace(",", ""))
+        unit |= counts
+        ballots, invalid = counts["ballots"], counts["invalid"]
+        names = [label for number, label, _, _ in rows if number == 1]
+        elected = {label for _, label, _, outcome in rows if outcome == "Elected"}
+        stages = sorted({number for number, _, _, _ in rows})
+        status = "loaded"
+        if odd:
+            status = f"unread lines: {odd[:3]}"
+        elif not names or "valid" not in facts:
+            status = "no stages read"
+        elif len(elected) != facts.get("seats"):
+            status = "elected do not fill the seats"
+        elif ballots is not None and invalid is not None and ballots - invalid != facts["valid"]:
+            status = "ballots less rejected differ from the valid votes"
+        elif declared and any(not declares(declared, label, votes) for number, label, votes, _ in rows if number == 1):
+            status = "stage 1 differs from the declaration"
+        else:
+            for number in stages:
+                total = exhausted.get(number, Decimal(0)) + sum(votes for at, _, votes, _ in rows if at == number)
+                if total != facts["valid"]:
+                    status = f"stage {number} sums to {total}, not {facts['valid']}"
+                    break
+            for candidate in sorted(elected):
+                if status != "loaded":
+                    break
+                best = max(votes for _, label, votes, _ in rows if label == candidate)
+                when = min(number for number, label, _, outcome in rows if label == candidate and outcome == "Elected")
+                if best < facts["quota"] and when != stages[-1]:
+                    status = f"{candidate} elected below the quota before the last stage"
+        unit |= {
+            "status": status,
+            "seats": int(facts["seats"]) if "seats" in facts else None,
+            "valid": str(facts.get("valid")),
+            "quota": str(facts.get("quota")),
+        }
+        missing = [label for label in names if national(affiliations.get(label)) is None]
+        if status == "loaded" and missing:
+            unit["status"] = f"unmapped descriptions: {[affiliations.get(label) for label in missing]}"
+        if unit["status"] != "loaded":
+            continue
+        order = {label: number for number, label in enumerate(names, start=1)}
+        when = {
+            label: min(number for number, other, _, outcome in rows if other == label and outcome == "Elected")
+            for label in elected
+        }
+        for number, label, votes, _ in rows:
+            totals.append(
+                {
+                    "key": key,
+                    "number": order[label],
+                    "name": label,
+                    "description": affiliations.get(label),
+                    "party": national(affiliations.get(label)),
+                    "elected": label in elected,
+                    "outcome": "elected"
+                    if label in elected
+                    else ("eliminated" if name_key(label) in dropped else "lost"),
+                    "stage": number,
+                    "stage_elected": when.get(label),
+                    "votes": str(votes),
+                }
+            )
+        for number in stages:
+            totals.append({"key": key, "number": 0, "stage": number, "votes": str(exhausted.get(number, Decimal(0)))})
+    frame = pl.DataFrame(units, infer_schema_length=None)
+    print(frame.group_by("status").len().sort("len", descending=True).rows())
+    BY.mkdir(parents=True, exist_ok=True)
+    frame.write_parquet(BY / "units.parquet")
+    pl.DataFrame(totals, infer_schema_length=None).write_parquet(BY / "totals.parquet")
+
+
+def emit_by() -> Path:
+    units = pl.read_parquet(BY / "units.parquet").filter(pl.col("status") == "loaded")
+    totals = pl.read_parquet(BY / "totals.parquet")
+    with connect() as conn:
+        cs = Changeset(
+            conn,
+            pipeline=SOURCE,
+            version=VERSION,
+            summary="Scottish council by-elections since May 2017 by ward with every STV stage, from the councils' "
+            "count reports",
+            polity="GB-SCT",
+        )
+
+        def name(entity: UUID, text: str) -> None:
+            cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
+
+        def held(entity: UUID, what: str) -> UUID:
+            if entity in cs.minted:
+                raise ValueError(f"{what} is not held; publish gb.scot_council and gb.leap_scot first")
+            return entity
+
+        system = held(cs.key("gb.electoral_system", "stv"), "the stv electoral system")
+        parties: dict[str, UUID] = {}
+        elections: set[UUID] = set()
+        for unit_row in units.sort("day", "ward_code").iter_rows(named=True):
+            code, ward_code, label, day = (
+                unit_row["council_code"],
+                unit_row["ward_code"],
+                unit_row["ward_name"],
+                unit_row["day"],
+            )
+            polity = held(cs.key("gb.polity", code), code)
+            body = held(cs.key("gb.body", code), code)
+            found = conn.execute(
+                "select s.path, n.text from slug s join name n on n.entity_id = %s and n.is_preferred "
+                "where s.entity_id = %s order by s.is_current desc limit 1",
+                [body, polity],
+            ).fetchone()
+            if found is None:
+                raise ValueError(f"{code} has no slug")
+            path, authority = found
+            election = cs.key("gb.election", f"{day}:local:{code}")
+            if election not in elections:
+                elections.add(election)
+                cs.add(
+                    "election",
+                    id=election,
+                    polity_id=polity,
+                    kind="by_election",
+                    date_from=day,
+                    date_to=day,
+                    status="held",
+                )
+                name(election, f"{authority} by-election, {day.day} {day:%B %Y}")
+                cs.add("slug", path=f"{path}/{day}-local", entity_id=election)
+            ward = held(cs.area("gb.ward", ward_code), ward_code)
+            unit = held(cs.unit("gb.ward", ward_code), ward_code)
+            contest_key = unit_row["key"]
+            contest = cs.key("gb.contest", contest_key)
+            cs.add(
+                "contest",
+                id=contest,
+                election_id=election,
+                kind="body_seats",
+                body_id=body,
+                district_area_id=ward,
+                magnitude=unit_row["seats"],
+                round_number=1,
+                electoral_system_id=system,
+                default_result_kind="counted",
+                term="remainder",
+            )
+            name(contest, f"{label} ward by-election, {authority}, {day.year}")
+            cs.add("slug", path=f"{path}/{day}-local/{slug(label)}-by-election", entity_id=contest)
+            cs.add("external_id", entity_id=contest, scheme="democracyclub.ballot", value=unit_row["ballot"])
+            title = f"{label} ward by-election, {day.day} {day:%B %Y}: count reports"
+            source = cs.source(authority, title)
+            cs.add(
+                "source",
+                id=source,
+                kind="official_body",
+                publisher=authority,
+                title=title,
+                url=unit_row["stages"],
+                license="Open Government Licence v3.0",
+                license_url=OGL,
+                attribution=authority,
+                notes="The returning officer's Candidate Votes per Stage report"
+                + (" and Declaration of Results" if unit_row["declaration"] else "")
+                + ", as published by the council.",
+            )
+            result_set = cs.key("gb.scot_council.result_set", contest_key)
+            cs.add(
+                "result_set",
+                id=result_set,
+                election_id=election,
+                contest_id=contest,
+                stage="official",
+                kind="counted",
+                status="active",
+                source_id=source,
+                is_default=True,
+                completeness=1,
+            )
+            for url in (unit_row["stages"], unit_row["declaration"]):
+                if url is not None:
+                    cs.artifact(raw.cached(SOURCE, url), source)
+                    cs.add("citation", entity_id=result_set, source_id=source, locator={"file": url})
+            for measure, amount in (
+                (REGISTERED, unit_row["electorate"]),
+                (BALLOTS, unit_row["ballots"]),
+                (VALID, unit_row["valid"]),
+                (INVALID, unit_row["invalid"]),
+                (QUOTA, unit_row["quota"]),
+            ):
+                if amount is not None:
+                    cs.add(
+                        "result_value",
+                        result_set_id=result_set,
+                        unit_id=unit,
+                        option_id=None,
+                        channel=0,
+                        measure=measure,
+                        count_round=0,
+                        flags=0,
+                        value=Decimal(str(amount)),
+                    )
+            lines = totals.filter(pl.col("key") == contest_key)
+            for candidate in (
+                lines.filter(pl.col("number") > 0).unique(maintain_order=True, subset=["number"]).iter_rows(named=True)
+            ):
+                owner = party_of(cs, parties, candidate["party"])
+                full = " ".join(
+                    re.sub(
+                        r"\b(Mc|Mac|O')([a-z])",
+                        lambda found: found.group(1) + found.group(2).upper(),
+                        re.sub(r"[^\W\d_']+", lambda part: part.group(0).capitalize(), word),
+                    )
+                    if word.isupper() and len(word) > 1
+                    else word
+                    for word in candidate["name"].split()
+                )
+                option_key = f"{contest_key}:{candidate['number']}"
+                option = cs.key("gb.scot_council.option", option_key)
+                person = cs.key("gb.scot_council.person", option_key)
+                cs.add("person", id=person)
+                name(person, full)
+                cs.add(
+                    "contest_option", id=option, contest_id=contest, kind="candidate", party_id=owner, ballot_label=full
+                )
+                cs.add(
+                    "candidacy",
+                    id=cs.key("gb.scot_council.candidacy", option_key),
+                    person_id=person,
+                    option_id=option,
+                    role="head",
+                    ballot_name=candidate["name"],
+                    member_of_party_id=owner,
+                    is_independent=candidate["party"] == "Independent",
+                )
+                for row in lines.filter(pl.col("number") == candidate["number"]).sort("stage").iter_rows(named=True):
+                    cs.add(
+                        "result_value",
+                        result_set_id=result_set,
+                        unit_id=unit,
+                        option_id=option,
+                        channel=0,
+                        measure=VOTES,
+                        count_round=row["stage"],
+                        flags=0,
+                        value=Decimal(row["votes"]),
+                    )
+                    if Decimal(row["votes"]) == 0 and row["stage"] > 1 and not candidate["elected"]:
+                        break
+                cs.add(
+                    "outcome",
+                    result_set_id=result_set,
+                    option_id=option,
+                    kind=candidate["outcome"],
+                    notes=f"Elected at stage {candidate['stage_elected']}." if candidate["elected"] else None,
+                )
+            for row in lines.filter(pl.col("number") == 0).iter_rows(named=True):
+                cs.add(
+                    "result_value",
+                    result_set_id=result_set,
+                    unit_id=unit,
+                    option_id=None,
+                    channel=0,
+                    measure=EXHAUSTED,
+                    count_round=row["stage"],
+                    flags=0,
+                    value=Decimal(row["votes"]),
+                )
         return cs.write()
