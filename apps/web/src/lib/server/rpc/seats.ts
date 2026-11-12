@@ -894,7 +894,7 @@ export const seats = {
           from contest c join tree on tree.id = c.election_id join election e on e.id = c.election_id
           join body b on b.id = c.body_id join slug bp on bp.entity_id = b.polity_id and bp.is_current
           left join boundary_set bs on bs.id = c.boundary_set_id
-          where c.kind = 'body_seats' and c.allocation_parent_id is null and c.party_scope_id is null
+          where c.kind = 'body_seats' and not c.notional and c.allocation_parent_id is null and c.party_scope_id is null
             and c.district_area_id is not null and (coalesce(c.magnitude, 1) = 1 or bp.path = 'ie')
             and ((bp.path = 'us' and b.kind = 'lower_house') or not (bp.path = 'us' or bp.path like 'us/%'))
             and ${input.within == null ? sql`true` : inside(input.within, sql`c.district_area_id`, sql`e.date_from`)}
