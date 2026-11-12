@@ -1,5 +1,7 @@
 import json
+import os
 import time
+from collections.abc import Callable
 from datetime import date
 from pathlib import Path
 from uuid import UUID
@@ -25,6 +27,13 @@ DAYS = {
     2025: date(2025, 5, 1),
     2026: date(2026, 5, 7),
 }
+POLLING_DAYS = DAYS | {2020: date(2020, 5, 7), 2021: date(2021, 5, 6), 2022: date(2022, 5, 5)}
+BY_BALLOTS = (
+    "https://elections.democracyclub.org.uk/api/elections/?election_id_regex="
+    "%5Elocal%5C.{council}%5B%5E.%5D%2A%5C.%5B%5E.%5D%2B%5C.by%5C.{year}-{month}&limit=100"
+)
+BY_ELSEWHERE = ("local.city-of-london.", "local.isles-of-scilly.")
+BY = PARSED / "by"
 RESULTS = "https://candidates.democracyclub.org.uk/media/csv-archives/results-{day}.csv"
 ARCHIVED = {2018, 2019, 2023}
 SAMPLED = {2026}
@@ -53,12 +62,52 @@ LOOKUPS = {
     2017: ("WD17_LAD17_CTY17_OTH_UK_LUv2_c8956eca906348fd9e3bb1f6af54f2ce", "17", 9131, PAGE),
     2018: ("WD18_LAD18_CTY18_OTH_UK_LU_971f977f4a444d09842fcfbfd51f8982", "18", 9114, PAGE),
     2019: ("WD19_LAD19_CTY19_OTH_UK_LU_89ea1f028be347e7a44d71743c96b60d", "19", 8887, PAGE),
+    2020: ("WD20_LAD20_UK_LU_v2_3784d8d58a134af091cf9601bd36acdf", "20", 8887, PAGE),
+    2022: ("WD22_LAD22_UK_LU", "22", 8483, 1000),
     2023: ("WD23_LAD23_CTY23_OTH_UK_LU", "23", 8441, 1000),
     2024: ("WD24_LAD24_UK_LU", "24", 8396, 1000),
     2025: ("WD25_LAD25_UK_LU_v2", "25", 8405, 1000),
     2026: ("WD26_LAD26_UK_LU", "26", 8413, 1000),
 }
 LAYERS = {
+    "wd15": (
+        "Wards_December_2015_GCB_in_Great_Britain_2022",
+        "wd15cd",
+        8734,
+        2000,
+        "Wards (December 2015) Boundaries GB BGC",
+    ),
+    "lad15": (
+        "LAD_Dec_2015_GCB_GB_2022",
+        "lad15cd",
+        380,
+        2000,
+        "Local Authority Districts (December 2015) Boundaries GB BGC",
+    ),
+    "wd20": ("Wards_Dec_2020_UK_BGC_2022", "WD20CD", 8887, 2000, "Wards (December 2020) Boundaries UK BGC"),
+    "lad20": (
+        "LAD_DEC_2020_UK_BGC",
+        "LAD20CD",
+        379,
+        2000,
+        "Local Authority Districts (December 2020) Boundaries UK BGC",
+    ),
+    "wd21": ("Wards_December_2021_UK_BGC_2022", "WD21CD", 8694, 2000, "Wards (December 2021) Boundaries UK BGC"),
+    "lad21": (
+        "Local_Authority_Districts_December_2021_UK_BGC_2022",
+        "LAD21CD",
+        374,
+        2000,
+        "Local Authority Districts (December 2021) Boundaries UK BGC",
+    ),
+    "wd22": ("Wards_December_2022_Boundaries_UK_BGC", "WD22CD", 8483, 1000, "Wards (December 2022) Boundaries UK BGC"),
+    "lad22": (
+        "Local_Authority_Districts_December_2022_UK_BGC_V2",
+        "LAD22CD",
+        374,
+        2000,
+        "Local Authority Districts (December 2022) Boundaries UK BGC",
+    ),
     "wd16": (
         "Wards_December_2016_GCB_in_Great_Britain_2022",
         "wd16cd",
@@ -220,20 +269,29 @@ EE_TITLE = "EveryElection"
 VOTES, INVALID = 1, 5
 
 
-def result_pages(year: int) -> list[str]:
-    if year in ARCHIVED:
-        return [RESULTS.format(day=DAYS[year])]
-    first = f"{API.format(day=DAYS[year])}&page_size=200&page=1"
+def day_pages(day: date) -> list[str]:
+    first = f"{API.format(day=day)}&page_size=200&page=1"
     count = json.loads(raw.cached(SOURCE, first).path.read_text())["count"]
-    return [f"{API.format(day=DAYS[year])}&page_size=200&page={page}" for page in range(1, (count - 1) // 200 + 2)]
+    return [f"{API.format(day=day)}&page_size=200&page={page}" for page in range(1, max(count - 1, 0) // 200 + 2)]
+
+
+def result_pages(year: int) -> list[str]:
+    return [RESULTS.format(day=DAYS[year])] if year in ARCHIVED else day_pages(DAYS[year])
 
 
 def result_lines(year: int) -> pl.DataFrame:
     if year in ARCHIVED:
         frame = pl.read_csv(raw.cached(SOURCE, RESULTS.format(day=DAYS[year])).path, infer_schema_length=0)
         return frame.rename({"elected": "is_winner"}) if "is_winner" not in frame.columns else frame
+    frame = day_lines(DAYS[year])
+    if frame.is_empty():
+        raise ValueError(f"{year}: no results")
+    return frame
+
+
+def day_lines(day: date) -> pl.DataFrame:
     rows = []
-    for url in result_pages(year):
+    for url in day_pages(day):
         for record in json.loads(raw.cached(SOURCE, url).path.read_text())["results"]:
             ballot = record["ballot"]["ballot_paper_id"]
             for line in record["candidate_results"]:
@@ -252,10 +310,86 @@ def result_lines(year: int) -> pl.DataFrame:
                         "ballots_cast": str(line["num_ballots"]),
                     }
                 )
-    frame = pl.DataFrame(rows, schema=dict.fromkeys(rows[0], pl.String))
+    columns = (
+        "ballot_paper_id",
+        "election_id",
+        "is_winner",
+        "source",
+        "spoilt_ballots",
+        "person_id",
+        "person_name",
+        "party_name",
+        "ballots_cast",
+    )
+    frame = pl.DataFrame(rows, schema=dict.fromkeys(columns, pl.String))
     if frame.select("ballot_paper_id", "person_id").is_duplicated().any():
-        raise ValueError(f"{year}: a candidate appears twice on a ballot")
+        raise ValueError(f"{day}: a candidate appears twice on a ballot")
     return frame
+
+
+def polite(url: str, suffix: str) -> raw.Artifact:
+    try:
+        return raw.cached(SOURCE, url)
+    except LookupError:
+        pass
+    for _ in range(9):
+        try:
+            artifact = raw.fetch(SOURCE, url, suffix=suffix)
+            time.sleep(2)
+            return artifact
+        except httpx.HTTPStatusError as error:
+            if error.response.status_code != 429 and error.response.status_code < 500:
+                raise
+            time.sleep(30)
+    return raw.fetch(SOURCE, url, suffix=suffix)
+
+
+def by_years() -> list[int]:
+    return sorted({int(year) for year in os.environ["DC_BY"].split(",")}, reverse=True)
+
+
+def by_ballot_pages(year: int, get: Callable[[str], raw.Artifact] = lambda url: raw.cached(SOURCE, url)) -> list[str]:
+    pages = []
+    for month in range(1, 13):
+        url = BY_BALLOTS.format(council="", year=year, month=f"{month:02}")
+        if json.loads(get(url).path.read_text())["count"] <= 100:
+            pages.append(url)
+            continue
+        for council in "abcdefghijklmnopqrstuvwxyz0123456789":
+            part = BY_BALLOTS.format(council=council, year=year, month=f"{month:02}")
+            if json.loads(get(part).path.read_text())["count"] > 100:
+                raise ValueError(f"{part}: more than 100 ballots")
+            pages.append(part)
+    return pages
+
+
+def by_records(year: int) -> list[dict[str, object]]:
+    records = []
+    for url in by_ballot_pages(year):
+        page = json.loads(raw.cached(SOURCE, url).path.read_text())
+        if page["count"] != len(page["results"]):
+            raise ValueError(f"{url}: {page['count']} elections, {len(page['results'])} on the page")
+        records += [
+            {
+                "ballot": record["election_id"],
+                "day": date.fromisoformat(record["poll_open_date"]),
+                "seats": record["seats_contested"],
+                "system": (record["voting_system"] or {}).get("slug"),
+                "gss": (record["division"] or {}).get("official_identifier"),
+                "division": (record["division"] or {}).get("name"),
+                "territory": (record["organisation"] or {}).get("territory_code"),
+                "cancelled": record["cancelled"],
+            }
+            for record in page["results"]
+            if record["identifier_type"] == "ballot"
+            and date.fromisoformat(record["poll_open_date"]) != POLLING_DAYS[year]
+            and not record["election_id"].startswith(BY_ELSEWHERE)
+        ]
+    return records
+
+
+def by_days(year: int) -> list[date]:
+    return sorted({record["day"] for record in by_records(year) if isinstance(record["day"], date)})
 
 
 def ballot_pages(year: int) -> list[str]:
@@ -292,6 +426,20 @@ def layer_pages(key: str) -> list[str]:
 
 
 def fetch() -> None:
+    if "DC_BY" in os.environ:
+        for year in by_years():
+            by_ballot_pages(year, lambda url: polite(url, ".json"))
+            for day in by_days(year):
+                polite(f"{API.format(day=day)}&page_size=200&page=1", ".json")
+                for url in day_pages(day):
+                    polite(url, ".json")
+        for year in LOOKUPS:
+            for url in lookup_pages(year):
+                raw.fetch(SOURCE, url, suffix=".json")
+        for key in LAYERS:
+            for url in layer_pages(key):
+                raw.fetch(SOURCE, url, suffix=".geojson")
+        return
     for year in LOOKUPS:
         for url in lookup_pages(year):
             raw.fetch(SOURCE, url, suffix=".json")
@@ -402,15 +550,40 @@ def locate_divisions(found: pl.DataFrame, divisions: pl.DataFrame) -> pl.DataFra
     ).drop("council", "key", "county", "match", "ced_name", "ced_county")
 
 
-def parse() -> None:
-    wards, candidates, lookups = [], [], []
+def statuses(council_file: pl.Expr) -> pl.Expr:
+    press = pl.col("source").str.to_lowercase().str.contains("|".join(PRESS).replace(".", r"\."))
+    return (
+        pl.when(pl.col("system").is_null())
+        .then(pl.lit("no EveryElection ballot"))
+        .when(pl.col("territory").is_in(["ENG", "WLS"]).not_())
+        .then(pl.lit("outside England and Wales"))
+        .when(pl.col("system") != "FPTP")
+        .then(pl.lit("not first past the post"))
+        .when(pl.col("cancelled"))
+        .then(pl.lit("cancelled"))
+        .when(pl.col("coded").not_())
+        .then(pl.lit("no GSS code"))
+        .when(pl.col("la_code").is_null())
+        .then(pl.lit("code not in the ONS ward lookup"))
+        .when(pl.col("source").str.contains(r"(?i)andrewteale|\bLEAP\b"))
+        .then(pl.lit("source is LEAP"))
+        .when((press | pl.col("source").str.contains(r"https?://|www\.").not_()) & council_file.not_())
+        .then(pl.lit("source is not the council"))
+        .when(pl.col("winners") != pl.col("seats"))
+        .then(pl.lit("winners do not equal seats"))
+        .otherwise(pl.lit("loaded"))
+    )
+
+
+def lookup_frame() -> pl.DataFrame:
+    frames = []
     for year, (_, suffix, _, _) in LOOKUPS.items():
         rows = [
             feature["attributes"]
             for url in lookup_pages(year)
             for feature in json.loads(raw.cached(SOURCE, url).path.read_text())["features"]
         ]
-        lookups.append(
+        frames.append(
             pl.DataFrame(rows, infer_schema_length=None).select(
                 year=pl.lit(year),
                 ward_code=pl.col(f"WD{suffix}CD"),
@@ -419,7 +592,128 @@ def parse() -> None:
                 la_name=pl.col(f"LAD{suffix}NM"),
             )
         )
-    lookup = pl.concat(lookups)
+    return pl.concat(frames)
+
+
+def layer_codes(key: str) -> set[str]:
+    field = LAYERS[key][1]
+    return {
+        feature["properties"][field]
+        for url in layer_pages(key)
+        for feature in json.loads(raw.cached(SOURCE, url).path.read_text())["features"]
+    }
+
+
+def nearest(vintage: int, code: str, held: dict[int, set[str]]) -> int | None:
+    return min(
+        (year for year, codes in held.items() if code in codes),
+        key=lambda year: (abs(year - vintage), -year),
+        default=None,
+    )
+
+
+def parse_by() -> None:
+    lookup = lookup_frame()
+    lookups_held = {held: set(codes) for held, codes in lookup.group_by("year").agg("ward_code").iter_rows()}
+    wards_held = {int(key[2:]) + 2000: layer_codes(key) for key in LAYERS if key.startswith("wd")}
+    councils_held = {int(key[3:]) + 2000: layer_codes(key) for key in LAYERS if key.startswith("lad")}
+    BY.mkdir(parents=True, exist_ok=True)
+    for year in by_years():
+        records = by_records(year)
+        count = sum(json.loads(raw.cached(SOURCE, url).path.read_text())["count"] for url in by_ballot_pages(year))
+        ballots = pl.DataFrame(records, infer_schema_length=None)
+        if ballots["ballot"].is_duplicated().any():
+            raise ValueError(f"{year}: EveryElection lists a by-election twice")
+        results = pl.concat([day_lines(day) for day in by_days(year)]).join(
+            ballots.select(ballot_paper_id="ballot"), on="ballot_paper_id"
+        )
+        found = (
+            ballots.join(
+                results.group_by("ballot_paper_id", maintain_order=True)
+                .agg(
+                    winners=(pl.col("is_winner") == "True").sum(),
+                    source=pl.col("source").first(),
+                    spoilt=pl.col("spoilt_ballots").cast(pl.Int64, strict=False).max(),
+                )
+                .rename({"ballot_paper_id": "ballot"}),
+                on="ballot",
+                how="left",
+            )
+            .with_columns(
+                year=pl.lit(year),
+                vintage=pl.when(pl.col("day") < POLLING_DAYS[year]).then(pl.lit(year - 1)).otherwise(pl.lit(year)),
+                ward_code=pl.col("gss").str.strip_prefix("gss:"),
+                by=pl.lit(True),
+                coded=pl.col("gss").str.starts_with("gss:").fill_null(False),
+            )
+            .with_columns(
+                lookup_year=pl.struct("vintage", "ward_code").map_elements(
+                    lambda row: nearest(row["vintage"], row["ward_code"] or "", lookups_held),
+                    return_dtype=pl.Int64,
+                )
+            )
+            .join(lookup.rename({"year": "lookup_year"}), on=["lookup_year", "ward_code"], how="left")
+            .with_columns(
+                shape=pl.struct("vintage", "ward_code").map_elements(
+                    lambda row: (
+                        None
+                        if (held := nearest(row["vintage"], row["ward_code"] or "", wards_held)) is None
+                        else f"wd{held % 100}"
+                    ),
+                    return_dtype=pl.String,
+                ),
+                la_layer=pl.struct("vintage", "la_code").map_elements(
+                    lambda row: (
+                        None
+                        if (held := nearest(row["vintage"], row["la_code"] or "", councils_held)) is None
+                        else f"lad{held % 100}"
+                    ),
+                    return_dtype=pl.String,
+                ),
+            )
+        )
+        found = found.with_columns(
+            status=pl.when(pl.col("winners").is_null())
+            .then(pl.lit("no Democracy Club result"))
+            .otherwise(statuses(pl.lit(False)))
+        )
+        print(year, count, "ballots,", len(found), "off the polling day")
+        print("  ", found.group_by("status").len().sort("len", descending=True).rows())
+        print(
+            "   Scottish with results:",
+            found.filter(pl.col("territory") == "SCT", pl.col("winners").is_not_null()).height,
+            "Scottish without:",
+            found.filter(pl.col("territory") == "SCT", pl.col("winners").is_null()).height,
+        )
+        for row in found.filter(
+            pl.col("status").is_in(["no GSS code", "code not in the ONS ward lookup", "winners do not equal seats"])
+        ).iter_rows(named=True):
+            print("  ", row["status"], row["ballot"], row["gss"], row["winners"], row["seats"])
+        loaded = found.filter(pl.col("status") == "loaded")
+        needed: dict[str, set[str]] = {}
+        for layer, code in [
+            *loaded.select("shape", "ward_code").rows(),
+            *loaded.select("la_layer", "la_code").rows(),
+        ]:
+            if layer is not None:
+                needed.setdefault(layer, set()).add(code)
+        found.write_parquet(BY / f"{year}-wards.parquet")
+        results.rename({"ballot_paper_id": "ballot"}).join(loaded.select("ballot"), on="ballot").select(
+            "ballot",
+            "person_id",
+            "person_name",
+            "party_name",
+            votes=pl.col("ballots_cast").cast(pl.Int64),
+            elected=pl.col("is_winner") == "True",
+        ).write_parquet(BY / f"{year}-candidates.parquet")
+        shapes_for(needed).write_parquet(BY / f"{year}-shapes.parquet")
+
+
+def parse() -> None:
+    if "DC_BY" in os.environ:
+        return parse_by()
+    wards, candidates = [], []
+    lookup = lookup_frame()
     ced = divisions()
     for year in DAYS:
         records = []
@@ -475,30 +769,8 @@ def parse() -> None:
         )
         if year == 2026:
             found = locate_divisions(found, ced)
-        press = pl.col("source").str.to_lowercase().str.contains("|".join(PRESS).replace(".", r"\."))
         found = found.with_columns(
-            status=pl.when(pl.col("system").is_null())
-            .then(pl.lit("no EveryElection ballot"))
-            .when(pl.col("territory").is_in(["ENG", "WLS"]).not_())
-            .then(pl.lit("outside England and Wales"))
-            .when(pl.col("system") != "FPTP")
-            .then(pl.lit("not first past the post"))
-            .when(pl.col("cancelled"))
-            .then(pl.lit("cancelled"))
-            .when(pl.col("coded").not_())
-            .then(pl.lit("no GSS code"))
-            .when(pl.col("la_code").is_null())
-            .then(pl.lit("code not in the ONS ward lookup"))
-            .when(pl.col("source").str.contains(r"(?i)andrewteale|\bLEAP\b"))
-            .then(pl.lit("source is LEAP"))
-            .when(
-                (press | pl.col("source").str.contains(r"https?://|www\.").not_())
-                & (pl.col("ballot").str.starts_with("local.croydon.") & pl.lit(year in CROYDON)).not_()
-            )
-            .then(pl.lit("source is not the council"))
-            .when(pl.col("winners") != pl.col("seats"))
-            .then(pl.lit("winners do not equal seats"))
-            .otherwise(pl.lit("loaded"))
+            status=statuses(pl.col("ballot").str.starts_with("local.croydon.") & pl.lit(year in CROYDON))
         )
         print(year, found.group_by("status").len().sort("len", descending=True).rows())
         for row in found.filter(
@@ -580,40 +852,18 @@ def parse() -> None:
                 spoilt=pl.col("spoilt").cast(pl.Int64, strict=False),
             )
         )
-    with connect() as conn:
-        conn.execute("create temp table feature (layer text, code text, geojson text) on commit drop")
-        with conn.cursor() as cursor, cursor.copy("copy feature from stdin") as copy:
-            for year in DAYS:
-                for key, codes in (
-                    *(
-                        (layer, set(loaded.filter((pl.col("year") == year) & (pl.col("shape") == layer))["ward_code"]))
-                        for layer in (f"wd{year % 100}", *(["ced26"] if year == 2026 else []))
-                    ),
-                    (f"lad{year % 100}", set(loaded.filter(pl.col("year") == year)["la_code"])),
-                ):
-                    _, field, count, _, _ = LAYERS[key]
-                    features = [
-                        feature
-                        for url in layer_pages(key)
-                        for feature in json.loads(raw.cached(SOURCE, url).path.read_text())["features"]
-                    ]
-                    if len(features) != count:
-                        raise ValueError(f"{key}: {len(features)} features, expected {count}")
-                    for feature in features:
-                        if feature["properties"][field] in codes:
-                            copy.write_row((key, feature["properties"][field], json.dumps(feature["geometry"])))
-        rows = conn.execute(
-            """select layer, code,
-                      encode(st_asewkb(st_multi(st_transform(geom, 4326))), 'hex'),
-                      encode(st_asewkb(st_transform(st_pointonsurface(geom), 4326)), 'hex')
-               from (select layer, code, st_multi(st_collectionextract(st_makevalid(st_union(
-                       st_makevalid(st_force2d(st_setsrid(st_geomfromgeojson(geojson), 27700))))), 3)) as geom
-                     from feature group by layer, code) whole"""
-        ).fetchall()
-    shapes = pl.DataFrame(
-        rows,
-        schema={"layer": pl.String, "code": pl.String, "geom": pl.String, "label_point": pl.String},
-        orient="row",
+    shapes = shapes_for(
+        {
+            key: codes
+            for year in DAYS
+            for key, codes in (
+                *(
+                    (layer, set(loaded.filter((pl.col("year") == year) & (pl.col("shape") == layer))["ward_code"]))
+                    for layer in (f"wd{year % 100}", *(["ced26"] if year == 2026 else []))
+                ),
+                (f"lad{year % 100}", set(loaded.filter(pl.col("year") == year)["la_code"])),
+            )
+        }
     )
     print(shapes.group_by("layer").len().sort("layer").rows())
     PARSED.mkdir(parents=True, exist_ok=True)
@@ -623,13 +873,67 @@ def parse() -> None:
     shapes.write_parquet(PARSED / "shapes.parquet")
 
 
+def shapes_for(needed: dict[str, set[str]]) -> pl.DataFrame:
+    with connect() as conn:
+        conn.execute("create temp table feature (layer text, code text, geojson text) on commit drop")
+        with conn.cursor() as cursor, cursor.copy("copy feature from stdin") as copy:
+            for key, codes in needed.items():
+                _, field, count, _, _ = LAYERS[key]
+                features = [
+                    feature
+                    for url in layer_pages(key)
+                    for feature in json.loads(raw.cached(SOURCE, url).path.read_text())["features"]
+                ]
+                if len(features) != count:
+                    raise ValueError(f"{key}: {len(features)} features, expected {count}")
+                for feature in features:
+                    if feature["properties"][field] in codes:
+                        copy.write_row((key, feature["properties"][field], json.dumps(feature["geometry"])))
+        rows = conn.execute(
+            """select layer, code,
+                      encode(st_asewkb(st_multi(st_transform(geom, 4326))), 'hex'),
+                      encode(st_asewkb(st_transform(st_pointonsurface(geom), 4326)), 'hex')
+               from (select layer, code, st_multi(st_collectionextract(st_makevalid(st_union(
+                       st_makevalid(st_force2d(st_setsrid(st_geomfromgeojson(geojson), 27700))))), 3)) as geom
+                     from feature group by layer, code) whole"""
+        ).fetchall()
+    return pl.DataFrame(
+        rows,
+        schema={"layer": pl.String, "code": pl.String, "geom": pl.String, "label_point": pl.String},
+        orient="row",
+    )
+
+
 def emit() -> Path:
-    days = {year: day for year, day in DAYS.items() if year in SAMPLED | CROSS_CHECKS}
-    wards = pl.read_parquet(PARSED / "wards.parquet")
-    candidates = pl.read_parquet(PARSED / "candidates.parquet")
-    shapes = {
-        (layer, code): (geom, point) for layer, code, geom, point in pl.read_parquet(PARSED / "shapes.parquet").rows()
-    }
+    by_mode = "DC_BY" in os.environ
+    years = by_years() if by_mode else []
+    days = {} if by_mode else {year: day for year, day in DAYS.items() if year in SAMPLED | CROSS_CHECKS}
+    if by_mode:
+        wards = pl.concat(
+            [pl.read_parquet(BY / f"{year}-wards.parquet") for year in years], how="diagonal_relaxed"
+        ).filter(pl.col("status") == "loaded")
+        candidates = pl.concat([pl.read_parquet(BY / f"{year}-candidates.parquet") for year in years])
+        shape_rows = pl.concat([pl.read_parquet(BY / f"{year}-shapes.parquet") for year in years]).unique(
+            ["layer", "code"]
+        )
+    else:
+        wards = (
+            pl.read_parquet(PARSED / "wards.parquet")
+            .filter(pl.col("year").is_in(list(days)))
+            .with_columns(
+                day=pl.col("year").replace_strict(days, return_dtype=pl.Date),
+                la_layer=pl.when(
+                    pl.col("la_code").str.starts_with("E10")
+                    | pl.col("la_code").is_in([code for code, _ in SHADOWS.values()])
+                )
+                .then(None)
+                .otherwise(pl.format("lad{}", pl.col("year") % 100)),
+            )
+        )
+        candidates = pl.read_parquet(PARSED / "candidates.parquet")
+        shape_rows = pl.read_parquet(PARSED / "shapes.parquet")
+    shapes = {(layer, code): (geom, point) for layer, code, geom, point in shape_rows.rows()}
+    polls = sorted(set(wards.select("year", "day").rows()))
     with connect() as conn:
         published = [
             value
@@ -642,7 +946,7 @@ def emit() -> Path:
             | pl.col("status").str.starts_with("source is")
             & pl.format(
                 "{}:local:{}{}",
-                pl.col("year").replace_strict({year: str(day) for year, day in days.items()}, default=None),
+                pl.col("day").cast(pl.String),
                 "ward_code",
                 pl.when("by").then(pl.lit(":by")).otherwise(pl.lit("")),
             ).is_in(published)
@@ -659,8 +963,11 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary=f"English and Welsh council elections {', '.join(map(str, days))} by ward and county division, compiled "
-            "by Democracy Club from the councils' declarations, with ONS ward, division, and council shapes",
+            summary=f"English and Welsh council by-elections {', '.join(map(str, years))} off the May polling day, "
+            "by ward, compiled by Democracy Club from the councils' declarations, with ONS ward and council shapes"
+            if by_mode
+            else f"English and Welsh council elections {', '.join(map(str, days))} by ward and county division, "
+            "compiled by Democracy Club from the councils' declarations, with ONS ward, division, and council shapes",
             polity="GB",
         )
 
@@ -702,6 +1009,27 @@ def emit() -> Path:
                 cs.artifact(raw.cached(SOURCE, url), sources[year])
             for url in ballot_pages(year):
                 cs.artifact(raw.cached(SOURCE, url), sources[year])
+        for year in years:
+            title = f"Candidate results, council by-elections {year}"
+            sources[year] = cs.source(DC, title)
+            cs.add(
+                "source",
+                id=sources[year],
+                kind="compendium",
+                publisher=DC,
+                title=title,
+                url=BY_BALLOTS.format(council="", year=year, month=""),
+                license=LICENSE,
+                license_url=LICENSE_URL,
+                attribution=ATTRIBUTION,
+                notes=f"{METHODOLOGY} Ballots come from EveryElection's by-election register for the year; results "
+                "from Democracy Club's results API, one request per polling day.",
+            )
+            for day in by_days(year):
+                for url in day_pages(day):
+                    cs.artifact(raw.cached(SOURCE, url), sources[year])
+            for url in by_ballot_pages(year):
+                cs.artifact(raw.cached(SOURCE, url), sources[year])
         leeds_sources: dict[tuple[str, int], UUID] = {}
         for year, day in days.items():
             if year in LEEDS:
@@ -742,10 +1070,20 @@ def emit() -> Path:
             council_rows.setdefault((row["council"], row["year"], row["ward"]), []).append(row)
         used: set[tuple[str, int, str]] = set()
         ons: dict[str, UUID] = {}
+        layers = {*wards["shape"].drop_nulls(), *wards["la_layer"].drop_nulls()}
+        foreign = {
+            id
+            for (id,) in conn.execute(
+                "select s.id from source s join changeset c on c.id = s.changeset_id where c.pipeline <> %s",
+                [SOURCE],
+            ).fetchall()
+        }
         for key, (service, _, _, _, title) in LAYERS.items():
-            if int(key[-2:]) + 2000 not in days:
+            if key not in layers:
                 continue
             ons[key] = cs.source("Office for National Statistics", title)
+            if ons[key] in foreign:
+                continue
             cs.add(
                 "source",
                 id=ons[key],
@@ -763,7 +1101,7 @@ def emit() -> Path:
             )
             for url in layer_pages(key):
                 cs.artifact(raw.cached(SOURCE, url), ons[key])
-            if key.startswith("wd"):
+            if key.startswith("wd") and int(key[-2:]) + 2000 in LOOKUPS:
                 for url in lookup_pages(int(key[-2:]) + 2000):
                     cs.artifact(raw.cached(SOURCE, url), ons[key])
 
@@ -773,10 +1111,19 @@ def emit() -> Path:
         elections: set[UUID] = set()
         seen: set[UUID] = set()
         geometry: dict[UUID, tuple[str, str, date]] = {}
+        elsewhere = {
+            id
+            for (id,) in conn.execute(
+                "select x.entity_id from external_id x join changeset c on c.id = x.changeset_id "
+                "where x.scheme = 'gb.election' and c.pipeline <> %s",
+                [SOURCE],
+            ).fetchall()
+        }
 
-        for year, day in days.items():
-            national[year] = cs.key("gb.election", f"{day}:local:gb")
-            if national[year] in cs.minted:
+        for year, day in polls:
+            if year in days and year not in national:
+                national[year] = cs.key("gb.election", f"{day}:local:gb")
+            if year in days and national[year] in cs.minted:
                 cs.add(
                     "election",
                     id=national[year],
@@ -788,14 +1135,14 @@ def emit() -> Path:
                 )
                 name(national[year], f"{year} local elections in England and Wales")
                 cs.add("slug", path=f"gb/{day}-local", entity_id=national[year])
-            lines = candidates.join(wards.filter(pl.col("year") == year).select("ballot"), on="ballot")
+            lines = candidates.join(wards.filter(pl.col("day") == day).select("ballot"), on="ballot")
             only_by = set(
-                wards.filter(pl.col("year") == year)
+                wards.filter(pl.col("day") == day)
                 .group_by("la_code")
                 .agg(pl.col("by").all())
                 .filter(pl.col("by"))["la_code"]
             )
-            for ward in wards.filter(pl.col("year") == year).sort("ballot").iter_rows(named=True):
+            for ward in wards.filter(pl.col("day") == day).sort("ballot").iter_rows(named=True):
                 code, ward_code = ward["la_code"], ward["ward_code"]
                 if code not in councils:
                     area = cs.area("gb.lad", code)
@@ -842,23 +1189,28 @@ def emit() -> Path:
                         cs.add("body", id=body, polity_id=polity, kind="council")
                         name(body, council_name)
                     councils[code] = (area, polity, body, path, council_name)
-                    if not code.startswith("E10") and code not in {code for code, _ in SHADOWS.values()}:
-                        geometry.setdefault(area, (f"lad{year % 100}", code, day))
+                    if ward["la_layer"] is not None:
+                        geometry.setdefault(area, (ward["la_layer"], code, day))
                 area, polity, body, path, council_name = councils[code]
                 election = cs.key("gb.election", f"{day}:local:{code}")
-                if election not in elections:
+                if election not in elections and (year in days or election not in elsewhere):
                     elections.add(election)
                     cs.add(
                         "election",
                         id=election,
                         polity_id=polity,
-                        parent_id=national[year],
+                        parent_id=national.get(year) if year in days else None,
                         kind="by_election" if code in only_by else "local",
                         date_from=day,
                         date_to=day,
                         status="held",
                     )
-                    name(election, f"{year} {council_name} {'by-election' if code in only_by else 'election'}")
+                    name(
+                        election,
+                        f"{council_name} by-election, {day.day} {day:%B %Y}"
+                        if year not in days
+                        else f"{year} {council_name} {'by-election' if code in only_by else 'election'}",
+                    )
                     cs.add("slug", path=f"{path}/{day}-local", entity_id=election)
                 display = ward["ons_name"]
                 display = " ".join(
@@ -1082,7 +1434,7 @@ def emit() -> Path:
         others: dict[UUID, list[tuple[date, date | None]]] = {}
         for area, start, end in conn.execute(
             "select area_id, lower(valid), upper(valid) from area_geometry where area_id = any(%s) and source_id <> all(%s)",
-            [list(geometry), list(ons.values())],
+            [list(geometry), [id for id in ons.values() if id not in foreign]],
         ).fetchall():
             others.setdefault(area, []).append((start, end))
         missing: list[str] = []
