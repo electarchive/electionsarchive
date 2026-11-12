@@ -333,7 +333,12 @@ def emit(
                 row = book[str(source_id)]
                 made = cs.source(row["publisher"], row["title"])
                 sources_made[str(source_id)] = made
-                if made in cs.minted:
+                if (
+                    made in cs.minted
+                    or conn.execute(
+                        "select license is distinct from %s from source where id = %s", [row["license"], made]
+                    ).fetchone()[0]
+                ):
                     cs.add(
                         "source",
                         id=made,
