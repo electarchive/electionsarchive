@@ -1697,9 +1697,9 @@
 
   $effect(() => {
     const isDetailed = view.isBasemap;
-    const side = base?.isInset === true ? "inset" : "main";
+    const planes = base?.planes ?? [-1];
     if (engine.gl != null) {
-      untrack(() => basemap(engine, scheme, isDetailed, [], side));
+      untrack(() => basemap(engine, scheme, isDetailed, [], planes));
     }
   });
 

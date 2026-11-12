@@ -131,7 +131,11 @@
     own: {
       tiles: string;
       k: number;
-      parted?: { isOnly: boolean; ks: Array<number> } | null;
+      parted?: {
+        isOnly: boolean;
+        planes: Array<number>;
+        ks: Array<number>;
+      } | null;
     } | null;
     nested?: { tiles: string; ks: Array<number> } | null;
     frame: Box;
@@ -151,6 +155,7 @@
     parted?: {
       isOnly: boolean;
       isApart?: boolean;
+      planes: Array<number>;
       ks: Array<number>;
       inset: { scheme: string; day: string; ks: Array<number> } | null;
     } | null;
@@ -2550,8 +2555,8 @@
     const shown = isSummary ? null : outline;
     const isDetailed = isBasemap;
     const polity = scheme;
-    const side = (parted ?? own?.parted)?.isOnly === true ? "inset" : "main";
-    untrack(() => basemap(engine, polity, isDetailed, shown, side));
+    const planes = (parted ?? own?.parted)?.planes ?? [-1];
+    untrack(() => basemap(engine, polity, isDetailed, shown, planes));
   });
 
   $effect(() => {

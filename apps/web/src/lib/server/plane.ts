@@ -244,13 +244,14 @@ export const parted = async (
     mine === -1 && insets.some((inset) => inset.detached !== true);
   if (rows.length === 0) {
     return isApart
-      ? { isOnly: false, isApart, ks: [], inset: null }
+      ? { isOnly: false, isApart, planes: [-1], ks: [], inset: null }
       : undefined;
   }
   if (mine !== -1) {
     return {
       isOnly: true,
       isApart,
+      planes: [mine],
       ks: rows.filter((row) => row.part === mine).map((row) => row.k),
       inset: null,
     };
@@ -291,19 +292,19 @@ export const parted = async (
         (!isAlive(row.part) && insets[row.part]?.detached !== true),
     )
     .map((row) => row.k);
-  const boxed = outer
-    .filter(
-      (row) =>
-        inner.has(row.k) &&
-        isAlive(row.part) &&
-        insets[row.part]?.detached !== true,
-    )
-    .map((row) => row.k);
+  const kept = outer.filter(
+    (row) =>
+      inner.has(row.k) &&
+      isAlive(row.part) &&
+      insets[row.part]?.detached !== true,
+  );
+  const boxed = kept.map((row) => row.k);
   return ks.length === 0 && boxed.length === 0 && !isApart
     ? undefined
     : {
         isOnly: false,
         isApart,
+        planes: [-1, ...new Set(kept.map((row) => row.part))],
         ks,
         inset: boxed.length === 0 ? null : { scheme, day, ks: boxed },
       };
