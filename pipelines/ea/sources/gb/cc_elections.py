@@ -43,7 +43,9 @@ ALIASES = {
     ("S12000017", "Fort Augustus and Glenmorriston"): "Fort Augustus and Glenmoriston",
     ("S12000017", "Dunvegan"): "Dunvegan and District",
     ("S12000017", "Stromeferry and Achmore"): "Stromeferry",
+    ("S12000017", "Grantown-on-Spey and Vicinity"): "Grantown-on-Spey",
 }
+UNSTATED = "The notice does not state how many places the community council had, so the seat count is not recorded."
 SHORT = "Highland Council's notice lists {elected} members elected unopposed to {places} places, leaving {left} vacant."
 
 
@@ -52,8 +54,18 @@ def fetch() -> None:
         if _cached(url):
             continue
         if "web.archive.org" in url:
-            time.sleep(5)
-        response = httpx.get(url, headers={"User-Agent": BROWSER}, timeout=90, follow_redirects=True)
+            time.sleep(10)
+        for _ in range(10):
+            try:
+                response = httpx.get(url, headers={"User-Agent": BROWSER}, timeout=90, follow_redirects=True)
+            except httpx.TransportError:
+                response = None
+            if response is not None and response.status_code != 429:
+                break
+            time.sleep(90)
+        if response is None:
+            print(f"unreachable: {url}", file=sys.stderr)
+            continue
         if response.status_code != 200 or not response.content.startswith(b"%PDF"):
             print(f"not a PDF: {url}", file=sys.stderr)
             continue
@@ -86,6 +98,8 @@ def when(text: str) -> date:
 
 def proper(printed: str) -> str:
     words = printed.split()
+    if len(words) > 1 and words[0].isupper() and not any(word.isupper() for word in words[1:]):
+        return " ".join([*(display(word) for word in words[1:]), display(words[0])])
     cut = len(words)
     while cut > 1 and words[cut - 1].isupper():
         cut -= 1
@@ -163,7 +177,40 @@ def declaration(text: str) -> dict:
     }
 
 
+def legacy_notice(text: str) -> dict:
+    flat = " ".join(text.split())
+    head = re.search(r"ELECTION OF COUNCILLORS FOR (.+?) COMMUNITY COUNCIL", flat, re.IGNORECASE)
+    day = re.search(r"(?:Wednesday|at 12\s?noon on|at 12 noon on) (\d+ \w+ \d{4})", flat)
+    table = re.search(r"remaining validly nominated\*\s*\n(.*?)\n\s*\*Where", text, re.DOTALL)
+    if not (head and day and table):
+        raise ValueError("unreadable legacy notice")
+    lines = [line for line in table.group(1).splitlines() if line.strip()]
+    names, forenames = [], ""
+    address_first = lines[0].startswith(" ")
+    for line in lines:
+        if line.startswith(" "):
+            continue
+        cells = [cell for cell in re.split(r"\s{2,}", line.strip()) if cell]
+        if address_first:
+            names.append(" ".join(cells))
+        elif len(cells) == 1 and not re.search(r"\d", line):
+            forenames = f"{forenames} {cells[0]}".strip()
+        else:
+            names.append(f"{forenames} {cells[0]}".strip())
+            forenames = ""
+    if forenames or not names:
+        raise ValueError("unreadable legacy member lines")
+    return {
+        "council": display(head.group(1)).replace(" And ", " and "),
+        "day": when(day.group(1)),
+        "places": None,
+        "members": names,
+    }
+
+
 def notice(text: str) -> dict:
+    if "ELECTION OF COUNCILLORS FOR" in text:
+        return legacy_notice(text)
     head = re.search(r"Election Of Community Councillors for\s+(.+?)\s+NOTICE IS HEREBY GIVEN", text, re.DOTALL)
     day = re.search(r"with effect from 12 noon on \w+\s+(\d+\s+\w+\s+\d{4})", " ".join(text.split()))
     table = re.search(r"\n([^\n]*Forename[^\n]*)\n(.*?)\n\s*\*Where", text, re.DOTALL)
@@ -214,7 +261,11 @@ def parse() -> None:
                 raise ValueError(f"{url}: the elected candidates are not the top polling ones")
             candidates = read["candidates"]
         else:
-            read = notice(text)
+            try:
+                read = notice(text)
+            except ValueError as error:
+                print(f"unreadable notice: {url}: {error}", file=sys.stderr)
+                continue
             candidates = [{"printed": name, "votes": None, "elected": True} for name in read["members"]]
         council = council_name(lad, read["council"])
         for candidate in candidates:
@@ -261,7 +312,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Highland community council elections of 2023 to 2026 under the council's scheme of "
+            summary="Highland community council elections of 2015 to 2026 under the council's scheme of "
             "establishment: postal ballots from the returning officer's declarations of result, and councils "
             "formed unopposed from the notices of uncontested election, as tacit sets",
             polity="GB",
@@ -364,7 +415,9 @@ def emit() -> Path:
                 is_default=True,
                 completeness=1,
             )
-            if tacit and lines.height < places:
+            if tacit and places is None:
+                cs.add("note", entity_id=result_set, kind="caveat", body_md=UNSTATED)
+            elif tacit and lines.height < places:
                 cs.add(
                     "note",
                     entity_id=result_set,
