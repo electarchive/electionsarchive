@@ -22,6 +22,11 @@ VOTES, BALLOTS, INVALID, VOTERS = 1, 3, 5, 14
 SHARE_ONLY = 4
 CITY_DAY = date(2022, 3, 24)
 CITY_NOTICES = {
+    date(2009, 3, 16): (
+        "http://www.cityoflondon.gov.uk/about-the-city/how-we-work/elections-and-wards/Documents/ALL.pdf",
+        "https://web.archive.org/web/20120830201319if_/",
+        "Election of Common Councilmen: notices of persons elected, 16 March 2009",
+    ),
     date(2013, 3, 21): (
         "http://www.cityoflondon.gov.uk/about-the-city/how-we-work/elections-and-wards/Documents/Notice-of-Results-City-Vote-2013.pdf",
         "https://web.archive.org/web/20130720042049if_/",
@@ -64,7 +69,7 @@ HISTORY_PAGES = (
     ("20171223181623", "https://www.cityoflondon.gov.uk/about-the-city/voting-elections/Pages/results.aspx"),
     ("20191016091131", "https://www.cityoflondon.gov.uk/about-the-city/voting-elections/Pages/results.aspx"),
 )
-WARDS_FROM = date(2013, 3, 21)
+WARDS_FROM = date(2013, 3, 8)
 DAY_FIXES = {
     ("E05009307", date(2017, 8, 7)): (
         date(2019, 8, 6),
@@ -110,9 +115,19 @@ CITY_WARDS = (
     ("E05009311", "Vintry", "vintry"),
     ("E05009312", "Walbrook", "walbrook"),
 )
+OLD_WARDS = tuple((f"E05{number:06d}", label, page) for number, (_, label, page) in enumerate(CITY_WARDS, start=1))
+OLD_CODES = {new: old for (new, *_), (old, *_) in zip(CITY_WARDS, OLD_WARDS, strict=True)}
+NEW_CODES = {old: new for new, old in OLD_CODES.items()}
 CITY_SEATS = 100
-GENERAL_DAYS = (date(2013, 3, 21), date(2017, 3, 23), CITY_DAY, date(2025, 3, 20))
+GENERAL_DAYS = (date(2009, 3, 16), date(2013, 3, 21), date(2017, 3, 23), CITY_DAY, date(2025, 3, 20))
 CITY_NOTES = {
+    date(2009, 3, 16): (
+        "Voters in each ward had as many votes as the ward has seats. The corporation's notices of persons elected "
+        "print each candidate's votes and mark the winners; they print neither the electorate nor the turnout. In the "
+        "wards where no more candidates stood than seats, the candidates were declared elected without a poll on 13 "
+        "March. The wards are those drawn in 2003, which were replaced on 8 March 2013. The aldermen are elected "
+        "separately, at ward meetings, and are not included."
+    ),
     date(2013, 3, 21): (
         "Voters in each ward had as many votes as the ward has seats. The corporation's notices of persons elected "
         "print each candidate's votes and mark the winners; they print neither the electorate nor the turnout. In the "
@@ -153,6 +168,16 @@ CITY_PARTIES = {
     "Womens Equality Party": ("wikidata", "Q20648714"),
     "Castle Baynard Independents Party": "Castle Baynard Independents Party",
     "Temple and Farringdon Together": "Temple and Farringdon Together",
+}
+CITY_VACANCIES = {
+    (date(2009, 3, 16), "E05000005"): (
+        1,
+        (
+            "Seven candidates were nominated for the ward's eight seats, so all seven were declared elected without "
+            "a poll and one seat was left vacant. The corporation's results page records the by-election of 20 and 21 "
+            "May 2009 that filled it."
+        ),
+    ),
 }
 CITY_DISAGREEMENTS = {
     (CITY_DAY, "E05009297"): (
@@ -495,12 +520,70 @@ def notices(day: date, path: Path) -> list[dict[str, object]]:
     return rows
 
 
+def layout_notices(day: date, path: Path) -> list[dict[str, object]]:
+    text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True).stdout
+    url, archive, _ = CITY_NOTICES[day]
+    wards: list[dict] = []
+    reading = False
+    for line in text.replace("’", "'").splitlines():
+        if m := re.fullmatch(r"\s*([A-Z ]+?) WARD\s*", line):
+            code, label = WARD_KEYS[m.group(1)]
+            wards.append({"code": OLD_CODES[code], "label": label, "uncontested": None, "candidates": []})
+        elif m := re.fullmatch(r"\s*Date of Election( \(Uncontested\))?: (.+?)\s*", line):
+            stated = datetime.strptime(m.group(2), "%d %B %Y").date()
+            wards[-1]["uncontested"] = m.group(1) is not None
+            if stated != (date(2009, 3, 13) if m.group(1) else day):
+                raise ValueError(f"{wards[-1]['label']}: dated {stated}")
+        elif line.strip().startswith("CANDIDATE"):
+            reading = True
+        elif re.match(r"\s*(\*denotes|Dated:|Printed and Published)", line):
+            reading = False
+        elif reading and line.strip():
+            parts = re.split(r"\s{2,}", line.strip())
+            candidates = wards[-1]["candidates"]
+            if re.match(r"[A-Z][A-Z' \-]*[A-Z],", line):
+                votes = parts.pop() if len(parts) > 1 and parts[-1].isdigit() else None
+                candidates.append([parts[0], " ".join(parts[1:]), votes])
+            elif len(parts) == 1 and candidates:
+                candidates[-1][0] += " " + parts[0]
+            else:
+                raise ValueError(f"{wards[-1]['label']}: line {line!r}")
+    rows: list[dict[str, object]] = []
+    for ward in wards:
+        for number, (printed, party, votes) in enumerate(ward["candidates"], start=1):
+            uncontested = ward["uncontested"]
+            elected = uncontested or printed.endswith("*")
+            surname, _, given = printed.removesuffix("*").partition(", ")
+            if uncontested != (votes is None) or not given or "*" in given:
+                raise ValueError(f"{day} {ward['label']}: {printed!r} {votes!r}")
+            rows.append(
+                {
+                    "day": day,
+                    "ward_code": ward["code"],
+                    "ward": ward["label"],
+                    "number": number,
+                    "printed": printed.removesuffix("*"),
+                    "surname": proper(surname),
+                    "given": given.replace(",", ""),
+                    "party": party,
+                    "votes": None if votes is None else int(votes),
+                    "elected": elected,
+                    "turnout": None,
+                    "uncontested": uncontested,
+                    "page": archive + url,
+                }
+            )
+    return rows
+
+
 MONTHS = "January|February|March|April|May|June|July|August|September|October|November|December"
 DATE = re.compile(rf"(\d{{1,2}} (?:{MONTHS}) \d{{4}})")
 WARD_KEYS: dict[str, tuple[str, str]] = {label.upper(): (code, label) for code, label, _ in CITY_WARDS}
 WARD_KEYS["BRIDGE & BRIDGE WITHOUT"] = WARD_KEYS["BRIDGE AND BRIDGE WITHOUT"]
 WARD_KEYS["CORDWINER"] = WARD_KEYS["CORDWAINER"]
 WARD_KEYS["ALDERGATE"] = WARD_KEYS["ALDERSGATE"]
+WARD_KEYS["BRIDGE"] = WARD_KEYS["BRIDGE AND BRIDGE WITHOUT"]
+SPAN = re.compile(rf"(\d{{1,2}})(?: ({MONTHS}))? ?/ ?(\d{{1,2}} (?:{MONTHS}) \d{{4}})")
 SECTION = re.compile(r"(?i)^(Aldermanic elections|Common Council(?:lor|man)? (?:By-)?elections?)\b")
 SECTION_END = re.compile(
     r"^(Lord Mayor|Sheriffs|UK Parliamentary|GLA|London Region|Mayor of London|Referendum|Business Improvement|"
@@ -521,6 +604,10 @@ ALDERMEN_NOTE = (
     "elected without a poll."
 )
 ALDERMEN_TITLE = "Aldermanic results for all wards (PDF)"
+MULTI_NOTE = (
+    "This by-election filled {seats} vacancies at once, and each voter had {seats} votes, so the candidates' votes "
+    "add up to more than the ballot papers counted."
+)
 SDP_NOTE = (
     "The notice prints the Social Democratic Party as this candidate's description. It is not linked to a party "
     "record because the notice does not say which party of that name is meant."
@@ -778,9 +865,22 @@ def history_lines(path: Path) -> list[str]:
     return out
 
 
+def given_first(head: str) -> bool:
+    words = head.split()
+    return len(words) > 1 and len(words[-1]) > 1 and words[-1].isupper() and not words[0].isupper()
+
+
 def history_name(head: str) -> tuple[str, str, str]:
     head = head.strip(" -–:")
     party = ""
+    if m := re.fullmatch(r"(.+?)\s*\((Independent)\)", head):
+        head, party = m.groups()
+    if given_first(head):
+        words = head.split()
+        count = 1
+        while count < len(words) - 1 and words[-1 - count].isupper() and len(words[-1 - count]) > 1:
+            count += 1
+        return proper(" ".join(words[-count:])), " ".join(words[:-count]).rstrip(","), party
     if ":" in head:
         head, party = (part.strip(" -–") for part in head.split(":", 1))
     else:
@@ -814,7 +914,8 @@ def history_rows(stamp: str, url: str) -> list[dict[str, object]]:
             ward = ward_of(line.split(" - ")[0].removeprefix("Ward of "))
             if ward is None:
                 raise ValueError(f"{page}: ward {line!r}")
-            blocks.append({"kind": section, "ward": ward, "day": None, "lines": []})
+            seats = 2 if line.endswith(" - Two Common Councilmen") else 1
+            blocks.append({"kind": section, "ward": ward, "seats": seats, "lines": []})
         elif blocks and blocks[-1]["kind"] == section:
             block_lines = blocks[-1]["lines"]
             assert isinstance(block_lines, list)
@@ -824,12 +925,20 @@ def history_rows(stamp: str, url: str) -> list[dict[str, object]]:
         block_lines = block["lines"]
         ward = block["ward"]
         assert isinstance(block_lines, list) and isinstance(ward, tuple)
-        found = next((m for line in block_lines if (m := DATE.search(line.replace("/", " ")))), None)
+        found = next((m for line in block_lines if (m := DATE.search(line))), None)
         if found is None:
             raise ValueError(f"{page}: {ward[1]} has no date")
-        day = datetime.strptime(found.group(1), "%d %B %Y").date()
+        if span := SPAN.search(found.string):
+            day_to = datetime.strptime(span.group(3), "%d %B %Y").date()
+            day = datetime.strptime(
+                f"{span.group(1)} {span.group(2) or f'{day_to:%B}'} {day_to.year}", "%d %B %Y"
+            ).date()
+        else:
+            day = day_to = datetime.strptime(found.group(1), "%d %B %Y").date()
         if day < WARDS_FROM:
-            continue
+            ward = (OLD_CODES[ward[0]], ward[1])
+        seats = block["seats"]
+        assert isinstance(seats, int)
         candidates: list[tuple[str, str, str, str, int | None, bool]] = []
         spoilt = ballots = cast = None
         turnout = None
@@ -856,27 +965,34 @@ def history_rows(stamp: str, url: str) -> list[dict[str, object]]:
                 if uncontested and ", " in line.split(" was ")[0]:
                     surname, given, party = history_name(line.split(" was ")[0])
                     candidates.append((line.split(" was ")[0], surname, given, party, None, True))
-            elif after_colon and uncontested and ", " in line:
+            elif after_colon and uncontested and (", " in line or given_first(line)):
                 surname, given, party = history_name(line)
                 candidates.append((line, surname, given, party, None, True))
-            elif not uncontested and ", " in line and (m := HISTORY_LINE.fullmatch(line)):
+            elif (
+                not uncontested
+                and (m := HISTORY_LINE.fullmatch(line))
+                and (", " in line or given_first(m.group(1).strip(" -–:")))
+            ):
                 surname, given, party = history_name(m.group(1))
                 candidates.append((line, surname, given, party, int(m.group(2)), m.group(3) is not None))
-            after_colon = line.endswith(":") and "elected" in line
+            after_colon = "elected" in line and (line.endswith(":") or "following" in line)
         if not candidates:
             if uncontested:
                 out.append({"kind": block["kind"], "day": day, "ward_code": ward[0], "ward": ward[1], "missing": True})
                 continue
             raise ValueError(f"{page}: {ward[1]} {day} has no candidates")
         if not uncontested:
+            ranked = sorted((c[4] or 0 for c in candidates), reverse=True)
             if not any(flag for *_, flag in candidates):
-                top = max(votes or 0 for *_, votes, _ in candidates)
-                candidates = [(*c[:5], c[4] == top) for c in candidates]
+                candidates = [(*c[:5], (c[4] or 0) >= ranked[seats - 1]) for c in candidates]
             winners = [c for c in candidates if c[5]]
-            top = max(votes or 0 for *_, votes, _ in candidates)
-            if len(winners) != 1 or winners[0][4] != top or [c[4] for c in candidates].count(top) != 1:
+            if (
+                len(winners) != seats
+                or min(c[4] or 0 for c in winners) != ranked[seats - 1]
+                or ranked[seats - 1] in ranked[seats:]
+            ):
                 raise ValueError(f"{page}: {ward[1]} {day} winner")
-            if winners[0][1].upper() not in statement.upper():
+            if any(c[1].upper() not in statement.upper() for c in winners):
                 raise ValueError(f"{page}: {ward[1]} {day} statement {statement!r}")
             total = sum(c[4] or 0 for c in candidates)
             if ballots is None and cast is not None and spoilt is not None and cast == total + spoilt:
@@ -886,6 +1002,7 @@ def history_rows(stamp: str, url: str) -> list[dict[str, object]]:
                 {
                     "kind": block["kind"],
                     "day": day,
+                    "day_to": day_to,
                     "ward_code": ward[0],
                     "ward": ward[1],
                     "number": number,
@@ -925,7 +1042,9 @@ def extra_rows() -> list[dict[str, object]]:
         for row in history_rows(stamp, url):
             fix = day_fix(row)
             if fix:
-                row["day"] = fix[0]
+                if row["day"] != row["day_to"]:
+                    raise ValueError(f"{row['ward']} {row['day']}: a two-day poll to redate")
+                row["day"] = row["day_to"] = fix[0]
             found.setdefault((row["kind"], row["day"], row["ward_code"]), []).append(row)
         for key, lines in found.items():
             if lines[0].get("missing"):
@@ -943,13 +1062,14 @@ def extra_rows() -> list[dict[str, object]]:
         rows += lines
     for row in rows:
         row.setdefault("caveat", None)
+        row.setdefault("day_to", row["day"])
     return rows
 
 
 def parse() -> None:
     rows: list[dict[str, object]] = []
     for day, (url, archive, _) in CITY_NOTICES.items():
-        rows += notices(day, raw.cached(SOURCE, archive + url).path)
+        rows += (layout_notices if day < WARDS_FROM else notices)(day, raw.cached(SOURCE, archive + url).path)
     for code, label, page in CITY_WARDS:
         text = raw.cached(SOURCE, WAYBACK + CITY_PAGE.format(page=page)).path.read_text(errors="ignore")
         caption = re.search(r"<caption>(.*?)</caption>", text, flags=re.DOTALL)
@@ -1029,7 +1149,9 @@ def parse() -> None:
             )
     frame = pl.DataFrame(rows, infer_schema_length=None)
     seats = frame.group_by("day").agg(pl.col("ward_code").n_unique().alias("wards"), pl.col("elected").sum())
-    if seats.height != 4 or (seats["wards"] != 25).any() or (seats["elected"] != CITY_SEATS).any():
+    vacant = {day: sum(n for (on, _), (n, _) in CITY_VACANCIES.items() if on == day) for day in seats["day"]}
+    seats = seats.with_columns(pl.col("elected") + pl.col("day").replace_strict(vacant, return_dtype=pl.UInt32))
+    if seats.height != len(CITY_NOTICES) + 2 or (seats["wards"] != 25).any() or (seats["elected"] != CITY_SEATS).any():
         raise ValueError(f"wards and seats by day: {seats}")
     for ward in frame.group_by("day", "ward_code"):
         lines = ward[1]
@@ -1100,7 +1222,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="City of London Corporation's 2013, 2017, 2022, and 2025 Common Council ward elections, its aldermanic elections and Common Council by-elections, and the Council of the Isles of Scilly's 2021 and 2025 elections, from the councils' own results",
+            summary="City of London Corporation's 2009, 2013, 2017, 2022, and 2025 Common Council ward elections, its aldermanic elections and Common Council by-elections from 2007, and the Council of the Isles of Scilly's 2021 and 2025 elections, from the councils' own results",
             polity="GB",
         )
 
@@ -1167,17 +1289,19 @@ def emit() -> Path:
             return sources[url]
 
         wards_made: set[str] = set()
+        old_codes = set(OLD_CODES.values())
 
         def ward_entities(code: str, label: str) -> tuple[UUID, UUID]:
             area = cs.area("gb.ward", code)
             unit = cs.unit("gb.ward", code)
             if code not in wards_made:
                 wards_made.add(code)
+                since, until = (None, WARDS_FROM) if code in old_codes else (WARDS_FROM, None)
                 if area in cs.minted:
                     cs.add("area", id=area, scheme_code="gb.ward")
-                    cs.add("area_code", area_id=area, code=code, valid_from=None, valid_to=None)
-                    cs.add("area_parent", area_id=area, parent_id=city_area, valid_from=None, valid_to=None)
                     name(area, label)
+                cs.add("area_code", area_id=area, code=code, valid_from=since, valid_to=until)
+                cs.add("area_parent", area_id=area, parent_id=city_area, valid_from=since, valid_to=until)
                 if unit in cs.minted:
                     cs.add(
                         "reporting_unit",
@@ -1189,6 +1313,7 @@ def emit() -> Path:
                         area_id=area,
                         kind="standard",
                         valid_from=None,
+                        valid_to=until,
                     )
                     name(unit, label)
             return area, unit
@@ -1207,9 +1332,10 @@ def emit() -> Path:
             name(city_election, f"{day.year} City of London Corporation election")
             cs.add("slug", path=f"gb/city-of-london/{day}-local", entity_id=city_election)
             cs.add("note", entity_id=city_election, kind="context", body_md=CITY_NOTES[day])
-            for code, label, page in CITY_WARDS:
+            for code, label, page in OLD_WARDS if day < WARDS_FROM else CITY_WARDS:
                 lines = held.filter(pl.col("ward_code") == code).sort("number")
-                seats = int(lines["elected"].sum())
+                vacancy = CITY_VACANCIES.get((day, code))
+                seats = int(lines["elected"].sum()) + (vacancy[0] if vacancy else 0)
                 tacit = bool(lines["uncontested"][0])
                 if day in CITY_NOTICES:
                     url, archive, title = CITY_NOTICES[day]
@@ -1256,6 +1382,8 @@ def emit() -> Path:
                 )
                 if (day, code) in CITY_DISAGREEMENTS:
                     cs.add("note", entity_id=result_set, kind="caveat", body_md=CITY_DISAGREEMENTS[day, code])
+                if vacancy:
+                    cs.add("note", entity_id=result_set, kind="caveat", body_md=vacancy[1])
                 for line in lines.iter_rows(named=True):
                     surname, given = line["surname"], line["given"]
                     option_key = f"{contest_key}:{line['number']}"
@@ -1312,17 +1440,21 @@ def emit() -> Path:
         staged_contests: set[str] = set()
         staged_elections: set[str] = set()
         for (kind, day), held in extra.group_by("kind", "day", maintain_order=True):
+            day_to = held["day_to"].max()
+            assert isinstance(day, date) and isinstance(day_to, date)
             aldermanic = kind == "alderman"
             election = cs.key("gb.election", f"{day}:{'aldermanic' if aldermanic else 'by'}:{CITY_CODE}")
             staged_elections.add(f"{day}:{'aldermanic' if aldermanic else 'by'}:{CITY_CODE}")
             when = f"{day.day} {day:%B} {day.year}"
+            if day_to != day:
+                when = f"{day.day} {f'{day:%B} ' if day.month != day_to.month else ''}to {day_to.day} {day_to:%B} {day.year}"
             cs.add(
                 "election",
                 id=election,
                 polity_id=city_polity,
                 kind="local" if aldermanic else "by_election",
                 date_from=day,
-                date_to=day,
+                date_to=day_to,
                 status="held",
             )
             name(
@@ -1352,14 +1484,16 @@ def emit() -> Path:
                     source = source_of(page, "City of London Corporation", title)
                 area, unit = ward_entities(code, label)
                 tacit = bool(lines["uncontested"][0])
+                magnitude = int(lines["elected"].sum())
                 contest_key = f"{day}:{'aldermanic' if aldermanic else 'by'}:{code}"
                 staged_contests.add(contest_key)
                 contest = cs.key("gb.contest", contest_key)
                 fields: dict[str, object] = {}
                 if aldermanic:
-                    office = cs.key("gb.office", f"alderman:{code}")
-                    if code not in offices:
-                        offices.add(code)
+                    seat = NEW_CODES.get(code, code)
+                    office = cs.key("gb.office", f"alderman:{seat}")
+                    if seat not in offices:
+                        offices.add(seat)
                         if office in cs.minted:
                             cs.add("office", id=office, polity_id=city_polity, body_id=None, kind="other")
                             name(office, f"Alderman of {label}")
@@ -1371,9 +1505,9 @@ def emit() -> Path:
                     id=contest,
                     election_id=election,
                     district_area_id=area,
-                    magnitude=1,
+                    magnitude=magnitude,
                     round_number=1,
-                    electoral_system_id=fptp,
+                    electoral_system_id=fptp if magnitude == 1 else block,
                     default_result_kind="tacit" if tacit else "counted",
                     **fields,
                 )
@@ -1401,6 +1535,9 @@ def emit() -> Path:
                 votes_sum = int(lines["votes"].sum()) if not tacit else 0
                 spoilt, ballots = lines["spoilt"][0], lines["ballots"][0]
                 reconciled = ballots is not None and spoilt is not None and votes_sum + spoilt == ballots
+                if magnitude > 1:
+                    reconciled = ballots is not None and max(lines["votes"].to_list()) <= ballots <= votes_sum
+                    cs.add("note", entity_id=result_set, kind="caveat", body_md=MULTI_NOTE.format(seats=magnitude))
                 if ballots is not None and not reconciled:
                     cs.add(
                         "note",
@@ -1476,7 +1613,7 @@ def emit() -> Path:
             "The Corporation's own pages date this election differently from the earlier load, so the contest is "
             "now held under its corrected date."
         )
-        ward_codes = [code for code, *_ in CITY_WARDS]
+        ward_codes = [code for code, *_ in CITY_WARDS + OLD_WARDS]
         for scheme, value, entity in conn.execute(
             """select x.scheme, x.value, x.entity_id from external_id x join entity e on e.id = x.entity_id
                where e.retired_by is null and (
