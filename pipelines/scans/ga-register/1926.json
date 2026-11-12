@@ -1,0 +1,452 @@
+{
+  "polity": "US-GA",
+  "publisher": "Georgia Department of Archives and History",
+  "title": "Georgia's Official Register 1927, consolidated vote of the general election held 1926-11-02",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/GeorgiasOfficialRegister1927/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/GeorgiasOfficialRegister1927"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "senate": {
+      "year": 1926,
+      "chamber": "senate",
+      "day": "1926-11-02",
+      "special": false,
+      "state": "GA",
+      "district": null
+    },
+    "house1": {
+      "year": 1926,
+      "chamber": "house",
+      "day": "1926-11-02",
+      "special": false,
+      "state": "GA",
+      "district": 1
+    },
+    "house3": {
+      "year": 1926,
+      "chamber": "house",
+      "day": "1926-11-02",
+      "special": false,
+      "state": "GA",
+      "district": 3
+    },
+    "house2": {
+      "year": 1926,
+      "chamber": "house",
+      "day": "1926-11-02",
+      "special": false,
+      "state": "GA",
+      "district": 2
+    },
+    "house4": {
+      "year": 1926,
+      "chamber": "house",
+      "day": "1926-11-02",
+      "special": false,
+      "state": "GA",
+      "district": 4
+    },
+    "house5": {
+      "year": 1926,
+      "chamber": "house",
+      "day": "1926-11-02",
+      "special": false,
+      "state": "GA",
+      "district": 5
+    },
+    "house7": {
+      "year": 1926,
+      "chamber": "house",
+      "day": "1926-11-02",
+      "special": false,
+      "state": "GA",
+      "district": 7
+    },
+    "house6": {
+      "year": 1926,
+      "chamber": "house",
+      "day": "1926-11-02",
+      "special": false,
+      "state": "GA",
+      "district": 6
+    },
+    "house8": {
+      "year": 1926,
+      "chamber": "house",
+      "day": "1926-11-02",
+      "special": false,
+      "state": "GA",
+      "district": 8
+    },
+    "house9": {
+      "year": 1926,
+      "chamber": "house",
+      "day": "1926-11-02",
+      "special": false,
+      "state": "GA",
+      "district": 9
+    },
+    "house11": {
+      "year": 1926,
+      "chamber": "house",
+      "day": "1926-11-02",
+      "special": false,
+      "state": "GA",
+      "district": 11
+    },
+    "house12": {
+      "year": 1926,
+      "chamber": "house",
+      "day": "1926-11-02",
+      "special": false,
+      "state": "GA",
+      "district": 12
+    },
+    "house10": {
+      "year": 1926,
+      "chamber": "house",
+      "day": "1926-11-02",
+      "special": false,
+      "state": "GA",
+      "district": 10
+    }
+  },
+  "pages": [
+    {
+      "page": 399,
+      "id": "399-0",
+      "columns": [
+        {
+          "label": "WALTER F. GEORGE, U. S. SENATOR",
+          "contest": "senate",
+          "candidate": "Walter F. George"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.068,
+        0.1,
+        0.482,
+        1.0
+      ],
+      "hint": "Read only the table headed 'CONSOLIDATED VOTE OF ELECTION HELD NOVEMBER 2, 1926 FOR UNITED STATES SENATOR'; ignore any other table visible in the image."
+    },
+    {
+      "page": 399,
+      "id": "399-1",
+      "columns": [
+        {
+          "label": "WALTER F. GEORGE, U. S. SENATOR",
+          "contest": "senate",
+          "candidate": "Walter F. George"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.535,
+        0.104,
+        0.932,
+        1.0
+      ],
+      "hint": "Read only the table headed 'CONSOLIDATED VOTE OF ELECTION HELD NOVEMBER 2, 1926 FOR UNITED STATES SENATOR'; ignore any other table visible in the image."
+    },
+    {
+      "page": 400,
+      "id": "400-0",
+      "columns": [
+        {
+          "label": "Walter F. George",
+          "contest": "senate",
+          "candidate": "Walter F. George"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.052,
+        0.096,
+        0.473,
+        0.555
+      ],
+      "hint": "Read only the table headed 'WALTER F. GEORGE, U. S. SENATOR'; ignore any other table visible in the image."
+    },
+    {
+      "page": 400,
+      "id": "400-1",
+      "columns": [
+        {
+          "label": "Walter F. George",
+          "contest": "senate",
+          "candidate": "Walter F. George"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.527,
+        0.15,
+        0.932,
+        0.549
+      ],
+      "hint": "Read only the table headed 'WALTER F. GEORGE, U. S. SENATOR'; ignore any other table visible in the image."
+    },
+    {
+      "page": 400,
+      "id": "400-2",
+      "columns": [
+        {
+          "label": "Richard B. Russell",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.052,
+        0.547,
+        0.478,
+        1.0
+      ],
+      "hint": "Read only the table headed 'RICHARD B. RUSSELL, U. S. SENATOR'; ignore any other table visible in the image."
+    },
+    {
+      "page": 401,
+      "id": "401-0",
+      "columns": [
+        {
+          "label": "Chas. G. Edwards",
+          "contest": "house1",
+          "candidate": "Charles G. Edwards"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.033,
+        0.119,
+        0.513,
+        0.455
+      ],
+      "hint": "Read only the table headed '1st District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 401,
+      "id": "401-1",
+      "columns": [
+        {
+          "label": "Chas. R. Crisp",
+          "contest": "house3",
+          "candidate": "Charles R. Crisp"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.514,
+        0.119,
+        0.991,
+        0.486
+      ],
+      "hint": "Read only the table headed '3rd District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 401,
+      "id": "401-2",
+      "columns": [
+        {
+          "label": "E. E. Cox",
+          "contest": "house2",
+          "candidate": "E. E. Cox"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.447,
+        0.506,
+        0.788
+      ],
+      "hint": "Read only the table headed '2nd District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 401,
+      "id": "401-3",
+      "columns": [
+        {
+          "label": "W. C. Wright",
+          "contest": "house4",
+          "candidate": "William C. Wright"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.514,
+        0.478,
+        0.991,
+        0.788
+      ],
+      "hint": "Read only the table headed '4th District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 402,
+      "id": "402-0",
+      "columns": [
+        {
+          "label": "Leslie J. Steele",
+          "contest": "house5",
+          "candidate": "Leslie J. Steele"
+        },
+        {
+          "label": "William D Upshaw",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.007,
+        0.115,
+        0.478,
+        0.391
+      ],
+      "hint": "Read only the table headed '5th District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 402,
+      "id": "402-1",
+      "columns": [
+        {
+          "label": "Malcolm C. Tarver",
+          "contest": "house7",
+          "candidate": "Malcolm C. Tarver"
+        },
+        {
+          "label": "Geo. A. Coffee",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.473,
+        0.119,
+        0.945,
+        0.456
+      ],
+      "hint": "Read only the table headed '7th District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 402,
+      "id": "402-2",
+      "columns": [
+        {
+          "label": "Samuel Rutherford",
+          "contest": "house6",
+          "candidate": "Samuel Rutherford"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.007,
+        0.383,
+        0.478,
+        0.776
+      ],
+      "hint": "Read only the table headed '6th District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 402,
+      "id": "402-3",
+      "columns": [
+        {
+          "label": "Chas. H. Brand",
+          "contest": "house8",
+          "candidate": "Charles H. Brand"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.473,
+        0.448,
+        0.945,
+        0.788
+      ],
+      "hint": "Read only the table headed '8th District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 403,
+      "id": "403-0",
+      "columns": [
+        {
+          "label": "Thomas M. Bell",
+          "contest": "house9",
+          "candidate": "Thomas M. Bell"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.072,
+        0.13,
+        0.53,
+        0.547
+      ],
+      "hint": "Read only the table headed '9th District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 403,
+      "id": "403-1",
+      "columns": [
+        {
+          "label": "W. C. Lankford",
+          "contest": "house11",
+          "candidate": "William C. Lankford"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.526,
+        0.13,
+        0.985,
+        0.54
+      ],
+      "hint": "Read only the table headed '11th District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 403,
+      "id": "403-2",
+      "columns": [
+        {
+          "label": "W. W. Larsen",
+          "contest": "house12",
+          "candidate": "William W. Larsen"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.526,
+        0.532,
+        0.979,
+        0.868
+      ],
+      "hint": "Read only the table headed '12th District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 403,
+      "id": "403-3",
+      "columns": [
+        {
+          "label": "Carl Vinson",
+          "contest": "house10",
+          "candidate": "Carl Vinson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.066,
+        0.539,
+        0.518,
+        0.868
+      ],
+      "hint": "Read only the table headed '10th District'; ignore any other table visible in the image."
+    }
+  ]
+}

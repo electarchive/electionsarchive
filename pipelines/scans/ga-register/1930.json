@@ -1,0 +1,477 @@
+{
+  "polity": "US-GA",
+  "publisher": "Georgia Department of Archives and History",
+  "title": "Georgia's Official Register 1931, consolidated vote of the general election held 1930-11-04",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/GeorgiasOfficialRegister1931/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/GeorgiasOfficialRegister1931"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "senate": {
+      "year": 1930,
+      "chamber": "senate",
+      "day": "1930-11-04",
+      "special": false,
+      "state": "GA",
+      "district": null
+    },
+    "house1": {
+      "year": 1930,
+      "chamber": "house",
+      "day": "1930-11-04",
+      "special": false,
+      "state": "GA",
+      "district": 1
+    },
+    "house4": {
+      "year": 1930,
+      "chamber": "house",
+      "day": "1930-11-04",
+      "special": false,
+      "state": "GA",
+      "district": 4
+    },
+    "house2": {
+      "year": 1930,
+      "chamber": "house",
+      "day": "1930-11-04",
+      "special": false,
+      "state": "GA",
+      "district": 2
+    },
+    "house5": {
+      "year": 1930,
+      "chamber": "house",
+      "day": "1930-11-04",
+      "special": false,
+      "state": "GA",
+      "district": 5
+    },
+    "house6": {
+      "year": 1930,
+      "chamber": "house",
+      "day": "1930-11-04",
+      "special": false,
+      "state": "GA",
+      "district": 6
+    },
+    "house3": {
+      "year": 1930,
+      "chamber": "house",
+      "day": "1930-11-04",
+      "special": false,
+      "state": "GA",
+      "district": 3
+    },
+    "house7": {
+      "year": 1930,
+      "chamber": "house",
+      "day": "1930-11-04",
+      "special": false,
+      "state": "GA",
+      "district": 7
+    },
+    "house9": {
+      "year": 1930,
+      "chamber": "house",
+      "day": "1930-11-04",
+      "special": false,
+      "state": "GA",
+      "district": 9
+    },
+    "house8": {
+      "year": 1930,
+      "chamber": "house",
+      "day": "1930-11-04",
+      "special": false,
+      "state": "GA",
+      "district": 8
+    },
+    "house10": {
+      "year": 1930,
+      "chamber": "house",
+      "day": "1930-11-04",
+      "special": false,
+      "state": "GA",
+      "district": 10
+    },
+    "house11": {
+      "year": 1930,
+      "chamber": "house",
+      "day": "1930-11-04",
+      "special": false,
+      "state": "GA",
+      "district": 11
+    },
+    "house12": {
+      "year": 1930,
+      "chamber": "house",
+      "day": "1930-11-04",
+      "special": false,
+      "state": "GA",
+      "district": 12
+    }
+  },
+  "pages": [
+    {
+      "page": 713,
+      "id": "713-0",
+      "columns": [
+        {
+          "label": "WILLIAM J. HARRIS",
+          "contest": "senate",
+          "candidate": "William J. Harris"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.1,
+        0.076,
+        0.486,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR WILLIAM J. HARRIS'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.0844
+      ]
+    },
+    {
+      "page": 713,
+      "id": "713-1",
+      "columns": [
+        {
+          "label": "WILLIAM J. HARRIS",
+          "contest": "senate",
+          "candidate": "William J. Harris"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.509,
+        0.076,
+        0.896,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR WILLIAM J. HARRIS'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.0844
+      ]
+    },
+    {
+      "page": 714,
+      "id": "714-0",
+      "columns": [
+        {
+          "label": "WILLIAM J. HARRIS",
+          "contest": "senate",
+          "candidate": "William J. Harris"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.107,
+        0.071,
+        0.481,
+        0.554
+      ],
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR WILLIAM J. HARRIS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1636
+      ]
+    },
+    {
+      "page": 714,
+      "id": "714-1",
+      "columns": [
+        {
+          "label": "WILLIAM J. HARRIS",
+          "contest": "senate",
+          "candidate": "William J. Harris"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.511,
+        0.16,
+        0.891,
+        0.528
+      ],
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR WILLIAM J. HARRIS'; ignore any other table visible in the image."
+    },
+    {
+      "page": 714,
+      "id": "714-2",
+      "columns": [
+        {
+          "label": "WALLACE MILLER",
+          "contest": "senate",
+          "candidate": "Wallace Miller"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.107,
+        0.546,
+        0.473,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR WALLACE MILLER'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0529
+      ]
+    },
+    {
+      "page": 733,
+      "id": "733-0",
+      "columns": [
+        {
+          "label": "CHAS. G. EDWARDS",
+          "contest": "house1",
+          "candidate": "Charles G. Edwards"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.087,
+        0.135,
+        0.496,
+        0.401
+      ],
+      "hint": "Read only the table headed '1st District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 733,
+      "id": "733-1",
+      "columns": [
+        {
+          "label": "W. C. WRIGHT",
+          "contest": "house4",
+          "candidate": "William C. Wright"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.487,
+        0.135,
+        0.901,
+        0.414
+      ],
+      "hint": "Read only the table headed '4th District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 733,
+      "id": "733-2",
+      "columns": [
+        {
+          "label": "E. E. COX",
+          "contest": "house2",
+          "candidate": "E. E. Cox"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.087,
+        0.393,
+        0.496,
+        0.644
+      ],
+      "hint": "Read only the table headed '2d District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 733,
+      "id": "733-3",
+      "columns": [
+        {
+          "label": "ROBT. RAMSPECK",
+          "contest": "house5",
+          "candidate": "Robert Ramspeck"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.487,
+        0.406,
+        0.901,
+        0.617
+      ],
+      "hint": "Read only the table headed '5th District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 733,
+      "id": "733-4",
+      "columns": [
+        {
+          "label": "SAMUEL RUTHERFORD",
+          "contest": "house6",
+          "candidate": "Samuel Rutherford"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.487,
+        0.609,
+        0.901,
+        0.908
+      ],
+      "hint": "Read only the table headed '6th District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 733,
+      "id": "733-5",
+      "columns": [
+        {
+          "label": "CHAS. R. CRISP",
+          "contest": "house3",
+          "candidate": "Charles R. Crisp"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.087,
+        0.636,
+        0.496,
+        0.919
+      ],
+      "hint": "Read only the table headed '3d District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 734,
+      "id": "734-0",
+      "columns": [
+        {
+          "label": "MALCOLM C. TARVER",
+          "contest": "house7",
+          "candidate": "Malcolm C. Tarver"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.091,
+        0.137,
+        0.507,
+        0.497
+      ],
+      "hint": "Read only the table headed '7th District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 734,
+      "id": "734-1",
+      "columns": [
+        {
+          "label": "JOHN S. WOOD",
+          "contest": "house9",
+          "candidate": "John S. Wood"
+        },
+        {
+          "label": "THOS. M. BELL",
+          "contest": "house9",
+          "candidate": "Thomas S. Bell"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.491,
+        0.137,
+        0.909,
+        0.565
+      ],
+      "hint": "Read only the table headed '9th District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 734,
+      "id": "734-2",
+      "columns": [
+        {
+          "label": "CHAS. H. BRAND",
+          "contest": "house8",
+          "candidate": "Charles H. Brand"
+        },
+        {
+          "label": "W. N. PHILLIPS",
+          "contest": "house8",
+          "candidate": "W. N. Phillips"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.091,
+        0.489,
+        0.507,
+        0.845
+      ],
+      "hint": "Read only the table headed '8th District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 734,
+      "id": "734-3",
+      "columns": [
+        {
+          "label": "CARL VINSON",
+          "contest": "house10",
+          "candidate": "Carl Vinson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.491,
+        0.557,
+        0.909,
+        0.863
+      ],
+      "hint": "Read only the table headed '10th District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 735,
+      "id": "735-0",
+      "columns": [
+        {
+          "label": "W. C. LANK-FORD",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "H. J. CARS-WELL",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.105,
+        0.141,
+        0.521,
+        0.518
+      ],
+      "hint": "Read only the table headed '11th District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 735,
+      "id": "735-1",
+      "columns": [
+        {
+          "label": "W. W. LARSEN",
+          "contest": "house12",
+          "candidate": "William W. Larsen"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.507,
+        0.145,
+        0.913,
+        0.467
+      ],
+      "hint": "Read only the table headed '12th District'; ignore any other table visible in the image."
+    }
+  ]
+}
