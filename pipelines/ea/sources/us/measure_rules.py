@@ -166,7 +166,7 @@ STATEWIDE = {
 
 def statewide(state: str, label: str) -> str:
     if state == "CO":
-        return "referendum-co-55" if label.startswith("Amendment") else "referendum"
+        return "referendum-co-55" if re.match(r"Amendment \d", label) else "referendum"
     if state == "MP":
         return "referendum-mp-two-thirds" if label.startswith("Constitutional Convention") else "referendum"
     return STATEWIDE.get(state, "referendum")

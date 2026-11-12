@@ -11,7 +11,7 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
-from ea.sources.us import elstats
+from ea.sources.us import elstats, measure_rules
 from ea.sources.us.county_changes import ct_regions
 from ea.store import DATA, connect
 
@@ -334,6 +334,7 @@ def emit() -> Path:
             "electoral_system", id=system, polity_id=cs.polity("US"), rules={"formula": "referendum"}, rules_version=1
         )
         name(system, "Statewide ballot question")
+        colorado = measure_rules.systems(cs, {"referendum-co-55"})["referendum-co-55"]
         states = {
             abbreviation: area
             for abbreviation, area in conn.execute(
@@ -404,20 +405,21 @@ def emit() -> Path:
 
             contest_key = f"{day}:{state}:question:{question}"
             contest = cs.key("us.contest", contest_key)
+            initiative = (
+                kind in ("Initiative Petition", "Proposition")
+                or (state == "CO" and re.match(r"(?i)(amendment|proposition)\s*\d", title) is not None)
+            ) and "referendum" not in title.lower()
+            co_55 = state == "CO" and day.year >= 2018 and initiative and kind == "Constitutional Amendment"
             cs.add(
                 "contest",
                 id=contest,
                 election_id=election,
                 kind="ballot_question",
                 district_area_id=states[state],
-                electoral_system_id=system,
+                electoral_system_id=colorado if co_55 else system,
                 round_number=1,
                 default_result_kind="counted",
             )
-            initiative = (
-                kind in ("Initiative Petition", "Proposition")
-                or (state == "CO" and re.match(r"(?i)(amendment|proposition)\s*\d", title) is not None)
-            ) and "referendum" not in title.lower()
             cs.add(
                 "ballot_question",
                 contest_id=contest,
@@ -449,6 +451,20 @@ def emit() -> Path:
                     ballot_position=position + 1,
                     ballot_label=label,
                 )
+            if (
+                (state, day) not in REDATED
+                and conn.execute(
+                    "select 1 from external_id where scheme = %s and value = %s",
+                    [f"{SOURCE}.result_set", contest_key],
+                ).fetchone()
+                is None
+                and conn.execute(
+                    "select 1 from result_set where contest_id = %s and stage = 'certified' and is_default",
+                    [contest],
+                ).fetchone()
+                is not None
+            ):
+                continue
             result_set = cs.key(f"{SOURCE}.result_set", contest_key)
             misdated = (
                 conn.execute(
@@ -519,9 +535,7 @@ def emit() -> Path:
                     cs.add("outcome", result_set_id=result_set, option_id=options[winner], kind="won")
                 continue
             threshold, rule = (
-                THRESHOLDS[state]
-                if kind == "Constitutional Amendment" and (state == "NH" or (state == "CO" and day.year >= 2016))
-                else (0.5, "")
+                THRESHOLDS[state] if kind == "Constitutional Amendment" and (state == "NH" or co_55) else (0.5, "")
             )
             note(result_set, "methodology", METHOD.format(threshold=rule))
             if state == "NM" and kind == "Constitutional Amendment" and 0.5 < yes / valid < 0.75:
