@@ -17,6 +17,7 @@ PARSED = DATA / "parsed" / SOURCE
 PUBLISHER = "Iowa Secretary of State"
 TITLE = "Election night reporting results by county"
 FILES = [
+    "https://results.enr.clarityelections.com/IA/91323/223398/reports/detailxml.zip",
     "https://results.enr.clarityelections.com/IA/115641/316303/reports/detailxml.zip",
     "https://results.enr.clarityelections.com/IA/122322/356043/reports/detailxml.zip",
 ]
@@ -25,6 +26,7 @@ OFFICES = {
     "President and Vice President": "president",
     "United States Senator": "senate",
     "Governor and Lt. Governor": "governor",
+    "Governor/Lieutenant Governor": "governor",
     "Attorney General": "attorney-general",
     "Auditor of State": "auditor",
     "Secretary of Agriculture": "secretary-of-agriculture",
@@ -49,7 +51,7 @@ def _chamber(text: str, day: str, contests: set[str]) -> tuple[str, int | None] 
         return "house", int(found[1])
     if found := re.fullmatch(r"State (Representative|Senator) District (\d+)", text):
         return f"{'house' if found[1] == 'Representative' else 'senate'}:{int(found[2])}:g", None
-    if found := re.fullmatch(r"(Supreme Court Justice|Court of Appeals Judge) - (.+)", text):
+    if found := re.fullmatch(r"(Supreme Court Justice|Court of Appeals Judge)(?: -)? (.+)", text):
         words = re.sub(r"[^a-z ]", "", found[2].lower()).split()
         return f"{COURTS[found[1]]}:{words[0]}-{words[-1]}", None
     if found := re.fullmatch(r"Constitutional Amendment (\d+)", text):
@@ -130,7 +132,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Iowa's 2022 and 2024 general elections by county and ballot type (election day and absentee), from the Secretary of State's results files",
+            summary="Iowa's 2018, 2022, and 2024 general elections by county and ballot type (election day and absentee), from the Secretary of State's results files",
             polity="US-IA",
         )
         source = cs.source(PUBLISHER, TITLE)
