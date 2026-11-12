@@ -1,0 +1,134 @@
+{
+  "polity": "US-PA",
+  "publisher": "Pennsylvania Department of State",
+  "title": "The Pennsylvania Manual 1989 (vol. 109), county returns of the general election 1988-11-08",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706939_0270/micro_IA40706939_0270.pdf",
+    "item": "https://archive.org/details/micro_IA40706939_0270"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1988,
+      "chamber": "president",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "PA",
+      "district": null
+    },
+    "senate": {
+      "year": 1988,
+      "chamber": "senate",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "PA",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 650,
+      "id": "650-0",
+      "columns": [
+        {
+          "label": "REPUBLICAN George Bush",
+          "contest": "president",
+          "candidate": "George Bush"
+        },
+        {
+          "label": "DEMOCRATIC Michael S. Dukakis",
+          "contest": "president",
+          "candidate": "Michael S. Dukakis"
+        },
+        {
+          "label": "CONSUMER Eugene J. McCarthy",
+          "contest": "president",
+          "candidate": "Eugene J. McCarthy"
+        },
+        {
+          "label": "LIBERTARIAN Ron Paul",
+          "contest": "president",
+          "candidate": "Ronald E. Paul"
+        },
+        {
+          "label": "NEW ALLIANCE Leonora B. Fulani",
+          "contest": "president",
+          "candidate": "Lenora B. Fulani"
+        },
+        {
+          "label": "POPULIST David E. Duke",
+          "contest": "president",
+          "candidate": "David E. Duke"
+        },
+        {
+          "label": "WORKERS LEAGUE Edward Winn",
+          "contest": "president",
+          "candidate": "Edward Winn"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.121,
+        0.126,
+        0.893,
+        0.935
+      ],
+      "hint": "Read only the table headed 'PRESIDENT OF THE UNITED STATES General Election, November 8, 1988'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1075
+      ]
+    },
+    {
+      "page": 651,
+      "id": "651-0",
+      "columns": [
+        {
+          "label": "REPUBLICAN John Heinz",
+          "contest": "senate",
+          "candidate": "John Heinz"
+        },
+        {
+          "label": "DEMOCRATIC Joe Vignola",
+          "contest": "senate",
+          "candidate": "Joe Vignola"
+        },
+        {
+          "label": "CONSUMER Darcy Richardson",
+          "contest": "senate",
+          "candidate": "Darcy Richardson"
+        },
+        {
+          "label": "LIBERTARIAN Henry Haller, III",
+          "contest": "senate",
+          "candidate": "Henry Haller III"
+        },
+        {
+          "label": "NEW ALLIANCE Sam Blancato",
+          "contest": "senate",
+          "candidate": "Sam Blancato"
+        },
+        {
+          "label": "POPULIST Samuel Cross, Jr.",
+          "contest": "senate",
+          "candidate": "Samuel Cross Jr."
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.154,
+        0.08,
+        0.913,
+        0.896
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATE General Election, November 8, 1988'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1078
+      ]
+    }
+  ]
+}
