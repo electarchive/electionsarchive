@@ -324,6 +324,11 @@ NUANCE_FIXES = {
     }
 }
 VOTE_FIXES = {
+    (1988, 1, "1602"): {"PIERRON ANTOINE": 1977},
+    (1988, 1, "1803"): {"MAGDELENAT LOUIS": 4024},
+    (1988, 1, "5706"): {"BARTKOWIAK DANIEL": 1535},
+    (1988, 2, "2A01"): {"ALFONSI NICOLAS": 11573},
+    (1988, 2, "7201"): {"ISNARD NYCETTE": 19110},
     (1993, 1, "1801"): {"CAMUZAT MAXIME": 7716},
     (1993, 1, "1903"): {"CHIRAC JACQUES": 25951},
     (1993, 1, "3303"): {"COYCAUT MARIE-JOELLE": 841},
@@ -875,6 +880,7 @@ ACCOUNTING_FIXES = {
     (2012, 2, "ZZ03"): {INVALID: 502},
 }
 EXTRA_CANDIDATES = {
+    (1988, 1, "97501"): [("GRIGNON", "GERARD", "M", "UDF", 3, 2241)],
     (1997, 1, "7502"): [
         ("CARPENTIER", "ANNE", "F", "DIV", 27, 299),
         ("FUR", "ALEXANDRE", "M", "DIV", 28, 14),
@@ -1193,7 +1199,7 @@ def parse() -> None:
                 "legi",
                 year,
                 number,
-                circ[:2],
+                circ[:3] if circ.startswith("97") else circ[:2],
                 circ,
                 f"{surname} {forename}",
                 slot,
