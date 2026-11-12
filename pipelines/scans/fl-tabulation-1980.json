@@ -1,0 +1,107 @@
+{
+ "polity": "US-FL",
+ "publisher": "Florida Department of State, Division of Elections",
+ "title": "Tabulation of Official Votes, Florida General Election 1980-11-04",
+ "license": "Public record",
+ "file": {
+  "url": "https://archive.org/download/micro_IA40706905_0253/micro_IA40706905_0253.pdf",
+  "item": "https://archive.org/details/micro_IA40706905_0253"
+ },
+ "raw_source": "us.sri",
+ "contests": {
+  "president": {
+   "year": 1980,
+   "chamber": "president",
+   "day": "1980-11-04",
+   "special": false,
+   "state": "FL",
+   "district": null
+  },
+  "senate": {
+   "year": 1980,
+   "chamber": "senate",
+   "day": "1980-11-04",
+   "special": false,
+   "state": "FL",
+   "district": null
+  }
+ },
+ "pages": [
+  {
+   "page": 7,
+   "id": "7-0",
+   "columns": [
+    {
+     "label": "JIMMY CARTER & WALTER F. MONDALE (DEMOCRAT)",
+     "contest": "president",
+     "candidate": "Jimmy Carter (Democratic)"
+    },
+    {
+     "label": "RONALD REAGAN & GEORGE BUSH (REPUBLICAN)",
+     "contest": "president",
+     "candidate": "Ronald Reagan (Republican)"
+    },
+    {
+     "label": "ED CLARK & DAVID KOCH (LIBERTARIAN)",
+     "contest": "president",
+     "candidate": "Ed Clark (Libertarian)"
+    },
+    {
+     "label": "JOHN B. ANDERSON & PATRICK J. LUCEY (INDEPENDENT)",
+     "contest": "president",
+     "candidate": "John B. Anderson (Independent)"
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.16,
+    0.09,
+    0.91,
+    0.72
+   ],
+   "hint": "Read the 67 county rows and stop at the TOTALS row; ignore the ABSENTEES rows below it.",
+   "bands": 2,
+   "header": [
+    0.0,
+    0.08
+   ]
+  },
+  {
+   "page": 9,
+   "id": "9-0",
+   "columns": [
+    {
+     "label": "Bill Gunter (Democrat)",
+     "contest": "senate",
+     "candidate": "Bill Gunter (Democratic)"
+    },
+    {
+     "label": "Paula Hawkins (Republican)",
+     "contest": "senate",
+     "candidate": "Paula Hawkins (Republican)"
+    },
+    {
+     "label": "Andrea Baron (Write-In)",
+     "contest": "senate",
+     "candidate": "Andrea Baron (Write-in)"
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.15,
+    0.11,
+    0.55,
+    0.77
+   ],
+   "hint": "Read only the table headed 'UNITED STATES SENATOR' on the left; ignore the Representative in Congress tables on the right and the ABSENTEES rows below TOTALS.",
+   "bands": 2,
+   "header": [
+    0.0,
+    0.07
+   ]
+  }
+ ],
+ "unit_codes": {
+  "Dade": "12086"
+ }
+}
