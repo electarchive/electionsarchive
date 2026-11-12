@@ -2,6 +2,7 @@
   import type { Snippet } from "svelte";
   import { resolve } from "$app/paths";
   import { getContext } from "svelte";
+  import { on } from "svelte/events";
   import { cards, loadCards } from "#lib/cards.svelte.js";
   import * as HoverCard from "#lib/components/ui/hover-card/index.js";
   import { isTouch, show } from "#lib/explain.svelte.js";
@@ -34,6 +35,15 @@
     key != null && /^[0-9a-f-]{36}$/u.test(key) ? key : null,
   );
   const scope = getContext<(() => string | null) | undefined>(WITHIN);
+
+  const prefetchCards = (node: HTMLElement) => {
+    if ("requestIdleCallback" in window) {
+      requestIdleCallback(loadCards);
+    } else {
+      setTimeout(loadCards, 1000);
+    }
+    return on(node, "pointerenter", loadCards);
+  };
 </script>
 
 {#snippet face()}
@@ -61,12 +71,13 @@
     <HoverCard.Trigger>
       {#snippet child({ props })}
         {#if !hasLink}
-          <span {...props} class={className}
+          <span {...props} class={className} {@attach prefetchCards}
             >{@render (children ?? face)()}</span
           >
         {:else}
           <a
             {...props}
+            {@attach prefetchCards}
             href={resolve("/id/[id]", { id: person ?? party ?? "" })}
             {tabindex}
             class={cn(
