@@ -595,11 +595,15 @@ VOTE_FIXES = {
     (2012, 2, "97203"): {"CAROLE FRANCIS": 6437},
     (2012, 2, "97204"): {"NILOR JEAN-PHILIPPE": 20204},
     (2012, 2, "97403"): {"THIEN AH KOON ANDRÉ": 18012},
+    (1993, 2, "7808"): {"BEDIER PIERRE": 18864, "D'ANDRE JEAN-LOUIS": 12387},
     (2012, 2, "98701"): {"FRITCH EDOUARD": 21921, "FREBAULT PIERRE": 12752},
     (2012, 2, "98702"): {"NEUFFER PHILIPPE": 14311},
 }
 ACCOUNTING_FIXES = {
     (1993, 1, "6402"): {VALID: 43265},
+    (1993, 1, "97405"): {REGISTERED: 66642, VOTERS: 42305, VALID: 40813, INVALID: 1492},
+    (1993, 2, "97405"): {REGISTERED: 66647, VOTERS: 47918, VALID: 46385, INVALID: 1533},
+    (1993, 2, "7808"): {REGISTERED: 60133, VOTERS: 37605, VALID: 31251, INVALID: 6354},
     (2012, 1, "9307"): {VALID: 35414, INVALID: 606},
     (2012, 1, "9309"): {VOTERS: 33192, VALID: 32566, INVALID: 626},
     (2012, 2, "0101"): {VALID: 46976, INVALID: 924},
@@ -881,6 +885,19 @@ ACCOUNTING_FIXES = {
 }
 EXTRA_CANDIDATES = {
     (1988, 1, "97501"): [("GRIGNON", "GERARD", "M", "UDF", 3, 2241)],
+    (1993, 1, "97405"): [
+        ("SUDRE", "CAMILLE", "M", "EXG", 1, 15863),
+        ("REALE", "MICHEL", "M", "EXG", 2, 233),
+        ("FRUTEAU", "JEAN-CLAUDE", "M", "SOC", 3, 5959),
+        ("PARIS", "M.FRANCE", "F", "DIV", 4, 336),
+        ("POYNIN", "J.HUGUES", "M", "DIV", 5, 609),
+        ("VIRAPOULLE", "J.PAUL", "M", "UDF", 6, 17400),
+        ("VENNER", "JEAN-MARC", "M", "FRN", 7, 413),
+    ],
+    (1993, 2, "97405"): [
+        ("SUDRE", "CAMILLE", "M", "EXG", 1, 22509),
+        ("VIRAPOULLE", "J.PAUL", "M", "UDF", 2, 23876),
+    ],
     (1997, 1, "7502"): [
         ("CARPENTIER", "ANNE", "F", "DIV", 27, 299),
         ("FUR", "ALEXANDRE", "M", "DIV", 28, 14),
@@ -1175,6 +1192,17 @@ def parse() -> None:
         .with_columns(value=pl.coalesce("fixed", "value"))
         .drop("fixed")
     )
+    absent = (
+        fixed.join(values, on=["year", "round", "circ", "measure"], how="anti")
+        .with_columns(
+            kind=pl.lit("legi"),
+            dept=pl.when(pl.col("circ").str.starts_with("97"))
+            .then(pl.col("circ").str.slice(0, 3))
+            .otherwise(pl.col("circ").str.slice(0, 2)),
+        )
+        .rename({"fixed": "value"})
+    )
+    values = pl.concat([values, absent], how="diagonal")
     standing = pl.concat(options, how="diagonal")
     fixes = pl.DataFrame(
         [
