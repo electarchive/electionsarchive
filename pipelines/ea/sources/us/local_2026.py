@@ -12538,6 +12538,8 @@ def live_key(cs: Changeset, scheme: str, value: str) -> tuple[UUID, str]:
 
 
 def emit() -> None:
+    if GROUPS is None:
+        raise SystemExit("set LOCAL_STATES (for example LOCAL_STATES=AR) and parse those states first")
     whole = pl.read_parquet(PARSED / "candidates.parquet")
     groups = whole["tail"].str.split(":").list.first()
     present = set(groups)
