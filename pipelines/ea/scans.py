@@ -956,7 +956,8 @@ def match(labels: list[str], held: list[tuple[str, str, int | None]], contest: s
         for form in (name, text):
             forms = [word for word in slug(form).split() if len(word) > 1 and word not in SUFFIX_WORDS]
             if forms:
-                surname = forms[0] if "," in form else forms[-1]
+                before = re.sub(r",\s*(jr|sr|ii|iii|iv)\.?\s*$", "", form.lower())
+                surname = forms[0] if "," in before else forms[-1]
                 if surname not in GENERIC_NAMES:
                     found_surnames.add(surname)
         surnames.append((name, found_surnames))

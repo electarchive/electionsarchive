@@ -379,8 +379,8 @@
       "columns": [
         {
           "label": "Reynolds, Jr. (Dem.)",
-          "contest": null,
-          "candidate": ""
+          "contest": "house8",
+          "candidate": "John W. Reynolds, Jr."
         },
         {
           "label": "Byrnes (Rep.)",

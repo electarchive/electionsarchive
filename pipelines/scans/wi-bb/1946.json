@@ -424,8 +424,8 @@
         },
         {
           "label": "Pearson (Soc.)",
-          "contest": null,
-          "candidate": ""
+          "contest": "house7",
+          "candidate": "John A. Pearson, Jr."
         }
       ],
       "orientation": "counties_down",

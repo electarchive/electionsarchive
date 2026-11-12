@@ -8,6 +8,7 @@
     "item": "https://search.library.wisc.edu/digital/AGPUOJWPI5SXM38W"
   },
   "raw_source": "us.county_volumes",
+  "extend": true,
   "contests": {
     "president": {
       "year": 1940,
@@ -165,60 +166,6 @@
       ]
     },
     {
-      "page": 678,
-      "id": "678-0",
-      "columns": [
-        {
-          "label": "Roosevelt (Dem.)",
-          "contest": "president",
-          "candidate": "Franklin D. Roosevelt (Democratic)"
-        },
-        {
-          "label": "Willkie (Rep.)",
-          "contest": "president",
-          "candidate": "Wendell Willkie (Republican)"
-        },
-        {
-          "label": "Thomas (Soc.)",
-          "contest": "president",
-          "candidate": "Norman Thomas (Socialist)"
-        },
-        {
-          "label": "Babson (Proh.)",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "Browder (Com.)",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "Roosevelt (Dem.) electoral",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "Willkie (Rep.) electoral",
-          "contest": null,
-          "candidate": ""
-        }
-      ],
-      "orientation": "counties_down",
-      "crop": [
-        0.078,
-        0.157,
-        0.875,
-        0.757
-      ],
-      "hint": "Read only the table headed 'PRESIDENTIAL ELECTION, 1940 By States'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        0.1367
-      ]
-    },
-    {
       "page": 679,
       "id": "679-0",
       "columns": [
@@ -288,8 +235,8 @@
         },
         {
           "label": "Wiggert, Jr. (Ind. Soc. Labor)",
-          "contest": null,
-          "candidate": ""
+          "contest": "senate",
+          "candidate": "Adolf Wiggert, Jr."
         }
       ],
       "orientation": "counties_down",
@@ -351,8 +298,9 @@
         },
         {
           "label": "Hawks, Jr. (Rep.)",
-          "contest": null,
-          "candidate": ""
+          "contest": "house2",
+          "candidate": "Hawks, Jr.",
+          "party": "Rep."
         }
       ],
       "orientation": "counties_down",
@@ -462,8 +410,8 @@
         },
         {
           "label": "Corrigan, Sr. (Prog.)",
-          "contest": null,
-          "candidate": ""
+          "contest": "house6",
+          "candidate": "Walter D. Corrigan, Sr."
         },
         {
           "label": "Keefe (Rep.)",

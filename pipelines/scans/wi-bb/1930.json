@@ -8,6 +8,7 @@
     "item": "https://search.library.wisc.edu/digital/AABWTCD5E6MWIC8O"
   },
   "raw_source": "us.county_volumes",
+  "extend": true,
   "contests": {
     "governor": {
       "year": 1930,
@@ -162,8 +163,9 @@
         },
         {
           "label": "Henry Allen (Rep.)",
-          "contest": null,
-          "candidate": ""
+          "contest": "house1",
+          "candidate": "Henry Allen",
+          "party": "Rep."
         }
       ],
       "orientation": "counties_down",
@@ -229,8 +231,8 @@
       "columns": [
         {
           "label": "William J. Kershaw (Dem.)",
-          "contest": null,
-          "candidate": ""
+          "contest": "house4",
+          "candidate": "William J. Kershaw"
         },
         {
           "label": "Jos. A. Hansen (Pro.)",
@@ -244,8 +246,8 @@
         },
         {
           "label": "Wm. F. Quick (Soc.)",
-          "contest": null,
-          "candidate": ""
+          "contest": "house4",
+          "candidate": "William F. Quick, sr."
         },
         {
           "label": "John Kasun",

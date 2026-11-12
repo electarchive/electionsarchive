@@ -8,6 +8,7 @@
     "item": "https://search.library.wisc.edu/digital/AK4UW47RO2T4A38E"
   },
   "raw_source": "us.county_volumes",
+  "extend": true,
   "contests": {
     "governor": {
       "year": 1974,
@@ -290,8 +291,9 @@
         },
         {
           "label": "Vernon W. Thomas (Rep.)",
-          "contest": null,
-          "candidate": ""
+          "contest": "house3",
+          "candidate": "Vernon W. Thomas",
+          "party": "Rep."
         }
       ],
       "orientation": "counties_down",

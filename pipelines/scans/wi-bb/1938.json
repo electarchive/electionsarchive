@@ -133,8 +133,8 @@
         },
         {
           "label": "Schleier, Jr. (Ind. Soc. Labor)",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "John Schleier, Jr."
         }
       ],
       "orientation": "counties_down",

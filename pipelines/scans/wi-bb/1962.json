@@ -8,6 +8,7 @@
     "item": "https://search.library.wisc.edu/digital/AXF6R5VAIXPXFS8Y"
   },
   "raw_source": "us.county_volumes",
+  "extend": true,
   "contests": {
     "governor": {
       "year": 1962,
@@ -128,13 +129,15 @@
         },
         {
           "label": "David Carley (Dem.)",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "David Carley",
+          "party": "Dem."
         },
         {
           "label": "Jack Olson (Rep.)",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "Jack Olson",
+          "party": "Rep."
         }
       ],
       "orientation": "counties_down",

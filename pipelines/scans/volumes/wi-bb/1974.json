@@ -25,5 +25,6 @@
   838,
   839
  ],
- "mixed": true
+ "mixed": true,
+ "extend": true
 }

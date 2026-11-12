@@ -22,5 +22,6 @@
   776,
   777
  ],
- "mixed": true
+ "mixed": true,
+ "extend": true
 }

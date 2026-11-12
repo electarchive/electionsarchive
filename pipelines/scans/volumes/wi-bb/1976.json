@@ -24,5 +24,6 @@
   925,
   926
  ],
- "mixed": true
+ "mixed": true,
+ "extend": true
 }

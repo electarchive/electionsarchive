@@ -8,6 +8,7 @@
     "item": "https://search.library.wisc.edu/digital/AXHRYO3YEVDUIK8X"
   },
   "raw_source": "us.county_volumes",
+  "extend": true,
   "contests": {
     "president": {
       "year": 1936,
@@ -270,8 +271,9 @@
       "columns": [
         {
           "label": "Wolf (Dem.)",
-          "contest": null,
-          "candidate": ""
+          "contest": "house1",
+          "candidate": "Wolf",
+          "party": "Dem."
         },
         {
           "label": "Amlie (Prog.)",
@@ -299,8 +301,9 @@
       "columns": [
         {
           "label": "Dempsey (Dem.)",
-          "contest": null,
-          "candidate": ""
+          "contest": "house2",
+          "candidate": "Dempsey",
+          "party": "Dem."
         },
         {
           "label": "Sauthoff (Prog.)",
@@ -328,8 +331,9 @@
       "columns": [
         {
           "label": "McGonigle (Dem.)",
-          "contest": null,
-          "candidate": ""
+          "contest": "house3",
+          "candidate": "McGonigle",
+          "party": "Dem."
         },
         {
           "label": "Withrow (Prog.)",
@@ -367,8 +371,9 @@
         },
         {
           "label": "Schafer (Rep.)",
-          "contest": null,
-          "candidate": ""
+          "contest": "house4",
+          "candidate": "Schafer",
+          "party": "Rep."
         }
       ],
       "orientation": "counties_down",
@@ -396,8 +401,9 @@
         },
         {
           "label": "Spence (Rep.)",
-          "contest": null,
-          "candidate": ""
+          "contest": "house5",
+          "candidate": "Spence",
+          "party": "Rep."
         }
       ],
       "orientation": "counties_down",
@@ -420,8 +426,9 @@
         },
         {
           "label": "Poltl (Prog.)",
-          "contest": null,
-          "candidate": ""
+          "contest": "house6",
+          "candidate": "Poltl",
+          "party": "Prog."
         },
         {
           "label": "Keefe (Rep.)",
@@ -444,8 +451,9 @@
       "columns": [
         {
           "label": "Coleman (Dem.)",
-          "contest": null,
-          "candidate": ""
+          "contest": "house7",
+          "candidate": "Coleman",
+          "party": "Dem."
         },
         {
           "label": "Boileau (Prog.)",
@@ -454,8 +462,9 @@
         },
         {
           "label": "Prehn (Rep.)",
-          "contest": null,
-          "candidate": ""
+          "contest": "house7",
+          "candidate": "Prehn",
+          "party": "Rep."
         }
       ],
       "orientation": "counties_down",
@@ -483,13 +492,15 @@
         },
         {
           "label": "Farrell (Rep.)",
-          "contest": null,
-          "candidate": ""
+          "contest": "house8",
+          "candidate": "Farrell",
+          "party": "Rep."
         },
         {
           "label": "Weber (Ind.)",
-          "contest": null,
-          "candidate": ""
+          "contest": "house8",
+          "candidate": "Weber",
+          "party": "Ind."
         }
       ],
       "orientation": "counties_down",
@@ -531,8 +542,9 @@
       "columns": [
         {
           "label": "Bostrom (Dem.)",
-          "contest": null,
-          "candidate": ""
+          "contest": "house10",
+          "candidate": "Bostrom",
+          "party": "Dem."
         },
         {
           "label": "Gehrmann (Prog.)",

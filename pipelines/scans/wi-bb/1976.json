@@ -8,6 +8,7 @@
     "item": "https://search.library.wisc.edu/digital/AXFTVPSYH4JPMZ8D"
   },
   "raw_source": "us.county_volumes",
+  "extend": true,
   "contests": {
     "president": {
       "year": 1976,
@@ -261,8 +262,9 @@
         },
         {
           "label": "Adolf L. Gudnerson (Rep.)",
-          "contest": null,
-          "candidate": ""
+          "contest": "house3",
+          "candidate": "Adolf L. Gudnerson",
+          "party": "Rep."
         }
       ],
       "orientation": "counties_down",
