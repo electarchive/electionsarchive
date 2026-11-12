@@ -1,0 +1,443 @@
+{
+  "polity": "US-NC",
+  "publisher": "North Carolina Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "title": "North Carolina Manual 1991-92, abstracts of votes, general election 1990-11-06",
+  "file": {
+    "url": "https://archive.org/download/northcarolinaman19911992nort/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/northcarolinaman19911992nort"
+  },
+  "contests": {
+    "senate": {
+      "year": 1990,
+      "chamber": "senate",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "NC",
+      "district": null
+    },
+    "house1": {
+      "year": 1990,
+      "chamber": "house",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "NC",
+      "district": 1
+    },
+    "house2": {
+      "year": 1990,
+      "chamber": "house",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "NC",
+      "district": 2
+    },
+    "house3": {
+      "year": 1990,
+      "chamber": "house",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "NC",
+      "district": 3
+    },
+    "house4": {
+      "year": 1990,
+      "chamber": "house",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "NC",
+      "district": 4
+    },
+    "house5": {
+      "year": 1990,
+      "chamber": "house",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "NC",
+      "district": 5
+    },
+    "house6": {
+      "year": 1990,
+      "chamber": "house",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "NC",
+      "district": 6
+    },
+    "house7": {
+      "year": 1990,
+      "chamber": "house",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "NC",
+      "district": 7
+    },
+    "house8": {
+      "year": 1990,
+      "chamber": "house",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "NC",
+      "district": 8
+    },
+    "house9": {
+      "year": 1990,
+      "chamber": "house",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "NC",
+      "district": 9
+    },
+    "house10": {
+      "year": 1990,
+      "chamber": "house",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "NC",
+      "district": 10
+    },
+    "house11": {
+      "year": 1990,
+      "chamber": "house",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "NC",
+      "district": 11
+    }
+  },
+  "pages": [
+    {
+      "page": 938,
+      "id": "938-0",
+      "columns": [
+        {
+          "label": "(D) Harvey B. Gantt",
+          "contest": "senate",
+          "candidate": "Harvey B. Gantt"
+        },
+        {
+          "label": "(R) Jesse A. Helms",
+          "contest": "senate",
+          "candidate": "Jesse Helms"
+        },
+        {
+          "label": "Rich Stuart",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.017,
+        0.095,
+        0.458,
+        1.0
+      ],
+      "hint": "Read only the table headed 'GENERAL ELECTIONS, NOVEMBER 6, 1990'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.0751
+      ]
+    },
+    {
+      "page": 938,
+      "id": "938-1",
+      "columns": [
+        {
+          "label": "(D) Harvey B. Gantt",
+          "contest": "senate",
+          "candidate": "Harvey B. Gantt"
+        },
+        {
+          "label": "(R) Jesse A. Helms",
+          "contest": "senate",
+          "candidate": "Jesse Helms"
+        },
+        {
+          "label": "Rich Stuart",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.452,
+        0.099,
+        0.913,
+        0.936
+      ],
+      "hint": "Read only the table headed 'GENERAL ELECTIONS, NOVEMBER 6, 1990'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0765
+      ]
+    },
+    {
+      "page": 953,
+      "id": "953-0",
+      "columns": [
+        {
+          "label": "(D) Walter B. Jones",
+          "contest": "house1",
+          "candidate": "Walter B. Jones"
+        },
+        {
+          "label": "(R) Howard D. Moye",
+          "contest": "house1",
+          "candidate": "Howard D. Moye"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.106,
+        0.116,
+        0.994,
+        0.491
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 953,
+      "id": "953-1",
+      "columns": [
+        {
+          "label": "(D) I.T. (Tim) Valentine, Jr.",
+          "contest": "house2",
+          "candidate": "I.T. (Tim) Valentine Jr."
+        },
+        {
+          "label": "(R) Hal C. Sharpe",
+          "contest": "house2",
+          "candidate": "Hal C. Sharpe"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.105,
+        0.483,
+        0.988,
+        0.741
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 953,
+      "id": "953-2",
+      "columns": [
+        {
+          "label": "(D) Martin Lancaster",
+          "contest": "house3",
+          "candidate": "Martin Lancaster"
+        },
+        {
+          "label": "(R) Don Davis",
+          "contest": "house3",
+          "candidate": "Don Davis"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.105,
+        0.733,
+        0.985,
+        0.976
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 954,
+      "id": "954-0",
+      "columns": [
+        {
+          "label": "(D) David E. Price",
+          "contest": "house4",
+          "candidate": "David E. Price"
+        },
+        {
+          "label": "(R) John Carrington",
+          "contest": "house4",
+          "candidate": "John Carrington"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.004,
+        0.139,
+        0.907,
+        0.314
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 954,
+      "id": "954-1",
+      "columns": [
+        {
+          "label": "(D) Steve Neal",
+          "contest": "house5",
+          "candidate": "Stephen L. Neal"
+        },
+        {
+          "label": "(R) Ken Bell",
+          "contest": "house5",
+          "candidate": "Ken Bell"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.007,
+        0.306,
+        0.907,
+        0.528
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 954,
+      "id": "954-2",
+      "columns": [
+        {
+          "label": "(D) Helen R. Allegrone",
+          "contest": "house6",
+          "candidate": "Helen R. Allegrone"
+        },
+        {
+          "label": "(R) Howard Coble",
+          "contest": "house6",
+          "candidate": "Howard Coble"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.012,
+        0.52,
+        0.907,
+        0.678
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 954,
+      "id": "954-3",
+      "columns": [
+        {
+          "label": "(D) Charles G. Rose, III",
+          "contest": "house7",
+          "candidate": "Charles G. Rose III"
+        },
+        {
+          "label": "(R) Robert C. Anderson",
+          "contest": "house7",
+          "candidate": "Robert C. Anderson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.016,
+        0.67,
+        0.908,
+        0.834
+      ],
+      "hint": "Read only the table headed 'SEVENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 955,
+      "id": "955-0",
+      "columns": [
+        {
+          "label": "(D) W.G. (Bill) Hefner",
+          "contest": "house8",
+          "candidate": "W.G. (Bill) Hefner"
+        },
+        {
+          "label": "(R) Ted Blanton",
+          "contest": "house8",
+          "candidate": "Ted Blanton"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.104,
+        0.108,
+        0.991,
+        0.364
+      ],
+      "hint": "Read only the table headed 'EIGHTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 955,
+      "id": "955-1",
+      "columns": [
+        {
+          "label": "(D) David P. McKnight",
+          "contest": "house9",
+          "candidate": "David P. McKnight"
+        },
+        {
+          "label": "(R) J. Alex McMillan",
+          "contest": "house9",
+          "candidate": "J. Alex McMillan"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.104,
+        0.356,
+        0.991,
+        0.523
+      ],
+      "hint": "Read only the table headed 'NINTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 955,
+      "id": "955-2",
+      "columns": [
+        {
+          "label": "(D) Daniel R. Green, Jr.",
+          "contest": "house10",
+          "candidate": "Daniel R. Green Jr."
+        },
+        {
+          "label": "(R) T. Cass Ballenger",
+          "contest": "house10",
+          "candidate": "Cass Ballenger"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.107,
+        0.515,
+        0.991,
+        0.731
+      ],
+      "hint": "Read only the table headed 'TENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 956,
+      "id": "956-0",
+      "columns": [
+        {
+          "label": "(D) James M. Clarke",
+          "contest": "house11",
+          "candidate": "James McClure Clarke"
+        },
+        {
+          "label": "(R) Charles H. Taylor",
+          "contest": "house11",
+          "candidate": "Charles H. Taylor"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.131,
+        0.9,
+        0.429
+      ],
+      "hint": "Read only the table headed 'ELEVENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    }
+  ]
+}

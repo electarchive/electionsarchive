@@ -1,0 +1,438 @@
+{
+  "polity": "US-NC",
+  "publisher": "North Carolina Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "title": "North Carolina Manual, votes for U.S. Senator and U.S. House, general election 1978-11-07",
+  "file": {
+    "url": "https://archive.org/download/northcarolinaman1979nort/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/northcarolinaman1979nort"
+  },
+  "contests": {
+    "senate": {
+      "year": 1978,
+      "chamber": "senate",
+      "day": "1978-11-07",
+      "special": false,
+      "state": "NC",
+      "district": null
+    },
+    "house1": {
+      "year": 1978,
+      "chamber": "house",
+      "day": "1978-11-07",
+      "special": false,
+      "state": "NC",
+      "district": 1
+    },
+    "house2": {
+      "year": 1978,
+      "chamber": "house",
+      "day": "1978-11-07",
+      "special": false,
+      "state": "NC",
+      "district": 2
+    },
+    "house3": {
+      "year": 1978,
+      "chamber": "house",
+      "day": "1978-11-07",
+      "special": false,
+      "state": "NC",
+      "district": 3
+    },
+    "house4": {
+      "year": 1978,
+      "chamber": "house",
+      "day": "1978-11-07",
+      "special": false,
+      "state": "NC",
+      "district": 4
+    },
+    "house5": {
+      "year": 1978,
+      "chamber": "house",
+      "day": "1978-11-07",
+      "special": false,
+      "state": "NC",
+      "district": 5
+    },
+    "house6": {
+      "year": 1978,
+      "chamber": "house",
+      "day": "1978-11-07",
+      "special": false,
+      "state": "NC",
+      "district": 6
+    },
+    "house7": {
+      "year": 1978,
+      "chamber": "house",
+      "day": "1978-11-07",
+      "special": false,
+      "state": "NC",
+      "district": 7
+    },
+    "house8": {
+      "year": 1978,
+      "chamber": "house",
+      "day": "1978-11-07",
+      "special": false,
+      "state": "NC",
+      "district": 8
+    },
+    "house9": {
+      "year": 1978,
+      "chamber": "house",
+      "day": "1978-11-07",
+      "special": false,
+      "state": "NC",
+      "district": 9
+    },
+    "house10": {
+      "year": 1978,
+      "chamber": "house",
+      "day": "1978-11-07",
+      "special": false,
+      "state": "NC",
+      "district": 10
+    },
+    "house11": {
+      "year": 1978,
+      "chamber": "house",
+      "day": "1978-11-07",
+      "special": false,
+      "state": "NC",
+      "district": 11
+    }
+  },
+  "pages": [
+    {
+      "page": 768,
+      "id": "768-0",
+      "columns": [
+        {
+          "label": "John Ingram (D)",
+          "contest": "senate",
+          "candidate": "John Randolph Ingram"
+        },
+        {
+          "label": "Jesse Helms (R)",
+          "contest": "senate",
+          "candidate": "Jesse Helms"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.002,
+        0.113,
+        0.952,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTES IN GENERAL ELECTION FOR UNITED STATES SENATOR NOVEMBER 7, 1978'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1285
+      ]
+    },
+    {
+      "page": 769,
+      "id": "769-0",
+      "columns": [
+        {
+          "label": "John Ingram (D)",
+          "contest": "senate",
+          "candidate": "John Randolph Ingram"
+        },
+        {
+          "label": "Jesse Helms (R)",
+          "contest": "senate",
+          "candidate": "Jesse Helms"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.108,
+        0.113,
+        0.971,
+        0.774
+      ],
+      "hint": "Read only the table headed 'U.S. Senator'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0545
+      ]
+    },
+    {
+      "page": 773,
+      "id": "773-0",
+      "columns": [
+        {
+          "label": "Walter B. Jones (D)",
+          "contest": "house1",
+          "candidate": "Walter Jones"
+        },
+        {
+          "label": "James M. Newcomb (R)",
+          "contest": "house1",
+          "candidate": "James Milford Newcomb"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.096,
+        0.258,
+        0.961,
+        0.626
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 773,
+      "id": "773-1",
+      "columns": [
+        {
+          "label": "L. H. Fountain (D)",
+          "contest": "house2",
+          "candidate": "L. H. Fountain"
+        },
+        {
+          "label": "Barry L. Gardner (R)",
+          "contest": "house2",
+          "candidate": "Barry Lynn Gardner"
+        },
+        {
+          "label": "Leslie L. Koehler (LIB)",
+          "contest": "house2",
+          "candidate": "Les Koehler"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.094,
+        0.618,
+        0.959,
+        0.866
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 774,
+      "id": "774-0",
+      "columns": [
+        {
+          "label": "Charles Whitley (D)",
+          "contest": "house3",
+          "candidate": "Charles Whitely"
+        },
+        {
+          "label": "Willard J. Blanchard (R)",
+          "contest": "house3",
+          "candidate": "Willard Jackson Blanchard"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.024,
+        0.135,
+        0.946,
+        0.332
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 774,
+      "id": "774-1",
+      "columns": [
+        {
+          "label": "Ike Andrews (D)",
+          "contest": "house4",
+          "candidate": "Ike Andrews"
+        },
+        {
+          "label": "Naudeen Beek (LIB)",
+          "contest": "house4",
+          "candidate": "Naudeen Beek"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.029,
+        0.324,
+        0.951,
+        0.495
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 774,
+      "id": "774-2",
+      "columns": [
+        {
+          "label": "Stephen L. Neal (D)",
+          "contest": "house5",
+          "candidate": "Stephen L. Neal"
+        },
+        {
+          "label": "Hamilton C. Horton (R)",
+          "contest": "house5",
+          "candidate": "Hamilton C. Horton"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.019,
+        0.487,
+        0.942,
+        0.704
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 774,
+      "id": "774-3",
+      "columns": [
+        {
+          "label": "Richardson Preyer (D)",
+          "contest": "house6",
+          "candidate": "Richardson Preyer"
+        },
+        {
+          "label": "George H. Bemus (R)",
+          "contest": "house6",
+          "candidate": "George H. Bemus"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.019,
+        0.696,
+        0.942,
+        0.843
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 775,
+      "id": "775-0",
+      "columns": [
+        {
+          "label": "Charles Rose (D)",
+          "contest": "house7",
+          "candidate": "Charles Rose"
+        },
+        {
+          "label": "Raymond C. Schrump (R)",
+          "contest": "house7",
+          "candidate": "Raymond Schrump"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.099,
+        0.107,
+        0.964,
+        0.284
+      ],
+      "hint": "Read only the table headed 'SEVENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 775,
+      "id": "775-1",
+      "columns": [
+        {
+          "label": "W. G. Hefner (D)",
+          "contest": "house8",
+          "candidate": "W. G. (Bill) Hefner"
+        },
+        {
+          "label": "Roger L. Austin (R)",
+          "contest": "house8",
+          "candidate": "Roger Lee Austin"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.096,
+        0.276,
+        0.96,
+        0.546
+      ],
+      "hint": "Read only the table headed 'EIGHTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 775,
+      "id": "775-2",
+      "columns": [
+        {
+          "label": "Charles K. Maxwell (D)",
+          "contest": "house9",
+          "candidate": "Charles Kimball Maxwell"
+        },
+        {
+          "label": "James G. Martin (R)",
+          "contest": "house9",
+          "candidate": "James G. Martin"
+        },
+        {
+          "label": "F. W. Pasotto (LIB)",
+          "contest": "house9",
+          "candidate": "Frederick W. Pasotto"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.097,
+        0.538,
+        0.967,
+        0.686
+      ],
+      "hint": "Read only the table headed 'NINTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 776,
+      "id": "776-0",
+      "columns": [
+        {
+          "label": "James T. Broyhill (R)",
+          "contest": "house10",
+          "candidate": "James T. Broyhill"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.035,
+        0.117,
+        0.968,
+        0.309
+      ],
+      "hint": "Read only the table headed 'TENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 776,
+      "id": "776-1",
+      "columns": [
+        {
+          "label": "Lamar Gudger (D)",
+          "contest": "house11",
+          "candidate": "Lamar Gudger"
+        },
+        {
+          "label": "R. Curtis Ratcliff (R)",
+          "contest": "house11",
+          "candidate": "R. Curtis Ratcliff"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.004,
+        0.301,
+        0.955,
+        0.614
+      ],
+      "hint": "Read only the table headed 'ELEVENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    }
+  ]
+}

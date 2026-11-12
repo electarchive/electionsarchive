@@ -1,0 +1,249 @@
+{
+  "polity": "US-NC",
+  "publisher": "North Carolina Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "title": "North Carolina Manual, votes in general elections for U.S. House 1972-1976, general election 1976-11-02",
+  "file": {
+    "url": "https://archive.org/download/northcarolinaman1977nort/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/northcarolinaman1977nort"
+  },
+  "contests": {
+    "house1": {
+      "year": 1976,
+      "chamber": "house",
+      "day": "1976-11-02",
+      "special": false,
+      "state": "NC",
+      "district": 1
+    },
+    "house2": {
+      "year": 1976,
+      "chamber": "house",
+      "day": "1976-11-02",
+      "special": false,
+      "state": "NC",
+      "district": 2
+    },
+    "house3": {
+      "year": 1976,
+      "chamber": "house",
+      "day": "1976-11-02",
+      "special": false,
+      "state": "NC",
+      "district": 3
+    },
+    "house4": {
+      "year": 1976,
+      "chamber": "house",
+      "day": "1976-11-02",
+      "special": false,
+      "state": "NC",
+      "district": 4
+    },
+    "house5": {
+      "year": 1976,
+      "chamber": "house",
+      "day": "1976-11-02",
+      "special": false,
+      "state": "NC",
+      "district": 5
+    },
+    "house6": {
+      "year": 1976,
+      "chamber": "house",
+      "day": "1976-11-02",
+      "special": false,
+      "state": "NC",
+      "district": 6
+    },
+    "house7": {
+      "year": 1976,
+      "chamber": "house",
+      "day": "1976-11-02",
+      "special": false,
+      "state": "NC",
+      "district": 7
+    }
+  },
+  "pages": [
+    {
+      "page": 757,
+      "id": "757-0",
+      "columns": [
+        {
+          "label": "Walter B. Jones Dem.",
+          "contest": "house1",
+          "candidate": "Walter B. Jones"
+        },
+        {
+          "label": "Joseph M. Ward Rep.",
+          "contest": "house1",
+          "candidate": "Joseph M. Ward"
+        },
+        {
+          "label": "Michael M. Parker Am.",
+          "contest": "house1",
+          "candidate": "Michael M. Parker"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.116,
+        0.171,
+        0.958,
+        0.616
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 757,
+      "id": "757-1",
+      "columns": [
+        {
+          "label": "L. H. Fountain Dem.",
+          "contest": "house2",
+          "candidate": "L. H. Fountain"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.116,
+        0.608,
+        0.96,
+        0.936
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 758,
+      "id": "758-0",
+      "columns": [
+        {
+          "label": "Charles Whitley Dem.",
+          "contest": "house3",
+          "candidate": "Charles Whitley"
+        },
+        {
+          "label": "Willard J. Blanchard Rep.",
+          "contest": "house3",
+          "candidate": "Willard J. (Jack) Blanchard"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.024,
+        0.188,
+        0.911,
+        0.463
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL'; ignore any other table visible in the image."
+    },
+    {
+      "page": 758,
+      "id": "758-1",
+      "columns": [
+        {
+          "label": "Ike Andrews Dem.",
+          "contest": "house4",
+          "candidate": "Ike Andrews"
+        },
+        {
+          "label": "Johnnie L. Gallemore, Jr. Rep.",
+          "contest": "house4",
+          "candidate": "Johnnie L. Gallemore, Jr."
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.025,
+        0.455,
+        0.915,
+        0.709
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 758,
+      "id": "758-2",
+      "columns": [
+        {
+          "label": "Wilmer Mizell Rep.",
+          "contest": "house5",
+          "candidate": "Wilmer (Vinegar Bend) Mizell"
+        },
+        {
+          "label": "Stephen L. Neal Dem.",
+          "contest": "house5",
+          "candidate": "Stephen L. (Steve) Neal"
+        },
+        {
+          "label": "Geoffrey M. Hooks Labor",
+          "contest": "house5",
+          "candidate": "Geoffrey M. Hooks"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.028,
+        0.701,
+        0.918,
+        0.962
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 759,
+      "id": "759-0",
+      "columns": [
+        {
+          "label": "Richardson Preyer Democrat",
+          "contest": "house6",
+          "candidate": "Richardson Preyer"
+        },
+        {
+          "label": "Carl Wagle Libertarian",
+          "contest": "house6",
+          "candidate": "Carl Wagle"
+        },
+        {
+          "label": "Marion Porter Labor",
+          "contest": "house6",
+          "candidate": "Marion Porter"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.117,
+        0.195,
+        0.96,
+        0.414
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 759,
+      "id": "759-1",
+      "columns": [
+        {
+          "label": "Charles G. Rose Democrat",
+          "contest": "house7",
+          "candidate": "Charles G. Rose"
+        },
+        {
+          "label": "M. H. Vaughan Republican",
+          "contest": "house7",
+          "candidate": "M. H. (Mike) Vaughan"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.117,
+        0.406,
+        0.96,
+        0.667
+      ],
+      "hint": "Read only the table headed 'SEVENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    }
+  ]
+}
