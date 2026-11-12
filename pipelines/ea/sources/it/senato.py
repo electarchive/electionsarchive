@@ -281,6 +281,10 @@ SYSTEMS = {
             "formula": "hare",
             "pooling": "coalition",
             "lists": {"order": "closed", "constituencies": "skip", "vacancy": "next_on_list"},
+            "threshold": [
+                {"percent": 10, "level": "coalition", "scope": "national", "requires": {"percent": 3}},
+                {"percent": 3, "level": "list", "scope": "national", "members": "any"},
+            ],
         },
         "Senate, regional lists, since 2017",
         (
@@ -289,13 +293,14 @@ SYSTEMS = {
             "for a list also counts for the single-member candidate it supports, and a vote for the candidate alone "
             "is shared among the candidate's lists in proportion to their votes in the collegio, so the list votes "
             "shown include those shares. Lists need 3% of the national valid vote, or 20% in their region, and "
-            "coalitions need 10% nationally. A coalition list between 1% and 3% adds its votes to the coalition but "
-            "wins no seats. Seats are shared region by region among qualifying coalitions and lists by the largest "
+            "coalitions need 10% nationally with at least one such list. A coalition list between 1% and 3% adds its "
+            "votes to the coalition but wins no seats, and one under 1% adds nothing unless it won 20% in its region. "
+            "Seats are shared region by region among qualifying coalitions and lists by the largest "
             "remainder of a Hare quota, then among each coalition's qualifying lists in the same way, and then among "
             "the region's multi-member collegi. Valle d'Aosta elects one senator by plurality, and Trentino-Alto "
             "Adige elects six in single-member collegi (and in 2018 one more from lists). The Senate had 315 elected "
-            "seats until 2022, and 200 since. The schema stores the Hare step; the thresholds and the split among "
-            "collegi are described here only."
+            "seats until 2022, and 200 since. The rules store the Hare step and the national 3% and 10% bars; the "
+            "20% regional alternative, the 1% floor, and the split among collegi are described here only."
         ),
     ),
     "senato-estero": (
