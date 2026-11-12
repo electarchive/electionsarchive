@@ -11972,7 +11972,7 @@ export const contests = {
       const present = new Set(
         kids.filter((kid) => kid.scheme === input.level).map((kid) => kid.k),
       );
-      const absent = whole.filter((row) => !present.has(row.k));
+      const absent = whole.filter((row) => !present.has(row.k) && !row.unused);
       const [offside, cut] =
         input.level == null
           ? [[], undefined]
@@ -12001,7 +12001,7 @@ export const contests = {
             ...whole.filter((row) => !row.outside).map((row) => row.k),
           ].filter((k) => !off.has(k)),
         ),
-        blankNames(whole, contest.date),
+        blankNames(absent, contest.date),
       ]);
       const blank = absent
         .map((row) => ({
@@ -14506,6 +14506,7 @@ async function universe(
     held: boolean;
     outside: boolean;
     pending: boolean;
+    unused: boolean;
   }>(sql`
     with recursive base as (
       select c.office_id, c.body_id, c.party_scope_id, ec.date_from, ec.date_to, ec.kind
@@ -14561,15 +14562,16 @@ async function universe(
       where not exists (select from entity_merge m where m.entity_id = a.id)
     )
     select distinct candidate.id, candidate.k, candidate.held, false as outside,
-      not candidate.held and (select b.party_scope_id is not null and b.kind <> 'indirect' from base b) as pending
+      not candidate.held and (select b.party_scope_id is not null and b.kind <> 'indirect' from base b) as pending,
+      false as unused
     from candidate
     join up on up.start = candidate.id where up.id = ${area}::uuid
     union
-    select i.id, i.k, false, true, false from inside i
+    select i.id, i.k, false, true, false, false from inside i
     where not exists (select from candidate c where c.id = i.id)
       and exists (select from area_geometry g where g.area_id = i.id and g.valid @> ${day}::date)
     union all
-    select null, 0, false, false, false where not exists (select from candidate)
+    select null, 0, false, false, false, false where not exists (select from candidate)
   `);
   const rows = found.rows.filter(
     (row): row is typeof row & { id: string } => row.id != null,
@@ -14585,6 +14587,7 @@ async function universe(
             held: boolean;
             outside: boolean;
             pending: boolean;
+            unused: boolean;
           }>(sql`
             with l1 as materialized (${beneath(sql`select p.area_id as id from area_parent p where p.parent_id = ${area}::uuid and p.valid @> ${day}::date`)}),
             l2 as materialized (${beneath(sql`select p.area_id as id from l1 u join area_parent p on p.parent_id = u.id where u.scheme <> ${level} and p.valid @> ${day}::date`)}),
@@ -14598,8 +14601,13 @@ async function universe(
               where scheme = ${level}
               order by id
             )
-            select id, k, true as held, false as outside, false as pending from found
-            where exists (select from area_geometry g where g.area_id = found.id and g.valid @> ${day}::date offset 0)
+            select id, k, true as held, false as outside, false as pending,
+              not exists (select from result_rollup_unit r where r.area_k = shaped.k offset 0) as unused
+            from (
+              select id, k from found
+              where exists (select from area_geometry g where g.area_id = found.id and g.valid @> ${day}::date offset 0)
+              offset 0
+            ) shaped
           `);
           return below.rows;
         },
@@ -14750,7 +14758,7 @@ async function sketch(
   const whole =
     contest == null ? [] : await universe(contest, level, area.id, day);
   const counted = new Set(ks);
-  const absent = whole.filter((row) => !counted.has(row.k));
+  const absent = whole.filter((row) => !counted.has(row.k) && !row.unused);
   const [offside, split] = await Promise.all([
     outside(level, area.id, [...ks, ...whole.map((row) => row.k)], day),
     parted(level, area.id, day, contest == null ? null : { id: contest, ks }),
@@ -14808,7 +14816,7 @@ async function sketch(
       order by bs.valid_from desc nulls last
       limit 1
     `),
-    blankNames(whole, day),
+    blankNames(absent, day),
     level === "us.state"
       ? db.execute<{ k: number; code: string }>(sql`
         select a.k, (array['AS', 'GU', 'MP', 'PR', 'VI'])[array_position(array['60', '66', '69', '72', '78'], c.code)] as code from area a join area_code c on c.area_id = a.id
