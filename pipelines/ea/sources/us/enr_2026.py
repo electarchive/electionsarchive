@@ -226,6 +226,8 @@ AR_TITLE = re.compile(
     r"|Constable|Dr\.?)\s+(\S+\s+\S)"
 )
 AR_TRAILER = re.compile(r"\s+-\s+\D+$|\s+(?:J P|JUSTICE OF THE PEACE|(?:[A-Z]+\s+)?CIRCUIT CLERK)$")
+AR_RESPELL = re.compile(r"\bBlackrock\b")
+AR_ANSWER = re.compile(r"(?i)^(?:(for)\b|(against))")
 AR_HEADERS = {"User-Agent": "Mozilla/5.0", "Origin": "https://arkansas.tally-enr.com"}
 OK_BASE = "https://results.okelections.gov/OKERS/enrapi/"
 OK_HEADERS = {
@@ -1397,8 +1399,10 @@ def rows(state: str, url: str, path: Path, urls: dict[str, Path]):
             places = contest.get("Locations") or {contest.get("DistrictID") or "": contest}
             for fips, location in places.items():
                 for choice in [*location["Choices"], *location["WriteinChoices"]]:
-                    named = re.fullmatch(r"([A-Z]{3}) (.+)", choice["Name"]) or re.fullmatch(
-                        r"([DRIL]) ([A-Z][A-Z .'-]+)", choice["Name"]
+                    answer = AR_ANSWER.match(choice["Name"])
+                    named = not answer and (
+                        re.fullmatch(r"([A-Z]{3}) (.+)", choice["Name"])
+                        or re.fullmatch(r"([DRIL]) ([A-Z][A-Z .'-]+)", choice["Name"])
                     )
                     yield {
                         "office": "other"
@@ -1408,11 +1412,15 @@ def rows(state: str, url: str, path: Path, urls: dict[str, Path]):
                         else "governor"
                         if found[1] is None
                         else "house",
-                        "contest": contest["ContestName"] if found is None else "",
+                        "contest": AR_RESPELL.sub("Black Rock", contest["ContestName"]) if found is None else "",
                         "district": ((found[1] if found else None) or "").lstrip("0"),
                         "party": named[1] if named else "",
                         "county": fips,
-                        "candidate": named[2] if named else choice["Name"],
+                        "candidate": named[2]
+                        if named
+                        else (answer[1] and "For" or "Against")
+                        if answer
+                        else choice["Name"],
                         "write_in": "write-in" in choice["Name"].lower(),
                         "votes": choice["TotalVotes"]
                         if "TotalVotes" in choice
