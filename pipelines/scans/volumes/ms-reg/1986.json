@@ -1,0 +1,20 @@
+{
+  "year": 1986,
+  "day": "1986-11-04",
+  "polity": "US-MS",
+  "publisher": "Mississippi Secretary of State",
+  "title": "Mississippi Official and Statistical Register 1988-1992, general election returns of 1986-11-04",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706932_0204/micro_IA40706932_0204.pdf",
+    "item": "https://archive.org/details/micro_IA40706932_0204"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "house": "United States Representative, one table per congressional district"
+  },
+  "leaves": [
+    432,
+    433
+  ]
+}

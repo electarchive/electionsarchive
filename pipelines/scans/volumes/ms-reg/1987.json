@@ -1,0 +1,20 @@
+{
+  "year": 1987,
+  "day": "1987-11-03",
+  "polity": "US-MS",
+  "publisher": "Mississippi Secretary of State",
+  "title": "Mississippi Official and Statistical Register 1988-1992, general election returns of 1987-11-03",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706932_0204/micro_IA40706932_0204.pdf",
+    "item": "https://archive.org/details/micro_IA40706932_0204"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "governor": "Governor"
+  },
+  "leaves": [
+    494,
+    495
+  ]
+}

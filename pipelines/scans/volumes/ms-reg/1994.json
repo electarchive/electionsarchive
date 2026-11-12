@@ -1,0 +1,21 @@
+{
+  "year": 1994,
+  "day": "1994-11-08",
+  "polity": "US-MS",
+  "publisher": "Mississippi Secretary of State",
+  "title": "Mississippi Elections Spreadsheet Summary, 1994 General Election, general election returns of 1994-11-08",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706953_0014/micro_IA40706953_0014.pdf",
+    "item": "https://archive.org/details/micro_IA40706953_0014"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "senate": "United States Senator"
+  },
+  "leaves": [
+    2,
+    3,
+    4
+  ]
+}

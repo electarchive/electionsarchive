@@ -1,0 +1,26 @@
+{
+  "year": 1988,
+  "day": "1988-11-08",
+  "polity": "US-MS",
+  "publisher": "Mississippi Secretary of State",
+  "title": "Mississippi Official and Statistical Register 1988-1992, general election returns of 1988-11-08",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706932_0204/micro_IA40706932_0204.pdf",
+    "item": "https://archive.org/details/micro_IA40706932_0204"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "president": "President and Vice President",
+    "senate": "United States Senator",
+    "house": "United States Representative, one table per congressional district"
+  },
+  "leaves": [
+    554,
+    555,
+    556,
+    557,
+    558,
+    559
+  ]
+}

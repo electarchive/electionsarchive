@@ -1,0 +1,19 @@
+{
+  "year": 1991,
+  "day": "1991-11-05",
+  "polity": "US-MS",
+  "publisher": "Mississippi Secretary of State",
+  "title": "Mississippi Official and Statistical Register 1992-1996, general election returns of 1991-11-05",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706949_0143/micro_IA40706949_0143.pdf",
+    "item": "https://archive.org/details/micro_IA40706949_0143"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "governor": "Governor"
+  },
+  "leaves": [
+    406
+  ]
+}

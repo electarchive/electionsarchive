@@ -1,0 +1,22 @@
+{
+  "year": 1992,
+  "day": "1992-11-03",
+  "polity": "US-MS",
+  "publisher": "Mississippi Secretary of State",
+  "title": "Mississippi Official and Statistical Register 1992-1996, general election returns of 1992-11-03",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706949_0143/micro_IA40706949_0143.pdf",
+    "item": "https://archive.org/details/micro_IA40706949_0143"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "president": "President and Vice President",
+    "house": "United States Representative, one table per congressional district"
+  },
+  "leaves": [
+    462,
+    463,
+    464
+  ]
+}

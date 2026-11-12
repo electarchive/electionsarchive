@@ -1,0 +1,25 @@
+{
+  "year": 1984,
+  "day": "1984-11-06",
+  "polity": "US-MS",
+  "publisher": "Mississippi Secretary of State",
+  "title": "Mississippi Official and Statistical Register 1984-1988, general election returns of 1984-11-06",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706919_0183/micro_IA40706919_0183.pdf",
+    "item": "https://archive.org/details/micro_IA40706919_0183"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "president": "President and Vice President",
+    "senate": "United States Senator",
+    "house": "United States Representative, one table per congressional district"
+  },
+  "leaves": [
+    490,
+    491,
+    492,
+    493,
+    494
+  ]
+}
