@@ -1,7 +1,6 @@
 import type { InferRouterOutputs } from "@orpc/server";
 import type { RequestEvent } from "@sveltejs/kit";
 import { READ_ONLY } from "$app/env/public";
-import { call } from "@orpc/server";
 import { error, isHttpError, isRedirect, redirect } from "@sveltejs/kit";
 import type { Column, Counts, Tier } from "#lib/coverage.js";
 import type { Counted } from "#lib/server/counted.js";
@@ -60,6 +59,7 @@ import { counting, liveOf } from "#lib/server/counting.js";
 import {
   archive,
   atlasPage,
+  call,
   chamber,
   comparison,
   coverage,
