@@ -29,6 +29,7 @@ PAGE_PREFIXES = (
     "https://www.eastherts.gov.uk/planning-building/",
     "https://www.eastherts.gov.uk/planning-and-building/",
     "https://web.archive.org/web/",
+    "https://www.warwickdc.gov.uk/info/",
 )
 PAGES = {
     "E06000052": (
