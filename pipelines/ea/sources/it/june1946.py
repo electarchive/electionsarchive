@@ -25,6 +25,8 @@ FIRST_SITTING = date(1946, 6, 25)
 DISSOLVED = date(1948, 1, 31)
 CAMERA = date(1948, 4, 18)
 SCHEME = "it.circoscrizione_costituente_1946"
+PROVINCES = "it.provincia_1946"
+ALIASES = {"ALL.REPUBBLICANA": "ALL.REPUB.IT."}
 GAZZETTA = "https://www.gazzettaufficiale.it/eli/gu/1946/03/12/60/so/60/sg/pdf"
 REGISTERED, VALID, INVALID, BLANK, VOTES, VOTERS = 2, 4, 5, 6, 1, 14
 SEATS = {
@@ -109,6 +111,13 @@ TOTALS_NOTE = (
     "Italy's national page prints {blank:,} blank and {invalid:,} invalid ballots (blank included), {blank_gap:,} and "
     "{invalid_gap:,} more than its constituency pages add up to. The constituency figures are loaded as printed."
 )
+PROVINCES_NOTE = (
+    "Province figures are loaded as printed. Their valid list votes add up to each constituency's, but their blank and "
+    "invalid ballots, and in a few places their electors and voters, differ slightly from the constituency pages. "
+    "Invalid ballots are left out for {places}, where the printed figures do not add up to the voters. Frosinone, "
+    "Latina, Roma, Viterbo, Caserta, and Napoli print their small lists together as other lists, which have no list "
+    "votes here; their valid votes are loaded in full."
+)
 INVALID_NOTE = (
     "Invalid ballots are left out for {places}, where the printed invalid ballots and valid list votes do not add up "
     "to the voters."
@@ -118,8 +127,9 @@ REFERENDUM_NOTE = (
     "98 of March 16, 1946. The Court of Cassation proclaimed the result on June 18, 1946."
 )
 METHODOLOGY = (
-    "Each constituency's electors, voters, valid, blank, and invalid ballots, and votes for the Republic and the "
-    "Monarchy are the Interior Ministry's Eligendo figures; they add up to Eligendo's national totals. Invalid ballots "
+    "Each constituency's and province's electors, voters, valid, blank, and invalid ballots, and votes for the Republic and the "
+    "Monarchy are the Interior Ministry's Eligendo figures; they add up to Eligendo's national totals, and the provinces "
+    "add up to their constituencies. Invalid ballots "
     "here leave out the blank ones."
 )
 
@@ -168,12 +178,34 @@ def place(address: str, text: str) -> tuple[int, str] | None:
     return int(re.findall(r"&ne1=(\d+)", address)[0]), found[1].strip()
 
 
+def province(address: str, text: str) -> tuple[int, int, str] | None:
+    if "&ne2=" not in address:
+        return None
+    found = re.search(r"Provincia (.+?) (?:Elettori|Affluenza)", text)
+    if found is None:
+        raise ValueError(f"no provincia on {address}")
+    ne1, ne2 = map(int, re.findall(r"&ne[12]=(\d+)", address))
+    return ne1, ne2, found[1].strip()
+
+
 def parse() -> None:
     referendum = []
+    referendum_provinces = []
+    accounting_provinces = []
+    list_provinces = []
     for address, _ in pages("referendum"):
         text = flattened(address)
         where = place(address, text)
         if where is None:
+            if (there := province(address, text)) is not None:
+                found = re.search(
+                    r"Elettori ([\d.]+) 1\. .*? Votanti ([\d.]+) % [\d,]+ Schede Valide ([\d.]+) Schede bianche "
+                    r"([\d.]+) Schede non valide \(bianche incl\.\) ([\d.]+) Repubblica Monarchia ([\d.]+) ([\d.]+)",
+                    text,
+                )
+                if found is None:
+                    raise ValueError(f"no referendum figures on {address}")
+                referendum_provinces.append((*there, address, *map(number, found.groups())))
             continue
         found = re.search(
             r"Elettori ([\d.]+) 1\. .*? Votanti ([\d.]+) % [\d,]+ Schede Valide ([\d.]+) Schede bianche ([\d.]+) "
@@ -205,6 +237,22 @@ def parse() -> None:
         text = flattened(address)
         where = place(address, text)
         if where is None:
+            if (there := province(address, text)) is not None:
+                found = re.search(
+                    r"Elettori ([\d.]+) Votanti ([\d.]+) [\d,]+ % Schede Bianche ([\d.]+) Non valide \(bianche incl\.\) "
+                    r"([\d.]+) Liste/Gruppi Voti % (.*?) TOTALI ([\d.]+)",
+                    text,
+                )
+                if found is None:
+                    raise ValueError(f"no Constituent Assembly figures on {address}")
+                rows = [
+                    (label.strip(), number(votes))
+                    for label, votes in re.findall(r" ?(.+?) ([\d.]+) \d+,\d\d(?= [^\d ]|$)", found[5])
+                ]
+                if sum(row[1] for row in rows) != number(found[6]):
+                    raise ValueError(f"lists do not add up to the totals on {address}")
+                accounting_provinces.append((*there, address, *map(number, found.groups()[:4]), number(found[6])))
+                list_provinces.extend((there[1], label, votes) for label, votes in rows)
             continue
         found = re.search(
             r"Elettori ([\d.]+) Votanti ([\d.]+) [\d,]+ % Schede Bianche ([\d.]+) Non valide \(bianche incl\.\) ([\d.]+) "
@@ -248,7 +296,53 @@ def parse() -> None:
             raise ValueError(f"circoscrizione {n} prints {won} seats, more than its {SEATS[n]}")
     if national["seats"].sum() != MAGNITUDE or sum(SEATS.values()) != MAGNITUDE:
         raise ValueError("the Constituent Assembly's seats do not add up to 556")
+    measure_names = ["registered", "voters", "valid", "blank", "spoiled", "republic", "monarchy"]
+    referendum_provinces = pl.DataFrame(
+        referendum_provinces, schema=["n", "p", "province", "address", *measure_names], orient="row"
+    )
+    accounting_provinces = pl.DataFrame(
+        accounting_provinces,
+        schema=["n", "p", "province", "address", "registered", "voters", "blank", "spoiled", "valid"],
+        orient="row",
+    )
+    list_provinces = pl.DataFrame(list_provinces, schema=["p", "label", "votes"], orient="row")
+    if referendum_provinces.height != 89 or accounting_provinces.height != 89:
+        raise ValueError("expected 89 provinces per election")
+    if (
+        referendum_provinces.group_by("n").agg(pl.col(measures).sum()).sort("n").drop("n").to_dicts()
+        != circs.sort("n").select(measures).to_dicts()
+    ):
+        raise ValueError("the referendum's provinces do not add up to their circoscrizioni")
+    if referendum_provinces.filter(
+        (pl.col("valid") != pl.col("republic") + pl.col("monarchy"))
+        | (pl.col("voters") != pl.col("valid") + pl.col("spoiled"))
+    ).height:
+        raise ValueError("a referendum province does not add up")
+    for frame, name in ((referendum_provinces, "referendum"), (accounting_provinces, "Constituent Assembly")):
+        if sorted(frame["n"].unique()) != sorted(circs["n"]) or frame["p"].n_unique() != 89:
+            raise ValueError(f"the {name}'s provinces do not cover the circoscrizioni")
+    if set(referendum_provinces["p"]) != set(accounting_provinces["p"]):
+        raise ValueError("the two elections' provinces differ")
+    mismatch = (
+        accounting_provinces.group_by("n")
+        .agg(pl.col("registered", "voters", "blank", "spoiled", "valid").sum())
+        .join(accounting.filter(pl.col("n") > 0), on="n", suffix="_circ")
+    )
+    for column in ("registered", "voters", "valid"):
+        bad = mismatch.filter(pl.col(column) != pl.col(f"{column}_circ"))
+        if bad.height:
+            print(
+                f"Constituent Assembly provinces differ from circoscrizioni in {column}:",
+                bad.select("n", column, f"{column}_circ").rows(),
+            )
+    for column in ("blank", "spoiled"):
+        bad = mismatch.filter(pl.col(column) != pl.col(f"{column}_circ"))
+        if bad.height:
+            print(f"{column} differs:", bad.select("n", column, f"{column}_circ").rows())
     PARSED.mkdir(parents=True, exist_ok=True)
+    referendum_provinces.write_parquet(PARSED / "referendum_provinces.parquet")
+    accounting_provinces.write_parquet(PARSED / "accounting_provinces.parquet")
+    list_provinces.write_parquet(PARSED / "list_provinces.parquet")
     referendum.write_parquet(PARSED / "referendum.parquet")
     accounting.write_parquet(PARSED / "accounting.parquet")
     lists.write_parquet(PARSED / "lists.parquet")
@@ -259,6 +353,9 @@ def emit() -> Path:
     referendum = pl.read_parquet(PARSED / "referendum.parquet")
     accounting = pl.read_parquet(PARSED / "accounting.parquet")
     lists = pl.read_parquet(PARSED / "lists.parquet")
+    referendum_provinces = pl.read_parquet(PARSED / "referendum_provinces.parquet")
+    accounting_provinces = pl.read_parquet(PARSED / "accounting_provinces.parquet")
+    list_provinces = pl.read_parquet(PARSED / "list_provinces.parquet")
     with connect() as conn:
         cs = Changeset(
             conn,
@@ -266,7 +363,7 @@ def emit() -> Path:
             version=VERSION,
             summary=(
                 "Italy's institutional referendum and Constituent Assembly election of June 2, 1946, by "
-                "constituency, from the Interior Ministry's Eligendo archive"
+                "constituency and province, from the Interior Ministry's Eligendo archive"
             ),
             polity="IT",
         )
@@ -312,7 +409,7 @@ def emit() -> Path:
         if interno in cs.minted or gazzetta in cs.minted:
             raise ValueError("publish it.interno and it.storico before it.june1946")
         cs.artifact(raw.cached(SOURCE, GAZZETTA), gazzetta)
-        for frame in (referendum, accounting):
+        for frame in (referendum, accounting, referendum_provinces, accounting_provinces):
             for (address,) in frame.select("address").iter_rows():
                 cs.artifact(raw.cached(SOURCE, address), interno)
 
@@ -344,6 +441,33 @@ def emit() -> Path:
                     valid_to=CAMERA,
                 )
                 name(units[n], label, "it")
+
+        if conn.execute("select 1 from scheme where code = %s", [PROVINCES]).fetchone() is None:
+            cs.add("scheme", code=PROVINCES, polity_id=italy, kind="administrative", rank=3, noun="province")
+        province_units: dict[int, UUID] = {}
+        for n, p, province in referendum_provinces.sort("p").select("n", "p", "province").iter_rows():
+            label = cased(province)
+            area = cs.area(PROVINCES, str(p), on=DAY)
+            province_units[p] = cs.unit(PROVINCES, str(p), on=DAY)
+            if area in cs.minted:
+                cs.add("area", id=area, scheme_code=PROVINCES)
+                cs.add("area_code", area_id=area, code=str(p), valid_from=DAY, valid_to=CAMERA)
+                cs.add("area_parent", area_id=area, parent_id=areas[n], valid_from=DAY, valid_to=CAMERA)
+                name(area, label, "it")
+            if province_units[p] in cs.minted:
+                cs.add(
+                    "reporting_unit",
+                    id=province_units[p],
+                    polity_id=italy,
+                    scheme_code=PROVINCES,
+                    code=str(p),
+                    area_relation="equals",
+                    area_id=area,
+                    kind="standard",
+                    valid_from=DAY,
+                    valid_to=CAMERA,
+                )
+                name(province_units[p], label, "it")
 
         system = cs.key("it.electoral_system", "institutional-referendum-1946")
         cs.add("electoral_system", id=system, polity_id=italy, rules={"formula": "referendum"}, rules_version=1)
@@ -398,6 +522,21 @@ def emit() -> Path:
                 (None, INVALID, spoiled - blank),
             ):
                 value(counted, units[n], option, measure, amount)
+        for p, registered, voters, valid, blank, spoiled, republic, monarchy in (
+            referendum_provinces.sort("p")
+            .select("p", "registered", "voters", "valid", "blank", "spoiled", "republic", "monarchy")
+            .iter_rows()
+        ):
+            for option, measure, amount in (
+                (options["republic"], VOTES, republic),
+                (options["monarchy"], VOTES, monarchy),
+                (None, REGISTERED, registered),
+                (None, VOTERS, voters),
+                (None, VALID, valid),
+                (None, BLANK, blank),
+                (None, INVALID, spoiled - blank),
+            ):
+                value(counted, province_units[p], option, measure, amount)
         totals = referendum.filter(pl.col("n") == 0).row(0, named=True)
         winner = "republic" if totals["republic"] > totals["monarchy"] else "monarchy"
         for column, option in options.items():
@@ -480,6 +619,13 @@ def emit() -> Path:
                 kind="caveat",
                 body_md=INVALID_NOTE.format(places=", ".join(places[:-1]) + f", and {places[-1]}"),
             )
+        odd = accounting_provinces.filter(pl.col("voters") != pl.col("valid") + pl.col("spoiled"))
+        cs.add(
+            "note",
+            entity_id=counted,
+            kind="caveat",
+            body_md=PROVINCES_NOTE.format(places=f"{', '.join(cased(x) for x in odd['province'])} province"),
+        )
         for n, registered, voters, blank, spoiled, valid in circ_rows.select(
             "n", "registered", "voters", "blank", "spoiled", "valid"
         ).iter_rows():
@@ -504,6 +650,21 @@ def emit() -> Path:
             )
             if won.get(label):
                 cs.add("outcome", result_set_id=counted, option_id=options[label], kind="won", seats=won[label])
+        for p, registered, voters, blank, spoiled, valid in (
+            accounting_provinces.sort("p").select("p", "registered", "voters", "blank", "spoiled", "valid").iter_rows()
+        ):
+            value(counted, province_units[p], None, REGISTERED, registered)
+            value(counted, province_units[p], None, VOTERS, voters)
+            value(counted, province_units[p], None, VALID, valid)
+            value(counted, province_units[p], None, BLANK, blank)
+            if voters == valid + spoiled:
+                value(counted, province_units[p], None, INVALID, spoiled - blank)
+        parent_of = dict(accounting_provinces.select("p", "n").iter_rows())
+        province_lists = list_provinces.filter((pl.col("votes") > 0) & (pl.col("label") != "ALTRE LISTE")).with_columns(
+            pl.col("label").replace(ALIASES)
+        )
+        for p, label, votes in province_lists.sort("p", "label").iter_rows():
+            value(counted, province_units[p], options[label], VOTES, votes)
         for n, label, votes in circ_lists.sort("n", "label").select("n", "label", "votes").iter_rows():
             value(counted, units[n], options[label], VOTES, votes)
 
@@ -529,6 +690,8 @@ def emit() -> Path:
             if n != 32:
                 cs.add("note", entity_id=child_set, kind="methodology", body_md=CONSTITUENCY_SEATS)
             value(child_set, units[n], None, VALID, valid)
+            for p, province_valid in accounting_provinces.filter(pl.col("n") == n).select("p", "valid").iter_rows():
+                value(child_set, province_units[p], None, VALID, province_valid)
             for label, votes, seats in (
                 circ_lists.filter(pl.col("n") == n).sort("label").select("label", "votes", "seats").iter_rows()
             ):
@@ -542,6 +705,14 @@ def emit() -> Path:
                     ballot_label=label,
                 )
                 value(child_set, units[n], child_option, VOTES, votes)
+                for p, province_votes in (
+                    province_lists.filter(
+                        (pl.col("label") == label) & pl.col("p").is_in([q for q, m in parent_of.items() if m == n])
+                    )
+                    .select("p", "votes")
+                    .iter_rows()
+                ):
+                    value(child_set, province_units[p], child_option, VOTES, province_votes)
                 if seats:
                     cs.add("outcome", result_set_id=child_set, option_id=child_option, kind="won", seats=seats)
         return cs.write()
