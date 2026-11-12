@@ -8,7 +8,7 @@ from ea.changeset import Changeset
 from ea.store import DATA, connect
 
 SOURCE = "tr.muhtar_1963_links"
-VERSION = "2"
+VERSION = "3"
 RENAMES = Path(__file__).with_name("koy_renames_1968.tsv")
 RENAMES_URL = "https://acikerisim.tbmm.gov.tr/server/api/core/bitstreams/42c011d2-44d8-498e-8353-41a658b94ba9/content"
 
@@ -115,6 +115,32 @@ def emit() -> Path:
             for unit, key in members:
                 if unit not in links and key and seen[key] == 1 and len(index[key]) == 1 and index[key][0] not in taken:
                     links[unit] = (index[key][0], "province")
+        misread = {}
+
+        def read_pass(members: list, index: dict, label: str) -> None:
+            taken = {place for place, _ in links.values()}
+            names = Counter(key for _, key in members)
+            for unit, key in members:
+                if unit in links or not key or names[key] != 1 or index[key]:
+                    continue
+                hits = {index[k][0]: k for k in readings(key) - {key} if len(index[k]) == 1 and names[k] == 0}
+                if len(hits) == 1 and (place := next(iter(hits))) not in taken:
+                    links[unit] = (place, label)
+                    misread[unit] = hits[place]
+                    taken.add(place)
+
+        for (area, scheme), members in groups.items():
+            pool = in_il[area] if scheme == "tr.il" else [p for ilce in family(area) for p in in_ilce[ilce]]
+            index = defaultdict(list)
+            for place, key in pool:
+                index[key].append(place)
+            read_pass(members, index, "ilce misread")
+        for plate, members in plates.items():
+            index = defaultdict(list)
+            for il in plate_ils[plate]:
+                for place, key in in_il[il]:
+                    index[key].append(place)
+            read_pass(members, index, "province misread")
         renames = defaultdict(list)
         for row in pl.read_csv(RENAMES, separator="\t", infer_schema=False).iter_rows(named=True):
             renames[row["plate"], fold(row["old_name"])].append(row)
@@ -192,7 +218,7 @@ def emit() -> Path:
                     "name": text,
                     "linked": unit in links,
                     "pass": links[unit][1] if unit in links else None,
-                    "renamed_to": renamed_to.get(unit),
+                    "renamed_to": renamed_to.get(unit) or misread.get(unit),
                 }
                 for unit, code, text, _, _ in units
             ]
@@ -205,6 +231,6 @@ def emit() -> Path:
         print(
             f"{len(links)} of {len(units)} köys linked, {sum(1 for _, how in links.values() if how == 'province')} "
             f"by a name unique in the province, {sum(1 for _, how in links.values() if how.startswith('renamed'))} by a 1968 "
-            f"rename; {len(twice)} places claimed twice left out"
+            f"rename, {sum(1 for _, how in links.values() if how.endswith('misread'))} by an OCR m or g reading; {len(twice)} places claimed twice left out"
         )
         return cs.write()
