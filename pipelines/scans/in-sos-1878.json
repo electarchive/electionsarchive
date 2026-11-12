@@ -1,0 +1,449 @@
+{
+  "polity": "US-IN",
+  "publisher": "Indiana Secretary of State",
+  "title": "Report of the Secretary of State of the State of Indiana for the year ending October 31, 1878: vote for congressmen at the October election, 1878",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/reportsecretary15statgoog/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/reportsecretary15statgoog"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "house1": {
+      "year": 1878,
+      "chamber": "house",
+      "day": "1878-10",
+      "special": false,
+      "state": "IN",
+      "district": 1
+    },
+    "house3": {
+      "year": 1878,
+      "chamber": "house",
+      "day": "1878-10",
+      "special": false,
+      "state": "IN",
+      "district": 3
+    },
+    "house4": {
+      "year": 1878,
+      "chamber": "house",
+      "day": "1878-10",
+      "special": false,
+      "state": "IN",
+      "district": 4
+    },
+    "house5": {
+      "year": 1878,
+      "chamber": "house",
+      "day": "1878-10",
+      "special": false,
+      "state": "IN",
+      "district": 5
+    },
+    "house6": {
+      "year": 1878,
+      "chamber": "house",
+      "day": "1878-10",
+      "special": false,
+      "state": "IN",
+      "district": 6
+    },
+    "house7": {
+      "year": 1878,
+      "chamber": "house",
+      "day": "1878-10",
+      "special": false,
+      "state": "IN",
+      "district": 7
+    },
+    "house8": {
+      "year": 1878,
+      "chamber": "house",
+      "day": "1878-10",
+      "special": false,
+      "state": "IN",
+      "district": 8
+    },
+    "house9": {
+      "year": 1878,
+      "chamber": "house",
+      "day": "1878-10",
+      "special": false,
+      "state": "IN",
+      "district": 9
+    },
+    "house10": {
+      "year": 1878,
+      "chamber": "house",
+      "day": "1878-10",
+      "special": false,
+      "state": "IN",
+      "district": 10
+    },
+    "house11": {
+      "year": 1878,
+      "chamber": "house",
+      "day": "1878-10",
+      "special": false,
+      "state": "IN",
+      "district": 11
+    },
+    "house12": {
+      "year": 1878,
+      "chamber": "house",
+      "day": "1878-10",
+      "special": false,
+      "state": "IN",
+      "district": 12
+    },
+    "house13": {
+      "year": 1878,
+      "chamber": "house",
+      "day": "1878-10",
+      "special": false,
+      "state": "IN",
+      "district": 13
+    }
+  },
+  "pages": [
+    {
+      "page": 120,
+      "id": "120-0",
+      "columns": [
+        {
+          "label": "William Heilman.",
+          "contest": "house1",
+          "candidate": "William Heilman"
+        },
+        {
+          "label": "Thomas E. Garvin.",
+          "contest": "house1",
+          "candidate": "Thomas E. Garvin"
+        },
+        {
+          "label": "Thos. F. DeBruler.",
+          "contest": "house1",
+          "candidate": "Thomas F. Debruler"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.129,
+        0.153,
+        0.904,
+        0.534
+      ],
+      "hint": "Read only the table headed 'FIRST DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 120,
+      "id": "120-1",
+      "columns": [
+        {
+          "label": "George A. Bicknell.",
+          "contest": "house3",
+          "candidate": "George Augustus Bicknell"
+        },
+        {
+          "label": "Ara E. S. Long.",
+          "contest": "house3",
+          "candidate": "Ara E. S. Long"
+        },
+        {
+          "label": "John F. Willy.",
+          "contest": "house3",
+          "candidate": "John F. Willy"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.129,
+        0.526,
+        0.904,
+        0.895
+      ],
+      "hint": "Read only the table headed 'THIRD DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 121,
+      "id": "121-0",
+      "columns": [
+        {
+          "label": "Jeptha D. New.",
+          "contest": "house4",
+          "candidate": "Jeptha Dudley New"
+        },
+        {
+          "label": "Leonidas Sexton.",
+          "contest": "house4",
+          "candidate": "Leonidas Sexton"
+        },
+        {
+          "label": "Robert Gregg.",
+          "contest": "house4",
+          "candidate": "Robert Gregg"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.132,
+        0.146,
+        0.881,
+        0.416
+      ],
+      "hint": "Read only the table headed 'FOURTH DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 121,
+      "id": "121-1",
+      "columns": [
+        {
+          "label": "Thomas M. Browne.",
+          "contest": "house5",
+          "candidate": "Thomas McLelland Browne"
+        },
+        {
+          "label": "Wm. S. Holman.",
+          "contest": "house5",
+          "candidate": "William S. Holman"
+        },
+        {
+          "label": "Wm. C. Jeffries.",
+          "contest": "house5",
+          "candidate": "William C. Jeffries"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.132,
+        0.408,
+        0.881,
+        0.677
+      ],
+      "hint": "Read only the table headed 'FIFTH DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 121,
+      "id": "121-2",
+      "columns": [
+        {
+          "label": "William R. Myers.",
+          "contest": "house6",
+          "candidate": "William Ralph Myers"
+        },
+        {
+          "label": "William Grose.",
+          "contest": "house6",
+          "candidate": "William Grose"
+        },
+        {
+          "label": "Reuben A. Riley.",
+          "contest": "house6",
+          "candidate": "Reuben A. Riley"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.132,
+        0.669,
+        0.878,
+        0.931
+      ],
+      "hint": "Read only the table headed 'SIXTH DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 122,
+      "id": "122-0",
+      "columns": [
+        {
+          "label": "Gilbert De La Matyr",
+          "contest": "house7",
+          "candidate": "Gilbert De La Matyr"
+        },
+        {
+          "label": "John Hanna",
+          "contest": "house7",
+          "candidate": "John Hanna"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.143,
+        0.157,
+        0.906,
+        0.396
+      ],
+      "hint": "Read only the table headed 'SEVENTH DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 122,
+      "id": "122-1",
+      "columns": [
+        {
+          "label": "A. J. Hostetler",
+          "contest": "house8",
+          "candidate": "Abraham Jonathan Hostetler"
+        },
+        {
+          "label": "Morton C. Hunt",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Henry A. Whit",
+          "contest": "house8",
+          "candidate": "Henry A. White"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.143,
+        0.388,
+        0.906,
+        0.654
+      ],
+      "hint": "Read only the table headed 'EIGHTH DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 122,
+      "id": "122-2",
+      "columns": [
+        {
+          "label": "Godlove S. Orth",
+          "contest": "house9",
+          "candidate": "Godlove Stein Orth"
+        },
+        {
+          "label": "James McCabe",
+          "contest": "house9",
+          "candidate": "James McCabe"
+        },
+        {
+          "label": "Leroy Templeton",
+          "contest": "house9",
+          "candidate": "Leroy Templeton"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.143,
+        0.646,
+        0.906,
+        0.913
+      ],
+      "hint": "Read only the table headed 'NINTH DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 123,
+      "id": "123-0",
+      "columns": [
+        {
+          "label": "William H. Calkins",
+          "contest": "house10",
+          "candidate": "William Henry Calkins"
+        },
+        {
+          "label": "Morgan H. Weir",
+          "contest": "house10",
+          "candidate": "Morgan H. Weir"
+        },
+        {
+          "label": "John N. Skinner",
+          "contest": "house10",
+          "candidate": "John N. Skinner"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.11,
+        0.128,
+        0.886,
+        0.402
+      ],
+      "hint": "Read only the table headed 'TENTH DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 123,
+      "id": "123-1",
+      "columns": [
+        {
+          "label": "Calvin Cowgill",
+          "contest": "house11",
+          "candidate": "Calvin Cowgill"
+        },
+        {
+          "label": "David D. Dykeman",
+          "contest": "house11",
+          "candidate": "David D. Dykeman"
+        },
+        {
+          "label": "David Moss",
+          "contest": "house11",
+          "candidate": "David Moss"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.11,
+        0.394,
+        0.886,
+        0.647
+      ],
+      "hint": "Read only the table headed 'ELEVENTH DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 123,
+      "id": "123-2",
+      "columns": [
+        {
+          "label": "Walpole G. Colerick",
+          "contest": "house12",
+          "candidate": "Walpole Gillespie Colerick"
+        },
+        {
+          "label": "John Studebaker",
+          "contest": "house12",
+          "candidate": "John Studebaker"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.11,
+        0.639,
+        0.862,
+        1.0
+      ],
+      "hint": "Read only the table headed 'TWELFTH DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 124,
+      "id": "124-0",
+      "columns": [
+        {
+          "label": "John B. Baker.",
+          "contest": "house13",
+          "candidate": "John Harris Baker"
+        },
+        {
+          "label": "John B. Stoll.",
+          "contest": "house13",
+          "candidate": "John B. Stoll"
+        },
+        {
+          "label": "Wm. C. Williams.",
+          "contest": "house13",
+          "candidate": "William C. Williams"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.13,
+        0.165,
+        0.88,
+        0.376
+      ],
+      "hint": "Read only the table headed 'THIRTEENTH DISTRICT.'; ignore any other table visible in the image."
+    }
+  ]
+}
