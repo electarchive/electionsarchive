@@ -1,0 +1,31 @@
+{
+  "year": 1982,
+  "day": "1982-11-02",
+  "polity": "US-NY",
+  "publisher": "New York State Board of Elections",
+  "title": "Ballot Billboard (election newsletter) with the county vote, General Election, November 2, 1982, New York State",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706913_0180/micro_IA40706913_0180.pdf",
+    "item": "https://archive.org/details/micro_IA40706913_0180"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "governor": "Governor and Lieutenant Governor (one column per party line)",
+    "senate": "U.S. Senator (one column per party line)",
+    "house": "U.S. Representative in Congress, one block per congressional district; rows are the parts of counties (Part of Suffolk) with a TOTAL row when the district spans several counties, and one column per candidate and party line"
+  },
+  "hint": "Leaves 12-14 are one governor table split by columns (same county rows on each leaf). Leaves 19-20 are U.S. Senator. Leaves 21-25 hold the 34 congressional districts; the state senate blocks start on leaf 26. Leaves 15-18 (comptroller, attorney general) are skipped. Copy TOTAL ENTIRE STATE as printed_total.",
+  "leaves": [
+    12,
+    13,
+    14,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25
+  ]
+}

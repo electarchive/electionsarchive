@@ -1,0 +1,34 @@
+{
+  "year": 1980,
+  "day": "1980-11-04",
+  "polity": "US-NY",
+  "publisher": "New York State Board of Elections",
+  "title": "Ballot Billboard (election newsletter) with the county vote, General Election, November 4, 1980, New York State",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706906_0076/micro_IA40706906_0076.pdf",
+    "item": "https://archive.org/details/micro_IA40706906_0076"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "president": "President (votes for the highest elector, one column per party line)",
+    "senate": "U.S. Senator (one column per party line)",
+    "house": "U.S. Representative in Congress, one block per congressional district; rows are the parts of counties (Part of Suffolk) with a TOTAL row when the district spans several counties, and one column per candidate and party line"
+  },
+  "hint": "Leaves 5-7 are one president table split by columns (same 62 county rows on each leaf, subtotals for outside NYC, NYC, and TOTAL ENTIRE STATE). Leaves 8-10 are the same split for U.S. Senator. Leaves 11-17 hold the 39 congressional districts. Copy TOTAL ENTIRE STATE as printed_total.",
+  "leaves": [
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17
+  ]
+}

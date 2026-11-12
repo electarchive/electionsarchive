@@ -1,0 +1,28 @@
+{
+  "year": 1984,
+  "day": "1984-11-06",
+  "polity": "US-NY",
+  "publisher": "New York State Board of Elections",
+  "title": "Ballot Billboard (election newsletter) with the county vote, General Election, November 6, 1984, New York State",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706919_0277/micro_IA40706919_0277.pdf",
+    "item": "https://archive.org/details/micro_IA40706919_0277"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "president": "President (votes for the highest elector, one column per party line)",
+    "house": "U.S. Representative in Congress, one block per congressional district; rows are the parts of counties (Part of Suffolk) with a TOTAL row when the district spans several counties, and one column per candidate and party line"
+  },
+  "hint": "Leaves 3-5 are one president table split by columns (same county rows on each leaf). Leaf 6 (turnout) and 7-8 (ballot proposals) are skipped. Leaves 9-13 hold the 34 congressional districts; the state senate blocks start on leaf 14. Copy TOTAL ENTIRE STATE as printed_total.",
+  "leaves": [
+    3,
+    4,
+    5,
+    9,
+    10,
+    11,
+    12,
+    13
+  ]
+}
