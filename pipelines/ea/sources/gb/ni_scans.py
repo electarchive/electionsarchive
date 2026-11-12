@@ -21,6 +21,7 @@ PARSED = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
 STATE = PARSED / "state.json"
 SHEETS = json.loads((Path(__file__).parent / "ni_scans_sheets.json").read_text())
+HAND = json.loads((Path(__file__).parent / "ni_scans_hand.json").read_text())
 MODELS = ("claude-haiku-5-5", "claude-sonnet-5-5", "claude-haiku-5-5-high")
 LEGACY = {"claude-sonnet-5-5"}
 PROMPT = """This is a Northern Ireland local council election count sheet (single transferable vote); the pages are in order. Transcribe it exactly as printed and answer with one JSON object and nothing else:
@@ -145,7 +146,8 @@ def submit(pattern: str = "") -> None:
         todo = [
             key
             for key in wanted
-            if re.search(pattern, key)
+            if key not in HAND
+            and re.search(pattern, key)
             and f"read:{label}:{key}" not in held
             and all(
                 reads.get(f"{earlier}:{key}", False if earlier in LEGACY else None) is False
@@ -204,9 +206,12 @@ def surname_first(printed: str) -> str:
 def read(
     model: str, key: str, target: dict[str, str], areas: dict[str, tuple[str, str, str]]
 ) -> tuple[dict[str, object], list[dict[str, object]]]:
-    message = json.loads(raw.cached(SOURCE, f"read:{model}:{key}").path.read_text())
-    text = "".join(block["text"] for block in message["content"] if block["type"] == "text")
-    sheet = json.loads(text[text.index("{") : text.rindex("}") + 1])
+    if model == "hand":
+        sheet = HAND[key]
+    else:
+        message = json.loads(raw.cached(SOURCE, f"read:{model}:{key}").path.read_text())
+        text = "".join(block["text"] for block in message["content"] if block["type"] == "text")
+        sheet = json.loads(text[text.index("{") : text.rindex("}") + 1])
     sizes = [] if grid(target) is not None else images(target["url"])
     candidates = [
         {
@@ -275,6 +280,8 @@ def read(
                 "x1": x1 / 1000 * pixel_width,
                 "y1": y1 / 1000 * pixel_height,
             }
+    if model == "hand":
+        unit["note"] = " ".join(filter(None, [unit["note"], sheet["note"]]))
     if sizes:
         unit["note"] = " ".join(
             filter(
@@ -296,8 +303,8 @@ def parse() -> None:
     units, totals, failed = [], [], []
     held = raw.keys(SOURCE)
     for key, target in wanted.items():
-        for model in MODELS:
-            if f"read:{model}:{key}" not in held:
+        for model in ("hand",) if key in HAND else MODELS:
+            if model != "hand" and f"read:{model}:{key}" not in held:
                 continue
             try:
                 unit, rows = read(model, key, target, areas)
