@@ -2693,13 +2693,13 @@ async function fetchLoads(asks: Array<LoadAsk>, head: LoadAsk) {
                 join lateral (${FACTS[facts](sql`p.set`, sql`p.area`, units)}) r on true
                 where (r.measure = any(${COUNTED}) or r.option_k = 0 and (r.measure = 2 or r.measure = 4))
               ),
-              mains as materialized (
-                select request, area, (${COUNTED})[min(array_position(${COUNTED}, measure))] as main from fetched group by request, area
-              ),
               flagged as (
-                select f.*, m.main, bool_or(f.measure = m.main) over (partition by f.request, f.set, f.area) as kept,
-                  sum(f.value) filter (where f.count_round = f.opening and f.measure = m.main) over (partition by f.request, f.option) as rank
-                from fetched f join mains m on m.request = f.request and m.area = f.area
+                select f.*, bool_or(f.measure = f.main) over (partition by f.request, f.set, f.area) as kept,
+                  sum(f.value) filter (where f.count_round = f.opening and f.measure = f.main) over (partition by f.request, f.option) as rank
+                from (
+                  select f.*, (${COUNTED})[min(array_position(${COUNTED}, f.measure)) over (partition by f.request, f.area)] as main
+                  from fetched f
+                ) f
               ),
               whole as (
                 select distinct on (s.request, x.option_k) s.request, x.option_k as option, x.value::float8 as total
