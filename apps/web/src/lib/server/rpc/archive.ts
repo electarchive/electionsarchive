@@ -6959,6 +6959,7 @@ async function atlas(input: {
     frame,
     parted: split,
     apart,
+    ...((boxed ?? split)?.isOnly === true && { isInset: true }),
     ...(outlying.length > 0 && { outlying }),
     levels: levels.map(({ rank: _rank, ...entry }) => entry),
     level: level?.code ?? null,
@@ -11994,6 +11995,7 @@ export const contests = {
           }),
         ),
         parted: v.optional(Parted),
+        isInset: v.optional(v.boolean()),
         apart: v.optional(
           v.object({
             isApart: v.boolean(),

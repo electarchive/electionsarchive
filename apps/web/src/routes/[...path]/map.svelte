@@ -2550,8 +2550,8 @@
     const shown = isSummary ? null : outline;
     const isDetailed = isBasemap;
     const polity = scheme;
-    const isHidden = isBoxed || parted?.isApart === true;
-    untrack(() => basemap(engine, polity, isDetailed, shown, isHidden));
+    const side = (parted ?? own?.parted)?.isOnly === true ? "inset" : "main";
+    untrack(() => basemap(engine, polity, isDetailed, shown, side));
   });
 
   $effect(() => {

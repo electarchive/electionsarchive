@@ -582,7 +582,14 @@
     const isDetailed = prefs.isBasemap;
     const isShownAlone = isAlone;
     untrack(() =>
-      basemap(engine, scheme, isDetailed, outline, false, isShownAlone),
+      basemap(
+        engine,
+        scheme,
+        isDetailed,
+        outline,
+        isShownAlone ? "inset" : null,
+        isShownAlone,
+      ),
     );
   });
 
