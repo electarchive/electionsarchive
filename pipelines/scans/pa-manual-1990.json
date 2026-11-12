@@ -1,0 +1,52 @@
+{
+  "polity": "US-PA",
+  "publisher": "Pennsylvania Department of State",
+  "title": "The Pennsylvania Manual 1991 (vol. 110), county returns of the general election 1990-11-06",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706943_0004/micro_IA40706943_0004.pdf",
+    "item": "https://archive.org/details/micro_IA40706943_0004"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "governor": {
+      "year": 1990,
+      "chamber": "governor",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "PA",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 649,
+      "id": "649-0",
+      "columns": [
+        {
+          "label": "Robert P. Casey Mark S. Singel",
+          "contest": "governor",
+          "candidate": "Bob Casey"
+        },
+        {
+          "label": "Barbara Hafer Harold F. Mowery, Jr.",
+          "contest": "governor",
+          "candidate": "Barbara Hafer"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.13,
+        0.114,
+        0.882,
+        0.864
+      ],
+      "hint": "Read only the table headed 'GOVERNOR AND LIEUTENANT GOVERNOR OF PENNSYLVANIA'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0547
+      ]
+    }
+  ]
+}
