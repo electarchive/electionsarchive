@@ -4,16 +4,17 @@ import re
 import zipfile
 from datetime import date, timedelta
 from pathlib import Path
+from uuid import uuid5
 
 import polars as pl
 import shapefile
 
 from ea import raw
-from ea.changeset import Changeset
+from ea.changeset import NAMESPACE, Changeset
 from ea.store import DATA, connect
 
 SOURCE = "us.swdb_precincts"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 SWDB = "https://statewidedatabase.org/pub/data/"
 PUBLISHER = "Statewide Database, University of California, Berkeley"
@@ -58,6 +59,7 @@ BROKEN = {("P14", "mprec")}
 TOLERANCE = 0.00002
 VEST = {"G16", "G20"}
 RELEASED_VEST = {"G20": ("06001", "06037", "06059", "06095")}
+RELEASED_SRPREC = {"G14": ("06037",), "G18": ("06037",), "G24": ("06037",)}
 OVERLAP = 0.02
 
 
@@ -228,7 +230,7 @@ def parse() -> None:
                 .unique("county", keep="first", maintain_order=True)
                 .select("county", "kind")
                 .iter_rows()
-            )
+            ) | dict.fromkeys(RELEASED_SRPREC.get(election, ()), "srprec")
             picks[election] = (choice, "srprec" if "srprec" in kinds else "mprec")
             for kind in kinds:
                 layers.append(
@@ -326,6 +328,32 @@ def emit() -> Path:
             as_of
             for (as_of,) in conn.execute("select as_of from boundary_set where scheme_code = 'us.precinct'").fetchall()
         }
+        moved = {
+            (code, kind.lower()): id
+            for code, id, kind in conn.execute(
+                """select c.code, a.id::text, substring(n.text from '\\((\\w+), ') from area a
+                   join area_code c on c.area_id = a.id join changeset s on s.id = c.changeset_id
+                   join name n on n.entity_id = a.id and n.kind = 'official' and n.is_preferred
+                   where a.scheme_code = 'us.precinct' and s.pipeline = %s""",
+                [SOURCE],
+            ).fetchall()
+        }
+        shown = set(
+            released.select(
+                pl.format(
+                    "{}:CA:{}:{}",
+                    pl.col("election").replace_strict({election: str(day) for election, day in DAYS.items()}),
+                    pl.col("key").str.slice(0, 5),
+                    pl.col("key").str.slice(5),
+                ),
+                "kind",
+            ).iter_rows()
+        )
+        fresh = {code for code, _ in moved} - {code for code, kind in moved if (code, kind) in shown}
+        for (code, kind), id in list(moved.items()):
+            if code in fresh and id == str(uuid5(NAMESPACE, f"area:us.precinct@None\x1f{code}")):
+                del moved[(code, kind)]
+                fresh.discard(code)
         restricted: dict[tuple[str, str, str], str] = {}
         for (election, kind), urls in files().items():
             year = 2000 + int(election[1:])
@@ -379,7 +407,12 @@ def emit() -> Path:
                     valid_to=day + timedelta(days=1),
                     as_of=day,
                 )
-            ids = [str(cs.area(scheme, code)) for scheme, code in frame.select("scheme", "code").iter_rows()]
+            ids = [
+                str(uuid5(NAMESPACE, f"area:{scheme}@None\x1f{code}") if code in fresh else cs.area(scheme, code))
+                if scheme == "us.precinct"
+                else moved.get((f"{day}:CA:{key[:5]}:{key[5:]}", kind)) or str(cs.area(scheme, code))
+                for scheme, code, key in frame.select("scheme", "code", "key").iter_rows()
+            ]
             restricted |= {
                 (election, kind, key): id
                 for key, id, public in zip(frame["key"], ids, frame["public"], strict=True)
