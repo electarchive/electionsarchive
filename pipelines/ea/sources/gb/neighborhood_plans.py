@@ -35,6 +35,7 @@ PAGE_PREFIXES = (
     "https://www.nwleics.gov.uk/pages/",
     "https://elections.shropshire.gov.uk/",
     "https://hardenvillagecouncil.gov.uk/",
+    "https://www.middevon.gov.uk/your-council/",
 )
 HANDWRITTEN = (
     "https://info.ambervalley.gov.uk/docarc/",
@@ -53,6 +54,10 @@ PAGES = {
         "neighbourhood-planning-referendum-results"
     ),
     "E07000085": "https://www.easthants.gov.uk/elections/election-results",
+    "E07000070": (
+        "https://www.chelmsford.gov.uk/voting-and-elections/results-of-elections/"
+        "neighbourhood-planning-referendum-results"
+    ),
 }
 DOCUMENTS = "https://elections.wiltshire.gov.uk/Home/Document/"
 OFFICE = {
@@ -222,7 +227,9 @@ def emit() -> Path:
                 plan = str(row["plan"])
                 key = f"{day}:neighborhood:{code}:{slug(plan)}:{row['kind']}"
                 title = (
-                    f"Declaration of result of poll: {plan} {row['kind']} referendum, {day}"
+                    f"Decision statement: {plan} {row['kind']} referendum, {day}"
+                    if pdf and "decision" in row["url"].lower()
+                    else f"Declaration of result of poll: {plan} {row['kind']} referendum, {day}"
                     if pdf
                     else "Neighbourhood plan referendum results"
                     if row["url"] in PAGES.values()
