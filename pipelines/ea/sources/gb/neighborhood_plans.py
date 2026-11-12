@@ -50,6 +50,7 @@ HANDWRITTEN = (
     "/download/downloads/id/4521/",
     "/download/downloads/id/8012/",
     "/download/downloads/id/8854/",
+    "lanliveryparishcouncil.gov.uk/data/uploads/570_1456565066.pdf",
 )
 PAGES = {
     "E06000052": (
