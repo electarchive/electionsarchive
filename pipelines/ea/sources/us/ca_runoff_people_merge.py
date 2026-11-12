@@ -1,4 +1,5 @@
 from pathlib import Path
+from uuid import UUID
 
 from ea.changeset import Changeset
 from ea.store import connect
@@ -30,5 +31,5 @@ def emit() -> Path:
             polity="US-CA",
         )
         for duplicate, survivor in PAIRS:
-            cs.merge(duplicate, survivor)
+            cs.merge(UUID(duplicate), UUID(survivor))
         return cs.write()
