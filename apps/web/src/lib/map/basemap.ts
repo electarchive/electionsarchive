@@ -24,10 +24,10 @@ export function basemap(
   scheme: string,
   isDetailed: boolean,
   outline: Array<Array<[number, number]>> | null,
-  planes: Array<number> | null = null,
+  plane: number | null = null,
   isAlone = false,
 ) {
-  const key = JSON.stringify([scheme, isDetailed, outline, planes, isAlone]);
+  const key = JSON.stringify([scheme, isDetailed, outline, plane, isAlone]);
   const base = JSON.stringify([scheme, isDetailed]);
   const was = drawn.get(engine);
   const isDrawn = engine.gl?.getLayer("basemap:earth") != null;
@@ -60,20 +60,11 @@ export function basemap(
       ? ["!", within]
       : ["has", "out"];
   const scope: Maplibre.ExpressionSpecification | null =
-    planes == null
+    plane == null
       ? null
-      : [
-          "any",
-          planes.includes(-1) && ["!", ["has", "inset"]],
-          [
-            "in",
-            ["get", "inset"],
-            [
-              "literal",
-              planes.filter((plane) => plane !== -1).map((plane) => plane + 1),
-            ],
-          ],
-        ];
+      : plane === -1
+        ? ["!", ["has", "inset"]]
+        : ["==", ["get", "inset"], plane + 1];
   const veiled = isFocused ? (isAlone ? 1 : VEIL) : 0;
   const inside: Maplibre.ExpressionSpecification = isFocused
     ? within

@@ -870,7 +870,7 @@ const Crowned = v.object({ ...Lean.entries, legend: fullLegend });
 const Parted = v.object({
   isOnly: v.boolean(),
   isApart: v.boolean(),
-  planes: v.array(v.number()),
+  plane: v.number(),
   ks: v.array(v.number()),
   inset: v.nullable(
     v.object({ scheme: v.string(), day: v.string(), ks: v.array(v.number()) }),
@@ -6601,7 +6601,7 @@ async function atlas(input: {
         `,
     ),
     branches(day),
-    chain.length === 0 || input.isLean === true
+    input.isLean === true
       ? undefined
       : parted(own.rows[0]?.scheme ?? "", area.id, day),
   ]);
@@ -7005,7 +7005,7 @@ async function atlas(input: {
     frame,
     parted: split,
     apart,
-    planes: (boxed ?? split)?.planes ?? [-1],
+    plane: (boxed ?? split)?.plane ?? -1,
     ...(outlying.length > 0 && { outlying }),
     levels: levels.map(({ rank: _rank, ...entry }) => entry),
     level: level?.code ?? null,
@@ -12041,7 +12041,7 @@ export const contests = {
           }),
         ),
         parted: v.optional(Parted),
-        planes: v.array(v.number()),
+        plane: v.number(),
         apart: v.optional(
           v.object({
             isApart: v.boolean(),
