@@ -16,8 +16,8 @@ PARSED = DATA / "parsed" / SOURCE
 API = "https://www.electionreturns.pa.gov/api/ElectionReturn/"
 LANDING = "https://www.electionreturns.pa.gov/"
 PUBLISHER = "Pennsylvania Department of State"
-TITLE = "Election returns by county and vote type, 2022 and 2024 general elections"
-ELECTIONS = {date(2022, 11, 8): "94", date(2024, 11, 5): "105"}
+TITLE = "Election returns by county and vote type, 2020, 2022, and 2024 general elections"
+ELECTIONS = {date(2020, 11, 3): "83", date(2022, 11, 8): "94", date(2024, 11, 5): "105"}
 OFFICES = {
     "1": "president",
     "2": "senate",
@@ -141,7 +141,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Pennsylvania's 2022 and 2024 general elections by county and vote type (election day, mail-in, and provisional), from the Department of State's official returns",
+            summary="Pennsylvania's 2020, 2022, and 2024 general elections by county and vote type (election day, mail-in, and provisional), from the Department of State's official returns",
             polity="US-PA",
         )
         source = cs.source(PUBLISHER, TITLE)
