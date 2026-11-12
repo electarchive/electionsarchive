@@ -1573,6 +1573,153 @@ ND_2004_NOTE = (
     " Only the statewide totals are recorded: the county labels in the Secretary of State's scanned abstract are too "
     "degraded to read, so the figures are the printed Total row."
 )
+ND_EARLY = "https://sos.nd.gov/sites/default/files/documents/elections/election-results-pdfs/{}.pdf"
+ND_EARLY_FILES = {
+    date(1918, 11, 5): "1918-11-05-general",
+    date(1919, 6, 26): "1919-06-26-primary",
+    date(1920, 3, 16): "1920-03-16-presprimary",
+    date(1920, 6, 30): "1920-06-30-primary",
+    date(1920, 11, 2): "1920-11-02-general",
+    date(1921, 10, 28): "1921-10-28-special",
+    date(1922, 6, 28): "1922-06-28-primary",
+    date(1922, 11, 7): "1922-11-07-general",
+    date(1924, 3, 18): "1924-03-18-presprimary",
+    date(1924, 11, 4): "1924-11-04-general",
+    date(1926, 6, 30): "1926-06-30-primary",
+}
+ND_MANUAL = "https://digitalhorizonsonline.org/digital/api/collection/ndbb/id/22730/download"
+ND_COUNCIL = "https://ndlegis.gov/files/resource/library/measuresbeforethevoters.pdf"
+ND_LEGIS, ND_INIT, ND_REF = "Legislative Referendum", "Initiative", "Popular Referendum"
+ND_EARLY_MEASURES = {
+    (date(1918, 11, 5), "1"): ("Section 135", "Voting rules of cooperative corporations", ND_LEGIS, 49392, 32053),
+    (date(1918, 11, 5), "2"): (
+        "Section 89",
+        "Four Supreme Court judges to declare a law unconstitutional",
+        ND_LEGIS,
+        52678,
+        28846,
+    ),
+    (date(1918, 11, 5), "3"): ("New section on hail insurance", "Tax for state hail insurance", ND_LEGIS, 52475, 30257),
+    (date(1918, 11, 5), "4"): ("Section 25", "Initiative and referendum", ND_INIT, 47447, 32598),
+    (date(1918, 11, 5), "5"): ("Section 67", "Emergency measures", ND_INIT, 46121, 32507),
+    (date(1918, 11, 5), "6"): ("Section 202", "Constitutional amendments", ND_INIT, 46329, 33572),
+    (date(1918, 11, 5), "7"): ("Section 176", "Taxation and exemption of personal property", ND_INIT, 46833, 33921),
+    (date(1918, 11, 5), "8"): ("Section 177", "Acreage tax for hail insurance", ND_INIT, 49878, 31586),
+    (date(1918, 11, 5), "9"): ("Section 182", "State debt limit", ND_INIT, 46275, 34235),
+    (date(1918, 11, 5), "10"): ("Section 185", "Public ownership of industries", ND_INIT, 46830, 32574),
+    (date(1919, 6, 26), "1"): (
+        "Senate Bill 157",
+        "State Printing Commission and official county newspapers",
+        ND_REF,
+        59364,
+        52450,
+    ),
+    (date(1919, 6, 26), "2"): ("Senate Bill 134", "State Board of Administration", ND_REF, 59749, 51894),
+    (date(1919, 6, 26), "3"): ("Senate Bill 67", "Tax Commissioner", ND_REF, 60412, 50316),
+    (date(1919, 6, 26), "4"): ("House Bill 123", "Commissioner of Immigration", ND_REF, 59421, 52156),
+    (date(1919, 6, 26), "5"): ("House Bill 17", "Industrial Commission", ND_REF, 61188, 50271),
+    (date(1919, 6, 26), "6"): ("House Bill 124", "Judicial districts", ND_REF, 60343, 49925),
+    (date(1919, 6, 26), "7"): ("House Bill 18", "Bank of North Dakota", ND_REF, 61495, 48239),
+    (date(1920, 3, 16), "1"): ("Constitutional amendment", "Recall of public officers", ND_LEGIS, 29262, 17255),
+    (date(1920, 3, 16), "2"): ("Constitutional amendment", "Leasing of state lands", ND_LEGIS, 31579, 14153),
+    (date(1920, 3, 16), "3"): (
+        "Constitutional amendment",
+        "Debt limit of political subdivisions",
+        ND_LEGIS,
+        24869,
+        18923,
+    ),
+    (date(1920, 3, 16), "4"): (
+        "Constitutional amendment",
+        "Residence requirements of electors",
+        ND_LEGIS,
+        31082,
+        16366,
+    ),
+    (date(1920, 3, 16), "5"): ("Initiated measure", "State Athletic Commission", ND_INIT, 22712, 27677),
+    (date(1920, 3, 16), "6"): ("Initiated measure", "Sale of cigarettes", ND_INIT, 24152, 27212),
+    (date(1920, 3, 16), "7"): ("Initiated measure", "Sunday baseball", ND_INIT, 26681, 24885),
+    (date(1920, 3, 16), "8"): ("Initiated measure", "Sunday theaters", ND_INIT, 23522, 27363),
+    (date(1920, 6, 30), "1"): ("Initiated measure", "Anti-red flag bill", ND_INIT, 74634, 41009),
+    (date(1920, 6, 30), "2"): ("Referred measure", "Absent voters law", ND_REF, 52301, 62998),
+    (date(1920, 6, 30), "3"): ("Referred measure", "Investigation committee", ND_REF, 51063, 63152),
+    (date(1920, 6, 30), "4"): ("Referred measure", "State sheriff", ND_REF, 47831, 63777),
+    (date(1920, 11, 2), "1"): ("Constitutional amendment", "Elective franchise for women", ND_LEGIS, 135370, 60772),
+    (date(1920, 11, 2), "2"): ("Constitutional amendment", "Name of the State Reform School", ND_LEGIS, 129628, 63569),
+    (date(1920, 11, 2), "3"): ("Constitutional amendment", "Investment of school funds", ND_LEGIS, 124331, 56526),
+    (date(1920, 11, 2), "4"): ("Initiated measure", "Examinations of state industries", ND_INIT, 118269, 102238),
+    (date(1920, 11, 2), "5"): ("Initiated measure", "Deposit of public funds", ND_INIT, 114022, 106853),
+    (date(1920, 11, 2), "6"): (
+        "Initiated measure",
+        "Real estate loans of the Bank of North Dakota",
+        ND_INIT,
+        116608,
+        105348,
+    ),
+    (date(1920, 11, 2), "7"): ("Initiated measure", "Legal notices", ND_INIT, 114320, 105961),
+    (date(1920, 11, 2), "8"): ("Initiated measure", "Superintendent of Public Instruction", ND_INIT, 114571, 104722),
+    (date(1920, 11, 2), "9"): ("Referred measure", "Removal of county seats", ND_REF, 85637, 92213),
+    (date(1921, 10, 28), "1"): (
+        "Constitutional amendment",
+        "State debt limit and bond issue",
+        ND_LEGIS,
+        101034,
+        104822,
+    ),
+    (date(1921, 10, 28), "2"): ("Constitutional amendment", "Compensation of legislators", ND_LEGIS, 88168, 112622),
+    (date(1921, 10, 28), "3"): ("Constitutional amendment", "County judge and clerk of court", ND_LEGIS, 94661, 105975),
+    (date(1921, 10, 28), "4"): (
+        "Initiated measure",
+        "Nonpartisan election of state and county officials",
+        ND_INIT,
+        98103,
+        108324,
+    ),
+    (date(1921, 10, 28), "5"): ("Initiated measure", "Form of ballot", ND_INIT, 100672, 108409),
+    (date(1921, 10, 28), "6"): ("Initiated measure", "Public depositories", ND_INIT, 103474, 106225),
+    (date(1921, 10, 28), "7"): ("Initiated measure", "Industrial Commission", ND_INIT, 101438, 106230),
+    (date(1921, 10, 28), "8"): ("Initiated measure", "Rural credits", ND_INIT, 103933, 105821),
+    (date(1921, 10, 28), "9"): (
+        "Initiated measure",
+        "Liquidation of the Bank of North Dakota",
+        ND_INIT,
+        101353,
+        105591,
+    ),
+    (date(1922, 6, 28), "1"): (
+        "Constitutional amendment",
+        "Voting after a change of residence",
+        ND_LEGIS,
+        127074,
+        38299,
+    ),
+    (date(1922, 6, 28), "2"): ("Initiated measure", "Teachers' training and salary standards", ND_INIT, 101167, 70372),
+    (date(1922, 6, 28), "3"): ("Initiated measure", "Bonded debt for real estate loans", ND_INIT, 99866, 58186),
+    (date(1922, 11, 7), "1"): ("Initiated measure", "Grain Grading Act", ND_INIT, 138735, 44406),
+    (date(1924, 3, 18), "1"): ("Constitutional amendment", "County officials", ND_LEGIS, 70447, 49762),
+    (date(1924, 3, 18), "2"): ("Constitutional amendment", "State bond issues", ND_LEGIS, 64996, 57345),
+    (date(1924, 3, 18), "3"): ("Initiated measure", "Farm labor lien", ND_INIT, 51550, 78174),
+    (date(1924, 3, 18), "4"): ("Referred measure", "Precinct committeemen", ND_REF, 54867, 65747),
+    (date(1924, 3, 18), "5"): ("Referred measure", "Partisan and nonpartisan ballots", ND_REF, 53914, 66621),
+    (date(1924, 3, 18), "6"): ("Referred measure", "Party central committees", ND_REF, 53449, 64093),
+    (date(1924, 3, 18), "7"): ("Referred measure", "Compromise of bank stock taxes", ND_REF, 56717, 64189),
+    (date(1924, 11, 4), "1"): ("Initiated measure", "Tax limitation law", ND_INIT, 97384, 102393),
+    (date(1926, 6, 30), "1"): ("Constitutional amendment", "Legislators' per diem", ND_LEGIS, 48719, 86883),
+    (date(1926, 6, 30), "2"): ("Constitutional amendment", "Term of railroad commissioners", ND_LEGIS, 69214, 61235),
+    (date(1926, 6, 30), "3"): ("Initiated measure", "Gasoline tax", ND_INIT, 65813, 57374),
+}
+ND_EARLY_METHOD = (
+    "County returns from the North Dakota Secretary of State's official abstract of the votes, as posted with a "
+    "machine-read text layer. Each county column ties exactly to the statewide total in the Legislative Council's "
+    "compilation Measures Before the Voters, which also gives the title and type. Where the text layer misreads a "
+    "figure, the figure is taken from a second printing of the same table in the abstract or, for 1918 and 1919, from "
+    "the 1919 Legislative Manual."
+)
+ND_EARLY_NOTE = (
+    " Only the statewide totals are recorded: in the text layer of the Secretary of State's abstract, the county "
+    "figures for this measure do not add up to the printed totals, and no second printing settles them. The totals "
+    "are the abstract's printed Total row, or the Legislative Council's figure where the two differ."
+)
 SC = "https://scvotes.gov/wp-content/uploads/2022/08/Election_Report_{}.pdf"
 SC_2010 = "https://www.enr-scvotes.org/SC/19077/39934/reports/detailxml.zip"
 GA = "https://web.archive.org/web/{}id_/http://sos.georgia.gov/elections/election_results/{}.htm"
@@ -2709,6 +2856,11 @@ def fetch() -> None:
         raw.fetch(SOURCE, ND_ABSTRACTS + name + ".pdf", suffix=".pdf")
         time.sleep(1)
     raw.fetch(SOURCE, ND_2004_PRIMARY[1] + ".pdf", suffix=".pdf")
+    for name in ND_EARLY_FILES.values():
+        raw.fetch(SOURCE, ND_EARLY.format(name), suffix=".pdf")
+        time.sleep(1)
+    raw.fetch(SOURCE, ND_MANUAL, suffix=".pdf")
+    raw.fetch(SOURCE, ND_COUNCIL, suffix=".pdf")
     raw.fetch(fl_sos.SOURCE, fl_sos.EXTRACT.format(day=FL_DAYS[0]), suffix=".txt")
     for name, _ in NH_FILES.values():
         raw.fetch(SOURCE, NH_PDF.format(name), suffix=".pdf")
@@ -7123,6 +7275,41 @@ def north_dakota() -> list[dict[str, object]]:
     return rows
 
 
+def north_dakota_early() -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    table = pl.read_csv(Path(__file__).with_name("nd_measures_early.tsv"), separator="\t", try_parse_dates=True)
+    urls = {"manual": ND_MANUAL, "council": ND_COUNCIL}
+    for (day, number), group in table.group_by("day", "number", maintain_order=True):
+        heading, subject, kind, yes, no = ND_EARLY_MEASURES[day, str(number)]
+        label, title = (
+            (subject, heading.lower())
+            if heading.endswith(("amendment", "measure"))
+            else (f"{subject} ({heading})", "constitutional amendment" if day.year == 1918 else "referred measure")
+        )
+        counties = group.filter(pl.col("county") != "statewide")
+        if counties.height not in (0, 53) or (group["yes"].sum(), group["no"].sum()) != (yes, no):
+            raise ValueError(f"ND {day} measure {number}: does not tie to {yes:,} and {no:,}")
+        for row in group.iter_rows(named=True):
+            for answer, votes in (("YES", row["yes"]), ("NO", row["no"])):
+                rows.append(
+                    {
+                        "state": "ND",
+                        "day": day,
+                        "number": str(number),
+                        "label": label,
+                        "url": urls.get(row["cited"], ND_EARLY.format(ND_EARLY_FILES[day])),
+                        "county": row["county"],
+                        "answer": answer,
+                        "votes": votes,
+                        "title": title,
+                        "kind": kind,
+                    }
+                )
+    if len({(row["day"], row["number"]) for row in rows}) != len(ND_EARLY_MEASURES):
+        raise ValueError("ND 1918-1926: measures missing from nd_measures_early.tsv")
+    return rows
+
+
 def hawaii() -> list[dict[str, object]]:
     rows: list[dict[str, object]] = []
     for year, measures in HI_MEASURES.items():
@@ -7764,6 +7951,7 @@ def parse() -> None:
             *missouri(),
             *montana(),
             *north_dakota(),
+            *north_dakota_early(),
             *new_york(),
             *michigan(),
             *michigan_old(),
@@ -8000,6 +8188,16 @@ def emit() -> Path:
                     url=url,
                     license="Public record",
                 )
+        council = cs.source("North Dakota Legislative Council", "Measures Before the Voters")
+        cs.add(
+            "source",
+            id=council,
+            kind="official_body",
+            publisher="North Dakota Legislative Council",
+            title="Measures Before the Voters",
+            url=ND_COUNCIL,
+            license="Public record",
+        )
         artifacts: dict[str, UUID] = {}
         for state, url in frame.select("state", "url").unique(maintain_order=True).iter_rows():
             artifacts[url] = cs.artifact(
@@ -8011,7 +8209,7 @@ def emit() -> Path:
                     }.get(state, gov_counties.SOURCE if url == gov_counties.OH_2006 else SOURCE),
                     url,
                 ),
-                sources[state],
+                council if url == ND_COUNCIL else sources[state],
             )
         pages: dict[tuple[str, int], UUID] = {}
         for url, number in frame.filter(pl.col("page").is_not_null()).select("url", "page").unique().iter_rows():
@@ -8226,7 +8424,7 @@ def emit() -> Path:
                 stage="preliminary" if preliminary else "certified",
                 kind="counted",
                 status="active",
-                source_id=sources[state],
+                source_id=council if (rows["url"] == ND_COUNCIL).all() else sources[state],
                 is_default=True,
                 completeness=1,
             )
@@ -8237,6 +8435,8 @@ def emit() -> Path:
                 body_md=(
                     METHODOLOGY_FACTS
                     if state == "CA" and day.year < 1998
+                    else ND_EARLY_METHOD
+                    if state == "ND" and day.year < 1930
                     else METHODOLOGY.format(publisher=PUBLISHERS[state][0])
                 )
                 + (MAINE if state == "ME" else "")
@@ -8262,6 +8462,8 @@ def emit() -> Path:
                         if state == "CA" and day.year < 1998
                         else AK_STATEWIDE_NOTE
                         if state == "AK"
+                        else ND_EARLY_NOTE
+                        if state == "ND" and day.year < 1930
                         else ND_2004_NOTE
                         if state == "ND"
                         else KS_2010_NOTE
