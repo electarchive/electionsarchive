@@ -26,12 +26,14 @@ DAYS = {
     2017: date(2017, 5, 4),
     2018: date(2018, 5, 3),
     2019: date(2019, 5, 2),
+    2021: date(2021, 5, 6),
+    2022: date(2022, 5, 5),
     2023: date(2023, 5, 4),
     2024: date(2024, 5, 2),
     2025: date(2025, 5, 1),
     2026: date(2026, 5, 7),
 }
-POLLING_DAYS = DAYS | {2020: date(2020, 5, 7), 2021: date(2021, 5, 6), 2022: date(2022, 5, 5)}
+POLLING_DAYS = DAYS | {2020: date(2020, 5, 7)}
 BY_BALLOTS = (
     "https://elections.democracyclub.org.uk/api/elections/?election_id_regex="
     "%5Elocal%5C.{council}%5B%5E.%5D%2A%5C.%5B%5E.%5D%2B%5C.by%5C.{year}-{month}&limit=100"
@@ -42,7 +44,7 @@ DECLARATIONS = Path(__file__).with_name("by_declarations.tsv")
 RESULTS = "https://candidates.democracyclub.org.uk/media/csv-archives/results-{day}.csv"
 ARCHIVED = {2018, 2019, 2023}
 SAMPLED = {2026}
-DIVISIONS = {2018, 2019, 2023, 2024, 2025}
+DIVISIONS = {2018, 2019, 2021, 2022, 2023, 2024, 2025}
 TACIT = {2018, 2019}
 RERUN = "https://elections.democracyclub.org.uk/api/elections/{ballot}/"
 BALLOT = "https://candidates.democracyclub.org.uk/api/next/ballots/{ballot}/"
