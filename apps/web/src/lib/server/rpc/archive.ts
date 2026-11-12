@@ -2783,26 +2783,27 @@ async function fetchLoads(asks: Array<LoadAsk>, head: LoadAsk) {
             ), covered as (${covered(sql`select id from held`)})
             select o.k, o.id, o.contest_id as contest, o.kind::text, coalesce(pm.into_id, o.party_id) as party, o.ballot_label as label, o.candidate_count as candidates,
               o.alliance_id as alliance, o.parent_option_id is not null as is_line,
-              exists (select from candidacy cy where cy.option_id = o.id and cy.role = 'head' and cy.is_independent offset 0) as independent,
+              coalesce(hd.independent, false) as independent,
               case when o.contest_id in (select id from covered) then exists (
-                  select from candidacy cy left join entity_merge m on m.entity_id = cy.person_id
-                  where cy.option_id = o.id and cy.role = 'head' and ${tenured(sql`coalesce(m.into_id, cy.person_id)`, sql`o.contest_id`)}
+                  select from unnest(hd.people, hd.intos) as h(person_id, into_id)
+                  where ${tenured(sql`coalesce(h.into_id, h.person_id)`, sql`o.contest_id`)}
                     and (o.kind <> 'write_in' or exists (
                       select from tenure wt
                       join contest wk on wk.id = o.contest_id
                       join election we on we.id = wk.election_id
                       left join seat ws on ws.id = wt.seat_id
                       left join contest wc on wc.id = wt.contest_id
-                      where wt.person_id in (cy.person_id, m.into_id) and ${holding("wt", sql`we.date_from`)}
+                      where wt.person_id in (h.person_id, h.into_id) and ${holding("wt", sql`we.date_from`)}
                         and coalesce(ws.district_area_id, wc.district_area_id) = wk.district_area_id
                     ))
                 )
-                else exists (select from candidacy cy where cy.option_id = o.id and cy.role = 'head' and cy.is_incumbent offset 0)
+                else coalesce(hd.incumbent, false)
               end as incumbent,
-              (select coalesce(m.into_id, cy.person_id) from candidacy cy left join entity_merge m on m.entity_id = cy.person_id
-               where cy.option_id in (o.id, o.parent_option_id) and cy.role = 'head'
-                 and not exists (select from candidacy cz where cz.option_id = cy.option_id and cz.role = 'head' and cz.id <> cy.id)
-               order by cy.option_id = o.id desc, cy.id limit 1) as person,
+              coalesce(hd.person, case when o.parent_option_id is not null then (
+                select (array_agg(coalesce(m.into_id, cy.person_id)))[1] from candidacy cy left join entity_merge m on m.entity_id = cy.person_id
+                where cy.option_id = o.parent_option_id and cy.role = 'head'
+                having count(*) = 1
+              ) end) as person,
               oc.kind::text as outcome, oc.note, coalesce(oc.declined, false) as declined,
               case when o.id = any(pf.ids) then null
                 when o.parent_option_id is null or o.parent_option_id = any(pf.ids) or not exists (
@@ -2812,6 +2813,13 @@ async function fetchLoads(asks: Array<LoadAsk>, head: LoadAsk) {
                 ) then oc.seats end as seats
             from base o
             left join entity_merge pm on pm.entity_id = o.party_id
+            left join lateral (
+              select bool_or(cy.is_independent) as independent, bool_or(cy.is_incumbent) as incumbent,
+                case when count(*) = 1 then (array_agg(coalesce(m.into_id, cy.person_id)))[1] end as person,
+                array_agg(cy.person_id) as people, array_agg(m.into_id) as intos
+              from candidacy cy left join entity_merge m on m.entity_id = cy.person_id
+              where cy.option_id = o.id and cy.role = 'head'
+            ) hd on true
             left join lateral (${pooledIds(sql`o.id`, sql`o.parent_option_id`, sql`o.kind::text`)}) pf on true
             left join lateral (
               select (array_agg(x.kind order by array_position(array['elected', 'advanced', 'won', 'tied', 'withdrew', 'disqualified']::outcome_kind[], x.kind)) filter (where x.kind <> 'declined'))[1] as kind,
