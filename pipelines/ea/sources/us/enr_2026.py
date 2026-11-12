@@ -288,7 +288,7 @@ CHANNELS = {
     "failsafe": 5,
     "failsafe provisional": 5,
 }
-STATE_CHANNELS = {("AZ", "early voting"): 3, ("AZ", "late early*"): 3}
+STATE_CHANNELS = {("AZ", "early voting"): 3, ("AZ", "late early*"): 3, ("AZ", "early a.r.s. 16-579"): 3}
 
 
 def office_name(text: str) -> str:
