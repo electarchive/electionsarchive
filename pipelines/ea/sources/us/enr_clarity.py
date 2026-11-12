@@ -16,6 +16,7 @@ from xml.etree import ElementTree
 import httpx
 import polars as pl
 import shapefile
+from psycopg import Connection
 
 from ea import portals, raw
 from ea.changeset import NAMESPACE, Changeset, slug
@@ -620,8 +621,9 @@ def parse(
     source: str = SOURCE,
     platform: str = "clarity",
     read: Callable[[Mapping[str, Mapping[str, str]]], Iterator[dict[str, Any]]] = _read,
+    rows: list[dict[str, str]] | None = None,
 ) -> None:
-    registry = {row["tenant"]: row for row in tenants(platform)}
+    registry = {row["tenant"]: row for row in (tenants(platform) if rows is None else rows)}
     states = sorted({row["county_fips"][:2] for row in registry.values()})
     jurisdictions: dict[tuple[str, str], tuple[str, str, str]] = {}
     geoms: list[tuple[str, str, str]] = []
@@ -1651,14 +1653,47 @@ def _pieces(
     )
 
 
+def defer(cs: Changeset, conn: Connection, source: str) -> None:
+    held = {
+        str(contest): str(election)
+        for contest, election in conn.execute(
+            """select k.id, k.election_id from contest k join changeset c on c.id = k.changeset_id
+               where k.id = any(%s::uuid[]) and c.pipeline <> %s""",
+            [[str(row["id"]) for row in cs.rows.get("contest", [])], source],
+        ).fetchall()
+    }
+    cs.rows["contest"] = [row for row in cs.rows["contest"] if str(row["id"]) not in held]
+    for table, field in (("ballot_question", "contest_id"), ("name", "entity_id"), ("slug", "entity_id")):
+        if table in cs.rows:
+            cs.rows[table] = [row for row in cs.rows[table] if str(row[field]) not in held]
+    if "external_id" in cs.rows:
+        cs.rows["external_id"] = [
+            row
+            for row in cs.rows["external_id"]
+            if not (row.get("scheme") == "us.contest" and str(row["entity_id"]) in held)
+        ]
+    for row in cs.rows.get("result_set", []):
+        if (election := held.get(str(row["contest_id"]))) is not None:
+            row["election_id"] = election
+    used = {str(row["election_id"]) for table in ("contest", "result_set") for row in cs.rows.get(table, [])}
+    parents = {str(row["parent_id"]) for row in cs.rows.get("election", []) if str(row["id"]) in used}
+    unused = {str(row["id"]) for row in cs.rows.get("election", [])} - used - parents
+    cs.rows["election"] = [row for row in cs.rows["election"] if str(row["id"]) not in unused]
+    for table in ("name", "slug", "external_id", "note"):
+        if table in cs.rows:
+            cs.rows[table] = [row for row in cs.rows[table] if str(row.get("entity_id")) not in unused]
+
+
 def emit(
     source: str = SOURCE,
     platform: str = "clarity",
     owns: Callable[[str, str], bool] = lambda link, tenant: link.startswith(tenant) and link.endswith("detailxml.zip"),
     floor: float = 0.5,
+    rows: list[dict[str, str]] | None = None,
+    keep_foreign: bool = False,
 ) -> Path:
     parsed = DATA / "parsed" / source
-    listed = tenants(platform)
+    listed = tenants(platform) if rows is None else rows
     county_names = {row["county_fips"]: row["county"].upper() for row in listed}
     contests = pl.read_parquet(parsed / "contests.parquet")
     lines = pl.read_parquet(parsed / "lines.parquet")
@@ -2803,6 +2838,15 @@ def emit(
                     continue
                 else:
                     ballot = _title(re.sub(r"\s*\((?:DEM|REP|IND|NON|NP|NPA|LIB|GRN|D|R)\)$", "", choice))
+                    option = options[same] = cs.key("us.option", f"{contest_key}:{slug(ballot)}")
+                    if theirs := conn.execute(
+                        """select y.person_id from candidacy y join changeset c on c.id = y.changeset_id
+                           where y.option_id = %s and c.pipeline <> %s limit 1""",
+                        [option, source],
+                    ).fetchone():
+                        seated[(contest, slug(ballot))] = theirs[0]
+                        ranked.append((votes, option, slug(_title(choice))))
+                        continue
                     old = stale.get(slug(ballot)) or slug(
                         _title(re.sub(r"\s*\((?:DEM|REP|IND|NON|NP|NPA|LIB|GRN|D|R)\)$", "", was))
                     )
@@ -3086,6 +3130,8 @@ def emit(
                 text=held_text,
                 reason="another pipeline's preferred name stands for this contest",
             )
+        if keep_foreign:
+            defer(cs, conn, source)
         repair(cs)
         sweep(cs, source)
         return cs.write()
