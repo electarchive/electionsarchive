@@ -493,6 +493,20 @@ const tenured = (person: SQL, contest: SQL) => sql`
   )
 `;
 
+const tenuredAt = (person: SQL, post: string) => {
+  const p = sql.raw(post);
+  return sql`
+    exists (
+      select from (
+        select ${person} union all select hm.entity_id from entity_merge hm where hm.into_id = ${person}
+      ) hq(id)
+      cross join lateral (select * from tenure ht where ht.person_id = hq.id offset 0) ht
+      where ${holding("ht", sql`${p}.day`)}
+        and (ht.office_id = ${p}.office_id or (${p}.office_id is null and ht.body_id = ${p}.body_id))
+    )
+  `;
+};
+
 const nearest = (alias: SQL, date: SQL) => sql`
   case when ${date} is not null then greatest(lower(${alias}.valid) - ${date}, ${date} - upper(${alias}.valid) + 1, 0) end
 `;
@@ -2732,6 +2746,13 @@ async function listOptions(ks: Array<number>, contests: Array<string>) {
         where k = any(${optionKs}::int[]) or contest_id = any(${outcomes}::uuid[])
       ), held as materialized (
         select distinct contest_id as id from base
+      ), post as materialized (
+        select hc.* from held h cross join lateral (
+          select hc.id, coalesce(hc.office_id, hp.office_id) as office_id, hc.body_id, hc.district_area_id, he.date_from as day
+          from contest hc join election he on he.id = hc.election_id
+          left join contest hp on hp.id = hc.allocation_parent_id
+          where hc.id = h.id offset 0
+        ) hc
       ), newest as materialized (
         select rs.id from held h
         cross join lateral (select rs.id from result_set rs where rs.contest_id = h.id and ${latest("rs")} offset 0) rs
@@ -2741,15 +2762,13 @@ async function listOptions(ks: Array<number>, contests: Array<string>) {
         coalesce(hd.independent, false) as independent,
         case when o.contest_id in (select id from covered) then exists (
             select from unnest(hd.people, hd.intos) as h(person_id, into_id)
-            where ${tenured(sql`coalesce(h.into_id, h.person_id)`, sql`o.contest_id`)}
+            where ${tenuredAt(sql`coalesce(h.into_id, h.person_id)`, "ps")}
               and (o.kind <> 'write_in' or exists (
                 select from tenure wt
-                join contest wk on wk.id = o.contest_id
-                join election we on we.id = wk.election_id
                 left join seat ws on ws.id = wt.seat_id
                 left join contest wc on wc.id = wt.contest_id
-                where wt.person_id in (h.person_id, h.into_id) and ${holding("wt", sql`we.date_from`)}
-                  and coalesce(ws.district_area_id, wc.district_area_id) = wk.district_area_id
+                where wt.person_id in (h.person_id, h.into_id) and ${holding("wt", sql`ps.day`)}
+                  and coalesce(ws.district_area_id, wc.district_area_id) = ps.district_area_id
               ))
           )
           else coalesce(hd.incumbent, false)
@@ -2767,6 +2786,7 @@ async function listOptions(ks: Array<number>, contests: Array<string>) {
             offset 0
           ) then oc.seats end as seats
       from base o
+      left join post ps on ps.id = o.contest_id
       left join entity_merge pm on pm.entity_id = o.party_id
       left join lateral (
         select bool_or(cy.is_independent) as independent, bool_or(cy.is_incumbent) as incumbent,
