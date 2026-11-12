@@ -315,6 +315,37 @@ export const areaGeometry = pgTable("area_geometry", {
 	index("area_geometry_synthetic_idx").using("btree", table.areaId.asc().nullsLast()).where(sql`(quality = 'synthetic'::geometry_quality)`),
 ]);
 
+export const areaKind = pgTable("area_kind", {
+	areaId: uuid("area_id").notNull(),
+	kind: text().notNull(),
+	validFrom: date("valid_from"),
+	validFromPrecision: datePrecision("valid_from_precision").default("day").notNull(),
+	validTo: date("valid_to"),
+	validToPrecision: datePrecision("valid_to_precision").default("day").notNull(),
+	valid: daterange().notNull().generatedAlwaysAs(sql`daterange(valid_from, valid_to, '[)'::text)`),
+	sourceId: uuid("source_id"),
+	changesetId: uuid("changeset_id").notNull(),
+	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => [
+	primaryKey({ columns: [table.areaId, table.valid], name: "area_kind_pkey"}),
+	foreignKey({
+		columns: [table.areaId],
+		foreignColumns: [area.id],
+		name: "area_kind_area_id_fkey"
+	}).onDelete("cascade"),
+	foreignKey({
+		columns: [table.changesetId],
+		foreignColumns: [changeset.id],
+		name: "area_kind_changeset_id_fkey"
+	}),
+	foreignKey({
+		columns: [table.sourceId],
+		foreignColumns: [source.id],
+		name: "area_kind_source_id_fkey"
+	}),
+	index("area_kind_changeset_id_idx").using("btree", table.changesetId.asc().nullsLast()),
+check("area_kind_kind_check", sql`(kind ~ '^[a-z][a-z0-9_]*$'::text)`),]);
+
 export const areaParent = pgTable("area_parent", {
 	areaId: uuid("area_id").notNull(),
 	parentId: uuid("parent_id").notNull(),
@@ -345,6 +376,38 @@ export const areaParent = pgTable("area_parent", {
 	index("area_parent_changeset_id_idx").using("btree", table.changesetId.asc().nullsLast()),
 	index("area_parent_parent_idx").using("btree", table.parentId.asc().nullsLast()),
 ]);
+
+export const areaMembership = pgTable("area_membership", {
+	areaId: uuid("area_id").notNull(),
+	parentId: uuid("parent_id").notNull(),
+	partial: boolean().default(false).notNull(),
+	validFrom: date("valid_from"),
+	validFromPrecision: datePrecision("valid_from_precision").default("day").notNull(),
+	validTo: date("valid_to"),
+	validToPrecision: datePrecision("valid_to_precision").default("day").notNull(),
+	valid: daterange().notNull().generatedAlwaysAs(sql`daterange(valid_from, valid_to, '[)'::text)`),
+	changesetId: uuid("changeset_id").notNull(),
+	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => [
+	primaryKey({ columns: [table.areaId, table.parentId, table.valid], name: "area_membership_pkey"}),
+	foreignKey({
+		columns: [table.areaId],
+		foreignColumns: [area.id],
+		name: "area_membership_area_id_fkey"
+	}).onDelete("cascade"),
+	foreignKey({
+		columns: [table.changesetId],
+		foreignColumns: [changeset.id],
+		name: "area_membership_changeset_id_fkey"
+	}),
+	foreignKey({
+		columns: [table.parentId],
+		foreignColumns: [area.id],
+		name: "area_membership_parent_id_fkey"
+	}),
+	index("area_membership_changeset_id_idx").using("btree", table.changesetId.asc().nullsLast()),
+	index("area_membership_parent_idx").using("btree", table.parentId.asc().nullsLast()),
+check("area_membership_check", sql`(area_id <> parent_id)`),]);
 
 export const areaUniverse = pgTable("area_universe", {
 	areaId: uuid("area_id").notNull(),
@@ -2772,6 +2835,8 @@ export const scheme = pgTable("scheme", {
 	noun: text().notNull(),
 	changesetId: uuid("changeset_id").notNull(),
 	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
+	kinds: jsonb(),
+	codeSystem: text("code_system"),
 }, (table) => [
 	foreignKey({
 		columns: [table.changesetId],
@@ -2784,7 +2849,7 @@ export const scheme = pgTable("scheme", {
 		name: "scheme_polity_id_fkey"
 	}),
 	index("scheme_changeset_id_idx").using("btree", table.changesetId.asc().nullsLast()),
-check("scheme_code_check", sql`(code ~ '^([a-z]{2,3}(-[a-z0-9]+)?|world)\\.[a-z0-9_]+$'::text)`),check("scheme_polity_check", sql`((polity_id IS NOT NULL) OR (code ~~ 'world.%'::text))`),]);
+check("scheme_code_check", sql`(code ~ '^([a-z]{2,3}(-[a-z0-9]+)?|world)\\.[a-z0-9_]+$'::text)`),check("scheme_code_system_check", sql`(code_system ~ '^[a-z][a-z0-9_]*$'::text)`),check("scheme_kinds_check", sql`(jsonb_typeof(kinds) = 'object'::text)`),check("scheme_polity_check", sql`((polity_id IS NOT NULL) OR (code ~~ 'world.%'::text))`),]);
 
 export const searchDocument = pgTable("search_document", {
 	entityId: uuid("entity_id").primaryKey(),

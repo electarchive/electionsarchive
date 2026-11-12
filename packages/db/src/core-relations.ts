@@ -96,6 +96,8 @@ export const relations = defineRelations(schema, (r) => ({
 		areaEvents: r.many.areaEvent(),
 		areaEventMembers: r.many.areaEventMember(),
 		areaGeometries: r.many.areaGeometry(),
+		areaKinds: r.many.areaKind(),
+		areaMemberships: r.many.areaMembership(),
 		areaParents: r.many.areaParent(),
 		areaUniverses: r.many.areaUniverse(),
 		contestsViaBallotQuestion: r.many.contest({
@@ -627,6 +629,13 @@ export const relations = defineRelations(schema, (r) => ({
 		areaCodes: r.many.areaCode(),
 		areaEventMembers: r.many.areaEventMember(),
 		areaGeometries: r.many.areaGeometry(),
+		areaKinds: r.many.areaKind(),
+		areaMembershipsAreaId: r.many.areaMembership({
+			alias: "areaMembership_areaId_area_id"
+		}),
+		areaMembershipsParentId: r.many.areaMembership({
+			alias: "areaMembership_parentId_area_id"
+		}),
 		areaParentsAreaId: r.many.areaParent({
 			alias: "areaParent_areaId_area_id"
 		}),
@@ -682,6 +691,7 @@ export const relations = defineRelations(schema, (r) => ({
 		}),
 		areaEvents: r.many.areaEvent(),
 		areaGeometries: r.many.areaGeometry(),
+		areaKinds: r.many.areaKind(),
 		areaUniverses: r.many.areaUniverse(),
 		ballotQuestionTexts: r.many.ballotQuestionText(),
 		bodyChambers: r.many.bodyChamber(),
@@ -762,6 +772,36 @@ export const relations = defineRelations(schema, (r) => ({
 		source: r.one.source({
 			from: r.areaGeometry.sourceId,
 			to: r.source.id
+		}),
+	},
+	areaKind: {
+		area: r.one.area({
+			from: r.areaKind.areaId,
+			to: r.area.id
+		}),
+		changeset: r.one.changeset({
+			from: r.areaKind.changesetId,
+			to: r.changeset.id
+		}),
+		source: r.one.source({
+			from: r.areaKind.sourceId,
+			to: r.source.id
+		}),
+	},
+	areaMembership: {
+		areaAreaId: r.one.area({
+			from: r.areaMembership.areaId,
+			to: r.area.id,
+			alias: "areaMembership_areaId_area_id"
+		}),
+		changeset: r.one.changeset({
+			from: r.areaMembership.changesetId,
+			to: r.changeset.id
+		}),
+		areaParentId: r.one.area({
+			from: r.areaMembership.parentId,
+			to: r.area.id,
+			alias: "areaMembership_parentId_area_id"
 		}),
 	},
 	areaParent: {

@@ -18,7 +18,7 @@ KEYS = {
     "from_option_id": "contest_option",
 }
 REPLACEABLE = ("area_geometry", "area_parent", "tenure_affiliation")
-DROPPABLE = ("area_code", "area_parent", "area_geometry")
+DROPPABLE = ("area_code", "area_parent", "area_geometry", "area_kind", "area_membership")
 SWEEPABLE = {
     "party_image": "id",
     "party_founding": "party_id",
@@ -487,6 +487,25 @@ def _geometry(stage: Stage) -> list[tuple[str, sql.Composed]]:
     ]
 
 
+def _kinds(stage: Stage) -> list[tuple[str, sql.Composed]]:
+    if "area_kind" not in stage.tables:
+        return []
+    return [
+        (
+            "area.kind_unknown",
+            sql.SQL(
+                """select k.area_id, null::uuid, jsonb_build_object('kind', k.kind, 'scheme', a.scheme_code)
+                   from {kinds} k join {areas} a on a.id = k.area_id
+                   where not exists (select from {schemes} s where s.code = a.scheme_code and s.kinds ? k.kind)"""
+            ).format(
+                kinds=stage.staged("area_kind"),
+                areas=stage.either("area", "id", "scheme_code"),
+                schemes=stage.either("scheme", "code", "kinds"),
+            ),
+        )
+    ]
+
+
 def _country_names(stage: Stage) -> list[tuple[str, sql.Composed]]:
     columns = stage.tables.get("name", [])
     if not {"entity_id", "text", "lang", "is_preferred"} <= set(columns):
@@ -882,6 +901,7 @@ def run(conn: Connection, stage: Stage) -> list[Finding]:
         *_outcomes(stage),
         *_dropped(stage),
         *_geometry(stage),
+        *_kinds(stage),
         *_country_names(stage),
         *_seated(stage),
         *_memberships(stage),
