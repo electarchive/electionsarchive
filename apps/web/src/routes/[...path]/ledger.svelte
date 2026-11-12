@@ -152,7 +152,14 @@
   );
 </script>
 
-{#if places != null && shown.length > 0}
+{#if ledger.isPending}
+  <p
+    class="col-span-12 bg-card px-3.5 py-3 text-[0.8125rem] text-muted-foreground"
+    aria-busy="true"
+  >
+    {m.siblings_loading()}
+  </p>
+{:else if places != null && shown.length > 0}
   <section
     class="col-span-12 grid gap-3 bg-card px-3.5 pbs-3.5 pbe-3"
     aria-labelledby="{uid}-title"

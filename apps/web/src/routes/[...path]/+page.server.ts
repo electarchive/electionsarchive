@@ -319,39 +319,11 @@ async function reads(id: string, polity: Parameters<typeof sourceOf>[0]) {
   return found.flat();
 }
 
-async function contested(
-  id: string,
-  unit: string,
-  match: string,
-  search: URLSearchParams,
-  contest: Contest,
-) {
-  const { places } = contest;
-  const isLedgered =
-    places != null &&
-    !places.level.startsWith("unit:") &&
-    !(places.rows.length > 0 && places.rows.every((row) => row.valid === 0));
-  const ledger = {
-    id,
-    unit: unit === "" ? undefined : unit,
-    level: places?.level ?? undefined,
-    match: match === "person" || match === "family" ? match : "party",
-    group: search.get("group") ?? undefined,
-    round: Math.max(0, Math.trunc(Number(search.get("round"))) || 0),
-  } as const;
-  const found = await Promise.all([
-    keyed(
-      orpc.coverage.known.queryKey({ input: { id } }),
-      call(router.coverage.known, { id }),
-    ),
-    isLedgered
-      ? keyed(
-          orpc.contests.ledger.queryKey({ input: ledger }),
-          call(router.contests.ledger, ledger),
-        )
-      : [],
-  ]);
-  return found.flat();
+async function contested(id: string) {
+  return keyed(
+    orpc.coverage.known.queryKey({ input: { id } }),
+    call(router.coverage.known, { id }),
+  );
 }
 
 async function elected({
@@ -565,16 +537,7 @@ export const load: PageServerLoad = async ({
         ? null
         : parted(
             "contest.primed",
-            data.body
-              .then(async ({ contest }) =>
-                contested(
-                  data.id,
-                  data.unit,
-                  data.match,
-                  url.searchParams,
-                  contest,
-                ),
-              )
+            contested(data.id)
               .then((found) => (found.length === 0 ? null : found))
               .catch(() => null),
             "preload",
