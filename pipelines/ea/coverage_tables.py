@@ -1273,7 +1273,8 @@ def build(full: bool = False) -> str:
             and switch.period is not None
             and (g["period"], g["phase"]) != (switch.period, switch.phase)
         ):
-            g["era"] = (switch.since - 1, switch.since, (g["period"], g["phase"]))
+            last = switch.since - (switch.period if g["period"] == switch.period else 1)
+            g["era"] = (last, switch.since, (g["period"], g["phase"]))
             g["period"], g["phase"] = switch.period, switch.phase
             g["basis"] = "state calendar, changed"
         if own is not None and own.period is not None:
