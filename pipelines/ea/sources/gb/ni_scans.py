@@ -59,6 +59,27 @@ def targets() -> dict[str, dict[str, str]]:
         urls = [url for url in sheets if key in ni_council.squeeze(url.rsplit("/", 1)[-1])]
         if len(urls) == 1:
             found[f"2023:{key}"] = {"year": "2023", "label": name, "url": urls[0]}
+    for year, prefix in ni_council.ARK.items():
+        url = ni_council.ark_url(year)
+        official = set(units.filter((pl.col("year") == year) & (pl.col("source_url") != url))["dea_code"])
+        failed = json.loads((ni_council.PARSED / f"ark-{year}-failed.json").read_text())
+        paths = {path.name: path for path in (ni_council.PARSED / f"ark-{year}").rglob(f"{prefix}-*.xls*")}
+        codes = set()
+        for name in failed:
+            path = paths[name]
+            sheet = [list(row) for row in pl.read_excel(path, has_header=False, infer_schema_length=0).iter_rows()]
+            dea, code, abbr = ni_council.ark_workbook(year, path, sheet)
+            if code in official or code in codes:
+                continue
+            codes.add(code)
+            found[f"{year}:ark:{name}"] = {
+                "year": str(year),
+                "label": dea,
+                "url": url,
+                "path": str(path),
+                "code": code,
+                "abbr": abbr,
+            }
     return found
 
 
@@ -86,8 +107,8 @@ def fetch() -> None:
                 time.sleep(60 * attempt)
 
 
-def grid(url: str) -> str | None:
-    path = document(url).path
+def grid(target: dict[str, str]) -> str | None:
+    path = Path(target["path"]) if "path" in target else document(target["url"]).path
     if path.read_bytes()[:2] not in (b"\xd0\xcf", b"PK"):
         return None
     sheet = pl.read_excel(path, sheet_id=1, has_header=False, infer_schema_length=0)
@@ -132,7 +153,7 @@ def submit() -> None:
         requests: dict[str, batch.Want] = {}
         for key in todo:
             content: list[TextBlockParam | ImageBlockParam] = []
-            text = grid(wanted[key]["url"])
+            text = grid(wanted[key])
             if text is not None:
                 content.append({"type": "text", "text": f"Spreadsheet, tab separated, page 1:\n{text}"})
             try:
@@ -182,7 +203,7 @@ def read(
     message = json.loads(raw.cached(SOURCE, f"read:{model}:{key}").path.read_text())
     text = "".join(block["text"] for block in message["content"] if block["type"] == "text")
     sheet = json.loads(text[text.index("{") : text.rindex("}") + 1])
-    sizes = [] if grid(target["url"]) is not None else images(target["url"])
+    sizes = [] if grid(target) is not None else images(target["url"])
     candidates = [
         {
             "name": surname_first(candidate["name"]),
@@ -204,6 +225,8 @@ def read(
     tied = ni_council.tie(sums, valid, len(candidates))
     if not tied:
         raise ValueError(f"stage 1 sums to {sums[1]} against {valid} valid")
+    if "code" in target and len(tied) < width and sum(bool(c["elected"]) for c in candidates) < int(sheet["seats"]):
+        raise ValueError(f"seats unmarked and the count is tied through stage {len(tied)} of {width}")
     for candidate in candidates:
         candidate["totals"] = candidate["totals"][: len(tied)]
     facts = {
@@ -219,8 +242,21 @@ def read(
         exhausted[: len(tied)],
         width,
         target["url"],
-        areas,
+        {ni_council.squeeze(target["label"]): (target["code"], target["label"], target["abbr"])}
+        if "code" in target
+        else areas,
     )
+    if "code" in target:
+        unit["council_name"] = ni_council.LEGACY_NAMES[target["abbr"]]
+        unit["note"] = " ".join(
+            filter(
+                None,
+                [
+                    unit["note"],
+                    f"Workbook {Path(target['path']).name} in the ARK archive, transcribed by a language model because its layout defeats the parser.",
+                ],
+            )
+        )
     for row in rows:
         row["page"] = row["x0"] = row["y0"] = row["x1"] = row["y1"] = None
         if row["number"] > 0 and sizes:

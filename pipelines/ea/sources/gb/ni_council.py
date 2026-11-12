@@ -732,8 +732,28 @@ WP_PARTIES: dict[str, list[tuple[str, str]]] = json.loads((Path(__file__).parent
 FULL_NAMES: dict[str, list[str]] = json.loads((Path(__file__).parent / "ni_council_names.json").read_text())
 
 
+def ark_workbook(year: int, path: Path, grid: list[list[str | None]]) -> tuple[str, str, str]:
+    _, abbr, *rest = path.stem.split("-")
+    rest = [word for word in rest if word.lower() != "corrected"]
+    abbr = {code.upper(): code for code in LEGACY_NAMES}.get(abbr.upper(), abbr)
+    era = "1973:" if year < 1985 else "1985:" if year < 1993 else ""
+    dea = None
+    for row in grid:
+        for text in (cell for cell in row if isinstance(cell, str)):
+            if text.lower().startswith("district electo") and dea is None:
+                dea = re.sub(r"^district electo\w* area\W*(?:of\s+|for\s+)?", "", text, flags=re.IGNORECASE).strip()
+    dea = dea or " ".join(rest)
+    if era == "1973:" and len(rest) == 2 and rest[0].lower() == "area":
+        dea = f"Area {rest[1].upper()}"
+    return dea, f"{era}{abbr}/{slug('-'.join(rest))}", abbr
+
+
+def ark_url(year: int) -> str:
+    return f"https://web.archive.org/web/2020if_/https://www.ark.ac.uk/elections/xls/lgov/{year}.rar"
+
+
 def parse_ark(year: int) -> tuple[list[dict[str, object]], list[dict[str, object]]]:
-    url = f"https://web.archive.org/web/2020if_/https://www.ark.ac.uk/elections/xls/lgov/{year}.rar"
+    url = ark_url(year)
     folder = PARSED / f"ark-{year}"
     if not folder.exists():
         folder.mkdir(parents=True)
@@ -747,19 +767,8 @@ def parse_ark(year: int) -> tuple[list[dict[str, object]], list[dict[str, object
     for path in workbooks:
         if path.name.lower() in read:
             continue
-        _, abbr, *rest = path.stem.split("-")
-        rest = [word for word in rest if word.lower() != "corrected"]
-        abbr = {code.upper(): code for code in LEGACY_NAMES}.get(abbr.upper(), abbr)
-        era = "1973:" if year < 1985 else "1985:" if year < 1993 else ""
         grid = [list(row) for row in pl.read_excel(path, has_header=False, infer_schema_length=0).iter_rows()]
-        dea = None
-        for row in grid:
-            for text in (cell for cell in row if isinstance(cell, str)):
-                if text.lower().startswith("district electo") and dea is None:
-                    dea = re.sub(r"^district electo\w* area\W*(?:of\s+|for\s+)?", "", text, flags=re.IGNORECASE).strip()
-        dea = dea or " ".join(rest)
-        if era == "1973:" and len(rest) == 2 and rest[0].lower() == "area":
-            dea = f"Area {rest[1].upper()}"
+        dea, code, abbr = ark_workbook(year, path, grid)
         try:
             sheet = grid_sheet(grid, dea, 40, 80)
             if sheet["tied"] < 1:
@@ -783,7 +792,7 @@ def parse_ark(year: int) -> tuple[list[dict[str, object]], list[dict[str, object
                 sheet["exhausted"],
                 sheet["stages"],
                 url,
-                {squeeze(dea): (f"{era}{abbr}/{slug('-'.join(rest))}", dea, abbr)},
+                {squeeze(dea): (code, dea, abbr)},
             )
         except (ValueError, KeyError, StopIteration, IndexError, TypeError) as error:
             print(f"FAILED {year} {path.name}: {error!r}")
