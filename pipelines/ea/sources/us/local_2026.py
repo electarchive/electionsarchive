@@ -12044,14 +12044,16 @@ def parse() -> None:
                         )
                         or (
                             (
-                                f"Ward {(ward[1] or ward[2] or ward[3] or ward[5] or ward[6]).upper()}"
+                                (
+                                    f"Ward {(ward[1] or ward[2] or ward[3] or ward[5] or ward[6]).upper()}"
+                                    if ward[4] is None
+                                    else f"{ward[4].title()} Ward"
+                                )
                                 + (
                                     f" Position {pos[1]}"
                                     if state in ("AR", "NV") and (pos := re.search(r"\bposition (\d+)\b", post))
                                     else ""
                                 )
-                                if ward[4] is None
-                                else f"{ward[4].title()} Ward"
                             )
                             if ward
                             and (
