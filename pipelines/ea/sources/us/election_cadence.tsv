@@ -5,10 +5,10 @@ state	government_kind	function	name_pattern	government	selection	period_years	ph
 AK	county				elected	1	0						Alaska Stat. § 29.26.040	https://ak.elaws.us/as/29.26.040
 AK	municipality				elected	1	0						Alaska Stat. § 29.26.040	https://ak.elaws.us/as/29.26.040
 AK	school				elected	1	0						Alaska Division of Elections, REAA elections: held every year on the first Tuesday in October	https://www.elections.alaska.gov/reaa/
-AL	county				elected	2	0							
+AL	county				elected	2	0						Ala. Code § 36-3-4(a): members of county commissions hold office for four years; elected at the general election of state and county officers	https://law.onecle.com/alabama/title-36/36-3-4.html
 AL	municipality				elected	4	0				2025-01-01		Alabama Code § 11-46-21(a) before 2021 Ala. Acts SB119: regular municipal elections on the fourth Tuesday in August 1984 and every fourth year, held 2000 to 2020	https://law.justia.com/codes/alabama/title-11/title-2/chapter-46/article-2/section-11-46-21/
 AL	municipality				elected	4	1	8		2025-01-01			Alabama Code § 11-46-21(a) as amended by 2021 SB119 (signed April 2021): regular municipal elections on the fourth Tuesday in August 2025 and every fourth year thereafter, so a city or town elected in 2020 serves an extra year	https://alison.legislature.state.al.us/files/pdf/SearchableInstruments/2021RS/PrintFiles/SB119-Eng.pdf
-AL	school				elected	2	0							
+AL	school				elected	2	0						Ala. Code § 16-8-2: county board of education members elected at the general election of state and county officers for six-year terms	https://law.onecle.com/alabama/title-16/16-8-2.html
 AR	county				elected	2	0						Ark. Code Ann. § 7-5-102	https://law.justia.com/codes/arkansas/title-7/chapter-5/subchapter-1/section-7-5-102/
 AR	municipality				elected	2	0						Ark. Code Ann. §§ 14-44-103, 14-44-105, 14-44-115; § 14-43-201	https://www.armunileague.org/wp-content/uploads/2024/07/Municipal-Law-in-Arkansas-FAQ_2021_11_WEB.pdf
 AR	school				elected	1	0						Ark. Code Ann. § 6-14-102(a)(1)(A) (as amended by Act 503 of 2025)	https://law.justia.com/codes/arkansas/2017/title-6/subtitle-2/chapter-14/section-6-14-102-d-1/
@@ -25,7 +25,7 @@ CO	special				elected	2	1						Colo. Rev. Stat. § 1-13.5-111(1)	https://colorad
 CT	municipality				elected	2	1						Conn. Gen. Stat. § 9-164(a)(1)(A)	https://www.cga.ct.gov/current/pub/chap_146.htm
 CT	school				elected	2	1						Conn. Gen. Stat. §§ 10-46(a), (b); 9-164	https://www.cga.ct.gov/2005/rpt/2005-R-0097.htm
 CT	township				elected	2	1						Conn. Gen. Stat. § 9-164(a)(1)(A)	https://www.cga.ct.gov/current/pub/chap_146.htm
-DE	municipality				elected	1	0							
+DE	municipality				elected	1	0						15 Del. C. § 7550(h): the date and time of municipal elections, offices, and terms are as provided in the municipality's charter or ordinance	https://delcode.delaware.gov/title15/c075/sc04/index.html
 DE	school				elected	1	0						Del. Code tit. 14, § 1072	https://delcode.delaware.gov/title14/c010/sc04/
 FL	special	soil and water conservation			elected	2	0						Fla. Stat. § 582.18	https://www.flsenate.gov/Laws/Statutes/2025/582.18
 FL	county				elected	2	0						Fla. Stat. § 100.041(2)(a)	https://flsenate.gov/Laws/Statutes/2026/100.041
@@ -65,13 +65,13 @@ LA	municipality				elected	4	1						La. Rev. Stat. § 33:383(A)(1); § 18:402(D)
 LA	school				elected	4	2						La. Rev. Stat. § 17:52(A)(1), (A)(2)	https://legis.la.gov/legis/Law.aspx?d=81132
 MA	municipality				elected	2	1						Mass. Gen. Laws ch. 43, §§ 15(a)-(c), 109	https://malegislature.gov/Laws/GeneralLaws/PartI/TitleVII/Chapter43/Section109
 MA	school				elected	1	0						Mass. Gen. Laws ch. 41, § 1	https://malegislature.gov/Laws/GeneralLaws/PartI/TitleVII/Chapter41/Section1
-MA	special				elected	1	0							
+MA	special				elected	1	0						M.G.L. c. 41 §§ 1A and 69A: district officers (fire, water, and similar districts) are elected at the district's annual meeting; each district's special act and bylaws set the date	https://malegislature.gov/Laws/GeneralLaws/PartI/TitleVII/Chapter41/Section1A
 MA	township				elected	1	0						Mass. Gen. Laws ch. 41, § 1	https://malegislature.gov/Laws/GeneralLaws/PartI/TitleVII/Chapter41/section1
 MD	county				elected	2	0						Md. Code, Elec. Law § 8-301 (general elections)	https://msa.maryland.gov/msa/mdmanual/41electp/html/forth.html
 MD	school				elected	2	0						Md. Code, Elec. Law § 8-301 (general elections)	https://msa.maryland.gov/msa/mdmanual/41electp/html/forth.html
 ME	municipality				elected	1	0						30-A M.R.S. § 2525 (Annual meeting)	https://legislature.maine.gov/statutes/30-a/title30-Asec2525.html
 ME	school				elected	1	0						30-A M.R.S. § 2525(1)(C); 20-A M.R.S. § 1653	https://legislature.maine.gov/statutes/30-a/title30-Asec2525.html
-ME	special				elected	1	0							
+ME	special				elected	1	0						38 M.R.S. § 1105: sanitary district trustees are nominated and elected as municipal officers are under Title 30-A, or under a municipal charter	https://legislature.maine.gov/statutes/38/title38sec1105.html
 ME	township				elected	1	0						30-A M.R.S. § 2525 (Annual meeting)	https://legislature.maine.gov/statutes/30-a/title30-Asec2525.html
 MI	county				elected	2	0				2024-01-01		Mich. Const. art. II, § 5	https://www.legislature.mi.gov/Laws/MCL?objectName=mcl-Article-II-5
 MI	county				elected	4	0	11	nov_tuesday_after_first_monday	2024-01-01			MCL 46.410 as amended by 2021 PA 121: commissioners elected at or after the 2024 general election serve four-year terms	https://www.legislature.mi.gov/Laws/MCL?objectName=mcl-46-410
@@ -97,32 +97,32 @@ NC	county				elected	2	0						N.C. Gen. Stat. § 163-1(c) (statewide general ele
 NC	municipality				elected	2	1						N.C. Gen. Stat. § 163-279(a)	https://www.ncleg.gov/EnactedLegislation/Statutes/HTML/BySection/Chapter_163/GS_163-279.html
 NC	school				elected	2	0						N.C. Gen. Stat. § 115C-37(a)	https://www.ncleg.gov/EnactedLegislation/Statutes/HTML/BySection/Chapter_115C/GS_115C-37.html
 ND	special	soil and water conservation			elected	2	0						N.D.C.C. § 4.1-20-18	https://ndlegis.gov/cencode/t04-1c20.pdf
-ND	county				elected	2	0							
+ND	county				elected	2	0						N.D.C.C. § 11-07-04: county commissioners serve staggered terms, elected at the general election	https://ndlegis.gov/cencode/t11c07.pdf
 ND	municipality				elected	2	0						N.D. Cent. Code § 40-21-02	https://ndlegis.gov/cencode/t40c21.pdf
 ND	school				elected	1	0						N.D. Cent. Code § 15.1-09-22(1)	https://codes.findlaw.com/nd/title-15-1-elementary-and-secondary-education/nd-cent-code-sect-15-1-09-22/
 ND	township				elected	1	0						N.D. Cent. Code § 58-05-02	https://ndlegis.gov/cencode/t58c05.pdf
 NE	special	soil and water conservation			elected	2	0						Neb. Rev. Stat. § 32-513	https://www.nebraskalegislature.gov/laws/statutes.php?statute=32-513
-NE	county				elected	2	0							
-NE	municipality				elected	2	0							
+NE	county				elected	2	0						Neb. Rev. Stat. § 32-528: county commissioners elected at the statewide general election, two or three in 1994 and every four years thereafter and the rest in 1996 and every four years thereafter	https://nebraskalegislature.gov/laws/statutes.php?statute=32-528
+NE	municipality				elected	2	0						Neb. Rev. Stat. § 32-556: city and village elections, except home rule charter cities, held in conjunction with the statewide primary or general election	https://nebraskalegislature.gov/laws/statutes.php?statute=32-556
 NE	school				elected	2	0						Neb. Rev. Stat. § 32-543(2) (Class I, II, III); § 32-544 (Class IV, city election); § 32-545 (Class V)	https://nebraskalegislature.gov/laws/statutes.php?statute=32-543
 NE	special				elected	2	0						Neb. Rev. Stat. § 32-404(3)	https://nebraskalegislature.gov/laws/statutes.php?statute=32-404
-NE	township				elected	2	0							
-NH	municipality				elected	2	1							
-NH	school				elected	1	0							
-NH	special				elected	1	0							
+NE	township				elected	2	0						Neb. Rev. Stat. § 32-530: township board officers elected at the statewide general election in 1994 and every four years thereafter	https://nebraskalegislature.gov/laws/statutes.php?statute=32-530
+NH	municipality				elected	2	1						RSA 669:1: towns hold an election annually for town officers on the second Tuesday in March, unless an alternative date is adopted under RSA 40:14 or RSA 31:94-a	https://www.gencourt.state.nh.us/rsa/html/LXIII/669/669-1.htm
+NH	school				elected	1	0						RSA 197:1: every school district holds a meeting annually between March 1 and March 25, or under RSA 40:13 where adopted	https://www.gencourt.state.nh.us/rsa/html/XV/197/197-1.htm
+NH	special				elected	1	0						RSA 52:12: the annual meeting of each village district is held between January 1 and May 1	https://www.gencourt.state.nh.us/rsa/html/III/52/52-12.htm
 NH	township				elected	1	0						N.H. RSA 669:1, I	https://gc.nh.gov/rsa/html/LXIII/669/669-1.htm
-NJ	county				elected	1	0							
+NJ	county				elected	1	0						N.J.S.A. 40:20-23: chosen freeholders (county commissioners) elected at the county's general election for three-year terms	https://law.justia.com/codes/new-jersey/title-40/section-40-20-23/
 NJ	municipality				elected	1	0						N.J. Stat. § 40:45-1	https://law.justia.com/codes/new-jersey/title-40/section-40-45-1/
 NJ	school				elected	1	0						N.J. Stat. § 19:60-1(a)	https://pub.njleg.state.nj.us/Bills/2018/PL18/20_.HTM
-NJ	special				elected	1	0							
+NJ	special				elected	1	0						N.J.S.A. 40A:14-72: fire district annual election on the third Saturday in February, movable to the general election under N.J.S.A. 40A:14-72.1	https://law.justia.com/codes/new-jersey/2018/title-40a/chapter-14/section-40a-14-72/
 NJ	township				elected	1	0						N.J. Stat. § 40:45-1	https://law.justia.com/codes/new-jersey/title-40/section-40-45-1/
-NM	county				elected	2	0							
+NM	county				elected	2	0						NMSA 1978 § 4-38-6: county commissioners are elected to four-year terms	https://law.justia.com/codes/new-mexico/2020/chapter-4/article-38/section-4-38-6/
 NM	municipality				elected	2	1						N.M. Stat. § 1-22-3	https://codes.findlaw.com/nm/chapter-1-elections/nm-st-sect-1-22-3/
 NM	school				elected	2	1						N.M. Stat. § 1-22-3	https://codes.findlaw.com/nm/chapter-1-elections/nm-st-sect-1-22-3/
 NV	special	soil and water conservation			elected	2	0						NRS 548.285	https://www.leg.state.nv.us/nrs/nrs-548.html
 NV	county				elected	2	0						Nev. Rev. Stat. § 293.12755 (general election)	https://www.leg.state.nv.us/nrs/nrs-293.html
 NV	municipality				elected	2	0						Nev. Rev. Stat. §§ 293C.140, 293C.145	https://www.leg.state.nv.us/nrs/NRS-293C.html
-NV	school				elected	2	0							
+NV	school				elected	2	0						NRS 386.165 and 386.200: school trustees are elected at the general election for four-year terms	https://www.leg.state.nv.us/nrs/nrs-386.html#NRS386Sec200
 NY	municipality				elected	1	0						N.Y. Town Law § 80 (biennial town election each November of even years from 2025; town justices excepted); N.Y. Election Law § 15-104 (village election third Tuesday in March unless the village chose another date)	https://law.justia.com/codes/new-york/twn/article-6/80/
 NY	school				elected	1	0	5					N.Y. Educ. Law § 2002(1) (third Tuesday in May); § 2601-a(2)	https://www.nysenate.gov/legislation/laws/EDN/2002
 NY	special				elected	1	0						N.Y. Town Law § 175 (fire district annual election on the second Tuesday in December)	https://www.nysenate.gov/legislation/laws/TWN/175
@@ -165,18 +165,18 @@ UT	municipality				elected	2	1						Utah Code § 20A-1-202(1)	https://le.utah.go
 UT	school				elected	2	0						Utah Code § 20A-1-201(2)(a)(vii)–(viii); § 20A-14-202	https://le.utah.gov/xcode/Title20A/Chapter1/20A-1-S201.html?v=C20A-1-S201_2023022720230227
 VA	special	soil and water conservation			elected	4	3						Va. Code § 10.1-523(D)	https://law.lis.virginia.gov/vacode/title10.1/chapter5/section10.1-523/
 VA	county				elected	4	3						Va. Code § 24.2-218	https://law.lis.virginia.gov/vacodefull/title24.2/chapter2/article5/
-VA	municipality				elected	2	0							
+VA	municipality				elected	2	0						Va. Code § 24.2-222(B): city and town elections at two- or four-year intervals take place at the May general election of an even-numbered year, unless moved to November under § 24.2-222.1	https://law.lis.virginia.gov/vacode/24.2-222/
 VA	school				elected	2	1						Va. Code § 24.2-223	https://law.lis.virginia.gov/vacodefull/title24.2/chapter2/article5/
 VT	municipality				elected	1	0						17 V.S.A. § 2640(a)	https://legislature.vermont.gov/statutes/section/17/055/02640
 VT	school				elected	1	0						16 V.S.A. § 423(a)	https://legislature.vermont.gov/statutes/fullchapter/16/009
-VT	special				elected	1	0							
+VT	special				elected	1	0						20 V.S.A. § 2485: a fire district elects its clerk, treasurer, and collector at each annual meeting and one prudential committee member each year; district charters in 24 V.S.A. Appendix set their own dates	https://legislature.vermont.gov/statutes/section/20/171/02485
 VT	township				elected	1	0						17 V.S.A. § 2640(a)	https://legislature.vermont.gov/statutes/section/17/055/02640
 WA	county				elected	2	0						RCW 29A.04.321(1); RCW 36.16.010	https://app.leg.wa.gov/rcw/default.aspx?cite=29a.04.330
 WA	municipality				elected	2	1						RCW 29A.04.330(1)	https://app.leg.wa.gov/rcw/default.aspx?cite=29a.04.330
 WA	school				elected	2	1						RCW 29A.04.330(1)	https://app.leg.wa.gov/rcw/default.aspx?cite=29a.04.330
 WA	special				elected	2	1						RCW 29A.04.330(1)(b)	https://app.leg.wa.gov/rcw/default.aspx?cite=29a.04.330
 WI	county				elected	2	0						Wis. Stat. § 59.10(3)(d)	https://docs.legis.wisconsin.gov/scroll/up/274/statutes/statutes/59
-WI	municipality				elected	1	0							
+WI	municipality				elected	1	0						Wis. Stat. § 5.02(21): the spring election, held on the first Tuesday in April, elects municipal officers	https://docs.legis.wisconsin.gov/statutes/statutes/5/i/02
 WI	school				elected	1	0						Wis. Stat. § 120.06(3), (7)(b)	https://docs.legis.wisconsin.gov/statutes/statutes/120/i/06/9
 WI	township				elected	2	1						Wis. Stat. § 60.30(1)(a), (4)(a)	https://law.justia.com/codes/wisconsin/chapter-60/section-60-30/
 WV	special	soil and water conservation			elected	2	0						W. Va. Code § 19-21A-6	https://code.wvlegislature.gov/19-21A-6/
@@ -184,7 +184,7 @@ WV	county				elected	2	0						W. Va. Code § 3-1-31(a)	https://code.wvlegislatur
 WV	school				elected	2	0						W. Va. Code § 18-5-1b	https://code.wvlegislature.gov/18-5-1b/
 WY	special	soil and water conservation			elected	2	0						W.S. §§ 11-16-120, 22-2-101(a)(ix)	https://wyoleg.gov/statutes/compress/title11.pdf
 WY	county				elected	2	0						Wyo. Stat. §§ 22-2-104(a), 22-2-105(a)(ii)	https://wyoleg.gov/statutes/compress/title22.pdf
-WY	municipality				elected	2	0							
+WY	municipality				elected	2	0						Wyo. Stat. § 22-23-201: municipal primary and general elections are held with the statewide elections, except for towns that adopt a charter ordinance under § 22-23-202	https://law.justia.com/codes/wyoming/2020/title-22/chapter-23/article-2/section-22-23-201/
 WY	school				elected	2	0						Wyo. Stat. § 22-2-104(e)	https://wyoleg.gov/statutes/compress/title22.pdf
 CA	special		(?<!GROUND)WATER AGENCY		elected			11	nov_tuesday_after_first_monday			Special-act water agencies elect directors at the November general election when their act provides; ch. 45 is the County Water Authority Act, whose directors are appointed by member agencies	Cal. Elec. Code §§ 1303(b), 10403 (special districts hold regular elections on the statewide general election date when their principal act so provides); each county water agency's own special act sets its board election	https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=ELEC&sectionNum=10403
 CA	special		AUTHORITY|\bAUTH\b|JOINT POWERS|\bJPA\b		appointed							Joint powers authority board of member-agency appointees	Cal. Gov. Code §§ 6500, 6508.1	https://california.public.law/codes/ca_gov't_code_section_6508.1
