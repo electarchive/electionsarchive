@@ -1,4 +1,4 @@
-state	district	label	parent	office	candidate	source	system	seat	party	seats
+state	district	label	parent	office	candidate	source	system	seat	party	seats	round
 IL	IL:circuit-7	Seventh Judicial Circuit		Circuit Judge	Adam Giganti	https://www.elections.il.gov/Downloads/ElectionOperations/PDF/JudicialOfficers.pdf	retention		
 IL	IL:circuit-7	Seventh Judicial Circuit		Circuit Judge	John M. Madonia	https://www.elections.il.gov/Downloads/ElectionOperations/PDF/JudicialOfficers.pdf	retention		
 IL	IL:circuit-7	Seventh Judicial Circuit		Circuit Judge	Gail L. Noll	https://www.elections.il.gov/Downloads/ElectionOperations/PDF/JudicialOfficers.pdf	retention		
@@ -911,3 +911,11 @@ NY	NY:county-court-suffolk	Suffolk County Court	NY:judicial-district-10	County C
 NY	NY:district-court-suffolk-5	Suffolk County District Court, 5th District	NY:judicial-district-10	District Court Judge	Alonzo G Jacobs	https://app.enhancedvoting.com/ebd/voter/api/ballotStyle/01000000-2e24-b8a5-c53e-08df1342f78d?jurisdictionId=2caf39ae-a496-44e6-baa7-142c5f40644e&precinctId=84a90000-3fb7-f46d-298f-08ddeb48c68f&ballotType=sample	fptp		democratic-party	3
 NY	NY:district-court-suffolk-5	Suffolk County District Court, 5th District	NY:judicial-district-10	District Court Judge	Pierce F Cohalan	https://app.enhancedvoting.com/ebd/voter/api/ballotStyle/01000000-2e24-b8a5-c53e-08df1342f78d?jurisdictionId=2caf39ae-a496-44e6-baa7-142c5f40644e&precinctId=84a90000-3fb7-f46d-298f-08ddeb48c68f&ballotType=sample	fptp		democratic-party	3
 NY	NY:district-court-suffolk-5	Suffolk County District Court, 5th District	NY:judicial-district-10	District Court Judge	Thomas D Luciano	https://app.enhancedvoting.com/ebd/voter/api/ballotStyle/01000000-2e24-b8a5-c53e-08df1342f78d?jurisdictionId=2caf39ae-a496-44e6-baa7-142c5f40644e&precinctId=84a90000-3fb7-f46d-298f-08ddeb48c68f&ballotType=sample	fptp		republican-party	3
+AR	AR:05021	2nd Judicial District		Circuit Judge	Curtis Hitt	https://results.tally-enr.com/results/arkansas/11b07106-031e-4d7c-911a-d01fb473d6dd/FullDataFile.json	fptp	Division 4		1	2
+AR	AR:05021	2nd Judicial District		Circuit Judge	Andrew Nadzam	https://results.tally-enr.com/results/arkansas/11b07106-031e-4d7c-911a-d01fb473d6dd/FullDataFile.json	fptp	Division 4		1	2
+AR	AR:05087	4th Judicial District		Circuit Judge	Wendy Howerton	https://results.tally-enr.com/results/arkansas/11b07106-031e-4d7c-911a-d01fb473d6dd/FullDataFile.json	fptp	Division 2		1	2
+AR	AR:05087	4th Judicial District		Circuit Judge	Kristin Pawlik	https://results.tally-enr.com/results/arkansas/11b07106-031e-4d7c-911a-d01fb473d6dd/FullDataFile.json	fptp	Division 2		1	2
+AR	AR:05069	11th West Judicial District		Prosecuting Attorney	Karres Manning-Center	https://results.tally-enr.com/results/arkansas/11b07106-031e-4d7c-911a-d01fb473d6dd/FullDataFile.json	fptp			1	2
+AR	AR:05069	11th West Judicial District		Prosecuting Attorney	Evelyn Moorehead	https://results.tally-enr.com/results/arkansas/11b07106-031e-4d7c-911a-d01fb473d6dd/FullDataFile.json	fptp			1	2
+AR	AR:05023	16th Judicial District		Circuit Judge	Kara Byars	https://results.tally-enr.com/results/arkansas/11b07106-031e-4d7c-911a-d01fb473d6dd/FullDataFile.json	fptp	Division 2		1	2
+AR	AR:05023	16th Judicial District		Circuit Judge	Scott Davidson	https://results.tally-enr.com/results/arkansas/11b07106-031e-4d7c-911a-d01fb473d6dd/FullDataFile.json	fptp	Division 2		1	2

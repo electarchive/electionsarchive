@@ -31,6 +31,10 @@ PUBLISHERS = {
         "Utah Judicial Performance Evaluation Commission",
         "Judges Standing for Retention in 2026",
     ),
+    "results.tally-enr.com": (
+        "Arkansas Secretary of State",
+        "November 3, 2026 General Election and Nonpartisan Runoff: election-night results (Tally ENR)",
+    ),
 }
 BALLOTS = {
     "f556954e-bea5-489c-8351-dee0327daf9a": (
@@ -52,7 +56,7 @@ PAGES = {
 TITLES = {
     "https://www.elections.il.gov/ElectionOperations/EOPDFViewer.aspx?ElectionID=sejIrI%2BQmww%3D&QueryType=xF443FTCAJbIL3atac%2FUjEg7Y4yklgT1&Status=P2wRQXkiFoo%3D": "Website Candidate List, General Election, November 3, 2026",
 }
-BORROWED = {"www.nvsos.gov": "us.nv_districts_2026"}
+BORROWED = {"www.nvsos.gov": "us.nv_districts_2026", "results.tally-enr.com": "us.local_2026"}
 
 
 def read() -> list[dict[str, str]]:
@@ -208,6 +212,7 @@ def emit() -> Path:
                 if office in cs.minted:
                     cs.add("office", id=office, polity_id=state_polity, kind="other")
                     name(office, f"{title}, {state}")
+            runoff = row.get("round") == "2"
             contest = cs.key("us.contest", key)
             cs.add(
                 "contest",
@@ -221,14 +226,14 @@ def emit() -> Path:
                 boundary_set_id=None,
                 magnitude=int(row.get("seats") or 1),
                 term="full",
-                round_number=1,
+                round_number=2 if runoff else 1,
                 previous_round_id=None,
                 electoral_system_id=fptp,
                 default_result_kind="counted",
             )
             label = ", ".join(part for part in (title, row["label"], row["seat"]) if part)
-            name(contest, f"2026 {state} {label} election")
-            path = f"us/{state.lower()}/2026-11-03-general/{slug(label)}"
+            name(contest, f"2026 {state} {label}{' runoff' if runoff else ''} election")
+            path = f"us/{state.lower()}/2026-11-03-general/{slug(label)}{'-runoff' if runoff else ''}"
             if taken.get(path, contest) != contest:
                 raise ValueError(f"{label} would take {path}")
             taken[path] = contest
