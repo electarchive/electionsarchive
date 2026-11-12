@@ -212,6 +212,23 @@ LAND_INFO = {
     "TH": ("16", "Thuringia", ("Landtag of Thuringia", "Thüringer Landtag"), "Landtagswahl in Thüringen"),
 }
 HISTORY_OTHERS = ("Wgr./Einzelbew.", "Sonstige")
+HISTORY_RELABELED = {
+    ("BY", date(1950, 11, 26)): (
+        ("WAV", "Wirtschaftliche Aufbau-Vereinigung"),
+        ("KPD", "Kommunistische Partei Deutschlands"),
+        ("Der Deutsche Block", "Der Deutsche Block"),
+        ("Königspartei", "Königspartei"),
+        ("WKHE", "Wahlblock der Kriegsgeschädigten, Heimatvertriebenen und Entrechteten"),
+        ("BdH", "Block der Heimatvertriebenen"),
+        ("VWPE", "Vereinigung wirtschaftlich und politisch Entrechteter"),
+        ("UBN", "Unpolitische Bäuerliche Notgemeinschaft – Hilfe für den Bayerischen Wald"),
+    ),
+    ("BY", date(1978, 10, 15)): (
+        ("KBW", "Kommunistischer Bund Westdeutschland"),
+        ("UWV", "UWV"),
+        ("EAP", "Europäische Arbeiterpartei"),
+    ),
+}
 HISTORY_SKIP = {("BE", date(1946, 10, 20))}
 HISTORY_NOTES = {
     "Stand nach der Wiederholungswahl am 12.03.1961.": "The figures include the repeat vote of 12 March 1961.",
@@ -591,11 +608,24 @@ def parse_history() -> None:
         rows = sorted((row for row in results if row["index"] == election["index"]), key=lambda row: row["position"])
         seen: set[str] = set()
         election["folded"] = None
+        election["relabeled"] = None
         for row in rows:
             if row["label"] in seen:
                 election["folded"] = row["position"]
                 break
             seen.add(row["label"])
+        relabels = HISTORY_RELABELED.get((election["state"], election["day"]))
+        if relabels and election["folded"] is not None:
+            tail = [row for row in rows if row["position"] >= election["folded"]]
+            if len(tail) != len(relabels):
+                raise ValueError(f"{election['state']} {election['day']}: {len(tail)} repeated rows")
+            for row, (label, name_) in zip(tail, relabels, strict=True):
+                row["label"] = label
+                row["seats"] = 0
+                glossary.append({"state": election["state"], "label": label, "name": name_, "remark": ""})
+            election["seats"] = sum(row["seats"] for row in results if row["index"] == election["index"])
+            election["relabeled"] = election["folded"]
+            election["folded"] = None
         if election["folded"] is not None:
             tail = [row for row in rows if row["position"] >= election["folded"]]
             results = [row for row in results if not any(row is other for other in tail)]
@@ -1620,6 +1650,13 @@ def emit_history(
                 notes.append("The source prints 360 as the total of seats; the parties' seats add up to 120.")
             if row["extra"] is not None:
                 notes.append(row["extra"])
+            if row["relabeled"] is not None:
+                notes.append(
+                    f"From row {row['relabeled']} on, the source repeats party abbreviations from above and prints "
+                    "seat numbers that do not add up. The parties and seats shown are those of the Bavarian "
+                    "statistical office's report on the election (Beiträge zur Statistik Bayerns, Heft "
+                    f"{163 if day.year == 1950 else 373})."
+                )
             if row["folded"] is not None:
                 notes.append(
                     f"From row {row['folded']} on, the source repeats party abbreviations from above and prints seat "
