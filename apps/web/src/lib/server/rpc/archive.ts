@@ -1553,31 +1553,7 @@ async function labeled(rows: Promise<Surveyed>, key: string, date: string) {
   return remember(`children:${key}`, async () => label(await rows, date));
 }
 
-async function survey(
-  contest: string | Array<string>,
-  area: { id: string; k: number },
-  isRoot: boolean,
-  date: string,
-  isDeep = false,
-) {
-  const sets = await db.execute<{ k: number }>(sql`
-    with recursive grp(id) as (
-      select unnest(${sql.param([contest].flat())}::uuid[])
-      union all
-      select c.id from contest c join grp on c.allocation_parent_id = grp.id
-    )
-    select rs.k from grp cross join lateral (select * from result_set x where x.contest_id = grp.id and x.status <> 'withdrawn' and ${served("x")} offset 0) rs
-  `);
-  const held = await Promise.all(
-    [contest].flat().map(async (id) => convention(id)),
-  );
-  const ks = [
-    ...sets.rows.map((row) => row.k),
-    ...held.flat().map((row) => row.k),
-  ];
-  if (ks.length === 0) {
-    return [];
-  }
+function countingFor(ks: Array<number>) {
   const pool = sql`${sql.param(ks)}::int[]`;
   const valued = (k: SQL) => sql`
     exists (
@@ -1622,6 +1598,34 @@ async function survey(
         or ${valued(sql`kids.k`)}
         or ${named}
       `;
+  return { pool, valued, counted };
+}
+
+async function shallow(
+  contest: string | Array<string>,
+  area: { id: string; k: number },
+  isRoot: boolean,
+  date: string,
+) {
+  const sets = await db.execute<{ k: number }>(sql`
+    with recursive grp(id) as (
+      select unnest(${sql.param([contest].flat())}::uuid[])
+      union all
+      select c.id from contest c join grp on c.allocation_parent_id = grp.id
+    )
+    select rs.k from grp cross join lateral (select * from result_set x where x.contest_id = grp.id and x.status <> 'withdrawn' and ${served("x")} offset 0) rs
+  `);
+  const held = await Promise.all(
+    [contest].flat().map(async (id) => convention(id)),
+  );
+  const ks = [
+    ...sets.rows.map((row) => row.k),
+    ...held.flat().map((row) => row.k),
+  ];
+  if (ks.length === 0) {
+    return undefined;
+  }
+  const { pool, valued, counted } = countingFor(ks);
   const lazy = (within: SQL) => sql`
     with sums as materialized (
       select r.area_k as k from result_rollup_sum r
@@ -1775,7 +1779,7 @@ async function survey(
   );
   found.rows.push(...joined.rows, ...abroad.rows);
   if (found.rows.length === 0) {
-    return [];
+    return undefined;
   }
   const unlinked = await db.execute<{ id: string; k: number; scheme: string }>(
     sql`
@@ -1795,6 +1799,28 @@ async function survey(
     `,
   );
   found.rows.push(...unlinked.rows);
+  return { ks, found: found.rows, members: [...members], deeper: [...deeper] };
+}
+
+async function survey(
+  contest: string | Array<string>,
+  area: { id: string; k: number },
+  isRoot: boolean,
+  date: string,
+  isDeep = false,
+) {
+  const base = await remember(
+    `shallow:${childrenKey(contest, area, isRoot, date, false)}`,
+    async () => shallow(contest, area, isRoot, date),
+  );
+  if (base == null) {
+    return [];
+  }
+  const { ks } = base;
+  const members = new Set(base.members);
+  const deeper = new Set(base.deeper);
+  const found = { rows: base.found };
+  const { counted } = countingFor(ks);
   const tops = found.rows.filter(
     (row) => !members.has(row.id) && !deeper.has(row.id),
   );
