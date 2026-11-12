@@ -10321,10 +10321,12 @@ export const contests = {
                   [
                     row.area,
                     row.party,
-                    row.person,
+                    row.party == null && !row.independent ? row.person : null,
                     ...(row.held ?? []).flatMap((entry) => [
                       entry.party,
-                      entry.person,
+                      entry.party == null && !entry.independent
+                        ? entry.person
+                        : null,
                     ]),
                   ].filter((id) => id != null),
                 ),
