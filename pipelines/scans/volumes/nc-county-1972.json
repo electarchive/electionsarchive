@@ -1,0 +1,28 @@
+{
+  "polity": "US-NC",
+  "publisher": "North Carolina Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "year": 1972,
+  "day": "1972-11-07",
+  "title": "North Carolina Manual 1973, vote for Governor, U.S. Senator, and Congressmen by counties, general election 1972-11-07",
+  "file": {
+    "url": "https://archive.org/download/northcarolinama1973nort/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/northcarolinama1973nort"
+  },
+  "offices": {
+    "governor": "Governor, counties down, candidates across",
+    "senate": "U.S. Senator, counties down, candidates across",
+    "house": "U.S. Representative, one table per congressional district, counties down, with a district total row"
+  },
+  "leaves": [
+    359,
+    360,
+    398,
+    404,
+    405,
+    406,
+    407
+  ],
+  "create": true
+}
