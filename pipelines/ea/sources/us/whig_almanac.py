@@ -52,12 +52,18 @@ VOLUMES = {year: (PDF, LANDING, day, pages) for year, (_, _, day, pages) in ITEM
 ERRATA: set[tuple[int, tuple[str, int]]] = set()
 REREAD = ("1848-11-07:VT:president", "1844:MD:president")
 CHECKED = {
-    1848: ("ME", "VT", "MA", "RI", "NH", "CT", "NJ", "DE", "MD", "VA", "NC", "AL", "GA", "LA", "MS", "TN", "KY")
-    + ("OH", "IN", "IL", "MO", "MI", "WI", "IA"),
-    1844: ("ME", "VT", "MA", "RI", "NH", "CT", "NJ", "PA", "DE", "MD", "VA", "NC", "AL", "GA", "LA", "MS", "TN")
-    + ("KY", "OH", "IN", "IL"),
+    1848: ("ME", "VT", "MA", "RI", "NH", "CT", "NY", "NJ", "PA", "DE", "MD", "VA", "NC", "AL", "GA", "LA", "MS")
+    + ("TN", "KY", "OH", "IN", "IL", "MO", "MI", "WI", "IA"),
+    1844: ("ME", "VT", "MA", "RI", "NH", "CT", "NY", "NJ", "PA", "DE", "MD", "VA", "NC", "AL", "GA", "LA", "MS")
+    + ("TN", "KY", "OH", "IN", "IL"),
 }
+WARDS = ("I", "II", "III", "IV", "V", "VI", "VII", "X", "XIII", "VIII", "IX", "XIV", "XI", "XII", "XV", "XVI", "XVII")
+UNREAD = {("NY", f"Ward {ward}"): 54 for ward in (*WARDS, "XVIII")} | {("NY", "New-York City"): 54}
 NAMES = {
+    **{("NY", f"Ward {ward}"): "36061" for ward in (*WARDS, "XVIII")},
+    ("NY", "New-York City"): "36061",
+    ("NY", "Hamilton/Fulton"): "NY:hamiltonandfultoncounties",
+    ("NY", "Chautauque"): "Chautauqua",
     ("NH", "Hillsboro'"): "Hillsborough",
     ("CT", "N.-London"): "New London",
     ("MD", "Balt. City"): "24510",
@@ -195,6 +201,7 @@ FORMER: dict[tuple[str, str], tuple[str, str, date]] = {
     ("VA", "ritchie"): ("Ritchie", "54085", date(1863, 6, 20)),
     ("VA", "wayne"): ("Wayne", "54099", date(1863, 6, 20)),
     ("VA", "wetzel"): ("Wetzel", "54103", date(1863, 6, 20)),
+    ("NY", "hamiltonandfultoncounties"): ("Hamilton and Fulton Counties", "36035", date(1849, 1, 1)),
     ("WI", "crawfordandchippewacounties"): ("Crawford and Chippewa Counties", "55023", date(1849, 1, 1)),
     ("WI", "iowaandrichlandcounties"): ("Iowa and Richland Counties", "55049", date(1849, 1, 1)),
 }
@@ -525,7 +532,8 @@ def build() -> None:
         else None
         for line in csv.DictReader(Path(__file__).with_name("whig_almanac.tsv").open(), delimiter="\t")
     }
-    for row in {key_[:2] for key_ in checked} - set(order):
+    unread = {(state, _plain(county)): (county, page) for (state, county), page in UNREAD.items()}
+    for row in {key_[:2] for key_ in checked} - set(order) - set(unread):
         print(f"checked by eye but not in the reads: {row}")
     settled: dict[tuple[str, str, int, str], int | None] = {}
     doubts: dict[tuple[str, int, str], list[str]] = {}
@@ -541,6 +549,13 @@ def build() -> None:
                 doubts.setdefault((row[0], *cell), []).append(
                     f"{NAMED[row]} p{pages[row]}: {value if sure else '?'} of {dict(Counter(by.values()))}"
                 )
+    for row, (county, page) in unread.items():
+        NAMED[row], pages[row], seen[row] = county, page, {}
+        order.insert(max(i for i, other in enumerate(order) if other[0] == row[0]) + 1, row)
+        for (state, name, year, candidate), votes in checked.items():
+            if (state, name) == row:
+                seen[row][(year, candidate)] = {}
+                settled[(*row, year, candidate)] = votes
     folder = raw.parsed(SOURCE) / "model"
     folder.mkdir(parents=True, exist_ok=True)
     for year, names in CANDIDATES.items():
