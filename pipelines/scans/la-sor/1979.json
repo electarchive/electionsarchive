@@ -1,0 +1,87 @@
+{
+  "polity": "US-LA",
+  "publisher": "Louisiana Secretary of State",
+  "title": "Report of the Secretary of State, 1979\u20131980",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706905_0363/micro_IA40706905_0363.pdf",
+    "item": "https://archive.org/details/micro_IA40706905_0363"
+  },
+  "raw_source": "us.la_sos",
+  "contests": {
+    "governor": {
+      "year": 1979,
+      "chamber": "governor",
+      "day": "1979-10-27",
+      "special": false,
+      "state": "LA",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 38,
+      "id": "38-0",
+      "columns": [
+        {
+          "label": "James E. Fitzmorris, Jr. Democrat",
+          "contest": "governor",
+          "candidate": "Jimmy Fitzmorris"
+        },
+        {
+          "label": "Paul Hardy Democrat",
+          "contest": "governor",
+          "candidate": "Paul Hardy"
+        },
+        {
+          "label": "E. L. Bubba Henry Democrat",
+          "contest": "governor",
+          "candidate": "E. L. Henry"
+        },
+        {
+          "label": "Luther Devine L. D. Knox Democrat",
+          "contest": "governor",
+          "candidate": "L.D. Knox"
+        },
+        {
+          "label": "Louis Lambert Democrat",
+          "contest": "governor",
+          "candidate": "Louis Lambert"
+        },
+        {
+          "label": "Ken Lewis Democrat",
+          "contest": "governor",
+          "candidate": "Ken Lewis"
+        },
+        {
+          "label": "Edgar G. Sonny Mouton, Jr. Democrat",
+          "contest": "governor",
+          "candidate": "Edgar G. \"Sonny\" Mouton, Jr."
+        },
+        {
+          "label": "Greg Nelson No Party",
+          "contest": "governor",
+          "candidate": "Greg Nelson"
+        },
+        {
+          "label": "Dave Treen Republican",
+          "contest": "governor",
+          "candidate": "David Conner Treen"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.247,
+        0.086,
+        0.773,
+        0.8
+      ],
+      "hint": "Read only the governor table for the October 27, 1979 open primary (Insert B). Each parish row has nine handwritten numbers, one per candidate column, written close together with only small gaps or dots between them; split each row into exactly nine numbers in column order.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.07
+      ]
+    }
+  ]
+}
