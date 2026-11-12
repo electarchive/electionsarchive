@@ -2522,8 +2522,8 @@ AL_2007_NOTE = (
     "figure is approximate."
 )
 MS_2002_NOTE = (
-    " Only the statewide totals are recorded: the figures are the printed Total row of the Mississippi Official and"
-    " Statistical Register 2004-2008 table for Amendment 1 (SCR 543), page 574; the county rows are not loaded."
+    " The county figures and the statewide totals are from the Mississippi Official and Statistical Register"
+    " 2004-2008 table for Amendment 1 (SCR 543), page 574; the box shown on the statewide figures is approximate."
 )
 MS_2004_NOTE = (
     " Only the statewide totals are recorded: the figures are those printed in the Secretary of State's proclamation "
@@ -6006,7 +6006,21 @@ def mississippi_2004() -> list[dict[str, object]]:
 
 
 def mississippi_2002() -> list[dict[str, object]]:
-    return [
+    text = subprocess.run(
+        ["pdftotext", "-layout", "-f", "50", "-l", "50", str(raw.cached(SOURCE, MS_2002).path), "-"],
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout.split("SENATE DISTRICT 5")[0]
+    table: dict[str, tuple[int, int]] = {}
+    for name, yes, no in re.findall(r"([A-Z][A-Za-z ]+?) (?:\. ?)+\.?\s*([\d,]+) (?:\. ?)+\.?\s*([\d,]+)", text):
+        table[name.strip()] = (int(yes.replace(",", "")), int(no.replace(",", "")))
+    totals = table.pop("TOTAL")
+    if totals != (MS_2002_TOTALS[0][0], MS_2002_TOTALS[1][0]) or len(table) != 82:
+        raise ValueError(f"MS 2002: {len(table)} counties, total {totals}")
+    if any(sum(v[at] for v in table.values()) != totals[at] for at in (0, 1)):
+        raise ValueError("MS 2002: county columns do not sum to the printed totals")
+    rows: list[dict[str, object]] = [
         {
             "state": "MS",
             "day": date(2002, 11, 5),
@@ -6024,6 +6038,21 @@ def mississippi_2002() -> list[dict[str, object]]:
         }
         for answer, (votes, box) in zip(("YES", "NO"), MS_2002_TOTALS, strict=True)
     ]
+    rows.extend(
+        {
+            "state": "MS",
+            "day": date(2002, 11, 5),
+            "number": "1",
+            "label": "Amendment 1",
+            "url": MS_2002,
+            "county": county,
+            "answer": answer,
+            "votes": votes[at],
+        }
+        for county, votes in table.items()
+        for answer, at in (("YES", 0), ("NO", 1))
+    )
+    return rows
 
 
 def texas_2022() -> list[dict[str, object]]:
@@ -7950,6 +7979,13 @@ def emit() -> Path:
                 "select s.id from source s join changeset c on c.id = s.changeset_id where c.pipeline = %s", [SOURCE]
             ).fetchall()
         }
+        held_values = dict(
+            conn.execute(
+                """select r.id, count(*) from result_value v join result_set r on r.k = v.result_set_k
+                   where r.source_id = any(%s) group by 1""",
+                [list(owned)],
+            ).fetchall()
+        )
         sources: dict[str, UUID] = {}
         for state in frame["state"].unique(maintain_order=True):
             publisher, title, url = PUBLISHERS[state]
@@ -8248,7 +8284,9 @@ def emit() -> Path:
                 option_id=options["YES" if passed else "NO"],
                 kind="won",
             )
-            if result_set in cs.minted:
+            if result_set in cs.minted or (
+                state == "MS" and day.year == 2002 and held_values.get(result_set) != rows.height
+            ):
                 for row in rows.iter_rows(named=True):
                     unit = cs.unit(
                         "us.ak_house_district"
