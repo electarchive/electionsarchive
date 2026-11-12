@@ -24,5 +24,6 @@
     243,
     244
   ],
-  "mixed": true
+  "mixed": true,
+  "extend": true
 }

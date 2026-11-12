@@ -7,6 +7,7 @@
     "url": "https://archive.org/download/officialvoteofso00sout/officialvoteofso00sout.pdf"
   },
   "raw_source": "us.scans",
+  "extend": true,
   "contests": {
     "house": {
       "year": 1894,
@@ -86,52 +87,44 @@
       ]
     },
     {
-      "page": 36,
-      "id": "36-0",
+      "page": 29,
+      "id": "29-0",
       "columns": [
         {
-          "label": "A. O. Ringsrud Republican",
-          "contest": null,
-          "candidate": ""
+          "label": "Chas. H. Sheldon Republican",
+          "contest": "governor",
+          "candidate": "Charles H. Sheldon"
         },
         {
-          "label": "Andrew E. Lee Peoples",
-          "contest": null,
-          "candidate": ""
+          "label": "Isaac Howe Independent",
+          "contest": "governor",
+          "candidate": "Isaac Howe",
+          "party": "Independent"
         },
         {
-          "label": "J. F. Hanson Prohibition",
-          "contest": null,
-          "candidate": ""
+          "label": "Jas. A. Ward Democrat",
+          "contest": "governor",
+          "candidate": "James A. Ward"
         },
         {
-          "label": "D. T. Hindman Republican",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "P. R. Crothers Peoples",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "F. J. Carlisle Prohibition",
-          "contest": null,
-          "candidate": ""
+          "label": "M. D. Alexander Prohibition",
+          "contest": "governor",
+          "candidate": "M. D. Alexander",
+          "party": "Prohibition"
         }
       ],
       "orientation": "counties_down",
       "crop": [
-        0.114,
-        0.154,
-        0.897,
-        0.924
+        0.079,
+        0.148,
+        0.59,
+        0.861
       ],
-      "hint": "Read only the table headed 'OFFICIAL VOTE\u2014Continued November Election, 1896'; ignore any other table visible in the image.",
+      "hint": "Read only the table headed 'Governor'; ignore any other table visible in the image.",
       "bands": 2,
       "header": [
         0.0,
-        0.1779
+        0.2258
       ]
     }
   ]

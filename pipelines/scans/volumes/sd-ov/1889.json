@@ -18,5 +18,6 @@
   ],
   "mixed": true,
   "at_large": true,
-  "create": true
+  "create": true,
+  "extend": true
 }

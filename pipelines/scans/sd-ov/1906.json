@@ -7,6 +7,7 @@
     "url": "https://archive.org/download/officialvoteofso00sout/officialvoteofso00sout.pdf"
   },
   "raw_source": "us.scans",
+  "extend": true,
   "contests": {
     "house": {
       "year": 1906,
@@ -120,13 +121,15 @@
         },
         {
           "label": "Freeman Knowles Socialist",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "Freeman Knowles",
+          "party": "Socialist"
         },
         {
           "label": "Knute Lewis Prohibition",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "Knute Lewis",
+          "party": "Prohibition"
         }
       ],
       "orientation": "counties_down",

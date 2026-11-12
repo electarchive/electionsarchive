@@ -1,0 +1,258 @@
+{
+  "polity": "US-CO",
+  "publisher": "Colorado Secretary of State",
+  "title": "Abstract of votes cast at the general election, 1938",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/abstractofvotesc1938geor/abstractofvotesc1938geor.pdf"
+  },
+  "raw_source": "us.scans",
+  "extend": true,
+  "contests": {
+    "senate": {
+      "year": 1938,
+      "chamber": "senate",
+      "day": "1938-11-08",
+      "special": false,
+      "state": "CO",
+      "district": null
+    },
+    "governor": {
+      "year": 1938,
+      "chamber": "governor",
+      "day": "1938-11-08",
+      "special": false,
+      "state": "CO",
+      "district": null
+    },
+    "house1": {
+      "year": 1938,
+      "chamber": "house",
+      "day": "1938-11-08",
+      "special": false,
+      "state": "CO",
+      "district": 1
+    },
+    "house2": {
+      "year": 1938,
+      "chamber": "house",
+      "day": "1938-11-08",
+      "special": false,
+      "state": "CO",
+      "district": 2
+    },
+    "house3": {
+      "year": 1938,
+      "chamber": "house",
+      "day": "1938-11-08",
+      "special": false,
+      "state": "CO",
+      "district": 3
+    },
+    "house4": {
+      "year": 1938,
+      "chamber": "house",
+      "day": "1938-11-08",
+      "special": false,
+      "state": "CO",
+      "district": 4
+    }
+  },
+  "pages": [
+    {
+      "page": 13,
+      "id": "13-0",
+      "columns": [
+        {
+          "label": "Alva B. Adams\u2014Dem.",
+          "contest": "senate",
+          "candidate": "Alva B. Adams"
+        },
+        {
+          "label": "Archibald A. Lee\u2014Rep.",
+          "contest": "senate",
+          "candidate": "Archibald A. Lee"
+        },
+        {
+          "label": "James Allander\u2014Ind. Prog.",
+          "contest": "senate",
+          "candidate": "James Allander"
+        },
+        {
+          "label": "Carle Whitehead\u2014Soc.",
+          "contest": "senate",
+          "candidate": "Carle Whitehead"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.006,
+        0.041,
+        0.138,
+        0.942
+      ],
+      "hint": "Read only the table headed 'U. S. SENATOR'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.2797
+      ]
+    },
+    {
+      "page": 13,
+      "id": "13-1",
+      "columns": [
+        {
+          "label": "Peter Ammons\u2014Dem.",
+          "contest": "governor",
+          "candidate": "Teller Ammons"
+        },
+        {
+          "label": "Ralph L. Carr\u2014Rep.",
+          "contest": "governor",
+          "candidate": "Ralph L. Carr"
+        },
+        {
+          "label": "Harvey I. Mayfield\u2014Royal Way",
+          "contest": "governor",
+          "candidate": "Harvey L. Mayfield"
+        },
+        {
+          "label": "Jack R. White\u2014Nat'l Union",
+          "contest": "governor",
+          "candidate": "Jack R. White"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.248,
+        0.041,
+        0.34,
+        0.942
+      ],
+      "hint": "Read only the table headed 'GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.2797
+      ]
+    },
+    {
+      "page": 16,
+      "id": "16-0",
+      "columns": [
+        {
+          "label": "Lawrence Lewis \u2014D",
+          "contest": "house1",
+          "candidate": "Lawrence Lewis"
+        },
+        {
+          "label": "William I. Reilly \u2014R",
+          "contest": "house1",
+          "candidate": "William I. Reilly"
+        },
+        {
+          "label": "Oliver L. Barnes \u2014Pro.",
+          "contest": "house1",
+          "candidate": "Oliver L. Barnes"
+        },
+        {
+          "label": "Edgar P. Sherman \u2014Soc.",
+          "contest": "house1",
+          "candidate": "Edgar P. Sherman"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.089,
+        0.093,
+        0.905,
+        0.199
+      ],
+      "hint": "Read only the table headed 'REPRESENTATIVE IN CONGRESS, FIRST DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 16,
+      "id": "16-1",
+      "columns": [
+        {
+          "label": "Fred Cummings \u2014D",
+          "contest": "house2",
+          "candidate": "Fred Cummings"
+        },
+        {
+          "label": "William S. Hill \u2014R",
+          "contest": "house2",
+          "candidate": "William S. Hill"
+        },
+        {
+          "label": "George H. Bradfield \u2014R",
+          "contest": "house2",
+          "candidate": "George H. Bradfield",
+          "party": "R"
+        },
+        {
+          "label": "Charles R. Axelson \u2014Soc.",
+          "contest": "house2",
+          "candidate": "Charles R. Axelson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.089,
+        0.191,
+        0.914,
+        0.573
+      ],
+      "hint": "Read only the table headed 'REPRESENTATIVE IN CONGRESS, SECOND DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 16,
+      "id": "16-2",
+      "columns": [
+        {
+          "label": "Henry Leonard \u2014R",
+          "contest": "house3",
+          "candidate": "Henry Leonard"
+        },
+        {
+          "label": "John A. Martin \u2014D",
+          "contest": "house3",
+          "candidate": "John A. Martin"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.089,
+        0.565,
+        0.923,
+        0.937
+      ],
+      "hint": "Read only the table headed 'REPRESENTATIVE IN CONGRESS, THIRD DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 17,
+      "id": "17-0",
+      "columns": [
+        {
+          "label": "Edward T. Taylor \u2014D",
+          "contest": "house4",
+          "candidate": "Edward T. Taylor"
+        },
+        {
+          "label": "John S. Woody \u2014R",
+          "contest": "house4",
+          "candidate": "John S. Woody"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.084,
+        0.095,
+        0.91,
+        0.532
+      ],
+      "hint": "Read only the table headed 'REPRESENTATIVE IN CONGRESS, FOURTH DISTRICT'; ignore any other table visible in the image."
+    }
+  ]
+}

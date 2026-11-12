@@ -7,6 +7,7 @@
     "url": "https://archive.org/download/officialvoteofso00sout/officialvoteofso00sout.pdf"
   },
   "raw_source": "us.scans",
+  "extend": true,
   "contests": {
     "house": {
       "year": 1889,

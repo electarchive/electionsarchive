@@ -7,6 +7,7 @@
     "url": "https://archive.org/download/officialvoteofso00sout/officialvoteofso00sout.pdf"
   },
   "raw_source": "us.scans",
+  "extend": true,
   "contests": {
     "president": {
       "year": 1912,
@@ -56,8 +57,8 @@
       "columns": [
         {
           "label": "Oscar Olson",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "Theodore Roosevelt (Progressive \"Bull Moose\")"
         },
         {
           "label": "H. C. Preston",
@@ -100,8 +101,8 @@
       "columns": [
         {
           "label": "Millard Aasved",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "Woodrow Wilson (Democratic)"
         },
         {
           "label": "John P. Biehn",
@@ -144,8 +145,8 @@
       "columns": [
         {
           "label": "C. M. Dahlberg",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "Eugene Chafin (Prohibition)"
         },
         {
           "label": "H. T. Hurd",
@@ -188,8 +189,8 @@
       "columns": [
         {
           "label": "M. J. Foley",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "Eugene V. Debs (Socialist)"
         },
         {
           "label": "Walter A. Williams",

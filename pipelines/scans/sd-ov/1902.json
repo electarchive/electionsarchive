@@ -7,6 +7,7 @@
     "url": "https://archive.org/download/officialvoteofso00sout/officialvoteofso00sout.pdf"
   },
   "raw_source": "us.scans",
+  "extend": true,
   "contests": {
     "house": {
       "year": 1902,
@@ -120,13 +121,15 @@
         },
         {
           "label": "H. H. Curtis Prohibition",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "Curtis",
+          "party": "Prohibition"
         },
         {
           "label": "John C. Crawford Socialist",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "Crawford",
+          "party": "Socialist"
         }
       ],
       "orientation": "counties_down",

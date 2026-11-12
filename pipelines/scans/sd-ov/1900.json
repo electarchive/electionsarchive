@@ -7,6 +7,7 @@
     "url": "https://archive.org/download/officialvoteofso00sout/officialvoteofso00sout.pdf"
   },
   "raw_source": "us.scans",
+  "extend": true,
   "contests": {
     "president": {
       "year": 1900,
@@ -46,18 +47,18 @@
         },
         {
           "label": "A. R. Brown Republican",
-          "contest": "president",
-          "candidate": "William McKinley (Republican)"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "Charles Thompson Republican",
-          "contest": "president",
-          "candidate": "William McKinley (Republican)"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "Arthur H. Marble Republican",
-          "contest": "president",
-          "candidate": "William McKinley (Republican)"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "John P. McElroy Fusion",
@@ -105,18 +106,18 @@
         },
         {
           "label": "E. E. Ostroot Prohibition",
-          "contest": "president",
-          "candidate": "John Woolley (Prohibition)"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "N. G. Rude Prohibition",
-          "contest": "president",
-          "candidate": "John Woolley (Prohibition)"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "A. H. Reed Prohibition",
-          "contest": "president",
-          "candidate": "John Woolley (Prohibition)"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "Thos. Thompson Populist",
@@ -125,8 +126,8 @@
         },
         {
           "label": "Edward W. Tracy Populist",
-          "contest": "president",
-          "candidate": "Wharton Barker (Populist)"
+          "contest": null,
+          "candidate": ""
         }
       ],
       "orientation": "counties_down",
@@ -154,8 +155,8 @@
         },
         {
           "label": "Ulrich Bosley Populist",
-          "contest": "president",
-          "candidate": "Wharton Barker (Populist)"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "W. Haire Robt. Social Democrat",

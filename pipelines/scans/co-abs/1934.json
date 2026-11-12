@@ -1,0 +1,68 @@
+{
+  "polity": "US-CO",
+  "publisher": "Colorado Secretary of State",
+  "title": "Abstract of votes cast at the general election, 1934",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/abstractofvotesc1934jame/abstractofvotesc1934jame.pdf"
+  },
+  "raw_source": "us.scans",
+  "extend": true,
+  "contests": {
+    "governor": {
+      "year": 1934,
+      "chamber": "governor",
+      "day": "1934-11-06",
+      "special": false,
+      "state": "CO",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 11,
+      "id": "11-0",
+      "columns": [
+        {
+          "label": "Ed C. Johnson\u2014D",
+          "contest": "governor",
+          "candidate": "Edwin C. Johnson"
+        },
+        {
+          "label": "Nate C. Warren\u2014R",
+          "contest": "governor",
+          "candidate": "Nate C. Warren"
+        },
+        {
+          "label": "P. C. Frost\u2014Com",
+          "contest": "governor",
+          "candidate": "P. C. Frost",
+          "party": "Com"
+        },
+        {
+          "label": "Paul W. Hipp\u2014Pro",
+          "contest": "governor",
+          "candidate": "Paul W. Hipp"
+        },
+        {
+          "label": "Paul S. McCormick\u2014Soc",
+          "contest": "governor",
+          "candidate": "Paul S. McCormick"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.187,
+        0.056,
+        0.263,
+        0.904
+      ],
+      "hint": "Read only the table headed 'GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2347
+      ]
+    }
+  ]
+}

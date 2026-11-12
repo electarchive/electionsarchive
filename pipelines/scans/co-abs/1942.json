@@ -1,0 +1,62 @@
+{
+  "polity": "US-CO",
+  "publisher": "Colorado Secretary of State",
+  "title": "Abstract of votes cast at the general election, 1942",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/abstractofvotesc1942walt/abstractofvotesc1942walt.pdf"
+  },
+  "raw_source": "us.scans",
+  "extend": true,
+  "contests": {
+    "senate": {
+      "year": 1942,
+      "chamber": "senate",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "CO",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 13,
+      "id": "13-0",
+      "columns": [
+        {
+          "label": "Ralph L. Carr\u2014Rep.",
+          "contest": "senate",
+          "candidate": "Ralph L. Carr"
+        },
+        {
+          "label": "Edwin C. Johnson\u2014Dem.",
+          "contest": "senate",
+          "candidate": "Edwin C. Johnson"
+        },
+        {
+          "label": "James A. Allender\u2014Ind.",
+          "contest": "senate",
+          "candidate": "James Allander"
+        },
+        {
+          "label": "Carle Whitehead\u2014Soc.",
+          "contest": "senate",
+          "candidate": "Carle Whitehead"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.058,
+        0.07,
+        0.157,
+        0.949
+      ],
+      "hint": "Read only the table headed 'U. S. SENATOR 6-YEAR TERM'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2617
+      ]
+    }
+  ]
+}

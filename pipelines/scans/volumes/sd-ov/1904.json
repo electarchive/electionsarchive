@@ -25,5 +25,6 @@
     102
   ],
   "mixed": true,
-  "at_large": true
+  "at_large": true,
+  "extend": true
 }

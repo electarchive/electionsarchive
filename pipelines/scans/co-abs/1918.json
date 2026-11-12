@@ -1,0 +1,57 @@
+{
+  "polity": "US-CO",
+  "publisher": "Colorado Secretary of State",
+  "title": "Abstract of votes cast at the general election, 1918",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/abstractofvotesc1918jame/abstractofvotesc1918jame.pdf"
+  },
+  "raw_source": "us.scans",
+  "extend": true,
+  "contests": {
+    "senate": {
+      "year": 1918,
+      "chamber": "senate",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "CO",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 11,
+      "id": "11-0",
+      "columns": [
+        {
+          "label": "Phipps\u2014R.",
+          "contest": "senate",
+          "candidate": "Lawrence Cowle Phipps"
+        },
+        {
+          "label": "Richardson\u2014S.",
+          "contest": "senate",
+          "candidate": "P. A. Richardson"
+        },
+        {
+          "label": "Shafroth\u2014D.",
+          "contest": "senate",
+          "candidate": "John F. Shafroth"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.022,
+        0.062,
+        0.142,
+        0.902
+      ],
+      "hint": "Read only the table headed 'U. S. SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1607
+      ]
+    }
+  ]
+}

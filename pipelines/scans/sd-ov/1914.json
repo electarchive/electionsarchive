@@ -7,6 +7,7 @@
     "url": "https://archive.org/download/officialvoteofso00sout/officialvoteofso00sout.pdf"
   },
   "raw_source": "us.scans",
+  "extend": true,
   "contests": {
     "house1": {
       "year": 1914,
@@ -76,8 +77,9 @@
         },
         {
           "label": "A. L. Van Osdel",
-          "contest": null,
-          "candidate": ""
+          "contest": "house1",
+          "candidate": "A. L. Vanosdel",
+          "party": ""
         }
       ],
       "orientation": "counties_down",
@@ -168,8 +170,9 @@
         },
         {
           "label": "Ed. S. Johnson",
-          "contest": null,
-          "candidate": ""
+          "contest": "senate",
+          "candidate": "Edwin Stockton Johnson",
+          "party": ""
         },
         {
           "label": "O. W. Butterfield",
@@ -178,8 +181,9 @@
         },
         {
           "label": "E. P. Johnson",
-          "contest": null,
-          "candidate": ""
+          "contest": "senate",
+          "candidate": "E. P. Johnson",
+          "party": ""
         },
         {
           "label": "H. L. Loucks",

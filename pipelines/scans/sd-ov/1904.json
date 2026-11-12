@@ -7,6 +7,7 @@
     "url": "https://archive.org/download/officialvoteofso00sout/officialvoteofso00sout.pdf"
   },
   "raw_source": "us.scans",
+  "extend": true,
   "contests": {
     "president": {
       "year": 1904,
@@ -45,18 +46,18 @@
         },
         {
           "label": "Henry S. Morris Republican",
-          "contest": "president",
-          "candidate": "Theodore Roosevelt (Republican)"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "John Q. Anderson Republican",
-          "contest": "president",
-          "candidate": "Theodore Roosevelt (Republican)"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "Peter Edwards Republican",
-          "contest": "president",
-          "candidate": "Theodore Roosevelt (Republican)"
+          "contest": null,
+          "candidate": ""
         }
       ],
       "orientation": "counties_down",
@@ -84,18 +85,18 @@
         },
         {
           "label": "J. G. Segers Democrat",
-          "contest": "president",
-          "candidate": "Alton B. Parker (Democratic)"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "John S. Bean Democrat",
-          "contest": "president",
-          "candidate": "Alton B. Parker (Democratic)"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "H. C. Burch Democrat",
-          "contest": "president",
-          "candidate": "Alton B. Parker (Democratic)"
+          "contest": null,
+          "candidate": ""
         }
       ],
       "orientation": "counties_down",
@@ -123,18 +124,18 @@
         },
         {
           "label": "G. A. Grant Socialist",
-          "contest": "president",
-          "candidate": "Eugene V. Debs (Socialist)"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "D. G. Stewart Socialist",
-          "contest": "president",
-          "candidate": "Eugene V. Debs (Socialist)"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "Edward Anderson Socialist",
-          "contest": "president",
-          "candidate": "Eugene V. Debs (Socialist)"
+          "contest": null,
+          "candidate": ""
         }
       ],
       "orientation": "counties_down",
@@ -177,18 +178,18 @@
         },
         {
           "label": "A. H. Brehmer Prohibition",
-          "contest": "president",
-          "candidate": "Silas Swallow (Prohibition)"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "C. A. Kelley Prohibition",
-          "contest": "president",
-          "candidate": "Silas Swallow (Prohibition)"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "E. C. Pitcher Prohibition",
-          "contest": "president",
-          "candidate": "Silas Swallow (Prohibition)"
+          "contest": null,
+          "candidate": ""
         }
       ],
       "orientation": "counties_down",

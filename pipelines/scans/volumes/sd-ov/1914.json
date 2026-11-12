@@ -20,5 +20,6 @@
     312,
     313
   ],
-  "mixed": true
+  "mixed": true,
+  "extend": true
 }

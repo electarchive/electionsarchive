@@ -71,6 +71,7 @@ class Volume(TypedDict):
     mixed: NotRequired[bool]
     autorotate: NotRequired[bool]
     at_large: NotRequired[bool]
+    extend: NotRequired[bool]
     turn: NotRequired[int]
 
 
@@ -345,6 +346,23 @@ def generate(name: str, volume: Volume, pages: dict[int, LayoutPage], folder: Pa
                             [column["label"] for column in candidates], scans.options(conn, ids[key]), label
                         )
                         matched = {column["label"]: column for column in named}
+                        if office == "president":
+                            slates: set[str] = set()
+                            for column in named:
+                                if column["candidate"] in slates:
+                                    matched[column["label"]] = scans.Column(
+                                        label=column["label"], contest=None, candidate=""
+                                    )
+                                slates.add(column["candidate"])
+                        elif volume.get("extend"):
+                            for column in candidates:
+                                if column["label"] in unmatched[label]:
+                                    matched[column["label"]] = scans.Column(
+                                        label=column["label"],
+                                        contest=label,
+                                        candidate=column["name"],
+                                        party=column["party"],
+                                    )
                     elif volume.get("create"):
                         contest["create"] = True
                         matched = {
@@ -398,7 +416,8 @@ def generate(name: str, volume: Volume, pages: dict[int, LayoutPage], folder: Pa
     manifest = {
         key: value
         for key, value in volume.items()
-        if key in ("polity", "publisher", "title", "license", "file", "raw_source", "unit_scheme", "unit_codes")
+        if key
+        in ("polity", "publisher", "title", "license", "file", "raw_source", "unit_scheme", "unit_codes", "extend")
     }
     manifest["contests"] = contests
     manifest["pages"] = sections

@@ -7,7 +7,17 @@
     "url": "https://archive.org/download/officialvoteofso00sout/officialvoteofso00sout.pdf"
   },
   "raw_source": "us.scans",
+  "extend": true,
   "contests": {
+    "governor": {
+      "year": 1896,
+      "chamber": "governor",
+      "day": "1896-11-03",
+      "special": false,
+      "state": "SD",
+      "district": null,
+      "create": true
+    },
     "president": {
       "year": 1896,
       "chamber": "president",
@@ -27,6 +37,58 @@
   },
   "pages": [
     {
+      "page": 36,
+      "id": "36-0",
+      "columns": [
+        {
+          "label": "A. O. Ringsrud Republican",
+          "contest": "governor",
+          "candidate": "A. O. Ringsrud",
+          "party": "Republican"
+        },
+        {
+          "label": "Andrew E. Lee Peoples",
+          "contest": "governor",
+          "candidate": "Andrew E. Lee",
+          "party": "Peoples"
+        },
+        {
+          "label": "J. F. Hanson Prohibition",
+          "contest": "governor",
+          "candidate": "J. F. Hanson",
+          "party": "Prohibition"
+        },
+        {
+          "label": "D. T. Hindman Republican",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "P. R. Crothers Peoples",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "F. J. Carlisle Prohibition",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.114,
+        0.157,
+        0.906,
+        0.919
+      ],
+      "hint": "Read only the table headed 'OFFICIAL VOTE\u2014Continued November Election, 1896'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.168
+      ]
+    },
+    {
       "page": 43,
       "id": "43-0",
       "columns": [
@@ -37,18 +99,18 @@
         },
         {
           "label": "Richard M. Slocum Republican",
-          "contest": "president",
-          "candidate": "William McKinley (Republican)"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "John L. Turner Republican",
-          "contest": "president",
-          "candidate": "William McKinley (Republican)"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "Thomas D. Edwards Republican",
-          "contest": "president",
-          "candidate": "William McKinley (Republican)"
+          "contest": null,
+          "candidate": ""
         }
       ],
       "orientation": "counties_down",
@@ -76,18 +138,18 @@
         },
         {
           "label": "F. M. Goodykoontz Populist",
-          "contest": "president",
-          "candidate": "William Jennings Bryan (Democratic / Populist)"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "F. M. McLaFresh Populist",
-          "contest": "president",
-          "candidate": "William Jennings Bryan (Democratic / Populist)"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "P. M. Ringrose Populist",
-          "contest": "president",
-          "candidate": "William Jennings Bryan (Democratic / Populist)"
+          "contest": null,
+          "candidate": ""
         }
       ],
       "orientation": "counties_down",
@@ -115,18 +177,18 @@
         },
         {
           "label": "A. H. Reed Prohibition",
-          "contest": "president",
-          "candidate": "Joshua Levering (Prohibition)"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "A. G. Hunt Prohibition",
-          "contest": "president",
-          "candidate": "Joshua Levering (Prohibition)"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "C. A. Kelly Prohibition",
-          "contest": "president",
-          "candidate": "Joshua Levering (Prohibition)"
+          "contest": null,
+          "candidate": ""
         }
       ],
       "orientation": "counties_down",

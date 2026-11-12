@@ -841,8 +841,7 @@ def options(conn: Connection, contest: UUID | None) -> list[tuple[str, str, int 
                   (select sum(v.value)::bigint from result_value v
                    where v.result_set_k = rs.k and v.option_k = o.k and v.measure = 1
                      and v.count_round = (select min(count_round) from result_value
-                                          where result_set_k = rs.k)),
-                  rs.k is not null
+                                          where result_set_k = rs.k))
            from contest_option o
            left join result_set rs on rs.contest_id = o.contest_id and rs.is_default
            left join candidacy cy on cy.option_id = o.id and cy.role = 'head'
@@ -850,9 +849,9 @@ def options(conn: Connection, contest: UUID | None) -> list[tuple[str, str, int 
            where o.contest_id = %s and o.parent_option_id is null""",
         [contest],
     ).fetchall()
-    if any(held for *_, held in rows):
-        return [(label or text, text, total) for label, text, total, _ in rows if total]
-    return [(label or text, text, None) for label, text, _, _ in rows if label or text]
+    if any(total for _, _, total in rows):
+        return [(label or text, text, total) for label, text, total in rows if total]
+    return [(label or text, text, None) for label, text, _ in rows if label or text]
 
 
 def official_totals(manifest: Manifest) -> dict[str, int | None]:
@@ -906,6 +905,7 @@ def match(labels: list[str], held: list[tuple[str, str, int | None]], contest: s
                 for name, options_ in surnames
                 if any(difflib.get_close_matches(word, options_, n=1, cutoff=0.85) for word in words)
             ]
+        found_options = list(dict.fromkeys(found_options))
         if len(found_options) == 1:
             columns.append({"label": label, "contest": contest, "candidate": found_options[0]})
         else:

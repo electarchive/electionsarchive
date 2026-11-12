@@ -7,6 +7,7 @@
     "url": "https://archive.org/download/officialvoteofso00sout/officialvoteofso00sout.pdf"
   },
   "raw_source": "us.scans",
+  "extend": true,
   "contests": {
     "president": {
       "year": 1908,
@@ -45,18 +46,18 @@
         },
         {
           "label": "C. H. Lien Republican",
-          "contest": "president",
-          "candidate": "William Howard Taft (Republican)"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "John F. Schrader Republican",
-          "contest": "president",
-          "candidate": "William Howard Taft (Republican)"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "Gotthilf Doering Republican",
-          "contest": "president",
-          "candidate": "William Howard Taft (Republican)"
+          "contest": null,
+          "candidate": ""
         }
       ],
       "orientation": "counties_down",
@@ -84,18 +85,18 @@
         },
         {
           "label": "Fred C. Nutting Democrat",
-          "contest": "president",
-          "candidate": "William Jennings Bryan (Democratic)"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "J. T. Goodwin Democrat",
-          "contest": "president",
-          "candidate": "William Jennings Bryan (Democratic)"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "William Galvin Democrat",
-          "contest": "president",
-          "candidate": "William Jennings Bryan (Democratic)"
+          "contest": null,
+          "candidate": ""
         }
       ],
       "orientation": "counties_down",
@@ -123,18 +124,18 @@
         },
         {
           "label": "M. L. Dunlap Prohibition",
-          "contest": "president",
-          "candidate": "Eugene Chafin (Prohibition)"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "H. W. Reinecke Prohibition",
-          "contest": "president",
-          "candidate": "Eugene Chafin (Prohibition)"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "Wm. MacKenzie Prohibition",
-          "contest": "president",
-          "candidate": "Eugene Chafin (Prohibition)"
+          "contest": null,
+          "candidate": ""
         }
       ],
       "orientation": "counties_down",
@@ -162,18 +163,18 @@
         },
         {
           "label": "D. E. Mullins Socialist",
-          "contest": "president",
-          "candidate": "Eugene V. Debs (Socialist)"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "Chris Grosse Socialist",
-          "contest": "president",
-          "candidate": "Eugene V. Debs (Socialist)"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "Henry Ojala Socialist",
-          "contest": "president",
-          "candidate": "Eugene V. Debs (Socialist)"
+          "contest": null,
+          "candidate": ""
         }
       ],
       "orientation": "counties_down",

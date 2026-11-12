@@ -1,0 +1,136 @@
+{
+  "polity": "US-CO",
+  "publisher": "Colorado Secretary of State",
+  "title": "Abstract of votes cast at the general election, 1914",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/abstractofvotesc1914john/abstractofvotesc1914john.pdf"
+  },
+  "raw_source": "us.scans",
+  "extend": true,
+  "contests": {
+    "house2": {
+      "year": 1914,
+      "chamber": "house",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "CO",
+      "district": 2
+    },
+    "house3": {
+      "year": 1914,
+      "chamber": "house",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "CO",
+      "district": 3
+    },
+    "house4": {
+      "year": 1914,
+      "chamber": "house",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "CO",
+      "district": 4
+    }
+  },
+  "pages": [
+    {
+      "page": 106,
+      "id": "106-0",
+      "columns": [
+        {
+          "label": "Charles E. Fisher (Prog.)",
+          "contest": "house2",
+          "candidate": "Charles E. Fisher"
+        },
+        {
+          "label": "Harry H. Seldomridge (Dem.)",
+          "contest": "house2",
+          "candidate": "Harry H. Seldomridge"
+        },
+        {
+          "label": "Charles B. Timberlake (Rep.)",
+          "contest": "house2",
+          "candidate": "Charles Bateman Timberlake"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.082,
+        0.1,
+        0.94,
+        0.729
+      ],
+      "hint": "Read only the table headed 'Abstract of votes cast at a general election held on Tuesday, November 3, A. D. 1914, for Representative in the Sixty-fourth Congress for Second Congressional District'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3386
+      ]
+    },
+    {
+      "page": 107,
+      "id": "107-0",
+      "columns": [
+        {
+          "label": "Edward Keating (Dem.)",
+          "contest": "house3",
+          "candidate": "Edward Keating"
+        },
+        {
+          "label": "Neil N. McLean (Rep.-Prog.)",
+          "contest": "house3",
+          "candidate": "Neil N. McLean"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.068,
+        0.099,
+        0.927,
+        0.83
+      ],
+      "hint": "Read only the table headed 'ABSTRACT OF VOTES CAST AT A GENERAL ELECTION HELD ON TUESDAY, NOVEMBER 3, A. D. 1914, FOR REPRESENTATIVE IN THE SIXTY-FOURTH CONGRESS FOR THIRD CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2845
+      ]
+    },
+    {
+      "page": 108,
+      "id": "108-0",
+      "columns": [
+        {
+          "label": "H. J. Baird (Rep.-Prog.)",
+          "contest": "house4",
+          "candidate": "H. J. Baird"
+        },
+        {
+          "label": "George Kunkle (Soc.)",
+          "contest": "house4",
+          "candidate": "George Kunkle"
+        },
+        {
+          "label": "Edward T. Taylor (Dem.)",
+          "contest": "house4",
+          "candidate": "Edward Thomas Taylor"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.085,
+        0.097,
+        0.945,
+        0.835
+      ],
+      "hint": "Read only the table headed 'Abstract of votes cast at a general election held on Tuesday, November 3, A. D. 1914, for Representative in the Sixty-Fourth Congress for Fourth Congressional District'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2764
+      ]
+    }
+  ]
+}

@@ -1,0 +1,67 @@
+{
+  "polity": "US-CO",
+  "publisher": "Colorado Secretary of State",
+  "title": "Abstract of votes cast at the general election, 1924",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/abstractofvotesc1924carl/abstractofvotesc1924carl.pdf"
+  },
+  "raw_source": "us.scans",
+  "extend": true,
+  "contests": {
+    "senate": {
+      "year": 1924,
+      "chamber": "senate",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "CO",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 13,
+      "id": "13-0",
+      "columns": [
+        {
+          "label": "Alva E. Adams\u2014D.",
+          "contest": "senate",
+          "candidate": "Alva B. Adams"
+        },
+        {
+          "label": "Morton Alexander\u2014F.-L.",
+          "contest": "senate",
+          "candidate": "Morton Alexander"
+        },
+        {
+          "label": "James Albert Ayres\u2014W.",
+          "contest": "senate",
+          "candidate": "James Albert Ayres"
+        },
+        {
+          "label": "Elwood Hillis\u2014S.",
+          "contest": "senate",
+          "candidate": "Elwood Hillis"
+        },
+        {
+          "label": "Lawrence C. Phipps\u2014R.",
+          "contest": "senate",
+          "candidate": "Lawrence C. Phipps"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.012,
+        0.071,
+        0.148,
+        0.959
+      ],
+      "hint": "Read only the table headed 'United States Senators, Long Term'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2241
+      ]
+    }
+  ]
+}

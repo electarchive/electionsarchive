@@ -1,0 +1,180 @@
+{
+  "polity": "US-CO",
+  "publisher": "Colorado Secretary of State",
+  "title": "Abstract of votes cast at the general election, 1940",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/abstractofvotesc1940walt/abstractofvotesc1940walt.pdf"
+  },
+  "raw_source": "us.scans",
+  "extend": true,
+  "contests": {
+    "house1": {
+      "year": 1940,
+      "chamber": "house",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "CO",
+      "district": 1
+    },
+    "house2": {
+      "year": 1940,
+      "chamber": "house",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "CO",
+      "district": 2
+    },
+    "house3": {
+      "year": 1940,
+      "chamber": "house",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "CO",
+      "district": 3
+    },
+    "house4": {
+      "year": 1940,
+      "chamber": "house",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "CO",
+      "district": 4
+    }
+  },
+  "pages": [
+    {
+      "page": 20,
+      "id": "20-0",
+      "columns": [
+        {
+          "label": "Lawrence Lewis \u2014D",
+          "contest": "house1",
+          "candidate": "Lawrence Lewis"
+        },
+        {
+          "label": "James D. Parriott \u2014R",
+          "contest": "house1",
+          "candidate": "James D. Parriott"
+        },
+        {
+          "label": "George T. Evans \u2014R",
+          "contest": "house1",
+          "candidate": "George T. Evans",
+          "party": "R"
+        },
+        {
+          "label": "James Allander \u2014Com.",
+          "contest": "house1",
+          "candidate": "James Allander"
+        },
+        {
+          "label": "Ward Rogers \u2014Soc.",
+          "contest": "house1",
+          "candidate": "Ward Rogers"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.085,
+        0.084,
+        0.898,
+        0.197
+      ],
+      "hint": "Read only the table headed 'CONGRESSMAN, FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 20,
+      "id": "20-1",
+      "columns": [
+        {
+          "label": "Fred Cummings \u2014D",
+          "contest": "house2",
+          "candidate": "Fred Cummings"
+        },
+        {
+          "label": "William S. Hill \u2014R",
+          "contest": "house2",
+          "candidate": "William S. Hill"
+        },
+        {
+          "label": "William R. Kelly \u2014R",
+          "contest": "house2",
+          "candidate": "William R. Kelly",
+          "party": "R"
+        },
+        {
+          "label": "Robert F. Billings \u2014Peace",
+          "contest": "house2",
+          "candidate": "Robert F. Billings"
+        },
+        {
+          "label": "Henry Neumann \u2014Soc.",
+          "contest": "house2",
+          "candidate": "Henry Neumann"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.085,
+        0.189,
+        0.898,
+        0.581
+      ],
+      "hint": "Read only the table headed 'CONGRESSMAN, SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 20,
+      "id": "20-2",
+      "columns": [
+        {
+          "label": "J. Edgar Chenoweth \u2014R",
+          "contest": "house3",
+          "candidate": "J. Edgar Chenoweth"
+        },
+        {
+          "label": "Byron G. Rogers \u2014D",
+          "contest": "house3",
+          "candidate": "Byron G. Rogers"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.107,
+        0.573,
+        0.903,
+        0.942
+      ],
+      "hint": "Read only the table headed 'CONGRESSMAN, THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 21,
+      "id": "21-1",
+      "columns": [
+        {
+          "label": "Paul W. Crawford \u2014R",
+          "contest": "house4",
+          "candidate": "Paul W. Crawford"
+        },
+        {
+          "label": "Edward T. Taylor \u2014D",
+          "contest": "house4",
+          "candidate": "Edward T. Taylor"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.107,
+        0.483,
+        0.918,
+        0.941
+      ],
+      "hint": "Read only the table headed 'CONGRESSMAN, FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2533
+      ]
+    }
+  ]
+}
