@@ -153,6 +153,17 @@ GENERAL_ELECTIONS = [
     (date(2020, 2, 8), 2017),
     (date(2024, 11, 29), 2023),
 ]
+SIGNED = {
+    1935: date(1935, 2, 27),
+    1947: date(1947, 11, 27),
+    1961: date(1961, 7, 14),
+    1969: date(1969, 3, 26),
+    1974: date(1974, 5, 7),
+    1980: date(1980, 7, 1),
+    1983: date(1983, 12, 14),
+    1990: date(1990, 12, 26),
+    1995: date(1995, 7, 20),
+}
 LOCAL = {date(1979, 7, 5), date(1984, 6, 14), date(1999, 6, 11), date(2004, 6, 11), date(2019, 5, 24)}
 REJECTED = {
     (date(1959, 6, 17), 1),
@@ -396,9 +407,12 @@ def emit() -> Path:
         units: dict[tuple[str, str], UUID] = {}
         for scheme, code, label in frame.select("scheme", "code", "name").unique().sort("scheme", "code").iter_rows():
             area = cs.area(scheme, code)
+            if scheme == "ie.dail" and int(code[:4]) in SIGNED:
+                cs.add("area_code", area_id=area, code=code, valid_from=SIGNED[int(code[:4])])
             if area in cs.minted:
                 cs.add("area", id=area, scheme_code=scheme)
-                cs.add("area_code", area_id=area, code=code, valid_from=None)
+                if scheme != "ie.dail" or int(code[:4]) not in SIGNED:
+                    cs.add("area_code", area_id=area, code=code, valid_from=None)
                 cs.add("area_parent", area_id=area, parent_id=nation, valid_from=None)
                 name(area, label)
             unit = cs.unit(scheme, code)

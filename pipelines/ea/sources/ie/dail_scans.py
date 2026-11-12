@@ -24,6 +24,7 @@ from ea.changeset import Changeset, slug
 from ea.sources.ie.dail import ALIASES as DAIL_ALIASES
 from ea.sources.ie.dail import EXHAUSTED, PARTY_CODES, QUOTA, REGISTERED, VALID, VOTES
 from ea.sources.ie.dail_pdf import ORDINALS
+from ea.sources.ie.referendums import SIGNED
 from ea.store import DATA, connect
 
 SOURCE = "ie.dail_scans"
@@ -1377,6 +1378,7 @@ def emit() -> Path:
             return pages_done[year, stem]
 
         elections: dict[tuple[str, bool], tuple[UUID, str]] = {}
+        dated: set[UUID] = set()
         for item in sorted(found, key=lambda item: (item["day"], item["constituency"])):
             day = date.fromisoformat(item["day"])
             if (item["day"], item["by"]) not in elections:
@@ -1401,11 +1403,13 @@ def emit() -> Path:
             election, path = elections[item["day"], item["by"]]
             constituency, code = item["constituency"], item["code"]
             area = cs.area("ie.dail", code)
+            if item["act"] == 1974 and area not in dated:
+                dated.add(area)
+                cs.add("area_code", area_id=area, code=code, valid_from=SIGNED[1974])
             if area in cs.minted:
                 if item["act"] != 1974:
                     raise ValueError(f"{code} is not on record")
                 cs.add("area", id=area, scheme_code="ie.dail")
-                cs.add("area_code", area_id=area, code=code, valid_from=None)
                 cs.add("area_parent", area_id=area, parent_id=nation, valid_from=None)
                 name(area, constituency)
             unit = cs.unit("ie.dail", code)
