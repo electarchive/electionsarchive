@@ -745,7 +745,8 @@ def emit() -> Path:
                    join external_id x on x.entity_id = rs.id and x.scheme = 'tr.die_local.result_set'
                    join source_page p on p.id = l.page_id
                    join reporting_unit u on u.k = l.unit_k
-                   where x.value in ('1963-11-17:provincial-councils:by-district', '1963-11-17:mayors:by-municipality')""",
+                   where x.value in ('1963-11-17:provincial-councils:by-district', '1963-11-17:mayors:by-municipality',
+                                     '1963-11-17:municipal-councils:by-municipality')""",
             ).fetchall(),
             schema=["page", "x0", "y0", "unit", "area", "set"],
             orient="row",
@@ -754,19 +755,33 @@ def emit() -> Path:
         def key(text: str) -> str:
             return norm(re.sub(r"\s*[İIi]l[cç]es[iı]\s*$", "", text or ""))
 
-        order: dict[tuple[str, int], list[tuple[str, tuple[str, str | None]]]] = defaultdict(list)
+        ilce_of_area = dict(
+            conn.execute(
+                "select area_id::text, id::text from reporting_unit where scheme_code = 'tr.ilce' and area_relation = 'equals'"
+            ).fetchall()
+        )
+        lists: dict[tuple[str, str, int], list[tuple[str, tuple[str, str | None]]]] = defaultdict(list)
         for record in located.filter(pl.col("level") == "district").sort("seq").iter_rows(named=True):
-            role = "ilce" if record["table"] == "il_genel" else "sehir"
-            held = (record["unit"], record["area"])
-            if held not in [at for _, at in order[role, record["plate"]]]:
-                order[role, record["plate"]].append((key(record["name"]), held))
+            plate, text, table = record["plate"], key(record["name"]), record["table"]
+            held = {"sehir": (record["unit"], record["area"])}
+            if record["area"] in ilce_of_area:
+                held["ilce"] = (ilce_of_area[record["area"]], record["area"])
+            if table == "il_genel":
+                held = {"ilce": (record["unit"], record["area"])}
+            for role, at in held.items():
+                if at not in [other for _, other in lists[table, role, plate]]:
+                    lists[table, role, plate].append((text, at))
         wanted = rows.filter(pl.col("level").is_in(["ilce", "sehir"])).sort("plate", "seq")
 
         def align(printed: list[str], held: list[str]) -> dict[int, int]:
             best = [[0.0] * (len(held) + 1) for _ in range(len(printed) + 1)]
             for i, left in enumerate(printed, 1):
                 for j, right in enumerate(held, 1):
-                    ratio = 1.0 if i == j == 1 else difflib.SequenceMatcher(None, left, right).ratio()
+                    ratio = difflib.SequenceMatcher(None, left, right).ratio()
+                    if i == j == 1 and not any(
+                        difflib.SequenceMatcher(None, other, right).ratio() >= 0.75 for other in printed[1:]
+                    ):
+                        ratio = 1.0
                     if min(len(left), len(right)) >= 4 and (left.startswith(right) or right.startswith(left)):
                         ratio = max(ratio, 0.9)
                     best[i][j] = max(
@@ -789,12 +804,34 @@ def emit() -> Path:
             return pairs
 
         placed: dict[tuple[str, int, int], tuple[str, str | None] | None] = {}
+        tables = {
+            "ilce": ("il_genel", "belediye_baskani", "belediye_meclisi"),
+            "sehir": ("belediye_baskani", "belediye_meclisi"),
+        }
         for (role, plate), part in wanted.group_by("level", "plate"):
             part = part.sort("seq")
-            listed = order[role, plate]
-            pairs = align([key(text) for text in part["ilce"]], [at for at, _ in listed])
+            printed = [key(text) for text in part["ilce"]]
+            chosen: dict[int, tuple[str, str | None]] = {}
+            for table in tables[role]:
+                listed = lists[table, role, plate]
+                pairs = align(printed, [at for at, _ in listed]) if listed else {}
+                taken = {at[0] for at in chosen.values()}
+                for index, found in pairs.items():
+                    if index not in chosen and listed[found][1][0] not in taken:
+                        chosen[index] = listed[found][1]
+                for index, text in enumerate(printed):
+                    if index in chosen or len(text) < 4:
+                        continue
+                    close = [
+                        at
+                        for name_, at in listed
+                        if at[0] not in {chosen_[0] for chosen_ in chosen.values()}
+                        and difflib.SequenceMatcher(None, text, name_).ratio() >= 0.85
+                    ]
+                    if len(close) == 1:
+                        chosen[index] = close[0]
             for index, seq in enumerate(part["seq"]):
-                placed[role, plate, seq] = listed[pairs[index]][1] if index in pairs else None
+                placed[role, plate, seq] = chosen.get(index)
 
         def name(entity: UUID, text: str, lang: str = "tr", kind: str = "official") -> None:
             cs.add("name", entity_id=entity, text=text, lang=lang, kind=kind, is_preferred=kind == "official")
