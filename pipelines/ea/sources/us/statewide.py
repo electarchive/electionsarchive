@@ -17,6 +17,7 @@ import polars as pl
 from ea import names, raw
 from ea.changeset import Changeset, slug
 from ea.names import initials
+from ea.sources.us import contingent
 from ea.sources.us.county_changes import ct_regions
 from ea.sources.us.elstats import (
     FORMER,
@@ -514,12 +515,21 @@ def emit() -> Path:
             slugs[path] = entity
             return path
 
+        in_use = {
+            id
+            for (id,) in conn.execute(
+                """select distinct c.office_id from contest c join changeset s on s.id = c.changeset_id
+                   where s.pipeline <> %s""",
+                [SOURCE],
+            ).fetchall()
+        }
         for key in offices_known:
-            if key.startswith("county-"):
+            if key.startswith("county-") and cs.key("us.office", key) not in in_use:
                 cs.add("entity_retirement", entity_id=cs.key("us.office", key), reason=RETIRED_OFFICE)
         systems = {key: cs.key("us.electoral_system", key) for key in ("fptp", "two_round", "block")}
         if cs.minted & set(systems.values()):
             raise ValueError("the fptp, two-round, and block systems must exist")
+        majority = contingent.systems(cs, name)
 
         def party(state: str, year: int, label: str | None) -> tuple[UUID | None, bool]:
             label = (label or "").split("/")[0].strip()
@@ -772,6 +782,8 @@ def emit() -> Path:
                     or runoff
                     or advancing
                     or (state == "VA" and 1953 <= year <= 1969 and scope)
+                    else majority(rule)
+                    if kind == "general" and seats == 1 and (rule := contingent.statewide(state, office, year))
                     else systems["fptp"]
                     if seats == 1
                     else systems["block"],

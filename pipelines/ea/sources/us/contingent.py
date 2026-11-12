@@ -49,6 +49,15 @@ def governor(state: str, year: int) -> str | None:
     return key if (start is None or year >= start) and (end is None or year <= end) else None
 
 
+VERMONT_OFFICES = ("Lieutenant Governor", "Treasurer", "Secretary of State", "Auditor")
+
+
+def statewide(state: str, office: str, year: int) -> str | None:
+    if state == "VT" and office in VERMONT_OFFICES:
+        return "contingent_legislature_3"
+    return None
+
+
 def systems(cs: Changeset, name: Callable[[UUID, str], None]) -> Callable[[str], UUID]:
     ids: dict[str, UUID] = {}
 
