@@ -366,7 +366,7 @@ def emit() -> Path:
         ]
 
         dates = dict(places.group_by("round").agg(pl.col("day").min()).iter_rows())
-        first, last = dates["1"], places["day"].max()
+        first, last = dates["1"], max(places["day"])
         umbrella = cs.key("br.election", f"{first}:municipal-elections")
         cs.add("election", id=umbrella, polity_id=brazil, kind="local", date_from=first, date_to=last, status="held")
         name(umbrella, f"{year} Brazilian municipal elections", "en")
