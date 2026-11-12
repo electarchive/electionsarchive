@@ -8005,6 +8005,7 @@ def resolve(
                 )
                 and bool({"education", "school"} & mine) == bool({"education", "school"} & theirs)
                 and not (roles and theirs & ROLES and not roles & {ROLE.get(word, word) for word in theirs})
+                and not ("clerk" in mine and ("district" in mine) != ("district" in theirs))
             ),
             reverse=True,
         )

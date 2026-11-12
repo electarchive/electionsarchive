@@ -27,6 +27,11 @@ FILES = (
         "Travis",
     ),
 )
+CANVASS_NAMES = {
+    "Gregory Harrington": "Gregory L. Harrington",
+    "Oscar Mitchell": "Oscar R. Mitchell",
+    "Robert 'Bobby' Hidrogo": "Robert Hidrogo",
+}
 VOTE_FOR = re.compile(r"\s*\(Vote For (\d+)\)\s*$")
 TAG = re.compile(r"\s*\((?:REP|DEM|LIB|GRN|IND|NON)\)\s*$")
 BOARD = frozenset({"board", "directors", "director", "permanent", "trustees", "trustee", "three", "places", "2026"})
@@ -92,6 +97,7 @@ def _read(registry: Mapping[str, Mapping[str, str]]) -> Iterator[dict[str, Any]]
                 },
             )
             label = TAG.sub("", row["choice name"])
+            label = CANVASS_NAMES.get(label, label) if "Pflugerville" in name or "Del Valle" in name else label
             if kept := next((choice for choice in node["choices"] if choice["text"] == label), None):
                 kept["total"] = str(int(kept["total"]) + int(row["total votes"]))
                 continue
@@ -189,4 +195,5 @@ def emit() -> Path:
         lambda url, tenant: url.startswith(tenant) and url.endswith("summary.csv"),
         rows=rows(),
         keep_foreign=True,
+        canvass_names=CANVASS_NAMES,
     )

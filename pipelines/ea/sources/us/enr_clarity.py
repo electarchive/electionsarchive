@@ -1682,6 +1682,9 @@ def defer(cs: Changeset, conn: Connection, source: str) -> None:
     for table in ("name", "slug", "external_id", "note"):
         if table in cs.rows:
             cs.rows[table] = [row for row in cs.rows[table] if str(row.get("entity_id")) not in unused]
+    for table in [table for table, rows in cs.rows.items() if not rows and not cs.frames.get(table)]:
+        del cs.rows[table]
+        cs.frames.pop(table, None)
 
 
 def emit(
@@ -1691,6 +1694,7 @@ def emit(
     floor: float = 0.5,
     rows: list[dict[str, str]] | None = None,
     keep_foreign: bool = False,
+    canvass_names: Mapping[str, str] | None = None,
 ) -> Path:
     parsed = DATA / "parsed" / source
     listed = tenants(platform) if rows is None else rows
@@ -3048,7 +3052,7 @@ def emit(
                 cs.add("entity_retirement", entity_id=candidacy, reason=reason)
                 people.pop(candidacy, None)
                 continue
-            clean = _label(ballot_name)[0]
+            clean = (canvass_names or {}).get(_label(ballot_name)[0], _label(ballot_name)[0])
             if clean != ballot_name and (survivor := seated.get((contest, slug(_title(clean))))) is not None:
                 reason = f"{ballot_name} is a stale label for {clean}"
                 cs.add("entity_retirement", entity_id=candidacy, reason=reason)
