@@ -120,13 +120,13 @@
         },
         {
           "label": "James M. Cox.",
-          "contest": "president",
-          "candidate": "James Cox (Democratic)"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "Warren G. Harding.",
-          "contest": "president",
-          "candidate": "Warren G. Harding (Republican)"
+          "contest": null,
+          "candidate": ""
         }
       ],
       "orientation": "counties_down",
@@ -136,7 +136,56 @@
         0.917,
         0.612
       ],
-      "hint": "Read only the table headed 'TABLE SHOWING VOTES BY COUNTIES FOR CANDIDATES FOR PRESIDENT (FIRST ELECTOR) AT THE ELECTION HELD NOVEMBER 2, 1920\u2014Concluded.'; ignore any other table visible in the image."
+      "hint": "Read only the table headed 'TABLE SHOWING VOTES BY COUNTIES FOR CANDIDATES FOR PRESIDENT (FIRST ELECTOR) AT THE ELECTION HELD NOVEMBER 2, 1920—Concluded.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 33,
+      "id": "33-0",
+      "columns": [
+        {
+          "label": "W. A. Julian",
+          "contest": "senate",
+          "candidate": "W. A. Julian"
+        },
+        {
+          "label": "Frank B. Willis",
+          "contest": "senate",
+          "candidate": "Frank B. Willis"
+        },
+        {
+          "label": "Henry B. Strong",
+          "contest": "senate",
+          "candidate": "Henry B. Strong"
+        },
+        {
+          "label": "Joseph W. Gottlieb",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C. T. Marshall",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Hugh L. Nichols",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "hint": "Read only the table headed 'TABLE SHOWING VOTES CAST BY COUNTIES FOR CANDIDATES FOR UNITED STATES SENATOR AND CHIEF JUSTICE OF THE SUPREME COURT AT THE ELECTION HELD NOVEMBER 2, 1920.'; ignore any other table visible in the image.",
+      "crop": [
+        0.09,
+        0.135,
+        0.885,
+        0.94
+      ],
+      "bands": 2,
+      "header": [
+        0.0,
+        0.26
+      ]
     },
     {
       "page": 34,
@@ -180,7 +229,7 @@
         0.914,
         0.634
       ],
-      "hint": "Read only the table headed 'TABLE SHOWING VOTES CAST BY COUNTIES FOR CANDIDATES FOR UNITED STATES SENATOR AND CHIEF JUSTICE OF THE SUPREME COURT AT THE ELECTION HELD NOVEMBER 2, 1920\u2014Concluded.'; ignore any other table visible in the image.",
+      "hint": "Read only the table headed 'TABLE SHOWING VOTES CAST BY COUNTIES FOR CANDIDATES FOR UNITED STATES SENATOR AND CHIEF JUSTICE OF THE SUPREME COURT AT THE ELECTION HELD NOVEMBER 2, 1920—Concluded.'; ignore any other table visible in the image.",
       "bands": 2,
       "header": [
         0.0,
@@ -193,23 +242,23 @@
       "columns": [
         {
           "label": "Dem.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "A. Victor Donahey"
         },
         {
           "label": "Rep.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "Harry L. Davis"
         },
         {
           "label": "Soc.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "Frank B. Hamilton"
         },
         {
           "label": "S. T.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "Earl H. Foote"
         },
         {
           "label": "Total Vote Cast for Governor",
@@ -283,7 +332,7 @@
         0.864,
         0.619
       ],
-      "hint": "Read only the table headed 'TABLE SHOWING THE VOTES CAST BY COUNTIES FOR CANDIDATES FOR GOVERNOR FOR 1920 AND 1918 AND THE TOTAL VOTE CAST FOR ALL CANDIDATES FOR THE AFORESAID YEARS\u2014Concluded.'; ignore any other table visible in the image."
+      "hint": "Read only the table headed 'TABLE SHOWING THE VOTES CAST BY COUNTIES FOR CANDIDATES FOR GOVERNOR FOR 1920 AND 1918 AND THE TOTAL VOTE CAST FOR ALL CANDIDATES FOR THE AFORESAID YEARS—Concluded.'; ignore any other table visible in the image."
     }
   ]
 }
