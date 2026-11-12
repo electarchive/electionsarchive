@@ -1,0 +1,22 @@
+{
+  "polity": "US-NC",
+  "publisher": "North Carolina Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "year": 1976,
+  "day": "1976-11-02",
+  "title": "North Carolina Manual, votes in general elections for U.S. House 1972-1976, general election 1976-11-02",
+  "file": {
+    "url": "https://archive.org/download/northcarolinaman1977nort/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/northcarolinaman1977nort"
+  },
+  "offices": {
+    "house": "U.S. Representative, one table per district, counties down; columns also carry other election years, read only the column for the election day"
+  },
+  "leaves": [
+    757,
+    758,
+    759
+  ],
+  "create": true
+}

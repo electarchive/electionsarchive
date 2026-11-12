@@ -1,0 +1,21 @@
+{
+  "polity": "US-NC",
+  "publisher": "North Carolina Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "year": 1986,
+  "day": "1986-11-04",
+  "title": "North Carolina Manual 1991-92, abstracts of votes, U.S. Senate general election 1986-11-04",
+  "file": {
+    "url": "https://archive.org/download/northcarolinaman19911992nort/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/northcarolinaman19911992nort"
+  },
+  "offices": {
+    "senate": "U.S. Senator, two contests side by side: remainder of the unexpired term and the regular six-year term"
+  },
+  "leaves": [
+    943,
+    944
+  ],
+  "create": true
+}

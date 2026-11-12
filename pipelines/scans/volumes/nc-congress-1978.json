@@ -1,0 +1,26 @@
+{
+  "polity": "US-NC",
+  "publisher": "North Carolina Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "year": 1978,
+  "day": "1978-11-07",
+  "title": "North Carolina Manual, votes for U.S. Senator and U.S. House, general election 1978-11-07",
+  "file": {
+    "url": "https://archive.org/download/northcarolinaman1979nort/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/northcarolinaman1979nort"
+  },
+  "offices": {
+    "senate": "U.S. Senator, counties down",
+    "house": "U.S. Representative, one table per district, counties down"
+  },
+  "leaves": [
+    768,
+    769,
+    773,
+    774,
+    775,
+    776
+  ],
+  "create": true
+}
