@@ -9,6 +9,14 @@
   },
   "raw_source": "us.scans",
   "contests": {
+    "house1": {
+      "year": 1896,
+      "chamber": "house",
+      "day": "1896-11-03",
+      "special": false,
+      "state": "OH",
+      "district": 1
+    },
     "house2": {
       "year": 1896,
       "chamber": "house",
@@ -16,9 +24,195 @@
       "special": false,
       "state": "OH",
       "district": 2
+    },
+    "house3": {
+      "year": 1896,
+      "chamber": "house",
+      "day": "1896-11-03",
+      "special": false,
+      "state": "OH",
+      "district": 3
+    },
+    "house4": {
+      "year": 1896,
+      "chamber": "house",
+      "day": "1896-11-03",
+      "special": false,
+      "state": "OH",
+      "district": 4
+    },
+    "house5": {
+      "year": 1896,
+      "chamber": "house",
+      "day": "1896-11-03",
+      "special": false,
+      "state": "OH",
+      "district": 5
+    },
+    "house6": {
+      "year": 1896,
+      "chamber": "house",
+      "day": "1896-11-03",
+      "special": false,
+      "state": "OH",
+      "district": 6
+    },
+    "house7": {
+      "year": 1896,
+      "chamber": "house",
+      "day": "1896-11-03",
+      "special": false,
+      "state": "OH",
+      "district": 7
+    },
+    "house8": {
+      "year": 1896,
+      "chamber": "house",
+      "day": "1896-11-03",
+      "special": false,
+      "state": "OH",
+      "district": 8
+    },
+    "house9": {
+      "year": 1896,
+      "chamber": "house",
+      "day": "1896-11-03",
+      "special": false,
+      "state": "OH",
+      "district": 9
+    },
+    "house10": {
+      "year": 1896,
+      "chamber": "house",
+      "day": "1896-11-03",
+      "special": false,
+      "state": "OH",
+      "district": 10
+    },
+    "house11": {
+      "year": 1896,
+      "chamber": "house",
+      "day": "1896-11-03",
+      "special": false,
+      "state": "OH",
+      "district": 11
+    },
+    "house12": {
+      "year": 1896,
+      "chamber": "house",
+      "day": "1896-11-03",
+      "special": false,
+      "state": "OH",
+      "district": 12
+    },
+    "house13": {
+      "year": 1896,
+      "chamber": "house",
+      "day": "1896-11-03",
+      "special": false,
+      "state": "OH",
+      "district": 13
+    },
+    "house14": {
+      "year": 1896,
+      "chamber": "house",
+      "day": "1896-11-03",
+      "special": false,
+      "state": "OH",
+      "district": 14
+    },
+    "house15": {
+      "year": 1896,
+      "chamber": "house",
+      "day": "1896-11-03",
+      "special": false,
+      "state": "OH",
+      "district": 15
+    },
+    "house16": {
+      "year": 1896,
+      "chamber": "house",
+      "day": "1896-11-03",
+      "special": false,
+      "state": "OH",
+      "district": 16
+    },
+    "house17": {
+      "year": 1896,
+      "chamber": "house",
+      "day": "1896-11-03",
+      "special": false,
+      "state": "OH",
+      "district": 17
+    },
+    "house18": {
+      "year": 1896,
+      "chamber": "house",
+      "day": "1896-11-03",
+      "special": false,
+      "state": "OH",
+      "district": 18
+    },
+    "house19": {
+      "year": 1896,
+      "chamber": "house",
+      "day": "1896-11-03",
+      "special": false,
+      "state": "OH",
+      "district": 19
+    },
+    "house20": {
+      "year": 1896,
+      "chamber": "house",
+      "day": "1896-11-03",
+      "special": false,
+      "state": "OH",
+      "district": 20
+    },
+    "house21": {
+      "year": 1896,
+      "chamber": "house",
+      "day": "1896-11-03",
+      "special": false,
+      "state": "OH",
+      "district": 21
     }
   },
   "pages": [
+    {
+      "page": 272,
+      "id": "272-0",
+      "columns": [
+        {
+          "label": "Rep. William B. Shattuc.",
+          "contest": "house1",
+          "candidate": "William Bunn Shattuc"
+        },
+        {
+          "label": "Dem. Thomas J. Donnelly.",
+          "contest": "house1",
+          "candidate": "Thomas J. Donnelly"
+        },
+        {
+          "label": "Rep. McKinley.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Dem. Bryan.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.177,
+        0.278,
+        0.798,
+        0.532
+      ],
+      "hint": "Read only the table headed 'First District—Congressional and Presidential Vote.'; ignore any other table visible in the image."
+    },
     {
       "page": 272,
       "id": "272-1",
@@ -31,12 +225,808 @@
         {
           "label": "Dem. David S. Oliver.",
           "contest": "house2",
-          "candidate": "David S Oliver"
+          "candidate": "David S. Oliver"
         }
       ],
       "orientation": "counties_down",
-      "crop": [0.177, 0.524, 0.798, 0.801],
-      "hint": "Read only the table headed 'Second District\u2014Congressional Vote.'; ignore any other table visible in the image."
+      "crop": [
+        0.177,
+        0.524,
+        0.798,
+        0.801
+      ],
+      "hint": "Read only the table headed 'Second District—Congressional Vote.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 272,
+      "id": "272-2",
+      "columns": [
+        {
+          "label": "Rep. Robert M. Nevin.",
+          "contest": "house3",
+          "candidate": "Robert M. Nevin"
+        },
+        {
+          "label": "Dem. John L. Brenner.",
+          "contest": "house3",
+          "candidate": "John Lewis Brenner"
+        },
+        {
+          "label": "Peo. Joel S. Steward.",
+          "contest": "house3",
+          "candidate": "Joel S. Steward"
+        },
+        {
+          "label": "Nat. P. Samuel N. Stubbs.",
+          "contest": "house3",
+          "candidate": "Samuel N. Stubbs"
+        },
+        {
+          "label": "Rep. McKinley",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Dem. Bryan.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.175,
+        0.793,
+        0.798,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Third District—Congressional and Presidential Vote.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 273,
+      "id": "273-0",
+      "columns": [
+        {
+          "label": "Rep. John P. Maclean.",
+          "contest": "house4",
+          "candidate": "John P. Maclean"
+        },
+        {
+          "label": "Dem. George A. Marshall.",
+          "contest": "house4",
+          "candidate": "George Alexander Marshall"
+        },
+        {
+          "label": "Peo. L. M. Kraner.",
+          "contest": "house4",
+          "candidate": "L. M. Kraner"
+        },
+        {
+          "label": "Nat. P. Geo. W. Mace.",
+          "contest": "house4",
+          "candidate": "George W. Mace"
+        },
+        {
+          "label": "Rep. McKinley",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Dem. Bryan.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.2,
+        0.136,
+        0.81,
+        0.387
+      ],
+      "hint": "Read only the table headed 'Fourth District—Congressional and Presidential Vote.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 273,
+      "id": "273-1",
+      "columns": [
+        {
+          "label": "Rep. Francis B. DeWitt.",
+          "contest": "house5",
+          "candidate": "Francis B. Dewitt"
+        },
+        {
+          "label": "Dem. David Meekison",
+          "contest": "house5",
+          "candidate": "David Meekison"
+        },
+        {
+          "label": "Peo. Geo. N. Rice.",
+          "contest": "house5",
+          "candidate": "George N. Rice"
+        },
+        {
+          "label": "Rep. McKinley",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Dem. Bryan.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.2,
+        0.379,
+        0.81,
+        0.655
+      ],
+      "hint": "Read only the table headed 'Fifth District—Congressional and Presidential Vote.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 273,
+      "id": "273-2",
+      "columns": [
+        {
+          "label": "Rep. Seth W. Brown.",
+          "contest": "house6",
+          "candidate": "Seth W. Brown"
+        },
+        {
+          "label": "Dem. Harry W. Paxton.",
+          "contest": "house6",
+          "candidate": "Harry W. Paxton"
+        },
+        {
+          "label": "Proh. Frank S. Delo.",
+          "contest": "house6",
+          "candidate": "Frank S. Delo"
+        },
+        {
+          "label": "Rep. McKinley",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Dem. Bryan.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.198,
+        0.647,
+        0.805,
+        0.909
+      ],
+      "hint": "Read only the table headed 'Sixth District—Congressional and Presidential Vote.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 274,
+      "id": "274-0",
+      "columns": [
+        {
+          "label": "Rep. Walter L. Weaver.",
+          "contest": "house7",
+          "candidate": "Walter Lowrie Weaver"
+        },
+        {
+          "label": "Dem. Francis M. Hunt.",
+          "contest": "house7",
+          "candidate": "Francis M. Hunt"
+        },
+        {
+          "label": "Nat. Party. R. S. Thom'son",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Rep. McKinley",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Dem. Bryan.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.197,
+        0.139,
+        0.798,
+        0.395
+      ],
+      "hint": "Read only the table headed 'Seventh District—Congressional and Presidential Vote.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 274,
+      "id": "274-1",
+      "columns": [
+        {
+          "label": "Rep. Archibald Lybrand.",
+          "contest": "house8",
+          "candidate": "Archibald Lybrand"
+        },
+        {
+          "label": "Dem. McEldin Dun.",
+          "contest": "house8",
+          "candidate": "McEldin Dun"
+        },
+        {
+          "label": "Rep. McKinley",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Dem. Bryan.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.197,
+        0.387,
+        0.803,
+        0.669
+      ],
+      "hint": "Read only the table headed 'Eighth District—Congressional and Presidential Vote.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 274,
+      "id": "274-2",
+      "columns": [
+        {
+          "label": "Rep. James H. Southard.",
+          "contest": "house9",
+          "candidate": "James Harding Southard"
+        },
+        {
+          "label": "Dem. Stephen Brophy.",
+          "contest": "house9",
+          "candidate": "Stephen Brophy"
+        },
+        {
+          "label": "Rep. McKinley",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Dem. Bryan.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.194,
+        0.661,
+        0.805,
+        0.909
+      ],
+      "hint": "Read only the table headed 'Ninth District—Congressional and Presidential Vote.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 275,
+      "id": "275-0",
+      "columns": [
+        {
+          "label": "Rep. Lucien J. Fenton.",
+          "contest": "house10",
+          "candidate": "Lucien Jerome Fenton"
+        },
+        {
+          "label": "Dem. T. S. Hogan.",
+          "contest": "house10",
+          "candidate": "T. S. Hogan"
+        },
+        {
+          "label": "Scattering.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Rep. McKinley",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Dem. Bryan.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.201,
+        0.151,
+        0.811,
+        0.401
+      ],
+      "hint": "Read only the table headed 'Tenth District—Congressional and Presidential Vote.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 275,
+      "id": "275-1",
+      "columns": [
+        {
+          "label": "Rep. Charles H. Grosvenor.",
+          "contest": "house11",
+          "candidate": "Charles Henry Grosvenor"
+        },
+        {
+          "label": "Dem. William E. Finck, jr.",
+          "contest": "house11",
+          "candidate": "William E. Jr. Finck"
+        },
+        {
+          "label": "Proh. Lawrence C. Crippen.",
+          "contest": "house11",
+          "candidate": "Lawrence C. Crippen"
+        },
+        {
+          "label": "Rep. McKinley.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Dem. Bryan.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.199,
+        0.393,
+        0.814,
+        0.68
+      ],
+      "hint": "Read only the table headed 'Eleventh District—Congressional and Presidential Vote.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 275,
+      "id": "275-2",
+      "columns": [
+        {
+          "label": "Rep. David K. Watson.",
+          "contest": "house12",
+          "candidate": "David K. Watson"
+        },
+        {
+          "label": "Dem. John J. Lentz.",
+          "contest": "house12",
+          "candidate": "John Jacob Lentz"
+        },
+        {
+          "label": "Peo. L. J. Finley.",
+          "contest": "house12",
+          "candidate": "L. J. Finley"
+        },
+        {
+          "label": "Proh. Jacob B. Turner.",
+          "contest": "house12",
+          "candidate": "Jacob B. Turner"
+        },
+        {
+          "label": "Rep. McKinley.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Dem. Bryan.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.2,
+        0.672,
+        0.809,
+        0.897
+      ],
+      "hint": "Read only the table headed 'Twelfth District—Congressional and Presidential Vote.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 276,
+      "id": "276-0",
+      "columns": [
+        {
+          "label": "Rep. Stephen R. Harris.",
+          "contest": "house13",
+          "candidate": "Stephen R. Harris"
+        },
+        {
+          "label": "Dem. James A. Norton.",
+          "contest": "house13",
+          "candidate": "James Albert Norton"
+        },
+        {
+          "label": "Peo. John H. Rhodes.",
+          "contest": "house13",
+          "candidate": "John H. Rhodes"
+        },
+        {
+          "label": "Proh. John W. Belser.",
+          "contest": "house13",
+          "candidate": "John W. Belser"
+        },
+        {
+          "label": "Rep. McKinley.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Dem. Bryan.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.197,
+        0.14,
+        0.808,
+        0.414
+      ],
+      "hint": "Read only the table headed 'Thirteenth District—Congressional and Presidential Vote.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 276,
+      "id": "276-1",
+      "columns": [
+        {
+          "label": "Rep. Winfield S. Kerr.",
+          "contest": "house14",
+          "candidate": "Winfield Scott Kerr"
+        },
+        {
+          "label": "Dem. John B. Coffinberry.",
+          "contest": "house14",
+          "candidate": "John B. Coffinberry"
+        },
+        {
+          "label": "Nation'l Party. Robert F. Mosher.",
+          "contest": "house14",
+          "candidate": "Robert F. Mosher"
+        },
+        {
+          "label": "Rep. McKinley.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Dem. Bryan.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.197,
+        0.406,
+        0.808,
+        0.686
+      ],
+      "hint": "Read only the table headed 'Fourteenth District—Congressional and Presidential Vote.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 276,
+      "id": "276-2",
+      "columns": [
+        {
+          "label": "Rep. Henry Clay Van Voorhis.",
+          "contest": "house15",
+          "candidate": "Henry Clay Van Voorhis"
+        },
+        {
+          "label": "Dem. James B. Tannehill.",
+          "contest": "house15",
+          "candidate": "James B. Tannehill"
+        },
+        {
+          "label": "Peo. Illion E. Moore.",
+          "contest": "house15",
+          "candidate": "Illion E. Moore"
+        },
+        {
+          "label": "Proh. T. H. Padan.",
+          "contest": "house15",
+          "candidate": "T. H. Padan"
+        },
+        {
+          "label": "Rep. McKinley.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Dem. Bryan.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.197,
+        0.678,
+        0.818,
+        0.934
+      ],
+      "hint": "Read only the table headed 'Fifteenth District—Congressional and Presidential Vote.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 277,
+      "id": "277-0",
+      "columns": [
+        {
+          "label": "Rep. Lorenzo Danford.",
+          "contest": "house16",
+          "candidate": "Lorenzo Danford"
+        },
+        {
+          "label": "Dem. Henry H. McFadden",
+          "contest": "house16",
+          "candidate": "Henry H. McFadden"
+        },
+        {
+          "label": "Rep. McKinley.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Dem. Bryan.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.2,
+        0.139,
+        0.811,
+        0.408
+      ],
+      "hint": "Read only the table headed 'Sixteenth District—Congressional and Presidential Vote.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 277,
+      "id": "277-1",
+      "columns": [
+        {
+          "label": "Rep. Addison S. McClure.",
+          "contest": "house17",
+          "candidate": "Addison S. McClure"
+        },
+        {
+          "label": "Dem. John A. McDowell",
+          "contest": "house17",
+          "candidate": "John Anderson McDowell"
+        },
+        {
+          "label": "Proh. I. N. Kieffer.",
+          "contest": "house17",
+          "candidate": "I. N. Kieffer"
+        },
+        {
+          "label": "Nat. P. Homer E. Cole.",
+          "contest": "house17",
+          "candidate": "Homer E. Cole"
+        },
+        {
+          "label": "Rep. McKinley.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Dem. Bryan.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.2,
+        0.4,
+        0.811,
+        0.677
+      ],
+      "hint": "Read only the table headed 'Seventeenth District—Congressional and Presidential Vote.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 277,
+      "id": "277-2",
+      "columns": [
+        {
+          "label": "Rep. Robert W. Tayler.",
+          "contest": "house18",
+          "candidate": "Robert Walker Tayler"
+        },
+        {
+          "label": "Dem. Isaac R. Sherwood",
+          "contest": "house18",
+          "candidate": "Isaac R. Sherwood"
+        },
+        {
+          "label": "Proh. James L. Swan.",
+          "contest": "house18",
+          "candidate": "James L. Swan"
+        },
+        {
+          "label": "Scattering.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Rep. McKinley.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Dem. Bryan.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.198,
+        0.669,
+        0.811,
+        0.917
+      ],
+      "hint": "Read only the table headed 'Eighteenth District—Congressional and Presidential Vote.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 278,
+      "id": "278-0",
+      "columns": [
+        {
+          "label": "Rep. Stephen A. Northway.",
+          "contest": "house19",
+          "candidate": "Stephen Asa Northway"
+        },
+        {
+          "label": "Dem. Wm. T. Sawyer.",
+          "contest": "house19",
+          "candidate": "William T. Sawyer"
+        },
+        {
+          "label": "Peo. Solon C. Thayer.",
+          "contest": "house19",
+          "candidate": "Solon C. Thayer"
+        },
+        {
+          "label": "Scattering.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Rep. McKinley.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Dem. Bryan.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.19,
+        0.156,
+        0.799,
+        0.408
+      ],
+      "hint": "Read only the table headed 'Nineteenth District—Congressional and Presidential Vote.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 278,
+      "id": "278-1",
+      "columns": [
+        {
+          "label": "Rep. Clifton B. Beach.",
+          "contest": "house20",
+          "candidate": "Clifton Bailey Beach"
+        },
+        {
+          "label": "Dem. A. T. Van Tassel.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Proh. J. J. Harrison.",
+          "contest": "house20",
+          "candidate": "J. J. Harrison"
+        },
+        {
+          "label": "Nat. Party. Wm. H. Watkins.",
+          "contest": "house20",
+          "candidate": "William H. Watkins"
+        },
+        {
+          "label": "Soc. Labor. Paul Dinger.",
+          "contest": "house20",
+          "candidate": "Paul Dinger"
+        },
+        {
+          "label": "Rep. McKinley.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Dem. Bryan.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.187,
+        0.4,
+        0.799,
+        0.659
+      ],
+      "hint": "Read only the table headed 'Twentieth District—Congressional and Presidential Vote.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 278,
+      "id": "278-2",
+      "columns": [
+        {
+          "label": "Rep. Theodore E. Burton",
+          "contest": "house21",
+          "candidate": "Theodore Elijah Burton"
+        },
+        {
+          "label": "Dem. L. A. Russell.",
+          "contest": "house21",
+          "candidate": "L. A. Russell"
+        },
+        {
+          "label": "Peo. Louis B. Tuckerman.",
+          "contest": "house21",
+          "candidate": "Louis B. Tuckerman"
+        },
+        {
+          "label": "Proh. E. Jay Pinney.",
+          "contest": "house21",
+          "candidate": "E. Jay Pinney"
+        },
+        {
+          "label": "Nat. Party. Thomas P. McDonough",
+          "contest": "house21",
+          "candidate": "Thomas P. McDonough"
+        },
+        {
+          "label": "Soc. Labor. Walter Gillet.",
+          "contest": "house21",
+          "candidate": "Walter Gillet"
+        },
+        {
+          "label": "Rep. McKinley.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Dem. Bryan.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.185,
+        0.651,
+        0.798,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Twenty-first District—Congressional and Presidential Vote.'; ignore any other table visible in the image."
     }
   ]
 }
