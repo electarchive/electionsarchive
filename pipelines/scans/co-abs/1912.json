@@ -9,5 +9,6 @@
   "raw_source": "us.scans",
   "extend": true,
   "contests": {},
-  "pages": []
+  "pages": [],
+  "empty": true
 }

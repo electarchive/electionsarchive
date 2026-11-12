@@ -81,6 +81,7 @@ class Manifest(TypedDict):
     unit_scheme: NotRequired[Literal["town", "split"]]
     authoritative: NotRequired[str]
     extend: NotRequired[bool]
+    empty: NotRequired[bool]
     restage: NotRequired[bool]
     autorotate: NotRequired[bool]
     caveat: NotRequired[str]
@@ -1234,7 +1235,8 @@ def write_totals(manifest: Manifest, table: pl.DataFrame) -> Path:
         .with_columns(winner=pl.when(pl.col("votes") == pl.col("top")).then(1).otherwise(None))
         .select("source", "state", "date", "office", "title", "name", "party", "votes", "winner", "page")
     )
-    table.write_csv(folder / f"{manifest['name']}.tsv", separator="\t")
+    path = folder / f"{manifest['name'].replace('/', '-')}.tsv"
+    table.write_csv(path, separator="\t")
     book = folder / "sources.tsv"
     if manifest["name"] not in book.read_text():
         with book.open("a") as handle:
@@ -1253,7 +1255,7 @@ def write_totals(manifest: Manifest, table: pl.DataFrame) -> Path:
                 )
                 + "\n"
             )
-    return folder / f"{manifest['name']}.tsv"
+    return path
 
 
 def emit(name: str) -> Path:
@@ -1398,6 +1400,7 @@ def emit(name: str) -> Path:
             strict=not manifest.get("authoritative_loose"),
             authoritative=manifest.get("authoritative"),
             extend=bool(manifest.get("extend")),
+            empty=bool(manifest.get("empty")),
             restage=bool(manifest.get("restage")) or "EA_SCANS_RESTAGE" in os.environ,
         )
         targets = {row["id"]: row["contest_id"] for row in cs.rows.get("result_set", [])}

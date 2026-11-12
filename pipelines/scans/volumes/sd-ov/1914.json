@@ -21,5 +21,6 @@
     313
   ],
   "mixed": true,
-  "extend": true
+  "extend": true,
+  "empty": true
 }

@@ -18,5 +18,6 @@
     9,
     11
   ],
-  "extend": true
+  "extend": true,
+  "empty": true
 }

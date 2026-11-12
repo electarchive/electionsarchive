@@ -72,6 +72,7 @@ class Volume(TypedDict):
     autorotate: NotRequired[bool]
     at_large: NotRequired[bool]
     extend: NotRequired[bool]
+    empty: NotRequired[bool]
     turn: NotRequired[int]
 
 
@@ -417,7 +418,18 @@ def generate(name: str, volume: Volume, pages: dict[int, LayoutPage], folder: Pa
         key: value
         for key, value in volume.items()
         if key
-        in ("polity", "publisher", "title", "license", "file", "raw_source", "unit_scheme", "unit_codes", "extend")
+        in (
+            "polity",
+            "publisher",
+            "title",
+            "license",
+            "file",
+            "raw_source",
+            "unit_scheme",
+            "unit_codes",
+            "extend",
+            "empty",
+        )
     }
     manifest["contests"] = contests
     manifest["pages"] = sections

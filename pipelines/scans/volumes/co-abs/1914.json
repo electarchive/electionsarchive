@@ -17,5 +17,6 @@
     107,
     108
   ],
-  "extend": true
+  "extend": true,
+  "empty": true
 }

@@ -22,5 +22,6 @@
     160,
     161
   ],
-  "extend": true
+  "extend": true,
+  "empty": true
 }

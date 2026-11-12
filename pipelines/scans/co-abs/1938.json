@@ -254,5 +254,6 @@
       ],
       "hint": "Read only the table headed 'REPRESENTATIVE IN CONGRESS, FOURTH DISTRICT'; ignore any other table visible in the image."
     }
-  ]
+  ],
+  "empty": true
 }

@@ -20,5 +20,6 @@
   ],
   "mixed": true,
   "at_large": true,
-  "extend": true
+  "extend": true,
+  "empty": true
 }

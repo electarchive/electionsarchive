@@ -845,7 +845,7 @@ def attach(
                              join contest_option p on p.k = v.option_k and p.parent_option_id = o.id
                              where v.result_set_k = rs.k and v.measure = 1 and v.count_round = %s))
                    from contest_option o
-                   join result_set rs on rs.contest_id = o.contest_id and rs.is_default
+                   left join result_set rs on rs.contest_id = o.contest_id and rs.is_default
                    left join candidacy cy on cy.option_id = o.id and cy.role = 'head'
                    left join name n on n.entity_id = cy.person_id and n.is_preferred
                    where o.contest_id = %s and o.parent_option_id is null""",
@@ -1101,7 +1101,7 @@ def attach(
             kind="counted",
             status="active",
             source_id=sources[lines["source"][0]],
-            is_default=key in declared or inherited or (held is not None and held[0]),
+            is_default=key in declared or inherited or emptied or (held is not None and held[0]),
             completeness=1
             if authoritative is not None
             else round(
