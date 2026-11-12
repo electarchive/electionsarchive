@@ -569,7 +569,11 @@ def emit() -> Path:
                    union
                    select x.value from external_id x join contest c on c.id = x.entity_id
                    join changeset s on s.id = c.changeset_id
-                   where x.scheme = 'us.contest' and x.value like 'alged:%' and s.pipeline in ('us.wards', 'us.chicago_boe', 'us.ceda', 'us.houston_citysec', 'us.medsl_local', 'us.bexar', 'us.dallas_citysec', 'us.electionsfl')"""
+                   where x.scheme = 'us.contest' and x.value like 'alged:%' and s.pipeline in ('us.wards', 'us.chicago_boe', 'us.ceda', 'us.houston_citysec', 'us.medsl_local', 'us.bexar', 'us.dallas_citysec', 'us.electionsfl')
+                   union
+                   select x.value from external_id x join result_set r on r.contest_id = x.entity_id and r.status = 'active'
+                   join changeset s on s.id = r.changeset_id and s.pipeline = 'us.ceda'
+                   where x.scheme = 'us.contest' and x.value like 'alged:%'"""
             )
         }
         held = dict(
