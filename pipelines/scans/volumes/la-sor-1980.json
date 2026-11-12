@@ -1,0 +1,21 @@
+{
+  "year": 1980,
+  "day": "1980-11-04",
+  "polity": "US-LA",
+  "publisher": "Louisiana Secretary of State",
+  "title": "Report of the Secretary of State, 1979–1980",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706905_0363/micro_IA40706905_0363.pdf",
+    "item": "https://archive.org/details/micro_IA40706905_0363"
+  },
+  "raw_source": "us.la_sos",
+  "offices": {
+    "president": "Presidential electors (President and Vice President), general election of November 4, 1980, parish rows (Insert I)",
+    "house": "Member of the United States House of Representatives, general election of November 4, 1980, parish rows"
+  },
+  "leaves": [
+    35,
+    45
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "year": 1980,
+  "day": "1980-09-13",
+  "polity": "US-LA",
+  "publisher": "Louisiana Secretary of State",
+  "title": "Report of the Secretary of State, 1979–1980",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706905_0363/micro_IA40706905_0363.pdf",
+    "item": "https://archive.org/details/micro_IA40706905_0363"
+  },
+  "raw_source": "us.la_sos",
+  "offices": {
+    "house": "Member of the United States House of Representatives, open primary of September 13, 1980, one table per congressional district, parish rows; Orleans and Jefferson rows split by wards are parts of a parish",
+    "senate": "United States Senator, open primary of September 13, 1980, parish rows"
+  },
+  "leaves": [
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32
+  ]
+}
