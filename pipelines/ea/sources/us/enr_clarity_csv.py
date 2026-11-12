@@ -183,9 +183,68 @@ def _remap() -> None:
     contests.with_columns(contest_key=pl.col("contest_key").replace(mapped)).write_parquet(path)
 
 
+def _restore() -> None:
+    path = DATA / "parsed" / SOURCE / "contests.parquet"
+    contests = pl.read_parquet(path)
+    lines = pl.read_parquet(path.with_name("lines.parquet"))
+    with connect() as conn:
+        keys = {
+            value
+            for (value,) in conn.execute(
+                "select value from external_id where scheme = 'us.contest' and value like '2026-11-03:TX:%%'"
+            ).fetchall()
+        }
+    prefix = "2026-11-03:TX:"
+    template = contests.filter(pl.col("scheme") == "us.county").head(1).to_dicts()[0]
+    added: list[dict[str, Any]] = []
+    extra: list[dict[str, Any]] = []
+    for record in _read({}):
+        for node in record["contests"]:
+            text = node["text"]
+            if found := re.match(r"District Judge, (\d+)(?:st|nd|rd|th) Judicial District$", text):
+                key = f"{prefix}district-judge:district-{found[1]}"
+            elif found := re.match(r"Travis Central Appraisal District, .*Board of Directors, Place (\d)$", text):
+                key = f"{prefix}48453-travis-central-appraisal-district:board:place-{found[1]}"
+            elif text == "City of Sunset Valley, Two City Council Member Seats":
+                key = f"{prefix}4871324:council"
+            elif text == "Travis County MMD No. 1 Permanent Directors":
+                key = f"{prefix}48453-travis-county-municipal-management-district-no-1:board"
+            else:
+                continue
+            if key not in keys or key in contests["contest_key"]:
+                continue
+            added.append(
+                {
+                    **template,
+                    "contest": node["key"],
+                    "text": text,
+                    "party": None,
+                    "magnitude": node["vote_for"],
+                    "contest_key": key,
+                }
+            )
+            for choice in node["choices"]:
+                extra.append(
+                    {
+                        "county": template["county"],
+                        "election": record["election"],
+                        "contest": node["key"],
+                        "place": None,
+                        "choice": choice["text"],
+                        "was": choice["text"],
+                        "party": enr_clarity._party(choice["party"]) if key.split(":")[2] == "district-judge" else None,
+                        "votes": int(choice["total"]),
+                    }
+                )
+    print(f"{len(added)} skipped contests restored onto the keys already minted")
+    contests.vstack(pl.DataFrame(added, schema=contests.schema)).write_parquet(path)
+    lines.vstack(pl.DataFrame(extra, schema=lines.schema)).write_parquet(path.with_name("lines.parquet"))
+
+
 def parse() -> None:
     enr_clarity.parse(SOURCE, "clarity_csv", _read, rows())
     _remap()
+    _restore()
 
 
 def emit() -> Path:
