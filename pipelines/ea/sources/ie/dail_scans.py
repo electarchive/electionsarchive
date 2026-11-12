@@ -1654,6 +1654,20 @@ def emit() -> Path:
                         x1=1.0,
                         y1=box[3] / 1000,
                     )
+        fresh = {(row["entity_id"], row["body_md"]) for row in cs.rows["note"]}
+        for note, entity, text in conn.execute(
+            """select n.id, n.entity_id, n.body_md from note n join changeset c on c.id = n.changeset_id
+               where n.entity_id = any(%s) and n.kind = 'caveat' and c.pipeline = %s""",
+            [[row["id"] for kind in ("contest", "result_set") for row in cs.rows[kind]], SOURCE],
+        ).fetchall():
+            if (entity, text) not in fresh:
+                cs.add(
+                    "note_drop",
+                    note_id=note,
+                    entity_id=entity,
+                    body_md=text,
+                    reason="A re-emit writes the count's caveats afresh.",
+                )
         return cs.write()
 
 
