@@ -952,6 +952,7 @@ def emit() -> Path:
                 valid_from=pl.lit(None, pl.Date),
             ),
         )
+        official_areas = [comune_ids[code] for code in comuni.filter("matched")["code"]]
         cs.frame(
             "name",
             comuni.select(
@@ -959,7 +960,7 @@ def emit() -> Path:
                 text="name",
                 lang=pl.lit("it"),
                 kind=pl.lit("official"),
-                is_preferred=pl.lit(True),
+                is_preferred=pl.col("matched") | comune_area.is_in(official_areas).not_(),
             ),
         )
 
@@ -1049,7 +1050,27 @@ def emit() -> Path:
                 "camera-proportional",
                 {
                     "formula": "hare",
-                    "threshold": {"percent": 3, "level": "list", "scope": "national"},
+                    "pooling": "coalition",
+                    "threshold": [
+                        {
+                            "percent": 10,
+                            "level": "coalition",
+                            "scope": "national",
+                            "requires": {"percent": 3},
+                            "floor": {"percent": 1},
+                        },
+                        {
+                            "percent": 3,
+                            "level": "list",
+                            "scope": "national",
+                            "members": "any",
+                            "alternative": {
+                                "percent": 20,
+                                "scope": "region",
+                                "lists": [str(party_ids["SUDTIROLER VOLKSPARTEI (SVP) - PATT"])],
+                            },
+                        },
+                    ],
                     "lists": {
                         "order": "closed",
                         "constituencies": "skip",

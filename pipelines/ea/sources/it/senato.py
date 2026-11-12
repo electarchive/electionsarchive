@@ -282,8 +282,20 @@ SYSTEMS = {
             "pooling": "coalition",
             "lists": {"order": "closed", "constituencies": "skip", "vacancy": "next_on_list"},
             "threshold": [
-                {"percent": 10, "level": "coalition", "scope": "national", "requires": {"percent": 3}},
-                {"percent": 3, "level": "list", "scope": "national", "members": "any"},
+                {
+                    "percent": 10,
+                    "level": "coalition",
+                    "scope": "national",
+                    "requires": {"percent": 3},
+                    "floor": {"percent": 1},
+                },
+                {
+                    "percent": 3,
+                    "level": "list",
+                    "scope": "national",
+                    "members": "any",
+                    "alternative": {"percent": 20, "scope": "region"},
+                },
             ],
         },
         "Senate, regional lists, since 2017",
@@ -299,8 +311,8 @@ SYSTEMS = {
             "remainder of a Hare quota, then among each coalition's qualifying lists in the same way, and then among "
             "the region's multi-member collegi. Valle d'Aosta elects one senator by plurality, and Trentino-Alto "
             "Adige elects six in single-member collegi (and in 2018 one more from lists). The Senate had 315 elected "
-            "seats until 2022, and 200 since. The rules store the Hare step and the national 3% and 10% bars; the "
-            "20% regional alternative, the 1% floor, and the split among collegi are described here only."
+            "seats until 2022, and 200 since. The rules store the Hare step, the national 3% and 10% bars, the "
+            "20% regional alternative, and the 1% floor; the split among collegi is described here only."
         ),
     ),
     "senato-estero": (
