@@ -1894,26 +1894,32 @@ def publish(conn: Connection, changeset_id: str, reviewer: str | None = None) ->
                          where d.is_default and d.id <> s.id and o.kind = 'official_body' and {group})"""
                 ).format(staged=stage.staged("result_set"), official=official, group=sql.SQL(group))
             )
+            has_status = "status" in stage.tables["result_set"]
             conn.execute(
                 sql.SQL(
                     """update {staged} s set is_default = true
                        from public.result_set d
-                       where d.id = s.id and d.is_default and not s.is_default and {official} and s.status = 'active'
+                       where d.id = s.id and d.is_default and not s.is_default and {official} and {active}
                          and not exists (select from {staged} x where x.is_default and x.election_id = s.election_id
                                            and x.contest_id = s.contest_id and x.stage = s.stage)"""
-                ).format(staged=stage.staged("result_set"), official=official)
+                ).format(
+                    staged=stage.staged("result_set"),
+                    official=official,
+                    active=sql.SQL("s.status = 'active'" if has_status else "true"),
+                )
             )
-            conn.execute(
-                sql.SQL(
-                    """update {staged} s set is_default = true
-                       where s.status = 'active' and not s.is_default and {official}
-                         and exists (select from {staged} w join public.result_set d on d.id = w.id and d.is_default
-                                     where w.status = 'withdrawn' and w.election_id = s.election_id
-                                       and w.contest_id = s.contest_id and w.stage = s.stage)
-                         and not exists (select from {staged} x where x.is_default and x.election_id = s.election_id
-                                           and x.contest_id = s.contest_id and x.stage = s.stage)"""
-                ).format(staged=stage.staged("result_set"), official=official)
-            )
+            if has_status:
+                conn.execute(
+                    sql.SQL(
+                        """update {staged} s set is_default = true
+                           where s.status = 'active' and not s.is_default and {official}
+                             and exists (select from {staged} w join public.result_set d on d.id = w.id and d.is_default
+                                         where w.status = 'withdrawn' and w.election_id = s.election_id
+                                           and w.contest_id = s.contest_id and w.stage = s.stage)
+                             and not exists (select from {staged} x where x.is_default and x.election_id = s.election_id
+                                               and x.contest_id = s.contest_id and x.stage = s.stage)"""
+                    ).format(staged=stage.staged("result_set"), official=official)
+                )
             conn.execute(
                 sql.SQL(
                     """update public.result_set d set is_default = false
