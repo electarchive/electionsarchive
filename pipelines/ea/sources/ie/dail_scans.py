@@ -22,7 +22,7 @@ from scipy import ndimage
 from ea import batch, raw
 from ea.changeset import Changeset, slug
 from ea.sources.ie.dail import ALIASES as DAIL_ALIASES
-from ea.sources.ie.dail import EXHAUSTED, PARTY_CODES, QUOTA, REGISTERED, VALID, VOTES
+from ea.sources.ie.dail import CEANN, EXHAUSTED, PARTY_CODES, QUOTA, REGISTERED, VALID, VOTES
 from ea.sources.ie.dail_pdf import ORDINALS
 from ea.sources.ie.referendums import SIGNED
 from ea.store import DATA, connect
@@ -550,7 +550,7 @@ SPOILT = re.compile(r"non.?transfer|not effective|papers")
 
 def amounts(text: str) -> list[int]:
     found = []
-    for sign, digits in NUMBER.findall(text.replace("—", "").replace("–", "-")):
+    for sign, digits in NUMBER.findall(text.replace("—", "").replace("–", "-").replace("\u2212", "-")):
         value = int(re.sub(r"\D", "", digits))
         found.append(-value if "-" in sign else value)
     return found
@@ -647,7 +647,7 @@ def layout(table: dict) -> list[str]:
         cells = [row["cells"][column] for row in rows]
         head = heading.lower()
         if column == 0:
-            signed = sum(bool(re.match(r"\s*[+-]\s*\d", cell)) for cell in cells)
+            signed = sum(bool(re.match(r"\s*[+\-\u2212]\s*\d", cell)) for cell in cells)
             kinds.append("transfer" if signed >= 2 else "first")
         elif sum(len(amounts(cell)) == 2 for cell in cells) >= 2 or "and result" in head:
             kinds.append("combined")
@@ -681,12 +681,12 @@ def series(table: dict) -> dict:
             elif len(found) == 2:
                 transfers[index].append(found[0])
                 results[index].append(found[1])
-            elif found and re.match(r"[+-]", text):
+            elif found and re.match(r"[+\-\u2212]", text) and not (role(row["label"]) == "spoilt" and found[0] < 0):
                 transfers[index].append(found[0])
                 results[index].append(None)
             else:
                 transfers[index].append(None)
-                results[index].append(found[0] if found else None)
+                results[index].append(abs(found[0]) if found else None)
     return {"kinds": kinds, "results": results, "transfers": transfers}
 
 
@@ -751,11 +751,48 @@ def merge(page: dict | None, cells: dict | None) -> dict:
             return good + 0.5 * (read is row["reads"][0])
 
         ranked = sorted(row["reads"], key=consistent, reverse=True)
-        row["results"] = [
-            next((results[count] for results, _ in ranked if count < len(results) and results[count] is not None), 0)
-            for count in range(counts)
-        ]
+        row["results"] = []
+        for count in range(counts):
+            prior = row["results"][-1] if row["results"] else 0
+            value = None
+            for results, moved in ranked:
+                if count < len(results) and results[count] is not None:
+                    value = results[count]
+                    break
+                step = moved[count - 1] if 0 < count <= len(moved) else None
+                if step is not None and count < len(results):
+                    value = 0 if step < 0 and row["role"] == "candidate" else prior
+                    break
+            row["results"].append(prior if value is None else value)
     return {"rows": rows, "counts": counts}
+
+
+def steps(row: dict, count: int) -> set[int]:
+    found = set()
+    for results, moved in row["reads"]:
+        if count - 1 < len(moved):
+            value = moved[count - 1] or 0
+            if value > 0 and count - 1 < len(results) and results[count - 1] == value:
+                found.add(0)
+            found.update(abs(option) for option in variants(value))
+    return found
+
+
+def named(names: list[str], elected: str) -> int | None:
+    text = fold(elected)
+    exact = [index for index, name in enumerate(names) if name and name in text]
+    if exact:
+        return max(exact, key=lambda index: len(names[index]))
+    words = [fold(word) for word in re.split(r"[\s,]+", re.sub(r"\(.*", "", elected))]
+    close = [
+        (difflib.SequenceMatcher(None, name, word).ratio(), index)
+        for index, name in enumerate(names)
+        if len(name) >= 4
+        for word in words
+        if len(word) >= 4
+    ]
+    best = max(close, default=(0.0, None))
+    return best[1] if best[0] >= 0.8 else None
 
 
 def overlap(a: dict, b: dict) -> float:
@@ -792,14 +829,27 @@ def poll(merged: dict, table: dict) -> int | None:
         if value
     ]
     printed.extend(amounts(table["valid_poll"])[:1] * 2)
+    quota, seats = amounts(table["quota"])[:1], amounts(table["seats"])[:1]
+    if quota and seats:
+        fits = [value for value in printed if value // (seats[0] + 1) + 1 == quota[0]]
+        if fits:
+            printed = fits
     return max(printed, key=printed.count) if printed else None
+
+
+def droop(table: dict, valid: int | None) -> int | None:
+    quota, seats = amounts(table["quota"])[:1], amounts(table["seats"])[:1]
+    if not quota or not seats or valid is None:
+        return quota[0] if quota else None
+    target = valid // (seats[0] + 1) + 1
+    return target if target in variants(quota[0]) else quota[0]
 
 
 def assess(merged: dict, table: dict) -> list[str]:
     issues = []
     valid = merged["valid"]
     seats = (amounts(table["seats"]) or [None])[0]
-    quota = (amounts(table["quota"]) or [None])[0]
+    quota = droop(table, valid)
     rows = [row for row in merged["rows"] if row["role"] != "total"]
     if sum(row["role"] == "total" for row in merged["rows"]) != 1:
         issues.append("no total row")
@@ -814,23 +864,33 @@ def assess(merged: dict, table: dict) -> list[str]:
     for row in rows:
         for count in range(1, merged["counts"]):
             before, after = row["results"][count - 1], row["results"][count]
-            moves = {
-                abs(value)
-                for _, moved in row["reads"]
-                if count - 1 < len(moved)
-                for value in variants(moved[count - 1] or 0)
-            }
+            moves = steps(row, count)
             if abs(after - before) not in moves and not (
                 after == 0
                 and row["role"] == "candidate"
                 and not any(results[count] for results, _ in row["reads"] if count < len(results))
             ):
                 issues.append(f"{row['label']}: count {count + 1}: {before} to {after}, transfers {sorted(moves)}")
-    names = {person(row["label"]) for row in rows if row["role"] == "candidate"}
+    names = [person(row["label"]) for row in rows if row["role"] == "candidate"]
     for elected in table["elected"]:
-        if not any(name and name in fold(elected) for name in names):
+        if named(names, elected) is None:
             issues.append(f"elected {elected} not among the candidates")
     return issues
+
+
+def settle(table: dict, shaped: dict, cells: dict | None) -> dict:
+    merged = merge(shaped, cells)
+    printed = len(
+        {word for heading in table["counts"] for word in ORDINALS if heading.lower().startswith(word.lower())}
+    )
+    if table["complete"] and 0 < printed < merged["counts"]:
+        merged["counts"] = printed
+        for row in merged["rows"]:
+            row["results"] = row["results"][:printed]
+    merged["valid"] = valid = poll(merged, table)
+    repair(merged, valid)
+    merged["changes"] = solve(merged, valid) if valid else []
+    return merged
 
 
 def tables(year: int) -> list[dict]:
@@ -844,17 +904,11 @@ def tables(year: int) -> list[dict]:
         shaped = page_grid(table)
         best = max(built, key=lambda cells: overlap(shaped, cells), default=None)
         cells = best if best is not None and overlap(shaped, best) >= 0.5 else None
-        merged = merge(shaped, cells)
-        printed = len(
-            {word for heading in table["counts"] for word in ORDINALS if heading.lower().startswith(word.lower())}
-        )
-        if table["complete"] and 0 < printed < merged["counts"]:
-            merged["counts"] = printed
-            for row in merged["rows"]:
-                row["results"] = row["results"][:printed]
-        merged["valid"] = valid = poll(merged, table)
-        repair(merged, valid)
-        merged["changes"] = solve(merged, valid) if valid else []
+        merged = settle(table, shaped, cells)
+        if cells is not None and assess(merged, table):
+            alone = settle(table, shaped, None)
+            if not assess(alone, table):
+                merged, cells = alone, None
         found.append(
             {
                 "year": year,
@@ -871,11 +925,11 @@ def tables(year: int) -> list[dict]:
 CONFUSED = {"3": "58", "5": "36", "6": "58", "8": "3609", "9": "80", "0": "89", "1": "7", "7": "1"}
 
 
-def variants(value: int) -> list[int]:
+def variants(value: int, wide: bool = False) -> list[int]:
     text = str(abs(value))
     found = [value]
     for position, digit in enumerate(text):
-        for other in CONFUSED.get(digit, ""):
+        for other in "0123456789".replace(digit, "") if wide else CONFUSED.get(digit, ""):
             if position == 0 and other == "0":
                 continue
             found.append(int(text[:position] + other + text[position + 1 :]))
@@ -885,18 +939,7 @@ def variants(value: int) -> list[int]:
 def solve(merged: dict, valid: int) -> list[tuple[int, int, int, int]]:
     rows = [row for row in merged["rows"] if row["role"] != "total"]
     counts = merged["counts"]
-    moves = [
-        [
-            {
-                abs(value)
-                for _, moved in row["reads"]
-                if 0 < count <= len(moved)
-                for value in variants(moved[count - 1] or 0)
-            }
-            for count in range(counts)
-        ]
-        for row in rows
-    ]
+    moves = [[steps(row, count) if count else set() for count in range(counts)] for row in rows]
     read = [
         [{results[count] or 0 for results, _ in row["reads"] if count < len(results)} for count in range(counts)]
         for row in rows
@@ -916,7 +959,14 @@ def solve(merged: dict, valid: int) -> list[tuple[int, int, int, int]]:
     def gap(count: int) -> int:
         return valid - sum(row["results"][count] for row in rows)
 
+    def cost(index: int, first: int, last: int) -> tuple[int, int]:
+        sums = sum(bool(gap(k)) for k in range(first, last + 1))
+        return sums + 2 * sum(broken(index, k) for k in range(first, last + 2)), sum(
+            abs(gap(k)) for k in range(first, last + 1)
+        )
+
     changes: list[tuple[int, int, int, int]] = []
+    wide = False
     for _ in range(200):
         best: tuple[float, int, int, int, int] | None = None
         for index, row in enumerate(rows):
@@ -924,37 +974,40 @@ def solve(merged: dict, valid: int) -> list[tuple[int, int, int, int]]:
             for count in range(counts):
                 if not (gap(count) or broken(index, count) or broken(index, count + 1)):
                     continue
-                end = count
-                while end + 1 < counts and results[end + 1] == results[count]:
-                    end += 1
-                for span in {(count, count), (count, end)}:
-                    first, last = span
-                    old = results[first]
-                    options = {old, *read[index][first]}
-                    for option in sorted({value for base in options for value in variants(base)}):
-                        if option == old or option < 0:
-                            continue
-                        before = sum(bool(gap(k)) for k in range(first, last + 1)) + sum(
-                            broken(index, k) for k in range(first, last + 2)
-                        )
+                old = results[count]
+                options = {old, *read[index][count]}
+                for option in sorted({value for base in options for value in variants(base, wide)}):
+                    if option == old or option < 0:
+                        continue
+                    delta = option - old
+                    first, last = count, count
+                    while True:
+                        before = cost(index, first, last)
                         for k in range(first, last + 1):
-                            results[k] = option
-                        after = sum(bool(gap(k)) for k in range(first, last + 1)) + sum(
-                            broken(index, k) for k in range(first, last + 2)
-                        )
+                            results[k] += delta
+                        after = cost(index, first, last)
                         for k in range(first, last + 1):
-                            results[k] = old
-                        if after < before:
+                            results[k] -= delta
+                        if after[0] < before[0]:
                             known = option in read[index][first]
-                            score = (after - before) - 0.5 * known
+                            score = (after[0] - before[0]) - 0.5 * known + 0.01 * (last - first)
+                            score += 0.1 * (after[1] >= before[1])
                             if best is None or score < best[0]:
-                                best = (score, index, first, last, option)
+                                best = (score, index, first, last, delta)
+                        last += 1
+                        if last >= counts or results[last] + delta not in {
+                            value for base in {results[last], *read[index][last]} for value in variants(base, wide)
+                        }:
+                            break
+        if best is None and not wide:
+            wide = True
+            continue
         if best is None:
             break
-        _, index, first, last, option = best
+        _, index, first, last, delta = best
         for count in range(first, last + 1):
-            changes.append((index, count, rows[index]["results"][count], option))
-            rows[index]["results"][count] = option
+            changes.append((index, count, rows[index]["results"][count], rows[index]["results"][count] + delta))
+            rows[index]["results"][count] += delta
     return changes
 
 
@@ -1044,6 +1097,20 @@ BY_ELECTIONS = {
     (1977, "p060"): date(1975, 3, 4),
     (198211, "p057"): date(1982, 5, 25),
     (1997, "p074"): date(1994, 11, 10),
+    (1965, "p048"): date(1964, 2, 19),
+    (1965, "p052"): date(1964, 2, 19),
+    (1965, "p053"): date(1964, 7, 8),
+    (1973, "p062"): date(1970, 4, 14),
+    (1977, "p058"): date(1976, 6, 10),
+    (1977, "p059"): date(1975, 3, 4),
+    (1977, "p062"): date(1973, 11, 27),
+    (198211, "p058"): date(1982, 7, 20),
+    (1997, "p073"): date(1994, 11, 10),
+    (1997, "p075"): date(1996, 4, 2),
+    (1997, "p076"): date(1994, 6, 9),
+    (1997, "p077"): date(1996, 4, 2),
+    (1997, "p078"): date(1994, 6, 9),
+    (1997, "p079"): date(1995, 6, 29),
 }
 ACTS = [
     (date(1948, 2, 4), 1947),
@@ -1168,13 +1235,32 @@ def title(name: str) -> str:
     return re.sub(r"\s+", " ", text.replace(" And ", " and ")).strip()
 
 
+MARKED = re.compile(r"^[\s*]*[†‡]")
+
+
+def given(label: str, text: str) -> float:
+    words = [fold(word) for word in re.sub(r"\(.*", "", text).split()]
+    return sum(
+        max((difflib.SequenceMatcher(None, fold(word), other).ratio() for other in words if other), default=0.0)
+        for word in re.sub(r"\(.*", "", label).replace(",", " ").split()
+        if fold(word)
+    )
+
+
 def winners(rows: list[dict], elected: list[str]) -> set[int] | None:
     chosen: set[int] = set()
     for text in elected:
         names = [index for index, row in enumerate(rows) if row["surname"] and row["surname"] in fold(text)]
         if not names:
-            return None
-        chosen.add(max(names, key=lambda index: similar(rows[index]["label"], text)))
+            if (index := named([row["surname"] for row in rows], text)) is None:
+                return None
+            names = [index]
+        chosen.add(
+            max(
+                names,
+                key=lambda index: similar(rows[index]["label"], text) + given(rows[index]["label"], text),
+            )
+        )
     return chosen if len(chosen) == len(elected) else None
 
 
@@ -1215,14 +1301,32 @@ def contest(entry: dict, areas: dict[int, dict[frozenset[str], str]]) -> dict:
         ]
         spoilt[0]["box"] = [*spoilt[0]["box"][:3], extra["box"][3]]
         rows.remove(extra)
-    candidates = [row for row in rows if row["role"] == "candidate"]
-    chosen = winners(candidates, table["elected"])
+    deemed = [
+        text
+        for text in [*table["elected"], *table["footnotes"]]
+        if MARKED.match(text) or "deemed to be elected" in text.lower()
+    ]
+    for row in rows:
+        row["speaker"] = (
+            row["role"] == "candidate"
+            and bool(MARKED.match(row["label"]))
+            and not any(row["results"])
+            and any(row["surname"] in fold(text) for text in deemed)
+        )
+    candidates = [row for row in rows if row["role"] == "candidate" and not row["speaker"]]
+    speakers = [row for row in rows if row["speaker"]]
+    elected = [text for text in table["elected"] if not (speakers and text in deemed)]
+    if len(speakers) > 1:
+        raise LookupError("more than one candidate is deemed elected")
+    chosen = winners(candidates, elected)
     if chosen is None:
         raise LookupError("elected names do not match the candidates one to one")
     if len(chosen) != amounts(table["seats"])[0]:
         raise LookupError(f"{len(chosen)} elected for {table['seats']} seats")
     for index, row in enumerate(candidates):
         row["elected"] = index in chosen
+    for row in speakers:
+        row["elected"] = True
     return {
         "year": year,
         "page": entry["page"],
@@ -1233,7 +1337,8 @@ def contest(entry: dict, areas: dict[int, dict[frozenset[str], str]]) -> dict:
         "act": act,
         "code": code,
         "seats": amounts(table["seats"])[0],
-        "quota": amounts(table["quota"])[0],
+        "total": amounts(table["seats"])[0] + len(speakers),
+        "quota": droop(table, merged["valid"]),
         "valid": merged["valid"],
         "electorate": (amounts(table["electorate"]) or [None])[0],
         "counts": merged["counts"],
@@ -1273,9 +1378,9 @@ def parse() -> None:
 
 
 RESOLVED = (
-    "The scanned print makes some digits look alike (3, 5, 6, 8, 9, and 0). Where a read of this table did not "
-    "add up, the look-alike digit was chosen that makes every count sum to the valid poll and every candidate's "
-    "total move by the printed transfer."
+    "The scanned print makes some digits hard to tell apart, most often 3, 5, 6, 8, 9, and 0. Where a read of this "
+    "table did not add up, each doubtful figure was replaced by the other reading of it or by a one-digit change, "
+    "whichever makes every count sum to the valid poll and every candidate's total move by the printed transfer."
 )
 LICENSE = "Irish public sector information licence, CC BY 4.0 terms"
 LICENSE_URL = "https://creativecommons.org/licenses/by/4.0/"
@@ -1435,7 +1540,7 @@ def emit() -> Path:
                 kind="body_seats",
                 body_id=body,
                 district_area_id=area,
-                magnitude=item["seats"],
+                magnitude=item["total"],
                 round_number=1,
                 electoral_system_id=system,
                 default_result_kind="counted",
@@ -1460,6 +1565,13 @@ def emit() -> Path:
                 is_default=True,
                 completeness=1,
             )
+            if item["total"] != item["seats"]:
+                cs.add(
+                    "note",
+                    entity_id=result_set,
+                    kind="caveat",
+                    body_md=CEANN.format(contested=item["seats"], total=item["total"]),
+                )
             page = page_id(item["year"], item["page"])
             values: list[tuple[UUID | None, int, int, int, list[int] | None]] = [
                 (None, VALID, 0, item["valid"], None),
@@ -1476,7 +1588,7 @@ def emit() -> Path:
                         if count
                     )
                     continue
-                position += 1
+                position += not row["speaker"]
                 key = f"{contest_key}:{fold(row['name'])}"
                 if sum(fold(other["name"] or "") == fold(row["name"]) for other in item["rows"]) > 1:
                     key = f"{key}:{position}"
@@ -1492,7 +1604,7 @@ def emit() -> Path:
                     contest_id=contest,
                     kind="candidate",
                     party_id=party,
-                    ballot_position=position,
+                    ballot_position=None if row["speaker"] else position,
                     ballot_label=row["name"],
                 )
                 cs.add(
@@ -1505,6 +1617,9 @@ def emit() -> Path:
                     member_of_party_id=party,
                     is_independent=party is None,
                 )
+                if row["speaker"]:
+                    cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected")
+                    continue
                 results = row["results"]
                 last = max((count for count, amount in enumerate(results) if amount), default=0)
                 values.extend(
