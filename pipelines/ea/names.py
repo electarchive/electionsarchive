@@ -1,6 +1,13 @@
 import re
 import unicodedata
 from itertools import combinations
+from typing import TYPE_CHECKING
+from uuid import UUID
+
+if TYPE_CHECKING:
+    from psycopg import Connection
+
+    from ea.changeset import Changeset
 
 SUFFIXES = {"jr", "sr", "ii", "iii", "iv"}
 TITLES = {"judge", "gen", "col", "capt", "maj", "dr", "rev", "hon", "mr", "mrs", "gov", "senator"}
@@ -144,3 +151,27 @@ def display(text: str, lang: str = "en", known: str | None = None) -> str:
         out.append(proper(word))
     out.append(text[end:])
     return "".join(out)
+
+
+def foreign_preferred(conn: Connection, cs: Changeset, pipeline: str) -> set[UUID]:
+    held: set[UUID] = set()
+    for name_id, entity, text, preferred, lang, kind in conn.execute(
+        """select n.id, n.entity_id, n.text, n.is_preferred, n.lang, n.kind
+           from name n join person p on p.id = n.entity_id
+           join changeset c on c.id = n.changeset_id and c.pipeline = %s
+           where exists (
+             select 1 from name o join changeset oc on oc.id = o.changeset_id
+             where o.entity_id = n.entity_id and o.lang = 'en' and o.kind = 'official' and o.is_preferred
+               and oc.pipeline <> %s)""",
+        [pipeline, pipeline],
+    ).fetchall():
+        held.add(entity)
+        if preferred and lang == "en" and kind == "official":
+            cs.add(
+                "name_drop",
+                name_id=name_id,
+                entity_id=entity,
+                text=text,
+                reason="another pipeline's preferred name stands for this person",
+            )
+    return held

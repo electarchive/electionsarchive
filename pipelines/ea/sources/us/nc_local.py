@@ -11,7 +11,7 @@ import shapefile
 
 from ea import raw
 from ea.changeset import Changeset, slug
-from ea.names import display
+from ea.names import display, foreign_preferred
 from ea.sources.us.ncsbe import FILES, PUBLISHER, TITLE
 from ea.sources.us.ncsbe import SOURCE as NCSBE
 from ea.store import DATA, connect
@@ -483,7 +483,11 @@ def emit() -> Path:
             polity="US-NC",
         )
 
+        foreign = foreign_preferred(conn, cs, SOURCE)
+
         def name(entity: UUID, text: str) -> None:
+            if entity in foreign and entity not in cs.minted:
+                return
             cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
 
         source = cs.source(PUBLISHER, TITLE)

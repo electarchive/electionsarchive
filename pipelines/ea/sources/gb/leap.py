@@ -12,6 +12,7 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
+from ea.names import foreign_preferred
 from ea.sources.gb import leh
 from ea.store import DATA, connect
 
@@ -414,7 +415,11 @@ def emit() -> Path:
             polity="GB",
         )
 
+        foreign = foreign_preferred(conn, cs, SOURCE)
+
         def name(entity: UUID, text: str) -> None:
+            if entity in foreign and entity not in cs.minted:
+                return
             cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
 
         gb = cs.polity("GB")

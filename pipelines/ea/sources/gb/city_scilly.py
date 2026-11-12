@@ -13,6 +13,7 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
+from ea.names import foreign_preferred
 from ea.store import DATA, Connection, connect
 
 SOURCE = "gb.city_scilly"
@@ -1226,7 +1227,11 @@ def emit() -> Path:
             polity="GB",
         )
 
+        foreign = foreign_preferred(conn, cs, SOURCE)
+
         def name(entity: UUID, text: str, kind: str = "official") -> None:
+            if kind == "official" and entity in foreign and entity not in cs.minted:
+                return
             cs.add("name", entity_id=entity, text=text, lang="en", kind=kind, is_preferred=kind == "official")
 
         gb = cs.polity("GB")
@@ -1256,10 +1261,14 @@ def emit() -> Path:
                 parties[description] = found
             return parties[description], False
 
+        named: set[UUID] = set()
+
         def add_person(key: str, given: str, surname: str) -> UUID:
             person = cs.key("gb.city_scilly.person", key)
             cs.add("person", id=person)
-            name(person, f"{given} {surname}")
+            if person not in named:
+                named.add(person)
+                name(person, f"{given} {surname}")
             return person
 
         city_area = cs.area("gb.lad", CITY_CODE)

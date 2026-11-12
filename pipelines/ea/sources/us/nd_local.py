@@ -15,6 +15,7 @@ from psycopg import Connection
 
 from ea import raw
 from ea.changeset import NAMESPACE, Changeset, slug
+from ea.names import foreign_preferred
 from ea.offices import Offices
 from ea.store import DATA, connect
 
@@ -227,8 +228,12 @@ def emit() -> Path:
 
         wanted: dict[UUID, str] = {}
 
+        foreign = foreign_preferred(conn, cs, SOURCE)
+
         def name(entity: UUID, text: str) -> None:
             wanted[entity] = text
+            if entity in foreign and entity not in cs.minted:
+                return
             cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
 
         source = cs.source(PUBLISHER, TITLE)

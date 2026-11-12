@@ -8,7 +8,7 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
-from ea.names import display
+from ea.names import display, foreign_preferred
 from ea.sources.us.phila_returns import LISTING, METHOD, PARSED, PUBLISHER, TITLE
 from ea.sources.us.phila_returns import SOURCE as RETURNS
 from ea.store import connect
@@ -290,7 +290,11 @@ def emit() -> Path:
             }
         )
 
+        foreign = foreign_preferred(conn, cs, SOURCE)
+
         def name(entity: UUID, text: str) -> None:
+            if entity in foreign and entity not in cs.minted:
+                return
             if entity in named:
                 return
             named.add(entity)
