@@ -1451,7 +1451,7 @@ plate	il	ilce	bucak	name	printed	page	population	boxes	registered	voters	valid
 3	Afyonkarahisar	Sandıklı	Merkez	Omerkuyu	Omerkuyu	80	242	1	109	95	81
 3	Afyonkarahisar	Sandıklı	Merkez	Reşadiye	Reşadiye	80	540	1	288	257	250
 3	Afyonkarahisar	Sandıklı	Merkez	Saltık	Saltık	80	705		341	310	280
-3	Afyonkarahisar	Sandıklı	Merkez	Selçik	Selçik	80	418	1	31	210	
+3	Afyonkarahisar	Sandıklı	Merkez	Selçik	Selçik	80	418	1	231	210	199
 3	Afyonkarahisar	Sandıklı	Merkez	""	""	80	283	1	105	99	92
 3	Afyonkarahisar	Sandıklı	Merkez	Sorkun	Sorkun	80	1473	3	751	636	596
 3	Afyonkarahisar	Sandıklı	Merkez	Susuz	Susuz	80	377		195	144	144
@@ -5906,7 +5906,7 @@ plate	il	ilce	bucak	name	printed	page	population	boxes	registered	voters	valid
 10	Balıkesir	Savaştepe	Sarıbeyler	Çukurçayır	Çukurçayır	303	114		71	69	65
 10	Balıkesir	Savaştepe	Sarıbeyler	Güven	Güven	303	137		96	86	62
 10	Balıkesir	Savaştepe	Sarıbeyler	Koneurca	Koneurca	303	192		115	104	90
-10	Balıkesir	Savaştepe	Sarıbeyler	Kovukyurt	Kovukyurt	303	153	1	1	50	
+10	Balıkesir	Savaştepe	Sarıbeyler	Kovukyurt	Kovukyurt	303	153	1	100	90	90
 10	Balıkesir	Savaştepe	Sarıbeyler	Kurudere	Kurudere	303	309		180	150	137
 10	Balıkesir	Savaştepe	Sarıbeyler	Küsyen	Küsyen	303	279	1	158	136	125
 10	Balıkesir	Savaştepe	Sarıbeyler	Madenmezarı	Madenmezarı	303	276		151	146	129
@@ -30130,12 +30130,12 @@ plate	il	ilce	bucak	name	printed	page	population	boxes	registered	voters	valid
 58	Sivas	Gemerek	Merkez	Kekliktepe	Kekliktepe	1530	400		38	22	
 58	Sivas	Gemerek	Merkez	Ku-kgöz	Ku-kgöz	1530	11	1		28	
 58	Sivas	Gemerek	Merkez	Oğlakh	Oğlakh	1530	31			30	
-58	Sivas	Gemerek	Merkez	Ovacık	Ovacık	1530	163		17	94	
+58	Sivas	Gemerek	Merkez	Ovacık	Ovacık	1530	163		317	264	248
 58	Sivas	Gemerek	Merkez	Ölçekli	Ölçekli	1530					
 58	Sivas	Gemerek	Merkez	Özbağı	Özbağı	1530					
 58	Sivas	Gemerek	Merkez	Sırçalı	Sırçalı	1530			80	18	
 58	Sivas	Gemerek	Merkez	Susuzlar	Susuzlar	1530	337		27	7	1
-58	Sivas	Gemerek	Merkez	Şahin	Şahin	1530	147	1	1	40	
+58	Sivas	Gemerek	Merkez	Şahin	Şahin	1530	147	1	201	140	112
 58	Sivas	Gemerek	Merkez	Tepehan	Tepehan	1530	253		98	76	16
 58	Sivas	Gemerek	Merkez	Yağıbasan	Yağıbasan	1530	547			95	
 58	Sivas	Gemerek	Merkez	Yusufşeyh	Yusuf şeyh	1530	269			99	
@@ -30143,7 +30143,7 @@ plate	il	ilce	bucak	name	printed	page	population	boxes	registered	voters	valid
 58	Sivas	Gemerek	Vazıdan	Mursal	Mursal B.M	1530	419	2		54	44
 58	Sivas	Gemerek	Vazıdan	Bahtiyar	Bahtiyar	1530		1		49	49
 58	Sivas	Gemerek	Vazıdan	Gökçebel	Gökçebel	1530	362	1		9	86
-58	Sivas	Gemerek	Vazıdan	Göndüren	Göndüren	1530		1	7	75	
+58	Sivas	Gemerek	Vazıdan	Göndüren	Göndüren	1530		1	207	175	173
 58	Sivas	Gemerek	Vazıdan	Karazar	Karazar	1530	645	1	45	14	8
 58	Sivas	Gemerek	Vazıdan	Kavaklisu	Kavaklisu	1530	390				
 58	Sivas	Gemerek	Vazıdan	Kızücaören	Kızücaören	1530	314		94	94	90

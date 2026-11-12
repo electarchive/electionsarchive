@@ -661,7 +661,10 @@ def parse() -> None:
                 listed += [("koy", district, bucak, row) for row in group["koys"]]
         for seq, (level, district, bucak, row) in enumerate(listed):
             width, height = row["size"]
-            final = row.get("final", {})
+            final = {
+                **row.get("final", {}),
+                **{k: (v, "page") for k, v in CELL_FIXES.get((place["plate"], row["page"], row["name"]), {}).items()},
+            }
             record = {
                 "plate": place["plate"],
                 "seq": seq,
@@ -726,6 +729,13 @@ OVERRIDES: dict[tuple[int, int], tuple[str, str | None] | None] = {
     (35, 392): ("sehir", "35:Kınık"),
     (35, 393): ("sehir", "35:Kınık"),
     (51, 306): ("sehir", "51:Ulukışla"),
+}
+CELL_FIXES: dict[tuple[int, int, str], dict[str, int]] = {
+    (3, 80, "Selçik"): {"registered": 231, "voters": 210, "valid": 199},
+    (10, 303, "Kovukyurt"): {"registered": 100, "voters": 90, "valid": 90},
+    (58, 1530, "Ovacık"): {"registered": 317, "voters": 264, "valid": 248},
+    (58, 1530, "Şahin"): {"registered": 201, "voters": 140, "valid": 112},
+    (58, 1530, "Göndüren"): {"registered": 207, "voters": 175, "valid": 173},
 }
 LEVELS = {"il": "by-province", "ilce": "by-district", "sehir": "by-village", "koy": "by-village"}
 
