@@ -1258,9 +1258,13 @@ export const seats = {
             and ((bp.path = 'us' and b.kind = 'lower_house') or not (bp.path = 'us' or bp.path like 'us/%'))
             and not (bp.path = 'ie' and e.kind = 'by_election')
         ),
+        ran as materialized (
+          select e.id, e.kind, e.status, e.date_from, e.parent_id from election e
+          where e.id in (select c.election_id from contest c where c.body_id = (select body from this))
+        ),
         last as (
           select e.date_from as day, coalesce(e.parent_id, e.id) as election
-          from this t join contest c on c.body_id = t.body join election e on e.id = c.election_id
+          from this t cross join ran e
           where e.status = 'held'
             and ((t.kind <> 'local' and e.kind = 'general' and e.date_from < t.day - case when t.kind = 'general' then 120 else 0 end)
               or (t.kind = 'local' and e.kind = 'local' and e.date_from <= t.day - interval '42 months'))
@@ -1269,9 +1273,9 @@ export const seats = {
         prev as materialized (
           select c.id, c.district_area_id as area, coalesce(bs.as_of, e.date_from) as drawn, c.notional,
             case when e.kind = 'by_election' then e.date_from else (select day from last) end as day
-          from contest c join election e on e.id = c.election_id
+          from ran e join contest c on c.election_id = e.id and c.body_id = (select body from this)
           left join boundary_set bs on bs.id = c.boundary_set_id
-          where c.body_id = (select body from this) and (not c.notional or c.district_area_id = (select area from this))
+          where (not c.notional or c.district_area_id = (select area from this))
             and ((e.kind = case when (select kind from this) = 'local' then 'local' else 'general' end::election_kind
               and e.date_from between (select day from last) - 200 and (select day from last))
               or (e.kind = 'by_election' and (select kind from this) = 'by_election'
@@ -1300,17 +1304,17 @@ export const seats = {
             join area_geometry gp on gp.area_id = p.area and gp.valid @> p.drawn
             join area_geometry gn on gn.area_id = t.area and gn.valid @> t.drawn
             cross join lateral (select ST_Intersection(${coarse("gp")}, ${coarse("gn")}, 0.00001) as geom) x
-            where gp.geom && gn.geom and ST_Intersects(gp.geom, gn.geom)
+            where s.id is null and gp.geom && gn.geom and ST_Intersects(gp.geom, gn.geom)
               and (not t."isIe" or ST_Area(x.geom) > 0.5 * ST_Area(gn.geom))
             order by ST_Area(x.geom) desc, p.day desc limit 1
-          ) g on s.id is null
+          ) g on true
           left join lateral (
             select p.id, p.area, p.day from prev p
-            where exists (
+            where s.id is null and g.id is null and exists (
               select from name a join name b on lower(a.text) = lower(b.text)
               where a.entity_id = t.area and b.entity_id = p.area
             ) order by p.day desc limit 1
-          ) n on s.id is null and g.id is null
+          ) n on true
         ),
         top as materialized (
           select rs.contest_id as contest, rs.k as set, e.date_from as day, o.id, o.k, o.party_id, coalesce(x.seats, 1) as seats, v.votes
