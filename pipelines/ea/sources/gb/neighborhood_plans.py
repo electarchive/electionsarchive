@@ -38,6 +38,9 @@ PAGE_PREFIXES = (
     "https://hardenvillagecouncil.gov.uk/",
     "https://www.middevon.gov.uk/your-council/",
     "https://www.cherwell.gov.uk/info/",
+    "https://www.bassetlaw.gov.uk/council-and-democracy/",
+    "https://www.north-norfolk.gov.uk/info/",
+    "https://eastcambs.gov.uk/about-council/",
 )
 HANDWRITTEN = (
     "https://info.ambervalley.gov.uk/docarc/",
@@ -59,6 +62,10 @@ PAGES = {
         "neighbourhood-planning-referendum-results"
     ),
     "E07000085": "https://www.easthants.gov.uk/elections/election-results",
+    "E07000171": (
+        "https://www.bassetlaw.gov.uk/council-and-democracy/elections-in-bassetlaw/elections-information/"
+        "past-election-results/election-results-2021/neighbourhood-plan-referendum-results-2021/"
+    ),
     "E07000070": (
         "https://www.chelmsford.gov.uk/voting-and-elections/results-of-elections/"
         "neighbourhood-planning-referendum-results"
