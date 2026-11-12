@@ -167,6 +167,8 @@ Responses are cached in the raw cache, keyed by the model, the prompt version, t
 
 Live workers poll official machine-readable feeds where they exist, and official results pages, such as HTML, PDF, or results platforms that vendors host for election offices, where they do not. They poll at a polite interval, send conditional requests, back off when a server pushes back, and identify themselves with a User-Agent header. Each update writes a live result set and publishes a snapshot with a manifest. Live values never become certified values. Certified results come from post-count imports, which replace the live set through the usual changeset path. Any restore or copy into `live.fetch`, `live.frame`, or `live.issue` must re-run the setval statements in the `live_sequences` migration, or the next insert hits a duplicate key. The architecture document covers how live results are served.
 
+Where a feed splits its counts by ballot type, as Clarity's `VoteType` and Enhanced Voting's `groupName` do, `live.value` keeps one row per channel, using the core channel codes (1 election day, 2 early, 3 postal, 5 provisional). A unit in a frame has either a single row on channel 0 or the full split, never both. The label map in `enr_2026.CHANNELS` turns host labels into channels; a label missing from the map puts that unit on channel 0, and an issue is filed for the feed. Readers that want one total per unit sum the rows across channels. `ea live backfill [--feed id]` rebuilds stored frames by ballot type from their cached raw files, and leaves any frame whose rebuilt totals differ from what it holds.
+
 ## Adding a source
 
 Follow these steps to add a source. The example uses a hypothetical source, `xx.example`.

@@ -19,7 +19,7 @@ def collect(client: httpx.Client) -> dict[str, tuple[bytes, str]]:
 
 def plan(
     conn: Connection, paths: dict[str, Path]
-) -> tuple[list[tuple[str, str, UUID, dict[tuple[UUID, UUID], int], tuple[int, int], str | None]], list[str]]:
+) -> tuple[list[tuple[str, str, UUID, dict[tuple[UUID, UUID, int], int], tuple[int, int], str | None]], list[str]]:
     path = paths[DELEGATE_2026]
     sha = hashlib.sha256(path.read_bytes()).hexdigest()
     if sha != READ:
@@ -35,14 +35,14 @@ def plan(
         [CONTEST],
     ).fetchall()
     districts = read(path, DAY_2026, KEYWORDS_2026)
-    sums: dict[tuple[UUID, UUID], int] = {}
+    sums: dict[tuple[UUID, UUID, int], int] = {}
     unmatched = []
     for keyword in KEYWORDS_2026:
         hits = [option for _, option, label in options if keyword in label]
         if len(hits) != 1:
             unmatched.append(f"{CONTEST}: {len(hits)} options for {keyword}")
             continue
-        sums[(unit, hits[0])] = sum(votes[keyword] for votes in districts.values())
+        sums[(unit, hits[0], 0)] = sum(votes[keyword] for votes in districts.values())
     if unmatched:
         return [], unmatched
     reporting = (len(districts), len(districts))

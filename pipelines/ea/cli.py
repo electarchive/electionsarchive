@@ -174,14 +174,17 @@ def main() -> None:
     living = commands.add_parser("live", help="poll official election night feeds into the live schema")
     living.add_argument(
         "action",
-        choices=("run", "sync", "status", "check"),
-        help="poll this poller's enabled feeds until stopped, load ea/live_feeds.toml into live.feed, list feeds, or "
-        "check that each feed, state, and page will work on the night (exits nonzero on any red row)",
+        choices=("run", "sync", "status", "check", "backfill"),
+        help="poll this poller's enabled feeds until stopped, load ea/live_feeds.toml into live.feed, list feeds, "
+        "check that each feed, state, and page will work on the night (exits nonzero on any red row), or rebuild "
+        "stored frames by ballot type from their raw files where the totals still match",
     )
     living.add_argument("--poller", default="fsn1", help="which feeds to poll, by their poller column")
     living.add_argument("--once", action="store_true", help="poll each due feed once and stop")
     living.add_argument(
-        "--feed", help="with check: print one feed's frame totals and unresolved issues, not the readiness table"
+        "--feed",
+        help="with check: print one feed's frame totals and unresolved issues, not the readiness table; with "
+        "backfill: rebuild only this feed",
     )
     living.add_argument(
         "--contest",
@@ -237,6 +240,8 @@ def main() -> None:
                 raise SystemExit(live_check.feed_view(args.feed, args.contest) if args.feed else live_check.run())
             if args.action == "run":
                 live.run(args.poller, args.once)
+            elif args.action == "backfill":
+                print(live.backfill(args.feed))
             else:
                 print(getattr(live, args.action)())
         case "i18n":

@@ -1,4 +1,6 @@
+import contextlib
 import hashlib
+import io
 import json
 import time
 import tomllib
@@ -208,7 +210,7 @@ def poll(feed: str, adapter: str, params: dict[str, str], client: httpx.Client) 
             issue(conn, feed, "unmatched", line)
         written = 0
         frames: list[
-            tuple[UUID, datetime, dict[tuple[UUID, UUID], int], tuple[int, int], dict[UUID, tuple[float, int]]]
+            tuple[UUID, datetime, dict[tuple[UUID, UUID, int], int], tuple[int, int], dict[UUID, tuple[float, int]]]
         ] = []
         for _, contest_key, contest, sums, reporting, stamp in tallies:
             as_of = datetime.fromisoformat(str(stamp)) if stamp else fetched_at
@@ -220,7 +222,7 @@ def poll(feed: str, adapter: str, params: dict[str, str], client: httpx.Client) 
                 continue
             if not any(sums.values()):
                 continue
-            units = {unit for unit, _ in sums}
+            units = {unit for unit, _, _ in sums}
             told = {unit: value for unit, value in expected.get(contest_key, {}).items() if unit in units}
             previous = conn.execute(
                 """select f.k, f.as_of from live.frame f
@@ -230,12 +232,7 @@ def poll(feed: str, adapter: str, params: dict[str, str], client: httpx.Client) 
             if previous is not None:
                 if previous[1] > as_of:
                     continue
-                stored = {
-                    (unit, option): int(votes)
-                    for unit, option, votes in conn.execute(
-                        "select unit_id, option_id, votes from live.value where frame_k = %s", [previous[0]]
-                    ).fetchall()
-                }
+                stored = held(conn, previous[0])
                 known = (
                     {
                         unit: (float(share), int(total))
@@ -276,15 +273,83 @@ def poll(feed: str, adapter: str, params: dict[str, str], client: httpx.Client) 
                    values (%s, %s, %s, %s, %s, %s) returning k""",
                 [feed, contest, as_of, fetch, reporting[0] or None, reporting[1] or None],
             ).fetchall()[0][0]
-            with conn.cursor().copy("copy live.value (frame_k, unit_id, option_id, votes) from stdin") as copy:
-                for (unit, option), votes in sums.items():
-                    copy.write_row((k, unit, option, votes))
+            write(conn, k, sums)
             if told:
                 with conn.cursor().copy("copy live.expectation (frame_k, unit_id, share, expected) from stdin") as copy:
                     for unit, (share, total) in told.items():
                         copy.write_row((k, unit, share, total))
             written += 1
         return f"{written} frames" + (f", {len(set(unmatched))} unmatched" if unmatched else "")
+
+
+def backfill(feed: str | None = None) -> str:
+    counts: dict[str, int] = {}
+    with connect() as conn:
+        fetches = conn.execute(
+            """select x.id, d.params->>'state', x.path from live.fetch x join live.feed d on d.id = x.feed_id
+               where d.adapter = 'us.enr_2026' and x.status = 'frame' and x.path is not null
+                 and (%s::text is null or x.feed_id = %s)
+               order by x.id""",
+            [feed, feed],
+        ).fetchall()
+        for fetch, state, path in fetches:
+            for k, verdict, sums in rebuilt(conn, fetch, state, Path(path)):
+                counts[verdict] = counts.get(verdict, 0) + 1
+                if verdict == "split":
+                    conn.execute("delete from live.value where frame_k = %s", [k])
+                    write(conn, k, sums)
+            conn.commit()
+    return f"{len(fetches)} fetches: " + ", ".join(
+        f"{count} frames {verdict}" for verdict, count in sorted(counts.items())
+    )
+
+
+def held(conn: Connection, k: int) -> dict[tuple[UUID, UUID, int], int]:
+    return {
+        (unit, option, channel): int(votes)
+        for unit, option, channel, votes in conn.execute(
+            "select unit_id, option_id, channel, votes from live.value where frame_k = %s", [k]
+        ).fetchall()
+    }
+
+
+def rebuilt(
+    conn: Connection, fetch: int, state: str, folder: Path
+) -> list[tuple[int, str, dict[tuple[UUID, UUID, int], int]]]:
+    frames = conn.execute("select k, contest_id from live.frame where fetch_id = %s", [fetch]).fetchall()
+    if not (folder / "index.json").exists():
+        return [(k, "without raw files", {}) for k, _ in frames]
+    paths = {url: folder / name for url, name in json.loads((folder / "index.json").read_text()).items()}
+    with contextlib.redirect_stdout(io.StringIO()):
+        tallies, _ = enr_2026.plan(conn, enr_2026.table({state: paths}), lambda _, __: None)
+    found = {contest: sums for _, _, contest, sums, _, _ in tallies}
+    verdicts = []
+    for k, contest in frames:
+        stored = held(conn, k)
+        kept = {(unit, option) for unit, option, _ in stored}
+        sums = {key: votes for key, votes in found.get(contest, {}).items() if key[:2] in kept}
+        verdicts.append(
+            (
+                k,
+                "not rebuilt"
+                if not sums
+                else "with other totals"
+                if enr_2026.totals(sums) != enr_2026.totals(stored)
+                else "without a split"
+                if not any(channel for _, _, channel in sums)
+                else "already split"
+                if sums == stored
+                else "split",
+                sums,
+            )
+        )
+    return verdicts
+
+
+def write(conn: Connection, k: int, sums: dict[tuple[UUID, UUID, int], int]) -> None:
+    with conn.cursor().copy("copy live.value (frame_k, unit_id, option_id, channel, votes) from stdin") as copy:
+        for (unit, option, channel), votes in sums.items():
+            copy.write_row((k, unit, option, channel, votes))
 
 
 def record(

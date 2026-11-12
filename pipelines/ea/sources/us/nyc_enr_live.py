@@ -75,7 +75,7 @@ def inside(conn: Connection, feed: str, contest: UUID) -> bool:
 
 def plan(
     conn: Connection, feed: str, paths: dict[str, Path]
-) -> tuple[list[tuple[str, str, UUID, dict[tuple[UUID, UUID], int], tuple[int, int], str | None]], list[str]]:
+) -> tuple[list[tuple[str, str, UUID, dict[tuple[UUID, UUID, int], int], tuple[int, int], str | None]], list[str]]:
     boroughs = dict(
         conn.execute(
             "select code, id from reporting_unit where scheme_code = 'us.county' and code = any(%s)",
@@ -147,7 +147,7 @@ def plan(
             name = ballot_name or label or ""
             split = words(name)
             roots[label if kind in ("answer", "write_in") else (split[0], split[-1]) if split else name] = option
-        sums: dict[tuple[UUID, UUID], int] = {}
+        sums: dict[tuple[UUID, UUID, int], int] = {}
         for index, name in enumerate(names):
             if name in ("YES", "NO"):
                 option = roots.get(name.title())
@@ -162,7 +162,7 @@ def plan(
                 unmatched.append(f"{title}: no option for {name}")
                 continue
             for borough, votes in places.items():
-                key = (boroughs[COUNTIES[borough]], option)
+                key = (boroughs[COUNTIES[borough]], option, 0)
                 sums[key] = sums.get(key, 0) + votes[index]
         tallies.append(("NY", contest_key, contest, sums, (0, 0), as_of.isoformat() if as_of else None))
     return tallies, unmatched

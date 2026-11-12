@@ -246,6 +246,49 @@ NOTE = (
 TAGS = re.compile(r"(?:\s*(?:\([A-Za-z]{1,4}\)|\*))+$")
 WRITE_IN = re.compile(r"write-?in|scattering|\(W\)$", re.IGNORECASE)
 NO_CANDIDATE = re.compile(r"^no candidate", re.IGNORECASE)
+CHANNELS = {
+    "total votes": 0,
+    "vote by mail/provisional": 0,
+    "election day": 1,
+    "election": 1,
+    "election day votes": 1,
+    "election day total votes": 1,
+    "polling": 1,
+    "precinct votes": 1,
+    "early": 2,
+    "early vote": 2,
+    "early votes": 2,
+    "early voting": 2,
+    "early voting - central": 2,
+    "early voting - regional": 2,
+    "ev in-person": 2,
+    "advance": 2,
+    "advance voting": 2,
+    "advanced voting": 2,
+    "one stop": 2,
+    "absentee": 3,
+    "absentee - county": 3,
+    "absentee - local": 3,
+    "absentee votes": 3,
+    "absentee by mail": 3,
+    "absentee/evbm": 3,
+    "av counting boards": 3,
+    "mailed absentee": 3,
+    "mail ballots": 3,
+    "mail-in": 3,
+    "mail-in/absentee votes": 3,
+    "ev mail": 3,
+    "vbm": 3,
+    "vote by mail": 3,
+    "post-election": 3,
+    "provisional": 5,
+    "provionsal": 5,
+    "provisional votes": 5,
+    "affidavit": 5,
+    "failsafe": 5,
+    "failsafe provisional": 5,
+}
+STATE_CHANNELS = {("AZ", "early voting"): 3, ("AZ", "late early*"): 3}
 
 
 def office_name(text: str) -> str:
@@ -842,17 +885,25 @@ def ev_export(state: str, path: Path):
             seat = ev_seat(state, name)
             reporting, total = precincts[item["id"]]
             for option in item["ballotOptions"]:
-                yield {
-                    **seat,
-                    "party": option["politicalParty"] or "",
-                    "county": county,
-                    "candidate": TAGS.sub("", option["name"]).strip(),
-                    "write_in": bool(WRITE_IN.search(option["name"])),
-                    "votes": int(option["voteCount"] or 0),
-                    "as_of": export["createdAt"],
-                    "reporting": reporting,
-                    "total": total,
-                }
+                votes = int(option["voteCount"] or 0)
+                groups = [
+                    (group["groupName"], int(group["voteCount"] or 0)) for group in option.get("groupResults") or []
+                ]
+                for ballot, count in (
+                    groups if len(groups) > 1 and sum(count for _, count in groups) == votes else [("", votes)]
+                ):
+                    yield {
+                        **seat,
+                        "party": option["politicalParty"] or "",
+                        "county": county,
+                        "candidate": TAGS.sub("", option["name"]).strip(),
+                        "write_in": bool(WRITE_IN.search(option["name"])),
+                        "votes": count,
+                        "ballot": ballot,
+                        "as_of": export["createdAt"],
+                        "reporting": reporting,
+                        "total": total,
+                    }
 
 
 def rows(state: str, url: str, path: Path, urls: dict[str, Path]):
@@ -1007,7 +1058,8 @@ def rows(state: str, url: str, path: Path, urls: dict[str, Path]):
             if tenant and state != "MI" and (found is None if state == "TX" else found is not None):
                 continue
             for choice in contest.iter("Choice"):
-                for kind in choice.iter("VoteType"):
+                kinds = list(choice.iter("VoteType"))
+                for kind in kinds:
                     for place in kind:
                         yield {
                             "office": "other"
@@ -1026,6 +1078,7 @@ def rows(state: str, url: str, path: Path, urls: dict[str, Path]):
                             "candidate": re.sub(r"\s*(\(I\)|\*)$", "", choice.get("text") or "").strip(),
                             "write_in": "write-in" in (choice.get("text") or "").lower(),
                             "votes": int(place.get("votes") or 0),
+                            "ballot": (kind.get("name") or "") if len(kinds) > 1 else "",
                             "as_of": as_of,
                             "reporting": int(contest.get("precinctsReported") or 0),
                             "total": int(contest.get("precinctsParticipating") or 0),
@@ -1466,10 +1519,26 @@ def table(pages: dict[str, dict[str, Path]]) -> pl.DataFrame:
             "candidate": pl.String,
             "write_in": pl.Boolean,
             "votes": pl.Int64,
+            "ballot": pl.String,
             "as_of": pl.String,
             "reporting": pl.Int64,
             "total": pl.Int64,
         },
+    ).with_columns(channel=ballot_channel())
+
+
+def ballot_channel() -> pl.Expr:
+    label = pl.col("ballot").fill_null("").str.strip_chars().str.to_lowercase()
+    return (
+        pl.when(label == "")
+        .then(0)
+        .otherwise(
+            pl.concat_str(pl.col("state"), label, separator="|").replace_strict(
+                {f"{state}|{name}": code for (state, name), code in STATE_CHANNELS.items()}, default=None
+            )
+        )
+        .fill_null(label.replace_strict(CHANNELS, default=None))
+        .cast(pl.Int16)
     )
 
 
@@ -1484,9 +1553,20 @@ def countywide(key: str) -> bool:
 
 def plan(
     conn: Connection, frame: pl.DataFrame, scatter: Callable[[str, UUID], UUID | None], also: Sequence[str] = ()
-) -> tuple[list[tuple[str, str, UUID, dict[tuple[UUID, UUID], int], tuple[int, int], str | None]], list[str]]:
+) -> tuple[list[tuple[str, str, UUID, dict[tuple[UUID, UUID, int], int], tuple[int, int], str | None]], list[str]]:
+    if "channel" not in frame.columns:
+        frame = frame.with_columns(ballot=pl.lit(None, pl.String), channel=pl.lit(0, pl.Int16))
+    unmatched = [
+        f"{state}: ballot type {ballot} has no channel; its units stay on all channels"
+        for state, ballot in frame.filter(pl.col("channel").is_null() & (pl.col("ballot").fill_null("") != ""))
+        .select("state", "ballot")
+        .unique()
+        .sort("state", "ballot")
+        .iter_rows()
+    ]
     frame = (
-        frame.filter(~pl.col("candidate").fill_null("").str.contains(NOBODY))
+        frame.with_columns(pl.col("channel").fill_null(0))
+        .filter(~pl.col("candidate").fill_null("").str.contains(NOBODY))
         .with_columns(
             candidate=pl.when(
                 pl.col("party").is_not_null() & pl.col("candidate").str.starts_with(pl.col("party") + " ")
@@ -1542,7 +1622,6 @@ def plan(
         counties[("02", code)] = id
     for code, id in conn.execute("select code, id from reporting_unit where scheme_code = 'us.state'").fetchall():
         counties[(code, code)] = id
-    unmatched: list[str] = []
     work: list[tuple[str, str, UUID, pl.DataFrame, UUID | None]] = []
     local_keys: set[str] = set()
     clashed: set[str] = set()
@@ -2056,8 +2135,8 @@ def plan(
             if state in ("AK", "AL", "FL", "NJ", "NM", "SD", "ND", "NE", "MT")
             else group.select(pl.col("reporting").max(), pl.col("total").max()).row(0)
         )
-        sums: dict[tuple[UUID, UUID], int] = {}
-        for county, name, votes in group.select("county", "candidate", "votes").iter_rows():
+        sums: dict[tuple[UUID, UUID, int], int] = {}
+        for county, name, channel, votes in group.select("county", "candidate", "channel", "votes").iter_rows():
             option = ballots.get(name)
             unit = place or (
                 counties.get((FIPS[state], plain(ALIASES.get((state, plain(county)), county))))
@@ -2069,9 +2148,25 @@ def plan(
             if unit is None:
                 unmatched.append(f"{contest_key}: no county {county}")
                 continue
-            sums[(unit, option)] = sums.get((unit, option), 0) + votes
-        tallies.append((state, contest_key, contest, sums, reporting, group["as_of"].drop_nulls().max()))
+            sums[(unit, option, channel)] = sums.get((unit, option, channel), 0) + votes
+        tallies.append((state, contest_key, contest, partition(sums), reporting, group["as_of"].drop_nulls().max()))
     return tallies, unmatched
+
+
+def partition(sums: dict[tuple[UUID, UUID, int], int]) -> dict[tuple[UUID, UUID, int], int]:
+    whole = {unit for unit, _, channel in sums if channel == 0}
+    kept: dict[tuple[UUID, UUID, int], int] = {}
+    for (unit, option, channel), votes in sums.items():
+        key = (unit, option, 0 if unit in whole else channel)
+        kept[key] = kept.get(key, 0) + votes
+    return kept
+
+
+def totals(sums: dict[tuple[UUID, UUID, int], int]) -> dict[tuple[UUID, UUID], int]:
+    kept: dict[tuple[UUID, UUID], int] = {}
+    for (unit, option, _), votes in sums.items():
+        kept[(unit, option)] = kept.get((unit, option), 0) + votes
+    return kept
 
 
 def emit():
@@ -2094,7 +2189,8 @@ def emit():
 
         tallies, unmatched = plan(conn, frame, scatter)
         sources: dict[str, UUID] = {}
-        for state, contest_key, contest, sums, reporting, stamp in tallies:
+        for state, contest_key, contest, split, reporting, stamp in tallies:
+            sums = totals(split)
             election = conn.execute("select election_id from contest where id = %s", [contest]).fetchone()[0]
             if state not in sources:
                 publisher, site, _ = OFFICIAL[state]

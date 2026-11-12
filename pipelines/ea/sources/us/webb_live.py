@@ -19,7 +19,7 @@ def collect(client: httpx.Client) -> dict[str, tuple[bytes, str]]:
 
 def plan(
     conn: Connection, paths: dict[str, Path]
-) -> tuple[list[tuple[str, str, UUID, dict[tuple[UUID, UUID], int], tuple[int, int], str | None]], list[str]]:
+) -> tuple[list[tuple[str, str, UUID, dict[tuple[UUID, UUID, int], int], tuple[int, int], str | None]], list[str]]:
     sha = hashlib.sha256(paths[URL].read_bytes()).hexdigest()
     if sha != READ:
         raise ValueError(f"Webb County posted a new results file ({sha}); transcribe it into us.webb_2026")
@@ -40,13 +40,13 @@ def plan(
             [f"{key}:%"],
         ).fetchall()
         options = {value: option for value, option, _ in found}
-        sums: dict[tuple[UUID, UUID], int] = {}
+        sums: dict[tuple[UUID, UUID, int], int] = {}
         for row in rows:
             option = options.get(f"{key}:{slug(row[0])}")
             if option is None:
                 unmatched.append(f"{key}: no option for {row[0]}")
                 continue
-            sums[(unit, option)] = row[1]
+            sums[(unit, option, 0)] = row[1]
         if sums:
             tallies.append(("TX", key, found[0][2], sums, (0, 0), AS_OF.isoformat()))
     return tallies, unmatched

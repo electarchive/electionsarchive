@@ -72,7 +72,7 @@ def near(candidate: str, labels: dict[UUID, list[str]]) -> UUID | None:
 
 def plan(
     conn: Connection, paths: dict[str, Path]
-) -> tuple[list[tuple[str, str, UUID, dict[tuple[UUID, UUID], int], tuple[int, int], str | None]], list[str]]:
+) -> tuple[list[tuple[str, str, UUID, dict[tuple[UUID, UUID, int], int], tuple[int, int], str | None]], list[str]]:
     info = json.loads(paths[INFO].read_bytes())
     stamp = info.get("LastUpdated")
     reporting = (int(info.get("PrecinctsCounted") or 0), int(info.get("TotalPrecincts") or 0))
@@ -106,14 +106,14 @@ def plan(
             continue
         labels = {option: words(label or "") for _, option, kind, label in options if kind != "write_in"}
         write_in = next((option for _, option, kind, _ in options if kind == "write_in"), None)
-        sums: dict[tuple[UUID, UUID], int] = {}
+        sums: dict[tuple[UUID, UUID, int], int] = {}
         for candidate, votes in totals.items():
             option = write_in if candidate == "Write-in" else pick(candidate, labels) or near(candidate, labels)
             if option is None:
                 if candidate != "Write-in":
                     unmatched.append(f"{contest_key}: {candidate}")
                 continue
-            sums[(unit, option)] = sums.get((unit, option), 0) + votes
+            sums[(unit, option, 0)] = sums.get((unit, option, 0), 0) + votes
         if sums:
             tallies.append(("DC", contest_key, options[0][0], sums, reporting, stamp))
     return tallies, unmatched

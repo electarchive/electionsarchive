@@ -84,7 +84,7 @@ def read(path: Path) -> tuple[str, str | None, dict[str, list[tuple[str, int]]]]
 
 def plan(
     conn: Connection, paths: dict[str, Path]
-) -> tuple[list[tuple[str, str, UUID, dict[tuple[UUID, UUID], int], tuple[int, int], str | None]], list[str]]:
+) -> tuple[list[tuple[str, str, UUID, dict[tuple[UUID, UUID, int], int], tuple[int, int], str | None]], list[str]]:
     unit = conn.execute(
         """select u.id from reporting_unit u join polity_territory t on t.area_id = u.area_id
            join polity p on p.id = t.polity_id where p.iso_code = 'US-VI' and u.scheme_code = 'us.state'"""
@@ -142,13 +142,13 @@ def plan(
             unmatched.append(f"no contest: {contest_key}")
             continue
         labels = {option: words(label or "") for _, option, label in options}
-        sums: dict[tuple[UUID, UUID], int] = {}
+        sums: dict[tuple[UUID, UUID, int], int] = {}
         for name, votes in rows:
             option = pick(name, labels)
             if option is None:
                 unmatched.append(f"{contest_key}: {name}")
                 continue
-            sums[(unit, option)] = votes
+            sums[(unit, option, 0)] = votes
         if sums:
             tallies.append(("VI", contest_key, options[0][0], sums, (0, 0), stamp))
     return tallies, unmatched
