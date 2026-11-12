@@ -957,16 +957,16 @@ export const seats = {
           ) as prior
           from now n left join kept k on k.id = n.id
           left join lateral (
-            select p.id, ST_Area(x.geom) >= 0.97 * greatest(ST_Area(gp.geom), ST_Area(gn.geom)) as same
+            select p.id, x.area >= 0.97 * greatest(ST_Area(gp.geom), ST_Area(gn.geom)) as same
             from nbox nb
             join pbox pb on pb.env && nb.env
             join prev p on p.id = pb.id
             join area_geometry gp on gp.area_id = p.area and gp.valid @> p.drawn
             join area_geometry gn on gn.area_id = n.area and gn.valid @> n.drawn
-            cross join lateral (select ST_Intersection(${coarse("gp")}, ${coarse("gn")}, 0.00001) as geom) x
-            where nb.id = n.id and k.prior is null and p.magnitude = n.magnitude and gp.geom && gn.geom and ST_Intersects(gp.geom, gn.geom)
-              and (n.magnitude = 1 or ST_Area(x.geom) > 0.5 * ST_Area(gn.geom))
-            order by ST_Area(x.geom) desc limit 1
+            cross join lateral (select ST_Area(ST_Intersection(${coarse("gp")}, ${coarse("gn")}, 0.00001)) as area offset 0) x
+            where nb.id = n.id and k.prior is null and p.magnitude = n.magnitude and gp.geom && gn.geom and x.area > 0
+              and (n.magnitude = 1 or x.area > 0.5 * ST_Area(gn.geom))
+            order by x.area desc limit 1
           ) g on true
           where n.body = (select body from chamber)
         ),
@@ -1310,14 +1310,14 @@ export const seats = {
             from prev p where p.area = t.area order by p.notional desc, p.drawn desc, p.day desc limit 1
           ) s on true
           left join lateral (
-            select p.id, p.area, p.day, ST_Area(x.geom) >= 0.97 * greatest(ST_Area(gp.geom), ST_Area(gn.geom)) as same
+            select p.id, p.area, p.day, x.area >= 0.97 * greatest(ST_Area(gp.geom), ST_Area(gn.geom)) as same
             from prev p
             join area_geometry gp on gp.area_id = p.area and gp.valid @> p.drawn
             join area_geometry gn on gn.area_id = t.area and gn.valid @> t.drawn
-            cross join lateral (select ST_Intersection(${coarse("gp")}, ${coarse("gn")}, 0.00001) as geom) x
-            where s.id is null and gp.geom && gn.geom and ST_Intersects(gp.geom, gn.geom)
-              and (not t."isIe" or ST_Area(x.geom) > 0.5 * ST_Area(gn.geom))
-            order by ST_Area(x.geom) desc, p.day desc limit 1
+            cross join lateral (select ST_Area(ST_Intersection(${coarse("gp")}, ${coarse("gn")}, 0.00001)) as area offset 0) x
+            where s.id is null and gp.geom && gn.geom and x.area > 0
+              and (not t."isIe" or x.area > 0.5 * ST_Area(gn.geom))
+            order by x.area desc, p.day desc limit 1
           ) g on true
           left join lateral (
             select p.id, p.area, p.day from prev p
