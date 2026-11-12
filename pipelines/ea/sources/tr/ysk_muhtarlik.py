@@ -2,7 +2,7 @@ import gzip
 import itertools
 import json
 import time
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from pathlib import Path
 from urllib.parse import parse_qs, urlencode, urlparse
 
@@ -19,7 +19,9 @@ CACHE = DATA / "tmp" / "ysk_muhtarlik"
 REGISTER_2024 = Path(__file__).with_name("muhtarlik_2024.tsv")
 HISTORY = Path(__file__).with_name("muhtarlik_history.tsv")
 KIND_CHANGES = Path(__file__).with_name("muhtarlik_kind_changes.tsv")
+CODES = Path(__file__).with_name("muhtarlik_2024_codes.tsv")
 SECIM_IDS = {2009: 12972, 2014: 36039, 2019: 49302}
+DAYS = {2009: date(2009, 3, 29), 2014: date(2014, 3, 30), 2019: date(2019, 3, 31), 2024: date(2024, 3, 31)}
 TYPES = {2: "mahalle", 4: "köy"}
 YSK_TOTALS = {
     2009: (52879, None, None, None),
@@ -268,5 +270,41 @@ def parse() -> None:
     print(pairs.group_by("from_year", "from_kind", "to_year", "to_kind").len().sort("from_year", "from_kind"))
     pairs.filter(pl.col("from_kind") != pl.col("to_kind")).sort("plate", "ilce", "to_name", "to_id").write_csv(
         KIND_CHANGES, separator="\t"
+    )
+    links = pairs.filter(pl.col("match") == "ilce")
+    chain = current.select(muhtarlik_id="muhtarlik_id", code="muhtarlik_id", year=pl.lit(2024, dtype=pl.Int64))
+    steps = [chain]
+    for before, after in reversed(list(itertools.pairwise(years))):
+        ids = every.filter(pl.col("year") == before).select(code="muhtarlik_id", earlier="muhtarlik_id")
+        chain = (
+            chain.join(ids, on="code", how="left")
+            .join(
+                links.filter(pl.col("from_year") == before).select(code="to_id", linked="from_id"),
+                on="code",
+                how="left",
+            )
+            .select("muhtarlik_id", code=pl.coalesce("earlier", "linked"), year=pl.lit(before, dtype=pl.Int64))
+            .drop_nulls("code")
+        )
+        steps.append(chain)
+    days = pl.col("year").replace_strict(DAYS, return_dtype=pl.Date)
+    codes = (
+        pl.concat(steps)
+        .group_by("muhtarlik_id", "code")
+        .agg(valid_from=days.min(), last=pl.col("year").max())
+        .sort("muhtarlik_id", "valid_from")
+        .with_columns(valid_to=pl.col("valid_from").shift(-1).over("muhtarlik_id"))
+    )
+    if codes.filter(
+        pl.col("valid_to").is_not_null() & (pl.col("last").replace_strict(DAYS) >= pl.col("valid_to"))
+    ).height:
+        raise ValueError("a muhtarlık code recurs after it was replaced")
+    codes.select("muhtarlik_id", "code", "valid_from", "valid_to").write_csv(CODES, separator="\t")
+    print(
+        "codes",
+        codes.height,
+        "replaced",
+        codes["valid_to"].is_not_null().sum(),
+        codes.group_by("valid_from").len().sort("valid_from").rows(),
     )
     print("history rows", history.height)

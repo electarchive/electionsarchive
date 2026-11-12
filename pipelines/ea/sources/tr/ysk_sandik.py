@@ -9,7 +9,7 @@ import polars as pl
 
 from ea import changeset, raw
 from ea.changeset import Changeset
-from ea.sources.tr import oveo, ysk, ysk_local
+from ea.sources.tr import oveo, ysk, ysk_local, ysk_muhtarlik
 from ea.sources.tr.ysk import (
     ALLIANCES,
     ALLIANCES_2018,
@@ -51,7 +51,7 @@ from ea.store import DATA, connect
 
 SOURCE = "tr.ysk_sandik"
 BALLOT_BOX_DAYS = {"2014-03-30", "2019-03-31", "2024-03-31"}
-VERSION = "21"
+VERSION = "22"
 PARSED = DATA / "parsed" / SOURCE
 SITE = "https://sonuc.ysk.gov.tr"
 PUBLISHER = "Yüksek Seçim Kurulu (YSK)"
@@ -121,7 +121,6 @@ YSK = {
     },
 }
 MUHTARLIK_SLUGS = {"2024-yerel-belediye-baskanlık-secimleri": 0, "2024-yerel-il-genel-meclis-uyeligi-secimleri": 1}
-MUHTARLIK_DAY = date(2024, 3, 31)
 REGISTER = Path(__file__).with_name("muhtarlik_2024.tsv")
 NEW_PARTIES = {"Demokratik Sol Parti": "DSP", "Bağımsız Türkiye Partisi": "BTP", "Demokrat Parti": "DP"}
 LABELS = (
@@ -463,6 +462,12 @@ def parse() -> None:
     )
 
 
+def district_label(plate: str, district: str) -> str:
+    return DISTRICTS.get((plate, district)) or (
+        f"{upper(PROVINCES[int(plate) - 1])} MERKEZ" if district == "MERKEZ" else district.split(" - ")[0]
+    )
+
+
 def emit() -> Path:
     frame = (
         pl.read_parquet(PARSED / "neighborhoods.parquet")
@@ -588,6 +593,7 @@ def emit() -> Path:
         seats_2011: dict[str, str] = {}
         added: list[str] = []
         areas: dict[tuple[str, str, str], tuple[UUID, str]] = {}
+        located: dict[tuple[int, str], set[UUID]] = {}
         rows: list[dict[str, object]] = []
         for plate, district, neighborhood in (
             pl.concat(
@@ -601,9 +607,7 @@ def emit() -> Path:
             .sort("plate", "district", "neighborhood", nulls_last=False)
             .iter_rows()
         ):
-            label = DISTRICTS.get((plate, district)) or (
-                f"{upper(PROVINCES[int(plate) - 1])} MERKEZ" if district == "MERKEZ" else district.split(" - ")[0]
-            )
+            label = district_label(plate, district)
             ilce_id = districts[(plate, OVO_DISTRICTS.get(label, label))]
             parent = cs.key("tr.oveo.ilce", str(ilce_id))
             if neighborhood is None:
@@ -679,6 +683,7 @@ def emit() -> Path:
             units[place] = str(unit)
             if not prison:
                 areas[(plate, district, neighborhood)] = (area, code)
+                located.setdefault((ilce_id, neighborhood), set()).add(area)
             seats[place] = sorted_into.get(f"{plate}:{district_names[ilce_id]}", plate)
             seats_2015[place] = sorted_2015.get(f"{plate}:{district_names[ilce_id]}", plate)
             seats_2011[place] = sorted_2011.get(f"{plate}:{district_names[ilce_id]}", plate)
@@ -711,14 +716,54 @@ def emit() -> Path:
         coded = {areas[place][0]: id for id, place in zip(register["muhtarlik_id"], places, strict=True)}
         if len(coded) != register.height:
             raise ValueError("two muhtarlıks share an area")
+        current = {id: str(area) for area, id in coded.items()}
+        dated = pl.read_csv(
+            ysk_muhtarlik.CODES, separator="\t", schema_overrides={"valid_from": pl.Date, "valid_to": pl.Date}
+        )
+        if set(dated["muhtarlik_id"]) != set(current):
+            raise ValueError("muhtarlik_2024_codes.tsv does not cover the 2024 muhtarlıks")
+        chained = set(dated["code"])
+        elections = list(ysk_muhtarlik.DAYS)
+        matched: dict[UUID, list[tuple[int, date, date]]] = {}
+        unmatched = 0
+        for id, plate, ilce, _, neighborhood, _, years in pl.read_csv(
+            ysk_muhtarlik.HISTORY, separator="\t", infer_schema_length=0
+        ).iter_rows():
+            seen = [int(year) for year in years.split(",")]
+            label = district_label(plate, ilce.split("/")[0])
+            found = located.get((districts.get((plate, OVO_DISTRICTS.get(label, label)), 0), neighborhood), set())
+            start = elections.index(seen[0])
+            if int(id) in chained or seen != elections[start : start + len(seen)]:
+                continue
+            if len(found) != 1 or (area := next(iter(found))) in coded:
+                unmatched += 1
+                continue
+            matched.setdefault(area, []).append(
+                (int(id), ysk_muhtarlik.DAYS[seen[0]], ysk_muhtarlik.DAYS[elections[start + len(seen)]])
+            )
+        earlier = [
+            (str(area), str(id), valid_from, valid_to)
+            for area, spans in matched.items()
+            if len(spans) == 1
+            for id, valid_from, valid_to in spans
+        ]
+        print(f"{len(earlier)} earlier muhtarlık IDs on areas with no 2024 muhtarlık, {unmatched} unmatched")
         cs.frame(
             "area_code",
-            pl.DataFrame(
-                {
-                    "area_id": [str(area) for area in coded],
-                    "code": [str(id) for id in coded.values()],
-                    "valid_from": [MUHTARLIK_DAY] * len(coded),
-                }
+            pl.concat(
+                [
+                    dated.select(
+                        area_id=pl.col("muhtarlik_id").replace_strict(current),
+                        code=pl.col("code").cast(pl.String),
+                        valid_from="valid_from",
+                        valid_to="valid_to",
+                    ),
+                    pl.DataFrame(
+                        earlier,
+                        schema={"area_id": pl.String, "code": pl.String, "valid_from": pl.Date, "valid_to": pl.Date},
+                        orient="row",
+                    ),
+                ]
             ),
         )
         register.select(
