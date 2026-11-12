@@ -1,24 +1,27 @@
 import csv
 import html
+import io
 import json
 import re
 import subprocess
-from datetime import UTC, datetime
+import zipfile
+from datetime import UTC, date, datetime
 from pathlib import Path
 from uuid import UUID
 
 import httpx
 import polars as pl
+import shapefile
 
 from ea import raw
 from ea.changeset import Changeset, slug
 from ea.sources.us import enr_al
 from ea.sources.us.sld_primaries_2026 import cased
 from ea.store import DATA, connect
-from ea.typed import one
+from ea.typed import one, present
 
 SOURCE = "us.state_boards_2026"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 DAY = "2026-11-03"
 NE = "https://electionresults.nebraska.gov/resultsCSV.aspx?text=All&type={}&map=DIST"
@@ -130,6 +133,75 @@ SEATS = {
     "ND:psc": {"": 1},
     "ND:psc-unexpired": {"": 1},
 }
+QUERY = "/query?where=1%3D1&outFields=*&outSR=4326&f=geojson"
+NE_GIS = "https://giscat.ne.gov/enterprise/rest/services/PoliticalBoundaries_2021/MapServer/{}" + QUERY
+SHAPES = {
+    "NE:sboe": (
+        "Nebraska Office of the Chief Information Officer",
+        "State Board of Education districts, 2021 plan",
+        NE_GIS.format(6),
+        "DISTRICT",
+        2022,
+    ),
+    "NE:regents": (
+        "Nebraska Office of the Chief Information Officer",
+        "Board of Regents districts, 2021 plan",
+        NE_GIS.format(5),
+        "DISTRICT",
+        2022,
+    ),
+    "NE:psc": (
+        "Nebraska Office of the Chief Information Officer",
+        "Public Service Commission districts, 2021 plan",
+        NE_GIS.format(3),
+        "DISTRICT",
+        2022,
+    ),
+    "MT:psc": (
+        "Montana State Library",
+        "Public Service Commission districts (SB 109, 2023)",
+        "https://gisservice.mt.gov/ArcGIS/rest/services/msdi_administrative_boundaries_map_v1/MapServer/40" + QUERY,
+        "DistrictNumber",
+        2024,
+    ),
+    "NM:pec": (
+        "New Mexico Secretary of State",
+        "Public Education Commission districts, 2021 plan",
+        "https://edacarcweb.unm.edu/arcgis/rest/services/SOS/Education/MapServer/8" + QUERY,
+        "DISTRICT",
+        2022,
+    ),
+    "UT:sboe": (
+        "Utah Geospatial Resource Center",
+        "Utah School Board Districts 2022 to 2032",
+        "https://services1.arcgis.com/99lidPhWCzftIe9K/ArcGIS/rest/services/UtahSchoolBoardDistricts2022to2032/FeatureServer/0"
+        + QUERY,
+        "DIST",
+        2022,
+    ),
+    "AL:sboe": (
+        "Alabama Legislature Reapportionment Office",
+        "2021 Alabama State Board of Education districts (Act 2021-559)",
+        "https://services7.arcgis.com/jF2q3LPxL7PETdYk/arcgis/rest/services/_2021_Alabama_State_Bd_of_Education/FeatureServer/0"
+        + QUERY,
+        "DISTRICT",
+        2022,
+    ),
+    "KS:sboe": (
+        "Kansas Legislative Research Department",
+        "State Board of Education districts, 2022 enacted plan (Apple 7), shapefiles",
+        "https://klrd.gov/wp-content/uploads/2023/11/Apple7.zip",
+        "DISTRICT",
+        2022,
+    ),
+    "NV:regents": (
+        "Nevada Legislative Counsel Bureau",
+        "Board of Regents districts, 2021 plan, shapefiles",
+        "https://www.leg.state.nv.us/Division/Research/Documents/2021Regents_BDR_Final.zip",
+        "DISTRICT",
+        2022,
+    ),
+}
 REMAINDER = {("NE:regents", "4"), ("UT:sboe", "7"), ("ND:psc-unexpired", "")}
 FIPS = {
     "MI": "26",
@@ -182,6 +254,8 @@ NE_BOARDS = {"SE": "NE:sboe", "RG": "NE:regents", "PS": "NE:psc"}
 
 
 def fetch() -> None:
+    for _, _, url, _, _ in SHAPES.values():
+        raw.fetch(SOURCE, url, suffix=".zip" if url.endswith(".zip") else ".geojson")
     for state, (_, _, urls, suffix) in SOURCES.items():
         for url in urls:
             if state not in ("AL", "ND") and state not in HELD:
@@ -394,7 +468,82 @@ def emit() -> Path:
                 cs.artifact(raw.cached(SOURCE, url), source)
             sources[state] = source
         made: set[UUID] = set()
-        counts = {"contests": 0, "candidates": 0, "matched": 0}
+        counts = {"contests": 0, "candidates": 0, "matched": 0, "shapes": 0}
+
+        def seat_area(state: str, state_area: UUID, board: str, district: str) -> UUID:
+            stem, title = BODIES[board]
+            code = f"{FIPS[state]}:{stem}:district-{district}"
+            area = cs.area("us.local_district", code)
+            if area in cs.minted and area not in made:
+                made.add(area)
+                cs.add("area", id=area, scheme_code="us.local_district")
+                cs.add("area_code", area_id=area, code=code, valid_from=None)
+                cs.add("area_parent", area_id=area, parent_id=state_area)
+                name(area, f"{title}, District {district}")
+            return area
+
+        def shapes(state: str, state_area: UUID) -> None:
+            for board, (publisher, title, url, field, start) in SHAPES.items():
+                if not board.startswith(f"{state}:"):
+                    continue
+                source = cs.source(publisher, title)
+                if source in cs.minted:
+                    cs.add(
+                        "source",
+                        id=source,
+                        kind="official_body",
+                        publisher=publisher,
+                        title=title,
+                        url=url,
+                        license="Public record",
+                    )
+                artifact = raw.cached(SOURCE, url)
+                cs.artifact(artifact, source)
+                pieces: dict[int, list[str]] = {}
+                if url.endswith(".zip"):
+                    srid = 4269
+                    with zipfile.ZipFile(artifact.path) as archive:
+                        parts = {
+                            item.rsplit(".", 1)[1].lower(): io.BytesIO(archive.read(item))
+                            for item in archive.namelist()
+                            if item.lower().endswith((".shp", ".shx", ".dbf"))
+                        }
+                    reader = shapefile.Reader(shp=parts["shp"], shx=parts.get("shx"), dbf=parts["dbf"])
+                    for record, item in zip(reader.iterRecords(), reader.iterShapes(), strict=True):
+                        number = int(float(str(present(record, "record")[field])))
+                        pieces.setdefault(number, []).append(json.dumps(present(item, "shape").__geo_interface__))
+                else:
+                    srid = 4326
+                    for feature in json.loads(artifact.path.read_bytes())["features"]:
+                        number = int(float(feature["properties"][field]))
+                        pieces.setdefault(number, []).append(json.dumps(feature["geometry"]))
+                if sorted(pieces) != list(range(1, len(pieces) + 1)) or not {
+                    int(district) for district in SEATS[board]
+                } <= set(pieces):
+                    raise ValueError(f"{board} shapes: districts {sorted(pieces)}")
+                for number, group in pieces.items():
+                    area = seat_area(state, state_area, board, str(number))
+                    geom, point = one(
+                        conn.execute(
+                            """select encode(st_asewkb(geom), 'hex'), encode(st_asewkb(st_pointonsurface(geom)), 'hex')
+                               from (select st_multi(st_collectionextract(st_makevalid(st_transform(st_union(
+                                       st_setsrid(st_geomfromgeojson(piece), %s)), 4326)), 3)) as geom
+                                     from unnest(%s::text[]) piece) shape""",
+                            [srid, group],
+                        )
+                    )
+                    cs.add(
+                        "area_geometry",
+                        area_id=area,
+                        valid_from=date(start, 1, 1),
+                        valid_to=None,
+                        geom=geom,
+                        label_point=point,
+                        quality="official",
+                        source_id=source,
+                    )
+                    counts["shapes"] += 1
+
         for state, rows in frame.group_by("state", maintain_order=True):
             state = str(state[0])
             polity = cs.polity(f"US-{state}")
@@ -416,6 +565,7 @@ def emit() -> Path:
                 [f"^20(1[0-9]|2[0-6])-\\d\\d-\\d\\d:{state}:"],
             ).fetchall():
                 pool.setdefault(slug(text), set()).add(person)
+            shapes(state, state_area)
             source = sources[state]
             for (board, district), group in rows.group_by("board", "district", maintain_order=True):
                 board, district = str(board), str(district)
@@ -445,14 +595,7 @@ def emit() -> Path:
                             name(body, title)
                     tail = f"{stem}:{district}"
                     label = f"{title}, District {district}"
-                    code = f"{FIPS[state]}:{stem}:district-{district}"
-                    area = cs.area("us.local_district", code)
-                    if area in cs.minted and area not in made:
-                        made.add(area)
-                        cs.add("area", id=area, scheme_code="us.local_district")
-                        cs.add("area_code", area_id=area, code=code, valid_from=None)
-                        cs.add("area_parent", area_id=area, parent_id=state_area)
-                        name(area, label)
+                    area = seat_area(state, state_area, board, district)
                 if remainder:
                     tail, label = f"{tail}:remainder", f"{label}, unexpired term"
                 key = f"{DAY}:{state}:{tail}"
