@@ -75,13 +75,13 @@
         },
         {
           "label": "George W. Oldham, Democrat",
-          "contest": "house1",
-          "candidate": "George W. Oldham"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "Carl G. Bachmann, Republican",
-          "contest": "house1",
-          "candidate": "Carl G. Bachmann"
+          "contest": null,
+          "candidate": ""
         }
       ],
       "orientation": "counties_down",
@@ -114,8 +114,8 @@
         },
         {
           "label": "Robert E. Lee Allen, Democrat",
-          "contest": "house2",
-          "candidate": "R. E. L. Allen"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "John Chase, Socialist",
@@ -124,8 +124,8 @@
         },
         {
           "label": "Frank L. Bowman, Republican",
-          "contest": "house2",
-          "candidate": "Frank L. Bowman"
+          "contest": null,
+          "candidate": ""
         }
       ],
       "orientation": "counties_down",
@@ -158,8 +158,8 @@
         },
         {
           "label": "John M. Wolverton, Republican",
-          "contest": "house3",
-          "candidate": "John M. Wolverton"
+          "contest": null,
+          "candidate": ""
         }
       ],
       "orientation": "counties_down",
@@ -255,8 +255,8 @@
         },
         {
           "label": "J. Alfred Taylor, Democrat",
-          "contest": "house6",
-          "candidate": "J. Alfred Taylor"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "Fisher B. Plymale, Farm'r-Lab'r",

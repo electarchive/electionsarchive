@@ -130,7 +130,7 @@
         0.869,
         0.796
       ],
-      "hint": "Read only the table headed \"WEST VIRGINIA'S VOTE FOR PRESIDENT\u20141916-1912.\"; ignore any other table visible in the image.",
+      "hint": "Read only the table headed \"WEST VIRGINIA'S VOTE FOR PRESIDENT—1916-1912.\"; ignore any other table visible in the image.",
       "bands": 2,
       "header": [
         0.0,
@@ -179,7 +179,7 @@
         0.871,
         0.801
       ],
-      "hint": "Read only the table headed 'VOTE FOR GOVERNOR\u20141916-1912'; ignore any other table visible in the image.",
+      "hint": "Read only the table headed 'VOTE FOR GOVERNOR—1916-1912'; ignore any other table visible in the image.",
       "bands": 2,
       "header": [
         0.0,
@@ -202,8 +202,8 @@
         },
         {
           "label": "Cuciser Socialist",
-          "contest": null,
-          "candidate": ""
+          "contest": "senate",
+          "candidate": "G. A. Gneiser"
         }
       ],
       "orientation": "counties_down",
@@ -213,7 +213,7 @@
         0.882,
         0.782
       ],
-      "hint": "Read only the table headed 'VOTE FOR UNITED STATES SENATOR\u20141916.'; ignore any other table visible in the image.",
+      "hint": "Read only the table headed 'VOTE FOR UNITED STATES SENATOR—1916.'; ignore any other table visible in the image.",
       "bands": 2,
       "header": [
         0.0,
@@ -364,5 +364,6 @@
       ],
       "hint": "Read only the table headed 'Sixth Congressional District'; ignore any other table visible in the image."
     }
-  ]
+  ],
+  "authoritative_loose": true
 }

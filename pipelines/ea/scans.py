@@ -1080,7 +1080,10 @@ def vote(*readers: Series) -> Series:
         counts = Counter(value for value, _ in found)
         best, seen = counts.most_common(1)[0]
         value = best if seen > 1 else found[-1][0]
-        voted.cells[key] = next((v, box) for v, box in found if v == value)
+        voted.cells[key] = max(
+            ((v, box) for v, box in found if v == value),
+            key=lambda cell: (cell[1][2] - cell[1][0]) * (cell[1][3] - cell[1][1]),
+        )
     voted.total = sum(value for value, _ in voted.cells.values())
     printed = {reader.printed for reader in readers if reader.printed is not None}
     voted.printed = voted.total if voted.total in printed else Counter(r.printed for r in readers).most_common(1)[0][0]

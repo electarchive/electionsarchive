@@ -224,8 +224,8 @@
         },
         {
           "label": "Harry C. Woodyard, Republican",
-          "contest": "house4",
-          "candidate": "Harry C. Woodyard"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "John L. Conner, Democrat",
@@ -258,8 +258,8 @@
         },
         {
           "label": "Wells Goodykoontz, Republican",
-          "contest": "house5",
-          "candidate": "Wells Goodykoontz"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "W. W. McNeal, Democrat",
@@ -297,8 +297,8 @@
         },
         {
           "label": "Leonard S. Echols, Republican",
-          "contest": "house6",
-          "candidate": "Leonard S. Echols"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "William E. Wilson, Democrat",

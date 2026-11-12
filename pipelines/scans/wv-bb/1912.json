@@ -38,8 +38,8 @@
         },
         {
           "label": "Wilson Democrat",
-          "contest": "president",
-          "candidate": "Woodrow Wilson (Democratic)"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "Benson Socialist",
@@ -74,7 +74,7 @@
         0.87,
         0.802
       ],
-      "hint": "Read only the table headed \"WEST VIRGINIA'S VOTE FOR PRESIDENT\u20141916-1912.\"; ignore any other table visible in the image.",
+      "hint": "Read only the table headed \"WEST VIRGINIA'S VOTE FOR PRESIDENT—1916-1912.\"; ignore any other table visible in the image.",
       "bands": 2,
       "header": [
         0.0,
@@ -123,12 +123,13 @@
         0.872,
         0.799
       ],
-      "hint": "Read only the table headed 'VOTE FOR GOVERNOR\u20141916-1912'; ignore any other table visible in the image.",
+      "hint": "Read only the table headed 'VOTE FOR GOVERNOR—1916-1912'; ignore any other table visible in the image.",
       "bands": 2,
       "header": [
         0.0,
         0.14
       ]
     }
-  ]
+  ],
+  "authoritative_loose": true
 }

@@ -64,36 +64,74 @@
       "special": false,
       "state": "WV",
       "district": 6
+    },
+    "governor": {
+      "year": 1920,
+      "chamber": "governor",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "WV",
+      "district": null
     }
   },
   "pages": [
     {
-      "page": 407,
-      "id": "407-0",
+      "page": 408,
+      "id": "408-0",
       "columns": [
         {
-          "label": "R.",
-          "contest": null,
-          "candidate": ""
+          "label": "James M. Cox, Democrat",
+          "contest": "president",
+          "candidate": "James Cox (Democratic)"
         },
         {
-          "label": "D.",
-          "contest": null,
-          "candidate": ""
+          "label": "Eugene V. Debs, Socialist",
+          "contest": "president",
+          "candidate": "Eugene Debs (Socialist)"
+        },
+        {
+          "label": "Aaron S. Watkins, Prohibition",
+          "contest": "president",
+          "candidate": "Aaron Watkins (Prohibition)"
+        },
+        {
+          "label": "Warren G. Harding, Republican",
+          "contest": "president",
+          "candidate": "Warren G. Harding (Republican)"
+        },
+        {
+          "label": "Arthur B. Koontz, Democrat",
+          "contest": "governor",
+          "candidate": "Arthur B. Koontz"
+        },
+        {
+          "label": "S. B. Montgomery, Non-Partisan",
+          "contest": "governor",
+          "candidate": "Samuel B. Montgomery"
+        },
+        {
+          "label": "M. S. Holt, Socialist",
+          "contest": "governor",
+          "candidate": "Matthew Samuel Holt"
+        },
+        {
+          "label": "Ephraim F. Morgan, Republican",
+          "contest": "governor",
+          "candidate": "Ephraim F. Morgan"
         }
       ],
       "orientation": "counties_down",
       "crop": [
-        0.123,
-        0.196,
-        0.851,
-        0.77
+        0.05,
+        0.165,
+        0.96,
+        0.935
       ],
-      "hint": "Read only the table headed 'ELECTORAL VOTE FOR PRESIDENT, BY STATES, 1896-1920'; ignore any other table visible in the image.",
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENT AND GOVERNOR, 1920'. Its eight column headings are printed sideways: four President columns (Cox, Debs, Watkins, Harding) then four Governor columns (Koontz, Montgomery, Holt, Morgan).",
       "bands": 2,
       "header": [
         0.0,
-        0.1254
+        0.17
       ]
     },
     {
