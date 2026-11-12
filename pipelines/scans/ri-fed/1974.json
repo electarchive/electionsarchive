@@ -1,0 +1,117 @@
+{
+  "polity": "US-RI",
+  "publisher": "Rhode Island Board of Elections",
+  "title": "Official Count of the Ballots Cast, 1974",
+  "license": "Public record",
+  "file": {
+    "url": "https://elections.ri.gov/publications/Election_Publications/Countbooks/1974%20Count%20Book.pdf"
+  },
+  "raw_source": "us.scans",
+  "unit_scheme": "town",
+  "contests": {
+    "house1": {
+      "year": 1974,
+      "day": "1974-11-05",
+      "special": false,
+      "state": "RI",
+      "district": 1,
+      "chamber": "house"
+    },
+    "house2": {
+      "year": 1974,
+      "day": "1974-11-05",
+      "special": false,
+      "state": "RI",
+      "district": 2,
+      "chamber": "house"
+    },
+    "governor": {
+      "year": 1974,
+      "day": "1974-11-05",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "chamber": "governor"
+    }
+  },
+  "pages": [
+    {
+      "page": 17,
+      "id": "17-0",
+      "columns": [
+        {
+          "label": "St Germain D.",
+          "contest": "house1",
+          "candidate": "Fernand J. St Germain"
+        },
+        {
+          "label": "Barone R.",
+          "contest": "house1",
+          "candidate": "Ernest Barone"
+        },
+        {
+          "label": "Beard D.",
+          "contest": "house2",
+          "candidate": "Edward P. Beard"
+        },
+        {
+          "label": "Rotondo R.",
+          "contest": "house2",
+          "candidate": "Vincent J. Rotondo"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.108,
+        0.071,
+        0.973,
+        0.789
+      ],
+      "hint": "Read only the table headed 'VOTE FOR UNITED STATES CONGRESSMEN'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2298
+      ]
+    },
+    {
+      "page": 22,
+      "id": "22-0",
+      "columns": [
+        {
+          "label": "Noel, D",
+          "contest": "governor",
+          "candidate": "Philip W. Noel"
+        },
+        {
+          "label": "Nugent, R.",
+          "contest": "governor",
+          "candidate": "James W. Nugent"
+        },
+        {
+          "label": "Garrahy, D.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Kazanjian, R.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.067,
+        0.101,
+        0.948,
+        0.882
+      ],
+      "hint": "Read only the table headed 'VOTE FOR GOVERNOR AND LIEUTENANT-GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2907
+      ]
+    }
+  ]
+}

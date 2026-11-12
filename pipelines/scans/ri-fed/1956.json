@@ -1,0 +1,154 @@
+{
+  "polity": "US-RI",
+  "publisher": "Rhode Island Board of Elections",
+  "title": "Official Count of the Ballots Cast, 1956",
+  "license": "Public record",
+  "file": {
+    "url": "https://elections.ri.gov/publications/Election_Publications/Countbooks/1956%20Count%20Book.pdf"
+  },
+  "raw_source": "us.scans",
+  "unit_scheme": "town",
+  "contests": {
+    "president": {
+      "year": 1956,
+      "day": "1956-11-06",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "chamber": "president"
+    },
+    "house1": {
+      "year": 1956,
+      "day": "1956-11-06",
+      "special": false,
+      "state": "RI",
+      "district": 1,
+      "chamber": "house"
+    },
+    "house2": {
+      "year": 1956,
+      "day": "1956-11-06",
+      "special": false,
+      "state": "RI",
+      "district": 2,
+      "chamber": "house"
+    },
+    "governor": {
+      "year": 1956,
+      "day": "1956-11-06",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "chamber": "governor"
+    }
+  },
+  "pages": [
+    {
+      "page": 21,
+      "id": "21-0",
+      "columns": [
+        {
+          "label": "Stevenson Kefauver D.",
+          "contest": "president",
+          "candidate": "Adlai Stevenson (Democratic)"
+        },
+        {
+          "label": "Eisenhower Nixon R.",
+          "contest": "president",
+          "candidate": "Dwight D. Eisenhower (Republican)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.13,
+        0.061,
+        0.885,
+        0.74
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENTIAL ELECTORS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1605
+      ]
+    },
+    {
+      "page": 23,
+      "id": "23-0",
+      "columns": [
+        {
+          "label": "Forand",
+          "contest": "house1",
+          "candidate": "Aime J. Forand"
+        },
+        {
+          "label": "Ramsay",
+          "contest": "house1",
+          "candidate": "Samuel H. Ramsay"
+        },
+        {
+          "label": "Fogarty",
+          "contest": "house2",
+          "candidate": "John E. Fogarty"
+        },
+        {
+          "label": "Needham",
+          "contest": "house2",
+          "candidate": "Thomas H. Needham"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.122,
+        0.058,
+        0.885,
+        0.708
+      ],
+      "hint": "Read only the table headed 'VOTE FOR CONGRESSMEN'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1292
+      ]
+    },
+    {
+      "page": 26,
+      "id": "26-0",
+      "columns": [
+        {
+          "label": "Roberts",
+          "contest": "governor",
+          "candidate": "Dennis J. Roberts"
+        },
+        {
+          "label": "Del Sesto",
+          "contest": "governor",
+          "candidate": "Christopher Del Sesto"
+        },
+        {
+          "label": "Cote",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Broomhead",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.152,
+        0.058,
+        0.912,
+        0.709
+      ],
+      "hint": "Read only the table headed 'VOTE FOR GOVERNOR AND LIEUTENANT-GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1259
+      ]
+    }
+  ]
+}

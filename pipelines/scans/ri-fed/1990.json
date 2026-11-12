@@ -1,0 +1,135 @@
+{
+  "polity": "US-RI",
+  "publisher": "Rhode Island Board of Elections",
+  "title": "Official Count of the Ballots Cast, 1990",
+  "license": "Public record",
+  "file": {
+    "url": "https://elections.ri.gov/publications/Election_Publications/Countbooks/1990%20Count%20Book.pdf"
+  },
+  "raw_source": "us.scans",
+  "unit_scheme": "town",
+  "contests": {
+    "senate": {
+      "year": 1990,
+      "day": "1990-11-06",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "chamber": "senate"
+    },
+    "house1": {
+      "year": 1990,
+      "day": "1990-11-06",
+      "special": false,
+      "state": "RI",
+      "district": 1,
+      "chamber": "house"
+    },
+    "house2": {
+      "year": 1990,
+      "day": "1990-11-06",
+      "special": false,
+      "state": "RI",
+      "district": 2,
+      "chamber": "house"
+    },
+    "governor": {
+      "year": 1990,
+      "day": "1990-11-06",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "chamber": "governor"
+    }
+  },
+  "pages": [
+    {
+      "page": 23,
+      "id": "23-0",
+      "columns": [
+        {
+          "label": "PELL, D.",
+          "contest": "senate",
+          "candidate": "Claiborne Pell"
+        },
+        {
+          "label": "SCHNEIDER, R.",
+          "contest": "senate",
+          "candidate": "Claudine Schneider"
+        },
+        {
+          "label": "WOLF, D.",
+          "contest": "house1",
+          "candidate": "J. Scott Wolf"
+        },
+        {
+          "label": "MACHTLEY, R.",
+          "contest": "house1",
+          "candidate": "Ronald K. Machtley"
+        },
+        {
+          "label": "REED, D.",
+          "contest": "house2",
+          "candidate": "John F. Reed"
+        },
+        {
+          "label": "COXE, R.",
+          "contest": "house2",
+          "candidate": "Gertrude M. Coxe"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.123,
+        0.079,
+        1,
+        0.929
+      ],
+      "hint": "Read only the table headed 'VOTE FOR UNITED STATES SENATOR AND REPRESENTATIVES IN CONGRESS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2918
+      ]
+    },
+    {
+      "page": 28,
+      "id": "28-0",
+      "columns": [
+        {
+          "label": "SUNDLUN, D.",
+          "contest": "governor",
+          "candidate": "Bruce G. Sundlun"
+        },
+        {
+          "label": "DIPRETE, R.",
+          "contest": "governor",
+          "candidate": "Edward Diprete"
+        },
+        {
+          "label": "BEGIN, D.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DEUTSCH, R.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.026,
+        0.091,
+        0.936,
+        0.899
+      ],
+      "hint": "Read only the table headed 'VOTE FOR GOVERNOR AND LIEUTENANT GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.224
+      ]
+    }
+  ]
+}

@@ -1,0 +1,127 @@
+{
+  "polity": "US-RI",
+  "publisher": "Rhode Island Board of Elections",
+  "title": "Official Count of the Ballots Cast, 1986",
+  "license": "Public record",
+  "file": {
+    "url": "https://elections.ri.gov/publications/Election_Publications/Countbooks/1986%20Count%20Book.pdf"
+  },
+  "raw_source": "us.scans",
+  "unit_scheme": "town",
+  "contests": {
+    "house1": {
+      "year": 1986,
+      "day": "1986-11-04",
+      "special": false,
+      "state": "RI",
+      "district": 1,
+      "chamber": "house"
+    },
+    "house2": {
+      "year": 1986,
+      "day": "1986-11-04",
+      "special": false,
+      "state": "RI",
+      "district": 2,
+      "chamber": "house"
+    },
+    "governor": {
+      "year": 1986,
+      "day": "1986-11-04",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "chamber": "governor"
+    }
+  },
+  "pages": [
+    {
+      "page": 25,
+      "id": "25-0",
+      "columns": [
+        {
+          "label": "Holmes, Jr., R",
+          "contest": "house1",
+          "candidate": "John A. Holmes Jr."
+        },
+        {
+          "label": "St Germain, D",
+          "contest": "house1",
+          "candidate": "Fernand J. St. Germain"
+        },
+        {
+          "label": "Schneider, R",
+          "contest": "house2",
+          "candidate": "Claudine Schneider"
+        },
+        {
+          "label": "Ferry, D",
+          "contest": "house2",
+          "candidate": "Donald J. Ferry"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.096,
+        0.171,
+        0.951,
+        0.912
+      ],
+      "hint": "Read only the table headed 'VOTE FOR UNITED STATES CONGRESS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1971
+      ]
+    },
+    {
+      "page": 30,
+      "id": "30-0",
+      "columns": [
+        {
+          "label": "DiPrete, R",
+          "contest": "governor",
+          "candidate": "Edward Diprete"
+        },
+        {
+          "label": "Sundlun, D",
+          "contest": "governor",
+          "candidate": "Bruce G. Sundlun"
+        },
+        {
+          "label": "Affigne, CP",
+          "contest": "governor",
+          "candidate": "Tony Affigne"
+        },
+        {
+          "label": "Healey, Jr., CM",
+          "contest": "governor",
+          "candidate": "Robert J. Healey"
+        },
+        {
+          "label": "Farmer, R",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Licht, D",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.098,
+        0.087,
+        0.972,
+        0.899
+      ],
+      "hint": "Read only the table headed 'VOTE FOR GOVERNOR AND LIEUTENANT GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2537
+      ]
+    }
+  ]
+}

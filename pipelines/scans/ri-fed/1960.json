@@ -1,0 +1,172 @@
+{
+  "polity": "US-RI",
+  "publisher": "Rhode Island Board of Elections",
+  "title": "Official Count of the Ballots Cast, 1960",
+  "license": "Public record",
+  "file": {
+    "url": "https://elections.ri.gov/publications/Election_Publications/Countbooks/1960%20Count%20Book.pdf"
+  },
+  "raw_source": "us.scans",
+  "unit_scheme": "town",
+  "contests": {
+    "president": {
+      "year": 1960,
+      "day": "1960-11-08",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "chamber": "president"
+    },
+    "senate": {
+      "year": 1960,
+      "day": "1960-11-08",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "chamber": "senate"
+    },
+    "house1": {
+      "year": 1960,
+      "day": "1960-11-08",
+      "special": false,
+      "state": "RI",
+      "district": 1,
+      "chamber": "house"
+    },
+    "house2": {
+      "year": 1960,
+      "day": "1960-11-08",
+      "special": false,
+      "state": "RI",
+      "district": 2,
+      "chamber": "house"
+    },
+    "governor": {
+      "year": 1960,
+      "day": "1960-11-08",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "chamber": "governor"
+    }
+  },
+  "pages": [
+    {
+      "page": 25,
+      "id": "25-0",
+      "columns": [
+        {
+          "label": "Kennedy Johnson D",
+          "contest": "president",
+          "candidate": "John F. Kennedy (Democratic)"
+        },
+        {
+          "label": "Nixon Lodge R",
+          "contest": "president",
+          "candidate": "Richard Nixon (Republican)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.137,
+        0.079,
+        0.903,
+        0.863
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENTIAL ELECTORS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1454
+      ]
+    },
+    {
+      "page": 27,
+      "id": "27-0",
+      "columns": [
+        {
+          "label": "Pell, D.",
+          "contest": "senate",
+          "candidate": "Claiborne Pell"
+        },
+        {
+          "label": "Archambault, Jr., R.",
+          "contest": "senate",
+          "candidate": "Raoul Archambault, Jr."
+        },
+        {
+          "label": "St. Germain, D.",
+          "contest": "house1",
+          "candidate": "Fernand J. St. Germain"
+        },
+        {
+          "label": "Martin, R.",
+          "contest": "house1",
+          "candidate": "Theophile Martin"
+        },
+        {
+          "label": "Fogarty, D.",
+          "contest": "house2",
+          "candidate": "John E. Fogarty"
+        },
+        {
+          "label": "Gammell, R.",
+          "contest": "house2",
+          "candidate": "Robert L. Gammell"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.092,
+        0.086,
+        0.933,
+        0.914
+      ],
+      "hint": "Read only the table headed 'VOTE FOR UNITED STATES SENATOR AND CONGRESSMEN'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2609
+      ]
+    },
+    {
+      "page": 31,
+      "id": "31-0",
+      "columns": [
+        {
+          "label": "Notte, Jr. D.",
+          "contest": "governor",
+          "candidate": "John A. Jr. Notte"
+        },
+        {
+          "label": "Del Sesto R.",
+          "contest": "governor",
+          "candidate": "Christopher Del Sesto"
+        },
+        {
+          "label": "Gallogly D.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Kilvert R.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.133,
+        0.066,
+        0.898,
+        0.832
+      ],
+      "hint": "Read only the table headed 'VOTE FOR GOVERNOR AND LIEUTENANT-GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1267
+      ]
+    }
+  ]
+}

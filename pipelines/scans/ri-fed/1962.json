@@ -1,0 +1,136 @@
+{
+  "polity": "US-RI",
+  "publisher": "Rhode Island Board of Elections",
+  "title": "Official Count of the Ballots Cast, 1962",
+  "license": "Public record",
+  "file": {
+    "url": "https://elections.ri.gov/publications/Election_Publications/Countbooks/1962%20Count%20Book.pdf"
+  },
+  "raw_source": "us.scans",
+  "unit_scheme": "town",
+  "contests": {
+    "house1": {
+      "year": 1962,
+      "day": "1962-11-06",
+      "special": false,
+      "state": "RI",
+      "district": 1,
+      "chamber": "house"
+    },
+    "house2": {
+      "year": 1962,
+      "day": "1962-11-06",
+      "special": false,
+      "state": "RI",
+      "district": 2,
+      "chamber": "house"
+    },
+    "governor": {
+      "year": 1962,
+      "day": "1962-11-06",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "chamber": "governor"
+    }
+  },
+  "pages": [
+    {
+      "page": 33,
+      "id": "33-0",
+      "columns": [
+        {
+          "label": "St. Germain D.",
+          "contest": "house1",
+          "candidate": "Fernand J. St Germain"
+        },
+        {
+          "label": "Butler R.",
+          "contest": "house1",
+          "candidate": "R. Gordon Butler"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.139,
+        0.127,
+        0.643,
+        0.753
+      ],
+      "hint": "Read only the table headed 'VOTE FOR CONGRESSMEN'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0942
+      ]
+    },
+    {
+      "page": 33,
+      "id": "33-1",
+      "columns": [
+        {
+          "label": "Fogarty D.",
+          "contest": "house2",
+          "candidate": "John E. Fogarty"
+        },
+        {
+          "label": "Kennedy R.",
+          "contest": "house2",
+          "candidate": "John F. Kennedy"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.664,
+        0.131,
+        0.91,
+        0.752
+      ],
+      "hint": "Read only the table headed 'VOTE FOR CONGRESSMEN'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0886
+      ]
+    },
+    {
+      "page": 36,
+      "id": "36-0",
+      "columns": [
+        {
+          "label": "Notte, Jr., D.",
+          "contest": "governor",
+          "candidate": "John A. Jr. Notte"
+        },
+        {
+          "label": "Chafee R.",
+          "contest": "governor",
+          "candidate": "John H. Chafee"
+        },
+        {
+          "label": "Gallogly D.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "O'Donnell, Jr., R.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.1,
+        0.16,
+        0.95,
+        0.76
+      ],
+      "hint": "Read only the table headed 'VOTE FOR GOVERNOR AND LIEUTENANT-GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.09
+      ]
+    }
+  ]
+}

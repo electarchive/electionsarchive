@@ -1,0 +1,169 @@
+{
+  "polity": "US-RI",
+  "publisher": "Rhode Island Board of Elections",
+  "title": "Official Count of the Ballots Cast, 1982",
+  "license": "Public record",
+  "file": {
+    "url": "https://elections.ri.gov/publications/Election_Publications/Countbooks/1982%20Count%20Book.pdf"
+  },
+  "raw_source": "us.scans",
+  "unit_scheme": "town",
+  "contests": {
+    "senate": {
+      "year": 1982,
+      "day": "1982-11-02",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "chamber": "senate"
+    },
+    "house1": {
+      "year": 1982,
+      "day": "1982-11-02",
+      "special": false,
+      "state": "RI",
+      "district": 1,
+      "chamber": "house"
+    },
+    "house2": {
+      "year": 1982,
+      "day": "1982-11-02",
+      "special": false,
+      "state": "RI",
+      "district": 2,
+      "chamber": "house"
+    },
+    "governor": {
+      "year": 1982,
+      "day": "1982-11-02",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "chamber": "governor"
+    }
+  },
+  "pages": [
+    {
+      "page": 18,
+      "id": "18-0",
+      "columns": [
+        {
+          "label": "Michaelson D.",
+          "contest": "senate",
+          "candidate": "Julius C. Michaelson"
+        },
+        {
+          "label": "Chafee R.",
+          "contest": "senate",
+          "candidate": "John H. Chafee"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.108,
+        0.114,
+        0.985,
+        0.69
+      ],
+      "hint": "Read only the table headed 'VOTE FOR UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1024
+      ]
+    },
+    {
+      "page": 20,
+      "id": "20-0",
+      "columns": [
+        {
+          "label": "St Germain, D.",
+          "contest": "house1",
+          "candidate": "Fernand J. St Germain"
+        },
+        {
+          "label": "Stallwood, R.",
+          "contest": "house1",
+          "candidate": "Burton Stallwood"
+        },
+        {
+          "label": "Fowler, I.",
+          "contest": "house1",
+          "candidate": "Gertrude M. Jayne Fowler"
+        },
+        {
+          "label": "Aukerman, D.",
+          "contest": "house2",
+          "candidate": "James V. Aukerman"
+        },
+        {
+          "label": "Schneider, R.",
+          "contest": "house2",
+          "candidate": "Claudine Schneider"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.098,
+        0.076,
+        0.967,
+        0.789
+      ],
+      "hint": "Read only the table headed 'VOTE FOR UNITED STATES CONGRESS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2609
+      ]
+    },
+    {
+      "page": 25,
+      "id": "25-0",
+      "columns": [
+        {
+          "label": "Garrahy, D.",
+          "contest": "governor",
+          "candidate": "J. Joseph Garrahy"
+        },
+        {
+          "label": "Marzullo, R.",
+          "contest": "governor",
+          "candidate": "Vincent Marzullo"
+        },
+        {
+          "label": "Salk, I.",
+          "contest": "governor",
+          "candidate": "Hilary R. Salk"
+        },
+        {
+          "label": "Van Daam, I.",
+          "contest": "governor",
+          "candidate": "Peter Van Daam"
+        },
+        {
+          "label": "DiLuglio, D.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Doolittle, R.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.079,
+        0.076,
+        0.952,
+        0.818
+      ],
+      "hint": "Read only the table headed 'VOTE FOR GOVERNOR AND LIEUTENANT GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2978
+      ]
+    }
+  ]
+}

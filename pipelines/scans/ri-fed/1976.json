@@ -1,0 +1,236 @@
+{
+  "polity": "US-RI",
+  "publisher": "Rhode Island Board of Elections",
+  "title": "Official Count of the Ballots Cast, 1976",
+  "license": "Public record",
+  "file": {
+    "url": "https://elections.ri.gov/publications/Election_Publications/Countbooks/1976%20Count%20Book.pdf"
+  },
+  "raw_source": "us.scans",
+  "unit_scheme": "town",
+  "contests": {
+    "president": {
+      "year": 1976,
+      "day": "1976-11-02",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "chamber": "president"
+    },
+    "senate": {
+      "year": 1976,
+      "day": "1976-11-02",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "chamber": "senate"
+    },
+    "house1": {
+      "year": 1976,
+      "day": "1976-11-02",
+      "special": false,
+      "state": "RI",
+      "district": 1,
+      "chamber": "house"
+    },
+    "house2": {
+      "year": 1976,
+      "day": "1976-11-02",
+      "special": false,
+      "state": "RI",
+      "district": 2,
+      "chamber": "house"
+    },
+    "governor": {
+      "year": 1976,
+      "day": "1976-11-02",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "chamber": "governor"
+    }
+  },
+  "pages": [
+    {
+      "page": 23,
+      "id": "23-0",
+      "columns": [
+        {
+          "label": "Carter-Mondale D.",
+          "contest": "president",
+          "candidate": "Jimmy Carter (Democratic)"
+        },
+        {
+          "label": "Ford-Dole R.",
+          "contest": "president",
+          "candidate": "Gerald Ford (Republican)"
+        },
+        {
+          "label": "Hall-Tyner CP",
+          "contest": "president",
+          "candidate": "Communist"
+        },
+        {
+          "label": "MacBride-Bergland LP",
+          "contest": "president",
+          "candidate": "Roger MacBride (Libertarian)"
+        },
+        {
+          "label": "Levin-Blomen SLP",
+          "contest": "president",
+          "candidate": "Socialist Labor"
+        },
+        {
+          "label": "Camejo-Reid SWP",
+          "contest": "president",
+          "candidate": "Socialist Workers"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.077,
+        0.141,
+        0.955,
+        0.799
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENTIAL ELECTORS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1717
+      ]
+    },
+    {
+      "page": 26,
+      "id": "26-0",
+      "columns": [
+        {
+          "label": "Lorber D.",
+          "contest": "senate",
+          "candidate": "Richard P. Lorber"
+        },
+        {
+          "label": "Chafee R.",
+          "contest": "senate",
+          "candidate": "John H. Chafee"
+        },
+        {
+          "label": "Cann CP",
+          "contest": "senate",
+          "candidate": "Margaret R. Cann"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.117,
+        0.141,
+        0.985,
+        0.76
+      ],
+      "hint": "Read only the table headed 'VOTE FOR UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1147
+      ]
+    },
+    {
+      "page": 28,
+      "id": "28-0",
+      "columns": [
+        {
+          "label": "St Germain D.",
+          "contest": "house1",
+          "candidate": "Fernand J. St Germain"
+        },
+        {
+          "label": "Slocum R.",
+          "contest": "house1",
+          "candidate": "John J. Slocum, Jr."
+        },
+        {
+          "label": "Morrissey Ind.",
+          "contest": "house1",
+          "candidate": "Ann M. Morrissey"
+        },
+        {
+          "label": "Beard D.",
+          "contest": "house2",
+          "candidate": "Edward P. Beard"
+        },
+        {
+          "label": "Iannitti R.",
+          "contest": "house2",
+          "candidate": "Thomas V. Iannitti"
+        },
+        {
+          "label": "Pacia Ind.",
+          "contest": "house2",
+          "candidate": "Pasquale F. Pacia"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.133,
+        0.099,
+        0.981,
+        0.772
+      ],
+      "hint": "Read only the table headed 'VOTE FOR UNITED STATES CONGRESSMEN'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2035
+      ]
+    },
+    {
+      "page": 33,
+      "id": "33-0",
+      "columns": [
+        {
+          "label": "Garrahy, D.",
+          "contest": "governor",
+          "candidate": "J. Joseph Garrahy"
+        },
+        {
+          "label": "Taft, R.",
+          "contest": "governor",
+          "candidate": "James L. Taft"
+        },
+        {
+          "label": "Swift, Ind.",
+          "contest": "governor",
+          "candidate": "John C. Swift"
+        },
+        {
+          "label": "Engel, I.P",
+          "contest": "governor",
+          "candidate": "Stewart L. Engel"
+        },
+        {
+          "label": "DiLuglio, D.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Guerin, R.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.075,
+        0.104,
+        0.96,
+        0.874
+      ],
+      "hint": "Read only the table headed 'VOTE FOR GOVERNOR AND LIEUTENANT-GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2922
+      ]
+    }
+  ]
+}

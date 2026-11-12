@@ -1,0 +1,140 @@
+{
+  "polity": "US-RI",
+  "publisher": "Rhode Island Board of Elections",
+  "title": "Official Count of the Ballots Cast, 1954",
+  "license": "Public record",
+  "file": {
+    "url": "https://elections.ri.gov/publications/Election_Publications/Countbooks/1954%20Count%20book.pdf"
+  },
+  "raw_source": "us.scans",
+  "unit_scheme": "town",
+  "contests": {
+    "senate": {
+      "year": 1954,
+      "day": "1954-11-02",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "chamber": "senate"
+    },
+    "house1": {
+      "year": 1954,
+      "day": "1954-11-02",
+      "special": false,
+      "state": "RI",
+      "district": 1,
+      "chamber": "house"
+    },
+    "house2": {
+      "year": 1954,
+      "day": "1954-11-02",
+      "special": false,
+      "state": "RI",
+      "district": 2,
+      "chamber": "house"
+    },
+    "governor": {
+      "year": 1954,
+      "day": "1954-11-02",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "chamber": "governor"
+    }
+  },
+  "pages": [
+    {
+      "page": 20,
+      "id": "20-0",
+      "columns": [
+        {
+          "label": "Green",
+          "contest": "senate",
+          "candidate": "Theodore Francis Green"
+        },
+        {
+          "label": "Sundlun",
+          "contest": "senate",
+          "candidate": "Walter I. Sundlun"
+        },
+        {
+          "label": "Forand",
+          "contest": "house1",
+          "candidate": "Aime J. Forand"
+        },
+        {
+          "label": "Carrellas",
+          "contest": "house1",
+          "candidate": "Arthur A. Carrellas"
+        },
+        {
+          "label": "Fogarty",
+          "contest": "house2",
+          "candidate": "John E. Fogarty"
+        },
+        {
+          "label": "Watts",
+          "contest": "house2",
+          "candidate": "James O. Watts"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.115,
+        0.06,
+        0.869,
+        0.724
+      ],
+      "hint": "Read only the table headed 'VOTE FOR UNITED STATES SENATOR AND CONGRESSMEN'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1702
+      ]
+    },
+    {
+      "page": 23,
+      "id": "23-0",
+      "columns": [
+        {
+          "label": "Roberts",
+          "contest": "governor",
+          "candidate": "Dennis J. Roberts"
+        },
+        {
+          "label": "Lewis",
+          "contest": "governor",
+          "candidate": "Dean J. Lewis"
+        },
+        {
+          "label": "Marley",
+          "contest": "governor",
+          "candidate": "Arthur E. Marley"
+        },
+        {
+          "label": "McKiernan",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Leclaire",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.136,
+        0.068,
+        0.903,
+        0.699
+      ],
+      "hint": "Read only the table headed 'VOTE FOR GOVERNOR AND LIEUTENANT-GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1172
+      ]
+    }
+  ]
+}

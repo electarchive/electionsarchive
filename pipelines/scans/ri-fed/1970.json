@@ -1,0 +1,184 @@
+{
+  "polity": "US-RI",
+  "publisher": "Rhode Island Board of Elections",
+  "title": "Official Count of the Ballots Cast, 1970",
+  "license": "Public record",
+  "file": {
+    "url": "https://elections.ri.gov/publications/Election_Publications/Countbooks/1970%20Count%20Book.pdf"
+  },
+  "raw_source": "us.scans",
+  "unit_scheme": "town",
+  "contests": {
+    "senate": {
+      "year": 1970,
+      "day": "1970-11-03",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "chamber": "senate"
+    },
+    "house1": {
+      "year": 1970,
+      "day": "1970-11-03",
+      "special": false,
+      "state": "RI",
+      "district": 1,
+      "chamber": "house"
+    },
+    "house2": {
+      "year": 1970,
+      "day": "1970-11-03",
+      "special": false,
+      "state": "RI",
+      "district": 2,
+      "chamber": "house"
+    },
+    "governor": {
+      "year": 1970,
+      "day": "1970-11-03",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "chamber": "governor"
+    }
+  },
+  "pages": [
+    {
+      "page": 18,
+      "id": "18-0",
+      "columns": [
+        {
+          "label": "Pastore, D.",
+          "contest": "senate",
+          "candidate": "John O. Pastore"
+        },
+        {
+          "label": "McLaughlin, R.",
+          "contest": "senate",
+          "candidate": "John McLaughlin"
+        },
+        {
+          "label": "Fein, S.W.P.",
+          "contest": "senate",
+          "candidate": "Daniel B. Fein"
+        },
+        {
+          "label": "Fenton, P & F",
+          "contest": "senate",
+          "candidate": "David N. Fenton"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.071,
+        0.097,
+        0.936,
+        0.931
+      ],
+      "hint": "Read only the table headed 'VOTE FOR UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2122
+      ]
+    },
+    {
+      "page": 20,
+      "id": "20-0",
+      "columns": [
+        {
+          "label": "St. Germain, D.",
+          "contest": "house1",
+          "candidate": "Fernand J. St Germain"
+        },
+        {
+          "label": "Miska, R.",
+          "contest": "house1",
+          "candidate": "Walter J. Miska"
+        },
+        {
+          "label": "Murray, P & F",
+          "contest": "house1",
+          "candidate": "Stephen Bruce Murray"
+        },
+        {
+          "label": "Tiernan, D.",
+          "contest": "house2",
+          "candidate": "Robert O. Tiernan"
+        },
+        {
+          "label": "Dimitri, Jr., R.",
+          "contest": "house2",
+          "candidate": "William A. Dimitri, Jr."
+        },
+        {
+          "label": "O'Hara, I.",
+          "contest": "house2",
+          "candidate": "Louis Dona G. O'Hara"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.063,
+        0.094,
+        0.927,
+        0.924
+      ],
+      "hint": "Read only the table headed 'VOTE FOR UNITED STATES CONGRESSMEN'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2048
+      ]
+    },
+    {
+      "page": 24,
+      "id": "24-0",
+      "columns": [
+        {
+          "label": "Licht, D.",
+          "contest": "governor",
+          "candidate": "Frank Licht"
+        },
+        {
+          "label": "DeSimone, R.",
+          "contest": "governor",
+          "candidate": "Herbert F. DeSimone"
+        },
+        {
+          "label": "Powers, Jr., S.W.P.",
+          "contest": "governor",
+          "candidate": "John E. Powers"
+        },
+        {
+          "label": "Garrahy, D.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Gorham, R.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Traugott, S.W.P.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.06,
+        0.085,
+        0.926,
+        0.904
+      ],
+      "hint": "Read only the table headed 'VOTE FOR GOVERNOR AND LIEUTENANT-GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2723
+      ]
+    }
+  ]
+}

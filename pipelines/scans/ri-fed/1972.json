@@ -1,0 +1,216 @@
+{
+  "polity": "US-RI",
+  "publisher": "Rhode Island Board of Elections",
+  "title": "Official Count of the Ballots Cast, 1972",
+  "license": "Public record",
+  "file": {
+    "url": "https://elections.ri.gov/publications/Election_Publications/Countbooks/1972%20Count%20Book.pdf"
+  },
+  "raw_source": "us.scans",
+  "unit_scheme": "town",
+  "contests": {
+    "president": {
+      "year": 1972,
+      "day": "1972-11-07",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "chamber": "president"
+    },
+    "senate": {
+      "year": 1972,
+      "day": "1972-11-07",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "chamber": "senate"
+    },
+    "house1": {
+      "year": 1972,
+      "day": "1972-11-07",
+      "special": false,
+      "state": "RI",
+      "district": 1,
+      "chamber": "house"
+    },
+    "house2": {
+      "year": 1972,
+      "day": "1972-11-07",
+      "special": false,
+      "state": "RI",
+      "district": 2,
+      "chamber": "house"
+    },
+    "governor": {
+      "year": 1972,
+      "day": "1972-11-07",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "chamber": "governor"
+    }
+  },
+  "pages": [
+    {
+      "page": 18,
+      "id": "18-0",
+      "columns": [
+        {
+          "label": "McGovern-Shriver D.",
+          "contest": "president",
+          "candidate": "McGovern (Democratic)"
+        },
+        {
+          "label": "Nixon-Agnew R.",
+          "contest": "president",
+          "candidate": "Nixon (Republican)"
+        },
+        {
+          "label": "Jenness-Pulley S.W.P.",
+          "contest": "president",
+          "candidate": "Socialist Workers"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.088,
+        0.083,
+        0.952,
+        0.799
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENTIAL ELECTORS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2318
+      ]
+    },
+    {
+      "page": 20,
+      "id": "20-0",
+      "columns": [
+        {
+          "label": "Pell D.",
+          "contest": "senate",
+          "candidate": "Claiborne deB. Pell"
+        },
+        {
+          "label": "Chafee R.",
+          "contest": "senate",
+          "candidate": "John H. Chafee"
+        },
+        {
+          "label": "DeTemple S.W.P.",
+          "contest": "senate",
+          "candidate": "Patrick M. DeTemple"
+        },
+        {
+          "label": "Quattrocchi I.",
+          "contest": "senate",
+          "candidate": "John Quattrocchi, Jr."
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.091,
+        0.089,
+        0.974,
+        0.782
+      ],
+      "hint": "Read only the table headed 'VOTE FOR UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2179
+      ]
+    },
+    {
+      "page": 23,
+      "id": "23-0",
+      "columns": [
+        {
+          "label": "St Germain D.",
+          "contest": "house1",
+          "candidate": "Fernand J. St Germain"
+        },
+        {
+          "label": "Feeley R.",
+          "contest": "house1",
+          "candidate": "John M. Feeley"
+        },
+        {
+          "label": "Miska I.",
+          "contest": "house1",
+          "candidate": "Walter J. Miska"
+        },
+        {
+          "label": "Tiernan D.",
+          "contest": "house2",
+          "candidate": "Robert O. Tiernan"
+        },
+        {
+          "label": "Ryan R.",
+          "contest": "house2",
+          "candidate": "Donald P. Ryan"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.092,
+        0.156,
+        0.952,
+        0.825
+      ],
+      "hint": "Read only the table headed 'VOTE FOR UNITED STATES CONGRESSMEN'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1614
+      ]
+    },
+    {
+      "page": 28,
+      "id": "28-0",
+      "columns": [
+        {
+          "label": "Noel, D",
+          "contest": "governor",
+          "candidate": "Philip W. Noel"
+        },
+        {
+          "label": "DeSimone, R.",
+          "contest": "governor",
+          "candidate": "Herbert F. DeSimone"
+        },
+        {
+          "label": "Varone, I.",
+          "contest": "governor",
+          "candidate": "Adam J. Varone"
+        },
+        {
+          "label": "Garrahy, D.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Gammell, R.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.094,
+        0.081,
+        0.976,
+        0.864
+      ],
+      "hint": "Read only the table headed 'VOTE FOR GOVERNOR AND LIEUTENANT-GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2938
+      ]
+    }
+  ]
+}

@@ -1,0 +1,172 @@
+{
+  "polity": "US-RI",
+  "publisher": "Rhode Island Board of Elections",
+  "title": "Official Count of the Ballots Cast, 1964",
+  "license": "Public record",
+  "file": {
+    "url": "https://elections.ri.gov/publications/Election_Publications/Countbooks/1964%20Count%20Book.pdf"
+  },
+  "raw_source": "us.scans",
+  "unit_scheme": "town",
+  "contests": {
+    "president": {
+      "year": 1964,
+      "day": "1964-11-03",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "chamber": "president"
+    },
+    "senate": {
+      "year": 1964,
+      "day": "1964-11-03",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "chamber": "senate"
+    },
+    "house1": {
+      "year": 1964,
+      "day": "1964-11-03",
+      "special": false,
+      "state": "RI",
+      "district": 1,
+      "chamber": "house"
+    },
+    "house2": {
+      "year": 1964,
+      "day": "1964-11-03",
+      "special": false,
+      "state": "RI",
+      "district": 2,
+      "chamber": "house"
+    },
+    "governor": {
+      "year": 1964,
+      "day": "1964-11-03",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "chamber": "governor"
+    }
+  },
+  "pages": [
+    {
+      "page": 37,
+      "id": "37-0",
+      "columns": [
+        {
+          "label": "Johnson Humphrey D.",
+          "contest": "president",
+          "candidate": "Lyndon B. Johnson (Democratic)"
+        },
+        {
+          "label": "Goldwater Miller R.",
+          "contest": "president",
+          "candidate": "Barry Goldwater (Republican)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.131,
+        0.077,
+        0.898,
+        0.749
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENTIAL ELECTORS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1622
+      ]
+    },
+    {
+      "page": 39,
+      "id": "39-0",
+      "columns": [
+        {
+          "label": "Pastore, D.",
+          "contest": "senate",
+          "candidate": "John O. Pastore"
+        },
+        {
+          "label": "Lagueux, R.",
+          "contest": "senate",
+          "candidate": "Ronald R. Lagueux"
+        },
+        {
+          "label": "St. Germain, D.",
+          "contest": "house1",
+          "candidate": "Fernand J. St Germain"
+        },
+        {
+          "label": "Blanchette, R.",
+          "contest": "house1",
+          "candidate": "Rolland H. Blanchette"
+        },
+        {
+          "label": "Fogarty, D.",
+          "contest": "house2",
+          "candidate": "John E. Fogarty"
+        },
+        {
+          "label": "Wells, R.",
+          "contest": "house2",
+          "candidate": "Guy J. Wells"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.122,
+        0.082,
+        0.874,
+        0.896
+      ],
+      "hint": "Read only the table headed 'VOTE FOR UNITED STATES SENATOR AND CONGRESSMEN'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.301
+      ]
+    },
+    {
+      "page": 43,
+      "id": "43-0",
+      "columns": [
+        {
+          "label": "Gallogly D.",
+          "contest": "governor",
+          "candidate": "Edward P. Gallogly"
+        },
+        {
+          "label": "Chafee R.",
+          "contest": "governor",
+          "candidate": "John H. Chafee"
+        },
+        {
+          "label": "Folcarelli D.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "O'Donnell, Jr., R.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.1,
+        0.12,
+        0.95,
+        0.73
+      ],
+      "hint": "Read only the table headed 'VOTE FOR GOVERNOR AND LIEUTENANT-GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.09
+      ]
+    }
+  ]
+}

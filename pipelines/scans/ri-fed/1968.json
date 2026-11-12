@@ -1,0 +1,174 @@
+{
+  "polity": "US-RI",
+  "publisher": "Rhode Island Board of Elections",
+  "title": "Official Count of the Ballots Cast, 1968",
+  "license": "Public record",
+  "file": {
+    "url": "https://elections.ri.gov/publications/Election_Publications/Countbooks/1968%20Count%20Book.pdf"
+  },
+  "raw_source": "us.scans",
+  "unit_scheme": "town",
+  "contests": {
+    "president": {
+      "year": 1968,
+      "day": "1968-11-05",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "chamber": "president"
+    },
+    "house1": {
+      "year": 1968,
+      "day": "1968-11-05",
+      "special": false,
+      "state": "RI",
+      "district": 1,
+      "chamber": "house"
+    },
+    "house2": {
+      "year": 1968,
+      "day": "1968-11-05",
+      "special": false,
+      "state": "RI",
+      "district": 2,
+      "chamber": "house"
+    },
+    "governor": {
+      "year": 1968,
+      "day": "1968-11-05",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "chamber": "governor"
+    }
+  },
+  "pages": [
+    {
+      "page": 17,
+      "id": "17-0",
+      "columns": [
+        {
+          "label": "Humphrey-Muskie, D.",
+          "contest": "president",
+          "candidate": "Hubert H. Humphrey (Democratic)"
+        },
+        {
+          "label": "Nixon-Agnew, R.",
+          "contest": "president",
+          "candidate": "Richard Nixon (Republican)"
+        },
+        {
+          "label": "Halstead-Boutelle Nom. Papers",
+          "contest": "president",
+          "candidate": "Socialist Workers"
+        },
+        {
+          "label": "Wallace-Griffin Nom. Papers",
+          "contest": "president",
+          "candidate": "George Wallace (American Independent)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.094,
+        0.073,
+        0.953,
+        0.782
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENTIAL ELECTORS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2214
+      ]
+    },
+    {
+      "page": 19,
+      "id": "19-0",
+      "columns": [
+        {
+          "label": "St. Germain, D.",
+          "contest": "house1",
+          "candidate": "Fernand J. St Germain"
+        },
+        {
+          "label": "Almond, R.",
+          "contest": "house1",
+          "candidate": "Lincoln A. Almond"
+        },
+        {
+          "label": "O'Brien, I.",
+          "contest": "house1",
+          "candidate": "Joseph O'Brien"
+        },
+        {
+          "label": "O'Hara, I.",
+          "contest": "house1",
+          "candidate": "Louis O'Hara"
+        },
+        {
+          "label": "Tiernan, D.",
+          "contest": "house2",
+          "candidate": "Robert O. Tiernan"
+        },
+        {
+          "label": "Russell, Jr., R.",
+          "contest": "house2",
+          "candidate": "Howard Russell"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.082,
+        0.071,
+        0.948,
+        0.784
+      ],
+      "hint": "Read only the table headed 'VOTE FOR UNITED STATES CONGRESSMEN'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2371
+      ]
+    },
+    {
+      "page": 24,
+      "id": "24-0",
+      "columns": [
+        {
+          "label": "Licht, D.",
+          "contest": "governor",
+          "candidate": "Frank Licht"
+        },
+        {
+          "label": "Chafee, R.",
+          "contest": "governor",
+          "candidate": "John H. Chafee"
+        },
+        {
+          "label": "Garrahy, D.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "O'Donnell, Jr., R.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.059,
+        0.141,
+        0.948,
+        0.849
+      ],
+      "hint": "Read only the table headed 'VOTE FOR GOVERNOR AND LIEUTENANT-GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2203
+      ]
+    }
+  ]
+}

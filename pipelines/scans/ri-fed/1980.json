@@ -1,0 +1,184 @@
+{
+  "polity": "US-RI",
+  "publisher": "Rhode Island Board of Elections",
+  "title": "Official Count of the Ballots Cast, 1980",
+  "license": "Public record",
+  "file": {
+    "url": "https://elections.ri.gov/publications/Election_Publications/Countbooks/1980%20Count%20Book.pdf"
+  },
+  "raw_source": "us.scans",
+  "unit_scheme": "town",
+  "contests": {
+    "president": {
+      "year": 1980,
+      "day": "1980-11-04",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "chamber": "president"
+    },
+    "house1": {
+      "year": 1980,
+      "day": "1980-11-04",
+      "special": false,
+      "state": "RI",
+      "district": 1,
+      "chamber": "house"
+    },
+    "house2": {
+      "year": 1980,
+      "day": "1980-11-04",
+      "special": false,
+      "state": "RI",
+      "district": 2,
+      "chamber": "house"
+    },
+    "governor": {
+      "year": 1980,
+      "day": "1980-11-04",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "chamber": "governor"
+    }
+  },
+  "pages": [
+    {
+      "page": 27,
+      "id": "27-0",
+      "columns": [
+        {
+          "label": "Carter Mondale, D",
+          "contest": "president",
+          "candidate": "Jimmy Carter (Democratic)"
+        },
+        {
+          "label": "Reagan Bush, R",
+          "contest": "president",
+          "candidate": "Ronald Reagan (Republican)"
+        },
+        {
+          "label": "Anderson Lucey, I",
+          "contest": "president",
+          "candidate": "John Anderson (Independent)"
+        },
+        {
+          "label": "Hall Davis, CP",
+          "contest": "president",
+          "candidate": "Communist"
+        },
+        {
+          "label": "Clark Koch, LP",
+          "contest": "president",
+          "candidate": "Ed Clark (Libertarian)"
+        },
+        {
+          "label": "McReynolds Drufenbrock, SP",
+          "contest": "president",
+          "candidate": "Socialist"
+        },
+        {
+          "label": "DeBerry Zimmerman, SWP",
+          "contest": "president",
+          "candidate": "Socialist Workers"
+        },
+        {
+          "label": "Griswold Holmes, WWP",
+          "contest": "president",
+          "candidate": "Workers World"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.052,
+        0.114,
+        0.916,
+        0.784
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENTIAL ELECTORS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2209
+      ]
+    },
+    {
+      "page": 30,
+      "id": "30-0",
+      "columns": [
+        {
+          "label": "St. Germain, D",
+          "contest": "house1",
+          "candidate": "Fernand J. St Germain"
+        },
+        {
+          "label": "Montgomery, R",
+          "contest": "house1",
+          "candidate": "William P. Montgomery"
+        },
+        {
+          "label": "Beard, D",
+          "contest": "house2",
+          "candidate": "Edward P. Beard"
+        },
+        {
+          "label": "Schneider, R",
+          "contest": "house2",
+          "candidate": "Claudine Schneider"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.085,
+        0.074,
+        0.96,
+        0.785
+      ],
+      "hint": "Read only the table headed 'VOTE FOR UNITED STATES REPRESENTATIVE'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2701
+      ]
+    },
+    {
+      "page": 34,
+      "id": "34-0",
+      "columns": [
+        {
+          "label": "Garrahy, D",
+          "contest": "governor",
+          "candidate": "J. Joseph Garrahy"
+        },
+        {
+          "label": "Cianci, R",
+          "contest": "governor",
+          "candidate": "Buddy Cianci"
+        },
+        {
+          "label": "DiLuglio, D",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DeCelles, R",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.094,
+        0.077,
+        0.955,
+        0.765
+      ],
+      "hint": "Read only the table headed 'VOTE FOR GOVERNOR AND LIEUTENANT GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2166
+      ]
+    }
+  ]
+}

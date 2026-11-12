@@ -1,0 +1,135 @@
+{
+  "polity": "US-RI",
+  "publisher": "Rhode Island Board of Elections",
+  "title": "Official Count of the Ballots Cast, 1950",
+  "license": "Public record",
+  "file": {
+    "url": "https://elections.ri.gov/publications/Election_Publications/Countbooks/1950%20Count%20Book.pdf"
+  },
+  "raw_source": "us.scans",
+  "unit_scheme": "town",
+  "contests": {
+    "senate": {
+      "year": 1950,
+      "day": "1950-11-07",
+      "special": true,
+      "state": "RI",
+      "district": null,
+      "chamber": "senate"
+    },
+    "house1": {
+      "year": 1950,
+      "day": "1950-11-07",
+      "special": false,
+      "state": "RI",
+      "district": 1,
+      "chamber": "house"
+    },
+    "house2": {
+      "year": 1950,
+      "day": "1950-11-07",
+      "special": false,
+      "state": "RI",
+      "district": 2,
+      "chamber": "house"
+    },
+    "governor": {
+      "year": 1950,
+      "day": "1950-11-07",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "chamber": "governor"
+    }
+  },
+  "pages": [
+    {
+      "page": 13,
+      "id": "13-0",
+      "columns": [
+        {
+          "label": "Pastore",
+          "contest": "senate",
+          "candidate": "John O. Pastore"
+        },
+        {
+          "label": "Levy",
+          "contest": "senate",
+          "candidate": "Austin T. Levy"
+        },
+        {
+          "label": "Forand",
+          "contest": "house1",
+          "candidate": "Aime J. Forand"
+        },
+        {
+          "label": "Foley",
+          "contest": "house1",
+          "candidate": "Francis R. Foley"
+        },
+        {
+          "label": "Fogarty",
+          "contest": "house2",
+          "candidate": "John E. Fogarty"
+        },
+        {
+          "label": "Budlong",
+          "contest": "house2",
+          "candidate": "Wilford S. Budlong"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.132,
+        0.096,
+        0.894,
+        0.739
+      ],
+      "hint": "Read only the table headed 'VOTE FOR UNITED STATES SENATOR AND CONGRESSMEN'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1135
+      ]
+    },
+    {
+      "page": 16,
+      "id": "16-0",
+      "columns": [
+        {
+          "label": "Roberts",
+          "contest": "governor",
+          "candidate": "Dennis J. Roberts"
+        },
+        {
+          "label": "Lachapelle",
+          "contest": "governor",
+          "candidate": "Eugene J. Lachapelle"
+        },
+        {
+          "label": "McKiernan",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Gardiner",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.115,
+        0.15,
+        0.876,
+        0.758
+      ],
+      "hint": "Read only the table headed 'VOTE FOR GOVERNOR AND LIEUTENANT-GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.06
+      ]
+    }
+  ]
+}

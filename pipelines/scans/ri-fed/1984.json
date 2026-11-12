@@ -1,0 +1,207 @@
+{
+  "polity": "US-RI",
+  "publisher": "Rhode Island Board of Elections",
+  "title": "Official Count of the Ballots Cast, 1984",
+  "license": "Public record",
+  "file": {
+    "url": "https://elections.ri.gov/publications/Election_Publications/Countbooks/1984%20Count%20Book.pdf"
+  },
+  "raw_source": "us.scans",
+  "unit_scheme": "town",
+  "contests": {
+    "president": {
+      "year": 1984,
+      "day": "1984-11-06",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "chamber": "president"
+    },
+    "senate": {
+      "year": 1984,
+      "day": "1984-11-06",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "chamber": "senate"
+    },
+    "house1": {
+      "year": 1984,
+      "day": "1984-11-06",
+      "special": false,
+      "state": "RI",
+      "district": 1,
+      "chamber": "house"
+    },
+    "house2": {
+      "year": 1984,
+      "day": "1984-11-06",
+      "special": false,
+      "state": "RI",
+      "district": 2,
+      "chamber": "house"
+    },
+    "governor": {
+      "year": 1984,
+      "day": "1984-11-06",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "chamber": "governor"
+    }
+  },
+  "pages": [
+    {
+      "page": 31,
+      "id": "31-0",
+      "columns": [
+        {
+          "label": "Reagan Bush",
+          "contest": "president",
+          "candidate": "Ronald Reagan"
+        },
+        {
+          "label": "Mondale Ferraro",
+          "contest": "president",
+          "candidate": "Walter F. Mondale"
+        },
+        {
+          "label": "Richard Salaman",
+          "contest": "president",
+          "candidate": "Bob Richards"
+        },
+        {
+          "label": "Johnson Walton",
+          "contest": "president",
+          "candidate": "Sonia Johnson"
+        },
+        {
+          "label": "Hall Davis",
+          "contest": "president",
+          "candidate": "Gus Hall"
+        },
+        {
+          "label": "Bergland Lewis",
+          "contest": "president",
+          "candidate": "David Bergland"
+        },
+        {
+          "label": "Serrette Ross",
+          "contest": "president",
+          "candidate": "Dennis L. Serrette"
+        },
+        {
+          "label": "Mason Zimmerman",
+          "contest": "president",
+          "candidate": "Mel Mason"
+        },
+        {
+          "label": "Holmes Vera",
+          "contest": "president",
+          "candidate": "Gavrielle Holmes"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.093,
+        0.085,
+        0.964,
+        0.891
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENTIAL ELECTORS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2667
+      ]
+    },
+    {
+      "page": 34,
+      "id": "34-0",
+      "columns": [
+        {
+          "label": "Leonard, R.",
+          "contest": "senate",
+          "candidate": "Barbara M. Leonard"
+        },
+        {
+          "label": "Pell, D.",
+          "contest": "senate",
+          "candidate": "Claiborne Pell"
+        },
+        {
+          "label": "Rego, R.",
+          "contest": "house1",
+          "candidate": "Alfred R. Rego Jr."
+        },
+        {
+          "label": "St Germain, D.",
+          "contest": "house1",
+          "candidate": "Fernand J. St. Germain"
+        },
+        {
+          "label": "Schneider, R.",
+          "contest": "house2",
+          "candidate": "Claudine Schneider"
+        },
+        {
+          "label": "Sinapi, D.",
+          "contest": "house2",
+          "candidate": "Richard Sinapi"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.065,
+        0.187,
+        0.929,
+        0.932
+      ],
+      "hint": "Read only the table headed 'VOTE FOR UNITED STATES SENATOR AND REPRESENTATIVES IN CONGRESS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1933
+      ]
+    },
+    {
+      "page": 39,
+      "id": "39-0",
+      "columns": [
+        {
+          "label": "DiPrete, R.",
+          "contest": "governor",
+          "candidate": "Edward Diprete"
+        },
+        {
+          "label": "Solomon, D.",
+          "contest": "governor",
+          "candidate": "Anthony J. Solomon"
+        },
+        {
+          "label": "Sapinsley, R.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Licht, D.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.1,
+        0.12,
+        0.97,
+        0.89
+      ],
+      "hint": "Read only the table headed 'VOTE FOR GOVERNOR AND LIEUTENANT GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2
+      ]
+    }
+  ]
+}

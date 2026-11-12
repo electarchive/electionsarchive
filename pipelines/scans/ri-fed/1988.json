@@ -1,0 +1,207 @@
+{
+  "polity": "US-RI",
+  "publisher": "Rhode Island Board of Elections",
+  "title": "Official Count of the Ballots Cast, 1988",
+  "license": "Public record",
+  "file": {
+    "url": "https://elections.ri.gov/publications/Election_Publications/Countbooks/1988%20Count%20Book.pdf"
+  },
+  "raw_source": "us.scans",
+  "unit_scheme": "town",
+  "contests": {
+    "president": {
+      "year": 1988,
+      "day": "1988-11-08",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "chamber": "president"
+    },
+    "senate": {
+      "year": 1988,
+      "day": "1988-11-08",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "chamber": "senate"
+    },
+    "house1": {
+      "year": 1988,
+      "day": "1988-11-08",
+      "special": false,
+      "state": "RI",
+      "district": 1,
+      "chamber": "house"
+    },
+    "house2": {
+      "year": 1988,
+      "day": "1988-11-08",
+      "special": false,
+      "state": "RI",
+      "district": 2,
+      "chamber": "house"
+    },
+    "governor": {
+      "year": 1988,
+      "day": "1988-11-08",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "chamber": "governor"
+    }
+  },
+  "pages": [
+    {
+      "page": 33,
+      "id": "33-0",
+      "columns": [
+        {
+          "label": "Dukakis Bentsen",
+          "contest": "president",
+          "candidate": "Michael S. Dukakis"
+        },
+        {
+          "label": "Bush Quayle",
+          "contest": "president",
+          "candidate": "George Bush"
+        },
+        {
+          "label": "Paul Marrou",
+          "contest": "president",
+          "candidate": "Ronald E. Paul"
+        },
+        {
+          "label": "Fulani Dattner",
+          "contest": "president",
+          "candidate": "Lenora B. Fulani"
+        },
+        {
+          "label": "Lewin Murdock",
+          "contest": "president",
+          "candidate": "Herbert Lewin"
+        },
+        {
+          "label": "Duke Parker",
+          "contest": "president",
+          "candidate": "David E. Duke"
+        },
+        {
+          "label": "Kenoyer Ehrenreich",
+          "contest": "president",
+          "candidate": "Willa Kenoyer"
+        },
+        {
+          "label": "Warren Mickells",
+          "contest": "president",
+          "candidate": "James Mac Warren"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.072,
+        0.194,
+        0.955,
+        0.82
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENTIAL ELECTORS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1566
+      ]
+    },
+    {
+      "page": 34,
+      "id": "34-0",
+      "columns": [
+        {
+          "label": "Licht, D.",
+          "contest": "senate",
+          "candidate": "Richard A. Licht"
+        },
+        {
+          "label": "Chafee, R.",
+          "contest": "senate",
+          "candidate": "John H. Chafee"
+        },
+        {
+          "label": "St Germain, D. First District",
+          "contest": "house1",
+          "candidate": "Fernand J. St. Germain"
+        },
+        {
+          "label": "Machtley, R. First District",
+          "contest": "house1",
+          "candidate": "Ronald K. Machtley"
+        },
+        {
+          "label": "Morgenthau, D. Second District",
+          "contest": "house2",
+          "candidate": "Ruth S. Morgenthau"
+        },
+        {
+          "label": "Schneider, R. Second District",
+          "contest": "house2",
+          "candidate": "Claudine Schneider"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.082,
+        0.202,
+        0.952,
+        0.904
+      ],
+      "hint": "Read only the table headed 'VOTE FOR UNITED STATES SENATOR AND REPRESENTATIVES IN CONGRESS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2394
+      ]
+    },
+    {
+      "page": 39,
+      "id": "39-0",
+      "columns": [
+        {
+          "label": "Sundlun, D.",
+          "contest": "governor",
+          "candidate": "Bruce G. Sundlun"
+        },
+        {
+          "label": "DiPrete, R.",
+          "contest": "governor",
+          "candidate": "Edward Diprete"
+        },
+        {
+          "label": "Beglin, D.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Lippitt, R.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "White, I.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.079,
+        0.091,
+        0.948,
+        0.839
+      ],
+      "hint": "Read only the table headed 'VOTE FOR GOVERNOR AND LIEUTENANT GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2874
+      ]
+    }
+  ]
+}

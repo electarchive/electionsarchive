@@ -1,0 +1,159 @@
+{
+  "polity": "US-RI",
+  "publisher": "Rhode Island Board of Elections",
+  "title": "Official Count of the Ballots Cast, 1978",
+  "license": "Public record",
+  "file": {
+    "url": "https://elections.ri.gov/publications/Election_Publications/Countbooks/1978%20Count%20Book.pdf"
+  },
+  "raw_source": "us.scans",
+  "unit_scheme": "town",
+  "contests": {
+    "senate": {
+      "year": 1978,
+      "day": "1978-11-07",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "chamber": "senate"
+    },
+    "house1": {
+      "year": 1978,
+      "day": "1978-11-07",
+      "special": false,
+      "state": "RI",
+      "district": 1,
+      "chamber": "house"
+    },
+    "house2": {
+      "year": 1978,
+      "day": "1978-11-07",
+      "special": false,
+      "state": "RI",
+      "district": 2,
+      "chamber": "house"
+    },
+    "governor": {
+      "year": 1978,
+      "day": "1978-11-07",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "chamber": "governor"
+    }
+  },
+  "pages": [
+    {
+      "page": 21,
+      "id": "21-0",
+      "columns": [
+        {
+          "label": "Pell D.",
+          "contest": "senate",
+          "candidate": "Claiborne Pell"
+        },
+        {
+          "label": "Reynolds R.",
+          "contest": "senate",
+          "candidate": "James G. Reynolds"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.079,
+        0.099,
+        0.977,
+        0.749
+      ],
+      "hint": "Read only the table headed 'VOTE FOR UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1554
+      ]
+    },
+    {
+      "page": 23,
+      "id": "23-0",
+      "columns": [
+        {
+          "label": "St.Germain, D.",
+          "contest": "house1",
+          "candidate": "Fernand St Germain"
+        },
+        {
+          "label": "Slocum, R.",
+          "contest": "house1",
+          "candidate": "Jerry Slocum"
+        },
+        {
+          "label": "Beard, D.",
+          "contest": "house2",
+          "candidate": "Edward P. Beard"
+        },
+        {
+          "label": "Schneider, R.",
+          "contest": "house2",
+          "candidate": "Claudine Camarada Schneider"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.099,
+        0.078,
+        0.99,
+        0.811
+      ],
+      "hint": "Read only the table headed 'VOTE FOR UNITED STATES CONGRESSMEN'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2319
+      ]
+    },
+    {
+      "page": 28,
+      "id": "28-0",
+      "columns": [
+        {
+          "label": "Garrahy, D.",
+          "contest": "governor",
+          "candidate": "J. Joseph Garrahy"
+        },
+        {
+          "label": "Almond, R.",
+          "contest": "governor",
+          "candidate": "Lincoln C. Almond"
+        },
+        {
+          "label": "Doorley, Ind.",
+          "contest": "governor",
+          "candidate": "Joseph A. Doorley Jr."
+        },
+        {
+          "label": "DiLuglio, D.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Garabedian, R.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.072,
+        0.093,
+        0.953,
+        0.872
+      ],
+      "hint": "Read only the table headed 'VOTE FOR GOVERNOR AND LIEUTENANT-GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2927
+      ]
+    }
+  ]
+}

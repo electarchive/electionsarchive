@@ -1,0 +1,187 @@
+{
+  "polity": "US-RI",
+  "publisher": "Rhode Island Board of Elections",
+  "title": "Official Count of the Ballots Cast, 1952",
+  "license": "Public record",
+  "file": {
+    "url": "https://elections.ri.gov/publications/Election_Publications/Countbooks/1952%20Count%20Book.pdf"
+  },
+  "raw_source": "us.scans",
+  "unit_scheme": "town",
+  "contests": {
+    "president": {
+      "year": 1952,
+      "day": "1952-11-04",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "chamber": "president"
+    },
+    "senate": {
+      "year": 1952,
+      "day": "1952-11-04",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "chamber": "senate"
+    },
+    "house1": {
+      "year": 1952,
+      "day": "1952-11-04",
+      "special": false,
+      "state": "RI",
+      "district": 1,
+      "chamber": "house"
+    },
+    "house2": {
+      "year": 1952,
+      "day": "1952-11-04",
+      "special": false,
+      "state": "RI",
+      "district": 2,
+      "chamber": "house"
+    },
+    "governor": {
+      "year": 1952,
+      "day": "1952-11-04",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "chamber": "governor"
+    }
+  },
+  "pages": [
+    {
+      "page": 22,
+      "id": "22-0",
+      "columns": [
+        {
+          "label": "Stevenson",
+          "contest": "president",
+          "candidate": "Adlai Stevenson (Democratic)"
+        },
+        {
+          "label": "Eisenhower",
+          "contest": "president",
+          "candidate": "Dwight D. Eisenhower (Republican)"
+        },
+        {
+          "label": "Hass",
+          "contest": "president",
+          "candidate": "Eric Hass (Socialist Labor)"
+        },
+        {
+          "label": "Hallinan",
+          "contest": "president",
+          "candidate": "Vincent Hallinan (Progressive)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.102,
+        0.106,
+        0.843,
+        0.741
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENTIAL ELECTORS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1307
+      ]
+    },
+    {
+      "page": 24,
+      "id": "24-0",
+      "columns": [
+        {
+          "label": "Pastore",
+          "contest": "senate",
+          "candidate": "John O. Pastore"
+        },
+        {
+          "label": "Ewing",
+          "contest": "senate",
+          "candidate": "Bayard Ewing"
+        },
+        {
+          "label": "Ewing",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Forand",
+          "contest": "house1",
+          "candidate": "Aime J. Forand"
+        },
+        {
+          "label": "Leclaire",
+          "contest": "house1",
+          "candidate": "Berthelot A. Leclaire"
+        },
+        {
+          "label": "Fogarty",
+          "contest": "house2",
+          "candidate": "John E. Fogarty"
+        },
+        {
+          "label": "Watts",
+          "contest": "house2",
+          "candidate": "James O. Watts"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.112,
+        0.064,
+        0.873,
+        0.715
+      ],
+      "hint": "Read only the table headed 'VOTE FOR UNITED STATES SENATOR AND CONGRESSMEN'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1629
+      ]
+    },
+    {
+      "page": 27,
+      "id": "27-0",
+      "columns": [
+        {
+          "label": "Roberts",
+          "contest": "governor",
+          "candidate": "Dennis J. Roberts"
+        },
+        {
+          "label": "Archambault",
+          "contest": "governor",
+          "candidate": "Raoul Archambault"
+        },
+        {
+          "label": "McKiernan",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Cioci",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.133,
+        0.065,
+        0.903,
+        0.701
+      ],
+      "hint": "Read only the table headed 'VOTE FOR GOVERNOR AND LIEUTENANT-GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1273
+      ]
+    }
+  ]
+}
