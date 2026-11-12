@@ -712,6 +712,21 @@ METHOD = (
     "totals to the province's, or else where all three readings agree; any other count is left out."
 )
 UNREAD = "{count:,} counts in this table could not be confirmed against the printed totals and are left out."
+OVERRIDES: dict[tuple[int, int], tuple[str, str | None] | None] = {
+    (11, 248): None,
+    (11, 249): ("koy", None),
+    (17, 576): None,
+    (17, 577): ("sehir", "17:Yenice"),
+    (34, 64): None,
+    (34, 65): None,
+    (34, 119): ("ilce", "34:Gaziosmanpaşa"),
+    (34, 120): ("sehir", "34:Gaziosmanpaşa"),
+    (35, 390): ("ilce", "35:Kınık"),
+    (35, 391): ("ilce", "35:Kınık"),
+    (35, 392): ("sehir", "35:Kınık"),
+    (35, 393): ("sehir", "35:Kınık"),
+    (51, 306): ("sehir", "51:Ulukışla"),
+}
 LEVELS = {"il": "by-province", "ilce": "by-district", "sehir": "by-village", "koy": "by-village"}
 
 
@@ -848,6 +863,23 @@ def emit() -> Path:
             for index, seq in enumerate(part["seq"]):
                 placed[role, plate, seq] = chosen.get(index)
 
+        targets: dict[tuple[str, str | None], tuple[str, str | None]] = {}
+        for role, ref in {fixed for fixed in OVERRIDES.values() if fixed is not None and fixed[1] is not None}:
+            found = conn.execute(
+                "select id::text, area_id::text from reporting_unit "
+                "where scheme_code = 'tr.ilce' and area_relation = 'equals' and code = %s",
+                [ref],
+            ).fetchone()
+            if found is None:
+                continue
+            if role == "ilce":
+                targets[role, ref] = (found[0], found[1])
+                continue
+            for (_, held_role, _), entries in lists.items():
+                for _, at in entries:
+                    if held_role == "sehir" and at[1] == found[1]:
+                        targets[role, ref] = at
+
         def name(entity: UUID, text: str, lang: str = "tr", kind: str = "official") -> None:
             cs.add("name", entity_id=entity, text=text, lang=lang, kind=kind, is_preferred=kind == "official")
 
@@ -899,9 +931,22 @@ def emit() -> Path:
         current: dict[str, tuple[str | None, str | None] | None] = {}
         for row in rows.sort("plate", "seq").iter_rows(named=True):
             level, plate = row["level"], row["plate"]
+            fixed = OVERRIDES.get((plate, row["seq"]))
+            forced = (plate, row["seq"]) in OVERRIDES
+            if forced and fixed is None:
+                continue
+            if fixed is not None:
+                level = fixed[0]
             if level not in LEVELS:
                 continue
-            if level == "il":
+            if fixed is not None and fixed[1] is not None:
+                if fixed not in targets:
+                    missing.append(f"{plate:02} {row['ilce']} {fixed[1]} ({level})")
+                    continue
+                if level == "ilce":
+                    current["ilce"] = targets[fixed]
+                unit = UUID(targets[fixed][0])
+            elif level == "il":
                 unit = cs.unit("tr.il", f"{plate:02}")
             elif level == "ilce":
                 current["ilce"] = placed["ilce", plate, row["seq"]]
