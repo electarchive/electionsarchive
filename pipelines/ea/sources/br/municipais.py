@@ -282,7 +282,9 @@ def emit() -> Path:
     votes = pl.read_parquet(folder / "votes.parquet")
     legends = pl.read_parquet(folder / "legends.parquet")
     detail = pl.read_parquet(folder / "detail.parquet")
-    places = pl.read_parquet(folder / "places.parquet")
+    places = pl.read_parquet(folder / "places.parquet").filter(
+        pl.col("municipality").is_in(candidates["municipality"].unique().implode())
+    )
     short = {code: -excess for code, excess in pl.read_parquet(folder / "excess.parquet").iter_rows() if excess < 0}
     every = places.sort("round").unique("municipality", keep="first")
     with connect() as conn:
@@ -423,7 +425,7 @@ def emit() -> Path:
                 "election",
                 id=election,
                 polity_id=polities[code],
-                parent_id=elections.get((code, "1"), umbrella),
+                parent_id=umbrella if round == "1" else elections.get((code, "1"), umbrella),
                 kind="local" if round == "1" else "runoff",
                 date_from=day,
                 date_to=day,
