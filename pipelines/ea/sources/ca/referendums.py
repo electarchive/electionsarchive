@@ -19,7 +19,7 @@ from ea.sources.ca.elections import PROVINCES
 from ea.store import DATA, connect
 
 SOURCE = "ca.referendums"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
 DAY = date(1992, 10, 26)
@@ -35,6 +35,10 @@ QUESTION = (
     "Do you agree that the Constitution of Canada should be renewed on the basis of the agreement reached on "
     "August 28, 1992?"
 )
+SYNOPSIS = "https://archive.org/download/31761115535080/31761115535080.pdf"
+SYNOPSIS_PAGE = "https://archive.org/details/31761115535080"
+SYNOPSIS_TITLE = "Referendum 92: Official Voting Results, Synopsis (Chief Electoral Officer of Canada)"
+DISTRICTS = Path(__file__).with_name("referendum_1992_districts.tsv")
 TABLE_PAGE = 26
 RENDER_DPI = 200
 VOTES, REGISTERED, BALLOTS, VALID, INVALID = 1, 2, 3, 4, 5
@@ -75,6 +79,17 @@ TABLE = {
     "60": (5360, 6916, 12276, 66, 12342, 17628),
     "CA": (4482031, 5325049, 9807080, 48898, 9855978, 13725966),
 }
+SYNOPSIS_DPI = 400
+SYNOPSIS_COLUMNS = {
+    19: (1316, 1630, 1781, 1940, 2078, 2256),
+    20: (1063, 1380, 1533, 1692, 1831, 2010),
+    21: (1304, 1618, 1770, 1929, 2067, 2245),
+    22: (1024, 1340, 1493, 1652, 1792, 1971),
+    23: (1318, 1632, 1784, 1941, 2080, 2257),
+    24: (1038, 1354, 1507, 1666, 1805, 1985),
+    25: (1328, 1643, 1794, 1952, 2090, 2267),
+}
+SYNOPSIS_FIELDS = ("registered", "yes", "no", "valid", "invalid", "ballots")
 SYSTEM = (
     "A consultative referendum under the Referendum Act of June 23, 1992, on the Constitution of Canada. The "
     "Governor in Council proclaimed the question, and the Chief Electoral Officer ran the vote on the federal "
@@ -87,8 +102,19 @@ METHOD = (
     "figures were read from the scanned table and checked: each row's Yes and No add to its valid votes, valid "
     "votes and rejected ballots add to ballots cast, and the provinces add to the printed total. Quebec is absent: "
     "it held its own referendum on the same day and question under its own law, and its results are not part of "
-    "the federal count. The report prints no result by electoral district; those are in the separate book "
-    "Referendum 92: Official Voting Results."
+    "the federal count. The results by electoral district are a separate result set from the Chief Electoral "
+    "Officer's synopsis of the official voting results."
+)
+DISTRICT_METHOD = (
+    "Votes in each of the 220 electoral districts outside Quebec as the Chief Electoral Officer of Canada printed "
+    "them in Table 3 of Referendum 92: Official Voting Results, Synopsis, read from the University of Toronto's scan "
+    "and checked: each district's Yes and No add to its valid votes, valid votes and rejected ballots add to ballots "
+    "cast, and the districts add to every printed provincial total, which match the Chief Electoral Officer's report. "
+    "The districts are those of the 1987 Representation Order used at the 1988 general election. Ten were renamed in "
+    "1990, and the synopsis prints the new names: Acadie-Bathurst (formerly Gloucester), Fredericton-York-Sunbury "
+    "(Fredericton), Restigouche-Chaleur (Restigouche), Bramalea-Gore-Malton (Brampton-Malton), Elgin-Norfolk "
+    "(Elgin), Markham-Whitchurch-Stouffville (Markham), Renfrew-Nipissing-Pembroke (Renfrew), Windsor-St. Clair "
+    "(Windsor-Lake St. Clair), Selkirk-Red River (Selkirk), and Surrey-White Rock-South Langley (Surrey-White Rock)."
 )
 
 
@@ -174,6 +200,7 @@ def fetch() -> None:
     raw.fetch(SOURCE, REPORT, suffix=".pdf")
     raw.fetch(SOURCE, WORDING, suffix=".html")
     raw.fetch(SOURCE, VOLUME, suffix=".html")
+    raw.fetch(SOURCE, SYNOPSIS, suffix=".pdf")
     images = page_images()
     price_in, price_out = batch.PRICES[MODEL]
     wanted: dict[str, batch.Want] = {}
@@ -232,35 +259,60 @@ def parse() -> None:
     for column in ("yes", "no", "valid", "invalid", "ballots", "registered"):
         if provinces[column].sum() != total[column]:
             raise ValueError(f"{column}: the provinces do not add to the printed total")
+    districts = pl.read_csv(DISTRICTS, separator="\t", schema_overrides={"province": pl.String}).rename(
+        {"electors": "registered", "rejected": "invalid"}
+    )
+    if districts["district"].n_unique() != districts.height:
+        raise ValueError("a district appears twice")
+    for row in districts.iter_rows(named=True):
+        if row["yes"] + row["no"] != row["valid"] or row["valid"] + row["invalid"] != row["ballots"]:
+            raise ValueError(f"{row['name']}: the row's figures do not add up")
+    sums = districts.group_by("province").agg(pl.col(column).sum() for column in SYNOPSIS_FIELDS)
+    for row in sums.iter_rows(named=True):
+        printed = provinces.filter(pl.col("code") == row["province"]).row(0, named=True)
+        for column in SYNOPSIS_FIELDS:
+            if row[column] != printed[column]:
+                raise ValueError(f"{row['province']} {column}: the districts do not add to the provincial total")
+    if sums.height != provinces.height:
+        raise ValueError("a province has no districts")
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.write_parquet(PARSED / "results.parquet")
+    districts.write_parquet(PARSED / "districts.parquet")
     print(frame)
+    print(districts)
 
 
-def emit() -> Path:
-    results = pl.read_parquet(PARSED / "results.parquet")
-    report = raw.cached(SOURCE, REPORT)
+def render(path: Path, sha256: str, number: int, dpi: int) -> tuple[Path, int, int]:
     PAGES.mkdir(parents=True, exist_ok=True)
-    image = PAGES / f"{report.sha256}-{TABLE_PAGE}.png"
+    image = PAGES / f"{sha256}-{number}.png"
     if not image.exists():
         subprocess.run(
             [
                 "pdftoppm",
                 "-r",
-                str(RENDER_DPI),
+                str(dpi),
                 "-gray",
                 "-png",
                 "-f",
-                str(TABLE_PAGE),
+                str(number),
                 "-l",
-                str(TABLE_PAGE),
+                str(number),
                 "-singlefile",
-                str(report.path),
+                str(path),
                 str(image.with_suffix("")),
             ],
             check=True,
         )
     width, height = struct.unpack(">II", image.read_bytes()[16:24])
+    return image, width, height
+
+
+def emit() -> Path:
+    results = pl.read_parquet(PARSED / "results.parquet")
+    districts = pl.read_parquet(PARSED / "districts.parquet")
+    report = raw.cached(SOURCE, REPORT)
+    synopsis = raw.cached(SOURCE, SYNOPSIS)
+    image, width, height = render(report.path, report.sha256, TABLE_PAGE, RENDER_DPI)
     with connect() as conn:
         cs = Changeset(
             conn,
@@ -268,7 +320,7 @@ def emit() -> Path:
             version=VERSION,
             summary=(
                 "Canada's 1992 federal referendum on the Charlottetown Accord, with the Chief Electoral Officer's "
-                "totals by province and territory"
+                "totals by province and territory and by electoral district"
             ),
             polity="CA",
         )
@@ -295,9 +347,36 @@ def emit() -> Path:
             publisher="Privy Council Office",
             title=WORDING_TITLE,
             url=WORDING,
+            license="Public record",
+        )
+        synopsis_source = cs.source("Elections Canada", SYNOPSIS_TITLE)
+        cs.add(
+            "source",
+            id=synopsis_source,
+            kind="official_body",
+            publisher="Elections Canada",
+            title=SYNOPSIS_TITLE,
+            url=SYNOPSIS_PAGE,
+            license="Crown copyright; scanned by the University of Toronto Libraries and served by the Internet Archive",
         )
         artifact = cs.artifact(report, elections_canada)
         cs.artifact(raw.cached(SOURCE, WORDING), wording)
+        synopsis_artifact = cs.artifact(synopsis, synopsis_source)
+        synopsis_pages = {}
+        scales = {}
+        for number in SYNOPSIS_COLUMNS:
+            scan, scan_width, scan_height = render(synopsis.path, synopsis.sha256, number, RENDER_DPI)
+            synopsis_pages[number] = cs.page(synopsis_artifact, number)
+            scales[number] = (scan_width * SYNOPSIS_DPI / RENDER_DPI, scan_height * SYNOPSIS_DPI / RENDER_DPI)
+            cs.add(
+                "source_page",
+                id=synopsis_pages[number],
+                artifact_id=synopsis_artifact,
+                page_number=number,
+                image_key=f"pages/{SOURCE}/{scan.name}",
+                width=scan_width,
+                height=scan_height,
+            )
         page = cs.page(artifact, TABLE_PAGE)
         cs.add(
             "source_page",
@@ -388,8 +467,52 @@ def emit() -> Path:
                 option_id=option,
                 kind="won" if national[answer] == max(national["yes"], national["no"]) else "lost",
             )
+        district_set = cs.key("ca.referendums.result_set", f"{DAY}:district")
+        cs.add(
+            "result_set",
+            id=district_set,
+            election_id=election,
+            contest_id=contest,
+            stage="official",
+            kind="counted",
+            status="active",
+            source_id=synopsis_source,
+            is_default=False,
+            completeness=1,
+        )
+        cs.add("note", entity_id=district_set, kind="methodology", body_md=DISTRICT_METHOD)
+        for answer, option in options.items():
+            cs.add(
+                "outcome",
+                result_set_id=district_set,
+                option_id=option,
+                kind="won" if national[answer] == max(national["yes"], national["no"]) else "lost",
+            )
         values = []
         locators = []
+        for row in districts.iter_rows(named=True):
+            unit = cs.unit("ca.fed", row["district"], DAY)
+            if unit in cs.minted:
+                raise ValueError(f"{row['name']}: no 1988 riding unit for {row['district']}")
+            top = row["top"]
+            scan_width, scan_height = scales[row["page"]]
+            for column, right in zip(SYNOPSIS_FIELDS, SYNOPSIS_COLUMNS[row["page"]], strict=True):
+                option = options.get(column)
+                measure = {"registered": REGISTERED, "ballots": BALLOTS, "valid": VALID, "invalid": INVALID}.get(
+                    column, VOTES
+                )
+                key = (str(district_set), str(unit), None if option is None else str(option), measure)
+                values.append((*key, row[column]))
+                locators.append(
+                    (
+                        *key,
+                        str(synopsis_pages[row["page"]]),
+                        (right - 160) / scan_width,
+                        (top - 12) / scan_height,
+                        (right + 12) / scan_width,
+                        (top + 48) / scan_height,
+                    )
+                )
         for row in results.iter_rows(named=True):
             for column, option, measure in (
                 ("yes", options["yes"], VOTES),
