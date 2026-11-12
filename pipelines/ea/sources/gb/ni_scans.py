@@ -34,7 +34,7 @@ Candidates are the numbered rows. "elected" is true when the row is marked elect
 
 def targets() -> dict[str, dict[str, str]]:
     areas = ni_council.area_table()
-    units = pl.read_parquet(ni_council.PARSED / "units.parquet")
+    units = pl.read_parquet(ni_council.PARSED / "native.parquet")
     found = {}
     for label, url in SHEETS["2019"]:
         found[f"2019:{ni_council.squeeze(label)}"] = {"year": "2019", "label": label, "url": url}

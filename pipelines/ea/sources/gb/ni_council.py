@@ -1189,6 +1189,7 @@ def parse() -> None:
     scanned = DATA / "parsed" / "gb.ni_scans"
     units = pl.DataFrame(units, infer_schema_length=None)
     totals = pl.DataFrame(totals, infer_schema_length=None)
+    units.write_parquet(PARSED / "native.parquet")
     if (scanned / "units.parquet").exists():
         read = pl.read_parquet(scanned / "units.parquet")
         keys = read.select("year", "dea_code")
