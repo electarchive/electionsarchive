@@ -1,0 +1,509 @@
+{
+  "polity": "US-NC",
+  "publisher": "North Carolina Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "title": "North Carolina Manual 1973, vote for Governor, U.S. Senator, and Congressmen by counties, general election 1972-11-07",
+  "file": {
+    "url": "https://archive.org/download/northcarolinama1973nort/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/northcarolinama1973nort"
+  },
+  "contests": {
+    "governor": {
+      "year": 1972,
+      "chamber": "governor",
+      "day": "1972-11-07",
+      "special": false,
+      "state": "NC",
+      "district": null
+    },
+    "senate": {
+      "year": 1972,
+      "chamber": "senate",
+      "day": "1972-11-07",
+      "special": false,
+      "state": "NC",
+      "district": null
+    },
+    "house1": {
+      "year": 1972,
+      "chamber": "house",
+      "day": "1972-11-07",
+      "special": false,
+      "state": "NC",
+      "district": 1
+    },
+    "house2": {
+      "year": 1972,
+      "chamber": "house",
+      "day": "1972-11-07",
+      "special": false,
+      "state": "NC",
+      "district": 2
+    },
+    "house3": {
+      "year": 1972,
+      "chamber": "house",
+      "day": "1972-11-07",
+      "special": false,
+      "state": "NC",
+      "district": 3
+    },
+    "house4": {
+      "year": 1972,
+      "chamber": "house",
+      "day": "1972-11-07",
+      "special": false,
+      "state": "NC",
+      "district": 4
+    },
+    "house5": {
+      "year": 1972,
+      "chamber": "house",
+      "day": "1972-11-07",
+      "special": false,
+      "state": "NC",
+      "district": 5
+    },
+    "house6": {
+      "year": 1972,
+      "chamber": "house",
+      "day": "1972-11-07",
+      "special": false,
+      "state": "NC",
+      "district": 6
+    },
+    "house7": {
+      "year": 1972,
+      "chamber": "house",
+      "day": "1972-11-07",
+      "special": false,
+      "state": "NC",
+      "district": 7
+    },
+    "house8": {
+      "year": 1972,
+      "chamber": "house",
+      "day": "1972-11-07",
+      "special": false,
+      "state": "NC",
+      "district": 8
+    },
+    "house9": {
+      "year": 1972,
+      "chamber": "house",
+      "day": "1972-11-07",
+      "special": false,
+      "state": "NC",
+      "district": 9
+    },
+    "house10": {
+      "year": 1972,
+      "chamber": "house",
+      "day": "1972-11-07",
+      "special": false,
+      "state": "NC",
+      "district": 10
+    },
+    "house11": {
+      "year": 1972,
+      "chamber": "house",
+      "day": "1972-11-07",
+      "special": false,
+      "state": "NC",
+      "district": 11
+    }
+  },
+  "pages": [
+    {
+      "page": 359,
+      "id": "359-0",
+      "columns": [
+        {
+          "label": "Hargrove Bowles Democratic",
+          "contest": "governor",
+          "candidate": "Skipper Bowles"
+        },
+        {
+          "label": "James E. Holshouser, Jr. Republican",
+          "contest": "governor",
+          "candidate": "James E. Jr. Holshouser"
+        },
+        {
+          "label": "Arlis F. PettyJohn American",
+          "contest": "governor",
+          "candidate": "Arlis F. Pettyjohn"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.089,
+        0.134,
+        0.881,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTE FOR GOVERNOR BY COUNTIES GENERAL ELECTION, NOVEMBER 7, 1972'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1236
+      ]
+    },
+    {
+      "page": 360,
+      "id": "360-0",
+      "columns": [
+        {
+          "label": "Hargrove Bowles Democratic",
+          "contest": "governor",
+          "candidate": "Skipper Bowles"
+        },
+        {
+          "label": "James E. Holshouser, Jr. Republican",
+          "contest": "governor",
+          "candidate": "James E. Jr. Holshouser"
+        },
+        {
+          "label": "Arlis F. PettyJohn American",
+          "contest": "governor",
+          "candidate": "Arlis F. Pettyjohn"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.107,
+        0.234,
+        0.926,
+        0.737
+      ],
+      "hint": "Read only the table headed 'VOTE FOR GOVERNOR BY COUNTIES GENERAL ELECTION, NOVEMBER 7, 1972\u2014Continued'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        -0.0119
+      ]
+    },
+    {
+      "page": 398,
+      "id": "398-0",
+      "columns": [
+        {
+          "label": "Nick Galifianakis Democrat",
+          "contest": "senate",
+          "candidate": "Nick Galifianakis"
+        },
+        {
+          "label": "Jesse Helms Republican",
+          "contest": "senate",
+          "candidate": "Jesse A. Helms"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.097,
+        0.126,
+        0.516,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTE FOR UNITED STATES SENATOR BY COUNTIES GENERAL ELECTION, NOVEMBER 7, 1972'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.119
+      ]
+    },
+    {
+      "page": 398,
+      "id": "398-1",
+      "columns": [
+        {
+          "label": "Nick Galifianakis Democrat",
+          "contest": "senate",
+          "candidate": "Nick Galifianakis"
+        },
+        {
+          "label": "Jesse Helms Republican",
+          "contest": "senate",
+          "candidate": "Jesse A. Helms"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.505,
+        0.13,
+        0.92,
+        0.828
+      ],
+      "hint": "Read only the table headed 'VOTE FOR UNITED STATES SENATOR BY COUNTIES GENERAL ELECTION, NOVEMBER 7, 1972'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1433
+      ]
+    },
+    {
+      "page": 404,
+      "id": "404-0",
+      "columns": [
+        {
+          "label": "Walter B. Jones Democrat",
+          "contest": "house1",
+          "candidate": "Walter B. Jones"
+        },
+        {
+          "label": "J. Jordan Bonner Republican",
+          "contest": "house1",
+          "candidate": "J. Jordan Bonner"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.099,
+        0.221,
+        0.912,
+        0.598
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 404,
+      "id": "404-1",
+      "columns": [
+        {
+          "label": "L. H. Fountain Democrat",
+          "contest": "house2",
+          "candidate": "L. H. Fountain"
+        },
+        {
+          "label": "Erick P. Little Republican",
+          "contest": "house2",
+          "candidate": "Erick P. Little"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.097,
+        0.59,
+        0.917,
+        0.874
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 405,
+      "id": "405-0",
+      "columns": [
+        {
+          "label": "David N. Henderson Democrat",
+          "contest": "house3",
+          "candidate": "David N. Henderson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.105,
+        0.199,
+        0.888,
+        0.478
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 405,
+      "id": "405-1",
+      "columns": [
+        {
+          "label": "Ike F. Andrews Democrat",
+          "contest": "house4",
+          "candidate": "Ike F. Andrews"
+        },
+        {
+          "label": "R. Jack Hawke Republican",
+          "contest": "house4",
+          "candidate": "R. (Jack) Hawke"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.103,
+        0.47,
+        0.888,
+        0.694
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 405,
+      "id": "405-2",
+      "columns": [
+        {
+          "label": "Brooks Hays Democrat",
+          "contest": "house5",
+          "candidate": "Brooks Hays"
+        },
+        {
+          "label": "Wilmer D. Mizell Republican",
+          "contest": "house5",
+          "candidate": "Wilmer D. Mizell"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.105,
+        0.686,
+        0.888,
+        0.925
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 406,
+      "id": "406-0",
+      "columns": [
+        {
+          "label": "L. Richardson Preyer Democrat",
+          "contest": "house6",
+          "candidate": "Richardson Preyer"
+        },
+        {
+          "label": "Lynwood Bullock American",
+          "contest": "house6",
+          "candidate": "Lynwood (Lyn) Bullock"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.097,
+        0.188,
+        0.91,
+        0.366
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 406,
+      "id": "406-1",
+      "columns": [
+        {
+          "label": "Charles Rose Democrat",
+          "contest": "house7",
+          "candidate": "Charles Rose, III"
+        },
+        {
+          "label": "Jerry C. Scott Republican",
+          "contest": "house7",
+          "candidate": "Jerry C. Scott"
+        },
+        {
+          "label": "Alvis H. Ballard American",
+          "contest": "house7",
+          "candidate": "Alvis H. Ballard"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.097,
+        0.358,
+        0.916,
+        0.6
+      ],
+      "hint": "Read only the table headed 'SEVENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 406,
+      "id": "406-2",
+      "columns": [
+        {
+          "label": "Richard Clark Democrat",
+          "contest": "house8",
+          "candidate": "Richard Clark"
+        },
+        {
+          "label": "Earl B. Ruth Republican",
+          "contest": "house8",
+          "candidate": "Earl B. Ruth"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.099,
+        0.592,
+        0.917,
+        0.862
+      ],
+      "hint": "Read only the table headed 'EIGHTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 407,
+      "id": "407-0",
+      "columns": [
+        {
+          "label": "James Beatty Democrat",
+          "contest": "house9",
+          "candidate": "James Beatty"
+        },
+        {
+          "label": "James G. Martin Republican",
+          "contest": "house9",
+          "candidate": "James G. Martin"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.115,
+        0.217,
+        0.896,
+        0.385
+      ],
+      "hint": "Read only the table headed 'NINTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 407,
+      "id": "407-1",
+      "columns": [
+        {
+          "label": "Paul L. Beck Democrat",
+          "contest": "house10",
+          "candidate": "Paul L. Beck"
+        },
+        {
+          "label": "James T. Broyhill Republican",
+          "contest": "house10",
+          "candidate": "James T. Broyhill"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.114,
+        0.377,
+        0.896,
+        0.618
+      ],
+      "hint": "Read only the table headed 'TENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 407,
+      "id": "407-2",
+      "columns": [
+        {
+          "label": "Ray A. Taylor Democrat",
+          "contest": "house11",
+          "candidate": "Roy A. Taylor"
+        },
+        {
+          "label": "Jesse I. Ledbetter Republican",
+          "contest": "house11",
+          "candidate": "Jesse I. Ledbetter"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.114,
+        0.61,
+        0.9,
+        0.943
+      ],
+      "hint": "Read only the table headed 'ELEVENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    }
+  ]
+}
