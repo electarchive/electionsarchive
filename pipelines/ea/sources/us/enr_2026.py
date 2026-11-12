@@ -1470,10 +1470,24 @@ def countywide(key: str) -> bool:
 def plan(
     conn: Connection, frame: pl.DataFrame, scatter: Callable[[str, UUID], UUID | None], also: Sequence[str] = ()
 ) -> tuple[list[tuple[str, str, UUID, dict[tuple[UUID, UUID], int], tuple[int, int], str | None]], list[str]]:
-    frame = frame.filter(~pl.col("candidate").fill_null("").str.contains(NOBODY)).with_columns(
-        candidate=pl.when(pl.col("party").is_not_null() & pl.col("candidate").str.starts_with(pl.col("party") + " "))
-        .then(pl.col("candidate").str.slice(pl.col("party").str.len_chars() + 1))
-        .otherwise(pl.col("candidate"))
+    frame = (
+        frame.filter(~pl.col("candidate").fill_null("").str.contains(NOBODY))
+        .with_columns(
+            candidate=pl.when(
+                pl.col("party").is_not_null() & pl.col("candidate").str.starts_with(pl.col("party") + " ")
+            )
+            .then(pl.col("candidate").str.slice(pl.col("party").str.len_chars() + 1))
+            .otherwise(pl.col("candidate"))
+        )
+        .with_columns(
+            candidate=pl.when(pl.col("state") == "AR")
+            .then(
+                pl.col("candidate")
+                .str.replace(r"^(?:Mayor|Council Member|Councilman|Councilwoman)\s+", "")
+                .str.replace(r",\s*Mayor$|\s+\(Mayor\)$", "")
+            )
+            .otherwise(pl.col("candidate"))
+        )
     )
     tenant = pl.col("page").str.contains(TENANT.pattern)
     race = pl.concat_str(

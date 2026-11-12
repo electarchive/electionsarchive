@@ -11971,7 +11971,7 @@ def parse() -> None:
                                     (r"^(?:town |city )?clerk recorder$", "clerk-recorder"),
                                     (
                                         (
-                                            r"^(?:township |village |city |town )?(supervisor|clerk|treasurer|moderator|administrator)$"
+                                            r"^(?:township |village |city |town )?(supervisor|clerk|treasurer|moderator|administrator|attorney)$"
                                             r"|^(?:town )?(?:clerk and )?tax collector$"
                                         ),
                                         "office",
@@ -12152,6 +12152,7 @@ def parse() -> None:
                                 "board-of-directors": "Board of Directors",
                                 "supervisor": "Supervisor",
                                 "clerk": "Clerk",
+                                "attorney": "Attorney",
                                 "clerk-treasurer": "Clerk-Treasurer",
                                 "recorder-treasurer": "Recorder-Treasurer",
                                 "clerk-recorder": "Clerk-Recorder",
@@ -12776,6 +12777,7 @@ def emit_state(frame: pl.DataFrame, state: str, snapshot: Snapshot, offices: Off
                     "vice-mayor",
                     "supervisor",
                     "clerk",
+                    "attorney",
                     "treasurer",
                     "president",
                     "judge",
