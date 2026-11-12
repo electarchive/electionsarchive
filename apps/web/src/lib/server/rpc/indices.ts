@@ -13,6 +13,7 @@ import { openapi } from "@orpc/openapi";
 import { call, ORPCError } from "@orpc/server";
 import { sql } from "drizzle-orm";
 import * as v from "valibot";
+import type { record as recompute } from "#lib/server/rpc/archive.js";
 import { os, remember } from "#lib/server/cache.js";
 import { db } from "#lib/server/db/index.js";
 import {
@@ -579,9 +580,18 @@ async function ids(paths: Array<string>) {
 
 type Point = { name: string; path: string | null; date: string; year: number };
 
-async function series(polity: string) {
-  const record = await call(polities.record, { id: polity });
-  return record.series.filter(
+async function series(polity: string, isStaleOk = false) {
+  const stored = isStaleOk
+    ? (
+        await db.execute<{
+          series: Awaited<ReturnType<typeof recompute>>["series"];
+        }>(sql`
+          select record->'series' as series from polity_record where polity_id = ${polity}::uuid
+        `)
+      ).rows[0]?.series
+    : undefined;
+  const found = stored ?? (await call(polities.record, { id: polity })).series;
+  return found.filter(
     (entry) =>
       !entry.isOffice &&
       !entry.isAbroad &&
@@ -615,7 +625,7 @@ async function measure(id: string) {
   if (head == null || own.length === 0) {
     return { chambers: [] };
   }
-  const record = await series(head.polity);
+  const record = await series(head.polity, true);
   const paths = await ids(
     record.flatMap((entry) =>
       entry.points.flatMap((point) => point.path ?? []),
