@@ -11254,12 +11254,14 @@ def parse() -> None:
                 pl.col("USPS").is_in(
                     ["OR", "FL", "MI", "KY", "OK", "NV", "AR", "AZ", "MD", "LA", "IN", "NE", "KS", "WY", "NY", "TN"]
                 )
-                & (pl.col("FUNCSTAT") == "A")
+                & ((pl.col("FUNCSTAT") == "A") | (pl.col("GEOID") == "0532650"))
             )
             .select("USPS", "GEOID", "NAME")
             .iter_rows()
         ):
             label = re.sub(r" (city|town|village)$", "", full)
+            if geoid == "0532650":
+                label = "Holiday Island"
             if st == "KY" and label == "Brownsboro Village":
                 label = "Brownsboro"
             if st == "NE" and label == "De Witt":
