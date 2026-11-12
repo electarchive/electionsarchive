@@ -1586,6 +1586,20 @@ ND_EARLY_FILES = {
     date(1924, 3, 18): "1924-03-18-presprimary",
     date(1924, 11, 4): "1924-11-04-general",
     date(1926, 6, 30): "1926-06-30-primary",
+    date(1928, 3, 20): "1928-03-20-presprimary",
+    date(1928, 6, 27): "1928-06-27-primary",
+    date(1928, 11, 6): "1928-11-06-general",
+    date(1930, 6, 25): "1930-06-25-primary",
+    date(1930, 11, 4): "1930-11-04-general",
+    date(1932, 3, 15): "1932-03-15-presprimary",
+    date(1932, 6, 29): "1932-06-29-primary",
+    date(1933, 9, 22): "1933-09-22-special",
+    date(1934, 6, 27): "1934-06-27-primary",
+    date(1934, 11, 6): "1934-11-06-general",
+    date(1936, 6, 24): "1936-06-24-primary",
+    date(1936, 11, 3): "1936-11-03-general",
+    date(1938, 6, 28): "1938-06-28-primary",
+    date(1938, 11, 8): "1938-11-08-general",
 }
 ND_MANUAL = "https://digitalhorizonsonline.org/digital/api/collection/ndbb/id/22730/download"
 ND_COUNCIL = "https://ndlegis.gov/files/resource/library/measuresbeforethevoters.pdf"
@@ -1707,6 +1721,187 @@ ND_EARLY_MEASURES = {
     (date(1926, 6, 30), "1"): ("Constitutional amendment", "Legislators' per diem", ND_LEGIS, 48719, 86883),
     (date(1926, 6, 30), "2"): ("Constitutional amendment", "Term of railroad commissioners", ND_LEGIS, 69214, 61235),
     (date(1926, 6, 30), "3"): ("Initiated measure", "Gasoline tax", ND_INIT, 65813, 57374),
+    (date(1928, 3, 20), "1"): ("Constitutional amendment", "Legislators' pay", ND_LEGIS, 41446, 66904),
+    (date(1928, 3, 20), "2"): (
+        "Constitutional amendment",
+        "Assessment of light, heat, and power company property",
+        ND_LEGIS,
+        63568,
+        37284,
+    ),
+    (date(1928, 6, 27), "1"): (
+        "Constitutional amendment",
+        "Repeal of the constitutional prohibition clause",
+        ND_INIT,
+        96837,
+        103696,
+    ),
+    (date(1928, 11, 6), "1"): (
+        "Constitutional amendment",
+        "Bond issue to indemnify bank depositors",
+        ND_INIT,
+        24755,
+        218270,
+    ),
+    (date(1930, 6, 25), "1"): ("Constitutional amendment", "Terms of district judges", ND_LEGIS, 83635, 63316),
+    (date(1930, 6, 25), "2"): ("Constitutional amendment", "Terms of Supreme Court judges", ND_LEGIS, 75009, 65795),
+    (date(1930, 6, 25), "3"): ("Initiated measure", "State gasoline tax", ND_INIT, 81758, 83681),
+    (date(1930, 6, 25), "4"): ("Initiated measure", "Sunday motion picture theaters", ND_INIT, 84629, 96990),
+    (date(1930, 6, 25), "5"): ("Referred measure", "Depositors' guarantee fund", ND_REF, 94124, 55853),
+    (date(1930, 6, 25), "6"): ("Referred measure", "Game and Fish Commissioner", ND_REF, 91443, 59329),
+    (date(1930, 11, 4), "1"): (
+        "Constitutional amendment",
+        "Four-year terms of state and county officials",
+        ND_INIT,
+        84849,
+        109060,
+    ),
+    (date(1932, 3, 15), "1"): (
+        "Constitutional amendment",
+        "Moving the state capital to Jamestown",
+        ND_INIT,
+        24368,
+        170000,
+    ),
+    (date(1932, 3, 15), "2"): (
+        "Constitutional amendment",
+        "Signatures to initiate constitutional amendments",
+        ND_LEGIS,
+        51459,
+        104953,
+    ),
+    (date(1932, 3, 15), "3"): (
+        "Constitutional amendment",
+        "Signatures for initiative and referendum petitions",
+        ND_LEGIS,
+        50967,
+        105581,
+    ),
+    (date(1932, 3, 15), "4"): ("Initiated measure", "Absentee ballots", ND_INIT, 65707, 76135),
+    (date(1932, 3, 15), "5"): ("Referred measure", "State gasoline tax", ND_REF, 69181, 106770),
+    (date(1932, 6, 29), "1"): ("Initiated measure", "Assessed valuation of property", ND_INIT, 111308, 97733),
+    (date(1932, 6, 29), "2"): ("Initiated measure", "Farming by corporations", ND_INIT, 114496, 85932),
+    (date(1932, 6, 29), "3"): ("Initiated measure", "Travel expenses of county officials", ND_INIT, 159434, 50603),
+    (date(1932, 6, 29), "4"): ("Initiated measure", "Travel expenses of state officials", ND_INIT, 153878, 54027),
+    (date(1932, 6, 29), "5"): ("Initiated measure", "Five-year debt moratorium", ND_INIT, 92266, 111745),
+    (date(1932, 6, 29), "6"): ("Initiated measure", "Crop mortgages", ND_INIT, 102149, 98135),
+    (date(1932, 6, 29), "7"): ("Initiated measure", "Salaries of county officials", ND_INIT, 144715, 55459),
+    (date(1932, 11, 8), "1"): ("Constitutional amendment", "Repeal of prohibition", ND_INIT, 134742, 99316),
+    (date(1932, 11, 8), "2"): ("Initiated measure", "Three-year debt moratorium", ND_INIT, 103156, 142562),
+    (date(1932, 11, 8), "3"): ("Initiated measure", "Repeal of the crop mortgage prohibition", ND_INIT, 111198, 123566),
+    (date(1932, 11, 8), "4"): ("Initiated measure", "Legal notice fees", ND_INIT, 160399, 66776),
+    (date(1932, 11, 8), "5"): ("Initiated measure", "Notice of tax sales of real estate", ND_INIT, 127095, 89195),
+    (date(1932, 11, 8), "6"): ("Initiated measure", "Salaries of district judges", ND_INIT, 176044, 54451),
+    (date(1932, 11, 8), "7"): ("Initiated measure", "Salaries of Supreme Court judges", ND_INIT, 179662, 52521),
+    (date(1932, 11, 8), "8"): ("Initiated measure", "Salaries of state officials", ND_INIT, 166871, 60269),
+    (date(1932, 11, 8), "9"): ("Initiated measure", "District tax supervisor", ND_INIT, 154662, 60096),
+    (date(1933, 9, 22), "1"): (
+        "Constitutional amendment",
+        "County judge and clerk of court offices",
+        ND_LEGIS,
+        84207,
+        62945,
+    ),
+    (date(1933, 9, 22), "2"): ("Constitutional amendment", "Readings of legislative bills", ND_LEGIS, 77077, 61987),
+    (date(1933, 9, 22), "3"): ("Initiated measure", "Manufacture and sale of beer", ND_INIT, 116420, 48731),
+    (date(1933, 9, 22), "4"): ("Initiated measure", "Sunday motion picture theaters", ND_INIT, 81453, 82235),
+    (date(1933, 9, 22), "5"): ("Referred measure", "Administration of closed banks", ND_REF, 58746, 94130),
+    (date(1933, 9, 22), "6"): ("Referred measure", "Retail sales tax", ND_REF, 41241, 113807),
+    (date(1933, 9, 22), "7"): ("Referred measure", "Workmen's Compensation Bureau commissioner", ND_REF, 50819, 94429),
+    (date(1934, 6, 27), "1"): (
+        "Initiated measure",
+        "Liquor sales in drugstores, hotels, and clubs",
+        ND_INIT,
+        88079,
+        119968,
+    ),
+    (date(1934, 6, 27), "2"): (
+        "Initiated measure",
+        "Liquor sales by individuals and State Beer Commissioner",
+        ND_INIT,
+        90076,
+        114299,
+    ),
+    (date(1934, 6, 27), "3"): ("Initiated measure", "School tax levy limit", ND_INIT, 91391, 99299),
+    (date(1934, 11, 6), "1"): ("Initiated measure", "Sunday motion picture theaters", ND_INIT, 136743, 135073),
+    (date(1934, 11, 6), "2"): ("Initiated measure", "Repeal of state prohibition laws", ND_INIT, 111511, 139733),
+    (date(1935, 7, 15), "1"): ("Referred measure", "Retail sales tax", ND_REF, 75166, 65890),
+    (date(1936, 6, 24), "1"): (
+        "Constitutional amendment",
+        "Classification of property for taxation",
+        ND_LEGIS,
+        36187,
+        147009,
+    ),
+    (date(1936, 6, 24), "2"): (
+        "Constitutional amendment",
+        "Signatures for initiative and referendum petitions",
+        ND_LEGIS,
+        41500,
+        127511,
+    ),
+    (date(1936, 6, 24), "3"): (
+        "Constitutional amendment",
+        "County judge and clerk of court offices",
+        ND_LEGIS,
+        50183,
+        111007,
+    ),
+    (date(1936, 6, 24), "4"): (
+        "Constitutional amendment",
+        "Interest on school land mortgages",
+        ND_LEGIS,
+        51691,
+        108703,
+    ),
+    (date(1936, 6, 24), "5"): (
+        "Constitutional amendment",
+        "Settlement of land board investment claims",
+        ND_LEGIS,
+        47987,
+        108064,
+    ),
+    (date(1936, 6, 24), "6"): ("Initiated measure", "Absent voters' ballots", ND_INIT, 61677, 108792),
+    (date(1936, 6, 24), "7"): ("Initiated measure", "Federal funds for political purposes", ND_INIT, 74579, 96716),
+    (date(1936, 6, 24), "8"): ("Referred measure", "Jurisdiction of police magistrates", ND_REF, 42304, 110331),
+    (date(1936, 6, 24), "9"): ("Referred measure", "Livestock weighing and grading charges", ND_REF, 49069, 120229),
+    (date(1936, 6, 24), "10"): ("Referred measure", "Municipal liquor stores", ND_REF, 78337, 105832),
+    (date(1936, 6, 24), "11"): ("Referred measure", "State income tax rates", ND_REF, 45498, 127359),
+    (date(1936, 11, 3), "1"): ("Initiated measure", "Sale of liquor", ND_INIT, 147330, 128064),
+    (date(1938, 6, 28), "1"): ("Constitutional amendment", "County manager form of government", ND_LEGIS, 80786, 94702),
+    (date(1938, 6, 28), "2"): (
+        "Constitutional amendment",
+        "County judge and clerk of court offices",
+        ND_LEGIS,
+        80246,
+        91219,
+    ),
+    (date(1938, 6, 28), "3"): ("Constitutional amendment", "Interest on state land contracts", ND_LEGIS, 95700, 76051),
+    (date(1938, 6, 28), "4"): ("Constitutional amendment", "State employment of legislators", ND_INIT, 106699, 64087),
+    (date(1938, 6, 28), "5"): ("Constitutional amendment", "Election of the Tax Commissioner", ND_INIT, 86822, 78206),
+    (date(1938, 6, 28), "6"): (
+        "Constitutional amendment",
+        "Deposit of public funds in the state treasury",
+        ND_INIT,
+        83140,
+        75818,
+    ),
+    (date(1938, 6, 28), "7"): ("Constitutional amendment", "State Board of Higher Education", ND_INIT, 93156, 71448),
+    (date(1938, 6, 28), "8"): ("Initiated measure", "State Laboratories Department", ND_INIT, 77683, 76672),
+    (date(1938, 6, 28), "9"): ("Initiated measure", "State civil service", ND_INIT, 39710, 116632),
+    (date(1938, 6, 28), "10"): ("Initiated measure", "County securities transactions", ND_INIT, 41301, 115785),
+    (date(1938, 6, 28), "11"): ("Initiated measure", "Legal rate of interest", ND_INIT, 45808, 121206),
+    (date(1938, 6, 28), "12"): (
+        "Initiated measure",
+        "Appointment of city and village officials",
+        ND_INIT,
+        24222,
+        138940,
+    ),
+    (date(1938, 6, 28), "13"): ("Referred measure", "Dancing where liquor is sold", ND_REF, 109619, 77046),
+    (date(1938, 11, 8), "1"): ("Initiated measure", "Repeal of the Liquor Control Act", ND_INIT, 98478, 160365),
+    (date(1938, 11, 8), "2"): ("Initiated measure", "Old-age assistance minimum pension", ND_INIT, 154367, 78427),
+    (date(1938, 11, 8), "3"): ("Referred measure", "Licensing of creameries and cream stations", ND_REF, 97019, 106718),
 }
 ND_EARLY_METHOD = (
     "County returns from the North Dakota Secretary of State's official abstract of the votes, as posted with a "
@@ -1717,8 +1912,9 @@ ND_EARLY_METHOD = (
 )
 ND_EARLY_NOTE = (
     " Only the statewide totals are recorded: in the text layer of the Secretary of State's abstract, the county "
-    "figures for this measure do not add up to the printed totals, and no second printing settles them. The totals "
-    "are the abstract's printed Total row, or the Legislative Council's figure where the two differ."
+    "figures for this measure do not add up to the printed totals and no second printing settles them, or the "
+    "abstract does not print the measure. The totals are the abstract's printed Total row, or the Legislative "
+    "Council's figure where the two differ or the abstract is silent."
 )
 SC = "https://scvotes.gov/wp-content/uploads/2022/08/Election_Report_{}.pdf"
 SC_2010 = "https://www.enr-scvotes.org/SC/19077/39934/reports/detailxml.zip"
@@ -7297,7 +7493,7 @@ def north_dakota_early() -> list[dict[str, object]]:
                         "day": day,
                         "number": str(number),
                         "label": label,
-                        "url": urls.get(row["cited"], ND_EARLY.format(ND_EARLY_FILES[day])),
+                        "url": urls.get(row["cited"]) or ND_EARLY.format(ND_EARLY_FILES[day]),
                         "county": row["county"],
                         "answer": answer,
                         "votes": votes,
@@ -7306,7 +7502,7 @@ def north_dakota_early() -> list[dict[str, object]]:
                     }
                 )
     if len({(row["day"], row["number"]) for row in rows}) != len(ND_EARLY_MEASURES):
-        raise ValueError("ND 1918-1926: measures missing from nd_measures_early.tsv")
+        raise ValueError("ND 1918-1938: measures missing from nd_measures_early.tsv")
     return rows
 
 
@@ -8436,7 +8632,7 @@ def emit() -> Path:
                     METHODOLOGY_FACTS
                     if state == "CA" and day.year < 1998
                     else ND_EARLY_METHOD
-                    if state == "ND" and day.year < 1930
+                    if state == "ND" and day.year < 1940
                     else METHODOLOGY.format(publisher=PUBLISHERS[state][0])
                 )
                 + (MAINE if state == "ME" else "")
@@ -8463,7 +8659,7 @@ def emit() -> Path:
                         else AK_STATEWIDE_NOTE
                         if state == "AK"
                         else ND_EARLY_NOTE
-                        if state == "ND" and day.year < 1930
+                        if state == "ND" and day.year < 1940
                         else ND_2004_NOTE
                         if state == "ND"
                         else KS_2010_NOTE
