@@ -1,0 +1,1764 @@
+{
+  "polity": "US-NY",
+  "publisher": "New York State Board of Elections",
+  "title": "Ballot Billboard (election newsletter) with the county vote, General Election, November 2, 1982, New York State",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706913_0180/micro_IA40706913_0180.pdf",
+    "item": "https://archive.org/details/micro_IA40706913_0180"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "governor": {
+      "year": 1982,
+      "chamber": "governor",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "NY",
+      "district": null
+    },
+    "senate": {
+      "year": 1982,
+      "chamber": "senate",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "NY",
+      "district": null
+    },
+    "house1": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "NY",
+      "district": 1
+    },
+    "house2": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "NY",
+      "district": 2
+    },
+    "house3": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "NY",
+      "district": 3
+    },
+    "house4": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "NY",
+      "district": 4
+    },
+    "house5": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "NY",
+      "district": 5
+    },
+    "house6": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "NY",
+      "district": 6
+    },
+    "house7": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "NY",
+      "district": 7
+    },
+    "house8": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "NY",
+      "district": 8
+    },
+    "house9": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "NY",
+      "district": 9
+    },
+    "house10": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "NY",
+      "district": 10
+    },
+    "house11": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "NY",
+      "district": 11
+    },
+    "house12": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "NY",
+      "district": 12
+    },
+    "house13": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "NY",
+      "district": 13
+    },
+    "house14": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "NY",
+      "district": 14
+    },
+    "house15": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "NY",
+      "district": 15
+    },
+    "house16": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "NY",
+      "district": 16
+    },
+    "house17": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "NY",
+      "district": 17
+    },
+    "house18": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "NY",
+      "district": 18
+    },
+    "house19": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "NY",
+      "district": 19
+    },
+    "house20": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "NY",
+      "district": 20
+    },
+    "house21": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "NY",
+      "district": 21
+    },
+    "house22": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "NY",
+      "district": 22
+    },
+    "house23": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "NY",
+      "district": 23
+    },
+    "house24": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "NY",
+      "district": 24
+    },
+    "house25": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "NY",
+      "district": 25
+    },
+    "house26": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "NY",
+      "district": 26
+    },
+    "house27": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "NY",
+      "district": 27
+    },
+    "house28": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "NY",
+      "district": 28
+    },
+    "house29": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "NY",
+      "district": 29
+    },
+    "house30": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "NY",
+      "district": 30
+    },
+    "house31": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "NY",
+      "district": 31
+    },
+    "house32": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "NY",
+      "district": 32
+    },
+    "house33": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "NY",
+      "district": 33
+    },
+    "house34": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "NY",
+      "district": 34
+    }
+  },
+  "pages": [
+    {
+      "page": 12,
+      "id": "12-0",
+      "columns": [
+        {
+          "label": "DEMOCRATIC",
+          "contest": "governor",
+          "candidate": "Mario M. Cuomo"
+        },
+        {
+          "label": "REPUBLICAN",
+          "contest": "governor",
+          "candidate": "Lew Lehrman"
+        },
+        {
+          "label": "CONSERVATIVE",
+          "contest": "governor",
+          "candidate": "Lew Lehrman"
+        },
+        {
+          "label": "RIGHT TO LIFE",
+          "contest": "governor",
+          "candidate": "Robert J. Bohner"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.145,
+        0.11,
+        0.829,
+        0.92
+      ],
+      "hint": "Read only the table headed 'GOVERNOR AND LIEUTENANT GOVERNOR - VOTES CAST NOVEMBER 2, 1982'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1321
+      ]
+    },
+    {
+      "page": 13,
+      "id": "13-0",
+      "columns": [
+        {
+          "label": "LIBERAL",
+          "contest": "governor",
+          "candidate": "Mario M. Cuomo"
+        },
+        {
+          "label": "FREE-LIBERTARIAN",
+          "contest": "governor",
+          "candidate": "John H. Northrup"
+        },
+        {
+          "label": "SOCIALIST WORKERS",
+          "contest": "governor",
+          "candidate": "Diane Wang"
+        },
+        {
+          "label": "NEW ALLIANCE",
+          "contest": "governor",
+          "candidate": "Nancy Ross"
+        },
+        {
+          "label": "UNITY",
+          "contest": "governor",
+          "candidate": "Jane Benedict"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.186,
+        0.163,
+        0.873,
+        0.912
+      ],
+      "hint": "Read only the table headed 'GOVERNOR and LIEUTENANT GOVERNOR, Vote Cast November 2, 1982 (continued)'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0307
+      ]
+    },
+    {
+      "page": 14,
+      "id": "14-0",
+      "columns": [
+        {
+          "label": "STATEWIDE INDEPENDENT",
+          "contest": "governor",
+          "candidate": "Lew Lehrman"
+        },
+        {
+          "label": "BLANK",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "VOID",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "SCATTERING",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "WHOLE NUMBER OF VOTES",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.167,
+        0.16,
+        0.854,
+        0.884
+      ],
+      "hint": "Read only the table headed 'GOVERNOR and LIEUTENANT GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        -0.0028
+      ]
+    },
+    {
+      "page": 19,
+      "id": "19-0",
+      "columns": [
+        {
+          "label": "DANIEL P. MOYNIHAN DEM.",
+          "contest": "senate",
+          "candidate": "Daniel P. Moynihan"
+        },
+        {
+          "label": "FLORENCE M. SULLIVAN REP.",
+          "contest": "senate",
+          "candidate": "Florence M. Sullivan"
+        },
+        {
+          "label": "FLORENCE M. SULLIVAN CONS.",
+          "contest": "senate",
+          "candidate": "Florence M. Sullivan"
+        },
+        {
+          "label": "FLORENCE M. SULLIVAN RTL.",
+          "contest": "senate",
+          "candidate": "Florence M. Sullivan"
+        },
+        {
+          "label": "DANIEL P. MOYNIHAN LIB.",
+          "contest": "senate",
+          "candidate": "Daniel P. Moynihan"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.135,
+        0.048,
+        0.829,
+        0.852
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1032
+      ]
+    },
+    {
+      "page": 20,
+      "id": "20-0",
+      "columns": [
+        {
+          "label": "JAMES J. McKEOWN FREE LIB.",
+          "contest": "senate",
+          "candidate": "James J. McKeown"
+        },
+        {
+          "label": "STEVEN WATTENMAKER SOCIALIST WORKERS",
+          "contest": "senate",
+          "candidate": "Steven Wattenmaker"
+        },
+        {
+          "label": "BLANK",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "VOID",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "SCATTERING",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "WHOLE NUMBER OF VOTES",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.159,
+        0.138,
+        0.849,
+        0.842
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        -0.0028
+      ]
+    },
+    {
+      "page": 21,
+      "id": "21-0",
+      "columns": [
+        {
+          "label": "Ethan C. Eldon Dem.",
+          "contest": "house1",
+          "candidate": "Ethan C. Eldon"
+        },
+        {
+          "label": "William Carney Rep.",
+          "contest": "house1",
+          "candidate": "William Carney"
+        },
+        {
+          "label": "William Carney Cons.",
+          "contest": "house1",
+          "candidate": "William Carney"
+        },
+        {
+          "label": "William Carney RTL",
+          "contest": "house1",
+          "candidate": "William Carney"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.137,
+        0.134,
+        0.658,
+        0.218
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 21,
+      "id": "21-1",
+      "columns": [
+        {
+          "label": "Thomas J. Downey Dem.",
+          "contest": "house2",
+          "candidate": "Thomas J. Downey"
+        },
+        {
+          "label": "Paul G. Costello Rep.",
+          "contest": "house2",
+          "candidate": "Paul G. Costello"
+        },
+        {
+          "label": "Paul G. Costello Cons.",
+          "contest": "house2",
+          "candidate": "Paul G. Costello"
+        },
+        {
+          "label": "Louis VanDenEssen RTL",
+          "contest": "house2",
+          "candidate": "Louis VanDenEssen"
+        },
+        {
+          "label": "Thomas J. Downey Independence",
+          "contest": "house2",
+          "candidate": "Thomas J. Downey"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.137,
+        0.21,
+        0.785,
+        0.304
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 21,
+      "id": "21-2",
+      "columns": [
+        {
+          "label": "Robert J. Mrazek Dem.",
+          "contest": "house3",
+          "candidate": "Robert J. Mrazek"
+        },
+        {
+          "label": "John LeBoutillier Rep.",
+          "contest": "house3",
+          "candidate": "John LeBoutillier"
+        },
+        {
+          "label": "John LeBoutillier Cons.",
+          "contest": "house3",
+          "candidate": "John LeBoutillier"
+        },
+        {
+          "label": "Richard G. Bohner RTL",
+          "contest": "house3",
+          "candidate": "Richard G. Bohner"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.141,
+        0.296,
+        0.667,
+        0.424
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 21,
+      "id": "21-3",
+      "columns": [
+        {
+          "label": "Robert P. Zimmerman Dem.",
+          "contest": "house4",
+          "candidate": "Robert P. Zimmerman"
+        },
+        {
+          "label": "Norman F. Lent Rep.",
+          "contest": "house4",
+          "candidate": "Norman F. Lent"
+        },
+        {
+          "label": "Norman F. Lent Cons.",
+          "contest": "house4",
+          "candidate": "Norman F. Lent"
+        },
+        {
+          "label": "John J. Dunkle RTL",
+          "contest": "house4",
+          "candidate": "John J. Dunkle"
+        },
+        {
+          "label": "Robert P. Zimmerman Lib.",
+          "contest": "house4",
+          "candidate": "Robert P. Zimmerman"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.141,
+        0.416,
+        0.761,
+        0.512
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 21,
+      "id": "21-4",
+      "columns": [
+        {
+          "label": "Arnold J. Miller Dem.",
+          "contest": "house5",
+          "candidate": "Arnold J. Miller"
+        },
+        {
+          "label": "Raymond J. McGrath Rep.",
+          "contest": "house5",
+          "candidate": "Raymond J. McGrath"
+        },
+        {
+          "label": "Raymond J. McGrath Cons.",
+          "contest": "house5",
+          "candidate": "Raymond J. McGrath"
+        },
+        {
+          "label": "Thomas J. Boyle RTL",
+          "contest": "house5",
+          "candidate": "Thomas J. Boyle"
+        },
+        {
+          "label": "Arnold J. Miller Lib.",
+          "contest": "house5",
+          "candidate": "Arnold J. Miller"
+        },
+        {
+          "label": "Richard Horan FreeLib.",
+          "contest": "house5",
+          "candidate": "Richard Horan"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.141,
+        0.504,
+        0.829,
+        0.6
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 21,
+      "id": "21-5",
+      "columns": [
+        {
+          "label": "Joseph P. Addabbo Dem.",
+          "contest": "house6",
+          "candidate": "Joseph P. Addabbo"
+        },
+        {
+          "label": "Joseph P. Addabbo Rep.",
+          "contest": "house6",
+          "candidate": "Joseph P. Addabbo"
+        },
+        {
+          "label": "Mark E. Scott Cons.",
+          "contest": "house6",
+          "candidate": "Mark E. Scott"
+        },
+        {
+          "label": "Joseph P. Addabbo Lib.",
+          "contest": "house6",
+          "candidate": "Joseph P. Addabbo"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.141,
+        0.592,
+        0.661,
+        0.686
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 21,
+      "id": "21-6",
+      "columns": [
+        {
+          "label": "Benjamin S. Rosenthal Dem.",
+          "contest": "house7",
+          "candidate": "Benjamin S. Rosenthal"
+        },
+        {
+          "label": "Albert Lemishow Rep.",
+          "contest": "house7",
+          "candidate": "Albert Lemishow"
+        },
+        {
+          "label": "Albert Lemishow Cons.",
+          "contest": "house7",
+          "candidate": "Albert Lemishow"
+        },
+        {
+          "label": "Albert Lemishow RTL",
+          "contest": "house7",
+          "candidate": "Albert Lemishow"
+        },
+        {
+          "label": "Benjamin Rosenthal Lib.",
+          "contest": "house7",
+          "candidate": "Benjamin S. Rosenthal"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.141,
+        0.678,
+        0.761,
+        0.777
+      ],
+      "hint": "Read only the table headed 'SEVENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 21,
+      "id": "21-7",
+      "columns": [
+        {
+          "label": "James H. Scheuer Dem.",
+          "contest": "house8",
+          "candidate": "James H. Scheuer"
+        },
+        {
+          "label": "John T. Plume Cons.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "James H. Scheuer Lib.",
+          "contest": "house8",
+          "candidate": "James H. Scheuer"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.141,
+        0.769,
+        0.555,
+        0.897
+      ],
+      "hint": "Read only the table headed 'EIGHTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 22,
+      "id": "22-0",
+      "columns": [
+        {
+          "label": "Geraldine A. Ferraro Dem.",
+          "contest": "house9",
+          "candidate": "Geraldine A. Ferraro"
+        },
+        {
+          "label": "John J. Weigandt Rep.",
+          "contest": "house9",
+          "candidate": "John J. Weigandt"
+        },
+        {
+          "label": "Ralph C. Croves Cons.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Ralph C. Croves RTL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Patricia A. Salarzo Lib.",
+          "contest": "house9",
+          "candidate": "Patricia A. Salargo"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.168,
+        0.045,
+        0.808,
+        0.131
+      ],
+      "hint": "Read only the table headed 'NINTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 22,
+      "id": "22-1",
+      "columns": [
+        {
+          "label": "Charles E. Schumer Dem.",
+          "contest": "house10",
+          "candidate": "Charles E. Schumer"
+        },
+        {
+          "label": "Stephen Marks Rep.",
+          "contest": "house10",
+          "candidate": "Stephen Marks"
+        },
+        {
+          "label": "Stephen Marks Cons.",
+          "contest": "house10",
+          "candidate": "Stephen Marks"
+        },
+        {
+          "label": "Alice J. Bertolotti RTL",
+          "contest": "house10",
+          "candidate": "Alice J. Bertolotti"
+        },
+        {
+          "label": "Charles E. Schumer Lib.",
+          "contest": "house10",
+          "candidate": "Charles E. Schumer"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.168,
+        0.123,
+        0.808,
+        0.221
+      ],
+      "hint": "Read only the table headed 'TENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 22,
+      "id": "22-2",
+      "columns": [
+        {
+          "label": "Edolphus Towns Dem.",
+          "contest": "house11",
+          "candidate": "Edolphus Towns"
+        },
+        {
+          "label": "James W. Smith Rep.",
+          "contest": "house11",
+          "candidate": "James W. Smith"
+        },
+        {
+          "label": "Joseph N.O. Caesar Cons.",
+          "contest": "house11",
+          "candidate": "Joseph N. O. Caesar"
+        },
+        {
+          "label": "Joseph N.O. Caesar RTL",
+          "contest": "house11",
+          "candidate": "Joseph N. O. Caesar"
+        },
+        {
+          "label": "Patrick W. Giagnacova Lib.",
+          "contest": "house11",
+          "candidate": "Patrick W. Giagnacova"
+        },
+        {
+          "label": "Susan C. Zarate Soc. Work.",
+          "contest": "house11",
+          "candidate": "Susan C. Zarate"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.168,
+        0.213,
+        0.853,
+        0.31
+      ],
+      "hint": "Read only the table headed 'ELEVENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 22,
+      "id": "22-3",
+      "columns": [
+        {
+          "label": "Major R. Owens Dem.",
+          "contest": "house12",
+          "candidate": "Major R. Owens"
+        },
+        {
+          "label": "David Katan, Sr. Rep.",
+          "contest": "house12",
+          "candidate": "David Katan Sr."
+        },
+        {
+          "label": "David E. Rosenstroch Cons.",
+          "contest": "house12",
+          "candidate": "David E. Rosenstroch"
+        },
+        {
+          "label": "Jahn-Clymer Francis RTL",
+          "contest": "house12",
+          "candidate": "Jahn-Clymer Francis"
+        },
+        {
+          "label": "Major R. Owens Lib.",
+          "contest": "house12",
+          "candidate": "Major R. Owens"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.168,
+        0.302,
+        0.779,
+        0.399
+      ],
+      "hint": "Read only the table headed 'TWELFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 22,
+      "id": "22-4",
+      "columns": [
+        {
+          "label": "Stephen J. Solarz Dem.",
+          "contest": "house13",
+          "candidate": "Stephen J. Solarz"
+        },
+        {
+          "label": "Leon F. Nadrowski Rep.",
+          "contest": "house13",
+          "candidate": "Leon F. Nadrowski"
+        },
+        {
+          "label": "James M. Gay Cons.",
+          "contest": "house13",
+          "candidate": "James M. Gay"
+        },
+        {
+          "label": "Leon Nadrowski RTL",
+          "contest": "house13",
+          "candidate": "Leon F. Nadrowski"
+        },
+        {
+          "label": "Stephen J. Solarz Lib.",
+          "contest": "house13",
+          "candidate": "Stephen J. Solarz"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.168,
+        0.391,
+        0.791,
+        0.487
+      ],
+      "hint": "Read only the table headed 'THIRTEENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 22,
+      "id": "22-5",
+      "columns": [
+        {
+          "label": "Leo C. Zeferetti Dem.",
+          "contest": "house14",
+          "candidate": "Leo C. Zeferetti"
+        },
+        {
+          "label": "Guy V. Molinari Rep.",
+          "contest": "house14",
+          "candidate": "Guy V. Molinari"
+        },
+        {
+          "label": "Guy V. Molinari Cons.",
+          "contest": "house14",
+          "candidate": "Guy V. Molinari"
+        },
+        {
+          "label": "Guy V. Molinari RTL",
+          "contest": "house14",
+          "candidate": "Guy V. Molinari"
+        },
+        {
+          "label": "Carl F. Grillo Lib.",
+          "contest": "house14",
+          "candidate": "Carl F. Grillo"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.168,
+        0.479,
+        0.772,
+        0.609
+      ],
+      "hint": "Read only the table headed 'FOURTEENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 22,
+      "id": "22-6",
+      "columns": [
+        {
+          "label": "Betty G. Lall Dem.",
+          "contest": "house15",
+          "candidate": "Betty G. Lall"
+        },
+        {
+          "label": "Bill Green Rep.",
+          "contest": "house15",
+          "candidate": "Bill Green"
+        },
+        {
+          "label": "Henry VanRossem Cons.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Betty Lall Lib.",
+          "contest": "house15",
+          "candidate": "Betty G. Lall"
+        },
+        {
+          "label": "Bill Green Ind. Neighbors",
+          "contest": "house15",
+          "candidate": "Bill Green"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.168,
+        0.601,
+        0.819,
+        0.698
+      ],
+      "hint": "Read only the table headed 'FIFTEENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 22,
+      "id": "22-7",
+      "columns": [
+        {
+          "label": "Charles B. Rangel Dem.",
+          "contest": "house16",
+          "candidate": "Charles B. Rangel"
+        },
+        {
+          "label": "Charles B. Rangel Rep.",
+          "contest": "house16",
+          "candidate": "Charles B. Rangel"
+        },
+        {
+          "label": "Michael T. Berns Cons.",
+          "contest": "house16",
+          "candidate": "Michael T. Berns"
+        },
+        {
+          "label": "Charles B. Rangel Lib.",
+          "contest": "house16",
+          "candidate": "Charles B. Rangel"
+        },
+        {
+          "label": "Veronica Cruz Soc. Workers",
+          "contest": "house16",
+          "candidate": "Veronica Cruz"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.168,
+        0.69,
+        0.804,
+        0.787
+      ],
+      "hint": "Read only the table headed 'SIXTEENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 22,
+      "id": "22-8",
+      "columns": [
+        {
+          "label": "Ted Weiss Dem.",
+          "contest": "house17",
+          "candidate": "Ted Weiss"
+        },
+        {
+          "label": "Louis S. Antonelli Rep.",
+          "contest": "house17",
+          "candidate": "Louis S. Antonelli"
+        },
+        {
+          "label": "Louis S. Antonelli Cons.",
+          "contest": "house17",
+          "candidate": "Louis S. Antonelli"
+        },
+        {
+          "label": "Louis S. Antonelli RTL",
+          "contest": "house17",
+          "candidate": "Louis S. Antonelli"
+        },
+        {
+          "label": "Theodore S. Weiss Lib.",
+          "contest": "house17",
+          "candidate": "Ted Weiss"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.168,
+        0.779,
+        0.797,
+        0.901
+      ],
+      "hint": "Read only the table headed 'SEVENTEENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 23,
+      "id": "23-0",
+      "columns": [
+        {
+          "label": "Robert Garcia Dem.",
+          "contest": "house18",
+          "candidate": "Robert Garcia"
+        },
+        {
+          "label": "Robert Garcia Rep.",
+          "contest": "house18",
+          "candidate": "Robert Garcia"
+        },
+        {
+          "label": "Robert Garcia Lib.",
+          "contest": "house18",
+          "candidate": "Robert Garcia"
+        },
+        {
+          "label": "Rafael Perez Popular",
+          "contest": "house18",
+          "candidate": "Rafael Perez"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.146,
+        0.055,
+        0.743,
+        0.142
+      ],
+      "hint": "Read only the table headed 'EIGHTEENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 23,
+      "id": "23-1",
+      "columns": [
+        {
+          "label": "Mario Biaggi Dem.",
+          "contest": "house19",
+          "candidate": "Mario Biaggi"
+        },
+        {
+          "label": "Mario Biaggi Rep.",
+          "contest": "house19",
+          "candidate": "Mario Biaggi"
+        },
+        {
+          "label": "Michael J. McSherry Cons.",
+          "contest": "house19",
+          "candidate": "Michael J. McSherry"
+        },
+        {
+          "label": "Mario Biaggi Lib.",
+          "contest": "house19",
+          "candidate": "Mario Biaggi"
+        },
+        {
+          "label": "Eva Chertov Soc. Workers",
+          "contest": "house19",
+          "candidate": "Eva Chertov"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.146,
+        0.134,
+        0.777,
+        0.261
+      ],
+      "hint": "Read only the table headed 'NINETEENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 23,
+      "id": "23-2",
+      "columns": [
+        {
+          "label": "Richard L. Ottinger Dem.",
+          "contest": "house20",
+          "candidate": "Richard L. Ottinger"
+        },
+        {
+          "label": "Jon S. Fossel Rep.",
+          "contest": "house20",
+          "candidate": "Jon S. Fossel"
+        },
+        {
+          "label": "Jon S. Fossel Cons.",
+          "contest": "house20",
+          "candidate": "Jon S. Fossel"
+        },
+        {
+          "label": "Florence T. O'Grady RTL",
+          "contest": "house20",
+          "candidate": "Florence T. O'Grady"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.146,
+        0.253,
+        0.672,
+        0.348
+      ],
+      "hint": "Read only the table headed 'TWENTIETH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 23,
+      "id": "23-3",
+      "columns": [
+        {
+          "label": "J. Morgan Strong Dem.",
+          "contest": "house21",
+          "candidate": "J. Morgan Strong"
+        },
+        {
+          "label": "Hamilton Fish, Jr. Rep.",
+          "contest": "house21",
+          "candidate": "Hamilton Fish Jr."
+        },
+        {
+          "label": "Hamilton Fish, Jr. Cons.",
+          "contest": "house21",
+          "candidate": "Hamilton Fish Jr."
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.146,
+        0.34,
+        0.565,
+        0.49
+      ],
+      "hint": "Read only the table headed 'TWENTY-FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 23,
+      "id": "23-4",
+      "columns": [
+        {
+          "label": "Peter A. Peyser Dem.",
+          "contest": "house22",
+          "candidate": "Peter A. Peyser"
+        },
+        {
+          "label": "Benjamin A. Gilman Rep.",
+          "contest": "house22",
+          "candidate": "Benjamin A. Gilman"
+        },
+        {
+          "label": "Charles C. Beck Cons.",
+          "contest": "house22",
+          "candidate": "Charles C. Beck"
+        },
+        {
+          "label": "Richard Bruno RTL",
+          "contest": "house22",
+          "candidate": "Richard Bruno"
+        },
+        {
+          "label": "Peter A. Peyser Lib.",
+          "contest": "house22",
+          "candidate": "Peter A. Peyser"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.146,
+        0.482,
+        0.752,
+        0.631
+      ],
+      "hint": "Read only the table headed 'TWENTY-SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 23,
+      "id": "23-5",
+      "columns": [
+        {
+          "label": "Samuel S. Stratton Dem.",
+          "contest": "house23",
+          "candidate": "Samuel S. Stratton"
+        },
+        {
+          "label": "Frank Wicks Rep.",
+          "contest": "house23",
+          "candidate": "Frank Wicks"
+        },
+        {
+          "label": "John G. Dow Lib.",
+          "contest": "house23",
+          "candidate": "John G. Dow"
+        },
+        {
+          "label": "Patricia A. Mayberry Soc. Workers",
+          "contest": "house23",
+          "candidate": "Patricia A. Mayberry"
+        },
+        {
+          "label": "Mark A. Dunlea Citizens",
+          "contest": "house23",
+          "candidate": "Mark A. Dunlea"
+        },
+        {
+          "label": "Frank Wicks Nuclear Freeze",
+          "contest": "house23",
+          "candidate": "Frank Wicks"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.146,
+        0.623,
+        0.82,
+        0.764
+      ],
+      "hint": "Read only the table headed 'TWENTY-THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 24,
+      "id": "24-0",
+      "columns": [
+        {
+          "label": "Roy Esiason Dem.",
+          "contest": "house24",
+          "candidate": "Roy Esiason"
+        },
+        {
+          "label": "Gerald B. Solomon Rep.",
+          "contest": "house24",
+          "candidate": "Gerald B. Solomon"
+        },
+        {
+          "label": "Gerald B. Solomon Cons.",
+          "contest": "house24",
+          "candidate": "Gerald B. Solomon"
+        },
+        {
+          "label": "Gerald B. Solomon PTL",
+          "contest": "house24",
+          "candidate": "Gerald B. Solomon"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.152,
+        0.03,
+        0.678,
+        0.209
+      ],
+      "hint": "Read only the table headed 'TWENTY-FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 24,
+      "id": "24-1",
+      "columns": [
+        {
+          "label": "Anita Maxwell Dem.",
+          "contest": "house25",
+          "candidate": "Anita Maxwell"
+        },
+        {
+          "label": "Sherwood L. Roehlert Rep.",
+          "contest": "house25",
+          "candidate": "Sherwood L. Boehlert"
+        },
+        {
+          "label": "Donald J. Thomas RTL",
+          "contest": "house25",
+          "candidate": "Donald J. Thomas"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.154,
+        0.201,
+        0.558,
+        0.408
+      ],
+      "hint": "Read only the table headed 'TWENTY-FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 24,
+      "id": "24-2",
+      "columns": [
+        {
+          "label": "David P. Landy Dem.",
+          "contest": "house26",
+          "candidate": "David P. Landy"
+        },
+        {
+          "label": "David O'B Martin Rep.",
+          "contest": "house26",
+          "candidate": "David O'B. Martin"
+        },
+        {
+          "label": "David O'B Martin Cons.",
+          "contest": "house26",
+          "candidate": "David O'B. Martin"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.154,
+        0.4,
+        0.577,
+        0.609
+      ],
+      "hint": "Read only the table headed 'TWENTY-SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 24,
+      "id": "24-3",
+      "columns": [
+        {
+          "label": "Elaine Lytel Dem.",
+          "contest": "house27",
+          "candidate": "Elaine Lytel"
+        },
+        {
+          "label": "George C. Wortley Rep.",
+          "contest": "house27",
+          "candidate": "George C. Wortley"
+        },
+        {
+          "label": "Thomas M. Hunter Cons.",
+          "contest": "house27",
+          "candidate": "Thomas M. Hunter"
+        },
+        {
+          "label": "George Hyrcza RTL",
+          "contest": "house27",
+          "candidate": "George Hyrcza"
+        },
+        {
+          "label": "Elaine Lytel Lib.",
+          "contest": "house27",
+          "candidate": "Elaine Lytel"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.155,
+        0.601,
+        0.754,
+        0.733
+      ],
+      "hint": "Read only the table headed 'TWENTY-SEVENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 24,
+      "id": "24-4",
+      "columns": [
+        {
+          "label": "Matt McHugh Dem.",
+          "contest": "house28",
+          "candidate": "Matt McHugh"
+        },
+        {
+          "label": "David F. Crowley Rep.",
+          "contest": "house28",
+          "candidate": "David F. Crowley"
+        },
+        {
+          "label": "David F. Crowley Cons.",
+          "contest": "house28",
+          "candidate": "David F. Crowley"
+        },
+        {
+          "label": "Mark Masterson RTL",
+          "contest": "house28",
+          "candidate": "Mark Masterson"
+        },
+        {
+          "label": "Matt McHugh Lib.",
+          "contest": "house28",
+          "candidate": "Matt McHugh"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.159,
+        0.725,
+        0.757,
+        0.894
+      ],
+      "hint": "Read only the table headed 'TWENTY-EIGHTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 25,
+      "id": "25-0",
+      "columns": [
+        {
+          "label": "William C. Larsen Dem.",
+          "contest": "house29",
+          "candidate": "William C. Larsen"
+        },
+        {
+          "label": "Frank Horton Rep.",
+          "contest": "house29",
+          "candidate": "Frank Horton"
+        },
+        {
+          "label": "Edwin Lundberg Cons.",
+          "contest": "house29",
+          "candidate": "Edwin Lundberg"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.147,
+        0.053,
+        0.568,
+        0.22
+      ],
+      "hint": "Read only the table headed 'TWENTY-NINTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 25,
+      "id": "25-1",
+      "columns": [
+        {
+          "label": "Bill Benet Dem.",
+          "contest": "house30",
+          "candidate": "Bill Benet"
+        },
+        {
+          "label": "Barber T. Conable, Jr. Rep.",
+          "contest": "house30",
+          "candidate": "Barber B. Conable Jr."
+        },
+        {
+          "label": "Richard G. Baxter Cons.",
+          "contest": "house30",
+          "candidate": "Richard G. Baxter"
+        },
+        {
+          "label": "David J. Valone RTL",
+          "contest": "house30",
+          "candidate": "David J. Valone"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.147,
+        0.212,
+        0.648,
+        0.364
+      ],
+      "hint": "Read only the table headed 'THIRTIETH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 25,
+      "id": "25-2",
+      "columns": [
+        {
+          "label": "James A. Martin Dem.",
+          "contest": "house31",
+          "candidate": "James A. Martin"
+        },
+        {
+          "label": "Jack F. Kemp Rep.",
+          "contest": "house31",
+          "candidate": "Jack F. Kemp"
+        },
+        {
+          "label": "Jack Kemp Cons",
+          "contest": "house31",
+          "candidate": "Jack F. Kemp"
+        },
+        {
+          "label": "James A. Martin Lib.",
+          "contest": "house31",
+          "candidate": "James A. Martin"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.147,
+        0.356,
+        0.643,
+        0.519
+      ],
+      "hint": "Read only the table headed 'THIRTY-FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 25,
+      "id": "25-3",
+      "columns": [
+        {
+          "label": "John J. LaFalce Dem.",
+          "contest": "house32",
+          "candidate": "John J. LaFalce"
+        },
+        {
+          "label": "Raymond R. Walker Cons.",
+          "contest": "house32",
+          "candidate": "Raymond R. Walker"
+        },
+        {
+          "label": "Timothy J. Hubbard RTL",
+          "contest": "house32",
+          "candidate": "Timothy J. Hubbard"
+        },
+        {
+          "label": "John J. LaFalce Lib.",
+          "contest": "house32",
+          "candidate": "John J. LaFalce"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.147,
+        0.511,
+        0.643,
+        0.664
+      ],
+      "hint": "Read only the table headed 'THIRTY-SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 25,
+      "id": "25-4",
+      "columns": [
+        {
+          "label": "Henry J. Nowak Dem.",
+          "contest": "house33",
+          "candidate": "Henry J. Nowak"
+        },
+        {
+          "label": "Walter J. Pillich Rep.",
+          "contest": "house33",
+          "candidate": "Walter J. Pillich"
+        },
+        {
+          "label": "Walter J. Pillich Cons.",
+          "contest": "house33",
+          "candidate": "Walter J. Pillich"
+        },
+        {
+          "label": "James F. Gallagher RTL",
+          "contest": "house33",
+          "candidate": "James F. Gallagher"
+        },
+        {
+          "label": "Henry J. Nowak Lib.",
+          "contest": "house33",
+          "candidate": "Henry J. Nowak"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.147,
+        0.656,
+        0.713,
+        0.753
+      ],
+      "hint": "Read only the table headed 'THIRTY-THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 25,
+      "id": "25-5",
+      "columns": [
+        {
+          "label": "Stanley N. Lundine",
+          "contest": "house34",
+          "candidate": "Stanley N. Lundine"
+        },
+        {
+          "label": "James J. Snyder, SR.",
+          "contest": "house34",
+          "candidate": "James J. Snyder Sr."
+        },
+        {
+          "label": "James J. Snyder, Sr.",
+          "contest": "house34",
+          "candidate": "James J. Snyder Sr."
+        },
+        {
+          "label": "Genevieve F. Ronan",
+          "contest": "house34",
+          "candidate": "Genevieve F. Ronan"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.147,
+        0.745,
+        0.673,
+        0.919
+      ],
+      "hint": "Read only the table headed 'THIRTY-FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    }
+  ]
+}
