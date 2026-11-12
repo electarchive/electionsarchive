@@ -1,0 +1,22 @@
+{
+  "year": 1984,
+  "day": "1984-11-06",
+  "polity": "US-CO",
+  "publisher": "Colorado Secretary of State",
+  "title": "Abstract of votes cast, 1984",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/abstractofvotesc1984nata/abstractofvotesc1984nata.pdf"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "president": "presidential electors (President and Vice President); general election only, never the primary"
+  },
+  "leaves": [
+    130,
+    131
+  ],
+  "autorotate": true,
+  "extend": true,
+  "empty": true
+}

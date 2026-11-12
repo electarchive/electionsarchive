@@ -1,0 +1,24 @@
+{
+  "year": 1990,
+  "day": "1990-11-06",
+  "polity": "US-CO",
+  "publisher": "Colorado Secretary of State",
+  "title": "Abstract of votes cast, 1990",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/abstractofvotesc1990nata/abstractofvotesc1990nata.pdf"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "house": "U.S. Representative in Congress; district is the congressional district number; general election only, never the primary"
+  },
+  "leaves": [
+    150,
+    151,
+    152,
+    153
+  ],
+  "autorotate": true,
+  "extend": true,
+  "empty": true
+}
