@@ -22,6 +22,12 @@ URL = (
 HISTORY = "https://sos.nd.gov/sites/default/files/documents/elections/election-results-pdfs/{}.pdf"
 PUBLISHER = "North Dakota Secretary of State"
 TITLE = "Official abstracts of votes cast at the general elections"
+BLUE_BOOKS = {
+    1902: (date(1902, 11, 4), "northdakotablue03statgoog", 1903),
+    1904: (date(1904, 11, 8), "northdakotablue00statgoog", 1905),
+    1906: (date(1906, 11, 6), "northdakotablue05statgoog", 1907),
+    1908: (date(1908, 11, 3), "northdakotablue01statgoog", 1909),
+}
 FILES = {
     1904: "1904-pres-congress-gov",
     1910: "1910-general",
@@ -973,6 +979,12 @@ ERRATA = {
     (1944, "Olaf M. Thorsen"),
     (1950, "A. J. Jensen"),
     (1966, "B. C. Thompson"),
+    (1902, "Andrew Schatz"),
+    (1904, "C. D. Diesem"),
+    (1904, "G. S. Cryne"),
+    (1906, "D. C. Greenleaf"),
+    (1906, "A. J. Evans"),
+    (1906, "Arthur LeSueur"),
 }
 READ_1944 = {("wells", 32): 1386, ("grant", 35): 1606}
 TYPOS = {"mclntosh": "mcintosh", "poster": "foster"}
@@ -1127,6 +1139,34 @@ def batch_column(year: int, column: int, size: int) -> list[int | None]:
     return out
 
 
+def blue_book(codes: dict[str, str]) -> list[dict[str, object]]:
+    frame = pl.read_csv(Path(__file__).with_name("nd_blue_book.tsv"), separator="\t")
+    totals = frame.filter(pl.col("county") == "Total")
+    counted = frame.filter(pl.col("county") != "Total")
+    for year, candidate, printed in totals.select("year", "candidate", "votes").iter_rows():
+        found = counted.filter((pl.col("year") == year) & (pl.col("candidate") == candidate))["votes"].sum()
+        if abs(found - printed) > max(20, printed // 100) and (year, candidate) not in ERRATA:
+            raise ValueError(f"{year} {candidate}: counties sum to {found}, the Blue Book prints {printed}")
+    return [
+        {
+            "day": BLUE_BOOKS[year][0],
+            "office": office,
+            "code": party,
+            "candidate": candidate,
+            "county": codes[plain(county)],
+            "votes": votes,
+        }
+        for year, office, candidate, party, county, votes in counted.select(
+            "year", "office", "candidate", "party", "county", "votes"
+        ).iter_rows()
+    ]
+
+
+def blue_book_url(year: int) -> str:
+    volume = BLUE_BOOKS[year][1]
+    return f"https://archive.org/download/{volume}/{volume}.pdf"
+
+
 def url(year: int) -> str:
     if year in FILES:
         return HISTORY.format(FILES[year])
@@ -1136,6 +1176,8 @@ def url(year: int) -> str:
 def fetch() -> None:
     for year in DAYS:
         raw.fetch(SOURCE, url(year), suffix=".pdf")
+    for year in BLUE_BOOKS:
+        raw.fetch(SOURCE, blue_book_url(year), suffix=".pdf")
 
 
 def plain(text: str) -> str:
@@ -1379,6 +1421,7 @@ def parse() -> None:
             )
     for year in PAGES:
         rows.extend(abstract(year, codes))
+    rows.extend(blue_book(codes))
     PARSED.mkdir(parents=True, exist_ok=True)
     pl.DataFrame(rows, infer_schema_length=None).write_parquet(PARSED / "lines.parquet")
 
@@ -1418,6 +1461,20 @@ def emit() -> Path:
         )
         for year in DAYS:
             cs.artifact(raw.cached(SOURCE, url(year)), source)
+        books: dict[int, UUID] = {}
+        for year, (_, volume, edition) in BLUE_BOOKS.items():
+            title = f"North Dakota Blue Book {edition}"
+            books[year] = cs.source(PUBLISHER, title)
+            cs.add(
+                "source",
+                id=books[year],
+                kind="official_body",
+                publisher=PUBLISHER,
+                title=title,
+                url=f"https://archive.org/details/{volume}",
+                license="Public domain",
+            )
+            cs.artifact(raw.cached(SOURCE, blue_book_url(year)), books[year])
         counties: dict[str, UUID] = dict(
             conn.execute(
                 "select code, id from reporting_unit where scheme_code = 'us.county' and code like '38%%'"
@@ -1627,7 +1684,7 @@ def emit() -> Path:
                 stage="certified",
                 kind="counted",
                 status="active",
-                source_id=source,
+                source_id=books[year] if year in BLUE_BOOKS and office != "governor" else source,
                 is_default=True,
                 completeness=1,
             )
