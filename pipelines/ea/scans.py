@@ -82,6 +82,7 @@ class Manifest(TypedDict):
     raw_source: NotRequired[str]
     unit_codes: NotRequired[dict[str, str]]
     unit_parts: NotRequired[dict[str, str]]
+    unit_standalone: NotRequired[bool]
     unit_scheme: NotRequired[Literal["town", "split"]]
     authoritative: NotRequired[str]
     extend: NotRequired[bool]
@@ -734,7 +735,7 @@ def cells(
             owners: list[tuple[str | None, str | None]] = [place(row["label"]) for row in rows]
             found = [code for code, _ in owners]
             for r, (code, owner) in enumerate(owners):
-                if code is None or ":" not in code or owner is not None:
+                if code is None or ":" not in code or owner is not None or manifest.get("unit_standalone"):
                     continue
                 if any(other is not None and ":" not in other for other in found[r + 1 :]) or found.count(code) > 1:
                     before = [other for other in found[:r] if other is not None and ":" not in other]

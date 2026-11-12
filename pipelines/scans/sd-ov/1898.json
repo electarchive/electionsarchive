@@ -116,6 +116,7 @@
     }
   ],
   "empty": true,
+  "unit_standalone": true,
   "unit_codes": {
     "Unorganized counties to Butte": "SD:unorganized-butte",
     "Unorganized to Butte": "SD:unorganized-butte",
