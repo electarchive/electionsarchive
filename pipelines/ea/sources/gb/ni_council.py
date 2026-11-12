@@ -135,7 +135,15 @@ def grid_sheet(grid: list[list[str | None]], dea: str, scan: int = 14, width: in
                     for key, words in (
                         ("electorate", ("eligible electorate", "total no of electors", "no. of electors")),
                         ("polled", ("votes polled", "total votes polled")),
-                        ("seats", ("number to be elected", "number of members to be elected")),
+                        (
+                            "seats",
+                            (
+                                "number to be elected",
+                                "number of members to be elected",
+                                "members to be elected",
+                                "no. to be elected",
+                            ),
+                        ),
                         ("invalid", ("invalid votes", "number of invalid votes")),
                         (
                             "valid",
@@ -151,7 +159,9 @@ def grid_sheet(grid: list[list[str | None]], dea: str, scan: int = 14, width: in
                     )
                     if any(label.startswith(word) for word in words)
                 ),
-                "seats" if re.match(r"number\b.*\bele(?:c|tc)", label) and "elector" not in label else None,
+                "seats"
+                if (re.match(r"number\b.*\bele(?:c|tc)", label) or "to be elected" in label) and "elector" not in label
+                else None,
             )
             if key is not None:
                 value = next((number(c) for c in row[index + 1 :] if number(c) is not None), None)
@@ -178,20 +188,32 @@ def grid_sheet(grid: list[list[str | None]], dea: str, scan: int = 14, width: in
         if index is not None
     )
     description_col = name_col + 1
+
+    def label_of(index: int) -> str:
+        return (grid[index][description_col] or grid[index][name_col] or "").strip().lower()
+
     totals_row = next(
-        (
-            index
-            for index in range(header + 1, len(grid))
-            if (grid[index][description_col] or "").strip().lower().startswith("totals")
-        ),
+        (index for index in range(header + 1, len(grid)) if label_of(index).startswith("totals")),
         len(grid),
     )
     nontransferable_row = next(
-        index
-        for index in range(header + 1, totals_row)
-        if (grid[index][description_col] or "").strip().lower().startswith("non")
-        and "tran" in (grid[index][description_col] or "").lower()
+        (
+            index
+            for index in range(header + 1, totals_row)
+            if label_of(index).startswith("non") and ("tran" in label_of(index) or "tans" in label_of(index))
+        ),
+        None,
     )
+    if nontransferable_row is None:
+        first_candidate = next(
+            index for index in range(header + 1, len(grid)) if (grid[index][name_col] or "").strip() not in ("", "0")
+        )
+        nontransferable_row = next(
+            index
+            for index in range(first_candidate + 1, len(grid))
+            if (grid[index][name_col] or "").strip() == "" and (grid[index][1] or "").strip() == ""
+        )
+        grid.insert(nontransferable_row, [None] * len(grid[0]))
     rows = [
         row
         for row in grid[header + 1 : nontransferable_row]
@@ -214,7 +236,7 @@ def grid_sheet(grid: list[list[str | None]], dea: str, scan: int = 14, width: in
         (
             number(grid[index][first])
             for index in range(header + 1, len(grid))
-            if (grid[index][description_col] or "").strip().lower() in ("total", "totals")
+            if label_of(index) in ("total", "totals")
         ),
         None,
     )
@@ -443,6 +465,10 @@ def finish(
         raise ValueError(f"{year} {dea}: {sum(flagged)} marked elected for {seats} seats")
     if sum(flagged) < seats:
         vacancies = seats - sum(flagged)
+        if stages > tied:
+            raise ValueError(
+                f"{year} {dea}: {vacancies} seats unmarked and the count is tied through stage {tied} of {stages}"
+            )
         continuing = [index for index, amount in enumerate(last) if amount > 0 and not flagged[index]]
         if len(continuing) < vacancies or len(continuing) > vacancies + 1:
             raise ValueError(f"{year} {dea}: {len(continuing)} continuing for {vacancies} vacancies")
@@ -718,7 +744,12 @@ def parse_ark(year: int) -> tuple[list[dict[str, object]], list[dict[str, object
     units: list[dict[str, object]] = []
     totals: list[dict[str, object]] = []
     failed: list[str] = []
-    for path in sorted(path for path in folder.rglob("*.xls*") if path.name.lower().startswith(f"{ARK[year]}-")):
+    workbooks = sorted(path for path in folder.rglob("*.xls*") if path.name.lower().startswith(f"{ARK[year]}-"))
+    workbooks.sort(key=lambda path: "-corrected" not in path.name.lower())
+    read: set[str] = set()
+    for path in workbooks:
+        if path.name.lower() in read:
+            continue
         _, abbr, *rest = path.stem.split("-")
         rest = [word for word in rest if word.lower() != "corrected"]
         abbr = {code.upper(): code for code in LEGACY_NAMES}.get(abbr.upper(), abbr)
@@ -734,10 +765,10 @@ def parse_ark(year: int) -> tuple[list[dict[str, object]], list[dict[str, object
             dea = f"Area {rest[1].upper()}"
         try:
             sheet = grid_sheet(grid, dea, 40, 80)
-            if sheet["tied"] < sheet["stages"]:
-                raise ValueError(f"tied through stage {sheet['tied']} of {sheet['stages']}")
+            if sheet["tied"] < 1:
+                raise ValueError("first preferences do not add up to the valid votes")
             candidates = [
-                {**c, "elected": re.fullmatch(r"e|elected|e\d+|e'.*|.*stage e", c["flag"]) is not None}
+                {**c, "elected": re.fullmatch(r"e|elected|e\d+|e'.*|.*stage e|e\s*\(.*", c["flag"]) is not None}
                 for c in sheet["candidates"]
                 if re.search("[A-Za-z]", c["name"])
             ]
@@ -755,6 +786,7 @@ def parse_ark(year: int) -> tuple[list[dict[str, object]], list[dict[str, object
             print(f"FAILED {year} {path.name}: {error!r}")
             failed.append(path.name)
             continue
+        read.add(path.name.lower().replace("-corrected", ""))
         unit["note"] = " ".join(filter(None, [unit["note"], f"Workbook {path.name} in the ARK archive."]))
         units.append(unit)
         totals.extend(rows)
@@ -1130,6 +1162,21 @@ def parse() -> None:
             [totals.join(keys, on=["year", "dea_code"], how="anti"), pl.read_parquet(scanned / "totals.parquet")],
             how="diagonal_relaxed",
         )
+    units = units.with_columns(
+        pl.when((pl.col("invalid") < 0) & (pl.col("polled") == pl.col("valid") - pl.col("invalid")))
+        .then(-pl.col("invalid"))
+        .otherwise(pl.col("invalid"))
+        .alias("invalid")
+    ).with_columns(
+        pl.when((pl.col("polled") < pl.col("valid")) | (pl.col("polled") < 100))
+        .then(None)
+        .otherwise(pl.col("polled"))
+        .alias("polled")
+    )
+    units = units.with_columns(
+        pl.when(pl.col("invalid") < 0).then(None).otherwise(pl.col("invalid")).alias("invalid"),
+        pl.when(pl.col("electorate") < pl.col("valid")).then(None).otherwise(pl.col("electorate")).alias("electorate"),
+    )
     units.write_parquet(PARSED / "units.parquet")
     totals.write_parquet(PARSED / "totals.parquet")
     print(units.group_by("year").len().sort("year"))
