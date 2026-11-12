@@ -1,0 +1,289 @@
+{
+  "polity": "US-WV",
+  "publisher": "West Virginia Legislature",
+  "title": "West Virginia Blue Book 1981, election returns (general election 1980-11-04)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1981.pdf",
+    "item": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1981.pdf"
+  },
+  "raw_source": "us.wv_bluebook",
+  "contests": {
+    "president": {
+      "year": 1980,
+      "chamber": "president",
+      "day": "1980-11-04",
+      "special": false,
+      "state": "WV",
+      "district": null
+    },
+    "house1": {
+      "year": 1980,
+      "chamber": "house",
+      "day": "1980-11-04",
+      "special": false,
+      "state": "WV",
+      "district": 1
+    },
+    "house2": {
+      "year": 1980,
+      "chamber": "house",
+      "day": "1980-11-04",
+      "special": false,
+      "state": "WV",
+      "district": 2
+    },
+    "house3": {
+      "year": 1980,
+      "chamber": "house",
+      "day": "1980-11-04",
+      "special": false,
+      "state": "WV",
+      "district": 3
+    },
+    "house4": {
+      "year": 1980,
+      "chamber": "house",
+      "day": "1980-11-04",
+      "special": false,
+      "state": "WV",
+      "district": 4
+    },
+    "governor": {
+      "year": 1980,
+      "chamber": "governor",
+      "day": "1980-11-04",
+      "special": false,
+      "state": "WV",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 661,
+      "id": "661-0",
+      "columns": [
+        {
+          "label": "DEMOCRATIC ELECTORS",
+          "contest": "president",
+          "candidate": "Jimmy Carter (Democratic)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.132,
+        0.209,
+        0.853,
+        0.876
+      ],
+      "hint": "Read only the table headed 'President and Vice President of the United States'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.057
+      ]
+    },
+    {
+      "page": 662,
+      "id": "662-0",
+      "columns": [
+        {
+          "label": "REPUBLICAN ELECTORS",
+          "contest": "president",
+          "candidate": "Ronald Reagan (Republican)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.133,
+        0.228,
+        0.858,
+        0.904
+      ],
+      "hint": "Read only the table headed 'PRESIDENT AND VICE PRESIDENT OF THE UNITED STATES'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0651
+      ]
+    },
+    {
+      "page": 663,
+      "id": "663-0",
+      "columns": [
+        {
+          "label": "John Anderson Patrick J. Lucey",
+          "contest": "president",
+          "candidate": "John Anderson (Independent)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.147,
+        0.196,
+        0.867,
+        0.866
+      ],
+      "hint": "Read only the table headed 'PRESIDENT AND VICE PRESIDENT OF THE UNITED STATES'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0896
+      ]
+    },
+    {
+      "page": 664,
+      "id": "664-0",
+      "columns": [
+        {
+          "label": "Ed Clark David Koch",
+          "contest": "president",
+          "candidate": "Ed Clark (Libertarian)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.119,
+        0.225,
+        0.849,
+        0.901
+      ],
+      "hint": "Read only the table headed 'PRESIDENT AND VICE PRESIDENT OF THE UNITED STATES - LIBERTARIAN ELECTORS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0888
+      ]
+    },
+    {
+      "page": 665,
+      "id": "665-0",
+      "columns": [
+        {
+          "label": "*Robert H. Mollohan Fairmont Democrat",
+          "contest": "house1",
+          "candidate": "Robert H. Mollohan"
+        },
+        {
+          "label": "Joe Bartlett Lost Creek Republican",
+          "contest": "house1",
+          "candidate": "Joe Bartlett"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.151,
+        0.124,
+        0.858,
+        0.43
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 665,
+      "id": "665-1",
+      "columns": [
+        {
+          "label": "Pat R. Hamilton Oak Hill Democrat",
+          "contest": "house2",
+          "candidate": "Pat R. Hamilton"
+        },
+        {
+          "label": "*Cleve Benedict Lewisburg Republican",
+          "contest": "house2",
+          "candidate": "Cleve Benedict"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.151,
+        0.422,
+        0.868,
+        0.869
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 666,
+      "id": "666-0",
+      "columns": [
+        {
+          "label": "John G. Hutchinson Charleston Democrat",
+          "contest": "house3",
+          "candidate": "John G. Hutchinson"
+        },
+        {
+          "label": "*Mick Staton South Charleston Republican",
+          "contest": "house3",
+          "candidate": "Mick Staton"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.137,
+        0.131,
+        0.849,
+        0.493
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 666,
+      "id": "666-1",
+      "columns": [
+        {
+          "label": "*Nick Joe Rahall II Beckley Democrat",
+          "contest": "house4",
+          "candidate": "Nick Joe Rahall, II"
+        },
+        {
+          "label": "Winton G. Covey, Jr. Lerona Republican",
+          "contest": "house4",
+          "candidate": "Winton Guy Covey, Jr."
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.124,
+        0.485,
+        0.844,
+        0.795
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 667,
+      "id": "667-0",
+      "columns": [
+        {
+          "label": "*Jay Rockefeller Charleston Democrat",
+          "contest": "governor",
+          "candidate": "John D. IV Rockefeller"
+        },
+        {
+          "label": "Arch A. Moore, Jr. Glen Dale Republican",
+          "contest": "governor",
+          "candidate": "Arch A. Jr. Moore"
+        },
+        {
+          "label": "Jack K. Kelley Parkersburg Libertarian",
+          "contest": "governor",
+          "candidate": "Jack Kelley"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.152,
+        0.164,
+        0.868,
+        0.845
+      ],
+      "hint": "Read only the table headed 'GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0896
+      ]
+    }
+  ]
+}
