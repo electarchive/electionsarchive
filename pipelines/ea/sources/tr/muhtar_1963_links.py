@@ -10,6 +10,8 @@ from ea.store import DATA, connect
 SOURCE = "tr.muhtar_1963_links"
 VERSION = "3"
 RENAMES = Path(__file__).with_name("koy_renames_1968.tsv")
+KOYLERIMIZ_1933 = Path(__file__).with_name("koylerimiz_1933.tsv")
+ANCHORS = Path(__file__).with_name("koylerimiz_1933_links.tsv")
 RENAMES_URL = "https://acikerisim.tbmm.gov.tr/server/api/core/bitstreams/42c011d2-44d8-498e-8353-41a658b94ba9/content"
 
 
@@ -23,6 +25,91 @@ def readings(name: str) -> set[str]:
     return {key} | {
         key[:i] + new + key[i + 1 :] for old, new in (("m", "in"), ("g", "s")) for i, c in enumerate(key) if c == old
     }
+
+
+def same_ilce(a: str, b: str) -> bool:
+    from ea.sources.tr.koylerimiz_1933 import key
+
+    short, long = sorted((key(a), key(b)), key=len)
+    return short == long or (len(short) > 3 and (long.endswith(short) or long.startswith(short)))
+
+
+def parse() -> Path:
+    from ea.sources.tr.koylerimiz_1933 import PROVINCES, key
+
+    with connect() as conn:
+        units = conn.execute(
+            """select u.code, n.text, x.scheme || ':' || x.value, an.text from reporting_unit u
+               join name n on n.entity_id = u.id and n.is_preferred
+               left join reporting_unit_area l on l.unit_id = u.id and l.approximate
+               left join area a on a.id = l.area_id and a.scheme_code = 'tr.mahalle'
+               left join name an on an.entity_id = a.id and an.is_preferred and an.lang = 'tr'
+               left join lateral (
+                 select scheme, value from external_id where entity_id = a.id
+                 order by scheme = 'tr.tuik.koy' desc, scheme = 'tr.tuik.mahalle' desc, scheme limit 1
+               ) x on true
+               where u.scheme_code = 'tr.mahalle' and u.code like '1963:%'"""
+        ).fetchall()
+    book = pl.read_csv(KOYLERIMIZ_1933, separator="\t", infer_schema=False).fill_null("").to_dicts()
+    by_name = defaultdict(list)
+    for index, row in enumerate(book):
+        for plate in PROVINCES.get(row["vilayet"], []):
+            by_name[plate, key(row["koy"])].append(index)
+    renamed = defaultdict(list)
+    for row in pl.read_csv(RENAMES, separator="\t", infer_schema=False).iter_rows(named=True):
+        renamed[row["plate"], key(row["new_name"])].append(row)
+    named = Counter((code.split(":")[1], key(text)) for code, text, _, _ in units)
+    picks, claims = {}, defaultdict(list)
+    for code, text, _, _ in units:
+        plate, ilce = code.split(":")[1:3]
+        name = key(text)
+        if not name:
+            continue
+        via, options = "name", by_name.get((plate, name), [])
+        if not options:
+            olds = {key(row["old_name"]) for row in renamed[plate, name] if same_ilce(row["ilce"], ilce)}
+            if len(olds) == 1:
+                via, options = "1968 rename", by_name.get((plate, olds.pop()), [])
+        if len(options) > 1 or named[plate, name] > 1:
+            options = [i for i in options if book[i]["kaza"] and same_ilce(book[i]["kaza"], ilce)]
+        if len(options) == 1:
+            picks[code] = (options[0], via)
+            claims[options[0]].append(code)
+    rows = []
+    for code, text, area, area_name in units:
+        if code not in picks or len(claims[picks[code][0]]) != 1:
+            continue
+        index, via = picks[code]
+        row = book[index]
+        kaza = row["kaza"] and ("agrees" if same_ilce(row["kaza"], code.split(":")[2]) else "differs")
+        rows.append(
+            {
+                "code": code,
+                "name": text,
+                "page": row["page"],
+                "column": row["column"],
+                "y": row["y"],
+                "koy_1933": row["koy"],
+                "vilayet_1933": row["vilayet"],
+                "kaza_1933": row["kaza"],
+                "mark": row["mark"],
+                "via": via,
+                "kaza": kaza,
+                "name_1968": row["name_1968"],
+                "area_2024": area or "",
+                "area_name_2024": area_name or "",
+            }
+        )
+    frame = pl.DataFrame(rows).sort("code")
+    frame.write_csv(ANCHORS, separator="\t")
+    print(
+        f"{frame.height} of {len(units)} 1963 köys anchored one to one to a 1933 Köylerimiz row "
+        f"({frame.filter(pl.col('via') == '1968 rename').height} through a 1968 rename; kaza "
+        f"{dict(frame.group_by('kaza').len().iter_rows())}; "
+        f"{frame.filter(pl.col('name_1968') != '').height} also read in the 1968 old names; "
+        f"{frame.filter(pl.col('area_2024') != '').height} with a 2024 place)"
+    )
+    return ANCHORS
 
 
 def emit() -> Path:
