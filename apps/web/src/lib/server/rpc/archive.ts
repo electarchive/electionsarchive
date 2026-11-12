@@ -11455,105 +11455,140 @@ export const contests = {
           groups: [],
         };
       }
-      const found = await db.execute<{
-        k: number;
-        id: string;
-        code: string;
-        scheme: string;
-        noun: string;
-        kind: string;
-        group: string | null;
-        at: number | null;
-      }>(sql`
-        with recursive raw as materialized (
-          select u.k, u.id, u.code, u.scheme_code as scheme, u.kind::text as kind, u.area_id, u.parent_id
-          from unnest(${sql.param(candidates)}::int[]) c(k)
-          join reporting_unit u on u.k = c.k
-          where u.area_relation = 'within' and u.kind in ('standard', 'aggregate')
-            and u.area_id is not null
-        ),
-        covered as materialized (
-          select a.id, a.scheme_code from area a
-          where a.id = any(array(select distinct area_id from raw))
-            and exists (select from area_geometry g where g.area_id = a.id and g.valid @> ${day}::date)
-        ),
-        placed as materialized (
-          select * from raw r
-          where not exists (select from covered c where c.id = r.area_id and c.scheme_code = r.scheme)
-        ),
-        links as materialized (
-          select p.k as unit, p.area_id as start from placed p
-          union all
-          select p.k, m.area_id from placed p
-          cross join lateral (
-            select x.area_id from reporting_unit_area x
-            where x.unit_id = p.id and not x.approximate and x.valid @> ${day}::date offset 0
-          ) m
-        ),
-        anc(start, id, depth) as (
-          select s.start, s.start, 0 from (select distinct start from links) s
-          union all
-          select anc.start, ap.parent_id, anc.depth + 1 from anc
-          join area_parent ap on ap.area_id = anc.id and ap.valid @> ${day}::date
-          where anc.depth < 6 and anc.id <> ${area.id}::uuid
-        ),
-        up as (
-          select l.unit, anc.id, anc.depth from links l join anc on anc.start = l.start
-        ),
-        reached as materialized (
-          select a.id, a.scheme_code = ${input.level ?? ""}
-            and exists (select from area_geometry ag where ag.area_id = a.id and ag.valid @> ${day}::date) as "isLevel"
-          from area a
-          where a.id = any(array(select distinct id from anc))
-        ),
-        chains as (
-          select up.unit, ${chain.length === 0} or bool_or(up.id = ${area.id}::uuid) as inside,
-            (array_agg(a.id order by up.depth) filter (where a."isLevel"))[1] as "group"
-          from up join reached a on a.id = up.id
-          group by up.unit
-        ),
-        grouped as (
-          select p.*, coalesce(c."group", (
-            select o.id from area o
-            where o.id = p.area_id and o.id <> ${area.id}::uuid
-              and exists (select from area_geometry ag where ag.area_id = o.id and ag.valid @> ${day}::date)
-          )) as "group"
-          from placed p
-          join chains c on c.unit = p.k and c.inside
-        )
-        select p.k, p.id, p.code, p.scheme, s.noun, p.kind, p."group", g.k as at
-        from grouped p
-        join scheme s on s.code = p.scheme
-        left join area g on g.id = p."group"
-        where not exists (select from placed x where x.parent_id = p.id)
-        order by p.k
-      `);
-      if (found.rows.length < 2) {
+      const level = input.level ?? "";
+      const found = await remember(
+        `ledger-units:${createHash("sha1")
+          .update(
+            JSON.stringify([
+              area.id,
+              day,
+              level,
+              chain.length === 0,
+              candidates.toSorted((a, b) => a - b),
+            ]),
+          )
+          .digest("hex")}`,
+        async () =>
+          rowsOf(
+            await db.execute<{
+              k: number;
+              id: string;
+              code: string;
+              scheme: string;
+              noun: string;
+              kind: string;
+              group: string | null;
+              at: number | null;
+            }>(sql`
+              with recursive raw as materialized (
+                select u.k, u.id, u.code, u.scheme_code as scheme, u.kind::text as kind, u.area_id, u.parent_id
+                from unnest(${sql.param(candidates)}::int[]) c(k)
+                join reporting_unit u on u.k = c.k
+                where u.area_relation = 'within' and u.kind in ('standard', 'aggregate')
+                  and u.area_id is not null
+              ),
+              covered as materialized (
+                select a.id, a.scheme_code from area a
+                where a.id = any(array(select distinct area_id from raw))
+                  and exists (select from area_geometry g where g.area_id = a.id and g.valid @> ${day}::date)
+              ),
+              placed as materialized (
+                select * from raw r
+                where not exists (select from covered c where c.id = r.area_id and c.scheme_code = r.scheme)
+              ),
+              links as materialized (
+                select p.k as unit, p.area_id as start from placed p
+                union all
+                select p.k, m.area_id from placed p
+                cross join lateral (
+                  select x.area_id from reporting_unit_area x
+                  where x.unit_id = p.id and not x.approximate and x.valid @> ${day}::date offset 0
+                ) m
+              ),
+              starts as materialized (
+                select s.start as id, a.scheme_code = ${level}
+                  and exists (select from area_geometry ag where ag.area_id = a.id and ag.valid @> ${day}::date) as "isLevel"
+                from (select distinct start from links) s
+                join area a on a.id = s.start
+              ),
+              anc(start, id, depth) as (
+                select s.id, s.id, 0 from starts s
+                union all
+                select anc.start, ap.parent_id, anc.depth + 1 from anc
+                join area_parent ap on ap.area_id = anc.id and ap.valid @> ${day}::date
+                where anc.depth < 6 and anc.id <> ${area.id}::uuid
+                  and not (${chain.length === 0} and anc.depth = 0 and exists (select from starts s where s.id = anc.id and s."isLevel"))
+              ),
+              up as (
+                select l.unit, anc.id, anc.depth from links l join anc on anc.start = l.start
+              ),
+              reached as materialized (
+                select id, "isLevel" from starts
+                union all
+                select a.id, a.scheme_code = ${level}
+                  and exists (select from area_geometry ag where ag.area_id = a.id and ag.valid @> ${day}::date)
+                from area a
+                where a.id = any(array(select id from anc where depth > 0 except select id from starts))
+              ),
+              chains as (
+                select up.unit, ${chain.length === 0} or bool_or(up.id = ${area.id}::uuid) as inside,
+                  (array_agg(a.id order by up.depth) filter (where a."isLevel"))[1] as "group"
+                from up join reached a on a.id = up.id
+                group by up.unit
+              ),
+              grouped as (
+                select p.*, coalesce(c."group", (
+                  select o.id from area o
+                  where o.id = p.area_id and o.id <> ${area.id}::uuid
+                    and exists (select from area_geometry ag where ag.area_id = o.id and ag.valid @> ${day}::date)
+                )) as "group"
+                from placed p
+                join chains c on c.unit = p.k and c.inside
+              )
+              select p.k, p.id, p.code, p.scheme, s.noun, p.kind, p."group", g.k as at
+              from grouped p
+              join scheme s on s.code = p.scheme
+              left join area g on g.id = p."group"
+              where not exists (select from placed x where x.parent_id = p.id)
+              order by p.k
+            `),
+          ),
+        false,
+        undefined,
+        true,
+      );
+      if (found.length < 2) {
         return null;
       }
-      if (found.rows.length > 4000) {
+      if (found.length > 4000) {
         return {
-          count: found.rows.length,
+          count: found.length,
           isCapped: true,
           folded: 0,
           places: null,
           groups: [],
         };
       }
+      if (
+        found.every((row) => row.at != null) &&
+        new Set(found.map((row) => row.at)).size === found.length
+      ) {
+        return null;
+      }
       const labels = await names(
         [
           area.id,
-          ...found.rows.flatMap((row) =>
+          ...found.flatMap((row) =>
             row.group == null ? [row.id] : [row.id, row.group],
           ),
         ],
         contest.date,
       );
-      const units = found.rows
+      const units = found
         .filter(
           (row) =>
             row.kind === "standard" ||
-            found.rows.every(
+            found.every(
               (other) =>
                 other.scheme !== row.scheme || other.kind !== "standard",
             ),
