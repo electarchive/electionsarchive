@@ -240,7 +240,7 @@
         { "label": "Soc. Lab.", "contest": null, "candidate": "" }
       ],
       "orientation": "counties_down",
-      "crop": [0.172, 0.713, 0.87, 1.0],
+      "crop": [0.172, 0.5, 0.87, 0.74],
       "hint": "Read only the table headed 'SECOND DISTRICT.'; ignore any other table visible in the image."
     },
     {

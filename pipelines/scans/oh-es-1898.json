@@ -503,7 +503,7 @@
         { "label": "Scattering.", "contest": null, "candidate": "" }
       ],
       "orientation": "counties_down",
-      "crop": [0.18, 0.583, 0.888, 0.971],
+      "crop": [0.18, 0.39, 0.888, 0.65],
       "hint": "Read only the table headed 'Fourteenth Congressional District.'; ignore any other table visible in the image."
     },
     {
@@ -523,7 +523,7 @@
         { "label": "Scattering.", "contest": null, "candidate": "" }
       ],
       "orientation": "counties_down",
-      "crop": [0.18, 0.963, 0.888, 1.0],
+      "crop": [0.18, 0.645, 0.888, 0.89],
       "hint": "Read only the table headed 'Fifteenth Congressional District.'; ignore any other table visible in the image."
     },
     {
