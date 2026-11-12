@@ -1,0 +1,37 @@
+day	park	ward	kind	source	electorate	ballots	rejected
+2026-07-09	S21000002	1	local	https://www.stirling.gov.uk/media/tmdfali2/the-loch-lomond-and-the-trossachs-national-park-results-ward-1.pdf	2005	634	0
+2026-07-09	S21000002	2	local	https://www.stirling.gov.uk/media/s0ghv3fr/the-loch-lomond-and-the-trossachs-national-park-declaration-ward-2.pdf			
+2026-07-09	S21000002	3	local	https://www.stirling.gov.uk/media/lyvflfk0/the-loch-lomond-and-the-trossachs-national-park-results-ward-3.pdf	2757	929	4
+2026-07-09	S21000002	4	local	https://www.stirling.gov.uk/media/upiabxya/the-loch-lomond-and-the-trossachs-national-park-results-ward-4.pdf	2375	817	2
+2026-07-09	S21000002	5	local	https://www.stirling.gov.uk/media/kcmlz555/the-loch-lomond-and-the-trossachs-national-park-declaration-ward-5.pdf			
+2022-07-07	S21000002	1	local	https://www.stirling.gov.uk/media/zpmdiyhr/lltnpa-election-7th-july-2022-results-sheets.pdf	2036	567	0
+2022-07-07	S21000002	2	local	https://www.stirling.gov.uk/media/zpmdiyhr/lltnpa-election-7th-july-2022-results-sheets.pdf	2806	827	4
+2022-07-07	S21000002	3	local	https://www.stirling.gov.uk/media/zpmdiyhr/lltnpa-election-7th-july-2022-results-sheets.pdf	2765	815	3
+2022-07-07	S21000002	4	local	https://www.stirling.gov.uk/media/zpmdiyhr/lltnpa-election-7th-july-2022-results-sheets.pdf	2426	901	2
+2022-07-07	S21000002	5	local	https://www.stirling.gov.uk/media/zpmdiyhr/lltnpa-election-7th-july-2022-results-sheets.pdf	2378	764	2
+2018-07-05	S21000002	1	local	https://www.lochlomond-trossachs.org/wp-content/uploads/2018/07/RESULTS.pdf	1997	648	1
+2018-07-05	S21000002	2	local	https://www.lochlomond-trossachs.org/wp-content/uploads/2018/07/RESULTS.pdf	2759	873	1
+2018-07-05	S21000002	3	local	https://www.lochlomond-trossachs.org/wp-content/uploads/2018/07/RESULTS.pdf	2691	1074	0
+2018-07-05	S21000002	4	local	https://www.lochlomond-trossachs.org/wp-content/uploads/2018/07/RESULTS.pdf	2382	792	4
+2018-07-05	S21000002	5	local	https://www.lochlomond-trossachs.org/wp-content/uploads/2018/07/RESULTS.pdf	2349	619	0
+2014-07-03	S21000002	1	local	https://parkswatchscotland.co.uk/wp-content/uploads/2018/05/election-results-2014.pdf	2067	615	3
+2014-07-03	S21000002	2	local	https://parkswatchscotland.co.uk/wp-content/uploads/2018/05/election-results-2014.pdf	2708	1036	1
+2014-07-03	S21000002	3	local	https://parkswatchscotland.co.uk/wp-content/uploads/2018/05/election-results-2014.pdf	2663	1053	2
+2014-07-03	S21000002	4	local	https://parkswatchscotland.co.uk/wp-content/uploads/2018/05/election-results-2014.pdf	2340	960	2
+2014-07-03	S21000002	5	local	https://parkswatchscotland.co.uk/wp-content/uploads/2018/05/election-results-2014.pdf	2337	663	2
+2023-03-23	S21000003	1	local	https://www.highland.gov.uk/downloads/file/4855/declaration-results-for-ward-1-2023-	3561	1275	7
+2023-03-23	S21000003	2	local	https://www.highland.gov.uk/news/article/15221/cairngorms-national-park-authority-board-elections-2023-results			
+2023-03-23	S21000003	3	local	https://www.highland.gov.uk/downloads/file/4856/declaration-results-for-ward-3-2023-	4274	1688	4
+2023-03-23	S21000003	4	local	https://www.highland.gov.uk/downloads/file/4857/declaration-results-for-ward-4-2023-	1065	433	0
+2023-03-23	S21000003	5	local	https://www.highland.gov.uk/downloads/file/4858/declaration-results-for-ward-5-2023-	2305	694	1
+2019-03-21	S21000003	1	local	https://www.highland.gov.uk/downloads/file/5401/declaration-results-for-ward-1	3598	1385	6
+2019-03-21	S21000003	2	local	https://www.highland.gov.uk/downloads/file/5402/declaration-results-for-ward-2	3356	1358	0
+2019-03-21	S21000003	3	local	https://www.highland.gov.uk/downloads/file/5403/declaration-results-for-ward-3	4257	1848	6
+2019-03-21	S21000003	4	local	https://www.highland.gov.uk/elections-voting/cairngorms-national-park-authority-election/5			
+2019-03-21	S21000003	5	local	https://www.highland.gov.uk/downloads/file/5404/declaration-results-for-ward-5	2323	1028	0
+2017-03-30	S21000003	5	by	https://www.highland.gov.uk/downloads/file/5372/declaration-of-results-for-ward-5-2017	2373	865	2
+2015-03-19	S21000003	1	local	https://www.highland.gov.uk/downloads/file/5445/declaration-of-result-ward-1	3731	1058	
+2015-03-19	S21000003	2	local	https://www.highland.gov.uk/downloads/file/5446/declaration-of-result-ward-2	3384	965	
+2015-03-19	S21000003	3	local	https://www.highland.gov.uk/downloads/file/5447/declaration-of-result-ward-3	4250	1045	
+2015-03-19	S21000003	4	local	https://www.highland.gov.uk/downloads/file/5448/declaration-of-result-ward-4			
+2015-03-19	S21000003	5	local	https://www.highland.gov.uk/downloads/file/5449/declaration-of-result-ward-5	2479	1175	
