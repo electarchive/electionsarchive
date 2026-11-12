@@ -2,16 +2,16 @@ import html
 import re
 from datetime import date
 from pathlib import Path
-from uuid import UUID
+from uuid import UUID, uuid5
 
 import polars as pl
 
 from ea import raw
-from ea.changeset import Changeset
+from ea.changeset import NAMESPACE, Changeset
 from ea.store import DATA, connect
 
 SOURCE = "fr.referendums"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 FIGURE = r"\d{1,3}(?:[ .]\d{3})*"
 VOTES, REGISTERED, VALID, INVALID, VOTERS = 1, 2, 4, 5, 14
@@ -106,6 +106,31 @@ REFERENDUMS = {
         "2005/200538REF",
         "Ratification of the Treaty establishing a Constitution for Europe",
         "Ratification du traité établissant une Constitution pour l'Europe",
+    ),
+}
+LEGIFRANCE_PUBLISHER = "Direction de l'information légale et administrative"
+LEGIFRANCE_TITLE = "Légifrance : décrets décidant de soumettre un projet de loi au référendum"
+QUESTIONS = {
+    date(1992, 9, 20): (
+        "https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000000504610",
+        (
+            "Approuvez-vous le projet de loi soumis au peuple français par le Président de la République autorisant la "
+            "ratification du Traité sur l'Union européenne ?"
+        ),
+    ),
+    date(2000, 9, 24): (
+        "https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000000766148",
+        (
+            "Approuvez-vous le projet de loi constitutionnelle fixant la durée du mandat du Président de la République à "
+            "cinq ans ?"
+        ),
+    ),
+    date(2005, 5, 29): (
+        "https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000000627571",
+        (
+            "Approuvez-vous le projet de loi qui autorise la ratification du traité établissant une Constitution pour "
+            "l'Europe ?"
+        ),
     ),
 }
 MONTHS = [
@@ -256,6 +281,7 @@ def emit() -> Path:
             publisher=SENATE_PUBLISHER,
             title=SENATE_TITLE,
             url=SENATE_URL,
+            license="Public record",
         )
         ministry = cs.source(MINISTRY_PUBLISHER, MINISTRY_TITLE)
         cs.add(
@@ -266,6 +292,17 @@ def emit() -> Path:
             title=MINISTRY_TITLE,
             url="https://www.data.gouv.fr/datasets/referendum-de-2005-571473",
             license="Licence Ouverte v1.0",
+            license_url="https://www.etalab.gouv.fr/licence-ouverte-open-licence",
+        )
+        legifrance = cs.source(LEGIFRANCE_PUBLISHER, LEGIFRANCE_TITLE)
+        cs.add(
+            "source",
+            id=legifrance,
+            kind="official_body",
+            publisher=LEGIFRANCE_PUBLISHER,
+            title=LEGIFRANCE_TITLE,
+            url="https://www.legifrance.gouv.fr/",
+            license="Licence Ouverte v2.0",
             license_url="https://www.etalab.gouv.fr/licence-ouverte-open-licence",
         )
         cs.artifact(raw.cached(SOURCE, SENATE_URL), senate)
@@ -307,6 +344,18 @@ def emit() -> Path:
                 default_result_kind="counted",
             )
             cs.add("ballot_question", contest_id=contest, type="plebiscite")
+            if day in QUESTIONS:
+                url, body = QUESTIONS[day]
+                cs.add(
+                    "ballot_question_text",
+                    id=uuid5(NAMESPACE, f"ballot_question_text\x1f{contest}\x1ffr"),
+                    contest_id=contest,
+                    kind="text",
+                    lang="fr",
+                    body=body,
+                    url=url,
+                    source_id=legifrance,
+                )
             name(contest, english)
             name(contest, french, "fr", "native")
             cs.add("slug", path=f"{path}/question", entity_id=contest)
