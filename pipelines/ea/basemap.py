@@ -14,14 +14,14 @@ from fontTools.ttLib import TTFont
 from PIL import Image, ImageDraw, ImageFont
 from pmtiles.reader import MmapSource, Reader
 from pyproj import Transformer
-from shapely import LineString, affinity, box, clip_by_rect, get_dimensions, make_valid, unary_union
+from shapely import LineString, affinity, box, clip_by_rect, from_wkb, get_dimensions, make_valid, unary_union
 from shapely.geometry import Point, mapping, shape
 from shapely.geometry.base import BaseGeometry
 from shapely.prepared import PreparedGeometry, prep
 
 from ea import display, raw
 from ea.plane import REGISTRY
-from ea.store import DATA, ROOT
+from ea.store import DATA, ROOT, connect
 
 BUILDS = "https://build-metadata.protomaps.dev/builds.json"
 PLANET = "https://build.protomaps.com/{key}"
@@ -89,6 +89,8 @@ MUTED = {
 }
 
 REACH = 0.02
+SPAN = 2.0
+RINGS = [REACH * 1.5**k for k in range(12)]
 
 
 class Zone(NamedTuple):
@@ -106,7 +108,27 @@ inside: PreparedGeometry
 near: PreparedGeometry
 
 
-def setup(scheme: str) -> None:
+def territory(scheme: str) -> list[bytes]:
+    if not REGISTRY["projections"][REGISTRY["schemes"][scheme]].get("insets"):
+        return []
+    with connect() as db:
+        return [
+            bytes(row[0])
+            for row in db.execute(
+                """
+                select ST_AsBinary(g.geom) from area a
+                cross join lateral (
+                  select geom from area_geometry where area_id = a.id
+                  order by valid @> current_date desc, upper(valid) desc nulls first limit 1
+                ) g
+                where a.scheme_code = %s
+                """,
+                (f"{scheme}.nation",),
+            )
+        ]
+
+
+def setup(scheme: str, nation: list[bytes]) -> None:
     global land, inside, near
     entry = REGISTRY["projections"][REGISTRY["schemes"][scheme]]
     admin = raw.fetch("world.natural_earth", ADMIN, suffix=".geojson")
@@ -114,8 +136,10 @@ def setup(scheme: str) -> None:
         (f["properties"]["ADM0_A3"] in COUNTRIES[scheme], shape(f["geometry"]))
         for f in json.loads(admin.path.read_text())["features"]
     ]
-    home = unary_union([geom for mine, geom in countries if mine])
-    land = home.buffer(REACH)
+    coarse = unary_union([geom for mine, geom in countries if mine])
+    land = coarse.buffer(REACH)
+    exact = unary_union([from_wkb(wkb).simplify(REACH / 40) for wkb in nation])
+    home = unary_union([exact, *(piece for piece in getattr(coarse, "geoms", [coarse]) if not piece.intersects(exact))])
     inside = prep(land)
     zones.clear()
     taken: list[BaseGeometry] = []
@@ -125,13 +149,24 @@ def setup(scheme: str) -> None:
         taken.append(area)
         if "clip" in part:
             region = region.intersection(box(*part["clip"]))
-        around = region.buffer(4 * REACH)
+        around = region.buffer(SPAN)
         foreign = unary_union(
             [geom.intersection(around) for mine, geom in countries if not mine and geom.intersects(around)]
         )
+        mainland = home.intersection(around)
         halo = foreign.buffer(REACH)
-        claim = home.intersection(around).buffer(REACH / 2).difference(foreign)
-        own = region.difference(halo.difference(claim))
+        claim = mainland.buffer(REACH / 4)
+        nearer = unary_union(
+            [
+                foreign.simplify(r / 4)
+                .buffer(r, quad_segs=4)
+                .difference(mainland.simplify(r / 4).buffer(r, quad_segs=4))
+                for r in RINGS
+            ]
+            if not foreign.is_empty
+            else []
+        )
+        own = region.difference(unary_union([halo, nearer]).difference(claim))
         zones.append(Zone(part["within"], projector(part["srid"]), part["affine"], own, prep(own), prep(halo)))
     zones.append(Zone(entry["within"], projector(entry["srid"]), None))
     near = prep(unary_union([box(*b) for zone in zones for b in zone.within] + surround(framed=True)))
@@ -387,7 +422,8 @@ def extract(key: str, target: Path, region: object, minzoom: int, maxzoom: int) 
 
 
 def build(scheme: str) -> str:
-    setup(scheme)
+    nation = territory(scheme)
+    setup(scheme, nation)
     key = httpx.get(BUILDS, timeout=60).raise_for_status().json()[-1]["key"]
     folder = WORK / key.removesuffix(".pmtiles")
     for old in WORK.glob("2*"):
@@ -456,7 +492,7 @@ def build(scheme: str) -> str:
     staging.mkdir(parents=True)
     files = {}
     seen: dict[str, list[tuple[float, float]]] = {}
-    with Pool(8, initializer=setup, initargs=(scheme,)) as pool:
+    with Pool(8, initializer=setup, initargs=(scheme, nation)) as pool:
         for rows in pool.imap_unordered(work, jobs, chunksize=16):
             for layer, line in rows:
                 if layer in ("places", "hoods"):
@@ -501,7 +537,7 @@ def historical(schemes: list[str], date: str) -> str:
     world = unary_union([shape(f["geometry"]) for f in json.loads(admin.path.read_text())["features"]]).buffer(0.02)
     regions: dict[str, tuple[PreparedGeometry, PreparedGeometry]] = {}
     for scheme in schemes:
-        setup(scheme)
+        setup(scheme, territory(scheme))
         regions[scheme] = (near, inside)
     folder = WORK / "ohm" / date
     shutil.rmtree(folder, ignore_errors=True)
@@ -595,7 +631,7 @@ def historical(schemes: list[str], date: str) -> str:
     OUT.mkdir(parents=True, exist_ok=True)
     report = []
     for scheme in schemes:
-        setup(scheme)
+        setup(scheme, territory(scheme))
         staging = folder / scheme
         written = {"rail": 0, "borders": 0}
         with (staging / "rail.geojsons").open("w") as out, (staging / "rail.wgs").open() as source:
