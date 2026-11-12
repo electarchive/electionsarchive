@@ -2004,6 +2004,27 @@ async function areaNouns(ids: Array<string>, date: string) {
   return new Map(found.rows.map((row) => [row.id, row.noun]));
 }
 
+async function areaPopulation(area: string, date: string) {
+  const found = await db.execute<{
+    value: string;
+    date: string;
+    source: string;
+  }>(sql`
+    select f.value::text as value, s.publisher as source,
+      case f.date_precision when 'year' then to_char(f.date, 'YYYY')
+        when 'month' then to_char(f.date, 'YYYY-MM') else f.date::text end as date
+    from area_figure f
+    join source s on s.id = f.source_id and s.kind = 'official_body'
+    where f.area_id = ${area}::uuid and f.kind = 'population' and f.date <= ${date}::date
+    order by f.date desc, f.source_id
+    limit 1
+  `);
+  const row = found.rows[0];
+  return row == null
+    ? null
+    : { value: Number(row.value), date: row.date, source: row.source };
+}
+
 async function areaMembers(area: string, date: string) {
   const found = await db.execute<{
     id: string;
@@ -2194,7 +2215,7 @@ async function contestFrame({
     ...chain.map((entry) => entry.id),
   ];
   const scopedArea = scoped?.id ?? contest.place?.id;
-  const [nearby, memberships] = await Promise.all([
+  const [nearby, memberships, population] = await Promise.all([
     db.execute<{ id: string }>(sql`
       select a.id from area a
       where a.id = any(${sql.param(stops.filter((id) => id != null))}::uuid[])
@@ -2212,6 +2233,9 @@ async function contestFrame({
     scopedArea == null
       ? []
       : areaMembers(scopedArea, contest.date ?? "infinity"),
+    scopedArea == null
+      ? null
+      : areaPopulation(scopedArea, contest.date ?? "infinity"),
   ]);
   const away = new Set(rowsOf(nearby).map((row) => row.id));
   const trail: Array<{
@@ -2290,6 +2314,7 @@ async function contestFrame({
       home,
       abroad,
       memberships,
+      population,
       trail,
     },
     isScoped: contest.isScoped,
@@ -6477,6 +6502,10 @@ const Membership = v.object({
   isParent: v.boolean(),
 });
 
+const Population = v.nullable(
+  v.object({ value: v.number(), date: v.string(), source: v.string() }),
+);
+
 const Frame = {
   name: v.string(),
   kind: v.string(),
@@ -6498,6 +6527,7 @@ const Frame = {
     home: v.nullable(v.string()),
     abroad: v.nullable(v.object({ electorate: v.nullable(v.string()) })),
     memberships: v.array(Membership),
+    population: Population,
     trail: v.array(
       v.object({
         name: v.string(),
@@ -23507,6 +23537,7 @@ export const polities = {
           }),
         ),
         memberships: v.array(Membership),
+        population: Population,
         holdings: v.array(
           v.object({
             level: v.string(),
@@ -23607,7 +23638,7 @@ export const polities = {
       }),
     )
     .handler(async ({ input }) => {
-      const memberships = db
+      const territory = db
         .execute<{ id: string }>(
           sql`
             select t.area_id as id from polity_territory t
@@ -23615,11 +23646,13 @@ export const polities = {
             order by upper(t.valid) desc nulls first limit 1
           `,
         )
-        .then(async (found) =>
-          found.rows[0] == null
-            ? []
-            : areaMembers(found.rows[0].id, "infinity"),
-        );
+        .then((found) => found.rows[0]?.id ?? null);
+      const memberships = territory.then(async (area) =>
+        area == null ? [] : areaMembers(area, "infinity"),
+      );
+      const population = territory.then(async (area) =>
+        area == null ? null : areaPopulation(area, "infinity"),
+      );
       const [
         found,
         subdivisions,
@@ -24107,6 +24140,7 @@ export const polities = {
           .filter((row) => row.name !== "")
           .toSorted((a, b) => natural(a.name, b.name)),
         memberships: await memberships,
+        population: await population,
         holdings: holdings.rows.filter((row) => row.population > 0),
         within: subdivisions.rows[0]?.within ?? 0,
         dates: sizes.length,

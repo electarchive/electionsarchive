@@ -451,6 +451,15 @@
         })}{/if}
     </p>
   {/if}
+  {#if polity.population != null}
+    <p class="text-[0.8125rem] text-muted-foreground">
+      {m.population_figure({
+        population: count(polity.population.value),
+        date: date(polity.population.date),
+        source: polity.population.source,
+      })}
+    </p>
+  {/if}
   {#if polity.latest == null && polity.results.length > 0 && ["county", "municipality", "school_district", "special_district"].includes(polity.kind)}
     <p
       class="text-[0.8125rem] text-pretty text-muted-foreground max-inline-[64ch]"

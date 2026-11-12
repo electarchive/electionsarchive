@@ -2783,6 +2783,20 @@
           {percent(contest.turnout.voters / contest.turnout.registered)}
         </dd>
       </div>
+      {#if contest.scope.population != null}
+        <div class="flex items-baseline gap-2">
+          <dt class="text-muted-foreground">{m.stat_population()}</dt>
+          <dd class="font-figures font-semibold tabular-nums">
+            {count(contest.scope.population.value)}
+            <span class="font-sans font-normal text-muted-foreground"
+              >{m.population_dated({
+                date: date(contest.scope.population.date),
+                source: contest.scope.population.source,
+              })}</span
+            >
+          </dd>
+        </div>
+      {/if}
     </dl>
   {/if}
 {/snippet}
@@ -2821,6 +2835,22 @@
       ]
         .filter((part) => part !== "")
         .join(" ")}
+    />
+  {/if}
+{/snippet}
+
+{#snippet perResident()}
+  {#if contest.scope.population != null}
+    {const counts = $derived({
+      population: count(contest.scope.population.value),
+      date: date(contest.scope.population.date),
+      source: contest.scope.population.source,
+    })}
+    <Term
+      label={m.stat_per_resident()}
+      definition={contest.turnout == null
+        ? m.term_per_resident_valid(counts)
+        : m.term_per_resident_ballots(counts)}
     />
   {/if}
 {/snippet}
@@ -2907,6 +2937,23 @@
                 detail: m.stat_turnout_count({
                   voters: count(contest.turnout.voters),
                   registered: count(contest.turnout.registered),
+                }),
+              },
+            ]),
+        ...(contest.scope.population == null
+          ? []
+          : [
+              {
+                key: "population",
+                label: perResident,
+                figure: percent(
+                  (contest.turnout?.voters ?? contest.current.valid) /
+                    contest.scope.population.value,
+                ),
+                detail: m.population_figure({
+                  population: count(contest.scope.population.value),
+                  date: date(contest.scope.population.date),
+                  source: contest.scope.population.source,
                 }),
               },
             ]),

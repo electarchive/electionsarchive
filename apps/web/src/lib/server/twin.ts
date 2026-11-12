@@ -2506,6 +2506,15 @@ function polityMarkdown(
     `# ${polity.name}`,
     ...[formerly(polity.former, getLocale())].flatMap((line) => line ?? []),
     byline(polity.breadcrumbs, link, null),
+    ...(polity.population == null
+      ? []
+      : [
+          m.population_figure({
+            population: count(polity.population.value),
+            date: date(polity.population.date),
+            source: polity.population.source,
+          }),
+        ]),
     ...(polity.latest == null &&
     polity.results.length > 0 &&
     ["county", "municipality", "school_district", "special_district"].includes(
@@ -6463,6 +6472,10 @@ function resultsMarkdown(
         contest.turnout == null || contest.turnout.registered === 0
           ? ""
           : `\n\n${m.stat_turnout()}: ${percent(contest.turnout.voters / contest.turnout.registered)} (${m.stat_turnout_count({ voters: count(contest.turnout.voters), registered: count(contest.turnout.registered) })})${contest.turnout.basis === "rejected" ? ` ${m.turnout_basis_rejected()}` : contest.turnout.basis === "valid" ? ` ${m.turnout_basis_valid()}` : ""}`
+      }${
+        contest.scope.population == null
+          ? ""
+          : `\n\n${m.stat_per_resident()}: ${percent((contest.turnout?.voters ?? contest.current.valid) / contest.scope.population.value)}. ${(contest.turnout == null ? m.term_per_resident_valid : m.term_per_resident_ballots)({ population: count(contest.scope.population.value), date: date(contest.scope.population.date), source: contest.scope.population.source })}`
       }${contest.contingent == null ? "" : `\n\n${contingency(contest.contingent)}`}${contest.partial == null ? "" : `\n\n${m.race_partial_counties(contest.partial)}`}${contest.rows
         .flatMap((row) =>
           row.current == null || row.supported.length === 0
