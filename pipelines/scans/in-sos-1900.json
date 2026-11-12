@@ -1,0 +1,798 @@
+{
+  "polity": "US-IN",
+  "publisher": "Indiana Secretary of State",
+  "title": "Annual report of the Secretary of State of the State of Indiana, 1900: certificate of vote cast, November 6, 1900, and abstract of vote cast for congressmen by districts and counties",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/annualreport05indigoog/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/annualreport05indigoog"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1900,
+      "chamber": "president",
+      "day": "1900-11-06",
+      "special": false,
+      "state": "IN",
+      "district": null
+    },
+    "governor": {
+      "year": 1900,
+      "chamber": "governor",
+      "day": "1900-11-06",
+      "special": false,
+      "state": "IN",
+      "district": null
+    },
+    "house1": {
+      "year": 1900,
+      "chamber": "house",
+      "day": "1900-11-06",
+      "special": false,
+      "state": "IN",
+      "district": 1
+    },
+    "house2": {
+      "year": 1900,
+      "chamber": "house",
+      "day": "1900-11-06",
+      "special": false,
+      "state": "IN",
+      "district": 2
+    },
+    "house3": {
+      "year": 1900,
+      "chamber": "house",
+      "day": "1900-11-06",
+      "special": false,
+      "state": "IN",
+      "district": 3
+    },
+    "house4": {
+      "year": 1900,
+      "chamber": "house",
+      "day": "1900-11-06",
+      "special": false,
+      "state": "IN",
+      "district": 4
+    },
+    "house5": {
+      "year": 1900,
+      "chamber": "house",
+      "day": "1900-11-06",
+      "special": false,
+      "state": "IN",
+      "district": 5
+    },
+    "house6": {
+      "year": 1900,
+      "chamber": "house",
+      "day": "1900-11-06",
+      "special": false,
+      "state": "IN",
+      "district": 6
+    },
+    "house7": {
+      "year": 1900,
+      "chamber": "house",
+      "day": "1900-11-06",
+      "special": false,
+      "state": "IN",
+      "district": 7
+    },
+    "house8": {
+      "year": 1900,
+      "chamber": "house",
+      "day": "1900-11-06",
+      "special": false,
+      "state": "IN",
+      "district": 8
+    },
+    "house9": {
+      "year": 1900,
+      "chamber": "house",
+      "day": "1900-11-06",
+      "special": false,
+      "state": "IN",
+      "district": 9
+    },
+    "house10": {
+      "year": 1900,
+      "chamber": "house",
+      "day": "1900-11-06",
+      "special": false,
+      "state": "IN",
+      "district": 10
+    },
+    "house11": {
+      "year": 1900,
+      "chamber": "house",
+      "day": "1900-11-06",
+      "special": false,
+      "state": "IN",
+      "district": 11
+    },
+    "house12": {
+      "year": 1900,
+      "chamber": "house",
+      "day": "1900-11-06",
+      "special": false,
+      "state": "IN",
+      "district": 12
+    },
+    "house13": {
+      "year": 1900,
+      "chamber": "house",
+      "day": "1900-11-06",
+      "special": false,
+      "state": "IN",
+      "district": 13
+    }
+  },
+  "pages": [
+    {
+      "page": 264,
+      "id": "264-0",
+      "columns": [
+        {
+          "label": "At Large, Allen Zollars.",
+          "contest": "president",
+          "candidate": "William Jennings Bryan (Democratic)"
+        },
+        {
+          "label": "At Large, Hugh H. Hanna.",
+          "contest": "president",
+          "candidate": "William McKinley (Republican)"
+        },
+        {
+          "label": "At Large, Edward W. Clark.",
+          "contest": "president",
+          "candidate": "John G. Woolley (Prohibition)"
+        },
+        {
+          "label": "At Large, Samuel Walker.",
+          "contest": "president",
+          "candidate": "Wharton Barker (People's)"
+        },
+        {
+          "label": "At Large, W. J. Colbert.",
+          "contest": "president",
+          "candidate": "Joseph F. Malloney (Socialist Labor)"
+        },
+        {
+          "label": "At Large, Herman Stuempfle.",
+          "contest": "president",
+          "candidate": "Eugene V. Debs (Social Democratic)"
+        },
+        {
+          "label": "At Large, John E. Bayless.",
+          "contest": "president",
+          "candidate": "Seth H. Ellis (Union Reform)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.124,
+        0.23,
+        0.837,
+        1.0
+      ],
+      "hint": "Read only the table headed 'CERTIFICATE OF VOTE CAST FOR PRESIDENTIAL ELECTORS, NOVEMBER 6, 1900.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1338
+      ]
+    },
+    {
+      "page": 265,
+      "id": "265-0",
+      "columns": [
+        {
+          "label": "At Large, Allen Zollars.",
+          "contest": "president",
+          "candidate": "William Jennings Bryan (Democratic)"
+        },
+        {
+          "label": "At Large, Hugh H. Hanna.",
+          "contest": "president",
+          "candidate": "William McKinley (Republican)"
+        },
+        {
+          "label": "At Large, Edward W. Clark.",
+          "contest": "president",
+          "candidate": "John G. Woolley (Prohibition)"
+        },
+        {
+          "label": "At Large, Samuel Walker.",
+          "contest": "president",
+          "candidate": "Wharton Barker (People's)"
+        },
+        {
+          "label": "At Large, W. J. Colbert.",
+          "contest": "president",
+          "candidate": "Joseph F. Malloney (Socialist Labor)"
+        },
+        {
+          "label": "At Large, Herman Stuempfle.",
+          "contest": "president",
+          "candidate": "Eugene V. Debs (Social Democratic)"
+        },
+        {
+          "label": "At Large, John E. Bayless.",
+          "contest": "president",
+          "candidate": "Seth H. Ellis (Union Reform)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.107,
+        0.116,
+        0.828,
+        0.801
+      ],
+      "hint": "Read only the table headed 'CERTIFICATE OF VOTE CAST FOR PRESIDENTIAL ELECTORS, NOVEMBER 6, 1900\u2014Continued.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2365
+      ]
+    },
+    {
+      "page": 266,
+      "id": "266-0",
+      "columns": [
+        {
+          "label": "John W. Kern, Dem.",
+          "contest": "governor",
+          "candidate": "John W. Kern"
+        },
+        {
+          "label": "Winfield T. Durbin, Rep.",
+          "contest": "governor",
+          "candidate": "Winfield T. Durbin"
+        },
+        {
+          "label": "Charles Eckhart, Prohi.",
+          "contest": "governor",
+          "candidate": "Charles N. Eckhart"
+        },
+        {
+          "label": "Alonzo G. Burkhart, Pop.",
+          "contest": "governor",
+          "candidate": "Alonzo G. Burkhart"
+        },
+        {
+          "label": "Philip H. More, Socialist.",
+          "contest": "governor",
+          "candidate": "Philip H. More"
+        },
+        {
+          "label": "John W. Kelly, Soc. Dem.",
+          "contest": "governor",
+          "candidate": "John W. Kelly"
+        },
+        {
+          "label": "M. A. Wilson, U. Ref.",
+          "contest": "governor",
+          "candidate": "M. A. Wilson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.165,
+        0.261,
+        0.879,
+        1.0
+      ],
+      "hint": "Read only the table headed 'GOVERNOR.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.18
+      ]
+    },
+    {
+      "page": 267,
+      "id": "267-0",
+      "columns": [
+        {
+          "label": "John W. Kern, Dem.",
+          "contest": "governor",
+          "candidate": "John W. Kern"
+        },
+        {
+          "label": "Winfield T. Durbin, Rep.",
+          "contest": "governor",
+          "candidate": "Winfield T. Durbin"
+        },
+        {
+          "label": "Charles Eckhart, Prohi.",
+          "contest": "governor",
+          "candidate": "Charles N. Eckhart"
+        },
+        {
+          "label": "Alonzo G. Burkhart, Pop.",
+          "contest": "governor",
+          "candidate": "Alonzo G. Burkhart"
+        },
+        {
+          "label": "Philip H. More, Socialist.",
+          "contest": "governor",
+          "candidate": "Philip H. More"
+        },
+        {
+          "label": "John W. Kelly, Soc. Dem.",
+          "contest": "governor",
+          "candidate": "John W. Kelly"
+        },
+        {
+          "label": "M. A. Wilson, U. Ref.",
+          "contest": "governor",
+          "candidate": "M. A. Wilson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.108,
+        0.341,
+        0.823,
+        0.917
+      ],
+      "hint": "Read only the table headed 'GOVERNOR\u2014Continued.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        -0.0226
+      ]
+    },
+    {
+      "page": 288,
+      "id": "288-0",
+      "columns": [
+        {
+          "label": "Democrat. Alfred Dale Owen.",
+          "contest": "house1",
+          "candidate": "Alfred Dale Owen"
+        },
+        {
+          "label": "Republican. James A. Hemenway.",
+          "contest": "house1",
+          "candidate": "James Alexander Hemenway"
+        },
+        {
+          "label": "Prohibitionist. George W. Norman.",
+          "contest": "house1",
+          "candidate": "George W. Norman"
+        },
+        {
+          "label": "Populist. Matthew Hallenberger.",
+          "contest": "house1",
+          "candidate": "Matthew Hallenberger"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.152,
+        0.253,
+        0.863,
+        0.445
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 288,
+      "id": "288-1",
+      "columns": [
+        {
+          "label": "Democrat. Robert W. Miers.",
+          "contest": "house2",
+          "candidate": "Robert Walter Miers"
+        },
+        {
+          "label": "Republican. Peter R. Wadsworth.",
+          "contest": "house2",
+          "candidate": "Peter R. Wadsworth"
+        },
+        {
+          "label": "Prohibitionist. Charles F. Pressler.",
+          "contest": "house2",
+          "candidate": "Charles F. Pressler"
+        },
+        {
+          "label": "Populist. William H. Crowder.",
+          "contest": "house2",
+          "candidate": "William H. Crowder"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.152,
+        0.437,
+        0.853,
+        0.671
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 288,
+      "id": "288-2",
+      "columns": [
+        {
+          "label": "Democrat. William T. Zenor.",
+          "contest": "house3",
+          "candidate": "William Taylor Zenor"
+        },
+        {
+          "label": "Republican. Hugh T. O'Connor.",
+          "contest": "house3",
+          "candidate": "Hugh T. O'Connor"
+        },
+        {
+          "label": "Prohibitionist. George W. Speedy.",
+          "contest": "house3",
+          "candidate": "George W. Speedy"
+        },
+        {
+          "label": "Populist. Isaac Curry.",
+          "contest": "house3",
+          "candidate": "Isaac Curry"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.155,
+        0.663,
+        0.856,
+        0.896
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 289,
+      "id": "289-0",
+      "columns": [
+        {
+          "label": "Democrat. Francis M. Griffith.",
+          "contest": "house4",
+          "candidate": "Francis Marion Griffith"
+        },
+        {
+          "label": "Republican. Nathan Powell.",
+          "contest": "house4",
+          "candidate": "Nathan Powell"
+        },
+        {
+          "label": "Prohibitionist. George Church.",
+          "contest": "house4",
+          "candidate": "George Church"
+        },
+        {
+          "label": "Populist. John L. Hammond.",
+          "contest": "house4",
+          "candidate": "John L. Hammond"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.118,
+        0.11,
+        0.845,
+        0.355
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 289,
+      "id": "289-1",
+      "columns": [
+        {
+          "label": "Democrat. Frank A. Horner.",
+          "contest": "house5",
+          "candidate": "Frank A. Horner"
+        },
+        {
+          "label": "Republican. Elias S. Holliday.",
+          "contest": "house5",
+          "candidate": "Elias Selah Holliday"
+        },
+        {
+          "label": "Prohibitionist. Lindley L. Wells.",
+          "contest": "house5",
+          "candidate": "Lindley L. Wells"
+        },
+        {
+          "label": "Populist. Samuel R. Hoar.",
+          "contest": "house5",
+          "candidate": "Samuel R. Hoar"
+        },
+        {
+          "label": "Jason H. Allen.",
+          "contest": "house5",
+          "candidate": "Jason H. Allen"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.118,
+        0.347,
+        0.831,
+        0.565
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 289,
+      "id": "289-2",
+      "columns": [
+        {
+          "label": "Democrat. David W. McKee.",
+          "contest": "house6",
+          "candidate": "David W. McKee"
+        },
+        {
+          "label": "Republican. James E. Watson.",
+          "contest": "house6",
+          "candidate": "James Eli Watson"
+        },
+        {
+          "label": "Prohibitionist. Henry C. Pitts.",
+          "contest": "house6",
+          "candidate": "Henry C. Pitts"
+        },
+        {
+          "label": "Populist. John Nipp.",
+          "contest": "house6",
+          "candidate": "John Nipp"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.118,
+        0.557,
+        0.821,
+        0.779
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 289,
+      "id": "289-3",
+      "columns": [
+        {
+          "label": "Democrat. Frank B. Burke.",
+          "contest": "house7",
+          "candidate": "Frank B. Burke"
+        },
+        {
+          "label": "Republican. Jesse Overstreet.",
+          "contest": "house7",
+          "candidate": "Jesse Overstreet"
+        },
+        {
+          "label": "Prohibitionist. Basil L. Allen.",
+          "contest": "house7",
+          "candidate": "Basil L. Allen"
+        },
+        {
+          "label": "Socialist Labor. Henry Kuerst.",
+          "contest": "house7",
+          "candidate": "Henry Kuerst"
+        },
+        {
+          "label": "Social Democrat. Hugo Miller.",
+          "contest": "house7",
+          "candidate": "Hugo Miller"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.118,
+        0.771,
+        0.831,
+        0.907
+      ],
+      "hint": "Read only the table headed 'SEVENTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 290,
+      "id": "290-0",
+      "columns": [
+        {
+          "label": "Democrat. Joseph T. Day.",
+          "contest": "house8",
+          "candidate": "Joseph T. Day"
+        },
+        {
+          "label": "Republican. George W. Cromer.",
+          "contest": "house8",
+          "candidate": "George Washington Cromer"
+        },
+        {
+          "label": "Prohibitionist. Dalley Powell.",
+          "contest": "house8",
+          "candidate": "Dalley Powell"
+        },
+        {
+          "label": "Populist. William E. Hurley.",
+          "contest": "house8",
+          "candidate": "William E. Hurley"
+        },
+        {
+          "label": "Social Democrat. Peter Brock.",
+          "contest": "house8",
+          "candidate": "Peter Brock"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.147,
+        0.097,
+        0.86,
+        0.296
+      ],
+      "hint": "Read only the table headed 'EIGHTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 290,
+      "id": "290-1",
+      "columns": [
+        {
+          "label": "Democrat. David F. Allen.",
+          "contest": "house9",
+          "candidate": "David F. Allen"
+        },
+        {
+          "label": "Republican. Charles B. Landis.",
+          "contest": "house9",
+          "candidate": "Charles Beary Landis"
+        },
+        {
+          "label": "Prohibitionist. Lindley T. Vancleve.",
+          "contest": "house9",
+          "candidate": "Lindley T. Vancleve"
+        },
+        {
+          "label": "Populist. William B. Gill.",
+          "contest": "house9",
+          "candidate": "William B. Gill"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.145,
+        0.288,
+        0.873,
+        0.5
+      ],
+      "hint": "Read only the table headed 'NINTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 290,
+      "id": "290-2",
+      "columns": [
+        {
+          "label": "Democrat. John Ross.",
+          "contest": "house10",
+          "candidate": "John Ross"
+        },
+        {
+          "label": "Republican. Edgar D. Crumpacker.",
+          "contest": "house10",
+          "candidate": "Edgar Dean Crumpacker"
+        },
+        {
+          "label": "Prohibitionist. Charles W. Bone.",
+          "contest": "house10",
+          "candidate": "Charles W. Bone"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.145,
+        0.492,
+        0.873,
+        0.724
+      ],
+      "hint": "Read only the table headed 'TENTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 290,
+      "id": "290-3",
+      "columns": [
+        {
+          "label": "Democrat. William J Houck.",
+          "contest": "house11",
+          "candidate": "William J. Houck"
+        },
+        {
+          "label": "Republican. George W. Steele.",
+          "contest": "house11",
+          "candidate": "George Washington Steele"
+        },
+        {
+          "label": "Prohibitionist. Nathan Johnson.",
+          "contest": "house11",
+          "candidate": "Nathan Johnson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.144,
+        0.716,
+        0.866,
+        0.891
+      ],
+      "hint": "Read only the table headed 'ELEVENTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 291,
+      "id": "291-0",
+      "columns": [
+        {
+          "label": "Democrat. James M. Robinson.",
+          "contest": "house12",
+          "candidate": "James McClellan Robinson"
+        },
+        {
+          "label": "Republican. Robert B. Hanna.",
+          "contest": "house12",
+          "candidate": "Robert B. Hanna"
+        },
+        {
+          "label": "Prohibitionist. Thos. J. Mawhorter.",
+          "contest": "house12",
+          "candidate": "Thomas J. Mawhorter"
+        },
+        {
+          "label": "Populist. Henry H. Haines.",
+          "contest": "house12",
+          "candidate": "Henry H. Haines"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.12,
+        0.1,
+        0.815,
+        0.305
+      ],
+      "hint": "Read only the table headed 'TWELFTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 291,
+      "id": "291-1",
+      "columns": [
+        {
+          "label": "Democrat. Charles C. Bower.",
+          "contest": "house13",
+          "candidate": "Charles C. Bower"
+        },
+        {
+          "label": "Republican. Abraham L. Brick.",
+          "contest": "house13",
+          "candidate": "Abraham Lincoln Brick"
+        },
+        {
+          "label": "Prohibitionist. Barney Uline.",
+          "contest": "house13",
+          "candidate": "Barney Uline"
+        },
+        {
+          "label": "Populist. Harney A. Wiley.",
+          "contest": "house13",
+          "candidate": "Harney A. Wiley"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.12,
+        0.297,
+        0.837,
+        0.484
+      ],
+      "hint": "Read only the table headed 'THIRTEENTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    }
+  ]
+}

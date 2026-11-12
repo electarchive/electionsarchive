@@ -1,0 +1,561 @@
+{
+  "polity": "US-IN",
+  "publisher": "Indiana Secretary of State",
+  "title": "Annual report of the Secretary of State of the State of Indiana, 1910: vote by counties, November election, 1910",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/annualreport14indigoog/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/annualreport14indigoog"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "house1": {
+      "year": 1910,
+      "chamber": "house",
+      "day": "1910-11-08",
+      "special": false,
+      "state": "IN",
+      "district": 1
+    },
+    "house2": {
+      "year": 1910,
+      "chamber": "house",
+      "day": "1910-11-08",
+      "special": false,
+      "state": "IN",
+      "district": 2
+    },
+    "house3": {
+      "year": 1910,
+      "chamber": "house",
+      "day": "1910-11-08",
+      "special": false,
+      "state": "IN",
+      "district": 3
+    },
+    "house4": {
+      "year": 1910,
+      "chamber": "house",
+      "day": "1910-11-08",
+      "special": false,
+      "state": "IN",
+      "district": 4
+    },
+    "house5": {
+      "year": 1910,
+      "chamber": "house",
+      "day": "1910-11-08",
+      "special": false,
+      "state": "IN",
+      "district": 5
+    },
+    "house6": {
+      "year": 1910,
+      "chamber": "house",
+      "day": "1910-11-08",
+      "special": false,
+      "state": "IN",
+      "district": 6
+    },
+    "house7": {
+      "year": 1910,
+      "chamber": "house",
+      "day": "1910-11-08",
+      "special": false,
+      "state": "IN",
+      "district": 7
+    },
+    "house8": {
+      "year": 1910,
+      "chamber": "house",
+      "day": "1910-11-08",
+      "special": false,
+      "state": "IN",
+      "district": 8
+    },
+    "house9": {
+      "year": 1910,
+      "chamber": "house",
+      "day": "1910-11-08",
+      "special": false,
+      "state": "IN",
+      "district": 9
+    },
+    "house10": {
+      "year": 1910,
+      "chamber": "house",
+      "day": "1910-11-08",
+      "special": false,
+      "state": "IN",
+      "district": 10
+    },
+    "house11": {
+      "year": 1910,
+      "chamber": "house",
+      "day": "1910-11-08",
+      "special": false,
+      "state": "IN",
+      "district": 11
+    },
+    "house12": {
+      "year": 1910,
+      "chamber": "house",
+      "day": "1910-11-08",
+      "special": false,
+      "state": "IN",
+      "district": 12
+    },
+    "house13": {
+      "year": 1910,
+      "chamber": "house",
+      "day": "1910-11-08",
+      "special": false,
+      "state": "IN",
+      "district": 13
+    }
+  },
+  "pages": [
+    {
+      "page": 226,
+      "id": "226-0",
+      "columns": [
+        {
+          "label": "John W. Boehne, Dem.",
+          "contest": "house1",
+          "candidate": "John William Boehne"
+        },
+        {
+          "label": "Francis B. Posey, Rep.",
+          "contest": "house1",
+          "candidate": "Francis B. Posey"
+        },
+        {
+          "label": "William V. Harrell, Pro.",
+          "contest": "house1",
+          "candidate": "William V. Harrell"
+        },
+        {
+          "label": "Romelia Bishop, Soc.",
+          "contest": "house1",
+          "candidate": "Romelia Bishop"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.158,
+        0.12,
+        0.863,
+        0.288
+      ],
+      "hint": "Read only the table headed 'First District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 226,
+      "id": "226-1",
+      "columns": [
+        {
+          "label": "William A. Cullop, Dem.",
+          "contest": "house2",
+          "candidate": "William Allen Cullop"
+        },
+        {
+          "label": "Oscar E. Bland, Rep.",
+          "contest": "house2",
+          "candidate": "Oscar E. Bland"
+        },
+        {
+          "label": "Elijah Eddington, Pro.",
+          "contest": "house2",
+          "candidate": "Elijah Eddington"
+        },
+        {
+          "label": "Zimri M. Garton, Soc.",
+          "contest": "house2",
+          "candidate": "Zimri M. Garton"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.157,
+        0.28,
+        0.863,
+        0.475
+      ],
+      "hint": "Read only the table headed 'Second District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 226,
+      "id": "226-2",
+      "columns": [
+        {
+          "label": "William E. Cox, Dem.",
+          "contest": "house3",
+          "candidate": "William Elijah Cox"
+        },
+        {
+          "label": "Harry C. Poindexter, Rep.",
+          "contest": "house3",
+          "candidate": "Harry C. Poindexter"
+        },
+        {
+          "label": "Wm. B. Lewis, Pro.",
+          "contest": "house3",
+          "candidate": "William B. Lewis"
+        },
+        {
+          "label": "A. J. Wells, Soc.",
+          "contest": "house3",
+          "candidate": "A. J. Wells"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.157,
+        0.467,
+        0.869,
+        0.678
+      ],
+      "hint": "Read only the table headed 'Third District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 226,
+      "id": "226-3",
+      "columns": [
+        {
+          "label": "Lincoln Dixon, Dem.",
+          "contest": "house4",
+          "candidate": "Lincoln Dixon"
+        },
+        {
+          "label": "John H. Kemman, Rep.",
+          "contest": "house4",
+          "candidate": "John H. Kemman"
+        },
+        {
+          "label": "John A. Kinnick, Pro.",
+          "contest": "house4",
+          "candidate": "John A. Kinnick"
+        },
+        {
+          "label": "Reese C. Townsend, Soc.",
+          "contest": "house4",
+          "candidate": "Reese C. Townsend"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.157,
+        0.67,
+        0.866,
+        0.884
+      ],
+      "hint": "Read only the table headed 'Fourth District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 227,
+      "id": "227-0",
+      "columns": [
+        {
+          "label": "Ralph W. Moss, Dem.",
+          "contest": "house5",
+          "candidate": "Ralph Wilbur Moss"
+        },
+        {
+          "label": "Frank Tilley, Rep.",
+          "contest": "house5",
+          "candidate": "Frank Tilley"
+        },
+        {
+          "label": "Ernest R. Walter, Pro.",
+          "contest": "house5",
+          "candidate": "Ernest R. Walter"
+        },
+        {
+          "label": "James O'Neal, Soc.",
+          "contest": "house5",
+          "candidate": "James Oneal"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.119,
+        0.098,
+        0.819,
+        0.306
+      ],
+      "hint": "Read only the table headed 'Fifth District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 227,
+      "id": "227-1",
+      "columns": [
+        {
+          "label": "Finley P. Gray, Dem.",
+          "contest": "house6",
+          "candidate": "Finly Hutchinson Gray"
+        },
+        {
+          "label": "Wm. O. Barnard, Rep.",
+          "contest": "house6",
+          "candidate": "William O. Barnard"
+        },
+        {
+          "label": "Aaron Worth, Pro.",
+          "contest": "house6",
+          "candidate": "Aaron Worth"
+        },
+        {
+          "label": "William L. Parkins, Soc.",
+          "contest": "house6",
+          "candidate": "William L. Parkins"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.119,
+        0.298,
+        0.835,
+        0.555
+      ],
+      "hint": "Read only the table headed 'Sixth District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 227,
+      "id": "227-2",
+      "columns": [
+        {
+          "label": "Chas. A. Korbly, Dem.",
+          "contest": "house7",
+          "candidate": "Charles Alexander Korbly"
+        },
+        {
+          "label": "Linton A. Cox, Rep.",
+          "contest": "house7",
+          "candidate": "Linton A. Cox"
+        },
+        {
+          "label": "James A. Lewis, Pro.",
+          "contest": "house7",
+          "candidate": "James A. Lewis"
+        },
+        {
+          "label": "Carl L. E. Ott, Soc.",
+          "contest": "house7",
+          "candidate": "Carl L. E. Ott"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.118,
+        0.547,
+        0.821,
+        0.702
+      ],
+      "hint": "Read only the table headed 'Seventh District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 227,
+      "id": "227-3",
+      "columns": [
+        {
+          "label": "John A. M. Adair, Dem.",
+          "contest": "house8",
+          "candidate": "John Alfred McDowell Adair"
+        },
+        {
+          "label": "Rollin Warner, Rep.",
+          "contest": "house8",
+          "candidate": "Rollin Warner"
+        },
+        {
+          "label": "Carey C. Ayers, Pro.",
+          "contest": "house8",
+          "candidate": "Carey C. Ayers"
+        },
+        {
+          "label": "Orville G. Overcarsh, Soc.",
+          "contest": "house8",
+          "candidate": "Orville G. Overcarsh"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.117,
+        0.694,
+        0.832,
+        0.89
+      ],
+      "hint": "Read only the table headed 'Eighth District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 228,
+      "id": "228-0",
+      "columns": [
+        {
+          "label": "Martin A. Morrison, Dem.",
+          "contest": "house9",
+          "candidate": "Martin Andrew Morrison"
+        },
+        {
+          "label": "Everett E. Neal, Rep.",
+          "contest": "house9",
+          "candidate": "Everett E. Neal"
+        },
+        {
+          "label": "William L. Northam, Pro.",
+          "contest": "house9",
+          "candidate": "William L. Northam"
+        },
+        {
+          "label": "Robert A. Wasson, Soc.",
+          "contest": "house9",
+          "candidate": "Robert A. Wasson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.155,
+        0.093,
+        0.866,
+        0.3
+      ],
+      "hint": "Read only the table headed 'Ninth District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 228,
+      "id": "228-1",
+      "columns": [
+        {
+          "label": "John B. Peterson, Dem.",
+          "contest": "house10",
+          "candidate": "John B. Peterson"
+        },
+        {
+          "label": "Edgar D. Crumpacker, Rep.",
+          "contest": "house10",
+          "candidate": "Edgar Dean Crumpacker"
+        },
+        {
+          "label": "Charles H. Tuesburg, Pro.",
+          "contest": "house10",
+          "candidate": "Charles H. Tuesburg"
+        },
+        {
+          "label": "Ira E. Tilton, Soc.",
+          "contest": "house10",
+          "candidate": "Ira E. Tilton"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.155,
+        0.292,
+        0.866,
+        0.524
+      ],
+      "hint": "Read only the table headed 'Tenth District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 228,
+      "id": "228-2",
+      "columns": [
+        {
+          "label": "George W. Rauch, Dem.",
+          "contest": "house11",
+          "candidate": "George Washington Rauch"
+        },
+        {
+          "label": "John L. Thompson, Rep.",
+          "contest": "house11",
+          "candidate": "John L. Thompson"
+        },
+        {
+          "label": "Charles P. Baldwin, Pro.",
+          "contest": "house11",
+          "candidate": "Charles P. Baldwin"
+        },
+        {
+          "label": "Norvall G. Marlott, Soc.",
+          "contest": "house11",
+          "candidate": "Norvall G. Marlott"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.155,
+        0.516,
+        0.866,
+        0.712
+      ],
+      "hint": "Read only the table headed 'Eleventh District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 228,
+      "id": "228-3",
+      "columns": [
+        {
+          "label": "Cyrus Cline, Dem.",
+          "contest": "house12",
+          "candidate": "Cyrus Cline"
+        },
+        {
+          "label": "Owen N. Heaton, Rep.",
+          "contest": "house12",
+          "candidate": "Owen N. Heaton"
+        },
+        {
+          "label": "Beneville Sawyer, Pro.",
+          "contest": "house12",
+          "candidate": "Beneville Sawyer"
+        },
+        {
+          "label": "John S. Brunskill, Soc.",
+          "contest": "house12",
+          "candidate": "John S. Brunskill"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.155,
+        0.704,
+        0.866,
+        0.884
+      ],
+      "hint": "Read only the table headed 'Twelfth District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 229,
+      "id": "229-0",
+      "columns": [
+        {
+          "label": "Henry A. Barnhart, Dem.",
+          "contest": "house13",
+          "candidate": "Henry A. Barnhart"
+        },
+        {
+          "label": "John L. Moorman, Rep.",
+          "contest": "house13",
+          "candidate": "John L. Moorman"
+        },
+        {
+          "label": "Joseph L. Scheuerman, Pro.",
+          "contest": "house13",
+          "candidate": "Joseph L. Scheuerman"
+        },
+        {
+          "label": "Isai T. Kohn, Soc.",
+          "contest": "house13",
+          "candidate": "Isai T. Kohn"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.126,
+        0.091,
+        0.834,
+        0.271
+      ],
+      "hint": "Read only the table headed 'Thirteenth District.'; ignore any other table visible in the image."
+    }
+  ]
+}
