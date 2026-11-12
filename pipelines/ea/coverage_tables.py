@@ -370,10 +370,24 @@ WORKERS = 8
 CADENCE = "pipelines/ea/sources/us/election_cadence.tsv"
 CADENCE_SQL = """
 select s.iso_code, e.government_kind, e.function, e.name_pattern, e.polity_id::text, e.selection::text,
-       e.period_years, e.phase, e.month, e.day_rule, extract(year from e.valid_from)::int
+       e.period_years, e.phase, e.month, e.day_rule, extract(year from e.valid_from)::int, e.id::text
 from election_cadence e join polity s on s.id = e.polity_id
 """
-CADENCE_STAMP_SQL = "select count(*), max(changeset_id::text) from election_cadence"
+CADENCE_STAMP_SQL = """
+select (select count(*) || max(changeset_id::text) from election_cadence),
+       (select count(*) || max(changeset_id::text) from results_access),
+       (select count(*) || max(changeset_id::text) from election where status = 'scheduled')
+"""
+ACCESS_SQL = """
+select r.polity_id::text, r.id::text, p.iso_code from results_access r join polity p on p.id = r.polity_id
+where r.valid_to is null or r.valid_to > current_date
+order by r.serves = 'administered', r.checked_at desc
+"""
+SCHEDULED_SQL = """
+select p.iso_code, e.date_from, e.id::text from election e join polity p on p.id = e.polity_id
+where e.status = 'scheduled' and e.kind = 'local' and e.date_from > current_date and p.iso_code like 'US-%'
+order by e.date_from
+"""
 
 
 class Rule(NamedTuple):
@@ -389,6 +403,7 @@ class Rule(NamedTuple):
     day_rule: str | None
     since: int | None
     cited: bool
+    id: str | None
 
 
 def cadence_rules(conn: psycopg.Connection) -> tuple[dict[str, list[Rule]], dict[object, Rule]]:
@@ -406,9 +421,10 @@ def cadence_rules(conn: psycopg.Connection) -> tuple[dict[str, list[Rule]], dict
             day_rule,
             since,
             True,
+            rule_id,
         )
-        for iso, kind, function, pattern, polity, selection, period, phase, month, day_rule, since in conn.execute(
-            CADENCE_SQL
+        for iso, kind, function, pattern, polity, selection, period, phase, month, day_rule, since, rule_id in (
+            conn.execute(CADENCE_SQL)
         )
     ]
     with (ROOT / CADENCE).open(newline="") as f:
@@ -430,6 +446,7 @@ def cadence_rules(conn: psycopg.Connection) -> tuple[dict[str, list[Rule]], dict
                     row["day_rule"] or None,
                     int(row["valid_from"][:4]) if row["valid_from"] else None,
                     cited,
+                    None,
                 )
             )
     classes: dict[str, list[Rule]] = defaultdict(list)
@@ -897,6 +914,14 @@ def build(full: bool = False) -> str:
                     held[polity][int(year)] = values
         polities = {str(pid): (kind, code, name, st) for pid, kind, code, name, st in conn.execute(POLITIES_SQL)}
         rules = cadence_rules(conn)
+        access: dict[str, str] = {}
+        for pid, aid, iso in conn.execute(ACCESS_SQL):
+            access.setdefault(pid, aid)
+            if iso and iso.startswith("US-"):
+                access.setdefault(iso[3:], aid)
+        scheduled: dict[str, list[tuple[date, str]]] = defaultdict(list)
+        for iso, day, eid in conn.execute(SCHEDULED_SQL):
+            scheduled[iso[3:]].append((day, eid))
         timings["load"] = time.monotonic() - clock
         clock = time.monotonic()
 
@@ -1283,6 +1308,36 @@ def build(full: bool = False) -> str:
             g["basis"] = "district calendar"
         if primary and calendar is not None and calendar.kind == g["kind"]:
             g["month"] = calendar.month
+        rule = (
+            own
+            if own is not None and own.period is not None
+            else switch
+            if switch is not None and switch.since is not None and switch.since <= today.year
+            else calendar or chosen
+        )
+        g["cadence_id"] = None if rule is None else rule.id
+        g["access_id"] = (
+            access.get(g["polity_id"] or "")
+            or access.get(codes.get(f"county:{g['county']}") or "")
+            or access.get(g["state"])
+        )
+        g["next_date"] = g["next_election_id"] = None
+        if g["active"] and g["elected"] and g["period"] is not None and g["phase"] is not None:
+            found = next(
+                (
+                    (day, eid)
+                    for day, eid in scheduled.get(g["state"], [])
+                    if day.month == g["month"] and (day.year - g["phase"]) % g["period"] == 0
+                ),
+                None,
+            )
+            if found is not None:
+                g["next_date"], g["next_election_id"] = found
+            elif rule is not None and rule.day_rule == "nov_tuesday_after_first_monday":
+                year = today.year + (g["phase"] - today.year) % g["period"]
+                while (day := date(year, 11, 2 + -date(year, 11, 1).weekday() % 7)) <= today:
+                    year += g["period"]
+                g["next_date"] = day
         years = held.get(g.get("held_key") or g["polity_id"] or "", {})
         for year in sorted(set(years) | set(range(2000, today.year + 1))):
             era = g["era"]
@@ -1472,7 +1527,7 @@ def build(full: bool = False) -> str:
         conn.execute("delete from coverage_government")
         with conn.cursor().copy(
             "copy coverage_government (id, state, county, kind, name, function, population, population_basis, active,"
-            " polity_id, period, phase, month, basis) from stdin"
+            " polity_id, period, phase, month, basis, next_date, next_election_id, cadence_id, access_id) from stdin"
         ) as copy:
             for g in governments:
                 copy.write_row(
@@ -1493,6 +1548,10 @@ def build(full: bool = False) -> str:
                             "phase",
                             "month",
                             "basis",
+                            "next_date",
+                            "next_election_id",
+                            "cadence_id",
+                            "access_id",
                         )
                     ]
                 )

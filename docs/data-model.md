@@ -166,7 +166,7 @@ Being elected is an outcome, and being seated is a tenure. A winner who never ta
 
 `results_access` records where an authority publishes results and how a script reaches them: the platform, a URL pattern, the format, and an `access` of `open`, `browser`, `blocked`, `manual`, or `none`, with when and how that was checked.
 
-Upcoming dates are not stored here: a scheduled election is an `election` row with `status = 'scheduled'`. The derived `coverage_government` table, rebuilt by `ea coverage`, holds the cadence of each government in the Census of Governments, and `coverage_goal` measures how many of the governments due in a year the archive holds.
+Upcoming dates are not stored here: a scheduled election is an `election` row with `status = 'scheduled'`. The derived `coverage_government` table, rebuilt by `ea coverage`, holds the cadence of each government in the Census of Governments, the `election_cadence` rule and `results_access` row it resolves to (`cadence_id` and `access_id`: its own polity's access row, else its county's, else its state's), and its `next_date`: the earliest future scheduled `local` election in its state whose month and year fit its cycle (with `next_election_id`), else the computed November general date when its rule's `day_rule` is `nov_tuesday_after_first_monday`, else null. `coverage_goal` measures how many of the governments due in a year the archive holds.
 
 ## Provenance
 
