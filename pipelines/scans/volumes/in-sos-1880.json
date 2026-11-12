@@ -1,0 +1,26 @@
+{
+  "year": 1880,
+  "day": "1880-11-02",
+  "polity": "US-IN",
+  "publisher": "Indiana Secretary of State",
+  "title": "Report of the Secretary of State of the State of Indiana for the year ending October 31, 1880: vote for congressmen, October election, 1880",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/reportofsecretar1880indi/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/reportofsecretar1880indi"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "house": "Representatives in Congress, one table per district (several per page), counties down, columns by candidate"
+  },
+  "leaves": [
+    104,
+    105,
+    106,
+    107,
+    108,
+    109,
+    110
+  ],
+  "note": "Leaves are Internet Archive page indexes (printed pages 101 to 107). The congressional election was held October 12, 1880; the archive dates these contests 1880-11-02. The president and governor are on a fold-out sheet (leaves 136-137) that is not specced here."
+}

@@ -1,0 +1,23 @@
+{
+  "year": 1910,
+  "day": "1910-11-08",
+  "polity": "US-IN",
+  "publisher": "Indiana Secretary of State",
+  "title": "Annual report of the Secretary of State of the State of Indiana, 1910: vote by counties, November election, 1910",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/annualreport14indigoog/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/annualreport14indigoog"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "house": "Representatives in Congress, one table per district (several per page), counties down, columns by candidate"
+  },
+  "leaves": [
+    226,
+    227,
+    228,
+    229
+  ],
+  "note": "Leaves are Internet Archive page indexes (printed pages 222 to 225)."
+}
