@@ -22127,6 +22127,10 @@ export async function record(input: { id: string; body?: string }) {
       left join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
       where e.id in (select election_id from picked) and e.kind in ('general', 'local', 'primary')
     ),
+    ak as materialized (
+      select a.id, a.k from area a
+      where a.id = any(array(select distinct coalesce(c.district_area_id, e.area_id) from picked c join held e on e.id = c.election_id))
+    ),
     roots as materialized (
       select c.id, coalesce(c.office_id, c.body_id) as seat, c.office_id is not null as "isOffice",
         c.kind = 'list_allocation' as "isList", coalesce(c.term = 'remainder', false) as "isRemainder",
@@ -22146,7 +22150,7 @@ export async function record(input: { id: string; body?: string }) {
           ) end as link
       from picked c
       join held e on e.id = c.election_id
-      left join area a on a.id = coalesce(c.district_area_id, e.area_id)
+      left join ak a on a.id = coalesce(c.district_area_id, e.area_id)
       where (e.kind in ('general', 'local') or (
           e.kind = 'primary'
           and not exists (select from contest n where n.previous_round_id = c.id)
@@ -22187,11 +22191,14 @@ export async function record(input: { id: string; body?: string }) {
           )
         ))
     ),
+    prev as materialized (
+      select id, previous_round_id, party_scope_id, allocation_parent_id from contest where previous_round_id is not null
+    ),
     rounds as (
       select r.id as root, r.id, false as scoped, false as nested from roots r
       union all
       select r.id, c.id, c.party_scope_id is not null, c.allocation_parent_id is not null
-      from roots r join contest c on c.previous_round_id = r.id
+      from roots r join prev c on c.previous_round_id = r.id
     ),
     tree(root, id, parent, scoped, nested) as (
       select root, id, null::uuid, scoped, nested from rounds
