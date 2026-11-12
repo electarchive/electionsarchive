@@ -1736,7 +1736,8 @@
           ],
           "schemes": [
             "gb.parish",
-            "gb.parish_ward"
+            "gb.parish_ward",
+            "gb.community_council"
           ],
           "iso": "*"
         }
