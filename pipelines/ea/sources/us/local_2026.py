@@ -11954,7 +11954,7 @@ def parse() -> None:
                                 role
                                 for pattern, role in (
                                     (r"^(?:town |city )?clerk treasurer$", "clerk-treasurer"),
-                                    (r"^(?:town |city )?recorder treasurer$", "recorder-treasurer"),
+                                    (r"^(?:town |city )?(?:clerk )?recorder treasurer$", "recorder-treasurer"),
                                     (r"^(?:town |city )?clerk recorder$", "clerk-recorder"),
                                     (
                                         (
