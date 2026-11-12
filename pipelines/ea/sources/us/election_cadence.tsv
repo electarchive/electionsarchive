@@ -31,7 +31,7 @@ FL	special	soil and water conservation			elected	2	0						Fla. Stat. § 582.18	h
 FL	county				elected	2	0						Fla. Stat. § 100.041(2)(a)	https://flsenate.gov/Laws/Statutes/2026/100.041
 FL	school				elected	2	0	8	with_state_primary				Fla. Stat. §§ 100.041(3)(a), (b); 100.031	https://flsenate.gov/Laws/Statutes/2026/100.041
 FL	special				elected	2	0						Fla. Stat. § 100.031; § 189.04	https://www.leg.state.fl.us/statutes/index.cfm?App_mode=Display_Statute&Search_String=&URL=0100-0199%2F0100%2FSections%2F0100.031.html
-GA	county				elected	2	0							
+GA	county				elected	2	0						O.C.G.A. § 21-2-9(a) (county officers not elected under § 21-2-139 are elected in the November election next preceding the expiration of the term of office); commissioner terms are set by local act	https://codes.findlaw.com/ga/title-21-elections/ga-code-sect-21-2-9/
 GA	municipality				elected	2	1						Ga. Code Ann. § 21-2-9(c), (d)	https://georgiacommons.org/code/21-2-9
 GA	school				elected	2	0	5					Ga. Code Ann. § 21-2-139 (nonpartisan school board elections at the May general primary unless local law says otherwise)	https://law.justia.com/codes/georgia/title-21/chapter-2/article-4/section-21-2-139/
 HI	county				elected	2	0						Hawaii Office of Elections, primary and general elections (HRS ch. 11)	https://elections.hawaii.gov/elections-in-hawaii/
@@ -46,8 +46,8 @@ ID	school				elected	2	1						Idaho Code § 33-503(1)	https://legislature.idaho.
 IL	county				elected	2	0						10 ILCS 5/2A-1.2(a)(5)	https://ilga.gov/documents/legislation/ilcs/documents/001000050K2A-1.2.htm
 IL	municipality				elected	2	1						10 ILCS 5/2A-1.1(b); 10 ILCS 5/2A-1.2(c)(1)	https://www.ilga.gov/documents/legislation/ilcs/documents/001000050K2A-1.1.htm
 IL	school				elected	2	1						10 ILCS 5/2A-1.1(b); 10 ILCS 5/2A-1.2	https://elections.il.gov/agencyforms/1%20ELECTION%20CALENDAR/2025%20Election%20Calendar%20Issued%2007292024.pdf
-IL	special				elected	2	1							
-IL	township				elected	4	1							
+IL	special				elected	2	1						10 ILCS 5/2A-1.1 (consolidated elections in odd-numbered years, April)	https://www.ilga.gov/documents/legislation/ilcs/documents/001000050K2A-1.1.htm
+IL	township				elected	4	1						60 ILCS 1/50-5 (township officers elected at the regular township election for 4-year terms); 10 ILCS 5/2A-1.1	https://www.ilga.gov/documents/legislation/ilcs/documents/006000010K50-5.htm
 IN	county				elected	2	0						Ind. Code § 3-10 (general election, even years); county officers per Indiana Election Division 2026 calendar	https://www.in.gov/sos/elections/files/2026-Election-Calendar-Election-Administrators-Edition-Revised-March-2026.pdf
 IN	municipality				elected	4	3						Ind. Code § 3-10-6-5	https://law.justia.com/codes/indiana/title-3/article-10/chapter-6/section-3-10-6-5/
 IN	school				elected	2	0						Ind. Code § 20-23-4-29.1(b)	https://law.justia.com/codes/indiana/title-20/article-23/chapter-4/section-20-23-4-29-1/
@@ -76,8 +76,8 @@ ME	township				elected	1	0						30-A M.R.S. § 2525 (Annual meeting)	https://leg
 MI	county				elected	2	0				2024-01-01		Mich. Const. art. II, § 5	https://www.legislature.mi.gov/Laws/MCL?objectName=mcl-Article-II-5
 MI	county				elected	4	0	11	nov_tuesday_after_first_monday	2024-01-01			MCL 46.410 as amended by 2021 PA 121: commissioners elected at or after the 2024 general election serve four-year terms	https://www.legislature.mi.gov/Laws/MCL?objectName=mcl-46-410
 MI	municipality				elected	2	1						MCL 168.642(1)(a)	https://www.legislature.mi.gov/Laws/MCL?objectName=MCL-168-642
-MI	school				elected	2	0							
-MI	township				elected	4	0							
+MI	school				elected	2	0						MCL 168.642c (a school district shall hold its regular election for the office of school board member at the general November election); MCL 380.384	https://www.legislature.mi.gov/Laws/MCL?objectName=mcl-168-642c
+MI	township				elected	4	0						MCL 168.358 (general November election in each even-numbered year for township officers); Const. 1963 art. VII § 18	https://legislature.mi.gov/Laws/MCL?objectName=mcl-168-358
 MN	special	soil and water conservation			elected	2	0						Minn. Stat. § 103C.305	https://www.revisor.mn.gov/statutes/cite/103C.305
 MN	county				elected	2	0						Minn. Stat. § 204D.03 and § 204B.09 (state general election); SOS county guide	https://www.sos.mn.gov/media/4251/county-election-administration-guide.pdf
 MN	municipality				elected	2	0						Minn. Stat. § 205.07, subd. 1	https://www.revisor.mn.gov/statutes/2025/cite/205.07
@@ -123,9 +123,10 @@ NV	special	soil and water conservation			elected	2	0						NRS 548.285	https://ww
 NV	county				elected	2	0						Nev. Rev. Stat. § 293.12755 (general election)	https://www.leg.state.nv.us/nrs/nrs-293.html
 NV	municipality				elected	2	0						Nev. Rev. Stat. §§ 293C.140, 293C.145	https://www.leg.state.nv.us/nrs/NRS-293C.html
 NV	school				elected	2	0							
-NY	municipality				elected	1	0							
+NY	municipality				elected	1	0						N.Y. Town Law § 80 (biennial town election each November of even years from 2025; town justices excepted); N.Y. Election Law § 15-104 (village election third Tuesday in March unless the village chose another date)	https://law.justia.com/codes/new-york/twn/article-6/80/
 NY	school				elected	1	0	5					N.Y. Educ. Law § 2002(1) (third Tuesday in May); § 2601-a(2)	https://www.nysenate.gov/legislation/laws/EDN/2002
-NY	special				elected	1	0							
+NY	special				elected	1	0						N.Y. Town Law § 175 (fire district annual election on the second Tuesday in December)	https://www.nysenate.gov/legislation/laws/TWN/175
+NY	special	libraries	LIBRAR		elected	1	0	5					N.Y. Educ. Law § 260(2) (trustees of a library established by a school district are elected by the legal voters in the same manner as school board trustees); Educ. Law § 2002(1) (third Tuesday of May)	https://newyork.public.law/laws/n.y._education_law_section_260
 NY	township				elected	2	1						N.Y. Town Law § 80 (odd years; L. 2023, ch. 741 moves town elections to even years from 2026)	https://assembly.state.ny.us/leg/?Text=Y&bn=A8822&default_fld=&leg_video=&term=2023
 NY	municipality		^VILLAGE OF 		elected	1	0	3					N.Y. Elec. Law § 15-104(1)(a) (third Tuesday in March, unless a village moves it to June or November)	https://www.nysenate.gov/legislation/laws/ELN/15-104
 OH	county				elected	2	0						Ohio Rev. Code § 3501.02(C); Ohio Const. art. XVII, § 1	https://codes.ohio.gov/ohio-revised-code/section-3501.02
@@ -157,7 +158,7 @@ SD	township				elected	1	0						S.D. Codified Laws § 8-3-12; ch. 8-3	https://sd
 TN	county				elected	2	0						T.C.A. § 2-3-202	https://www.ctas.tennessee.edu/eli/dates-regular-elections
 TN	school				elected	2	0	8	with_state_primary				T.C.A. § 49-2-201(a)(1), (d); § 2-3-202	https://law.justia.com/codes/tennessee/title-49/chapter-2/part-2/section-49-2-201/
 TX	county				elected	2	0						Tex. Elec. Code § 41.002	https://statutes.capitol.texas.gov/Docs/EL/htm/EL.41.htm
-TX	municipality				elected	1	0							
+TX	municipality				elected	1	0						Tex. Elec. Code § 41.001 (uniform election dates: first Saturday in May and November Tuesday after the first Monday)	https://statutes.capitol.texas.gov/GetStatute.aspx?Code=EL&Value=41.001
 TX	special				elected	2	0						Tex. Elec. Code § 41.001(a)(2)–(3); § 41.0052	https://www.sos.texas.gov/elections/laws/changing-election-dates-local-political-subdivisions.shtml
 UT	county				elected	2	0						Utah Code § 20A-1-201(1), (2)(a)(vi)	https://le.utah.gov/xcode/Title20A/Chapter1/20A-1-S201.html?v=C20A-1-S201_2023022720230227
 UT	municipality				elected	2	1						Utah Code § 20A-1-202(1)	https://le.utah.gov/xcode/Title20A/Chapter1/C20A-1-S202_2024050220240621.pdf
