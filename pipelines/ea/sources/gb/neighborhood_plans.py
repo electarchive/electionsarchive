@@ -42,6 +42,8 @@ HTML = (
     "/declaration-result-poll-clapham-cum-newby-neighbourhood-plan-area",
     "-declaration-result-poll",
     "-neighbourhood-planning-referendum-results-15-december-2022",
+    "/sherington-neighbourhood-plan",
+    "/woughton-community-council-neighbourhood-plan",
 )
 CONTEXT = {
     "residential": (
