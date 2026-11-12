@@ -1,0 +1,22 @@
+{
+  "year": 1914,
+  "day": "1914-11-03",
+  "polity": "US-WV",
+  "publisher": "West Virginia Legislature",
+  "title": "West Virginia Legislative Hand Book and Manual and Official Register 1916, general election returns 1914-11-03",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/westvirginialegi1916west/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/westvirginialegi1916west"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "house": "U.S. Representative in Congress: the at-large seat (page 742) and one table per congressional district (pages 743 and 744)"
+  },
+  "at_large": true,
+  "leaves": [
+    783,
+    784,
+    785
+  ]
+}
