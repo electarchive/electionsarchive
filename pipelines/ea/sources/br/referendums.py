@@ -1,5 +1,6 @@
 import html
 import re
+import struct
 import subprocess
 from datetime import date
 from pathlib import Path
@@ -15,7 +16,9 @@ from ea.store import DATA, connect
 SOURCE = "br.referendums"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
+PAGES = DATA / "pages" / SOURCE
 VOTES, REGISTERED, INVALID, BLANK, VOTERS = 1, 2, 5, 6, 14
+DIGITIZED = 8
 PUBLISHER = "Tribunal Superior Eleitoral"
 GLOSSARY_PLEBISCITE = "https://www.tse.jus.br/servicos-eleitorais/glossario/termos/plebiscito"
 GLOSSARY_REFERENDUM = "https://www.tse.jus.br/servicos-eleitorais/glossario/termos/referendo"
@@ -24,6 +27,50 @@ TABLE_1993 = "https://www.justicaeleitoral.jus.br/arquivos/plebiscito-de-1993/@@
 PAGE_1963 = "https://www.tse.jus.br/eleicoes/plebiscitos-e-referendos/referendo-1963"
 PAGE_1993 = "https://www.tse.jus.br/eleicoes/plebiscitos-e-referendos/plebiscito-1993"
 REPORT_2005 = "https://www.senado.gov.br/Relatorios_SGM/RelPresi/2005/P2_J_REFERENDO_2005.pdf"
+MANAGEMENT_2005 = (
+    "https://web.archive.org/web/20101011191123id_/http://www.tse.gov.br/internet/CatalogoPublicacoes/pdf/"
+    "relatorio_gestao_referendo_2005/relatorio_gestao_2005.pdf"
+)
+STATES_2005 = Path(__file__).with_name("referendum_2005_states.tsv")
+PAGE_2005 = 194
+ROWS_2005 = (
+    0.3117,
+    0.3286,
+    0.3453,
+    0.3622,
+    0.3792,
+    0.3961,
+    0.413,
+    0.43,
+    0.4469,
+    0.4639,
+    0.4808,
+    0.4977,
+    0.5147,
+    0.5316,
+    0.5485,
+    0.5655,
+    0.5824,
+    0.5994,
+    0.6163,
+    0.6332,
+    0.65,
+    0.6671,
+    0.6841,
+    0.7008,
+    0.7178,
+    0.7347,
+    0.7517,
+    0.7685,
+)
+COLUMNS_2005 = {
+    "registered": (0.2449, 0.2797),
+    "voters": (0.2797, 0.3285),
+    "yes": (0.4677, 0.5001),
+    "no": (0.524, 0.5651),
+    "blank": (0.589, 0.6211),
+    "null": (0.6471, 0.6827),
+}
 FIGURE = r"(\d{1,3}(?:\.\d{3})*)"
 D1963, D1993, D2005 = date(1963, 1, 6), date(1993, 4, 21), date(2005, 10, 23)
 STATES_1963 = {
@@ -103,6 +150,15 @@ NOTE_2005 = (
     "registered voters could not vote because the polling station in Vila de Urucarazinho, Amazonas, was not "
     "installed."
 )
+NOTE_2005_STATES = (
+    'Results by state and the Federal District from the table "Quadro geral dos resultados no Brasil por estado" '
+    "(last updated 22 November 2005) on page 192 of the TSE's management report on the 2005 referendum "
+    "(Relatório de Gestão – Referendo 2005, January 2006), read from the scanned table. In every row the "
+    "registered voters equal the ballots cast plus abstentions and the ballots cast equal the Yes, No, blank, and "
+    "null votes, and each column adds up to the table's national row: 33,333,045 Yes, 59,109,265 No, 1,329,207 "
+    "blank, and 1,604,307 null votes, the same as the proclamation. The table's 122,042,615 registered voters are "
+    "210 fewer than the proclamation's 122,042,825. No ballots were annulled or counted separately."
+)
 TEXT_1963 = "Do you approve the Additional Act that institutes the parliamentary system?"
 TEXT_1963_PT = "Aprova o ato adicional que institui o Parlamentarismo?"
 TEXT_2005 = "Should the trade in firearms and ammunition be banned in Brazil?"
@@ -141,6 +197,7 @@ def table_rows(path: Path, minimum: int) -> dict[str, list[int | None]]:
 
 def fetch() -> None:
     raw.fetch(SOURCE, REPORT_2005, suffix=".pdf")
+    raw.fetch(SOURCE, MANAGEMENT_2005, suffix=".pdf")
     for url in (TABLE_1963, TABLE_1993, GLOSSARY_PLEBISCITE, GLOSSARY_REFERENDUM):
         raw.cached(SOURCE, url)
 
@@ -209,6 +266,59 @@ def parse() -> None:
         ],
         orient="row",
     ).write_parquet(PARSED / "national.parquet")
+
+    states_2005 = pl.read_csv(STATES_2005, separator="\t")
+    if sorted(states_2005["uf"]) != sorted(UFS) or states_2005.height != len(ROWS_2005) - 1:
+        raise ValueError("2005: the state table does not have one row per state")
+    for row in states_2005.iter_rows(named=True):
+        if (
+            row["registered"] != row["voters"] + row["abstentions"]
+            or row["voters"] != row["valid"] + row["blank"] + row["null"]
+            or row["valid"] != row["yes"] + row["no"]
+        ):
+            raise ValueError(f"2005: the {row['uf']} row does not add up")
+    sums = states_2005.select(pl.all().exclude("uf").sum()).row(0, named=True)
+    if (sums["yes"], sums["no"], sums["blank"], sums["null"], sums["voters"]) != (yes, no, blank, null, voters):
+        raise ValueError("2005: the state table does not add up to the proclamation")
+    if registered - sums["registered"] != 210:
+        raise ValueError("2005: the registered voters differ from the proclamation by other than 210")
+    management = raw.cached(SOURCE, MANAGEMENT_2005)
+    if (
+        "Quadro geral dos resultados no Brasil por estado"
+        not in subprocess.run(
+            ["pdftotext", "-f", str(PAGE_2005), "-l", str(PAGE_2005), str(management.path), "-"],
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout
+    ):
+        raise ValueError("2005: the state table is not on the expected page")
+    PAGES.mkdir(parents=True, exist_ok=True)
+    image = PAGES / f"{management.sha256}-{PAGE_2005}.png"
+    if not image.exists():
+        subprocess.run(
+            [
+                "pdftoppm",
+                "-r",
+                "100",
+                "-png",
+                "-f",
+                str(PAGE_2005),
+                "-l",
+                str(PAGE_2005),
+                "-singlefile",
+                str(management.path),
+                str(image.with_suffix("")),
+            ],
+            check=True,
+        )
+    width, height = struct.unpack(">II", image.read_bytes()[16:24])
+    pl.DataFrame(
+        [{"page": PAGE_2005, "image": f"pages/{SOURCE}/{image.name}", "width": width, "height": height}]
+    ).write_parquet(PARSED / "pages_2005.parquet")
+    states_2005.with_columns(y0=pl.Series(ROWS_2005[:-1]), y1=pl.Series(ROWS_2005[1:])).write_parquet(
+        PARSED / "states_2005.parquet"
+    )
 
     referendum = text_of(raw.cached(SOURCE, GLOSSARY_REFERENDUM).path)
     found = re.search(
@@ -285,6 +395,8 @@ def emit() -> Path:
     national = pl.read_parquet(PARSED / "national.parquet")
     states_1963 = pl.read_parquet(PARSED / "states_1963.parquet")
     states_1993 = pl.read_parquet(PARSED / "states_1993.parquet")
+    states_2005 = pl.read_parquet(PARSED / "states_2005.parquet")
+    page_2005 = pl.read_parquet(PARSED / "pages_2005.parquet").row(0, named=True)
     with connect() as conn:
         cs = Changeset(
             conn,
@@ -320,6 +432,22 @@ def emit() -> Path:
         cs.artifact(raw.cached(SOURCE, GLOSSARY_PLEBISCITE), glossary_1)
         cs.artifact(raw.cached(SOURCE, GLOSSARY_REFERENDUM), glossary_2)
         cs.artifact(raw.cached(SOURCE, REPORT_2005), report)
+        management = add_source(
+            "Relatório de Gestão – Referendo 2005",
+            MANAGEMENT_2005,
+            notes="Page 192: Quadro geral dos resultados no Brasil por estado, last updated 22 November 2005.",
+        )
+        management_artifact = cs.artifact(raw.cached(SOURCE, MANAGEMENT_2005), management)
+        management_page = cs.page(management_artifact, page_2005["page"])
+        cs.add(
+            "source_page",
+            id=management_page,
+            artifact_id=management_artifact,
+            page_number=page_2005["page"],
+            image_key=page_2005["image"],
+            width=page_2005["width"],
+            height=page_2005["height"],
+        )
 
         system = cs.key("br.electoral_system", "national-consultation")
         cs.add("electoral_system", id=system, polity_id=brazil, rules={"formula": "referendum"}, rules_version=1)
@@ -377,7 +505,8 @@ def emit() -> Path:
                 "abroad_mission" if abroad else "standard",
             )
 
-        values: list[tuple[str, str, str | None, int, int]] = []
+        values: list[tuple[str, str, str | None, int, int, int]] = []
+        locators: list[tuple[str, str, str | None, int, str, float, float, float, float]] = []
 
         def election_for(day: date, english: str, portuguese: str, kind: str) -> tuple[UUID, str]:
             election = cs.key("br.election", f"{day}:{kind}")
@@ -457,10 +586,10 @@ def emit() -> Path:
             for answer, option in options.items():
                 value = figures[answer]
                 if value is not None:
-                    values.append((str(result_set), str(unit), str(option), VOTES, value))
+                    values.append((str(result_set), str(unit), str(option), VOTES, value, 0))
             for measure, value in accounting.items():
                 if value is not None:
-                    values.append((str(result_set), str(unit), None, measure, value))
+                    values.append((str(result_set), str(unit), None, measure, value, 0))
 
         def outcomes(result_set: UUID, options: dict[str, UUID], winner: str) -> None:
             for answer, option in options.items():
@@ -612,6 +741,23 @@ def emit() -> Path:
             {REGISTERED: row["registered"], VOTERS: row["voters"], BLANK: row["blank"], INVALID: row["null"]},
         )
 
+        result_set = result_set_for(election, contest, f"{D2005}:states", management, False, 1, NOTE_2005_STATES)
+        outcomes(result_set, options, row["first"] if row["first_votes"] > row["second_votes"] else row["second"])
+        for state in states_2005.iter_rows(named=True):
+            unit = str(units_1993[state["uf"]])
+            for column, option, measure in (
+                ("yes", options["yes"], VOTES),
+                ("no", options["no"], VOTES),
+                ("registered", None, REGISTERED),
+                ("voters", None, VOTERS),
+                ("blank", None, BLANK),
+                ("null", None, INVALID),
+            ):
+                key = (str(result_set), unit, None if option is None else str(option), measure)
+                values.append((*key, state[column], DIGITIZED))
+                x0, x1 = COLUMNS_2005[column]
+                locators.append((*key, str(management_page), x0, state["y0"], x1, state["y1"]))
+
         cs.frame(
             "result_value",
             pl.DataFrame(
@@ -622,8 +768,27 @@ def emit() -> Path:
                     "option_id": pl.String,
                     "measure": pl.Int16,
                     "value": pl.Int64,
+                    "flags": pl.Int16,
                 },
                 orient="row",
-            ).with_columns(channel=pl.lit(0, pl.Int16), count_round=pl.lit(0, pl.Int16), flags=pl.lit(0, pl.Int16)),
+            ).with_columns(channel=pl.lit(0, pl.Int16), count_round=pl.lit(0, pl.Int16)),
+        )
+        cs.frame(
+            "value_locator",
+            pl.DataFrame(
+                locators,
+                schema={
+                    "result_set_id": pl.String,
+                    "unit_id": pl.String,
+                    "option_id": pl.String,
+                    "measure": pl.Int16,
+                    "page_id": pl.String,
+                    "x0": pl.Float64,
+                    "y0": pl.Float64,
+                    "x1": pl.Float64,
+                    "y1": pl.Float64,
+                },
+                orient="row",
+            ).with_columns(channel=pl.lit(0, pl.Int16), count_round=pl.lit(0, pl.Int16)),
         )
         return cs.write()
