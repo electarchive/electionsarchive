@@ -1,0 +1,394 @@
+{
+  "polity": "US-GA",
+  "publisher": "Georgia Secretary of State",
+  "title": "Official State of Georgia Tabulation by Counties, general election held 1978-11-07",
+  "license": "Public record",
+  "file": {
+    "url": "https://dlg.galileo.usg.edu/data/dlg/ggpd/pdfs/dlg_ggpd_y-ga-bs700-b-ps1-bs4-b1978-bfolio.pdf",
+    "item": "https://dlg.galileo.usg.edu/id:dlg_ggpd_y-ga-bs700-b-ps1-bs4-b1978-bfolio"
+  },
+  "raw_source": "us.ga_usrep",
+  "contests": {
+    "senate": {
+      "year": 1978,
+      "chamber": "senate",
+      "day": "1978-11-07",
+      "special": false,
+      "state": "GA",
+      "district": null
+    },
+    "governor": {
+      "year": 1978,
+      "chamber": "governor",
+      "day": "1978-11-07",
+      "special": false,
+      "state": "GA",
+      "district": null
+    },
+    "house1": {
+      "year": 1978,
+      "chamber": "house",
+      "day": "1978-11-07",
+      "special": false,
+      "state": "GA",
+      "district": 1
+    },
+    "house2": {
+      "year": 1978,
+      "chamber": "house",
+      "day": "1978-11-07",
+      "special": false,
+      "state": "GA",
+      "district": 2
+    },
+    "house3": {
+      "year": 1978,
+      "chamber": "house",
+      "day": "1978-11-07",
+      "special": false,
+      "state": "GA",
+      "district": 3
+    },
+    "house4": {
+      "year": 1978,
+      "chamber": "house",
+      "day": "1978-11-07",
+      "special": false,
+      "state": "GA",
+      "district": 4
+    },
+    "house5": {
+      "year": 1978,
+      "chamber": "house",
+      "day": "1978-11-07",
+      "special": false,
+      "state": "GA",
+      "district": 5
+    },
+    "house6": {
+      "year": 1978,
+      "chamber": "house",
+      "day": "1978-11-07",
+      "special": false,
+      "state": "GA",
+      "district": 6
+    },
+    "house7": {
+      "year": 1978,
+      "chamber": "house",
+      "day": "1978-11-07",
+      "special": false,
+      "state": "GA",
+      "district": 7
+    },
+    "house8": {
+      "year": 1978,
+      "chamber": "house",
+      "day": "1978-11-07",
+      "special": false,
+      "state": "GA",
+      "district": 8
+    },
+    "house9": {
+      "year": 1978,
+      "chamber": "house",
+      "day": "1978-11-07",
+      "special": false,
+      "state": "GA",
+      "district": 9
+    },
+    "house10": {
+      "year": 1978,
+      "chamber": "house",
+      "day": "1978-11-07",
+      "special": false,
+      "state": "GA",
+      "district": 10
+    }
+  },
+  "pages": [
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Democrat Sam Nunn",
+          "contest": "senate",
+          "candidate": "Sam Nunn"
+        },
+        {
+          "label": "Republican John W. Stokes",
+          "contest": "senate",
+          "candidate": "John W. Stokes"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.197,
+        0.004,
+        0.453,
+        0.962
+      ],
+      "hint": "Read only the table headed 'U.S. Senate'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.0522
+      ]
+    },
+    {
+      "page": 2,
+      "id": "2-1",
+      "columns": [
+        {
+          "label": "Democrat George Busbee",
+          "contest": "governor",
+          "candidate": "George Busbee"
+        },
+        {
+          "label": "Republican Rodney M. Cook",
+          "contest": "governor",
+          "candidate": "Rodney M. Cook"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.439,
+        0.004,
+        0.698,
+        0.962
+      ],
+      "hint": "Read only the table headed 'Governor'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.0522
+      ]
+    },
+    {
+      "page": 8,
+      "id": "8-0",
+      "columns": [
+        {
+          "label": "BO GINN",
+          "contest": "house1",
+          "candidate": "Bo Ginn"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.057,
+        0.724,
+        0.508,
+        1.0
+      ],
+      "hint": "Read only the table headed 'CONSOLIDATED RETURNS FOR U. S. REPRESENTATIVE FROM GEORGIA, GENERAL ELECTION HELD NOVEMBER 7, 1978'; ignore any other table visible in the image."
+    },
+    {
+      "page": 9,
+      "id": "9-1",
+      "columns": [
+        {
+          "label": "DAWSON MATHIS",
+          "contest": "house2",
+          "candidate": "Dawson Mathis"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.073,
+        0.162,
+        0.963,
+        0.692
+      ],
+      "hint": "Read only the table headed 'Second Congressional District of Georgia General Election November 7, 1978'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1434
+      ]
+    },
+    {
+      "page": 9,
+      "id": "9-2",
+      "columns": [
+        {
+          "label": "JACK BRINKLEY",
+          "contest": "house3",
+          "candidate": "Jack Brinkley"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.073,
+        0.684,
+        0.963,
+        0.983
+      ],
+      "hint": "Read only the table headed 'Third Congressional District of Georgia General Election November 7, 1978'; ignore any other table visible in the image."
+    },
+    {
+      "page": 10,
+      "id": "10-0",
+      "columns": [
+        {
+          "label": "ELLIOTT H. LEVITAS",
+          "contest": "house4",
+          "candidate": "Elliott H. Levitas"
+        },
+        {
+          "label": "HOMER CHEUNG",
+          "contest": "house4",
+          "candidate": "Homer Cheung"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.05,
+        0.023,
+        0.935,
+        0.258
+      ],
+      "hint": "Read only the table headed 'Fourth Congressional District of Georgia'; ignore any other table visible in the image."
+    },
+    {
+      "page": 10,
+      "id": "10-1",
+      "columns": [
+        {
+          "label": "WYCHE FOWLER, JR.",
+          "contest": "house5",
+          "candidate": "Wyche Fowler, Jr."
+        },
+        {
+          "label": "THOMAS P. BOWLES, JR.",
+          "contest": "house5",
+          "candidate": "Thomas P. Bowles, Jr."
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.05,
+        0.25,
+        0.935,
+        0.446
+      ],
+      "hint": "Read only the table headed 'Fifth Congressional District of Georgia'; ignore any other table visible in the image."
+    },
+    {
+      "page": 10,
+      "id": "10-2",
+      "columns": [
+        {
+          "label": "VIRGINIA SHAPARD",
+          "contest": "house6",
+          "candidate": "Virginia Shapard"
+        },
+        {
+          "label": "NEWT GINGRICH",
+          "contest": "house6",
+          "candidate": "Newton Leroy Gingrich"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.056,
+        0.438,
+        0.943,
+        0.825
+      ],
+      "hint": "Read only the table headed 'Sixth Congressional District of Georgia'; ignore any other table visible in the image."
+    },
+    {
+      "page": 10,
+      "id": "10-3",
+      "columns": [
+        {
+          "label": "LARRY McDONALD",
+          "contest": "house7",
+          "candidate": "Larry P. McDonald"
+        },
+        {
+          "label": "ERNIE NORSWORTHY",
+          "contest": "house7",
+          "candidate": "Earnest Norsworthy"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.056,
+        0.817,
+        0.944,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Seventh Congressional District of Georgia'; ignore any other table visible in the image."
+    },
+    {
+      "page": 11,
+      "id": "11-0",
+      "columns": [
+        {
+          "label": "BILLY EVANS",
+          "contest": "house8",
+          "candidate": "Billy Lee Evans"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.063,
+        0.36,
+        0.953,
+        0.832
+      ],
+      "hint": "Read only the table headed 'Eighth Congressional District of Georgia General Election November 7, 1978'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1208
+      ]
+    },
+    {
+      "page": 11,
+      "id": "11-1",
+      "columns": [
+        {
+          "label": "ED JENKINS",
+          "contest": "house9",
+          "candidate": "Ed Jenkins"
+        },
+        {
+          "label": "DAVID ASHWORTH",
+          "contest": "house9",
+          "candidate": "David G. Ashworth"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.063,
+        0.824,
+        0.953,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Ninth Congressional District of Georgia General Election November 7, 1978'; ignore any other table visible in the image."
+    },
+    {
+      "page": 12,
+      "id": "12-0",
+      "columns": [
+        {
+          "label": "DOUG BARNARD JR. DEMOCRAT",
+          "contest": "house10",
+          "candidate": "Doug Barnard"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.048,
+        0.241,
+        0.939,
+        0.661
+      ],
+      "hint": "Read only the table headed 'Tenth Congressional District of Georgia General Election November 7, 1978'; ignore any other table visible in the image."
+    }
+  ]
+}

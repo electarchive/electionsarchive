@@ -1,0 +1,478 @@
+{
+  "polity": "US-GA",
+  "publisher": "Georgia Secretary of State",
+  "title": "Official State of Georgia Tabulation by Counties, general election held 1992-11-03",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706945_0278/micro_IA40706945_0278.pdf",
+    "item": "https://archive.org/details/micro_IA40706945_0278"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "senate": {
+      "year": 1992,
+      "chamber": "senate",
+      "day": "1992-11-03",
+      "special": false,
+      "state": "GA",
+      "district": null
+    },
+    "house3": {
+      "year": 1992,
+      "chamber": "house",
+      "day": "1992-11-03",
+      "special": false,
+      "state": "GA",
+      "district": 3
+    },
+    "house7": {
+      "year": 1992,
+      "chamber": "house",
+      "day": "1992-11-03",
+      "special": false,
+      "state": "GA",
+      "district": 7
+    },
+    "house8": {
+      "year": 1992,
+      "chamber": "house",
+      "day": "1992-11-03",
+      "special": false,
+      "state": "GA",
+      "district": 8
+    },
+    "house10": {
+      "year": 1992,
+      "chamber": "house",
+      "day": "1992-11-03",
+      "special": false,
+      "state": "GA",
+      "district": 10
+    },
+    "house11": {
+      "year": 1992,
+      "chamber": "house",
+      "day": "1992-11-03",
+      "special": false,
+      "state": "GA",
+      "district": 11
+    }
+  },
+  "pages": [
+    {
+      "page": 18,
+      "id": "18-0",
+      "columns": [
+        {
+          "label": "WYCHE FOWLER, JR. VOTES",
+          "contest": "senate",
+          "candidate": "Wyche Fowler Jr."
+        },
+        {
+          "label": "WYCHE FOWLER, JR. PERCENT",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PAUL COVERDELL VOTES",
+          "contest": "senate",
+          "candidate": "Paul Coverdell"
+        },
+        {
+          "label": "PAUL COVERDELL PERCENT",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "JIM HUDSON VOTES",
+          "contest": "senate",
+          "candidate": "Jim Hudson"
+        },
+        {
+          "label": "JIM HUDSON PERCENT",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.141,
+        0.168,
+        0.79,
+        1.0
+      ],
+      "hint": "Read only the table headed 'OFFICE : UNITED STATES SENATOR (FOWLER)'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0913
+      ]
+    },
+    {
+      "page": 19,
+      "id": "19-0",
+      "columns": [
+        {
+          "label": "WYCHE FOWLER, JR. VOTES",
+          "contest": "senate",
+          "candidate": "Wyche Fowler Jr."
+        },
+        {
+          "label": "WYCHE FOWLER, JR. PERCENT",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PAUL COVERDELL VOTES",
+          "contest": "senate",
+          "candidate": "Paul Coverdell"
+        },
+        {
+          "label": "PAUL COVERDELL PERCENT",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "JIM HUDSON VOTES",
+          "contest": "senate",
+          "candidate": "Jim Hudson"
+        },
+        {
+          "label": "JIM HUDSON PERCENT",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.137,
+        0.294,
+        0.796,
+        1.0
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR (FOWLER)'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        -0.0807
+      ]
+    },
+    {
+      "page": 20,
+      "id": "20-0",
+      "columns": [
+        {
+          "label": "WYCHE FOWLER, JR. VOTES",
+          "contest": "senate",
+          "candidate": "Wyche Fowler Jr."
+        },
+        {
+          "label": "PERCENT",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PAUL COVERDELL VOTES",
+          "contest": "senate",
+          "candidate": "Paul Coverdell"
+        },
+        {
+          "label": "PERCENT",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "JIM HUDSON VOTES",
+          "contest": "senate",
+          "candidate": "Jim Hudson"
+        },
+        {
+          "label": "PERCENT",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.139,
+        0.167,
+        0.798,
+        1.0
+      ],
+      "hint": "Read only the table headed 'OFFICE : UNITED STATES SENATOR (FOWLER)'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.096
+      ]
+    },
+    {
+      "page": 21,
+      "id": "21-0",
+      "columns": [
+        {
+          "label": "INCUMBENT WYCHE FOWLER, JR. VOTES",
+          "contest": "senate",
+          "candidate": "Wyche Fowler Jr."
+        },
+        {
+          "label": "INCUMBENT WYCHE FOWLER, JR. PERCENT",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PAUL COVERDELL VOTES",
+          "contest": "senate",
+          "candidate": "Paul Coverdell"
+        },
+        {
+          "label": "PAUL COVERDELL PERCENT",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "JIM HUDSON VOTES",
+          "contest": "senate",
+          "candidate": "Jim Hudson"
+        },
+        {
+          "label": "JIM HUDSON PERCENT",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.13,
+        0.214,
+        0.791,
+        1.0
+      ],
+      "hint": "Read only the table headed 'OFFICE : UNITED STATES SENATOR (FOWLER)'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1043
+      ]
+    },
+    {
+      "page": 22,
+      "id": "22-0",
+      "columns": [
+        {
+          "label": "WYCHE FOWLER, JR. VOTES",
+          "contest": "senate",
+          "candidate": "Wyche Fowler Jr."
+        },
+        {
+          "label": "WYCHE FOWLER, JR. PERCENT",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PAUL COVERDELL VOTES",
+          "contest": "senate",
+          "candidate": "Paul Coverdell"
+        },
+        {
+          "label": "PAUL COVERDELL PERCENT",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "JIM HUDSON VOTES",
+          "contest": "senate",
+          "candidate": "Jim Hudson"
+        },
+        {
+          "label": "JIM HUDSON PERCENT",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.127,
+        0.191,
+        0.781,
+        0.429
+      ],
+      "hint": "Read only the table headed 'OFFICE : UNITED STATES SENATOR (FOWLER)'; ignore any other table visible in the image."
+    },
+    {
+      "page": 32,
+      "id": "32-0",
+      "columns": [
+        {
+          "label": "INCUMBENT RICHARD RAY VOTES",
+          "contest": "house3",
+          "candidate": "Richard Ray"
+        },
+        {
+          "label": "INCUMBENT RICHARD RAY PERCENT",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "MAC COLLINS VOTES",
+          "contest": "house3",
+          "candidate": "Mac Collins"
+        },
+        {
+          "label": "MAC COLLINS PERCENT",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.083,
+        0.196,
+        0.605,
+        0.531
+      ],
+      "hint": "Read only the table headed 'OFFICE : UNITED STATES REPRESENTATIVE, 3RD DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 37,
+      "id": "37-0",
+      "columns": [
+        {
+          "label": "BUDDY DARDEN VOTES",
+          "contest": "house7",
+          "candidate": "Buddy Darden"
+        },
+        {
+          "label": "BUDDY DARDEN PERCENT",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "AL BEVERLY VOTES",
+          "contest": "house7",
+          "candidate": "Al Beverly"
+        },
+        {
+          "label": "AL BEVERLY PERCENT",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.132,
+        0.191,
+        0.6,
+        0.461
+      ],
+      "hint": "Read only the table headed 'OFFICE : UNITED STATES REPRESENTATIVE, 7TH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 38,
+      "id": "38-0",
+      "columns": [
+        {
+          "label": "J. ROY ROWLAND VOTES",
+          "contest": "house8",
+          "candidate": "J. Roy Rowland"
+        },
+        {
+          "label": "J. ROY ROWLAND PERCENT",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "BOB CUNNINGHAM VOTES",
+          "contest": "house8",
+          "candidate": "Bob Cunningham"
+        },
+        {
+          "label": "BOB CUNNINGHAM PERCENT",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.147,
+        0.174,
+        0.613,
+        0.69
+      ],
+      "hint": "Read only the table headed 'OFFICE : UNITED STATES REPRESENTATIVE, 8TH DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1589
+      ]
+    },
+    {
+      "page": 40,
+      "id": "40-0",
+      "columns": [
+        {
+          "label": "DON JOHNSON VOTES",
+          "contest": "house10",
+          "candidate": "Don Johnson"
+        },
+        {
+          "label": "DON JOHNSON PERCENT",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "RALPH HUDGENS VOTES",
+          "contest": "house10",
+          "candidate": "Ralph Hudgens"
+        },
+        {
+          "label": "RALPH HUDGENS PERCENT",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.142,
+        0.178,
+        0.618,
+        0.553
+      ],
+      "hint": "Read only the table headed 'OFFICE : UNITED STATES REPRESENTATIVE, 10TH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 41,
+      "id": "41-0",
+      "columns": [
+        {
+          "label": "CYNTHIA MCKINNEY VOTES",
+          "contest": "house11",
+          "candidate": "Cynthia McKinney"
+        },
+        {
+          "label": "CYNTHIA MCKINNEY PERCENT",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "WOODROW LOVETT VOTES",
+          "contest": "house11",
+          "candidate": "Woodrow Lovett"
+        },
+        {
+          "label": "WOODROW LOVETT PERCENT",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.142,
+        0.175,
+        0.611,
+        0.575
+      ],
+      "hint": "Read only the table headed 'OFFICE : UNITED STATES REPRESENTATIVE, 11TH DISTRICT'; ignore any other table visible in the image."
+    }
+  ]
+}

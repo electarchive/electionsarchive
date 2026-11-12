@@ -1,0 +1,296 @@
+{
+  "polity": "US-GA",
+  "publisher": "Georgia Secretary of State",
+  "title": "Official State of Georgia Tabulation by Counties, general election held 1982-11-02",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706912_0248/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/micro_IA40706912_0248"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "house1": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "GA",
+      "district": 1
+    },
+    "house2": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "GA",
+      "district": 2
+    },
+    "house3": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "GA",
+      "district": 3
+    },
+    "house6": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "GA",
+      "district": 6
+    },
+    "house9": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "GA",
+      "district": 9
+    },
+    "governor": {
+      "year": 1982,
+      "chamber": "governor",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "GA",
+      "district": null
+    },
+    "house4s": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-30",
+      "special": true,
+      "state": "GA",
+      "district": 4
+    },
+    "house5s": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-30",
+      "special": true,
+      "state": "GA",
+      "district": 5
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "columns": [
+        {
+          "label": "Governor Democrat Joe Frank Harris",
+          "contest": "governor",
+          "candidate": "Joe Frank Harris"
+        },
+        {
+          "label": "Governor Republican Bob Bell",
+          "contest": "governor",
+          "candidate": "Bob Bell"
+        },
+        {
+          "label": "Lieutenant Governor Democrat Zell Miller",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Lieutenant Governor Republican Franklin Sutton",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Secretary of State Democrat Max Cleland",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Secretary of State Republican Nick Reagan Belluso",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.1,
+        0.02,
+        0.95,
+        0.97
+      ],
+      "hint": "Read the single wide table of county returns for Governor, Lieutenant Governor, and Secretary of State; ignore the percentage rows."
+    },
+    {
+      "page": 8,
+      "id": "8-0",
+      "columns": [
+        {
+          "label": "DEMOCRAT Lindsay Thomas",
+          "contest": "house1",
+          "candidate": "Lindsay Thomas"
+        },
+        {
+          "label": "REPUBLICAN Herb Jones",
+          "contest": "house1",
+          "candidate": "Herb Jones"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.105,
+        0.628,
+        0.95,
+        0.939
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT GENERAL ELECTION November 2, 1982'; ignore any other table visible in the image."
+    },
+    {
+      "page": 9,
+      "id": "9-0",
+      "columns": [
+        {
+          "label": "DEMOCRAT Charles Hatcher",
+          "contest": "house2",
+          "candidate": "Charles Hatcher"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.216,
+        0.067,
+        0.788,
+        0.531
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT GENERAL ELECTION November 2, 1982'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0603
+      ]
+    },
+    {
+      "page": 9,
+      "id": "9-1",
+      "columns": [
+        {
+          "label": "DEMOCRAT Richard Ray",
+          "contest": "house3",
+          "candidate": "Richard Ray"
+        },
+        {
+          "label": "REPUBLICAN Tyron Elliott",
+          "contest": "house3",
+          "candidate": "Tyron Elliott"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.088,
+        0.523,
+        0.921,
+        0.893
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT GENERAL ELECTION November 2, 1982'; ignore any other table visible in the image."
+    },
+    {
+      "page": 10,
+      "id": "10-2",
+      "columns": [
+        {
+          "label": "DEMOCRAT Jim Wood",
+          "contest": "house6",
+          "candidate": "Jim Wood"
+        },
+        {
+          "label": "REPUBLICAN Newt Gingrich",
+          "contest": "house6",
+          "candidate": "Newt Gingrich"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.078,
+        0.595,
+        0.916,
+        0.932
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT GENERAL ELECTION November 2, 1982'; ignore any other table visible in the image."
+    },
+    {
+      "page": 12,
+      "id": "12-0",
+      "columns": [
+        {
+          "label": "DEMOCRAT Ed Jenkins",
+          "contest": "house9",
+          "candidate": "Ed Jenkins"
+        },
+        {
+          "label": "REPUBLICAN Charles Sherwood",
+          "contest": "house9",
+          "candidate": "Charles Sherwood"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.047,
+        0.079,
+        0.885,
+        0.5
+      ],
+      "hint": "Read only the table headed 'NINTH CONGRESSIONAL DISTRICT GENERAL ELECTION November 2, 1982'; ignore any other table visible in the image."
+    },
+    {
+      "page": 10,
+      "id": "10-s4",
+      "columns": [
+        {
+          "label": "DEMOCRAT Elliott H. Levitas",
+          "contest": "house4s",
+          "candidate": "Elliott H. Levitas"
+        },
+        {
+          "label": "REPUBLICAN Dick Winder",
+          "contest": "house4s",
+          "candidate": "Dick Winder"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.08,
+        0.06,
+        0.93,
+        0.18
+      ],
+      "hint": "Read only the table headed 'SPECIAL CONGRESSIONAL GENERAL ELECTION November 30, 1982' for the FOURTH Congressional District; ignore any other table visible in the image."
+    },
+    {
+      "page": 10,
+      "id": "10-s5",
+      "columns": [
+        {
+          "label": "DEMOCRAT Wyche Fowler, Jr.",
+          "contest": "house5s",
+          "candidate": "Wyche Fowler Jr."
+        },
+        {
+          "label": "REPUBLICAN Paul Jones",
+          "contest": "house5s",
+          "candidate": "Paul Jones"
+        },
+        {
+          "label": "INDEPENDENT J.E. 'Billy' McKinney",
+          "contest": "house5s",
+          "candidate": "J.E. McKinney"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.08,
+        0.41,
+        0.93,
+        0.51
+      ],
+      "hint": "Read only the table headed 'SPECIAL CONGRESSIONAL GENERAL ELECTION November 30, 1982' for the FIFTH Congressional District; ignore any other table visible in the image."
+    }
+  ]
+}

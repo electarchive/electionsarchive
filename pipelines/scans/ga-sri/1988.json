@@ -1,0 +1,574 @@
+{
+  "polity": "US-GA",
+  "publisher": "Georgia Secretary of State",
+  "title": "Official State of Georgia Tabulation by Counties, general election held 1988-11-08",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706935_0212/micro_IA40706935_0212.pdf",
+    "item": "https://archive.org/details/micro_IA40706935_0212"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1988,
+      "chamber": "president",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "GA",
+      "district": null
+    },
+    "house1": {
+      "year": 1988,
+      "chamber": "house",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "GA",
+      "district": 1
+    },
+    "house2": {
+      "year": 1988,
+      "chamber": "house",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "GA",
+      "district": 2
+    },
+    "house3": {
+      "year": 1988,
+      "chamber": "house",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "GA",
+      "district": 3
+    },
+    "house4": {
+      "year": 1988,
+      "chamber": "house",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "GA",
+      "district": 4
+    },
+    "house5": {
+      "year": 1988,
+      "chamber": "house",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "GA",
+      "district": 5
+    },
+    "house6": {
+      "year": 1988,
+      "chamber": "house",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "GA",
+      "district": 6
+    },
+    "house7": {
+      "year": 1988,
+      "chamber": "house",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "GA",
+      "district": 7
+    },
+    "house8": {
+      "year": 1988,
+      "chamber": "house",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "GA",
+      "district": 8
+    },
+    "house9": {
+      "year": 1988,
+      "chamber": "house",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "GA",
+      "district": 9
+    },
+    "house10": {
+      "year": 1988,
+      "chamber": "house",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "GA",
+      "district": 10
+    }
+  },
+  "pages": [
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "John Henry Anderson",
+          "contest": "president",
+          "candidate": "Michael S. Dukakis"
+        },
+        {
+          "label": "Faye Fox",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Maxine S. Goldstein",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Joseph D. Greene",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Joe Frank Harris",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Dollie Horton",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.052,
+        0.027,
+        0.987,
+        0.953
+      ],
+      "hint": "Read only the table headed 'DEMOCRATIC PARTY—PRESIDENTIAL ELECTORS'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.0572
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "Stanley M. Baum",
+          "contest": "president",
+          "candidate": "George Bush"
+        },
+        {
+          "label": "Will A. Chappell",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Guy G. Gebhardt",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Bert Seth Harp, Jr.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Walter I. Moore",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John E. Robson",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.094,
+        0.027,
+        0.982,
+        0.951
+      ],
+      "hint": "Read only the table headed 'REPUBLICAN PARTY—PRESIDENTIAL ELECTORS'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.0552
+      ]
+    },
+    {
+      "page": 6,
+      "id": "6-0",
+      "columns": [
+        {
+          "label": "Jack D. Aiken",
+          "contest": "president",
+          "candidate": "Ronald E. Paul"
+        },
+        {
+          "label": "Mary Bridget Carter",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.089,
+        0.029,
+        0.983,
+        0.951
+      ],
+      "hint": "Read only the table headed 'LIBERTARIAN PARTY—PRESIDENTIAL ELECTORS'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.0553
+      ]
+    },
+    {
+      "page": 8,
+      "id": "8-0",
+      "columns": [
+        {
+          "label": "Amy Jo Antenen",
+          "contest": "president",
+          "candidate": "Lenora B. Fulani"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.072,
+        0.023,
+        1.0,
+        0.943
+      ],
+      "hint": "Read only the table headed 'NEW ALLIANCE PARTY—PRESIDENTIAL ELECTORS (LENORA B. FULANI—President; JOYCE DATTNER—Vice-President)'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.0554
+      ]
+    },
+    {
+      "page": 13,
+      "id": "13-1",
+      "columns": [
+        {
+          "label": "LINDSAY THOMAS Incumbent",
+          "contest": "house1",
+          "candidate": "Lindsay Thomas"
+        },
+        {
+          "label": "LINDSAY THOMAS Incumbent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "JOHN CHRISTIAN (CHRIS) MEREDITH",
+          "contest": "house1",
+          "candidate": "John Christian Meredith"
+        },
+        {
+          "label": "JOHN CHRISTIAN (CHRIS) MEREDITH",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.051,
+        0.167,
+        0.974,
+        0.571
+      ],
+      "hint": "Read only the table headed 'First Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 13,
+      "id": "13-2",
+      "columns": [
+        {
+          "label": "CHARLES HATCHER Incumbent",
+          "contest": "house2",
+          "candidate": "Charles Hatcher"
+        },
+        {
+          "label": "CHARLES HATCHER Incumbent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "RALPH T. HUDGENS",
+          "contest": "house2",
+          "candidate": "Ralph Terry Hudgens"
+        },
+        {
+          "label": "RALPH T. HUDGENS",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.027,
+        0.563,
+        0.959,
+        0.951
+      ],
+      "hint": "Read only the table headed 'Second Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 14,
+      "id": "14-0",
+      "columns": [
+        {
+          "label": "RICHARD RAY",
+          "contest": "house3",
+          "candidate": "Richard B. Ray"
+        },
+        {
+          "label": "RICHARD RAY",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.047,
+        0.018,
+        0.698,
+        0.294
+      ],
+      "hint": "Read only the table headed 'Third Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 14,
+      "id": "14-1",
+      "columns": [
+        {
+          "label": "BEN JONES",
+          "contest": "house4",
+          "candidate": "Ben Lewis Jones"
+        },
+        {
+          "label": "BEN JONES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PAT SWINDALL",
+          "contest": "house4",
+          "candidate": "Pat Swindall"
+        },
+        {
+          "label": "PAT SWINDALL",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.037,
+        0.286,
+        0.98,
+        0.432
+      ],
+      "hint": "Read only the table headed 'Fourth Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 14,
+      "id": "14-2",
+      "columns": [
+        {
+          "label": "JOHN LEWIS",
+          "contest": "house5",
+          "candidate": "John Lewis"
+        },
+        {
+          "label": "JOHN LEWIS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J.W. TIBBS, JR.",
+          "contest": "house5",
+          "candidate": "James W. Tibbs"
+        },
+        {
+          "label": "J.W. TIBBS, JR.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.037,
+        0.424,
+        0.98,
+        0.553
+      ],
+      "hint": "Read only the table headed 'Fifth Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 14,
+      "id": "14-3",
+      "columns": [
+        {
+          "label": "DAVID WORLEY",
+          "contest": "house6",
+          "candidate": "David James Worley"
+        },
+        {
+          "label": "DAVID WORLEY",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "NEWT GINGRICH",
+          "contest": "house6",
+          "candidate": "Newt Gingrich"
+        },
+        {
+          "label": "NEWT GINGRICH",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.032,
+        0.545,
+        0.97,
+        0.781
+      ],
+      "hint": "Read only the table headed 'Sixth Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 14,
+      "id": "14-4",
+      "columns": [
+        {
+          "label": "GEORGE (BUDDY) DARDEN",
+          "contest": "house7",
+          "candidate": "George (Buddy) Darden"
+        },
+        {
+          "label": "GEORGE (BUDDY) DARDEN",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "ROBERT LAMUTT",
+          "contest": "house7",
+          "candidate": "Robert Bruce Lamutt"
+        },
+        {
+          "label": "ROBERT LAMUTT",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.027,
+        0.773,
+        0.96,
+        0.946
+      ],
+      "hint": "Read only the table headed 'Seventh Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 15,
+      "id": "15-0",
+      "columns": [
+        {
+          "label": "J. ROY ROWLAND",
+          "contest": "house8",
+          "candidate": "J. Roy Rowland"
+        },
+        {
+          "label": "J. ROY ROWLAND",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.052,
+        0.052,
+        0.719,
+        0.417
+      ],
+      "hint": "Read only the table headed 'Eighth Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 15,
+      "id": "15-1",
+      "columns": [
+        {
+          "label": "ED JENKINS",
+          "contest": "house9",
+          "candidate": "Ed Jenkins"
+        },
+        {
+          "label": "ED JENKINS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "JOE HOFFMAN",
+          "contest": "house9",
+          "candidate": "Charles Joseph Hoffman"
+        },
+        {
+          "label": "JOE HOFFMAN",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.044,
+        0.409,
+        0.99,
+        0.725
+      ],
+      "hint": "Read only the table headed 'Ninth Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 15,
+      "id": "15-2",
+      "columns": [
+        {
+          "label": "DOUG BARNARD, JR.",
+          "contest": "house10",
+          "candidate": "Doug Barnard Jr."
+        },
+        {
+          "label": "DOUG BARNARD, JR.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "MARK MYERS",
+          "contest": "house10",
+          "candidate": "Mark Myers"
+        },
+        {
+          "label": "MARK MYERS",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.037,
+        0.717,
+        0.982,
+        0.945
+      ],
+      "hint": "Read only the table headed 'Tenth Congressional District'; ignore any other table visible in the image."
+    }
+  ]
+}
