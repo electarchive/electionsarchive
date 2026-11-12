@@ -306,7 +306,12 @@ def parse() -> None:
         frame.join(pl.DataFrame(labels, infer_schema_length=None), on=["jur", "office", "place", "county"])
         .with_columns(area=pl.coalesce("area", "suffix"))
         .drop("suffix")
-        .with_columns(pl.col("race").min().over("code", "key", "day", "area", "remainder", "magnitude"))
+        .with_columns(
+            pl.col("race").min().over("code", "key", "day", "area", "remainder", "magnitude").alias("merged"),
+            (pl.col("elected") == "1").sum().over("code", "key", "day", "area", "remainder", "magnitude").alias("won"),
+        )
+        .with_columns(race=pl.when(pl.col("won") <= pl.col("magnitude")).then("merged").otherwise("race"))
+        .drop("merged", "won")
     )
     print(f"kept {frame['race'].n_unique()} races; unmatched: {len(missing)} places")
     parts = []
@@ -787,6 +792,16 @@ def emit() -> Path:
             .drop("into")
         )
     print(f"{len(into)} county spellings merged into {len(ballots)} candidates")
+    over = (
+        frame.group_by("race")
+        .agg((pl.col("elected") == "1").sum().alias("won"), pl.col("magnitude").first())
+        .filter(pl.col("won") > pl.col("magnitude"))["race"]
+    )
+    print(f"{len(over)} races flag more winners than seats; ALGED's winners stand, or none are declared")
+    unsettled = set(over)
+    emptied: list[str] = []
+    kept_options: set[UUID] = set()
+    emitted: set[UUID] = set()
     merged = {race for race, _ in into}
     for line in looser:
         print(f"  looser, not merged: {line}")
@@ -896,6 +911,21 @@ def emit() -> Path:
                 [SOURCE],
             ).fetchall()
         }
+        own_slugs = dict(
+            conn.execute(
+                """select s.entity_id, s.path from slug s join changeset c on c.id = s.changeset_id
+                   where s.path like 'us/ca/%%/%%/%%' and c.pipeline = %s""",
+                [SOURCE],
+            ).fetchall()
+        )
+        claimed = set(own_slugs.values())
+        old_options: dict[UUID, set[UUID]] = {}
+        for option, contest in conn.execute(
+            """select o.id, o.contest_id from contest_option o join changeset c on c.id = o.changeset_id
+               where c.pipeline = %s and o.kind = 'candidate'""",
+            [SOURCE],
+        ).fetchall():
+            old_options.setdefault(contest, set()).add(option)
         held = set(
             conn.execute(
                 """select x.value, extract(year from e.date_from)::int, extract(month from e.date_from)::int
@@ -1182,10 +1212,10 @@ def emit() -> Path:
                 + ("-short-term" if first["remainder"] else "")
             )
             suffix = 1
-            while (
-                candidate := contest_path if suffix == 1 else f"{contest_path}-{suffix}"
-            ) in paths or candidate in taken:
+            candidate = own_slugs.get(contest, contest_path)
+            while contest not in own_slugs and (candidate in paths or candidate in taken or candidate in claimed):
                 suffix += 1
+                candidate = f"{contest_path}-{suffix}"
             paths.add(candidate)
             cs.add("slug", path=candidate, entity_id=contest)
             alged_notes = {body for _, body in (taken_over or {}).get("notes", [])}
@@ -1251,6 +1281,13 @@ def emit() -> Path:
                 body_md=METHOD if reported is None else f"{METHOD} {PRECINCT}",
             )
 
+            winners = (
+                {option["surname"] for option in taken_over["options"] if option["elected"]}
+                if race in unsettled and taken_over is not None
+                else set()
+            )
+            if race in unsettled and not winners:
+                emptied.append(str(result_set))
             entries: list[tuple[UUID, str, int]] = []
             unused = list((taken_over or {}).get("options", []))
             for candidate_id, ballot, incumbent, votes, elected in rows.select(
@@ -1269,6 +1306,7 @@ def emit() -> Path:
                     cs.add("person", id=person)
                     name(person, ballot)
                 option = reused["option"] if reused else cs.key("us.option", f"{contest_key}:{candidate_id}")
+                kept_options.add(option)
                 cs.add("contest_option", id=option, contest_id=contest, kind="candidate", ballot_label=ballot)
                 candidacy = (
                     reused["candidacy"]
@@ -1293,6 +1331,8 @@ def emit() -> Path:
                             ("us.candidacy", f"{contest_key}:{away[1]}:head", candidacy),
                             (f"{SOURCE}.person", f"{race}:{away[1]}", person),
                         ]
+                if race in unsettled and elected == "1":
+                    elected = "1" if surname(ballot) in winners else "2"
                 if elected in ("1", "3"):
                     cs.add(
                         "outcome",
@@ -1308,7 +1348,9 @@ def emit() -> Path:
                 if race in WRITE_IN_WON:
                     cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected", seats=None)
                 entries.append((option, "write-ins", writeins))
-            for option, candidate_id, votes in entries if result_set in cs.minted or race in merged else []:
+            emitted.add(contest)
+            restage = bool(old_options.get(contest, set()) - kept_options)
+            for option, candidate_id, votes in entries if result_set in cs.minted or race in merged or restage else []:
                 if reported is None:
                     values.append((str(result_set), str(unit), str(option), votes))
                     continue
@@ -1407,4 +1449,18 @@ def emit() -> Path:
             ),
         )
         print(f"{stale} taken-over contests keep an ALGED partial-district caveat that CEDA's district does not need")
+        for contest in emitted:
+            for option in old_options.get(contest, set()) - kept_options:
+                candidacies = [
+                    candidacy
+                    for (candidacy,) in conn.execute(
+                        "select id from candidacy where option_id = %s", [option]
+                    ).fetchall()
+                ]
+                reason = "CEDA lists this candidate in another race"
+                for candidacy in candidacies:
+                    cs.add("entity_retirement", entity_id=candidacy, reason=reason)
+                if not candidacies:
+                    cs.add("option_drop", option_id=option, contest_id=contest, reason=reason)
+        cs.manifest["scope"] = {"polity": "US-CA", "clears": emptied}
         return cs.write()
