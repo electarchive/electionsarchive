@@ -158,8 +158,8 @@
       "columns": [
         {
           "label": "John M. Pease People's",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "Thomas Watson (Populist)"
         },
         {
           "label": "Philip Rammp Peoples",

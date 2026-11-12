@@ -62,8 +62,8 @@
         },
         {
           "label": "John P. McElroy Fusion",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "William Jennings Bryan (Democratic)"
         },
         {
           "label": "John W. Martin Fusion",
@@ -150,8 +150,8 @@
       "columns": [
         {
           "label": "K. Halvorson Populist",
-          "contest": "president",
-          "candidate": "Wharton Barker (Populist)"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "Ulrich Bosley Populist",
@@ -160,8 +160,8 @@
         },
         {
           "label": "W. Haire Robt. Social Democrat",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "Eugene V. Debs (Social Democratic)"
         },
         {
           "label": "W. W. Swan Social Democrat",

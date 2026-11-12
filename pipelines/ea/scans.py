@@ -772,7 +772,7 @@ def cells(
                     value = int(digits) if digits.isascii() and digits.isdigit() else None
                     if value is not None and manifest.get("halves", False):
                         value = value * 2 + half
-                    if TOTAL.match(slug(label)):
+                    if TOTAL.match(slug(label)) or (not across and not slug(label) and r == len(rows) - 1):
                         if value is not None:
                             printed[(number, series)] = value
                         continue
