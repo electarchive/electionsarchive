@@ -1653,11 +1653,21 @@ async function survey(
     from area_parent p join area a on a.id = p.area_id
     where p.valid @> ${date}::date and ${within}
   `;
-  const kidsOf = async (within: SQL) =>
-    db.execute<{ id: string; k: number; scheme: string }>(
-      ks.length < 100 ? lazy(within) : counted(wide(within)),
+  const kidsOf = async (parents: Array<string>, within: SQL) => {
+    const isLazy =
+      ks.length < 100 &&
+      (
+        await db.execute<{ n: number }>(sql`
+          select count(*)::int as n from (
+            select from area_parent p where p.parent_id = any(${sql.param(parents)}::uuid[]) limit 10000
+          ) z
+        `)
+      ).rows[0]?.n === 10_000;
+    return db.execute<{ id: string; k: number; scheme: string }>(
+      isLazy ? lazy(within) : counted(wide(within)),
     );
-  let found = await kidsOf(sql`p.parent_id = ${area.id}::uuid`);
+  };
+  let found = await kidsOf([area.id], sql`p.parent_id = ${area.id}::uuid`);
   const lone = Map.groupBy(found.rows, (row) => row.scheme)
     .values()
     .filter((group) => group.length === 1)
@@ -1665,10 +1675,13 @@ async function survey(
     .toArray();
   const deeper = new Set<string>();
   if (lone.length > 0) {
-    const through = await kidsOf(sql`
-      p.parent_id = any(${sql.param(lone)}::uuid[])
-        and a.scheme_code <> all(${sql.param(found.rows.map((row) => row.scheme))}::text[])
-    `);
+    const through = await kidsOf(
+      lone,
+      sql`
+        p.parent_id = any(${sql.param(lone)}::uuid[])
+          and a.scheme_code <> all(${sql.param(found.rows.map((row) => row.scheme))}::text[])
+      `,
+    );
     for (const row of through.rows) {
       deeper.add(row.id);
       found.rows.push(row);
@@ -11962,15 +11975,12 @@ export const contests = {
             ...whole.filter((row) => !row.outside).map((row) => row.k),
           ].filter((k) => !off.has(k)),
         ),
-        names(
-          absent.map((row) => row.id),
-          contest.date,
-        ),
+        blankNames(whole, contest.date),
       ]);
       const blank = absent
         .map((row) => ({
           k: row.k,
-          name: blankLabels.full.get(row.id) ?? "",
+          name: blankLabels.get(row.id) ?? "",
           isHeld: row.held,
           isOutside: row.outside,
           isPending: row.pending,
@@ -14550,17 +14560,20 @@ async function universe(
             outside: boolean;
             pending: boolean;
           }>(sql`
-            with recursive down(id, k, scheme, depth) as (
-              select ${area}::uuid, 0, ''::text, 0
-              union all
-              select a.id, a.k, a.scheme_code, down.depth + 1 from area_parent p join down on p.parent_id = down.id
-              join area a on a.id = p.area_id
-              where p.valid @> ${day}::date and down.depth < 4 and down.scheme <> ${level}
-                and not exists (select from entity_merge m where m.entity_id = a.id)
+            with l1 as materialized (${beneath(sql`select p.area_id as id from area_parent p where p.parent_id = ${area}::uuid and p.valid @> ${day}::date`)}),
+            l2 as materialized (${beneath(sql`select p.area_id as id from l1 u join area_parent p on p.parent_id = u.id where u.scheme <> ${level} and p.valid @> ${day}::date`)}),
+            l3 as materialized (${beneath(sql`select p.area_id as id from l2 u join area_parent p on p.parent_id = u.id where u.scheme <> ${level} and p.valid @> ${day}::date`)}),
+            l4 as materialized (${beneath(sql`select p.area_id as id from l3 u join area_parent p on p.parent_id = u.id where u.scheme <> ${level} and p.valid @> ${day}::date`)}),
+            found as materialized (
+              select distinct id, k from (
+                select id, k, scheme from l1 union all select id, k, scheme from l2
+                union all select id, k, scheme from l3 union all select id, k, scheme from l4
+              ) x
+              where scheme = ${level}
+              order by id
             )
-            select distinct id, k, true as held, false as outside, false as pending from down
-            where depth > 0 and scheme = ${level}
-              and exists (select from area_geometry g where g.area_id = down.id and g.valid @> ${day}::date)
+            select id, k, true as held, false as outside, false as pending from found
+            where exists (select from area_geometry g where g.area_id = found.id and g.valid @> ${day}::date offset 0)
           `);
           return below.rows;
         },
@@ -14570,18 +14583,44 @@ async function universe(
       );
 }
 
+async function blankNames(whole: Array<{ id: string }>, on: string | null) {
+  const ids = [...new Set(whole.map((row) => row.id))].toSorted((a, b) =>
+    a.localeCompare(b),
+  );
+  return new Map(
+    await remember(
+      `blank-names:${createHash("sha1")
+        .update(JSON.stringify([on, ids]))
+        .digest("hex")}`,
+      async () => [...(await names(ids, on)).full],
+      false,
+      undefined,
+      true,
+    ),
+  );
+}
+
+function beneath(from: SQL) {
+  return sql`
+    select a.id, a.k, a.scheme from (${from} order by 1) d
+    cross join lateral (select a.id, a.k, a.scheme_code as scheme from area a where a.id = d.id offset 0) a
+    where not exists (select from entity_merge m where m.entity_id = a.id offset 0)
+  `;
+}
+
 const framed = new Map<string, ReturnType<typeof framing>>();
 
 async function framing(area: string, day: string, ks: Array<number> = []) {
-  return ks.length === 0
-    ? remember(
-        `framing:${area}:${day}`,
-        async () => framingBox(area, day, ks),
-        false,
-        undefined,
-        true,
-      )
-    : framingBox(area, day, ks);
+  const kept = [...new Set(ks)].toSorted((a, b) => a - b);
+  return remember(
+    kept.length === 0
+      ? `framing:${area}:${day}`
+      : `framing:${area}:${day}:${createHash("sha1").update(JSON.stringify(kept)).digest("hex")}`,
+    async () => framingBox(area, day, kept),
+    false,
+    undefined,
+    true,
+  );
 }
 
 async function framingBox(area: string, day: string, ks: Array<number>) {
@@ -14743,10 +14782,7 @@ async function sketch(
       order by bs.valid_from desc nulls last
       limit 1
     `),
-    names(
-      absent.map((row) => row.id),
-      day,
-    ),
+    blankNames(whole, day),
     level === "us.state"
       ? db.execute<{ k: number; code: string }>(sql`
         select a.k, (array['AS', 'GU', 'MP', 'PR', 'VI'])[array_position(array['60', '66', '69', '72', '78'], c.code)] as code from area a join area_code c on c.area_id = a.id
@@ -14788,7 +14824,7 @@ async function sketch(
         blank: absent
           .map((row) => ({
             k: row.k,
-            name: labels.full.get(row.id) ?? "",
+            name: labels.get(row.id) ?? "",
             isHeld: row.held,
             isOutside: row.outside,
             isPending: row.pending,
