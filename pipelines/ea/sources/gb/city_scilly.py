@@ -1,7 +1,9 @@
+import difflib
 import html
 import re
 import subprocess
 import time
+import unicodedata
 from dataclasses import dataclass, field
 from datetime import date, datetime
 from pathlib import Path
@@ -649,6 +651,55 @@ def ward_of(text: str) -> tuple[str, str] | None:
     return WARD_KEYS.get(re.sub(r"^Ward of ", "", key, flags=re.IGNORECASE).upper())
 
 
+def given_tokens(given: str) -> tuple[list[str], set[str]]:
+    nick = {m.lower() for m in re.findall(r"commonly known as (\w+)", given)}
+    plain = re.sub(r"\(.*?\)|, commonly known as.*", "", given)
+    plain = unicodedata.normalize("NFKD", plain).encode("ascii", "ignore").decode()
+    return re.findall(r"[a-z]+", plain.lower()), nick
+
+
+def same_given(a: str, b: str) -> int:
+    (x, nx), (y, ny) = given_tokens(a), given_tokens(b)
+    if not x or not y:
+        return 0
+    if x == y or x[: len(y)] == y or y[: len(x)] == x or sorted(x) == sorted(y):
+        return 2
+    if difflib.SequenceMatcher(None, " ".join(x), " ".join(y)).ratio() >= 0.93:
+        return 2
+    if len(x) == len(y) and x[1:] == y[1:] and {x[0], y[0]} == {"steve", "stephen"}:
+        return 2
+    for short, long, nick in ((x, y, ny), (y, x, nx)):
+        if len(short) == 1:
+            if short[0] in nick or (len(short[0]) >= 3 and long[0].startswith(short[0])):
+                return 2
+            if short[0] in long:
+                return 1
+    return 0
+
+
+def same_councilman(stood: list[tuple[str, UUID, str, str, str]]) -> list[tuple[UUID, UUID]]:
+    clusters: list[list[tuple[str, UUID, str, str, str]]] = []
+    for row in sorted(stood, key=lambda row: (row[0], str(row[1]))):
+        day, _, given, surname, ward = row
+        norm = re.sub(r"[^a-z]", "", surname.lower())
+        fits = [
+            cluster
+            for cluster in clusters
+            if re.sub(r"[^a-z]", "", cluster[0][3].lower()) == norm
+            and all(member[0] != day for member in cluster)
+            and any(
+                match == 2 or (match == 1 and member[4] == ward)
+                for member in cluster
+                if (match := same_given(member[2], given))
+            )
+        ]
+        if len(fits) == 1:
+            fits[0].append(row)
+        elif not fits:
+            clusters.append([row])
+    return [(row[1], cluster[0][1]) for cluster in clusters for row in cluster[1:] if row[1] != cluster[0][1]]
+
+
 @dataclass
 class Block:
     section: str | None
@@ -1262,10 +1313,13 @@ def emit() -> Path:
             return parties[description], False
 
         named: set[UUID] = set()
+        stood: list[tuple[str, UUID, str, str, str]] = []
 
-        def add_person(key: str, given: str, surname: str) -> UUID:
+        def add_person(key: str, given: str, surname: str, link: bool = True) -> UUID:
             person = cs.key("gb.city_scilly.person", key)
             cs.add("person", id=person)
+            if link:
+                stood.append((key[:10], person, given, surname, key.split(":")[2]))
             if person not in named:
                 named.add(person)
                 name(person, f"{given} {surname}")
@@ -1724,7 +1778,7 @@ def emit() -> Path:
             won = sorted((votes for *_, votes in candidates if votes is not None), reverse=True)[:seats]
             for number, (surname, given, votes) in enumerate(candidates, start=1):
                 option_key = f"{contest_key}:{number}"
-                person = add_person(option_key, given, surname)
+                person = add_person(option_key, given, surname, link=False)
                 option = cs.key("gb.city_scilly.option", option_key)
                 cs.add(
                     "contest_option",
@@ -1773,4 +1827,6 @@ def emit() -> Path:
             if key == "martins25":
                 other = source_of(SCILLY_PAGES["results25"][0], SCILLY_HOLDER, SCILLY_PAGES["results25"][2])
                 cs.add("citation", entity_id=contest, source_id=other)
+        for person, into in same_councilman(stood):
+            cs.merge(person, into)
         return cs.write()
