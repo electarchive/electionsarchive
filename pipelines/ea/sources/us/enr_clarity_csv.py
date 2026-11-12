@@ -201,14 +201,24 @@ def _restore() -> None:
     for record in _read({}):
         for node in record["contests"]:
             text = node["text"]
+            place = {}
             if found := re.match(r"District Judge, (\d+)(?:st|nd|rd|th) Judicial District$", text):
                 key = f"{prefix}district-judge:district-{found[1]}"
+                place = {"key": "district-judge", "office": "District Judge", "seat": f"District {found[1]}"}
             elif found := re.match(r"Travis Central Appraisal District, .*Board of Directors, Place (\d)$", text):
                 key = f"{prefix}48453-travis-central-appraisal-district:board:place-{found[1]}"
+                place = {
+                    "key": "appraisal-board",
+                    "office": "Board of Directors",
+                    "seat": f"Place {found[1]}",
+                    "body": True,
+                }
             elif text == "City of Sunset Valley, Two City Council Member Seats":
                 key = f"{prefix}4871324:council"
+                place = {"scheme": "us.place", "code": "4871324", "key": "council", "office": "Council", "body": True}
             elif text == "Travis County MMD No. 1 Permanent Directors":
                 key = f"{prefix}48453-travis-county-municipal-management-district-no-1:board"
+                place = {"key": "mmd-board", "office": "Board of Directors", "body": True}
             else:
                 continue
             if key not in keys or key in contests["contest_key"]:
@@ -220,6 +230,11 @@ def _restore() -> None:
                     "text": text,
                     "party": None,
                     "magnitude": node["vote_for"],
+                    "seat": None,
+                    "body": False,
+                    **place,
+                    "label": text.upper(),
+                    "base": f"TX:{key[len(prefix) :]}",
                     "contest_key": key,
                 }
             )
