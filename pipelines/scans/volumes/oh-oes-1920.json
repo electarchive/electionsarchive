@@ -1,0 +1,19 @@
+{
+ "polity": "US-OH",
+ "publisher": "Ohio Secretary of State",
+ "license": "Public record",
+ "raw_source": "us.scans",
+ "year": 1920,
+ "day": "1920-11-02",
+ "title": "Ohio Election Statistics 1920, general election held November 2, 1920",
+ "file": {
+  "url": "https://archive.org/download/ohioelectionsta02statgoog/page/n{page}_w2000.jpg",
+  "item": "https://archive.org/details/ohioelectionsta02statgoog"
+ },
+ "offices": {
+  "president": "President (first elector) by county, the table continues on the next leaf",
+  "senate": "U.S. Senator (the same table prints the Chief Justice of the Supreme Court), the table continues on the next leaf",
+  "governor": "Governor for 1920, counties down; the table also prints 1918 governor columns, which are not read"
+ },
+ "leaves": [19, 20, 33, 34, 42, 43]
+}
