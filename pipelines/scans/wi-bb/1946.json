@@ -1,0 +1,523 @@
+{
+  "polity": "US-WI",
+  "publisher": "Wisconsin Legislative Reference Bureau",
+  "title": "The Wisconsin Blue Book 1948, vote by counties (general election 1946-11-05)",
+  "license": "Public record",
+  "file": {
+    "url": "https://search.library.wisc.edu/digital/AM65CYC7ECEXCX9D",
+    "item": "https://search.library.wisc.edu/digital/AM65CYC7ECEXCX9D"
+  },
+  "raw_source": "us.county_volumes",
+  "contests": {
+    "governor": {
+      "year": 1946,
+      "chamber": "governor",
+      "day": "1946-11-05",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "senate": {
+      "year": 1946,
+      "chamber": "senate",
+      "day": "1946-11-05",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "house1": {
+      "year": 1946,
+      "chamber": "house",
+      "day": "1946-11-05",
+      "special": false,
+      "state": "WI",
+      "district": 1
+    },
+    "house2": {
+      "year": 1946,
+      "chamber": "house",
+      "day": "1946-11-05",
+      "special": false,
+      "state": "WI",
+      "district": 2
+    },
+    "house3": {
+      "year": 1946,
+      "chamber": "house",
+      "day": "1946-11-05",
+      "special": false,
+      "state": "WI",
+      "district": 3
+    },
+    "house4": {
+      "year": 1946,
+      "chamber": "house",
+      "day": "1946-11-05",
+      "special": false,
+      "state": "WI",
+      "district": 4
+    },
+    "house5": {
+      "year": 1946,
+      "chamber": "house",
+      "day": "1946-11-05",
+      "special": false,
+      "state": "WI",
+      "district": 5
+    },
+    "house6": {
+      "year": 1946,
+      "chamber": "house",
+      "day": "1946-11-05",
+      "special": false,
+      "state": "WI",
+      "district": 6
+    },
+    "house7": {
+      "year": 1946,
+      "chamber": "house",
+      "day": "1946-11-05",
+      "special": false,
+      "state": "WI",
+      "district": 7
+    },
+    "house8": {
+      "year": 1946,
+      "chamber": "house",
+      "day": "1946-11-05",
+      "special": false,
+      "state": "WI",
+      "district": 8
+    },
+    "house9": {
+      "year": 1946,
+      "chamber": "house",
+      "day": "1946-11-05",
+      "special": false,
+      "state": "WI",
+      "district": 9
+    },
+    "house10": {
+      "year": 1946,
+      "chamber": "house",
+      "day": "1946-11-05",
+      "special": false,
+      "state": "WI",
+      "district": 10
+    }
+  },
+  "pages": [
+    {
+      "page": 696,
+      "id": "696-0",
+      "columns": [
+        {
+          "label": "Hoan (Dem.)",
+          "contest": "governor",
+          "candidate": "Daniel W. Hoan"
+        },
+        {
+          "label": "Goodland (Rep.)",
+          "contest": "governor",
+          "candidate": "Walter S. Goodland"
+        },
+        {
+          "label": "Uphoff (Soc.)",
+          "contest": "governor",
+          "candidate": "Walter H. Uphoff"
+        },
+        {
+          "label": "Eisenscher (Ind.)",
+          "contest": "governor",
+          "candidate": "Sigmund G. Eisenscher"
+        },
+        {
+          "label": "Kenyon (Ind.)",
+          "contest": "governor",
+          "candidate": "Jerry R. Kenyon"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.082,
+        0.172,
+        0.837,
+        1.0
+      ],
+      "hint": "Read only the table headed 'SUMMARY VOTE FOR GOVERNOR BY PRECINCTS\u2014Continued'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        -0.0133
+      ]
+    },
+    {
+      "page": 697,
+      "id": "697-0",
+      "columns": [
+        {
+          "label": "Hoan (Dem.)",
+          "contest": "governor",
+          "candidate": "Daniel W. Hoan"
+        },
+        {
+          "label": "Goodland (Rep.)",
+          "contest": "governor",
+          "candidate": "Walter S. Goodland"
+        },
+        {
+          "label": "Uphoff (Soc.)",
+          "contest": "governor",
+          "candidate": "Walter H. Uphoff"
+        },
+        {
+          "label": "Eisenscher (Ind. Comm.)",
+          "contest": "governor",
+          "candidate": "Sigmund G. Eisenscher"
+        },
+        {
+          "label": "Kenyon (Ind. Soc. Lab.)",
+          "contest": "governor",
+          "candidate": "Jerry R. Kenyon"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.161,
+        0.095,
+        0.917,
+        0.899
+      ],
+      "hint": "Read only the table headed 'SUMMARY VOTE FOR GOVERNOR BY COUNTIES November 5, 1946'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1032
+      ]
+    },
+    {
+      "page": 702,
+      "id": "702-0",
+      "columns": [
+        {
+          "label": "McMurray (Dem.)",
+          "contest": "senate",
+          "candidate": "Howard J. McMurray"
+        },
+        {
+          "label": "McCarthy (Rep.)",
+          "contest": "senate",
+          "candidate": "Joseph R. McCarthy"
+        },
+        {
+          "label": "Knappe (Soc.)",
+          "contest": "senate",
+          "candidate": "Edwin W. Knappe"
+        },
+        {
+          "label": "Cozzini (Ind. Soc. Labor)",
+          "contest": "senate",
+          "candidate": "Georgia Cozzini"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.094,
+        0.139,
+        0.848,
+        0.902
+      ],
+      "hint": "Read only the table headed 'SUMMARY VOTE FOR UNITED STATES SENATOR BY COUNTIES November 5, 1946'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0642
+      ]
+    },
+    {
+      "page": 703,
+      "id": "703-0",
+      "columns": [
+        {
+          "label": "Redstrom (Dem.)",
+          "contest": "house1",
+          "candidate": "John R. Redstrom"
+        },
+        {
+          "label": "Smith (Rep.)",
+          "contest": "house1",
+          "candidate": "Lawrence H. Smith"
+        },
+        {
+          "label": "Christensen (Soc.)",
+          "contest": "house1",
+          "candidate": "Lars P. Christensen"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.155,
+        0.187,
+        0.908,
+        0.356
+      ],
+      "hint": "Read only the table headed 'First District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 703,
+      "id": "703-1",
+      "columns": [
+        {
+          "label": "Rice (Dem.)",
+          "contest": "house2",
+          "candidate": "William G. Rice"
+        },
+        {
+          "label": "Henry* (Rep.)",
+          "contest": "house2",
+          "candidate": "Robert K. Henry"
+        },
+        {
+          "label": "Wallace (Soc.)",
+          "contest": "house2",
+          "candidate": "Ayer T. Wallace"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.155,
+        0.348,
+        0.908,
+        0.534
+      ],
+      "hint": "Read only the table headed 'Second District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 703,
+      "id": "703-2",
+      "columns": [
+        {
+          "label": "Stevenson (Rep.)",
+          "contest": "house3",
+          "candidate": "William H. Stevenson"
+        },
+        {
+          "label": "Alexander (Soc.)",
+          "contest": "house3",
+          "candidate": "Walter L. Alexander"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.155,
+        0.526,
+        0.908,
+        0.761
+      ],
+      "hint": "Read only the table headed 'Third District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 703,
+      "id": "703-3",
+      "columns": [
+        {
+          "label": "Bobrowicz (Dem.)",
+          "contest": "house4",
+          "candidate": "Edmund V. Bobrowicz"
+        },
+        {
+          "label": "Brophy (Rep.)",
+          "contest": "house4",
+          "candidate": "John C. Brophy"
+        },
+        {
+          "label": "Helberg (Soc.)",
+          "contest": "house4",
+          "candidate": "George E. Helberg"
+        },
+        {
+          "label": "Wasielewski (Ind.)",
+          "contest": "house4",
+          "candidate": "Thad F. Wasielewski"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.155,
+        0.753,
+        0.908,
+        0.882
+      ],
+      "hint": "Read only the table headed 'Fourth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 704,
+      "id": "704-0",
+      "columns": [
+        {
+          "label": "Biemiller (Dem.)",
+          "contest": "house5",
+          "candidate": "Andrew J. Biemiller"
+        },
+        {
+          "label": "Kersten (Rep.)",
+          "contest": "house5",
+          "candidate": "Charles J. Kersten"
+        },
+        {
+          "label": "Zeidler (Soc.)",
+          "contest": "house5",
+          "candidate": "Frank P. Zeidler"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.094,
+        0.182,
+        0.851,
+        0.301
+      ],
+      "hint": "Read only the table headed 'Fifth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 704,
+      "id": "704-1",
+      "columns": [
+        {
+          "label": "Webster (Dem.)",
+          "contest": "house6",
+          "candidate": "Edwin W. Webster"
+        },
+        {
+          "label": "Keefe (Rep.)",
+          "contest": "house6",
+          "candidate": "Frank B. Keefe"
+        },
+        {
+          "label": "Renn (Soc.)",
+          "contest": "house6",
+          "candidate": "Rudolph Renn"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.094,
+        0.293,
+        0.853,
+        0.487
+      ],
+      "hint": "Read only the table headed 'Sixth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 704,
+      "id": "704-2",
+      "columns": [
+        {
+          "label": "Fraley (Dem.)",
+          "contest": "house7",
+          "candidate": "Elmer E. Fraley"
+        },
+        {
+          "label": "Murray (Rep.)",
+          "contest": "house7",
+          "candidate": "Reid F. Murray"
+        },
+        {
+          "label": "Pearson (Soc.)",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.094,
+        0.479,
+        0.855,
+        0.709
+      ],
+      "hint": "Read only the table headed 'Seventh District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 704,
+      "id": "704-3",
+      "columns": [
+        {
+          "label": "Young (Dem.)",
+          "contest": "house8",
+          "candidate": "Martin J. Young"
+        },
+        {
+          "label": "Byrnes (Rep.)",
+          "contest": "house8",
+          "candidate": "John W. Byrnes"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.103,
+        0.701,
+        0.869,
+        0.893
+      ],
+      "hint": "Read only the table headed 'Eighth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 705,
+      "id": "705-0",
+      "columns": [
+        {
+          "label": "Hull (Rep.)",
+          "contest": "house9",
+          "candidate": "Merlin Hull"
+        },
+        {
+          "label": "Maassen (Soc.)",
+          "contest": "house9",
+          "candidate": "Adolph Maassen"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.15,
+        0.155,
+        0.91,
+        0.377
+      ],
+      "hint": "Read only the table headed 'Ninth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 705,
+      "id": "705-1",
+      "columns": [
+        {
+          "label": "Berquist (Dem.)",
+          "contest": "house10",
+          "candidate": "Henry J. Bergquist"
+        },
+        {
+          "label": "O'Konski (Rep.)",
+          "contest": "house10",
+          "candidate": "Alvin E. O'Konski"
+        },
+        {
+          "label": "Kreie (Soc.)",
+          "contest": "house10",
+          "candidate": "Adolph F. Kreie"
+        },
+        {
+          "label": "Princeton (Ind.)",
+          "contest": "house10",
+          "candidate": "Eugene R. Princeton"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.15,
+        0.369,
+        0.905,
+        0.607
+      ],
+      "hint": "Read only the table headed 'Tenth District'; ignore any other table visible in the image."
+    }
+  ]
+}

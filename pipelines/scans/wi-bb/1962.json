@@ -1,0 +1,439 @@
+{
+  "polity": "US-WI",
+  "publisher": "Wisconsin Legislative Reference Bureau",
+  "title": "The Wisconsin Blue Book 1964, vote by counties (general election 1962-11-06)",
+  "license": "Public record",
+  "file": {
+    "url": "https://search.library.wisc.edu/digital/AXF6R5VAIXPXFS8Y",
+    "item": "https://search.library.wisc.edu/digital/AXF6R5VAIXPXFS8Y"
+  },
+  "raw_source": "us.county_volumes",
+  "contests": {
+    "governor": {
+      "year": 1962,
+      "chamber": "governor",
+      "day": "1962-11-06",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "senate": {
+      "year": 1962,
+      "chamber": "senate",
+      "day": "1962-11-06",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "house7": {
+      "year": 1962,
+      "chamber": "house",
+      "day": "1962-11-06",
+      "special": false,
+      "state": "WI",
+      "district": 7
+    },
+    "house1": {
+      "year": 1962,
+      "chamber": "house",
+      "day": "1962-11-06",
+      "special": false,
+      "state": "WI",
+      "district": 1
+    },
+    "house2": {
+      "year": 1962,
+      "chamber": "house",
+      "day": "1962-11-06",
+      "special": false,
+      "state": "WI",
+      "district": 2
+    },
+    "house8": {
+      "year": 1962,
+      "chamber": "house",
+      "day": "1962-11-06",
+      "special": false,
+      "state": "WI",
+      "district": 8
+    },
+    "house3": {
+      "year": 1962,
+      "chamber": "house",
+      "day": "1962-11-06",
+      "special": false,
+      "state": "WI",
+      "district": 3
+    },
+    "house9": {
+      "year": 1962,
+      "chamber": "house",
+      "day": "1962-11-06",
+      "special": false,
+      "state": "WI",
+      "district": 9
+    },
+    "house4": {
+      "year": 1962,
+      "chamber": "house",
+      "day": "1962-11-06",
+      "special": false,
+      "state": "WI",
+      "district": 4
+    },
+    "house5": {
+      "year": 1962,
+      "chamber": "house",
+      "day": "1962-11-06",
+      "special": false,
+      "state": "WI",
+      "district": 5
+    },
+    "house10": {
+      "year": 1962,
+      "chamber": "house",
+      "day": "1962-11-06",
+      "special": false,
+      "state": "WI",
+      "district": 10
+    },
+    "house6": {
+      "year": 1962,
+      "chamber": "house",
+      "day": "1962-11-06",
+      "special": false,
+      "state": "WI",
+      "district": 6
+    }
+  },
+  "pages": [
+    {
+      "page": 774,
+      "id": "774-0",
+      "columns": [
+        {
+          "label": "John W. Reynolds (Dem.)",
+          "contest": "governor",
+          "candidate": "John W. Reynolds"
+        },
+        {
+          "label": "Philip G. Kuehn (Rep.)",
+          "contest": "governor",
+          "candidate": "Philip G. Kuehn"
+        },
+        {
+          "label": "Adolf Wiggert (Ind.)",
+          "contest": "governor",
+          "candidate": "Adolf Wiggert"
+        },
+        {
+          "label": "David Carley (Dem.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Jack Olson (Rep.)",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.161,
+        0.127,
+        0.911,
+        0.892
+      ],
+      "hint": "Read only the table headed 'VOTE FOR STATE OFFICERS BY COUNTY WISCONSIN GENERAL ELECTION, November 6, 1962*'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0654
+      ]
+    },
+    {
+      "page": 776,
+      "id": "776-0",
+      "columns": [
+        {
+          "label": "Gaylord A. Nelson (Dem.)",
+          "contest": "senate",
+          "candidate": "Gaylord Nelson"
+        },
+        {
+          "label": "Alexander Wiley (Rep.)",
+          "contest": "senate",
+          "candidate": "Alexander Wiley"
+        },
+        {
+          "label": "Georgia Cozzini (Ind.)",
+          "contest": "senate",
+          "candidate": "Georgia Cozzini"
+        },
+        {
+          "label": "William Osborne Hart (Ind.)",
+          "contest": "senate",
+          "candidate": "William Osborne Hart"
+        },
+        {
+          "label": "Wayne P. Leverenz (Ind.)",
+          "contest": "senate",
+          "candidate": "Wayne P. Leverenz"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.162,
+        0.083,
+        0.913,
+        0.901
+      ],
+      "hint": "Read only the table headed 'VOTE FOR UNITED STATES SENATOR BY COUNTY WISCONSIN GENERAL ELECTION, November 6, 1962'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1088
+      ]
+    },
+    {
+      "page": 777,
+      "id": "777-0",
+      "columns": [
+        {
+          "label": "John E. Evans (Dem.)",
+          "contest": "house7",
+          "candidate": "John E. Evans"
+        },
+        {
+          "label": "Melvin R. Laird (Rep.)",
+          "contest": "house7",
+          "candidate": "Melvin R. Laird"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.462,
+        0.128,
+        0.832,
+        0.321
+      ],
+      "hint": "Read only the table headed 'Seventh District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 777,
+      "id": "777-1",
+      "columns": [
+        {
+          "label": "Gerald T. Flynn (Dem.)",
+          "contest": "house1",
+          "candidate": "Gerald T. Flynn"
+        },
+        {
+          "label": "Henry C. Schadeberg (Rep.)",
+          "contest": "house1",
+          "candidate": "Henry C. Schadeberg"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.077,
+        0.129,
+        0.45,
+        0.263
+      ],
+      "hint": "Read only the table headed 'First District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 777,
+      "id": "777-2",
+      "columns": [
+        {
+          "label": "Robert W. Kastenmeier (Dem.)",
+          "contest": "house2",
+          "candidate": "Robert W. Kastenmeier"
+        },
+        {
+          "label": "Ivan H. Kindschi (Rep.)",
+          "contest": "house2",
+          "candidate": "Ivan H. Kindschi"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.077,
+        0.255,
+        0.45,
+        0.395
+      ],
+      "hint": "Read only the table headed 'Second District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 777,
+      "id": "777-3",
+      "columns": [
+        {
+          "label": "Owen F. Monfils (Dem.)",
+          "contest": "house8",
+          "candidate": "Owen F. Monfils"
+        },
+        {
+          "label": "John W. Byrnes (Rep.)",
+          "contest": "house8",
+          "candidate": "John W. Byrnes"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.462,
+        0.313,
+        0.832,
+        0.492
+      ],
+      "hint": "Read only the table headed 'Eighth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 777,
+      "id": "777-4",
+      "columns": [
+        {
+          "label": "Walter P. Thoresen (Dem.)",
+          "contest": "house3",
+          "candidate": "Walter P. Thoresen"
+        },
+        {
+          "label": "Vernon W. Thomson (Rep.)",
+          "contest": "house3",
+          "candidate": "Vernon W. Thomson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.077,
+        0.387,
+        0.45,
+        0.575
+      ],
+      "hint": "Read only the table headed 'Third District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 777,
+      "id": "777-5",
+      "columns": [
+        {
+          "label": "Lester R. Johnson (Dem.)",
+          "contest": "house9",
+          "candidate": "Lester R. Johnson"
+        },
+        {
+          "label": "Dennis B. Danielson (Rep.)",
+          "contest": "house9",
+          "candidate": "Dennis B. Danielson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.462,
+        0.484,
+        0.832,
+        0.68
+      ],
+      "hint": "Read only the table headed 'Ninth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 777,
+      "id": "777-6",
+      "columns": [
+        {
+          "label": "Clement J. Zablocki (Dem.)",
+          "contest": "house4",
+          "candidate": "Clement J. Zablocki"
+        },
+        {
+          "label": "David F. Tillotson (Rep.)",
+          "contest": "house4",
+          "candidate": "David F. Tillotson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.077,
+        0.567,
+        0.45,
+        0.667
+      ],
+      "hint": "Read only the table headed 'Fourth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 777,
+      "id": "777-7",
+      "columns": [
+        {
+          "label": "Henry S. Reuss (Dem.)",
+          "contest": "house5",
+          "candidate": "Henry S. Reuss"
+        },
+        {
+          "label": "Thomas F. Nelson (Rep.)",
+          "contest": "house5",
+          "candidate": "Thomas F. Nelson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.077,
+        0.659,
+        0.45,
+        0.76
+      ],
+      "hint": "Read only the table headed 'Fifth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 777,
+      "id": "777-8",
+      "columns": [
+        {
+          "label": "J. Louis Hanson (Dem.)",
+          "contest": "house10",
+          "candidate": "J. Louis Hanson"
+        },
+        {
+          "label": "Alvin E. O'Konski (Rep.)",
+          "contest": "house10",
+          "candidate": "Alvin E. O'Konski"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.462,
+        0.672,
+        0.832,
+        0.892
+      ],
+      "hint": "Read only the table headed 'Tenth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 777,
+      "id": "777-9",
+      "columns": [
+        {
+          "label": "John A. Race (Dem.)",
+          "contest": "house6",
+          "candidate": "John A. Race"
+        },
+        {
+          "label": "William K. Van Pelt (Rep.)",
+          "contest": "house6",
+          "candidate": "William K. Van Pelt"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.077,
+        0.752,
+        0.45,
+        0.892
+      ],
+      "hint": "Read only the table headed 'Sixth District'; ignore any other table visible in the image."
+    }
+  ]
+}

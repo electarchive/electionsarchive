@@ -1,0 +1,454 @@
+{
+  "polity": "US-WI",
+  "publisher": "Wisconsin Legislative Reference Bureau",
+  "title": "The Wisconsin Blue Book 1952, vote by counties (general election 1950-11-07)",
+  "license": "Public record",
+  "file": {
+    "url": "https://search.library.wisc.edu/digital/A7UFC4I5EZMQLN8H",
+    "item": "https://search.library.wisc.edu/digital/A7UFC4I5EZMQLN8H"
+  },
+  "raw_source": "us.county_volumes",
+  "contests": {
+    "governor": {
+      "year": 1950,
+      "chamber": "governor",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "senate": {
+      "year": 1950,
+      "chamber": "senate",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "house1": {
+      "year": 1950,
+      "chamber": "house",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "WI",
+      "district": 1
+    },
+    "house2": {
+      "year": 1950,
+      "chamber": "house",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "WI",
+      "district": 2
+    },
+    "house3": {
+      "year": 1950,
+      "chamber": "house",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "WI",
+      "district": 3
+    },
+    "house4": {
+      "year": 1950,
+      "chamber": "house",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "WI",
+      "district": 4
+    },
+    "house5": {
+      "year": 1950,
+      "chamber": "house",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "WI",
+      "district": 5
+    },
+    "house6": {
+      "year": 1950,
+      "chamber": "house",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "WI",
+      "district": 6
+    },
+    "house7": {
+      "year": 1950,
+      "chamber": "house",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "WI",
+      "district": 7
+    },
+    "house8": {
+      "year": 1950,
+      "chamber": "house",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "WI",
+      "district": 8
+    },
+    "house9": {
+      "year": 1950,
+      "chamber": "house",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "WI",
+      "district": 9
+    },
+    "house10": {
+      "year": 1950,
+      "chamber": "house",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "WI",
+      "district": 10
+    }
+  },
+  "pages": [
+    {
+      "page": 762,
+      "id": "762-0",
+      "columns": [
+        {
+          "label": "Thompson (Dem.)",
+          "contest": "governor",
+          "candidate": "Carl W. Thompson"
+        },
+        {
+          "label": "Essin (People's Prog.)",
+          "contest": "governor",
+          "candidate": "M. Michael Essin"
+        },
+        {
+          "label": "Kohler, Jr. (Rep.)",
+          "contest": "governor",
+          "candidate": "Walter J. Jr. Kohler"
+        },
+        {
+          "label": "Hart (Soc.)",
+          "contest": "governor",
+          "candidate": "William O. Hart"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.084,
+        0.114,
+        0.84,
+        0.918
+      ],
+      "hint": "Read only the table headed 'VOTE FOR GOVERNOR BY COUNTIES November 7, 1950'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.102
+      ]
+    },
+    {
+      "page": 767,
+      "id": "767-0",
+      "columns": [
+        {
+          "label": "Thomas E. Fairchild (Dem.)",
+          "contest": "senate",
+          "candidate": "Thomas E. Fairchild"
+        },
+        {
+          "label": "James E. Boulton (Ind.)",
+          "contest": "senate",
+          "candidate": "James E. Boulton"
+        },
+        {
+          "label": "Artemio Cozzini (Ind.)",
+          "contest": "senate",
+          "candidate": "Artemio Cozzini"
+        },
+        {
+          "label": "Perry J. Stearns (Ind.)",
+          "contest": "senate",
+          "candidate": "Perry J. Stearns"
+        },
+        {
+          "label": "Alexander Wiley (Rep.)",
+          "contest": "senate",
+          "candidate": "Alexander Wiley"
+        },
+        {
+          "label": "Edwin W. Knappe (Soc.)",
+          "contest": "senate",
+          "candidate": "Edwin W. Knappe"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.149,
+        0.105,
+        0.908,
+        0.925
+      ],
+      "hint": "Read only the table headed 'VOTE FOR UNITED STATES SENATOR BY COUNTIES November 7, 1950'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1159
+      ]
+    },
+    {
+      "page": 768,
+      "id": "768-0",
+      "columns": [
+        {
+          "label": "Harvey (Dem.)",
+          "contest": "house1",
+          "candidate": "Jack Harvey"
+        },
+        {
+          "label": "Smith (Rep.)",
+          "contest": "house1",
+          "candidate": "Lawrence H. Smith"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.066,
+        0.151,
+        0.818,
+        0.316
+      ],
+      "hint": "Read only the table headed 'First District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 768,
+      "id": "768-1",
+      "columns": [
+        {
+          "label": "Wilkie (Dem.)",
+          "contest": "house2",
+          "candidate": "Horace W. Wilkie"
+        },
+        {
+          "label": "Davis (Rep.)",
+          "contest": "house2",
+          "candidate": "Glenn R. Davis"
+        },
+        {
+          "label": "Sadowsky (Soc.)",
+          "contest": "house2",
+          "candidate": "Nathan Sadowsky"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.066,
+        0.308,
+        0.818,
+        0.478
+      ],
+      "hint": "Read only the table headed 'Second District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 768,
+      "id": "768-2",
+      "columns": [
+        {
+          "label": "Lucey (Dem.)",
+          "contest": "house3",
+          "candidate": "Patrick J. Lucey"
+        },
+        {
+          "label": "Withrow (Rep.)",
+          "contest": "house3",
+          "candidate": "Gardner R. Withrow"
+        },
+        {
+          "label": "Alexander (Soc.)",
+          "contest": "house3",
+          "candidate": "Walter Alexander"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.066,
+        0.47,
+        0.818,
+        0.684
+      ],
+      "hint": "Read only the table headed 'Third District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 768,
+      "id": "768-3",
+      "columns": [
+        {
+          "label": "Zablocki (Dem.)",
+          "contest": "house4",
+          "candidate": "Clement J. Zablocki"
+        },
+        {
+          "label": "Brophy (Rep.)",
+          "contest": "house4",
+          "candidate": "John C. Brophy"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.066,
+        0.676,
+        0.818,
+        0.802
+      ],
+      "hint": "Read only the table headed 'Fourth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 768,
+      "id": "768-4",
+      "columns": [
+        {
+          "label": "Biemiller (Dem.)",
+          "contest": "house5",
+          "candidate": "Andrew J. Biemiller"
+        },
+        {
+          "label": "Kersten (Rep.)",
+          "contest": "house5",
+          "candidate": "Charles J. Kersten"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.066,
+        0.794,
+        0.818,
+        0.911
+      ],
+      "hint": "Read only the table headed 'Fifth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 769,
+      "id": "769-0",
+      "columns": [
+        {
+          "label": "Kunde (Dem.)",
+          "contest": "house6",
+          "candidate": "Kenneth Kunde"
+        },
+        {
+          "label": "Van Pelt (Rep.)",
+          "contest": "house6",
+          "candidate": "William K. Van Pelt"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.177,
+        0.142,
+        0.934,
+        0.305
+      ],
+      "hint": "Read only the table headed 'Sixth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 769,
+      "id": "769-1",
+      "columns": [
+        {
+          "label": "Gilbertson (Dem.)",
+          "contest": "house7",
+          "candidate": "Edward G. Gilbertson"
+        },
+        {
+          "label": "Murray (Rep.)",
+          "contest": "house7",
+          "candidate": "Reid F. Murray"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.177,
+        0.297,
+        0.931,
+        0.505
+      ],
+      "hint": "Read only the table headed 'Seventh District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 769,
+      "id": "769-2",
+      "columns": [
+        {
+          "label": "Reynolds, Jr. (Dem.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Byrnes (Rep.)",
+          "contest": "house8",
+          "candidate": "John W. Byrnes"
+        },
+        {
+          "label": "Schaal (Soc.)",
+          "contest": "house8",
+          "candidate": "Lee Schaal"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.177,
+        0.497,
+        0.931,
+        0.695
+      ],
+      "hint": "Read only the table headed 'Eighth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 769,
+      "id": "769-3",
+      "columns": [
+        {
+          "label": "Henning (Dem.)",
+          "contest": "house9",
+          "candidate": "Arthur L. Henning"
+        },
+        {
+          "label": "Hull (Rep.)",
+          "contest": "house9",
+          "candidate": "Merlin Hull"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.177,
+        0.687,
+        0.931,
+        0.898
+      ],
+      "hint": "Read only the table headed 'Ninth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 770,
+      "id": "770-0",
+      "columns": [
+        {
+          "label": "Edwards (Dem.)",
+          "contest": "house10",
+          "candidate": "Rodney J. Edwards"
+        },
+        {
+          "label": "O'Konski (Rep.)",
+          "contest": "house10",
+          "candidate": "Alvin E. O'Konski"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.075,
+        0.166,
+        0.829,
+        0.404
+      ],
+      "hint": "Read only the table headed 'Tenth District'; ignore any other table visible in the image."
+    }
+  ]
+}

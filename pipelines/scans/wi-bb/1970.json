@@ -1,0 +1,489 @@
+{
+  "polity": "US-WI",
+  "publisher": "Wisconsin Legislative Reference Bureau",
+  "title": "The Wisconsin Blue Book 1971, vote by counties (general election 1970-11-03)",
+  "license": "Public record",
+  "file": {
+    "url": "https://search.library.wisc.edu/digital/A4QZIH6JIJYFLR8R",
+    "item": "https://search.library.wisc.edu/digital/A4QZIH6JIJYFLR8R"
+  },
+  "raw_source": "us.county_volumes",
+  "contests": {
+    "governor": {
+      "year": 1970,
+      "chamber": "governor",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "senate": {
+      "year": 1970,
+      "chamber": "senate",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "house1": {
+      "year": 1970,
+      "chamber": "house",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "WI",
+      "district": 1
+    },
+    "house2": {
+      "year": 1970,
+      "chamber": "house",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "WI",
+      "district": 2
+    },
+    "house3": {
+      "year": 1970,
+      "chamber": "house",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "WI",
+      "district": 3
+    },
+    "house4": {
+      "year": 1970,
+      "chamber": "house",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "WI",
+      "district": 4
+    },
+    "house5": {
+      "year": 1970,
+      "chamber": "house",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "WI",
+      "district": 5
+    },
+    "house6": {
+      "year": 1970,
+      "chamber": "house",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "WI",
+      "district": 6
+    },
+    "house7": {
+      "year": 1970,
+      "chamber": "house",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "WI",
+      "district": 7
+    },
+    "house8": {
+      "year": 1970,
+      "chamber": "house",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "WI",
+      "district": 8
+    },
+    "house9": {
+      "year": 1970,
+      "chamber": "house",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "WI",
+      "district": 9
+    },
+    "house10": {
+      "year": 1970,
+      "chamber": "house",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "WI",
+      "district": 10
+    }
+  },
+  "pages": [
+    {
+      "page": 323,
+      "id": "323-0",
+      "columns": [
+        {
+          "label": "McDonald & Kothe (Amer.)",
+          "contest": "governor",
+          "candidate": "Leo James McDonald"
+        },
+        {
+          "label": "Lucey & Schreiber (Dem.)",
+          "contest": "governor",
+          "candidate": "Patrick J. Lucey"
+        },
+        {
+          "label": "Olson & Martin (Rep.)",
+          "contest": "governor",
+          "candidate": "Jack B. Olson"
+        },
+        {
+          "label": "Cozzini & Kitchen (Ind.)",
+          "contest": "governor",
+          "candidate": "Georgia Cozzini"
+        },
+        {
+          "label": "Hunt & Kohlenberg (Ind.)",
+          "contest": "governor",
+          "candidate": "Samuel K. Hunt"
+        },
+        {
+          "label": "Kastner & Chabot (Ind.)",
+          "contest": "governor",
+          "candidate": "Myrtle Kastner"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.172,
+        0.156,
+        0.918,
+        0.919
+      ],
+      "hint": "Read only the table headed 'Governor and Lieutenant Governor'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0734
+      ]
+    },
+    {
+      "page": 326,
+      "id": "326-0",
+      "columns": [
+        {
+          "label": "Edmond E. Hou-Seye (Amer.)",
+          "contest": "senate",
+          "candidate": "Edmond E. Hou-Seye"
+        },
+        {
+          "label": "William Proxmire (Dem.)",
+          "contest": "senate",
+          "candidate": "William Proxmire"
+        },
+        {
+          "label": "John E. Erickson (Rep.)",
+          "contest": "senate",
+          "candidate": "John E. Erickson"
+        },
+        {
+          "label": "Elizabeth Boardman (Ind.)",
+          "contest": "senate",
+          "candidate": "Elizabeth (Betty) Boardman"
+        },
+        {
+          "label": "Martha Quinn (Ind.)",
+          "contest": "senate",
+          "candidate": "Martha M. Quinn"
+        },
+        {
+          "label": "Adolf Wiggert (Ind.)",
+          "contest": "senate",
+          "candidate": "Adolf Wiggers"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.077,
+        0.146,
+        0.828,
+        0.934
+      ],
+      "hint": "Read only the table headed 'VOTE FOR UNITED STATES SENATOR BY COUNTY*'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0863
+      ]
+    },
+    {
+      "page": 327,
+      "id": "327-0",
+      "columns": [
+        {
+          "label": "Les Aspin (Dem.)",
+          "contest": "house1",
+          "candidate": "Les Aspin"
+        },
+        {
+          "label": "Henry C. Schadeberg (Rep.)",
+          "contest": "house1",
+          "candidate": "Henry C. Schadeberg"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.168,
+        0.18,
+        0.92,
+        0.342
+      ],
+      "hint": "Read only the table headed 'First District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 327,
+      "id": "327-1",
+      "columns": [
+        {
+          "label": "Lavern F. Krohn (Amer.)",
+          "contest": "house2",
+          "candidate": "Lavern F. Krohn"
+        },
+        {
+          "label": "Robert W. Kastenmeier (Dem.)",
+          "contest": "house2",
+          "candidate": "Robert W. Kastenmeier"
+        },
+        {
+          "label": "Norman Anderson (Rep.)",
+          "contest": "house2",
+          "candidate": "Norman Anderson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.168,
+        0.334,
+        0.92,
+        0.529
+      ],
+      "hint": "Read only the table headed 'Second District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 327,
+      "id": "327-2",
+      "columns": [
+        {
+          "label": "Ray Short (Dem.)",
+          "contest": "house3",
+          "candidate": "Ray Short"
+        },
+        {
+          "label": "Vernon W. Thomson (Rep.)",
+          "contest": "house3",
+          "candidate": "Vernon W. Thomson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.168,
+        0.521,
+        0.92,
+        0.809
+      ],
+      "hint": "Read only the table headed 'Third District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 327,
+      "id": "327-3",
+      "columns": [
+        {
+          "label": "John A. Zierhut (Amer.)",
+          "contest": "house4",
+          "candidate": "John A. Zierhut"
+        },
+        {
+          "label": "Clement J. Zablocki (Dem.)",
+          "contest": "house4",
+          "candidate": "Clement J. Zablocki"
+        },
+        {
+          "label": "Phillip D. Mrozinski (Rep.)",
+          "contest": "house4",
+          "candidate": "Phillip D. Mrozinski"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.168,
+        0.801,
+        0.92,
+        0.934
+      ],
+      "hint": "Read only the table headed 'Fourth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 328,
+      "id": "328-0",
+      "columns": [
+        {
+          "label": "Earl R. Denny (Amer.)",
+          "contest": "house5",
+          "candidate": "Earl R. Denny"
+        },
+        {
+          "label": "Henry S. Reuss (Dem.)",
+          "contest": "house5",
+          "candidate": "Henry S. Reuss"
+        },
+        {
+          "label": "Robert J. Dwyer (Rep.)",
+          "contest": "house5",
+          "candidate": "Robert J. Dwyer"
+        },
+        {
+          "label": "James E. Boulton (Ind.)",
+          "contest": "house5",
+          "candidate": "James E. Boulton"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.08,
+        0.196,
+        0.83,
+        0.38
+      ],
+      "hint": "Read only the table headed 'Fifth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 328,
+      "id": "328-1",
+      "columns": [
+        {
+          "label": "Rani V. Davidson (Amer.)",
+          "contest": "house6",
+          "candidate": "Rani V. Davidson"
+        },
+        {
+          "label": "Franklin R. Utech (Dem.)",
+          "contest": "house6",
+          "candidate": "Franklin R. Utech"
+        },
+        {
+          "label": "William A. Steiger (Rep.)",
+          "contest": "house6",
+          "candidate": "William A. Steiger"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.08,
+        0.372,
+        0.83,
+        0.653
+      ],
+      "hint": "Read only the table headed 'Sixth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 328,
+      "id": "328-2",
+      "columns": [
+        {
+          "label": "Richard D. Wolfe (Amer.)",
+          "contest": "house7",
+          "candidate": "Richard D. Wolfe"
+        },
+        {
+          "label": "David R. Obey (Dem.)",
+          "contest": "house7",
+          "candidate": "David R. Obey"
+        },
+        {
+          "label": "Andre' E. Le Tendre (Rep.)",
+          "contest": "house7",
+          "candidate": "Andr\u00e9 E. Le Tendre"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.08,
+        0.645,
+        0.83,
+        0.945
+      ],
+      "hint": "Read only the table headed 'Seventh District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 329,
+      "id": "329-0",
+      "columns": [
+        {
+          "label": "Joseph W. Dery (Amer.)",
+          "contest": "house8",
+          "candidate": "Joseph W. Dery"
+        },
+        {
+          "label": "Robert J. Cornell (Dem.)",
+          "contest": "house8",
+          "candidate": "Robert J. Cornell"
+        },
+        {
+          "label": "John W. Byrnes (Rep.)",
+          "contest": "house8",
+          "candidate": "John W. Byrnes"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.163,
+        0.191,
+        0.915,
+        0.412
+      ],
+      "hint": "Read only the table headed 'Eighth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 329,
+      "id": "329-1",
+      "columns": [
+        {
+          "label": "Fred N. Tabak (Dem.)",
+          "contest": "house9",
+          "candidate": "Fred N. Tabak"
+        },
+        {
+          "label": "Glenn R. Davis (Rep.)",
+          "contest": "house9",
+          "candidate": "Glenn R. Davis"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.163,
+        0.404,
+        0.915,
+        0.633
+      ],
+      "hint": "Read only the table headed 'Ninth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 329,
+      "id": "329-2",
+      "columns": [
+        {
+          "label": "William Hable (Amer.)",
+          "contest": "house10",
+          "candidate": "William Hable"
+        },
+        {
+          "label": "Walter Thoresen (Dem.)",
+          "contest": "house10",
+          "candidate": "Walter Thoresen"
+        },
+        {
+          "label": "Alvin E. O'Konski (Rep.)",
+          "contest": "house10",
+          "candidate": "Alvin E. O'Konski"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.163,
+        0.625,
+        0.915,
+        0.936
+      ],
+      "hint": "Read only the table headed 'Tenth District'; ignore any other table visible in the image."
+    }
+  ]
+}

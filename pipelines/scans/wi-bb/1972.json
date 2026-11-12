@@ -1,0 +1,410 @@
+{
+  "polity": "US-WI",
+  "publisher": "Wisconsin Legislative Reference Bureau",
+  "title": "The Wisconsin Blue Book 1973, vote by counties (general election 1972-11-07)",
+  "license": "Public record",
+  "file": {
+    "url": "https://search.library.wisc.edu/digital/AZKQZSCWLXXUFN8R",
+    "item": "https://search.library.wisc.edu/digital/AZKQZSCWLXXUFN8R"
+  },
+  "raw_source": "us.county_volumes",
+  "contests": {
+    "president": {
+      "year": 1972,
+      "chamber": "president",
+      "day": "1972-11-07",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "house1": {
+      "year": 1972,
+      "chamber": "house",
+      "day": "1972-11-07",
+      "special": false,
+      "state": "WI",
+      "district": 1
+    },
+    "house2": {
+      "year": 1972,
+      "chamber": "house",
+      "day": "1972-11-07",
+      "special": false,
+      "state": "WI",
+      "district": 2
+    },
+    "house3": {
+      "year": 1972,
+      "chamber": "house",
+      "day": "1972-11-07",
+      "special": false,
+      "state": "WI",
+      "district": 3
+    },
+    "house4": {
+      "year": 1972,
+      "chamber": "house",
+      "day": "1972-11-07",
+      "special": false,
+      "state": "WI",
+      "district": 4
+    },
+    "house5": {
+      "year": 1972,
+      "chamber": "house",
+      "day": "1972-11-07",
+      "special": false,
+      "state": "WI",
+      "district": 5
+    },
+    "house6": {
+      "year": 1972,
+      "chamber": "house",
+      "day": "1972-11-07",
+      "special": false,
+      "state": "WI",
+      "district": 6
+    },
+    "house7": {
+      "year": 1972,
+      "chamber": "house",
+      "day": "1972-11-07",
+      "special": false,
+      "state": "WI",
+      "district": 7
+    },
+    "house8": {
+      "year": 1972,
+      "chamber": "house",
+      "day": "1972-11-07",
+      "special": false,
+      "state": "WI",
+      "district": 8
+    },
+    "house9": {
+      "year": 1972,
+      "chamber": "house",
+      "day": "1972-11-07",
+      "special": false,
+      "state": "WI",
+      "district": 9
+    }
+  },
+  "pages": [
+    {
+      "page": 834,
+      "id": "834-0",
+      "columns": [
+        {
+          "label": "Schmitz and Anderson (Amer.)",
+          "contest": "president",
+          "candidate": "Schmitz (American Independent)"
+        },
+        {
+          "label": "McGovern and Shriver (Dem.)",
+          "contest": "president",
+          "candidate": "McGovern (Democratic)"
+        },
+        {
+          "label": "Nixon and Agnew (Rep.)",
+          "contest": "president",
+          "candidate": "Nixon (Republican)"
+        },
+        {
+          "label": "Fisher and Gunderson (Ind.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Hall and Tyner (Ind.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Reed and DeBerry (Ind.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Spock and Hobson (Ind.)",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.094,
+        0.099,
+        0.867,
+        0.902
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENT AND VICE PRESIDENT BY COUNTY*'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1071
+      ]
+    },
+    {
+      "page": 835,
+      "id": "835-0",
+      "columns": [
+        {
+          "label": "Charles J. Fortner (Amer.)",
+          "contest": "house1",
+          "candidate": "Charles J. Fortner"
+        },
+        {
+          "label": "Les Aspin (Dem.)",
+          "contest": "house1",
+          "candidate": "Les Aspin"
+        },
+        {
+          "label": "Merrill E. Stalbaum (Rep.)",
+          "contest": "house1",
+          "candidate": "Merrill E. Stalbaum"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.159,
+        0.143,
+        0.908,
+        0.322
+      ],
+      "hint": "Read only the table headed 'First District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 835,
+      "id": "835-1",
+      "columns": [
+        {
+          "label": "Lavern F. Krohn (Amer.)",
+          "contest": "house2",
+          "candidate": "Lavern F. Krohn"
+        },
+        {
+          "label": "Robert W. Kastenmeier (Dem.)",
+          "contest": "house2",
+          "candidate": "Robert W. Kastenmeier"
+        },
+        {
+          "label": "J. Michael Kelly (Rep.)",
+          "contest": "house2",
+          "candidate": "J. Michael Kelly"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.154,
+        0.314,
+        0.908,
+        0.531
+      ],
+      "hint": "Read only the table headed 'Second District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 835,
+      "id": "835-2",
+      "columns": [
+        {
+          "label": "Keith Ellison (Amer.)",
+          "contest": "house3",
+          "candidate": "Keith Ellison"
+        },
+        {
+          "label": "Walter Thoresen (Dem.)",
+          "contest": "house3",
+          "candidate": "Walter Thoresen"
+        },
+        {
+          "label": "Vernon W. Thomson (Rep.)",
+          "contest": "house3",
+          "candidate": "Vernon W. Thomson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.142,
+        0.523,
+        0.908,
+        0.803
+      ],
+      "hint": "Read only the table headed 'Third District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 836,
+      "id": "836-0",
+      "columns": [
+        {
+          "label": "Eugene Annell (Amer.)",
+          "contest": "house4",
+          "candidate": "Eugene Annell"
+        },
+        {
+          "label": "Clement J. Zablocki (Dem.)",
+          "contest": "house4",
+          "candidate": "Clement J. Zablocki"
+        },
+        {
+          "label": "Phillip D. Mrozinski (Rep.)",
+          "contest": "house4",
+          "candidate": "Phillip D. Mrozinski"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.092,
+        0.167,
+        0.846,
+        0.327
+      ],
+      "hint": "Read only the table headed 'Fourth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 836,
+      "id": "836-1",
+      "columns": [
+        {
+          "label": "George Sprague (Amer.)",
+          "contest": "house5",
+          "candidate": "George Sprague"
+        },
+        {
+          "label": "Henry S. Reuss (Dem.)",
+          "contest": "house5",
+          "candidate": "Henry S. Reuss"
+        },
+        {
+          "label": "Frederick Van Hecke (Rep.)",
+          "contest": "house5",
+          "candidate": "Frederick Van Hecke"
+        },
+        {
+          "label": "R. Julian Chapman (Ind.)",
+          "contest": "house5",
+          "candidate": "R. Julian Chapman"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.097,
+        0.319,
+        0.852,
+        0.519
+      ],
+      "hint": "Read only the table headed 'Fifth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 836,
+      "id": "836-2",
+      "columns": [
+        {
+          "label": "Valeria M. Sitter (Amer.)",
+          "contest": "house6",
+          "candidate": "Valeria M. Sitter"
+        },
+        {
+          "label": "James A. Adams (Dem.)",
+          "contest": "house6",
+          "candidate": "James A. Adams"
+        },
+        {
+          "label": "William A. Steiger (Rep.)",
+          "contest": "house6",
+          "candidate": "William A. Steiger"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.101,
+        0.511,
+        0.862,
+        0.77
+      ],
+      "hint": "Read only the table headed 'Sixth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 837,
+      "id": "837-0",
+      "columns": [
+        {
+          "label": "David R. Obey (Dem.)",
+          "contest": "house7",
+          "candidate": "David R. Obey"
+        },
+        {
+          "label": "Alvin E. O'Konski (Rep.)",
+          "contest": "house7",
+          "candidate": "Alvin E. O'Konski"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.163,
+        0.161,
+        0.915,
+        0.44
+      ],
+      "hint": "Read only the table headed 'Seventh District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 837,
+      "id": "837-1",
+      "columns": [
+        {
+          "label": "Clyde Bunker (Amer.)",
+          "contest": "house8",
+          "candidate": "Clyde Bunker"
+        },
+        {
+          "label": "Robert J. Cornell (Dem.)",
+          "contest": "house8",
+          "candidate": "Robert J. Cornell"
+        },
+        {
+          "label": "Harold V. Froehlich (Rep.)",
+          "contest": "house8",
+          "candidate": "Harold V. Froehlich"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.154,
+        0.432,
+        0.908,
+        0.699
+      ],
+      "hint": "Read only the table headed 'Eighth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 837,
+      "id": "837-2",
+      "columns": [
+        {
+          "label": "George Reed (Amer.)",
+          "contest": "house9",
+          "candidate": "George Reed"
+        },
+        {
+          "label": "Ralph A. Fine (Dem.)",
+          "contest": "house9",
+          "candidate": "Ralph A. Fine"
+        },
+        {
+          "label": "Glenn R. Davis (Rep.)",
+          "contest": "house9",
+          "candidate": "Glenn R. Davis"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.148,
+        0.691,
+        0.901,
+        0.859
+      ],
+      "hint": "Read only the table headed 'Ninth District'; ignore any other table visible in the image."
+    }
+  ]
+}

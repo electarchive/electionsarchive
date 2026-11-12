@@ -1,0 +1,558 @@
+{
+  "polity": "US-WI",
+  "publisher": "Wisconsin Legislative Reference Bureau",
+  "title": "The Wisconsin Blue Book 1937, vote by counties (general election 1936-11-03)",
+  "license": "Public record",
+  "file": {
+    "url": "https://search.library.wisc.edu/digital/AXHRYO3YEVDUIK8X",
+    "item": "https://search.library.wisc.edu/digital/AXHRYO3YEVDUIK8X"
+  },
+  "raw_source": "us.county_volumes",
+  "contests": {
+    "president": {
+      "year": 1936,
+      "chamber": "president",
+      "day": "1936-11-03",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "governor": {
+      "year": 1936,
+      "chamber": "governor",
+      "day": "1936-11-03",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "house1": {
+      "year": 1936,
+      "chamber": "house",
+      "day": "1936-11-03",
+      "special": false,
+      "state": "WI",
+      "district": 1
+    },
+    "house2": {
+      "year": 1936,
+      "chamber": "house",
+      "day": "1936-11-03",
+      "special": false,
+      "state": "WI",
+      "district": 2
+    },
+    "house3": {
+      "year": 1936,
+      "chamber": "house",
+      "day": "1936-11-03",
+      "special": false,
+      "state": "WI",
+      "district": 3
+    },
+    "house4": {
+      "year": 1936,
+      "chamber": "house",
+      "day": "1936-11-03",
+      "special": false,
+      "state": "WI",
+      "district": 4
+    },
+    "house5": {
+      "year": 1936,
+      "chamber": "house",
+      "day": "1936-11-03",
+      "special": false,
+      "state": "WI",
+      "district": 5
+    },
+    "house6": {
+      "year": 1936,
+      "chamber": "house",
+      "day": "1936-11-03",
+      "special": false,
+      "state": "WI",
+      "district": 6
+    },
+    "house7": {
+      "year": 1936,
+      "chamber": "house",
+      "day": "1936-11-03",
+      "special": false,
+      "state": "WI",
+      "district": 7
+    },
+    "house8": {
+      "year": 1936,
+      "chamber": "house",
+      "day": "1936-11-03",
+      "special": false,
+      "state": "WI",
+      "district": 8
+    },
+    "house9": {
+      "year": 1936,
+      "chamber": "house",
+      "day": "1936-11-03",
+      "special": false,
+      "state": "WI",
+      "district": 9
+    },
+    "house10": {
+      "year": 1936,
+      "chamber": "house",
+      "day": "1936-11-03",
+      "special": false,
+      "state": "WI",
+      "district": 10
+    }
+  },
+  "pages": [
+    {
+      "page": 440,
+      "id": "440-0",
+      "columns": [
+        {
+          "label": "Roosevelt and Garner (Dem.)",
+          "contest": "president",
+          "candidate": "Franklin D. Roosevelt (Democratic)"
+        },
+        {
+          "label": "Landon and Knox (Rep.)",
+          "contest": "president",
+          "candidate": "Alfred Landon (Republican)"
+        },
+        {
+          "label": "Browder and Ford (Com.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Colvin and Watson (Proh.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Thomas and Nelson (Soc.)",
+          "contest": "president",
+          "candidate": "Norman Thomas (Socialist)"
+        },
+        {
+          "label": "Aiken and Teichert (Soc. Lab.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Lemke and O'Brien (Union)",
+          "contest": "president",
+          "candidate": "William Lemke (Union)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.145,
+        0.128,
+        0.962,
+        0.934
+      ],
+      "hint": "Read only the table headed 'SUMMARY VOTE FOR PRESIDENT BY COUNTIES'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1191
+      ]
+    },
+    {
+      "page": 442,
+      "id": "442-0",
+      "columns": [
+        {
+          "label": "Roosevelt (Dem.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Landon (Rep.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Lemke (Union)",
+          "contest": "president",
+          "candidate": "William Lemke (Union)"
+        },
+        {
+          "label": "Thomas (Soc.)",
+          "contest": "president",
+          "candidate": "Norman Thomas (Socialist)"
+        },
+        {
+          "label": "Browder (Com.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Roosevelt (Dem.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Landon (Rep.)",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.031,
+        0.237,
+        0.844,
+        0.794
+      ],
+      "hint": "Read only the table headed 'PRESIDENTIAL ELECTION, 1936 By States'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1095
+      ]
+    },
+    {
+      "page": 443,
+      "id": "443-0",
+      "columns": [
+        {
+          "label": "Lueck (Dem.)",
+          "contest": "governor",
+          "candidate": "Arthur W. Lueck"
+        },
+        {
+          "label": "La Follette (Prog.)",
+          "contest": "governor",
+          "candidate": "Philip La Follette"
+        },
+        {
+          "label": "Wiley (Rep.)",
+          "contest": "governor",
+          "candidate": "Alexander Wiley"
+        },
+        {
+          "label": "Fehlandt (Proh.)",
+          "contest": "governor",
+          "candidate": "August F. Fehlandt"
+        },
+        {
+          "label": "Joe Ehrhardt (Soc. Lab.)",
+          "contest": "governor",
+          "candidate": "Joseph Ehrhardt"
+        },
+        {
+          "label": "Walsh (Union)",
+          "contest": "governor",
+          "candidate": "Joseph F. Walsh"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.161,
+        0.131,
+        0.971,
+        0.934
+      ],
+      "hint": "Read only the table headed 'SUMMARY VOTE FOR GOVERNOR BY COUNTIES November 1936'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1108
+      ]
+    },
+    {
+      "page": 448,
+      "id": "448-0",
+      "columns": [
+        {
+          "label": "Wolf (Dem.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Amlie (Prog.)",
+          "contest": "house1",
+          "candidate": "Thomas R. Amlie"
+        },
+        {
+          "label": "Jorgensen (Rep.)",
+          "contest": "house1",
+          "candidate": "Paul E. Jorgensen"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.066,
+        0.212,
+        0.817,
+        0.404
+      ],
+      "hint": "Read only the table headed 'FIRST DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 448,
+      "id": "448-1",
+      "columns": [
+        {
+          "label": "Dempsey (Dem.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Sauthoff (Prog.)",
+          "contest": "house2",
+          "candidate": "Harry Sauthoff"
+        },
+        {
+          "label": "Bentley (Rep.)",
+          "contest": "house2",
+          "candidate": "Frank R. Bentley"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.066,
+        0.396,
+        0.817,
+        0.613
+      ],
+      "hint": "Read only the table headed 'SECOND DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 448,
+      "id": "448-2",
+      "columns": [
+        {
+          "label": "McGonigle (Dem.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Withrow (Prog.)",
+          "contest": "house3",
+          "candidate": "Gardner R. Withrow"
+        },
+        {
+          "label": "Pile (Rep.)",
+          "contest": "house3",
+          "candidate": "J. Charles Pile"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.07,
+        0.605,
+        0.823,
+        0.841
+      ],
+      "hint": "Read only the table headed 'THIRD DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 449,
+      "id": "449-0",
+      "columns": [
+        {
+          "label": "Cannon (Dem.)",
+          "contest": "house4",
+          "candidate": "Raymond J. Cannon"
+        },
+        {
+          "label": "Gauer (Prog.)",
+          "contest": "house4",
+          "candidate": "Paul Gauer"
+        },
+        {
+          "label": "Schafer (Rep.)",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.182,
+        0.187,
+        0.936,
+        0.324
+      ],
+      "hint": "Read only the table headed 'FOURTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 449,
+      "id": "449-1",
+      "columns": [
+        {
+          "label": "O'Malley (Dem.)",
+          "contest": "house5",
+          "candidate": "Thomas O'Malley"
+        },
+        {
+          "label": "Dietz (Prog.)",
+          "contest": "house5",
+          "candidate": "Carl P. Dietz"
+        },
+        {
+          "label": "Spence (Rep.)",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.182,
+        0.316,
+        0.934,
+        0.484
+      ],
+      "hint": "Read only the table headed 'FIFTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 449,
+      "id": "449-2",
+      "columns": [
+        {
+          "label": "Reilly (Dem.)",
+          "contest": "house6",
+          "candidate": "Michael K. Reilly"
+        },
+        {
+          "label": "Poltl (Prog.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Keefe (Rep.)",
+          "contest": "house6",
+          "candidate": "Frank B. Keefe"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.182,
+        0.476,
+        0.931,
+        0.697
+      ],
+      "hint": "Read only the table headed 'SIXTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 449,
+      "id": "449-3",
+      "columns": [
+        {
+          "label": "Coleman (Dem.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Boileau (Prog.)",
+          "contest": "house7",
+          "candidate": "Gerald J. Boileau"
+        },
+        {
+          "label": "Prehn (Rep.)",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.177,
+        0.689,
+        0.931,
+        0.915
+      ],
+      "hint": "Read only the table headed 'SEVENTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 450,
+      "id": "450-0",
+      "columns": [
+        {
+          "label": "Cashman (Dem.)",
+          "contest": "house8",
+          "candidate": "John E. Cashman"
+        },
+        {
+          "label": "Schneider (Prog.)",
+          "contest": "house8",
+          "candidate": "George J. Schneider"
+        },
+        {
+          "label": "Farrell (Rep.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Weber (Ind.)",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.073,
+        0.172,
+        0.828,
+        0.395
+      ],
+      "hint": "Read only the table headed 'EIGHTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 450,
+      "id": "450-1",
+      "columns": [
+        {
+          "label": "Larkin (Dem.)",
+          "contest": "house9",
+          "candidate": "Edwin J. Larkin"
+        },
+        {
+          "label": "Hull (Prog.)",
+          "contest": "house9",
+          "candidate": "Merlin Hull"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.077,
+        0.387,
+        0.83,
+        0.646
+      ],
+      "hint": "Read only the table headed 'NINTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 450,
+      "id": "450-2",
+      "columns": [
+        {
+          "label": "Bostrom (Dem.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Gehrmann (Prog.)",
+          "contest": "house10",
+          "candidate": "Bernard J. Gehrmann"
+        },
+        {
+          "label": "Nelson (Rep.)",
+          "contest": "house10",
+          "candidate": "Philip E. Nelson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.085,
+        0.638,
+        0.832,
+        0.897
+      ],
+      "hint": "Read only the table headed 'TENTH DISTRICT'; ignore any other table visible in the image."
+    }
+  ]
+}

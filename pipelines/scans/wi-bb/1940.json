@@ -1,0 +1,595 @@
+{
+  "polity": "US-WI",
+  "publisher": "Wisconsin Legislative Reference Bureau",
+  "title": "The Wisconsin Blue Book 1942, vote by counties (general election 1940-11-05)",
+  "license": "Public record",
+  "file": {
+    "url": "https://search.library.wisc.edu/digital/AGPUOJWPI5SXM38W",
+    "item": "https://search.library.wisc.edu/digital/AGPUOJWPI5SXM38W"
+  },
+  "raw_source": "us.county_volumes",
+  "contests": {
+    "president": {
+      "year": 1940,
+      "chamber": "president",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "governor": {
+      "year": 1940,
+      "chamber": "governor",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "senate": {
+      "year": 1940,
+      "chamber": "senate",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "house1": {
+      "year": 1940,
+      "chamber": "house",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "WI",
+      "district": 1
+    },
+    "house2": {
+      "year": 1940,
+      "chamber": "house",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "WI",
+      "district": 2
+    },
+    "house3": {
+      "year": 1940,
+      "chamber": "house",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "WI",
+      "district": 3
+    },
+    "house4": {
+      "year": 1940,
+      "chamber": "house",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "WI",
+      "district": 4
+    },
+    "house5": {
+      "year": 1940,
+      "chamber": "house",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "WI",
+      "district": 5
+    },
+    "house6": {
+      "year": 1940,
+      "chamber": "house",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "WI",
+      "district": 6
+    },
+    "house7": {
+      "year": 1940,
+      "chamber": "house",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "WI",
+      "district": 7
+    },
+    "house8": {
+      "year": 1940,
+      "chamber": "house",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "WI",
+      "district": 8
+    },
+    "house9": {
+      "year": 1940,
+      "chamber": "house",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "WI",
+      "district": 9
+    },
+    "house10": {
+      "year": 1940,
+      "chamber": "house",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "WI",
+      "district": 10
+    }
+  },
+  "pages": [
+    {
+      "page": 677,
+      "id": "677-0",
+      "columns": [
+        {
+          "label": "Roosevelt and Wallace (Dem.)",
+          "contest": "president",
+          "candidate": "Franklin D. Roosevelt (Democratic)"
+        },
+        {
+          "label": "Willkie and McNary (Rep.)",
+          "contest": "president",
+          "candidate": "Wendell Willkie (Republican)"
+        },
+        {
+          "label": "Browder and Ford (Com.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Babson and Moorman (Proh.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Thomas and Krueger (Soc.)",
+          "contest": "president",
+          "candidate": "Norman Thomas (Socialist)"
+        },
+        {
+          "label": "Aiken and Orange (Soc. Lab.)",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.148,
+        0.073,
+        0.876,
+        0.892
+      ],
+      "hint": "Read only the table headed 'SUMMARY VOTE FOR PRESIDENT BY COUNTIES November 1940'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1136
+      ]
+    },
+    {
+      "page": 678,
+      "id": "678-0",
+      "columns": [
+        {
+          "label": "Roosevelt (Dem.)",
+          "contest": "president",
+          "candidate": "Franklin D. Roosevelt (Democratic)"
+        },
+        {
+          "label": "Willkie (Rep.)",
+          "contest": "president",
+          "candidate": "Wendell Willkie (Republican)"
+        },
+        {
+          "label": "Thomas (Soc.)",
+          "contest": "president",
+          "candidate": "Norman Thomas (Socialist)"
+        },
+        {
+          "label": "Babson (Proh.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Browder (Com.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Roosevelt (Dem.) electoral",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Willkie (Rep.) electoral",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.078,
+        0.157,
+        0.875,
+        0.757
+      ],
+      "hint": "Read only the table headed 'PRESIDENTIAL ELECTION, 1940 By States'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1367
+      ]
+    },
+    {
+      "page": 679,
+      "id": "679-0",
+      "columns": [
+        {
+          "label": "McGovern (Dem.)",
+          "contest": "governor",
+          "candidate": "Francis E. McGovern"
+        },
+        {
+          "label": "Loomis (Prog.)",
+          "contest": "governor",
+          "candidate": "Orland S. Loomis"
+        },
+        {
+          "label": "Heil (Rep.)",
+          "contest": "governor",
+          "candidate": "Julius P. Heil"
+        },
+        {
+          "label": "Blair (Com.)",
+          "contest": "governor",
+          "candidate": "Fred Basset Blair"
+        },
+        {
+          "label": "Fisher (Soc. Lab.)",
+          "contest": "governor",
+          "candidate": "Louis Fisher"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.166,
+        0.121,
+        0.892,
+        0.896
+      ],
+      "hint": "Read only the table headed 'SUMMARY VOTE FOR GOVERNOR BY COUNTIES'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0555
+      ]
+    },
+    {
+      "page": 684,
+      "id": "684-0",
+      "columns": [
+        {
+          "label": "Finnegan (Dem.)",
+          "contest": "senate",
+          "candidate": "James E. Finnegan"
+        },
+        {
+          "label": "La Follette, Jr. (Prog.)",
+          "contest": "senate",
+          "candidate": "Robert M. LaFollette, Jr."
+        },
+        {
+          "label": "Clausen (Rep.)",
+          "contest": "senate",
+          "candidate": "Fred H. Clausen"
+        },
+        {
+          "label": "Furman (Ind.)",
+          "contest": "senate",
+          "candidate": "Ted Furman"
+        },
+        {
+          "label": "Wiggert, Jr. (Ind. Soc. Labor)",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.104,
+        0.091,
+        0.833,
+        0.903
+      ],
+      "hint": "Read only the table headed 'SUMMARY VOTE FOR UNITED STATES SENATOR BY COUNTIES November 1940'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.117
+      ]
+    },
+    {
+      "page": 685,
+      "id": "685-0",
+      "columns": [
+        {
+          "label": "Weisman (Dem.)",
+          "contest": "house1",
+          "candidate": "Jacob M. Weisman"
+        },
+        {
+          "label": "Slagg (Prog.)",
+          "contest": "house1",
+          "candidate": "Stanley W. Slagg"
+        },
+        {
+          "label": "Bolles (Rep.)",
+          "contest": "house1",
+          "candidate": "Stephen Bolles"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.175,
+        0.187,
+        0.901,
+        0.355
+      ],
+      "hint": "Read only the table headed 'First District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 685,
+      "id": "685-1",
+      "columns": [
+        {
+          "label": "Brooks (Dem.)",
+          "contest": "house2",
+          "candidate": "Thomas R. Brooks"
+        },
+        {
+          "label": "Sauthoff (Prog.)",
+          "contest": "house2",
+          "candidate": "Harry Sauthoff"
+        },
+        {
+          "label": "Hawks, Jr. (Rep.)",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.175,
+        0.347,
+        0.901,
+        0.533
+      ],
+      "hint": "Read only the table headed 'Second District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 685,
+      "id": "685-2",
+      "columns": [
+        {
+          "label": "Doherty (Dem.)",
+          "contest": "house3",
+          "candidate": "George T. Doherty"
+        },
+        {
+          "label": "Withrow (Prog.)",
+          "contest": "house3",
+          "candidate": "Gardner R. Withrow"
+        },
+        {
+          "label": "Stevenson (Rep.)",
+          "contest": "house3",
+          "candidate": "William H. Stevenson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.175,
+        0.525,
+        0.901,
+        0.759
+      ],
+      "hint": "Read only the table headed 'Third District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 685,
+      "id": "685-3",
+      "columns": [
+        {
+          "label": "Wasielewski (Dem.)",
+          "contest": "house4",
+          "candidate": "T. F. B. Wasielewski"
+        },
+        {
+          "label": "Fons (Prog.)",
+          "contest": "house4",
+          "candidate": "Leonard C. Fons"
+        },
+        {
+          "label": "Schafer (Rep.)",
+          "contest": "house4",
+          "candidate": "John C. Schafer"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.175,
+        0.751,
+        0.901,
+        0.889
+      ],
+      "hint": "Read only the table headed 'Fourth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 686,
+      "id": "686-0",
+      "columns": [
+        {
+          "label": "Murphy (Dem.)",
+          "contest": "house5",
+          "candidate": "Francis T. Murphy"
+        },
+        {
+          "label": "Pasch (Prog.)",
+          "contest": "house5",
+          "candidate": "James M. Pasch"
+        },
+        {
+          "label": "Thill (Rep.)",
+          "contest": "house5",
+          "candidate": "Lewis D. Thill"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.097,
+        0.181,
+        0.838,
+        0.308
+      ],
+      "hint": "Read only the table headed 'Fifth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 686,
+      "id": "686-1",
+      "columns": [
+        {
+          "label": "Fessler (Dem.)",
+          "contest": "house6",
+          "candidate": "Jacob A. Fessler"
+        },
+        {
+          "label": "Corrigan, Sr. (Prog.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Keefe (Rep.)",
+          "contest": "house6",
+          "candidate": "Frank B. Keefe"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.097,
+        0.3,
+        0.838,
+        0.484
+      ],
+      "hint": "Read only the table headed 'Sixth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 686,
+      "id": "686-2",
+      "columns": [
+        {
+          "label": "Bloedorn (Dem.)",
+          "contest": "house7",
+          "candidate": "Wallace A. Bloedorn"
+        },
+        {
+          "label": "Boileau (Prog.)",
+          "contest": "house7",
+          "candidate": "Gerald J. Boileau"
+        },
+        {
+          "label": "Murray (Rep.)",
+          "contest": "house7",
+          "candidate": "Reid F. Murray"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.097,
+        0.476,
+        0.838,
+        0.698
+      ],
+      "hint": "Read only the table headed 'Seventh District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 686,
+      "id": "686-3",
+      "columns": [
+        {
+          "label": "Kresky (Prog.)",
+          "contest": "house8",
+          "candidate": "Michael F. Kresky"
+        },
+        {
+          "label": "Johns (Rep.)",
+          "contest": "house8",
+          "candidate": "Joshua L. Johns"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.097,
+        0.69,
+        0.838,
+        0.889
+      ],
+      "hint": "Read only the table headed 'Eighth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 687,
+      "id": "687-0",
+      "columns": [
+        {
+          "label": "Hughes (Dem.)",
+          "contest": "house9",
+          "candidate": "James E. Hughes"
+        },
+        {
+          "label": "Hull (Prog.)",
+          "contest": "house9",
+          "candidate": "Merlin Hull"
+        },
+        {
+          "label": "Nygaard (Rep.)",
+          "contest": "house9",
+          "candidate": "John R. Nygaard"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.171,
+        0.18,
+        0.903,
+        0.397
+      ],
+      "hint": "Read only the table headed 'Ninth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 687,
+      "id": "687-1",
+      "columns": [
+        {
+          "label": "Green (Dem.)",
+          "contest": "house10",
+          "candidate": "John G. Green"
+        },
+        {
+          "label": "Gehrmann (Prog.)",
+          "contest": "house10",
+          "candidate": "Bernard J. Gehrmann"
+        },
+        {
+          "label": "Van Nostrand (Rep.)",
+          "contest": "house10",
+          "candidate": "Peter Van Nostrand"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.171,
+        0.389,
+        0.903,
+        0.643
+      ],
+      "hint": "Read only the table headed 'Tenth District'; ignore any other table visible in the image."
+    }
+  ]
+}

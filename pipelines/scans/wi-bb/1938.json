@@ -1,0 +1,529 @@
+{
+  "polity": "US-WI",
+  "publisher": "Wisconsin Legislative Reference Bureau",
+  "title": "The Wisconsin Blue Book 1940, vote by counties (general election 1938-11-08)",
+  "license": "Public record",
+  "file": {
+    "url": "https://search.library.wisc.edu/digital/A5YLAAJEI53TTB8Q",
+    "item": "https://search.library.wisc.edu/digital/A5YLAAJEI53TTB8Q"
+  },
+  "raw_source": "us.county_volumes",
+  "contests": {
+    "governor": {
+      "year": 1938,
+      "chamber": "governor",
+      "day": "1938-11-08",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "senate": {
+      "year": 1938,
+      "chamber": "senate",
+      "day": "1938-11-08",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "house1": {
+      "year": 1938,
+      "chamber": "house",
+      "day": "1938-11-08",
+      "special": false,
+      "state": "WI",
+      "district": 1
+    },
+    "house2": {
+      "year": 1938,
+      "chamber": "house",
+      "day": "1938-11-08",
+      "special": false,
+      "state": "WI",
+      "district": 2
+    },
+    "house3": {
+      "year": 1938,
+      "chamber": "house",
+      "day": "1938-11-08",
+      "special": false,
+      "state": "WI",
+      "district": 3
+    },
+    "house4": {
+      "year": 1938,
+      "chamber": "house",
+      "day": "1938-11-08",
+      "special": false,
+      "state": "WI",
+      "district": 4
+    },
+    "house5": {
+      "year": 1938,
+      "chamber": "house",
+      "day": "1938-11-08",
+      "special": false,
+      "state": "WI",
+      "district": 5
+    },
+    "house6": {
+      "year": 1938,
+      "chamber": "house",
+      "day": "1938-11-08",
+      "special": false,
+      "state": "WI",
+      "district": 6
+    },
+    "house7": {
+      "year": 1938,
+      "chamber": "house",
+      "day": "1938-11-08",
+      "special": false,
+      "state": "WI",
+      "district": 7
+    },
+    "house8": {
+      "year": 1938,
+      "chamber": "house",
+      "day": "1938-11-08",
+      "special": false,
+      "state": "WI",
+      "district": 8
+    },
+    "house9": {
+      "year": 1938,
+      "chamber": "house",
+      "day": "1938-11-08",
+      "special": false,
+      "state": "WI",
+      "district": 9
+    },
+    "house10": {
+      "year": 1938,
+      "chamber": "house",
+      "day": "1938-11-08",
+      "special": false,
+      "state": "WI",
+      "district": 10
+    }
+  },
+  "pages": [
+    {
+      "page": 629,
+      "id": "629-0",
+      "columns": [
+        {
+          "label": "Bolens (Dem.)",
+          "contest": "governor",
+          "candidate": "Harry W. Bolens"
+        },
+        {
+          "label": "La Follette (Prog.)",
+          "contest": "governor",
+          "candidate": "Philip La Follette"
+        },
+        {
+          "label": "Heil (Rep.)",
+          "contest": "governor",
+          "candidate": "Julius P. Heil"
+        },
+        {
+          "label": "Smith (Union)",
+          "contest": "governor",
+          "candidate": "Frank W. Smith"
+        },
+        {
+          "label": "Schleier, Jr. (Ind. Soc. Labor)",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.145,
+        0.141,
+        0.897,
+        0.902
+      ],
+      "hint": "Read only the table headed 'SUMMARY VOTE FOR GOVERNOR BY COUNTIES'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0591
+      ]
+    },
+    {
+      "page": 634,
+      "id": "634-0",
+      "columns": [
+        {
+          "label": "Duffy (Dem.)",
+          "contest": "senate",
+          "candidate": "F. Ryan Duffy"
+        },
+        {
+          "label": "Ekern (Prog.)",
+          "contest": "senate",
+          "candidate": "Herman L. Ekern"
+        },
+        {
+          "label": "Wiley (Rep.)",
+          "contest": "senate",
+          "candidate": "Alexander Wiley"
+        },
+        {
+          "label": "Blair (Ind.)",
+          "contest": "senate",
+          "candidate": "Fred Bassett Blair"
+        },
+        {
+          "label": "Chapple (Ind.)",
+          "contest": "senate",
+          "candidate": "John B. Chapple"
+        },
+        {
+          "label": "Ehrhardt (Ind. Soc. Labor)",
+          "contest": "senate",
+          "candidate": "Joseph Ehrhardt"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.103,
+        0.133,
+        0.86,
+        0.954
+      ],
+      "hint": "Read only the table headed 'SUMMARY VOTE FOR UNITED STATES SENATOR BY COUNTIES November 1938'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.123
+      ]
+    },
+    {
+      "page": 635,
+      "id": "635-0",
+      "columns": [
+        {
+          "label": "Stewart (Dem.)",
+          "contest": "house1",
+          "candidate": "Calvin Stewart"
+        },
+        {
+          "label": "Wendt (Prog.)",
+          "contest": "house1",
+          "candidate": "Francis H. Wendt"
+        },
+        {
+          "label": "Bolles (Rep.)",
+          "contest": "house1",
+          "candidate": "Stephen Bolles"
+        },
+        {
+          "label": "Randolph (Union)",
+          "contest": "house1",
+          "candidate": "Thomas O. F. Randolph"
+        },
+        {
+          "label": "Hansen (Ind.)",
+          "contest": "house1",
+          "candidate": "Harvey C. Hansen"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.143,
+        0.247,
+        0.895,
+        0.425
+      ],
+      "hint": "Read only the table headed 'First District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 635,
+      "id": "635-1",
+      "columns": [
+        {
+          "label": "Gerth (Dem.)",
+          "contest": "house2",
+          "candidate": "Reinhold A. Gerth"
+        },
+        {
+          "label": "Sauthoff (Prog.)",
+          "contest": "house2",
+          "candidate": "Harry Sauthoff"
+        },
+        {
+          "label": "Hawks, Jr. (Rep.)",
+          "contest": "house2",
+          "candidate": "Charles Hawks, Jr."
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.143,
+        0.417,
+        0.897,
+        0.636
+      ],
+      "hint": "Read only the table headed 'Second District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 635,
+      "id": "635-2",
+      "columns": [
+        {
+          "label": "McGonigle (Dem.)",
+          "contest": "house3",
+          "candidate": "Bart E. McGonigle"
+        },
+        {
+          "label": "Withrow (Prog.)",
+          "contest": "house3",
+          "candidate": "Gardner R. Withrow"
+        },
+        {
+          "label": "Griswold (Rep.)",
+          "contest": "house3",
+          "candidate": "Harry W. Griswold"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.149,
+        0.628,
+        0.901,
+        0.858
+      ],
+      "hint": "Read only the table headed 'Third District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 636,
+      "id": "636-0",
+      "columns": [
+        {
+          "label": "Wasielewski (Dem.)",
+          "contest": "house4",
+          "candidate": "Thaddeus F. B. Wasielowski"
+        },
+        {
+          "label": "Gauer (Prog.)",
+          "contest": "house4",
+          "candidate": "Paul Gauer"
+        },
+        {
+          "label": "Schafer (Rep.)",
+          "contest": "house4",
+          "candidate": "John C. Schaefer"
+        },
+        {
+          "label": "Sprague (Union)",
+          "contest": "house4",
+          "candidate": "Robert Sprague"
+        },
+        {
+          "label": "Cannon (Ind.)",
+          "contest": "house4",
+          "candidate": "Raymond J. Cannon"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.107,
+        0.202,
+        0.858,
+        0.349
+      ],
+      "hint": "Read only the table headed 'Fourth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 636,
+      "id": "636-1",
+      "columns": [
+        {
+          "label": "O'Malley (Dem.)",
+          "contest": "house5",
+          "candidate": "Thomas O'Malley"
+        },
+        {
+          "label": "Benson (Prog.)",
+          "contest": "house5",
+          "candidate": "Alfred Benson"
+        },
+        {
+          "label": "Thill (Rep.)",
+          "contest": "house5",
+          "candidate": "Lewis D. Thill"
+        },
+        {
+          "label": "Otto (Union)",
+          "contest": "house5",
+          "candidate": "Henry W. Otto"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.107,
+        0.341,
+        0.858,
+        0.505
+      ],
+      "hint": "Read only the table headed 'Fifth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 636,
+      "id": "636-2",
+      "columns": [
+        {
+          "label": "Reilly (Dem.)",
+          "contest": "house6",
+          "candidate": "Michael K. Reilly"
+        },
+        {
+          "label": "Poltl (Prog.)",
+          "contest": "house6",
+          "candidate": "Adam F. Poltl"
+        },
+        {
+          "label": "Keefe (Rep.)",
+          "contest": "house6",
+          "candidate": "Frank B. Keefe"
+        },
+        {
+          "label": "Willihnganz (Union)",
+          "contest": "house6",
+          "candidate": "Joseph Willihnganz"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.107,
+        0.497,
+        0.858,
+        0.707
+      ],
+      "hint": "Read only the table headed 'Sixth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 636,
+      "id": "636-3",
+      "columns": [
+        {
+          "label": "Cavanaugh (Dem.)",
+          "contest": "house7",
+          "candidate": "James J. Cavanaugh"
+        },
+        {
+          "label": "Boileau (Prog.)",
+          "contest": "house7",
+          "candidate": "Gerald J. Boileau"
+        },
+        {
+          "label": "Murray (Rep.)",
+          "contest": "house7",
+          "candidate": "Reid F. Murray"
+        },
+        {
+          "label": "Behm (Ind.)",
+          "contest": "house7",
+          "candidate": "Herman H. Behm"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.101,
+        0.699,
+        0.852,
+        0.925
+      ],
+      "hint": "Read only the table headed 'Seventh District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 637,
+      "id": "637-0",
+      "columns": [
+        {
+          "label": "Cashman (Dem.)",
+          "contest": "house8",
+          "candidate": "John E. Cashman"
+        },
+        {
+          "label": "Schneider (Prog.)",
+          "contest": "house8",
+          "candidate": "George J. Schneider"
+        },
+        {
+          "label": "Johns (Rep.)",
+          "contest": "house8",
+          "candidate": "Joshua L. Johns"
+        },
+        {
+          "label": "Gloudemans (Union)",
+          "contest": "house8",
+          "candidate": "Peter J. Gloudemans"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.137,
+        0.219,
+        0.889,
+        0.407
+      ],
+      "hint": "Read only the table headed 'Eighth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 637,
+      "id": "637-1",
+      "columns": [
+        {
+          "label": "Crane (Dem.)",
+          "contest": "house9",
+          "candidate": "William F. Crane"
+        },
+        {
+          "label": "Hull (Prog.)",
+          "contest": "house9",
+          "candidate": "Merlin Hull"
+        },
+        {
+          "label": "Jones (Rep.)",
+          "contest": "house9",
+          "candidate": "Hugh M. Jones"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.137,
+        0.399,
+        0.889,
+        0.653
+      ],
+      "hint": "Read only the table headed 'Ninth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 637,
+      "id": "637-2",
+      "columns": [
+        {
+          "label": "Gehrmann (Prog.)",
+          "contest": "house10",
+          "candidate": "Bernard J. Gehrmann"
+        },
+        {
+          "label": "Carroll (Rep.)",
+          "contest": "house10",
+          "candidate": "James H. Carroll"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.137,
+        0.645,
+        0.889,
+        0.898
+      ],
+      "hint": "Read only the table headed 'Tenth District'; ignore any other table visible in the image."
+    }
+  ]
+}

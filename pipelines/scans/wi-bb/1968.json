@@ -1,0 +1,520 @@
+{
+  "polity": "US-WI",
+  "publisher": "Wisconsin Legislative Reference Bureau",
+  "title": "The Wisconsin Blue Book 1970, vote by counties (general election 1968-11-05)",
+  "license": "Public record",
+  "file": {
+    "url": "https://search.library.wisc.edu/digital/A63MVAJVDHMHFW9E",
+    "item": "https://search.library.wisc.edu/digital/A63MVAJVDHMHFW9E"
+  },
+  "raw_source": "us.county_volumes",
+  "contests": {
+    "president": {
+      "year": 1968,
+      "chamber": "president",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "governor": {
+      "year": 1968,
+      "chamber": "governor",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "senate": {
+      "year": 1968,
+      "chamber": "senate",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "house1": {
+      "year": 1968,
+      "chamber": "house",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "WI",
+      "district": 1
+    },
+    "house2": {
+      "year": 1968,
+      "chamber": "house",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "WI",
+      "district": 2
+    },
+    "house3": {
+      "year": 1968,
+      "chamber": "house",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "WI",
+      "district": 3
+    },
+    "house4": {
+      "year": 1968,
+      "chamber": "house",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "WI",
+      "district": 4
+    },
+    "house5": {
+      "year": 1968,
+      "chamber": "house",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "WI",
+      "district": 5
+    },
+    "house6": {
+      "year": 1968,
+      "chamber": "house",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "WI",
+      "district": 6
+    },
+    "house7": {
+      "year": 1968,
+      "chamber": "house",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "WI",
+      "district": 7
+    },
+    "house8": {
+      "year": 1968,
+      "chamber": "house",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "WI",
+      "district": 8
+    },
+    "house9": {
+      "year": 1968,
+      "chamber": "house",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "WI",
+      "district": 9
+    },
+    "house10": {
+      "year": 1968,
+      "chamber": "house",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "WI",
+      "district": 10
+    }
+  },
+  "pages": [
+    {
+      "page": 825,
+      "id": "825-0",
+      "columns": [
+        {
+          "label": "Humphrey and Muskie (Dem.)",
+          "contest": "president",
+          "candidate": "Hubert H. Humphrey (Democratic)"
+        },
+        {
+          "label": "Nixon and Agnew (Rep.)",
+          "contest": "president",
+          "candidate": "Richard Nixon (Republican)"
+        },
+        {
+          "label": "Blomen and Taylor (Ind.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Halstead and Boutelle (Ind.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Wallace and Griffin (Ind.)",
+          "contest": "president",
+          "candidate": "George Wallace (American Independent)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.094,
+        0.116,
+        0.844,
+        0.901
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENT AND VICE PRESIDENT BY COUNTY*'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0892
+      ]
+    },
+    {
+      "page": 826,
+      "id": "826-0",
+      "columns": [
+        {
+          "label": "Bronson C. LaFollette (Dem.)",
+          "contest": "governor",
+          "candidate": "Bronson C. La Follette"
+        },
+        {
+          "label": "Warren P. Knowles (Rep.)",
+          "contest": "governor",
+          "candidate": "Warren P. Knowles"
+        },
+        {
+          "label": "Adolf Wiggert (Ind.)",
+          "contest": "governor",
+          "candidate": "Adolf Wiggert"
+        },
+        {
+          "label": "Robert Wilkinson (Ind.)",
+          "contest": "governor",
+          "candidate": "Robert Wilkinson"
+        },
+        {
+          "label": "Taylor Benson (Dem.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Jack B. Olson (Rep.)",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.162,
+        0.143,
+        0.913,
+        0.901
+      ],
+      "hint": "Read only the table headed 'VOTE FOR STATE OFFICERS BY COUNTY*'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.058
+      ]
+    },
+    {
+      "page": 828,
+      "id": "828-0",
+      "columns": [
+        {
+          "label": "Gaylord Nelson (Dem.)",
+          "contest": "senate",
+          "candidate": "Gaylord Nelson"
+        },
+        {
+          "label": "Jerris Leonard (Rep.)",
+          "contest": "senate",
+          "candidate": "Jerris Leonard"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.154,
+        0.116,
+        0.513,
+        0.586
+      ],
+      "hint": "Read only the table headed 'VOTE FOR UNITED STATES SENATOR BY COUNTY'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1298
+      ]
+    },
+    {
+      "page": 828,
+      "id": "828-1",
+      "columns": [
+        {
+          "label": "Gaylord Nelson (Dem.)",
+          "contest": "senate",
+          "candidate": "Gaylord Nelson"
+        },
+        {
+          "label": "Jerris Leonard (Rep.)",
+          "contest": "senate",
+          "candidate": "Jerris Leonard"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.534,
+        0.12,
+        0.908,
+        0.586
+      ],
+      "hint": "Read only the table headed 'VOTE FOR UNITED STATES SENATOR BY COUNTY'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1223
+      ]
+    },
+    {
+      "page": 828,
+      "id": "828-2",
+      "columns": [
+        {
+          "label": "Lynn E. Stalbaum (Dem.)",
+          "contest": "house1",
+          "candidate": "Lynn E. Stalbaum"
+        },
+        {
+          "label": "Henry C. Schadeberg (Rep.)",
+          "contest": "house1",
+          "candidate": "Henry C. Schadeberg"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.154,
+        0.578,
+        0.908,
+        0.756
+      ],
+      "hint": "Read only the table headed 'VOTE FOR MEMBERS OF CONGRESS BY DISTRICT, First District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 828,
+      "id": "828-3",
+      "columns": [
+        {
+          "label": "Robert W. Kastenmeier (Dem.)",
+          "contest": "house2",
+          "candidate": "Robert W. Kastenmeier"
+        },
+        {
+          "label": "Richard D. Murray (Rep.)",
+          "contest": "house2",
+          "candidate": "Richard D. Murray"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.154,
+        0.748,
+        0.908,
+        0.89
+      ],
+      "hint": "Read only the table headed 'VOTE FOR MEMBERS OF CONGRESS BY DISTRICT, Second District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 829,
+      "id": "829-0",
+      "columns": [
+        {
+          "label": "Gunnar A. Gundersen (Dem.)",
+          "contest": "house3",
+          "candidate": "Gunnar A. Gundersen"
+        },
+        {
+          "label": "Vernon W. Thomson (Rep.)",
+          "contest": "house3",
+          "candidate": "Vernon W. Thomson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.096,
+        0.094,
+        0.846,
+        0.334
+      ],
+      "hint": "Read only the table headed 'Third District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 829,
+      "id": "829-1",
+      "columns": [
+        {
+          "label": "Clement J. Zablocki (Dem.)",
+          "contest": "house4",
+          "candidate": "Clement J. Zablocki"
+        },
+        {
+          "label": "Walter McCullough (Rep.)",
+          "contest": "house4",
+          "candidate": "Walter McCullough"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.096,
+        0.326,
+        0.846,
+        0.441
+      ],
+      "hint": "Read only the table headed 'Fourth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 829,
+      "id": "829-2",
+      "columns": [
+        {
+          "label": "Henry S. Reuss (Dem.)",
+          "contest": "house5",
+          "candidate": "Henry S. Reuss"
+        },
+        {
+          "label": "Robert J. Dwyer (Rep.)",
+          "contest": "house5",
+          "candidate": "Robert J. Dwyer"
+        },
+        {
+          "label": "Julian R. Chapman (Ind.)",
+          "contest": "house5",
+          "candidate": "Julian R. Chapman"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.096,
+        0.433,
+        0.846,
+        0.548
+      ],
+      "hint": "Read only the table headed 'Fifth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 829,
+      "id": "829-3",
+      "columns": [
+        {
+          "label": "John A. Race (Dem.)",
+          "contest": "house6",
+          "candidate": "John A. Race"
+        },
+        {
+          "label": "William A. Steiger (Rep.)",
+          "contest": "house6",
+          "candidate": "William A. Steiger"
+        },
+        {
+          "label": "Albert Balthazor, Jr. (Wis. Cong. of Conserv.)",
+          "contest": "house6",
+          "candidate": "Albert Balthazor, Jr."
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.096,
+        0.54,
+        0.846,
+        0.721
+      ],
+      "hint": "Read only the table headed 'Sixth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 829,
+      "id": "829-4",
+      "columns": [
+        {
+          "label": "Lawrence Dahl (Dem.)",
+          "contest": "house7",
+          "candidate": "Lawrence Dahl"
+        },
+        {
+          "label": "Melvin R. Laird (Rep.)",
+          "contest": "house7",
+          "candidate": "Melvin R. Laird"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.096,
+        0.713,
+        0.846,
+        0.953
+      ],
+      "hint": "Read only the table headed 'Seventh District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 830,
+      "id": "830-0",
+      "columns": [
+        {
+          "label": "John E. Nixon (Dem.)",
+          "contest": "house8",
+          "candidate": "John E. Nixon"
+        },
+        {
+          "label": "John W. Byrnes (Rep.)",
+          "contest": "house8",
+          "candidate": "John W. Byrnes"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.154,
+        0.127,
+        0.904,
+        0.286
+      ],
+      "hint": "Read only the table headed 'Eighth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 830,
+      "id": "830-1",
+      "columns": [
+        {
+          "label": "Carol E. Baumann (Dem.)",
+          "contest": "house9",
+          "candidate": "Carol E. Baumann"
+        },
+        {
+          "label": "Glenn R. Davis (Rep.)",
+          "contest": "house9",
+          "candidate": "Glenn R. Davis"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.154,
+        0.278,
+        0.904,
+        0.395
+      ],
+      "hint": "Read only the table headed 'Ninth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 830,
+      "id": "830-2",
+      "columns": [
+        {
+          "label": "Timothy J. Hirsch (Dem.)",
+          "contest": "house10",
+          "candidate": "Timothy J. Hirsch"
+        },
+        {
+          "label": "Alvin E. O'Konski (Rep.)",
+          "contest": "house10",
+          "candidate": "Alvin E. O'Konski"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.154,
+        0.387,
+        0.904,
+        0.647
+      ],
+      "hint": "Read only the table headed 'Tenth District'; ignore any other table visible in the image."
+    }
+  ]
+}

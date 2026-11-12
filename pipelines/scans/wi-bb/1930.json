@@ -1,0 +1,444 @@
+{
+  "polity": "US-WI",
+  "publisher": "Wisconsin Legislative Reference Bureau",
+  "title": "The Wisconsin Blue Book 1931, vote by counties (general election 1930-11-04)",
+  "license": "Public record",
+  "file": {
+    "url": "https://search.library.wisc.edu/digital/AABWTCD5E6MWIC8O",
+    "item": "https://search.library.wisc.edu/digital/AABWTCD5E6MWIC8O"
+  },
+  "raw_source": "us.county_volumes",
+  "contests": {
+    "governor": {
+      "year": 1930,
+      "chamber": "governor",
+      "day": "1930-11-04",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "house1": {
+      "year": 1930,
+      "chamber": "house",
+      "day": "1930-11-04",
+      "special": false,
+      "state": "WI",
+      "district": 1
+    },
+    "house2": {
+      "year": 1930,
+      "chamber": "house",
+      "day": "1930-11-04",
+      "special": false,
+      "state": "WI",
+      "district": 2
+    },
+    "house3": {
+      "year": 1930,
+      "chamber": "house",
+      "day": "1930-11-04",
+      "special": false,
+      "state": "WI",
+      "district": 3
+    },
+    "house4": {
+      "year": 1930,
+      "chamber": "house",
+      "day": "1930-11-04",
+      "special": false,
+      "state": "WI",
+      "district": 4
+    },
+    "house5": {
+      "year": 1930,
+      "chamber": "house",
+      "day": "1930-11-04",
+      "special": false,
+      "state": "WI",
+      "district": 5
+    },
+    "house6": {
+      "year": 1930,
+      "chamber": "house",
+      "day": "1930-11-04",
+      "special": false,
+      "state": "WI",
+      "district": 6
+    },
+    "house7": {
+      "year": 1930,
+      "chamber": "house",
+      "day": "1930-11-04",
+      "special": false,
+      "state": "WI",
+      "district": 7
+    },
+    "house8": {
+      "year": 1930,
+      "chamber": "house",
+      "day": "1930-11-04",
+      "special": false,
+      "state": "WI",
+      "district": 8
+    },
+    "house9": {
+      "year": 1930,
+      "chamber": "house",
+      "day": "1930-11-04",
+      "special": false,
+      "state": "WI",
+      "district": 9
+    },
+    "house10": {
+      "year": 1930,
+      "chamber": "house",
+      "day": "1930-11-04",
+      "special": false,
+      "state": "WI",
+      "district": 10
+    },
+    "house11": {
+      "year": 1930,
+      "chamber": "house",
+      "day": "1930-11-04",
+      "special": false,
+      "state": "WI",
+      "district": 11
+    }
+  },
+  "pages": [
+    {
+      "page": 500,
+      "id": "500-0",
+      "columns": [
+        {
+          "label": "Hammersley (Dem.)",
+          "contest": "governor",
+          "candidate": "Charles E. Hammersley"
+        },
+        {
+          "label": "Taynton (Pro.)",
+          "contest": "governor",
+          "candidate": "Alfred B. Taynton"
+        },
+        {
+          "label": "La Follette (Rep.)",
+          "contest": "governor",
+          "candidate": "Philip F. La Follette"
+        },
+        {
+          "label": "Metcalfe (Soc.)",
+          "contest": "governor",
+          "candidate": "Frank Metcalfe"
+        },
+        {
+          "label": "Blair (Ind. Com.)",
+          "contest": "governor",
+          "candidate": "Fred Basset Blair"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.071,
+        0.108,
+        0.825,
+        0.898
+      ],
+      "hint": "Read only the table headed 'SUMMARY VOTE FOR GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1
+      ]
+    },
+    {
+      "page": 596,
+      "id": "596-0",
+      "columns": [
+        {
+          "label": "William C. Kiernan (Ind. Dem.)",
+          "contest": "house1",
+          "candidate": "William C. Kiernan"
+        },
+        {
+          "label": "Henry Allen (Rep.)",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.08,
+        0.189,
+        0.832,
+        0.373
+      ],
+      "hint": "Read only the table headed 'First District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 596,
+      "id": "596-1",
+      "columns": [
+        {
+          "label": "A. A. Nowak (Dem.)",
+          "contest": "house2",
+          "candidate": "A. A. Nowak"
+        },
+        {
+          "label": "Charles A. Kading (Rep.)",
+          "contest": "house2",
+          "candidate": "Charles A. Kading"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.077,
+        0.365,
+        0.828,
+        0.572
+      ],
+      "hint": "Read only the table headed 'Second District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 596,
+      "id": "596-2",
+      "columns": [
+        {
+          "label": "Frank J. Antoine (Ind. Dem.)",
+          "contest": "house3",
+          "candidate": "Frank J. Antoine"
+        },
+        {
+          "label": "John M. Nelson (Rep.)",
+          "contest": "house3",
+          "candidate": "John M. Nelson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.073,
+        0.564,
+        0.828,
+        0.787
+      ],
+      "hint": "Read only the table headed 'Third District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 596,
+      "id": "596-3",
+      "columns": [
+        {
+          "label": "William J. Kershaw (Dem.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Jos. A. Hansen (Pro.)",
+          "contest": "house4",
+          "candidate": "Joseph A. Hansen"
+        },
+        {
+          "label": "John C. Schafer (Rep.)",
+          "contest": "house4",
+          "candidate": "John C. Schafer"
+        },
+        {
+          "label": "Wm. F. Quick (Soc.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John Kasun",
+          "contest": "house4",
+          "candidate": "John Kasun"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.066,
+        0.779,
+        0.823,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Fourth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 597,
+      "id": "597-0",
+      "columns": [
+        {
+          "label": "Thomas O'Malley (Dem.)",
+          "contest": "house5",
+          "candidate": "Thomas O'Malley"
+        },
+        {
+          "label": "William H. Stafford (Rep.)",
+          "contest": "house5",
+          "candidate": "William H. Stafford"
+        },
+        {
+          "label": "James P. Sheehan (Soc.)",
+          "contest": "house5",
+          "candidate": "James P. Sheehan"
+        },
+        {
+          "label": "Raymond Hansborogh",
+          "contest": "house5",
+          "candidate": "Raymond Hansborough"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.2,
+        0.12,
+        0.921,
+        0.258
+      ],
+      "hint": "Read only the table headed 'Fifth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 597,
+      "id": "597-2",
+      "columns": [
+        {
+          "label": "Michael K. Reilly (Dem.)",
+          "contest": "house6",
+          "candidate": "Michael K. Reilly"
+        },
+        {
+          "label": "Philip Lehner (Rep.)",
+          "contest": "house6",
+          "candidate": "Philip Lehner"
+        },
+        {
+          "label": "Leonard L. Gudex (Soc.)",
+          "contest": "house6",
+          "candidate": "Leonard L. Gudex"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.205,
+        0.467,
+        0.927,
+        0.69
+      ],
+      "hint": "Read only the table headed 'Sixth District (Full Term)'; ignore any other table visible in the image."
+    },
+    {
+      "page": 597,
+      "id": "597-3",
+      "columns": [
+        {
+          "label": "Merlin Hull (Rep.)",
+          "contest": "house7",
+          "candidate": "Merlin Hull"
+        },
+        {
+          "label": "Oliver Needham (Pro.)",
+          "contest": "house7",
+          "candidate": "Oliver Needham"
+        },
+        {
+          "label": "Gardener R. Withrow (Rep.)",
+          "contest": "house7",
+          "candidate": "Gardner R. Withrow"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.205,
+        0.682,
+        0.931,
+        0.907
+      ],
+      "hint": "Read only the table headed 'Seventh District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 598,
+      "id": "598-0",
+      "columns": [
+        {
+          "label": "William F. Collins (Dem.)",
+          "contest": "house8",
+          "candidate": "William F. Collins"
+        },
+        {
+          "label": "Gerald J. Boileau (Rep.)",
+          "contest": "house8",
+          "candidate": "Gerald J. Boileau"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.061,
+        0.134,
+        0.815,
+        0.352
+      ],
+      "hint": "Read only the table headed 'Eighth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 598,
+      "id": "598-1",
+      "columns": [
+        {
+          "label": "George J. Schneider (Rep.)",
+          "contest": "house9",
+          "candidate": "George J. Schneider"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.059,
+        0.344,
+        0.811,
+        0.606
+      ],
+      "hint": "Read only the table headed 'Ninth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 598,
+      "id": "598-2",
+      "columns": [
+        {
+          "label": "Wesley Vasey (Pro.)",
+          "contest": "house10",
+          "candidate": "Wesley Vasey"
+        },
+        {
+          "label": "James A. Frear (Rep.)",
+          "contest": "house10",
+          "candidate": "James A. Frear"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.051,
+        0.598,
+        0.806,
+        0.821
+      ],
+      "hint": "Read only the table headed 'Tenth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 599,
+      "id": "599-0",
+      "columns": [
+        {
+          "label": "Hubert H. Peavey (Rep.)",
+          "contest": "house11",
+          "candidate": "Hubert H. Peavey"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.191,
+        0.129,
+        0.945,
+        0.392
+      ],
+      "hint": "Read only the table headed 'Eleventh District'; ignore any other table visible in the image."
+    }
+  ]
+}

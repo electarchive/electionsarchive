@@ -1,0 +1,439 @@
+{
+  "polity": "US-WI",
+  "publisher": "Wisconsin Legislative Reference Bureau",
+  "title": "The Wisconsin Blue Book 1962, vote by counties (general election 1960-11-08)",
+  "license": "Public record",
+  "file": {
+    "url": "https://search.library.wisc.edu/digital/A5BZZBS2FDP3LV8O",
+    "item": "https://search.library.wisc.edu/digital/A5BZZBS2FDP3LV8O"
+  },
+  "raw_source": "us.county_volumes",
+  "contests": {
+    "president": {
+      "year": 1960,
+      "chamber": "president",
+      "day": "1960-11-08",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "governor": {
+      "year": 1960,
+      "chamber": "governor",
+      "day": "1960-11-08",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "house1": {
+      "year": 1960,
+      "chamber": "house",
+      "day": "1960-11-08",
+      "special": false,
+      "state": "WI",
+      "district": 1
+    },
+    "house7": {
+      "year": 1960,
+      "chamber": "house",
+      "day": "1960-11-08",
+      "special": false,
+      "state": "WI",
+      "district": 7
+    },
+    "house2": {
+      "year": 1960,
+      "chamber": "house",
+      "day": "1960-11-08",
+      "special": false,
+      "state": "WI",
+      "district": 2
+    },
+    "house8": {
+      "year": 1960,
+      "chamber": "house",
+      "day": "1960-11-08",
+      "special": false,
+      "state": "WI",
+      "district": 8
+    },
+    "house3": {
+      "year": 1960,
+      "chamber": "house",
+      "day": "1960-11-08",
+      "special": false,
+      "state": "WI",
+      "district": 3
+    },
+    "house9": {
+      "year": 1960,
+      "chamber": "house",
+      "day": "1960-11-08",
+      "special": false,
+      "state": "WI",
+      "district": 9
+    },
+    "house4": {
+      "year": 1960,
+      "chamber": "house",
+      "day": "1960-11-08",
+      "special": false,
+      "state": "WI",
+      "district": 4
+    },
+    "house5": {
+      "year": 1960,
+      "chamber": "house",
+      "day": "1960-11-08",
+      "special": false,
+      "state": "WI",
+      "district": 5
+    },
+    "house10": {
+      "year": 1960,
+      "chamber": "house",
+      "day": "1960-11-08",
+      "special": false,
+      "state": "WI",
+      "district": 10
+    },
+    "house6": {
+      "year": 1960,
+      "chamber": "house",
+      "day": "1960-11-08",
+      "special": false,
+      "state": "WI",
+      "district": 6
+    }
+  },
+  "pages": [
+    {
+      "page": 879,
+      "id": "879-0",
+      "columns": [
+        {
+          "label": "Kennedy and Johnson (Dem.)",
+          "contest": "president",
+          "candidate": "John F. Kennedy (Democratic)"
+        },
+        {
+          "label": "Nixon and Lodge (Rep.)",
+          "contest": "president",
+          "candidate": "Richard Nixon (Republican)"
+        },
+        {
+          "label": "Dobbs and Weiss (Ind.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Hass and Cozzini (Ind.)",
+          "contest": "president",
+          "candidate": "Eric Hass (Socialist Labor)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.166,
+        0.098,
+        0.925,
+        0.893
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENT AND VICE PRESIDENT BY COUNTY WISCONSIN GENERAL ELECTION, November 8, 1960'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1069
+      ]
+    },
+    {
+      "page": 882,
+      "id": "882-0",
+      "columns": [
+        {
+          "label": "Gaylord A. Nelson (Dem.)",
+          "contest": "governor",
+          "candidate": "Gaylord Anton Nelson"
+        },
+        {
+          "label": "Philip G. Kuehn (Rep.)",
+          "contest": "governor",
+          "candidate": "Philip G. Kuehn"
+        },
+        {
+          "label": "Philleo Nash (Dem.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Warren P. Knowles (Rep.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "William H. Evans (Dem.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Robert C. Zimmerman (Rep.)",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.07,
+        0.144,
+        0.825,
+        0.916
+      ],
+      "hint": "Read only the table headed 'Vote for State Officers by County, Wisconsin General Election, November 8, 1960'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0777
+      ]
+    },
+    {
+      "page": 884,
+      "id": "884-0",
+      "columns": [
+        {
+          "label": "Gerald T. Flynn (Dem.)",
+          "contest": "house1",
+          "candidate": "Gerald T. Flynn"
+        },
+        {
+          "label": "Henry C. Schadeberg (Rep.)",
+          "contest": "house1",
+          "candidate": "Henry C. Schadeberg"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.084,
+        0.148,
+        0.456,
+        0.278
+      ],
+      "hint": "Read only the table headed 'First District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 884,
+      "id": "884-1",
+      "columns": [
+        {
+          "label": "Kenneth Traeger (Dem.)",
+          "contest": "house7",
+          "candidate": "Kenneth Traeger"
+        },
+        {
+          "label": "Melvin R. Laird (Rep.)",
+          "contest": "house7",
+          "candidate": "Melvin R. Laird"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.47,
+        0.148,
+        0.842,
+        0.323
+      ],
+      "hint": "Read only the table headed 'Seventh District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 884,
+      "id": "884-2",
+      "columns": [
+        {
+          "label": "Robert W. Kastenmeier (Dem.)",
+          "contest": "house2",
+          "candidate": "Robert W. Kastenmeier"
+        },
+        {
+          "label": "Donald E. Tewes (Rep.)",
+          "contest": "house2",
+          "candidate": "Donald E. Tewes"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.084,
+        0.27,
+        0.456,
+        0.408
+      ],
+      "hint": "Read only the table headed 'Second District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 884,
+      "id": "884-3",
+      "columns": [
+        {
+          "label": "Milo Singler (Dem.)",
+          "contest": "house8",
+          "candidate": "Milo Singler"
+        },
+        {
+          "label": "John W. Byrnes (Rep.)",
+          "contest": "house8",
+          "candidate": "John W. Byrnes"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.47,
+        0.315,
+        0.842,
+        0.495
+      ],
+      "hint": "Read only the table headed 'Eighth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 884,
+      "id": "884-4",
+      "columns": [
+        {
+          "label": "Norman M. Clapp (Dem.)",
+          "contest": "house3",
+          "candidate": "Norman M. Clapp"
+        },
+        {
+          "label": "Vernon W. Thomson (Rep.)",
+          "contest": "house3",
+          "candidate": "Vernon W. Thomson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.084,
+        0.4,
+        0.456,
+        0.587
+      ],
+      "hint": "Read only the table headed 'Third District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 884,
+      "id": "884-5",
+      "columns": [
+        {
+          "label": "Lester R. Johnson (Dem.)",
+          "contest": "house9",
+          "candidate": "Lester R. Johnson"
+        },
+        {
+          "label": "Perry M. Hull (Rep.)",
+          "contest": "house9",
+          "candidate": "Perry M. Hull"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.47,
+        0.487,
+        0.842,
+        0.689
+      ],
+      "hint": "Read only the table headed 'Ninth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 884,
+      "id": "884-6",
+      "columns": [
+        {
+          "label": "Clement J. Zablocki (Dem.)",
+          "contest": "house4",
+          "candidate": "Clement J. Zablocki"
+        },
+        {
+          "label": "Samuel P. Murray (Rep.)",
+          "contest": "house4",
+          "candidate": "Samuel P. Murray"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.084,
+        0.579,
+        0.456,
+        0.679
+      ],
+      "hint": "Read only the table headed 'Fourth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 884,
+      "id": "884-7",
+      "columns": [
+        {
+          "label": "Henry S. Reuss (Dem.)",
+          "contest": "house5",
+          "candidate": "Henry S. Reuss"
+        },
+        {
+          "label": "Kirby Hendee (Rep.)",
+          "contest": "house5",
+          "candidate": "Kirby Hendee"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.084,
+        0.671,
+        0.456,
+        0.768
+      ],
+      "hint": "Read only the table headed 'Fifth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 884,
+      "id": "884-8",
+      "columns": [
+        {
+          "label": "Alvin E. O'Konski (Rep.)",
+          "contest": "house10",
+          "candidate": "Alvin E. O'Konski"
+        },
+        {
+          "label": "John B. Chapple (Write-in)",
+          "contest": "house10",
+          "candidate": "John B. Chapple"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.47,
+        0.681,
+        0.842,
+        0.899
+      ],
+      "hint": "Read only the table headed 'Tenth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 884,
+      "id": "884-9",
+      "columns": [
+        {
+          "label": "James Megellas (Dem.)",
+          "contest": "house6",
+          "candidate": "James Megellas"
+        },
+        {
+          "label": "William K. Van Pelt (Rep.)",
+          "contest": "house6",
+          "candidate": "William K. Van Pelt"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.084,
+        0.76,
+        0.456,
+        0.899
+      ],
+      "hint": "Read only the table headed 'Sixth District'; ignore any other table visible in the image."
+    }
+  ]
+}

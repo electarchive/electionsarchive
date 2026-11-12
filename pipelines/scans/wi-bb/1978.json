@@ -1,0 +1,385 @@
+{
+  "polity": "US-WI",
+  "publisher": "Wisconsin Legislative Reference Bureau",
+  "title": "The Wisconsin Blue Book 1979-1980, vote by counties (general election 1978-11-07)",
+  "license": "Public record",
+  "file": {
+    "url": "https://search.library.wisc.edu/digital/AKCFKES24WHTNW8F",
+    "item": "https://search.library.wisc.edu/digital/AKCFKES24WHTNW8F"
+  },
+  "raw_source": "us.county_volumes",
+  "contests": {
+    "governor": {
+      "year": 1978,
+      "chamber": "governor",
+      "day": "1978-11-07",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "house1": {
+      "year": 1978,
+      "chamber": "house",
+      "day": "1978-11-07",
+      "special": false,
+      "state": "WI",
+      "district": 1
+    },
+    "house2": {
+      "year": 1978,
+      "chamber": "house",
+      "day": "1978-11-07",
+      "special": false,
+      "state": "WI",
+      "district": 2
+    },
+    "house3": {
+      "year": 1978,
+      "chamber": "house",
+      "day": "1978-11-07",
+      "special": false,
+      "state": "WI",
+      "district": 3
+    },
+    "house4": {
+      "year": 1978,
+      "chamber": "house",
+      "day": "1978-11-07",
+      "special": false,
+      "state": "WI",
+      "district": 4
+    },
+    "house5": {
+      "year": 1978,
+      "chamber": "house",
+      "day": "1978-11-07",
+      "special": false,
+      "state": "WI",
+      "district": 5
+    },
+    "house6": {
+      "year": 1978,
+      "chamber": "house",
+      "day": "1978-11-07",
+      "special": false,
+      "state": "WI",
+      "district": 6
+    },
+    "house7": {
+      "year": 1978,
+      "chamber": "house",
+      "day": "1978-11-07",
+      "special": false,
+      "state": "WI",
+      "district": 7
+    },
+    "house8": {
+      "year": 1978,
+      "chamber": "house",
+      "day": "1978-11-07",
+      "special": false,
+      "state": "WI",
+      "district": 8
+    },
+    "house9": {
+      "year": 1978,
+      "chamber": "house",
+      "day": "1978-11-07",
+      "special": false,
+      "state": "WI",
+      "district": 9
+    }
+  },
+  "pages": [
+    {
+      "page": 929,
+      "id": "929-0",
+      "columns": [
+        {
+          "label": "Eugene R. Zimmerman George Reed (Cons.)",
+          "contest": "governor",
+          "candidate": "Eugene R. Zimmerman"
+        },
+        {
+          "label": "Martin J. Schreiber Douglas J. LaFollette (Dem.)",
+          "contest": "governor",
+          "candidate": "Martin J. Schreiber"
+        },
+        {
+          "label": "Lee S. Dreyfus Russell A. Olson (Rep.)",
+          "contest": "governor",
+          "candidate": "Lee S. Dreyfus"
+        },
+        {
+          "label": "John C. Doherty Marion A. Doherty (Ind.)",
+          "contest": "governor",
+          "candidate": "John C. Doherty"
+        },
+        {
+          "label": "Adrienne Kaplan William Breihan (Ind.)",
+          "contest": "governor",
+          "candidate": "Adrienne Kaplan"
+        },
+        {
+          "label": "Henry A. Ochsner Robert E. Nordlander (Ind.)",
+          "contest": "governor",
+          "candidate": "Henry A. Ochsner"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.055,
+        0.117,
+        0.895,
+        0.949
+      ],
+      "hint": "Read only the table headed 'Governor and Lieutenant Governor'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1046
+      ]
+    },
+    {
+      "page": 932,
+      "id": "932-0",
+      "columns": [
+        {
+          "label": "Les Aspin (Dem.)",
+          "contest": "house1",
+          "candidate": "Les Aspin"
+        },
+        {
+          "label": "William W. Petrie (Rep.)",
+          "contest": "house1",
+          "candidate": "William Watson Petrie III"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.159,
+        0.187,
+        0.908,
+        0.361
+      ],
+      "hint": "Read only the table headed 'FIRST DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 932,
+      "id": "932-1",
+      "columns": [
+        {
+          "label": "Robert W. Kastenmeier (Dem.)",
+          "contest": "house2",
+          "candidate": "Robert W. Kastenmeier"
+        },
+        {
+          "label": "James A. Wright (Rep.)",
+          "contest": "house2",
+          "candidate": "James A. Wright"
+        },
+        {
+          "label": "Dick G. Fields (Ind.)",
+          "contest": "house2",
+          "candidate": "Dick G. Fields"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.161,
+        0.353,
+        0.908,
+        0.591
+      ],
+      "hint": "Read only the table headed 'SECOND DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 932,
+      "id": "932-2",
+      "columns": [
+        {
+          "label": "Alvin J Baldus (Dem.)",
+          "contest": "house3",
+          "candidate": "Alvin Baldus"
+        },
+        {
+          "label": "Michael S. Ellis (Rep.)",
+          "contest": "house3",
+          "candidate": "Michael Steven Ellis"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.161,
+        0.583,
+        0.913,
+        0.849
+      ],
+      "hint": "Read only the table headed 'THIRD DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 933,
+      "id": "933-0",
+      "columns": [
+        {
+          "label": "Clement J. Zablocki (Dem.)",
+          "contest": "house4",
+          "candidate": "Clement J. Zablocki"
+        },
+        {
+          "label": "Elroy C. Honadel (Rep.)",
+          "contest": "house4",
+          "candidate": "Elroy Charles Honadel"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.098,
+        0.137,
+        0.853,
+        0.263
+      ],
+      "hint": "Read only the table headed 'FOURTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 933,
+      "id": "933-1",
+      "columns": [
+        {
+          "label": "Henry S Reuss (Dem.)",
+          "contest": "house5",
+          "candidate": "Henry S. Reuss"
+        },
+        {
+          "label": "James R Medina (Rep.)",
+          "contest": "house5",
+          "candidate": "James R. W. Medina"
+        },
+        {
+          "label": "Paul Greenberg (Ind.)",
+          "contest": "house5",
+          "candidate": "Paul Greenberg"
+        },
+        {
+          "label": "John E. Sokoly (Ind.)",
+          "contest": "house5",
+          "candidate": "John Edward Sokoly"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.096,
+        0.255,
+        0.849,
+        0.406
+      ],
+      "hint": "Read only the table headed 'FIFTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 933,
+      "id": "933-2",
+      "columns": [
+        {
+          "label": "Gordon Ponschock (Cons.)",
+          "contest": "house6",
+          "candidate": "Gordon Ponschock"
+        },
+        {
+          "label": "Robert J. Steffes (Dem.)",
+          "contest": "house6",
+          "candidate": "Robert J. Steffes"
+        },
+        {
+          "label": "William A. Steiger (Rep.)",
+          "contest": "house6",
+          "candidate": "William A. Steiger"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.094,
+        0.398,
+        0.846,
+        0.654
+      ],
+      "hint": "Read only the table headed 'SIXTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 933,
+      "id": "933-3",
+      "columns": [
+        {
+          "label": "George Olishkewych (Cons.)",
+          "contest": "house7",
+          "candidate": "George Olishkewych"
+        },
+        {
+          "label": "David R. Obey (Dem.)",
+          "contest": "house7",
+          "candidate": "David R. Obey"
+        },
+        {
+          "label": "Vinton A. Vesta (Rep.)",
+          "contest": "house7",
+          "candidate": "Vinton A. Vesta"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.092,
+        0.646,
+        0.844,
+        0.929
+      ],
+      "hint": "Read only the table headed 'SEVENTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 934,
+      "id": "934-0",
+      "columns": [
+        {
+          "label": "Robert J. Cornell (Dem.)",
+          "contest": "house8",
+          "candidate": "Robert J. Cornell"
+        },
+        {
+          "label": "Toby Roth (Rep.)",
+          "contest": "house8",
+          "candidate": "Toby Roth"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.141,
+        0.14,
+        0.892,
+        0.407
+      ],
+      "hint": "Read only the table headed 'EIGHTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 934,
+      "id": "934-1",
+      "columns": [
+        {
+          "label": "Matthew J. Flynn (Dem.)",
+          "contest": "house9",
+          "candidate": "Matthew J. Flynn"
+        },
+        {
+          "label": "F. James Sensenbrenner, Jr. (Rep.)",
+          "contest": "house9",
+          "candidate": "F. James Sensenbrenner, Jr."
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.141,
+        0.399,
+        0.892,
+        0.583
+      ],
+      "hint": "Read only the table headed 'NINTH DISTRICT'; ignore any other table visible in the image."
+    }
+  ]
+}

@@ -1,0 +1,491 @@
+{
+  "polity": "US-WI",
+  "publisher": "Wisconsin Legislative Reference Bureau",
+  "title": "The Wisconsin Blue Book 1956, vote by counties (general election 1954-11-02)",
+  "license": "Public record",
+  "file": {
+    "url": "https://search.library.wisc.edu/digital/ATT2C657GYH2FO85",
+    "item": "https://search.library.wisc.edu/digital/ATT2C657GYH2FO85"
+  },
+  "raw_source": "us.county_volumes",
+  "contests": {
+    "governor": {
+      "year": 1954,
+      "chamber": "governor",
+      "day": "1954-11-02",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "house1": {
+      "year": 1954,
+      "chamber": "house",
+      "day": "1954-11-02",
+      "special": false,
+      "state": "WI",
+      "district": 1
+    },
+    "house2": {
+      "year": 1954,
+      "chamber": "house",
+      "day": "1954-11-02",
+      "special": false,
+      "state": "WI",
+      "district": 2
+    },
+    "house3": {
+      "year": 1954,
+      "chamber": "house",
+      "day": "1954-11-02",
+      "special": false,
+      "state": "WI",
+      "district": 3
+    },
+    "house4": {
+      "year": 1954,
+      "chamber": "house",
+      "day": "1954-11-02",
+      "special": false,
+      "state": "WI",
+      "district": 4
+    },
+    "house5": {
+      "year": 1954,
+      "chamber": "house",
+      "day": "1954-11-02",
+      "special": false,
+      "state": "WI",
+      "district": 5
+    },
+    "house6": {
+      "year": 1954,
+      "chamber": "house",
+      "day": "1954-11-02",
+      "special": false,
+      "state": "WI",
+      "district": 6
+    },
+    "house7": {
+      "year": 1954,
+      "chamber": "house",
+      "day": "1954-11-02",
+      "special": false,
+      "state": "WI",
+      "district": 7
+    },
+    "house8": {
+      "year": 1954,
+      "chamber": "house",
+      "day": "1954-11-02",
+      "special": false,
+      "state": "WI",
+      "district": 8
+    },
+    "house9": {
+      "year": 1954,
+      "chamber": "house",
+      "day": "1954-11-02",
+      "special": false,
+      "state": "WI",
+      "district": 9
+    },
+    "house10": {
+      "year": 1954,
+      "chamber": "house",
+      "day": "1954-11-02",
+      "special": false,
+      "state": "WI",
+      "district": 10
+    }
+  },
+  "pages": [
+    {
+      "page": 764,
+      "id": "764-0",
+      "columns": [
+        {
+          "label": "William Proxmire Dem.",
+          "contest": "governor",
+          "candidate": "William Proxmire"
+        },
+        {
+          "label": "Walter J. Kohler Rep.",
+          "contest": "governor",
+          "candidate": "Walter J. Jr. Kohler"
+        },
+        {
+          "label": "Arthur Wepfer Ind. Soc. Lab.",
+          "contest": "governor",
+          "candidate": "Arthur Wepfer"
+        },
+        {
+          "label": "Edwin Larkin Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Warren P. Knowles Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Marguerite R. Benson Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Fred R. Zimmerman Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Oscar M. Jonas Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Warren R. Smith Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Frank L. Nikolay Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Vernon W. Thomson Rep.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.057,
+        0.121,
+        0.876,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Vote for State Officers by Counties, General Election, November 4, 1954'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1206
+      ]
+    },
+    {
+      "page": 765,
+      "id": "765-0",
+      "columns": [
+        {
+          "label": "William Proxmire Dem.",
+          "contest": "governor",
+          "candidate": "William Proxmire"
+        },
+        {
+          "label": "Walter J. Kohler Rep.",
+          "contest": "governor",
+          "candidate": "Walter J. Jr. Kohler"
+        },
+        {
+          "label": "Arthur Wepfer Ind. Soc. Lab.",
+          "contest": "governor",
+          "candidate": "Arthur Wepfer"
+        },
+        {
+          "label": "Edwin Larkin Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Warren P. Knowles Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Marguerite R. Benson Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Fred R. Zimmerman Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Oscar M. Jonas Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Warren R. Smith Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Frank L. Nikolay Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Vernon W. Thomson Rep.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.061,
+        0.212,
+        0.879,
+        0.907
+      ],
+      "hint": "Read only the table headed 'VOTE FOR STATE OFFICERS BY COUNTIES, GENERAL ELECTION, NOVEMBER 4, 1954\u2014Continued'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1525
+      ]
+    },
+    {
+      "page": 766,
+      "id": "766-0",
+      "columns": [
+        {
+          "label": "Edward A. Krenzke (Dem.)",
+          "contest": "house1",
+          "candidate": "Edward A. Krenzke"
+        },
+        {
+          "label": "Lawrence H. Smith (Rep.)",
+          "contest": "house1",
+          "candidate": "Lawrence H. Smith"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.077,
+        0.196,
+        0.832,
+        0.341
+      ],
+      "hint": "Read only the table headed 'FIRST DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 766,
+      "id": "766-1",
+      "columns": [
+        {
+          "label": "Gaylord A. Nelson (Dem.)",
+          "contest": "house2",
+          "candidate": "Gaylord A. Nelson"
+        },
+        {
+          "label": "Glenn R. Davis (Rep.)",
+          "contest": "house2",
+          "candidate": "Glenn R. Davis"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.077,
+        0.333,
+        0.832,
+        0.493
+      ],
+      "hint": "Read only the table headed 'SECOND DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 766,
+      "id": "766-2",
+      "columns": [
+        {
+          "label": "Joseph A. Seep (Dem.)",
+          "contest": "house3",
+          "candidate": "Joseph A. Seep"
+        },
+        {
+          "label": "Gardner R. Withrow (Rep.)",
+          "contest": "house3",
+          "candidate": "Gardner R. Withrow"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.077,
+        0.485,
+        0.832,
+        0.695
+      ],
+      "hint": "Read only the table headed 'THIRD DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 766,
+      "id": "766-3",
+      "columns": [
+        {
+          "label": "Clement J. Zablocki (Dem.)",
+          "contest": "house4",
+          "candidate": "Clement J. Zablocki"
+        },
+        {
+          "label": "John C. Schafer (Rep.)",
+          "contest": "house4",
+          "candidate": "John C. Schafer"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.077,
+        0.687,
+        0.832,
+        0.811
+      ],
+      "hint": "Read only the table headed 'FOURTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 766,
+      "id": "766-4",
+      "columns": [
+        {
+          "label": "Henry S. Reuss (Dem.)",
+          "contest": "house5",
+          "candidate": "Henry S. Reuss"
+        },
+        {
+          "label": "Charles J. Kersten (Rep.)",
+          "contest": "house5",
+          "candidate": "Charles J. Kersten"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.077,
+        0.803,
+        0.832,
+        0.905
+      ],
+      "hint": "Read only the table headed 'FIFTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 767,
+      "id": "767-0",
+      "columns": [
+        {
+          "label": "Russell S. Johnson (Dem.)",
+          "contest": "house6",
+          "candidate": "Russell S. Johnson"
+        },
+        {
+          "label": "William K. Van Pelt (Rep.)",
+          "contest": "house6",
+          "candidate": "William K. Van Pelt"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.175,
+        0.143,
+        0.935,
+        0.307
+      ],
+      "hint": "Read only the table headed 'SIXTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 767,
+      "id": "767-1",
+      "columns": [
+        {
+          "label": "Kenneth E. Anderson (Dem.)",
+          "contest": "house7",
+          "candidate": "Kenneth E. Anderson"
+        },
+        {
+          "label": "Melvin R. Laird (Rep.)",
+          "contest": "house7",
+          "candidate": "Melvin R. Laird"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.175,
+        0.299,
+        0.935,
+        0.511
+      ],
+      "hint": "Read only the table headed 'SEVENTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 767,
+      "id": "767-2",
+      "columns": [
+        {
+          "label": "Jerome J. Reinke (Dem.)",
+          "contest": "house8",
+          "candidate": "Jerome J. Reinke"
+        },
+        {
+          "label": "John W. Byrnes (Rep.)",
+          "contest": "house8",
+          "candidate": "John W. Byrnes"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.175,
+        0.503,
+        0.935,
+        0.706
+      ],
+      "hint": "Read only the table headed 'EIGHTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 767,
+      "id": "767-3",
+      "columns": [
+        {
+          "label": "Lester R. Johnson (Dem.)",
+          "contest": "house9",
+          "candidate": "Lester R. Johnson"
+        },
+        {
+          "label": "William E. Owen (Rep.)",
+          "contest": "house9",
+          "candidate": "William E. Owen"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.175,
+        0.698,
+        0.938,
+        0.909
+      ],
+      "hint": "Read only the table headed 'NINTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 768,
+      "id": "768-0",
+      "columns": [
+        {
+          "label": "Basil G. Kennedy (Dem.)",
+          "contest": "house10",
+          "candidate": "Basil G. Kennedy"
+        },
+        {
+          "label": "Alvin E. O'Konski (Rep.)",
+          "contest": "house10",
+          "candidate": "Alvin E. O'Konski"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.08,
+        0.148,
+        0.834,
+        0.379
+      ],
+      "hint": "Read only the table headed 'TENTH DISTRICT'; ignore any other table visible in the image."
+    }
+  ]
+}

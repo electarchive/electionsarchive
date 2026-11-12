@@ -1,0 +1,566 @@
+{
+  "polity": "US-WI",
+  "publisher": "Wisconsin Legislative Reference Bureau",
+  "title": "The Wisconsin Blue Book 1933, vote by counties (general election 1932-11-08)",
+  "license": "Public record",
+  "file": {
+    "url": "https://search.library.wisc.edu/digital/AWPG6E4D5P7OSQ82",
+    "item": "https://search.library.wisc.edu/digital/AWPG6E4D5P7OSQ82"
+  },
+  "raw_source": "us.county_volumes",
+  "contests": {
+    "house1": {
+      "year": 1932,
+      "chamber": "house",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "WI",
+      "district": 1
+    },
+    "house2": {
+      "year": 1932,
+      "chamber": "house",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "WI",
+      "district": 2
+    },
+    "house3": {
+      "year": 1932,
+      "chamber": "house",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "WI",
+      "district": 3
+    },
+    "house4": {
+      "year": 1932,
+      "chamber": "house",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "WI",
+      "district": 4
+    },
+    "house5": {
+      "year": 1932,
+      "chamber": "house",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "WI",
+      "district": 5
+    },
+    "house6": {
+      "year": 1932,
+      "chamber": "house",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "WI",
+      "district": 6
+    },
+    "house7": {
+      "year": 1932,
+      "chamber": "house",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "WI",
+      "district": 7
+    },
+    "house8": {
+      "year": 1932,
+      "chamber": "house",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "WI",
+      "district": 8
+    },
+    "house9": {
+      "year": 1932,
+      "chamber": "house",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "WI",
+      "district": 9
+    },
+    "house10": {
+      "year": 1932,
+      "chamber": "house",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "WI",
+      "district": 10
+    },
+    "president": {
+      "year": 1932,
+      "chamber": "president",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "senate": {
+      "year": 1932,
+      "chamber": "senate",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "governor": {
+      "year": 1932,
+      "chamber": "governor",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "WI",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 544,
+      "id": "544-0",
+      "columns": [
+        {
+          "label": "William D. Thompson (Dem.)",
+          "contest": "house1",
+          "candidate": "William D. Thompson"
+        },
+        {
+          "label": "Henry H. Tubbs (Prohib.)",
+          "contest": "house1",
+          "candidate": "Henry H. Tubbs"
+        },
+        {
+          "label": "George W. Blanchard (Rep.)",
+          "contest": "house1",
+          "candidate": "George W. Blanchard"
+        },
+        {
+          "label": "Otis J. Bouma (Soc.)",
+          "contest": "house1",
+          "candidate": "Otis J. Bouma"
+        },
+        {
+          "label": "John Sekat (Ind. Com.)",
+          "contest": "house1",
+          "candidate": "John Sekat"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.077,
+        0.201,
+        0.828,
+        0.404
+      ],
+      "hint": "Read only the table headed 'First District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 544,
+      "id": "544-1",
+      "columns": [
+        {
+          "label": "C. W. Henney (Dem.)",
+          "contest": "house2",
+          "candidate": "C. W. Henney"
+        },
+        {
+          "label": "Georgenia J. Koppke (Prohib.)",
+          "contest": "house2",
+          "candidate": "Georgenia J. Koppke"
+        },
+        {
+          "label": "John B. Gay (Rep.)",
+          "contest": "house2",
+          "candidate": "John B. Gay"
+        },
+        {
+          "label": "Charles D. Madsen (Soc.)",
+          "contest": "house2",
+          "candidate": "Charles D. Madsen"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.077,
+        0.396,
+        0.828,
+        0.624
+      ],
+      "hint": "Read only the table headed 'Second District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 544,
+      "id": "544-2",
+      "columns": [
+        {
+          "label": "John J. Boyle (Dem.)",
+          "contest": "house3",
+          "candidate": "John J. Boyle"
+        },
+        {
+          "label": "Gardner R. Withrow (Rep.)",
+          "contest": "house3",
+          "candidate": "Gardner R. Withrow"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.073,
+        0.616,
+        0.828,
+        0.864
+      ],
+      "hint": "Read only the table headed 'Third District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 545,
+      "id": "545-0",
+      "columns": [
+        {
+          "label": "Raymond J. Cannon (Dem.)",
+          "contest": "house4",
+          "candidate": "Raymond Cannon"
+        },
+        {
+          "label": "John C. Schaefer (Rep.)",
+          "contest": "house4",
+          "candidate": "John C. Schafer"
+        },
+        {
+          "label": "Walter Pola-kowski (Soc.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Carl Lester (Ind.)",
+          "contest": "house4",
+          "candidate": "Carl Lester"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.174,
+        0.13,
+        0.925,
+        0.288
+      ],
+      "hint": "Read only the table headed 'Fourth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 545,
+      "id": "545-1",
+      "columns": [
+        {
+          "label": "Thomas O'Malley (Dem.)",
+          "contest": "house5",
+          "candidate": "Thomas O'Malley"
+        },
+        {
+          "label": "Joseph A. Padway (Rep.)",
+          "contest": "house5",
+          "candidate": "Joseph A. Padway"
+        },
+        {
+          "label": "Herman O. Kent (Soc.)",
+          "contest": "house5",
+          "candidate": "Herman O. Kent"
+        },
+        {
+          "label": "Kavanaugh C. Downey (Ind.)",
+          "contest": "house5",
+          "candidate": "Kavanaugh C. Downey"
+        },
+        {
+          "label": "Emil Gardos (Ind.)",
+          "contest": "house5",
+          "candidate": "Emil Gardos"
+        },
+        {
+          "label": "Emil B. Gennrich (Ind. Rep.)",
+          "contest": "house5",
+          "candidate": "Emil B. Gennrich"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.174,
+        0.28,
+        0.925,
+        0.466
+      ],
+      "hint": "Read only the table headed 'Fifth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 545,
+      "id": "545-2",
+      "columns": [
+        {
+          "label": "Michael K. Reilly (Dem.)",
+          "contest": "house6",
+          "candidate": "Michael K. Reilly"
+        },
+        {
+          "label": "Louis J. Fellenz (Rep.)",
+          "contest": "house6",
+          "candidate": "Louis J. Fellenz"
+        },
+        {
+          "label": "Franklin Pfeiffer (Soc.)",
+          "contest": "house6",
+          "candidate": "Franklin Pfeiffer"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.174,
+        0.458,
+        0.925,
+        0.684
+      ],
+      "hint": "Read only the table headed 'Sixth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 545,
+      "id": "545-3",
+      "columns": [
+        {
+          "label": "Frank D. Chapman (Dem.)",
+          "contest": "house7",
+          "candidate": "Frank D. Chapman"
+        },
+        {
+          "label": "Gerald J. Boileau (Rep.)",
+          "contest": "house7",
+          "candidate": "Gerald J. Boileau"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.174,
+        0.676,
+        0.925,
+        0.919
+      ],
+      "hint": "Read only the table headed 'Seventh District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 546,
+      "id": "546-0",
+      "columns": [
+        {
+          "label": "James Hughes (Dem.)",
+          "contest": "house8",
+          "candidate": "James Hughes"
+        },
+        {
+          "label": "George J. Schneider (Rep.)",
+          "contest": "house8",
+          "candidate": "George J. Schneider"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.07,
+        0.134,
+        0.816,
+        0.368
+      ],
+      "hint": "Read only the table headed 'Eighth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 546,
+      "id": "546-1",
+      "columns": [
+        {
+          "label": "Miles H. McNally (Dem.)",
+          "contest": "house9",
+          "candidate": "Miles H. McNally"
+        },
+        {
+          "label": "James A. Frear (Rep.)",
+          "contest": "house9",
+          "candidate": "James A. Frear"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.07,
+        0.36,
+        0.816,
+        0.652
+      ],
+      "hint": "Read only the table headed 'Ninth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 546,
+      "id": "546-2",
+      "columns": [
+        {
+          "label": "Peter B. Cadigan (Dem.)",
+          "contest": "house10",
+          "candidate": "Peter B. Cadigan"
+        },
+        {
+          "label": "Hubert H. Peavey (Rep.)",
+          "contest": "house10",
+          "candidate": "Hubert H. Peavey"
+        },
+        {
+          "label": "Arvid Salonen (Ind. Com.)",
+          "contest": "house10",
+          "candidate": "Arvid Salonen"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.068,
+        0.644,
+        0.814,
+        0.909
+      ],
+      "hint": "Read only the table headed 'Tenth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 564,
+      "id": "564-0",
+      "columns": [
+        {
+          "label": "Roose-velt and Garner Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Upshaw and Regan Proh.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Hoover and Curtis Rep.",
+          "contest": "president",
+          "candidate": "Hoover (Republican)"
+        },
+        {
+          "label": "Thomas and Maurer Soc.",
+          "contest": "president",
+          "candidate": "Thomas (Socialist)"
+        },
+        {
+          "label": "Foster and Ford Ind. Com.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Reynolds and Aiken Ind. Soc. Labor",
+          "contest": "president",
+          "candidate": "Socialist-Labor"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.072,
+        0.146,
+        0.823,
+        0.934
+      ],
+      "hint": "Read only the table headed 'SUMMARY VOTE FOR PRESIDENT November, 1932'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0926
+      ]
+    },
+    {
+      "page": 565,
+      "id": "565-0",
+      "columns": [
+        {
+          "label": "F. Ryan Duffy Dem.",
+          "contest": "senate",
+          "candidate": "F. Ryan Duffy"
+        },
+        {
+          "label": "Harvey A. Knapp Proh.",
+          "contest": "senate",
+          "candidate": "Harvey A. Knapp"
+        },
+        {
+          "label": "John B. Chapple Rep.",
+          "contest": "senate",
+          "candidate": "John B. Chapple"
+        },
+        {
+          "label": "Emil Seidel Soc.",
+          "contest": "senate",
+          "candidate": "Emil Seidel"
+        },
+        {
+          "label": "Ray Hansborough Ind. Com.",
+          "contest": "senate",
+          "candidate": "Ray Hansbrough"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.173,
+        0.111,
+        0.929,
+        0.907
+      ],
+      "hint": "Read only the table headed 'SUMMARY VOTE FOR UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1055
+      ]
+    },
+    {
+      "page": 566,
+      "id": "566-0",
+      "columns": [
+        {
+          "label": "Schmedeman Dem.",
+          "contest": "governor",
+          "candidate": "Albert G. Schmedeman"
+        },
+        {
+          "label": "Dean Proh.",
+          "contest": "governor",
+          "candidate": "William C. Dean"
+        },
+        {
+          "label": "Kohler Rep.",
+          "contest": "governor",
+          "candidate": "Walter J. Sr. Kohler"
+        },
+        {
+          "label": "Metcalfe Soc.",
+          "contest": "governor",
+          "candidate": "Frank Metcalfe"
+        },
+        {
+          "label": "Blair Com.",
+          "contest": "governor",
+          "candidate": "Fred Basset Blair"
+        },
+        {
+          "label": "Ehrhardt Soc.-Lab.",
+          "contest": "governor",
+          "candidate": "Joseph Ehrhardt"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.073,
+        0.116,
+        0.827,
+        0.912
+      ],
+      "hint": "Read only the table headed 'SUMMARY VOTE FOR GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.108
+      ]
+    }
+  ]
+}

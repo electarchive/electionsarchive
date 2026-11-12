@@ -1,0 +1,682 @@
+{
+  "polity": "US-WI",
+  "publisher": "Wisconsin Legislative Reference Bureau",
+  "title": "The Wisconsin Blue Book 1950, vote by counties (general election 1948-11-02)",
+  "license": "Public record",
+  "file": {
+    "url": "https://search.library.wisc.edu/digital/ACKSBXV5IMWXXJ8I",
+    "item": "https://search.library.wisc.edu/digital/ACKSBXV5IMWXXJ8I"
+  },
+  "raw_source": "us.county_volumes",
+  "contests": {
+    "president": {
+      "year": 1948,
+      "chamber": "president",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "governor": {
+      "year": 1948,
+      "chamber": "governor",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "house1": {
+      "year": 1948,
+      "chamber": "house",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "WI",
+      "district": 1
+    },
+    "house2": {
+      "year": 1948,
+      "chamber": "house",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "WI",
+      "district": 2
+    },
+    "house3": {
+      "year": 1948,
+      "chamber": "house",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "WI",
+      "district": 3
+    },
+    "house4": {
+      "year": 1948,
+      "chamber": "house",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "WI",
+      "district": 4
+    },
+    "house5": {
+      "year": 1948,
+      "chamber": "house",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "WI",
+      "district": 5
+    },
+    "house6": {
+      "year": 1948,
+      "chamber": "house",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "WI",
+      "district": 6
+    },
+    "house7": {
+      "year": 1948,
+      "chamber": "house",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "WI",
+      "district": 7
+    },
+    "house8": {
+      "year": 1948,
+      "chamber": "house",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "WI",
+      "district": 8
+    },
+    "house9": {
+      "year": 1948,
+      "chamber": "house",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "WI",
+      "district": 9
+    },
+    "house10": {
+      "year": 1948,
+      "chamber": "house",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "WI",
+      "district": 10
+    }
+  },
+  "pages": [
+    {
+      "page": 769,
+      "id": "769-0",
+      "columns": [
+        {
+          "label": "Truman and Barkley (Dem.)",
+          "contest": "president",
+          "candidate": "Harry S. Truman (Democratic)"
+        },
+        {
+          "label": "Wallace and Taylor (Peop. Prog.)",
+          "contest": "president",
+          "candidate": "Henry Wallace (Progressive)"
+        },
+        {
+          "label": "Dewey and Warren (Rep.)",
+          "contest": "president",
+          "candidate": "Thomas E. Dewey (Republican)"
+        },
+        {
+          "label": "Thomas and Smith (Soc.)",
+          "contest": "president",
+          "candidate": "Norman Thomas (Socialist)"
+        },
+        {
+          "label": "Dobbs and Carlson (Ind. Soc. Work.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Teichert and Emery (Ind. Soc. Labor)",
+          "contest": "president",
+          "candidate": "Socialist-Labor (Ind. Socialist-Labor)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.182,
+        0.098,
+        0.938,
+        0.919
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENT BY COUNTIES, November 2, 1948'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1303
+      ]
+    },
+    {
+      "page": 770,
+      "id": "770-0",
+      "columns": [
+        {
+          "label": "Truman (Dem.)",
+          "contest": "president",
+          "candidate": "Harry S. Truman (Democratic)"
+        },
+        {
+          "label": "Dewey (Rep.)",
+          "contest": "president",
+          "candidate": "Thomas E. Dewey (Republican)"
+        },
+        {
+          "label": "Wallace (People's Prog.)",
+          "contest": "president",
+          "candidate": "Henry Wallace (Progressive)"
+        },
+        {
+          "label": "Watson (Prohibition)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Thomas (Soc.)",
+          "contest": "president",
+          "candidate": "Norman Thomas (Socialist)"
+        },
+        {
+          "label": "Thurmond (States' Rights Dem.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Teichert (Soc. Labor)",
+          "contest": "president",
+          "candidate": "Socialist-Labor (Ind. Socialist-Labor)"
+        },
+        {
+          "label": "Dobbs (Soc. Worker)",
+          "contest": "president",
+          "candidate": "Socialist-Workers (Ind. Socialist-Workers)"
+        },
+        {
+          "label": "Others",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Electoral Truman (Dem.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Electoral Dewey (Rep.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Electoral Thurmond (States' Rights Dem.)",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.081,
+        0.144,
+        0.902,
+        1.0
+      ],
+      "hint": "Read only the table headed 'PRESIDENTIAL ELECTION, NOVEMBER 2, 1948 By States'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1565
+      ]
+    },
+    {
+      "page": 771,
+      "id": "771-0",
+      "columns": [
+        {
+          "label": "Truman (Dem.)",
+          "contest": "president",
+          "candidate": "Harry S. Truman (Democratic)"
+        },
+        {
+          "label": "Dewey (Rep.)",
+          "contest": "president",
+          "candidate": "Thomas E. Dewey (Republican)"
+        },
+        {
+          "label": "Wallace (People's Prog.)",
+          "contest": "president",
+          "candidate": "Henry Wallace (Progressive)"
+        },
+        {
+          "label": "Watson (Prohibition)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Thomas (Soc.)",
+          "contest": "president",
+          "candidate": "Norman Thomas (Socialist)"
+        },
+        {
+          "label": "Thurmond (States' Rights Dem.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Teichert (Soc. Labor)",
+          "contest": "president",
+          "candidate": "Socialist-Labor (Ind. Socialist-Labor)"
+        },
+        {
+          "label": "Dobbs (Soc. Worker)",
+          "contest": "president",
+          "candidate": "Socialist-Workers (Ind. Socialist-Workers)"
+        },
+        {
+          "label": "Others",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Electoral Truman (Dem.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Electoral Dewey (Rep.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Electoral Thurmond (States' Rights Dem.)",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.087,
+        0.398,
+        0.903,
+        0.673
+      ],
+      "hint": "Read only the table headed 'PRESIDENTIAL ELECTION, NOVEMBER 2, 1948\u2014Continued By States'; ignore any other table visible in the image."
+    },
+    {
+      "page": 772,
+      "id": "772-0",
+      "columns": [
+        {
+          "label": "Thompson (Dem.)",
+          "contest": "governor",
+          "candidate": "Carl W. Thompson"
+        },
+        {
+          "label": "Berquist (Peop. Prog.)",
+          "contest": "governor",
+          "candidate": "Henry J. Berquist"
+        },
+        {
+          "label": "Rennebohm (Rep.)",
+          "contest": "governor",
+          "candidate": "Oscar Rennebohm"
+        },
+        {
+          "label": "Uphoff (Soc.)",
+          "contest": "governor",
+          "candidate": "Walter H. Uphoff"
+        },
+        {
+          "label": "Cozzini (Ind. Soc. Lab.)",
+          "contest": "governor",
+          "candidate": "Georgia Cozzini"
+        },
+        {
+          "label": "Boulton (Ind. Soc. Work.)",
+          "contest": "governor",
+          "candidate": "James E. Boulton"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.071,
+        0.099,
+        0.825,
+        0.903
+      ],
+      "hint": "Read only the table headed 'VOTE FOR GOVERNOR BY COUNTIES*'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1007
+      ]
+    },
+    {
+      "page": 777,
+      "id": "777-0",
+      "columns": [
+        {
+          "label": "Harvey (Dem.)",
+          "contest": "house1",
+          "candidate": "Jack Harvey"
+        },
+        {
+          "label": "Smith (Rep.)",
+          "contest": "house1",
+          "candidate": "Lawrence H. Smith"
+        },
+        {
+          "label": "Spence (Soc.)",
+          "contest": "house1",
+          "candidate": "John C. Spence"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.166,
+        0.136,
+        0.921,
+        0.299
+      ],
+      "hint": "Read only the table headed 'First District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 777,
+      "id": "777-1",
+      "columns": [
+        {
+          "label": "Wilkie (Dem.)",
+          "contest": "house2",
+          "candidate": "Horace W. Wilkie"
+        },
+        {
+          "label": "Davis (Rep.)",
+          "contest": "house2",
+          "candidate": "Glenn R. Davis"
+        },
+        {
+          "label": "Uphoff (Soc.)",
+          "contest": "house2",
+          "candidate": "Mary Jo Uphoff"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.166,
+        0.291,
+        0.921,
+        0.452
+      ],
+      "hint": "Read only the table headed 'Second District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 777,
+      "id": "777-2",
+      "columns": [
+        {
+          "label": "Antoine (Dem.)",
+          "contest": "house3",
+          "candidate": "Frank J. Antoine"
+        },
+        {
+          "label": "Withrow (Rep.)",
+          "contest": "house3",
+          "candidate": "Gardner R. Withrow"
+        },
+        {
+          "label": "Haberlman (Soc.)",
+          "contest": "house3",
+          "candidate": "Clarence J. Habelman"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.166,
+        0.444,
+        0.921,
+        0.646
+      ],
+      "hint": "Read only the table headed 'Third District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 777,
+      "id": "777-3",
+      "columns": [
+        {
+          "label": "Zablocki (Dem.)",
+          "contest": "house4",
+          "candidate": "Clement J. Zablocki"
+        },
+        {
+          "label": "Bobrowicz (Peop. Prog.)",
+          "contest": "house4",
+          "candidate": "Edmund V. Bobrowicz"
+        },
+        {
+          "label": "Brophy (Rep.)",
+          "contest": "house4",
+          "candidate": "John C. Brophy"
+        },
+        {
+          "label": "Stachowiak (Soc.)",
+          "contest": "house4",
+          "candidate": "Clement Stachowiak"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.166,
+        0.638,
+        0.921,
+        0.77
+      ],
+      "hint": "Read only the table headed 'Fourth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 777,
+      "id": "777-4",
+      "columns": [
+        {
+          "label": "Biemiller (Dem.)",
+          "contest": "house5",
+          "candidate": "Andrew J. Biemiller"
+        },
+        {
+          "label": "Kersten (Rep.)",
+          "contest": "house5",
+          "candidate": "Charles J. Kersten"
+        },
+        {
+          "label": "Knappe (Soc.)",
+          "contest": "house5",
+          "candidate": "Edwin W. Knappe"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.166,
+        0.762,
+        0.921,
+        0.88
+      ],
+      "hint": "Read only the table headed 'Fifth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 778,
+      "id": "778-0",
+      "columns": [
+        {
+          "label": "Kunde (Dem.)",
+          "contest": "house6",
+          "candidate": "Kenneth Kunde"
+        },
+        {
+          "label": "Keefe (Rep.)",
+          "contest": "house6",
+          "candidate": "Frank B. Keefe"
+        },
+        {
+          "label": "Renn (Soc.)",
+          "contest": "house6",
+          "candidate": "Rudolph Renn"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.075,
+        0.171,
+        0.828,
+        0.358
+      ],
+      "hint": "Read only the table headed 'Sixth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 778,
+      "id": "778-1",
+      "columns": [
+        {
+          "label": "Kronenwetter (Dem.)",
+          "contest": "house7",
+          "candidate": "Ralph E. Kronenwetter"
+        },
+        {
+          "label": "Muelver (Peop. Prog.)",
+          "contest": "house7",
+          "candidate": "Emil Muelver"
+        },
+        {
+          "label": "Murray (Rep.)",
+          "contest": "house7",
+          "candidate": "Reid F. Murray"
+        },
+        {
+          "label": "Pearson (Soc.)",
+          "contest": "house7",
+          "candidate": "John A. Pearson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.071,
+        0.35,
+        0.827,
+        0.607
+      ],
+      "hint": "Read only the table headed 'Seventh District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 778,
+      "id": "778-2",
+      "columns": [
+        {
+          "label": "Young (Dem.)",
+          "contest": "house8",
+          "candidate": "Martin J. Young"
+        },
+        {
+          "label": "Rasmussen (Peop. Prog.)",
+          "contest": "house8",
+          "candidate": "Oliver Rasmussen"
+        },
+        {
+          "label": "Byrnes (Rep.)",
+          "contest": "house8",
+          "candidate": "John W. Byrnes"
+        },
+        {
+          "label": "Schaal (Soc.)",
+          "contest": "house8",
+          "candidate": "Lee M. Schaal"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.066,
+        0.599,
+        0.821,
+        0.817
+      ],
+      "hint": "Read only the table headed 'Eighth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 779,
+      "id": "779-0",
+      "columns": [
+        {
+          "label": "Jahr (Peop. Prog.)",
+          "contest": "house9",
+          "candidate": "Linton Jahr"
+        },
+        {
+          "label": "Hull (Rep.)",
+          "contest": "house9",
+          "candidate": "Merlin Hull"
+        },
+        {
+          "label": "Hendricks (Soc.)",
+          "contest": "house9",
+          "candidate": "Howard C. Hendricks"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.174,
+        0.174,
+        0.929,
+        0.443
+      ],
+      "hint": "Read only the table headed 'Ninth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 779,
+      "id": "779-1",
+      "columns": [
+        {
+          "label": "Hoan (Dem.)",
+          "contest": "house10",
+          "candidate": "Daniel W. Hoan"
+        },
+        {
+          "label": "Polich (Peop. Prog.)",
+          "contest": "house10",
+          "candidate": "Charles N. Polich"
+        },
+        {
+          "label": "O'Konski (Rep.)",
+          "contest": "house10",
+          "candidate": "Alvin E. O'Konski"
+        },
+        {
+          "label": "Kreie (Soc.)",
+          "contest": "house10",
+          "candidate": "Adolph F. Kreie"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.177,
+        0.435,
+        0.932,
+        0.735
+      ],
+      "hint": "Read only the table headed 'Tenth District'; ignore any other table visible in the image."
+    }
+  ]
+}

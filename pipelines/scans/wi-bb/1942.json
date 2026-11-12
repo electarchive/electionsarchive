@@ -1,0 +1,457 @@
+{
+  "polity": "US-WI",
+  "publisher": "Wisconsin Legislative Reference Bureau",
+  "title": "The Wisconsin Blue Book 1944, vote by counties (general election 1942-11-03)",
+  "license": "Public record",
+  "file": {
+    "url": "https://search.library.wisc.edu/digital/A5MPC2C75NJZEK8Z",
+    "item": "https://search.library.wisc.edu/digital/A5MPC2C75NJZEK8Z"
+  },
+  "raw_source": "us.county_volumes",
+  "contests": {
+    "governor": {
+      "year": 1942,
+      "chamber": "governor",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "house1": {
+      "year": 1942,
+      "chamber": "house",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "WI",
+      "district": 1
+    },
+    "house2": {
+      "year": 1942,
+      "chamber": "house",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "WI",
+      "district": 2
+    },
+    "house3": {
+      "year": 1942,
+      "chamber": "house",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "WI",
+      "district": 3
+    },
+    "house4": {
+      "year": 1942,
+      "chamber": "house",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "WI",
+      "district": 4
+    },
+    "house5": {
+      "year": 1942,
+      "chamber": "house",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "WI",
+      "district": 5
+    },
+    "house6": {
+      "year": 1942,
+      "chamber": "house",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "WI",
+      "district": 6
+    },
+    "house7": {
+      "year": 1942,
+      "chamber": "house",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "WI",
+      "district": 7
+    },
+    "house8": {
+      "year": 1942,
+      "chamber": "house",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "WI",
+      "district": 8
+    },
+    "house9": {
+      "year": 1942,
+      "chamber": "house",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "WI",
+      "district": 9
+    },
+    "house10": {
+      "year": 1942,
+      "chamber": "house",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "WI",
+      "district": 10
+    }
+  },
+  "pages": [
+    {
+      "page": 595,
+      "id": "595-0",
+      "columns": [
+        {
+          "label": "Sullivan (Dem.)",
+          "contest": "governor",
+          "candidate": "William C. Sullivan"
+        },
+        {
+          "label": "Loomis (Prog.)",
+          "contest": "governor",
+          "candidate": "Orland S. Loomis"
+        },
+        {
+          "label": "Heil (Rep.)",
+          "contest": "governor",
+          "candidate": "Julius P. Heil"
+        },
+        {
+          "label": "Zeidler (Soc.)",
+          "contest": "governor",
+          "candidate": "Frank P. Zeidler"
+        },
+        {
+          "label": "Blair (Ind. Com.)",
+          "contest": "governor",
+          "candidate": "Fred Basset Blair"
+        },
+        {
+          "label": "Cozzini (Ind. Soc. Lab.)",
+          "contest": "governor",
+          "candidate": "Georgia Cozzini"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.154,
+        0.134,
+        0.911,
+        0.909
+      ],
+      "hint": "Read only the table headed 'SUMMARY VOTE FOR GOVERNOR BY COUNTIES'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0645
+      ]
+    },
+    {
+      "page": 600,
+      "id": "600-0",
+      "columns": [
+        {
+          "label": "Magruder (Dem.)",
+          "contest": "house1",
+          "candidate": "Bernard F. Magruder"
+        },
+        {
+          "label": "Smith (Rep.)",
+          "contest": "house1",
+          "candidate": "Lawrence H. Smith"
+        },
+        {
+          "label": "Benson (Soc.)",
+          "contest": "house1",
+          "candidate": "Walter G. Benson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.092,
+        0.225,
+        0.845,
+        0.405
+      ],
+      "hint": "Read only the table headed 'First District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 600,
+      "id": "600-1",
+      "columns": [
+        {
+          "label": "Brooks (Dem.)",
+          "contest": "house2",
+          "candidate": "Thomas R. Brooks"
+        },
+        {
+          "label": "Brooks Sauthoff (Prog.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Sauthoff Hawks, Jr. (Rep.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Hale (Soc.)",
+          "contest": "house2",
+          "candidate": "Fred A. Hale"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.092,
+        0.397,
+        0.845,
+        0.63
+      ],
+      "hint": "Read only the table headed 'Second District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 600,
+      "id": "600-2",
+      "columns": [
+        {
+          "label": "Carroll (Dem.)",
+          "contest": "house3",
+          "candidate": "William D. Carroll"
+        },
+        {
+          "label": "Withrow (Prog.)",
+          "contest": "house3",
+          "candidate": "Gardner R. Withrow"
+        },
+        {
+          "label": "Stevenson (Rep.)",
+          "contest": "house3",
+          "candidate": "William H. Stevenson"
+        },
+        {
+          "label": "Ochsner (Soc.)",
+          "contest": "house3",
+          "candidate": "Henry A. Ochsner"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.092,
+        0.622,
+        0.845,
+        0.845
+      ],
+      "hint": "Read only the table headed 'Third District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 601,
+      "id": "601-0",
+      "columns": [
+        {
+          "label": "Wasielewski (Dem.)",
+          "contest": "house4",
+          "candidate": "Thad F. Wasielewski"
+        },
+        {
+          "label": "Brophy (Prog.)",
+          "contest": "house4",
+          "candidate": "John C. Brophy"
+        },
+        {
+          "label": "Schafer (Rep.)",
+          "contest": "house4",
+          "candidate": "John C. Schafer"
+        },
+        {
+          "label": "Buech (Soc.)",
+          "contest": "house4",
+          "candidate": "Robert Buech"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.147,
+        0.161,
+        0.898,
+        0.311
+      ],
+      "hint": "Read only the table headed 'Fourth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 601,
+      "id": "601-1",
+      "columns": [
+        {
+          "label": "McMurray (Dem.)",
+          "contest": "house5",
+          "candidate": "Howard J. McMurray"
+        },
+        {
+          "label": "Roush (Prog.)",
+          "contest": "house5",
+          "candidate": "Roy A. Roush"
+        },
+        {
+          "label": "Thill (Rep.)",
+          "contest": "house5",
+          "candidate": "Lewis D. Thill"
+        },
+        {
+          "label": "Knappe (Soc.)",
+          "contest": "house5",
+          "candidate": "Edwin W. Knappe"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.147,
+        0.303,
+        0.898,
+        0.47
+      ],
+      "hint": "Read only the table headed 'Fifth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 601,
+      "id": "601-2",
+      "columns": [
+        {
+          "label": "Schallern (Dem.)",
+          "contest": "house6",
+          "candidate": "Eugene Schallern"
+        },
+        {
+          "label": "Poltl (Prog.)",
+          "contest": "house6",
+          "candidate": "Adam F. Poltl"
+        },
+        {
+          "label": "Keefe (Rep.)",
+          "contest": "house6",
+          "candidate": "Frank B. Keefe"
+        },
+        {
+          "label": "Boll (Soc.)",
+          "contest": "house6",
+          "candidate": "John C. Boll"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.147,
+        0.462,
+        0.898,
+        0.675
+      ],
+      "hint": "Read only the table headed 'Sixth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 601,
+      "id": "601-3",
+      "columns": [
+        {
+          "label": "Kennedy (Dem.)",
+          "contest": "house7",
+          "candidate": "John A. Kennedy"
+        },
+        {
+          "label": "Murray (Rep.)",
+          "contest": "house7",
+          "candidate": "Reid F. Murray"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.147,
+        0.667,
+        0.898,
+        0.894
+      ],
+      "hint": "Read only the table headed 'Seventh District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 602,
+      "id": "602-0",
+      "columns": [
+        {
+          "label": "Dilweg (Dem.)",
+          "contest": "house8",
+          "candidate": "LaVern R. Dilweg"
+        },
+        {
+          "label": "Johns (Rep.)",
+          "contest": "house8",
+          "candidate": "Joshua L. Johns"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.098,
+        0.16,
+        0.85,
+        0.382
+      ],
+      "hint": "Read only the table headed 'Eighth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 602,
+      "id": "602-1",
+      "columns": [
+        {
+          "label": "Joyce (Dem.)",
+          "contest": "house9",
+          "candidate": "Jack E. Joyce"
+        },
+        {
+          "label": "Hull (Prog.)",
+          "contest": "house9",
+          "candidate": "Merlin Hull"
+        },
+        {
+          "label": "Hipke (Rep.)",
+          "contest": "house9",
+          "candidate": "George H. Hipke"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.098,
+        0.374,
+        0.85,
+        0.637
+      ],
+      "hint": "Read only the table headed 'Ninth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 602,
+      "id": "602-2",
+      "columns": [
+        {
+          "label": "Green (Dem.)",
+          "contest": "house10",
+          "candidate": "John G. Green"
+        },
+        {
+          "label": "Gehrmann (Prog.)",
+          "contest": "house10",
+          "candidate": "Bernard J. Gehrmann"
+        },
+        {
+          "label": "O'Konski (Rep.)",
+          "contest": "house10",
+          "candidate": "Alvin E. O'Konski"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.098,
+        0.629,
+        0.85,
+        0.896
+      ],
+      "hint": "Read only the table headed 'Tenth District'; ignore any other table visible in the image."
+    }
+  ]
+}
