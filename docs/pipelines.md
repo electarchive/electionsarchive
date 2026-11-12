@@ -124,6 +124,8 @@ Matching people, parties, and places across elections and sources runs in three 
 
 The `wikidata` pipeline matches each party to a Wikidata item. It queries parties by country, scores each item by how well its labels, aliases, short names, and official names match the party's names, and checks the item's founding and dissolution dates against the party's elections. The top item must score well enough and beat its runner-up. A party that another pipeline has already linked keeps its link. The same pipeline imports each party's colors and political position from Wikidata. The module keeps a party's hand-curated color, or a political position that the source leaves out, as a constant with a note, so reviewers can see where it came from.
 
+The `partyfacts` pipeline adds each party's Party Facts ID as an `external_id` with scheme `partyfacts`. Party Facts' data is CC0. A Party Facts party matches one of ours through the Wikidata item of the Wikipedia page it cites, or through its ParlGov party ID; a party that two routes send to different parties, or that would hold several Party Facts IDs, is skipped. Each match carries a citation whose locator names the route. A party that matches only through ParlGov and has no Wikidata link takes the Wikidata item of Party Facts' Wikipedia page, when no other party holds it.
+
 ### People
 
 Two people who are the same person merge with `cs.merge(duplicate, survivor)`. Publishing the merge re-points every foreign key and every fact that references the duplicate, moves the duplicate's names and slugs to redirects, and records each re-pointed row in `fact_rekey`, so `ea revert` can undo the merge. The merge is refused when the survivor already holds a conflicting row for the same key.
