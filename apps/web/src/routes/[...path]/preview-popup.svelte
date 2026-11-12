@@ -66,7 +66,9 @@
         {failed ? m.preview_failed() : m.preview_loading()}
       </p>
     {:else if data.kind === "contest"}
-      {const head = $derived(data.head)}
+      {const head: Extract<PageData, { kind: "contest" }>["head"] = $derived(
+        data.head,
+      )}
       <div class="grid gap-0.5 px-3 pbs-2.5 pbe-2">
         <p class="text-[1.0625rem]/tight font-[720] text-balance">
           {head.scope.noun == null
