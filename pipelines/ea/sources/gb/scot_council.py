@@ -146,6 +146,8 @@ def unwrap(lines: list[str]) -> list[str]:
         ):
             numbers = merged.pop(filled[0]).strip()
             fields = re.split(r"\s{2,}", line.strip())
+            if fields[-1] in ("Elected", "Excluded"):
+                numbers = f"{numbers}  {fields.pop()}"
             if (
                 len(filled) > 1
                 and merged[filled[1]][:1].isspace()
@@ -207,7 +209,7 @@ def read_stages(
             continue
         status_found = re.search(r"\s(Elected|Excluded)$", line.rstrip())
         outcome = status_found.group(1) if status_found else None
-        fields = re.split(r"\s{2,}", line.rstrip()[: status_found.start()] if status_found else line.strip())
+        fields = re.split(r"\s{2,}", line.rstrip()[: status_found.start()].rstrip() if status_found else line.strip())
         numbers = []
         while fields and re.fullmatch(NUMBER, fields[-1]):
             numbers.insert(0, fields.pop())
@@ -929,7 +931,9 @@ DESCRIPTIONS = (
     (r"communist party", "Communist Party of Britain"),
     (r"workers party", "Workers Party of Britain"),
     (r"british unionist", "British Unionist Party"),
-    (r"^independent$|^$", "Independent"),
+    (r"abolish holyrood|abolish the scottish parliament", "Abolish the Scottish Parliament Party"),
+    (r"alliance to liberate scotland", "Alliance to Liberate Scotland"),
+    (r"^independent$|^independent trade union and socialist candidate$|^$", "Independent"),
 )
 
 
