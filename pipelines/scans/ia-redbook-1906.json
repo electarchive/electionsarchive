@@ -1,0 +1,669 @@
+{
+ "polity": "US-IA",
+ "publisher": "Iowa Secretary of State (Iowa Official Register)",
+ "title": "Iowa Official Register 1907-1908 (Redbook), vote by counties for president, governor, and Members of Congress",
+ "license": "Public record",
+ "raw_source": "us.scans",
+ "file": {
+  "url": "https://www.legis.iowa.gov/docs/publications/REDBK/860880.pdf",
+  "item": "https://www.legis.iowa.gov/archives/register"
+ },
+ "contests": {
+  "governor-1906": {
+   "year": 1906,
+   "chamber": "governor",
+   "day": "1906-11-06",
+   "special": false,
+   "state": "IA",
+   "district": null
+  },
+  "president-1900": {
+   "year": 1900,
+   "chamber": "president",
+   "day": "1900-11-06",
+   "special": false,
+   "state": "IA",
+   "district": null
+  },
+  "president-1904": {
+   "year": 1904,
+   "chamber": "president",
+   "day": "1904-11-08",
+   "special": false,
+   "state": "IA",
+   "district": null
+  },
+  "house1-1898": {
+   "year": 1898,
+   "chamber": "house",
+   "day": "1898-11-08",
+   "special": false,
+   "state": "IA",
+   "district": 1
+  },
+  "house1-1900": {
+   "year": 1900,
+   "chamber": "house",
+   "day": "1900-11-06",
+   "special": false,
+   "state": "IA",
+   "district": 1
+  },
+  "house1-1902": {
+   "year": 1902,
+   "chamber": "house",
+   "day": "1902-11-04",
+   "special": false,
+   "state": "IA",
+   "district": 1
+  },
+  "house1-1904": {
+   "year": 1904,
+   "chamber": "house",
+   "day": "1904-11-08",
+   "special": false,
+   "state": "IA",
+   "district": 1
+  },
+  "house1-1906": {
+   "year": 1906,
+   "chamber": "house",
+   "day": "1906-11-06",
+   "special": false,
+   "state": "IA",
+   "district": 1
+  },
+  "house2-1898": {
+   "year": 1898,
+   "chamber": "house",
+   "day": "1898-11-08",
+   "special": false,
+   "state": "IA",
+   "district": 2
+  },
+  "house2-1900": {
+   "year": 1900,
+   "chamber": "house",
+   "day": "1900-11-06",
+   "special": false,
+   "state": "IA",
+   "district": 2
+  },
+  "house2-1902": {
+   "year": 1902,
+   "chamber": "house",
+   "day": "1902-11-04",
+   "special": false,
+   "state": "IA",
+   "district": 2
+  },
+  "house2-1904": {
+   "year": 1904,
+   "chamber": "house",
+   "day": "1904-11-08",
+   "special": false,
+   "state": "IA",
+   "district": 2
+  },
+  "house2-1906": {
+   "year": 1906,
+   "chamber": "house",
+   "day": "1906-11-06",
+   "special": false,
+   "state": "IA",
+   "district": 2
+  },
+  "house3-1898": {
+   "year": 1898,
+   "chamber": "house",
+   "day": "1898-11-08",
+   "special": false,
+   "state": "IA",
+   "district": 3
+  },
+  "house3-1900": {
+   "year": 1900,
+   "chamber": "house",
+   "day": "1900-11-06",
+   "special": false,
+   "state": "IA",
+   "district": 3
+  },
+  "house3-1902": {
+   "year": 1902,
+   "chamber": "house",
+   "day": "1902-11-04",
+   "special": false,
+   "state": "IA",
+   "district": 3
+  },
+  "house3-1904": {
+   "year": 1904,
+   "chamber": "house",
+   "day": "1904-11-08",
+   "special": false,
+   "state": "IA",
+   "district": 3
+  },
+  "house3-1906": {
+   "year": 1906,
+   "chamber": "house",
+   "day": "1906-11-06",
+   "special": false,
+   "state": "IA",
+   "district": 3
+  },
+  "house4-1898": {
+   "year": 1898,
+   "chamber": "house",
+   "day": "1898-11-08",
+   "special": false,
+   "state": "IA",
+   "district": 4
+  },
+  "house4-1900": {
+   "year": 1900,
+   "chamber": "house",
+   "day": "1900-11-06",
+   "special": false,
+   "state": "IA",
+   "district": 4
+  },
+  "house4-1902": {
+   "year": 1902,
+   "chamber": "house",
+   "day": "1902-11-04",
+   "special": false,
+   "state": "IA",
+   "district": 4
+  },
+  "house4-1904": {
+   "year": 1904,
+   "chamber": "house",
+   "day": "1904-11-08",
+   "special": false,
+   "state": "IA",
+   "district": 4
+  },
+  "house4-1906": {
+   "year": 1906,
+   "chamber": "house",
+   "day": "1906-11-06",
+   "special": false,
+   "state": "IA",
+   "district": 4
+  },
+  "house5-1898": {
+   "year": 1898,
+   "chamber": "house",
+   "day": "1898-11-08",
+   "special": false,
+   "state": "IA",
+   "district": 5
+  },
+  "house5-1900": {
+   "year": 1900,
+   "chamber": "house",
+   "day": "1900-11-06",
+   "special": false,
+   "state": "IA",
+   "district": 5
+  },
+  "house5-1902": {
+   "year": 1902,
+   "chamber": "house",
+   "day": "1902-11-04",
+   "special": false,
+   "state": "IA",
+   "district": 5
+  },
+  "house5-1904": {
+   "year": 1904,
+   "chamber": "house",
+   "day": "1904-11-08",
+   "special": false,
+   "state": "IA",
+   "district": 5
+  },
+  "house5-1906": {
+   "year": 1906,
+   "chamber": "house",
+   "day": "1906-11-06",
+   "special": false,
+   "state": "IA",
+   "district": 5
+  },
+  "house6-1898": {
+   "year": 1898,
+   "chamber": "house",
+   "day": "1898-11-08",
+   "special": false,
+   "state": "IA",
+   "district": 6
+  },
+  "house6-1900": {
+   "year": 1900,
+   "chamber": "house",
+   "day": "1900-11-06",
+   "special": false,
+   "state": "IA",
+   "district": 6
+  },
+  "house6-1902": {
+   "year": 1902,
+   "chamber": "house",
+   "day": "1902-11-04",
+   "special": false,
+   "state": "IA",
+   "district": 6
+  },
+  "house6-1904": {
+   "year": 1904,
+   "chamber": "house",
+   "day": "1904-11-08",
+   "special": false,
+   "state": "IA",
+   "district": 6
+  },
+  "house6-1906": {
+   "year": 1906,
+   "chamber": "house",
+   "day": "1906-11-06",
+   "special": false,
+   "state": "IA",
+   "district": 6
+  },
+  "house7-1898": {
+   "year": 1898,
+   "chamber": "house",
+   "day": "1898-11-08",
+   "special": false,
+   "state": "IA",
+   "district": 7
+  },
+  "house7-1900": {
+   "year": 1900,
+   "chamber": "house",
+   "day": "1900-11-06",
+   "special": false,
+   "state": "IA",
+   "district": 7
+  },
+  "house7-1902": {
+   "year": 1902,
+   "chamber": "house",
+   "day": "1902-11-04",
+   "special": false,
+   "state": "IA",
+   "district": 7
+  },
+  "house7-1904": {
+   "year": 1904,
+   "chamber": "house",
+   "day": "1904-11-08",
+   "special": false,
+   "state": "IA",
+   "district": 7
+  },
+  "house7-1906": {
+   "year": 1906,
+   "chamber": "house",
+   "day": "1906-11-06",
+   "special": false,
+   "state": "IA",
+   "district": 7
+  },
+  "house8-1898": {
+   "year": 1898,
+   "chamber": "house",
+   "day": "1898-11-08",
+   "special": false,
+   "state": "IA",
+   "district": 8
+  },
+  "house8-1900": {
+   "year": 1900,
+   "chamber": "house",
+   "day": "1900-11-06",
+   "special": false,
+   "state": "IA",
+   "district": 8
+  },
+  "house8-1902": {
+   "year": 1902,
+   "chamber": "house",
+   "day": "1902-11-04",
+   "special": false,
+   "state": "IA",
+   "district": 8
+  },
+  "house8-1904": {
+   "year": 1904,
+   "chamber": "house",
+   "day": "1904-11-08",
+   "special": false,
+   "state": "IA",
+   "district": 8
+  },
+  "house8-1906": {
+   "year": 1906,
+   "chamber": "house",
+   "day": "1906-11-06",
+   "special": false,
+   "state": "IA",
+   "district": 8
+  },
+  "house9-1898": {
+   "year": 1898,
+   "chamber": "house",
+   "day": "1898-11-08",
+   "special": false,
+   "state": "IA",
+   "district": 9
+  },
+  "house9-1900": {
+   "year": 1900,
+   "chamber": "house",
+   "day": "1900-11-06",
+   "special": false,
+   "state": "IA",
+   "district": 9
+  },
+  "house9-1902": {
+   "year": 1902,
+   "chamber": "house",
+   "day": "1902-11-04",
+   "special": false,
+   "state": "IA",
+   "district": 9
+  },
+  "house9-1904": {
+   "year": 1904,
+   "chamber": "house",
+   "day": "1904-11-08",
+   "special": false,
+   "state": "IA",
+   "district": 9
+  },
+  "house9-1906": {
+   "year": 1906,
+   "chamber": "house",
+   "day": "1906-11-06",
+   "special": false,
+   "state": "IA",
+   "district": 9
+  },
+  "house10-1898": {
+   "year": 1898,
+   "chamber": "house",
+   "day": "1898-11-08",
+   "special": false,
+   "state": "IA",
+   "district": 10
+  },
+  "house10-1900": {
+   "year": 1900,
+   "chamber": "house",
+   "day": "1900-11-06",
+   "special": false,
+   "state": "IA",
+   "district": 10
+  },
+  "house10-1902": {
+   "year": 1902,
+   "chamber": "house",
+   "day": "1902-11-04",
+   "special": false,
+   "state": "IA",
+   "district": 10
+  },
+  "house10-1904": {
+   "year": 1904,
+   "chamber": "house",
+   "day": "1904-11-08",
+   "special": false,
+   "state": "IA",
+   "district": 10
+  },
+  "house10-1906": {
+   "year": 1906,
+   "chamber": "house",
+   "day": "1906-11-06",
+   "special": false,
+   "state": "IA",
+   "district": 10
+  },
+  "house11-1898": {
+   "year": 1898,
+   "chamber": "house",
+   "day": "1898-11-08",
+   "special": false,
+   "state": "IA",
+   "district": 11
+  },
+  "house11-1900": {
+   "year": 1900,
+   "chamber": "house",
+   "day": "1900-11-06",
+   "special": false,
+   "state": "IA",
+   "district": 11
+  },
+  "house11-1902": {
+   "year": 1902,
+   "chamber": "house",
+   "day": "1902-11-04",
+   "special": false,
+   "state": "IA",
+   "district": 11
+  },
+  "house11-1904": {
+   "year": 1904,
+   "chamber": "house",
+   "day": "1904-11-08",
+   "special": false,
+   "state": "IA",
+   "district": 11
+  },
+  "house11-1906": {
+   "year": 1906,
+   "chamber": "house",
+   "day": "1906-11-06",
+   "special": false,
+   "state": "IA",
+   "district": 11
+  }
+ },
+ "pages": [
+  {
+   "page": 529,
+   "id": "529",
+   "turn": 270,
+   "orientation": "counties_down",
+   "discover": [
+    "governor-1906",
+    "president-1900",
+    "president-1904"
+   ],
+   "hint": "Begin every column label with the election year printed in the heading above its group of columns, then the candidate's name and party as printed, for example '1906 Thomas Hedge, Rep.'. The page is one third of a table of the 99 Iowa counties with the vote for governor 1906 and president 1900 and 1904; the Total row prints on the last of the three pages only. Include the Number of precincts column if printed. Ignore Plurality and Majority rows."
+  },
+  {
+   "page": 530,
+   "id": "530",
+   "turn": 270,
+   "orientation": "counties_down",
+   "discover": [
+    "governor-1906",
+    "president-1900",
+    "president-1904"
+   ],
+   "hint": "Begin every column label with the election year printed in the heading above its group of columns, then the candidate's name and party as printed, for example '1906 Thomas Hedge, Rep.'. The page is one third of a table of the 99 Iowa counties with the vote for governor 1906 and president 1900 and 1904; the Total row prints on the last of the three pages only. Include the Number of precincts column if printed. Ignore Plurality and Majority rows."
+  },
+  {
+   "page": 531,
+   "id": "531",
+   "turn": 270,
+   "orientation": "counties_down",
+   "discover": [
+    "governor-1906",
+    "president-1900",
+    "president-1904"
+   ],
+   "hint": "Begin every column label with the election year printed in the heading above its group of columns, then the candidate's name and party as printed, for example '1906 Thomas Hedge, Rep.'. The page is one third of a table of the 99 Iowa counties with the vote for governor 1906 and president 1900 and 1904; the Total row prints on the last of the three pages only. Include the Number of precincts column if printed. Ignore Plurality and Majority rows."
+  },
+  {
+   "page": 541,
+   "id": "541",
+   "turn": 270,
+   "orientation": "counties_down",
+   "discover": [
+    "house1-1898",
+    "house1-1900",
+    "house1-1902",
+    "house1-1904",
+    "house1-1906"
+   ],
+   "hint": "Begin every column label with the election year printed in the heading above its group of columns, then the candidate's name and party as printed, for example '1906 Thomas Hedge, Rep.'. The table is the comparative vote for Member of Congress in the First Congressional District, one group of candidate columns per election year side by side. Ignore Plurality and Majority rows."
+  },
+  {
+   "page": 542,
+   "id": "542",
+   "turn": 270,
+   "orientation": "counties_down",
+   "discover": [
+    "house2-1898",
+    "house2-1900",
+    "house2-1902",
+    "house2-1904",
+    "house2-1906"
+   ],
+   "hint": "Begin every column label with the election year printed in the heading above its group of columns, then the candidate's name and party as printed, for example '1906 Thomas Hedge, Rep.'. The table is the comparative vote for Member of Congress in the Second Congressional District, one group of candidate columns per election year side by side. Ignore Plurality and Majority rows."
+  },
+  {
+   "page": 543,
+   "id": "543",
+   "turn": 270,
+   "orientation": "counties_down",
+   "discover": [
+    "house3-1898",
+    "house3-1900",
+    "house3-1902",
+    "house3-1904",
+    "house3-1906"
+   ],
+   "hint": "Begin every column label with the election year printed in the heading above its group of columns, then the candidate's name and party as printed, for example '1906 Thomas Hedge, Rep.'. The table is the comparative vote for Member of Congress in the Third Congressional District, one group of candidate columns per election year side by side. Ignore Plurality and Majority rows."
+  },
+  {
+   "page": 544,
+   "id": "544",
+   "turn": 270,
+   "orientation": "counties_down",
+   "discover": [
+    "house4-1898",
+    "house4-1900",
+    "house4-1902",
+    "house4-1904",
+    "house4-1906"
+   ],
+   "hint": "Begin every column label with the election year printed in the heading above its group of columns, then the candidate's name and party as printed, for example '1906 Thomas Hedge, Rep.'. The table is the comparative vote for Member of Congress in the Fourth Congressional District, one group of candidate columns per election year side by side. Ignore Plurality and Majority rows."
+  },
+  {
+   "page": 545,
+   "id": "545",
+   "turn": 270,
+   "orientation": "counties_down",
+   "discover": [
+    "house5-1898",
+    "house5-1900",
+    "house5-1902",
+    "house5-1904",
+    "house5-1906"
+   ],
+   "hint": "Begin every column label with the election year printed in the heading above its group of columns, then the candidate's name and party as printed, for example '1906 Thomas Hedge, Rep.'. The table is the comparative vote for Member of Congress in the Fifth Congressional District, one group of candidate columns per election year side by side. Ignore Plurality and Majority rows."
+  },
+  {
+   "page": 546,
+   "id": "546",
+   "turn": 270,
+   "orientation": "counties_down",
+   "discover": [
+    "house6-1898",
+    "house6-1900",
+    "house6-1902",
+    "house6-1904",
+    "house6-1906"
+   ],
+   "hint": "Begin every column label with the election year printed in the heading above its group of columns, then the candidate's name and party as printed, for example '1906 Thomas Hedge, Rep.'. The table is the comparative vote for Member of Congress in the Sixth Congressional District, one group of candidate columns per election year side by side. Ignore Plurality and Majority rows."
+  },
+  {
+   "page": 547,
+   "id": "547",
+   "turn": 270,
+   "orientation": "counties_down",
+   "discover": [
+    "house7-1898",
+    "house7-1900",
+    "house7-1902",
+    "house7-1904",
+    "house7-1906"
+   ],
+   "hint": "Begin every column label with the election year printed in the heading above its group of columns, then the candidate's name and party as printed, for example '1906 Thomas Hedge, Rep.'. The table is the comparative vote for Member of Congress in the Seventh Congressional District, one group of candidate columns per election year side by side. Ignore Plurality and Majority rows."
+  },
+  {
+   "page": 548,
+   "id": "548",
+   "turn": 270,
+   "orientation": "counties_down",
+   "discover": [
+    "house8-1898",
+    "house8-1900",
+    "house8-1902",
+    "house8-1904",
+    "house8-1906"
+   ],
+   "hint": "Begin every column label with the election year printed in the heading above its group of columns, then the candidate's name and party as printed, for example '1906 Thomas Hedge, Rep.'. The table is the comparative vote for Member of Congress in the Eighth Congressional District, one group of candidate columns per election year side by side. Ignore Plurality and Majority rows."
+  },
+  {
+   "page": 549,
+   "id": "549",
+   "turn": 270,
+   "orientation": "counties_down",
+   "discover": [
+    "house9-1898",
+    "house9-1900",
+    "house9-1902",
+    "house9-1904",
+    "house9-1906"
+   ],
+   "hint": "Begin every column label with the election year printed in the heading above its group of columns, then the candidate's name and party as printed, for example '1906 Thomas Hedge, Rep.'. The table is the comparative vote for Member of Congress in the Ninth Congressional District, one group of candidate columns per election year side by side. Ignore Plurality and Majority rows."
+  },
+  {
+   "page": 550,
+   "id": "550",
+   "turn": 270,
+   "orientation": "counties_down",
+   "discover": [
+    "house10-1898",
+    "house10-1900",
+    "house10-1902",
+    "house10-1904",
+    "house10-1906"
+   ],
+   "hint": "Begin every column label with the election year printed in the heading above its group of columns, then the candidate's name and party as printed, for example '1906 Thomas Hedge, Rep.'. The table is the comparative vote for Member of Congress in the Tenth Congressional District, one group of candidate columns per election year side by side. Ignore Plurality and Majority rows."
+  },
+  {
+   "page": 551,
+   "id": "551",
+   "turn": 270,
+   "orientation": "counties_down",
+   "discover": [
+    "house11-1898",
+    "house11-1900",
+    "house11-1902",
+    "house11-1904",
+    "house11-1906"
+   ],
+   "hint": "Begin every column label with the election year printed in the heading above its group of columns, then the candidate's name and party as printed, for example '1906 Thomas Hedge, Rep.'. The table is the comparative vote for Member of Congress in the Eleventh Congressional District, one group of candidate columns per election year side by side. Ignore Plurality and Majority rows."
+  }
+ ]
+}

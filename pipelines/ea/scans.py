@@ -986,7 +986,13 @@ def discover(manifest: Manifest, folder: Path) -> str:
             columns = []
             unmatched = []
             for index, label in enumerate(labels):
-                hits = [one[index] for one in matched if one[index]["contest"] is not None]
+                year = re.match(r"\s*(1[6-9]\d\d|20\d\d)\b", label)
+                hits = [
+                    one[index]
+                    for one, contest in zip(matched, wanted, strict=True)
+                    if one[index]["contest"] is not None
+                    and (year is None or manifest["contests"][contest]["year"] == int(year.group(1)))
+                ]
                 if len(hits) == 1:
                     columns.append(hits[0])
                 else:
