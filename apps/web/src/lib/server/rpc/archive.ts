@@ -22218,7 +22218,8 @@ export async function record(input: { id: string; body?: string }) {
       select root, id, null::uuid, scoped, nested from rounds
       union all
       select tree.root, c.id, c.allocation_parent_id, c.party_scope_id is not null, true
-      from contest c join tree on c.allocation_parent_id = tree.id
+      from contest c join tree on coalesce(c.allocation_parent_id, c.id) = tree.id
+      where c.allocation_parent_id is not null
     ),
     winners as materialized (
       select t.root, t.id as contest, t.nested, o.id, o.party_id, max(coalesce(o.seats, 1)) as seats
