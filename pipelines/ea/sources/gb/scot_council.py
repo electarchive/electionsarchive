@@ -160,16 +160,17 @@ def unwrap(lines: list[str]) -> list[str]:
     return merged
 
 
-def read_stages(
-    text: str,
-) -> tuple[
+Stages = tuple[
     dict[str, Decimal],
     list[tuple[int, str, Decimal, str | None]],
     dict[int, Decimal],
     set[str],
     list[str],
     dict[str, str],
-]:
+]
+
+
+def read_stages(text: str) -> Stages:
     facts = {
         key: Decimal(found.group(1).replace(",", ""))
         for key, pattern in (
@@ -227,6 +228,266 @@ def read_stages(
         if stage == 1 and len(fields) > 1:
             affiliations[fields[0]] = fields[1]
     return facts, rows, exhausted, dropped, odd, affiliations
+
+
+def whole(token: str) -> Decimal:
+    if token.strip() == "-":
+        return Decimal(0)
+    return Decimal(token.replace(",", "").replace(" ", "")).quantize(Decimal(1))
+
+
+def declared_descriptions(declared: str) -> dict[str, str]:
+    found = {}
+    for line in declared.splitlines():
+        fields = re.split(r"\s{2,}", line.strip())
+        if len(fields) >= 3 and re.fullmatch(NUMBER, fields[2]) and re.fullmatch(r"[^\d,]+ [^\d,]+", fields[0]):
+            found[fields[0].casefold()] = "" if fields[1] == "-" else fields[1]
+    return found
+
+
+def read_moray(text: str, declared: str) -> Stages:
+    lines = text.splitlines()
+    facts = {
+        key: Decimal(found.group(1).replace(",", ""))
+        for key, pattern in (
+            ("cast", r"Total Votes Cast\s+(" + NUMBER + ")"),
+            ("rejected", r"Rejected as Void\s+(" + NUMBER + ")"),
+            ("quota", r"Quota\s+(" + NUMBER + ")"),
+            ("electorate", r"Total Electorate\s+(" + NUMBER + ")"),
+        )
+        if (found := re.search(pattern, text)) is not None
+    }
+    if "cast" in facts and "rejected" in facts:
+        facts["valid"] = facts["cast"] - facts["rejected"]
+    head = next(index for index, line in enumerate(lines) if re.match(r"\s+Stage\s+Stage 1", line))
+    last = len(re.findall(r"Stage \d+", lines[head]))
+    header = next(line for line in lines[head + 1 :] if line.strip())
+    excluding = [name for name in re.split(r"\s{2,}", header.replace("Exclusion of", "").strip()) if name]
+    descriptions = declared_descriptions(declared)
+    rows: list[tuple[int, str, Decimal, str | None]] = []
+    exhausted: dict[int, Decimal] = {}
+    odd = []
+    affiliations: dict[str, str] = {}
+    candidates: dict[str, list[int]] = {}
+    started = False
+    for line in lines[head + 1 :]:
+        fields = re.split(r"\s{2,}", line.strip())
+        if fields[0] == "Candidate":
+            started = True
+            continue
+        if not started or not line.strip() or fields[0] in {"Rejected", "TOTAL"} or line.startswith("  " * 20):
+            continue
+        numbers = [int(field) for field in fields[1:] if re.fullmatch(r"-?\d+", field)]
+        if fields[0] == "Non-transferable":
+            count = len(numbers)
+            totals = (
+                numbers[1::2]
+                if count == 2 * (last - 1)
+                else numbers[:1] + numbers[2::2]
+                if count == 2 * last - 3
+                else numbers
+                if count == last - 1
+                else []
+            )
+            if len(totals) != last - 1:
+                odd.append(line.strip())
+            for stage, total in enumerate(totals, start=2):
+                exhausted[stage] = Decimal(total)
+            continue
+        if len(fields) < 3 or not numbers:
+            break
+        candidates[fields[0]] = numbers
+        affiliations[fields[0]] = descriptions.get(fields[0].casefold(), fields[1])
+    dropped = {
+        name_key(label) for label in candidates for name in excluding if label.casefold().endswith(name.casefold())
+    }
+    leader = ""
+    for stage in range(1, last + 1):
+        stage_rows = []
+        for label, numbers in candidates.items():
+            out = name_key(label) in dropped and (
+                stage >= 2 + next(i for i, name in enumerate(excluding) if label.casefold().endswith(name.casefold()))
+            )
+            if out:
+                votes = Decimal(0)
+            elif stage == 1:
+                votes = Decimal(numbers[0])
+            elif 2 * stage - 2 < len(numbers):
+                votes = Decimal(numbers[2 * stage - 2])
+            else:
+                odd.append(label)
+                votes = Decimal(0)
+            stage_rows.append((label, votes))
+        leader = max(stage_rows, key=lambda row: row[1])[0]
+        rows.extend(
+            (stage, label, votes, "Elected" if stage == last and label == leader else None)
+            for label, votes in stage_rows
+        )
+    exhausted.setdefault(1, Decimal(0))
+    return facts, rows, exhausted, dropped, odd, affiliations
+
+
+def read_tables(text: str) -> Stages:
+    rows: list[tuple[int, str, Decimal, str | None]] = []
+    exhausted: dict[int, Decimal] = {}
+    dropped: set[str] = set()
+    affiliations: dict[str, str] = {}
+    stage = 0
+    after = False
+    for line in text.splitlines():
+        was, after = after, False
+        if (found := re.match(r"Stage (\d+)\s*$", line)) is not None:
+            stage = int(found.group(1))
+        elif (found := re.match(r"Exclusion of (.+?)\s*$", line)) is not None:
+            dropped.add(name_key(found.group(1)))
+        elif stage and (
+            found := re.match(r"\s+Non-transferable votes\s+" + NUMBER + r"\s+(" + NUMBER + r")\s*$", line)
+        ):
+            exhausted[stage] = whole(found.group(1))
+        elif stage and (
+            found := re.match(r"\s(\S.*?)\s{2,}(\S.*?)\s{2,}-?\s?" + NUMBER + r"\s+(" + NUMBER + r")\s*$", line)
+        ):
+            rows.append((stage, found.group(1), whole(found.group(3)), None))
+            after = True
+            affiliations.setdefault(found.group(1), found.group(2))
+        elif was and (found := re.match(r"(\s+)(\S[^\d]*?)\s*$", line)) is not None:
+            if len(found.group(1)) < 4:
+                raw_name = rows[-1][1]
+                rows = [(a, f"{raw_name} {found.group(2)}" if b == raw_name else b, c, d) for a, b, c, d in rows]
+                affiliations[f"{raw_name} {found.group(2)}"] = affiliations.pop(raw_name)
+            elif stage == 1:
+                affiliations[rows[-1][1]] += f" {found.group(2)}"
+            after = True
+    names = {raw_name: " ".join(reversed(raw_name.split(", ", 1))) for _, raw_name, _, _ in rows}
+    rows = [(a, names[b], c, d) for a, b, c, d in rows]
+    affiliations = {names[key]: value for key, value in affiliations.items()}
+    facts: dict[str, Decimal] = {}
+    if rows:
+        final = max(number for number, *_ in rows)
+        leader = max((row for row in rows if row[0] == final), key=lambda row: row[2])[1]
+        rows = [(a, b, c, "Elected" if a == final and b == leader else d) for a, b, c, d in rows]
+        facts["valid"] = sum((votes for number, _, votes, _ in rows if number == 1), Decimal(0)) + exhausted.get(
+            1, Decimal(0)
+        )
+    return facts, rows, exhausted, dropped, [], affiliations
+
+
+def read_matrix(text: str) -> Stages:
+    facts: dict[str, Decimal] = {}
+    if (found := re.search(r"Total Votes: (\S+), Positions to be Filled: (\d+), Quota: (\S+)", text)) is not None:
+        facts = {
+            "valid": whole(found.group(1).rstrip(",")),
+            "seats": Decimal(found.group(2)),
+            "quota": whole(found.group(3)),
+        }
+    rows: list[tuple[int, str, Decimal, str | None]] = []
+    exhausted: dict[int, Decimal] = {}
+    dropped: set[str] = set()
+    odd = []
+    affiliations: dict[str, str] = {}
+    for page in text.split("\f"):
+        stages = sorted({int(number) for number in re.findall(r"Stage (\d+) - ", page)})
+        if not stages:
+            continue
+        label = ""
+        for line in page.splitlines():
+            if not line.strip() or line.startswith(("Name", "Total", "Report Name", "Contest Name")):
+                continue
+            if line[0].isspace():
+                found = re.fullmatch(r"\s{10,}(\S.*?)\s*", line)
+                if label and found is not None and re.search(r"\d", found.group(1)) is None and stages[0] == 1:
+                    affiliations[label] = f"{affiliations[label]} {found.group(1)}"
+                continue
+            status = re.search(r"\s(Elected|Excluded) Stage (\d+)", line)
+            body = line[: status.start()] if status else line
+            fields = re.split(r"\s{2,}", body.strip())
+            tail = line[status.end() :] if status else line[len(body) :]
+            leftover = fields[0] in {"No further preference", "Remainder not transferred"}
+            numbers = re.findall(
+                r"-?\d[\d,]*(?:\.\d+)?|(?<=\s)-(?=\s)", tail if status else " ".join(fields[1 if leftover else 2 :])
+            )
+            values = [whole(number) for number in numbers]
+            totals = values[:1] + values[2::2] if stages[0] == 1 else values[1::2]
+            if leftover:
+                for stage, value in zip(stages, totals, strict=False):
+                    exhausted[stage] = exhausted.get(stage, Decimal(0)) + value
+                continue
+            if len(fields) < 2:
+                odd.append(line.strip())
+                continue
+            label = fields[0]
+            if label not in affiliations:
+                affiliations[label] = fields[1]
+            if len(totals) != len(stages):
+                odd.append(line.strip())
+                continue
+            for stage, votes in zip(stages, totals, strict=True):
+                outcome = (
+                    "Elected" if status and status.group(1) == "Elected" and int(status.group(2)) == stage else None
+                )
+                rows.append((stage, label, votes, outcome))
+            if status and status.group(1) == "Excluded":
+                dropped.add(name_key(label))
+    return facts, rows, exhausted, dropped, odd, affiliations
+
+
+def read_script(text: str, declared: str) -> Stages:
+    facts: dict[str, Decimal] = {}
+    if (
+        found := re.search(r"There were ([\d,]+) valid votes cast and ([\d,]+) votes had to be rejected", text)
+    ) is not None:
+        facts["valid"] = whole(found.group(1))
+        facts["rejected"] = whole(found.group(2))
+    if (found := re.search(r"quota for the ward is ([\d,]+)", text)) is not None:
+        facts["quota"] = whole(found.group(1))
+    rows: list[tuple[int, str, Decimal, str | None]] = []
+    exhausted: dict[int, Decimal] = {}
+    dropped = {name_key(name) for name in re.findall(r"This is ([^.]+?)\.", " ".join(text.split()))}
+    stage = 1
+    inside = False
+    for line in text.splitlines():
+        if re.match(r"\s*At Stage 1 the number", line):
+            inside = True
+            continue
+        if (found := re.search(r"give the Stage (\d+) result as:", line)) is not None:
+            stage = int(found.group(1))
+            inside = True
+            continue
+        if not inside:
+            continue
+        if (found := re.match(r"Value of non-transferable ballot papers - (" + NUMBER + ")", line)) is not None:
+            exhausted[stage] = exhausted.get(stage - 1, Decimal(0)) + whole(found.group(1))
+            inside = False
+            continue
+        if stage == 1:
+            if (found := re.match(r"(\S.*?)\s{2,}(" + NUMBER + r")\s*$", line)) is not None:
+                rows.append((1, found.group(1), whole(found.group(2)), None))
+            elif line.startswith("At this stage"):
+                inside = False
+        elif (found := re.match(r"([A-Z].*?) - (" + NUMBER + r")\s*$", line)) is not None:
+            rows.append((stage, found.group(1), whole(found.group(2)), None))
+    exhausted.setdefault(1, Decimal(0))
+    elected = re.search(r"basis of the foregoing (.+?) will be declared elected", " ".join(text.split()))
+    if rows and elected is not None:
+        final = max(number for number, *_ in rows)
+        rows = [(a, b, c, "Elected" if a == final and b == elected.group(1) else d) for a, b, c, d in rows]
+    descriptions = declared_descriptions(declared)
+    affiliations = {
+        label: descriptions[label.casefold()] for _, label, _, _ in rows if label.casefold() in descriptions
+    }
+    return facts, rows, exhausted, dropped, [], affiliations
+
+
+def read_other(text: str, declared: str) -> Stages:
+    if "Stage 1 - First Preference" in text:
+        return read_matrix(text)
+    if re.search(r"Candidate name\s+Party", text):
+        return read_tables(text)
+    if "First Pref." in text:
+        return read_moray(text, declared)
+    if "Results Script for Returning Officer" in text:
+        return read_script(text, declared)
+    return {}, [], {}, set(), [], {}
 
 
 def parse() -> None:
@@ -997,8 +1258,15 @@ def parse_by() -> None:
             unit["status"] = row["note"] or "no stage report"
             continue
         stages_text = pdf_text(raw.cached(SOURCE, row["stages"]).path)
-        facts, rows, exhausted, dropped, odd, affiliations = read_stages(stages_text)
         declared = pdf_text(raw.cached(SOURCE, row["declaration"]).path) if row["declaration"] else ""
+        facts, rows, exhausted, dropped, odd, affiliations = read_stages(stages_text)
+        if not rows or odd:
+            other = read_other(stages_text, declared)
+            if other[1]:
+                facts, rows, exhausted, dropped, odd, affiliations = other
+                facts.setdefault("seats", Decimal(ward["seats"] or 1))
+                if "quota" not in facts and "valid" in facts:
+                    facts["quota"] = facts["valid"] // (facts["seats"] + 1) + 1
         counts: dict[str, int | None] = {}
         for name, pattern in (
             ("electorate", r"electorate was ([\d,]+)"),
@@ -1013,6 +1281,9 @@ def parse_by() -> None:
             found := re.search(r"Total number of Ballot Papers Received\s+([\d,]+)", stages_text)
         ):
             counts["ballots"] = int(found.group(1).replace(",", ""))
+        for name, key_ in (("electorate", "electorate"), ("ballots", "cast"), ("invalid", "rejected")):
+            if counts[name] is None and key_ in facts:
+                counts[name] = int(facts[key_])
         unit |= counts
         ballots, invalid = counts["ballots"], counts["invalid"]
         names = [label for number, label, _, _ in rows if number == 1]
@@ -1027,7 +1298,17 @@ def parse_by() -> None:
             status = "elected do not fill the seats"
         elif ballots is not None and invalid is not None and ballots - invalid != facts["valid"]:
             status = "ballots less rejected differ from the valid votes"
-        elif declared and any(not declares(declared, label, votes) for number, label, votes, _ in rows if number == 1):
+        elif declared and any(
+            not (
+                declares(declared, label, votes)
+                or (
+                    "Stage No" in declared
+                    and declares(declared, label, max(at for _, other, at, _ in rows if other == label))
+                )
+            )
+            for number, label, votes, _ in rows
+            if number == 1
+        ):
             status = "stage 1 differs from the declaration"
         else:
             for number in stages:
