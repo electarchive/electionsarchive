@@ -189,6 +189,26 @@ def malatya_html(page: str, _: str) -> list[dict[str, str]]:
     return rows
 
 
+def agin_html(page: str, _: str) -> list[dict[str, str]]:
+    rows = []
+    kind = ""
+    for c in cells(page):
+        if len(c) == 1 and re.search(r"MUHTARLARI L[İI]STES[İI]", c[0]):
+            kind = "mahalle" if "MAHALLE" in c[0] else "köy"
+        elif len(c) == 4 and c[0].isdigit() and kind:
+            rows.append(line(c[0], "AĞIN", "", kind, c[1], c[2]))
+    return rows
+
+
+def maden_html(page: str, _: str) -> list[dict[str, str]]:
+    rows = []
+    for c in cells(page):
+        if len(c) == 5 and c[0].isdigit():
+            kind = "mahalle" if re.search(r"Mahall?esi$", c[1]) else "köy"
+            rows.append(line(c[0], "MADEN", "", kind, re.sub(r"\s+Mahall?esi$", "", c[1]), c[2]))
+    return rows
+
+
 KIRIKKALE = (
     "https://www.kirikkale.gov.tr/kurumlar/kirikkale.gov.tr/site/site_files/il_idare_ve_denetim/"
     "ilGeneliMuhtarListesi_2026ekim.pdf"
@@ -425,9 +445,41 @@ PROVINCES = {
         method=(
             "Elazığ Merkez's muhtars as the governorate lists them in two scanned lists headed 2024 yılında "
             "seçilen, one for mahalles (sha256 {mahalle} of the names-only extract) and one for köys (sha256 "
-            "{köy}), scanned 3 September 2025. Only Merkez is listed. The scans were read with OCR and every name "
+            "{köy}), scanned 3 September 2025. Only Merkez is listed here; Ağın, Maden, and Palu are listed separately. The scans were read with OCR and every name "
             "was checked against the page image. The lists also print phone numbers, which the archive does not "
             "store."
+        ),
+    ),
+    "23-ilce": Province(
+        name="Elazığ",
+        publisher="T.C. Ağın, Maden, and Palu Kaymakamlıkları",
+        page="https://palu.gov.tr/kurumlar/palu.gov.tr/muhtar-listesi.pdf",
+        title="Ağın, Maden, and Palu muhtar lists",
+        lists={
+            "ağın": (
+                "https://agin.gov.tr/agin-muhtarlar-isim-ve-iletisim-listesi",
+                "77b5813465a5bb9662652edd9ebee92090121725c7edff8c647fbcb1c3dcd3f4",
+                agin_html,
+            ),
+            "maden": (
+                "https://maden.gov.tr/belde-ve-koylerimiz",
+                "50bcbab200ad93203613d5e91331e9f0d2772e0b9154ce4b8a6b61d85ece4f0b",
+                maden_html,
+            ),
+            "palu": (
+                "https://palu.gov.tr/kurumlar/palu.gov.tr/muhtar-listesi.pdf",
+                "b1904b9a47e76497040234ed5935b290ab83b0faaf811bc5f7da2e8111d44c8e",
+                None,
+            ),
+        },
+        method=(
+            "Muhtars of three Elazığ ilçes as their Kaymakamlıks list them: Ağın's page headed 2024 yılında seçilen "
+            "(names-only extract sha256 {ağın}), Maden's köy and mahalle page, which carries no date (sha256 "
+            "{maden}), and Palu's scanned list headed 31 March 2024, dated October 2026 (sha256 {palu} of the "
+            "names-only extract read by eye from the page image; one row marked Vekil is left out). The lists also "
+            "print phone numbers, which the archive does not store. Maden's page was read in 2026, so a muhtar who "
+            "took office after a by-election may be listed instead of the 2024 winner. The other seven Elazığ "
+            "ilçes publish no list."
         ),
     ),
     "24": Province(
@@ -613,7 +665,7 @@ def emit() -> Path:
         everything = list(csv.DictReader(handle, delimiter="\t"))
     plans = []
     for plate, config in PROVINCES.items():
-        register = [row for row in everything if row["plate"] == plate]
+        register = [row for row in everything if row["plate"] == plate.partition("-")[0]]
         listed = []
         for kind, (url, digest, _) in config.lists.items():
             artifact = raw.cached(SOURCE, f"{url}#names")
