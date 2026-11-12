@@ -45,9 +45,24 @@ PRIMARIES = {
     (2024, "republican"): "2024-sp-executive-council-1-5-republican_2.xls",
 }
 GENERAL_DAYS = {**nh_sos_legislature.DAYS, 2026: date(2026, 11, 3)}
-PRIMARY_DAYS = nh_sos_primaries.DAYS
-GENERAL_PAGES = nh_sos_legislature.PAGES
-PRIMARY_PAGES = nh_sos_primaries.PAGES
+PRIMARY_DAYS = {**nh_sos_primaries.DAYS, 2026: date(2026, 9, 8)}
+GENERAL_PAGES = {**nh_sos_legislature.PAGES, 2026: "https://www.sos.nh.gov/2026-general-election-results"}
+PRIMARY_PAGES = {
+    **nh_sos_primaries.PAGES,
+    2026: "https://www.sos.nh.gov/2026-democratic-state-primary",
+}
+PRIMARY_PAGES_2026 = {
+    "democratic": "https://www.sos.nh.gov/2026-democratic-state-primary",
+    "republican": "https://www.sos.nh.gov/2026-republican-state-primary",
+}
+INBOX = DATA / "inbox" / "manual" / "MF-596"
+INBOX_FILES = {
+    (2026, "general", None, number): f"2026-ge-executive-council-{number}.xlsx" for number in range(1, 6)
+} | {
+    (2026, "primary", party, number): f"2026-sp-executive-council-{number}-{party}.xlsx"
+    for party in PRIMARY_PAGES_2026
+    for number in range(1, 6)
+}
 CANDIDATES = "https://mm.nh.gov/files/uploads/sos/docs/2026-ge-candidate-list.pdf"
 CANDIDATES_INBOX = DATA / "inbox" / "manual" / "MF-132" / "2026-ge-candidate-list.pdf"
 GRANIT = (
@@ -82,7 +97,15 @@ def files() -> list[tuple[int, str, str | None, str]]:
     return [
         *((year, "general", None, name) for year, name in GENERALS.items()),
         *((year, "primary", party, name) for (year, party), name in PRIMARIES.items()),
+        *((year, stage, party, name) for (year, stage, party, _), name in INBOX_FILES.items()),
     ]
+
+
+def link(year: int, stage: str, party: str | None, name: str) -> str:
+    if year < 2026:
+        return WAYBACK + name
+    page = GENERAL_PAGES[2026] if stage == "general" else PRIMARY_PAGES_2026[str(party)]
+    return f"{page}#{name}"
 
 
 def fetch() -> None:
@@ -99,13 +122,24 @@ def fetch() -> None:
             retrieved_at=datetime.fromtimestamp(CANDIDATES_INBOX.stat().st_mtime, UTC),
             media_type="application/pdf",
         )
-    for *_, name in files():
-        url = WAYBACK + name
+    for year, stage, party, name in files():
+        url = link(year, stage, party, name)
         try:
             raw.cached(SOURCE, url)
             continue
         except LookupError:
             pass
+        if year == 2026:
+            path = INBOX / name
+            raw.store(
+                SOURCE,
+                url,
+                path.read_bytes(),
+                suffix=path.suffix,
+                retrieved_at=datetime.fromtimestamp(path.stat().st_mtime, UTC),
+                media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            )
+            continue
         for attempt in range(6):
             try:
                 raw.fetch(SOURCE, url, suffix=Path(name).suffix)
@@ -130,7 +164,7 @@ def parse() -> None:
     rows = []
     for year, stage, party, name in files():
         sheets = pl.read_excel(
-            raw.cached(SOURCE, WAYBACK + name).path,
+            raw.cached(SOURCE, link(year, stage, party, name)).path,
             sheet_id=0,
             has_header=False,
             infer_schema_length=0,
@@ -182,7 +216,8 @@ def parse() -> None:
                 raise ValueError(f"{name}: district {district} twice")
             districts.add(district)
             rows.extend((year, stage, party, district, label, place, votes) for label, place, votes in block)
-        if districts != {1, 2, 3, 4, 5}:
+        expected = {int(present(re.search(r"council-(\d)", name), "district")[1])} if year == 2026 else {1, 2, 3, 4, 5}
+        if districts != expected:
             raise ValueError(f"{name}: districts {sorted(districts)}")
     PARSED.mkdir(parents=True, exist_ok=True)
     frame = pl.DataFrame(
@@ -244,8 +279,8 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="New Hampshire Executive Council: the 2016 to 2024 generals and party primaries by town and ward "
-            "from the Secretary of State's workbooks, the 2026 general candidates, and GRANIT shapes for the 2012 "
+            summary="New Hampshire Executive Council: the 2016 to 2026 generals and party primaries by town and ward "
+            "from the Secretary of State's workbooks, the 2026 primaries and general by town, and GRANIT shapes for the 2012 "
             "and 2022 district plans",
             polity="US-NH",
         )
@@ -389,22 +424,22 @@ def emit() -> Path:
         candidates = source("2026 general election candidate list", CANDIDATES)
         cs.artifact(raw.cached(SOURCE, CANDIDATES), candidates)
         sources: dict[tuple[int, str], UUID] = {}
-        for year, stage, _, file in files():
+        for year, stage, party, file in files():
             if (year, stage) not in sources:
                 title = f"{year} {'general' if stage == 'general' else 'state primary'} election results, Executive Council, by town and ward"
                 sources[(year, stage)] = source(title, (GENERAL_PAGES if stage == "general" else PRIMARY_PAGES)[year])
-            cs.artifact(raw.cached(SOURCE, WAYBACK + file), sources[(year, stage)])
+            cs.artifact(raw.cached(SOURCE, link(year, stage, party, file)), sources[(year, stage)])
 
         units: dict[int, dict[str, str]] = {}
         for year in sorted(set(towns["year"])):
             units[year] = {}
             for (code,) in conn.execute(
                 "select code from reporting_unit where scheme_code = 'us.precinct' and code like %s order by code",
-                [f"{year}:NH:%%"],
+                [f"{min(year, 2024)}:NH:%%"],
             ).fetchall():
                 parts = code.split(":", 4)
                 if len(parts) == 5:
-                    units[year].setdefault(unit_key(parts[4] or parts[3]), code)
+                    units[year].setdefault(unit_key(parts[4] or parts[3]), f"{year}{code[4:]}")
             missing = sorted(
                 {
                     place
@@ -415,10 +450,10 @@ def emit() -> Path:
             if missing:
                 raise ValueError(f"towns with no {year} unit: {missing}")
 
+        used: set[str] = set()
         counts = {"contests": 0, "result sets": 0, "values": 0}
         values = []
         groups = [
-            *(((year, "general", None, number), None) for year in [2026] for number in range(1, 6)),
             *towns.group_by("year", "stage", "party", "district", maintain_order=True),
         ]
         for (year, stage, party, number), rows in groups:
@@ -454,29 +489,12 @@ def emit() -> Path:
             name(contest, text)
             cs.add("slug", path=path, entity_id=contest)
             counts["contests"] += 1
-            if rows is None:
+            if year == 2026 and stage == "general":
                 cs.add("citation", entity_id=contest, source_id=candidates, locator=None)
-                for position, row in enumerate(ballot.filter(pl.col("district") == number).iter_rows(named=True), 1):
-                    option = cs.key("us.option", f"{external}:{slug(row['candidate'])}")
-                    cs.add(
-                        "contest_option",
-                        id=option,
-                        contest_id=contest,
-                        kind="candidate",
-                        party_id=cs.key("us.party", PARTIES[row["party"]]),
-                        ballot_position=position,
-                        ballot_label=row["candidate"],
-                    )
-                    cs.add(
-                        "candidacy",
-                        id=cs.key("us.candidacy", f"{external}:{slug(row['candidate'])}:head"),
-                        person_id=person(row["candidate"]),
-                        option_id=option,
-                        role="head",
-                        ballot_name=row["candidate"],
-                        is_independent=False,
-                    )
-                continue
+                listed = {slug(name) for name in ballot.filter(pl.col("district") == number)["candidate"]}
+                counted = {slug(candidate(label)[0]) for label in rows["label"].unique()} - {"write-ins"}
+                if listed != counted:
+                    raise ValueError(f"2026 district {number}: ballot {sorted(listed)}, workbook {sorted(counted)}")
             mapping: dict[str, UUID] = {}
             pool: UUID | None = None
             tally = []
@@ -554,6 +572,12 @@ def emit() -> Path:
                 .group_by("unit_id", "option_id")
                 .agg(value=pl.col("votes").sum())
             )
+            if year == 2026:
+                used.update(
+                    rows.filter(pl.col("label").is_in(list(mapping)), pl.col("votes") > 0)["town"].map_elements(
+                        lambda place: units[year][unit_key(place)], return_dtype=pl.String
+                    )
+                )
             values.append(
                 lines.with_columns(
                     result_set_id=pl.lit(str(result_set)),
@@ -565,6 +589,26 @@ def emit() -> Path:
             )
             counts["result sets"] += 1
             counts["values"] += lines.height
+        if used:
+            for code, parent, area, relation, kind in conn.execute(
+                """select code, parent_id, area_id, area_relation, kind from reporting_unit
+                   where scheme_code = 'us.precinct' and code like '2024:NH:%%'"""
+            ).fetchall():
+                new = f"2026{code[4:]}"
+                if new in used:
+                    cs.add(
+                        "reporting_unit",
+                        id=cs.unit("us.precinct", new),
+                        polity_id=polity,
+                        scheme_code="us.precinct",
+                        code=new,
+                        parent_id=parent,
+                        area_relation=relation,
+                        area_id=area,
+                        kind=kind,
+                        valid_from=PRIMARY_DAYS[2026],
+                        valid_to=date(2026, 11, 4),
+                    )
         cs.frame(
             "result_value",
             pl.concat(values).select(
