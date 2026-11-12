@@ -7,6 +7,7 @@ import subprocess
 import zipfile
 from collections import Counter
 from datetime import UTC, date, datetime
+from itertools import pairwise
 from uuid import UUID
 
 import httpx
@@ -133,11 +134,12 @@ def fetch() -> None:
 
 
 def ky_totals(text: str) -> list[Counter[int]]:
-    return [
+    singles = [
         Counter(int(number.replace(",", "")) for number in re.findall(r"\d[\d,]*", line.split("Totals", 1)[1]))
         for line in text.splitlines()
         if line.strip().startswith("Totals ")
     ]
+    return singles + [left + right for left, right in pairwise(singles)]
 
 
 def rows(state: str, url: str, path):
