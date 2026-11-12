@@ -1,6 +1,8 @@
 import gzip
+import html
 import itertools
 import json
+import re
 import time
 from datetime import UTC, date, datetime
 from pathlib import Path
@@ -31,6 +33,22 @@ YSK_TOTALS = {
 Rows = list[dict[str, int | str]]
 HEADERS = {"User-Agent": "Mozilla/5.0", "Referer": "https://sonuc.ysk.gov.tr/"}
 PAUSE = 0.8
+LAW_6360 = "https://www.resmigazete.gov.tr/eskiler/2012/12/20121206-1.htm"
+WHOLE_MERKEZ = {
+    ("09", "EFELER"): "6360 art. 2(1)",
+    ("47", "ARTUKLU"): "6360 art. 2(21)",
+    ("48", "MENTEŞE"): "6360 art. 2(22)",
+    ("59", "SÜLEYMANPAŞA"): "6360 art. 2(24)",
+    ("61", "ORTAHİSAR"): "6360 art. 2(27)",
+    ("52", "ALTINORDU"): "6447 art. 2(24) added to 6360",
+}
+NAMED_VILLAGES = {
+    ("31", "HATAY MERKEZ", "ALTINÖZÜ"): ("6360 art. 2(8)", ("Sofular", "Hanyolu")),
+    ("31", "DÖRTYOL", "PAYAS"): ("6360 art. 2(11)", ("Sincan", "Kozludere", "Çağlalık")),
+    ("46", "PAZARCIK", "TÜRKOĞLU"): ("6360 art. 2(19)", ("Kelebişler", "Bayramgazi", "Cennetpınarı")),
+    ("67", "ZONGULDAK MERKEZ", "KOZLU"): ("6360 art. 2(39)", ("Esenköy", "Yahma")),
+}
+LISTED_ILCES = {"AKKÖY (PAMUKKALE)": "PAMUKKALE"}
 ILCES_WITHOUT_OWN_MAHALLES = {(67, 1043): "KİLİMLİ", (67, 1044): "KOZLU"}
 
 
@@ -179,6 +197,43 @@ def read(year: int, secim_turu: int) -> pl.DataFrame:
     )
 
 
+def fold(text: str) -> str:
+    lowered = text.replace("İ", "i").replace("I", "ı").lower()
+    return re.sub(r"[^a-z0-9]", "", lowered.translate(str.maketrans("çğıöşüâîû", "cgiosuaiu")))
+
+
+def law_annexes() -> dict[str, str]:
+    body = raw.cached("tr.reforms", LAW_6360).path.read_bytes().decode("cp1254", "replace")
+    text = re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", body)))
+    text = "(" + text[text.index("1) SAYILI LİSTE BALIKESİR") :]
+    parts = re.split(r"\(\s*\d+\)\s*SAYILI LİSTE", text)
+    annexes: dict[str, str] = {}
+    for part in parts[1:25]:
+        header = re.search(r"İLİ (.+?) İLÇESİNE", part)
+        if header is None:
+            raise ValueError("a law 6360 annex has no ilçe")
+        name = fold(LISTED_ILCES.get(header[1], header[1]))
+        annexes[name] = annexes.get(name, "") + fold(part)
+    return annexes
+
+
+def law_basis(pair: dict[str, str | int], annexes: dict[str, str]) -> str | None:
+    plate, from_ilce, to_ilce = str(pair["plate"]), str(pair["from_ilce"]), str(pair["ilce"]).split("/")[0]
+    stem = re.sub(r" (KÖYÜ|MAH\.)$", "", str(pair["from_name"]))
+    if from_ilce.endswith(" MERKEZ") and (plate, to_ilce) in WHOLE_MERKEZ:
+        return WHOLE_MERKEZ[(plate, to_ilce)]
+    if from_ilce == "AKKÖY" and to_ilce == "PAMUKKALE":
+        return "6360 art. 2(5)"
+    named = NAMED_VILLAGES.get((plate, from_ilce, to_ilce))
+    if named is not None:
+        return named[0] if any(fold(stem) == fold(village) for village in named[1]) else None
+    annex = annexes.get(fold(to_ilce))
+    old_ilce = "merkez" if from_ilce.endswith(" MERKEZ") else fold(from_ilce)
+    if annex is not None and re.search(r"\d" + fold(stem) + old_ilce, annex):
+        return "6360 annex list"
+    return None
+
+
 def parse() -> None:
     frame = pl.concat([read(year, secim_turu) for year in SECIM_IDS for secim_turu in TYPES])
     register = (
@@ -268,10 +323,21 @@ def parse() -> None:
             new = new.join(pairs.select(muhtarlik_id="to_id"), on="muhtarlik_id", how="anti")
     pairs = pl.concat(changes)
     print(pairs.group_by("from_year", "from_kind", "to_year", "to_kind").len().sort("from_year", "from_kind"))
+    annexes = law_annexes()
+    province = pairs.filter((pl.col("match") == "province") & (pl.col("from_year") == 2009)).join(
+        every.select(from_id="muhtarlik_id", from_year="year", from_ilce="ilce"), on=["from_id", "from_year"]
+    )
+    law = {(row["from_id"], row["to_id"]): law_basis(row, annexes) for row in province.to_dicts()}
+    pairs = pairs.with_columns(
+        law=pl.struct("from_id", "to_id").map_elements(
+            lambda row: law.get((row["from_id"], row["to_id"])), return_dtype=pl.String
+        )
+    )
+    print("province pairs confirmed by the law", pairs["law"].is_not_null().sum(), "of", province.height)
     pairs.filter(pl.col("from_kind") != pl.col("to_kind")).sort("plate", "ilce", "to_name", "to_id").write_csv(
         KIND_CHANGES, separator="\t"
     )
-    links = pairs.filter(pl.col("match") == "ilce")
+    links = pairs.filter((pl.col("match") == "ilce") | pl.col("law").is_not_null())
     chain = current.select(muhtarlik_id="muhtarlik_id", code="muhtarlik_id", year=pl.lit(2024, dtype=pl.Int64))
     steps = [chain]
     for before, after in reversed(list(itertools.pairwise(years))):
