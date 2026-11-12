@@ -73,6 +73,12 @@ ROLES = (
     (r"^(?:board of county commissioners|county commissioner)\b", "commission"),
     (r"^school board(?: member)?\b", "board-of-education"),
 )
+CITIES = {
+    "STL": (
+        (r"^City of Port St\. Lucie Mayor$", "1258715", "mayor"),
+        (r"^Port St\. Lucie City Council District (\d+)$", "1258715", "council:district-{}"),
+    ),
+}
 PARTIES = {"REP": "republican-party", "DEM": "democratic-party"}
 OFFICES = {"commission": "County Commission", "board-of-education": "School Board"}
 
@@ -83,8 +89,9 @@ def fetch() -> None:
             raw.fetch(SOURCE, ENR.format(county=county, election=number), suffix=".html")
 
 
-def races(county: str) -> list[tuple[str, str, str, bool, list[tuple[str, str, int]]]]:
+def races(county: str) -> list[tuple[str, str, str, bool, list[tuple[str, str, int]], str | None]]:
     found = []
+    fips = FIPS[county]
     for number in ELECTIONS[county]:
         url = ENR.format(county=county, election=number)
         page = raw.cached(SOURCE, url).path.read_text(errors="replace")
@@ -94,14 +101,22 @@ def races(county: str) -> list[tuple[str, str, str, bool, list[tuple[str, str, i
             continue
         for block in re.split(r'<div id="\d+" class="Race row">', page)[1:]:
             label = re.search(r"<label>([^<]*)</label>", block)
+            city = next(
+                (
+                    (place, tail.format(*match.groups()))
+                    for pattern, place, tail in CITIES.get(county, ())
+                    if label and (match := re.match(pattern, html.unescape(label[1]).strip()))
+                ),
+                None,
+            )
             district = re.search(r"\bdistrict\s*(\d+)", label[1], re.IGNORECASE) if label else None
-            if label is None or district is None:
+            if label is None or district is None and city is None:
                 continue
             name = html.unescape(label[1]).strip()
             role = next((role for pattern, role in ROLES if re.search(pattern, name, re.IGNORECASE)), None)
-            if role is None:
+            if role is None and city is None:
                 continue
-            universal = "universal" in name.lower()
+            universal = city is not None or "universal" in name.lower()
             candidates = []
             for cell, votes in re.findall(
                 r'<td class="ChoiceColumn">(.*?)<div class="DetailsFullBar">.*?class="DetailResultsColumn notranslate TotalVotes">([\d,]+)<',
@@ -111,8 +126,10 @@ def races(county: str) -> list[tuple[str, str, str, bool, list[tuple[str, str, i
                 text = re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", cell))).strip()
                 match = re.match(r"^(.*?)\s*\(([A-Z]{3})\)$", text)
                 candidates.append((match[1] if match else text, match[2] if match else "", int(votes.replace(",", ""))))
-            if candidates:
-                found.append((url, f"{role}:district-{district[1]}", name, universal, candidates))
+            if candidates and city is not None:
+                found.append((url, f"FL:{city[0]}:{city[1]}", name, universal, candidates, city[0]))
+            elif candidates and district is not None:
+                found.append((url, f"FL:{fips}:{role}:district-{district[1]}", name, universal, candidates, None))
     return found
 
 
@@ -137,6 +154,12 @@ def emit() -> Path:
                 "select code, id, area_id from reporting_unit where scheme_code = 'us.county' and code like '12%%'"
             ).fetchall()
         }
+        units = dict(
+            conn.execute(
+                "select code, id from reporting_unit where scheme_code = 'us.place' and code = any(%s)",
+                [[place for cities in CITIES.values() for _, place, _ in cities]],
+            ).fetchall()
+        )
         elections: dict[str, object] = {}
         for county in ELECTIONS:
             fips = str(FIPS[county])
@@ -157,15 +180,13 @@ def emit() -> Path:
                 )
             for url in {url for url, *_ in rows}:
                 cs.artifact(raw.cached(SOURCE, url), source)
-            for _, tail, label, universal, candidates in rows:
-                _role, seat = tail.split(":")
+            for _, full, label, universal, candidates, place in rows:
                 parties = {party for _, party, _ in candidates}
                 if not universal and len(parties - {""}) > 1:
                     continue
                 party_slug = (
                     None if universal or not (parties & set(PARTIES)) else PARTIES[next(iter(parties & set(PARTIES)))]
                 )
-                full = f"FL:{fips}:{tail}"
                 value = f"{DAY}:{full}" + (f":{party_slug.removesuffix('-party')}" if party_slug else "")
                 if conn.execute(
                     "select 1 from external_id where scheme = 'us.contest' and value = %s", [value]
@@ -192,7 +213,17 @@ def emit() -> Path:
                 kind, office, body, area, seat, plan, magnitude, term, system, template_election, polity, name, path = (
                     template
                 )
-                election_key = f"{DAY}:FL:{fips}"
+                if place is not None:
+                    area = next(
+                        iter(
+                            conn.execute(
+                                "select area_id from area_code where code = any(%s) order by code desc limit 1",
+                                [[full, f"12:{full[3:]}"]],
+                            ).fetchall()
+                        ),
+                        (area,),
+                    )[0]
+                election_key = f"{DAY}:FL:{place or fips}"
                 if election_key not in elections:
                     found = conn.execute(
                         "select entity_id from external_id where scheme = 'us.election' and value = %s", [election_key]
@@ -260,8 +291,8 @@ def emit() -> Path:
                     """select ca.person_id, coalesce(ca.ballot_name, o.ballot_label) from contest co
                        join contest_option o on o.contest_id = co.id
                        join candidacy ca on ca.option_id = o.id
-                       where co.district_area_id = %s and co.id <> %s""",
-                    [area, contest],
+                       where co.district_area_id = any(%s) and co.id <> %s""",
+                    [[area, template[3]], contest],
                 ).fetchall():
                     words = slug(re.sub(r'"[^"]*"|\([^)]*\)', " ", ballot or "")).split("-")
                     known.setdefault(f"{words[0][:1]}:{words[-1]}", person)
@@ -316,7 +347,9 @@ def emit() -> Path:
                         if rank < (1 if decided or party_slug else 2)
                         else "lost",
                     )
-                    values.append((str(result_set), str(county_units[fips][0]), str(option), votes))
+                    values.append(
+                        (str(result_set), str(units[place] if place else county_units[fips][0]), str(option), votes)
+                    )
         print(counts)
         cs.frame(
             "result_value",

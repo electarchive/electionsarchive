@@ -12636,6 +12636,17 @@ def emit_state(frame: pl.DataFrame, state: str, snapshot: Snapshot, offices: Off
                 templates[row[0]] = row
             if row[8] is not None and row[12].year >= DAY.year - 8:
                 seat_history.setdefault(row[0], {})[row[12].year] = row[8]
+        first_rounds = dict(
+            conn.execute(
+                """select distinct regexp_replace(x.value, '^[0-9-]+:', ''), co.id from external_id x
+                   join changeset c on c.id = x.changeset_id and c.pipeline = 'us.fl_primary_2026'
+                   join contest co on co.id = x.entity_id join entity e on e.id = co.id and e.retired_by is null
+                   join result_set rs on rs.contest_id = co.id join outcome o on o.result_set_id = rs.id and o.kind = 'advanced'
+                   where x.scheme = 'us.contest' and x.value !~ ':commission:'
+                       and regexp_replace(x.value, '^[0-9-]+:', '') = any(%s)""",
+                [sorted(set(frame["tail"]))],
+            ).fetchall()
+        )
         known: dict[str, list[tuple[object, str]]] = {}
         for tail, person, text in conn.execute(
             """select regexp_replace(x.value, '^[0-9-]+:', ''), ca.person_id, coalesce(ca.ballot_name, o.ballot_label, pn.text)
@@ -13170,6 +13181,8 @@ def emit_state(frame: pl.DataFrame, state: str, snapshot: Snapshot, offices: Off
                             reason="This name belongs to another polity's election",
                         )
             chained = previous is not None and held_on.year == DAY.year
+            if tail in first_rounds:
+                previous, chained = first_rounds[tail], True
             if str(group["feed"][0]).endswith("-rcv"):
                 system = cs.key(
                     "us.electoral_system",
