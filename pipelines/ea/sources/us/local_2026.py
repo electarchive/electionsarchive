@@ -12688,6 +12688,7 @@ def emit_state(frame: pl.DataFrame, state: str, snapshot: Snapshot, offices: Off
             "dropped": 0,
             "stale contests": 0,
             "orphan people": 0,
+            "carried": 0,
         }
         created: set[str] = set()
         made: set[object] = set()
@@ -13599,6 +13600,41 @@ def emit_state(frame: pl.DataFrame, state: str, snapshot: Snapshot, offices: Off
                 print("retiring orphan person", value)
                 cs.add("entity_retirement", entity_id=person, reason="No longer on any official candidate list")
                 counts["orphan people"] += 1
+        held = {str(row["id"]) for table in ("body", "office", "person") for row in cs.rows.get(table, [])}
+        wanted = {
+            str(row[column])
+            for table, column in (("contest", "body_id"), ("contest", "office_id"), ("candidacy", "person_id"))
+            for row in cs.rows.get(table, [])
+            if row.get(column) is not None
+        } - held
+        for id, kind, polity_id, holder_kind in conn.execute(
+            """select e.id, e.type::text, coalesce(b.polity_id, o.polity_id), coalesce(b.kind::text, o.kind::text)
+               from entity e join changeset c on c.id = e.changeset_id
+               left join body b on b.id = e.id left join office o on o.id = e.id
+               where e.id = any(%s::uuid[]) and c.pipeline = %s and e.type::text in ('body', 'office', 'person')""",
+            [sorted(wanted), SOURCE],
+        ).fetchall():
+            if kind == "person":
+                cs.add("person", id=id)
+            else:
+                cs.add(kind, id=id, polity_id=polity_id, kind=holder_kind)
+            counts["carried"] += 1
+        for entity, text, lang, kind, preferred in conn.execute(
+            """select n.entity_id, n.text, n.lang, n.kind::text, n.is_preferred from name n
+               join changeset c on c.id = n.changeset_id
+               join entity e on e.id = n.entity_id join changeset m on m.id = e.changeset_id
+               where n.entity_id = any(%s::uuid[]) and c.pipeline = %s and m.pipeline = %s""",
+            [sorted(wanted), SOURCE, SOURCE],
+        ).fetchall():
+            cs.add("name", entity_id=entity, text=text, lang=lang, kind=kind, is_preferred=preferred)
+        for entity, scheme, value in conn.execute(
+            """select x.entity_id, x.scheme, x.value from external_id x
+               join changeset c on c.id = x.changeset_id
+               join entity e on e.id = x.entity_id join changeset m on m.id = e.changeset_id
+               where x.entity_id = any(%s::uuid[]) and c.pipeline = %s and m.pipeline = %s""",
+            [sorted(wanted), SOURCE, SOURCE],
+        ).fetchall():
+            cs.add("external_id", entity_id=entity, scheme=scheme, value=value)
         counts["renamed people"] = repair(cs)
         print(counts)
         return cs.write()
