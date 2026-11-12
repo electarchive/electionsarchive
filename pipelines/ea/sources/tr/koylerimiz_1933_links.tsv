@@ -52,6 +52,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:01:Feke:Merkez:Akoluk	Akoluk	28	2	456.4	AKOLUK	Seyhan	Feke	*	name	agrees	""	tr.tuik.mahalle:177105	Akoluk Mah.
 1963:01:Feke:Merkez:Bahçecik	Bahçecik	80	2	140.5	BAHÇECİK	Seyhan	Feke	""	name	agrees	""	tr.tuik.mahalle:177109	Bahçecik Mah.
 1963:01:Feke:Merkez:Bağdatlı	Bağdatlı	78	1	370.2	BAĞDATLI	Seyhan	Feke	""	name	agrees	""	tr.tuik.mahalle:177107	Bağdatlı Mah.
+1963:01:Feke:Merkez:Kızılyer	Kızılyer	479	1	121.6	KIZIL YER	Seyhan	Feke	*	name	agrees	""	tr.tuik.mahalle:177137	Kızılyer Mah.
 1963:01:Feke:Merkez:Olucak	Olucak	594	2	336.2	OLUCAK	Seyhan	Bahçe	*	name	differs	""	tr.tuik.mahalle:177143	Olucak Mah.
 1963:01:Feke:Merkez:Tokmanaklı	Tokmanaklı	732	2	322.0	TOKMANAKLI	Seyhan	Feke	*	name	agrees	""	tr.tuik.mahalle:177151	Tokmanaklı Mah.
 1963:01:Feke:Merkez:Yaylâpınar	Yaylâpınar	143	1	338.9	ÇİZERİN	Seyhan	Feke	*	1968 rename	agrees	Yaylapınar	tr.tuik.mahalle:177157	Yaylapınar Mah.
@@ -64,6 +65,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:01:Kadirli:Merkez:Değirmendere	Değirmendere	200	1	229.8	DEĞİRMENDERE	Seyhan	Kadirli	*	name	agrees	""	tr.tuik.koy:37260	Değirmendere Köyü
 1963:01:Kadirli:Merkez:Durmuşsofular	Durmuşsofular	226	2	190.4	DURMUŞ SOFULAR	Seyhan	Kadirli	""	name	agrees	""	tr.tuik.koy:37261	Durmuşsofular Köyü
 1963:01:Kadirli:Merkez:Erdoğdu	Erdoğdu	28	2	268.0	AKMAŞAT	Seyhan	Kadirli	""	1968 rename	agrees	Erdoğdu	tr.tuik.koy:37263	Erdoğdu Köyü
+1963:01:Kadirli:Merkez:Göztaşı	Göztaşı	587	2	148.3	NURFET	Seyhan	Kadirli	*	1968 rename	agrees	Göztaşı	tr.tuik.koy:37264	Göztaşı Köyü
 1963:01:Kadirli:Merkez:Hardallık	Hardallık	326	1	407.9	HARDALLIK	Seyhan	Kadirli	*	name	agrees	""	tr.tuik.koy:37306	Hardallık Köyü
 1963:01:Kadirli:Merkez:Karabacak	Karabacak	404	2	324.7	KARABACAK	Seyhan	Kadirli	*	name	agrees	""	tr.tuik.koy:37268	Karabacak Köyü
 1963:01:Kadirli:Merkez:Karakütük	Karakütük	421	1	443.3	KARA KÜTÜK	Seyhan	Kadirli	""	name	agrees	""	tr.tuik.koy:37269	Karakütük Köyü
@@ -117,6 +119,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:01:Karaisalı:Merkez:Kocaveliler	Kocaveliler	481	2	185.4	KOCA VELİLER	Seyhan	Karaisalı	*	name	agrees	""	tr.tuik.mahalle:334	Kocaveliler Mah.
 1963:01:Karaisalı:Merkez:Kuyucu	Kuyucu	512	2	112.8	KUYUCU	Seyhan	Karaisalı	""	name	agrees	""	tr.tuik.mahalle:177275	Kuyucu Mah.
 1963:01:Karaisalı:Merkez:Küçükçınar	Küçükçınar	516	1	328.6	KÜÇÜK ÇINAR	Seyhan	Karaisalı	*	name	agrees	""	""	""
+1963:01:Karaisalı:Merkez:Pirili	Pirili	623	1	426.2	PİRİLİ	Seyhan	Karaisalı	*	name	agrees	""	tr.tuik.mahalle:177839	Pirili Mah.
 1963:01:Karaisalı:Merkez:Söğütlü	Söğütlü	678	1	435.2	SÖĞÜTLÜ	Seyhan	Karaisalı	*	name	agrees	""	""	""
 1963:01:Karaisalı:Merkez:Yağbasan	Yağbasan	766	1	365.5	YAĞBASAN	Seyhan	Karaisalı	*	name	agrees	""	""	""
 1963:01:Karaisalı:Merkez:Çocuklar	Çocuklar	180	1	408.9	ÇOCUKLAR	Seyhan	Karaisalı	""	name	agrees	""	tr.tuik.mahalle:177243	Çocuklar Mah.
@@ -141,6 +144,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:01:Karataş:Merkez:Kesik	Kesik	453	2	418.2	KESİK	Seyhan	""	*	name	""	""	tr.tuik.mahalle:177351	Kesik Mah.
 1963:01:Karataş:Merkez:Koprugozu	Koprugozu	495	2	109.4	KÖPRÜ GÖZÜ	Seyhan	""	""	name	""	""	tr.tuik.mahalle:209	Köprügözü Mah.
 1963:01:Karataş:Merkez:Kumrulu	Kumrulu	504	1	417.2	KUMRULU	Seyhan	""	*	name	""	""	""	""
+1963:01:Karataş:Merkez:Kızıltahta	Kızıltahta	478	2	150.4	KIZIL TAHTA	Seyhan	""	*	name	""	""	tr.tuik.mahalle:177355	Kızıltahta Mah.
 1963:01:Karataş:Merkez:Terliksiz	Terliksiz	726	1	381.2	TERLİKSİZ	Seyhan	""	""	name	""	""	tr.tuik.mahalle:177363	Terliksiz Mah.
 1963:01:Karataş:Merkez:Topraklı	Topraklı	734	2	188.2	TOPRAKLI	Seyhan	""	""	name	""	""	tr.tuik.mahalle:177365	Topraklı Mah.
 1963:01:Karataş:Merkez:Yenice	Yenice	779	1	274.3	YENİCE	Seyhan	""	*	name	""	""	tr.tuik.mahalle:206	Yenice Mah.
@@ -210,6 +214,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:01:Mağara:Merkez:Akçal	Akçal	25	1	285.7	AKÇAL	Seyhan	Saimbeyli	*	name	differs	""	tr.tuik.mahalle:177661	Akçal Mah.
 1963:01:Mağara:Merkez:Ayvat	Ayvat	72	1	338.0	AYVAT	Seyhan	Saimbeyli	""	name	differs	""	tr.tuik.mahalle:177665	Ayvat Mah.
 1963:01:Mağara:Merkez:Damlalı	Damlalı	193	1	243.3	DAMLALI	Seyhan	Saimbeyli	*	name	differs	""	tr.tuik.mahalle:177673	Damlalı Mah.
+1963:01:Mağara:Merkez:Doğanbeyli	Doğanbeyli	220	2	181.0	DOĞAN BEYLİ	Seyhan	Saimbeyli	""	name	differs	""	tr.tuik.mahalle:177677	Doğanbeyli Mah.
 1963:01:Mağara:Merkez:Evci	Evci	249	2	426.0	EVCİ	Seyhan	Saimbeyli	*	name	differs	""	tr.tuik.mahalle:177681	Evci Mah.
 1963:01:Mağara:Merkez:Fatmakuyu	Fatmakuyu	257	2	189.9	FATMA KUYU	Seyhan	Saimbeyli	*	name	differs	""	tr.tuik.mahalle:177683	Fatmakuyu Mah.
 1963:01:Mağara:Merkez:Güzelim	Güzelim	300	2	114.1	GÜZELİM	Seyhan	Saimbeyli	""	name	differs	""	tr.tuik.mahalle:177685	Güzelim Mah.
@@ -230,6 +235,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:01:Merkez:Merkez:Kayışlı	Kayışlı	444	1	156.6	KAYIŞLI	Seyhan	""	*	name	""	""	tr.tuik.mahalle:106	Kayışlı Mah.
 1963:01:Merkez:Merkez:Kireçocağı	Kireçocağı	459	2	288.9	KİREÇ OCAĞI	Seyhan	""	*	name	""	""	""	""
 1963:01:Merkez:Merkez:Koyuncu	Koyuncu	489	1	258.4	KOYUNCU	Seyhan	""	*	name	""	""	tr.tuik.mahalle:86	Koyuncu Mah.
+1963:01:Merkez:Merkez:Kurttepe	Kurttepe	507	1	387.1	KURT TEPE	Seyhan	""	*	name	""	""	tr.tuik.mahalle:88	Kurttepe Mah.
 1963:01:Merkez:Merkez:Kuyumcular	Kuyumcular	512	2	399.2	KUYUMCULAR	Seyhan	""	*	name	""	""	tr.tuik.mahalle:89	Kuyumcular Mah.
 1963:01:Merkez:Merkez:Köylüoğlu	Köylüoğlu	500	2	244.6	KÖYLÜ OĞLU	Seyhan	""	""	name	""	""	tr.tuik.mahalle:110	Köylüoğlu Mah.
 1963:01:Merkez:Merkez:Küçükdikili	Küçükdikili	516	1	433.5	KÜÇÜK DİKİLİ	Seyhan	""	*	name	""	""	tr.tuik.mahalle:114	Küçükdikili Mah.
@@ -277,6 +283,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:01:Saimbeyli:Merkez:Karakuyu	Karakuyu	421	1	206.1	KARA KUYU	Seyhan	Saimbeyli	*	name	agrees	""	tr.tuik.mahalle:177643	Karakuyu Mah.
 1963:01:Saimbeyli:Merkez:Kızılağaç	Kızılağaç	471	1	429.8	KIZIL AĞAÇ	Seyhan	Saimbeyli	*	name	agrees	""	tr.tuik.mahalle:177645	Kızılağaç Mah.
 1963:01:Saimbeyli:Merkez:Tülü	Tülü	739	2	454.3	TÜLÜ	Seyhan	Saimbeyli	*	name	agrees	""	tr.tuik.mahalle:177651	Tülü Mah.
+1963:01:Saimbeyli:Merkez:Yardibi	Yardibi	772	2	433.8	YARDİBİ	Seyhan	Saimbeyli	""	name	agrees	""	tr.tuik.mahalle:177653	Yardibi Mah.
 1963:01:Saimbeyli:Merkez:Çatak	Çatak	160	2	182.7	ÇATAK	Seyhan	Saimbeyli	*	name	agrees	""	tr.tuik.mahalle:177621	Çatak Mah.
 1963:01:Yumurtalık:Merkez:Ayvalık	Ayvalık	72	1	235.4	AYVALIK	Seyhan	Ceyhan	*	name	differs	""	tr.tuik.mahalle:177727	Ayvalık Mah.
 1963:01:Yumurtalık:Merkez:Aşmalı	Aşmalı	55	2	161.4	AŞMALI	Seyhan	Ceyhan	*	name	differs	""	""	""
@@ -290,6 +297,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:02:Besni:Keysun:Kesmetepe	Kesmetepe	548	2	218.3	MEHMANLI	Malatya	Besni	*	1968 rename	agrees	""	""	""
 1963:02:Besni:Keysun:Köseceli	Köseceli	497	1	403.3	KÖSECELİ	Malatya	Besni	*	name	agrees	""	""	""
 1963:02:Besni:Keysun:Tetirli	Tetirli	727	1	415.9	TETİRLİ	Malatya	Besni	*	name	agrees	""	""	""
+1963:02:Besni:Keysun:Yazıbeydili	Yazıbeydili	776	2	292.1	YAZI BEYDİLİ	Malatya	Besni	""	name	agrees	""	tr.tuik.koy:687	Yazıbeydili Köyü
 1963:02:Besni:Keysun:Çomak	Çomak	181	1	332.6	ÇOMAK	Malatya	""	""	name	""	""	tr.tuik.koy:680	Çomak Köyü
 1963:02:Besni:Keysun:İnce	İnce	47	2	159.0	ARAPLAR	Malatya	Besni	*	1968 rename	agrees	ince	""	""
 1963:02:Besni:Kızılin:Hacıhalil	Hacıhalil	307	1	332.3	HACI HALÎL	Malatya	Besni	*	name	agrees	""	tr.tuik.koy:694	Hacıhalil Köyü
@@ -347,8 +355,10 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:02:Merkez:Merkez:Dişbudak	Dişbudak	218	1	338.9	DİŞ BUDAK	Malatya	Adıyaman	""	name	differs	""	tr.tuik.koy:539	Dişbudak Köyü
 1963:02:Merkez:Merkez:Durukaynak	Durukaynak	624	1	424.6	PİŞİNİK	Malatya	Adıyaman	*	1968 rename	differs	Durukaynak	tr.tuik.koy:540	Durukaynak Köyü
 1963:02:Merkez:Merkez:Hasancık	Hasancık	329	1	295.6	HASANCIK	Malatya	Adıyaman	*	name	differs	""	tr.tuik.koy:545	Hasancık Köyü
+1963:02:Merkez:Merkez:Hasankendi	Hasankendi	329	2	442.9	HASAN KENDİ	Malatya	Adıyaman	""	name	differs	""	tr.tuik.koy:546	Hasankendi Köyü
 1963:02:Merkez:Merkez:Karagöl	Karagöl	17	1	121.7	AĞDİKÂN	Malatya	Adıyaman	""	1968 rename	differs	Karagöl	tr.tuik.koy:552	Karagöl Köyü
 1963:02:Merkez:Merkez:Lokman	Lokman	532	2	186.6	LOKMAN	Malatya	Adıyaman	""	name	differs	""	tr.tuik.koy:561	Lokman Köyü
+1963:02:Merkez:Merkez:Sarıharman	Sarıharman	659	1	394.8	SELAMUT	Malatya	Adıyaman	*	1968 rename	differs	""	tr.tuik.koy:565	Sarıharman Köyü
 1963:02:Merkez:Merkez:Toptepe	Toptepe	666	2	292.8	SİMEYLİ	Malatya	Adıyaman	""	1968 rename	differs	""	tr.tuik.koy:569	Toptepe Köyü
 1963:02:Merkez:Merkez:Uludam	Uludam	745	2	151.5	ULUDAM	Malatya	Adıyaman	""	name	differs	""	tr.tuik.koy:570	Uludam Köyü
 1963:02:Merkez:Merkez:Yaylakonak	Yaylakonak	87	1	109.9	BALYAN	Malatya	Adıyaman	*	1968 rename	differs	Yaylakonak	""	""
@@ -388,6 +398,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:03:Dazkırı:Merkez:Baraklı	Baraklı	87	2	280.8	BARAKLI	Afyonkarahisar	Dinar	*	name	differs	""	tr.tuik.koy:1251	Baraklı Köyü
 1963:03:Dazkırı:Merkez:Idris	Idris	362	1	142.0	İDRİS	Afyonkarahisar	Dinar	*	name	differs	""	tr.tuik.koy:1101	İdris Köyü
 1963:03:Dazkırı:Merkez:Karaağaçkuyusu	Karaağaçkuyusu	402	1	362.1	KARAAĞAÇ KUYUSU	Afyonkarahisar	Dinar	*	name	differs	""	tr.tuik.koy:1102	Karaağaçkuyusu Köyü
+1963:03:Dazkırı:Merkez:Körkuyu	Körkuyu	496	1	304.3	KÖR KUYU	Afyonkarahisar	Dinar	""	name	differs	""	tr.tuik.koy:1254	Körkuyu Köyü
 1963:03:Dazkırı:Merkez:Madenler	Madenler	536	2	252.1	MADENLER	Afyonkarahisar	""	*	name	""	""	tr.tuik.koy:1255	Madenler Köyü
 1963:03:Dazkırı:Merkez:Yorgalar	Yorgalar	788	2	176.5	YORGALAR	Afyonkarahisar	Dinar	*	name	differs	""	""	""
 1963:03:Dinar:Dombayova:Afşar	Afşar	13	2	210.1	AFŞAR	Afyonkarahisar	Dinar	*	name	agrees	""	tr.tuik.koy:1145	Afşar Köyü
@@ -545,6 +556,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:03:Sincanlı:Merkez:Kırka	Kırka	467	1	425.5	KIRKA	Afyonkarahisar	""	*	name	""	""	""	""
 1963:03:Sincanlı:Merkez:Nuh	Nuh	587	1	171.1	NUH	Afyonkarahisar	""	""	name	""	""	tr.tuik.koy:1407	Nuh Köyü
 1963:03:Sincanlı:Merkez:Saraycık	Saraycık	648	2	169.9	SARAYCIK	Afyonkarahisar	""	""	name	""	""	tr.tuik.koy:1408	Saraycık Köyü
+1963:03:Sincanlı:Merkez:Tokuşlar	Tokuşlar	732	2	400.5	TOKUŞLAR	Afyonkarahisar	""	""	name	""	""	tr.tuik.koy:1413	Tokuşlar Köyü
 1963:03:Sincanlı:Merkez:Çayhisar	Çayhisar	164	2	276.6	ÇAYHİSAR	Afyonkarahisar	""	*	name	""	""	tr.tuik.koy:1392	Çayhisar Köyü
 1963:03:Sincanlı:Merkez:Çobanözü	Çobanözü	180	1	331.0	ÇOBAN ÖZÜ	Afyonkarahisar	""	*	name	""	""	tr.tuik.koy:1393	Çobanözü Köyü
 1963:03:Sultandağı amı:Merkez:Akbaba	Akbaba	23	1	237.8	AKBABA	Afyonkarahisar	Bolvadin	""	name	differs	""	tr.tuik.koy:1417	Akbaba Köyü
@@ -623,6 +635,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:04:Doğubeyazit:Merkez:Karakent	Karakent	418	1	390.2	KARA KENT	Bayazıt	Karaköse	*	name	differs	""	tr.tuik.koy:1676	Karakent Köyü
 1963:04:Doğubeyazit:Merkez:Kargakonmaz	Kargakonmaz	430	2	355.1	KARGA KONMAZ	Bayazıt	Karaköse	""	name	differs	""	tr.tuik.koy:1677	Kargakonmaz Köyü
 1963:04:Doğubeyazit:Merkez:Melikşah	Melikşah	550	2	388.2	MELİKŞE	Bayazıt	Karaköse	""	1968 rename	differs	""	tr.tuik.koy:1680	Melikşah Köyü
+1963:04:Doğubeyazit:Merkez:Ortadirek	Ortadirek	475	1	185.9	KIZILDİZE	Bayazıt	Karaköse	""	1968 rename	differs	""	tr.tuik.koy:1681	Ortadirek Köyü
 1963:04:Doğubeyazit:Merkez:Yağmurdüşen	Yağmurdüşen	152	2	259.3	ÇALGANİ SİVO	Bayazıt	Karaköse	""	1968 rename	differs	Yağmurdüşen	tr.tuik.koy:1699	Yağmurdüşen Köyü
 1963:04:Doğubeyazit:Merkez:Yılanlı	Yılanlı	787	1	106.0	YILANLI	Muş	Varto	""	name	differs	""	tr.tuik.koy:1705	Yılanlı Köyü
 1963:04:Doğubeyazit:Merkez:Örtülü	Örtülü	609	2	410.7	ÖRTÜLÜ	Bayazıt	Karaköse	""	name	differs	""	tr.tuik.koy:1683	Örtülü Köyü
@@ -796,6 +809,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:05:Merkez:Ezinepazar:Tatar	Tatar	716	2	170.6	TATAR	Amasya	""	*	name	""	""	tr.tuik.koy:2147	Tatar Köyü
 1963:05:Merkez:Ezinepazar:Yolyanı	Yolyanı	338	2	129.6	HENİSKE	Amasya	""	*	1968 rename	""	""	tr.tuik.koy:2152	Yolyanı Köyü
 1963:05:Merkez:Ezinepazar:Zıgala	Zıgala	808	2	373.5	ZİĞALA	Amasya	""	*	name	""	Aydınca	tr.tuik.koy:2120	Aydınca Köyü
+1963:05:Merkez:Ezinepazar:Çengelkayı	Çengelkayı	168	2	374.4	ÇENGEL KAYI	Amasya	""	""	name	""	""	tr.tuik.koy:2128	Çengelkayı Köyü
 1963:05:Merkez:Ezinepazar:İmük	İmük	367	1	223.3	İMÜK	Amasya	""	""	name	""	""	""	""
 1963:05:Merkez:Merkez:Aksalur	Aksalur	30	2	144.2	AKSALUR	Amasya	""	*	name	""	""	tr.tuik.koy:2051	Aksalur Köyü
 1963:05:Merkez:Merkez:Aydoğdu	Aydoğdu	70	1	214.7	AYDOĞDU	Amasya	""	""	name	""	""	tr.tuik.koy:2056	Aydoğdu Köyü
@@ -833,6 +847,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:05:Merzifon:Alıcık:Yakup	Yakup	769	1	345.9	YAKUP	Amasya	Merzifon	*	name	agrees	""	tr.tuik.koy:2301	Yakup Köyü
 1963:05:Merzifon:Merkez:Aksungur	Aksungur	272	1	339.3	GEMEREZ	Amasya	Merzifon	""	1968 rename	agrees	Aksungur	tr.tuik.koy:2260	Aksungur Köyü
 1963:05:Merzifon:Merkez:Bayat	Bayat	93	2	187.9	BAYAT	Amasya	Merzifon	*	name	agrees	""	tr.tuik.koy:2263	Bayat Köyü
+1963:05:Merzifon:Merkez:Gökçebağ	Gökçebağ	812	2	158.6	ZUĞU	Amasya	Merzifon	**	1968 rename	agrees	Gökçebag	tr.tuik.koy:2269	Gökçebağ Köyü
 1963:05:Merzifon:Merkez:Hırka	Hırka	346	2	351.5	HIRKA	Amasya	Merzifon	*	name	agrees	""	tr.tuik.koy:2270	Hırka Köyü
 1963:05:Merzifon:Merkez:Inalanı	Inalanı	312	2	279.3	HACI VELİ	Amasya	Merzifon	""	1968 rename	agrees	İnalanı	tr.tuik.koy:2271	İnalanı Köyü
 1963:05:Merzifon:Merkez:Karamağara	Karamağara	421	2	434.7	KARA MAĞARA	Amasya	Merzifon	*	name	agrees	""	tr.tuik.koy:2272	Karamağara Köyü
@@ -936,6 +951,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:06:Beypazarı:Merkez:Dağşıhlar	Dağşıhlar	192	1	114.4	DAĞŞIHLAR	Ankara	Beypazarı	""	name	agrees	Dağşeyhler	tr.tuik.mahalle:177997	Dağşeyhler Mah.
 1963:06:Beypazarı:Merkez:Dibecik	Dibecik	214	1	330.4	DİBECİK	Ankara	Beypazarı	""	name	agrees	""	tr.tuik.mahalle:177999	Dibecik Mah.
 1963:06:Beypazarı:Merkez:Dikmen	Dikmen	215	2	300.2	DİKMEN	Ankara	Beypazarı	*	name	agrees	""	tr.tuik.mahalle:178001	Dikmen Mah.
+1963:06:Beypazarı:Merkez:Hamzalar	Hamzalar	321	1	210.0	HAMZALAR	Ankara	Beypazarı	""	name	agrees	""	""	""
 1963:06:Beypazarı:Merkez:Kaplan	Kaplan	400	1	346.6	KAPLAN	Ankara	Beypazarı	*	name	agrees	""	tr.tuik.mahalle:178019	Kaplan Mah.
 1963:06:Beypazarı:Merkez:Karabire	Karabire	404	2	302.2	KARABİRE	Ankara	Beypazarı	*	name	agrees	Doğanyurt	tr.tuik.mahalle:178003	Doğanyurt Mah.
 1963:06:Beypazarı:Merkez:Kozalan	Kozalan	490	1	236.7	KOZ ALAN	Ankara	Beypazarı	*	name	agrees	""	tr.tuik.mahalle:178029	Kozalan Mah.
@@ -1107,6 +1123,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:06:Koçhisar:Merkez:Hacıbektaşlı	Hacıbektaşlı	306	1	386.6	HACI BEKTAŞLI	Ankara	Şerefli	*	name	differs	""	tr.tuik.mahalle:179187	Hacıbektaşlı Mah.
 1963:06:Koçhisar:Merkez:Haydarlı	Haydarlı	335	2	106.5	HAYDARLI	Ankara	Şerefli koçhisar	*	name	agrees	""	tr.tuik.mahalle:179191	Haydarlı Mah.
 1963:06:Koçhisar:Merkez:Kadıncık	Kadıncık	388	2	131.7	KADINCIK	Ankara	Şerefli	*	name	differs	""	tr.tuik.mahalle:179193	Kadıncık Mah.
+1963:06:Koçhisar:Merkez:Karabük	Karabük	405	2	378.3	KARABÜK	Ankara	Şerefli	*	name	differs	""	tr.tuik.mahalle:179197	Karabük Mah.
 1963:06:Koçhisar:Merkez:Mamalı	Mamalı	541	2	374.9	MAMALI	Ankara	Şerefli	*	name	differs	""	""	""
 1963:06:Koçhisar:Merkez:Mustafacık	Mustafacık	572	2	291.7	MUSTAFACIK	Ankara	Şerefli Ko(,'hisar	*	name	differs	""	tr.tuik.mahalle:2259	Mustafacık Mah.
 1963:06:Koçhisar:Merkez:Musular	Musular	573	1	177.7	MUSULAR	Ankara	Şerefli	""	name	differs	""	tr.tuik.mahalle:179205	Musular Mah.
@@ -1268,10 +1285,12 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:06:Polatlı:Merkez:Şabanözü	Şabanözü	690	1	259.5	ŞABANÖZÜ	Ankara	Polatlı	*	name	agrees	""	tr.tuik.mahalle:179041	Şabanözü Mah.
 1963:06:Polatlı:Temelli:Alagöz	Alagöz	34	1	274.9	ALAGÖZ	Ankara	Polatlı	""	name	agrees	""	tr.tuik.mahalle:2236	Alagöz Mah.
 1963:06:Polatlı:Temelli:Alcı	Alcı	36	1	375.0	ALCI	Ankara	Polatlı	*	name	agrees	""	tr.tuik.mahalle:2237	Alcı Mah.
+1963:06:Polatlı:Temelli:Babayakup	Babayakup	76	1	373.1	BABAYAKUP	Ankara	Polatlı	""	name	agrees	""	tr.tuik.mahalle:179063	Babayakup Mah.
 1963:06:Polatlı:Temelli:Bacı	Bacı	76	2	427.8	BACI	Ankara	Polatlı	*	name	agrees	""	tr.tuik.mahalle:2247	Bacı Mah.
 1963:06:Polatlı:Temelli:Beyobası	Beyobası	107	1	248.1	BEY OBASI	Ankara	Polatlı	*	name	agrees	""	""	""
 1963:06:Polatlı:Temelli:Gedikli	Gedikli	270	1	282.2	GEDİKLİ	Ankara	Polatlı	""	name	agrees	""	tr.tuik.mahalle:179067	Gedikli Mah.
 1963:06:Polatlı:Temelli:Güreş	Güreş	298	2	259.0	GÜREŞ	Ankara	Polatlı	*	name	agrees	""	tr.tuik.mahalle:179069	Güreş Mah.
+1963:06:Polatlı:Temelli:Hıdırşıh	Hıdırşıh	345	2	148.5	HIDIR ŞIH	Ankara	Polatlı	*	name	agrees	Hıdırşeyh	tr.tuik.mahalle:179071	Hıdırşeyh Mah.
 1963:06:Polatlı:Temelli:Macun	Macun	536	1	241.3	MACUN	Ankara	Polatlı	*	name	agrees	""	tr.tuik.mahalle:179073	Macun Mah.
 1963:06:Polatlı:Temelli:Poyraz	Poyraz	627	1	146.8	POYRAZ	Ankara	Polatlı	*	name	agrees	""	tr.tuik.mahalle:179077	Poyraz Mah.
 1963:06:Polatlı:Temelli:Temelli	Temelli	646	2	178.7	SAMUTLU	Ankara	Polatlı	""	1968 rename	agrees	Temelli	""	""
@@ -1279,6 +1298,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:06:Polatlı:Temelli:Ücret	Ücret	752	1	126.9	ÜCRET	Ankara	Haymana	*	name	differs	""	tr.tuik.mahalle:2242	Ücret Mah.
 1963:06:Polatlı:Yenimehmetli:Ilıca	Ilıca	378	2	227.5	ILİCA	Ankara	Polatlı	""	name	agrees	""	tr.tuik.mahalle:179093	Ilıca Mah.
 1963:06:Polatlı:Yenimehmetli:Karabenli	Karabenli	404	2	153.1	KARA BENLİ	Ankara	Polatlı	**	name	agrees	""	tr.tuik.mahalle:179099	Karabenli Mah.
+1963:06:Polatlı:Yenimehmetli:Kocahacılı	Kocahacılı	480	2	198.3	KOCA HACILI	Ankara	Polatlı	*	name	agrees	""	tr.tuik.mahalle:179105	Kocahacılı Mah.
 1963:06:Polatlı:Yenimehmetli:Sarıhalil	Sarıhalil	651	1	216.3	SARI HALİL	Ankara	Polatlı	*	name	agrees	""	tr.tuik.mahalle:179113	Sarıhalil Mah.
 1963:06:Polatlı:Yenimehmetli:Yıldızlı	Yıldızlı	787	2	136.9	YILDIZLI	Ankara	Polatlı	""	name	agrees	""	tr.tuik.mahalle:179133	Yıldızlı Mah.
 1963:06:Polatlı:Yenimehmetli:Ördekgölü	Ördekgölü	608	1	419.0	ÖRDEK GÖLÜ	Ankara	Haymana	""	name	differs	""	tr.tuik.mahalle:179107	Ördekgölü Mah.
@@ -1291,7 +1311,6 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:06:Sulakyurt:Merkez:Sarımbey	Sarımbey	653	1	220.1	SARIMBEY	Ankara	Kalecik	*	name	differs	""	tr.tuik.koy:35452	Sarımbey Köyü
 1963:06:Sulakyurt:Merkez:Sofular çiftliği	Sofular çiftliği	674	2	157.1	SOFULAR ÇİFTLİĞİ	Ankara	Kalecik	*	name	differs	""	tr.tuik.koy:35453	Sofularçiftliği Köyü
 1963:06:Sulakyurt:Merkez:Yeniceli	Yeniceli	780	2	345.4	YENİCELİ	Ankara	Kalecik	*	name	differs	""	tr.tuik.koy:35455	Yeniceli Köyü
-1963:06:Sulakyurt:Merkez:Yeşilli	Yeşilli	785	2	372.0	YEŞİLLİ	Ankara	Kalecik	""	name	differs	""	tr.tuik.koy:35456	Yeşilli Köyü
 1963:06:Sulakyurt:Merkez:Çayoba	Çayoba	166	1	147.4	ÇAYOBA	Ankara	Kalecik	*	name	differs	""	tr.tuik.koy:35437	Çayoba Köyü
 1963:06:Yenimahalle:Etimesgut:Alacaatlı	Alacaatlı	33	1	329.1	ALACAATLI	Ankara	""	*	name	""	""	tr.ysk_sandik.mahalle:97:ALACAATLI MAH.	Alacaatlı Mah.
 1963:06:Yenimahalle:Etimesgut:Dodurga	Dodurga	220	1	172.9	DODURGA	Ankara	""	*	name	""	""	tr.ysk_sandik.mahalle:97:DODURGA MAH.	Dodurga Mah.
@@ -1374,6 +1393,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:06:Çubuk:Merkez:Ovacık	Ovacık	602	1	154.0	OVACIK	Ankara	Çubuk	*	name	agrees	""	tr.tuik.mahalle:178237	Ovacık Mah.
 1963:06:Çubuk:Merkez:Saraycık	Saraycık	648	1	406.4	SARAYCIK	Ankara	Çubuk	*	name	agrees	""	tr.tuik.mahalle:178243	Saraycık Mah.
 1963:06:Çubuk:Merkez:Sele	Sele	659	2	202.9	SELE	Ankara	Çubuk	""	name	agrees	""	tr.tuik.mahalle:178249	Sele Mah.
+1963:06:Çubuk:Merkez:Tahtayazı	Tahtayazı	719	2	287.9	TAHTAYAZI	Ankara	Çubuk	*	name	agrees	""	tr.tuik.mahalle:2041	Tahtayazı Mah.
 1963:06:Çubuk:Merkez:Tuğla	Tuğla	736	2	269.2	TUĞLA	Ankara	Çubuk	""	name	agrees	""	tr.tuik.mahalle:2043	Tuğla Mah.
 1963:06:Çubuk:Merkez:Uluağaç	Uluağaç	745	1	260.2	ULUAĞAÇ	Ankara	Çubuk	*	name	agrees	""	tr.tuik.mahalle:178255	Uluağaç Mah.
 1963:06:Çubuk:Merkez:Yaylak	Yaylak	776	1	378.1	YAYLÂK	Ankara	Çubuk	*	name	agrees	""	tr.tuik.mahalle:178257	Yaylak Mah.
@@ -1387,6 +1407,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:06:Çubuk:Ravlı:Karacalar	Karacalar	408	1	222.6	KARACALAR	Ankara	Çubuk	*	name	agrees	""	tr.tuik.mahalle:1932	Karacalar Mah.
 1963:06:Çubuk:Ravlı:Karayatak	Karayatak	429	2	282.6	KARA YATAK	Ankara	Çubuk	*	name	agrees	""	tr.tuik.mahalle:1933	Karayatak Mah.
 1963:06:Çubuk:Ravlı:Teberik	Teberik	719	1	456.0	TEBERİK	Ankara	Çubuk	*	name	agrees	Doğanoluk	tr.tuik.mahalle:1927	Teberik Mah.
+1963:06:Çubuk:Ravlı:Çam	Çam	154	2	307.8	ÇAM	Ankara	Çubuk	""	name	agrees	""	tr.tuik.mahalle:1924	Çam Mah.
 1963:06:Çubuk:Ravlı:Çınar	Çınar	178	2	296.7	ÇINAR	Ankara	Çubuk	*	name	agrees	""	tr.tuik.mahalle:1926	Çınar Mah.
 1963:06:Çubuk:Ravlı:İmamhüseyin	İmamhüseyin	366	1	143.4	İMAM HÜSEYİN	Ankara	Çubuk	""	name	agrees	""	tr.tuik.mahalle:2031	İmamhüseyin Mah.
 1963:06:Çubuk:Sirkeli:Abadan	Abadan	8	1	121.9	ABADAN	Ankara	Çubuk	*	name	agrees	""	tr.tuik.mahalle:2063	Abadan Mah.
@@ -1413,12 +1434,14 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:07:Akseki:Geriş:Alaçeşme	Alaçeşme	33	2	400.0	ALAÇEŞME	Antalya	Akseki	*	name	agrees	""	tr.tuik.mahalle:179897	Alaçeşme Mah.
 1963:07:Akseki:Geriş:Cendeve	Cendeve	139	1	384.1	CENDEVE	Antalya	Akseki	*	name	agrees	""	tr.tuik.mahalle:179909	Cendeve Mah.
 1963:07:Akseki:Geriş:Geriş	Geriş	274	1	390.6	GERİŞ	Antalya	Akseki	*	name	agrees	""	tr.tuik.mahalle:179893	Geriş Mah.
+1963:07:Akseki:Geriş:Kepez	Kepez	450	2	388.8	KEPEZ	Antalya	Akseki	""	name	agrees	""	tr.tuik.mahalle:179923	Kepez Mah.
 1963:07:Akseki:Geriş:Sinanhoca	Sinanhoca	667	1	293.5	SİNAN HOCA	Antalya	Akseki	""	name	agrees	""	tr.tuik.mahalle:179939	Sinanhoca Mah.
 1963:07:Akseki:Güzelsu:Güzelsu	Güzelsu	300	2	236.0	GÜZEL SU	Antalya	Akseki	*	name	agrees	""	tr.tuik.mahalle:179941	Güzelsu Mah.
 1963:07:Akseki:Güzelsu:Taşlıca	Taşlıca	714	2	277.2	TAŞLICA	Antalya	Akseki	*	name	agrees	""	tr.tuik.mahalle:179949	Taşlıca Mah.
 1963:07:Akseki:Merkez:Akşahap	Akşahap	31	1	214.4	AKŞAHAP	Antalya	Akseki	""	name	agrees	""	tr.tuik.mahalle:179803	Akşahap Mah.
 1963:07:Akseki:Merkez:Bucakkışla	Bucakkışla	121	1	121.8	BUCAK KIŞLA	Antalya	Akseki	*	name	agrees	""	tr.tuik.mahalle:179819	Bucakkışla Mah.
 1963:07:Akseki:Merkez:Emiraşıklar	Emiraşıklar	238	1	177.8	EMİRAŞIKLAR	Antalya	Akseki	*	name	agrees	""	tr.tuik.mahalle:179839	Emiraşıklar Mah.
+1963:07:Akseki:Merkez:Hüsamettin	Hüsamettin	355	1	391.6	HÜSAMETTİN	Antalya	Akseki	""	name	agrees	""	""	""
 1963:07:Akseki:Merkez:Menteşbey	Menteşbey	281	2	287.8	GÖDENE	Antalya	Akseki	*	1968 rename	agrees	Menteşbey	tr.tuik.mahalle:179847	Menteşbey Mah.
 1963:07:Akseki:Merkez:Minareli	Minareli	561	2	214.5	MİNARELİ	Antalya	Akseki	*	name	agrees	""	tr.tuik.mahalle:179853	Minareli Mah.
 1963:07:Akseki:Merkez:Sarıhacılar	Sarıhacılar	651	1	147.6	SARI HACILAR	Antalya	Akseki	*	name	agrees	""	tr.tuik.mahalle:179855	Sarıhacılar Mah.
@@ -1511,6 +1534,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:07:Kaş:Kale:Kale	Kale	392	2	166.3	KALE	Antalya	Kaş	*	name	agrees	""	tr.tuik.mahalle:2594	Kale Mah.
 1963:07:Kaş:Kale:Kapaklı	Kapaklı	399	2	344.3	KAPAKLI	Antalya	Kaş	*	name	agrees	""	tr.tuik.mahalle:180697	Kapaklı Mah.
 1963:07:Kaş:Kale:Kum	Kum	503	1	228.0	KUM	Antalya	Kaş	*	name	agrees	""	""	""
+1963:07:Kaş:Kale:Matırlı	Matırlı	546	2	192.0	MATIRLI	Antalya	Küş	""	name	differs	""	""	""
 1963:07:Kaş:Kale:Tırmısın	Tırmısın	731	2	343.8	TIRMISIN	Antalya	Kaş	*	name	agrees	Çevreli	""	""
 1963:07:Kaş:Kale:Çağman	Çağman	148	2	277.5	ÇAĞMAN	Antalya	""	*	name	""	""	tr.tuik.mahalle:180687	Çağman Mah.
 1963:07:Kaş:Kalkan:Aklar	Aklar	28	2	224.5	AKLAR	Antalya	Kaş	""	name	agrees	""	tr.tuik.mahalle:180845	Aklar Mah.
@@ -1532,6 +1556,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:07:Kaş:Merkez:Gelemen	Gelemen	271	1	138.6	GELEMEN	Antalya	Kaş	""	name	agrees	Balkonak	""	""
 1963:07:Kaş:Merkez:Karadağ	Karadağ	412	1	114.4	KARADAĞ	Antalya	Kaş	*	name	agrees	""	tr.tuik.mahalle:180809	Karadağ Mah.
 1963:07:Kaş:Merkez:Kasaba	Kasaba	434	2	365.5	KASABA	Antalya	Kaş	*	name	agrees	""	tr.tuik.mahalle:180811	Kasaba Mah.
+1963:07:Kaş:Merkez:Kızılağaç	Kızılağaç	471	1	418.8	KIZIL AĞAÇ	Antalya	Kaş	""	name	agrees	""	tr.tuik.mahalle:180821	Kızılağaç Mah.
 1963:07:Kaş:Merkez:Ortabağ	Ortabağ	597	1	313.5	ORTA BAĞ	Antalya	Kaş	*	name	agrees	""	tr.tuik.mahalle:180823	Ortabağ Mah.
 1963:07:Kaş:Merkez:Pınarbaşı	Pınarbaşı	625	1	122.0	PINARBAŞI	Antalya	Kaş	""	name	agrees	""	tr.tuik.mahalle:180827	Pınarbaşı Mah.
 1963:07:Kaş:Merkez:Seyret	Seyret	665	2	246.2	SEYRET	Antalya	Kaş	*	name	agrees	""	""	""
@@ -1544,6 +1569,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:07:Korkuteli:Bozova:Zivint	Zivint	810	2	236.8	ZİVİNT	Antalya	Korkudeli	*	name	differs	Bozova	tr.tuik.mahalle:181063	Bozova Mah.
 1963:07:Korkuteli:Bozova:Çukurca	Çukurca	144	2	109.4	CUKURCA	Antalya	Korkudeli	""	name	differs	""	tr.tuik.mahalle:181297	Çukurca Mah.
 1963:07:Korkuteli:Kızılcadağ:Mamatlar	Mamatlar	542	1	187.2	MAMATLAR	Antalya	Korkudeli	*	name	differs	""	tr.tuik.mahalle:181347	Mamatlar Mah.
+1963:07:Korkuteli:Kızılcadağ:Manay	Manay	543	1	295.2	MANAY	Antalya	Korkudeli	""	name	differs	Söğüt	tr.tuik.mahalle:181359	Manay Mah.
 1963:07:Korkuteli:Kızılcadağ:Osmankalfalar	Osmankalfalar	601	1	208.2	OSMAN KALFALAR	Antalya	Korkudeli	""	name	differs	""	tr.tuik.mahalle:181355	Osmankalfalar Mah.
 1963:07:Korkuteli:Merkez:Avdan	Avdan	67	1	225.0	AVDAN	Antalya	Korkudeli	*	name	differs	""	tr.tuik.mahalle:181181	Avdan Mah.
 1963:07:Korkuteli:Merkez:Beyiş	Beyiş	106	1	287.6	BEYİŞ	Antalya	Korkudeli	*	name	differs	""	""	""
@@ -1584,6 +1610,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:07:Manavgat:Merkez:Saraçlı	Saraçlı	647	2	330.3	SARAÇLI	Antalya	Manavgat	*	name	agrees	""	tr.tuik.mahalle:181921	Saraçlı Mah.
 1963:07:Manavgat:Merkez:Sarılar	Sarılar	652	2	441.5	SARILAR	Antalya	Manavgat	*	name	agrees	""	tr.tuik.mahalle:181839	Sarılar Mah.
 1963:07:Manavgat:Merkez:Seki	Seki	658	2	235.9	SEKİ	Antalya	Manavgat	""	name	agrees	""	""	""
+1963:07:Manavgat:Merkez:Sevinç	Sevinç	663	2	396.1	SEVİNÇ	Antalya	Manavgat	""	name	agrees	""	""	""
 1963:07:Manavgat:Merkez:Sülek	Sülek	683	2	374.4	SÜLEK	Antalya	Manavgat	*	name	agrees	""	tr.tuik.mahalle:181929	Sülek Mah.
 1963:07:Manavgat:Merkez:Sırt	Sırt	673	1	198.7	SIRT	Antalya	Manavgat	*	name	agrees	""	""	""
 1963:07:Manavgat:Merkez:Uzunlar	Uzunlar	749	1	111.4	UZUNLAR	Antalya	Manavgat	*	name	agrees	""	tr.tuik.mahalle:181941	Uzunlar Mah.
@@ -1610,6 +1637,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:07:Merkez:Aksu:Kundu	Kundu	504	2	256.3	KUNDU	Antalya	""	*	name	""	özlü	tr.tuik.mahalle:182169	Kundu Mah.
 1963:07:Merkez:Aksu:İhsaniye	İhsaniye	363	1	234.7	İHSANİYE	Antalya	""	*	name	""	""	tr.tuik.mahalle:182159	İhsaniye Mah.
 1963:07:Merkez:Döşemealtı:Bıyıklı	Bıyıklı	112	2	334.6	BIYIKLI	Antalya	""	""	name	""	""	tr.tuik.mahalle:182191	Bıyıklı Mah.
+1963:07:Merkez:Döşemealtı:Camili	Camili	135	1	409.8	CAMİLİ	Antalya	""	""	name	""	""	tr.tuik.mahalle:182193	Camili Mah.
 1963:07:Merkez:Döşemealtı:Dereli	Dereli	210	2	296.1	DERELİ	Antalya	""	""	name	""	""	tr.tuik.mahalle:182195	Dereli Mah.
 1963:07:Merkez:Döşemealtı:Ekşili	Ekşili	242	2	159.3	EKŞİLİ	Antalya	""	""	name	""	""	tr.tuik.mahalle:182181	Ekşili Mah.
 1963:07:Merkez:Döşemealtı:Karaveliler	Karaveliler	428	2	210.9	KARAVELİLER	Antalya	""	*	name	""	""	tr.tuik.mahalle:182183	Karaveliler Mah.
@@ -1717,6 +1745,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:08:Savşat:Meydancık:Erikli	Erikli	244	2	280.0	ERİKLİ	Çoruh	Şavşat	*	name	agrees	""	tr.tuik.koy:4039	Erikli Köyü
 1963:08:Savşat:Meydancık:Maden	Maden	536	2	177.3	MADEN	Çoruh	""	*	name	""	""	tr.tuik.koy:4040	Maden Köyü
 1963:08:Savşat:Meydancık:Çukur	Çukur	184	2	411.3	ÇUKUR	Çoruh	Şavşat	*	name	agrees	""	tr.tuik.koy:4035	Çukur Köyü
+1963:08:Yusufeli:Erkinis:Çağlayan	Çağlayan	148	2	202.6	ÇAĞLAYAN	Çoruh	""	""	name	""	""	""	""
 1963:09:Bozdoğan:Merkez:Alamut	Alamut	35	1	148.9	ALAMUT	Aydın	Bozdoğan	""	name	agrees	""	tr.tuik.mahalle:143679	Alamut Mah.
 1963:09:Bozdoğan:Merkez:Amasya	Amasya	43	1	143.7	AMASYA	Aydın	Bozdoğan	*	name	agrees	""	tr.tuik.mahalle:143685	Amasya Mah.
 1963:09:Bozdoğan:Merkez:Araplı	Araplı	47	2	227.0	ARAPLI	Aydın	Bozdoğan	*	name	agrees	Pınarlı	tr.tuik.mahalle:143747	Pınarlı Mah.
@@ -1731,6 +1760,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:09:Bozdoğan:Merkez:Kemer	Kemer	449	1	402.2	KEMER	Aydın	Bozdoğan	*	name	agrees	""	tr.tuik.mahalle:143719	Kemer Mah.
 1963:09:Bozdoğan:Merkez:Koyuncular	Koyuncular	489	1	303.4	KOYUNCULAR	Aydın	Bozdoğan	*	name	agrees	""	tr.tuik.mahalle:143731	Koyuncular Mah.
 1963:09:Bozdoğan:Merkez:Kılavuzlar	Kılavuzlar	462	2	325.2	KILAVUZLAR	Aydın	Nazilli	""	name	differs	""	tr.tuik.mahalle:143721	Kılavuzlar Mah.
+1963:09:Bozdoğan:Merkez:Kızılca	Kızılca	472	1	254.4	KIZILCA	Aydın	Bozdoğan	""	name	agrees	""	tr.tuik.mahalle:143723	Kızılca Mah.
 1963:09:Bozdoğan:Merkez:Kızıltepe	Kızıltepe	478	1	307.8	KIZIL TEPE	Aydın	Bozdoğan	*	name	agrees	""	tr.tuik.mahalle:143725	Kızıltepe Mah.
 1963:09:Bozdoğan:Merkez:Osmaniye	Osmaniye	600	2	297.7	OSMANİYE	Aydın	Bozdoğan	*	name	agrees	""	tr.tuik.mahalle:143737	Osmaniye Mah.
 1963:09:Bozdoğan:Merkez:Yaka	Yaka	768	2	259.0	YAKA	Aydın	Bozdoğan	*	name	agrees	""	tr.tuik.mahalle:143755	Yaka Mah.
@@ -1766,6 +1796,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:09:Koçarlı:Merkez:Bıyıklı	Bıyıklı	112	2	358.0	BIYIKLI	Aydın	""	*	name	""	""	tr.tuik.mahalle:144157	Bıyıklı Mah.
 1963:09:Koçarlı:Merkez:Cincin	Cincin	142	1	235.2	CİNCİN	Aydın	""	*	name	""	""	tr.tuik.mahalle:144171	Cincin Mah.
 1963:09:Koçarlı:Merkez:Gaffarlar	Gaffarlar	266	1	153.7	GAFFARLAR	Aydın	Çine	*	name	differs	""	tr.tuik.mahalle:144187	Gaffarlar Mah.
+1963:09:Koçarlı:Merkez:Kasaplar	Kasaplar	435	1	161.7	KASAPLAR	Aydın	""	""	name	""	""	tr.tuik.mahalle:144199	Kasaplar Mah.
 1963:09:Koçarlı:Merkez:Kullar	Kullar	502	2	126.3	KULLAR	Aydın	Çine	""	name	differs	""	tr.tuik.mahalle:144205	Kullar Mah.
 1963:09:Koçarlı:Merkez:Kuşlarbeleni	Kuşlarbeleni	511	1	120.9	KUŞLAR BELENİ	Aydın	""	*	name	""	""	""	""
 1963:09:Koçarlı:Merkez:Kızılkaya	Kızılkaya	476	1	286.9	KIZILKAYA	Aydın	""	*	name	""	""	tr.tuik.mahalle:144203	Kızılkaya Mah.
@@ -1824,7 +1855,6 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:09:Merkez:Umurlu:Kocagür	Kocagür	480	2	165.7	KOCA GÜR	Aydın	""	*	name	""	""	tr.tuik.mahalle:143657	Kocagür Mah.
 1963:09:Merkez:Umurlu:Kuyucular	Kuyucular	512	2	134.4	KUYUCULAR	Aydın	""	*	name	""	""	tr.tuik.mahalle:143659	Kuyucular Mah.
 1963:09:Merkez:Umurlu:Musluca	Musluca	572	1	424.6	MUSLUCA	Aydın	""	*	name	""	""	tr.tuik.mahalle:143661	Musluca Mah.
-1963:09:Merkez:Umurlu:Ortaköy	Ortaköy	598	1	339.6	ORTA KÖY	İzmir	Tire	""	name	differs	""	tr.tuik.mahalle:143663	Ortaköy Mah.
 1963:09:Merkez:Umurlu:Pınardere	Pınardere	625	1	185.4	PINAR DERE	Aydın	""	""	name	""	""	tr.tuik.mahalle:143665	Pınardere Mah.
 1963:09:Merkez:Umurlu:Terziler	Terziler	726	2	453.2	TERZİLER	Aydın	""	*	name	""	""	tr.tuik.mahalle:143669	Terziler Mah.
 1963:09:Merkez:Umurlu:Çayyüzü	Çayyüzü	166	1	285.4	ÇAY YÜZÜ	Aydın	""	""	name	""	""	tr.tuik.mahalle:143645	Çayyüzü Mah.
@@ -1874,6 +1904,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:09:Sultanhisar:Merkez:Güvendik	Güvendik	299	2	310.1	GÜVENDİK	İzmir	Urla	*	name	differs	""	tr.tuik.mahalle:144617	Güvendik Mah.
 1963:09:Sultanhisar:Merkez:Kabaca	Kabaca	382	1	251.2	KABACA	Aydın	Nazilli	""	name	differs	""	tr.tuik.mahalle:144619	Kabaca Mah.
 1963:09:Söke:Arköy:Balat	Balat	83	2	411.3	BALAT	Aydın	Söke	*	name	agrees	""	tr.tuik.mahalle:143929	Balat Mah.
+1963:09:Söke:Arköy:Sarıkemer	Sarıkemer	652	1	285.3	SARI KEMER	Aydın	Söke	""	name	agrees	""	tr.tuik.mahalle:144517	Sarıkemer Mah.
 1963:09:Söke:Arköy:Serçin	Serçin	662	1	349.7	SERÇİN	Aydın	Söke	*	name	agrees	Gölönü	tr.tuik.mahalle:144555	Serçin Mah.
 1963:09:Söke:Bağarası:Akçakaya	Akçakaya	24	2	384.5	AKÇAKAYA	Aydın	Söke	""	name	agrees	""	tr.tuik.mahalle:144567	Akçakaya Mah.
 1963:09:Söke:Bağarası:Demirçay	Demirçay	204	2	150.8	DEMİRÇAY	Aydın	Söke	""	name	agrees	""	tr.tuik.mahalle:144581	Demirçay Mah.
@@ -1993,6 +2024,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:10:Bigadiç:Yağcılar:Hacıömerderesi	Hacıömerderesi	311	2	301.1	HACI ÖMER DERESİ	Balıkesir	""	*	name	""	""	tr.tuik.mahalle:147399	Hacıömerderesi Mah.
 1963:10:Bigadiç:Yağcılar:Kalafat	Kalafat	391	1	276.2	KALAFAT	Balıkesir	""	""	name	""	""	tr.tuik.mahalle:147403	Kalafat Mah.
 1963:10:Bigadiç:Yağcılar:Karabahçe	Karabahçe	404	1	109.4	KARA BAHÇE	Balıkesir	""	""	name	""	""	tr.tuik.mahalle:147405	Karabahçe Mah.
+1963:10:Bigadiç:Yağcılar:Kızılçukur	Kızılçukur	474	2	276.6	KIZIL ÇUKUR	Balıkesir	""	""	name	""	""	tr.tuik.mahalle:147409	Kızılçukur Mah.
 1963:10:Bigadiç:Yağcılar:Okçularyeri	Okçularyeri	594	1	249.1	OKÇULARYERİ	Balıkesir	""	*	name	""	""	tr.tuik.mahalle:147417	Okçularyeri Mah.
 1963:10:Bigadiç:Yağcılar:Panayır	Panayır	615	1	374.9	PANAYIR	Balıkesir	""	""	name	""	""	tr.tuik.mahalle:147419	Panayır Mah.
 1963:10:Bigadiç:Yağcılar:Topalak	Topalak	733	2	347.3	TOPALAK	Balıkesir	""	""	name	""	""	tr.tuik.mahalle:147421	Topalak Mah.
@@ -2155,6 +2187,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:10:Merkez:Merkez:Bakacak	Bakacak	82	1	115.7	BAKACAK	Balıkesir	""	**	name	""	""	tr.tuik.mahalle:146909	Bakacak Mah.
 1963:10:Merkez:Merkez:Büyükbostancı	Büyükbostancı	127	1	388.9	BÜYÜK BOSTANCI	Balıkesir	""	*	name	""	""	tr.tuik.mahalle:147047	Büyükbostancı Mah.
 1963:10:Merkez:Merkez:Dereçiftlik	Dereçiftlik	208	2	363.1	DERE ÇİFTLİK	Balıkesir	""	*	name	""	""	tr.tuik.mahalle:147059	Dereçiftlik Mah.
+1963:10:Merkez:Merkez:Halalca	Halalca	315	1	248.1	HALALCA	Balıkesir	""	*	name	""	""	tr.tuik.mahalle:147063	Halalca Mah.
 1963:10:Merkez:Merkez:Irvana	Irvana	379	1	380.8	IRVANA	Balıkesir	""	*	name	""	""	""	""
 1963:10:Merkez:Merkez:Kalaycılar	Kalaycılar	391	2	398.5	KALAYCILAR	Balıkesir	""	*	name	""	""	tr.tuik.mahalle:146917	Kalaycılar Mah.
 1963:10:Merkez:Merkez:Kavaklı	Kavaklı	438	2	379.2	KAVAKLI	Balıkesir	""	*	name	""	""	tr.tuik.mahalle:146919	Kavaklı Mah.
@@ -2292,6 +2325,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:11:Gölpazarı:Merkez:Kasımlar	Kasımlar	435	2	361.7	KASIMLAR	Bilecik	Gölpazarı	*	name	agrees	""	tr.tuik.koy:5739	Kasımlar Köyü
 1963:11:Gölpazarı:Merkez:Keskin	Keskin	454	1	259.9	KESKİN	Bilecik	Gölpazarı	*	name	agrees	""	tr.tuik.koy:5741	Keskin Köyü
 1963:11:Gölpazarı:Merkez:Kurşunlu	Kurşunlu	506	1	206.4	KURŞUNLU	Bilecik	Gölpazarı	*	name	agrees	""	tr.tuik.koy:5743	Kurşunlu Köyü
+1963:11:Gölpazarı:Merkez:Kusçaviran	Kusçaviran	509	2	316.6	KUŞCAVİRAN	Bilecik	Gölpazarı	*	name	agrees	Kuşçuören	""	""
 1963:11:Gölpazarı:Merkez:Kümbet	Kümbet	520	2	399.0	KÜMBET	Bilecik	Gölpazarı	*	name	agrees	""	tr.tuik.koy:5747	Kümbet Köyü
 1963:11:Gölpazarı:Merkez:Sarıhacılar	Sarıhacılar	651	1	167.0	SARI HACILAR	Bilecik	Gölpazarı	""	name	agrees	""	tr.tuik.koy:5748	Sarıhacılar Köyü
 1963:11:Gölpazarı:Merkez:Softalar	Softalar	673	2	363.6	SOFTALAR	Bilecik	Gölpazarı	""	name	agrees	""	tr.tuik.koy:5749	Softalar Köyü
@@ -2390,7 +2424,6 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:11:Pazaryeri:Merkez:Esemen	Esemen	246	2	202.1	ESEMEN	Bilecik	""	*	name	""	""	tr.tuik.koy:5809	Esemen Köyü
 1963:11:Pazaryeri:Merkez:Güde	Güde	292	1	313.3	GÜDE	Bilecik	Bozüyük	*	name	differs	""	tr.tuik.koy:5811	Güde Köyü
 1963:11:Pazaryeri:Merkez:Gümüşdere	Gümüşdere	295	1	152.1	GÜMÜŞ DERE	Bilecik	Bozüyük	*	name	differs	""	tr.tuik.koy:5812	Gümüşdere Köyü
-1963:11:Pazaryeri:Merkez:Karaköy	Karaköy	420	1	245.3	KARAKÖY	Bilecik	Gölpazarı	""	name	differs	""	tr.tuik.koy:5815	Karaköy
 1963:11:Pazaryeri:Merkez:Sarıdayı	Sarıdayı	650	2	284.1	SARIDAYİ	Bilecik	Bozüyük	*	name	differs	""	tr.tuik.koy:5819	Sarıdayı Köyü
 1963:12:Genç:Merkez:Arakıl	Arakıl	46	1	407.4	ARAKİL	Muş	Genç	""	name	agrees	Ardıçdibi	tr.tuik.koy:5996	Ardıçdibi Köyü
 1963:12:Genç:Merkez:Diyarbük	Diyarbük	218	2	432.9	DİYAR BÜK	Muş	Genç	*	name	agrees	Sürekli	tr.tuik.koy:6001	Sürekli Köyü
@@ -2451,6 +2484,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:12:Solhan:Arduşin:Badinan	Badinan	77	2	288.3	BADİNAN	Muş	""	""	name	""	Tarhan	tr.tuik.koy:6164	Tarhan Köyü
 1963:12:Solhan:Arduşin:Dorni	Dorni	223	1	194.7	DORNİ	Muş	""	""	name	""	Bozkanat	tr.tuik.koy:6152	Bozkanat Köyü
 1963:12:Solhan:Arduşin:Kâhmut	Kâhmut	389	2	385.1	KAHMUT	Muş	""	""	name	""	Gelintepe	tr.tuik.koy:6156	Gelintepe Köyü
+1963:12:Solhan:Arduşin:Perho	Perho	620	2	225.3	PERHO	Muş	""	""	name	""	""	tr.tuik.koy:6151	Asmakaya Köyü
 1963:12:Solhan:Arduşin:Sükyan	Sükyan	683	2	297.0	SÜKYAN	Muş	""	""	name	""	""	tr.tuik.koy:6162	Sükyan Köyü
 1963:12:Solhan:Merkez:Girvas	Girvas	279	2	275.0	GİRVAS	Muş	""	""	name	""	Arakonak	""	""
 1963:12:Solhan:Merkez:Serban	Serban	662	1	205.5	SERBAN	Muş	""	""	name	""	Dilektepe	tr.tuik.koy:6139	Dilektepe Köyü
@@ -2468,6 +2502,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:13:Hizan:Uçum:KİŞ	KİŞ	469	1	451.2	KIŞ	Muş	Bitlis	""	name	differs	""	tr.tuik.koy:6406	Çatakdeğirmen Köyü
 1963:13:Hizan:Uçum:Sürücüler	Sürücüler	744	1	278.6	UÇUM	Muş	Bitlis	**	1968 rename	differs	Sürücüler	tr.tuik.koy:6426	Sürücüler Köyü
 1963:13:Merkez:Merkez:Kireçtaşı	Kireçtaşı	620	2	214.3	PERHENT	Muş	Bitlis	""	1968 rename	differs	Kireçtaşı	tr.tuik.koy:6209	Kireçtaşı Köyü
+1963:13:Merkez:Merkez:Kömüryakan	Kömüryakan	341	2	233.0	HİLORİNK	Muş	Bitlis	*	1968 rename	differs	""	tr.tuik.koy:6212	Kömüryakan Köyü
 1963:13:Merkez:Merkez:Tabanözü	Tabanözü	186	2	151.5	ÇUKUS	Muş	Bitlis	""	1968 rename	differs	""	tr.tuik.koy:6213	Tabanözü Köyü
 1963:13:Merkez:Narlıdere:Narlıdere	Narlıdere	436	1	249.5	KASRİK	Muş	Bitlis	*	1968 rename	differs	Narlıdere	tr.tuik.koy:6246	Narlıdere Köyü
 1963:13:Merkez:Setek:Ağaçdere	Ağaçdere	313	2	275.2	HAÇÜKÂN	Muş	Bitlis	*	1968 rename	differs	Ağaçdere	tr.tuik.koy:6255	Ağaçdere Köyü
@@ -2491,6 +2526,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:13:Merkez:Çukur:Tahtalı	Tahtalı	710	1	186.8	TAHTALI	Muş	Bitlis	""	name	differs	""	tr.tuik.koy:6356	Tahtalı Köyü
 1963:13:Merkez:Çukur:Uzümveren	Uzümveren	159	2	194.5	ÇAPKİS	Muş	Bitlis	""	1968 rename	differs	Üzümveren	tr.tuik.koy:6358	Üzümveren Köyü
 1963:13:Merkez:Çukur:Çukur	Çukur	184	2	376.9	ÇUKUR	Muş	Bitlis	**	name	differs	""	""	""
+1963:13:Mutki:Huyut:Boğazönü	Boğazönü	616	1	449.8	PARSİNK	Muş	Mutki	""	1968 rename	agrees	""	tr.tuik.koy:6458	Boğazönü Köyü
 1963:13:Mutki:Huyut:Uran	Uran	708	2	401.7	TAĞVANK	Muş	Mutki	""	1968 rename	agrees	Uran	tr.tuik.koy:6476	Uran Köyü
 1963:13:Mutki:Merkez:Dereyolu	Dereyolu	576	2	324.9	MÜZÜK	Muş	Mutki	""	1968 rename	agrees	Dereyolu	tr.tuik.koy:6439	Dereyolu Köyü
 1963:13:Mutki:Merkez:Sekiliyazı	Sekiliyazı	717	2	345.7	TATVAN	Muş	Mutki	*	1968 rename	agrees	Sekiliyazı	tr.tuik.koy:6440	Sekiliyazı Köyü
@@ -2653,6 +2689,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:14:Göynük:Merkez:Bulanık	Bulanık	122	2	186.7	BULANIK	Bolu	Göynük	*	name	agrees	""	tr.tuik.koy:6822	Bulanık Köyü
 1963:14:Göynük:Merkez:Bölücekova	Bölücekova	120	1	274.3	BÖLÜCEK OVA	Bolu	Göynük	""	name	agrees	""	tr.tuik.koy:6821	Bölücekova Köyü
 1963:14:Göynük:Merkez:Demirhanlar	Demirhanlar	204	2	231.6	DEMİRHANLAR	Bolu	Göynük	*	name	agrees	""	tr.tuik.koy:6834	Demirhanlar Köyü
+1963:14:Göynük:Merkez:Ekinciler	Ekinciler	241	2	163.6	EKİNCİLER	Bolu	Göynük	""	name	agrees	""	tr.tuik.koy:6835	Ekinciler Köyü
 1963:14:Göynük:Merkez:Gerişler	Gerişler	274	2	130.5	GERİŞLER	Bolu	Göynük	*	name	agrees	""	tr.tuik.koy:6836	Gerişler Köyü
 1963:14:Göynük:Merkez:Hacımahmut	Hacımahmut	310	1	133.3	HACI MAHMUT	Bolu	Göynük	*	name	agrees	""	tr.tuik.koy:6840	Hacımahmut Köyü
 1963:14:Göynük:Merkez:Hasanlar	Hasanlar	330	1	213.1	HASANLAR	Bolu	Göynük	*	name	agrees	""	tr.tuik.koy:6841	Hasanlar Köyü
@@ -2723,6 +2760,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:14:Merkez:Merkez:Karacasu	Karacasu	408	2	325.0	KARACASU	Bolu	""	*	name	""	""	""	""
 1963:14:Merkez:Merkez:Kasaplar	Kasaplar	435	1	183.9	KASAPLAR	Bolu	""	*	name	""	""	tr.tuik.mahalle:99430	Kasaplar Mah.
 1963:14:Merkez:Merkez:Kozlu	Kozlu	491	1	372.2	KOZLU	Bolu	""	*	name	""	""	tr.tuik.koy:6618	Kozlu Köyü
+1963:14:Merkez:Merkez:Kuzfındık	Kuzfındık	513	2	148.8	KUZ FINDIK	Bolu	""	""	name	""	""	tr.tuik.koy:6620	Kuzfındık Köyü
 1963:14:Merkez:Merkez:Küplüce	Küplüce	522	2	247.6	KÜPLÜCE	Bolu	""	*	name	""	""	tr.tuik.koy:6624	Küplüce Köyü
 1963:14:Merkez:Merkez:Kürkçüler	Kürkçüler	523	2	239.2	KÜRKÇÜLER	Bolu	""	*	name	""	""	tr.tuik.mahalle:140473	Kürkçüler Mah.
 1963:14:Merkez:Merkez:Kırha	Kırha	466	2	350.4	KIRHA	Bolu	""	*	name	""	""	tr.tuik.koy:6615	Kırha Köyü
@@ -2731,6 +2769,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:14:Merkez:Merkez:Okçular	Okçular	594	1	181.6	OKÇULAR	Bolu	""	*	name	""	""	tr.tuik.koy:6634	Okçular Köyü
 1963:14:Merkez:Merkez:Paşaköy	Paşaköy	617	1	204.1	PAŞA KÖY	Bolu	""	*	name	""	""	tr.tuik.mahalle:99434	Paşaköy Mah.
 1963:14:Merkez:Merkez:Pirahmetler	Pirahmetler	622	1	448.2	PİRAHMETLER	Bolu	""	*	name	""	""	tr.tuik.koy:6640	Pirahmetler Köyü
+1963:14:Merkez:Merkez:Salıbeyler	Salıbeyler	644	2	129.9	SALIBEYLER	Bolu	""	*	name	""	""	tr.tuik.mahalle:99435	Salıbeyler Mah.
 1963:14:Merkez:Merkez:Sandallar	Sandallar	646	2	443.5	SANDALLAR	Bolu	""	*	name	""	""	tr.tuik.mahalle:99843	Sandallar Mah.
 1963:14:Merkez:Merkez:Semerciler	Semerciler	661	1	417.6	SEMERCİLER	Bolu	""	""	name	""	""	tr.tuik.koy:6651	Semerciler Köyü
 1963:14:Merkez:Merkez:Sultanbey	Sultanbey	680	2	332.2	SULTAN BEY	Bolu	""	*	name	""	""	tr.tuik.koy:6653	Sultanbey Köyü
@@ -2799,6 +2838,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:15:Ağlasun:Merkez:Mamak	Mamak	541	2	298.8	MAMAK	Burdur	""	*	name	""	""	tr.tuik.koy:7134	Mamak Köyü
 1963:15:Gölhisar:Dirmil:Aşmalı	Aşmalı	55	2	150.6	AŞMALI	Burdur	Tefenni	*	name	differs	""	""	""
 1963:15:Gölhisar:Dirmil:Evciler	Evciler	250	1	204.5	EVCİLER	Burdur	Tefenni	*	name	differs	""	tr.tuik.koy:7210	Evciler Köyü
+1963:15:Gölhisar:Dirmil:Kızılkaya	Kızılkaya	476	1	320.0	KIZILKAYA	Burdur	Bucak	**	name	differs	""	""	""
 1963:15:Gölhisar:Dirmil:Yamadı	Yamadı	771	1	260.4	YAMADI	Burdur	Tefenni	""	name	differs	""	tr.tuik.koy:7217	Yamadı Köyü
 1963:15:Gölhisar:Dirmil:Çörten	Çörten	184	1	113.0	ÇÖRTEN	Burdur	Tefenni	""	name	differs	""	tr.tuik.koy:7145	Çörten Köyü
 1963:15:Gölhisar:Merkez:Kargalı	Kargalı	430	2	450.3	KARGALI	Burdur	Tefenni	""	name	differs	""	tr.tuik.koy:7214	Kargalı Köyü
@@ -2806,6 +2846,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:15:Gölhisar:Çavdır:Dengere	Dengere	205	2	292.3	DENGERE	Burdur	Tefenni	*	name	differs	Bölmepınar	tr.tuik.koy:7189	Bölmepınar Köyü
 1963:15:Gölhisar:Çavdır:Hisarardı	Hisarardı	344	1	166.5	HİSAR ARDI	Burdur	Tefenni	""	name	differs	""	tr.tuik.koy:7211	Hisarardı Köyü
 1963:15:Gölhisar:Çavdır:Kayacık	Kayacık	441	2	119.5	KAYACIK	Burdur	Tefenni	*	name	differs	""	tr.tuik.koy:7193	Kayacık Köyü
+1963:15:Gölhisar:Çavdır:Kızıllar	Kızıllar	477	1	189.5	KIZILLAR	Burdur	Tefenni	""	name	differs	""	tr.tuik.koy:7194	Kızıllar Köyü
 1963:15:Gölhisar:Çavdır:Söğüt	Söğüt	677	2	326.7	SÖĞÜT	Burdur	Tefenni	*	name	differs	""	""	""
 1963:15:Gölhisar:Çavdır:İshak	İshak	372	2	184.6	İSHAK	Burdur	Tefenni	""	name	differs	""	""	""
 1963:15:Merkez:Kızılkaya:Anbahan	Anbahan	43	2	244.1	ANBAHAN	Burdur	Bucak	*	name	differs	""	tr.tuik.koy:7169	Anbahan Köyü
@@ -2875,6 +2916,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:16:Audanya:Merkez:Misebolu	Misebolu	561	2	437.5	MİSE BOLU	Bursa	Mudanya	*	name	differs	""	tr.tuik.mahalle:184229	Aydınpınar Mah.
 1963:16:Audanya:Merkez:Mürsel	Mürsel	575	1	337.3	MÜRSEL	Bursa	Mudanya	*	name	differs	""	tr.tuik.mahalle:184257	Mürsel Mah.
 1963:16:Audanya:Merkez:Sigi	Sigi	671	1	386.4	SİĞİ	Bursa	Mudanya	*	name	differs	""	""	""
+1963:16:Audanya:Merkez:Yörükali	Yörükali	799	2	157.9	YÖRÜK ALİ	Bursa	Mudanya	*	name	differs	""	tr.tuik.mahalle:184263	Yörükali Mah.
 1963:16:Audanya:Merkez:Çepni	Çepni	169	1	436.8	ÇEPNİ	Bursa	Mudanya	*	name	differs	""	tr.tuik.mahalle:184237	Çepni Mah.
 1963:16:Audanya:Tiralya:Emirleryenicesi	Emirleryenicesi	238	1	454.5	EMİRLER YENİCESİ	Bursa	""	""	name	""	""	tr.tuik.mahalle:184271	Emirleryenicesi Mah.
 1963:16:Audanya:Tiralya:Evciler	Evciler	250	1	270.2	EVCİLER	Bursa	""	*	name	""	""	tr.tuik.mahalle:184275	Evciler Mah.
@@ -2883,6 +2925,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:16:Audanya:Tiralya:Hançerli	Hançerli	322	1	252.9	HANÇERLİ	Bursa	""	*	name	""	""	tr.tuik.mahalle:184279	Hançerli Mah.
 1963:16:Audanya:Tiralya:Yaman	Yaman	771	1	288.4	YAMAN	Bursa	Mudanya	""	name	differs	""	tr.tuik.mahalle:184287	Yaman Mah.
 1963:16:Audanya:Tiralya:Yörükyenicesi	Yörükyenicesi	799	2	428.5	YÖRÜK YENİCESİ	Bursa	""	*	name	""	""	tr.tuik.mahalle:184289	Yörükyenicesi Mah.
+1963:16:Audanya:Tiralya:Çamlık	Çamlık	155	2	344.7	ÇAMLIK	Bursa	""	""	name	""	""	tr.tuik.mahalle:184265	Çamlık Mah.
 1963:16:Gemlik:Armutlu:Armutlu	Armutlu	51	2	326.5	ARMUTLU	Bursa	Gemlik	*	name	agrees	""	""	""
 1963:16:Gemlik:Armutlu:Fıstıklı	Fıstıklı	262	1	190.0	FISTIKLI	Bursa	Gemlik	*	name	agrees	""	""	""
 1963:16:Gemlik:Armutlu:Kapaklı	Kapaklı	399	2	300.2	KAPAKLI	Bursa	Gemlik	*	name	agrees	""	""	""
@@ -2930,6 +2973,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:16:Karacabey:Merkez:Çarık	Çarık	159	1	198.2	ÇARIK	Bursa	Karacabey	*	name	agrees	""	tr.ysk_sandik.mahalle:282:ÇARIK KÖYÜ	Çarık Köyü
 1963:16:Karacabey:Merkez:Çavuş	Çavuş	163	1	211.1	ÇAVUŞ	Bursa	Karacabey	*	name	agrees	""	tr.tuik.mahalle:183993	Çavuş Mah.
 1963:16:Karacabey:Merkez:Çeşnigir	Çeşnigir	171	2	281.7	ÇEŞNIGİR	Bursa	Karacabey	*	name	agrees	""	tr.tuik.mahalle:183995	Çeşnigir Mah.
+1963:16:Karacabey:Merkez:Örencik	Örencik	608	2	430.3	ÖRENCİK	Bursa	Karacabey	""	name	agrees	""	tr.tuik.mahalle:184065	Örencik Mah.
 1963:16:Karacabey:Merkez:İkizce	İkizce	364	1	156.2	İKİZCE	Bursa	Karacabey	*	name	agrees	""	tr.tuik.mahalle:184033	İkizce Mah.
 1963:16:Karacabey:Merkez:İnkaya	İnkaya	370	1	113.4	İNKAYA	Bursa	Karacabey	*	name	agrees	""	tr.tuik.mahalle:184035	İnkaya Mah.
 1963:16:Karacabey:Merkez:İsmetpaşa	İsmetpaşa	374	1	429.7	İSMET PAŞA	Bursa	Karacabey	*	name	agrees	""	tr.tuik.mahalle:184037	İsmetpaşa Mah.
@@ -2995,6 +3039,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:16:MKemalpaşa:Söğütalan:Körekem	Körekem	495	2	443.7	KÖREKEM	Bursa	M. Kemal	*	name	agrees	""	tr.tuik.mahalle:184501	Körekem Mah.
 1963:16:MKemalpaşa:Söğütalan:Onaç	Onaç	595	1	344.5	ONAÇ	Bursa	M. Kemal	*	name	agrees	""	tr.tuik.mahalle:184503	Onaç Mah.
 1963:16:MKemalpaşa:Söğütalan:Unçukuru	Unçukuru	747	1	110.7	UNÇUKURU	Bursa	Mustafa	*	name	differs	""	tr.tuik.mahalle:183465	Unçukuru Mah.
+1963:16:MKemalpaşa:Çalıtılbük:Balubala	Balubala	86	2	423.9	BALÜBALÂ	Bursa	M. Kemal	""	name	agrees	""	""	""
 1963:16:MKemalpaşa:Çalıtılbük:Döllük	Döllük	223	2	348.4	DÖLLÜK	Bursa	Mustafa	""	name	differs	""	tr.tuik.mahalle:184411	Döllük Mah.
 1963:16:MKemalpaşa:Çalıtılbük:Hacıali	Hacıali	305	2	110.1	HACI ALİ	Bursa	Mustafa	*	name	differs	""	tr.tuik.mahalle:184343	Hacıali Mah.
 1963:16:MKemalpaşa:Çalıtılbük:Işıklar	Işıklar	379	2	333.9	IŞIKLAR	Bursa	M. Kemal	""	name	agrees	""	tr.tuik.mahalle:184413	Işıklar Mah.
@@ -3101,6 +3146,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:16:Orhaneli:Büyükorhan:Kayapa	Kayapa	442	2	344.8	KAYAPA	Bursa	Orhaneli	*	name	agrees	""	""	""
 1963:16:Orhaneli:Büyükorhan:Kuşlar	Kuşlar	510	2	413.2	KUŞLAR	Bursa	Orhaneli	""	name	agrees	""	tr.tuik.mahalle:183585	Kuşlar Mah.
 1963:16:Orhaneli:Büyükorhan:Perçin	Perçin	620	2	133.7	PERÇİN	Bursa	Orhaneli	""	name	agrees	""	tr.tuik.mahalle:183595	Perçin Mah.
+1963:16:Orhaneli:Büyükorhan:Sarnıç	Sarnıç	654	2	397.4	SARNIÇ	Bursa	Orhaneli	*	name	agrees	""	tr.tuik.mahalle:183601	Sarnıç Mah.
 1963:16:Orhaneli:Büyükorhan:Semerci	Semerci	661	1	396.5	SEMERCİ	Bursa	Orhaneli	""	name	agrees	""	tr.tuik.mahalle:184597	Semerci Mah.
 1963:16:Orhaneli:Büyükorhan:Tekerler	Tekerler	720	1	367.0	TEKERLER	Bursa	Orhaneli	""	name	agrees	""	tr.tuik.mahalle:183603	Tekerler Mah.
 1963:16:Orhaneli:Büyükorhan:Veletler	Veletler	760	1	298.2	VELETLER	Bursa	Orhaneli	""	name	agrees	""	tr.ysk_sandik.mahalle:279:VELETLER KÖYÜ	Veletler Köyü
@@ -3153,6 +3199,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:16:Orhangazi:Merkez:Bayır	Bayır	94	2	198.6	BAYIR	Bursa	Yenişehir	*	name	differs	""	""	""
 1963:16:Orhangazi:Merkez:Gemiç	Gemiç	272	2	122.5	GEMİÇ	Bursa	Orhangazi	*	name	agrees	""	tr.tuik.mahalle:184645	Gemiç Mah.
 1963:16:Orhangazi:Merkez:Keramet	Keramet	451	1	382.0	KERAMET	Bursa	Orhaneli	*	name	differs	""	tr.tuik.mahalle:184657	Keramet Mah.
+1963:16:Orhangazi:Merkez:Narlıca	Narlıca	581	2	436.8	NARLICA	Bursa	Orhangazi	*	name	agrees	""	tr.tuik.mahalle:184623	Narlıca Mah.
 1963:16:Orhangazi:Merkez:Ortaköy	Ortaköy	598	2	357.7	ORTA KÖY	Bursa	Orhangazi	*	name	agrees	""	tr.tuik.mahalle:184661	Ortaköy Mah.
 1963:16:Orhangazi:Merkez:Çakırlı	Çakırlı	150	2	434.5	ÇAKIRLI	Bursa	Orhangazi	*	name	agrees	""	tr.tuik.mahalle:184621	Çakırlı Mah.
 1963:16:Orhangazi:Merkez:Çeltikçi	Çeltikçi	167	2	452.7	ÇELTİKÇİ	Bursa	Orhangazi	*	name	agrees	""	tr.tuik.mahalle:184637	Çeltikçi Mah.
@@ -3180,6 +3227,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:16:Yenişehir:Merkez:Köprühisar	Köprühisar	495	2	129.7	KÖPRÜ HİSAR	Bursa	Yenişehir	*	name	agrees	""	tr.tuik.mahalle:184749	Köprühisar Mah.
 1963:16:Yenişehir:Merkez:Kızıl	Kızıl	471	1	276.8	KIZIL	Bursa	Yenişehir	*	name	agrees	""	""	""
 1963:16:Yenişehir:Merkez:Kızılhisar	Kızılhisar	475	2	264.0	KIZILHİSAR	Bursa	Yenişehir	*	name	agrees	""	tr.tuik.mahalle:184739	Kızılhisar Mah.
+1963:16:Yenişehir:Merkez:Mahmudiye	Mahmudiye	538	1	414.1	MAHMUDİYE	Bursa	Yenişehir	""	name	agrees	""	tr.tuik.mahalle:184751	Mahmudiye Mah.
 1963:16:Yenişehir:Merkez:Mecidiye	Mecidiye	547	2	285.4	MECİDİYE	Bursa	Yenişehir	*	name	agrees	""	tr.tuik.mahalle:184755	Mecidiye Mah.
 1963:16:Yenişehir:Merkez:Okuf	Okuf	594	2	137.5	OKUF	Bursa	Yenişehir	*	name	agrees	Çayırlı	tr.tuik.mahalle:184697	Çayırlı Mah.
 1963:16:Yenişehir:Merkez:Orhaniye	Orhaniye	596	1	388.9	ORHANİYE	Bursa	Yenişehir	*	name	agrees	""	tr.tuik.mahalle:184759	Orhaniye Mah.
@@ -3244,6 +3292,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:16:İnegöl:Merkez:İçlâliye	İçlâliye	361	2	241.5	İCLALİYE	Bursa	İnegöl	*	name	agrees	""	tr.tuik.mahalle:183779	İclaliye Mah.
 1963:16:İnegöl:Tahtaköprü:Aşağıballık	Aşağıballık	56	2	279.9	AŞAĞIBALLIK	Bursa	İnegöl	*	name	agrees	""	tr.tuik.mahalle:183851	Aşağıballık Mah.
 1963:16:İnegöl:Tahtaköprü:Güneykestane	Güneykestane	297	1	429.1	GÜNEY KESTANE	Bursa	İnegöl	*	name	agrees	""	tr.tuik.mahalle:183861	Güneykestane Mah.
+1963:16:İnegöl:Tahtaköprü:Hilmiye	Hilmiye	341	2	180.1	HİLMİYE	Bursa	""	*	name	""	""	tr.tuik.mahalle:183865	Hilmiye Mah.
 1963:16:İnegöl:Tahtaköprü:Karacakayayeni	Karacakayayeni	407	2	254.7	KARACA KAYA YENİ	Bursa	İnegöl	*	name	agrees	""	""	""
 1963:16:İnegöl:Tahtaköprü:Kocakonak	Kocakonak	480	2	353.5	KOCA KONAK	Bursa	İnegöl	*	name	agrees	""	tr.tuik.mahalle:183869	Kocakonak Mah.
 1963:16:İnegöl:Tahtaköprü:Mesruriye	Mesruriye	556	1	150.8	MESRURİYE	Bursa	İnegöl	*	name	agrees	""	tr.ysk_sandik.mahalle:270:MESRURİYE KÖYÜ	Mesruriye Köyü
@@ -3338,6 +3387,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:17:Bayramiç:Merkez:Saraycık	Saraycık	648	2	285.4	SARAYCIK	Çanakkale	Bayramiç	*	name	agrees	""	tr.tuik.koy:8150	Saraycık Köyü
 1963:17:Bayramiç:Merkez:Saçaklı	Saçaklı	640	1	453.6	SAÇAKLI	Çanakkale	Bayramiç	*	name	agrees	""	tr.tuik.koy:8149	Saçaklı Köyü
 1963:17:Bayramiç:Merkez:Tülüler	Tülüler	740	1	120.7	TÜLÜLER	Çanakkale	Bayramiç	*	name	agrees	""	tr.tuik.koy:8152	Tülüler Köyü
+1963:17:Bayramiç:Merkez:Türkmenli	Türkmenli	741	1	292.2	TÜRKMENLİ	Çanakkale	Bayramiç	*	name	agrees	""	tr.tuik.koy:8153	Türkmenli Köyü
 1963:17:Bayramiç:Merkez:Viranlı	Viranlı	762	2	151.4	VİRANLI	Çanakkale	Bayramiç	*	name	agrees	örenli	tr.tuik.koy:8145	Örenli Köyü
 1963:17:Bayramiç:Merkez:Zerdalilik	Zerdalilik	807	1	160.8	ZERDALİLİK	Çanakkale	Bayramiç	""	name	agrees	""	tr.tuik.koy:8157	Zerdalilik Köyü
 1963:17:Bayramiç:Merkez:Çavuşköy	Çavuşköy	163	1	413.6	ÇAVUŞ KÖY	Çanakkale	Bayramiç	*	name	agrees	""	tr.tuik.koy:8134	Çavuşköy
@@ -3368,6 +3418,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:17:Biga Oo:Gündoğdu:Danişment	Danişment	194	1	157.8	DANİŞMENT	Çanakkale	Biga	*	name	agrees	""	""	""
 1963:17:Biga Oo:Gündoğdu:Göktepe	Göktepe	285	1	241.0	GÖK TEPE	Çanakkale	Lii^a	*	name	differs	""	tr.tuik.koy:8268	Göktepe Köyü
 1963:17:Biga Oo:Gündoğdu:Karaağaç	Karaağaç	401	2	225.5	KARAAĞAÇ	Çanakkale	Lapseki	*	name	differs	""	tr.tuik.koy:8292	Karaağaç Köyü
+1963:17:Biga Oo:Gündoğdu:Pekmezli	Pekmezli	619	1	345.4	PEKMEZLİ	Çanakkale	Biga	*	name	agrees	""	tr.tuik.koy:8294	Pekmezli Köyü
 1963:17:Biga Oo:Karabiga:Aksaz	Aksaz	30	2	166.0	AKSAZ	Çanakkale	Biga	""	name	agrees	""	tr.tuik.koy:8296	Aksaz Köyü
 1963:17:Biga Oo:Karabiga:Değirmencik	Değirmencik	199	1	450.7	DEĞİRMENCİK	Çanakkale	Lii^a	*	name	differs	""	tr.tuik.koy:8298	Değirmencik Köyü
 1963:17:Biga Oo:Karabiga:Karabiga	Karabiga	404	2	291.2	KARABİĞA	Çanakkale	Lîiga	*	name	differs	""	""	""
@@ -3418,6 +3469,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:17:Ezine:Merkez:Köseler	Köseler	498	1	151.8	KÖSELER	Çanakkale	Ezine	*	name	agrees	""	tr.tuik.koy:8426	Köseler Köyü
 1963:17:Ezine:Merkez:Kızılköy	Kızılköy	476	2	394.0	KIZIL KÖY	Çanakkale	Ezine	*	name	agrees	""	tr.tuik.koy:8421	Kızılköy
 1963:17:Ezine:Merkez:Kızıltepe	Kızıltepe	478	1	286.0	KIZIL TEPE	Çanakkale	Ezine	""	name	agrees	""	tr.tuik.koy:8422	Kızıltepe Köyü
+1963:17:Ezine:Merkez:Mormat	Mormat	567	1	408.3	MORMAT	Çanakkale	Ezine	""	name	agrees	""	""	""
 1963:17:Ezine:Merkez:Pazarköy	Pazarköy	618	2	261.1	PAZARKÖY	Çanakkale	Ezine	*	name	agrees	""	tr.tuik.koy:8427	Pazarköy
 1963:17:Ezine:Merkez:Sap	Sap	692	2	422.8	ŞAP	Çanakkale	Ezine	""	name	agrees	""	""	""
 1963:17:Ezine:Merkez:Sarpdere	Sarpdere	655	1	217.2	SARPDERE	Çanakkale	Ezine	""	name	agrees	""	tr.tuik.koy:8429	Sarpdere Köyü
@@ -3427,6 +3479,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:17:Ezine:Merkez:Çarıksız	Çarıksız	159	1	432.0	ÇARIKSIZ	Çanakkale	""	""	name	""	""	tr.tuik.koy:8410	Çarıksız Köyü
 1963:17:Ezine:Merkez:Çetmi	Çetmi	171	2	441.7	ÇETMİ	Çanakkale	Ezine	*	name	agrees	""	tr.tuik.koy:8411	Çetmi Köyü
 1963:17:Ezine:Merkez:Çınarköy	Çınarköy	178	2	446.7	ÇINAR KÖY	Çanakkale	Ezine	""	name	agrees	""	tr.tuik.koy:8412	Çınarköy
+1963:17:Gelibolu:Bolayır:Bolayır	Bolayır	114	1	268.5	BOLAYIR	Çanakkale	Gelibolu	""	name	agrees	""	tr.tuik.koy:8463	Bolayır Köyü
 1963:17:Gelibolu:Bolayır:Kavak	Kavak	437	2	304.3	KAVAK	Çanakkale	Gelibolu	*	name	agrees	""	""	""
 1963:17:Gelibolu:Evrese:Bayramiç	Bayramiç	95	1	325.8	BAYRAMİÇ	Çanakkale	Gelibolu	*	name	agrees	""	tr.tuik.koy:8470	Bayramiç Köyü
 1963:17:Gelibolu:Evrese:Evrese	Evrese	251	1	196.0	EVREŞE	Çanakkale	Gelibolu	*	name	agrees	""	""	""
@@ -3607,6 +3660,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:18:Kurşunlu:Merkez:Dumlupınar	Dumlupınar	225	2	130.6	DUMLU PINAR	Çankırı	İlgaz	*	name	differs	""	""	""
 1963:18:Kurşunlu:Merkez:Gollüce	Gollüce	287	2	126.1	GÖLLÜCE	Çankırı	İlgaz	*	name	differs	""	tr.tuik.koy:8898	Göllüce Köyü
 1963:18:Kurşunlu:Merkez:Hocahasan	Hocahasan	348	1	218.8	HOCA HAŞAN	Çankırı	İlgaz	*	name	differs	""	tr.tuik.koy:8900	Hocahasan Köyü
+1963:18:Kurşunlu:Merkez:Kızılca	Kızılca	472	1	374.9	KIZILCA	Çankırı	İlgaz	*	name	differs	""	tr.tuik.koy:8903	Kızılca Köyü
 1963:18:Kurşunlu:Merkez:Mekören	Mekören	549	2	247.6	MEKÖREN	Çankırı	""	""	name	""	""	""	""
 1963:18:Kurşunlu:Merkez:Sumucak	Sumucak	682	1	344.8	SUMUCAK	Çankırı	İlgaz	*	name	differs	""	tr.tuik.koy:8908	Sumucak Köyü
 1963:18:Kurşunlu:Merkez:Sünürlü	Sünürlü	686	1	115.9	SÜNÜRLÜ	Çankırı	""	*	name	""	""	tr.tuik.koy:8909	Sünürlü Köyü
@@ -3718,7 +3772,6 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:18:Çerkeş:Merkez:Yalaközü	Yalaközü	770	1	133.5	YALAK ÖZÜ	Çankırı	Çerkeş	*	name	agrees	""	""	""
 1963:18:Çerkeş:Merkez:Yeniköy	Yeniköy	781	2	347.7	YENİ KÖY	Çankırı	Çerkeş	""	name	agrees	""	tr.tuik.koy:8747	Yeniköy
 1963:18:Çerkeş:Merkez:Yıprak	Yıprak	786	1	422.2	YİPRAK	Çankırı	Çerkeş	*	name	agrees	""	tr.tuik.koy:8748	Yıprak Köyü
-1963:18:Çerkeş:Merkez:Çaylı	Çaylı	165	2	318.0	ÇAYLI	Çankırı	Çerkeş	""	name	agrees	""	tr.tuik.koy:8713	Çaylı Köyü
 1963:18:Çerkeş:Merkez:Örenli	Örenli	609	2	144.5	ÖRENLİ	Çankırı	Çerkeş	*	name	agrees	""	tr.tuik.koy:8737	Örenli Köyü
 1963:18:Çerkeş:Merkez:Şeyhdoğan	Şeyhdoğan	698	2	254.5	ŞEYH DOĞAN	Çankırı	Çerkeş	*	name	agrees	""	tr.tuik.koy:8740	Şeyhdoğan Köyü
 1963:18:İa:Merkez:Avrateli	Avrateli	68	1	237.7	AVRATELİ	Çankırı	""	*	name	""	""	""	""
@@ -4012,6 +4065,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:19:Sungurlu:Merkez:Tatlı	Tatlı	717	2	155.1	TATLI	Çorum	Sungurlu	*	name	agrees	""	tr.tuik.koy:9734	Tatlı Köyü
 1963:19:Sungurlu:Merkez:Terzili	Terzili	727	1	165.4	TERZİLİ	Çorum	Sungurlu	""	name	agrees	""	tr.tuik.koy:9736	Terzili Köyü
 1963:19:Sungurlu:Merkez:Tokullu	Tokullu	732	2	371.3	TOKULLU	Çorum	Sungurlu	*	name	agrees	""	tr.tuik.koy:9737	Tokullu Köyü
+1963:19:Sungurlu:Merkez:Topuz	Topuz	734	2	325.8	TOPUZ	Çorum	Sungurlu	""	name	agrees	""	tr.tuik.koy:9738	Topuz Köyü
 1963:19:Sungurlu:Merkez:Tuğcu	Tuğcu	736	2	258.3	TUĞCU	Çorum	Sungurlu	*	name	agrees	""	tr.tuik.koy:9739	Tuğcu Köyü
 1963:19:Sungurlu:Merkez:Tuğlu	Tuğlu	736	2	361.7	TUĞLU	Çorum	""	*	name	""	""	tr.tuik.koy:9740	Tuğlu Köyü
 1963:19:Sungurlu:Merkez:Yirce	Yirce	786	1	431.1	YİRCE	Çorum	""	""	name	""	""	tr.tuik.koy:9748	Yirce Köyü
@@ -4197,6 +4251,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:20:Sarayköy:Merkez:Karataş	Karataş	427	2	370.8	KARATAŞ	Denizli	Sarayköy	""	name	agrees	""	tr.tuik.mahalle:150659	Karataş Mah.
 1963:20:Sarayköy:Merkez:Kumluca	Kumluca	504	1	253.0	KUMLUCA	Denizli	Sarayköy	*	name	agrees	""	tr.tuik.mahalle:150663	Kumluca Mah.
 1963:20:Sarayköy:Merkez:Köprübaşı	Köprübaşı	495	1	334.4	KÖPRÜ BAŞI	Denizli	Sarayköy	*	name	agrees	""	tr.tuik.mahalle:150661	Köprübaşı Mah.
+1963:20:Sarayköy:Merkez:Kızılköy	Kızılköy	476	2	405.0	KIZIL KÖY	Denizli	Sarayköy	*	name	agrees	""	""	""
 1963:20:Sarayköy:Merkez:Tahtacı	Tahtacı	709	2	130.8	TAHTACI	Denizli	Sarayköy	""	name	agrees	""	""	""
 1963:20:Sarayköy:Merkez:Tepeköy	Tepeköy	724	2	301.5	TEPEKÖY	Denizli	Buldan	""	name	differs	""	tr.tuik.mahalle:150669	Tepeköy Mah.
 1963:20:Sarayköy:Merkez:Tosunlar	Tosunlar	735	2	324.0	TOSUNLAR	Denizli	Buldan	*	name	differs	""	tr.tuik.mahalle:150635	Tosunlar Mah.
@@ -4211,6 +4266,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:20:Tavas:Merkez:Garip	Garip	267	1	125.4	GARİP	Denizli	Davas	*	name	differs	""	""	""
 1963:20:Tavas:Merkez:Kayaca	Kayaca	441	1	345.8	KAYACA	Denizli	Davas	*	name	differs	""	tr.tuik.mahalle:150735	Kayaca Mah.
 1963:20:Tavas:Merkez:Kozlar	Kozlar	491	1	222.1	KOZLAR	Denizli	Davas	*	name	differs	""	tr.tuik.mahalle:150741	Kozlar Mah.
+1963:20:Tavas:Merkez:Kızılca	Kızılca	472	1	329.1	KIZILCA	Denizli	Davas	""	name	differs	""	tr.tuik.mahalle:150695	Kızılca Mah.
 1963:20:Tavas:Merkez:Medet	Medet	548	1	274.5	MEDET	Denizli	Davas	*	name	differs	""	tr.tuik.mahalle:150743	Medet Mah.
 1963:20:Tavas:Merkez:Tilkili	Tilkili	729	2	183.2	TİLKİLİ	Denizli	Davas	*	name	differs	""	""	""
 1963:20:Tavas:Merkez:Uluköy	Uluköy	745	2	299.3	ULUKÖY	Denizli	Davas	*	name	differs	""	""	""
@@ -4263,6 +4319,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:20:Çivril:Merkez:Çıtak	Çıtak	179	2	267.8	ÇITAK	Denizli	Çal	*	name	differs	""	tr.tuik.mahalle:150381	Çıtak Mah.
 1963:20:Çivril:Merkez:Ömerli	Ömerli	607	2	388.8	ÖMERLİ	Denizli	Çivril	**	name	agrees	""	tr.tuik.mahalle:150435	Ömerli Mah.
 1963:20:Çivril:Merkez:İmrallı	İmrallı	366	2	380.5	İMRALLI	Denizli	Çal	*	name	differs	""	tr.tuik.mahalle:150413	İmrallı Mah.
+1963:21:Dicle:Merkez:Alkan	Alkan	201	1	149.5	DEHÜL	Diyarbekir	Osmaniye	""	1968 rename	differs	Alkan	""	""
 1963:21:Dicle:Merkez:Dedeköy	Dedeköy	701	1	123.6	ŞEYH SELÂMETAN	Diyarbekir	""	*	1968 rename	""	Dedeköy	tr.tuik.mahalle:192663	Dedeköy Mah.
 1963:21:Dicle:Merkez:Durabeyli	Durabeyli	195	1	126.1	DARAT	Diyarbekir	""	""	1968 rename	""	""	tr.tuik.mahalle:192669	Durabeyli Mah.
 1963:21:Dicle:Merkez:Döğer	Döğer	219	1	401.2	DIBNI	Diyarbekir	""	""	1968 rename	""	Döğer	tr.tuik.mahalle:192667	Döğer Mah.
@@ -4408,6 +4465,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:21:Çınar:Merkez:Yukarımollaali	Yukarımollaali	794	2	271.3	YUKARI MOLLA ALİ	Diyarbekir	""	""	name	""	""	tr.tuik.mahalle:20936	Yukarı Mollaali Mah.
 1963:21:İsmil:Bahremki:Akköy	Akköy	701	1	390.9	ŞEYH YUSUF	Diyarbekir	""	*	1968 rename	""	""	tr.tuik.mahalle:192107	Akköy Mah.
 1963:21:İsmil:Bahremki:Bayındır	Bayındır	47	1	324.3	ARAPKENT	Diyarbekir	""	*	1968 rename	""	""	tr.ysk_sandik.mahalle:782:BAYINDIR KÖYÜ	Bayındır Köyü
+1963:21:İsmil:Bahremki:Başhan	Başhan	323	1	427.8	HANUSER	Diyarbekir	""	""	1968 rename	""	Başhan	tr.tuik.mahalle:192115	Başhan Mah.
 1963:21:İsmil:Bahremki:Başören	Başören	91	2	128.9	BAŞMERLU	Diyarbekir	""	*	1968 rename	""	Başören	tr.tuik.mahalle:192117	Başören Mah.
 1963:21:İsmil:Bahremki:Keberli	Keberli	445	2	424.8	KEBERLİ	Diyarbekir	""	""	name	""	""	tr.tuik.mahalle:192069	Keberli Mah.
 1963:21:İsmil:Merkez:Babahaki	Babahaki	76	2	202.6	BABAHAKİ	Diyarbekir	""	""	name	""	""	tr.tuik.mahalle:192021	Babahaki Mah.
@@ -4453,6 +4511,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:22:Keşan:Mecidiye:Kızkapan	Kızkapan	479	1	273.9	KIZ KAPAN	Edirne	Keşan	*	name	agrees	""	tr.tuik.koy:11183	Kızkapan Köyü
 1963:22:Keşan:Mecidiye:Mecidiye	Mecidiye	547	2	454.5	MECİDİYE	Edirne	Keşan	*	name	agrees	""	tr.tuik.koy:11185	Mecidiye Köyü
 1963:22:Keşan:Mecidiye:Sabanmera	Sabanmera	690	1	238.3	ŞABANMERA	Edirne	Keşan	*	name	agrees	""	""	""
+1963:22:Keşan:Mecidiye:Suluca	Suluca	681	2	330.4	SULUCA	Edirne	Keşan	""	name	agrees	""	tr.tuik.koy:11174	Suluca Köyü
 1963:22:Keşan:Mecidiye:Çelebi	Çelebi	166	2	426.7	ÇELEBİ	Edirne	Keşan	""	name	agrees	""	tr.tuik.koy:11178	Çelebi Köyü
 1963:22:Keşan:Mecidiye:Çeltik	Çeltik	167	2	303.3	ÇELTİK	Edirne	Keşan	*	name	agrees	""	tr.tuik.koy:11179	Çeltik Köyü
 1963:22:Keşan:Merkez:Akçeşme	Akçeşme	26	1	338.4	AKÇEŞME	Edirne	Keşan	""	name	agrees	""	tr.tuik.koy:11154	Akçeşme Köyü
@@ -4520,6 +4579,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:22:Merkez:Süloğlu:Tatarlar	Tatarlar	716	2	439.3	TATARLAR	Edirne	""	*	name	""	""	tr.tuik.koy:11264	Tatarlar Köyü
 1963:22:Merkez:Süloğlu:Yağcılı	Yağcılı	766	2	425.3	YAĞCILI	Edirne	""	*	name	""	""	tr.tuik.koy:11265	Yağcılı Köyü
 1963:22:Merkez:Sıpsındığı:Büyükismailce	Büyükismailce	128	2	163.1	BÜYÜK İSMAİLÇE	Edirne	""	*	name	""	""	tr.tuik.koy:11082	Büyükismailçe Köyü
+1963:22:Merkez:Sıpsındığı:Karabulut	Karabulut	405	2	348.9	KARABULUT	Edirne	""	""	name	""	""	tr.tuik.koy:11084	Karabulut Köyü
 1963:22:Uzunköprü:Hamidiye:Alıç	Alıç	40	1	224.5	ALIÇ	Edirne	Uzun	*	name	agrees	""	tr.tuik.koy:11300	Alıç Köyü
 1963:22:Uzunköprü:Hamidiye:Balabankoru	Balabankoru	83	1	302.2	BALABAN KORU	Edirne	""	*	name	""	""	tr.tuik.koy:11303	Balabankoru Köyü
 1963:22:Uzunköprü:Hamidiye:Hamidiye	Hamidiye	319	2	312.0	HAMİDİYE	Edirne	Uzunköprü	*	name	agrees	""	tr.tuik.koy:11299	Hamidiye Köyü
@@ -4553,8 +4613,10 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:22:İpsala:Merkez:Koyuntepe	Koyuntepe	489	2	251.6	KOYUN TEPE	Edirne	İpsala	*	name	agrees	""	tr.tuik.koy:11136	Koyuntepe Köyü
 1963:22:İpsala:Merkez:Koyunyeri	Koyunyeri	489	2	294.1	KOYUN YERİ	Edirne	İpsala	*	name	agrees	""	""	""
 1963:22:İpsala:Merkez:Kumdere	Kumdere	503	2	363.1	KUM DERE	Edirne	İpsala	*	name	agrees	""	tr.tuik.koy:11138	Kumdere Köyü
+1963:22:İpsala:Merkez:Paşa	Paşa	616	2	330.8	PAŞA	Edirne	İpsala	""	name	agrees	""	""	""
 1963:22:İpsala:Merkez:Sarpdere	Sarpdere	655	1	227.8	SARPDERE	Edirne	İpsala	*	name	agrees	""	tr.tuik.koy:11142	Sarpdere Köyü
 1963:22:İpsala:Merkez:Sarıcaali	Sarıcaali	650	1	288.0	SARICAALİ	Edirne	İpsala	*	name	agrees	""	tr.tuik.koy:11141	Sarıcaali Köyü
+1963:22:İpsala:Merkez:Yapıldak	Yapıldak	772	1	281.7	YAPILDAK	Edirne	İpsala	*	name	agrees	""	tr.tuik.koy:11144	Yapıldak Köyü
 1963:22:İpsala:İbriktepe:Balabancık	Balabancık	83	1	281.5	BALABANCIK	Edirne	İpsala	*	name	agrees	""	tr.tuik.koy:11147	Balabancık Köyü
 1963:22:İpsala:İbriktepe:Hacı	Hacı	304	2	270.7	HACI	Edirne	İpsala	*	name	agrees	""	tr.tuik.koy:11148	Hacı Köyü
 1963:22:İpsala:İbriktepe:Karaağaç	Karaağaç	402	1	183.0	KARAAĞAÇ	Edirne	İpsala	*	name	agrees	""	tr.tuik.koy:11149	Karaağaç Köyü
@@ -4691,6 +4753,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:23:Palu:Gökdere:Karasungur	Karasungur	81	1	244.2	BAHRAMAN	Elâzız	Palu	""	1968 rename	agrees	""	tr.tuik.koy:11712	Karasungur Köyü
 1963:23:Palu:Gökdere:Okçular	Okçular	593	2	288.7	OKÇİYAN	Elâzız	Palu	*	1968 rename	agrees	Okçular	""	""
 1963:23:Palu:Gökdere:Yoncalıbayır	Yoncalıbayır	349	2	380.0	HOR	Elâzız	Palu	*	1968 rename	agrees	""	tr.tuik.koy:11734	Yoncalıbayır Köyü
+1963:23:Palu:Karabegan:Erbağı	Erbağı	555	1	313.2	MERZİL	Elâzız	Palu	*	1968 rename	agrees	Erbağı	tr.tuik.koy:11498	Erbağı Köyü
 1963:23:Palu:Karabegan:Esenlik	Esenlik	278	1	451.6	GİRDO	Elâzız	Palu	""	1968 rename	agrees	Esenlik	tr.tuik.koy:11486	Esenlik Köyü
 1963:23:Palu:Karabegan:Göründü	Göründü	270	2	208.0	GEHAR	Elâzız	Palu	""	1968 rename	agrees	Göründü	tr.tuik.koy:11500	Göründü Köyü
 1963:23:Palu:Karabegan:Gürçubuk	Gürçubuk	693	1	334.0	ŞARIH	Elâzız	Palu	*	1968 rename	agrees	""	tr.tuik.koy:11487	Gürçubuk Köyü
@@ -4785,6 +4848,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:24:Kemaliye:Aşukta:Çakırtaş	Çakırtaş	546	1	426.0	MAŞKİR	Malatya	Kemaliye	""	1968 rename	agrees	Çakırtaş	tr.tuik.koy:12208	Çakırtaş Köyü
 1963:24:Kemaliye:Merkez:Apçağa	Apçağa	45	1	315.4	APCAĞA	Malatya	Kemaliye	*	name	agrees	""	tr.tuik.koy:12160	Apçağa Köyü
 1963:24:Kemaliye:Merkez:Ağıl	Ağıl	17	1	342.4	AĞIL	Malatya	Kemaliye	*	name	agrees	""	tr.tuik.koy:12158	Ağıl Köyü
+1963:24:Kemaliye:Merkez:Başarı	Başarı	666	1	260.8	SİHSOR	Erzurum	Oltu	*	1968 rename	differs	Gökçedere	tr.tuik.koy:12162	Başarı Köyü
 1963:24:Kemaliye:Merkez:Dallıca	Dallıca	703	2	268.5	ŞİRZİ EKREĞİ	Malatya	Kemaliye	""	1968 rename	agrees	Dallıca	tr.tuik.koy:12165	Dallıca Köyü
 1963:24:Kemaliye:Merkez:Esertepe	Esertepe	703	2	257.2	ŞİRZİ	Malatya	Kemaliye	""	1968 rename	agrees	Esertepe	tr.tuik.mahalle:183718	Esertepe Mah.
 1963:24:Kemaliye:Merkez:Gümüşçeşme	Gümüşçeşme	582	2	387.9	NAVRİL	Malatya	Kemaliye	""	1968 rename	agrees	Gümüşçeşme	tr.tuik.koy:12172	Gümüşçeşme Köyü
@@ -4880,6 +4944,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:24:Refahiye:Zevker:Çatak	Çatak	160	2	361.4	ÇATAK	Erzincan	Refahiye	""	name	agrees	""	tr.tuik.koy:12307	Çatak Köyü
 1963:24:Refahiye:Zevker:Çatalçam	Çatalçam	807	2	265.9	ZEVKER	Erzincan	Refahiye	""	1968 rename	agrees	Çatalçam	tr.tuik.koy:12298	Çatalçam Köyü
 1963:24:Refahiye:Zevker:Çukuryazı	Çukuryazı	538	1	202.1	MAHMER	Erzincan	Refahiye	""	1968 rename	agrees	Çukuryazı	tr.tuik.koy:12310	Çukuryazı Köyü
+1963:24:Refahiye:Çengerli:Bölüktepe	Bölüktepe	270	2	289.6	GELBULAS	Erzincan	Refahiye	""	1968 rename	agrees	Bölüktepe	tr.tuik.koy:12283	Bölüktepe Köyü
 1963:24:Refahiye:Çengerli:Derebaşı	Derebaşı	208	1	163.6	DEREBAŞI	Erzincan	Relalaye	""	name	differs	""	tr.tuik.koy:12285	Derebaşı Köyü
 1963:24:Refahiye:Çengerli:Diştaş	Diştaş	218	1	415.2	DİŞ TAŞ	Erzincan	Refahiye	""	name	agrees	""	tr.tuik.koy:12286	Diştaş Köyü
 1963:24:Refahiye:Çengerli:Erecek	Erecek	543	2	443.9	MANK	Erzincan	Refahiye	*	1968 rename	agrees	Erecek	tr.tuik.koy:12287	Erecek Köyü
@@ -4932,7 +4997,9 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:25:Horasan:Aras:Hasanbey	Hasanbey	329	1	133.1	HAŞAN BEY	Erzurum	Pasinler	""	name	differs	""	tr.tuik.mahalle:188887	Hasanbey Mah.
 1963:25:Horasan:Aras:Kaynarca	Kaynarca	444	2	371.5	KAYNARCA	Erzurum	Pasinler	*	name	differs	""	tr.tuik.mahalle:188901	Kaynarca Mah.
 1963:25:Horasan:Aras:Kemerli	Kemerli	220	1	109.3	DODİ	Erzurum	Hasankale	*	1968 rename	differs	Kemerli	tr.tuik.mahalle:188903	Kemerli Mah.
+1963:25:Horasan:Aras:Kepenek	Kepenek	450	2	345.4	KEPENEK	Erzurum	Pasinler	""	name	differs	""	tr.tuik.mahalle:188795	Kepenek Mah.
 1963:25:Horasan:Aras:Pirali	Pirali	622	2	153.5	PİRALİ	Erzurum	Hasankale	*	name	differs	""	tr.tuik.mahalle:188911	Pirali Mah.
+1963:25:Horasan:Aras:Pirhasan	Pirhasan	623	1	260.8	PİR HASAN	Erzurum	Hasankale	""	name	differs	""	tr.tuik.mahalle:188821	Pirhasan Mah.
 1963:25:Horasan:Aras:Sekman	Sekman	658	2	362.1	SEKMAN	Erzurum	Hasankale	""	name	differs	""	tr.tuik.mahalle:188913	Sekman Mah.
 1963:25:Horasan:Aras:Yazılıtaş	Yazılıtaş	777	1	283.3	YAZILI TAŞ	Erzurum	Hasankale	""	name	differs	""	tr.tuik.mahalle:188921	Yazılıtaş Mah.
 1963:25:Horasan:Merkez:Akçataş	Akçataş	805	1	147.2	ZANZAK	Erzurum	Pasinler	*	1968 rename	differs	Akçataş	tr.tuik.mahalle:188705	Akçataş Mah.
@@ -4965,6 +5032,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:25:Hınıs:Halilçavuş:Toraman	Toraman	734	2	411.1	TORAMAN	Erzurum	Hınıs	""	name	agrees	""	tr.tuik.mahalle:188693	Toraman Mah.
 1963:25:Hınıs:Halilçavuş:Yeşilyazı	Yeşilyazı	331	2	431.6	HASSE	Erzurum	Hınıs	""	1968 rename	agrees	Yeşilyazı	tr.tuik.mahalle:188701	Yeşilyazı Mah.
 1963:25:Hınıs:Halilçavuş:Çatak	Çatak	160	2	118.4	ÇATAK	Erzurum	Hınıs	""	name	agrees	""	tr.tuik.mahalle:188645	Çatak Mah.
+1963:25:Hınıs:Halilçavuş:Çilligöl	Çilligöl	175	2	225.3	ÇİLLİ GÖL	Erzurum	Hınıs	""	name	agrees	""	tr.tuik.mahalle:188649	Çilligöl Mah.
 1963:25:Hınıs:Halilçavuş:Ünlüce	Ünlüce	537	1	133.9	MAGALİSOR	Erzurum	Hınıs	""	1968 rename	agrees	Ünlüce	tr.tuik.mahalle:188697	Ünlüce Mah.
 1963:25:Hınıs:Halilçavuş:Şahverdi	Şahverdi	691	2	300.1	ŞAHVERDİ	Erzurum	Hınıs	""	name	agrees	""	tr.tuik.mahalle:188683	Şahverdi Mah.
 1963:25:Hınıs:Karaçoban:Akkavak	Akkavak	159	2	422.1	ÇASKO	Erzurum	Hınıs	*	1968 rename	agrees	""	tr.tuik.mahalle:189337	Akkavak Mah.
@@ -4999,6 +5067,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:25:Hınıs:Merkez:Çamurlu	Çamurlu	156	1	335.7	ÇAMURLU	Erzurum	Hınıs	""	name	agrees	""	tr.tuik.mahalle:188487	Çamurlu Mah.
 1963:25:Hınıs:Merkez:Şalgam	Şalgam	692	1	220.3	ŞALGAM	Erzurum	Hınıs	""	name	agrees	""	""	""
 1963:25:Irayazı:Göksu:Kopal	Kopal	485	2	310.6	KOPAL	Erzurum	Hınıs	*	name	differs	""	tr.tuik.mahalle:189335	Kopal Mah.
+1963:25:Irayazı:Göksu:Kösehasan	Kösehasan	497	2	156.6	KÖSE HASAN	Erzurum	Hınıs	""	name	differs	""	tr.tuik.mahalle:189661	Kösehasan Mah.
 1963:25:Irayazı:Göksu:Yahya	Yahya	768	1	288.5	YAHYA	Erzurum	Hınıs	""	name	differs	""	""	""
 1963:25:Irayazı:Göksu:Şakir	Şakir	691	2	406.7	ŞAKİR	Erzurum	Hınıs	""	name	differs	""	""	""
 1963:25:Irayazı:Merkez:Bezirhane	Bezirhane	108	1	242.1	BEZİRHANE	Erzurum	Pasinler	""	name	differs	""	tr.tuik.mahalle:189435	Bezirhane Mah.
@@ -5054,6 +5123,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:25:Merkez:Ovacık:Geyik	Geyik	276	1	347.6	GEYİK	Erzurum	""	*	name	""	""	tr.tuik.mahalle:189001	Geyik Mah.
 1963:25:Merkez:Ovacık:Güllüce	Güllüce	617	1	306.1	PAŞAKİ	Erzurum	""	*	1968 rename	""	Güllüce	""	""
 1963:25:Merkez:Ovacık:Kabaktepe	Kabaktepe	383	2	368.1	KABAK TEPE	Erzurum	""	""	name	""	""	tr.tuik.mahalle:189007	Kabaktepe Mah.
+1963:25:Merkez:Ovacık:Kızılkale	Kızılkale	476	1	129.9	KIZILKALE	Erzurum	""	*	name	""	""	tr.tuik.mahalle:189015	Kızılkale Mah.
 1963:25:Merkez:Ovacık:Sırlı	Sırlı	672	2	400.3	SIRLI	Erzurum	""	*	name	""	""	tr.tuik.mahalle:189023	Sırlı Mah.
 1963:25:Merkez:Ovacık:Çavdarlı	Çavdarlı	811	2	232.6	ZIRNIK	Erzurum	""	""	1968 rename	""	Çavdarlı	tr.tuik.mahalle:188989	Çavdarlı Mah.
 1963:25:Merkez:Ovacık:Üçköse	Üçköse	752	2	148.1	ÜÇKÖSE	Erzurum	""	*	name	""	""	""	""
@@ -5282,6 +5352,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:26:Mihalıççık:Beylikahır:Doğray	Doğray	221	2	246.2	DOĞRAY	Eskişehir	Sivrihisar	*	name	differs	""	""	""
 1963:26:Mihalıççık:Beylikahır:Emircik	Emircik	237	2	289.8	EMİRCİK	Eskişehir	Mihalıç-	*	name	agrees	""	tr.tuik.mahalle:191001	Emircik Mah.
 1963:26:Mihalıççık:Beylikahır:Parsibey	Parsibey	616	1	438.8	PARSİ BEY	Eskişehir	Mihalıççık	*	name	agrees	""	tr.tuik.mahalle:191015	Parsıbey Mah.
+1963:26:Mihalıççık:Beylikahır:Rahmiye	Rahmiye	632	1	417.4	RAHMİYE	Eskişehir	Mihalıççık	*	name	agrees	Akgüney	tr.tuik.mahalle:190989	Rahmiye Mah.
 1963:26:Mihalıççık:Beylikahır:Sultaniye	Sultaniye	680	2	457.7	SULTANİYE	Eskişehir	Mihalıççık	""	name	agrees	""	tr.tuik.mahalle:191017	Sultaniye Mah.
 1963:26:Mihalıççık:Merkez:Adahisar	Adahisar	12	1	227.9	ADAHİSAR	Eskişehir	Sivrihisar	""	name	differs	""	tr.tuik.mahalle:191197	Adahisar Mah.
 1963:26:Mihalıççık:Merkez:Ahırözü	Ahırözü	20	2	447.5	AHIR ÖZÜ	Eskişehir	Mihalıççık	*	name	agrees	""	""	""
@@ -5404,6 +5475,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:26:Çifteler:Merkez:Kadıkuyusu	Kadıkuyusu	388	1	221.9	KADI KUYUSU	Eskişehir	""	*	name	""	""	tr.tuik.mahalle:191053	Kadıkuyusu Mah.
 1963:26:Çifteler:Merkez:Körhasan	Körhasan	495	2	415.0	KÖR HAŞAN	Eskişehir	""	*	name	""	""	tr.tuik.mahalle:191055	Körhasan Mah.
 1963:26:Çifteler:Merkez:Nasriye	Nasriye	582	1	452.3	NASRİYE	Eskişehir	Sivrihisar	*	name	differs	Dikmen	tr.tuik.mahalle:191043	Dikmen Mah.
+1963:26:Çifteler:Merkez:Zaferhamıt	Zaferhamıt	804	1	203.7	ZAFERHAMİT	Eskişehir	Sivrihisar	""	name	differs	""	tr.tuik.mahalle:191073	Zaferhamit Mah.
 1963:27:Araban:Merkez:Akbudak	Akbudak	686	1	158.2	SÜPÜRGÜÇ	Gaziantep	Nizip	*	1968 rename	differs	Akbudak	tr.tuik.mahalle:179435	Akbudak Mah.
 1963:27:Araban:Merkez:Aşağıyufkalı	Aşağıyufkalı	61	2	452.5	AŞAĞILOLAN	Gaziantep	""	""	1968 rename	""	Aşağı Yufkalı	tr.tuik.mahalle:179443	Aşağıyufkalı Mah.
 1963:27:Araban:Merkez:Fıstıklıdağ	Fıstıklıdağ	806	1	159.4	ZEKTERİŞ	Gaziantep	Nizip	*	1968 rename	differs	Fıstıklıdağ	tr.tuik.mahalle:179465	Fıstıklıdağ Mah.
@@ -5465,6 +5537,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:27:Merkez:Burç:Akpınar	Akpınar	29	1	241.9	AKPINAR	Gaziantep	""	*	name	""	""	tr.tuik.mahalle:30470	Akpınar Mah.
 1963:27:Merkez:Burç:Bekişli	Bekişli	98	2	359.6	BEKİSLİ	Gaziantep	""	""	name	""	""	tr.tuik.mahalle:179277	Bekişli Mah.
 1963:27:Merkez:Burç:Beşkuyu	Beşkuyu	299	2	119.2	GÜVEÇÇE	Gaziantep	""	*	1968 rename	""	Beşkuyu	tr.tuik.mahalle:179281	Beşkuyu Mah.
+1963:27:Merkez:Burç:Burç	Burç	123	1	431.4	BURÇ	Gaziantep	""	*	name	""	""	""	""
 1963:27:Merkez:Burç:Cebeler	Cebeler	539	2	196.2	MAHRAMAN	Gaziantep	""	*	1968 rename	""	Cebeler	tr.tuik.mahalle:30460	Cebeler Mah.
 1963:27:Merkez:Burç:Cevizli	Cevizli	532	2	175.6	LOHAN	Gaziantep	""	*	1968 rename	""	Cevizli	tr.tuik.mahalle:179233	Cevizli Mah.
 1963:27:Merkez:Burç:Durantaş	Durantaş	807	2	285.0	ZEVKİR	Gaziantep	""	""	1968 rename	""	Durantaş	tr.tuik.mahalle:30471	Durantaş Mah.
@@ -5576,6 +5649,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:27:Oğuzeli:Haral:Ulaşh	Ulaşh	458	2	220.2	KİNNAP	Gaziantep	""	""	1968 rename	""	""	""	""
 1963:27:Oğuzeli:Haral:Uçdamlar	Uçdamlar	397	2	184.5	KANDEVİR	Gaziantep	""	""	1968 rename	""	Üçdamlar	tr.tuik.mahalle:180159	Üçdamlar Mah.
 1963:27:Oğuzeli:Haral:Üçkubbe	Üçkubbe	744	1	194.9	UÇKUBBE	Gaziantep	""	""	name	""	""	tr.tuik.mahalle:180161	Üçkubbe Mah.
+1963:27:Oğuzeli:Haral:İnkilâp	İnkilâp	370	1	154.4	İNKİLÂP	Gaziantep	""	""	name	""	""	tr.tuik.mahalle:180125	İnkılap Mah.
 1963:27:Oğuzeli:Merkez:Direkli	Direkli	217	1	422.2	DİREKLİ	Gaziantep	""	""	name	""	""	tr.tuik.mahalle:30690	Direkli Mah.
 1963:27:Oğuzeli:Merkez:Duruköy	Duruköy	318	2	430.7	HAMEYLİ	Gaziantep	""	*	1968 rename	""	Duruköy	tr.tuik.mahalle:180039	Duruköy Mah.
 1963:27:Oğuzeli:Merkez:Ekinveren	Ekinveren	729	2	442.9	TİLSEVET	Gaziantep	""	*	1968 rename	""	""	tr.tuik.mahalle:180043	Ekinveren Mah.
@@ -5651,7 +5725,6 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:28:Alucra:Merkez:Tohumluk	Tohumluk	732	1	334.8	TOHUMLUK	Giresun	Tirebolu	*	name	differs	""	tr.tuik.koy:14421	Tohumluk Köyü
 1963:28:Alucra:Merkez:Topçam	Topçam	323	2	256.7	HANZAR	Giresun	Alucra	*	1968 rename	agrees	Topçam	tr.tuik.mahalle:30738	Topçam Mah.
 1963:28:Alucra:Merkez:Yükselen	Yükselen	323	2	430.1	HAPU	Giresun	Alucra	*	1968 rename	agrees	Yükselen	tr.tuik.koy:14423	Yükselen Köyü
-1963:28:Alucra:Merkez:Çakmak	Çakmak	809	1	115.7	ZİHAR	Giresun	Alucra	*	1968 rename	agrees	Çakmak	""	""
 1963:28:Alucra:Merkez:Çakrak	Çakrak	151	2	431.4	ÇAKRAK	Giresun	Tirebolu	""	name	differs	""	tr.tuik.koy:14396	Çakrak Köyü
 1963:28:Bulancak:Kovanlık:Cindi	Cindi	142	1	245.5	CİNDİ	Giresun	""	*	name	""	""	tr.tuik.koy:14433	Cindi Köyü
 1963:28:Bulancak:Kovanlık:Elmalı	Elmalı	235	2	133.1	ELMALI	Giresun	""	*	name	""	""	tr.tuik.koy:14481	Elmalı Köyü
@@ -5663,6 +5736,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:28:Bulancak:Merkez:Kuz	Kuz	513	1	290.3	KUZ	Giresun	""	*	name	""	""	""	""
 1963:28:Bulancak:Merkez:Küçükdere	Küçükdere	516	1	381.9	KÜÇÜK DERE	Giresun	""	""	name	""	""	tr.tuik.koy:14457	Küçükdere Köyü
 1963:28:Bulancak:Merkez:Küçüklü	Küçüklü	518	2	109.8	KÜÇÜKLÜ	Giresun	""	*	name	""	""	tr.tuik.koy:14458	Küçüklü Köyü
+1963:28:Bulancak:Merkez:Yunuslu	Yunuslu	798	1	236.5	YUNUSLU	Giresun	""	""	name	""	""	tr.tuik.koy:14475	Yunuslu Köyü
 1963:28:Bulancak:Merkez:İnece	İnece	369	1	400.3	İNECE	Giresun	""	*	name	""	""	tr.tuik.koy:14447	İnece Köyü
 1963:28:Bulancak:Piraziz:Alidede	Alidede	38	1	412.9	ALİDEDE	Giresun	""	*	name	""	""	tr.tuik.koy:14741	Alidede Köyü
 1963:28:Bulancak:Piraziz:Balçıklı	Balçıklı	84	2	230.4	BALÇIKLI	Giresun	""	*	name	""	""	tr.tuik.koy:14743	Balçıklı Köyü
@@ -5764,13 +5838,16 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:28:Tirebolu:Merkez:İnköy	İnköy	370	1	208.4	İNKÖY	Giresun	Tirebolu	*	name	agrees	""	""	""
 1963:28:Şap:Karabulduk:Geçit	Geçit	269	2	170.8	GEÇİT	Giresun	""	""	name	""	""	tr.tuik.koy:14734	Geçit Köyü
 1963:28:Şap:Karabulduk:Halkalı	Halkalı	317	1	268.5	HALKALI	Giresun	""	""	name	""	""	tr.tuik.koy:14735	Halkalı Köyü
+1963:28:Şap:Karabulduk:Yivdincik	Yivdincik	786	2	138.7	YİVDİNCİK	Giresun	""	""	name	""	""	tr.tuik.koy:14737	Yivdincik Köyü
 1963:28:Şap:Merkez:Bayrambey	Bayrambey	95	1	252.7	BAYRAMBEY	Giresun	""	*	name	""	""	tr.tuik.koy:14697	Bayrambey Köyü
 1963:28:Şap:Merkez:Bayramşah	Bayramşah	95	2	281.8	BAYRAMŞAH	Giresun	""	*	name	""	""	tr.tuik.koy:14698	Bayramşah Köyü
 1963:28:Şap:Merkez:Gönüllü	Gönüllü	288	1	441.2	GÖNÜLLÜ	Giresun	""	*	name	""	""	tr.tuik.koy:14704	Gönüllü Köyü
+1963:28:Şap:Merkez:Hisarüstü	Hisarüstü	344	2	229.1	HİSAR ÜSTÜ	Giresun	""	""	name	""	""	tr.tuik.koy:14708	Hisarüstü Köyü
 1963:28:Şap:Merkez:Kayabaşı	Kayabaşı	440	2	377.6	KAYA BAŞI	Giresun	""	*	name	""	""	tr.tuik.koy:14713	Kayabaşı Köyü
 1963:28:Şap:Merkez:Kaşaltı	Kaşaltı	436	1	359.8	KAŞ ALTİ	Giresun	""	""	name	""	""	tr.tuik.koy:14712	Kaşaltı Köyü
 1963:28:Şap:Merkez:Küçükgeriş	Küçükgeriş	516	2	194.5	KÜÇÜK GERİŞ	Giresun	""	""	name	""	""	tr.tuik.koy:14716	Küçükgeriş Köyü
 1963:28:Şebinkarahisar:Merkez:Ahırcık	Ahırcık	20	2	304.4	AHIRCIK	Giresun	Ş. kara hisar	*	name	differs	""	""	""
+1963:28:Şebinkarahisar:Merkez:Akpınar	Akpınar	29	2	293.5	AKPINAR	Giresun	""	""	name	""	""	""	""
 1963:28:Şebinkarahisar:Merkez:Baltası	Baltası	736	1	446.3	TÖNÜK	Giresun	Ş. kara hisar	""	1968 rename	differs	Baltası	""	""
 1963:28:Şebinkarahisar:Merkez:Bayhasan	Bayhasan	94	1	124.0	BAYHASAN	Giresun	Ş. k. hisar	""	name	differs	""	tr.tuik.koy:14766	Bayhasan Köyü
 1963:28:Şebinkarahisar:Merkez:Bayram	Bayram	95	1	241.9	BAYRAM	Giresun	Ş. k. hisar	*	name	differs	""	""	""
@@ -5811,7 +5888,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:29:Bayburt:Maden:Yıldırım	Yıldırım	545	2	400.5	MASAT	Gümüşane	Hayhurt	*	1968 rename	differs	Yıldırım	""	""
 1963:29:Bayburt:Maden:Çalıdere	Çalıdere	576	1	249.3	MÜŞEVEREK	Gümüşane	Bayburt	""	1968 rename	agrees	Çalıdere	tr.tuik.koy:35023	Çalıdere Köyü
 1963:29:Bayburt:Maden:Örence	Örence	250	2	127.4	EVEREK	Gümüşane	Bayburt	*	1968 rename	agrees	Örence	tr.tuik.koy:35032	Örence Köyü
-1963:29:Bayburt:Maden:İğdir	İğdir	378	1	237.9	İĞ D İR	Gümüşane	Bayburt	**	name	agrees	""	tr.tuik.koy:35027	Iğdır Köyü
+1963:29:Bayburt:Maden:İğdir	İğdir	378	1	237.9	IĞDIR	Gümüşane	Bayburt	**	name	agrees	""	tr.tuik.koy:35027	Iğdır Köyü
 1963:29:Bayburt:Merkez:Danişment	Danişment	194	1	311.9	DANİŞMENT	Gümüşane	Bayburt	*	name	agrees	""	tr.tuik.koy:34945	Danişment Köyü
 1963:29:Bayburt:Merkez:Dağtarla	Dağtarla	599	2	144.1	ORTUKU	Gümüşane	Bayburt	*	1968 rename	agrees	""	tr.tuik.koy:34944	Dağtarla Köyü
 1963:29:Bayburt:Merkez:Demirışık	Demirışık	169	1	257.2	ÇEPE	Gümüşane	Bayburt	*	1968 rename	agrees	Demirışık	tr.tuik.koy:34948	Demirışık Köyü
@@ -5870,6 +5947,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:29:Kelkit:Merkez:Bulak	Bulak	122	1	322.4	BULAK	Gümüşane	Kelkit	*	name	agrees	""	tr.tuik.koy:15014	Bulak Köyü
 1963:29:Kelkit:Merkez:Deliler	Deliler	202	1	298.9	DELİLER	Gümüşane	Kelkit	*	name	agrees	""	tr.tuik.koy:15023	Deliler Köyü
 1963:29:Kelkit:Merkez:Devekorusu	Devekorusu	213	1	295.0	DEVE KORUSU	Gümüşane	Kelkit	*	name	agrees	""	tr.tuik.koy:15026	Devekorusu Köyü
+1963:29:Kelkit:Merkez:Doğanca	Doğanca	239	1	366.1	ENCİRTİ	Gümüşane	Kelkit	""	1968 rename	agrees	""	tr.tuik.koy:15027	Doğanca Köyü
 1963:29:Kelkit:Merkez:Doğankavak	Doğankavak	432	2	343.8	KARLANKAS	Gümüşane	Kelkit	*	1968 rename	agrees	Doğankavak	tr.tuik.koy:15028	Doğankavak Köyü
 1963:29:Kelkit:Merkez:Elmelik	Elmelik	236	2	342.8	ELMELİK	Gümüşane	Kelkit	""	name	agrees	""	tr.tuik.koy:15030	Elmelik Köyü
 1963:29:Kelkit:Merkez:Eskikadı	Eskikadı	247	2	455.0	ESKİ KADI	Gümüşane	Kelkit	""	name	agrees	""	tr.tuik.koy:15031	Eskikadı Köyü
@@ -5931,6 +6009,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:29:Torul:Kürtün:Söğüteli	Söğüteli	678	1	289.0	SÖĞÜTELİ	Gümüşane	Torul	*	name	agrees	""	tr.tuik.koy:15124	Söğüteli Köyü
 1963:29:Torul:Kürtün:Taşlıca	Taşlıca	714	2	418.3	TAŞLICA	Gümüşane	Torul	*	name	agrees	""	tr.tuik.koy:15126	Taşlıca Köyü
 1963:29:Torul:Kürtün:Yukarıkaradere	Yukarıkaradere	412	2	115.2	KARADEREI BALÂ	Gümüşane	Torul	""	1968 rename	agrees	Yukarı Karadere	tr.tuik.koy:15130	Yukarıkaradere Köyü
+1963:29:Torul:Merkez:Altınpmar	Altınpmar	807	1	432.4	ZERMUT	Gümüşane	Torul	*	1968 rename	agrees	""	tr.tuik.koy:15207	Altınpınar Köyü
 1963:29:Torul:Merkez:Budak	Budak	704	1	112.8	ŞİVE	Gümüşane	Torul	*	1968 rename	agrees	Budak	tr.tuik.koy:15212	Budak Köyü
 1963:29:Torul:Merkez:Cebeli	Cebeli	83	2	109.4	BALADAN	Gümüşane	Torul	""	1968 rename	agrees	Cebeli	tr.tuik.koy:15214	Cebeli Köyü
 1963:29:Torul:Merkez:Dağdibi	Dağdibi	260	1	225.5	FİDİKÂR	Gümüşane	Torul	""	1968 rename	agrees	Dağdibi	tr.tuik.koy:15215	Dağdibi Köyü
@@ -6140,6 +6219,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:33:Erdemli:Güzeloluk:Aydınlar	Aydınlar	67	2	262.0	AVKADI	İçel	Silifke	**	1968 rename	differs	Aydınlar	tr.tuik.mahalle:182561	Aydınlar Mah.
 1963:33:Erdemli:Güzeloluk:Güneyli	Güneyli	297	1	202.3	GÜNEYLİ	İçel	Silifke	*	name	differs	""	tr.tuik.mahalle:182567	Güneyli Mah.
 1963:33:Erdemli:Güzeloluk:Karakesli	Karakesli	418	2	130.8	KARAKEŞLİ	İçel	Silifke	*	name	differs	""	""	""
+1963:33:Erdemli:Güzeloluk:Koramsalı	Koramsalı	486	1	215.4	KORAMŞALI	İçel	Silifke	""	name	differs	""	""	""
 1963:33:Erdemli:Güzeloluk:Küstülü	Küstülü	526	1	197.7	KÜSTÜLÜ	İçel	Silifke	*	name	differs	""	tr.tuik.mahalle:182519	Küstülü Mah.
 1963:33:Erdemli:Güzeloluk:Tapureli	Tapureli	708	1	337.5	TABURELİ	İçel	Silifke	*	1968 rename	differs	Tapureli	tr.tuik.mahalle:182581	Tapureli Mah.
 1963:33:Erdemli:Güzeloluk:Yağda	Yağda	767	1	108.7	YAĞDA	İçel	Silifke	*	name	differs	""	tr.tuik.mahalle:182587	Yağda Mah.
@@ -6197,6 +6277,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:33:Mut:Merkez:Alaçam	Alaçam	33	2	283.2	ALAÇAM	İçel	Mut	*	name	agrees	""	tr.tuik.mahalle:182691	Alaçam Mah.
 1963:33:Mut:Merkez:Bağcağız	Bağcağız	78	1	300.6	BAĞCAĞIZ	İçel	Mut	**	name	agrees	""	tr.tuik.mahalle:182697	Bağcağız Mah.
 1963:33:Mut:Merkez:Diştaş	Diştaş	218	1	424.4	DİŞ TAŞ	İçel	Mut	*	name	agrees	""	tr.tuik.mahalle:182729	Diştaş Mah.
+1963:33:Mut:Merkez:Elbeyli	Elbeyli	233	2	403.4	ELBEYLİ	İçel	Mut	*	name	agrees	""	tr.tuik.mahalle:182731	Elbeyli Mah.
 1963:33:Mut:Merkez:Esençay	Esençay	404	2	142.3	KARA BELALI	İçel	Mut	""	1968 rename	agrees	""	tr.tuik.mahalle:182735	Esençay Mah.
 1963:33:Mut:Merkez:Evren	Evren	250	2	394.2	EVREN	İçel	Mut	*	name	agrees	""	tr.tuik.mahalle:182737	Evren Mah.
 1963:33:Mut:Merkez:Geçimli	Geçimli	541	2	150.4	MALYA	İçel	Mut	*	1968 rename	agrees	""	tr.tuik.mahalle:182741	Geçimli Mah.
@@ -6209,6 +6290,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:33:Mut:Merkez:Kurtuluş	Kurtuluş	603	1	226.4	OYLADIN	İçel	Mut	""	1968 rename	agrees	Kurtuluş	tr.tuik.mahalle:182795	Kurtuluş Mah.
 1963:33:Mut:Merkez:Kıravga	Kıravga	466	1	362.5	KIRAVGA	İçel	Mut	*	name	agrees	""	""	""
 1963:33:Mut:Merkez:Kırkyalan	Kırkyalan	468	1	348.6	KIRK YALAN	İçel	Mut	*	name	agrees	""	""	""
+1963:33:Mut:Merkez:Mirahor	Mirahor	563	1	158.8	MİRAHOR	İçel	Mut	*	name	agrees	""	tr.tuik.mahalle:182797	Mirahor Mah.
 1963:33:Mut:Merkez:Ortaköy	Ortaköy	598	1	394.5	ORTA KÖY	İçel	Mut	*	name	agrees	""	tr.tuik.mahalle:182803	Ortaköy Mah.
 1963:33:Mut:Merkez:Palantepe	Palantepe	614	2	423.3	PALANTEPE	İçel	Mut	*	name	agrees	""	tr.tuik.mahalle:182809	Palantepe Mah.
 1963:33:Mut:Merkez:Selamlı	Selamlı	659	1	321.6	SELAMLI	İçel	Mut	*	name	agrees	""	tr.tuik.mahalle:182815	Selamlı Mah.
@@ -6374,9 +6456,10 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:34:Silivri:Merkez:Akviran	Akviran	32	1	308.5	AKVİRAN	İstanbul	Silivri	*	name	agrees	Akören	tr.tuik.mahalle:191835	Akören Mah.
 1963:34:Silivri:Merkez:Alipaşa	Alipaşa	39	2	202.9	ALİPAŞA	İstanbul	Silivri	*	name	agrees	""	tr.tuik.mahalle:40927	Alipaşa Mah.
 1963:34:Silivri:Merkez:Celaliye	Celaliye	138	1	443.3	CELÂLİYE	İstanbul	Silivri	*	name	agrees	""	tr.tuik.mahalle:40928	Celaliye Mah.
-1963:34:Silivri:Merkez:Fener	Fener	258	1	108.9	FENER	İstanbul	Fatih	*	name	differs	""	tr.tuik.mahalle:191839	Fener Mah.
+1963:34:Silivri:Merkez:Fener	Fener	257	2	451.9	FENER	İstanbul	Silivri	""	name	agrees	""	tr.tuik.mahalle:191839	Fener Mah.
 1963:34:Silivri:Merkez:Feteköy	Feteköy	259	1	234.8	FETE KÖY	İstanbul	Silivri	*	name	agrees	Kavaklı	""	""
 1963:34:Silivri:Merkez:Gelevri	Gelevri	271	1	373.8	GELEVRİ	İstanbul	Silivri	*	name	agrees	""	tr.tuik.mahalle:40932	Yolçatı Mah.
+1963:34:Silivri:Merkez:Haraççı	Haraççı	325	1	119.3	HARAÇÇI	İstanbul	Silivri	""	name	agrees	""	tr.tuik.mahalle:40925	Gazitepe Mah.
 1963:34:Silivri:Merkez:Kadıköy	Kadıköy	388	1	123.1	KADIKÖY	İstanbul	Silivri	*	name	agrees	""	tr.tuik.mahalle:40939	Kadıköy Mah.
 1963:34:Silivri:Merkez:Ortaköy	Ortaköy	598	2	227.8	ORTA KÖY	İstanbul	Silivri	*	name	agrees	""	tr.tuik.mahalle:40938	Ortaköy Mah.
 1963:34:Silivri:Merkez:Selimpaşa	Selimpaşa	660	2	142.7	SELİMPAŞA	İstanbul	Silivri	*	name	agrees	""	tr.tuik.mahalle:40940	Selimpaşa Mah.
@@ -6425,6 +6508,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:34:Çatalca:Hadımköy:Yeniköy	Yeniköy	782	2	387.8	YENİ KÖY	İstanbul	Çatalca	*	name	agrees	""	""	""
 1963:34:Çatalca:Karacaköy:Hisarbeyli	Hisarbeyli	344	1	230.0	HİSAR BEYLİ	İstanbul	Çatalca	*	name	agrees	""	tr.tuik.mahalle:191827	Hisarbeyli Mah.
 1963:34:Çatalca:Karacaköy:Ormanlı	Ormanlı	596	2	407.1	ORMANLI	İstanbul	Çatalca	*	name	agrees	""	tr.tuik.mahalle:191831	Ormanlı Mah.
+1963:34:Çatalca:Karacaköy:Sivas	Sivas	670	1	265.6	SİVAS	İstanbul	Çatalca	""	name	agrees	Başak	tr.tuik.mahalle:191821	Başak Mah.
 1963:34:Çatalca:Karacaköy:Yaylacık	Yaylacık	776	1	117.9	YAYLÂCIK	İstanbul	Çatalca	""	name	agrees	""	tr.tuik.mahalle:191817	Yaylacık Mah.
 1963:34:Çatalca:Merkez:Akalan	Akalan	22	2	385.8	AKALAN	İstanbul	Çatalca	*	name	agrees	""	tr.tuik.mahalle:191781	Akalan Mah.
 1963:34:Çatalca:Merkez:Bahşayış	Bahşayış	81	2	141.3	BAHŞAYİŞ	İstanbul	Çatalca	*	name	agrees	""	tr.tuik.mahalle:40902	Bahşayiş Mah.
@@ -6562,6 +6646,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:35:Karaburun:Merkez:Anbarseki	Anbarseki	44	1	195.3	ANBARSEKİ	İzmir	Karaburun	*	name	agrees	""	tr.tuik.mahalle:194135	Anbarseki Mah.
 1963:35:Karaburun:Merkez:Bozköy	Bozköy	118	2	368.8	BOZ KÖY	İzmir	Karaburun	*	name	agrees	""	tr.tuik.mahalle:194137	Bozköy Mah.
 1963:35:Karaburun:Merkez:Saip	Saip	642	1	428.5	SAİP	İzmir	Karaburun	*	name	agrees	""	tr.tuik.mahalle:194141	Saip Mah.
+1963:35:Karaburun:Mordoğan:Çatalkaya	Çatalkaya	161	2	268.7	ÇATAL KAYA	İzmir	Karaburun	*	name	agrees	""	tr.tuik.mahalle:41313	Çatalkaya Mah.
 1963:35:Karaburun:Mordoğan:İnecik	İnecik	369	1	409.2	İNECİK	İzmir	Karaburun	*	name	agrees	""	tr.tuik.mahalle:194157	İnecik Mah.
 1963:35:Karşıyaka:Merkez:Yamanlar	Yamanlar	771	1	298.9	YAMANLAR	İzmir	""	*	name	""	""	tr.tuik.mahalle:192901	Yamanlar Mah.
 1963:35:Kemalpaşa:Merkez:Akalan	Akalan	22	2	364.7	AKALAN	İzmir	Kemalpaşa	*	name	agrees	""	tr.tuik.mahalle:194161	Akalan Mah.
@@ -6596,6 +6681,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:35:Menemen:Aliağa:Güzelhisar	Güzelhisar	300	1	357.3	GÜZEL HİSAR	İzmir	Menemen	*	name	agrees	""	tr.tuik.mahalle:193049	Güzelhisar Mah.
 1963:35:Menemen:Aliağa:Kalabak	Kalabak	390	2	347.2	KALABAK	İzmir	Menemen	*	name	agrees	""	""	""
 1963:35:Menemen:Aliağa:Karaköy	Karaköy	420	1	289.2	KARAKÖY	İzmir	Menemen	""	name	agrees	""	""	""
+1963:35:Menemen:Aliağa:Samurlu	Samurlu	646	2	139.6	SAMURLU	İzmir	Menemen	""	name	agrees	""	tr.tuik.mahalle:193097	Samurlu Mah.
 1963:35:Menemen:Aliağa:Çaltılıdere	Çaltılıdere	154	2	160.9	ÇALTILI DERE	İzmir	Menemen	*	name	agrees	""	tr.tuik.mahalle:193021	Çaltılıdere Mah.
 1963:35:Menemen:Aliağa:Çoraklar	Çoraklar	182	1	324.0	ÇORAKLAR	İzmir	Menemen	""	name	agrees	""	tr.tuik.mahalle:193035	Çoraklar Mah.
 1963:35:Menemen:Aliağa:Çıtak	Çıtak	179	2	246.0	ÇITAK	İzmir	Menemen	*	name	agrees	""	tr.tuik.mahalle:193029	Çıtak Mah.
@@ -6653,6 +6739,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:35:Merkez:Merkez:Mazılı	Mazılı	547	1	247.6	M AZİLİ	İzmir	Dikili	*	name	differs	""	tr.tuik.mahalle:194101	Mazılı Mah.
 1963:35:Merkez:Merkez:Musacalı	Musacalı	571	2	130.8	MUSACALİ	İzmir	Bergama	""	name	differs	""	tr.tuik.mahalle:194269	Musacalı Mah.
 1963:35:Merkez:Merkez:Poyracık	Poyracık	627	1	114.8	POYRACIK	İzmir	Bergama	*	name	differs	""	tr.tuik.mahalle:194219	Poyracık Mah.
+1963:35:Merkez:Merkez:Salihler	Salihler	644	1	316.3	SALİHLER	İzmir	Dikili	*	name	differs	""	tr.tuik.mahalle:194107	Salihler Mah.
 1963:35:Merkez:Merkez:Samanlık	Samanlık	645	2	440.2	SAMANLIK	İzmir	Dikili	""	name	differs	""	""	""
 1963:35:Merkez:Merkez:Sucahlı	Sucahlı	680	1	212.7	SU CAHLI	İzmir	Bergama	*	name	differs	""	tr.tuik.mahalle:194273	Sucahlı Mah.
 1963:35:Merkez:Merkez:Uzunburun	Uzunburun	748	1	408.4	UZUNBURUN	İzmir	Dikili	*	name	differs	""	tr.tuik.mahalle:194111	Uzunburun Mah.
@@ -6709,6 +6796,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:35:Çeşme:Merkez:Ovacık	Ovacık	602	1	208.6	OVACIK	İzmir	Çeşme	*	name	agrees	""	tr.tuik.mahalle:194065	Ovacık Mah.
 1963:35:Ödemiş:Adagide:Balabanlı	Balabanlı	83	1	196.2	BALABANLI	İzmir	Ödemiş	*	name	agrees	""	tr.tuik.mahalle:194607	Balabanlı Mah.
 1963:35:Ödemiş:Adagide:Bozcayaka	Bozcayaka	118	1	277.5	BOZCA YAKA	İzmir	Ödemiş	*	name	agrees	""	tr.tuik.mahalle:194609	Bozcayaka Mah.
+1963:35:Ödemiş:Adagide:Çamlıca	Çamlıca	155	2	187.8	ÇAMLICA	İzmir	Ödemiş	*	name	agrees	""	tr.tuik.mahalle:194611	Çamlıca Mah.
 1963:35:Ödemiş:Bademiye:Emirli	Emirli	238	2	142.9	EMİRLİ	İzmir	Ödemiş	*	name	agrees	""	tr.tuik.mahalle:194561	Emirli Mah.
 1963:35:Ödemiş:Bademiye:Kemenler	Kemenler	449	1	336.3	KEMENLER	İzmir	()demiş	""	name	agrees	""	tr.tuik.mahalle:194563	Kemenler Mah.
 1963:35:Ödemiş:Beydağ:Aktepe	Aktepe	31	2	372.9	AKTEPE	İzmir	Ödemiş	*	name	agrees	""	""	""
@@ -6737,6 +6825,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:35:Ödemiş:Merkez:Demircili	Demircili	204	1	263.7	DEMİRCİLİ	İzmir	Ödemiş	*	name	agrees	""	tr.tuik.mahalle:194495	Demircili Mah.
 1963:35:Ödemiş:Merkez:Dolaylar	Dolaylar	222	1	210.2	DOLAYLAR	İzmir	Ödemiş	*	name	agrees	""	tr.tuik.mahalle:194499	Dolaylar Mah.
 1963:35:Ödemiş:Merkez:Karadoğan	Karadoğan	413	1	120.0	KARA DOĞAN	İzmir	Ödemiş	*	name	agrees	""	tr.tuik.mahalle:194513	Karadoğan Mah.
+1963:35:Ödemiş:Merkez:Ortaköy	Ortaköy	598	1	350.8	ORTA KÖY	İzmir	Ödemiş	""	name	agrees	""	tr.tuik.mahalle:194533	Ortaköy Mah.
 1963:35:Ödemiş:Merkez:Oğuzlar	Oğuzlar	593	1	409.5	OĞUZLAR	İzmir	Ödemiş	""	name	agrees	""	tr.tuik.mahalle:194531	Oğuzlar Mah.
 1963:35:Ödemiş:Merkez:Veliler	Veliler	760	2	203.4	VELİLER	İzmir	Ödemiş	*	name	agrees	""	tr.tuik.mahalle:194545	Veliler Mah.
 1963:35:Ödemiş:Merkez:Yusufdere	Yusufdere	798	1	446.4	YUSUF DERE	İzmir	Ödemiş	*	name	agrees	""	tr.tuik.mahalle:194553	Yusufdere Mah.
@@ -6760,10 +6849,12 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:35:İre:-:Toparlar	Toparlar	734	1	209.3	TOPARLAR	İzmir	Tire	""	name	differs	""	tr.tuik.mahalle:194737	Toparlar Mah.
 1963:35:İre:-:Uzgur	Uzgur	748	1	243.1	UZGUR	İzmir	Tire	*	name	differs	Başköy	tr.tuik.mahalle:194675	Başköy Mah.
 1963:35:İre:-:Yemişler	Yemişler	784	2	147.9	YEMİŞLER	İzmir	Tire	""	name	differs	""	tr.tuik.mahalle:194743	Yemişler Mah.
+1963:35:İre:-:Çeriközü	Çeriközü	170	1	395.1	ÇERİKOZU	İzmir	Tire	*	name	differs	""	tr.tuik.mahalle:194687	Çeriközü Mah.
 1963:35:İre:-:Çiniyeri	Çiniyeri	176	2	151.7	ÇİNİYERİ	İzmir	Tire	""	name	differs	""	tr.tuik.mahalle:194689	Çiniyeri Mah.
 1963:35:İre:Boğaziçi:Akyurt	Akyurt	32	2	423.6	AKYURT	İzmir	Tire	*	name	differs	""	tr.tuik.mahalle:194753	Akyurt Mah.
 1963:35:İre:Boğaziçi:Akçaşehir	Akçaşehir	25	2	376.4	AKÇAŞEHİR	İzmir	Tire	*	name	differs	""	tr.tuik.mahalle:194751	Akçaşehir Mah.
 1963:35:İre:Boğaziçi:Alaylı	Alaylı	36	1	231.0	ALAYLI	İzmir	Tire	*	name	differs	""	tr.tuik.mahalle:194755	Alaylı Mah.
+1963:35:İre:Boğaziçi:Kursak	Kursak	506	1	130.1	KURŞAK	İzmir	Tire	*	name	differs	""	""	""
 1963:35:İre:Boğaziçi:Küçükkale	Küçükkale	517	1	368.8	KÜÇÜK KALE	İzmir	Tire	*	name	differs	""	tr.tuik.mahalle:194763	Küçükkale Mah.
 1963:35:İre:Gökçen:Dereli	Dereli	210	2	145.9	DERELİ	İzmir	Tire	*	name	differs	""	tr.tuik.mahalle:194771	Dereli Mah.
 1963:35:İre:Gökçen:Gökçen (	Gökçen (	283	2	110.8	GÖKÇEN	İzmir	Tire	**	name	differs	""	tr.tuik.mahalle:194663	Gökçen Mah.
@@ -6771,6 +6862,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:35:İre:Gökçen:Kocaaliler	Kocaaliler	480	1	167.7	KOCA ALİLER	İzmir	Tire	""	name	differs	""	tr.tuik.mahalle:194779	Kocaaliler Mah.
 1963:35:İre:Gökçen:Osmancık	Osmancık	600	1	352.8	OSMANCIK	İzmir	Tire	*	name	differs	""	tr.tuik.mahalle:194781	Osmancık Mah.
 1963:35:İre:Gökçen:Peşrefli	Peşrefli	621	1	312.3	PEŞREFLİ	İzmir	Tire	*	name	differs	""	tr.tuik.mahalle:194783	Peşrefli Mah.
+1963:35:İre:Gökçen:Saruhanlı	Saruhanlı	655	2	181.0	SARUHANLI	İzmir	Tire	""	name	differs	""	tr.tuik.mahalle:194787	Saruhanlı Mah.
 1963:35:İre:Gökçen:Çobanköy	Çobanköy	180	1	155.2	ÇOBAN KÖY	İzmir	Tire	*	name	differs	""	tr.tuik.mahalle:194769	Çobanköy Mah.
 1963:36:Ardahan:Hocuvan:Bayramoğlu	Bayramoğlu	95	2	176.2	BAYRAMOĞLU	Kars	Göle	*	name	differs	""	tr.tuik.koy:36302	Bayramoğlu Köyü
 1963:36:Ardahan:Hocuvan:Gölgeli	Gölgeli	286	2	418.9	GÖLGELİ	Kars	Göle	*	name	differs	""	tr.tuik.koy:36309	Gölgeli Köyü
@@ -6830,6 +6922,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:36:Iğdır:Merkez:Asma	Asma	55	1	405.1	ASMA	Bayazıt	Igdu	*	name	differs	""	tr.tuik.koy:36512	Asma Köyü
 1963:36:Iğdır:Merkez:Enginalan	Enginalan	627	2	269.8	PULUR	Bayazıt	İğdır	*	1968 rename	agrees	Enginalan	tr.tuik.koy:36522	Enginalan Köyü
 1963:36:Iğdır:Merkez:Evci	Evci	249	2	459.0	EVCİ	Bayazıt	""	*	name	""	""	tr.tuik.koy:36523	Evci Köyü
+1963:36:Iğdır:Merkez:Gülpınar	Gülpınar	567	2	338.5	MUÇA	Bayazıt	İğdır	""	1968 rename	agrees	Gülpınar	tr.tuik.koy:36524	Gülpınar Köyü
 1963:36:Iğdır:Merkez:GüngÖrmez	GüngÖrmez	297	2	282.7	GÜN GÖRMEZ	Bayazıt	İğdır	""	name	agrees	""	tr.tuik.koy:36525	Güngörmez Köyü
 1963:36:Iğdır:Merkez:Hakveyis	Hakveyis	314	2	381.1	HAK VEYİS	Bayazıt	İğdır	*	name	agrees	""	tr.tuik.mahalle:90763	Hakveyis Mah.
 1963:36:Iğdır:Merkez:Kadıkışlak	Kadıkışlak	387	2	337.8	KADI KIŞLAK	Bayazıt	İğdır	""	name	agrees	""	tr.tuik.koy:36530	Kadıkışlak Köyü
@@ -6943,7 +7036,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:36:Tuzluca:Merkez:Aşağısutaşlı	Aşağısutaşlı	61	1	237.7	AŞAĞIKENZEK	Bayazıt	Tuzluca	""	1968 rename	agrees	Aşağı Sutaşlı	""	""
 1963:36:Tuzluca:Merkez:Göktaş	Göktaş	285	1	232.0	GÖKTAŞ	Bayazıt	Tuzluca	""	name	agrees	""	tr.tuik.koy:36610	Göktaş Köyü
 1963:36:Tuzluca:Merkez:Güllüce	Güllüce	294	1	112.6	GÜLLÜCE	Bayazıt	Tuzluca	*	name	agrees	""	tr.tuik.koy:36611	Güllüce Köyü
-1963:36:Tuzluca:Merkez:Hadımlı	Hadımlı	314	1	123.4	HADİM Lİ	Bayazıt	Tuzluca	""	name	agrees	""	tr.tuik.koy:36612	Hadımlı Köyü
+1963:36:Tuzluca:Merkez:Hadımlı	Hadımlı	314	1	123.4	HADIMLI	Bayazıt	Tuzluca	""	name	agrees	""	tr.tuik.koy:36612	Hadımlı Köyü
 1963:36:Tuzluca:Merkez:Hamurkesen	Hamurkesen	320	2	229.8	HAMUR KESEN	Bayazıt	Tuzluca	*	name	agrees	""	tr.tuik.koy:36613	Hamurkesen Köyü
 1963:36:Tuzluca:Merkez:Hasankent	Hasankent	330	1	120.0	HAŞAN KENT	Bayazıt	Tuzluca	""	name	agrees	""	tr.tuik.koy:36614	Hasankent Köyü
 1963:36:Tuzluca:Merkez:Kamışlı	Kamışlı	396	2	150.6	KAMIŞLI	Bayazıt	Tuzluca	*	name	agrees	""	tr.tuik.koy:36616	Kamışlı Köyü
@@ -7000,6 +7093,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:37:Araç:Mergüze:Kapaklı	Kapaklı	399	2	412.2	KAPAKLI	Kastamonu	Araç	""	name	agrees	""	""	""
 1963:37:Araç:Mergüze:Kızıleller	Kızıleller	475	1	218.8	KIZIL ELLER	Kastamonu	Araç	*	name	agrees	""	tr.tuik.koy:18631	Kızıleller Köyü
 1963:37:Araç:Mergüze:Serdar	Serdar	662	1	370.9	SERDAR	Kastamonu	Araç	*	name	agrees	""	tr.tuik.koy:18152	Serdar Köyü
+1963:37:Araç:Mergüze:Sevindik	Sevindik	664	1	145.6	SEVİNDİK	Kastamonu	Araç	*	name	agrees	""	tr.tuik.mahalle:41869	Sevindik Mah.
 1963:37:Araç:Mergüze:Sipahiler	Sipahiler	668	2	314.8	SİPAHİLER	Kastamonu	Araç	*	name	agrees	""	""	""
 1963:37:Araç:Mergüze:Örencik	Örencik	608	2	451.6	ÖRENCİK	Kastamonu	Araç	""	name	agrees	""	""	""
 1963:37:Araç:Mergüze:İhsangazi	İhsangazi	362	2	376.0	İHSAN GAZİ	Kastamonu	Araç	*	name	agrees	""	""	""
@@ -7040,12 +7134,14 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:37:Araç:İğdir:Köse	Köse	497	1	223.0	KÖSE	Kastamonu	Araç	*	name	agrees	""	tr.tuik.koy:18219	Köse Köyü
 1963:37:Araç:İğdir:Kıyan	Kıyan	470	2	195.6	KIYAN	Kastamonu	Araç	*	name	agrees	""	tr.tuik.koy:18215	Kıyan Köyü
 1963:37:Araç:İğdir:Maşlar	Maşlar	546	1	255.7	MAŞLAR	Kastamonu	Araç	*	name	agrees	Üçpınar	tr.tuik.koy:18235	Üçpınar Köyü
+1963:37:Araç:İğdir:Moğsu	Moğsu	565	1	275.7	MOĞSU	Kastamonu	Araç	*	name	agrees	Gökçesu	tr.tuik.koy:18204	Gökçesu Köyü
 1963:37:Araç:İğdir:Mugamlar	Mugamlar	568	1	185.7	MUĞAMLAR	Kastamonu	Araç	*	name	agrees	Değirmençay	tr.tuik.koy:18199	Değirmençay Köyü
 1963:37:Araç:İğdir:Müslimler	Müslimler	575	2	433.0	MÜSLİMLER	Kastamonu	Araç	*	name	agrees	""	tr.tuik.koy:18220	Müslimler Köyü
 1963:37:Araç:İğdir:Okçular	Okçular	593	2	398.3	OKÇULAR	Kastamonu	Araç	*	name	agrees	""	tr.tuik.koy:18221	Okçular Köyü
 1963:37:Araç:İğdir:Ovza	Ovza	603	1	164.1	OVZA	Kastamonu	Araç	""	name	agrees	""	""	""
 1963:37:Araç:İğdir:Recepbey	Recepbey	633	1	268.7	RECEP BEY	Kastamonu	Araç	*	name	agrees	""	tr.tuik.koy:18224	Recepbey Köyü
 1963:37:Araç:İğdir:Saltuklu	Saltuklu	645	1	358.2	SALTÜKLÜ	Kastamonu	Araç	*	name	agrees	""	tr.tuik.koy:18225	Saltuklu Köyü
+1963:37:Araç:İğdir:Samatlar	Samatlar	646	1	180.5	SAMATLAR	Kastamonu	Araç	*	name	agrees	""	tr.tuik.koy:18185	Samatlar Köyü
 1963:37:Araç:İğdir:Tellikoz	Tellikoz	722	2	237.7	TELLİ KOZ	Kastamonu	Araç	*	name	agrees	""	tr.tuik.koy:18231	Tellikoz Köyü
 1963:37:Araç:İğdir:Terke	Terke	726	1	236.3	TERKE	Kastamonu	Araç	*	name	agrees	""	tr.tuik.koy:18232	Terke Köyü
 1963:37:Araç:İğdir:İhsanlı	İhsanlı	362	2	442.8	İHSANLI	Kastamonu	Araç	*	name	agrees	""	tr.tuik.koy:18209	İhsanlı Köyü
@@ -7082,6 +7178,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:37:Azdavay:Merkez:Yumacık	Yumacık	797	1	386.7	YUMACIK	Kastamonu	Daday	*	name	differs	""	tr.tuik.koy:18288	Yumacık Köyü
 1963:37:Azdavay:Pınarbaşı:Demirtaş	Demirtaş	205	1	295.7	DEMİRTAŞ	Kastamonu	Daday	*	name	differs	""	tr.tuik.koy:18763	Demirtaş Köyü
 1963:37:Azdavay:Pınarbaşı:Dizdarlı	Dizdarlı	219	1	192.9	DİZDARLI	Kastamonu	Daday	*	name	differs	""	tr.tuik.koy:18764	Dizdarlı Köyü
+1963:37:Azdavay:Pınarbaşı:Elmacık	Elmacık	235	2	375.0	ELMACIK	Kastamonu	Daday	""	name	differs	""	""	""
 1963:37:Azdavay:Pınarbaşı:Emle	Emle	238	2	329.2	EMLE	Kastamonu	Daday	*	name	differs	Uzunçam	tr.tuik.mahalle:140833	Uzunçam Mah.
 1963:37:Azdavay:Pınarbaşı:Erkemle	Erkemle	245	1	379.4	ERKEMLE	Kastamonu	Daday	*	name	differs	Çamkışla	tr.tuik.mahalle:140831	Çamkışla Mah.
 1963:37:Azdavay:Pınarbaşı:Hocalar	Hocalar	348	1	283.9	HOCALAR	Kastamonu	Daday	*	name	differs	""	tr.tuik.koy:18767	Hocalar Köyü
@@ -7175,6 +7272,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:37:Cide:Sarbana:Dördül	Dördül	224	1	248.2	DÖRDÜL	Kastamonu	Cide	*	name	agrees	""	tr.tuik.koy:18811	Dördül Köyü
 1963:37:Cide:Sarbana:Furuncuk	Furuncuk	262	2	247.3	FURUNCUK	Kastamonu	Cide	*	name	agrees	""	""	""
 1963:37:Cide:Sarbana:Güneytekke	Güneytekke	297	2	209.0	GÜNEY TEKKE	Kastamonu	Cide	*	name	agrees	""	tr.tuik.mahalle:41902	Güneytekke Mah.
+1963:37:Cide:Sarbana:Gürleyik	Gürleyik	299	1	198.5	GÜRLEYİK	Kastamonu	Cide	""	name	agrees	""	tr.tuik.koy:18814	Gürleyik Köyü
 1963:37:Cide:Sarbana:Gürpelit	Gürpelit	299	1	319.6	GÜR PELİT	Kastamonu	Cide	*	name	agrees	""	tr.tuik.koy:18815	Gürpelit Köyü
 1963:37:Cide:Sarbana:Harmangeriş	Harmangeriş	327	1	413.6	HARMAN GERİŞ	Kastamonu	Cide	*	name	agrees	""	tr.tuik.koy:18816	Harmangeriş Köyü
 1963:37:Cide:Sarbana:Himmet	Himmet	341	2	366.6	HİMMET	Kastamonu	Cide	*	name	agrees	""	tr.tuik.koy:18817	Himmet Köyü
@@ -7203,6 +7301,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:37:Daday:Merkez:Değirmencik	Değirmencik	199	1	430.4	DEĞİRMENCİK	Kastamonu	Daday	*	name	agrees	""	tr.tuik.koy:18474	Değirmencik Köyü
 1963:37:Daday:Merkez:Fasıllar	Fasıllar	257	1	431.7	FASILLAR	Kastamonu	Daday	*	name	agrees	""	tr.tuik.koy:18481	Fasıllar Köyü
 1963:37:Daday:Merkez:Gulam	Gulam	291	2	226.4	GULÂM	Kastamonu	Daday	*	name	agrees	""	tr.tuik.koy:17949	Gökçekent Köyü
+1963:37:Daday:Merkez:Görük	Görük	289	2	419.9	GÖRÜK	Kastamonu	Daday	""	name	agrees	""	tr.tuik.koy:18483	Görük Köyü
 1963:37:Daday:Merkez:Hasanağa	Hasanağa	328	2	299.8	HAŞAN AĞA	Kastamonu	Daday	*	name	agrees	""	tr.tuik.koy:18484	Hasanağa Köyü
 1963:37:Daday:Merkez:Hasanşeyh	Hasanşeyh	330	2	182.3	HAŞAN ŞEYH	Kastamonu	Daday	*	name	agrees	""	tr.tuik.koy:18485	Hasanşeyh Köyü
 1963:37:Daday:Merkez:Honsalar	Honsalar	349	2	122.1	HONSALAR	Kastamonu	Daday	*	name	agrees	Alipaşa	tr.tuik.mahalle:41797	Honsalar Mah.
@@ -7258,7 +7357,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:37:Devrekani:Seyidiler:Şeydiler	Şeydiler	664	1	444.7	ŞEYDİLER	Kastamonu	Küre	*	name	differs	""	""	""
 1963:37:Küre:Ağlı:Akdivan	Akdivan	26	2	448.8	AKDİVAN	Kastamonu	Daday	*	name	differs	""	tr.tuik.koy:18109	Akdivan Köyü
 1963:37:Küre:Ağlı:Ağlı	Ağlı	17	2	441.6	AĞLI	Kastamonu	Küre	*	name	agrees	""	""	""
-1963:37:Küre:Ağlı:Karandı	Karandı	423	2	431.6	KARANDI	Kastamonu	""	""	name	""	Oluközü	tr.tuik.koy:18116	Oluközü Köyü
+1963:37:Küre:Ağlı:Karandı	Karandı	423	2	420.6	KARANDI	Kastamonu	Küre	""	name	agrees	""	tr.tuik.koy:18116	Oluközü Köyü
 1963:37:Küre:Merkez:Afsargüney	Afsargüney	13	2	361.6	AFŞAR GÜNEY	Kastamonu	Küre	*	name	agrees	""	""	""
 1963:37:Küre:Merkez:Afşarimam	Afşarimam	13	2	370.8	AFŞAR İMAM	Kastamonu	Küre	*	name	agrees	""	tr.tuik.koy:18722	Afşarimam Köyü
 1963:37:Küre:Merkez:Alacık	Alacık	33	2	210.3	ALACIK	Kastamonu	Küre	*	name	agrees	""	tr.tuik.koy:18724	Alacık Köyü
@@ -7316,6 +7415,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:37:Merkez:Kuzkaya:Maraz	Maraz	544	2	340.2	MARAZ	Kastamonu	""	*	name	""	Esenli	tr.tuik.koy:18061	Esenli Köyü
 1963:37:Merkez:Kuzkaya:Merzuklar	Merzuklar	555	1	345.9	MERZUKLAR	Kastamonu	""	*	name	""	Kurtkayı	tr.tuik.koy:18081	Kurtkayı Köyü
 1963:37:Merkez:Kuzkaya:Mescit	Mescit	555	2	144.9	MESCİT	Kastamonu	""	""	name	""	""	tr.tuik.koy:18082	Mescit Köyü
+1963:37:Merkez:Kuzkaya:Timzan	Timzan	730	1	379.5	TİMZAN	Kastamonu	""	""	name	""	Damlacay	tr.tuik.koy:18057	Damlaçay Köyü
 1963:37:Merkez:Kuzkaya:Ümit	Ümit	753	1	263.5	ÜMİT	Kastamonu	""	*	name	""	""	tr.tuik.koy:18090	Ümit Köyü
 1963:37:Merkez:Kuzkaya:İbişler	İbişler	360	2	168.3	İBİŞLER	Kastamonu	""	*	name	""	""	tr.tuik.koy:18067	İbişler Köyü
 1963:37:Merkez:Kuzkaya:Şeyh	Şeyh	697	2	397.2	ŞEYH	Kastamonu	""	*	name	""	""	tr.tuik.koy:18088	Şeyh Köyü
@@ -7414,7 +7514,6 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:37:Taşköprü:Merkez:Kılıçlı	Kılıçlı	463	2	265.9	KILIÇLI	Kastamonu	Taşköprü	*	name	agrees	""	tr.tuik.koy:18906	Kılıçlı Köyü
 1963:37:Taşköprü:Merkez:Kıran	Kıran	465	2	330.3	KIRAN	Kastamonu	Taşköprü	*	name	agrees	""	tr.tuik.koy:18907	Kıran Köyü
 1963:37:Taşköprü:Merkez:Kırha	Kırha	466	2	361.2	KIRHA	Kastamonu	Taşköprü	*	name	agrees	""	tr.tuik.koy:18908	Kırha Köyü
-1963:37:Taşköprü:Merkez:Kızılkilise	Kızılkilise	476	2	247.5	KIZIL KİLİSE	Kastamonu	""	*	name	""	Alaçay	tr.tuik.koy:18517	Alaçay Köyü
 1963:37:Taşköprü:Merkez:Masatlar	Masatlar	545	2	430.2	MASATLAR	Kastamonu	Taşköprü	*	name	agrees	""	tr.tuik.koy:18919	Masatlar Köyü
 1963:37:Taşköprü:Merkez:Meye	Meye	557	2	388.5	MEYE	Kastamonu	Taşköprü	*	name	agrees	Çambaşı	tr.tuik.koy:18859	Çambaşı Köyü
 1963:37:Taşköprü:Merkez:Niğel	Niğel	585	1	438.4	NİĞEL	Kastamonu	Taşköprü	*	name	agrees	İkizler	""	""
@@ -7549,6 +7648,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:38:Bünyan:Merkez:Karacaören	Karacaören	409	2	284.4	KARACA VİRAN	Kayseri	Bünyan	*	1968 rename	agrees	Karacaören	tr.tuik.mahalle:180917	Karacaören Mah.
 1963:38:Bünyan:Merkez:Karahıdırlı	Karahıdırlı	416	1	198.7	KARAHIDIR LI	Kayseri	Bünyan	*	name	agrees	""	""	""
 1963:38:Bünyan:Merkez:Karakaya	Karakaya	417	2	431.1	KARA KAYA	Kayseri	Bünyan	*	name	agrees	""	tr.tuik.mahalle:180877	Karakaya Mah.
+1963:38:Bünyan:Merkez:Kösehacılı	Kösehacılı	497	2	145.4	KÖSE HACILI	Kayseri	Bünyan	*	name	agrees	""	tr.tuik.mahalle:180923	Kösehacılı Mah.
 1963:38:Bünyan:Merkez:Musaşeyh	Musaşeyh	572	1	147.9	MUSA ŞEYH	Kayseri	Bünyan	""	name	agrees	""	tr.tuik.mahalle:180925	Musaşeyh Mah.
 1963:38:Bünyan:Merkez:Pirahmet	Pirahmet	622	1	416.5	PİRAHMET	Kayseri	Bünyan	""	name	agrees	""	tr.tuik.mahalle:197755	Pirahmet Mah.
 1963:38:Bünyan:Merkez:Sultanhanı	Sultanhanı	681	1	366.6	SULTAN HANI	Kayseri	Bünyan	*	name	agrees	""	tr.tuik.mahalle:180931	Sultanhanı Mah.
@@ -7648,6 +7748,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:38:Inarbaşı:Pazarören:Yeregeçen	Yeregeçen	785	1	280.6	YERE GEÇEN	Kayseri	Pınarbaşı	*	name	agrees	""	tr.tuik.mahalle:181439	Yeregeçen Mah.
 1963:38:Inarbaşı:Pazarören:Şabanlı	Şabanlı	690	1	207.0	ŞABANLI	Kayseri	Pınarbaşı	*	name	agrees	""	tr.tuik.mahalle:181431	Şabanlı Mah.
 1963:38:Inarbaşı:Viranşehir:Dikilitaş	Dikilitaş	215	2	117.9	DİKİLİ TAŞ	Kayseri	L’niarhaşı	*	name	differs	""	tr.tuik.mahalle:181319	Dikilitaş Mah.
+1963:38:Inarbaşı:Viranşehir:Hilmiye	Hilmiye	341	2	168.2	HILMIYE	Kayseri	L’niarhaşı	*	name	differs	""	tr.tuik.mahalle:181321	Hilmiye Mah.
 1963:38:Inarbaşı:Viranşehir:Kaftangiyen	Kaftangiyen	389	1	378.8	KAFTAN GİYEN	Kayseri	Pınarbaşı	*	name	agrees	""	tr.tuik.mahalle:181325	Kaftangiyen Mah.
 1963:38:Inarbaşı:Viranşehir:Karahalka	Karahalka	414	2	383.2	KARA HALKA	Kayseri	Pınarbaşı	*	name	agrees	""	tr.tuik.mahalle:181329	Karahalka Mah.
 1963:38:Inarbaşı:Viranşehir:Karakuyu	Karakuyu	421	1	226.4	KARA KUYU	Kayseri	Pınarbaşı	*	name	agrees	""	tr.tuik.mahalle:181333	Karakuyu Mah.
@@ -7686,6 +7787,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:38:Merkez:Talaş:Kamber	Kamber	397	1	144.9	KAMBER	Kayseri	Develi	*	name	differs	""	tr.tuik.mahalle:181619	Kamber Mah.
 1963:38:Merkez:Talaş:Kepez	Kepez	450	2	433.9	KEPEZ	Kayseri	Develi	*	name	differs	""	tr.tuik.mahalle:42328	Kepez Mah.
 1963:38:Merkez:Talaş:Kıranardı	Kıranardı	465	2	358.9	KIRAN ARDI	Kayseri	""	*	name	""	""	tr.tuik.mahalle:42098	Kıranardı Mah.
+1963:38:Merkez:Talaş:Süleymanlı	Süleymanlı	685	1	216.5	SÜLEYMANLI	Kayseri	Develi	""	name	differs	""	tr.tuik.mahalle:181629	Süleymanlı Mah.
 1963:38:Merkez:Talaş:Talaş	Talaş	710	2	399.4	TALAŞ	Kayseri	""	**	name	""	""	""	""
 1963:38:Sarioğlan:-:Alamettin	Alamettin	35	1	137.9	ALAMETTİN	Kayseri	Bünyan	*	name	differs	""	tr.tuik.mahalle:181441	Alamettin Mah.
 1963:38:Sarioğlan:-:Ebülhayır	Ebülhayır	232	1	416.5	EBÜLHAYIR	Kayseri	Bünyan	*	name	differs	""	tr.tuik.mahalle:181457	Ebülhayır Mah.
@@ -7744,6 +7846,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:38:Tomarza:Toklar:Melikören	Melikören	550	2	412.5	MELİK VİRAN	Kayseri	Pınarbaşı	*	1968 rename	differs	Melikören	tr.tuik.mahalle:181729	Melikören Mah.
 1963:38:Tomarza:Toklar:Tahtakemer	Tahtakemer	709	2	341.2	TAHTA KEMER	Kayseri	Pınarbaşı	*	name	differs	""	tr.tuik.mahalle:181693	Tahtakemer Mah.
 1963:38:Tomarza:Toklar:Toklar	Toklar	732	2	166.3	TOKLAR	Kayseri	Aziziye	*	name	differs	""	tr.tuik.mahalle:181699	Toklar Mah.
+1963:38:Tomarza:Toklar:Uçkonak	Uçkonak	806	1	251.6	ZELHİN	Kayseri	Pınarbaşı	*	1968 rename	differs	Üçkonak	tr.tuik.mahalle:181733	Üçkonak Mah.
 1963:38:Tomarza:Toklar:Çulha	Çulha	144	2	141.7	ÇULHA	Kayseri	Aziziye	*	name	differs	""	tr.tuik.mahalle:181657	Culha Mah.
 1963:38:Tomarza:Toklar:İcadiye	İcadiye	361	2	134.8	İCADİYE	Kayseri	Aziziye	""	name	differs	""	tr.tuik.mahalle:181719	İcadiye Mah.
 1963:38:Yeşilhisar:Merkez:Doğanlı	Doğanlı	289	1	352.4	GÖRDELES	Kayseri	İncesu	*	1968 rename	differs	""	tr.tuik.mahalle:181805	Doğanlı Mah.
@@ -7837,6 +7940,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:39:Merkez:Usküp:Yundalan	Yundalan	797	2	395.7	YUNDALAN	Kırklareli	""	*	name	""	""	tr.tuik.koy:19506	Yündalan Köyü
 1963:39:Merkez:İnece:Kocahıdır	Kocahıdır	480	2	260.6	KOCA HIDIR	Kırklareli	""	*	name	""	""	""	""
 1963:39:Merkez:İnece:Ulukonak	Ulukonak	721	2	254.7	TEKKE ŞEYHLER	Kırklareli	""	*	1968 rename	""	Ulukonak	""	""
+1963:39:Pehlivanköy:Merkez:Hıdırca	Hıdırca	341	1	134.7	HİDIRCA	Kırklareli	""	*	name	""	""	tr.tuik.koy:19621	Hıdırca Köyü
 1963:39:Pehlivanköy:Merkez:Imampazarı	Imampazarı	365	2	423.7	İMAM PAZARI	Kırklareli	Babaeski	*	name	differs	""	tr.tuik.koy:19622	İmampazarı Köyü
 1963:39:Pehlivanköy:Merkez:Kuştepe	Kuştepe	511	1	282.7	KUŞTEPE	Kırklareli	Babaeski	*	name	differs	""	tr.tuik.koy:19624	Kuştepe Köyü
 1963:39:Pınarhisar:Merkez:Akören	Akören	32	1	256.0	AKVİRAN	Kırklareli	""	*	1968 rename	""	Akören	tr.tuik.koy:19628	Akören Köyü
@@ -7961,6 +8065,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:41:Gölcük:Merkez:Ferhadiye	Ferhadiye	258	1	419.5	FERHADİYE	Kocaeli	""	*	name	""	""	tr.tuik.mahalle:210112	Ferhadiye Mah.
 1963:41:Gölcük:Merkez:Halıdere	Halıdere	316	1	125.1	HALİDERE	Kocaeli	Karamür-	*	name	differs	""	""	""
 1963:41:Gölcük:Merkez:Nimetiye	Nimetiye	585	2	288.0	NİMETİYE	Kocaeli	""	*	name	""	""	tr.tuik.mahalle:440586	Nimetiye Mah.
+1963:41:Gölcük:Merkez:Saraylı	Saraylı	648	2	406.9	SARAYLI	Kocaeli	""	""	name	""	""	tr.tuik.mahalle:829010	Saraylı Mah.
 1963:41:Gölcük:Merkez:Siretiye	Siretiye	669	1	379.8	SİRETİYE	Kocaeli	""	*	name	""	""	""	""
 1963:41:Gölcük:Merkez:Örcün	Örcün	608	1	321.3	ÖRÇÜN	Kocaeli	""	*	name	""	""	tr.tuik.mahalle:171520	Örcün Mah.
 1963:41:Gölcük:Merkez:Ümmiye	Ümmiye	753	1	396.0	ÜMMİYE	Kocaeli	""	*	name	""	""	tr.tuik.mahalle:378596	Ümmiye Mah.
@@ -8017,6 +8122,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:41:Merkez:Akineşe:Ortaburun	Ortaburun	597	1	344.5	ORTA BURUN	Kocaeli	""	""	name	""	""	tr.tuik.mahalle:599829	Ortaburun Mah.
 1963:41:Merkez:Derbent:Acısu	Acısu	11	2	132.7	ACISU	Kocaeli	""	*	name	""	""	tr.tuik.mahalle:50257	Acısu Mah.
 1963:41:Merkez:Derbent:Gedikli	Gedikli	270	1	345.4	GEDİKLİ	Kocaeli	""	""	name	""	""	tr.tuik.mahalle:121525	Gedikli Mah.
+1963:41:Merkez:Derbent:Ketenciler	Ketenciler	455	2	371.8	KETENCİLER	Kocaeli	""	*	name	""	""	tr.tuik.mahalle:668822	Ketenciler Mah.
 1963:41:Merkez:Derbent:Uzuntarla	Uzuntarla	749	2	250.0	UZUNTARLA	Kocaeli	""	*	name	""	""	tr.tuik.mahalle:50264	Uzuntarla Mah.
 1963:41:Merkez:Merkez:Alihocalar	Alihocalar	38	2	362.4	ALİHOCALAR	Kocaeli	(îehze	*	name	differs	""	tr.tuik.mahalle:959825	Alihocalar Mah.
 1963:41:Merkez:Merkez:Böğürgen	Böğürgen	120	1	133.3	BÖĞÜRGEN	Kocaeli	""	""	name	""	""	tr.tuik.mahalle:348805	Böğürgen Mah.
@@ -8136,6 +8242,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:42:Bozkır:Merkez:Yazdamı	Yazdamı	776	2	210.7	YAZDAMI	Konya	Bozkır	*	name	agrees	""	tr.tuik.mahalle:195351	Yazdamı Mah.
 1963:42:Bozkır:Merkez:Çat	Çat	159	2	451.3	ÇAT	Konya	Bozkır	*	name	agrees	""	""	""
 1963:42:Bozkır:Uçpınar:Baybağan	Baybağan	93	2	344.8	BAYBAĞAN	Konya	Bozkır	*	name	agrees	""	tr.tuik.mahalle:195371	Baybağan Mah.
+1963:42:Bozkır:Uçpınar:Elmaağaç	Elmaağaç	235	2	261.0	ELMAAĞAÇ	Konya	Bozkır	""	name	agrees	""	tr.tuik.mahalle:195373	Elmaağaç Mah.
 1963:42:Bozkır:Uçpınar:Gederet	Gederet	269	2	418.5	GEDERET	Konya	Hadım	*	name	differs	""	tr.tuik.mahalle:195303	Dereiçi Mah.
 1963:42:Bozkır:Uçpınar:Hisarlık	Hisarlık	344	2	143.4	HİSARLIK	Konya	Bozkır	*	name	agrees	""	tr.tuik.mahalle:195293	Hisarlık Mah.
 1963:42:Bozkır:Uçpınar:Karabayır	Karabayır	404	1	361.4	KARA BAYIR	Konya	Bozkır	*	name	agrees	""	tr.tuik.mahalle:195377	Karabayır Mah.
@@ -8156,6 +8263,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:42:Cihanbeyli:Yeniceoba:Çimen	Çimen	175	2	361.5	ÇİMEN	Konya	Cihanbeyli	*	name	agrees	""	tr.tuik.mahalle:195435	Çimen Mah.
 1963:42:Cihanbeyli:Zıvank:Dedeler	Dedeler	198	1	373.2	DEDELER	Konya	Cihan-	*	name	agrees	""	tr.tuik.mahalle:195147	Dedeler Mah.
 1963:42:Cihanbeyli:Zıvank:Hacınuman	Hacınuman	311	1	190.8	HACI NÜMAN	Konya	""	*	name	""	""	tr.tuik.mahalle:195159	Hacınuman Mah.
+1963:42:Cihanbeyli:Zıvank:Sarnıç	Sarnıç	654	2	449.8	SARNIÇ	Konya	Cihanbeyli	""	name	agrees	""	""	""
 1963:42:Doğanhisar:Merkez:Furunlu	Furunlu	262	2	258.8	FURUNLU	Konya	Akşehir	*	name	differs	""	""	""
 1963:42:Doğanhisar:Merkez:Kemer	Kemer	449	1	433.3	KEMER	Konya	Akşehir	*	name	differs	""	tr.tuik.mahalle:195595	Kemer Mah.
 1963:42:Doğanhisar:Merkez:Silint	Silint	666	1	417.2	SİLİNT	Konya	Akşehir	*	name	differs	Uncular	tr.tuik.mahalle:195599	Uncular Mah.
@@ -8219,6 +8327,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:42:Ilgın:Argıthanı:Burhaniye	Burhaniye	126	1	287.8	BÜRHANİYE	Konya	Ilgın	*	name	agrees	""	""	""
 1963:42:Ilgın:Merkez:Ağalar	Ağalar	14	2	179.3	AĞALAR	Konya	Ilgın	*	name	agrees	""	""	""
 1963:42:Ilgın:Merkez:Balkı	Balkı	86	1	113.6	BALKI	Konya	Ilgın	*	name	agrees	""	tr.tuik.mahalle:195875	Balkı Mah.
+1963:42:Ilgın:Merkez:Barakmuslu	Barakmuslu	87	2	330.3	BARAKMUSLU	Konya	Ilgın	""	name	agrees	""	tr.tuik.mahalle:195893	Barakmuslu Mah.
 1963:42:Ilgın:Merkez:Bulcuk	Bulcuk	122	2	264.2	BULCUK	Konya	Ilgın	*	name	agrees	""	tr.tuik.mahalle:195897	Bulcuk Mah.
 1963:42:Ilgın:Merkez:Büyükoba	Büyükoba	129	2	382.6	BÜYÜK OBA	Konya	Aksel	*	name	differs	""	tr.tuik.mahalle:195899	Büyükoba Mah.
 1963:42:Ilgın:Merkez:Dere	Dere	207	2	266.0	DERE	Konya	Ilgın	""	name	agrees	""	tr.tuik.mahalle:199755	Dere Mah.
@@ -8607,6 +8716,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:43:Merkez:Aslanapa:Ada	Ada	11	2	418.0	ADA	Kütahya	""	*	name	""	""	""	""
 1963:43:Merkez:Aslanapa:Aslanapa	Aslanapa	54	2	305.5	ASLANAPA	Kütahya	""	*	name	""	""	""	""
 1963:43:Merkez:Aslanapa:Bezirgan	Bezirgan	108	1	145.8	BEZİRGAN	Kütahya	""	*	name	""	""	tr.tuik.koy:21171	Bezirgan Köyü
+1963:43:Merkez:Aslanapa:Emrez	Emrez	239	1	280.0	EMREZ	Kütahya	""	*	name	""	""	tr.tuik.koy:21178	Emrez Köyü
 1963:43:Merkez:Aslanapa:Haydarlar	Haydarlar	335	1	323.4	HAYDARLAR	Kütahya	""	*	name	""	""	tr.tuik.koy:21182	Haydarlar Köyü
 1963:43:Merkez:Aslanapa:Karadiğin	Karadiğin	412	2	203.5	KARA DİĞİN	Kütahya	""	""	name	""	""	tr.tuik.koy:21183	Karadiğin Köyü
 1963:43:Merkez:Aslanapa:Kureyşler	Kureyşler	505	2	188.4	KUREYŞLER	Kütahya	""	*	name	""	""	tr.tuik.koy:21184	Kureyşler Köyü
@@ -8716,6 +8826,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:43:Simav:Merkez:Samat	Samat	646	1	160.9	SAMAT	Kütahya	Simav	*	name	agrees	""	tr.tuik.koy:21450	Samat Köyü
 1963:43:Simav:Merkez:Sarıçam	Sarıçam	650	2	128.1	SARICAM	Kütahya	Gedis	""	name	differs	""	tr.tuik.koy:21451	Sarıçam Köyü
 1963:43:Simav:Merkez:Savcılar	Savcılar	656	1	299.1	SAVÇILAR	Kütahya	Simav	*	name	agrees	""	""	""
+1963:43:Simav:Merkez:Semer	Semer	661	1	366.6	SEMER	Kütahya	Simav	""	name	agrees	""	""	""
 1963:43:Simav:Merkez:Sofular	Sofular	674	1	243.1	SOFULAR	Kütahya	(îedis	*	name	differs	""	tr.tuik.koy:21397	Sofular Köyü
 1963:43:Simav:Merkez:Söğüt	Söğüt	677	2	379.6	SÖĞÜT	Kütahya	Simav	*	name	agrees	""	tr.tuik.koy:21453	Söğüt Köyü
 1963:43:Simav:Merkez:Taşlık	Taşlık	715	1	226.4	TAŞLIK	Kütahya	Simav	""	name	agrees	""	tr.tuik.koy:21455	Taşlık Köyü
@@ -8816,6 +8927,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:44:Arapkir:Mutmur:Kazanç	Kazanç	551	1	427.2	MEMEFİR	Malatya	Arapkir	*	1968 rename	agrees	Kazanç	tr.tuik.mahalle:165695	Kazanç Mah.
 1963:44:Arapkir:Mutmur:Paçalı	Paçalı	614	1	157.1	PAÇALI	Malatya	Arapkir	""	name	agrees	""	tr.tuik.mahalle:165679	Pacalı Mah.
 1963:44:Arapkir:Mutmur:Pirali	Pirali	622	2	173.8	PİRALİ	Malatya	Arapkir	*	name	agrees	""	tr.tuik.mahalle:165703	Pirali Mah.
+1963:44:Arapkir:Mutmur:Sipahiuşağı	Sipahiuşağı	669	1	109.8	SİPAHI UŞAĞI	Malatya	Arapkir	""	name	agrees	""	tr.tuik.mahalle:165707	Sipahiuşağı Mah.
 1963:44:Arapkir:Mutmur:Taşdelen	Taşdelen	573	2	264.9	MUTMUR	Malatya	Arapkir	*	1968 rename	agrees	Taşdelen	tr.tuik.mahalle:165673	Taşdelen Mah.
 1963:44:Argun:Merkez:Asar	Asar	53	2	450.9	ASAR	Malatya	""	""	name	""	""	tr.tuik.mahalle:165719	Asar Mah.
 1963:44:Argun:Merkez:Asmaca	Asmaca	55	1	426.7	ASMACA	Malatya	""	""	name	""	""	tr.tuik.mahalle:165721	Asmaca Mah.
@@ -8867,7 +8979,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:44:Hekimhan:Merkez:Sarıkız	Sarıkız	652	1	348.6	SARI KIZ	Malatya	Hekimhan	*	name	agrees	""	tr.tuik.mahalle:166209	Sarıkız Mah.
 1963:44:Hekimhan:Merkez:Yürektaşı	Yürektaşı	315	2	397.7	HALİCAN	Malatya	Hekimhan	""	1968 rename	agrees	Yürektaşı	tr.tuik.mahalle:165789	Yürektaşı Mah.
 1963:44:Hekimhan:Merkez:Çanakpınar	Çanakpınar	157	1	367.7	ÇANAK PINAR	Malatya	Hekimhan	""	name	agrees	""	tr.tuik.mahalle:166175	Çanakpınar Mah.
-1963:44:Hekimhan:Merkez:İğdir	İğdir	378	1	290.3	İĞ D İR	Malatya	Hekimhan	**	name	agrees	""	tr.tuik.mahalle:166193	İğdir Mah.
+1963:44:Hekimhan:Merkez:İğdir	İğdir	378	1	290.3	IĞDIR	Malatya	Hekimhan	**	name	agrees	""	tr.tuik.mahalle:166193	İğdir Mah.
 1963:44:Merkez:Eskimalatya:Atabey	Atabey	65	2	162.9	ATABEY	Malatya	""	""	name	""	""	""	""
 1963:44:Merkez:Eskimalatya:Boran	Boran	114	2	297.7	BORAN	Malatya	""	*	name	""	""	tr.tuik.mahalle:165379	Boran Mah.
 1963:44:Merkez:Eskimalatya:Eskimalatya	Eskimalatya	248	1	376.9	ESKİ MALATYA	Malatya	""	*	name	""	""	""	""
@@ -8894,6 +9006,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:44:Merkez:Yazıhan:Fethiye	Fethiye	259	1	352.8	FETHİYE	Malatya	""	*	name	""	""	tr.tuik.mahalle:166591	Fethiye Mah.
 1963:44:Merkez:Yazıhan:Hamidiye	Hamidiye	319	1	139.6	HAMİDİYE	Malatya	""	*	name	""	""	""	""
 1963:44:Merkez:Yazıhan:Korucuk	Korucuk	487	2	153.7	KORUCUK	Malatya	""	""	name	""	""	""	""
+1963:44:Merkez:Yazıhan:Sinanlı	Sinanlı	667	1	325.4	SİNANLI	Malatya	""	""	name	""	""	tr.tuik.mahalle:166779	Sinanlı Mah.
 1963:44:Merkez:Yazıhan:Sürür	Sürür	686	2	115.7	SÜRÜR	Malatya	""	*	name	""	""	tr.tuik.mahalle:166781	Sürür Mah.
 1963:44:Merkez:Yazıhan:Çivril	Çivril	177	2	293.4	ÇİVRİL	Malatya	Hekimhan	""	name	differs	""	tr.tuik.mahalle:166693	Çivril Mah.
 1963:44:Merkez:Yazıhan:İriağaç	İriağaç	371	1	240.8	İRİ AĞAÇ	Malatya	Hekimhan	*	name	differs	""	tr.tuik.mahalle:166747	İriağaç Mah.
@@ -8929,6 +9042,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:44:Yeşilyurt:Merkez:Görgü	Görgü	134	2	190.1	CAFANA	Malatya	""	*	1968 rename	""	Görgü	tr.ysk_sandik.mahalle:949:GÖRGÜ KÖYÜ	Görgü Köyü
 1963:44:Yeşilyurt:Merkez:Kuşdoğan	Kuşdoğan	510	2	182.8	KUŞDOĞAN	Malatya	""	""	name	""	""	tr.tuik.mahalle:164907	Kuşdoğan Mah.
 1963:44:Yeşilyurt:Merkez:Kırlangıç	Kırlangıç	468	1	359.8	KIRLANGIÇ	Malatya	""	**	name	""	""	tr.tuik.mahalle:164897	Kırlangıç Mah.
+1963:44:Yeşilyurt:Merkez:Seyituşağı	Seyituşağı	665	1	143.1	SEYİT USAĞI	Malatya	""	*	name	""	""	tr.tuik.mahalle:164917	Seyituşağı Mah.
 1963:44:Yeşilyurt:Merkez:Üçgöze	Üçgöze	632	1	253.8	RAFA	Malatya	""	*	1968 rename	""	Üçgöze	tr.tuik.mahalle:164921	Üçgöze Mah.
 1963:45:Akhisar:Gölmarmara:Hacıbastanlar	Hacıbastanlar	306	1	168.1	HACI BAŞTANLAR	Manisa	""	""	name	""	""	""	""
 1963:45:Akhisar:Gölmarmara:Hacıveliler	Hacıveliler	312	2	310.5	HACI VELİLER	Manisa	Akhisar	""	name	agrees	""	tr.tuik.mahalle:154115	Hacıveliler Mah.
@@ -9017,6 +9131,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:45:Demirci:Borlu:Gerencik	Gerencik	274	1	171.0	GERENCİK	Manisa	Gördes	*	name	differs	""	""	""
 1963:45:Demirci:Borlu:Karacaibrahim	Karacaibrahim	407	1	382.6	KARACA İBRAHİM	Manisa	Gördes	""	name	differs	""	""	""
 1963:45:Demirci:Borlu:Karyağdı	Karyağdı	434	2	289.4	KARYAĞDI	Manisa	Gördes	""	name	differs	""	tr.ysk_sandik.mahalle:140:KARYAĞDI KÖYÜ	Karyağdı Köyü
+1963:45:Demirci:Borlu:Kızılca	Kızılca	472	1	265.3	KIZILCA	Manisa	Demirci	""	name	agrees	""	""	""
 1963:45:Demirci:Borlu:Şelekler	Şelekler	695	2	268.7	ŞELEKLER	Manisa	Gördes	*	name	differs	""	""	""
 1963:45:Demirci:Merkez:Ahatlar	Ahatlar	19	2	389.0	AHATLAR	Manisa	""	""	name	""	""	tr.tuik.mahalle:153849	Ahatlar Mah.
 1963:45:Demirci:Merkez:Ahmetler	Ahmetler	22	1	196.8	AHMETLER	Manisa	Demirci	*	name	agrees	""	tr.tuik.mahalle:153853	Ahmetler Mah.
@@ -9075,6 +9190,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:45:Görüs:Merkez:Kurtlar	Kurtlar	507	1	124.9	KURTLAR	Manisa	Gördes	""	name	differs	""	tr.tuik.mahalle:181534	Kurtlar Mah.
 1963:45:Görüs:Merkez:Kuşluk	Kuşluk	511	1	176.0	KUŞLUK	Manisa	Gördes	*	name	differs	""	tr.ysk_sandik.mahalle:126:KUŞLUK KÖYÜ	Kuşluk Köyü
 1963:45:Görüs:Merkez:Köseler	Köseler	497	2	262.2	KÖSELER	Manisa	Gördes	*	name	differs	""	tr.tuik.mahalle:154341	Köseler Mah.
+1963:45:Görüs:Merkez:Kürekçi	Kürekçi	523	1	286.5	KÜREKCİ	Manisa	Gördes	""	name	differs	""	tr.tuik.mahalle:154353	Kürekçi Mah.
 1963:45:Görüs:Merkez:Kıdırcık	Kıdırcık	462	2	174.1	KIDIRCIK	Manisa	Gördes	""	name	differs	""	tr.tuik.mahalle:181560	Kıdırcık Mah.
 1963:45:Görüs:Merkez:Kıranköy	Kıranköy	466	1	194.0	KIRAN KÖY	Manisa	Eşme	*	name	differs	""	tr.tuik.mahalle:154319	Kıranköy Mah.
 1963:45:Görüs:Merkez:Kıranşıh	Kıranşıh	466	1	299.1	KIRAN ŞIH	Manisa	Gördes	*	name	differs	Kıranşeyh	tr.tuik.mahalle:153327	Kıranşeyh Mah.
@@ -9188,6 +9304,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:45:Salihli:Adala:Ortaköy	Ortaköy	598	2	347.2	ORTA KÖY	Manisa	Salihli	*	name	agrees	""	tr.tuik.mahalle:155215	Ortaköy Mah.
 1963:45:Salihli:Adala:Pazarköy	Pazarköy	618	2	271.8	PAZARKÖY	Manisa	Salihli	""	name	agrees	""	tr.tuik.mahalle:155217	Pazarköy Mah.
 1963:45:Salihli:Adala:Poyraz	Poyraz	627	1	168.1	POYRAZ	Manisa	Salihli	*	name	agrees	""	tr.tuik.mahalle:155219	Poyraz Mah.
+1963:45:Salihli:Adala:Yeşilova	Yeşilova	785	2	450.9	YEŞİL OVA	Manisa	Salihli	*	name	agrees	""	tr.tuik.mahalle:155235	Yeşilova Mah.
 1963:45:Salihli:Adala:Çökelek	Çökelek	182	2	435.9	ÇÖKELEK	Manisa	Salihli	*	name	agrees	""	tr.tuik.mahalle:155169	Çökelek Mah.
 1963:45:Salihli:Adala:İğdecik	İğdecik	362	1	303.8	İĞDECİK	Manisa	Salihli	*	name	agrees	""	tr.tuik.mahalle:155189	İğdecik Mah.
 1963:45:Salihli:Merkez:Bahçecik	Bahçecik	80	1	323.7	BAHÇEÇİK	Manisa	Salihli	*	name	agrees	""	tr.tuik.mahalle:155097	Bahçecik Mah.
@@ -9352,6 +9469,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:46:Elbistan:Merkez:Demircilik	Demircilik	204	1	351.5	DEMİRCİLİK	Maraş	Elbistan	*	name	agrees	""	tr.tuik.mahalle:160367	Demircilik Mah.
 1963:46:Elbistan:Merkez:Eldelek	Eldelek	234	1	401.4	ELDELEK	Maraş	Elbistan	*	name	agrees	""	tr.tuik.mahalle:160405	Eldelek Mah.
 1963:46:Elbistan:Merkez:Fakıoğlu	Fakıoğlu	256	2	159.7	FAKI OĞLU	Maraş	Elbistan	""	name	agrees	""	tr.tuik.mahalle:160411	Fakıoğlu Mah.
+1963:46:Elbistan:Merkez:Ha-sankendi	Ha-sankendi	329	2	453.7	HASAN KENDİ	Maraş	Elbistan	*	name	agrees	""	tr.tuik.mahalle:160425	Hasankendi Mah.
 1963:46:Elbistan:Merkez:Izgın	Izgın	379	2	447.6	IZĞIN	Maraş	Elbistan	*	name	agrees	""	tr.tuik.mahalle:160371	Izgın Mah.
 1963:46:Elbistan:Merkez:Karahüyük	Karahüyük	416	2	163.9	KARA HÜYÜK	Maraş	Elbistan	*	name	agrees	""	tr.tuik.mahalle:160439	Karahüyük Mah.
 1963:46:Elbistan:Merkez:Köşk	Köşk	499	2	122.0	KÖŞK	Maraş	Elbistan	*	name	agrees	""	tr.tuik.mahalle:160451	Köşk Mah.
@@ -9455,6 +9573,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:47:Kızıltepe:Merkez:Akziyaret	Akziyaret	32	2	456.5	AKZİYARET	Mardin	Kızıltepe	""	name	agrees	""	tr.tuik.mahalle:157653	Akziyaret Mah.
 1963:47:Kızıltepe:Merkez:Alipaşa	Alipaşa	39	2	192.1	ALİPAŞA	Mardin	""	*	name	""	""	tr.tuik.mahalle:157657	Alipaşa Mah.
 1963:47:Kızıltepe:Merkez:Belli	Belli	101	1	351.3	BELLİ	Mardin	Kızıltepe	""	name	agrees	""	tr.tuik.mahalle:157685	Belli Mah.
+1963:47:Kızıltepe:Merkez:Demirci	Demirci	313	2	440.8	HADİDİ	Mardin	Kızıltepe	""	1968 rename	agrees	Demirci	tr.tuik.mahalle:157715	Demirci Mah.
 1963:47:Kızıltepe:Merkez:Dura	Dura	722	1	224.2	TELAÇIK	Mardin	Kızıltepe	""	1968 rename	agrees	Dura	""	""
 1963:47:Kızıltepe:Merkez:Dörtyol	Dörtyol	722	2	414.9	TELTİN	Mardin	Derik	""	1968 rename	differs	Dörtyol	tr.tuik.mahalle:157721	Dörtyol Mah.
 1963:47:Kızıltepe:Merkez:Elbeyli	Elbeyli	722	2	393.6	TELŞİRİZ	Mardin	Kızıltepe	*	1968 rename	agrees	Elbeyli	tr.tuik.mahalle:157727	Elbeyli Mah.
@@ -9489,6 +9608,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:47:Merkez:Merkez:Kütüklü	Kütüklü	523	2	369.7	KÜRRÜMAN	Mardin	""	*	1968 rename	""	Kütüklü	""	""
 1963:47:Merkez:Merkez:Oğuz	Oğuz	194	2	257.9	DARA	Mardin	""	*	1968 rename	""	""	""	""
 1963:47:Merkez:Merkez:Yalım	Yalım	544	1	274.1	MANSURİ	Mardin	Cizre	""	1968 rename	differs	Yalım	tr.tuik.mahalle:157285	Yalım Mah.
+1963:47:Merkez:Merkez:Yaylabaşı	Yaylabaşı	693	2	172.9	ŞATIH	Mardin	Savur	*	1968 rename	differs	""	tr.tuik.mahalle:157349	Yaylabaşı Mah.
 1963:47:Merkez:Merkez:Yeşilli	Yeşilli	635	2	122.0	RİŞMİL	Mardin	""	*	1968 rename	""	Yeşilli	""	""
 1963:47:Midyat:Kerbusan:Akçaköy	Akçaköy	375	2	228.0	İZAR	Mardin	Midyat	""	1968 rename	agrees	Akçaköy	""	""
 1963:47:Midyat:Kerbusan:Alagöz	Alagöz	82	1	334.4	BAKİSYAN	Mardin	Midyat	*	1968 rename	agrees	Alagöz	tr.ysk_sandik.mahalle:162:ALAGÖZ KÖYÜ	Alagöz Köyü
@@ -9617,6 +9737,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:48:Fethiye:Merkez:Gökben	Gökben	282	1	418.5	GÖK BEN	Muğla	Fethiye	*	name	agrees	""	tr.tuik.mahalle:176333	Gökben Mah.
 1963:48:Fethiye:Merkez:Gökçeovacık	Gökçeovacık	283	2	151.5	GÖKÇE OVACIK	Muğla	Fethiye	*	name	agrees	""	tr.tuik.mahalle:176335	Gökçeovacık Mah.
 1963:48:Fethiye:Merkez:Kaya	Kaya	440	2	209.8	KAYA	Muğla	Fethiye	**	name	agrees	""	""	""
+1963:48:Fethiye:Merkez:Keçiler	Keçiler	446	2	301.6	KEÇİLER	Muğla	Fethiye	""	name	agrees	""	tr.ysk_sandik.mahalle:805:KEÇİLER KÖYÜ	Keçiler Köyü
 1963:48:Fethiye:Merkez:Patlangıç	Patlangıç	617	2	395.1	PATLANGIÇ	Muğla	Fethiye	*	name	agrees	""	tr.tuik.mahalle:60130	Patlangıç Mah.
 1963:48:Fethiye:Merkez:Yanıklar	Yanıklar	771	2	358.1	YANIKLAR	Muğla	Fethiye	*	name	agrees	""	tr.tuik.mahalle:176353	Yanıklar Mah.
 1963:48:Fethiye:Merkez:Çenger	Çenger	169	1	171.7	ÇENGER	Muğla	Fethiye	*	name	agrees	""	tr.tuik.mahalle:176327	Çenger Mah.
@@ -9648,6 +9769,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:48:Köyceğiz:Ortaca:Karaçalı	Karaçalı	411	1	145.2	KARAÇALI	Muğla	Köyceğiz	*	name	agrees	""	tr.tuik.mahalle:60113	Karaçalı Mah.
 1963:48:Köyceğiz:Ortaca:Kargınkürü	Kargınkürü	431	2	180.7	KARGIN KÜRÜ	Muğla	Köyceğiz	*	name	agrees	""	tr.tuik.mahalle:176279	Kargınkürü Mah.
 1963:48:Köyceğiz:Ortaca:Kızılkaya	Kızılkaya	476	1	276.3	KIZILKAYA	Muğla	Köyceğiz	*	name	agrees	""	tr.tuik.mahalle:176285	Kızılkaya Mah.
+1963:48:Köyceğiz:Ortaca:Kızılyurt	Kızılyurt	479	1	110.5	KIZIL YURT	Muğla	Köyceğiz	*	name	agrees	""	""	""
 1963:48:Köyceğiz:Ortaca:Mergenli	Mergenli	554	1	116.2	MERGENLİ	Muğla	Köyceğiz	""	name	agrees	""	tr.tuik.mahalle:176723	Mergenli Mah.
 1963:48:Marmaris:Merkez:Ada	Ada	11	2	387.0	ADA	Muğla	Mermeris	""	name	differs	""	""	""
 1963:48:Marmaris:Merkez:Armutalanı	Armutalanı	51	1	312.6	ARMUTALANI	Muğla	Mermeris	*	name	differs	""	""	""
@@ -9705,6 +9827,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:48:Milas:Selimiye:Haciahmetler	Haciahmetler	304	2	449.6	HACI AHMETLER	Muğla	Milas	*	name	agrees	""	tr.tuik.mahalle:176675	Hacıahmetler Mah.
 1963:48:Milas:Selimiye:Hisarcık	Hisarcık	344	1	338.9	HİSARCIK	Muğla	Milas	*	name	agrees	""	tr.tuik.mahalle:176677	Hisarcık Mah.
 1963:48:Milas:Selimiye:Kandak	Kandak	397	1	353.5	KANDAK	Muğla	Milas	*	name	agrees	""	tr.tuik.mahalle:176679	Kandak Mah.
+1963:48:Milas:Selimiye:Narhisar	Narhisar	581	1	161.2	NARHİSAR	Muğla	Milas	""	name	agrees	""	tr.tuik.mahalle:176695	Narhisar Mah.
 1963:48:Milas:Selimiye:Selimiye	Selimiye	660	1	207.0	SELİMİYE	Muğla	Milas	**	name	agrees	""	tr.tuik.mahalle:176471	Selimiye Mah.
 1963:48:Milas:Selimiye:Viran	Viran	762	1	177.6	VİRAN	Muğla	Milas	""	name	agrees	""	""	""
 1963:48:Milas:Selimiye:Çandır	Çandır	157	2	358.3	ÇANDIR	Muğla	Milas	*	name	agrees	""	tr.tuik.mahalle:176655	Çandır Mah.
@@ -9860,10 +9983,12 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:50:Gülgehir:Merkez:Karacaşar	Karacaşar	408	2	355.8	KARACAŞAR	Niğde	Arapsun	*	name	differs	""	tr.tuik.mahalle:140909	Karacaşar Mah.
 1963:50:Gülgehir:Merkez:Terlemez	Terlemez	726	1	370.6	TERLEMEZ	Niğde	Arapsun	*	name	differs	""	tr.tuik.koy:25093	Terlemez Köyü
 1963:50:Gülgehir:Salanda:Sığırlı	Sığırlı	671	2	190.4	SIĞIRLI	Niğde	Arapsun	*	name	differs	""	""	""
+1963:50:Gülgehir:Salanda:Yeşilli	Yeşilli	785	2	382.5	YEŞİLLİ	Kırşehir	""	*	name	""	""	tr.tuik.koy:25104	Yeşilli Köyü
 1963:50:Gülgehir:Salanda:Yüksekli	Yüksekli	800	1	169.5	YÜKSEKLİ	Niğde	Arapsun	*	name	differs	""	tr.tuik.koy:25106	Yüksekli Köyü
 1963:50:Jacıbektaş Tovlamı:Merkez:Avuç	Avuç	68	2	275.7	AVUÇ	Kırşehir	Mucur	*	name	differs	""	tr.tuik.koy:25112	Avuç Köyü
 1963:50:Jacıbektaş Tovlamı:Merkez:Belbarak	Belbarak	99	2	217.1	BELBARAK	Niğde	Arapsun	*	name	differs	""	tr.tuik.koy:25114	Belbarak Köyü
 1963:50:Jacıbektaş Tovlamı:Merkez:Büyükkışla	Büyükkışla	129	1	391.8	BÜYÜK KIŞLA	Niğde	Arapsun	*	name	differs	""	tr.tuik.koy:25116	Büyükkışla Köyü
+1963:50:Jacıbektaş Tovlamı:Merkez:Engel	Engel	239	1	440.8	ENGEL	Kırşehir	Mucur	*	name	differs	""	""	""
 1963:50:Jacıbektaş Tovlamı:Merkez:Güzyurdu	Güzyurdu	300	2	377.2	GÜZ YURDU	Kırşehir	Mucur	""	name	differs	""	""	""
 1963:50:Jacıbektaş Tovlamı:Merkez:Hasanlar	Hasanlar	330	1	170.8	HASANLAR	Kırşehir	Mucur	*	name	differs	""	tr.tuik.koy:25119	Hasanlar Köyü
 1963:50:Jacıbektaş Tovlamı:Merkez:Hıdırlar	Hıdırlar	345	1	389.5	HIDIRLAR	Niğde	Arapsun	""	name	differs	""	tr.tuik.koy:25120	Hıdırlar Köyü
@@ -9919,6 +10044,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:50:Ürgüplü tleesi:Merkez:İltaş	İltaş	365	1	297.3	İLTAŞ	Kayseri	Ürgüp	*	name	agrees	""	tr.tuik.koy:25177	İltaş Köyü
 1963:51:Aksaray:Acıpmar:Aşağıkabakulak	Aşağıkabakulak	60	1	457.0	AŞAĞIKABAKULAK	Niğde	Aksaray	*	name	agrees	""	""	""
 1963:51:Aksaray:Acıpmar:Baymış	Baymış	95	1	126.2	BAYMIŞ	Niğde	Aksaray	*	name	agrees	""	tr.tuik.koy:34778	Baymış Köyü
+1963:51:Aksaray:Acıpmar:Bostanlık	Bostanlık	115	2	309.7	BOSTANLIK	Niğde	Aksaray	""	name	agrees	""	tr.tuik.koy:34779	Bostanlık Köyü
 1963:51:Aksaray:Acıpmar:Boyalı	Boyalı	116	2	276.8	BOYALI	Niğde	Aksaray	*	name	agrees	""	tr.tuik.koy:34780	Boyalı Köyü
 1963:51:Aksaray:Acıpmar:Cerit	Cerit	139	2	189.1	CERİT	Niğde	Aksaray	*	name	agrees	""	tr.tuik.koy:49369	Cerit Köyü
 1963:51:Aksaray:Acıpmar:Fatmauşağı	Fatmauşağı	257	2	227.3	FATMA UŞAĞI	Niğde	Aksaray	""	name	agrees	""	tr.tuik.koy:34785	Fatmauşağı Köyü
@@ -10078,6 +10204,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:52:Aybastı:Merkez:Zaferimilli	Zaferimilli	804	1	214.2	ZAFERİMİLLİ	Ordu	""	*	name	""	""	tr.tuik.mahalle:151009	Zaferimilli Mah.
 1963:52:Fatsa:Bolaman:Demirci	Demirci	203	1	337.3	DEMİRCİ	Ordu	""	*	name	""	""	tr.tuik.mahalle:151167	Demirci Mah.
 1963:52:Fatsa:Bolaman:Hacıköy	Hacıköy	308	2	354.7	HACI KÖY	Ordu	""	*	name	""	""	tr.tuik.mahalle:183188	Hacıköy Mah.
+1963:52:Fatsa:Bolaman:Kabakdağı	Kabakdağı	382	2	302.9	KABAK DAĞI	Ordu	""	""	name	""	""	tr.tuik.mahalle:151173	Kabakdağı Mah.
 1963:52:Fatsa:Bolaman:Kayaköy	Kayaköy	442	1	296.2	KAYA KÖY	Ordu	""	*	name	""	""	""	""
 1963:52:Fatsa:Bolaman:Konakbaşı	Konakbaşı	485	1	119.7	KONAK BAŞI	Ordu	""	""	name	""	""	tr.tuik.mahalle:60959	Konakbaşı Mah.
 1963:52:Fatsa:Bolaman:Korucuk	Korucuk	440	1	357.6	KAVRAZ	Ordu	""	*	1968 rename	""	Korucuk	""	""
@@ -10152,8 +10279,10 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:52:Merkez:Merkez:Gökömer	Gökömer	284	2	361.9	GÖK ÖMER	Ordu	""	*	name	""	""	tr.tuik.mahalle:150811	Gökömer Mah.
 1963:52:Merkez:Merkez:Karapınar	Karapınar	425	2	383.1	KARA PINAR	Ordu	""	*	name	""	""	tr.tuik.mahalle:60824	Karapınar Mah.
 1963:52:Merkez:Merkez:Kısacık	Kısacık	469	1	215.6	KISACIK	Ordu	""	*	name	""	""	tr.tuik.mahalle:150823	Kısacık Mah.
+1963:52:Merkez:Merkez:Kızılhisar	Kızılhisar	475	2	209.1	KIZILHİSAR	Ordu	""	*	name	""	""	tr.tuik.mahalle:150825	Kızılhisar Mah.
 1963:52:Merkez:Merkez:Mübarek	Mübarek	567	2	274.5	MÜBAREK	Ordu	""	*	name	""	""	tr.tuik.mahalle:150829	Mubarek Mah.
 1963:52:Merkez:Merkez:Osmaniye	Osmaniye	600	2	398.2	OSMANİYE	Ordu	""	*	name	""	""	tr.tuik.mahalle:150837	Osmaniye Mah.
+1963:52:Merkez:Merkez:Oğmaca	Oğmaca	593	1	165.4	OĞMACA	Ordu	""	""	name	""	""	tr.tuik.mahalle:150831	Oğmaca Mah.
 1963:52:Merkez:Merkez:Taşlıçay	Taşlıçay	232	2	147.6	EBÜLHAYIR TEPE	Ordu	""	""	1968 rename	""	Taşlıçay	tr.tuik.mahalle:151303	Taşlıçay Mah.
 1963:52:Merkez:Merkez:Topluca	Topluca	125	1	113.0	BÜBEN	Ordu	""	*	1968 rename	""	Topluca	tr.tuik.mahalle:150853	Topluca Mah.
 1963:52:Merkez:Merkez:Uzunmusa	Uzunmusa	749	1	224.0	UZUNMUSA	Ordu	""	*	name	""	""	tr.tuik.mahalle:150855	Uzunmusa Mah.
@@ -10403,6 +10532,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:54:Geyve:Merkez:Hacılar	Hacılar	309	1	327.4	HACILAR	Kocaeli	Geyve	""	name	agrees	""	tr.tuik.mahalle:184999	Hacılar Mah.
 1963:54:Geyve:Merkez:Halidiye	Halidiye	316	1	166.5	HALİDİYE	Kocaeli	Geyve	*	name	agrees	""	tr.tuik.mahalle:185003	Halidiye Mah.
 1963:54:Geyve:Merkez:Hisarlık	Hisarlık	344	2	132.3	HİSARLIK	Kocaeli	Geyve	*	name	agrees	""	tr.tuik.mahalle:185007	Hisarlık Mah.
+1963:54:Geyve:Merkez:Hırka	Hırka	346	2	340.5	HIRKA	Kocaeli	Geyve	""	name	agrees	""	tr.tuik.mahalle:185005	Hırka Mah.
 1963:54:Geyve:Merkez:Ilıca	Ilıca	378	2	160.9	ILİCA	Kocaeli	Geyve	*	name	agrees	""	tr.tuik.mahalle:185009	Ilıca Mah.
 1963:54:Geyve:Merkez:Kozan	Kozan	490	1	310.1	KOZAN	Kocaeli	Geyve	*	name	agrees	""	tr.tuik.mahalle:185019	Kozan Mah.
 1963:54:Geyve:Merkez:Köprübaşı	Köprübaşı	495	1	247.3	KÖPRÜ BAŞI	Kocaeli	Geyve	*	name	agrees	""	tr.tuik.mahalle:185021	Köprübaşı Mah.
@@ -10443,6 +10573,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:54:Hendek:Karadere:Bakacak	Bakacak	81	2	454.5	BAKACAK	Kocaeli	Geyve	""	name	differs	""	tr.tuik.mahalle:185205	Bakacak Mah.
 1963:54:Hendek:Karadere:Karadere	Karadere	412	1	370.4	KARADERE	Kocaeli	Hendek	*	name	agrees	""	tr.tuik.mahalle:185201	Karadere Mah.
 1963:54:Hendek:Karadere:Kızanlık	Kızanlık	470	2	261.3	KIZANLIK	Kocaeli	Hendek	*	name	agrees	""	tr.tuik.mahalle:185215	Kızanlık Mah.
+1963:54:Hendek:Merkez:Akarca	Akarca	23	1	108.4	AKARCA	Kocaeli	Hendek	*	name	agrees	""	tr.tuik.mahalle:185083	Akarca Mah.
 1963:54:Hendek:Merkez:Aktefek	Aktefek	31	2	287.4	AKTEFEK	Kocaeli	Hendek	*	name	agrees	""	tr.tuik.mahalle:185087	Aktefek Mah.
 1963:54:Hendek:Merkez:Camili	Camili	135	2	156.2	CAMİLİ	Kocaeli	Hendek	*	name	agrees	""	""	""
 1963:54:Hendek:Merkez:Güldibi	Güldibi	293	1	256.8	GÜL DİBİ	Kocaeli	Hendek	*	name	agrees	""	tr.tuik.mahalle:185113	Güldibi Mah.
@@ -10559,7 +10690,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:55:Bafra:Kolay:Bengü	Bengü	101	2	335.7	BENGÜ	Samsun	Bafra	*	name	agrees	""	tr.tuik.mahalle:187089	Bengü Mah.
 1963:55:Bafra:Kolay:Kolay	Kolay	483	2	265.8	KOLAY	Samsun	HaIra	*	name	differs	""	tr.tuik.mahalle:186545	Kolay Mah.
 1963:55:Bafra:Kolay:Terzili	Terzili	727	1	154.9	TERZİLİ	Samsun	Bafra	*	name	agrees	""	tr.tuik.mahalle:187111	Terzili Mah.
-1963:55:Bafra:Kolay:İğdır	İğdır	378	1	310.1	İĞ D İR	Samsun	Bafra	**	name	agrees	""	tr.tuik.mahalle:187099	İğdir Mah.
+1963:55:Bafra:Kolay:İğdır	İğdır	378	1	310.1	IĞDIR	Samsun	Bafra	**	name	agrees	""	tr.tuik.mahalle:187099	İğdir Mah.
 1963:55:Bafra:Merkez:Balıklar	Balıklar	85	1	335.5	BALIKLAR	Samsun	Havza	""	name	differs	""	tr.tuik.mahalle:186605	Balıklar Mah.
 1963:55:Bafra:Merkez:Dedeli	Dedeli	198	2	131.4	DEDELİ	Samsun	HaIra	*	name	differs	""	tr.tuik.mahalle:186631	Dedeli Mah.
 1963:55:Bafra:Merkez:Derbent	Derbent	206	2	281.7	DERBENT	Samsun	Bafra	*	name	agrees	""	tr.tuik.mahalle:186635	Derbent Mah.
@@ -10636,6 +10767,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:55:Havza:Merkez:Çeltek	Çeltek	167	2	197.5	ÇELTEK	Samsun	Havza	*	name	agrees	""	tr.tuik.mahalle:187757	Çeltek Mah.
 1963:55:Havza:Merkez:Şeyhkoyun	Şeyhkoyun	699	1	315.1	ŞEYH KOYUN	Samsun	Havza	*	name	agrees	""	tr.tuik.mahalle:187877	Şeyhkoyun Mah.
 1963:55:Havza:Çakıralan:Boyalı	Boyalı	116	2	254.8	BOYALI	Samsun	Bafra	*	name	differs	""	tr.tuik.mahalle:187901	Boyalı Mah.
+1963:55:Havza:Çakıralan:Karahalil	Karahalil	414	2	229.5	KARA HALİL	Samsun	Havza	**	name	agrees	""	tr.tuik.mahalle:187919	Karahalil Mah.
 1963:55:Havza:Çakıralan:Kirenlik	Kirenlik	466	2	295.7	KIRENLİK	Samsun	Havza	""	name	agrees	""	tr.tuik.mahalle:187921	Kirenlik Mah.
 1963:55:Havza:Çakıralan:Sofular	Sofular	674	1	179.2	SOFULAR	Samsun	Havza	""	name	agrees	""	tr.tuik.mahalle:187923	Sofular Mah.
 1963:55:Havza:Çakıralan:Çakıralan	Çakıralan	150	1	343.4	ÇAKIR ALAN	Samsun	Havza	*	name	agrees	""	tr.tuik.mahalle:187897	Çakıralan Mah.
@@ -10724,6 +10856,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:55:Terme:Merkez:Gündoğdu	Gündoğdu	271	1	415.8	GELEYDİ	Samsun	Terme	*	1968 rename	agrees	""	tr.tuik.mahalle:189161	Gündoğdu Mah.
 1963:55:Terme:Merkez:Hüseyinmescidi	Hüseyinmescidi	356	1	150.1	HÜSEYİN MESCİDİ	Samsun	Terme	*	name	agrees	""	""	""
 1963:55:Terme:Merkez:Karamahmut	Karamahmut	422	1	206.1	KARA MAHMUT	Samsun	Terme	""	name	agrees	""	tr.tuik.mahalle:189179	Karamahmut Mah.
+1963:55:Terme:Merkez:Karaman	Karaman	422	1	343.4	KARAMAN	Samsun	Terme	""	name	agrees	""	tr.tuik.mahalle:188613	Karaman Mah.
 1963:55:Terme:Merkez:Karayonca	Karayonca	430	1	141.1	KARA YONCA	Samsun	Terme	*	name	agrees	""	tr.tuik.mahalle:188619	Karayonca Mah.
 1963:55:Terme:Merkez:Karaçalı	Karaçalı	408	1	252.3	KARAÇALI	Samsun	Terme	*	name	agrees	""	tr.tuik.mahalle:189175	Karacalı Mah.
 1963:55:Terme:Merkez:Karkucak	Karkucak	432	2	311.0	KARKÜCAK	Samsun	Terme	*	name	agrees	""	tr.tuik.mahalle:189183	Karkucak Mah.
@@ -10808,6 +10941,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:55:dik:Merkez:Ayvalisokağı	Ayvalisokağı	72	1	286.2	AYVALISOKAĞI	Samsun	Ladik	*	name	differs	""	tr.tuik.mahalle:188121	Ayvalısokağı Mah.
 1963:55:dik:Merkez:Başlamış	Başlamış	91	1	332.7	BAŞLAMIŞ	Samsun	Ladik	*	name	differs	""	tr.tuik.mahalle:188123	Başlamış Mah.
 1963:55:dik:Merkez:Cüce	Cüce	145	2	159.1	CÜCE	Samsun	Ladik	*	name	differs	""	tr.tuik.mahalle:188131	Cüce Mah.
+1963:55:dik:Merkez:Hasırcı	Hasırcı	331	1	348.4	HASIRCI	Samsun	Ladik	""	name	differs	""	tr.tuik.mahalle:188153	Hasırcı Mah.
 1963:55:dik:Merkez:Küpecik	Küpecik	522	1	343.6	KÜPECİK	Samsun	Ladik	*	name	differs	""	tr.tuik.mahalle:188187	Küpecik Mah.
 1963:55:dik:Merkez:Küçükkızoğlu	Küçükkızoğlu	518	1	190.9	KÜÇÜK KIZOĞLU	Samsun	Ladik	*	name	differs	""	tr.tuik.mahalle:188181	Küçükkızoğlu Mah.
 1963:55:dik:Merkez:Soğanlı	Soğanlı	674	2	340.2	SOĞANLI	Samsun	Ladik	*	name	differs	""	tr.tuik.mahalle:188227	Soğanlı Mah.
@@ -10932,6 +11066,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:56:Eruh:Merkez:Çırpılı	Çırpılı	562	1	124.9	MİSİFRE	Siirt	Eruh	""	1968 rename	agrees	Çırpılı	tr.tuik.koy:27824	Çırpılı Köyü
 1963:56:Eruh:Merkez:Üzümlük	Üzümlük	616	1	218.3	PARİS	Siirt	Eruh	*	1968 rename	agrees	""	tr.tuik.koy:27838	Üzümlük Köyü
 1963:56:Kozluk:Bekiran:Danagöze	Danagöze	82	1	290.5	BAKİRNAZ	Muş	Sasun	""	1968 rename	differs	Danagöze	""	""
+1963:56:Kozluk:Bekiran:Duygulu	Duygulu	45	2	146.9	APİKAN	Siirt	Beşiri	*	1968 rename	differs	Duygulu	tr.tuik.koy:35661	Duygulu Köyü
 1963:56:Kozluk:Bekiran:Kamışlı	Kamışlı	396	2	139.5	KAMIŞLI	Muş	""	""	name	""	""	tr.tuik.koy:35665	Kamışlı Köyü
 1963:56:Kozluk:Bekiran:Kavakdibi	Kavakdibi	551	1	202.4	MELKİŞAN	Siirt	Beşiri	""	1968 rename	differs	Kavakdibi	tr.tuik.koy:35668	Kavakdibi Köyü
 1963:56:Kozluk:Bekiran:Ulaşh	Ulaşh	695	2	321.6	ŞELMO	Siirt	Beşiri	*	1968 rename	differs	Ulaşh	""	""
@@ -10962,6 +11097,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:56:Pervari:Harhur:Okçular	Okçular	730	2	329.1	TİRİ	Siirt	Pervari	*	1968 rename	agrees	Okçular	tr.ysk_sandik.mahalle:513:OKÇULAR KÖYÜ	Okçular Köyü
 1963:56:Pervari:Merkez:Beğendik	Beğendik	108	2	178.3	BİDAR	Siirt	Pervari	*	1968 rename	agrees	Beğendik	""	""
 1963:56:Pervari:Merkez:Dolusalkım	Dolusalkım	549	2	302.5	MEKTİS	Siirt	Pervari	*	1968 rename	agrees	Dolusalkım	tr.tuik.koy:27940	Dolusalkım Köyü
+1963:56:Pervari:Merkez:Gökbudak	Gökbudak	647	1	322.5	SANUH	Siirt	Pervari	*	1968 rename	agrees	Gökbudak	tr.tuik.koy:27942	Gökbudak Köyü
 1963:56:Pervari:Merkez:Güleçler	Güleçler	354	1	154.8	HUNÜK	Siirt	Pervari	""	1968 rename	agrees	Güleçler	tr.tuik.koy:27945	Güleçler Köyü
 1963:56:Pervari:Merkez:Tuzcular	Tuzcular	662	2	230.0	SERHAL	Siirt	Pervari	*	1968 rename	agrees	Tuzcular	tr.tuik.koy:27954	Tuzcular Köyü
 1963:56:Pervari:Merkez:Yeniaydın	Yeniaydın	635	2	442.8	RUBAR	Siirt	Pervari	*	1968 rename	agrees	Yeniaydın	tr.tuik.koy:27957	Yeniaydın Köyü
@@ -11056,7 +11192,9 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:57:Boyabat:Merkez:Gökçukur	Gökçukur	283	2	408.7	GÖK ÇUKUR	Sinop	Boyabat	*	name	agrees	""	tr.tuik.koy:28194	Gökçukur Köyü
 1963:57:Boyabat:Merkez:Göve	Göve	290	1	210.4	GÖVE	Sinop	Boyabat	*	name	agrees	""	tr.tuik.koy:28195	Göve Köyü
 1963:57:Boyabat:Merkez:Haciahmetli	Haciahmetli	305	1	221.0	HACI AHMETLİ	Sinop	Boyabat	""	name	agrees	""	tr.tuik.koy:28197	Hacıahmetli Köyü
+1963:57:Boyabat:Merkez:Hamzalı	Hamzalı	321	1	306.0	HAMZALI	Sinop	Boyabat	""	name	agrees	""	tr.tuik.koy:28198	Hamzalı Köyü
 1963:57:Boyabat:Merkez:Ilıca	Ilıca	364	2	409.0	İLİCA	Sinop	Boyabat	*	name	agrees	""	""	""
+1963:57:Boyabat:Merkez:Karamusalı	Karamusalı	423	2	217.4	KARA MUSALI	Sinop	Hoyahat	""	name	differs	""	tr.tuik.koy:28204	Karamusalı Köyü
 1963:57:Boyabat:Merkez:Kavak	Kavak	437	2	111.6	KAVAK	Sinop	Boyabat	*	name	agrees	""	tr.tuik.koy:28207	Kavak Köyü
 1963:57:Boyabat:Merkez:Kayaboğazı	Kayaboğazı	441	1	259.3	KAYA BOĞAZI	Sinop	Boyabat	*	name	agrees	""	tr.tuik.koy:28208	Kayaboğazı Köyü
 1963:57:Boyabat:Merkez:Keşler	Keşler	455	2	197.9	KEŞLER	Sinop	Boyabat	*	name	agrees	""	""	""
@@ -11174,6 +11312,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:57:Merkez:Kabah:Tangal	Tangal	711	2	321.4	TANGAL	Sinop	""	*	name	""	""	""	""
 1963:57:Merkez:Kabah:Şamlıoğlu	Şamlıoğlu	692	2	210.2	ŞAMLİ OĞLU	Sinop	""	*	name	""	""	tr.tuik.koy:28068	Şamlıoğlu Köyü
 1963:57:Merkez:Merkez:Dizdaroğlu	Dizdaroğlu	219	1	204.1	DİZDAR OĞLU	Sinop	""	*	name	""	""	tr.tuik.koy:28038	Dizdaroğlu Köyü
+1963:57:Merkez:Merkez:Kızılabalı	Kızılabalı	471	1	320.7	KIZIL ABALI	Sinop	""	*	name	""	""	""	""
 1963:57:Merkez:Merkez:Taşmanlı	Taşmanlı	715	1	444.8	TAŞMANLI	Sinop	""	*	name	""	""	tr.tuik.koy:28047	Taşmanlı Köyü
 1963:57:Merkez:Merkez:Uzungürgen	Uzungürgen	748	2	264.7	UZUNGÜRGEN	Sinop	""	*	name	""	""	tr.tuik.koy:28048	Uzungürgen Köyü
 1963:57:Merkez:Merkez:Çiftlik	Çiftlik	173	1	384.4	ÇİFTLİK	Sinop	""	*	name	""	""	tr.tuik.koy:28034	Çiftlik Köyü
@@ -11202,6 +11341,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:58:Divriği:Danişmen:Karşıkonak	Karşıkonak	390	1	131.4	KÂHTİK	Sivas	Divrik	*	1968 rename	differs	Karşıkonak	tr.tuik.koy:28764	Karşıkonak Köyü
 1963:58:Divriği:Danişmen:Selimoğlu	Selimoğlu	660	2	132.1	SELİM OĞLU	Sivas	Divrik	*	name	differs	""	tr.tuik.koy:28766	Selimoğlu Köyü
 1963:58:Divriği:Danişmen:Yeşilyol	Yeşilyol	195	1	223.1	DAREGAN	Sivas	Divrik	""	1968 rename	differs	""	tr.tuik.koy:28767	Yeşilyol Köyü
+1963:58:Divriği:Danişmen:Çakmakdüzü	Çakmakdüzü	615	1	212.0	PALHA	Sivas	Divrik	*	1968 rename	differs	""	tr.tuik.koy:28761	Çakmakdüzü Köyü
 1963:58:Divriği:Hamo:Yozyatağı	Yozyatağı	788	2	348.8	YOZYATAĞI	Sivas	Divrik	*	name	differs	""	tr.tuik.koy:29161	Yozyatağı Köyü
 1963:58:Divriği:Hamo:Yürektaşı	Yürektaşı	553	2	423.1	MERENDİ	Sivas	Halik	""	1968 rename	differs	Yürektaşı	tr.tuik.koy:29160	Yürektaşı Köyü
 1963:58:Divriği:Hamo:Çitme	Çitme	177	2	195.6	ÇİTME	Sivas	Divrik	""	name	differs	""	tr.tuik.koy:28772	Çitme Köyü
@@ -11255,6 +11395,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:58:Gürün:Gürekviran:Çiçekyurt	Çiçekyurt	178	1	167.4	ÇİÇEK YURT	Sivas	Gürün	*	name	agrees	""	tr.tuik.koy:28955	Çiçekyurt Köyü
 1963:58:Gürün:Gürekviran:İncesu	İncesu	368	1	398.9	İNCE SU	Sivas	Gürün	*	name	agrees	""	tr.tuik.koy:28918	İncesu Köyü
 1963:58:Gürün:Karadoruk:Bağlıçay	Bağlıçay	36	1	364.0	ALACAMEZAR	Sivas	Gürün	*	1968 rename	agrees	Bağlıçay	tr.tuik.koy:28914	Bağlıçay Köyü
+1963:58:Gürün:Karadoruk:Böğrüdelik	Böğrüdelik	119	2	442.8	BÖĞRÜ DELİK	Sivas	Gürün	""	name	agrees	""	tr.tuik.koy:28936	Böğrüdelik Köyü
 1963:58:Gürün:Karadoruk:Dürmepınar	Dürmepınar	228	1	404.1	DÜRME PINAR	Sivas	Gürün	""	name	agrees	""	tr.tuik.koy:28939	Dürmepınar Köyü
 1963:58:Gürün:Karadoruk:Eskihamal	Eskihamal	247	2	306.5	ESKİ HAMAL	Sivas	Gürün	*	name	agrees	""	tr.tuik.koy:28917	Eskihamal Köyü
 1963:58:Gürün:Karadoruk:Karaören	Karaören	428	2	384.4	KARA VİRAN	Sivas	Gürün	""	1968 rename	agrees	Karaören	tr.tuik.koy:28943	Karaören Köyü
@@ -11446,6 +11587,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:58:Merkez:Merkez:Kolluca	Kolluca	389	2	363.0	KAHKİK	Sivas	""	*	1968 rename	""	Kolluca	tr.tuik.koy:28562	Kolluca Köyü
 1963:58:Merkez:Merkez:Kumyurt	Kumyurt	504	2	125.6	KUMYURT	Sivas	""	""	name	""	""	tr.tuik.koy:28566	Kumyurt Köyü
 1963:58:Merkez:Merkez:Kızılca	Kızılca	472	1	223.0	KIZILCA	Sivas	""	*	name	""	""	tr.tuik.koy:28559	Kızılca Köyü
+1963:58:Merkez:Merkez:Uzuntepe	Uzuntepe	457	1	203.2	KİLHİDİK	Sivas	""	*	1968 rename	""	Uzuntepe	tr.tuik.koy:583724	Uzuntepe Mah.
 1963:58:Merkez:Merkez:Yazıbaşı	Yazıbaşı	525	1	164.1	KÜRTLER	Sivas	Şarkışla	""	1968 rename	differs	Yazıbaşı	tr.tuik.koy:28583	Yazıbaşı Köyü
 1963:58:Merkez:Merkez:Çelebiler	Çelebiler	167	1	218.1	ÇELEBİLER	Sivas	""	""	name	""	""	tr.tuik.koy:28530	Çelebiler Köyü
 1963:58:Merkez:Merkez:Üçtepe	Üçtepe	752	2	457.0	ÜÇTEPE	Sivas	Hafik	""	name	differs	""	tr.tuik.koy:28581	Üçtepe Köyü
@@ -11601,7 +11743,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:58:Zara:Beypınar:Körpınar	Körpınar	496	2	181.6	KÖR PINAR	Sivas	Zara	""	name	agrees	""	tr.tuik.koy:29736	Körpınar Köyü
 1963:58:Zara:Beypınar:İkideğirmen	İkideğirmen	808	2	178.9	ZEYVE	Sivas	Zara	*	1968 rename	agrees	İkideğirmen	tr.tuik.koy:29732	İkideğirmen Köyü
 1963:58:Zara:Beypınar:İğdeli	İğdeli	362	1	432.7	İĞDELİ	Sivas	Zara	""	name	agrees	""	tr.tuik.koy:29730	İğdeli Köyü
-1963:58:Zara:Beypınar:İğdir	İğdir	378	1	228.1	İĞ D İR	Sivas	Zara	*	name	agrees	""	tr.tuik.koy:29731	İğdir Köyü
+1963:58:Zara:Beypınar:İğdir	İğdir	378	1	228.1	IĞDIR	Sivas	Zara	*	name	agrees	""	tr.tuik.koy:29731	İğdir Köyü
 1963:58:Zara:Bulucan:Akdede	Akdede	141	2	426.2	CİMİLTİ	Sivas	Zara	*	1968 rename	agrees	Akdede	tr.tuik.koy:29741	Akdede Köyü
 1963:58:Zara:Bulucan:Aşağımescit	Aşağımescit	62	1	243.3	AŞAĞIMESCİT	Sivas	Zara	*	name	agrees	""	tr.tuik.koy:29745	Aşağımescit Köyü
 1963:58:Zara:Bulucan:Aşağıçamözü	Aşağıçamözü	57	2	117.6	AŞAĞIÇAMÖZÜ	Sivas	Zara	*	name	agrees	""	tr.tuik.koy:29743	Aşağıçamözü Köyü
@@ -11618,6 +11760,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:58:Zara:Merkez:Bektaş	Bektaş	99	1	175.5	BEKTAŞ	Sivas	Zara	""	name	agrees	""	tr.tuik.koy:29668	Bektaş Köyü
 1963:58:Zara:Merkez:Bozkır	Bozkır	118	2	272.1	BOZKIR	Sivas	Zara	*	name	agrees	""	tr.tuik.koy:29669	Bozkır Köyü
 1963:58:Zara:Merkez:Burhaniye	Burhaniye	126	1	332.1	BÜRHANİYE	Sivas	Zara	""	name	agrees	""	tr.tuik.koy:29670	Burhaniye Köyü
+1963:58:Zara:Merkez:Demiryurt	Demiryurt	736	1	322.5	TÖDÜRGE	Sivas	Zara	""	1968 rename	agrees	Demiryurt	""	""
 1963:58:Zara:Merkez:Derbent	Derbent	206	1	437.7	DERBENT	Sivas	""	*	name	""	""	tr.tuik.koy:29678	Derbent Köyü
 1963:58:Zara:Merkez:Deredam	Deredam	208	2	392.9	DEREDAM	Sivas	Zara	""	name	agrees	""	tr.tuik.koy:29679	Deredam Köyü
 1963:58:Zara:Merkez:Dipsizgöl	Dipsizgöl	216	2	450.4	DİPSİZGÖL	Sivas	Zara	*	name	agrees	""	tr.tuik.koy:29680	Dipsizgöl Köyü
@@ -11722,6 +11865,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:58:İmranlı:Karacaviran:Arık	Arık	50	1	238.9	ARIK	Sivas	Zara	*	name	differs	""	tr.tuik.koy:29133	Arık Köyü
 1963:58:İmranlı:Karacaviran:Celâldamı	Celâldamı	138	1	374.4	CELÂLDAMI	Sivas	Zara	""	name	differs	""	tr.tuik.koy:29142	Celaldamı Köyü
 1963:58:İmranlı:Karacaviran:Cerit	Cerit	139	2	211.3	CERİT	Sivas	Zara	*	name	differs	""	tr.tuik.koy:29143	Cerit Köyü
+1963:58:İmranlı:Karacaviran:Erdemşah	Erdemşah	243	1	452.1	ERDEMSAH	Sivas	Zara	""	name	differs	""	tr.tuik.koy:29145	Erdemşah Köyü
 1963:58:İmranlı:Karacaviran:Güven	Güven	546	2	181.0	MATİ	Sivas	Zara	""	1968 rename	differs	Güven	tr.tuik.koy:29146	Güven Köyü
 1963:58:İmranlı:Karacaviran:Kaşlı	Kaşlı	143	2	351.5	COĞİ	Sivas	Zara	*	1968 rename	differs	Kaşlı	""	""
 1963:58:İmranlı:Karacaviran:Koçgediği	Koçgediği	277	2	202.6	GİLİCEK	Sivas	Zara	""	1968 rename	differs	Koçgediği	tr.tuik.koy:29150	Koçgediği Köyü
@@ -11809,6 +11953,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:59:Malkara:Şahin:Demircili	Demircili	204	1	220.0	DEMİRCİLİ	Tekirdağ	Malkara	*	name	agrees	""	tr.tuik.mahalle:175785	Demircili Mah.
 1963:59:Malkara:Şahin:Dolu	Dolu	222	1	327.7	DOLU	Tekirdağ	Malkara	*	name	agrees	""	tr.tuik.mahalle:175789	Dolu Mah.
 1963:59:Malkara:Şahin:Güneşli	Güneşli	296	2	199.6	GÜNEŞLİ	Tekirdağ	Malkara	""	name	agrees	""	tr.tuik.mahalle:175791	Güneşli Mah.
+1963:59:Malkara:Şahin:Hemit	Hemit	338	1	302.4	HEMİT	Tekirdağ	Malkara	*	name	agrees	""	tr.tuik.mahalle:175793	Hemit Mah.
 1963:59:Malkara:Şahin:Kiremitlik	Kiremitlik	459	2	427.3	KİREMİTLİK	Tekirdağ	Malkara	*	name	agrees	""	tr.tuik.mahalle:175799	Kiremitlik Mah.
 1963:59:Malkara:Şahin:Mestanlar	Mestanlar	556	1	205.5	MESTANLAR	Tekirdağ	Malkara	*	name	agrees	""	tr.tuik.mahalle:175803	Mestanlar Mah.
 1963:59:Malkara:Şahin:Sarnıç	Sarnıç	654	2	407.8	SARNIÇ	Tekirdağ	Malkara	*	name	agrees	""	tr.tuik.mahalle:175809	Sarnıç Mah.
@@ -11834,12 +11979,14 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:59:Merkez:Merkez:Yağcı	Yağcı	766	2	115.5	YAĞCI	Tekirdağ	""	*	name	""	""	tr.tuik.mahalle:175455	Yağcı Mah.
 1963:59:Merkez:İnecik:Ahmetçe	Ahmetçe	21	2	214.9	AHMETÇE	Tekirdağ	""	*	name	""	""	tr.tuik.mahalle:175499	Ahmetçe Mah.
 1963:59:Merkez:İnecik:Akçahalil	Akçahalil	24	2	274.7	AKÇAHALİL	Tekirdağ	""	*	name	""	""	tr.tuik.mahalle:175501	Akçahalil Mah.
+1963:59:Merkez:İnecik:Araphacı	Araphacı	47	1	230.1	ARAPHACI	Tekirdağ	""	*	name	""	""	tr.tuik.mahalle:175503	Araphacı Mah.
 1963:59:Merkez:İnecik:Evciler	Evciler	250	1	226.5	EVCİLER	Tekirdağ	""	*	name	""	""	tr.tuik.mahalle:175507	Evciler Mah.
 1963:59:Merkez:İnecik:Karansıllı	Karansıllı	424	1	234.5	KARANSİLLİ	Tekirdağ	""	*	name	""	""	tr.tuik.mahalle:175517	Karansıllı Mah.
 1963:59:Merkez:İnecik:Kınıklar	Kınıklar	465	1	203.5	KINIKLAR	Tekirdağ	""	""	name	""	""	tr.tuik.mahalle:175519	Kınıklar Mah.
 1963:59:Merkez:İnecik:Semetli	Semetli	661	1	449.1	SEMETLİ	Tekirdağ	""	*	name	""	""	tr.tuik.mahalle:175535	Semetli Mah.
 1963:59:Merkez:İnecik:Yuva	Yuva	798	2	307.9	YUVA	Tekirdağ	Malkara	""	name	differs	""	tr.tuik.mahalle:175545	Yuva Mah.
 1963:59:Merkez:İnecik:İnecik	İnecik	369	1	418.8	İNECİK	Tekirdağ	""	*	name	""	""	tr.tuik.mahalle:175497	İnecik Mah.
+1963:59:Muratlı:Merkez:Arzulu	Arzulu	53	2	283.6	ARZULU	Tekirdağ	Hayrabolu	""	name	differs	""	tr.tuik.mahalle:175857	Arzulu Mah.
 1963:59:Muratlı:Merkez:Aşağısevindikli	Aşağısevindikli	63	1	419.9	AŞAĞISEVİNDİKLİ	Tekirdağ	Çorlu	*	name	differs	""	tr.tuik.mahalle:175859	Aşağısevindikli Mah.
 1963:59:Muratlı:Merkez:Ballıhoca	Ballıhoca	86	1	340.0	BALLIHOCA	Tekirdağ	Çorlu	""	name	differs	""	tr.tuik.mahalle:175865	Ballıhoca Mah.
 1963:59:Muratlı:Merkez:Hanoğlu	Hanoğlu	323	1	343.5	HAN OĞLU	Tekirdağ	Hayrabolu	*	name	differs	""	tr.tuik.mahalle:175869	Hanoğlu Mah.
@@ -11908,7 +12055,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:60:Artova:Merkez:Sivri	Sivri	670	2	143.6	SİVRİ	Tokat	Artova	*	name	agrees	""	tr.tuik.koy:30636	Sivri Köyü
 1963:60:Artova:Merkez:Yağmur	Yağmur	767	2	185.2	YAĞMÜR	Tokat	Artova	""	name	agrees	""	tr.tuik.koy:30637	Yağmur Köyü
 1963:60:Artova:Merkez:Yukarıgüçlü	Yukarıgüçlü	789	1	453.9	YUKARI AVARA	Tokat	Artova	*	1968 rename	agrees	""	tr.tuik.koy:30257	Yukarıgüçlü Köyü
-1963:60:Artova:Merkez:İğdır	İğdır	378	1	141.3	İĞ D İR	Tokat	Artova	**	name	agrees	""	tr.tuik.mahalle:183840	İğdir Mah.
+1963:60:Artova:Merkez:İğdır	İğdır	378	1	141.3	IĞDIR	Tokat	Artova	**	name	agrees	""	tr.tuik.mahalle:183840	İğdir Mah.
 1963:60:Artova:Sulusaray:Alanyurt	Alanyurt	35	2	327.7	ALANYURT	Tokat	Artova	*	name	agrees	""	tr.tuik.koy:30554	Alanyurt Köyü
 1963:60:Artova:Sulusaray:Arabacımusa	Arabacımusa	45	2	436.0	ARABACI MUSA	Tokat	Artova	*	name	agrees	""	""	""
 1963:60:Artova:Sulusaray:Arpacıkaraçay	Arpacıkaraçay	52	1	363.9	ARPACI (KARAÇAY	Tokat	Artova	*	name	agrees	""	tr.tuik.koy:30556	Arpacıkaraçay Köyü
@@ -11950,6 +12097,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:60:Erbaa:Merkez:Evciler	Evciler	246	1	300.9	ERZENÜS	Tokat	Erbaa	""	1968 rename	agrees	Evciler	tr.tuik.koy:30285	Evciler Köyü
 1963:60:Erbaa:Merkez:Hacıbükü	Hacıbükü	306	2	203.4	HACI BÜKÜ	Tokat	Erbaa	*	name	agrees	""	tr.tuik.koy:30286	Hacıbükü Köyü
 1963:60:Erbaa:Merkez:Küplüce	Küplüce	272	2	208.6	GEMRE	Tokat	Erbaa	*	1968 rename	agrees	Küplüce	tr.tuik.koy:30292	Küplüce Köyü
+1963:60:Erbaa:Merkez:Ocakbaşı	Ocakbaşı	239	1	388.2	ENDEKSE	Tokat	Krhaa	""	1968 rename	differs	Ocakbaşı	tr.tuik.koy:30293	Ocakbaşı Köyü
 1963:60:Erbaa:Merkez:Tazı	Tazı	719	1	333.4	TAZI	Tokat	Erbaa	*	name	agrees	""	""	""
 1963:60:Erbaa:Merkez:Yukarıçandır	Yukarıçandır	790	1	408.6	YUKARI ÇANDIR	Tokat	Erbaa	*	name	agrees	""	tr.tuik.koy:30297	Yukarıçandır Köyü
 1963:60:Erbaa:Merkez:Çakır	Çakır	560	2	380.5	MİLAL	Tokat	Krhaa	*	1968 rename	differs	Çakır	tr.tuik.koy:30277	Çakır Köyü
@@ -12031,6 +12179,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:60:Niksar:Merkez:Mahmudiye	Mahmudiye	538	1	339.1	MAHMUDİYE	Tokat	Niksar	""	name	agrees	""	tr.tuik.koy:39944	Mahmudiye Köyü
 1963:60:Niksar:Merkez:Sulugöl	Sulugöl	681	2	437.0	SULU GÖL	Tokat	Niksar	*	name	agrees	""	tr.tuik.koy:30406	Sulugöl Köyü
 1963:60:Niksar:Merkez:Tahtalı	Tahtalı	710	1	250.3	TAHTALI	Tokat	Niksar	*	name	agrees	""	tr.tuik.koy:30409	Tahtalı Köyü
+1963:60:Niksar:Merkez:Ustahasan	Ustahasan	747	2	224.1	USTAHASAN	Tokat	Niksar	*	name	agrees	""	tr.tuik.koy:30413	Ustahasan Köyü
 1963:60:Niksar:Merkez:Yarbaşı	Yarbaşı	772	2	391.5	YARBAŞI	Tokat	Niksar	""	name	agrees	""	tr.tuik.koy:30414	Yarbaşı Köyü
 1963:60:Niksar:Merkez:Çayköy	Çayköy	164	2	405.0	ÇAYKÖY	Tokat	Niksar	*	name	agrees	""	""	""
 1963:60:Niksar:Merkez:Çiçekli	Çiçekli	701	2	326.8	ŞİDİBE	Tokat	Niksar	*	1968 rename	agrees	Çiçekli	tr.tuik.koy:30367	Çiçekli Köyü
@@ -12169,7 +12318,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:60:Zile:İğdir:Çeltek	Çeltek	167	2	230.2	ÇELTEK	Tokat	Zile	*	name	agrees	""	tr.tuik.koy:30647	Çeltek Köyü
 1963:60:Zile:İğdir:Üyük	Üyük	754	1	354.0	ÜYÜK	Tokat	Zile	**	name	agrees	""	tr.tuik.koy:30715	Üyük Köyü
 1963:60:Zile:İğdir:Üçköy	Üçköy	752	2	158.4	ÜÇKÖY	Tokat	Zile	*	name	agrees	""	tr.tuik.koy:30676	Üçköy
-1963:60:Zile:İğdir:İğdir	İğdir	378	1	163.4	İĞ D İR	Tokat	Zile	**	name	agrees	""	tr.tuik.koy:30719	İğdir Köyü
+1963:60:Zile:İğdir:İğdir	İğdir	378	1	163.4	IĞDIR	Tokat	Zile	**	name	agrees	""	tr.tuik.koy:30719	İğdir Köyü
 1963:60:Zile:İğdir:Şeyhköy	Şeyhköy	699	1	344.3	ŞEYH KÖY	Tokat	Zile	*	name	agrees	""	tr.tuik.koy:30747	Şeyhköy
 1963:61:Akçaabat:Derecik:Cevizlik	Cevizlik	140	1	256.8	CEVİZLİK	Trabzon	Maçka	*	name	differs	""	tr.tuik.mahalle:156413	Cevizlik Mah.
 1963:61:Akçaabat:Derecik:Dumankaya	Dumankaya	350	1	194.7	HORCOROT	Trabzon	Akçaabat	""	1968 rename	agrees	Dumankaya	""	""
@@ -12250,6 +12399,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:61:Merkez:Merkez:Akyazı	Akyazı	680	1	341.2	SUĞA	Trabzon	Akçaabat	*	1968 rename	differs	Akyazı	tr.tuik.mahalle:156213	Akyazı Mah.
 1963:61:Merkez:Merkez:Ayvalı	Ayvalı	348	2	363.2	HOHA	Trabzon	Akçaabat	*	1968 rename	differs	Ayvalı	tr.tuik.mahalle:156233	Ayvalı Mah.
 1963:61:Merkez:Merkez:Beşirli	Beşirli	348	2	431.7	HOLAMANA	Trabzon	""	*	1968 rename	""	""	""	""
+1963:61:Merkez:Merkez:Beştaş	Beştaş	398	2	402.8	KANLIKA	Trabzon	""	""	1968 rename	""	Beştaş	tr.tuik.mahalle:156235	Beştaş Mah.
 1963:61:Merkez:Merkez:Karasu	Karasu	427	1	175.0	KARASU	Trabzon	Vakfıke-	*	name	differs	""	tr.tuik.mahalle:157155	Karasu Mah.
 1963:61:Merkez:Merkez:Kavala	Kavala	439	1	448.5	KAVALA	Trabzon	""	*	name	""	""	tr.tuik.mahalle:156265	Kavala Mah.
 1963:61:Merkez:Merkez:Konaklar	Konaklar	351	2	165.2	HOSKONAK	Trabzon	""	""	1968 rename	""	""	tr.tuik.mahalle:71120	Konaklar Mah.
@@ -12393,6 +12543,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:62:Mazgirt:Muhlındu:Aydınlık	Aydınlık	136	1	376.0	CANİK	Elâzız	Mazkirt	*	1968 rename	differs	""	tr.tuik.koy:31479	Aydınlık Köyü
 1963:62:Mazgirt:Muhlındu:Bağın	Bağın	78	2	196.2	BAĞIN	Elâzız	Mazkirt	""	name	differs	""	""	""
 1963:62:Mazgirt:Muhlındu:Kartutan	Kartutan	532	1	400.3	LODEK	Elâzız	Mazkirt	""	1968 rename	differs	Kartutan	tr.tuik.koy:31489	Kartutan Köyü
+1963:62:Mazgirt:Muhlındu:Kızılkale	Kızılkale	476	1	108.1	KIZIL KALE	Elâzız	Mazkirt	*	name	differs	""	tr.tuik.koy:31490	Kızılkale Köyü
 1963:62:Mazgirt:Muhlındu:Ortaharman	Ortaharman	556	1	194.4	MESTAN	Elâzız	Mazkirt	*	1968 rename	differs	""	tr.tuik.koy:31494	Ortaharman Köyü
 1963:62:Mazgirt:Muhlındu:Otlukaya	Otlukaya	627	2	124.9	PULAN	Elâzız	Mazkirt	*	1968 rename	differs	Otlukaya	tr.tuik.koy:31495	Otlukaya Köyü
 1963:62:Mazgirt:Muhlındu:Sökücek	Sökücek	27	2	444.4	AKKİLİSE	Elâzız	Mazkirt	""	1968 rename	differs	Sökücek	tr.tuik.koy:31499	Sökücek Köyü
@@ -12418,9 +12569,9 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:62:Merkez:Pah:Kuyluca	Kuyluca	628	1	377.2	PUTİK	Elâzız	Mazkirt	""	1968 rename	differs	""	tr.tuik.koy:31346	Kuyluca Köyü
 1963:62:Merkez:Pah:Yeşilkaya	Yeşilkaya	276	1	164.1	GEVREK	Elâzız	Mazkirt	""	1968 rename	differs	Yeşilkaya	tr.tuik.koy:31349	Yeşilkaya Köyü
 1963:62:Merkez:Pah:Çukur	Çukur	184	2	354.9	ÇUKUR	Elâzız	Mazkirt	""	name	differs	""	tr.tuik.koy:31341	Çukur Köyü
+1963:62:Merkez:Türüşmek:Aktuluk	Aktuluk	741	2	324.6	TÜRÜŞMEK	Elâzız	Mazkirt	""	1968 rename	differs	Aktuluk	tr.tuik.mahalle:140663	Aktuluk Mah.
 1963:62:Merkez:Türüşmek:Çemçeli	Çemçeli	168	1	365.7	ÇEMÇELİ	Elâzız	Mazkirt	""	name	differs	""	tr.tuik.koy:31330	Çemçeli Köyü
 1963:62:Nazimiye:Hakis:Beytaşı	Beytaşı	192	1	415.8	DALAV	Elâzız	Nazimiye	""	1968 rename	agrees	Beytaşı	tr.tuik.koy:31517	Beytaşı Köyü
-1963:62:Nazimiye:Hakis:Büyükyurt	Büyükyurt	314	2	260.3	HAKİS	Elâzız	Nazimiye	*	1968 rename	agrees	Büyük Yurt	tr.tuik.koy:31518	Büyükyurt Köyü
 1963:62:Nazimiye:Hakis:Dereova	Dereova	210	2	454.1	DERE OVA	Elâzız	Nazimiye	""	name	agrees	""	tr.tuik.koy:31515	Dereova Köyü
 1963:62:Nazimiye:Hakis:Ramazan	Ramazan	632	2	147.9	RAMAZAN	Elâzız	""	*	name	""	""	tr.tuik.koy:31520	Ramazan Köyü
 1963:62:Nazimiye:Hakis:Sanyayla	Sanyayla	142	2	424.2	CİVARİK	Elâzız	Nazimiye	*	1968 rename	agrees	""	""	""
@@ -12495,6 +12646,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:62:Çemişkezek:Merkez:Hacıbey	Hacıbey	306	1	427.5	HACI BEY	Elâzız	Çemişgezek	""	name	differs	""	""	""
 1963:62:Çemişkezek:Merkez:Karasar	Karasar	426	2	255.9	KARASAR	Elâzız	Çemişgezek	*	name	differs	""	tr.tuik.koy:31369	Karasar Köyü
 1963:62:Çemişkezek:Merkez:Savuk	Savuk	656	2	240.1	SAVUK	Elâzız	Çemişgezek	*	name	differs	""	""	""
+1963:62:Çemişkezek:Vaskovan:Doğan	Doğan	220	1	430.8	DOĞAN	Elâzız	Çemişgezek	""	name	differs	""	tr.tuik.koy:31380	Doğan Köyü
 1963:62:Çemişkezek:Vaskovan:Ulukale	Ulukale	745	2	229.8	ULUKALE	Elâzız	Çemişgezek	**	name	differs	""	tr.tuik.koy:31383	Ulukale Köyü
 1963:63:Akçakale:Harran:Aklar	Aklar	21	2	458.3	AHMET KARA	Urfa	Haran	""	1968 rename	differs	Aklar	""	""
 1963:63:Akçakale:Harran:Buğdaytepe	Buğdaytepe	722	1	446.7	TELHİNTA	Urfa	Haran	*	1968 rename	differs	""	tr.tuik.mahalle:174421	Buğdaytepe Mah.
@@ -12535,6 +12687,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:63:Birecik:Merkez:Konak	Konak	484	2	418.8	KONAK	Urfa	Birecik	""	name	agrees	""	""	""
 1963:63:Birecik:Merkez:Meteler	Meteler	730	1	214.3	TİLVEZ	Urfa	Birecik	""	1968 rename	agrees	Meteler	tr.tuik.mahalle:174021	Meteler Mah.
 1963:63:Birecik:Merkez:Surtepe	Surtepe	686	1	374.5	SÜRTEPE	Urfa	Birecik	""	name	agrees	""	tr.tuik.mahalle:174027	Surtepe Mah.
+1963:63:Birecik:Merkez:Ziyaret	Ziyaret	811	1	120.5	ZİYARET	Urfa	Sürüç	*	name	differs	""	tr.tuik.mahalle:174043	Ziyaret Mah.
 1963:63:Birecik:Merkez:Çiftlik	Çiftlik	173	2	140.7	ÇİFTLİK	Urfa	Birecik	*	name	agrees	""	tr.tuik.mahalle:173979	Çiftlik Mah.
 1963:63:Birecik:Merkez:Çoğan	Çoğan	180	1	430.7	ÇOĞAN	Urfa	Birecik	""	name	agrees	""	tr.tuik.mahalle:173981	Çoğan Mah.
 1963:63:Birecik:Merkez:İnaplı	İnaplı	367	2	135.9	İNAPLI	Urfa	Hilvan	""	name	differs	""	""	""
@@ -12583,6 +12736,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:63:Hilvan:Ovacık:Estağfurullah	Estağfurullah	249	1	188.6	ESTAĞFURULLAH	Urfa	Hilvan	""	name	agrees	""	tr.tuik.mahalle:173651	Estağfurullah Mah.
 1963:63:Hilvan:Ovacık:Kanatlı	Kanatlı	616	1	152.4	PARÇİNİK	Urfa	Hilvan	""	1968 rename	agrees	Kanatlı	tr.tuik.mahalle:173437	Kanatlı Mah.
 1963:63:Hilvan:Ovacık:Millisaray	Millisaray	561	1	280.9	MİLLİ SARAY	Urfa	Hilvan	*	name	agrees	""	tr.tuik.mahalle:173707	Millisaray Mah.
+1963:63:Hilvan:Ovacık:Ovacık	Ovacık	329	2	344.4	HASANİK	Urfa	Hilvan	""	1968 rename	agrees	Ovacık	tr.tuik.mahalle:174683	Ovacık Mah.
 1963:63:Hilvan:Ovacık:Oymaağaç	Oymaağaç	580	1	279.5	NACARUK	Urfa	Hilvan	*	1968 rename	agrees	Oymaağaç	tr.tuik.mahalle:174703	Oymaağaç Mah.
 1963:63:Hilvan:Ovacık:Çakmak	Çakmak	151	2	210.6	ÇAKMAK	Urfa	Hilvan	""	name	agrees	""	""	""
 1963:63:Merkez:Akziyaret:Akziyaret	Akziyaret	32	2	445.5	AKZİYARET	Urfa	""	""	name	""	""	""	""
@@ -12686,6 +12840,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:63:Viranşehir:Merkez:Tanyeli	Tanyeli	642	2	379.4	SAKO	Urfa	Viranşehir	""	1968 rename	agrees	Tanyeli	tr.tuik.mahalle:175341	Tanyeli Mah.
 1963:64:Banaz:Merkez:Ahat	Ahat	19	2	347.4	AHAT	Kütahya	Uşak	*	name	differs	""	tr.tuik.koy:32915	Ahat Köyü
 1963:64:Banaz:Merkez:Alaba	Alaba	33	1	154.8	ALABA	Kütahya	Uşak	*	name	differs	""	tr.tuik.koy:32916	Alaba Köyü
+1963:64:Banaz:Merkez:Ayrancı	Ayrancı	143	2	397.0	COMBURT	Kütahya	Gedis	""	1968 rename	differs	Ayrancı	tr.tuik.koy:32917	Ayrancı Köyü
 1963:64:Banaz:Merkez:Bahadır	Bahadır	79	2	128.7	BAHADİR	Kütahya	Uşak	*	name	differs	""	tr.tuik.koy:32920	Bahadır Köyü
 1963:64:Banaz:Merkez:Banaz	Banaz	87	1	356.0	BANAZ	Kütahya	Uşak	*	name	differs	""	tr.tuik.koy:32923	Banaz Köyü
 1963:64:Banaz:Merkez:Burhaniye	Burhaniye	126	1	213.3	BÜRHANİYE	Kütahya	Uşak	*	name	differs	""	tr.tuik.koy:32924	Burhaniye Köyü
@@ -12720,10 +12875,12 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:64:Merkez:Merkez:Kabaklar	Kabaklar	382	2	347.2	KABAKLAR	Kütahya	Uşak	*	name	differs	""	tr.tuik.koy:32851	Kabaklar Köyü
 1963:64:Merkez:Merkez:Kediyünü	Kediyünü	447	1	196.8	KEDİ YÜNÜ	Kütahya	Uşak	*	name	differs	""	tr.tuik.koy:32861	Kediyünü Köyü
 1963:64:Merkez:Merkez:Kırka	Kırka	467	1	414.4	KIRKA	Kütahya	Uşak	*	name	differs	""	tr.tuik.koy:32863	Kırka Köyü
+1963:64:Merkez:Merkez:Mesudiye	Mesudiye	556	1	271.3	MESUDİYE	Kütahya	Uşak	""	name	differs	""	tr.tuik.koy:32866	Mesudiye Köyü
 1963:64:Merkez:Merkez:Ovademirler	Ovademirler	602	2	351.9	OVA DEMİRLER	Kütahya	Uşak	*	name	differs	""	tr.tuik.mahalle:952671	Ovademirler Mah.
 1963:64:Merkez:Merkez:Selikler	Selikler	659	2	395.5	SELİKLER	Kütahya	Uşak	""	name	differs	""	tr.tuik.koy:32872	Selikler Köyü
 1963:64:Merkez:Merkez:Yapağılar	Yapağılar	772	1	186.8	YAPAĞILAR	Kütahya	Uşak	*	name	differs	""	tr.tuik.koy:32879	Yapağılar Köyü
 1963:64:Merkez:Merkez:Yavı	Yavı	774	2	378.7	YAVİ	Kütahya	Simav	*	name	differs	""	tr.tuik.koy:32881	Yavi Köyü
+1963:64:Merkez:Merkez:Çarık	Çarık	159	1	187.3	ÇARIK	Kütahya	Uşak	""	name	differs	""	tr.tuik.koy:32831	Çarık Köyü
 1963:64:Merkez:Merkez:Çukurağıl	Çukurağıl	185	1	117.3	ÇUKUR AĞIL	Kütahya	Uşak	""	name	differs	""	tr.tuik.koy:32834	Çukurağıl Köyü
 1963:64:Merkez:Merkez:Ürün	Ürün	753	2	281.5	ÜRÜN	Kütahya	Uşak	*	name	differs	""	tr.tuik.koy:32878	Ürün Köyü
 1963:64:Merkez:Merkez:İkisaray	İkisaray	363	2	386.2	İKİ SARAY	Kütahya	Uşak	*	name	differs	""	tr.tuik.mahalle:172619	İkisaray Mah.
@@ -12810,6 +12967,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:65:Gürpınar:Hoşap:Giyimli	Giyimli	343	2	161.2	HİRKANİS	Van	""	""	1968 rename	""	Giyimli	tr.tuik.mahalle:159325	Giyimli Mah.
 1963:65:Gürpınar:Hoşap:Sütlüce	Sütlüce	810	2	142.8	ZİVİK	Van	""	""	1968 rename	""	Sütlüce	tr.tuik.mahalle:159351	Sütlüce Mah.
 1963:65:Gürpınar:Hoşap:Topsakal	Topsakal	614	1	198.9	PAÇAN	Van	""	""	1968 rename	""	Topsakal	tr.tuik.mahalle:159357	Topsakal Mah.
+1963:65:Gürpınar:Hoşap:Tutmaç	Tutmaç	460	1	270.3	KİRİL	Van	""	""	1968 rename	""	Tutmaç	tr.tuik.mahalle:159359	Tutmaç Mah.
 1963:65:Gürpınar:Hoşap:Umut	Umut	487	1	203.4	KORTİKAN	Van	""	""	1968 rename	""	Umut	tr.tuik.mahalle:159361	Umut Mah.
 1963:65:Gürpınar:Hoşap:Uzungedik	Uzungedik	278	1	407.3	GİRDESER	Van	""	""	1968 rename	""	Uzungedik	tr.tuik.mahalle:159363	Uzungedik Mah.
 1963:65:Gürpınar:Hoşap:Yurtbaşı	Yurtbaşı	698	1	189.7	ŞEYHAN	Van	""	""	1968 rename	""	""	tr.tuik.mahalle:159369	Yurtbaşı Mah.
@@ -12831,6 +12989,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:65:Merkez:Merkez:Bakacık	Bakacık	455	2	110.4	KEŞİŞ OĞLU	Van	""	""	1968 rename	""	Bakacık	tr.tuik.mahalle:158691	Bakacık Mah.
 1963:65:Merkez:Merkez:Bardakçı	Bardakçı	88	1	370.2	BARDAKÇI	Van	""	""	name	""	""	tr.tuik.mahalle:158515	Bardakçı Mah.
 1963:65:Merkez:Merkez:Beşçatak	Beşçatak	248	2	163.8	ESKİ PAK	Van	""	""	1968 rename	""	""	tr.tuik.mahalle:158631	Beşçatak Mah.
+1963:65:Merkez:Merkez:Bostaniçi	Bostaniçi	666	1	250.2	SİHKE	Van	""	*	1968 rename	""	Bostaniçi	tr.tuik.mahalle:158613	Bostaniçi Mah.
 1963:65:Merkez:Merkez:Dereüstü	Dereüstü	45	1	221.1	ANZAV	Van	""	""	1968 rename	""	Dereüstü	tr.tuik.mahalle:158639	Dereüstü Mah.
 1963:65:Merkez:Merkez:Çobanoğlu	Çobanoğlu	180	1	319.8	ÇOBAN OĞLU	Van	""	""	name	""	""	tr.tuik.mahalle:158521	Çobanoğlu Mah.
 1963:65:Merkez:Timar:Adıgüzel	Adıgüzel	13	1	181.5	ADIGÜZEL	Van	""	""	name	""	""	tr.tuik.mahalle:158495	Adıgüzel Mah.
@@ -12947,6 +13106,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:66:Akdağ Madeni:Merkez:Çardak	Çardak	158	2	177.3	ÇARDAK	Yozgat	Akdağ madeni	*	name	agrees	""	tr.tuik.koy:33807	Çardak Köyü
 1963:66:Akdağ Madeni:Merkez:Özer	Özer	610	2	303.8	ÖZER	Yozgat	Akdağ	*	name	agrees	""	tr.tuik.koy:33850	Özer Köyü
 1963:66:Boğazlıyan:Fakıh:Bektaşlı	Bektaşlı	99	1	282.9	BEKTAŞLI	Yozgat	Boğazlı-	*	name	agrees	""	tr.tuik.koy:34245	Bektaşlı Köyü
+1963:66:Boğazlıyan:Fakıh:Fehimli	Fehimli	257	2	348.3	FEHİMLİ	Yozgat	Boğazlıyan	*	name	agrees	""	tr.tuik.koy:34248	Fehimli Köyü
 1963:66:Boğazlıyan:Fakıh:Üçobalar	Üçobalar	752	2	282.6	ÜÇOBALAR	Yozgat	Boğazlıyan	*	name	agrees	""	tr.tuik.koy:34249	Üçobalar Köyü
 1963:66:Boğazlıyan:Merkez:Abdilli	Abdilli	9	1	435.1	ABDİLLİ	Yozgat	Boğazlıyan	*	name	agrees	""	tr.tuik.koy:33897	Abdilli Köyü
 1963:66:Boğazlıyan:Merkez:Güveçli	Güveçli	299	2	173.7	GÜVEÇLİ	Yozgat	Boğazlıyan	*	name	agrees	""	tr.tuik.koy:33907	Güveçli Köyü
@@ -12975,6 +13135,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:66:Merkez:Merkez:Kuşçu	Kuşçu	510	1	161.4	KUŞÇU	Yozgat	""	*	name	""	""	tr.tuik.koy:33724	Kuşcu Köyü
 1963:66:Merkez:Merkez:Kızıltepe	Kızıltepe	478	1	417.6	KIZIL TEPE	Yozgat	""	*	name	""	""	tr.tuik.koy:33720	Kızıltepe Köyü
 1963:66:Merkez:Merkez:Recepli	Recepli	633	1	331.9	RECEPLİ	Yozgat	""	*	name	""	""	tr.tuik.koy:33727	Recepli Köyü
+1963:66:Merkez:Merkez:Topçu	Topçu	734	1	251.2	TOPÇU	Yozgat	""	""	name	""	""	tr.tuik.koy:33732	Topcu Köyü
 1963:66:Merkez:Merkez:Tosbekiroğlu	Tosbekiroğlu	735	2	250.5	TOSBEKİROĞLU	Yozgat	""	""	name	""	""	""	""
 1963:66:Merkez:Merkez:Yassıhüyük	Yassıhüyük	773	2	426.9	YASSI HÜYÜK	Yozgat	""	*	name	""	""	tr.tuik.koy:33735	Yassıhüyük Köyü
 1963:66:Merkez:Merkez:İşleğen	İşleğen	374	2	373.6	İŞLEĞEN	Yozgat	""	*	name	""	""	tr.tuik.koy:33713	İşleğen Köyü
@@ -13145,6 +13306,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:66:Şefaatli:Merkez:Deliler	Deliler	202	1	373.8	DELİLER	Yozgat	""	*	name	""	""	""	""
 1963:66:Şefaatli:Merkez:Güzelli	Güzelli	300	2	153.7	GÜZELLİ	Yozgat	""	*	name	""	""	""	""
 1963:66:Şefaatli:Merkez:Hüyükkışla	Hüyükkışla	356	2	337.5	HÜYÜK KIŞLA	Yozgat	""	""	name	""	""	tr.tuik.koy:34219	Hüyükkışla Köyü
+1963:66:Şefaatli:Merkez:Kabacıoğlu	Kabacıoğlu	382	1	415.6	KABACIOĞLU	Yozgat	""	""	name	""	""	""	""
 1963:66:Şefaatli:Merkez:Köycü	Köycü	500	2	147.6	KÖYCÜ	Yozgat	""	*	name	""	""	tr.tuik.koy:34280	Köycü Köyü
 1963:66:Şefaatli:Merkez:Küçükincirli	Küçükincirli	517	1	268.7	KÜÇÜK İNCİRLİ	Yozgat	""	*	name	""	""	tr.tuik.koy:34233	Küçükincirli Köyü
 1963:66:Şefaatli:Merkez:Saatli	Saatli	640	1	165.0	SAATLİ	Yozgat	""	""	name	""	""	tr.tuik.koy:34235	Saatli Köyü
@@ -13186,6 +13348,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:67:Bartin:Kozcağız:Gerişli	Gerişli	298	1	191.5	GÜNYE GERİŞ	Zonguldak	Bartın	*	1968 rename	agrees	Gerişli	""	""
 1963:67:Bartin:Kozcağız:Gökçedere	Gökçedere	298	1	180.9	GÜNYE DERE	Zonguldak	Bartın	*	1968 rename	agrees	Gökçedere	""	""
 1963:67:Bartin:Kozcağız:Hasanefendi	Hasanefendi	329	2	177.4	HAŞAN EFENDİ	Zonguldak	Bartın	*	name	agrees	""	tr.tuik.koy:36119	Hasanefendi Köyü
+1963:67:Bartin:Kozcağız:Hasankadı	Hasankadı	329	2	377.2	HASAN KADI	Zonguldak	Hartnı	*	name	differs	""	""	""
 1963:67:Bartin:Kozcağız:Hocaoğlu	Hocaoğlu	348	1	348.0	HOCA OĞLU	Zonguldak	Bartın	*	name	agrees	""	tr.tuik.koy:36122	Hocaoğlu Köyü
 1963:67:Bartin:Kozcağız:Hıdırlar	Hıdırlar	345	1	378.2	HIDIRLAR	Zonguldak	Bartın	*	name	agrees	""	tr.tuik.koy:36121	Hıdırlar Köyü
 1963:67:Bartin:Kozcağız:Ozbaşı	Ozbaşı	372	2	410.2	İSKALAN	Zonguldak	Bartın	*	1968 rename	agrees	Özbaşı	tr.tuik.koy:36128	Özbaşı Köyü
@@ -13255,6 +13418,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:67:Devrek:Merkez:Halilbeyoğlu	Halilbeyoğlu	316	2	165.6	HALİL BEY OĞLU	Zonguldak	Devrek	*	name	agrees	""	tr.tuik.koy:34536	Halilbeyoğlu Köyü
 1963:67:Devrek:Merkez:Hüseyinçavuşoğlu	Hüseyinçavuşoğlu	355	2	302.5	HÜSEYİN ÇAVUŞ OĞLU	Zonguldak	""	*	name	""	""	tr.tuik.koy:34539	Hüseyinçavuşoğlu Köyü
 1963:67:Devrek:Merkez:Kabaca	Kabaca	382	1	208.9	KABACA	Zonguldak	Devrek	*	name	agrees	""	tr.tuik.koy:34542	Kabaca Köyü
+1963:67:Devrek:Merkez:Karabaşlı	Karabaşlı	404	1	328.6	KARABAŞLI	Zonguldak	Devrek	""	name	agrees	""	tr.tuik.koy:34572	Karabaşlı Köyü
 1963:67:Devrek:Merkez:Karakoçlu	Karakoçlu	419	1	447.8	KARA KOÇLÜ	Zonguldak	Devrek	*	name	agrees	""	tr.tuik.koy:34544	Karakoçlu Köyü
 1963:67:Devrek:Merkez:Kemerler	Kemerler	449	2	353.6	KEMERLER	Zonguldak	Devrek	*	name	agrees	""	""	""
 1963:67:Devrek:Merkez:Komşular	Komşular	484	2	289.4	KOMŞULAR	Zonguldak	Devrek	*	name	agrees	""	tr.tuik.koy:34545	Komşular Köyü
@@ -13389,11 +13553,14 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:67:Merkez:Beycuma:Eceler	Eceler	232	2	257.4	ECELER	Zonguldak	""	*	name	""	""	tr.tuik.koy:34323	Eceler Köyü
 1963:67:Merkez:Beycuma:Hacıali	Hacıali	305	2	128.7	HACI ALİ	Zonguldak	""	*	name	""	""	tr.tuik.koy:34324	Hacıali Köyü
 1963:67:Merkez:Beycuma:Himmetoğlu	Himmetoğlu	342	1	119.8	HİMMET OĞLU	Zonguldak	""	*	name	""	""	tr.tuik.koy:34325	Himmetoğlu Köyü
+1963:67:Merkez:Beycuma:Kaleoğlu	Kaleoğlu	394	1	264.6	KALEOĞLU	Zonguldak	""	*	name	""	""	tr.tuik.koy:34327	Kaleoğlu Köyü
 1963:67:Merkez:Beycuma:Karadere	Karadere	412	1	379.8	KARADERE	Zonguldak	""	*	name	""	""	tr.tuik.koy:34328	Karadere Köyü
 1963:67:Merkez:Beycuma:Kasımlar	Kasımlar	435	2	349.1	KASIMLAR	Zonguldak	""	*	name	""	""	tr.tuik.mahalle:90706	Kasımlar Mah.
 1963:67:Merkez:Beycuma:Keller	Keller	448	2	304.2	KELLER	Zonguldak	""	*	name	""	""	tr.tuik.koy:34331	Keller Köyü
 1963:67:Merkez:Beycuma:Korucak	Korucak	770	1	193.1	YALANDA	Zonguldak	""	*	1968 rename	""	Korucak	tr.tuik.koy:34332	Korucak Köyü
 1963:67:Merkez:Beycuma:Kumtarla	Kumtarla	504	2	114.6	KUMTARLA	Zonguldak	""	*	name	""	""	tr.tuik.koy:34333	Kumtarla Köyü
+1963:67:Merkez:Beycuma:Taşçılar	Taşçılar	713	2	401.0	TAŞCILAR	Zonguldak	""	*	name	""	""	tr.tuik.koy:34336	Taşçılar Köyü
+1963:67:Merkez:Kilimli:Kilimli	Kilimli	457	1	334.5	KİLİMLİ	Zonguldak	""	*	name	""	""	""	""
 1963:67:Merkez:Kozlu:Akşeyh	Akşeyh	31	1	246.7	AKŞEYH	Zonguldak	""	*	name	""	""	""	""
 1963:67:Merkez:Kozlu:Aşağıçayır	Aşağıçayır	57	2	296.6	AŞAĞIÇAYIR	Zonguldak	""	*	name	""	""	""	""
 1963:67:Merkez:Kozlu:Bozca	Bozca	118	1	165.6	BOZCA	Zonguldak	""	*	name	""	""	""	""
@@ -13405,6 +13572,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:67:Merkez:Kozlu:Çamköy	Çamköy	155	1	308.1	ÇAMKÖY	Zonguldak	""	*	name	""	""	tr.tuik.koy:49271	Çamköy
 1963:67:Merkez:Merkez:Bağlık	Bağlık	79	1	159.7	BAĞLIK	Zonguldak	""	*	name	""	""	tr.tuik.mahalle:80932	Bağlık Mah.
 1963:67:Merkez:Merkez:Kardeşler	Kardeşler	266	1	120.4	GACA	Zonguldak	""	*	1968 rename	""	Kardeşler	tr.tuik.koy:34316	Kardeşler Köyü
+1963:67:Merkez:Merkez:Çağlı	Çağlı	148	2	213.8	ÇAĞLI	Zonguldak	""	*	name	""	""	tr.tuik.koy:34314	Çağlı Köyü
 1963:67:Safranbolu:Merkez:Alören	Alören	42	2	323.1	ALVEREN	Zonguldak	Safran-	*	1968 rename	agrees	Alören	tr.tuik.koy:36927	Alören Köyü
 1963:67:Safranbolu:Merkez:Aşağıdana	Aşağıdana	58	1	193.3	AŞAĞIDANA	Zonguldak	Safranbolu	*	name	agrees	""	tr.tuik.koy:36930	Aşağıdana Köyü
 1963:67:Safranbolu:Merkez:Aşağıçiftlik	Aşağıçiftlik	57	2	358.2	AŞAĞIÇİFTLİK	Zonguldak	Safran-	*	name	agrees	""	tr.tuik.koy:36929	Aşağıçiftlik Köyü
@@ -13431,6 +13599,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:67:Safranbolu:Ovacuma:Cebbar	Cebbar	137	1	213.1	CEBBAR	Zonguldak	Safran-	*	name	agrees	""	""	""
 1963:67:Safranbolu:Ovacuma:Cucahlı	Cucahlı	145	2	130.1	CÜCAHLI	Zonguldak	Safranbolu	*	name	agrees	""	tr.tuik.koy:36972	Cücahlı Köyü
 1963:67:Safranbolu:Ovacuma:Danişment	Danişment	194	1	185.5	DANİŞMENT	Zonguldak	Safran-	*	name	agrees	""	tr.tuik.koy:49253	Danişment Köyü
+1963:67:Safranbolu:Ovacuma:Hacıhasan	Hacıhasan	307	2	295.2	HACI HASAN	Zonguldak	Safran-	""	name	agrees	""	tr.tuik.koy:49251	Hacıhasan Köyü
 1963:67:Safranbolu:Ovacuma:Nebioğlu	Nebioğlu	583	1	441.7	NEBİ OĞLU	Zonguldak	Safran-	*	name	agrees	""	tr.tuik.koy:36977	Nebioğlu Köyü
 1963:67:Safranbolu:Ovacuma:Ovaköseler	Ovaköseler	602	2	442.9	OVA KÖSELER	Zonguldak	Safranbolu	*	name	agrees	""	tr.tuik.koy:49247	Ovaköseler Köyü
 1963:67:Safranbolu:Ovacuma:Tintin	Tintin	730	2	138.3	TİNTİN	Zonguldak	Safranbolu	*	name	agrees	""	tr.tuik.koy:49249	Tintin Köyü
@@ -13483,6 +13652,7 @@ code	name	page	column	y	koy_1933	vilayet_1933	kaza_1933	mark	via	kaza	name_1968	
 1963:67:Çaycuma:Merkez:Çomranlı	Çomranlı	181	2	172.0	ÇOMRANLI	Zonguldak	""	*	name	""	""	tr.tuik.koy:34430	Çomranlı Köyü
 1963:67:Çaycuma:Perşembe:Başat	Başat	89	1	282.9	BASAT	Zonguldak	Devrek	*	name	differs	""	""	""
 1963:67:Çaycuma:Perşembe:Dereköseler	Dereköseler	209	2	154.1	DERE KÖSELER	Zonguldak	Devrek	*	name	differs	""	tr.tuik.koy:34432	Dereköseler Köyü
+1963:67:Çaycuma:Perşembe:Dursunlar	Dursunlar	738	1	358.6	TURSUNLAR	Zonguldak	Devrek	""	1968 rename	differs	Dursunlar	tr.tuik.koy:34472	Dursunlar Köyü
 1963:67:Çaycuma:Perşembe:Emirşah	Emirşah	238	2	230.9	EMİRŞAH	Zonguldak	Devrek	*	name	differs	""	tr.tuik.koy:34473	Emirşah Köyü
 1963:67:Çaycuma:Perşembe:Haciibadi	Haciibadi	308	1	252.1	HACI İBADI	Zonguldak	Devrek	*	name	differs	""	tr.tuik.koy:34474	Hacıibadi Köyü
 1963:67:Çaycuma:Perşembe:Helvacılar	Helvacılar	338	1	206.8	HELVACILAR	Zonguldak	Devrek	*	name	differs	""	tr.tuik.koy:34476	Helvacılar Köyü
