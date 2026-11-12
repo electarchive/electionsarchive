@@ -1144,12 +1144,31 @@ def emit() -> Path:
         moved: set[UUID] = set()
         sources: set[UUID] = set()
         chained: set[str] = set()
+        settled = 0
         for (race,), rows in frame.sort("race", "votes", descending=[False, True]).group_by(
             "race", maintain_order=True
         ):
             first = rows.row(0, named=True)
             code, key, day = first["code"], first["key"], first["day"]
             if (f"CA:{code}:{key}", day.year, day.month) in held or race in waiting:
+                if race in unsettled and race not in waiting and (held_contest := own.get(f"ceda:{race}")) is not None:
+                    declared = conn.execute(
+                        """select o.option_id, o.seats from outcome o
+                           join result_set d on d.id = o.result_set_id and d.contest_id = %s and d.is_default
+                           where o.kind = 'elected'""",
+                        [held_contest],
+                    ).fetchall()
+                    if declared and f"ceda:{race}" in sets:
+                        held_set = cs.key(f"{SOURCE}.result_set", f"ceda:{race}")
+                        for option_id, seats in declared:
+                            cs.add(
+                                "outcome",
+                                result_set_id=held_set,
+                                option_id=option_id,
+                                kind="elected",
+                                seats=seats,
+                            )
+                        settled += 1
                 if race in previous and f"ceda:{race}" in own and race not in waiting:
                     chained.add(race)
                 continue
@@ -1488,6 +1507,7 @@ def emit() -> Path:
                     "us.contest", takeover.get(previous[race], {}).get("value", f"ceda:{previous[race]}")
                 ),
             )
+        print(f"{settled} held contests have their CEDA set's winners declared from the default set")
         print(f"{len(chained)} runoffs held by another source's default set chained in place")
         held_ids = {
             (scheme, value): entity
