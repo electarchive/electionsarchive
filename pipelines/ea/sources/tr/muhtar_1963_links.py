@@ -8,16 +8,24 @@ from ea.changeset import Changeset
 from ea.store import DATA, connect
 
 SOURCE = "tr.muhtar_1963_links"
-VERSION = "3"
+VERSION = "4"
 RENAMES = Path(__file__).with_name("koy_renames_1968.tsv")
 KOYLERIMIZ_1933 = Path(__file__).with_name("koylerimiz_1933.tsv")
 ANCHORS = Path(__file__).with_name("koylerimiz_1933_links.tsv")
+KOYLERIMIZ_URL = (
+    "https://acikerisim.tbmm.gov.tr/server/api/core/bitstreams/4fa70aa0-9537-4c18-b776-fb75a93b2bdc/content"
+)
 RENAMES_URL = "https://acikerisim.tbmm.gov.tr/server/api/core/bitstreams/42c011d2-44d8-498e-8353-41a658b94ba9/content"
 
 
 def fold(text: str) -> str:
     text = re.sub(r"\s+(Mah\.|Mahallesi|Köyü)$", "", text.strip()).replace("İ", "i").replace("I", "ı").lower()
     return re.sub(r"[^a-z]", "", text.translate(str.maketrans("ığüşöçâîû", "iguoocaiu")))
+
+
+def title(text: str) -> str:
+    words = text.replace("İ", "i").replace("I", "ı").lower().split()
+    return " ".join(word[:1].replace("i", "İ").replace("ı", "I").upper() + word[1:] for word in words)
 
 
 def readings(name: str) -> set[str]:
@@ -297,6 +305,47 @@ def emit() -> Path:
                 schema={"unit_id": pl.String, "area_id": pl.String},
             ).with_columns(valid_from=pl.lit(None, pl.Date), valid_to=pl.lit(None, pl.Date), approximate=pl.lit(True)),
         )
+        anchors = pl.read_csv(ANCHORS, separator="\t", infer_schema=False).fill_null("")
+        anchors = anchors.filter((pl.col("area_2024") != "") & (pl.col("kaza") != "differs"))
+        current = defaultdict(set)
+        for area, text in conn.execute(
+            "select entity_id, text from name where entity_id in (select id from area where scheme_code = 'tr.mahalle')"
+        ).fetchall():
+            current[area].add(fold(text))
+        book = cs.source("İçişleri Bakanlığı", "Köylerimiz (1933)")
+        cs.add(
+            "source",
+            id=book,
+            kind="official_body",
+            publisher="İçişleri Bakanlığı",
+            title="Köylerimiz (1933)",
+            url=KOYLERIMIZ_URL,
+            license="Official public record, no license stated",
+            notes="Village register of the republic's vilayets and kazas; the 1933 name is the printed one.",
+        )
+        seen, names = set(), []
+        for row in anchors.sort("page", "column", "y").iter_rows(named=True):
+            scheme, value = row["area_2024"].split(":", 1)
+            area = cs.key(scheme, value)
+            text = title(row["koy_1933"])
+            key = fold(text)
+            if not key or (area, key) in seen or key in current[area]:
+                continue
+            seen.add((area, key))
+            names.append({"entity_id": str(area), "text": text, "source_id": str(book)})
+        cs.frame(
+            "name",
+            pl.DataFrame(
+                names, schema={"entity_id": pl.String, "text": pl.String, "source_id": pl.String}
+            ).with_columns(
+                lang=pl.lit("tr"),
+                kind=pl.lit("historical"),
+                valid_from=pl.lit("1933-01-01").str.to_date(),
+                valid_from_precision=pl.lit("year"),
+                is_preferred=pl.lit(False),
+            ),
+        )
+        print(f"{len(names)} 1933 names on linked 2024 places")
         report = pl.DataFrame(
             [
                 {
