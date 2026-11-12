@@ -621,35 +621,53 @@ async function measure(id: string) {
     select polity_id::text as polity, date_from::text as date from election where id = ${id}::uuid
   `);
   const head = found.rows[0];
-  const own = await chambers(id);
-  if (head == null || own.length === 0) {
+  if (head == null) {
     return { chambers: [] };
   }
+  const settled = chambers(id);
   const record = await series(head.polity, true);
   const paths = await ids(
     record.flatMap((entry) =>
       entry.points.flatMap((point) => point.path ?? []),
     ),
   );
+  const earlier = (entry: (typeof record)[number]) =>
+    entry.points
+      .filter((point) => point.date < head.date)
+      .findLast((point) => paths.has(point.path ?? ""));
+  const priors = new Map<string, Promise<Array<Chamber>>>();
+  for (const entry of record) {
+    const before = earlier(entry);
+    const prior = paths.get(before?.path ?? "");
+    if (
+      prior != null &&
+      !priors.has(prior) &&
+      entry.points.some((point) => point.date === head.date)
+    ) {
+      priors.set(prior, chambers(prior));
+    }
+  }
+  for (const prior of priors.values()) {
+    prior.catch(() => null);
+  }
+  const own = await settled;
+  if (own.length === 0) {
+    return { chambers: [] };
+  }
   return {
     chambers: await Promise.all(
       own.map(async (chamber) => {
-        const points = (
-          record.find((entry) => entry.id === chamber.body)?.points ?? []
-        ).filter((point) => point.date < head.date);
+        const entry = record.find((candidate) => candidate.id === chamber.body);
+        const before = entry == null ? undefined : earlier(entry);
+        const prior = paths.get(before?.path ?? "");
         let previous: Previous | null = null;
-        for (const point of points.toReversed()) {
-          const before = paths.get(point.path ?? "");
-          if (before == null) {
-            continue;
-          }
-          const match = (await chambers(before)).find(
-            (entry) => entry.body === chamber.body,
+        if (before != null && prior != null) {
+          const match = (await chambers(prior)).find(
+            (item) => item.body === chamber.body,
           );
           if (match != null) {
-            previous = { ...point, chamber: match };
+            previous = { ...before, chamber: match };
           }
-          break;
         }
         return compute(chamber, head.date, previous);
       }),
