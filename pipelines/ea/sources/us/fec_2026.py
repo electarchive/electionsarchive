@@ -397,6 +397,13 @@ MAJOR = [
     (re.compile(r"(?i)\bgreen\b"), "green-party"),
     (re.compile(r"(?i)\bconstitution\b"), "constitution-party"),
 ]
+BOARD_OFFICES = {
+    "MI:member-of-the-state-board-of-education",
+    "MI:regent-of-the-university-of-michigan",
+    "MI:trustee-of-michigan-state-university",
+    "MI:governor-of-wayne-state-university",
+    "ND:public-service-commissioner",
+}
 OFFICE_ALIASES = {
     "agriculture-commissioner": "commissioner-of-agriculture",
     "insurance-and-fire-safety-commissioner": "commissioner-of-insurance",
@@ -2128,7 +2135,7 @@ def emit() -> Path:
                 r" \(Place \d+\)$", "", label.replace(" Washington mayoral", " District of Columbia mayoral")
             )
             _, state, chamber = template[0].split(":")
-            if f"{state}:{chamber}" == "TX:railroad-commissioner":
+            if f"{state}:{chamber}" == "TX:railroad-commissioner" or f"{state}:{chamber}" in BOARD_OFFICES:
                 continue
             if f"{state}:{chamber}" not in offices:
                 offices[f"{state}:{chamber}"] = label
