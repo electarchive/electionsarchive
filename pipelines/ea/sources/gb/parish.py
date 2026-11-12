@@ -47,7 +47,8 @@ PRECEPTS_COPY = f"https://web.archive.org/web/20250910183531id_/{PRECEPTS}"
 PRECEPTS_NOTE = (
     "StatsWales table LGFS0036, community council precepts and tax bases for 2019-20 to 2022-23, read from the "
     "copy archived on 10 September 2025 after the table stopped being updated. Each council with a 2022-23 precept "
-    "is a council body of the community it serves; councils that served a group of communities are not recorded."
+    "is a council body of the community it serves, or of the group of communities it serves where the principal "
+    "council has grouped several communities under one council."
 )
 AUTHORITIES = {"Rhondda Cynon Taff": "Rhondda Cynon Taf"}
 RENAMED = {
@@ -67,10 +68,51 @@ RENAMED = {
     ("Vale of Glamorgan", "Sully"): "Sully and Lavernock",
 }
 GROUPED = {
-    ("Denbighshire", "Tremeirchion/Cwm/Waen"),
-    ("Torfaen", "Croesyceiliog & Llanyrafon"),
-    ("Torfaen", "Cwmbran"),
-    ("Torfaen", "Pontypool"),
+    ("Denbighshire", "Tremeirchion/Cwm/Waen"): ("Tremeirchion, Cwm and Waen", ("Tremeirchion", "Cwm", "Waen")),
+    ("Torfaen", "Croesyceiliog & Llanyrafon"): ("Croesyceiliog and Llanyrafon", ("Croesyceiliog", "Llanyrafon")),
+    ("Torfaen", "Cwmbran"): ("Cwmbran", ("Cwmbran Central", "Fairwater", "Llantarnam", "Pontnewydd", "Upper Cwmbran")),
+    ("Torfaen", "Pontypool"): (
+        "Pontypool",
+        ("Abersychan", "New Inn", "Panteg", "Pen Tranch", "Pontymoile", "Trevethin"),
+    ),
+}
+GROUP_SCHEME = "gb.community_group"
+TORFAEN_RESULTS = "https://www.torfaen.gov.uk/en/about-the-council/elections/elections-results/community-council"
+DENBIGHSHIRE_COUNCIL = "https://moderngov.denbighshire.gov.uk/mgParishCouncilDetails.aspx?ID=267&LLL=0"
+GROUP_SOURCES = {
+    "Torfaen": [
+        ("Torfaen County Borough Council", "Community Council Election Results", TORFAEN_RESULTS, TORFAEN_RESULTS),
+        (
+            "legislation.gov.uk",
+            "The County Borough of Torfaen (Electoral Changes) Order 2002",
+            "https://www.legislation.gov.uk/wsi/2002/3279/made",
+            "https://www.legislation.gov.uk/wsi/2002/3279/made/data.xml",
+        ),
+        (
+            "legislation.gov.uk",
+            "The County Borough of Torfaen (Electoral Arrangements) Order 2021",
+            "https://www.legislation.gov.uk/wsi/2021/1139/made",
+            "https://www.legislation.gov.uk/wsi/2021/1139/made/data.xml",
+        ),
+    ],
+    "Denbighshire": [
+        (
+            "Denbighshire County Council",
+            "City, Town and Community Councils: Tremeirchion Cwm & Waen",
+            DENBIGHSHIRE_COUNCIL,
+            f"https://web.archive.org/web/20250814134725id_/{DENBIGHSHIRE_COUNCIL}",
+        ),
+    ],
+}
+GROUP_EVIDENCE = {
+    "Torfaen": (
+        "Torfaen's community council results list each council's wards, and the County Borough of Torfaen "
+        "(Electoral Changes) Order 2002 and (Electoral Arrangements) Order 2021 place those wards in their communities"
+    ),
+    "Denbighshire": (
+        "Denbighshire's register of city, town, and community councils lists one Tremeirchion Cwm & Waen council, "
+        "and the Welsh Government's precept table shows no separate council for any of the three communities"
+    ),
 }
 
 
@@ -88,6 +130,9 @@ def fetch() -> None:
         for url in pages(year):
             raw.fetch(SOURCE, url, suffix=".geojson")
     raw.fetch(SOURCE, PRECEPTS_COPY, suffix=".html")
+    for entries in GROUP_SOURCES.values():
+        for _, _, _, copy in entries:
+            raw.fetch(SOURCE, copy, suffix=".xml" if copy.endswith(".xml") else ".html")
 
 
 def parse_precepts() -> pl.DataFrame:
@@ -238,7 +283,7 @@ def emit() -> Path:
                    where e.scheme = 'gb.polity'"""
             ).fetchall()
         )
-        taken = {path for (path,) in conn.execute("select path from slug where path like 'gb/%%'").fetchall()}
+        taken = dict(conn.execute("select path, entity_id from slug where path like 'gb/%%'").fetchall())
         cs = Changeset(
             conn,
             pipeline=SOURCE,
@@ -333,9 +378,9 @@ def emit() -> Path:
                 if code.startswith("W04") and row["name_cy"]:
                     name(polity, row["name_cy"], lang="cy", kind="native")
                 path = f"{councils[lads[code]]}/{slug(row['name'])}"
-                if path in taken:
+                if taken.get(path, polity) != polity:
                     path = f"{path}-{key.lower()}"
-                taken.add(path)
+                taken[path] = polity
                 cs.add("slug", path=path, entity_id=polity)
             cs.add("polity_territory", polity_id=polity, area_id=area, valid_from=LAYERS[first][4], valid_to=ends(last))
         print(
@@ -387,7 +432,117 @@ def emit() -> Path:
             style = re.search(r"\b(Town|City)$", council)
             base = re.sub(r"\s+(Town|City)$", "", council)
             name(body, f"{base} {style.group(1) if style else 'Community'} Council")
-        print(f"{len(served)} community councils, {len(GROUPED)} grouped councils left out", file=sys.stderr)
+        print(f"{len(served)} community councils", file=sys.stderr)
+        if conn.execute("select 1 from scheme where code = %s", [GROUP_SCHEME]).fetchone() is None:
+            cs.add(
+                "scheme", code=GROUP_SCHEME, polity_id=gb, kind="administrative", rank=4, noun="group of communities"
+            )
+        evidence: dict[str, list[object]] = {}
+        for authority, entries in GROUP_SOURCES.items():
+            for publisher, title, url, copy in entries:
+                source = cs.source(publisher, title)
+                cs.add(
+                    "source",
+                    id=source,
+                    kind="official_body",
+                    publisher=publisher,
+                    title=title,
+                    url=url,
+                    license=LICENSE if publisher == "legislation.gov.uk" else None,
+                    license_url=LICENSE_URL if publisher == "legislation.gov.uk" else None,
+                )
+                cs.artifact(raw.cached(SOURCE, copy), source)
+                evidence.setdefault(authority, []).append(source)
+        group_spans = set()
+        for (authority, council), (label, members) in sorted(GROUPED.items()):
+            lad = authorities[authority]
+            keys = []
+            for member in members:
+                found = communities.get((lad, fold(member)), set())
+                if len(found) != 1:
+                    raise ValueError(f"{council}: {member} matches {len(found)} communities")
+                keys.append(next(iter(found)))
+            if clash := [key for key in keys if key in served]:
+                raise ValueError(f"{council}: {', '.join(clash)} already have their own council")
+            served |= dict.fromkeys(keys, council)
+            codes = [code for code in spans if root[code] in keys]
+            if len(codes) != len(keys):
+                raise ValueError(f"{council}: a member community was recoded")
+            group_spans |= {spans[code] for code in codes}
+            first, last = spans[codes[0]]
+            if any(spans[code] != (first, last) for code in codes):
+                raise ValueError(f"{council}: member communities span different layers")
+            row = conn.execute(
+                """with u as (select st_union(st_transform(st_geomfromewkb(decode(g, 'hex')), 27700)) as geom
+                              from unnest(%s::text[]) g)
+                   select encode(st_asewkb(st_transform(
+                            st_multi(st_collectionextract(st_makevalid(geom), 3)), 4326)), 'hex'),
+                          encode(st_asewkb(st_transform(st_pointonsurface(geom), 4326)), 'hex')
+                   from u""",
+                [[latest[code]["geom"] for code in codes]],
+            ).fetchone()
+            assert row is not None
+            geom, point = row
+            code = f"{lad}:{slug(label)}"
+            area = cs.area(GROUP_SCHEME, code)
+            if area in cs.minted:
+                cs.add("area", id=area, scheme_code=GROUP_SCHEME)
+                cs.add("area_code", area_id=area, code=code, valid_from=None, valid_to=None)
+                cs.add("area_parent", area_id=area, parent_id=cs.area("gb.lad", lad), valid_from=None, valid_to=None)
+            name(area, label)
+            names = sorted(latest[code]["name"] for code in codes)
+            cs.add(
+                "area_geometry",
+                area_id=area,
+                valid_from=LAYERS[first][4],
+                valid_to=ends(last),
+                geom=geom,
+                label_point=point,
+                quality="official",
+                source_id=sources[first],
+            )
+            cs.add(
+                "note",
+                entity_id=area,
+                kind="methodology",
+                body_md=f"The communities of {', '.join(names[:-1])}{',' if len(names) > 2 else ''} and {names[-1]}, "
+                f"which {label} Community Council serves; {GROUP_EVIDENCE[authority]}. The shape is the union of the "
+                "ONS shapes of those communities.",
+            )
+            polity = cs.key("gb.polity", code)
+            if polity in cs.minted:
+                cs.add("polity", id=polity, kind="submunicipal", iso_code=None)
+                cs.add("polity_parent", polity_id=polity, parent_id=cs.key("gb.polity", lad))
+            name(polity, label)
+            path = f"{councils[lad]}/{slug(label)}"
+            if taken.get(path, polity) != polity:
+                raise ValueError(f"{path} is taken")
+            taken[path] = polity
+            cs.add("slug", path=path, entity_id=polity)
+            cs.add("polity_territory", polity_id=polity, area_id=area, valid_from=LAYERS[first][4], valid_to=ends(last))
+            for source in [precepts, *evidence[authority]]:
+                cs.add("citation", entity_id=polity, source_id=source)
+            body = cs.key("gb.body", code)
+            if body in cs.minted:
+                cs.add("body", id=body, polity_id=polity, kind="council")
+            name(body, f"{label} Community Council")
+        print(f"{len(GROUPED)} grouped councils, {len(served)} communities with a council", file=sys.stderr)
+        group_plans = {
+            vintage: id
+            for id, vintage in conn.execute(
+                "select id, vintage from boundary_set where scheme_code = %s", [GROUP_SCHEME]
+            ).fetchall()
+        }
+        for first, last in sorted(group_spans):
+            cs.add(
+                "boundary_set",
+                **({"id": group_plans[str(first)]} if str(first) in group_plans else {}),
+                scheme_code=GROUP_SCHEME,
+                vintage=str(first),
+                valid_from=LAYERS[first][4],
+                valid_to=ends(last),
+                as_of=LAYERS[first][4],
+            )
         plans = {
             vintage: id
             for id, vintage in conn.execute(
