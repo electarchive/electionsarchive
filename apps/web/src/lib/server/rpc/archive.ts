@@ -11222,6 +11222,9 @@ export const contests = {
           select exists (
             select from unnest(${sql.param(ks)}::int[]) s(k)
             where (select count(*) from (select 1 from result_rollup_unit r where r.result_set_k = s.k limit ${CAP + 1}) q) > ${CAP}
+          ) or exists (
+            select from unnest(${sql.param(ks)}::int[]) s(k)
+            where (select count(*) from (select distinct v.unit_k from result_value v where v.result_set_k = s.k limit ${CAP + 1}) q) > ${CAP}
           ) as over
         `),
       )[0]?.over;
