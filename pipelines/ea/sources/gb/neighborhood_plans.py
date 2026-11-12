@@ -1,6 +1,7 @@
 import html
 import re
 import subprocess
+import tempfile
 import zipfile
 from datetime import UTC, date, datetime
 from pathlib import Path
@@ -19,7 +20,11 @@ ROWS = Path(__file__).with_name("neighborhood_referendums.tsv")
 SCHEME = "gb.neighborhood_area"
 VOTES, REGISTERED, BALLOTS, INVALID, VOTERS = 1, 2, 3, 5, 14
 SHARE_ONLY = 4
-STRATFORD_PAGES = ("https://www.stratford.gov.uk/news/", "https://www.stratford.gov.uk/planning-building/")
+STRATFORD_PAGES = (
+    "https://www.stratford.gov.uk/news/",
+    "https://www.stratford.gov.uk/planning-building/",
+    "https://www.west-norfolk.gov.uk/info/",
+)
 PAGES = {
     "E06000052": (
         "https://www.cornwall.gov.uk/the-council-and-democracy/elections/elections-and-referendums/"
@@ -102,6 +107,13 @@ def printed(url: str) -> tuple[str, bool, set[str]]:
         text = subprocess.run(
             ["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True
         ).stdout
+        if not text.strip():
+            with tempfile.TemporaryDirectory() as folder:
+                subprocess.run(["pdftoppm", "-r", "200", "-png", str(path), f"{folder}/page"], check=True)
+                text = "".join(
+                    subprocess.run(["tesseract", str(png), "-"], capture_output=True, text=True, check=True).stdout
+                    for png in sorted(Path(folder).glob("page*.png"))
+                )
     elif pdf:
         with zipfile.ZipFile(path) as archive:
             xml = archive.read("word/document.xml" if path.suffix == ".docx" else "content.xml").decode()
