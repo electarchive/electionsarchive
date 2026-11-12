@@ -26,6 +26,9 @@ PAGE_PREFIXES = (
     "https://www.west-norfolk.gov.uk/info/",
     "https://somerset.gov.uk/news/",
     "https://netherstowey-pc.gov.uk/news/",
+    "https://www.eastherts.gov.uk/planning-building/",
+    "https://www.eastherts.gov.uk/planning-and-building/",
+    "https://web.archive.org/web/",
 )
 PAGES = {
     "E06000052": (
@@ -96,7 +99,7 @@ def fetch() -> None:
     for url in PAGES.values():
         raw.fetch(SOURCE, url, suffix=".html")
     for url in pl.read_csv(ROWS, separator="\t", infer_schema=False)["url"]:
-        if url.startswith(DOCUMENTS):
+        if url.startswith(DOCUMENTS) or url.endswith(".docx"):
             document(url)
         else:
             raw.fetch(SOURCE, url, suffix=".jpg" if url.endswith(".jpg") else ".html" if is_page(url) else ".pdf")
