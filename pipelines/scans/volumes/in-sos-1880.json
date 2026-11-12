@@ -22,5 +22,6 @@
     109,
     110
   ],
-  "note": "Leaves are Internet Archive page indexes (printed pages 101 to 107). The congressional election was held October 12, 1880; the archive dates these contests 1880-11-02. The president and governor are on a fold-out sheet (leaves 136-137) that is not specced here."
+  "note": "Leaves are Internet Archive page indexes (printed pages 101 to 107). The congressional election was held October 12, 1880; the archive dates these contests 1880-11-02. The president and governor are on a fold-out sheet (leaves 136-137) that is not specced here.",
+  "extend": true
 }
