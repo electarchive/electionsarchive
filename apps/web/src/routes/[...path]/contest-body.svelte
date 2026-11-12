@@ -78,13 +78,9 @@
     unit: path,
     contest,
     lists,
-    rounds,
     ballot,
-    cycle,
-    handover,
     additional,
-    successors,
-    statutes,
+    sections,
     shapes,
     match,
     standing,
@@ -101,25 +97,11 @@
     lists: Awaited<
       Extract<PageServerData, { kind: "contest" }>["body"]
     >["lists"];
-    rounds: Awaited<
-      Extract<PageServerData, { kind: "contest" }>["body"]
-    >["rounds"];
     ballot: Extract<PageServerData, { kind: "contest" }>["ballot"];
-    cycle: Awaited<
-      Extract<PageServerData, { kind: "contest" }>["body"]
-    >["cycle"];
-    handover: Awaited<
-      Extract<PageServerData, { kind: "contest" }>["body"]
-    >["handover"];
     additional: Awaited<
       Extract<PageServerData, { kind: "contest" }>["body"]
     >["additional"];
-    successors: Awaited<
-      Extract<PageServerData, { kind: "contest" }>["body"]
-    >["successors"];
-    statutes: Awaited<
-      Extract<PageServerData, { kind: "contest" }>["body"]
-    >["statutes"];
+    sections: Extract<PageServerData, { kind: "contest" }>["sections"];
     shapes: Extract<PageData, { kind: "contest" }>["shapes"];
     match: string;
     standing: Extract<PageServerData, { kind: "contest" }>["standing"];
@@ -129,7 +111,7 @@
   } = $props();
 
   const shaped = latest(
-    () => shapes,
+    (): typeof shapes => shapes,
     () => `${id}:${path}`,
   );
   const boundaries = $derived(shaped.current?.boundaries ?? []);
@@ -137,6 +119,33 @@
   const day = latest(
     (): typeof sameDay | Awaited<typeof sameDay> => sameDay,
     () => `${id}:${path}`,
+  );
+  const arrived = {
+    rounds: latest(
+      (): typeof sections.rounds => sections.rounds,
+      () => `${id}:${path}`,
+    ),
+    handover: latest(
+      (): typeof sections.handover => sections.handover,
+      () => `${id}:${path}`,
+    ),
+    successors: latest(
+      (): typeof sections.successors => sections.successors,
+      () => `${id}:${path}`,
+    ),
+    statutes: latest(
+      (): typeof sections.statutes => sections.statutes,
+      () => `${id}:${path}`,
+    ),
+  };
+  const rounds = $derived(arrived.rounds.current);
+  const handover = $derived(arrived.handover.current);
+  const successors = $derived(arrived.successors.current);
+  const statutes = $derived(arrived.statutes.current);
+  const routed = $derived(
+    sections.rounds instanceof Promise || sections.cycle instanceof Promise
+      ? Promise.all([sections.rounds, sections.cycle])
+      : ([sections.rounds, sections.cycle] as const),
   );
 
   const DAY: Record<string, () => string> = {
@@ -246,6 +255,7 @@
     if (
       list.length === 0 ||
       year == null ||
+      statutes == null ||
       list.every((origin) =>
         statutes.some((link) => !link.isNext && link.name === origin.name),
       )
@@ -300,6 +310,7 @@
   const heirs = $derived.by(() => {
     if (
       successors == null ||
+      statutes == null ||
       successors.places.every((place) =>
         statutes.some((link) => link.isNext && link.name === place.name),
       )
@@ -972,6 +983,9 @@
   );
   const verdict = $derived(lede(contest));
   const held = $derived.by(() => {
+    if (!arrived.handover.isReady) {
+      return null;
+    }
     if (handover == null || contest.current == null) {
       const won = contest.rows
         .filter((row) => (row.current?.seats ?? 0) > 0)
@@ -1096,7 +1110,7 @@
           name: handover.vacated.name,
         }),
   );
-  const comeback = $derived(rerun(contest, rounds));
+  const comeback = $derived(rounds == null ? null : rerun(contest, rounds));
   const items = $derived.by(() => {
     const winners = new Map(
       contest.series.map((entry) => [entry.date, entry.winner]),
@@ -1476,7 +1490,7 @@
           >{/if}{/each}
     </p>
   {/if}
-  {#each statutes as link, index (index)}
+  {#each statutes ?? [] as link, index (index)}
     {const parts = $derived(
       (link.isNext
         ? m.statutes_into({ year: link.year, seat: "\u0001" })
@@ -1576,26 +1590,35 @@
       </ol>
     </nav>
   {/if}
-  <SameDay
-    place={day.current?.place ?? cycle.day.place}
-    races={day.current?.races ?? []}
-    day={{
-      place: cycle.day.place,
-      part: cycle.day.part,
-      groups: cycle.day.groups.flatMap((group, index) =>
-        group.path == null
-          ? []
-          : [
-              {
-                ...group,
-                path: group.path,
-                key: `${group.kind}:${index}`,
-                label: group.label ?? DAY[group.kind]?.() ?? "",
-              },
-            ],
-      ),
-    }}
-  />
+  <Await
+    promise={sections.cycle}
+    name="contest.same-day"
+    reserve="0.75rem"
+    class="[--island-inset:0]"
+  >
+    {#snippet children(cycled: Awaited<typeof sections.cycle>)}
+      <SameDay
+        place={day.current?.place ?? cycled.day.place}
+        races={day.current?.races ?? []}
+        day={{
+          place: cycled.day.place,
+          part: cycled.day.part,
+          groups: cycled.day.groups.flatMap((group, index) =>
+            group.path == null
+              ? []
+              : [
+                  {
+                    ...group,
+                    path: group.path,
+                    key: `${group.kind}:${index}`,
+                    label: group.label ?? DAY[group.kind]?.() ?? "",
+                  },
+                ],
+          ),
+        }}
+      />
+    {/snippet}
+  </Await>
 </header>
 
 {#snippet roundsTable()}
@@ -1607,60 +1630,68 @@
 {/snippet}
 
 {#snippet road(isBelow: boolean)}
-  <Road
-    {isBelow}
-    {rounds}
-    {cycle}
-    paint={new Map(
-      contest.rows.flatMap((row) =>
-        row.current?.person == null
-          ? []
-          : [[row.current.person, swatch(row.color, row.key)]],
-      ),
-    )}
+  <Await
+    promise={routed}
+    name="contest.road:{isBelow ? 'below' : 'above'}"
+    class="[--island-inset:0]"
   >
-    {#snippet more()}
-      {#if cycle.others.length > 0}
-        <Disclosure class="text-[0.8125rem]">
-          {#snippet summary()}
-            <summary
-              class="cursor-pointer text-muted-foreground marker:text-border hover:text-foreground"
-            >
-              {m.cycle_others()}
-              <span class="font-figures tabular-nums"
-                >{count(cycle.others.length)}</span
-              >
-            </summary>
-          {/snippet}
-          <ul class="mbs-1.5 grid gap-x-6 gap-y-1 xl:grid-cols-2">
-            {#each cycle.others as other (other.party.id)}
-              <li class="grid gap-x-3 sm:grid-cols-[9.5rem_minmax(0,1fr)]">
-                <Name
-                  class="truncate font-medium"
-                  label={other.party.label}
-                  color={other.party.color}
-                />
-                <span class="flex flex-wrap gap-x-2.5">
-                  {#each other.races as race, index (index)}
-                    {#if race.path == null || race.isCurrent}
-                      <span class={cn({ "font-semibold": race.isCurrent })}
-                        >{race.place}</span
-                      >
-                    {:else}
-                      <Preview
-                        class="underline decoration-border underline-offset-4 hover:decoration-foreground"
-                        path={race.path}>{race.place}</Preview
-                      >
-                    {/if}
-                  {/each}
-                </span>
-              </li>
-            {/each}
-          </ul>
-        </Disclosure>
-      {/if}
+    {#snippet children([found, cycled]: Awaited<typeof routed>)}
+      <Road
+        {isBelow}
+        rounds={found}
+        cycle={cycled}
+        paint={new Map(
+          contest.rows.flatMap((row) =>
+            row.current?.person == null
+              ? []
+              : [[row.current.person, swatch(row.color, row.key)]],
+          ),
+        )}
+      >
+        {#snippet more()}
+          {#if cycled.others.length > 0}
+            <Disclosure class="text-[0.8125rem]">
+              {#snippet summary()}
+                <summary
+                  class="cursor-pointer text-muted-foreground marker:text-border hover:text-foreground"
+                >
+                  {m.cycle_others()}
+                  <span class="font-figures tabular-nums"
+                    >{count(cycled.others.length)}</span
+                  >
+                </summary>
+              {/snippet}
+              <ul class="mbs-1.5 grid gap-x-6 gap-y-1 xl:grid-cols-2">
+                {#each cycled.others as other (other.party.id)}
+                  <li class="grid gap-x-3 sm:grid-cols-[9.5rem_minmax(0,1fr)]">
+                    <Name
+                      class="truncate font-medium"
+                      label={other.party.label}
+                      color={other.party.color}
+                    />
+                    <span class="flex flex-wrap gap-x-2.5">
+                      {#each other.races as race, index (index)}
+                        {#if race.path == null || race.isCurrent}
+                          <span class={cn({ "font-semibold": race.isCurrent })}
+                            >{race.place}</span
+                          >
+                        {:else}
+                          <Preview
+                            class="underline decoration-border underline-offset-4 hover:decoration-foreground"
+                            path={race.path}>{race.place}</Preview
+                          >
+                        {/if}
+                      {/each}
+                    </span>
+                  </li>
+                {/each}
+              </ul>
+            </Disclosure>
+          {/if}
+        {/snippet}
+      </Road>
     {/snippet}
-  </Road>
+  </Await>
 {/snippet}
 
 {@render road(false)}

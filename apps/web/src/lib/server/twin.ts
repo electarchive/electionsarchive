@@ -325,8 +325,25 @@ export function negotiate(accept: string | null) {
 
 async function settle(data: Awaited<ReturnType<typeof archive>>) {
   if (data.kind === "contest") {
-    const [body, shapes, sameDay, ballot, standing] = await Promise.all([
+    const { sections } = data;
+    const [
+      body,
+      rounds,
+      cycle,
+      handover,
+      successors,
+      statutes,
+      shapes,
+      sameDay,
+      ballot,
+      standing,
+    ] = await Promise.all([
       data.body,
+      sections.rounds,
+      sections.cycle,
+      sections.handover,
+      sections.successors,
+      sections.statutes,
       data.shapes,
       data.sameDay,
       data.ballot,
@@ -338,13 +355,13 @@ async function settle(data: Awaited<ReturnType<typeof archive>>) {
       unit: data.unit,
       contest: body.contest,
       lists: body.lists,
-      rounds: body.rounds,
+      rounds,
       ballot,
-      cycle: body.cycle,
-      handover: body.handover,
+      cycle,
+      handover,
       additional: body.additional,
-      successors: body.successors,
-      statutes: body.statutes,
+      successors,
+      statutes,
       boundaries: shapes.boundaries,
       surround: shapes.surround,
       match: data.match,

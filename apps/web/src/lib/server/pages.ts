@@ -1366,25 +1366,21 @@ export async function archive(path: string, search: URLSearchParams) {
             }),
       )
       .catch(() => null);
+    const sections = {
+      rounds: call(router.contests.rounds, { id: slug.entity_id, unit }),
+      cycle: call(router.contests.cycle, { id: slug.entity_id, unit }),
+      handover: call(router.seats.change, { id: slug.entity_id }),
+      successors: call(router.seats.successors, { id: slug.entity_id }),
+      statutes: call(router.seats.statutes, { id: slug.entity_id }),
+    };
+    for (const section of Object.values(sections)) {
+      void section.catch(() => null);
+    }
     const body = (async () => {
-      const [
-        contest,
-        lists,
-        rounds,
-        cycle,
-        handover,
-        additional,
-        successors,
-        statutes,
-      ] = await Promise.all([
+      const [contest, lists, additional] = await Promise.all([
         got,
         call(router.contests.lists, { id: slug.entity_id }),
-        call(router.contests.rounds, { id: slug.entity_id, unit }),
-        call(router.contests.cycle, { id: slug.entity_id, unit }),
-        call(router.seats.change, { id: slug.entity_id }),
         call(router.seats.additional, { id: slug.entity_id }),
-        call(router.seats.successors, { id: slug.entity_id }),
-        call(router.seats.statutes, { id: slug.entity_id }),
       ]);
       ahead(contest.count, input.round, async (round) =>
         call(router.contests.get, { ...input, round }),
@@ -1395,12 +1391,7 @@ export async function archive(path: string, search: URLSearchParams) {
           ? { ...contest, election: { ...contest.election, path: null } }
           : contest,
         lists,
-        rounds,
-        cycle,
-        handover,
         additional,
-        successors,
-        statutes,
       };
     })();
     const shapes = (async () => {
@@ -1470,6 +1461,7 @@ export async function archive(path: string, search: URLSearchParams) {
       within,
       live,
       body,
+      sections,
       shapes,
       sameDay: races,
       ballot,

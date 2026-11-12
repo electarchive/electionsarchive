@@ -23,6 +23,7 @@
     unit,
     head,
     body,
+    sections,
     shapes,
     sameDay,
     primed,
@@ -37,6 +38,7 @@
     unit: string;
     head: Extract<PageServerData, { kind: "contest" }>["head"];
     body: Extract<PageServerData, { kind: "contest" }>["body"];
+    sections: Extract<PageServerData, { kind: "contest" }>["sections"];
     shapes: Extract<PageData, { kind: "contest" }>["shapes"];
     sameDay: Extract<PageServerData, { kind: "contest" }>["sameDay"];
     primed: Primed | Promise<Primed>;
@@ -131,13 +133,9 @@
       {unit}
       contest={opened.contest}
       lists={opened.lists}
-      rounds={opened.rounds}
       {ballot}
-      cycle={opened.cycle}
-      handover={opened.handover}
       additional={opened.additional}
-      successors={opened.successors}
-      statutes={opened.statutes}
+      {sections}
       {shapes}
       {match}
       {standing}
