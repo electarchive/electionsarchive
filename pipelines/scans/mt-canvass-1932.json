@@ -1,0 +1,272 @@
+{
+ "polity": "US-MT",
+ "publisher": "Montana Secretary of State",
+ "title": "Official Montana general election returns 1932, by county",
+ "license": "Public record",
+ "file": {
+  "url": "https://archive.org/download/officialmontanag1932montrich/officialmontanag1932montrich.pdf",
+  "item": "https://archive.org/details/officialmontanag1932montrich"
+ },
+ "raw_source": "us.county_volumes",
+ "contests": {
+  "president": {
+   "year": 1932,
+   "chamber": "president",
+   "day": "1932-11-08",
+   "special": false,
+   "state": "MT",
+   "district": null
+  },
+  "house1": {
+   "year": 1932,
+   "chamber": "house",
+   "day": "1932-11-08",
+   "special": false,
+   "state": "MT",
+   "district": 1
+  },
+  "house2": {
+   "year": 1932,
+   "chamber": "house",
+   "day": "1932-11-08",
+   "special": false,
+   "state": "MT",
+   "district": 2
+  },
+  "governor": {
+   "year": 1932,
+   "chamber": "governor",
+   "day": "1932-11-08",
+   "special": false,
+   "state": "MT",
+   "district": null
+  }
+ },
+ "pages": [
+  {
+   "page": 2,
+   "orientation": "counties_down",
+   "bands": 2,
+   "header": [
+    0.0,
+    0.3472
+   ],
+   "id": "2-pres",
+   "columns": [
+    {
+     "label": "Guy C. Derry",
+     "contest": "president",
+     "candidate": "Roosevelt (Democratic)"
+    },
+    {
+     "label": "Thomas Dignan",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Mrs. Otto Simonson",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "B. C. White",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Mrs. George H. Berry",
+     "contest": "president",
+     "candidate": "Hoover (Republican)"
+    },
+    {
+     "label": "Frank B. Connelly",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "George Sinton",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "M. A. Tschirgi",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "William A. Curtis",
+     "contest": "president",
+     "candidate": "Thomas (Socialist)"
+    },
+    {
+     "label": "Mrs. Katherine Held",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "John F. Mass",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Clifton L. Williams",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "May Adams",
+     "contest": "president",
+     "candidate": "Communist"
+    },
+    {
+     "label": "Jerome Blodgett",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Thomas Murphy",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "W. T. Hartley",
+     "contest": "president",
+     "candidate": "Liberty"
+    },
+    {
+     "label": "O. J. Kenny",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Dr. J. H. Meyer",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Mrs. W. E. Parker",
+     "contest": null,
+     "candidate": ""
+    }
+   ],
+   "crop": [
+    0.0,
+    0.182,
+    0.505,
+    0.925
+   ],
+   "hint": "Read only the presidential electors table: four Democratic, four Republican, four Socialist, three Communist, and four Liberty electors, 19 columns in all."
+  },
+  {
+   "page": 2,
+   "orientation": "counties_down",
+   "bands": 2,
+   "header": [
+    0.0,
+    0.3472
+   ],
+   "id": "2-house",
+   "columns": [
+    {
+     "label": "Joseph P. Monaghan",
+     "contest": "house1",
+     "candidate": "Joseph F. Monaghan"
+    },
+    {
+     "label": "Mark D. Fitzgerald",
+     "contest": "house1",
+     "candidate": "Mark D. Fitzgerald"
+    },
+    {
+     "label": "A. N. Brooks",
+     "contest": "house1",
+     "candidate": "A. N. Brooks"
+    },
+    {
+     "label": "Roger Murray",
+     "contest": "house1",
+     "candidate": "Roger Murray"
+    },
+    {
+     "label": "Roy E. Ayers",
+     "contest": "house2",
+     "candidate": "Roy E. Ayers"
+    },
+    {
+     "label": "Scott Leavitt",
+     "contest": "house2",
+     "candidate": "Scott Leavitt"
+    },
+    {
+     "label": "J. H. Matheson",
+     "contest": "house2",
+     "candidate": "J. H. Matheson"
+    },
+    {
+     "label": "Harry Juul",
+     "contest": "house2",
+     "candidate": "Harry Juul"
+    },
+    {
+     "label": "H. F. Fuerstnow",
+     "contest": "house2",
+     "candidate": "H. F. Fuerstnow"
+    }
+   ],
+   "crop": [
+    0.0,
+    0.182,
+    0.745,
+    0.925
+   ],
+   "hint": "Read only the two Representative in Congress tables (First District, four columns, and Second District, five columns), the nine rightmost columns of the image; skip the presidential elector columns. Blank or dotted cells are empty strings."
+  },
+  {
+   "page": 2,
+   "orientation": "counties_down",
+   "bands": 2,
+   "header": [
+    0.0,
+    0.3472
+   ],
+   "id": "2-gov",
+   "columns": [
+    {
+     "label": "John E. Erickson",
+     "contest": "governor",
+     "candidate": "John E. Erickson"
+    },
+    {
+     "label": "Frank A. Hazelbaker",
+     "contest": "governor",
+     "candidate": "Frank A. Hazelbaker"
+    },
+    {
+     "label": "Christian Yegen",
+     "contest": "governor",
+     "candidate": "Christian Yegen",
+     "party": "Socialist"
+    },
+    {
+     "label": "Rodney Salisbury",
+     "contest": "governor",
+     "candidate": "Rodney Salisbury",
+     "party": "Communist"
+    },
+    {
+     "label": "Wm. R. Duncan",
+     "contest": "governor",
+     "candidate": "William R. Duncan"
+    }
+   ],
+   "crop": [
+    0.0,
+    0.182,
+    1.0,
+    0.925
+   ],
+   "hint": "Read only the Governor table, the five rightmost columns of the image (Democratic, Republican, Socialist, Communist, and Liberty); skip every other column."
+  }
+ ],
+ "extend": true
+}

@@ -1137,6 +1137,9 @@ def finalize(
         fixes = [item for item in overrides.get("cells", []) if item["series"] == name]
         for item in fixes:
             key = (str(item.get("section", item.get("page"))), str(item["county"]))
+            if "value" in item and item["value"] is None:
+                cellmap.pop(key, None)
+                continue
             seen = cellmap.get(key) or one.cells.get(key) or (two.cells.get(key) if two is not None else None)
             if seen is not None:
                 cellmap[key] = (int(item["value"]) if "value" in item else seen[0] + int(item["delta"]), seen[1])
