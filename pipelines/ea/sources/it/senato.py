@@ -1876,7 +1876,8 @@ def emit() -> Path:
                     ballot_label=row["label"],
                 )
                 person = None
-                if row["surname"] or row["forename"] or row["senator"]:
+                if row["senator"] or re.search("[A-Za-z]{2}", f"{row['surname']} {row['forename']}"):
+                    row = row | {"forename": "" if row["forename"] == "-" else row["forename"]}
                     person = person_of(row, day, region)
                     candidacy = cs.key("it.candidacy", option_key)
                     cs.add(
@@ -2660,4 +2661,18 @@ def emit() -> Path:
                 )
         for row in cs.rows["contest"]:
             cs.add("note", entity_id=row["id"], kind="context", body_md=SENATE_NOTE)
+        staged = {str(row["id"]) for row in cs.rows.get("candidacy", [])} | {
+            str(row["id"]) for row in cs.rows.get("person", [])
+        }
+        for person, candidacy in cs.conn.execute(
+            """select p.id, cy.id from person p join changeset c on c.id = p.changeset_id
+               join name n on n.entity_id = p.id and n.is_preferred
+               left join candidacy cy on cy.person_id = p.id
+               where c.pipeline = %s and (n.text !~ '[A-Za-z]{2}' or n.text ~ '(^|\\s)-(\\s|$)')""",
+            [SOURCE],
+        ).fetchall():
+            if candidacy is not None and str(candidacy) not in staged:
+                cs.add("entity_retirement", entity_id=candidacy, reason="placeholder name with no letters")
+            if candidacy is None and str(person) not in staged:
+                cs.add("entity_retirement", entity_id=person, reason="placeholder name with no letters")
         return cs.write()
