@@ -11211,19 +11211,41 @@ export const contests = {
             ? null
             : rowsOf(
                 await db.execute<{ k: number }>(sql`
-                  with recursive down(id, depth) as (
+                  with recursive anc(id, depth) as (
                     select ${area.id}::uuid, 0
                     union all
-                    select p.area_id, down.depth + 1 from area_parent p join down on p.parent_id = down.id
-                    where p.valid @> ${day}::date and down.depth < 3
+                    select p.parent_id, anc.depth + 1 from anc
+                    cross join lateral (select x.parent_id from area_parent x where x.area_id = anc.id and x.valid @> ${day}::date offset 0) p
+                    where anc.depth < 8
+                  ),
+                  rise(k, id, depth) as (
+                    select rs.k, c.district_area_id, 0 from result_set rs join contest c on c.id = rs.contest_id
+                    where rs.k = any(${sql.param(ks)}::int[]) and c.district_area_id is not null
+                    union all
+                    select rise.k, p.parent_id, rise.depth + 1 from rise
+                    cross join lateral (select x.parent_id from area_parent x where x.area_id = rise.id and x.valid @> ${day}::date offset 0) p
+                    where rise.depth < 8 and rise.id <> ${area.id}::uuid
+                  ),
+                  near as materialized (
+                    select rs.k from result_set rs join contest c on c.id = rs.contest_id
+                    where rs.k = any(${sql.param(ks)}::int[])
+                      and (c.district_area_id is null or c.district_area_id in (select id from anc))
+                    union
+                    select k from rise where id = ${area.id}::uuid
+                  ),
+                  units as materialized (
+                    select u.k, u.area_id from reporting_unit u
+                    where u.k in (select v.unit_k from result_value v where v.result_set_k = any(array(select k from near)))
+                      and u.area_relation = 'within' and u.kind in ('standard', 'aggregate') and u.area_id is not null
+                  ),
+                  up(k, id, depth) as (
+                    select k, area_id, 0 from units
+                    union all
+                    select up.k, p.parent_id, up.depth + 1 from up
+                    cross join lateral (select x.parent_id from area_parent x where x.area_id = up.id and x.valid @> ${day}::date offset 0) p
+                    where up.depth < 3 and up.id <> ${area.id}::uuid
                   )
-                  select u.k from (select distinct id from down) d
-                  join reporting_unit u on u.area_id = d.id
-                  where u.area_relation = 'within' and u.kind in ('standard', 'aggregate')
-                    and exists (
-                      select from result_value v
-                      where v.result_set_k = any(${sql.param(ks)}::int[]) and v.unit_k = u.k
-                    )
+                  select distinct k from up where id = ${area.id}::uuid
                   limit ${CAP + 1}
                 `),
               ).map((row) => row.k);
