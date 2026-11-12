@@ -38,6 +38,7 @@ BY_BALLOTS = (
 )
 BY_ELSEWHERE = ("local.city-of-london.", "local.isles-of-scilly.")
 BY = PARSED / "by"
+DECLARATIONS = Path(__file__).with_name("by_declarations.tsv")
 RESULTS = "https://candidates.democracyclub.org.uk/media/csv-archives/results-{day}.csv"
 ARCHIVED = {2018, 2019, 2023}
 SAMPLED = {2026}
@@ -359,6 +360,10 @@ def polite(url: str, suffix: str) -> raw.Artifact:
     return raw.fetch(SOURCE, url, suffix=suffix)
 
 
+def declarations() -> pl.DataFrame:
+    return pl.read_csv(DECLARATIONS, separator="\t", infer_schema_length=0)
+
+
 def by_years() -> list[int]:
     return sorted({int(year) for year in os.environ["DC_BY"].split(",")}, reverse=True)
 
@@ -458,6 +463,8 @@ def fetch() -> None:
                 polite(f"{API.format(day=day)}&page_size=200&page=1", ".json")
                 for url in day_pages(day):
                     polite(url, ".json")
+        for url in declarations()["url"].unique().sort():
+            polite(url, ".pdf" if url.lower().endswith(".pdf") else ".html")
         for year in LOOKUPS:
             for url in lookup_pages(year):
                 raw.fetch(SOURCE, url, suffix=".json")
@@ -739,6 +746,16 @@ def parse_by() -> None:
     councils_held = {int(key[3:]) + 2000: layer_codes(key) for key in LAYERS if key.startswith("lad")}
     held = held_divisions()
     ced = divisions() if 2026 in by_years() else None
+    declared = declarations().select(
+        ballot_paper_id="ballot",
+        person_id="person_id",
+        declared_source="url",
+        declared_votes="votes",
+        declared_winner=pl.when(pl.col("elected") == "y").then(pl.lit("True")).otherwise(pl.lit("False")),
+        declared_spoilt="spoilt",
+    )
+    if declared.select("ballot_paper_id", "person_id").is_duplicated().any():
+        raise ValueError("by_declarations.tsv lists a candidate twice")
     BY.mkdir(parents=True, exist_ok=True)
     for year in by_years():
         records = by_records(year)
@@ -749,6 +766,27 @@ def parse_by() -> None:
         results = pl.concat([day_lines(day) for day in by_days(year)]).join(
             ballots.select(ballot_paper_id="ballot"), on="ballot_paper_id"
         )
+        council = declared.join(ballots.select(ballot_paper_id="ballot"), on="ballot_paper_id")
+        if not (stray := council.join(results, on=["ballot_paper_id", "person_id"], how="anti")).is_empty():
+            raise ValueError(f"declared candidates with no Democracy Club result: {stray.rows()}")
+        results = results.join(council, on=["ballot_paper_id", "person_id"], how="left")
+        if not (
+            short := results.filter(
+                pl.col("ballot_paper_id").is_in(council["ballot_paper_id"].implode()),
+                pl.col("declared_source").is_null(),
+            )
+        ).is_empty():
+            raise ValueError(
+                f"declared ballots missing a candidate: {short.select('ballot_paper_id', 'person_name').rows()}"
+            )
+        results = results.with_columns(
+            source=pl.coalesce("declared_source", "source"),
+            ballots_cast=pl.coalesce("declared_votes", "ballots_cast"),
+            is_winner=pl.coalesce("declared_winner", "is_winner"),
+            spoilt_ballots=pl.when(pl.col("declared_source").is_null())
+            .then("spoilt_ballots")
+            .otherwise("declared_spoilt"),
+        ).drop(column for column in council.columns if column.startswith("declared_"))
         found = (
             ballots.join(
                 results.group_by("ballot_paper_id", maintain_order=True)
@@ -800,7 +838,7 @@ def parse_by() -> None:
         found = found.with_columns(
             status=pl.when(pl.col("winners").is_null())
             .then(pl.lit("no Democracy Club result"))
-            .otherwise(statuses(pl.lit(False)))
+            .otherwise(statuses(pl.col("ballot").is_in(council["ballot_paper_id"].implode())))
         )
         print(year, count, "ballots,", len(found), "off the polling day")
         print("  ", found.group_by("status").len().sort("len", descending=True).rows())
@@ -1320,6 +1358,7 @@ def emit() -> Path:
                     "declaration notices are linked from the same page.",
                 )
                 cs.artifact(raw.cached(SOURCE, CROYDON[year]), leeds_sources[(CROYDON_CODE, year)])
+        declared = set(declarations()["url"]) if by_mode else set()
         council_rows: dict[tuple[str, int, str], list[dict[str, object]]] = {}
         for row in (
             pl.read_parquet(PARSED / "leeds.parquet").filter(pl.col("year").is_in(list(full))).iter_rows(named=True)
@@ -1573,6 +1612,24 @@ def emit() -> Path:
                             f"{ward['ballot']}: the council's file and Democracy Club list different candidates"
                         )
                 differing = [line for line in ballot_lines if tallies[line["person_id"]] != counted[line["person_id"]]]
+                source = sources[year]
+                if ward["source"] in declared:
+                    title = f"Declaration of result of poll, {display} {part} by-election, {day.day} {day:%B %Y}"
+                    source = cs.source(council_name, title)
+                    if source not in foreign:
+                        cs.add(
+                            "source",
+                            id=source,
+                            kind="official_body",
+                            publisher=council_name,
+                            title=title,
+                            url=ward["source"],
+                            notes="The returning officer's declaration of the result of the poll, published by the "
+                            "council. Democracy Club's record of this by-election cites a newspaper, social media "
+                            "post, or the Local Elections Archive Project, so the council's own declaration is "
+                            "loaded in its place; its figures were checked against Democracy Club's.",
+                        )
+                        cs.artifact(raw.cached(SOURCE, ward["source"]), source)
                 sets = []
                 tacit = ward["status"] == "tacit"
                 withdrawn = ward["status"] not in ("loaded", "tacit")
@@ -1580,7 +1637,7 @@ def emit() -> Path:
                     sets.append(
                         (
                             cs.key("gb.dc_local.result_set", contest_key),
-                            tacit_sources[year] if tacit else sources[year],
+                            tacit_sources[year] if tacit else source,
                             council is None and not withdrawn and contest not in handbook and year not in CROSS_CHECKS,
                             {"ballot_paper_id": ward["ballot"], "council_source": ward["source"]},
                             ward["spoilt"],
