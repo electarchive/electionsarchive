@@ -102,7 +102,8 @@ def emit() -> Path:
                    join entity e on e.id = co.id and e.retired_by is null
                    join election el on el.id = co.election_id
                    join external_id ex on ex.entity_id = el.id and ex.scheme = 'us.election'
-                   join name n on n.entity_id = co.id and n.is_preferred and n.lang = 'en'
+                   join lateral (select text from name where entity_id = co.id and lang = 'en'
+                                 order by is_preferred desc, text desc limit 1) n on true
                    join name pn on pn.entity_id = el.polity_id and pn.is_preferred and pn.lang = 'en'
                    join slug s on s.entity_id = co.id and s.is_current
                    join slug es on es.entity_id = el.id and es.is_current
