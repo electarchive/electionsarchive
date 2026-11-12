@@ -27,6 +27,7 @@ PAGE_PREFIXES = (
     "https://somerset.gov.uk/news/",
     "https://netherstowey-pc.gov.uk/news/",
     "https://www.eastherts.gov.uk/planning-building/",
+    "https://www.hart.gov.uk/news/",
     "https://www.eastherts.gov.uk/planning-and-building/",
     "https://web.archive.org/web/",
     "https://www.warwickdc.gov.uk/info/",
@@ -141,6 +142,13 @@ def printed(url: str) -> tuple[str, bool, set[str]]:
                 text = "".join(
                     subprocess.run(["tesseract", str(png), "-"], capture_output=True, text=True, check=True).stdout
                     for png in sorted(Path(folder).glob("page*.png"))
+                )
+                subprocess.run(["pdftoppm", "-r", "400", "-png", str(path), f"{folder}/fine"], check=True)
+                text += "".join(
+                    subprocess.run(
+                        ["tesseract", str(png), "-", "--psm", "6"], capture_output=True, text=True, check=True
+                    ).stdout
+                    for png in sorted(Path(folder).glob("fine*.png"))
                 )
     elif pdf:
         with zipfile.ZipFile(path) as archive:
