@@ -150,7 +150,7 @@
       "crop": [
         0.158,
         0.096,
-        0.819,
+        0.86,
         0.313
       ],
       "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
@@ -174,7 +174,7 @@
       "crop": [
         0.158,
         0.305,
-        0.818,
+        0.86,
         0.596
       ],
       "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."

@@ -139,7 +139,7 @@
       "crop": [
         0.543,
         0.143,
-        0.625,
+        0.87,
         0.42
       ],
       "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
@@ -187,7 +187,7 @@
       "crop": [
         0.543,
         0.412,
-        0.625,
+        0.87,
         0.683
       ],
       "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
@@ -235,7 +235,7 @@
       "crop": [
         0.543,
         0.675,
-        0.625,
+        0.87,
         0.89
       ],
       "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."

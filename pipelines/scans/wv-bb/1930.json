@@ -107,8 +107,8 @@
       "columns": [
         {
           "label": "Robert L. Ramsey Democrat",
-          "contest": null,
-          "candidate": ""
+          "contest": "house1",
+          "candidate": "Robert L. Ramsay"
         },
         {
           "label": "Carl G. Bachmann Republican",
@@ -131,13 +131,13 @@
       "columns": [
         {
           "label": "Mary M. Johnson Dem. (Short Term)",
-          "contest": "house4",
-          "candidate": "Mary M. Johnson"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "Robert L. Hogg Rep. (Short Term)",
-          "contest": "house4",
-          "candidate": "Robert L. Hogg"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "L. R. Via Dem. (Long Term)",
@@ -146,8 +146,8 @@
         },
         {
           "label": "Robert L. Hogg Rep. (Long Term)",
-          "contest": "house4",
-          "candidate": "Robert L. Hogg"
+          "contest": null,
+          "candidate": ""
         }
       ],
       "orientation": "counties_down",

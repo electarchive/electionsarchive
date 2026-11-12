@@ -101,6 +101,30 @@
     },
     {
       "page": 453,
+      "id": "453-3",
+      "columns": [
+        {
+          "label": "*Harley O. Staggers, Keyser Democrat",
+          "contest": "house2",
+          "candidate": "Harley O. Staggers"
+        },
+        {
+          "label": "Cooper P. Benedict, Lewisburg Republican",
+          "contest": "house2",
+          "candidate": "Cooper P. Benedict"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.099,
+        0.06,
+        0.878,
+        0.25
+      ],
+      "hint": "This is the continuation of the 'SECOND CONGRESSIONAL DISTRICT' table from the previous page (Monongalia through Webster, then TOTAL); the first column is Harley O. Staggers and the second Cooper P. Benedict. Ignore the THIRD CONGRESSIONAL DISTRICT table."
+    },
+    {
+      "page": 453,
       "id": "453-0",
       "columns": [
         {
