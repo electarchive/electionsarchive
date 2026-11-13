@@ -1,0 +1,619 @@
+{
+  "polity": "US-WI",
+  "publisher": "Wisconsin Legislative Reference Bureau",
+  "title": "The Wisconsin Blue Book 1921, vote by counties (general election 1920-11-02)",
+  "license": "Public record",
+  "file": {
+    "url": "https://search.library.wisc.edu/digital/AQEHAMYTSP3ADT86",
+    "item": "https://search.library.wisc.edu/digital/AQEHAMYTSP3ADT86"
+  },
+  "raw_source": "us.county_volumes",
+  "extend": true,
+  "contests": {
+    "president": {
+      "year": 1920,
+      "chamber": "president",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "senate": {
+      "year": 1920,
+      "chamber": "senate",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "house1": {
+      "year": 1920,
+      "chamber": "house",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "WI",
+      "district": 1
+    },
+    "house2": {
+      "year": 1920,
+      "chamber": "house",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "WI",
+      "district": 2
+    },
+    "house3": {
+      "year": 1920,
+      "chamber": "house",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "WI",
+      "district": 3
+    },
+    "house4": {
+      "year": 1920,
+      "chamber": "house",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "WI",
+      "district": 4
+    },
+    "house5": {
+      "year": 1920,
+      "chamber": "house",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "WI",
+      "district": 5
+    },
+    "house6": {
+      "year": 1920,
+      "chamber": "house",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "WI",
+      "district": 6
+    },
+    "house7": {
+      "year": 1920,
+      "chamber": "house",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "WI",
+      "district": 7
+    },
+    "house8": {
+      "year": 1920,
+      "chamber": "house",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "WI",
+      "district": 8
+    },
+    "house9": {
+      "year": 1920,
+      "chamber": "house",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "WI",
+      "district": 9
+    },
+    "house10": {
+      "year": 1920,
+      "chamber": "house",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "WI",
+      "district": 10
+    },
+    "house11": {
+      "year": 1920,
+      "chamber": "house",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "WI",
+      "district": 11
+    }
+  },
+  "pages": [
+    {
+      "page": 177,
+      "id": "177-0",
+      "columns": [
+        {
+          "label": "Cox",
+          "contest": "president",
+          "candidate": "James Cox (Democratic)"
+        },
+        {
+          "label": "Watkins",
+          "contest": "president",
+          "candidate": "Aaron Watkins (Prohibition)"
+        },
+        {
+          "label": "Harding",
+          "contest": "president",
+          "candidate": "Warren G. Harding (Republican)"
+        },
+        {
+          "label": "Debs",
+          "contest": "president",
+          "candidate": "Eugene Debs (Socialist)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.168,
+        0.128,
+        0.919,
+        0.916
+      ],
+      "hint": "Read only the table headed 'SUMMARY OF VOTE FOR PRESIDENT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0571
+      ]
+    },
+    {
+      "page": 222,
+      "id": "222-0",
+      "columns": [
+        {
+          "label": "Total vote",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Paul S. Reinsch, Dem.",
+          "contest": "senate",
+          "candidate": "Paul S. Reinsch"
+        },
+        {
+          "label": "Clyde D. Mead, Pro.",
+          "contest": "senate",
+          "candidate": "Clyde D. Mead"
+        },
+        {
+          "label": "Irvine L. Lenroot, Rep.",
+          "contest": "senate",
+          "candidate": "Irvine L. Lenroot"
+        },
+        {
+          "label": "Frank J Weber, Soc.",
+          "contest": "senate",
+          "candidate": "Frank J. Weber"
+        },
+        {
+          "label": "James Thompson, Ind.",
+          "contest": "senate",
+          "candidate": "James Thompson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.112,
+        0.104,
+        0.862,
+        0.944
+      ],
+      "hint": "Read only the table headed 'SUMMARY OF VOTE FOR UNITED STATES SENATOR, NOVEMBER 2, 1920'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1071
+      ]
+    },
+    {
+      "page": 235,
+      "id": "235-0",
+      "columns": [
+        {
+          "label": "Total Vote",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Andrew F. Stahl",
+          "contest": "house1",
+          "candidate": "Andrew F. Stahl"
+        },
+        {
+          "label": "Henry Allen Cooper",
+          "contest": "house1",
+          "candidate": "Henry Allen Cooper"
+        },
+        {
+          "label": "Samuel S. Walkup",
+          "contest": "house1",
+          "candidate": "Samuel S. Walkup"
+        },
+        {
+          "label": "Scattering",
+          "contest": "house1",
+          "candidate": "Scattering"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.138,
+        0.294,
+        0.887,
+        0.527
+      ],
+      "hint": "Read only the table headed 'FIRST DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 235,
+      "id": "235-1",
+      "columns": [
+        {
+          "label": "Total Vote",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Harry W. Bolens",
+          "contest": "house2",
+          "candidate": "Harry W. Bolens"
+        },
+        {
+          "label": "Edward Voigt",
+          "contest": "house2",
+          "candidate": "Edward Voigt"
+        },
+        {
+          "label": "Jacob F. Miller",
+          "contest": "house2",
+          "candidate": "Jacob F. Miller"
+        },
+        {
+          "label": "Scattering",
+          "contest": "house2",
+          "candidate": "Scattering"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.138,
+        0.519,
+        0.887,
+        0.749
+      ],
+      "hint": "Read only the table headed 'SECOND DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 236,
+      "id": "236-0",
+      "columns": [
+        {
+          "label": "Total Vote",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "James W. Murphy",
+          "contest": "house3",
+          "candidate": "James W. Murphy"
+        },
+        {
+          "label": "John M. Nelson",
+          "contest": "house3",
+          "candidate": "John M. Nelson"
+        },
+        {
+          "label": "Scattering",
+          "contest": "house3",
+          "candidate": "",
+          "party": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.109,
+        0.147,
+        0.855,
+        0.389
+      ],
+      "hint": "Read only the table headed 'THIRD DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 236,
+      "id": "236-1",
+      "columns": [
+        {
+          "label": "Total Vote",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Gerald P. Hayes",
+          "contest": "house4",
+          "candidate": "Gerald P. Hayes"
+        },
+        {
+          "label": "John C. Kleczka",
+          "contest": "house4",
+          "candidate": "John C. Kleczka"
+        },
+        {
+          "label": "Robert Buech",
+          "contest": "house4",
+          "candidate": "Robert Buech"
+        },
+        {
+          "label": "Scattering",
+          "contest": "house4",
+          "candidate": "",
+          "party": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.105,
+        0.381,
+        0.853,
+        0.605
+      ],
+      "hint": "Read only the table headed 'FOURTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 236,
+      "id": "236-2",
+      "columns": [
+        {
+          "label": "Total Vote",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "William H. Stafford",
+          "contest": "house5",
+          "candidate": "William H. Stafford"
+        },
+        {
+          "label": "Victor L. Berger",
+          "contest": "house5",
+          "candidate": "Victor L. Berger"
+        },
+        {
+          "label": "Scattering",
+          "contest": "house5",
+          "candidate": "Scattering"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.103,
+        0.597,
+        0.853,
+        0.775
+      ],
+      "hint": "Read only the table headed 'FIFTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 237,
+      "id": "237-0",
+      "columns": [
+        {
+          "label": "Total Vote",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Leo P. Fox",
+          "contest": "house6",
+          "candidate": "Leo P. Fox"
+        },
+        {
+          "label": "Florian Lampert",
+          "contest": "house6",
+          "candidate": "Florian Lampert"
+        },
+        {
+          "label": "Edward C. Damrow",
+          "contest": "house6",
+          "candidate": "Edward C. Damrow"
+        },
+        {
+          "label": "Scattering",
+          "contest": "house6",
+          "candidate": "Scattering"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.154,
+        0.164,
+        0.9,
+        0.372
+      ],
+      "hint": "Read only the table headed 'SIXTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 237,
+      "id": "237-1",
+      "columns": [
+        {
+          "label": "Total Vote",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Robert H. Clarke",
+          "contest": "house7",
+          "candidate": "Robert H. Clarke"
+        },
+        {
+          "label": "Joseph D. Beck",
+          "contest": "house7",
+          "candidate": "Joseph D. Beck"
+        },
+        {
+          "label": "A. W. Steinbach",
+          "contest": "house7",
+          "candidate": "A. W. Steinbach"
+        },
+        {
+          "label": "Scattering",
+          "contest": "house7",
+          "candidate": "Scattering"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.154,
+        0.364,
+        0.901,
+        0.643
+      ],
+      "hint": "Read only the table headed 'SEVENTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 237,
+      "id": "237-2",
+      "columns": [
+        {
+          "label": "Total Vote",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Leo P. Pasternacki",
+          "contest": "house8",
+          "candidate": "L. P. Pasternacki"
+        },
+        {
+          "label": "Edward E. Browne",
+          "contest": "house8",
+          "candidate": "Edward E. Browne"
+        },
+        {
+          "label": "George W. Lippert",
+          "contest": "house8",
+          "candidate": "George W. Lippert"
+        },
+        {
+          "label": "Scattering",
+          "contest": "house8",
+          "candidate": "Scattering"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.156,
+        0.635,
+        0.905,
+        0.86
+      ],
+      "hint": "Read only the table headed 'EIGHTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 238,
+      "id": "238-0",
+      "columns": [
+        {
+          "label": "Total Vote",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Andrew R. McDonald",
+          "contest": "house9",
+          "candidate": "A. R. McDonald"
+        },
+        {
+          "label": "David G. Classon",
+          "contest": "house9",
+          "candidate": "David G. Classon"
+        },
+        {
+          "label": "Harry G. Hanrahan",
+          "contest": "house9",
+          "candidate": "H. G. Hanrahan"
+        },
+        {
+          "label": "Scattering",
+          "contest": "house9",
+          "candidate": "Scattering"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.101,
+        0.137,
+        0.847,
+        0.383
+      ],
+      "hint": "Read only the table headed 'NINTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 238,
+      "id": "238-1",
+      "columns": [
+        {
+          "label": "Total Vote",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "James A. Frear",
+          "contest": "house10",
+          "candidate": "James A. Frear"
+        },
+        {
+          "label": "Thomas Ryan",
+          "contest": "house10",
+          "candidate": "Thomas Ryan"
+        },
+        {
+          "label": "Scattering",
+          "contest": "house10",
+          "candidate": "Scattering"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.101,
+        0.375,
+        0.847,
+        0.637
+      ],
+      "hint": "Read only the table headed 'TENTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 238,
+      "id": "238-2",
+      "columns": [
+        {
+          "label": "Total Vote",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Adolphus P. Nelson",
+          "contest": "house11",
+          "candidate": "Adolphus P. Nelson"
+        },
+        {
+          "label": "John P. Jensen",
+          "contest": "house11",
+          "candidate": "John P. Jensen"
+        },
+        {
+          "label": "Scattering",
+          "contest": "house11",
+          "candidate": "Scattering"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.101,
+        0.629,
+        0.847,
+        0.92
+      ],
+      "hint": "Read only the table headed 'ELEVENTH DISTRICT'; ignore any other table visible in the image."
+    }
+  ]
+}

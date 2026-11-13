@@ -1,0 +1,168 @@
+{
+  "polity": "US-WI",
+  "publisher": "Wisconsin Secretary of State",
+  "title": "The Wisconsin Blue Book 1913, vote by counties (general election 1912-11-05)",
+  "license": "Public record",
+  "file": {
+    "url": "https://search.library.wisc.edu/digital/ALGTKLQSRXWSF786",
+    "item": "https://search.library.wisc.edu/digital/ALGTKLQSRXWSF786"
+  },
+  "raw_source": "us.county_volumes",
+  "extend": true,
+  "contests": {
+    "president": {
+      "year": 1912,
+      "chamber": "president",
+      "day": "1912-11-05",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "governor": {
+      "year": 1912,
+      "chamber": "governor",
+      "day": "1912-11-05",
+      "special": false,
+      "state": "WI",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 225,
+      "id": "225-0",
+      "columns": [
+        {
+          "label": "Woodrow Wilson, Dem.",
+          "contest": "president",
+          "candidate": "Woodrow Wilson (Democratic)"
+        },
+        {
+          "label": "Eugene Chafin, Pro.",
+          "contest": "president",
+          "candidate": "Eugene Chafin (Prohibition)"
+        },
+        {
+          "label": "Wm. H. Taft, Rep.",
+          "contest": "president",
+          "candidate": "William H. Taft (Republican)"
+        },
+        {
+          "label": "Eugene V. Debs, Soc. Dem.",
+          "contest": "president",
+          "candidate": "Eugene V. Debs (Socialist)"
+        },
+        {
+          "label": "Theodore Roosevelt, Prog. Ind.",
+          "contest": "president",
+          "candidate": "Theodore Roosevelt (Progressive \"Bull Moose\")"
+        },
+        {
+          "label": "A. E. Reimer, Ind.",
+          "contest": "president",
+          "candidate": "Arthur Reimer (Socialist Labor)"
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Pluralities Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Pluralities Prog. Ind.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Pluralities Rep.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.167,
+        0.112,
+        0.922,
+        0.98
+      ],
+      "hint": "Read only the table headed 'SUMMARY OF VOTE FOR PRESIDENT, 1912, BY COUNTIES'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1071
+      ]
+    },
+    {
+      "page": 271,
+      "id": "271-0",
+      "columns": [
+        {
+          "label": "John C. Karel, Dem.",
+          "contest": "governor",
+          "candidate": "John C. Karel"
+        },
+        {
+          "label": "Chas. L. Hill, Pro.",
+          "contest": "governor",
+          "candidate": "Charles L. Hill"
+        },
+        {
+          "label": "Francis E. McGovern, Rep.",
+          "contest": "governor",
+          "candidate": "Francis E. McGovern"
+        },
+        {
+          "label": "Carl D. Tho'p-son, Soc. Dem.",
+          "contest": "governor",
+          "candidate": "Carl D. Tho'pson",
+          "party": "Soc. Dem."
+        },
+        {
+          "label": "Wm. H. Cur-tis, Soc. Lab.",
+          "contest": "governor",
+          "candidate": "Wm. H. Curtis",
+          "party": "Soc. Lab."
+        },
+        {
+          "label": "Scattering",
+          "contest": "governor",
+          "candidate": "",
+          "party": ""
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality Rep.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.149,
+        0.111,
+        0.902,
+        0.925
+      ],
+      "hint": "Read only the table headed 'GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0971
+      ]
+    }
+  ]
+}

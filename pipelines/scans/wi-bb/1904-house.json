@@ -1,0 +1,757 @@
+{
+  "polity": "US-WI",
+  "publisher": "Wisconsin Secretary of State",
+  "title": "The Wisconsin Blue Book 1905, vote by counties (general election 1904-11-08)",
+  "license": "Public record",
+  "file": {
+    "url": "https://search.library.wisc.edu/digital/ALVHJTC5U76EDH9D",
+    "item": "https://search.library.wisc.edu/digital/ALVHJTC5U76EDH9D"
+  },
+  "raw_source": "us.county_volumes",
+  "extend": true,
+  "contests": {
+    "house3": {
+      "year": 1904,
+      "chamber": "house",
+      "day": "1904-11-08",
+      "special": false,
+      "state": "WI",
+      "district": 3
+    },
+    "house4": {
+      "year": 1904,
+      "chamber": "house",
+      "day": "1904-11-08",
+      "special": false,
+      "state": "WI",
+      "district": 4
+    },
+    "house5": {
+      "year": 1904,
+      "chamber": "house",
+      "day": "1904-11-08",
+      "special": false,
+      "state": "WI",
+      "district": 5
+    },
+    "house6": {
+      "year": 1904,
+      "chamber": "house",
+      "day": "1904-11-08",
+      "special": false,
+      "state": "WI",
+      "district": 6
+    },
+    "house7": {
+      "year": 1904,
+      "chamber": "house",
+      "day": "1904-11-08",
+      "special": false,
+      "state": "WI",
+      "district": 7
+    },
+    "house8": {
+      "year": 1904,
+      "chamber": "house",
+      "day": "1904-11-08",
+      "special": false,
+      "state": "WI",
+      "district": 8
+    },
+    "house9": {
+      "year": 1904,
+      "chamber": "house",
+      "day": "1904-11-08",
+      "special": false,
+      "state": "WI",
+      "district": 9
+    },
+    "house10": {
+      "year": 1904,
+      "chamber": "house",
+      "day": "1904-11-08",
+      "special": false,
+      "state": "WI",
+      "district": 10
+    },
+    "house11": {
+      "year": 1904,
+      "chamber": "house",
+      "day": "1904-11-08",
+      "special": false,
+      "state": "WI",
+      "district": 11
+    }
+  },
+  "pages": [
+    {
+      "page": 410,
+      "id": "410-0",
+      "columns": [
+        {
+          "label": "Herman Grotophorst, Dem.",
+          "contest": "house3",
+          "candidate": "Herman Grotophorst"
+        },
+        {
+          "label": "H. J. Noyes, Pro.",
+          "contest": "house3",
+          "candidate": "H. J. Noyes"
+        },
+        {
+          "label": "J. W. Babcock, Rep.",
+          "contest": "house3",
+          "candidate": "Joseph Weeks Babcock"
+        },
+        {
+          "label": "Scattering",
+          "contest": "house3",
+          "candidate": "",
+          "party": ""
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality Rep.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.089,
+        0.128,
+        0.834,
+        0.39
+      ],
+      "hint": "Read only the table headed 'SUMMARY OF VOTE IN THIRD CONGRESSIONAL DISTRICT, NOVEMBER 8th, 1904'; ignore any other table visible in the image."
+    },
+    {
+      "page": 410,
+      "id": "410-1",
+      "columns": [
+        {
+          "label": "Peter J. Sommers, Dem.",
+          "contest": "house4",
+          "candidate": "Peter J. Sommers"
+        },
+        {
+          "label": "Thomas Gardner, Pro.",
+          "contest": "house4",
+          "candidate": "Thomas Gardner"
+        },
+        {
+          "label": "Theobold Otjen, Rep.",
+          "contest": "house4",
+          "candidate": "Theobald Otjen"
+        },
+        {
+          "label": "W. R. Gaylord, Soc. Dem.",
+          "contest": "house4",
+          "candidate": "W. R. Gaylord"
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality Rep.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.094,
+        0.382,
+        0.839,
+        0.904
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL VOTE, FOURTH DISTRICT, 1904'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2375
+      ]
+    },
+    {
+      "page": 411,
+      "id": "411-0",
+      "columns": [
+        {
+          "label": "Peter J. Sommers, Dem.",
+          "contest": "house4",
+          "candidate": "Peter J. Sommers"
+        },
+        {
+          "label": "Thomas Gardner, Pro.",
+          "contest": "house4",
+          "candidate": "Thomas Gardner"
+        },
+        {
+          "label": "Theobold Otjen, Rep.",
+          "contest": "house4",
+          "candidate": "Theobald Otjen"
+        },
+        {
+          "label": "W. R. Gaylord, Soc. Dem.",
+          "contest": "house4",
+          "candidate": "W. R. Gaylord"
+        },
+        {
+          "label": "Total.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Rep.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.163,
+        0.154,
+        0.908,
+        0.42
+      ],
+      "hint": "Read only the table headed 'SUMMARY OF VOTE IN FOURTH CONGRESSIONAL DISTRICT, NOVEMBER 8TH, 1904.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 411,
+      "id": "411-1",
+      "columns": [
+        {
+          "label": "Arthur Dopp, Dem.",
+          "contest": "house5",
+          "candidate": "Arthur Dopp"
+        },
+        {
+          "label": "Moritz Schmover, Pro.",
+          "contest": "house5",
+          "candidate": "Moritz Schmoyer"
+        },
+        {
+          "label": "Wm. H. Stafford, Rep.",
+          "contest": "house5",
+          "candidate": "William Henry Stafford"
+        },
+        {
+          "label": "V. L. Berger, Soc. Dem.",
+          "contest": "house5",
+          "candidate": "V. L. Berger"
+        },
+        {
+          "label": "Frank Wilke, Soc. Lab.",
+          "contest": "house5",
+          "candidate": "Frank Wilke"
+        },
+        {
+          "label": "Total.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Rep.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.158,
+        0.412,
+        0.904,
+        0.797
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL VOTE, FIFTH DISTRICT, 1904.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 416,
+      "id": "416-0",
+      "columns": [
+        {
+          "label": "C. H. Weisse, Dem.",
+          "contest": "house6",
+          "candidate": "Charles Herman Weisse"
+        },
+        {
+          "label": "Wm. J. Perry, Pro.",
+          "contest": "house6",
+          "candidate": "William J. Perry"
+        },
+        {
+          "label": "Roy L. Morse, Rep.",
+          "contest": "house6",
+          "candidate": "Roy L. Morse"
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality Rep.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.092,
+        0.114,
+        0.84,
+        0.405
+      ],
+      "hint": "Read only the table headed 'SUMMARY OF VOTE IN SIXTH CONGRESSIONAL DISTRICT, NOV. 8, 1904'; ignore any other table visible in the image."
+    },
+    {
+      "page": 416,
+      "id": "416-1",
+      "columns": [
+        {
+          "label": "N. C. Bashelier, Dem.",
+          "contest": "house7",
+          "candidate": "N. C. Basheller"
+        },
+        {
+          "label": "Geo. A. Markam, Pro.",
+          "contest": "house7",
+          "candidate": "G. A. Markam"
+        },
+        {
+          "label": "Jno. J. Esch, Rep.",
+          "contest": "house7",
+          "candidate": "John Jacob Esch"
+        },
+        {
+          "label": "H. Leinenkugel, Soc. Dem.",
+          "contest": "house7",
+          "candidate": "H. Leinenkugel"
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality Rep.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.098,
+        0.397,
+        0.854,
+        0.896
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL VOTE, SEVENTH DISTRICT, 1904'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2946
+      ]
+    },
+    {
+      "page": 421,
+      "id": "421-0",
+      "columns": [
+        {
+          "label": "N. C. Bashelder, Dem.",
+          "contest": "house7",
+          "candidate": "N. C. Basheller"
+        },
+        {
+          "label": "G. A. Markam, Pro.",
+          "contest": "house7",
+          "candidate": "G. A. Markam"
+        },
+        {
+          "label": "Jno. J. Esch, Rep.",
+          "contest": "house7",
+          "candidate": "John Jacob Esch"
+        },
+        {
+          "label": "H. Leinenkugel, Soc. Dem.",
+          "contest": "house7",
+          "candidate": "H. Leinenkugel"
+        },
+        {
+          "label": "Scattering",
+          "contest": "house7",
+          "candidate": "",
+          "party": ""
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality Rep.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.163,
+        0.114,
+        0.906,
+        0.405
+      ],
+      "hint": "Read only the table headed 'SUMMARY OF VOTE IN SEVENTH CONGRESSIONAL DISTRICT, NOV. 8, 1904'; ignore any other table visible in the image."
+    },
+    {
+      "page": 421,
+      "id": "421-1",
+      "columns": [
+        {
+          "label": "C. F. Crane, Dem.",
+          "contest": "house8",
+          "candidate": "C. F. Crane"
+        },
+        {
+          "label": "C. A. Smart, Pro.",
+          "contest": "house8",
+          "candidate": "C. A. Smart"
+        },
+        {
+          "label": "J. H. Davidson, Rep.",
+          "contest": "house8",
+          "candidate": "James Henry Davidson"
+        },
+        {
+          "label": "J. J. Pitz, Soc. Dem.",
+          "contest": "house8",
+          "candidate": "J. J. Pitz"
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality Rep.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.158,
+        0.397,
+        0.906,
+        1.0
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL VOTE, EIGHTH DISTRICT, 1904.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1857
+      ]
+    },
+    {
+      "page": 425,
+      "id": "425-0",
+      "columns": [
+        {
+          "label": "C. F. Crane, Dem.",
+          "contest": "house8",
+          "candidate": "C. F. Crane"
+        },
+        {
+          "label": "C. A. Smart, Pro.",
+          "contest": "house8",
+          "candidate": "C. A. Smart"
+        },
+        {
+          "label": "J. H. Davidson, Rep.",
+          "contest": "house8",
+          "candidate": "James Henry Davidson"
+        },
+        {
+          "label": "J. J. Pitz, Soc. Dem.",
+          "contest": "house8",
+          "candidate": "J. J. Pitz"
+        },
+        {
+          "label": "Total.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality Rep.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.163,
+        0.152,
+        0.905,
+        0.4
+      ],
+      "hint": "Read only the table headed 'SUMMARY OF VOTE IN EIGHTH CONGRESSIONAL DISTRICT, NOV. 8, 1904.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 425,
+      "id": "425-1",
+      "columns": [
+        {
+          "label": "R. J. McGeehan, Dem.",
+          "contest": "house9",
+          "candidate": "R. J. McGrehan"
+        },
+        {
+          "label": "C. W. Lomas, Pro.",
+          "contest": "house9",
+          "candidate": "C. W. Lomas"
+        },
+        {
+          "label": "E. S. Minor, Rep.",
+          "contest": "house9",
+          "candidate": "Edward Sloman Minor"
+        },
+        {
+          "label": "J. W. Harris, Soc. Dem.",
+          "contest": "house9",
+          "candidate": "J. W. Harris"
+        },
+        {
+          "label": "Total.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality Rep.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.161,
+        0.392,
+        0.905,
+        0.929
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL VOTE, NINTH DISTRICT, 1904.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.175
+      ]
+    },
+    {
+      "page": 435,
+      "id": "435-0",
+      "columns": [
+        {
+          "label": "Wells M. Ruggles, Dem.",
+          "contest": "house10",
+          "candidate": "Wells M. Ruggles"
+        },
+        {
+          "label": "David W. Emerson, Pro.",
+          "contest": "house10",
+          "candidate": "David W. Emerson"
+        },
+        {
+          "label": "W. E. Brown, Rep.",
+          "contest": "house10",
+          "candidate": "Webster Everett Brown"
+        },
+        {
+          "label": "A. B. Crawford, Soc. Dem.",
+          "contest": "house10",
+          "candidate": "A. B. Crawford"
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality Rep.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.154,
+        0.129,
+        0.9,
+        0.418
+      ],
+      "hint": "Read only the table headed 'Summary of vote in tenth congressional district, Nov. 8, 1904'; ignore any other table visible in the image."
+    },
+    {
+      "page": 435,
+      "id": "435-1",
+      "columns": [
+        {
+          "label": "Geo. C. Cooper, Dem.",
+          "contest": "house11",
+          "candidate": "George C. Cooper"
+        },
+        {
+          "label": "J. S. White, Pro.",
+          "contest": "house11",
+          "candidate": "J. S. White"
+        },
+        {
+          "label": "John J. Jenkins, Rep.",
+          "contest": "house11",
+          "candidate": "John James Jenkins"
+        },
+        {
+          "label": "W. P. Frei, Soc. Dem.",
+          "contest": "house11",
+          "candidate": "W. B. Freil"
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality Rep.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.154,
+        0.41,
+        0.898,
+        0.91
+      ],
+      "hint": "Read only the table headed 'Congressional vote, eleventh district, 1904'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.192
+      ]
+    },
+    {
+      "page": 441,
+      "id": "441-0",
+      "columns": [
+        {
+          "label": "Geo. C. Cooper, Dem.",
+          "contest": "house11",
+          "candidate": "George C. Cooper"
+        },
+        {
+          "label": "J. S. White, Pro.",
+          "contest": "house11",
+          "candidate": "J. S. White"
+        },
+        {
+          "label": "John J. Jenkins, Rep.",
+          "contest": "house11",
+          "candidate": "John James Jenkins"
+        },
+        {
+          "label": "W. B. Freil, Soc. Dem.",
+          "contest": "house11",
+          "candidate": "W. B. Freil"
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality Rep.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.156,
+        0.218,
+        0.899,
+        0.493
+      ],
+      "hint": "Read only the table headed 'Summary of Vote in Eleventh Congressional District, Nov. 8, 1904'; ignore any other table visible in the image."
+    }
+  ]
+}

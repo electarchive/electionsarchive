@@ -1,0 +1,342 @@
+{
+  "polity": "US-WI",
+  "publisher": "Wisconsin Secretary of State",
+  "title": "The Wisconsin Blue Book 1909, vote by counties (general election 1908-11-03)",
+  "license": "Public record",
+  "file": {
+    "url": "https://search.library.wisc.edu/digital/AKQ2ESFGDC6BPH9C",
+    "item": "https://search.library.wisc.edu/digital/AKQ2ESFGDC6BPH9C"
+  },
+  "raw_source": "us.county_volumes",
+  "extend": true,
+  "contests": {
+    "house5": {
+      "year": 1908,
+      "chamber": "house",
+      "day": "1908-11-03",
+      "special": false,
+      "state": "WI",
+      "district": 5
+    },
+    "house6": {
+      "year": 1908,
+      "chamber": "house",
+      "day": "1908-11-03",
+      "special": false,
+      "state": "WI",
+      "district": 6
+    },
+    "house7": {
+      "year": 1908,
+      "chamber": "house",
+      "day": "1908-11-03",
+      "special": false,
+      "state": "WI",
+      "district": 7
+    },
+    "house8": {
+      "year": 1908,
+      "chamber": "house",
+      "day": "1908-11-03",
+      "special": false,
+      "state": "WI",
+      "district": 8
+    },
+    "house9": {
+      "year": 1908,
+      "chamber": "house",
+      "day": "1908-11-03",
+      "special": false,
+      "state": "WI",
+      "district": 9
+    }
+  },
+  "pages": [
+    {
+      "page": 479,
+      "id": "479-0",
+      "columns": [
+        {
+          "label": "G. Holmes Daubner, Dem.",
+          "contest": "house5",
+          "candidate": "G. Holmes Daubner"
+        },
+        {
+          "label": "Wm. H. Stafford, Rep.",
+          "contest": "house5",
+          "candidate": "William Henry Stafford"
+        },
+        {
+          "label": "Albert J. Welch, Soc. Dem.",
+          "contest": "house5",
+          "candidate": "Albert J. Welch"
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Pluralities Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Pluralities Rep.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.112,
+        0.147,
+        0.865,
+        0.455
+      ],
+      "hint": "Read only the table headed 'SUMMARY OF VOTE IN FIFTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 479,
+      "id": "479-1",
+      "columns": [
+        {
+          "label": "Charles H. Weisse, Dem.",
+          "contest": "house6",
+          "candidate": "Charles Herman Weisse"
+        },
+        {
+          "label": "George Spratt, Rep.",
+          "contest": "house6",
+          "candidate": "George Spratt"
+        },
+        {
+          "label": "Edward C. Damrow, Soc. Dem.",
+          "contest": "house6",
+          "candidate": "Edward C. Damrow"
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Pluralities Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Pluralities Rep.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.107,
+        0.447,
+        0.853,
+        1.0
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL VOTE, SIXTH DISTRICT. 1908.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.179
+      ]
+    },
+    {
+      "page": 483,
+      "id": "483-0",
+      "columns": [
+        {
+          "label": "Charles H. Weisse, Dem.",
+          "contest": "house6",
+          "candidate": "Charles Herman Weisse"
+        },
+        {
+          "label": "George Spratt, Rep.",
+          "contest": "house6",
+          "candidate": "George Spratt"
+        },
+        {
+          "label": "Edward C. Damrow, Soc. Dem.",
+          "contest": "house6",
+          "candidate": "Edward C. Damrow"
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Pluralities Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Pluralities Rep.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.154,
+        0.111,
+        0.899,
+        0.317
+      ],
+      "hint": "Read only the table headed 'SUMMARY OF VOTES IN SIXTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 483,
+      "id": "483-1",
+      "columns": [
+        {
+          "label": "B. F. Keeler, Dem.",
+          "contest": "house7",
+          "candidate": "B. F. Keeler"
+        },
+        {
+          "label": "John J. Esch, Rep.",
+          "contest": "house7",
+          "candidate": "John Jacob Esch"
+        },
+        {
+          "label": "W. Gray, Soc. Dem.",
+          "contest": "house7",
+          "candidate": "W. Gray"
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Pluralities Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Pluralities Rep.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.13,
+        0.309,
+        0.89,
+        0.793
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL VOTE, SEVENTH DISTRICT, 1908.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2479
+      ]
+    },
+    {
+      "page": 495,
+      "id": "495-0",
+      "columns": [
+        {
+          "label": "Lyman J. Nash, Dem.",
+          "contest": "house8",
+          "candidate": "Lyman J. Nash"
+        },
+        {
+          "label": "Byron E. Van Keuren, Pro.",
+          "contest": "house8",
+          "candidate": "Byron E. Van Keuren",
+          "party": "Pro."
+        },
+        {
+          "label": "James H. Davidson, Rep.",
+          "contest": "house8",
+          "candidate": "James Henry Davidson"
+        },
+        {
+          "label": "Martin Georgenson, Soc. Dem.",
+          "contest": "house8",
+          "candidate": "Martin Georgenson"
+        },
+        {
+          "label": "Total.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Pluralities Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Pluralities Rep.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.17,
+        0.15,
+        0.915,
+        0.381
+      ],
+      "hint": "Read only the table headed 'SUMMARY OF VOTES IN EIGHTH CONGRESSIONAL DISTRICT, 1908.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 495,
+      "id": "495-1",
+      "columns": [
+        {
+          "label": "L. Lindauer, Dem.",
+          "contest": "house9",
+          "candidate": "L. Lindauer"
+        },
+        {
+          "label": "Gustav Kuesterman, Rep.",
+          "contest": "house9",
+          "candidate": "Gustav Kuesterman",
+          "party": "Rep."
+        },
+        {
+          "label": "J. E. Harris, Soc. Dem.",
+          "contest": "house9",
+          "candidate": "J. E. Harris"
+        },
+        {
+          "label": "Total.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Pluralities Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Pluralities Rep.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.17,
+        0.373,
+        0.918,
+        0.925
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL VOTE, NINTH DISTRICT, 1908.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1703
+      ]
+    }
+  ]
+}

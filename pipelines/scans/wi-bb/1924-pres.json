@@ -1,0 +1,68 @@
+{
+  "polity": "US-WI",
+  "publisher": "Wisconsin Legislative Reference Bureau",
+  "title": "The Wisconsin Blue Book 1927, vote by counties (general election 1924-11-04)",
+  "license": "Public record",
+  "file": {
+    "url": "https://search.library.wisc.edu/digital/AUD5FWPOZSCOKV84",
+    "item": "https://search.library.wisc.edu/digital/AUD5FWPOZSCOKV84"
+  },
+  "raw_source": "us.county_volumes",
+  "extend": true,
+  "contests": {
+    "president": {
+      "year": 1924,
+      "chamber": "president",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "WI",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 595,
+      "id": "595-0",
+      "columns": [
+        {
+          "label": "Democrat (Davis)",
+          "contest": "president",
+          "candidate": "John W. Davis (Democratic)"
+        },
+        {
+          "label": "Prohibition (Faris)",
+          "contest": "president",
+          "candidate": "Herman Faris (Prohibition)"
+        },
+        {
+          "label": "Republican (Coolidge)",
+          "contest": "president",
+          "candidate": "Calvin Coolidge (Republican)"
+        },
+        {
+          "label": "Independent (LaFollette)",
+          "contest": "president",
+          "candidate": "Robert La Follette (Progressive)"
+        },
+        {
+          "label": "Workers Part Party (Foster)",
+          "contest": "president",
+          "candidate": "William Foster (Communist)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.177,
+        0.147,
+        0.925,
+        0.908
+      ],
+      "hint": "Read only the table headed 'SUMMARY OF VOTE FOR PRESIDENT 1924'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0591
+      ]
+    }
+  ]
+}

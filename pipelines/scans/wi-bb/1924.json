@@ -1,0 +1,646 @@
+{
+  "polity": "US-WI",
+  "publisher": "Wisconsin Legislative Reference Bureau",
+  "title": "The Wisconsin Blue Book 1925, vote by counties (general election 1924-11-04)",
+  "license": "Public record",
+  "file": {
+    "url": "https://search.library.wisc.edu/digital/AZFV5VA4RAR4QZ8S",
+    "item": "https://search.library.wisc.edu/digital/AZFV5VA4RAR4QZ8S"
+  },
+  "raw_source": "us.county_volumes",
+  "extend": true,
+  "contests": {
+    "governor": {
+      "year": 1924,
+      "chamber": "governor",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "house1": {
+      "year": 1924,
+      "chamber": "house",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "WI",
+      "district": 1
+    },
+    "house2": {
+      "year": 1924,
+      "chamber": "house",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "WI",
+      "district": 2
+    },
+    "house3": {
+      "year": 1924,
+      "chamber": "house",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "WI",
+      "district": 3
+    },
+    "house4": {
+      "year": 1924,
+      "chamber": "house",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "WI",
+      "district": 4
+    },
+    "house5": {
+      "year": 1924,
+      "chamber": "house",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "WI",
+      "district": 5
+    },
+    "house6": {
+      "year": 1924,
+      "chamber": "house",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "WI",
+      "district": 6
+    },
+    "house7": {
+      "year": 1924,
+      "chamber": "house",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "WI",
+      "district": 7
+    },
+    "house8": {
+      "year": 1924,
+      "chamber": "house",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "WI",
+      "district": 8
+    },
+    "house9": {
+      "year": 1924,
+      "chamber": "house",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "WI",
+      "district": 9
+    },
+    "house10": {
+      "year": 1924,
+      "chamber": "house",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "WI",
+      "district": 10
+    },
+    "house11": {
+      "year": 1924,
+      "chamber": "house",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "WI",
+      "district": 11
+    }
+  },
+  "pages": [
+    {
+      "page": 617,
+      "id": "617-0",
+      "columns": [
+        {
+          "label": "Martin L. Lueck Dem.",
+          "contest": "governor",
+          "candidate": "Martin L. Lueck"
+        },
+        {
+          "label": "Adolph R. Bucknam Pro.",
+          "contest": "governor",
+          "candidate": "Adolph R. Bucknam"
+        },
+        {
+          "label": "John J. Blaine Rep.",
+          "contest": "governor",
+          "candidate": "John J. Blaine"
+        },
+        {
+          "label": "William F. Quick Soc.",
+          "contest": "governor",
+          "candidate": "William F. Quick"
+        },
+        {
+          "label": "Severi Alanne Ind. Workers Party",
+          "contest": "governor",
+          "candidate": "Severi Alanne"
+        },
+        {
+          "label": "Farrand K. Shuttleworth Ind. Pro. Rep.",
+          "contest": "governor",
+          "candidate": "Farrand K. Shuttleworth"
+        },
+        {
+          "label": "Jose Snover Soc. Lab.",
+          "contest": "governor",
+          "candidate": "Jose Snover"
+        },
+        {
+          "label": "Scattering",
+          "contest": "governor",
+          "candidate": "",
+          "party": ""
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.062,
+        0.229,
+        0.888,
+        1.0
+      ],
+      "hint": "Read only the table headed 'GENERAL ELECTION STATISTICS NOV. 4, 1924 SUMMARY OF VOTE FOR GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1466
+      ]
+    },
+    {
+      "page": 618,
+      "id": "618-0",
+      "columns": [
+        {
+          "label": "Martin L. Lueck Dem.",
+          "contest": "governor",
+          "candidate": "Martin L. Lueck"
+        },
+        {
+          "label": "Adolph R. Bucknam Pro.",
+          "contest": "governor",
+          "candidate": "Adolph R. Bucknam"
+        },
+        {
+          "label": "John J. Blaine Rep.",
+          "contest": "governor",
+          "candidate": "John J. Blaine"
+        },
+        {
+          "label": "William F. Quick Soc.",
+          "contest": "governor",
+          "candidate": "William F. Quick"
+        },
+        {
+          "label": "Severi Alanne Ind. Workers Party",
+          "contest": "governor",
+          "candidate": "Severi Alanne"
+        },
+        {
+          "label": "Farrand K. Shuttleworth Ind. Pro. Rep.",
+          "contest": "governor",
+          "candidate": "Farrand K. Shuttleworth"
+        },
+        {
+          "label": "Jose Snover Soc. Lab.",
+          "contest": "governor",
+          "candidate": "Jose Snover"
+        },
+        {
+          "label": "Scattering",
+          "contest": "governor",
+          "candidate": "",
+          "party": ""
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.062,
+        0.0,
+        0.888,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings."
+    },
+    {
+      "page": 626,
+      "id": "626-0",
+      "columns": [
+        {
+          "label": "Total Vote",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Calvin Stewart (Dem.)",
+          "contest": "house1",
+          "candidate": "Calvin Stewart"
+        },
+        {
+          "label": "Henry Allen Cooper (Rep.)",
+          "contest": "house1",
+          "candidate": "Henry Allen Cooper"
+        },
+        {
+          "label": "Scattering",
+          "contest": "house1",
+          "candidate": "",
+          "party": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.07,
+        0.167,
+        0.819,
+        0.36
+      ],
+      "hint": "Read only the table headed 'FIRST DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 626,
+      "id": "626-1",
+      "columns": [
+        {
+          "label": "Total Vote",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Ernst C. Wrucke (Dem.)",
+          "contest": "house2",
+          "candidate": "Ernst C. Wrucke"
+        },
+        {
+          "label": "Edward Voigt (Rep.)",
+          "contest": "house2",
+          "candidate": "Edward Voigt"
+        },
+        {
+          "label": "Scattering",
+          "contest": "house2",
+          "candidate": "",
+          "party": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.07,
+        0.352,
+        0.819,
+        0.569
+      ],
+      "hint": "Read only the table headed 'SECOND DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 626,
+      "id": "626-2",
+      "columns": [
+        {
+          "label": "Total Vote",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "William Victora (Dem.)",
+          "contest": "house3",
+          "candidate": "William Victoria"
+        },
+        {
+          "label": "John M. Nelson (Rep.)",
+          "contest": "house3",
+          "candidate": "John M. Nelson"
+        },
+        {
+          "label": "Scattering",
+          "contest": "house3",
+          "candidate": "",
+          "party": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.07,
+        0.561,
+        0.819,
+        0.789
+      ],
+      "hint": "Read only the table headed 'THIRD DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 626,
+      "id": "626-3",
+      "columns": [
+        {
+          "label": "Total Vote",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Thomas H. Dorr (Dem.)",
+          "contest": "house4",
+          "candidate": "Thomas H. Dorr",
+          "party": "Dem."
+        },
+        {
+          "label": "John C. Schafer (Rep.)",
+          "contest": "house4",
+          "candidate": "John C. Schafer"
+        },
+        {
+          "label": "Leo Krzycki (Soc.)",
+          "contest": "house4",
+          "candidate": "Leo Krzycki"
+        },
+        {
+          "label": "Scattering",
+          "contest": "house4",
+          "candidate": "",
+          "party": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.07,
+        0.781,
+        0.819,
+        0.924
+      ],
+      "hint": "Read only the table headed 'FOURTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 627,
+      "id": "627-0",
+      "columns": [
+        {
+          "label": "Total Vote",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Raymond Moore (Dem.)",
+          "contest": "house5",
+          "candidate": "Raymond Moore",
+          "party": "Dem."
+        },
+        {
+          "label": "Ernst A. Braun (Rep.)",
+          "contest": "house5",
+          "candidate": "Ernst A. Braun"
+        },
+        {
+          "label": "Victor L. Berger (Soc.)",
+          "contest": "house5",
+          "candidate": "Victor L. Berger"
+        },
+        {
+          "label": "Scattering",
+          "contest": "house5",
+          "candidate": "",
+          "party": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.177,
+        0.127,
+        0.926,
+        0.277
+      ],
+      "hint": "Read only the table headed 'FIFTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 627,
+      "id": "627-1",
+      "columns": [
+        {
+          "label": "Total Vote",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Michael K. Reilly (Dem.)",
+          "contest": "house6",
+          "candidate": "M. K. Reilly"
+        },
+        {
+          "label": "Florian Lampert (Rep.)",
+          "contest": "house6",
+          "candidate": "Florian Lampert"
+        },
+        {
+          "label": "Scattering",
+          "contest": "house6",
+          "candidate": "",
+          "party": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.177,
+        0.269,
+        0.925,
+        0.487
+      ],
+      "hint": "Read only the table headed 'SIXTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 627,
+      "id": "627-2",
+      "columns": [
+        {
+          "label": "Total Vote",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. D. Martin (Dem.)",
+          "contest": "house7",
+          "candidate": "W. D. Martin"
+        },
+        {
+          "label": "Gay Harrison (Pro.)",
+          "contest": "house7",
+          "candidate": "Gay Harrison",
+          "party": "Pro."
+        },
+        {
+          "label": "J. D. Beck (Rep.)",
+          "contest": "house7",
+          "candidate": "Joseph D. Beck"
+        },
+        {
+          "label": "Scattering",
+          "contest": "house7",
+          "candidate": "",
+          "party": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.177,
+        0.479,
+        0.925,
+        0.726
+      ],
+      "hint": "Read only the table headed 'SEVENTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 627,
+      "id": "627-3",
+      "columns": [
+        {
+          "label": "Total Vote",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Edward E. Browne (Rep.)",
+          "contest": "house8",
+          "candidate": "Edward E. Browne"
+        },
+        {
+          "label": "R. J. Walsh (Ind.)",
+          "contest": "house8",
+          "candidate": "R. J. Walsh"
+        },
+        {
+          "label": "Scattering",
+          "contest": "house8",
+          "candidate": "",
+          "party": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.177,
+        0.718,
+        0.925,
+        0.918
+      ],
+      "hint": "Read only the table headed 'EIGHTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 628,
+      "id": "628-0",
+      "columns": [
+        {
+          "label": "Total Vote",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "T. J. Reinert (Dem.)",
+          "contest": "house9",
+          "candidate": "T. J. Reinert"
+        },
+        {
+          "label": "George J. Schneider (Rep.)",
+          "contest": "house9",
+          "candidate": "George J. Schneider"
+        },
+        {
+          "label": "Scattering",
+          "contest": "house9",
+          "candidate": "",
+          "party": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.094,
+        0.134,
+        0.846,
+        0.377
+      ],
+      "hint": "Read only the table headed 'NINTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 628,
+      "id": "628-1",
+      "columns": [
+        {
+          "label": "Total Vote",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Thomas A. Ryan (Dem.)",
+          "contest": "house10",
+          "candidate": "Thomas A. Ryan"
+        },
+        {
+          "label": "James A. Frear (Rep.)",
+          "contest": "house10",
+          "candidate": "James A. Frear"
+        },
+        {
+          "label": "A. S. Michalson (Ind.)",
+          "contest": "house10",
+          "candidate": "A. S. Michalson",
+          "party": "Ind."
+        },
+        {
+          "label": "Scattering",
+          "contest": "house10",
+          "candidate": "",
+          "party": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.091,
+        0.369,
+        0.843,
+        0.623
+      ],
+      "hint": "Read only the table headed 'TENTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 628,
+      "id": "628-2",
+      "columns": [
+        {
+          "label": "Total Vote",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John Cadigan (Dem.)",
+          "contest": "house11",
+          "candidate": "John A. Cadigan"
+        },
+        {
+          "label": "Hubert H. Peavey (Rep.)",
+          "contest": "house11",
+          "candidate": "Hubert H. Peavey"
+        },
+        {
+          "label": "Scattering",
+          "contest": "house11",
+          "candidate": "",
+          "party": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.087,
+        0.615,
+        0.839,
+        0.884
+      ],
+      "hint": "Read only the table headed 'ELEVENTH DISTRICT'; ignore any other table visible in the image."
+    }
+  ]
+}

@@ -1,0 +1,720 @@
+{
+  "polity": "US-WI",
+  "publisher": "Wisconsin Legislative Reference Bureau",
+  "title": "The Wisconsin Blue Book 1929, vote by counties (general election 1928-11-06)",
+  "license": "Public record",
+  "file": {
+    "url": "https://search.library.wisc.edu/digital/AVXBBLDIOJOQ268I",
+    "item": "https://search.library.wisc.edu/digital/AVXBBLDIOJOQ268I"
+  },
+  "raw_source": "us.county_volumes",
+  "extend": true,
+  "contests": {
+    "president": {
+      "year": 1928,
+      "chamber": "president",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "senate": {
+      "year": 1928,
+      "chamber": "senate",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "governor": {
+      "year": 1928,
+      "chamber": "governor",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "house1": {
+      "year": 1928,
+      "chamber": "house",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "WI",
+      "district": 1
+    },
+    "house2": {
+      "year": 1928,
+      "chamber": "house",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "WI",
+      "district": 2
+    },
+    "house3": {
+      "year": 1928,
+      "chamber": "house",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "WI",
+      "district": 3
+    },
+    "house4": {
+      "year": 1928,
+      "chamber": "house",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "WI",
+      "district": 4
+    },
+    "house5": {
+      "year": 1928,
+      "chamber": "house",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "WI",
+      "district": 5
+    },
+    "house6": {
+      "year": 1928,
+      "chamber": "house",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "WI",
+      "district": 6
+    },
+    "house7": {
+      "year": 1928,
+      "chamber": "house",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "WI",
+      "district": 7
+    },
+    "house8": {
+      "year": 1928,
+      "chamber": "house",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "WI",
+      "district": 8
+    },
+    "house9": {
+      "year": 1928,
+      "chamber": "house",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "WI",
+      "district": 9
+    },
+    "house10": {
+      "year": 1928,
+      "chamber": "house",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "WI",
+      "district": 10
+    },
+    "house11": {
+      "year": 1928,
+      "chamber": "house",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "WI",
+      "district": 11
+    }
+  },
+  "pages": [
+    {
+      "page": 840,
+      "id": "840-0",
+      "columns": [
+        {
+          "label": "Total Vote",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Smith and Robinson (Dem.)",
+          "contest": "president",
+          "candidate": "Al Smith (Democratic)"
+        },
+        {
+          "label": "Varney and Edgerton (Proh.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Hoover and Curtis (Rep.)",
+          "contest": "president",
+          "candidate": "Herbert Hoover (Republican)"
+        },
+        {
+          "label": "Thomas and Maurer (Soc.)",
+          "contest": "president",
+          "candidate": "Norman Thomas (Socialist)"
+        },
+        {
+          "label": "Foster and Gitlow (Ind. Workers)",
+          "contest": "president",
+          "candidate": "William Foster (Communist)"
+        },
+        {
+          "label": "Reynolds and Crowley (Ind. Labor)",
+          "contest": "president",
+          "candidate": "Verne Reynolds (Socialist Labor)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.057,
+        0.106,
+        0.868,
+        0.952
+      ],
+      "hint": "Read only the table headed 'SUMMARY VOTE FOR PRESIDENT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1359
+      ]
+    },
+    {
+      "page": 841,
+      "id": "841-0",
+      "columns": [
+        {
+          "label": "Total Vote",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "(Dem.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "David W. Emerson (Proh.)",
+          "contest": "senate",
+          "candidate": "David W. Emerson"
+        },
+        {
+          "label": "Robert M. LaFollette Jr. (Rep.)",
+          "contest": "senate",
+          "candidate": "Robert M. La Follette, jr."
+        },
+        {
+          "label": "(Soc.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Richard Koeppel (Ind. Labor)",
+          "contest": "senate",
+          "candidate": "Richard Koeppel"
+        },
+        {
+          "label": "Wm. H. Markham (Ind. Rep.)",
+          "contest": "senate",
+          "candidate": "William H. Markham"
+        },
+        {
+          "label": "John Kasun (Ind. Wkrs.)",
+          "contest": "senate",
+          "candidate": "John Kasun"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.121,
+        0.101,
+        0.936,
+        0.929
+      ],
+      "hint": "Read only the table headed 'SUMMARY VOTE FOR UNITED STATES SENATOR Nov. 6, 1928'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1171
+      ]
+    },
+    {
+      "page": 842,
+      "id": "842-0",
+      "columns": [
+        {
+          "label": "Total Vote",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. G. Schmedeman (Dem.)",
+          "contest": "governor",
+          "candidate": "Albert G. Schmedeman"
+        },
+        {
+          "label": "Adolph R. Bucknam (Proh.)",
+          "contest": "governor",
+          "candidate": "Adolph R. Bucknam"
+        },
+        {
+          "label": "Walter J. Kohler (Rep.)",
+          "contest": "governor",
+          "candidate": "Walter J. Sr. Kohler"
+        },
+        {
+          "label": "Otto R. Hauser (Soc.)",
+          "contest": "governor",
+          "candidate": "Otto R. Hauser"
+        },
+        {
+          "label": "Joseph Ehrhardt (Ind. Labor)",
+          "contest": "governor",
+          "candidate": "Joseph Ehrhardt"
+        },
+        {
+          "label": "Alvar J. Hayes (Ind. Workers)",
+          "contest": "governor",
+          "candidate": "Alvar J. Hayes"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.046,
+        0.136,
+        0.86,
+        0.924
+      ],
+      "hint": "Read only the table headed 'SUMMARY VOTE FOR GOVERNOR Nov. 6, 1928'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0863
+      ]
+    },
+    {
+      "page": 847,
+      "id": "847-0",
+      "columns": [
+        {
+          "label": "Total Note",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "William C. Kiernan (Dem.)",
+          "contest": "house1",
+          "candidate": "William C. Kiernan"
+        },
+        {
+          "label": "Henry Allen Cooper (Rep.)",
+          "contest": "house1",
+          "candidate": "Henry Allen Cooper"
+        },
+        {
+          "label": "Scattering",
+          "contest": "house1",
+          "candidate": "",
+          "party": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.181,
+        0.187,
+        0.93,
+        0.367
+      ],
+      "hint": "Read only the table headed 'First District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 847,
+      "id": "847-1",
+      "columns": [
+        {
+          "label": "Total Vote",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Eugene A. Clifford (Dem.)",
+          "contest": "house2",
+          "candidate": "Eugene A. Clifford"
+        },
+        {
+          "label": "Charles A. Kading (Rep.)",
+          "contest": "house2",
+          "candidate": "Charles A. Kading"
+        },
+        {
+          "label": "Scattering",
+          "contest": "house2",
+          "candidate": "",
+          "party": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.181,
+        0.359,
+        0.93,
+        0.56
+      ],
+      "hint": "Read only the table headed 'Second District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 847,
+      "id": "847-2",
+      "columns": [
+        {
+          "label": "Total Vote",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "William Victora (Dem.)",
+          "contest": "house3",
+          "candidate": "William Victora"
+        },
+        {
+          "label": "Thomas Dobson (Pro.)",
+          "contest": "house3",
+          "candidate": "Thomas Dobson"
+        },
+        {
+          "label": "John Mandt Nelson (Rep.)",
+          "contest": "house3",
+          "candidate": "John M. Nelson"
+        },
+        {
+          "label": "Scattering",
+          "contest": "house3",
+          "candidate": "",
+          "party": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.177,
+        0.552,
+        0.93,
+        0.755
+      ],
+      "hint": "Read only the table headed 'Third District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 847,
+      "id": "847-3",
+      "columns": [
+        {
+          "label": "Total Vote",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "William J. Kershaw (Dem.)",
+          "contest": "house4",
+          "candidate": "William J. Kershaw"
+        },
+        {
+          "label": "John C. Schafer (Rep.)",
+          "contest": "house4",
+          "candidate": "John C. Schafer"
+        },
+        {
+          "label": "Walter Polakowski (Soc.)",
+          "contest": "house4",
+          "candidate": "Walter Polakowski"
+        },
+        {
+          "label": "Scattering",
+          "contest": "house4",
+          "candidate": "",
+          "party": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.177,
+        0.747,
+        0.93,
+        0.901
+      ],
+      "hint": "Read only the table headed 'Fourth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 848,
+      "id": "848-0",
+      "columns": [
+        {
+          "label": "Total Vote",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Thomas O'Malley (Dem.)",
+          "contest": "house5",
+          "candidate": "Thomas O'Malley"
+        },
+        {
+          "label": "Wm. H. Stafford (Rep.)",
+          "contest": "house5",
+          "candidate": "William H. Stafford"
+        },
+        {
+          "label": "Victor L. Berger (Soc.)",
+          "contest": "house5",
+          "candidate": "Victor L. Berger"
+        },
+        {
+          "label": "Herbert Friedrichs (Workers' Communist Party of America)",
+          "contest": "house5",
+          "candidate": "Herbert Friedrichs"
+        },
+        {
+          "label": "Scattering",
+          "contest": "house5",
+          "candidate": "",
+          "party": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.073,
+        0.144,
+        0.824,
+        0.325
+      ],
+      "hint": "Read only the table headed 'Fifth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 848,
+      "id": "848-1",
+      "columns": [
+        {
+          "label": "Total Vote",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Morley G. Kelly (Dem.)",
+          "contest": "house6",
+          "candidate": "Morley G. Kelly"
+        },
+        {
+          "label": "Florian Lampert (Rep.)",
+          "contest": "house6",
+          "candidate": "Florian Lampert"
+        },
+        {
+          "label": "Scattering",
+          "contest": "house6",
+          "candidate": "",
+          "party": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.073,
+        0.317,
+        0.826,
+        0.519
+      ],
+      "hint": "Read only the table headed 'Sixth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 848,
+      "id": "848-2",
+      "columns": [
+        {
+          "label": "Total Vote",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. H. Schubert (Dem.)",
+          "contest": "house7",
+          "candidate": "A. H. Schubert"
+        },
+        {
+          "label": "Arthur H. Shanley (Pro.)",
+          "contest": "house7",
+          "candidate": "Arthur H. Shanley"
+        },
+        {
+          "label": "Merlin Hull (Rep.)",
+          "contest": "house7",
+          "candidate": "Merlin Hull"
+        },
+        {
+          "label": "Scattering",
+          "contest": "house7",
+          "candidate": "",
+          "party": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.075,
+        0.511,
+        0.826,
+        0.741
+      ],
+      "hint": "Read only the table headed 'Seventh District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 848,
+      "id": "848-3",
+      "columns": [
+        {
+          "label": "Total Vote",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R. J. Walsh (Dem.)",
+          "contest": "house8",
+          "candidate": "R. J. Walsh"
+        },
+        {
+          "label": "E. W. Shatto (Pro.)",
+          "contest": "house8",
+          "candidate": "E. W. Shatto"
+        },
+        {
+          "label": "Edward E. Browne (Rep.)",
+          "contest": "house8",
+          "candidate": "Edward E. Browne"
+        },
+        {
+          "label": "Scattering",
+          "contest": "house8",
+          "candidate": "",
+          "party": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.08,
+        0.733,
+        0.83,
+        0.924
+      ],
+      "hint": "Read only the table headed 'Eighth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 849,
+      "id": "849-0",
+      "columns": [
+        {
+          "label": "Total Vote",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "James H. McGillan (Dem.)",
+          "contest": "house9",
+          "candidate": "James H. McGillan"
+        },
+        {
+          "label": "Maria I. A. Nelson (Pro.)",
+          "contest": "house9",
+          "candidate": "Maria I. A. Nelson"
+        },
+        {
+          "label": "George J. Schneider (Rep.)",
+          "contest": "house9",
+          "candidate": "George J. Schneider"
+        },
+        {
+          "label": "Scattering",
+          "contest": "house9",
+          "candidate": "",
+          "party": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.169,
+        0.146,
+        0.919,
+        0.369
+      ],
+      "hint": "Read only the table headed 'Ninth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 849,
+      "id": "849-1",
+      "columns": [
+        {
+          "label": "Total Vote",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Miles H. McNally (Dem.)",
+          "contest": "house10",
+          "candidate": "Miles H. McNally"
+        },
+        {
+          "label": "James A. Frear (Rep.)",
+          "contest": "house10",
+          "candidate": "James A. Frear"
+        },
+        {
+          "label": "Scattering",
+          "contest": "house10",
+          "candidate": "",
+          "party": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.169,
+        0.361,
+        0.919,
+        0.61
+      ],
+      "hint": "Read only the table headed 'Tenth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 849,
+      "id": "849-2",
+      "columns": [
+        {
+          "label": "Total Vote",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Frank P. Kennedy (Dem.)",
+          "contest": "house11",
+          "candidate": "Frank P. Kennedy"
+        },
+        {
+          "label": "Edwin Kerswill (Pro.)",
+          "contest": "house11",
+          "candidate": "Edwin Kerswill"
+        },
+        {
+          "label": "Hubert H. Peavey (Rep.)",
+          "contest": "house11",
+          "candidate": "Hubert H. Peavey"
+        },
+        {
+          "label": "Scattering",
+          "contest": "house11",
+          "candidate": "",
+          "party": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.169,
+        0.602,
+        0.919,
+        0.876
+      ],
+      "hint": "Read only the table headed 'Eleventh District'; ignore any other table visible in the image."
+    }
+  ]
+}

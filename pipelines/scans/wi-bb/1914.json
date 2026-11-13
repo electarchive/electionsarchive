@@ -1,0 +1,666 @@
+{
+  "polity": "US-WI",
+  "publisher": "Wisconsin Secretary of State",
+  "title": "The Wisconsin Blue Book 1915, vote by counties (general election 1914-11-03)",
+  "license": "Public record",
+  "file": {
+    "url": "https://search.library.wisc.edu/digital/AMDGH3X7LTLI3O8A",
+    "item": "https://search.library.wisc.edu/digital/AMDGH3X7LTLI3O8A"
+  },
+  "raw_source": "us.county_volumes",
+  "extend": true,
+  "contests": {
+    "governor": {
+      "year": 1914,
+      "chamber": "governor",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "senate": {
+      "year": 1914,
+      "chamber": "senate",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "house1": {
+      "year": 1914,
+      "chamber": "house",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "WI",
+      "district": 1
+    },
+    "house2": {
+      "year": 1914,
+      "chamber": "house",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "WI",
+      "district": 2
+    },
+    "house3": {
+      "year": 1914,
+      "chamber": "house",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "WI",
+      "district": 3
+    },
+    "house4": {
+      "year": 1914,
+      "chamber": "house",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "WI",
+      "district": 4
+    },
+    "house5": {
+      "year": 1914,
+      "chamber": "house",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "WI",
+      "district": 5
+    },
+    "house6": {
+      "year": 1914,
+      "chamber": "house",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "WI",
+      "district": 6
+    },
+    "house7": {
+      "year": 1914,
+      "chamber": "house",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "WI",
+      "district": 7
+    },
+    "house8": {
+      "year": 1914,
+      "chamber": "house",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "WI",
+      "district": 8
+    },
+    "house9": {
+      "year": 1914,
+      "chamber": "house",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "WI",
+      "district": 9
+    },
+    "house10": {
+      "year": 1914,
+      "chamber": "house",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "WI",
+      "district": 10
+    },
+    "house11": {
+      "year": 1914,
+      "chamber": "house",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "WI",
+      "district": 11
+    }
+  },
+  "pages": [
+    {
+      "page": 233,
+      "id": "233-0",
+      "columns": [
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John C. Karel, Dem.",
+          "contest": "governor",
+          "candidate": "John C. Karel"
+        },
+        {
+          "label": "D. W. Emerson, Pro.",
+          "contest": "governor",
+          "candidate": "David W. Emerson"
+        },
+        {
+          "label": "Emanuel L. Philipp, Rep.",
+          "contest": "governor",
+          "candidate": "Emanuel L. Philipp"
+        },
+        {
+          "label": "Oscar Ameringer, So. Dem.",
+          "contest": "governor",
+          "candidate": "Oscar Ameringer"
+        },
+        {
+          "label": "John J. Blaine, Ind.",
+          "contest": "governor",
+          "candidate": "John J. Blaine"
+        },
+        {
+          "label": "Scattering",
+          "contest": "governor",
+          "candidate": "",
+          "party": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.172,
+        0.124,
+        0.918,
+        0.926
+      ],
+      "hint": "Read only the table headed 'VOTES FOR GOVERNOR, 1914'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0898
+      ]
+    },
+    {
+      "page": 239,
+      "id": "239-0",
+      "columns": [
+        {
+          "label": "Total.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Paul O. Husting. Dem.",
+          "contest": "senate",
+          "candidate": "Paul Oscar Husting"
+        },
+        {
+          "label": "Charles L. Hill, Pro.",
+          "contest": "senate",
+          "candidate": "Charles L. Hill"
+        },
+        {
+          "label": "Francis E. McGovern, Rep.",
+          "contest": "senate",
+          "candidate": "Francis E. McGovern"
+        },
+        {
+          "label": "Emil Seidel, Soc. Dem.",
+          "contest": "senate",
+          "candidate": "Emil Seidel"
+        },
+        {
+          "label": "Scattering.",
+          "contest": "senate",
+          "candidate": "",
+          "party": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.177,
+        0.117,
+        0.933,
+        0.919
+      ],
+      "hint": "Read only the table headed 'VOTE FOR UNITED STATES SENATOR, 1914.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.081
+      ]
+    },
+    {
+      "page": 240,
+      "id": "240-0",
+      "columns": [
+        {
+          "label": "Calvin Stewart, Dem.",
+          "contest": "house1",
+          "candidate": "Calvin Stewart"
+        },
+        {
+          "label": "Truman Parker, Pro.",
+          "contest": "house1",
+          "candidate": "Truman Parker"
+        },
+        {
+          "label": "Henry Allen Cooper, Rep.",
+          "contest": "house1",
+          "candidate": "Henry Allen Cooper"
+        },
+        {
+          "label": "John P. Fennell, Soc. Dem.",
+          "contest": "house1",
+          "candidate": "John P. Fennell"
+        },
+        {
+          "label": "Scattering",
+          "contest": "house1",
+          "candidate": "",
+          "party": ""
+        },
+        {
+          "label": "Total.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.08,
+        0.153,
+        0.83,
+        0.38
+      ],
+      "hint": "Read only the table headed 'SUMMARY OF VOTES IN FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 240,
+      "id": "240-1",
+      "columns": [
+        {
+          "label": "Michael E. Burke, Dem.",
+          "contest": "house2",
+          "candidate": "Michael Edmund Burke"
+        },
+        {
+          "label": "Wm. E. Mack, Pro.",
+          "contest": "house2",
+          "candidate": "William E. Mack"
+        },
+        {
+          "label": "Edward Voigt, Rep.",
+          "contest": "house2",
+          "candidate": "Edward Voigt"
+        },
+        {
+          "label": "John Bauernfiend, Soc. Dem.",
+          "contest": "house2",
+          "candidate": "John Bauernfiend"
+        },
+        {
+          "label": "Total.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.084,
+        0.372,
+        0.835,
+        0.641
+      ],
+      "hint": "Read only the table headed 'SUMMARY OF VOTES IN SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 240,
+      "id": "240-2",
+      "columns": [
+        {
+          "label": "W. F. Pierstorff, Dem.",
+          "contest": "house3",
+          "candidate": "W. F. Pierstorff"
+        },
+        {
+          "label": "Herbert Noyes, Pro.",
+          "contest": "house3",
+          "candidate": "Herbert Noyes"
+        },
+        {
+          "label": "John M. Nelson, Rep.",
+          "contest": "house3",
+          "candidate": "John Mandt Nelson"
+        },
+        {
+          "label": "Scattering",
+          "contest": "house3",
+          "candidate": "",
+          "party": ""
+        },
+        {
+          "label": "Total.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.092,
+        0.633,
+        0.842,
+        0.884
+      ],
+      "hint": "Read only the table headed 'SUMMARY OF VOTES IN THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 241,
+      "id": "241-0",
+      "columns": [
+        {
+          "label": "Francis A. Cannon, Dem.",
+          "contest": "house4",
+          "candidate": "Francis A. Cannon"
+        },
+        {
+          "label": "C. H. Mott, Pro.",
+          "contest": "house4",
+          "candidate": "C. H. Mott"
+        },
+        {
+          "label": "Wm. G. Cary, Rep.",
+          "contest": "house4",
+          "candidate": "William Joseph Cary"
+        },
+        {
+          "label": "Winfield Gaylord, So. Dem.",
+          "contest": "house4",
+          "candidate": "Winfield Gaylord"
+        },
+        {
+          "label": "Total.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.17,
+        0.133,
+        0.917,
+        0.529
+      ],
+      "hint": "Read only the table headed 'SUMMARY OF VOTES IN FOURTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 241,
+      "id": "241-1",
+      "columns": [
+        {
+          "label": "Law- rence McGreal Dem.",
+          "contest": "house5",
+          "candidate": "Lawrence McGreal"
+        },
+        {
+          "label": "Wm. R. Nethercut, Pro.",
+          "contest": "house5",
+          "candidate": "William R. Nethercut"
+        },
+        {
+          "label": "Wm. H. Stafford, Rep.",
+          "contest": "house5",
+          "candidate": "William Henry Stafford"
+        },
+        {
+          "label": "Victor L. Berger, So. Dem.",
+          "contest": "house5",
+          "candidate": "Victor L. Berger"
+        },
+        {
+          "label": "Total.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.167,
+        0.521,
+        0.911,
+        0.899
+      ],
+      "hint": "Read only the table headed 'SUMMARY OF VOTES IN FIFTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 242,
+      "id": "242-0",
+      "columns": [
+        {
+          "label": "Michael K. Reilly, Dem.",
+          "contest": "house6",
+          "candidate": "Michael Kieran Reilly"
+        },
+        {
+          "label": "Verner N. Weeks, Pro.",
+          "contest": "house6",
+          "candidate": "Verner N. Weeks"
+        },
+        {
+          "label": "James H. Davidson, Rep.",
+          "contest": "house6",
+          "candidate": "James H. Davidson"
+        },
+        {
+          "label": "Martin Georgenson, Soc. Dem.",
+          "contest": "house6",
+          "candidate": "Martin Georgenson"
+        },
+        {
+          "label": "Scattering",
+          "contest": "house6",
+          "candidate": "",
+          "party": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.061,
+        0.163,
+        0.809,
+        0.388
+      ],
+      "hint": "Read only the table headed 'SUMMARY OF VOTES IN SIXTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 242,
+      "id": "242-1",
+      "columns": [
+        {
+          "label": "Virgil W. Cady, Dem.",
+          "contest": "house7",
+          "candidate": "Virgil W. Cady"
+        },
+        {
+          "label": "Martin Larson, Pro.",
+          "contest": "house7",
+          "candidate": "Martin Larson"
+        },
+        {
+          "label": "John J. Esch, Rep.",
+          "contest": "house7",
+          "candidate": "John Jacob Esch"
+        },
+        {
+          "label": "Carl A. Noetzelman, Soc. Dem.",
+          "contest": "house7",
+          "candidate": "Carl A. Noetzelman"
+        },
+        {
+          "label": "Scattering",
+          "contest": "house7",
+          "candidate": "",
+          "party": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.066,
+        0.38,
+        0.816,
+        0.674
+      ],
+      "hint": "Read only the table headed 'SUMMARY OF VOTES IN SEVENTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 242,
+      "id": "242-2",
+      "columns": [
+        {
+          "label": "Albert C. Schmidt, Dem.",
+          "contest": "house8",
+          "candidate": "Albert C. Schmidt"
+        },
+        {
+          "label": "Adolph R. Bucknam, Pro.",
+          "contest": "house8",
+          "candidate": "Adolph R. Bucknam"
+        },
+        {
+          "label": "Edward E. Browne, Rep.",
+          "contest": "house8",
+          "candidate": "Edward Everts Browne"
+        },
+        {
+          "label": "Curtis R. Boorman, Soc. Dem.",
+          "contest": "house8",
+          "candidate": "Curtis R. Boorman"
+        },
+        {
+          "label": "Scattering",
+          "contest": "house8",
+          "candidate": "",
+          "party": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.066,
+        0.666,
+        0.816,
+        0.902
+      ],
+      "hint": "Read only the table headed 'SUMMARY OF VOTES IN EIGHTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 243,
+      "id": "243-0",
+      "columns": [
+        {
+          "label": "Thos. F. Konop, Dem.",
+          "contest": "house9",
+          "candidate": "Thomas Frank Konop"
+        },
+        {
+          "label": "John W. Reynolds, Rep.",
+          "contest": "house9",
+          "candidate": "John W. Reynolds"
+        },
+        {
+          "label": "Thomas J. Oliver, Soc. Dem.",
+          "contest": "house9",
+          "candidate": "Thomas J. Oliver"
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.191,
+        0.147,
+        0.943,
+        0.388
+      ],
+      "hint": "Read only the table headed 'SUMMARY OF VOTES IN NINTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 243,
+      "id": "243-1",
+      "columns": [
+        {
+          "label": "Andrew Sutherland, Dem.",
+          "contest": "house10",
+          "candidate": "Andrew Sutherland"
+        },
+        {
+          "label": "John Waldal, Pro.",
+          "contest": "house10",
+          "candidate": "John Waldal"
+        },
+        {
+          "label": "Jas. A. Frear, Rep.",
+          "contest": "house10",
+          "candidate": "James Archibald Frear"
+        },
+        {
+          "label": "Henry Haefner, Soc. Dem.",
+          "contest": "house10",
+          "candidate": "Henry Haefner"
+        },
+        {
+          "label": "Scattering",
+          "contest": "house10",
+          "candidate": "",
+          "party": ""
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.191,
+        0.38,
+        0.939,
+        0.654
+      ],
+      "hint": "Read only the table headed 'SUMMARY OF VOTES IN TENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 243,
+      "id": "243-2",
+      "columns": [
+        {
+          "label": "John L. Molone, Dem.",
+          "contest": "house11",
+          "candidate": "John L. Molone"
+        },
+        {
+          "label": "Edw. Kerswill, Pro.",
+          "contest": "house11",
+          "candidate": "Edw Kerswill"
+        },
+        {
+          "label": "Irvine L. Lenroot, Rep.",
+          "contest": "house11",
+          "candidate": "Irvine Luther Lenroot"
+        },
+        {
+          "label": "Otto F. Eick, Soc. Dem.",
+          "contest": "house11",
+          "candidate": "Otto F. Eick"
+        },
+        {
+          "label": "Scattering",
+          "contest": "house11",
+          "candidate": "",
+          "party": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.186,
+        0.646,
+        0.936,
+        0.942
+      ],
+      "hint": "Read only the table headed 'SUMMARY OF VOTES IN ELEVENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    }
+  ]
+}
