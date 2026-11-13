@@ -20,7 +20,7 @@ VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 DOWNLOAD = lb.DOWNLOAD
 PUBLISHER = "Greater London Council"
-INDEPENDENT = {"Independent", "Electrician", "Labourer", "Theatrical Agent", "Retired Garage Proprietor"}
+INDEPENDENT = {"Independent", "Citizen", "Electrician", "Labourer", "Theatrical Agent", "Retired Garage Proprietor"}
 METHODOLOGY = (
     "Read from the text layer of the Greater London Council's scanned report, with a second reading by optical "
     "character recognition of every column and the page images checked where the two differ. The report lists each "
@@ -39,6 +39,13 @@ NOTES = {
     "after which A. Young was declared elected in place of Mrs M. T. Catterson. The report's summary by wards gives "
     "the Liberals 5.1 percent in Ravensbury ward, Merton, where the printed votes give 5.7 percent; the votes are "
     "stored as printed.",
+    1971: "Both readings of the report agree on every candidate's votes. The report prints 2,553 votes for "
+    "J. D. Gordon-Lee, elected for the Conservatives in Hendon ward, Barnet, where its summary by wards gives party "
+    "shares that fit 2,353; with that, the party table's Conservative total exceeds the sum of the printed "
+    "Conservative votes by 209 and its Labour total falls 10 short of the printed Labour votes; the candidates' "
+    "figures are stored as printed. The third letter of N. K. Dewey's surname, a Conservative candidate in "
+    "Bow South ward, Tower Hamlets, is blotted in the report and is read as w. Five candidate lines missing from "
+    "the report's text layer were read from the page images.",
     1978: "Both readings of the report agree on every candidate's votes, and each ward's party shares match the "
     "report's summary by wards, yet the party table's totals differ from the candidates' sums by 153 votes for "
     "Labour (short), 121 for the Conservatives (over), and 38 for the Liberals (short); the candidates' figures "
@@ -49,6 +56,210 @@ POSTPONED = (
     "The poll in this ward was countermanded after the death of a candidate and held later, as the report notes."
 )
 BOOKS: dict[int, dict] = {
+    1971: {
+        "day": date(1971, 5, 13),
+        "url": f"{DOWNLOAD}/1871bfe0-e894-484e-bb07-66740b35e0f2/LBCE_1971-5-13.pdf",
+        "candidates": (12, 65),
+        "wards": (67, 99),
+        "step": 2,
+        "plain": True,
+        "trailing": True,
+        "titled": True,
+        "figures": {
+            (25, "~117"): "2117",
+            (73, "10.026"): "10,026",
+            (73, "10.334"): "10,334",
+            (73, "10,760'"): "10,760",
+            (81, "H1LLINGDON"): "HILLINGDON",
+            (61, "lllGHAMlllLL"): "HIGHAM HILL",
+            (61, "lllGHSTREET"): "HIGH STREET",
+            (91, "II,051"): "11,051",
+            (75, "5404"): "54.4",
+            (75, "6404"): "64.4",
+            (75, "4704"): "47.4",
+            (75, "5904"): "59.4",
+            (91, "13;046"): "13,046",
+            (95, "4.229"): "4,229",
+            (95, "6.576"): "6,576",
+        },
+        "missing": {
+            13: [("Bignell", ("Turbutt C.", "Con", 471, False, [48, 748, 259, 758]))],
+            44: [("Webb W. J.", ("Haynes R. V.", "Con", 1433, False, [326, 690, 525, 700]))],
+            53: [("Carradice", ("Reynolds T. R.", "Lab", 2435, True, [47, 752, 259, 762]))],
+            54: [
+                ("Odam", ("Jackson H. J.", "Con", 1432, True, [45, 160, 258, 170])),
+                ("Jakobi S. E", ("Schaler H. Miss", "Lab", 814, False, [323, 672, 525, 682])),
+            ],
+        },
+        "residual": {"Con": 209, "Lab": -10},
+        "elected": {
+            (35, "Childerhouse W. A."): False,
+            (35, "Bigrave W. T."): False,
+            (35, "Russell R. A."): False,
+            (35, "Dudmish P. E."): False,
+            (35, "Whitmore O. M. Mrs"): False,
+            (35, "Williams P. N. P."): False,
+            (56, "Howley K. Mrs"): False,
+            (56, "Holland J. Mrs"): False,
+            (56, "Willoughby J. Mrs"): False,
+            (56, "Cobley G.Mrs"): False,
+            (56, "RuddellJ.T."): False,
+        },
+        "names": {
+            "Crayford West J": "Crayford West",
+            "St. Mary's l": "St. Mary's",
+            "S t. Michael's": "St. Michael's",
+            "Stoneb ridge": "Stonebridge",
+            "Plaistow & Sundridge I": "Plaistow & Sundridge",
+            "Priory J": "Priory",
+            "St. Pancras J": "St. Pancras",
+            "~ Norbury": "Norbury",
+            "Waddon J": "Waddon",
+            "Whitehorse Manor J": "Whitehorse Manor",
+            "Woodside J": "Woodside",
+            "West j": "West",
+            "Well Hall j": "Well Hall",
+            "Cen tral Homsey": "Central Hornsey",
+            "South Homsey": "South Hornsey",
+            "Wealds tone South": "Wealdstone South",
+            "Colham - Cowley": "Colham-Cowley",
+            "Station J": "Station",
+            "Sou th Stanley": "South Stanley",
+            "Hook and Southborough l": "Hook and Southborough",
+            "Sydenham West J": "Sydenham West",
+            "Whitefoot J": "Whitefoot",
+            "Wimbledon West J": "Wimbledon West",
+            "Manor Park I (": "Manor Park",
+            "Woodgrange J": "Woodgrange",
+            "llford": "Ilford",
+            "Wan stead": "Wanstead",
+            "Cen tral Twickenham": "Central Twickenham",
+            "f Dockyard": "Dockyard",
+            "St. Giles j": "St. Giles",
+            "I Bow North": "Bow North",
+            "Ley tons tone": "Leytonstone",
+            "James Street": "St. James Street",
+            "John": "St. John",
+            "Mary's Park": "St. Mary's Park",
+            "Southfield },putn,y": "Southfield",
+            "'. Baker Street": "Baker Street",
+            "Regent's Park J": "Regent's Park",
+            "Capers Cope": "Copers Cope",
+            "Coddington": "Goddington",
+            "Elthome": "Elthorne",
+            "Amos": "Arnos",
+            "North": "Feltham North",
+        },
+        "columns": ["Con", "Lab", "Lib", "Other"],
+        "merged": {
+            code: "Other"
+            for code in (
+                "Comm",
+                "R",
+                "NF",
+                "Ind R",
+                "LIA",
+                "HBR",
+                "UM",
+                "Dwarf",
+                "HYM",
+                "SPGB",
+                "Ass Ind",
+                "Ind Lab",
+                "NDc",
+                "SEP",
+                "Ind Con",
+                "Rep Ass",
+                "Citizen",
+                "C+HR",
+                "FP",
+                "Ind FL",
+                "Indian Ind",
+                "LS",
+                "Local Ind",
+                "ND",
+                "NHBF",
+                "NRHI",
+                "PD",
+                "SE Ind",
+                "TC",
+                "TV",
+                "U-Con",
+                "Ind",
+            )
+        },
+        "state": {
+            "Barking": {"Lab": 45, "Other": 4, "Total": 49},
+            "Barnet": {"Con": 43, "Lab": 17, "Total": 60},
+            "Bexley": {"Con": 24, "Lab": 32, "Total": 56},
+            "Brent": {"Con": 22, "Lab": 38, "Total": 60},
+            "Bromley": {"Con": 41, "Lab": 15, "Lib": 4, "Total": 60},
+            "Camden": {"Con": 11, "Lab": 49, "Total": 60},
+            "Croydon": {"Con": 30, "Lab": 27, "Other": 3, "Total": 60},
+            "Ealing": {"Con": 20, "Lab": 40, "Total": 60},
+            "Enfield": {"Con": 32, "Lab": 28, "Total": 60},
+            "Greenwich": {"Con": 5, "Lab": 55, "Total": 60},
+            "Hackney": {"Lab": 60, "Total": 60},
+            "Hammersmith": {"Con": 2, "Lab": 58, "Total": 60},
+            "Haringey": {"Con": 19, "Lab": 41, "Total": 60},
+            "Harrow": {"Con": 26, "Lab": 27, "Lib": 2, "Other": 1, "Total": 56},
+            "Havering": {"Con": 13, "Lab": 30, "Other": 12, "Total": 55},
+            "Hillingdon": {"Con": 24, "Lab": 36, "Total": 60},
+            "Hounslow": {"Con": 13, "Lab": 47, "Total": 60},
+            "Islington": {"Lab": 60, "Total": 60},
+            "Kensington and Chelsea": {"Con": 39, "Lab": 21, "Total": 60},
+            "Kingston upon Thames": {"Con": 40, "Lab": 20, "Total": 60},
+            "Lambeth": {"Con": 9, "Lab": 51, "Total": 60},
+            "Lewisham": {"Con": 4, "Lab": 56, "Total": 60},
+            "Merton": {"Con": 21, "Lab": 29, "Other": 4, "Total": 54},
+            "Newham": {"Lab": 53, "Other": 7, "Total": 60},
+            "Redbridge": {"Con": 42, "Lab": 18, "Total": 60},
+            "Richmond upon Thames": {"Con": 37, "Lab": 14, "Lib": 3, "Total": 54},
+            "Southwark": {"Con": 2, "Lab": 58, "Total": 60},
+            "Sutton": {"Con": 25, "Lab": 21, "Other": 5, "Total": 51},
+            "Tower Hamlets": {"Lab": 60, "Total": 60},
+            "Waltham Forest": {"Con": 9, "Lab": 39, "Total": 48},
+            "Wandsworth": {"Con": 7, "Lab": 53, "Total": 60},
+            "Westminster, City of": {"Con": 37, "Lab": 23, "Total": 60},
+        },
+        "parties": {
+            "Lab": ("Labour", 1861, 3184710),
+            "Con": ("Conservative", 1745, 2363299),
+            "Lib": ("Liberal", 595, 253255),
+            "Comm": ("Communist", 140, 20212),
+            "R": ("Ratepayers and Residents Associations", 110, 94421),
+            "NF": ("National Front", 45, 4954),
+            "Ind R": ("Independent Ratepayers", 31, 39718),
+            "LIA": ("Liberal and Independent Alliance", 10, 2633),
+            "HBR": ("Homes Before Roads", 6, 2093),
+            "UM": ("Union Movement", 6, 571),
+            "Dwarf": ("Dwarf", 4, 344),
+            "HYM": ("Harrow Youth Movement", 4, 491),
+            "SPGB": ("Socialist Party of Great Britain", 4, 137),
+            "Ass Ind": ("Association of Independents", 3, 226),
+            "Ind Lab": ("Independent Labour", 3, 668),
+            "NDc": ("National Democratic", 3, 294),
+            "SEP": ("Stop 11 Plus", 3, 628),
+            "Ind Con": ("Independent Conservative", 2, 1504),
+            "Rep Ass": ("Republican's Association", 2, 265),
+            "Citizen": ("Citizen", 1, 105),
+            "C+HR": ("Civil and Human Rights", 1, 67),
+            "FP": ("Fellowship Party", 1, 450),
+            "Ind FL": ("Independent Federation of the Left", 1, 66),
+            "Indian Ind": ("Indian Independent", 1, 27),
+            "LS": ("Libertarian Socialist", 1, 130),
+            "Local Ind": ("Local Independent", 1, 1585),
+            "ND": ("National Democrat", 1, 167),
+            "NHBF": ("Nationalist House Britons First", 1, 133),
+            "NRHI": ("No Rates on Home Improvement", 1, 251),
+            "PD": ("People's Democracy", 1, 124),
+            "SE Ind": ("Self Employed Independent", 1, 270),
+            "TC": ("Tenant's Candidate", 1, 398),
+            "TV": ("A Tenant's Voice", 1, 205),
+            "U-Con": ("Unofficial Conservative", 1, 567),
+            "Ind": ("Independent", 43, 21427),
+        },
+    },
     1974: {
         "day": date(1974, 5, 2),
         "url": f"{DOWNLOAD}/f6b33f95-fca4-4f94-a15e-f0ffc946ed47/LBCE_1974-5-2.pdf",
@@ -393,6 +604,21 @@ CODES = {
     "RA*": "RA",
     "RA'\"": "RA",
     "Lib.-": "Lib",
+    "Ub": "Lib",
+    "Lal>": "Lab",
+    "LlA": "LIA",
+    "LocalInd": "Local Ind",
+    "Corum": "Comm",
+    "Con-": "Con",
+    "NF-ACM": "NF",
+    "Con AM": "Con",
+    "Lib AHR": "Lib",
+    "C01J1m": "Comm",
+    "lab+Co-op": "Lab",
+    "lab + Co-op": "Lab",
+    "Lab+Co-op": "Lab",
+    "Lab +Co-op": "Lab",
+    "OM": "UM",
 }
 TOKENS = {"Can": "Con", "Can.": "Con", "lnd": "Ind", "lnd.": "Ind", "Ind.": "Ind", "IndR": "Ind R"}
 Word = tuple[float, float, float, float, str]
@@ -420,24 +646,25 @@ def columns(words: list[Word], width: float) -> list[list[Word]]:
     return [[w for w in words if w[0] < split], [w for w in words if w[0] >= split]]
 
 
-def candidate(line: list[Word], codes: set[str]) -> tuple[str, str, int | None] | None:
+def candidate(line: list[Word], codes: set[str], plain: bool = False) -> tuple[str, str, int | None] | None:
     if len(line) > 4 and [w[4] for w in line[-2:]] == ["r", line[-1][4]] and re.fullmatch(r"\d", line[-3][4]):
         line = [*line[:-3], (*line[-3][:4], f"{line[-3][4]},{line[-1][4]}")]
-    found = read(line, codes)
+    found = read(line, codes, plain)
     while found is None and len(line) > 3 and re.fullmatch(r"[.,;:'\"*r-]+|\.\d", line[-2][4]):
         line = [*line[:-2], line[-1]]
-        found = read(line, codes)
+        found = read(line, codes, plain)
     return found
 
 
-def read(line: list[Word], codes: set[str]) -> tuple[str, str, int | None] | None:
+def read(line: list[Word], codes: set[str], plain: bool = False) -> tuple[str, str, int | None] | None:
     texts = [w[4] for w in line]
     if len(texts) < 3:
         return None
     if re.fullmatch(r"(?i)unopposed|uncontested|un-", texts[-1]):
         votes = None
     else:
-        votes = lb.number(texts[-1].replace("'", "").replace("~", ""))
+        figure = texts[-1].replace("'", "").replace("~", "")
+        votes = int(figure) if plain and re.fullmatch(r"\d{1,5}", figure) else lb.number(figure)
         if votes is None:
             return None
     rest = [TOKENS.get(t, t) for t in texts[:-1]]
@@ -470,7 +697,7 @@ def table2(year: int, sizes: list[tuple[float, float]], book: list[list[Word]]) 
             left = min((row[0][0] for row in rows), default=0)
             for row in rows:
                 text = " ".join(w[4] for w in row)
-                found = candidate(row, codes)
+                found = candidate(row, codes, spec.get("plain", False))
                 if found:
                     if ward is None:
                         raise ValueError(f"{year} page {number}: candidate before a ward: {text}")
@@ -485,7 +712,9 @@ def table2(year: int, sizes: list[tuple[float, float]], book: list[list[Word]]) 
                                     "votes": line[2],
                                     "elected": line[3],
                                     "page": number,
-                                    "bbox": [min(w[0] for w in row), lower - 12, max(w[2] for w in row), lower - 3],
+                                    "bbox": line[4]
+                                    if len(line) > 4
+                                    else [min(w[0] for w in row), lower - 12, max(w[2] for w in row), lower - 3],
                                     "width": width,
                                     "height": sizes[number - 1][1],
                                 }
@@ -516,12 +745,15 @@ def table2(year: int, sizes: list[tuple[float, float]], book: list[list[Word]]) 
                     continue
                 if len(row) >= 3 and lb.number(row[-1][4]) is not None:
                     print(f"UNPARSED {year} p{number}: {text}")
-                named = borough_of(text)
+                bare = re.sub(r"[-·•\s]+c\s*[oa]\s*[nm]\s*\w*\s*$", "", text, flags=re.IGNORECASE)
+                named = None if spec.get("titled") and bare.upper() == bare else borough_of(text)
                 if named:
                     borough = named
                     left = row[0][0]
                     continue
                 head = re.sub(r"\s*-\s*c\s*o\s*[nm]\s*\w*\s*$", "", text, flags=re.IGNORECASE)
+                if spec.get("titled"):
+                    head = re.sub(r"\s*[-·•]\s*c\s*[oa]\s*[nm]\s*\w*\s*$", "", head, flags=re.IGNORECASE)
                 cont = head != text
                 head = head.split(",")[0] if "," in head else re.split(r"\.\s+(?=[A-Z][a-z])", head)[0]
                 head = head.strip(" ,.*")
@@ -542,7 +774,7 @@ def table3(year: int, book: list[list[Word]]) -> dict[str, list[tuple]]:
     first, last = BOOKS[year]["wards"]
     found: dict[str, list[tuple]] = {}
     borough: str | None = None
-    for number in range(first, last + 1):
+    for number in range(first, last + 1, BOOKS[year].get("step", 1)):
         page = book[number - 1]
         heads = [w[0] for w in page if re.fullmatch(r"(?i)cons?tituency|parliamentary", w[4])]
         cut = min(heads) - 4 if heads else 140
@@ -728,7 +960,11 @@ def parse() -> None:
                             "la_code": code,
                             "ward": name,
                             "number": rank + 1,
-                            "name": initials(line["name"]) if spec.get("initials") else line["name"],
+                            "name": trailing(line["name"])
+                            if spec.get("trailing")
+                            else initials(line["name"])
+                            if spec.get("initials")
+                            else line["name"],
                             "party": line["party"],
                             "votes": line["votes"],
                             "elected": line["elected"],
@@ -905,6 +1141,31 @@ PEOPLE = {
     "Kal'ile, P. B.": "Kane, P. B.",
     "KeIlY, D.": "Kelly, D.",
     "Clifford P, A. H.": "Clifford, P. A. H.",
+    "01ins F.": "Olins, F.",
+    "P~wsey K. A.": "Pawsey, K. A.",
+    "Peskin B..": "Peskin, B.",
+    "Hu tchins B. A.": "Hutchins, B. A.",
+    "l..ewis D. R.": "Lewis, D. R.",
+    "Subharwall. M.": "Subharwal, I. M.",
+    "litchfield W. G. R.": "Litchfield, W. G. R.",
+    "Cusack'J. J.": "Cusack, J. J.",
+    "Hughes-Narb orough N.": "Hughes-Narborough, N.",
+    "La wrence J. H.": "Lawrence, J. H.",
+    "Bull J.'": "Bull, J.",
+    "litchfield C.": "Litchfield, C.",
+    "i.e Franc L.": "Le Franc, L.",
+    "F1intoff I. R. S.": "Flintoff, I. R. S.",
+    "Crofton Sir Malby Bt.": "Crofton, Sir Malby, Bt.",
+    "Needham'A. H.": "Needham, A. H.",
+    "Hay ward C. C.": "Hayward, C. C.",
+    "De ~ ey N. K.": "Dewey, N. K.",
+    "Philli.ps T. E.": "Phillips, T. E.",
+    "Nadav'A.": "Nadav, A.",
+    "MarshalIF.W.": "Marshall, F. W.",
+    "C1apton B.": "Clapton, B.",
+    ".erooks W. F.": "Brooks, W. F.",
+    "Carl ton P. A. Mrs": "Carlton, Mrs P. A.",
+    "King G. ,A.": "King, G. A.",
 }
 TITLES = {"Mrs", "Miss", "Dr", "Sir", "Lady", "The", "Major", "Col.", "St.", "de", "la"}
 
@@ -927,6 +1188,54 @@ def initials(text: str) -> str:
                 out.append(f"{char}.")
     text = f"{surname}, {' '.join(out)}" if out else surname
     return PEOPLE.get(text, text)
+
+
+HONORIFICS = {
+    "Mrs",
+    "Miss",
+    "Ms",
+    "Dr",
+    "Sir",
+    "Lady",
+    "Countess",
+    "Rev",
+    "Hon",
+    "The",
+    "Capt",
+    "Cdr",
+    "Lt",
+    "Col",
+    "Bt",
+}
+LETTERS = {"1": "I", "l": "I", "8": "B", "c": "C", "s": "S"}
+
+
+def trailing(text: str) -> str:
+    text = PEOPLE.get(text, text)
+    if re.fullmatch(r"[^,]+, \S.*", text):
+        return text
+    text = re.sub(r"(?<=[a-z])1(?=[a-z])", "l", text.replace("·", "-"))
+    suffix = " ".join(re.findall(r"\(\w+\)", text))
+    text = re.sub(r"\s*\(\w+\)", "", text)
+    text = re.sub(r"(?<=[a-z])(?=[A-Z]\.)", " ", text)
+    text = re.sub(r"\.(?=[A-Za-z])", ". ", text)
+    tokens = [{"S1.": "St."}.get(t, t) for t in text.split()]
+
+    def kind(token: str) -> str | None:
+        if token.rstrip(".") in HONORIFICS:
+            return "title"
+        if re.fullmatch(r"[A-Z1l8cs]\.?|St\.|de", token):
+            return "letter"
+        return None
+
+    index = next((i for i, t in enumerate(tokens) if i and kind(t)), len(tokens))
+    surname, rest = " ".join(tokens[:index]), tokens[index:]
+    if any(kind(t) is None for t in rest):
+        print(f"NAME {text!r}")
+    titles = [{"Mrs.": "Mrs", "Dr.": "Dr"}.get(t, t) for t in rest if kind(t) == "title"]
+    letters = [t if t in ("St.", "de") else f"{LETTERS.get(t[0], t[0])}." for t in rest if kind(t) == "letter"]
+    out = f"{surname}, {' '.join(titles + letters)}" if rest else surname
+    return f"{out}, {suffix}" if suffix else out
 
 
 UNRELATED = {"Senior Citizens"}
