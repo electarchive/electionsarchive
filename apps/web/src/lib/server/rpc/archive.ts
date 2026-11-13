@@ -13019,7 +13019,7 @@ export const contests = {
       ]);
       const placed = kept.flatMap((row, index) => {
         const place = others[index]?.place;
-        return place == null ? [] : [{ row, place, lane: index % 4 }];
+        return place == null ? [] : [{ row, place }];
       });
       const away = placed.filter(({ place }) => place.k !== area.k);
       const near =
@@ -13074,67 +13074,72 @@ export const contests = {
               ).map((row) => row.id),
             );
       const locate = async ({ row, place }: (typeof placed)[number]) => {
-        if (place.k === area.k) {
-          return { row, unit: "" };
-        }
-        if (
-          !near.has(row.id) ||
-          (!row.voted && !(await reaches(place.id, area.id, day)))
-        ) {
+        if (!row.voted && !(await reaches(place.id, area.id, day))) {
           return null;
         }
         const kids = await children(row.id, place, true, day);
-        const unit = kids.find((kid) => kid.k === area.k)?.segment;
-        return unit == null ? null : { row, unit };
+        return kids.find((kid) => kid.k === area.k)?.segment ?? null;
       };
-      const lanes = Map.groupBy(placed, (entry) => entry.lane)
+      const asked = placed
+        .filter(({ row, place }) => place.k === area.k || near.has(row.id))
+        .toSorted((a, b) => natural(a.row.path, b.row.path));
+      const lanes = Map.groupBy(
+        asked.filter(({ place }) => place.k !== area.k),
+        (_, index) => index % 4,
+      )
         .values()
         .toArray();
-      const [located, lineage] = await Promise.all([
+      const [located, totals, lineage] = await Promise.all([
         Promise.all(
           lanes.map(async (lane) => {
-            const done: Array<Awaited<ReturnType<typeof locate>>> = [];
+            const done: Array<[string, string | null]> = [];
             for (const entry of lane) {
-              done.push(await locate(entry));
+              done.push([entry.row.id, await locate(entry)]);
             }
             return done;
           }),
         ),
+        Promise.all(
+          asked.map(async ({ row }) => load([row.id], [area.k], day, [row.id])),
+        ),
         branches(day),
       ]);
-      const ready = located.flat().filter((entry) => entry != null);
-      const totals = await Promise.all(
-        ready.map(async ({ row }) => load([row.id], [area.k], day, [row.id])),
-      );
-      return ready
-        .map(({ row, unit }, index) => {
+      const units = new Map(located.flat());
+      return asked
+        .flatMap(({ row, place }, index) => {
+          const unit = place.k === area.k ? "" : units.get(row.id);
+          if (unit == null) {
+            return [];
+          }
           const loaded = totals[index]?.get(area.k);
-          return {
-            id: row.id,
-            name: labels.full.get(row.id) ?? "",
-            path: [row.path, unit].filter((part) => part !== "").join("/"),
-            leaders:
-              loaded == null
-                ? []
-                : compare(loaded.side, null, lineage, "party")
-                    .flatMap((entry) =>
-                      entry.current == null
-                        ? []
-                        : [
-                            {
-                              key: entry.key,
-                              label: entry.label,
-                              color: entry.color,
-                              person: entry.current.person,
-                              party: entry.current.party,
-                              votes: entry.current.votes,
-                              share: entry.current.share,
-                            },
-                          ],
-                    )
-                    .toSorted((a, b) => b.votes - a.votes)
-                    .slice(0, 2),
-          };
+          return [
+            {
+              id: row.id,
+              name: labels.full.get(row.id) ?? "",
+              path: [row.path, unit].filter((part) => part !== "").join("/"),
+              leaders:
+                loaded == null
+                  ? []
+                  : compare(loaded.side, null, lineage, "party")
+                      .flatMap((entry) =>
+                        entry.current == null
+                          ? []
+                          : [
+                              {
+                                key: entry.key,
+                                label: entry.label,
+                                color: entry.color,
+                                person: entry.current.person,
+                                party: entry.current.party,
+                                votes: entry.current.votes,
+                                share: entry.current.share,
+                              },
+                            ],
+                      )
+                      .toSorted((a, b) => b.votes - a.votes)
+                      .slice(0, 2),
+            },
+          ];
         })
         .toSorted((a, b) => natural(a.name, b.name));
     }),
