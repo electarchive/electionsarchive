@@ -22,6 +22,23 @@ where p is not null
 DENSE = {"us.nyc_ed": 14}
 
 
+def sweep_scratch(scratch_root: Path, max_age: float = 86_400) -> None:
+    now = time.time()
+    held: set[str] = set()
+    for fd in Path("/proc").glob("[0-9]*/fd/*"):
+        try:
+            held.add(str(fd.readlink()))
+        except OSError:
+            continue
+    for folder in scratch_root.glob("tiles-*"):
+        if not folder.is_dir():
+            continue
+        newest = max((p.stat().st_mtime for p in (folder, *folder.iterdir())), default=0)
+        if now - newest < max_age or any(h.startswith(f"{folder}/") or h == str(folder) for h in held):
+            continue
+        shutil.rmtree(folder, ignore_errors=True)
+
+
 def build(prefix: str | None) -> str:
     started = time.monotonic()
     with connect() as conn:
@@ -44,6 +61,7 @@ def build(prefix: str | None) -> str:
         display.straddle(conn)
     summaries: list[str] = []
     (DATA / "tmp").mkdir(exist_ok=True)
+    sweep_scratch(DATA / "tmp")
     with tempfile.TemporaryDirectory(prefix="tiles-", dir=DATA / "tmp") as scratch:
         for scheme_code, vintage, as_of, features, attribution in sets:
             if not features:
