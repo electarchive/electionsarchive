@@ -11,7 +11,7 @@ from ea.changeset import NAMESPACE, Changeset
 from ea.store import DATA, connect
 
 SOURCE = "fr.referendums"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 FIGURE = r"\d{1,3}(?:[ .]\d{3})*"
 VOTES, REGISTERED, VALID, INVALID, VOTERS = 1, 2, 4, 5, 14
@@ -130,6 +130,21 @@ QUESTIONS = {
         (
             "Approuvez-vous le projet de loi qui autorise la ratification du traité établissant une Constitution pour "
             "l'Europe ?"
+        ),
+    ),
+    date(1972, 4, 23): (
+        "https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000000513770",
+        (
+            "Approuvez-vous, dans les perspectives nouvelles qui s'ouvrent à l'Europe, le projet de loi soumis au peuple "
+            "français par le Président de la République, et autorisant la ratification du traité relatif à l'adhésion de "
+            "la Grande-Bretagne, du Danemark, de l'Irlande et de la Norvège aux Communautés européennes ?"
+        ),
+    ),
+    date(1988, 11, 6): (
+        "https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000000872797",
+        (
+            "Approuvez-vous le projet de loi soumis au peuple français par le Président de la République portant "
+            "dispositions statutaires et préparatoires à l'autodétermination de la Nouvelle-Calédonie en 1998 ?"
         ),
     ),
 }
