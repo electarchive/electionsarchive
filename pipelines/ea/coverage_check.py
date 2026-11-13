@@ -131,7 +131,7 @@ def database(conn) -> list[str]:
                 ).fetchone()
             ):
                 problems.append(f"finest-reported {row['state']} {row['year']} {row['level']}: no county {county}")
-    polities = {"us", *coverage_countries.countries()}
+    polities = {"us", *coverage_countries.countries(conn)}
     gap_ids = known_gap_ids(conn, {value for row in coverage.registry() for value in row["ids"]})
     for row in coverage.registry():
         where = f"coverage-gaps.tsv {row['polity']} {row['state']} {row['level']} {row['years']} {row['grain']}"
@@ -216,8 +216,8 @@ def database(conn) -> list[str]:
         polity: [n for n in found if n["from"] is None and n["note"].startswith(OVER)]
         for polity, found in conn.execute("select polity, notes from coverage_polity")
     }
-    for cc in coverage_countries.countries():
-        spec = coverage_countries.load(cc)
+    for cc in coverage_countries.countries(conn):
+        spec = coverage_countries.census_spec(conn, cc)
         for level in spec["levels"]:
             cited: dict[int, int] = defaultdict(int)
             for e in level.get("elections", []):

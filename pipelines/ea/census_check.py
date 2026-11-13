@@ -4,7 +4,7 @@ SHOWN = 12
 
 CLASSIFY_SQL = """
 with recursive census_polity as (
-    select distinct polity_id from census_class
+    select distinct polity_id from census_class where %(root)s::uuid is null or polity_id = %(root)s::uuid
 ), tree(root, id) as (
     select polity_id, polity_id from census_polity
     union
@@ -69,6 +69,17 @@ with recursive census_polity as (
 )
 """
 HELD_SQL = CLASSIFY_SQL + "select class_id, count(distinct contest_id) from top where place = 1 group by class_id"
+PICKED_SQL = (
+    CLASSIFY_SQL
+    + """
+select distinct on (t.contest_id) t.contest_id, t.class_id, t.rank
+from top t
+join census_class k on k.id = t.class_id
+join polity p on p.id = t.root
+where t.place = 1
+order by t.contest_id, p.kind <> 'sovereign_state', k.key
+"""
+)
 CLASSIFY_SQL += """
 select p.iso_code, 'census.unclassified', array_agg(h.contest_id::text order by h.contest_id), count(*)
 from held h
@@ -87,12 +98,25 @@ order by 1, 2
 
 
 def held(conn: Connection) -> dict:
-    return dict(conn.execute(HELD_SQL).fetchall())
+    return dict(conn.execute(HELD_SQL, {"root": None}).fetchall())
+
+
+def picked(conn: Connection, root: str | None = None) -> dict[str, str]:
+    return {str(contest): str(k) for contest, k, _ in conn.execute(PICKED_SQL, {"root": root})}
+
+
+def rebuild(conn: Connection) -> int:
+    rows = conn.execute(PICKED_SQL, {"root": None}).fetchall()
+    conn.execute("delete from contest_class")
+    with conn.cursor().copy("copy contest_class (contest_id, class_id, rank) from stdin") as copy:
+        for row in rows:
+            copy.write_row(row)
+    return len(rows)
 
 
 def problems(conn: Connection) -> list[str]:
     found = []
-    for iso, check, ids, total in conn.execute(CLASSIFY_SQL):
+    for iso, check, ids, total in conn.execute(CLASSIFY_SQL, {"root": None}):
         shown = ", ".join(ids[:SHOWN]) + (f", and {total - SHOWN:,} more" if total > SHOWN else "")
         found.append(f"{check} {iso}: {total:,} contests: {shown}")
     return found

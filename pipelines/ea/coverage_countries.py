@@ -6,14 +6,15 @@ from collections import Counter, defaultdict
 from datetime import date, timedelta
 from pathlib import Path
 
-from ea import coverage, readiness
+from ea import census_check, coverage, readiness
 from ea.store import ROOT, connect
 
-DENOMINATORS = Path(__file__).parent / "denominators"
+CENSUS = Path(__file__).parent / "census"
 INPUTS = (
     "pipelines/ea/coverage.py",
     "pipelines/ea/coverage_tables.py",
     "pipelines/ea/coverage_countries.py",
+    "pipelines/ea/census_check.py",
     "pipelines/ea/statewide_table.py",
     "pipelines/ea/readiness.py",
     "pipelines/ea/readiness/2026-11-03.json",
@@ -34,10 +35,6 @@ EP_SCHEMES = {
 }
 
 CONTESTS_SQL = """
-with recursive t(id) as (
-    select id from polity where iso_code = %(iso)s
-    union select pp.polity_id from polity_parent pp join t on pp.parent_id = t.id
-)
 select c.id::text, e.id::text, e.date_from, e.kind::text, coalesce(b.kind::text, o.kind::text, c.kind::text),
     op.iso_code, ep.iso_code, c.default_result_kind in ('tacit', 'show_of_hands'), c.district_area_id::text, a.scheme_code,
     coalesce(b.polity_id, o.polity_id, e.polity_id)::text,
@@ -50,8 +47,7 @@ left join body b on b.id = c.body_id
 left join office o on o.id = c.office_id
 left join polity op on op.id = coalesce(b.polity_id, o.polity_id, e.polity_id)
 left join area a on a.id = c.district_area_id
-where e.date_from is not null and not c.notional
-    and case when %(iso)s = 'EU' then op.iso_code = 'EU' else e.polity_id in (select id from t) end
+where c.id = any(%s::uuid[])
 """
 
 UNITS_SQL = """
@@ -159,6 +155,78 @@ where u.polity_id in (select id from t) and (%(iso)s <> 'EU' or u.scheme_code = 
 group by 1, 2, s.rank having count(*) >= 100 order by s.rank desc, count(*) desc limit 1
 """
 
+COUNTRIES_SQL = """
+select distinct lower(p.iso_code) from census_class k join polity p on p.id = k.polity_id
+where p.iso_code <> 'US' order by 1
+"""
+
+STAMP_SQL = """
+select lower(p.iso_code), max(x.changeset_id::text) || ':' || count(*)
+from (
+    select polity_id, changeset_id from census_class
+    union all select k.polity_id, d.changeset_id from census_date d join census_class k on k.id = d.class_id
+    union all select k.polity_id, m.changeset_id from census_match m join census_class k on k.id = m.class_id
+    union all select polity_id, changeset_id from census_tier
+    union all select t.polity_id, c.changeset_id from census_tier_count c join census_tier t on t.id = c.tier_id
+    union all select k.polity_id, c.changeset_id from election_cadence c join census_class k on k.id = c.class_id
+) x
+join polity p on p.id = x.polity_id
+group by 1
+"""
+
+NAME_SQL = """
+select p.id::text, coalesce(
+    (select n.text from name n where n.entity_id = p.id and n.is_preferred order by n.lang <> 'en' limit 1), p.iso_code)
+from polity p where p.iso_code = %s
+"""
+
+CLASSES_SQL = """
+select k.id::text, k.key, k.goal, coalesce(k.name_en, k.name), k.note, k.finest_note, k.measure, k.disposition::text,
+    k.contests_per_unit, k.valid_from, k.valid_to, k.tier_id::text
+from census_class k
+where k.polity_id = %s and k.disposition is distinct from 'out_of_scope'
+"""
+
+DATES_SQL = """
+select d.class_id::text, d.date, d.date_precision::text, d.through, d.contests, d.seats, d.regions, d.deferred, d.note,
+    s.title
+from census_date d
+join census_class k on k.id = d.class_id
+left join source s on s.id = d.source_id
+where k.polity_id = %s and d.within_polity_id is null
+order by d.date
+"""
+
+CADENCE_SQL = """
+select c.class_id::text, w.iso_code, c.period_years, c.phase, c.valid_from, c.valid_to
+from election_cadence c
+join census_class k on k.id = c.class_id
+join polity w on w.id = c.polity_id
+where k.polity_id = %s and c.period_years is not null and c.phase is not null
+"""
+
+COUNTS_SQL = """
+select t.id::text, w.iso_code, c.date, c.value
+from census_tier_count c
+join census_tier t on t.id = c.tier_id
+left join polity w on w.id = c.within_polity_id
+where t.polity_id = %s
+order by c.date
+"""
+
+SOURCES_SQL = """
+select s.id::text, s.publisher, s.title, s.url, s.notes
+from source s
+where s.id in (
+    select source_id from census_class where polity_id = %(polity)s
+    union select d.source_id from census_date d join census_class k on k.id = d.class_id where k.polity_id = %(polity)s
+    union select source_id from census_tier where polity_id = %(polity)s
+    union select c.source_id from census_tier_count c join census_tier t on t.id = c.tier_id
+        where t.polity_id = %(polity)s
+)
+order by s.publisher, s.title
+"""
+
 
 IT_REGIONS = {
     "PIEMONTE": "01",
@@ -220,41 +288,144 @@ def region(cc: str, scheme: str | None, code: str | None, parent: str | None, el
     return ""
 
 
-def load(cc: str) -> dict:
-    return json.loads((DENOMINATORS / f"{cc}.json").read_text())
+def countries(conn=None) -> list[str]:
+    if conn is None:
+        with connect() as own:
+            return countries(own)
+    return [cc for (cc,) in conn.execute(COUNTRIES_SQL)]
 
 
-def countries() -> list[str]:
-    return sorted(p.stem for p in DENOMINATORS.glob("*.json"))
+def stamps(conn) -> dict[str, str]:
+    return dict(conn.execute(STAMP_SQL).fetchall())
 
 
-def matches(rule: dict, row: tuple) -> bool:
-    _, _, day, ekind, body, body_iso, _, _, _, scheme, _, code = row
-    return (
-        ekind in rule["kinds"]
-        and body in rule["bodies"]
-        and scheme in rule.get("schemes", [scheme])
-        and not any((code or "").startswith(prefix) for prefix in rule.get("except_codes", []))
-        and (
-            (body_iso or "") == rule["iso"]
-            or rule["iso"].endswith("*")
-            and (body_iso or "").startswith(rule["iso"][:-1])
+def merged(entries: list[dict]) -> dict:
+    first = dict(entries[0])
+    for e in entries[1:]:
+        if e.get("contests") is not None:
+            first["contests"] = (first.get("contests") or 0) + e["contests"]
+        if e.get("seats") is not None:
+            first["seats"] = (first.get("seats") or 0) + e["seats"]
+        if e.get("regions"):
+            regions = dict(first.get("regions") or {})
+            for reg, n in e["regions"].items():
+                regions[reg] = regions.get(reg, 0) + n
+            first["regions"] = regions
+        first["deferred"] = first.get("deferred", []) + e.get("deferred", [])
+        first["note"] = " ".join(n for n in (first.get("note"), e.get("note")) if n)
+    return first
+
+
+def counted(cc: str, iso: str, k: dict, cadence: list[tuple], counts: list[tuple]) -> list[dict]:
+    today = date.today()
+    per = k["per"] or 1
+    years: dict[int, dict[str, int]] = defaultdict(dict)
+    for within, period, phase, lo, hi in cadence:
+        start = max(d.year for d in (lo, k["from"], date(1800, 1, 1)) if d is not None)
+        end = min(d.year - 1 for d in (hi, k["to"], date(today.year + 1, 1, 1)) if d is not None)
+        scope = None if within == iso else within
+        for year in range(start + (phase - start) % period, end + 1, period):
+            found = [value for tier, w, day, value in counts if tier == k["tier"] and w == scope and day.year <= year]
+            if found:
+                years[year][region(cc, None, None, None, scope) if scope else ""] = found[-1] * per
+    return [
+        {
+            "year": year,
+            "contests": sum(regions.values()),
+            "regions": {reg: n for reg, n in regions.items() if reg},
+            "note": "Expected from the official count of units and the statutory cycle.",
+        }
+        for year, regions in sorted(years.items())
+    ]
+
+
+def census_spec(conn, cc: str) -> dict:
+    iso = cc.upper()
+    found = conn.execute(NAME_SQL, [iso]).fetchone()
+    if found is None:
+        raise SystemExit(f"no polity {iso}")
+    pid, name = found
+    extra = json.loads(path.read_text()) if (path := CENSUS / f"{cc}.json").exists() else {}
+    dates: dict[str, list[tuple]] = defaultdict(list)
+    for row in conn.execute(DATES_SQL, [pid]):
+        dates[row[0]].append(row[1:])
+    cadence: dict[str, list[tuple]] = defaultdict(list)
+    for class_id, *rule in conn.execute(CADENCE_SQL, [pid]):
+        cadence[class_id].append(tuple(rule))
+    counts = list(conn.execute(COUNTS_SQL, [pid]))
+    levels = []
+    for class_id, key, goal, label, note, fine_note, measure_, disposition, per, lo, hi, tier in conn.execute(
+        CLASSES_SQL, [pid]
+    ):
+        rows = dates.get(class_id, [])
+        gaps = [
+            {"from": day.year, "to": through.year, "note": text or ""}
+            for day, _, through, contests, _, _, _, text, _ in rows
+            if contests is None and through is not None
+        ]
+        listed = [r for r in rows if not (r[3] is None and r[2] is not None)]
+        by_year = any(precision != "day" and contests is not None for _, precision, _, contests, *_ in listed)
+        slots: dict[str, list[dict]] = defaultdict(list)
+        for day, _, _, contests, seats, regions, deferred, text, title in listed:
+            e: dict = {"contests": contests}
+            if seats is not None:
+                e["seats"] = seats
+            if regions:
+                e["regions"] = regions
+            if deferred:
+                e["deferred"] = [d.isoformat() for d in deferred]
+            if text:
+                e["note"] = text
+            if title:
+                e["source"] = title
+            if by_year:
+                e["year"] = day.year
+            else:
+                e["date"] = day.isoformat()
+            slots[str(e.get("year") or e.get("date"))].append(e)
+        elections = [merged(entries) for entries in slots.values()]
+        if not rows:
+            elections = counted(
+                cc, iso, {"per": per, "from": lo, "to": hi, "tier": tier}, cadence.get(class_id, []), counts
+            )
+        levels.append(
+            {
+                "class_id": class_id,
+                "key": key,
+                "goal": goal,
+                "label": label,
+                **({"note": note} if note else {}),
+                **({"fine_note": fine_note} if fine_note else {}),
+                **(measure_ or {}),
+                "blocked": disposition == "blocked",
+                "elections": elections,
+                "gaps": gaps,
+            }
         )
-        and rule.get("from", "0000") <= day.isoformat() < rule.get("to", "9999")
-    )
+    levels.sort(key=lambda lv: (GOALS.index(lv["goal"]) if lv["goal"] in GOALS else len(GOALS), lv["key"]))
+    sources = {
+        id: {"publisher": publisher, "title": title, "url": url, **({"note": notes} if notes else {})}
+        for id, publisher, title, url, notes in conn.execute(SOURCES_SQL, {"polity": pid})
+    }
+    return {
+        "polity": iso,
+        "polity_id": pid,
+        "name": name,
+        "levels": levels,
+        "sources": sources,
+        **{k: extra[k] for k in ("region_schemes", "region_labels", "regions") if k in extra},
+    }
 
 
 def measure(conn, cc: str) -> dict:
-    spec = load(cc)
+    spec = census_spec(conn, cc)
     iso = spec["polity"]
-    rows = list(conn.execute(CONTESTS_SQL, {"iso": iso}))
     levels = spec["levels"]
+    keys = {lv["class_id"]: lv["key"] for lv in levels}
+    picks = {cid: keys[k] for cid, k in census_check.picked(conn, spec["polity_id"]).items() if k in keys}
     picked: dict[str, list[tuple]] = defaultdict(list)
-    for row in rows:
-        for level in levels:
-            if any(matches(rule, row) for rule in level["match"]):
-                picked[level["key"]].append(row)
-                break
+    for row in conn.execute(CONTESTS_SQL, [list(picks)]):
+        picked[picks[row[0]]].append(row)
     ids = [r[0] for rs in picked.values() for r in rs]
     ahead = readiness.ready(
         conn, [r[0] for rs in picked.values() for r in rs if r[2] >= readiness.local_today(r[6] or iso)]
@@ -521,6 +692,9 @@ def tally(cc: str, data: dict) -> tuple[dict, list[dict], list[dict]]:
                     cell[0] += gap
                     cell[4 if coarse_only else 2] += gap
             for reg, cell in by_region.items():
+                if level["blocked"]:
+                    cell[17] += cell[2]
+                    cell[2] = 0
                 found = coverage.gap(registry, ("results",), cc, reg, key, "", year)
                 if found is not None and cell[2] > 0:
                     reached[found["i"]] += cell[2]
@@ -730,8 +904,8 @@ def markdown(cc: str, data: dict, goals: dict, elections: list[dict], notes: lis
     lines = [
         f"# {spec['name']} coverage",
         "",
-        f"Generated by `ea coverage {cc}` on {date.today().isoformat()} from the database and the cited denominators in "
-        f"`pipelines/ea/denominators/{cc}.json`. The archive holds {data['elections']:,} elections and "
+        f"Generated by `ea coverage {cc}` on {date.today().isoformat()} from the database and its published census of "
+        f"{spec['name']}. The archive holds {data['elections']:,} elections and "
         f"{data['contests']:,} contests for {spec['name']}"
         + (f", {data['first']}–{data['last']}" if data["first"] is not None else "")
         + ".",
@@ -848,9 +1022,9 @@ EFFORT = {
 }
 
 
-def inputs(ref: str = "HEAD") -> dict[str, str]:
+def inputs(conn, ref: str = "HEAD") -> dict[str, str]:
     listed = subprocess.run(
-        ["git", "ls-tree", "-r", ref, "--", *INPUTS, str(DENOMINATORS.relative_to(ROOT))],
+        ["git", "ls-tree", "-r", ref, "--", *INPUTS, str(CENSUS.relative_to(ROOT))],
         cwd=ROOT,
         capture_output=True,
         text=True,
@@ -860,11 +1034,11 @@ def inputs(ref: str = "HEAD") -> dict[str, str]:
         path: line.split()[2]
         for line in listed.splitlines()
         if (path := line.split("\t")[1]) in INPUTS or path.endswith(".json")
-    }
+    } | {f"census:{cc}": stamp for cc, stamp in stamps(conn).items()}
 
 
 def record(conn) -> list[str]:
-    latest = inputs("main")
+    latest = inputs(conn, "main")
     conn.execute("update coverage_build set latest = %s", [json.dumps(latest)])
     row = conn.execute("select commit, inputs from coverage_build").fetchone()
     built = (row[1] if row else None) or {}
@@ -876,7 +1050,7 @@ def world() -> str:
     with connect() as conn:
         record(conn)
         rows = list(conn.execute(WORLD_SQL))
-    specs = {cc: load(cc) for cc in countries()}
+        specs = {cc: census_spec(conn, cc) for cc in countries(conn)}
     spans: dict[tuple, dict] = {}
     for cc, level, year, total, complete, absent, bare, known in rows:
         found = next(
@@ -941,8 +1115,8 @@ def world() -> str:
         "## How it is counted",
         "",
         (
-            "- A gap is a country, level, and year outside the US whose cited denominator (`pipelines/ea/denominators/`)"
-            " counts more contests than the archive holds with results at the level's grain, or, for a contest still to"
+            "- A gap is a country, class, and year outside the US whose published census (the `census_date` rows, or"
+            " the official unit count over the statutory cycle) counts more contests than the archive holds with results at the level's grain, or, for a contest still to"
             " vote, with its candidates or options in full. Missing is total less complete, split into contests the"
             " archive lacks entirely and contests it holds with no results."
         ),

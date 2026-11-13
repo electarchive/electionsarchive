@@ -134,7 +134,7 @@ def main() -> None:
         "coverage/{cc}-coverage.md to the reports folder (EA_REPORTS), refresh the coverage tables the app's coverage pages read from the states and countries that changed "
         "(rebuild: all of them), "
         "check them against the cited counts, the pages, their twins, and REST, or write world-gaps.md there",
-    ).add_argument("polity", choices=("us", "refresh", "rebuild", "check", "world", *coverage_countries.countries()))
+    ).add_argument("polity", help="us, refresh, rebuild, check, world, or a polity with a published census")
     census = commands.add_parser(
         "census",
         help="write .agents/spec/coverage/{cc}-census.md from the census tables, keeping its Research section, "

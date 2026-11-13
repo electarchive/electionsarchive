@@ -17,7 +17,7 @@ import polars as pl
 import psycopg
 from psycopg.types.json import Json
 
-from ea import coverage, coverage_countries, raw, readiness, statewide_table
+from ea import census_check, coverage, coverage_countries, raw, readiness, statewide_table
 from ea.census_calendar import next_date
 from ea.sources.us.clerk import LEGISLATORS
 from ea.store import ROOT, connect
@@ -513,6 +513,7 @@ STATE_INPUTS = (
 COUNTRY_INPUTS = (
     "pipelines/ea/coverage.py",
     "pipelines/ea/coverage_countries.py",
+    "pipelines/ea/census_check.py",
     "pipelines/ea/readiness.py",
     f"pipelines/ea/readiness/{readiness.DAY}.json",
     "pipelines/ea/coverage_inputs/finest-reported.csv",
@@ -674,7 +675,7 @@ def refresh(full: bool = False) -> str:
                        where built_at is null or requested_at > built_at returning started_at"""
                 ).fetchone()
             ) is not None:
-                stamp = coverage_countries.inputs()
+                stamp = coverage_countries.inputs(conn)
                 commit = subprocess.run(
                     ["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True, check=True
                 ).stdout.strip()
@@ -806,19 +807,26 @@ def build(full: bool = False) -> str:
         states = {fips: (st, name) for st, fips, name in conn.execute(coverage.STATES_SQL)}
         scope = sorted({st for (st,) in conn.execute("select distinct st from pstate where st is not null")} | {"US"})
         wanted = {("state", st): f"{states_code}:{today}:{readiness.local_today('US-' + st)}" for st in scope}
-        for cc in ["us", *coverage_countries.countries()]:
+        clock = time.monotonic()
+        with conn.transaction():
+            census_check.rebuild(conn)
+        timings["classes"] = time.monotonic() - clock
+        census = coverage_countries.stamps(conn)
+        listed = coverage_countries.countries(conn)
+        for cc in ["us", *listed]:
             zones = sorted(
                 {str(readiness.local_today(iso)) for iso in readiness.ZONES if cc == "eu" or iso[:2] == cc.upper()}
                 | {str(readiness.local_today(cc.upper()))}
             )
-            extra = "" if cc == "us" else digest((f"pipelines/ea/denominators/{cc}.json",))
+            path = f"pipelines/ea/census/{cc}.json"
+            extra = "" if cc == "us" else census[cc] + (":" + digest((path,)) if (ROOT / path).exists() else "")
             wanted[("country", cc)] = f"{countries_code}:{extra}:{today}:{','.join(zones)}"
         wanted[("local", "")] = f"{local_code}:{next(iter(conn.execute(CADENCE_STAMP_SQL)))}:{today}"
         clock = time.monotonic()
         moved: dict[tuple[str, str], datetime] = {}
         since = min((built for (stage, _), (_, built, _) in parts.items() if stage != "cache"), default=None)
         if since is not None and not full:
-            isos = {coverage_countries.load(cc)["polity"]: cc for cc in coverage_countries.countries()}
+            isos = {cc.upper(): cc for cc in listed}
             for at, wide, ancestors, st in conn.execute(CHANGED_SQL, {"since": since}):
                 keys = [("country", isos[iso]) for iso in set(ancestors or []) if iso in isos]
                 if "US" in (ancestors or []):
@@ -867,6 +875,7 @@ def build(full: bool = False) -> str:
                 )
         timings["parts"] = time.monotonic() - clock
         conn.execute("delete from coverage_cache_part where stage = 'state' and part <> all(%s)", [scope])
+        conn.execute("delete from coverage_cache_part where stage = 'country' and part <> all(%s)", [["us", *listed]])
         written = parts.get(("local", ""), ("", None, 0.0))[1]
         newer = {
             stage
@@ -1597,7 +1606,7 @@ def build(full: bool = False) -> str:
             [wanted[("local", "")], stamp, timings["local"], Json({"known": known})],
         )
     return (
-        f"{len(todo)} of {len(scope)} states and {len(countries)} of {len(coverage_countries.countries()) + 1} "
+        f"{len(todo)} of {len(scope)} states and {len(countries)} of {len(listed) + 1} "
         f"countries rebuilt; {len(governments):,} governments ({len(link):,} linked), {len(years_out):,} government "
         f"years, {len(goals):,} goal rows, {len(country_goals):,} other countries' goal rows in "
         f"{time.monotonic() - started:.0f}s ("
