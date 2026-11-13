@@ -1,0 +1,596 @@
+{
+ "polity": "US-MS",
+ "publisher": "Mississippi Secretary of State",
+ "title": "Mississippi Official and Statistical Register 1980-1984, presidential elector returns of 1980-11-04",
+ "license": "Public record",
+ "file": {
+  "url": "https://archive.org/download/micro_IA40706905_0434/micro_IA40706905_0434.pdf",
+  "item": "https://archive.org/details/micro_IA40706905_0434"
+ },
+ "raw_source": "us.scans",
+ "caveat": "The register prints one column per presidential elector on each slate; a slate's votes here are those of its first-listed elector, whose printed state total on every slate equals the slate's official state total.",
+ "contests": {
+  "president": {
+   "year": 1980,
+   "chamber": "president",
+   "day": "1980-11-04",
+   "special": false,
+   "state": "MS",
+   "district": null
+  }
+ },
+ "pages": [
+  {
+   "page": 556,
+   "id": "556",
+   "columns": [
+    {
+     "label": "W. H. Austin, Jr.",
+     "contest": "president",
+     "candidate": "Jimmy Carter"
+    },
+    {
+     "label": "Sidney Runnels",
+     "contest": null,
+     "candidate": "Sidney Runnels"
+    },
+    {
+     "label": "Jack A. Travis, Jr.",
+     "contest": null,
+     "candidate": "Jack A. Travis, Jr."
+    },
+    {
+     "label": "William Giles",
+     "contest": null,
+     "candidate": "William Giles"
+    },
+    {
+     "label": "Heber Ladner, Sr.",
+     "contest": null,
+     "candidate": "Heber Ladner, Sr."
+    },
+    {
+     "label": "Esther Harrison",
+     "contest": null,
+     "candidate": "Esther Harrison"
+    },
+    {
+     "label": "Boyce Holleman",
+     "contest": null,
+     "candidate": "Boyce Holleman"
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.05,
+    0.25,
+    0.97,
+    0.99
+   ],
+   "hint": "Read only the table of the Democratic electors pledged to Jimmy Carter, one column per elector; ignore any other table visible in the image."
+  },
+  {
+   "page": 557,
+   "id": "557-0",
+   "columns": [
+    {
+     "label": "W. H. Austin, Jr.",
+     "contest": "president",
+     "candidate": "Jimmy Carter"
+    },
+    {
+     "label": "Sidney Runnels",
+     "contest": null,
+     "candidate": "Sidney Runnels"
+    },
+    {
+     "label": "Jack A. Travis, Jr.",
+     "contest": null,
+     "candidate": "Jack A. Travis, Jr."
+    },
+    {
+     "label": "William Giles",
+     "contest": null,
+     "candidate": "William Giles"
+    },
+    {
+     "label": "Heber Ladner, Sr.",
+     "contest": null,
+     "candidate": "Heber Ladner, Sr."
+    },
+    {
+     "label": "Esther Harrison",
+     "contest": null,
+     "candidate": "Esther Harrison"
+    },
+    {
+     "label": "Boyce Holleman",
+     "contest": null,
+     "candidate": "Boyce Holleman"
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.05,
+    0.09,
+    0.97,
+    0.38
+   ],
+   "hint": "Read only the table of the Democratic electors pledged to Jimmy Carter, one column per elector; ignore any other table visible in the image."
+  },
+  {
+   "page": 557,
+   "id": "557-1",
+   "columns": [
+    {
+     "label": "Jerry Barrier",
+     "contest": "president",
+     "candidate": "Ronald Reagan"
+    },
+    {
+     "label": "James B. Furrh, Jr.",
+     "contest": null,
+     "candidate": "James B. Furrh, Jr."
+    },
+    {
+     "label": "Stuart C. Irby, Jr.",
+     "contest": null,
+     "candidate": "Stuart C. Irby, Jr."
+    },
+    {
+     "label": "Julius W. King",
+     "contest": null,
+     "candidate": "Julius W. King"
+    },
+    {
+     "label": "Jean Lindsey",
+     "contest": null,
+     "candidate": "Jean Lindsey"
+    },
+    {
+     "label": "Glenn McKittrick",
+     "contest": null,
+     "candidate": "Glenn McKittrick"
+    },
+    {
+     "label": "Paul Watson, Jr.",
+     "contest": null,
+     "candidate": "Paul Watson, Jr."
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.05,
+    0.5,
+    0.97,
+    0.99
+   ],
+   "hint": "Read only the table of the Republican electors pledged to Ronald Reagan, one column per elector; ignore any other table visible in the image."
+  },
+  {
+   "page": 558,
+   "id": "558-0",
+   "columns": [
+    {
+     "label": "Jerry Barrier",
+     "contest": "president",
+     "candidate": "Ronald Reagan"
+    },
+    {
+     "label": "James B. Furrh, Jr.",
+     "contest": null,
+     "candidate": "James B. Furrh, Jr."
+    },
+    {
+     "label": "Stuart C. Irby, Jr.",
+     "contest": null,
+     "candidate": "Stuart C. Irby, Jr."
+    },
+    {
+     "label": "Julius W. King",
+     "contest": null,
+     "candidate": "Julius W. King"
+    },
+    {
+     "label": "Jean Lindsey",
+     "contest": null,
+     "candidate": "Jean Lindsey"
+    },
+    {
+     "label": "Glenn McKittrick",
+     "contest": null,
+     "candidate": "Glenn McKittrick"
+    },
+    {
+     "label": "Paul Watson, Jr.",
+     "contest": null,
+     "candidate": "Paul Watson, Jr."
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.05,
+    0.09,
+    0.97,
+    0.615
+   ],
+   "hint": "Read only the table of the Republican electors pledged to Ronald Reagan, one column per elector; ignore any other table visible in the image."
+  },
+  {
+   "page": 558,
+   "id": "558-1",
+   "columns": [
+    {
+     "label": "Fred D. Coffman",
+     "contest": "president",
+     "candidate": "John Anderson"
+    },
+    {
+     "label": "Melvin R. Jennings",
+     "contest": null,
+     "candidate": "Melvin R. Jennings"
+    },
+    {
+     "label": "Emma K. Lytle",
+     "contest": null,
+     "candidate": "Emma K. Lytle"
+    },
+    {
+     "label": "Luther C. Fisher, IV",
+     "contest": null,
+     "candidate": "Luther C. Fisher, IV"
+    },
+    {
+     "label": "Fife Whiteside",
+     "contest": null,
+     "candidate": "Fife Whiteside"
+    },
+    {
+     "label": "Jonathan B. Hoin",
+     "contest": null,
+     "candidate": "Jonathan B. Hoin"
+    },
+    {
+     "label": "Fred Ashmead",
+     "contest": null,
+     "candidate": "Fred Ashmead"
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.05,
+    0.74,
+    0.97,
+    0.99
+   ],
+   "hint": "Read only the table of the independent electors pledged to John B. Anderson, one column per elector; ignore any other table visible in the image."
+  },
+  {
+   "page": 559,
+   "id": "559",
+   "columns": [
+    {
+     "label": "Fred D. Coffman",
+     "contest": "president",
+     "candidate": "John Anderson"
+    },
+    {
+     "label": "Melvin R. Jennings",
+     "contest": null,
+     "candidate": "Melvin R. Jennings"
+    },
+    {
+     "label": "Emma K. Lytle",
+     "contest": null,
+     "candidate": "Emma K. Lytle"
+    },
+    {
+     "label": "Luther C. Fisher, IV",
+     "contest": null,
+     "candidate": "Luther C. Fisher, IV"
+    },
+    {
+     "label": "Fife Whiteside",
+     "contest": null,
+     "candidate": "Fife Whiteside"
+    },
+    {
+     "label": "Jonathan B. Hoin",
+     "contest": null,
+     "candidate": "Jonathan B. Hoin"
+    },
+    {
+     "label": "Fred Ashmead",
+     "contest": null,
+     "candidate": "Fred Ashmead"
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.05,
+    0.09,
+    0.97,
+    0.87
+   ],
+   "hint": "Read only the table of the independent electors pledged to John B. Anderson, one column per elector; ignore any other table visible in the image."
+  },
+  {
+   "page": 560,
+   "id": "560",
+   "columns": [
+    {
+     "label": "Chris P. Etheridge",
+     "contest": "president",
+     "candidate": "Ed Clark"
+    },
+    {
+     "label": "Rob Barber",
+     "contest": null,
+     "candidate": "Rob Barber"
+    },
+    {
+     "label": "Janice Chumbley",
+     "contest": null,
+     "candidate": "Janice Chumbley"
+    },
+    {
+     "label": "C. T. Scarborough, Jr.",
+     "contest": null,
+     "candidate": "C. T. Scarborough, Jr."
+    },
+    {
+     "label": "Jerry D. Himelstein",
+     "contest": null,
+     "candidate": "Jerry D. Himelstein"
+    },
+    {
+     "label": "Joseph L. Versen",
+     "contest": null,
+     "candidate": "Joseph L. Versen"
+    },
+    {
+     "label": "Charles M. Clark",
+     "contest": null,
+     "candidate": "Charles M. Clark"
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.05,
+    0.2,
+    0.97,
+    0.99
+   ],
+   "hint": "Read only the table of the independent electors pledged to Ed Clark, one column per elector; ignore any other table visible in the image."
+  },
+  {
+   "page": 561,
+   "id": "561-0",
+   "columns": [
+    {
+     "label": "Chris P. Etheridge",
+     "contest": "president",
+     "candidate": "Ed Clark"
+    },
+    {
+     "label": "Rob Barber",
+     "contest": null,
+     "candidate": "Rob Barber"
+    },
+    {
+     "label": "Janice Chumbley",
+     "contest": null,
+     "candidate": "Janice Chumbley"
+    },
+    {
+     "label": "C. T. Scarborough, Jr.",
+     "contest": null,
+     "candidate": "C. T. Scarborough, Jr."
+    },
+    {
+     "label": "Jerry D. Himelstein",
+     "contest": null,
+     "candidate": "Jerry D. Himelstein"
+    },
+    {
+     "label": "Joseph L. Versen",
+     "contest": null,
+     "candidate": "Joseph L. Versen"
+    },
+    {
+     "label": "Charles M. Clark",
+     "contest": null,
+     "candidate": "Charles M. Clark"
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.05,
+    0.09,
+    0.97,
+    0.31
+   ],
+   "hint": "Read only the table of the independent electors pledged to Ed Clark, one column per elector; ignore any other table visible in the image."
+  },
+  {
+   "page": 561,
+   "id": "561-1",
+   "columns": [
+    {
+     "label": "Dora Erving",
+     "contest": "president",
+     "candidate": "Deirdre Griswold (Workers World)",
+     "official": 2402
+    },
+    {
+     "label": "Edgar A. Sandifer, Jr.",
+     "contest": null,
+     "candidate": "Edgar A. Sandifer, Jr."
+    },
+    {
+     "label": "Cleo Burkett Smith",
+     "contest": null,
+     "candidate": "Cleo Burkett Smith"
+    },
+    {
+     "label": "Maria Smith",
+     "contest": null,
+     "candidate": "Maria Smith"
+    },
+    {
+     "label": "Loretta Beyer",
+     "contest": null,
+     "candidate": "Loretta Beyer"
+    },
+    {
+     "label": "Arnett Lewis",
+     "contest": null,
+     "candidate": "Arnett Lewis"
+    },
+    {
+     "label": "Jessie Newsome",
+     "contest": null,
+     "candidate": "Jessie Newsome"
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.05,
+    0.395,
+    0.97,
+    0.99
+   ],
+   "hint": "Read only the table of the independent electors pledged to Deirdre Griswold, one column per elector; ignore any other table visible in the image."
+  },
+  {
+   "page": 562,
+   "id": "562-0",
+   "columns": [
+    {
+     "label": "Dora Erving",
+     "contest": "president",
+     "candidate": "Deirdre Griswold (Workers World)",
+     "official": 2402
+    },
+    {
+     "label": "Edgar A. Sandifer, Jr.",
+     "contest": null,
+     "candidate": "Edgar A. Sandifer, Jr."
+    },
+    {
+     "label": "Cleo Burkett Smith",
+     "contest": null,
+     "candidate": "Cleo Burkett Smith"
+    },
+    {
+     "label": "Maria Smith",
+     "contest": null,
+     "candidate": "Maria Smith"
+    },
+    {
+     "label": "Loretta Beyer",
+     "contest": null,
+     "candidate": "Loretta Beyer"
+    },
+    {
+     "label": "Arnett Lewis",
+     "contest": null,
+     "candidate": "Arnett Lewis"
+    },
+    {
+     "label": "Jessie Newsome",
+     "contest": null,
+     "candidate": "Jessie Newsome"
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.05,
+    0.09,
+    0.97,
+    0.52
+   ],
+   "hint": "Read only the table of the independent electors pledged to Deirdre Griswold, one column per elector; ignore any other table visible in the image."
+  },
+  {
+   "page": 562,
+   "id": "562-1",
+   "columns": [
+    {
+     "label": "Richard Abraham",
+     "contest": "president",
+     "candidate": "Andrew Pulley (Socialist Workers)",
+     "official": 2240
+    },
+    {
+     "label": "Judy Johnson",
+     "contest": null,
+     "candidate": "Judy Johnson"
+    },
+    {
+     "label": "Mary M. Bordes",
+     "contest": null,
+     "candidate": "Mary M. Bordes"
+    },
+    {
+     "label": "William Earl Johnson",
+     "contest": null,
+     "candidate": "William Earl Johnson"
+    },
+    {
+     "label": "Jimmy Fred Wallace",
+     "contest": null,
+     "candidate": "Jimmy Fred Wallace"
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.05,
+    0.61,
+    0.97,
+    0.99
+   ],
+   "hint": "Read only the table of the independent electors pledged to Andrew Pulley, one column per elector; ignore any other table visible in the image."
+  },
+  {
+   "page": 563,
+   "id": "563-0",
+   "columns": [
+    {
+     "label": "Richard Abraham",
+     "contest": "president",
+     "candidate": "Andrew Pulley (Socialist Workers)",
+     "official": 2240
+    },
+    {
+     "label": "Judy Johnson",
+     "contest": null,
+     "candidate": "Judy Johnson"
+    },
+    {
+     "label": "Mary M. Bordes",
+     "contest": null,
+     "candidate": "Mary M. Bordes"
+    },
+    {
+     "label": "William Earl Johnson",
+     "contest": null,
+     "candidate": "William Earl Johnson"
+    },
+    {
+     "label": "Jimmy Fred Wallace",
+     "contest": null,
+     "candidate": "Jimmy Fred Wallace"
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.05,
+    0.09,
+    0.97,
+    0.73
+   ],
+   "hint": "Read only the table of the independent electors pledged to Andrew Pulley, one column per elector; ignore any other table visible in the image."
+  }
+ ]
+}
