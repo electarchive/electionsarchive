@@ -53,6 +53,15 @@ def apr_last_sunday_unless_easter(year: int) -> date:
     return nth_weekday(5, 6, 1)(year) if when == easter(year) else when
 
 
+def wednesday_from(month: int, day_of_month: int) -> Callable[[int], date]:
+    def day(year: int) -> date:
+        start = date(year, month, day_of_month)
+        when = start + timedelta(days=(2 - start.weekday()) % 7)
+        return when + timedelta(days=7) if abs((date(year, 6, 6) - when).days) <= 1 else when
+
+    return day
+
+
 DAY_RULES = {
     "nov_tuesday_after_first_monday": tuesday_after_first_monday(11),
     "mar_second_tuesday": nth_weekday(3, 1, 2),
@@ -75,6 +84,8 @@ DAY_RULES = {
     "oct_last_sunday": last_weekday(10, 6),
     "mar_last_sunday": last_weekday(3, 6),
     "may_first_thursday": nth_weekday(5, 3, 1),
+    "wednesday_from_apr_9": wednesday_from(4, 9),
+    "wednesday_from_may_31_unless_jun_6": wednesday_from(5, 31),
 }
 
 
