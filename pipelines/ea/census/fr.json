@@ -272,43 +272,358 @@
       "publisher": "Ministère de l'Intérieur",
       "url": "https://mobile.interieur.gouv.fr/Archives/Archives-des-dossiers/2017-Dossiers/La-Meuse/Les-communes-tombees-pour-la-France",
       "kind": "official_body"
+    },
+    "constitution-1958": {
+      "title": "Texte intégral de la Constitution du 4 octobre 1958 en vigueur",
+      "publisher": "Conseil constitutionnel",
+      "url": "https://www.conseil-constitutionnel.fr/le-bloc-de-constitutionnalite/texte-integral-de-la-constitution-du-4-octobre-1958-en-vigueur",
+      "kind": "official_body",
+      "note": "Art. 6 and 7 (President: five-year term since the 2000 revision, election 20 to 35 days before the term ends, a new election 20 to 35 days after a vacancy, absolute majority or a runoff of the top two), art. 11 and 89 (national referendums), art. 12 (dissolution: elections 20 to 40 days later), art. 24 (Senate represents the territorial communities and French residents abroad), art. 72-1, 72-4, and 73 (local referendums and territorial consultations), and art. 76 and 77 (New Caledonia)."
+    },
+    "code-electoral": {
+      "title": "Code électoral",
+      "publisher": "Légifrance (Secrétariat général du Gouvernement)",
+      "url": "https://www.legifrance.gouv.fr/codes/texte_lc/LEGITEXT000006070239",
+      "kind": "official_body",
+      "note": "Book I (deputies, departmental and municipal councillors, conseillers communautaires, and the Métropole de Lyon), Book II (senators), Book IV (Paris, Lyon, and Marseille), Book IV bis and VI (regional councils, the Assemblée de Corse, and the Assemblées de Guyane and Martinique), and Book VI (Mayotte, Saint-Barthélemy, Saint-Martin, and Saint-Pierre-et-Miquelon)."
+    },
+    "cgct": {
+      "title": "Code général des collectivités territoriales",
+      "publisher": "Légifrance (Secrétariat général du Gouvernement)",
+      "url": "https://www.legifrance.gouv.fr/codes/texte_lc/LEGITEXT000006070633",
+      "kind": "official_body",
+      "note": "Art. LO1112-1 to LO1112-14 (local decision referendums since 2003), L1112-15 to L1112-22 (local consultations), and L2411-3 (commissions syndicales of sections de commune)."
+    },
+    "elysee-presidents": {
+      "title": "Les présidents de la République depuis 1848",
+      "publisher": "Présidence de la République",
+      "url": "https://www.elysee.fr/la-presidence/les-presidents-de-la-republique-depuis-1848",
+      "kind": "official_body"
+    },
+    "interieur-archives": {
+      "title": "Archives des résultats électoraux",
+      "publisher": "Ministère de l'Intérieur",
+      "url": "https://www.archives-resultats-elections.interieur.gouv.fr/",
+      "kind": "official_body"
+    },
+    "datagouv-agregees": {
+      "title": "Données des élections agrégées",
+      "publisher": "Ministère de l'Intérieur, on data.gouv.fr",
+      "url": "https://www.data.gouv.fr/datasets/donnees-des-elections-agregees",
+      "kind": "official_body",
+      "note": "Dataset 6481e741d4cf002ec0efec9d, Licence Ouverte v2.0: every election since 1999 by polling station."
+    },
+    "dgcl-bis-206-pdf": {
+      "title": "BIS n° 206, Les structures territoriales au 1er janvier 2026 (janvier 2026)",
+      "publisher": "Ministère de l'Intérieur, Direction générale des collectivités locales",
+      "url": "https://www.collectivites-locales.gouv.fr/files/files/Etudes-et-statistiques/BIS/2026/BIS%20%20interco%202026.pdf",
+      "kind": "official_body",
+      "note": "Communes of metropolitan France and the DOM, and EPCI à fiscalité propre by category, at 1 January 2026."
+    },
+    "insee-cog-2026": {
+      "title": "Code officiel géographique au 1er janvier 2026",
+      "publisher": "Institut national de la statistique et des études économiques (INSEE)",
+      "url": "https://www.insee.fr/fr/information/8740222",
+      "kind": "official_body",
+      "note": "Files v_region_2026, v_departement_2026, v_arrondissement_2026, v_canton_2026 (type C cantons are the departmental constituencies), v_ctcd_2026 (territorial collectivities with departmental powers), and v_commune_comer_2026 (overseas collectivities)."
+    },
+    "vp-nc-2026": {
+      "title": "Nouvelle-Calédonie : élections provinciales le 28 juin 2026",
+      "publisher": "vie-publique.fr (Direction de l'information légale et administrative)",
+      "url": "https://www.vie-publique.fr/en-bref/303820-nouvelle-caledonie-elections-provinciales-le-28-juin-2026",
+      "kind": "official_body"
+    },
+    "vp-nc-2021": {
+      "title": "Nouvelle-Calédonie : 3e référendum d'autodétermination du 12 décembre 2021",
+      "publisher": "vie-publique.fr (Direction de l'information légale et administrative)",
+      "url": "https://www.vie-publique.fr/eclairage/18649-nouvelle-caledonie-3e-referendum-dautodetermination-12-decembre-2021",
+      "kind": "official_body"
+    },
+    "hc-pf-2023": {
+      "title": "Élection des représentants à l'assemblée de la Polynésie française, résultats définitifs du second tour (30 avril 2023)",
+      "publisher": "Haut-commissariat de la République en Polynésie française",
+      "url": "https://www.polynesie-francaise.pref.gouv.fr/contenu/telechargement/50751/323027/file/01-05-2023%20-%20R%C3%A9sultats%20d%C3%A9finitifs%20Tour%202.pdf",
+      "kind": "official_body"
+    },
+    "lo-2004-192": {
+      "title": "Loi organique n° 2004-192 du 27 février 2004 portant statut d'autonomie de la Polynésie française",
+      "publisher": "Journal officiel de la République française",
+      "url": "https://www.legifrance.gouv.fr/loda/id/JORFTEXT000000435515",
+      "kind": "official_body",
+      "note": "Art. 104 and 105: 57 representatives elected for five years."
+    },
+    "lo-99-209": {
+      "title": "Loi organique n° 99-209 du 19 mars 1999 relative à la Nouvelle-Calédonie",
+      "publisher": "Journal officiel de la République française",
+      "url": "https://www.legifrance.gouv.fr/loda/id/JORFTEXT000000393606",
+      "kind": "official_body",
+      "note": "Provincial assemblies (whose members form the Congress) elected for five years; consultations on accession to full sovereignty (title IX)."
+    },
+    "decret-2026-914": {
+      "title": "Décret n° 2026-914 du 28 septembre 2026 portant convocation des électeurs pour l'élection des membres de l'assemblée territoriale des îles Wallis et Futuna",
+      "publisher": "Journal officiel de la République française",
+      "url": "https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000054930510",
+      "kind": "official_body",
+      "note": "Election on Sunday 14 March 2027 (loi n° 61-814 du 29 juillet 1961, art. 12)."
+    },
+    "decret-2026-911": {
+      "title": "Décret n° 2026-911 du 28 septembre 2026 portant convocation des électeurs pour l'élection des conseillers territoriaux de Saint-Pierre-et-Miquelon",
+      "publisher": "Journal officiel de la République française",
+      "url": "https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000054930486",
+      "kind": "official_body"
+    },
+    "decret-2026-912": {
+      "title": "Décret n° 2026-912 du 28 septembre 2026 portant convocation des électeurs pour l'élection des conseillers territoriaux de Saint-Barthélemy",
+      "publisher": "Journal officiel de la République française",
+      "url": "https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000054930494",
+      "kind": "official_body"
+    },
+    "decret-2026-913": {
+      "title": "Décret n° 2026-913 du 28 septembre 2026 portant convocation des électeurs pour l'élection des conseillers territoriaux de Saint-Martin",
+      "publisher": "Journal officiel de la République française",
+      "url": "https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000054930502",
+      "kind": "official_body"
+    },
+    "dgcl-referendum-local": {
+      "title": "Le référendum local",
+      "publisher": "Ministère de l'Intérieur, Direction générale des collectivités locales",
+      "url": "https://www.collectivites-locales.gouv.fr/institutions/le-referendum-local",
+      "kind": "official_body",
+      "note": "Loi constitutionnelle n° 2003-276, loi organique n° 2003-705, and CGCT art. LO1112-1 to LO1112-14; no count of referendums held."
+    },
+    "mi-metropolitaines-2026": {
+      "title": "Élections métropolitaines 2026, Métropole de Lyon",
+      "publisher": "Ministère de l'Intérieur",
+      "url": "https://www.resultats-elections.interieur.gouv.fr/metropolitaines2026/ensemble_geographique/84/69M/index.html",
+      "kind": "official_body"
+    },
+    "sp-calendrier": {
+      "title": "Calendrier des prochaines élections",
+      "publisher": "Service-public.gouv.fr (Direction de l'information légale et administrative)",
+      "url": "https://www.service-public.gouv.fr/particuliers/actualites/A15577",
+      "kind": "official_body",
+      "note": "Checked 2026-11-09: presidential 18 April and 2 May 2027; regional and departmental March 2028; legislative, European, and senatorial 2029; municipal 2032."
+    },
+    "loi-2025-795": {
+      "title": "Loi n° 2025-795 du 11 août 2025 visant à réformer le mode d'élection des membres du Conseil de Paris et des conseils municipaux de Lyon et Marseille",
+      "publisher": "Journal officiel de la République française",
+      "url": "https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000052071425",
+      "kind": "official_body",
+      "note": "Two simultaneous ballots from March 2026: one for the city council and one for the arrondissement or sector councils."
+    },
+    "loi-2021-191": {
+      "title": "Loi n° 2021-191 du 22 février 2021 portant report, de mars à juin 2021, du renouvellement général des conseils départementaux, des conseils régionaux et des assemblées de Corse, de Guyane et de Martinique",
+      "publisher": "Journal officiel de la République française",
+      "url": "https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000043158479",
+      "kind": "official_body",
+      "note": "Councils elected in June 2021 serve until March 2028."
+    },
+    "senat-2026-dossier": {
+      "title": "Sénatoriales 2026, dossier de presse",
+      "publisher": "Sénat",
+      "url": "https://www.senat.fr/fileadmin/cru-1781387320/Presse/Dossiers_de_presse/Senatoriales_2026_dossier_presse.pdf",
+      "kind": "official_body",
+      "note": "Series 2 renewed on Sunday 27 September 2026 (décret n° 2026-301 du 21 avril 2026)."
+    },
+    "senat-1959": {
+      "title": "Le Sénat de 1959",
+      "publisher": "Sénat",
+      "url": "https://www.senat.fr/evenement/archives/D50/senat_1959.pdf",
+      "kind": "official_body",
+      "note": "First Senate of the Fifth Republic, elected 26 April 1959; départements assigned to series A, B, and C."
+    },
+    "mae-cfe-2026": {
+      "title": "Élections des conseillers des Français de l'étranger 2026 : résultats",
+      "publisher": "Ministère de l'Europe et des Affaires étrangères",
+      "url": "https://www.diplomatie.gouv.fr/fr/services-aux-francaises-et-aux-francais/vie-administrative-et-elections/elections-a-l-etranger/consulter-les-resultats-des-elections-vote-des-francais-de-l-etranger/elections-des-conseillers-des-francais-de-l-etranger-2026-resultats",
+      "kind": "official_body",
+      "note": "Held 30 May 2026 in the Americas and the Caribbean and 31 May 2026 elsewhere; results by consular constituency."
+    },
+    "loi-2013-659": {
+      "title": "Loi n° 2013-659 du 22 juillet 2013 relative à la représentation des Français établis hors de France",
+      "publisher": "Journal officiel de la République française",
+      "url": "https://www.legifrance.gouv.fr/loda/id/JORFTEXT000027735009",
+      "kind": "official_body",
+      "note": "Consular councillors elected for six years in May by direct universal suffrage; the Assemblée des Français de l'étranger elected by and among them."
     }
   },
   "tiers": [
     {
       "key": "national",
-      "name": "French Republic",
+      "name": "République française",
       "parent": null,
       "polity_kind": "sovereign_state",
-      "source": "jorf-58-964-965"
+      "source": "jorf-58-964-965",
+      "name_en": "French Republic",
+      "scheme": "fr.nation"
     },
     {
       "key": "region",
-      "name": "Regions",
+      "name": "Régions",
       "parent": "national",
       "polity_kind": "region",
-      "source": "cdsp-regionales"
+      "source": "insee-cog-2026",
+      "name_en": "Regions: 13 in metropolitan France, including the Collectivité de Corse, and 5 overseas, including the single collectivities of Guyane and Martinique and the Département-Région de Mayotte",
+      "scheme": "fr.region",
+      "counts": [
+        {
+          "date": "2026-01-01",
+          "value": 18,
+          "source": "insee-cog-2026",
+          "locator": "https://www.insee.fr/fr/statistiques/fichier/8740222/cog_ensemble_2026_csv.zip"
+        }
+      ]
     },
     {
       "key": "departement",
-      "name": "Departments",
+      "name": "Départements",
       "parent": "region",
       "polity_kind": "county",
-      "source": "cdsp-cantonales"
+      "source": "insee-cog-2026",
+      "name_en": "Departments (93 have a departmental council; Paris, the Lyon metropolis, Corsica, Alsace, Guyane, Martinique, and Mayotte are run by other collectivities)",
+      "scheme": "fr.departement",
+      "counts": [
+        {
+          "date": "2026-01-01",
+          "value": 101,
+          "source": "insee-cog-2026",
+          "locator": "https://www.insee.fr/fr/statistiques/fichier/8740222/cog_ensemble_2026_csv.zip"
+        }
+      ]
     },
     {
       "key": "commune",
       "name": "Communes",
       "parent": "departement",
       "polity_kind": "municipality",
-      "source": "senat-q900610160"
+      "source": "dgcl-bis-206-pdf",
+      "name_en": "Communes (34,875 in metropolitan France and the overseas departments, plus 48 in French Polynesia, 33 in New Caledonia, and 2 in Saint-Pierre-et-Miquelon)",
+      "scheme": "fr.commune",
+      "counts": [
+        {
+          "date": "2026-01-01",
+          "value": 34875,
+          "source": "dgcl-bis-206-pdf",
+          "locator": "https://www.collectivites-locales.gouv.fr/files/files/Etudes-et-statistiques/BIS/2026/BIS%20%20interco%202026.pdf"
+        }
+      ]
+    },
+    {
+      "key": "arrondissement",
+      "name": "Arrondissements",
+      "name_en": "Arrondissements (State districts under a sub-prefect; elected councils from 1833 to 1940)",
+      "parent": "departement",
+      "elects": false,
+      "source": "insee-cog-2026",
+      "counts": [
+        {
+          "date": "2026-01-01",
+          "value": 333,
+          "source": "insee-cog-2026",
+          "locator": "https://www.insee.fr/fr/statistiques/fichier/8740222/cog_ensemble_2026_csv.zip"
+        }
+      ]
+    },
+    {
+      "key": "epci",
+      "name": "Établissements publics de coopération intercommunale à fiscalité propre",
+      "name_en": "Intercommunal bodies with their own tax (21 métropoles, 14 communautés urbaines, 230 communautés d'agglomération, and 987 communautés de communes)",
+      "parent": "departement",
+      "source": "dgcl-bis-206-pdf",
+      "counts": [
+        {
+          "date": "2026-01-01",
+          "value": 1252,
+          "source": "dgcl-bis-206-pdf",
+          "locator": "https://www.collectivites-locales.gouv.fr/files/files/Etudes-et-statistiques/BIS/2026/BIS%20%20interco%202026.pdf"
+        }
+      ]
+    },
+    {
+      "key": "metropole_lyon",
+      "name": "Métropole de Lyon",
+      "name_en": "Lyon Metropolis, a territorial collectivity with departmental powers since 1 January 2015",
+      "parent": "region",
+      "valid_from": "2015-01-01",
+      "source": "insee-cog-2026",
+      "counts": [
+        {
+          "date": "2026-01-01",
+          "value": 1,
+          "source": "insee-cog-2026",
+          "locator": "https://www.insee.fr/fr/statistiques/fichier/8740222/cog_ensemble_2026_csv.zip"
+        }
+      ]
+    },
+    {
+      "key": "secteur",
+      "name": "Arrondissements municipaux et secteurs de Paris, Lyon et Marseille",
+      "name_en": "Municipal arrondissements of Paris (20), Lyon (9), and Marseille (16), grouped for elections into 34 sectors (Paris 17, Lyon 9, Marseille 8)",
+      "parent": "commune",
+      "polity_kind": "submunicipal",
+      "scheme": "fr.secteur",
+      "valid_from": "1983-03-06",
+      "source": "insee-cog-2026",
+      "counts": [
+        {
+          "date": "2026-01-01",
+          "value": 45,
+          "source": "insee-cog-2026",
+          "locator": "https://www.insee.fr/fr/statistiques/fichier/8740222/cog_ensemble_2026_csv.zip"
+        }
+      ]
+    },
+    {
+      "key": "com",
+      "name": "Collectivités d'outre-mer et Nouvelle-Calédonie",
+      "name_en": "Overseas collectivities with elected assemblies: French Polynesia, New Caledonia, Wallis and Futuna, Saint-Pierre-et-Miquelon, Saint-Barthélemy, and Saint-Martin (the French Southern and Antarctic Lands and Clipperton elect no one)",
+      "parent": "national",
+      "source": "insee-cog-2026",
+      "counts": [
+        {
+          "date": "2026-01-01",
+          "value": 6,
+          "source": "insee-cog-2026",
+          "locator": "https://www.insee.fr/fr/statistiques/fichier/8740222/cog_ensemble_2026_csv.zip"
+        }
+      ]
+    },
+    {
+      "key": "province_nc",
+      "name": "Provinces de Nouvelle-Calédonie",
+      "name_en": "Provinces of New Caledonia (South, North, and Loyalty Islands)",
+      "parent": "com",
+      "valid_from": "1989-06-11",
+      "source": "lo-99-209",
+      "counts": [
+        {
+          "date": "1999-03-19",
+          "value": 3,
+          "source": "lo-99-209",
+          "locator": "https://www.legifrance.gouv.fr/loda/id/JORFTEXT000000393606"
+        }
+      ]
+    },
+    {
+      "key": "francais_etranger",
+      "name": "Français établis hors de France",
+      "name_en": "French residents abroad (consular constituencies, 11 legislative constituencies since 2012, and a Senate constituency)",
+      "parent": "national",
+      "source": "loi-2013-659"
+    },
+    {
+      "key": "functional",
+      "name": "Électorats professionnels et sociaux",
+      "name_en": "Functional electorates (labor courts, chambers, social security boards, workplaces, and parties), not territorial",
+      "parent": "national",
+      "source": "code-electoral"
     }
   ],
   "classes": [
     {
       "key": "assemblee",
       "tier": "national",
-      "name": "National Assembly elections",
+      "name": "Élections législatives (Assemblée nationale)",
       "category": "legislature",
       "goal": "national",
       "measure": {
@@ -326,12 +641,14 @@
         {
           "election_kinds": [
             "general",
-            "runoff"
+            "runoff",
+            "by_election"
           ],
+          "iso_pattern": "FR",
           "body_kinds": [
             "lower_house"
           ],
-          "iso_pattern": "FR"
+          "valid_from": "1958-10-04"
         }
       ],
       "dates": [
@@ -467,12 +784,57 @@
           "source": "mi-2024",
           "quote": "Vous pouvez désormais découvrir le nom des députés élus dans les 577 circonscriptions en consultant les résultats définitifs des élections législatives anticipées 2024."
         }
-      ]
+      ],
+      "name_en": "National Assembly elections",
+      "first_held": "1958-11-23",
+      "earliest_record": "1958-11-23",
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 4,
+          "month": 6,
+          "term_years": 5,
+          "called": true,
+          "runoff": "threshold",
+          "runoff_rule": "Single-member constituencies: elected in the first round with an absolute majority of votes cast and a quarter of registered voters; otherwise candidates with 12.5 percent of registered voters (10 percent before 1976, 5 percent before 1966) go to a second round a week later, won by a plurality (art. L123 to L126). In 1986 only, list proportional representation by département. The Assembly's powers end the third Tuesday of June of the fifth year after its election (art. LO121), so after the 2024 dissolution the next regular election falls in June 2029.",
+          "vacancy_rule": "Substitutes fill most vacancies (art. LO176); otherwise by-elections within three months, except in the last year of the term (art. LO178). After a dissolution (art. 12 of the Constitution) a general election is held 20 to 40 days later, as in 1962, 1968, 1981, 1988, 1997, and 2024.",
+          "administered_by": "Ministère de l'Intérieur",
+          "source": "code-electoral"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Ministère de l'Intérieur, open data on data.gouv.fr",
+          "url": "https://www.data.gouv.fr/datasets/donnees-des-elections-agregees",
+          "format": "Parquet and CSV",
+          "access": "open",
+          "checked_at": "2026-11-13T00:00:00Z",
+          "first_date": "1999-06-13",
+          "license": "Licence Ouverte v2.0",
+          "finest": "fr.bureau",
+          "source": "datagouv-agregees",
+          "evidence": "Every election since 1999 by polling station (general_results and candidats_results parquets)."
+        },
+        {
+          "platform": "Centre de données socio-politiques (Sciences Po), on data.gouv.fr",
+          "url": "https://www.data.gouv.fr/datasets/547744abc751df097472f5d4",
+          "format": "CSV",
+          "access": "open",
+          "checked_at": "2026-11-13T00:00:00Z",
+          "first_date": "1958-11-23",
+          "last_date": "2012-06-17",
+          "license": "ODbL",
+          "finest": "fr.circonscription",
+          "evidence": "One file per round by constituency, 1958 to 2012; 1986 by tendency only."
+        }
+      ],
+      "est_votes": 30000000,
+      "effort": 1
     },
     {
       "key": "president",
       "tier": "national",
-      "name": "Presidential elections",
+      "name": "Élection du président de la République",
       "category": "executive",
       "goal": "national",
       "measure": {
@@ -492,10 +854,11 @@
             "general",
             "runoff"
           ],
+          "iso_pattern": "FR",
           "office_kinds": [
             "head_of_state"
           ],
-          "iso_pattern": "FR"
+          "valid_from": "1958-10-04"
         }
       ],
       "dates": [
@@ -565,12 +928,80 @@
           "source": "cc-2022-195-pdr",
           "quote": "auquel il a été procédé les 9 et 10 avril 2022"
         }
-      ]
+      ],
+      "name_en": "Presidential elections",
+      "first_held": "1965-12-05",
+      "earliest_record": "1965-12-05",
+      "cadence": [
+        {
+          "period_years": 7,
+          "term_years": 7,
+          "called": true,
+          "runoff": "majority",
+          "runoff_rule": "Absolute majority of votes cast in the first round; otherwise a second round fourteen days later between the two leading candidates (art. 7).",
+          "valid_from": "1962-11-06",
+          "valid_to": "2002-05-16",
+          "vacancy_rule": "On vacancy the President of the Senate acts and a new election is held 20 to 35 days later (art. 7), as in 1969 and 1974.",
+          "administered_by": "Ministère de l'Intérieur; the Conseil constitutionnel proclaims the result",
+          "source": "constitution-1958"
+        },
+        {
+          "period_years": 5,
+          "phase": 2,
+          "month": 4,
+          "term_years": 5,
+          "called": true,
+          "runoff": "majority",
+          "runoff_rule": "Absolute majority of votes cast in the first round; otherwise a second round fourteen days later between the two leading candidates (art. 7).",
+          "valid_from": "2002-05-16",
+          "vacancy_rule": "On vacancy the President of the Senate acts and a new election is held 20 to 35 days later (art. 7).",
+          "administered_by": "Ministère de l'Intérieur; the Conseil constitutionnel proclaims the result",
+          "source": "constitution-1958"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Ministère de l'Intérieur, open data on data.gouv.fr",
+          "url": "https://www.data.gouv.fr/datasets/donnees-des-elections-agregees",
+          "format": "Parquet and CSV",
+          "access": "open",
+          "checked_at": "2026-11-13T00:00:00Z",
+          "first_date": "1999-06-13",
+          "license": "Licence Ouverte v2.0",
+          "finest": "fr.bureau",
+          "source": "datagouv-agregees",
+          "evidence": "Every election since 1999 by polling station (general_results and candidats_results parquets)."
+        },
+        {
+          "platform": "Conseil constitutionnel, proclamations (PDR decisions)",
+          "url": "https://www.conseil-constitutionnel.fr/les-decisions/annee/2022/type/pdr",
+          "format": "HTML",
+          "access": "open",
+          "checked_at": "2026-11-13T00:00:00Z",
+          "first_date": "1965-12-05",
+          "evidence": "National totals per candidate for every round since 1965; no subnational figures."
+        },
+        {
+          "platform": "Centre de données socio-politiques (Sciences Po), on data.gouv.fr",
+          "url": "https://www.data.gouv.fr/datasets/54aeb906c751df6643de6534",
+          "format": "CSV",
+          "access": "open",
+          "checked_at": "2026-11-13T00:00:00Z",
+          "first_date": "1965-12-05",
+          "last_date": "2012-05-06",
+          "license": "ODbL",
+          "finest": "fr.circonscription",
+          "role": "publishes",
+          "evidence": "One file per round by constituency, 1965 to 2012."
+        }
+      ],
+      "est_votes": 35000000,
+      "effort": 1
     },
     {
       "key": "regionales",
       "tier": "region",
-      "name": "Regional elections",
+      "name": "Élections régionales et des assemblées de Corse, de Guyane et de Martinique",
       "category": "legislature",
       "goal": "subnational",
       "measure": {
@@ -583,12 +1014,15 @@
       "match": [
         {
           "election_kinds": [
-            "general"
+            "general",
+            "runoff"
           ],
           "body_kinds": [
             "unicameral"
           ],
-          "iso_pattern": "FR-*"
+          "polity_kinds": [
+            "region"
+          ]
         }
       ],
       "dates": [
@@ -925,13 +1359,73 @@
           "contests": 17,
           "source": "interieur-reg2021-t1",
           "quote": "resultats-par-niveau-reg-t1-france-entiere.txt: 17 rows, one per region or single authority."
+        },
+        {
+          "date": "2028-03-01",
+          "source": "sp-calendrier",
+          "quote": "Élections régionales : mars 2028, sans jour précis.",
+          "precision": "month"
         }
-      ]
+      ],
+      "name_en": "Regional elections, with the Corsican, Guyane, and Martinique assemblies",
+      "first_held": "1986-03-16",
+      "earliest_record": "1986-03-16",
+      "cadence": [
+        {
+          "period_years": 6,
+          "term_years": 6,
+          "month": 3,
+          "valid_from": "1986-03-16",
+          "valid_to": "2004-03-21",
+          "runoff_rule": "One round of list proportional representation by département (highest average, 5 percent threshold); the Assemblée de Corse, first elected in 1982, by one regional list.",
+          "administered_by": "Ministère de l'Intérieur",
+          "source": "code-electoral"
+        },
+        {
+          "period_years": 6,
+          "phase": 0,
+          "term_years": 6,
+          "month": 3,
+          "valid_from": "2004-03-21",
+          "runoff": "threshold",
+          "runoff_threshold": 0.5,
+          "runoff_rule": "Regional lists with département sections: a list with an absolute majority in the first round wins; otherwise lists with 10 percent of votes cast go to a second round a week later (lists with 5 percent may merge). The leading list takes a quarter of the seats (11 seats in Corsica, 11 in Martinique, 11 in Guyane) and the rest are shared by highest average among lists with 5 percent. The 2015 councils served until 2021, and the 2021 elections moved from March to June (loi n° 2021-191), with the next in March 2028.",
+          "administered_by": "Ministère de l'Intérieur",
+          "source": "loi-2021-191"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Ministère de l'Intérieur, results workbooks on data.gouv.fr",
+          "url": "https://www.data.gouv.fr/datasets/elections-regionales-2021-resultats-du-1er-tour-1",
+          "format": "XLSX",
+          "access": "open",
+          "checked_at": "2026-11-13T00:00:00Z",
+          "first_date": "2004-03-21",
+          "license": "Licence Ouverte v2.0",
+          "finest": "fr.departement",
+          "evidence": "Région and département sheets per round, 2004 to 2021; by polling station in the aggregated dataset."
+        },
+        {
+          "platform": "Centre de données socio-politiques (Sciences Po), on data.gouv.fr",
+          "url": "https://www.data.gouv.fr/datasets/elections-regionales-1986-2010",
+          "format": "CSV",
+          "access": "open",
+          "checked_at": "2026-11-13T00:00:00Z",
+          "first_date": "1986-03-16",
+          "last_date": "2010-03-21",
+          "license": "ODbL",
+          "finest": "fr.departement",
+          "source": "cdsp-regionales"
+        }
+      ],
+      "est_votes": 22000000,
+      "effort": 1
     },
     {
       "key": "departementales",
       "tier": "departement",
-      "name": "Departmental and cantonal elections",
+      "name": "Élections départementales (cantonales jusqu'en 2011)",
       "category": "council",
       "goal": "subnational",
       "measure": {
@@ -944,10 +1438,15 @@
       "match": [
         {
           "election_kinds": [
-            "general"
+            "general",
+            "runoff",
+            "by_election"
           ],
           "body_kinds": [
             "council"
+          ],
+          "polity_kinds": [
+            "county"
           ]
         }
       ],
@@ -2010,13 +2509,72 @@
           "precision": "year",
           "through": "1985-12-31",
           "note": "The official canton-level files start in 1988, so earlier cantonal elections aren't counted yet."
+        },
+        {
+          "date": "2028-03-01",
+          "source": "sp-calendrier",
+          "quote": "Élections départementales : mars 2028, sans jour précis.",
+          "precision": "month"
         }
-      ]
+      ],
+      "name_en": "Departmental (formerly cantonal) elections",
+      "earliest_record": "1988-09-25",
+      "cadence": [
+        {
+          "period_years": 3,
+          "classes": 2,
+          "term_years": 6,
+          "month": 3,
+          "valid_to": "2015-03-22",
+          "runoff": "threshold",
+          "runoff_rule": "One general councillor per canton, half the cantons renewed every three years: elected in the first round with an absolute majority and a quarter of registered voters; otherwise candidates with 12.5 percent of registered voters (10 percent before 2011) go to a second round a week later, won by a plurality.",
+          "administered_by": "Ministère de l'Intérieur",
+          "source": "code-electoral"
+        },
+        {
+          "period_years": 6,
+          "phase": 0,
+          "term_years": 6,
+          "month": 3,
+          "valid_from": "2015-03-22",
+          "runoff": "threshold",
+          "runoff_rule": "A man-and-woman pair (binôme) per canton, 2,054 cantons, all renewed together: elected in the first round with an absolute majority and a quarter of registered voters; otherwise pairs with 12.5 percent of registered voters go to a second round a week later, won by a plurality (art. L191 and L193). The 2021 elections moved from March to June (loi n° 2021-191), with the next in March 2028.",
+          "administered_by": "Ministère de l'Intérieur",
+          "source": "loi-2021-191"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Ministère de l'Intérieur, results workbooks on data.gouv.fr",
+          "url": "https://www.data.gouv.fr/datasets/elections-departementales-2021-resultats-du-1er-tour",
+          "format": "XLSX",
+          "access": "open",
+          "checked_at": "2026-11-13T00:00:00Z",
+          "first_date": "2008-03-09",
+          "license": "Licence Ouverte v2.0",
+          "finest": "fr.canton",
+          "source": "interieur-dep2021-t1"
+        },
+        {
+          "platform": "Centre de données socio-politiques (Sciences Po), on data.gouv.fr",
+          "url": "https://www.data.gouv.fr/datasets/elections-cantonales-1988-2011",
+          "format": "CSV",
+          "access": "open",
+          "checked_at": "2026-11-13T00:00:00Z",
+          "first_date": "1988-09-25",
+          "last_date": "2011-03-27",
+          "license": "ODbL",
+          "finest": "fr.canton",
+          "source": "cdsp-cantonales"
+        }
+      ],
+      "est_votes": 15000000,
+      "effort": 2
     },
     {
       "key": "municipales",
       "tier": "commune",
-      "name": "Municipal elections",
+      "name": "Élections municipales",
       "category": "council",
       "goal": "local",
       "measure": {
@@ -2044,7 +2602,8 @@
         {
           "election_kinds": [
             "local",
-            "runoff"
+            "runoff",
+            "by_election"
           ],
           "body_kinds": [
             "unicameral"
@@ -2054,8 +2613,6 @@
             "fr.secteur"
           ],
           "except_codes": [
-            "977",
-            "978",
             "55039",
             "55050",
             "55139",
@@ -2113,13 +2670,61 @@
           "precision": "year",
           "through": "1995-12-31",
           "note": "No count of the communes that voted has been found for these years yet."
+        },
+        {
+          "date": "2032-03-01",
+          "source": "sp-calendrier",
+          "quote": "Élections municipales : 2032, sans jour précis.",
+          "precision": "month"
         }
-      ]
+      ],
+      "name_en": "Municipal elections",
+      "earliest_record": "1989-03-12",
+      "cadence": [
+        {
+          "period_years": 6,
+          "phase": 4,
+          "term_years": 6,
+          "month": 3,
+          "runoff": "threshold",
+          "runoff_threshold": 0.5,
+          "runoff_rule": "Communes of 1,000 inhabitants or more (3,500 before 2014): closed lists, elected in the first round with an absolute majority, otherwise lists with 10 percent go to a second round; the leading list takes half the seats and the rest go by highest average among lists with 5 percent. Smaller communes: two-round plurinominal majority vote. Paris, Lyon, and Marseille vote by sector; from 2026 they elect the city council and the sector councils on two ballots (loi n° 2025-795). The mayor is then elected by the council.",
+          "vacancy_rule": "Partial or complete by-elections within three months when a council loses a third of its members or the mayor must be replaced without a full council.",
+          "administered_by": "Préfectures; Ministère de l'Intérieur",
+          "source": "code-electoral"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Ministère de l'Intérieur, open data on data.gouv.fr",
+          "url": "https://www.data.gouv.fr/datasets/donnees-des-elections-agregees",
+          "format": "Parquet and CSV",
+          "access": "open",
+          "checked_at": "2026-11-13T00:00:00Z",
+          "first_date": "1999-06-13",
+          "license": "Licence Ouverte v2.0",
+          "finest": "fr.bureau",
+          "source": "datagouv-agregees",
+          "evidence": "Every election since 1999 by polling station (general_results and candidats_results parquets)."
+        },
+        {
+          "platform": "Ministère de l'Intérieur, results site",
+          "url": "https://www.resultats-elections.interieur.gouv.fr/municipales2026/",
+          "format": "HTML",
+          "access": "open",
+          "checked_at": "2026-11-13T00:00:00Z",
+          "first_date": "2026-03-15",
+          "license": "Licence Ouverte v2.0",
+          "finest": "fr.commune"
+        }
+      ],
+      "est_votes": 26000000,
+      "effort": 2
     },
     {
       "key": "referendums",
       "tier": "national",
-      "name": "Referendums",
+      "name": "Référendums nationaux",
       "category": "direct_democracy",
       "goal": "referendums",
       "measure": {
@@ -2137,7 +2742,8 @@
           "contest_kinds": [
             "ballot_question"
           ],
-          "iso_pattern": "FR"
+          "iso_pattern": "FR",
+          "valid_from": "1958-09-01"
         }
       ],
       "dates": [
@@ -2204,12 +2810,48 @@
           "source": "cc-referendums-tableau",
           "quote": "29 mai 2005 | Ratification du traité établissant une Constitution pour l'Europe"
         }
-      ]
+      ],
+      "name_en": "National referendums",
+      "first_held": "1958-09-28",
+      "earliest_record": "1958-09-28",
+      "cadence": [
+        {
+          "called": true,
+          "administered_by": "Ministère de l'Intérieur; the Conseil constitutionnel proclaims the result",
+          "runoff_rule": "Called by the President on a bill under art. 11 or a constitutional revision under art. 89; a shared-initiative referendum (art. 11, since 2015) needs a fifth of Parliament and a tenth of registered voters, and none has reached a vote.",
+          "source": "constitution-1958"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Conseil constitutionnel, proclamations (REF decisions)",
+          "url": "https://www.conseil-constitutionnel.fr/referendum-sous-la-ve-republique/tableau-recapitulatif-des-referendums-de-la-veme-republique",
+          "format": "HTML",
+          "access": "open",
+          "checked_at": "2026-11-13T00:00:00Z",
+          "first_date": "1961-01-08",
+          "evidence": "National totals for every referendum since 1961; the 1958 result was proclaimed by a special commission."
+        },
+        {
+          "platform": "Ministère de l'Intérieur, open data on data.gouv.fr",
+          "url": "https://www.data.gouv.fr/datasets/donnees-des-elections-agregees",
+          "format": "Parquet and CSV",
+          "access": "open",
+          "checked_at": "2026-11-13T00:00:00Z",
+          "first_date": "1999-06-13",
+          "license": "Licence Ouverte v2.0",
+          "finest": "fr.bureau",
+          "source": "datagouv-agregees",
+          "evidence": "Every election since 1999 by polling station (general_results and candidats_results parquets)."
+        }
+      ],
+      "est_votes": 30000000,
+      "effort": 2
     },
     {
       "key": "ep",
       "tier": "national",
-      "name": "European Parliament elections",
+      "name": "Élection des représentants au Parlement européen",
       "category": "legislature",
       "goal": "ep",
       "measure": {
@@ -2227,7 +2869,12 @@
           "body_kinds": [
             "unicameral"
           ],
-          "iso_pattern": "EU"
+          "iso_pattern": "EU",
+          "schemes": [
+            "fr.ep_constituency",
+            "eu.member_state"
+          ],
+          "within": null
         }
       ],
       "dates": [
@@ -2301,7 +2948,1380 @@
           "source": "vp-ep-elus",
           "quote": "En France, la loi du 25 juin 2018 rétablit une circonscription électorale unique en lieu et place du découpage en 8 circonscriptions régionales mis en place précédemment par une loi de 2003."
         }
-      ]
+      ],
+      "name_en": "European Parliament elections",
+      "first_held": "1979-06-10",
+      "earliest_record": "1979-06-10",
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 4,
+          "month": 6,
+          "term_years": 5,
+          "administered_by": "Ministère de l'Intérieur",
+          "runoff_rule": "List proportional representation with a 5 percent threshold: one national constituency in 1979 to 1999 and since 2019, eight interregional constituencies in 2004 to 2014 (loi n° 77-729 du 7 juillet 1977).",
+          "source": "cc-2019-811-commentaire"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Ministère de l'Intérieur, open data on data.gouv.fr",
+          "url": "https://www.data.gouv.fr/datasets/donnees-des-elections-agregees",
+          "format": "Parquet and CSV",
+          "access": "open",
+          "checked_at": "2026-11-13T00:00:00Z",
+          "first_date": "1999-06-13",
+          "license": "Licence Ouverte v2.0",
+          "finest": "fr.bureau",
+          "source": "datagouv-agregees",
+          "evidence": "Every election since 1999 by polling station (general_results and candidats_results parquets)."
+        }
+      ],
+      "est_votes": 25000000,
+      "effort": 1
+    },
+    {
+      "dates": [
+        {
+          "date": "1959-04-26",
+          "source": "senat-1959",
+          "quote": "Le Sénat de 1959",
+          "note": "Whole Senate elected; départements drawn into series A, B, and C."
+        },
+        {
+          "date": "2026-09-27",
+          "contests": 64,
+          "seats": 178,
+          "source": "senat-2026-dossier",
+          "quote": "64 circonscriptions sont concernées par les élections sénatoriales. Les élections de septembre 2026 concernent 178 sièges de la série 2"
+        },
+        {
+          "date": "2029-09-01",
+          "precision": "month",
+          "source": "sp-calendrier",
+          "note": "Series 1, set by decree."
+        }
+      ],
+      "key": "senat",
+      "tier": "national",
+      "name": "Élections sénatoriales",
+      "name_en": "Senate elections",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "schemes": [
+          "fr.departement"
+        ]
+      },
+      "note": "Senators are elected in each département and overseas collectivity, and by the French abroad, by an electoral college of deputies, regional and departmental councillors, and delegates of the municipal councils (about 93,000 electors for series 2 in 2026). Constituencies with three or more seats use list proportional representation (highest average); those with one or two use a two-round majority vote. Renewed by thirds every three years for nine-year terms from 1959 to 2004 (series A, B, and C); since 2011 by halves every three years for six-year terms (series 1 and 2), after a transition in 2004 and 2008. The Senate's own archive lists every renewal.",
+      "source": "senat-2026-dossier",
+      "first_held": "1959-04-26",
+      "earliest_record": "1959-04-26",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect",
+            "runoff",
+            "by_election"
+          ],
+          "body_kinds": [
+            "upper_house"
+          ],
+          "iso_pattern": "FR",
+          "valid_from": "1958-10-04"
+        }
+      ],
+      "cadence": [
+        {
+          "selection": "elected",
+          "period_years": 3,
+          "phase": 0,
+          "month": 9,
+          "classes": 3,
+          "term_years": 9,
+          "valid_from": "1959-04-26",
+          "valid_to": "2004-09-26",
+          "runoff": "majority",
+          "runoff_rule": "Majority constituencies: absolute majority and a quarter of the college in the first or second round, plurality in the third (art. L294).",
+          "administered_by": "Préfectures; Ministère de l'Intérieur",
+          "source": "senat-1959"
+        },
+        {
+          "selection": "elected",
+          "period_years": 3,
+          "phase": 1,
+          "month": 9,
+          "classes": 2,
+          "term_years": 6,
+          "valid_from": "2011-09-25",
+          "runoff": "majority",
+          "runoff_rule": "Constituencies electing one or two senators: two rounds the same day, absolute majority and a quarter of the electors in the first, plurality in the second; three or more: list proportional representation, highest average (art. L294 and L295).",
+          "vacancy_rule": "Substitutes or the next on the list replace senators; otherwise a by-election within three months, except in the year before a renewal.",
+          "administered_by": "Préfectures; Ministère de l'Intérieur",
+          "source": "senat-2026-dossier"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Sénat, élections sénatoriales",
+          "url": "https://www.senat.fr/senatoriales2014.html",
+          "format": "HTML and PDF",
+          "access": "open",
+          "checked_at": "2026-11-13T00:00:00Z",
+          "first_date": "1959-04-26",
+          "finest": "fr.departement",
+          "evidence": "Results per constituency for each renewal on senat.fr."
+        },
+        {
+          "platform": "Ministère de l'Intérieur, open data on data.gouv.fr",
+          "url": "https://www.data.gouv.fr/datasets/6ab9abea8ebfc5bc472f3924",
+          "format": "CSV",
+          "access": "open",
+          "checked_at": "2026-11-13T00:00:00Z",
+          "first_date": "2026-09-27",
+          "license": "Licence Ouverte v2.0",
+          "finest": "fr.departement",
+          "evidence": "2026 results by constituency, lists, and the elected."
+        }
+      ],
+      "est_votes": 90000,
+      "effort": 2
+    },
+    {
+      "dates": [
+        {
+          "date": "1876-02-20",
+          "seats": 542,
+          "source": "qe-52861",
+          "quote": "20 février et 5 mars 1876 526 16 542"
+        },
+        {
+          "date": "1877-10-14",
+          "seats": 542,
+          "source": "qe-52861",
+          "quote": "14 et 28 octobre 1877 526 16 542"
+        },
+        {
+          "date": "1881-08-21",
+          "seats": 557,
+          "source": "qe-52861",
+          "quote": "21 août et 4 septembre 1881 541 16 557"
+        },
+        {
+          "date": "1885-10-04",
+          "seats": 585,
+          "source": "qe-52861",
+          "quote": "4 et 18 octobre 1885 569 16 585"
+        },
+        {
+          "date": "1889-09-22",
+          "seats": 576,
+          "source": "qe-52861",
+          "quote": "22 septembre et 6 octobre 1889 560 16 576"
+        },
+        {
+          "date": "1893-08-20",
+          "seats": 581,
+          "source": "qe-52861",
+          "quote": "20 août et 3 septembre 1893 565 16 581"
+        },
+        {
+          "date": "1898-05-08",
+          "seats": 586,
+          "source": "qe-52861",
+          "quote": "8 et 22 mai 1898 570 16 586"
+        },
+        {
+          "date": "1902-04-27",
+          "seats": 591,
+          "source": "qe-52861",
+          "quote": "27 avril et 11 mai 1902 575 16 591"
+        },
+        {
+          "date": "1906-05-06",
+          "seats": 591,
+          "source": "qe-52861",
+          "quote": "6 et 20 mai 1906 575 16 591"
+        },
+        {
+          "date": "1910-04-24",
+          "seats": 596,
+          "source": "qe-52861",
+          "quote": "24 avril et 8 mai 1910 580 16 596"
+        },
+        {
+          "date": "1914-04-26",
+          "seats": 602,
+          "source": "qe-52861",
+          "quote": "26 avril et 10 mai 1914 586 16 602"
+        },
+        {
+          "date": "1919-11-16",
+          "seats": 626,
+          "source": "qe-52861",
+          "quote": "16 et 30 novembre 1919 610 16 626"
+        },
+        {
+          "date": "1924-05-11",
+          "seats": 584,
+          "source": "qe-52861",
+          "quote": "11 mai 1924 568 16 584"
+        },
+        {
+          "date": "1928-04-22",
+          "seats": 612,
+          "source": "qe-52861",
+          "quote": "22 et 29 avril 1928 593 19 612"
+        },
+        {
+          "date": "1932-05-01",
+          "seats": 615,
+          "source": "qe-52861",
+          "quote": "1er et 8 mai 1932 596 19 615"
+        },
+        {
+          "date": "1936-04-26",
+          "seats": 618,
+          "source": "qe-52861",
+          "quote": "26 avril et 3 mai 1936 598 20 618"
+        }
+      ],
+      "key": "chambre_deputes",
+      "tier": "national",
+      "name": "Élections à la Chambre des députés (IIIe République)",
+      "name_en": "Chamber of Deputies elections (Third Republic)",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "election"
+      },
+      "valid_from": "1871-02-08",
+      "valid_to": "1940-07-10",
+      "first_held": "1871-02-08",
+      "note": "Universal male suffrage, single-member arrondissement constituencies in two rounds for most of the period, with département lists in 1871, 1885, 1919, and 1924. Includes the National Assembly elected on 8 February 1871, which the Interior Ministry's table leaves out. Seats count metropolitan France and overseas (Algeria and the old colonies).",
+      "source": "qe-52861",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff",
+            "by_election"
+          ],
+          "body_kinds": [
+            "lower_house",
+            "unicameral"
+          ],
+          "iso_pattern": "FR",
+          "valid_from": "1871-01-01",
+          "valid_to": "1940-07-10"
+        }
+      ],
+      "est_votes": 8000000,
+      "effort": 4
+    },
+    {
+      "dates": [
+        {
+          "date": "1945-10-21",
+          "seats": 586,
+          "source": "qe-52861",
+          "quote": "21 octobre 1945 522 64 586",
+          "note": "First Constituent Assembly."
+        },
+        {
+          "date": "1946-06-02",
+          "seats": 586,
+          "source": "qe-52861",
+          "quote": "2 juin 1946 522 64 586",
+          "note": "Second Constituent Assembly."
+        },
+        {
+          "date": "1946-11-10",
+          "seats": 619,
+          "source": "qe-52861",
+          "quote": "10 novembre 1946 544 75 619"
+        },
+        {
+          "date": "1951-06-17",
+          "seats": 627,
+          "source": "qe-52861",
+          "quote": "17 juin 1951 544 83 627"
+        },
+        {
+          "date": "1956-01-02",
+          "seats": 597,
+          "source": "qe-52861",
+          "quote": "2 janvier 1956 544 53* 597",
+          "note": "Elections in Algeria were postponed by a decree of 12 December 1955."
+        }
+      ],
+      "key": "assemblees_4e",
+      "tier": "national",
+      "name": "Élections aux assemblées constituantes et à l'Assemblée nationale (IVe République)",
+      "name_en": "Constituent Assembly and National Assembly elections (Fourth Republic)",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "election"
+      },
+      "valid_from": "1945-10-21",
+      "valid_to": "1958-10-04",
+      "first_held": "1945-10-21",
+      "note": "List proportional representation by département, with apparentements in 1951 and 1956; women voted from 1945. Seats count metropolitan France and overseas.",
+      "source": "qe-52861",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "by_election"
+          ],
+          "body_kinds": [
+            "lower_house",
+            "unicameral",
+            "constituent_assembly"
+          ],
+          "iso_pattern": "FR",
+          "valid_from": "1945-01-01",
+          "valid_to": "1958-10-04"
+        }
+      ],
+      "est_votes": 19000000,
+      "effort": 3
+    },
+    {
+      "dates": [],
+      "key": "assemblees_1848_1870",
+      "tier": "national",
+      "name": "Élections aux assemblées de la IIe République et au Corps législatif du Second Empire",
+      "name_en": "Second Republic assemblies and Second Empire Legislative Body elections",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "election"
+      },
+      "valid_from": "1848-04-23",
+      "valid_to": "1870-09-04",
+      "first_held": "1848-04-23",
+      "note": "The first elections by universal male suffrage: the Constituent Assembly (April 1848) and the Legislative Assembly (May 1849) by département lists, then the Corps législatif of the Second Empire (1852, 1857, 1863, and 1869) in single-member constituencies with official candidates. Dates to be enumerated from an official list.",
+      "source": "elysee-presidents",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff",
+            "by_election"
+          ],
+          "body_kinds": [
+            "lower_house",
+            "unicameral",
+            "constituent_assembly"
+          ],
+          "iso_pattern": "FR",
+          "valid_from": "1848-01-01",
+          "valid_to": "1871-01-01"
+        }
+      ],
+      "est_votes": 7000000,
+      "effort": 4
+    },
+    {
+      "dates": [],
+      "key": "chambres_censitaires",
+      "tier": "national",
+      "name": "Élections à la Chambre des députés censitaire (Restauration et monarchie de Juillet)",
+      "name_en": "Chamber of Deputies elections under property suffrage (1815–1848)",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "election"
+      },
+      "valid_from": "1815-08-14",
+      "valid_to": "1848-02-24",
+      "note": "Elections by electoral colleges of taxpayers (about 90,000 electors under the Restoration, about 250,000 by 1846). No national series of results is known to us.",
+      "source": "elysee-presidents",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "by_election"
+          ],
+          "body_kinds": [
+            "lower_house"
+          ],
+          "iso_pattern": "FR",
+          "valid_to": "1848-01-01"
+        }
+      ],
+      "est_votes": 200000,
+      "effort": 5
+    },
+    {
+      "dates": [],
+      "key": "assemblees_revolution",
+      "tier": "national",
+      "name": "Élections aux assemblées de la Révolution, du Consulat et de l'Empire",
+      "name_en": "Elections to the assemblies of the Revolution, the Consulate, and the Empire (1789–1815)",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "election"
+      },
+      "valid_from": "1789-01-24",
+      "valid_to": "1815-07-08",
+      "note": "The Estates-General (1789), the Legislative Assembly (1791), the Convention (1792), and the councils of the Directory (1795 to 1798) were chosen in two degrees by assemblies of electors; under the Consulate and Empire, lists of notables fed appointment by the Senate.",
+      "disposition": "blocked",
+      "disposition_reason": "Two-degree elections in electoral assemblies, published as lists of the elected (Archives parlementaires) without a national series of vote counts.",
+      "source": "elysee-presidents",
+      "est_votes": 0,
+      "effort": 5
+    },
+    {
+      "dates": [],
+      "key": "senat_avant_1958",
+      "tier": "national",
+      "name": "Élections au Sénat (IIIe République) et au Conseil de la République (IVe République)",
+      "name_en": "Senate (1876–1940) and Council of the Republic (1946–1958) elections",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "election"
+      },
+      "valid_from": "1876-01-30",
+      "valid_to": "1958-10-04",
+      "first_held": "1876-01-30",
+      "note": "The Third Republic Senate was elected in each département by a college of deputies, general and arrondissement councillors, and municipal delegates, renewed by thirds every three years (with 75 life senators until 1884); the Council of the Republic of the Fourth Republic was elected by similar colleges from 1946.",
+      "source": "elysee-presidents",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect",
+            "general",
+            "runoff",
+            "by_election"
+          ],
+          "body_kinds": [
+            "upper_house"
+          ],
+          "iso_pattern": "FR",
+          "valid_to": "1958-10-04"
+        }
+      ],
+      "est_votes": 80000,
+      "effort": 4
+    },
+    {
+      "dates": [
+        {
+          "date": "1848-12-10",
+          "contests": 1,
+          "source": "elysee-presidents",
+          "quote": "Deuxième République Louis-Napoléon Bonaparte 1848 - 1851"
+        }
+      ],
+      "key": "president_1848",
+      "tier": "national",
+      "name": "Élection du président de la République de 1848",
+      "name_en": "Presidential election of 1848",
+      "category": "executive",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "valid_from": "1848-11-04",
+      "valid_to": "1852-12-02",
+      "first_held": "1848-12-10",
+      "note": "The only direct presidential election before 1965: Louis-Napoléon Bonaparte, elected for four years under the Constitution of 4 November 1848.",
+      "source": "elysee-presidents",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "FR",
+          "valid_from": "1848-01-01",
+          "valid_to": "1852-12-02"
+        }
+      ],
+      "est_votes": 7400000,
+      "effort": 2
+    },
+    {
+      "dates": [],
+      "key": "president_indirect",
+      "tier": "national",
+      "name": "Élection du président de la République par le Parlement ou le collège électoral",
+      "name_en": "Presidential elections by Parliament or an electoral college (1871–1958)",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "ballot"
+      },
+      "valid_from": "1871-08-31",
+      "valid_to": "1962-11-06",
+      "note": "Third and Fourth Republic presidents were elected by the deputies and senators meeting as the Congress at Versailles (Thiers by the National Assembly in 1871); de Gaulle was elected on 21 December 1958 by a college of about 80,000 parliamentarians, councillors, and municipal delegates. The 1962 referendum introduced direct election.",
+      "source": "elysee-presidents",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "FR"
+        }
+      ],
+      "est_votes": 900,
+      "effort": 2
+    },
+    {
+      "dates": [],
+      "key": "plebiscites",
+      "tier": "national",
+      "name": "Plébiscites et référendums avant 1958",
+      "name_en": "Plebiscites and referendums before 1958",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "question"
+      },
+      "valid_to": "1958-09-01",
+      "note": "Constitutional plebiscites of the Revolution and the Napoleonic era (1793, 1795, 1799 to 1800, 1802, 1804, and 1815), the Second Empire plebiscites of December 1851, November 1852, and May 1870, and the referendums of 21 October 1945 (two questions), 5 May 1946, and 13 October 1946.",
+      "source": "elysee-presidents",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "iso_pattern": "FR",
+          "valid_to": "1958-09-01"
+        }
+      ],
+      "est_votes": 20000000,
+      "effort": 3
+    },
+    {
+      "dates": [
+        {
+          "date": "2026-03-15",
+          "source": "loi-2025-795",
+          "note": "First elections on a separate ballot."
+        },
+        {
+          "date": "2032-03-01",
+          "source": "sp-calendrier",
+          "quote": "Élections municipales : 2032, sans jour précis.",
+          "precision": "month"
+        }
+      ],
+      "key": "conseils_secteur",
+      "tier": "secteur",
+      "name": "Élections des conseils d'arrondissement de Paris, Lyon et Marseille",
+      "name_en": "Paris, Lyon, and Marseille arrondissement and sector council elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "schemes": [
+          "fr.secteur"
+        ]
+      },
+      "first_held": "1983-03-06",
+      "valid_from": "1983-01-01",
+      "note": "Each sector elects a council (conseil d'arrondissement, or conseil de secteur in Marseille). Until 2020 one ballot per sector elected both the city councillors and the sector councillors, so those contests are municipal elections; from 2026 the sector councils have their own ballot (loi n° 2025-795). Paris has 17 sectors since 2020 (arrondissements 1 to 4 vote together as Paris Centre), Lyon 9, and Marseille 8.",
+      "source": "loi-2025-795",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "runoff"
+          ],
+          "body_kinds": [
+            "unicameral",
+            "council"
+          ],
+          "schemes": [
+            "fr.secteur"
+          ],
+          "name_pattern": "(secteur|arrondissement)"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 6,
+          "phase": 4,
+          "term_years": 6,
+          "month": 3,
+          "runoff": "threshold",
+          "runoff_threshold": 0.5,
+          "runoff_rule": "As in communes of 1,000 inhabitants or more, by sector.",
+          "administered_by": "Préfectures de Paris, du Rhône et des Bouches-du-Rhône",
+          "source": "loi-2025-795"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Ministère de l'Intérieur, results site",
+          "url": "https://www.resultats-elections.interieur.gouv.fr/municipales2026/",
+          "format": "HTML",
+          "access": "open",
+          "checked_at": "2026-11-13T00:00:00Z",
+          "first_date": "2026-03-15",
+          "license": "Licence Ouverte v2.0",
+          "finest": "fr.secteur"
+        }
+      ],
+      "est_votes": 1300000,
+      "effort": 1
+    },
+    {
+      "dates": [
+        {
+          "date": "2026-03-15",
+          "source": "mi-metropolitaines-2026"
+        }
+      ],
+      "key": "metropole_lyon",
+      "tier": "metropole_lyon",
+      "name": "Élection des conseillers métropolitains de Lyon",
+      "name_en": "Lyon Metropolis council elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "constituency"
+      },
+      "first_held": "2020-03-15",
+      "valid_from": "2020-01-01",
+      "note": "Since 2020 the 150 members of the Métropole de Lyon's council are elected directly in metropolitan constituencies, on the day of the municipal elections and by the same list system, separately from the communes' councils (Code électoral, art. L224-1 and following). Held in 2020 (15 March and 28 June) and 2026 (15 and 22 March).",
+      "source": "mi-metropolitaines-2026",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "runoff"
+          ],
+          "body_kinds": [
+            "unicameral",
+            "council"
+          ],
+          "name_pattern": "(Métropole de Lyon|Lyon Metropolis|métropolitain)"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 6,
+          "phase": 4,
+          "term_years": 6,
+          "month": 3,
+          "runoff": "threshold",
+          "runoff_threshold": 0.5,
+          "runoff_rule": "Lists per metropolitan constituency, with the municipal list rules.",
+          "administered_by": "Préfecture du Rhône",
+          "source": "code-electoral"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Ministère de l'Intérieur, results site",
+          "url": "https://www.resultats-elections.interieur.gouv.fr/metropolitaines2026/ensemble_geographique/84/69M/index.html",
+          "format": "HTML",
+          "access": "open",
+          "checked_at": "2026-11-13T00:00:00Z",
+          "first_date": "2020-03-15",
+          "license": "Licence Ouverte v2.0",
+          "source": "mi-metropolitaines-2026"
+        }
+      ],
+      "est_votes": 450000,
+      "effort": 2
+    },
+    {
+      "dates": [],
+      "key": "communautaires",
+      "tier": "epci",
+      "name": "Élection des conseillers communautaires",
+      "name_en": "Intercommunal council members (conseillers communautaires)",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "first_held": "2014-03-23",
+      "note": "Since 2014, in communes of 1,000 inhabitants or more, the municipal ballot carries a second list of candidates for the commune's seats on its EPCI council (fléchage), and seats go to lists in proportion to the municipal result (Code électoral, art. L273-1 and following, loi n° 2013-403); smaller communes send members in the order of their municipal council. Before 2014 the municipal councils chose their delegates. No separate vote is cast, so the class holds the seat allocation rather than new vote counts.",
+      "source": "code-electoral",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "runoff"
+          ],
+          "body_kinds": [
+            "unicameral",
+            "council"
+          ],
+          "name_pattern": "(communaut|intercommunal|EPCI)"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 6,
+          "phase": 4,
+          "term_years": 6,
+          "month": 3,
+          "administered_by": "Préfectures",
+          "source": "code-electoral"
+        }
+      ],
+      "est_votes": 15000000,
+      "effort": 3
+    },
+    {
+      "dates": [],
+      "key": "executifs_locaux",
+      "tier": "commune",
+      "name": "Élection des maires et des présidents des conseils départementaux, régionaux et communautaires",
+      "name_en": "Election of mayors and of the presidents of departmental, regional, and intercommunal councils by their councils",
+      "category": "indirect",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "Each council elects its executive (and deputies) by secret ballot at its first meeting, by absolute majority in two ballots and plurality in the third. Mayors have been elected by the council since 1882.",
+      "disposition": "blocked",
+      "disposition_reason": "The ballots are minuted by each council and not collected; the Répertoire national des élus lists who holds each office, not the council votes.",
+      "source": "cgct",
+      "est_votes": 0,
+      "effort": 5
+    },
+    {
+      "dates": [],
+      "key": "referendums_locaux",
+      "tier": "commune",
+      "name": "Référendums locaux et consultations locales",
+      "name_en": "Local referendums and consultations",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "question"
+      },
+      "first_held": "2003-08-02",
+      "note": "Since 2003 a commune, département, region, or EPCI may submit a decision within its powers to a binding referendum (valid when half the registered voters take part), and may hold advisory consultations; communes held advisory consultations from 1992. The DGCL publishes no list.",
+      "source": "dgcl-referendum-local",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "polity_kinds": [
+            "municipality",
+            "submunicipal",
+            "county"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "called": true,
+          "administered_by": "The collectivity concerned",
+          "source": "cgct"
+        }
+      ],
+      "est_votes": 200000,
+      "effort": 5
+    },
+    {
+      "dates": [],
+      "key": "consultations_territoriales",
+      "tier": "region",
+      "name": "Consultations des électeurs d'une collectivité territoriale (art. 72-1, 72-4 et 73 de la Constitution)",
+      "name_en": "Territorial status consultations",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "question"
+      },
+      "first_held": "2003-07-06",
+      "note": "Votes on a collectivity's status or institutions, called by the President or by law: Corsica (6 July 2003), Guadeloupe, Martinique, Saint-Barthélemy, and Saint-Martin (7 December 2003), Mayotte (29 March 2009), Martinique and Guyane (10 and 24 January 2010), and Alsace (7 April 2013).",
+      "source": "constitution-1958",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "polity_kinds": [
+            "region"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "called": true,
+          "administered_by": "Ministère de l'Intérieur",
+          "source": "constitution-1958"
+        }
+      ],
+      "est_votes": 1500000,
+      "effort": 3
+    },
+    {
+      "dates": [],
+      "key": "sections_commune",
+      "tier": "commune",
+      "name": "Élection des commissions syndicales des sections de commune",
+      "name_en": "Elections of the boards of sections de commune",
+      "category": "special_purpose",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "The electors of a section de commune (a part of a commune holding its own property, such as common land) may elect a board when the prefect convenes them (CGCT, art. L2411-3).",
+      "disposition": "blocked",
+      "disposition_reason": "Rare, convened case by case, and posted only locally; no collector.",
+      "source": "cgct",
+      "est_votes": 0,
+      "effort": 5
+    },
+    {
+      "dates": [],
+      "key": "conseils_arrondissement",
+      "tier": "arrondissement",
+      "name": "Élections des conseils d'arrondissement (1833–1940)",
+      "name_en": "Arrondissement council elections (1833–1940)",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "valid_from": "1833-06-22",
+      "valid_to": "1940-10-12",
+      "note": "Arrondissement councils were elected by canton alongside the general councils from 1833 (by property suffrage, then by universal male suffrage from 1848) until they were suspended in 1940 and not restored.",
+      "source": "insee-cog-2026",
+      "est_votes": 3000000,
+      "effort": 5
+    },
+    {
+      "dates": [
+        {
+          "date": "2023-04-16",
+          "source": "hc-pf-2023",
+          "quote": "01-05-2023 - Résultats définitifs Tour 2",
+          "note": "Second round on 30 April 2023."
+        }
+      ],
+      "key": "polynesie_assemblee",
+      "tier": "com",
+      "name": "Élection des représentants à l'assemblée de la Polynésie française",
+      "name_en": "Assembly of French Polynesia elections",
+      "category": "legislature",
+      "goal": "subnational",
+      "measure": {
+        "unit": "election"
+      },
+      "note": "57 representatives elected for five years by list in one constituency of eight sections, with a bonus of 19 seats to the leading list since 2013 (loi organique n° 2004-192, art. 104 and 105). Elections since the 2004 statute: May 2004, the partial vote of February 2005, 2008, 2013, April and May 2018, and 16 and 30 April 2023. The Territorial Assembly it replaced was elected from 1946.",
+      "source": "lo-2004-192",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff",
+            "by_election"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "name_pattern": "(Assemblée de la Polynésie|Assembly of French Polynesia|Territorial Assembly of French Polynesia)"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 3,
+          "term_years": 5,
+          "month": 4,
+          "called": true,
+          "runoff": "threshold",
+          "runoff_rule": "Two-round list vote with a majority bonus: a list with an absolute majority in the first round wins; otherwise a second round a week later among lists above the threshold.",
+          "administered_by": "Haut-commissariat de la République en Polynésie française",
+          "vacancy_rule": "The Assembly can be dissolved by decree (art. 157), as in 2004.",
+          "source": "lo-2004-192"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Haut-commissariat de la République en Polynésie française",
+          "url": "https://www.polynesie-francaise.pref.gouv.fr/",
+          "format": "PDF",
+          "access": "open",
+          "checked_at": "2026-11-13T00:00:00Z",
+          "first_date": "2013-04-21",
+          "source": "hc-pf-2023",
+          "evidence": "Results PDFs by section and commune for each round."
+        }
+      ],
+      "est_votes": 140000,
+      "effort": 2
+    },
+    {
+      "dates": [
+        {
+          "date": "2026-06-28",
+          "source": "vp-nc-2026",
+          "quote": "Nouvelle-Calédonie : élections provinciales le 28 juin 2026",
+          "contests": 3
+        }
+      ],
+      "key": "nc_provinciales",
+      "tier": "province_nc",
+      "name": "Élections provinciales de Nouvelle-Calédonie (assemblées de province et Congrès)",
+      "name_en": "New Caledonia provincial elections (provincial assemblies and Congress)",
+      "category": "legislature",
+      "goal": "subnational",
+      "measure": {
+        "unit": "constituency"
+      },
+      "first_held": "1989-06-11",
+      "note": "The three provinces (South 40 seats, North 22, Loyalty Islands 14) elect their assemblies by list proportional representation with a 5 percent of registered voters threshold, and 54 of their members sit in the Congress (loi organique n° 99-209). Electors are on a restricted special roll. Held in 1989, 1995, 1999, 2004, 2009, 2014, and 2019; the 2024 elections were postponed three times and held on 28 June 2026.",
+      "source": "lo-99-209",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "by_election"
+          ],
+          "body_kinds": [
+            "unicameral",
+            "council"
+          ],
+          "name_pattern": "(assemblée de la province|provincial assembly|Congrès de la Nouvelle-Calédonie|Congress of New Caledonia)"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 1,
+          "term_years": 5,
+          "runoff": "none",
+          "runoff_rule": "One round of list proportional representation per province (highest average), threshold 5 percent of registered voters.",
+          "administered_by": "Haut-commissariat de la République en Nouvelle-Calédonie",
+          "source": "lo-99-209"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Haut-commissariat de la République en Nouvelle-Calédonie",
+          "url": "https://www.nouvelle-caledonie.gouv.fr/",
+          "format": "HTML and PDF",
+          "access": "open",
+          "checked_at": "2026-11-13T00:00:00Z",
+          "first_date": "2014-05-11",
+          "evidence": "Results by province and commune."
+        }
+      ],
+      "est_votes": 120000,
+      "effort": 2
+    },
+    {
+      "dates": [
+        {
+          "date": "2021-12-12",
+          "source": "vp-nc-2021",
+          "quote": "Nouvelle-Calédonie : 3e référendum d'autodétermination du 12 décembre 2021",
+          "contests": 1
+        }
+      ],
+      "key": "nc_consultations",
+      "tier": "com",
+      "name": "Consultations sur l'accession de la Nouvelle-Calédonie à la pleine souveraineté",
+      "name_en": "New Caledonia self-determination referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "question"
+      },
+      "first_held": "1987-09-13",
+      "note": "Held 13 September 1987, 8 November 1998 (approval of the Nouméa Accord), 4 November 2018, 4 October 2020, and 12 December 2021, on the special consultation roll. The national referendum of 6 November 1988 on the Matignon Accords is in the national referendums class. No consultation on the 2025 Bougival agreement had been held by November 2026.",
+      "source": "vp-nc-2021",
+      "cadence": [
+        {
+          "called": true,
+          "administered_by": "Haut-commissariat de la République en Nouvelle-Calédonie, under a control commission",
+          "source": "lo-99-209"
+        }
+      ],
+      "est_votes": 150000,
+      "effort": 2
+    },
+    {
+      "dates": [
+        {
+          "date": "2027-03-14",
+          "source": "decret-2026-914",
+          "quote": "est fixée au dimanche 14 mars 2027"
+        }
+      ],
+      "key": "wf_assemblee",
+      "tier": "com",
+      "name": "Élection des membres de l'assemblée territoriale des îles Wallis et Futuna",
+      "name_en": "Wallis and Futuna Territorial Assembly elections",
+      "category": "legislature",
+      "goal": "subnational",
+      "measure": {
+        "unit": "election"
+      },
+      "note": "20 members elected for five years by list proportional representation in five constituencies (loi n° 61-814 du 29 juillet 1961, art. 12). Last elected on 20 March 2022, with a rerun in Sigave on 5 February 2023 after the Conseil d'État annulled it.",
+      "source": "decret-2026-914",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "by_election"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "name_pattern": "territorial.*Wallis|Wallis.*territorial"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 2,
+          "term_years": 5,
+          "month": 3,
+          "runoff": "none",
+          "runoff_rule": "One round, list proportional representation by highest average.",
+          "administered_by": "Administration supérieure des îles Wallis et Futuna",
+          "source": "decret-2026-914"
+        }
+      ],
+      "est_votes": 8000,
+      "effort": 2
+    },
+    {
+      "dates": [
+        {
+          "date": "2027-03-14",
+          "source": "decret-2026-911"
+        }
+      ],
+      "key": "spm_conseil",
+      "tier": "com",
+      "name": "Élection des conseillers territoriaux de Saint-Pierre-et-Miquelon",
+      "name_en": "Saint-Pierre-et-Miquelon Territorial Council elections",
+      "category": "legislature",
+      "goal": "subnational",
+      "measure": {
+        "unit": "election"
+      },
+      "note": "19 councillors (a General Council until 2007) elected by list with a majority bonus; last elected in March 2022.",
+      "source": "decret-2026-911",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff",
+            "by_election"
+          ],
+          "body_kinds": [
+            "unicameral",
+            "council"
+          ],
+          "name_pattern": "territorial.*Miquelon|Miquelon.*territorial"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 2,
+          "term_years": 5,
+          "month": 3,
+          "runoff": "threshold",
+          "runoff_rule": "Two-round list vote with a majority bonus: a list with an absolute majority in the first round wins; otherwise a second round a week later among lists above the threshold.",
+          "administered_by": "Préfecture de Saint-Pierre-et-Miquelon",
+          "source": "decret-2026-911"
+        }
+      ],
+      "est_votes": 3500,
+      "effort": 2
+    },
+    {
+      "dates": [
+        {
+          "date": "2027-03-14",
+          "contests": 2,
+          "source": "decret-2026-912",
+          "note": "Saint-Martin on the same day (décret n° 2026-913)."
+        }
+      ],
+      "key": "sbh_sxm_conseils",
+      "tier": "com",
+      "name": "Élection des conseillers territoriaux de Saint-Barthélemy et de Saint-Martin",
+      "name_en": "Saint-Barthélemy and Saint-Martin Territorial Council elections",
+      "category": "legislature",
+      "goal": "subnational",
+      "measure": {
+        "unit": "constituency"
+      },
+      "first_held": "2007-07-01",
+      "note": "Since leaving Guadeloupe in 2007, Saint-Barthélemy (19 councillors) and Saint-Martin (23) elect territorial councils for five years by list with a majority bonus: July 2007, March 2012, March 2017, and March 2022. Before 2007 they were communes of Guadeloupe and voted in municipal elections.",
+      "source": "decret-2026-912",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff",
+            "by_election",
+            "local"
+          ],
+          "body_kinds": [
+            "unicameral",
+            "council"
+          ],
+          "name_pattern": "(Saint-Barth|Saint-Martin).*territorial|territorial.*(Saint-Barth|Saint-Martin)",
+          "valid_from": "2007-02-22"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 2,
+          "term_years": 5,
+          "month": 3,
+          "runoff": "threshold",
+          "runoff_rule": "Two-round list vote with a majority bonus: a list with an absolute majority in the first round wins; otherwise a second round a week later among lists above the threshold.",
+          "administered_by": "Préfecture de Saint-Barthélemy et de Saint-Martin",
+          "source": "decret-2026-912"
+        }
+      ],
+      "est_votes": 12000,
+      "effort": 2
+    },
+    {
+      "dates": [
+        {
+          "date": "2026-05-31",
+          "source": "mae-cfe-2026",
+          "quote": "le dimanche 31 mai pour le reste du monde",
+          "note": "30 May in the Americas and the Caribbean."
+        }
+      ],
+      "key": "conseillers_fde",
+      "tier": "francais_etranger",
+      "name": "Élection des conseillers des Français de l'étranger",
+      "name_en": "Consular councillor elections (French residents abroad)",
+      "category": "non_territorial",
+      "goal": "local",
+      "measure": {
+        "unit": "constituency"
+      },
+      "first_held": "2014-05-25",
+      "note": "Registered French residents abroad elect 442 consular councillors in consular constituencies for six years, in person or online (loi n° 2013-659). Held in May 2014, May 2021 (postponed from 2020), and 30 and 31 May 2026.",
+      "source": "loi-2013-659",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff",
+            "by_election"
+          ],
+          "body_kinds": [
+            "council",
+            "unicameral"
+          ],
+          "name_pattern": "(conseil consulaire|conseillers? des Français de l'étranger|consular council)",
+          "valid_from": "2014-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 6,
+          "phase": 4,
+          "term_years": 6,
+          "month": 5,
+          "runoff": "none",
+          "runoff_rule": "One round: plurality where one seat is filled, otherwise list proportional representation by highest average.",
+          "administered_by": "Ministère de l'Europe et des Affaires étrangères",
+          "source": "loi-2013-659"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Ministère de l'Europe et des Affaires étrangères",
+          "url": "https://www.diplomatie.gouv.fr/fr/services-aux-francaises-et-aux-francais/vie-administrative-et-elections/elections-a-l-etranger/consulter-les-resultats-des-elections-vote-des-francais-de-l-etranger/elections-des-conseillers-des-francais-de-l-etranger-2026-resultats",
+          "format": "HTML and PDF",
+          "access": "open",
+          "checked_at": "2026-11-13T00:00:00Z",
+          "first_date": "2014-05-25",
+          "source": "mae-cfe-2026",
+          "evidence": "Results by consular constituency for 2026; earlier elections on the same site."
+        }
+      ],
+      "est_votes": 200000,
+      "effort": 3
+    },
+    {
+      "dates": [],
+      "key": "afe",
+      "tier": "francais_etranger",
+      "name": "Élection des membres de l'Assemblée des Français de l'étranger",
+      "name_en": "Assembly of French Citizens Abroad elections",
+      "category": "indirect",
+      "goal": "local",
+      "measure": {
+        "unit": "constituency"
+      },
+      "first_held": "2014-06-21",
+      "note": "Since 2014 the 90 members are elected by and among the consular councillors in 15 constituencies (loi n° 2013-659). Before 2013 the Assembly (the Conseil supérieur des Français de l'étranger until 2004, created in 1948) was elected directly by French residents abroad, by halves, from 1982; that era is the class afe_direct.",
+      "source": "loi-2013-659",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "body_kinds": [
+            "council",
+            "unicameral"
+          ],
+          "name_pattern": "(Assemblée des Français|Assembly of French)",
+          "valid_from": "2014-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 6,
+          "phase": 4,
+          "term_years": 6,
+          "month": 6,
+          "administered_by": "Ministère de l'Europe et des Affaires étrangères",
+          "source": "loi-2013-659"
+        }
+      ],
+      "est_votes": 450,
+      "effort": 3
+    },
+    {
+      "dates": [],
+      "key": "afe_direct",
+      "tier": "francais_etranger",
+      "name": "Élection directe au Conseil supérieur puis à l'Assemblée des Français de l'étranger (1982–2013)",
+      "name_en": "Direct elections to the Higher Council and Assembly of French Citizens Abroad (1982–2013)",
+      "category": "non_territorial",
+      "goal": "local",
+      "measure": {
+        "unit": "constituency"
+      },
+      "valid_from": "1982-06-07",
+      "valid_to": "2013-07-22",
+      "note": "French residents abroad elected their councillors directly by halves every three years for six-year terms, by constituency, until the 2013 reform.",
+      "source": "loi-2013-659",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "by_election"
+          ],
+          "body_kinds": [
+            "council",
+            "unicameral"
+          ],
+          "name_pattern": "(Conseil supérieur des Français|Assemblée des Français|Higher Council of French|Assembly of French)",
+          "valid_to": "2014-01-01"
+        }
+      ],
+      "est_votes": 100000,
+      "effort": 4
+    },
+    {
+      "dates": [],
+      "key": "prudhomales",
+      "tier": "functional",
+      "name": "Élections prud'homales",
+      "name_en": "Labor court (conseils de prud'hommes) elections",
+      "category": "judicial",
+      "goal": "national",
+      "measure": {
+        "unit": "election"
+      },
+      "valid_to": "2017-01-01",
+      "first_held": "1979-12-12",
+      "note": "Employees and employers elected the lay judges of the labor courts on union and employer lists in 1979, 1982, 1987, 1992, 1997, 2002, and 2008; since 2017 they are appointed from the unions' measured audience.",
+      "disposition": "out_of_scope",
+      "disposition_reason": "A functional electorate of employees and employers voting union and employer-organization lists, like workplace votes; no territorial office.",
+      "source": "code-electoral"
+    },
+    {
+      "dates": [],
+      "key": "chambres_consulaires",
+      "tier": "functional",
+      "name": "Élections aux chambres de commerce, de métiers et d'agriculture et aux tribunaux de commerce",
+      "name_en": "Chamber of commerce, trades, and agriculture elections and commercial court judges",
+      "category": "non_territorial",
+      "goal": "local",
+      "measure": {
+        "unit": "election"
+      },
+      "disposition": "out_of_scope",
+      "disposition_reason": "Professional chambers elected by their members, and commercial judges elected by delegates of those chambers; professional-chamber votes are out of scope.",
+      "source": "code-electoral"
+    },
+    {
+      "dates": [],
+      "key": "elections_professionnelles",
+      "tier": "functional",
+      "name": "Élections professionnelles et représentatives",
+      "name_en": "Workplace, civil service, very-small-business, university, school, and social housing tenant elections",
+      "category": "non_territorial",
+      "goal": "local",
+      "measure": {
+        "unit": "election"
+      },
+      "disposition": "out_of_scope",
+      "disposition_reason": "Workplace and institutional representation votes, not public office.",
+      "source": "code-electoral"
+    },
+    {
+      "dates": [],
+      "key": "securite_sociale",
+      "tier": "functional",
+      "name": "Élections des administrateurs des caisses de sécurité sociale",
+      "name_en": "Social security board elections (1947–1983)",
+      "category": "non_territorial",
+      "goal": "national",
+      "measure": {
+        "unit": "election"
+      },
+      "valid_to": "1996-04-24",
+      "note": "Insured persons elected the boards of the social security and family allowance funds on union lists in 1947, 1950, 1955, 1962, and 1983; board members have been appointed since 1996.",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Functional self-government of social insurance funds with union lists, like Germany's Sozialwahl; no territorial office.",
+      "source": "code-electoral"
+    },
+    {
+      "dates": [],
+      "key": "primaires",
+      "tier": "functional",
+      "name": "Primaires et désignations internes des partis",
+      "name_en": "Party primaries and internal nominations",
+      "category": "nominating",
+      "goal": "national",
+      "measure": {
+        "unit": "election"
+      },
+      "note": "Open presidential primaries were held by the Socialist Party and its allies in 2011 and 2017, by the right and centre in 2016, and by the ecologists in 2016 and 2021.",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Run by the parties, not by the State; no authority administers or certifies them.",
+      "source": "code-electoral"
     }
   ]
 }
