@@ -541,25 +541,34 @@ function units(
   const paces = new Map<string, number>();
   const befores = new Map<string, number>();
   if (cutoff != null && start > cutoff) {
+    const seen = race.frames
+      .map((frame) => Date.parse(frame.at))
+      .filter((time) => time <= clock)
+      .toSorted((x, y) => x - y);
     for (const [id, list] of byUnit) {
-      let then: LiveUnitCount | null = null;
-      let earlier: LiveUnitCount | null = null;
-      for (const count of list) {
-        if (
-          Date.parse(count.at) <= start &&
-          (then == null || count.at > then.at)
-        ) {
-          then = count;
+      const value = (time: number) => {
+        let then: LiveUnitCount | null = null;
+        for (const count of list) {
+          if (
+            Date.parse(count.at) <= time &&
+            (then == null || count.at > then.at)
+          ) {
+            then = count;
+          }
         }
-        if (
-          Date.parse(count.at) <= start - MODEL.late.span * 86_400_000 &&
-          (earlier == null || count.at > earlier.at)
-        ) {
-          earlier = count;
+        return then == null ? 0 : sum(then.votes);
+      };
+      const point = (time: number) => {
+        const low = seen.findLast((frame) => frame <= time);
+        const high = seen.find((frame) => frame > time) ?? clock;
+        if (low == null || high <= low) {
+          return value(time);
         }
-      }
-      paces.set(id, then == null ? 0 : sum(then.votes));
-      befores.set(id, earlier == null ? 0 : sum(earlier.votes));
+        const from = value(low);
+        return from + ((value(high) - from) * (time - low)) / (high - low);
+      };
+      paces.set(id, point(start));
+      befores.set(id, point(start - MODEL.late.span * 86_400_000));
     }
   }
   const [a, b] = pair(race, latest);
@@ -1155,28 +1164,29 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
   );
   const onNight = night == null ? 0 : sum(night.totals);
   const latest = shown.length > 0 ? sum(shown.at(-1)!.totals) : 0;
-  const since = shown.findLast(
-    (frame) =>
-      Date.parse(frame.at) <=
-      Math.max(cutoff ?? 0, Date.parse(stamp) - MODEL.late.window * 86_400_000),
+  const lookback = Math.max(
+    cutoff ?? 0,
+    Date.parse(stamp) - MODEL.late.window * 86_400_000,
   );
+  const since = shown.findLast((frame) => Date.parse(frame.at) <= lookback);
   const recent =
     isLate && since != null && latest > 0
       ? sum(
-          shown
-            .slice(shown.indexOf(since))
-            .map((frame, index, list) =>
-              index === 0
-                ? 0
-                : Math.max(
-                    0,
-                    sum(frame.totals) - sum(list[index - 1]!.totals),
-                  ) *
-                  0.5 **
-                    (Math.max(0, Date.parse(stamp) - Date.parse(frame.at)) /
-                      86_400_000 /
-                      MODEL.late.half),
-            ),
+          shown.slice(shown.indexOf(since)).map((frame, index, list) => {
+            if (index === 0) {
+              return 0;
+            }
+            const end = Date.parse(frame.at);
+            const begin = Date.parse(list[index - 1]!.at);
+            return (
+              Math.max(0, sum(frame.totals) - sum(list[index - 1]!.totals)) *
+              Math.min(1, (end - lookback) / Math.max(1, end - begin)) *
+              0.5 **
+                (Math.max(0, Date.parse(stamp) - end) /
+                  86_400_000 /
+                  MODEL.late.half)
+            );
+          }),
         ) / latest
       : 0;
   const tailWeight = Math.min(1, tail / MODEL.tail.share);
