@@ -327,11 +327,13 @@ def emit() -> Path:
                 "select value from external_id where scheme = %s", [f"{SOURCE}.person"]
             ).fetchall()
         }
+        ticketed: set[UUID] = set()
         for name_id, entity, text in conn.execute(
             """select n.id, n.entity_id, n.text from name n join changeset c on c.id = n.changeset_id
                join person p on p.id = n.entity_id where c.pipeline = %s and n.text ~ '/' and not n.is_preferred""",
             [SOURCE],
         ).fetchall():
+            ticketed.add(name_id)
             cs.add("name_drop", name_id=name_id, entity_id=entity, text=text, reason="Ticket stamped as a person name")
         existing: dict[str, list[tuple[UUID, str]]] = {}
         for key, option, label in conn.execute(
@@ -464,14 +466,16 @@ def emit() -> Path:
                 reason="another pipeline's preferred name stands for this person",
             )
 
+        spelled: dict[UUID, list[str]] = {}
+
         def person(state: str, text: str) -> UUID:
             if (state, slug(text)) not in persons:
                 id = cs.key(f"{SOURCE}.person", f"{state}:{slug(text)}")
                 if id not in persons.values():
                     cs.add("person", id=id)
                 persons[(state, slug(text))] = id
-                if id in cs.minted or id not in foreign:
-                    name(id, text)
+                if (id in cs.minted or id not in foreign) and text not in spelled.setdefault(id, []):
+                    spelled[id].append(text)
             return persons[(state, slug(text))]
 
         folds: dict[UUID, list[UUID]] = {}
@@ -779,4 +783,36 @@ def emit() -> Path:
         for duplicate, into in folds.items():
             if len(set(into)) == 1 and candidacies.get(duplicate, 0) == len(into) and duplicate not in cs.minted:
                 cs.merge(duplicate, into[0])
+        staged: dict[UUID, set[tuple[str, bool]]] = {}
+        for id, texts in spelled.items():
+            chosen = max(
+                texts,
+                key=lambda text: (
+                    sum(len(word) for word in text.split() if not word.endswith(".") and not word.startswith("(")),
+                    "(" not in text,
+                    len(text),
+                ),
+            )
+            staged[id] = {(text, text == chosen) for text in texts}
+            for text, preferred in staged[id]:
+                cs.add("name", entity_id=id, text=text, lang="en", kind="official", is_preferred=preferred)
+        kept: set[tuple[UUID, str, bool]] = set()
+        for name_id, entity, text, preferred in conn.execute(
+            """select n.id, n.entity_id, n.text, n.is_preferred from name n join changeset c on c.id = n.changeset_id
+               where c.pipeline = %s and n.lang = 'en' and n.kind = 'official' and n.entity_id = any(%s)
+               order by n.is_preferred desc, n.recorded_from, n.id""",
+            [SOURCE, list(staged.keys() - cs.survivors.keys())],
+        ).fetchall():
+            if name_id in ticketed or all(text != printed for printed, _ in staged[entity]):
+                continue
+            if (text, preferred) in staged[entity] and (entity, text, preferred) not in kept:
+                kept.add((entity, text, preferred))
+                continue
+            cs.add(
+                "name_drop",
+                name_id=name_id,
+                entity_id=entity,
+                text=text,
+                reason="Repeated printing of this person's name",
+            )
         return cs.write()

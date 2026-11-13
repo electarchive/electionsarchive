@@ -291,7 +291,14 @@ def emit() -> Path:
         )
 
         def name(entity: UUID, text: str) -> None:
-            cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
+            cs.add("name", entity_id=entity, text=" ".join(text.split()), lang="en", kind="official", is_preferred=True)
+
+        for name_id, entity, text in conn.execute(
+            """select n.id, n.entity_id, n.text from name n join changeset c on c.id = n.changeset_id
+               where c.pipeline = %s and n.text ~ '\\s\\s|[\\r\\n\\t]'""",
+            [SOURCE],
+        ).fetchall():
+            cs.add("name_drop", name_id=name_id, entity_id=entity, text=text, reason="Line breaks and doubled spaces")
 
         def note(entity: UUID, kind: str, body: str) -> None:
             cs.add("note", entity_id=entity, kind=kind, body_md=body)
