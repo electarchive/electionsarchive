@@ -1797,7 +1797,7 @@ ND_EARLY_MEASURES = {
     (date(1932, 6, 29), "4"): ("Initiated measure", "Travel expenses of state officials", ND_INIT, 153878, 54027),
     (date(1932, 6, 29), "5"): ("Initiated measure", "Five-year debt moratorium", ND_INIT, 92266, 111745),
     (date(1932, 6, 29), "6"): ("Initiated measure", "Crop mortgages", ND_INIT, 102149, 98135),
-    (date(1932, 6, 29), "7"): ("Initiated measure", "Salaries of county officials", ND_INIT, 144715, 55459),
+    (date(1932, 6, 29), "7"): ("Initiated measure", "Salaries of county officials", ND_INIT, 144175, 55459),
     (date(1932, 11, 8), "1"): ("Constitutional amendment", "Repeal of prohibition", ND_INIT, 134742, 99316),
     (date(1932, 11, 8), "2"): ("Initiated measure", "Three-year debt moratorium", ND_INIT, 103156, 142562),
     (date(1932, 11, 8), "3"): ("Initiated measure", "Repeal of the crop mortgage prohibition", ND_INIT, 111198, 123566),
@@ -2095,6 +2095,51 @@ ND_EARLY_MEASURES = {
     ),
     (date(1950, 6, 27), "5"): ("Referred measure", "Gasoline tax increase", ND_REF, 29045, 127016),
 }
+ND_EARLY_COLUMNS = {
+    (date(1930, 6, 25), "1"): (3, 0.2083, 0.2344, 0.2344, 0.2605, 0.3378, 0.7171),
+    (date(1930, 11, 4), "1"): (1, 0.7846, 0.81, 0.81, 0.8349, 0.2145, 0.5949),
+    (date(1932, 3, 15), "1"): (1, 0.4104, 0.4357, 0.4357, 0.4622, 0.3837, 0.7517),
+    (date(1932, 3, 15), "2"): (1, 0.4622, 0.4886, 0.4886, 0.515, 0.3837, 0.7517),
+    (date(1932, 3, 15), "4"): (1, 0.6213, 0.6483, 0.6483, 0.6746, 0.3837, 0.7517),
+    (date(1932, 3, 15), "5"): (1, 0.568, 0.5948, 0.5948, 0.6213, 0.3837, 0.7517),
+    (date(1932, 6, 29), "2"): (1, 0.6246, 0.6511, 0.6511, 0.6776, 0.3604, 0.7356),
+    (date(1932, 6, 29), "3"): (1, 0.6776, 0.7041, 0.7041, 0.7305, 0.3604, 0.7356),
+    (date(1932, 6, 29), "4"): (1, 0.889, 0.9155, 0.9155, 0.9433, 0.3604, 0.7356),
+    (date(1932, 6, 29), "5"): (1, 0.7839, 0.8096, 0.8096, 0.8354, 0.3604, 0.7356),
+    (date(1932, 6, 29), "6"): (1, 0.8354, 0.8625, 0.8625, 0.889, 0.3604, 0.7356),
+    (date(1932, 6, 29), "7"): (1, 0.7305, 0.7567, 0.7567, 0.7839, 0.3605, 0.7356),
+    (date(1933, 9, 22), "1"): (1, 0.3592, 0.3857, 0.3857, 0.4122, 0.3809, 0.745),
+    (date(1933, 9, 22), "2"): (1, 0.4122, 0.4387, 0.4387, 0.4653, 0.3809, 0.745),
+    (date(1933, 9, 22), "3"): (1, 0.6242, 0.6506, 0.6506, 0.6777, 0.3809, 0.745),
+    (date(1933, 9, 22), "5"): (1, 0.4653, 0.4918, 0.4918, 0.5182, 0.3809, 0.745),
+    (date(1933, 9, 22), "6"): (1, 0.5182, 0.5439, 0.5439, 0.5708, 0.3809, 0.745),
+    (date(1933, 9, 22), "7"): (1, 0.5708, 0.5984, 0.5984, 0.6242, 0.3809, 0.745),
+    (date(1934, 6, 27), "2"): (2, 0.8489, 0.8756, 0.8756, 0.9031, 0.3185, 0.7016),
+    (date(1934, 11, 6), "1"): (1, 0.8533, 0.8744, 0.8744, 0.896, 0.3754, 0.7492),
+    (date(1934, 11, 6), "2"): (1, 0.896, 0.9177, 0.9177, 0.9391, 0.3754, 0.7492),
+    (date(1936, 6, 24), "1"): (2, 0.7499, 0.7722, 0.7722, 0.7952, 0.381, 0.7526),
+    (date(1936, 6, 24), "3"): (2, 0.8413, 0.8644, 0.8644, 0.8874, 0.381, 0.7526),
+    (date(1936, 6, 24), "5"): (2, 0.9336, 0.9553, 0.9553, 0.9742, 0.381, 0.7526),
+    (date(1936, 6, 24), "6"): (2, 0.6597, 0.6828, 0.6828, 0.7047, 0.381, 0.7526),
+    (date(1936, 6, 24), "8"): (2, 0.4786, 0.4985, 0.4985, 0.5215, 0.381, 0.7526),
+    (date(1936, 6, 24), "9"): (2, 0.5215, 0.5446, 0.5446, 0.5676, 0.381, 0.7526),
+    (date(1936, 6, 24), "11"): (2, 0.6136, 0.6366, 0.6366, 0.6597, 0.381, 0.7526),
+    (date(1936, 11, 3), "1"): (2, 0.5676, 0.5925, 0.5925, 0.618, 0.3836, 0.7566),
+    (date(1938, 6, 28), "1"): (4, 0.2581, 0.2836, 0.2836, 0.3091, 0.3802, 0.7414),
+    (date(1938, 6, 28), "3"): (4, 0.3599, 0.3853, 0.3853, 0.4101, 0.3802, 0.7414),
+    (date(1938, 6, 28), "4"): (4, 0.4101, 0.4379, 0.4379, 0.4665, 0.3802, 0.7414),
+    (date(1938, 6, 28), "7"): (4, 0.5685, 0.5939, 0.5939, 0.6187, 0.3802, 0.7414),
+    (date(1938, 6, 28), "8"): (4, 0.6719, 0.699, 0.699, 0.7244, 0.3802, 0.7414),
+    (date(1938, 6, 28), "11"): (4, 0.8261, 0.8517, 0.8517, 0.8769, 0.3802, 0.7414),
+    (date(1938, 6, 28), "12"): (4, 0.8769, 0.9041, 0.9041, 0.9316, 0.3802, 0.7414),
+    (date(1938, 6, 28), "13"): (4, 0.6187, 0.6441, 0.6441, 0.6719, 0.3802, 0.7414),
+    (date(1938, 11, 8), "1"): (1, 0.8768, 0.9005, 0.9005, 0.9236, 0.3386, 0.7097),
+    (date(1938, 11, 8), "2"): (1, 0.9236, 0.9478, 0.9478, 0.9727, 0.3386, 0.7097),
+}
+ND_1932_SALARIES = (
+    " The Legislative Council lists 144,715 yes votes; the abstract prints 144,175 and its county column adds up to "
+    "that figure, so the abstract's figures are used."
+)
 ND_EARLY_METHOD = (
     "County returns from the North Dakota Secretary of State's official abstract of the votes, as posted with a "
     "machine-read text layer. Each county column ties exactly to the statewide total in the Legislative Council's "
@@ -3019,6 +3064,11 @@ LIMITED = (
 SCANNED = (
     " The county figures were read from the scanned canvass book by a vision model and checked against the book's "
     "printed state totals; the box shown on each figure is approximate."
+)
+ND_EARLY_SCANNED = (
+    " Here the text layer was unreadable, so the county figures were read from the page images, twice by a vision "
+    "model and once by OCR. Each figure is one that at least two reads agree on, and each column adds up exactly to "
+    "the printed total. The box shown on each figure is approximate."
 )
 GA_PRELIMINARY = (
     " The county figures are the state's page as captured on November 6 or 7, 2010, before certification; the "
@@ -7677,8 +7727,21 @@ def north_dakota_early() -> list[dict[str, object]]:
         counties = group.filter(pl.col("county") != "statewide")
         if counties.height not in (0, 53) or (group["yes"].sum(), group["no"].sum()) != (yes, no):
             raise ValueError(f"ND {day} measure {number}: does not tie to {yes:,} and {no:,}")
-        for row in group.iter_rows(named=True):
-            for answer, votes in (("YES", row["yes"]), ("NO", row["no"])):
+        column = ND_EARLY_COLUMNS.get((day, str(number)))
+        for line, row in enumerate(group.iter_rows(named=True)):
+            for side, (answer, votes) in enumerate((("YES", row["yes"]), ("NO", row["no"]))):
+                box = {}
+                if column is not None and row["county"] != "statewide":
+                    page, top, bottom = column[0], column[5], column[6]
+                    middle = top + line * (bottom - top) / 53
+                    half = (bottom - top) / 106
+                    box = {
+                        "page": page,
+                        "x0": column[1 + 2 * side],
+                        "y0": middle - half,
+                        "x1": column[2 + 2 * side],
+                        "y1": middle + half,
+                    }
                 rows.append(
                     {
                         "state": "ND",
@@ -7692,6 +7755,7 @@ def north_dakota_early() -> list[dict[str, object]]:
                         "title": title,
                         "kind": kind,
                     }
+                    | box
                 )
     if len({(row["day"], row["number"]) for row in rows}) != len(ND_EARLY_MEASURES):
         raise ValueError("ND 1918-1950: measures missing from nd_measures_early.tsv")
@@ -8830,8 +8894,13 @@ def emit() -> Path:
                 + (MAINE if state == "ME" else "")
                 + (OVERSEAS if (rows["code"] == "ME:uocava").any() else "")
                 + (LIMITED if (rows["code"] == "RI:limited").any() else "")
-                + (SCANNED if rows["page"].is_not_null().any() and state not in ("AL", "MS", "CA") else "")
+                + (
+                    (ND_EARLY_SCANNED if state == "ND" else SCANNED)
+                    if rows["page"].is_not_null().any() and state not in ("AL", "MS", "CA")
+                    else ""
+                )
                 + (GA_PRELIMINARY if preliminary else "")
+                + (ND_1932_SALARIES if state == "ND" and day == date(1932, 6, 29) and entry["number"] == "7" else "")
                 + (AL_2006_NOTE if (rows["url"] == AL_2006_PRIMARY).any() else "")
                 + (NM_2003_NOTE if (rows["url"] == NM_2003).any() else "")
                 + (
@@ -8875,7 +8944,8 @@ def emit() -> Path:
                 kind="won",
             )
             if result_set in cs.minted or (
-                state == "MS" and day.year == 2002 and held_values.get(result_set) != rows.height
+                (state == "MS" and day.year == 2002 or state == "ND" and day.year < 1952)
+                and held_values.get(result_set) != rows.height
             ):
                 for row in rows.iter_rows(named=True):
                     unit = cs.unit(
