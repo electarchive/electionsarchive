@@ -20177,16 +20177,6 @@ export const elections = {
                         join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
                         where e.id = ${election}::uuid limit 1
                       )
-                      , das as materialized (
-                        select a.id, a.k from area a
-                        where a.id = any(array(
-                          select c.district_area_id from contest c
-                          where c.election_id = any(${sql.param(chunk)}::uuid[]) and c.kind = 'office' and c.district_area_id is not null
-                          union
-                          select pt.area_id from polity_territory pt
-                          where pt.polity_id in (select k.polity_id from election k where k.id = any(${sql.param(chunk)}::uuid[]))
-                        ))
-                      )
                       , base0 as materialized (
                       select x.n, s.path, k.date_from as dt, w.person, w.party, w.label, w.color, w.area, w.led, w.votes, w.office
                       from unnest(${sql.param(chunk)}::uuid[]) with ordinality as x(id, n)
@@ -20213,7 +20203,7 @@ export const elections = {
                             order by pt.valid @> k.date_from desc limit 1
                           )) as id
                         ) ar
-                        left join das da on da.id = ar.id
+                        left join area da on da.id = ar.id
                         cross join lateral (
                           select json_agg(json_build_array(coalesce(qm.into_id, q.party_id), qp.person, t.value)) as votes,
                             array_agg(q.id) as options, array_agg(qp.person) as persons,
