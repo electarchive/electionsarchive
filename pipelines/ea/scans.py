@@ -782,7 +782,9 @@ def cells(
                 current, kept = carry.get(number), []
                 for row in rows:
                     if not any(text.strip() for text in row["values"]):
-                        current = row["label"]
+                        current = re.sub(
+                            r"\s*[—–-]+\s*(continued|concluded)\.?\s*$", "", row["label"], flags=re.IGNORECASE
+                        )
                     elif re.fullmatch(r"(county |grand )?totals?( county)?", slug(row["label"])):
                         if current is None:
                             errors[number] = f"{custom}: a Totals row comes before any county heading"
@@ -1251,6 +1253,8 @@ def finalize(
                 chosen, how = two, "agreed"
             elif three is not None and not three.errors and three.total in (three.printed, three.official):
                 chosen, how = three, "third"
+            elif name in accepted and three is not None and not three.errors:
+                chosen, how = three, "review"
             elif two is not None and three is not None:
                 chosen = vote(one, two, three)
                 how = "voted" if chosen.status == "tied" else "review"
