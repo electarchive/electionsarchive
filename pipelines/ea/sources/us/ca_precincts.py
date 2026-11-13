@@ -9,6 +9,7 @@ from ea.changeset import Changeset, slug
 from ea.store import connect
 
 SUFFIXES = {"jr", "sr", "ii", "iii", "iv", "junior", "senior"}
+TWIN = "Withdrawn: the same precinct returns are this contest's default set, which a merge of two copies of the contest left beside it."
 
 
 def emit(
@@ -253,6 +254,29 @@ def emit(
             for _, option, label, *_ in found:
                 if label in labels:
                     cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected", seats=None)
+        for twin, election, contest, stage, kind, set_source, completeness in conn.execute(
+            """select r.id, r.election_id, r.contest_id, r.stage, r.kind, r.source_id, r.completeness from result_set r
+               join changeset g on g.id = r.changeset_id
+               where g.pipeline = %s and r.status = 'active' and not r.is_default and exists (
+                 select from result_set o join changeset h on h.id = o.changeset_id
+                 where o.contest_id = r.contest_id and o.id <> r.id and o.source_id = r.source_id
+                   and o.status = 'active' and o.is_default and h.pipeline = %s)""",
+            [pipeline, pipeline],
+        ).fetchall():
+            report["withdrawn twin of its own default"] = report.get("withdrawn twin of its own default", 0) + 1
+            cs.add(
+                "result_set",
+                id=twin,
+                election_id=election,
+                contest_id=contest,
+                stage=stage,
+                kind=kind,
+                status="withdrawn",
+                source_id=set_source,
+                is_default=False,
+                completeness=completeness,
+            )
+            cs.add("note", entity_id=twin, kind="caveat", body_md=TWIN)
         print(report)
         if values:
             cs.frame("result_value", pl.concat(values))
