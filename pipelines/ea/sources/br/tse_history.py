@@ -1,6 +1,7 @@
 import csv
 import io
 import json
+import multiprocessing
 import os
 import shutil
 import time
@@ -39,7 +40,7 @@ POLLING_PLACES = {
     year: f"{TSE}eleitorado_locais_votacao/eleitorado_local_votacao_{year}.zip"
     for year in (2010, 2014, 2018, 2022, 2026)
 }
-SECTION_YEARS = (2010, 2014, 2018, 2026)
+SECTION_YEARS = (2002, 2006, 2010, 2014, 2018, 2026)
 SECTIONS = {
     year: {key: f"{TSE}votacao_secao/votacao_secao_{year}_{key}.zip" for key in ("BR", *UFS)} for year in SECTION_YEARS
 }
@@ -53,6 +54,8 @@ SECTION_NAMES = {
     "8": "district deputies",
 }
 SECTION_OFFICES = {
+    2002: ("1", "3", "5"),
+    2006: ("1", "3", "5"),
     2010: ("1", "3", "5"),
     2014: ("1", "3", "5"),
     2018: ("1", "3", "5"),
@@ -288,9 +291,10 @@ def describe(frame: pl.LazyFrame, year: int, roster: pl.DataFrame) -> pl.DataFra
             .otherwise(pl.col("uf"))
             .alias("uf"),
             birth=pl.col("DT_NASCIMENTO").str.to_date("%d/%m/%Y", strict=False),
-            gender=pl.col("DS_GENERO").replace_strict(
-                {"MASCULINO": "male", "FEMININO": "female"}, default=None, return_dtype=pl.String
-            ),
+            gender=pl.when(pl.col("DS_GENERO") == "MASCULINO")
+            .then(pl.lit("male"))
+            .when(pl.col("DS_GENERO") == "FEMININO")
+            .then(pl.lit("female")),
             outcome=pl.when(pl.col("status").is_in(ELECTED) & ~pl.col("situation").is_in(WITHDRAWN))
             .then(pl.lit("elected"))
             .when(pl.col("status") == "2º TURNO")
@@ -561,8 +565,13 @@ def parse() -> None:
     )
     excess.write_parquet(PARSED / "excess.parquet")
     del frames, candidates, votes, legends, detail, places
+    context = multiprocessing.get_context("spawn")
     for year in SECTION_YEARS:
-        sections(year)
+        child = context.Process(target=sections, args=(year,))
+        child.start()
+        child.join()
+        if child.exitcode:
+            raise RuntimeError(f"the {year} section load failed with exit code {child.exitcode}")
 
 
 def unpack(url: str, suffix: str = ".csv") -> list[Path]:
@@ -604,6 +613,20 @@ def numbered(year: int, voted: pl.DataFrame) -> pl.DataFrame:
         .filter(pl.col("held") | ~pl.col("held").any().over("contest", "choice"))
         .drop("held")
     )
+    if year <= 2006:
+        offices = list(SECTION_OFFICES[year])
+        held = (
+            pl.read_parquet(PARSED / "candidates.parquet")
+            .filter(
+                pl.col("contest").str.starts_with(f"{year}:")
+                & pl.col("contest").str.split(":").list.get(2).is_in(offices)
+            )
+            .select("contest", choice="number", sequence="candidate")
+            .join(pairs.select("contest", "choice"), on=["contest", "choice"], how="anti")
+            .sort(pl.col("sequence").cast(pl.Int64))
+            .unique(["contest", "choice"], keep="last")
+        )
+        pairs = pl.concat([pairs, held.select(pairs.columns)])
     ambiguous = pairs.filter(pairs.select("contest", "choice").is_duplicated()).join(
         voted, on=["contest", "choice"], how="semi"
     )
@@ -699,6 +722,7 @@ def sections(year: int) -> None:
                     field: pl.col(column).cast(pl.Int64) if column in present else pl.lit(0, pl.Int64)
                     for field, column in counts.items()
                 },
+                declared=pl.lit(True),
                 opened=pl.col("ST_SECAO_INSTALADA") != "Não" if "ST_SECAO_INSTALADA" in present else pl.lit(True),
                 annulled=pl.col("ST_SECAO_ANULADA") == "Sim" if "ST_SECAO_ANULADA" in present else pl.lit(False),
             )
@@ -708,12 +732,39 @@ def sections(year: int) -> None:
     sheet = pl.concat(frames)
     if sheet.select("contest", "section").is_duplicated().any():
         raise ValueError("a section's detail repeats")
-
     keys = ["contest", "section", "kind"]
+    summed = tally.group_by(keys).agg(pl.col("votes").sum()).collect(engine="streaming")
+    undeclared = (
+        summed.group_by("contest", "section")
+        .agg(pl.col("votes").sum())
+        .join(sheet.select("contest", "section"), on=["contest", "section"], how="anti")
+        .with_columns(municipality=pl.col("section").str.split(":").list.get(0))
+    )
+    if undeclared.height:
+        places = sheet.unique("municipality").select("municipality", "uf", "label")
+        sheet = pl.concat(
+            [
+                sheet,
+                undeclared.join(places, on="municipality", how="left").select(
+                    "contest",
+                    "uf",
+                    "municipality",
+                    "label",
+                    zone=pl.col("section").str.split(":").list.get(1).cast(pl.Int64),
+                    number=pl.col("section").str.split(":").list.get(2).cast(pl.Int64),
+                    section="section",
+                    **{field: pl.col("votes") if field == "null" else pl.lit(0, pl.Int64) for field in counts},
+                    declared=pl.lit(False),
+                    opened=pl.lit(True),
+                    annulled=pl.lit(True),
+                ),
+            ],
+            how="vertical_relaxed",
+        )
+
     expected = sheet.with_columns(null=pl.col("null") + pl.col("separate")).unpivot(
         on=["nominal", "blank", "null", "legend"], index=["contest", "section"], variable_name="kind", value_name="sum"
     )
-    summed = tally.group_by(keys).agg(pl.col("votes").sum()).collect(engine="streaming")
     mismatched = expected.join(summed, on=keys, how="left").filter(pl.col("sum") != pl.col("votes").fill_null(0))
     unmatched = summed.join(expected, on=keys, how="anti")
     scope = list(sheet["contest"].unique())
@@ -827,18 +878,35 @@ def sections(year: int) -> None:
         .select("contest", "municipality", *measures)
         .join(totals, on=["contest", "municipality"], how="full", coalesce=True, suffix="_sections")
         .join(rejected, on=["contest", "municipality"], how="left")
-        .with_columns(rejected=pl.col("rejected").fill_null(0))
+        .join(
+            undeclared.select("contest", "municipality").unique().with_columns(lacking=pl.lit(True)),
+            on=["contest", "municipality"],
+            how="left",
+        )
+        .with_columns(rejected=pl.col("rejected").fill_null(0), lacking=pl.col("lacking").fill_null(False))
         .filter(
             pl.any_horizontal(
-                pl.col(field).fill_null(-1) != pl.col(f"{field}_sections").fill_null(-1)
+                pl.when(pl.col("lacking"))
+                .then(pl.col(field).fill_null(-1) < pl.col(f"{field}_sections").fill_null(-1))
+                .otherwise(pl.col(field).fill_null(-1) != pl.col(f"{field}_sections").fill_null(-1))
                 for field in measures
                 if field not in ("null", "registered")
             )
             | ~(pl.col("null") - pl.col("null_sections")).is_between(0, pl.col("rejected"))
-            | ~(pl.col("registered") - pl.col("registered_sections")).is_between(0, SHORTFALL)
+            | ~(pl.col("registered") - pl.col("registered_sections")).is_between(
+                0, pl.col("registered") if year <= 2006 else SHORTFALL
+            )
         )
     )
     differ = differ.join(missing, on=["contest", "candidate"], how="anti")
+    shared = (
+        pl.read_parquet(PARSED / "candidates.parquet")
+        .filter(pl.col("contest").is_in(scope))
+        .filter(pl.struct("contest", "number").is_duplicated())
+        .select("contest", "candidate")
+        .join(rolled.select("contest", "candidate").unique(), on=["contest", "candidate"], how="anti")
+    )
+    differ = differ.join(shared, on=["contest", "candidate"], how="anti")
     if differ.height or apart.height:
         raise ValueError(
             f"section sums differ from the municipal totals: {differ.head(10)} {apart.select('contest', 'municipality', *(pl.col(field) - pl.col(f'{field}_sections') for field in measures)).head(10)}"
@@ -846,7 +914,10 @@ def sections(year: int) -> None:
     full = scan(year, "roster")
     extra = (
         describe(
-            full.filter(pl.col("SQ_CANDIDATO").is_in(missing["candidate"].implode())),
+            full.filter(
+                pl.col("SQ_CANDIDATO").is_in(missing["candidate"].implode())
+                & pl.col("CD_CARGO").is_in(SECTION_OFFICES[year])
+            ),
             year,
             full.select("SQ_CANDIDATO", "DT_NASCIMENTO", "DS_GENERO").unique("SQ_CANDIDATO").collect(),
         )
@@ -894,6 +965,7 @@ def sections(year: int) -> None:
                 value="votes",
             ),
             sheet.lazy()
+            .filter("declared")
             .unpivot(on=["registered", "voters"], index=["contest", "section"])
             .select(
                 "contest",
@@ -908,20 +980,21 @@ def sections(year: int) -> None:
     values = values.group_by("contest", "section", "candidate", "measure").agg(pl.col("value").sum())
 
     registry: list[pl.DataFrame] = []
-    with zipfile.ZipFile(raw.cached(SOURCE, POLLING_PLACES[year]).path) as archive:
-        for member in archive.namelist():
-            if member.endswith(".csv"):
-                registry.append(
-                    pl.read_csv(
-                        io.TextIOWrapper(archive.open(member), encoding="latin-1").read().encode(),
-                        separator=";",
-                        infer_schema=False,
-                        columns=["NR_TURNO", "CD_MUNICIPIO", "NR_ZONA", "NR_SECAO", "DS_TIPO_SECAO_AGREGADA"]
-                        + list(COORDINATES),
+    registry_columns = ["NR_TURNO", "CD_MUNICIPIO", "NR_ZONA", "NR_SECAO", "DS_TIPO_SECAO_AGREGADA", *COORDINATES]
+    if year in POLLING_PLACES:
+        with zipfile.ZipFile(raw.cached(SOURCE, POLLING_PLACES[year]).path) as archive:
+            for member in archive.namelist():
+                if member.endswith(".csv"):
+                    registry.append(
+                        pl.read_csv(
+                            io.TextIOWrapper(archive.open(member), encoding="latin-1").read().encode(),
+                            separator=";",
+                            infer_schema=False,
+                            columns=registry_columns,
+                        )
                     )
-                )
     points = (
-        pl.concat(registry)
+        (pl.concat(registry) if registry else pl.DataFrame(schema=dict.fromkeys(registry_columns, pl.String)))
         .filter(pl.col("DS_TIPO_SECAO_AGREGADA") == "Principal")
         .select(
             "NR_TURNO",
@@ -1021,7 +1094,11 @@ def emit() -> Path:
                 )
                 for file in ("roster",) if kind == "candidates" else ("candidates", "parties", "detail"):
                     cs.artifact(raw.cached(SOURCE, FILES[(year, file)]), source)
-        for url in [*SECTIONS[section_year].values(), SECTION_DETAIL[section_year], POLLING_PLACES[section_year]]:
+        for url in [
+            *SECTIONS[section_year].values(),
+            SECTION_DETAIL[section_year],
+            *([POLLING_PLACES[section_year]] if section_year in POLLING_PLACES else []),
+        ]:
             cs.artifact(raw.cached(SOURCE, url), results[section_year])
         feed = None
         if votes.filter(pl.col("contest").str.starts_with("2026:2:")).height:
