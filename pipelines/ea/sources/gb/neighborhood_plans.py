@@ -51,6 +51,9 @@ PAGE_PREFIXES = (
     "https://longhoughton-pc.gov.uk/news/",
     "https://www.york.gov.uk/planning-policy/",
     "https://www.york.gov.uk/elections-1/",
+    "https://www.hinckley-bosworth.gov.uk/info/",
+    "https://www.southderbyshire.gov.uk/our-services/",
+    "https://www.north-herts.gov.uk/baldock-",
 )
 HANDWRITTEN = (
     "https://info.ambervalley.gov.uk/docarc/",
@@ -189,7 +192,7 @@ def printed(url: str) -> tuple[str, bool, set[str]]:
         text = html.unescape(re.sub(r"<[^>]+>", "", xml))
     else:
         text = html.unescape(re.sub(r"(?s)<(script|style).*?</\1>|<[^>]+>", " ", path.read_text()))
-    text = re.sub(r"\s+", " ", text)
+    text = re.sub(r"\s+", " ", text).replace("Two votes", "2 votes")
     return text, pdf, set(re.findall(r"\d+(?:\.\d+)?", re.sub(r"(?<=\d),(?=\d{3}\b)", "", text)))
 
 
