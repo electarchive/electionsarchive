@@ -5548,15 +5548,34 @@ async function places(
           listed.map((row) => row.k),
         )
       : null;
+  const surname = (label: string | null) =>
+    (label ?? "")
+      .toLowerCase()
+      .replaceAll(/\b(jr|sr|ii|iii|iv)\b\.?/g, "")
+      .match(/[\p{L}'-]+/gu)
+      ?.at(-1) ?? null;
   const indexed = (picks: Array<Pick>) =>
     picks.flatMap((pick) => {
-      const index = tabulated.legend.findIndex((item) =>
+      let index = tabulated.legend.findIndex((item) =>
         pick.person != null
           ? item.person === pick.person
           : pick.kind === "candidate"
             ? item.key === `party:${pick.party ?? ""}`
             : item.key.startsWith(`kind:${pick.kind}`),
       );
+      const found = index === -1 ? null : tabulated.legend[index];
+      if (pick.person != null && found?.person != null) {
+        const named = surname(found.label);
+        const first = tabulated.legend.findIndex(
+          (item) => item.person != null && surname(item.label) === named,
+        );
+        index = first === -1 ? index : first;
+      } else if (pick.person != null) {
+        const named = surname(pick.label);
+        index = tabulated.legend.findIndex(
+          (item) => item.person != null && surname(item.label) === named,
+        );
+      }
       return index === -1 ? [] : [[index, pick.votes] as [number, number]];
     });
   const delegated = (k: number) => {
