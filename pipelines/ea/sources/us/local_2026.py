@@ -13297,6 +13297,8 @@ def emit_state(frame: pl.DataFrame, state: str, snapshot: Snapshot, offices: Off
                             reason="This name belongs to another polity's election",
                         )
             chained = previous is not None and held_on.year == DAY.year
+            if chained and tail.startswith("LA:") and (DAY - held_on).days > 70:
+                chained = False
             if tail in first_rounds:
                 previous, chained = first_rounds[tail], True
             if str(group["feed"][0]).endswith("-rcv"):
