@@ -9259,7 +9259,12 @@ export const contests = {
                             or exists (
                               select from area_geometry gf join area_geometry gt on gf.geom && gt.geom
                               where gf.area_id = f.area_id and gt.area_id = t.area_id
-                                and ST_Area(ST_Intersection(gf.geom, gt.geom)) > 0.05 * least(ST_Area(gf.geom), ST_Area(gt.geom))
+                                and case
+                                  when (ST_Covers(gf.geom, gt.geom) or ST_Covers(gt.geom, gf.geom))
+                                    and least(ST_Area(gf.geom), ST_Area(gt.geom)) > 0 then true
+                                  when not ST_Intersects(gf.geom, gt.geom) then false
+                                  else ST_Area(ST_Intersection(gf.geom, gt.geom)) > 0.05 * least(ST_Area(gf.geom), ST_Area(gt.geom))
+                                end
                             )
                           )
                         where f.area_id = later.id and f.role = 'from'
@@ -9336,7 +9341,12 @@ export const contests = {
                             or exists (
                               select from area_geometry gf join area_geometry gt on gf.geom && gt.geom
                               where gf.area_id = f.area_id and gt.area_id = t.area_id
-                                and ST_Area(ST_Intersection(gf.geom, gt.geom)) > 0.05 * least(ST_Area(gf.geom), ST_Area(gt.geom))
+                                and case
+                                  when (ST_Covers(gf.geom, gt.geom) or ST_Covers(gt.geom, gf.geom))
+                                    and least(ST_Area(gf.geom), ST_Area(gt.geom)) > 0 then true
+                                  when not ST_Intersects(gf.geom, gt.geom) then false
+                                  else ST_Area(ST_Intersection(gf.geom, gt.geom)) > 0.05 * least(ST_Area(gf.geom), ST_Area(gt.geom))
+                                end
                             )
                           )
                         where t.area_id = earlier.id and t.role = 'to'
