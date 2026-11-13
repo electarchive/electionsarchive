@@ -1561,6 +1561,7 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
             closed *
             settles *
             Math.min(1, recent / (MODEL.late.hush * tail)) *
+            (1 - drained * fade) *
             Math.exp(scatter * gaussian(random) - scatter ** 2 / 2);
         }
       }
