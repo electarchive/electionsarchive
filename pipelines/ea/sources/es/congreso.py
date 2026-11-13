@@ -10,6 +10,7 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
+from ea.names import display
 from ea.sources.es.infoelectoral import APLIEXTR, PAGE, records
 from ea.store import DATA, connect
 
@@ -589,7 +590,7 @@ def emit() -> Path:
                     tag = f"{key}:{person_row['list']}:{person_row['kind']}{person_row['position']}"
                     person = cs.key(f"{SOURCE}.person", tag)
                     cs.add("person", id=person, gender={"M": "male", "F": "female"}.get(person_row["sex"]))
-                    name(person, full)
+                    name(person, display(full, "es"))
                     candidacy = cs.key(f"{SOURCE}.candidacy", tag)
                     cs.add(
                         "candidacy",
