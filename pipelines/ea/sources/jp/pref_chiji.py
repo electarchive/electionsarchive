@@ -16,7 +16,7 @@ from ea.sources.jp import mic_chiji
 from ea.store import DATA, connect
 
 SOURCE = "jp.pref_chiji"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 WAYBACK = "https://web.archive.org/web/{stamp}id_/{url}"
 TOCHIGI = "https://www.pref.tochigi.lg.jp/senkyo"
@@ -70,6 +70,14 @@ RECORDS: dict[str, tuple[str, str]] = {
     "2021-09-05:茨城県": (
         f"{IBARAKI}/2021chijisen/documents/d_kaihyo_k_50_05.xlsx",
         f"{IBARAKI}/2021chijisen/documents/d_tohyo_k_50_1.xlsx",
+    ),
+    "2017-08-27:茨城県": (
+        f"{IBARAKI}/2017kenchiji/documents/d_kaihyo_k_50_05_teisei.xls",
+        f"{IBARAKI}/2017kenchiji/documents/d_tohyo_k_50_1.xls",
+    ),
+    "2013-09-08:茨城県": (
+        f"{IBARAKI}/2013chijisen/documents/d_kaihyo_k_50_02.xls",
+        f"{IBARAKI}/2013chijisen/documents/d_tohyo_k_50_1.xls",
     ),
     "2020-11-15:栃木県": (
         WAYBACK.format(stamp="20230308052226", url=f"{TOCHIGI}/r02chiji/file/DS_KAIHYO_K_50.xls"),
@@ -170,6 +178,8 @@ def excel_registered(path: Path) -> dict[str, tuple[str, str]]:
 
 
 def ibaraki_spread(values: list[str], n: int) -> list[str]:
+    if len(values) == n + 9:
+        values = [*values[: n + 1], "0", *values[n + 1 :]]
     cast = number(values[n + 5])
     unreturned = sum(number(v) for v in values[n + 6 : n + 9])
     return [x for v in values[:n] for x in (v, "")] + values[n : n + 6] + [str(unreturned), str(cast + unreturned)]
@@ -181,7 +191,7 @@ def ibaraki_votes(path: Path) -> tuple[list[str], list[dict[str, Any]], dict[str
     n = header.index("得票総数") - 2
     places, total = [], None
     for row in rows:
-        if len(row) > n + 10 and PLACE.match(row[0]) and row[1] == "*":
+        if len(row) > n + 9 and PLACE.match(row[0]) and row[1] == "*":
             places.append({"place": row[0], **counts(ibaraki_spread(row[2:], n), n)})
         elif row and row[0] == "県計":
             total = counts(ibaraki_spread(row[1:], n), n)
@@ -194,7 +204,7 @@ def ibaraki_registered(path: Path) -> dict[str, tuple[str, str]]:
     return {
         row[0]: (str(number(row[3])), str(number(row[6])))
         for row in cells(path)
-        if len(row) >= 7 and PLACE.match(row[0]) and row[1].isdigit()
+        if len(row) >= 7 and PLACE.match(row[0]) and re.match(r"^[\d,]+$", row[1])
     }
 
 
@@ -234,9 +244,9 @@ def pdf_registered(path: Path) -> dict[str, tuple[str, str]]:
 
 
 READERS = {
-    ".xls": (excel_votes, excel_registered),
-    ".xlsx": (ibaraki_votes, ibaraki_registered),
-    ".pdf": (pdf_votes, pdf_registered),
+    "栃木県": (excel_votes, excel_registered),
+    "茨城県": (ibaraki_votes, ibaraki_registered),
+    "和歌山県": (pdf_votes, pdf_registered),
 }
 
 
@@ -247,7 +257,7 @@ def parse() -> None:
     rows = []
     for key, (votes_url, turnout_url) in RECORDS.items():
         votes_path, turnout_path = raw.cached(SOURCE, votes_url).path, raw.cached(SOURCE, turnout_url).path
-        votes_reader, turnout_reader = READERS[votes_path.suffix]
+        votes_reader, turnout_reader = READERS[key.split(":")[1]]
         names, places, total = votes_reader(votes_path)
         registered = turnout_reader(turnout_path)
         official = elections.filter(pl.col("key") == key).row(0, named=True)
