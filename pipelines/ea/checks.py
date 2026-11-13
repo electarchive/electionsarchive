@@ -516,27 +516,49 @@ def _references(conn: Connection, stage: Stage) -> list[tuple[str, sql.Composed]
                 )
             )
     if "result_set" in stage.tables:
+        sizes = dict(
+            conn.execute(
+                """select p.relname, sum(greatest(c.reltuples, 0))
+                   from pg_class p left join pg_inherits i on i.inhparent = p.oid
+                   join pg_class c on c.oid = coalesce(i.inhrelid, p.oid)
+                   where p.relnamespace = 'public'::regnamespace and p.relname = any(%s)
+                   group by 1""",
+                [list(FACTS)],
+            ).fetchall()
+        )
         for table, column, parent in references(conn):
             if table in FACTS and parent != "result_set":
                 queries.append(
                     (
                         "reference.stranded",
                         sql.SQL(
-                            """select null::uuid, r.id, jsonb_build_object('table', {table}, 'column', {column}, 'rows', count(*))
-                               from {sets} s join public.result_set r on r.id = s.id
-                               join public.{facts} t on t.result_set_k = r.k
-                               where t.{key} <> 0 and not exists (select from public.{parent} p where p.k = t.{key}){fresh}
-                                 and not exists (
+                            """with sets as materialized (
+                                 select r.id, r.k from {sets} s join public.result_set r on r.id = s.id
+                                 where not exists (
                                    select from public.flag f where f.result_set_id = r.id and f.check_code = 'reference.stranded'
-                                     and f.details ->> 'table' = {table} and f.details ->> 'column' = {column})
-                               group by r.id"""
+                                     and f.details ->> 'table' = {table} and f.details ->> 'column' = {column}){fresh}
+                               )
+                               select null::uuid, r.id, jsonb_build_object('table', {table}, 'column', {column}, 'rows', x.n)
+                               from sets r {stranded}"""
                         ).format(
+                            stranded=sql.SQL(
+                                """cross join lateral (
+                                     select count(*) n from public.{facts} t
+                                     where t.result_set_k = r.k and t.{key} <> 0
+                                       and not exists (select from public.{parent} p where p.k = t.{key})
+                                   ) x where x.n > 0"""
+                                if sizes.get(table, 0) > 10_000_000
+                                else """join (
+                                     select r.id, count(*) n from sets r join public.{facts} t on t.result_set_k = r.k
+                                     where t.{key} <> 0 and not exists (select from public.{parent} p where p.k = t.{key})
+                                     group by r.id
+                                   ) x on x.id = r.id"""
+                            ).format(
+                                facts=sql.Identifier(table), key=sql.Identifier(column), parent=sql.Identifier(parent)
+                            ),
                             table=sql.Literal(table),
                             column=sql.Literal(column),
                             sets=stage.staged("result_set"),
-                            facts=sql.Identifier(table),
-                            key=sql.Identifier(column),
-                            parent=sql.Identifier(parent),
                             fresh=sql.SQL(" and not exists (select from ({}) x where x.k = r.k)").format(
                                 stage.replaced(table)
                             )
@@ -850,10 +872,12 @@ def _scope(stage: Stage) -> list[tuple[str, sql.Composed]]:
                                   jsonb_build_object('table', {table}, 'scheme', s.scheme, 'value', s.value,
                                                      'pipeline', c.pipeline)
                            from {staged} s
-                           join public.external_id p using (scheme, value)
+                           cross join lateral (
+                             select p.changeset_id from public.external_id p
+                             where p.scheme = s.scheme and p.value = s.value and p.entity_id <> s.entity_id limit 1
+                           ) p
                            join changeset c on c.id = p.changeset_id
-                           where c.pipeline is distinct from {pipeline} and c.pipeline <> 'contrib'
-                             and p.entity_id <> s.entity_id"""
+                           where c.pipeline is distinct from {pipeline} and c.pipeline <> 'contrib'"""
                     ).format(
                         table=sql.Literal(table), staged=stage.staged(table), pipeline=sql.Literal(stage.pipeline)
                     ),
