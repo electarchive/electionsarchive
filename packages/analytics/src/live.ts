@@ -184,6 +184,7 @@ const MODEL = {
     base: 0.002,
     window: 2,
     carry: 1,
+    half: 1,
     amount: 1.2,
     small: 0.03,
     weigh: 1,
@@ -1129,7 +1130,22 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
   );
   const recent =
     isLate && since != null && latest > 0
-      ? Math.max(0, latest - sum(since.totals)) / latest
+      ? sum(
+          shown
+            .slice(shown.indexOf(since))
+            .map((frame, index, list) =>
+              index === 0
+                ? 0
+                : Math.max(
+                    0,
+                    sum(frame.totals) - sum(list[index - 1]!.totals),
+                  ) *
+                  0.5 **
+                    (Math.max(0, Date.parse(stamp) - Date.parse(frame.at)) /
+                      86_400_000 /
+                      MODEL.late.half),
+            ),
+        ) / latest
       : 0;
   const planned = Math.min(
     tail *
