@@ -196,6 +196,8 @@ const MODEL = {
     scatter: 1.2,
     brisk: 0.25,
     hush: 0.02,
+    idle: 0.5,
+    trickle: 0.01,
   },
   reported: { common: 0.9, own: 0.3, capped: 0.99 },
   channel: { turnout: 0.35, prior: 0.08, sigma: 1.5, unlisted: 0.02 },
@@ -1169,6 +1171,17 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
     Date.parse(stamp) - MODEL.late.window * 86_400_000,
   );
   const since = shown.findLast((frame) => Date.parse(frame.at) <= lookback);
+  const moved = shown.findLast(
+    (frame, index) =>
+      index > 0 &&
+      sum(frame.totals) - sum(shown[index - 1]!.totals) >
+        MODEL.late.trickle * tail * sum(frame.totals),
+  );
+  const quiet =
+    moved == null ? 0 : Math.max(0, Date.parse(stamp) - Date.parse(moved.at));
+  const idled =
+    Date.parse(stamp) -
+    Math.min(quiet, Math.max(0, 2 * MODEL.late.idle * 86_400_000 - quiet));
   const recent =
     isLate && since != null && latest > 0
       ? sum(
@@ -1181,10 +1194,7 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
             return (
               Math.max(0, sum(frame.totals) - sum(list[index - 1]!.totals)) *
               Math.min(1, (end - lookback) / Math.max(1, end - begin)) *
-              0.5 **
-                (Math.max(0, Date.parse(stamp) - end) /
-                  86_400_000 /
-                  MODEL.late.half)
+              0.5 ** (Math.max(0, idled - end) / 86_400_000 / MODEL.late.half)
             );
           }),
         ) / latest
