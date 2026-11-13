@@ -5,12 +5,12 @@ import unicodedata
 import zipfile
 from datetime import date, timedelta
 from pathlib import Path
-from uuid import UUID
+from uuid import UUID, uuid5
 
 import polars as pl
 
 from ea import raw
-from ea.changeset import Changeset
+from ea.changeset import NAMESPACE, Changeset
 from ea.sources.br.tse import UFS, proper
 from ea.sources.br.tse_history import ELECTED, WITHDRAWN, party_key
 from ea.store import DATA, connect
@@ -146,7 +146,15 @@ def parse() -> None:
             ]
         ).unique(["municipality", "round"])
         roster = (
-            scan(year, "roster").select("SQ_CANDIDATO", "DT_NASCIMENTO", "DS_GENERO").unique("SQ_CANDIDATO").collect()
+            scan(year, "roster")
+            .select(
+                municipality=pl.col("SG_UE").str.zfill(5),
+                candidate="SQ_CANDIDATO",
+                birth="DT_NASCIMENTO",
+                gender="DS_GENERO",
+            )
+            .unique(["municipality", "candidate"])
+            .collect()
         )
         everyone = (
             candidates.unique(["NR_TURNO", "CD_CARGO", "CD_MUNICIPIO", "SQ_CANDIDATO"])
@@ -182,10 +190,10 @@ def parse() -> None:
             )
             .unique(["contest", "candidate"])
             .collect()
-            .join(roster, left_on="candidate", right_on="SQ_CANDIDATO", how="left")
+            .join(roster, on=["municipality", "candidate"], how="left")
             .with_columns(
-                birth=pl.col("DT_NASCIMENTO").str.to_date("%d/%m/%Y", strict=False),
-                gender=pl.col("DS_GENERO").replace_strict(
+                birth=pl.col("birth").str.to_date("%d/%m/%Y", strict=False),
+                gender=pl.col("gender").replace_strict(
                     {"MASCULINO": "male", "FEMININO": "female"}, default=None, return_dtype=pl.String
                 ),
                 outcome=pl.when(pl.col("status").is_in(ELECTED) & ~pl.col("situation").is_in(WITHDRAWN))
@@ -193,7 +201,6 @@ def parse() -> None:
                 .when(pl.col("status") == "2º TURNO")
                 .then(pl.lit("advanced")),
             )
-            .drop("DT_NASCIMENTO", "DS_GENERO")
         )
         standing = (
             everyone.sort(pl.col("situation").is_in([*WITHDRAWN, *REPLACED]), "candidate")
@@ -520,15 +527,12 @@ def emit() -> Path:
                 if member in by_abbreviation:
                     cs.add("alliance_member", alliance_id=alliance, party_id=by_abbreviation[member])
 
-        persons: dict[str, UUID] = dict(
-            conn.execute(
-                """
-                select x.value, x.entity_id from external_id x
-                where x.scheme = 'br.tse_history.person'
-                  and not exists (select from entity_merge m where m.entity_id = x.entity_id)
-                """
+        persons: dict[str, UUID] = {
+            value: cs.survivors.get(entity, entity)
+            for value, entity in conn.execute(
+                "select value, entity_id from external_id where scheme = 'br.tse_history.person'"
             ).fetchall()
-        )
+        }
         mayor_registered = dict(
             detail.filter(pl.col("contest").str.starts_with(f"{year}:1:{MAYOR}:"))
             .select(pl.col("contest").str.slice(-5), "registered")
@@ -557,6 +561,11 @@ def emit() -> Path:
         options: dict[str, str] = {}
         result_sets: dict[str, str] = {}
         contests: dict[str, UUID] = {}
+        shared = set(
+            candidates.group_by("candidate")
+            .agg(pl.col("municipality").n_unique())
+            .filter(pl.col("municipality") > 1)["candidate"]
+        )
         by_contest = candidates.sort("number").partition_by("contest", as_dict=True)
         by_slate = slates.sort("party_number").partition_by("contest", as_dict=True)
         for (code,), standing in sorted(by_contest.items()):
@@ -656,10 +665,15 @@ def emit() -> Path:
             seats: dict[str, int] = {}
             for row in standing.iter_rows(named=True):
                 person_key = (
-                    f"{slug(row['name'])}|{row['birth']}" if row["birth"] is not None else f"{year}:{row['candidate']}"
+                    f"{slug(row['name'])}|{row['birth']}"
+                    if row["birth"] is not None
+                    else f"{year}:{municipality}:{row['candidate']}"
+                    if row["candidate"] in shared
+                    else f"{year}:{row['candidate']}"
                 )
                 if person_key not in persons:
-                    persons[person_key] = cs.key(f"{SOURCE}.person", person_key)
+                    reused = uuid5(NAMESPACE, f"external_id:{SOURCE}.person\x1f{person_key}") in cs.retired
+                    persons[person_key] = cs.key(f"{SOURCE}.person", f"{person_key}|2" if reused else person_key)
                     if persons[person_key] in cs.minted:
                         cs.add(
                             "person",
@@ -740,4 +754,26 @@ def emit() -> Path:
                 **common,
             ),
         )
+        staged = {str(row["id"]): str(row["person_id"]) for row in cs.rows.get("candidacy", [])}
+        for (person,) in conn.execute(
+            """
+            with staged (id, person_id) as (select * from unnest(%s::uuid[], %s::uuid[]))
+            select distinct c.person_id from candidacy c
+            join staged s on s.id = c.id
+            join person p on p.id = c.person_id
+            join changeset w on w.id = p.changeset_id and w.pipeline = %s
+            where not exists (select from staged n where n.person_id = c.person_id)
+              and not exists (
+                select from candidacy o where o.person_id = c.person_id
+                  and not exists (select from staged t where t.id = o.id)
+              )
+              and not exists (select from entity_merge m where m.into_id = c.person_id)
+            """,
+            [list(staged), list(staged.values()), SOURCE],
+        ).fetchall():
+            cs.add(
+                "entity_retirement",
+                entity_id=person,
+                reason="Keyed by another candidate's birth date or sequence number",
+            )
         return cs.write()
