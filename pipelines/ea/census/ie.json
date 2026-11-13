@@ -947,7 +947,9 @@
           "body_kinds": [
             "unicameral"
           ],
-          "iso_pattern": "EU"
+          "iso_pattern": "EU",
+          "within": null,
+          "precedence": 5
         }
       ],
       "dates": [
