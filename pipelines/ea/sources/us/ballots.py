@@ -24,9 +24,33 @@ FL_PAGE = "https://countyfilesvbm-ev.floridados.gov/VoteByMailEarlyVotingReports
 FL_REPORTS = "https://countyfilesvbm-ev.floridados.gov/VoteByMailEarlyVotingReports/PublicReports"
 FL_EARLY = "https://countyfilesvbm-ev.floridados.gov/VoteByMailEarlyVotingReports/ViewArchive?name=EVL_{number}.zip"
 FL_PDFS = {
-    "https://fldoswebumbracoprod.blob.core.windows.net/media/703948/gen-2020.pdf": date(2020, 11, 3),
-    "https://files.floridados.gov/media/706191/2022-ge-rptstatuscountsarchive-ev-vbm.pdf": date(2022, 11, 8),
-    "https://files.floridados.gov/media/708648/2024gen_vbm-ev_statuscounts.pdf": date(2024, 11, 5),
+    "https://files.floridados.gov/media/696917/early-voting-and-vote-by-mail-report-2014-gen.pdf": (
+        date(2014, 11, 4),
+        "general",
+    ),
+    "https://files.floridados.gov/media/696918/early-voting-and-vote-by-mail-report-2014-pri.pdf": (
+        date(2014, 8, 26),
+        "primary",
+    ),
+    "https://files.floridados.gov/media/697363/early-voting-and-vote-by-mail-report-2016-gen.pdf": (
+        date(2016, 11, 8),
+        "general",
+    ),
+    "https://files.floridados.gov/media/703387/2016-pri-status-counts-all.pdf": (date(2016, 8, 30), "primary"),
+    "https://files.floridados.gov/media/700669/early-voting-and-vote-by-mail-report-2018-genpdf.pdf": (
+        date(2018, 11, 6),
+        "general",
+    ),
+    "https://files.floridados.gov/media/700670/early-voting-and-vote-by-mail-report-2018-pripdf.pdf": (
+        date(2018, 8, 28),
+        "primary",
+    ),
+    "https://fldoswebumbracoprod.blob.core.windows.net/media/703948/gen-2020.pdf": (date(2020, 11, 3), "general"),
+    "https://files.floridados.gov/media/706191/2022-ge-rptstatuscountsarchive-ev-vbm.pdf": (
+        date(2022, 11, 8),
+        "general",
+    ),
+    "https://files.floridados.gov/media/708648/2024gen_vbm-ev_statuscounts.pdf": (date(2024, 11, 5), "general"),
 }
 STATS = {"Voted Vote-by-Mail": 3, "Voted Early": 2}
 ANCHORS = {"county_abl": 3, "county_evs": 2}
@@ -92,7 +116,7 @@ def page(content: bytes) -> Iterator[Row]:
             yield days[found], kind, row[0], channel, stamp(row[7]), number(row[6])
 
 
-def pdf(path: Path, day: date) -> Iterator[Row]:
+def pdf(path: Path, day: date, kind: str) -> Iterator[Row]:
     text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, check=True, text=True).stdout
     county = None
     for line in text.splitlines():
@@ -113,7 +137,7 @@ def pdf(path: Path, day: date) -> Iterator[Row]:
         )
         yield (
             day,
-            "general",
+            kind,
             county,
             channel,
             datetime.combine(as_of, datetime.min.time(), EASTERN),
@@ -257,7 +281,7 @@ def archive(conn: Connection, feed: str) -> tuple[int, int, set[str]]:
     sources: list[tuple[str, Callable[[Path], Iterator[Row]], bool]] = [
         (key, lambda path: page(path.read_bytes()), False) for key in captures
     ]
-    sources += [(url, lambda path, day=day: pdf(path, day), True) for url, day in FL_PDFS.items() if url in held]
+    sources += [(url, lambda path, found=found: pdf(path, *found), True) for url, found in FL_PDFS.items() if url in held]
     sources += [
         (key, lambda path: daily(path.read_bytes()), False) for key in sorted(held) if key.endswith("#county-day")
     ]
