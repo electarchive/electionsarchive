@@ -1,4 +1,5 @@
 import gzip
+import itertools
 import json
 import re
 from datetime import UTC, date, datetime
@@ -51,7 +52,7 @@ from ea.store import DATA, connect
 
 SOURCE = "tr.ysk_sandik"
 BALLOT_BOX_DAYS = {"2014-03-30", "2019-03-31", "2024-03-31"}
-VERSION = "23"
+VERSION = "24"
 PARSED = DATA / "parsed" / SOURCE
 SITE = "https://sonuc.ysk.gov.tr"
 PUBLISHER = "Yüksek Seçim Kurulu (YSK)"
@@ -123,6 +124,8 @@ YSK = {
 MUHTARLIK_SLUGS = {"2024-yerel-belediye-baskanlık-secimleri": 0, "2024-yerel-il-genel-meclis-uyeligi-secimleri": 1}
 REGISTER = Path(__file__).with_name("muhtarlik_2024.tsv")
 TUIK = Path(__file__).with_name("muhtarlik_2024_tuik.tsv")
+KINDS = {"mahalle": "neighborhood", "koy": "village"}
+KIND_CODES = {"mahalle": "mahalle", "köy": "koy"}
 NEW_PARTIES = {"Demokratik Sol Parti": "DSP", "Bağımsız Türkiye Partisi": "BTP", "Demokrat Parti": "DP"}
 LABELS = (
     {upper(short): full for full, short, *_ in PARTIES}
@@ -767,6 +770,101 @@ def emit() -> Path:
                 ]
             ),
         )
+        cs.add(
+            "scheme",
+            code="tr.mahalle",
+            polity_id=turkey,
+            kind="administrative",
+            rank=3,
+            noun="neighborhood",
+            kinds=KINDS,
+        )
+        kind_of = {
+            (year, id): kind
+            for year, id, kind in pl.read_parquet(ysk_muhtarlik.PARSED / "register.parquet")
+            .select("year", "muhtarlik_id", "kind")
+            .iter_rows()
+        } | {(2024, id): kind for id, kind in register.select("muhtarlik_id", "kind").iter_rows()}
+        spans_of: dict[str, list[tuple[date, str]]] = {}
+        ends: dict[str, date | None] = {}
+        for area, code, valid_from, valid_to in [
+            (current[id], int(code), valid_from, valid_to)
+            for id, code, valid_from, valid_to in dated.select(
+                "muhtarlik_id", "code", "valid_from", "valid_to"
+            ).iter_rows()
+        ] + [(area, int(code), valid_from, valid_to) for area, code, valid_from, valid_to in earlier]:
+            for year, day in ysk_muhtarlik.DAYS.items():
+                if valid_from <= day and (valid_to is None or day < valid_to):
+                    spans_of.setdefault(area, []).append((day, kind_of[(year, code)]))
+            if area not in ends or ends[area] is not None and (valid_to is None or valid_to > ends[area]):
+                ends[area] = valid_to
+        kinds = []
+        for area, spans in spans_of.items():
+            spans.sort()
+            runs = [spans[0]] + [span for previous, span in itertools.pairwise(spans) if span[1] != previous[1]]
+            for (valid_from, kind), following in zip(runs, [*runs[1:], None]):
+                kinds.append(
+                    (area, KIND_CODES[kind], valid_from, following[0] if following else ends[area], str(source))
+                )
+        kind_frame = pl.DataFrame(
+            kinds,
+            schema={
+                "area_id": pl.String,
+                "kind": pl.String,
+                "valid_from": pl.Date,
+                "valid_to": pl.Date,
+                "source_id": pl.String,
+            },
+            orient="row",
+        )
+        cs.frame("area_kind", kind_frame)
+        print(
+            f"{len(kinds)} dated kinds on {len(spans_of)} areas:",
+            kind_frame.group_by("kind", "valid_from", "valid_to")
+            .len()
+            .sort("valid_from", "kind", "valid_to", nulls_last=True)
+            .rows(),
+        )
+        towns = dict(
+            conn.execute(
+                """select e.value, e.entity_id::text from external_id e
+                   where e.scheme = 'tr.belde' and exists (
+                     select from area_parent p where p.area_id = e.entity_id and p.valid @> %s::date)""",
+                [ysk_muhtarlik.DAYS[2024]],
+            ).fetchall()
+        )
+        memberships = []
+        unlinked: dict[tuple[str, str, str], int] = {}
+        for id, plate, ilce, belde in (
+            register.filter(pl.col("belde_id").is_not_null())
+            .select("muhtarlik_id", "plate", "ilce", "belde")
+            .iter_rows()
+        ):
+            province = PROVINCES[int(plate) - 1]
+            central = upper(ilce) in ("MERKEZ", upper(province)) or upper(ilce).endswith(" MERKEZ")
+            key = "-".join(
+                [changeset.slug(province), "merkez" if central else changeset.slug(ilce), changeset.slug(belde)]
+            )
+            if key in towns:
+                memberships.append((current[id], towns[key]))
+            else:
+                unlinked[(plate, ilce, belde)] = unlinked.get((plate, ilce, belde), 0) + 1
+        cs.frame(
+            "area_membership",
+            pl.DataFrame(memberships, schema=["area_id", "parent_id"], orient="row").with_columns(
+                valid_from=pl.lit(ysk_muhtarlik.DAYS[2024])
+            ),
+        )
+        print(
+            f"{len(memberships)} belde mahalles linked to their belde, {sum(unlinked.values())} in "
+            f"{len(unlinked)} beldes with no tr.belde area open on 2024-03-31: {sorted(unlinked)}"
+        )
+        cs.manifest["scope"] = {
+            "polity": "TR",
+            "drops": {
+                table: {"areas": sorted(spans_of), "from": "2009-01-01"} for table in ("area_kind", "area_membership")
+            },
+        }
         tuik = pl.read_csv(TUIK, separator="\t", infer_schema_length=0).filter(pl.col("tuik_code").is_not_null())
         cs.frame(
             "external_id",
