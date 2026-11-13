@@ -676,6 +676,218 @@ BOOKS: dict[int, dict] = {
             "Ind": ("Independent", 25, 5971),
         },
     },
+    1982: {
+        "day": date(1982, 5, 6),
+        "url": READS[1982][0],
+        "publisher": "Greater London Council",
+        "methodology": "Read from the page images of the Greater London Council's scanned report by a vision model, "
+        "page by page, with each figure located on the report's text layer. The report lists each ward's candidates "
+        "in vote order with the elected flush left and the others indented. Every party's London-wide candidates add "
+        "up to the report's table of candidates and votes by party, and its votes do too except for small "
+        "differences in four parties (Conservative 38 fewer, Labour 33 more, the Alliance's Liberal and SDP candidates 12 and 1 fewer) "
+        "that no reading of the ward figures closes; each borough's elected councillors by "
+        "party match its table of the state of the parties in the new councils, each ward's party shares match its "
+        "summary of results by wards, and each ward's electorate comes from that summary, whose ward figures add up "
+        "to each borough's printed total. The report's errata are applied. Party labels marked in the report as "
+        "Labour and Co-operative or as Alliance candidates are stored under the party the report names. Candidate "
+        "names are printed as surname and forenames.",
+        "candidates": READS[1982][1],
+        "wards": (71, 87),
+        "ocr": {},
+        "columns": [
+            "CON",
+            "LAB",
+            "LIBSDP",
+            "LIBFTA",
+            "LABCP",
+            "SDPLIB",
+            "INDRA",
+            "RRCON",
+            "REA",
+            "RAA",
+            "INDLAB",
+            "RARE",
+            "IND",
+            "INDRE",
+        ],
+        "merged": {},
+        "residual": {"CON": -38, "LAB": 33, "SDPLIB": -1, "LIBSDP": -12},
+        "summary": {"Park Bethnal": ("4,743", "4,748"), "Hoe Street": ("3,669", "8,669")},
+        "inserted": {
+            ("Merton", "Coll i eros Wood Dundonald"): (
+                "Colliers Wood",
+                "Dundonald",
+                6422,
+                3,
+                {"Con": 50.4, "Lab": 23.9, "Lib": 25.7},
+            ),
+            ("Merton", "Ournsford Figge's Marsh"): (
+                "Durnsford",
+                "Figge's Marsh",
+                7149,
+                3,
+                {"Con": 47.9, "Lab": 31.0, "Lib": 19.3, "Others": 1.7},
+            ),
+            ("Newham", "Bemersyde Canning Town and Grange"): (
+                "Bemersyde",
+                "Canning Town and Grange",
+                6110,
+                2,
+                {"Lab": 68.2, "Lib": 31.8},
+            ),
+            ("Richmond upon Thames", "Richmond HHI Richmond Town"): (
+                "Richmond Hill",
+                "Richmond Town",
+                4642,
+                2,
+                {"Con": 35.8, "Lab": 10.0, "Lib": 53.3, "Others": 0.9},
+            ),
+        },
+        "codes": {"CCN": "CON", "KEMML": "WEMML", "PNC": "PWC", "SOPLIB": "SDPLIB", "LAECP": "LABCP"},
+        "appended": {
+            66: [{"kind": "candidate", "text": "Lewis, Robert E.", "party": "COMM", "votes": "159", "indented": True}]
+        },
+        "people": {(16, "Muir, Anthea"): "Lahr, Anthea", (18, "Selden, John A."): "Seiden, John A."},
+        "votes": {
+            (9, "Davis, Frank"): 1183,
+            (9, "Desmond, Michael B."): 844,
+            (9, "Freeman, Michael L."): 1398,
+            (9, "Kerens, Harry"): 806,
+            (9, "Miller, Montague"): 758,
+            (9, "Perkin, Christopher"): 1218,
+            (9, "Raff, David"): 1205,
+            (11, "Tandy, Colin L."): 2835,
+            (13, "Patel, Manibhai D."): 883,
+            (14, "Walls, Stephen R."): 925,
+            (15, "Coverson, Ron"): 1188,
+            (17, "Jowell, Tessa"): 1095,
+            (19, "Kent, Reginald H."): 2285,
+            (19, "Pickering, Jonathan"): 588,
+            (24, "Lennox, Audrey M."): 788,
+            (24, "Nellis, Frank"): 1389,
+            (28, "Amos, Myra"): 381,
+            (28, "Cady, Lorna"): 85,
+            (30, "Gray, Ian"): 817,
+            (34, "Appleford, Malcolm J."): 885,
+            (34, "Cripps, John E."): 1461,
+            (34, "Emsley, Vaughan A."): 848,
+            (34, "Powell, Lynda A."): 886,
+            (34, "Winter, John S."): 543,
+            (37, "Age, Sydney H."): 881,
+            (37, "Craxton, Michael C."): 793,
+            (37, "Minns, Joseph S."): 1251,
+            (37, "Rogers, Graham C."): 889,
+            (37, "Salisbury, Keith E."): 910,
+            (37, "Thomas, Gordon"): 890,
+            (37, "York, Colin"): 1580,
+            (38, "Doel, Sally J."): 488,
+            (38, "Kurtz, Alan H."): 458,
+            (39, "Butler, Kerry"): 1188,
+            (39, "Crooke, Roland J."): 588,
+            (40, "Kent, Patricia A."): 1627,
+            (41, "Mitchell, Andrew J.B."): 389,
+            (42, "Chapman, Charles H."): 882,
+            (43, "Arbuthnot, James N."): 1087,
+            (46, "Shakespeare, Anthony J."): 484,
+            (47, "Mungol, Hari C."): 683,
+            (49, "Hurst, Janet R."): 882,
+            (51, "Baskaran, Benjamin C.K."): 198,
+            (51, "Cameron, Donald W."): 882,
+            (52, "Linford, Margaret E."): 489,
+            (56, "Johnston, Paul J."): 1064,
+            (58, "Davis, Alan R."): 786,
+            (58, "Holland, Johanna"): 268,
+            (61, "Smoker, John A."): 897,
+            (62, "Beasley, Paul"): None,
+            (62, "Thompson, Patricia M."): None,
+            (64, "Collen, Kenneth F."): 480,
+            (65, "Chope, Christopher R."): 2928,
+            (66, "Constable, Martin B."): 880,
+            (67, "Demby, Brian G."): 188,
+            (68, "Bramall, Lady Germaine M."): 278,
+            (68, "Cobbold, Michael D.N."): 1588,
+        },
+        "withdrawn": {(62, "Islam, Quadratul")},
+        "banners": {(52, "NEWHAM")},
+        "party": {(51, "Lean, William"): "LAB"},
+        "starts": {(22, "ANGEL ROAD"): "Enfield"},
+        "state": {
+            "Barking and Dagenham": {"CON": 3, "LAB": 37, "LIBSDP": 3, "INDRA": 3, "IND": 2, "Total": 48},
+            "Barnet": {"CON": 48, "LAB": 12, "Total": 60},
+            "Bexley": {"CON": 41, "LAB": 14, "LIBSDP": 5, "LIBFTA": 2, "Total": 62},
+            "Brent": {"CON": 30, "LAB": 33, "LIBFTA": 3, "Total": 66},
+            "Bromley": {"CON": 52, "LAB": 5, "LIBSDP": 1, "SDPLIB": 2, "Total": 60},
+            "Camden": {"CON": 26, "LAB": 33, "Total": 59},
+            "Croydon": {"CON": 62, "LAB": 3, "LABCP": 2, "RARE": 3, "Total": 70},
+            "Ealing": {"CON": 37, "LAB": 28, "LIBSDP": 3, "LABCP": 2, "Total": 70},
+            "Enfield": {"CON": 47, "LAB": 19, "Total": 66},
+            "Greenwich": {"CON": 16, "LAB": 43, "LIBSDP": 2, "SDPLIB": 1, "Total": 62},
+            "Hackney": {"CON": 3, "LAB": 50, "LIBFTA": 7, "Total": 60},
+            "Hammersmith and Fulham": {"CON": 23, "LAB": 25, "LIBSDP": 2, "Total": 50},
+            "Haringey": {"CON": 22, "LAB": 32, "LABCP": 1, "RRCON": 4, "Total": 59},
+            "Harrow": {"CON": 41, "LAB": 6, "LIBSDP": 13, "RAA": 3, "Total": 63},
+            "Havering": {"CON": 37, "LAB": 12, "LIBSDP": 5, "INDRA": 4, "REA": 4, "RAA": 1, "Total": 63},
+            "Hillingdon": {"CON": 57, "LAB": 10, "LIBSDP": 2, "Total": 69},
+            "Hounslow": {"CON": 27, "LAB": 33, "Total": 60},
+            "Islington": {"LAB": 41, "LABCP": 10, "SDPLIB": 1, "Total": 52},
+            "Kensington and Chelsea": {"CON": 39, "LAB": 15, "Total": 54},
+            "Kingston upon Thames": {"CON": 40, "LAB": 3, "LIBSDP": 7, "Total": 50},
+            "Lambeth": {"CON": 27, "LAB": 32, "LIBSDP": 1, "SDPLIB": 4, "Total": 64},
+            "Lewisham": {"CON": 26, "LAB": 41, "Total": 67},
+            "Merton": {"CON": 44, "LAB": 13, "Total": 57},
+            "Newham": {"LAB": 54, "LIBFTA": 3, "SDPLIB": 3, "Total": 60},
+            "Redbridge": {"CON": 51, "LAB": 12, "Total": 63},
+            "Richmond upon Thames": {"CON": 26, "LIBSDP": 24, "SDPLIB": 2, "Total": 52},
+            "Southwark": {"CON": 8, "LAB": 47, "LABCP": 6, "INDLAB": 3, "Total": 64},
+            "Sutton": {"CON": 46, "LAB": 7, "LIBSDP": 3, "Total": 56},
+            "Tower Hamlets": {"LAB": 31, "LIBFTA": 18, "IND": 1, "Total": 50},
+            "Waltham Forest": {"CON": 25, "LAB": 26, "LIBSDP": 6, "Total": 57},
+            "Wandsworth": {"CON": 33, "LAB": 25, "LIBSDP": 1, "LABCP": 2, "Total": 61},
+            "Westminster": {"CON": 43, "LAB": 15, "LABCP": 1, "INDRE": 1, "Total": 60},
+        },
+        "parties": {
+            "CON": ("Conservative", 1809, 2310936, 980, "Con"),
+            "RRCON": ("Rate Reduction Conservative Party", 17, 12105, 4),
+            "LAB": ("Labour", 1876, 1597100, 757, "Lab"),
+            "LABCP": ("Labour and Co-operative", 38, 44310, 24, "Lab"),
+            "SDPLIB": ("Social Democratic Party", 953, 626086, 13, "Lib"),
+            "LIBSDP": ("Liberal", 806, 633407, 78, "Lib"),
+            "LIBFTA": ("Liberal", 45, 52152, 33, "Lib"),
+            "SDP": ("Social Democratic Party", 18, 11032, 0, "Lib"),
+            "LIB": ("Liberal", 7, 5782, 0, "Lib"),
+            "IND": ("Independent", 52, 16959, 3),
+            "REA": ("Residents' Association", 16, 17517, 4),
+            "RAA": ("Ratepayers' Association", 21, 16891, 4),
+            "INDRA": ("Independent Ratepayer", 13, 16198, 7),
+            "INDLAB": ("Independent Labour", 12, 7959, 3),
+            "COMM": ("Communist", 71, 7166, 0),
+            "RARE": ("Ratepayers and Residents", 3, 4908, 3),
+            "S": ("Southall Party", 9, 4662, 0),
+            "E": ("Ecology", 49, 4646, 0),
+            "NF": ("National Front", 57, 4162, 0),
+            "INDRE": ("Independent Resident", 4, 4004, 1),
+            "SD": ("Social Democrat", 9, 1342, 0),
+            "INDSDP": ("Independent Social Democratic Party", 7, 1284, 0),
+            "IIND": ("Island Independent", 2, 1250, 0),
+            "SLAG": ("Save London Action Group", 49, 1172, 0),
+            "WRP": ("Workers Revolutionary Party", 16, 982, 0),
+            "CW": ("Community Worker", 1, 530, 0),
+            "F": ("Fellowship Party", 2, 406, 0),
+            "MTA": ("Mercers Tenants Association", 1, 296, 0),
+            "AAA": ("Anglo-Asian Alliance", 3, 283, 0),
+            "WEMML": ("For Wealth Equality Marxist Maoist Leninist", 1, 273, 0),
+            "COMMGB": ("Communist Party of Great Britain", 2, 122, 0),
+            "DPL": ("Democratic Pro-Life", 1, 110, 0),
+            "INP": ("Irish National Party", 2, 92, 0),
+            "SLE": ("Save London Ecology", 2, 74, 0),
+            "INDCON": ("Independent Conservative", 1, 73, 0),
+            "WP": ("Workers Party", 1, 58, 0),
+            "WFCM": ("For Withdrawal from the Common Market", 2, 47, 0),
+            "SDPL": ("Social Democrat Pro-Life", 1, 32, 0),
+            "PWC": ("Providers Who Care", 1, 22, 0),
+            "INDSL": ("Independent Save London", 1, 11, 0),
+        },
+    },
     1986: {
         "day": date(1986, 5, 8),
         "url": f"{DOWNLOAD}/860bbb06-09d8-4f3f-bd84-b60e442a61e8/LBCE_1986-5-8.pdf",
@@ -1072,7 +1284,92 @@ def read_key(sha256: str, page: int) -> str:
 
 def vision(sha256: str, page: int) -> list[dict]:
     message = json.loads(raw.cached(lb.SOURCE, read_key(sha256, page)).path.read_text())
-    return json.loads(next(block["text"] for block in message["content"] if block["type"] == "text"))["rows"]
+    text = next(block["text"] for block in message["content"] if block["type"] == "text")
+    if message["stop_reason"] == "max_tokens":
+        text = text[: text.rindex("},{") + 1] + "]}"
+    return json.loads(text)["rows"]
+
+
+def viewed(year: int, sizes: list[tuple[float, float]], book: list[list[Word]]) -> list[dict]:
+    spec = BOOKS[year]
+    url, (first, last) = READS[year]
+    artifact = raw.cached(lb.SOURCE, url)
+    out: list[dict] = []
+    borough: str | None = None
+    ward: dict | None = None
+    for number in range(first, last + 1):
+        width, height = sizes[number - 1]
+        printed = [line for column in columns(book[number - 1], width, True) for line in lb.lines(column)]
+        at = 0
+        for row in [*vision(artifact.sha256, number), *spec.get("appended", {}).get(number, [])]:
+            text = re.sub(r"\s+", " ", row["text"]).strip()
+            named = (
+                borough_of(text) if row["kind"] == "borough" or (number, text) in spec.get("banners", set()) else None
+            )
+            if named:
+                borough = named
+                continue
+            if row["kind"] != "candidate":
+                head = re.sub(r"(?i)\s*[-–—]?\s*continued\s*$", "", text).strip(" ,.*#+")
+                if head != text and ward is not None and fold(ward["printed"]) == fold(head):
+                    continue
+                borough = spec.get("starts", {}).get((number, head), borough)
+                if borough is None:
+                    raise ValueError(f"{year} page {number}: ward before a borough: {text}")
+                ward = {"borough": borough, "printed": head, "page": number, "lines": []}
+                out.append(ward)
+                continue
+            if ward is None:
+                raise ValueError(f"{year} page {number}: candidate before a ward: {text}")
+            name = spec.get("people", {}).get((number, text), text)
+            if (number, name) in spec.get("withdrawn", set()):
+                continue
+            code = re.sub(r"\s+", "", row["party"] or "").upper()
+            code = spec.get("party", {}).get((number, name), spec.get("codes", {}).get(code, code))
+            if code not in spec["parties"]:
+                print(f"UNKNOWN {year} p{number}: {name} {row['party']}")
+            figure = row["votes"] or ""
+            votes = int(re.sub(r"\D", "", figure)) if re.search(r"\d", figure) else None
+            votes = spec.get("votes", {}).get((number, name), votes)
+
+            def score(index: int) -> float:
+                words = [w[4] for w in printed[index]]
+                ratio = difflib.SequenceMatcher(None, fold(name), fold(" ".join(words[:-2]))).ratio()
+                return ratio + any(lb.number(w.translate(lb.DIGITS)) == votes for w in words[-2:])
+
+            window = range(at, min(at + 8, len(printed)))
+            best = max(window, key=score, default=None)
+            if best is None or score(best) < 0.6:
+                above = printed[at - 1] if at else None
+                below = printed[at] if at < len(printed) else None
+                across = below or above or [(0.0, 0.0, width, height, "")]
+                top = max(w[3] for w in above) if above else min(w[1] for w in across) - 12
+                bottom = min(w[1] for w in below) if below else max(w[3] for w in across) + 12
+                if bottom - top < 6:
+                    top, bottom = min(top, bottom) - 6, max(top, bottom) + 6
+                box = [min(w[0] for w in across), top, max(w[2] for w in across), bottom]
+            else:
+                at = best + 1
+                row_ = printed[best]
+                box = [
+                    min(w[0] for w in row_),
+                    min(w[1] for w in row_),
+                    max(w[2] for w in row_),
+                    max(w[3] for w in row_),
+                ]
+            ward["lines"].append(
+                {
+                    "name": name,
+                    "party": code,
+                    "votes": votes,
+                    "elected": spec.get("elected", {}).get((number, name), not row["indented"]),
+                    "page": number,
+                    "bbox": box,
+                    "width": width,
+                    "height": height,
+                }
+            )
+    return [ward for ward in out if ward["lines"]]
 
 
 def fetch() -> None:
@@ -1565,10 +1862,17 @@ def parse() -> None:
             [(*w[:4], fixes.get((number, w[4]), w[4])) for w in page if fixes.get((number, w[4]), "") is not None]
             for number, page in enumerate(book, 1)
         ]
-        heads = table2(year, sizes, book)
-        if "ocr" in spec:
+        heads = viewed(year, sizes, book) if year in READS else table2(year, sizes, book)
+        if "ocr" in spec and year not in READS:
             reread(year, heads)
         stats = table3(year, book)
+        for (borough, printed_), (renamed, extra, electorate, seats, share) in spec.get("inserted", {}).items():
+            rows = stats[borough]
+            index = next(i for i, r in enumerate(rows) if r[0] == printed_)
+            upper, lower = rows[index][3], rows[index + 1][3]
+            box = [upper[0], (upper[1] + lower[1]) / 2, upper[2], (upper[3] + lower[3]) / 2]
+            rows[index] = (renamed, *rows[index][1:])
+            rows.insert(index + 1, (extra, electorate, rows[index][2], box, share, seats))
         sizes_: dict[str, int | None] = {}
         bad = []
         for borough, rows in stats.items():
@@ -1627,10 +1931,21 @@ def parse() -> None:
                     mine_ = {"Con": 0, "Lab": 0, "Lib": 0, "Others": 0}
                     for line in lines_:
                         mine_[groups.get(line["party"], "Others")] += line["votes"] or 0
+                    tokens = list(row[4].values())
+                    if year in READS and row[3] is not None:
+                        middle = (row[3][1] + row[3][3]) / 2
+                        tokens = [
+                            float(w[4])
+                            for w in book[row[2] - 1]
+                            if abs((w[1] + w[3]) / 2 - middle) < 3
+                            and w[0] > row[3][2]
+                            and re.fullmatch(r"\d{1,3}\.\d", w[4])
+                        ]
                     off = {
                         k: (round(100 * v / total, 1), row[4].get(k, 0.0))
                         for k, v in mine_.items()
                         if abs(100 * v / total - row[4].get(k, 0.0)) > 0.11
+                        and (year not in READS or (v and all(abs(100 * v / total - t) > 0.11 for t in tokens)))
                     }
                     if off:
                         print(f"{year} {borough} {name} p{head['page']}: shares {off}")
