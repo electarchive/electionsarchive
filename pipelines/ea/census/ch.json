@@ -98,22 +98,614 @@
       "publisher": "Kanton Graubünden, Kantonsamtsblatt-Archiv 1800-2000",
       "url": "https://www.kantonsamtsblatt.gr.ch/fileadmin/ekab/archiv_1800-2000/files/StAGR_Amtsblatt_1872/StAGR_Amtsblatt_1872-09-13_37_0325-0334.pdf",
       "kind": "official_body"
+    },
+    "fedlex-bv": {
+      "title": "Bundesverfassung der Schweizerischen Eidgenossenschaft vom 18. April 1999 (SR 101)",
+      "publisher": "Bundeskanzlei, Fedlex",
+      "url": "https://www.fedlex.admin.ch/eli/cc/1999/404/de",
+      "kind": "official_body"
+    },
+    "fedlex-bpr": {
+      "title": "Bundesgesetz über die politischen Rechte vom 17. Dezember 1976 (BPR, SR 161.1)",
+      "publisher": "Bundeskanzlei, Fedlex",
+      "url": "https://www.fedlex.admin.ch/eli/cc/1978/688_688_688/de",
+      "kind": "official_body"
+    },
+    "fedlex-vpr": {
+      "title": "Verordnung über die politischen Rechte vom 24. Mai 1978 (VPR, SR 161.11)",
+      "publisher": "Bundeskanzlei, Fedlex",
+      "url": "https://www.fedlex.admin.ch/eli/cc/1978/712_712_712/de",
+      "kind": "official_body"
+    },
+    "fedlex-parlg": {
+      "title": "Bundesgesetz über die Bundesversammlung vom 13. Dezember 2002 (Parlamentsgesetz, ParlG, SR 171.10)",
+      "publisher": "Bundeskanzlei, Fedlex",
+      "url": "https://www.fedlex.admin.ch/eli/cc/2003/510/de",
+      "kind": "official_body"
+    },
+    "bfs-agv-2026": {
+      "title": "Amtliches Gemeindeverzeichnis der Schweiz, Stand 1. Januar 2026 (Kantone, Bezirke, Gemeinden; API snapshot)",
+      "publisher": "Bundesamt für Statistik (BFS)",
+      "url": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2026",
+      "kind": "official_body",
+      "note": "2,280 rows: 26 cantons, 144 districts (nine of them a whole canton without districts: UR, OW, NW, GL, ZG, BS, AI, NE, and GE), and 2,110 political communes."
+    },
+    "bfs-kt-parl-seats": {
+      "title": "Kantonale Parlamentswahlen: Mandatsverteilung nach Parteien und Kanton, 1968–2024 (T 17.02.05.01.03; one sheet per four-year window, with each canton's election year)",
+      "publisher": "Bundesamt für Statistik (BFS)",
+      "url": "https://www.bfs.admin.ch/asset/de/30685455",
+      "kind": "official_body"
+    },
+    "bfs-kt-parl-strength": {
+      "title": "Kantonale Parlamentswahlen: Stärke der Parteien und Wahlbeteiligung, 1972–2024 (T 17.02.05.02.01)",
+      "publisher": "Bundesamt für Statistik (BFS)",
+      "url": "https://www.bfs.admin.ch/asset/de/30685453",
+      "kind": "official_body"
+    },
+    "bfs-kt-gov": {
+      "title": "Kantonale Regierungswahlen: Mandatsverteilung nach Parteien und Geschlecht, 1980–2024 (T 17.02.06.03; one sheet per four-year window, with each canton's election year)",
+      "publisher": "Bundesamt für Statistik (BFS)",
+      "url": "https://www.bfs.admin.ch/asset/de/30685466",
+      "kind": "official_body"
+    },
+    "bfs-city-legislatives": {
+      "title": "Die Legislativen der statistischen Städte: Gewählte Frauen und Männer nach Parteien, 1983–2018 (T 17.02.07.02)",
+      "publisher": "Bundesamt für Statistik (BFS)",
+      "url": "https://www.bfs.admin.ch/asset/de/7646549",
+      "kind": "official_body"
+    },
+    "voteinfo-kant": {
+      "title": "Kantonale Abstimmungen: Resultate am Abstimmungstag (Open Government Data, voteinfo; one JSON per vote day, sd-t-17-02-YYYYMMDD-kantAbstimmung.json)",
+      "publisher": "Bundesamt für Statistik (BFS)",
+      "url": "https://ogd-static.voteinfo-app.ch/v1/ogd/sd-t-17-02-20250928-kantAbstimmung.json",
+      "kind": "official_body",
+      "note": "Files exist for 10 February 2019 onward and not for 4 March 2018. Each cantonal question has results by district and commune."
+    },
+    "hls-helvetik": {
+      "title": "Helvetische Republik (Historisches Lexikon der Schweiz, article 009797)",
+      "publisher": "Historisches Lexikon der Schweiz (HLS)",
+      "url": "https://hls-dhs-dss.ch/de/articles/009797/",
+      "kind": "official_body"
+    },
+    "kv-zh": {
+      "title": "Verfassung des Kantons Zürich (SR 131.211, as published in the federal classified compilation)",
+      "publisher": "Bundeskanzlei, Fedlex",
+      "url": "https://www.fedlex.admin.ch/eli/cc/2006/14_fga/de",
+      "kind": "official_body"
+    },
+    "kv-be": {
+      "title": "Verfassung des Kantons Bern (SR 131.212, as published in the federal classified compilation)",
+      "publisher": "Bundeskanzlei, Fedlex",
+      "url": "https://www.fedlex.admin.ch/eli/cc/1994/1_401_401_361_fga/de",
+      "kind": "official_body"
+    },
+    "kv-lu": {
+      "title": "Verfassung des Kantons Luzern (SR 131.213, as published in the federal classified compilation)",
+      "publisher": "Bundeskanzlei, Fedlex",
+      "url": "https://www.fedlex.admin.ch/eli/cc/2008/359_fga/de",
+      "kind": "official_body"
+    },
+    "kv-ur": {
+      "title": "Verfassung des Kantons Uri (SR 131.214, as published in the federal classified compilation)",
+      "publisher": "Bundeskanzlei, Fedlex",
+      "url": "https://www.fedlex.admin.ch/eli/cc/1985/2_621_625_589_fga/de",
+      "kind": "official_body"
+    },
+    "kv-sz": {
+      "title": "Verfassung des Kantons Schwyz (SR 131.215, as published in the federal classified compilation)",
+      "publisher": "Bundeskanzlei, Fedlex",
+      "url": "https://www.fedlex.admin.ch/eli/cc/2012/1262_fga/de",
+      "kind": "official_body"
+    },
+    "kv-ow": {
+      "title": "Verfassung des Kantons Obwalden (SR 131.216.1, as published in the federal classified compilation)",
+      "publisher": "Bundeskanzlei, Fedlex",
+      "url": "https://www.fedlex.admin.ch/eli/cc/1968/2_53_49_93_fga/de",
+      "kind": "official_body"
+    },
+    "kv-nw": {
+      "title": "Verfassung des Kantons Nidwalden (SR 131.216.2, as published in the federal classified compilation)",
+      "publisher": "Bundeskanzlei, Fedlex",
+      "url": "https://www.fedlex.admin.ch/eli/cc/1965/3_619_631_611_fga/de",
+      "kind": "official_body"
+    },
+    "kv-gl": {
+      "title": "Verfassung des Kantons Glarus (SR 131.217, as published in the federal classified compilation)",
+      "publisher": "Bundeskanzlei, Fedlex",
+      "url": "https://www.fedlex.admin.ch/eli/cc/1989/3_730_706_654_fga/de",
+      "kind": "official_body"
+    },
+    "kv-zg": {
+      "title": "Verfassung des Kantons Zug (SR 131.218, as published in the federal classified compilation)",
+      "publisher": "Bundeskanzlei, Fedlex",
+      "url": "https://www.fedlex.admin.ch/eli/cc/1894/2_278_126_278_fga/de",
+      "kind": "official_body"
+    },
+    "kv-fr": {
+      "title": "Verfassung des Kantons Freiburg (SR 131.219, as published in the federal classified compilation)",
+      "publisher": "Bundeskanzlei, Fedlex",
+      "url": "https://www.fedlex.admin.ch/eli/cc/2004/2129_cc/de",
+      "kind": "official_body"
+    },
+    "kv-so": {
+      "title": "Verfassung des Kantons Solothurn (SR 131.221, as published in the federal classified compilation)",
+      "publisher": "Bundeskanzlei, Fedlex",
+      "url": "https://www.fedlex.admin.ch/eli/cc/1987/2_642_626_526_fga/de",
+      "kind": "official_body"
+    },
+    "kv-bs": {
+      "title": "Verfassung des Kantons Basel-Stadt (SR 131.222.1, as published in the federal classified compilation)",
+      "publisher": "Bundeskanzlei, Fedlex",
+      "url": "https://www.fedlex.admin.ch/eli/cc/2006/614_fga/de",
+      "kind": "official_body"
+    },
+    "kv-bl": {
+      "title": "Verfassung des Kantons Basel-Landschaft (SR 131.222.2, as published in the federal classified compilation)",
+      "publisher": "Bundeskanzlei, Fedlex",
+      "url": "https://www.fedlex.admin.ch/eli/cc/1985/2_1157_1173_1041_fga/de",
+      "kind": "official_body"
+    },
+    "kv-sh": {
+      "title": "Verfassung des Kantons Schaffhausen (SR 131.223, as published in the federal classified compilation)",
+      "publisher": "Bundeskanzlei, Fedlex",
+      "url": "https://www.fedlex.admin.ch/eli/cc/2003/1135_fga/de",
+      "kind": "official_body"
+    },
+    "kv-ar": {
+      "title": "Verfassung des Kantons Appenzell Ausserrhoden (SR 131.224.1, as published in the federal classified compilation)",
+      "publisher": "Bundeskanzlei, Fedlex",
+      "url": "https://www.fedlex.admin.ch/eli/cc/1996/1_1021_965_841_fga/de",
+      "kind": "official_body"
+    },
+    "kv-ai": {
+      "title": "Verfassung des Kantons Appenzell Innerrhoden (SR 131.224.2, as published in the federal classified compilation)",
+      "publisher": "Bundeskanzlei, Fedlex",
+      "url": "https://www.fedlex.admin.ch/eli/cc/1872/3_842_832_842_fga/de",
+      "kind": "official_body"
+    },
+    "kv-sg": {
+      "title": "Verfassung des Kantons St. Gallen (SR 131.225, as published in the federal classified compilation)",
+      "publisher": "Bundeskanzlei, Fedlex",
+      "url": "https://www.fedlex.admin.ch/eli/cc/2002/258_fga/de",
+      "kind": "official_body"
+    },
+    "kv-gr": {
+      "title": "Verfassung des Kantons Graubünden (SR 131.226, as published in the federal classified compilation)",
+      "publisher": "Bundeskanzlei, Fedlex",
+      "url": "https://www.fedlex.admin.ch/eli/cc/2004/232_fga/de",
+      "kind": "official_body"
+    },
+    "kv-ag": {
+      "title": "Verfassung des Kantons Aargau (SR 131.227, as published in the federal classified compilation)",
+      "publisher": "Bundeskanzlei, Fedlex",
+      "url": "https://www.fedlex.admin.ch/eli/cc/1981/2_249_249_253_fga/de",
+      "kind": "official_body"
+    },
+    "kv-tg": {
+      "title": "Verfassung des Kantons Thurgau (SR 131.228, as published in the federal classified compilation)",
+      "publisher": "Bundeskanzlei, Fedlex",
+      "url": "https://www.fedlex.admin.ch/eli/cc/1989/3_873_833_773_fga/de",
+      "kind": "official_body"
+    },
+    "kv-ti": {
+      "title": "Verfassung des Kantons Tessin (SR 131.229, as published in the federal classified compilation)",
+      "publisher": "Bundeskanzlei, Fedlex",
+      "url": "https://www.fedlex.admin.ch/eli/cc/1998/5_5494_4818_4364_fga/de",
+      "kind": "official_body"
+    },
+    "kv-vd": {
+      "title": "Verfassung des Kantons Waadt (SR 131.231, as published in the federal classified compilation)",
+      "publisher": "Bundeskanzlei, Fedlex",
+      "url": "https://www.fedlex.admin.ch/eli/cc/2003/1136_fga/de",
+      "kind": "official_body"
+    },
+    "kv-vs": {
+      "title": "Verfassung des Kantons Wallis (SR 131.232, as published in the federal classified compilation)",
+      "publisher": "Bundeskanzlei, Fedlex",
+      "url": "https://www.fedlex.admin.ch/eli/cc/1907/5_611_1_1_fga/de",
+      "kind": "official_body"
+    },
+    "kv-ne": {
+      "title": "Verfassung des Kantons Neuenburg (SR 131.233, as published in the federal classified compilation)",
+      "publisher": "Bundeskanzlei, Fedlex",
+      "url": "https://www.fedlex.admin.ch/eli/cc/2001/523_fga/de",
+      "kind": "official_body"
+    },
+    "kv-ge": {
+      "title": "Verfassung des Kantons Genf (SR 131.234, as published in the federal classified compilation)",
+      "publisher": "Bundeskanzlei, Fedlex",
+      "url": "https://www.fedlex.admin.ch/eli/cc/2013/1846_fga/de",
+      "kind": "official_body"
+    },
+    "kv-ju": {
+      "title": "Verfassung des Kantons Jura (SR 131.235, as published in the federal classified compilation)",
+      "publisher": "Bundeskanzlei, Fedlex",
+      "url": "https://www.fedlex.admin.ch/eli/cc/1977/2_264_259_261_fga/de",
+      "kind": "official_body"
+    },
+    "kt-be-2026": {
+      "title": "Bericht zu den Gesamterneuerungswahlen vom 29. März 2026 (Beilage, Regierungsrat, 29.04.2026)",
+      "publisher": "Kanton Bern, Regierungsrat",
+      "url": "https://www.rrgr-service.apps.be.ch/api/rr/documents/document/fd5803d0d5d64f09b4580cafd098b47e-332/13/Beilage-Bericht-29.04.2026-de.pdf",
+      "kind": "official_body"
+    },
+    "kt-so-2025": {
+      "title": "Kantonsrat und Regierungsrat: Solothurn wählt am 9. März 2025",
+      "publisher": "Kanton Solothurn, Staatskanzlei",
+      "url": "https://so.ch/staatskanzlei/medien/medienmitteilung/news/kantonsrat-und-regierungsrat-solothurn-waehlt-am-9-maerz-2025/",
+      "kind": "official_body"
+    },
+    "kt-bs-2024": {
+      "title": "Gesamterneuerungswahlen Basel-Stadt 2024: Wahlanleitung in Leichter Sprache",
+      "publisher": "Kanton Basel-Stadt, Staatskanzlei",
+      "url": "https://www.bs.ch/medienmitteilungen/staatskanzlei/2024-gesamterneuerungswahlen-basel-stadt-wahlanleitung-leichter-sprache-und-erklaervideo-auf-wwwbsch",
+      "kind": "official_body"
+    },
+    "kt-ag-2024": {
+      "title": "Gesamterneuerungswahlen des Grossen Rats vom 20. Oktober 2024",
+      "publisher": "Kanton Aargau",
+      "url": "https://www.ag.ch/grw2024",
+      "kind": "official_body"
+    },
+    "kt-tg-2024": {
+      "title": "Gesamterneuerungswahl des Grossen Rates 2024: Schlussresultat",
+      "publisher": "Kanton Thurgau, Staatskanzlei",
+      "url": "https://wahlen.tg.ch/public/upload/assets/157819/GR24_Schlussresultat.pdf?fp=1",
+      "kind": "official_body"
+    },
+    "kt-vs-2025": {
+      "title": "Élections cantonales 2025",
+      "publisher": "Canton du Valais, Chancellerie d'État",
+      "url": "https://www.vs.ch/web/votel/elections-cantonales-2025",
+      "kind": "official_body"
+    },
+    "kt-ow-2026": {
+      "title": "Gesamterneuerungswahlen 2026 (Kantonsrat und Regierungsrat)",
+      "publisher": "Kanton Obwalden, Staatskanzlei",
+      "url": "https://www.ow.ch/_doc/419632",
+      "kind": "official_body"
+    },
+    "kt-zg-2026": {
+      "title": "Kantonsratswahlen 2026",
+      "publisher": "Kanton Zug",
+      "url": "https://zg.ch/de/staat-politik/wahlen-und-abstimmungen/wahlen/kantonsratswahlen",
+      "kind": "official_body"
+    },
+    "kt-fr-2026": {
+      "title": "Convocation du corps électoral en vue des élections cantonales de cet automne 2026",
+      "publisher": "État de Fribourg, Chancellerie d'État",
+      "url": "https://www.fr.ch/cha/actualites/convocation-du-corps-electoral-en-vue-des-elections-cantonales-de-cet-automne-2026",
+      "kind": "official_body"
+    },
+    "kt-gl-2026": {
+      "title": "Resultate Gesamterneuerungswahlen Regierungsrat vom 8. März 2026",
+      "publisher": "Kanton Glarus",
+      "url": "https://www.gl.ch/public/upload/assets/64330/Resultate%20Gesamterneuerungswaheln%20Regierungsrat%20vom%208.%20M%C3%A4rz%202026.pdf?fp=1",
+      "kind": "official_body"
     }
   },
   "tiers": [
     {
       "key": "national",
-      "name": "Swiss Confederation",
+      "name": "Schweizerische Eidgenossenschaft",
+      "name_en": "Swiss Confederation",
       "parent": null,
       "polity_kind": "sovereign_state",
-      "source": "ch-parlament-1848"
+      "scheme": "ch.nation",
+      "valid_from": "1848-09-12",
+      "source": "fedlex-bv"
+    },
+    {
+      "key": "canton",
+      "name": "Kantone",
+      "name_en": "Cantons (20 cantons and 6 half-cantons, each with one Council of States seat)",
+      "parent": "national",
+      "polity_kind": "federal_unit",
+      "scheme": "ch.canton",
+      "source": "fedlex-bv",
+      "counts": [
+        {
+          "date": "2026-01-01",
+          "value": 26,
+          "source": "bfs-agv-2026"
+        }
+      ]
+    },
+    {
+      "key": "district",
+      "name": "Bezirke, Ämter, Verwaltungskreise, districts, distretti",
+      "name_en": "Districts (in 17 cantons; 135 units)",
+      "parent": "canton",
+      "polity_kind": "county",
+      "source": "bfs-agv-2026",
+      "counts": [
+        {
+          "within": "CH-AG",
+          "date": "2026-01-01",
+          "value": 11,
+          "source": "bfs-agv-2026"
+        },
+        {
+          "within": "CH-AR",
+          "date": "2026-01-01",
+          "value": 3,
+          "source": "bfs-agv-2026"
+        },
+        {
+          "within": "CH-BE",
+          "date": "2026-01-01",
+          "value": 10,
+          "source": "bfs-agv-2026"
+        },
+        {
+          "within": "CH-BL",
+          "date": "2026-01-01",
+          "value": 5,
+          "source": "bfs-agv-2026"
+        },
+        {
+          "within": "CH-FR",
+          "date": "2026-01-01",
+          "value": 7,
+          "source": "bfs-agv-2026"
+        },
+        {
+          "within": "CH-GR",
+          "date": "2026-01-01",
+          "value": 11,
+          "source": "bfs-agv-2026"
+        },
+        {
+          "within": "CH-JU",
+          "date": "2026-01-01",
+          "value": 4,
+          "source": "bfs-agv-2026"
+        },
+        {
+          "within": "CH-LU",
+          "date": "2026-01-01",
+          "value": 6,
+          "source": "bfs-agv-2026"
+        },
+        {
+          "within": "CH-SG",
+          "date": "2026-01-01",
+          "value": 8,
+          "source": "bfs-agv-2026"
+        },
+        {
+          "within": "CH-SH",
+          "date": "2026-01-01",
+          "value": 6,
+          "source": "bfs-agv-2026"
+        },
+        {
+          "within": "CH-SO",
+          "date": "2026-01-01",
+          "value": 10,
+          "source": "bfs-agv-2026"
+        },
+        {
+          "within": "CH-SZ",
+          "date": "2026-01-01",
+          "value": 6,
+          "source": "bfs-agv-2026"
+        },
+        {
+          "within": "CH-TG",
+          "date": "2026-01-01",
+          "value": 5,
+          "source": "bfs-agv-2026"
+        },
+        {
+          "within": "CH-TI",
+          "date": "2026-01-01",
+          "value": 8,
+          "source": "bfs-agv-2026"
+        },
+        {
+          "within": "CH-VD",
+          "date": "2026-01-01",
+          "value": 10,
+          "source": "bfs-agv-2026"
+        },
+        {
+          "within": "CH-VS",
+          "date": "2026-01-01",
+          "value": 13,
+          "source": "bfs-agv-2026"
+        },
+        {
+          "within": "CH-ZH",
+          "date": "2026-01-01",
+          "value": 12,
+          "source": "bfs-agv-2026"
+        }
+      ]
+    },
+    {
+      "key": "commune",
+      "name": "Politische Gemeinden, communes, comuni",
+      "name_en": "Political communes (municipalities)",
+      "parent": "canton",
+      "polity_kind": "municipality",
+      "scheme": "ch.commune",
+      "source": "bfs-agv-2026",
+      "counts": [
+        {
+          "within": "CH-AG",
+          "date": "2026-01-01",
+          "value": 231,
+          "source": "bfs-agv-2026"
+        },
+        {
+          "within": "CH-AI",
+          "date": "2026-01-01",
+          "value": 5,
+          "source": "bfs-agv-2026"
+        },
+        {
+          "within": "CH-AR",
+          "date": "2026-01-01",
+          "value": 20,
+          "source": "bfs-agv-2026"
+        },
+        {
+          "within": "CH-BE",
+          "date": "2026-01-01",
+          "value": 334,
+          "source": "bfs-agv-2026"
+        },
+        {
+          "within": "CH-BL",
+          "date": "2026-01-01",
+          "value": 86,
+          "source": "bfs-agv-2026"
+        },
+        {
+          "within": "CH-BS",
+          "date": "2026-01-01",
+          "value": 3,
+          "source": "bfs-agv-2026"
+        },
+        {
+          "within": "CH-FR",
+          "date": "2026-01-01",
+          "value": 119,
+          "source": "bfs-agv-2026"
+        },
+        {
+          "within": "CH-GE",
+          "date": "2026-01-01",
+          "value": 45,
+          "source": "bfs-agv-2026"
+        },
+        {
+          "within": "CH-GL",
+          "date": "2026-01-01",
+          "value": 3,
+          "source": "bfs-agv-2026"
+        },
+        {
+          "within": "CH-GR",
+          "date": "2026-01-01",
+          "value": 82,
+          "source": "bfs-agv-2026"
+        },
+        {
+          "within": "CH-JU",
+          "date": "2026-01-01",
+          "value": 51,
+          "source": "bfs-agv-2026"
+        },
+        {
+          "within": "CH-LU",
+          "date": "2026-01-01",
+          "value": 51,
+          "source": "bfs-agv-2026"
+        },
+        {
+          "within": "CH-NE",
+          "date": "2026-01-01",
+          "value": 24,
+          "source": "bfs-agv-2026"
+        },
+        {
+          "within": "CH-NW",
+          "date": "2026-01-01",
+          "value": 11,
+          "source": "bfs-agv-2026"
+        },
+        {
+          "within": "CH-OW",
+          "date": "2026-01-01",
+          "value": 7,
+          "source": "bfs-agv-2026"
+        },
+        {
+          "within": "CH-SG",
+          "date": "2026-01-01",
+          "value": 75,
+          "source": "bfs-agv-2026"
+        },
+        {
+          "within": "CH-SH",
+          "date": "2026-01-01",
+          "value": 26,
+          "source": "bfs-agv-2026"
+        },
+        {
+          "within": "CH-SO",
+          "date": "2026-01-01",
+          "value": 104,
+          "source": "bfs-agv-2026"
+        },
+        {
+          "within": "CH-SZ",
+          "date": "2026-01-01",
+          "value": 30,
+          "source": "bfs-agv-2026"
+        },
+        {
+          "within": "CH-TG",
+          "date": "2026-01-01",
+          "value": 80,
+          "source": "bfs-agv-2026"
+        },
+        {
+          "within": "CH-TI",
+          "date": "2026-01-01",
+          "value": 100,
+          "source": "bfs-agv-2026"
+        },
+        {
+          "within": "CH-UR",
+          "date": "2026-01-01",
+          "value": 19,
+          "source": "bfs-agv-2026"
+        },
+        {
+          "within": "CH-VD",
+          "date": "2026-01-01",
+          "value": 300,
+          "source": "bfs-agv-2026"
+        },
+        {
+          "within": "CH-VS",
+          "date": "2026-01-01",
+          "value": 142,
+          "source": "bfs-agv-2026"
+        },
+        {
+          "within": "CH-ZG",
+          "date": "2026-01-01",
+          "value": 11,
+          "source": "bfs-agv-2026"
+        },
+        {
+          "within": "CH-ZH",
+          "date": "2026-01-01",
+          "value": 151,
+          "source": "bfs-agv-2026"
+        }
+      ]
+    },
+    {
+      "key": "helvetic",
+      "name": "Helvetische Republik",
+      "name_en": "Helvetic Republic (1798–1803)",
+      "parent": null,
+      "polity_kind": "historical_state",
+      "valid_from": "1798-04-12",
+      "valid_to": "1803-03-10",
+      "source": "hls-helvetik"
     }
   ],
   "classes": [
     {
       "key": "national_council",
       "tier": "national",
-      "name": "National Council elections",
+      "name": "Nationalratswahlen",
       "category": "legislature",
       "goal": "national",
       "measure": {
@@ -130,7 +722,9 @@
       "match": [
         {
           "election_kinds": [
-            "general"
+            "general",
+            "by_election",
+            "runoff"
           ],
           "body_kinds": [
             "lower_house"
@@ -1754,12 +2348,61 @@
           "source": "bfs-nr-turnout-cantons",
           "quote": "Column 2023: 26 cantons with a figure"
         }
+      ],
+      "name_en": "National Council elections",
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 3,
+          "month": 10,
+          "day_rule": "oct_second_last_sunday",
+          "term_years": 4,
+          "administered_by": "Kantonsregierungen; Bundeskanzlei",
+          "vacancy_rule": "A vacant seat goes to the first substitute on the same list (BPR Art. 55); by-elections and supplementary elections are set by the cantonal government for the next possible date (BPR Art. 19).",
+          "source": "fedlex-bpr",
+          "locator": "https://www.fedlex.admin.ch/eli/cc/1978/688_688_688/de#art_19"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Bundesamt für Statistik, STAT-TAB (PXWeb px-x-1702020000_104, _105, _101)",
+          "url": "https://www.pxweb.bfs.admin.ch/pxweb/de/px-x-1702020000_105/",
+          "format": "json-stat2 (PXWeb API)",
+          "access": "open",
+          "first_date": "1971-10-31",
+          "checked_at": "2026-11-13T00:00:00Z",
+          "license": "OGD Schweiz: freie Nutzung, Quellenangabe Pflicht (opendata.swiss terms_by)",
+          "finest": "ch.commune",
+          "evidence": "Party votes by canton, district, and commune from 1971; ballots by commune."
+        },
+        {
+          "platform": "Bundesamt für Statistik, voteinfo (Nationalratswahlen)",
+          "url": "https://ogd-static.voteinfo-app.ch/v4/ogd/sd-t-17.02-NRW2023-kandidierende.json",
+          "format": "JSON",
+          "access": "open",
+          "first_date": "2023-10-22",
+          "checked_at": "2026-11-13T00:00:00Z",
+          "license": "OGD Schweiz: freie Nutzung, Quellenangabe Pflicht (opendata.swiss terms_by)",
+          "finest": "ch.commune",
+          "evidence": "Lists, candidates, and candidate votes by commune for 2023."
+        },
+        {
+          "platform": "Bundesamt für Statistik, Nationalratswahlen: Wahlbeteiligung nach Kanton",
+          "url": "https://www.bfs.admin.ch/asset/de/28765047",
+          "format": "XLSX",
+          "access": "open",
+          "first_date": "1919-10-26",
+          "checked_at": "2026-11-13T00:00:00Z",
+          "license": "OGD Schweiz: freie Nutzung, Quellenangabe Pflicht (opendata.swiss terms_by)",
+          "finest": "ch.canton",
+          "evidence": "Turnout by canton from 1919; seats by party and canton (asset 28765024)."
+        }
       ]
     },
     {
       "key": "council_of_states",
       "tier": "national",
-      "name": "Council of States elections",
+      "name": "Ständeratswahlen",
       "category": "legislature",
       "goal": "national",
       "measure": {
@@ -1773,7 +2416,9 @@
       "match": [
         {
           "election_kinds": [
-            "general"
+            "general",
+            "by_election",
+            "runoff"
           ],
           "body_kinds": [
             "upper_house"
@@ -3562,12 +4207,51 @@
           "source": "parl-staenderat",
           "quote": "Die Zahl seiner Mitglieder wurde 1979 anlässlich der Gründung des Kantons Jura auf 46 erhöht. (26 cantons and former half-cantons); National Council election year 2023 from Termine der Nationalratswahlen seit 1848"
         }
+      ],
+      "name_en": "Council of States elections",
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 3,
+          "month": 10,
+          "day_rule": "oct_second_last_sunday",
+          "term_years": 4,
+          "runoff": "majority",
+          "runoff_rule": "Cantonal law (BV Art. 150 Abs. 3): absolute majority in the first round in all cantons but Neuchâtel and Jura, which use proportional representation; a plurality elects in the second round.",
+          "administered_by": "Kantone",
+          "source": "fedlex-bv",
+          "locator": "https://www.fedlex.admin.ch/eli/cc/1999/404/de#art_150"
+        },
+        {
+          "within": "CH-AI",
+          "selection": "town_meeting",
+          "period_years": 4,
+          "phase": 3,
+          "month": 4,
+          "day_rule": "apr_last_sunday_unless_easter",
+          "term_years": 4,
+          "administered_by": "Landsgemeinde Appenzell Innerrhoden",
+          "source": "kv-ai"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Bundesamt für Statistik, Ständeratswahlen: Kandidierende und Gewählte",
+          "url": "https://www.bfs.admin.ch/asset/de/28765111",
+          "format": "XLSX",
+          "access": "open",
+          "first_date": "1990-03-18",
+          "checked_at": "2026-11-13T00:00:00Z",
+          "license": "OGD Schweiz: freie Nutzung, Quellenangabe Pflicht (opendata.swiss terms_by)",
+          "finest": "ch.canton",
+          "evidence": "Candidate votes and turnout by canton and round from 1990/1991; no commune results."
+        }
       ]
     },
     {
       "key": "federal_votes",
       "tier": "national",
-      "name": "Federal popular votes",
+      "name": "Eidgenössische Volksabstimmungen",
       "category": "direct_democracy",
       "goal": "referendums",
       "measure": {
@@ -4581,7 +5265,2838 @@
           "source": "bfs-votes-xlsx",
           "quote": "08.03.2026\t682.1\tVolksinitiative «Ja zu einer unabhängigen, freien Schweizer Währung mit Münzen oder Banknoten (Bargeld ist Freiheit)»"
         }
+      ],
+      "name_en": "Federal popular votes",
+      "cadence": [
+        {
+          "period_years": 1,
+          "phase": 0,
+          "called": true,
+          "administered_by": "Bundeskanzlei; Kantone",
+          "runoff_rule": "Four vote days a year: the fourth-to-last Sunday before Easter, the Sunday after Pentecost, the Sunday after the Federal Day of Thanksgiving, and the last Sunday of November (VPR Art. 2a); the Federal Council picks the questions at least four months ahead (BPR Art. 10).",
+          "source": "fedlex-vpr",
+          "locator": "https://www.fedlex.admin.ch/eli/cc/1978/712_712_712/de#art_2_a"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Bundesamt für Statistik, STAT-TAB (PXWeb px-x-1703030000_101)",
+          "url": "https://www.pxweb.bfs.admin.ch/pxweb/de/px-x-1703030000_101/",
+          "format": "json-stat2 (PXWeb API)",
+          "access": "open",
+          "first_date": "1960-01-01",
+          "checked_at": "2026-11-13T00:00:00Z",
+          "license": "OGD Schweiz: freie Nutzung, Quellenangabe Pflicht (opendata.swiss terms_by)",
+          "finest": "ch.commune",
+          "evidence": "Registered, ballots, valid, yes, and no by commune from 1960 (today's communes)."
+        },
+        {
+          "platform": "Bundesamt für Statistik, voteinfo (eidgenössische Abstimmungen)",
+          "url": "https://ogd-static.voteinfo-app.ch/v1/ogd/sd-t-17-02-{YYYYMMDD}-eidgAbstimmung.json",
+          "format": "JSON",
+          "access": "open",
+          "first_date": null,
+          "checked_at": "2026-11-13T00:00:00Z",
+          "license": "OGD Schweiz: freie Nutzung, Quellenangabe Pflicht (opendata.swiss terms_by)",
+          "finest": "ch.commune",
+          "evidence": "One file per vote day with results by canton, district, and commune."
+        },
+        {
+          "platform": "Bundesamt für Statistik, Eidgenössische Volksabstimmungen: detaillierte Ergebnisse",
+          "url": "https://www.bfs.admin.ch/asset/de/36842612",
+          "format": "XLSX",
+          "access": "open",
+          "first_date": "1848-06-06",
+          "checked_at": "2026-11-13T00:00:00Z",
+          "license": "OGD Schweiz: freie Nutzung, Quellenangabe Pflicht (opendata.swiss terms_by)",
+          "finest": "ch.canton",
+          "evidence": "Every federal vote from 1848 with results by canton."
+        }
       ]
+    },
+    {
+      "key": "federal_council",
+      "tier": "national",
+      "name": "Wahl des Bundesrates durch die Vereinigte Bundesversammlung",
+      "name_en": "Federal Council elections (by the Federal Assembly)",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "The United Federal Assembly elects the seven members one seat at a time after each National Council renewal, in order of seniority of the incumbents, and fills vacancies in the session after a resignation (BV Art. 175; ParlG Art. 132 and 133). Each seat is one contest; ballots continue until a candidate passes the absolute majority of valid ballots.",
+      "source": "fedlex-bv",
+      "first_held": "1848-11-16",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "body_kinds": [
+            "electoral_college"
+          ],
+          "iso_pattern": "CH"
+        }
+      ],
+      "cadence": [
+        {
+          "selection": "elected",
+          "period_years": 4,
+          "phase": 3,
+          "month": 12,
+          "term_years": 4,
+          "runoff": "majority",
+          "runoff_rule": "Absolute majority of valid ballots; anyone eligible may receive votes in the first two ballots, no new candidates from the third, and from then on the candidate with the fewest votes drops out (ParlG Art. 130 and 132).",
+          "administered_by": "Vereinigte Bundesversammlung",
+          "vacancy_rule": "Vacancies are filled as a rule in the session after the resignation or death (ParlG Art. 133).",
+          "source": "fedlex-parlg",
+          "locator": "https://www.fedlex.admin.ch/eli/cc/2003/510/de#art_132"
+        }
+      ],
+      "est_votes": 2500,
+      "effort": 2,
+      "dates": []
+    },
+    {
+      "key": "federal_president",
+      "tier": "national",
+      "name": "Wahl der Bundespräsidentin oder des Bundespräsidenten und der Vizepräsidentin oder des Vizepräsidenten",
+      "name_en": "President and Vice President of the Confederation (by the Federal Assembly)",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "Elected each December for one year from among the members of the Federal Council; immediate re-election is barred (BV Art. 176).",
+      "source": "fedlex-bv",
+      "locator": "https://www.fedlex.admin.ch/eli/cc/1999/404/de#art_176",
+      "cadence": [
+        {
+          "period_years": 1,
+          "phase": 0,
+          "month": 12,
+          "term_years": 1,
+          "runoff": "majority",
+          "runoff_rule": "Absolute majority of valid ballots (ParlG Art. 130).",
+          "administered_by": "Vereinigte Bundesversammlung",
+          "source": "fedlex-bv",
+          "locator": "https://www.fedlex.admin.ch/eli/cc/1999/404/de#art_176"
+        }
+      ],
+      "est_votes": 500,
+      "effort": 2,
+      "dates": []
+    },
+    {
+      "key": "federal_assembly_other",
+      "tier": "national",
+      "name": "Weitere Wahlen der Vereinigten Bundesversammlung (Bundeskanzler, Bundesrichter, General)",
+      "name_en": "Other Federal Assembly elections (Federal Chancellor, federal judges, General)",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "The Federal Assembly also elects the Federal Chancellor (four years), the judges of the Federal Supreme Court (six years) and of the other federal courts, and in wartime the General (BV Art. 145 and 168).",
+      "source": "fedlex-bv",
+      "locator": "https://www.fedlex.admin.ch/eli/cc/1999/404/de#art_168",
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 3,
+          "month": 12,
+          "term_years": 4,
+          "runoff": "majority",
+          "administered_by": "Vereinigte Bundesversammlung",
+          "source": "fedlex-bv",
+          "locator": "https://www.fedlex.admin.ch/eli/cc/1999/404/de#art_145"
+        }
+      ],
+      "est_votes": 5000,
+      "effort": 3,
+      "dates": []
+    },
+    {
+      "key": "cantonal_parliament",
+      "tier": "canton",
+      "name": "Wahlen der Kantonsparlamente (Kantonsrat, Grosser Rat, Landrat, Grand Conseil, Gran Consiglio, Parlement)",
+      "name_en": "Cantonal parliament elections",
+      "category": "legislature",
+      "goal": "subnational",
+      "measure": {
+        "unit": "polity",
+        "schemes": [
+          "ch.canton"
+        ],
+        "fine": [
+          "ch.commune"
+        ]
+      },
+      "note": "Every canton elects a unicameral parliament, all by list proportional representation today except Appenzell Innerrhoden (majority vote in the districts) and, for some seats, Graubünden before 2022; constituencies are districts, communes, or regions set by each canton. Terms are four years except Fribourg, Vaud, Geneva, and Jura (five). Each canton's general election counts once. The listed years are those the Federal Statistical Office gives per canton in its four-year windows from 1968 to spring 2024, so cantons with three-year terms before the 2000s (Appenzell Ausserrhoden, Graubünden) are short a year in some windows. Elections after spring 2024 are listed by date from each canton's own announcement or results.",
+      "source": "bfs-kt-parl-seats",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "by_election"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "CH-*"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1968-01-01",
+          "precision": "year",
+          "contests": 6,
+          "regions": {
+            "BS": 1,
+            "SG": 1,
+            "SH": 1,
+            "SZ": 1,
+            "TG": 1,
+            "UR": 1
+          },
+          "source": "bfs-kt-parl-seats",
+          "quote": "Wahljahr 1968: BS, SG, SH, SZ, TG, UR (BFS T 17.02.05.01.03, column Wahljahr)"
+        },
+        {
+          "date": "1969-01-01",
+          "precision": "year",
+          "contests": 6,
+          "regions": {
+            "AG": 1,
+            "AR": 1,
+            "GE": 1,
+            "NE": 1,
+            "SO": 1,
+            "VS": 1
+          },
+          "source": "bfs-kt-parl-seats",
+          "quote": "Wahljahr 1969: AG, AR, GE, NE, SO, VS (BFS T 17.02.05.01.03, column Wahljahr)"
+        },
+        {
+          "date": "1970-01-01",
+          "precision": "year",
+          "contests": 5,
+          "regions": {
+            "BE": 1,
+            "NW": 1,
+            "OW": 1,
+            "VD": 1,
+            "ZG": 1
+          },
+          "source": "bfs-kt-parl-seats",
+          "quote": "Wahljahr 1970: BE, NW, OW, VD, ZG (BFS T 17.02.05.01.03, column Wahljahr)"
+        },
+        {
+          "date": "1971-01-01",
+          "precision": "year",
+          "contests": 8,
+          "regions": {
+            "AI": 1,
+            "BL": 1,
+            "FR": 1,
+            "GL": 1,
+            "GR": 1,
+            "LU": 1,
+            "TI": 1,
+            "ZH": 1
+          },
+          "source": "bfs-kt-parl-seats",
+          "quote": "Wahljahr 1971: AI, BL, FR, GL, GR, LU, TI, ZH (BFS T 17.02.05.01.03, column Wahljahr)"
+        },
+        {
+          "date": "1972-01-01",
+          "precision": "year",
+          "contests": 6,
+          "regions": {
+            "BS": 1,
+            "SG": 1,
+            "SH": 1,
+            "SZ": 1,
+            "TG": 1,
+            "UR": 1
+          },
+          "source": "bfs-kt-parl-seats",
+          "quote": "Wahljahr 1972: BS, SG, SH, SZ, TG, UR (BFS T 17.02.05.01.03, column Wahljahr)"
+        },
+        {
+          "date": "1973-01-01",
+          "precision": "year",
+          "contests": 5,
+          "regions": {
+            "AG": 1,
+            "GE": 1,
+            "NE": 1,
+            "SO": 1,
+            "VS": 1
+          },
+          "source": "bfs-kt-parl-seats",
+          "quote": "Wahljahr 1973: AG, GE, NE, SO, VS (BFS T 17.02.05.01.03, column Wahljahr)"
+        },
+        {
+          "date": "1974-01-01",
+          "precision": "year",
+          "contests": 6,
+          "regions": {
+            "BE": 1,
+            "GL": 1,
+            "NW": 1,
+            "OW": 1,
+            "VD": 1,
+            "ZG": 1
+          },
+          "source": "bfs-kt-parl-seats",
+          "quote": "Wahljahr 1974: BE, GL, NW, OW, VD, ZG (BFS T 17.02.05.01.03, column Wahljahr)"
+        },
+        {
+          "date": "1975-01-01",
+          "precision": "year",
+          "contests": 7,
+          "regions": {
+            "AI": 1,
+            "AR": 1,
+            "BL": 1,
+            "GR": 1,
+            "LU": 1,
+            "TI": 1,
+            "ZH": 1
+          },
+          "source": "bfs-kt-parl-seats",
+          "quote": "Wahljahr 1975: AI, AR, BL, GR, LU, TI, ZH (BFS T 17.02.05.01.03, column Wahljahr)"
+        },
+        {
+          "date": "1976-01-01",
+          "precision": "year",
+          "contests": 7,
+          "regions": {
+            "BS": 1,
+            "FR": 1,
+            "SG": 1,
+            "SH": 1,
+            "SZ": 1,
+            "TG": 1,
+            "UR": 1
+          },
+          "source": "bfs-kt-parl-seats",
+          "quote": "Wahljahr 1976: BS, FR, SG, SH, SZ, TG, UR (BFS T 17.02.05.01.03, column Wahljahr)"
+        },
+        {
+          "date": "1977-01-01",
+          "precision": "year",
+          "contests": 5,
+          "regions": {
+            "AG": 1,
+            "GE": 1,
+            "NE": 1,
+            "SO": 1,
+            "VS": 1
+          },
+          "source": "bfs-kt-parl-seats",
+          "quote": "Wahljahr 1977: AG, GE, NE, SO, VS (BFS T 17.02.05.01.03, column Wahljahr)"
+        },
+        {
+          "date": "1978-01-01",
+          "precision": "year",
+          "contests": 8,
+          "regions": {
+            "AR": 1,
+            "BE": 1,
+            "GL": 1,
+            "JU": 1,
+            "NW": 1,
+            "OW": 1,
+            "VD": 1,
+            "ZG": 1
+          },
+          "source": "bfs-kt-parl-seats",
+          "quote": "Wahljahr 1978: AR, BE, GL, JU, NW, OW, VD, ZG (BFS T 17.02.05.01.03, column Wahljahr)"
+        },
+        {
+          "date": "1979-01-01",
+          "precision": "year",
+          "contests": 6,
+          "regions": {
+            "AI": 1,
+            "BL": 1,
+            "GR": 1,
+            "LU": 1,
+            "TI": 1,
+            "ZH": 1
+          },
+          "source": "bfs-kt-parl-seats",
+          "quote": "Wahljahr 1979: AI, BL, GR, LU, TI, ZH (BFS T 17.02.05.01.03, column Wahljahr)"
+        },
+        {
+          "date": "1980-01-01",
+          "precision": "year",
+          "contests": 6,
+          "regions": {
+            "BS": 1,
+            "SG": 1,
+            "SH": 1,
+            "SZ": 1,
+            "TG": 1,
+            "UR": 1
+          },
+          "source": "bfs-kt-parl-seats",
+          "quote": "Wahljahr 1980: BS, SG, SH, SZ, TG, UR (BFS T 17.02.05.01.03, column Wahljahr)"
+        },
+        {
+          "date": "1981-01-01",
+          "precision": "year",
+          "contests": 7,
+          "regions": {
+            "AG": 1,
+            "AR": 1,
+            "FR": 1,
+            "GE": 1,
+            "NE": 1,
+            "SO": 1,
+            "VS": 1
+          },
+          "source": "bfs-kt-parl-seats",
+          "quote": "Wahljahr 1981: AG, AR, FR, GE, NE, SO, VS (BFS T 17.02.05.01.03, column Wahljahr)"
+        },
+        {
+          "date": "1982-01-01",
+          "precision": "year",
+          "contests": 7,
+          "regions": {
+            "BE": 1,
+            "GL": 1,
+            "JU": 1,
+            "NW": 1,
+            "OW": 1,
+            "VD": 1,
+            "ZG": 1
+          },
+          "source": "bfs-kt-parl-seats",
+          "quote": "Wahljahr 1982: BE, GL, JU, NW, OW, VD, ZG (BFS T 17.02.05.01.03, column Wahljahr)"
+        },
+        {
+          "date": "1983-01-01",
+          "precision": "year",
+          "contests": 6,
+          "regions": {
+            "AI": 1,
+            "BL": 1,
+            "GR": 1,
+            "LU": 1,
+            "TI": 1,
+            "ZH": 1
+          },
+          "source": "bfs-kt-parl-seats",
+          "quote": "Wahljahr 1983: AI, BL, GR, LU, TI, ZH (BFS T 17.02.05.01.03, column Wahljahr)"
+        },
+        {
+          "date": "1984-01-01",
+          "precision": "year",
+          "contests": 6,
+          "regions": {
+            "BS": 1,
+            "SG": 1,
+            "SH": 1,
+            "SZ": 1,
+            "TG": 1,
+            "UR": 1
+          },
+          "source": "bfs-kt-parl-seats",
+          "quote": "Wahljahr 1984: BS, SG, SH, SZ, TG, UR (BFS T 17.02.05.01.03, column Wahljahr)"
+        },
+        {
+          "date": "1985-01-01",
+          "precision": "year",
+          "contests": 5,
+          "regions": {
+            "AG": 1,
+            "GE": 1,
+            "NE": 1,
+            "SO": 1,
+            "VS": 1
+          },
+          "source": "bfs-kt-parl-seats",
+          "quote": "Wahljahr 1985: AG, GE, NE, SO, VS (BFS T 17.02.05.01.03, column Wahljahr)"
+        },
+        {
+          "date": "1986-01-01",
+          "precision": "year",
+          "contests": 8,
+          "regions": {
+            "BE": 1,
+            "FR": 1,
+            "GL": 1,
+            "JU": 1,
+            "NW": 1,
+            "OW": 1,
+            "VD": 1,
+            "ZG": 1
+          },
+          "source": "bfs-kt-parl-seats",
+          "quote": "Wahljahr 1986: BE, FR, GL, JU, NW, OW, VD, ZG (BFS T 17.02.05.01.03, column Wahljahr)"
+        },
+        {
+          "date": "1987-01-01",
+          "precision": "year",
+          "contests": 7,
+          "regions": {
+            "AI": 1,
+            "AR": 1,
+            "BL": 1,
+            "GR": 1,
+            "LU": 1,
+            "TI": 1,
+            "ZH": 1
+          },
+          "source": "bfs-kt-parl-seats",
+          "quote": "Wahljahr 1987: AI, AR, BL, GR, LU, TI, ZH (BFS T 17.02.05.01.03, column Wahljahr)"
+        },
+        {
+          "date": "1988-01-01",
+          "precision": "year",
+          "contests": 6,
+          "regions": {
+            "BS": 1,
+            "SG": 1,
+            "SH": 1,
+            "SZ": 1,
+            "TG": 1,
+            "UR": 1
+          },
+          "source": "bfs-kt-parl-seats",
+          "quote": "Wahljahr 1988: BS, SG, SH, SZ, TG, UR (BFS T 17.02.05.01.03, column Wahljahr)"
+        },
+        {
+          "date": "1989-01-01",
+          "precision": "year",
+          "contests": 5,
+          "regions": {
+            "AG": 1,
+            "GE": 1,
+            "NE": 1,
+            "SO": 1,
+            "VS": 1
+          },
+          "source": "bfs-kt-parl-seats",
+          "quote": "Wahljahr 1989: AG, GE, NE, SO, VS (BFS T 17.02.05.01.03, column Wahljahr)"
+        },
+        {
+          "date": "1990-01-01",
+          "precision": "year",
+          "contests": 8,
+          "regions": {
+            "AR": 1,
+            "BE": 1,
+            "GL": 1,
+            "JU": 1,
+            "NW": 1,
+            "OW": 1,
+            "VD": 1,
+            "ZG": 1
+          },
+          "source": "bfs-kt-parl-seats",
+          "quote": "Wahljahr 1990: AR, BE, GL, JU, NW, OW, VD, ZG (BFS T 17.02.05.01.03, column Wahljahr)"
+        },
+        {
+          "date": "1991-01-01",
+          "precision": "year",
+          "contests": 7,
+          "regions": {
+            "AI": 1,
+            "BL": 1,
+            "FR": 1,
+            "GR": 1,
+            "LU": 1,
+            "TI": 1,
+            "ZH": 1
+          },
+          "source": "bfs-kt-parl-seats",
+          "quote": "Wahljahr 1991: AI, BL, FR, GR, LU, TI, ZH (BFS T 17.02.05.01.03, column Wahljahr)"
+        },
+        {
+          "date": "1992-01-01",
+          "precision": "year",
+          "contests": 6,
+          "regions": {
+            "BS": 1,
+            "SG": 1,
+            "SH": 1,
+            "SZ": 1,
+            "TG": 1,
+            "UR": 1
+          },
+          "source": "bfs-kt-parl-seats",
+          "quote": "Wahljahr 1992: BS, SG, SH, SZ, TG, UR (BFS T 17.02.05.01.03, column Wahljahr)"
+        },
+        {
+          "date": "1993-01-01",
+          "precision": "year",
+          "contests": 6,
+          "regions": {
+            "AG": 1,
+            "AR": 1,
+            "GE": 1,
+            "NE": 1,
+            "SO": 1,
+            "VS": 1
+          },
+          "source": "bfs-kt-parl-seats",
+          "quote": "Wahljahr 1993: AG, AR, GE, NE, SO, VS (BFS T 17.02.05.01.03, column Wahljahr)"
+        },
+        {
+          "date": "1994-01-01",
+          "precision": "year",
+          "contests": 8,
+          "regions": {
+            "BE": 1,
+            "GL": 1,
+            "GR": 1,
+            "JU": 1,
+            "NW": 1,
+            "OW": 1,
+            "VD": 1,
+            "ZG": 1
+          },
+          "source": "bfs-kt-parl-seats",
+          "quote": "Wahljahr 1994: BE, GL, GR, JU, NW, OW, VD, ZG (BFS T 17.02.05.01.03, column Wahljahr)"
+        },
+        {
+          "date": "1995-01-01",
+          "precision": "year",
+          "contests": 5,
+          "regions": {
+            "AI": 1,
+            "BL": 1,
+            "LU": 1,
+            "TI": 1,
+            "ZH": 1
+          },
+          "source": "bfs-kt-parl-seats",
+          "quote": "Wahljahr 1995: AI, BL, LU, TI, ZH (BFS T 17.02.05.01.03, column Wahljahr)"
+        },
+        {
+          "date": "1996-01-01",
+          "precision": "year",
+          "contests": 7,
+          "regions": {
+            "BS": 1,
+            "FR": 1,
+            "SG": 1,
+            "SH": 1,
+            "SZ": 1,
+            "TG": 1,
+            "UR": 1
+          },
+          "source": "bfs-kt-parl-seats",
+          "quote": "Wahljahr 1996: BS, FR, SG, SH, SZ, TG, UR (BFS T 17.02.05.01.03, column Wahljahr)"
+        },
+        {
+          "date": "1997-01-01",
+          "precision": "year",
+          "contests": 6,
+          "regions": {
+            "AG": 1,
+            "GE": 1,
+            "GR": 1,
+            "NE": 1,
+            "SO": 1,
+            "VS": 1
+          },
+          "source": "bfs-kt-parl-seats",
+          "quote": "Wahljahr 1997: AG, GE, GR, NE, SO, VS (BFS T 17.02.05.01.03, column Wahljahr)"
+        },
+        {
+          "date": "1998-01-01",
+          "precision": "year",
+          "contests": 7,
+          "regions": {
+            "BE": 1,
+            "GL": 1,
+            "JU": 1,
+            "NW": 1,
+            "OW": 1,
+            "VD": 1,
+            "ZG": 1
+          },
+          "source": "bfs-kt-parl-seats",
+          "quote": "Wahljahr 1998: BE, GL, JU, NW, OW, VD, ZG (BFS T 17.02.05.01.03, column Wahljahr)"
+        },
+        {
+          "date": "1999-01-01",
+          "precision": "year",
+          "contests": 6,
+          "regions": {
+            "AI": 1,
+            "AR": 1,
+            "BL": 1,
+            "LU": 1,
+            "TI": 1,
+            "ZH": 1
+          },
+          "source": "bfs-kt-parl-seats",
+          "quote": "Wahljahr 1999: AI, AR, BL, LU, TI, ZH (BFS T 17.02.05.01.03, column Wahljahr)"
+        },
+        {
+          "date": "2000-01-01",
+          "precision": "year",
+          "contests": 6,
+          "regions": {
+            "BS": 1,
+            "SG": 1,
+            "SH": 1,
+            "SZ": 1,
+            "TG": 1,
+            "UR": 1
+          },
+          "source": "bfs-kt-parl-seats",
+          "quote": "Wahljahr 2000: BS, SG, SH, SZ, TG, UR (BFS T 17.02.05.01.03, column Wahljahr)"
+        },
+        {
+          "date": "2001-01-01",
+          "precision": "year",
+          "contests": 6,
+          "regions": {
+            "AG": 1,
+            "FR": 1,
+            "GE": 1,
+            "NE": 1,
+            "SO": 1,
+            "VS": 1
+          },
+          "source": "bfs-kt-parl-seats",
+          "quote": "Wahljahr 2001: AG, FR, GE, NE, SO, VS (BFS T 17.02.05.01.03, column Wahljahr)"
+        },
+        {
+          "date": "2002-01-01",
+          "precision": "year",
+          "contests": 7,
+          "regions": {
+            "BE": 1,
+            "GL": 1,
+            "JU": 1,
+            "NW": 1,
+            "OW": 1,
+            "VD": 1,
+            "ZG": 1
+          },
+          "source": "bfs-kt-parl-seats",
+          "quote": "Wahljahr 2002: BE, GL, JU, NW, OW, VD, ZG (BFS T 17.02.05.01.03, column Wahljahr)"
+        },
+        {
+          "date": "2003-01-01",
+          "precision": "year",
+          "contests": 7,
+          "regions": {
+            "AI": 1,
+            "AR": 1,
+            "BL": 1,
+            "GR": 1,
+            "LU": 1,
+            "TI": 1,
+            "ZH": 1
+          },
+          "source": "bfs-kt-parl-seats",
+          "quote": "Wahljahr 2003: AI, AR, BL, GR, LU, TI, ZH (BFS T 17.02.05.01.03, column Wahljahr)"
+        },
+        {
+          "date": "2004-01-01",
+          "precision": "year",
+          "contests": 6,
+          "regions": {
+            "BS": 1,
+            "SG": 1,
+            "SH": 1,
+            "SZ": 1,
+            "TG": 1,
+            "UR": 1
+          },
+          "source": "bfs-kt-parl-seats",
+          "quote": "Wahljahr 2004: BS, SG, SH, SZ, TG, UR (BFS T 17.02.05.01.03, column Wahljahr)"
+        },
+        {
+          "date": "2005-01-01",
+          "precision": "year",
+          "contests": 5,
+          "regions": {
+            "AG": 1,
+            "GE": 1,
+            "NE": 1,
+            "SO": 1,
+            "VS": 1
+          },
+          "source": "bfs-kt-parl-seats",
+          "quote": "Wahljahr 2005: AG, GE, NE, SO, VS (BFS T 17.02.05.01.03, column Wahljahr)"
+        },
+        {
+          "date": "2006-01-01",
+          "precision": "year",
+          "contests": 8,
+          "regions": {
+            "BE": 1,
+            "FR": 1,
+            "GL": 1,
+            "GR": 1,
+            "JU": 1,
+            "NW": 1,
+            "OW": 1,
+            "ZG": 1
+          },
+          "source": "bfs-kt-parl-seats",
+          "quote": "Wahljahr 2006: BE, FR, GL, GR, JU, NW, OW, ZG (BFS T 17.02.05.01.03, column Wahljahr)"
+        },
+        {
+          "date": "2007-01-01",
+          "precision": "year",
+          "contests": 7,
+          "regions": {
+            "AI": 1,
+            "AR": 1,
+            "BL": 1,
+            "LU": 1,
+            "TI": 1,
+            "VD": 1,
+            "ZH": 1
+          },
+          "source": "bfs-kt-parl-seats",
+          "quote": "Wahljahr 2007: AI, AR, BL, LU, TI, VD, ZH (BFS T 17.02.05.01.03, column Wahljahr)"
+        },
+        {
+          "date": "2008-01-01",
+          "precision": "year",
+          "contests": 6,
+          "regions": {
+            "BS": 1,
+            "SG": 1,
+            "SH": 1,
+            "SZ": 1,
+            "TG": 1,
+            "UR": 1
+          },
+          "source": "bfs-kt-parl-seats",
+          "quote": "Wahljahr 2008: BS, SG, SH, SZ, TG, UR (BFS T 17.02.05.01.03, column Wahljahr)"
+        },
+        {
+          "date": "2009-01-01",
+          "precision": "year",
+          "contests": 5,
+          "regions": {
+            "AG": 1,
+            "GE": 1,
+            "NE": 1,
+            "SO": 1,
+            "VS": 1
+          },
+          "source": "bfs-kt-parl-seats",
+          "quote": "Wahljahr 2009: AG, GE, NE, SO, VS (BFS T 17.02.05.01.03, column Wahljahr)"
+        },
+        {
+          "date": "2010-01-01",
+          "precision": "year",
+          "contests": 7,
+          "regions": {
+            "BE": 1,
+            "GL": 1,
+            "GR": 1,
+            "JU": 1,
+            "NW": 1,
+            "OW": 1,
+            "ZG": 1
+          },
+          "source": "bfs-kt-parl-seats",
+          "quote": "Wahljahr 2010: BE, GL, GR, JU, NW, OW, ZG (BFS T 17.02.05.01.03, column Wahljahr)"
+        },
+        {
+          "date": "2011-01-01",
+          "precision": "year",
+          "contests": 7,
+          "regions": {
+            "AI": 1,
+            "AR": 1,
+            "BL": 1,
+            "FR": 1,
+            "LU": 1,
+            "TI": 1,
+            "ZH": 1
+          },
+          "source": "bfs-kt-parl-seats",
+          "quote": "Wahljahr 2011: AI, AR, BL, FR, LU, TI, ZH (BFS T 17.02.05.01.03, column Wahljahr)"
+        },
+        {
+          "date": "2012-01-01",
+          "precision": "year",
+          "contests": 8,
+          "regions": {
+            "AG": 1,
+            "BS": 1,
+            "SG": 1,
+            "SH": 1,
+            "SZ": 1,
+            "TG": 1,
+            "UR": 1,
+            "VD": 1
+          },
+          "source": "bfs-kt-parl-seats",
+          "quote": "Wahljahr 2012: AG, BS, SG, SH, SZ, TG, UR, VD (BFS T 17.02.05.01.03, column Wahljahr)"
+        },
+        {
+          "date": "2013-01-01",
+          "precision": "year",
+          "contests": 4,
+          "regions": {
+            "GE": 1,
+            "NE": 1,
+            "SO": 1,
+            "VS": 1
+          },
+          "source": "bfs-kt-parl-seats",
+          "quote": "Wahljahr 2013: GE, NE, SO, VS (BFS T 17.02.05.01.03, column Wahljahr)"
+        },
+        {
+          "date": "2014-01-01",
+          "precision": "year",
+          "contests": 6,
+          "regions": {
+            "BE": 1,
+            "GL": 1,
+            "GR": 1,
+            "NW": 1,
+            "OW": 1,
+            "ZG": 1
+          },
+          "source": "bfs-kt-parl-seats",
+          "quote": "Wahljahr 2014: BE, GL, GR, NW, OW, ZG (BFS T 17.02.05.01.03, column Wahljahr)"
+        },
+        {
+          "date": "2015-01-01",
+          "precision": "year",
+          "contests": 7,
+          "regions": {
+            "AI": 1,
+            "AR": 1,
+            "BL": 1,
+            "JU": 1,
+            "LU": 1,
+            "TI": 1,
+            "ZH": 1
+          },
+          "source": "bfs-kt-parl-seats",
+          "quote": "Wahljahr 2015: AI, AR, BL, JU, LU, TI, ZH (BFS T 17.02.05.01.03, column Wahljahr)"
+        },
+        {
+          "date": "2016-01-01",
+          "precision": "year",
+          "contests": 8,
+          "regions": {
+            "AG": 1,
+            "BS": 1,
+            "FR": 1,
+            "SG": 1,
+            "SH": 1,
+            "SZ": 1,
+            "TG": 1,
+            "UR": 1
+          },
+          "source": "bfs-kt-parl-seats",
+          "quote": "Wahljahr 2016: AG, BS, FR, SG, SH, SZ, TG, UR (BFS T 17.02.05.01.03, column Wahljahr)"
+        },
+        {
+          "date": "2017-01-01",
+          "precision": "year",
+          "contests": 4,
+          "regions": {
+            "NE": 1,
+            "SO": 1,
+            "VD": 1,
+            "VS": 1
+          },
+          "source": "bfs-kt-parl-seats",
+          "quote": "Wahljahr 2017: NE, SO, VD, VS (BFS T 17.02.05.01.03, column Wahljahr)"
+        },
+        {
+          "date": "2018-01-01",
+          "precision": "year",
+          "contests": 7,
+          "regions": {
+            "BE": 1,
+            "GE": 1,
+            "GL": 1,
+            "GR": 1,
+            "NW": 1,
+            "OW": 1,
+            "ZG": 1
+          },
+          "source": "bfs-kt-parl-seats",
+          "quote": "Wahljahr 2018: BE, GE, GL, GR, NW, OW, ZG (BFS T 17.02.05.01.03, column Wahljahr)"
+        },
+        {
+          "date": "2019-01-01",
+          "precision": "year",
+          "contests": 6,
+          "regions": {
+            "AI": 1,
+            "AR": 1,
+            "BL": 1,
+            "LU": 1,
+            "TI": 1,
+            "ZH": 1
+          },
+          "source": "bfs-kt-parl-seats",
+          "quote": "Wahljahr 2019: AI, AR, BL, LU, TI, ZH (BFS T 17.02.05.01.03, column Wahljahr)"
+        },
+        {
+          "date": "2020-01-01",
+          "precision": "year",
+          "contests": 8,
+          "regions": {
+            "AG": 1,
+            "BS": 1,
+            "JU": 1,
+            "SG": 1,
+            "SH": 1,
+            "SZ": 1,
+            "TG": 1,
+            "UR": 1
+          },
+          "source": "bfs-kt-parl-seats",
+          "quote": "Wahljahr 2020: AG, BS, JU, SG, SH, SZ, TG, UR (BFS T 17.02.05.01.03, column Wahljahr)"
+        },
+        {
+          "date": "2021-01-01",
+          "precision": "year",
+          "contests": 4,
+          "regions": {
+            "FR": 1,
+            "NE": 1,
+            "SO": 1,
+            "VS": 1
+          },
+          "source": "bfs-kt-parl-seats",
+          "quote": "Wahljahr 2021: FR, NE, SO, VS (BFS T 17.02.05.01.03, column Wahljahr)"
+        },
+        {
+          "date": "2022-01-01",
+          "precision": "year",
+          "contests": 7,
+          "regions": {
+            "BE": 1,
+            "GL": 1,
+            "GR": 1,
+            "NW": 1,
+            "OW": 1,
+            "VD": 1,
+            "ZG": 1
+          },
+          "source": "bfs-kt-parl-seats",
+          "quote": "Wahljahr 2022: BE, GL, GR, NW, OW, VD, ZG (BFS T 17.02.05.01.03, column Wahljahr)"
+        },
+        {
+          "date": "2023-01-01",
+          "precision": "year",
+          "contests": 7,
+          "regions": {
+            "AI": 1,
+            "AR": 1,
+            "BL": 1,
+            "GE": 1,
+            "LU": 1,
+            "TI": 1,
+            "ZH": 1
+          },
+          "source": "bfs-kt-parl-seats",
+          "quote": "Wahljahr 2023: AI, AR, BL, GE, LU, TI, ZH (BFS T 17.02.05.01.03, column Wahljahr)"
+        },
+        {
+          "date": "2024-01-01",
+          "precision": "year",
+          "contests": 3,
+          "regions": {
+            "SG": 1,
+            "SZ": 1,
+            "UR": 1
+          },
+          "source": "bfs-kt-parl-seats",
+          "quote": "Wahljahr 2024: SG, SZ, UR (BFS T 17.02.05.01.03, column Wahljahr)"
+        },
+        {
+          "date": "2024-04-07",
+          "contests": 1,
+          "regions": {
+            "TG": 1
+          },
+          "source": "kt-tg-2024",
+          "quote": "07. April 2024"
+        },
+        {
+          "date": "2024-10-20",
+          "contests": 1,
+          "regions": {
+            "BS": 1
+          },
+          "source": "kt-bs-2024",
+          "quote": "Am Wochenende vom 20. Oktober 2024 stehen im Kanton Basel-Stadt Gesamterneuerungswahlen an."
+        },
+        {
+          "date": "2025-03-02",
+          "contests": 1,
+          "regions": {
+            "VS": 1
+          },
+          "source": "kt-vs-2025",
+          "quote": "en vue de l'élection du Conseil d'Etat du 2 mars 2025 … en vue des élections du Grand Conseil du 2 mars 2025"
+        },
+        {
+          "date": "2025-03-09",
+          "contests": 1,
+          "regions": {
+            "SO": 1
+          },
+          "source": "kt-so-2025",
+          "quote": "Kantonsrat und Regierungsrat: Solothurn wählt am 9. März 2025"
+        },
+        {
+          "date": "2026-03-08",
+          "contests": 1,
+          "regions": {
+            "OW": 1
+          },
+          "source": "kt-ow-2026",
+          "quote": "Gesamterneuerungswahlen finden am 8. März 2026 statt … des Regierungsrats für die Amtsdauer 2026 bis 2030 auf den 8. März 2026 festgelegt."
+        },
+        {
+          "date": "2026-03-29",
+          "contests": 1,
+          "regions": {
+            "BE": 1
+          },
+          "source": "kt-be-2026",
+          "quote": "vom 29. März 2026"
+        },
+        {
+          "date": "2026-10-04",
+          "contests": 1,
+          "regions": {
+            "ZG": 1
+          },
+          "source": "kt-zg-2026",
+          "quote": "Am 4. Oktober 2026 wählten die Zugerinnen und Zuger den Kantonsrat"
+        },
+        {
+          "date": "2026-11-08",
+          "contests": 1,
+          "regions": {
+            "FR": 1
+          },
+          "source": "kt-fr-2026",
+          "quote": "le corps électoral du canton de Fribourg pour le dimanche 8 novembre 2026 CE-GC-Préfectures"
+        }
+      ],
+      "cadence": [
+        {
+          "within": "CH-ZH",
+          "period_years": 4,
+          "phase": 3,
+          "term_years": 4,
+          "administered_by": "Staatskanzlei des Kantons Zürich",
+          "source": "kv-zh"
+        },
+        {
+          "within": "CH-BE",
+          "period_years": 4,
+          "phase": 2,
+          "term_years": 4,
+          "administered_by": "Staatskanzlei des Kantons Bern",
+          "source": "kv-be",
+          "month": 3
+        },
+        {
+          "within": "CH-LU",
+          "period_years": 4,
+          "phase": 3,
+          "term_years": 4,
+          "administered_by": "Staatskanzlei des Kantons Luzern",
+          "source": "kv-lu"
+        },
+        {
+          "within": "CH-UR",
+          "period_years": 4,
+          "phase": 0,
+          "term_years": 4,
+          "administered_by": "Staatskanzlei des Kantons Uri",
+          "source": "kv-ur"
+        },
+        {
+          "within": "CH-SZ",
+          "period_years": 4,
+          "phase": 0,
+          "term_years": 4,
+          "administered_by": "Staatskanzlei des Kantons Schwyz",
+          "source": "kv-sz"
+        },
+        {
+          "within": "CH-OW",
+          "period_years": 4,
+          "phase": 2,
+          "term_years": 4,
+          "administered_by": "Staatskanzlei des Kantons Obwalden",
+          "source": "kv-ow",
+          "month": 3
+        },
+        {
+          "within": "CH-NW",
+          "period_years": 4,
+          "phase": 2,
+          "term_years": 4,
+          "administered_by": "Staatskanzlei des Kantons Nidwalden",
+          "source": "kv-nw"
+        },
+        {
+          "within": "CH-GL",
+          "period_years": 4,
+          "phase": 2,
+          "term_years": 4,
+          "administered_by": "Staatskanzlei des Kantons Glarus",
+          "source": "kv-gl"
+        },
+        {
+          "within": "CH-ZG",
+          "period_years": 4,
+          "phase": 2,
+          "term_years": 4,
+          "administered_by": "Staatskanzlei des Kantons Zug",
+          "source": "kv-zg",
+          "month": 10
+        },
+        {
+          "within": "CH-FR",
+          "period_years": 5,
+          "phase": 1,
+          "term_years": 5,
+          "administered_by": "Staatskanzlei des Kantons Freiburg",
+          "source": "kv-fr",
+          "month": 11
+        },
+        {
+          "within": "CH-SO",
+          "period_years": 4,
+          "phase": 1,
+          "term_years": 4,
+          "administered_by": "Staatskanzlei des Kantons Solothurn",
+          "source": "kv-so",
+          "month": 3
+        },
+        {
+          "within": "CH-BS",
+          "period_years": 4,
+          "phase": 0,
+          "term_years": 4,
+          "administered_by": "Staatskanzlei des Kantons Basel-Stadt",
+          "source": "kv-bs",
+          "month": 10
+        },
+        {
+          "within": "CH-BL",
+          "period_years": 4,
+          "phase": 3,
+          "term_years": 4,
+          "administered_by": "Staatskanzlei des Kantons Basel-Landschaft",
+          "source": "kv-bl"
+        },
+        {
+          "within": "CH-SH",
+          "period_years": 4,
+          "phase": 0,
+          "term_years": 4,
+          "administered_by": "Staatskanzlei des Kantons Schaffhausen",
+          "source": "kv-sh"
+        },
+        {
+          "within": "CH-AR",
+          "period_years": 4,
+          "phase": 3,
+          "term_years": 4,
+          "administered_by": "Staatskanzlei des Kantons Appenzell Ausserrhoden",
+          "source": "kv-ar"
+        },
+        {
+          "within": "CH-AI",
+          "period_years": 4,
+          "phase": 3,
+          "term_years": 4,
+          "administered_by": "Staatskanzlei des Kantons Appenzell Innerrhoden",
+          "source": "kv-ai"
+        },
+        {
+          "within": "CH-SG",
+          "period_years": 4,
+          "phase": 0,
+          "term_years": 4,
+          "administered_by": "Staatskanzlei des Kantons St. Gallen",
+          "source": "kv-sg"
+        },
+        {
+          "within": "CH-GR",
+          "period_years": 4,
+          "phase": 2,
+          "term_years": 4,
+          "administered_by": "Staatskanzlei des Kantons Graubünden",
+          "source": "kv-gr"
+        },
+        {
+          "within": "CH-AG",
+          "period_years": 4,
+          "phase": 0,
+          "term_years": 4,
+          "administered_by": "Staatskanzlei des Kantons Aargau",
+          "source": "kv-ag"
+        },
+        {
+          "within": "CH-TG",
+          "period_years": 4,
+          "phase": 0,
+          "term_years": 4,
+          "administered_by": "Staatskanzlei des Kantons Thurgau",
+          "source": "kv-tg",
+          "month": 4
+        },
+        {
+          "within": "CH-TI",
+          "period_years": 4,
+          "phase": 3,
+          "term_years": 4,
+          "administered_by": "Staatskanzlei des Kantons Tessin",
+          "source": "kv-ti",
+          "month": 4
+        },
+        {
+          "within": "CH-VD",
+          "period_years": 5,
+          "phase": 2,
+          "term_years": 5,
+          "administered_by": "Staatskanzlei des Kantons Waadt",
+          "source": "kv-vd"
+        },
+        {
+          "within": "CH-VS",
+          "period_years": 4,
+          "phase": 1,
+          "term_years": 4,
+          "administered_by": "Staatskanzlei des Kantons Wallis",
+          "source": "kv-vs",
+          "month": 3,
+          "day_rule": "mar_first_sunday"
+        },
+        {
+          "within": "CH-NE",
+          "period_years": 4,
+          "phase": 1,
+          "term_years": 4,
+          "administered_by": "Staatskanzlei des Kantons Neuenburg",
+          "source": "kv-ne"
+        },
+        {
+          "within": "CH-GE",
+          "period_years": 5,
+          "phase": 3,
+          "term_years": 5,
+          "administered_by": "Staatskanzlei des Kantons Genf",
+          "source": "kv-ge"
+        },
+        {
+          "within": "CH-JU",
+          "period_years": 5,
+          "phase": 0,
+          "term_years": 5,
+          "administered_by": "Staatskanzlei des Kantons Jura",
+          "source": "kv-ju"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Bundesamt für Statistik, Kantonale Parlamentswahlen",
+          "url": "https://www.bfs.admin.ch/bfs/de/home/statistiken/politik/wahlen/kantonale-parlamentswahlen.html",
+          "format": "XLSX",
+          "access": "open",
+          "first_date": "1968-01-01",
+          "checked_at": "2026-11-13T00:00:00Z",
+          "license": "OGD Schweiz: freie Nutzung, Quellenangabe Pflicht (opendata.swiss terms_by)",
+          "finest": "ch.canton",
+          "evidence": "Party seats per canton from 1968 and party strength and turnout per canton from 1972; no candidate or commune results. Candidate and commune results are with each canton's chancellery or statistics office."
+        }
+      ],
+      "est_votes": 2300000,
+      "effort": 4
+    },
+    {
+      "key": "cantonal_government",
+      "tier": "canton",
+      "name": "Wahlen der Kantonsregierungen (Regierungsrat, Staatsrat, Standeskommission)",
+      "name_en": "Cantonal government elections",
+      "category": "executive",
+      "goal": "subnational",
+      "measure": {
+        "unit": "polity",
+        "schemes": [
+          "ch.canton"
+        ],
+        "fine": [
+          "ch.commune"
+        ]
+      },
+      "note": "Every canton elects its five- or seven-member government by the people, by majority vote with a second round in all but Ticino, which uses proportional representation (KV TI). Appenzell Innerrhoden and Glarus hold Landsgemeinden; Innerrhoden elects its Standeskommission there by show of hands, Glarus at the ballot box. Most cantons vote on the same day as the parliament. The listed years are those the Federal Statistical Office gives per canton from 1980 to spring 2024. Elections after spring 2024 are listed by date from each canton's own announcement or results.",
+      "source": "bfs-kt-gov",
+      "dates": [
+        {
+          "date": "1980-01-01",
+          "precision": "year",
+          "contests": 6,
+          "regions": {
+            "BS": 1,
+            "SG": 1,
+            "SH": 1,
+            "SZ": 1,
+            "TG": 1,
+            "UR": 1
+          },
+          "source": "bfs-kt-gov",
+          "quote": "Wahljahr 1980: BS, SG, SH, SZ, TG, UR (BFS T 17.02.06.03, column Wahljahr)"
+        },
+        {
+          "date": "1981-01-01",
+          "precision": "year",
+          "contests": 6,
+          "regions": {
+            "AG": 1,
+            "FR": 1,
+            "GE": 1,
+            "NE": 1,
+            "SO": 1,
+            "VS": 1
+          },
+          "source": "bfs-kt-gov",
+          "quote": "Wahljahr 1981: AG, FR, GE, NE, SO, VS (BFS T 17.02.06.03, column Wahljahr)"
+        },
+        {
+          "date": "1982-01-01",
+          "precision": "year",
+          "contests": 8,
+          "regions": {
+            "BE": 1,
+            "GL": 1,
+            "GR": 1,
+            "JU": 1,
+            "NW": 1,
+            "OW": 1,
+            "VD": 1,
+            "ZG": 1
+          },
+          "source": "bfs-kt-gov",
+          "quote": "Wahljahr 1982: BE, GL, GR, JU, NW, OW, VD, ZG (BFS T 17.02.06.03, column Wahljahr)"
+        },
+        {
+          "date": "1983-01-01",
+          "precision": "year",
+          "contests": 6,
+          "regions": {
+            "AI": 1,
+            "AR": 1,
+            "BL": 1,
+            "LU": 1,
+            "TI": 1,
+            "ZH": 1
+          },
+          "source": "bfs-kt-gov",
+          "quote": "Wahljahr 1983: AI, AR, BL, LU, TI, ZH (BFS T 17.02.06.03, column Wahljahr)"
+        },
+        {
+          "date": "1984-01-01",
+          "precision": "year",
+          "contests": 6,
+          "regions": {
+            "BS": 1,
+            "SG": 1,
+            "SH": 1,
+            "SZ": 1,
+            "TG": 1,
+            "UR": 1
+          },
+          "source": "bfs-kt-gov",
+          "quote": "Wahljahr 1984: BS, SG, SH, SZ, TG, UR (BFS T 17.02.06.03, column Wahljahr)"
+        },
+        {
+          "date": "1985-01-01",
+          "precision": "year",
+          "contests": 5,
+          "regions": {
+            "AG": 1,
+            "GE": 1,
+            "NE": 1,
+            "SO": 1,
+            "VS": 1
+          },
+          "source": "bfs-kt-gov",
+          "quote": "Wahljahr 1985: AG, GE, NE, SO, VS (BFS T 17.02.06.03, column Wahljahr)"
+        },
+        {
+          "date": "1986-01-01",
+          "precision": "year",
+          "contests": 9,
+          "regions": {
+            "BE": 1,
+            "FR": 1,
+            "GL": 1,
+            "GR": 1,
+            "JU": 1,
+            "NW": 1,
+            "OW": 1,
+            "VD": 1,
+            "ZG": 1
+          },
+          "source": "bfs-kt-gov",
+          "quote": "Wahljahr 1986: BE, FR, GL, GR, JU, NW, OW, VD, ZG (BFS T 17.02.06.03, column Wahljahr)"
+        },
+        {
+          "date": "1987-01-01",
+          "precision": "year",
+          "contests": 6,
+          "regions": {
+            "AI": 1,
+            "AR": 1,
+            "BL": 1,
+            "LU": 1,
+            "TI": 1,
+            "ZH": 1
+          },
+          "source": "bfs-kt-gov",
+          "quote": "Wahljahr 1987: AI, AR, BL, LU, TI, ZH (BFS T 17.02.06.03, column Wahljahr)"
+        },
+        {
+          "date": "1988-01-01",
+          "precision": "year",
+          "contests": 7,
+          "regions": {
+            "AG": 1,
+            "BS": 1,
+            "SG": 1,
+            "SH": 1,
+            "SZ": 1,
+            "TG": 1,
+            "UR": 1
+          },
+          "source": "bfs-kt-gov",
+          "quote": "Wahljahr 1988: AG, BS, SG, SH, SZ, TG, UR (BFS T 17.02.06.03, column Wahljahr)"
+        },
+        {
+          "date": "1989-01-01",
+          "precision": "year",
+          "contests": 4,
+          "regions": {
+            "GE": 1,
+            "NE": 1,
+            "SO": 1,
+            "VS": 1
+          },
+          "source": "bfs-kt-gov",
+          "quote": "Wahljahr 1989: GE, NE, SO, VS (BFS T 17.02.06.03, column Wahljahr)"
+        },
+        {
+          "date": "1990-01-01",
+          "precision": "year",
+          "contests": 8,
+          "regions": {
+            "BE": 1,
+            "GL": 1,
+            "GR": 1,
+            "JU": 1,
+            "NW": 1,
+            "OW": 1,
+            "VD": 1,
+            "ZG": 1
+          },
+          "source": "bfs-kt-gov",
+          "quote": "Wahljahr 1990: BE, GL, GR, JU, NW, OW, VD, ZG (BFS T 17.02.06.03, column Wahljahr)"
+        },
+        {
+          "date": "1991-01-01",
+          "precision": "year",
+          "contests": 7,
+          "regions": {
+            "AI": 1,
+            "AR": 1,
+            "BL": 1,
+            "FR": 1,
+            "LU": 1,
+            "TI": 1,
+            "ZH": 1
+          },
+          "source": "bfs-kt-gov",
+          "quote": "Wahljahr 1991: AI, AR, BL, FR, LU, TI, ZH (BFS T 17.02.06.03, column Wahljahr)"
+        },
+        {
+          "date": "1992-01-01",
+          "precision": "year",
+          "contests": 7,
+          "regions": {
+            "AG": 1,
+            "BS": 1,
+            "SG": 1,
+            "SH": 1,
+            "SZ": 1,
+            "TG": 1,
+            "UR": 1
+          },
+          "source": "bfs-kt-gov",
+          "quote": "Wahljahr 1992: AG, BS, SG, SH, SZ, TG, UR (BFS T 17.02.06.03, column Wahljahr)"
+        },
+        {
+          "date": "1993-01-01",
+          "precision": "year",
+          "contests": 4,
+          "regions": {
+            "GE": 1,
+            "NE": 1,
+            "SO": 1,
+            "VS": 1
+          },
+          "source": "bfs-kt-gov",
+          "quote": "Wahljahr 1993: GE, NE, SO, VS (BFS T 17.02.06.03, column Wahljahr)"
+        },
+        {
+          "date": "1994-01-01",
+          "precision": "year",
+          "contests": 8,
+          "regions": {
+            "BE": 1,
+            "GL": 1,
+            "GR": 1,
+            "JU": 1,
+            "NW": 1,
+            "OW": 1,
+            "VD": 1,
+            "ZG": 1
+          },
+          "source": "bfs-kt-gov",
+          "quote": "Wahljahr 1994: BE, GL, GR, JU, NW, OW, VD, ZG (BFS T 17.02.06.03, column Wahljahr)"
+        },
+        {
+          "date": "1995-01-01",
+          "precision": "year",
+          "contests": 6,
+          "regions": {
+            "AI": 1,
+            "AR": 1,
+            "BL": 1,
+            "LU": 1,
+            "TI": 1,
+            "ZH": 1
+          },
+          "source": "bfs-kt-gov",
+          "quote": "Wahljahr 1995: AI, AR, BL, LU, TI, ZH (BFS T 17.02.06.03, column Wahljahr)"
+        },
+        {
+          "date": "1996-01-01",
+          "precision": "year",
+          "contests": 8,
+          "regions": {
+            "AG": 1,
+            "BS": 1,
+            "FR": 1,
+            "SG": 1,
+            "SH": 1,
+            "SZ": 1,
+            "TG": 1,
+            "UR": 1
+          },
+          "source": "bfs-kt-gov",
+          "quote": "Wahljahr 1996: AG, BS, FR, SG, SH, SZ, TG, UR (BFS T 17.02.06.03, column Wahljahr)"
+        },
+        {
+          "date": "1997-01-01",
+          "precision": "year",
+          "contests": 4,
+          "regions": {
+            "GE": 1,
+            "NE": 1,
+            "SO": 1,
+            "VS": 1
+          },
+          "source": "bfs-kt-gov",
+          "quote": "Wahljahr 1997: GE, NE, SO, VS (BFS T 17.02.06.03, column Wahljahr)"
+        },
+        {
+          "date": "1998-01-01",
+          "precision": "year",
+          "contests": 8,
+          "regions": {
+            "BE": 1,
+            "GL": 1,
+            "GR": 1,
+            "JU": 1,
+            "NW": 1,
+            "OW": 1,
+            "VD": 1,
+            "ZG": 1
+          },
+          "source": "bfs-kt-gov",
+          "quote": "Wahljahr 1998: BE, GL, GR, JU, NW, OW, VD, ZG (BFS T 17.02.06.03, column Wahljahr)"
+        },
+        {
+          "date": "1999-01-01",
+          "precision": "year",
+          "contests": 6,
+          "regions": {
+            "AI": 1,
+            "AR": 1,
+            "BL": 1,
+            "LU": 1,
+            "TI": 1,
+            "ZH": 1
+          },
+          "source": "bfs-kt-gov",
+          "quote": "Wahljahr 1999: AI, AR, BL, LU, TI, ZH (BFS T 17.02.06.03, column Wahljahr)"
+        },
+        {
+          "date": "2000-01-01",
+          "precision": "year",
+          "contests": 8,
+          "regions": {
+            "AG": 1,
+            "AI": 1,
+            "BS": 1,
+            "SG": 1,
+            "SH": 1,
+            "SZ": 1,
+            "TG": 1,
+            "UR": 1
+          },
+          "source": "bfs-kt-gov",
+          "quote": "Wahljahr 2000: AG, AI, BS, SG, SH, SZ, TG, UR (BFS T 17.02.06.03, column Wahljahr)"
+        },
+        {
+          "date": "2001-01-01",
+          "precision": "year",
+          "contests": 6,
+          "regions": {
+            "AI": 1,
+            "FR": 1,
+            "GE": 1,
+            "NE": 1,
+            "SO": 1,
+            "VS": 1
+          },
+          "source": "bfs-kt-gov",
+          "quote": "Wahljahr 2001: AI, FR, GE, NE, SO, VS (BFS T 17.02.06.03, column Wahljahr)"
+        },
+        {
+          "date": "2002-01-01",
+          "precision": "year",
+          "contests": 9,
+          "regions": {
+            "AI": 1,
+            "BE": 1,
+            "GL": 1,
+            "GR": 1,
+            "JU": 1,
+            "NW": 1,
+            "OW": 1,
+            "VD": 1,
+            "ZG": 1
+          },
+          "source": "bfs-kt-gov",
+          "quote": "Wahljahr 2002: AI, BE, GL, GR, JU, NW, OW, VD, ZG (BFS T 17.02.06.03, column Wahljahr)"
+        },
+        {
+          "date": "2003-01-01",
+          "precision": "year",
+          "contests": 6,
+          "regions": {
+            "AI": 1,
+            "AR": 1,
+            "BL": 1,
+            "LU": 1,
+            "TI": 1,
+            "ZH": 1
+          },
+          "source": "bfs-kt-gov",
+          "quote": "Wahljahr 2003: AI, AR, BL, LU, TI, ZH (BFS T 17.02.06.03, column Wahljahr)"
+        },
+        {
+          "date": "2004-01-01",
+          "precision": "year",
+          "contests": 8,
+          "regions": {
+            "AG": 1,
+            "AI": 1,
+            "BS": 1,
+            "SG": 1,
+            "SH": 1,
+            "SZ": 1,
+            "TG": 1,
+            "UR": 1
+          },
+          "source": "bfs-kt-gov",
+          "quote": "Wahljahr 2004: AG, AI, BS, SG, SH, SZ, TG, UR (BFS T 17.02.06.03, column Wahljahr)"
+        },
+        {
+          "date": "2005-01-01",
+          "precision": "year",
+          "contests": 5,
+          "regions": {
+            "AI": 1,
+            "GE": 1,
+            "NE": 1,
+            "SO": 1,
+            "VS": 1
+          },
+          "source": "bfs-kt-gov",
+          "quote": "Wahljahr 2005: AI, GE, NE, SO, VS (BFS T 17.02.06.03, column Wahljahr)"
+        },
+        {
+          "date": "2006-01-01",
+          "precision": "year",
+          "contests": 9,
+          "regions": {
+            "AI": 1,
+            "BE": 1,
+            "FR": 1,
+            "GL": 1,
+            "GR": 1,
+            "JU": 1,
+            "NW": 1,
+            "OW": 1,
+            "ZG": 1
+          },
+          "source": "bfs-kt-gov",
+          "quote": "Wahljahr 2006: AI, BE, FR, GL, GR, JU, NW, OW, ZG (BFS T 17.02.06.03, column Wahljahr)"
+        },
+        {
+          "date": "2007-01-01",
+          "precision": "year",
+          "contests": 7,
+          "regions": {
+            "AI": 1,
+            "AR": 1,
+            "BL": 1,
+            "LU": 1,
+            "TI": 1,
+            "VD": 1,
+            "ZH": 1
+          },
+          "source": "bfs-kt-gov",
+          "quote": "Wahljahr 2007: AI, AR, BL, LU, TI, VD, ZH (BFS T 17.02.06.03, column Wahljahr)"
+        },
+        {
+          "date": "2008-01-01",
+          "precision": "year",
+          "contests": 8,
+          "regions": {
+            "AG": 1,
+            "AI": 1,
+            "BS": 1,
+            "SG": 1,
+            "SH": 1,
+            "SZ": 1,
+            "TG": 1,
+            "UR": 1
+          },
+          "source": "bfs-kt-gov",
+          "quote": "Wahljahr 2008: AG, AI, BS, SG, SH, SZ, TG, UR (BFS T 17.02.06.03, column Wahljahr)"
+        },
+        {
+          "date": "2009-01-01",
+          "precision": "year",
+          "contests": 5,
+          "regions": {
+            "AI": 1,
+            "GE": 1,
+            "NE": 1,
+            "SO": 1,
+            "VS": 1
+          },
+          "source": "bfs-kt-gov",
+          "quote": "Wahljahr 2009: AI, GE, NE, SO, VS (BFS T 17.02.06.03, column Wahljahr)"
+        },
+        {
+          "date": "2010-01-01",
+          "precision": "year",
+          "contests": 8,
+          "regions": {
+            "AI": 1,
+            "BE": 1,
+            "GL": 1,
+            "GR": 1,
+            "JU": 1,
+            "NW": 1,
+            "OW": 1,
+            "ZG": 1
+          },
+          "source": "bfs-kt-gov",
+          "quote": "Wahljahr 2010: AI, BE, GL, GR, JU, NW, OW, ZG (BFS T 17.02.06.03, column Wahljahr)"
+        },
+        {
+          "date": "2011-01-01",
+          "precision": "year",
+          "contests": 7,
+          "regions": {
+            "AI": 1,
+            "AR": 1,
+            "BL": 1,
+            "FR": 1,
+            "LU": 1,
+            "TI": 1,
+            "ZH": 1
+          },
+          "source": "bfs-kt-gov",
+          "quote": "Wahljahr 2011: AI, AR, BL, FR, LU, TI, ZH (BFS T 17.02.06.03, column Wahljahr)"
+        },
+        {
+          "date": "2012-01-01",
+          "precision": "year",
+          "contests": 9,
+          "regions": {
+            "AG": 1,
+            "AI": 1,
+            "BS": 1,
+            "SG": 1,
+            "SH": 1,
+            "SZ": 1,
+            "TG": 1,
+            "UR": 1,
+            "VD": 1
+          },
+          "source": "bfs-kt-gov",
+          "quote": "Wahljahr 2012: AG, AI, BS, SG, SH, SZ, TG, UR, VD (BFS T 17.02.06.03, column Wahljahr)"
+        },
+        {
+          "date": "2013-01-01",
+          "precision": "year",
+          "contests": 5,
+          "regions": {
+            "AI": 1,
+            "GE": 1,
+            "NE": 1,
+            "SO": 1,
+            "VS": 1
+          },
+          "source": "bfs-kt-gov",
+          "quote": "Wahljahr 2013: AI, GE, NE, SO, VS (BFS T 17.02.06.03, column Wahljahr)"
+        },
+        {
+          "date": "2014-01-01",
+          "precision": "year",
+          "contests": 7,
+          "regions": {
+            "AI": 1,
+            "BE": 1,
+            "GL": 1,
+            "GR": 1,
+            "NW": 1,
+            "OW": 1,
+            "ZG": 1
+          },
+          "source": "bfs-kt-gov",
+          "quote": "Wahljahr 2014: AI, BE, GL, GR, NW, OW, ZG (BFS T 17.02.06.03, column Wahljahr)"
+        },
+        {
+          "date": "2015-01-01",
+          "precision": "year",
+          "contests": 7,
+          "regions": {
+            "AI": 1,
+            "AR": 1,
+            "BL": 1,
+            "JU": 1,
+            "LU": 1,
+            "TI": 1,
+            "ZH": 1
+          },
+          "source": "bfs-kt-gov",
+          "quote": "Wahljahr 2015: AI, AR, BL, JU, LU, TI, ZH (BFS T 17.02.06.03, column Wahljahr)"
+        },
+        {
+          "date": "2016-01-01",
+          "precision": "year",
+          "contests": 9,
+          "regions": {
+            "AG": 1,
+            "AI": 1,
+            "BS": 1,
+            "FR": 1,
+            "SG": 1,
+            "SH": 1,
+            "SZ": 1,
+            "TG": 1,
+            "UR": 1
+          },
+          "source": "bfs-kt-gov",
+          "quote": "Wahljahr 2016: AG, AI, BS, FR, SG, SH, SZ, TG, UR (BFS T 17.02.06.03, column Wahljahr)"
+        },
+        {
+          "date": "2017-01-01",
+          "precision": "year",
+          "contests": 5,
+          "regions": {
+            "AI": 1,
+            "NE": 1,
+            "SO": 1,
+            "VD": 1,
+            "VS": 1
+          },
+          "source": "bfs-kt-gov",
+          "quote": "Wahljahr 2017: AI, NE, SO, VD, VS (BFS T 17.02.06.03, column Wahljahr)"
+        },
+        {
+          "date": "2018-01-01",
+          "precision": "year",
+          "contests": 8,
+          "regions": {
+            "AI": 1,
+            "BE": 1,
+            "GE": 1,
+            "GL": 1,
+            "GR": 1,
+            "NW": 1,
+            "OW": 1,
+            "ZG": 1
+          },
+          "source": "bfs-kt-gov",
+          "quote": "Wahljahr 2018: AI, BE, GE, GL, GR, NW, OW, ZG (BFS T 17.02.06.03, column Wahljahr)"
+        },
+        {
+          "date": "2019-01-01",
+          "precision": "year",
+          "contests": 6,
+          "regions": {
+            "AI": 1,
+            "AR": 1,
+            "BL": 1,
+            "LU": 1,
+            "TI": 1,
+            "ZH": 1
+          },
+          "source": "bfs-kt-gov",
+          "quote": "Wahljahr 2019: AI, AR, BL, LU, TI, ZH (BFS T 17.02.06.03, column Wahljahr)"
+        },
+        {
+          "date": "2020-01-01",
+          "precision": "year",
+          "contests": 9,
+          "regions": {
+            "AG": 1,
+            "AI": 1,
+            "BS": 1,
+            "JU": 1,
+            "SG": 1,
+            "SH": 1,
+            "SZ": 1,
+            "TG": 1,
+            "UR": 1
+          },
+          "source": "bfs-kt-gov",
+          "quote": "Wahljahr 2020: AG, AI, BS, JU, SG, SH, SZ, TG, UR (BFS T 17.02.06.03, column Wahljahr)"
+        },
+        {
+          "date": "2021-01-01",
+          "precision": "year",
+          "contests": 4,
+          "regions": {
+            "AI": 1,
+            "FR": 1,
+            "NE": 1,
+            "VS": 1
+          },
+          "source": "bfs-kt-gov",
+          "quote": "Wahljahr 2021: AI, FR, NE, VS (BFS T 17.02.06.03, column Wahljahr)"
+        },
+        {
+          "date": "2022-01-01",
+          "precision": "year",
+          "contests": 8,
+          "regions": {
+            "AI": 1,
+            "BE": 1,
+            "GL": 1,
+            "GR": 1,
+            "NW": 1,
+            "OW": 1,
+            "VD": 1,
+            "ZG": 1
+          },
+          "source": "bfs-kt-gov",
+          "quote": "Wahljahr 2022: AI, BE, GL, GR, NW, OW, VD, ZG (BFS T 17.02.06.03, column Wahljahr)"
+        },
+        {
+          "date": "2023-01-01",
+          "precision": "year",
+          "contests": 7,
+          "regions": {
+            "AI": 1,
+            "AR": 1,
+            "BL": 1,
+            "GE": 1,
+            "LU": 1,
+            "TI": 1,
+            "ZH": 1
+          },
+          "source": "bfs-kt-gov",
+          "quote": "Wahljahr 2023: AI, AR, BL, GE, LU, TI, ZH (BFS T 17.02.06.03, column Wahljahr)"
+        },
+        {
+          "date": "2024-01-01",
+          "precision": "year",
+          "contests": 3,
+          "regions": {
+            "SG": 1,
+            "SZ": 1,
+            "UR": 1
+          },
+          "source": "bfs-kt-gov",
+          "quote": "Wahljahr 2024: SG, SZ, UR (BFS T 17.02.06.03, column Wahljahr)"
+        },
+        {
+          "date": "2024-10-20",
+          "contests": 1,
+          "regions": {
+            "BS": 1
+          },
+          "source": "kt-bs-2024",
+          "quote": "Am Wochenende vom 20. Oktober 2024 stehen im Kanton Basel-Stadt Gesamterneuerungswahlen an."
+        },
+        {
+          "date": "2025-03-02",
+          "contests": 1,
+          "regions": {
+            "VS": 1
+          },
+          "source": "kt-vs-2025",
+          "quote": "en vue de l'élection du Conseil d'Etat du 2 mars 2025 … en vue des élections du Grand Conseil du 2 mars 2025"
+        },
+        {
+          "date": "2025-03-09",
+          "contests": 1,
+          "regions": {
+            "SO": 1
+          },
+          "source": "kt-so-2025",
+          "quote": "Kantonsrat und Regierungsrat: Solothurn wählt am 9. März 2025"
+        },
+        {
+          "date": "2026-03-08",
+          "contests": 1,
+          "regions": {
+            "OW": 1
+          },
+          "source": "kt-ow-2026",
+          "quote": "Gesamterneuerungswahlen finden am 8. März 2026 statt … des Regierungsrats für die Amtsdauer 2026 bis 2030 auf den 8. März 2026 festgelegt."
+        },
+        {
+          "date": "2026-03-29",
+          "contests": 1,
+          "regions": {
+            "BE": 1
+          },
+          "source": "kt-be-2026",
+          "quote": "vom 29. März 2026"
+        },
+        {
+          "date": "2026-11-08",
+          "contests": 1,
+          "regions": {
+            "FR": 1
+          },
+          "source": "kt-fr-2026",
+          "quote": "le corps électoral du canton de Fribourg pour le dimanche 8 novembre 2026 CE-GC-Préfectures"
+        }
+      ],
+      "cadence": [
+        {
+          "within": "CH-ZH",
+          "period_years": 4,
+          "phase": 3,
+          "term_years": 4,
+          "administered_by": "Staatskanzlei des Kantons Zürich",
+          "source": "kv-zh",
+          "runoff": "majority"
+        },
+        {
+          "within": "CH-BE",
+          "period_years": 4,
+          "phase": 2,
+          "term_years": 4,
+          "administered_by": "Staatskanzlei des Kantons Bern",
+          "source": "kv-be",
+          "runoff": "majority",
+          "month": 3
+        },
+        {
+          "within": "CH-LU",
+          "period_years": 4,
+          "phase": 3,
+          "term_years": 4,
+          "administered_by": "Staatskanzlei des Kantons Luzern",
+          "source": "kv-lu",
+          "runoff": "majority"
+        },
+        {
+          "within": "CH-UR",
+          "period_years": 4,
+          "phase": 0,
+          "term_years": 4,
+          "administered_by": "Staatskanzlei des Kantons Uri",
+          "source": "kv-ur",
+          "runoff": "majority"
+        },
+        {
+          "within": "CH-SZ",
+          "period_years": 4,
+          "phase": 0,
+          "term_years": 4,
+          "administered_by": "Staatskanzlei des Kantons Schwyz",
+          "source": "kv-sz",
+          "runoff": "majority"
+        },
+        {
+          "within": "CH-OW",
+          "period_years": 4,
+          "phase": 2,
+          "term_years": 4,
+          "administered_by": "Staatskanzlei des Kantons Obwalden",
+          "source": "kv-ow",
+          "runoff": "majority",
+          "month": 3
+        },
+        {
+          "within": "CH-NW",
+          "period_years": 4,
+          "phase": 2,
+          "term_years": 4,
+          "administered_by": "Staatskanzlei des Kantons Nidwalden",
+          "source": "kv-nw",
+          "runoff": "majority"
+        },
+        {
+          "within": "CH-GL",
+          "period_years": 4,
+          "phase": 2,
+          "term_years": 4,
+          "administered_by": "Staatskanzlei des Kantons Glarus",
+          "source": "kv-gl",
+          "runoff": "majority",
+          "runoff_rule": "Elected at the ballot box by majority vote (KV GL: 'an der Urne nach dem Mehrheitswahlverfahren')."
+        },
+        {
+          "within": "CH-ZG",
+          "period_years": 4,
+          "phase": 2,
+          "term_years": 4,
+          "administered_by": "Staatskanzlei des Kantons Zug",
+          "source": "kv-zg",
+          "runoff": "majority"
+        },
+        {
+          "within": "CH-FR",
+          "period_years": 5,
+          "phase": 1,
+          "term_years": 5,
+          "administered_by": "Staatskanzlei des Kantons Freiburg",
+          "source": "kv-fr",
+          "runoff": "majority",
+          "month": 11
+        },
+        {
+          "within": "CH-SO",
+          "period_years": 4,
+          "phase": 1,
+          "term_years": 4,
+          "administered_by": "Staatskanzlei des Kantons Solothurn",
+          "source": "kv-so",
+          "runoff": "majority",
+          "month": 3
+        },
+        {
+          "within": "CH-BS",
+          "period_years": 4,
+          "phase": 0,
+          "term_years": 4,
+          "administered_by": "Staatskanzlei des Kantons Basel-Stadt",
+          "source": "kv-bs",
+          "runoff": "majority",
+          "month": 10
+        },
+        {
+          "within": "CH-BL",
+          "period_years": 4,
+          "phase": 3,
+          "term_years": 4,
+          "administered_by": "Staatskanzlei des Kantons Basel-Landschaft",
+          "source": "kv-bl",
+          "runoff": "majority"
+        },
+        {
+          "within": "CH-SH",
+          "period_years": 4,
+          "phase": 0,
+          "term_years": 4,
+          "administered_by": "Staatskanzlei des Kantons Schaffhausen",
+          "source": "kv-sh",
+          "runoff": "majority"
+        },
+        {
+          "within": "CH-AR",
+          "period_years": 4,
+          "phase": 3,
+          "term_years": 4,
+          "administered_by": "Staatskanzlei des Kantons Appenzell Ausserrhoden",
+          "source": "kv-ar",
+          "runoff": "majority"
+        },
+        {
+          "within": "CH-AI",
+          "period_years": 1,
+          "phase": 0,
+          "term_years": 1,
+          "administered_by": "Staatskanzlei des Kantons Appenzell Innerrhoden",
+          "source": "kv-ai",
+          "month": 4,
+          "selection": "town_meeting",
+          "runoff_rule": "The Landsgemeinde elects the Standeskommission each year by show of hands, on the last Sunday of April (on the first Sunday of May when Easter falls on the last Sunday of April)."
+        },
+        {
+          "within": "CH-SG",
+          "period_years": 4,
+          "phase": 0,
+          "term_years": 4,
+          "administered_by": "Staatskanzlei des Kantons St. Gallen",
+          "source": "kv-sg",
+          "runoff": "majority"
+        },
+        {
+          "within": "CH-GR",
+          "period_years": 4,
+          "phase": 2,
+          "term_years": 4,
+          "administered_by": "Staatskanzlei des Kantons Graubünden",
+          "source": "kv-gr",
+          "runoff": "majority"
+        },
+        {
+          "within": "CH-AG",
+          "period_years": 4,
+          "phase": 0,
+          "term_years": 4,
+          "administered_by": "Staatskanzlei des Kantons Aargau",
+          "source": "kv-ag",
+          "runoff": "majority"
+        },
+        {
+          "within": "CH-TG",
+          "period_years": 4,
+          "phase": 0,
+          "term_years": 4,
+          "administered_by": "Staatskanzlei des Kantons Thurgau",
+          "source": "kv-tg",
+          "runoff": "majority"
+        },
+        {
+          "within": "CH-TI",
+          "period_years": 4,
+          "phase": 3,
+          "term_years": 4,
+          "administered_by": "Staatskanzlei des Kantons Tessin",
+          "source": "kv-ti",
+          "runoff": "none",
+          "runoff_rule": "Proportional representation in a single constituency.",
+          "month": 4
+        },
+        {
+          "within": "CH-VD",
+          "period_years": 5,
+          "phase": 2,
+          "term_years": 5,
+          "administered_by": "Staatskanzlei des Kantons Waadt",
+          "source": "kv-vd",
+          "runoff": "majority"
+        },
+        {
+          "within": "CH-VS",
+          "period_years": 4,
+          "phase": 1,
+          "term_years": 4,
+          "administered_by": "Staatskanzlei des Kantons Wallis",
+          "source": "kv-vs",
+          "runoff": "majority",
+          "month": 3,
+          "day_rule": "mar_first_sunday"
+        },
+        {
+          "within": "CH-NE",
+          "period_years": 4,
+          "phase": 1,
+          "term_years": 4,
+          "administered_by": "Staatskanzlei des Kantons Neuenburg",
+          "source": "kv-ne",
+          "runoff": "majority"
+        },
+        {
+          "within": "CH-GE",
+          "period_years": 5,
+          "phase": 3,
+          "term_years": 5,
+          "administered_by": "Staatskanzlei des Kantons Genf",
+          "source": "kv-ge",
+          "runoff": "majority"
+        },
+        {
+          "within": "CH-JU",
+          "period_years": 5,
+          "phase": 0,
+          "term_years": 5,
+          "administered_by": "Staatskanzlei des Kantons Jura",
+          "source": "kv-ju",
+          "runoff": "majority"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Bundesamt für Statistik, Kantonale Regierungswahlen",
+          "url": "https://www.bfs.admin.ch/bfs/de/home/statistiken/politik/wahlen/kantonale-regierungswahlen.html",
+          "format": "XLSX",
+          "access": "open",
+          "first_date": "1980-01-01",
+          "checked_at": "2026-11-13T00:00:00Z",
+          "license": "OGD Schweiz: freie Nutzung, Quellenangabe Pflicht (opendata.swiss terms_by)",
+          "finest": "ch.canton",
+          "evidence": "Seats by party and gender per canton from 1980; candidate votes are with each canton."
+        }
+      ],
+      "est_votes": 2300000,
+      "effort": 4
+    },
+    {
+      "key": "cantonal_votes",
+      "tier": "canton",
+      "name": "Kantonale Volksabstimmungen (obligatorische und fakultative Referenden, Volksinitiativen, Gegenvorschläge)",
+      "name_en": "Cantonal popular votes",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "question",
+        "fine": [
+          "ch.commune"
+        ]
+      },
+      "note": "Every canton's constitution and its amendments need the people's approval (BV Art. 51), and every canton has the initiative and a mandatory or optional referendum on laws, many also on spending. Votes are mostly held on the four federal vote days. Recall of the parliament or government exists in several cantons but has not been used in modern times. Votes taken at the Landsgemeinde in Glarus and Appenzell Innerrhoden are a separate class.",
+      "source": "fedlex-bv",
+      "locator": "https://www.fedlex.admin.ch/eli/cc/1999/404/de#art_51",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "iso_pattern": "CH-*"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 1,
+          "called": true,
+          "administered_by": "Kantone (Staatskanzleien)",
+          "source": "fedlex-vpr",
+          "locator": "https://www.fedlex.admin.ch/eli/cc/1978/712_712_712/de#art_2_a"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Bundesamt für Statistik, voteinfo (kantonale Abstimmungen)",
+          "url": "https://ogd-static.voteinfo-app.ch/v1/ogd/sd-t-17-02-{YYYYMMDD}-kantAbstimmung.json",
+          "format": "JSON",
+          "access": "open",
+          "first_date": "2019-02-10",
+          "checked_at": "2026-11-13T00:00:00Z",
+          "license": "OGD Schweiz: freie Nutzung, Quellenangabe Pflicht (opendata.swiss terms_by)",
+          "finest": "ch.commune",
+          "evidence": "One file per vote day with each canton's questions and results by district and commune; 2019-02-10 and later answer, 2018-03-04 does not."
+        }
+      ],
+      "est_votes": 12000000,
+      "effort": 2,
+      "dates": []
+    },
+    {
+      "key": "landsgemeinde",
+      "tier": "canton",
+      "name": "Landsgemeinde",
+      "name_en": "Landsgemeinde (cantonal assembly)",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "question"
+      },
+      "note": "The citizens of Glarus (first Sunday in May) and Appenzell Innerrhoden (last Sunday in April) meet in the open air to pass laws and the budget, and in Innerrhoden to elect the government, judges, and the Council of States member, all by show of hands, so there are outcomes but no vote counts. Abolished in Obwalden (1998), Nidwalden (1996), Appenzell Ausserrhoden (1997), Uri (1928), and Schwyz and Zug (1848).",
+      "source": "kv-gl",
+      "locator": "https://www.fedlex.admin.ch/eli/cc/1989/3_730_706_654_fga/de",
+      "cadence": [
+        {
+          "within": "CH-GL",
+          "selection": "town_meeting",
+          "period_years": 1,
+          "phase": 0,
+          "month": 5,
+          "day_rule": "may_first_sunday",
+          "administered_by": "Landsgemeinde Glarus",
+          "source": "kv-gl"
+        },
+        {
+          "within": "CH-AI",
+          "selection": "town_meeting",
+          "period_years": 1,
+          "phase": 0,
+          "month": 4,
+          "day_rule": "apr_last_sunday_unless_easter",
+          "administered_by": "Landsgemeinde Appenzell Innerrhoden",
+          "source": "kv-ai"
+        }
+      ],
+      "est_votes": 15000,
+      "effort": 3,
+      "dates": []
+    },
+    {
+      "key": "constituent_assembly",
+      "tier": "canton",
+      "name": "Wahlen der kantonalen Verfassungsräte",
+      "name_en": "Cantonal constituent assembly elections",
+      "category": "legislature",
+      "goal": "subnational",
+      "measure": {
+        "unit": "polity",
+        "schemes": [
+          "ch.canton"
+        ]
+      },
+      "note": "A canton that totally revises its constitution may have the people elect a constitutional council (Verfassungsrat, Constituante) to draft it, as several did from the late 1990s (among them Vaud, Basel-Stadt, Zurich, Geneva, and Valais). Irregular; no federal list exists.",
+      "source": "fedlex-bv",
+      "locator": "https://www.fedlex.admin.ch/eli/cc/1999/404/de#art_51",
+      "est_votes": 800000,
+      "effort": 3,
+      "dates": []
+    },
+    {
+      "key": "district_officials",
+      "tier": "district",
+      "name": "Wahlen der Bezirksbehörden (Statthalter, Bezirksrat, Regierungsstatthalter, Bezirksammann)",
+      "name_en": "District executive and prefect elections",
+      "category": "executive",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "In several cantons the voters of each district elect its officials: in Zurich the Statthalter and the Bezirksrat (KV ZH Art. 80), in Bern a Regierungsstatthalter for each administrative region (KV BE), in Schwyz the district councils and parliaments (KV SZ § 27), and in Appenzell Innerrhoden the district councils at the Bezirksgemeinden. Elsewhere district officials are appointed or there are no districts.",
+      "source": "kv-zh",
+      "locator": "https://www.fedlex.admin.ch/eli/cc/2006/14_fga/de#art_80",
+      "est_votes": 600000,
+      "effort": 4,
+      "dates": []
+    },
+    {
+      "key": "district_votes",
+      "tier": "district",
+      "name": "Bezirksabstimmungen und Bezirksgemeinden",
+      "name_en": "District votes and district assemblies",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "question"
+      },
+      "note": "The districts of Schwyz and Appenzell Innerrhoden are self-governing corporations whose voters decide district business at the ballot box or in a Bezirksgemeinde (KV SZ; KV AI Art. 33 to 38).",
+      "source": "kv-sz",
+      "est_votes": 50000,
+      "effort": 5,
+      "dates": []
+    },
+    {
+      "key": "lower_courts",
+      "tier": "district",
+      "name": "Volkswahl von Richterinnen und Richtern (Bezirks- und Amtsgerichte, Gerichtspräsidien, Friedensrichter)",
+      "name_en": "Popular election of judges and justices of the peace",
+      "category": "judicial",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "Several cantons have the people elect lower-court judges: Zurich the district courts (KV ZH Art. 75 and 80), Schwyz the district courts (KV SZ § 27), Basel-Stadt its court presidents (KV BS), and others their justices of the peace (Friedensrichter, juges de paix) by commune or circle. Higher cantonal judges are elected by the cantonal parliaments in all cantons.",
+      "source": "kv-zh",
+      "locator": "https://www.fedlex.admin.ch/eli/cc/2006/14_fga/de#art_75",
+      "est_votes": 800000,
+      "effort": 5,
+      "dates": []
+    },
+    {
+      "key": "communal_parliament",
+      "tier": "commune",
+      "name": "Wahlen der Gemeindeparlamente (Gemeinderat, Grosser Gemeinderat, Einwohnerrat, Stadtrat, Conseil communal, Conseil général, Consiglio comunale)",
+      "name_en": "Communal parliament elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "municipality",
+        "schemes": [
+          "ch.commune"
+        ]
+      },
+      "note": "Only some communes have an elected parliament (all communes in Geneva and Neuchâtel, communes above a size threshold in Vaud and Ticino, the cities elsewhere); the rest decide in a communal assembly. No federal register lists which communes have one. Terms follow the canton (KV ZH Art. 87: a commune may replace its assembly with a parliament). The Federal Statistical Office publishes party seats in the parliaments of the statistical cities from 1983.",
+      "source": "kv-zh",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "general",
+            "runoff"
+          ],
+          "body_kinds": [
+            "council",
+            "unicameral"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "within": "CH"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Bundesamt für Statistik, Statistik der Schweizer Städte",
+          "url": "https://www.bfs.admin.ch/asset/de/7646549",
+          "format": "XLSX",
+          "access": "open",
+          "first_date": "1983-01-01",
+          "checked_at": "2026-11-13T00:00:00Z",
+          "license": "OGD Schweiz: freie Nutzung, Quellenangabe Pflicht (opendata.swiss terms_by)",
+          "finest": "ch.commune",
+          "evidence": "Party seats by gender in the legislatives of the statistical cities, one sheet per year to 2018; no votes."
+        }
+      ],
+      "est_votes": 1500000,
+      "effort": 5,
+      "dates": []
+    },
+    {
+      "key": "communal_executive",
+      "tier": "commune",
+      "name": "Wahlen der Gemeindeexekutiven (Gemeinderat, Stadtrat, Municipalité, Conseil communal, Municipio)",
+      "name_en": "Communal executive elections",
+      "category": "executive",
+      "goal": "local",
+      "measure": {
+        "unit": "municipality",
+        "schemes": [
+          "ch.commune"
+        ]
+      },
+      "note": "Every commune's executive is elected by its voters, at the ballot box or in the communal assembly, mostly by majority vote with a second round; Ticino's municipi and the executives in some other cantons by proportional representation (KV TI). Foreigners vote in communal elections in Neuchâtel, Jura, Vaud, Fribourg, and Geneva, and in some communes of Appenzell Ausserrhoden, Graubünden, and Basel-Stadt.",
+      "source": "kv-ti",
+      "est_votes": 2500000,
+      "effort": 5,
+      "dates": []
+    },
+    {
+      "key": "communal_president",
+      "tier": "commune",
+      "name": "Wahlen der Gemeinde- und Stadtpräsidien (Gemeindepräsident, Stadtpräsident, syndic, maire, sindaco)",
+      "name_en": "Communal president (mayor) elections",
+      "category": "executive",
+      "goal": "local",
+      "measure": {
+        "unit": "municipality",
+        "schemes": [
+          "ch.commune"
+        ]
+      },
+      "note": "In most German-speaking cantons the voters elect the president of the communal executive in a separate contest (KV SG Art. 40); in Vaud, Neuchâtel, Geneva, and Ticino the president or mayor is chosen from or by the elected executive in many communes.",
+      "source": "kv-sg",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "general",
+            "runoff"
+          ],
+          "office_kinds": [
+            "mayor"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "within": "CH"
+        }
+      ],
+      "est_votes": 1800000,
+      "effort": 5,
+      "dates": []
+    },
+    {
+      "key": "communal_votes",
+      "tier": "commune",
+      "name": "Gemeindeabstimmungen an der Urne",
+      "name_en": "Communal ballot-box votes",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "question"
+      },
+      "note": "Communes with a parliament, and many without, put budgets, credits, and bylaws to a ballot-box vote, mostly on federal vote days. Cantonal statistical offices publish some (Zurich's open data); there is no national collection.",
+      "source": "kv-zh",
+      "est_votes": 6000000,
+      "effort": 5,
+      "dates": []
+    },
+    {
+      "key": "communal_assembly",
+      "tier": "commune",
+      "name": "Gemeindeversammlung, assemblée communale, assemblea comunale",
+      "name_en": "Communal assemblies (town meetings)",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "question"
+      },
+      "note": "Most Swiss communes decide their budget, accounts, and bylaws, and in many cantons elect their executive, in an assembly of all voters.",
+      "source": "kv-zh",
+      "disposition": "blocked",
+      "disposition_reason": "Assemblies decide by show of hands; the outcome stands only in each commune's minutes, with no count and no cantonal or national record to load from.",
+      "est_votes": 300000,
+      "effort": 5,
+      "dates": []
+    },
+    {
+      "key": "school_board",
+      "tier": "commune",
+      "name": "Wahlen der Schulbehörden (Schulpflege, Schulkommission, Schulrat, Schulgemeinden)",
+      "name_en": "School board elections",
+      "category": "special_purpose",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "In Zurich, Thurgau, Aargau, Appenzell Ausserrhoden, and other German-speaking cantons the voters of the commune or of a separate school commune (Schulgemeinde) elect the school board; Zurich city elects one per school circle (Kreisschulbehörde). In the French- and Italian-speaking cantons schools are run by the commune executive.",
+      "source": "kv-zh",
+      "est_votes": 600000,
+      "effort": 5,
+      "dates": []
+    },
+    {
+      "key": "burgher_community",
+      "tier": "commune",
+      "name": "Wahlen der Bürger- und Burgergemeinden (Bürgerrat, Burgerrat, conseil bourgeoisial, patriziato)",
+      "name_en": "Burgher community elections",
+      "category": "non_territorial",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "Public-law corporations of the citizens (Bürger) of a commune by descent, which hold property and in some cantons grant citizenship; their councils are elected by members only, in Valais with the communal councils (KV VS: 'die Gemeinderäte und die Burgerräte sind für eine Amtsdauer von vier Jahren gewählt').",
+      "source": "kv-vs",
+      "est_votes": 100000,
+      "effort": 5,
+      "dates": []
+    },
+    {
+      "key": "church_parishes",
+      "tier": "commune",
+      "name": "Wahlen und Abstimmungen der Kirchgemeinden der Landeskirchen",
+      "name_en": "Parish elections of the recognized churches",
+      "category": "non_territorial",
+      "goal": "local",
+      "measure": {},
+      "source": "kv-zh",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Church members only, run by the recognized churches and their parishes (pastors, parish councils, synods), not by the communes' electoral authorities for all residents.",
+      "dates": []
+    },
+    {
+      "key": "corporations",
+      "tier": "commune",
+      "name": "Korporationen, Genossenschaften, Zünfte, Alpgenossenschaften",
+      "name_en": "Corporations, cooperatives, and guilds",
+      "category": "non_territorial",
+      "goal": "local",
+      "measure": {},
+      "source": "kv-sz",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Property-holding corporations and guilds (Oberallmeind- and Unterallmeindkorporationen, Alpgenossenschaften, Zünfte) whose members are owners or descendants, not a territorial electorate.",
+      "dates": []
+    },
+    {
+      "key": "functional_bodies",
+      "tier": "national",
+      "name": "Kammer-, Hochschul-, Personal- und Parteiwahlen",
+      "name_en": "Professional, university, staff, and party-internal votes",
+      "category": "non_territorial",
+      "goal": "national",
+      "measure": {},
+      "source": "fedlex-bv",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Votes run by professional bodies, universities, employers, the Organisation of the Swiss Abroad, and parties for their own members; Swiss parties hold no state-run primaries.",
+      "dates": []
+    },
+    {
+      "key": "helvetic_referendum",
+      "tier": "helvetic",
+      "name": "Volksabstimmung über die Verfassung der Helvetischen Republik 1802",
+      "name_en": "Helvetic constitutional referendum of 1802",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "question"
+      },
+      "valid_from": "1798-04-12",
+      "valid_to": "1803-03-10",
+      "note": "The first popular vote held in Switzerland: the second Helvetic constitution, declared accepted on 2 July 1802, with abstentions counted as yes votes.",
+      "source": "hls-helvetik",
+      "dates": [
+        {
+          "date": "1802-01-01",
+          "precision": "year",
+          "contests": 1,
+          "source": "hls-helvetik",
+          "quote": "Nach der ersten in der Schweiz durchgeführten Volksabstimmung, bei der die Nichtstimmenden als Befürworter gezählt wurden ( Abstimmungen ), galt sie am 2. Juli als angenommen."
+        }
+      ],
+      "est_votes": 160000,
+      "effort": 4
+    },
+    {
+      "key": "helvetic_assemblies",
+      "tier": "helvetic",
+      "name": "Urversammlungen und Wahlmännerversammlungen der Helvetischen Republik",
+      "name_en": "Primary and electoral assemblies of the Helvetic Republic",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "polity"
+      },
+      "valid_from": "1798-04-12",
+      "valid_to": "1803-03-10",
+      "note": "Citizens met each year in primary assemblies in their communes to choose electors, and each canton's electoral assembly then chose the members of the Senate and Great Council and the cantonal authorities.",
+      "source": "hls-helvetik",
+      "cadence": [
+        {
+          "period_years": 1,
+          "phase": 0,
+          "selection": "elected",
+          "valid_from": "1798-04-12",
+          "valid_to": "1803-03-10",
+          "source": "hls-helvetik"
+        }
+      ],
+      "est_votes": 100000,
+      "effort": 5,
+      "dates": []
     }
   ]
 }
