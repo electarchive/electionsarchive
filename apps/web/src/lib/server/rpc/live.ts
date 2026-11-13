@@ -6,6 +6,7 @@ import type {
   LiveOffice,
   LiveOption,
   LiveRace,
+  LiveRemaining,
   LiveUnit,
   LiveUnitCount,
 } from "@ea/analytics/live";
@@ -1244,6 +1245,16 @@ async function night(
   slot = "",
 ) {
   const contests = picked.map((row) => row.id);
+  const counted = picked.flatMap((row) => {
+    const parts = row.path.split("/");
+    const seat = parts.at(-1) ?? "";
+    const zone = ZONES[parts[1] ?? ""];
+    return parts.length === 4 &&
+      zone != null &&
+      (seat === "president" || STATEWIDE.includes(seat))
+      ? [{ id: row.id, zone }]
+      : [];
+  });
   const roster = createHash("sha1")
     .update(contests.toSorted((x, y) => x.localeCompare(y, "en")).join(","))
     .digest("base64url");
@@ -1253,6 +1264,7 @@ async function night(
     { choices, incumbents, settled, prior, drawn, placed, lone },
     feeds,
     polities,
+    tallies,
   ] = await Promise.all([
     db.execute<{
       k: number;
@@ -1397,6 +1409,39 @@ async function night(
     db.execute<{ state: string; id: string }>(sql`
       select lower(substr(iso_code, 4)) as state, id from polity where iso_code ~ '^US-[A-Z]{2}$'
     `),
+    db.execute<{
+      contest: string;
+      unit: string;
+      at: string | null;
+      count: number;
+    }>(sql`
+      with wanted as (
+        select w.contest, c.election_id as election, w.zone
+        from unnest(${sql.param(counted.map((row) => row.id))}::uuid[], ${sql.param(counted.map((row) => row.zone))}::text[]) as w(contest, zone)
+        join contest c on c.id = w.contest
+      ), own as (
+        select distinct election, zone from wanted
+      ), early as (
+        select distinct on (o.election, b.unit_id, b.channel) o.election, b.unit_id, b.count
+        from own o join live.ballots b on b.election_id = o.election
+        where b.stage in ('accepted', 'returned') and b.channel in (2, 3)
+          and b.as_of < ${found.date}::date::timestamp at time zone o.zone
+        order by o.election, b.unit_id, b.channel, b.stage = 'accepted' desc, b.as_of desc, b.fetch_id desc
+      ), floors as (
+        select election, unit_id, null::text as at, sum(count)::float8 as count from early group by 1, 2
+      ), pending as (
+        select distinct on (o.election, b.unit_id, b.channel, b.as_of) o.election, b.unit_id, b.as_of, b.count
+        from own o join live.ballots b on b.election_id = o.election
+        join live.fetch x on x.id = b.fetch_id join live.feed d on d.id = x.feed_id and d.params @> '{"remaining": true}'
+        where b.stage = 'remaining' and b.as_of >= ${found.date}::date::timestamp at time zone o.zone and ${shown.results}::boolean
+        order by o.election, b.unit_id, b.channel, b.as_of, b.fetch_id desc
+      ), lefts as (
+        select election, unit_id, to_char(as_of at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"') as at, sum(count)::float8 as count
+        from pending group by 1, 2, 3
+      )
+      select w.contest, t.unit_id as unit, t.at, t.count
+      from wanted w join (select * from floors union all select * from lefts) t on t.election = w.election
+    `),
   ]);
   const fed = new Map(feeds.rows.map((row) => [row.state, row.isRunning]));
   const lapsed = new Map<string, "none" | "outside">();
@@ -1493,6 +1538,7 @@ async function night(
   const channelBy = Map.groupBy(prior.channels, (row) => row.contest);
   const settledBy = Map.groupBy(settled, (row) => row.contest);
   const drawnBy = Map.groupBy(drawn, (row) => row.contest);
+  const talliedBy = Map.groupBy(tallies.rows, (row) => row.contest);
   const badges = new Map<string, NonNullable<LiveOption["party"]>>();
   const calledBy = new Map(called.map((row) => [row.contest, row]));
   const built = picked.map((row): LiveRace => {
@@ -1846,10 +1892,25 @@ async function night(
       }
     }
     const fallback = presidential > 0 ? midterm / presidential : null;
+    const tallied = talliedBy.get(row.id) ?? [];
+    const floors = new Map(
+      tallied.flatMap((line) =>
+        line.at == null ? [[line.unit, line.count] as const] : [],
+      ),
+    );
+    const closed = CLOSES[row.path.split("/", 2)[1] ?? ""];
+    const remaining = tallied.flatMap((line): Array<LiveRemaining> =>
+      line.at != null &&
+      closed != null &&
+      Date.parse(line.at) >= Date.parse(eastern(found.date, closed))
+        ? [{ unitId: line.unit, at: line.at, left: line.count }]
+        : [],
+    );
     const baseline = grouped.map(([unit, value]): LiveBaseline => {
       seen.add(unit);
       const traits = traitsOf.get(unit);
       const channels = mixes.get(unit);
+      const floor = floors.get(unit);
       return {
         unitId: unit,
         label: unitOf.get(unit)?.name ?? "",
@@ -1863,6 +1924,7 @@ async function night(
         }),
         ...(traits != null && { traits }),
         ...(channels != null && { channels }),
+        ...(floor != null && { floor }),
       };
     });
     const final = settledBy.get(row.id) ?? [];
@@ -1989,6 +2051,7 @@ async function night(
       frames: raceFrames,
       counts,
       baseline,
+      ...(remaining.length > 0 && { remaining }),
       certified:
         final.length === 0
           ? null
@@ -2067,7 +2130,15 @@ async function night(
       ]),
     ),
     races: built.map((race) =>
-      kept ? race : { ...race, units: [], counts: [], baseline: [] },
+      kept
+        ? race
+        : {
+            ...race,
+            units: [],
+            counts: [],
+            baseline: [],
+            ...(race.remaining != null && { remaining: [] }),
+          },
     ),
   };
   return {
