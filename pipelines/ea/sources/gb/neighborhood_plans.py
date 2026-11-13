@@ -47,6 +47,8 @@ PAGE_PREFIXES = (
     "https://eastcambs.gov.uk/about-council/",
     "https://www.northleach.gov.uk/",
     "https://www.northantslive.news/news/",
+    "https://www.southdowns.gov.uk/planning/",
+    "https://longhoughton-pc.gov.uk/news/",
 )
 HANDWRITTEN = (
     "https://info.ambervalley.gov.uk/docarc/",
@@ -112,6 +114,8 @@ WITHIN = (
 
 
 def is_page(url: str) -> bool:
+    if url.split("?")[0].endswith((".pdf", ".doc")):
+        return False
     return url in PAGES.values() or "/w/" in url or url.startswith(PAGE_PREFIXES) or url.endswith(HTML)
 
 
@@ -132,6 +136,14 @@ def document(url: str) -> None:
         )
 
 
+def suffix(url: str) -> str:
+    if url.endswith(".jpg"):
+        return ".jpg"
+    if url.split("?")[0].endswith(".doc"):
+        return ".doc"
+    return ".html" if is_page(url) else ".pdf"
+
+
 def fetch() -> None:
     for url in PAGES.values():
         raw.fetch(SOURCE, url, suffix=".html")
@@ -139,14 +151,16 @@ def fetch() -> None:
         if url.startswith(DOCUMENTS) or url.endswith(".docx"):
             document(url)
         else:
-            raw.fetch(SOURCE, url, suffix=".jpg" if url.endswith(".jpg") else ".html" if is_page(url) else ".pdf")
+            raw.fetch(SOURCE, url, suffix=suffix(url))
 
 
 def printed(url: str) -> tuple[str, bool, set[str]]:
     path = raw.cached(SOURCE, url).path
-    pdf = path.suffix in OFFICE.values() or path.suffix == ".jpg"
+    pdf = path.suffix in OFFICE.values() or path.suffix in (".jpg", ".doc")
     if path.suffix == ".jpg":
         text = subprocess.run(["tesseract", str(path), "-"], capture_output=True, text=True, check=True).stdout
+    elif path.suffix == ".doc":
+        text = subprocess.run(["antiword", str(path)], capture_output=True, text=True, check=True).stdout
     elif path.suffix == ".pdf":
         text = subprocess.run(
             ["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True
