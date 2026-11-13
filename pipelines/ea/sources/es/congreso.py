@@ -690,26 +690,24 @@ def emit() -> Path:
 
         print(f"D'Hondt differs from the declared seats in {len(mismatched)} contests: {mismatched}")
         print(f"{unmatched} candidates on lists with no votes in their province")
-        cs.frame(
-            "reporting_unit",
-            pl.DataFrame(
-                [
-                    {
-                        "id": str(unit),
-                        "polity_id": str(spain),
-                        "scheme_code": scheme,
-                        "code": code,
-                        "parent_id": None if parent is None else str(parent),
-                        "area_relation": relation,
-                        "area_id": None if area is None else str(area),
-                        "kind": kind,
-                    }
-                    for unit, scheme, code, parent, relation, area, kind in unit_rows.values()
-                    if unit in cs.minted
-                ],
-                schema_overrides={"parent_id": pl.String, "area_id": pl.String},
-            ),
-        )
+        minted = [
+            {
+                "id": str(unit),
+                "polity_id": str(spain),
+                "scheme_code": scheme,
+                "code": code,
+                "parent_id": None if parent is None else str(parent),
+                "area_relation": relation,
+                "area_id": None if area is None else str(area),
+                "kind": kind,
+            }
+            for unit, scheme, code, parent, relation, area, kind in unit_rows.values()
+            if unit in cs.minted
+        ]
+        if minted:
+            cs.frame(
+                "reporting_unit", pl.DataFrame(minted, schema_overrides={"parent_id": pl.String, "area_id": pl.String})
+            )
         cs.frame(
             "result_value",
             pl.DataFrame(
