@@ -393,6 +393,7 @@ COUNCIL_SEATS = (
     "for mayor who took a seat on the council."
 )
 NO_SEATS = "Seats are not shown: the open data gives no seats to these lists, or more seats than any council has."
+TURNOUT = "As published, the voters outnumber the registered electors."
 OVER = "As published, the votes here add up to more than the number of voters."
 MAYOR_FLAGS = "The winner is the candidate the open data marks as elected mayor."
 NO_MAYOR = "No winner is shown: the open data does not mark exactly one candidate as elected mayor."
@@ -596,7 +597,7 @@ def emit() -> Path:
     _, extinct, _ = regionali.municipalities()
     ended = {code: (region, label, until) for code, label, region, until in extinct.iter_rows()}
     held = (
-        pl.concat([frame.select("day", "code", "region") for frame in (accounting, lists, candidates)])
+        pl.concat([frame.select("day", "code", "region") for frame in (lists, candidates)])
         .unique(["day", "code"])
         .sort("day", "code")
     )
@@ -803,7 +804,12 @@ def emit() -> Path:
                     counts = by_place.get((day, code, round_))
                     if counts is not None:
                         row = counts.row(0, named=True)
-                        accounting_set = result_set(f"{day}:{code}:{round_}:election", elections[round_], None, [])
+                        accounting_set = result_set(
+                            f"{day}:{code}:{round_}:election",
+                            elections[round_],
+                            None,
+                            [TURNOUT] if row["voters"] > row["registered"] else [],
+                        )
                         for measure, column in (
                             (REGISTERED, "registered"),
                             (VOTERS, "voters"),
