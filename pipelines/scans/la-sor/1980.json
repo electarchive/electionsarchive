@@ -1,7 +1,7 @@
 {
   "polity": "US-LA",
   "publisher": "Louisiana Secretary of State",
-  "title": "Report of the Secretary of State, 1979\u20131980",
+  "title": "Report of the Secretary of State, 1979–1980",
   "license": "Public record",
   "file": {
     "url": "https://archive.org/download/micro_IA40706905_0363/micro_IA40706905_0363.pdf",
@@ -16,9 +16,45 @@
       "special": false,
       "state": "LA",
       "district": null
+    },
+    "house4": {
+      "year": 1980,
+      "chamber": "house",
+      "day": "1980-11-04",
+      "special": false,
+      "state": "LA",
+      "district": 4
     }
   },
   "pages": [
+    {
+      "page": 35,
+      "id": "35-0",
+      "columns": [
+        {
+          "label": "Claude \"Buddy\" Leach (Democrat)",
+          "contest": "house4",
+          "candidate": "Claude \"Buddy\" Leach"
+        },
+        {
+          "label": "Buddy Roemer (Democrat)",
+          "contest": "house4",
+          "candidate": "Buddy Roemer"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.17,
+        0.24,
+        0.84,
+        0.47
+      ],
+      "hint": "Read only the table headed 'OFFICIAL RETURNS OF GENERAL ELECTION NOVEMBER 4, 1980 For Member of the United States House of Representatives Fourth Congressional District'; ignore the Court of Appeal table below it.",
+      "header": [
+        0.0,
+        0.34
+      ]
+    },
     {
       "page": 45,
       "id": "45-0",

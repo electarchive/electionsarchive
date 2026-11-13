@@ -101,7 +101,7 @@ MISSED = {
 }
 CORRECTED = {(1978, 41, "Raymond B. Whitaker"): 50456, (1978, 41, "Alan Kooi Simpson"): 82908}
 JUNGLE = {1978: date(1978, 9, 16), 1980: date(1980, 9, 13)}
-RUNOFFS = {(1978, "LA", 4)}
+RUNOFFS = {(1978, "LA", 4), (1980, "LA", 4)}
 HELD = {(1958, "AK"): date(1958, 11, 25)}
 LABELS = {
     "Prohibitionist": "Prohibition", "Farmer Labor": "Farmer-Labor", "Soc.-Lab.": "Socialist Labor",
@@ -1189,6 +1189,17 @@ def emit() -> Path:
             missing = (year, state, district) in NOVOTES and chamber == "house"
             tacit = not missing and all(row["votes"] is None for row in rows)
             contest = cs.key("us.contest", contest_key)
+            if runoff and jungle:
+                for (stale,) in conn.execute(
+                    """select x.entity_id from external_id x join entity e on e.id = x.entity_id
+                       where x.scheme = 'us.contest' and x.value = %s and e.retired_by is null""",
+                    [f"{JUNGLE[year]}:{state}:house:{district}"],
+                ).fetchall():
+                    cs.add(
+                        "entity_retirement",
+                        entity_id=stale,
+                        reason="The Clerk's statistics report only the November runoff of this district, which an earlier version dated to the open primary.",
+                    )
             cs.add(
                 "contest",
                 id=contest,
