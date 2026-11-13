@@ -298,6 +298,7 @@ const TAILS: Record<string, number> = {
   co: 0.1,
   dc: 0.1,
   fl: 0.01,
+  ga: 0.025,
   hi: 0.05,
   il: 0.08,
   md: 0.2,
