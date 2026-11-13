@@ -52,9 +52,14 @@ FL_PDFS = {
     ),
     "https://files.floridados.gov/media/708648/2024gen_vbm-ev_statuscounts.pdf": (date(2024, 11, 5), "general"),
 }
-STATS = {"Voted Vote-by-Mail": 3, "Voted Early": 2}
-ANCHORS = {"county_abl": 3, "county_evs": 2}
-Row = tuple[date, str, str, int, datetime, int]
+STATS = {
+    "Voted Vote-by-Mail": ("returned", 3),
+    "Voted Early": ("returned", 2),
+    "Vote-by-Mail Provided (Not Yet Returned)": ("unreturned", 3),
+}
+ANCHORS = {"county_abl": ("returned", 3), "county_evs": ("returned", 2), "county_ablnotyet": ("unreturned", 3)}
+REPORT = "archived report, with mail ballots not yet returned"
+Row = tuple[date, str, str, str, int, datetime, int]
 
 
 def plain(name: str) -> str:
@@ -75,12 +80,12 @@ def kind_of(election: str) -> str | None:
 
 def tsv(content: bytes) -> Iterator[Row]:
     for row in csv.DictReader(io.StringIO(content.decode("utf-8-sig")), delimiter="\t"):
-        channel = STATS.get(row["StatType"])
+        found = STATS.get(row["StatType"])
         kind = kind_of(row["ElectionName"])
-        if channel is None or kind is None or row["CountyName"] == "State Totals" or not row["CompileDate"].strip():
+        if found is None or kind is None or row["CountyName"] == "State Totals" or not row["CompileDate"].strip():
             continue
         day = datetime.strptime(row["ElectionDate"], "%m/%d/%Y").date()
-        yield day, kind, row["CountyName"], channel, stamp(row["CompileDate"]), number(row["GrandTotal"])
+        yield day, kind, row["CountyName"], *found, stamp(row["CompileDate"]), number(row["GrandTotal"])
 
 
 def cells(row: str) -> list[str]:
@@ -96,7 +101,7 @@ def page(content: bytes) -> Iterator[Row]:
         found: datetime.strptime(day, "%m/%d/%Y").date()
         for found, day in re.findall(r"Number\s*-\s*(\d+)(?:\s|&nbsp;)*Election Date\s*-\s*(\d\d/\d\d/\d{4})", text)
     }
-    for anchor, channel in ANCHORS.items():
+    for anchor, (stage, channel) in ANCHORS.items():
         start = text.find(f'id="{anchor}"')
         if start < 0:
             continue
@@ -113,7 +118,7 @@ def page(content: bytes) -> Iterator[Row]:
             kind = kind_of(election)
             if found not in days or kind is None:
                 continue
-            yield days[found], kind, row[0], channel, stamp(row[7]), number(row[6])
+            yield days[found], kind, row[0], stage, channel, stamp(row[7]), number(row[6])
 
 
 def pdf(path: Path, day: date, kind: str) -> Iterator[Row]:
@@ -124,10 +129,14 @@ def pdf(path: Path, day: date, kind: str) -> Iterator[Row]:
         if head:
             county = None if head.group(1) == "STATE TOTAL" else head.group(1)
             continue
-        row = re.match(r"^\s+(Voted Vote.by.Mail|Voted Early)\s+(?:(\d+/\d+/\d{4})\s+)?.*?\s([\d,]+)\s*$", line)
+        row = re.match(
+            r"^\s+(Voted Vote.by.Mail|Voted Early|Vote.by.Mail Provided \(Not Yet Returned\))\s+(?:(\d+/\d+/\d{4})\s+)?.*?\s([\d,]+)\s*$",
+            line,
+        )
         if county is None or row is None:
             continue
         channel = 3 if "Mail" in row.group(1) else 2
+        stage = "unreturned" if "Provided" in row.group(1) else "returned"
         as_of = (
             datetime.strptime(row.group(2), "%m/%d/%Y").date()
             if row.group(2)
@@ -139,6 +148,7 @@ def pdf(path: Path, day: date, kind: str) -> Iterator[Row]:
             day,
             kind,
             county,
+            stage,
             channel,
             datetime.combine(as_of, datetime.min.time(), EASTERN),
             number(row.group(3)),
@@ -193,6 +203,7 @@ def daily(content: bytes) -> Iterator[Row]:
             day,
             kind,
             row["CountyName"],
+            "returned",
             2,
             datetime.combine(voted, time(23, 59, 59), EASTERN),
             totals[(day, kind, row["CountyName"])],
@@ -207,7 +218,7 @@ def collect(client: httpx.Client) -> dict[str, tuple[bytes, str]]:
         raise ValueError("Florida's statistics page links no Stats_<election>_VbmVoted.txt file")
     pages = {}
     for election in found:
-        for kind in ("VbmVoted", "EarlyVoted"):
+        for kind in ("VbmVoted", "VbmProvided", "EarlyVoted"):
             url = FL_STATS.format(number=election, kind=kind)
             got = client.get(url)
             got.raise_for_status()
@@ -235,44 +246,51 @@ def resolve(conn: Connection) -> tuple[dict[tuple[date, str], UUID], dict[str, U
 def write(conn: Connection, feed: str, fetch: int, rows: list[Row], *, final: bool = False) -> tuple[int, set[str]]:
     elections, counties = resolve(conn)
     held = {
-        (election, unit, channel, as_of): count
-        for election, unit, channel, as_of, count in conn.execute(
-            """select b.election_id, b.unit_id, b.channel, b.as_of, b.count from live.ballots b
-               join live.fetch x on x.id = b.fetch_id where x.feed_id = %s and b.stage = 'returned'""",
+        (election, unit, stage, channel, as_of): count
+        for election, unit, stage, channel, as_of, count in conn.execute(
+            """select b.election_id, b.unit_id, b.stage, b.channel, b.as_of, b.count from live.ballots b
+               join live.fetch x on x.id = b.fetch_id where x.feed_id = %s""",
             [feed],
         ).fetchall()
     }
-    latest: dict[tuple[UUID, UUID, int], tuple[datetime, int]] = {}
-    for (election, unit, channel, as_of), count in held.items():
-        if (election, unit, channel) not in latest or latest[(election, unit, channel)][0] < as_of:
-            latest[(election, unit, channel)] = (as_of, count)
+    latest: dict[tuple[UUID, UUID, str, int], tuple[datetime, int]] = {}
+    for (election, unit, stage, channel, as_of), count in held.items():
+        if (election, unit, stage, channel) not in latest or latest[(election, unit, stage, channel)][0] < as_of:
+            latest[(election, unit, stage, channel)] = (as_of, count)
     missing: set[str] = set()
-    fresh: dict[tuple[UUID, UUID, int, datetime], int] = {}
-    for day, kind, county, channel, as_of, count in rows:
+    fresh: dict[tuple[UUID, UUID, str, int, datetime], int] = {}
+    for day, kind, county, stage, channel, as_of, count in rows:
         election = elections.get((day, kind)) or elections.get((day, "general"))
         unit = counties.get(plain(county))
         if election is None or unit is None:
             missing.add(f"{day} {kind}" if election is None else county)
             continue
-        key = (election, unit, channel, as_of)
+        key = (election, unit, stage, channel, as_of)
         if key in held or key in fresh:
             continue
-        if final and (election, unit, channel) in latest and latest[(election, unit, channel)][1] == count:
+        if (
+            final
+            and (election, unit, stage, channel) in latest
+            and latest[(election, unit, stage, channel)][1] == count
+        ):
             continue
         fresh[key] = count
     with conn.cursor().copy(
         "copy live.ballots (fetch_id, election_id, unit_id, as_of, stage, channel, count) from stdin"
     ) as copy:
-        for (election, unit, channel, as_of), count in fresh.items():
-            copy.write_row((fetch, election, unit, as_of, "returned", channel, count))
+        for (election, unit, stage, channel, as_of), count in fresh.items():
+            copy.write_row((fetch, election, unit, as_of, stage, channel, count))
     return len(fresh), missing
 
 
 def archive(conn: Connection, feed: str) -> tuple[int, int, set[str]]:
     done = {
-        sha
-        for (sha,) in conn.execute("select sha256 from live.fetch where feed_id = %s and sha256 is not null", [feed])
+        sha: (fetch, detail)
+        for sha, fetch, detail in conn.execute(
+            "select sha256, id, detail from live.fetch where feed_id = %s and sha256 is not null", [feed]
+        )
     }
+    seen: set[str] = set()
     held = raw.keys(SOURCE)
     captures = sorted(
         (key for key in held if key.startswith("https://web.archive.org/web/") and "PublicStats" in key),
@@ -291,24 +309,32 @@ def archive(conn: Connection, feed: str) -> tuple[int, int, set[str]]:
     missing: set[str] = set()
     for key, parse, final in sources:
         artifact = raw.cached(SOURCE, key)
-        if artifact.sha256 in done:
+        if artifact.sha256 in seen:
             continue
-        done.add(artifact.sha256)
+        seen.add(artifact.sha256)
+        known = done.get(artifact.sha256)
+        if known is not None and known[1] != "archived report":
+            continue
         rows = list(parse(artifact.path))
-        fetch = conn.execute(
-            """insert into live.fetch (feed_id, fetched_at, as_of, sha256, path, status, detail)
+        if known is not None:
+            fetch = known[0]
+            conn.execute("update live.fetch set detail = %s where id = %s", [REPORT, fetch])
+            rows = [row for row in rows if row[3] == "unreturned"]
+        else:
+            fetch = conn.execute(
+                """insert into live.fetch (feed_id, fetched_at, as_of, sha256, path, status, detail)
                values (%s, %s, %s, %s, %s, 'frame', %s) returning id""",
-            [
-                feed,
-                artifact.retrieved_at,
-                max((row[4] for row in rows), default=None),
-                artifact.sha256,
-                key,
-                "per-voter early voting file, totaled by county and vote day"
-                if key.endswith("#county-day")
-                else "archived report",
-            ],
-        ).fetchall()[0][0]
+                [
+                    feed,
+                    artifact.retrieved_at,
+                    max((row[5] for row in rows), default=None),
+                    artifact.sha256,
+                    key,
+                    "per-voter early voting file, totaled by county and vote day"
+                    if key.endswith("#county-day")
+                    else REPORT,
+                ],
+            ).fetchall()[0][0]
         count, lost = write(conn, feed, fetch, rows, final=final)
         fetches += 1
         written += count
@@ -338,7 +364,7 @@ def poll(conn: Connection, feed: str, pages: dict[str, tuple[bytes, str]], fetch
     fetch = conn.execute(
         """insert into live.fetch (feed_id, fetched_at, as_of, sha256, path, status)
            values (%s, %s, %s, %s, %s, 'frame') returning id""",
-        [feed, fetched_at, max((row[4] for row in rows), default=None), sha, str(folder)],
+        [feed, fetched_at, max((row[5] for row in rows), default=None), sha, str(folder)],
     ).fetchall()[0][0]
     written, lost = write(conn, feed, fetch, rows)
     missing |= lost
