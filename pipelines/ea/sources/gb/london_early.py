@@ -51,6 +51,13 @@ NOTES = {
     "Labour (short), 121 for the Conservatives (over), and 38 for the Liberals (short); the candidates' figures "
     "are stored as printed. The report prints Richard W. Gregory twice in South Defoe ward with 367 votes; the "
     "party table and the ward's shares count him once, and so does this record.",
+    1986: "The London Residuary Body's Research and Intelligence Unit compiled this report after the Greater London "
+    "Council was abolished, so the text layer and the second reading were checked against each borough's seats in "
+    "the summary by wards and against the party table's candidates, votes, and elected instead of a state-of-the-"
+    "parties table. The party table counts Kishore K. Gumaste, printed in Wallington North as SDP (Alliance), among "
+    "the Liberal (Alliance) candidates; this record keeps the ward table's label. In Blackfen ward, William J. Boyd "
+    "and Peter W. Shonk tied on 1,072 votes for the second seat and Boyd was elected by lot. The Wallington North "
+    "poll was deferred to 19 June 1986.",
 }
 POSTPONED = (
     "The poll in this ward was countermanded after the death of a candidate and held later, as the report notes."
@@ -448,6 +455,198 @@ BOOKS: dict[int, dict] = {
             "Ind": ("Independent", 25, 5971),
         },
     },
+    1986: {
+        "day": date(1986, 5, 8),
+        "url": f"{DOWNLOAD}/860bbb06-09d8-4f3f-bd84-b60e442a61e8/LBCE_1986-5-8.pdf",
+        "publisher": "London Residuary Body",
+        "candidates": (7, 75),
+        "wards": (77, 93),
+        "byelections": {"holytrinity", "hestonwest"},
+        "ocr": {"LIBIT": "LIBFT", "LIIMFT": "LIBAFT"},
+        "figures": {
+            "Barnes, Rex V. LAB 94-1": "944",
+            "Gillie, Mary SDPLIB 21Z": "212",
+            "Richards, Norman E. REA l,t97": "1,297",
+        },
+        "party": {
+            (8, "Pepper, Donald"): "IND",
+            (55, "Giddins, Grace"): "IND",
+            (68, "Smith, Stephen"): "IND",
+        },
+        "tallied": {"Gumaste, Kishore K.": "LIBSDP"},
+        "names": {
+            "East Finchley·": "East Finchley",
+            "FincWey": "Finchley",
+            "Friem Barnet": "Friern Barnet",
+            "Bladden": "Blackfen",
+            "O~een's Park": "Queen's Park",
+            "l\\.oe Green": "Roe Green",
+            "Famborough": "Farnborough",
+            "Shortiands": "Shortlands",
+            "Castiehaven": "Castlehaven",
+            "Donners Wells": "Dormers Wells",
+            "Elthome": "Elthorne",
+            "MOllIlt Pleasant": "Mount Pleasant",
+            "Nor1hcote": "Northcote",
+            "Amos": "Arnos",
+            "liighfield": "Highfield",
+            "La!ymer": "Latymer",
+            "StJ?eters": "St Peters",
+            "Town'": "Town",
+            "White City and Sheph<:rds Bush": "White City and Shepherds Bush",
+            "Homsey Central": "Hornsey Central",
+            "Homsey Vale": "Hornsey Vale",
+            "South Homsey": "South Hornsey",
+            "South Tottenharn": "South Tottenham",
+            "Harrow On The Hill": "Harrow on the Hill",
+            "Roxboume": "Roxbourne",
+            "01dchurch": "Oldchurch",
+            "lckenham": "Ickenham",
+            "TOllington": "Tollington",
+            "Golbome": "Golborne",
+            "Heme Hill": "Herne Hill",
+            "Streatharn Wells": "Streatham Wells",
+            "LadyweJl": "Ladywell",
+            "Dumsford": "Durnsford",
+            "Longthomton": "Longthornton",
+            "Wandie Valley": "Wandle Valley",
+            "Leytons tone": "Leytonstone",
+            "Uoyd Park": "Lloyd Park",
+            ("Wandsworth", "St Mary's"): "St Mary's Park",
+        },
+        "votes": {(30, "Brennels, Ann B.M."): 277},
+        "people": {
+            "Pym, Leslle J.": "Pym, Leslie J.",
+            "Simpson, Emest": "Simpson, Ernest",
+            "Azecz, Abdool": "Azeez, Abdool",
+            "Conway, Naderan": "Conway, Nadezda",
+            "Cillysostomou, Rolandos": "Chrysostomou, Rolandos",
+            "Lucas, Vicloria G.": "Lucas, Victoria G.",
+            "Butler, Vie": "Butler, Vic",
+            "Welfare, Damien FJ.": "Welfare, Damien F.J.",
+            "Green, Len A. ATA.": "Green, Len A. Al'A.",
+            "Thomas, Cella M.": "Thomas, Celia M.",
+            "May, Aian S.": "May, Alan S.",
+            "Robertson, Ista B.": "Robertson, Isla B.",
+            "~ilkinson, Peter B.": "Wilkinson, Peter B.",
+            "SlDne, Oliver L.": "Stone, Oliver L.",
+            "Vickers, lan": "Vickers, Ian",
+            "Allen, Kathlr-en M.": "Allen, Kathleen M.",
+            "Hepworth, Be~aminM.": "Hepworth, Benjamin M.",
+            "Brooker, Alan lB.": "Brooker, Alan J.B.",
+            "Donovan, Eileen 1": "Donovan, Eileen J.",
+            "Sterry, lan J.": "Sterry, Ian J.",
+            "Wall, lan L.": "Wall, Ian L.",
+            "Noyes, lames F.": "Noyes, James F.",
+            "MeAndrew, Kenneth": "McAndrew, Kenneth",
+            "For~, Leslie J.": "Ford, Leslie J.",
+            "Waterhouse, Benjamin W.e.": "Waterhouse, Benjamin W.C.",
+            "Randall, Simon J.e.": "Randall, Simon J.C.",
+            "Alnsb!', Raymond L.": "Ainsby, Raymond L.",
+            "Warren, Kei'h": "Warren, Keith",
+            "[)eves, Michael F.": "Deves, Michael F.",
+            "Living~ton, John H.": "Livingston, John H.",
+            "Morton,· Humphrey M.L.": "Morton, Humphrey M.L.",
+            "Hall, JeJ1!lifer B.": "Hall, Jennifer B.",
+            "Wunn, Catherine M.e.": "Wunn, Catherine M.C.",
+            "Forbes, lain K.": "Forbes, Iain K.",
+            "Blackwell, Valerie 0.": "Blackwell, Valerie O.",
+            "PatH, Madhavrao N.": "Patil, Madhavrao N.",
+            "Logan, lain W.": "Logan, Iain W.",
+            "Lawson, Michael 1\\.": "Lawson, Michael K.",
+            "AC:ams, Robert": "Adams, Robert",
+            "Scr.ofield, Nigel C.": "Schofield, Nigel C.",
+            "Hasl.::r, Wa'ter L.": "Hasler, Walter L.",
+            "kincaid, Jean D.": "Kincaid, Jean D.",
+            "Smythe, Eric J.e.": "Smythe, Eric J.C.",
+            "Barrows, Laurna C.1.": "Barrows, Laurna C.I.",
+            "Coleman, lain": "Coleman, Iain",
+            "Kablr, Sy~d": "Kabir, Syed",
+            "Green, Robert a.M.": "Green, Robert O.M.",
+            "Dewar, lain": "Dewar, Iain",
+            "Parsonage, Clarissa 0.": "Parsonage, Clarissa O.",
+            "Key, Hubert J.e.": "Key, Hubert J.C.",
+            "lng, Ernest L.": "Ing, Ernest L.",
+            "Briggs, Keith e.": "Briggs, Keith C.",
+            "Hugo, Mary e.": "Hugo, Mary C.",
+            "Campbell, lain P.": "Campbell, Iain P.",
+            "HardWick, John F.": "Hardwick, John F.",
+            "lanner, Daniel J.M.": "Janner, Daniel J.M.",
+            "Rose, Marie M.l.": "Rose, Marie M.I.",
+            "Jenkins, Claudia C.c.": "Jenkins, Claudia C.C.",
+            "Burton, lvor F.": "Burton, Ivor F.",
+            "Knighting, Frank p.w.": "Knighting, Frank P.W.",
+            "BUTton, Michael J.": "Burton, Michael J.",
+            "~icol, Margaret": "Nicol, Margaret",
+            "Hart, Michael C.c.": "Hart, Michael C.C.",
+            "Oppenheimer, Jonathan W.s.": "Oppenheimer, Jonathan W.S.",
+            "Turner, Madeleine M.l.": "Turner, Madeleine M.I.",
+            "Hannah, lain W.H.": "Hannah, Iain W.H.",
+            "Kraemer, lohn W.S.": "Kraemer, John W.S.",
+            "FitlSimmons', Peggy M.": "Fitzsimmons, Peggy M.",
+            "Stock, Davjj J.": "Stock, David J.",
+            "PatiJ, Anand N.": "Patil, Anand N.",
+            "Oram, Linda e.": "Oram, Linda C.",
+            "Payne, David J.e.": "Payne, David J.C.",
+            "Johncock, lain A.": "Johncock, Iain A.",
+            "Jenkins, Diana M.1.": "Jenkins, Diana M.I.",
+            "Hughes; Peter J.": "Hughes, Peter J.",
+            "Mackie, lain J.": "Mackie, Iain J.",
+            "Newton, lain": "Newton, Iain",
+            "Akhtarzia~ Fazal K.": "Akhtarziai, Fazal K.",
+            "Tilbury, Charles M.w.": "Tilbury, Charles M.W.",
+            "Campbel~ Madeline B.": "Campbell, Madeline B.",
+            "Hal~ Michael": "Hall, Michael",
+            "Davis, Mark A.a.": "Davis, Mark A.O.",
+            "Walker, lain B.": "Walker, Iain B.",
+        },
+        "postponed": {("Sutton", "Wallington North"): date(1986, 6, 19)},
+        "parties": {
+            "LAB": ("Labour", 1887, 2104986, 937, "Lab"),
+            "LABCP": ("Labour and Co-operative", 26, 34238, 20, "Lab"),
+            "CON": ("Conservative", 1835, 2028535, 684, "Con"),
+            "OCONC": ("Conservative", 2, 1181, 1, "Con"),
+            "SDPLIB": ("Social Democratic Party", 862, 544035, 53, "Lib"),
+            "LIBSDP": ("Liberal", 683, 529113, 109, "Lib"),
+            "LIBAFT": ("Liberal", 168, 162987, 45, "Lib"),
+            "LIBFT": ("Liberal", 49, 55223, 35, "Lib"),
+            "SDPAFT": ("Social Democratic Party", 40, 29201, 1, "Lib"),
+            "LIBAHT": ("Liberal", 9, 11024, 3, "Lib"),
+            "SDPAST": ("Social Democratic Party", 6, 5397, 0, "Lib"),
+            "INDNBA": ("Newham Broad Alliance", 12, 4665, 0, "Lib"),
+            "LIBACT": ("Liberal", 2, 3414, 1, "Lib"),
+            "LIBAST": ("Liberal", 4, 2180, 2, "Lib"),
+            "SDPACT": ("Social Democratic Party", 1, 1462, 0, "Lib"),
+            "LIB": ("Liberal", 2, 1005, 0, "Lib"),
+            "GRE": ("Green", 166, 28867, 0),
+            "REA": ("Residents' Association", 14, 16018, 9),
+            "RAA": ("Ratepayers' Association", 6, 9936, 3),
+            "INDRA": ("Independent Ratepayer", 10, 9686, 5),
+            "RA": ("Ratepayers", 7, 8892, 3),
+            "IND": ("Independent", 40, 7726, 1),
+            "INDLAB": ("Independent Labour", 11, 4296, 0),
+            "NF": ("National Front", 21, 2352, 0),
+            "IIND": ("Island Independent", 3, 2090, 0),
+            "DC": ("Democrats and Commonwealth", 28, 2074, 0),
+            "NHLF": ("New Hackney Liberal Focus", 9, 2058, 0),
+            "COMM": ("Communist", 19, 2029, 0),
+            "COND": ("Conservative Democratic", 3, 2000, 0),
+            "INDRE": ("Independent Resident", 3, 1916, 2),
+            "INDCON": ("Independent Conservative", 6, 1779, 0),
+            "SPA": ("Southall Parents Association", 3, 1644, 0),
+            "TEN": ("Tenants Representative", 2, 874, 0),
+            "H": ("Humanist", 18, 777, 0),
+            "RCOMM": ("Revolutionary Communist", 11, 751, 0),
+            "RARE": ("Ratepayers and Residents", 1, 710, 0),
+            "UINDG": ("United Independent Group", 7, 570, 0),
+            "VIND": ("Village Independent", 4, 529, 0),
+            "ISCG": ("Isleworth South Community Group", 2, 287, 0),
+            "COMMPP": ("Communist, People before Profit", 3, 249, 0),
+            "COMMGB": ("Communist Party of Great Britain", 5, 238, 0),
+            "BN": ("British National", 1, 212, 0),
+            "WRP": ("Workers Revolutionary Party", 1, 54, 0),
+        },
+    },
     1978: {
         "day": date(1978, 5, 4),
         "url": f"{DOWNLOAD}/7ff41bee-72bd-4a3e-8cc4-6dca65383247/LBCE_1978-5-4.pdf",
@@ -621,7 +820,26 @@ CODES = {
     "OM": "UM",
 }
 TOKENS = {"Can": "Con", "Can.": "Con", "lnd": "Ind", "lnd.": "Ind", "Ind.": "Ind", "IndR": "Ind R"}
+UPPER = {
+    "INO": "IND",
+    "ORE": "GRE",
+    "~ON": "CON",
+    "CO~": "CON",
+    "CO": "CON",
+    "NEON": "CON",
+    "CONN": "CON",
+    "1ND": "IND",
+    "LIND": "IIND",
+    "LIB~DP": "LIBSDP",
+    "UINOO": "UINDG",
+}
+ALIASES = {"cityofwestminster": "westminster", "exley": "bexley"}
 Word = tuple[float, float, float, float, str]
+
+
+def fetch() -> None:
+    for spec in BOOKS.values():
+        raw.fetch(lb.SOURCE, spec["url"], suffix=".pdf")
 
 
 def fold(text: str) -> str:
@@ -631,33 +849,72 @@ def fold(text: str) -> str:
 def borough_of(text: str) -> str | None:
     text = re.sub(r"[\s.·-]*(continued|contined|contd)\s*$", "", text.strip(), flags=re.IGNORECASE)
     text = re.sub(r"\s*\(Royal\s*Borough\)", "", text, flags=re.IGNORECASE)
-    key = fold(text)
-    for name in BOROUGHS:
-        if fold(name) == key:
-            return name
+    spaced = re.sub(r"^[|Il1~\[\]\s]*[|Il1~\[\]]\s+|\s+[|Il1~\[\]][|Il1~\[\]\s]*$", "", text)
+    boxed = re.sub(r"^[|Il1~\[\]\s]+|[|Il1~\[\]\s]+$", "", text)
+    for key in (fold(text), fold(spaced), fold(boxed)):
+        key = ALIASES.get(key, key)
+        for name in BOROUGHS:
+            if fold(name) == key:
+                return name
     return None
 
 
-def columns(words: list[Word], width: float) -> list[list[Word]]:
-    split = min(
-        range(int(width * 0.38), int(width * 0.62), 2),
-        key=lambda x: (sum(w[0] <= x <= w[2] for w in words), abs(x - width / 2)),
-    )
+def columns(words: list[Word], width: float, rightmost: bool = False) -> list[list[Word]]:
+    span = range(int(width * 0.38), int(width * 0.62), 2)
+    crossing = {x: sum(w[0] <= x <= w[2] for w in words) for x in span}
+    if rightmost:
+        clear = [x for x in span if crossing[x] <= min(crossing.values()) + 1]
+        run = [clear[-1]]
+        while run[-1] - 2 in clear:
+            run.append(run[-1] - 2)
+        split = run[len(run) // 2]
+    else:
+        split = min(span, key=lambda x: (crossing[x], abs(x - width / 2)))
     return [[w for w in words if w[0] < split], [w for w in words if w[0] >= split]]
 
 
-def candidate(line: list[Word], codes: set[str], plain: bool = False) -> tuple[str, str, int | None] | None:
+def upper_code(text: str) -> str:
+    code = re.sub(r"[^A-Za-z0-9~\[]", "", text).upper()
+    code = re.sub(r"^(UB|UN|LM|LFFI|LID|LIA|L1B|LLB|LIO)", "LIB", code)
+    code = re.sub(r"^(SDP|SOP)(UB|LLB|LID|L1B)$", "SDPLIB", code).replace("SOP", "SDP")
+    code = re.sub(r"(?<=LIB)F[FIR]$", "FT", re.sub(r"AF[FIR\[]$", "AFT", code))
+    code = re.sub(r"^SDPL(M|JB)$", "SDPLIB", re.sub(r"AS[FI]$", "AST", re.sub(r"^INO", "IND", code)))
+    return UPPER.get(code, code)
+
+
+def cleaned(name: str) -> str:
+    name = re.sub(r"^(?:[^A-Za-z]+|[Il1]{1,3}[!|]?\s+|il\s+)+(?=[A-Z])", "", name.strip())
+    name = re.sub(r"\.(?=,)|(?<=[A-Z])\.(?=\.)|'$|(?<=[A-Z]) (?=\.[A-Z])", "", name)
+    name = re.sub(r",(?=[A-Za-z])", ", ", re.sub(r"(?<=[A-Z]),(?=[A-Z]\.)", ".", name))
+    name = re.sub(r"(?<= )1\.$", "J.", name)
+    name = re.sub(r"(?<=[a-z])(?<!Mc)(?<!Mac)I(?=[a-z])", "l", name)
+    name = re.sub(r"(?<=[a-z])lD(?=[a-z])", "to", name)
+    name = re.sub(r"(?<=[a-z])Ij(?=[a-z])", "rj", name)
+    name = re.sub(r"(?<=[A-Za-z])1(?=[a-z])|(?<=[a-z])1\b", "l", name)
+    name = re.sub(r"\bChrislopher\b", "Christopher", name)
+    return re.sub(r"\s+", " ", name)
+
+
+def candidate(
+    line: list[Word], codes: set[str], ocr: dict[str, str], plain: bool = False
+) -> tuple[str, str, int | None] | None:
     if len(line) > 4 and [w[4] for w in line[-2:]] == ["r", line[-1][4]] and re.fullmatch(r"\d", line[-3][4]):
         line = [*line[:-3], (*line[-3][:4], f"{line[-3][4]},{line[-1][4]}")]
-    found = read(line, codes, plain)
+    found = read(line, codes, ocr, plain)
     while found is None and len(line) > 3 and re.fullmatch(r"[.,;:'\"*r-]+|\.\d", line[-2][4]):
         line = [*line[:-2], line[-1]]
-        found = read(line, codes, plain)
+        found = read(line, codes, ocr, plain)
     return found
 
 
-def read(line: list[Word], codes: set[str], plain: bool = False) -> tuple[str, str, int | None] | None:
+def read(
+    line: list[Word], codes: set[str], ocr: dict[str, str], plain: bool = False
+) -> tuple[str, str, int | None] | None:
     texts = [w[4] for w in line]
+    if len(texts) > 3 and ocr and texts[-1] in {"-", "—", "•", "·"}:
+        texts.pop()
+    if len(texts) > 3 and texts[-1] == texts[-2] and re.fullmatch(r"[\d,]+", texts[-1]):
+        texts.pop()
     if len(texts) < 3:
         return None
     if re.fullmatch(r"(?i)unopposed|uncontested|un-", texts[-1]):
@@ -665,6 +922,8 @@ def read(line: list[Word], codes: set[str], plain: bool = False) -> tuple[str, s
     else:
         figure = texts[-1].replace("'", "").replace("~", "")
         votes = int(figure) if plain and re.fullmatch(r"\d{1,5}", figure) else lb.number(figure)
+        if votes is None and ocr and re.fullmatch(r"\d{4,5}", figure.translate(lb.DIGITS)):
+            votes = int(figure.translate(lb.DIGITS))
         if votes is None:
             return None
     rest = [TOKENS.get(t, t) for t in texts[:-1]]
@@ -677,7 +936,10 @@ def read(line: list[Word], codes: set[str], plain: bool = False) -> tuple[str, s
             head, _, code = code.rpartition(".")
             name = f"{name} {head}."
         for attempt in (code, re.sub(r"[*·•]+$", "", code), re.sub(r"(t|tt|\*|\*\*|·)$", "", code)):
-            attempt = CODES.get(attempt, attempt)
+            attempt = ocr.get(attempt, CODES.get(attempt, attempt))
+            if attempt not in codes and ocr:
+                attempt = upper_code(attempt)
+                attempt = ocr.get(attempt, attempt)
             if attempt in codes:
                 return name, attempt, votes
     return None
@@ -692,16 +954,28 @@ def table2(year: int, sizes: list[tuple[float, float]], book: list[list[Word]]) 
     ward: dict | None = None
     for number in range(first, last + 1):
         width = sizes[number - 1][0]
-        for index, column in enumerate(columns(book[number - 1], width)):
+        right: str | None = None
+        for index, column in enumerate(columns(book[number - 1], width, "ocr" in spec)):
             rows = lb.lines(column)
             left = min((row[0][0] for row in rows), default=0)
+            if index and right:
+                borough = right
             for row in rows:
                 text = " ".join(w[4] for w in row)
-                found = candidate(row, codes, spec.get("plain", False))
+                after = re.search(r"(?i)\bcontinued\s+(\S.*)$", text)
+                if after and borough_of(after.group(1)):
+                    right = borough_of(after.group(1))
+                if text in spec.get("figures", {}):
+                    row = [*row[:-1], (*row[-1][:4], spec["figures"][text])]
+                    text = " ".join(w[4] for w in row)
+                found = candidate(row, codes, spec.get("ocr", {}), spec.get("plain", False))
                 if found:
                     if ward is None:
                         raise ValueError(f"{year} page {number}: candidate before a ward: {text}")
                     name, code, votes = found
+                    if "ocr" in spec:
+                        name = spec.get("people", {}).get(cleaned(name), cleaned(name))
+                    code = spec.get("party", {}).get((number, name), code)
                     for before, line in spec.get("missing", {}).get(number, []):
                         if name.startswith(before):
                             lower = min(w[1] for w in row)
@@ -766,8 +1040,58 @@ def table2(year: int, sizes: list[tuple[float, float]], book: list[list[Word]]) 
                     if cont and ward is not None:
                         continue
                     ward = {"borough": borough, "printed": head, "page": number, "column": index, "lines": []}
-                    out.append(ward)
+                    if fold(head) not in spec.get("byelections", set()) or not any(
+                        w["borough"] == borough and fold(w["printed"]) == fold(head) for w in out
+                    ):
+                        out.append(ward)
     return out
+
+
+STRICT = re.compile(
+    r"(?:Mc|Mac|O'|D'|de |Le |La |van )?[A-Z][a-z'\-]+(?:[ -][A-Z][a-z'\-]+)*, "
+    r"[A-Z][a-z'\-]+(?: [A-Z][a-z'\-]+)*(?: [A-Z]\.(?:[A-Z]\.)*)?"
+)
+
+
+def reread(year: int, heads: list[dict]) -> None:
+    spec = BOOKS[year]
+    artifact = raw.cached(lb.SOURCE, spec["url"])
+    codes = set(spec["parties"])
+    known: dict[str, int] = {}
+    for head in heads:
+        for line in head["lines"]:
+            for word in re.findall(r"[A-Za-z]{3,}", line["name"]):
+                known[word] = known.get(word, 0) + 1
+
+    def score(name: str) -> tuple[bool, int]:
+        return bool(STRICT.fullmatch(name)), sum(known.get(w, 0) > 1 for w in re.findall(r"[A-Za-z]{3,}", name))
+
+    changed = 0
+    for head in heads:
+        for line in head["lines"]:
+            if line["name"] in spec.get("people", {}).values():
+                continue
+            _, page = lb.scan(artifact, line["page"], dpi=300)
+            scale = 300 / 72
+            x0, y0, x1, y1 = (v * scale for v in line["bbox"])
+            words = sorted(
+                (
+                    w
+                    for row in page
+                    for w in row
+                    if x0 - 30 <= w[0] and w[2] <= x1 + 30 and y0 - 8 <= (w[1] + w[3]) / 2 <= y1 + 8
+                ),
+                key=lambda w: w[0],
+            )
+            found = candidate(words, codes, spec["ocr"]) if words else None
+            if found is None or found[2] != line["votes"]:
+                continue
+            name = cleaned(found[0])
+            if name.count(" ") != line["name"].count(" ") or score(name) < score(line["name"]):
+                continue
+            line["name"] = spec.get("people", {}).get(name, name)
+            changed += 1
+    print(f"{year}: {changed} names taken from the second reading")
 
 
 def table3(year: int, book: list[list[Word]]) -> dict[str, list[tuple]]:
@@ -785,19 +1109,19 @@ def table3(year: int, book: list[list[Word]]) -> dict[str, list[tuple]]:
         for index, row in enumerate(rows_):
             text = " ".join(w[4] for w in row)
             named = borough_of(text)
-            if named and re.match(r"[A-Z]{2}", text):
+            if named and (re.match(r"[A-Z]{2}", text) or not re.search(r"\d", text)):
                 borough = named
                 found.setdefault(borough, [])
                 pending = ""
                 continue
             if borough is None:
                 continue
-            figures = [w for w in row if re.fullmatch(r"\d{1,3},\d{3}", w[4])]
-            name = " ".join(w[4] for w in row if w[0] < cut and not re.search(r"\d", w[4])).strip(" *}")
+            figures = [w for w in row if re.fullmatch(r"\d{1,3}[,.]\d{3}", w[4].translate(lb.DIGITS).strip(",.'"))]
+            name = " ".join(w[4] for w in row if w[0] < cut and not re.fullmatch(r"[\d.,%()]+", w[4])).strip(" *}")
             rows = found[borough]
             if not figures:
                 after = rows_[index + 1] if index + 1 < len(rows_) else []
-                ahead = " ".join(w[4] for w in after if w[0] < cut and not re.search(r"\d", w[4]))
+                ahead = " ".join(w[4] for w in after if w[0] < cut and not re.fullmatch(r"[\d.,%()]+", w[4]))
                 before = rows_[index - 1] if index else []
                 nearer = bool(after and before) and after[0][3] - row[0][3] < row[0][3] - before[0][3] - 1
                 indent = bool(after) and after[0][0] - row[0][0] > 6
@@ -819,9 +1143,13 @@ def table3(year: int, book: list[list[Word]]) -> dict[str, list[tuple]]:
                     pending = f"{pending} {name}".strip()
                 continue
             name, pending = f"{pending} {name}".strip(), ""
+            if re.search(r"(?i)\btotal$", name) or any(w[4].lower() == "total" for w in row):
+                name = "Total"
             if not name:
                 continue
             electorate = figures[0]
+            before = [w for w in row if w[2] < electorate[0] and re.fullmatch(r"[1-3]", w[4])]
+            seats = int(before[-1][4]) if before else None
             share: dict[str, float] = {}
             for w in row:
                 if w[0] > electorate[2] and re.fullmatch(r"\d{1,3}\.\d", w[4]):
@@ -829,7 +1157,7 @@ def table3(year: int, book: list[list[Word]]) -> dict[str, list[tuple]]:
                     if len(shares_x) == 4 and x > shares_x[0] - 25:
                         column = min(range(4), key=lambda i: abs(shares_x[i] - x))
                         share[("Con", "Lab", "Lib", "Others")[column]] = float(w[4])
-            rows.append((name, int(electorate[4].replace(",", "")), number, list(electorate[:4]), share))
+            rows.append((name, lb.number(electorate[4].strip(",.'")), number, list(electorate[:4]), share, seats))
     return found
 
 
@@ -882,14 +1210,27 @@ def parse() -> None:
             for number, page in enumerate(book, 1)
         ]
         heads = table2(year, sizes, book)
+        if "ocr" in spec:
+            reread(year, heads)
         stats = table3(year, book)
+        sizes_: dict[str, int | None] = {}
+        bad = []
         for borough, rows in stats.items():
             total = [r for r in rows if fold(r[0]) == "total"]
             listed = [r for r in rows if fold(r[0]) != "total"]
             if len(total) != 1 or sum(r[1] for r in listed) != total[0][1]:
-                raise ValueError(f"{year} {borough}: electorate {sum(r[1] for r in listed)} against total {total}")
+                bad.append(f"{year} {borough}: electorate {sum(r[1] for r in listed)} against total {total[:1]}")
+                continue
             stats[borough] = listed
+            sizes_[borough] = total[0][5]
+        if bad:
+            raise ValueError("\n".join(bad))
         printed = spec["parties"]
+        groups = {code: figures[4] for code, figures in printed.items() if len(figures) > 4} or {
+            "Con": "Con",
+            "Lab": "Lab",
+            "Lib": "Lib",
+        }
         seen: dict[str, list[int]] = {}
         elected: dict[str, dict[str, int]] = {}
         for borough, code in BOROUGHS.items():
@@ -903,13 +1244,18 @@ def parse() -> None:
             won = elected.setdefault(borough, {})
             for number, (head, index) in enumerate(zip(mine, order, strict=True)):
                 row = listed[index]
-                name = spec.get("names", {}).get(row[0], row[0])
+                name = spec.get("names", {}).get((borough, row[0]), spec.get("names", {}).get(row[0], row[0]))
                 lines_ = head["lines"]
                 votes = [line["votes"] for line in lines_]
+                if row[5] is not None and len(votes) > row[5] and (None in votes or votes[row[5] - 1] != votes[row[5]]):
+                    for rank, line in enumerate(lines_):
+                        if line["elected"] != (rank < row[5]):
+                            print(f"{year} {borough} {name}: indent of {line['name']} reads elected {line['elected']}")
+                        line["elected"] = rank < row[5]
                 seats = sum(line["elected"] for line in lines_)
                 tacit = all(v is None for v in votes)
-                if seats == 0 or len(lines_) < seats:
-                    print(f"{year} {borough} {name}: {seats} elected of {len(lines_)}")
+                if seats == 0 or len(lines_) < seats or row[5] not in (None, seats):
+                    print(f"{year} {borough} {name}: {seats} elected of {len(lines_)}, printed seats {row[5]}")
                 if not tacit:
                     votes = [v for v in votes if v is not None]
                     ranked = sorted(votes, reverse=True)
@@ -923,8 +1269,7 @@ def parse() -> None:
                     total = sum(votes)
                     mine_ = {"Con": 0, "Lab": 0, "Lib": 0, "Others": 0}
                     for line in lines_:
-                        key = line["party"] if line["party"] in ("Con", "Lab", "Lib") else "Others"
-                        mine_[key] += line["votes"] or 0
+                        mine_[groups.get(line["party"], "Others")] += line["votes"] or 0
                     off = {
                         k: (round(100 * v / total, 1), row[4].get(k, 0.0))
                         for k, v in mine_.items()
@@ -950,7 +1295,7 @@ def parse() -> None:
                     }
                 )
                 for rank, line in enumerate(lines_):
-                    tally = seen.setdefault(line["party"], [0, 0])
+                    tally = seen.setdefault(spec.get("tallied", {}).get(line["name"], line["party"]), [0, 0])
                     tally[0] += 1
                     tally[1] += line["votes"] or 0
                     won[line["party"]] = won.get(line["party"], 0) + line["elected"]
@@ -979,6 +1324,10 @@ def parse() -> None:
         ]
         problems += [f"unknown party {code}" for code in seen if code not in printed]
         for borough, won in elected.items():
+            if sizes_[borough] not in (None, sum(won.values())):
+                problems.append(f"{borough}: {sum(won.values())} elected, printed {sizes_[borough]} seats")
+            if "state" not in spec:
+                continue
             table = spec["state"][borough]
             if sum(won.values()) != table["Total"]:
                 problems.append(f"{borough}: {sum(won.values())} elected, printed {table['Total']}")
@@ -990,6 +1339,12 @@ def parse() -> None:
             for party_, count in won.items():
                 if count and party_ not in spec["columns"] and party_ not in spec["merged"]:
                     problems.append(f"{borough} {party_}: {count} elected, no column in the printed table")
+        totals = {code: sum(won.get(code, 0) for won in elected.values()) for code in printed}
+        problems += [
+            f"{code}: {totals[code]} elected, printed {figures[3]}"
+            for code, figures in printed.items()
+            if len(figures) > 3 and totals[code] != figures[3]
+        ]
         if problems:
             raise ValueError(f"{year}:\n" + "\n".join(problems))
     pl.DataFrame(wards).write_parquet(PARSED / "wards.parquet")
@@ -1319,19 +1674,20 @@ def emit() -> Path:
         for year, spec in BOOKS.items():
             day = spec["day"]
             title = f"London Borough Council Elections {day.day} May {year}"
-            source = cs.source(PUBLISHER, title)
+            publisher = spec.get("publisher", PUBLISHER)
+            source = cs.source(publisher, title)
             if source in cs.minted:
                 cs.add(
                     "source",
                     id=source,
                     kind="compendium",
-                    publisher=PUBLISHER,
+                    publisher=publisher,
                     title=title,
                     url=lb.DATASET,
-                    license="Published by the Greater London Council; the Greater London Authority lists it on the "
+                    license=f"Published by the {publisher}; the Greater London Authority lists it on the "
                     "London Datastore with no licence stated",
                     license_url=None,
-                    attribution=f"{PUBLISHER}, {title}.",
+                    attribution=f"{publisher}, {title}.",
                 )
             artifact = raw.cached(lb.SOURCE, spec["url"])
             artifact_id = cs.artifact(artifact, source)
