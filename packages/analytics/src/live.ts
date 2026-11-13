@@ -310,7 +310,7 @@ const HOLDS: Record<string, number> = { ga: 0.002 };
 
 const NIGHTS: Record<string, number> = { ga: 0.0075 };
 
-const STILLS: Record<string, string> = { ga: "2021-03-25" };
+const STILLS: Record<string, string> = { ga: "2021-03-25", wi: "2012-01-01" };
 
 const TAILS: Record<string, number> = {
   ak: 0.4,
