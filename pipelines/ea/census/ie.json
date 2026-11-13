@@ -1,0 +1,1036 @@
+{
+  "polity": "IE",
+  "name": "Ireland",
+  "sources": {
+    "oir-34dail": {
+      "title": "Dáil and Seanad election results (34th Dáil general election, 29 November 2024)",
+      "publisher": "Houses of the Oireachtas",
+      "url": "https://www.oireachtas.ie/en/elections/",
+      "kind": "official_body"
+    },
+    "lrs-ge2020": {
+      "title": "General Election 2020: A Statistical Profile",
+      "publisher": "Houses of the Oireachtas Library & Research Service",
+      "url": "https://data.oireachtas.ie/ie/oireachtas/libraryResearch/2020/2020-02-20_l-rs-infographic-general-election-2020-a-statistical-profile_en.pdf",
+      "kind": "official_body"
+    },
+    "referendums-1937-2024": {
+      "title": "Referendum Results 1937 - 2024",
+      "publisher": "Department of Housing, Local Government and Heritage",
+      "url": "https://assets.gov.ie/static/documents/referendum-results-1937-2024.pdf",
+      "note": "Contents items 8 to 51 are the referendums (44 entries in total). Each entry is one question put to the national vote.",
+      "kind": "official_body"
+    },
+    "ec-president": {
+      "title": "Presidential election",
+      "publisher": "Electoral Commission (An Coimisiún Toghcháin)",
+      "url": "https://www.electoralcommission.ie/presidential-elections/",
+      "kind": "official_body"
+    },
+    "ec-local": {
+      "title": "Local council elections",
+      "publisher": "Electoral Commission (An Coimisiún Toghcháin)",
+      "url": "https://www.electoralcommission.ie/local-council-elections/",
+      "kind": "official_body"
+    },
+    "dhlgh-local-guide": {
+      "title": "How members of Local Authorities are elected",
+      "publisher": "Department of Housing, Local Government and Heritage",
+      "url": "https://assets.gov.ie/133249/2b2122d7-0ea0-4654-88c1-fe6e73bc0fd7.pdf",
+      "kind": "official_body"
+    },
+    "ep-results-2024": {
+      "title": "European Parliament Election Results 2024",
+      "publisher": "Department of Housing, Local Government and Heritage",
+      "url": "https://assets.gov.ie/301939/b7262287-3894-44e6-a0b3-f46ac83bc5e2.pdf",
+      "kind": "official_body"
+    },
+    "constituency-commission-2003": {
+      "title": "Constituency Commission Report on European Parliament Constituencies, 2003",
+      "publisher": "Constituency Commission (Ireland)",
+      "url": "https://www.electoralcommission.ie/app/uploads/2025/04/euro.pdf",
+      "kind": "official_body"
+    },
+    "ie-ea-1923": {
+      "title": "Electoral Act, 1923, Eighth Schedule",
+      "publisher": "Irish Statute Book (eISB)",
+      "url": "https://www.irishstatutebook.ie/eli/1923/act/12/schedule/8/enacted/en/html",
+      "kind": "official_body"
+    },
+    "ie-ea-1935": {
+      "title": "Electoral (Revision of Constituencies) Act, 1935, First Schedule",
+      "publisher": "Irish Statute Book (eISB)",
+      "url": "https://www.irishstatutebook.ie/eli/1935/act/5/schedule/1/enacted/en/html",
+      "note": "The universities' seats were abolished in 1936, so the 1937 to 1944 elections used only the 34 constituencies in this schedule.",
+      "kind": "official_body"
+    },
+    "ie-ea-1947": {
+      "title": "Electoral (Amendment) Act, 1947, First Schedule",
+      "publisher": "Irish Statute Book (eISB)",
+      "url": "https://www.irishstatutebook.ie/eli/1947/act/31/schedule/1/enacted/en/html",
+      "kind": "official_body"
+    },
+    "ie-ea-1961": {
+      "title": "Electoral (Amendment) Act, 1961, Schedule",
+      "publisher": "Irish Statute Book (eISB)",
+      "url": "https://www.irishstatutebook.ie/eli/1961/act/19/enacted/en/print.html",
+      "kind": "official_body"
+    },
+    "ie-ea-1969": {
+      "title": "Electoral (Amendment) Act, 1969, Schedule",
+      "publisher": "Irish Statute Book (eISB)",
+      "url": "https://www.irishstatutebook.ie/eli/1969/act/3/enacted/en/print.html",
+      "kind": "official_body"
+    },
+    "ie-ea-1974": {
+      "title": "Electoral (Amendment) Act, 1974, Schedule",
+      "publisher": "Irish Statute Book (eISB)",
+      "url": "https://www.irishstatutebook.ie/eli/1974/act/7/enacted/en/print.html",
+      "kind": "official_body"
+    },
+    "ie-ea-1980": {
+      "title": "Electoral (Amendment) Act, 1980, Schedule",
+      "publisher": "Irish Statute Book (eISB)",
+      "url": "https://www.irishstatutebook.ie/eli/1980/act/17/enacted/en/print.html",
+      "kind": "official_body"
+    },
+    "ie-ea-1983": {
+      "title": "Electoral (Amendment) Act, 1983, Schedule",
+      "publisher": "Irish Statute Book (eISB)",
+      "url": "https://www.irishstatutebook.ie/eli/1983/act/36/enacted/en/print.html",
+      "kind": "official_body"
+    },
+    "ie-ea-1990": {
+      "title": "Electoral (Amendment) Act, 1990, Schedule",
+      "publisher": "Irish Statute Book (eISB)",
+      "url": "https://www.irishstatutebook.ie/eli/1990/act/36/enacted/en/print.html",
+      "kind": "official_body"
+    },
+    "ie-ea-1995": {
+      "title": "Electoral (Amendment) Act, 1995, Schedule",
+      "publisher": "Irish Statute Book (eISB)",
+      "url": "https://www.irishstatutebook.ie/eli/1995/act/21/enacted/en/print.html",
+      "kind": "official_body"
+    },
+    "ie-ea-1998": {
+      "title": "Electoral (Amendment) (No. 2) Act, 1998, Schedule",
+      "publisher": "Irish Statute Book (eISB)",
+      "url": "https://www.irishstatutebook.ie/eli/1998/act/19/enacted/en/print.html",
+      "kind": "official_body"
+    },
+    "ie-ea-2005": {
+      "title": "Electoral (Amendment) Act 2005, Schedule",
+      "publisher": "Irish Statute Book (eISB)",
+      "url": "https://www.irishstatutebook.ie/eli/2005/act/16/enacted/en/print.html",
+      "kind": "official_body"
+    },
+    "dhlgh-president": {
+      "title": "Toghcháin Uachtaráin 1938 – 2025 Presidential Elections",
+      "publisher": "Department of Housing, Local Government and Heritage",
+      "url": "https://www.presidentialelection.ie/wp-content/uploads/2026/01/Presidential-Elections-1938-2025.pdf",
+      "note": "November 2025. The Holders of the Office of President table marks each of the 15 elections since 1938 as contested or uncontested.",
+      "kind": "official_body"
+    },
+    "cib-relate-2014": {
+      "title": "Relate, May 2014: Local and European elections 2014",
+      "publisher": "Citizens Information Board",
+      "url": "https://www.citizensinformationboard.ie/downloads/relate/relate_2014_05.pdf",
+      "kind": "official_body"
+    },
+    "ie_2009": {
+      "title": "Electoral (Amendment) Act 2009, section 8",
+      "publisher": "Irish Statute Book (eISB)",
+      "url": "https://www.irishstatutebook.ie/eli/2009/act/4/section/8/enacted/en/html",
+      "kind": "official_body"
+    },
+    "ie_2014": {
+      "title": "European Parliament Elections (Amendment) Act 2014, section 3",
+      "publisher": "Irish Statute Book (eISB)",
+      "url": "https://www.irishstatutebook.ie/eli/2014/act/2/section/3/enacted/en/html",
+      "kind": "official_body"
+    },
+    "ep_ee19_ie": {
+      "title": "European elections, 23-26 May 2019, country sheet: Ireland",
+      "publisher": "European Parliament",
+      "url": "https://www.europarl.europa.eu/news/en/press-room/20190516BKG51011/european-elections-2019-country-sheets/13/ireland",
+      "kind": "official_body"
+    },
+    "goi-1920": {
+      "title": "Government of Ireland Act 1920, Fifth Schedule (constituencies in Southern Ireland and Northern Ireland)",
+      "publisher": "legislation.gov.uk",
+      "url": "https://www.legislation.gov.uk/ukpga/Geo5/10-11/67/enacted",
+      "kind": "official_body"
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "Ireland",
+      "parent": null,
+      "polity_kind": "sovereign_state",
+      "source": "goi-1920"
+    },
+    {
+      "key": "local",
+      "name": "Local authorities",
+      "parent": "national",
+      "polity_kind": "municipality",
+      "source": "cib-relate-2014"
+    }
+  ],
+  "classes": [
+    {
+      "key": "dail",
+      "tier": "national",
+      "name": "Dáil general elections",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "schemes": [
+          "ie.dail"
+        ]
+      },
+      "finest_note": "Dáil votes are counted and declared by constituency; the tallies by ballot box are kept by parties, not published by returning officers.",
+      "source": "goi-1920",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "lower_house"
+          ],
+          "iso_pattern": "IE"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1922-06-16",
+          "contests": 28,
+          "seats": 128,
+          "note": "Counted as 28 constituencies, from the seats the Government of Ireland Act 1920 gave Southern Ireland: 4 borough, 22 county, and 2 university constituencies, electing 128 members.",
+          "source": "goi-1920",
+          "quote": "Fifth Schedule, Part I: 4 borough constituencies (Mid Dublin, North West Dublin, South City, Cork), 22 county constituencies, and 2 universities (Dublin University, National University); \"Total Members 128\""
+        },
+        {
+          "date": "1923-08-27",
+          "contests": 30,
+          "seats": 153,
+          "note": "Constituencies counted from the schedule's rows; the polling date is not quoted from a fetched source.",
+          "source": "ie-ea-1923",
+          "quote": "Eighth Schedule: 3 borough constituencies (Part I), 25 county constituencies (Part II), and 2 university constituencies (Part III); section 50(1): The Dáil shall consist of 153 members"
+        },
+        {
+          "date": "1927-06-09",
+          "contests": 30,
+          "seats": 153,
+          "note": "Constituencies counted from the schedule's rows; the polling date is not quoted from a fetched source.",
+          "source": "ie-ea-1923",
+          "quote": "Eighth Schedule: 3 borough constituencies (Part I), 25 county constituencies (Part II), and 2 university constituencies (Part III); section 50(1): The Dáil shall consist of 153 members"
+        },
+        {
+          "date": "1927-09-15",
+          "contests": 30,
+          "seats": 153,
+          "note": "Constituencies counted from the schedule's rows; the polling date is not quoted from a fetched source.",
+          "source": "ie-ea-1923",
+          "quote": "Eighth Schedule: 3 borough constituencies (Part I), 25 county constituencies (Part II), and 2 university constituencies (Part III); section 50(1): The Dáil shall consist of 153 members"
+        },
+        {
+          "date": "1932-02-16",
+          "contests": 30,
+          "seats": 153,
+          "note": "Constituencies counted from the schedule's rows; the polling date is not quoted from a fetched source.",
+          "source": "ie-ea-1923",
+          "quote": "Eighth Schedule: 3 borough constituencies (Part I), 25 county constituencies (Part II), and 2 university constituencies (Part III); section 50(1): The Dáil shall consist of 153 members"
+        },
+        {
+          "date": "1933-01-24",
+          "contests": 30,
+          "seats": 153,
+          "note": "Constituencies counted from the schedule's rows; the polling date is not quoted from a fetched source.",
+          "source": "ie-ea-1923",
+          "quote": "Eighth Schedule: 3 borough constituencies (Part I), 25 county constituencies (Part II), and 2 university constituencies (Part III); section 50(1): The Dáil shall consist of 153 members"
+        },
+        {
+          "date": "1937-07-01",
+          "contests": 34,
+          "seats": 138,
+          "note": "Constituencies counted from the schedule's rows; the polling date is not quoted from a fetched source.",
+          "source": "ie-ea-1935",
+          "quote": "First Schedule: 34 borough and county constituencies; section 3: Dáil Eireann shall consist of one hundred and thirty-eight members returned by borough constituencies and county constituencies"
+        },
+        {
+          "date": "1938-06-17",
+          "contests": 34,
+          "seats": 138,
+          "note": "Constituencies counted from the schedule's rows; the polling date is not quoted from a fetched source.",
+          "source": "ie-ea-1935",
+          "quote": "First Schedule: 34 borough and county constituencies; section 3: Dáil Eireann shall consist of one hundred and thirty-eight members returned by borough constituencies and county constituencies"
+        },
+        {
+          "date": "1943-06-23",
+          "contests": 34,
+          "seats": 138,
+          "note": "Constituencies counted from the schedule's rows; the polling date is not quoted from a fetched source.",
+          "source": "ie-ea-1935",
+          "quote": "First Schedule: 34 borough and county constituencies; section 3: Dáil Eireann shall consist of one hundred and thirty-eight members returned by borough constituencies and county constituencies"
+        },
+        {
+          "date": "1944-05-30",
+          "contests": 34,
+          "seats": 138,
+          "note": "Constituencies counted from the schedule's rows; the polling date is not quoted from a fetched source.",
+          "source": "ie-ea-1935",
+          "quote": "First Schedule: 34 borough and county constituencies; section 3: Dáil Eireann shall consist of one hundred and thirty-eight members returned by borough constituencies and county constituencies"
+        },
+        {
+          "date": "1948-02-04",
+          "contests": 40,
+          "seats": 147,
+          "note": "Constituencies counted from the schedule's rows; the polling date is not quoted from a fetched source.",
+          "source": "ie-ea-1947",
+          "quote": "First Schedule: 40 constituencies, members totaling 147"
+        },
+        {
+          "date": "1951-05-30",
+          "contests": 40,
+          "seats": 147,
+          "note": "Constituencies counted from the schedule's rows; the polling date is not quoted from a fetched source.",
+          "source": "ie-ea-1947",
+          "quote": "First Schedule: 40 constituencies, members totaling 147"
+        },
+        {
+          "date": "1954-05-18",
+          "contests": 40,
+          "seats": 147,
+          "note": "Constituencies counted from the schedule's rows; the polling date is not quoted from a fetched source.",
+          "source": "ie-ea-1947",
+          "quote": "First Schedule: 40 constituencies, members totaling 147"
+        },
+        {
+          "date": "1957-03-05",
+          "contests": 40,
+          "seats": 147,
+          "note": "Constituencies counted from the schedule's rows; the polling date is not quoted from a fetched source.",
+          "source": "ie-ea-1947",
+          "quote": "First Schedule: 40 constituencies, members totaling 147"
+        },
+        {
+          "date": "1961-10-04",
+          "contests": 38,
+          "seats": 144,
+          "note": "Constituencies counted from the schedule's rows; the polling date is not quoted from a fetched source.",
+          "source": "ie-ea-1961",
+          "quote": "Schedule: 38 constituencies, members totaling 144"
+        },
+        {
+          "date": "1965-04-07",
+          "contests": 38,
+          "seats": 144,
+          "note": "Constituencies counted from the schedule's rows; the polling date is not quoted from a fetched source.",
+          "source": "ie-ea-1961",
+          "quote": "Schedule: 38 constituencies, members totaling 144"
+        },
+        {
+          "date": "1969-06-18",
+          "contests": 42,
+          "seats": 144,
+          "note": "Constituencies counted from the schedule's rows; the polling date is not quoted from a fetched source.",
+          "source": "ie-ea-1969",
+          "quote": "Schedule: 42 constituencies, members totaling 144"
+        },
+        {
+          "date": "1973-02-28",
+          "contests": 42,
+          "seats": 144,
+          "note": "Constituencies counted from the schedule's rows; the polling date is not quoted from a fetched source.",
+          "source": "ie-ea-1969",
+          "quote": "Schedule: 42 constituencies, members totaling 144"
+        },
+        {
+          "date": "1977-06-16",
+          "contests": 42,
+          "seats": 148,
+          "note": "Constituencies counted from the schedule's rows; the polling date is not quoted from a fetched source.",
+          "source": "ie-ea-1974",
+          "quote": "Schedule: 42 constituencies, members totaling 148"
+        },
+        {
+          "date": "1981-06-11",
+          "contests": 41,
+          "seats": 166,
+          "note": "Constituencies counted from the schedule's rows; the polling date is not quoted from a fetched source.",
+          "source": "ie-ea-1980",
+          "quote": "Schedule: 41 constituencies, members totaling 166"
+        },
+        {
+          "date": "1982-02-18",
+          "contests": 41,
+          "seats": 166,
+          "note": "Constituencies counted from the schedule's rows; the polling date is not quoted from a fetched source.",
+          "source": "ie-ea-1980",
+          "quote": "Schedule: 41 constituencies, members totaling 166"
+        },
+        {
+          "date": "1982-11-24",
+          "contests": 41,
+          "seats": 166,
+          "note": "Constituencies counted from the schedule's rows; the polling date is not quoted from a fetched source.",
+          "source": "ie-ea-1980",
+          "quote": "Schedule: 41 constituencies, members totaling 166"
+        },
+        {
+          "date": "1987-02-17",
+          "contests": 41,
+          "seats": 166,
+          "note": "Constituencies counted from the schedule's rows; the polling date is not quoted from a fetched source.",
+          "source": "ie-ea-1983",
+          "quote": "Schedule: 41 constituencies, members totaling 166"
+        },
+        {
+          "date": "1989-06-15",
+          "contests": 41,
+          "seats": 166,
+          "note": "Constituencies counted from the schedule's rows; the polling date is not quoted from a fetched source.",
+          "source": "ie-ea-1983",
+          "quote": "Schedule: 41 constituencies, members totaling 166"
+        },
+        {
+          "date": "1992-11-25",
+          "contests": 41,
+          "seats": 166,
+          "note": "Constituencies counted from the schedule's rows; the polling date is not quoted from a fetched source.",
+          "source": "ie-ea-1990",
+          "quote": "Schedule: 41 constituencies, members totaling 166"
+        },
+        {
+          "date": "1997-06-06",
+          "contests": 41,
+          "seats": 166,
+          "note": "Constituencies counted from the schedule's rows; the polling date is not quoted from a fetched source.",
+          "source": "ie-ea-1995",
+          "quote": "Schedule: 41 constituencies, members totaling 166"
+        },
+        {
+          "date": "2002-05-17",
+          "contests": 42,
+          "seats": 166,
+          "note": "Constituencies counted from the schedule's rows; the polling date is not quoted from a fetched source.",
+          "source": "ie-ea-1998",
+          "quote": "Schedule: 42 constituencies, members totaling 166"
+        },
+        {
+          "date": "2007-05-24",
+          "contests": 43,
+          "seats": 166,
+          "note": "Constituencies counted from the schedule's rows; the polling date is not quoted from a fetched source.",
+          "source": "ie-ea-2005",
+          "quote": "Schedule: 43 constituencies, members totaling 166"
+        },
+        {
+          "date": "2011-02-25",
+          "contests": 43,
+          "note": "Constituency count from the L&RS profile's constituency row (GE2020, GE2016, GE2011 columns). Seats not stated in this source (166 is not in the document). The date is not quoted from a fetched source.",
+          "source": "lrs-ge2020",
+          "quote": "39          40         43"
+        },
+        {
+          "date": "2016-02-26",
+          "contests": 40,
+          "seats": 158,
+          "note": "Seats 158 from the TDs row total (GE2016). Constituency count 40 from the same profile's constituency row. The date is not quoted from a fetched source.",
+          "source": "lrs-ge2020",
+          "quote": "TDs 44 23 50 2 7 3 6 4 - 19 158"
+        },
+        {
+          "date": "2020-02-08",
+          "contests": 39,
+          "seats": 160,
+          "note": "Seats 160 from the TDs row total (GE2020). Constituency count 39 from the profile's turnout table heading '(of 39)'. The date is not quoted from a fetched source.",
+          "source": "lrs-ge2020",
+          "quote": "Female TDs elected (of 160)"
+        },
+        {
+          "date": "2024-11-29",
+          "contests": 43,
+          "seats": 174,
+          "note": "Official statement. The search excerpt's count of 39 for 2024 is the 2020 count and is not used.",
+          "source": "oir-34dail",
+          "quote": "The general election of Members forming the Thirty-fourth Dáil took place on Friday, 29 November 2024. The election returned 174 TDs to Dáil Éireann from 43 constituencies"
+        }
+      ]
+    },
+    {
+      "key": "dail_by",
+      "tier": "national",
+      "name": "Dáil by-elections",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "oir-34dail",
+      "match": [
+        {
+          "election_kinds": [
+            "by_election"
+          ],
+          "body_kinds": [
+            "lower_house"
+          ],
+          "iso_pattern": "IE"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1923-01-01",
+          "precision": "year",
+          "through": "2026-12-31",
+          "note": "No official count of by-elections each year has been compiled yet."
+        }
+      ]
+    },
+    {
+      "key": "president",
+      "tier": "national",
+      "name": "Presidential elections",
+      "category": "executive",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "ie.dail"
+        ]
+      },
+      "note": "Elections with only one nominee count as races too, when that candidate is declared elected without a poll (1938, 1952, 1974, 1976, 1983, and 2004).",
+      "source": "dhlgh-president",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "IE"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1938-01-01",
+          "precision": "year",
+          "contests": 1,
+          "note": "Uncontested: the only nominee was declared elected without a poll.",
+          "source": "dhlgh-president",
+          "quote": "| 1938 | Uncontested | Only one person nominated | 1 |"
+        },
+        {
+          "date": "1945-01-01",
+          "precision": "year",
+          "contests": 1,
+          "source": "dhlgh-president",
+          "quote": "| 1945 | Contested | | 3 |"
+        },
+        {
+          "date": "1952-01-01",
+          "precision": "year",
+          "contests": 1,
+          "note": "Uncontested: the only nominee was declared elected without a poll.",
+          "source": "dhlgh-president",
+          "quote": "| 1952 | Uncontested | Incumbent only nominee | 1 |"
+        },
+        {
+          "date": "1959-01-01",
+          "precision": "year",
+          "contests": 1,
+          "source": "dhlgh-president",
+          "quote": "| 1959 | Contested | | 2 |"
+        },
+        {
+          "date": "1966-01-01",
+          "precision": "year",
+          "contests": 1,
+          "source": "dhlgh-president",
+          "quote": "| 1966 | Contested | | 2 |"
+        },
+        {
+          "date": "1973-01-01",
+          "precision": "year",
+          "contests": 1,
+          "source": "dhlgh-president",
+          "quote": "| 1973 | Contested | | 2 |"
+        },
+        {
+          "date": "1974-01-01",
+          "precision": "year",
+          "contests": 1,
+          "note": "Uncontested: the only nominee was declared elected without a poll.",
+          "source": "dhlgh-president",
+          "quote": "| 1974 | Uncontested | Death of incumbent; only one person nominated | 1 |"
+        },
+        {
+          "date": "1976-01-01",
+          "precision": "year",
+          "contests": 1,
+          "note": "Uncontested: the only nominee was declared elected without a poll.",
+          "source": "dhlgh-president",
+          "quote": "| 1976 | Uncontested | Resignation of incumbent; only one person nominated | 1 |"
+        },
+        {
+          "date": "1983-01-01",
+          "precision": "year",
+          "contests": 1,
+          "note": "Uncontested: the only nominee was declared elected without a poll.",
+          "source": "dhlgh-president",
+          "quote": "| 1983 | Uncontested | Only one nominated | 1 |"
+        },
+        {
+          "date": "1990-01-01",
+          "precision": "year",
+          "contests": 1,
+          "source": "dhlgh-president",
+          "quote": "| 1990 | Contested | | 3 |"
+        },
+        {
+          "date": "1997-01-01",
+          "precision": "year",
+          "contests": 1,
+          "source": "dhlgh-president",
+          "quote": "| 1997 | Contested | | 5 |"
+        },
+        {
+          "date": "2004-01-01",
+          "precision": "year",
+          "contests": 1,
+          "note": "Uncontested: the only nominee was declared elected without a poll.",
+          "source": "dhlgh-president",
+          "quote": "| 2004 | Uncontested | Incumbent only person nominated | 1 |"
+        },
+        {
+          "date": "2011-01-01",
+          "precision": "year",
+          "contests": 1,
+          "source": "dhlgh-president",
+          "quote": "| 2011 | Contested | | 7 |"
+        },
+        {
+          "date": "2018-01-01",
+          "precision": "year",
+          "contests": 1,
+          "source": "dhlgh-president",
+          "quote": "| 2018 | Contested | | 6 |"
+        },
+        {
+          "date": "2025-01-01",
+          "precision": "year",
+          "contests": 1,
+          "source": "dhlgh-president",
+          "quote": "| 2025 | Contested | | 3 |"
+        }
+      ]
+    },
+    {
+      "key": "referendums",
+      "tier": "national",
+      "name": "Referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "ie.dail"
+        ]
+      },
+      "source": "referendums-1937-2024",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "iso_pattern": "IE"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1937-01-01",
+          "precision": "year",
+          "contests": 1,
+          "note": "Item 8, plebiscite on the draft Constitution.",
+          "source": "referendums-1937-2024",
+          "quote": "The draft Constitution was approved by the people at a plebiscite held on 1 July 1937."
+        },
+        {
+          "date": "1959-01-01",
+          "precision": "year",
+          "contests": 1,
+          "note": "Item 9. Polling 17 June 1959.",
+          "source": "referendums-1937-2024",
+          "quote": "9. Referendum on the voting system (1959)"
+        },
+        {
+          "date": "1968-01-01",
+          "precision": "year",
+          "contests": 2,
+          "note": "Items 10 and 11 (voting system, 1968), both polled 16 October 1968.",
+          "source": "referendums-1937-2024",
+          "quote": "10. Referendum on the formation of Dáil constituencies (1968)"
+        },
+        {
+          "date": "1972-01-01",
+          "precision": "year",
+          "contests": 3,
+          "note": "Items 12 to 14: item 12 polled 10 May 1972; items 13 and 14 polled 7 December 1972.",
+          "source": "referendums-1937-2024",
+          "quote": "12. Referendum on accession to the European Communities (1972)"
+        },
+        {
+          "date": "1979-01-01",
+          "precision": "year",
+          "contests": 2,
+          "note": "Items 15 and 16, both polled 5 July 1979.",
+          "source": "referendums-1937-2024",
+          "quote": "15. Referendum on adoption (1979)"
+        },
+        {
+          "date": "1983-01-01",
+          "precision": "year",
+          "contests": 1,
+          "note": "Item 17. Polling 7 September 1983.",
+          "source": "referendums-1937-2024",
+          "quote": "17. Referendum on the right to life of the unborn (1983)"
+        },
+        {
+          "date": "1984-01-01",
+          "precision": "year",
+          "contests": 1,
+          "note": "Item 18.",
+          "source": "referendums-1937-2024",
+          "quote": "18. Referendum on extension of voting rights at Dáil elections (1984)"
+        },
+        {
+          "date": "1986-01-01",
+          "precision": "year",
+          "contests": 1,
+          "note": "Item 19. Polling 26 June 1986.",
+          "source": "referendums-1937-2024",
+          "quote": "19. Referendum on dissolution of marriage (1986)"
+        },
+        {
+          "date": "1987-01-01",
+          "precision": "year",
+          "contests": 1,
+          "note": "Item 20. Polling 26 May 1987.",
+          "source": "referendums-1937-2024",
+          "quote": "20. Referendum on ratification of the Single European Act (1987)"
+        },
+        {
+          "date": "1992-01-01",
+          "precision": "year",
+          "contests": 4,
+          "note": "Items 21 to 24: item 21 polled 18 June 1992; items 22 to 24 polled 25 November 1992.",
+          "source": "referendums-1937-2024",
+          "quote": "21. Referendum on European Union (1992)"
+        },
+        {
+          "date": "1995-01-01",
+          "precision": "year",
+          "contests": 1,
+          "note": "Item 25. Polling 24 November 1995.",
+          "source": "referendums-1937-2024",
+          "quote": "25. Referendum on dissolution of marriage (1995)"
+        },
+        {
+          "date": "1996-01-01",
+          "precision": "year",
+          "contests": 1,
+          "note": "Item 26. Polling 28 November 1996.",
+          "source": "referendums-1937-2024",
+          "quote": "26. Referendum on bail (1996)"
+        },
+        {
+          "date": "1997-01-01",
+          "precision": "year",
+          "contests": 1,
+          "note": "Item 27.",
+          "source": "referendums-1937-2024",
+          "quote": "27. Referendum on cabinet confidentiality (1997)"
+        },
+        {
+          "date": "1998-01-01",
+          "precision": "year",
+          "contests": 2,
+          "note": "Items 28 and 29, both polled 22 May 1998.",
+          "source": "referendums-1937-2024",
+          "quote": "28. Referendum on the Treaty of Amsterdam (1998)"
+        },
+        {
+          "date": "1999-01-01",
+          "precision": "year",
+          "contests": 1,
+          "note": "Item 30. Polling 11 June 1999.",
+          "source": "referendums-1937-2024",
+          "quote": "30. Referendum on local government (1999)"
+        },
+        {
+          "date": "2001-01-01",
+          "precision": "year",
+          "contests": 3,
+          "note": "Items 31 to 33, all polled 7 June 2001.",
+          "source": "referendums-1937-2024",
+          "quote": "31. Referendum on prohibition of death penalty (2001)"
+        },
+        {
+          "date": "2002-01-01",
+          "precision": "year",
+          "contests": 2,
+          "note": "Item 34 polled 6 March 2002; item 35 (Treaty of Nice) polled 19 October 2002.",
+          "source": "referendums-1937-2024",
+          "quote": "34. Referendum on Human Life in Pregnancy (2002)"
+        },
+        {
+          "date": "2004-01-01",
+          "precision": "year",
+          "contests": 1,
+          "note": "Item 36. Polling 11 June 2004.",
+          "source": "referendums-1937-2024",
+          "quote": "36. Referendum on citizenship (2004)"
+        },
+        {
+          "date": "2008-01-01",
+          "precision": "year",
+          "contests": 1,
+          "note": "Item 37. Polling 12 June 2008.",
+          "source": "referendums-1937-2024",
+          "quote": "37. Referendum on the Lisbon Treaty (2008)"
+        },
+        {
+          "date": "2009-01-01",
+          "precision": "year",
+          "contests": 1,
+          "note": "Item 38. Polling 2 October 2009.",
+          "source": "referendums-1937-2024",
+          "quote": "38. Referendum on the Treaty of Lisbon (2009)"
+        },
+        {
+          "date": "2011-01-01",
+          "precision": "year",
+          "contests": 2,
+          "note": "Items 39 and 40, both polled 27 October 2011.",
+          "source": "referendums-1937-2024",
+          "quote": "39. Referendum on Judges' Remuneration (2011)"
+        },
+        {
+          "date": "2012-01-01",
+          "precision": "year",
+          "contests": 2,
+          "note": "Items 41 and 42: item 41 polled 31 May 2012; item 42 polled 10 November 2012.",
+          "source": "referendums-1937-2024",
+          "quote": "41. Referendum on the Treaty on Stability, Coordination and Governance in the Economic and Monetary Union (2012)"
+        },
+        {
+          "date": "2013-01-01",
+          "precision": "year",
+          "contests": 2,
+          "note": "Items 43 and 44, both polled 4 October 2013.",
+          "source": "referendums-1937-2024",
+          "quote": "43. Referendum on Abolition of Seanad Éireann (2013)"
+        },
+        {
+          "date": "2015-01-01",
+          "precision": "year",
+          "contests": 2,
+          "note": "Items 45 and 46, both polled 22 May 2015.",
+          "source": "referendums-1937-2024",
+          "quote": "45. Referendum on Marriage Equality (2015)"
+        },
+        {
+          "date": "2018-01-01",
+          "precision": "year",
+          "contests": 2,
+          "note": "Items 47 and 48: item 47 polled 25 May 2018; item 48 polled 26 October 2018.",
+          "source": "referendums-1937-2024",
+          "quote": "47. Referendum on the Thirty-sixth Amendment of the Constitution Bill (2018)"
+        },
+        {
+          "date": "2019-01-01",
+          "precision": "year",
+          "contests": 1,
+          "note": "Item 49. Polling 24 May 2019.",
+          "source": "referendums-1937-2024",
+          "quote": "49. Referendum on the Thirty-eighth Amendment of the Constitution (Dissolution of Marriage) Bill 2016 (2019)"
+        },
+        {
+          "date": "2024-01-01",
+          "precision": "year",
+          "contests": 2,
+          "note": "Items 50 and 51 (Family and Care amendments). The polling line is quoted for item 50; item 51's own polling line was not separately matched.",
+          "source": "referendums-1937-2024",
+          "quote": "Polling at the referendum took place on Friday, 08 March 2024"
+        }
+      ]
+    },
+    {
+      "key": "local",
+      "tier": "local",
+      "name": "Local elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "schemes": [
+          "ie.lea"
+        ]
+      },
+      "source": "cib-relate-2014",
+      "match": [
+        {
+          "election_kinds": [
+            "local"
+          ],
+          "body_kinds": [
+            "council"
+          ]
+        }
+      ],
+      "dates": [
+        {
+          "date": "2014-01-01",
+          "precision": "year",
+          "contests": 137,
+          "note": "The Local Electoral Area Boundary Committee's 2013 report set these areas; the Minister also gave 137 in a Dáil reply on 12 June 2013.",
+          "source": "cib-relate-2014",
+          "quote": "There are 137 local electoral areas for the 31 local authorities."
+        },
+        {
+          "date": "2019-01-01",
+          "precision": "year",
+          "contests": 166,
+          "source": "dhlgh-local-guide",
+          "quote": "Elections were held in respect of 166 local electoral areas in 2019."
+        },
+        {
+          "date": "2024-01-01",
+          "precision": "year",
+          "contests": 166,
+          "note": "The Electoral Commission page also gives 949 councillors nationally (quoted as 'The number of councillors to be elected nationally is 949.').",
+          "source": "ec-local",
+          "quote": "In total, there are 166 electoral areas in Ireland and each of them elects a number of councillors."
+        },
+        {
+          "date": "1999-01-01",
+          "precision": "year",
+          "through": "2009-12-31",
+          "note": "No official count of local electoral areas at these elections has been compiled yet."
+        }
+      ]
+    },
+    {
+      "key": "ep",
+      "tier": "national",
+      "name": "European Parliament elections in Ireland",
+      "category": "legislature",
+      "goal": "ep",
+      "measure": {
+        "schemes": [
+          "ie.ep_constituency"
+        ]
+      },
+      "source": "constituency-commission-2003",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "EU"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1979-06-07",
+          "contests": 4,
+          "seats": 15,
+          "note": "Four constituencies (Connacht-Ulster, Dublin, Leinster, Munster) as listed in the 1977 Commission distribution. The report does not confirm that structure for 1979 specifically. The date is not quoted from a fetched source.",
+          "source": "constituency-commission-2003",
+          "quote": "The 1977 Commission recommended that Ireland's representation of 15 MEP's be distributed as follows:"
+        },
+        {
+          "date": "1984-06-14",
+          "contests": 4,
+          "seats": 15,
+          "note": "Same four-constituency structure as 1979. Not confirmed specifically for 1984. The date is not quoted from a fetched source.",
+          "source": "constituency-commission-2003",
+          "quote": "The 1977 Commission recommended that Ireland's representation of 15 MEP's be distributed as follows:"
+        },
+        {
+          "date": "1989-06-15",
+          "contests": 4,
+          "seats": 15,
+          "note": "Same four-constituency structure as 1979. Not confirmed specifically for 1989. The date is not quoted from a fetched source.",
+          "source": "constituency-commission-2003",
+          "quote": "The 1977 Commission recommended that Ireland's representation of 15 MEP's be distributed as follows:"
+        },
+        {
+          "date": "1994-06-09",
+          "contests": 4,
+          "seats": 15,
+          "note": "Constituency structure unchanged from 1994 onward per the 2003 report. The 15-seat total is from the 1977 distribution plus the 1993 transfer described in the report. The date is not quoted from a fetched source.",
+          "source": "constituency-commission-2003",
+          "quote": "There has, therefore, been no change in the constituencies or the number of members elected from them since the European Parliament elections in 1994."
+        },
+        {
+          "date": "1999-06-10",
+          "contests": 4,
+          "seats": 15,
+          "note": "Same structure as 1994. The date is not quoted from a fetched source.",
+          "source": "constituency-commission-2003",
+          "quote": "There has, therefore, been no change in the constituencies or the number of members elected from them since the European Parliament elections in 1994."
+        },
+        {
+          "date": "2004-06-11",
+          "contests": 4,
+          "seats": 13,
+          "note": "Four constituencies (Dublin, East, North-West, South) as recommended by the 2003 Constituency Commission. The recommendation was not checked against the enacting order. The date is not quoted from a fetched source.",
+          "source": "constituency-commission-2003",
+          "quote": "The recommended constituencies for the election of thirteen members of the European Parliament are:"
+        },
+        {
+          "date": "2009-06-05",
+          "contests": 4,
+          "note": "Constituencies as set by the Act in force at this election.",
+          "source": "ie_2009",
+          "quote": "Dublin | The counties of: Dún Laoghaire-Rathdown, Fingal and South Dublin; and the city of Dublin. | 3 | East | The counties of: Carlow, Kildare, Kilkenny, Laois, Louth, Meath, Offaly, Wexford and Wicklow. | 3 | North-West | The counties of: Cavan, Clare, Donegal, Galway, Leitrim, Longford, Mayo, Monaghan, Roscommon, Sligo and Westmeath; and the city of Galway. | 3 | South | The counties of: Cork, Kerry, Limerick, North Tipperary, South Tipperary and Waterford; and the cities of Cork, Limerick and Waterford. | 3"
+        },
+        {
+          "date": "2014-05-23",
+          "contests": 3,
+          "seats": 11,
+          "note": "Constituencies as set by the Act in force at this election.",
+          "source": "ie_2014",
+          "quote": "Dublin | The counties of: Dun Laoghaire-Rathdown, Fingal and South Dublin; and the city of Dublin. | 3 | Midlands-North-West | The counties of: Cavan, Donegal, Galway, Kildare, Laois, Leitrim, Longford, Louth, Mayo, Meath, Monaghan, Offaly, Roscommon, Sligo and Westmeath; and the city of Galway. | 4 | South | The counties of: Carlow, Clare, Cork, Kerry, Kilkenny, Limerick, North Tipperary, South Tipperary, Waterford, Wexford and Wicklow; and the cities of Cork, Limerick and Waterford. | 4"
+        },
+        {
+          "date": "2019-05-24",
+          "contests": 3,
+          "seats": 13,
+          "note": "Constituencies as set by the Act in force at this election.",
+          "source": "ep_ee19_ie",
+          "quote": "Number of constituencies 3"
+        },
+        {
+          "date": "2024-06-07",
+          "contests": 3,
+          "seats": 14,
+          "note": "Three constituencies: Dublin (4 seats), Midlands-North-West (5), and South (5), per the same report's constituency sections. The date is not quoted from a fetched source.",
+          "source": "ep-results-2024",
+          "quote": "No. of Seats                4                       5                              5                         14"
+        }
+      ]
+    }
+  ]
+}

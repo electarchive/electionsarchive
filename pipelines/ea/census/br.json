@@ -1,0 +1,1169 @@
+{
+  "polity": "BR",
+  "name": "Brazil",
+  "sources": {
+    "cf88": {
+      "title": "Constituição da República Federativa do Brasil de 1988",
+      "publisher": "Presidência da República (Planalto)",
+      "url": "https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm",
+      "kind": "official_body"
+    },
+    "tse-vagas": {
+      "title": "Consulta vagas (seats by office and state for each election), 1994–2026",
+      "publisher": "Tribunal Superior Eleitoral, Portal de Dados Abertos",
+      "url": "https://dadosabertos.tse.jus.br/dataset/?q=vagas",
+      "note": "One file per election, https://cdn.tse.jus.br/estatistica/sead/odsele/consulta_vagas/consulta_vagas_{year}.zip; counted by distinct SG_UF per DS_CARGO, deduplicating the national file.",
+      "kind": "official_body"
+    },
+    "tse-cand": {
+      "title": "Consulta candidatos (candidates and their result by round), 1994–2026",
+      "publisher": "Tribunal Superior Eleitoral, Portal de Dados Abertos",
+      "url": "https://dadosabertos.tse.jus.br/dataset/?q=candidatos",
+      "note": "consulta_cand_{year}.zip, BRASIL file, DS_CARGO Presidente: NR_TURNO and DS_SIT_TOT_TURNO.",
+      "kind": "official_body"
+    },
+    "tse-detalhe-2006": {
+      "title": "Detalhe da apuração por município e zona, 2006",
+      "publisher": "Tribunal Superior Eleitoral, Portal de Dados Abertos",
+      "url": "https://cdn.tse.jus.br/estatistica/sead/odsele/detalhe_votacao_munzona/detalhe_votacao_munzona_2006.zip",
+      "kind": "official_body"
+    },
+    "tse-mun-1996": {
+      "title": "A evolução da urna eletrônica",
+      "publisher": "Tribunal Superior Eleitoral (Revista Eletrônica da EJE, n. 6)",
+      "url": "https://www.tse.jus.br/o-tse/escola-judiciaria-eleitoral/publicacoes/revistas-da-eje/artigos/revista-eletronica-eje-n.-6-ano-2/a-evolucao-da-urna-eletronica",
+      "kind": "official_body"
+    },
+    "senado-2004": {
+      "title": "Eleições 2004 em números (Fonte: Tribunal Superior Eleitoral)",
+      "publisher": "Agência Senado",
+      "url": "https://www12.senado.leg.br/noticias/materias/2004/10/01/eleicoes-2004-em-numeros",
+      "kind": "official_body"
+    },
+    "tse-mun-2008": {
+      "title": "Revista Eletrônica da EJE ano II, n. 5, ago./set. 2012",
+      "publisher": "Tribunal Superior Eleitoral",
+      "url": "https://www.tse.jus.br/institucional/escola-judiciaria-eleitoral/publicacoes/revistas-da-eje/revista-eletronica-da-eje",
+      "kind": "official_body"
+    },
+    "tse-mun-2016": {
+      "title": "TSE realizou maior eleição municipal da história em 2016",
+      "publisher": "Tribunal Superior Eleitoral",
+      "url": "https://www.tse.jus.br/comunicacao/noticias/2017/Julho/tse-realizou-maior-eleicao-municipal-da-historia-em-2016",
+      "kind": "official_body"
+    },
+    "tse-mun-2020": {
+      "title": "Diplomação do prefeito eleito em Macapá (AP) será dia 29 de dezembro",
+      "publisher": "Tribunal Superior Eleitoral",
+      "url": "https://www.tse.jus.br/comunicacao/noticias/2020/Dezembro/diplomacao-do-prefeito-eleito-em-macapa-ap-sera-dia-29-de-dezembro",
+      "kind": "official_body"
+    },
+    "tse-mun-2024": {
+      "title": "Retrospectiva 2024: números confirmam a realização do maior pleito municipal da história",
+      "publisher": "Tribunal Superior Eleitoral",
+      "url": "https://www.tse.jus.br/comunicacao/noticias/2024/Dezembro/retrospectiva-2024-numeros-confirmam-a-realizacao-do-maior-pleito-municipal-da-historia",
+      "kind": "official_body"
+    },
+    "tse-cronologia": {
+      "title": "Cronologia das eleições",
+      "publisher": "Tribunal Superior Eleitoral",
+      "url": "https://www.tse.jus.br/eleicoes/historia/cronologia-das-eleicoes",
+      "kind": "official_body"
+    },
+    "tse-dados-1945": {
+      "title": "Dados estatísticos: eleições federal, estadual e municipal, realizadas no Brasil a partir de 1945 (v. 1)",
+      "publisher": "Tribunal Superior Eleitoral; Departamento de Imprensa Nacional (digitized by the Câmara dos Deputados library)",
+      "url": "http://bd.camara.gov.br/bd/handle/bdcamara/12956",
+      "kind": "official_body"
+    },
+    "ibge-1953-1950": {
+      "title": "Anuário Estatístico do Brasil: Representação Política VII-VIII: Constituição do Congresso Nacional, 1950 (Câmara dos Deputados); Constituição das assembleias legislativas estaduais, 1950",
+      "publisher": "IBGE",
+      "url": "https://seculoxx.ibge.gov.br/images/seculoxx/arquivos_download/representacao_politica/1953/rep_polit_1953m_aeb_102_1.pdf",
+      "kind": "official_body"
+    },
+    "ibge-1970": {
+      "title": "Anuário Estatístico do Brasil 1970: Número de deputados federais e estaduais fixados para as eleições de 15-11-1970",
+      "publisher": "IBGE (source: Tribunal Superior Eleitoral)",
+      "url": "https://seculoxx.ibge.gov.br/images/seculoxx/arquivos_download/representacao_politica/1970/rep_polit_1970_aeb_03_1.pdf",
+      "kind": "official_body"
+    },
+    "ibge-1975": {
+      "title": "Anuário Estatístico do Brasil 1975: Número de deputados federais e estaduais eleitos, 15-11-1974",
+      "publisher": "IBGE (source: Tribunal Superior Eleitoral)",
+      "url": "https://seculoxx.ibge.gov.br/images/seculoxx/arquivos_download/representacao_politica/1975/rep_polit_1975_aeb_07_1.pdf",
+      "kind": "official_body"
+    },
+    "senado-noticias": {
+      "title": "Todas as eleições para o Senado na história da República",
+      "publisher": "Agência Senado, Senado Federal",
+      "url": "https://www12.senado.leg.br/noticias/infomaterias/2026/09/todas-as-eleicoes-para-o-senado-na-historia-da-republica",
+      "kind": "official_body"
+    },
+    "ibge-1947-gov": {
+      "title": "Anuário Estatístico do Brasil: Representação Política: Resultado das eleições estaduais, 19-I-1947",
+      "publisher": "IBGE",
+      "url": "https://seculoxx.ibge.gov.br/images/seculoxx/arquivos_download/representacao_politica/1947/rep_polit1947aeb_01.pdf",
+      "kind": "official_body"
+    },
+    "ibge-1950-gov": {
+      "title": "Anuário Estatístico do Brasil: Representação Política IV-V: Resultados das eleições para governadores, 3-X-1950; Constituição do Congresso Nacional, 1950 (Senado)",
+      "publisher": "IBGE",
+      "url": "https://seculoxx.ibge.gov.br/images/seculoxx/arquivos_download/representacao_politica/1950/rep_polit_1950aeb_04_1.pdf",
+      "kind": "official_body"
+    },
+    "ibge-1955-gov": {
+      "title": "Anuário Estatístico do Brasil: Representação Política V: Resultados das eleições para governadores, 3-X-1954",
+      "publisher": "IBGE",
+      "url": "https://seculoxx.ibge.gov.br/images/seculoxx/arquivos_download/representacao_politica/1955/rep_polit_1955aeb_4.pdf",
+      "kind": "official_body"
+    },
+    "ibge-1957-gov": {
+      "title": "Anuário Estatístico do Brasil: Representação Política V: Resultados das eleições para governadores, 3-X-1954 e 3-X-1955",
+      "publisher": "IBGE",
+      "url": "https://seculoxx.ibge.gov.br/images/seculoxx/arquivos_download/representacao_politica/1957/rep_polit_1957m_aeb_150_3.pdf",
+      "kind": "official_body"
+    },
+    "ibge-1963-gov": {
+      "title": "Anuário Estatístico do Brasil: Representação Política: Resultados das eleições para governador, 1960/62; Constituição do Congresso Nacional, 1963 (Senado)",
+      "publisher": "IBGE",
+      "url": "https://seculoxx.ibge.gov.br/images/seculoxx/arquivos_download/representacao_politica/1963/rep_polit_1963m_aeb_83.pdf",
+      "kind": "official_body"
+    },
+    "cf46": {
+      "title": "Constituição dos Estados Unidos do Brasil de 1946, with its Ato das Disposições Constitucionais Transitórias",
+      "publisher": "Presidência da República (Planalto)",
+      "url": "https://www.planalto.gov.br/ccivil_03/constituicao/constituicao46.htm",
+      "kind": "official_body"
+    },
+    "ibge-1948-cn": {
+      "title": "Anuário Estatístico do Brasil 1948: Representação Política V: Constituição do Congresso Nacional, 1947",
+      "publisher": "IBGE",
+      "url": "https://seculoxx.ibge.gov.br/images/seculoxx/arquivos_download/representacao_politica/1948/rep_polit_1948m_aeb_89.pdf",
+      "kind": "official_body"
+    },
+    "ibge-1949-ae": {
+      "title": "Anuário Estatístico do Brasil 1949: Representação Política: Resultado das eleições para as câmaras estaduais, 19-I-1947",
+      "publisher": "IBGE",
+      "url": "https://seculoxx.ibge.gov.br/images/seculoxx/arquivos_download/representacao_politica/1949/rep_polit1949m_aeb_93_1a95.pdf",
+      "kind": "official_body"
+    },
+    "ibge-1954-cn": {
+      "title": "Anuário Estatístico do Brasil 1954: Representação Política VII–VIII: Constituição do Congresso Nacional (Câmara dos Deputados) e das assembleias legislativas estaduais, 1950",
+      "publisher": "IBGE",
+      "url": "https://seculoxx.ibge.gov.br/images/seculoxx/arquivos_download/representacao_politica/1954/rep_polit_1954m_aeb_210_1.pdf",
+      "kind": "official_body"
+    },
+    "ibge-1954-sen": {
+      "title": "Anuário Estatístico do Brasil 1954: Representação Política VII: Constituição do Congresso Nacional, 1950 (Senado)",
+      "publisher": "IBGE",
+      "url": "https://seculoxx.ibge.gov.br/images/seculoxx/arquivos_download/representacao_politica/1954/rep_polit_1954m_aeb_209.pdf",
+      "kind": "official_body"
+    },
+    "ibge-1955-sen": {
+      "title": "Anuário Estatístico do Brasil 1955: Representação Política VII: Constituição do Congresso Nacional, 1954 (Senado)",
+      "publisher": "IBGE",
+      "url": "https://seculoxx.ibge.gov.br/images/seculoxx/arquivos_download/representacao_politica/1955/rep_polit_1955aeb_5.pdf",
+      "kind": "official_body"
+    },
+    "ibge-1955-cam": {
+      "title": "Anuário Estatístico do Brasil 1955: Representação Política VII: Constituição do Congresso Nacional, 1954 (Câmara dos Deputados)",
+      "publisher": "IBGE",
+      "url": "https://seculoxx.ibge.gov.br/images/seculoxx/arquivos_download/representacao_politica/1955/rep_polit_1955aeb_6.pdf",
+      "kind": "official_body"
+    },
+    "ibge-1955-ae": {
+      "title": "Anuário Estatístico do Brasil 1955: Representação Política VIII: Constituição das assembleias legislativas estaduais, 1954",
+      "publisher": "IBGE",
+      "url": "https://seculoxx.ibge.gov.br/images/seculoxx/arquivos_download/representacao_politica/1955/rep_polit_1955aeb_7.pdf",
+      "kind": "official_body"
+    },
+    "ibge-1959-cn": {
+      "title": "Anuário Estatístico do Brasil 1959: Representação Política VI: Constituição do Congresso Nacional, 1954/58",
+      "publisher": "IBGE",
+      "url": "https://seculoxx.ibge.gov.br/images/seculoxx/arquivos_download/representacao_politica/1959/rep_polit_1959m_aeb_136_1.pdf",
+      "kind": "official_body"
+    },
+    "ibge-1959-ae": {
+      "title": "Anuário Estatístico do Brasil 1959: Representação Política VII: Constituição das assembleias legislativas estaduais, 1958",
+      "publisher": "IBGE",
+      "url": "https://seculoxx.ibge.gov.br/images/seculoxx/arquivos_download/representacao_politica/1959/rep_polit_1959m_aeb_137.pdf",
+      "kind": "official_body"
+    },
+    "ibge-1963-cn": {
+      "title": "Anuário Estatístico do Brasil 1963: Representação Política: Constituição do Congresso Nacional (Câmara dos Deputados) e das assembleias estaduais, 1963",
+      "publisher": "IBGE",
+      "url": "https://seculoxx.ibge.gov.br/images/seculoxx/arquivos_download/representacao_politica/1963/rep_polit_1963m_aeb_84.pdf",
+      "kind": "official_body"
+    },
+    "ibge-1969-cn": {
+      "title": "Anuário Estatístico do Brasil 1969: Resultado das eleições para o Congresso Nacional (Câmara Federal) e para a Assembleia Legislativa, por Unidades da Federação, 1966",
+      "publisher": "IBGE (source: Tribunal Superior Eleitoral)",
+      "url": "https://seculoxx.ibge.gov.br/images/seculoxx/arquivos_download/representacao_politica/1969/rep_polit_1969_aeb_03_1.pdf",
+      "kind": "official_body"
+    },
+    "ibge-1969-sen": {
+      "title": "Anuário Estatístico do Brasil 1969: Resultado das eleições para o Congresso Nacional (Senado Federal), por Unidades da Federação, 1966",
+      "publisher": "IBGE (source: Tribunal Superior Eleitoral)",
+      "url": "https://seculoxx.ibge.gov.br/images/seculoxx/arquivos_download/representacao_politica/1969/rep_polit_1969_aeb_02_1.pdf",
+      "kind": "official_body"
+    },
+    "ibge-1971-sen": {
+      "title": "Anuário Estatístico do Brasil 1971: Número de Senadores eleitos, segundo as siglas partidárias, por Unidades da Federação, 15-11-1970",
+      "publisher": "IBGE (source: Tribunal Superior Eleitoral)",
+      "url": "https://seculoxx.ibge.gov.br/images/seculoxx/arquivos_download/representacao_politica/1971/rep_polit_m1971aeb_243_1.pdf",
+      "kind": "official_body"
+    },
+    "ibge-1975-sen": {
+      "title": "Anuário Estatístico do Brasil 1975: Número de Senadores eleitos, segundo as siglas partidárias, por Unidades da Federação, 15-11-1974",
+      "publisher": "IBGE (source: Tribunal Superior Eleitoral)",
+      "url": "https://seculoxx.ibge.gov.br/images/seculoxx/arquivos_download/representacao_politica/1975/rep_polit_1975_aeb_06_1.pdf",
+      "kind": "official_body"
+    },
+    "ibge-1983": {
+      "title": "Anuário Estatístico do Brasil 1983: Candidatos eleitos por partido político, segundo as Unidades da Federação, 1982",
+      "publisher": "IBGE (source: Tribunal Superior Eleitoral)",
+      "url": "https://seculoxx.ibge.gov.br/images/seculoxx/arquivos_download/representacao_politica/1983/rep_polit_1983m_aeb_262.pdf",
+      "kind": "official_body"
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "Federative Republic of Brazil",
+      "parent": null,
+      "polity_kind": "sovereign_state",
+      "source": "tse-cronologia"
+    },
+    {
+      "key": "state",
+      "name": "States and Federal District",
+      "parent": "national",
+      "polity_kind": "federal_unit",
+      "source": "ibge-1947-gov"
+    },
+    {
+      "key": "municipality",
+      "name": "Municipalities",
+      "parent": "state",
+      "polity_kind": "municipality",
+      "source": "tse-mun-1996"
+    }
+  ],
+  "classes": [
+    {
+      "key": "president",
+      "tier": "national",
+      "name": "Presidential elections",
+      "category": "executive",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "br.uf"
+        ],
+        "fine": [
+          "br.municipality",
+          "br.zona",
+          "br.secao"
+        ]
+      },
+      "source": "tse-cronologia",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "BR"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1945-01-01",
+          "precision": "year",
+          "contests": 1,
+          "source": "tse-cronologia",
+          "quote": "1945 [3] | Eleição direta 2 de dezembro | Eleição direta 2 de dezembro | _ | _ | _"
+        },
+        {
+          "date": "1950-01-01",
+          "precision": "year",
+          "contests": 1,
+          "source": "tse-cronologia",
+          "quote": "1950 [5] | Eleição direta 3 de outubro | Eleição direta 3 de outubro | Eleição direta 3 de outubro | Eleição direta 3 de outubro | Eleição direta [6] 3 de outubro"
+        },
+        {
+          "date": "1955-01-01",
+          "precision": "year",
+          "contests": 1,
+          "source": "tse-cronologia",
+          "quote": "1955 [8] | Eleição direta 3 de outubro | _ | Eleição direta 3 de outubro | _ | Eleição direta [9] 3 de outubro"
+        },
+        {
+          "date": "1960-01-01",
+          "precision": "year",
+          "contests": 1,
+          "source": "tse-cronologia",
+          "quote": "1960 [11] | Eleição direta 3 de outubro | _ | Eleição direta 3 de outubro | _ | Eleição direta [12] 3 de outubro"
+        },
+        {
+          "date": "1989-01-01",
+          "precision": "year",
+          "contests": 2,
+          "note": "Counted as two contests, one for each round.",
+          "source": "tse-cronologia",
+          "quote": "1989 | Eleição direta [38] 15 de novembro (1º turno) 17 de dezembro (2º turno)"
+        },
+        {
+          "date": "1994-01-01",
+          "precision": "year",
+          "contests": 1,
+          "source": "tse-cand",
+          "quote": "consulta_cand_1994, DS_CARGO Presidente: only NR_TURNO 1, one candidate 'ELEITO'"
+        },
+        {
+          "date": "1998-01-01",
+          "precision": "year",
+          "contests": 1,
+          "source": "tse-cand",
+          "quote": "consulta_cand_1998, DS_CARGO Presidente: only NR_TURNO 1, one candidate 'ELEITO'"
+        },
+        {
+          "date": "2002-01-01",
+          "precision": "year",
+          "contests": 2,
+          "source": "tse-cand",
+          "quote": "consulta_cand_2002, DS_CARGO Presidente: two candidates '2º TURNO' in round 1, and NR_TURNO 2 rows with 'ELEITO' and 'NÃO ELEITO'"
+        },
+        {
+          "date": "2006-01-01",
+          "precision": "year",
+          "contests": 2,
+          "source": "tse-detalhe-2006",
+          "quote": "DS_CARGO Presidente, BRASIL file: NR_TURNO 1 on 01/10/2006 and NR_TURNO 2 on 29/10/2006"
+        },
+        {
+          "date": "2010-01-01",
+          "precision": "year",
+          "contests": 2,
+          "source": "tse-cand",
+          "quote": "consulta_cand_2010, DS_CARGO Presidente: two candidates '2º TURNO' in round 1, and NR_TURNO 2 rows with 'ELEITO' and 'NÃO ELEITO'"
+        },
+        {
+          "date": "2014-01-01",
+          "precision": "year",
+          "contests": 2,
+          "source": "tse-cand",
+          "quote": "consulta_cand_2014, DS_CARGO Presidente: two candidates '2º TURNO' in round 1, and NR_TURNO 2 rows with 'ELEITO' and 'NÃO ELEITO'"
+        },
+        {
+          "date": "2018-01-01",
+          "precision": "year",
+          "contests": 2,
+          "source": "tse-cand",
+          "quote": "consulta_cand_2018, DS_CARGO Presidente: two candidates '2º TURNO' in round 1, and NR_TURNO 2 rows with 'ELEITO' and 'NÃO ELEITO'"
+        },
+        {
+          "date": "2022-01-01",
+          "precision": "year",
+          "contests": 2,
+          "source": "tse-cand",
+          "quote": "consulta_cand_2022, DS_CARGO Presidente: two candidates '2º TURNO' in round 1, and NR_TURNO 2 rows with 'ELEITO' and 'NÃO ELEITO'"
+        },
+        {
+          "date": "2026-01-01",
+          "precision": "year",
+          "contests": 2,
+          "source": "tse-cand",
+          "quote": "consulta_cand_2026, DS_CARGO Presidente: two candidates '2º TURNO' in round 1, and two NR_TURNO 2 rows"
+        }
+      ]
+    },
+    {
+      "key": "camara",
+      "tier": "national",
+      "name": "Chamber of Deputies elections",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "schemes": [
+          "br.uf"
+        ],
+        "fine": [
+          "br.municipality",
+          "br.zona",
+          "br.secao"
+        ]
+      },
+      "source": "tse-dados-1945",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "lower_house"
+          ],
+          "iso_pattern": "BR"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1945-12-02",
+          "contests": 22,
+          "seats": 286,
+          "note": "Counted per unit of the federation that elected members: the states, the federal district, and the federal territories that had seats.",
+          "source": "tse-dados-1945",
+          "quote": "I - ELEIÇÕES REALIZADAS EM 2 DE DEZEMBRO DE 1945 ... Acre............................... 1.968 6.895 ... Mato Grosso........................ 8.788 59.121"
+        },
+        {
+          "date": "1950-10-03",
+          "contests": 25,
+          "seats": 304,
+          "note": "Counted per unit of the federation that elected members: the states, the federal district, and the federal territories that had seats.",
+          "source": "ibge-1953-1950",
+          "quote": "2. CAMARA DOS DEPUTADOS NUMERO DE DEPUTADOS ... Guaporé. . 1 ... Acre, .. 2 ... Amazonas 7 ... Rio Brauco. 1 ... Pari... 9 ... Amapa 1 ... Distrito Federal. 7 3 4 8 ... FONTE - Secretaria do Tribunal Superior Eleitoral"
+        },
+        {
+          "date": "1954-10-03",
+          "contests": 25,
+          "seats": 340,
+          "note": "IBGE's table gives the chamber's makeup at the start of the legislature, with one row for each unit that elected members.",
+          "source": "ibge-1955-cam",
+          "quote": "p. 616, VII — Constituição do Congresso Nacional — 1954, 2. Câmara dos Deputados: 25 rows (Guaporé to Goiás), BRASIL 340"
+        },
+        {
+          "date": "1958-10-03",
+          "contests": 25,
+          "seats": 326,
+          "note": "IBGE's table gives the chamber's makeup at the start of the legislature, with one row for each unit that elected members.",
+          "source": "ibge-1959-cn",
+          "quote": "p. 475, VI — Constituição do Congresso Nacional — 1954/58, 2. Câmara dos Deputados: 25 rows (Rondônia to Goiás), BRASIL 326"
+        },
+        {
+          "date": "1962-10-07",
+          "contests": 25,
+          "seats": 409,
+          "note": "IBGE's table gives the chamber's makeup at the start of the legislature, with one row for each unit that elected members.",
+          "source": "ibge-1963-cn",
+          "quote": "p. 428, Constituição do Congresso Nacional — 1963, 2. Câmara dos Deputados: 25 rows (Rondônia to Goiás), BRASIL 409"
+        },
+        {
+          "date": "1966-11-15",
+          "contests": 25,
+          "note": "For this election IBGE prints votes by unit, not seats, so seats are left out.",
+          "source": "ibge-1969-cn",
+          "quote": "p. 703, 6.4.1.5 Resultado das eleições para o Congresso Nacional — 1966, b) Câmara Federal: 25 rows (Rondônia to Goiás), votos BRASIL 17 285 556"
+        },
+        {
+          "date": "1970-11-15",
+          "contests": 25,
+          "seats": 310,
+          "note": "Counted per unit of the federation that elected members: the states, the federal district, and the federal territories that had seats.",
+          "source": "ibge-1970",
+          "quote": "Tablo 6.4.1.5 (15-11-1970): 25 Unidades da Federação rows (Rondônia to Goiás), BRASIL 310"
+        },
+        {
+          "date": "1974-11-15",
+          "contests": 25,
+          "seats": 364,
+          "note": "Counted per unit of the federation that elected members: the states, the federal district, and the federal territories that had seats.",
+          "source": "ibge-1975",
+          "quote": "Tablo 6.4.1.7 (15-11-1974): 25 Unidades da Federação rows (Rondônia to Goiás), BRASIL 364"
+        },
+        {
+          "date": "1982-11-15",
+          "contests": 25,
+          "seats": 479,
+          "note": "Counted per unit of the federation that elected members: the states, the federal district, and the federal territories that had seats.",
+          "source": "ibge-1983",
+          "quote": "p. 354, Candidatos eleitos em 15-11 — 1982, Deputados federais: 25 rows (Rondônia to Goiás), BRASIL 479"
+        },
+        {
+          "date": "1994-10-03",
+          "contests": 27,
+          "note": "TSE's 1994 seat file has no Deputado Federal rows; its other offices list the same 27 units (26 states and the Distrito Federal).",
+          "source": "cf88",
+          "quote": "Art. 45. A Câmara dos Deputados compõe-se de representantes do povo, eleitos, pelo sistema proporcional, em cada Estado, em cada Território e no Distrito Federal."
+        },
+        {
+          "date": "1998-10-04",
+          "contests": 27,
+          "seats": 513,
+          "source": "tse-vagas",
+          "quote": "consulta_vagas_1998: DS_CARGO Deputado Federal in 27 SG_UF, QT_VAGA summing to 513"
+        },
+        {
+          "date": "2002-10-06",
+          "contests": 27,
+          "seats": 513,
+          "source": "tse-vagas",
+          "quote": "consulta_vagas_2002: DS_CARGO Deputado Federal in 27 SG_UF, QT_VAGA summing to 513"
+        },
+        {
+          "date": "2006-10-01",
+          "contests": 27,
+          "seats": 513,
+          "source": "tse-vagas",
+          "quote": "consulta_vagas_2006: DS_CARGO Deputado Federal in 27 SG_UF, QT_VAGA summing to 513"
+        },
+        {
+          "date": "2010-10-03",
+          "contests": 27,
+          "seats": 513,
+          "source": "tse-vagas",
+          "quote": "consulta_vagas_2010: DS_CARGO Deputado Federal in 27 SG_UF, QT_VAGA summing to 513"
+        },
+        {
+          "date": "2014-10-05",
+          "contests": 27,
+          "seats": 513,
+          "source": "tse-vagas",
+          "quote": "consulta_vagas_2014: DS_CARGO Deputado Federal in 27 SG_UF, QT_VAGA summing to 513"
+        },
+        {
+          "date": "2018-10-07",
+          "contests": 27,
+          "seats": 513,
+          "source": "tse-vagas",
+          "quote": "consulta_vagas_2018: DS_CARGO Deputado Federal in 27 SG_UF, QT_VAGA summing to 513"
+        },
+        {
+          "date": "2022-10-02",
+          "contests": 27,
+          "seats": 513,
+          "source": "tse-vagas",
+          "quote": "consulta_vagas_2022: DS_CARGO Deputado Federal in 27 SG_UF, QT_VAGA summing to 513"
+        },
+        {
+          "date": "2026-10-04",
+          "contests": 27,
+          "seats": 513,
+          "source": "tse-vagas",
+          "quote": "consulta_vagas_2026: DS_CARGO Deputado Federal in 27 SG_UF, QT_VAGA summing to 513"
+        },
+        {
+          "date": "1978-01-01",
+          "precision": "year",
+          "through": "1978-12-31",
+          "note": "This election isn't counted yet. IBGE's statistical yearbooks don't print seats or results for it."
+        },
+        {
+          "date": "1986-01-01",
+          "precision": "year",
+          "through": "1990-12-31",
+          "note": "These elections aren't counted yet. IBGE's statistical yearbooks don't print seats or results for them. The TSE's 1986 results volume is in the Câmara dos Deputados library, and the TSE's 1990 seat resolution covers 1990."
+        }
+      ]
+    },
+    {
+      "key": "senado",
+      "tier": "national",
+      "name": "Senate elections",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "schemes": [
+          "br.uf"
+        ],
+        "fine": [
+          "br.municipality",
+          "br.zona",
+          "br.secao"
+        ]
+      },
+      "source": "senado-noticias",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "upper_house"
+          ],
+          "iso_pattern": "BR"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1945-12-02",
+          "contests": 21,
+          "seats": 42,
+          "note": "Counted per unit of the federation that elected members: the states, the federal district, and the federal territories that had seats.",
+          "source": "senado-noticias",
+          "quote": "Em dezembro daquele ano, cada estado escolheu dois senadores para a Assembleia Nacional Constituinte."
+        },
+        {
+          "date": "1947-01-19",
+          "contests": 21,
+          "seats": 21,
+          "note": "The 1946 Constitution's transitional provisions (art. 11, § 2) called this election in every state and the federal district to fill each one's third Senate seat.",
+          "source": "ibge-1948-cn",
+          "quote": "p. 545, V — Constituição do Congresso Nacional — 1947, 1. Senado: 21 units with 3 each (Amazonas to Goiás, Distrito Federal included; Acre none), BRASIL 63"
+        },
+        {
+          "date": "1950-10-03",
+          "contests": 21,
+          "note": "IBGE's table gives the whole Senate, three members per unit. Under the 1946 Constitution (art. 60, § 3), each unit renewed one or two of its three seats at every election, so each unit with senators counts as one contest.",
+          "source": "ibge-1954-sen",
+          "quote": "p. 541, VII — Constituição do Congresso Nacional — 1950, 1. Senado: 21 units with 3 each, BRASIL 63"
+        },
+        {
+          "date": "1954-10-03",
+          "contests": 21,
+          "note": "IBGE's table gives the whole Senate, three members per unit. Under the 1946 Constitution (art. 60, § 3), each unit renewed one or two of its three seats at every election, so each unit with senators counts as one contest.",
+          "source": "ibge-1955-sen",
+          "quote": "p. 615, VII — Constituição do Congresso Nacional — 1954, 1. Senado: 21 units with 3 each (Guaporé, Acre, Rio Branco, and Amapá none), BRASIL 63"
+        },
+        {
+          "date": "1958-10-03",
+          "contests": 21,
+          "note": "IBGE's table gives the whole Senate, three members per unit. Under the 1946 Constitution (art. 60, § 3), each unit renewed one or two of its three seats at every election, so each unit with senators counts as one contest.",
+          "source": "ibge-1959-cn",
+          "quote": "p. 475, VI — Constituição do Congresso Nacional — 1954/58, 1. Senado: 21 units with 3 each, BRASIL 63"
+        },
+        {
+          "date": "1962-10-07",
+          "contests": 22,
+          "note": "IBGE's table gives the whole Senate, three members per unit. Under the 1946 Constitution (art. 60, § 3), each unit renewed one or two of its three seats at every election, so each unit with senators counts as one contest.",
+          "source": "ibge-1963-gov",
+          "quote": "p. 427, Constituição do Congresso Nacional — 1963, 1. Senado: 22 units with 3 each (Acre to Goiás), BRASIL 66"
+        },
+        {
+          "date": "1966-11-15",
+          "contests": 22,
+          "note": "For this election IBGE prints votes by unit, not seats, so seats are left out.",
+          "source": "ibge-1969-sen",
+          "quote": "p. 702, 6.4.1.5 Resultado das eleições para o Congresso Nacional — 1966, a) Senado Federal: 22 rows (Acre to Goiás), votos BRASIL 17 259 598"
+        },
+        {
+          "date": "1970-11-15",
+          "contests": 22,
+          "seats": 46,
+          "source": "ibge-1971-sen",
+          "quote": "p. 818, Número de Senadores eleitos — 15-11-1970: 22 rows (Acre to Goiás), BRASIL 46 (ARENA 41, MDB 5)"
+        },
+        {
+          "date": "1974-11-15",
+          "contests": 22,
+          "seats": 22,
+          "source": "ibge-1975-sen",
+          "quote": "p. 988, Número de Senadores eleitos — 15-11-1974: 22 rows (Acre to Goiás), BRASIL 22 (ARENA 6, MDB 16)"
+        },
+        {
+          "date": "1982-11-15",
+          "contests": 23,
+          "seats": 25,
+          "note": "Rondônia, a new state, elected three senators and every other state elected one. Roraima and Amapá were still territories and had no senators.",
+          "source": "ibge-1983",
+          "quote": "p. 354, Candidatos eleitos em 15-11 — 1982, Senadores: 23 units (Rondônia 3, the other 22 states 1 each; Roraima and Amapá —), BRASIL 25"
+        },
+        {
+          "date": "1994-10-03",
+          "contests": 27,
+          "seats": 54,
+          "source": "tse-vagas",
+          "quote": "consulta_vagas_1994: DS_CARGO Senador in 27 SG_UF, QT_VAGA summing to 54"
+        },
+        {
+          "date": "1998-10-04",
+          "contests": 27,
+          "seats": 27,
+          "source": "tse-vagas",
+          "quote": "consulta_vagas_1998: DS_CARGO Senador in 27 SG_UF, QT_VAGA summing to 27"
+        },
+        {
+          "date": "2002-10-06",
+          "contests": 27,
+          "seats": 54,
+          "source": "tse-vagas",
+          "quote": "consulta_vagas_2002: DS_CARGO Senador in 27 SG_UF, QT_VAGA summing to 54"
+        },
+        {
+          "date": "2006-10-01",
+          "contests": 27,
+          "seats": 27,
+          "source": "tse-vagas",
+          "quote": "consulta_vagas_2006: DS_CARGO Senador in 27 SG_UF, QT_VAGA summing to 27"
+        },
+        {
+          "date": "2010-10-03",
+          "contests": 27,
+          "seats": 54,
+          "source": "tse-vagas",
+          "quote": "consulta_vagas_2010: DS_CARGO Senador in 27 SG_UF, QT_VAGA summing to 54"
+        },
+        {
+          "date": "2014-10-05",
+          "contests": 27,
+          "seats": 27,
+          "source": "tse-vagas",
+          "quote": "consulta_vagas_2014: DS_CARGO Senador in 27 SG_UF, QT_VAGA summing to 27"
+        },
+        {
+          "date": "2018-10-07",
+          "contests": 27,
+          "seats": 54,
+          "source": "tse-vagas",
+          "quote": "consulta_vagas_2018: DS_CARGO Senador in 27 SG_UF, QT_VAGA summing to 54"
+        },
+        {
+          "date": "2022-10-02",
+          "contests": 27,
+          "seats": 27,
+          "source": "tse-vagas",
+          "quote": "consulta_vagas_2022: DS_CARGO Senador in 27 SG_UF, QT_VAGA summing to 27"
+        },
+        {
+          "date": "2026-10-04",
+          "contests": 27,
+          "seats": 54,
+          "source": "tse-vagas",
+          "quote": "consulta_vagas_2026: DS_CARGO Senador in 27 SG_UF, QT_VAGA summing to 54"
+        },
+        {
+          "date": "1978-01-01",
+          "precision": "year",
+          "through": "1978-12-31",
+          "note": "This election isn't counted yet. IBGE's statistical yearbooks don't print seats or results for it."
+        },
+        {
+          "date": "1986-01-01",
+          "precision": "year",
+          "through": "1990-12-31",
+          "note": "These elections aren't counted yet. IBGE's statistical yearbooks don't print seats or results for them. The TSE's 1986 results volume is in the Câmara dos Deputados library, and the TSE's 1990 seat resolution covers 1990."
+        }
+      ]
+    },
+    {
+      "key": "governor",
+      "tier": "state",
+      "name": "Gubernatorial elections",
+      "category": "executive",
+      "goal": "subnational",
+      "measure": {
+        "schemes": [
+          "br.uf"
+        ]
+      },
+      "source": "ibge-1947-gov",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff"
+          ],
+          "office_kinds": [
+            "governor"
+          ],
+          "iso_pattern": "BR-*"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1947-01-19",
+          "contests": 20,
+          "source": "ibge-1947-gov",
+          "quote": "RESULTADO DAS ELEICOES ESTADUAIS — 19-1-1947 ... PODER EXECUTIVO ... Amazonas ... Pará ... Maranhão ... Piaui ... Ceará ... Rio Grande do Norte ... Paraiba ... Pernambuco ... Alagoas ... Sergipe ... Bahia ... Minas Gerais ... Espirito Santo ... Rio de Janeiro ... Sio Paulo ... Parand ... Santa Catar"
+        },
+        {
+          "date": "1950-10-03",
+          "contests": 20,
+          "source": "ibge-1950-gov",
+          "quote": "RESULTADOS DAS ELEICOES PARA GOVERNADORES — 3-X-1950 ... Amazonas ... Pard ... Maranhio ... Piaui ... Ceard ... Rio Grande do Norte ... Paraiba ... Pernamibuco ... Alagoas ... Sergipe ... Bahia ... Minas Gerais ... Espirito Santo ... Rio de Janeiro ... S0 Paulo ... Parani ... Santa Catarina ... Rio "
+        },
+        {
+          "date": "1954-10-03",
+          "contests": 11,
+          "note": "Governors' terms were staggered: eleven states elected governors in 1954 and nine in 1955.",
+          "source": "ibge-1955-gov",
+          "quote": "RESULTADOS DAS ELEICOES PARA GOVERNADORES — 3-X-1954 ... Amazonas ... Piaui ... Ceard ... Pernambuco ... Sergipe ... Bahia ... Espirito Santo ... Rio de Janeiro ... Sio Paulo ... Rio Grande do Sul ... Goids"
+        },
+        {
+          "date": "1955-10-03",
+          "contests": 9,
+          "note": "Governors' terms were staggered: eleven states elected governors in 1954 and nine in 1955.",
+          "source": "ibge-1957-gov",
+          "quote": "2. ELEICOES DE 3-X-1955 ... Pard ... Maranhdo. Rio Grande do Norte ... Paraiba. ... Alagoas. ... Minas Gerais ... Parand.. ... Santa Catarina. ... Mato Grosso."
+        },
+        {
+          "date": "1960-10-03",
+          "contests": 11,
+          "source": "ibge-1963-gov",
+          "quote": "RESULTADOS DAS ELEICOES PARA GOVERNADOR — 1960/62 ... Luiz de Souza Cavalcante ... UDN ... 38 915 ... 1960 ... Carlos Frederico Werncck de Lacerd ... UDN ... 357 153 ... 1960 ... José de Magalhaes Pinto ... UDN ... 760 427 ... 1960 ... Fernando Corréa da Costa ... UDN ... 66 208 ... 1960"
+        },
+        {
+          "date": "1962-10-07",
+          "contests": 11,
+          "note": "Governors' terms were staggered: eleven states elected governors in 1960 and eleven in 1962.",
+          "source": "ibge-1963-gov",
+          "quote": "p. 427, Resultados das eleições para governador — 1960/62: 1962 for Acre, Amazonas, Piauí, Ceará, Pernambuco, Sergipe, Bahia, Rio de Janeiro, Guanabara, São Paulo, and Rio Grande do Sul"
+        },
+        {
+          "date": "1982-11-15",
+          "contests": 22,
+          "note": "Rondônia's first governor was appointed under Lei Complementar 41 of 1981, so 22 states voted.",
+          "source": "ibge-1983",
+          "quote": "p. 354, Candidatos eleitos em 15-11 — 1982, Governadores: 22 states, BRASIL 22; Rondônia — (1) Lei Complementar n.º 41, 22-12-81"
+        },
+        {
+          "date": "1994-10-03",
+          "contests": 27,
+          "seats": 27,
+          "source": "tse-vagas",
+          "quote": "consulta_vagas_1994: DS_CARGO Governador in 27 SG_UF, one seat each"
+        },
+        {
+          "date": "1998-10-04",
+          "contests": 27,
+          "seats": 27,
+          "source": "tse-vagas",
+          "quote": "consulta_vagas_1998: DS_CARGO Governador in 27 SG_UF, one seat each"
+        },
+        {
+          "date": "2002-10-06",
+          "contests": 27,
+          "seats": 27,
+          "source": "tse-vagas",
+          "quote": "consulta_vagas_2002: DS_CARGO Governador in 27 SG_UF, one seat each"
+        },
+        {
+          "date": "2006-10-01",
+          "contests": 27,
+          "seats": 27,
+          "source": "tse-vagas",
+          "quote": "consulta_vagas_2006: DS_CARGO Governador in 27 SG_UF, one seat each"
+        },
+        {
+          "date": "2010-10-03",
+          "contests": 27,
+          "seats": 27,
+          "source": "tse-vagas",
+          "quote": "consulta_vagas_2010: DS_CARGO Governador in 27 SG_UF, one seat each"
+        },
+        {
+          "date": "2014-10-05",
+          "contests": 27,
+          "seats": 27,
+          "source": "tse-vagas",
+          "quote": "consulta_vagas_2014: DS_CARGO Governador in 27 SG_UF, one seat each"
+        },
+        {
+          "date": "2018-10-07",
+          "contests": 27,
+          "seats": 27,
+          "source": "tse-vagas",
+          "quote": "consulta_vagas_2018: DS_CARGO Governador in 27 SG_UF, one seat each"
+        },
+        {
+          "date": "2022-10-02",
+          "contests": 27,
+          "seats": 27,
+          "source": "tse-vagas",
+          "quote": "consulta_vagas_2022: DS_CARGO Governador in 27 SG_UF, one seat each"
+        },
+        {
+          "date": "2026-10-04",
+          "contests": 27,
+          "seats": 27,
+          "source": "tse-vagas",
+          "quote": "consulta_vagas_2026: DS_CARGO Governador in 27 SG_UF, one seat each"
+        },
+        {
+          "date": "1965-01-01",
+          "precision": "year",
+          "through": "1965-12-31",
+          "note": "Eleven states elected governors directly in October 1965. These elections aren't counted yet, because IBGE's statistical yearbooks don't print them. From 1966 to 1978, governors were chosen indirectly, so there was no popular vote."
+        },
+        {
+          "date": "1986-01-01",
+          "precision": "year",
+          "through": "1990-12-31",
+          "note": "These elections aren't counted yet. IBGE's statistical yearbooks don't print seats or results for them. The TSE's 1986 results volume is in the Câmara dos Deputados library, and the TSE's 1990 seat resolution covers 1990."
+        }
+      ]
+    },
+    {
+      "key": "assemblies",
+      "tier": "state",
+      "name": "State assembly elections",
+      "category": "legislature",
+      "goal": "subnational",
+      "measure": {
+        "schemes": [
+          "br.uf"
+        ]
+      },
+      "source": "ibge-1949-ae",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "BR-*"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1947-01-19",
+          "contests": 20,
+          "seats": 855,
+          "note": "The table's row for the federal district is the Rio de Janeiro city council, not a state assembly, so it is left out of the count and the seats.",
+          "source": "ibge-1949-ae",
+          "quote": "p. 641, Resultado das eleições para as câmaras estaduais — 19-I-1947, 2. Deputados eleitos: 21 rows, BRASIL 905, of which Distrito Federal (5) 50"
+        },
+        {
+          "date": "1950-10-03",
+          "contests": 20,
+          "seats": 880,
+          "note": "The table's row for the federal district is the Rio de Janeiro city council, not a state assembly, so it is left out of the count and the seats.",
+          "source": "ibge-1954-cn",
+          "quote": "p. 542, VIII — Constituição das assembleias legislativas estaduais — 1950: 21 rows, BRASIL 930, of which Distrito Federal (1) 50"
+        },
+        {
+          "date": "1954-10-03",
+          "contests": 20,
+          "seats": 886,
+          "note": "The table's row for the federal district is the Rio de Janeiro city council, not a state assembly, so it is left out of the count and the seats.",
+          "source": "ibge-1955-ae",
+          "quote": "p. 617, VIII — Constituição das assembleias legislativas estaduais — 1954: 21 rows, BRASIL 936, of which Distrito Federal (1) 50"
+        },
+        {
+          "date": "1958-10-03",
+          "contests": 20,
+          "seats": 913,
+          "note": "The table's row for the federal district is the Rio de Janeiro city council, not a state assembly, so it is left out of the count and the seats.",
+          "source": "ibge-1959-ae",
+          "quote": "p. 476, VII — Constituição das assembleias legislativas estaduais — 1958: 21 rows, BRASIL 963, of which Distrito Federal (1) 50"
+        },
+        {
+          "date": "1962-10-07",
+          "contests": 22,
+          "seats": 1073,
+          "source": "ibge-1963-cn",
+          "quote": "p. 428, Constituição das assembleias estaduais — 1963: 22 rows (Acre to Goiás), BRASIL 1 073"
+        },
+        {
+          "date": "1966-11-15",
+          "contests": 22,
+          "note": "For this election IBGE prints votes by unit, not seats, so seats are left out.",
+          "source": "ibge-1969-cn",
+          "quote": "p. 703, 6.4.1.6 Resultado das eleições para a Assembléia Legislativa — 1966: 22 rows (Acre to Goiás), votos BRASIL 17 260 382"
+        },
+        {
+          "date": "1970-11-15",
+          "contests": 22,
+          "seats": 701,
+          "source": "ibge-1970",
+          "quote": "Tablo 6.4.1.6 (15-11-1970): 22 Unidades da Federação rows (Acre to Goiás), TOTAL 701"
+        },
+        {
+          "date": "1974-11-15",
+          "contests": 22,
+          "seats": 787,
+          "source": "ibge-1975",
+          "quote": "Tablo 6.4.1.8 (15-11-1974): 22 Unidades da Federação rows (Acre to Goiás), BRASIL 787"
+        },
+        {
+          "date": "1982-11-15",
+          "contests": 23,
+          "seats": 947,
+          "note": "The 22 states and the new state of Rondônia elected assemblies. Roraima and Amapá were still territories and had none.",
+          "source": "ibge-1983",
+          "quote": "p. 354, Candidatos eleitos em 15-11 — 1982, Deputados estaduais: 23 units (Rondônia and the 22 states; Roraima and Amapá —), BRASIL 947"
+        },
+        {
+          "date": "1994-10-03",
+          "contests": 27,
+          "note": "The 1994 file's seat totals for Deputado Estadual match the Chamber's 513, so seats are left out.",
+          "source": "tse-vagas",
+          "quote": "consulta_vagas_1994: DS_CARGO Deputado Estadual in 27 SG_UF, the Distrito Federal included"
+        },
+        {
+          "date": "1998-10-04",
+          "contests": 27,
+          "seats": 1059,
+          "source": "tse-vagas",
+          "quote": "consulta_vagas_1998: DS_CARGO Deputado Estadual in 26 SG_UF (1,035 seats) and Deputado Distrital in DF (24 seats)"
+        },
+        {
+          "date": "2002-10-06",
+          "contests": 27,
+          "seats": 1059,
+          "source": "tse-vagas",
+          "quote": "consulta_vagas_2002: DS_CARGO Deputado Estadual in 26 SG_UF (1,035 seats) and Deputado Distrital in DF (24 seats)"
+        },
+        {
+          "date": "2006-10-01",
+          "contests": 27,
+          "seats": 1059,
+          "source": "tse-vagas",
+          "quote": "consulta_vagas_2006: DS_CARGO Deputado Estadual in 26 SG_UF (1,035 seats) and Deputado Distrital in DF (24 seats)"
+        },
+        {
+          "date": "2010-10-03",
+          "contests": 27,
+          "seats": 1059,
+          "source": "tse-vagas",
+          "quote": "consulta_vagas_2010: DS_CARGO Deputado Estadual in 26 SG_UF (1,035 seats) and Deputado Distrital in DF (24 seats)"
+        },
+        {
+          "date": "2014-10-05",
+          "contests": 27,
+          "seats": 1059,
+          "source": "tse-vagas",
+          "quote": "consulta_vagas_2014: DS_CARGO Deputado Estadual in 26 SG_UF (1,035 seats) and Deputado Distrital in DF (24 seats)"
+        },
+        {
+          "date": "2018-10-07",
+          "contests": 27,
+          "seats": 1059,
+          "source": "tse-vagas",
+          "quote": "consulta_vagas_2018: DS_CARGO Deputado Estadual in 26 SG_UF (1,035 seats) and Deputado Distrital in DF (24 seats)"
+        },
+        {
+          "date": "2022-10-02",
+          "contests": 27,
+          "seats": 1059,
+          "source": "tse-vagas",
+          "quote": "consulta_vagas_2022: DS_CARGO Deputado Estadual in 26 SG_UF (1,035 seats) and Deputado Distrital in DF (24 seats)"
+        },
+        {
+          "date": "2026-10-04",
+          "contests": 27,
+          "seats": 1059,
+          "source": "tse-vagas",
+          "quote": "consulta_vagas_2026: DS_CARGO Deputado Estadual in 26 SG_UF (1,035 seats) and Deputado Distrital in DF (24 seats)"
+        },
+        {
+          "date": "1978-01-01",
+          "precision": "year",
+          "through": "1978-12-31",
+          "note": "This election isn't counted yet. IBGE's statistical yearbooks don't print seats or results for it."
+        },
+        {
+          "date": "1986-01-01",
+          "precision": "year",
+          "through": "1990-12-31",
+          "note": "These elections aren't counted yet. IBGE's statistical yearbooks don't print seats or results for them. The TSE's 1986 results volume is in the Câmara dos Deputados library, and the TSE's 1990 seat resolution covers 1990."
+        }
+      ]
+    },
+    {
+      "key": "municipal",
+      "tier": "municipality",
+      "name": "Municipal elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "Counted per municipality: each municipality that elected its mayor and council counts once, runoff included, from the Superior Electoral Court's counts (2004 from the Federal Senate's news agency, citing the court). Brasília and Fernando de Noronha hold no municipal elections. In 2020 Macapá voted in December, after a blackout postponed its election, and it counts with the rest.",
+      "source": "tse-mun-1996",
+      "match": [
+        {
+          "election_kinds": [
+            "local"
+          ],
+          "body_kinds": [
+            "council"
+          ]
+        },
+        {
+          "election_kinds": [
+            "local"
+          ],
+          "office_kinds": [
+            "mayor"
+          ]
+        }
+      ],
+      "dates": [
+        {
+          "date": "1996-10-03",
+          "contests": 5507,
+          "source": "tse-mun-1996",
+          "quote": "Nº de municípios | 5.507 | 5.513 | 5.559"
+        },
+        {
+          "date": "2000-10-01",
+          "contests": 5559,
+          "source": "tse-mun-1996",
+          "quote": "Nº de municípios | 5.507 | 5.513 | 5.559"
+        },
+        {
+          "date": "2004-10-03",
+          "contests": 5563,
+          "source": "senado-2004",
+          "quote": "Municípios: 5.563"
+        },
+        {
+          "date": "2008-10-05",
+          "contests": 5564,
+          "source": "tse-mun-2008",
+          "quote": "5.564 cidades no Brasil"
+        },
+        {
+          "date": "2012-10-07",
+          "contests": 5568,
+          "source": "tse-mun-2008",
+          "quote": "serão 138.544.348 eleitores de 5.568 municípios aptos a digitar seus votos nas 501.923 urnas em outubro"
+        },
+        {
+          "date": "2016-10-02",
+          "contests": 5568,
+          "source": "tse-mun-2016",
+          "quote": "nos 5.568 municípios para escolher seus representantes, entre prefeitos e vereadores"
+        },
+        {
+          "date": "2020-11-15",
+          "contests": 5568,
+          "source": "tse-mun-2020",
+          "quote": "O novo prefeito assumirá o mandato no dia 1º de janeiro de 2021, juntamente com os demais eleitos nos 5.568 municípios que realizaram eleições este ano."
+        },
+        {
+          "date": "2024-10-06",
+          "contests": 5569,
+          "regions": {
+            "RO": 52,
+            "AC": 22,
+            "AM": 62,
+            "RR": 15,
+            "PA": 144,
+            "AP": 16,
+            "TO": 139,
+            "MA": 217,
+            "PI": 224,
+            "CE": 184,
+            "RN": 167,
+            "PB": 223,
+            "PE": 184,
+            "AL": 102,
+            "SE": 75,
+            "BA": 417,
+            "MG": 853,
+            "ES": 78,
+            "RJ": 92,
+            "SP": 645,
+            "PR": 399,
+            "SC": 295,
+            "RS": 497,
+            "MS": 79,
+            "MT": 142,
+            "GO": 246
+          },
+          "note": "Regions from IBGE, Anuário Estatístico do Brasil 2024, table 2.7.1.2, citing the TSE.",
+          "source": "tse-mun-2024",
+          "quote": "Participaram das eleições deste ano 5.569 cidades"
+        }
+      ]
+    }
+  ]
+}

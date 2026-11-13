@@ -1,0 +1,2361 @@
+{
+  "polity": "GB",
+  "name": "United Kingdom",
+  "sources": {
+    "scotact1998-sch1": {
+      "title": "Scotland Act 1998, Schedule 1 (Scottish Parliament: constituencies and regional members)",
+      "publisher": "legislation.gov.uk (National Archives)",
+      "url": "https://www.legislation.gov.uk/ukpga/1998/46/schedule/1",
+      "note": "Current revised text. Quotes are from paragraphs 1(1), 2(1), and 2(3). Not checked paragraph by paragraph against each election's order.",
+      "kind": "official_body"
+    },
+    "asc2024-s1": {
+      "title": "Senedd Cymru (Members and Elections) Act 2024, section 1",
+      "publisher": "legislation.gov.uk (National Archives)",
+      "url": "https://www.legislation.gov.uk/asc/2024/4/section/1",
+      "kind": "official_body"
+    },
+    "senedd-research-2021": {
+      "title": "Senedd Election 2021: Research Briefing",
+      "publisher": "Senedd Research (Senedd Cymru)",
+      "url": "https://senedd.wales/media/gp0hueyu/21-008-senedd-election-2021-web.pdf",
+      "kind": "official_body"
+    },
+    "hoc-cbp7529": {
+      "title": "UK Election Statistics: 1918-2023, A Long Century of Elections (CBP-7529, 9 August 2023)",
+      "publisher": "House of Commons Library",
+      "url": "https://commonslibrary.parliament.uk/research-briefings/cbp-7529/",
+      "kind": "official_body"
+    },
+    "uksi-2023-1230": {
+      "title": "The Parliamentary Constituencies Order 2023 (SI 2023/1230)",
+      "publisher": "legislation.gov.uk",
+      "url": "https://www.legislation.gov.uk/uksi/2023/1230/made",
+      "kind": "official_body"
+    },
+    "bs-1995": {
+      "title": "Local government electoral arrangements in Scotland: 1995 onwards",
+      "publisher": "Boundaries Scotland",
+      "url": "https://www.boundaries.scot/wp-content/uploads/2026/03/Local_government_electoral_1995_onwards.pdf",
+      "kind": "official_body"
+    },
+    "senedd-lg": {
+      "title": "Local government in Wales: a timeline (Research paper 18-050)",
+      "publisher": "Senedd Research",
+      "url": "https://senedd.wales/media/e2laky1h/18-050-web-english.pdf",
+      "kind": "official_body"
+    },
+    "wsi-2012-686": {
+      "title": "The Isle of Anglesey (Local Government Elections) Order 2012 (SI 2012/686)",
+      "publisher": "legislation.gov.uk",
+      "url": "https://www.legislation.gov.uk/wsi/2012/686/pdfs/wsi_20120686_mi.pdf",
+      "kind": "official_body"
+    },
+    "cain-2014": {
+      "title": "Local Government Elections (NI) Thursday 22 May 2014",
+      "publisher": "CAIN, Ulster University",
+      "url": "https://www.cain.ulster.ac.uk/issues/politics/election/2014lg/rd2014.htm",
+      "kind": "academic"
+    },
+    "ec-ni-2023": {
+      "title": "Report on the May 2023 local elections in Northern Ireland",
+      "publisher": "Electoral Commission",
+      "url": "https://www.electoralcommission.org.uk/research-reports-and-data/our-reports-and-data-past-elections-and-referendums/report-may-2023-local-elections-northern-ireland",
+      "kind": "official_body"
+    },
+    "ni-1973": {
+      "title": "CAIN: Politics: Elections: Results of Elections Held in Northern Ireland Since 1968",
+      "publisher": "CAIN, Ulster University",
+      "url": "https://www.cain.ulster.ac.uk/issues/politics/election/elect.htm",
+      "kind": "academic"
+    },
+    "ni-1977": {
+      "title": "Local Government Elections (NI) Wednesday 18 May 1977",
+      "publisher": "CAIN, Ulster University",
+      "url": "https://cain.ulster.ac.uk/issues/politics/election/rd1977.htm",
+      "kind": "academic"
+    },
+    "ni-1981": {
+      "title": "CAIN: Politics: Elections: Results of Elections Held in Northern Ireland Since 1968",
+      "publisher": "CAIN, Ulster University",
+      "url": "https://www.cain.ulster.ac.uk/issues/politics/election/elect.htm",
+      "kind": "academic"
+    },
+    "ni-1985": {
+      "title": "CAIN: Politics: Elections: Local Government Election (NI) Wednesday 15 May 1985",
+      "publisher": "CAIN, Ulster University",
+      "url": "https://www.cain.ulster.ac.uk/issues/politics/election/rd1985.htm",
+      "kind": "academic"
+    },
+    "ni-1989": {
+      "title": "CAIN: Politics: Elections: Local Government Election (NI) Wednesday 17 May 1989",
+      "publisher": "CAIN, Ulster University",
+      "url": "https://www.cain.ulster.ac.uk/issues/politics/election/rd1989.htm",
+      "kind": "academic"
+    },
+    "ni-1993": {
+      "title": "Local Government Elections 1993",
+      "publisher": "ARK (Access Research Knowledge), Queen's University Belfast, Nicholas Whyte",
+      "url": "https://www.ark.ac.uk/elections/flg93.htm",
+      "kind": "academic"
+    },
+    "ni-1997": {
+      "title": "Local Government Elections 1997",
+      "publisher": "ARK (Access Research Knowledge), Queen's University Belfast, Nicholas Whyte",
+      "url": "https://www.ark.ac.uk/elections/flg97.htm",
+      "kind": "academic"
+    },
+    "ni-2001": {
+      "title": "Local Government Elections 2001",
+      "publisher": "ARK (Access Research Knowledge), Queen's University Belfast, Nicholas Whyte",
+      "url": "https://www.ark.ac.uk/elections/flg01.htm",
+      "kind": "academic"
+    },
+    "ni-2005": {
+      "title": "Local Government Elections 2005",
+      "publisher": "ARK (Access Research Knowledge), Queen's University Belfast, Nicholas Whyte",
+      "url": "https://www.ark.ac.uk/elections/flg05.htm",
+      "kind": "academic"
+    },
+    "ni-2011": {
+      "title": "Local Government Elections 2011",
+      "publisher": "ARK (Access Research Knowledge), Queen's University Belfast, Nicholas Whyte",
+      "url": "https://www.ark.ac.uk/elections/flg11.htm",
+      "kind": "academic"
+    },
+    "ark-2019": {
+      "title": "Northern Ireland Elections",
+      "publisher": "ARK (Access Research Knowledge)",
+      "url": "https://www.ark.ac.uk/elections/",
+      "kind": "academic"
+    },
+    "leh-2002": {
+      "title": "Local Elections Handbook 2002",
+      "publisher": "Colin Rallings and Michael Thrasher, The Elections Centre (LGC Elections Centre, University of Plymouth)",
+      "url": "https://www.electionscentre.co.uk/wp-content/uploads/2015/07/Local-Elections-Handbook-2002-complete.pdf",
+      "kind": "academic"
+    },
+    "leh-2003": {
+      "title": "Local Elections Handbook 2003",
+      "publisher": "Colin Rallings and Michael Thrasher, The Elections Centre (LGC Elections Centre, University of Plymouth)",
+      "url": "https://www.electionscentre.co.uk/wp-content/uploads/2015/07/Local-Elections-Handbook-2003-complete.pdf",
+      "kind": "academic"
+    },
+    "leh-2004": {
+      "title": "Local Elections Handbook 2004",
+      "publisher": "Colin Rallings and Michael Thrasher, The Elections Centre (LGC Elections Centre, University of Plymouth)",
+      "url": "https://www.electionscentre.co.uk/wp-content/uploads/2015/07/Local-Elections-Handbook-2004-complete.pdf",
+      "kind": "academic"
+    },
+    "leh-2005": {
+      "title": "Local Elections Handbook 2005",
+      "publisher": "Colin Rallings and Michael Thrasher, The Elections Centre (LGC Elections Centre, University of Plymouth)",
+      "url": "https://www.electionscentre.co.uk/wp-content/uploads/2015/07/Local-Elections-Handbook-2005-complete.pdf",
+      "kind": "academic"
+    },
+    "leh-2006": {
+      "title": "Local Elections Handbook 2006",
+      "publisher": "Colin Rallings and Michael Thrasher, The Elections Centre (LGC Elections Centre, University of Plymouth)",
+      "url": "http://www.electionscentre.co.uk/wp-content/uploads/2015/07/Local-Elections-Handbook-2006-complete.pdf",
+      "kind": "academic"
+    },
+    "leh-2007": {
+      "title": "Local Elections Handbook 2007",
+      "publisher": "Colin Rallings and Michael Thrasher, The Elections Centre (LGC Elections Centre, University of Plymouth)",
+      "url": "http://www.electionscentre.co.uk/wp-content/uploads/2015/07/Local-Elections-Handbook-2007-complete.pdf",
+      "kind": "academic"
+    },
+    "leh-2008": {
+      "title": "Local Elections Handbook 2008",
+      "publisher": "Colin Rallings and Michael Thrasher, The Elections Centre (LGC Elections Centre, University of Plymouth)",
+      "url": "https://www.electionscentre.co.uk/wp-content/uploads/2015/07/Local-Elections-Handbook-2008complete.pdf",
+      "kind": "academic"
+    },
+    "leh-2009": {
+      "title": "Local Elections Handbook 2009",
+      "publisher": "Colin Rallings and Michael Thrasher, The Elections Centre (LGC Elections Centre, University of Plymouth)",
+      "url": "https://www.electionscentre.co.uk/wp-content/uploads/2015/07/Local-Elections-Handbook-2009-complete.pdf",
+      "kind": "academic"
+    },
+    "leh-2010": {
+      "title": "Local Elections Handbook 2010",
+      "publisher": "Colin Rallings and Michael Thrasher, The Elections Centre (LGC Elections Centre, University of Plymouth)",
+      "url": "https://www.electionscentre.co.uk/wp-content/uploads/2015/07/Local-Elections-Handbook-2010-complete.pdf",
+      "kind": "academic"
+    },
+    "leh-2011": {
+      "title": "Local Elections Handbook 2011",
+      "publisher": "Colin Rallings and Michael Thrasher, The Elections Centre (LGC Elections Centre, University of Plymouth)",
+      "url": "https://www.electionscentre.co.uk/wp-content/uploads/2015/07/Local-Elections-Handbook-2011-complete.pdf",
+      "kind": "academic"
+    },
+    "ec-2012": {
+      "title": "Results and turnout at the 2012 Greater London Authority elections (summary of the Rallings and Thrasher local elections report)",
+      "publisher": "Electoral Commission",
+      "url": "https://www.electoralcommission.org.uk/research-reports-and-data/our-reports-and-data-past-elections-and-referendums/results-and-turnout-2012-greater-london-authority-elections",
+      "kind": "official_body"
+    },
+    "hocl-2013": {
+      "title": "Local Elections 2013 (RP 13/30)",
+      "publisher": "House of Commons Library",
+      "url": "https://commonslibrary.parliament.uk/research-briefings/rp13-30/",
+      "kind": "official_body"
+    },
+    "hocl-2014": {
+      "title": "Local elections 2014 (RP 14/33)",
+      "publisher": "House of Commons Library",
+      "url": "https://commonslibrary.parliament.uk/research-briefings/rp14-33/",
+      "kind": "official_body"
+    },
+    "ec-2015": {
+      "title": "Local Elections in England May 2015 (including Mayoral elections)",
+      "publisher": "Colin Rallings and Michael Thrasher, The Elections Centre, published by the Electoral Commission",
+      "url": "https://www.electoralcommission.org.uk/sites/default/files/pdf_file/Plymouth-locals-electoral-data-report-final-WEB.pdf",
+      "kind": "academic"
+    },
+    "hocl-2016": {
+      "title": "Local Elections 2016 (CBP 7596)",
+      "publisher": "House of Commons Library",
+      "url": "https://commonslibrary.parliament.uk/research-briefings/cbp-7596/",
+      "kind": "official_body"
+    },
+    "ec-2017": {
+      "title": "Local Elections in England, May 2017",
+      "publisher": "Electoral Commission",
+      "url": "https://www.electoralcommission.org.uk/sites/default/files/pdf_file/May-2017-England-locals-electoral-data-report.pdf",
+      "kind": "official_body"
+    },
+    "hocl-2018": {
+      "title": "Local Elections 2018 (CBP 8306)",
+      "publisher": "House of Commons Library",
+      "url": "https://commonslibrary.parliament.uk/research-briefings/cbp-8306/",
+      "kind": "official_body"
+    },
+    "leh-2019": {
+      "title": "Local Elections Handbook 2019",
+      "publisher": "Colin Rallings and Michael Thrasher, The Elections Centre",
+      "url": "https://www.electionscentre.co.uk/wp-content/uploads/2021/02/LEH2019-complete.pdf",
+      "kind": "academic"
+    },
+    "hocl-2021": {
+      "title": "May 2021 local elections (Briefing Paper CBP 9228)",
+      "publisher": "House of Commons Library",
+      "url": "https://commonslibrary.parliament.uk/research-briefings/cbp-9228/",
+      "kind": "official_body"
+    },
+    "hocl-2022": {
+      "title": "Local Elections 2022: Results and analysis (CBP 9545)",
+      "publisher": "House of Commons Library",
+      "url": "https://commonslibrary.parliament.uk/research-briefings/cbp-9545/",
+      "kind": "official_body"
+    },
+    "hocl-2023": {
+      "title": "2023 Local Elections Handbook and dataset",
+      "publisher": "House of Commons Library",
+      "url": "https://commonslibrary.parliament.uk/2023-local-elections-handbook-and-dataset/",
+      "kind": "official_body"
+    },
+    "hocl-2024": {
+      "title": "2024 Local Elections Handbook and dataset",
+      "publisher": "House of Commons Library",
+      "url": "https://commonslibrary.parliament.uk/2024-local-elections-handbook-and-dataset/",
+      "kind": "official_body"
+    },
+    "hocl-2025": {
+      "title": "Local elections 2025: Results and analysis (CBP 10272)",
+      "publisher": "House of Commons Library",
+      "url": "https://commonslibrary.parliament.uk/research-briefings/cbp-10272/",
+      "kind": "official_body"
+    },
+    "ec-2026": {
+      "title": "Report on the 2026 England mayoral and local government elections",
+      "publisher": "Electoral Commission",
+      "url": "https://www.electoralcommission.org.uk/sites/default/files/2026-09/Report%20on%20the%202026%20England%20mayoral%20and%20local%20government%20elections.pdf",
+      "kind": "official_body"
+    },
+    "hoc-cbp9225": {
+      "title": "By-elections in the 2019 Parliament (CBP-9225, 3 May 2024)",
+      "publisher": "House of Commons Library",
+      "url": "https://commonslibrary.parliament.uk/research-briefings/cbp-9225/",
+      "kind": "official_body"
+    },
+    "hoc-cbp10268": {
+      "title": "By-elections in the 2024 Parliament (CBP-10268, 9 October 2026)",
+      "publisher": "House of Commons Library",
+      "url": "https://commonslibrary.parliament.uk/research-briefings/cbp-10268/",
+      "kind": "official_body"
+    },
+    "hoc-cbp8647": {
+      "title": "General election results from 1918 to 2019 (CBP-8647), constituency results workbook",
+      "publisher": "House of Commons Library",
+      "url": "https://commonslibrary.parliament.uk/research-briefings/cbp-8647/",
+      "kind": "official_body"
+    },
+    "ukparl-ge": {
+      "title": "UK General Elections Results 1832–2019",
+      "publisher": "UK Parliament",
+      "url": "https://api.parliament.uk/uk-general-elections/general-elections",
+      "kind": "official_body"
+    },
+    "goi-1920": {
+      "title": "Government of Ireland Act 1920, Fifth Schedule (constituencies in Southern Ireland and Northern Ireland)",
+      "publisher": "legislation.gov.uk",
+      "url": "https://www.legislation.gov.uk/ukpga/Geo5/10-11/67/enacted",
+      "kind": "official_body"
+    },
+    "ark-nihoc": {
+      "title": "The Northern Ireland House of Commons, 1921-1972",
+      "publisher": "ARK (Queen's University Belfast and Ulster University)",
+      "url": "https://www.ark.ac.uk/elections/hnihoc.htm",
+      "kind": "academic"
+    },
+    "ni-ela-1968": {
+      "title": "Electoral Law Act (Northern Ireland) 1968",
+      "publisher": "legislation.gov.uk",
+      "url": "https://www.legislation.gov.uk/apni/1968/20",
+      "kind": "official_body"
+    },
+    "ark-fa73": {
+      "title": "Northern Ireland Assembly Elections 1973",
+      "publisher": "ARK (Queen's University Belfast and Ulster University)",
+      "url": "https://www.ark.ac.uk/elections/fa73.htm",
+      "kind": "academic"
+    },
+    "ark-fc75": {
+      "title": "Northern Ireland Constitutional Convention Elections 1975",
+      "publisher": "ARK (Queen's University Belfast and Ulster University)",
+      "url": "https://www.ark.ac.uk/elections/fc75.htm",
+      "kind": "academic"
+    },
+    "ark-fa82": {
+      "title": "Northern Ireland Assembly Elections 1982",
+      "publisher": "ARK (Queen's University Belfast and Ulster University)",
+      "url": "https://www.ark.ac.uk/elections/fa82.htm",
+      "kind": "academic"
+    },
+    "ark-ff96": {
+      "title": "Northern Ireland Forum Elections 1996",
+      "publisher": "ARK (Queen's University Belfast and Ulster University)",
+      "url": "https://www.ark.ac.uk/elections/ff96.htm",
+      "kind": "academic"
+    },
+    "lga-1972-s16": {
+      "title": "Local Government Act 1972, section 16",
+      "publisher": "legislation.gov.uk",
+      "url": "https://www.legislation.gov.uk/ukpga/1972/70/section/16",
+      "kind": "official_body"
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "United Kingdom",
+      "parent": null,
+      "polity_kind": "sovereign_state",
+      "source": "ukparl-ge"
+    },
+    {
+      "key": "nation",
+      "name": "Scotland, Wales, and Northern Ireland",
+      "parent": "national",
+      "polity_kind": "region",
+      "source": "scotact1998-sch1"
+    },
+    {
+      "key": "local",
+      "name": "Principal councils",
+      "parent": "national",
+      "polity_kind": "municipality",
+      "source": "ni-1973"
+    },
+    {
+      "key": "parish",
+      "name": "Parish, town, and community councils",
+      "parent": "local",
+      "polity_kind": "submunicipal",
+      "source": "lga-1972-s16"
+    }
+  ],
+  "classes": [
+    {
+      "key": "commons",
+      "tier": "national",
+      "name": "House of Commons general elections",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "schemes": [
+          "gb.pcon"
+        ]
+      },
+      "finest_note": "Returning officers declare Westminster results by constituency only, so there is no finer official count to collect.",
+      "source": "ukparl-ge",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "lower_house"
+          ],
+          "iso_pattern": "GB"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1832-12-08",
+          "contests": 401,
+          "note": "Counted from UK Parliament's results site for general elections since 1832, which lists one election per constituency, including the two-member boroughs and the university seats. The site doesn't say which nation each constituency was in, so these years aren't split by nation.",
+          "source": "ukparl-ge",
+          "quote": "general-elections/1 (1832 General Election): \"There are 401 elections.\""
+        },
+        {
+          "date": "1835-01-06",
+          "contests": 401,
+          "note": "Counted from UK Parliament's results site for general elections since 1832, which lists one election per constituency, including the two-member boroughs and the university seats. The site doesn't say which nation each constituency was in, so these years aren't split by nation.",
+          "source": "ukparl-ge",
+          "quote": "general-elections/2 (1835 General Election): \"There are 401 elections.\""
+        },
+        {
+          "date": "1837-07-24",
+          "contests": 401,
+          "note": "Counted from UK Parliament's results site for general elections since 1832, which lists one election per constituency, including the two-member boroughs and the university seats. The site doesn't say which nation each constituency was in, so these years aren't split by nation.",
+          "source": "ukparl-ge",
+          "quote": "general-elections/3 (1837 General Election): \"There are 401 elections.\""
+        },
+        {
+          "date": "1841-06-29",
+          "contests": 401,
+          "note": "Counted from UK Parliament's results site for general elections since 1832, which lists one election per constituency, including the two-member boroughs and the university seats. The site doesn't say which nation each constituency was in, so these years aren't split by nation.",
+          "source": "ukparl-ge",
+          "quote": "general-elections/4 (1841 General Election): \"There are 401 elections.\""
+        },
+        {
+          "date": "1847-07-29",
+          "contests": 400,
+          "note": "Counted from UK Parliament's results site for general elections since 1832, which lists one election per constituency, including the two-member boroughs and the university seats. The site doesn't say which nation each constituency was in, so these years aren't split by nation.",
+          "source": "ukparl-ge",
+          "quote": "general-elections/5 (1847 General Election): \"There are 400 elections.\""
+        },
+        {
+          "date": "1852-07-07",
+          "contests": 399,
+          "note": "Counted from UK Parliament's results site for general elections since 1832, which lists one election per constituency, including the two-member boroughs and the university seats. The site doesn't say which nation each constituency was in, so these years aren't split by nation.",
+          "source": "ukparl-ge",
+          "quote": "general-elections/6 (1852 General Election): \"There are 399 elections.\""
+        },
+        {
+          "date": "1857-03-27",
+          "contests": 399,
+          "note": "Counted from UK Parliament's results site for general elections since 1832, which lists one election per constituency, including the two-member boroughs and the university seats. The site doesn't say which nation each constituency was in, so these years aren't split by nation.",
+          "source": "ukparl-ge",
+          "quote": "general-elections/7 (1857 General Election): \"There are 399 elections.\""
+        },
+        {
+          "date": "1859-04-28",
+          "contests": 399,
+          "note": "Counted from UK Parliament's results site for general elections since 1832, which lists one election per constituency, including the two-member boroughs and the university seats. The site doesn't say which nation each constituency was in, so these years aren't split by nation.",
+          "source": "ukparl-ge",
+          "quote": "general-elections/8 (1859 General Election): \"There are 399 elections.\""
+        },
+        {
+          "date": "1865-07-11",
+          "contests": 401,
+          "note": "Counted from UK Parliament's results site for general elections since 1832, which lists one election per constituency, including the two-member boroughs and the university seats. The site doesn't say which nation each constituency was in, so these years aren't split by nation.",
+          "source": "ukparl-ge",
+          "quote": "general-elections/9 (1865 General Election): \"There are 401 elections.\""
+        },
+        {
+          "date": "1868-11-17",
+          "contests": 420,
+          "note": "Counted from UK Parliament's results site for general elections since 1832, which lists one election per constituency, including the two-member boroughs and the university seats. The site doesn't say which nation each constituency was in, so these years aren't split by nation.",
+          "source": "ukparl-ge",
+          "quote": "general-elections/10 (1868 General Election): \"There are 420 elections.\""
+        },
+        {
+          "date": "1874-01-31",
+          "contests": 416,
+          "note": "Counted from UK Parliament's results site for general elections since 1832, which lists one election per constituency, including the two-member boroughs and the university seats. The site doesn't say which nation each constituency was in, so these years aren't split by nation.",
+          "source": "ukparl-ge",
+          "quote": "general-elections/11 (1874 General Election): \"There are 416 elections.\""
+        },
+        {
+          "date": "1880-03-31",
+          "contests": 416,
+          "note": "Counted from UK Parliament's results site for general elections since 1832, which lists one election per constituency, including the two-member boroughs and the university seats. The site doesn't say which nation each constituency was in, so these years aren't split by nation.",
+          "source": "ukparl-ge",
+          "quote": "general-elections/12 (1880 General Election): \"There are 416 elections.\""
+        },
+        {
+          "date": "1885-11-24",
+          "contests": 643,
+          "note": "Counted from UK Parliament's results site for general elections since 1832, which lists one election per constituency, including the two-member boroughs and the university seats. The site doesn't say which nation each constituency was in, so these years aren't split by nation.",
+          "source": "ukparl-ge",
+          "quote": "general-elections/13 (1885 General Election): \"There are 643 elections.\""
+        },
+        {
+          "date": "1886-07-01",
+          "contests": 643,
+          "note": "Counted from UK Parliament's results site for general elections since 1832, which lists one election per constituency, including the two-member boroughs and the university seats. The site doesn't say which nation each constituency was in, so these years aren't split by nation.",
+          "source": "ukparl-ge",
+          "quote": "general-elections/14 (1886 General Election): \"There are 643 elections.\""
+        },
+        {
+          "date": "1892-07-04",
+          "contests": 643,
+          "note": "Counted from UK Parliament's results site for general elections since 1832, which lists one election per constituency, including the two-member boroughs and the university seats. The site doesn't say which nation each constituency was in, so these years aren't split by nation.",
+          "source": "ukparl-ge",
+          "quote": "general-elections/15 (1892 General Election): \"There are 643 elections.\""
+        },
+        {
+          "date": "1895-07-13",
+          "contests": 643,
+          "note": "Counted from UK Parliament's results site for general elections since 1832, which lists one election per constituency, including the two-member boroughs and the university seats. The site doesn't say which nation each constituency was in, so these years aren't split by nation.",
+          "source": "ukparl-ge",
+          "quote": "general-elections/16 (1895 General Election): \"There are 643 elections.\""
+        },
+        {
+          "date": "1900-09-26",
+          "contests": 643,
+          "note": "Counted from UK Parliament's results site for general elections since 1832, which lists one election per constituency, including the two-member boroughs and the university seats. The site doesn't say which nation each constituency was in, so these years aren't split by nation.",
+          "source": "ukparl-ge",
+          "quote": "general-elections/17 (1900 General Election): \"There are 643 elections.\""
+        },
+        {
+          "date": "1906-01-12",
+          "contests": 643,
+          "note": "Counted from UK Parliament's results site for general elections since 1832, which lists one election per constituency, including the two-member boroughs and the university seats. The site doesn't say which nation each constituency was in, so these years aren't split by nation.",
+          "source": "ukparl-ge",
+          "quote": "general-elections/18 (1906 General Election): \"There are 643 elections.\""
+        },
+        {
+          "date": "1910-01-15",
+          "contests": 643,
+          "note": "Counted from UK Parliament's results site for general elections since 1832, which lists one election per constituency, including the two-member boroughs and the university seats. The site doesn't say which nation each constituency was in, so these years aren't split by nation.",
+          "source": "ukparl-ge",
+          "quote": "general-elections/19 (January 1910 General Election): \"There are 643 elections.\""
+        },
+        {
+          "date": "1910-12-03",
+          "contests": 643,
+          "note": "Counted from UK Parliament's results site for general elections since 1832, which lists one election per constituency, including the two-member boroughs and the university seats. The site doesn't say which nation each constituency was in, so these years aren't split by nation.",
+          "source": "ukparl-ge",
+          "quote": "general-elections/20 (December 1910 General Election): \"There are 643 elections.\""
+        },
+        {
+          "date": "1918-12-14",
+          "contests": 688,
+          "seats": 707,
+          "regions": {
+            "ENG": 478,
+            "WLS": 36,
+            "SCT": 71,
+            "IRL": 103
+          },
+          "note": "Counted from the House of Commons Library's constituency results (CBP-8647): one race per constituency, including the two-member boroughs and the university seats.",
+          "source": "hoc-cbp8647",
+          "quote": "Sheet 1918: 688 constituency rows (territorial sheet rows plus the university seats), whose Seats column sums to 707"
+        },
+        {
+          "date": "1922-11-15",
+          "contests": 595,
+          "seats": 615,
+          "regions": {
+            "ENG": 478,
+            "WLS": 36,
+            "SCT": 71,
+            "NIR": 10
+          },
+          "note": "Counted from the House of Commons Library's constituency results (CBP-8647): one race per constituency, including the two-member boroughs and the university seats.",
+          "source": "hoc-cbp8647",
+          "quote": "Sheet 1922: 595 constituency rows (territorial sheet rows plus the university seats), whose Seats column sums to 615"
+        },
+        {
+          "date": "1923-12-06",
+          "contests": 595,
+          "seats": 615,
+          "regions": {
+            "ENG": 478,
+            "WLS": 36,
+            "SCT": 71,
+            "NIR": 10
+          },
+          "note": "Counted from the House of Commons Library's constituency results (CBP-8647): one race per constituency, including the two-member boroughs and the university seats.",
+          "source": "hoc-cbp8647",
+          "quote": "Sheet 1923: 595 constituency rows (territorial sheet rows plus the university seats), whose Seats column sums to 615"
+        },
+        {
+          "date": "1924-10-29",
+          "contests": 595,
+          "seats": 615,
+          "regions": {
+            "ENG": 478,
+            "WLS": 36,
+            "SCT": 71,
+            "NIR": 10
+          },
+          "note": "Counted from the House of Commons Library's constituency results (CBP-8647): one race per constituency, including the two-member boroughs and the university seats.",
+          "source": "hoc-cbp8647",
+          "quote": "Sheet 1924: 595 constituency rows (territorial sheet rows plus the university seats), whose Seats column sums to 615"
+        },
+        {
+          "date": "1929-05-30",
+          "contests": 595,
+          "seats": 615,
+          "regions": {
+            "ENG": 478,
+            "WLS": 36,
+            "SCT": 71,
+            "NIR": 10
+          },
+          "note": "Counted from the House of Commons Library's constituency results (CBP-8647): one race per constituency, including the two-member boroughs and the university seats.",
+          "source": "hoc-cbp8647",
+          "quote": "Sheet 1929: 595 constituency rows (territorial sheet rows plus the university seats), whose Seats column sums to 615"
+        },
+        {
+          "date": "1931-10-27",
+          "contests": 595,
+          "seats": 615,
+          "regions": {
+            "ENG": 478,
+            "WLS": 36,
+            "SCT": 71,
+            "NIR": 10
+          },
+          "note": "Counted from the House of Commons Library's constituency results (CBP-8647): one race per constituency, including the two-member boroughs and the university seats.",
+          "source": "hoc-cbp8647",
+          "quote": "Sheet 1931: 595 constituency rows (territorial sheet rows plus the university seats), whose Seats column sums to 615"
+        },
+        {
+          "date": "1935-11-14",
+          "contests": 595,
+          "seats": 615,
+          "regions": {
+            "ENG": 478,
+            "WLS": 36,
+            "SCT": 71,
+            "NIR": 10
+          },
+          "note": "Counted from the House of Commons Library's constituency results (CBP-8647): one race per constituency, including the two-member boroughs and the university seats.",
+          "source": "hoc-cbp8647",
+          "quote": "Sheet 1935: 595 constituency rows (territorial sheet rows plus the university seats), whose Seats column sums to 615"
+        },
+        {
+          "date": "1945-07-05",
+          "contests": 620,
+          "seats": 640,
+          "regions": {
+            "ENG": 503,
+            "WLS": 36,
+            "SCT": 71,
+            "NIR": 10
+          },
+          "note": "Counted from the House of Commons Library's constituency results (CBP-8647): one race per constituency, including the two-member boroughs and the university seats.",
+          "source": "hoc-cbp8647",
+          "quote": "Sheet 1945: 620 constituency rows (territorial sheet rows plus the university seats), whose Seats column sums to 640"
+        },
+        {
+          "date": "1950-02-23",
+          "contests": 625,
+          "seats": 625,
+          "regions": {
+            "ENG": 506,
+            "WLS": 36,
+            "SCT": 71,
+            "NIR": 12
+          },
+          "source": "hoc-cbp7529",
+          "quote": "Tables 1a, 1c, 1e, 1g, and 1i, Total seats, 1950: UK 625, GB 613, England 506, Wales 36, Scotland 71; every constituency has returned one member since 1950, and Northern Ireland is the UK total less the GB total"
+        },
+        {
+          "date": "1951-10-25",
+          "contests": 625,
+          "seats": 625,
+          "regions": {
+            "ENG": 506,
+            "WLS": 36,
+            "SCT": 71,
+            "NIR": 12
+          },
+          "source": "hoc-cbp7529",
+          "quote": "Tables 1a, 1c, 1e, 1g, and 1i, Total seats, 1951: UK 625, GB 613, England 506, Wales 36, Scotland 71; every constituency has returned one member since 1950, and Northern Ireland is the UK total less the GB total"
+        },
+        {
+          "date": "1955-05-26",
+          "contests": 630,
+          "seats": 630,
+          "regions": {
+            "ENG": 511,
+            "WLS": 36,
+            "SCT": 71,
+            "NIR": 12
+          },
+          "source": "hoc-cbp7529",
+          "quote": "Tables 1a, 1c, 1e, 1g, and 1i, Total seats, 1955: UK 630, GB 618, England 511, Wales 36, Scotland 71; every constituency has returned one member since 1950, and Northern Ireland is the UK total less the GB total"
+        },
+        {
+          "date": "1959-10-08",
+          "contests": 630,
+          "seats": 630,
+          "regions": {
+            "ENG": 511,
+            "WLS": 36,
+            "SCT": 71,
+            "NIR": 12
+          },
+          "source": "hoc-cbp7529",
+          "quote": "Tables 1a, 1c, 1e, 1g, and 1i, Total seats, 1959: UK 630, GB 618, England 511, Wales 36, Scotland 71; every constituency has returned one member since 1950, and Northern Ireland is the UK total less the GB total"
+        },
+        {
+          "date": "1964-10-15",
+          "contests": 630,
+          "seats": 630,
+          "regions": {
+            "ENG": 511,
+            "WLS": 36,
+            "SCT": 71,
+            "NIR": 12
+          },
+          "source": "hoc-cbp7529",
+          "quote": "Tables 1a, 1c, 1e, 1g, and 1i, Total seats, 1964: UK 630, GB 618, England 511, Wales 36, Scotland 71; every constituency has returned one member since 1950, and Northern Ireland is the UK total less the GB total"
+        },
+        {
+          "date": "1966-03-31",
+          "contests": 630,
+          "seats": 630,
+          "regions": {
+            "ENG": 511,
+            "WLS": 36,
+            "SCT": 71,
+            "NIR": 12
+          },
+          "source": "hoc-cbp7529",
+          "quote": "Tables 1a, 1c, 1e, 1g, and 1i, Total seats, 1966: UK 630, GB 618, England 511, Wales 36, Scotland 71; every constituency has returned one member since 1950, and Northern Ireland is the UK total less the GB total"
+        },
+        {
+          "date": "1970-06-18",
+          "contests": 630,
+          "seats": 630,
+          "regions": {
+            "ENG": 511,
+            "WLS": 36,
+            "SCT": 71,
+            "NIR": 12
+          },
+          "source": "hoc-cbp7529",
+          "quote": "Tables 1a, 1c, 1e, 1g, and 1i, Total seats, 1970: UK 630, GB 618, England 511, Wales 36, Scotland 71; every constituency has returned one member since 1950, and Northern Ireland is the UK total less the GB total"
+        },
+        {
+          "date": "1974-02-28",
+          "contests": 635,
+          "seats": 635,
+          "regions": {
+            "ENG": 516,
+            "WLS": 36,
+            "SCT": 71,
+            "NIR": 12
+          },
+          "source": "hoc-cbp7529",
+          "quote": "Tables 1a, 1c, 1e, 1g, and 1i, Total seats, 1974 Feb: UK 635, GB 623, England 516, Wales 36, Scotland 71; every constituency has returned one member since 1950, and Northern Ireland is the UK total less the GB total"
+        },
+        {
+          "date": "1974-10-10",
+          "contests": 635,
+          "seats": 635,
+          "regions": {
+            "ENG": 516,
+            "WLS": 36,
+            "SCT": 71,
+            "NIR": 12
+          },
+          "source": "hoc-cbp7529",
+          "quote": "Tables 1a, 1c, 1e, 1g, and 1i, Total seats, 1974 Oct: UK 635, GB 623, England 516, Wales 36, Scotland 71; every constituency has returned one member since 1950, and Northern Ireland is the UK total less the GB total"
+        },
+        {
+          "date": "1979-05-03",
+          "contests": 635,
+          "seats": 635,
+          "regions": {
+            "ENG": 516,
+            "WLS": 36,
+            "SCT": 71,
+            "NIR": 12
+          },
+          "source": "hoc-cbp7529",
+          "quote": "Tables 1a, 1c, 1e, 1g, and 1i, Total seats, 1979: UK 635, GB 623, England 516, Wales 36, Scotland 71; every constituency has returned one member since 1950, and Northern Ireland is the UK total less the GB total"
+        },
+        {
+          "date": "1983-06-09",
+          "contests": 650,
+          "seats": 650,
+          "regions": {
+            "ENG": 523,
+            "WLS": 38,
+            "SCT": 72,
+            "NIR": 17
+          },
+          "source": "hoc-cbp7529",
+          "quote": "Tables 1a, 1c, 1e, 1g, and 1i, Total seats, 1983: UK 650, GB 633, England 523, Wales 38, Scotland 72; every constituency has returned one member since 1950, and Northern Ireland is the UK total less the GB total"
+        },
+        {
+          "date": "1987-06-11",
+          "contests": 650,
+          "seats": 650,
+          "regions": {
+            "ENG": 523,
+            "WLS": 38,
+            "SCT": 72,
+            "NIR": 17
+          },
+          "source": "hoc-cbp7529",
+          "quote": "Tables 1a, 1c, 1e, 1g, and 1i, Total seats, 1987: UK 650, GB 633, England 523, Wales 38, Scotland 72; every constituency has returned one member since 1950, and Northern Ireland is the UK total less the GB total"
+        },
+        {
+          "date": "1992-04-09",
+          "contests": 651,
+          "seats": 651,
+          "regions": {
+            "ENG": 524,
+            "WLS": 38,
+            "SCT": 72,
+            "NIR": 17
+          },
+          "source": "hoc-cbp7529",
+          "quote": "Tables 1a, 1c, 1e, 1g, and 1i, Total seats, 1992: UK 651, GB 634, England 524, Wales 38, Scotland 72; every constituency has returned one member since 1950, and Northern Ireland is the UK total less the GB total"
+        },
+        {
+          "date": "1997-05-01",
+          "contests": 659,
+          "seats": 659,
+          "regions": {
+            "ENG": 529,
+            "WLS": 40,
+            "SCT": 72,
+            "NIR": 18
+          },
+          "source": "hoc-cbp7529",
+          "quote": "Tables 1a, 1c, 1e, 1g, and 1i, Total seats, 1997: UK 659, GB 641, England 529, Wales 40, Scotland 72; every constituency has returned one member since 1950, and Northern Ireland is the UK total less the GB total"
+        },
+        {
+          "date": "2001-06-07",
+          "contests": 659,
+          "seats": 659,
+          "regions": {
+            "ENG": 529,
+            "WLS": 40,
+            "SCT": 72,
+            "NIR": 18
+          },
+          "source": "hoc-cbp7529",
+          "quote": "Tables 1a, 1c, 1e, 1g, and 1i, Total seats, 2001: UK 659, GB 641, England 529, Wales 40, Scotland 72; every constituency has returned one member since 1950, and Northern Ireland is the UK total less the GB total"
+        },
+        {
+          "date": "2005-05-05",
+          "contests": 646,
+          "seats": 646,
+          "regions": {
+            "ENG": 529,
+            "WLS": 40,
+            "SCT": 59,
+            "NIR": 18
+          },
+          "source": "hoc-cbp7529",
+          "quote": "Tables 1a, 1c, 1e, 1g, and 1i, Total seats, 2005: UK 646, GB 628, England 529, Wales 40, Scotland 59; every constituency has returned one member since 1950, and Northern Ireland is the UK total less the GB total"
+        },
+        {
+          "date": "2010-05-06",
+          "contests": 650,
+          "seats": 650,
+          "regions": {
+            "ENG": 533,
+            "WLS": 40,
+            "SCT": 59,
+            "NIR": 18
+          },
+          "source": "hoc-cbp7529",
+          "quote": "Tables 1a, 1c, 1e, 1g, and 1i, Total seats, 2010: UK 650, GB 632, England 533, Wales 40, Scotland 59; every constituency has returned one member since 1950, and Northern Ireland is the UK total less the GB total"
+        },
+        {
+          "date": "2015-05-07",
+          "contests": 650,
+          "seats": 650,
+          "regions": {
+            "ENG": 533,
+            "WLS": 40,
+            "SCT": 59,
+            "NIR": 18
+          },
+          "source": "hoc-cbp7529",
+          "quote": "Tables 1a, 1c, 1e, 1g, and 1i, Total seats, 2015: UK 650, GB 632, England 533, Wales 40, Scotland 59; every constituency has returned one member since 1950, and Northern Ireland is the UK total less the GB total"
+        },
+        {
+          "date": "2017-06-08",
+          "contests": 650,
+          "seats": 650,
+          "regions": {
+            "ENG": 533,
+            "WLS": 40,
+            "SCT": 59,
+            "NIR": 18
+          },
+          "source": "hoc-cbp7529",
+          "quote": "Tables 1a, 1c, 1e, 1g, and 1i, Total seats, 2017: UK 650, GB 632, England 533, Wales 40, Scotland 59; every constituency has returned one member since 1950, and Northern Ireland is the UK total less the GB total"
+        },
+        {
+          "date": "2019-12-12",
+          "contests": 650,
+          "seats": 650,
+          "regions": {
+            "ENG": 533,
+            "WLS": 40,
+            "SCT": 59,
+            "NIR": 18
+          },
+          "source": "hoc-cbp7529",
+          "quote": "Tables 1a, 1c, 1e, 1g, and 1i, Total seats, 2019: UK 650, GB 632, England 533, Wales 40, Scotland 59; every constituency has returned one member since 1950, and Northern Ireland is the UK total less the GB total"
+        },
+        {
+          "date": "2024-07-04",
+          "contests": 650,
+          "seats": 650,
+          "regions": {
+            "ENG": 543,
+            "WLS": 32,
+            "SCT": 57,
+            "NIR": 18
+          },
+          "source": "uksi-2023-1230",
+          "quote": "Schedules 1 to 4 name 543 constituencies in England, 18 in Northern Ireland, 57 in Scotland, and 32 in Wales"
+        }
+      ]
+    },
+    {
+      "key": "commons_by",
+      "tier": "national",
+      "name": "House of Commons by-elections",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "hoc-cbp7529",
+      "match": [
+        {
+          "election_kinds": [
+            "by_election"
+          ],
+          "body_kinds": [
+            "lower_house"
+          ],
+          "iso_pattern": "GB"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1946-01-01",
+          "precision": "year",
+          "contests": 18,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 18 by-elections dated 1946"
+        },
+        {
+          "date": "1947-01-01",
+          "precision": "year",
+          "contests": 8,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 8 by-elections dated 1947"
+        },
+        {
+          "date": "1948-01-01",
+          "precision": "year",
+          "contests": 11,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 11 by-elections dated 1948"
+        },
+        {
+          "date": "1949-01-01",
+          "precision": "year",
+          "contests": 6,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 6 by-elections dated 1949"
+        },
+        {
+          "date": "1950-01-01",
+          "precision": "year",
+          "contests": 10,
+          "note": "The tables give 9; Table 14a omits the uncontested Belfast East by-election of 29 November 1950. The missing by-elections are in Resul Umit's by-election dataset (the archive's gb.byelections source) and were checked against the archive's results.",
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 9 by-elections dated 1950"
+        },
+        {
+          "date": "1951-01-01",
+          "precision": "year",
+          "contests": 6,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 6 by-elections dated 1951"
+        },
+        {
+          "date": "1952-01-01",
+          "precision": "year",
+          "contests": 10,
+          "note": "The tables give 9; Table 14a omits the Belfast South by-election of 4 November 1952. The missing by-elections are in Resul Umit's by-election dataset (the archive's gb.byelections source) and were checked against the archive's results.",
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 9 by-elections dated 1952"
+        },
+        {
+          "date": "1953-01-01",
+          "precision": "year",
+          "contests": 14,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 14 by-elections dated 1953"
+        },
+        {
+          "date": "1954-01-01",
+          "precision": "year",
+          "contests": 18,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 18 by-elections dated 1954"
+        },
+        {
+          "date": "1955-01-01",
+          "precision": "year",
+          "contests": 10,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 10 by-elections dated 1955"
+        },
+        {
+          "date": "1956-01-01",
+          "precision": "year",
+          "contests": 12,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 12 by-elections dated 1956"
+        },
+        {
+          "date": "1957-01-01",
+          "precision": "year",
+          "contests": 15,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 15 by-elections dated 1957"
+        },
+        {
+          "date": "1958-01-01",
+          "precision": "year",
+          "contests": 14,
+          "note": "The tables give 15, but one is the Galloway by-election of 9 April 1959, which Table 13 misdates to 1958; it is counted in 1959.",
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 15 by-elections dated 1958"
+        },
+        {
+          "date": "1959-01-01",
+          "precision": "year",
+          "contests": 7,
+          "note": "The tables give 5; Table 14a omits the Belfast East by-election of 19 March 1959, and Table 13 misdates the Galloway by-election of 9 April 1959 to 1958. The missing by-elections are in Resul Umit's by-election dataset (the archive's gb.byelections source) and were checked against the archive's results.",
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 5 by-elections dated 1959"
+        },
+        {
+          "date": "1960-01-01",
+          "precision": "year",
+          "contests": 11,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 11 by-elections dated 1960"
+        },
+        {
+          "date": "1961-01-01",
+          "precision": "year",
+          "contests": 12,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 12 by-elections dated 1961"
+        },
+        {
+          "date": "1962-01-01",
+          "precision": "year",
+          "contests": 17,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 17 by-elections dated 1962"
+        },
+        {
+          "date": "1963-01-01",
+          "precision": "year",
+          "contests": 16,
+          "note": "The tables give 15; Table 14a omits the Belfast South by-election of 22 October 1963. The missing by-elections are in Resul Umit's by-election dataset (the archive's gb.byelections source) and were checked against the archive's results.",
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 15 by-elections dated 1963"
+        },
+        {
+          "date": "1964-01-01",
+          "precision": "year",
+          "contests": 6,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 6 by-elections dated 1964"
+        },
+        {
+          "date": "1965-01-01",
+          "precision": "year",
+          "contests": 12,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 12 by-elections dated 1965"
+        },
+        {
+          "date": "1966-01-01",
+          "precision": "year",
+          "contests": 2,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 2 by-elections dated 1966"
+        },
+        {
+          "date": "1967-01-01",
+          "precision": "year",
+          "contests": 11,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 11 by-elections dated 1967"
+        },
+        {
+          "date": "1968-01-01",
+          "precision": "year",
+          "contests": 11,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 11 by-elections dated 1968"
+        },
+        {
+          "date": "1969-01-01",
+          "precision": "year",
+          "contests": 13,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 13 by-elections dated 1969"
+        },
+        {
+          "date": "1970-01-01",
+          "precision": "year",
+          "contests": 4,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 4 by-elections dated 1970"
+        },
+        {
+          "date": "1971-01-01",
+          "precision": "year",
+          "contests": 10,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 10 by-elections dated 1971"
+        },
+        {
+          "date": "1972-01-01",
+          "precision": "year",
+          "contests": 6,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 6 by-elections dated 1972"
+        },
+        {
+          "date": "1973-01-01",
+          "precision": "year",
+          "contests": 12,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 12 by-elections dated 1973"
+        },
+        {
+          "date": "1974-01-01",
+          "precision": "year",
+          "contests": 1,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 1 by-elections dated 1974"
+        },
+        {
+          "date": "1975-01-01",
+          "precision": "year",
+          "contests": 1,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 1 by-elections dated 1975"
+        },
+        {
+          "date": "1976-01-01",
+          "precision": "year",
+          "contests": 9,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 9 by-elections dated 1976"
+        },
+        {
+          "date": "1977-01-01",
+          "precision": "year",
+          "contests": 7,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 7 by-elections dated 1977"
+        },
+        {
+          "date": "1978-01-01",
+          "precision": "year",
+          "contests": 10,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 10 by-elections dated 1978"
+        },
+        {
+          "date": "1979-01-01",
+          "precision": "year",
+          "contests": 5,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 5 by-elections dated 1979"
+        },
+        {
+          "date": "1980-01-01",
+          "precision": "year",
+          "contests": 2,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 2 by-elections dated 1980"
+        },
+        {
+          "date": "1981-01-01",
+          "precision": "year",
+          "contests": 5,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 5 by-elections dated 1981"
+        },
+        {
+          "date": "1982-01-01",
+          "precision": "year",
+          "contests": 9,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 9 by-elections dated 1982"
+        },
+        {
+          "date": "1983-01-01",
+          "precision": "year",
+          "contests": 3,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 3 by-elections dated 1983"
+        },
+        {
+          "date": "1984-01-01",
+          "precision": "year",
+          "contests": 6,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 6 by-elections dated 1984"
+        },
+        {
+          "date": "1985-01-01",
+          "precision": "year",
+          "contests": 2,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 2 by-elections dated 1985"
+        },
+        {
+          "date": "1986-01-01",
+          "precision": "year",
+          "contests": 20,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 20 by-elections dated 1986"
+        },
+        {
+          "date": "1987-01-01",
+          "precision": "year",
+          "contests": 2,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 2 by-elections dated 1987"
+        },
+        {
+          "date": "1988-01-01",
+          "precision": "year",
+          "contests": 3,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 3 by-elections dated 1988"
+        },
+        {
+          "date": "1989-01-01",
+          "precision": "year",
+          "contests": 5,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 5 by-elections dated 1989"
+        },
+        {
+          "date": "1990-01-01",
+          "precision": "year",
+          "contests": 9,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 9 by-elections dated 1990"
+        },
+        {
+          "date": "1991-01-01",
+          "precision": "year",
+          "contests": 7,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 7 by-elections dated 1991"
+        },
+        {
+          "date": "1992-01-01",
+          "precision": "year",
+          "contests": 0,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 0 by-elections dated 1992"
+        },
+        {
+          "date": "1993-01-01",
+          "precision": "year",
+          "contests": 2,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 2 by-elections dated 1993"
+        },
+        {
+          "date": "1994-01-01",
+          "precision": "year",
+          "contests": 8,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 8 by-elections dated 1994"
+        },
+        {
+          "date": "1995-01-01",
+          "precision": "year",
+          "contests": 4,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 4 by-elections dated 1995"
+        },
+        {
+          "date": "1996-01-01",
+          "precision": "year",
+          "contests": 3,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 3 by-elections dated 1996"
+        },
+        {
+          "date": "1997-01-01",
+          "precision": "year",
+          "contests": 5,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 5 by-elections dated 1997"
+        },
+        {
+          "date": "1998-01-01",
+          "precision": "year",
+          "contests": 0,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 0 by-elections dated 1998"
+        },
+        {
+          "date": "1999-01-01",
+          "precision": "year",
+          "contests": 5,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 5 by-elections dated 1999"
+        },
+        {
+          "date": "2000-01-01",
+          "precision": "year",
+          "contests": 8,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 8 by-elections dated 2000"
+        },
+        {
+          "date": "2001-01-01",
+          "precision": "year",
+          "contests": 1,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 1 by-elections dated 2001"
+        },
+        {
+          "date": "2002-01-01",
+          "precision": "year",
+          "contests": 1,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 1 by-elections dated 2002"
+        },
+        {
+          "date": "2003-01-01",
+          "precision": "year",
+          "contests": 1,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 1 by-elections dated 2003"
+        },
+        {
+          "date": "2004-01-01",
+          "precision": "year",
+          "contests": 3,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 3 by-elections dated 2004"
+        },
+        {
+          "date": "2005-01-01",
+          "precision": "year",
+          "contests": 2,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 2 by-elections dated 2005"
+        },
+        {
+          "date": "2006-01-01",
+          "precision": "year",
+          "contests": 3,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 3 by-elections dated 2006"
+        },
+        {
+          "date": "2007-01-01",
+          "precision": "year",
+          "contests": 2,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 2 by-elections dated 2007"
+        },
+        {
+          "date": "2008-01-01",
+          "precision": "year",
+          "contests": 5,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 5 by-elections dated 2008"
+        },
+        {
+          "date": "2009-01-01",
+          "precision": "year",
+          "contests": 2,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 2 by-elections dated 2009"
+        },
+        {
+          "date": "2010-01-01",
+          "precision": "year",
+          "contests": 0,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 0 by-elections dated 2010"
+        },
+        {
+          "date": "2011-01-01",
+          "precision": "year",
+          "contests": 6,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 6 by-elections dated 2011"
+        },
+        {
+          "date": "2012-01-01",
+          "precision": "year",
+          "contests": 7,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 7 by-elections dated 2012"
+        },
+        {
+          "date": "2013-01-01",
+          "precision": "year",
+          "contests": 3,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 3 by-elections dated 2013"
+        },
+        {
+          "date": "2014-01-01",
+          "precision": "year",
+          "contests": 5,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 5 by-elections dated 2014"
+        },
+        {
+          "date": "2015-01-01",
+          "precision": "year",
+          "contests": 1,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 1 by-elections dated 2015"
+        },
+        {
+          "date": "2016-01-01",
+          "precision": "year",
+          "contests": 7,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 7 by-elections dated 2016"
+        },
+        {
+          "date": "2017-01-01",
+          "precision": "year",
+          "contests": 2,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 2 by-elections dated 2017"
+        },
+        {
+          "date": "2018-01-01",
+          "precision": "year",
+          "contests": 2,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 2 by-elections dated 2018"
+        },
+        {
+          "date": "2019-01-01",
+          "precision": "year",
+          "contests": 3,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 3 by-elections dated 2019"
+        },
+        {
+          "date": "2020-01-01",
+          "precision": "year",
+          "contests": 0,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 0 by-elections dated 2020"
+        },
+        {
+          "date": "2021-01-01",
+          "precision": "year",
+          "contests": 6,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 6 by-elections dated 2021"
+        },
+        {
+          "date": "2022-01-01",
+          "precision": "year",
+          "contests": 6,
+          "source": "hoc-cbp7529",
+          "quote": "Tables 13, 14a, and 14b list 6 by-elections dated 2022"
+        },
+        {
+          "date": "2023-01-01",
+          "precision": "year",
+          "contests": 7,
+          "source": "hoc-cbp9225",
+          "quote": "Results listed for West Lancashire – 9 February 2023; Uxbridge and South Ruislip, Selby and Ainsty, and Somerton and Frome – 20 July 2023; Rutherglen and Hamilton West – 5 October 2023; Mid Bedfordshire and Tamworth – 19 October 2023"
+        },
+        {
+          "date": "2024-01-01",
+          "precision": "year",
+          "contests": 4,
+          "source": "hoc-cbp9225",
+          "quote": "Results listed for Kingswood and Wellingborough – 15 Feb 2024; Rochdale – 29 Feb 2024; Blackpool South – 2 May 2024; the 2024 Parliament briefing (CBP-10268) lists none in 2024"
+        },
+        {
+          "date": "2025-01-01",
+          "precision": "year",
+          "contests": 1,
+          "source": "hoc-cbp10268",
+          "quote": "Results listed for Runcorn and Helsby – 1 May 2025"
+        },
+        {
+          "date": "2026-01-01",
+          "precision": "year",
+          "contests": 6,
+          "source": "hoc-cbp10268",
+          "quote": "Results listed for Gorton and Denton (26 February 2026); Makerfield, Aberdeen South, and Arbroath and Broughty Ferry (18 June 2026); Clacton (13 August 2026); Holborn and St Pancras (8 October 2026)"
+        },
+        {
+          "date": "1832-01-01",
+          "precision": "year",
+          "through": "1945-12-31",
+          "note": "The House of Commons Library lists every by-election only from 1945 on, and Northern Ireland's from 1922."
+        }
+      ]
+    },
+    {
+      "key": "holyrood",
+      "tier": "nation",
+      "name": "Scottish Parliament elections",
+      "category": "legislature",
+      "goal": "subnational",
+      "measure": {
+        "schemes": [
+          "gb.spc",
+          "gb.spr"
+        ]
+      },
+      "source": "scotact1998-sch1",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "GB-SCT"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1999-05-06",
+          "contests": 81,
+          "seats": 129,
+          "note": "Contests = 73 constituencies + 8 regions. Seats = 73 + (8 x 7), derived from the quoted provisions. The date is not quoted from a fetched source.",
+          "source": "scotact1998-sch1",
+          "quote": "There are to be 73 constituencies for the purposes of this Act. There are to be eight regions for the purposes of this Act. Seven regional members are to be returned for each region."
+        },
+        {
+          "date": "2003-05-01",
+          "contests": 81,
+          "seats": 129,
+          "note": "Same structure as the current revised text. Per-election check not made. The date is not quoted from a fetched source.",
+          "source": "scotact1998-sch1",
+          "quote": "There are to be 73 constituencies for the purposes of this Act. There are to be eight regions for the purposes of this Act. Seven regional members are to be returned for each region."
+        },
+        {
+          "date": "2007-05-03",
+          "contests": 81,
+          "seats": 129,
+          "note": "Same structure as the current revised text. Per-election check not made. The date is not quoted from a fetched source.",
+          "source": "scotact1998-sch1",
+          "quote": "There are to be 73 constituencies for the purposes of this Act. There are to be eight regions for the purposes of this Act. Seven regional members are to be returned for each region."
+        },
+        {
+          "date": "2011-05-05",
+          "contests": 81,
+          "seats": 129,
+          "note": "Same structure as the current revised text. Per-election check not made. The date is not quoted from a fetched source.",
+          "source": "scotact1998-sch1",
+          "quote": "There are to be 73 constituencies for the purposes of this Act. There are to be eight regions for the purposes of this Act. Seven regional members are to be returned for each region."
+        },
+        {
+          "date": "2016-05-05",
+          "contests": 81,
+          "seats": 129,
+          "note": "Same structure as the current revised text. Per-election check not made. The date is not quoted from a fetched source.",
+          "source": "scotact1998-sch1",
+          "quote": "There are to be 73 constituencies for the purposes of this Act. There are to be eight regions for the purposes of this Act. Seven regional members are to be returned for each region."
+        },
+        {
+          "date": "2021-05-06",
+          "contests": 81,
+          "seats": 129,
+          "note": "Same structure as the current revised text. Per-election check not made. The date is not quoted from a fetched source.",
+          "source": "scotact1998-sch1",
+          "quote": "There are to be 73 constituencies for the purposes of this Act. There are to be eight regions for the purposes of this Act. Seven regional members are to be returned for each region."
+        },
+        {
+          "date": "2026-05-07",
+          "contests": 81,
+          "seats": 129,
+          "note": "Seats corroborated by the six party totals on parl-scot-2026 (58, 17, 17, 15, 12, 10, summing to 129). The date is not quoted from a fetched source.",
+          "source": "scotact1998-sch1",
+          "quote": "There are to be 73 constituencies for the purposes of this Act. There are to be eight regions for the purposes of this Act. Seven regional members are to be returned for each region."
+        }
+      ]
+    },
+    {
+      "key": "senedd",
+      "tier": "nation",
+      "name": "Senedd elections",
+      "category": "legislature",
+      "goal": "subnational",
+      "measure": {
+        "schemes": [
+          "gb.senc",
+          "gb.senr"
+        ]
+      },
+      "source": "senedd-research-2021",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "GB-WLS"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2021-05-06",
+          "contests": 45,
+          "seats": 60,
+          "note": "Contests = 40 constituencies + 5 regions. Seats from the table row 'All Regions' with total 60 (second table on the Senedd Research PDF, line 1116). Quote for 'five regions' from the same PDF: 'Only one out of the five regions saw a decrease in turnout from the 2016 election.' The date is not quoted from a fetched source.",
+          "source": "senedd-research-2021",
+          "quote": "In 14 of the 40 constituencies, more than 50% of the electorate cast valid votes."
+        },
+        {
+          "date": "2026-05-07",
+          "contests": 16,
+          "seats": 96,
+          "note": "Seats 96 = 16 x 6 (derived from the quoted provisions). The 2026 date is not quoted from a fetched source. The Act's schedule applies to the first election after 6 April 2026.",
+          "source": "asc2024-s1",
+          "quote": "(a)16 Senedd constituencies, and (b)six seats for each constituency, and"
+        },
+        {
+          "date": "1999-05-06",
+          "contests": 45,
+          "seats": 60,
+          "source": "hoc-cbp7529",
+          "quote": "Table 16, Constituency seats Total 40; section 9.4: 40 constituencies across five regions"
+        },
+        {
+          "date": "2003-05-01",
+          "contests": 45,
+          "seats": 60,
+          "source": "hoc-cbp7529",
+          "quote": "Table 16, Constituency seats Total 40; section 9.4: 40 constituencies across five regions"
+        },
+        {
+          "date": "2007-05-03",
+          "contests": 45,
+          "seats": 60,
+          "source": "hoc-cbp7529",
+          "quote": "Table 16, Constituency seats Total 40; section 9.4: 40 constituencies across five regions"
+        },
+        {
+          "date": "2011-05-05",
+          "contests": 45,
+          "seats": 60,
+          "source": "hoc-cbp7529",
+          "quote": "Table 16, Constituency seats Total 40; section 9.4: 40 constituencies across five regions"
+        },
+        {
+          "date": "2016-05-05",
+          "contests": 45,
+          "seats": 60,
+          "source": "hoc-cbp7529",
+          "quote": "Table 16, Constituency seats Total 40; section 9.4: 40 constituencies across five regions"
+        }
+      ]
+    },
+    {
+      "key": "ni_assembly",
+      "tier": "nation",
+      "name": "Northern Ireland Assembly elections",
+      "category": "legislature",
+      "goal": "subnational",
+      "measure": {
+        "schemes": [
+          "gb.pcon",
+          "gb.nia"
+        ]
+      },
+      "source": "ark-fa73",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "GB-NIR"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1973-06-28",
+          "contests": 12,
+          "seats": 78,
+          "note": "Counted as 12 constituencies, Northern Ireland's Westminster seats as drawn in 1970, which together elected 78 members by single transferable vote.",
+          "source": "ark-fa73",
+          "quote": "\"the 52 members of the old Stormont House of Commons and the 26 members of the Senate; they were elected by proportional respresentation from the existing Westminster seats, or rather from the new boundaries that had been approved shortly after the 1970 Westminster election\""
+        },
+        {
+          "date": "1975-05-01",
+          "contests": 12,
+          "seats": 78,
+          "note": "The Constitutional Convention. Counted as 12 constituencies, with the same seats and the same 78 members as the 1973 Assembly.",
+          "source": "ark-fc75",
+          "quote": "\"The 78 members were elected on the same basis as the 1973 Assembly, with the same distribution of members among the 12 parliamentary seats.\""
+        },
+        {
+          "date": "1982-10-20",
+          "contests": 12,
+          "seats": 78,
+          "note": "Counted as 12 constituencies, the Westminster seats drawn in 1970, electing 78 members by single transferable vote.",
+          "source": "ark-fa82",
+          "quote": "\"The Assembly elections on 20 October 1982\"; \"the last full elections held on the boundaries that had been set at the end of 1970\" (12 seats, 78 members)"
+        },
+        {
+          "date": "1996-05-30",
+          "contests": 19,
+          "seats": 110,
+          "note": "The Northern Ireland Forum. Counted as 19 contests: 18 constituencies electing five members each from party lists, plus one Northern Ireland-wide count that gave two more seats to each of the ten parties with the most votes.",
+          "source": "ark-ff96",
+          "quote": "\"Each of the 18 new constituencies elected five representatives from closed party lists using the d'Hondt formula. In addition, each of the ten parties with the most votes across Northern Ireland elected another two representatives. The total number of potential delegates/Forum members was thus 110.\""
+        },
+        {
+          "date": "1998-06-25",
+          "contests": 18,
+          "seats": 108,
+          "source": "hoc-cbp7529",
+          "quote": "Table 18, seats won total 108; section 9.4: eighteen constituencies"
+        },
+        {
+          "date": "2003-11-26",
+          "contests": 18,
+          "seats": 108,
+          "source": "hoc-cbp7529",
+          "quote": "Table 18, seats won total 108; section 9.4: eighteen constituencies"
+        },
+        {
+          "date": "2007-03-07",
+          "contests": 18,
+          "seats": 108,
+          "source": "hoc-cbp7529",
+          "quote": "Table 18, seats won total 108; section 9.4: eighteen constituencies"
+        },
+        {
+          "date": "2011-05-05",
+          "contests": 18,
+          "seats": 108,
+          "source": "hoc-cbp7529",
+          "quote": "Table 18, seats won total 108; section 9.4: eighteen constituencies"
+        },
+        {
+          "date": "2016-05-05",
+          "contests": 18,
+          "seats": 108,
+          "source": "hoc-cbp7529",
+          "quote": "Table 18, seats won total 108; section 9.4: eighteen constituencies"
+        },
+        {
+          "date": "2017-03-02",
+          "contests": 18,
+          "seats": 90,
+          "source": "hoc-cbp7529",
+          "quote": "Table 18, seats won total 90; section 9.4: eighteen constituencies"
+        },
+        {
+          "date": "2022-05-05",
+          "contests": 18,
+          "seats": 90,
+          "source": "hoc-cbp7529",
+          "quote": "Table 18, seats won total 90; section 9.4: eighteen constituencies"
+        }
+      ]
+    },
+    {
+      "key": "stormont",
+      "tier": "nation",
+      "name": "Parliament of Northern Ireland elections",
+      "category": "legislature",
+      "goal": "subnational",
+      "measure": {
+        "schemes": [
+          "gb.stormont"
+        ]
+      },
+      "source": "goi-1920",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "lower_house"
+          ],
+          "iso_pattern": "GB-NIR"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1921-01-01",
+          "precision": "year",
+          "contests": 10,
+          "seats": 52,
+          "note": "Counted as 10 constituencies, from the Government of Ireland Act 1920: Belfast's four divisions, five county constituencies, and Queen's University, electing 52 members by single transferable vote.",
+          "source": "goi-1920",
+          "quote": "Fifth Schedule, Part II: East, North, South, and West Belfast (4 each); Antrim 7, Armagh 4, Fermanagh and Tyrone 8, Londonderry 5, Down 8; Queen's University of Belfast 4; \"Total members 52\""
+        },
+        {
+          "date": "1925-01-01",
+          "precision": "year",
+          "contests": 10,
+          "seats": 52,
+          "note": "Counted as 10 constituencies, from the Government of Ireland Act 1920: Belfast's four divisions, five county constituencies, and Queen's University, electing 52 members by single transferable vote.",
+          "source": "goi-1920",
+          "quote": "Fifth Schedule, Part II: East, North, South, and West Belfast (4 each); Antrim 7, Armagh 4, Fermanagh and Tyrone 8, Londonderry 5, Down 8; Queen's University of Belfast 4; \"Total members 52\""
+        },
+        {
+          "date": "1929-01-01",
+          "precision": "year",
+          "contests": 49,
+          "seats": 52,
+          "note": "Counted as 49 constituencies: the 48 single-member seats drawn in 1929, and Queen's University, which elected four members.",
+          "source": "ark-nihoc",
+          "quote": "\"For the 1929 election the Unionist government abolished PR and carved out 48 single-member seats from the city and county constituencies\"; Queen's University kept its four seats until 1968"
+        },
+        {
+          "date": "1933-01-01",
+          "precision": "year",
+          "contests": 49,
+          "seats": 52,
+          "note": "Counted as 49 constituencies: the 48 single-member seats drawn in 1929, and Queen's University, which elected four members.",
+          "source": "ark-nihoc",
+          "quote": "\"For the 1929 election the Unionist government abolished PR and carved out 48 single-member seats from the city and county constituencies\"; Queen's University kept its four seats until 1968"
+        },
+        {
+          "date": "1938-01-01",
+          "precision": "year",
+          "contests": 49,
+          "seats": 52,
+          "note": "Counted as 49 constituencies: the 48 single-member seats drawn in 1929, and Queen's University, which elected four members.",
+          "source": "ark-nihoc",
+          "quote": "\"For the 1929 election the Unionist government abolished PR and carved out 48 single-member seats from the city and county constituencies\"; Queen's University kept its four seats until 1968"
+        },
+        {
+          "date": "1945-01-01",
+          "precision": "year",
+          "contests": 49,
+          "seats": 52,
+          "note": "Counted as 49 constituencies: the 48 single-member seats drawn in 1929, and Queen's University, which elected four members.",
+          "source": "ark-nihoc",
+          "quote": "\"For the 1929 election the Unionist government abolished PR and carved out 48 single-member seats from the city and county constituencies\"; Queen's University kept its four seats until 1968"
+        },
+        {
+          "date": "1949-01-01",
+          "precision": "year",
+          "contests": 49,
+          "seats": 52,
+          "note": "Counted as 49 constituencies: the 48 single-member seats drawn in 1929, and Queen's University, which elected four members.",
+          "source": "ark-nihoc",
+          "quote": "\"For the 1929 election the Unionist government abolished PR and carved out 48 single-member seats from the city and county constituencies\"; Queen's University kept its four seats until 1968"
+        },
+        {
+          "date": "1953-01-01",
+          "precision": "year",
+          "contests": 49,
+          "seats": 52,
+          "note": "Counted as 49 constituencies: the 48 single-member seats drawn in 1929, and Queen's University, which elected four members.",
+          "source": "ark-nihoc",
+          "quote": "\"For the 1929 election the Unionist government abolished PR and carved out 48 single-member seats from the city and county constituencies\"; Queen's University kept its four seats until 1968"
+        },
+        {
+          "date": "1958-01-01",
+          "precision": "year",
+          "contests": 49,
+          "seats": 52,
+          "note": "Counted as 49 constituencies: the 48 single-member seats drawn in 1929, and Queen's University, which elected four members.",
+          "source": "ark-nihoc",
+          "quote": "\"For the 1929 election the Unionist government abolished PR and carved out 48 single-member seats from the city and county constituencies\"; Queen's University kept its four seats until 1968"
+        },
+        {
+          "date": "1962-01-01",
+          "precision": "year",
+          "contests": 49,
+          "seats": 52,
+          "note": "Counted as 49 constituencies: the 48 single-member seats drawn in 1929, and Queen's University, which elected four members.",
+          "source": "ark-nihoc",
+          "quote": "\"For the 1929 election the Unionist government abolished PR and carved out 48 single-member seats from the city and county constituencies\"; Queen's University kept its four seats until 1968"
+        },
+        {
+          "date": "1965-01-01",
+          "precision": "year",
+          "contests": 49,
+          "seats": 52,
+          "note": "Counted as 49 constituencies: the 48 single-member seats drawn in 1929, and Queen's University, which elected four members.",
+          "source": "ark-nihoc",
+          "quote": "\"For the 1929 election the Unionist government abolished PR and carved out 48 single-member seats from the city and county constituencies\"; Queen's University kept its four seats until 1968"
+        },
+        {
+          "date": "1969-01-01",
+          "precision": "year",
+          "contests": 52,
+          "seats": 52,
+          "note": "Counted as 52 single-member constituencies. The Electoral Law Act (Northern Ireland) 1968 abolished the university seats and created four new constituencies.",
+          "source": "ni-ela-1968",
+          "quote": "Long title: \"An Act to abolish the university constituency for the purposes of elections to the Parliament of Northern Ireland; to create four new constituencies\" (48 + 4)"
+        }
+      ]
+    },
+    {
+      "key": "parish",
+      "tier": "parish",
+      "name": "Parish, town, and community council elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "No source counts the parish, town, and community councils that voted each year, so this level lists no elections and holds only its gap rows. It sits ahead of the principal councils so a parish ward contest is never counted as one of them.",
+      "source": "lga-1972-s16",
+      "match": [
+        {
+          "election_kinds": [
+            "local"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "schemes": [
+            "gb.parish",
+            "gb.parish_ward",
+            "gb.community_council"
+          ]
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "councils",
+      "tier": "local",
+      "name": "Council elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "Counted per council: each council that held its scheduled elections on the year's local polling day counts once, whether it elected every member or a third of them. By-elections don't count. England's figures come from the House of Commons Library, the Electoral Commission, and the Elections Centre's Local Elections Handbooks; Scotland's 32 councils, Wales's 22, and Northern Ireland's 26 (11 from 2014) are added in the years they voted. In 2012 Wales counts 21, because Anglesey's election was moved to 2013.",
+      "source": "ni-1973",
+      "match": [
+        {
+          "election_kinds": [
+            "local"
+          ],
+          "body_kinds": [
+            "council"
+          ]
+        }
+      ],
+      "dates": [
+        {
+          "date": "1973-05-30",
+          "contests": 26,
+          "note": "Northern Ireland's 26 district councils.",
+          "source": "ni-1973",
+          "quote": "1973 Local Government Election (Wednesday 30 May 1973)"
+        },
+        {
+          "date": "1977-05-18",
+          "contests": 26,
+          "note": "Northern Ireland's 26 district councils.",
+          "source": "ni-1977",
+          "quote": "The elections were held to elect 526 councillors to the 26 District Councils of Northern Ireland."
+        },
+        {
+          "date": "1981-05-20",
+          "contests": 26,
+          "note": "Northern Ireland's 26 district councils.",
+          "source": "ni-1981",
+          "quote": "1981 Local Government Election (Wednesday 20 May 1981)"
+        },
+        {
+          "date": "1985-05-15",
+          "contests": 26,
+          "note": "Northern Ireland's 26 district councils.",
+          "source": "ni-1985",
+          "quote": "The elections on 15 May 1985 were held to elect 566 councilors to the 26 District Councils of Northern Ireland."
+        },
+        {
+          "date": "1989-05-17",
+          "contests": 26,
+          "note": "Northern Ireland's 26 district councils.",
+          "source": "ni-1989",
+          "quote": "The following is a first draft (v1) of the results of the 1989 District Council (local government) elections held in Northern Ireland on Wednesday 17 May 1989."
+        },
+        {
+          "date": "1993-05-19",
+          "contests": 26,
+          "note": "Northern Ireland's 26 district councils.",
+          "source": "ni-1993",
+          "quote": "The elections for Northern Ireland's 26 local councils took place on 19 May 1993."
+        },
+        {
+          "date": "1997-05-21",
+          "contests": 26,
+          "note": "Northern Ireland's 26 district councils.",
+          "source": "ni-1997",
+          "quote": "The elections for Northern Ireland's 26 local councils took place on May 21, 1997"
+        },
+        {
+          "date": "2001-06-07",
+          "contests": 26,
+          "note": "Northern Ireland's 26 district councils.",
+          "source": "ni-2001",
+          "quote": "The elections for Northern Ireland's 26 local councils took place on 7 June, 2001"
+        },
+        {
+          "date": "2002-05-02",
+          "contests": 174,
+          "note": "England 174. Academic research centre, not an official source. No Commons Library or Electoral Commission count for 2002 was found.",
+          "source": "leh-2002",
+          "quote": "The headline figures, shown in Table 1, show that there were elections for 5,914 seats in 3,342 wards across 174 councils in England."
+        },
+        {
+          "date": "2003-05-01",
+          "contests": 340,
+          "note": "England 308; Scotland 32 (Boundaries Scotland: 'The Local Government etc. (Scotland) Act 1994 created the 32 single-tier local government areas that cover Scotland.'). Academic research centre, not an official source.",
+          "source": "leh-2003",
+          "quote": "In 2003 there were elections in England for a total of 308 local authorities comprising 36 metropolitan boroughs, 40 unitary councils and 232 shire district councils."
+        },
+        {
+          "date": "2004-06-10",
+          "contests": 166,
+          "note": "England 144; Wales 22 (Senedd Research: 'A single tier of 22 unitary authorities was created'). Count is the sum of the three categories in the quoted sentence (36 + 89 + 19). Election held 10 June 2004 alongside the European Parliament election. Academic research centre, not an official source.",
+          "source": "leh-2004",
+          "quote": "Local elections in 2004 were held in England for the 36 metropolitan boroughs, for 89 shire districts and 19 unitary councils."
+        },
+        {
+          "date": "2005-05-05",
+          "contests": 63,
+          "note": "England 37; Northern Ireland 26 (ni-2005: 'The elections for Northern Ireland's 26 local councils took place on 5 May, 2005'). Count is the sum of the two categories in the quoted sentence (34 + 3). The handbook's Using the Handbook section repeats the 37 figure but labels it 2004, which looks like a typo. Academic research centre, not an official source.",
+          "source": "leh-2005",
+          "quote": "Local elections in 2005 were held in England for 34 county and 3 unitary councils."
+        },
+        {
+          "date": "2006-05-04",
+          "contests": 176,
+          "note": "England 176. Academic research centre, not an official source. The same count appears in Rallings and Thrasher, Representation (2006).",
+          "source": "leh-2006",
+          "quote": "In 2006 there were elections in England for a total of 176 local authorities comprising 32 London boroughs, 36 metropolitan boroughs, 20 unitary authorities and 88 shire districts."
+        },
+        {
+          "date": "2007-05-03",
+          "contests": 344,
+          "note": "England 312; Scotland 32 (Boundaries Scotland: 'The Local Government etc. (Scotland) Act 1994 created the 32 single-tier local government areas that cover Scotland.'). Academic research centre, not an official source. The handbook's introduction says England and Scotland voted on 3 May 2007.",
+          "source": "leh-2007",
+          "quote": "In England, 312 local authorities held elections, the majority of which were of the whole council."
+        },
+        {
+          "date": "2008-05-01",
+          "contests": 159,
+          "note": "England 137; Wales 22 (Senedd Research: 'A single tier of 22 unitary authorities was created'). Academic research centre, not an official source.",
+          "source": "leh-2008",
+          "quote": "In 2008 there were elections in England for a total of 137 local authorities comprising 36 metropolitan boroughs, 19 current and 4 ‘shadow’ unitary authorities and 78 shire districts."
+        },
+        {
+          "date": "2009-06-04",
+          "contests": 34,
+          "note": "England 34. Held 4 June 2009 alongside the European Parliament election. Academic research centre, not an official source.",
+          "source": "leh-2009",
+          "quote": "In 2009 there were elections in England for a total of 34 local authorities comprising 27 counties and 7 unitary authorities, three of which, Cornwall, Shropshire and Wiltshire, were replacing former counties."
+        },
+        {
+          "date": "2010-05-06",
+          "contests": 164,
+          "note": "England 164. Academic research centre, not an official source. The House of Commons Library briefing Local elections 2010 (rp10-44, https://commonslibrary.parliament.uk/research-briefings/rp10-44/) lists the same categories (32 + 36 + 20 + 76 = 164) but states no total.",
+          "source": "leh-2010",
+          "quote": "In 2010 there were elections in England for a total of 164 local authorities comprising 32 London boroughs, 36 metropolitan boroughs, 20 unitary authorities and 76 shire districts."
+        },
+        {
+          "date": "2011-05-05",
+          "contests": 305,
+          "note": "England 279; Northern Ireland 26 (ni-2011: 'The elections for Northern Ireland's 26 local councils took place on 5 May, 2011'). Academic research centre, not an official source. The same date is the UK referendum on voting reform.",
+          "source": "leh-2011",
+          "quote": "In 2011 there were elections in England for a total of 279 local authorities comprising 36 metropolitan boroughs, 49 unitary authorities and 194 shire districts."
+        },
+        {
+          "date": "2012-05-03",
+          "contests": 181,
+          "note": "England 128; Scotland 32 (Boundaries Scotland: 'The Local Government etc. (Scotland) Act 1994 created the 32 single-tier local government areas that cover Scotland.'); Wales 21 (22 unitary authorities less Anglesey, postponed to 2013 by SI 2012/686). Conflict: the Electoral Commission's Local elections and referendums in England 2012 report (July 2012, https://www.markpack.org.uk/files/2016/05/Electoral-Commission-Report-Into-May-2012-Elections.pdf, hosted copy) states 'On 3 May 2012 there were local elections to 103 local authorities in England.' The House of Commons Library briefing SN06194 (January 2012) gives 128 before the poll. The 128 figure is used here; the 103 figure is unexplained and should be checked against the report's data.",
+          "source": "ec-2012",
+          "quote": "Local elections were held for just under 2,400 seats in 128 authorities in England."
+        },
+        {
+          "date": "2013-05-02",
+          "contests": 35,
+          "note": "England 34; Wales 1 (the Isle of Anglesey, per the same Commons Library paper). Count is the sum of 27 county councils and 7 unitary authorities named in the briefing. Wikipedia's figure of 35 includes one Welsh council (Anglesey), which is excluded here.",
+          "source": "hocl-2013",
+          "quote": "Elections were held in all 27 shire counties in England (all seats) and seven English unitary authorities"
+        },
+        {
+          "date": "2014-05-22",
+          "contests": 172,
+          "note": "England 161; Northern Ireland 11 (cain-2014: 'held to choose 462 councillors for the new 11 District Councils in Northern Ireland.'). Count is the sum of the four categories in the quoted sentence (32 + 36 + 19 + 74). The Electoral Commission's report on the 22 May 2014 elections says local elections covered 'approximately one third of English local authority areas', which is not a count.",
+          "source": "hocl-2014",
+          "quote": "In England, elections were held in all 32 London boroughs, 36 metropolitan boroughs, 19 unitary authorities, and 74 shire districts."
+        },
+        {
+          "date": "2015-05-07",
+          "contests": 279,
+          "note": "England 279. The Electoral Commission's 2015 UK general election administration report gives the 7 May 2015 English local authority areas as 36 metropolitan boroughs, 194 district authorities and 49 unitary authorities, which sums to 279.",
+          "source": "ec-2015",
+          "quote": "Local elections were held for just over 9,200 seats in 279 authorities in England."
+        },
+        {
+          "date": "2016-05-05",
+          "contests": 124,
+          "note": "England 124. Components in the briefing: 70 district councils, 19 unitary authorities, and 35 metropolitan boroughs (sums to 124).",
+          "source": "hocl-2016",
+          "quote": "Local elections were held for 2,782 seats on 124 local councils in England on 5 May 2016."
+        },
+        {
+          "date": "2017-05-04",
+          "contests": 88,
+          "note": "England 34; Scotland 32 (Boundaries Scotland: 'The Local Government etc. (Scotland) Act 1994 created the 32 single-tier local government areas that cover Scotland.'); Wales 22 (Senedd Research: 'A single tier of 22 unitary authorities was created'). Commons Library Local Elections 2017 (CBP 7975, https://commonslibrary.parliament.uk/research-briefings/cbp-7975/) gives 27 county councils, 6 unitary authorities, and 1 metropolitan borough in England, which also sums to 34.",
+          "source": "ec-2017",
+          "quote": "Local elections were scheduled in 27 counties and seven unitary and metropolitan authorities on 4 May 2017."
+        },
+        {
+          "date": "2018-05-03",
+          "contests": 150,
+          "note": "England 150. The Electoral Commission's Results and turnout 2018 May England local elections report gives 67 district, 17 unitary, 34 metropolitan, and 32 London borough councils, which also sums to 150.",
+          "source": "hocl-2018",
+          "quote": "Elections were held for 4,404 seats in 150 local councils in England on 3 May 2018."
+        },
+        {
+          "date": "2019-05-02",
+          "contests": 259,
+          "note": "England 248; Northern Ireland 11 (ark-2019: 'The 11 District Councils.'). Academic research centre, not an official source. No Commons Library or Electoral Commission total for 2019 was found in the search.",
+          "source": "leh-2019",
+          "quote": "In 2019 there were elections in England for a total of 248 local authorities comprising 33 Metropolitan boroughs, 47 Unitary councils and 168 shire district councils."
+        },
+        {
+          "date": "2021-05-06",
+          "contests": 143,
+          "note": "England 143. The election was held on 6 May 2021, not in June as the brief stated. The Elections Centre Local Elections Handbook 2021 gives the same total (143 = 21 county + 28 unitary + 35 metropolitan + 59 district).",
+          "source": "hocl-2021",
+          "quote": "143 councils in England held local elections on 6 May 2021, along with some that held by-elections to fill seats that had fallen vacant."
+        },
+        {
+          "date": "2022-05-05",
+          "contests": 200,
+          "note": "England 146; Scotland 32 (Boundaries Scotland: 'The Local Government etc. (Scotland) Act 1994 created the 32 single-tier local government areas that cover Scotland.'); Wales 22 (Senedd Research: 'A single tier of 22 unitary authorities was created'). Conflict: the Electoral Commission's Report on the May 2022 local elections in England (https://www.electoralcommission.org.uk/research-reports-and-data/our-reports-and-data-past-elections-and-referendums/report-may-2022-local-elections-england) says 'Elections took place in 165 local authorities in England'. The Commons Library and the Elections Centre handbook (32 + 33 + 21 + 60 = 146) agree on 146, so 146 is used here.",
+          "source": "hocl-2022",
+          "quote": "England held elections in 146 councils, while all 32 councils in Scotland and 22 Welsh councils were up for election."
+        },
+        {
+          "date": "2023-05-04",
+          "contests": 241,
+          "note": "England 230; Northern Ireland 11 (ec-ni-2023: 'A total of 807 candidates contested 462 seats across the 11 councils in Northern Ireland.'). The same page gives 152 district councils, 32 metropolitan districts, and 46 unitary authorities, which sums to 230.",
+          "source": "hocl-2023",
+          "quote": "Elections were held in 230 councils in England on 4 May 2023."
+        },
+        {
+          "date": "2024-05-02",
+          "contests": 107,
+          "note": "England 107",
+          "source": "hocl-2024",
+          "quote": "In 2024 there were elections for a total of 107 local authorities across England."
+        },
+        {
+          "date": "2025-05-01",
+          "contests": 23,
+          "note": "England 23. The 2025 cycle was reduced because the government postponed nine county council elections to 2026. The Electoral Commission's Report on the May 2025 local elections in England gives 14 county councils, eight unitary authorities, and one metropolitan borough, which also sums to 23.",
+          "source": "hocl-2025",
+          "quote": "On 1 May 2025, local elections were held in 23 of England's councils."
+        },
+        {
+          "date": "2026-05-07",
+          "contests": 136,
+          "note": "England 136. Published 14 September 2026. The Commons Library has not yet published a 2026 local elections briefing that was found in the search.",
+          "source": "ec-2026",
+          "quote": "In England, scheduled elections were held for 136 authorities with metropolitan, unitary, district, London borough and county council elections taking place."
+        },
+        {
+          "date": "1973-01-01",
+          "precision": "year",
+          "through": "2001-12-31",
+          "note": "Before 2002, only Northern Ireland's council elections are counted. Counts of the councils that voted each year in England, Scotland, and Wales before 2002 haven't been compiled yet."
+        }
+      ]
+    },
+    {
+      "key": "referendums",
+      "tier": "national",
+      "name": "UK-wide referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "gb.counting_area",
+          "gb.lad",
+          "gb.country",
+          "gb.ep_constituency"
+        ]
+      },
+      "source": "hoc-cbp7529",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "iso_pattern": "GB"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1975-01-01",
+          "precision": "year",
+          "contests": 1,
+          "source": "hoc-cbp7529",
+          "quote": "Table 31: Referendum on membership of the European Community"
+        },
+        {
+          "date": "2011-01-01",
+          "precision": "year",
+          "contests": 1,
+          "source": "hoc-cbp7529",
+          "quote": "Table 36: Results of the referendum on the Alternative Vote"
+        },
+        {
+          "date": "2016-01-01",
+          "precision": "year",
+          "contests": 1,
+          "source": "hoc-cbp7529",
+          "quote": "Table 30: EU referendum results by region"
+        }
+      ]
+    },
+    {
+      "key": "ep",
+      "tier": "national",
+      "name": "European Parliament elections in the UK",
+      "category": "legislature",
+      "goal": "ep",
+      "measure": {
+        "schemes": [
+          "gb.euc",
+          "gb.ep_constituency"
+        ]
+      },
+      "source": "hoc-cbp7529",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "EU"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1979-06-07",
+          "contests": 79,
+          "seats": 81,
+          "source": "hoc-cbp7529",
+          "quote": "Table 15a: Great Britain total 78, Northern Ireland total 3; section 9.3: before 1999 Great Britain elected by First Past the Post from constituencies, Northern Ireland by STV"
+        },
+        {
+          "date": "1984-06-14",
+          "contests": 79,
+          "seats": 81,
+          "source": "hoc-cbp7529",
+          "quote": "Table 15a: Great Britain total 78, Northern Ireland total 3; section 9.3"
+        },
+        {
+          "date": "1989-06-15",
+          "contests": 79,
+          "seats": 81,
+          "source": "hoc-cbp7529",
+          "quote": "Table 15a: Great Britain total 78, Northern Ireland total 3; section 9.3"
+        },
+        {
+          "date": "1994-06-09",
+          "contests": 85,
+          "seats": 87,
+          "source": "hoc-cbp7529",
+          "quote": "Table 15a: Great Britain total 84, Northern Ireland total 3; section 9.3"
+        },
+        {
+          "date": "1999-06-10",
+          "contests": 12,
+          "seats": 87,
+          "source": "hoc-cbp7529",
+          "quote": "Section 9.3: 12 regions, Scotland, Wales, Northern Ireland and the nine English regions"
+        },
+        {
+          "date": "2004-06-10",
+          "contests": 12,
+          "seats": 78,
+          "source": "hoc-cbp7529",
+          "quote": "Section 9.3: 12 regions"
+        },
+        {
+          "date": "2009-06-04",
+          "contests": 12,
+          "seats": 72,
+          "source": "hoc-cbp7529",
+          "quote": "Section 9.3: 12 regions"
+        },
+        {
+          "date": "2014-05-22",
+          "contests": 12,
+          "seats": 73,
+          "source": "hoc-cbp7529",
+          "quote": "Section 9.3: 12 regions"
+        },
+        {
+          "date": "2019-05-23",
+          "contests": 12,
+          "seats": 73,
+          "source": "hoc-cbp7529",
+          "quote": "Section 9.3: 12 regions"
+        }
+      ]
+    }
+  ]
+}
