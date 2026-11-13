@@ -172,6 +172,8 @@ Where a feed splits its counts by ballot type, as Clarity's `VoteType` and Enhan
 
 `live.election` passes the split on as one count per unit, update, and channel, and gives each county baseline the channel mix of the most recent certified result from the same state within the last five years, split by channel: the same office if it was contested, otherwise the president, Senate, or governor race. Each channel's share is its part of the county's votes, and its shift is its share for each option minus the county's share for that option. The live model fits a county with both as one stream per channel; `countsAt()` in `src/lib/live/standing.ts` sums the channels back into one count per unit for the map and tables.
 
+`live.ballots` holds administrative counts of ballots in progress for each county: ballots requested, issued, returned, accepted, rejected, and still remaining, as of a time the source states. Each row carries the fetch that read it, the election, the county unit, the stage, a channel (the core codes above, or 0 when the source gives no split), and the count. One fetch can hold many `as_of` times, because a per-voter file such as North Carolina's absentee file rebuilds a whole returned-by-day series. Readers take the latest `as_of` for each county, stage, and channel. These counts are never results and never become certified values; final ballots cast by channel come from post-count imports into the core tables.
+
 ## Adding a source
 
 Follow these steps to add a source. The example uses a hypothetical source, `xx.example`.
