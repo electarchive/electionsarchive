@@ -1,0 +1,2880 @@
+{
+ "polity": "KR",
+ "name": "South Korea",
+ "create": {
+  "kind": "sovereign_state",
+  "names": [
+   {
+    "text": "South Korea",
+    "lang": "en",
+    "kind": "official"
+   },
+   {
+    "text": "대한민국",
+    "lang": "ko",
+    "kind": "native"
+   }
+  ],
+  "slug": "kr",
+  "wikidata": "Q884",
+  "source": "constitution"
+ },
+ "sources": {
+  "constitution": {
+   "title": "대한민국헌법 (Constitution of the Republic of Korea), wholly amended 29 October 1987, Korean and English",
+   "publisher": "Korea Legislation Research Institute (KLRI), Statutes of the Republic of Korea",
+   "url": "https://elaw.klri.re.kr/kor_service/lawViewMultiContent.do?hseq=1",
+   "kind": "official_body",
+   "note": "Arts. 41 and 42 (National Assembly of at least 200, four-year term), 67, 68, and 70 (direct presidential election, 70 to 40 days before the term ends, single five-year term), 72 and 130 (referendums), and 118 (local councils). law.go.kr was down for maintenance on 2026-11-13; KLRI's bilingual page reproduces the official Korean text."
+  },
+  "poea": {
+   "title": "공직선거법 (Public Official Election Act), as amended to Act No. 20370 of 8 March 2024, Korean and English",
+   "publisher": "Korea Legislation Research Institute (KLRI), Statutes of the Republic of Korea",
+   "url": "https://elaw.klri.re.kr/kor_service/lawViewMultiContent.do?hseq=64713",
+   "kind": "official_body",
+   "note": "Arts. 14, 21 (254 constituency and 46 proportional members), 22 and 23 (sido and sigungu council seats, proportional seats a tenth of constituency seats), and 26 (two- to four-member sigungu council districts); the English page also carries the current Arts. 34 and 35 (by-elections on the first Wednesday of April since the amendment of 29 December 2020)."
+  },
+  "poea2020": {
+   "title": "공직선거법 (Public Official Election Act), as amended to Act No. 17127 of 25 March 2020, Korean and English",
+   "publisher": "Korea Legislation Research Institute (KLRI), Statutes of the Republic of Korea",
+   "url": "https://elaw.klri.re.kr/kor_service/lawViewMultiContent.do?hseq=53845",
+   "kind": "official_body",
+   "note": "Arts. 34 (election days), 35, 36, 187 to 189 (plurality, no runoff; 3 percent or 5 seats for proportional seats), 190-2 (local proportional seats, 5 percent), and 200 (by-elections for constituency seats and heads, succession for proportional seats)."
+  },
+  "leaa": {
+   "title": "지방교육자치에 관한 법률 (Local Education Autonomy Act), as amended to Act No. 10866 of 21 July 2011, Korean and English",
+   "publisher": "Korea Legislation Research Institute (KLRI), Statutes of the Republic of Korea",
+   "url": "https://elaw.klri.re.kr/kor_service/lawViewMultiContent.do?hseq=50993",
+   "kind": "official_body",
+   "note": "Arts. 21 (four-year term, three consecutive terms), 43 (superintendent elected by residents, added 26 February 2010), 44, and 49; the addenda of Act No. 10046 (2010) elect education council members once with the 2010 local elections, for 2010 to 2014 only."
+  },
+  "jeju_act": {
+   "title": "제주특별자치도 설치 및 국제자유도시 조성을 위한 특별법 (Special Act on Jeju Special Self-Governing Province), as amended to Act No. 20626 of 31 December 2024",
+   "publisher": "Korea Legislation Research Institute (KLRI), Statutes of the Republic of Korea",
+   "url": "https://elaw.klri.re.kr/kor_service/lawViewMultiContent.do?hseq=69264",
+   "kind": "official_body",
+   "note": "Arts. 64 to 66 (five education council members of the Jeju council); addenda of Act No. 18840 (20 April 2022), Art. 4: the education council members and committee lapse on 30 June 2026 and no election is held at that expiry."
+  },
+  "laa": {
+   "title": "지방자치법 (Local Autonomy Act), as amended to Act No. 18092 of 20 April 2021, English",
+   "publisher": "Korea Legislation Research Institute (KLRI), Statutes of the Republic of Korea",
+   "url": "https://elaw.klri.re.kr/eng_service/lawViewContent.do?hseq=57596",
+   "kind": "official_body",
+   "note": "Art. 39: the term of local council members is four years."
+  },
+  "nec_history": {
+   "title": "선거통계시스템, 역대선거 실시상황 (Election Statistics System: elections held, BIGI06)",
+   "publisher": "중앙선거관리위원회 (National Election Commission)",
+   "url": "http://info.nec.go.kr/main/showDocument.xhtml?electionId=0000000000&topMenuId=BI&secondMenuId=BIGI06",
+   "kind": "official_body",
+   "note": "POST http://info.nec.go.kr/electioninfo/electionInfo_report.xhtml with electionId=0000000000, statementId=BIGI06, and electionType 1 (president), 2 (vice president), 3 (National Assembly), 4 (local), 5 (by-elections), or 9 (referendums). Read 2026-11-13."
+  },
+  "nec_seats": {
+   "title": "선거통계시스템, 선거구수 및 정수현황 (Election Statistics System: constituencies and seats, BIGI01)",
+   "publisher": "중앙선거관리위원회 (National Election Commission)",
+   "url": "http://info.nec.go.kr/main/showDocument.xhtml?electionId=0000000000&topMenuId=BI&secondMenuId=BIGI01",
+   "kind": "official_body",
+   "note": "Totals rows (합계) per election: pairs of constituencies (선거구수) and seats (정수) per office. The national list counts as one constituency. Read 2026-11-13."
+  },
+  "nec_2026": {
+   "title": "선거통계시스템, 제9회 전국동시지방선거 선거구수 및 정수현황 (9th nationwide local elections, 3 June 2026)",
+   "publisher": "중앙선거관리위원회 (National Election Commission)",
+   "url": "http://info.nec.go.kr/main/showDocument.xhtml?electionId=0020260603&topMenuId=BI&secondMenuId=BIGI01",
+   "kind": "official_body",
+   "note": "Totals row: 16 sido heads, 227 sigungu heads, sido councils 811 constituencies and 933 seats (795 and 804 constituency, 16 and 129 proportional), sigungu councils 1,265 and 3,035 (1,038 and 2,650; 227 and 385), and 16 superintendents; no education council column. Read 2026-11-13."
+  },
+  "nec_results": {
+   "title": "선거통계시스템, 개표현황(투표구별) (Election Statistics System: results by polling district, VCCP08)",
+   "publisher": "중앙선거관리위원회 (National Election Commission)",
+   "url": "http://info.nec.go.kr/main/showDocument.xhtml?electionId=0000000000&topMenuId=VC&secondMenuId=VCCP08",
+   "kind": "official_body",
+   "note": "Per 구·시·군, rows by 읍면동 and 투표구 with electors, votes, and each candidate's votes, plus absentee and early-vote rows; checked for Jongno-gu in the 2007 and 2025 presidential elections. Every table exports as XLS. Earlier years returned no rows with the same parameters."
+  },
+  "nec_museum_na17": {
+   "title": "선거역사관: 제17대 국회의원선거 (Election history museum: the 17th National Assembly election)",
+   "publisher": "중앙선거관리위원회 (National Election Commission)",
+   "url": "https://museum.nec.go.kr/museum2018/bbs/2/1/1/20170912155756377100_view.do?bbs_id=20170912155756377100&article_id=20171208145021256100&article_category=1",
+   "kind": "official_body"
+  },
+  "nec_museum_ncu1972": {
+   "title": "선거역사관: 통일주체국민회의 대의원선거와 제8대 대통령선거 (Election history museum: the 1972 delegate election)",
+   "publisher": "중앙선거관리위원회 (National Election Commission)",
+   "url": "https://museum.nec.go.kr/museum2018/bbs/2/1/1/20170912155756377100_view.do?bbs_id=20170912155756377100&article_id=20171208141201903100&article_category=1",
+   "kind": "official_body"
+  },
+  "nec_museum_ncu1978": {
+   "title": "선거역사관: 제2대 통일주체국민회의 대의원선거와 제9대 대통령선거 (Election history museum: the 1978 delegate election)",
+   "publisher": "중앙선거관리위원회 (National Election Commission)",
+   "url": "https://museum.nec.go.kr/museum2018/bbs/2/2/1/20170912155756377100_view.do?bbs_id=20170912155756377100&article_id=20171208141452579100&article_category=2",
+   "kind": "official_body"
+  },
+  "nara_1981": {
+   "title": "기록으로 보는 오늘: 대통령 선거인단 선거 (1981년 2월 11일)",
+   "publisher": "국가기록원 (National Archives of Korea)",
+   "url": "https://theme.archives.go.kr/next/daily/viewMain.do?selectDay=20140211",
+   "kind": "official_body"
+  },
+  "assembly": {
+   "title": "역대국회 (Past National Assemblies: seats by party)",
+   "publisher": "대한민국 국회 (National Assembly of the Republic of Korea)",
+   "url": "https://www.assembly.go.kr/portal/main/contents.do?menuNo=600161",
+   "kind": "official_body"
+  },
+  "seoul_merger": {
+   "title": "전남광주통합특별시 출범 (Launch of the Jeonnam-Gwangju Integrated Special City, 1 July 2026)",
+   "publisher": "서울특별시 (Seoul Metropolitan Government), 내 손안에 서울",
+   "url": "https://news.seoul.go.kr/gov/archives/578881",
+   "kind": "official_body"
+  },
+  "datagokr_counts": {
+   "title": "중앙선거관리위원회 투·개표 정보 (open API)",
+   "publisher": "공공데이터포털 (data.go.kr)",
+   "url": "https://www.data.go.kr/data/15000900/openapi.do",
+   "kind": "official_body",
+   "note": "JSON and XML from 1960, free key, 이용허락범위 제한 없음 (no restriction on use); modified 2026-01-27."
+  },
+  "datagokr_byelections": {
+   "title": "중앙선거관리위원회 재보궐선거 개표결과 (file data, XLSX)",
+   "publisher": "공공데이터포털 (data.go.kr)",
+   "url": "https://www.data.go.kr/data/15082974/fileData.do",
+   "kind": "official_body"
+  },
+  "sgis": {
+   "title": "통계청 SGIS 행정구역 경계 (administrative boundaries, SHP)",
+   "publisher": "공공데이터포털 (data.go.kr)",
+   "url": "https://www.data.go.kr/data/15141768/fileData.do",
+   "kind": "official_body",
+   "note": "Sido, sigungu, and eup/myeon/dong boundaries as SHP, 이용허락범위 제한 없음; finer census output areas by application at sgis.mods.go.kr. National Assembly constituencies have no official GIS layer; POEA Art. 25 and Annex 1 define them by eup/myeon/dong."
+  }
+ },
+ "tiers": [
+  {
+   "key": "national",
+   "name": "대한민국",
+   "name_en": "Republic of Korea",
+   "parent": null,
+   "polity_kind": "sovereign_state",
+   "scheme": "kr.nation",
+   "source": "constitution"
+  },
+  {
+   "key": "sido",
+   "name": "광역자치단체 (특별시·광역시·특별자치시·도·특별자치도)",
+   "name_en": "Provincial-level governments: the special city, metropolitan cities, special self-governing city, and provinces (sido)",
+   "parent": "national",
+   "polity_kind": "region",
+   "scheme": "kr.sido",
+   "source": "nec_seats",
+   "counts": [
+    {
+     "date": "1995-06-27",
+     "value": 15,
+     "source": "nec_seats",
+     "locator": "1995-06-27 합계 row: 시·도지사 15 | 15"
+    },
+    {
+     "date": "1998-06-04",
+     "value": 16,
+     "source": "nec_seats",
+     "locator": "1998-06-04 합계 row: 시·도지사 16 | 16 (Ulsan a metropolitan city from 1997)"
+    },
+    {
+     "date": "2014-06-04",
+     "value": 17,
+     "source": "nec_seats",
+     "locator": "2014-06-04 합계 row: 시·도지사 17 | 17 (Sejong from 2012)"
+    },
+    {
+     "date": "2026-07-01",
+     "value": 16,
+     "source": "seoul_merger",
+     "locator": "\"2026. 7. 1. 전남광주통합특별시 출범\", replacing Gwangju Metropolitan City and South Jeolla Province; NEC's list for the 3 June 2026 elections has 16 시·도지사"
+    }
+   ]
+  },
+  {
+   "key": "sigungu",
+   "name": "기초자치단체 (시·군·자치구)",
+   "name_en": "Municipal-level governments: cities, counties, and autonomous districts (sigungu)",
+   "parent": "sido",
+   "polity_kind": "municipality",
+   "scheme": "kr.sigungu",
+   "source": "nec_seats",
+   "counts": [
+    {
+     "date": "1995-06-27",
+     "value": 230,
+     "source": "nec_seats",
+     "locator": "1995-06-27 합계 row: 구·시·군의 장 230 | 230"
+    },
+    {
+     "date": "1998-06-04",
+     "value": 232,
+     "source": "nec_seats",
+     "locator": "1998-06-04 합계 row: 구·시·군의 장 232 | 232"
+    },
+    {
+     "date": "2006-05-31",
+     "value": 230,
+     "source": "nec_seats",
+     "locator": "2006-05-31 합계 row: 구·시·군의 장 230 | 230 (Jeju's four basic governments abolished in 2006)"
+    },
+    {
+     "date": "2010-06-02",
+     "value": 228,
+     "source": "nec_seats",
+     "locator": "2010-06-02 합계 row: 구·시·군의 장 228 | 228"
+    },
+    {
+     "date": "2014-06-04",
+     "value": 226,
+     "source": "nec_seats",
+     "locator": "2014-06-04 합계 row: 구·시·군의 장 226 | 226"
+    },
+    {
+     "date": "2026-06-03",
+     "value": 227,
+     "source": "nec_2026",
+     "locator": "9th local elections 합계 row: 구·시·군의 장 227 | 227"
+    }
+   ]
+  },
+  {
+   "key": "sieupmyeon",
+   "name": "시·읍·면 (1949-1961)",
+   "name_en": "Cities, towns, and townships as basic local governments, 1949-1961",
+   "parent": "sido",
+   "polity_kind": "municipality",
+   "scheme": "kr.sieupmyeon",
+   "valid_from": "1949-07-04",
+   "valid_to": "1961-10-01",
+   "source": "nec_history",
+   "counts": [
+    {
+     "date": "1960-12-26",
+     "value": 1468,
+     "source": "nec_history",
+     "locator": "시·읍·면장선거 | 1960.12.26 | 1,468 | 75.4% (one head per city, town, and township)"
+    }
+   ]
+  },
+  {
+   "key": "emd",
+   "name": "읍·면·동",
+   "name_en": "Towns, townships, and neighborhoods (eup, myeon, and dong)",
+   "parent": "sigungu",
+   "polity_kind": "submunicipal",
+   "scheme": "kr.emd",
+   "elects": false,
+   "source": "sgis"
+  }
+ ],
+ "classes": [
+  {
+   "key": "president",
+   "tier": "national",
+   "name": "대통령선거",
+   "name_en": "Presidential elections by direct vote",
+   "category": "executive",
+   "goal": "national",
+   "first_held": "1952-08-05",
+   "earliest_record": "1952-08-05",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "kr.sido"
+    ],
+    "fine": [
+     "kr.sigungu",
+     "kr.emd",
+     "kr.tupyogu"
+    ]
+   },
+   "note": "Direct election by plurality with no runoff (Constitution Art. 67; POEA Art. 187), for four years from 1952 to 1971 and a single five-year term since 1987 (Art. 70). A tie goes to the National Assembly, and a sole candidate needs a third of the electorate. 1972 to 1981 the president was chosen indirectly (class president_indirect).",
+   "source": "constitution",
+   "locator": "https://elaw.klri.re.kr/kor_service/lawViewMultiContent.do?hseq=1 (Arts. 67, 68, and 70)",
+   "est_votes": 34000000,
+   "effort": 1,
+   "finest_note": "투표구 (polling district) inside each 읍면동, in NEC's 개표현황(투표구별) for 2007 and 2025 at least; older elections by 구·시·군 or 읍면동",
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "special"
+     ],
+     "office_kinds": [
+      "head_of_state"
+     ],
+     "iso_pattern": "KR"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "phase": 2,
+     "month": 12,
+     "term_years": 5,
+     "called": false,
+     "runoff": "none",
+     "administered_by": "National Election Commission",
+     "source": "constitution",
+     "locator": "https://elaw.klri.re.kr/kor_service/lawViewMultiContent.do?hseq=1 (Art. 68(1): \"임기만료 70일 내지 40일전에 후임자를 선거한다\"; Art. 70: five years); terms ran from 25 February",
+     "valid_from": "1987-10-29",
+     "valid_to": "2017-03-10"
+    },
+    {
+     "period_years": 5,
+     "phase": 2,
+     "month": 3,
+     "term_years": 5,
+     "called": false,
+     "runoff": "none",
+     "administered_by": "National Election Commission",
+     "source": "poea2020",
+     "locator": "https://elaw.klri.re.kr/kor_service/lawViewMultiContent.do?hseq=53845 (Art. 34(1)1: \"대통령선거는 그 임기만료일전 70일 이후 첫번째 수요일\"); the term begun on 10 May 2017 ended on 9 May 2022",
+     "valid_from": "2017-03-10",
+     "valid_to": "2025-04-04"
+    },
+    {
+     "period_years": 5,
+     "phase": 0,
+     "month": 3,
+     "term_years": 5,
+     "called": false,
+     "runoff": "none",
+     "administered_by": "National Election Commission",
+     "source": "poea2020",
+     "locator": "https://elaw.klri.re.kr/kor_service/lawViewMultiContent.do?hseq=53845 (Art. 34(1)1); the term begun on 4 June 2025 ends on 3 June 2030, so the 70th day before is 25 March 2030",
+     "valid_from": "2025-04-04",
+     "vacancy_rule": "A vacancy election within 60 days of the vacancy (Constitution Art. 68(2); POEA Art. 35(1)); the winner starts a full five-year term on being declared."
+    }
+   ],
+   "access": [
+    {
+     "platform": "NEC 선거통계시스템 (info.nec.go.kr), 대통령선거",
+     "url": "http://info.nec.go.kr/main/showDocument.xhtml?electionId=0000000000&topMenuId=VC&secondMenuId=VCCP08",
+     "format": "html, xls",
+     "access": "open",
+     "checked_at": "2026-11-13",
+     "first_date": "1952-08-05",
+     "source": "nec_results",
+     "evidence": "Every presidential election from 1948 in 역대선거; 개표현황(투표구별) returns polling-district rows for Jongno-gu in 2007 and 2025 and none for 1987 or 1997 with the same parameters",
+     "finest": "kr.tupyogu"
+    },
+    {
+     "platform": "data.go.kr 중앙선거관리위원회 투·개표 정보 API",
+     "url": "https://www.data.go.kr/data/15000900/openapi.do",
+     "format": "json, xml",
+     "access": "open",
+     "checked_at": "2026-11-13",
+     "license": "이용허락범위 제한 없음 (no restriction on use)",
+     "source": "datagokr_counts",
+     "evidence": "Vote and count data by election (sgId), type, sido, and sigungu, from 1960; free key; usually posted two months after an election"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1952-08-05",
+     "source": "nec_history",
+     "quote": "제2대 | 1952.07.18 | 1952.08.05 | 이승만 | 직접선출",
+     "contests": 1
+    },
+    {
+     "date": "1956-05-15",
+     "source": "nec_history",
+     "quote": "제3대 | 1956.05.15 | 이승만 | 직접선출",
+     "contests": 1
+    },
+    {
+     "date": "1960-03-15",
+     "source": "nec_history",
+     "quote": "제4대 | 1960.02.03(수) | 1960.03.15(화) | 이승만 | 직접선출",
+     "contests": 1,
+     "note": "Annulled after the April Revolution of 1960; the Assembly elected Yun Po-sun on 12 August 1960 (class president_indirect)."
+    },
+    {
+     "date": "1963-10-15",
+     "source": "nec_history",
+     "quote": "제5대 | 1963.10.15 | 박정희 | 직접선출",
+     "contests": 1
+    },
+    {
+     "date": "1967-05-03",
+     "source": "nec_history",
+     "quote": "제6대 | 1967.05.03 | 박정희 | 직접선출",
+     "contests": 1
+    },
+    {
+     "date": "1971-04-27",
+     "source": "nec_history",
+     "quote": "제7대 | 1971.04.27 | 박정희 | 직접선출",
+     "contests": 1
+    },
+    {
+     "date": "1987-12-16",
+     "source": "nec_history",
+     "quote": "제13대 | 1987.12.16 | 노태우 | 직접선출",
+     "contests": 1
+    },
+    {
+     "date": "1992-12-18",
+     "source": "nec_history",
+     "quote": "제14대 | 1992.12.18 | 김영삼 | 직접선출",
+     "contests": 1
+    },
+    {
+     "date": "1997-12-18",
+     "source": "nec_history",
+     "quote": "제15대 | 법정화 | 1997.12.18 | 김대중 | 직접선출",
+     "contests": 1
+    },
+    {
+     "date": "2002-12-19",
+     "source": "nec_history",
+     "quote": "제16대 | 법정화 | 2002.12.19 | 노무현 | 직접선출",
+     "contests": 1
+    },
+    {
+     "date": "2007-12-19",
+     "source": "nec_history",
+     "quote": "제17대 | 법정화 | 2007.12.19 | 이명박 | 직접선출",
+     "contests": 1
+    },
+    {
+     "date": "2012-12-19",
+     "source": "nec_history",
+     "quote": "제18대 | 법정화 | 2012.12.19 | 박근혜 | 직접선출",
+     "contests": 1
+    },
+    {
+     "date": "2017-05-09",
+     "source": "nec_history",
+     "quote": "제19대 | 2017.05.09 | 문재인 | 직접선출",
+     "contests": 1,
+     "election_kind": "special",
+     "note": "Vacancy election after the Constitutional Court removed Park Geun-hye on 10 March 2017."
+    },
+    {
+     "date": "2022-03-09",
+     "source": "nec_history",
+     "quote": "제20대 | 법정화 | 2022.03.09 | 윤석열 | 직접선출",
+     "contests": 1
+    },
+    {
+     "date": "2025-06-03",
+     "source": "nec_history",
+     "quote": "제21대 | 2025.04.08(화) | 2025.06.03(화) | 이재명 | 직접선출",
+     "contests": 1,
+     "election_kind": "special",
+     "note": "Vacancy election after the Constitutional Court removed Yoon Suk Yeol on 4 April 2025."
+    },
+    {
+     "date": "2030-03-01",
+     "precision": "month",
+     "note": "Next regular election: the term that began on 4 June 2025 ends on 3 June 2030, and Art. 34(1)1 sets the first Wednesday from the 70th day before, 27 March 2030, unless Art. 34(2) moves it."
+    }
+   ]
+  },
+  {
+   "key": "president_indirect",
+   "tier": "national",
+   "name": "대통령 간접선거 (국회, 통일주체국민회의, 대통령선거인단)",
+   "name_en": "Presidents elected indirectly: by the National Assembly, the National Conference for Unification, or the 1981 electoral college",
+   "category": "indirect",
+   "goal": "national",
+   "first_held": "1948-07-20",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "The Constituent Assembly elected the first president in 1948 and the Assembly elected Yun Po-sun in 1960; under the Yushin constitution the National Conference for Unification elected the president in 1972, 1978, 1979, and 1980, and an electoral college of 5,278 chose Chun Doo-hwan in 1981.",
+   "source": "nec_history",
+   "est_votes": 5300,
+   "effort": 3,
+   "match": [
+    {
+     "election_kinds": [
+      "indirect"
+     ],
+     "office_kinds": [
+      "head_of_state"
+     ],
+     "iso_pattern": "KR"
+    }
+   ],
+   "access": [
+    {
+     "platform": "NEC 선거통계시스템 (info.nec.go.kr), 대통령선거 (역대선거 실시상황)",
+     "url": "http://info.nec.go.kr/main/showDocument.xhtml?electionId=0000000000&topMenuId=VC&secondMenuId=VCCP08",
+     "format": "html, xls",
+     "access": "open",
+     "checked_at": "2026-11-13",
+     "first_date": "1948-07-20",
+     "source": "nec_results",
+     "evidence": "역대선거 lists each indirect election with its method (국회선출, 통일주체국민회의선출, or 대통령선거인단선출) and the candidates' votes"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1948-07-20",
+     "source": "nec_history",
+     "quote": "초대 | 1948.07.20 | 이승만 | 국회선출",
+     "contests": 1
+    },
+    {
+     "date": "1960-08-12",
+     "source": "nec_history",
+     "quote": "제4대 | 1960.08.10(수) | 1960.08.12(금) | 윤보선 | 국회선출",
+     "contests": 1
+    },
+    {
+     "date": "1972-12-23",
+     "source": "nec_history",
+     "quote": "제8대 | 1972.12.23 | 박정희 | 통일주체국민회의선출",
+     "contests": 1
+    },
+    {
+     "date": "1978-07-06",
+     "source": "nec_history",
+     "quote": "제9대 | 1978.07.06 | 박정희 | 통일주체국민회의선출",
+     "contests": 1
+    },
+    {
+     "date": "1979-12-06",
+     "source": "nec_history",
+     "quote": "제10대 | 1979.12.06 | 최규하 | 통일주체국민회의선출",
+     "contests": 1
+    },
+    {
+     "date": "1980-08-27",
+     "source": "nec_history",
+     "quote": "제11대 | 1980.08.27 | 전두환 | 통일주체국민회의선출",
+     "contests": 1
+    },
+    {
+     "date": "1981-02-25",
+     "source": "nec_history",
+     "quote": "제12대 | 1981.01.24(토) | 1981.02.25(수) | 전두환 | 대통령선거인단선출",
+     "contests": 1
+    }
+   ]
+  },
+  {
+   "key": "vice_president",
+   "tier": "national",
+   "name": "부통령선거",
+   "name_en": "Vice-presidential elections",
+   "category": "executive",
+   "goal": "national",
+   "first_held": "1948-07-20",
+   "valid_to": "1960-06-15",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "kr.sido"
+    ]
+   },
+   "note": "The Assembly elected the vice president in 1948 and again on 16 May 1951 after Yi Si-yeong resigned; the people elected one in 1952, 1956, and 1960, on a separate ballot from the president. The office was abolished with the constitution of 15 June 1960.",
+   "source": "nec_history",
+   "est_votes": 9000000,
+   "effort": 3,
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "indirect",
+      "special"
+     ],
+     "name_pattern": "(부통령|Vice[- ]President)",
+     "iso_pattern": "KR",
+     "valid_to": "1960-06-15"
+    }
+   ],
+   "access": [
+    {
+     "platform": "NEC 선거통계시스템 (info.nec.go.kr), 부통령선거",
+     "url": "http://info.nec.go.kr/main/showDocument.xhtml?electionId=0000000000&topMenuId=VC&secondMenuId=VCCP08",
+     "format": "html, xls",
+     "access": "open",
+     "checked_at": "2026-11-13",
+     "first_date": "1948-07-20",
+     "source": "nec_results",
+     "evidence": "역대선거 electionType 2 lists all five votes with each candidate's votes"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1948-07-20",
+     "source": "nec_history",
+     "quote": "초대 | 1948.07.18 | 1948.07.20 | 이시영 | 국회선출",
+     "contests": 1,
+     "election_kind": "indirect"
+    },
+    {
+     "date": "1951-05-16",
+     "source": "nec_history",
+     "quote": "제2대 | 1951.05.16(화) | 김성수 | 국회선출 (재적 210, 재석 152)",
+     "contests": 1,
+     "election_kind": "indirect"
+    },
+    {
+     "date": "1952-08-05",
+     "source": "nec_history",
+     "quote": "제3대 | 1952.07.18 | 1952.08.05(화) | 함태영 | 직접선출",
+     "contests": 1
+    },
+    {
+     "date": "1956-05-15",
+     "source": "nec_history",
+     "quote": "제4대 | 1956.03.28 | 1956.05.15(화) | 장면 | 직접선출",
+     "contests": 1
+    },
+    {
+     "date": "1960-03-15",
+     "source": "nec_history",
+     "quote": "제5대 | 1960.02.03 | 1960.03.15(화) | 이기붕 | 직접선출",
+     "contests": 1,
+     "note": "Annulled after the April Revolution."
+    }
+   ]
+  },
+  {
+   "key": "na",
+   "tier": "national",
+   "name": "국회의원선거 (지역구)",
+   "name_en": "National Assembly elections: constituency seats",
+   "category": "legislature",
+   "goal": "national",
+   "first_held": "1948-05-10",
+   "earliest_record": "1948-05-10",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "kr.na_constituency"
+    ],
+    "fine": [
+     "kr.emd",
+     "kr.tupyogu"
+    ]
+   },
+   "note": "Single-member plurality since 1988 (POEA Arts. 21(2) and 188; a tie goes to the elder), with 254 constituencies since 2024. 1948 to 1971 single-member districts; 1973 to 1985 two-member districts; the 1948 vote elected the Constituent Assembly. The 1960 House of Representatives (민의원) is this class; the 1960 House of Councillors is councillors_1960.",
+   "source": "poea",
+   "locator": "https://elaw.klri.re.kr/kor_service/lawViewMultiContent.do?hseq=64713 (Art. 21: \"지역구국회의원 254명과 비례대표국회의원 46명을 합하여 300명\")",
+   "est_votes": 29000000,
+   "effort": 1,
+   "finest_note": "투표구 in NEC's 개표현황(투표구별) for recent elections; constituencies are defined by eup/myeon/dong in POEA Annex 1, with no official GIS layer",
+   "boundary_source": "sgis",
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "special"
+     ],
+     "body_kinds": [
+      "lower_house",
+      "unicameral",
+      "constituent_assembly"
+     ],
+     "contest_kinds": [
+      "body_seats",
+      "office"
+     ],
+     "iso_pattern": "KR"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 0,
+     "month": 4,
+     "day_rule": "wednesday_from_apr_9",
+     "term_years": 4,
+     "called": false,
+     "runoff": "none",
+     "administered_by": "National Election Commission and its sido and sigungu election commissions",
+     "source": "poea2020",
+     "locator": "https://elaw.klri.re.kr/kor_service/lawViewMultiContent.do?hseq=53845 (Art. 34(1)2: \"국회의원선거는 그 임기만료일전 50일 이후 첫번째 수요일\"; Art. 34(2) moves it a week when it or the day beside it is a holiday)",
+     "valid_from": "2004-04-16"
+    },
+    {
+     "period_years": 4,
+     "phase": 0,
+     "month": 4,
+     "term_years": 4,
+     "called": false,
+     "runoff": "none",
+     "administered_by": "National Election Commission",
+     "source": "constitution",
+     "locator": "https://elaw.klri.re.kr/kor_service/lawViewMultiContent.do?hseq=1 (Art. 42: \"국회의원의 임기는 4년으로 한다\"; the Assembly cannot be dissolved); held 1988-04-26, 1992-03-24, 1996-04-11, and 2000-04-13",
+     "valid_from": "1987-10-29",
+     "valid_to": "2004-04-16"
+    }
+   ],
+   "access": [
+    {
+     "platform": "NEC 선거통계시스템 (info.nec.go.kr), 국회의원선거",
+     "url": "http://info.nec.go.kr/main/showDocument.xhtml?electionId=0000000000&topMenuId=VC&secondMenuId=VCCP08",
+     "format": "html, xls",
+     "access": "open",
+     "checked_at": "2026-11-13",
+     "first_date": "1948-05-10",
+     "source": "nec_results",
+     "evidence": "역대선거 and 선거구수 및 정수현황 cover every Assembly from 1948; 당선인명부 lists members of the 1st to 22nd Assemblies; polling-district tables checked only for recent elections"
+    },
+    {
+     "platform": "data.go.kr 중앙선거관리위원회 투·개표 정보 API",
+     "url": "https://www.data.go.kr/data/15000900/openapi.do",
+     "format": "json, xml",
+     "access": "open",
+     "checked_at": "2026-11-13",
+     "license": "이용허락범위 제한 없음 (no restriction on use)",
+     "source": "datagokr_counts",
+     "evidence": "Vote and count data by election (sgId), type, sido, and sigungu, from 1960; free key; usually posted two months after an election"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1948-05-10",
+     "source": "nec_seats",
+     "quote": "합계 | 200 | 200 | 200 | 200",
+     "contests": 200,
+     "seats": 200
+    },
+    {
+     "date": "1950-05-30",
+     "source": "nec_seats",
+     "quote": "합계 | 210 | 210 | 210 | 210",
+     "contests": 210,
+     "seats": 210
+    },
+    {
+     "date": "1954-05-20",
+     "source": "nec_seats",
+     "quote": "합계 | 203 | 203 | 203 | 203",
+     "contests": 203,
+     "seats": 203
+    },
+    {
+     "date": "1958-05-02",
+     "source": "nec_seats",
+     "quote": "합계 | 233 | 233 | 233 | 233",
+     "contests": 233,
+     "seats": 233
+    },
+    {
+     "date": "1960-07-29",
+     "source": "nec_seats",
+     "quote": "합계 | 243 | 291 | 233 | 233 | 10 | 58 (민의원 233; 참의원 10 districts and 58 seats)",
+     "contests": 233,
+     "seats": 233
+    },
+    {
+     "date": "1963-11-26",
+     "source": "nec_seats",
+     "quote": "합계 | 132 | 175 | 131 | 131 | 1 | 44",
+     "contests": 131,
+     "seats": 131
+    },
+    {
+     "date": "1967-06-08",
+     "source": "nec_seats",
+     "quote": "합계 | 132 | 175 | 131 | 131 | 1 | 44",
+     "contests": 131,
+     "seats": 131
+    },
+    {
+     "date": "1971-05-25",
+     "source": "nec_seats",
+     "quote": "합계 | 153 | 153 | 153 | 153",
+     "contests": 153,
+     "seats": 153
+    },
+    {
+     "date": "1973-02-27",
+     "source": "nec_seats",
+     "quote": "합계 | 73 | 146 | 73 | 146",
+     "contests": 73,
+     "seats": 146
+    },
+    {
+     "date": "1978-12-12",
+     "source": "nec_seats",
+     "quote": "합계 | 77 | 154 | 77 | 154",
+     "contests": 77,
+     "seats": 154
+    },
+    {
+     "date": "1981-03-25",
+     "source": "nec_seats",
+     "quote": "합계 | 93 | 276 | 92 | 184 | 1 | 92",
+     "contests": 92,
+     "seats": 184
+    },
+    {
+     "date": "1985-02-12",
+     "source": "nec_seats",
+     "quote": "합계 | 93 | 276 | 92 | 184 | 1 | 92",
+     "contests": 92,
+     "seats": 184
+    },
+    {
+     "date": "1988-04-26",
+     "source": "nec_seats",
+     "quote": "합계 | 225 | 299 | 224 | 224 | 1 | 75",
+     "contests": 224,
+     "seats": 224
+    },
+    {
+     "date": "1992-03-24",
+     "source": "nec_seats",
+     "quote": "합계 | 238 | 299 | 237 | 237 | 1 | 62",
+     "contests": 237,
+     "seats": 237
+    },
+    {
+     "date": "1996-04-11",
+     "source": "nec_seats",
+     "quote": "합계 | 254 | 299 | 253 | 253 | 1 | 46",
+     "contests": 253,
+     "seats": 253
+    },
+    {
+     "date": "2000-04-13",
+     "source": "nec_seats",
+     "quote": "합계 | 228 | 273 | 227 | 227 | 1 | 46",
+     "contests": 227,
+     "seats": 227
+    },
+    {
+     "date": "2004-04-15",
+     "source": "nec_seats",
+     "quote": "합계 | 244 | 299 | 243 | 243 | 1 | 56",
+     "contests": 243,
+     "seats": 243
+    },
+    {
+     "date": "2008-04-09",
+     "source": "nec_seats",
+     "quote": "합계 | 246 | 299 | 245 | 245 | 1 | 54",
+     "contests": 245,
+     "seats": 245
+    },
+    {
+     "date": "2012-04-11",
+     "source": "nec_seats",
+     "quote": "합계 | 247 | 300 | 246 | 246 | 1 | 54",
+     "contests": 246,
+     "seats": 246
+    },
+    {
+     "date": "2016-04-13",
+     "source": "nec_seats",
+     "quote": "합계 | 254 | 300 | 253 | 253 | 1 | 47",
+     "contests": 253,
+     "seats": 253
+    },
+    {
+     "date": "2020-04-15",
+     "source": "nec_seats",
+     "quote": "합계 | 254 | 300 | 253 | 253 | 1 | 47",
+     "contests": 253,
+     "seats": 253
+    },
+    {
+     "date": "2024-04-10",
+     "source": "nec_seats",
+     "quote": "합계 | 255 | 300 | 254 | 254 | 1 | 46",
+     "contests": 254,
+     "seats": 254
+    }
+   ]
+  },
+  {
+   "key": "na_pr",
+   "tier": "national",
+   "name": "국회의원선거 (전국구·비례대표)",
+   "name_en": "National Assembly elections: national list and proportional seats",
+   "category": "legislature",
+   "goal": "national",
+   "first_held": "1963-11-26",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "kr.nation"
+    ],
+    "fine": [
+     "kr.sido",
+     "kr.sigungu",
+     "kr.emd",
+     "kr.tupyogu"
+    ]
+   },
+   "note": "National list seats (전국구) from 1963, allocated from the constituency vote until 2000; a separate party-list ballot from 2004 (one person, two votes), with 3 percent or five constituency seats to qualify (POEA Art. 189). Semi-linked compensation since 2020. Vacancies pass down the list (Art. 200(2)), so there are no proportional by-elections. The 1973 and 1978 Yujeonghoe seats are a separate class.",
+   "source": "nec_museum_na17",
+   "locator": "https://museum.nec.go.kr/museum2018/bbs/2/1/1/20170912155756377100_view.do?bbs_id=20170912155756377100&article_id=20171208145021256100&article_category=1 (\"국회의원선거 사상 처음으로 비례대표제가 도입되어 지역후보자 이외에 정당에 또 한번 투표하는 1인 2표제가 실시되었다\")",
+   "est_votes": 29000000,
+   "effort": 2,
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "lower_house",
+      "unicameral"
+     ],
+     "contest_kinds": [
+      "list_allocation"
+     ],
+     "iso_pattern": "KR"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 0,
+     "month": 4,
+     "day_rule": "wednesday_from_apr_9",
+     "term_years": 4,
+     "called": false,
+     "runoff": "none",
+     "administered_by": "National Election Commission and its sido and sigungu election commissions",
+     "source": "poea2020",
+     "locator": "https://elaw.klri.re.kr/kor_service/lawViewMultiContent.do?hseq=53845 (Art. 34(1)2: \"국회의원선거는 그 임기만료일전 50일 이후 첫번째 수요일\"; Art. 34(2) moves it a week when it or the day beside it is a holiday)",
+     "valid_from": "2004-04-16"
+    }
+   ],
+   "access": [
+    {
+     "platform": "NEC 선거통계시스템 (info.nec.go.kr), 비례대표국회의원선거",
+     "url": "http://info.nec.go.kr/main/showDocument.xhtml?electionId=0000000000&topMenuId=VC&secondMenuId=VCCP08",
+     "format": "html, xls",
+     "access": "open",
+     "checked_at": "2026-11-13",
+     "first_date": "2004-04-15",
+     "source": "nec_results",
+     "evidence": "The 비례대표국회의원선거 sub-election carries the party-list vote from 2004; earlier national-list seats appear only in the seat tables"
+    },
+    {
+     "platform": "data.go.kr 중앙선거관리위원회 투·개표 정보 API",
+     "url": "https://www.data.go.kr/data/15000900/openapi.do",
+     "format": "json, xml",
+     "access": "open",
+     "checked_at": "2026-11-13",
+     "license": "이용허락범위 제한 없음 (no restriction on use)",
+     "source": "datagokr_counts",
+     "evidence": "Vote and count data by election (sgId), type, sido, and sigungu, from 1960; free key; usually posted two months after an election"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1963-11-26",
+     "source": "nec_seats",
+     "quote": "합계 | 132 | 175 | 131 | 131 | 1 | 44",
+     "contests": 1,
+     "seats": 44
+    },
+    {
+     "date": "1967-06-08",
+     "source": "nec_seats",
+     "quote": "합계 | 132 | 175 | 131 | 131 | 1 | 44",
+     "contests": 1,
+     "seats": 44
+    },
+    {
+     "date": "1971-05-25",
+     "source": "assembly",
+     "quote": "제8대 국회 합계 | 204 (51)석; the NEC row omits the 전국구 seats",
+     "contests": 1,
+     "seats": 51
+    },
+    {
+     "date": "1981-03-25",
+     "source": "nec_seats",
+     "quote": "합계 | 93 | 276 | 92 | 184 | 1 | 92",
+     "contests": 1,
+     "seats": 92
+    },
+    {
+     "date": "1985-02-12",
+     "source": "nec_seats",
+     "quote": "합계 | 93 | 276 | 92 | 184 | 1 | 92",
+     "contests": 1,
+     "seats": 92
+    },
+    {
+     "date": "1988-04-26",
+     "source": "nec_seats",
+     "quote": "합계 | 225 | 299 | 224 | 224 | 1 | 75",
+     "contests": 1,
+     "seats": 75
+    },
+    {
+     "date": "1992-03-24",
+     "source": "nec_seats",
+     "quote": "합계 | 238 | 299 | 237 | 237 | 1 | 62",
+     "contests": 1,
+     "seats": 62
+    },
+    {
+     "date": "1996-04-11",
+     "source": "nec_seats",
+     "quote": "합계 | 254 | 299 | 253 | 253 | 1 | 46",
+     "contests": 1,
+     "seats": 46
+    },
+    {
+     "date": "2000-04-13",
+     "source": "nec_seats",
+     "quote": "합계 | 228 | 273 | 227 | 227 | 1 | 46",
+     "contests": 1,
+     "seats": 46
+    },
+    {
+     "date": "2004-04-15",
+     "source": "nec_seats",
+     "quote": "합계 | 244 | 299 | 243 | 243 | 1 | 56",
+     "contests": 1,
+     "seats": 56
+    },
+    {
+     "date": "2008-04-09",
+     "source": "nec_seats",
+     "quote": "합계 | 246 | 299 | 245 | 245 | 1 | 54",
+     "contests": 1,
+     "seats": 54
+    },
+    {
+     "date": "2012-04-11",
+     "source": "nec_seats",
+     "quote": "합계 | 247 | 300 | 246 | 246 | 1 | 54",
+     "contests": 1,
+     "seats": 54
+    },
+    {
+     "date": "2016-04-13",
+     "source": "nec_seats",
+     "quote": "합계 | 254 | 300 | 253 | 253 | 1 | 47",
+     "contests": 1,
+     "seats": 47
+    },
+    {
+     "date": "2020-04-15",
+     "source": "nec_seats",
+     "quote": "합계 | 254 | 300 | 253 | 253 | 1 | 47",
+     "contests": 1,
+     "seats": 47
+    },
+    {
+     "date": "2024-04-10",
+     "source": "nec_seats",
+     "quote": "합계 | 255 | 300 | 254 | 254 | 1 | 46",
+     "contests": 1,
+     "seats": 46
+    }
+   ]
+  },
+  {
+   "key": "na_by",
+   "tier": "national",
+   "name": "국회의원 재선거·보궐선거",
+   "name_en": "National Assembly by-elections and re-elections",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "kr.na_constituency"
+    ],
+    "fine": [
+     "kr.emd",
+     "kr.tupyogu"
+    ]
+   },
+   "note": "A vacant constituency seat is filled by a by-election (보궐선거) and a voided election by a re-election (재선거) (POEA Arts. 195 and 200(1)); no by-election in the last year of the term. Since the amendment of 29 December 2020 they are held once a year on the first Wednesday of April. Not enumerated here: NEC's 재·보궐선거 table lists every one.",
+   "source": "poea",
+   "locator": "https://elaw.klri.re.kr/eng_service/lawViewContent.do?hseq=64713 (Art. 35(2)1 as amended 29 December 2020: special elections and re-elections once a year on the first Wednesday of April; heads of local governments also in October)",
+   "est_votes": 1000000,
+   "effort": 2,
+   "match": [
+    {
+     "election_kinds": [
+      "by_election"
+     ],
+     "body_kinds": [
+      "lower_house",
+      "unicameral"
+     ],
+     "iso_pattern": "KR"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 1,
+     "phase": 0,
+     "month": 4,
+     "day_rule": "apr_first_wednesday",
+     "term_years": 4,
+     "called": true,
+     "runoff": "none",
+     "administered_by": "National Election Commission",
+     "source": "poea",
+     "locator": "https://elaw.klri.re.kr/eng_service/lawViewContent.do?hseq=64713 (Art. 35(2)1 as amended 29 December 2020: special elections and re-elections once a year on the first Wednesday of April; heads of local governments also in October)",
+     "valid_from": "2020-12-29",
+     "vacancy_rule": "Held only when a constituency seat falls vacant or an election is voided; a cause that becomes definite less than 30 days before the April date waits for the next year's."
+    }
+   ],
+   "access": [
+    {
+     "platform": "NEC 선거통계시스템 (info.nec.go.kr), 재·보궐선거",
+     "url": "http://info.nec.go.kr/main/showDocument.xhtml?electionId=0000000000&topMenuId=VC&secondMenuId=VCCP08",
+     "format": "html, xls",
+     "access": "open",
+     "checked_at": "2026-11-13",
+     "source": "nec_results",
+     "evidence": "역대선거 electionType 5 lists by-elections; results in the same 개표현황 menus"
+    },
+    {
+     "platform": "data.go.kr 중앙선거관리위원회 재보궐선거 개표결과",
+     "url": "https://www.data.go.kr/data/15082974/fileData.do",
+     "format": "xlsx",
+     "access": "open",
+     "checked_at": "2026-11-13",
+     "source": "datagokr_byelections",
+     "evidence": "File data of by-election count results; years covered unchecked"
+    }
+   ]
+  },
+  {
+   "key": "councillors_1960",
+   "tier": "national",
+   "name": "참의원의원선거",
+   "name_en": "House of Councillors election (1960)",
+   "category": "legislature",
+   "goal": "national",
+   "first_held": "1960-07-29",
+   "valid_from": "1960-06-15",
+   "valid_to": "1961-05-16",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "kr.sido"
+    ]
+   },
+   "note": "The Second Republic's upper house: 58 councillors from 10 province-wide districts, elected with the House of Representatives on 29 July 1960 for six years; dissolved by the coup of 16 May 1961.",
+   "source": "nec_history",
+   "est_votes": 9000000,
+   "effort": 3,
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "upper_house"
+     ],
+     "iso_pattern": "KR"
+    }
+   ],
+   "access": [
+    {
+     "platform": "NEC 선거통계시스템 (info.nec.go.kr), 국회의원선거 (제5대 참의원)",
+     "url": "http://info.nec.go.kr/main/showDocument.xhtml?electionId=0000000000&topMenuId=VC&secondMenuId=VCCP08",
+     "format": "html, xls",
+     "access": "open",
+     "checked_at": "2026-11-13",
+     "first_date": "1960-07-29",
+     "source": "nec_results",
+     "evidence": "역대선거 lists the 참의원 election beside the 민의원"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1960-07-29",
+     "source": "nec_history",
+     "quote": "제5대(참의원) | 1960.06.27(월) | 1960.07.29(금) | 33 | 1960.07.29~1961.05.16 (6년)",
+     "contests": 10,
+     "seats": 58
+    }
+   ]
+  },
+  {
+   "key": "referendums",
+   "tier": "national",
+   "name": "국민투표",
+   "name_en": "National referendums",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "first_held": "1962-12-17",
+   "measure": {
+    "unit": "question",
+    "grain": [
+     "kr.sido"
+    ]
+   },
+   "note": "Constitutional amendments go to a referendum within 30 days of the Assembly's two-thirds vote and pass with a majority of votes cast by a majority of the electorate (Constitution Art. 130); the president may also put important policy to a vote (Art. 72). Six held, the last on 27 October 1987.",
+   "source": "constitution",
+   "locator": "https://elaw.klri.re.kr/kor_service/lawViewMultiContent.do?hseq=1 (Arts. 72 and 130)",
+   "est_votes": 20000000,
+   "effort": 2,
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "iso_pattern": "KR"
+    }
+   ],
+   "access": [
+    {
+     "platform": "NEC 선거통계시스템 (info.nec.go.kr), 국민투표",
+     "url": "http://info.nec.go.kr/main/showDocument.xhtml?electionId=0000000000&topMenuId=VC&secondMenuId=VCCP08",
+     "format": "html, xls",
+     "access": "open",
+     "checked_at": "2026-11-13",
+     "first_date": "1962-12-17",
+     "source": "nec_results",
+     "evidence": "역대선거 electionType 9 gives electors, turnout, yes, and no for each referendum and per sido"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1962-12-17",
+     "source": "nec_history",
+     "quote": "1962.12.17 | 12,412,798 | 10,585,998(85.3%) | 8,339,333(78.8%) | 헌법개정",
+     "contests": 1
+    },
+    {
+     "date": "1969-10-17",
+     "source": "nec_history",
+     "quote": "1969.10.17 | 15,048,925 | 11,604,038(77.1%) | 7,553,655(65.1%) | 헌법개정",
+     "contests": 1
+    },
+    {
+     "date": "1972-11-21",
+     "source": "nec_history",
+     "quote": "1972.11.21 | 15,676,395 | 14,410,714(91.9%) | 13,186,559(91.5%) | 헌법개정",
+     "contests": 1
+    },
+    {
+     "date": "1975-02-12",
+     "source": "nec_history",
+     "quote": "1975.02.12(수) | 1975.01.22(수) | 1975.02.05(수) | 33,290,921 | 16,788,839 | 13,404,245(79.8%) | 9,800,201(73.1%) | 3,384,594 | 헌법개정 및 정부신임",
+     "contests": 1
+    },
+    {
+     "date": "1980-10-22",
+     "source": "nec_history",
+     "quote": "1980.10.22 | 20,373,869 | 19,453,926(95.5%) | 17,829,354(91.6%) | 헌법개정",
+     "contests": 1
+    },
+    {
+     "date": "1987-10-27",
+     "source": "nec_history",
+     "quote": "1987.10.27 | 25,619,648 | 20,028,672(78.2%) | 18,640,625(93.1%) | 헌법개정",
+     "contests": 1
+    }
+   ]
+  },
+  {
+   "key": "ncu_delegates",
+   "tier": "national",
+   "name": "통일주체국민회의 대의원선거",
+   "name_en": "National Conference for Unification delegate elections (1972 and 1978)",
+   "category": "indirect",
+   "goal": "national",
+   "first_held": "1972-12-15",
+   "valid_to": "1980-10-27",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Delegates (2,000 to 5,000) elected by popular vote in small districts under the Yushin constitution; the Conference then elected the president and a third of the Assembly (Yujeonghoe). NEC's statistics system does not carry these elections; NEC's 대한민국선거사 volumes and the official gazette are the leads.",
+   "source": "nec_museum_ncu1978",
+   "est_votes": 13000000,
+   "effort": 4,
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "electoral_college"
+     ],
+     "name_pattern": "(통일주체국민회의|National Conference for Unification)"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1972-12-15",
+     "source": "nec_museum_ncu1972",
+     "quote": "제1대 통일주체국민회의 대의원선거 | 1972.12.15 ... 2,000명 이상 5,000명 이하의 대의원으로 구성",
+     "note": "2,359 delegates attended the presidential vote of 23 December 1972; the number elected is not printed on NEC's page."
+    },
+    {
+     "date": "1978-05-18",
+     "source": "nec_museum_ncu1978",
+     "quote": "제2대 통일주체국민회의 대의원선거가 5월 18일 실시되었고, 2,583명의 대의원이 선출되었다",
+     "seats": 2583
+    }
+   ]
+  },
+  {
+   "key": "electors_1981",
+   "tier": "national",
+   "name": "대통령선거인선거",
+   "name_en": "Presidential elector election (1981)",
+   "category": "indirect",
+   "goal": "national",
+   "first_held": "1981-02-11",
+   "valid_from": "1980-10-27",
+   "valid_to": "1987-10-29",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Under the 1980 constitution the people elected a presidential electoral college, which chose the president on 25 February 1981. Not in NEC's statistics system.",
+   "source": "nara_1981",
+   "est_votes": 16000000,
+   "effort": 4,
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "electoral_college"
+     ],
+     "name_pattern": "(선거인단|[Ee]lectoral [Cc]ollege|[Ee]lectors)",
+     "valid_from": "1980-10-27",
+     "valid_to": "1987-10-29"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1981-02-11",
+     "source": "nara_1981",
+     "quote": "제12대 대통령을 선출하기 위한 대통령 선거인단 선거가 1981년 2월 11일 실시되었다. 1,905개 선거구에서 5,278명의 선거인단이 선출되었다.",
+     "contests": 1905,
+     "seats": 5278
+    }
+   ]
+  },
+  {
+   "key": "yujeonghoe",
+   "tier": "national",
+   "name": "유신정우회 국회의원 선출 (통일주체국민회의)",
+   "name_en": "Assembly members elected by the National Conference for Unification (Yujeonghoe, 1973 and 1978)",
+   "category": "indirect",
+   "goal": "national",
+   "first_held": "1973-01-01",
+   "valid_from": "1972-12-27",
+   "valid_to": "1980-10-27",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "A third of the Assembly, nominated by the president and approved en bloc by the National Conference for Unification: 73 members in 1973 and 77 in 1978. Exact dates of the Conference votes are not in the sources read.",
+   "source": "assembly",
+   "est_votes": 2600,
+   "effort": 4,
+   "match": [
+    {
+     "election_kinds": [
+      "indirect"
+     ],
+     "body_kinds": [
+      "lower_house",
+      "unicameral"
+     ],
+     "iso_pattern": "KR",
+     "valid_from": "1972-12-27",
+     "valid_to": "1980-10-27"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1973-01-01",
+     "source": "assembly",
+     "quote": "제9대 국회 합계 | 219석 (NEC: 73 districts and 146 constituency seats)",
+     "seats": 73,
+     "precision": "year"
+    },
+    {
+     "date": "1978-01-01",
+     "source": "assembly",
+     "quote": "제10대 국회 합계 | 231석 (NEC: 77 districts and 154 constituency seats)",
+     "seats": 77,
+     "precision": "year"
+    }
+   ]
+  },
+  {
+   "key": "sido_head",
+   "tier": "sido",
+   "name": "시·도지사선거",
+   "name_en": "Mayors of the special and metropolitan cities and provincial governors",
+   "category": "executive",
+   "goal": "subnational",
+   "first_held": "1960-12-29",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "kr.sido"
+    ],
+    "fine": [
+     "kr.sigungu",
+     "kr.emd",
+     "kr.tupyogu"
+    ]
+   },
+   "note": "Elected once in 1960 (Seoul's mayor and the governors, 29 December) and in every nationwide local election since 1995, by plurality for four years, at most three consecutive terms.",
+   "source": "nec_history",
+   "est_votes": 26000000,
+   "effort": 2,
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "local"
+     ],
+     "office_kinds": [
+      "governor",
+      "mayor",
+      "head_of_government"
+     ],
+     "iso_pattern": "KR-*"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 2,
+     "month": 6,
+     "day_rule": "wednesday_from_may_31_unless_jun_6",
+     "term_years": 4,
+     "called": false,
+     "runoff": "none",
+     "administered_by": "National Election Commission and its sido and sigungu election commissions",
+     "source": "poea2020",
+     "locator": "https://elaw.klri.re.kr/kor_service/lawViewMultiContent.do?hseq=53845 (Art. 34(1)3: \"지방의회의원 및 지방자치단체의 장의 선거는 그 임기만료일전 30일 이후 첫번째 수요일\"; terms end 30 June)",
+     "valid_from": "2004-04-16"
+    },
+    {
+     "period_years": 4,
+     "phase": 2,
+     "month": 6,
+     "term_years": 4,
+     "called": false,
+     "runoff": "none",
+     "administered_by": "National Election Commission and its sido and sigungu election commissions",
+     "source": "nec_history",
+     "locator": "BIGI06 local rows: 제2회 1998.06.04 and 제3회 2002.06.13 (the first nationwide local elections of 1995.06.27 elected a three-year term)",
+     "valid_from": "1995-06-28",
+     "valid_to": "2004-04-16"
+    }
+   ],
+   "access": [
+    {
+     "platform": "NEC 선거통계시스템 (info.nec.go.kr), 지방선거",
+     "url": "http://info.nec.go.kr/main/showDocument.xhtml?electionId=0000000000&topMenuId=VC&secondMenuId=VCCP08",
+     "format": "html, xls",
+     "access": "open",
+     "checked_at": "2026-11-13",
+     "source": "nec_results",
+     "first_date": "1960-12-29",
+     "evidence": "역대선거 lists every local election from 1952 with seats per office; results by 구·시·군, 읍면동 (VCCP04), and 투표구 (VCCP08) as HTML tables with XLS export; how far back the polling-district tables go is unchecked"
+    },
+    {
+     "platform": "data.go.kr 중앙선거관리위원회 투·개표 정보 API",
+     "url": "https://www.data.go.kr/data/15000900/openapi.do",
+     "format": "json, xml",
+     "access": "open",
+     "checked_at": "2026-11-13",
+     "license": "이용허락범위 제한 없음 (no restriction on use)",
+     "source": "datagokr_counts",
+     "evidence": "Vote and count data by election (sgId), type, sido, and sigungu, from 1960; free key; usually posted two months after an election"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1960-12-29",
+     "source": "nec_history",
+     "quote": "서울시장 및 도지사선거 | 1960.12.29(목) | 10 | 38.8%",
+     "contests": 10,
+     "seats": 10
+    },
+    {
+     "date": "1995-06-27",
+     "source": "nec_seats",
+     "quote": "시·도지사: 15 | 15 (선거구수 | 정수)",
+     "contests": 15,
+     "seats": 15
+    },
+    {
+     "date": "1998-06-04",
+     "source": "nec_seats",
+     "quote": "시·도지사: 16 | 16 (선거구수 | 정수)",
+     "contests": 16,
+     "seats": 16
+    },
+    {
+     "date": "2002-06-13",
+     "source": "nec_seats",
+     "quote": "시·도지사: 16 | 16 (선거구수 | 정수)",
+     "contests": 16,
+     "seats": 16
+    },
+    {
+     "date": "2006-05-31",
+     "source": "nec_seats",
+     "quote": "시·도지사: 16 | 16 (선거구수 | 정수)",
+     "contests": 16,
+     "seats": 16
+    },
+    {
+     "date": "2010-06-02",
+     "source": "nec_seats",
+     "quote": "시·도지사: 16 | 16 (선거구수 | 정수)",
+     "contests": 16,
+     "seats": 16
+    },
+    {
+     "date": "2014-06-04",
+     "source": "nec_seats",
+     "quote": "시·도지사: 17 | 17 (선거구수 | 정수)",
+     "contests": 17,
+     "seats": 17
+    },
+    {
+     "date": "2018-06-13",
+     "source": "nec_seats",
+     "quote": "시·도지사: 17 | 17 (선거구수 | 정수)",
+     "contests": 17,
+     "seats": 17
+    },
+    {
+     "date": "2022-06-01",
+     "source": "nec_seats",
+     "quote": "시·도지사: 17 | 17 (선거구수 | 정수)",
+     "contests": 17,
+     "seats": 17
+    },
+    {
+     "date": "2026-06-03",
+     "source": "nec_2026",
+     "quote": "시·도지사: 16 | 16 (선거구수 | 정수)",
+     "contests": 16,
+     "seats": 16
+    }
+   ]
+  },
+  {
+   "key": "sido_council",
+   "tier": "sido",
+   "name": "시·도의회의원선거 (지역구)",
+   "name_en": "Metropolitan and provincial councils: constituency seats",
+   "category": "council",
+   "goal": "subnational",
+   "first_held": "1952-05-10",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "kr.sido_council_constituency"
+    ],
+    "fine": [
+     "kr.emd",
+     "kr.tupyogu"
+    ]
+   },
+   "note": "Provincial and Seoul councils were elected in 1952, 1956, and 1960 and dissolved in 1961; restored on 20 June 1991 and elected with every nationwide local election since 1995, single-member plurality (POEA Art. 22: twice the number of sigungu, adjustable by a fifth).",
+   "source": "poea",
+   "locator": "https://elaw.klri.re.kr/kor_service/lawViewMultiContent.do?hseq=64713 (Art. 22)",
+   "est_votes": 26000000,
+   "effort": 2,
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "local"
+     ],
+     "body_kinds": [
+      "council",
+      "unicameral"
+     ],
+     "contest_kinds": [
+      "body_seats",
+      "office"
+     ],
+     "iso_pattern": "KR-*"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 2,
+     "month": 6,
+     "day_rule": "wednesday_from_may_31_unless_jun_6",
+     "term_years": 4,
+     "called": false,
+     "runoff": "none",
+     "administered_by": "National Election Commission and its sido and sigungu election commissions",
+     "source": "poea2020",
+     "locator": "https://elaw.klri.re.kr/kor_service/lawViewMultiContent.do?hseq=53845 (Art. 34(1)3: \"지방의회의원 및 지방자치단체의 장의 선거는 그 임기만료일전 30일 이후 첫번째 수요일\"; terms end 30 June)",
+     "valid_from": "2004-04-16"
+    },
+    {
+     "period_years": 4,
+     "phase": 2,
+     "month": 6,
+     "term_years": 4,
+     "called": false,
+     "runoff": "none",
+     "administered_by": "National Election Commission and its sido and sigungu election commissions",
+     "source": "nec_history",
+     "locator": "BIGI06 local rows: 제2회 1998.06.04 and 제3회 2002.06.13 (the first nationwide local elections of 1995.06.27 elected a three-year term)",
+     "valid_from": "1995-06-28",
+     "valid_to": "2004-04-16"
+    }
+   ],
+   "access": [
+    {
+     "platform": "NEC 선거통계시스템 (info.nec.go.kr), 지방선거",
+     "url": "http://info.nec.go.kr/main/showDocument.xhtml?electionId=0000000000&topMenuId=VC&secondMenuId=VCCP08",
+     "format": "html, xls",
+     "access": "open",
+     "checked_at": "2026-11-13",
+     "source": "nec_results",
+     "first_date": "1952-05-10",
+     "evidence": "역대선거 lists every local election from 1952 with seats per office; results by 구·시·군, 읍면동 (VCCP04), and 투표구 (VCCP08) as HTML tables with XLS export; how far back the polling-district tables go is unchecked"
+    },
+    {
+     "platform": "data.go.kr 중앙선거관리위원회 투·개표 정보 API",
+     "url": "https://www.data.go.kr/data/15000900/openapi.do",
+     "format": "json, xml",
+     "access": "open",
+     "checked_at": "2026-11-13",
+     "license": "이용허락범위 제한 없음 (no restriction on use)",
+     "source": "datagokr_counts",
+     "evidence": "Vote and count data by election (sgId), type, sido, and sigungu, from 1960; free key; usually posted two months after an election"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1952-05-10",
+     "source": "nec_history",
+     "quote": "시·도의회의원선거 | 1952.05.10 | 306 | 81.2%",
+     "seats": 306
+    },
+    {
+     "date": "1956-08-13",
+     "source": "nec_history",
+     "quote": "시·도의회의원선거 | 1956.08.13 | 437 | 85.8%",
+     "seats": 437
+    },
+    {
+     "date": "1960-12-12",
+     "source": "nec_history",
+     "quote": "시·도의회의원선거 | 1960.12.12 | 487 | 67.4%",
+     "seats": 487
+    },
+    {
+     "date": "1991-06-20",
+     "source": "nec_history",
+     "quote": "시·도의회의원선거 | 1991.06.20(목) | 866 | 58.9%",
+     "seats": 866
+    },
+    {
+     "date": "1995-06-27",
+     "source": "nec_seats",
+     "quote": "시·도의회 지역구: 875 | 875 (선거구수 | 정수)",
+     "contests": 875,
+     "seats": 875
+    },
+    {
+     "date": "1998-06-04",
+     "source": "nec_seats",
+     "quote": "시·도의회 지역구: 616 | 616 (선거구수 | 정수)",
+     "contests": 616,
+     "seats": 616
+    },
+    {
+     "date": "2002-06-13",
+     "source": "nec_seats",
+     "quote": "시·도의회 지역구: 609 | 609 (선거구수 | 정수)",
+     "contests": 609,
+     "seats": 609
+    },
+    {
+     "date": "2006-05-31",
+     "source": "nec_seats",
+     "quote": "시·도의회 지역구: 655 | 655 (선거구수 | 정수)",
+     "contests": 655,
+     "seats": 655
+    },
+    {
+     "date": "2010-06-02",
+     "source": "nec_seats",
+     "quote": "시·도의회 지역구: 680 | 680 (선거구수 | 정수)",
+     "contests": 680,
+     "seats": 680
+    },
+    {
+     "date": "2014-06-04",
+     "source": "nec_seats",
+     "quote": "시·도의회 지역구: 705 | 705 (선거구수 | 정수)",
+     "contests": 705,
+     "seats": 705
+    },
+    {
+     "date": "2018-06-13",
+     "source": "nec_seats",
+     "quote": "시·도의회 지역구: 737 | 737 (선거구수 | 정수)",
+     "contests": 737,
+     "seats": 737
+    },
+    {
+     "date": "2022-06-01",
+     "source": "nec_seats",
+     "quote": "시·도의회 지역구: 779 | 779 (선거구수 | 정수)",
+     "contests": 779,
+     "seats": 779
+    },
+    {
+     "date": "2026-06-03",
+     "source": "nec_2026",
+     "quote": "시·도의회 지역구: 795 | 804 (선거구수 | 정수)",
+     "contests": 795,
+     "seats": 804
+    }
+   ]
+  },
+  {
+   "key": "sido_council_pr",
+   "tier": "sido",
+   "name": "시·도의회의원선거 (비례대표)",
+   "name_en": "Metropolitan and provincial councils: proportional seats",
+   "category": "council",
+   "goal": "subnational",
+   "first_held": "1995-06-27",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "kr.sido"
+    ],
+    "fine": [
+     "kr.sigungu",
+     "kr.emd",
+     "kr.tupyogu"
+    ]
+   },
+   "note": "One list per sido, a tenth of the constituency seats and at least three (POEA Art. 22(4)), 5 percent threshold and no party over two thirds (Art. 190-2); a separate party ballot since 2002.",
+   "source": "poea",
+   "locator": "https://elaw.klri.re.kr/kor_service/lawViewMultiContent.do?hseq=64713 (Art. 22(4))",
+   "est_votes": 26000000,
+   "effort": 2,
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "local"
+     ],
+     "body_kinds": [
+      "council",
+      "unicameral"
+     ],
+     "contest_kinds": [
+      "list_allocation"
+     ],
+     "iso_pattern": "KR-*"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 2,
+     "month": 6,
+     "day_rule": "wednesday_from_may_31_unless_jun_6",
+     "term_years": 4,
+     "called": false,
+     "runoff": "none",
+     "administered_by": "National Election Commission and its sido and sigungu election commissions",
+     "source": "poea2020",
+     "locator": "https://elaw.klri.re.kr/kor_service/lawViewMultiContent.do?hseq=53845 (Art. 34(1)3: \"지방의회의원 및 지방자치단체의 장의 선거는 그 임기만료일전 30일 이후 첫번째 수요일\"; terms end 30 June)",
+     "valid_from": "2004-04-16"
+    },
+    {
+     "period_years": 4,
+     "phase": 2,
+     "month": 6,
+     "term_years": 4,
+     "called": false,
+     "runoff": "none",
+     "administered_by": "National Election Commission and its sido and sigungu election commissions",
+     "source": "nec_history",
+     "locator": "BIGI06 local rows: 제2회 1998.06.04 and 제3회 2002.06.13 (the first nationwide local elections of 1995.06.27 elected a three-year term)",
+     "valid_from": "1995-06-28",
+     "valid_to": "2004-04-16"
+    }
+   ],
+   "access": [
+    {
+     "platform": "NEC 선거통계시스템 (info.nec.go.kr), 지방선거",
+     "url": "http://info.nec.go.kr/main/showDocument.xhtml?electionId=0000000000&topMenuId=VC&secondMenuId=VCCP08",
+     "format": "html, xls",
+     "access": "open",
+     "checked_at": "2026-11-13",
+     "source": "nec_results",
+     "first_date": "1995-06-27",
+     "evidence": "역대선거 lists every local election from 1952 with seats per office; results by 구·시·군, 읍면동 (VCCP04), and 투표구 (VCCP08) as HTML tables with XLS export; how far back the polling-district tables go is unchecked"
+    },
+    {
+     "platform": "data.go.kr 중앙선거관리위원회 투·개표 정보 API",
+     "url": "https://www.data.go.kr/data/15000900/openapi.do",
+     "format": "json, xml",
+     "access": "open",
+     "checked_at": "2026-11-13",
+     "license": "이용허락범위 제한 없음 (no restriction on use)",
+     "source": "datagokr_counts",
+     "evidence": "Vote and count data by election (sgId), type, sido, and sigungu, from 1960; free key; usually posted two months after an election"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1995-06-27",
+     "source": "nec_seats",
+     "quote": "시·도의회 비례대표: 15 | 97 (선거구수 | 정수)",
+     "contests": 15,
+     "seats": 97
+    },
+    {
+     "date": "1998-06-04",
+     "source": "nec_seats",
+     "quote": "시·도의회 비례대표: 16 | 74 (선거구수 | 정수)",
+     "contests": 16,
+     "seats": 74
+    },
+    {
+     "date": "2002-06-13",
+     "source": "nec_seats",
+     "quote": "시·도의회 비례대표: 16 | 73 (선거구수 | 정수)",
+     "contests": 16,
+     "seats": 73
+    },
+    {
+     "date": "2006-05-31",
+     "source": "nec_seats",
+     "quote": "시·도의회 비례대표: 16 | 78 (선거구수 | 정수)",
+     "contests": 16,
+     "seats": 78
+    },
+    {
+     "date": "2010-06-02",
+     "source": "nec_seats",
+     "quote": "시·도의회 비례대표: 16 | 81 (선거구수 | 정수)",
+     "contests": 16,
+     "seats": 81
+    },
+    {
+     "date": "2014-06-04",
+     "source": "nec_seats",
+     "quote": "시·도의회 비례대표: 17 | 84 (선거구수 | 정수)",
+     "contests": 17,
+     "seats": 84
+    },
+    {
+     "date": "2018-06-13",
+     "source": "nec_seats",
+     "quote": "시·도의회 비례대표: 17 | 87 (선거구수 | 정수)",
+     "contests": 17,
+     "seats": 87
+    },
+    {
+     "date": "2022-06-01",
+     "source": "nec_seats",
+     "quote": "시·도의회 비례대표: 17 | 93 (선거구수 | 정수)",
+     "contests": 17,
+     "seats": 93
+    },
+    {
+     "date": "2026-06-03",
+     "source": "nec_2026",
+     "quote": "시·도의회 비례대표: 16 | 129 (선거구수 | 정수)",
+     "contests": 16,
+     "seats": 129
+    }
+   ]
+  },
+  {
+   "key": "superintendent",
+   "tier": "sido",
+   "name": "교육감선거",
+   "name_en": "Superintendents of education",
+   "category": "executive",
+   "goal": "subnational",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "kr.sido"
+    ],
+    "fine": [
+     "kr.sigungu",
+     "kr.emd",
+     "kr.tupyogu"
+    ]
+   },
+   "note": "Elected by residents (Local Education Autonomy Act Art. 43, added 26 February 2010) with the nationwide local elections since 2010, without party labels, for four years and at most three terms (Art. 21). Superintendents were first elected directly one at a time as terms ended from 2007; before that school steering committee members chose them (out of scope, school_committee).",
+   "source": "leaa",
+   "locator": "https://elaw.klri.re.kr/kor_service/lawViewMultiContent.do?hseq=50993 (Arts. 21 and 43)",
+   "est_votes": 26000000,
+   "effort": 2,
+   "match": [
+    {
+     "name_pattern": "(교육감|[Ss]uperintendent)",
+     "iso_pattern": "KR-*",
+     "precedence": 1
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 2,
+     "month": 6,
+     "day_rule": "wednesday_from_may_31_unless_jun_6",
+     "term_years": 4,
+     "called": false,
+     "runoff": "none",
+     "administered_by": "National Election Commission and its sido and sigungu election commissions",
+     "source": "poea2020",
+     "locator": "https://elaw.klri.re.kr/kor_service/lawViewMultiContent.do?hseq=53845 (Art. 34(1)3: \"지방의회의원 및 지방자치단체의 장의 선거는 그 임기만료일전 30일 이후 첫번째 수요일\"; terms end 30 June)",
+     "valid_from": "2010-02-26",
+     "partisan": false
+    }
+   ],
+   "access": [
+    {
+     "platform": "NEC 선거통계시스템 (info.nec.go.kr), 교육감선거",
+     "url": "http://info.nec.go.kr/main/showDocument.xhtml?electionId=0000000000&topMenuId=VC&secondMenuId=VCCP08",
+     "format": "html, xls",
+     "access": "open",
+     "checked_at": "2026-11-13",
+     "first_date": "2010-06-02",
+     "source": "nec_results",
+     "evidence": "The 교육감선거 menu holds the simultaneous elections from 2010; earlier individual elections unchecked"
+    },
+    {
+     "platform": "data.go.kr 중앙선거관리위원회 투·개표 정보 API",
+     "url": "https://www.data.go.kr/data/15000900/openapi.do",
+     "format": "json, xml",
+     "access": "open",
+     "checked_at": "2026-11-13",
+     "license": "이용허락범위 제한 없음 (no restriction on use)",
+     "source": "datagokr_counts",
+     "evidence": "Vote and count data by election (sgId), type, sido, and sigungu, from 1960; free key; usually posted two months after an election"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2010-06-02",
+     "source": "nec_seats",
+     "quote": "교육감: 16 | 16 (선거구수 | 정수)",
+     "contests": 16,
+     "seats": 16
+    },
+    {
+     "date": "2014-06-04",
+     "source": "nec_seats",
+     "quote": "교육감: 17 | 17 (선거구수 | 정수)",
+     "contests": 17,
+     "seats": 17
+    },
+    {
+     "date": "2018-06-13",
+     "source": "nec_seats",
+     "quote": "교육감: 17 | 17 (선거구수 | 정수)",
+     "contests": 17,
+     "seats": 17
+    },
+    {
+     "date": "2022-06-01",
+     "source": "nec_seats",
+     "quote": "교육감: 17 | 17 (선거구수 | 정수)",
+     "contests": 17,
+     "seats": 17
+    },
+    {
+     "date": "2026-06-03",
+     "source": "nec_2026",
+     "quote": "교육감: 16 | 16 (선거구수 | 정수)",
+     "contests": 16,
+     "seats": 16
+    }
+   ]
+  },
+  {
+   "key": "edu_council",
+   "tier": "sido",
+   "name": "교육의원선거",
+   "name_en": "Education council members",
+   "category": "council",
+   "goal": "subnational",
+   "first_held": "2006-05-31",
+   "valid_to": "2026-07-01",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Elected by residents for the education committees of every sido council once, in 2010 (82 seats, terms to 30 June 2014, Local Education Autonomy Act addenda of Act No. 10046), and in Jeju alone from 2006 to 2022 (5 seats). The Jeju seats lapsed on 30 June 2026 and were not elected in 2026 (Jeju Special Act, addenda of Act No. 18840, Art. 4).",
+   "source": "jeju_act",
+   "locator": "https://elaw.klri.re.kr/kor_service/lawViewMultiContent.do?hseq=69264 (addenda of Act No. 18840, Art. 4: \"2026년 6월 30일 임기만료에 따른 교육의원선거는 실시하지 아니한다\")",
+   "est_votes": 12000000,
+   "effort": 3,
+   "match": [
+    {
+     "name_pattern": "(교육의원|[Ee]ducation council)",
+     "iso_pattern": "KR-*",
+     "precedence": 1
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 2,
+     "month": 6,
+     "day_rule": "wednesday_from_may_31_unless_jun_6",
+     "term_years": 4,
+     "called": false,
+     "runoff": "none",
+     "administered_by": "National Election Commission and its sido and sigungu election commissions",
+     "source": "poea2020",
+     "locator": "https://elaw.klri.re.kr/kor_service/lawViewMultiContent.do?hseq=53845 (Art. 34(1)3: \"지방의회의원 및 지방자치단체의 장의 선거는 그 임기만료일전 30일 이후 첫번째 수요일\"; terms end 30 June)",
+     "valid_from": "2006-05-01",
+     "valid_to": "2026-07-01",
+     "partisan": false
+    }
+   ],
+   "access": [
+    {
+     "platform": "NEC 선거통계시스템 (info.nec.go.kr), 지방선거",
+     "url": "http://info.nec.go.kr/main/showDocument.xhtml?electionId=0000000000&topMenuId=VC&secondMenuId=VCCP08",
+     "format": "html, xls",
+     "access": "open",
+     "checked_at": "2026-11-13",
+     "source": "nec_results",
+     "first_date": "2006-05-31",
+     "evidence": "역대선거 lists every local election from 1952 with seats per office; results by 구·시·군, 읍면동 (VCCP04), and 투표구 (VCCP08) as HTML tables with XLS export; how far back the polling-district tables go is unchecked"
+    },
+    {
+     "platform": "data.go.kr 중앙선거관리위원회 투·개표 정보 API",
+     "url": "https://www.data.go.kr/data/15000900/openapi.do",
+     "format": "json, xml",
+     "access": "open",
+     "checked_at": "2026-11-13",
+     "license": "이용허락범위 제한 없음 (no restriction on use)",
+     "source": "datagokr_counts",
+     "evidence": "Vote and count data by election (sgId), type, sido, and sigungu, from 1960; free key; usually posted two months after an election"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2006-05-31",
+     "source": "nec_seats",
+     "quote": "교육의원: 5 | 5 (선거구수 | 정수)",
+     "contests": 5,
+     "seats": 5
+    },
+    {
+     "date": "2010-06-02",
+     "source": "nec_seats",
+     "quote": "교육의원: 82 | 82 (선거구수 | 정수)",
+     "contests": 82,
+     "seats": 82
+    },
+    {
+     "date": "2014-06-04",
+     "source": "nec_seats",
+     "quote": "교육의원: 5 | 5 (선거구수 | 정수)",
+     "contests": 5,
+     "seats": 5
+    },
+    {
+     "date": "2018-06-13",
+     "source": "nec_seats",
+     "quote": "교육의원: 5 | 5 (선거구수 | 정수)",
+     "contests": 5,
+     "seats": 5
+    },
+    {
+     "date": "2022-06-01",
+     "source": "nec_seats",
+     "quote": "교육의원: 5 | 5 (선거구수 | 정수)",
+     "contests": 5,
+     "seats": 5
+    }
+   ]
+  },
+  {
+   "key": "sigungu_head",
+   "tier": "sigungu",
+   "name": "구·시·군의 장 선거",
+   "name_en": "Heads of cities, counties, and autonomous districts",
+   "category": "executive",
+   "goal": "local",
+   "first_held": "1995-06-27",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "kr.sigungu"
+    ],
+    "fine": [
+     "kr.emd",
+     "kr.tupyogu"
+    ]
+   },
+   "note": "Elected by plurality for four years, at most three consecutive terms, with every nationwide local election since 1995.",
+   "source": "nec_seats",
+   "est_votes": 26000000,
+   "effort": 2,
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "local"
+     ],
+     "office_kinds": [
+      "mayor",
+      "head_of_government",
+      "governor"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ],
+     "valid_from": "1991-01-01"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 2,
+     "month": 6,
+     "day_rule": "wednesday_from_may_31_unless_jun_6",
+     "term_years": 4,
+     "called": false,
+     "runoff": "none",
+     "administered_by": "National Election Commission and its sido and sigungu election commissions",
+     "source": "poea2020",
+     "locator": "https://elaw.klri.re.kr/kor_service/lawViewMultiContent.do?hseq=53845 (Art. 34(1)3: \"지방의회의원 및 지방자치단체의 장의 선거는 그 임기만료일전 30일 이후 첫번째 수요일\"; terms end 30 June)",
+     "valid_from": "2004-04-16"
+    },
+    {
+     "period_years": 4,
+     "phase": 2,
+     "month": 6,
+     "term_years": 4,
+     "called": false,
+     "runoff": "none",
+     "administered_by": "National Election Commission and its sido and sigungu election commissions",
+     "source": "nec_history",
+     "locator": "BIGI06 local rows: 제2회 1998.06.04 and 제3회 2002.06.13 (the first nationwide local elections of 1995.06.27 elected a three-year term)",
+     "valid_from": "1995-06-28",
+     "valid_to": "2004-04-16"
+    }
+   ],
+   "access": [
+    {
+     "platform": "NEC 선거통계시스템 (info.nec.go.kr), 지방선거",
+     "url": "http://info.nec.go.kr/main/showDocument.xhtml?electionId=0000000000&topMenuId=VC&secondMenuId=VCCP08",
+     "format": "html, xls",
+     "access": "open",
+     "checked_at": "2026-11-13",
+     "source": "nec_results",
+     "first_date": "1995-06-27",
+     "evidence": "역대선거 lists every local election from 1952 with seats per office; results by 구·시·군, 읍면동 (VCCP04), and 투표구 (VCCP08) as HTML tables with XLS export; how far back the polling-district tables go is unchecked"
+    },
+    {
+     "platform": "data.go.kr 중앙선거관리위원회 투·개표 정보 API",
+     "url": "https://www.data.go.kr/data/15000900/openapi.do",
+     "format": "json, xml",
+     "access": "open",
+     "checked_at": "2026-11-13",
+     "license": "이용허락범위 제한 없음 (no restriction on use)",
+     "source": "datagokr_counts",
+     "evidence": "Vote and count data by election (sgId), type, sido, and sigungu, from 1960; free key; usually posted two months after an election"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1995-06-27",
+     "source": "nec_seats",
+     "quote": "구·시·군의 장: 230 | 230 (선거구수 | 정수)",
+     "contests": 230,
+     "seats": 230
+    },
+    {
+     "date": "1998-06-04",
+     "source": "nec_seats",
+     "quote": "구·시·군의 장: 232 | 232 (선거구수 | 정수)",
+     "contests": 232,
+     "seats": 232
+    },
+    {
+     "date": "2002-06-13",
+     "source": "nec_seats",
+     "quote": "구·시·군의 장: 232 | 232 (선거구수 | 정수)",
+     "contests": 232,
+     "seats": 232
+    },
+    {
+     "date": "2006-05-31",
+     "source": "nec_seats",
+     "quote": "구·시·군의 장: 230 | 230 (선거구수 | 정수)",
+     "contests": 230,
+     "seats": 230
+    },
+    {
+     "date": "2010-06-02",
+     "source": "nec_seats",
+     "quote": "구·시·군의 장: 228 | 228 (선거구수 | 정수)",
+     "contests": 228,
+     "seats": 228
+    },
+    {
+     "date": "2014-06-04",
+     "source": "nec_seats",
+     "quote": "구·시·군의 장: 226 | 226 (선거구수 | 정수)",
+     "contests": 226,
+     "seats": 226
+    },
+    {
+     "date": "2018-06-13",
+     "source": "nec_seats",
+     "quote": "구·시·군의 장: 226 | 226 (선거구수 | 정수)",
+     "contests": 226,
+     "seats": 226
+    },
+    {
+     "date": "2022-06-01",
+     "source": "nec_seats",
+     "quote": "구·시·군의 장: 226 | 226 (선거구수 | 정수)",
+     "contests": 226,
+     "seats": 226
+    },
+    {
+     "date": "2026-06-03",
+     "source": "nec_2026",
+     "quote": "구·시·군의 장: 227 | 227 (선거구수 | 정수)",
+     "contests": 227,
+     "seats": 227
+    }
+   ]
+  },
+  {
+   "key": "sigungu_council",
+   "tier": "sigungu",
+   "name": "구·시·군의회의원선거 (지역구)",
+   "name_en": "City, county, and district councils: constituency seats",
+   "category": "council",
+   "goal": "local",
+   "first_held": "1991-03-26",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "kr.sigungu_council_constituency"
+    ],
+    "fine": [
+     "kr.emd",
+     "kr.tupyogu"
+    ]
+   },
+   "note": "Non-partisan single-member districts by eup/myeon/dong from 1991 to 2002; since 2006 multi-member districts of two to four seats with party nominations and single non-transferable votes (POEA Art. 26(2)).",
+   "source": "poea",
+   "locator": "https://elaw.klri.re.kr/kor_service/lawViewMultiContent.do?hseq=64713 (Arts. 23 and 26)",
+   "est_votes": 26000000,
+   "effort": 2,
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "local"
+     ],
+     "body_kinds": [
+      "council",
+      "unicameral"
+     ],
+     "contest_kinds": [
+      "body_seats",
+      "office"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ],
+     "valid_from": "1991-01-01"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 2,
+     "month": 6,
+     "day_rule": "wednesday_from_may_31_unless_jun_6",
+     "term_years": 4,
+     "called": false,
+     "runoff": "none",
+     "administered_by": "National Election Commission and its sido and sigungu election commissions",
+     "source": "poea2020",
+     "locator": "https://elaw.klri.re.kr/kor_service/lawViewMultiContent.do?hseq=53845 (Art. 34(1)3: \"지방의회의원 및 지방자치단체의 장의 선거는 그 임기만료일전 30일 이후 첫번째 수요일\"; terms end 30 June)",
+     "valid_from": "2004-04-16"
+    },
+    {
+     "period_years": 4,
+     "phase": 2,
+     "month": 6,
+     "term_years": 4,
+     "called": false,
+     "runoff": "none",
+     "administered_by": "National Election Commission and its sido and sigungu election commissions",
+     "source": "nec_history",
+     "locator": "BIGI06 local rows: 제2회 1998.06.04 and 제3회 2002.06.13 (the first nationwide local elections of 1995.06.27 elected a three-year term)",
+     "valid_from": "1995-06-28",
+     "valid_to": "2004-04-16"
+    }
+   ],
+   "access": [
+    {
+     "platform": "NEC 선거통계시스템 (info.nec.go.kr), 지방선거",
+     "url": "http://info.nec.go.kr/main/showDocument.xhtml?electionId=0000000000&topMenuId=VC&secondMenuId=VCCP08",
+     "format": "html, xls",
+     "access": "open",
+     "checked_at": "2026-11-13",
+     "source": "nec_results",
+     "first_date": "1991-03-26",
+     "evidence": "역대선거 lists every local election from 1952 with seats per office; results by 구·시·군, 읍면동 (VCCP04), and 투표구 (VCCP08) as HTML tables with XLS export; how far back the polling-district tables go is unchecked"
+    },
+    {
+     "platform": "data.go.kr 중앙선거관리위원회 투·개표 정보 API",
+     "url": "https://www.data.go.kr/data/15000900/openapi.do",
+     "format": "json, xml",
+     "access": "open",
+     "checked_at": "2026-11-13",
+     "license": "이용허락범위 제한 없음 (no restriction on use)",
+     "source": "datagokr_counts",
+     "evidence": "Vote and count data by election (sgId), type, sido, and sigungu, from 1960; free key; usually posted two months after an election"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1991-03-26",
+     "source": "nec_history",
+     "quote": "구·시·군의회의원선거 | 1991.03.26(화) | 4,304 | 55.0%",
+     "seats": 4304
+    },
+    {
+     "date": "1995-06-27",
+     "source": "nec_seats",
+     "quote": "구·시·군의회 지역구: 3,750 | 4,541 (선거구수 | 정수)",
+     "contests": 3750,
+     "seats": 4541
+    },
+    {
+     "date": "1998-06-04",
+     "source": "nec_seats",
+     "quote": "구·시·군의회 지역구: 3,467 | 3,490 (선거구수 | 정수)",
+     "contests": 3467,
+     "seats": 3490
+    },
+    {
+     "date": "2002-06-13",
+     "source": "nec_seats",
+     "quote": "구·시·군의회 지역구: 3,459 | 3,485 (선거구수 | 정수)",
+     "contests": 3459,
+     "seats": 3485
+    },
+    {
+     "date": "2006-05-31",
+     "source": "nec_seats",
+     "quote": "구·시·군의회 지역구: 1,028 | 2,513 (선거구수 | 정수)",
+     "contests": 1028,
+     "seats": 2513
+    },
+    {
+     "date": "2010-06-02",
+     "source": "nec_seats",
+     "quote": "구·시·군의회 지역구: 1,039 | 2,512 (선거구수 | 정수)",
+     "contests": 1039,
+     "seats": 2512
+    },
+    {
+     "date": "2014-06-04",
+     "source": "nec_seats",
+     "quote": "구·시·군의회 지역구: 1,034 | 2,519 (선거구수 | 정수)",
+     "contests": 1034,
+     "seats": 2519
+    },
+    {
+     "date": "2018-06-13",
+     "source": "nec_seats",
+     "quote": "구·시·군의회 지역구: 1,035 | 2,541 (선거구수 | 정수)",
+     "contests": 1035,
+     "seats": 2541
+    },
+    {
+     "date": "2022-06-01",
+     "source": "nec_seats",
+     "quote": "구·시·군의회 지역구: 1,030 | 2,602 (선거구수 | 정수)",
+     "contests": 1030,
+     "seats": 2602
+    },
+    {
+     "date": "2026-06-03",
+     "source": "nec_2026",
+     "quote": "구·시·군의회 지역구: 1,038 | 2,650 (선거구수 | 정수)",
+     "contests": 1038,
+     "seats": 2650
+    }
+   ]
+  },
+  {
+   "key": "sigungu_council_pr",
+   "tier": "sigungu",
+   "name": "구·시·군의회의원선거 (비례대표)",
+   "name_en": "City, county, and district councils: proportional seats",
+   "category": "council",
+   "goal": "local",
+   "first_held": "2006-05-31",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "kr.sigungu"
+    ],
+    "fine": [
+     "kr.emd",
+     "kr.tupyogu"
+    ]
+   },
+   "note": "One list per sigungu since 2006, a tenth of the constituency seats (POEA Art. 23(3)), 5 percent threshold (Art. 190-2).",
+   "source": "poea",
+   "locator": "https://elaw.klri.re.kr/kor_service/lawViewMultiContent.do?hseq=64713 (Art. 23(3))",
+   "est_votes": 26000000,
+   "effort": 2,
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "local"
+     ],
+     "body_kinds": [
+      "council",
+      "unicameral"
+     ],
+     "contest_kinds": [
+      "list_allocation"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ],
+     "valid_from": "2006-01-01"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 2,
+     "month": 6,
+     "day_rule": "wednesday_from_may_31_unless_jun_6",
+     "term_years": 4,
+     "called": false,
+     "runoff": "none",
+     "administered_by": "National Election Commission and its sido and sigungu election commissions",
+     "source": "poea2020",
+     "locator": "https://elaw.klri.re.kr/kor_service/lawViewMultiContent.do?hseq=53845 (Art. 34(1)3: \"지방의회의원 및 지방자치단체의 장의 선거는 그 임기만료일전 30일 이후 첫번째 수요일\"; terms end 30 June)",
+     "valid_from": "2004-04-16"
+    }
+   ],
+   "access": [
+    {
+     "platform": "NEC 선거통계시스템 (info.nec.go.kr), 지방선거",
+     "url": "http://info.nec.go.kr/main/showDocument.xhtml?electionId=0000000000&topMenuId=VC&secondMenuId=VCCP08",
+     "format": "html, xls",
+     "access": "open",
+     "checked_at": "2026-11-13",
+     "source": "nec_results",
+     "first_date": "2006-05-31",
+     "evidence": "역대선거 lists every local election from 1952 with seats per office; results by 구·시·군, 읍면동 (VCCP04), and 투표구 (VCCP08) as HTML tables with XLS export; how far back the polling-district tables go is unchecked"
+    },
+    {
+     "platform": "data.go.kr 중앙선거관리위원회 투·개표 정보 API",
+     "url": "https://www.data.go.kr/data/15000900/openapi.do",
+     "format": "json, xml",
+     "access": "open",
+     "checked_at": "2026-11-13",
+     "license": "이용허락범위 제한 없음 (no restriction on use)",
+     "source": "datagokr_counts",
+     "evidence": "Vote and count data by election (sgId), type, sido, and sigungu, from 1960; free key; usually posted two months after an election"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2006-05-31",
+     "source": "nec_seats",
+     "quote": "구·시·군의회 비례대표: 230 | 375 (선거구수 | 정수)",
+     "contests": 230,
+     "seats": 375
+    },
+    {
+     "date": "2010-06-02",
+     "source": "nec_seats",
+     "quote": "구·시·군의회 비례대표: 230 | 376 (선거구수 | 정수)",
+     "contests": 230,
+     "seats": 376
+    },
+    {
+     "date": "2014-06-04",
+     "source": "nec_seats",
+     "quote": "구·시·군의회 비례대표: 227 | 379 (선거구수 | 정수)",
+     "contests": 227,
+     "seats": 379
+    },
+    {
+     "date": "2018-06-13",
+     "source": "nec_seats",
+     "quote": "구·시·군의회 비례대표: 226 | 386 (선거구수 | 정수)",
+     "contests": 226,
+     "seats": 386
+    },
+    {
+     "date": "2022-06-01",
+     "source": "nec_seats",
+     "quote": "구·시·군의회 비례대표: 226 | 386 (선거구수 | 정수)",
+     "contests": 226,
+     "seats": 386
+    },
+    {
+     "date": "2026-06-03",
+     "source": "nec_2026",
+     "quote": "구·시·군의회 비례대표: 227 | 385 (선거구수 | 정수)",
+     "contests": 227,
+     "seats": 385
+    }
+   ]
+  },
+  {
+   "key": "sieupmyeon_council",
+   "tier": "sieupmyeon",
+   "name": "시·읍·면의회의원선거",
+   "name_en": "City, town, and township councils (1952-1960)",
+   "category": "council",
+   "goal": "local",
+   "first_held": "1952-04-25",
+   "valid_from": "1949-07-04",
+   "valid_to": "1961-10-01",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "kr.sieupmyeon"
+    ]
+   },
+   "note": "The First and Second Republics' basic councils, elected in 1952, 1956, and 1960 and dissolved after the coup of 16 May 1961; the county (gun) then replaced the town and township as the basic unit.",
+   "source": "nec_history",
+   "est_votes": 9000000,
+   "effort": 5,
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "local"
+     ],
+     "body_kinds": [
+      "council",
+      "unicameral"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ],
+     "valid_to": "1961-10-01"
+    }
+   ],
+   "access": [
+    {
+     "platform": "NEC 선거통계시스템 (info.nec.go.kr), 지방선거 (역대선거 실시상황)",
+     "url": "http://info.nec.go.kr/main/showDocument.xhtml?electionId=0000000000&topMenuId=VC&secondMenuId=VCCP08",
+     "format": "html, xls",
+     "access": "open",
+     "checked_at": "2026-11-13",
+     "first_date": "1952-04-25",
+     "source": "nec_results",
+     "evidence": "역대선거 lists each election with seats and turnout; results below the national totals unchecked"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1952-04-25",
+     "source": "nec_history",
+     "quote": "시·읍·면의회의원선거 | 1952.04.25 | 17,559 | 90.7%",
+     "seats": 17559
+    },
+    {
+     "date": "1956-08-08",
+     "source": "nec_history",
+     "quote": "시·읍·면의회의원선거 | 1956.08.08 | 16,961 | 79.6%",
+     "seats": 16961
+    },
+    {
+     "date": "1960-12-19",
+     "source": "nec_history",
+     "quote": "시·읍·면의회의원선거 | 1960.12.19 | 16,909 | 78.9%",
+     "seats": 16909
+    }
+   ]
+  },
+  {
+   "key": "sieupmyeon_head",
+   "tier": "sieupmyeon",
+   "name": "시·읍·면장선거",
+   "name_en": "Mayors of cities, towns, and townships (1956 and 1960)",
+   "category": "executive",
+   "goal": "local",
+   "first_held": "1956-08-08",
+   "valid_from": "1956-02-13",
+   "valid_to": "1961-10-01",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "kr.sieupmyeon"
+    ]
+   },
+   "note": "Chosen by their councils from 1952; elected by residents in 1956 and 1960.",
+   "source": "nec_history",
+   "est_votes": 9000000,
+   "effort": 5,
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "local"
+     ],
+     "office_kinds": [
+      "mayor",
+      "head_of_government"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ],
+     "valid_to": "1961-10-01"
+    }
+   ],
+   "access": [
+    {
+     "platform": "NEC 선거통계시스템 (info.nec.go.kr), 지방선거 (역대선거 실시상황)",
+     "url": "http://info.nec.go.kr/main/showDocument.xhtml?electionId=0000000000&topMenuId=VC&secondMenuId=VCCP08",
+     "format": "html, xls",
+     "access": "open",
+     "checked_at": "2026-11-13",
+     "first_date": "1956-08-08",
+     "source": "nec_results",
+     "evidence": "역대선거 lists each election with seats and turnout; results below the national totals unchecked"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1956-08-08",
+     "source": "nec_history",
+     "quote": "시·읍·면장선거 | 1956.08.08 | 582 | 86.7%",
+     "seats": 582
+    },
+    {
+     "date": "1960-12-26",
+     "source": "nec_history",
+     "quote": "시·읍·면장선거 | 1960.12.26 | 1,468 | 75.4%",
+     "seats": 1468
+    }
+   ]
+  },
+  {
+   "key": "local_by",
+   "tier": "sido",
+   "name": "지방선거 재선거·보궐선거",
+   "name_en": "Local by-elections and re-elections (heads and council constituency seats)",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Vacant heads and council constituency seats at both tiers are filled at the annual April by-election (heads also in October); proportional vacancies pass down the list (POEA Arts. 35 and 200). Superintendent by-elections are the class superintendent.",
+   "source": "poea",
+   "locator": "https://elaw.klri.re.kr/eng_service/lawViewContent.do?hseq=64713 (Art. 35(2)1 as amended 29 December 2020: special elections and re-elections once a year on the first Wednesday of April; heads of local governments also in October)",
+   "est_votes": 2000000,
+   "effort": 3,
+   "match": [
+    {
+     "election_kinds": [
+      "by_election",
+      "special"
+     ],
+     "iso_pattern": "KR-*"
+    },
+    {
+     "election_kinds": [
+      "by_election",
+      "special"
+     ],
+     "polity_kinds": [
+      "municipality",
+      "region"
+     ]
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 1,
+     "phase": 0,
+     "month": 4,
+     "day_rule": "apr_first_wednesday",
+     "called": true,
+     "runoff": "none",
+     "administered_by": "Sido and sigungu election commissions",
+     "source": "poea",
+     "locator": "https://elaw.klri.re.kr/eng_service/lawViewContent.do?hseq=64713 (Art. 35(2)1 as amended 29 December 2020: special elections and re-elections once a year on the first Wednesday of April; heads of local governments also in October)",
+     "valid_from": "2020-12-29",
+     "vacancy_rule": "Council seats, and heads whose cause became definite from September to February, on the first Wednesday of April; heads whose cause became definite from March to August on the first Wednesday of October, moved by Art. 34(2) when a holiday is beside it."
+    }
+   ],
+   "access": [
+    {
+     "platform": "NEC 선거통계시스템 (info.nec.go.kr), 재·보궐선거",
+     "url": "http://info.nec.go.kr/main/showDocument.xhtml?electionId=0000000000&topMenuId=VC&secondMenuId=VCCP08",
+     "format": "html, xls",
+     "access": "open",
+     "checked_at": "2026-11-13",
+     "source": "nec_results",
+     "evidence": "역대선거 electionType 5 lists local by-elections with the National Assembly ones"
+    }
+   ]
+  },
+  {
+   "key": "local_referendum",
+   "tier": "sido",
+   "name": "주민투표",
+   "name_en": "Residents' votes (local referendums)",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "question"
+   },
+   "note": "Residents' Voting Act (2004): local matters put to residents by the head of a sido or sigungu, on the council's or residents' request, and national-policy votes requested by a central ministry (Art. 8), run by the election commissions. The Act's text was not read (law.go.kr down); the votes held are not enumerated here.",
+   "source": "constitution",
+   "locator": "https://elaw.klri.re.kr/kor_service/lawViewMultiContent.do?hseq=1 (Art. 118(2): local matters determined by Act)",
+   "est_votes": 1000000,
+   "effort": 4,
+   "match": [
+    {
+     "election_kinds": [
+      "referendum",
+      "local"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "iso_pattern": "KR-*"
+    },
+    {
+     "election_kinds": [
+      "referendum",
+      "local"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "polity_kinds": [
+      "municipality",
+      "region"
+     ]
+    }
+   ]
+  },
+  {
+   "key": "recall",
+   "tier": "sido",
+   "name": "주민소환투표",
+   "name_en": "Recall votes against local heads and council members",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "question"
+   },
+   "note": "Act on Residents' Recall (2006): residents may petition to recall a head or a constituency council member (not proportional members), and the vote is valid with a third of electors voting. The Act's text was not read (law.go.kr down); the votes held are not enumerated here.",
+   "source": "constitution",
+   "locator": "https://elaw.klri.re.kr/kor_service/lawViewMultiContent.do?hseq=1 (Art. 118(2))",
+   "est_votes": 300000,
+   "effort": 4,
+   "match": [
+    {
+     "election_kinds": [
+      "recall"
+     ]
+    }
+   ]
+  },
+  {
+   "key": "primaries",
+   "tier": "national",
+   "name": "정당 경선",
+   "name_en": "Party primaries and nomination contests",
+   "category": "nominating",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "poea",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Parties run their own nomination contests; election commissions only manage the ballot when a party entrusts them (POEA Art. 57-4), and the results are the party's, not official returns.",
+   "match": [
+    {
+     "election_kinds": [
+      "primary",
+      "caucus"
+     ]
+    }
+   ]
+  },
+  {
+   "key": "cooperative_heads",
+   "tier": "national",
+   "name": "전국동시조합장선거",
+   "name_en": "Nationwide simultaneous elections of cooperative heads",
+   "category": "non_territorial",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "nec_history",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Heads of agricultural, fisheries, and forestry cooperatives (2015, 2019, and 2023) are chosen by members of private bodies; the election commissions run them under the Act on Entrustment of Elections for Public Organizations, but they elect no public office."
+  },
+  {
+   "key": "school_committee",
+   "tier": "sido",
+   "name": "학교운영위원 선거인단 선거 (교육위원·교육감)",
+   "name_en": "Education committee members and superintendents chosen by school steering committee members (to 2006)",
+   "category": "indirect",
+   "goal": "subnational",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "leaa",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Electorates of school steering committee members (and earlier, local councils) chose education committee members and superintendents before direct election; the electorates were a few thousand appointed or school-elected members and the returns are administrative records, not public elections."
+  },
+  {
+   "key": "village_heads",
+   "tier": "emd",
+   "name": "이장·통장 선출",
+   "name_en": "Village and neighborhood heads (ijang and tongjang)",
+   "category": "executive",
+   "goal": "local",
+   "measure": {
+    "unit": "polity"
+   },
+   "source": "laa",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Ri and tong heads are appointed by the eup, myeon, or dong head, sometimes after a village meeting picks a nominee; no election commission runs or publishes these choices."
+  }
+ ]
+}
