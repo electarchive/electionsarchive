@@ -1778,7 +1778,7 @@ def emit() -> Path:
             won = sorted((votes for *_, votes in candidates if votes is not None), reverse=True)[:seats]
             for number, (surname, given, votes) in enumerate(candidates, start=1):
                 option_key = f"{contest_key}:{number}"
-                person = add_person(option_key, given, surname, link=False)
+                person = add_person(option_key, given, surname)
                 option = cs.key("gb.city_scilly.option", option_key)
                 cs.add(
                     "contest_option",
