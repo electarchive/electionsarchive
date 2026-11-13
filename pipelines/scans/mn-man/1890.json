@@ -221,13 +221,15 @@
       "columns": [
         {
           "label": "D. S. Hall, R.",
-          "contest": null,
-          "candidate": ""
+          "contest": "house3",
+          "candidate": "D. S. Hall",
+          "official": 13106
         },
         {
           "label": "O. M. Hall, D.",
-          "contest": null,
-          "candidate": ""
+          "contest": "house3",
+          "candidate": "Osee Matson Hall",
+          "official": 17639
         },
         {
           "label": "Gamble, A.",
