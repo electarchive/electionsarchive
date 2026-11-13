@@ -43,7 +43,8 @@ def build(prefix: str | None) -> str:
         display.coarsen(conn)
         display.straddle(conn)
     summaries: list[str] = []
-    with tempfile.TemporaryDirectory() as scratch:
+    (DATA / "tmp").mkdir(exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix="tiles-", dir=DATA / "tmp") as scratch:
         for scheme_code, vintage, as_of, features, attribution in sets:
             if not features:
                 continue
@@ -75,6 +76,7 @@ def build(prefix: str | None) -> str:
                     f"--output={output}",
                     "--force",
                     "--quiet",
+                    f"--temporary-directory={scratch}",
                     "--projection=EPSG:3857",
                     f"--attribution={chr(10).join(filter(None, [attribution, display.ATTRIBUTION]))}",
                     "--minimum-zoom=0",
