@@ -260,6 +260,222 @@
       "publisher": "Elections Canada",
       "url": "https://www.elections.ca/content.aspx?dir=pas&document=byel&lang=e&section=ele",
       "kind": "official_body"
+    },
+    "ec-turnout": {
+      "title": "Voter Turnout at Federal Elections and Referendums",
+      "publisher": "Elections Canada",
+      "url": "https://www.elections.ca/content.aspx?section=ele&dir=turn&document=index&lang=e",
+      "kind": "official_body"
+    },
+    "on-munis": {
+      "title": "List of Ontario municipalities",
+      "publisher": "Government of Ontario",
+      "url": "https://www.ontario.ca/page/list-ontario-municipalities",
+      "kind": "official_body"
+    },
+    "on-mea": {
+      "title": "Municipal Elections Act, 1996, S.O. 1996, c. 32, Sched.",
+      "publisher": "Government of Ontario",
+      "url": "https://www.ontario.ca/laws/statute/96m32",
+      "kind": "official_body"
+    },
+    "on-elections": {
+      "title": "Municipal elections",
+      "publisher": "Government of Ontario",
+      "url": "https://www.ontario.ca/page/municipal-elections",
+      "kind": "official_body"
+    },
+    "on-education": {
+      "title": "Education facts, schools and school boards",
+      "publisher": "Government of Ontario",
+      "url": "https://www.ontario.ca/page/education-facts",
+      "kind": "official_body"
+    },
+    "on-results": {
+      "title": "Municipal election results",
+      "publisher": "Government of Ontario",
+      "url": "https://data2.ontario.ca/dataset/municipal-election-results",
+      "kind": "official_body"
+    },
+    "toronto-results": {
+      "title": "Election Results - Official",
+      "publisher": "City of Toronto",
+      "url": "https://open.toronto.ca/dataset/election-results-official/",
+      "kind": "official_body"
+    },
+    "qc-local": {
+      "title": "Palier local du régime municipal",
+      "publisher": "Gouvernement du Québec",
+      "url": "https://www.quebec.ca/gouvernement/gestion-municipale/organisation-municipale/organisation-territoriale/regime-municipal/palier-local",
+      "kind": "official_body"
+    },
+    "qc-supralocal": {
+      "title": "Palier supralocal du régime municipal",
+      "publisher": "Gouvernement du Québec",
+      "url": "https://www.quebec.ca/gouvernement/gestion-municipale/organisation-municipale/organisation-territoriale/regime-municipal/palier-supralocal",
+      "kind": "official_body"
+    },
+    "qc-elections": {
+      "title": "À propos des élections municipales",
+      "publisher": "Gouvernement du Québec",
+      "url": "https://www.quebec.ca/gouvernement/gestion-municipale/organisation-municipale/democratie-municipale/elections-municipales/a-propos",
+      "kind": "official_body"
+    },
+    "qc-2025-release": {
+      "title": "Élections municipales 2025 : la proportion de femmes dans les conseils municipaux du Québec poursuit sa progression",
+      "publisher": "Gouvernement du Québec",
+      "url": "https://www.quebec.ca/nouvelles/actualites/details/elections-municipales-2025-la-proportion-de-femmes-dans-les-conseils-municipaux-du-quebec-poursuit-sa-progression-66865",
+      "kind": "official_body"
+    },
+    "eq-open": {
+      "title": "Données ouvertes",
+      "publisher": "Élections Québec",
+      "url": "https://www.electionsquebec.qc.ca/donnees-ouvertes/",
+      "kind": "official_body"
+    },
+    "mtl-results": {
+      "title": "Élections municipales - Résultats détaillés",
+      "publisher": "Ville de Montréal",
+      "url": "https://donnees.montreal.ca/dataset/resultats-detailles",
+      "kind": "official_body"
+    },
+    "qc-school": {
+      "title": "Élections scolaires",
+      "publisher": "Gouvernement du Québec",
+      "url": "https://www.quebec.ca/education/prescolaire-primaire-et-secondaire/administration-encadrements/gouvernance-scolaire/elections-scolaires",
+      "kind": "official_body"
+    },
+    "bc-lga": {
+      "title": "Local Government Act, RSBC 2015, c. 1, Part 3",
+      "publisher": "Province of British Columbia",
+      "url": "https://www.bclaws.gov.bc.ca/civix/document/id/complete/statreg/r15001_03",
+      "kind": "official_body"
+    },
+    "bc-elections": {
+      "title": "General local elections",
+      "publisher": "Province of British Columbia",
+      "url": "https://www2.gov.bc.ca/gov/content/governments/local-governments/governance-powers/general-local-elections",
+      "kind": "official_body"
+    },
+    "bc-systems": {
+      "title": "Local government systems",
+      "publisher": "Province of British Columbia",
+      "url": "https://www2.gov.bc.ca/gov/content/governments/local-governments/facts-framework/systems",
+      "kind": "official_body"
+    },
+    "ab-laea": {
+      "title": "Local Authorities Election Act, RSA 2000, c. L-21",
+      "publisher": "Alberta King's Printer",
+      "url": "https://kings-printer.alberta.ca/documents/Acts/L21.pdf",
+      "kind": "official_body"
+    },
+    "ab-types": {
+      "title": "Types of municipalities in Alberta",
+      "publisher": "Government of Alberta",
+      "url": "https://www.alberta.ca/types-of-municipalities-in-alberta",
+      "kind": "official_body"
+    },
+    "ab-msa": {
+      "title": "Metis Settlements Act, RSA 2000, c. M-14",
+      "publisher": "Alberta King's Printer",
+      "url": "https://kings-printer.alberta.ca/documents/Acts/M14.pdf",
+      "kind": "official_body"
+    },
+    "ab-senate": {
+      "title": "Senate nominee elections",
+      "publisher": "Elections Alberta",
+      "url": "https://www.elections.ab.ca/?p=10013",
+      "kind": "official_body"
+    },
+    "sk-voting": {
+      "title": "Municipal elections: voting",
+      "publisher": "Government of Saskatchewan",
+      "url": "https://saskatchewan.ca/government/municipal-administration/elections/voting",
+      "kind": "official_body"
+    },
+    "sk-system": {
+      "title": "About the Saskatchewan municipal system",
+      "publisher": "Government of Saskatchewan",
+      "url": "https://saskatchewan.ca/government/government-structure/local-federal-and-other-governments/your-local-government/about-the-saskatchewan-municipal-system",
+      "kind": "official_body"
+    },
+    "mb-elections": {
+      "title": "Municipal and School Board Elections 2026",
+      "publisher": "Manitoba Municipal and Northern Relations",
+      "url": "https://www.gov.mb.ca/mr/mfas/election.html",
+      "kind": "official_body"
+    },
+    "yt-term": {
+      "title": "Government of Yukon plans to move forward with municipal term of office change",
+      "publisher": "Government of Yukon",
+      "url": "https://yukon.ca/en/news/government-yukon-plans-move-forward-municipal-term-office-change-following-what-we-heard-report",
+      "kind": "official_body"
+    },
+    "nt-dates": {
+      "title": "Municipal election dates",
+      "publisher": "Northwest Territories Municipal and Community Affairs",
+      "url": "https://www.maca.gov.nt.ca/en/services/municipal-elections/election-dates",
+      "kind": "official_body"
+    },
+    "nu-municipal": {
+      "title": "Municipal elections",
+      "publisher": "Elections Nunavut",
+      "url": "https://www.elections.nu.ca/en/node/15",
+      "kind": "official_body"
+    },
+    "nb-manual": {
+      "title": "Local Resource Manual: local election process",
+      "publisher": "Government of New Brunswick",
+      "url": "https://www.gnb.ca/en/topic/family-home-community/communty-local-gov/local-resource-manual/local-election-process.html",
+      "kind": "official_body"
+    },
+    "nb-gov": {
+      "title": "Communities and local government",
+      "publisher": "Government of New Brunswick",
+      "url": "https://www.gnb.ca/en/topic/family-home-community/communty-local-gov.html",
+      "kind": "official_body"
+    },
+    "enb": {
+      "title": "Elections New Brunswick",
+      "publisher": "Elections New Brunswick",
+      "url": "https://www.electionsnb.ca/content/enb/en.html",
+      "kind": "official_body"
+    },
+    "ns-municipal": {
+      "title": "Municipal elections",
+      "publisher": "Province of Nova Scotia",
+      "url": "https://novascotia.ca/municipal-elections/",
+      "kind": "official_body"
+    },
+    "pe-municipal": {
+      "title": "Municipal Elections / By-Elections",
+      "publisher": "Elections PEI",
+      "url": "https://www.electionspei.ca/municipal-elections-by-elections",
+      "kind": "official_body"
+    },
+    "nl-mea": {
+      "title": "Municipal Elections Act, SNL 2001, c. M-20.2",
+      "publisher": "House of Assembly of Newfoundland and Labrador",
+      "url": "https://www.assembly.nl.ca/Legislation/sr/statutes/m20-2.htm",
+      "kind": "official_body"
+    },
+    "nl-deferral": {
+      "title": "Municipal Elections Deferral Order, NLR 74/24",
+      "publisher": "House of Assembly of Newfoundland and Labrador",
+      "url": "https://www.assembly.nl.ca/Legislation/sr/Regulations/rc240074.htm",
+      "kind": "official_body"
+    },
+    "isc-systems": {
+      "title": "Band Election Systems",
+      "publisher": "Indigenous Services Canada",
+      "url": "https://www.sac-isc.gc.ca/eng/1337794249355",
+      "kind": "official_body"
+    },
+    "isc-elections": {
+      "title": "First Nations elections",
+      "publisher": "Indigenous Services Canada",
+      "url": "https://www.sac-isc.gc.ca/eng/1323195944486",
+      "kind": "official_body"
     }
   },
   "tiers": [
@@ -276,6 +492,139 @@
       "parent": "national",
       "polity_kind": "federal_unit",
       "source": "ca-prov-qc"
+    },
+    {
+      "key": "regional",
+      "name": "Upper-tier and regional municipalities",
+      "parent": "province",
+      "polity_kind": "county",
+      "source": "qc-supralocal",
+      "counts": [
+        {
+          "date": "2026-11-13",
+          "value": 87,
+          "source": "qc-supralocal",
+          "within": "CA-QC"
+        },
+        {
+          "date": "2025-05-01",
+          "value": 27,
+          "source": "bc-systems",
+          "within": "CA-BC"
+        }
+      ]
+    },
+    {
+      "key": "municipal",
+      "name": "Municipalities",
+      "parent": "province",
+      "polity_kind": "municipality",
+      "source": "on-munis",
+      "counts": [
+        {
+          "date": "2025-07-10",
+          "value": 444,
+          "source": "on-munis",
+          "within": "CA-ON"
+        },
+        {
+          "date": "2025-10-01",
+          "value": 1123,
+          "source": "qc-local",
+          "within": "CA-QC",
+          "precision": "month"
+        },
+        {
+          "date": "2025-05-01",
+          "value": 161,
+          "source": "bc-systems",
+          "within": "CA-BC"
+        },
+        {
+          "date": "2026-11-13",
+          "value": 322,
+          "source": "ab-types",
+          "within": "CA-AB"
+        },
+        {
+          "date": "2026-11-13",
+          "value": 137,
+          "source": "mb-elections",
+          "within": "CA-MB"
+        },
+        {
+          "date": "2026-11-13",
+          "value": 25,
+          "source": "nu-municipal",
+          "within": "CA-NU"
+        }
+      ]
+    },
+    {
+      "key": "submunicipal",
+      "name": "Boroughs and electoral areas",
+      "parent": "municipal",
+      "polity_kind": "submunicipal",
+      "source": "mtl-results"
+    },
+    {
+      "key": "rural_district",
+      "name": "Rural districts",
+      "parent": "province",
+      "within": "CA-NB",
+      "polity_kind": "municipality",
+      "source": "nb-gov",
+      "counts": [
+        {
+          "date": "2026-11-13",
+          "value": 12,
+          "source": "nb-gov",
+          "within": "CA-NB"
+        }
+      ]
+    },
+    {
+      "key": "school",
+      "name": "School boards and divisions",
+      "parent": "province",
+      "polity_kind": "school_district",
+      "source": "on-education",
+      "counts": [
+        {
+          "date": "2026-11-13",
+          "value": 72,
+          "source": "on-education",
+          "within": "CA-ON"
+        }
+      ]
+    },
+    {
+      "key": "metis_settlement",
+      "name": "Metis Settlements",
+      "parent": "province",
+      "within": "CA-AB",
+      "source": "ab-types",
+      "counts": [
+        {
+          "date": "2026-11-13",
+          "value": 8,
+          "source": "ab-types",
+          "within": "CA-AB"
+        }
+      ]
+    },
+    {
+      "key": "first_nation",
+      "name": "First Nations",
+      "parent": "national",
+      "source": "isc-systems",
+      "counts": [
+        {
+          "date": "2015-07-01",
+          "value": 618,
+          "source": "isc-systems"
+        }
+      ]
     }
   ],
   "classes": [
@@ -5547,6 +5896,1594 @@
           "quote": "BC: Final Voting Day was October 24, 2026."
         }
       ]
+    },
+    {
+      "key": "provincial_by",
+      "tier": "province",
+      "name": "Provincial and territorial by-elections",
+      "category": "legislature",
+      "goal": "subnational",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "Each riding's by-election counts once. No national list of provincial by-elections exists; each agency lists its own, so this class has no enumerated dates yet.",
+      "source": "ca-prov-qc",
+      "match": [
+        {
+          "election_kinds": [
+            "by_election"
+          ],
+          "body_kinds": [
+            "unicameral",
+            "lower_house"
+          ],
+          "iso_pattern": "CA-*"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "referendums",
+      "tier": "national",
+      "name": "Federal referendums and plebiscites",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "Three national votes: prohibition (1898), conscription (1942), and the Charlottetown Accord (1992, held outside Quebec, which voted the same day under its own law).",
+      "source": "ec-turnout",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "iso_pattern": "CA"
+        }
+      ],
+      "est_votes": 9855978,
+      "effort": 2,
+      "dates": [
+        {
+          "date": "1898-09-29",
+          "contests": 1,
+          "source": "ec-turnout",
+          "quote": "29 September 1898 ... 551,405"
+        },
+        {
+          "date": "1942-04-27",
+          "contests": 1,
+          "source": "ec-turnout",
+          "quote": "27 April 1942 ... 4,638,847"
+        },
+        {
+          "date": "1992-10-26",
+          "contests": 1,
+          "source": "ec-turnout",
+          "quote": "26 October 1992 ... 9,855,978"
+        }
+      ]
+    },
+    {
+      "key": "provincial_referendums",
+      "tier": "province",
+      "name": "Provincial and territorial referendums and plebiscites",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "Called by each legislature under its own referendum act, so there is no regular cycle. Each question counts once. Quebec's 1980 and 1995 sovereignty referendums, British Columbia's electoral-reform votes (2005, 2009, and 2018), and Prince Edward Island's (2005, 2016, and 2019) are among those not yet held.",
+      "source": "ca-prov-qc",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "iso_pattern": "CA-*"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "ab_senate_nominee",
+      "tier": "province",
+      "name": "Alberta Senate nominee elections",
+      "category": "nominating",
+      "goal": "subnational",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "Province-wide votes for nominees the Prime Minister is asked to appoint to the Senate, held alongside municipal (1989, 1998, and 2021) or provincial (2004 and 2012) elections.",
+      "source": "ab-senate",
+      "valid_from": "1989-01-01",
+      "first_held": "1989-10-16",
+      "est_votes": 1000000,
+      "effort": 2,
+      "match": [
+        {
+          "election_kinds": [
+            "special",
+            "general",
+            "local"
+          ],
+          "office_kinds": [
+            "other"
+          ],
+          "within": "CA-AB",
+          "name_pattern": "senat"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1989-10-16",
+          "contests": 1,
+          "source": "ab-senate",
+          "quote": "October 16, 1989, in conjunction with the municipal elections"
+        },
+        {
+          "date": "1998-10-19",
+          "contests": 1,
+          "source": "ab-senate",
+          "quote": "October 19, 1998, in conjunction with the municipal elections"
+        },
+        {
+          "date": "2004-11-22",
+          "contests": 1,
+          "source": "ab-senate",
+          "quote": "November 22, 2004, in conjunction with the Provincial General Election"
+        },
+        {
+          "date": "2012-04-23",
+          "contests": 1,
+          "source": "ab-senate",
+          "quote": "April 23, 2012, in conjunction with the Provincial General Election"
+        },
+        {
+          "date": "2021-10-18",
+          "contests": 1,
+          "source": "ab-senate",
+          "quote": "October 18, 2021, in conjunction with the municipal elections"
+        }
+      ]
+    },
+    {
+      "key": "qc_municipal",
+      "tier": "municipal",
+      "name": "Quebec municipal general elections (mayors and councils)",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "Every local municipality under the Act respecting elections and referendums in municipalities elects its mayor and councillors on one fixed day; northern, Cree, and Naskapi villages vote under their own regimes. In 2025: 1,091 mayors and 6,795 councillors, with 41.3 percent turnout where the mayoralty was contested. By-elections count in the same class.",
+      "source": "qc-elections",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "within": "CA-QC"
+        },
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "office_kinds": [
+            "mayor"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "within": "CA-QC"
+        }
+      ],
+      "dates": [],
+      "cadence": [
+        {
+          "within": "CA-QC",
+          "government_kind": "municipality",
+          "source": "qc-elections",
+          "period_years": 4,
+          "phase": 1,
+          "month": 11,
+          "term_years": 4,
+          "day_rule": "nov_first_sunday",
+          "valid_from": "2005-01-01",
+          "locator": "https://www.quebec.ca/gouvernement/gestion-municipale/organisation-municipale/democratie-municipale/elections-municipales/a-propos",
+          "called": false
+        }
+      ],
+      "est_votes": 2700000,
+      "effort": 2,
+      "access": [
+        {
+          "url": "https://www.electionsquebec.qc.ca/donnees-ouvertes/",
+          "platform": "Élections Québec open data",
+          "format": "json",
+          "access": "open",
+          "checked": "2026-11-13",
+          "source": "eq-open",
+          "within": "CA-QC",
+          "first_date": "2021-11-07",
+          "evidence": "results by municipality for general and partial elections since November 2021, supplied by the municipalities"
+        }
+      ],
+      "finest_note": "municipality and district from Élections Québec; Montréal by polling station",
+      "first_held": "2005-11-06"
+    },
+    {
+      "key": "qc_borough",
+      "tier": "submunicipal",
+      "name": "Montréal borough mayors and borough councils",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "Montréal's 19 boroughs elect their mayors and borough councillors on the municipal ballot.",
+      "source": "mtl-results",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "submunicipal"
+          ],
+          "within": "CA-QC"
+        },
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "office_kinds": [
+            "mayor"
+          ],
+          "polity_kinds": [
+            "submunicipal"
+          ],
+          "within": "CA-QC"
+        }
+      ],
+      "dates": [],
+      "cadence": [
+        {
+          "within": "CA-QC",
+          "government_kind": "borough",
+          "source": "qc-elections",
+          "period_years": 4,
+          "phase": 1,
+          "month": 11,
+          "term_years": 4,
+          "day_rule": "nov_first_sunday",
+          "valid_from": "2005-01-01",
+          "called": false
+        }
+      ],
+      "est_votes": 400000,
+      "effort": 2,
+      "access": [
+        {
+          "url": "https://donnees.montreal.ca/dataset/resultats-detailles",
+          "platform": "Montréal open data",
+          "format": "csv",
+          "access": "open",
+          "checked": "2026-11-13",
+          "source": "mtl-results",
+          "within": "CA-QC",
+          "first_date": "2013-11-03",
+          "license": "CC BY 4.0",
+          "evidence": "votes by polling station for 2013, 2017, 2021, and 2025"
+        }
+      ],
+      "finest_note": "polling station"
+    },
+    {
+      "key": "qc_prefect",
+      "tier": "regional",
+      "name": "Quebec MRC prefects elected by universal suffrage",
+      "category": "executive",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "A regional county municipality's prefect is either elected by universal suffrage or chosen by its council; 21 of the 87 MRCs elected theirs in 2025 (18 in 2021, 13 in 2009 to 2017, and 8 in 2005).",
+      "source": "qc-supralocal",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "office_kinds": [
+            "other",
+            "mayor"
+          ],
+          "polity_kinds": [
+            "county"
+          ],
+          "within": "CA-QC"
+        }
+      ],
+      "dates": [],
+      "cadence": [
+        {
+          "within": "CA-QC",
+          "government_kind": "county",
+          "source": "qc-elections",
+          "period_years": 4,
+          "phase": 1,
+          "month": 11,
+          "term_years": 4,
+          "day_rule": "nov_first_sunday",
+          "valid_from": "2005-01-01",
+          "called": false
+        }
+      ],
+      "est_votes": 300000,
+      "effort": 2,
+      "first_held": "2005-11-06"
+    },
+    {
+      "key": "qc_school",
+      "tier": "school",
+      "name": "Quebec school board elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "Since 2020 only the nine English-language school boards elect commissioners; French-language boards became appointed school service centres. The last elections were held on 2 November 2014 and 3 November 2024.",
+      "source": "qc-school",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "school_district"
+          ],
+          "within": "CA-QC"
+        }
+      ],
+      "dates": [],
+      "cadence": [
+        {
+          "within": "CA-QC",
+          "government_kind": "school",
+          "source": "qc-school",
+          "period_years": 4,
+          "phase": 0,
+          "month": 11,
+          "term_years": 4,
+          "day_rule": "nov_first_sunday",
+          "valid_from": "2024-01-01",
+          "called": false
+        }
+      ],
+      "est_votes": 30000,
+      "effort": 2
+    },
+    {
+      "key": "on_municipal",
+      "tier": "municipal",
+      "name": "Ontario municipal elections (heads of council and councils)",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "All 444 municipalities elect on one regular voting day under the Municipal Elections Act, 1996, including the directly elected regional councillors and chairs of some upper-tier municipalities; terms were three years before 2006 and four since. By-elections count in the same class.",
+      "source": "on-mea",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "municipality",
+            "county"
+          ],
+          "within": "CA-ON"
+        },
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "office_kinds": [
+            "mayor",
+            "other"
+          ],
+          "polity_kinds": [
+            "municipality",
+            "county"
+          ],
+          "within": "CA-ON"
+        }
+      ],
+      "dates": [],
+      "cadence": [
+        {
+          "within": "CA-ON",
+          "government_kind": "municipality",
+          "source": "on-mea",
+          "period_years": 4,
+          "phase": 2,
+          "month": 10,
+          "term_years": 4,
+          "day_rule": "oct_fourth_monday",
+          "valid_from": "2010-01-01",
+          "called": false
+        }
+      ],
+      "est_votes": 3600000,
+      "effort": 4,
+      "access": [
+        {
+          "url": "https://data2.ontario.ca/dataset/municipal-election-results",
+          "platform": "Ontario Data Catalogue",
+          "format": "csv",
+          "access": "open",
+          "checked": "2026-11-13",
+          "source": "on-results",
+          "within": "CA-ON",
+          "first_date": "2014-10-27",
+          "last_date": "2022-10-24",
+          "evidence": "voters, turnout, and successful candidates by municipality; no candidate votes"
+        },
+        {
+          "url": "https://open.toronto.ca/dataset/election-results-official/",
+          "platform": "Toronto open data",
+          "format": "xlsx",
+          "access": "open",
+          "checked": "2026-11-13",
+          "source": "toronto-results",
+          "within": "CA-ON",
+          "first_date": "2003-11-10",
+          "evidence": "poll-by-poll results for every candidate, 2003 to 2026"
+        }
+      ],
+      "finest_note": "municipality from the province; Toronto by voting subdivision"
+    },
+    {
+      "key": "on_school",
+      "tier": "school",
+      "name": "Ontario school board trustee elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "Trustees of the 72 district school boards (31 English public, 29 English Catholic, 4 French public, and 8 French Catholic) are elected on the municipal voting day.",
+      "source": "on-education",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "school_district"
+          ],
+          "within": "CA-ON"
+        }
+      ],
+      "dates": [],
+      "cadence": [
+        {
+          "within": "CA-ON",
+          "government_kind": "school",
+          "source": "on-mea",
+          "period_years": 4,
+          "phase": 2,
+          "month": 10,
+          "term_years": 4,
+          "day_rule": "oct_fourth_monday",
+          "valid_from": "2010-01-01",
+          "called": false
+        }
+      ],
+      "est_votes": 3000000,
+      "effort": 4
+    },
+    {
+      "key": "bc_municipal",
+      "tier": "municipal",
+      "name": "British Columbia general local elections: mayors and councils",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "The 161 municipalities elect mayors and councillors on general voting day; terms were three years until 2011 and four from 2014. Vancouver's elected Park Board and local community commissions vote on the same ballot.",
+      "source": "bc-lga",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "within": "CA-BC"
+        },
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "office_kinds": [
+            "mayor"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "within": "CA-BC"
+        }
+      ],
+      "dates": [],
+      "cadence": [
+        {
+          "within": "CA-BC",
+          "government_kind": "municipality",
+          "source": "bc-lga",
+          "period_years": 4,
+          "phase": 2,
+          "month": 10,
+          "term_years": 4,
+          "day_rule": "oct_third_saturday",
+          "valid_from": "2014-01-01",
+          "called": false
+        }
+      ],
+      "est_votes": 1200000,
+      "effort": 3
+    },
+    {
+      "key": "bc_regional",
+      "tier": "regional",
+      "name": "British Columbia regional district electoral area directors",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "Each electoral area of the 27 regional districts elects one director on general voting day.",
+      "source": "bc-elections",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "county"
+          ],
+          "within": "CA-BC"
+        }
+      ],
+      "dates": [],
+      "cadence": [
+        {
+          "within": "CA-BC",
+          "government_kind": "county",
+          "source": "bc-lga",
+          "period_years": 4,
+          "phase": 2,
+          "month": 10,
+          "term_years": 4,
+          "day_rule": "oct_third_saturday",
+          "valid_from": "2014-01-01",
+          "called": false
+        }
+      ],
+      "est_votes": 150000,
+      "effort": 3
+    },
+    {
+      "key": "bc_school",
+      "tier": "school",
+      "name": "British Columbia board of education trustee elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "School trustees are elected on general voting day.",
+      "source": "bc-elections",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "school_district"
+          ],
+          "within": "CA-BC"
+        }
+      ],
+      "dates": [],
+      "cadence": [
+        {
+          "within": "CA-BC",
+          "government_kind": "school",
+          "source": "bc-lga",
+          "period_years": 4,
+          "phase": 2,
+          "month": 10,
+          "term_years": 4,
+          "day_rule": "oct_third_saturday",
+          "valid_from": "2014-01-01",
+          "called": false
+        }
+      ],
+      "est_votes": 1000000,
+      "effort": 3
+    },
+    {
+      "key": "bc_islands_trust",
+      "tier": "regional",
+      "name": "Islands Trust trustee elections",
+      "category": "special_purpose",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "Local trust areas of the Islands Trust elect two trustees each on general voting day.",
+      "source": "bc-elections",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "special_district"
+          ],
+          "within": "CA-BC"
+        }
+      ],
+      "dates": [],
+      "cadence": [
+        {
+          "within": "CA-BC",
+          "government_kind": "special",
+          "source": "bc-lga",
+          "period_years": 4,
+          "phase": 2,
+          "month": 10,
+          "term_years": 4,
+          "day_rule": "oct_third_saturday",
+          "valid_from": "2014-01-01",
+          "called": false
+        }
+      ],
+      "est_votes": 15000,
+      "effort": 3
+    },
+    {
+      "key": "ab_municipal",
+      "tier": "municipal",
+      "name": "Alberta municipal elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "Cities, towns, villages, summer villages, specialized municipalities, and municipal districts (322 in all) elect councils under the Local Authorities Election Act, every four years since 2013. Summer villages vote in summer.",
+      "source": "ab-laea",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "within": "CA-AB"
+        },
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "office_kinds": [
+            "mayor"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "within": "CA-AB"
+        }
+      ],
+      "dates": [],
+      "cadence": [
+        {
+          "within": "CA-AB",
+          "government_kind": "municipality",
+          "source": "ab-laea",
+          "period_years": 4,
+          "phase": 1,
+          "month": 10,
+          "term_years": 4,
+          "day_rule": "oct_third_monday",
+          "valid_from": "2013-01-01",
+          "called": false
+        }
+      ],
+      "est_votes": 1200000,
+      "effort": 4,
+      "finest_note": "Calgary and Edmonton by voting station"
+    },
+    {
+      "key": "ab_school",
+      "tier": "school",
+      "name": "Alberta school board trustee elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "Public and separate school board trustees are elected with the municipal councils under the Local Authorities Election Act.",
+      "source": "ab-laea",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "school_district"
+          ],
+          "within": "CA-AB"
+        }
+      ],
+      "dates": [],
+      "cadence": [
+        {
+          "within": "CA-AB",
+          "government_kind": "school",
+          "source": "ab-laea",
+          "period_years": 4,
+          "phase": 1,
+          "month": 10,
+          "term_years": 4,
+          "day_rule": "oct_third_monday",
+          "valid_from": "2013-01-01",
+          "called": false
+        }
+      ],
+      "est_votes": 900000,
+      "effort": 4
+    },
+    {
+      "key": "ab_metis_settlements",
+      "tier": "metis_settlement",
+      "name": "Alberta Metis Settlement council elections",
+      "category": "non_territorial",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "Each of the eight Metis Settlements elects its council under the Metis Settlements Act; the 40 councillors form the Metis Settlements General Council, whose officers are elected under its own policy.",
+      "source": "ab-msa",
+      "match": [],
+      "dates": [],
+      "cadence": [
+        {
+          "within": "CA-AB",
+          "government_kind": "metis_settlement",
+          "source": "ab-msa",
+          "period_years": 4,
+          "phase": 1,
+          "month": 10,
+          "term_years": 4,
+          "day_rule": "oct_first_monday",
+          "valid_from": "2013-01-01",
+          "called": false
+        }
+      ],
+      "est_votes": 3000,
+      "effort": 4
+    },
+    {
+      "key": "sk_urban",
+      "tier": "municipal",
+      "name": "Saskatchewan urban and northern municipal elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "Cities, towns, villages, and northern municipalities elect mayors and councillors every four years in November (2024-11-13, next 2028-11-08); resort villages vote in July. The 2015 Local Government Election Act governs.",
+      "source": "sk-voting",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "within": "CA-SK"
+        },
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "office_kinds": [
+            "mayor"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "within": "CA-SK"
+        }
+      ],
+      "dates": [],
+      "cadence": [
+        {
+          "within": "CA-SK",
+          "government_kind": "municipality",
+          "source": "sk-voting",
+          "period_years": 4,
+          "phase": 0,
+          "month": 11,
+          "term_years": 4,
+          "called": false
+        }
+      ],
+      "est_votes": 350000,
+      "effort": 4
+    },
+    {
+      "key": "sk_rural",
+      "tier": "municipal",
+      "name": "Saskatchewan rural municipality elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "Rural municipalities elect councillors for half their divisions every two years (even divisions on 2026-11-09; reeves and odd divisions with the urban elections in 2028), each for a four-year term.",
+      "source": "sk-voting",
+      "match": [],
+      "dates": [],
+      "cadence": [
+        {
+          "within": "CA-SK",
+          "government_kind": "rural_municipality",
+          "source": "sk-voting",
+          "period_years": 2,
+          "phase": 0,
+          "month": 11,
+          "term_years": 4,
+          "classes": 2,
+          "called": false
+        }
+      ],
+      "est_votes": 60000,
+      "effort": 4
+    },
+    {
+      "key": "mb_municipal",
+      "tier": "municipal",
+      "name": "Manitoba municipal elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "Winnipeg and the 136 other municipalities elect mayors or reeves and councillors on one day; three resort communities vote in July.",
+      "source": "mb-elections",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "within": "CA-MB"
+        },
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "office_kinds": [
+            "mayor"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "within": "CA-MB"
+        }
+      ],
+      "dates": [],
+      "cadence": [
+        {
+          "within": "CA-MB",
+          "government_kind": "municipality",
+          "source": "mb-elections",
+          "period_years": 4,
+          "phase": 2,
+          "month": 10,
+          "term_years": 4,
+          "day_rule": "oct_fourth_wednesday",
+          "called": false
+        }
+      ],
+      "est_votes": 450000,
+      "effort": 4
+    },
+    {
+      "key": "mb_school",
+      "tier": "school",
+      "name": "Manitoba school board trustee elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "School trustees are elected with the municipal councils.",
+      "source": "mb-elections",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "school_district"
+          ],
+          "within": "CA-MB"
+        }
+      ],
+      "dates": [],
+      "cadence": [
+        {
+          "within": "CA-MB",
+          "government_kind": "school",
+          "source": "mb-elections",
+          "period_years": 4,
+          "phase": 2,
+          "month": 10,
+          "term_years": 4,
+          "day_rule": "oct_fourth_wednesday",
+          "called": false
+        }
+      ],
+      "est_votes": 350000,
+      "effort": 4
+    },
+    {
+      "key": "nb_local",
+      "tier": "municipal",
+      "name": "New Brunswick local government and rural district elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "Mayors, councillors, and rural district advisory committees are elected every four years; the reformed local governments first voted on 2022-11-28, and the general elections of 2021-05-10 and 2026-05-11 preceded and followed the reform. Elections New Brunswick runs and reports them.",
+      "source": "nb-manual",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "within": "CA-NB"
+        },
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "office_kinds": [
+            "mayor"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "within": "CA-NB"
+        }
+      ],
+      "dates": [],
+      "cadence": [
+        {
+          "within": "CA-NB",
+          "government_kind": "municipality",
+          "source": "nb-manual",
+          "period_years": 4,
+          "phase": 2,
+          "month": 5,
+          "term_years": 4,
+          "day_rule": "may_second_monday",
+          "valid_from": "2026-01-01",
+          "called": false
+        }
+      ],
+      "est_votes": 216000,
+      "effort": 2,
+      "access": [
+        {
+          "url": "https://www.electionsnb.ca/content/enb/en.html",
+          "platform": "Elections New Brunswick",
+          "format": "pdf",
+          "access": "open",
+          "checked": "2026-11-13",
+          "source": "enb",
+          "within": "CA-NB",
+          "evidence": "event reports with poll-by-poll results and polling-division spreadsheets"
+        }
+      ],
+      "finest_note": "polling division"
+    },
+    {
+      "key": "nb_dec",
+      "tier": "school",
+      "name": "New Brunswick District Education Council elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "District Education Council members are elected with the local governments.",
+      "source": "enb",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "school_district"
+          ],
+          "within": "CA-NB"
+        }
+      ],
+      "dates": [],
+      "cadence": [
+        {
+          "within": "CA-NB",
+          "government_kind": "school",
+          "source": "nb-manual",
+          "period_years": 4,
+          "phase": 2,
+          "month": 5,
+          "term_years": 4,
+          "day_rule": "may_second_monday",
+          "valid_from": "2026-01-01",
+          "called": false
+        }
+      ],
+      "est_votes": 150000,
+      "effort": 2
+    },
+    {
+      "key": "ns_municipal",
+      "tier": "municipal",
+      "name": "Nova Scotia municipal elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "Mayors and councillors are elected every four years under the Municipal Elections Act; each municipality runs its own election and posts its results.",
+      "source": "ns-municipal",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "within": "CA-NS"
+        },
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "office_kinds": [
+            "mayor"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "within": "CA-NS"
+        }
+      ],
+      "dates": [],
+      "cadence": [
+        {
+          "within": "CA-NS",
+          "government_kind": "municipality",
+          "source": "ns-municipal",
+          "period_years": 4,
+          "phase": 0,
+          "month": 10,
+          "term_years": 4,
+          "day_rule": "oct_third_saturday",
+          "valid_from": "2000-01-01",
+          "called": false
+        }
+      ],
+      "est_votes": 300000,
+      "effort": 4
+    },
+    {
+      "key": "ns_csap",
+      "tier": "school",
+      "name": "Conseil scolaire acadien provincial member elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "The francophone school board's members are elected on the municipal voting day.",
+      "source": "ns-municipal",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "school_district"
+          ],
+          "within": "CA-NS"
+        }
+      ],
+      "dates": [],
+      "cadence": [
+        {
+          "within": "CA-NS",
+          "government_kind": "school",
+          "source": "ns-municipal",
+          "period_years": 4,
+          "phase": 0,
+          "month": 10,
+          "term_years": 4,
+          "day_rule": "oct_third_saturday",
+          "valid_from": "2000-01-01",
+          "called": false
+        }
+      ],
+      "est_votes": 10000,
+      "effort": 4
+    },
+    {
+      "key": "pe_municipal",
+      "tier": "municipal",
+      "name": "Prince Edward Island municipal elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "Every four years on the first Monday in November (2022-11-07 and 2026-11-02, next 2030-11-04). Elections PEI runs Charlottetown, Cornwall, Stratford, Summerside, and Three Rivers; the other municipalities run their own.",
+      "source": "pe-municipal",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "within": "CA-PE"
+        },
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "office_kinds": [
+            "mayor"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "within": "CA-PE"
+        }
+      ],
+      "dates": [],
+      "cadence": [
+        {
+          "within": "CA-PE",
+          "government_kind": "municipality",
+          "source": "pe-municipal",
+          "period_years": 4,
+          "phase": 2,
+          "month": 11,
+          "term_years": 4,
+          "day_rule": "nov_first_monday",
+          "called": false
+        }
+      ],
+      "est_votes": 60000,
+      "effort": 3
+    },
+    {
+      "key": "nl_municipal",
+      "tier": "municipal",
+      "name": "Newfoundland and Labrador municipal elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "Councils are elected every four years from 2001 on the last Tuesday in September; the 2025 election was deferred to 2 October, and local service districts voted for the first time.",
+      "source": "nl-mea",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "within": "CA-NL"
+        },
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "office_kinds": [
+            "mayor"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "within": "CA-NL"
+        }
+      ],
+      "dates": [],
+      "cadence": [
+        {
+          "within": "CA-NL",
+          "government_kind": "municipality",
+          "source": "nl-mea",
+          "period_years": 4,
+          "phase": 1,
+          "month": 9,
+          "term_years": 4,
+          "day_rule": "sep_last_tuesday",
+          "valid_from": "2001-01-01",
+          "called": false
+        }
+      ],
+      "est_votes": 150000,
+      "effort": 4
+    },
+    {
+      "key": "yt_municipal",
+      "tier": "municipal",
+      "name": "Yukon municipal elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "Eight municipalities elect mayors and councils in October; terms moved from three to four years with the 2024 election (2021-10-21, 2024-10-17).",
+      "source": "yt-term",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "within": "CA-YT"
+        },
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "office_kinds": [
+            "mayor"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "within": "CA-YT"
+        }
+      ],
+      "dates": [],
+      "cadence": [
+        {
+          "within": "CA-YT",
+          "government_kind": "municipality",
+          "source": "yt-term",
+          "period_years": 4,
+          "phase": 0,
+          "month": 10,
+          "term_years": 4,
+          "valid_from": "2024-01-01",
+          "called": false
+        }
+      ],
+      "est_votes": 12000,
+      "effort": 3
+    },
+    {
+      "key": "nt_community",
+      "tier": "municipal",
+      "name": "Northwest Territories community government elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "Towns and villages elect councils for three-year terms in October (2024-10-21); hamlets vote in December with staggered terms, and charter communities and the Tłı̨chǫ communities set their own dates.",
+      "source": "nt-dates",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "within": "CA-NT"
+        },
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "office_kinds": [
+            "mayor"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "within": "CA-NT"
+        }
+      ],
+      "dates": [],
+      "cadence": [
+        {
+          "within": "CA-NT",
+          "government_kind": "municipality",
+          "source": "nt-dates",
+          "period_years": 3,
+          "phase": 0,
+          "month": 10,
+          "term_years": 3,
+          "called": false
+        }
+      ],
+      "est_votes": 15000,
+      "effort": 4
+    },
+    {
+      "key": "nu_municipal",
+      "tier": "municipal",
+      "name": "Nunavut municipal elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "The 25 municipal councils are elected every four years under the Nunavut Elections Act, run by Elections Nunavut (2023-10-23, next 2027-10-25).",
+      "source": "nu-municipal",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "within": "CA-NU"
+        },
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "office_kinds": [
+            "mayor"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "within": "CA-NU"
+        }
+      ],
+      "dates": [],
+      "cadence": [
+        {
+          "within": "CA-NU",
+          "government_kind": "municipality",
+          "source": "nu-municipal",
+          "period_years": 4,
+          "phase": 3,
+          "month": 10,
+          "term_years": 4,
+          "called": false
+        }
+      ],
+      "est_votes": 10000,
+      "effort": 3
+    },
+    {
+      "key": "local_referendums",
+      "tier": "municipal",
+      "name": "Municipal referendums and plebiscites",
+      "category": "direct_democracy",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "Votes put to a municipality's electors (Quebec's approval referendums, Alberta and British Columbia plebiscites and assent votes, Ontario's municipal questions), held on general voting day or on their own.",
+      "source": "qc-elections",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum",
+            "local"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "polity_kinds": [
+            "municipality",
+            "submunicipal",
+            "county"
+          ]
+        }
+      ],
+      "dates": [],
+      "cadence": [],
+      "est_votes": 300000,
+      "effort": 5
+    },
+    {
+      "key": "band_councils",
+      "tier": "first_nation",
+      "name": "First Nations band council elections under the Indian Act and the First Nations Elections Act",
+      "category": "non_territorial",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "About 200 First Nations elect chiefs and councils every two years under the Indian Act, and those that opt in every four years under the First Nations Elections Act (2015). In 2015, 234 of 618 First Nations used the Indian Act and 2 the 2014 Act.",
+      "source": "isc-elections",
+      "match": [],
+      "dates": [],
+      "cadence": [],
+      "est_votes": 100000,
+      "effort": 5,
+      "disposition": "blocked",
+      "disposition_reason": "No central publisher: Indigenous Services Canada records who was elected but publishes no vote counts, and each First Nation posts its own results, often to members only."
+    },
+    {
+      "key": "indigenous_governments",
+      "tier": "first_nation",
+      "name": "Self-governing and custom-code Indigenous government elections",
+      "category": "non_territorial",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "First Nations under custom election codes (344 in 2015) or self-government agreements (38), modern-treaty governments such as Nunatsiavut and Nisga'a Lisims, the Cree Nation Government, and the Métis Nation governments.",
+      "source": "isc-systems",
+      "match": [],
+      "dates": [],
+      "cadence": [],
+      "effort": 5,
+      "disposition": "out_of_scope",
+      "disposition_reason": "Each government runs its elections under its own constitution or code; no federal, provincial, or territorial agency runs or certifies them."
     }
   ]
 }
