@@ -14,7 +14,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "gb.npa"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 HERE = Path(__file__).parent
 SOURCES = HERE / "npa_sources.tsv"
@@ -82,6 +82,12 @@ DISAGREES = (
 UNPRINTED = (
     "The declaration prints {ballots:,} total votes but no count of rejected ballot papers; the candidates' votes "
     "add up to {valid:,}."
+)
+
+
+NO_TOTALS = (
+    "The results page prints each candidate's votes and a turnout percentage but no electorate, ballot total, or "
+    "rejected count; the candidates' votes add up to {valid:,}."
 )
 
 
@@ -186,7 +192,7 @@ def emit() -> Path:
             version=VERSION,
             summary="Scotland's two national park authorities: the Loch Lomond and The Trossachs and Cairngorms "
             "parks (Scottish Government shapes) as polities, their five board wards each, and the local member "
-            "elections of 2014, 2018, 2022, and 2026 (Loch Lomond and The Trossachs) and 2015, 2017, 2019, and "
+            "elections of 2006, 2010, 2014, 2018, 2022, and 2026 (Loch Lomond and The Trossachs) and 2015, 2017, 2019, and "
             "2023 (Cairngorms), from the returning officers' declarations",
             polity="GB",
         )
@@ -206,9 +212,27 @@ def emit() -> Path:
                 cs.add("scheme", code=code, polity_id=gb, kind=kind, rank=rank, noun=noun)
 
         sources: dict[str, UUID] = {}
+        licensed = {
+            row[0]: row[1:]
+            for row in conn.execute(
+                "select url, license, license_url, attribution from source where url = any(%s)",
+                [sources_table["url"].to_list()],
+            )
+        }
         for url, publisher, title in sources_table.rows():
             sources[url] = cs.source(publisher, title)
-            cs.add("source", id=sources[url], kind="official_body", publisher=publisher, title=title, url=url)
+            license, license_url, attribution = licensed.get(url, (None, None, None))
+            cs.add(
+                "source",
+                id=sources[url],
+                kind="official_body",
+                publisher=publisher,
+                title=title,
+                url=url,
+                license=license,
+                license_url=license_url,
+                attribution=attribution,
+            )
             cs.artifact(raw.cached(SOURCE, url), sources[url])
         shapes = cs.source(SHAPES_PUBLISHER, SHAPES_TITLE)
         cs.add(
@@ -395,7 +419,10 @@ def emit() -> Path:
                 valid = int(lines["votes"].sum())
                 ballots, rejected = ward["ballots"], ward["rejected"]
                 accounting = [(REGISTERED, ward["electorate"])]
-                if rejected is None:
+                if ballots is None:
+                    accounting = []
+                    cs.add("note", entity_id=result_set, kind="caveat", body_md=NO_TOTALS.format(valid=valid))
+                elif rejected is None:
                     accounting.append((BALLOTS, ballots))
                     cs.add(
                         "note",
