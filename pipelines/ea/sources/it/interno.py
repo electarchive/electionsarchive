@@ -71,6 +71,14 @@ MIXED_LISTS = {
 GENERAL = date(2022, 9, 25)
 VOTING = (date(2025, 6, 8), date(2025, 6, 9))
 FOUNDING_MEMBER = date(1958, 1, 1)
+TRANSFERS = [
+    *(
+        (code, "11", "08", date(2009, 8, 15))
+        for code in ("099021", "099022", "099023", "099024", "099025", "099026", "099027")
+    ),
+    ("030189", "05", "06", date(2017, 12, 16)),
+    *((code, "11", "08", date(2021, 6, 17)) for code in ("099030", "099031")),
+]
 FIRST_SITTING = date(2022, 10, 13)
 AOSTA = "VALLE D'AOSTA - U01"
 REGISTERED, VALID, INVALID, BLANK, VOTES, VOTERS = 2, 4, 5, 6, 1, 14
@@ -944,12 +952,23 @@ def emit() -> Path:
             "area_code",
             comuni.filter("matched").select(area_id=comune_area, code="code", valid_from=pl.lit(None, pl.Date)),
         )
+        moved = pl.DataFrame(TRANSFERS, schema=["code", "before", "after", "on"], orient="row")
+        undated = pl.lit(None, pl.Date)
         cs.frame(
             "area_parent",
-            comuni.select(
-                area_id=comune_area,
+            pl.concat(
+                [
+                    comuni.filter(~pl.col("code").is_in(moved["code"].implode())).select(
+                        area_id=comune_area, region="region", valid_from=undated, valid_to=undated
+                    ),
+                    moved.select(area_id=comune_area, region="before", valid_from=undated, valid_to="on"),
+                    moved.select(area_id=comune_area, region="after", valid_from="on", valid_to=undated),
+                ]
+            ).select(
+                "area_id",
+                "valid_from",
+                "valid_to",
                 parent_id=pl.col("region").replace_strict({code: str(id) for code, id in region_ids.items()}),
-                valid_from=pl.lit(None, pl.Date),
             ),
         )
         official_areas = [comune_ids[code] for code in comuni.filter("matched")["code"]]
