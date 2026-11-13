@@ -2172,6 +2172,13 @@ def partition(sums: dict[tuple[UUID, UUID, int], int]) -> dict[tuple[UUID, UUID,
     return kept
 
 
+def totals(sums: dict[tuple[UUID, UUID, int], int]) -> dict[tuple[UUID, UUID], int]:
+    kept: dict[tuple[UUID, UUID], int] = {}
+    for (unit, option, _), votes in sums.items():
+        kept[(unit, option)] = kept.get((unit, option), 0) + votes
+    return kept
+
+
 def emit():
     frame = pl.read_parquet(PARSED / "results.parquet").filter(pl.col("scope") == "")
     pages = json.loads((PARSED / "pages.json").read_text())
