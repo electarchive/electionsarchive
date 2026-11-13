@@ -55,7 +55,7 @@ CHECKED = {
     1848: ("ME", "VT", "MA", "RI", "NH", "CT", "NY", "NJ", "PA", "DE", "MD", "VA", "NC", "AL", "GA", "LA", "MS")
     + ("TN", "KY", "OH", "IN", "IL", "MO", "MI", "WI", "IA"),
     1844: ("ME", "VT", "MA", "RI", "NH", "CT", "NY", "NJ", "PA", "DE", "MD", "VA", "NC", "AL", "GA", "LA", "MS")
-    + ("TN", "KY", "OH", "IN", "IL"),
+    + ("TN", "KY", "OH", "IN", "IL", "MI"),
 }
 WARDS = ("I", "II", "III", "IV", "V", "VI", "VII", "X", "XIII", "VIII", "IX", "XIV", "XI", "XII", "XV", "XVI", "XVII")
 UNREAD = {("NY", f"Ward {ward}"): 54 for ward in (*WARDS, "XVIII")} | {
