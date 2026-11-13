@@ -1416,7 +1416,11 @@ function governmentsMarkdown(
         row.cadence == null
           ? null
           : `${row.cadence.url == null ? row.cadence.title : `[${row.cadence.title}](${row.cadence.url})`}${row.cadence.locator == null ? "" : `, ${row.cadence.locator}`}`,
-        row.access == null ? null : (row.access.url ?? row.access.platform),
+        row.access == null
+          ? null
+          : row.access.url == null
+            ? row.access.platform
+            : `[${URL.canParse(row.access.url) ? new URL(row.access.url).host : row.access.url}](${row.access.url})`,
         row.access == null ? null : ACCESS_LABELS[row.access.access](),
       ]),
     ),
