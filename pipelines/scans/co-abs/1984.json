@@ -1,0 +1,199 @@
+{
+  "polity": "US-CO",
+  "publisher": "Colorado Secretary of State",
+  "title": "Abstract of votes cast, 1984",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/abstractofvotesc1984nata/abstractofvotesc1984nata.pdf"
+  },
+  "raw_source": "us.scans",
+  "extend": true,
+  "empty": true,
+  "contests": {
+    "president": {
+      "year": 1984,
+      "chamber": "president",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "CO",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 130,
+      "id": "130-0",
+      "columns": [
+        {
+          "label": "# REG",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "# VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "1",
+          "contest": "president",
+          "candidate": "Walter F. Mondale"
+        },
+        {
+          "label": "2",
+          "contest": "president",
+          "candidate": "Ronald Reagan"
+        },
+        {
+          "label": "3",
+          "contest": "president",
+          "candidate": "David Bergland"
+        },
+        {
+          "label": "4",
+          "contest": "president",
+          "candidate": "Earl F. Dodge"
+        },
+        {
+          "label": "5",
+          "contest": "president",
+          "candidate": "Lyndon H. LaRouche Jr."
+        },
+        {
+          "label": "6",
+          "contest": "president",
+          "candidate": "Mel Mason"
+        },
+        {
+          "label": "7",
+          "contest": "president",
+          "candidate": "Dennis L. Serrette"
+        },
+        {
+          "label": "TOTAL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "NO VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "%",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "NO VT",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "%TRNOUT",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.051,
+        0.091,
+        0.999,
+        1.0
+      ],
+      "hint": "Read only the table headed 'PRESIDENTIAL ELECTORS'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 3,
+      "header": [
+        0.0,
+        0.2959
+      ]
+    },
+    {
+      "page": 131,
+      "id": "131-0",
+      "columns": [
+        {
+          "label": "# REG",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "# VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "1",
+          "contest": "president",
+          "candidate": "Walter F. Mondale"
+        },
+        {
+          "label": "2",
+          "contest": "president",
+          "candidate": "Ronald Reagan"
+        },
+        {
+          "label": "3",
+          "contest": "president",
+          "candidate": "David Bergland"
+        },
+        {
+          "label": "4",
+          "contest": "president",
+          "candidate": "Earl F. Dodge"
+        },
+        {
+          "label": "5",
+          "contest": "president",
+          "candidate": "Lyndon H. LaRouche Jr."
+        },
+        {
+          "label": "6",
+          "contest": "president",
+          "candidate": "Mel Mason"
+        },
+        {
+          "label": "7",
+          "contest": "president",
+          "candidate": "Dennis L. Serrette"
+        },
+        {
+          "label": "TOTAL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "NO VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "%",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "NO VT",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "%TRNOUT",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.051,
+        0.0,
+        0.999,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings.",
+      "turn": -90
+    }
+  ]
+}

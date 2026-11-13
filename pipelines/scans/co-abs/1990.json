@@ -1,0 +1,433 @@
+{
+  "polity": "US-CO",
+  "publisher": "Colorado Secretary of State",
+  "title": "Abstract of votes cast, 1990",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/abstractofvotesc1990nata/abstractofvotesc1990nata.pdf"
+  },
+  "raw_source": "us.scans",
+  "extend": true,
+  "empty": true,
+  "contests": {
+    "house1": {
+      "year": 1990,
+      "chamber": "house",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "CO",
+      "district": 1
+    },
+    "house2": {
+      "year": 1990,
+      "chamber": "house",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "CO",
+      "district": 2
+    },
+    "house3": {
+      "year": 1990,
+      "chamber": "house",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "CO",
+      "district": 3
+    },
+    "house4": {
+      "year": 1990,
+      "chamber": "house",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "CO",
+      "district": 4
+    },
+    "house5": {
+      "year": 1990,
+      "chamber": "house",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "CO",
+      "district": 5
+    },
+    "house6": {
+      "year": 1990,
+      "chamber": "house",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "CO",
+      "district": 6
+    }
+  },
+  "pages": [
+    {
+      "page": 150,
+      "id": "150-0",
+      "columns": [
+        {
+          "label": "# REG",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "# VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "1",
+          "contest": "house1",
+          "candidate": "SCHROEDER, PATRICIA",
+          "party": "D"
+        },
+        {
+          "label": "2",
+          "contest": "house1",
+          "candidate": "ROEMER, GLORIA GONZALES",
+          "party": "R"
+        },
+        {
+          "label": "TOTAL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "NO VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "% NO VT",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "%TRNOUT",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.056,
+        0.183,
+        0.859,
+        0.534
+      ],
+      "hint": "Read only the table headed 'U.S. CONGRESS - FIRST DISTRICT'; ignore any other table visible in the image.",
+      "turn": -90
+    },
+    {
+      "page": 150,
+      "id": "150-1",
+      "columns": [
+        {
+          "label": "# REG",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "# VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "1",
+          "contest": "house2",
+          "candidate": "LEWIS, JASON",
+          "party": "R"
+        },
+        {
+          "label": "2",
+          "contest": "house2",
+          "candidate": "SKAGGS, DAVID E.",
+          "party": "D"
+        },
+        {
+          "label": "TOTAL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "NO VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "% NO VT",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "%TRNOUT",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.056,
+        0.526,
+        0.859,
+        0.918
+      ],
+      "hint": "Read only the table headed 'U.S. CONGRESS - SECOND DISTRICT'; ignore any other table visible in the image.",
+      "turn": -90
+    },
+    {
+      "page": 151,
+      "id": "151-0",
+      "columns": [
+        {
+          "label": "# REG",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "# VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "1",
+          "contest": "house3",
+          "candidate": "CAMPBELL, BEN NIGHTHORSE",
+          "party": "D"
+        },
+        {
+          "label": "2",
+          "contest": "house3",
+          "candidate": "ELLIS, BOB",
+          "party": "R"
+        },
+        {
+          "label": "3",
+          "contest": "house3",
+          "candidate": "FIELDS, HOWARD E.",
+          "party": "T"
+        },
+        {
+          "label": "TOTAL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "NO VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "% NO VT",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "%TRNOUT",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.047,
+        0.018,
+        0.927,
+        0.923
+      ],
+      "hint": "Read only the table headed 'U.S. CONGRESS - THIRD DISTRICT'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 3,
+      "header": [
+        0.0,
+        0.1613
+      ]
+    },
+    {
+      "page": 152,
+      "id": "152-0",
+      "columns": [
+        {
+          "label": "# REG",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "# VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "1",
+          "contest": "house4",
+          "candidate": "BOND, RICHARD R. (DICK)",
+          "party": "D"
+        },
+        {
+          "label": "2",
+          "contest": "house4",
+          "candidate": "ALLARD, WAYNE",
+          "party": "R"
+        },
+        {
+          "label": "TOTAL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "NO VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "% NO VT",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "%TRNOUT",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.047,
+        0.244,
+        0.853,
+        0.894
+      ],
+      "hint": "Read only the table headed 'U.S. CONGRESS - FOURTH DISTRICT'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2062
+      ]
+    },
+    {
+      "page": 153,
+      "id": "153-0",
+      "columns": [
+        {
+          "label": "# REG",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "# VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "1",
+          "contest": "house5",
+          "candidate": "JOHNSTON, CAL",
+          "party": "D"
+        },
+        {
+          "label": "2",
+          "contest": "house5",
+          "candidate": "HEFLEY, JOEL",
+          "party": "R"
+        },
+        {
+          "label": "3",
+          "contest": "house5",
+          "candidate": "HAMBURGER, KEITH",
+          "party": "L"
+        },
+        {
+          "label": "TOTAL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "NO VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "% NO VT",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "%TRNOUT",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.05,
+        0.022,
+        0.934,
+        0.582
+      ],
+      "hint": "Read only the table headed 'U.S. CONGRESS - FIFTH DISTRICT'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 2,
+      "header": [
+        0.0,
+        0.4196
+      ]
+    },
+    {
+      "page": 153,
+      "id": "153-1",
+      "columns": [
+        {
+          "label": "# REG",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "# VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "1",
+          "contest": "house6",
+          "candidate": "JARRETT, DON",
+          "party": "D"
+        },
+        {
+          "label": "2",
+          "contest": "house6",
+          "candidate": "SCHAEFER, DAN",
+          "party": "R"
+        },
+        {
+          "label": "TOTAL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "NO VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "% NO VT",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "%TRNOUT",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.051,
+        0.574,
+        0.859,
+        0.926
+      ],
+      "hint": "Read only the table headed 'U.S. CONGRESS - SIXTH DISTRICT'; ignore any other table visible in the image.",
+      "turn": -90
+    }
+  ]
+}

@@ -1,0 +1,169 @@
+{
+  "polity": "US-CO",
+  "publisher": "Colorado Secretary of State",
+  "title": "Abstract of votes cast, 1988",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/abstractofvotesc1988nata/abstractofvotesc1988nata.pdf"
+  },
+  "raw_source": "us.scans",
+  "extend": true,
+  "empty": true,
+  "contests": {
+    "president": {
+      "year": 1988,
+      "chamber": "president",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "CO",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 122,
+      "id": "122-0",
+      "columns": [
+        {
+          "label": "# REG",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "# VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "1",
+          "contest": "president",
+          "candidate": "George Bush"
+        },
+        {
+          "label": "2",
+          "contest": "president",
+          "candidate": "Michael S. Dukakis"
+        },
+        {
+          "label": "3",
+          "contest": "president",
+          "candidate": "Earl Dodge"
+        },
+        {
+          "label": "4",
+          "contest": "president",
+          "candidate": "Lenora B. Fulani"
+        },
+        {
+          "label": "5",
+          "contest": "president",
+          "candidate": "Ronald E. Paul"
+        },
+        {
+          "label": "TOTAL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "NO VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "% NO VT",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "%TRNOUT",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.042,
+        0.143,
+        0.983,
+        1.0
+      ],
+      "hint": "Read only the table headed 'PRESIDENTIAL ELECTORS'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3174
+      ]
+    },
+    {
+      "page": 123,
+      "id": "123-0",
+      "columns": [
+        {
+          "label": "# REG",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "# VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "1",
+          "contest": "president",
+          "candidate": "George Bush"
+        },
+        {
+          "label": "2",
+          "contest": "president",
+          "candidate": "Michael S. Dukakis"
+        },
+        {
+          "label": "3",
+          "contest": "president",
+          "candidate": "Earl Dodge"
+        },
+        {
+          "label": "4",
+          "contest": "president",
+          "candidate": "Lenora B. Fulani"
+        },
+        {
+          "label": "5",
+          "contest": "president",
+          "candidate": "Ronald E. Paul"
+        },
+        {
+          "label": "TOTAL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "NO VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "% NO VT",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "%TRNOUT",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.042,
+        0.0,
+        0.983,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings.",
+      "turn": -90
+    }
+  ]
+}
