@@ -68,6 +68,10 @@ later(id, depth) as (
 up(id) as (
   select id from later
   union select c.allocation_parent_id from contest c join up on c.id = up.id where c.allocation_parent_id is not null
+),
+logged as (
+  insert into cover_stale (contest_id, changeset_id)
+  select id, %(id)s from up
 )
 delete from contest_cover where id in (select id from up)"""
 
@@ -85,5 +89,6 @@ def uncover(
     params = {"id": changeset_id, "moved": moved or [], "repointed": repointed or [], "sets": sets or []}
     if changeset_id is not None and conn.execute(WIDE, params).fetchone() == (True,):
         conn.execute("delete from contest_cover")
+        conn.execute("insert into cover_stale (changeset_id) values (%(id)s)", params)
         return
     conn.execute(sql.SQL(STALE).format(facts=facts or sql.SQL("select null::uuid")), params)
