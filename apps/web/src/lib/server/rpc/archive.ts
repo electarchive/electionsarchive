@@ -1685,7 +1685,7 @@ async function shallow(
     ...held.flat().map((row) => row.k),
   ];
   if (ks.length === 0) {
-    return undefined;
+    return;
   }
   const { pool, valued, counted } = countingFor(ks);
   const lazy = (within: SQL) => sql`
@@ -1843,7 +1843,7 @@ async function shallow(
   );
   found.rows.push(...joined.rows, ...abroad.rows);
   if (found.rows.length === 0) {
-    return undefined;
+    return;
   }
   const unlinked = await db.execute<{ id: string; k: number; scheme: string }>(
     sql`
