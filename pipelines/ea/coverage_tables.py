@@ -991,11 +991,13 @@ def build(full: bool = False) -> str:
     cog = pl.read_parquet(raw.parsed("us.cog") / "governments.parquet")
     codes = {code: pid for pid, (_, code, _, _) in polities.items() if code is not None}
     link: dict[str, str] = {}
-    for gid, kind, st, county, place in cog.select("id", "kind", "state_fips", "county_fips", "place_fips").iter_rows():
+    for gid, kind, name, st, county, place in cog.select(
+        "id", "kind", "name", "state_fips", "county_fips", "place_fips"
+    ).iter_rows():
         candidates = [f"county:{st}{county}"] if kind == "county" else []
         if kind in ("municipality", "township") and place is not None:
             candidates = [f"place:{BALANCES.get(st + place, st + place)}", f"town:{st}{county}{place}"]
-            if county is not None and county >= "500":
+            if county is not None and (county >= "500" or name.startswith("CITY AND COUNTY OF")):
                 candidates.append(f"county:{st}{county}")
             if st + place == "3651000":
                 candidates.append("new-york-city")

@@ -251,7 +251,7 @@ def crawl(starts: list[str]) -> list[dict[str, str]]:
 
 def counties_of() -> dict[str, UUID]:
     with connect() as conn:
-        return {
+        found = {
             fips: polity
             for fips, polity in conn.execute(
                 """select distinct on (g.county) g.county, g.polity_id from coverage_government g
@@ -260,6 +260,12 @@ def counties_of() -> dict[str, UUID]:
                    order by g.county, g.kind, g.population desc nulls last"""
             ).fetchall()
         }
+        for value, polity in conn.execute(
+            """select substr(value, 8), entity_id from external_id
+               where scheme = 'us.polity' and value like 'county:_____'"""
+        ).fetchall():
+            found.setdefault(value, polity)
+        return found
 
 
 def registry() -> list[dict[str, str]]:
