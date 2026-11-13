@@ -150,6 +150,16 @@ publisher = "North Carolina State Board of Elections"
 url = "https://www.ncsbe.gov/results-data"
 
 [[feed]]
+id = "us.ballots.az"
+adapter = "us.ballots"
+enabled = false
+params = { state = "AZ" }
+poller = "muktedir"
+publisher = "Arizona Secretary of State"
+url = "https://apps.arizona.vote/info/bps/2022-general-election/33/0"
+note = "2022 general ballot-processing reports, loaded once from Wayback captures by ea parse and emit us.az_ballots; not polled"
+
+[[feed]]
 id = "us.ballots.nc"
 adapter = "us.ballots"
 enabled = false
