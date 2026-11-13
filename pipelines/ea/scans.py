@@ -90,6 +90,7 @@ class Manifest(TypedDict):
     license: NotRequired[str]
     raw_source: NotRequired[str]
     unit_codes: NotRequired[dict[str, str]]
+    unit_labels: NotRequired[dict[str, str]]
     unit_parts: NotRequired[dict[str, str]]
     unit_standalone: NotRequired[bool]
     unit_scheme: NotRequired[Literal["town", "split"]]
@@ -747,6 +748,8 @@ def cells(
             header, rows = table["header"], table["rows"]
             if not header and not rows:
                 continue
+            for row in rows:
+                row["label"] = manifest.get("unit_labels", {}).get(row["label"].strip(), row["label"])
             if not header and rows:
                 width = len(rows[0]["values"])
                 header = next(

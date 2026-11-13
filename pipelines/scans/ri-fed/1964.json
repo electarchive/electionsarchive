@@ -168,5 +168,8 @@
         0.09
       ]
     }
-  ]
+  ],
+  "unit_labels": {
+    "EAST PPROVIDENCE": "EAST PROVIDENCE"
+  }
 }
