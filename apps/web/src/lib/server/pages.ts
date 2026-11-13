@@ -155,47 +155,54 @@ function ahead(
   })();
 }
 
-const STRATA: Array<{
-  path: string;
-  body: string;
-  isNation: boolean;
-  isGrouped?: boolean;
-}> = [
-  { path: "us", body: "U.S. House", isNation: true },
-  { path: "gb", body: "House of Commons", isNation: true },
-  { path: "ca", body: "House of Commons", isNation: true },
-  { path: "ch", body: "National Council", isNation: true },
-  { path: "tr", body: "Grand National Assembly", isNation: true },
-  { path: "it", body: "Chamber of Deputies", isNation: true },
-  { path: "de", body: "Bundestag", isNation: true },
-  { path: "fr", body: "National Assembly", isNation: true },
-  { path: "eu", body: "European Parliament", isNation: true, isGrouped: true },
-  { path: "br", body: "Chamber of Deputies", isNation: true },
-  { path: "us/ma", body: "State House", isNation: false },
-  {
-    path: "us/nv/clark-county",
-    body: "Clark County Commission",
-    isNation: false,
-  },
-  { path: "gb/northern-ireland", body: "Stormont", isNation: false },
-  { path: "gb/scotland", body: "Scottish Parliament", isNation: false },
-  { path: "gb/leeds", body: "Leeds Council", isNation: false },
+const LOCAL_STRATA: Array<{ path: string; body: string }> = [
+  { path: "us/ma", body: "State House" },
+  { path: "us/nv/clark-county", body: "Clark County Commission" },
+  { path: "gb/northern-ireland", body: "Stormont" },
+  { path: "gb/scotland", body: "Scottish Parliament" },
+  { path: "gb/leeds", body: "Leeds Council" },
 ];
 
 async function strata() {
+  const local = new Map(LOCAL_STRATA.map((entry) => [entry.path, entry.body]));
   const found = await db.execute<{
     path: string;
     name: string | null;
     series: unknown;
     parties: unknown;
+    chamber: string | null;
+    isNation: boolean;
+    isGrouped: boolean;
   }>(sql`
     select s.path, r.record->'series' as series, r.record->'parties' as parties,
+      y.kind in ('sovereign_state', 'supranational') as "isNation",
+      y.kind = 'supranational' as "isGrouped",
+      (select e->>'name' from jsonb_array_elements(r.record->'series') e
+        join body b on b.id::text = e->>'id'
+        where b.polity_id = r.polity_id and b.kind in ('lower_house', 'unicameral')
+          and coalesce((e->>'isOwn')::boolean, true)
+        order by jsonb_array_length(e->'points') desc, e->>'name' limit 1) as chamber,
       (select n.text from name n where n.entity_id = r.polity_id and n.kind in ('official', 'english')
         order by n.is_preferred desc, (n.lang = 'en') desc, (n.kind = 'official') desc, n.recorded_from desc, n.id limit 1) as name
-    from slug s join polity_record r on r.polity_id = s.entity_id
-    where s.is_current and s.path = any(${sql.param(STRATA.map((entry) => entry.path))}::text[])
+    from slug s join polity_record r on r.polity_id = s.entity_id join polity y on y.id = r.polity_id
+    where s.is_current and (
+      y.kind in ('sovereign_state', 'supranational') or s.path = any(${sql.param([...local.keys()])}::text[])
+    )
   `);
-  const records = new Map(found.rows.map((row) => [row.path, row]));
+  const wanted = found.rows.flatMap((row) => {
+    const body = row.isNation ? row.chamber : local.get(row.path);
+    return body == null
+      ? []
+      : [
+          {
+            row,
+            body,
+            order: row.isNation
+              ? -1
+              : LOCAL_STRATA.findIndex((entry) => entry.path === row.path),
+          },
+        ];
+  });
   const parties: Array<{
     id: string;
     label: string;
@@ -208,9 +215,8 @@ async function strata() {
     independent: -2,
     others: -3,
   };
-  const rows = STRATA.flatMap((wanted) => {
-    const row = records.get(wanted.path);
-    const series = (row?.series ?? []) as Array<{
+  const built = wanted.flatMap(({ row, body: chamber, order }) => {
+    const series = (row.series ?? []) as Array<{
       name: string;
       isOwn?: boolean;
       points: Array<{
@@ -227,7 +233,7 @@ async function strata() {
     }>;
     const listed = new Map(
       (
-        (row?.parties ?? []) as Array<{
+        (row.parties ?? []) as Array<{
           id: string;
           lean: number | null;
           color: string | null;
@@ -237,9 +243,9 @@ async function strata() {
       ).map((party) => [party.id, party]),
     );
     const body = series.find(
-      (entry) => entry.name === wanted.body && entry.isOwn !== false,
+      (entry) => entry.name === chamber && entry.isOwn !== false,
     );
-    if (row == null || body == null || body.points.length === 0) {
+    if (body == null || body.points.length === 0) {
       return [];
     }
     let last = 0;
@@ -251,9 +257,7 @@ async function strata() {
       const pooled = new Map<string, number>();
       for (const entry of point.parties) {
         const party =
-          wanted.isGrouped === true &&
-          entry.group != null &&
-          listed.has(entry.group)
+          row.isGrouped && entry.group != null && listed.has(entry.group)
             ? entry.group
             : entry.party;
         const key =
@@ -302,16 +306,31 @@ async function strata() {
         },
       ];
     });
-    return [
-      {
-        path: wanted.path,
-        name: row.name ?? wanted.path,
-        body: body.name,
-        isNation: wanted.isNation,
-        points,
-      },
-    ];
+    return points.length === 0
+      ? []
+      : [
+          {
+            order,
+            row: {
+              path: row.path,
+              name: row.name ?? row.path,
+              body: body.name,
+              isNation: row.isNation,
+              points,
+            },
+          },
+        ];
   });
+  const rows = built
+    .toSorted(
+      (a, b) =>
+        a.order - b.order ||
+        (a.row.points[0]?.date ?? "").localeCompare(
+          b.row.points[0]?.date ?? "",
+        ) ||
+        a.row.name.localeCompare(b.row.name),
+    )
+    .map((entry) => entry.row);
   return { rows, parties };
 }
 
@@ -332,7 +351,7 @@ export async function home() {
       )
       .map(([id]) => id),
   ].toSorted((a, b) => a.localeCompare(b));
-  return remember(`home:v8:${today}:${ended}:${live.join(",")}`, async () =>
+  return remember(`home:v9:${today}:${ended}:${live.join(",")}`, async () =>
     welcome(today, ended, live),
   );
 }
