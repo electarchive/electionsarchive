@@ -1036,6 +1036,8 @@ async function baselines(
   };
 }
 
+const CHANNEL_SHRINK = 200;
+
 const scaled = new Map<string, Promise<Map<string, number>>>();
 
 async function load(state: string, midterm: string, presidential: string) {
@@ -1740,6 +1742,16 @@ async function night(
     const { units: chosen, credit } =
       fromSeat.usable || presidents.length === 0 ? fromSeat : allot(presidents);
     const mixes = new Map<string, Array<LiveChannel>>();
+    const raw = new Map<
+      string,
+      {
+        total: number;
+        all: Array<number>;
+        channels: Map<number, { total: number; votes: Array<number> }>;
+      }
+    >();
+    const state = new Map<number, { total: number; votes: Array<number> }>();
+    const whole = { total: 0, votes: own.map(() => 0) };
     for (const [unit, unitLines] of Map.groupBy(
       channelBy.get(row.id) ?? [],
       (line) => fold(line.unit),
@@ -1769,21 +1781,49 @@ async function night(
       if (total <= 0 || byChannel.size < 2 || byChannel.has(0)) {
         continue;
       }
+      raw.set(unit, { total, all, channels: byChannel });
+      whole.total += total;
+      for (const [position, votes] of all.entries()) {
+        whole.votes[position] = (whole.votes[position] ?? 0) + votes;
+      }
+      for (const [channel, held] of byChannel) {
+        const pool = state.get(channel) ?? {
+          total: 0,
+          votes: own.map(() => 0),
+        };
+        pool.total += held.total;
+        for (const [position, votes] of held.votes.entries()) {
+          pool.votes[position] = (pool.votes[position] ?? 0) + votes;
+        }
+        state.set(channel, pool);
+      }
+    }
+    for (const [unit, { total, all, channels }] of raw) {
       mixes.set(
         unit,
-        [...byChannel]
+        [...channels]
           .filter(([, held]) => held.total > 0)
           .toSorted(([x], [y]) => x - y)
-          .map(([channel, held]) => ({
-            channel,
-            share: Math.round((held.total / total) * 1e6) / 1e6,
-            shift: held.votes.map(
-              (votes, position) =>
-                Math.round(
-                  (votes / held.total - (all[position] ?? 0) / total) * 1e6,
-                ) / 1e6,
-            ),
-          })),
+          .map(([channel, held]) => {
+            const pooled = state.get(channel);
+            const weight = held.total / (held.total + CHANNEL_SHRINK);
+            return {
+              channel,
+              share: Math.round((held.total / total) * 1e6) / 1e6,
+              shift: held.votes.map((votes, position) => {
+                const local = votes / held.total - (all[position] ?? 0) / total;
+                const common =
+                  pooled == null || pooled.total <= 0 || whole.total <= 0
+                    ? local
+                    : (pooled.votes[position] ?? 0) / pooled.total -
+                      (whole.votes[position] ?? 0) / whole.total;
+                return (
+                  Math.round((weight * local + (1 - weight) * common) * 1e6) /
+                  1e6
+                );
+              }),
+            };
+          }),
       );
     }
     const grouped = [...chosen].map(
