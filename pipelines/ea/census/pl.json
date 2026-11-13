@@ -1,0 +1,2537 @@
+{
+  "polity": "PL",
+  "name": "Poland",
+  "sources": {
+    "konst1997": {
+      "title": "Konstytucja Rzeczypospolitej Polskiej z dnia 2 kwietnia 1997 r. (Dz.U. 1997 nr 78 poz. 483)",
+      "publisher": "Kancelaria Sejmu (Dziennik Ustaw)",
+      "url": "https://eli.gov.pl/eli/DU/1997/483/ogl",
+      "kind": "official_body"
+    },
+    "kw2011": {
+      "title": "Ustawa z dnia 5 stycznia 2011 r. Kodeks wyborczy (Dz.U. 2011 nr 21 poz. 112)",
+      "publisher": "Kancelaria Sejmu (Dziennik Ustaw)",
+      "url": "https://eli.gov.pl/eli/DU/2011/112/ogl",
+      "kind": "official_body"
+    },
+    "ord2001": {
+      "title": "Ustawa z dnia 12 kwietnia 2001 r. Ordynacja wyborcza do Sejmu i Senatu (Dz.U. 2001 nr 46 poz. 499)",
+      "publisher": "Kancelaria Sejmu (Dziennik Ustaw)",
+      "url": "https://eli.gov.pl/eli/DU/2001/499/ogl",
+      "kind": "official_body"
+    },
+    "usg1990": {
+      "title": "Ustawa z dnia 8 marca 1990 r. o samorządzie gminnym (Dz.U. 1990 nr 16 poz. 95)",
+      "publisher": "Kancelaria Sejmu (Dziennik Ustaw)",
+      "url": "https://eli.gov.pl/eli/DU/1990/95/ogl",
+      "kind": "official_body"
+    },
+    "warszawa2002": {
+      "title": "Ustawa z dnia 15 marca 2002 r. o ustroju miasta stołecznego Warszawy (Dz.U. 2002 nr 41 poz. 361)",
+      "publisher": "Kancelaria Sejmu (Dziennik Ustaw)",
+      "url": "https://eli.gov.pl/eli/DU/2002/361/ogl",
+      "kind": "official_body"
+    },
+    "refl2000": {
+      "title": "Ustawa z dnia 15 września 2000 r. o referendum lokalnym (Dz.U. 2000 nr 88 poz. 985)",
+      "publisher": "Kancelaria Sejmu (Dziennik Ustaw)",
+      "url": "https://eli.gov.pl/eli/DU/2000/985/ogl",
+      "kind": "official_body"
+    },
+    "refo2003": {
+      "title": "Ustawa z dnia 14 marca 2003 r. o referendum ogólnokrajowym (Dz.U. 2003 nr 57 poz. 507)",
+      "publisher": "Kancelaria Sejmu (Dziennik Ustaw)",
+      "url": "https://eli.gov.pl/eli/DU/2003/507/ogl",
+      "kind": "official_body"
+    },
+    "wbp2002": {
+      "title": "Ustawa z dnia 20 czerwca 2002 r. o bezpośrednim wyborze wójta, burmistrza i prezydenta miasta (Dz.U. 2002 nr 113 poz. 984)",
+      "publisher": "Kancelaria Sejmu (Dziennik Ustaw)",
+      "url": "https://eli.gov.pl/eli/DU/2002/984/ogl",
+      "kind": "official_body"
+    },
+    "kadencja2018": {
+      "title": "Ustawa z dnia 11 stycznia 2018 r. o zmianie niektórych ustaw w celu zwiększenia udziału obywateli w procesie wybierania, funkcjonowania i kontrolowania niektórych organów publicznych (Dz.U. 2018 poz. 130)",
+      "publisher": "Kancelaria Sejmu (Dziennik Ustaw)",
+      "url": "https://eli.gov.pl/eli/DU/2018/130/ogl",
+      "kind": "official_body"
+    },
+    "konst1921": {
+      "title": "Ustawa z dnia 17 marca 1921 r. Konstytucja Rzeczypospolitej Polskiej (Dz.U. 1921 nr 44 poz. 267)",
+      "publisher": "Kancelaria Sejmu (Dziennik Ustaw)",
+      "url": "https://eli.gov.pl/eli/DU/1921/267/ogl",
+      "kind": "official_body"
+    },
+    "statut_slaski": {
+      "title": "Ustawa konstytucyjna z dnia 15 lipca 1920 r. zawierająca statut organiczny Województwa Śląskiego (Dz.U. 1920 nr 73 poz. 497)",
+      "publisher": "Kancelaria Sejmu (Dziennik Ustaw)",
+      "url": "https://eli.gov.pl/eli/DU/1920/497/ogl",
+      "kind": "official_body"
+    },
+    "dekret1918": {
+      "title": "Dekret o ordynacji wyborczej do Sejmu Ustawodawczego (Dz.U. 1918 nr 18 poz. 46)",
+      "publisher": "Kancelaria Sejmu (Dziennik Ustaw)",
+      "url": "https://eli.gov.pl/eli/DU/1918/46/ogl",
+      "kind": "official_body"
+    },
+    "ord1922": {
+      "title": "Ustawa z dnia 28 lipca 1922 r. Ordynacja wyborcza do Sejmu (Dz.U. 1922 nr 66 poz. 590)",
+      "publisher": "Kancelaria Sejmu (Dziennik Ustaw)",
+      "url": "https://eli.gov.pl/eli/DU/1922/590/ogl",
+      "kind": "official_body"
+    },
+    "ords1922": {
+      "title": "Ustawa z dnia 28 lipca 1922 r. Ordynacja wyborcza do Senatu (Dz.U. 1922 nr 66 poz. 591)",
+      "publisher": "Kancelaria Sejmu (Dziennik Ustaw)",
+      "url": "https://eli.gov.pl/eli/DU/1922/591/ogl",
+      "kind": "official_body"
+    },
+    "ord1946": {
+      "title": "Dekret z dnia 22 września 1946 r. Ordynacja wyborcza do Sejmu Ustawodawczego (Dz.U. 1946 nr 48 poz. 274)",
+      "publisher": "Kancelaria Sejmu (Dziennik Ustaw)",
+      "url": "https://eli.gov.pl/eli/DU/1946/274/ogl",
+      "kind": "official_body"
+    },
+    "ord1952": {
+      "title": "Ustawa z dnia 1 sierpnia 1952 r. Ordynacja wyborcza do Sejmu PRL (Dz.U. 1952 nr 35 poz. 246)",
+      "publisher": "Kancelaria Sejmu (Dziennik Ustaw)",
+      "url": "https://eli.gov.pl/eli/DU/1952/246/ogl",
+      "kind": "official_body"
+    },
+    "ordrn1954": {
+      "title": "Ustawa z dnia 25 września 1954 r. Ordynacja wyborcza do rad narodowych (Dz.U. 1954 nr 42 poz. 193)",
+      "publisher": "Kancelaria Sejmu (Dziennik Ustaw)",
+      "url": "https://eli.gov.pl/eli/DU/1954/193/ogl",
+      "kind": "official_body"
+    },
+    "isap": {
+      "title": "Dziennik Ustaw and Monitor Polski: election orders and results notices (ELI API)",
+      "publisher": "Kancelaria Sejmu",
+      "url": "https://api.sejm.gov.pl/eli/acts/search",
+      "kind": "official_body",
+      "note": "Each date's quote names the ELI identifier of the order or results notice and repeats its title or the line counted."
+    },
+    "kbw": {
+      "title": "Dane wyborcze",
+      "publisher": "Krajowe Biuro Wyborcze",
+      "url": "https://danewyborcze.kbw.gov.pl/",
+      "kind": "official_body",
+      "note": "Archive of result files (xls, xlsx, csv, and zip) for elections from 1990 onward; the 1989 elections and the 1990 local elections are absent."
+    },
+    "pkw_wybory": {
+      "title": "Wybory i referenda",
+      "publisher": "Państwowa Komisja Wyborcza",
+      "url": "https://wybory.gov.pl/index/?language=pl&tab=uzupelniajace",
+      "kind": "official_body"
+    },
+    "gus_podzial": {
+      "title": "Podział administracyjny Polski",
+      "publisher": "Główny Urząd Statystyczny",
+      "url": "https://stat.gov.pl/statystyka-regionalna/jednostki-terytorialne/podzial-administracyjny-polski/",
+      "kind": "official_body"
+    },
+    "gus_bdl": {
+      "title": "Bank Danych Lokalnych: jednostki pomocnicze gmin",
+      "publisher": "Główny Urząd Statystyczny",
+      "url": "https://bdl.stat.gov.pl/bdl/",
+      "kind": "official_body"
+    },
+    "prg": {
+      "title": "Państwowy Rejestr Granic (PRG)",
+      "publisher": "Główny Urząd Geodezji i Kartografii",
+      "url": "https://www.geoportal.gov.pl/pl/dane/panstwowy-rejestr-granic-prg/",
+      "kind": "official_body"
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "Rzeczpospolita Polska",
+      "name_en": "Republic of Poland",
+      "parent": null,
+      "polity_kind": "sovereign_state",
+      "scheme": "pl.nation",
+      "source": "konst1997"
+    },
+    {
+      "key": "wojewodztwo",
+      "name": "Województwa",
+      "name_en": "Voivodeships",
+      "parent": "national",
+      "polity_kind": "region",
+      "scheme": "pl.wojewodztwo",
+      "source": "gus_podzial",
+      "counts": [
+        {
+          "date": "2025-01-01",
+          "value": 16,
+          "source": "gus_podzial",
+          "locator": "https://stat.gov.pl/statystyka-regionalna/jednostki-terytorialne/podzial-administracyjny-polski/"
+        },
+        {
+          "date": "1999-01-01",
+          "value": 16,
+          "source": "gus_podzial",
+          "locator": "https://stat.gov.pl/statystyka-regionalna/jednostki-terytorialne/podzial-administracyjny-polski/"
+        }
+      ]
+    },
+    {
+      "key": "powiat",
+      "name": "Powiaty",
+      "name_en": "Counties (powiaty)",
+      "parent": "wojewodztwo",
+      "polity_kind": "county",
+      "scheme": "pl.powiat",
+      "valid_from": "1999-01-01",
+      "source": "gus_podzial",
+      "counts": [
+        {
+          "date": "2025-01-01",
+          "value": 314,
+          "source": "gus_podzial",
+          "locator": "https://stat.gov.pl/statystyka-regionalna/jednostki-terytorialne/podzial-administracyjny-polski/"
+        },
+        {
+          "date": "1999-01-01",
+          "value": 308,
+          "source": "gus_podzial",
+          "locator": "https://stat.gov.pl/statystyka-regionalna/jednostki-terytorialne/podzial-administracyjny-polski/"
+        }
+      ]
+    },
+    {
+      "key": "gmina",
+      "name": "Gminy",
+      "name_en": "Municipalities (gminy)",
+      "parent": "powiat",
+      "polity_kind": "municipality",
+      "scheme": "pl.gmina",
+      "source": "gus_podzial",
+      "counts": [
+        {
+          "date": "2025-01-01",
+          "value": 2479,
+          "source": "gus_podzial",
+          "locator": "https://stat.gov.pl/statystyka-regionalna/jednostki-terytorialne/podzial-administracyjny-polski/"
+        },
+        {
+          "date": "1999-01-01",
+          "value": 2489,
+          "source": "gus_podzial",
+          "locator": "https://stat.gov.pl/statystyka-regionalna/jednostki-terytorialne/podzial-administracyjny-polski/"
+        }
+      ]
+    },
+    {
+      "key": "dzielnica_warszawy",
+      "name": "Dzielnice m.st. Warszawy",
+      "name_en": "Districts of Warsaw",
+      "parent": "gmina",
+      "polity_kind": "submunicipal",
+      "scheme": "pl.dzielnica_warszawy",
+      "valid_from": "2002-10-27",
+      "source": "warszawa2002",
+      "counts": [
+        {
+          "date": "2025-01-01",
+          "value": 18,
+          "source": "gus_bdl",
+          "locator": "https://bdl.stat.gov.pl/bdl/metadane/cechy/8838"
+        }
+      ]
+    },
+    {
+      "key": "jednostka_pomocnicza",
+      "name": "Jednostki pomocnicze gmin",
+      "name_en": "Auxiliary units of municipalities (sołectwa, dzielnice, and osiedla)",
+      "parent": "gmina",
+      "polity_kind": "submunicipal",
+      "source": "usg1990",
+      "counts": [
+        {
+          "date": "2024-12-31",
+          "value": 42906,
+          "source": "gus_bdl",
+          "locator": "https://bdl.stat.gov.pl/bdl/metadane/cechy/1705255"
+        }
+      ]
+    },
+    {
+      "key": "ii_rp",
+      "name": "II Rzeczpospolita",
+      "name_en": "Second Polish Republic (1918–1939)",
+      "parent": null,
+      "polity_kind": "historical_state",
+      "valid_from": "1918-11-11",
+      "valid_to": "1939-09-28",
+      "source": "konst1921"
+    },
+    {
+      "key": "prl",
+      "name": "Polska Rzeczpospolita Ludowa",
+      "name_en": "Polish People's Republic (1944–1989)",
+      "parent": null,
+      "polity_kind": "historical_state",
+      "valid_from": "1944-07-22",
+      "valid_to": "1989-12-30",
+      "source": "ord1952"
+    }
+  ],
+  "classes": [
+    {
+      "key": "sejm",
+      "tier": "national",
+      "name": "Wybory do Sejmu RP",
+      "name_en": "Sejm elections",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "schemes": [
+          "pl.okreg_sejm"
+        ],
+        "fine": [
+          "pl.gmina",
+          "pl.obwod"
+        ]
+      },
+      "finest_note": "Votes are counted and published by polling district (obwód głosowania); obwód boundaries are described by streets and addresses, not mapped.",
+      "boundary_source": "prg",
+      "note": "1989 was the semi-free contract election (108 constituencies, two rounds, and a national list); 1991–1997 used constituency lists plus a 69-seat national list; since 2001, 41 open-list constituencies.",
+      "source": "konst1997",
+      "valid_from": "1989-06-04",
+      "first_held": "1989-06-04",
+      "earliest_record": "1991-10-27",
+      "contests_per_unit": 1,
+      "est_votes": 165000000,
+      "effort": 2,
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 3,
+          "term_years": 4,
+          "called": true,
+          "administered_by": "Państwowa Komisja Wyborcza",
+          "source": "konst1997",
+          "locator": "https://eli.gov.pl/eli/DU/1997/483/ogl",
+          "vacancy_rule": "Kodeks wyborczy art. 195: early election within 45 days of the Sejm shortening its term"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Dane wyborcze (KBW)",
+          "url": "https://danewyborcze.kbw.gov.pl/",
+          "format": "xls, xlsx, csv, and zip",
+          "access": "open",
+          "checked_at": "2026-11-13T00:00:00Z",
+          "first_date": "1991-10-27",
+          "finest": "pl.obwod",
+          "evidence": "Polling-district files for 1991, 1993, 1997, and every election since 2001; 1989 is absent."
+        },
+        {
+          "platform": "Wybory i referenda (PKW)",
+          "url": "https://wybory.gov.pl/sejmsenat2023/",
+          "format": "csv and html",
+          "access": "open",
+          "checked_at": "2026-11-13T00:00:00Z",
+          "first_date": "2001-09-23",
+          "finest": "pl.obwod",
+          "evidence": "One results site per election since 2001, with polling-district protocols."
+        }
+      ],
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff",
+            "by_election"
+          ],
+          "body_kinds": [
+            "lower_house"
+          ],
+          "iso_pattern": "PL",
+          "valid_from": "1989-01-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1989-06-04",
+          "contests": 109,
+          "seats": 460,
+          "note": "Counted as 108 constituencies plus the national list.",
+          "source": "isap",
+          "quote": "MP/1989/149: Wybierano 460 posłów, w tym 425 spośród 1 682 kandydatów w 108 okręgach wyborczych oraz 35 posłów z krajowej listy wyborczej"
+        },
+        {
+          "date": "1989-06-18",
+          "election_kind": "runoff",
+          "note": "Second round in the constituencies and on the national list where no candidate won a majority on 4 June.",
+          "source": "isap",
+          "quote": "MP/1989/151: second round of the 1989 Sejm election"
+        },
+        {
+          "date": "1991-10-27",
+          "contests": 38,
+          "seats": 460,
+          "note": "Counted as 37 constituencies plus the national list.",
+          "source": "isap",
+          "quote": "MP/1991/288: Wybrano 460 posłów, w tym 391 ... w 37 okręgach wyborczych oraz 69 posłów z ogólnopolskich list kandydatów na posłów"
+        },
+        {
+          "date": "1993-09-19",
+          "contests": 53,
+          "seats": 460,
+          "note": "Counted as 52 constituencies plus the national list.",
+          "source": "isap",
+          "quote": "MP/1993/470: Wybrano 460 posłów, w tym 391 posłów ... w 52 okręgach wyborczych oraz 69 posłów ... na 15 ogólnopolskich listach"
+        },
+        {
+          "date": "1997-09-21",
+          "contests": 53,
+          "seats": 460,
+          "note": "Counted as 52 constituencies plus the national list.",
+          "source": "isap",
+          "quote": "MP/1997/620: Wybrano 460 posłów, w tym 391 ... oraz 69 posłów ... na 10 ogólnopolskich listach; 52 okręgowe komisje wyborcze"
+        },
+        {
+          "date": "2001-09-23",
+          "contests": 41,
+          "seats": 460,
+          "source": "ord2001",
+          "quote": "art. 132: Do Sejmu wybiera się 460 posłów; Załącznik nr 1: 41 okręgów wyborczych"
+        },
+        {
+          "date": "2005-09-25",
+          "contests": 41,
+          "seats": 460,
+          "source": "ord2001",
+          "quote": "art. 132: Do Sejmu wybiera się 460 posłów; Załącznik nr 1: 41 okręgów wyborczych"
+        },
+        {
+          "date": "2007-10-21",
+          "contests": 41,
+          "seats": 460,
+          "note": "Early election after the Sejm shortened its term.",
+          "source": "ord2001",
+          "quote": "art. 132: Do Sejmu wybiera się 460 posłów; Załącznik nr 1: 41 okręgów wyborczych"
+        },
+        {
+          "date": "2011-10-09",
+          "contests": 41,
+          "seats": 460,
+          "source": "kw2011",
+          "quote": "art. 193 § 1: Do Sejmu wybiera się 460 posłów; Załącznik nr 1: 41 okręgów wyborczych"
+        },
+        {
+          "date": "2015-10-25",
+          "contests": 41,
+          "seats": 460,
+          "source": "kw2011",
+          "quote": "art. 193 § 1: Do Sejmu wybiera się 460 posłów; Załącznik nr 1: 41 okręgów wyborczych"
+        },
+        {
+          "date": "2019-10-13",
+          "contests": 41,
+          "seats": 460,
+          "source": "kw2011",
+          "quote": "art. 193 § 1: Do Sejmu wybiera się 460 posłów; Załącznik nr 1: 41 okręgów wyborczych"
+        },
+        {
+          "date": "2023-10-15",
+          "contests": 41,
+          "seats": 460,
+          "source": "isap",
+          "quote": "DU/2023/2234: Wybory przeprowadziły: Państwowa Komisja Wyborcza, 41 okręgowych komisji wyborczych ...; Wybierano 460 posłów"
+        }
+      ]
+    },
+    {
+      "key": "senat",
+      "tier": "national",
+      "name": "Wybory do Senatu RP",
+      "name_en": "Senate elections",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "schemes": [
+          "pl.okreg_senat"
+        ],
+        "fine": [
+          "pl.gmina",
+          "pl.obwod"
+        ]
+      },
+      "finest_note": "Polling-district counts from 1997; the 1991 file has candidate totals only, and 1993 has gmina totals.",
+      "boundary_source": "prg",
+      "note": "49 voivodeship constituencies (2 or 3 seats each) from 1989 to 1997, 40 constituencies of 2 to 4 seats from 2001 to 2007, and 100 single-member constituencies since 2011.",
+      "source": "konst1997",
+      "valid_from": "1989-06-04",
+      "first_held": "1989-06-04",
+      "earliest_record": "1991-10-27",
+      "est_votes": 150000000,
+      "effort": 2,
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 3,
+          "term_years": 4,
+          "called": true,
+          "administered_by": "Państwowa Komisja Wyborcza",
+          "source": "konst1997",
+          "locator": "https://eli.gov.pl/eli/DU/1997/483/ogl"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Dane wyborcze (KBW)",
+          "url": "https://danewyborcze.kbw.gov.pl/",
+          "format": "xls, xlsx, csv, and zip",
+          "access": "open",
+          "checked_at": "2026-11-13T00:00:00Z",
+          "first_date": "1991-10-27",
+          "finest": "pl.obwod",
+          "evidence": "Senate files by polling district from 1997; 1991 candidate totals; 1993 by gmina."
+        }
+      ],
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff"
+          ],
+          "body_kinds": [
+            "upper_house"
+          ],
+          "iso_pattern": "PL",
+          "valid_from": "1989-01-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1989-06-04",
+          "contests": 49,
+          "seats": 100,
+          "source": "isap",
+          "quote": "MP/1989/150: W 49 okręgach wyborczych stanowiących obszar województw wybierano 100 senatorów"
+        },
+        {
+          "date": "1989-06-18",
+          "election_kind": "runoff",
+          "source": "isap",
+          "quote": "MP/1989/152: second round of the 1989 Senate election"
+        },
+        {
+          "date": "1991-10-27",
+          "contests": 49,
+          "seats": 100,
+          "source": "isap",
+          "quote": "MP/1991/287: 100 senators in 49 voivodeship constituencies"
+        },
+        {
+          "date": "1993-09-19",
+          "contests": 49,
+          "seats": 100,
+          "source": "isap",
+          "quote": "MP/1993/471: 100 senators in 49 voivodeship constituencies"
+        },
+        {
+          "date": "1997-09-21",
+          "contests": 49,
+          "seats": 100,
+          "source": "isap",
+          "quote": "MP/1997/621: W 49 okręgach wyborczych, stanowiących obszar województw, wybrano 100 senatorów"
+        },
+        {
+          "date": "2001-09-23",
+          "contests": 40,
+          "seats": 100,
+          "source": "ord2001",
+          "quote": "art. 189: 100 senatorów; Załącznik nr 2: 40 okręgów wyborczych"
+        },
+        {
+          "date": "2005-09-25",
+          "contests": 40,
+          "seats": 100,
+          "source": "ord2001",
+          "quote": "art. 189: 100 senatorów; Załącznik nr 2: 40 okręgów wyborczych"
+        },
+        {
+          "date": "2007-10-21",
+          "contests": 40,
+          "seats": 100,
+          "source": "ord2001",
+          "quote": "art. 189: 100 senatorów; Załącznik nr 2: 40 okręgów wyborczych"
+        },
+        {
+          "date": "2011-10-09",
+          "contests": 100,
+          "seats": 100,
+          "source": "kw2011",
+          "quote": "art. 260: jednomandatowe okręgi wyborcze; Załącznik nr 2: 100 okręgów wyborczych"
+        },
+        {
+          "date": "2015-10-25",
+          "contests": 100,
+          "seats": 100,
+          "source": "kw2011",
+          "quote": "art. 260: jednomandatowe okręgi wyborcze; Załącznik nr 2: 100 okręgów wyborczych"
+        },
+        {
+          "date": "2019-10-13",
+          "contests": 100,
+          "seats": 100,
+          "source": "kw2011",
+          "quote": "art. 260: jednomandatowe okręgi wyborcze; Załącznik nr 2: 100 okręgów wyborczych"
+        },
+        {
+          "date": "2023-10-15",
+          "contests": 100,
+          "seats": 100,
+          "source": "kw2011",
+          "quote": "art. 260: jednomandatowe okręgi wyborcze; Załącznik nr 2: 100 okręgów wyborczych"
+        }
+      ]
+    },
+    {
+      "key": "senat_by",
+      "tier": "national",
+      "name": "Wybory uzupełniające do Senatu",
+      "name_en": "Senate by-elections",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "fine": [
+          "pl.obwod"
+        ]
+      },
+      "note": "Held when a senator's seat falls vacant, except in the last six months of the term (Kodeks wyborczy art. 284).",
+      "source": "kw2011",
+      "valid_from": "1989-06-04",
+      "first_held": "1989-10-08",
+      "earliest_record": "2003-04-27",
+      "est_votes": 3000000,
+      "effort": 3,
+      "access": [
+        {
+          "platform": "Wybory i referenda (PKW): wybory uzupełniające",
+          "url": "https://wybory.gov.pl/index/?language=pl&tab=uzupelniajace",
+          "format": "html and csv",
+          "access": "open",
+          "checked_at": "2026-11-13T00:00:00Z",
+          "first_date": "2024-07-21",
+          "finest": "pl.obwod",
+          "evidence": "Result sites for the 2024 and 2025 by-elections and the scheduled 2026 one; older ones are in Dziennik Ustaw notices by candidate."
+        }
+      ],
+      "match": [
+        {
+          "election_kinds": [
+            "by_election"
+          ],
+          "body_kinds": [
+            "upper_house"
+          ],
+          "iso_pattern": "PL",
+          "valid_from": "1989-01-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1989-10-08",
+          "election_kind": "by_election",
+          "contests": 1,
+          "source": "isap",
+          "quote": "MP/1989/269: results notice of the Senate by-election in województwo piotrkowskie"
+        },
+        {
+          "date": "1990-02-04",
+          "election_kind": "by_election",
+          "contests": 1,
+          "source": "isap",
+          "quote": "MP/1990/38: results notice of the Senate by-election in województwo opolskie"
+        },
+        {
+          "date": "1990-02-18",
+          "election_kind": "runoff",
+          "source": "isap",
+          "quote": "MP/1990/56: second round of the opolskie Senate by-election"
+        },
+        {
+          "date": "1990-05-27",
+          "election_kind": "by_election",
+          "contests": 1,
+          "source": "isap",
+          "quote": "MP/1990/172: results notice of the Senate by-election in województwo lubelskie"
+        },
+        {
+          "date": "1990-06-10",
+          "election_kind": "runoff",
+          "source": "isap",
+          "quote": "MP/1990/180: second round of the lubelskie Senate by-election"
+        },
+        {
+          "date": "1994-06-19",
+          "election_kind": "by_election",
+          "contests": 2,
+          "source": "isap",
+          "quote": "MP/1994/303: results notice of the Senate by-election in województwa chełmskie and elbląskie"
+        },
+        {
+          "date": "1995-10-01",
+          "election_kind": "by_election",
+          "contests": 2,
+          "source": "isap",
+          "quote": "MP/1995/567: results notice of the Senate by-election in województwa szczecińskie and wrocławskie"
+        },
+        {
+          "date": "2000-06-25",
+          "election_kind": "by_election",
+          "contests": 3,
+          "source": "isap",
+          "quote": "MP/2000/396: results notice of the Senate by-election in województwa katowickie, szczecińskie, and wrocławskie"
+        },
+        {
+          "date": "2001-01-28",
+          "election_kind": "by_election",
+          "contests": 2,
+          "source": "isap",
+          "quote": "MP/2001/82: results notice of the Senate by-election in województwa chełmskie and wrocławskie"
+        },
+        {
+          "date": "2003-04-27",
+          "election_kind": "by_election",
+          "contests": 1,
+          "source": "isap",
+          "quote": "DU/2003/771: results notice of the Senate by-election in constituency 2 (dolnośląskie)"
+        },
+        {
+          "date": "2003-10-12",
+          "election_kind": "by_election",
+          "contests": 1,
+          "source": "isap",
+          "quote": "DU/2003/1757: results notice of the Senate by-election in a podlaskie constituency"
+        },
+        {
+          "date": "2004-03-28",
+          "election_kind": "by_election",
+          "contests": 1,
+          "source": "isap",
+          "quote": "DU/2004/552: results notice of the Senate by-election in constituency 3"
+        },
+        {
+          "date": "2004-07-11",
+          "election_kind": "by_election",
+          "contests": 1,
+          "source": "isap",
+          "quote": "DU/2004/1713: results notice of the Senate by-election in one constituency"
+        },
+        {
+          "date": "2004-09-12",
+          "election_kind": "by_election",
+          "contests": 1,
+          "source": "isap",
+          "quote": "DU/2004/2089: results notice of the Senate by-election in a podkarpackie constituency"
+        },
+        {
+          "date": "2004-11-21",
+          "election_kind": "by_election",
+          "contests": 1,
+          "source": "isap",
+          "quote": "DU/2004/2555: results notice of the Senate by-election in constituency 29"
+        },
+        {
+          "date": "2005-01-16",
+          "election_kind": "by_election",
+          "contests": 1,
+          "source": "isap",
+          "quote": "DU/2005/110: results notice of the Senate by-election in one constituency"
+        },
+        {
+          "date": "2006-01-22",
+          "election_kind": "by_election",
+          "contests": 1,
+          "source": "isap",
+          "quote": "DU/2006/117: results notice of the Senate by-election in constituency 27"
+        },
+        {
+          "date": "2007-01-28",
+          "election_kind": "by_election",
+          "contests": 1,
+          "source": "isap",
+          "quote": "DU/2007/105: results notice of the Senate by-election in one constituency"
+        },
+        {
+          "date": "2008-06-22",
+          "election_kind": "by_election",
+          "contests": 1,
+          "source": "isap",
+          "quote": "DU/2008/705: results notice of the Senate by-election in one constituency"
+        },
+        {
+          "date": "2010-06-20",
+          "election_kind": "by_election",
+          "contests": 3,
+          "source": "isap",
+          "quote": "DU/2010/747: results notice of the Senate by-election in constituencies 15, 21, and 30"
+        },
+        {
+          "date": "2011-02-06",
+          "election_kind": "by_election",
+          "contests": 1,
+          "source": "isap",
+          "quote": "DU/2011/192: results notice of the Senate by-election in constituency 37"
+        },
+        {
+          "date": "2013-04-21",
+          "election_kind": "by_election",
+          "contests": 1,
+          "source": "isap",
+          "quote": "DU/2013/498: results notice of the Senate by-election in constituency 73"
+        },
+        {
+          "date": "2013-09-08",
+          "election_kind": "by_election",
+          "contests": 1,
+          "source": "isap",
+          "quote": "DU/2013/1075: results notice of the Senate by-election in constituency 55"
+        },
+        {
+          "date": "2014-09-07",
+          "election_kind": "by_election",
+          "contests": 3,
+          "source": "isap",
+          "quote": "DU/2014/1208: results notice of the Senate by-election in constituencies 47, 73, and 82"
+        },
+        {
+          "date": "2015-02-08",
+          "election_kind": "by_election",
+          "contests": 1,
+          "source": "isap",
+          "quote": "DU/2015/217: results notice of the Senate by-election in constituency 75"
+        },
+        {
+          "date": "2016-03-06",
+          "election_kind": "by_election",
+          "contests": 1,
+          "source": "isap",
+          "quote": "DU/2016/294: results notice of the Senate by-election in constituency 59"
+        },
+        {
+          "date": "2024-07-21",
+          "election_kind": "by_election",
+          "contests": 1,
+          "source": "isap",
+          "quote": "DU/2024/1102: results notice of the Senate by-election in constituency 13"
+        },
+        {
+          "date": "2025-03-16",
+          "election_kind": "by_election",
+          "contests": 1,
+          "source": "isap",
+          "quote": "DU/2025/354: results notice of the Senate by-election in constituency 33"
+        },
+        {
+          "date": "2026-11-22",
+          "election_kind": "by_election",
+          "contests": 1,
+          "note": "Scheduled.",
+          "source": "pkw_wybory",
+          "quote": "Wybory uzupełniające do Senatu w okręgu wyborczym nr 20, 22 listopada 2026 r."
+        }
+      ]
+    },
+    {
+      "key": "prezydent",
+      "tier": "national",
+      "name": "Wybory Prezydenta RP",
+      "name_en": "Presidential elections",
+      "category": "executive",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "pl.gmina"
+        ],
+        "fine": [
+          "pl.obwod"
+        ]
+      },
+      "finest_note": "Polling-district files from 1990 onward; 1990 has gmina and polling-district tables.",
+      "source": "konst1997",
+      "valid_from": "1990-11-25",
+      "first_held": "1990-11-25",
+      "earliest_record": "1990-11-25",
+      "est_votes": 260000000,
+      "effort": 2,
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 0,
+          "term_years": 5,
+          "runoff": "majority",
+          "runoff_rule": "More than half of valid votes elects; otherwise the top two meet in a second round on the 14th day after the first (Kodeks wyborczy arts. 292 and 473).",
+          "administered_by": "Państwowa Komisja Wyborcza",
+          "source": "konst1997",
+          "locator": "https://eli.gov.pl/eli/DU/1997/483/ogl",
+          "vacancy_rule": "Konstytucja art. 128 ust. 2: an early election within 60 days of a vacancy"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Dane wyborcze (KBW)",
+          "url": "https://danewyborcze.kbw.gov.pl/",
+          "format": "xls, xlsx, csv, and zip",
+          "access": "open",
+          "checked_at": "2026-11-13T00:00:00Z",
+          "first_date": "1990-11-25",
+          "finest": "pl.obwod",
+          "evidence": "Every presidential election from 1990 to 2025, both rounds."
+        }
+      ],
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "PL",
+          "valid_from": "1990-01-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1990-11-25",
+          "contests": 1,
+          "source": "isap",
+          "quote": "DU/1990/483: results notice of the presidential election, first round"
+        },
+        {
+          "date": "1990-12-09",
+          "election_kind": "runoff",
+          "contests": 1,
+          "source": "isap",
+          "quote": "DU/1990/499: results notice of the presidential election, second round"
+        },
+        {
+          "date": "1995-11-05",
+          "contests": 1,
+          "source": "isap",
+          "quote": "DU/1995/604: results notice of the presidential election, first round"
+        },
+        {
+          "date": "1995-11-19",
+          "election_kind": "runoff",
+          "contests": 1,
+          "source": "isap",
+          "quote": "DU/1995/636: results notice of the presidential election, second round"
+        },
+        {
+          "date": "2000-10-08",
+          "contests": 1,
+          "source": "isap",
+          "quote": "DU/2000/952: results notice of the presidential election, first round"
+        },
+        {
+          "date": "2005-10-09",
+          "contests": 1,
+          "source": "isap",
+          "quote": "DU/2005/1647: results notice of the presidential election, first round"
+        },
+        {
+          "date": "2005-10-23",
+          "election_kind": "runoff",
+          "contests": 1,
+          "source": "isap",
+          "quote": "DU/2005/1739: results notice of the presidential election, second round"
+        },
+        {
+          "date": "2010-06-20",
+          "contests": 1,
+          "source": "kbw",
+          "quote": "Wybory Prezydenta RP 2010: I tura 2010-06-20"
+        },
+        {
+          "date": "2010-07-04",
+          "election_kind": "runoff",
+          "contests": 1,
+          "source": "kbw",
+          "quote": "Wybory Prezydenta RP 2010: II tura 2010-07-04"
+        },
+        {
+          "date": "2015-05-10",
+          "contests": 1,
+          "source": "kbw",
+          "quote": "Wybory Prezydenta RP 2015: I tura 2015-05-10"
+        },
+        {
+          "date": "2015-05-24",
+          "election_kind": "runoff",
+          "contests": 1,
+          "source": "kbw",
+          "quote": "Wybory Prezydenta RP 2015: II tura 2015-05-24"
+        },
+        {
+          "date": "2020-06-28",
+          "contests": 1,
+          "source": "kbw",
+          "quote": "Wybory Prezydenta RP 2020: I tura 2020-06-28"
+        },
+        {
+          "date": "2020-07-12",
+          "election_kind": "runoff",
+          "contests": 1,
+          "source": "kbw",
+          "quote": "Wybory Prezydenta RP 2020: II tura 2020-07-12"
+        },
+        {
+          "date": "2025-05-18",
+          "contests": 1,
+          "source": "kbw",
+          "quote": "Wybory Prezydenta RP 2025: I tura 2025-05-18"
+        },
+        {
+          "date": "2025-06-01",
+          "election_kind": "runoff",
+          "contests": 1,
+          "source": "kbw",
+          "quote": "Wybory Prezydenta RP 2025: II tura 2025-06-01"
+        }
+      ]
+    },
+    {
+      "key": "prezydent_zn",
+      "tier": "national",
+      "name": "Wybór Prezydenta przez Zgromadzenie Narodowe",
+      "name_en": "Indirect presidential elections",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "The National Assembly elected the president under the 1921 and 1935 constitutions, the Legislative Sejm elected Bolesław Bierut in 1947, and the National Assembly elected Wojciech Jaruzelski in 1989. Roll-call counts from the assembly records.",
+      "source": "konst1921",
+      "valid_to": "1990-01-01",
+      "first_held": "1922-12-09",
+      "est_votes": 4000,
+      "effort": 1,
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "PL"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1922-12-09",
+          "election_kind": "indirect",
+          "note": "Gabriel Narutowicz elected by the National Assembly.",
+          "source": "konst1921"
+        },
+        {
+          "date": "1922-12-20",
+          "election_kind": "indirect",
+          "note": "Stanisław Wojciechowski elected after Narutowicz's assassination.",
+          "source": "konst1921"
+        },
+        {
+          "date": "1926-05-31",
+          "election_kind": "indirect",
+          "note": "Józef Piłsudski elected and declined.",
+          "source": "konst1921"
+        },
+        {
+          "date": "1926-06-01",
+          "election_kind": "indirect",
+          "note": "Ignacy Mościcki elected.",
+          "source": "konst1921"
+        },
+        {
+          "date": "1933-05-08",
+          "election_kind": "indirect",
+          "note": "Mościcki reelected.",
+          "source": "konst1921"
+        },
+        {
+          "date": "1947-02-05",
+          "election_kind": "indirect",
+          "note": "Bolesław Bierut elected by the Legislative Sejm.",
+          "source": "ord1946"
+        },
+        {
+          "date": "1989-07-19",
+          "election_kind": "indirect",
+          "note": "Wojciech Jaruzelski elected by the National Assembly of Sejm and Senate.",
+          "source": "isap"
+        }
+      ]
+    },
+    {
+      "key": "referendum",
+      "tier": "national",
+      "name": "Referendum ogólnokrajowe",
+      "name_en": "National referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "pl.gmina"
+        ],
+        "fine": [
+          "pl.obwod"
+        ]
+      },
+      "source": "refo2003",
+      "first_held": "1946-06-30",
+      "earliest_record": "1996-02-18",
+      "est_votes": 70000000,
+      "effort": 2,
+      "access": [
+        {
+          "platform": "Dane wyborcze (KBW)",
+          "url": "https://danewyborcze.kbw.gov.pl/",
+          "format": "xls, xlsx, csv, and zip",
+          "access": "open",
+          "checked_at": "2026-11-13T00:00:00Z",
+          "first_date": "1996-02-18",
+          "finest": "pl.obwod",
+          "evidence": "1996 by polling district and gmina, then 1997, 2003, 2015, and 2023; 1946 and 1987 are absent."
+        }
+      ],
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "iso_pattern": "PL"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1946-06-30",
+          "election_kind": "referendum",
+          "contests": 3,
+          "note": "Date and question count are not quoted from a fetched gazette notice.",
+          "source": "isap",
+          "quote": "Referendum ludowe z 30 czerwca 1946 r.: three questions (Senate abolition, land reform and nationalization, and the western border)"
+        },
+        {
+          "date": "1987-11-29",
+          "election_kind": "referendum",
+          "contests": 2,
+          "source": "isap",
+          "quote": "MP/1987/294: results notice of the referendum of 29 November 1987 on two questions"
+        },
+        {
+          "date": "1996-02-18",
+          "election_kind": "referendum",
+          "contests": 5,
+          "source": "isap",
+          "quote": "DU/1996/101: results of two referendums held on 18 February 1996: one question on enfranchisement and four on the use of state property"
+        },
+        {
+          "date": "1997-05-25",
+          "election_kind": "referendum",
+          "contests": 1,
+          "source": "isap",
+          "quote": "DU/1997/353: results of the constitutional referendum of 25 May 1997"
+        },
+        {
+          "date": "2003-06-08",
+          "election_kind": "referendum",
+          "contests": 1,
+          "note": "Voting ran over two days, 7 and 8 June.",
+          "source": "isap",
+          "quote": "DU/2003/953: results of the national referendum of 7 and 8 June 2003 on accession to the European Union"
+        },
+        {
+          "date": "2015-09-06",
+          "election_kind": "referendum",
+          "contests": 3,
+          "source": "isap",
+          "quote": "DU/2015/1375: results of the national referendum of 6 September 2015 on three questions"
+        },
+        {
+          "date": "2023-10-15",
+          "election_kind": "referendum",
+          "contests": 4,
+          "source": "isap",
+          "quote": "DU/2023/2236: results of the national referendum of 15 October 2023 on four questions"
+        }
+      ]
+    },
+    {
+      "key": "ep",
+      "tier": "national",
+      "name": "Wybory do Parlamentu Europejskiego w Polsce",
+      "name_en": "European Parliament elections in Poland",
+      "category": "legislature",
+      "goal": "ep",
+      "measure": {
+        "schemes": [
+          "pl.ep_constituency"
+        ],
+        "fine": [
+          "pl.gmina",
+          "pl.obwod"
+        ]
+      },
+      "note": "13 constituencies; seats go to committees nationally and then to their constituency lists (Kodeks wyborczy arts. 331–343).",
+      "source": "kw2011",
+      "valid_from": "2004-06-13",
+      "first_held": "2004-06-13",
+      "earliest_record": "2004-06-13",
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 4,
+          "term_years": 5,
+          "administered_by": "Państwowa Komisja Wyborcza",
+          "source": "kw2011",
+          "locator": "https://eli.gov.pl/eli/DU/2011/112/ogl"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Dane wyborcze (KBW)",
+          "url": "https://danewyborcze.kbw.gov.pl/",
+          "format": "xls, xlsx, csv, and zip",
+          "access": "open",
+          "checked_at": "2026-11-13T00:00:00Z",
+          "first_date": "2004-06-13",
+          "finest": "pl.obwod",
+          "evidence": "2004 by gmina and powiat, polling districts from 2014."
+        }
+      ],
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "EU",
+          "within": null
+        }
+      ],
+      "dates": [
+        {
+          "date": "2004-06-13",
+          "contests": 13,
+          "source": "kbw",
+          "quote": "Wybory do Parlamentu Europejskiego 2004: 13 okręgów wyborczych"
+        },
+        {
+          "date": "2009-06-07",
+          "contests": 13,
+          "source": "kw2011",
+          "quote": "art. 331 and Załącznik nr 3: 13 okręgów wyborczych"
+        },
+        {
+          "date": "2014-05-25",
+          "contests": 13,
+          "source": "kw2011",
+          "quote": "art. 331 and Załącznik nr 3: 13 okręgów wyborczych"
+        },
+        {
+          "date": "2019-05-26",
+          "contests": 13,
+          "source": "kw2011",
+          "quote": "art. 331 and Załącznik nr 3: 13 okręgów wyborczych"
+        },
+        {
+          "date": "2024-06-09",
+          "contests": 13,
+          "source": "kw2011",
+          "quote": "art. 331 and Załącznik nr 3: 13 okręgów wyborczych"
+        }
+      ]
+    },
+    {
+      "key": "sejm_prl",
+      "tier": "prl",
+      "name": "Wybory do Sejmu PRL",
+      "name_en": "Sejm elections of the People's Republic",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "Single-list elections from 1952 to 1985 (the Front Jedności Narodu list, with more candidates than seats from 1957), after the 1947 Legislative Sejm election. Results are in Monitor Polski notices by constituency.",
+      "source": "ord1952",
+      "valid_from": "1947-01-19",
+      "valid_to": "1989-01-01",
+      "first_held": "1947-01-19",
+      "est_votes": 180000000,
+      "effort": 4,
+      "cadence": [
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "administered_by": "Państwowa Komisja Wyborcza",
+          "valid_from": "1952-01-01",
+          "valid_to": "1989-01-01",
+          "source": "ord1952",
+          "locator": "https://eli.gov.pl/eli/DU/1952/246/ogl"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Monitor Polski (ISAP)",
+          "url": "https://isap.sejm.gov.pl/",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-13T00:00:00Z",
+          "first_date": "1957-01-20",
+          "finest": "pl.okreg_sejm_prl",
+          "evidence": "Results notices by constituency, scanned with an uneven text layer."
+        }
+      ],
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "by_election"
+          ],
+          "body_kinds": [
+            "unicameral",
+            "constituent_assembly"
+          ],
+          "iso_pattern": "PL",
+          "valid_from": "1945-01-01",
+          "valid_to": "1989-01-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1947-01-19",
+          "source": "isap",
+          "quote": "DU/1946/322: order of the elections to the Legislative Sejm"
+        },
+        {
+          "date": "1952-10-26",
+          "source": "isap",
+          "quote": "DU/1952/247: order of the elections to the Sejm"
+        },
+        {
+          "date": "1957-01-20",
+          "source": "isap",
+          "quote": "MP/1957/30: results notice of the Sejm elections"
+        },
+        {
+          "date": "1961-04-16",
+          "source": "isap",
+          "quote": "MP/1961/145: results notice of the Sejm elections"
+        },
+        {
+          "date": "1965-05-30",
+          "source": "isap",
+          "quote": "MP/1965/157: results notice of the Sejm elections"
+        },
+        {
+          "date": "1969-06-01",
+          "source": "isap",
+          "quote": "MP/1969/177: results notice of the Sejm elections"
+        },
+        {
+          "date": "1972-03-19",
+          "source": "isap",
+          "quote": "MP/1972/110: results notice of the Sejm elections"
+        },
+        {
+          "date": "1976-03-21",
+          "source": "isap",
+          "quote": "MP/1976/52: results notice of the Sejm elections"
+        },
+        {
+          "date": "1980-03-23",
+          "source": "isap",
+          "quote": "MP/1980/37: results notice of the Sejm elections"
+        },
+        {
+          "date": "1985-10-13",
+          "source": "isap",
+          "quote": "MP/1985/198: results notice of the Sejm elections"
+        }
+      ]
+    },
+    {
+      "key": "sejm_ii_rp",
+      "tier": "ii_rp",
+      "name": "Wybory do Sejmu II RP",
+      "name_en": "Sejm elections of the Second Republic",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "Legislative Sejm 1919, then 1922, 1928, 1930, 1935, and 1938. Results by constituency in the Statystyka Polski volumes of GUS.",
+      "source": "ord1922",
+      "valid_from": "1919-01-26",
+      "valid_to": "1939-09-28",
+      "first_held": "1919-01-26",
+      "est_votes": 60000000,
+      "effort": 4,
+      "access": [
+        {
+          "platform": "Statystyka Polski (GUS) and Dziennik Ustaw",
+          "url": "https://isap.sejm.gov.pl/",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-13T00:00:00Z",
+          "first_date": "1919-01-26",
+          "finest": "pl.okreg_sejm_ii_rp",
+          "evidence": "Orders in Dziennik Ustaw; returns by constituency in GUS statistical volumes, scanned."
+        }
+      ],
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "by_election"
+          ],
+          "body_kinds": [
+            "lower_house",
+            "constituent_assembly"
+          ],
+          "iso_pattern": "PL",
+          "valid_from": "1918-11-11",
+          "valid_to": "1939-09-28"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1919-01-26",
+          "source": "isap",
+          "quote": "DU/1918/46: Dekret o ordynacji wyborczej do Sejmu Ustawodawczego"
+        },
+        {
+          "date": "1922-11-05",
+          "source": "isap",
+          "quote": "DU/1922/593: order of the elections to the Sejm and Senate"
+        },
+        {
+          "date": "1928-03-04",
+          "source": "isap",
+          "quote": "DU/1927/916: order of the elections to the Sejm and Senate"
+        },
+        {
+          "date": "1930-11-16",
+          "source": "isap",
+          "quote": "DU/1930/492: order of the elections to the Sejm and Senate"
+        },
+        {
+          "date": "1935-09-08",
+          "source": "isap",
+          "quote": "DU/1935/327: order of the elections to the Sejm"
+        },
+        {
+          "date": "1938-11-06",
+          "source": "isap",
+          "quote": "DU/1938/497: order of the elections to the Sejm"
+        }
+      ]
+    },
+    {
+      "key": "senat_ii_rp",
+      "tier": "ii_rp",
+      "name": "Wybory do Senatu II RP",
+      "name_en": "Senate elections of the Second Republic",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "By voivodeship, a week after each Sejm election; from 1935 a third of senators were appointed and the rest chosen by electoral colleges.",
+      "source": "ords1922",
+      "valid_from": "1922-11-12",
+      "valid_to": "1939-09-28",
+      "first_held": "1922-11-12",
+      "est_votes": 30000000,
+      "effort": 4,
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "upper_house"
+          ],
+          "iso_pattern": "PL",
+          "valid_from": "1918-11-11",
+          "valid_to": "1939-09-28"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1922-11-12",
+          "source": "isap",
+          "quote": "DU/1922/593: order of the elections to the Sejm and Senate"
+        },
+        {
+          "date": "1928-03-11",
+          "source": "isap",
+          "quote": "DU/1927/916: order of the elections to the Sejm and Senate"
+        },
+        {
+          "date": "1930-11-23",
+          "source": "isap",
+          "quote": "DU/1930/492: order of the elections to the Sejm and Senate"
+        },
+        {
+          "date": "1935-09-15",
+          "source": "isap",
+          "quote": "DU/1935/328: order of the elections to the Senate"
+        },
+        {
+          "date": "1938-11-13",
+          "source": "isap",
+          "quote": "DU/1938/498: order of the elections to the Senate"
+        }
+      ]
+    },
+    {
+      "key": "sejm_slaski",
+      "tier": "ii_rp",
+      "name": "Wybory do Sejmu Śląskiego",
+      "name_en": "Silesian Sejm elections",
+      "category": "legislature",
+      "goal": "subnational",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "The autonomous Silesian Voivodeship's legislature under its 1920 organic statute: elections in 1922, May 1930, November 1930, and 1935.",
+      "source": "statut_slaski",
+      "valid_from": "1922-09-24",
+      "valid_to": "1939-09-01",
+      "first_held": "1922-09-24",
+      "est_votes": 2400000,
+      "effort": 4,
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "name_pattern": "(Śląsk|Silesia)",
+          "within": null,
+          "valid_from": "1920-01-01",
+          "valid_to": "1939-09-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1922-09-24",
+          "source": "isap",
+          "quote": "DU/1922/529: order of the elections to the Silesian Sejm"
+        },
+        {
+          "date": "1930-05-11",
+          "source": "isap",
+          "quote": "DU/1930/130: order of the elections to the Silesian Sejm"
+        },
+        {
+          "date": "1930-11-23",
+          "source": "isap",
+          "quote": "DU/1930/531: order of the elections to the Silesian Sejm"
+        }
+      ]
+    },
+    {
+      "key": "sejmik",
+      "tier": "wojewodztwo",
+      "name": "Wybory do sejmików województw",
+      "name_en": "Voivodeship assembly elections",
+      "category": "council",
+      "goal": "subnational",
+      "measure": {
+        "schemes": [
+          "pl.okreg_sejmik"
+        ],
+        "fine": [
+          "pl.gmina",
+          "pl.obwod"
+        ]
+      },
+      "finest_note": "Polling-district files from 1998; 2002 has only candidates and turnout.",
+      "boundary_source": "prg",
+      "source": "kw2011",
+      "valid_from": "1998-10-11",
+      "first_held": "1998-10-11",
+      "earliest_record": "1998-10-11",
+      "contests_per_unit": 1,
+      "est_votes": 90000000,
+      "effort": 3,
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 2,
+          "term_years": 4,
+          "called": false,
+          "administered_by": "Państwowa Komisja Wyborcza",
+          "valid_to": "2018-12-31",
+          "source": "kw2011",
+          "locator": "https://eli.gov.pl/eli/DU/2011/112/ogl"
+        },
+        {
+          "period_years": 5,
+          "phase": 4,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "Państwowa Komisja Wyborcza",
+          "valid_from": "2019-01-01",
+          "source": "kadencja2018",
+          "locator": "https://eli.gov.pl/eli/DU/2018/130/ogl"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Dane wyborcze (KBW)",
+          "url": "https://danewyborcze.kbw.gov.pl/",
+          "format": "xls, xlsx, csv, and zip",
+          "access": "open",
+          "checked_at": "2026-11-13T00:00:00Z",
+          "first_date": "1998-10-11",
+          "finest": "pl.obwod",
+          "evidence": "Sejmik results by polling district for 1998, 2006, 2010, 2014, 2018, and 2024."
+        }
+      ],
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "region"
+          ],
+          "within": null
+        }
+      ],
+      "dates": [
+        {
+          "date": "1998-10-11",
+          "election_kind": "local",
+          "contests": 16,
+          "source": "isap",
+          "quote": "DU/1999/74: first elections to the 16 voivodeship assemblies"
+        },
+        {
+          "date": "2002-10-27",
+          "election_kind": "local",
+          "contests": 16,
+          "source": "isap",
+          "quote": "DU/2002/1125: order of the 2002 elections to voivodeship assemblies"
+        },
+        {
+          "date": "2006-11-12",
+          "election_kind": "local",
+          "contests": 16,
+          "source": "isap",
+          "quote": "DU/2006/1530: do 16 sejmików województw"
+        },
+        {
+          "date": "2010-11-21",
+          "election_kind": "local",
+          "contests": 16,
+          "source": "isap",
+          "quote": "DU/2010/1454: do 16 sejmików województw"
+        },
+        {
+          "date": "2014-11-16",
+          "election_kind": "local",
+          "contests": 16,
+          "source": "isap",
+          "quote": "DU/2014/1640: do 16 sejmików województw"
+        },
+        {
+          "date": "2018-10-21",
+          "election_kind": "local",
+          "contests": 16,
+          "source": "isap",
+          "quote": "DU/2018/2069: do 16 sejmików województw"
+        },
+        {
+          "date": "2024-04-07",
+          "election_kind": "local",
+          "contests": 16,
+          "source": "isap",
+          "quote": "DU/2024/543: do 16 sejmików województw"
+        }
+      ]
+    },
+    {
+      "key": "rada_powiatu",
+      "tier": "powiat",
+      "name": "Wybory do rad powiatów",
+      "name_en": "County council elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "schemes": [
+          "pl.powiat"
+        ],
+        "fine": [
+          "pl.gmina",
+          "pl.obwod"
+        ]
+      },
+      "boundary_source": "prg",
+      "source": "kw2011",
+      "valid_from": "1998-10-11",
+      "first_held": "1998-10-11",
+      "earliest_record": "1998-10-11",
+      "est_votes": 85000000,
+      "effort": 3,
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 2,
+          "term_years": 4,
+          "called": false,
+          "administered_by": "Państwowa Komisja Wyborcza",
+          "valid_to": "2018-12-31",
+          "source": "kw2011",
+          "locator": "https://eli.gov.pl/eli/DU/2011/112/ogl"
+        },
+        {
+          "period_years": 5,
+          "phase": 4,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "Państwowa Komisja Wyborcza",
+          "valid_from": "2019-01-01",
+          "source": "kadencja2018",
+          "locator": "https://eli.gov.pl/eli/DU/2018/130/ogl"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Dane wyborcze (KBW)",
+          "url": "https://danewyborcze.kbw.gov.pl/",
+          "format": "xls, xlsx, csv, and zip",
+          "access": "open",
+          "checked_at": "2026-11-13T00:00:00Z",
+          "first_date": "1998-10-11",
+          "finest": "pl.obwod",
+          "evidence": "Powiat council results by polling district for 1998 and from 2006."
+        }
+      ],
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "county"
+          ],
+          "within": null
+        }
+      ],
+      "dates": [
+        {
+          "date": "1998-10-11",
+          "election_kind": "local",
+          "contests": 308,
+          "note": "Counted from the powiats that existed when the 1998 councils took office; cities with powiat rights elect a city council instead.",
+          "source": "gus_podzial",
+          "quote": "Stan w dniu 1 stycznia 1999 r.: 308 powiatów"
+        },
+        {
+          "date": "2002-10-27",
+          "election_kind": "local",
+          "source": "isap",
+          "quote": "DU/2002/1125: order of the 2002 elections to gmina, powiat, and voivodeship councils"
+        },
+        {
+          "date": "2006-11-12",
+          "election_kind": "local",
+          "contests": 314,
+          "source": "isap",
+          "quote": "DU/2006/1530: 4) do 314 rad powiatów"
+        },
+        {
+          "date": "2010-11-21",
+          "election_kind": "local",
+          "contests": 314,
+          "source": "isap",
+          "quote": "DU/2010/1454: 4) do 314 rad powiatów"
+        },
+        {
+          "date": "2014-11-16",
+          "election_kind": "local",
+          "contests": 314,
+          "source": "isap",
+          "quote": "DU/2014/1640: 3) do 314 rad powiatów"
+        },
+        {
+          "date": "2018-10-21",
+          "election_kind": "local",
+          "contests": 314,
+          "source": "isap",
+          "quote": "DU/2018/2069: 3) do 314 rad powiatów"
+        },
+        {
+          "date": "2024-04-07",
+          "election_kind": "local",
+          "contests": 314,
+          "source": "isap",
+          "quote": "DU/2024/543: 3) do 314 rad powiatów"
+        }
+      ]
+    },
+    {
+      "key": "rada_gminy",
+      "tier": "gmina",
+      "name": "Wybory do rad gmin",
+      "name_en": "Municipal council elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "schemes": [
+          "pl.gmina"
+        ],
+        "fine": [
+          "pl.okreg_gmina",
+          "pl.obwod"
+        ]
+      },
+      "finest_note": "Councils in gminas up to 20,000 residents use single-member wards (all non-city gminas since 2018); larger ones use list PR.",
+      "boundary_source": "prg",
+      "note": "Includes the councils of cities with powiat rights and the Warsaw city council.",
+      "source": "usg1990",
+      "valid_from": "1990-05-27",
+      "first_held": "1990-05-27",
+      "earliest_record": "1994-06-19",
+      "est_votes": 105000000,
+      "effort": 4,
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 2,
+          "term_years": 4,
+          "called": false,
+          "administered_by": "Państwowa Komisja Wyborcza",
+          "valid_to": "2018-12-31",
+          "source": "usg1990",
+          "locator": "https://eli.gov.pl/eli/DU/1990/95/ogl"
+        },
+        {
+          "period_years": 5,
+          "phase": 4,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "Państwowa Komisja Wyborcza",
+          "valid_from": "2019-01-01",
+          "source": "kadencja2018",
+          "locator": "https://eli.gov.pl/eli/DU/2018/130/ogl",
+          "vacancy_rule": "Kodeks wyborczy art. 372: early elections within 90 days, none in the last 12 months of a term"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Dane wyborcze (KBW)",
+          "url": "https://danewyborcze.kbw.gov.pl/",
+          "format": "xls, xlsx, csv, and zip",
+          "access": "open",
+          "checked_at": "2026-11-13T00:00:00Z",
+          "first_date": "1994-06-19",
+          "finest": "pl.obwod",
+          "evidence": "1994 candidates with votes; 1998 by polling district for small gminas; 2002 candidates and turnout only; polling-district protocols from 2014."
+        },
+        {
+          "platform": "Wybory i referenda (PKW): wybory przedterminowe i uzupełniające",
+          "url": "https://wybory.gov.pl/index/?language=pl&tab=uzupelniajace",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-13T00:00:00Z",
+          "first_date": "2014-11-16",
+          "finest": "pl.obwod",
+          "evidence": "Mid-term early and by-elections for the 2014–2018, 2018–2024, and 2024–2029 terms."
+        }
+      ],
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "within": null,
+          "valid_from": "1990-01-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1990-05-27",
+          "election_kind": "local",
+          "contests": 2383,
+          "note": "Includes the 7 district councils of Warsaw.",
+          "source": "isap",
+          "quote": "MP/1990/170: Wybory przeprowadzono do 2.383 rad gmin, w tym: ... 574 rad gmin i miast, 7 rad dzielnic"
+        },
+        {
+          "date": "1994-06-19",
+          "election_kind": "local",
+          "contests": 2468,
+          "source": "isap",
+          "quote": "MP/1994/304: Wybory przeprowadzono do 2468 rad gmin"
+        },
+        {
+          "date": "1998-10-11",
+          "election_kind": "local",
+          "note": "The notice has no text layer; council count not read.",
+          "source": "isap",
+          "quote": "DU/1999/74: results notice of the 11 October 1998 elections to gmina, powiat, and voivodeship councils"
+        },
+        {
+          "date": "2002-10-27",
+          "election_kind": "local",
+          "source": "isap",
+          "quote": "DU/2002/1125: order of the 2002 elections to gmina, powiat, and voivodeship councils"
+        },
+        {
+          "date": "2006-11-12",
+          "election_kind": "local",
+          "contests": 2477,
+          "source": "isap",
+          "quote": "DU/2006/1530: Wybory przeprowadzono do 2 826 rad, w tym: 1) do 2 477 rad gmin"
+        },
+        {
+          "date": "2010-11-21",
+          "election_kind": "local",
+          "contests": 2478,
+          "source": "isap",
+          "quote": "DU/2010/1454: Wybory przeprowadzono do 2 827 rad, z czego: 1) do 2 478 rad gmin"
+        },
+        {
+          "date": "2014-11-16",
+          "election_kind": "local",
+          "contests": 2477,
+          "source": "isap",
+          "quote": "DU/2014/1640: Wybory przeprowadzono do 2 825 rad, z czego: 1) do 2 477 rad gmin"
+        },
+        {
+          "date": "2018-10-21",
+          "election_kind": "local",
+          "contests": 2477,
+          "source": "isap",
+          "quote": "DU/2018/2069: Wybory przeprowadzono do 2825 rad, z czego: 1) do 2477 rad gmin"
+        },
+        {
+          "date": "2024-04-07",
+          "election_kind": "local",
+          "contests": 2477,
+          "source": "isap",
+          "quote": "DU/2024/543: Wybory przeprowadzono do 2825 rad, z czego: 1) do 2477 rad gmin"
+        }
+      ]
+    },
+    {
+      "key": "wojt",
+      "tier": "gmina",
+      "name": "Wybory wójtów, burmistrzów i prezydentów miast",
+      "name_en": "Mayoral elections",
+      "category": "executive",
+      "goal": "local",
+      "measure": {
+        "schemes": [
+          "pl.gmina"
+        ],
+        "fine": [
+          "pl.obwod"
+        ]
+      },
+      "note": "Direct election since 2002; before that the council chose the wójt (see wybory_posrednie).",
+      "source": "wbp2002",
+      "valid_from": "2002-10-27",
+      "first_held": "2002-10-27",
+      "earliest_record": "2006-11-12",
+      "contests_per_unit": 1,
+      "est_votes": 95000000,
+      "effort": 3,
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 2,
+          "term_years": 4,
+          "called": false,
+          "runoff": "majority",
+          "runoff_rule": "More than half of valid votes elects; otherwise the top two meet in a second round on the 14th day after the first (Kodeks wyborczy arts. 292 and 473).",
+          "administered_by": "Państwowa Komisja Wyborcza",
+          "valid_to": "2018-12-31",
+          "source": "wbp2002",
+          "locator": "https://eli.gov.pl/eli/DU/2002/984/ogl"
+        },
+        {
+          "period_years": 5,
+          "phase": 4,
+          "term_years": 5,
+          "called": false,
+          "runoff": "majority",
+          "runoff_rule": "More than half of valid votes elects; otherwise the top two meet in a second round on the 14th day after the first (Kodeks wyborczy arts. 292 and 473).",
+          "administered_by": "Państwowa Komisja Wyborcza",
+          "valid_from": "2019-01-01",
+          "source": "kadencja2018",
+          "locator": "https://eli.gov.pl/eli/DU/2018/130/ogl"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Dane wyborcze (KBW)",
+          "url": "https://danewyborcze.kbw.gov.pl/",
+          "format": "xls, xlsx, csv, and zip",
+          "access": "open",
+          "checked_at": "2026-11-13T00:00:00Z",
+          "first_date": "2006-11-12",
+          "finest": "pl.obwod",
+          "evidence": "Polling-district files for 2006 and from 2014, including the 2024 second round; 2002 candidates only."
+        },
+        {
+          "platform": "Wybory i referenda (PKW): wybory przedterminowe",
+          "url": "https://wybory.gov.pl/index/?language=pl&tab=uzupelniajace",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-13T00:00:00Z",
+          "first_date": "2014-11-16",
+          "finest": "pl.obwod",
+          "evidence": "Early mayoral elections by term."
+        }
+      ],
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "runoff",
+            "by_election"
+          ],
+          "office_kinds": [
+            "mayor"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "within": null
+        }
+      ],
+      "dates": [
+        {
+          "date": "2002-10-27",
+          "election_kind": "local",
+          "source": "isap",
+          "quote": "DU/2002/1125: order of the first direct elections of wójt, burmistrz, and prezydent miasta"
+        },
+        {
+          "date": "2002-11-10",
+          "election_kind": "runoff",
+          "source": "wbp2002",
+          "quote": "second round on the 14th day after the first"
+        },
+        {
+          "date": "2006-11-12",
+          "election_kind": "local",
+          "contests": 2478,
+          "source": "isap",
+          "quote": "DU/2006/1586: Wybierano łącznie 2 478 wójtów, burmistrzów i prezydentów miast"
+        },
+        {
+          "date": "2006-11-26",
+          "election_kind": "runoff",
+          "contests": 827,
+          "source": "isap",
+          "quote": "DU/2006/1586: Wybierano łącznie 827 wójtów, burmistrzów i prezydentów miast spośród 1 654 zgłoszonych kandydatów"
+        },
+        {
+          "date": "2010-11-21",
+          "election_kind": "local",
+          "contests": 2479,
+          "source": "isap",
+          "quote": "DU/2010/1521: Wybierano łącznie 2 479 wójtów, burmistrzów i prezydentów miast"
+        },
+        {
+          "date": "2010-12-05",
+          "election_kind": "runoff",
+          "source": "isap",
+          "quote": "DU/2010/1521: second round of 5 December 2010"
+        },
+        {
+          "date": "2014-11-16",
+          "election_kind": "local",
+          "contests": 2477,
+          "source": "isap",
+          "quote": "DU/2014/1642: Wybierano łącznie 2 477 wójtów, burmistrzów i prezydentów miast"
+        },
+        {
+          "date": "2014-11-30",
+          "election_kind": "runoff",
+          "source": "isap",
+          "quote": "DU/2014/1642: second round of 30 November 2014"
+        },
+        {
+          "date": "2018-10-21",
+          "election_kind": "local",
+          "contests": 2477,
+          "source": "isap",
+          "quote": "DU/2018/2070: Wybierano łącznie 2477 wójtów, burmistrzów i prezydentów miast"
+        },
+        {
+          "date": "2018-11-04",
+          "election_kind": "runoff",
+          "source": "isap",
+          "quote": "DU/2018/2070: second round of 4 November 2018"
+        },
+        {
+          "date": "2024-04-07",
+          "election_kind": "local",
+          "contests": 2477,
+          "source": "isap",
+          "quote": "DU/2024/542: Wybierano łącznie 2477 wójtów, burmistrzów i prezydentów miast"
+        },
+        {
+          "date": "2024-04-21",
+          "election_kind": "runoff",
+          "source": "isap",
+          "quote": "DU/2024/617: second round of 21 April 2024"
+        }
+      ]
+    },
+    {
+      "key": "referendum_lokalne",
+      "tier": "gmina",
+      "name": "Referenda lokalne",
+      "name_en": "Local referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "Mostly recall votes on a wójt or council (valid only with at least 30% turnout, or three-fifths of the turnout that elected the official); a few on self-taxation or boundaries.",
+      "source": "refl2000",
+      "valid_from": "2000-10-28",
+      "first_held": "1991-01-01",
+      "earliest_record": "2014-11-16",
+      "est_votes": 3000000,
+      "effort": 4,
+      "access": [
+        {
+          "platform": "Wybory i referenda (PKW): referenda lokalne",
+          "url": "https://wybory.gov.pl/index/?language=pl&tab=uzupelniajace",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-13T00:00:00Z",
+          "first_date": "2014-11-16",
+          "finest": "pl.gmina",
+          "evidence": "Lists of local referendums with outcomes and turnout, by term from 2014."
+        }
+      ],
+      "match": [
+        {
+          "election_kinds": [
+            "referendum",
+            "recall"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "polity_kinds": [
+            "municipality",
+            "county",
+            "region"
+          ],
+          "within": null
+        }
+      ]
+    },
+    {
+      "key": "rada_dzielnicy_warszawa",
+      "tier": "dzielnica_warszawy",
+      "name": "Wybory do rad dzielnic m.st. Warszawy",
+      "name_en": "Warsaw district council elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "schemes": [
+          "pl.dzielnica_warszawy"
+        ],
+        "fine": [
+          "pl.obwod"
+        ]
+      },
+      "boundary_source": "prg",
+      "note": "Elected with the local councils under the Kodeks wyborczy; Warsaw is the only city whose district councils are on the national ballot.",
+      "source": "warszawa2002",
+      "valid_from": "2002-10-27",
+      "first_held": "2002-10-27",
+      "earliest_record": "2014-11-16",
+      "est_votes": 5000000,
+      "effort": 2,
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 2,
+          "term_years": 4,
+          "called": false,
+          "administered_by": "Państwowa Komisja Wyborcza",
+          "valid_to": "2018-12-31",
+          "source": "warszawa2002",
+          "locator": "https://eli.gov.pl/eli/DU/2002/361/ogl"
+        },
+        {
+          "period_years": 5,
+          "phase": 4,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "Państwowa Komisja Wyborcza",
+          "valid_from": "2019-01-01",
+          "source": "kadencja2018",
+          "locator": "https://eli.gov.pl/eli/DU/2018/130/ogl"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Dane wyborcze (KBW)",
+          "url": "https://danewyborcze.kbw.gov.pl/",
+          "format": "xls, xlsx, csv, and zip",
+          "access": "open",
+          "checked_at": "2026-11-13T00:00:00Z",
+          "first_date": "2014-11-16",
+          "finest": "pl.obwod",
+          "evidence": "Polling-district protocols for the 18 district councils in 2014, 2018, and 2024."
+        }
+      ],
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "submunicipal"
+          ],
+          "name_pattern": "(Warsz|Warsaw)",
+          "within": null
+        }
+      ],
+      "dates": [
+        {
+          "date": "2002-10-27",
+          "election_kind": "local",
+          "contests": 18,
+          "note": "First election of the 18 district councils set up by the 2002 Warsaw act.",
+          "source": "warszawa2002",
+          "quote": "art. 2: m.st. Warszawa dzieli się na 18 dzielnic"
+        },
+        {
+          "date": "2006-11-12",
+          "election_kind": "local",
+          "contests": 18,
+          "source": "isap",
+          "quote": "DU/2006/1530: do 18 rad dzielnic m.st. Warszawy"
+        },
+        {
+          "date": "2010-11-21",
+          "election_kind": "local",
+          "contests": 18,
+          "source": "isap",
+          "quote": "DU/2010/1454: do 18 rad dzielnic m.st. Warszawy"
+        },
+        {
+          "date": "2014-11-16",
+          "election_kind": "local",
+          "contests": 18,
+          "source": "isap",
+          "quote": "DU/2014/1640: do 18 rad dzielnic m.st. Warszawy"
+        },
+        {
+          "date": "2018-10-21",
+          "election_kind": "local",
+          "contests": 18,
+          "source": "isap",
+          "quote": "DU/2018/2069: do 18 rad dzielnic m.st. Warszawy"
+        },
+        {
+          "date": "2024-04-07",
+          "election_kind": "local",
+          "contests": 18,
+          "source": "isap",
+          "quote": "DU/2024/543: do 18 rad dzielnic m.st. Warszawy"
+        }
+      ]
+    },
+    {
+      "key": "jednostki_pomocnicze",
+      "tier": "jednostka_pomocnicza",
+      "name": "Wybory do rad dzielnic i osiedli",
+      "name_en": "District and neighborhood council elections outside Warsaw",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "About 2,300 district and osiedle councils (GUS BDL 2024: 295 dzielnice, 1,945 osiedla, and 120 other units) elected under each city's statute, with results published by the city, not the electoral commission.",
+      "source": "usg1990",
+      "first_held": "1990-01-01",
+      "est_votes": 1000000,
+      "effort": 5,
+      "access": [
+        {
+          "platform": "City websites",
+          "url": "https://bdl.stat.gov.pl/bdl/",
+          "format": "html and pdf",
+          "access": "manual",
+          "checked_at": "2026-11-13T00:00:00Z",
+          "first_date": "1990-01-01",
+          "finest": "pl.jednostka_pomocnicza",
+          "evidence": "Each city publishes its own; no national compilation."
+        }
+      ],
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "submunicipal"
+          ],
+          "within": null
+        }
+      ]
+    },
+    {
+      "key": "soltys",
+      "tier": "jednostka_pomocnicza",
+      "name": "Wybory sołtysów i rad sołeckich",
+      "name_en": "Village head and village council elections",
+      "category": "executive",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "40,546 sołectwa (GUS BDL, 2024).",
+      "source": "usg1990",
+      "disposition": "blocked",
+      "disposition_reason": "Chosen at village assemblies (zebranie wiejskie) under each gmina's statute (ustawa o samorządzie gminnym arts. 35–36); no electoral authority runs them or compiles returns.",
+      "match": [
+        {
+          "election_kinds": [
+            "local"
+          ],
+          "office_kinds": [
+            "other"
+          ],
+          "polity_kinds": [
+            "submunicipal"
+          ],
+          "within": null
+        }
+      ]
+    },
+    {
+      "key": "rady_narodowe",
+      "tier": "prl",
+      "name": "Wybory do rad narodowych",
+      "name_en": "National council elections of the People's Republic",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "Voivodeship, powiat, city, gromada, and gmina national councils elected on single lists from 1954 to 1988.",
+      "source": "ordrn1954",
+      "valid_from": "1954-12-05",
+      "valid_to": "1990-05-27",
+      "first_held": "1954-12-05",
+      "est_votes": 180000000,
+      "effort": 5,
+      "access": [
+        {
+          "platform": "Monitor Polski (ISAP)",
+          "url": "https://isap.sejm.gov.pl/",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-13T00:00:00Z",
+          "first_date": "1954-12-05",
+          "finest": "pl.wojewodztwo",
+          "evidence": "National totals in results notices; finer returns only in archives."
+        }
+      ],
+      "match": [
+        {
+          "election_kinds": [
+            "local"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "iso_pattern": "PL",
+          "within": null,
+          "valid_from": "1950-01-01",
+          "valid_to": "1990-01-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1954-12-05",
+          "election_kind": "local",
+          "source": "isap",
+          "quote": "DU/1954/210: order of elections to the national councils"
+        },
+        {
+          "date": "1958-02-02",
+          "election_kind": "local",
+          "source": "isap",
+          "quote": "DU/1957/271: order of elections to the national councils"
+        },
+        {
+          "date": "1961-04-16",
+          "election_kind": "local",
+          "source": "isap",
+          "quote": "DU/1960/333: order of elections to the national councils"
+        },
+        {
+          "date": "1965-05-30",
+          "election_kind": "local",
+          "source": "isap",
+          "quote": "DU/1965/62: order of elections to the national councils"
+        },
+        {
+          "date": "1969-06-01",
+          "election_kind": "local",
+          "source": "isap",
+          "quote": "DU/1969/57: order of elections to the national councils"
+        },
+        {
+          "date": "1973-12-09",
+          "election_kind": "local",
+          "source": "isap",
+          "quote": "DU/1973/227: order of elections to the national councils"
+        },
+        {
+          "date": "1976-03-21",
+          "election_kind": "local",
+          "source": "isap",
+          "quote": "DU/1976/16: order of elections to the national councils"
+        },
+        {
+          "date": "1980-03-23",
+          "election_kind": "local",
+          "source": "isap",
+          "quote": "DU/1980/3: order of elections to the national councils"
+        },
+        {
+          "date": "1984-06-17",
+          "election_kind": "local",
+          "source": "isap",
+          "quote": "DU/1984/40: order of elections to the national councils"
+        },
+        {
+          "date": "1988-06-19",
+          "election_kind": "local",
+          "source": "isap",
+          "quote": "DU/1988/56: order of elections to the national councils"
+        }
+      ]
+    },
+    {
+      "key": "samorzad_ii_rp",
+      "tier": "ii_rp",
+      "name": "Wybory samorządowe II RP",
+      "name_en": "Local elections of the Second Republic",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "City and gmina council elections from 1919 to 1939 under partition-era and then 1933 local laws; returns are in local gazettes and the GUS statistical yearbooks.",
+      "source": "konst1921",
+      "valid_from": "1919-01-01",
+      "valid_to": "1939-09-01",
+      "est_votes": 40000000,
+      "effort": 5,
+      "match": [
+        {
+          "election_kinds": [
+            "local"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "within": null,
+          "valid_from": "1918-11-11",
+          "valid_to": "1939-09-01"
+        }
+      ]
+    },
+    {
+      "key": "wybory_posrednie",
+      "tier": "national",
+      "name": "Wybory pośrednie",
+      "name_en": "Indirect elections by councils and the Sejm",
+      "category": "indirect",
+      "goal": "local",
+      "measure": {},
+      "source": "usg1990",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Officers chosen by elected bodies: the starosta, marszałek, and their boards by councils, the wójt by the council before 2002, lay judges by councils, and the Prime Minister by the Sejm; no electorate votes.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "head_of_government",
+            "governor",
+            "mayor",
+            "speaker",
+            "other"
+          ],
+          "iso_pattern": "PL",
+          "within": null
+        }
+      ]
+    },
+    {
+      "key": "wybory_wewnetrzne",
+      "tier": "national",
+      "name": "Wybory samorządów zawodowych, rolniczych i pracowniczych",
+      "name_en": "Chamber, workplace, university, and party elections",
+      "category": "non_territorial",
+      "goal": "local",
+      "measure": {},
+      "source": "konst1997",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Run by the bodies themselves for their members: agricultural chambers, professional chambers, workplace councils, universities, youth councils, and party primaries; no electoral authority certifies them for a territorial electorate."
+    }
+  ]
+}
