@@ -66,7 +66,14 @@ PARTIES = {
     "Plaid Cymru The Party of Wales": "Plaid Cymru",
     "Green Party": "Green Party",
 }
-INDEPENDENT = {"Independent", "Independant", "Independent Candidate"}
+INDEPENDENT = {
+    "Independent",
+    "Independant",
+    "Independent Candidate",
+    "Independent Tennant",
+    "Uplands Neighbourhood Independent",
+    "Independents@Swansea",
+}
 SWANSEA_SEATS = {
     "Labour": 47,
     "Liberal Democrats": 10,
