@@ -1,179 +1,660 @@
 {
-  "polity": "US-MT",
-  "publisher": "Montana Secretary of State",
-  "title": "Official Montana general election returns 1924, by county",
-  "license": "Public record",
-  "file": {
-    "url": "https://archive.org/download/officialmontanag1924montrich/officialmontanag1924montrich.pdf",
-    "item": "https://archive.org/details/officialmontanag1924montrich"
+ "polity": "US-MT",
+ "publisher": "Montana Secretary of State",
+ "title": "Official Montana general election returns 1924, by county (official abstract dated December 1, 1924, scanned in the Internet Archive item labeled 1926)",
+ "license": "Public record",
+ "file": {
+  "url": "https://archive.org/download/officialmontanag1926montrich/officialmontanag1926montrich.pdf",
+  "item": "https://archive.org/details/officialmontanag1926montrich"
+ },
+ "contests": {
+  "president": {
+   "year": 1924,
+   "chamber": "president",
+   "day": "1924-11-04",
+   "special": false,
+   "state": "MT",
+   "district": null
   },
-  "raw_source": "us.county_volumes",
-  "contests": {
-    "senate": {
-      "year": 1924,
-      "chamber": "senate",
-      "day": "1924-11-04",
-      "special": false,
-      "state": "MT",
-      "district": null
-    },
-    "president": {
-      "year": 1924,
-      "chamber": "president",
-      "day": "1924-11-04",
-      "special": false,
-      "state": "MT",
-      "district": null
-    }
+  "senate": {
+   "year": 1924,
+   "chamber": "senate",
+   "day": "1924-11-04",
+   "special": false,
+   "state": "MT",
+   "district": null
   },
-  "pages": [
+  "house1": {
+   "year": 1924,
+   "chamber": "house",
+   "day": "1924-11-04",
+   "special": false,
+   "state": "MT",
+   "district": 1
+  },
+  "house2": {
+   "year": 1924,
+   "chamber": "house",
+   "day": "1924-11-04",
+   "special": false,
+   "state": "MT",
+   "district": 2
+  },
+  "governor": {
+   "year": 1924,
+   "chamber": "governor",
+   "day": "1924-11-04",
+   "special": false,
+   "state": "MT",
+   "district": null
+  }
+ },
+ "pages": [
+  {
+   "page": 2,
+   "id": "2-dem",
+   "columns": [
     {
-      "page": 1,
-      "id": "1-0",
-      "columns": [
-        {
-          "label": "Thomas J. Walsh (Democratic)",
-          "contest": "senate",
-          "candidate": "Thomas J. Walsh"
-        },
-        {
-          "label": "Frank B. Linderman (Republican)",
-          "contest": "senate",
-          "candidate": "Frank B. Linderman"
-        },
-        {
-          "label": "J. W. Anderson (Farmer-Labor)",
-          "contest": "senate",
-          "candidate": "J. W. Anderson"
-        },
-        {
-          "label": "Sam W. Tenkarden (Independent)",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "Charles F. Juttner (Socialist)",
-          "contest": "senate",
-          "candidate": "Charles F. Juttner"
-        }
-      ],
-      "orientation": "counties_down",
-      "crop": [
-        0.203,
-        0.351,
-        0.446,
-        1.0
-      ],
-      "hint": "Read only the table headed 'United States Senator'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        0.5778
-      ]
+     "label": "H. J. Calhoun",
+     "contest": null,
+     "candidate": ""
     },
     {
-      "page": 4,
-      "id": "4-0",
-      "columns": [
-        {
-          "label": "H. J. Calhoun",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "Patrick Carney",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "G. E. LaFollette",
-          "contest": "president",
-          "candidate": "Robert La Follette (Progressive)"
-        },
-        {
-          "label": "Mrs. Henry L. Sherlock",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "May C. Bartos",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "Dr. James H. Irwin",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "W. D. Kyle",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "Geo. E. Snell",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "W. R. Duncan",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "John M. Johnson",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "Emma Salisbury",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "Ella Lord",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "B. R. Albin",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "Mina A. Loveland",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "Edwin H. Manson",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "O. E. Olsgard",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "M. Beach",
-          "contest": null,
-          "candidate": ""
-        }
-      ],
-      "orientation": "counties_down",
-      "crop": [
-        0.035,
-        0.404,
-        1.0,
-        1.0
-      ],
-      "hint": "Read only the table headed 'FOR PRESIDENTIAL ELECTORS'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        0.5554
-      ]
+     "label": "Patrick Carney",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "G. E. LaFollette",
+     "contest": "president",
+     "candidate": "John W. Davis (Democratic)"
+    },
+    {
+     "label": "Mrs. Henry L. Sherlock",
+     "contest": null,
+     "candidate": ""
     }
-  ]
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.0,
+    0.33,
+    0.197,
+    1.0
+   ],
+   "hint": "Read only the 4 rightmost columns of figures, headed Democratic presidential electors; skip every other column. The table runs past the bottom edge, so there is no total row here. Blank or dotted cells are empty strings. The county rows, top to bottom, are Beaverhead, Big Horn, Blaine, Broadwater, Carbon, Carter, Cascade, Chouteau, Custer, Daniels, Dawson, Deer Lodge, Fallon, Fergus, Flathead, Gallatin, Garfield, Glacier, Golden Valley, Granite, Hill, Jefferson, Judith Basin, Lake, Lewis and Clark, Liberty, Lincoln, Madison; the last may be cut at the bottom edge. Keep each county's figures on its own row, and give an empty row where the columns are blank."
+  },
+  {
+   "page": 2,
+   "id": "2-rep",
+   "columns": [
+    {
+     "label": "May C. Bartos",
+     "contest": "president",
+     "candidate": "Calvin Coolidge (Republican)"
+    },
+    {
+     "label": "Dr. James H. Irwin",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "W. D. Kyle",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Geo. E. Snell",
+     "contest": null,
+     "candidate": ""
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.0,
+    0.33,
+    0.28,
+    1.0
+   ],
+   "hint": "Read only the 4 rightmost columns of figures, headed Republican presidential electors; skip every other column. The table runs past the bottom edge, so there is no total row here. Blank or dotted cells are empty strings. The county rows, top to bottom, are Beaverhead, Big Horn, Blaine, Broadwater, Carbon, Carter, Cascade, Chouteau, Custer, Daniels, Dawson, Deer Lodge, Fallon, Fergus, Flathead, Gallatin, Garfield, Glacier, Golden Valley, Granite, Hill, Jefferson, Judith Basin, Lake, Lewis and Clark, Liberty, Lincoln, Madison; the last may be cut at the bottom edge. Keep each county's figures on its own row, and give an empty row where the columns are blank."
+  },
+  {
+   "page": 2,
+   "id": "2-lf",
+   "columns": [
+    {
+     "label": "W. R. Duncan",
+     "contest": "president",
+     "candidate": "Robert La Follette (Progressive)"
+    },
+    {
+     "label": "John M. Johnson",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Emma Salisbury",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Ella Lord",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "B. R. Albin",
+     "contest": "president",
+     "candidate": "Robert La Follette (Progressive)"
+    },
+    {
+     "label": "Mina A. Loveland",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Edwin H. Manson",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "O. B. Olsgard",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "M. Beach",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "J. C. Clark",
+     "contest": "president",
+     "candidate": "Robert La Follette (Progressive)"
+    },
+    {
+     "label": "H. R. Schneider",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Lucy A. Wilburn",
+     "contest": null,
+     "candidate": ""
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.0,
+    0.33,
+    0.524,
+    1.0
+   ],
+   "hint": "Read only the 12 rightmost columns of figures, headed presidential electors of three slates: Farmer-Labor (4 columns), LaFollette-Wheeler Independent (4 columns), and Socialist (4 columns); skip every other column. The table runs past the bottom edge, so there is no total row here. Blank or dotted cells are empty strings. The county rows, top to bottom, are Beaverhead, Big Horn, Blaine, Broadwater, Carbon, Carter, Cascade, Chouteau, Custer, Daniels, Dawson, Deer Lodge, Fallon, Fergus, Flathead, Gallatin, Garfield, Glacier, Golden Valley, Granite, Hill, Jefferson, Judith Basin, Lake, Lewis and Clark, Liberty, Lincoln, Madison; the last may be cut at the bottom edge. Keep each county's figures on its own row, and give an empty row where the columns are blank."
+  },
+  {
+   "page": 2,
+   "id": "2-wrk",
+   "columns": [
+    {
+     "label": "Gotlieb Brunner",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Mikel Horvath",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Charles Westfall",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "August Schultz",
+     "contest": "president",
+     "candidate": "William Foster (Communist)"
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.0,
+    0.33,
+    0.602,
+    1.0
+   ],
+   "hint": "Read only the 4 rightmost columns of figures, headed Workers Party of America presidential electors; skip every other column. The table runs past the bottom edge, so there is no total row here. Blank or dotted cells are empty strings. The county rows, top to bottom, are Beaverhead, Big Horn, Blaine, Broadwater, Carbon, Carter, Cascade, Chouteau, Custer, Daniels, Dawson, Deer Lodge, Fallon, Fergus, Flathead, Gallatin, Garfield, Glacier, Golden Valley, Granite, Hill, Jefferson, Judith Basin, Lake, Lewis and Clark, Liberty, Lincoln, Madison; the last may be cut at the bottom edge. Keep each county's figures on its own row, and give an empty row where the columns are blank."
+  },
+  {
+   "page": 2,
+   "id": "2-sen",
+   "columns": [
+    {
+     "label": "Thomas J. Walsh",
+     "contest": "senate",
+     "candidate": "Thomas J. Walsh"
+    },
+    {
+     "label": "Frank B. Linderman",
+     "contest": "senate",
+     "candidate": "Frank B. Linderman"
+    },
+    {
+     "label": "J. W. Anderson",
+     "contest": "senate",
+     "candidate": "J. W. Anderson"
+    },
+    {
+     "label": "Sam W. Teagarden",
+     "contest": "senate",
+     "candidate": "Sam. W. Teagarden"
+    },
+    {
+     "label": "Charles F. Juttner",
+     "contest": "senate",
+     "candidate": "Charles F. Juttner"
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.0,
+    0.33,
+    0.708,
+    1.0
+   ],
+   "hint": "Read only the 5 rightmost columns of figures, headed United States Senator (Democratic, Republican, Farmer-Labor, Independent, Socialist); skip every other column. The table runs past the bottom edge, so there is no total row here. Blank or dotted cells are empty strings. The county rows, top to bottom, are Beaverhead, Big Horn, Blaine, Broadwater, Carbon, Carter, Cascade, Chouteau, Custer, Daniels, Dawson, Deer Lodge, Fallon, Fergus, Flathead, Gallatin, Garfield, Glacier, Golden Valley, Granite, Hill, Jefferson, Judith Basin, Lake, Lewis and Clark, Liberty, Lincoln, Madison; the last may be cut at the bottom edge. Keep each county's figures on its own row, and give an empty row where the columns are blank."
+  },
+  {
+   "page": 2,
+   "id": "2-house",
+   "columns": [
+    {
+     "label": "John M. Evans",
+     "contest": "house1",
+     "candidate": "John M. Evans"
+    },
+    {
+     "label": "Joseph Kirschwing",
+     "contest": "house2",
+     "candidate": "Joseph Kirschwing"
+    },
+    {
+     "label": "John O. Davies",
+     "contest": "house1",
+     "candidate": "John O. Daveis"
+    },
+    {
+     "label": "Scott Leavitt",
+     "contest": "house2",
+     "candidate": "Scott Leavitt"
+    },
+    {
+     "label": "Farmer-Labor First Dist.",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Charles E. Taylor",
+     "contest": "house2",
+     "candidate": "Charles E. Taylor"
+    },
+    {
+     "label": "John F. McKay",
+     "contest": "house1",
+     "candidate": "John F. McKay"
+    },
+    {
+     "label": "Socialist Second Dist.",
+     "contest": null,
+     "candidate": ""
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.0,
+    0.33,
+    0.873,
+    1.0
+   ],
+   "hint": "Read only the 8 rightmost columns of figures, headed Representative in Congress, in this order: Democratic First Dist., Democratic Second Dist., Republican First Dist., Republican Second Dist., Farmer-Labor First Dist., Farmer-Labor Second Dist., Socialist First Dist., and Socialist Second Dist. Each county votes in only one district, so about half the cells in each row are dotted; skip every other column. The table runs past the bottom edge, so there is no total row here. Blank or dotted cells are empty strings. The county rows, top to bottom, are Beaverhead, Big Horn, Blaine, Broadwater, Carbon, Carter, Cascade, Chouteau, Custer, Daniels, Dawson, Deer Lodge, Fallon, Fergus, Flathead, Gallatin, Garfield, Glacier, Golden Valley, Granite, Hill, Jefferson, Judith Basin, Lake, Lewis and Clark, Liberty, Lincoln, Madison; the last may be cut at the bottom edge. Keep each county's figures on its own row, and give an empty row where the columns are blank."
+  },
+  {
+   "page": 4,
+   "id": "4-dem",
+   "columns": [
+    {
+     "label": "H. J. Calhoun",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Patrick Carney",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "G. E. LaFollette",
+     "contest": "president",
+     "candidate": "John W. Davis (Democratic)"
+    },
+    {
+     "label": "Mrs. Henry L. Sherlock",
+     "contest": null,
+     "candidate": ""
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.0,
+    0.0,
+    0.197,
+    0.56
+   ],
+   "hint": "The headings are not printed on this page. Read only the 4 rightmost columns of figures, which are the Democratic presidential electors; skip every other column. The rows, top to bottom, are Gallatin, Garfield, Glacier, Golden Valley, Granite, Hill, Jefferson, Judith Basin, Lake, Lewis and Clark, Liberty, Lincoln, Madison, McCone, Meagher, Mineral, Missoula, Musselshell, Park, Phillips, Pondera, Powder River, Powell, Prairie, Ravalli, Richland, Rosebud, Roosevelt, Sanders, Sheridan, Silver Bow, Stillwater, Sweet Grass, Teton, Toole, Treasure, Valley, Wheatland, Wibaux, Yellowstone, then TOTAL; the top row (Gallatin) may be cut at the top edge. Keep each county's figures on its own row, and give an empty row where the columns are blank. Blank or dotted cells are empty strings."
+  },
+  {
+   "page": 4,
+   "id": "4-rep",
+   "columns": [
+    {
+     "label": "May C. Bartos",
+     "contest": "president",
+     "candidate": "Calvin Coolidge (Republican)"
+    },
+    {
+     "label": "Dr. James H. Irwin",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "W. D. Kyle",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Geo. E. Snell",
+     "contest": null,
+     "candidate": ""
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.0,
+    0.0,
+    0.28,
+    0.56
+   ],
+   "hint": "The headings are not printed on this page. Read only the 4 rightmost columns of figures, which are the Republican presidential electors; skip every other column. The rows, top to bottom, are Gallatin, Garfield, Glacier, Golden Valley, Granite, Hill, Jefferson, Judith Basin, Lake, Lewis and Clark, Liberty, Lincoln, Madison, McCone, Meagher, Mineral, Missoula, Musselshell, Park, Phillips, Pondera, Powder River, Powell, Prairie, Ravalli, Richland, Rosebud, Roosevelt, Sanders, Sheridan, Silver Bow, Stillwater, Sweet Grass, Teton, Toole, Treasure, Valley, Wheatland, Wibaux, Yellowstone, then TOTAL; the top row (Gallatin) may be cut at the top edge. Keep each county's figures on its own row, and give an empty row where the columns are blank. Blank or dotted cells are empty strings."
+  },
+  {
+   "page": 4,
+   "id": "4-lf",
+   "columns": [
+    {
+     "label": "W. R. Duncan",
+     "contest": "president",
+     "candidate": "Robert La Follette (Progressive)"
+    },
+    {
+     "label": "John M. Johnson",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Emma Salisbury",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Ella Lord",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "B. R. Albin",
+     "contest": "president",
+     "candidate": "Robert La Follette (Progressive)"
+    },
+    {
+     "label": "Mina A. Loveland",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Edwin H. Manson",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "O. B. Olsgard",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "M. Beach",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "J. C. Clark",
+     "contest": "president",
+     "candidate": "Robert La Follette (Progressive)"
+    },
+    {
+     "label": "H. R. Schneider",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Lucy A. Wilburn",
+     "contest": null,
+     "candidate": ""
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.0,
+    0.0,
+    0.525,
+    0.56
+   ],
+   "hint": "The headings are not printed on this page. Read only the 12 rightmost columns of figures, which are the presidential electors of three slates: Farmer-Labor (4 columns), LaFollette-Wheeler Independent (4 columns), and Socialist (4 columns); skip every other column. The rows, top to bottom, are Gallatin, Garfield, Glacier, Golden Valley, Granite, Hill, Jefferson, Judith Basin, Lake, Lewis and Clark, Liberty, Lincoln, Madison, McCone, Meagher, Mineral, Missoula, Musselshell, Park, Phillips, Pondera, Powder River, Powell, Prairie, Ravalli, Richland, Rosebud, Roosevelt, Sanders, Sheridan, Silver Bow, Stillwater, Sweet Grass, Teton, Toole, Treasure, Valley, Wheatland, Wibaux, Yellowstone, then TOTAL; the top row (Gallatin) may be cut at the top edge. Keep each county's figures on its own row, and give an empty row where the columns are blank. Blank or dotted cells are empty strings."
+  },
+  {
+   "page": 4,
+   "id": "4-wrk",
+   "columns": [
+    {
+     "label": "Gotlieb Brunner",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Mikel Horvath",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Charles Westfall",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "August Schultz",
+     "contest": "president",
+     "candidate": "William Foster (Communist)"
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.0,
+    0.0,
+    0.604,
+    0.56
+   ],
+   "hint": "The headings are not printed on this page. Read only the 4 rightmost columns of figures, which are the Workers Party of America presidential electors; skip every other column. The rows, top to bottom, are Gallatin, Garfield, Glacier, Golden Valley, Granite, Hill, Jefferson, Judith Basin, Lake, Lewis and Clark, Liberty, Lincoln, Madison, McCone, Meagher, Mineral, Missoula, Musselshell, Park, Phillips, Pondera, Powder River, Powell, Prairie, Ravalli, Richland, Rosebud, Roosevelt, Sanders, Sheridan, Silver Bow, Stillwater, Sweet Grass, Teton, Toole, Treasure, Valley, Wheatland, Wibaux, Yellowstone, then TOTAL; the top row (Gallatin) may be cut at the top edge. Keep each county's figures on its own row, and give an empty row where the columns are blank. Blank or dotted cells are empty strings."
+  },
+  {
+   "page": 4,
+   "id": "4-sen",
+   "columns": [
+    {
+     "label": "Thomas J. Walsh",
+     "contest": "senate",
+     "candidate": "Thomas J. Walsh"
+    },
+    {
+     "label": "Frank B. Linderman",
+     "contest": "senate",
+     "candidate": "Frank B. Linderman"
+    },
+    {
+     "label": "J. W. Anderson",
+     "contest": "senate",
+     "candidate": "J. W. Anderson"
+    },
+    {
+     "label": "Sam W. Teagarden",
+     "contest": "senate",
+     "candidate": "Sam. W. Teagarden"
+    },
+    {
+     "label": "Charles F. Juttner",
+     "contest": "senate",
+     "candidate": "Charles F. Juttner"
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.0,
+    0.0,
+    0.709,
+    0.56
+   ],
+   "hint": "The headings are not printed on this page. Read only the 5 rightmost columns of figures, which are the United States Senator (Democratic, Republican, Farmer-Labor, Independent, Socialist); skip every other column. The rows, top to bottom, are Gallatin, Garfield, Glacier, Golden Valley, Granite, Hill, Jefferson, Judith Basin, Lake, Lewis and Clark, Liberty, Lincoln, Madison, McCone, Meagher, Mineral, Missoula, Musselshell, Park, Phillips, Pondera, Powder River, Powell, Prairie, Ravalli, Richland, Rosebud, Roosevelt, Sanders, Sheridan, Silver Bow, Stillwater, Sweet Grass, Teton, Toole, Treasure, Valley, Wheatland, Wibaux, Yellowstone, then TOTAL; the top row (Gallatin) may be cut at the top edge. Keep each county's figures on its own row, and give an empty row where the columns are blank. Blank or dotted cells are empty strings."
+  },
+  {
+   "page": 4,
+   "id": "4-house",
+   "columns": [
+    {
+     "label": "John M. Evans",
+     "contest": "house1",
+     "candidate": "John M. Evans"
+    },
+    {
+     "label": "Joseph Kirschwing",
+     "contest": "house2",
+     "candidate": "Joseph Kirschwing"
+    },
+    {
+     "label": "John O. Davies",
+     "contest": "house1",
+     "candidate": "John O. Daveis"
+    },
+    {
+     "label": "Scott Leavitt",
+     "contest": "house2",
+     "candidate": "Scott Leavitt"
+    },
+    {
+     "label": "Farmer-Labor First Dist.",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Charles E. Taylor",
+     "contest": "house2",
+     "candidate": "Charles E. Taylor"
+    },
+    {
+     "label": "John F. McKay",
+     "contest": "house1",
+     "candidate": "John F. McKay"
+    },
+    {
+     "label": "Socialist Second Dist.",
+     "contest": null,
+     "candidate": ""
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.0,
+    0.0,
+    0.877,
+    0.56
+   ],
+   "hint": "The headings are not printed on this page. Read only the 8 rightmost columns of figures, which are the Representative in Congress, in this order: Democratic First Dist., Democratic Second Dist., Republican First Dist., Republican Second Dist., Farmer-Labor First Dist., Farmer-Labor Second Dist., Socialist First Dist., and Socialist Second Dist. Each county votes in only one district, so about half the cells in each row are dotted; skip every other column. The rows, top to bottom, are Gallatin, Garfield, Glacier, Golden Valley, Granite, Hill, Jefferson, Judith Basin, Lake, Lewis and Clark, Liberty, Lincoln, Madison, McCone, Meagher, Mineral, Missoula, Musselshell, Park, Phillips, Pondera, Powder River, Powell, Prairie, Ravalli, Richland, Rosebud, Roosevelt, Sanders, Sheridan, Silver Bow, Stillwater, Sweet Grass, Teton, Toole, Treasure, Valley, Wheatland, Wibaux, Yellowstone, then TOTAL; the top row (Gallatin) may be cut at the top edge. Keep each county's figures on its own row, and give an empty row where the columns are blank. Blank or dotted cells are empty strings."
+  },
+  {
+   "page": 3,
+   "id": "3-gov",
+   "columns": [
+    {
+     "label": "J. E. Erickson",
+     "contest": "governor",
+     "candidate": "John E. Erickson"
+    },
+    {
+     "label": "Jos. M. Dixon",
+     "contest": "governor",
+     "candidate": "Joseph M. Dixon"
+    },
+    {
+     "label": "Frank J. Edwards",
+     "contest": "governor",
+     "candidate": "Frank J. Edwards"
+    },
+    {
+     "label": "J. H. Matheson",
+     "contest": "governor",
+     "candidate": "J. H. Matheson"
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.054,
+    0.33,
+    0.139,
+    1.0
+   ],
+   "hint": "Read only the Governor table (Democratic, Republican, Farmer-Labor, Socialist). The county names are not on this image: label the rows in order, top to bottom, Beaverhead, Big Horn, Blaine, Broadwater, Carbon, Carter, Cascade, Chouteau, Custer, Daniels, Dawson, Deer Lodge, Fallon, Fergus, Flathead, Gallatin, Garfield, Glacier, Golden Valley, Granite, Hill, Jefferson, Judith Basin, Lake, Lewis and Clark, Liberty, Lincoln, Madison, McCone; the last may be cut at the bottom edge."
+  },
+  {
+   "page": 5,
+   "id": "5-gov",
+   "columns": [
+    {
+     "label": "J. E. Erickson",
+     "contest": "governor",
+     "candidate": "John E. Erickson"
+    },
+    {
+     "label": "Jos. M. Dixon",
+     "contest": "governor",
+     "candidate": "Joseph M. Dixon"
+    },
+    {
+     "label": "Frank J. Edwards",
+     "contest": "governor",
+     "candidate": "Frank J. Edwards"
+    },
+    {
+     "label": "J. H. Matheson",
+     "contest": "governor",
+     "candidate": "J. H. Matheson"
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.054,
+    0.0,
+    0.142,
+    0.52
+   ],
+   "hint": "This image is the lower part of the Governor table (Democratic, Republican, Farmer-Labor, Socialist); its headings and county names are not printed here. Label the rows in order, top to bottom: Gallatin, Garfield, Glacier, Golden Valley, Granite, Hill, Jefferson, Judith Basin, Lake, Lewis and Clark, Liberty, Lincoln, Madison, McCone, Meagher, Mineral, Missoula, Musselshell, Park, Phillips, Pondera, Powder River, Powell, Prairie, Ravalli, Richland, Rosebud, Roosevelt, Sanders, Sheridan, Silver Bow, Stillwater, Sweet Grass, Teton, Toole, Treasure, Valley, Wheatland, Wibaux, Yellowstone, then TOTAL. The top row (Gallatin) is cut at the top edge; read it if its figures are legible."
+  }
+ ]
 }
