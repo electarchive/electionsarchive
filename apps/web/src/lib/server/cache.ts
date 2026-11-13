@@ -5,7 +5,7 @@ import { RESP_TYPES } from "@redis/client";
 import { sql } from "drizzle-orm";
 import { AsyncLocalStorage } from "node:async_hooks";
 import { Buffer } from "node:buffer";
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { isDeepStrictEqual, promisify } from "node:util";
 import { deserialize, serialize } from "node:v8";
 import { zstdCompress, zstdDecompress } from "node:zlib";
@@ -209,6 +209,14 @@ async function shelf() {
   return shelved;
 }
 
+function shelfSlot(slot: string) {
+  if (Buffer.byteLength(slot) <= 2000) {
+    return slot;
+  }
+  const digest = createHash("sha256").update(slot).digest("hex");
+  return `${slot.split(":", 2).join(":")}:#${digest}`;
+}
+
 async function retrieve(slot: string) {
   const reader = client();
   const cached = await reader?.get(slot).catch(() => null);
@@ -221,7 +229,7 @@ async function retrieve(slot: string) {
   }
   const result = await pool.query<{ body: Buffer }>(
     "select body from entry where slot = $1",
-    [slot],
+    [shelfSlot(slot)],
   );
   const stored = result.rows[0]?.body;
   if (stored != null && reader != null) {
@@ -267,7 +275,7 @@ async function shelve(slot: string, version: string, packed: Buffer) {
   await pool?.query(
     `insert into entry (slot, version, body) values ($1, $2, $3)
       on conflict (slot) do update set version = excluded.version, body = excluded.body, stored_at = now()`,
-    [slot, version, packed],
+    [shelfSlot(slot), version, packed],
   );
 }
 

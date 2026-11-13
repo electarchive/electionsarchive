@@ -1347,18 +1347,22 @@ async function night(
       order by f.as_of, f.k
     `),
     db.execute<{ contest: string; option: string; votes: number }>(sql`
-      with latest as (
+      with nota as (
+        select x.id, x.contest_id from contest_option x
+        where x.contest_id = any(${sql.param(contests)}::uuid[]) and x.kind = 'none_of_the_above'
+      ),
+      latest as (
         select distinct on (f.feed_id, f.contest_id) f.k, f.contest_id, f.as_of
         from live.frame f join live.feed d on d.id = f.feed_id and d.enabled
-        where f.contest_id = any(${sql.param(contests)}::uuid[]) and f.status = 'active' and ${shown.results}::boolean
+        where f.contest_id in (select contest_id from nota) and f.status = 'active' and ${shown.results}::boolean
         order by f.feed_id, f.contest_id, f.as_of desc, f.k desc
       )
       select distinct on (t.contest, t.option) t.contest, t.option, t.votes
       from (
         select l.contest_id as contest, x.id as option, l.as_of, l.k, sum(v.votes)::float8 as votes
         from latest l
-        join live.value v on v.frame_k = l.k
-        join contest_option x on x.id = v.option_id and x.kind = 'none_of_the_above'
+        join nota x on x.contest_id = l.contest_id
+        join live.value v on v.frame_k = l.k and v.option_id = x.id
         group by 1, 2, 3, 4
       ) t
       where t.votes > 0
