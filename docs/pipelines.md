@@ -49,6 +49,7 @@ The main steps take a registry name, except `apply`, `publish`, and `revert`, wh
 - `uv run ea fetch <source>` downloads the source's files into the raw cache.
 - `uv run ea parse <source>` writes typed Parquet tables under `data/parsed/<source>/`. It fails when the rows disagree with the totals the source prints.
 - `uv run ea emit <source>` writes a changeset folder and prints its path.
+- `uv run ea emit census.<cc>` writes a changeset from the country's census file, `pipelines/ea/census/<cc>.json`. The file lists the sources, the tiers of government, and each class of election with its selectors (the contest kinds, offices, and schemes that map held contests to the class), its dates, and its contest and seat counts. A date row with `through` and no `contests` is a span whose elections are not yet counted. A `states` entry on a date row becomes a census date for that member state, with its constituency count and source. A re-emit deletes the census rows the file no longer holds, so remove a row from the file only when you mean to delete it from the archive.
 - `uv run ea apply <changeset-folder>` loads a changeset, runs its checks, and publishes it or sets it to `pending_review`.
 - `uv run ea publish <changeset-id> [--reviewer <user-id>]` publishes a changeset that is in `pending_review`.
 - `uv run ea revert <changeset-id> "<reason>" [--reviewer <user-id>]` rejects an unpublished changeset, or undoes a published one that no later changeset builds on.
