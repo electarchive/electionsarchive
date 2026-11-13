@@ -1,0 +1,23 @@
+{
+  "year": 1900,
+  "day": "1900-11-06",
+  "polity": "US-RI",
+  "publisher": "Rhode Island Secretary of State",
+  "title": "Manual, with Rules and Orders, for the Use of the General Assembly of the State of Rhode Island, 1901: presidential election of November 6, 1900, by towns",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/manualwithrules02statgoog/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/manualwithrules02statgoog"
+  },
+  "raw_source": "us.scans",
+  "unit_scheme": "town",
+  "offices": {
+    "president": "Presidential electors, vote of Rhode Island by towns, wards, and districts; one column per party"
+  },
+  "leaves": [
+    225,
+    226,
+    227,
+    228
+  ]
+}
