@@ -137,7 +137,7 @@ def poll(feed: str, adapter: str, params: dict[str, str], client: httpx.Client) 
         pages = as_live.collect(client)
     else:
         raise ValueError(f"unknown adapter {adapter}")
-    with connect() as conn:
+    with connect(autocommit=True) as conn:
         if not any(not url.endswith(enr_2026.LISTINGS) for url in pages):
             record(conn, feed, fetched_at, None, None, None, "unchanged", "waiting: no result pages yet")
             return "waiting: no result pages yet"
@@ -219,7 +219,6 @@ def poll(feed: str, adapter: str, params: dict[str, str], client: httpx.Client) 
         )
         for line in sorted(set(unmatched)):
             issue(conn, feed, "unmatched", line)
-        written = 0
         frames: list[
             tuple[UUID, datetime, dict[tuple[UUID, UUID, int], int], tuple[int, int], dict[UUID, tuple[float, int]]]
         ] = []
@@ -265,32 +264,48 @@ def poll(feed: str, adapter: str, params: dict[str, str], client: httpx.Client) 
                     )
                     continue
             frames.append((contest, as_of, sums, reporting, told))
-        fetch = record(
-            conn,
-            feed,
-            fetched_at,
-            max((f[1] for f in frames), default=None),
-            sha,
-            str(folder),
-            "frame" if frames else "unchanged",
-            None,
+        with conn.transaction():
+            return store(conn, feed, fetched_at, sha, folder, frames, unmatched)
+
+
+def store(
+    conn: Connection,
+    feed: str,
+    fetched_at: datetime,
+    sha: str,
+    folder: Path,
+    frames: list[
+        tuple[UUID, datetime, dict[tuple[UUID, UUID, int], int], tuple[int, int], dict[UUID, tuple[float, int]]]
+    ],
+    unmatched: list[str],
+) -> str:
+    written = 0
+    fetch = record(
+        conn,
+        feed,
+        fetched_at,
+        max((f[1] for f in frames), default=None),
+        sha,
+        str(folder),
+        "frame" if frames else "unchanged",
+        None,
+    )
+    for contest, as_of, sums, reporting, told in frames:
+        conn.execute(
+            "delete from live.frame where feed_id = %s and contest_id = %s and as_of = %s", [feed, contest, as_of]
         )
-        for contest, as_of, sums, reporting, told in frames:
-            conn.execute(
-                "delete from live.frame where feed_id = %s and contest_id = %s and as_of = %s", [feed, contest, as_of]
-            )
-            k = conn.execute(
-                """insert into live.frame (feed_id, contest_id, as_of, fetch_id, reporting, expected)
-                   values (%s, %s, %s, %s, %s, %s) returning k""",
-                [feed, contest, as_of, fetch, reporting[0] or None, reporting[1] or None],
-            ).fetchall()[0][0]
-            write(conn, k, sums)
-            if told:
-                with conn.cursor().copy("copy live.expectation (frame_k, unit_id, share, expected) from stdin") as copy:
-                    for unit, (share, total) in told.items():
-                        copy.write_row((k, unit, share, total))
-            written += 1
-        return f"{written} frames" + (f", {len(set(unmatched))} unmatched" if unmatched else "")
+        k = conn.execute(
+            """insert into live.frame (feed_id, contest_id, as_of, fetch_id, reporting, expected)
+               values (%s, %s, %s, %s, %s, %s) returning k""",
+            [feed, contest, as_of, fetch, reporting[0] or None, reporting[1] or None],
+        ).fetchall()[0][0]
+        write(conn, k, sums)
+        if told:
+            with conn.cursor().copy("copy live.expectation (frame_k, unit_id, share, expected) from stdin") as copy:
+                for unit, (share, total) in told.items():
+                    copy.write_row((k, unit, share, total))
+        written += 1
+    return f"{written} frames" + (f", {len(set(unmatched))} unmatched" if unmatched else "")
 
 
 def backfill(feed: str | None = None) -> str:
