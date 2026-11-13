@@ -49,6 +49,8 @@ PAGE_PREFIXES = (
     "https://www.northantslive.news/news/",
     "https://www.southdowns.gov.uk/planning/",
     "https://longhoughton-pc.gov.uk/news/",
+    "https://www.greatercambridgeplanning.org/local-and-neighbourhood-planning/",
+    "https://www.wirksworthtowncouncil.gov.uk/",
     "https://www.york.gov.uk/planning-policy/",
     "https://www.york.gov.uk/elections-1/",
     "https://www.hinckley-bosworth.gov.uk/info/",
