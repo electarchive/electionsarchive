@@ -460,6 +460,7 @@ class Entry(TypedDict):
     notes: list[tuple[UUID, str]]
     unit: UUID | None
     row: dict[str, object] | None
+    foreign: bool
 
 
 class Taken(Entry):
@@ -484,17 +485,31 @@ def surname(text: str) -> str:
 
 def takeovers(conn, frame: pl.DataFrame) -> tuple[dict[str, Taken], set[str], pl.DataFrame]:
     contests: dict[tuple[object, ...], list[Entry]] = {}
-    for contest, value, owner, kind, magnitude, election, day, precision, area, district, alged_set in conn.execute(
+    for (
+        contest,
+        value,
+        owner,
+        kind,
+        magnitude,
+        election,
+        day,
+        precision,
+        area,
+        district,
+        alged_set,
+        foreign,
+    ) in conn.execute(
         """select c.id, x.value, coalesce(oe.value, be.value), c.kind::text, c.magnitude, e.id, e.date_from,
                   e.date_precision::text, c.district_area_id,
                   (select substring(ac.code from '(?:district|area)-([0-9a-z]+)$') from area_code ac
                    join area a on a.id = ac.area_id and a.scheme_code = 'us.local_district'
                    where ac.area_id = c.district_area_id limit 1),
                   (select r.id from result_set r join source s on s.id = r.source_id
-                   where r.contest_id = c.id and s.title = %s order by r.is_default desc limit 1)
+                   where r.contest_id = c.id and s.title = %s order by r.is_default desc limit 1),
+                  h.pipeline not in ('us.alged', 'us.ceda')
            from contest c join external_id x on x.entity_id = c.id and x.scheme = 'us.contest' and x.value like 'alged:%%'
            join entity n on n.id = c.id and n.retired_by is null
-           join changeset h on h.id = c.changeset_id and h.pipeline in ('us.alged', 'us.ceda')
+           join changeset h on h.id = c.changeset_id
            join election e on e.id = c.election_id
            left join external_id oe on oe.entity_id = c.office_id and oe.scheme = 'us.office'
            left join external_id be on be.entity_id = c.body_id and be.scheme = 'us.body'
@@ -505,6 +520,11 @@ def takeovers(conn, frame: pl.DataFrame) -> tuple[dict[str, Taken], set[str], pl
     ).fetchall():
         if precision == "year":
             continue
+        if foreign:
+            owner = re.sub(r"^CA:(\d{7}):board-of-education$", r"CA:sd\1:board-of-education", owner)
+            seat = value.rsplit("_", 2)[1].lower()
+            district = district or (None if seat.startswith("synthetic") else seat.lstrip("0") or seat)
+            alged_set = None
         contests.setdefault((owner, day.year, day.month, kind, district), []).append(
             Entry(
                 contest=contest,
@@ -518,6 +538,7 @@ def takeovers(conn, frame: pl.DataFrame) -> tuple[dict[str, Taken], set[str], pl
                 notes=[],
                 unit=None,
                 row=None,
+                foreign=foreign,
             )
         )
     by_id = {entry["contest"]: entry for entries in contests.values() for entry in entries}
@@ -618,7 +639,12 @@ def takeovers(conn, frame: pl.DataFrame) -> tuple[dict[str, Taken], set[str], pl
         candidates = races.get(key, [])
         pairs = []
         differ = set()
-        if (key[4] is not None or key[3] == "office") and len(entries) == 1 and len(candidates) == 1:
+        if (
+            (key[4] is not None or key[3] == "office")
+            and len(entries) == 1
+            and len(candidates) == 1
+            and (not entries[0]["foreign"] or entries[0]["magnitude"] == candidates[0]["magnitude"])
+        ):
             mapping = align(candidates[0], entries[0])
             if mapping and 2 * len(set(mapping.values())) >= len(entries[0]["options"]):
                 pairs = [(entries[0], candidates[0], mapping)]
@@ -716,7 +742,7 @@ def takeovers(conn, frame: pl.DataFrame) -> tuple[dict[str, Taken], set[str], pl
     used = {id(race) for _, _, race, _ in paired_pairs}
     for key, entries in contests.items():
         candidates = races.get(key, [])
-        if any(id(entry) not in paired_ids for entry in entries):
+        if any(id(entry) not in paired_ids and not entry["foreign"] for entry in entries):
             for race in candidates:
                 if id(race) not in used:
                     held.add(race["race"])
@@ -1105,6 +1131,9 @@ def emit() -> Path:
                 [SOURCE],
             ).fetchall()
         )
+        homes = dict(
+            conn.execute("select id, election_id from contest where id = any(%s)", [list(own.values())]).fetchall()
+        )
         previous: dict[str, str] = {}
         races = (
             frame.group_by("race")
@@ -1178,48 +1207,52 @@ def emit() -> Path:
             geoid = code.removeprefix("sd")
             scheme = {5: "us.county", 7: "us.place"}.get(len(code), "us.school_district")
             office = f"Mayor of {title}" if key == "mayor" else f"{title} {first['title']}"
-            owner = cs.key("us.body" if first["body"] else "us.office", f"CA:{code}:{key}")
-            if owner in cs.minted and owner not in owners:
-                if first["body"]:
-                    cs.add("body", id=owner, polity_id=polity, kind="council")
-                else:
-                    cs.add("office", id=owner, polity_id=polity, kind="mayor" if key == "mayor" else "other")
-                name(owner, office)
-            owners.add(owner)
+            foreign = taken_over is not None and taken_over["foreign"]
+            if taken_over is not None and taken_over["foreign"]:
+                election = taken_over["election"]
+            else:
+                owner = cs.key("us.body" if first["body"] else "us.office", f"CA:{code}:{key}")
+                if owner in cs.minted and owner not in owners:
+                    if first["body"]:
+                        cs.add("body", id=owner, polity_id=polity, kind="council")
+                    else:
+                        cs.add("office", id=owner, polity_id=polity, kind="mayor" if key == "mayor" else "other")
+                    name(owner, office)
+                owners.add(owner)
 
-            parent_key = next((value for value in (f"{day}:CA", f"{day}:CA:primary") if value in parents), None)
-            stage = "local" if parent_key is None else parents[parent_key]
-            parent = cs.key("us.election", parent_key or f"{day}:CA")
-            if parent_key is None and parent not in elections:
-                elections.add(parent)
-                cs.add(
-                    "election",
-                    id=parent,
-                    polity_id=state,
-                    kind="local",
-                    date_from=day,
-                    date_to=day,
-                    date_precision="day",
-                    status="held",
-                )
-                name(parent, f"{day.year} California local elections")
-                cs.add("slug", path=f"us/ca/{day}-local", entity_id=parent)
-            election = cs.key("us.election", f"{day}:CA:{code}")
-            if election in cs.minted and election not in elections:
-                elections.add(election)
-                cs.add(
-                    "election",
-                    id=election,
-                    polity_id=polity,
-                    parent_id=parent,
-                    kind=stage,
-                    date_from=day,
-                    date_to=day,
-                    date_precision="day",
-                    status="held",
-                )
-                name(election, f"{day.year} {title} {stage} election")
-                cs.add("slug", path=f"{path}/{day}-{stage}", entity_id=election)
+                parent_key = next((value for value in (f"{day}:CA", f"{day}:CA:primary") if value in parents), None)
+                stage = "local" if parent_key is None else parents[parent_key]
+                parent = cs.key("us.election", parent_key or f"{day}:CA")
+                if parent_key is None and parent not in elections:
+                    elections.add(parent)
+                    cs.add(
+                        "election",
+                        id=parent,
+                        polity_id=state,
+                        kind="local",
+                        date_from=day,
+                        date_to=day,
+                        date_precision="day",
+                        status="held",
+                    )
+                    name(parent, f"{day.year} California local elections")
+                    cs.add("slug", path=f"us/ca/{day}-local", entity_id=parent)
+                election = cs.key("us.election", f"{day}:CA:{code}")
+                if election in cs.minted and election not in elections:
+                    elections.add(election)
+                    cs.add(
+                        "election",
+                        id=election,
+                        polity_id=polity,
+                        parent_id=parent,
+                        kind=stage,
+                        date_from=day,
+                        date_to=day,
+                        date_precision="day",
+                        status="held",
+                    )
+                    name(election, f"{day.year} {title} {stage} election")
+                    cs.add("slug", path=f"{path}/{day}-{stage}", entity_id=election)
 
             area_text = first["area"]
             seat = None
@@ -1259,14 +1292,20 @@ def emit() -> Path:
                 if district not in districts:
                     name(area, f"{office}, {seat}")
                 districts.add(district)
-            if taken_over is not None:
+            if foreign and (mine := own.get(f"ceda:{race}")) is not None:
+                cs.merge(mine, taken_over["contest"])
+                moved.add(mine)
+                sources.add(homes[mine])
+            elif taken_over is not None:
                 moved.add(taken_over["contest"])
                 sources.add(taken_over["election"])
+            if taken_over is not None:
                 area = taken_over["area"] or area
                 unit = taken_over["unit"] or unit
             contest_key = (
                 taken_over["value"]
                 if taken_over is not None
+                and not foreign
                 and (
                     taken_over["value"] in sets
                     or f"ceda:{race}" not in own
@@ -1275,8 +1314,10 @@ def emit() -> Path:
                 )
                 else f"ceda:{race}"
             )
-            contest = cs.key("us.contest", contest_key)
-            if (displaced := own.get(f"ceda:{race}")) is not None and displaced != contest and taken_over is not None:
+            contest = taken_over["contest"] if foreign else cs.key("us.contest", contest_key)
+            if (
+                (displaced := own.get(f"ceda:{race}")) is not None and displaced != contest and taken_over is not None
+            ) or (foreign and displaced is None):
                 cs.add("external_id", entity_id=contest, scheme="us.contest", value=f"ceda:{race}")
             used.add(election)
             magnitude = first["magnitude"]
@@ -1291,56 +1332,57 @@ def emit() -> Path:
                 or (day.month != 11 and (code in runoff_places or (len(code) == 5 and key != "board-of-education")))
                 else "fptp"
             ]
-            cs.add(
-                "contest",
-                id=contest,
-                election_id=election,
-                kind="body_seats" if first["body"] else "office",
-                office_id=None if first["body"] else owner,
-                body_id=owner if first["body"] else None,
-                district_area_id=area,
-                magnitude=magnitude,
-                round_number=2 if race in previous else 1,
-                previous_round_id=cs.key(
-                    "us.contest", takeover.get(previous[race], {}).get("value", f"ceda:{previous[race]}")
+            if not foreign:
+                cs.add(
+                    "contest",
+                    id=contest,
+                    election_id=election,
+                    kind="body_seats" if first["body"] else "office",
+                    office_id=None if first["body"] else owner,
+                    body_id=owner if first["body"] else None,
+                    district_area_id=area,
+                    magnitude=magnitude,
+                    round_number=2 if race in previous else 1,
+                    previous_round_id=cs.key(
+                        "us.contest", takeover.get(previous[race], {}).get("value", f"ceda:{previous[race]}")
+                    )
+                    if race in previous
+                    else None,
+                    electoral_system_id=system
+                    if (held_system := kept.get(contest)) is None
+                    or (held_system == systems["fptp"] and system == systems["two_round"])
+                    else held_system,
+                    default_result_kind="counted",
+                    term="remainder" if first["remainder"] else "full",
                 )
-                if race in previous
-                else None,
-                electoral_system_id=system
-                if (held_system := kept.get(contest)) is None
-                or (held_system == systems["fptp"] and system == systems["two_round"])
-                else held_system,
-                default_result_kind="counted",
-                term="remainder" if first["remainder"] else "full",
-            )
-            name(
-                contest,
-                (f"{day.year} {title} mayoral election" if key == "mayor" else f"{day.year} {office} election")
-                + (f", {seat}" if seat else "")
-                + (" (short term)" if first["remainder"] else ""),
-            )
-            contest_path = (
-                f"{path}/{day}-{stage}/{key}"
-                + (f"-{slug(seat)}" if seat else "")
-                + ("-short-term" if first["remainder"] else "")
-            )
-            suffix = 1
-            candidate = own_slugs.get(contest, contest_path)
-            while contest not in own_slugs and (candidate in paths or candidate in taken or candidate in claimed):
-                suffix += 1
-                candidate = f"{contest_path}-{suffix}"
-            paths.add(candidate)
-            cs.add("slug", path=candidate, entity_id=contest)
-            alged_notes = {body for _, body in (taken_over or {}).get("notes", [])}
-            if partial and DISTRICT.format(whole=word) not in alged_notes:
-                cs.add("note", entity_id=contest, kind="caveat", body_md=DISTRICT.format(whole=word))
-            if not partial and alged_notes:
-                stale += 1
-            if rcv:
-                cs.add("note", entity_id=contest, kind="caveat", body_md=RCV)
+                name(
+                    contest,
+                    (f"{day.year} {title} mayoral election" if key == "mayor" else f"{day.year} {office} election")
+                    + (f", {seat}" if seat else "")
+                    + (" (short term)" if first["remainder"] else ""),
+                )
+                contest_path = (
+                    f"{path}/{day}-{stage}/{key}"
+                    + (f"-{slug(seat)}" if seat else "")
+                    + ("-short-term" if first["remainder"] else "")
+                )
+                suffix = 1
+                candidate = own_slugs.get(contest, contest_path)
+                while contest not in own_slugs and (candidate in paths or candidate in taken or candidate in claimed):
+                    suffix += 1
+                    candidate = f"{contest_path}-{suffix}"
+                paths.add(candidate)
+                cs.add("slug", path=candidate, entity_id=contest)
+                alged_notes = {body for _, body in (taken_over or {}).get("notes", [])}
+                if partial and DISTRICT.format(whole=word) not in alged_notes:
+                    cs.add("note", entity_id=contest, kind="caveat", body_md=DISTRICT.format(whole=word))
+                if not partial and alged_notes:
+                    stale += 1
+                if rcv:
+                    cs.add("note", entity_id=contest, kind="caveat", body_md=RCV)
             reported = None if contest in wards else grouped.get(race)
             superseded = None
-            if taken_over is not None:
+            if taken_over is not None and not taken_over["foreign"]:
                 for name_id, text in taken_over["names"]:
                     cs.add("name_drop", name_id=name_id, entity_id=contest, text=text, reason=TAKEOVER)
                 if taken_over["row"] is not None:
@@ -1352,7 +1394,7 @@ def emit() -> Path:
                     )
                     if taken_over["disagree"]:
                         cs.add("note", entity_id=taken_over["set"], kind="context", body_md=DISAGREE)
-            held_set = defaults.get(contest)
+            held_set = defaults.get(contest) or defaults.get(own.get(f"ceda:{race}", contest))
             if reported is None:
                 result_set = held_set or cs.key(f"{SOURCE}.result_set", contest_key)
             else:
@@ -1420,21 +1462,29 @@ def emit() -> Path:
                     name(person, ballot)
                 option = reused["option"] if reused else cs.key("us.option", f"{contest_key}:{candidate_id}")
                 kept_options.add(option)
-                cs.add("contest_option", id=option, contest_id=contest, kind="candidate", ballot_label=ballot)
+                if not (foreign and reused):
+                    cs.add("contest_option", id=option, contest_id=contest, kind="candidate", ballot_label=ballot)
                 candidacy = (
                     reused["candidacy"]
                     if reused and reused["candidacy"]
                     else cs.key("us.candidacy", f"{contest_key}:{candidate_id}:head")
                 )
-                cs.add(
-                    "candidacy",
-                    id=candidacy,
-                    person_id=person,
-                    option_id=option,
-                    role="head",
-                    ballot_name=ballot,
-                    is_incumbent=incumbent,
-                )
+                if not (foreign and reused and reused["candidacy"]):
+                    cs.add(
+                        "candidacy",
+                        id=candidacy,
+                        person_id=person,
+                        option_id=option,
+                        role="head",
+                        ballot_name=ballot,
+                        is_incumbent=incumbent,
+                    )
+                if foreign and reused:
+                    absorbed += [
+                        ("us.option", f"{contest_key}:{candidate_id}", option),
+                        ("us.candidacy", f"{contest_key}:{candidate_id}:head", candidacy),
+                        (f"{SOURCE}.person", f"{race}:{candidate_id}", person),
+                    ]
                 for text in ballots.get((race, candidate_id), []):
                     cs.add("name", entity_id=person, text=text, lang="en", kind="ballot", is_preferred=False)
                 for away, canonical in into.items():
@@ -1466,6 +1516,7 @@ def emit() -> Path:
             for option, candidate_id, votes in (
                 entries
                 if result_set in cs.minted
+                or foreign
                 or race in merged
                 or restage
                 or str(result_set) in emptied
