@@ -76,6 +76,7 @@ MEMBERS = {
     (1974, "CA", 15): "S000454",
 }
 SWAPPED = {(1958, "OH", 23), (1970, "CA", 1), (1972, "OR", 4)}
+REPAIRED = {(1930, 27, line) for line in (24, 25, 30, 31)}
 UNSEATED = {(1920, "CA", 9), (1922, "NY", 19), (1926, "IL", None), (1932, "VT", 0), (1934, "IN", 2), (1960, "WY", None)}
 TRANSCRIBED: dict[tuple[int, str, str, int | None], list[int]] = {
     (1948, "NY", "house", 13): [57997, 8114, 44718, 14440],
@@ -162,6 +163,11 @@ RESEATED = {
 SWAPPED_NOTE = (
     "The Clerk's statistics print these two candidates' votes against each other's names. We swapped them back to "
     "match the state's summary table and the member who took the seat."
+)
+REPAIRED_NOTE = (
+    "The Clerk's statistics pair Mary M. Johnson with the full-term race and L. R. Via with the race to fill the "
+    "vacancy. The 1931 West Virginia Blue Book prints Johnson in the short-term race and Via in the long-term race, "
+    "county by county, with the same totals. We follow the Blue Book."
 )
 TRANSCRIBED_NOTE = (
     "On this page the printed votes sit one line below the candidates' names. We read each value by hand and checked "
@@ -528,7 +534,10 @@ def parse() -> None:
         chamber=pl.when(pl.col("heading").fill_null("").str.contains(r"(?i)^\W*at[ -]large\W*$"))
         .then(pl.lit("house"))
         .otherwise(pl.col("office").replace_strict({"senator": "senate", "representative": "house"}, default=None)),
-        special=pl.col("heading").fill_null("").str.contains(SPECIAL),
+        special=pl.col("heading").fill_null("").str.contains(SPECIAL)
+        ^ pl.struct("year", "page", "line").map_elements(
+            lambda row: (row["year"], row["page"], row["line"]) in REPAIRED, return_dtype=pl.Boolean
+        ),
         kind=pl.when(pl.col("kind").is_in(["scattering", "write-in"]) & pl.col("name").str.contains(BLANK))
         .then(pl.lit("blank"))
         .when((pl.col("kind") == "write-in") | pl.col("name").str.contains(r"(?i)^write-?ins?$"))
@@ -1110,6 +1119,7 @@ def emit() -> Path:
             by_state[(str(row["state"]), slug(str(row["name"])))] = person
             return person
 
+        regrouped: list[UUID] = []
         for (year, state, chamber, district, special), group in frame.group_by(
             "year", "state", "chamber", "district", "special", maintain_order=True
         ):
@@ -1229,6 +1239,9 @@ def emit() -> Path:
                 entity_id=contest,
             )
             result_set = cs.key(f"{SOURCE}.result_set", contest_key)
+            repaired = any((row["year"], row["page"], row["line"]) in REPAIRED for row in rows)
+            if repaired:
+                regrouped.append(contest)
             if result_set in foreign:
                 rows = [{**row, "kind": "candidate", "relabeled": False} if row["relabeled"] else row for row in rows]
             cs.add(
@@ -1267,6 +1280,7 @@ def emit() -> Path:
                     MISNAMED.get((year, state, chamber, district), ("",))[0],
                 ),
                 (chamber == "house" and (year, state, district) in SWAPPED, "caveat", SWAPPED_NOTE),
+                (repaired, "caveat", REPAIRED_NOTE),
                 (
                     chamber == "house" and (year, state, "house", district) in TRANSCRIBED,
                     "methodology",
@@ -1366,7 +1380,12 @@ def emit() -> Path:
             counted = [votes for _, votes, _, _ in values if votes is not None]
             if counted:
                 values.append((None, sum(counted), DERIVED, None))
-            if result_set in cs.minted or contest_key in RESEATED.values() or any(row["relabeled"] for row in rows):
+            if (
+                result_set in cs.minted
+                or contest_key in RESEATED.values()
+                or repaired
+                or any(row["relabeled"] for row in rows)
+            ):
                 for option, votes, flags, row in values:
                     if votes is None:
                         continue
@@ -1420,6 +1439,17 @@ def emit() -> Path:
                         entity_id=candidacy,
                         reason="A candidacy on an option the Clerk's emit re-keyed",
                     )
+        for option, candidacy in conn.execute(
+            """select o.id, c.id from contest_option o join entity e on e.id = o.id and e.retired_by is null
+               join changeset h on h.id = o.changeset_id and h.pipeline = %s
+               left join candidacy c on c.option_id = o.id
+               where o.contest_id = any(%s::uuid[]) and o.id <> all(%s::uuid[])""",
+            [SOURCE, regrouped, list(ids)],
+        ).fetchall():
+            reason = "The Clerk's statistics paired this candidate with the other race of the same district"
+            if candidacy is not None:
+                cs.add("entity_retirement", entity_id=candidacy, reason=reason)
+            cs.add("entity_retirement", entity_id=option, reason=reason)
         reason = "A party label or write-in line in the Clerk's statistics read as a candidate's name"
         junk = conn.execute(
             """select c.id from candidacy c join changeset ch on ch.id = c.changeset_id

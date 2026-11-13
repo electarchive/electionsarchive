@@ -33,6 +33,14 @@
       "state": "WV",
       "district": 4
     },
+    "house4s": {
+      "year": 1930,
+      "chamber": "house",
+      "day": "1930-11-04",
+      "special": true,
+      "state": "WV",
+      "district": 4
+    },
     "house2": {
       "year": 1930,
       "chamber": "house",
@@ -131,23 +139,23 @@
       "columns": [
         {
           "label": "Mary M. Johnson Dem. (Short Term)",
-          "contest": null,
-          "candidate": ""
+          "contest": "house4s",
+          "candidate": "Mary M. Johnson"
         },
         {
           "label": "Robert L. Hogg Rep. (Short Term)",
-          "contest": null,
-          "candidate": ""
+          "contest": "house4s",
+          "candidate": "Robert L. Hogg"
         },
         {
           "label": "L. R. Via Dem. (Long Term)",
-          "contest": null,
-          "candidate": ""
+          "contest": "house4",
+          "candidate": "L. R. Via"
         },
         {
           "label": "Robert L. Hogg Rep. (Long Term)",
-          "contest": null,
-          "candidate": ""
+          "contest": "house4",
+          "candidate": "Robert L. Hogg"
         }
       ],
       "orientation": "counties_down",
