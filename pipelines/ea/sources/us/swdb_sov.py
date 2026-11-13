@@ -134,8 +134,22 @@ def parse() -> None:
                     names.setdefault(f"CNG{district:02d}{code}01", name)
         frame = read(election)
         columns = [column for column in frame.columns if OFFICE.fullmatch(column)]
+        house = [column for column in columns if column.startswith("CNG")]
+        whole = (
+            frame.filter(
+                pl.col("SVPREC").str.starts_with("SOV_CD")
+                & (pl.sum_horizontal(pl.col(house).replace("***", None).cast(pl.Float64)) > 0)
+            )
+            .group_by("FIPS")
+            .agg(pl.col("SVPREC").str.slice(6).unique())
+            .filter((pl.col("SVPREC").list.len() == 1) & (pl.col("SVPREC").list.first() != "00"))
+            .select("FIPS", whole=pl.col("SVPREC").list.first())
+        )
+        frame = (
+            frame.join(whole, on="FIPS", how="left").with_columns(CDDIST=pl.coalesce("CDDIST", "whole")).drop("whole")
+        )
         long = (
-            frame.filter(~pl.col("SVPREC").str.to_uppercase().str.contains("TOT"))
+            frame.filter(~pl.col("SVPREC").str.to_uppercase().str.contains(r"TOT|^NULL$|^SOV_"))
             .unpivot(columns, index=["FIPS", "SVPREC", "CDDIST"], variable_name="column", value_name="votes")
             .with_columns(pl.col("votes").replace("***", None).cast(pl.Float64).cast(pl.Int64))
             .filter(pl.col("votes").is_not_null() & (pl.col("votes") != 0))
@@ -253,7 +267,19 @@ def emit() -> Path:
                     cs.artifact(raw.cached(SOURCE, address), source)
         medsl.attach(cs, conn, returns, {"CA": source}, grain="precinct", restage=True)
         used = set(pl.concat(cs.frames["result_value"])["unit_id"].unique()) if cs.frames.get("result_value") else set()
-        canonical = returns.filter(~pl.col("code").str.contains(":SOV:"))["code"].unique()
+        dated = (
+            returns.group_by("code")
+            .agg(pl.col("fips").first(), pl.col("day").min())
+            .with_columns(
+                id=pl.struct("code", "day").map_elements(
+                    lambda row: str(cs.unit("us.precinct", row["code"], row["day"])), return_dtype=pl.String
+                ),
+                sov=pl.col("code").str.contains(":SOV:"),
+            )
+            .filter(pl.col("id").is_in(list(used)))
+        )
+        minted = dated.filter(pl.col("sov") | pl.col("id").is_in([str(id) for id in cs.minted]))
+        canonical = dated.filter(~pl.col("sov"))["code"]
         precinct_code.units(
             cs, conn, canonical.filter(canonical.map_elements(lambda code: str(cs.unit("us.precinct", code)) in used))
         )
@@ -263,15 +289,6 @@ def emit() -> Path:
                 "select code, id, area_id from reporting_unit where scheme_code = 'us.county'"
             ).fetchall()
         }
-        minted = (
-            returns.filter(pl.col("code").str.contains(":SOV:"))
-            .group_by("code")
-            .agg(pl.col("fips").first(), pl.col("day").min())
-            .with_columns(
-                id=pl.col("code").map_elements(lambda code: str(cs.unit("us.precinct", code)), return_dtype=pl.String)
-            )
-            .filter(pl.col("id").is_in(list(used)))
-        )
         cs.frame(
             "reporting_unit",
             minted.select(
@@ -283,8 +300,10 @@ def emit() -> Path:
                 area_relation=pl.lit("within"),
                 area_id=pl.col("fips").replace_strict({code: str(area) for code, (_, area) in counties.items()}),
                 kind=pl.lit("standard"),
-                valid_from="day",
-                valid_to=pl.col("day") + timedelta(days=1),
+                valid_from=pl.when("sov").then("day").otherwise(pl.date(pl.col("day").dt.year(), 1, 1)),
+                valid_to=pl.when("sov")
+                .then(pl.col("day") + timedelta(days=1))
+                .otherwise(pl.date(pl.col("day").dt.year() + 1, 1, 1)),
             ),
         )
         print(f"{minted.height} precincts")
