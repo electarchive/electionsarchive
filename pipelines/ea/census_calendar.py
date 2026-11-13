@@ -28,6 +28,14 @@ def nth_weekday(month: int, weekday: int, nth: int) -> Callable[[int], date]:
     return day
 
 
+def last_weekday(month: int, weekday: int) -> Callable[[int], date]:
+    def day(year: int) -> date:
+        last = date(year + month // 12, month % 12 + 1, 1) - timedelta(days=1)
+        return last - timedelta(days=(last.weekday() - weekday) % 7)
+
+    return day
+
+
 DAY_RULES = {
     "nov_tuesday_after_first_monday": tuesday_after_first_monday(11),
     "mar_second_tuesday": nth_weekday(3, 1, 2),
