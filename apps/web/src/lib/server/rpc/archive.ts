@@ -12885,27 +12885,43 @@ export const contests = {
           union all
           select e.id, e.parent_id from election e join up on e.id = up.parent
         ),
-        tree(id) as (
-          select id from up where parent is null
+        ondays as materialized (
+          select e.id, e.parent_id as parent from election e where e.date_from = ${day}::date
+        ),
+        lineage(start, cur) as (
+          select distinct parent, parent from ondays where parent is not null
           union all
-          select k.id from election k join tree on k.parent_id = tree.id
+          select l.start, e.parent from lineage l
+          cross join lateral (select e.parent_id as parent from election e where e.id = l.cur offset 0) e
+          where e.parent is not null
         ),
         own(id) as (
           select ${contest.root}::uuid
           union all
           select c.id from contest c join own on c.allocation_parent_id = own.id
         ),
-        candidates as materialized (
-          select c.id, c.allocation_parent_id as parent, c.election_id
-          from contest c
-          join tree on tree.id = c.election_id
-          join election e on e.id = c.election_id and e.date_from = ${day}::date
-          where c.id not in (select id from own) and not c.notional
+        days as materialized (
+          select o.id from ondays o
+          where o.id = (select id from up where parent is null)
+            or (o.parent in (select start from lineage where cur = (select id from up where parent is null))) is true
         ),
-        grp(id, top, election) as (
-          select id, id, election_id from candidates
+        kids as materialized (
+          select c.id, c.allocation_parent_id as parent, c.election_id from contest c where c.allocation_parent_id is not null
+        ),
+        anc(id, top) as (
+          select id, parent from kids
           union all
-          select g.id, grp.top, g.election_id from contest g join grp on g.allocation_parent_id = grp.id
+          select anc.id, k.parent from anc join kids k on k.id = anc.top
+        ),
+        lower(id, election) as (
+          select k.id, k.election_id from kids k
+          join contest p on p.id = k.parent and not p.notional and p.id not in (select id from own)
+          where (p.election_id in (select id from days)) is true
+          union all
+          select k.id, k.election_id from kids k join lower on k.parent = lower.id
+        ),
+        polls as materialized (
+          select id from days union select election from lower
         ),
         here as materialized (
           select r.result_set_k as k from result_rollup_sum r
@@ -12913,34 +12929,41 @@ export const contests = {
           union
           select u.result_set_k from result_rollup_unit u where u.area_k = ${area.k}
         ),
-        byel as materialized (
+        sets as materialized (
+          select x.k, x.contest_id from here
+          cross join lateral (
+            select x.k, x.contest_id from result_set x
+            where x.k = here.k and x.status <> 'withdrawn' and ${served("x")}
+            offset 0
+          ) x
+          where (select count(*) from here) <= (select count(*) from polls)
+          union all
           select x.k, x.contest_id from result_set x
-          where x.election_id = any(array(select distinct election from grp)) and x.status <> 'withdrawn' and ${served("x")}
+          join here on here.k = x.k
+          where x.election_id = any(array(select id from polls)) and x.status <> 'withdrawn' and ${served("x")}
+            and (select count(*) from here) > (select count(*) from polls)
         ),
         matched as materialized (
-          select grp.top, x.k from here
-          join result_set x on x.k = here.k and x.status <> 'withdrawn' and ${served("x")}
-          join grp on grp.id = x.contest_id
-          where (select count(*) from here) <= (select count(*) from grp)
-          union all
-          select grp.top, b.k from byel b
-          join here on here.k = b.k
-          join grp on grp.id = b.contest_id
-          where (select count(*) from here) > (select count(*) from grp)
+          select c.id as top, c.parent, s.k
+          from (select k, contest_id as id from sets union all select s.k, a.top from sets s join anc a on a.id = s.contest_id) s
+          cross join lateral (
+            select c.id, c.allocation_parent_id as parent, c.election_id from contest c
+            where c.id = s.id and not c.notional and c.id not in (select id from own) offset 0
+          ) c
+          where (c.election_id in (select id from days)) is true
         ),
         hits as (
-          select m.top, bool_or(r.voted) as voted from matched m
+          select m.top, m.parent, bool_or(r.voted) as voted from matched m
           cross join lateral (
             select bool_or(r.value <> 0) as voted from result_rollup r
             where r.result_set_k = m.k and r.area_k = ${area.k} and r.measure = any(${COUNTED})
             having count(*) > 0
           ) r
-          group by m.top
+          group by m.top, m.parent
         )
-        select c.id, c.parent, s.path, h.voted
-        from candidates c
-        join hits h on h.top = c.id
-        join slug s on s.entity_id = c.id and s.is_current
+        select h.top as id, h.parent, s.path, h.voted
+        from hits h
+        cross join lateral (select s.path from slug s where s.entity_id = h.top and s.is_current offset 0) s
       `);
       const parents = new Set(found.rows.map((row) => row.parent));
       const kept = found.rows.filter((row) => !parents.has(row.id));
