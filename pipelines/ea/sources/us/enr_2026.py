@@ -6,6 +6,7 @@ import itertools
 import json
 import os
 import re
+import threading
 import time
 import zipfile
 from collections.abc import Callable, Sequence
@@ -431,6 +432,7 @@ def snap(people: frozenset[str], wanted: set[str], words: set[str]) -> frozenset
 CLARITY_HOST = "results.enr.clarityelections.com"
 CLARITY_CHALLENGE = {202, 403, 405}
 CLARITY_EVERY = 300
+CLARITY_LOCK = threading.Lock()
 CLARITY_CHALLENGED_EVERY = 3600
 STATIC_EVERY = 3600
 STATIC: dict[tuple[str, str], tuple[float, list[tuple]]] = {}
@@ -446,16 +448,22 @@ def clarity_tenant(url: str) -> str | None:
 
 def clarity_gate(tenant: str, challenged: bool | None = None) -> bool:
     path = PARSED / "clarity-polls.json"
-    state: dict[str, dict[str, float | bool]] = json.loads(path.read_text()) if path.exists() else {}
-    entry = state.get(tenant, {})
-    now = time.time()
-    if challenged is None:
-        wait = CLARITY_CHALLENGED_EVERY if entry.get("challenged") else CLARITY_EVERY
-        return now - float(entry.get("at", 0)) >= wait
-    state[tenant] = {"at": now, "challenged": challenged}
-    PARSED.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(state))
-    return True
+    with CLARITY_LOCK:
+        try:
+            state: dict[str, dict[str, float | bool]] = json.loads(path.read_text()) if path.exists() else {}
+        except json.JSONDecodeError:
+            state = {}
+        entry = state.get(tenant, {})
+        now = time.time()
+        if challenged is None:
+            wait = CLARITY_CHALLENGED_EVERY if entry.get("challenged") else CLARITY_EVERY
+            return now - float(entry.get("at", 0)) >= wait
+        state[tenant] = {"at": now, "challenged": challenged}
+        PARSED.mkdir(parents=True, exist_ok=True)
+        staged = path.with_name(f"{path.name}.{os.getpid()}")
+        staged.write_text(json.dumps(state))
+        staged.replace(path)
+        return True
 
 
 def get(client: httpx.Client, url: str, headers: dict[str, str] | None = None) -> bytes | None:
