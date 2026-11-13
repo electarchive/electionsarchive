@@ -1667,7 +1667,7 @@ def _days(conn: Connection, where: sql.Composable) -> None:
     )
 
 
-def scope(conn: Connection, threshold: int) -> int:
+def scope(conn: Connection, threshold: int, rebuild: bool = False) -> int:
     with conn.transaction():
         conn.execute("lock table area_day_set in share row exclusive mode")
         wanted = [
@@ -1691,10 +1691,11 @@ def scope(conn: Connection, threshold: int) -> int:
                 "insert into area_day_scope select unnest(%s::int[]) on conflict do nothing returning area_k", [wanted]
             ).fetchall()
         ]
-        if added:
-            conn.execute("delete from area_day_set where area_k = any(%s)", [added])
-            _days(conn, sql.SQL("r.area_k = any({})").format(sql.Literal(added)))
-    print(f"{len(wanted)} areas in scope, {len(added)} added, {len(dropped)} dropped")
+        redo = wanted if rebuild else added
+        if redo:
+            conn.execute("delete from area_day_set where area_k = any(%s)", [redo])
+            _days(conn, sql.SQL("r.area_k = any({})").format(sql.Literal(redo)))
+    print(f"{len(wanted)} areas in scope, {len(added)} added, {len(dropped)} dropped, {len(redo)} rebuilt")
     return len(wanted)
 
 
@@ -2185,6 +2186,15 @@ def publish(conn: Connection, changeset_id: str, reviewer: str | None = None) ->
                     f"{relation}.{column} {entity} ({rows} rows), merged into {into} by {merge}"
                     for relation, column, entity, into, merge, rows in stray[:10]
                 )
+            )
+        if "election" in stage.tables:
+            conn.execute(
+                sql.SQL(
+                    """update area_day_set a set day = e.date_from
+                       from result_set x join election e on e.id = x.election_id
+                       where x.k = a.result_set_k and a.day <> e.date_from
+                         and e.id in (select id from {})"""
+                ).format(stage.staged("election"))
             )
         _rollup(conn, stage, moved, repointed)
         if "result_set" in stage.tables or stage.pipeline == "defaults":

@@ -123,6 +123,11 @@ def main() -> None:
         metavar="SETS",
         help="list the areas with at least this many rolled-up sets in area_day_scope and rebuild their area_day_set rows",
     )
+    rolling.add_argument(
+        "--rebuild",
+        action="store_true",
+        help="with --scope, rebuild the area_day_set rows of every area in scope, not only the added ones",
+    )
     commands.add_parser("merged", help="list rows anywhere in the database that still reference a merged entity")
     commands.add_parser(
         "capitals",
@@ -414,7 +419,7 @@ def main() -> None:
         case "rollup":
             with connect() as conn:
                 if args.scope is not None:
-                    scope(conn, args.scope)
+                    scope(conn, args.scope, args.rebuild)
                 if args.sets or args.affected:
                     rollup(conn, args.sets, args.affected)
         case "publish":
