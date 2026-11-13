@@ -393,6 +393,97 @@
       "publisher": "Eduskunta (Finlex)",
       "url": "https://www.finlex.fi/fi/hallituksen-esitykset/1994/297",
       "kind": "official_body"
+    },
+    "ep-results-composition": {
+      "title": "2024 European election results: Turnout (composition of the European Union and turnout by country and year, 1979-2024)",
+      "publisher": "European Parliament",
+      "url": "https://results.elections.europa.eu/en/turnout/",
+      "kind": "official_body"
+    },
+    "act-1976": {
+      "title": "Act concerning the election of the members of the European Parliament by direct universal suffrage, annexed to Council Decision 76/787/ECSC, EEC, Euratom of 20 September 1976 (consolidated text, CELEX 01976X1008(01)-20020923)",
+      "publisher": "Publications Office of the European Union (EUR-Lex)",
+      "url": "https://web.archive.org/web/20240928232246id_/https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX%3A01976X1008%2801%29-20020923",
+      "kind": "official_body",
+      "note": "EUR-Lex refuses scripts; read through the Wayback Machine capture of 28 September 2024."
+    },
+    "council-338-23": {
+      "title": "Statement 338/23: Council confirms 6 to 9 June 2024 as dates for next European Parliament elections (22 May 2023)",
+      "publisher": "Council of the European Union",
+      "url": "https://www.consilium.europa.eu/media/64327/338_23_statement_en.pdf",
+      "kind": "official_body"
+    },
+    "rop-2024": {
+      "title": "Rules of Procedure of the European Parliament, 10th parliamentary term (July 2024), Rules 15 to 19",
+      "publisher": "European Parliament",
+      "url": "https://web.archive.org/web/2025id_/https://www.europarl.europa.eu/rules/rules20240716/Rules20240716_EN.pdf",
+      "kind": "official_body"
+    },
+    "ep-presidents": {
+      "title": "Former Presidents of the European Parliament",
+      "publisher": "European Parliament, Historical Archives",
+      "url": "https://historicalarchives.europarl.europa.eu/en/presidents",
+      "kind": "official_body"
+    },
+    "ep-sdp-1999": {
+      "title": "Background note on the Parliament's votes on the President and College of the Commission, 26 August 1999 (b990826)",
+      "publisher": "European Parliament",
+      "url": "http://www.europarl.europa.eu/dg3/sdp/backg/en/1999/b990826.htm",
+      "kind": "official_body"
+    },
+    "ep-press-2009-barroso": {
+      "title": "Press release 20090911IPR60583: Parliament elects José Manuel Barroso as Commission President",
+      "publisher": "European Parliament",
+      "url": "https://www.europarl.europa.eu/news/en/press-room/20090911IPR60583",
+      "kind": "official_body"
+    },
+    "ep-press-2014-juncker": {
+      "title": "Press release 20140714IPR52341: Parliament elects Jean-Claude Juncker as Commission President",
+      "publisher": "European Parliament",
+      "url": "https://web.archive.org/web/2025id_/https://www.europarl.europa.eu/news/en/press-room/20140714IPR52341/parliament-elects-jean-claude-juncker-as-commission-president",
+      "kind": "official_body"
+    },
+    "ep-press-2024-vdl": {
+      "title": "Press release 20240710IPR22812: Parliament re-elects Ursula von der Leyen as Commission President",
+      "publisher": "European Parliament",
+      "url": "https://web.archive.org/web/2025id_/https://www.europarl.europa.eu/news/en/press-room/20240710IPR22812/parliament-re-elects-ursula-von-der-leyen-as-commission-president",
+      "kind": "official_body"
+    },
+    "eprs-2024-762359": {
+      "title": "Election of the President of the European Commission (EPRS briefing, PE 762.359, 2024)",
+      "publisher": "European Parliamentary Research Service",
+      "url": "https://www.europarl.europa.eu/RegData/etudes/BRIE/2024/762359/EPRS_BRI(2024)762359_EN.pdf",
+      "kind": "official_body"
+    },
+    "ombudsman-25": {
+      "title": "25 years of the European Ombudsman",
+      "publisher": "European Ombudsman",
+      "url": "https://www.ombudsman.europa.eu/webpub/25years/en/index.html",
+      "kind": "official_body"
+    },
+    "teu": {
+      "title": "Consolidated version of the Treaty on European Union (OJ C 202, 7.6.2016), Articles 15 and 17",
+      "publisher": "Publications Office of the European Union (EUR-Lex)",
+      "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:12016M/TXT",
+      "kind": "official_body"
+    },
+    "tfeu": {
+      "title": "Consolidated version of the Treaty on the Functioning of the European Union (OJ C 202, 7.6.2016), Articles 228, 234, 302, and 305",
+      "publisher": "Publications Office of the European Union (EUR-Lex)",
+      "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:12016E/TXT",
+      "kind": "official_body"
+    },
+    "eec-1957": {
+      "title": "Treaty establishing the European Economic Community (1957), Article 138",
+      "publisher": "Publications Office of the European Union (EUR-Lex)",
+      "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:11957E/TXT",
+      "kind": "official_body"
+    },
+    "reg-2019-788": {
+      "title": "Regulation (EU) 2019/788 of 17 April 2019 on the European citizens' initiative (OJ L 130, 17.5.2019)",
+      "publisher": "Publications Office of the European Union (EUR-Lex)",
+      "url": "https://eur-lex.europa.eu/eli/reg/2019/788/oj",
+      "kind": "official_body"
     }
   },
   "tiers": [
@@ -401,7 +492,288 @@
       "name": "European Union",
       "parent": null,
       "polity_kind": "supranational",
-      "source": "be-cc-26-1990"
+      "source": "act-1976",
+      "name_en": "European Union (European Communities until 1993)"
+    },
+    {
+      "key": "member_state",
+      "name": "Member States",
+      "name_en": "Member states, each electing its own members of the European Parliament under its own law",
+      "parent": "union",
+      "polity_kind": "sovereign_state",
+      "scheme": "eu.member_state",
+      "source": "ep-results-composition",
+      "counts": [
+        {
+          "date": "1958-01-01",
+          "precision": "year",
+          "value": 6,
+          "source": "ep-results-composition",
+          "locator": "https://results.elections.europa.eu/en/turnout/"
+        },
+        {
+          "date": "1973-01-01",
+          "precision": "year",
+          "value": 9,
+          "source": "ep-results-composition",
+          "locator": "https://results.elections.europa.eu/en/turnout/"
+        },
+        {
+          "date": "1981-01-01",
+          "precision": "year",
+          "value": 10,
+          "source": "ep-results-composition",
+          "locator": "https://results.elections.europa.eu/en/turnout/"
+        },
+        {
+          "date": "1986-01-01",
+          "precision": "year",
+          "value": 12,
+          "source": "ep-results-composition",
+          "locator": "https://results.elections.europa.eu/en/turnout/"
+        },
+        {
+          "date": "1995-01-01",
+          "precision": "year",
+          "value": 15,
+          "source": "ep-results-composition",
+          "locator": "https://results.elections.europa.eu/en/turnout/"
+        },
+        {
+          "date": "2004-01-01",
+          "precision": "year",
+          "value": 25,
+          "source": "ep-results-composition",
+          "locator": "https://results.elections.europa.eu/en/turnout/"
+        },
+        {
+          "date": "2007-01-01",
+          "precision": "year",
+          "value": 27,
+          "source": "ep-results-composition",
+          "locator": "https://results.elections.europa.eu/en/turnout/"
+        },
+        {
+          "date": "2013-01-01",
+          "precision": "year",
+          "value": 28,
+          "source": "ep-results-composition",
+          "locator": "https://results.elections.europa.eu/en/turnout/"
+        },
+        {
+          "date": "2020-01-01",
+          "precision": "year",
+          "value": 27,
+          "source": "ep-results-composition",
+          "locator": "https://results.elections.europa.eu/en/turnout/"
+        }
+      ]
+    },
+    {
+      "key": "ep_constituency",
+      "name": "European Parliament constituencies and electoral colleges",
+      "name_en": "Constituencies for European Parliament elections: one national constituency in most member states; Belgium's three electoral colleges, Ireland's, Italy's, and Poland's regional constituencies, France's eight regions in 2004-2014, and the United Kingdom's single-member seats (1979-1994) and regions (1999-2019)",
+      "parent": "member_state",
+      "elects": true,
+      "source": "act-1976",
+      "counts": [
+        {
+          "within": "AT",
+          "date": "2024-01-01",
+          "precision": "year",
+          "value": 1,
+          "source": "ep_ee24_at"
+        },
+        {
+          "within": "BE",
+          "date": "2024-01-01",
+          "precision": "year",
+          "value": 3,
+          "source": "be-1989"
+        },
+        {
+          "within": "BG",
+          "date": "2024-01-01",
+          "precision": "year",
+          "value": 1,
+          "source": "ep_ee24_bg"
+        },
+        {
+          "within": "CY",
+          "date": "2024-01-01",
+          "precision": "year",
+          "value": 1,
+          "source": "ep_factsheet"
+        },
+        {
+          "within": "CZ",
+          "date": "2024-01-01",
+          "precision": "year",
+          "value": 1,
+          "source": "ep_factsheet"
+        },
+        {
+          "within": "DE",
+          "date": "2024-01-01",
+          "precision": "year",
+          "value": 1,
+          "source": "euwg-2"
+        },
+        {
+          "within": "DK",
+          "date": "2024-01-01",
+          "precision": "year",
+          "value": 1,
+          "source": "ep_ee24_dk"
+        },
+        {
+          "within": "EE",
+          "date": "2024-01-01",
+          "precision": "year",
+          "value": 1,
+          "source": "ep_factsheet"
+        },
+        {
+          "within": "ES",
+          "date": "2024-01-01",
+          "precision": "year",
+          "value": 1,
+          "source": "ep_ee24_es"
+        },
+        {
+          "within": "FI",
+          "date": "2024-01-01",
+          "precision": "year",
+          "value": 1,
+          "source": "ep_factsheet"
+        },
+        {
+          "within": "FR",
+          "date": "2024-01-01",
+          "precision": "year",
+          "value": 1,
+          "source": "ep_factsheet"
+        },
+        {
+          "within": "GB",
+          "date": "2019-01-01",
+          "precision": "year",
+          "value": 12,
+          "source": "ep_ee19_gb"
+        },
+        {
+          "within": "GR",
+          "date": "2024-01-01",
+          "precision": "year",
+          "value": 1,
+          "source": "ep_ee24_gr"
+        },
+        {
+          "within": "HR",
+          "date": "2024-01-01",
+          "precision": "year",
+          "value": 1,
+          "source": "ep_ee24_hr"
+        },
+        {
+          "within": "HU",
+          "date": "2024-01-01",
+          "precision": "year",
+          "value": 1,
+          "source": "ep_factsheet"
+        },
+        {
+          "within": "IE",
+          "date": "2024-01-01",
+          "precision": "year",
+          "value": 3,
+          "source": "ep_ee24_ie"
+        },
+        {
+          "within": "IT",
+          "date": "2024-01-01",
+          "precision": "year",
+          "value": 5,
+          "source": "ep_ee24_it"
+        },
+        {
+          "within": "LT",
+          "date": "2024-01-01",
+          "precision": "year",
+          "value": 1,
+          "source": "ep_factsheet"
+        },
+        {
+          "within": "LU",
+          "date": "2024-01-01",
+          "precision": "year",
+          "value": 1,
+          "source": "ep_factsheet"
+        },
+        {
+          "within": "LV",
+          "date": "2024-01-01",
+          "precision": "year",
+          "value": 1,
+          "source": "ep_factsheet"
+        },
+        {
+          "within": "MT",
+          "date": "2024-01-01",
+          "precision": "year",
+          "value": 1,
+          "source": "ep_factsheet"
+        },
+        {
+          "within": "NL",
+          "date": "2024-01-01",
+          "precision": "year",
+          "value": 1,
+          "source": "ep_factsheet"
+        },
+        {
+          "within": "PL",
+          "date": "2024-01-01",
+          "precision": "year",
+          "value": 13,
+          "source": "ep_ee24_pl"
+        },
+        {
+          "within": "PT",
+          "date": "2024-01-01",
+          "precision": "year",
+          "value": 1,
+          "source": "ep_ee24_pt"
+        },
+        {
+          "within": "RO",
+          "date": "2024-01-01",
+          "precision": "year",
+          "value": 1,
+          "source": "ro_law_33_2007"
+        },
+        {
+          "within": "SE",
+          "date": "2024-01-01",
+          "precision": "year",
+          "value": 1,
+          "source": "ep_ee24_se"
+        },
+        {
+          "within": "SI",
+          "date": "2024-01-01",
+          "precision": "year",
+          "value": 1,
+          "source": "ep_factsheet"
+        },
+        {
+          "within": "SK",
+          "date": "2024-01-01",
+          "precision": "year",
+          "value": 1,
+          "source": "ep_factsheet"
+        }
+      ]
     }
   ],
   "classes": [
@@ -425,11 +797,12 @@
         "by_contest": true
       },
       "note": "Each member state's constituencies count as separate races. Belgium is counted by electoral college (Dutch-speaking, French-speaking, and, since 1994, German-speaking), because each college elects its own members.",
-      "source": "be-cc-26-1990",
+      "source": "act-1976",
       "match": [
         {
           "election_kinds": [
-            "general"
+            "general",
+            "by_election"
           ],
           "body_kinds": [
             "unicameral"
@@ -1865,8 +2238,803 @@
           },
           "source": "ep_factsheet",
           "quote": "However, four Member States (Belgium, Ireland, Italy and Poland) have divided their national territory into a number of regional constituencies."
+        },
+        {
+          "date": "2029-06-01",
+          "precision": "month",
+          "source": "act-1976",
+          "quote": "Subsequent elections shall take place in the corresponding period in the last year of the five-year period referred to in Article 5.",
+          "note": "The Council has not yet fixed the 2029 period; the 2024 period was 6 to 9 June (Council statement 338/23)."
+        }
+      ],
+      "name_en": "European Parliament elections",
+      "first_held": "1979-06-07",
+      "earliest_record": "1979-06-07",
+      "cadence": [
+        {
+          "source": "act-1976",
+          "locator": "https://web.archive.org/web/20240928232246id_/https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX%3A01976X1008%2801%29-20020923 (arts. 5, 10, 11(2), and 13)",
+          "period_years": 5,
+          "phase": 4,
+          "month": 6,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "Each member state's electoral authorities, on days it fixes within a Thursday-to-Sunday period common to all member states (Act art. 10)",
+          "vacancy_rule": "Each member state fills a vacant seat for the rest of the term under its own procedures (Act art. 13(2)), mostly from the list's substitutes; the United Kingdom held by-elections in its single-member seats until 1999."
+        }
+      ],
+      "access": [
+        {
+          "platform": "European Parliament, European election results",
+          "url": "https://results.elections.europa.eu/en/tools/download-datasheets/",
+          "format": "csv, json, html, pdf",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "evidence": "Downloadable datasheets for 1979 to 2019 and 2024, by member state, national party, and political group; no constituency or municipal files.",
+          "first_date": "1979-06-07",
+          "finest": "eu.member_state"
+        },
+        {
+          "platform": "Bundesministerium für Inneres, Europawahlen",
+          "url": "https://www.bmi.gv.at/412/europawahlen/europawahl_2024/start.html",
+          "format": "html, xlsx, pdf",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "evidence": "2024 final result with municipal (Gemeinde) results as xlsx and pdf; the archive lists the elections back to 1996.",
+          "within": "AT"
+        },
+        {
+          "platform": "SPF Intérieur, elections.fgov.be",
+          "url": "https://elections.fgov.be/resultats",
+          "format": "html, pdf",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "evidence": "Result tables for 2014, 2019, and 2024 by college, constituency, and province; commune results not confirmed.",
+          "within": "BE",
+          "first_date": "2014-05-25",
+          "finest": "be.ep_constituency"
+        },
+        {
+          "platform": "Central Election Commission (CIK)",
+          "url": "https://results.cik.bg/europe2024/rezultati/index.html",
+          "format": "unknown",
+          "access": "blocked",
+          "checked_at": "2026-11-13",
+          "evidence": "cik.bg and results.cik.bg answer scripts with a 403 challenge; search snippets describe 2024 results searchable by polling section.",
+          "within": "BG"
+        },
+        {
+          "platform": "Ministry of the Interior, Central Electoral Service",
+          "url": "https://results.elections.moi.gov.cy/english/european_elections_2024_163/Islandwide",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "evidence": "Official results for 2004, 2009, 2014, 2019, and 2024; the whole Republic is one constituency; finer units not checked.",
+          "within": "CY",
+          "first_date": "2004-06-13"
+        },
+        {
+          "platform": "Czech Statistical Office, volby.gov.cz",
+          "url": "https://volby.gov.cz/opendata/ep2024/EP2024_XML.pdf",
+          "format": "xml, csv, xlsx, html",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "evidence": "2024 open data with results by polling district (okrsek); earlier years not checked.",
+          "within": "CZ"
+        },
+        {
+          "platform": "Bundeswahlleiterin, Europawahl open data",
+          "url": "https://www.bundeswahlleiterin.de/europawahlen/2024/ergebnisse/opendata.html",
+          "format": "xml, csv, html, pdf",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "evidence": "2024 open data by county (Kreis); polling-district (Wahlbezirk) results announced but the 2019 archive path was not found.",
+          "within": "DE",
+          "finest": "de.kreis"
+        },
+        {
+          "platform": "Statistics Denmark, valg pages",
+          "url": "https://dst.dk/valg/Valg2546524/other/startside.htm",
+          "format": "html, csv, xml",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "evidence": "2024 results with csv and xml downloads and polling-district (afstemningsområde) pages; earlier years not checked.",
+          "within": "DK"
+        },
+        {
+          "platform": "Valimised (State Electoral Office)",
+          "url": "https://www.valimised.ee/et/valimiste-arhiiv/euroopa-parlamendi-valimised/euroopa-parlamendi-valimised-2024",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "evidence": "The archive links the 2014, 2019, and 2024 results and lists 2004; the 2024 results site is a script-rendered app.",
+          "within": "EE"
+        },
+        {
+          "platform": "Ministerio del Interior, Infoelectoral",
+          "url": "https://infoelectoral.interior.gob.es/es/elecciones-celebradas/resultados-electorales/",
+          "format": "unknown",
+          "access": "blocked",
+          "checked_at": "2026-11-13",
+          "evidence": "infoelectoral and descargas.interior.gob.es refuse scripts (403, no response through a Spanish exit); datos.gob.es lists EP data 1987 to 2024.",
+          "within": "ES"
+        },
+        {
+          "platform": "Statistics Finland, election statistics",
+          "url": "https://stat.fi/en/publication/cln484ez0efik0bvz8gumoquc",
+          "format": "html, database tables",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "evidence": "2024 tables by municipality and polling district (äänestysalue), with the series back to the 1996 election.",
+          "within": "FI",
+          "first_date": "1996-10-20"
+        },
+        {
+          "platform": "Ministry of the Interior, ekloges.ypes.gr",
+          "url": "https://ekloges.ypes.gr/current/e/home/",
+          "format": "unknown",
+          "access": "blocked",
+          "checked_at": "2026-11-13",
+          "evidence": "The site answers scripts with a 403 block page; search snippets show polling-section listings for June 2024.",
+          "within": "GR"
+        },
+        {
+          "platform": "State Electoral Commission (DIP)",
+          "url": "https://www.izbori.hr/site/UserDocsImages/2024/Izbori_za_EU_parlament/EU%20parlament%202024.%20Rezultati%20izbora.pdf",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "evidence": "2024 national result as a nine-page pdf; a separate report gives counties; polling-station data not seen.",
+          "within": "HR"
+        },
+        {
+          "platform": "National Election Office (NVI)",
+          "url": "https://www.valasztas.hu/europai-parlamenti-valasztasok",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "evidence": "2004 results at static.valasztas.hu by county; 2024 at vtr.valasztas.hu/ep2024, a script-rendered app; polling-station (szavazókör) level not seen.",
+          "within": "HU",
+          "first_date": "2004-06-13"
+        },
+        {
+          "platform": "Department of Housing, Local Government and Heritage",
+          "url": "https://assets.gov.ie/301939/b7262287-3894-44e6-a0b3-f46ac83bc5e2.pdf",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "evidence": "European Parliament Election Results 2024: count-by-count tables for the three constituencies; the gov.ie publication page refuses scripts.",
+          "within": "IE",
+          "finest": "ie.ep_constituency"
+        },
+        {
+          "platform": "Central Electoral Commission (VRK)",
+          "url": "https://rezultatai.vrk.lt/",
+          "format": "unknown",
+          "access": "blocked",
+          "checked_at": "2026-11-13",
+          "evidence": "vrk.lt and rezultatai.vrk.lt answer scripts with 403; no EP result page seen.",
+          "within": "LT"
+        },
+        {
+          "platform": "Ministère de l'Intérieur, elections.public.lu",
+          "url": "https://elections.public.lu/en/elections-europeennes/2024/resultats.html",
+          "format": "html, csv",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "evidence": "2024 results by commune with polling-station counts; labeled unofficial; earlier years not checked.",
+          "within": "LU"
+        },
+        {
+          "platform": "Central Election Commission (CVK)",
+          "url": "https://epv2024.cvk.lv/velesanu-rezultati",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "evidence": "2024 final results (published 14 June 2024) down to each polling station; older results not opened.",
+          "within": "LV"
+        },
+        {
+          "platform": "Electoral Commission of Malta",
+          "url": "https://electoral.gov.mt/ElectionResults/MEP",
+          "format": "unknown",
+          "access": "blocked",
+          "checked_at": "2026-11-13",
+          "evidence": "The site answers scripts with 403; snippets show 2024 turnout by the 13 electoral divisions.",
+          "within": "MT"
+        },
+        {
+          "platform": "Kiesraad, open data on data.overheid.nl",
+          "url": "https://data.overheid.nl/dataset/verkiezingsuitslag-europees-parlement-2024",
+          "format": "EML (xml), csv",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "evidence": "EP datasets for 1979, 2009, 2014, 2019, and 2024; polling-station files for 2019; CC0.",
+          "within": "NL",
+          "first_date": "1979-06-07"
+        },
+        {
+          "platform": "National Electoral Commission (PKW)",
+          "url": "https://wybory.gov.pl/index/",
+          "format": "html, pdf",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "evidence": "Archive entries for 2014, 2019, and 2024 with polling-district (obwód) protocols.",
+          "within": "PL",
+          "finest": "pl.ep_constituency"
+        },
+        {
+          "platform": "Ministério da Administração Interna (SGMAI)",
+          "url": "https://www.eleicoes.mai.gov.pt/europeias2014/resultados-globais.html",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "evidence": "Static results for 2004 and 2014; 2024 at /europeias2024/ is a script-rendered app; parish (freguesia) level not seen.",
+          "within": "PT",
+          "first_date": "2004-06-13"
+        },
+        {
+          "platform": "Permanent Electoral Authority (AEP)",
+          "url": "https://prezenta.roaep.ro/europarlamentare09062024/",
+          "format": "unknown",
+          "access": "blocked",
+          "checked_at": "2026-11-13",
+          "evidence": "roaep.ro answers scripts with a reCAPTCHA check.",
+          "within": "RO"
+        },
+        {
+          "platform": "Valmyndigheten, val.se",
+          "url": "https://www.val.se/valresultat-och-statistik",
+          "format": "html, raw data files",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "evidence": "EU election results 2004 to 2024 with raw data files; Statistics Sweden publishes county and municipal tables.",
+          "within": "SE",
+          "first_date": "2004-06-13"
+        },
+        {
+          "platform": "State Electoral Commission (DVK)",
+          "url": "https://www.dvk-rs.si/",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "evidence": "The archive lists the 2024 EP election with detailed results; earlier years not listed.",
+          "within": "SI"
+        },
+        {
+          "platform": "Statistical Office of the Slovak Republic",
+          "url": "https://volby.statistics.sk/ep/ep2024/",
+          "format": "html",
+          "access": "browser",
+          "checked_at": "2026-11-13",
+          "evidence": "Script-rendered results site; precinct (okrsok) results reported for 2019.",
+          "within": "SK"
         }
       ]
+    },
+    {
+      "key": "ep_president",
+      "tier": "union",
+      "name": "Election of the President of the European Parliament",
+      "name_en": "President of the European Parliament, elected by its members",
+      "category": "indirect",
+      "goal": "national",
+      "valid_from": "1979-07-17",
+      "first_held": "1979-07-17",
+      "measure": {
+        "unit": "ballot"
+      },
+      "note": "Elected by secret ballot for two and a half years at the start and the middle of each term; an absolute majority of votes cast is needed in the first three ballots, and a fourth is a runoff between the top two (Rules 15, 16, and 19). Acclaimed when there is only one candidate. Elected by the European Parliament in plenary by secret ballot; the Parliament's minutes and press releases give each ballot's counts.",
+      "source": "rop-2024",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "speaker"
+          ],
+          "iso_pattern": "EU"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "rop-2024",
+          "locator": "https://www.europarl.europa.eu/rules/rules20240716/Rules20240716_EN.pdf (Rules 15, 16, and 19(1))",
+          "called": false,
+          "runoff": "majority",
+          "runoff_rule": "Absolute majority of votes cast in the first three ballots; the fourth is confined to the two leaders of the third.",
+          "administered_by": "European Parliament"
+        }
+      ],
+      "est_votes": 15000,
+      "effort": 2,
+      "dates": [
+        {
+          "date": "1979-01-01",
+          "precision": "year",
+          "election_kind": "indirect",
+          "contests": 1,
+          "source": "ep-presidents",
+          "quote": "Simone Veil President from 1979-1982"
+        },
+        {
+          "date": "1982-01-01",
+          "precision": "year",
+          "election_kind": "indirect",
+          "contests": 1,
+          "source": "ep-presidents",
+          "quote": "Pieter Dankert President from 1982-1984"
+        },
+        {
+          "date": "1984-01-01",
+          "precision": "year",
+          "election_kind": "indirect",
+          "contests": 1,
+          "source": "ep-presidents",
+          "quote": "Pierre Pflimlin President from 1984-1987"
+        },
+        {
+          "date": "1987-01-01",
+          "precision": "year",
+          "election_kind": "indirect",
+          "contests": 1,
+          "source": "ep-presidents",
+          "quote": "Lord Plumb President from 1987-1989"
+        },
+        {
+          "date": "1989-01-01",
+          "precision": "year",
+          "election_kind": "indirect",
+          "contests": 1,
+          "source": "ep-presidents",
+          "quote": "Enrique Barón Crespo President from 1989-1992"
+        },
+        {
+          "date": "1992-01-01",
+          "precision": "year",
+          "election_kind": "indirect",
+          "contests": 1,
+          "source": "ep-presidents",
+          "quote": "Egon A. Klepsch President from 1992-1994"
+        },
+        {
+          "date": "1994-01-01",
+          "precision": "year",
+          "election_kind": "indirect",
+          "contests": 1,
+          "source": "ep-presidents",
+          "quote": "Klaus Hänsch President from 1994-1997"
+        },
+        {
+          "date": "1997-01-01",
+          "precision": "year",
+          "election_kind": "indirect",
+          "contests": 1,
+          "source": "ep-presidents",
+          "quote": "José María Gil-Robles Gil-Delgado President from 1997-1999"
+        },
+        {
+          "date": "1999-01-01",
+          "precision": "year",
+          "election_kind": "indirect",
+          "contests": 1,
+          "source": "ep-presidents",
+          "quote": "Nicole Fontaine President from 1999-2002"
+        },
+        {
+          "date": "2002-01-01",
+          "precision": "year",
+          "election_kind": "indirect",
+          "contests": 1,
+          "source": "ep-presidents",
+          "quote": "Pat Cox President from 2002-2004"
+        },
+        {
+          "date": "2004-01-01",
+          "precision": "year",
+          "election_kind": "indirect",
+          "contests": 1,
+          "source": "ep-presidents",
+          "quote": "Josep Borrell Fontelles President from 2004-2007"
+        },
+        {
+          "date": "2007-01-01",
+          "precision": "year",
+          "election_kind": "indirect",
+          "contests": 1,
+          "source": "ep-presidents",
+          "quote": "Hans-Gert Pöttering President from 2007-2009"
+        },
+        {
+          "date": "2009-01-01",
+          "precision": "year",
+          "election_kind": "indirect",
+          "contests": 1,
+          "source": "ep-presidents",
+          "quote": "Jerzy Buzek President from 2009-2012"
+        },
+        {
+          "date": "2012-01-01",
+          "precision": "year",
+          "election_kind": "indirect",
+          "contests": 1,
+          "source": "ep-presidents",
+          "quote": "Martin Schulz President from 2012-2017"
+        },
+        {
+          "date": "2014-01-01",
+          "precision": "year",
+          "election_kind": "indirect",
+          "note": "Martin Schulz re-elected at the start of the eighth term; the archive page shows one presidency for 2012-2017."
+        },
+        {
+          "date": "2017-01-01",
+          "precision": "year",
+          "election_kind": "indirect",
+          "contests": 1,
+          "source": "ep-presidents",
+          "quote": "Antonio Tajani President from 2017-2019"
+        },
+        {
+          "date": "2019-01-01",
+          "precision": "year",
+          "election_kind": "indirect",
+          "contests": 1,
+          "source": "ep-presidents",
+          "quote": "David Maria Sassoli President from 2019-2022"
+        },
+        {
+          "date": "2022-01-01",
+          "precision": "year",
+          "election_kind": "indirect",
+          "contests": 1,
+          "source": "ep-presidents",
+          "quote": "Roberta Metsola President since 2022"
+        },
+        {
+          "date": "2024-01-01",
+          "precision": "year",
+          "election_kind": "indirect",
+          "note": "Roberta Metsola re-elected at the start of the tenth term (press release 20240710IPR22805)."
+        },
+        {
+          "date": "2027-01-01",
+          "precision": "month",
+          "source": "rop-2024",
+          "quote": "The term of office of the President, Vice-Presidents and Quaestors shall be two-and-a-half years.",
+          "note": "Mid-term election of the tenth Parliament."
+        }
+      ]
+    },
+    {
+      "key": "ep_bureau",
+      "tier": "union",
+      "name": "Election of the Vice-Presidents and Quaestors of the European Parliament",
+      "name_en": "Vice-Presidents and Quaestors of the European Parliament",
+      "category": "indirect",
+      "goal": "national",
+      "valid_from": "1979-07-17",
+      "first_held": "1979-07-17",
+      "measure": {
+        "unit": "ballot"
+      },
+      "note": "Fourteen Vice-Presidents on a single ballot and five Quaestors by the same procedure, right after the President and for the same two and a half years (Rules 15, 17, 18, and 19). Elected by the European Parliament in plenary by secret ballot; the Parliament's minutes and press releases give each ballot's counts.",
+      "source": "rop-2024",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "other"
+          ],
+          "iso_pattern": "EU",
+          "name_pattern": "(Vice-President|Quaestor)"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "rop-2024",
+          "locator": "https://www.europarl.europa.eu/rules/rules20240716/Rules20240716_EN.pdf (Rules 17, 18, and 19(1))",
+          "called": false,
+          "administered_by": "European Parliament"
+        }
+      ],
+      "est_votes": 70000,
+      "effort": 3,
+      "dates": []
+    },
+    {
+      "key": "commission_president",
+      "tier": "union",
+      "name": "Election of the President of the European Commission",
+      "name_en": "President of the European Commission, approved and since 2009 elected by the European Parliament",
+      "category": "indirect",
+      "goal": "national",
+      "valid_from": "1993-11-01",
+      "first_held": "1994-07-21",
+      "measure": {
+        "unit": "ballot"
+      },
+      "note": "The European Council proposes a candidate and the Parliament votes on it: an approval vote under the Maastricht and Amsterdam treaties from 1994, and an election by a majority of its component members since the Lisbon Treaty (TEU art. 17(7)). Counted per vote, with yes, no, and abstentions.",
+      "source": "eprs-2024-762359",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "head_of_government"
+          ],
+          "iso_pattern": "EU"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "teu",
+          "locator": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:12016M/TXT (art. 17(7))",
+          "period_years": 5,
+          "phase": 4,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "European Parliament",
+          "valid_from": "2009-12-01"
+        }
+      ],
+      "est_votes": 5000,
+      "effort": 1,
+      "dates": [
+        {
+          "date": "1994-07-21",
+          "election_kind": "indirect",
+          "contests": 1,
+          "source": "ep-sdp-1999",
+          "note": "Jacques Santer approved, 260 for, 238 against, 23 abstentions."
+        },
+        {
+          "date": "1999-05-05",
+          "election_kind": "indirect",
+          "contests": 1,
+          "source": "ep-sdp-1999",
+          "note": "Romano Prodi approved, 392 for, 72 against, 41 abstentions."
+        },
+        {
+          "date": "2004-07-22",
+          "election_kind": "indirect",
+          "note": "José Manuel Barroso approved, 413 for, 251 against, 44 abstentions; not yet checked against the Parliament's minutes."
+        },
+        {
+          "date": "2009-09-16",
+          "election_kind": "indirect",
+          "contests": 1,
+          "source": "ep-press-2009-barroso",
+          "note": "José Manuel Barroso elected, 382 for, 219 against, 117 abstentions."
+        },
+        {
+          "date": "2014-07-15",
+          "election_kind": "indirect",
+          "contests": 1,
+          "source": "ep-press-2014-juncker",
+          "quote": "422 members voted in favour, 250 against, 47 abstained. The total number of votes cast was 729, 10 of which were non valid."
+        },
+        {
+          "date": "2019-07-16",
+          "election_kind": "indirect",
+          "note": "Ursula von der Leyen elected, 383 for, 327 against, 22 abstentions; not yet checked against the Parliament's minutes."
+        },
+        {
+          "date": "2024-07-18",
+          "election_kind": "indirect",
+          "contests": 1,
+          "source": "ep-press-2024-vdl",
+          "quote": "401 MEPs voted in favour, 284 against, and 22 cast blank or invalid votes."
+        }
+      ]
+    },
+    {
+      "key": "ombudsman",
+      "tier": "union",
+      "name": "Election of the European Ombudsman",
+      "name_en": "European Ombudsman, elected by the European Parliament",
+      "category": "indirect",
+      "goal": "national",
+      "valid_from": "1993-11-01",
+      "first_held": "1995-07-12",
+      "measure": {
+        "unit": "ballot"
+      },
+      "note": "Elected by the Parliament after each European election for the duration of its term, renewable (TFEU art. 228(2)); the first in 1995, after the Maastricht Treaty created the office. Elected by the European Parliament in plenary by secret ballot; the Parliament's minutes and press releases give each ballot's counts.",
+      "source": "ombudsman-25",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "other"
+          ],
+          "iso_pattern": "EU",
+          "name_pattern": "Ombudsman"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "tfeu",
+          "locator": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:12016E/TXT (art. 228(2))",
+          "period_years": 5,
+          "phase": 4,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "European Parliament"
+        }
+      ],
+      "est_votes": 4000,
+      "effort": 2,
+      "dates": [
+        {
+          "date": "1995-01-01",
+          "precision": "year",
+          "election_kind": "indirect",
+          "contests": 1,
+          "source": "ombudsman-25",
+          "quote": "1995 Jacob Söderman (Finland) elected by the European Parliament as the first European Ombudsman and the Office is opened"
+        },
+        {
+          "date": "2003-01-01",
+          "precision": "year",
+          "election_kind": "indirect",
+          "contests": 1,
+          "source": "ombudsman-25",
+          "quote": "2003 P. Nikiforos Diamandouros (Greece) elected as the second Ombudsman"
+        },
+        {
+          "date": "2013-01-01",
+          "precision": "year",
+          "election_kind": "indirect",
+          "contests": 1,
+          "source": "ombudsman-25",
+          "quote": "2013 Emily O’Reilly (Ireland) elected as the third Ombudsman"
+        },
+        {
+          "date": "2019-01-01",
+          "precision": "year",
+          "election_kind": "indirect",
+          "contests": 1,
+          "source": "ombudsman-25",
+          "quote": "2019 Emily O’Reilly elected for a new mandate"
+        },
+        {
+          "date": "1999-01-01",
+          "precision": "year",
+          "election_kind": "indirect",
+          "note": "Jacob Söderman re-elected after the 1999 European election; not on the Ombudsman's timeline, not yet checked."
+        },
+        {
+          "date": "2005-01-01",
+          "precision": "year",
+          "election_kind": "indirect",
+          "note": "P. Nikiforos Diamandouros re-elected after the 2004 European election; not on the Ombudsman's timeline, not yet checked."
+        },
+        {
+          "date": "2010-01-01",
+          "precision": "year",
+          "election_kind": "indirect",
+          "note": "P. Nikiforos Diamandouros re-elected after the 2009 European election; not on the Ombudsman's timeline, not yet checked."
+        },
+        {
+          "date": "2014-12-01",
+          "precision": "month",
+          "election_kind": "indirect",
+          "note": "Emily O'Reilly re-elected after the 2014 European election; not on the Ombudsman's timeline, not yet checked."
+        },
+        {
+          "date": "2024-12-01",
+          "precision": "month",
+          "election_kind": "indirect",
+          "note": "Teresa Anjinho elected (press release 20241212IPR25958); not yet checked."
+        }
+      ]
+    },
+    {
+      "key": "assembly_delegated",
+      "tier": "union",
+      "name": "Designation of members of the Common Assembly and the European Parliamentary Assembly",
+      "name_en": "Members delegated by the national parliaments (1952-1979)",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "eec-1957",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Before direct elections the members were designated by each national parliament from among its own members (EEC Treaty art. 138(1)); each parliament chose by its own procedure, mostly without a contested vote, and the national parliaments' records hold them.",
+      "match": [],
+      "dates": [],
+      "valid_from": "1952-09-10",
+      "valid_to": "1979-07-17"
+    },
+    {
+      "key": "european_council_president",
+      "tier": "union",
+      "name": "Election of the President of the European Council",
+      "name_en": "President of the European Council",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "teu",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Elected by the European Council, the heads of state or government, by qualified majority for two and a half years (TEU art. 15(5)); the vote is taken in closed session and no count is published.",
+      "match": [],
+      "dates": [],
+      "valid_from": "2009-12-01"
+    },
+    {
+      "key": "college_votes",
+      "tier": "union",
+      "name": "Consent to the College of Commissioners and motions of censure",
+      "name_en": "Parliament's consent vote on the Commission as a body, and motions of censure",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "tfeu",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Votes on the Commission as a whole (TEU art. 17(7)) and on censuring it (TFEU art. 234), not elections of a person or seat; they are roll-call votes of the Parliament.",
+      "match": [],
+      "dates": []
+    },
+    {
+      "key": "eci",
+      "tier": "union",
+      "name": "European citizens' initiative",
+      "name_en": "European citizens' initiatives",
+      "category": "direct_democracy",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "reg-2019-788",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Signature collections inviting the Commission to propose legislation (Regulation (EU) 2019/788); nobody votes on them.",
+      "match": [],
+      "dates": [],
+      "valid_from": "2012-04-01"
+    },
+    {
+      "key": "eesc_cor",
+      "tier": "union",
+      "name": "Members of the European Economic and Social Committee and the European Committee of the Regions",
+      "name_en": "Economic and Social Committee and Committee of the Regions",
+      "category": "non_territorial",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "tfeu",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Appointed by the Council on member states' proposals (TFEU arts. 302 and 305), not elected.",
+      "match": [],
+      "dates": []
+    },
+    {
+      "key": "eu_referendums",
+      "tier": "union",
+      "name": "Referendums on European matters",
+      "name_en": "Referendums on European treaties and membership",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "teu",
+      "disposition": "out_of_scope",
+      "disposition_reason": "The treaties provide for no EU-wide referendum. Referendums on accession, treaties, and withdrawal are national votes held under each member state's own law and belong to its census: class:fr/referendums, class:ie/referendums, class:it/referendums, class:gb/referendums, and class:de/volksentscheide.",
+      "match": [],
+      "dates": []
     }
   ]
 }
