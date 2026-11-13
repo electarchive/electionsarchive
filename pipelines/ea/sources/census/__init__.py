@@ -65,7 +65,8 @@ def emit(cc: str) -> str:
             polity=spec["polity"],
         )
         polity = cs.polity(spec["polity"])
-        if polity in cs.minted:
+        create = spec.get("create")
+        if polity in cs.minted and not create:
             raise ValueError(f"polity {spec['polity']} is not in the archive")
 
         def region(iso: str) -> UUID:
@@ -88,6 +89,22 @@ def emit(cc: str) -> str:
                     notes=source.get("note"),
                 )
             sources[tag] = id
+
+        if create and polity in cs.minted:
+            cs.add("polity", id=polity, kind=create["kind"], iso_code=spec["polity"])
+            for name in create["names"]:
+                kind = name.get("kind", "official")
+                cs.add(
+                    "name",
+                    entity_id=polity,
+                    text=name["text"],
+                    lang=name["lang"],
+                    kind=kind,
+                    is_preferred=kind == "official",
+                    source_id=sources[create["source"]],
+                )
+            cs.add("slug", path=create["slug"], entity_id=polity)
+            cs.add("external_id", entity_id=polity, scheme="wikidata", value=create["wikidata"])
 
         tiers = {tier["key"]: mint("census_tier", tier["key"]) for tier in spec["tiers"]}
         for tier in spec["tiers"]:
