@@ -3412,7 +3412,7 @@
       <button
         type="button"
         data-needs-script
-        class="mbe-4 rounded-sm border border-input bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-7 hover:bg-secondary [@media(scripting:none)]:hidden"
+        class="mbe-4 rounded-sm border border-input bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-7 hover:bg-secondary noscript:hidden"
         onpointerenter={prefetch}
         onfocus={prefetch}
         onclick={(event) => {
