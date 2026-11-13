@@ -49,6 +49,9 @@ OFFICIAL_HOSTS = frozenset(
         "katyisd.org",
         "killeenisd.org",
         "cityoftyler.org",
+        "sjgov.org",
+        "ndwa.specialdistrict.org",
+        "ccapweb.pacounties.org",
     }
 )
 COLUMNS = ("selection", "period_years", "phase", "month", "day_rule", "valid_from", "valid_to")
