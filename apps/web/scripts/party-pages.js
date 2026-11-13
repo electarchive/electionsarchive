@@ -15,6 +15,9 @@ try {
   pool.$client.options.connectionTimeoutMillis = Number(
     process.env.PARTY_PAGE_CONNECT_TIMEOUT_MS ?? 300_000,
   );
+  pool.$client.options.statement_timeout = Number(
+    process.env.PARTY_PAGE_STATEMENT_TIMEOUT_MS ?? 600_000,
+  );
   const { rebuild } = await server.ssrLoadModule(
     "/src/lib/server/party-pages.ts",
   );
