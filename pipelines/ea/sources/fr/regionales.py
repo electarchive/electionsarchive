@@ -1096,6 +1096,7 @@ def emit() -> Path:
                         ballot_position=None,
                         ballot_label=entry["long"] or entry["short"],
                     )
+                    name(option, entry["long"] or entry["short"], "fr", "official")
                     if entry["long"] and entry["short"] and entry["long"] != entry["short"]:
                         name(option, entry["short"], "fr", "short")
                     head = str(entry["head"])
@@ -1245,6 +1246,7 @@ def emit() -> Path:
                             ballot_position=entry["panel"],
                             ballot_label=entry["long"] or entry["short"],
                         )
+                        name(option, entry["long"] or entry["short"], "fr", "official")
                         if entry["long"] and entry["short"] and entry["long"] != entry["short"]:
                             name(option, entry["short"], "fr", "short")
                         head = str(entry["head"])
