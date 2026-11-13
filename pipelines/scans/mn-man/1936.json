@@ -149,38 +149,32 @@
       "id": "189-0",
       "columns": [
         {
-          "label": "Guy V. Howard, Republican",
-          "contest": null,
-          "candidate": ""
+          "label": "Ernest Lundeen, F.-Labor",
+          "contest": "senate",
+          "candidate": "Ernest Lundeen"
         },
         {
-          "label": "N. J. Holmberg, Independent Nominated by Petition",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "Andrew Olaf Devold, Independent-Progressive Nominated by Petition",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "John G. Alexander, Independent Nominated by Petition",
-          "contest": null,
-          "candidate": ""
+          "label": "Theodore Christianson, Rep.",
+          "contest": "senate",
+          "candidate": "Theodore Christianson"
         }
       ],
       "orientation": "counties_down",
       "crop": [
-        0.223,
+        0.158,
         0.044,
-        0.35,
+        0.232,
         0.959
       ],
-      "hint": "Read only the table headed 'U. S. Senator in Congress (For term beginning Nov. 3, 1936, ending Jan. 3, 1937.)'; ignore any other table visible in the image.",
+      "hint": "Read only the table headed 'U.S. Senator in Congress (For term begin. Jan. 3, 1937, and ending Jan. 3, 1943)', the Lundeen and Christianson columns; ignore any other table visible in the image.",
       "bands": 3,
       "header": [
         0.0,
         0.1934
+      ],
+      "stub": [
+        0.02,
+        0.125
       ]
     },
     {

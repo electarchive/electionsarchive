@@ -24,6 +24,14 @@
       "special": false,
       "state": "MN",
       "district": null
+    },
+    "senate-special": {
+      "year": 1942,
+      "chamber": "senate",
+      "day": "1942-11-03",
+      "special": true,
+      "state": "MN",
+      "district": null
     }
   },
   "pages": [
@@ -54,12 +62,50 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.192,
+        0.135,
         0.056,
-        0.333,
+        0.222,
         0.95
       ],
       "hint": "Read only the table headed 'U.S. Senator in Congress (For term beginning Jan. 3, 1943, and ending Jan. 3, 1949)'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1857
+      ],
+      "stub": [
+        0.015,
+        0.09
+      ]
+    },
+    {
+      "page": 197,
+      "id": "197-1",
+      "columns": [
+        {
+          "label": "Arthur E. Nelson Republican",
+          "contest": "senate-special",
+          "candidate": "Arthur E. Nelson"
+        },
+        {
+          "label": "Al. Hansen Farmer-Labor",
+          "contest": "senate-special",
+          "candidate": "Al. Hansen"
+        },
+        {
+          "label": "John E. O'Rourke Democrat",
+          "contest": "senate-special",
+          "candidate": "John E. O'Rourke"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.214,
+        0.056,
+        0.29,
+        0.95
+      ],
+      "hint": "Read only the table headed 'U.S. Senator in Cong. (For term beginning Nov. 3, 1942, and ending Jan. 3, 1943)'; ignore any other table visible in the image.",
       "bands": 2,
       "header": [
         0.0,
@@ -102,12 +148,12 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.413,
+        0.285,
         0.056,
-        0.574,
+        0.397,
         0.95
       ],
-      "hint": "Read only the table headed 'Governor'; ignore any other table visible in the image.",
+      "hint": "Read only the table headed 'Governor' (Stassen, Petersen, Sullivan, Brandborg, and Mackie columns); ignore any other table visible in the image.",
       "bands": 2,
       "header": [
         0.0,
