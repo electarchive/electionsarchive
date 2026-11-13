@@ -192,6 +192,7 @@ const MODEL = {
     reach: 5,
     spill: 0.3,
     scatter: 1.2,
+    brisk: 0.25,
   },
   reported: { common: 0.9, own: 0.3, capped: 0.99 },
   channel: { turnout: 0.35, prior: 0.08, sigma: 1.5, unlisted: 0.02 },
@@ -1171,7 +1172,13 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
   const isTail =
     complete ||
     (isLate && onNight > 0 && latest - onNight <= MODEL.late.small * onNight);
-  const settles = Math.min(1, tail / MODEL.tail.share);
+  const drained =
+    isTail && onNight > 0
+      ? Math.min(1, Math.max(0, latest - onNight) / (tail * onNight))
+      : 0;
+  const fade =
+    1 - drained * Math.max(0, 1 - recent / (MODEL.late.brisk * tail));
+  const settles = Math.min(1, tail / MODEL.tail.share) * fade;
   const outstanding = found.map((unit) => {
     if (!isTail || unit.reported == null) {
       return null;
@@ -1495,7 +1502,7 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
               unit.total,
               unit.floor,
               unit.total +
-                MODEL.late.reach * closed * (unit.total - unit.paced),
+                MODEL.late.reach * closed * fade * (unit.total - unit.paced),
             ),
           );
           const { spill, scatter } = MODEL.late;
