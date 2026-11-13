@@ -4,7 +4,7 @@ import json
 import re
 from datetime import UTC, date, datetime
 from pathlib import Path
-from uuid import UUID, uuid7
+from uuid import UUID, uuid5, uuid7
 
 import polars as pl
 
@@ -52,7 +52,7 @@ from ea.store import DATA, connect
 
 SOURCE = "tr.ysk_sandik"
 BALLOT_BOX_DAYS = {"2014-03-30", "2019-03-31", "2024-03-31"}
-VERSION = "24"
+VERSION = "25"
 PARSED = DATA / "parsed" / SOURCE
 SITE = "https://sonuc.ysk.gov.tr"
 PUBLISHER = "Yüksek Seçim Kurulu (YSK)"
@@ -124,6 +124,8 @@ YSK = {
 MUHTARLIK_SLUGS = {"2024-yerel-belediye-baskanlık-secimleri": 0, "2024-yerel-il-genel-meclis-uyeligi-secimleri": 1}
 REGISTER = Path(__file__).with_name("muhtarlik_2024.tsv")
 TUIK = Path(__file__).with_name("muhtarlik_2024_tuik.tsv")
+TRANSFERS = Path(__file__).with_name("ysk_sandik_transfers.tsv")
+LAW = ("Resmî Gazete", "Law No. 6360 (Resmî Gazete 28489, 06.12.2012)")
 KINDS = {"mahalle": "neighborhood", "koy": "village"}
 KIND_CODES = {"mahalle": "mahalle", "köy": "koy"}
 NEW_PARTIES = {"Demokratik Sol Parti": "DSP", "Bağımsız Türkiye Partisi": "BTP", "Demokrat Parti": "DP"}
@@ -485,6 +487,11 @@ def emit() -> Path:
         (district, upper(name)): id
         for id, district, name in pl.read_parquet(oveo.PARSED / "mahalle.parquet").iter_rows()
     }
+    ilce_of = {id: district for (district, _), id in neighborhoods.items()}
+    transfers = {
+        row["ysk_sandik_key"]: row
+        for row in pl.read_csv(TRANSFERS, separator="\t", infer_schema_length=0).iter_rows(named=True)
+    }
     local = pl.read_parquet(
         ysk_local.PARSED / "municipal.parquet",
         columns=["slug", "plate", "district", "neighborhood", "label", "votes", "contest", "option"],
@@ -591,6 +598,7 @@ def emit() -> Path:
             ).fetchall()
         )
         absorbed: dict[UUID, list[UUID]] = {}
+        moved: list[tuple[UUID, UUID, dict[str, str]]] = []
         units: dict[str, str] = {}
         seats: dict[str, str] = {}
         seats_2015: dict[str, str] = {}
@@ -660,6 +668,10 @@ def emit() -> Path:
                 area = cs.key("tr.oveo.mahalle", str(found))
             elif prison:
                 area = parent
+            elif (row := transfers.get(f"{ilce_id}:{neighborhood}")) is not None:
+                area = cs.key("tr.oveo.mahalle", row["oveo_mahalle"])
+                cs.merge(cs.key(f"{SOURCE}.mahalle", f"{ilce_id}:{neighborhood}"), area)
+                moved.append((area, parent, row))
             else:
                 area = cs.key(f"{SOURCE}.mahalle", f"{ilce_id}:{neighborhood}")
                 cs.add("area", id=area, scheme_code="tr.mahalle")
@@ -712,6 +724,35 @@ def emit() -> Path:
             for area in former:
                 cs.add("area_event_member", event_id=event, area_id=area, role="from")
         print(f"{len(units)} units, {len(added)} neighborhoods not in Oy ve Ötesi's list: {added}")
+        law = cs.source(*LAW)
+        if law in cs.minted:
+            raise ValueError("publish tr.reforms before tr.ysk_sandik")
+        if len(moved) != len(transfers):
+            raise ValueError(f"{len(transfers) - len(moved)} transfers in {TRANSFERS.name} matched no village")
+        for area, before, row in moved:
+            after = cs.key("tr.oveo.ilce", str(ilce_of[int(row["oveo_mahalle"])]))
+            precision = "day" if row["law"] else "unknown"
+            cs.add("area_parent", area_id=area, parent_id=before, valid_to=ABOLISHED, valid_to_precision=precision)
+            cs.add("area_parent", area_id=area, parent_id=after, valid_from=ABOLISHED, valid_from_precision=precision)
+            event = uuid5(changeset.NAMESPACE, f"{SOURCE}.transferred\x1f{area}")
+            cs.add(
+                "area_event",
+                id=event,
+                kind="transferred",
+                date=ABOLISHED,
+                date_precision=precision,
+                source_id=law if row["law"] else source,
+                notes=(
+                    f"{row['koy']} moved from {row['ilce_from']} to {row['ilce_to']} under law 6360 {row['provision']}, "
+                    f"which listed it as {row['listed_as']} and took effect at the March 30, 2014 local elections"
+                    if row["law"]
+                    else f"YSK's 2011 results place {row['koy']} in {row['ilce_from']} and its 2014 local election "
+                    f"results in {row['ilce_to']}; no act ordering the move has been found, so the date is the first "
+                    "election in its new district"
+                ),
+            )
+            cs.add("area_event_member", event_id=event, area_id=area, role="from")
+        print(f"{len(moved)} villages merged into the neighborhood they became in another district")
         register = pl.read_parquet(PARSED / "muhtarlik.parquet")
         places = [tuple(place) for place in register.select("plate", "district", "neighborhood").iter_rows()]
         if unplaced := [place for place in places if place not in areas]:
@@ -861,6 +902,7 @@ def emit() -> Path:
         )
         cs.manifest["scope"] = {
             "polity": "TR",
+            "replaces": {"area_parent": ["tr.oveo"]},
             "drops": {
                 table: {"areas": sorted(spans_of), "from": "2009-01-01"} for table in ("area_kind", "area_membership")
             },
