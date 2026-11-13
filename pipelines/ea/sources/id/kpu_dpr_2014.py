@@ -734,58 +734,169 @@ def _rows(dapil: str) -> list[Row]:
     return rows
 
 
+def _options(cell: set[int]) -> list[int]:
+    return sorted(cell - {-1})
+
+
+def _fixed(cell: set[int]) -> bool:
+    return len(cell) == 1 and -1 not in cell
+
+
 def _solve(rows: list[Row], constraints: list[list[tuple[int, int, int]]]) -> None:
     changed = True
     while changed:
         changed = False
         for terms in constraints:
-            open_ = [(row, column) for row, column, _ in terms if len(rows[row].cells[column]) > 1]
-            if not open_ or math.prod(len(rows[row].cells[column]) for row, column in open_) > 4096:
+            loose = [(row, column, sign) for row, column, sign in terms if not _fixed(rows[row].cells[column])]
+            free = [term for term in loose if not _options(rows[term[0]].cells[term[1]])]
+            open_ = [term for term in loose if _options(rows[term[0]].cells[term[1]])]
+            if not loose or len(free) > 1:
                 continue
+            if math.prod(len(_options(rows[row].cells[column])) for row, column, _ in open_) > 4096:
+                continue
+            base = sum(
+                sign * next(iter(rows[row].cells[column]))
+                for row, column, sign in terms
+                if (row, column, sign) not in loose
+            )
             fits = []
-            for choice in itertools.product(*(sorted(rows[row].cells[column]) for row, column in open_)):
-                picked = dict(zip(open_, choice, strict=True))
-                total = 0
-                for row, column, sign in terms:
-                    total += sign * picked.get((row, column), next(iter(rows[row].cells[column])))
-                if total == 0 and -1 not in choice:
+            for choice in itertools.product(*(_options(rows[row].cells[column]) for row, column, _ in open_)):
+                total = base + sum(sign * value for (_, _, sign), value in zip(open_, choice, strict=True))
+                if free:
+                    value = -total * free[0][2]
+                    if value >= 0:
+                        fits.append((*choice, value))
+                elif total == 0:
                     fits.append(choice)
             if len(fits) == 1:
-                for (row, column), value in zip(open_, fits[0], strict=True):
+                for (row, column, _), value in zip(open_ + free, fits[0], strict=True):
                     rows[row].cells[column] = {value}
                 changed = True
+
+
+def _repair(rows: list[Row], constraints: list[list[tuple[int, int, int]]]) -> list[str]:
+    def balance(terms: list[tuple[int, int, int]]) -> int | None:
+        if not all(_fixed(rows[row].cells[column]) for row, column, _ in terms):
+            return None
+        return sum(sign * next(iter(rows[row].cells[column])) for row, column, sign in terms)
+
+    member: dict[tuple[int, int], list[int]] = {}
+    for index, terms in enumerate(constraints):
+        for row, column, _ in terms:
+            member.setdefault((row, column), []).append(index)
+    repaired: list[str] = []
+    for terms in constraints:
+        total = balance(terms)
+        if not total:
+            continue
+        fits = []
+        for row, column, sign in terms:
+            if len(member[row, column]) < 2:
+                continue
+            old = next(iter(rows[row].cells[column]))
+            new = old - sign * total
+            if new < 0:
+                continue
+            rows[row].cells[column] = {new}
+            if all(balance(constraints[index]) in (0, None) for index in member[row, column]):
+                fits.append((row, column, old, new))
+            rows[row].cells[column] = {old}
+        if len(fits) == 1:
+            row, column, old, new = fits[0]
+            rows[row].cells[column] = {new}
+            repaired.append(
+                f"page {rows[row].band.page} {rows[row].text!r} column {column}: read {old}, sums give {new}"
+            )
+    return repaired
+
+
+HEADING = re.compile(r"[\d\s.]+")
+SECTION = re.compile(r"[IVX]+\.?|[A-Z]\.")
+VOTERS, USAGE, VALIDITY = 30, 4, 3
+READS = {("KALIMANTAN BARAT", 3, 1601, 13): 628, ("KALIMANTAN BARAT", 3, 1710, 5): 2258}
 
 
 def _scanned(dapil: str) -> tuple[list[dict[str, object]], list[str]]:
     codes = CERTIFICATES[dapil][3]
     rotate, _ = SCANS[dapil]
     width = len(codes)
-    rows = [row for row in _rows(dapil) if row.number or row.text or any(not blank for blank in row.blank)]
-    constraints = [[(index, column, 1) for column in range(width)] + [(index, width, -1)] for index in range(len(rows))]
-    start = next(index for index, row in enumerate(rows) if row.text.upper().startswith("PARTAI"))
-    tiers = [index for index in range(start) if _tail(rows[index]) in ("LK", "PR", "JML")]
-    for lk, pr, jml in zip(tiers, tiers[1:], tiers[2:], strict=False):
-        if [_tail(rows[index]) for index in (lk, pr, jml)] == ["LK", "PR", "JML"]:
-            for column in range(width + 1):
-                constraints.append([(lk, column, 1), (pr, column, 1), (jml, column, -1)])
+    rows: list[Row] = []
+    for row in _rows(dapil):
+        small = [next(iter(cell)) for cell in row.cells if _fixed(cell) and next(iter(cell))]
+        if len(small) >= 3 and max(small) <= 20 and small == sorted(set(small)):
+            continue
+        for column, code in enumerate(codes):
+            if code == "":
+                row.cells[width] |= {value for value in row.cells[column] if value > 0}
+                row.cells[column] = {0}
+        for (where, page, top, column), value in READS.items():
+            if where == dapil and (row.band.page, row.band.top) == (page, top):
+                row.cells[column] = {value}
+        votes = [cell for cell, code in zip(row.cells, codes, strict=False) if code != ""]
+        counted = sum(1 for cell in votes if _fixed(cell) and next(iter(cell)) > 0)
+        if not any(value > 0 for cell in votes for value in cell):
+            continue
+        if row.cells[width] <= {0, -1} and counted:
+            row.cells[width] = set()
+        if (
+            HEADING.fullmatch(row.text)
+            or row.text.upper().startswith("NOMOR/NAMA")
+            or (SECTION.fullmatch(row.number) and not row.text.endswith("LK"))
+        ):
+            continue
+        if not (row.number or row.text or _fixed(row.cells[width])):
+            continue
+        if any(value > 0 for value in row.cells[width]) or (not row.cells[width] and 2 * counted >= len(votes)):
+            rows.append(row)
+    start = VOTERS + USAGE + VALIDITY
+    if not rows[start].text.upper().startswith("PARTAI"):
+        raise ValueError(f"{dapil}: row {start} {rows[start].text!r} does not open the party section")
+    columns = range(width + 1)
+    constraints = [
+        [(index, column, 1) for column in range(width)] + [(index, width, -1)]
+        for index in range(len(rows))
+        if not VOTERS <= index < VOTERS + USAGE
+    ]
+    for triple in range(0, VOTERS, 3):
+        constraints += [[(triple, column, 1), (triple + 1, column, 1), (triple + 2, column, -1)] for column in columns]
+    for block in (0, 15):
+        for tier in range(3):
+            terms = [(block + 3 * group + tier, 1) for group in range(4)] + [(block + 12 + tier, -1)]
+            constraints += [[(row, column, sign) for row, sign in terms] for column in columns]
+    validity = VOTERS + USAGE
+    constraints += [
+        [(validity, column, 1), (validity + 1, column, 1), (validity + 2, column, -1)] for column in columns
+    ]
     blocks: list[tuple[int, list[int], int]] = []
     head: int | None = None
     members: list[int] = []
     for index in range(start, len(rows)):
-        row = rows[index]
-        if row.text.upper().startswith("PARTAI"):
+        if head is None:
             head, members = index, []
-        elif head is not None and "jumlah" in row.text.lower():
+        elif "jumlah" in rows[index].text.lower():
             blocks.append((head, members, index))
             head = None
-        elif head is not None:
+        else:
             members.append(index)
     for head, members, total in blocks:
-        for column in range(width + 1):
+        for column in columns:
             constraints.append([(head, column, 1), *((index, column, 1) for index in members), (total, column, -1)])
+    constraints += [[(total, column, 1) for _, _, total in blocks] + [(validity, column, -1)] for column in columns]
     _solve(rows, constraints)
-    out: list[dict[str, object]] = []
+    for repair in _repair(rows, constraints):
+        print(f"{dapil} {repair}")
     problems: list[str] = []
+    for row in rows:
+        if not _fixed(row.cells[width]):
+            row.cells[width] = set()
+    _solve(rows, constraints)
+    for terms in constraints:
+        if all(_fixed(rows[row].cells[column]) for row, column, _ in terms) and sum(
+            sign * next(iter(rows[row].cells[column])) for row, column, sign in terms
+        ):
+            where = sorted({(rows[row].band.page, rows[row].text[:30]) for row, _, _ in terms})
+            problems.append(f"{dapil}: sum off in columns {sorted({column for _, column, _ in terms})} over {where}")
+    out: list[dict[str, object]] = []
 
     def emit(measure: str, party: int | None, number: int | None, name: str | None, index: int) -> None:
         row = rows[index]
@@ -817,15 +928,10 @@ def _scanned(dapil: str) -> tuple[list[dict[str, object]], list[str]]:
                 }
             )
 
-    tallies = 0
-    for index in range(start):
-        row = rows[index]
-        if _tail(row) == "JML":
-            tallies += 1
-            if tallies in (5, 10):
-                emit("registered" if tallies == 5 else "voters", None, None, None, index)
-        elif measure := next((measure for phrase, measure in SUMMARY if phrase.lower() in row.text.lower()), None):
-            emit(measure, None, None, None, index)
+    emit("registered", None, None, None, 14)
+    emit("voters", None, None, None, 29)
+    for measure, index in (("valid", validity), ("invalid", validity + 1), ("ballots", validity + 2)):
+        emit(measure, None, None, None, index)
     parties = iter(PARTIES)
     for head, members, total in blocks:
         party = next(parties)
@@ -837,7 +943,10 @@ def _scanned(dapil: str) -> tuple[list[dict[str, object]], list[str]]:
             row = rows[index]
             if not row.number and all(row.blank):
                 continue
-            if row.number.rstrip(".") != str(expected):
+            printed = row.number.rstrip(".")
+            if printed.isdigit() and expected < int(printed) <= 12:
+                expected = int(printed)
+            elif printed != str(expected):
                 problems.append(f"{dapil} party {party}: candidate {row.number} {row.text!r}, {expected} expected")
             emit("votes", party, expected, row.text, index)
             expected += 1
@@ -845,11 +954,6 @@ def _scanned(dapil: str) -> tuple[list[dict[str, object]], list[str]]:
     if next(parties, None) is not None:
         problems.append(f"{dapil}: {len(blocks)} party blocks, not {len(PARTIES)}")
     return out, problems
-
-
-def _tail(row: Row) -> str:
-    words = row.text.upper().replace(".", "").split()
-    return words[-1] if words else ""
 
 
 def _reconcile(dapil: str, frame: pl.DataFrame, elected: pl.DataFrame) -> None:
@@ -944,6 +1048,13 @@ CERTIFIED = (
     "recapitulation. Declared seats and the elected members come from KPU decree 416/2014, which follows the national "
     "recapitulation of the same figures. A party's own votes (ballots marked for the party alone) sit on its party "
     "line; its total is that line plus its candidates' votes."
+)
+SCANNED = (
+    "The certificate is a scan. Each table cell was read twice by a vision model at two scales, and the reads were "
+    "settled against the certificate's own sums: each row's regency cells against its final total, men and women "
+    "against the voter totals, each party's line and candidates against its Jumlah line, and the party totals against "
+    "the valid votes. Where both reads agreed but every sum through one cell required another figure, the sums "
+    "decided; those cells, and two in Kalimantan Barat that the sums could not place, were checked against the page."
 )
 DIY = (
     "The figures come from the provincial commission's book Data Hasil Pemilu Tahun 2014, which transcribes the "
@@ -1192,6 +1303,8 @@ def emit() -> Path:
             if counted.height:
                 cs.add("note", entity_id=result_set, kind="methodology", body_md=CERTIFIED)
                 cs.add("citation", entity_id=result_set, source_id=sources["416"], locator={"pages": "6-21"})
+                if dapil in SCANS:
+                    cs.add("note", entity_id=result_set, kind="methodology", body_md=SCANNED)
                 if dapil == "DI YOGYAKARTA":
                     cs.add("note", entity_id=result_set, kind="caveat", body_md=DIY)
             else:
