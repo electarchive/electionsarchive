@@ -1,0 +1,6068 @@
+[
+  {
+    "block": "北海道選挙区",
+    "party": "自由民主党",
+    "seats": 3,
+    "members": [
+      {
+        "id": "伊東よしたか",
+        "rank": 1,
+        "won": false,
+        "ratio": null,
+        "elected": 1
+      },
+      {
+        "id": "東くによし",
+        "rank": 2,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "鈴木たかこ",
+        "rank": 2,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "武部あらた",
+        "rank": 2,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "中村ひろゆき",
+        "rank": 2,
+        "won": false,
+        "ratio": 92.714,
+        "elected": 2
+      },
+      {
+        "id": "向山じゅん",
+        "rank": 2,
+        "won": false,
+        "ratio": 84.909,
+        "elected": 3
+      },
+      {
+        "id": "高木ひろひさ",
+        "rank": 2,
+        "won": false,
+        "ratio": 82.976,
+        "elected": null
+      },
+      {
+        "id": "髙橋ゆうすけ",
+        "rank": 2,
+        "won": false,
+        "ratio": 81.737,
+        "elected": null
+      },
+      {
+        "id": "中川ゆうこ",
+        "rank": 2,
+        "won": false,
+        "ratio": 79.123,
+        "elected": null
+      },
+      {
+        "id": "かとう貴弘",
+        "rank": 2,
+        "won": false,
+        "ratio": 73.927,
+        "elected": null
+      },
+      {
+        "id": "松下ひでき",
+        "rank": 2,
+        "won": false,
+        "ratio": 58.796,
+        "elected": null
+      },
+      {
+        "id": "渡辺孝一",
+        "rank": 12,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "三輪綾子",
+        "rank": 13,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "相馬亜紀",
+        "rank": 14,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "久保じゅん",
+        "rank": 15,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "北海道選挙区",
+    "party": "公明党",
+    "seats": 1,
+    "members": [
+      {
+        "id": "佐藤英道",
+        "rank": 1,
+        "won": false,
+        "ratio": null,
+        "elected": 1
+      },
+      {
+        "id": "齊道勇太",
+        "rank": 2,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "北海道選挙区",
+    "party": "国民民主党",
+    "seats": 1,
+    "members": [
+      {
+        "id": "臼木ひでたけ",
+        "rank": 1,
+        "won": false,
+        "ratio": null,
+        "elected": 1
+      }
+    ]
+  },
+  {
+    "block": "北海道選挙区",
+    "party": "立憲民主党",
+    "seats": 3,
+    "members": [
+      {
+        "id": "池田まき",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "しのだ奈保子",
+        "rank": 1,
+        "won": false,
+        "ratio": 71.108,
+        "elected": 1
+      },
+      {
+        "id": "道下大樹",
+        "rank": 3,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "松木けんこう",
+        "rank": 3,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "荒井ゆたか",
+        "rank": 3,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "おおつきくれは",
+        "rank": 3,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "山岡達丸",
+        "rank": 3,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "神谷ひろし",
+        "rank": 3,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "石川かおり",
+        "rank": 3,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "にしかわ将人",
+        "rank": 3,
+        "won": false,
+        "ratio": 93.543,
+        "elected": 2
+      },
+      {
+        "id": "かわはらだ英世",
+        "rank": 3,
+        "won": false,
+        "ratio": 91.052,
+        "elected": 3
+      },
+      {
+        "id": "石川知裕",
+        "rank": 12,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "石川秀行",
+        "rank": 13,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "鈴木敦子",
+        "rank": 14,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "田島央一",
+        "rank": 15,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "東北選挙区",
+    "party": "自由民主党",
+    "seats": 5,
+    "members": [
+      {
+        "id": "江渡あきのり",
+        "rank": 1,
+        "won": false,
+        "ratio": null,
+        "elected": 1
+      },
+      {
+        "id": "もりした千里",
+        "rank": 2,
+        "won": false,
+        "ratio": null,
+        "elected": 2
+      },
+      {
+        "id": "つしま淳",
+        "rank": 3,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "神田潤一",
+        "rank": 3,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "とがし博之",
+        "rank": 3,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "すずきのりかず",
+        "rank": 3,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "かとう鮎子",
+        "rank": 3,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "坂本竜太郎",
+        "rank": 3,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "福原じゅんじ",
+        "rank": 3,
+        "won": false,
+        "ratio": 91.966,
+        "elected": 3
+      },
+      {
+        "id": "みのり川信英",
+        "rank": 3,
+        "won": false,
+        "ratio": 90.025,
+        "elected": 4
+      },
+      {
+        "id": "根本拓",
+        "rank": 3,
+        "won": false,
+        "ratio": 75.141,
+        "elected": 5
+      },
+      {
+        "id": "土井とおる",
+        "rank": 3,
+        "won": false,
+        "ratio": 71.15,
+        "elected": null
+      },
+      {
+        "id": "いとう信太郎",
+        "rank": 3,
+        "won": false,
+        "ratio": 64.185,
+        "elected": null
+      },
+      {
+        "id": "秋葉けんや",
+        "rank": 3,
+        "won": false,
+        "ratio": 61.545,
+        "elected": null
+      },
+      {
+        "id": "米内ひろまさ",
+        "rank": 3,
+        "won": false,
+        "ratio": 46.206,
+        "elected": null
+      },
+      {
+        "id": "伊藤聡",
+        "rank": 16,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "藤田誠",
+        "rank": 17,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "小林文紀",
+        "rank": 18,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "佐々木あすか",
+        "rank": 19,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "東北選挙区",
+    "party": "国民民主党",
+    "seats": 1,
+    "members": [
+      {
+        "id": "村岡としひで",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "きくち大二郎",
+        "rank": 1,
+        "won": false,
+        "ratio": 53.463,
+        "elected": 1
+      },
+      {
+        "id": "かねはまあきら",
+        "rank": 1,
+        "won": false,
+        "ratio": 40.55,
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "東北選挙区",
+    "party": "公明党",
+    "seats": 1,
+    "members": [
+      {
+        "id": "庄子賢一",
+        "rank": 1,
+        "won": false,
+        "ratio": null,
+        "elected": 1
+      },
+      {
+        "id": "小野寺泰明",
+        "rank": 2,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "佐々木伸和",
+        "rank": 3,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "東北選挙区",
+    "party": "立憲民主党",
+    "seats": 4,
+    "members": [
+      {
+        "id": "馬場ゆうき",
+        "rank": 1,
+        "won": false,
+        "ratio": null,
+        "elected": 1
+      },
+      {
+        "id": "岡田はなこ",
+        "rank": 2,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "しなたけし",
+        "rank": 2,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "小沢一郎",
+        "rank": 2,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "岡本あき子",
+        "rank": 2,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "鎌田さゆり",
+        "rank": 2,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "柳沢つよし",
+        "rank": 2,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "安住淳",
+        "rank": 2,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "緑川たかし",
+        "rank": 2,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "かねこ恵美",
+        "rank": 2,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "げんば光一郎",
+        "rank": 2,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "おぐま慎司",
+        "rank": 2,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "寺田学",
+        "rank": 2,
+        "won": false,
+        "ratio": 98.555,
+        "elected": 2
+      },
+      {
+        "id": "ますた世喜男",
+        "rank": 2,
+        "won": false,
+        "ratio": 93.373,
+        "elected": 3
+      },
+      {
+        "id": "斎藤ゆうき",
+        "rank": 2,
+        "won": false,
+        "ratio": 91.786,
+        "elected": 4
+      },
+      {
+        "id": "原田まさひろ",
+        "rank": 2,
+        "won": false,
+        "ratio": 70.163,
+        "elected": null
+      },
+      {
+        "id": "石黒さとる",
+        "rank": 2,
+        "won": false,
+        "ratio": 67.194,
+        "elected": null
+      },
+      {
+        "id": "中村ゆきこ",
+        "rank": 2,
+        "won": false,
+        "ratio": 61.081,
+        "elected": null
+      },
+      {
+        "id": "小川のりよ",
+        "rank": 2,
+        "won": false,
+        "ratio": 26.557,
+        "elected": null
+      },
+      {
+        "id": "伊藤勢至",
+        "rank": 20,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "岸田清実",
+        "rank": 21,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "東北選挙区",
+    "party": "れいわ新選組",
+    "seats": 1,
+    "members": [
+      {
+        "id": "にとうべとうま",
+        "rank": 1,
+        "won": false,
+        "ratio": "×",
+        "elected": null
+      },
+      {
+        "id": "大林まさひで",
+        "rank": 1,
+        "won": false,
+        "ratio": "×",
+        "elected": null
+      },
+      { "id": "佐原若子", "rank": 3, "won": false, "ratio": null, "elected": 1 }
+    ]
+  },
+  {
+    "block": "北関東選挙区",
+    "party": "日本共産党",
+    "seats": 1,
+    "members": [
+      {
+        "id": "塩川鉄也",
+        "rank": 1,
+        "won": false,
+        "ratio": null,
+        "elected": 1
+      },
+      {
+        "id": "梅村さえこ",
+        "rank": 2,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "高橋誠一郎",
+        "rank": 3,
+        "won": false,
+        "ratio": "×",
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "北関東選挙区",
+    "party": "自由民主党",
+    "seats": 7,
+    "members": [
+      {
+        "id": "はなし康弘",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "梶山ひろし",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "船田はじめ",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "茂木としみつ",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "中曽根やすたか",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "いのとしろう",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "ささがわ博義",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "おぶち優子",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "村井ひでき",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "しんどう義孝",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "きかわだひとし",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "ほさかやすし",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "小泉りゅうじ",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "田中良生",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "つちや品子",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "中野ひでゆき",
+        "rank": 1,
+        "won": false,
+        "ratio": 90.728,
+        "elected": 1
+      },
+      {
+        "id": "国光あやの",
+        "rank": 1,
+        "won": false,
+        "ratio": 89.098,
+        "elected": 2
+      },
+      {
+        "id": "ながおか桂子",
+        "rank": 1,
+        "won": false,
+        "ratio": 88.572,
+        "elected": 3
+      },
+      {
+        "id": "田所よしのり",
+        "rank": 1,
+        "won": false,
+        "ratio": 81.661,
+        "elected": 4
+      },
+      {
+        "id": "さとう勉",
+        "rank": 1,
+        "won": false,
+        "ratio": 77.93,
+        "elected": 5
+      },
+      {
+        "id": "いがらし清",
+        "rank": 1,
+        "won": false,
+        "ratio": 75.983,
+        "elected": 6
+      },
+      {
+        "id": "野中あつし",
+        "rank": 1,
+        "won": false,
+        "ratio": 73.937,
+        "elected": 7
+      },
+      {
+        "id": "牧原ひでき",
+        "rank": 1,
+        "won": false,
+        "ratio": 72.602,
+        "elected": null
+      },
+      {
+        "id": "石川あきまさ",
+        "rank": 1,
+        "won": false,
+        "ratio": 72.597,
+        "elected": null
+      },
+      {
+        "id": "山口すすむ",
+        "rank": 1,
+        "won": false,
+        "ratio": 69.436,
+        "elected": null
+      },
+      {
+        "id": "小倉悠里",
+        "rank": 26,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "西條昌良",
+        "rank": 27,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "原かずたか",
+        "rank": 28,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "須賀敬史",
+        "rank": 29,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "浅井昌志",
+        "rank": 30,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "友田雅明",
+        "rank": 31,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "増田勝",
+        "rank": 32,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "下田彰一",
+        "rank": 33,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "冨山ひで子",
+        "rank": 34,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "山崎大二郎",
+        "rank": 35,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "小菅亜希子",
+        "rank": 36,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "北関東選挙区",
+    "party": "国民民主党",
+    "seats": 1,
+    "members": [
+      {
+        "id": "浅野さとし",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "鈴木よしひろ",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "橋本みきひこ",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "岸田光広",
+        "rank": 1,
+        "won": false,
+        "ratio": 64.204,
+        "elected": 1
+      }
+    ]
+  },
+  {
+    "block": "北関東選挙区",
+    "party": "日本維新の会",
+    "seats": 1,
+    "members": [
+      {
+        "id": "高橋英明",
+        "rank": 1,
+        "won": false,
+        "ratio": 59.563,
+        "elected": 1
+      },
+      {
+        "id": "柏倉ゆうじ",
+        "rank": 1,
+        "won": false,
+        "ratio": 58.073,
+        "elected": null
+      },
+      {
+        "id": "沢田良",
+        "rank": 1,
+        "won": false,
+        "ratio": 53.881,
+        "elected": null
+      },
+      {
+        "id": "中村りか",
+        "rank": 1,
+        "won": false,
+        "ratio": 44.877,
+        "elected": null
+      },
+      {
+        "id": "渡辺やすゆき",
+        "rank": 1,
+        "won": false,
+        "ratio": 41.458,
+        "elected": null
+      },
+      {
+        "id": "加来たけよし",
+        "rank": 1,
+        "won": false,
+        "ratio": 40.777,
+        "elected": null
+      },
+      {
+        "id": "中島ゆみこ",
+        "rank": 1,
+        "won": false,
+        "ratio": 38.235,
+        "elected": null
+      },
+      {
+        "id": "伊勢田みちこ",
+        "rank": 1,
+        "won": false,
+        "ratio": 37.201,
+        "elected": null
+      },
+      {
+        "id": "中原よしむね",
+        "rank": 1,
+        "won": false,
+        "ratio": 35.094,
+        "elected": null
+      },
+      {
+        "id": "石川たかみ",
+        "rank": 1,
+        "won": false,
+        "ratio": 32.059,
+        "elected": null
+      },
+      {
+        "id": "いまむら敏昭",
+        "rank": 1,
+        "won": false,
+        "ratio": 30.388,
+        "elected": null
+      },
+      {
+        "id": "橋口なほ",
+        "rank": 1,
+        "won": false,
+        "ratio": 28.375,
+        "elected": null
+      },
+      {
+        "id": "むとうひろみつ",
+        "rank": 1,
+        "won": false,
+        "ratio": 27.755,
+        "elected": null
+      },
+      {
+        "id": "近藤ひでまさ",
+        "rank": 1,
+        "won": false,
+        "ratio": 26.086,
+        "elected": null
+      },
+      {
+        "id": "いちの一馬",
+        "rank": 1,
+        "won": false,
+        "ratio": 25.54,
+        "elected": null
+      },
+      {
+        "id": "むとうゆう子",
+        "rank": 1,
+        "won": false,
+        "ratio": 25.061,
+        "elected": null
+      },
+      {
+        "id": "ほそやみえこ",
+        "rank": 1,
+        "won": false,
+        "ratio": 23.218,
+        "elected": null
+      },
+      {
+        "id": "あさのめ義英",
+        "rank": 1,
+        "won": false,
+        "ratio": "×",
+        "elected": null
+      },
+      {
+        "id": "やこう勘司",
+        "rank": 1,
+        "won": false,
+        "ratio": 20.118,
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "北関東選挙区",
+    "party": "公明党",
+    "seats": 3,
+    "members": [
+      {
+        "id": "こしみず恵一",
+        "rank": 1,
+        "won": false,
+        "ratio": null,
+        "elected": 1
+      },
+      {
+        "id": "福重隆浩",
+        "rank": 2,
+        "won": false,
+        "ratio": null,
+        "elected": 2
+      },
+      {
+        "id": "山口良治",
+        "rank": 3,
+        "won": false,
+        "ratio": null,
+        "elected": 3
+      },
+      {
+        "id": "大塚英樹",
+        "rank": 4,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "北関東選挙区",
+    "party": "立憲民主党",
+    "seats": 5,
+    "members": [
+      {
+        "id": "青山やまと",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "福田あきお",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "藤岡たかお",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "えだの幸男",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "大島あつし",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "こみやま泰子",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "すぎむら慎治",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "坂本ゆうのすけ",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "森田としかず",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "長谷川かいち",
+        "rank": 1,
+        "won": false,
+        "ratio": 99.714,
+        "elected": 1
+      },
+      {
+        "id": "たけまさ公一",
+        "rank": 1,
+        "won": false,
+        "ratio": 96.235,
+        "elected": 2
+      },
+      {
+        "id": "三角そうた",
+        "rank": 1,
+        "won": false,
+        "ratio": 96.016,
+        "elected": 3
+      },
+      {
+        "id": "竹内千春",
+        "rank": 1,
+        "won": false,
+        "ratio": 86.704,
+        "elected": 4
+      },
+      {
+        "id": "いちき伴子",
+        "rank": 1,
+        "won": false,
+        "ratio": 83.219,
+        "elected": 5
+      },
+      {
+        "id": "高木れんたろう",
+        "rank": 1,
+        "won": false,
+        "ratio": 81.591,
+        "elected": null
+      },
+      {
+        "id": "板津ゆか",
+        "rank": 1,
+        "won": false,
+        "ratio": 80.316,
+        "elected": null
+      },
+      {
+        "id": "かじおか博樹",
+        "rank": 1,
+        "won": false,
+        "ratio": 75.624,
+        "elected": null
+      },
+      {
+        "id": "白井けいこ",
+        "rank": 1,
+        "won": false,
+        "ratio": 67.953,
+        "elected": null
+      },
+      {
+        "id": "いが央",
+        "rank": 1,
+        "won": false,
+        "ratio": 67.872,
+        "elected": null
+      },
+      {
+        "id": "山田ひろき",
+        "rank": 1,
+        "won": false,
+        "ratio": 58.33,
+        "elected": null
+      },
+      {
+        "id": "島田誠",
+        "rank": 1,
+        "won": false,
+        "ratio": 54.053,
+        "elected": null
+      },
+      {
+        "id": "まつうら玄嗣",
+        "rank": 1,
+        "won": false,
+        "ratio": 47.369,
+        "elected": null
+      },
+      {
+        "id": "若林幸子",
+        "rank": 23,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "木村誠",
+        "rank": 24,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "渡會光恵",
+        "rank": 25,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "北関東選挙区",
+    "party": "れいわ新選組",
+    "seats": 1,
+    "members": [
+      {
+        "id": "高井たかし",
+        "rank": 1,
+        "won": false,
+        "ratio": 36.194,
+        "elected": 1
+      },
+      {
+        "id": "長谷川ういこ",
+        "rank": 2,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "前田健司",
+        "rank": 3,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "南関東選挙区",
+    "party": "日本維新の会",
+    "seats": 2,
+    "members": [
+      {
+        "id": "金村りゅうな",
+        "rank": 1,
+        "won": false,
+        "ratio": 89.092,
+        "elected": 1
+      },
+      {
+        "id": "藤巻けんた",
+        "rank": 1,
+        "won": false,
+        "ratio": 42.585,
+        "elected": 2
+      },
+      {
+        "id": "久坂くにえ",
+        "rank": 1,
+        "won": false,
+        "ratio": 42.068,
+        "elected": null
+      },
+      {
+        "id": "横田光弘",
+        "rank": 1,
+        "won": false,
+        "ratio": 40.399,
+        "elected": null
+      },
+      {
+        "id": "そえだ勝",
+        "rank": 1,
+        "won": false,
+        "ratio": 39.85,
+        "elected": null
+      },
+      {
+        "id": "田沼たかし",
+        "rank": 1,
+        "won": false,
+        "ratio": 38.262,
+        "elected": null
+      },
+      {
+        "id": "金子洋一",
+        "rank": 1,
+        "won": false,
+        "ratio": 37.883,
+        "elected": null
+      },
+      {
+        "id": "加藤ちか",
+        "rank": 1,
+        "won": false,
+        "ratio": 35.742,
+        "elected": null
+      },
+      {
+        "id": "水戸まさし",
+        "rank": 1,
+        "won": false,
+        "ratio": 34.94,
+        "elected": null
+      },
+      {
+        "id": "浅川義治",
+        "rank": 1,
+        "won": false,
+        "ratio": 31.414,
+        "elected": null
+      },
+      {
+        "id": "雨宮きょうこ",
+        "rank": 1,
+        "won": false,
+        "ratio": 29.131,
+        "elected": null
+      },
+      {
+        "id": "佐藤かおり",
+        "rank": 1,
+        "won": false,
+        "ratio": 28.897,
+        "elected": null
+      },
+      {
+        "id": "しおさか源一郎",
+        "rank": 1,
+        "won": false,
+        "ratio": 28.668,
+        "elected": null
+      },
+      {
+        "id": "岸野ともやす",
+        "rank": 1,
+        "won": false,
+        "ratio": "×",
+        "elected": null
+      },
+      {
+        "id": "吉田大成",
+        "rank": 1,
+        "won": false,
+        "ratio": 25.866,
+        "elected": null
+      },
+      {
+        "id": "石塚さだみち",
+        "rank": 1,
+        "won": false,
+        "ratio": 25.849,
+        "elected": null
+      },
+      {
+        "id": "地引直輝",
+        "rank": 1,
+        "won": false,
+        "ratio": 24.53,
+        "elected": null
+      },
+      {
+        "id": "熊坂たかのり",
+        "rank": 1,
+        "won": false,
+        "ratio": "×",
+        "elected": null
+      },
+      {
+        "id": "むなかた富次郎",
+        "rank": 1,
+        "won": false,
+        "ratio": 23.218,
+        "elected": null
+      },
+      {
+        "id": "よだかずたか",
+        "rank": 1,
+        "won": false,
+        "ratio": 22.124,
+        "elected": null
+      },
+      {
+        "id": "京としひで",
+        "rank": 1,
+        "won": false,
+        "ratio": "×",
+        "elected": null
+      },
+      {
+        "id": "いさじよしえ",
+        "rank": 1,
+        "won": false,
+        "ratio": "×",
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "南関東選挙区",
+    "party": "自由民主党",
+    "seats": 7,
+    "members": [
+      {
+        "id": "小林たかゆき",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "さいとう健",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "小池まさあき",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "浜田やすかず",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "松本ひさし",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "中西けんじ",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "さかい学",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "あかま二郎",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "河野太郎",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "牧島かれん",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "くさま剛",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "堀内のり子",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "古川なおき",
+        "rank": 1,
+        "won": false,
+        "ratio": 98.845,
+        "elected": 1
+      },
+      {
+        "id": "中谷真一",
+        "rank": 1,
+        "won": false,
+        "ratio": 92.6,
+        "elected": 2
+      },
+      {
+        "id": "えりアルフィヤ",
+        "rank": 1,
+        "won": false,
+        "ratio": 90.315,
+        "elected": 3
+      },
+      {
+        "id": "鈴木けいすけ",
+        "rank": 1,
+        "won": false,
+        "ratio": 85.293,
+        "elected": 4
+      },
+      {
+        "id": "みたに英弘",
+        "rank": 1,
+        "won": false,
+        "ratio": 79.879,
+        "elected": 5
+      },
+      {
+        "id": "星野つよし",
+        "rank": 1,
+        "won": false,
+        "ratio": 77.907,
+        "elected": 6
+      },
+      {
+        "id": "やまぎわ大志郎",
+        "rank": 1,
+        "won": false,
+        "ratio": 76.63,
+        "elected": 7
+      },
+      {
+        "id": "たみやひさと",
+        "rank": 1,
+        "won": false,
+        "ratio": 76.403,
+        "elected": null
+      },
+      {
+        "id": "松本いずみ",
+        "rank": 1,
+        "won": false,
+        "ratio": 75.077,
+        "elected": null
+      },
+      {
+        "id": "木村てつや",
+        "rank": 1,
+        "won": false,
+        "ratio": 74.023,
+        "elected": null
+      },
+      {
+        "id": "まるたこう一郎",
+        "rank": 1,
+        "won": false,
+        "ratio": 67.809,
+        "elected": null
+      },
+      {
+        "id": "門山ひろあき",
+        "rank": 1,
+        "won": false,
+        "ratio": 62.763,
+        "elected": null
+      },
+      {
+        "id": "中山のりひろ",
+        "rank": 1,
+        "won": false,
+        "ratio": 55.772,
+        "elected": null
+      },
+      {
+        "id": "山本ともひろ",
+        "rank": 1,
+        "won": false,
+        "ratio": 45.436,
+        "elected": null
+      },
+      {
+        "id": "高橋きょうすけ",
+        "rank": 1,
+        "won": false,
+        "ratio": 35.47,
+        "elected": null
+      },
+      {
+        "id": "森田鉄平",
+        "rank": 28,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "梅崎瑞希",
+        "rank": 29,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "吉沢直美",
+        "rank": 30,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "文月涼",
+        "rank": 31,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "南関東選挙区",
+    "party": "立憲民主党",
+    "seats": 6,
+    "members": [
+      {
+        "id": "たじま要",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "水沼ひでゆき",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "矢崎けんたろう",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "安藤じゅん子",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "本庄さとし",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "おくの総一郎",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "しのはら豪",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "早稲田ゆき",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "あおやぎ陽一郎",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "中谷一馬",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "江田けんじ",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "笠ひろふみ",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "あべともこ",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "太ひでし",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "ごとう祐一",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "そうの創",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "大塚さゆり",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "中島かつひと",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "谷田川はじめ",
+        "rank": 1,
+        "won": false,
+        "ratio": 97.638,
+        "elected": 1
+      },
+      {
+        "id": "佐々木ナオミ",
+        "rank": 1,
+        "won": false,
+        "ratio": 96.377,
+        "elected": 2
+      },
+      {
+        "id": "みやかわ伸",
+        "rank": 1,
+        "won": false,
+        "ratio": 96.331,
+        "elected": 3
+      },
+      {
+        "id": "岡島かずまさ",
+        "rank": 1,
+        "won": false,
+        "ratio": 95.336,
+        "elected": 4
+      },
+      {
+        "id": "長友よしひろ",
+        "rank": 1,
+        "won": false,
+        "ratio": 91.17,
+        "elected": 5
+      },
+      { "id": "山崎誠", "rank": 1, "won": false, "ratio": 83.73, "elected": 6 },
+      {
+        "id": "佐藤たかし",
+        "rank": 1,
+        "won": false,
+        "ratio": 79.074,
+        "elected": null
+      },
+      {
+        "id": "中村たけと",
+        "rank": 1,
+        "won": false,
+        "ratio": 77.572,
+        "elected": null
+      },
+      {
+        "id": "鈴木みつたか",
+        "rank": 1,
+        "won": false,
+        "ratio": 68.68,
+        "elected": null
+      },
+      {
+        "id": "ひだか剛",
+        "rank": 1,
+        "won": false,
+        "ratio": 42.742,
+        "elected": null
+      },
+      {
+        "id": "やなぎや東三楼",
+        "rank": 1,
+        "won": false,
+        "ratio": 39.5,
+        "elected": null
+      },
+      {
+        "id": "金子健一",
+        "rank": 30,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "今野典人",
+        "rank": 31,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "爲谷義隆",
+        "rank": 32,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "南関東選挙区",
+    "party": "公明党",
+    "seats": 2,
+    "members": [
+      {
+        "id": "角田秀穂",
+        "rank": 1,
+        "won": false,
+        "ratio": null,
+        "elected": 1
+      },
+      {
+        "id": "沼﨑満子",
+        "rank": 2,
+        "won": false,
+        "ratio": null,
+        "elected": 2
+      },
+      {
+        "id": "原田直樹",
+        "rank": 3,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "豊澤健児",
+        "rank": 4,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "南関東選挙区",
+    "party": "れいわ新選組",
+    "seats": 1,
+    "members": [
+      {
+        "id": "たがや亮",
+        "rank": 1,
+        "won": false,
+        "ratio": 49.482,
+        "elected": 1
+      },
+      {
+        "id": "三好りょう",
+        "rank": 1,
+        "won": false,
+        "ratio": 23.032,
+        "elected": null
+      },
+      {
+        "id": "ミサオ・レッドウルフ",
+        "rank": 1,
+        "won": false,
+        "ratio": "×",
+        "elected": null
+      },
+      {
+        "id": "竹内雅浩",
+        "rank": 4,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "南関東選挙区",
+    "party": "日本共産党",
+    "seats": 1,
+    "members": [
+      {
+        "id": "志位和夫",
+        "rank": 1,
+        "won": false,
+        "ratio": null,
+        "elected": 1
+      },
+      {
+        "id": "はたの君枝",
+        "rank": 2,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "さいとう和子",
+        "rank": 3,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "横山せいご",
+        "rank": 4,
+        "won": false,
+        "ratio": "×",
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "南関東選挙区",
+    "party": "国民民主党",
+    "seats": 3,
+    "members": [
+      {
+        "id": "深作ヘスス",
+        "rank": 1,
+        "won": false,
+        "ratio": 78.641,
+        "elected": 1
+      },
+      {
+        "id": "岡野純子",
+        "rank": 1,
+        "won": false,
+        "ratio": 77.286,
+        "elected": 2
+      },
+      {
+        "id": "西岡よしたか",
+        "rank": 1,
+        "won": false,
+        "ratio": 76.634,
+        "elected": 3
+      },
+      {
+        "id": "平戸航太",
+        "rank": 1,
+        "won": false,
+        "ratio": 62.645,
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "南関東選挙区",
+    "party": "参政党",
+    "seats": 1,
+    "members": [
+      {
+        "id": "鈴木あつし",
+        "rank": 1,
+        "won": false,
+        "ratio": null,
+        "elected": 1
+      },
+      {
+        "id": "江岡たかひろ",
+        "rank": 2,
+        "won": false,
+        "ratio": "×",
+        "elected": null
+      },
+      {
+        "id": "藤田しゅういち",
+        "rank": 2,
+        "won": false,
+        "ratio": 18.461,
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "東京都選挙区",
+    "party": "日本共産党",
+    "seats": 1,
+    "members": [
+      {
+        "id": "田村智子",
+        "rank": 1,
+        "won": false,
+        "ratio": null,
+        "elected": 1
+      },
+      {
+        "id": "宮本徹",
+        "rank": 2,
+        "won": false,
+        "ratio": 62.335,
+        "elected": null
+      },
+      {
+        "id": "谷川智行",
+        "rank": 3,
+        "won": false,
+        "ratio": 37.925,
+        "elected": null
+      },
+      {
+        "id": "坂井和歌子",
+        "rank": 4,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "伊藤和子",
+        "rank": 5,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "東京都選挙区",
+    "party": "立憲民主党",
+    "seats": 5,
+    "members": [
+      {
+        "id": "海江田万里",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "手塚よしお",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "落合貴之",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "松尾あきひろ",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "吉田はるみ",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "山岸一生",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "あくつ幸彦",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "酒井なつみ",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "末松義規",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "大河原まさこ",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "山花郁夫",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "伊藤しゅんすけ",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "ながつま昭",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "高松さとし",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "五十嵐えり",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "鈴木ようすけ",
+        "rank": 1,
+        "won": false,
+        "ratio": 99.368,
+        "elected": 1
+      },
+      {
+        "id": "松下玲子",
+        "rank": 1,
+        "won": false,
+        "ratio": 97.796,
+        "elected": 2
+      },
+      {
+        "id": "有田芳生",
+        "rank": 1,
+        "won": false,
+        "ratio": 90.49,
+        "elected": 3
+      },
+      {
+        "id": "あべ祐美子",
+        "rank": 1,
+        "won": false,
+        "ratio": 87.864,
+        "elected": 4
+      },
+      {
+        "id": "柴田かつゆき",
+        "rank": 1,
+        "won": false,
+        "ratio": 84.644,
+        "elected": 5
+      },
+      {
+        "id": "木村たけつか",
+        "rank": 1,
+        "won": false,
+        "ratio": 79.86,
+        "elected": null
+      },
+      {
+        "id": "北出美翔",
+        "rank": 22,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "岩永久佳",
+        "rank": 23,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "本多平直",
+        "rank": 24,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "川島智太郎",
+        "rank": 25,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "東京都選挙区",
+    "party": "れいわ新選組",
+    "seats": 1,
+    "members": [
+      {
+        "id": "くしぶち万里",
+        "rank": 1,
+        "won": false,
+        "ratio": 33.386,
+        "elected": 1
+      },
+      {
+        "id": "よだかれん",
+        "rank": 1,
+        "won": false,
+        "ratio": 26.409,
+        "elected": null
+      },
+      {
+        "id": "伊勢崎賢治",
+        "rank": 3,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "赤木善美",
+        "rank": 4,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "東京都選挙区",
+    "party": "公明党",
+    "seats": 2,
+    "members": [
+      {
+        "id": "河西宏一",
+        "rank": 1,
+        "won": false,
+        "ratio": null,
+        "elected": 1
+      },
+      {
+        "id": "大森江里子",
+        "rank": 2,
+        "won": false,
+        "ratio": null,
+        "elected": 2
+      },
+      {
+        "id": "中村真大",
+        "rank": 3,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "山岡篤史",
+        "rank": 4,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "東京都選挙区",
+    "party": "日本維新の会",
+    "seats": 2,
+    "members": [
+      {
+        "id": "阿部司",
+        "rank": 1,
+        "won": false,
+        "ratio": 75.834,
+        "elected": 1
+      },
+      {
+        "id": "いのくち幸子",
+        "rank": 1,
+        "won": false,
+        "ratio": 65.772,
+        "elected": 2
+      },
+      {
+        "id": "小野たいすけ",
+        "rank": 1,
+        "won": false,
+        "ratio": 54.718,
+        "elected": null
+      },
+      {
+        "id": "おときた駿",
+        "rank": 1,
+        "won": false,
+        "ratio": 50.899,
+        "elected": null
+      },
+      {
+        "id": "今村充",
+        "rank": 1,
+        "won": false,
+        "ratio": 45.208,
+        "elected": null
+      },
+      {
+        "id": "いなば太郎",
+        "rank": 1,
+        "won": false,
+        "ratio": 43.958,
+        "elected": null
+      },
+      {
+        "id": "永野ひろ子",
+        "rank": 1,
+        "won": false,
+        "ratio": 42.309,
+        "elected": null
+      },
+      {
+        "id": "吉平としたか",
+        "rank": 1,
+        "won": false,
+        "ratio": 41.752,
+        "elected": null
+      },
+      {
+        "id": "大豆生田みのる",
+        "rank": 1,
+        "won": false,
+        "ratio": 40.894,
+        "elected": null
+      },
+      {
+        "id": "山下ようこ",
+        "rank": 1,
+        "won": false,
+        "ratio": 40.388,
+        "elected": null
+      },
+      {
+        "id": "えびさわ由紀",
+        "rank": 1,
+        "won": false,
+        "ratio": 40.111,
+        "elected": null
+      },
+      {
+        "id": "中津川ひろさと",
+        "rank": 1,
+        "won": false,
+        "ratio": 39.786,
+        "elected": null
+      },
+      {
+        "id": "宮﨑たろう",
+        "rank": 1,
+        "won": false,
+        "ratio": 37.18,
+        "elected": null
+      },
+      {
+        "id": "石川まさとし",
+        "rank": 1,
+        "won": false,
+        "ratio": 36.95,
+        "elected": null
+      },
+      {
+        "id": "重田じゅんぺい",
+        "rank": 1,
+        "won": false,
+        "ratio": 35.961,
+        "elected": null
+      },
+      {
+        "id": "大河内しげた",
+        "rank": 1,
+        "won": false,
+        "ratio": 31.12,
+        "elected": null
+      },
+      {
+        "id": "河村建一",
+        "rank": 1,
+        "won": false,
+        "ratio": 30.671,
+        "elected": null
+      },
+      {
+        "id": "吉田圭一郎",
+        "rank": 1,
+        "won": false,
+        "ratio": 30.285,
+        "elected": null
+      },
+      {
+        "id": "斉藤かよ",
+        "rank": 1,
+        "won": false,
+        "ratio": 28.509,
+        "elected": null
+      },
+      {
+        "id": "藤川たかし",
+        "rank": 1,
+        "won": false,
+        "ratio": "×",
+        "elected": null
+      },
+      {
+        "id": "さとう由美",
+        "rank": 1,
+        "won": false,
+        "ratio": "×",
+        "elected": null
+      },
+      {
+        "id": "南北ちとせ",
+        "rank": 1,
+        "won": false,
+        "ratio": "×",
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "東京都選挙区",
+    "party": "国民民主党",
+    "seats": 3,
+    "members": [
+      {
+        "id": "円より子",
+        "rank": 1,
+        "won": false,
+        "ratio": 80.587,
+        "elected": 1
+      },
+      {
+        "id": "森ようすけ",
+        "rank": 1,
+        "won": false,
+        "ratio": 77.794,
+        "elected": 2
+      },
+      {
+        "id": "鳩山紀一郎",
+        "rank": 1,
+        "won": false,
+        "ratio": 73.47,
+        "elected": 3
+      },
+      {
+        "id": "伊藤なな",
+        "rank": 1,
+        "won": false,
+        "ratio": 70.141,
+        "elected": null
+      },
+      {
+        "id": "大西けんたろう",
+        "rank": 1,
+        "won": false,
+        "ratio": 70.066,
+        "elected": null
+      },
+      {
+        "id": "奥村よしひろ",
+        "rank": 1,
+        "won": false,
+        "ratio": 68.996,
+        "elected": null
+      },
+      {
+        "id": "大くま利昭",
+        "rank": 1,
+        "won": false,
+        "ratio": 64.641,
+        "elected": null
+      },
+      {
+        "id": "井戸まさえ",
+        "rank": 1,
+        "won": false,
+        "ratio": 59.707,
+        "elected": null
+      },
+      {
+        "id": "たるい良和",
+        "rank": 1,
+        "won": false,
+        "ratio": 52.191,
+        "elected": null
+      },
+      {
+        "id": "おくもとゆり",
+        "rank": 1,
+        "won": false,
+        "ratio": 49.222,
+        "elected": null
+      },
+      {
+        "id": "浦川ゆうすけ",
+        "rank": 1,
+        "won": false,
+        "ratio": 31.121,
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "東京都選挙区",
+    "party": "自由民主党",
+    "seats": 5,
+    "members": [
+      {
+        "id": "清人",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "石原ひろたか",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "平将明",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "鈴木隼人",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "高木けい",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "土田しん",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "松島みどり",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "大西洋平",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "福田かおる",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "木原誠二",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "井上信治",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "安藤たかお",
+        "rank": 1,
+        "won": false,
+        "ratio": 99.336,
+        "elected": 1
+      },
+      {
+        "id": "伊藤達也",
+        "rank": 1,
+        "won": false,
+        "ratio": 96.951,
+        "elected": 2
+      },
+      {
+        "id": "松本洋平",
+        "rank": 1,
+        "won": false,
+        "ratio": 96.795,
+        "elected": 3
+      },
+      {
+        "id": "大空こうき",
+        "rank": 1,
+        "won": false,
+        "ratio": 93.981,
+        "elected": 4
+      },
+      {
+        "id": "長島昭久",
+        "rank": 1,
+        "won": false,
+        "ratio": 93.532,
+        "elected": 5
+      },
+      {
+        "id": "若宮けんじ",
+        "rank": 1,
+        "won": false,
+        "ratio": 83.145,
+        "elected": null
+      },
+      {
+        "id": "門ひろこ",
+        "rank": 1,
+        "won": false,
+        "ratio": 64.386,
+        "elected": null
+      },
+      {
+        "id": "よしわら修",
+        "rank": 1,
+        "won": false,
+        "ratio": 63.614,
+        "elected": null
+      },
+      {
+        "id": "今岡うえき",
+        "rank": 1,
+        "won": false,
+        "ratio": 63.386,
+        "elected": null
+      },
+      {
+        "id": "土屋みわ",
+        "rank": 1,
+        "won": false,
+        "ratio": 59.595,
+        "elected": null
+      },
+      {
+        "id": "黒崎祐一",
+        "rank": 1,
+        "won": false,
+        "ratio": 53.343,
+        "elected": null
+      },
+      {
+        "id": "畦元将吾",
+        "rank": 23,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "廣田千晶",
+        "rank": 24,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "江成道子",
+        "rank": 25,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "松野未佳",
+        "rank": 26,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "岩﨑比菜",
+        "rank": 27,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "内村大地",
+        "rank": 28,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "小嶋友香里",
+        "rank": 29,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "北陸信越選挙区",
+    "party": "日本維新の会",
+    "seats": 1,
+    "members": [
+      {
+        "id": "斉木武志",
+        "rank": 1,
+        "won": false,
+        "ratio": 71.624,
+        "elected": 1
+      },
+      {
+        "id": "手塚大輔",
+        "rank": 1,
+        "won": false,
+        "ratio": 51.651,
+        "elected": null
+      },
+      {
+        "id": "こばやし誠",
+        "rank": 1,
+        "won": false,
+        "ratio": 41.935,
+        "elected": null
+      },
+      {
+        "id": "わかさ清史",
+        "rank": 1,
+        "won": false,
+        "ratio": 31.806,
+        "elected": null
+      },
+      {
+        "id": "あさおか弘彦",
+        "rank": 1,
+        "won": false,
+        "ratio": "×",
+        "elected": null
+      },
+      {
+        "id": "井上もとゆき",
+        "rank": 1,
+        "won": false,
+        "ratio": 23.532,
+        "elected": null
+      },
+      {
+        "id": "石﨑とおる",
+        "rank": 1,
+        "won": false,
+        "ratio": "×",
+        "elected": null
+      },
+      {
+        "id": "よしむらゆういちろう",
+        "rank": 1,
+        "won": false,
+        "ratio": "×",
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "北陸信越選挙区",
+    "party": "公明党",
+    "seats": 1,
+    "members": [
+      {
+        "id": "中川宏昌",
+        "rank": 1,
+        "won": false,
+        "ratio": null,
+        "elected": 1
+      },
+      {
+        "id": "田島公一",
+        "rank": 2,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "北陸信越選挙区",
+    "party": "立憲民主党",
+    "seats": 3,
+    "members": [
+      {
+        "id": "西村ちなみ",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "菊田まきこ",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "黒岩たかひろ",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "米山隆一",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "うめたに守",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "こんどう和也",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "つじ英之",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "しのはら孝",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "下条みつ",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "神津たけし",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "山としひろ",
+        "rank": 1,
+        "won": false,
+        "ratio": 98.392,
+        "elected": 1
+      },
+      {
+        "id": "福田じゅんた",
+        "rank": 1,
+        "won": false,
+        "ratio": 87.856,
+        "elected": 2
+      },
+      {
+        "id": "はたのつばさ",
+        "rank": 1,
+        "won": false,
+        "ratio": 80.924,
+        "elected": 3
+      },
+      {
+        "id": "あらい淳志",
+        "rank": 1,
+        "won": false,
+        "ratio": 79.243,
+        "elected": null
+      },
+      {
+        "id": "おやまだ経子",
+        "rank": 1,
+        "won": false,
+        "ratio": 62.204,
+        "elected": null
+      },
+      {
+        "id": "こしかわ康晴",
+        "rank": 1,
+        "won": false,
+        "ratio": 56.118,
+        "elected": null
+      },
+      {
+        "id": "武居ひろあき",
+        "rank": 17,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "北陸信越選挙区",
+    "party": "国民民主党",
+    "seats": 1,
+    "members": [
+      {
+        "id": "おだけかい",
+        "rank": 1,
+        "won": false,
+        "ratio": 37.423,
+        "elected": 1
+      },
+      {
+        "id": "おおくぼ光太",
+        "rank": 1,
+        "won": false,
+        "ratio": 35.481,
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "北陸信越選挙区",
+    "party": "自由民主党",
+    "seats": 4,
+    "members": [
+      {
+        "id": "国定勇人",
+        "rank": 1,
+        "won": false,
+        "ratio": null,
+        "elected": 1
+      },
+      {
+        "id": "上田英俊",
+        "rank": 2,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "たちばな慶一郎",
+        "rank": 2,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "後藤しげゆき",
+        "rank": 2,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "さいとう洋明",
+        "rank": 2,
+        "won": false,
+        "ratio": 90.224,
+        "elected": 2
+      },
+      {
+        "id": "井出ようせい",
+        "rank": 2,
+        "won": false,
+        "ratio": 81.772,
+        "elected": 3
+      },
+      {
+        "id": "にしだ昭二",
+        "rank": 2,
+        "won": false,
+        "ratio": 79.367,
+        "elected": 4
+      },
+      {
+        "id": "わしお英一郎",
+        "rank": 2,
+        "won": false,
+        "ratio": 76.438,
+        "elected": null
+      },
+      {
+        "id": "つかだ一郎",
+        "rank": 2,
+        "won": false,
+        "ratio": 61.339,
+        "elected": null
+      },
+      {
+        "id": "むたい俊介",
+        "rank": 2,
+        "won": false,
+        "ratio": 54.999,
+        "elected": null
+      },
+      {
+        "id": "西崎萌",
+        "rank": 11,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "古井康介",
+        "rank": 12,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "下神納木加枝",
+        "rank": 13,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "遠藤奈央子",
+        "rank": 14,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "松﨑晃治",
+        "rank": 15,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "佐藤俊",
+        "rank": 16,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "今洋佑",
+        "rank": 17,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "滝沢圭隆",
+        "rank": 18,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "工藤昌克",
+        "rank": 19,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "東海選挙区",
+    "party": "日本維新の会",
+    "seats": 1,
+    "members": [
+      {
+        "id": "杉本和巳",
+        "rank": 1,
+        "won": false,
+        "ratio": 88.718,
+        "elected": 1
+      },
+      {
+        "id": "せき健一郎",
+        "rank": 1,
+        "won": false,
+        "ratio": 63.292,
+        "elected": null
+      },
+      {
+        "id": "岬まき",
+        "rank": 1,
+        "won": false,
+        "ratio": 61.235,
+        "elected": null
+      },
+      {
+        "id": "中田ちよ",
+        "rank": 1,
+        "won": false,
+        "ratio": 35.592,
+        "elected": null
+      },
+      {
+        "id": "山田良司",
+        "rank": 1,
+        "won": false,
+        "ratio": 27.108,
+        "elected": null
+      },
+      {
+        "id": "森口あゆみ",
+        "rank": 1,
+        "won": false,
+        "ratio": 26.288,
+        "elected": null
+      },
+      {
+        "id": "皆川まさかず",
+        "rank": 1,
+        "won": false,
+        "ratio": 26.236,
+        "elected": null
+      },
+      {
+        "id": "伊藤まさし",
+        "rank": 1,
+        "won": false,
+        "ratio": 23.194,
+        "elected": null
+      },
+      {
+        "id": "中川ひろと",
+        "rank": 1,
+        "won": false,
+        "ratio": 22.442,
+        "elected": null
+      },
+      {
+        "id": "山下こうき",
+        "rank": 1,
+        "won": false,
+        "ratio": 19.46,
+        "elected": null
+      },
+      {
+        "id": "かました由佳子",
+        "rank": 1,
+        "won": false,
+        "ratio": "×",
+        "elected": null
+      },
+      {
+        "id": "山本こういち",
+        "rank": 1,
+        "won": false,
+        "ratio": "×",
+        "elected": null
+      },
+      {
+        "id": "むろぞの幸志",
+        "rank": 1,
+        "won": false,
+        "ratio": "×",
+        "elected": null
+      },
+      {
+        "id": "寺島みずひと",
+        "rank": 1,
+        "won": false,
+        "ratio": "×",
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "東海選挙区",
+    "party": "国民民主党",
+    "seats": 1,
+    "members": [
+      {
+        "id": "田中けん",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "丹野みどり",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "日野さりあ",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "福田とおる",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "古川元久",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "せんだあきひろ",
+        "rank": 1,
+        "won": false,
+        "ratio": 65.1,
+        "elected": 1
+      }
+    ]
+  },
+  {
+    "block": "東海選挙区",
+    "party": "公明党",
+    "seats": 2,
+    "members": [
+      {
+        "id": "中川康洋",
+        "rank": 1,
+        "won": false,
+        "ratio": null,
+        "elected": 1
+      },
+      {
+        "id": "西園勝秀",
+        "rank": 2,
+        "won": false,
+        "ratio": null,
+        "elected": 2
+      },
+      {
+        "id": "小林宣子",
+        "rank": 3,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "丹後政明",
+        "rank": 4,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "東海選挙区",
+    "party": "日本保守党",
+    "seats": 1,
+    "members": [
+      {
+        "id": "竹上ゆうこ",
+        "rank": 1,
+        "won": false,
+        "ratio": null,
+        "elected": 1
+      },
+      {
+        "id": "中川健一",
+        "rank": 2,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "織田敏之",
+        "rank": 3,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "中村憲一",
+        "rank": 4,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "青木崇佳",
+        "rank": 5,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "東海選挙区",
+    "party": "日本共産党",
+    "seats": 1,
+    "members": [
+      {
+        "id": "もとむら伸子",
+        "rank": 1,
+        "won": false,
+        "ratio": null,
+        "elected": 1
+      },
+      {
+        "id": "すやま初美",
+        "rank": 2,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "山口ゆうき",
+        "rank": 3,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "東海選挙区",
+    "party": "立憲民主党",
+    "seats": 6,
+    "members": [
+      {
+        "id": "今井まさと",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "小山のぶひろ",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "わたなべ周",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "げんまけんたろう",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "近藤昭一",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "牧義夫",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "西川あつし",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "ばんの豊",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "岡本みつのり",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "藤原のりまさ",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "しげとく和彦",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "おおにし健介",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "しもの幸助",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "松田イサオ",
+        "rank": 1,
+        "won": false,
+        "ratio": 93.733,
+        "elected": 1
+      },
+      {
+        "id": "まのさとし",
+        "rank": 1,
+        "won": false,
+        "ratio": 80.04,
+        "elected": 2
+      },
+      {
+        "id": "おおたけりえ",
+        "rank": 1,
+        "won": false,
+        "ratio": 71.692,
+        "elected": 3
+      },
+      {
+        "id": "鈴木たけゆき",
+        "rank": 1,
+        "won": false,
+        "ratio": 61.833,
+        "elected": 4
+      },
+      {
+        "id": "小山ちほ",
+        "rank": 1,
+        "won": false,
+        "ratio": 60.323,
+        "elected": 5
+      },
+      {
+        "id": "ふくもり和歌子",
+        "rank": 1,
+        "won": false,
+        "ratio": 59.086,
+        "elected": 6
+      },
+      {
+        "id": "青沼陽一郎",
+        "rank": 1,
+        "won": false,
+        "ratio": 55.227,
+        "elected": null
+      },
+      {
+        "id": "吉田つねひこ",
+        "rank": 1,
+        "won": false,
+        "ratio": 50.52,
+        "elected": null
+      },
+      {
+        "id": "日吉雄太",
+        "rank": 1,
+        "won": false,
+        "ratio": 47.57,
+        "elected": null
+      },
+      {
+        "id": "とやまかずゆき",
+        "rank": 1,
+        "won": false,
+        "ratio": 47.235,
+        "elected": null
+      },
+      {
+        "id": "高橋みほ",
+        "rank": 1,
+        "won": false,
+        "ratio": 41.455,
+        "elected": null
+      },
+      {
+        "id": "堀誠",
+        "rank": 25,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "瀧本剛",
+        "rank": 26,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "太田真平",
+        "rank": 27,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "東海選挙区",
+    "party": "自由民主党",
+    "seats": 7,
+    "members": [
+      {
+        "id": "野田聖子",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "たはなし泰文",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "武藤ようじ",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "古屋圭司",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "かみかわ陽子",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "井林たつのり",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "細野豪志",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "城内みのる",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "丹羽ひでき",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "今枝宗一郎",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "田村のりひさ",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "若山しんじ",
+        "rank": 1,
+        "won": false,
+        "ratio": 99.728,
+        "elected": 1
+      },
+      {
+        "id": "ふかざわ陽一",
+        "rank": 1,
+        "won": false,
+        "ratio": 96.789,
+        "elected": 2
+      },
+      {
+        "id": "かつまた孝明",
+        "rank": 1,
+        "won": false,
+        "ratio": 96.033,
+        "elected": 3
+      },
+      {
+        "id": "川崎ひでと",
+        "rank": 1,
+        "won": false,
+        "ratio": 94.427,
+        "elected": 4
+      },
+      {
+        "id": "長坂やすまさ",
+        "rank": 1,
+        "won": false,
+        "ratio": 86.367,
+        "elected": 5
+      },
+      {
+        "id": "工藤彰三",
+        "rank": 1,
+        "won": false,
+        "ratio": 85.419,
+        "elected": 6
+      },
+      {
+        "id": "いとう忠彦",
+        "rank": 1,
+        "won": false,
+        "ratio": 83.138,
+        "elected": 7
+      },
+      {
+        "id": "金子しゅんぺい",
+        "rank": 1,
+        "won": false,
+        "ratio": 74.653,
+        "elected": null
+      },
+      {
+        "id": "山本ゆうぞう",
+        "rank": 1,
+        "won": false,
+        "ratio": 66.903,
+        "elected": null
+      },
+      {
+        "id": "石井たく",
+        "rank": 1,
+        "won": false,
+        "ratio": 65.399,
+        "elected": null
+      },
+      {
+        "id": "いなばだいすけ",
+        "rank": 1,
+        "won": false,
+        "ratio": 57.602,
+        "elected": null
+      },
+      {
+        "id": "水野よしひこ",
+        "rank": 1,
+        "won": false,
+        "ratio": 52.303,
+        "elected": null
+      },
+      {
+        "id": "くまだ裕通",
+        "rank": 1,
+        "won": false,
+        "ratio": 45.371,
+        "elected": null
+      },
+      {
+        "id": "中川たかもと",
+        "rank": 1,
+        "won": false,
+        "ratio": 41.231,
+        "elected": null
+      },
+      {
+        "id": "石原まさたか",
+        "rank": 1,
+        "won": false,
+        "ratio": 41.05,
+        "elected": null
+      },
+      {
+        "id": "山本左近",
+        "rank": 27,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "井澤京子",
+        "rank": 28,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "三澤宏明",
+        "rank": 29,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "伊藤智史",
+        "rank": 30,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "松本忠真",
+        "rank": 31,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "設楽真理子",
+        "rank": 32,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "杉山康弘",
+        "rank": 33,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "世古万美子",
+        "rank": 34,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "岩佐里沙",
+        "rank": 35,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "東海選挙区",
+    "party": "れいわ新選組",
+    "seats": 2,
+    "members": [
+      {
+        "id": "さかぐち直人",
+        "rank": 1,
+        "won": false,
+        "ratio": 48.797,
+        "elected": 1
+      },
+      {
+        "id": "つじ恵",
+        "rank": 1,
+        "won": false,
+        "ratio": "×",
+        "elected": null
+      },
+      {
+        "id": "冨谷こうすけ",
+        "rank": 1,
+        "won": false,
+        "ratio": "×",
+        "elected": null
+      },
+      {
+        "id": "上村英明",
+        "rank": 4,
+        "won": false,
+        "ratio": null,
+        "elected": 2
+      },
+      {
+        "id": "梅村忠司",
+        "rank": 5,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "近畿選挙区",
+    "party": "自由民主党",
+    "seats": 6,
+    "members": [
+      {
+        "id": "小寺ひろお",
+        "rank": 1,
+        "won": false,
+        "ratio": null,
+        "elected": 1
+      },
+      {
+        "id": "石田真敏",
+        "rank": 2,
+        "won": false,
+        "ratio": null,
+        "elected": 2
+      },
+      {
+        "id": "うえの賢一郎",
+        "rank": 3,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "武村のぶひで",
+        "rank": 3,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "勝目やすし",
+        "rank": 3,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "本田太郎",
+        "rank": 3,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "ふじいひさゆき",
+        "rank": 3,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "谷公一",
+        "rank": 3,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "やまだ賢司",
+        "rank": 3,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "松本たけあき",
+        "rank": 3,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "山口つよし",
+        "rank": 3,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "高市早苗",
+        "rank": 3,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "たのせ太道",
+        "rank": 3,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "山本だいち",
+        "rank": 3,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "大岡としたか",
+        "rank": 3,
+        "won": false,
+        "ratio": 94.478,
+        "elected": 3
+      },
+      {
+        "id": "大串まさき",
+        "rank": 3,
+        "won": false,
+        "ratio": 88.186,
+        "elected": 4
+      },
+      {
+        "id": "小林しげき",
+        "rank": 3,
+        "won": false,
+        "ratio": 81.057,
+        "elected": 5
+      },
+      {
+        "id": "島田ともあき",
+        "rank": 3,
+        "won": false,
+        "ratio": 80.365,
+        "elected": 6
+      },
+      {
+        "id": "こうらい啓一郎",
+        "rank": 3,
+        "won": false,
+        "ratio": 78.792,
+        "elected": null
+      },
+      {
+        "id": "塩川憲史",
+        "rank": 3,
+        "won": false,
+        "ratio": 75.018,
+        "elected": null
+      },
+      {
+        "id": "東田じゅんぺい",
+        "rank": 3,
+        "won": false,
+        "ratio": 73.952,
+        "elected": null
+      },
+      {
+        "id": "にかい伸康",
+        "rank": 3,
+        "won": false,
+        "ratio": 69.898,
+        "elected": null
+      },
+      {
+        "id": "とかしきなおみ",
+        "rank": 3,
+        "won": false,
+        "ratio": 69.662,
+        "elected": null
+      },
+      {
+        "id": "そのさき弘道",
+        "rank": 3,
+        "won": false,
+        "ratio": 66.793,
+        "elected": null
+      },
+      {
+        "id": "北川晋平",
+        "rank": 3,
+        "won": false,
+        "ratio": 64.433,
+        "elected": null
+      },
+      {
+        "id": "田中ひでゆき",
+        "rank": 3,
+        "won": false,
+        "ratio": 58.686,
+        "elected": null
+      },
+      {
+        "id": "岡下しょうへい",
+        "rank": 3,
+        "won": false,
+        "ratio": 55.821,
+        "elected": null
+      },
+      {
+        "id": "大西ひろゆき",
+        "rank": 3,
+        "won": false,
+        "ratio": 55.181,
+        "elected": null
+      },
+      {
+        "id": "大さや",
+        "rank": 3,
+        "won": false,
+        "ratio": 51.604,
+        "elected": null
+      },
+      {
+        "id": "もりやま正仁",
+        "rank": 3,
+        "won": false,
+        "ratio": 50.096,
+        "elected": null
+      },
+      {
+        "id": "さの英志",
+        "rank": 3,
+        "won": false,
+        "ratio": 48.649,
+        "elected": null
+      },
+      {
+        "id": "森カンセイ",
+        "rank": 3,
+        "won": false,
+        "ratio": 46.644,
+        "elected": null
+      },
+      {
+        "id": "内田たかつぐ",
+        "rank": 3,
+        "won": false,
+        "ratio": 46.378,
+        "elected": null
+      },
+      {
+        "id": "笠原真吾",
+        "rank": 34,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "樋口清士",
+        "rank": 35,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "原岡惠利子",
+        "rank": 36,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "田起代子",
+        "rank": 37,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "土井正親",
+        "rank": 38,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "近畿選挙区",
+    "party": "日本維新の会",
+    "seats": 7,
+    "members": [
+      {
+        "id": "斎藤アレックス",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "まえはら誠司",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "はぎ原けい",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "林ゆみ",
+        "rank": 1,
+        "won": false,
+        "ratio": 99.825,
+        "elected": 1
+      },
+      {
+        "id": "三木けえ",
+        "rank": 1,
+        "won": false,
+        "ratio": 89.948,
+        "elected": 2
+      },
+      {
+        "id": "徳安淳子",
+        "rank": 1,
+        "won": false,
+        "ratio": 83.793,
+        "elected": 3
+      },
+      {
+        "id": "池畑こうたろう",
+        "rank": 1,
+        "won": false,
+        "ratio": 78.016,
+        "elected": 4
+      },
+      {
+        "id": "いちむら浩一郎",
+        "rank": 1,
+        "won": false,
+        "ratio": 75.468,
+        "elected": 5
+      },
+      {
+        "id": "和田有一朗",
+        "rank": 1,
+        "won": false,
+        "ratio": 69.722,
+        "elected": 6
+      },
+      {
+        "id": "阿部けいし",
+        "rank": 1,
+        "won": false,
+        "ratio": 68.966,
+        "elected": 7
+      },
+      {
+        "id": "でじしんご",
+        "rank": 1,
+        "won": false,
+        "ratio": 67.409,
+        "elected": null
+      },
+      {
+        "id": "住吉ひろき",
+        "rank": 1,
+        "won": false,
+        "ratio": 66.417,
+        "elected": null
+      },
+      {
+        "id": "とくなが久志",
+        "rank": 1,
+        "won": false,
+        "ratio": 63.057,
+        "elected": null
+      },
+      {
+        "id": "堀場さち子",
+        "rank": 1,
+        "won": false,
+        "ratio": 60.066,
+        "elected": null
+      },
+      {
+        "id": "遠藤良太",
+        "rank": 1,
+        "won": false,
+        "ratio": 55.652,
+        "elected": null
+      },
+      {
+        "id": "高野あつし",
+        "rank": 1,
+        "won": false,
+        "ratio": 48.049,
+        "elected": null
+      },
+      {
+        "id": "原山だいすけ",
+        "rank": 1,
+        "won": false,
+        "ratio": 45.353,
+        "elected": null
+      },
+      {
+        "id": "ほりいけんじ",
+        "rank": 1,
+        "won": false,
+        "ratio": 43.464,
+        "elected": null
+      },
+      {
+        "id": "赤木正幸",
+        "rank": 1,
+        "won": false,
+        "ratio": 42.152,
+        "elected": null
+      },
+      {
+        "id": "なかじま秀樹",
+        "rank": 1,
+        "won": false,
+        "ratio": 39.562,
+        "elected": null
+      },
+      {
+        "id": "一谷勇一郎",
+        "rank": 1,
+        "won": false,
+        "ratio": 36.417,
+        "elected": null
+      },
+      {
+        "id": "道本たかや",
+        "rank": 1,
+        "won": false,
+        "ratio": 35.483,
+        "elected": null
+      },
+      {
+        "id": "木村元紀",
+        "rank": 1,
+        "won": false,
+        "ratio": 30.122,
+        "elected": null
+      },
+      {
+        "id": "加古きいちろ",
+        "rank": 1,
+        "won": false,
+        "ratio": 28.773,
+        "elected": null
+      },
+      {
+        "id": "服部ちか",
+        "rank": 1,
+        "won": false,
+        "ratio": 26.723,
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "近畿選挙区",
+    "party": "国民民主党",
+    "seats": 2,
+    "members": [
+      {
+        "id": "向山好一",
+        "rank": 1,
+        "won": false,
+        "ratio": 74.397,
+        "elected": 1
+      },
+      {
+        "id": "平岩まさき",
+        "rank": 1,
+        "won": false,
+        "ratio": 47.988,
+        "elected": 2
+      }
+    ]
+  },
+  {
+    "block": "近畿選挙区",
+    "party": "参政党",
+    "seats": 1,
+    "members": [
+      {
+        "id": "北野ゆうこ",
+        "rank": 1,
+        "won": false,
+        "ratio": 28.018,
+        "elected": 1
+      },
+      {
+        "id": "あだちゆうじ",
+        "rank": 1,
+        "won": false,
+        "ratio": "×",
+        "elected": null
+      },
+      {
+        "id": "あんどう裕",
+        "rank": 1,
+        "won": false,
+        "ratio": "×",
+        "elected": null
+      },
+      {
+        "id": "和泉修",
+        "rank": 4,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "谷浩一郎",
+        "rank": 5,
+        "won": false,
+        "ratio": "×",
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "近畿選挙区",
+    "party": "れいわ新選組",
+    "seats": 2,
+    "members": [
+      {
+        "id": "大石あきこ",
+        "rank": 1,
+        "won": false,
+        "ratio": 30.756,
+        "elected": 1
+      },
+      {
+        "id": "やはた愛",
+        "rank": 1,
+        "won": false,
+        "ratio": 28.138,
+        "elected": 2
+      },
+      {
+        "id": "安持なるみ",
+        "rank": 1,
+        "won": false,
+        "ratio": "×",
+        "elected": null
+      },
+      {
+        "id": "岡田哲扶",
+        "rank": 4,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "堤昌也",
+        "rank": 5,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "近畿選挙区",
+    "party": "公明党",
+    "seats": 3,
+    "members": [
+      { "id": "竹内讓", "rank": 1, "won": false, "ratio": null, "elected": 1 },
+      {
+        "id": "浮島智子",
+        "rank": 2,
+        "won": false,
+        "ratio": null,
+        "elected": 2
+      },
+      {
+        "id": "鰐淵洋子",
+        "rank": 3,
+        "won": false,
+        "ratio": null,
+        "elected": 3
+      },
+      {
+        "id": "大山一平",
+        "rank": 4,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "藤田将一",
+        "rank": 5,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "近畿選挙区",
+    "party": "立憲民主党",
+    "seats": 4,
+    "members": [
+      {
+        "id": "泉ケンタ",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "やまのい和則",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "いさか信彦",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "桜井シュウ",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "まぶちすみお",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "森山ひろゆき",
+        "rank": 1,
+        "won": false,
+        "ratio": 80.493,
+        "elected": 1
+      },
+      {
+        "id": "橋本けいご",
+        "rank": 1,
+        "won": false,
+        "ratio": 79.771,
+        "elected": 2
+      },
+      {
+        "id": "岡田さとる",
+        "rank": 1,
+        "won": false,
+        "ratio": 75.847,
+        "elected": 3
+      },
+      {
+        "id": "尾かな子",
+        "rank": 1,
+        "won": false,
+        "ratio": 74.064,
+        "elected": 4
+      },
+      {
+        "id": "平尾みちお",
+        "rank": 1,
+        "won": false,
+        "ratio": 65.753,
+        "elected": null
+      },
+      {
+        "id": "今泉まお",
+        "rank": 1,
+        "won": false,
+        "ratio": 64.539,
+        "elected": null
+      },
+      {
+        "id": "たむらなおや",
+        "rank": 1,
+        "won": false,
+        "ratio": 61.732,
+        "elected": null
+      },
+      {
+        "id": "おき圭子",
+        "rank": 1,
+        "won": false,
+        "ratio": 58.629,
+        "elected": null
+      },
+      {
+        "id": "ひらたけ耕三",
+        "rank": 1,
+        "won": false,
+        "ratio": 57.459,
+        "elected": null
+      },
+      {
+        "id": "ふなかわ治郎",
+        "rank": 1,
+        "won": false,
+        "ratio": 56.821,
+        "elected": null
+      },
+      {
+        "id": "山本わかこ",
+        "rank": 1,
+        "won": false,
+        "ratio": 56.313,
+        "elected": null
+      },
+      {
+        "id": "まつうらたけし",
+        "rank": 1,
+        "won": false,
+        "ratio": 37.208,
+        "elected": null
+      },
+      {
+        "id": "かわとやすし",
+        "rank": 1,
+        "won": false,
+        "ratio": 35.831,
+        "elected": null
+      },
+      {
+        "id": "村上のりあつ",
+        "rank": 1,
+        "won": false,
+        "ratio": 35.37,
+        "elected": null
+      },
+      {
+        "id": "しんこ祐子",
+        "rank": 1,
+        "won": false,
+        "ratio": 32.58,
+        "elected": null
+      },
+      {
+        "id": "はぎはら仁",
+        "rank": 1,
+        "won": false,
+        "ratio": 30.689,
+        "elected": null
+      },
+      {
+        "id": "おざき充典",
+        "rank": 1,
+        "won": false,
+        "ratio": 28.292,
+        "elected": null
+      },
+      {
+        "id": "福留ヨーコ",
+        "rank": 1,
+        "won": false,
+        "ratio": 25.514,
+        "elected": null
+      },
+      {
+        "id": "西川ひろき",
+        "rank": 24,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "石田京子",
+        "rank": 25,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "永江一之",
+        "rank": 26,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "横田昌三",
+        "rank": 27,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "近畿選挙区",
+    "party": "日本保守党",
+    "seats": 1,
+    "members": [
+      {
+        "id": "島田洋一",
+        "rank": 1,
+        "won": false,
+        "ratio": null,
+        "elected": 1
+      },
+      {
+        "id": "佐々木みのり",
+        "rank": 2,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "百田尚樹",
+        "rank": 3,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "豆谷和男",
+        "rank": 4,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "竹内唯裕",
+        "rank": 5,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "長谷川俊明",
+        "rank": 6,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "近畿選挙区",
+    "party": "日本共産党",
+    "seats": 2,
+    "members": [
+      {
+        "id": "たつみコータロー",
+        "rank": 1,
+        "won": false,
+        "ratio": null,
+        "elected": 1
+      },
+      {
+        "id": "堀川あきこ",
+        "rank": 2,
+        "won": false,
+        "ratio": 50.387,
+        "elected": 2
+      },
+      {
+        "id": "清水ただし",
+        "rank": 3,
+        "won": false,
+        "ratio": 35.679,
+        "elected": null
+      },
+      {
+        "id": "こむら潤",
+        "rank": 4,
+        "won": false,
+        "ratio": 37.435,
+        "elected": null
+      },
+      {
+        "id": "冨士谷かえ子",
+        "rank": 5,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "中国選挙区",
+    "party": "国民民主党",
+    "seats": 1,
+    "members": [
+      {
+        "id": "福田玄",
+        "rank": 1,
+        "won": false,
+        "ratio": 74.814,
+        "elected": 1
+      },
+      {
+        "id": "佐々木ゆうじ",
+        "rank": 1,
+        "won": false,
+        "ratio": 32.715,
+        "elected": null
+      },
+      {
+        "id": "のだきよし",
+        "rank": 1,
+        "won": false,
+        "ratio": 31.823,
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "中国選挙区",
+    "party": "立憲民主党",
+    "seats": 3,
+    "members": [
+      {
+        "id": "亀井亜紀子",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "柚木みちよし",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "佐藤こうじ",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "平岡秀夫",
+        "rank": 1,
+        "won": false,
+        "ratio": 98.356,
+        "elected": 1
+      },
+      {
+        "id": "つむらけいすけ",
+        "rank": 1,
+        "won": false,
+        "ratio": 96.285,
+        "elected": 2
+      },
+      {
+        "id": "あずまかつや",
+        "rank": 1,
+        "won": false,
+        "ratio": 83.033,
+        "elected": 3
+      },
+      {
+        "id": "原田ケンスケ",
+        "rank": 1,
+        "won": false,
+        "ratio": 76.111,
+        "elected": null
+      },
+      {
+        "id": "井上しんや",
+        "rank": 1,
+        "won": false,
+        "ratio": 53.935,
+        "elected": null
+      },
+      {
+        "id": "湯原俊二",
+        "rank": 1,
+        "won": false,
+        "ratio": 53.597,
+        "elected": null
+      },
+      {
+        "id": "大塚さとこ",
+        "rank": 1,
+        "won": false,
+        "ratio": 49.386,
+        "elected": null
+      },
+      {
+        "id": "平本浩一",
+        "rank": 1,
+        "won": false,
+        "ratio": 46.151,
+        "elected": null
+      },
+      {
+        "id": "はたともこ",
+        "rank": 1,
+        "won": false,
+        "ratio": 44.817,
+        "elected": null
+      },
+      {
+        "id": "坂本ふみこ",
+        "rank": 1,
+        "won": false,
+        "ratio": 40.38,
+        "elected": null
+      },
+      {
+        "id": "あさくら浩之",
+        "rank": 1,
+        "won": false,
+        "ratio": "×",
+        "elected": null
+      },
+      {
+        "id": "山本誉",
+        "rank": 15,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "加藤壽彦",
+        "rank": 16,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "中国選挙区",
+    "party": "公明党",
+    "seats": 1,
+    "members": [
+      { "id": "平林晃", "rank": 1, "won": false, "ratio": null, "elected": 1 },
+      {
+        "id": "日下正喜",
+        "rank": 2,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "芳田幸代",
+        "rank": 3,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "中国選挙区",
+    "party": "自由民主党",
+    "seats": 5,
+    "members": [
+      {
+        "id": "新谷正義",
+        "rank": 1,
+        "won": false,
+        "ratio": null,
+        "elected": 1
+      },
+      {
+        "id": "平沼正二郎",
+        "rank": 2,
+        "won": false,
+        "ratio": null,
+        "elected": 2
+      },
+      {
+        "id": "石橋林太郎",
+        "rank": 3,
+        "won": false,
+        "ratio": null,
+        "elected": 3
+      },
+      {
+        "id": "吉田真次",
+        "rank": 4,
+        "won": false,
+        "ratio": null,
+        "elected": 4
+      },
+      {
+        "id": "赤澤りょうせい",
+        "rank": 5,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "高見やすひろ",
+        "rank": 5,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "あいさわ一郎",
+        "rank": 5,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "山下たかし",
+        "rank": 5,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "加藤勝信",
+        "rank": 5,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "小林史明",
+        "rank": 5,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "高村正大",
+        "rank": 5,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "岸のぶちよ",
+        "rank": 5,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "林よしまさ",
+        "rank": 5,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "てらだ稔",
+        "rank": 5,
+        "won": false,
+        "ratio": 97.808,
+        "elected": 5
+      },
+      {
+        "id": "たかがい恵美子",
+        "rank": 5,
+        "won": false,
+        "ratio": 86.056,
+        "elected": null
+      },
+      {
+        "id": "橋本がく",
+        "rank": 5,
+        "won": false,
+        "ratio": 84.577,
+        "elected": null
+      },
+      {
+        "id": "虎井さえこ",
+        "rank": 17,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "大沼みずほ",
+        "rank": 18,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "鶴田亮介",
+        "rank": 19,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "四国選挙区",
+    "party": "立憲民主党",
+    "seats": 1,
+    "members": [
+      {
+        "id": "小川じゅんや",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "白石洋一",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "高橋えい",
+        "rank": 1,
+        "won": false,
+        "ratio": 64.224,
+        "elected": 1
+      },
+      {
+        "id": "武内のりお",
+        "rank": 1,
+        "won": false,
+        "ratio": 62.563,
+        "elected": null
+      },
+      {
+        "id": "越智きよすみ",
+        "rank": 1,
+        "won": false,
+        "ratio": 49.423,
+        "elected": null
+      },
+      {
+        "id": "大岡ひろみ",
+        "rank": 1,
+        "won": false,
+        "ratio": 47.805,
+        "elected": null
+      },
+      {
+        "id": "こうそがべよしみち",
+        "rank": 1,
+        "won": false,
+        "ratio": 30.133,
+        "elected": null
+      },
+      {
+        "id": "渡部昭",
+        "rank": 8,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "四国選挙区",
+    "party": "公明党",
+    "seats": 1,
+    "members": [
+      {
+        "id": "山崎正恭",
+        "rank": 1,
+        "won": false,
+        "ratio": null,
+        "elected": 1
+      },
+      {
+        "id": "久栄正志",
+        "rank": 2,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "四国選挙区",
+    "party": "自由民主党",
+    "seats": 3,
+    "members": [
+      {
+        "id": "村上誠一郎",
+        "rank": 1,
+        "won": false,
+        "ratio": null,
+        "elected": 1
+      },
+      {
+        "id": "仁木博文",
+        "rank": 2,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "大野敬太郎",
+        "rank": 2,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "塩崎あきひさ",
+        "rank": 2,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "長谷川じゅんじ",
+        "rank": 2,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "中谷元",
+        "rank": 2,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "おざき正直",
+        "rank": 2,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "平井卓也",
+        "rank": 2,
+        "won": false,
+        "ratio": 62.662,
+        "elected": 2
+      },
+      {
+        "id": "せと隆一",
+        "rank": 2,
+        "won": false,
+        "ratio": 43.388,
+        "elected": 3
+      },
+      {
+        "id": "山本有二",
+        "rank": 10,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "西内健",
+        "rank": 11,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "増富義明",
+        "rank": 12,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "大石美智子",
+        "rank": 13,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "古川康造",
+        "rank": 14,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "四国選挙区",
+    "party": "国民民主党",
+    "seats": 1,
+    "members": [
+      {
+        "id": "たまき雄一郎",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "いしいともえ",
+        "rank": 1,
+        "won": false,
+        "ratio": 45.871,
+        "elected": 1
+      }
+    ]
+  },
+  {
+    "block": "九州選挙区",
+    "party": "日本共産党",
+    "seats": 1,
+    "members": [
+      {
+        "id": "あかみね政賢",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "田村貴昭",
+        "rank": 2,
+        "won": false,
+        "ratio": null,
+        "elected": 1
+      },
+      {
+        "id": "まつざき真琴",
+        "rank": 3,
+        "won": false,
+        "ratio": "×",
+        "elected": null
+      },
+      {
+        "id": "島袋恵祐",
+        "rank": 4,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "九州選挙区",
+    "party": "れいわ新選組",
+    "seats": 1,
+    "members": [
+      {
+        "id": "山川ひとし",
+        "rank": 1,
+        "won": false,
+        "ratio": 33.095,
+        "elected": 1
+      },
+      {
+        "id": "奥田ふみよ",
+        "rank": 1,
+        "won": false,
+        "ratio": "×",
+        "elected": null
+      },
+      {
+        "id": "度模彌",
+        "rank": 3,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "民田森夫",
+        "rank": 4,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "九州選挙区",
+    "party": "立憲民主党",
+    "seats": 4,
+    "members": [
+      {
+        "id": "いなとみ修二",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "きいたかし",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "原口一博",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "大串ひろし",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "渡辺創",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "川内ひろし",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "野間たけし",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "ヤラともひろ",
+        "rank": 1,
+        "won": false,
+        "ratio": 97.584,
+        "elected": 1
+      },
+      {
+        "id": "吉川はじめ",
+        "rank": 1,
+        "won": false,
+        "ratio": 91.283,
+        "elected": 2
+      },
+      {
+        "id": "山田勝彦",
+        "rank": 1,
+        "won": false,
+        "ratio": 85.132,
+        "elected": 3
+      },
+      {
+        "id": "堤かなめ",
+        "rank": 1,
+        "won": false,
+        "ratio": 79.183,
+        "elected": 4
+      },
+      {
+        "id": "丸尾けいすけ",
+        "rank": 1,
+        "won": false,
+        "ratio": 78.603,
+        "elected": null
+      },
+      {
+        "id": "金城トオル",
+        "rank": 1,
+        "won": false,
+        "ratio": 77.09,
+        "elected": null
+      },
+      {
+        "id": "すえつぐ精一",
+        "rank": 1,
+        "won": false,
+        "ratio": 75.326,
+        "elected": null
+      },
+      {
+        "id": "にえだ元気",
+        "rank": 1,
+        "won": false,
+        "ratio": 69.246,
+        "elected": null
+      },
+      {
+        "id": "小林かやこ",
+        "rank": 1,
+        "won": false,
+        "ratio": 68.964,
+        "elected": null
+      },
+      {
+        "id": "かめだ晃尚",
+        "rank": 1,
+        "won": false,
+        "ratio": 60.033,
+        "elected": null
+      },
+      {
+        "id": "出口しんたろう",
+        "rank": 1,
+        "won": false,
+        "ratio": 58.362,
+        "elected": null
+      },
+      {
+        "id": "笹本ゆきこ",
+        "rank": 1,
+        "won": false,
+        "ratio": 41.411,
+        "elected": null
+      },
+      {
+        "id": "清藤啓",
+        "rank": 20,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "福松節生",
+        "rank": 21,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "九州選挙区",
+    "party": "国民民主党",
+    "seats": 2,
+    "members": [
+      {
+        "id": "西岡秀子",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "長友しんじ",
+        "rank": 1,
+        "won": false,
+        "ratio": 82.836,
+        "elected": 1
+      },
+      {
+        "id": "このみ亮太郎",
+        "rank": 1,
+        "won": false,
+        "ratio": 59.419,
+        "elected": 2
+      },
+      {
+        "id": "近藤まさひこ",
+        "rank": 1,
+        "won": false,
+        "ratio": 53.286,
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "九州選挙区",
+    "party": "日本維新の会",
+    "seats": 1,
+    "members": [
+      {
+        "id": "村上とものぶ",
+        "rank": 1,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "あべひろき",
+        "rank": 1,
+        "won": false,
+        "ratio": 50.407,
+        "elected": 1
+      },
+      {
+        "id": "山本ごうせい",
+        "rank": 1,
+        "won": false,
+        "ratio": 48.781,
+        "elected": null
+      },
+      {
+        "id": "赤嶺ノボル",
+        "rank": 1,
+        "won": false,
+        "ratio": 37.504,
+        "elected": null
+      },
+      {
+        "id": "外山いつき",
+        "rank": 1,
+        "won": false,
+        "ratio": 31.211,
+        "elected": null
+      },
+      {
+        "id": "矢上雅義",
+        "rank": 1,
+        "won": false,
+        "ratio": 30.182,
+        "elected": null
+      },
+      {
+        "id": "ふくなり健太",
+        "rank": 1,
+        "won": false,
+        "ratio": 25.827,
+        "elected": null
+      },
+      {
+        "id": "瀬尾ひでとし",
+        "rank": 1,
+        "won": false,
+        "ratio": 24.495,
+        "elected": null
+      },
+      {
+        "id": "つじ健太郎",
+        "rank": 1,
+        "won": false,
+        "ratio": 24.439,
+        "elected": null
+      },
+      {
+        "id": "松尾よしみつ",
+        "rank": 1,
+        "won": false,
+        "ratio": "×",
+        "elected": null
+      },
+      {
+        "id": "井上翔一朗",
+        "rank": 1,
+        "won": false,
+        "ratio": 21.133,
+        "elected": null
+      },
+      {
+        "id": "山川やすひろ",
+        "rank": 1,
+        "won": false,
+        "ratio": "×",
+        "elected": null
+      },
+      {
+        "id": "本司ゆきひろ",
+        "rank": 1,
+        "won": false,
+        "ratio": "×",
+        "elected": null
+      },
+      {
+        "id": "福本たかし",
+        "rank": 1,
+        "won": false,
+        "ratio": "×",
+        "elected": null
+      },
+      {
+        "id": "横田ともひろ",
+        "rank": 1,
+        "won": false,
+        "ratio": "×",
+        "elected": null
+      },
+      {
+        "id": "山田ひろし",
+        "rank": 1,
+        "won": false,
+        "ratio": "×",
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "九州選挙区",
+    "party": "自由民主党",
+    "seats": 7,
+    "members": [
+      {
+        "id": "あべ俊子",
+        "rank": 1,
+        "won": false,
+        "ratio": null,
+        "elected": 1
+      },
+      {
+        "id": "井上たかひろ",
+        "rank": 2,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "古賀あつし",
+        "rank": 2,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "くりはら渉",
+        "rank": 2,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "はとやま二郎",
+        "rank": 2,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "藤丸さとし",
+        "rank": 2,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "金子容三",
+        "rank": 2,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "木原みのる",
+        "rank": 2,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "西野だいすけ",
+        "rank": 2,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "金子やすし",
+        "rank": 2,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "岩屋たけし",
+        "rank": 2,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "江藤拓",
+        "rank": 2,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "ふるかわよしひさ",
+        "rank": 2,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "島尻あい子",
+        "rank": 2,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "ニシメ恒三郎",
+        "rank": 2,
+        "won": true,
+        "ratio": 100.0,
+        "elected": null
+      },
+      {
+        "id": "みやじ拓馬",
+        "rank": 2,
+        "won": false,
+        "ratio": 96.667,
+        "elected": 2
+      },
+      {
+        "id": "おにき誠",
+        "rank": 2,
+        "won": false,
+        "ratio": 87.718,
+        "elected": 3
+      },
+      {
+        "id": "コクバ幸之助",
+        "rank": 2,
+        "won": false,
+        "ratio": 84.481,
+        "elected": 4
+      },
+      {
+        "id": "岩田かずちか",
+        "rank": 2,
+        "won": false,
+        "ratio": 82.973,
+        "elected": 5
+      },
+      {
+        "id": "古川やすし",
+        "rank": 2,
+        "won": false,
+        "ratio": 80.093,
+        "elected": 6
+      },
+      {
+        "id": "ミヤザキ政久",
+        "rank": 2,
+        "won": false,
+        "ratio": 77.221,
+        "elected": 7
+      },
+      {
+        "id": "吉村はるか",
+        "rank": 2,
+        "won": false,
+        "ratio": 75.586,
+        "elected": null
+      },
+      {
+        "id": "えとう博昭",
+        "rank": 2,
+        "won": false,
+        "ratio": 72.809,
+        "elected": null
+      },
+      {
+        "id": "小里やすひろ",
+        "rank": 2,
+        "won": false,
+        "ratio": 71.65,
+        "elected": null
+      },
+      {
+        "id": "やすおか宏武",
+        "rank": 2,
+        "won": false,
+        "ratio": 68.22,
+        "elected": null
+      },
+      {
+        "id": "たけい俊輔",
+        "rank": 2,
+        "won": false,
+        "ratio": 61.943,
+        "elected": null
+      },
+      {
+        "id": "下条博文",
+        "rank": 2,
+        "won": false,
+        "ratio": 55.114,
+        "elected": null
+      },
+      {
+        "id": "藥師寺道代",
+        "rank": 28,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "かわの正美",
+        "rank": 29,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "島田ちやこ",
+        "rank": 30,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "九州選挙区",
+    "party": "公明党",
+    "seats": 3,
+    "members": [
+      {
+        "id": "濵地雅一",
+        "rank": 1,
+        "won": false,
+        "ratio": null,
+        "elected": 1
+      },
+      {
+        "id": "吉田宣弘",
+        "rank": 2,
+        "won": false,
+        "ratio": null,
+        "elected": 2
+      },
+      {
+        "id": "金城泰邦",
+        "rank": 3,
+        "won": false,
+        "ratio": null,
+        "elected": 3
+      },
+      {
+        "id": "吉田久美子",
+        "rank": 4,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "小野光久",
+        "rank": 5,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      },
+      {
+        "id": "時任伸一",
+        "rank": 6,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      }
+    ]
+  },
+  {
+    "block": "九州選挙区",
+    "party": "参政党",
+    "seats": 1,
+    "members": [
+      {
+        "id": "吉川りな",
+        "rank": 1,
+        "won": false,
+        "ratio": null,
+        "elected": 1
+      },
+      {
+        "id": "野中しんすけ",
+        "rank": 2,
+        "won": false,
+        "ratio": "×",
+        "elected": null
+      },
+      {
+        "id": "黒石隆太",
+        "rank": 2,
+        "won": false,
+        "ratio": "×",
+        "elected": null
+      },
+      {
+        "id": "吉川こうじ",
+        "rank": 4,
+        "won": false,
+        "ratio": null,
+        "elected": null
+      }
+    ]
+  }
+]

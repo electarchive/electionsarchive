@@ -5,6 +5,7 @@ export type Candidate = {
   rank?: number | null | undefined;
   votes?: number | null | undefined;
   share?: number | null | undefined;
+  constituency?: { votes: number; valid: number; most: number } | undefined;
 };
 export type Slate = {
   id: string;
@@ -20,6 +21,10 @@ export type Filled = {
 
 const byRank = (a: Candidate, b: Candidate) =>
   (a.rank ?? Infinity) - (b.rank ?? Infinity);
+const ratio = ({ constituency }: Candidate) =>
+  constituency == null || constituency.most === 0
+    ? 0
+    : constituency.votes / constituency.most;
 const byVotes = (a: Candidate, b: Candidate) =>
   (b.votes ?? 0) - (a.votes ?? 0) || byRank(a, b);
 
@@ -31,13 +36,22 @@ export function fill(
   quotient = 0,
 ): Filled {
   const floor = (lists.individual ?? 0) * quotient;
+  const forfeit = lists.forfeit;
   const eligible = candidates.filter(
-    ({ id, votes }) => !skip.has(id) && (votes ?? 0) >= floor,
+    ({ id, votes, constituency }) =>
+      !skip.has(id) &&
+      (votes ?? 0) >= floor &&
+      (forfeit == null ||
+        constituency == null ||
+        constituency.votes >= forfeit * constituency.valid),
   );
+  const isBestLoser = lists.order === "closed" && lists.tied === "best_loser";
   let ordered: Array<Candidate>;
   switch (lists.order) {
     case "closed": {
-      ordered = eligible.toSorted(byRank);
+      ordered = eligible.toSorted(
+        isBestLoser ? (a, b) => byRank(a, b) || ratio(b) - ratio(a) : byRank,
+      );
       break;
     }
     case "open": {
@@ -67,9 +81,13 @@ export function fill(
   const last = ordered[seats - 1];
   const next = ordered[seats];
   const standing = (candidate: Candidate) =>
-    lists.order === "share" ? candidate.share : candidate.votes;
+    lists.order === "share"
+      ? candidate.share
+      : isBestLoser
+        ? `${candidate.rank}:${ratio(candidate)}`
+        : candidate.votes;
   const tied =
-    (lists.order === "open" || lists.order === "share") &&
+    (lists.order === "open" || lists.order === "share" || isBestLoser) &&
     last != null &&
     next != null &&
     standing(last) === standing(next)

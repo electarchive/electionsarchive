@@ -12,6 +12,8 @@ const lists = v.optional(
     individual: v.optional(v.pipe(v.number(), v.minValue(0), v.maxValue(1))),
     constituencies: v.optional(v.picklist(["skip", "all", "covered"])),
     multiple: v.optional(v.picklist(["lowest_share"])),
+    tied: v.optional(v.picklist(["best_loser"])),
+    forfeit: v.optional(v.pipe(v.number(), v.minValue(0), v.maxValue(1))),
     exhausted: v.optional(v.picklist(["vacant", "elsewhere"]), "vacant"),
     vacancy: v.picklist([
       "next_on_list",

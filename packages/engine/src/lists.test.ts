@@ -3,6 +3,7 @@ import acre from "./fixtures/acre-2022-lists.json" with { type: "json" };
 import germany from "./fixtures/germany-2025-lists.json" with { type: "json" };
 import germanyEuropean from "./fixtures/germany-ep-2024-lists.json" with { type: "json" };
 import italy from "./fixtures/italy-2022-lists.json" with { type: "json" };
+import japan from "./fixtures/japan-representatives-2024-lists.json" with { type: "json" };
 import zurich from "./fixtures/zurich-2023-lists.json" with { type: "json" };
 import { cover, fill, proclaim } from "./lists.ts";
 
@@ -37,6 +38,48 @@ describe("closed lists", () => {
         declared(list.members),
       );
     }
+  });
+});
+
+describe("tied closed-list ranks", () => {
+  it("reproduces the 2024 House of Representatives' proportional members in declared order", () => {
+    const rules = {
+      ...closed,
+      constituencies: "skip",
+      exhausted: "elsewhere",
+      tied: "best_loser",
+      forfeit: 0.1,
+    } as const;
+    let seats = 0;
+    for (const list of japan) {
+      const members = list.members
+        .toReversed()
+        .map(({ id, rank, ratio }) => ({
+          id,
+          rank,
+          constituency:
+            ratio == null
+              ? undefined
+              : {
+                  votes: typeof ratio === "number" ? ratio : 0,
+                  valid: 100,
+                  most: 100,
+                },
+        }));
+      const won = new Set(
+        list.members.filter(({ won }) => won).map(({ id }) => id),
+      );
+      const expected = list.members
+        .filter(({ elected }) => elected != null)
+        .toSorted((a, b) => (a.elected ?? 0) - (b.elected ?? 0))
+        .map(({ id }) => id);
+      expect(
+        fill(rules, list.seats, members, won),
+        `${list.block} ${list.party}`,
+      ).toEqual({ elected: expected, short: 0, tie: undefined });
+      seats += list.seats;
+    }
+    expect(seats).toBe(176);
   });
 });
 

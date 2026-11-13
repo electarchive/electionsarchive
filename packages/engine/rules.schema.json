@@ -433,6 +433,17 @@
               ],
               "type": "string"
             },
+            "tied": {
+              "enum": [
+                "best_loser"
+              ],
+              "type": "string"
+            },
+            "forfeit": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
             "exhausted": {
               "enum": [
                 "vacant",
@@ -873,6 +884,17 @@
                 "lowest_share"
               ],
               "type": "string"
+            },
+            "tied": {
+              "enum": [
+                "best_loser"
+              ],
+              "type": "string"
+            },
+            "forfeit": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
             },
             "exhausted": {
               "enum": [
@@ -1371,6 +1393,17 @@
                 "lowest_share"
               ],
               "type": "string"
+            },
+            "tied": {
+              "enum": [
+                "best_loser"
+              ],
+              "type": "string"
+            },
+            "forfeit": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
             },
             "exhausted": {
               "enum": [
