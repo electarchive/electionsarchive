@@ -212,16 +212,17 @@ def emit() -> Path:
         for edition, item in ITEMS.items():
             title = f"Statistisches Jahrbuch für das Deutsche Reich {edition}"
             sources[edition] = cs.source(publisher, title)
-            cs.add(
-                "source",
-                id=sources[edition],
-                kind="official_body",
-                publisher=publisher,
-                title=title,
-                url=f"https://archive.org/details/{item}",
-                license="Public domain (official work of the German Reich)",
-                license_url=None,
-            )
+            if sources[edition] in cs.minted:
+                cs.add(
+                    "source",
+                    id=sources[edition],
+                    kind="official_body",
+                    publisher=publisher,
+                    title=title,
+                    url=f"https://archive.org/details/{item}",
+                    license="Public domain (official work of the German Reich)",
+                    license_url=None,
+                )
         for (edition, page), leaf in LEAVES.items():
             artifact = cs.artifact(raw.cached(SOURCE, url(edition, leaf)), sources[edition])
             key, width, height = image(edition, page)
