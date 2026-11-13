@@ -1,0 +1,4071 @@
+{
+  "polity": "US-TX",
+  "publisher": "Texas Secretary of State",
+  "title": "Supplemental Biennial Report of the Secretary of State of the State of Texas, 1908, returns of the general election 1908-11-03 by counties",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/biennialreportof1903texa/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/biennialreportof1903texa"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "governor": {
+      "year": 1908,
+      "chamber": "governor",
+      "day": "1908-11-03",
+      "special": false,
+      "state": "TX",
+      "district": null
+    },
+    "president": {
+      "year": 1908,
+      "chamber": "president",
+      "day": "1908-11-03",
+      "special": false,
+      "state": "TX",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 730,
+      "id": "730-0",
+      "columns": [
+        {
+          "label": "Thos. M. Campbell.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John N. Simpson.",
+          "contest": "governor",
+          "candidate": "John N. Simpson"
+        },
+        {
+          "label": "J. C. Rhodes.",
+          "contest": "governor",
+          "candidate": "J. C. Rhodes"
+        },
+        {
+          "label": "Wm. B. Cook.",
+          "contest": "governor",
+          "candidate": "W. B. Cook"
+        },
+        {
+          "label": "E. C. Heath.",
+          "contest": "governor",
+          "candidate": "Ephraim C. Heath"
+        },
+        {
+          "label": "A. B. Davidson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Chas. W. Ogden.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Ed. Rogers.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Nat. B. Hunt.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "I. Goodman.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "G. H. Wilson.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.049,
+        0.118,
+        0.941,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Returns of an election held November 3, 1908. For Governor and Lieutenant Governor.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1519
+      ]
+    },
+    {
+      "page": 731,
+      "id": "731-0",
+      "columns": [
+        {
+          "label": "Thos. M. Campbell.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John N. Simpson.",
+          "contest": "governor",
+          "candidate": "John N. Simpson"
+        },
+        {
+          "label": "J. C. Rhodes.",
+          "contest": "governor",
+          "candidate": "J. C. Rhodes"
+        },
+        {
+          "label": "Wm. B. Cook.",
+          "contest": "governor",
+          "candidate": "W. B. Cook"
+        },
+        {
+          "label": "E. C. Heath.",
+          "contest": "governor",
+          "candidate": "Ephraim C. Heath"
+        },
+        {
+          "label": "A. B. Davidson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Chas. W. Ogden.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Ed. Rogers.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Nat. B. Hunt.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "I. Goodman.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "G. H. Wilson.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.031,
+        0.263,
+        0.93,
+        1.0
+      ],
+      "hint": "Read only the table headed 'RETURNS OF AN ELECTION HELD NOVEMBER 3, 1908. For Governor and Lieutenant Governor\u2014continued.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        -0.0095
+      ]
+    },
+    {
+      "page": 732,
+      "id": "732-0",
+      "columns": [
+        {
+          "label": "Thos. M. Campbell.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John N. Simpson.",
+          "contest": "governor",
+          "candidate": "John N. Simpson"
+        },
+        {
+          "label": "J. C. Rhodes.",
+          "contest": "governor",
+          "candidate": "J. C. Rhodes"
+        },
+        {
+          "label": "Wm. B. Cook.",
+          "contest": "governor",
+          "candidate": "W. B. Cook"
+        },
+        {
+          "label": "E. C. Heath.",
+          "contest": "governor",
+          "candidate": "Ephraim C. Heath"
+        },
+        {
+          "label": "A. B. Davidson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Chas. W. Ogden.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Ed. Rogers.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Nat. B. Hunt.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "I. Goodman.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "G. H. Wilson.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.053,
+        0.268,
+        0.941,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Returns of an election held November 3, 1908. For Governor and Lieutenant Governor\u2014continued'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        -0.0082
+      ]
+    },
+    {
+      "page": 733,
+      "id": "733-0",
+      "columns": [
+        {
+          "label": "Thos. M. Campbell.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John N. Simpson.",
+          "contest": "governor",
+          "candidate": "John N. Simpson"
+        },
+        {
+          "label": "J. C. Rhodes.",
+          "contest": "governor",
+          "candidate": "J. C. Rhodes"
+        },
+        {
+          "label": "Wm. B. Cook.",
+          "contest": "governor",
+          "candidate": "W. B. Cook"
+        },
+        {
+          "label": "E. C. Heath.",
+          "contest": "governor",
+          "candidate": "Ephraim C. Heath"
+        },
+        {
+          "label": "A. B. Davidson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Chas. W. Ogden.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Ed. Rogers.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Nat. B. Hunt.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "I. Goodman.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "G. H. Wilson.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.065,
+        0.302,
+        0.965,
+        0.701
+      ],
+      "hint": "Read only the table headed 'For Governor and Lieutenant Governor\u2014continued.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 757,
+      "id": "757-0",
+      "columns": [
+        {
+          "label": "Hardy O'Neal",
+          "contest": "president",
+          "candidate": "William Jennings Bryan (Democratic)"
+        },
+        {
+          "label": "Jed C. Adams",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "N. P. Doak",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. W. Dies",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W W Moore",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R. S. Fulton",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Thomas D. Isbell",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. W. Woods",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Joseph Adams",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. A. Berry",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "G. L. Haidusek",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Lee J. Roundtree",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "S. P. York",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. H. Hawkins",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. B. Edwards",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "L. L. Shields",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Edgar Von Boeckmann, Sr.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. O. Son",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.018,
+        0.141,
+        0.909,
+        1.0
+      ],
+      "hint": "Read only the table headed 'DEMOCRATIC'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2992
+      ]
+    },
+    {
+      "page": 758,
+      "id": "758-0",
+      "columns": [
+        {
+          "label": "Hardy O'Neal",
+          "contest": "president",
+          "candidate": "William Jennings Bryan (Democratic)"
+        },
+        {
+          "label": "Jed C. Adams",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "N. P. Doak",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. W. Dies",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W W Moore",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R. S. Fulton",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Thomas D. Isbell",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. W. Woods",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Joseph Adams",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. A. Berry",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "G. L. Haidusek",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Lee J. Roundtree",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "S. P. York",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. H. Hawkins",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. B. Edwards",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "L. L. Shields",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Edgar Von Boeckmann, Sr.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. O. Son",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.018,
+        0.0,
+        0.909,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings.",
+      "turn": -90
+    },
+    {
+      "page": 759,
+      "id": "759-0",
+      "columns": [
+        {
+          "label": "Hardy O'Neal",
+          "contest": "president",
+          "candidate": "William Jennings Bryan (Democratic)"
+        },
+        {
+          "label": "Jed C. Adams",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "N. P. Doak",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. W. Dies",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W W Moore",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R. S. Fulton",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Thomas D. Isbell",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. W. Woods",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Joseph Adams",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. A. Berry",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "G. L. Haidusek",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Lee J. Roundtree",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "S. P. York",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. H. Hawkins",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. B. Edwards",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "L. L. Shields",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Edgar Von Boeckmann, Jr.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. O. Son",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.013,
+        0.131,
+        0.917,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Returns of an Election Held November 3, 1908. For Electors for President and Vice-President\u2014continued. Democratic.'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3153
+      ]
+    },
+    {
+      "page": 760,
+      "id": "760-0",
+      "columns": [
+        {
+          "label": "Hardy O'Neal",
+          "contest": "president",
+          "candidate": "William Jennings Bryan (Democratic)"
+        },
+        {
+          "label": "Jed C. Adams",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "N. P. Doak",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. W. Dies",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W W Moore",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R. S. Fulton",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Thomas D. Isbell",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. W. Woods",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Joseph Adams",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. A. Berry",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "G. L. Haidusek",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Lee J. Roundtree",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "S. P. York",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. H. Hawkins",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. B. Edwards",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "L. L. Shields",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Edgar Von Boeckmann, Jr.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. O. Son",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.013,
+        0.0,
+        0.917,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings.",
+      "turn": -90
+    },
+    {
+      "page": 761,
+      "id": "761-0",
+      "columns": [
+        {
+          "label": "Hardy O'Neal.",
+          "contest": "president",
+          "candidate": "William Jennings Bryan (Democratic)"
+        },
+        {
+          "label": "Jed C. Adams.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "N. P. Doak.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. W. Dies.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W W Moore.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R. S. Fulton.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Thomas D. Isbell.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. W. Woods.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Joseph Adams.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. A. Berry.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "G. L. Haidusek.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Lee J. Roundtree.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "S. P. York.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. H. Hawkins.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. B. Edwards.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "L. L. Shields.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Edgar Von Boeckmann, Jr.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. C. Son.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.022,
+        0.368,
+        0.923,
+        1.0
+      ],
+      "hint": "Read only the table headed 'DEMOCRATIC. For Electors for President and Vice-President\u2014continued.'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 2,
+      "header": [
+        0.0,
+        -0.0095
+      ]
+    },
+    {
+      "page": 762,
+      "id": "762-0",
+      "columns": [
+        {
+          "label": "Hardy O'Neal.",
+          "contest": "president",
+          "candidate": "William Jennings Bryan (Democratic)"
+        },
+        {
+          "label": "Jed C. Adams.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "N. P. Doak.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. W. Dies.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W W Moore.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R. S. Fulton.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Thomas D. Isbell.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. W. Woods.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Joseph Adams.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. A. Berry.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "G. L. Haidusek.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Lee J. Roundtree.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "S. P. York.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. H. Hawkins.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. B. Edwards.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "L. L. Shields.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Edgar Von Boeckmann, Jr.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. C. Son.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.022,
+        0.0,
+        0.923,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings.",
+      "turn": -90
+    },
+    {
+      "page": 763,
+      "id": "763-0",
+      "columns": [
+        {
+          "label": "N. V. Dittlinger",
+          "contest": "president",
+          "candidate": "William Howard Taft (Republican)"
+        },
+        {
+          "label": "R. E. Hannay",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. E. Singleton, Jr.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. H. Kurth",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "S. D. Waldrip",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "O. F. Johnson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "S. S. Conner",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "T. A. Pope",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "G. W. Burkitt",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. A. Matthaei",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. B. Barden",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. C. Bartholomew",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "F. H. Baker",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "T. H. Baker",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. F. Featherstone",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Alfred Vander Stucken",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. O. Scott",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Scott White",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.017,
+        0.118,
+        0.912,
+        1.0
+      ],
+      "hint": "Read only the table headed 'For Electors for President and Vice-President. REPUBLICAN.'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2982
+      ]
+    },
+    {
+      "page": 764,
+      "id": "764-0",
+      "columns": [
+        {
+          "label": "N. V. Dittlinger",
+          "contest": "president",
+          "candidate": "William Howard Taft (Republican)"
+        },
+        {
+          "label": "R. E. Hannay",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. E. Singleton, Jr.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. H. Kurth",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "S. D. Waldrip",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "O. F. Johnson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "S. S. Conner",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "T. A. Pope",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "G. W. Burkitt",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. A. Matthaei",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. B. Barden",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. C. Bartholomew",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "F. H. Baker",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "T. H. Baker",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. F. Featherstone",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Alfred Vander Stucken",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. O. Scott",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Scott White",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.017,
+        0.0,
+        0.912,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings.",
+      "turn": -90
+    },
+    {
+      "page": 765,
+      "id": "765-0",
+      "columns": [
+        {
+          "label": "N. V. Dittlinger.",
+          "contest": "president",
+          "candidate": "William Howard Taft (Republican)"
+        },
+        {
+          "label": "R. E. Hannay.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. E. Singleton, Jr.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. H. Kurth.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "S. D. Waldrip.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "O. F. Johnson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "S. S. Conner.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "T. A. Pope.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "G. W. Burkitt.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. A. Matthaei.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. B. Barden.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. C. Bartholomew.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "F. H. Baker.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "T. H. Baker.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. F. Featherstone.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Alfred Vander Stucken.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. C. Scott.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Scott White.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.012,
+        0.439,
+        0.915,
+        1.0
+      ],
+      "hint": "Read only the table headed 'For Electors for President and Vice-President\u2014continued.'; ignore any other table visible in the image.",
+      "turn": -90
+    },
+    {
+      "page": 766,
+      "id": "766-0",
+      "columns": [
+        {
+          "label": "N. V. Dittlinger.",
+          "contest": "president",
+          "candidate": "William Howard Taft (Republican)"
+        },
+        {
+          "label": "R. E. Hannay.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. E. Singleton, Jr.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. H. Kurth.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "S. D. Waldrip.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "O. F. Johnson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "S. S. Conner.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "T. A. Pope.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "G. W. Burkitt.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. A. Matthaei.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. B. Barden.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. C. Bartholomew.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "F. H. Baker.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "T. H. Baker.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. F. Featherstone.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Alfred Vander Stucken.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. C. Scott.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Scott White.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.012,
+        0.0,
+        0.915,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings.",
+      "turn": -90
+    },
+    {
+      "page": 767,
+      "id": "767-0",
+      "columns": [
+        {
+          "label": "N. V. Dittinger",
+          "contest": "president",
+          "candidate": "William Howard Taft (Republican)"
+        },
+        {
+          "label": "R. E. Hannay",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. E. Singleton, Jr.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. H. Kurth",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "S. D. Waldrip",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "O. F. Johnson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "S. S. Conner",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "T. A. Pope",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "G. W. Burkitt",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. A. Matthael",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. B. Barden",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. C. Bartholomew",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "F. H. Baker",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "T. H. Baker",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. F. Featherstone",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Alfred Vander Stucken",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. C. Scott",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Scott White",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.01,
+        0.432,
+        0.911,
+        1.0
+      ],
+      "hint": "Read only the table headed 'For Electors for President and Vice-President\u2014continued. REPUBLICAN.'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 2,
+      "header": [
+        0.0,
+        -0.0299
+      ]
+    },
+    {
+      "page": 768,
+      "id": "768-0",
+      "columns": [
+        {
+          "label": "N. V. Dittinger",
+          "contest": "president",
+          "candidate": "William Howard Taft (Republican)"
+        },
+        {
+          "label": "R. E. Hannay",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. E. Singleton, Jr.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. H. Kurth",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "S. D. Waldrip",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "O. F. Johnson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "S. S. Conner",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "T. A. Pope",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "G. W. Burkitt",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. A. Matthael",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. B. Barden",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. C. Bartholomew",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "F. H. Baker",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "T. H. Baker",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. F. Featherstone",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Alfred Vander Stucken",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. C. Scott",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Scott White",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.01,
+        0.0,
+        0.911,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings.",
+      "turn": -90
+    },
+    {
+      "page": 769,
+      "id": "769-0",
+      "columns": [
+        {
+          "label": "J. M. Mallett.",
+          "contest": "president",
+          "candidate": "Thomas Watson (People's)"
+        },
+        {
+          "label": "H. M. McCuistion.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. L. Darwin.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. S. Smith.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. M. Perdue.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. L. Webb.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "F. M. Hooks.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. G. Sessions.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. M. Garner.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. M. Pettigrew.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Jno. L. Moony.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. M. Horner.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. F. Douthitt.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "F. S. Taylor.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C. J. Van Meter.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "S. H. Holland.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "M. W. C. Frazier.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. L. Gross.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.016,
+        0.02,
+        0.834,
+        1.0
+      ],
+      "hint": "Read only the table headed 'For Electors for President and Vice-President'; ignore any other table visible in the image.",
+      "turn": 180,
+      "bands": 3,
+      "header": [
+        0.0,
+        0.8908
+      ]
+    },
+    {
+      "page": 771,
+      "id": "771-0",
+      "columns": [
+        {
+          "label": "J. M. Mallett.",
+          "contest": "president",
+          "candidate": "Thomas Watson (People's)"
+        },
+        {
+          "label": "H. M. McCuistion.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. L. Darwin.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. S. Smith.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. M. Perdue.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. L. Webb.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "F. M. Hooks.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. G. Sessions.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. M. Garner.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. M. Pettigrew.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Jno. L. Moony.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. M. Horner.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. F. Douthitt.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "F. S. Taylor.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "O. J. Van Meter.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "S. H. Holland.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "M. W. O. Frazier.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. L. Gross.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.014,
+        0.405,
+        0.913,
+        1.0
+      ],
+      "hint": "Read only the table headed \"Returns of an election held November 3, 1908. For Electors for President and Vice-President\u2014continued. PEOPLE'S.\"; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 2,
+      "header": [
+        0.0,
+        -0.0084
+      ]
+    },
+    {
+      "page": 772,
+      "id": "772-0",
+      "columns": [
+        {
+          "label": "J. M. Mallett.",
+          "contest": "president",
+          "candidate": "Thomas Watson (People's)"
+        },
+        {
+          "label": "H. M. McCuistion.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. L. Darwin.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. S. Smith.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. M. Perdue.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. L. Webb.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "F. M. Hooks.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. G. Sessions.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. M. Garner.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. M. Pettigrew.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Jno. L. Moony.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. M. Horner.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. F. Douthitt.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "F. S. Taylor.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "O. J. Van Meter.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "S. H. Holland.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "M. W. O. Frazier.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. L. Gross.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.014,
+        0.0,
+        0.913,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings.",
+      "turn": -90
+    },
+    {
+      "page": 773,
+      "id": "773-0",
+      "columns": [
+        {
+          "label": "J. M. Mallett.",
+          "contest": "president",
+          "candidate": "Thomas Watson (People's)"
+        },
+        {
+          "label": "H. M. McCuistion.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. L. Darwin.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. S. Smith.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. M. Perdue.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. L. Webb.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "F. M. Hooks.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. G. Sessions.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. M. Garner.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. M. Pettigrew.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Jno. L. Moony.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. M. Horner.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. F. Douthitt.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "F. S. Taylor.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C. J. Van Meter.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "S. H. Holland.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "M. W. C. Frazier.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. L. Gross.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.012,
+        0.429,
+        0.917,
+        1.0
+      ],
+      "hint": "Read only the table headed 'For Electors for President and Vice-President\u2014continued.'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 2,
+      "header": [
+        0.0,
+        -0.0298
+      ]
+    },
+    {
+      "page": 774,
+      "id": "774-0",
+      "columns": [
+        {
+          "label": "J. M. Mallett.",
+          "contest": "president",
+          "candidate": "Thomas Watson (People's)"
+        },
+        {
+          "label": "H. M. McCuistion.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. L. Darwin.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. S. Smith.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. M. Perdue.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. L. Webb.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "F. M. Hooks.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. G. Sessions.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. M. Garner.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. M. Pettigrew.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Jno. L. Moony.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. M. Horner.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. F. Douthitt.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "F. S. Taylor.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C. J. Van Meter.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "S. H. Holland.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "M. W. C. Frazier.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. L. Gross.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.012,
+        0.0,
+        0.917,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings.",
+      "turn": -90
+    },
+    {
+      "page": 775,
+      "id": "775-0",
+      "columns": [
+        {
+          "label": "Arthur A. Everts",
+          "contest": "president",
+          "candidate": "Eugene Chafin (Prohibition)"
+        },
+        {
+          "label": "H. G. Damon",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. T. Conway",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. H. Baxter",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. A. Duncan",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "N. W. Godbolt",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "D. M. Prendergast",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "L. B. Coker",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R. E. Burt",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. W. Vogan",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "F. T. Ramsey",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. B. Thompson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R. Clark",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C. Goodnight",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "S. A. Steele",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "L. J. Winters",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C. W. Cowden",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. A. Maples",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.016,
+        0.138,
+        0.917,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Returns of an Election Held November 3, 1908. For Electors for President and Vice-President. PROHIBITION.'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3144
+      ]
+    },
+    {
+      "page": 776,
+      "id": "776-0",
+      "columns": [
+        {
+          "label": "Arthur A. Everts",
+          "contest": "president",
+          "candidate": "Eugene Chafin (Prohibition)"
+        },
+        {
+          "label": "H. G. Damon",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. T. Conway",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. H. Baxter",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. A. Duncan",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "N. W. Godbolt",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "D. M. Prendergast",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "L. B. Coker",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R. E. Burt",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. W. Vogan",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "F. T. Ramsey",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. B. Thompson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R. Clark",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C. Goodnight",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "S. A. Steele",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "L. J. Winters",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C. W. Cowden",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. A. Maples",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.016,
+        0.0,
+        0.917,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings.",
+      "turn": -90
+    },
+    {
+      "page": 777,
+      "id": "777-0",
+      "columns": [
+        {
+          "label": "Arthur A. Everts",
+          "contest": "president",
+          "candidate": "Eugene Chafin (Prohibition)"
+        },
+        {
+          "label": "H. G. Damon",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. T. Conway",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. H. Baxter",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. A. Duncan",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "N. W. Godbolt",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "D. M. Prendergast",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "L. B. Coker",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R. E. Burt",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. W. Vogan",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "F. T. Ramsey",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. B. Thompson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R. Clark",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C. Goodnight",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "S. A. Steele",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "L. J. Winters",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C. W. Cowden",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. A. Maples",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.028,
+        0.405,
+        0.929,
+        1.0
+      ],
+      "hint": "Read only the table headed 'For Electors for President and Vice-President\u2014continued. PROHIBITION.'; ignore any other table visible in the image.",
+      "turn": -90
+    },
+    {
+      "page": 778,
+      "id": "778-0",
+      "columns": [
+        {
+          "label": "Arthur A. Everts",
+          "contest": "president",
+          "candidate": "Eugene Chafin (Prohibition)"
+        },
+        {
+          "label": "H. G. Damon",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. T. Conway",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. H. Baxter",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. A. Duncan",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "N. W. Godbolt",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "D. M. Prendergast",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "L. B. Coker",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R. E. Burt",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. W. Vogan",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "F. T. Ramsey",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. B. Thompson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R. Clark",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C. Goodnight",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "S. A. Steele",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "L. J. Winters",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C. W. Cowden",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. A. Maples",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.028,
+        0.0,
+        0.929,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings.",
+      "turn": -90
+    },
+    {
+      "page": 779,
+      "id": "779-0",
+      "columns": [
+        {
+          "label": "Arthur A. Everts.",
+          "contest": "president",
+          "candidate": "Eugene Chafin (Prohibition)"
+        },
+        {
+          "label": "H. G. Damon.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. T. Conway.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. H. Baxter.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. A. Duncan.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "N. W. Godbolt.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "D. M. Prendergast.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "L. B. Coker.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R. E. Burt.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. W. Vogan.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "F. T. Ramsey.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. B. Thompson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R. Clark.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C. Goodnight.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "S. A. Steele.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "L. J. Winters.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C. W. Cowden.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. A. Maples.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.018,
+        0.415,
+        0.921,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Returns of an election held November 3, 1908. For Electors for President and Vice-President\u2014continued. PROHIBITION.'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 2,
+      "header": [
+        0.0,
+        -0.0068
+      ]
+    },
+    {
+      "page": 780,
+      "id": "780-0",
+      "columns": [
+        {
+          "label": "Arthur A. Everts.",
+          "contest": "president",
+          "candidate": "Eugene Chafin (Prohibition)"
+        },
+        {
+          "label": "H. G. Damon.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. T. Conway.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. H. Baxter.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. A. Duncan.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "N. W. Godbolt.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "D. M. Prendergast.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "L. B. Coker.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R. E. Burt.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. W. Vogan.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "F. T. Ramsey.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. B. Thompson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R. Clark.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C. Goodnight.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "S. A. Steele.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "L. J. Winters.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C. W. Cowden.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. A. Maples.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.018,
+        0.0,
+        0.921,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings.",
+      "turn": -90
+    },
+    {
+      "page": 781,
+      "id": "781-0",
+      "columns": [
+        {
+          "label": "Stacy Wells.",
+          "contest": "president",
+          "candidate": "Thomas Hisgen (Independence)"
+        },
+        {
+          "label": "J. T. Garner.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "H. F. Marr.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. M. Hammer.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Bud Terry.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "George E. John.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. O. Osborn.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "George B. Huffard.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "D. H. Geiser.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. C. Delmage.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Henry Lovett.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Martin Hartman.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. C. Harper.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R. R. Patterson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "O. S. Haskell.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "B. F. Gibson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Thomas Cahil.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R. A. McCulloch.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.012,
+        0.146,
+        0.913,
+        1.0
+      ],
+      "hint": "Read only the table headed 'INDEPENDENCE.'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3103
+      ]
+    },
+    {
+      "page": 782,
+      "id": "782-0",
+      "columns": [
+        {
+          "label": "Stacy Wells.",
+          "contest": "president",
+          "candidate": "Thomas Hisgen (Independence)"
+        },
+        {
+          "label": "J. T. Garner.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "H. F. Marr.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. M. Hammer.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Bud Terry.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "George E. John.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. O. Osborn.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "George B. Huffard.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "D. H. Geiser.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. C. Delmage.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Henry Lovett.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Martin Hartman.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. C. Harper.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R. R. Patterson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "O. S. Haskell.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "B. F. Gibson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Thomas Cahil.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R. A. McCulloch.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.012,
+        0.0,
+        0.913,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings.",
+      "turn": -90
+    },
+    {
+      "page": 783,
+      "id": "783-0",
+      "columns": [
+        {
+          "label": "Stacy Wells.",
+          "contest": "president",
+          "candidate": "Thomas Hisgen (Independence)"
+        },
+        {
+          "label": "J. T. Garner.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "H. F. Marr.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. M. Hammer.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Bud Terry.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "George E. John.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. O. Osborn.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "George B. Huffard.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "D. H. Geiser.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. C. Delmage.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Henry Lovett.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Martin Hartman.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. C. Harper.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R. R. Patterson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "O. S. Haskell.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "B. F. Gibson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Thomas Cahil.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R. A. McCulloch.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.006,
+        0.431,
+        0.903,
+        1.0
+      ],
+      "hint": "Read only the table headed 'INDEPENDENCE'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 2,
+      "header": [
+        0.0,
+        -0.0176
+      ]
+    },
+    {
+      "page": 784,
+      "id": "784-0",
+      "columns": [
+        {
+          "label": "Stacy Wells.",
+          "contest": "president",
+          "candidate": "Thomas Hisgen (Independence)"
+        },
+        {
+          "label": "J. T. Garner.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "H. F. Marr.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. M. Hammer.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Bud Terry.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "George E. John.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. O. Osborn.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "George B. Huffard.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "D. H. Geiser.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. C. Delmage.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Henry Lovett.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Martin Hartman.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. C. Harper.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R. R. Patterson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "O. S. Haskell.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "B. F. Gibson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Thomas Cahil.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R. A. McCulloch.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.006,
+        0.0,
+        0.903,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings.",
+      "turn": -90
+    },
+    {
+      "page": 785,
+      "id": "785-0",
+      "columns": [
+        {
+          "label": "Stacy Wells.",
+          "contest": "president",
+          "candidate": "Thomas Hisgen (Independence)"
+        },
+        {
+          "label": "J. T. Garner.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "H. F. Marr.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. M. Hammer.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Bud Terry.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "George E. John.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. O. Osborn.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "George B. Huffard.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "D. H. Geiser.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. O. Delmage.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Henry Lovett.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Martin Hartman.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. O. Harper.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R. R. Patterson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "O. S. Haskell.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "B. F. Gibson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Thomas Cahil.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R. A. McCulloch.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.008,
+        0.403,
+        0.908,
+        1.0
+      ],
+      "hint": "Read only the table headed 'INDEPENDENCE.'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 2,
+      "header": [
+        0.0,
+        -0.0285
+      ]
+    },
+    {
+      "page": 786,
+      "id": "786-0",
+      "columns": [
+        {
+          "label": "Stacy Wells.",
+          "contest": "president",
+          "candidate": "Thomas Hisgen (Independence)"
+        },
+        {
+          "label": "J. T. Garner.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "H. F. Marr.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. M. Hammer.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Bud Terry.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "George E. John.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. O. Osborn.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "George B. Huffard.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "D. H. Geiser.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. O. Delmage.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Henry Lovett.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Martin Hartman.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. O. Harper.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R. R. Patterson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "O. S. Haskell.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "B. F. Gibson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Thomas Cahil.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R. A. McCulloch.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.008,
+        0.0,
+        0.908,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings."
+    },
+    {
+      "page": 787,
+      "id": "787-0",
+      "columns": [
+        {
+          "label": "J. M. Crier.",
+          "contest": "president",
+          "candidate": "Eugene V. Debs (Socialist)"
+        },
+        {
+          "label": "W. S. Pittillo.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. H. Carter.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "I. T. Watson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. B. Kessinger.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. E. Pellerin.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. F. Dove.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. H. Wilson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "T. E. Wiltsie.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. R. Wiltsie.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. B. Gay.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. S. Billingsley.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "G. B. Harris.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. W. Smith.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. E. Roberts.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "H. A. Fee.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. A. Robinson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. M. Guy.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.026,
+        0.195,
+        0.84,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Returns of an election held November 3, 1908. For Electors for President and Vice-President. SOCIALIST.'; ignore any other table visible in the image.",
+      "turn": 180
+    },
+    {
+      "page": 788,
+      "id": "788-0",
+      "columns": [
+        {
+          "label": "J. M. Crier.",
+          "contest": "president",
+          "candidate": "Eugene V. Debs (Socialist)"
+        },
+        {
+          "label": "W. S. Pittillo.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. H. Carter.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "I. T. Watson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. B. Kessinger.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. E. Pellerin.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. F. Dove.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. H. Wilson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "T. E. Wiltsie.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. R. Wiltsie.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. B. Gay.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. S. Billingsley.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "G. B. Harris.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. W. Smith.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. E. Roberts.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "H. A. Fee.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. A. Robinson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. M. Guy.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.026,
+        0.0,
+        0.84,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings.",
+      "turn": -90
+    },
+    {
+      "page": 789,
+      "id": "789-0",
+      "columns": [
+        {
+          "label": "J. M. Crier.",
+          "contest": "president",
+          "candidate": "Eugene V. Debs (Socialist)"
+        },
+        {
+          "label": "W. S. Pittillo.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. H. Carter.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "I. T. Watson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. B. Kessinger.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. E. Pellerin.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. F. Dove.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. H. Wilson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "T. E. Wiltsie.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. R. Wiltsie.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. B. Gay.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. S. Billingsley.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "G. B. Harris.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. W. Smith.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. E. Roberts.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "H. A. Fee.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. A. Robinson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. M. Guy.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.014,
+        0.412,
+        0.915,
+        1.0
+      ],
+      "hint": "Read only the table headed 'SOCIALIST. Electors for President and Vice-President, continued'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 2,
+      "header": [
+        0.0,
+        -0.0187
+      ]
+    },
+    {
+      "page": 790,
+      "id": "790-0",
+      "columns": [
+        {
+          "label": "J. M. Crier.",
+          "contest": "president",
+          "candidate": "Eugene V. Debs (Socialist)"
+        },
+        {
+          "label": "W. S. Pittillo.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. H. Carter.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "I. T. Watson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. B. Kessinger.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. E. Pellerin.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. F. Dove.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. H. Wilson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "T. E. Wiltsie.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. R. Wiltsie.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. B. Gay.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. S. Billingsley.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "G. B. Harris.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. W. Smith.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. E. Roberts.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "H. A. Fee.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. A. Robinson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. M. Guy.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.014,
+        0.0,
+        0.915,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings.",
+      "turn": -90
+    },
+    {
+      "page": 791,
+      "id": "791-0",
+      "columns": [
+        {
+          "label": "J. M. Crier.",
+          "contest": "president",
+          "candidate": "Eugene V. Debs (Socialist)"
+        },
+        {
+          "label": "W. S. Pittillo.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. H. Carter.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "I. T. Watson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. B. Kessinger.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. E. Pellerin.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. F. Dove.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. H. Wilson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "T. E. Wiltsie.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. R. Wiltsie.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. B. Gay.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. S. Billingsley.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "G. B. Harris.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. W. Smith.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. E. Roberts.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "H. A. Fee.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. A. Robinson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. M. Guy.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.017,
+        0.414,
+        0.921,
+        1.0
+      ],
+      "hint": "Read only the table headed 'RETURNS OF AN ELECTION HELD NOVEMBER 3, 1908. For Electors for President and Vice-President\u2014continued. SOCIALIST.'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 2,
+      "header": [
+        0.0,
+        -0.0154
+      ]
+    },
+    {
+      "page": 792,
+      "id": "792-0",
+      "columns": [
+        {
+          "label": "J. M. Crier.",
+          "contest": "president",
+          "candidate": "Eugene V. Debs (Socialist)"
+        },
+        {
+          "label": "W. S. Pittillo.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. H. Carter.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "I. T. Watson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. B. Kessinger.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. E. Pellerin.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. F. Dove.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. H. Wilson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "T. E. Wiltsie.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. R. Wiltsie.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. B. Gay.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. S. Billingsley.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "G. B. Harris.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. W. Smith.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. E. Roberts.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "H. A. Fee.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. A. Robinson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. M. Guy.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.017,
+        0.0,
+        0.921,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings.",
+      "turn": -90
+    }
+  ]
+}
