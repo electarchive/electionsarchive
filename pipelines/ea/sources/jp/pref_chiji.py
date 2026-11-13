@@ -16,10 +16,11 @@ from ea.sources.jp import mic_chiji
 from ea.store import DATA, connect
 
 SOURCE = "jp.pref_chiji"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 WAYBACK = "https://web.archive.org/web/{stamp}id_/{url}"
 TOCHIGI = "https://www.pref.tochigi.lg.jp/senkyo"
+IBARAKI = "https://www.pref.ibaraki.jp/somu/shichoson/senkyo/senkan"
 WAKAYAMA = "https://www.pref.wakayama.lg.jp/prefg/010600/wsenkan"
 
 
@@ -34,6 +35,14 @@ class Commission:
 
 
 COMMISSIONS = {
+    "茨城県": Commission(
+        "茨城県選挙管理委員会",
+        "茨城県知事選挙 開票速報（確定）・投票結果速報（確定）",
+        "https://www.pref.ibaraki.jp/somu/shichoson/senkyo/senkan/index2.html",
+        "No license stated: facts published with attribution, raw files not redistributed",
+        None,
+        "出典：茨城県選挙管理委員会",
+    ),
     "栃木県": Commission(
         "栃木県選挙管理委員会",
         "栃木県知事選挙 候補者別市町村別得票数調・投票に関する調",
@@ -54,6 +63,14 @@ COMMISSIONS = {
     ),
 }
 RECORDS: dict[str, tuple[str, str]] = {
+    "2025-09-07:茨城県": (
+        f"{IBARAKI}/2025tizi/documents/d_kaihyo_k_50_99.xlsx",
+        f"{IBARAKI}/2025tizi/documents/d_tohyo_k_50_1.xlsx",
+    ),
+    "2021-09-05:茨城県": (
+        f"{IBARAKI}/2021chijisen/documents/d_kaihyo_k_50_05.xlsx",
+        f"{IBARAKI}/2021chijisen/documents/d_tohyo_k_50_1.xlsx",
+    ),
     "2020-11-15:栃木県": (
         WAYBACK.format(stamp="20230308052226", url=f"{TOCHIGI}/r02chiji/file/DS_KAIHYO_K_50.xls"),
         WAYBACK.format(stamp="20230307040606", url=f"{TOCHIGI}/r02chiji/file/DS_TOHYO_K_50.xls"),
@@ -152,6 +169,35 @@ def excel_registered(path: Path) -> dict[str, tuple[str, str]]:
     }
 
 
+def ibaraki_spread(values: list[str], n: int) -> list[str]:
+    cast = number(values[n + 5])
+    unreturned = sum(number(v) for v in values[n + 6 : n + 9])
+    return [x for v in values[:n] for x in (v, "")] + values[n : n + 6] + [str(unreturned), str(cast + unreturned)]
+
+
+def ibaraki_votes(path: Path) -> tuple[list[str], list[dict[str, Any]], dict[str, Any]]:
+    rows = cells(path)
+    header = next(row for row in rows if row[:2] == ["市町村名", "確定"])
+    n = header.index("得票総数") - 2
+    places, total = [], None
+    for row in rows:
+        if len(row) > n + 10 and PLACE.match(row[0]) and row[1] == "*":
+            places.append({"place": row[0], **counts(ibaraki_spread(row[2:], n), n)})
+        elif row and row[0] == "県計":
+            total = counts(ibaraki_spread(row[1:], n), n)
+    if total is None:
+        raise ValueError(f"{path} has no prefecture total")
+    return header[2 : 2 + n], places, total
+
+
+def ibaraki_registered(path: Path) -> dict[str, tuple[str, str]]:
+    return {
+        row[0]: (str(number(row[3])), str(number(row[6])))
+        for row in cells(path)
+        if len(row) >= 7 and PLACE.match(row[0]) and row[1].isdigit()
+    }
+
+
 def layout(path: Path) -> list[str]:
     text = subprocess.run(["pdftotext", "-layout", str(path), "-"], check=True, capture_output=True, text=True).stdout
     return unicodedata.normalize("NFKC", text).splitlines()
@@ -187,6 +233,13 @@ def pdf_registered(path: Path) -> dict[str, tuple[str, str]]:
     return out
 
 
+READERS = {
+    ".xls": (excel_votes, excel_registered),
+    ".xlsx": (ibaraki_votes, ibaraki_registered),
+    ".pdf": (pdf_votes, pdf_registered),
+}
+
+
 def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
     elections = pl.read_parquet(mic_chiji.PARSED / f"elections-v{mic_chiji.VERSION}.parquet")
@@ -194,9 +247,9 @@ def parse() -> None:
     rows = []
     for key, (votes_url, turnout_url) in RECORDS.items():
         votes_path, turnout_path = raw.cached(SOURCE, votes_url).path, raw.cached(SOURCE, turnout_url).path
-        excel = votes_path.suffix == ".xls"
-        names, places, total = (excel_votes if excel else pdf_votes)(votes_path)
-        registered = (excel_registered if excel else pdf_registered)(turnout_path)
+        votes_reader, turnout_reader = READERS[votes_path.suffix]
+        names, places, total = votes_reader(votes_path)
+        registered = turnout_reader(turnout_path)
         official = elections.filter(pl.col("key") == key).row(0, named=True)
         candidates = people.filter(pl.col("key") == key).sort("order")
         if len(names) != candidates.height:
@@ -253,7 +306,7 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary="Japan's prefectural governor elections by municipality from the prefectural election "
-            "commissions' count and turnout tables (Tochigi and Wakayama)",
+            "commissions' count and turnout tables (Ibaraki, Tochigi, and Wakayama)",
             polity="JP",
         )
         sources = {}
