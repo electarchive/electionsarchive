@@ -2,6 +2,7 @@ import os
 import re
 from datetime import date, timedelta
 from pathlib import Path
+from typing import cast
 from uuid import UUID
 
 import polars as pl
@@ -34,6 +35,25 @@ FILES = {
         1,
     ): f"{STATIC}/resources/elections-municipales-2020-resultats/20200525-133704/2020-05-18-resultats-communes-de-1000-et-plus.txt",
     (2020, 2): f"{R2020}/20200629-192435/2020-06-29-resultats-t2-communes-de-1000-hab-et-plus.txt",
+}
+SMALL_FILES = {
+    2008: (
+        f"{STATIC}/0b/6af04d2d1b52a4735fc0b0171d5d94e7dfe0deeacab0e8075e33fa4a75245d.xls",
+        f"{STATIC}/0c/3db24502775bd8c6c3a4d1670b5a43353d848efe0857af1b07ee7d069b54e8.xls",
+    ),
+    2014: (
+        f"{STORAGE}/2014-03-25T16-08-50/muni-2014-resultats-com-moins-1000-t1.txt",
+        f"{STORAGE}/2014-03-31T09-51-08/muni-2014-resultats-com-moins-1000-t2.txt",
+    ),
+    2020: (
+        f"{STATIC}/resources/elections-municipales-2020-resultats/20200525-133805/2020-05-18-resultats-communes-de-moins-de-1000.txt",
+        f"{R2020}/20200629-192436/2020-06-29-resultats-t2-communes-de-moins-de-1000-hab.txt",
+    ),
+}
+SMALL_DATASETS = {
+    2008: "https://www.data.gouv.fr/datasets/53699394a3a729239d204227/",
+    2014: "https://www.data.gouv.fr/datasets/53699399a3a729239d204239/",
+    2020: "https://www.data.gouv.fr/datasets/5e7102d5ebe5d838b7581662/",
 }
 DATASETS = {
     2001: "https://www.data.gouv.fr/datasets/53699392a3a729239d20421e/",
@@ -102,14 +122,49 @@ NOTE = (
 NOTE_SCOPE = {
     2001: "Only communes of 3,500 or more inhabitants are loaded, from the ministry's file. It gives no seats, so "
     "none are recorded.",
-    2008: "Only communes of 3,500 or more inhabitants are loaded.",
-    2014: "Only communes of 1,000 or more inhabitants are loaded, which elect by closed lists.",
-    2020: "Only communes of 1,000 or more inhabitants are loaded, which elect by closed lists. The second round "
-    "was held on June 28 after the first was interrupted by the pandemic.",
+    2008: "Communes of 3,500 or more inhabitants elected their councils by closed lists.",
+    2014: "Communes of 1,000 or more inhabitants elected their councils by closed lists.",
+    2020: "Communes of 1,000 or more inhabitants elected their councils by closed lists. The second round was held "
+    "on June 28 after the first was interrupted by the pandemic.",
 }
 NOTE_INVALID = (
     "The ministry's file for this year gives one count of blank and spoiled ballots together, stored as invalid."
 )
+SMALL_NOTE = (
+    "Communes below the list threshold elect their councilors individually by a two-round majority system. Voters "
+    "may strike out names and add others (panachage), so each candidate receives a separate count and a ballot "
+    "may carry as many votes as there are seats. A candidate is elected in the first round with an absolute "
+    "majority of the valid votes and votes from at least a quarter of the registered voters; seats still unfilled "
+    "go to a second round a week later, where the most votes win and the older candidate takes a tie."
+)
+SMALL_SCOPE = {
+    2008: "Communes under 3,500 inhabitants elected their councilors individually. The ministry's file for them "
+    "lists only the elected candidates, with their votes and the round in which they were elected, so defeated "
+    "candidates are not recorded.",
+    2014: "Communes under 1,000 inhabitants elected their councilors individually. The ministry's first-round file "
+    "for them lists only the candidates elected in that round; its second-round file lists every candidate.",
+    2020: "Communes under 1,000 inhabitants elected their councilors individually; both rounds list every candidate.",
+}
+SMALL_MAGNITUDE = (
+    "The seats at stake are counted from the elected candidates: in the first round all councilors elected in either "
+    "round, and in the second round those elected in it."
+)
+SMALL_FIXES = {
+    (2008, 2, "62060"): (
+        "valid",
+        (
+            "The ministry's file gives 6 valid votes against 1,665 voters, below each elected candidate's count, so "
+            "the valid vote total is left out."
+        ),
+    ),
+}
+WINNERS_ONLY = (
+    "The ministry's file for this round lists only the elected candidates; defeated candidates are not recorded."
+)
+SMALL_RULES = {
+    "formula": "repeated_ballot",
+    "majorities": [{"fromRound": 1, "share": 0.5, "strict": True}, {"fromRound": 2, "share": 0}],
+}
 RULES = {
     "formula": "dhondt",
     "tieBreak": "votes",
@@ -124,7 +179,7 @@ RULES = {
 
 
 def fetch() -> None:
-    for url in FILES.values():
+    for url in [*FILES.values(), *(url for urls in SMALL_FILES.values() for url in urls)]:
         raw.fetch(SOURCE, url, suffix=f".{url.rsplit('.', 1)[1]}")
 
 
@@ -191,6 +246,136 @@ def regroup(rest: list[str | None], year: int) -> list[str | None]:
         )
         blocks += [*head, ";".join(str(part) for part in label if part is not None) or None, *tail]
     return blocks
+
+
+def str_or_none(value: object) -> str | None:
+    return None if value is None else str(value)
+
+
+def small_rows(year: int) -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    if year == 2008:
+        for url in SMALL_FILES[year]:
+            sheets = pl.read_excel(
+                raw.cached(SOURCE, url).path, sheet_id=0, has_header=False, infer_schema_length=0, engine="calamine"
+            )
+            for sheet in sheets.values():
+                for f in sheet.slice(1).rows():
+                    rows.append(
+                        {
+                            "dept": f[0],
+                            "code": f[2],
+                            "label": f[3],
+                            "round": number(f[4]),
+                            "registered": f[5],
+                            "voters": f[8],
+                            "invalid": f[10],
+                            "valid": f[12],
+                            "candidates": [(None, None, f[16], f[17], f[18], True, f[14])],
+                        }
+                    )
+        return rows
+    for round_, url in enumerate(SMALL_FILES[year], 1):
+        text = raw.cached(SOURCE, url).path.read_bytes().decode("cp1252", errors="replace")
+        for line in text.split("\n")[1:]:
+            if not line.strip():
+                continue
+            f = [field.strip() or None for field in line.rstrip("\r").split(";")]
+            if year == 2014 and round_ == 1:
+                rows.append(
+                    {
+                        "dept": f[0],
+                        "code": f[2],
+                        "label": f[3],
+                        "round": 1,
+                        "population": f[4],
+                        "registered": f[5],
+                        "voters": f[8],
+                        "invalid": f[10],
+                        "valid": f[13],
+                        "candidates": [(None, None, f[16], f[17], f[18], f[19] == "Elu", f[20])],
+                    }
+                )
+                continue
+            prefix, block = LAYOUTS[year]
+            head = dict(zip(prefix, f[: len(prefix)], strict=False))
+            rest = f[len(prefix) :]
+            while rest and rest[-1] is None:
+                rest.pop()
+            size = len(block)
+            if len(rest) % size:
+                raise ValueError(f"{year} round {round_} {head['dept']} {head['code']}: {len(rest)} candidate fields")
+            candidates = []
+            for index in range(len(rest) // size):
+                entry = dict(zip(block, rest[index * size : (index + 1) * size], strict=True))
+                if entry["sex"] not in ("M", "F"):
+                    raise ValueError(f"{year} round {round_} {head['dept']} {head['code']}: {entry}")
+                candidates.append(
+                    (
+                        number(entry.get("panel")),
+                        entry["nuance"],
+                        entry["sex"],
+                        entry["surname"],
+                        entry["forename"],
+                        entry["seats"] == "Oui",
+                        entry["votes"],
+                    )
+                )
+            rows.append({**head, "round": round_, "candidates": candidates})
+    return rows
+
+
+def parse_small() -> None:
+    accounting: dict[tuple[int, int, str], dict[str, object]] = {}
+    candidates: list[dict[str, object]] = []
+    for year in SMALL_FILES:
+        for row in small_rows(year):
+            code = code_of(str(row["dept"]), str(row["code"]))
+            if code is None:
+                continue
+            round_ = int(str(row["round"]))
+            totals = {
+                "year": year,
+                "round": round_,
+                "unit": code,
+                "label": row["label"],
+                "dept": str(row["dept"]).strip().upper().zfill(2),
+                **{name: number(str_or_none(row.get(name))) for name, _ in ACCOUNTING},
+                "population": number(str_or_none(row.get("population"))),
+            }
+            known = accounting.setdefault((year, round_, code), totals)
+            if any(known[name] != totals[name] for name, _ in ACCOUNTING):
+                raise ValueError(f"{year} round {round_} {code}: accounting differs between rows")
+            entries = cast(list[tuple[object, ...]], row["candidates"])
+            for panel, nuance, sex, surname, forename, elected, votes in entries:
+                candidates.append(
+                    {
+                        "year": year,
+                        "round": round_,
+                        "unit": code,
+                        "printed": panel,
+                        "nuance": nuance,
+                        "sex": sex,
+                        "surname": surname,
+                        "forename": forename,
+                        "elected": elected,
+                        "votes": number(str_or_none(votes)),
+                    }
+                )
+    accounting_frame = pl.DataFrame(list(accounting.values()), infer_schema_length=None)
+    candidate_frame = pl.DataFrame(candidates, infer_schema_length=None)
+    print(
+        candidate_frame.group_by("year", "round")
+        .agg(communes=pl.col("unit").n_unique(), candidates=pl.len(), elected=pl.col("elected").sum())
+        .sort("year", "round")
+    )
+    over = candidate_frame.join(accounting_frame, on=["year", "round", "unit"]).filter(
+        pl.col("votes") > pl.col("valid")
+    )
+    print("candidates above valid votes:", over.height)
+    PARSED.mkdir(parents=True, exist_ok=True)
+    accounting_frame.write_parquet(PARSED / "small_accounting.parquet")
+    candidate_frame.write_parquet(PARSED / "candidates.parquet")
 
 
 def parse() -> None:
@@ -269,6 +454,7 @@ def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
     accounting_frame.write_parquet(PARSED / "accounting.parquet")
     list_frame.write_parquet(PARSED / "lists.parquet")
+    parse_small()
 
 
 def emit() -> Path:
@@ -278,6 +464,12 @@ def emit() -> Path:
     lists = pl.read_parquet(PARSED / "lists.parquet").filter(pl.col("year") == year)
     lists = lists.join(accounting.select("round", "unit"), on=["round", "unit"])
     by_unit = {(row["round"], row["unit"]): row for row in accounting.iter_rows(named=True)}
+    small = pl.read_parquet(PARSED / "small_accounting.parquet").filter(pl.col("year") == year)
+    candidates = pl.read_parquet(PARSED / "candidates.parquet").filter(pl.col("year") == year)
+    small_units = {(row["round"], row["unit"]): row for row in small.iter_rows(named=True)}
+    candidate_rows: dict[tuple[int, str], list[dict[str, object]]] = {}
+    for row in candidates.with_row_index("order").sort("printed", "order", nulls_last=True).iter_rows(named=True):
+        candidate_rows.setdefault((row["round"], row["unit"]), []).append(row)
     list_rows: dict[tuple[int, str], list[dict[str, object]]] = {}
     for row in lists.sort("panel").iter_rows(named=True):
         list_rows.setdefault((row["round"], row["unit"]), []).append(row)
@@ -303,7 +495,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary=f"{year} French municipal elections, both rounds, by commune (communes with list elections)",
+            summary=f"{year} French municipal elections, both rounds, by commune",
             polity="FR",
         )
 
@@ -325,10 +517,25 @@ def emit() -> Path:
         for key, url in FILES.items():
             if key[0] == year:
                 cs.artifact(raw.cached(SOURCE, url), source)
+        small_source = source
+        if year in SMALL_FILES:
+            small_source = cs.source("Ministère de l'Intérieur", f"Élections municipales {year}, petites communes")
+            cs.add(
+                "source",
+                id=small_source,
+                kind="official_body",
+                publisher="Ministère de l'Intérieur",
+                title=f"Élections municipales {year}, petites communes",
+                url=SMALL_DATASETS[year],
+                license="Licence Ouverte v2.0",
+                license_url="https://www.etalab.gouv.fr/licence-ouverte-open-licence",
+            )
+            for url in SMALL_FILES[year]:
+                cs.artifact(raw.cached(SOURCE, url), small_source)
 
         nuances: dict[str, UUID] = {}
         shorts = dict(lists.drop_nulls("short").unique("nuance").select("nuance", "short").iter_rows())
-        for code in lists.drop_nulls("nuance").unique("nuance").sort("nuance")["nuance"]:
+        for code in sorted({*lists["nuance"].drop_nulls(), *candidates["nuance"].drop_nulls()}):
             nuances[code] = cs.key(f"{SOURCE}.nuance", f"{year}:{code}")
             cs.add("party", id=nuances[code], kind="nuance", polity_id=france)
             name(nuances[code], shorts.get(code, code))
@@ -337,6 +544,10 @@ def emit() -> Path:
         cs.add("electoral_system", id=system, polity_id=france, rules=RULES, rules_version=1)
         name(system, "French municipal list system", "en")
         cs.add("note", entity_id=system, kind="methodology", body_md=NOTE)
+        majority = cs.key(f"{SOURCE}.electoral_system", "majority-panachage")
+        cs.add("electoral_system", id=majority, polity_id=france, rules=SMALL_RULES, rules_version=1)
+        name(majority, "French municipal majority system with panachage", "en")
+        cs.add("note", entity_id=majority, kind="methodology", body_md=SMALL_NOTE)
         umbrella = cs.key(f"{SOURCE}.election", str(year))
         cs.add(
             "election",
@@ -350,7 +561,9 @@ def emit() -> Path:
         name(umbrella, f"{year} French municipal elections", "en")
         name(umbrella, f"Élections municipales de {year}", "fr", "native")
         cs.add("slug", path=f"fr/{days[0]}-local", entity_id=umbrella)
-        cs.add("note", entity_id=umbrella, kind="caveat", body_md=NOTE_SCOPE[year])
+        cs.add(
+            "note", entity_id=umbrella, kind="caveat", body_md=f"{NOTE_SCOPE[year]} {SMALL_SCOPE.get(year, '')}".strip()
+        )
         if year != 2020:
             cs.add("note", entity_id=umbrella, kind="caveat", body_md=NOTE_INVALID)
 
@@ -368,9 +581,7 @@ def emit() -> Path:
             paths[code] = path
             return path
 
-        for code in communes:
-            first = by_unit.get((1, code)) or by_unit[2, code]
-            label = str(first["label"])
+        def commune(code: str, label: str) -> tuple[str, UUID, UUID, UUID, UUID]:
             path = f"fr/{path_of(code, label)}"
             department = code[:3] if code.startswith(("97", "98")) else code[:2]
             area = cs.area("fr.commune", code)
@@ -411,6 +622,12 @@ def emit() -> Path:
                 cs.add("body", id=body, polity_id=polity, kind="unicameral")
                 name(body, f"Municipal council of {label}", "en")
                 name(body, f"Conseil municipal de {label}", "fr", "native")
+            return path, area, unit, polity, body
+
+        for code in communes:
+            first = by_unit.get((1, code)) or by_unit[2, code]
+            label = str(first["label"])
+            path, area, unit, polity, body = commune(code, label)
             size = sizes.get(code)
             if size is not None:
                 cs.add(
@@ -532,6 +749,140 @@ def emit() -> Path:
                             list_position=1,
                             ballot_name=f"{entry['surname']} {entry['forename'] or ''}".strip(),
                         )
+                previous = contest
+        small_communes = sorted({code for _, code in small_units})
+        for code in small_communes:
+            elected = {
+                round_: sum(1 for entry in candidate_rows.get((round_, code), []) if entry["elected"])
+                for round_ in (1, 2)
+            }
+            first = small_units.get((1, code)) or small_units[2, code]
+            label = str(first["label"])
+            path, area, unit, polity, body = commune(code, label)
+            elections = {}
+            previous = None
+            namesakes: dict[tuple[object, object], int] = {}
+            for round_ in (1, 2):
+                if (round_, code) not in small_units:
+                    continue
+                day = days[round_ - 1]
+                kind = "local" if round_ == 1 else "runoff"
+                key = f"{year}:{code}:{round_}"
+                elections[round_] = cs.key(f"{SOURCE}.election", key)
+                cs.add(
+                    "election",
+                    id=elections[round_],
+                    polity_id=polity,
+                    parent_id=umbrella if round_ == 1 else elections.get(1, umbrella),
+                    kind=kind,
+                    date_from=day,
+                    date_to=day,
+                    status="held",
+                )
+                name(
+                    elections[round_],
+                    f"{year} {label} municipal election" + (", second round" if round_ == 2 else ""),
+                    "en",
+                )
+                cs.add("slug", path=f"{path}/{day}-{kind}", entity_id=elections[round_])
+                contest = cs.key(f"{SOURCE}.contest", key)
+                cs.add(
+                    "contest",
+                    id=contest,
+                    election_id=elections[round_],
+                    kind="body_seats",
+                    body_id=body,
+                    district_area_id=area,
+                    magnitude=(elected[1] + elected[2] if round_ == 1 else elected[2]) or None,
+                    round_number=round_,
+                    previous_round_id=previous,
+                    electoral_system_id=majority,
+                    default_result_kind="counted",
+                )
+                name(contest, f"{year} {label} municipal election, {'first' if round_ == 1 else 'second'} round", "en")
+                cs.add("slug", path=f"{path}/{day}-{kind}/conseil-municipal", entity_id=contest)
+                cs.add("note", entity_id=contest, kind="caveat", body_md=SMALL_MAGNITUDE)
+                entries = candidate_rows.get((round_, code), [])
+                partial = year == 2008 or (year, round_) == (2014, 1)
+                result_set = cs.key(f"{SOURCE}.result_set", key)
+                cs.add(
+                    "result_set",
+                    id=result_set,
+                    election_id=elections[round_],
+                    contest_id=contest,
+                    stage="official",
+                    kind="counted",
+                    status="active",
+                    source_id=small_source,
+                    is_default=True,
+                    completeness=None if partial else 1,
+                )
+                if partial:
+                    cs.add("note", entity_id=result_set, kind="caveat", body_md=WINNERS_ONLY)
+                row = small_units[round_, code]
+                fix = SMALL_FIXES.get((year, round_, code))
+                if fix is not None:
+                    cs.add("note", entity_id=result_set, kind="caveat", body_md=fix[1])
+                for field, measure in ACCOUNTING:
+                    if row[field] is not None and (fix is None or field != fix[0]):
+                        values.append(
+                            {
+                                "result_set_id": str(result_set),
+                                "unit_id": str(unit),
+                                "option_id": None,
+                                "measure": measure,
+                                "value": row[field],
+                            }
+                        )
+                for entry in entries:
+                    identity = (entry["surname"], entry["forename"])
+                    person_key = f"{year}:{code}:{entry['surname']}:{entry['forename']}"
+                    option_key = f"{key}:{entry['surname']}:{entry['forename']}"
+                    seen = sum(1 for other in entries if (other["surname"], other["forename"]) == identity)
+                    if seen > 1:
+                        namesakes[identity] = namesakes.get(identity, 0) + 1
+                        suffix = f":{round_}:{namesakes[identity]}"
+                        person_key += suffix
+                        option_key += suffix
+                    if person_key not in persons:
+                        persons[person_key] = cs.key(f"{SOURCE}.person", person_key)
+                        if persons[person_key] in cs.minted:
+                            cs.add(
+                                "person",
+                                id=persons[person_key],
+                                gender={"F": "female", "M": "male"}.get(str(entry["sex"])),
+                            )
+                            name(persons[person_key], person_name(str(entry["forename"] or ""), str(entry["surname"])))
+                    ballot_name = f"{entry['surname']} {entry['forename'] or ''}".strip()
+                    option = cs.key(f"{SOURCE}.option", option_key)
+                    cs.add(
+                        "contest_option",
+                        id=option,
+                        contest_id=contest,
+                        kind="candidate",
+                        party_id=nuances.get(str(entry["nuance"])),
+                        ballot_position=entry["printed"],
+                        ballot_label=ballot_name,
+                    )
+                    cs.add(
+                        "candidacy",
+                        id=cs.key(f"{SOURCE}.candidacy", option_key),
+                        person_id=persons[person_key],
+                        option_id=option,
+                        role="head",
+                        ballot_name=ballot_name,
+                    )
+                    values.append(
+                        {
+                            "result_set_id": str(result_set),
+                            "unit_id": str(unit),
+                            "option_id": str(option),
+                            "measure": 1,
+                            "value": entry["votes"],
+                        }
+                    )
+                    if entry["elected"]:
+                        cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected")
                 previous = contest
         cs.frame(
             "result_value",
