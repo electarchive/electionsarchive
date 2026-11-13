@@ -1,18 +1,22 @@
 import html
 import re
 import subprocess
+from collections.abc import Callable
 from datetime import date
 from pathlib import Path
 from typing import Any
 from uuid import UUID
 
-from ea import raw
+import shapely
+
+from ea import boundaries, raw
 from ea.changeset import Changeset, slug
-from ea.store import connect
+from ea.store import Connection, connect
 
 SOURCE = "gb.advisory_polls"
 VERSION = "2"
 VOTES, REGISTERED, BALLOTS = 1, 2, 3
+SHARE_ONLY = 4
 IPSOS = (
     "https://www.ipsos.com/sites/default/files/migrations/en-uk/files/Assets/Docs/Archive/Polls/"
     "scottish-executive-transport.pdf"
@@ -21,6 +25,8 @@ BBC = "https://web.archive.org/web/20100808062848if_/http://news.bbc.co.uk/2/hi/
 HANSARD = "https://api.parliament.uk/historic-hansard/commons/1994/mar/22/engagements"
 WIKIPEDIA = "https://en.wikipedia.org/wiki/1994_Strathclyde_water_referendum"
 EVALUATION = "https://www.gov.scot/publications/health-board-elections-alternative-pilots-final-report-statutory-evaluation/pages/"
+SUNDAY = "https://api.parliament.uk/historic-hansard/written_answers/1978/mar/01/licensed-premises-polls-wales"
+DISTRICTS = "https://borders.ukdataservice.ac.uk/ukborders/easy_download/prebuilt/shape/Wales_dt_1991.zip"
 SOURCES = {
     "ipsos": (
         IPSOS,
@@ -64,6 +70,20 @@ SOURCES = {
         "Scottish Government",
         "Health Board Elections and Alternative Pilots: Final Report, 1 Introduction (2012)",
     ),
+    "sunday": (
+        SUNDAY,
+        ".html",
+        "official_body",
+        "UK Parliament",
+        "Licensed Premises Polls (Wales), HC Deb 1 March 1978 vol 945 cc232-3W",
+    ),
+    "districts": (
+        DISTRICTS,
+        ".zip",
+        "official_body",
+        "Office for National Statistics",
+        "1991 Census: boundary data (England and Wales), Wales districts",
+    ),
 }
 HEALTH_DAY = date(2010, 6, 10)
 HEALTH_BOARDS = [
@@ -79,6 +99,51 @@ HEALTH_CAVEAT = (
     "The Scottish Government's statutory evaluation gives {candidates} candidates, {seats} members elected, and "
     "{ballots:,} ballots returned. No declaration with each candidate's votes or the names of those elected was "
     "found, so only the ballots returned are stored."
+)
+DISTRICT_SCHEME = "gb.wls_district_1974"
+DISTRICT_SPAN = (date(1974, 4, 1), date(1996, 4, 1))
+COUNTIES = {
+    "48": "clwyd",
+    "49": "dyfed",
+    "50": "gwent",
+    "51": "gwynedd",
+    "52": "mid-glamorgan",
+    "53": "powys",
+    "54": "south-glamorgan",
+    "55": "west-glamorgan",
+}
+SUNDAY_1975 = {
+    "51SY": ("Aberconwy", "32.9", "17.2"),
+    "55TS": ("Afan", "17.8", "4.7"),
+    "51SZ": ("Arfon", "21.6", "26.0"),
+    "49SL": ("Carmarthen", "22.9", "28.1"),
+    "49SM": ("Ceredigion", "19.9", "29.3"),
+    "48SF": ("Colwyn", "27.5", "13.1"),
+    "49SN": ("Dinefwr", "26.1", "23.9"),
+    "51TA": ("Dwyfor", "18.5", "36.1"),
+    "48SH": ("Glyndwr", "32.1", "17.7"),
+    "49SP": ("Llanelli", "27.9", "16.7"),
+    "55TQ": ("Lliw Valley", "20.6", "9.2"),
+    "51TB": ("Meirionnydd", "25.2", "33.7"),
+    "53TL": ("Montgomery", "32.9", "13.2"),
+    "49SQ": ("Preseli", "31.4", "12.2"),
+    "48SJ": ("Rhuddlan", "26.7", "6.1"),
+    "49SR": ("South Pembrokeshire", "33.5", "9.3"),
+    "48SK": ("Wrexham Maelor", "33.1", "6.5"),
+    "51TC": ("Ynys Môn—Isle of Anglesey", "23.5", "27.4"),
+}
+SUNDAY_CONTEXT = (
+    "Under the Licensing Act 1964, public houses in Wales stayed closed on Sundays in any district that had not "
+    "voted to open them, and 500 local government electors could requisition a poll in their district every "
+    "seven years. In 1975 the district councils of 18 of the 37 Welsh districts received valid requisitions, and "
+    "every poll was held on one day set by the Secretary of State. Each district's poll decided by a simple "
+    "majority whether its public houses would open on Sundays."
+)
+SUNDAY_CAVEAT = (
+    "The House of Commons answer gives each side only as a percentage of the district's electorate, so no vote "
+    "counts, ballots, or electorate are stored, and the stored shares are of the electorate, not of the votes cast. "
+    "The answer does not give the polling day; the Act fixes it within six weeks of the requisition period that "
+    "ended on 3 October 1975."
 )
 GM_BOROUGHS = {
     "E08000001": ("Bolton", 20529, 76910),
@@ -176,6 +241,9 @@ def fetch() -> None:
 def printed(key: str) -> set[str]:
     url, suffix = SOURCES[key][:2]
     path = raw.cached(SOURCE, url).path
+    if key == "sunday":
+        text = html.unescape(re.sub(r"<[^>]+>", " ", path.read_text()))
+        return set(re.sub(r"(?<=\d)\. (?=\d)", ".", text).split())
     if suffix == ".pdf":
         text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, check=True).stdout.decode()
     else:
@@ -192,8 +260,10 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary="Council-run advisory polls: the Strathclyde water referendum of 1994, the Edinburgh congestion "
-            "charging referendum of 2005, and the Greater Manchester congestion charge referendum of 2008; and the "
-            "ballots returned in the 2010 NHS Fife and NHS Dumfries and Galloway board elections",
+            "charging referendum of 2005, the Greater Manchester congestion charge referendum of 2008, and the Welsh "
+            "Sunday opening polls of 1975 in 18 districts, with the 37 Welsh districts of 1974 to 1996 and their 1991 "
+            "census boundaries; and the ballots returned in the 2010 NHS Fife and NHS Dumfries and Galloway board "
+            "elections",
             polity="GB",
         )
 
@@ -207,7 +277,27 @@ def emit() -> Path:
         for key, (url, _, kind, publisher, title) in SOURCES.items():
             sources[key] = cs.source(publisher, title)
             if sources[key] in cs.minted:
-                cs.add("source", id=sources[key], kind=kind, publisher=publisher, title=title, url=url)
+                cs.add(
+                    "source",
+                    id=sources[key],
+                    kind=kind,
+                    publisher=publisher,
+                    title=title,
+                    url=url,
+                    **(
+                        {
+                            "license": "Open Government Licence v3.0",
+                            "license_url": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/",
+                            "attribution": "Contains National Statistics data © Crown copyright and database right "
+                            "2026. Contains OS data © Crown copyright 2026",
+                            "notes": "District boundaries as at the 1991 census, distributed by the UK Data Service "
+                            "(UKBORDERS); they are used for the whole life of the 1974 districts, so boundary changes "
+                            "between 1974 and 1991 are not shown.",
+                        }
+                        if key == "districts"
+                        else {}
+                    ),
+                )
                 cs.artifact(raw.cached(SOURCE, url), sources[key])
         for poll in POLLS:
             day = poll["to"]
@@ -409,4 +499,169 @@ def emit() -> Path:
                 flags=0,
                 value=ballots,
             )
+        sunday(conn, cs, name, system, sources)
         return cs.write()
+
+
+def sunday(
+    conn: Connection, cs: Changeset, name: Callable[[UUID, str], None], system: UUID, sources: dict[str, UUID]
+) -> None:
+    gb = cs.polity("GB")
+    wales = cs.polity("GB-WLS")
+    if conn.execute("select 1 from scheme where code = %s", [DISTRICT_SCHEME]).fetchone() is None:
+        cs.add(
+            "scheme",
+            code=DISTRICT_SCHEME,
+            polity_id=gb,
+            kind="administrative",
+            rank=2,
+            noun="district (1974 to 1996)",
+        )
+    found = conn.execute(
+        "select id from boundary_set where scheme_code = %s and vintage = '1991'", [DISTRICT_SCHEME]
+    ).fetchone()
+    cs.add(
+        "boundary_set",
+        **({"id": found[0]} if found else {}),
+        scheme_code=DISTRICT_SCHEME,
+        vintage="1991",
+        valid_from=DISTRICT_SPAN[0],
+        valid_to=DISTRICT_SPAN[1],
+        as_of=date(1991, 4, 21),
+    )
+    shapes: dict[str, list[shapely.Geometry]] = {}
+    labels: dict[str, str] = {}
+    for properties, geometry in boundaries.read(raw.cached(SOURCE, DISTRICTS).path):
+        shapes.setdefault(properties["label"], []).append(geometry)
+        labels[properties["label"]] = properties["name"]
+    if len(shapes) != 37 or not set(SUNDAY_1975) <= set(shapes):
+        raise ValueError(f"expected the 37 districts of 1974, found {sorted(shapes)}")
+    areas: dict[str, UUID] = {}
+    for code in sorted(shapes):
+        area = areas[code] = cs.area(DISTRICT_SCHEME, code)
+        if area in cs.minted:
+            cs.add("area", id=area, scheme_code=DISTRICT_SCHEME)
+            cs.add("area_code", area_id=area, code=code, valid_from=DISTRICT_SPAN[0], valid_to=DISTRICT_SPAN[1])
+            cs.add(
+                "area_parent",
+                area_id=area,
+                parent_id=cs.area("gb.counting_area", f"wls-county-1974-{COUNTIES[code[:2]]}"),
+                valid_from=DISTRICT_SPAN[0],
+                valid_to=DISTRICT_SPAN[1],
+            )
+        name(area, labels[code])
+        if code in SUNDAY_1975 and SUNDAY_1975[code][0] != labels[code]:
+            cs.add(
+                "name",
+                entity_id=area,
+                text=SUNDAY_1975[code][0],
+                lang="en",
+                kind="historical",
+                is_preferred=False,
+                source_id=sources["sunday"],
+            )
+        geom = shapely.set_srid(boundaries.polygonal(shapely.union_all(shapes[code])), 4326)
+        cs.add(
+            "area_geometry",
+            area_id=area,
+            valid_from=DISTRICT_SPAN[0],
+            valid_to=DISTRICT_SPAN[1],
+            geom=shapely.to_wkb(geom, hex=True, include_srid=True),
+            label_point=shapely.to_wkb(
+                shapely.set_srid(shapely.point_on_surface(geom), 4326), hex=True, include_srid=True
+            ),
+            quality="official",
+            source_id=sources["districts"],
+        )
+    election = cs.key("gb.election", "1975:sunday-opening")
+    cs.add(
+        "election",
+        id=election,
+        polity_id=wales,
+        parent_id=None,
+        kind="referendum",
+        date_from=date(1975, 1, 1),
+        date_to=date(1975, 12, 31),
+        date_precision="year",
+        status="held",
+    )
+    name(election, "1975 Welsh Sunday opening polls")
+    election_path = "gb/wales/1975-sunday-opening-polls"
+    cs.add("slug", path=election_path, entity_id=election)
+    cs.add("note", entity_id=election, kind="context", body_md=SUNDAY_CONTEXT)
+    found_text = printed("sunday")
+    for code, (district, *shares) in SUNDAY_1975.items():
+        for share in shares:
+            if share not in found_text:
+                raise ValueError(f"sunday 1975 {code}: {share} is not printed in the answer")
+        contest = cs.key("gb.contest", f"1975:sunday-opening:{code}")
+        cs.add(
+            "contest",
+            id=contest,
+            election_id=election,
+            kind="ballot_question",
+            district_area_id=areas[code],
+            electoral_system_id=system,
+            round_number=1,
+            default_result_kind="counted",
+        )
+        cs.add("ballot_question", contest_id=contest, type="optional_referendum")
+        name(contest, f"Sunday opening of licensed premises in {district}")
+        cs.add("slug", path=f"{election_path}/{slug(district)}", entity_id=contest)
+        options = [cs.key("gb.advisory_polls.option", f"sunday-1975:{code}:{position}") for position in range(2)]
+        for position, (option, label) in enumerate(
+            zip(options, ("For Sunday opening", "Against Sunday opening"), strict=True)
+        ):
+            cs.add(
+                "contest_option",
+                id=option,
+                contest_id=contest,
+                kind="answer",
+                ballot_position=position + 1,
+                ballot_label=label,
+            )
+        result_set = cs.key("gb.advisory_polls.result_set", f"sunday-1975:{code}")
+        cs.add(
+            "result_set",
+            id=result_set,
+            election_id=election,
+            contest_id=contest,
+            stage="official",
+            kind="counted",
+            status="active",
+            source_id=sources["sunday"],
+            is_default=True,
+            completeness=1,
+        )
+        cs.add("note", entity_id=result_set, kind="caveat", body_md=SUNDAY_CAVEAT)
+        values = [float(share) for share in shares]
+        if values[0] == values[1]:
+            raise ValueError(f"sunday 1975 {code}: tied")
+        cs.add("outcome", result_set_id=result_set, option_id=options[int(values[0] < values[1])], kind="won")
+        unit = cs.unit(DISTRICT_SCHEME, code)
+        if unit in cs.minted:
+            cs.add(
+                "reporting_unit",
+                id=unit,
+                polity_id=wales,
+                scheme_code=DISTRICT_SCHEME,
+                code=code,
+                area_relation="equals",
+                area_id=areas[code],
+                kind="standard",
+                valid_from=DISTRICT_SPAN[0],
+                valid_to=DISTRICT_SPAN[1],
+            )
+            name(unit, labels[code])
+        for option, value in zip(options, values, strict=True):
+            cs.add(
+                "result_value",
+                result_set_id=result_set,
+                unit_id=unit,
+                option_id=option,
+                channel=0,
+                measure=VOTES,
+                count_round=0,
+                flags=SHARE_ONLY,
+                value=round(value / 100, 4),
+            )
