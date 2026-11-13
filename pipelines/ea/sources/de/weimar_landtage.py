@@ -133,6 +133,12 @@ RIGHT_COLUMNS = {
     "AUFWERTUNG": (598, 651),
     "ANDERE": (680, 738),
 }
+WIKIDATA_NAMES = {
+    "Q487129": "Kommunistische Partei Deutschlands (Opposition)",
+    "Q689018": "Sozialistische Arbeiterpartei Deutschlands",
+    "Q2596896": "Württembergischer Bauern- und Weingärtnerbund",
+    "Q314832": "Christlich-sozialer Volksdienst",
+}
 LEFT_FOOTNOTES = {"3", "4", "5", "9", "12"}
 WIDTH, HEIGHT = 900, 1344.3
 NOTE = (
@@ -277,19 +283,21 @@ def emit() -> Path:
             )
 
         parties: dict[tuple[str, str], UUID] = {}
+        added: set[UUID] = set()
         for row in votes:
             label, wikidata, code = row["label"], row["wikidata"], row["state"]
             if wikidata:
                 party = cs.key("wikidata", wikidata)
-                if party in cs.minted:
+                if party in cs.minted and party not in added:
                     cs.add("party", id=party, kind="party", polity_id=germany)
-                    name(party, label, "de")
+                    name(party, WIKIDATA_NAMES.get(wikidata, label), "de")
             else:
                 party = cs.key("de.party", f"{code}:{label}")
-                if party in cs.minted:
-                    joint = " u. " in label or label.startswith(("Natl", "Nationale Einheitsliste", "Bürgerliche"))
+                if party in cs.minted and party not in added:
+                    joint = " u. " in label or label.startswith(("Nationale Einheitsliste", "Bürgerliche"))
                     cs.add("party", id=party, kind="list_vehicle" if joint else "party", polity_id=polities[code])
                     name(party, label, "de")
+            added.add(party)
             parties[code, label] = party
 
         values: list[tuple[str, str, str | None, int, int]] = []
