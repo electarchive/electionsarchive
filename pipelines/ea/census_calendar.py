@@ -73,6 +73,7 @@ DAY_RULES = {
     "apr_last_sunday_unless_easter": apr_last_sunday_unless_easter,
     "oct_first_sunday": nth_weekday(10, 6, 1),
     "oct_last_sunday": last_weekday(10, 6),
+    "mar_last_sunday": last_weekday(3, 6),
 }
 
 

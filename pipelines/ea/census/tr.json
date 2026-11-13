@@ -241,22 +241,155 @@
       "publisher": "Türkiye Büyük Millet Meclisi",
       "url": "https://www5.tbmm.gov.tr/tutanaklar/KANUNLAR_KARARLAR/kanuntbmmc028/kanuntbmmc028/kanuntbmmc02804918.pdf",
       "kind": "official_body"
+    },
+    "moi_envanter": {
+      "title": "Türkiye Mülki İdare Bölümleri Envanteri",
+      "publisher": "T.C. İçişleri Bakanlığı",
+      "url": "https://web.archive.org/web/20250201033916/https://www.e-icisleri.gov.tr/Anasayfa/MulkiIdariBolumleri.aspx",
+      "note": "The ministry's live inventory of administrative units, read from the Wayback copy of 1 February 2025: 81 provinces, 30 metropolitan municipalities, 922 districts, 51 provincial municipalities, 519 metropolitan district municipalities, 403 other district municipalities, 398 town (belde) municipalities, 1,401 municipalities in all, 32,270 mahalles, 18,248 köys, and 23,748 bağlıs.",
+      "kind": "official_body"
+    },
+    "anayasa_1982": {
+      "title": "Türkiye Cumhuriyeti Anayasası (Kanun 2709)",
+      "publisher": "T.C. Cumhurbaşkanlığı Mevzuat Bilgi Sistemi",
+      "url": "https://www.mevzuat.gov.tr/MevzuatMetin/1.5.2709.pdf",
+      "kind": "official_body"
+    },
+    "anayasa_1961": {
+      "title": "1961 Anayasası",
+      "publisher": "Anayasa Mahkemesi",
+      "url": "https://www.anayasa.gov.tr/tr/mevzuat/onceki-anayasalar/1961-anayasasi/",
+      "kind": "official_body"
+    },
+    "anayasa_1924": {
+      "title": "1924 Anayasası (Teşkilât-ı Esasiye Kanunu)",
+      "publisher": "Anayasa Mahkemesi",
+      "url": "https://www.anayasa.gov.tr/tr/mevzuat/onceki-anayasalar/1924-anayasasi/",
+      "kind": "official_body"
+    },
+    "k2972": {
+      "title": "Mahalli İdareler ile Mahalle Muhtarlıkları ve İhtiyar Heyetleri Seçimi Hakkında Kanun (Kanun 2972)",
+      "publisher": "T.C. Cumhurbaşkanlığı Mevzuat Bilgi Sistemi",
+      "url": "https://www.mevzuat.gov.tr/MevzuatMetin/1.5.2972.pdf",
+      "kind": "official_body"
+    },
+    "k2839": {
+      "title": "Milletvekili Seçimi Kanunu (Kanun 2839)",
+      "publisher": "T.C. Cumhurbaşkanlığı Mevzuat Bilgi Sistemi",
+      "url": "https://www.mevzuat.gov.tr/MevzuatMetin/1.5.2839.pdf",
+      "kind": "official_body"
+    },
+    "k6271": {
+      "title": "Cumhurbaşkanı Seçimi Kanunu (Kanun 6271)",
+      "publisher": "T.C. Cumhurbaşkanlığı Mevzuat Bilgi Sistemi",
+      "url": "https://www.mevzuat.gov.tr/MevzuatMetin/1.5.6271.pdf",
+      "kind": "official_body"
+    },
+    "k2820": {
+      "title": "Siyasi Partiler Kanunu (Kanun 2820)",
+      "publisher": "T.C. Cumhurbaşkanlığı Mevzuat Bilgi Sistemi",
+      "url": "https://www.mevzuat.gov.tr/MevzuatMetin/1.5.2820.pdf",
+      "kind": "official_body"
+    },
+    "ysk_secsis": {
+      "title": "Seçim Sonuçları (SEÇSİS sonuç sistemi), seçim listesi",
+      "publisher": "Yüksek Seçim Kurulu (YSK)",
+      "url": "https://sonuc.ysk.gov.tr/api/getSecimList?secimSayi=100&araSecim=0&yenilemeSecimi=0",
+      "note": "Lists 17 elections, from the general election of 22 July 2007 to the reruns of 2 June 2024; each has ballot-box results through the same API.",
+      "kind": "official_body"
     }
   },
   "tiers": [
     {
       "key": "national",
-      "name": "Republic of Türkiye",
+      "name": "Türkiye Cumhuriyeti",
+      "name_en": "Republic of Türkiye",
       "parent": null,
       "polity_kind": "sovereign_state",
-      "source": "tuik"
+      "scheme": "tr.nation",
+      "source": "anayasa_1982"
+    },
+    {
+      "key": "il",
+      "name": "İller",
+      "name_en": "Provinces",
+      "parent": "national",
+      "scheme": "tr.il",
+      "source": "moi_envanter",
+      "counts": [
+        {
+          "date": "2025-02-01",
+          "value": 81,
+          "source": "moi_envanter",
+          "locator": "Wayback 2025-02-01: \"İl Sayısı: 81\""
+        }
+      ]
+    },
+    {
+      "key": "buyuksehir",
+      "name": "Büyükşehir belediyeleri",
+      "name_en": "Metropolitan municipalities, coextensive with their provinces since 2014",
+      "parent": "il",
+      "polity_kind": "municipality",
+      "scheme": "tr.buyuksehir",
+      "source": "moi_envanter",
+      "counts": [
+        {
+          "date": "2025-02-01",
+          "value": 30,
+          "source": "moi_envanter",
+          "locator": "Wayback 2025-02-01: \"Büyükşehir Belediyesi Sayısı: 30\""
+        }
+      ]
+    },
+    {
+      "key": "ilce",
+      "name": "İlçeler",
+      "name_en": "Districts",
+      "parent": "il",
+      "elects": false,
+      "scheme": "tr.ilce",
+      "source": "moi_envanter",
+      "counts": [
+        {
+          "date": "2025-02-01",
+          "value": 922,
+          "source": "moi_envanter",
+          "locator": "Wayback 2025-02-01: \"İlçe Sayısı: 922\""
+        }
+      ]
     },
     {
       "key": "local",
-      "name": "Municipalities",
-      "parent": "national",
+      "name": "Belediyeler",
+      "name_en": "Municipalities: metropolitan, provincial, district, and town (belde)",
+      "parent": "ilce",
       "polity_kind": "municipality",
-      "source": "ysk-1963-bb"
+      "source": "moi_envanter",
+      "counts": [
+        {
+          "date": "2025-02-01",
+          "value": 1401,
+          "source": "moi_envanter",
+          "locator": "Wayback 2025-02-01: \"Toplam Belediye Sayısı 1401\" (30 metropolitan, 51 provincial, 519 metropolitan district, 403 district, and 398 belde)"
+        }
+      ]
+    },
+    {
+      "key": "muhtarlik",
+      "name": "Mahalle ve köy muhtarlıkları",
+      "name_en": "Neighborhoods (mahalle) and villages (köy), each electing a muhtar",
+      "parent": "ilce",
+      "scheme": "tr.mahalle",
+      "source": "moi_envanter",
+      "counts": [
+        {
+          "date": "2025-02-01",
+          "value": 50518,
+          "source": "moi_envanter",
+          "locator": "Wayback 2025-02-01: \"Mahalle Sayısı: 32270\" plus \"Köy Sayısı: 18248\""
+        }
+      ]
     }
   ],
   "classes": [
@@ -457,6 +590,188 @@
           "source": "ysk2023",
           "quote": "Section 4.3.3 (SEÇİM ÇEVRESİ table): 87 rows, 81 provinces with Ankara, Bursa, İstanbul, and İzmir split; TOPLAM 600"
         }
+      ],
+      "name_en": "Grand National Assembly of Türkiye",
+      "valid_from": "1920-04-23",
+      "first_held": "1923-06-01",
+      "earliest_record": "1923-06-01",
+      "note": "The First Assembly met on 23 April 1920, elected two-stage under Ottoman rules. Systems: two-stage majority voting by province (1923-1943); direct plurality (block) voting by province (1946-1957); D'Hondt PR by province (1961-1977, with a national remainder in 1965); D'Hondt in provinces and split constituencies with a 10 percent national threshold (1983-2018), lowered to 7 percent from 2023. Since 2018 elected for five years on the same day as the President (Constitution art. 77; Law 2839 art. 6), on the last Sunday before the joint term ends (Law 6271 art. 3), earlier when the Assembly or the President renews the elections (art. 116).",
+      "cadence": [
+        {
+          "source": "anayasa_1924",
+          "locator": "https://www.anayasa.gov.tr/tr/mevzuat/onceki-anayasalar/1924-anayasasi/ (art. 13: \"dört senede bir\")",
+          "period_years": 4,
+          "term_years": 4,
+          "called": true,
+          "valid_from": "1924-04-20",
+          "valid_to": "1960-05-27"
+        },
+        {
+          "source": "anayasa_1961",
+          "locator": "https://www.anayasa.gov.tr/tr/mevzuat/onceki-anayasalar/1961-anayasasi/ (art. 69: \"dört yılda bir\")",
+          "period_years": 4,
+          "term_years": 4,
+          "called": true,
+          "administered_by": "Yüksek Seçim Kurulu",
+          "valid_from": "1961-07-20",
+          "valid_to": "1980-09-12"
+        },
+        {
+          "source": "anayasa_1982",
+          "locator": "https://www.mevzuat.gov.tr/MevzuatMetin/1.5.2709.pdf (art. 77 as adopted: five years; Law 5678 of 2007: four years)",
+          "period_years": 5,
+          "term_years": 5,
+          "called": true,
+          "administered_by": "Yüksek Seçim Kurulu",
+          "vacancy_rule": "By-election once per term, not within 30 months of a general election nor in its last year, and within three months once 5 percent of seats are vacant (Constitution art. 78; Law 2839 art. 7).",
+          "valid_from": "1982-11-09",
+          "valid_to": "2007-10-31"
+        },
+        {
+          "source": "k2839",
+          "locator": "https://www.mevzuat.gov.tr/MevzuatMetin/1.5.2839.pdf (art. 6, \"dört yılda bir\" from Law 5678 of 2007 until Law 7140 of 2018)",
+          "period_years": 4,
+          "term_years": 4,
+          "called": true,
+          "administered_by": "Yüksek Seçim Kurulu",
+          "valid_from": "2007-10-31",
+          "valid_to": "2018-04-25"
+        },
+        {
+          "source": "anayasa_1982",
+          "locator": "https://www.mevzuat.gov.tr/MevzuatMetin/1.5.2709.pdf (art. 77, as amended by Law 6771: \"beş yılda bir aynı günde\"; art. 116)",
+          "period_years": 5,
+          "phase": 3,
+          "term_years": 5,
+          "called": true,
+          "administered_by": "Yüksek Seçim Kurulu",
+          "vacancy_rule": "By-election once per term, not within 30 months of a general election nor in its last year, and within three months once 5 percent of seats are vacant; a province left with no member votes on the first Sunday 90 days after (Constitution art. 78; Law 2839 art. 7).",
+          "valid_from": "2018-04-25"
+        }
+      ],
+      "access": [
+        {
+          "platform": "TÜİK, Milletvekili Genel Seçimleri 1923-2011 (hosted by YSK)",
+          "url": "https://www.ysk.gov.tr/doc/dosyalar/1923-2011-MVSecimleri-Tuik.pdf",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "license": "none stated",
+          "first_date": "1923-06-01",
+          "last_date": "2011-06-12",
+          "finest": "tr.il",
+          "source": "tuik",
+          "evidence": "Seats by province from 1923, votes by province and party from 1950"
+        },
+        {
+          "platform": "YSK SEÇSİS results (sonuc.ysk.gov.tr)",
+          "url": "https://sonuc.ysk.gov.tr/api/",
+          "format": "json API, xlsx",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "license": "none stated",
+          "finest": "tr.sandik",
+          "source": "ysk_secsis",
+          "first_date": "2007-07-22",
+          "last_date": "2023-05-14",
+          "evidence": "One election entry per general election from 2007; ballot-box results by party"
+        }
+      ]
+    },
+    {
+      "key": "tbmm_by",
+      "tier": "national",
+      "name": "By-elections",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "Held once per term at most (Constitution art. 78; Law 2839 art. 7); none since 2003 although seats fell vacant.",
+      "source": "tesav-ara",
+      "match": [
+        {
+          "election_kinds": [
+            "by_election"
+          ],
+          "body_kinds": [
+            "unicameral",
+            "lower_house"
+          ],
+          "iso_pattern": "TR"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1951-09-16",
+          "contests": 17,
+          "note": "These counts come from a TESAV compilation that reproduces the State Institute of Statistics' published results.",
+          "source": "tesav-ara",
+          "quote": "16 Eylül 1951 Milletvekili Ara Seçimi Sonuçları ... Seçim Yapılan İl Sayısı 17 İl"
+        },
+        {
+          "date": "1966-06-05",
+          "contests": 1,
+          "source": "rg-12318",
+          "quote": "Hatay İlinde boşalmış bir milletvekilliği için bu seçim çevresinde 5/6/1966 Pazar gününde yapılan ara seçimi"
+        },
+        {
+          "date": "1968-06-02",
+          "contests": 5,
+          "source": "rg-12922",
+          "quote": "2/6/1968 Pazar günü 5 ilde yapılan Milletvekili ara seçimi kesin sonuçları"
+        },
+        {
+          "date": "1975-10-12",
+          "contests": 6,
+          "note": "These counts come from a TESAV compilation that reproduces the State Institute of Statistics' published results.",
+          "source": "tesav-ara",
+          "quote": "12 Ekim 1975 Milletvekili Ara Seçimi Sonuçları ... Seçim Yapılan İl Sayısı 6 İl ... (YSK Bildirisi : 25 Ekim 1975 tarih ve 15394 sayılı Resmi Gazete)"
+        },
+        {
+          "date": "1979-10-14",
+          "contests": 5,
+          "source": "rg-16803",
+          "quote": "14 Ekim 1979 Pazar günü 26 İlde yapılmış olan Cumhuriyet Senatosu üyeliği (C) Grubu İlleri Seçimi ile Cumhuriyet Senatosu ve 5 İldeki Milletvekili Ara seçimleri sonuçları"
+        },
+        {
+          "date": "1986-09-28",
+          "contests": 11,
+          "source": "rg-19247",
+          "quote": "28 Eylül 1986 Pazar günü onbir seçim çevresinde yapılan Türkiye Büyük Millet Meclisi XVII. Dönem Milletvekili Ara Seçiminde"
+        },
+        {
+          "date": "2003-03-09",
+          "contests": 1,
+          "note": "Siirt's 2002 general election was annulled on appeal, and the province voted again on March 9, 2003.",
+          "source": "tesav-ara",
+          "quote": "9 Mart 2003 Siirt İli Yenileme Seçimi Sonuçları ... Kaynak: Yüksek Seçim Kurulu'nun, 11 Mart 2003 günlü ve 212 sayılı Kararı."
+        }
+      ],
+      "name_en": "Grand National Assembly by-elections",
+      "first_held": "1951-09-16",
+      "cadence": [
+        {
+          "source": "k2839",
+          "locator": "https://www.mevzuat.gov.tr/MevzuatMetin/1.5.2839.pdf (art. 7)",
+          "called": true,
+          "administered_by": "Yüksek Seçim Kurulu",
+          "vacancy_rule": "Once per term, not within 30 months of a general election nor in its last year; within three months once 5 percent of seats are vacant; a province with no member left votes on the first Sunday 90 days after the vacancy."
+        }
+      ],
+      "access": [
+        {
+          "platform": "YSK election archive (Kesin Seçim Sonuçları and Resmî Gazete decisions)",
+          "url": "https://www.ysk.gov.tr/doc/dosyalar/docs/",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "license": "none stated",
+          "first_date": "1951-09-16",
+          "last_date": "2003-03-09",
+          "finest": "tr.il",
+          "evidence": "By-election results by province in TÜİK and YSK compilations"
+        }
       ]
     },
     {
@@ -471,7 +786,7 @@
           "tr.il"
         ]
       },
-      "note": "Counted per round: each nationwide presidential vote counts once, the 2023 runoff included, from the Supreme Election Council's decisions and bulletins.",
+      "note": "Elected directly since the 2007 amendment (Law 5678), first on 10 August 2014; five-year term, at most two (Constitution art. 101). Since 2018 on the same day as the Assembly. A candidate needs an absolute majority, else a runoff between the top two on the second Sunday after (Law 6271 art. 16).",
       "source": "tr-nat-1",
       "match": [
         {
@@ -510,7 +825,113 @@
           "source": "tr-nat-4",
           "quote": "Hazırlamış olduğumuz bu bülten 28 Mayıs 2023 Cumhurbaşkanı 2. Oylama Seçimi sonuçlarını ve bu seçime ilişkin istatistikleri içermektedir."
         }
+      ],
+      "name_en": "President of Türkiye, by popular vote",
+      "valid_from": "2007-10-31",
+      "first_held": "2014-08-10",
+      "earliest_record": "2014-08-10",
+      "cadence": [
+        {
+          "source": "k6271",
+          "locator": "https://www.mevzuat.gov.tr/MevzuatMetin/1.5.6271.pdf (art. 3: \"beş yılda bir aynı günde\"; the last Sunday before the joint term ends)",
+          "period_years": 5,
+          "phase": 3,
+          "term_years": 5,
+          "called": true,
+          "runoff": "majority",
+          "runoff_threshold": 0.5,
+          "runoff_rule": "Absolute majority of valid votes, else a runoff between the top two on the second Sunday after the first vote.",
+          "administered_by": "Yüksek Seçim Kurulu",
+          "valid_from": "2018-04-25"
+        }
+      ],
+      "access": [
+        {
+          "platform": "YSK SEÇSİS results (sonuc.ysk.gov.tr)",
+          "url": "https://sonuc.ysk.gov.tr/api/",
+          "format": "json API, xlsx",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "license": "none stated",
+          "finest": "tr.sandik",
+          "source": "ysk_secsis",
+          "first_date": "2014-08-10",
+          "last_date": "2023-05-28",
+          "evidence": "Each presidential vote, the 2023 runoff included, with ballot-box results"
+        }
       ]
+    },
+    {
+      "key": "president_tbmm",
+      "tier": "national",
+      "name": "TBMM tarafından Cumhurbaşkanı seçimi",
+      "name_en": "President elected by the Grand National Assembly",
+      "category": "indirect",
+      "goal": "national",
+      "valid_from": "1923-10-29",
+      "valid_to": "2014-08-10",
+      "first_held": "1923-10-29",
+      "earliest_record": "1923-10-29",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "The Assembly elected the President for its own term under the 1924 Constitution (art. 31), for seven years by two-thirds majority in the first two rounds under 1961 art. 95 and 1982 art. 102, until the 2007 amendment moved the office to a popular vote. Counted per round of voting.",
+      "source": "anayasa_1924",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "TR"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "anayasa_1924",
+          "locator": "https://www.anayasa.gov.tr/tr/mevzuat/onceki-anayasalar/1924-anayasasi/ (art. 31)",
+          "called": true,
+          "administered_by": "Türkiye Büyük Millet Meclisi",
+          "valid_from": "1924-04-20",
+          "valid_to": "1960-05-27"
+        },
+        {
+          "source": "anayasa_1961",
+          "locator": "https://www.anayasa.gov.tr/tr/mevzuat/onceki-anayasalar/1961-anayasasi/ (art. 95)",
+          "period_years": 7,
+          "term_years": 7,
+          "called": false,
+          "administered_by": "Türkiye Büyük Millet Meclisi",
+          "valid_from": "1961-07-20",
+          "valid_to": "1980-09-12"
+        },
+        {
+          "source": "anayasa_1982",
+          "locator": "https://www.mevzuat.gov.tr/MevzuatMetin/1.5.2709.pdf (art. 102 as adopted)",
+          "period_years": 7,
+          "term_years": 7,
+          "called": false,
+          "administered_by": "Türkiye Büyük Millet Meclisi",
+          "valid_from": "1982-11-09",
+          "valid_to": "2007-10-31"
+        }
+      ],
+      "access": [
+        {
+          "platform": "TBMM Tutanak Dergisi",
+          "url": "https://www.tbmm.gov.tr/tutanaklar/TUTANAK/",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "license": "none stated",
+          "first_date": "1923-10-29",
+          "last_date": "2007-08-28",
+          "evidence": "Round-by-round votes in the Assembly's minutes"
+        }
+      ],
+      "dates": []
     },
     {
       "key": "senate",
@@ -524,12 +945,13 @@
           "tr.senato_cevresi"
         ]
       },
-      "note": "Counted per province: each province that elected senators on an election day counts once, including by-elections held the same day. The Senate was elected in full in all 67 provinces in 1961 and then renewed a third at a time. The 1968 and 1977 counts are stated in Emine Pür's study of Senate elections; the other renewals are counted from the province groups and by-election tables in studies by Hikmet Sami Türk and Çakırbaş.",
+      "note": "150 senators elected by province under the 1961 Constitution (art. 70), for six years with a third renewed every two years (art. 73), plus appointed and life members. Dissolved by the 1980 coup.",
       "source": "tr-nat-8",
       "match": [
         {
           "election_kinds": [
-            "general"
+            "general",
+            "by_election"
           ],
           "body_kinds": [
             "upper_house"
@@ -601,98 +1023,324 @@
           "source": "tr-nat-9",
           "quote": "14 Ekim 1979 günü Cumhuriyet Senatosu C Grubu illeri üçte bir yenileme seçimleri ile birlikte Manisa'da bir Cumhuriyet Senatosu üyeliği"
         }
+      ],
+      "name_en": "Senate of the Republic",
+      "valid_from": "1961-07-20",
+      "valid_to": "1980-09-12",
+      "first_held": "1961-10-15",
+      "earliest_record": "1961-10-15",
+      "cadence": [
+        {
+          "source": "anayasa_1961",
+          "locator": "https://www.anayasa.gov.tr/tr/mevzuat/onceki-anayasalar/1961-anayasasi/ (art. 73: \"üçte biri her iki yılda bir yenilenir\")",
+          "period_years": 2,
+          "term_years": 6,
+          "called": false,
+          "classes": 3,
+          "administered_by": "Yüksek Seçim Kurulu",
+          "valid_from": "1961-07-20",
+          "valid_to": "1980-09-12"
+        }
       ]
     },
     {
-      "key": "tbmm_by",
+      "key": "referendums",
       "tier": "national",
-      "name": "By-elections",
-      "category": "legislature",
-      "goal": "national",
+      "name": "Referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
       "measure": {
-        "unit": "contest"
+        "unit": "contest",
+        "grain": [
+          "tr.il"
+        ]
       },
-      "note": "Each by-election counts one race per province, or per numbered district where a province was split into several (from 1983 on).",
-      "source": "tesav-ara",
+      "note": "Constitutional amendments go to a referendum when passed by three fifths but less than two thirds of the Assembly, or when the President refers them (Constitution art. 175); the 1961 and 1982 constitutions were themselves approved by referendum.",
+      "source": "tr-nat-5",
       "match": [
         {
           "election_kinds": [
-            "by_election"
+            "referendum"
           ],
-          "body_kinds": [
-            "unicameral",
-            "lower_house"
+          "contest_kinds": [
+            "ballot_question"
           ],
           "iso_pattern": "TR"
         }
       ],
       "dates": [
         {
-          "date": "1951-09-16",
-          "contests": 17,
-          "note": "These counts come from a TESAV compilation that reproduces the State Institute of Statistics' published results.",
-          "source": "tesav-ara",
-          "quote": "16 Eylül 1951 Milletvekili Ara Seçimi Sonuçları ... Seçim Yapılan İl Sayısı 17 İl"
-        },
-        {
-          "date": "1966-06-05",
+          "date": "1961-07-09",
           "contests": 1,
-          "source": "rg-12318",
-          "quote": "Hatay İlinde boşalmış bir milletvekilliği için bu seçim çevresinde 5/6/1966 Pazar gününde yapılan ara seçimi"
+          "source": "tr-nat-5",
+          "quote": "Daha sonra 9 Temmuz 1961 tarihinde halkoyuna sunulan Anayasa, % 61,5 oranında kabul edilerek yürürlüğe girmiştir."
         },
         {
-          "date": "1968-06-02",
-          "contests": 5,
-          "source": "rg-12922",
-          "quote": "2/6/1968 Pazar günü 5 ilde yapılan Milletvekili ara seçimi kesin sonuçları"
-        },
-        {
-          "date": "1975-10-12",
-          "contests": 6,
-          "note": "These counts come from a TESAV compilation that reproduces the State Institute of Statistics' published results.",
-          "source": "tesav-ara",
-          "quote": "12 Ekim 1975 Milletvekili Ara Seçimi Sonuçları ... Seçim Yapılan İl Sayısı 6 İl ... (YSK Bildirisi : 25 Ekim 1975 tarih ve 15394 sayılı Resmi Gazete)"
-        },
-        {
-          "date": "1979-10-14",
-          "contests": 5,
-          "source": "rg-16803",
-          "quote": "14 Ekim 1979 Pazar günü 26 İlde yapılmış olan Cumhuriyet Senatosu üyeliği (C) Grubu İlleri Seçimi ile Cumhuriyet Senatosu ve 5 İldeki Milletvekili Ara seçimleri sonuçları"
-        },
-        {
-          "date": "1986-09-28",
-          "contests": 11,
-          "source": "rg-19247",
-          "quote": "28 Eylül 1986 Pazar günü onbir seçim çevresinde yapılan Türkiye Büyük Millet Meclisi XVII. Dönem Milletvekili Ara Seçiminde"
-        },
-        {
-          "date": "2003-03-09",
+          "date": "1982-11-07",
           "contests": 1,
-          "note": "Siirt's 2002 general election was annulled on appeal, and the province voted again on March 9, 2003.",
-          "source": "tesav-ara",
-          "quote": "9 Mart 2003 Siirt İli Yenileme Seçimi Sonuçları ... Kaynak: Yüksek Seçim Kurulu'nun, 11 Mart 2003 günlü ve 212 sayılı Kararı."
+          "source": "tr-nat-6",
+          "quote": "7 Kasım 1982 Anayasa Değişikliği Halk Oylaması"
+        },
+        {
+          "date": "1987-09-06",
+          "contests": 1,
+          "source": "tr-nat-6",
+          "quote": "6 Eylül 1987 Anayasa Değişikliği Halk Oylaması"
+        },
+        {
+          "date": "1988-09-25",
+          "contests": 1,
+          "source": "tr-nat-6",
+          "quote": "25 Eylül 1988 Anayasa Değişikliği Halk Oylaması"
+        },
+        {
+          "date": "2007-10-21",
+          "contests": 1,
+          "source": "tr-nat-7",
+          "quote": "21/10/2007 tarihinde yapılan halkoylaması sonuçları aynı gün Kurulumuza ulaşmaya başlamış olup"
+        },
+        {
+          "date": "2010-09-12",
+          "contests": 1,
+          "source": "tr-nat-6",
+          "quote": "12 Eylül 2010 Anayasa Değişikliği Halkoylaması"
+        },
+        {
+          "date": "2017-04-16",
+          "contests": 1,
+          "source": "tr-nat-6",
+          "quote": "16 Nisan 2017 Anayasa Değişikliği Halkoylaması"
+        }
+      ],
+      "name_en": "National referendums",
+      "first_held": "1961-07-09",
+      "earliest_record": "1961-07-09",
+      "cadence": [
+        {
+          "source": "anayasa_1982",
+          "locator": "https://www.mevzuat.gov.tr/MevzuatMetin/1.5.2709.pdf (art. 175)",
+          "called": true,
+          "administered_by": "Yüksek Seçim Kurulu"
+        }
+      ],
+      "access": [
+        {
+          "platform": "YSK SEÇSİS results (sonuc.ysk.gov.tr)",
+          "url": "https://sonuc.ysk.gov.tr/api/",
+          "format": "json API, xlsx",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "license": "none stated",
+          "finest": "tr.sandik",
+          "source": "ysk_secsis",
+          "first_date": "2007-10-21",
+          "last_date": "2017-04-16",
+          "evidence": "The 2007, 2010, and 2017 referendums"
         }
       ]
+    },
+    {
+      "key": "temsilciler_meclisi",
+      "tier": "national",
+      "name": "Temsilciler Meclisi seçimi",
+      "name_en": "House of Representatives of the 1961 Constituent Assembly",
+      "category": "indirect",
+      "goal": "national",
+      "valid_from": "1960-12-13",
+      "valid_to": "1961-10-25",
+      "first_held": "1961-01-01",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "Indirectly elected in December 1960 and January 1961 by provincial electoral colleges and named bodies under Law 157 on the Constituent Assembly; it drafted the 1961 Constitution. The archive holds its members (TBMM Albümü), not the votes.",
+      "source": "anayasa_1961",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect",
+            "general"
+          ],
+          "body_kinds": [
+            "constituent_assembly"
+          ],
+          "iso_pattern": "TR"
+        }
+      ],
+      "est_votes": 10000,
+      "effort": 4,
+      "dates": []
+    },
+    {
+      "key": "danisma_meclisi",
+      "tier": "national",
+      "name": "Danışma Meclisi",
+      "name_en": "Consultative Assembly (1981-1983)",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1981-10-23",
+      "valid_to": "1983-12-06",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "anayasa_1982",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Appointed by the National Security Council from governors' shortlists, not elected.",
+      "match": [],
+      "dates": []
+    },
+    {
+      "key": "meclisi_mebusan",
+      "tier": "national",
+      "name": "Meclis-i Mebusan seçimleri",
+      "name_en": "Ottoman Chamber of Deputies (1877-1919)",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1876-12-23",
+      "valid_to": "1920-03-18",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "anayasa_1924",
+      "disposition": "out_of_scope",
+      "disposition_reason": "The Ottoman Empire's parliament, a predecessor state: two-stage elections with no surviving vote counts; it belongs under an Ottoman polity if the archive adds one.",
+      "match": [],
+      "dates": []
+    },
+    {
+      "key": "onsecim",
+      "tier": "national",
+      "name": "Önseçim",
+      "name_en": "Party primaries under judicial supervision",
+      "category": "nominating",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "A party may pick candidates by a primary of its members, run under the district election board's supervision (Law 2820 arts. 37-41); parties have mostly used central nomination instead.",
+      "source": "k2820",
+      "disposition": "blocked",
+      "disposition_reason": "Results stay with the district election boards and the parties; YSK has never compiled or published them.",
+      "match": [
+        {
+          "election_kinds": [
+            "primary"
+          ],
+          "iso_pattern": "TR*"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "kurum_ici",
+      "tier": "national",
+      "name": "Kurum içi seçimler",
+      "name_en": "Party congresses, professional chambers, bar associations, unions, universities, and the judges' council",
+      "category": "non_territorial",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "k2820",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Internal votes of parties, professional and trade bodies, universities (rectors until 2016), and judges (HSYK/HSK members until 2017); not public elections.",
+      "match": [],
+      "dates": []
+    },
+    {
+      "key": "il_genel_meclisi",
+      "tier": "il",
+      "name": "İl genel meclisi",
+      "name_en": "Provincial general councils",
+      "category": "legislature",
+      "goal": "local",
+      "valid_from": "1963-07-05",
+      "first_held": "1963-11-17",
+      "earliest_record": "1963-11-17",
+      "measure": {
+        "unit": "polity",
+        "fine": [
+          "tr.sandik"
+        ]
+      },
+      "note": "Elected with the mayors, each district a constituency, by D'Hondt with a 10 percent threshold (Law 2972 arts. 5 and 23). Since Law 6360 took effect in 2014 only the 51 non-metropolitan provinces elect one; the 30 metropolitan provinces' councils were abolished. The archive holds only the nationwide seat totals by party (13 elections, 1963-2024), not results by province or district.",
+      "source": "k2972",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "name_pattern": "(Provincial council|İl Genel Meclisi)",
+          "within": null
+        }
+      ],
+      "cadence": [
+        {
+          "source": "k2972",
+          "locator": "https://www.mevzuat.gov.tr/MevzuatMetin/1.5.2972.pdf (art. 8, as amended by Law 3507 of 7 December 1988)",
+          "period_years": 5,
+          "phase": 4,
+          "month": 3,
+          "day_rule": "mar_last_sunday",
+          "term_years": 5,
+          "called": false,
+          "administered_by": "Yüksek Seçim Kurulu through the provincial and district election boards",
+          "valid_from": "1988-12-07",
+          "vacancy_rule": "Seats pass to the list's substitutes; a by-election follows when membership falls below half (Law 2972 art. 29)."
+        }
+      ],
+      "access": [
+        {
+          "platform": "YSK SEÇSİS results (sonuc.ysk.gov.tr)",
+          "url": "https://sonuc.ysk.gov.tr/api/",
+          "format": "json API, xlsx",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "license": "none stated",
+          "finest": "tr.sandik",
+          "source": "ysk_secsis",
+          "first_date": "2009-03-29",
+          "last_date": "2024-06-02",
+          "evidence": "secim_DETAY_SAYI 4 for each general local election: metropolitan mayor, mayor, municipal council, and provincial council, by ballot box"
+        },
+        {
+          "platform": "YSK election archive (Kesin Seçim Sonuçları and Resmî Gazete decisions)",
+          "url": "https://www.ysk.gov.tr/doc/dosyalar/docs/",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "license": "none stated",
+          "first_date": "1963-11-17",
+          "last_date": "2024-03-31",
+          "finest": "tr.ilce",
+          "evidence": "Provincial council results in the YSK and DİE local-election books"
+        }
+      ],
+      "est_votes": 225000000,
+      "effort": 3,
+      "dates": []
     },
     {
       "key": "local",
       "tier": "local",
       "name": "Mayoral elections",
-      "category": "council",
+      "category": "executive",
       "goal": "local",
       "measure": {
         "unit": "polity"
       },
-      "note": "Counted per mayoralty: every metropolitan, provincial, district, and town (belde) mayor elected at each nationwide local election, as the Supreme Election Council (YSK) reports it. YSK leaves out races it annulled, which were rerun weeks later, such as Istanbul's metropolitan mayor in 2019; the archive counts a rerun with its original election. Council and village headman (muhtar) elections aren't counted here.",
+      "note": "Elected directly by plurality since 1963 (Law 2972 art. 22 today), with the councils, every five years on the last Sunday of March; before 1963 each council chose its mayor. Metropolitan mayors since 1984 (3 then, 30 since 2014). Reruns (yenileme) follow annulled or new-municipality elections (art. 29).",
       "source": "ysk-1963-bb",
       "match": [
         {
           "election_kinds": [
-            "local"
+            "local",
+            "by_election"
           ],
           "office_kinds": [
             "mayor"
-          ]
+          ],
+          "within": null
         }
       ],
       "dates": [
@@ -763,77 +1411,238 @@
           "through": "1999-12-31",
           "note": "YSK's results for these elections give votes by province but not the number of mayoralties, so they aren't counted yet."
         }
+      ],
+      "name_en": "Mayors: metropolitan, provincial, district, and town (belde)",
+      "valid_from": "1963-07-05",
+      "first_held": "1963-11-17",
+      "earliest_record": "1963-11-17",
+      "cadence": [
+        {
+          "source": "k2972",
+          "locator": "https://www.mevzuat.gov.tr/MevzuatMetin/1.5.2972.pdf (art. 8, as amended by Law 3507 of 7 December 1988)",
+          "period_years": 5,
+          "phase": 4,
+          "month": 3,
+          "day_rule": "mar_last_sunday",
+          "term_years": 5,
+          "called": false,
+          "administered_by": "Yüksek Seçim Kurulu through the provincial and district election boards",
+          "valid_from": "1988-12-07",
+          "vacancy_rule": "A vacant mayoralty is filled by the council from its members; a rerun follows an annulment, a council falling below half its members, or a new municipality, on the first Sunday 60 days after notice, unless the next general local election is within a year (Law 2972 art. 29)."
+        }
+      ],
+      "access": [
+        {
+          "platform": "YSK election archive (Kesin Seçim Sonuçları and Resmî Gazete decisions)",
+          "url": "https://www.ysk.gov.tr/doc/dosyalar/docs/",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "license": "none stated",
+          "first_date": "1963-11-17",
+          "last_date": "2024-03-31",
+          "finest": "tr.belde",
+          "evidence": "Kesin sonuç PDFs of mayoral results by municipality for 1963-1977 and 2004-2024 (the sources of the dates listed here)"
+        },
+        {
+          "platform": "YSK SEÇSİS results (sonuc.ysk.gov.tr)",
+          "url": "https://sonuc.ysk.gov.tr/api/",
+          "format": "json API, xlsx",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "license": "none stated",
+          "finest": "tr.sandik",
+          "source": "ysk_secsis",
+          "first_date": "2009-03-29",
+          "last_date": "2024-06-02",
+          "evidence": "Mayoral and metropolitan mayoral results by ballot box from 2009"
+        }
       ]
     },
     {
-      "key": "referendums",
-      "tier": "national",
-      "name": "Referendums",
-      "category": "direct_democracy",
-      "goal": "referendums",
+      "key": "belediye_meclisi",
+      "tier": "local",
+      "name": "Belediye meclisi",
+      "name_en": "Municipal councils",
+      "category": "council",
+      "goal": "local",
+      "valid_from": "1930-04-14",
+      "first_held": "1930-10-01",
+      "earliest_record": "1963-11-17",
       "measure": {
-        "unit": "contest",
-        "grain": [
-          "tr.il"
+        "unit": "polity",
+        "fine": [
+          "tr.sandik"
         ]
       },
-      "note": "Counted per referendum: each nationwide vote counts once, from the Supreme Election Council's referendum archive and, for 1961, the Grand National Assembly.",
-      "source": "tr-nat-5",
+      "note": "Every municipality elects a council by D'Hondt with a 10 percent threshold, plus quota (kontenjan) seats for the leading party (Law 2972 arts. 23 and 10). A metropolitan council is not elected separately: it is the metropolitan mayor, the district mayors, and a fifth of each district council (art. 6). Councils were elected under Law 1580 from 1930. The archive holds only nationwide seat totals by party (13 elections, 1963-2024) and five rerun councils.",
+      "source": "k2972",
       "match": [
         {
           "election_kinds": [
-            "referendum"
+            "local",
+            "by_election"
+          ],
+          "name_pattern": "(Municipal council|Belediye Meclisi)",
+          "within": null
+        },
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
           ],
           "contest_kinds": [
-            "ballot_question"
+            "body_seats"
           ],
-          "iso_pattern": "TR"
+          "polity_kinds": [
+            "municipality"
+          ],
+          "within": null
         }
       ],
-      "dates": [
+      "cadence": [
         {
-          "date": "1961-07-09",
-          "contests": 1,
-          "source": "tr-nat-5",
-          "quote": "Daha sonra 9 Temmuz 1961 tarihinde halkoyuna sunulan Anayasa, % 61,5 oranında kabul edilerek yürürlüğe girmiştir."
-        },
-        {
-          "date": "1982-11-07",
-          "contests": 1,
-          "source": "tr-nat-6",
-          "quote": "7 Kasım 1982 Anayasa Değişikliği Halk Oylaması"
-        },
-        {
-          "date": "1987-09-06",
-          "contests": 1,
-          "source": "tr-nat-6",
-          "quote": "6 Eylül 1987 Anayasa Değişikliği Halk Oylaması"
-        },
-        {
-          "date": "1988-09-25",
-          "contests": 1,
-          "source": "tr-nat-6",
-          "quote": "25 Eylül 1988 Anayasa Değişikliği Halk Oylaması"
-        },
-        {
-          "date": "2007-10-21",
-          "contests": 1,
-          "source": "tr-nat-7",
-          "quote": "21/10/2007 tarihinde yapılan halkoylaması sonuçları aynı gün Kurulumuza ulaşmaya başlamış olup"
-        },
-        {
-          "date": "2010-09-12",
-          "contests": 1,
-          "source": "tr-nat-6",
-          "quote": "12 Eylül 2010 Anayasa Değişikliği Halkoylaması"
-        },
-        {
-          "date": "2017-04-16",
-          "contests": 1,
-          "source": "tr-nat-6",
-          "quote": "16 Nisan 2017 Anayasa Değişikliği Halkoylaması"
+          "source": "k2972",
+          "locator": "https://www.mevzuat.gov.tr/MevzuatMetin/1.5.2972.pdf (art. 8, as amended by Law 3507 of 7 December 1988)",
+          "period_years": 5,
+          "phase": 4,
+          "month": 3,
+          "day_rule": "mar_last_sunday",
+          "term_years": 5,
+          "called": false,
+          "administered_by": "Yüksek Seçim Kurulu through the provincial and district election boards",
+          "valid_from": "1988-12-07",
+          "vacancy_rule": "Seats pass to the list's substitutes; a by-election follows when membership falls below half (Law 2972 art. 29)."
         }
-      ]
+      ],
+      "access": [
+        {
+          "platform": "YSK SEÇSİS results (sonuc.ysk.gov.tr)",
+          "url": "https://sonuc.ysk.gov.tr/api/",
+          "format": "json API, xlsx",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "license": "none stated",
+          "finest": "tr.sandik",
+          "source": "ysk_secsis",
+          "first_date": "2009-03-29",
+          "last_date": "2024-06-02",
+          "evidence": "Municipal council results by ballot box from 2009"
+        },
+        {
+          "platform": "YSK election archive (Kesin Seçim Sonuçları and Resmî Gazete decisions)",
+          "url": "https://www.ysk.gov.tr/doc/dosyalar/docs/",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "license": "none stated",
+          "first_date": "1963-11-17",
+          "last_date": "2024-03-31",
+          "finest": "tr.belde",
+          "evidence": "Municipal council results in the YSK and DİE local-election books"
+        }
+      ],
+      "est_votes": 450000000,
+      "effort": 3,
+      "dates": []
+    },
+    {
+      "key": "muhtar",
+      "tier": "muhtarlik",
+      "name": "Muhtar",
+      "name_en": "Muhtars of mahalles and köys",
+      "category": "executive",
+      "goal": "local",
+      "first_held": "1924-03-18",
+      "earliest_record": "1963-11-17",
+      "measure": {
+        "unit": "polity"
+      },
+      "finest_note": "One muhtarlık per contest; no candidacy (Law 2972 art. 31) and no published vote counts, so winners only",
+      "note": "Each mahalle and köy elects a muhtar by plurality with the local elections, without candidacies (Law 2972 arts. 30-33; köy muhtars since the Köy Kanunu, Law 442 of 1924). Since 2014 the köys of the 30 metropolitan provinces are mahalles. Held: 2024 winners from the district governorates' lists and the 1963 national total; the research is in tr-muhtar.md.",
+      "source": "k2972",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "office_kinds": [
+            "other"
+          ],
+          "name_pattern": "^Muhtar",
+          "within": null
+        }
+      ],
+      "cadence": [
+        {
+          "source": "k2972",
+          "locator": "https://www.mevzuat.gov.tr/MevzuatMetin/1.5.2972.pdf (arts. 8 and 30-33)",
+          "period_years": 5,
+          "phase": 4,
+          "month": 3,
+          "day_rule": "mar_last_sunday",
+          "term_years": 5,
+          "called": false,
+          "administered_by": "Yüksek Seçim Kurulu through the provincial and district election boards",
+          "valid_from": "1988-12-07",
+          "vacancy_rule": "A vacant muhtarlık is filled by the senior member of the ihtiyar heyeti or meclisi until a by-election on the first Sunday 60 days after notice (Law 2972 art. 33)."
+        }
+      ],
+      "access": [
+        {
+          "platform": "District governorates' (kaymakamlık) winner lists",
+          "url": "https://www.e-icisleri.gov.tr/",
+          "format": "html, pdf",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "first_date": "2024-03-31",
+          "last_date": "2024-03-31",
+          "finest": "tr.mahalle",
+          "evidence": "Lists of elected muhtars per district; no vote counts (tr-muhtar.md)"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "ihtiyar_heyeti",
+      "tier": "muhtarlik",
+      "name": "Mahalle ihtiyar heyeti ve köy ihtiyar meclisi",
+      "name_en": "Neighborhood and village councils of elders",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "Eight members per mahalle; 8, 10, or 12 per köy by population, elected with the muhtar on a separate ballot (Law 2972 art. 30).",
+      "source": "k2972",
+      "disposition": "blocked",
+      "disposition_reason": "No list or vote count is published: the result exists only in each district election board's minutes (Law 2972 arts. 25 and 34), and no ministry or YSK compilation exists for any year.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "name_pattern": "(ihtiyar|council of elders)",
+          "within": null
+        }
+      ],
+      "cadence": [
+        {
+          "source": "k2972",
+          "locator": "https://www.mevzuat.gov.tr/MevzuatMetin/1.5.2972.pdf (arts. 8 and 30)",
+          "period_years": 5,
+          "phase": 4,
+          "month": 3,
+          "day_rule": "mar_last_sunday",
+          "term_years": 5,
+          "called": false,
+          "administered_by": "Yüksek Seçim Kurulu through the provincial and district election boards",
+          "valid_from": "1988-12-07"
+        }
+      ],
+      "dates": []
     }
   ]
 }
