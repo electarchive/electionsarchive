@@ -319,6 +319,7 @@ def parse(source: ModuleType) -> None:
                             for place, k in words
                             if place == _plain(table["rows"][lines[0]][0])
                             and 0 < k[1] - h[3] < 400
+                            and (table["state"] not in getattr(source, "LABELLED", ()) or k[0] < h[2])
                             and not any(
                                 k[0] + 50 < b[0] < h[0] and abs(b[1] - h[1]) < 200
                                 for name_, b in words
@@ -332,6 +333,24 @@ def parse(source: ModuleType) -> None:
                     for (r, c), b in anchors.items()
                     if c not in heads or (b[2] > heads[c][0] - 60 and b[0] < heads[c][2] + 150)
                 }
+                if table["state"] in getattr(source, "LABELLED", ()):
+                    anchors = {
+                        (r, c): b
+                        for (r, c), b in anchors.items()
+                        if not (names := [k for name, k in words if name == _plain(table["rows"][r][0])])
+                        or any(abs((k[1] + k[3]) / 2 - (b[1] + b[3]) / 2) < 12 and k[2] < b[0] for k in names)
+                    }
+                if table["state"] in getattr(source, "LABELLED", ()) and anchors:
+                    down = {
+                        r: statistics.median((b[1] + b[3]) / 2 for (rr, _), b in anchors.items() if rr == r)
+                        for r in sorted({r for r, _ in anchors})
+                    }
+                    best: dict[int, list[int]] = {}
+                    for r, y in down.items():
+                        before = [best[k] for k in best if down[k] < y]
+                        best[r] = [*max(before, key=len, default=[]), r]
+                    keep = set(max(best.values(), key=len))
+                    anchors = {key: b for key, b in anchors.items() if key[0] in keep}
                 for _ in range(2):
                     if not anchors:
                         break
@@ -547,6 +566,7 @@ def parse(source: ModuleType) -> None:
                         for place, k in words
                         if place == _plain(county)
                         and k[1] > h[3]
+                        and (table["state"] not in getattr(source, "LABELLED", ()) or r not in ys)
                         and not any(
                             k[0] + 50 < b[0] < h[0] and abs(b[1] - h[1]) < 200
                             for name_, b in words
