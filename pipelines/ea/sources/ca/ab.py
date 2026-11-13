@@ -118,13 +118,13 @@ BALLOTS_NOTE = (
     "A declined ballot is one an elector returned to the officials without marking it."
 )
 COLORS = {
-    "ndp": "#F37021",
-    "ucp": "#1F4E99",
-    "pc": "#1A57A6",
-    "wrp": "#2E8B57",
-    "lib": "#D71920",
-    "ap": "#00AEEF",
-    "gpa": "#3D9B35",
+    "ndp": "#f37021",
+    "ucp": "#1f4e99",
+    "pc": "#1a57a6",
+    "wrp": "#2e8b57",
+    "lib": "#d71920",
+    "ap": "#00aeef",
+    "gpa": "#3d9b35",
 }
 PARSED = DATA / "parsed" / SOURCE
 
