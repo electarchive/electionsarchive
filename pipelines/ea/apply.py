@@ -2198,10 +2198,11 @@ def publish(conn: Connection, changeset_id: str, reviewer: str | None = None) ->
             cursor.copy("copy flag (entity_id, result_set_id, check_code, severity, details) from stdin") as copy,
         ):
             for finding in findings:
-                if finding.entity_id is not None or finding.result_set_id is not None:
+                entity_id = None if finding.code.startswith("census.") else finding.entity_id
+                if entity_id is not None or finding.result_set_id is not None:
                     copy.write_row(
                         (
-                            finding.entity_id,
+                            entity_id,
                             finding.result_set_id,
                             finding.code,
                             finding.severity,
