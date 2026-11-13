@@ -419,6 +419,7 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
         return
     listed = sql.SQL(", ").join(map(sql.Identifier, columns))
     if table == "name" and "is_preferred" in columns:
+        conn.execute("select set_config('ea.repointing', 'on', true)")
         conn.execute(
             sql.SQL(
                 """update public.name p set is_preferred = false from {} s, changeset c
@@ -439,6 +440,7 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
             ),
             [stage.pipeline, stage.pipeline],
         )
+        conn.execute("select set_config('ea.repointing', 'off', true)")
     if table in stage.sweeps:
         conn.execute(sql.SQL("delete from public.{} p using changeset c where {}").format(target, stage.swept(table)))
     if table == "row_drop":
@@ -1043,16 +1045,25 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
             ):
                 raise ValueError(f"name {name} ({text!r}) is the only name of {entity}")
         conn.execute(sql.SQL("delete from public.name where id in (select name_id from {})").format(staged))
+        conn.execute("select set_config('ea.repointing', 'on', true)")
         conn.execute(
             sql.SQL(
                 """update public.name n set is_preferred = true
                    from (select distinct on (n.entity_id) n.id from public.name n
                          where n.entity_id in (select entity_id from {}) and n.valid_from is null and n.valid_to is null
-                           and not exists (select from public.name o where o.entity_id = n.entity_id and o.is_preferred)
+                           and not exists (select from public.name o where o.entity_id = n.entity_id and o.is_preferred){}
                          order by n.entity_id, n.recorded_from desc) pick
                    where n.id = pick.id"""
-            ).format(staged)
+            ).format(
+                staged,
+                sql.SQL(" and n.entity_id not in (select entity_id from {} where is_preferred)").format(
+                    stage.staged("name")
+                )
+                if "is_preferred" in stage.tables.get("name", ())
+                else sql.SQL(""),
+            )
         )
+        conn.execute("select set_config('ea.repointing', 'off', true)")
     if table == "external_id_drop":
         for scheme, value, entity, held in conn.execute(
             sql.SQL(
