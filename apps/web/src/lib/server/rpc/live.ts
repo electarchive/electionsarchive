@@ -1414,6 +1414,7 @@ async function night(
       unit: string;
       at: string | null;
       count: number;
+      counted: number | null;
     }>(sql`
       with wanted as (
         select w.contest, c.election_id as election, w.zone
@@ -1428,18 +1429,19 @@ async function night(
           and b.as_of < ${found.date}::date::timestamp at time zone o.zone
         order by o.election, b.unit_id, b.channel, b.stage = 'accepted' desc, b.as_of desc, b.fetch_id desc
       ), floors as (
-        select election, unit_id, null::text as at, sum(count)::float8 as count from early group by 1, 2
+        select election, unit_id, null::text as at, sum(count)::float8 as count, null::float8 as counted from early group by 1, 2
       ), pending as (
-        select distinct on (o.election, b.unit_id, b.channel, b.as_of) o.election, b.unit_id, b.as_of, b.count
+        select distinct on (o.election, b.unit_id, b.stage, b.channel, b.as_of) o.election, b.unit_id, b.stage, b.as_of, b.count
         from own o join live.ballots b on b.election_id = o.election
         join live.fetch x on x.id = b.fetch_id join live.feed d on d.id = x.feed_id and d.params @> '{"remaining": true}'
-        where b.stage = 'remaining' and b.as_of >= ${found.date}::date::timestamp at time zone o.zone and ${shown.results}::boolean
-        order by o.election, b.unit_id, b.channel, b.as_of, b.fetch_id desc
+        where b.stage in ('remaining', 'tabulated') and b.as_of >= ${found.date}::date::timestamp at time zone o.zone and ${shown.results}::boolean
+        order by o.election, b.unit_id, b.stage, b.channel, b.as_of, b.fetch_id desc
       ), lefts as (
-        select election, unit_id, to_char(as_of at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"') as at, sum(count)::float8 as count
-        from pending group by 1, 2, 3
+        select election, unit_id, to_char(as_of at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"') as at,
+          sum(count) filter (where stage = 'remaining')::float8 as count, sum(count) filter (where stage = 'tabulated')::float8 as counted
+        from pending group by 1, 2, 3 having bool_or(stage = 'remaining')
       )
-      select w.contest, t.unit_id as unit, t.at, t.count
+      select w.contest, t.unit_id as unit, t.at, t.count, t.counted
       from wanted w join (select * from floors union all select * from lefts) t on t.election = w.election
     `),
   ]);
@@ -1903,7 +1905,14 @@ async function night(
       line.at != null &&
       closed != null &&
       Date.parse(line.at) >= Date.parse(eastern(found.date, closed))
-        ? [{ unitId: line.unit, at: line.at, left: line.count }]
+        ? [
+            {
+              unitId: line.unit,
+              at: line.at,
+              left: line.count,
+              ...(line.counted != null && { counted: line.counted }),
+            },
+          ]
         : [],
     );
     const baseline = grouped.map(([unit, value]): LiveBaseline => {

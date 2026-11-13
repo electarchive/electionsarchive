@@ -153,7 +153,7 @@ url = "https://www.ncsbe.gov/results-data"
 id = "us.ballots.az"
 adapter = "us.ballots"
 enabled = false
-params = { state = "AZ" }
+params = { state = "AZ", remaining = true }
 poller = "muktedir"
 publisher = "Arizona Secretary of State"
 url = "https://apps.arizona.vote/info/bps/2022-general-election/33/0"
