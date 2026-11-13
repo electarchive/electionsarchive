@@ -7,9 +7,9 @@ AK	municipality				elected	1	0						Alaska Stat. § 29.26.040	https://ak.elaws.u
 AK	school				elected	1	0						Alaska Division of Elections, REAA elections: held every year on the first Tuesday in October	https://www.elections.alaska.gov/reaa/
 AL	county				elected	2	0						Ala. Code § 36-3-4(a): members of county commissions hold office for four years; elected at the general election of state and county officers	https://alison.legislature.state.al.us/code-of-alabama
 AL	municipality				elected	4	0				2025-01-01		Alabama Code § 11-46-21(a) before Act 2021-157 (SB119, enrolled text): regular municipal elections on the fourth Tuesday in August 1984 and every fourth year, held 2000 to 2020	https://alison.legislature.state.al.us/files/pdf/SearchableInstruments/2021RS/PrintFiles/SB119-Enr.pdf
-AL	municipality				elected	4	1	8		2025-01-01			Alabama Code § 11-46-21(a) as amended by Act 2021-157 (SB119, enrolled text):regular municipal elections on the fourth Tuesday in August 2025 and every fourth year thereafter, so a city or town elected in 2020 serves an extra year	https://alison.legislature.state.al.us/files/pdf/SearchableInstruments/2021RS/PrintFiles/SB119-Enr.pdf
+AL	municipality				elected	4	1	8	aug_fourth_tuesday	2025-01-01			Alabama Code § 11-46-21(a) as amended by Act 2021-157 (SB119, enrolled text):regular municipal elections on the fourth Tuesday in August 2025 and every fourth year thereafter, so a city or town elected in 2020 serves an extra year	https://alison.legislature.state.al.us/files/pdf/SearchableInstruments/2021RS/PrintFiles/SB119-Enr.pdf
 AL	school				elected	2	0						Ala. Code § 16-8-2: county board of education members elected at the general election of state and county officers for six-year terms	https://alison.legislature.state.al.us/code-of-alabama
-AL	municipality			Huntsville	elected	2	0	8					Alabama Code § 11-46-21(a) with 2021 Ala. Acts SB119 (Act 2021-157), which excludes Huntsville from the move to 2025: regular municipal elections on the fourth Tuesday in August of even years, the mayor and council seats staggered (mayor and Districts 1 and 5 in 2024)	https://alison.legislature.state.al.us/files/pdf/SearchableInstruments/2021RS/PrintFiles/SB119-Eng.pdf
+AL	municipality			Huntsville	elected	2	0	8	aug_fourth_tuesday				Alabama Code § 11-46-21(a) with 2021 Ala. Acts SB119 (Act 2021-157), which excludes Huntsville from the move to 2025: regular municipal elections on the fourth Tuesday in August of even years, the mayor and council seats staggered (mayor and Districts 1 and 5 in 2024)	https://alison.legislature.state.al.us/files/pdf/SearchableInstruments/2021RS/PrintFiles/SB119-Eng.pdf
 AR	county				elected	2	0						Ark. Code Ann. § 7-5-102	https://www.arkleg.state.ar.us/
 AR	municipality				elected	2	0						Ark. Code Ann. §§ 14-44-103, 14-44-105, 14-44-115; § 14-43-201	https://www.arkleg.state.ar.us/
 AR	school				elected	1	0						Ark. Code Ann. § 6-14-102(a)(1)(A) (as amended by Act 503 of 2025)	https://www.arkleg.state.ar.us/
@@ -83,7 +83,7 @@ MN	special	soil and water conservation			elected	2	0						Minn. Stat. § 103C.30
 MN	county				elected	2	0						Minn. Stat. § 204D.03 and § 204B.09 (state general election); SOS county guide	https://www.sos.mn.gov/media/4251/county-election-administration-guide.pdf
 MN	municipality				elected	2	0						Minn. Stat. § 205.07, subd. 1	https://www.revisor.mn.gov/statutes/2025/cite/205.07
 MN	school				elected	2	0						Minn. Stat. § 205A.04, subd. 1	https://www.revisor.mn.gov/statutes/cite/205A.04
-MN	township				elected	1	0	3					Minn. Stat. § 205.075, subd. 1 (second Tuesday in March); § 365.51, subd. 3	https://www.revisor.mn.gov/statutes/cite/205.075
+MN	township				elected	1	0	3	mar_second_tuesday				Minn. Stat. § 205.075, subd. 1 (second Tuesday in March); § 365.51, subd. 3	https://www.revisor.mn.gov/statutes/cite/205.075
 MO	county				elected	2	0						RSMo § 115.121.1	https://revisor.mo.gov/main/OneSection.aspx?section=115.121
 MO	municipality				elected	1	0						RSMo § 115.121.3	https://revisor.mo.gov/main/OneSection.aspx?section=115.121
 MO	school				elected	1	0						RSMo § 115.121.3	https://revisor.mo.gov/main/OneSection.aspx?section=115.121
@@ -125,9 +125,9 @@ NV	county				elected	2	0						Nev. Rev. Stat. § 293.12755 (general election)	ht
 NV	municipality				elected	2	0						Nev. Rev. Stat. §§ 293C.140, 293C.145	https://www.leg.state.nv.us/nrs/NRS-293C.html
 NV	school				elected	2	0						NRS 386.165 and 386.200: school trustees are elected at the general election for four-year terms	https://www.leg.state.nv.us/nrs/nrs-386.html#NRS386Sec200
 NY	municipality				elected	1	0						N.Y. Town Law § 80 (biennial town election each November of even years from 2025; town justices excepted); N.Y. Election Law § 15-104 (village election third Tuesday in March unless the village chose another date)	https://www.nysenate.gov/legislation/laws/TWN/80
-NY	school				elected	1	0	5					N.Y. Educ. Law § 2002(1) (third Tuesday in May); § 2601-a(2)	https://www.nysenate.gov/legislation/laws/EDN/2002
+NY	school				elected	1	0	5	may_third_tuesday				N.Y. Educ. Law § 2002(1) (third Tuesday in May); § 2601-a(2)	https://www.nysenate.gov/legislation/laws/EDN/2002
 NY	special				elected	1	0						N.Y. Town Law § 175 (fire district annual election on the second Tuesday in December)	https://www.nysenate.gov/legislation/laws/TWN/175
-NY	special	libraries	LIBRAR		elected	1	0	5					N.Y. Educ. Law § 260(2) (trustees of a library established by a school district are elected by the legal voters in the same manner as school board trustees); Educ. Law § 2002(1) (third Tuesday of May)	https://www.nysenate.gov/legislation/laws/EDN/260
+NY	special	libraries	LIBRAR		elected	1	0	5	may_third_tuesday				N.Y. Educ. Law § 260(2) (trustees of a library established by a school district are elected by the legal voters in the same manner as school board trustees); Educ. Law § 2002(1) (third Tuesday of May)	https://www.nysenate.gov/legislation/laws/EDN/260
 NY	township				elected	2	1						N.Y. Town Law § 80 (odd years; L. 2023, ch. 741 moves town elections to even years from 2026)	https://assembly.state.ny.us/leg/?Text=Y&bn=A8822&default_fld=&leg_video=&term=2023
 NY	municipality		^VILLAGE OF 		elected	1	0	3					N.Y. Elec. Law § 15-104(1)(a) (third Tuesday in March, unless a village moves it to June or November)	https://www.nysenate.gov/legislation/laws/ELN/15-104
 OH	county				elected	2	0						Ohio Rev. Code § 3501.02(C); Ohio Const. art. XVII, § 1	https://codes.ohio.gov/ohio-revised-code/section-3501.02

@@ -1,6 +1,7 @@
 import json
 from collections.abc import Callable, Iterator
 from datetime import date, timedelta
+from uuid import UUID
 
 from psycopg import Connection
 from psycopg.rows import dict_row
@@ -19,7 +20,20 @@ def tuesday_after_first_monday(month: int) -> Callable[[int], date]:
     return day
 
 
-DAY_RULES = {"nov_tuesday_after_first_monday": tuesday_after_first_monday(11)}
+def nth_weekday(month: int, weekday: int, nth: int) -> Callable[[int], date]:
+    def day(year: int) -> date:
+        first = date(year, month, 1)
+        return first + timedelta(days=(weekday - first.weekday()) % 7 + 7 * (nth - 1))
+
+    return day
+
+
+DAY_RULES = {
+    "nov_tuesday_after_first_monday": tuesday_after_first_monday(11),
+    "mar_second_tuesday": nth_weekday(3, 1, 2),
+    "may_third_tuesday": nth_weekday(5, 1, 3),
+    "aug_fourth_tuesday": nth_weekday(8, 1, 4),
+}
 
 
 def occurrences(
@@ -52,43 +66,76 @@ def horizon(today: date) -> date:
     return date(today.year + months // 12, months % 12 + 1, min(today.day, 28))
 
 
-def fixed_rules(conn: Connection, today: date) -> list[dict]:
+def fixed_rules(conn: Connection, today: date, country: str = "US") -> list[dict]:
     with conn.cursor(row_factory=dict_row) as cur:
         cur.execute(
-            """select c.id, c.polity_id, p.kind polity_kind, c.class_id, c.government_kind, c.body_id, c.office_id,
+            """with recursive within as (
+                 select id from polity where iso_code = %s
+                 union select pp.polity_id from polity_parent pp join within w on w.id = pp.parent_id
+                   where pp.valid_to is null
+               )
+               select c.id, c.polity_id, p.kind polity_kind, c.class_id, c.government_kind, c.body_id, c.office_id,
                       c.period_years, c.phase, c.day_rule, c.valid_from, c.valid_to, c.source_id, c.locator
                from election_cadence c join polity p on p.id = c.polity_id
-               where not c.called and c.period_years is not null and c.phase is not null
-                 and c.day_rule = any(%s) and (c.valid_to is null or c.valid_to > %s)""",
-            [list(DAY_RULES), today],
+               where c.polity_id in (select id from within) and not c.called
+                 and c.period_years is not null and c.phase is not null and c.day_rule = any(%s) and (c.valid_to is null or c.valid_to > %s)""",
+            [country, list(DAY_RULES), today],
         )
         return cur.fetchall()
 
 
+def class_next_date(conn: Connection, class_id: UUID, after: date) -> date | None:
+    rows = conn.execute(
+        """select day_rule, period_years, phase from election_cadence
+           where class_id = %s and not called and (valid_to is null or valid_to > %s)""",
+        [class_id, after],
+    ).fetchall()
+    return min((d for d in (next_date(*row, after) for row in rows) if d is not None), default=None)
+
+
+def certify_for(conn: Connection, polity_id: UUID, when: date) -> tuple[int, list[str]]:
+    rows = conn.execute(
+        """select day_rule, period_years, phase, valid_from, valid_to, certify_days, class_id
+           from election_cadence where polity_id = %s and not called and day_rule = any(%s)""",
+        [polity_id, list(DAY_RULES)],
+    ).fetchall()
+    days: list[int] = []
+    classes: list[str] = []
+    for rule, period, phase, valid_from, valid_to, certify, class_id in rows:
+        if when in occurrences(rule, period, phase, when - timedelta(days=1), when, valid_from, valid_to):
+            if certify is not None:
+                days.append(certify)
+            if class_id is not None:
+                classes.append(str(class_id))
+    return max(days, default=CERTIFY_DAYS), sorted(set(classes))
+
+
 def due(today: date | None = None) -> list[dict]:
     today = today or date.today()
-    with connect() as conn, conn.cursor(row_factory=dict_row) as cur:
-        cur.execute(
-            """select e.id election_id, p.iso_code, e.polity_id, e.kind, e.date_from, e.date_precision,
-                      coalesce(max(c.certify_days), %s) certify_days
+    with connect() as conn:
+        found = conn.execute(
+            """select e.id, p.iso_code, e.polity_id, e.kind, e.date_from
                from election e join polity p on p.id = e.polity_id
                join entity en on en.id = e.id and en.retired_by is null
-               left join election_cadence c on c.polity_id = e.polity_id and c.certify_days is not null
                where e.status = 'scheduled' and e.date_from >= %s
-               group by e.id, p.iso_code order by e.date_from, p.iso_code, e.kind""",
-            [CERTIFY_DAYS, today],
-        )
-        return [
-            {
-                "election_id": str(row["election_id"]),
-                "polity": row["iso_code"] or str(row["polity_id"]),
-                "kind": row["kind"],
-                "date": row["date_from"].isoformat(),
-                "certify_days": row["certify_days"],
-                "after": (row["date_from"] + timedelta(days=row["certify_days"])).isoformat(),
-            }
-            for row in cur.fetchall()
-        ]
+               order by e.date_from, p.iso_code, e.kind""",
+            [today],
+        ).fetchall()
+        out = []
+        for election_id, iso, polity_id, kind, when in found:
+            certify, classes = certify_for(conn, polity_id, when)
+            out.append(
+                {
+                    "election_id": str(election_id),
+                    "polity": iso or str(polity_id),
+                    "kind": kind,
+                    "date": when.isoformat(),
+                    "certify_days": certify,
+                    "classes": classes,
+                    "after": (when + timedelta(days=certify)).isoformat(),
+                }
+            )
+        return out
 
 
 def show(as_json: bool) -> str:

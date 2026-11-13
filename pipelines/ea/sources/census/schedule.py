@@ -1,3 +1,4 @@
+import os
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -18,6 +19,7 @@ def parse() -> None:
 
 
 def emit() -> Path:
+    country = os.environ.get("EA_SCHEDULE_POLITY", "US")
     today = datetime.now(UTC).date()
     until = horizon(today)
     with connect() as conn:
@@ -26,10 +28,10 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary="Scheduled elections for the next 18 months computed from fixed cadence rows that give a day rule, one per polity, date, and kind, each citing the statute of the rule that dates it",
-            polity="US",
+            polity=country,
         )
         found: dict[tuple, list[dict]] = {}
-        for rule in fixed_rules(conn, today):
+        for rule in fixed_rules(conn, today, country):
             kind = (
                 "local"
                 if rule["government_kind"] is not None or rule["polity_kind"] not in ("country", "federal_unit")
