@@ -362,6 +362,12 @@ def parse() -> None:
         frame.join(pl.DataFrame(labels, infer_schema_length=None), on=["jur", "office", "place", "county"])
         .with_columns(area=pl.coalesce("area", "suffix"))
         .drop("suffix")
+        .with_columns(split=pl.col("day").n_unique().over("race") > 1)
+        .with_columns(
+            day=pl.when("split").then(pl.col("day").max().over("race")).otherwise("day"),
+            race=pl.when("split").then(pl.format("{}-{}", "race", "code")).otherwise("race"),
+        )
+        .drop("split")
         .with_columns(
             pl.col("race").min().over("code", "key", "day", "area", "remainder", "magnitude").alias("merged"),
             (pl.col("elected") == "1").sum().over("code", "key", "day", "area", "remainder", "magnitude").alias("won"),
