@@ -1,18 +1,25 @@
+import base64
 import csv
 import io
 import itertools
+import json
+import math
 import re
 import subprocess
 from dataclasses import dataclass, field
 from datetime import date
+from functools import cache
 from pathlib import Path
 from statistics import median
 from uuid import UUID
 
+import numpy as np
 import polars as pl
+from anthropic.types import ImageBlockParam, TextBlockParam
+from anthropic.types.message_create_params import MessageCreateParamsNonStreaming
 from PIL import Image
 
-from ea import raw
+from ea import batch, raw
 from ea.sources.id.kpu_dpr import _slug
 from ea.sources.id.kpu_pilpres import PROVINCES
 from ea.store import DATA
@@ -96,6 +103,42 @@ CERTIFICATES = {
         ("75.71", "75.03", "75.01", "75.05", "75.02", "75.04"),
         (3, 8),
     ),
+    "SUMATERA BARAT I": (
+        f"{DRIVE}1w8ZlHa6vVK5xQxtXrFs9tZvyjDV1yMub",
+        "Komisi Pemilihan Umum Provinsi Sumatera Barat",
+        CERTIFICATE,
+        ("13.09", "13.01", "13.71", "13.72", "13.02", "13.11", "13.73", "13.03", "13.10", "13.74", "13.04"),
+        (1, 8),
+    ),
+    "SUMATERA BARAT II": (
+        f"{DRIVE}1GEUKXjtsBJTXVF8uCPYbBS4lCdxtmxpE",
+        "Komisi Pemilihan Umum Provinsi Sumatera Barat",
+        CERTIFICATE,
+        ("13.08", "13.12", "13.76", "13.07", "13.75", "13.06", "13.77", "13.05", "", "", ""),
+        (1, 8),
+    ),
+    "BALI": (
+        f"{DRIVE}1uee99u5rlGn94f4XbQLTLeLTpuMycPTh",
+        "Komisi Pemilihan Umum Provinsi Bali",
+        CERTIFICATE,
+        ("51.71", "51.03", "51.02", "51.01", "51.08", "51.06", "51.07", "51.05", "51.04"),
+        (1, 8),
+    ),
+    "BANGKA BELITUNG": (
+        f"{DRIVE}1hO_Si1NuFdSZNS3FtpOHvUGNtl__vDvC",
+        "Komisi Pemilihan Umum Provinsi Kepulauan Bangka Belitung",
+        CERTIFICATE,
+        ("19.71", "19.04", "19.03", "19.02", "19.06", "19.05", "19.01"),
+        (1, 6),
+    ),
+    "KALIMANTAN BARAT": (
+        "https://kalbar.kpu.go.id/public/kalbar/dmdocument/28712401d54f054f82ccac4ad2ac8049_27072026103951.pdf",
+        "Komisi Pemilihan Umum Provinsi Kalimantan Barat",
+        CERTIFICATE,
+        ("61.71", "61.02", "61.12", "61.72", "61.07", "61.01", "61.08", "61.03", "61.09", "61.05", "61.10", "61.06")
+        + ("61.04", "61.11"),
+        (1, 6),
+    ),
     "DI YOGYAKARTA": (
         f"{DRIVE}16BwThFUdoLXwtgjWnW8rhKn8ZptjrdVW",
         "Komisi Pemilihan Umum Daerah Istimewa Yogyakarta",
@@ -113,6 +156,43 @@ BANNER = re.compile(
     r"Perolehan Suara|^Calon$|Kota Yk|Kulon|Gunung|Bantul Sleman|^Bantul|^Progo|^Kidul"
 )
 SUMMARY = (("Sah Seluruh", "valid"), ("Sah dan Tidak", "ballots"), ("Tidak Sah", "invalid"))
+SCANS = {
+    "SUMATERA BARAT I": (0, 150),
+    "SUMATERA BARAT II": (0, 150),
+    "BALI": (90, 150),
+    "BANGKA BELITUNG": (0, 150),
+    "KALIMANTAN BARAT": (0, 200),
+}
+READER = "claude-haiku-5-5"
+PROMPT = "1"
+SCALES = (1.0, 1.3)
+LONGEST = 1560
+SCAN_DPI = 300
+CELLS_SYSTEM = (
+    "You copy numbers from one row of a scanned Indonesian election certificate (Model DC-1 DPR). The image is a strip "
+    "of {count} table cells side by side, separated by vertical rules. Copy each cell's content left to right, exactly "
+    "as printed, keeping the thousands dots (1.234). Give an empty string for a blank cell or one holding only a dash "
+    "or dots, and ? for a cell you cannot read. Return exactly {count} cells."
+)
+LABEL_SYSTEM = (
+    "You copy the row label from one row of a scanned Indonesian election certificate (Model DC-1 DPR). The image is "
+    "the left part of one table row. Give the number printed in the narrow first column (empty when none) and the "
+    "rest of the text exactly as printed, left to right, with its capitalization and punctuation (for example a "
+    "candidate name with titles, a party name, a line such as Jumlah Suara Sah Partai dan Suara Calon, or a voter "
+    "line ending in LK, PR, or JML)."
+)
+CELLS_SCHEMA: dict[str, object] = {
+    "type": "object",
+    "properties": {"cells": {"type": "array", "items": {"type": "string"}}},
+    "required": ["cells"],
+    "additionalProperties": False,
+}
+LABEL_SCHEMA: dict[str, object] = {
+    "type": "object",
+    "properties": {"number": {"type": "string"}, "text": {"type": "string"}},
+    "required": ["number", "text"],
+    "additionalProperties": False,
+}
 CODES = {"votes": 1, "registered": 2, "ballots": 3, "valid": 4, "invalid": 5, "voters": 14}
 
 
@@ -121,6 +201,7 @@ def fetch() -> None:
         raw.fetch(SOURCE, url, suffix=".pdf")
     for url, *_ in CERTIFICATES.values():
         raw.fetch(SOURCE, url, suffix=".pdf")
+    print(batch.ensure(SOURCE, "dc1", _requests())[1])
 
 
 def _path(key: str) -> Path:
@@ -432,6 +513,345 @@ def _counting(line: Line) -> bool:
     return len(numbers) > 2 and numbers == list(range(numbers[0], numbers[0] + len(numbers)))
 
 
+@dataclass
+class Band:
+    page: int
+    top: int
+    bottom: int
+    label: tuple[int, int]
+    columns: list[int]
+    inked: bool
+    height: int
+
+
+def _rules(dark: np.ndarray) -> list[int]:
+    window = 300
+    rows = dark[:-1] | dark[1:]
+    cumulative = np.cumsum(rows, axis=1, dtype=np.int32)
+    full = (cumulative[:, window:] - cumulative[:, :-window]) >= window - 4
+    found: list[list[int]] = []
+    for y in np.flatnonzero(full.any(axis=1)):
+        if found and y - found[-1][-1] <= 6:
+            found[-1].append(int(y))
+        else:
+            found.append([int(y)])
+    return [round(sum(group) / len(group)) for group in found]
+
+
+def _verticals(dark: np.ndarray, top: int, bottom: int) -> list[int]:
+    inner = dark[top + 4 : bottom - 3]
+    share = (inner[:, :-2] | inner[:, 1:-1] | inner[:, 2:]).mean(axis=0)
+    found: list[list[int]] = []
+    for x in np.flatnonzero(share > 0.92):
+        if found and x - found[-1][-1] <= 6:
+            found[-1].append(int(x))
+        else:
+            found.append([int(x)])
+    return [round(sum(group) / len(group)) + 1 for group in found]
+
+
+def _lattice(xs: list[int], width: int) -> list[int]:
+    best: list[int] = []
+    for end in range(len(xs) - 2, width - 2, -1):
+        for start in range(end):
+            pitch = (xs[end] - xs[start]) / (width - 1)
+            if pitch < 100:
+                continue
+            picked = [min(xs, key=lambda x: abs(x - (xs[start] + pitch * k))) for k in range(width)]
+            if len(set(picked)) != width or any(
+                abs(x - (xs[start] + pitch * k)) > 0.15 * pitch for k, x in enumerate(picked)
+            ):
+                continue
+            edge = [x for x in xs if picked[-1] + 0.8 * pitch < x < picked[-1] + 2 * pitch]
+            if edge and (not best or edge[0] > best[-1]):
+                best = [*picked, edge[0]]
+        if best:
+            return best
+    return best
+
+
+def _scan(dapil: str, page: int) -> tuple[Image.Image, list[Band]]:
+    url, _, _, codes, _ = CERTIFICATES[dapil]
+    rotate, threshold = SCANS[dapil]
+    cached = raw.cached(SOURCE, url)
+    image_path = PARSED / "scans" / f"{cached.sha256}-{page}.png"
+    if not image_path.exists():
+        image_path.parent.mkdir(parents=True, exist_ok=True)
+        png = subprocess.run(
+            ["pdftoppm", "-r", str(SCAN_DPI), "-gray", "-png", "-f", str(page), "-l", str(page), "-singlefile"]
+            + [str(cached.path)],
+            check=True,
+            capture_output=True,
+        ).stdout
+        Image.open(io.BytesIO(png)).rotate(rotate, expand=True).save(image_path)
+    image = Image.open(image_path).convert("L")
+    dark = np.asarray(image) < threshold
+    ys = _rules(dark)
+    spans = [(top, bottom) for top, bottom in itertools.pairwise(ys) if bottom - top >= 25]
+    seen = sorted(x for top, bottom in spans for x in _verticals(dark, top, bottom))
+    groups: list[list[int]] = []
+    for x in seen:
+        if groups and x - groups[-1][-1] <= 8:
+            groups[-1].append(x)
+        else:
+            groups.append([x])
+    xs = [round(sum(group) / len(group)) for group in groups if len(group) >= 0.3 * len(spans)]
+    columns = _lattice(xs, len(codes) + 1)
+    if not columns:
+        raise ValueError(f"{dapil} page {page}: no value columns among {xs}")
+    left = min((x for x in xs if x < columns[0] - 10), default=0)
+    bands = []
+    for top, bottom in spans:
+        ink = [int(dark[top + 6 : bottom - 4, x0 + 6 : x1 - 4].sum()) for x0, x1 in itertools.pairwise(columns)]
+        bands.append(Band(page, top, bottom, (left, columns[0]), columns, max(ink) >= 40, image.height))
+    return image, bands
+
+
+def _key(sha256: str, band: Band, part: str, read: int) -> str:
+    return f"anthropic-batch:{READER}/{PROMPT}/{sha256}/{band.page}/{band.top}/{part}/{read}"
+
+
+def _parts(band: Band) -> list[tuple[str, int, int]]:
+    count = len(band.columns) - 1
+    chunks = math.ceil((band.columns[-1] - band.columns[0]) / (LONGEST / max(SCALES)))
+    size = math.ceil(count / chunks)
+    parts = [("label", -1, -1)]
+    parts += [(f"cells{start}", start, min(start + size, count)) for start in range(0, count, size)]
+    return parts
+
+
+def _requests() -> dict[str, batch.Want]:
+    price_in, price_out = batch.PRICES[READER]
+    wanted: dict[str, batch.Want] = {}
+    for dapil in SCANS:
+        url, _, _, _, (first, last) = CERTIFICATES[dapil]
+        sha256 = raw.cached(SOURCE, url).sha256
+        for page in range(first, last + 1):
+            image, bands = _scan(dapil, page)
+            for band in bands:
+                if not band.inked:
+                    continue
+                for part, start, end in _parts(band):
+                    if part == "label":
+                        box = (band.label[0], band.top - 3, band.label[1], band.bottom + 3)
+                        system, schema, ask = LABEL_SYSTEM, LABEL_SCHEMA, "Copy this row label."
+                    else:
+                        box = (band.columns[start], band.top - 3, band.columns[end], band.bottom + 3)
+                        system = CELLS_SYSTEM.format(count=end - start)
+                        schema, ask = CELLS_SCHEMA, f"Copy the {end - start} cells of this row."
+                    for read, scale in enumerate(SCALES):
+                        crop = image.crop(box)
+                        crop = crop.resize((round(crop.width * scale), round(crop.height * scale)))
+                        crop.thumbnail((LONGEST, LONGEST))
+                        buffer = io.BytesIO()
+                        crop.save(buffer, "PNG")
+                        params = MessageCreateParamsNonStreaming(
+                            model=READER,
+                            max_tokens=1000,
+                            system=system,
+                            messages=[
+                                {
+                                    "role": "user",
+                                    "content": [
+                                        ImageBlockParam(
+                                            type="image",
+                                            source={
+                                                "type": "base64",
+                                                "media_type": "image/png",
+                                                "data": base64.b64encode(buffer.getvalue()).decode(),
+                                            },
+                                        ),
+                                        TextBlockParam(type="text", text=ask),
+                                    ],
+                                }
+                            ],
+                            output_config={"effort": "low", "format": {"type": "json_schema", "schema": schema}},
+                        )
+                        estimate = (crop.width * crop.height / 750 * price_in + 600 * price_in + 300 * price_out) / 1e6
+                        wanted[_key(sha256, band, part, read)] = (params, estimate)
+    return wanted
+
+
+@dataclass
+class Row:
+    band: Band
+    number: str
+    text: str
+    cells: list[set[int]]
+    blank: list[bool]
+
+
+def _answer(key: str) -> dict[str, object] | None:
+    if key not in _held():
+        return None
+    message = json.loads(raw.cached(SOURCE, key).path.read_text())
+    return json.loads(next(block["text"] for block in message["content"] if block["type"] == "text"))
+
+
+@cache
+def _held() -> set[str]:
+    return raw.keys(SOURCE)
+
+
+FILLER = re.compile(r"[\s.,\-–—_]*")
+NUMBER = re.compile(r"\d{1,3}(?:[.,]\d{3})+|\d+")
+
+
+def _cell(text: str) -> int | None | bool:
+    text = text.strip().replace(" ", "")
+    if FILLER.fullmatch(text):
+        return None
+    if NUMBER.fullmatch(text):
+        return int(text.replace(".", "").replace(",", ""))
+    return False
+
+
+def _rows(dapil: str) -> list[Row]:
+    url, _, _, _, (first, last) = CERTIFICATES[dapil]
+    sha256 = raw.cached(SOURCE, url).sha256
+    rows: list[Row] = []
+    for page in range(first, last + 1):
+        _, bands = _scan(dapil, page)
+        for band in bands:
+            if not band.inked:
+                continue
+            labels = [_answer(_key(sha256, band, "label", read)) for read in range(len(SCALES))]
+            label = next((found for found in labels if found), {"number": "", "text": ""})
+            readings: list[list[int | None | bool]] = [[] for _ in band.columns[1:]]
+            for part, start, end in _parts(band)[1:]:
+                for read in range(len(SCALES)):
+                    found = _answer(_key(sha256, band, part, read))
+                    cells = found["cells"] if found else []
+                    if not isinstance(cells, list) or len(cells) != end - start:
+                        continue
+                    for index, text in enumerate(cells, start):
+                        readings[index].append(_cell(str(text)))
+            cells = [{0 if value is None else value for value in found if value is not False} for found in readings]
+            unanimous = [len(found) == len(SCALES) and len({*found}) == 1 for found in readings]
+            cells = [found if agreed else found | {-1} for found, agreed in zip(cells, unanimous, strict=True)]
+            blank = [all(value is None for value in found) for found in readings]
+            rows.append(Row(band, str(label["number"]).strip(), " ".join(str(label["text"]).split()), cells, blank))
+    return rows
+
+
+def _solve(rows: list[Row], constraints: list[list[tuple[int, int, int]]]) -> None:
+    changed = True
+    while changed:
+        changed = False
+        for terms in constraints:
+            open_ = [(row, column) for row, column, _ in terms if len(rows[row].cells[column]) > 1]
+            if not open_ or math.prod(len(rows[row].cells[column]) for row, column in open_) > 4096:
+                continue
+            fits = []
+            for choice in itertools.product(*(sorted(rows[row].cells[column]) for row, column in open_)):
+                picked = dict(zip(open_, choice, strict=True))
+                total = 0
+                for row, column, sign in terms:
+                    total += sign * picked.get((row, column), next(iter(rows[row].cells[column])))
+                if total == 0 and -1 not in choice:
+                    fits.append(choice)
+            if len(fits) == 1:
+                for (row, column), value in zip(open_, fits[0], strict=True):
+                    rows[row].cells[column] = {value}
+                changed = True
+
+
+def _scanned(dapil: str) -> tuple[list[dict[str, object]], list[str]]:
+    codes = CERTIFICATES[dapil][3]
+    rotate, _ = SCANS[dapil]
+    width = len(codes)
+    rows = [row for row in _rows(dapil) if row.number or row.text or any(not blank for blank in row.blank)]
+    constraints = [[(index, column, 1) for column in range(width)] + [(index, width, -1)] for index in range(len(rows))]
+    start = next(index for index, row in enumerate(rows) if row.text.upper().startswith("PARTAI"))
+    tiers = [index for index in range(start) if _tail(rows[index]) in ("LK", "PR", "JML")]
+    for lk, pr, jml in zip(tiers, tiers[1:], tiers[2:], strict=False):
+        if [_tail(rows[index]) for index in (lk, pr, jml)] == ["LK", "PR", "JML"]:
+            for column in range(width + 1):
+                constraints.append([(lk, column, 1), (pr, column, 1), (jml, column, -1)])
+    blocks: list[tuple[int, list[int], int]] = []
+    head: int | None = None
+    members: list[int] = []
+    for index in range(start, len(rows)):
+        row = rows[index]
+        if row.text.upper().startswith("PARTAI"):
+            head, members = index, []
+        elif head is not None and "jumlah" in row.text.lower():
+            blocks.append((head, members, index))
+            head = None
+        elif head is not None:
+            members.append(index)
+    for head, members, total in blocks:
+        for column in range(width + 1):
+            constraints.append([(head, column, 1), *((index, column, 1) for index in members), (total, column, -1)])
+    _solve(rows, constraints)
+    out: list[dict[str, object]] = []
+    problems: list[str] = []
+
+    def emit(measure: str, party: int | None, number: int | None, name: str | None, index: int) -> None:
+        row = rows[index]
+        for column, code in enumerate((*codes, None)):
+            found = row.cells[column]
+            if len(found) != 1:
+                problems.append(f"{dapil} page {row.band.page} row {row.number} {row.text!r} column {column}: {found}")
+                continue
+            value = next(iter(found))
+            if code == "":
+                if value:
+                    problems.append(f"{dapil} page {row.band.page} {row.text!r}: blank column {column} holds {value}")
+                continue
+            x0, x1 = row.band.columns[column], row.band.columns[column + 1]
+            box = (x0, row.band.top, x1, row.band.bottom)
+            if rotate:
+                box = (row.band.height - row.band.bottom, x0, row.band.height - row.band.top, x1)
+            out.append(
+                {
+                    "dapil": dapil,
+                    "unit": code,
+                    "measure": measure,
+                    "party": party,
+                    "candidate": number,
+                    "name": name,
+                    "value": value,
+                    "page": row.band.page,
+                    "box": None if row.blank[column] else [side * 72 / SCAN_DPI for side in box],
+                }
+            )
+
+    tallies = 0
+    for index in range(start):
+        row = rows[index]
+        if _tail(row) == "JML":
+            tallies += 1
+            if tallies in (5, 10):
+                emit("registered" if tallies == 5 else "voters", None, None, None, index)
+        elif measure := next((measure for phrase, measure in SUMMARY if phrase.lower() in row.text.lower()), None):
+            emit(measure, None, None, None, index)
+    parties = iter(PARTIES)
+    for head, members, total in blocks:
+        party = next(parties)
+        if rows[head].number.rstrip(".") != str(party):
+            problems.append(f"{dapil}: party block {rows[head].number} {rows[head].text!r} where {party} was expected")
+        emit("votes", party, None, rows[head].text, head)
+        expected = 1
+        for index in members:
+            row = rows[index]
+            if not row.number and all(row.blank):
+                continue
+            if row.number.rstrip(".") != str(expected):
+                problems.append(f"{dapil} party {party}: candidate {row.number} {row.text!r}, {expected} expected")
+            emit("votes", party, expected, row.text, index)
+            expected += 1
+        emit("total", party, None, None, total)
+    if next(parties, None) is not None:
+        problems.append(f"{dapil}: {len(blocks)} party blocks, not {len(PARTIES)}")
+    return out, problems
+
+
+def _tail(row: Row) -> str:
+    words = row.text.upper().replace(".", "").split()
+    return words[-1] if words else ""
+
+
 def _reconcile(dapil: str, frame: pl.DataFrame, elected: pl.DataFrame) -> None:
     def column(measure: str) -> dict[str | None, int]:
         found = frame.filter(pl.col("measure") == measure).group_by("unit").agg(pl.col("value").sum())
@@ -480,7 +900,7 @@ def parse() -> None:
     elected.write_parquet(PARSED / "elected.parquet")
     certificates: list[dict[str, object]] = []
     for dapil, (url, *_) in CERTIFICATES.items():
-        rows, problems = _certificate(dapil, raw.cached(SOURCE, url).path)
+        rows, problems = _scanned(dapil) if dapil in SCANS else _certificate(dapil, raw.cached(SOURCE, url).path)
         frame = pl.DataFrame(rows, infer_schema_length=None).with_columns(flags=pl.lit(0, pl.Int16))
         for (where, party, number, code), (printed, value) in CORRECTIONS.items():
             if where != dapil:
