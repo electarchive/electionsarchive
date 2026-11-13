@@ -153,7 +153,7 @@ def emit(cc: str) -> str:
                     id=mint("election_cadence", key, number),
                     polity_id=region(rule["within"]) if rule.get("within") else polity,
                     class_id=id,
-                    government_kind=entry["tier"],
+                    government_kind=rule.get("government_kind", entry["tier"]),
                     function=key,
                     source_id=sources[rule["source"]],
                     locator=rule.get("locator") or spec["sources"][rule["source"]]["url"],

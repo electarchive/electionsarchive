@@ -3,6 +3,7 @@ import re
 from datetime import date
 from pathlib import Path
 
+from ea import census_calendar, census_check
 from ea.store import ROOT, connect
 
 PAGES = ROOT / ".agents" / "spec" / "coverage"
@@ -13,7 +14,6 @@ CLASSES_SQL = """
 select k.id, k.key, k.name_en, k.name, k.category, k.goal, k.valid_from, k.valid_to, k.first_held, k.earliest_record,
     k.contests_per_unit, k.finest_scheme_code, k.finest_note, k.disposition, k.disposition_reason, k.est_votes,
     k.effort, k.note, t.key as tier_key,
-    (select count(*) from contest_class cc join contest c on c.id = cc.contest_id where cc.class_id = k.id and not c.notional) as held,
     (select sum(g.complete)::float / nullif(sum(g.total), 0) from coverage_goal g where g.class_id = k.id) as share,
     (select min(d.date) from census_date d where d.class_id = k.id and d.date >= %(today)s) as next_date
 from census_class k
@@ -31,16 +31,14 @@ def polity_id(conn, cc: str) -> str:
 
 
 def open_classes(conn) -> list[dict]:
+    found_held = census_check.held(conn)
     rows = conn.execute(
         """
-        select lower(p.iso_code), k.key, coalesce(k.name_en, k.name), t.key, k.est_votes, k.effort
+        select k.id, lower(p.iso_code), k.key, coalesce(k.name_en, k.name), t.key, k.est_votes, k.effort
         from census_class k
         join census_tier t on t.id = k.tier_id
         join polity p on p.id = k.polity_id
         where k.disposition is null
-            and not exists (
-                select 1 from contest_class cc join contest c on c.id = cc.contest_id
-                where cc.class_id = k.id and not c.notional)
         """
     ).fetchall()
     found = [
@@ -53,7 +51,8 @@ def open_classes(conn) -> list[dict]:
             "effort": effort,
             "score": (votes or 0) / (effort or 3),
         }
-        for cc, key, name, tier, votes, effort in rows
+        for class_id, cc, key, name, tier, votes, effort in rows
+        if not found_held.get(class_id)
     ]
     found.sort(key=lambda row: (-row["score"], row["polity"], row["key"]))
     return found
@@ -83,6 +82,18 @@ def table(head: list[str], rows: list[list]) -> list[str]:
     return lines + [""]
 
 
+def units(found: list[tuple]) -> str:
+    if len(found) == 1 and found[0][0] is None:
+        _, when, value, locator, publisher = found[0]
+        return f"{value:,} on {when} ({publisher}, {locator})"
+    parts = [
+        f"{within or 'all'} {value:,} on {when} ({publisher})"
+        for within, when, value, _, publisher in sorted(found, key=lambda row: row[0] or "")
+    ]
+    regions = f"{len(found)} region" + ("s" if len(found) > 1 else "")
+    return f"{sum(row[2] for row in found):,} in {regions}: " + "; ".join(parts)
+
+
 def render(conn, cc: str, queued: set[tuple[str, str]]) -> str:
     pid = polity_id(conn, cc)
     name = conn.execute(
@@ -106,20 +117,20 @@ def render(conn, cc: str, queued: set[tuple[str, str]]) -> str:
         """,
         (pid,),
     ).fetchall()
-    counts = {
-        tier_id: (when, value, locator, publisher)
-        for tier_id, when, value, locator, publisher in conn.execute(
-            """
-            select distinct on (c.tier_id) c.tier_id, c.date, sum(c.value) over (partition by c.tier_id, c.date),
-                c.locator, s.publisher
-            from census_tier_count c
-            join census_tier t on t.id = c.tier_id and t.polity_id = %s
-            join source s on s.id = c.source_id
-            order by c.tier_id, c.date desc
-            """,
-            (pid,),
-        )
-    }
+    counts: dict = {}
+    for tier_id, when, value, locator, publisher, within in conn.execute(
+        """
+        select distinct on (c.tier_id, c.within_polity_id) c.tier_id, c.date, c.value, c.locator, s.publisher,
+            w.iso_code
+        from census_tier_count c
+        join census_tier t on t.id = c.tier_id and t.polity_id = %s
+        join source s on s.id = c.source_id
+        left join polity w on w.id = c.within_polity_id
+        order by c.tier_id, c.within_polity_id, c.date desc
+        """,
+        (pid,),
+    ):
+        counts.setdefault(tier_id, []).append((within, when, value, locator, publisher))
     keys = {tier[0]: tier[1] for tier in tiers}
     out += ["## Tiers", ""]
     rows = []
@@ -137,7 +148,7 @@ def render(conn, cc: str, queued: set[tuple[str, str]]) -> str:
                 scheme or "",
                 within or "",
                 span(vfrom, vto),
-                f"{count[1]:,} on {count[0]} ({count[3]}, {count[2]})" if count else "",
+                units(count) if count else "",
             ]
         )
     out += (
@@ -146,11 +157,15 @@ def render(conn, cc: str, queued: set[tuple[str, str]]) -> str:
         else ["None recorded.", ""]
     )
 
+    found_held = census_check.held(conn)
     classes = [
         dict(zip([c.name for c in cur.description], record, strict=True))
         for cur in [conn.execute(CLASSES_SQL, {"polity": pid, "today": date.today()})]
         for record in cur.fetchall()
     ]
+    for k in classes:
+        k["held"] = found_held.get(k["id"], 0)
+        k["next_date"] = k["next_date"] or census_calendar.class_next_date(conn, k["id"], date.today())
     cadence: dict = {}
     for (
         class_id,
