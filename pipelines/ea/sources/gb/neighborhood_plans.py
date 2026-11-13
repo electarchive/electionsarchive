@@ -125,8 +125,8 @@ CONTEXT = {
     "residential": (
         "A neighborhood planning referendum under Schedule 4B of the Town and Country Planning Act 1990 and the "
         "Neighbourhood Planning (Referendums) Regulations 2012. Voters registered in the neighborhood area were "
-        "asked whether {council} should use the neighborhood plan to help it decide planning applications there; "
-        "the council makes the plan part of its development plan if more than half of those voting say Yes."
+        "asked whether {council} should use the neighborhood plan to help {it} decide planning applications there; "
+        "{makes} if more than half of those voting say Yes."
     ),
     "business": (
         "A business referendum under Schedule 4B of the Town and Country Planning Act 1990, held with the "
@@ -203,7 +203,7 @@ def fetch() -> None:
             raw.fetch(SOURCE, url, suffix=suffix(url))
     for row in pl.read_csv(AREAS, separator="\t", infer_schema=False).iter_rows(named=True):
         raw.fetch(SOURCE, parishes(row["layer"], row["field"], row["parishes"]), suffix=".geojson")
-        raw.fetch(SOURCE, row["designation"], suffix=".pdf" if row["designation"].endswith(".pdf") else ".html")
+        raw.fetch(SOURCE, row["designation"], suffix=suffix(row["designation"]))
 
 
 def printed(url: str) -> tuple[str, bool, set[str]]:
@@ -281,18 +281,25 @@ def emit() -> Path:
         if conn.execute("select 1 from scheme where code = %s", [SCHEME]).fetchone() is None:
             cs.add("scheme", code=SCHEME, polity_id=gb, kind="electoral_district", rank=4, noun="neighborhood area")
         councils: dict[str, tuple[str, str]] = {}
+
+        def council(code: str) -> tuple[str, str]:
+            if code not in councils:
+                polity = cs.key("gb.polity", code)
+                if polity in cs.minted:
+                    raise ValueError(f"{code}: the council must exist")
+                found = conn.execute(
+                    "select n.text, s.path from name n join slug s on s.entity_id = n.entity_id"
+                    " where n.entity_id = %s and n.is_preferred order by s.is_current desc limit 1",
+                    [polity],
+                ).fetchone()
+                if found is None:
+                    raise ValueError(f"{code}: the council has no name or slug")
+                councils[code] = (found[0], found[1])
+            return councils[code]
+
         for code in sorted(set(table["council"])):
-            polity = cs.key("gb.polity", code)
-            if polity in cs.minted:
-                raise ValueError(f"{code}: the council must exist")
-            found = conn.execute(
-                "select n.text, s.path from name n join slug s on s.entity_id = n.entity_id"
-                " where n.entity_id = %s and n.is_preferred order by s.is_current desc limit 1",
-                [polity],
-            ).fetchone()
-            if found is None:
-                raise ValueError(f"{code}: the council has no name or slug")
-            councils[code] = (found[0], found[1])
+            council(code)
+        spans: dict[str, list[str]] = {}
         added: set[UUID] = set()
         drawn: dict[str, UUID] = {}
         layers: dict[str, UUID] = {}
@@ -334,7 +341,7 @@ def emit() -> Path:
             if area in cs.minted:
                 cs.add("area", id=area, scheme_code=SCHEME)
                 cs.add("area_code", area_id=area, code=row["unit"], valid_from=None, valid_to=None)
-            lads = row["councils"].split()
+            lads = spans[row["unit"]] = row["councils"].split()
             for lad in lads:
                 cs.add(
                     "area_parent" if len(lads) == 1 else "area_membership",
@@ -503,11 +510,19 @@ def emit() -> Path:
                 label = plan if row["kind"] == "residential" else f"{plan} (business referendum)"
                 name(contest, label)
                 cs.add("slug", path=f"{elections[election]}/{slug(label)}", entity_id=contest)
-                context = CONTEXT[str(row["kind"])].format(council=council_name)
+                single = {"it": "it", "makes": "the council makes the plan part of its development plan"}
+                context = CONTEXT[str(row["kind"])].format(council=council_name, **single)
                 if district is None:
                     context = f"{context} {WITHIN.format(council=council_name)}"
                 elif unit_code in drawn:
                     stale = f"{context} {WITHIN.format(council=council_name)}"
+                    if len(spans[unit_code]) > 1:
+                        names = [council(lad)[0] for lad in spans[unit_code]]
+                        context = CONTEXT[str(row["kind"])].format(
+                            council=f"{', '.join(names[:-1])} and {names[-1]}",
+                            it="them",
+                            makes="each council makes the plan part of its development plan",
+                        )
                     for (note,) in conn.execute(
                         "select id from note where entity_id = %s and kind = 'context' and body_md = %s",
                         [contest, stale],
