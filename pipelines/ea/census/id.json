@@ -165,7 +165,7 @@
           "administered_by": "Komisi Pemilihan Umum",
           "source": "uu7-2017",
           "locator": "https://peraturan.bpk.go.id/Details/37644/uu-no-7-tahun-2017 (Pasal 167 ayat 1: Pemilu dilaksanakan setiap 5 (lima) tahun sekali)",
-          "runoff": true
+          "runoff": "majority"
         }
       ],
       "access": [
@@ -622,7 +622,8 @@
           "polity_kinds": [
             "county",
             "municipality"
-          ]
+          ],
+          "within": null
         }
       ],
       "cadence": [
@@ -689,7 +690,7 @@
         }
       ],
       "est_votes": 1100000000,
-      "effort": 8
+      "effort": 5
     },
     {
       "key": "pilkada_gubernur",
@@ -790,7 +791,8 @@
           "polity_kinds": [
             "county",
             "municipality"
-          ]
+          ],
+          "within": null
         }
       ],
       "cadence": [
@@ -835,7 +837,7 @@
         }
       ],
       "est_votes": 600000000,
-      "effort": 6
+      "effort": 5
     },
     {
       "key": "pilkades",
@@ -859,7 +861,8 @@
           ],
           "polity_kinds": [
             "submunicipal"
-          ]
+          ],
+          "within": null
         }
       ],
       "cadence": [
@@ -872,7 +875,7 @@
         }
       ],
       "est_votes": 120000000,
-      "effort": 8
+      "effort": 5
     },
     {
       "key": "referendum",
