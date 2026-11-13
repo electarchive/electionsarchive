@@ -30,6 +30,20 @@ FILES = {
         ("roster", "consulta_cand"),
     )
 }
+SECTIONS = {
+    (year, uf): f"{TSE}votacao_secao/votacao_secao_{year}_{uf}.zip"
+    for year, ufs in (
+        (2000, ("MA",)),
+        (2004, ("RJ",)),
+        (2008, ("MT",)),
+        (2012, ("CE",)),
+        (2016, ("MA", "RJ", "SP")),
+        (2020, ("BA", "CE", "SP")),
+        (2024, ("GO", "MA", "PA", "PI", "SE")),
+    )
+    for uf in ufs
+}
+SECTION_DETAIL = {2004: f"{TSE}detalhe_votacao_secao/detalhe_votacao_secao_2004.zip"}
 MAYOR, COUNCIL = "11", "13"
 RUNOFF_ELECTORATE = 200_000
 SOURCE_NOTE = (
@@ -73,27 +87,49 @@ SHORT = (
     "The electoral court's candidate totals here fall {short} votes short of its count of valid nominal votes for "
     "this contest."
 )
+SECTIONED = (
+    "The electoral court's municipal results files leave this contest out, so its votes are summed from the court's "
+    "results by polling section. Candidates' final standings are as the court's candidate file records them."
+)
 REPLACED = ["CASSAÇÃO DO REGISTRO", "HOMOLOGAÇÃO DE RENÚNCIA", "SUBSTITUÍDO"]
 
 
 def fetch() -> None:
-    for url in FILES.values():
+    for url in [*FILES.values(), *SECTIONS.values(), *SECTION_DETAIL.values()]:
         raw.fetch(SOURCE, url, suffix=".zip")
 
 
-def scan(year: int, kind: str) -> pl.LazyFrame:
+def extract(url: str, suffix: str) -> pl.LazyFrame:
     folder = PARSED / "tmp"
     folder.mkdir(parents=True, exist_ok=True)
-    with zipfile.ZipFile(raw.cached(SOURCE, FILES[(year, kind)]).path) as archive:
-        member = next(name for name in archive.namelist() if name.endswith("_BRASIL.csv"))
+    with zipfile.ZipFile(raw.cached(SOURCE, url).path) as archive:
+        member = next(name for name in archive.namelist() if name.endswith(suffix))
         with archive.open(member) as source, (folder / member).open("w", encoding="utf-8") as target:
             shutil.copyfileobj(io.TextIOWrapper(source, encoding="latin-1"), target, 16 << 20)
-    frame = pl.scan_csv(folder / member, separator=";", infer_schema=False)
+    return pl.scan_csv(folder / member, separator=";", infer_schema=False)
+
+
+def scan(year: int, kind: str) -> pl.LazyFrame:
+    frame = extract(FILES[(year, kind)], "_BRASIL.csv")
     present = frame.collect_schema().names()
     return frame.with_columns(
         pl.lit(None, pl.String).alias(column)
         for column in ("NR_FEDERACAO", "NM_FEDERACAO", "NM_SOCIAL_CANDIDATO")
         if column not in present
+    )
+
+
+def sections(year: int, contest: pl.Expr, ordinary: pl.Expr, known: pl.DataFrame) -> pl.DataFrame:
+    files = [extract(url, ".csv") for (cycle, _), url in SECTIONS.items() if cycle == year]
+    if not files:
+        return pl.DataFrame(schema={"contest": pl.String, "number": pl.String, "votes": pl.Int64})
+    return (
+        pl.concat(files)
+        .filter(ordinary)
+        .group_by(contest=contest, number=pl.col("NR_VOTAVEL"))
+        .agg(votes=pl.col("QT_VOTOS").cast(pl.Int64).sum())
+        .collect(engine="streaming")
+        .join(known, on="contest", how="anti")
     )
 
 
@@ -122,14 +158,49 @@ def parse() -> None:
         candidates = scan(year, "candidates").filter(ordinary)
         columns = candidates.collect_schema().names()
         valid = "QT_VOTOS_NOMINAIS_VALIDOS" if "QT_VOTOS_NOMINAIS_VALIDOS" in columns else "QT_VOTOS_NOMINAIS"
+        cast = sections(year, contest, ordinary, candidates.select(contest=contest).unique().collect())
+        if cast.height:
+            annulled = pl.col("DS_SIT_TOT_TURNO").str.contains("INDEFERIDO") | (
+                pl.col("DS_SITUACAO_CANDIDATURA") == "INAPTO"
+            )
+            supplement = (
+                scan(year, "roster")
+                .filter(ordinary)
+                .with_columns(CD_MUNICIPIO="SG_UE", NM_MUNICIPIO="NM_UE")
+                .filter(contest.is_in(cast["contest"].unique().implode()))
+                .unique(["NR_TURNO", "CD_CARGO", "CD_MUNICIPIO", "SQ_CANDIDATO"])
+                .collect()
+                .with_columns(contest=contest)
+                .join(cast, left_on=["contest", "NR_CANDIDATO"], right_on=["contest", "number"], how="left")
+                .with_columns(pl.col("votes").fill_null(0))
+                .with_columns(
+                    SECAO_ANULADOS=pl.when(annulled).then(pl.col("votes")).otherwise(0),
+                    SECAO_VALIDOS=pl.when(annulled).then(0).otherwise(pl.col("votes")),
+                )
+                .drop("contest", "votes")
+            )
+            candidates = pl.concat([candidates, supplement.lazy()], how="diagonal_relaxed")
+            unmatched = cast.filter(
+                ~pl.col("number").is_in(["95", "96", "97", "98"])
+                & ((pl.col("contest").str.split(":").list.get(2) == MAYOR) | (pl.col("number").str.len_chars() > 2))
+            ).join(supplement.select(contest=contest, number="NR_CANDIDATO"), on=["contest", "number"], how="anti")
+            if unmatched.height:
+                raise ValueError(f"{year}: section votes for numbers not on the roster: {unmatched}")
         void = (
             pl.col("QT_VOTOS_NOMINAIS").cast(pl.Int64) - pl.col(valid).cast(pl.Int64)
             if valid != "QT_VOTOS_NOMINAIS"
             else pl.lit(0, pl.Int64)
         )
+        if cast.height:
+            void = pl.coalesce(pl.col("SECAO_ANULADOS"), void)
+        counted = (
+            pl.coalesce(pl.col("SECAO_VALIDOS"), pl.col(valid).cast(pl.Int64))
+            if cast.height
+            else pl.col(valid).cast(pl.Int64)
+        )
         votes = (
             candidates.group_by(contest=contest, candidate=pl.col("SQ_CANDIDATO"))
-            .agg(valid=pl.col(valid).cast(pl.Int64).sum(), void=void.sum())
+            .agg(valid=counted.sum(), void=void.sum())
             .collect()
         )
         detail = scan(year, "detail").filter(ordinary)
@@ -155,6 +226,12 @@ def parse() -> None:
             )
             .unique(["municipality", "candidate"])
             .collect()
+        )
+        runoff = (
+            candidates.filter(pl.col("NR_TURNO") == "2")
+            .select(pl.concat_str(municipality, "CD_CARGO", "SQ_CANDIDATO"))
+            .collect()
+            .to_series()
         )
         everyone = (
             candidates.unique(["NR_TURNO", "CD_CARGO", "CD_MUNICIPIO", "SQ_CANDIDATO"])
@@ -198,7 +275,14 @@ def parse() -> None:
                 ),
                 outcome=pl.when(pl.col("status").is_in(ELECTED) & ~pl.col("situation").is_in(WITHDRAWN))
                 .then(pl.lit("elected"))
-                .when(pl.col("status") == "2º TURNO")
+                .when(
+                    (pl.col("status") == "2º TURNO")
+                    | (
+                        (pl.col("status") == "#NULO")
+                        & (pl.col("round") == "1")
+                        & pl.concat_str("municipality", "office", "candidate").is_in(runoff.implode())
+                    )
+                )
                 .then(pl.lit("advanced")),
             )
         )
@@ -241,6 +325,111 @@ def parse() -> None:
             )
             .collect()
         )
+        if year in SECTION_DETAIL:
+            tallies = pl.concat(
+                [
+                    tallies,
+                    extract(SECTION_DETAIL[year], "_BRASIL.csv")
+                    .filter(ordinary)
+                    .group_by(contest=contest)
+                    .agg(
+                        registered=pl.col("QT_APTOS").cast(pl.Int64).sum(),
+                        voters=pl.col("QT_COMPARECIMENTO").cast(pl.Int64).sum(),
+                        blank=pl.col("QT_VOTOS_BRANCOS").cast(pl.Int64).sum(),
+                        null=pl.col("QT_VOTOS_NULOS").cast(pl.Int64).sum(),
+                        nominal=pl.col("QT_VOTOS_NOMINAIS").cast(pl.Int64).sum(),
+                        legend=pl.col("QT_VOTOS_LEGENDA").cast(pl.Int64).sum(),
+                    )
+                    .collect()
+                    .join(tallies, on="contest", how="anti")
+                    .filter(pl.col("contest").is_in(cast["contest"].unique().implode())),
+                ]
+            )
+        if cast.height:
+            parties_by_contest = everyone.select(
+                "contest", "party_number", "party_abbreviation", "party_label", "coalition"
+            ).unique(["contest", "party_number"])
+            ballots = cast.filter(
+                (pl.col("contest").str.split(":").list.get(2) == COUNCIL)
+                & (pl.col("number").str.len_chars() == 2)
+                & ~pl.col("number").is_in(["95", "96", "97", "98"])
+                & (pl.col("votes") > 0)
+            ).join(legends.select("contest").unique(), on="contest", how="anti")
+            matched = ballots.join(
+                parties_by_contest, left_on=["contest", "number"], right_on=["contest", "party_number"]
+            ).select(
+                "contest",
+                party_number="number",
+                votes="votes",
+                party_abbreviation="party_abbreviation",
+                party_label="party_label",
+                coalition="coalition",
+            )
+            national = everyone.select("party_number", "party_abbreviation", "party_label").unique("party_number")
+            members = (
+                everyone.filter(pl.col("coalition").is_not_null())
+                .select(
+                    "contest",
+                    "coalition",
+                    member=pl.col("coalition_members")
+                    .str.split("/")
+                    .list.eval(pl.element().str.split("-").list.last().str.replace_all(" ", "").str.to_uppercase()),
+                )
+                .explode("member")
+                .unique(["contest", "member"])
+            )
+            orphans = (
+                ballots.join(matched, left_on=["contest", "number"], right_on=["contest", "party_number"], how="anti")
+                .join(national, left_on="number", right_on="party_number")
+                .with_columns(member=pl.col("party_abbreviation").str.replace_all(" ", "").str.to_uppercase())
+                .join(members, on=["contest", "member"], how="left")
+                .select(
+                    "contest",
+                    party_number="number",
+                    votes="votes",
+                    party_abbreviation="party_abbreviation",
+                    party_label="party_label",
+                    coalition="coalition",
+                )
+            )
+            legends = pl.concat([legends, matched, orphans])
+            residue = (
+                cast.join(legends.select("contest", number="party_number"), on=["contest", "number"], how="anti")
+                .filter(
+                    (pl.col("number").str.len_chars() == 2)
+                    & (
+                        (pl.col("contest").str.split(":").list.get(2) == COUNCIL)
+                        | pl.col("number").is_in(["95", "96", "97", "98"])
+                    )
+                )
+                .group_by("contest")
+                .agg(
+                    blank=pl.col("votes").filter(pl.col("number") == "95").sum(),
+                    null=pl.col("votes").filter(pl.col("number") != "95").sum(),
+                )
+            )
+            checked = (
+                residue.join(votes.group_by("contest").agg(pl.col("valid", "void").sum()), on="contest", how="left")
+                .join(legends.group_by("contest").agg(legend=pl.col("votes").sum()), on="contest", how="left")
+                .join(tallies, on="contest", how="left", suffix="_detail")
+                .with_columns(pl.col("legend", "valid", "void").fill_null(0))
+                .filter(
+                    (pl.col("blank") != pl.col("blank_detail"))
+                    | (pl.col("null") + pl.col("void") != pl.col("null_detail"))
+                    | (pl.col("valid") != pl.col("nominal"))
+                    | (pl.col("legend") != pl.col("legend_detail"))
+                    | pl.col("registered").is_null()
+                )
+            )
+            print(
+                f"{year}: {cast['contest'].n_unique()} contests from section files, "
+                f"{checked.height} differ from the detail totals"
+            )
+            if checked.height:
+                with pl.Config(tbl_cols=-1, tbl_rows=-1, tbl_width_chars=250):
+                    print(checked)
+            tallies = tallies.update(residue, on="contest")
+        cast.select("contest").unique().sort("contest").write_parquet(folder / "sections.parquet")
         shutil.rmtree(PARSED / "tmp")
 
         failures: list[str] = []
@@ -334,6 +523,15 @@ def emit() -> Path:
         for kind in ("candidates", "parties", "detail"):
             cs.artifact(raw.cached(SOURCE, FILES[(year, kind)]), results)
         cs.artifact(raw.cached(SOURCE, FILES[(year, "roster")]), roster)
+        for url in [url for (cycle, _), url in SECTIONS.items() if cycle == year] + (
+            [SECTION_DETAIL[year]] if year in SECTION_DETAIL else []
+        ):
+            cs.artifact(raw.cached(SOURCE, url), results)
+        sectioned = (
+            set(pl.read_parquet(folder / "sections.parquet")["contest"])
+            if (folder / "sections.parquet").exists()
+            else set()
+        )
 
         brazil = cs.polity("BR")
         systems: dict[str, UUID] = {}
@@ -455,7 +653,7 @@ def emit() -> Path:
         rows: list[dict[str, object]] = []
         for code in sorted(labels):
             opened = min(day for (town, _), day in days.items() if town == code)
-            unit = cs.unit("br.municipality", code, opened)
+            unit = cs.unit("br.municipality", code, last)
             units[code] = str(unit)
             rows.append(
                 {
@@ -615,6 +813,8 @@ def emit() -> Path:
                 path=f"{prefixes[municipality]}/{day}-{stage}/{'mayor' if mayor else 'municipal-chamber'}",
                 entity_id=contest,
             )
+            if str(code) in sectioned:
+                cs.add("note", entity_id=contest, kind="caveat", body_md=SECTIONED)
             if str(code) in short:
                 cs.add("note", entity_id=contest, kind="caveat", body_md=SHORT.format(short=f"{short[str(code)]:,}"))
             result_set = cs.key(f"{SOURCE}.result_set", key) if str(code) in tallied else None
