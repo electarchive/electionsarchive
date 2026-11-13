@@ -45,6 +45,14 @@ export type LiveBaseline = {
   expected?: number;
   traits?: Array<number>;
   channels?: Array<LiveChannel>;
+  floor?: number;
+};
+
+export type LiveRemaining = {
+  unitId: string;
+  at: string;
+  left: number;
+  counted?: number | null;
 };
 
 export type LiveChannel = {
@@ -82,6 +90,7 @@ export type LiveRace = {
   isRanked?: boolean;
   rule?: LiveRule | null;
   unopposed?: LiveUnopposed | null;
+  remaining?: Array<LiveRemaining>;
 };
 
 export type LiveUnopposed = { options: Array<string>; isTacit: boolean };
@@ -181,6 +190,8 @@ const MODEL = {
   },
   reported: { common: 0.9, own: 0.3, capped: 0.99 },
   channel: { turnout: 0.35, prior: 0.08, sigma: 1.5, unlisted: 0.02 },
+  floor: { slack: 0.98 },
+  remaining: { spread: 0.2, stale: 3 },
 };
 
 const STREAM = "~";
@@ -316,6 +327,7 @@ type Unit = {
   county: string;
   channel: number;
   size: number;
+  floor: number;
 };
 
 function seeded(text: string) {
@@ -579,6 +591,7 @@ function units(
       hasBaseline: base != null && base.turnout > 0,
       night: nights.get(id) ?? null,
       reported: reported.get(id) ?? null,
+      floor: 0,
     });
   }
   const sized = found.filter((unit) => unit.hasBaseline);
@@ -689,14 +702,19 @@ function logcdf(x: number) {
 function components(unit: Unit, tau: number, pi: number, scale: number) {
   const sigma = unit.sigma * scale;
   const ell = Math.log(unit.total / unit.expected) - tau;
-  const p = clamp(pi * unit.settled, 1e-6, 1 - 1e-6);
+  const bound =
+    unit.total < MODEL.floor.slack * unit.floor
+      ? Math.log(unit.floor / unit.total)
+      : 0;
+  const p = clamp(bound > 0 ? 0 : pi * unit.settled, 1e-6, 1 - 1e-6);
   const mu = -ell - sigma * sigma;
   const done =
     Math.log(p) -
     (ell * ell) / (2 * sigma * sigma) -
     Math.log(sigma * Math.sqrt(2 * Math.PI));
-  const open = Math.log(1 - p) + ell + (sigma * sigma) / 2 + logcdf(mu / sigma);
-  return { done, open, mu };
+  const open =
+    Math.log(1 - p) + ell + (sigma * sigma) / 2 + logcdf((mu - bound) / sigma);
+  return { done, open, mu, bound };
 }
 
 function truncated(mu: number, sigma: number, random: () => number) {
@@ -769,12 +787,13 @@ function turnout(found: Array<Unit>, center: number, spread: number) {
     ) {
       const scale = SCALES[Math.floor(cell / PIS.length) % SCALES.length]!;
       if (unit.total <= 0) {
-        return (
+        return Math.max(
+          unit.floor,
           unit.expected *
-          Math.exp(tau + surge + unit.sigma * scale * gaussian(random))
+            Math.exp(tau + surge + unit.sigma * scale * gaussian(random)),
         );
       }
-      const { done, open, mu } = components(
+      const { done, open, mu, bound } = components(
         unit,
         tau,
         PIS[cell % PIS.length]!,
@@ -786,7 +805,10 @@ function turnout(found: Array<Unit>, center: number, spread: number) {
           (1 + MODEL.spike * -Math.log(Math.max(random(), Number.EPSILON)))
         );
       }
-      return unit.total * Math.exp(truncated(mu, unit.sigma * scale, random));
+      return (
+        unit.total *
+        Math.exp(bound + truncated(mu - bound, unit.sigma * scale, random))
+      );
     },
   };
 }
@@ -985,6 +1007,55 @@ function lean(found: Array<Unit>, a: number, b: number, coming: number) {
   return { mean, sd: Math.sqrt(variance + MODEL.late.drift ** 2), spread, own };
 }
 
+function remains(race: LiveRace, stamp: string) {
+  const time = Date.parse(stamp);
+  const latest = new Map<string, LiveRemaining>();
+  for (const row of race.remaining ?? []) {
+    const held = latest.get(row.unitId);
+    if (
+      Date.parse(row.at) <= time &&
+      (held == null || Date.parse(held.at) < Date.parse(row.at))
+    ) {
+      latest.set(row.unitId, row);
+    }
+  }
+  const targets = new Map<string, number>();
+  for (const [id, row] of latest) {
+    let counted = row.counted ?? null;
+    if (counted == null) {
+      const picks = new Map<number, LiveUnitCount>();
+      for (const count of race.counts) {
+        const channel = count.channel ?? 0;
+        const held = picks.get(channel);
+        if (
+          count.unitId === id &&
+          Date.parse(count.at) <= Date.parse(row.at) &&
+          (held == null || Date.parse(held.at) < Date.parse(count.at))
+        ) {
+          picks.set(channel, count);
+        }
+      }
+      const split = [...picks].filter(([channel]) => channel !== 0);
+      const used = (split.length > 0 ? split : [...picks]).map(
+        ([, count]) => count,
+      );
+      if (
+        used.length === 0 ||
+        used.some(
+          (count) =>
+            Date.parse(row.at) - Date.parse(count.at) >
+            MODEL.remaining.stale * 3_600_000,
+        )
+      ) {
+        continue;
+      }
+      counted = sum(used.map((count) => sum(count.votes)));
+    }
+    targets.set(id, counted + row.left);
+  }
+  return targets;
+}
+
 export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
   const { race, sizes } = split(given, at);
   const stamp = at ?? race.frames.at(-1)?.at ?? "";
@@ -1154,6 +1225,10 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
       ]);
     }
   }
+  const floors = new Map(
+    given.baseline.map((row) => [row.unitId, row.floor ?? 0]),
+  );
+  const reports = remains(given, stamp);
   const whole: Array<Unit> = [
     ...found.filter((unit) => unit.channel === 0),
     ...[...streamsOf].map(([county, indexes]) => {
@@ -1177,11 +1252,20 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
           clamp((MODEL.sizeRef / expected) ** MODEL.sizeExp, MODEL.sizeLow, 1),
       };
     }),
-  ];
+  ].map((unit) => ({
+    ...unit,
+    floor: (floors.get(unit.id) ?? 0) / (1 + tail),
+  }));
   const wholeOf = new Map(whole.map((unit, index) => [unit.id, index]));
+  const fitted = whole.map((unit) => {
+    const target = reports.get(unit.id);
+    return target == null || !unit.hasBaseline
+      ? unit
+      : { ...unit, total: Math.max(unit.total, target), settled: 1 };
+  });
   const model = isExpected
-    ? turnout(whole, 0, MODEL.turnout)
-    : turnout(whole, MODEL.same.center, MODEL.same.spread);
+    ? turnout(fitted, 0, MODEL.turnout)
+    : turnout(fitted, MODEL.same.center, MODEL.same.spread);
   const models = new Map(
     [...new Set(found.map((unit) => unit.channel))]
       .filter((channel) => channel !== 0)
@@ -1198,6 +1282,14 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
       }),
   );
   const finals = whole.map(() => 0);
+  const portion = found.map((unit) => {
+    const indexes = streamsOf.get(unit.county);
+    if (indexes == null) {
+      return 1;
+    }
+    const all = sum(indexes.map((index) => found[index]!.expected));
+    return all > 0 ? unit.expected / all : 1 / indexes.length;
+  });
   const random = seeded(`${race.id}@${stamp}`);
   const typical = found.map((unit) => {
     if (!unit.hasBaseline) {
@@ -1320,8 +1412,18 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
             Math.exp(reportedDraw.common + alone * gaussian(random)),
     );
     const fractions: Array<number> = [];
+    const pending = new Map<string, number>();
     for (const [index, unit] of whole.entries()) {
-      if (unit.hasBaseline) {
+      const target = reports.get(unit.id);
+      if (target != null) {
+        const { spread } = MODEL.remaining;
+        pending.set(
+          unit.id,
+          Math.max(0, target - unit.total) *
+            Math.exp(spread * gaussian(random) - spread ** 2 / 2),
+        );
+        finals[index] = unit.total;
+      } else if (unit.hasBaseline) {
         finals[index] =
           unit.total > 0 && complete
             ? unit.total
@@ -1372,13 +1474,14 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
         : 0.7;
     for (const [index, unit] of found.entries()) {
       if (!unit.hasBaseline) {
-        totals[index] = complete
-          ? unit.total
-          : Math.max(
-              unit.total,
-              (unit.total / Math.max(typicalFraction, 0.2)) *
-                Math.exp(MODEL.spread * gaussian(random)),
-            );
+        totals[index] =
+          complete || reports.has(unit.county)
+            ? unit.total
+            : Math.max(
+                unit.total,
+                (unit.total / Math.max(typicalFraction, 0.2)) *
+                  Math.exp(MODEL.spread * gaussian(random)),
+              );
       }
     }
     for (const [index, unit] of found.entries()) {
@@ -1437,8 +1540,11 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
       );
       const steady = clamp(margin * final - countedLead, -room, room);
       const open = opens[index];
-      const extra =
-        open == null ? final * later : Math.max(0, open - remaining);
+      const extra = reports.has(unit.county)
+        ? (pending.get(unit.county) ?? 0) * portion[index]!
+        : open == null
+          ? final * later
+          : Math.max(0, open - remaining);
       const ceiling = 1 - unit.others;
       const local =
         final > 0 && learned == null ? MODEL.tail.local * gaussian(random) : 0;
