@@ -46,6 +46,7 @@ PAGE_PREFIXES = (
     "https://www.north-norfolk.gov.uk/info/",
     "https://eastcambs.gov.uk/about-council/",
     "https://www.northleach.gov.uk/",
+    "https://www.northantslive.news/news/",
 )
 HANDWRITTEN = (
     "https://info.ambervalley.gov.uk/docarc/",
