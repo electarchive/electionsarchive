@@ -1,0 +1,302 @@
+{
+  "polity": "US-WV",
+  "publisher": "West Virginia Legislature",
+  "title": "West Virginia Legislative Hand Book and Manual and Official Register 1916, general election returns 1914-11-03",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/westvirginialegi1916west/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/westvirginialegi1916west"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "house": {
+      "year": 1914,
+      "chamber": "house",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "WV",
+      "district": 0
+    },
+    "house1": {
+      "year": 1914,
+      "chamber": "house",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "WV",
+      "district": 1
+    },
+    "house2": {
+      "year": 1914,
+      "chamber": "house",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "WV",
+      "district": 2
+    },
+    "house3": {
+      "year": 1914,
+      "chamber": "house",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "WV",
+      "district": 3
+    },
+    "house4": {
+      "year": 1914,
+      "chamber": "house",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "WV",
+      "district": 4
+    },
+    "house5": {
+      "year": 1914,
+      "chamber": "house",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "WV",
+      "district": 5
+    }
+  },
+  "pages": [
+    {
+      "page": 783,
+      "id": "783-0",
+      "columns": [
+        {
+          "label": "Sutherland Rep.",
+          "contest": "house",
+          "candidate": "Howard Sutherland"
+        },
+        {
+          "label": "Hodges Dem.",
+          "contest": "house",
+          "candidate": "Hodges"
+        },
+        {
+          "label": "Schuck Prog.",
+          "contest": "house",
+          "candidate": "Schuck"
+        },
+        {
+          "label": "Kintzer Soc.",
+          "contest": "house",
+          "candidate": "Kintzer"
+        },
+        {
+          "label": "White Prohib.",
+          "contest": "house",
+          "candidate": "White"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.095,
+        0.091,
+        0.935,
+        0.769
+      ],
+      "hint": "Read only the table headed 'VOTE FOR CONGRESSMAN-AT-LARGE\u20141914.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1047
+      ]
+    },
+    {
+      "page": 784,
+      "id": "784-0",
+      "columns": [
+        {
+          "label": "Neely Dem.",
+          "contest": "house1",
+          "candidate": "Matthew Mansfield Neely"
+        },
+        {
+          "label": "White Rep.",
+          "contest": "house1",
+          "candidate": "George E. White"
+        },
+        {
+          "label": "Harmer Prog.",
+          "contest": "house1",
+          "candidate": "H. W. Harmer"
+        },
+        {
+          "label": "Holt Soc.",
+          "contest": "house1",
+          "candidate": "M. S. Holt"
+        },
+        {
+          "label": "Withers Prohib.",
+          "contest": "house1",
+          "candidate": "A. B. Withers"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.081,
+        0.147,
+        0.921,
+        0.347
+      ],
+      "hint": "Read only the table headed 'FIRST DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 784,
+      "id": "784-1",
+      "columns": [
+        {
+          "label": "Brown Dem.",
+          "contest": "house2",
+          "candidate": "William Gay Brown, Jr."
+        },
+        {
+          "label": "Bowers Rep.",
+          "contest": "house2",
+          "candidate": "George M. Bowers"
+        },
+        {
+          "label": "Keim Prog.",
+          "contest": "house2",
+          "candidate": "Noah G. Keim"
+        },
+        {
+          "label": "Smith Soc.",
+          "contest": "house2",
+          "candidate": "Edgar L. Smith"
+        },
+        {
+          "label": "Thompson Prohib.",
+          "contest": "house2",
+          "candidate": "F. E. Thompson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.081,
+        0.339,
+        0.921,
+        0.621
+      ],
+      "hint": "Read only the table headed 'SECOND DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 784,
+      "id": "784-2",
+      "columns": [
+        {
+          "label": "Littlepage Dem.",
+          "contest": "house3",
+          "candidate": "Adam Brown Littlepage"
+        },
+        {
+          "label": "Avis Rep.",
+          "contest": "house3",
+          "candidate": "S. B. Avis"
+        },
+        {
+          "label": "Hughes Prog.",
+          "contest": "house3",
+          "candidate": "A. L. Hughes"
+        },
+        {
+          "label": "Link Soc.",
+          "contest": "house3",
+          "candidate": "H. F. Link"
+        },
+        {
+          "label": "Howard Prohib.",
+          "contest": "house3",
+          "candidate": "W. A. Howard"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.081,
+        0.613,
+        0.921,
+        0.843
+      ],
+      "hint": "Read only the table headed 'THIRD DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 785,
+      "id": "785-0",
+      "columns": [
+        {
+          "label": "Hamilton Dem.",
+          "contest": "house4",
+          "candidate": "J. M. Hamilton"
+        },
+        {
+          "label": "Moss Rep.",
+          "contest": "house4",
+          "candidate": "Hunter Holmes Moss, Jr."
+        },
+        {
+          "label": "Elliott Prog.",
+          "contest": "house4",
+          "candidate": "C. D. Elliott"
+        },
+        {
+          "label": "Benton Soc.",
+          "contest": "house4",
+          "candidate": "E. L. Benton"
+        },
+        {
+          "label": "Wernecke Prohib.",
+          "contest": "house4",
+          "candidate": "C. Wernecke"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.08,
+        0.144,
+        0.923,
+        0.369
+      ],
+      "hint": "Read only the table headed 'FOURTH DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 785,
+      "id": "785-1",
+      "columns": [
+        {
+          "label": "Neal Dem.",
+          "contest": "house5",
+          "candidate": "George S. Neal"
+        },
+        {
+          "label": "Cooper Rep.",
+          "contest": "house5",
+          "candidate": "Edward Cooper"
+        },
+        {
+          "label": "Leggett Prog.",
+          "contest": "house5",
+          "candidate": "H. F. Leggett"
+        },
+        {
+          "label": "Gillespie Soc.",
+          "contest": "house5",
+          "candidate": "G. W. Gillespie"
+        },
+        {
+          "label": "Wysor Prohib",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.08,
+        0.361,
+        0.923,
+        0.587
+      ],
+      "hint": "Read only the table headed 'FIFTH DISTRICT.'; ignore any other table visible in the image."
+    }
+  ]
+}
