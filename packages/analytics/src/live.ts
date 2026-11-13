@@ -172,6 +172,7 @@ const MODEL = {
   quiet: 15,
   pause: 2,
   moving: 0.1,
+  still: { span: 1, share: 0.02 },
   shift: 0.028,
   volatility: { scale: 0.9, prior: 0.1, weight: 0.02, calm: 0.2 },
   surge: 0.14,
@@ -307,6 +308,8 @@ function split(race: LiveRace, at: string | null) {
 const HOLDS: Record<string, number> = { ga: 0.002 };
 
 const NIGHTS: Record<string, number> = { ga: 0.0075 };
+
+const STILLS: Record<string, string> = { ga: "2021-03-25" };
 
 const TAILS: Record<string, number> = {
   ak: 0.4,
@@ -549,6 +552,18 @@ function units(
   }
   const clock = Date.parse(now);
   const start = clock - MODEL.late.span * 86_400_000;
+  const framed = race.frames.filter((frame) => Date.parse(frame.at) <= clock);
+  const hour = framed.findLast(
+    (frame) => Date.parse(frame.at) <= clock - MODEL.still.span * 3_600_000,
+  );
+  const since = STILLS[race.state];
+  const isStill =
+    since != null &&
+    (/\d{4}-\d{2}-\d{2}/.exec(race.slug)?.[0] ?? "") >= since &&
+    (cutoff == null || clock <= cutoff) &&
+    hour != null &&
+    sum(framed.at(-1)!.totals) - sum(hour.totals) <=
+      MODEL.still.share * sum(framed.at(-1)!.totals);
   const paces = new Map<string, number>();
   const befores = new Map<string, number>();
   if (cutoff != null && start > cutoff) {
@@ -642,7 +657,7 @@ function units(
       traits: base?.traits ?? null,
       settled: changed.has(id)
         ? (clock - Date.parse(changed.get(id)!)) / 60_000 >=
-          (waits.get(id) ?? MODEL.quiet)
+            (waits.get(id) ?? MODEL.quiet) || isStill
           ? 1
           : MODEL.moving
         : 1,
