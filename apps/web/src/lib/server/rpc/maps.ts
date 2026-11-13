@@ -285,9 +285,9 @@ export const maps = {
                   entry.path == null ? [] : [entry.path],
                 );
                 const shown = await db.execute<{ path: string }>(sql`
-                  select s.path from slug s
-                  where s.path = any(${sql.param(listed)}::text[]) and s.is_current
-                    and ${mapped(sql`s.entity_id`)}
+                  select s.path from unnest(${sql.param(listed)}::text[]) l(path)
+                  join slug s on s.path = l.path
+                  where s.is_current and ${mapped(sql`s.entity_id`)}
                 `);
                 const kept = new Set(shown.rows.map((row) => row.path));
                 return page.series.flatMap((entry) =>
