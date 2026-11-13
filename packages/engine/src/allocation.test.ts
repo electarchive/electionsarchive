@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { allocate, distribute, qualify } from "./allocation.ts";
+import brazilChamber from "./fixtures/brazil-chamber-1945-1947.json" with { type: "json" };
 import germany from "./fixtures/germany-2025.json" with { type: "json" };
 import germanyEuropean from "./fixtures/germany-ep-2024.json" with { type: "json" };
 import italyCamera from "./fixtures/italy-camera-1948-1992.json" with { type: "json" };
@@ -290,6 +291,27 @@ describe("golden elections", () => {
         ...Object.keys(distribution.seats),
       ]))
         expect(distribution.seats[id] ?? 0, id).toBe(declared[id] ?? 0);
+    });
+  }
+
+  for (const { date, districts } of brazilChamber) {
+    it(`reproduces Brazil's ${date} Chamber leftovers to the most-voted list`, () => {
+      for (const { id: district, seats, entries } of districts) {
+        const allocation = allocate(
+          {
+            formula: "hare",
+            quotaRounding: "half_down",
+            leftovers: "most_votes",
+          },
+          seats,
+          entries,
+        );
+        expect(allocation.tie, district).toBeUndefined();
+        for (const { id, declared } of entries)
+          expect(allocation.seats[id] ?? 0, `${district}: ${id}`).toBe(
+            declared,
+          );
+      }
     });
   }
 

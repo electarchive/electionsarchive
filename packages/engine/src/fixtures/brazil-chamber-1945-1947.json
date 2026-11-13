@@ -1,0 +1,316 @@
+[
+  {
+    "date": "1945-12-02",
+    "districts": [
+      {
+        "id": "AC",
+        "seats": 2,
+        "entries": [
+          { "id": "PSD", "votes": 3775, "declared": 2 },
+          { "id": "Blank", "votes": 37, "declared": 0, "inert": true }
+        ]
+      },
+      {
+        "id": "AL",
+        "seats": 9,
+        "entries": [
+          { "id": "PSD", "votes": 28742, "declared": 6 },
+          { "id": "UDN", "votes": 24279, "declared": 3 },
+          { "id": "PTB", "votes": 4997, "declared": 0 },
+          { "id": "PCB", "votes": 4930, "declared": 0 },
+          { "id": "PRP", "votes": 1629, "declared": 0 },
+          { "id": "Blank", "votes": 454, "declared": 0, "inert": true }
+        ]
+      },
+      {
+        "id": "AM",
+        "seats": 5,
+        "entries": [
+          { "id": "PSD", "votes": 8438, "declared": 3 },
+          { "id": "UDN", "votes": 6535, "declared": 1 },
+          { "id": "PTB", "votes": 5198, "declared": 1 },
+          { "id": "PCB", "votes": 1318, "declared": 0 },
+          { "id": "PRP", "votes": 700, "declared": 0 },
+          { "id": "Blank", "votes": 1520, "declared": 0, "inert": true }
+        ]
+      },
+      {
+        "id": "BA",
+        "seats": 24,
+        "entries": [
+          { "id": "UDN", "votes": 145900, "declared": 12 },
+          { "id": "PSD", "votes": 134851, "declared": 9 },
+          { "id": "PTB", "votes": 22695, "declared": 1 },
+          { "id": "PCB", "votes": 18691, "declared": 1 },
+          { "id": "PPS", "votes": 15426, "declared": 1 },
+          { "id": "PRP", "votes": 13173, "declared": 0 },
+          { "id": "PRD", "votes": 879, "declared": 0 },
+          { "id": "Blank", "votes": 2617, "declared": 0, "inert": true }
+        ]
+      },
+      {
+        "id": "CE",
+        "seats": 17,
+        "entries": [
+          { "id": "UDN", "votes": 123944, "declared": 10 },
+          { "id": "PSD", "votes": 94140, "declared": 5 },
+          { "id": "PPS", "votes": 43963, "declared": 2 },
+          { "id": "PCB", "votes": 12098, "declared": 0 },
+          { "id": "PDC", "votes": 5405, "declared": 0 },
+          { "id": "PRP", "votes": 3144, "declared": 0 },
+          { "id": "PAN", "votes": 1738, "declared": 0 },
+          { "id": "PL", "votes": 662, "declared": 0 },
+          { "id": "Blank", "votes": 2748, "declared": 0, "inert": true }
+        ]
+      },
+      {
+        "id": "ES",
+        "seats": 7,
+        "entries": [
+          { "id": "PSD", "votes": 64946, "declared": 6 },
+          { "id": "UDN", "votes": 22461, "declared": 1 },
+          { "id": "PRD", "votes": 7044, "declared": 0 },
+          { "id": "PTB", "votes": 3728, "declared": 0 },
+          { "id": "PCB", "votes": 3723, "declared": 0 },
+          { "id": "Blank", "votes": 3746, "declared": 0, "inert": true }
+        ]
+      },
+      {
+        "id": "GO",
+        "seats": 7,
+        "entries": [
+          { "id": "PSD", "votes": 38981, "declared": 5 },
+          { "id": "UDN", "votes": 32078, "declared": 2 },
+          { "id": "PCB", "votes": 6809, "declared": 0 },
+          { "id": "Blank", "votes": 1343, "declared": 0, "inert": true }
+        ]
+      },
+      {
+        "id": "MA",
+        "seats": 9,
+        "entries": [
+          { "id": "PSD", "votes": 40981, "declared": 6 },
+          { "id": "UDN/PR", "votes": 25196, "declared": 3 },
+          { "id": "PTB", "votes": 2391, "declared": 0 },
+          { "id": "PL", "votes": 1552, "declared": 0 },
+          { "id": "PCB", "votes": 838, "declared": 0 },
+          { "id": "Blank", "votes": 2097, "declared": 0, "inert": true }
+        ]
+      },
+      {
+        "id": "MT",
+        "seats": 5,
+        "entries": [
+          { "id": "PSD", "votes": 20077, "declared": 3 },
+          { "id": "UDN", "votes": 19622, "declared": 2 },
+          { "id": "PCB", "votes": 2984, "declared": 0 },
+          { "id": "Blank", "votes": 1737, "declared": 0, "inert": true }
+        ]
+      },
+      {
+        "id": "PA",
+        "seats": 9,
+        "entries": [
+          { "id": "PSD", "votes": 60479, "declared": 6 },
+          { "id": "UDN", "votes": 26695, "declared": 2 },
+          { "id": "PPS", "votes": 14452, "declared": 1 },
+          { "id": "PCB", "votes": 4479, "declared": 0 },
+          { "id": "PRP", "votes": 996, "declared": 0 },
+          { "id": "Blank", "votes": 3873, "declared": 0, "inert": true }
+        ]
+      },
+      {
+        "id": "PB",
+        "seats": 10,
+        "entries": [
+          { "id": "UDN", "votes": 70573, "declared": 7 },
+          { "id": "PSD", "votes": 52272, "declared": 3 },
+          { "id": "PPS", "votes": 7536, "declared": 0 },
+          { "id": "PDC", "votes": 4105, "declared": 0 },
+          { "id": "PCB", "votes": 3837, "declared": 0 },
+          { "id": "Blank", "votes": 1364, "declared": 0, "inert": true }
+        ]
+      },
+      {
+        "id": "PE",
+        "seats": 19,
+        "entries": [
+          { "id": "PSD", "votes": 106393, "declared": 10 },
+          { "id": "UDN", "votes": 63966, "declared": 4 },
+          { "id": "PCB", "votes": 42013, "declared": 3 },
+          { "id": "PDC", "votes": 18060, "declared": 1 },
+          { "id": "PR", "votes": 14747, "declared": 1 },
+          { "id": "PTB", "votes": 6280, "declared": 0 },
+          { "id": "PRP", "votes": 3973, "declared": 0 },
+          { "id": "PRD", "votes": 3400, "declared": 0 },
+          { "id": "Blank", "votes": 3193, "declared": 0, "inert": true }
+        ]
+      },
+      {
+        "id": "PI",
+        "seats": 7,
+        "entries": [
+          { "id": "UDN", "votes": 54486, "declared": 4 },
+          { "id": "PSD", "votes": 50716, "declared": 3 },
+          { "id": "PL", "votes": 3803, "declared": 0 },
+          { "id": "PPS", "votes": 1095, "declared": 0 },
+          { "id": "PCB", "votes": 603, "declared": 0 },
+          { "id": "Blank", "votes": 394, "declared": 0, "inert": true }
+        ]
+      },
+      {
+        "id": "PR",
+        "seats": 9,
+        "entries": [
+          { "id": "PSD", "votes": 81611, "declared": 6 },
+          { "id": "UDN", "votes": 45800, "declared": 2 },
+          { "id": "PTB", "votes": 30959, "declared": 1 },
+          { "id": "Blank", "votes": 3180, "declared": 0, "inert": true }
+        ]
+      },
+      {
+        "id": "RJ",
+        "seats": 17,
+        "entries": [
+          { "id": "PSD", "votes": 143747, "declared": 10 },
+          { "id": "UDN", "votes": 92137, "declared": 4 },
+          { "id": "PCB", "votes": 38399, "declared": 2 },
+          { "id": "PTB", "votes": 31917, "declared": 1 },
+          { "id": "PRP", "votes": 8884, "declared": 0 },
+          { "id": "PAN", "votes": 353, "declared": 0 },
+          { "id": "PPS", "votes": 188, "declared": 0 },
+          { "id": "Blank", "votes": 4102, "declared": 0, "inert": true }
+        ]
+      },
+      {
+        "id": "RN",
+        "seats": 7,
+        "entries": [
+          { "id": "PSD", "votes": 42460, "declared": 4 },
+          { "id": "UDN", "votes": 40397, "declared": 2 },
+          { "id": "PRP", "votes": 16993, "declared": 1 },
+          { "id": "PCB", "votes": 2558, "declared": 0 },
+          { "id": "PTB", "votes": 775, "declared": 0 },
+          { "id": "Blank", "votes": 1362, "declared": 0, "inert": true }
+        ]
+      },
+      {
+        "id": "RS",
+        "seats": 22,
+        "entries": [
+          { "id": "PSD", "votes": 389975, "declared": 17 },
+          { "id": "UDN", "votes": 58663, "declared": 2 },
+          { "id": "PL", "votes": 51324, "declared": 1 },
+          { "id": "PTB", "votes": 40146, "declared": 1 },
+          { "id": "PCB", "votes": 38759, "declared": 1 },
+          { "id": "PRP", "votes": 21197, "declared": 0 },
+          { "id": "Blank", "votes": 9268, "declared": 0, "inert": true }
+        ]
+      },
+      {
+        "id": "SC",
+        "seats": 9,
+        "entries": [
+          { "id": "PSD", "votes": 110090, "declared": 7 },
+          { "id": "UDN", "votes": 69173, "declared": 2 },
+          { "id": "PTB", "votes": 13915, "declared": 0 },
+          { "id": "PRP", "votes": 8771, "declared": 0 },
+          { "id": "PCB", "votes": 2012, "declared": 0 },
+          { "id": "Blank", "votes": 7181, "declared": 0, "inert": true }
+        ]
+      },
+      {
+        "id": "SP",
+        "seats": 35,
+        "entries": [
+          { "id": "PSD", "votes": 479414, "declared": 16 },
+          { "id": "UDN", "votes": 285962, "declared": 7 },
+          { "id": "PTB", "votes": 237700, "declared": 6 },
+          { "id": "PCB", "votes": 189422, "declared": 4 },
+          { "id": "PDC", "votes": 64486, "declared": 1 },
+          { "id": "PRP", "votes": 43004, "declared": 1 },
+          { "id": "PPS", "votes": 25659, "declared": 0 },
+          { "id": "PAN", "votes": 4804, "declared": 0 },
+          { "id": "Blank", "votes": 21592, "declared": 0, "inert": true }
+        ]
+      }
+    ]
+  },
+  {
+    "date": "1947-01-19",
+    "districts": [
+      {
+        "id": "AM",
+        "seats": 2,
+        "entries": [
+          { "id": "UDN/PTB", "votes": 12452, "declared": 2 },
+          { "id": "Blank", "votes": 1577, "declared": 0, "inert": true }
+        ]
+      },
+      {
+        "id": "AP",
+        "seats": 1,
+        "entries": [
+          { "id": "PSD", "votes": 2429, "declared": 1 },
+          { "id": "Blank", "votes": 34, "declared": 0, "inert": true }
+        ]
+      },
+      {
+        "id": "BA",
+        "seats": 1,
+        "entries": [
+          { "id": "UDN/PSD", "votes": 127877, "declared": 1 },
+          { "id": "PTB", "votes": 61359, "declared": 0 },
+          { "id": "ED", "votes": 38083, "declared": 0 },
+          { "id": "PR", "votes": 23382, "declared": 0 },
+          { "id": "PRP", "votes": 9614, "declared": 0 },
+          { "id": "PRD", "votes": 2569, "declared": 0 },
+          { "id": "Blank", "votes": 46094, "declared": 0, "inert": true }
+        ]
+      },
+      {
+        "id": "GP",
+        "seats": 1,
+        "entries": [
+          { "id": "PSD", "votes": 1288, "declared": 1 },
+          { "id": "UDN", "votes": 956, "declared": 0 }
+        ]
+      },
+      {
+        "id": "MG",
+        "seats": 3,
+        "entries": [
+          { "id": "UDN/PR/PDC/PTN", "votes": 429249, "declared": 2 },
+          { "id": "PSD", "votes": 360152, "declared": 1 },
+          { "id": "Blank", "votes": 35311, "declared": 0, "inert": true }
+        ]
+      },
+      {
+        "id": "RB",
+        "seats": 1,
+        "entries": [
+          { "id": "PSD", "votes": 820, "declared": 1 },
+          { "id": "Blank", "votes": 12, "declared": 0, "inert": true }
+        ]
+      },
+      {
+        "id": "SC",
+        "seats": 1,
+        "entries": [
+          { "id": "PSD", "votes": 92345, "declared": 1 },
+          { "id": "UDN", "votes": 74763, "declared": 0 },
+          { "id": "PRP", "votes": 3915, "declared": 0 },
+          { "id": "Blank", "votes": 10928, "declared": 0, "inert": true }
+        ]
+      },
+      {
+        "id": "SE",
+        "seats": 2,
+        "entries": [
+          { "id": "PSD/PR", "votes": 38600, "declared": 2 },
+          { "id": "Blank", "votes": 827, "declared": 0, "inert": true }
+        ]
+      }
+    ]
+  }
+]

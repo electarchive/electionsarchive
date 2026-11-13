@@ -98,7 +98,13 @@ function byQuota(rules: Quota, seats: number, entries: Array<Entry>) {
     const [numerator, denominator] =
       rules.formula === "droop"
         ? [Math.floor(total / (seats + 1)) + 1, 1]
-        : [total, seats + extra];
+        : rules.quotaRounding === "half_down"
+          ? [
+              Math.floor(total / (seats + extra)) +
+                (2 * (total % (seats + extra)) > seats + extra ? 1 : 0),
+              1,
+            ]
+          : [total, seats + extra];
     const automatic: Record<string, number> = {};
     const claims: Array<Claim> = [];
     let awarded = 0;
@@ -187,23 +193,34 @@ export function allocate(
       start = byDivisor(rules, seats, entries);
     }
   }
+  const inert = new Set(
+    entries.flatMap(({ id, inert }) => (inert ? [id] : [])),
+  );
+  for (const id of inert) start.automatic[id] = 0;
   let remaining = seats;
   for (const won of Object.values(start.automatic)) remaining -= won;
   if (remaining < 0)
     throw new Error(
       `The ${rules.formula} quota awards more than ${seats} seats`,
     );
-  const isSlate = rules.formula === "winner_take_all";
+  const isLeading = "leftovers" in rules && rules.leftovers === "most_votes";
+  const lump =
+    rules.formula === "winner_take_all" ? seats : isLeading ? remaining : 1;
+  const claims = start.claims.flatMap((claim) =>
+    inert.has(claim.id)
+      ? []
+      : [isLeading ? { ...claim, score: claim.votes } : claim],
+  );
   const { winners, tie } = award(
-    start.claims,
-    isSlate ? Math.min(remaining, 1) : remaining,
+    claims,
+    lump > 1 ? 1 : remaining,
     rules.tieBreak,
   );
   for (const { id } of winners)
-    start.automatic[id] = (start.automatic[id] ?? 0) + (isSlate ? seats : 1);
+    start.automatic[id] = (start.automatic[id] ?? 0) + lump;
   return {
     seats: start.automatic,
-    tie: isSlate && tie != null ? { ids: tie.ids, seats } : tie,
+    tie: lump > 1 && tie != null ? { ids: tie.ids, seats: lump } : tie,
   };
 }
 

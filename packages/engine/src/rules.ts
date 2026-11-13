@@ -143,6 +143,8 @@ export const rules = v.variant("formula", [
     remainderPlacement: v.optional(
       v.picklist(["residual", "remainder_over_quota"]),
     ),
+    quotaRounding: v.optional(v.literal("half_down")),
+    leftovers: v.optional(v.literal("most_votes")),
     lists,
     tieBreak,
   }),

@@ -1359,6 +1359,12 @@
           ],
           "type": "string"
         },
+        "quotaRounding": {
+          "const": "half_down"
+        },
+        "leftovers": {
+          "const": "most_votes"
+        },
         "lists": {
           "type": "object",
           "properties": {
