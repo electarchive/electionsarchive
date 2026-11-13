@@ -158,7 +158,14 @@ const MODEL = {
   partial: 0.05,
   residual: 0.04,
   spike: 0.003,
-  priors: { swing: 0.1, slope: 0.15, size: 0.01, order: 0.15, trait: 0.015 },
+  priors: {
+    swing: 0.1,
+    slope: 0.15,
+    size: 0.01,
+    order: 0.15,
+    trait: 0.015,
+    least: 0.05,
+  },
   turnout: 0.12,
   same: { center: 0.06, spread: 0.08 },
   drift: 0.06,
@@ -656,9 +663,13 @@ function units(
     ),
   ].toSorted((x, y) => x - y);
   const width = Math.max(0, ...sized.map((unit) => unit.traits?.length ?? 0));
+  const counted =
+    weight > 0
+      ? sum(sized.map((unit) => Math.min(unit.total, unit.expected))) / weight
+      : 0;
   const widths = [MODEL.priors.size];
   for (let index = 0; index < width; index += 1) {
-    widths.push(MODEL.priors.trait);
+    widths.push(MODEL.priors.trait * Math.max(MODEL.priors.least, counted));
   }
   for (const _ of streamed) {
     widths.push(MODEL.channel.prior);
