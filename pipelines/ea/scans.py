@@ -56,6 +56,7 @@ class Page(TypedDict):
     url: NotRequired[str]
     start: NotRequired[Literal["second"]]
     wards: NotRequired[str]
+    totals: NotRequired[bool]
 
 
 class Contest(TypedDict):
@@ -334,7 +335,11 @@ def framing(spec: Page, reader: str) -> tuple[list[float], int, int]:
     x0, y0, x1, y1 = spec.get("crop", [0, 0, 1, 1])
     dpi, count = spec.get("dpi", 300), spec.get("bands", 1)
     if reader == "third":
-        return [x0, max(0.0, y0 - 0.02), x1, min(1.0, y1 + 0.02)], max(count, 2), dpi * 4 // 3
+        return (
+            [x0, max(0.0, y0 - 0.02), x1, min(1.0, y1 + 0.02)],
+            count if spec.get("totals") else max(count, 2),
+            dpi * 4 // 3,
+        )
     return [x0, y0, x1, y1], count, dpi
 
 
@@ -394,7 +399,25 @@ def bands(
                 pixels += part.width * part.height
             across = spec.get("orientation") == "counties_across"
             unit = "towns" if manifest.get("unit_scheme") == "town" else "counties"
-            if labeled:
+            if spec.get("totals"):
+                text = (
+                    "This page prints returns by township, village, city, or ward under county headings, and each "
+                    "county's lines end in a county Totals row. Return only these rows, top to bottom: one row for "
+                    "each county heading printed on the page, labeled with the heading as printed (for example "
+                    "'AITKIN COUNTY') and with an empty string for every value; and one row for each Totals, Total "
+                    "County, or Grand Totals row of a whole county or a whole section, labeled 'Totals', with its "
+                    "printed values. Leave out every township, village, city, and ward line, every ward subtotal "
+                    "such as 'Totals 9th Ward', and any Towns, Cities, or Villages subtotal. "
+                    + (
+                        f"The data columns, left to right, are: {labels}. Header has one entry per data column and "
+                        "each row's values has one string per data column; leave out any column not in this list."
+                        if labeled
+                        else "Header has one entry per printed data column, left to right, labeled exactly as printed "
+                        "(the candidate's name, with party if printed), including a total column if one is printed. "
+                        "Each row's values has one string per header entry."
+                    )
+                )
+            elif labeled:
                 text = (
                     f"The columns are the {unit} and the rows are the candidates' lines, one row per line in this "
                     f"order: {labels}. Skip heading lines that carry no cells. Put the {unit[:-1]} names in header, "
@@ -677,6 +700,21 @@ def cells(
                 return code, owner
         return None, None
 
+    carry: dict[str, str | None] = {}
+    if any(spec.get("totals") for spec in manifest["pages"]):
+        firsts = {request.section: request for request in requests(manifest["name"], "first").values()}
+        last: str | None = None
+        for spec in manifest["pages"]:
+            number = str(spec.get("id", spec["page"]))
+            carry[number] = last
+            mine = next((request for request in plan.values() if request.section == number), None)
+            for request in (mine, firsts.get(number)):
+                table = None if request is None else parse(cached(request.key))
+                if table is not None and not isinstance(table, str):
+                    for row in table["rows"]:
+                        if not any(text.strip() for text in row["values"]):
+                            last = row["label"]
+                    break
     wards: str | None = None
     for spec in manifest["pages"]:
         across = spec.get("orientation") == "counties_across"
@@ -730,6 +768,20 @@ def cells(
             if any(after["y0"] < before["y0"] for before, after in itertools.pairwise(rows)):
                 errors[number] = f"{custom}: row bands are not ascending"
                 continue
+            if spec.get("totals"):
+                current, kept = carry.get(number), []
+                for row in rows:
+                    if not any(text.strip() for text in row["values"]):
+                        current = row["label"]
+                    elif re.fullmatch(r"(county |grand )?totals?( county)?", slug(row["label"])):
+                        if current is None:
+                            errors[number] = f"{custom}: a Totals row comes before any county heading"
+                            break
+                        kept.append({**row, "label": current})
+                else:
+                    rows = list({row["label"]: row for row in kept}.values())
+                if number in errors:
+                    continue
             start, stop = request.span
             ax, bx, _, ay, by, _ = lines.get(request.key, [0.001, 0.0, 0, 0.001, 0.0, 0])
             owners: list[tuple[str | None, str | None]] = [place(row["label"]) for row in rows]
@@ -816,6 +868,24 @@ def cells(
                 else:
                     continue
                 break
+    order = {
+        str(spec.get("id", spec["page"])): (i, spec) for i, spec in enumerate(manifest["pages"]) if spec.get("totals")
+    }
+
+    def column_of(number: str, unit: str, series: int) -> tuple[str, str]:
+        column = order[number][1].get("columns", [])[series]
+        return unit, f"{column['contest']}|{column['candidate']}"
+
+    latest: dict[tuple[str, str], int] = {}
+    for number, unit, series in values:
+        if number in order:
+            found = column_of(number, unit, series)
+            latest[found] = max(latest.get(found, -1), order[number][0])
+    values = {
+        found: entry
+        for found, entry in values.items()
+        if found[0] not in order or order[found[0]][0] == latest[column_of(*found)]
+    }
     if folded or any(unit != code for unit, code in home.items()):
         summed: dict[tuple[str, str, int], tuple[int, list[float]]] = {}
         for (number, unit, series), (value, box) in values.items():
@@ -832,6 +902,7 @@ def evaluate(manifest: Manifest, reader: str, names: dict[str, str], held: dict[
     folded = manifest.get("unit_scheme") in ("town", "split")
     series: dict[str, Series] = {}
     joined: set[tuple[str, str]] = set()
+    exact = {str(spec.get("id", spec["page"])) for spec in manifest["pages"] if spec.get("totals")}
     for spec in manifest["pages"]:
         page = str(spec.get("id", spec["page"]))
         for index, column in enumerate(spec.get("columns", [])):
@@ -866,6 +937,7 @@ def evaluate(manifest: Manifest, reader: str, names: dict[str, str], held: dict[
             or (
                 entry.printed is None
                 and entry.official is not None
+                and not exact.intersection(entry.pages)
                 and abs(entry.total - entry.official) <= max(50, entry.official * 0.01)
             )
             else "failed"
