@@ -685,6 +685,7 @@ def part(conn, cc: str) -> tuple[list[tuple], tuple]:
 
 def write(conn, goal_rows: list[tuple], polity_rows: list[tuple]) -> None:
     conn.execute("delete from coverage_goal where polity <> 'us'")
+    kept = dict(conn.execute("select polity, classes from coverage_polity"))
     conn.execute("delete from coverage_polity")
     with conn.cursor().copy(
         "copy coverage_goal (polity, goal, state, level, year, total, complete, absent, bare, totals, partial, coarse,"
@@ -699,6 +700,8 @@ def write(conn, goal_rows: list[tuple], polity_rows: list[tuple]) -> None:
     ) as copy:
         for row in polity_rows:
             copy.write_row(row)
+    for polity, classes in kept.items():
+        conn.execute("update coverage_polity set classes = %s where polity = %s", (json.dumps(classes), polity))
 
 
 def report(cc: str) -> str:

@@ -293,6 +293,21 @@ def queued_classes(text: str) -> set[tuple[str, str]]:
     return set(TICKET_REF.findall(text))
 
 
+def mark(conn, queued: set[tuple[str, str]]) -> str:
+    open_keys = {(r["polity"], r["key"]) for r in open_classes(conn)}
+    wanted: dict[str, list[dict[str, str]]] = {}
+    for polity, key in sorted(queued & open_keys):
+        wanted.setdefault(polity, []).append({"key": key, "status": "queued"})
+    conn.execute(
+        "update coverage_polity set classes = '[]' where classes <> '[]'::jsonb and not (polity = any(%s))",
+        (list(wanted),),
+    )
+    for polity, entries in wanted.items():
+        conn.execute("update coverage_polity set classes = %s where polity = %s", (json.dumps(entries), polity))
+    conn.commit()
+    return f"marked {sum(len(v) for v in wanted.values())} queued classes in {len(wanted)} polities"
+
+
 def run(targets: list[str], as_json: bool, queued_file: str | None) -> str:
     with connect() as conn:
         if targets == ["open"]:
@@ -301,4 +316,6 @@ def run(targets: list[str], as_json: bool, queued_file: str | None) -> str:
                 return json.dumps(found, indent=2)
             return "\n".join(f"{r['polity']}/{r['key']}\t{r['score']:.0f}\t{r['name']}" for r in found)
         queued = queued_classes(Path(queued_file).read_text()) if queued_file else set()
+        if targets == ["mark"]:
+            return mark(conn, queued)
         return "\n".join(str(page(conn, cc, queued)) for cc in targets)

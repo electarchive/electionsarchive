@@ -130,9 +130,10 @@ def main() -> None:
     census = commands.add_parser(
         "census",
         help="write .agents/spec/coverage/{cc}-census.md from the census tables, keeping its Research section, "
+        "or with 'mark' write the classes a --queued file names into coverage_polity, "
         "or with 'open' list the classes that are neither held nor dispositioned, ranked by estimated votes over effort",
     )
-    census.add_argument("targets", nargs="+", help="two-letter polity codes, or open")
+    census.add_argument("targets", nargs="+", help="two-letter polity codes, open, or mark")
     census.add_argument("--json", action="store_true", help="with open, print JSON")
     census.add_argument("--queued", help="a file whose class:<cc>/<key> mentions mark classes as queued on the page")
     portal = commands.add_parser(
