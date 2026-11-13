@@ -86,6 +86,10 @@ DAY_RULES = {
     "may_first_thursday": nth_weekday(5, 3, 1),
     "wednesday_from_apr_9": wednesday_from(4, 9),
     "wednesday_from_may_31_unless_jun_6": wednesday_from(5, 31),
+    "jun_first_sunday": nth_weekday(6, 6, 1),
+    "jul_first_sunday": nth_weekday(7, 6, 1),
+    "aug_first_sunday": nth_weekday(8, 6, 1),
+    "aug_third_sunday": nth_weekday(8, 6, 3),
 }
 
 

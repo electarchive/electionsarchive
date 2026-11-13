@@ -1,0 +1,2280 @@
+{
+ "polity": "MX",
+ "name": "Mexico",
+ "create": {
+  "kind": "sovereign_state",
+  "names": [
+   {
+    "text": "Mexico",
+    "lang": "en",
+    "kind": "official"
+   },
+   {
+    "text": "México",
+    "lang": "es",
+    "kind": "native"
+   }
+  ],
+  "slug": "mx",
+  "wikidata": "Q96",
+  "source": "cpeum"
+ },
+ "region_labels": {
+  "AGU": "Aguascalientes",
+  "BCN": "Baja California",
+  "BCS": "Baja California Sur",
+  "CAM": "Campeche",
+  "CHP": "Chiapas",
+  "CHH": "Chihuahua",
+  "CMX": "Ciudad de México",
+  "COA": "Coahuila",
+  "COL": "Colima",
+  "DUR": "Durango",
+  "GUA": "Guanajuato",
+  "GRO": "Guerrero",
+  "HID": "Hidalgo",
+  "JAL": "Jalisco",
+  "MEX": "México",
+  "MIC": "Michoacán",
+  "MOR": "Morelos",
+  "NAY": "Nayarit",
+  "NLE": "Nuevo León",
+  "OAX": "Oaxaca",
+  "PUE": "Puebla",
+  "QUE": "Querétaro",
+  "ROO": "Quintana Roo",
+  "SLP": "San Luis Potosí",
+  "SIN": "Sinaloa",
+  "SON": "Sonora",
+  "TAB": "Tabasco",
+  "TAM": "Tamaulipas",
+  "TLA": "Tlaxcala",
+  "VER": "Veracruz",
+  "YUC": "Yucatán",
+  "ZAC": "Zacatecas"
+ },
+ "sources": {
+  "cpeum": {
+   "title": "Constitución Política de los Estados Unidos Mexicanos (texto vigente, última reforma DOF 07-10-2026)",
+   "publisher": "Cámara de Diputados del H. Congreso de la Unión",
+   "url": "https://www.diputados.gob.mx/LeyesBiblio/pdf/CPEUM.pdf",
+   "kind": "official_body"
+  },
+  "lgipe": {
+   "title": "Ley General de Instituciones y Procedimientos Electorales (última reforma DOF 02-06-2026)",
+   "publisher": "Cámara de Diputados del H. Congreso de la Unión",
+   "url": "https://www.diputados.gob.mx/LeyesBiblio/pdf/LGIPE.pdf",
+   "kind": "official_body"
+  },
+  "lfrm": {
+   "title": "Ley Federal de Revocación de Mandato",
+   "publisher": "Cámara de Diputados del H. Congreso de la Unión",
+   "url": "https://www.diputados.gob.mx/LeyesBiblio/pdf/LFRM.pdf",
+   "kind": "official_body"
+  },
+  "inegi_cat": {
+   "title": "Catálogo Único de Claves de Áreas Geoestadísticas Estatales, Municipales y Localidades (servicio web wscatgeo v2)",
+   "publisher": "Instituto Nacional de Estadística y Geografía (INEGI)",
+   "url": "https://gaia.inegi.org.mx/wscatgeo/v2/mgem/",
+   "kind": "official_body",
+   "note": "Read 2026-11-13: mgee lists 32 entidades federativas; mgem/01 to mgem/32 list 2,478 municipal units, of which 16 are the demarcaciones territoriales (alcaldías) of Mexico City (mgem/09) and 570 are in Oaxaca (mgem/20)."
+  },
+  "ine_siceef": {
+   "title": "Sistema de Consulta de la Estadística de las Elecciones Federales (SICEEF), Bases de datos",
+   "publisher": "Instituto Nacional Electoral (INE)",
+   "url": "https://web.archive.org/web/20261019164507/http://siceef.ine.mx/downloadDB.html",
+   "kind": "official_body",
+   "note": "Every federal process the IFE and INE ran from 1991, with the extraordinary elections of 1992, 1995, and 2003, as CSV by sección and by casilla. The live site answers 521 from abroad and 403 through a Mexican VPN exit; the Wayback copy loads."
+  },
+  "ine_computos2018": {
+   "title": "Cómputos Distritales 2018, Elecciones Federales",
+   "publisher": "Instituto Nacional Electoral (INE)",
+   "url": "https://computos2018.ine.mx/",
+   "kind": "official_body"
+  },
+  "ine_computos2021": {
+   "title": "Cómputos Distritales 2021",
+   "publisher": "Instituto Nacional Electoral (INE)",
+   "url": "https://computos2021.ine.mx/",
+   "kind": "official_body"
+  },
+  "ine_computos2024": {
+   "title": "Cómputos Distritales 2024",
+   "publisher": "Instituto Nacional Electoral (INE)",
+   "url": "https://computos2024.ine.mx/",
+   "kind": "official_body"
+  },
+  "ine_pj2025": {
+   "title": "Cómputos de la Elección del Poder Judicial de la Federación 2025 (Cómputos DJ 2025)",
+   "publisher": "Instituto Nacional Electoral (INE)",
+   "url": "https://computospj2025.ine.mx/",
+   "kind": "official_body"
+  },
+  "ine_rm2022": {
+   "title": "Cómputos de la Revocación de Mandato 2022",
+   "publisher": "Instituto Nacional Electoral (INE)",
+   "url": "https://computosrm2022.ine.mx/",
+   "kind": "official_body"
+  },
+  "ine_rm": {
+   "title": "Revocación de Mandato",
+   "publisher": "Instituto Nacional Electoral (INE)",
+   "url": "https://www.ine.mx/revocacion-mandato/",
+   "kind": "official_body"
+  },
+  "ine_cp": {
+   "title": "Consulta Popular",
+   "publisher": "Instituto Nacional Electoral (INE)",
+   "url": "https://www.ine.mx/consulta-popular/",
+   "kind": "official_body"
+  },
+  "ine_2021": {
+   "title": "Elecciones 2021",
+   "publisher": "Instituto Nacional Electoral (INE)",
+   "url": "https://www.ine.mx/voto-y-elecciones/elecciones-2021/",
+   "kind": "official_body"
+  },
+  "ine_2022": {
+   "title": "Elecciones 2022",
+   "publisher": "Instituto Nacional Electoral (INE)",
+   "url": "https://www.ine.mx/voto-y-elecciones/elecciones-2022/",
+   "kind": "official_body"
+  },
+  "ine_2023": {
+   "title": "Elecciones 2023",
+   "publisher": "Instituto Nacional Electoral (INE)",
+   "url": "https://www.ine.mx/voto-y-elecciones/elecciones-2023/",
+   "kind": "official_body"
+  },
+  "ine_2024": {
+   "title": "Elecciones 2024",
+   "publisher": "Instituto Nacional Electoral (INE)",
+   "url": "https://www.ine.mx/voto-y-elecciones/elecciones-2024/",
+   "kind": "official_body"
+  },
+  "ine_2027": {
+   "title": "Elecciones 2027",
+   "publisher": "Instituto Nacional Electoral (INE)",
+   "url": "https://www.ine.mx/voto-y-elecciones/elecciones-2027/",
+   "kind": "official_body"
+  },
+  "ine_2025": {
+   "title": "Elecciones locales 2025",
+   "publisher": "Instituto Nacional Electoral (INE)",
+   "url": "https://www.ine.mx/voto-y-elecciones/elecciones-locales-2025/",
+   "kind": "official_body"
+  },
+  "ine_2026": {
+   "title": "Elecciones locales 2026",
+   "publisher": "Instituto Nacional Electoral (INE)",
+   "url": "https://www.ine.mx/voto-y-elecciones/elecciones-locales-2026/",
+   "kind": "official_body"
+  },
+  "ieepco_sni": {
+   "title": "Catálogo de municipios sujetos al régimen de sistemas normativos indígenas 2025",
+   "publisher": "Instituto Estatal Electoral y de Participación Ciudadana de Oaxaca (IEEPCO)",
+   "url": "https://www.ieepco.org.mx/archivos/SNI_CATALOGO2025/presenta_catsni25.pdf",
+   "kind": "official_body",
+   "note": "Updated by acuerdo IEEPCO-CG-SNI-17/2025 of 25 June 2025: 418 dictámenes, one per municipality that elects its ayuntamiento by its own normative system; 413 of them renewed authorities in 2025."
+  },
+  "iecm_pp2026": {
+   "title": "Convocatoria Única para la Elección de las Comisiones de Participación Comunitaria y la Consulta de Presupuesto Participativo 2026 (versión ejecutiva)",
+   "publisher": "Instituto Electoral de la Ciudad de México (IECM)",
+   "url": "https://iecm.mx/www/docs/consulta2026/convocatorias/VE_Convocatoria_PP_2026.pdf",
+   "kind": "official_body"
+  },
+  "iecm": {
+   "title": "Participación ciudadana",
+   "publisher": "Instituto Electoral de la Ciudad de México (IECM)",
+   "url": "https://www.iecm.mx/participacion-ciudadana/",
+   "kind": "official_body"
+  },
+  "ite": {
+   "title": "Instituto Tlaxcalteca de Elecciones",
+   "publisher": "Instituto Tlaxcalteca de Elecciones (ITE)",
+   "url": "https://ite.org.mx/",
+   "kind": "official_body"
+  }
+ },
+ "tiers": [
+  {
+   "key": "national",
+   "name": "Estados Unidos Mexicanos",
+   "name_en": "United Mexican States",
+   "parent": null,
+   "polity_kind": "sovereign_state",
+   "scheme": "mx.nation",
+   "source": "cpeum"
+  },
+  {
+   "key": "entidad",
+   "name": "Entidades federativas",
+   "name_en": "Federal entities: 31 states and Mexico City",
+   "parent": "national",
+   "polity_kind": "federal_unit",
+   "scheme": "mx.entidad",
+   "source": "inegi_cat",
+   "counts": [
+    {
+     "date": "2026-11-13",
+     "value": 32,
+     "source": "inegi_cat",
+     "locator": "https://gaia.inegi.org.mx/wscatgeo/v2/mgee/ (numReg 32)"
+    }
+   ]
+  },
+  {
+   "key": "municipio",
+   "name": "Municipios",
+   "name_en": "Municipalities",
+   "parent": "entidad",
+   "polity_kind": "municipality",
+   "scheme": "mx.municipio",
+   "source": "inegi_cat",
+   "counts": [
+    {
+     "date": "2026-11-13",
+     "value": 2462,
+     "source": "inegi_cat",
+     "locator": "https://gaia.inegi.org.mx/wscatgeo/v2/mgem/01 to /32: 2,478 records less the 16 of mgem/09 (Mexico City)"
+    }
+   ]
+  },
+  {
+   "key": "alcaldia",
+   "name": "Demarcaciones territoriales de la Ciudad de México (alcaldías)",
+   "name_en": "Mexico City boroughs (alcaldías; delegaciones until 2018)",
+   "parent": "entidad",
+   "polity_kind": "municipality",
+   "scheme": "mx.municipio",
+   "source": "inegi_cat",
+   "counts": [
+    {
+     "date": "2026-11-13",
+     "value": 16,
+     "source": "inegi_cat",
+     "locator": "https://gaia.inegi.org.mx/wscatgeo/v2/mgem/09 (numReg 16)"
+    }
+   ]
+  },
+  {
+   "key": "auxiliar",
+   "name": "Autoridades auxiliares municipales (cuarto orden de gobierno)",
+   "name_en": "Sub-municipal authorities: Tlaxcala's presidencias de comunidad, Campeche's juntas, comisarías, and agencias, Puebla's juntas auxiliares, and agencies, comisarías, and delegations elsewhere",
+   "parent": "municipio",
+   "polity_kind": "submunicipal",
+   "source": "ine_2024",
+   "counts": [
+    {
+     "date": "2024-06-02",
+     "value": 431,
+     "source": "ine_2024",
+     "locator": "INE, Elecciones 2024: Campeche \"132 Cuarto Orden de Gobierno\" and Tlaxcala \"299 Cuarto Orden de Gobierno\", the posts elected through the state electoral institutes; units elected by usos y costumbres or by municipal call are not counted"
+    }
+   ]
+  },
+  {
+   "key": "unidad_territorial",
+   "name": "Unidades territoriales de la Ciudad de México",
+   "name_en": "Mexico City participation units (colonias, pueblos, and barrios originarios)",
+   "parent": "alcaldia",
+   "polity_kind": "submunicipal",
+   "source": "iecm_pp2026",
+   "counts": [
+    {
+     "date": "2026-01-15",
+     "precision": "month",
+     "value": 1764,
+     "source": "iecm_pp2026",
+     "locator": "\"La presente convocatoria está dirigida a las 1,764 Unidades Territoriales, conforme al Marco Geográfico de Participación\""
+    }
+   ]
+  },
+  {
+   "key": "functional",
+   "name": "Ámbitos funcionales y no territoriales",
+   "name_en": "Functional and non-territorial electorates",
+   "parent": "national",
+   "elects": false,
+   "source": "cpeum"
+  }
+ ],
+ "classes": [
+  {
+   "key": "presidente",
+   "tier": "national",
+   "name": "Elección de la Presidencia de la República",
+   "name_en": "President of the Republic",
+   "category": "executive",
+   "goal": "national",
+   "first_held": "1917-03-11",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "mx.entidad",
+     "mx.distrito_federal"
+    ],
+    "fine": [
+     "mx.municipio",
+     "mx.seccion",
+     "mx.casilla"
+    ]
+   },
+   "note": "Direct election by plurality, one round, for a six-year term with no re-election (CPEUM arts. 81 and 83; four-year terms 1917-1928). Mexicans abroad vote since 2006. Interim and substitute presidents named by Congress are the class presidente_congreso.",
+   "source": "cpeum",
+   "locator": "https://www.diputados.gob.mx/LeyesBiblio/pdf/CPEUM.pdf (arts. 81 and 83)",
+   "est_votes": 60000000,
+   "effort": 2,
+   "finest_note": "casilla (polling station) inside the sección electoral; SICEEF CSVs by casilla from 1994",
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "special"
+     ],
+     "office_kinds": [
+      "head_of_state"
+     ],
+     "iso_pattern": "MX",
+     "valid_from": "1917-02-05"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 6,
+     "phase": 2,
+     "term_years": 6,
+     "called": false,
+     "runoff": "none",
+     "administered_by": "Instituto Nacional Electoral (Instituto Federal Electoral until 2014)",
+     "source": "lgipe",
+     "locator": "https://www.diputados.gob.mx/LeyesBiblio/pdf/LGIPE.pdf (art. 22: \"Las elecciones ordinarias deberán celebrarse el primer domingo de junio del año que corresponda\")",
+     "month": 6,
+     "day_rule": "jun_first_sunday",
+     "valid_from": "2014-05-24"
+    },
+    {
+     "period_years": 6,
+     "phase": 2,
+     "term_years": 6,
+     "called": false,
+     "runoff": "none",
+     "administered_by": "Instituto Nacional Electoral (Instituto Federal Electoral until 2014)",
+     "source": "lgipe",
+     "locator": "COFIPE as reformed in 1996 (first Sunday of July); recorded from the 1997 to 2012 election days and the LGIPE transitory article that kept 1 July 2018",
+     "month": 7,
+     "day_rule": "jul_first_sunday",
+     "valid_from": "1996-11-23",
+     "valid_to": "2014-05-23"
+    },
+    {
+     "period_years": 6,
+     "phase": 2,
+     "term_years": 6,
+     "called": false,
+     "runoff": "none",
+     "administered_by": "Instituto Nacional Electoral (Instituto Federal Electoral until 2014)",
+     "source": "lgipe",
+     "locator": "COFIPE of 15 August 1990 (third Sunday of August), recorded from the 1991 and 1994 election days",
+     "month": 8,
+     "day_rule": "aug_third_sunday",
+     "valid_from": "1990-08-15",
+     "valid_to": "1996-11-22"
+    }
+   ],
+   "access": [
+    {
+     "platform": "INE SICEEF, Atlas de Resultados de las Elecciones Federales",
+     "url": "https://siceef.ine.mx/downloadDB.html",
+     "format": "csv",
+     "access": "open",
+     "checked_at": "2026-11-13",
+     "first_date": "1991-08-18",
+     "finest": "mx.casilla",
+     "source": "ine_siceef",
+     "evidence": "Bases de datos page (Wayback 2026-10-19): CSV by sección and casilla for every federal process from 1991, with the 1992, 1995, and 2003 extraordinary elections; the live site is unreachable from abroad"
+    },
+    {
+     "platform": "INE Cómputos Distritales 2018",
+     "url": "https://computos2018.ine.mx/",
+     "format": "csv, html",
+     "access": "open",
+     "checked_at": "2026-11-13",
+     "first_date": "2018-07-01",
+     "last_date": "2018-07-01",
+     "finest": "mx.casilla",
+     "source": "ine_computos2018",
+     "evidence": "District count results by casilla with a downloadable database"
+    },
+    {
+     "platform": "INE Cómputos Distritales 2021",
+     "url": "https://computos2021.ine.mx/",
+     "format": "csv, html",
+     "access": "open",
+     "checked_at": "2026-11-13",
+     "first_date": "2021-06-06",
+     "last_date": "2021-06-06",
+     "finest": "mx.casilla",
+     "source": "ine_computos2021",
+     "evidence": "District count results by casilla with a downloadable database"
+    },
+    {
+     "platform": "INE Cómputos Distritales 2024",
+     "url": "https://computos2024.ine.mx/",
+     "format": "csv, html",
+     "access": "open",
+     "checked_at": "2026-11-13",
+     "first_date": "2024-06-02",
+     "last_date": "2024-06-02",
+     "finest": "mx.casilla",
+     "source": "ine_computos2024",
+     "evidence": "District count results by casilla with a downloadable database"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1917-03-11",
+     "through": "1988-07-06",
+     "note": "Presidential elections from 1917 (and the extraordinary one of 1929) to 1988 predate the IFE's databases; the Colegio Electoral's declarations in the Diario de los Debates are the record."
+    },
+    {
+     "date": "1994-08-21",
+     "contests": 1,
+     "source": "ine_siceef"
+    },
+    {
+     "date": "2000-07-02",
+     "contests": 1,
+     "source": "ine_siceef"
+    },
+    {
+     "date": "2006-07-02",
+     "contests": 1,
+     "source": "ine_siceef"
+    },
+    {
+     "date": "2012-07-01",
+     "contests": 1,
+     "source": "ine_siceef"
+    },
+    {
+     "date": "2018-07-01",
+     "contests": 1,
+     "source": "ine_computos2018"
+    },
+    {
+     "date": "2024-06-02",
+     "contests": 1,
+     "source": "ine_computos2024"
+    }
+   ]
+  },
+  {
+   "key": "diputados",
+   "tier": "national",
+   "name": "Elección de la Cámara de Diputados",
+   "name_en": "Chamber of Deputies",
+   "category": "legislature",
+   "goal": "national",
+   "first_held": "1917-03-11",
+   "measure": {
+    "schemes": [
+     "mx.distrito_federal",
+     "mx.circunscripcion"
+    ],
+    "fine": [
+     "mx.municipio",
+     "mx.seccion",
+     "mx.casilla"
+    ]
+   },
+   "note": "500 deputies for three years: 300 by plurality in single-member districts and 200 from closed lists in five circunscripciones by proportional representation, a parallel system with an 8-point overrepresentation cap (CPEUM arts. 52-54). Before 1979 single-member districts only, with party deputies from 1964; 400 seats 1979-1985. Extraordinary district elections (special) belong here. Contests are counted as 300 districts plus 5 circunscripciones.",
+   "source": "cpeum",
+   "locator": "https://www.diputados.gob.mx/LeyesBiblio/pdf/CPEUM.pdf (arts. 51-54)",
+   "est_votes": 59000000,
+   "effort": 2,
+   "finest_note": "casilla inside the sección electoral; 300 federal districts redrawn by INE (2017, 2023)",
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "special",
+      "by_election"
+     ],
+     "body_kinds": [
+      "lower_house"
+     ],
+     "iso_pattern": "MX",
+     "valid_from": "1917-02-05"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 3,
+     "phase": 0,
+     "term_years": 3,
+     "called": false,
+     "runoff": "none",
+     "administered_by": "Instituto Nacional Electoral (Instituto Federal Electoral until 2014)",
+     "source": "lgipe",
+     "locator": "https://www.diputados.gob.mx/LeyesBiblio/pdf/LGIPE.pdf (art. 22: \"Las elecciones ordinarias deberán celebrarse el primer domingo de junio del año que corresponda\")",
+     "month": 6,
+     "day_rule": "jun_first_sunday",
+     "valid_from": "2014-05-24"
+    },
+    {
+     "period_years": 3,
+     "phase": 0,
+     "term_years": 3,
+     "called": false,
+     "runoff": "none",
+     "administered_by": "Instituto Nacional Electoral (Instituto Federal Electoral until 2014)",
+     "source": "lgipe",
+     "locator": "COFIPE as reformed in 1996 (first Sunday of July); recorded from the 1997 to 2012 election days and the LGIPE transitory article that kept 1 July 2018",
+     "month": 7,
+     "day_rule": "jul_first_sunday",
+     "valid_from": "1996-11-23",
+     "valid_to": "2014-05-23"
+    },
+    {
+     "period_years": 3,
+     "phase": 0,
+     "term_years": 3,
+     "called": false,
+     "runoff": "none",
+     "administered_by": "Instituto Nacional Electoral (Instituto Federal Electoral until 2014)",
+     "source": "lgipe",
+     "locator": "COFIPE of 15 August 1990 (third Sunday of August), recorded from the 1991 and 1994 election days",
+     "month": 8,
+     "day_rule": "aug_third_sunday",
+     "valid_from": "1990-08-15",
+     "valid_to": "1996-11-22"
+    }
+   ],
+   "access": [
+    {
+     "platform": "INE SICEEF, Atlas de Resultados de las Elecciones Federales",
+     "url": "https://siceef.ine.mx/downloadDB.html",
+     "format": "csv",
+     "access": "open",
+     "checked_at": "2026-11-13",
+     "first_date": "1991-08-18",
+     "finest": "mx.casilla",
+     "source": "ine_siceef",
+     "evidence": "Bases de datos page (Wayback 2026-10-19): CSV by sección and casilla for every federal process from 1991, with the 1992, 1995, and 2003 extraordinary elections; the live site is unreachable from abroad"
+    },
+    {
+     "platform": "INE Cómputos Distritales 2018",
+     "url": "https://computos2018.ine.mx/",
+     "format": "csv, html",
+     "access": "open",
+     "checked_at": "2026-11-13",
+     "first_date": "2018-07-01",
+     "last_date": "2018-07-01",
+     "finest": "mx.casilla",
+     "source": "ine_computos2018",
+     "evidence": "District count results by casilla with a downloadable database"
+    },
+    {
+     "platform": "INE Cómputos Distritales 2021",
+     "url": "https://computos2021.ine.mx/",
+     "format": "csv, html",
+     "access": "open",
+     "checked_at": "2026-11-13",
+     "first_date": "2021-06-06",
+     "last_date": "2021-06-06",
+     "finest": "mx.casilla",
+     "source": "ine_computos2021",
+     "evidence": "District count results by casilla with a downloadable database"
+    },
+    {
+     "platform": "INE Cómputos Distritales 2024",
+     "url": "https://computos2024.ine.mx/",
+     "format": "csv, html",
+     "access": "open",
+     "checked_at": "2026-11-13",
+     "first_date": "2024-06-02",
+     "last_date": "2024-06-02",
+     "finest": "mx.casilla",
+     "source": "ine_computos2024",
+     "evidence": "District count results by casilla with a downloadable database"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1917-03-11",
+     "through": "1988-07-06",
+     "note": "Chamber elections from 1917 (every two years to 1932, every three since 1934) to 1988 predate the IFE's databases."
+    },
+    {
+     "date": "1991-08-18",
+     "contests": 305,
+     "source": "ine_siceef",
+     "seats": 500
+    },
+    {
+     "date": "1994-08-21",
+     "contests": 305,
+     "source": "ine_siceef",
+     "seats": 500
+    },
+    {
+     "date": "1997-07-06",
+     "contests": 305,
+     "source": "ine_siceef",
+     "seats": 500
+    },
+    {
+     "date": "2000-07-02",
+     "contests": 305,
+     "source": "ine_siceef",
+     "seats": 500
+    },
+    {
+     "date": "2003-07-06",
+     "contests": 305,
+     "source": "ine_siceef",
+     "seats": 500
+    },
+    {
+     "date": "2006-07-02",
+     "contests": 305,
+     "source": "ine_siceef",
+     "seats": 500
+    },
+    {
+     "date": "2009-07-05",
+     "contests": 305,
+     "source": "ine_siceef",
+     "seats": 500
+    },
+    {
+     "date": "2012-07-01",
+     "contests": 305,
+     "source": "ine_siceef",
+     "seats": 500
+    },
+    {
+     "date": "2015-06-07",
+     "contests": 305,
+     "source": "ine_siceef",
+     "seats": 500
+    },
+    {
+     "date": "2018-07-01",
+     "contests": 305,
+     "source": "ine_computos2018",
+     "seats": 500
+    },
+    {
+     "date": "2021-06-06",
+     "contests": 305,
+     "source": "ine_computos2021",
+     "seats": 500
+    },
+    {
+     "date": "2024-06-02",
+     "contests": 305,
+     "source": "ine_computos2024",
+     "seats": 500
+    }
+   ]
+  },
+  {
+   "key": "senado",
+   "tier": "national",
+   "name": "Elección de la Cámara de Senadores",
+   "name_en": "Senate",
+   "category": "legislature",
+   "goal": "national",
+   "first_held": "1917-03-11",
+   "measure": {
+    "schemes": [
+     "mx.entidad"
+    ],
+    "fine": [
+     "mx.municipio",
+     "mx.seccion",
+     "mx.casilla"
+    ]
+   },
+   "note": "128 senators for six years since 2000: in each state and Mexico City two by plurality (a list of two formulas) and one to the runner-up party's first formula (first minority), plus 32 from a national list by proportional representation (CPEUM art. 56). Two per state from 1917, renewed by halves until 1988-1991; 96 elected in 1994 and 32 by national list in 1997 for three years. Contests are counted as 32 entities plus the national list.",
+   "source": "cpeum",
+   "locator": "https://www.diputados.gob.mx/LeyesBiblio/pdf/CPEUM.pdf (art. 56)",
+   "est_votes": 59000000,
+   "effort": 2,
+   "finest_note": "casilla inside the sección electoral",
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "special",
+      "by_election"
+     ],
+     "body_kinds": [
+      "upper_house"
+     ],
+     "iso_pattern": "MX",
+     "valid_from": "1917-02-05"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 6,
+     "phase": 2,
+     "term_years": 6,
+     "called": false,
+     "runoff": "none",
+     "administered_by": "Instituto Nacional Electoral (Instituto Federal Electoral until 2014)",
+     "source": "lgipe",
+     "locator": "https://www.diputados.gob.mx/LeyesBiblio/pdf/LGIPE.pdf (art. 22: \"Las elecciones ordinarias deberán celebrarse el primer domingo de junio del año que corresponda\")",
+     "month": 6,
+     "day_rule": "jun_first_sunday",
+     "valid_from": "2014-05-24"
+    },
+    {
+     "period_years": 6,
+     "phase": 2,
+     "term_years": 6,
+     "called": false,
+     "runoff": "none",
+     "administered_by": "Instituto Nacional Electoral (Instituto Federal Electoral until 2014)",
+     "source": "lgipe",
+     "locator": "COFIPE as reformed in 1996 (first Sunday of July); recorded from the 1997 to 2012 election days and the LGIPE transitory article that kept 1 July 2018",
+     "month": 7,
+     "day_rule": "jul_first_sunday",
+     "valid_from": "1996-11-23",
+     "valid_to": "2014-05-23"
+    }
+   ],
+   "access": [
+    {
+     "platform": "INE SICEEF, Atlas de Resultados de las Elecciones Federales",
+     "url": "https://siceef.ine.mx/downloadDB.html",
+     "format": "csv",
+     "access": "open",
+     "checked_at": "2026-11-13",
+     "first_date": "1991-08-18",
+     "finest": "mx.casilla",
+     "source": "ine_siceef",
+     "evidence": "Bases de datos page (Wayback 2026-10-19): CSV by sección and casilla for every federal process from 1991, with the 1992, 1995, and 2003 extraordinary elections; the live site is unreachable from abroad"
+    },
+    {
+     "platform": "INE Cómputos Distritales 2018",
+     "url": "https://computos2018.ine.mx/",
+     "format": "csv, html",
+     "access": "open",
+     "checked_at": "2026-11-13",
+     "first_date": "2018-07-01",
+     "last_date": "2018-07-01",
+     "finest": "mx.casilla",
+     "source": "ine_computos2018",
+     "evidence": "District count results by casilla with a downloadable database"
+    },
+    {
+     "platform": "INE Cómputos Distritales 2021",
+     "url": "https://computos2021.ine.mx/",
+     "format": "csv, html",
+     "access": "open",
+     "checked_at": "2026-11-13",
+     "first_date": "2021-06-06",
+     "last_date": "2021-06-06",
+     "finest": "mx.casilla",
+     "source": "ine_computos2021",
+     "evidence": "District count results by casilla with a downloadable database"
+    },
+    {
+     "platform": "INE Cómputos Distritales 2024",
+     "url": "https://computos2024.ine.mx/",
+     "format": "csv, html",
+     "access": "open",
+     "checked_at": "2026-11-13",
+     "first_date": "2024-06-02",
+     "last_date": "2024-06-02",
+     "finest": "mx.casilla",
+     "source": "ine_computos2024",
+     "evidence": "District count results by casilla with a downloadable database"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1917-03-11",
+     "through": "1988-07-06",
+     "note": "Senate elections from 1917 to 1988 predate the IFE's databases."
+    },
+    {
+     "date": "1991-08-18",
+     "contests": 32,
+     "source": "ine_siceef",
+     "seats": 32,
+     "note": "One senator per entity, half renewal."
+    },
+    {
+     "date": "1994-08-21",
+     "contests": 32,
+     "source": "ine_siceef",
+     "seats": 96,
+     "note": "Three senators per entity: two by plurality and one first minority."
+    },
+    {
+     "date": "1997-07-06",
+     "contests": 1,
+     "source": "ine_siceef",
+     "seats": 32,
+     "note": "32 senators by national list for a three-year term."
+    },
+    {
+     "date": "2000-07-02",
+     "contests": 33,
+     "source": "ine_siceef",
+     "seats": 128
+    },
+    {
+     "date": "2006-07-02",
+     "contests": 33,
+     "source": "ine_siceef",
+     "seats": 128
+    },
+    {
+     "date": "2012-07-01",
+     "contests": 33,
+     "source": "ine_siceef",
+     "seats": 128
+    },
+    {
+     "date": "2018-07-01",
+     "contests": 33,
+     "source": "ine_computos2018",
+     "seats": 128
+    },
+    {
+     "date": "2024-06-02",
+     "contests": 33,
+     "source": "ine_computos2024",
+     "seats": 128
+    }
+   ]
+  },
+  {
+   "key": "consulta_popular",
+   "tier": "national",
+   "name": "Consulta popular federal",
+   "name_en": "Federal popular consultation",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "valid_from": "2012-08-10",
+   "first_held": "2021-08-01",
+   "measure": {
+    "unit": "question",
+    "grain": [
+     "mx.entidad"
+    ],
+    "fine": [
+     "mx.distrito_federal",
+     "mx.seccion"
+    ]
+   },
+   "note": "Called by the President, a third of either chamber, or 2% of registered voters, with the Supreme Court ruling on the question; binding with 40% turnout (CPEUM art. 35 VIII). Held on the first Sunday of August since the 2019 reform. One so far: 1 August 2021, on investigating past political actors, 7.1% turnout.",
+   "source": "cpeum",
+   "locator": "https://www.diputados.gob.mx/LeyesBiblio/pdf/CPEUM.pdf (art. 35 VIII, numeral 5o: \"se realizarán el primer domingo de agosto\", DOF 20-12-2019)",
+   "est_votes": 6700000,
+   "effort": 2,
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "iso_pattern": "MX"
+    }
+   ],
+   "cadence": [
+    {
+     "source": "cpeum",
+     "month": 8,
+     "day_rule": "aug_first_sunday",
+     "called": true,
+     "administered_by": "Instituto Nacional Electoral",
+     "valid_from": "2019-12-21",
+     "locator": "https://www.diputados.gob.mx/LeyesBiblio/pdf/CPEUM.pdf (art. 35 VIII 5o)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "INE Consulta Popular 2021 cómputos",
+     "url": "https://www.ine.mx/consulta-popular/",
+     "format": "csv, html",
+     "access": "open",
+     "checked_at": "2026-11-13",
+     "first_date": "2021-08-01",
+     "last_date": "2021-08-01",
+     "source": "ine_cp",
+     "evidence": "INE's page for the consultation of 1 August 2021"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2021-08-01",
+     "contests": 1,
+     "source": "ine_cp",
+     "quote": "la Consulta Popular que tendrá lugar el 1 de agosto de 2021"
+    }
+   ]
+  },
+  {
+   "key": "revocacion_mandato",
+   "tier": "national",
+   "name": "Revocación de mandato de la Presidencia de la República",
+   "name_en": "Presidential recall vote",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "valid_from": "2019-12-21",
+   "first_held": "2022-04-10",
+   "measure": {
+    "unit": "question",
+    "grain": [
+     "mx.entidad"
+    ],
+    "fine": [
+     "mx.distrito_federal",
+     "mx.seccion"
+    ]
+   },
+   "note": "Requested by 3% of registered voters in 17 states; valid with 40% turnout and decided by absolute majority (CPEUM art. 35 IX). Since the reform of 2 June 2026 held on the first Sunday of June of the fourth year of the term, with a federal or local election day; the first was held alone on 10 April 2022 (17.8% turnout).",
+   "source": "cpeum",
+   "locator": "https://www.diputados.gob.mx/LeyesBiblio/pdf/CPEUM.pdf (art. 35 IX, numeral 3o reformed DOF 02-06-2026)",
+   "est_votes": 16500000,
+   "effort": 2,
+   "match": [
+    {
+     "election_kinds": [
+      "recall"
+     ],
+     "iso_pattern": "MX"
+    }
+   ],
+   "cadence": [
+    {
+     "source": "cpeum",
+     "month": 6,
+     "day_rule": "jun_first_sunday",
+     "called": true,
+     "term_years": 6,
+     "administered_by": "Instituto Nacional Electoral",
+     "valid_from": "2026-06-03",
+     "locator": "https://www.diputados.gob.mx/LeyesBiblio/pdf/CPEUM.pdf (art. 35 IX 3o: \"el primer domingo de junio del cuarto año del periodo constitucional\")"
+    },
+    {
+     "source": "lfrm",
+     "called": true,
+     "administered_by": "Instituto Nacional Electoral",
+     "valid_from": "2019-12-21",
+     "valid_to": "2026-06-02"
+    }
+   ],
+   "access": [
+    {
+     "platform": "INE Cómputos de la Revocación de Mandato 2022",
+     "url": "https://computosrm2022.ine.mx/",
+     "format": "csv, html",
+     "access": "open",
+     "checked_at": "2026-11-13",
+     "first_date": "2022-04-10",
+     "last_date": "2022-04-10",
+     "finest": "mx.casilla",
+     "source": "ine_rm2022",
+     "evidence": "District counts site for the 2022 recall vote"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2022-04-10",
+     "contests": 1,
+     "source": "ine_rm",
+     "quote": "El 10 de abril"
+    }
+   ]
+  },
+  {
+   "key": "judicial_federal",
+   "tier": "national",
+   "name": "Elección de personas juzgadoras del Poder Judicial de la Federación",
+   "name_en": "Federal judicial elections",
+   "category": "judicial",
+   "goal": "national",
+   "valid_from": "2024-09-16",
+   "first_held": "2025-06-01",
+   "measure": {
+    "unit": "office",
+    "grain": [
+     "mx.entidad"
+    ],
+    "fine": [
+     "mx.distrito_federal",
+     "mx.seccion"
+    ]
+   },
+   "note": "Since the judicial reform of 15 September 2024, Supreme Court justices, Judicial Discipline Tribunal and Electoral Tribunal magistrates, circuit magistrates, and district judges are elected by popular vote from lists nominated by the three branches, nationally, by circuit, or by judicial electoral district (CPEUM arts. 94-97). First held 1 June 2025 for 881 posts with about 13% turnout; the decree of 2 June 2026 moved the next election, for every post not renewed in 2025, to the first Sunday of June 2028, coinciding with the state judicial elections.",
+   "source": "cpeum",
+   "locator": "https://www.diputados.gob.mx/LeyesBiblio/pdf/CPEUM.pdf (art. 96; transitorio tercero of DOF 02-06-2026: \"el primer domingo de junio del año 2028\")",
+   "est_votes": 13000000,
+   "effort": 3,
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "special"
+     ],
+     "name_pattern": "(Suprema Corte|Magistrad|Juez|Jueza|Tribunal|judicial)",
+     "valid_from": "2024-09-16"
+    }
+   ],
+   "cadence": [
+    {
+     "source": "cpeum",
+     "month": 6,
+     "day_rule": "jun_first_sunday",
+     "called": false,
+     "administered_by": "Instituto Nacional Electoral",
+     "valid_from": "2024-09-16",
+     "locator": "https://www.diputados.gob.mx/LeyesBiblio/pdf/CPEUM.pdf (art. 96: with the federal ordinary elections; 2025 and 2028 set by transitory articles)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "INE Cómputos DJ 2025",
+     "url": "https://computospj2025.ine.mx/",
+     "format": "csv, html",
+     "access": "open",
+     "checked_at": "2026-11-13",
+     "first_date": "2025-06-01",
+     "last_date": "2025-06-01",
+     "source": "ine_pj2025",
+     "evidence": "District count site for the 2025 judicial election"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2025-06-01",
+     "contests": null,
+     "source": "ine_pj2025",
+     "note": "Proceso Electoral Extraordinario del Poder Judicial de la Federación 2024-2025.",
+     "election_kind": "special"
+    },
+    {
+     "date": "2028-06-04",
+     "contests": null,
+     "source": "cpeum",
+     "note": "Set by the decree of 2 June 2026 for every federal judicial post not renewed in 2025."
+    }
+   ]
+  },
+  {
+   "key": "presidente_congreso",
+   "tier": "national",
+   "name": "Designación de Presidente interino o sustituto por el Congreso",
+   "name_en": "Interim and substitute presidents chosen by Congress",
+   "category": "indirect",
+   "goal": "national",
+   "first_held": "1920-05-24",
+   "measure": {
+    "unit": "ballot"
+   },
+   "note": "When the presidency falls vacant, Congress (or its Permanent Commission) names an interim or substitute president by secret ballot of an absolute majority (CPEUM arts. 84-85): Adolfo de la Huerta 1920, Emilio Portes Gil 1928, and Abelardo L. Rodríguez 1932. The record is the Diario de los Debates.",
+   "source": "cpeum",
+   "locator": "https://www.diputados.gob.mx/LeyesBiblio/pdf/CPEUM.pdf (arts. 84-85)",
+   "est_votes": 500,
+   "effort": 3,
+   "match": [
+    {
+     "election_kinds": [
+      "indirect"
+     ],
+     "office_kinds": [
+      "head_of_state"
+     ],
+     "iso_pattern": "MX"
+    }
+   ]
+  },
+  {
+   "key": "constituyente_1916",
+   "tier": "national",
+   "name": "Congreso Constituyente de 1916-1917",
+   "name_en": "Constituent Congress of Querétaro (1916)",
+   "category": "legislature",
+   "goal": "national",
+   "valid_from": "1916-09-19",
+   "valid_to": "1917-01-31",
+   "first_held": "1916-10-22",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Elected by direct vote in single-member districts on 22 October 1916; it wrote the Constitution of 1917. The record is the Diario de los Debates del Congreso Constituyente.",
+   "source": "cpeum",
+   "est_votes": 300000,
+   "effort": 4,
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "constituent_assembly"
+     ],
+     "iso_pattern": "MX",
+     "valid_to": "1917-01-31"
+    }
+   ]
+  },
+  {
+   "key": "presidente_1824",
+   "tier": "national",
+   "name": "Elecciones presidenciales indirectas (1824-1911)",
+   "name_en": "Indirect presidential elections, 1824-1911",
+   "category": "indirect",
+   "goal": "national",
+   "valid_from": "1824-10-04",
+   "valid_to": "1917-02-05",
+   "first_held": "1824-10-01",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Under the constitutions of 1824 and 1857 the president was chosen indirectly: by the state legislatures (1824-1853) and then by electoral colleges of electors chosen in primary elections (1857-1911, Madero's election of 1911 the last). Votes are electors' and legislatures' votes from the Diario de los Debates and Congress's declarations; no popular counts survive for most years.",
+   "source": "cpeum",
+   "est_votes": 20000,
+   "effort": 5,
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "indirect"
+     ],
+     "office_kinds": [
+      "head_of_state"
+     ],
+     "iso_pattern": "MX",
+     "valid_to": "1917-02-05",
+     "precedence": 1
+    }
+   ]
+  },
+  {
+   "key": "congreso_1824",
+   "tier": "national",
+   "name": "Elecciones al Congreso de la Unión (1822-1916)",
+   "name_en": "Congress elections, 1822-1916",
+   "category": "legislature",
+   "goal": "national",
+   "valid_from": "1822-01-01",
+   "valid_to": "1917-02-05",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Congresses of the Empire, the First Federal Republic, the centralist republics, and the Restored Republic and Porfiriato, elected indirectly through electors until the Ley Electoral of 1911 made deputy elections direct (first held 30 June 1912). Senate restored in 1874.",
+   "source": "cpeum",
+   "est_votes": 50000,
+   "effort": 5,
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "indirect"
+     ],
+     "body_kinds": [
+      "lower_house",
+      "upper_house"
+     ],
+     "iso_pattern": "MX",
+     "valid_to": "1917-02-05",
+     "precedence": 1
+    }
+   ]
+  },
+  {
+   "key": "gubernatura",
+   "tier": "entidad",
+   "name": "Elección de Gubernaturas y de la Jefatura de Gobierno",
+   "name_en": "State governors and the Head of Government of Mexico City",
+   "category": "executive",
+   "goal": "subnational",
+   "first_held": "1917-01-01",
+   "measure": {
+    "unit": "polity",
+    "schemes": [
+     "mx.entidad"
+    ],
+    "fine": [
+     "mx.municipio",
+     "mx.seccion",
+     "mx.casilla"
+    ]
+   },
+   "note": "Each state elects its governor by plurality for six years with no re-election (CPEUM art. 116 I); Mexico City elects its Head of Government since 1997 (art. 122). Each state's constitution sets the year; terms were shortened or lengthened between 2015 and 2022 so that every state votes with a federal election (Aguascalientes and Quintana Roo, elected in 2022, vote again in 2027). Extraordinary elections (Colima 2016, Puebla 2019) belong here.",
+   "source": "cpeum",
+   "locator": "https://www.diputados.gob.mx/LeyesBiblio/pdf/CPEUM.pdf (arts. 116 I and 122)",
+   "est_votes": 18000000,
+   "effort": 3,
+   "finest_note": "casilla, in each OPLE's cómputos",
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "local",
+      "special"
+     ],
+     "office_kinds": [
+      "governor",
+      "head_of_government"
+     ],
+     "iso_pattern": "MX-*"
+    }
+   ],
+   "cadence": [
+    {
+     "source": "lgipe",
+     "period_years": 6,
+     "month": 6,
+     "day_rule": "jun_first_sunday",
+     "term_years": 6,
+     "called": false,
+     "runoff": "none",
+     "administered_by": "The state electoral institute (OPLE) under INE's coordination",
+     "valid_from": "2014-05-24",
+     "locator": "https://www.diputados.gob.mx/LeyesBiblio/pdf/LGIPE.pdf (art. 25.1: local elections on the first Sunday of June; the year is each state's)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "The state electoral institute (OPLE) of each entity: cómputos and PREP sites",
+     "url": "https://www.ine.mx/voto-y-elecciones/opl/",
+     "format": "csv, xlsx, pdf, html",
+     "access": "open",
+     "checked_at": "2026-11-13",
+     "evidence": "Each of the 32 OPLEs publishes its own cómputos; formats and depth differ by state and are not yet surveyed",
+     "role": "publishes"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1917-01-01",
+     "through": "2020-12-31",
+     "note": "Per-state governor elections before 2021 are not yet enumerated; each OPLE and state congress holds them."
+    },
+    {
+     "date": "2021-06-06",
+     "contests": 15,
+     "source": "ine_2027",
+     "regions": {
+      "BCN": 1,
+      "BCS": 1,
+      "CAM": 1,
+      "CHH": 1,
+      "COL": 1,
+      "GRO": 1,
+      "MIC": 1,
+      "NAY": 1,
+      "NLE": 1,
+      "QUE": 1,
+      "SIN": 1,
+      "SLP": 1,
+      "SON": 1,
+      "TLA": 1,
+      "ZAC": 1
+     },
+     "note": "The 15 states that elect again in 2027 other than Aguascalientes and Quintana Roo, whose 2022 governors serve shortened terms."
+    },
+    {
+     "date": "2022-06-05",
+     "contests": 6,
+     "source": "ine_2022",
+     "regions": {
+      "AGU": 1,
+      "DUR": 1,
+      "HID": 1,
+      "OAX": 1,
+      "ROO": 1,
+      "TAM": 1
+     }
+    },
+    {
+     "date": "2023-06-04",
+     "contests": 2,
+     "source": "ine_2023",
+     "regions": {
+      "COA": 1,
+      "MEX": 1
+     }
+    },
+    {
+     "date": "2024-06-02",
+     "contests": 9,
+     "source": "ine_2024",
+     "regions": {
+      "CHP": 1,
+      "CMX": 1,
+      "GUA": 1,
+      "JAL": 1,
+      "MOR": 1,
+      "PUE": 1,
+      "TAB": 1,
+      "VER": 1,
+      "YUC": 1
+     }
+    },
+    {
+     "date": "2027-06-06",
+     "contests": 17,
+     "source": "ine_2027",
+     "regions": {
+      "AGU": 1,
+      "BCN": 1,
+      "BCS": 1,
+      "CAM": 1,
+      "CHH": 1,
+      "COL": 1,
+      "GRO": 1,
+      "MIC": 1,
+      "NAY": 1,
+      "NLE": 1,
+      "QUE": 1,
+      "ROO": 1,
+      "SIN": 1,
+      "SLP": 1,
+      "SON": 1,
+      "TLA": 1,
+      "ZAC": 1
+     }
+    }
+   ]
+  },
+  {
+   "key": "congreso_local",
+   "tier": "entidad",
+   "name": "Elección de los Congresos de los Estados y de la Ciudad de México",
+   "name_en": "State legislatures and the Congress of Mexico City",
+   "category": "legislature",
+   "goal": "subnational",
+   "first_held": "1917-01-01",
+   "measure": {
+    "unit": "polity",
+    "schemes": [
+     "mx.distrito_local"
+    ],
+    "fine": [
+     "mx.municipio",
+     "mx.seccion",
+     "mx.casilla"
+    ]
+   },
+   "note": "Unicameral, elected for three years by plurality in local districts and by proportional representation (CPEUM art. 116 II); consecutive re-election up to four terms since 2018. Mexico City's Asamblea de Representantes (1988-1994), Asamblea Legislativa (1997-2015), and Congress (since 2018) belong here; the 2016 constituent assembly is its own class. Some states add a migrant deputy.",
+   "source": "cpeum",
+   "locator": "https://www.diputados.gob.mx/LeyesBiblio/pdf/CPEUM.pdf (arts. 116 II and 122 A II)",
+   "est_votes": 55000000,
+   "effort": 4,
+   "finest_note": "casilla, in each OPLE's cómputos",
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "local",
+      "special"
+     ],
+     "body_kinds": [
+      "unicameral",
+      "lower_house"
+     ],
+     "iso_pattern": "MX-*"
+    }
+   ],
+   "cadence": [
+    {
+     "source": "lgipe",
+     "period_years": 3,
+     "month": 6,
+     "day_rule": "jun_first_sunday",
+     "term_years": 3,
+     "called": false,
+     "administered_by": "The state electoral institute (OPLE) under INE's coordination",
+     "valid_from": "2014-05-24",
+     "locator": "https://www.diputados.gob.mx/LeyesBiblio/pdf/LGIPE.pdf (art. 25.1)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "The state electoral institute (OPLE) of each entity: cómputos and PREP sites",
+     "url": "https://www.ine.mx/voto-y-elecciones/opl/",
+     "format": "csv, xlsx, pdf, html",
+     "access": "open",
+     "checked_at": "2026-11-13",
+     "evidence": "Each of the 32 OPLEs publishes its own cómputos; formats and depth differ by state and are not yet surveyed",
+     "role": "publishes"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1917-01-01",
+     "through": "2021-12-31",
+     "note": "Per-state legislative elections before 2022 are not yet enumerated."
+    },
+    {
+     "date": "2022-06-05",
+     "contests": 1,
+     "source": "ine_2022",
+     "regions": {
+      "ROO": 1
+     }
+    },
+    {
+     "date": "2023-06-04",
+     "contests": 1,
+     "source": "ine_2023",
+     "regions": {
+      "COA": 1
+     }
+    },
+    {
+     "date": "2024-06-02",
+     "contests": 31,
+     "source": "ine_2024",
+     "regions": {
+      "AGU": 1,
+      "BCN": 1,
+      "BCS": 1,
+      "CAM": 1,
+      "CHH": 1,
+      "CHP": 1,
+      "CMX": 1,
+      "COL": 1,
+      "DUR": 1,
+      "GRO": 1,
+      "GUA": 1,
+      "HID": 1,
+      "JAL": 1,
+      "MEX": 1,
+      "MIC": 1,
+      "MOR": 1,
+      "NAY": 1,
+      "NLE": 1,
+      "OAX": 1,
+      "PUE": 1,
+      "QUE": 1,
+      "ROO": 1,
+      "SIN": 1,
+      "SLP": 1,
+      "SON": 1,
+      "TAB": 1,
+      "TAM": 1,
+      "TLA": 1,
+      "VER": 1,
+      "YUC": 1,
+      "ZAC": 1
+     }
+    },
+    {
+     "date": "2027-06-06",
+     "contests": 31,
+     "source": "ine_2027",
+     "regions": {
+      "AGU": 1,
+      "BCN": 1,
+      "BCS": 1,
+      "CAM": 1,
+      "CHH": 1,
+      "CHP": 1,
+      "CMX": 1,
+      "COL": 1,
+      "DUR": 1,
+      "GRO": 1,
+      "GUA": 1,
+      "HID": 1,
+      "JAL": 1,
+      "MEX": 1,
+      "MIC": 1,
+      "MOR": 1,
+      "NAY": 1,
+      "NLE": 1,
+      "OAX": 1,
+      "PUE": 1,
+      "QUE": 1,
+      "ROO": 1,
+      "SIN": 1,
+      "SLP": 1,
+      "SON": 1,
+      "TAB": 1,
+      "TAM": 1,
+      "TLA": 1,
+      "VER": 1,
+      "YUC": 1,
+      "ZAC": 1
+     }
+    },
+    {
+     "date": "2026-06-07",
+     "contests": 1,
+     "source": "ine_2026",
+     "regions": {
+      "COA": 1
+     },
+     "quote": "El 7 de junio de 2026 , el estado de Coahuila llevará a cabo su Jornada Electoral para elegir 25 cargos."
+    }
+   ]
+  },
+  {
+   "key": "constituyente_cdmx",
+   "tier": "entidad",
+   "name": "Asamblea Constituyente de la Ciudad de México",
+   "name_en": "Constituent Assembly of Mexico City (2016)",
+   "category": "legislature",
+   "goal": "subnational",
+   "valid_from": "2016-01-29",
+   "valid_to": "2017-01-31",
+   "first_held": "2016-06-05",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "60 of its 100 members elected on 5 June 2016 from lists in a single Mexico City constituency by proportional representation; the other 40 were appointed. It wrote the Constitution of Mexico City.",
+   "source": "cpeum",
+   "est_votes": 2000000,
+   "effort": 2,
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "local"
+     ],
+     "body_kinds": [
+      "constituent_assembly"
+     ],
+     "iso_pattern": "MX-CMX"
+    }
+   ]
+  },
+  {
+   "key": "ayuntamiento",
+   "tier": "municipio",
+   "name": "Elección de Ayuntamientos",
+   "name_en": "Municipal councils (ayuntamientos)",
+   "category": "council",
+   "goal": "local",
+   "first_held": "1917-01-01",
+   "measure": {
+    "unit": "polity",
+    "schemes": [
+     "mx.municipio"
+    ],
+    "fine": [
+     "mx.seccion",
+     "mx.casilla"
+    ]
+   },
+   "note": "Each municipality elects its ayuntamiento, a municipal president, one or more síndicos, and regidores, as a closed slate (planilla) by plurality, with proportional regidores, for three years; consecutive re-election once since 2018 (CPEUM art. 115 I). Contests count municipal presidencies. Municipalities that elect by indigenous normative systems are the class ayuntamiento_sni.",
+   "source": "cpeum",
+   "locator": "https://www.diputados.gob.mx/LeyesBiblio/pdf/CPEUM.pdf (art. 115 I)",
+   "est_votes": 55000000,
+   "effort": 5,
+   "finest_note": "casilla, in each OPLE's cómputos",
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "local",
+      "special"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ]
+    },
+    {
+     "election_kinds": [
+      "general",
+      "local",
+      "special"
+     ],
+     "office_kinds": [
+      "mayor"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ]
+    }
+   ],
+   "cadence": [
+    {
+     "source": "lgipe",
+     "period_years": 3,
+     "month": 6,
+     "day_rule": "jun_first_sunday",
+     "term_years": 3,
+     "called": false,
+     "administered_by": "The state electoral institute (OPLE) under INE's coordination",
+     "valid_from": "2014-05-24",
+     "locator": "https://www.diputados.gob.mx/LeyesBiblio/pdf/LGIPE.pdf (art. 25.1)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "The state electoral institute (OPLE) of each entity: cómputos and PREP sites",
+     "url": "https://www.ine.mx/voto-y-elecciones/opl/",
+     "format": "csv, xlsx, pdf, html",
+     "access": "open",
+     "checked_at": "2026-11-13",
+     "evidence": "Each of the 32 OPLEs publishes its own cómputos; formats and depth differ by state and are not yet surveyed",
+     "role": "publishes"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1917-01-01",
+     "through": "2021-12-31",
+     "note": "Per-state municipal elections before 2022 are not yet enumerated."
+    },
+    {
+     "date": "2022-06-05",
+     "contests": 39,
+     "source": "ine_2022",
+     "regions": {
+      "DUR": 39
+     }
+    },
+    {
+     "date": "2024-06-02",
+     "contests": 1786,
+     "source": "ine_2024",
+     "regions": {
+      "AGU": 11,
+      "BCN": 7,
+      "BCS": 5,
+      "CAM": 13,
+      "CHH": 67,
+      "CHP": 123,
+      "COA": 38,
+      "COL": 10,
+      "GRO": 83,
+      "GUA": 46,
+      "HID": 84,
+      "JAL": 125,
+      "MEX": 125,
+      "MIC": 112,
+      "MOR": 33,
+      "NAY": 20,
+      "NLE": 51,
+      "OAX": 153,
+      "PUE": 217,
+      "QUE": 18,
+      "ROO": 11,
+      "SIN": 20,
+      "SLP": 58,
+      "SON": 72,
+      "TAB": 17,
+      "TAM": 43,
+      "TLA": 60,
+      "YUC": 106,
+      "ZAC": 58
+     },
+     "note": "Municipal presidencies elected through the OPLEs; Oaxaca's 153 are those elected by parties."
+    },
+    {
+     "date": "2025-06-01",
+     "contests": 251,
+     "regions": {
+      "DUR": 39,
+      "VER": 212
+     },
+     "source": "ine_2025",
+     "quote": "Durango 39 Presidencias; Veracruz 212 Presidencias"
+    },
+    {
+     "date": "2027-06-06",
+     "contests": 1786,
+     "source": "ine_2027",
+     "regions": {
+      "AGU": 11,
+      "BCN": 7,
+      "BCS": 5,
+      "CAM": 13,
+      "CHH": 67,
+      "CHP": 123,
+      "COA": 38,
+      "COL": 10,
+      "GRO": 83,
+      "GUA": 46,
+      "HID": 84,
+      "JAL": 125,
+      "MEX": 125,
+      "MIC": 112,
+      "MOR": 33,
+      "NAY": 20,
+      "NLE": 51,
+      "OAX": 152,
+      "PUE": 217,
+      "QUE": 18,
+      "ROO": 11,
+      "SIN": 20,
+      "SLP": 59,
+      "SON": 72,
+      "TAB": 17,
+      "TAM": 43,
+      "TLA": 60,
+      "YUC": 106,
+      "ZAC": 58
+     }
+    }
+   ]
+  },
+  {
+   "key": "ayuntamiento_sni",
+   "tier": "municipio",
+   "name": "Elección de Ayuntamientos por sistemas normativos indígenas",
+   "name_en": "Municipal authorities elected by indigenous normative systems (usos y costumbres)",
+   "category": "council",
+   "goal": "local",
+   "first_held": "1995-11-12",
+   "measure": {
+    "unit": "polity"
+   },
+   "note": "418 Oaxaca municipalities (IEEPCO catalog 2025) elect their authorities in community assemblies by show of hands, ballots, or other customary methods, on dates and terms (one to three years) each community sets; IEEPCO validates each election. Elsewhere Cherán (Michoacán, since 2011), Ayutla de los Libres (Guerrero, since 2018), and Oxchuc (Chiapas, since 2019) elect the same way. Results are rulings naming those elected, rarely vote counts.",
+   "source": "ieepco_sni",
+   "est_votes": 400000,
+   "effort": 4,
+   "finest_note": "municipality; winners and assembly minutes, rarely tallies",
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "special"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ],
+     "name_pattern": "(sistemas normativos|usos y costumbres)",
+     "precedence": 1
+    }
+   ],
+   "cadence": [
+    {
+     "source": "ieepco_sni",
+     "called": false,
+     "administered_by": "Each community's assembly, validated by IEEPCO",
+     "valid_from": "1995-08-30",
+     "locator": "https://www.ieepco.org.mx/archivos/SNI_CATALOGO2025/presenta_catsni25.pdf"
+    }
+   ],
+   "access": [
+    {
+     "platform": "IEEPCO, Dirección Ejecutiva de Sistemas Normativos Indígenas: dictámenes and acuerdos",
+     "url": "https://www.ieepco.org.mx/",
+     "format": "pdf",
+     "access": "open",
+     "checked_at": "2026-11-13",
+     "source": "ieepco_sni",
+     "evidence": "Catalog of 418 dictámenes and the CG-SNI acuerdos validating each municipality's election"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2025-01-01",
+     "precision": "year",
+     "contests": 413,
+     "source": "ieepco_sni",
+     "note": "413 of the 418 municipalities renewed their authorities in 2025."
+    }
+   ]
+  },
+  {
+   "key": "alcaldia",
+   "tier": "alcaldia",
+   "name": "Elección de Alcaldías de la Ciudad de México",
+   "name_en": "Mexico City borough mayors and councils (alcaldías)",
+   "category": "executive",
+   "goal": "local",
+   "valid_from": "2017-02-05",
+   "first_held": "2018-07-01",
+   "measure": {
+    "unit": "polity",
+    "schemes": [
+     "mx.municipio"
+    ],
+    "fine": [
+     "mx.seccion",
+     "mx.casilla"
+    ]
+   },
+   "note": "Each of the 16 alcaldías elects an alcalde and concejales on one slate for three years (CPEUM art. 122 A VI; Constitution of Mexico City art. 53).",
+   "source": "cpeum",
+   "locator": "https://www.diputados.gob.mx/LeyesBiblio/pdf/CPEUM.pdf (art. 122 A VI)",
+   "est_votes": 5000000,
+   "effort": 2,
+   "finest_note": "casilla, in IECM's cómputos",
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "local",
+      "special"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ],
+     "name_pattern": "Alcald",
+     "valid_from": "2017-02-05"
+    }
+   ],
+   "cadence": [
+    {
+     "source": "lgipe",
+     "period_years": 3,
+     "phase": 0,
+     "month": 6,
+     "day_rule": "jun_first_sunday",
+     "term_years": 3,
+     "called": false,
+     "administered_by": "Instituto Electoral de la Ciudad de México",
+     "valid_from": "2017-02-05",
+     "locator": "https://www.diputados.gob.mx/LeyesBiblio/pdf/LGIPE.pdf (art. 25.1)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "IECM cómputos",
+     "url": "https://www.iecm.mx/",
+     "format": "csv, xlsx, pdf, html",
+     "access": "open",
+     "checked_at": "2026-11-13",
+     "evidence": "IECM publishes its own cómputos by casilla",
+     "role": "publishes"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2018-07-01",
+     "through": "2021-06-06",
+     "note": "The 2018 and 2021 alcaldía elections are not yet enumerated from IECM."
+    },
+    {
+     "date": "2024-06-02",
+     "contests": 16,
+     "source": "ine_2024",
+     "regions": {
+      "CMX": 16
+     }
+    },
+    {
+     "date": "2027-06-06",
+     "contests": 16,
+     "source": "ine_2027",
+     "regions": {
+      "CMX": 16
+     }
+    }
+   ]
+  },
+  {
+   "key": "jefatura_delegacional",
+   "tier": "alcaldia",
+   "name": "Elección de Jefaturas Delegacionales del Distrito Federal",
+   "name_en": "Federal District borough chiefs (jefes delegacionales)",
+   "category": "executive",
+   "goal": "local",
+   "valid_from": "1999-12-01",
+   "valid_to": "2018-09-30",
+   "first_held": "2000-07-02",
+   "measure": {
+    "unit": "polity"
+   },
+   "note": "The 16 delegaciones elected a jefe delegacional by plurality for three years from 2000 to 2015, until the alcaldías replaced them.",
+   "source": "cpeum",
+   "est_votes": 4000000,
+   "effort": 2,
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "local"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ],
+     "name_pattern": "(Delegaci|Jefatura Delegacional)",
+     "valid_to": "2018-09-30"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2000-07-02",
+     "through": "2015-06-07",
+     "note": "Six elections of all 16 delegaciones (2000 to 2015), not yet enumerated from the Federal District electoral institute's records."
+    }
+   ]
+  },
+  {
+   "key": "auxiliar",
+   "tier": "auxiliar",
+   "name": "Elección de autoridades auxiliares por los organismos electorales locales",
+   "name_en": "Sub-municipal authorities elected with the local elections (Tlaxcala's presidencias de comunidad, Campeche's juntas, comisarías, and agencias)",
+   "category": "executive",
+   "goal": "local",
+   "measure": {
+    "unit": "polity"
+   },
+   "note": "Tlaxcala's presidencias de comunidad elected by parties (the others by usos y costumbres) and Campeche's juntas municipales, comisarías, and agencias are elected by the state electoral institute on the local election day, which INE counts as the fourth order of government.",
+   "source": "ine_2024",
+   "est_votes": 700000,
+   "effort": 3,
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "local",
+      "special"
+     ],
+     "polity_kinds": [
+      "submunicipal"
+     ]
+    }
+   ],
+   "cadence": [
+    {
+     "source": "lgipe",
+     "period_years": 3,
+     "phase": 0,
+     "month": 6,
+     "day_rule": "jun_first_sunday",
+     "term_years": 3,
+     "called": false,
+     "administered_by": "Instituto Tlaxcalteca de Elecciones and Instituto Electoral del Estado de Campeche",
+     "valid_from": "2014-05-24",
+     "locator": "https://www.diputados.gob.mx/LeyesBiblio/pdf/LGIPE.pdf (art. 25.1)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "ITE and IEEC cómputos",
+     "url": "https://ite.org.mx/",
+     "format": "csv, xlsx, pdf, html",
+     "access": "open",
+     "checked_at": "2026-11-13",
+     "evidence": "ITE publishes the presidencias de comunidad cómputos with its local results",
+     "role": "publishes",
+     "source": "ite"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2024-06-02",
+     "contests": 431,
+     "source": "ine_2024",
+     "regions": {
+      "CAM": 132,
+      "TLA": 299
+     }
+    },
+    {
+     "date": "2027-06-06",
+     "contests": 437,
+     "source": "ine_2027",
+     "regions": {
+      "CAM": 138,
+      "TLA": 299
+     }
+    }
+   ]
+  },
+  {
+   "key": "auxiliar_municipal",
+   "tier": "auxiliar",
+   "name": "Elección de autoridades auxiliares convocada por los ayuntamientos",
+   "name_en": "Sub-municipal authorities elected by municipal call (Puebla's juntas auxiliares, agentes and subagentes in Veracruz and Oaxaca, comisarios, and delegados)",
+   "category": "executive",
+   "goal": "local",
+   "measure": {
+    "unit": "polity"
+   },
+   "note": "Elected by plebiscite, ballot, or assembly under each state's municipal law, on dates the ayuntamiento sets.",
+   "source": "ine_2024",
+   "disposition": "blocked",
+   "disposition_reason": "Run by each ayuntamiento under the state's municipal law; no electoral authority compiles or publishes the results.",
+   "match": [
+    {
+     "election_kinds": [
+      "local"
+     ],
+     "polity_kinds": [
+      "submunicipal"
+     ],
+     "name_pattern": "(Junta Auxiliar|Agente|Subagente|Comisari|Delegad)"
+    }
+   ]
+  },
+  {
+   "key": "copaco",
+   "tier": "unidad_territorial",
+   "name": "Elección de las Comisiones de Participación Comunitaria (COPACO)",
+   "name_en": "Mexico City community participation commissions (comités ciudadanos until 2019)",
+   "category": "council",
+   "goal": "local",
+   "first_held": "1999-07-04",
+   "measure": {
+    "unit": "polity"
+   },
+   "note": "Each unidad territorial elects a nine-member commission for three years, organized by IECM (Ley de Participación Ciudadana de la Ciudad de México, 2019); comités ciudadanos and consejos de los pueblos from 2010 to 2016, comités vecinales in 1999. Elected in 2020, 2023, and 2026 (online 20-30 April, in person 3 May 2026).",
+   "source": "iecm_pp2026",
+   "est_votes": 900000,
+   "effort": 3,
+   "match": [
+    {
+     "election_kinds": [
+      "local"
+     ],
+     "polity_kinds": [
+      "submunicipal"
+     ],
+     "name_pattern": "(Participación Comunitaria|COPACO|Comit. Ciudadano|Comit. Vecinal|Consejo del Pueblo)"
+    }
+   ],
+   "cadence": [
+    {
+     "source": "iecm_pp2026",
+     "period_years": 3,
+     "phase": 2,
+     "term_years": 3,
+     "called": false,
+     "administered_by": "Instituto Electoral de la Ciudad de México",
+     "valid_from": "2019-08-12"
+    }
+   ],
+   "access": [
+    {
+     "platform": "IECM, resultados de participación ciudadana",
+     "url": "https://www.iecm.mx/participacion-ciudadana/",
+     "format": "pdf, html",
+     "access": "open",
+     "checked_at": "2026-11-13",
+     "source": "iecm",
+     "evidence": "IECM publishes the integration of each commission and the count by unidad territorial"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2026-05-03",
+     "contests": 1764,
+     "source": "iecm_pp2026",
+     "note": "One commission per unidad territorial; online voting 20-30 April."
+    }
+   ]
+  },
+  {
+   "key": "presupuesto_participativo",
+   "tier": "unidad_territorial",
+   "name": "Consulta de Presupuesto Participativo de la Ciudad de México",
+   "name_en": "Mexico City participatory budget consultation",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "first_held": "2011-03-27",
+   "measure": {
+    "unit": "question"
+   },
+   "note": "Each year (two budget years in one vote in 2020 and 2026) residents of each unidad territorial choose among projects for its share of the borough budget, organized by IECM.",
+   "source": "iecm_pp2026",
+   "est_votes": 900000,
+   "effort": 3,
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "polity_kinds": [
+      "submunicipal"
+     ]
+    }
+   ],
+   "cadence": [
+    {
+     "source": "iecm_pp2026",
+     "period_years": 1,
+     "phase": 0,
+     "called": false,
+     "administered_by": "Instituto Electoral de la Ciudad de México",
+     "valid_from": "2010-05-27"
+    }
+   ],
+   "access": [
+    {
+     "platform": "IECM, resultados de participación ciudadana",
+     "url": "https://www.iecm.mx/participacion-ciudadana/",
+     "format": "pdf, html",
+     "access": "open",
+     "checked_at": "2026-11-13",
+     "source": "iecm",
+     "evidence": "Results by unidad territorial"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2026-05-03",
+     "contests": 1764,
+     "source": "iecm_pp2026",
+     "note": "Presupuesto Participativo 2026 and 2027, with the COPACO election."
+    }
+   ]
+  },
+  {
+   "key": "consulta_local",
+   "tier": "entidad",
+   "name": "Plebiscitos, referendos, consultas y revocaciones locales",
+   "name_en": "State and municipal referendums, plebiscites, consultations, and recalls",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "question"
+   },
+   "note": "Every state's participation law provides plebiscites, referendums, popular consultations, and in some states recall, organized by the OPLE on request; few have been held (Mexico City's consultas, Jalisco's and Nuevo León's municipal consultations).",
+   "source": "cpeum",
+   "est_votes": 1000000,
+   "effort": 4,
+   "match": [
+    {
+     "election_kinds": [
+      "referendum",
+      "recall"
+     ],
+     "iso_pattern": "MX-*"
+    },
+    {
+     "election_kinds": [
+      "referendum",
+      "recall"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ]
+    }
+   ],
+   "access": [
+    {
+     "platform": "The state electoral institute (OPLE) of each entity: cómputos and PREP sites",
+     "url": "https://www.ine.mx/voto-y-elecciones/opl/",
+     "format": "csv, xlsx, pdf, html",
+     "access": "open",
+     "checked_at": "2026-11-13",
+     "evidence": "Each of the 32 OPLEs publishes its own cómputos; formats and depth differ by state and are not yet surveyed",
+     "role": "publishes"
+    }
+   ]
+  },
+  {
+   "key": "judicial_local",
+   "tier": "entidad",
+   "name": "Elección de personas juzgadoras de los Poderes Judiciales locales",
+   "name_en": "State judicial elections",
+   "category": "judicial",
+   "goal": "subnational",
+   "valid_from": "2024-09-16",
+   "first_held": "2025-06-01",
+   "measure": {
+    "unit": "office"
+   },
+   "note": "The 2024 reform requires each state to elect its high court magistrates, judicial discipline tribunal, and judges (CPEUM art. 116 III). Some states voted on 1 June 2025 with the federal judicial election; the rest, and the posts not renewed in 2025, vote on the first Sunday of June 2028 under the decree of 2 June 2026.",
+   "source": "cpeum",
+   "locator": "https://www.diputados.gob.mx/LeyesBiblio/pdf/CPEUM.pdf (art. 116 III; transitorio tercero of DOF 02-06-2026)",
+   "est_votes": 10000000,
+   "effort": 4,
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "local",
+      "special"
+     ],
+     "name_pattern": "(Magistrad|Juez|Jueza|Tribunal|judicial)",
+     "iso_pattern": "MX-*",
+     "precedence": 1
+    }
+   ],
+   "cadence": [
+    {
+     "source": "cpeum",
+     "month": 6,
+     "day_rule": "jun_first_sunday",
+     "called": false,
+     "administered_by": "The state electoral institute (OPLE)",
+     "valid_from": "2024-09-16",
+     "locator": "https://www.diputados.gob.mx/LeyesBiblio/pdf/CPEUM.pdf (art. 116 III)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "The state electoral institute (OPLE) of each entity: cómputos and PREP sites",
+     "url": "https://www.ine.mx/voto-y-elecciones/opl/",
+     "format": "csv, xlsx, pdf, html",
+     "access": "open",
+     "checked_at": "2026-11-13",
+     "evidence": "Each of the 32 OPLEs publishes its own cómputos; formats and depth differ by state and are not yet surveyed",
+     "role": "publishes"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2025-06-01",
+     "contests": null,
+     "source": "cpeum",
+     "note": "The states that held their first judicial election with the federal one; the list is not yet enumerated."
+    },
+    {
+     "date": "2028-06-04",
+     "contests": null,
+     "source": "cpeum",
+     "note": "Concurrent with the federal judicial election under the decree of 2 June 2026."
+    }
+   ]
+  },
+  {
+   "key": "internas_partidos",
+   "tier": "functional",
+   "name": "Procesos internos de los partidos",
+   "name_en": "Party primaries, conventions, and leadership votes",
+   "category": "nominating",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Parties choose candidates by conventions, polls, or member votes under their statutes; INE organizes a party's leadership vote only at its request (LGIPE art. 32.2 b).",
+   "source": "lgipe",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Party-internal processes the state does not run or certify as elections; INE's occasional organization of a leadership vote at a party's request (PRD 2014) publishes no comparable results."
+  },
+  {
+   "key": "sindicales",
+   "tier": "functional",
+   "name": "Votaciones sindicales y gremiales",
+   "name_en": "Union, professional, and university votes",
+   "category": "non_territorial",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "cpeum",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Workplace and professional votes (union leadership and collective contract votes verified by the Centro Federal de Conciliación y Registro Laboral since 2019); not public elections."
+  },
+  {
+   "key": "consultas_gobierno",
+   "tier": "functional",
+   "name": "Consultas organizadas por gobiernos sin autoridad electoral",
+   "name_en": "Government consultations run without an electoral authority",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "question"
+   },
+   "source": "cpeum",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Polls run by a government or its transition team rather than INE or an OPLE (the 2018 airport and 2018-2019 infrastructure consultations), and indigenous consultations under ILO Convention 169 held by assemblies; no electoral authority counted the votes."
+  }
+ ]
+}
