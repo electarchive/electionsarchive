@@ -2451,7 +2451,10 @@ export const live = {
       }
       const [stamp, shown, called] = await Promise.all([
         db.execute<{ key: string }>(sql`
-          select coalesce(max(k), 0)::text || '|' || count(*)::text || '|' || coalesce(max(as_of)::text, '') as key
+          select coalesce(max(k), 0)::text || '|' || count(*)::text || '|' || coalesce(max(as_of)::text, '') || '|' || (
+            select coalesce(max(b.fetch_id), 0)::text from live.ballots b
+            where b.election_id in (select c.election_id from contest c where c.id = any(${sql.param(picked.map((row) => row.id))}::uuid[]))
+          ) as key
           from live.frame where contest_id = any(${sql.param(picked.map((row) => row.id))}::uuid[]) and status = 'active'
         `),
         switches(),
@@ -2497,7 +2500,10 @@ export const live = {
       );
       const [stamp, shown, called] = await Promise.all([
         db.execute<{ key: string }>(sql`
-          select coalesce(max(k), 0)::text || '|' || count(*)::text || '|' || coalesce(max(as_of)::text, '') as key
+          select coalesce(max(k), 0)::text || '|' || count(*)::text || '|' || coalesce(max(as_of)::text, '') || '|' || (
+            select coalesce(max(b.fetch_id), 0)::text from live.ballots b
+            where b.election_id in (select c.election_id from contest c where c.id = any(${sql.param(picked.map((row) => row.id))}::uuid[]))
+          ) as key
           from live.frame where contest_id = any(${sql.param(picked.map((row) => row.id))}::uuid[]) and status = 'active'
         `),
         switches(),
