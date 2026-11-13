@@ -144,5 +144,6 @@
       ],
       "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
     }
-  ]
+  ],
+  "authoritative": "Source: the West Virginia Blue Book's official returns, whose county columns add up to the printed state totals; William L. Larcamp is 2,000 lower in the FEC figure (33,623 against 35,623)."
 }
