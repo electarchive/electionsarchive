@@ -101,7 +101,7 @@ These are the checks in the current code:
 - **Rules** (`rules.schema`) checks that each electoral system's rules validate against the engine's JSON schema.
 - **Geometry** (`geometry.valid`) checks that polygons are valid.
 - **Elections** (`election.empty`, a warning) flags a new held election that has no contests and no child elections, such as a year whose parse went missing before the emit.
-- **Scope** (`scope.polity`, `scope.owner`) checks that the diff touches only what the manifest declares, and that a pipeline never changes a row that another pipeline or a person last wrote.
+- **Scope** (`scope.polity`, `scope.owner`, `scope.overlap`) checks that the diff touches only what the manifest declares, and that a pipeline never changes a row that another pipeline or a person last wrote. `scope.overlap` names each staged temporal row whose period overlaps a different row another pipeline published, and `ea publish` refuses such a changeset before running the other checks, because the insert would break the period key.
 
 Apply and publish print each check's code and running time to stderr. Each check runs under a 20-minute statement timeout. A check that exceeds it fails the apply with an error naming the check and the changeset, so a pathological query never holds a transaction open for hours. A check reaches the public tables only through the ids that the changeset stages, so its cost grows with the changeset rather than the archive.
 

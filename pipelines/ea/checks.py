@@ -907,7 +907,7 @@ def _scope(stage: Stage) -> list[tuple[str, sql.Composed]]:
                     ),
                 )
             )
-        if table in stage.temporal:
+        if table in stage.temporal and stage.pipeline == "contrib":
             queries.append(
                 (
                     "scope.owner",
@@ -929,6 +929,63 @@ def _scope(stage: Stage) -> list[tuple[str, sql.Composed]]:
                     ),
                 )
             )
+    return [*queries, *overlaps(stage)]
+
+
+def overlaps(stage: Stage, limit: int | None = None) -> list[tuple[str, sql.Composed]]:
+    if stage.pipeline == "contrib":
+        return []
+    queries: list[tuple[str, sql.Composed]] = []
+    for table, keys in stage.temporal.items():
+        columns = stage.tables[table]
+        values = [
+            column
+            for column in columns
+            if column not in keys and column not in ("valid_from", "valid_to", "geom", "label_point")
+        ]
+        queries.append(
+            (
+                "scope.overlap",
+                sql.SQL(
+                    """select null::uuid, null::uuid,
+                              jsonb_build_object('table', {table}, 'key', jsonb_build_object({keys}),
+                                                 'staged', jsonb_build_object({staged}'valid', {start}),
+                                                 'published', o.rows)
+                       from {source} s
+                       cross join lateral (
+                         select jsonb_agg(jsonb_build_object({published}'valid', p.valid::text,
+                                                             'pipeline', c.pipeline, 'changeset_id', c.id)
+                                          order by p.valid) as rows
+                         from public.{target} p join changeset c on c.id = p.changeset_id
+                         where {overlaps} and not c.pipeline = any({writers}) and c.pipeline <> 'contrib'
+                       ) o
+                       where o.rows is not null
+                         and not exists (select from public.{target} p join changeset c on c.id = p.changeset_id
+                                         where c.pipeline = 'contrib' and {overlaps})
+                       order by 3{limit}"""
+                ).format(
+                    table=sql.Literal(table),
+                    keys=sql.SQL(", ").join(
+                        sql.SQL("{}, s.{}").format(sql.Literal(key), sql.Identifier(key)) for key in keys
+                    ),
+                    staged=sql.SQL("").join(
+                        sql.SQL("{}, s.{}, ").format(sql.Literal(column), sql.Identifier(column)) for column in values
+                    ),
+                    published=sql.SQL("").join(
+                        sql.SQL("{}, p.{}, ").format(sql.Literal(column), sql.Identifier(column)) for column in values
+                    ),
+                    start=sql.SQL("daterange({}, {}, '[)')::text").format(
+                        sql.SQL("s.valid_from" if "valid_from" in columns else "null::date"),
+                        sql.SQL("s.valid_to" if "valid_to" in columns else "null::date"),
+                    ),
+                    source=stage.staged(table),
+                    target=sql.Identifier(table),
+                    overlaps=stage.overlaps(table),
+                    writers=stage.writers(table),
+                    limit=sql.SQL("") if limit is None else sql.SQL(" limit {}").format(sql.Literal(limit)),
+                ),
+            )
+        )
     return queries
 
 

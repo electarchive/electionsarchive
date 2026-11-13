@@ -1956,6 +1956,16 @@ def _unmerge(conn: Connection, stage: Stage) -> None:
         conn.execute("delete from entity_merge where entity_id = %s", [entity])
 
 
+def _refuse_overlaps(conn: Connection, stage: Stage, changeset_id: str) -> None:
+    rows = [details for _, query in checks.overlaps(stage, 10) for _, _, details in conn.execute(query).fetchall()]
+    if rows:
+        raise ValueError(
+            f"{changeset_id} stages temporal rows that overlap rows another pipeline published, "
+            "so the insert would break the table's period key; first "
+            + "; ".join(json.dumps(details, default=str) for details in rows[:10])
+        )
+
+
 def publish(conn: Connection, changeset_id: str, reviewer: str | None = None) -> None:
     stage = _stage(conn, changeset_id)
     with conn.transaction():
@@ -2010,6 +2020,7 @@ def publish(conn: Connection, changeset_id: str, reviewer: str | None = None) ->
                             stage.staged(table), sql.Identifier(column), sql.Identifier(column)
                         )
                     )
+        _refuse_overlaps(conn, stage, changeset_id)
         findings = checks.run(conn, stage)
         moved = (
             [
