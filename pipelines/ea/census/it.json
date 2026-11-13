@@ -148,22 +148,347 @@
       "publisher": "Regione autonoma Valle d'Aosta",
       "url": "https://www.regione.vda.it/amministrazione/Elezioni/Dati_e_risultati/Risultati/Elezioni_regionali/default_i.aspx",
       "kind": "official_body"
+    },
+    "istat_codici_2026": {
+      "title": "Codici statistici delle unità amministrative territoriali: comuni, città metropolitane, province e regioni (codici al 21 febbraio 2026)",
+      "publisher": "Istituto nazionale di statistica (ISTAT)",
+      "url": "https://www.istat.it/storage/codici-unita-amministrative/Elenco-comuni-italiani.xlsx",
+      "kind": "official_body"
+    },
+    "eligendo_opendata": {
+      "title": "Eligendo: archivio storico delle elezioni, open data",
+      "publisher": "Ministero dell'Interno",
+      "url": "https://elezionistorico.interno.gov.it/eligendo/opendata.php",
+      "kind": "official_body"
+    },
+    "istat_compendio_1848_1934": {
+      "title": "Compendio delle statistiche elettorali italiane dal 1848 al 1934, volume I",
+      "publisher": "Istituto centrale di statistica",
+      "url": "https://ebiblio.istat.it/digibib/Elezioni/IST0003262Compendio_stat_elett_ita1848_1934_Vol1.pdf",
+      "kind": "official_body"
+    },
+    "nir_costituzione": {
+      "title": "Costituzione della Repubblica italiana",
+      "publisher": "Normattiva (Istituto Poligrafico e Zecca dello Stato)",
+      "kind": "official_body",
+      "url": "https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:costituzione"
+    },
+    "nir_l182_1991": {
+      "title": "Legge 7 giugno 1991, n. 182, Norme per lo svolgimento delle elezioni dei consigli provinciali e comunali",
+      "publisher": "Normattiva (Istituto Poligrafico e Zecca dello Stato)",
+      "kind": "official_body",
+      "url": "https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:legge:1991-06-07;182"
+    },
+    "nir_tuel": {
+      "title": "Decreto legislativo 18 agosto 2000, n. 267, Testo unico delle leggi sull'ordinamento degli enti locali",
+      "publisher": "Normattiva (Istituto Poligrafico e Zecca dello Stato)",
+      "kind": "official_body",
+      "url": "https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:decreto.legislativo:2000-08-18;267"
+    },
+    "nir_l81_1993": {
+      "title": "Legge 25 marzo 1993, n. 81, Elezione diretta del sindaco, del presidente della provincia, del consiglio comunale e del consiglio provinciale",
+      "publisher": "Normattiva (Istituto Poligrafico e Zecca dello Stato)",
+      "kind": "official_body",
+      "url": "https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:legge:1993-03-25;81"
+    },
+    "nir_l56_2014": {
+      "title": "Legge 7 aprile 2014, n. 56, Disposizioni sulle città metropolitane, sulle province, sulle unioni e fusioni di comuni",
+      "publisher": "Normattiva (Istituto Poligrafico e Zecca dello Stato)",
+      "kind": "official_body",
+      "url": "https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:legge:2014-04-07;56"
+    },
+    "nir_l108_1968": {
+      "title": "Legge 17 febbraio 1968, n. 108, Norme per la elezione dei Consigli regionali delle Regioni a statuto normale",
+      "publisher": "Normattiva (Istituto Poligrafico e Zecca dello Stato)",
+      "kind": "official_body",
+      "url": "https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:legge:1968-02-17;108"
+    },
+    "nir_l165_2004": {
+      "title": "Legge 2 luglio 2004, n. 165, Disposizioni di attuazione dell'articolo 122, primo comma, della Costituzione",
+      "publisher": "Normattiva (Istituto Poligrafico e Zecca dello Stato)",
+      "kind": "official_body",
+      "url": "https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:legge:2004-07-02;165"
+    },
+    "nir_l352_1970": {
+      "title": "Legge 25 maggio 1970, n. 352, Norme sui referendum previsti dalla Costituzione e sulla iniziativa legislativa del popolo",
+      "publisher": "Normattiva (Istituto Poligrafico e Zecca dello Stato)",
+      "kind": "official_body",
+      "url": "https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:legge:1970-05-25;352"
+    },
+    "nir_l286_2003": {
+      "title": "Legge 23 ottobre 2003, n. 286, Norme relative alla disciplina dei Comitati degli italiani all'estero",
+      "publisher": "Normattiva (Istituto Poligrafico e Zecca dello Stato)",
+      "kind": "official_body",
+      "url": "https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:legge:2003-10-23;286"
+    },
+    "nir_l122_1951": {
+      "title": "Legge 8 marzo 1951, n. 122, Norme per la elezione dei Consigli provinciali",
+      "publisher": "Normattiva (Istituto Poligrafico e Zecca dello Stato)",
+      "kind": "official_body",
+      "url": "https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:legge:1951-03-08;122"
+    },
+    "nir_statuto_taa": {
+      "title": "DPR 31 agosto 1972, n. 670, Testo unico delle leggi costituzionali concernenti lo statuto speciale per il Trentino-Alto Adige",
+      "publisher": "Normattiva (Istituto Poligrafico e Zecca dello Stato)",
+      "kind": "official_body",
+      "url": "https://www.normattiva.it/uri-res/N2Ls?urn:nir:presidente.repubblica:decreto:1972-08-31;670"
+    },
+    "camera_presidenti_1948": {
+      "title": "Elezione del Presidente della Repubblica 1948, scrutini",
+      "publisher": "Camera dei deputati",
+      "url": "https://leg14.camera.it/_presidenti/einaudi_scrutinio.asp",
+      "kind": "official_body"
+    },
+    "sardegna_elezioni": {
+      "title": "Sardegna Elezioni",
+      "publisher": "Regione autonoma della Sardegna",
+      "url": "https://elezioni.regione.sardegna.it/",
+      "kind": "official_body"
+    },
+    "fvg_elezioni": {
+      "title": "Elezioni in Friuli Venezia Giulia",
+      "publisher": "Regione autonoma Friuli Venezia Giulia",
+      "url": "https://elezioni.regione.fvg.it/",
+      "kind": "official_body"
+    },
+    "fvg_comunali_2022": {
+      "title": "Sistema delle autonomie locali: Elezioni comunali 2022",
+      "publisher": "Regione autonoma Friuli Venezia Giulia",
+      "url": "https://autonomielocali.regione.fvg.it/aall/opencms/AALL/Elezioni/elezioni2022",
+      "kind": "official_body"
+    },
+    "trento_elezioni_precedenti": {
+      "title": "Elezioni precedenti (provinciali 2003, 2008, 2013, and 2018; referendum 2021; comunità)",
+      "publisher": "Provincia autonoma di Trento",
+      "url": "https://elezioni.provincia.tn.it/Elezioni-precedenti",
+      "kind": "official_body"
+    },
+    "trento_elezioni_2023": {
+      "title": "Elezioni 2023",
+      "publisher": "Provincia autonoma di Trento",
+      "url": "https://www.elezioni-2023.provincia.tn.it/",
+      "kind": "official_body"
+    },
+    "trento_fascia_2025": {
+      "title": "Elezioni Comun general de Fascia 2025: risultati",
+      "publisher": "Provincia autonoma di Trento",
+      "url": "https://elezioni.provincia.tn.it/Elezioni-Comun-general-de-Fascia-2025/Risultati",
+      "kind": "official_body"
+    },
+    "bz_landtag": {
+      "title": "Elezioni provinciali / Landtagswahlen",
+      "publisher": "Provincia autonoma di Bolzano - Alto Adige",
+      "url": "https://landtagswahlen.provinz.bz.it/",
+      "kind": "official_body"
+    },
+    "bz_gemeindewahlen": {
+      "title": "Press Export: Elezioni comunali / Gemeindewahlen 2025",
+      "publisher": "Provincia autonoma di Bolzano - Alto Adige",
+      "url": "https://press.gemeindewahlen.bz.it/",
+      "kind": "official_body"
+    },
+    "vda_comunali": {
+      "title": "Elezioni comunali: dati e risultati",
+      "publisher": "Regione autonoma Valle d'Aosta",
+      "url": "https://www.regione.vda.it/amministrazione/Elezioni/Dati_e_risultati/Risultati/Elezioni_comunali/default_i.aspx",
+      "kind": "official_body"
+    },
+    "comites_montreal_2021": {
+      "title": "Risultati elezioni COMITES 2021 (circoscrizione consolare di Montréal)",
+      "publisher": "Consolato generale d'Italia a Montréal",
+      "url": "https://consmontreal.esteri.it/wp-content/uploads/2025/02/Risultati-elezioni-2021.pdf",
+      "kind": "official_body"
+    },
+    "sicilia_secondo_livello_2025": {
+      "title": "Elezioni amministrative dei Presidenti e dei Consigli dei Liberi Consorzi Comunali e dei Consigli delle Città Metropolitane del 27/04/2025",
+      "publisher": "Regione Siciliana, Dipartimento delle autonomie locali",
+      "url": "https://www.regione.sicilia.it/istituzioni/regione/strutture-regionali/assessorato-autonomie-locali-funzione-pubblica/dipartimento-autonomie-locali/elezioni-amministrative-presidenti-consigli-liberi-consorzi-comunali-consigli-7",
+      "kind": "official_body"
+    },
+    "lombardia_referendum_2017": {
+      "title": "Referendum per l'autonomia, Lombardia 2017",
+      "publisher": "Regione Lombardia",
+      "url": "https://referendum.regione.lombardia.it/",
+      "kind": "official_body"
+    },
+    "camera_presidenti_1955": {
+      "title": "Elezione del Presidente della Repubblica 1955, scrutini",
+      "publisher": "Camera dei deputati",
+      "url": "https://leg14.camera.it/_presidenti/gronchi_scrutinio.asp",
+      "kind": "official_body"
+    },
+    "camera_presidenti_1962": {
+      "title": "Elezione del Presidente della Repubblica 1962, scrutini",
+      "publisher": "Camera dei deputati",
+      "url": "https://leg14.camera.it/_presidenti/segni_scrutinio.asp",
+      "kind": "official_body"
+    },
+    "camera_presidenti_1964": {
+      "title": "Elezione del Presidente della Repubblica 1964, scrutini",
+      "publisher": "Camera dei deputati",
+      "url": "https://leg14.camera.it/_presidenti/saragat_scrutinio.asp",
+      "kind": "official_body"
+    },
+    "camera_presidenti_1971": {
+      "title": "Elezione del Presidente della Repubblica 1971, scrutini",
+      "publisher": "Camera dei deputati",
+      "url": "https://leg14.camera.it/_presidenti/leone_scrutinio.asp",
+      "kind": "official_body"
+    },
+    "camera_presidenti_1978": {
+      "title": "Elezione del Presidente della Repubblica 1978, scrutini",
+      "publisher": "Camera dei deputati",
+      "url": "https://leg14.camera.it/_presidenti/pertini_scrutinio.asp",
+      "kind": "official_body"
+    },
+    "camera_presidenti_1985": {
+      "title": "Elezione del Presidente della Repubblica 1985, scrutini",
+      "publisher": "Camera dei deputati",
+      "url": "https://leg14.camera.it/_presidenti/cossiga_scrutinio.asp",
+      "kind": "official_body"
+    },
+    "camera_presidenti_1992": {
+      "title": "Elezione del Presidente della Repubblica 1992, scrutini",
+      "publisher": "Camera dei deputati",
+      "url": "https://leg14.camera.it/_presidenti/scalfaro_scrutinio.asp",
+      "kind": "official_body"
+    },
+    "camera_presidenti_1999": {
+      "title": "Elezione del Presidente della Repubblica 1999, scrutini",
+      "publisher": "Camera dei deputati",
+      "url": "https://leg14.camera.it/_presidenti/ciampi_scrutinio.asp",
+      "kind": "official_body"
+    },
+    "camera_presidenti_2006": {
+      "title": "Elezione del Presidente della Repubblica 2006, scrutini",
+      "publisher": "Camera dei deputati",
+      "url": "https://leg14.camera.it/_presidenti/napolitano_scrutinio.asp",
+      "kind": "official_body"
+    },
+    "camera_presidenti_2013": {
+      "title": "Elezione del Presidente della Repubblica 2013, scrutini",
+      "publisher": "Camera dei deputati",
+      "url": "https://documenti.camera.it/leg17/resoconti/sedutaComune/pdf/sed0001/leg.17.sedutaComune.sed0001.data20130418.pdf",
+      "kind": "official_body"
+    },
+    "camera_presidenti_2015": {
+      "title": "Elezione del Presidente della Repubblica 2015, scrutini",
+      "publisher": "Camera dei deputati",
+      "url": "https://documenti.camera.it/leg17/resoconti/sedutaComune/pdf/sed0023/leg.17.sedutaComune.sed0023.data20150129.pdf",
+      "kind": "official_body"
+    },
+    "camera_presidenti_2022": {
+      "title": "Parlamento in seduta comune, resoconto stenografico, seduta n. 5",
+      "publisher": "Camera dei deputati",
+      "url": "https://documenti.camera.it/leg18/resoconti/sedutaComune/pdf/sed0005/leg.18.sedutaComune.sed0005.data20220124.pdf",
+      "kind": "official_body"
     }
   },
   "tiers": [
     {
       "key": "national",
-      "name": "Italian Republic",
+      "name": "Repubblica italiana",
+      "name_en": "Italian Republic",
       "parent": null,
       "polity_kind": "sovereign_state",
       "source": "dait_camera_1948"
     },
     {
       "key": "region",
-      "name": "Regions",
+      "name": "Regioni",
+      "name_en": "Regions (15 ordinary statute, 5 special statute)",
       "parent": "national",
       "polity_kind": "region",
-      "source": "eligendo-regionali"
+      "scheme": "it.regione",
+      "source": "istat_codici_2026",
+      "counts": [
+        {
+          "date": "2026-02-21",
+          "value": 20,
+          "source": "istat_codici_2026",
+          "locator": "https://www.istat.it/storage/codici-unita-amministrative/Elenco-comuni-italiani.xlsx (distinct Codice Regione)"
+        }
+      ]
+    },
+    {
+      "key": "autonomous_province",
+      "name": "Province autonome",
+      "name_en": "Autonomous provinces of Trento and Bolzano, which make up Trentino-Alto Adige",
+      "parent": "region",
+      "source": "istat_codici_2026",
+      "counts": [
+        {
+          "date": "2026-02-21",
+          "value": 2,
+          "source": "istat_codici_2026",
+          "locator": "https://www.istat.it/storage/codici-unita-amministrative/Elenco-comuni-italiani.xlsx (Tipologia di UTS 2)"
+        }
+      ]
+    },
+    {
+      "key": "province",
+      "name": "Province e liberi consorzi comunali",
+      "name_en": "Provinces (with Sicily's free municipal consortia)",
+      "parent": "region",
+      "polity_kind": "county",
+      "source": "istat_codici_2026",
+      "counts": [
+        {
+          "date": "2026-02-21",
+          "value": 89,
+          "source": "istat_codici_2026",
+          "locator": "https://www.istat.it/storage/codici-unita-amministrative/Elenco-comuni-italiani.xlsx (Tipologia di UTS 1, 83 provinces, and 4, 6 liberi consorzi; Friuli-Venezia Giulia's 4 non-administrative units, Tipologia 5, are left out)"
+        }
+      ]
+    },
+    {
+      "key": "metropolitan_city",
+      "name": "Città metropolitane",
+      "name_en": "Metropolitan cities",
+      "parent": "region",
+      "polity_kind": "county",
+      "valid_from": "2015-01-01",
+      "source": "istat_codici_2026",
+      "counts": [
+        {
+          "date": "2026-02-21",
+          "value": 15,
+          "source": "istat_codici_2026",
+          "locator": "https://www.istat.it/storage/codici-unita-amministrative/Elenco-comuni-italiani.xlsx (Tipologia di UTS 3)"
+        }
+      ]
+    },
+    {
+      "key": "comune",
+      "name": "Comuni",
+      "name_en": "Municipalities",
+      "parent": "province",
+      "polity_kind": "municipality",
+      "scheme": "it.comune",
+      "source": "istat_codici_2026",
+      "counts": [
+        {
+          "date": "2026-02-21",
+          "value": 7894,
+          "source": "istat_codici_2026",
+          "locator": "https://www.istat.it/storage/codici-unita-amministrative/Elenco-comuni-italiani.xlsx (rows of the sheet CODICI al 21_02_2026)"
+        }
+      ]
+    },
+    {
+      "key": "circoscrizione",
+      "name": "Circoscrizioni di decentramento (municipi, quartieri, municipalità)",
+      "name_en": "Sub-municipal districts of the largest cities",
+      "parent": "comune",
+      "polity_kind": "submunicipal",
+      "source": "nir_tuel"
+    },
+    {
+      "key": "abroad",
+      "name": "Circoscrizioni consolari",
+      "name_en": "Consular districts of Italians abroad",
+      "parent": "national",
+      "source": "nir_l286_2003"
     }
   ],
   "classes": [
@@ -197,7 +522,8 @@
           "body_kinds": [
             "lower_house"
           ],
-          "iso_pattern": "IT"
+          "iso_pattern": "IT",
+          "valid_from": "1946-06-03"
         }
       ],
       "dates": [
@@ -352,6 +678,40 @@
           "note": "Counted as 28 circoscrizioni, 147 collegi uninominali, 49 collegi plurinominali, 8 estero seats.",
           "source": "interno_dossier_2022",
           "quote": "Sono 147 i collegi uninominali del territorio nazionale, compreso il collegio della Valle d’Aosta, ai quali vengono assegnati i 147 seggi maggioritari alla Camera. Sono 49 i collegi plurinominali nei quali vengono assegnati i restanti 245 seggi proporzionali."
+        }
+      ],
+      "name_en": "Chamber of Deputies",
+      "first_held": "1948-04-18",
+      "earliest_record": "1948-04-18",
+      "valid_from": "1948-01-01",
+      "note": "Elected for five years (Constitution art. 60), earlier on dissolution. Systems: list PR in 31 or 32 circoscrizioni with a national remainder college (1948-1992; the 1953 majority bonus was never triggered); the Mattarellum, 475 single-member colleges plus 155 PR seats (1994-2001); the Porcellum, PR with a majority bonus (2006-2013); the Rosatellum, single-member colleges plus PR lists (2018-), with 12 seats abroad from 2006 (8 from 2022) and 400 seats from 2022.",
+      "cadence": [
+        {
+          "source": "nir_costituzione",
+          "locator": "https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:costituzione~art60",
+          "period_years": 5,
+          "term_years": 5,
+          "called": true,
+          "administered_by": "Ministero dell'Interno",
+          "vacancy_rule": "A vacant single-member seat (1994-2005 and 2018-) is filled at a by-election (elezione suppletiva); a list seat passes to the next candidate on the list.",
+          "valid_from": "1948-01-01"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Eligendo open data (Ministero dell'Interno)",
+          "url": "https://dait.interno.gov.it/documenti/opendata/camera/camera-{YYYYMMDD}.zip",
+          "format": "zip (txt, csv, xlsx)",
+          "access": "open",
+          "checked": "2026-11-13",
+          "checked_at": "2026-11-13",
+          "first_date": "1948-04-18",
+          "last_date": "2022-09-25",
+          "license": "none stated; open by default under art. 52 of the Codice dell'amministrazione digitale",
+          "finest": "it.sezione",
+          "finest_scheme": "it.sezione",
+          "source": "eligendo_opendata",
+          "evidence": "camera zips 1948-2022 by comune; 2018 and 2022 also by polling section"
         }
       ]
     },
@@ -528,6 +888,40 @@
           "source": "interno_dossier_2022",
           "quote": "Sono 74 i collegi uninominali del territorio nazionale, compreso il collegio della Valle d’Aosta, ai quali vengono assegnati i 74 seggi maggioritari al Senato."
         }
+      ],
+      "name_en": "Senate of the Republic",
+      "first_held": "1948-04-18",
+      "earliest_record": "1948-04-18",
+      "valid_from": "1948-01-01",
+      "note": "Elected on a regional basis (Constitution art. 57) for five years (art. 60; six until the 1963 reform, though both houses were always dissolved together). Systems: single-member colleges needing 65 percent, otherwise regional PR among college candidates (1948-1992); the Mattarellum (1994-2001); regional PR with regional majority bonuses (2006-2013); the Rosatellum (2018-), with 200 elected seats from 2022 plus senators for life.",
+      "cadence": [
+        {
+          "source": "nir_costituzione",
+          "locator": "https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:costituzione~art60",
+          "period_years": 5,
+          "term_years": 5,
+          "called": true,
+          "administered_by": "Ministero dell'Interno",
+          "vacancy_rule": "A vacant single-member seat (1994-2005 and 2018-) is filled at a by-election; a list seat passes to the next candidate on the list.",
+          "valid_from": "1948-01-01"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Eligendo open data (Ministero dell'Interno)",
+          "url": "https://dait.interno.gov.it/documenti/opendata/senato/senato-{YYYYMMDD}.zip",
+          "format": "zip (txt, csv, xlsx)",
+          "access": "open",
+          "checked": "2026-11-13",
+          "checked_at": "2026-11-13",
+          "first_date": "1948-04-18",
+          "last_date": "2022-09-25",
+          "license": "none stated; open by default under art. 52 of the Codice dell'amministrazione digitale",
+          "finest": "it.comune",
+          "finest_scheme": "it.comune",
+          "source": "eligendo_opendata",
+          "evidence": "senato zips listed in the opendata.php catalog from 1948-04-18 to 2022-09-25"
+        }
       ]
     },
     {
@@ -541,7 +935,7 @@
           "it.regione"
         ]
       },
-      "note": "Counted per region: each regional council election counts once. The 15 ordinary-statute regions' elections since 1970 come from the Interior Ministry's historical archive (Eligendo). Sicily, Sardinia, Aosta Valley, Trentino-Alto Adige, and Friuli-Venezia Giulia elect their councils under their own statutes, and Eligendo doesn't list them; of these, only the Aosta Valley elections since 2003, from the region's own results pages, are counted so far. Neither are four ordinary-statute elections that Eligendo leaves out: Marche in 2020 and 2025 and Molise in 2018 and 2023.",
+      "note": "Counted per region: each regional council election counts once. The 15 ordinary-statute regions' elections since 1970 come from the Interior Ministry's historical archive (Eligendo). Sicily, Sardinia, Aosta Valley, Trentino-Alto Adige, and Friuli-Venezia Giulia elect their councils under their own statutes, and Eligendo doesn't list them; of these, only the Aosta Valley elections since 2003, from the region's own results pages, are counted so far. Neither are four ordinary-statute elections that Eligendo leaves out: Marche in 2020 and 2025 and Molise in 2018 and 2023. The five special-statute regions first voted between 1947 (Sicily) and 1964 (Friuli-Venezia Giulia), the fifteen ordinary ones on 7 June 1970. Trentino-Alto Adige's council has since 2001 been the two provincial councils sitting together, counted under the autonomous provinces. Systems: PR by province (1970-1990), the Tatarellum's PR plus a regional list bonus (1995-), and each region's own law since the 1999 constitutional reform.",
       "source": "eligendo-regionali",
       "match": [
         {
@@ -551,7 +945,10 @@
           "body_kinds": [
             "unicameral"
           ],
-          "iso_pattern": "IT-*"
+          "iso_pattern": "IT-*",
+          "polity_kinds": [
+            "region"
+          ]
         }
       ],
       "dates": [
@@ -1068,6 +1465,83 @@
           "source": "eligendo-regionali",
           "quote": "Regionali 23/11/2025, Area ITALIA, Regione: CAMPANIA, PUGLIA, VENETO"
         }
+      ],
+      "name_en": "Regional councils",
+      "first_held": "1949-05-08",
+      "earliest_record": "1949-05-08",
+      "cadence": [
+        {
+          "source": "nir_l108_1968",
+          "locator": "https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:legge:1968-02-17;108~art3",
+          "period_years": 5,
+          "term_years": 5,
+          "called": true,
+          "administered_by": "Ministero dell'Interno with each region",
+          "valid_from": "1970-01-01",
+          "valid_to": "2004-07-03"
+        },
+        {
+          "source": "nir_l165_2004",
+          "locator": "https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:legge:2004-07-02;165~art5",
+          "period_years": 5,
+          "term_years": 5,
+          "called": true,
+          "administered_by": "Each region, with the prefectures (ordinary statute); the region itself (special statute)",
+          "vacancy_rule": "The council and president stand and fall together: the president's resignation, death, or no-confidence dissolves the council and brings an early election.",
+          "valid_from": "2004-07-03"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Eligendo open data (Ministero dell'Interno)",
+          "url": "https://dait.interno.gov.it/documenti/opendata/regionali/regionali-{YYYYMMDD}.zip",
+          "format": "zip (txt, csv, xlsx)",
+          "access": "open",
+          "checked": "2026-11-13",
+          "checked_at": "2026-11-13",
+          "first_date": "1970-06-07",
+          "last_date": "2025-11-23",
+          "license": "none stated; open by default under art. 52 of the Codice dell'amministrazione digitale",
+          "finest": "it.comune",
+          "finest_scheme": "it.comune",
+          "source": "eligendo_opendata",
+          "evidence": "regionali zips for the ordinary-statute regions 1970-2025 and Sicily 2001; no special-statute region otherwise, no Marche 2020 or 2025, no Molise 2018 or 2023"
+        },
+        {
+          "platform": "Regione autonoma Valle d'Aosta, Elezioni: dati e risultati",
+          "url": "https://www.regione.vda.it/amministrazione/Elezioni/Dati_e_risultati/Risultati/Elezioni_regionali/default_i.aspx",
+          "format": "html, pdf",
+          "access": "open",
+          "checked": "2026-11-13",
+          "checked_at": "2026-11-13",
+          "first_date": "2003-06-08",
+          "last_date": "2025-09-28",
+          "source": "vda-regionali",
+          "within": "IT-23",
+          "finest": "it.comune",
+          "finest_scheme": "it.comune",
+          "evidence": "list votes by comune for each regional election"
+        },
+        {
+          "platform": "Sardegna Elezioni",
+          "url": "https://elezioni.regione.sardegna.it/",
+          "format": "html",
+          "access": "open",
+          "checked": "2026-11-13",
+          "checked_at": "2026-11-13",
+          "source": "sardegna_elezioni",
+          "evidence": "the region's results site; years and grain not yet read"
+        },
+        {
+          "platform": "Elezioni in Friuli Venezia Giulia",
+          "url": "https://elezioni.regione.fvg.it/",
+          "format": "html",
+          "access": "open",
+          "checked": "2026-11-13",
+          "checked_at": "2026-11-13",
+          "source": "fvg_elezioni",
+          "evidence": "the region's results site; years and grain not yet read"
+        }
       ]
     },
     {
@@ -1276,6 +1750,36 @@
           "source": "gu_dpr_13_01_2026",
           "quote": "Indizione del referendum popolare confermativo della legge costituzionale recante: «Norme in materia di ordinamento giurisdizionale e di istituzione della Corte disciplinare»"
         }
+      ],
+      "name_en": "National referendums",
+      "first_held": "1946-06-02",
+      "earliest_record": "1946-06-02",
+      "note": "The 1946 institutional referendum, abrogative referendums (Constitution art. 75, valid only with turnout above half the electorate; first held 1974), constitutional referendums (art. 138, no quorum; first 2001), and the 1989 consultative referendum on a European mandate. Territorial referendums under art. 132 are their own class.",
+      "cadence": [
+        {
+          "source": "nir_l352_1970",
+          "locator": "https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:legge:1970-05-25;352~art34",
+          "called": true,
+          "administered_by": "Ministero dell'Interno; the Corte di cassazione's central office proclaims the result",
+          "month": null
+        }
+      ],
+      "access": [
+        {
+          "platform": "Eligendo open data (Ministero dell'Interno)",
+          "url": "https://dait.interno.gov.it/documenti/opendata/referendum/referendum-{YYYYMMDD}.zip",
+          "format": "zip (txt, csv, xlsx)",
+          "access": "open",
+          "checked": "2026-11-13",
+          "checked_at": "2026-11-13",
+          "first_date": "1946-06-02",
+          "last_date": "2026-03-22",
+          "license": "none stated; open by default under art. 52 of the Codice dell'amministrazione digitale",
+          "finest": "it.sezione",
+          "finest_scheme": "it.sezione",
+          "source": "eligendo_opendata",
+          "evidence": "referendum zips 1946-2026 by comune; recent ones by polling section"
+        }
       ]
     },
     {
@@ -1298,7 +1802,9 @@
           "body_kinds": [
             "unicameral"
           ],
-          "iso_pattern": "EU"
+          "iso_pattern": "EU",
+          "within": null,
+          "precedence": 1
         }
       ],
       "dates": [
@@ -1364,7 +1870,1446 @@
           "source": "gu_dpr_10_04_2024_ep",
           "quote": "Totali 59.030.133 74 76"
         }
+      ],
+      "name_en": "European Parliament (Italian seats)",
+      "first_held": "1979-06-10",
+      "earliest_record": "1979-06-10",
+      "note": "Five interregional constituencies with national list PR (4 percent threshold since 2009).",
+      "cadence": [
+        {
+          "source": "parlamento_l18_1979",
+          "locator": "https://www.parlamento.it/parlam/leggi/79018l.htm",
+          "period_years": 5,
+          "phase": 4,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "Ministero dell'Interno"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Eligendo open data (Ministero dell'Interno)",
+          "url": "https://dait.interno.gov.it/documenti/opendata/europee/europee-{YYYYMMDD}.zip",
+          "format": "zip (txt, csv, xlsx)",
+          "access": "open",
+          "checked": "2026-11-13",
+          "checked_at": "2026-11-13",
+          "first_date": "1979-06-10",
+          "last_date": "2024-06-09",
+          "license": "none stated; open by default under art. 52 of the Codice dell'amministrazione digitale",
+          "finest": "it.comune",
+          "finest_scheme": "it.comune",
+          "source": "eligendo_opendata",
+          "evidence": "europee zips listed in the opendata.php catalog from 1979-06-10 to 2024-06-09"
+        }
       ]
+    },
+    {
+      "key": "costituente",
+      "tier": "national",
+      "name": "Assemblea Costituente",
+      "name_en": "Constituent Assembly",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1946-06-02",
+      "valid_to": "1948-05-08",
+      "first_held": "1946-06-02",
+      "earliest_record": "1946-06-02",
+      "measure": {
+        "schemes": [
+          "it.circoscrizione_costituente_1946"
+        ]
+      },
+      "note": "One election, 2 June 1946, the same day as the institutional referendum: 556 seats by list PR in 31 circoscrizioni (Trieste and Bolzano did not vote) plus a national remainder college.",
+      "source": "eligendo_opendata",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "constituent_assembly"
+          ],
+          "iso_pattern": "IT"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1946-06-02",
+          "contests": 32,
+          "seats": 556,
+          "note": "31 circoscrizioni and the Collegio Unico Nazionale",
+          "source": "eligendo_opendata"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Eligendo open data (Ministero dell'Interno)",
+          "url": "https://dait.interno.gov.it/documenti/opendata/costituente/costituente-{YYYYMMDD}.zip",
+          "format": "zip (txt, csv, xlsx)",
+          "access": "open",
+          "checked": "2026-11-13",
+          "checked_at": "2026-11-13",
+          "first_date": "1946-06-02",
+          "last_date": "1946-06-02",
+          "license": "none stated; open by default under art. 52 of the Codice dell'amministrazione digitale",
+          "finest": "it.comune",
+          "finest_scheme": "it.comune",
+          "source": "eligendo_opendata",
+          "evidence": "costituente zips listed in the opendata.php catalog from 1946-06-02 to 1946-06-02"
+        }
+      ]
+    },
+    {
+      "key": "presidente_repubblica",
+      "tier": "national",
+      "name": "Presidente della Repubblica",
+      "name_en": "President of the Republic",
+      "category": "indirect",
+      "goal": "national",
+      "first_held": "1948-05-10",
+      "earliest_record": "1948-05-10",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "Elected by Parliament in joint session with three delegates per region (one for the Aosta Valley) for seven years (Constitution arts. 83 and 85): two-thirds of the assembly on the first three ballots, an absolute majority from the fourth. Each ballot is a contest. Enrico De Nicola was provisional head of state 1946-1948, chosen by the Constituent Assembly.",
+      "source": "nir_costituzione",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "IT"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "nir_costituzione",
+          "locator": "https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:costituzione~art85",
+          "period_years": 7,
+          "term_years": 7,
+          "called": true,
+          "selection": "elected",
+          "administered_by": "Parlamento in seduta comune, convened by the President of the Chamber",
+          "vacancy_rule": "On death, permanent impediment, or resignation the President of the Senate acts, and a new election is held within 15 days (Constitution art. 86)."
+        }
+      ],
+      "access": [
+        {
+          "platform": "Camera dei deputati",
+          "url": "https://leg14.camera.it/_presidenti/{name}_scrutinio.asp",
+          "format": "html, pdf (joint-session records from 2013)",
+          "access": "open",
+          "checked": "2026-11-13",
+          "checked_at": "2026-11-13",
+          "first_date": "1948-05-10",
+          "last_date": "2022-01-29",
+          "source": "camera_presidenti_1948",
+          "evidence": "ballot-by-ballot votes for every election; the 2013, 2015, and 2022 joint-session records on documenti.camera.it"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1948-05-10",
+          "contests": 4,
+          "note": "4 ballots (scrutini) in the joint session",
+          "source": "camera_presidenti_1948"
+        },
+        {
+          "date": "1955-04-28",
+          "contests": 4,
+          "note": "4 ballots (scrutini) in the joint session",
+          "source": "camera_presidenti_1955"
+        },
+        {
+          "date": "1962-05-02",
+          "contests": 9,
+          "note": "9 ballots (scrutini) in the joint session",
+          "source": "camera_presidenti_1962"
+        },
+        {
+          "date": "1964-12-16",
+          "contests": 21,
+          "note": "21 ballots (scrutini) in the joint session",
+          "source": "camera_presidenti_1964"
+        },
+        {
+          "date": "1971-12-09",
+          "contests": 23,
+          "note": "23 ballots (scrutini) in the joint session",
+          "source": "camera_presidenti_1971"
+        },
+        {
+          "date": "1978-06-29",
+          "contests": 16,
+          "note": "16 ballots (scrutini) in the joint session",
+          "source": "camera_presidenti_1978"
+        },
+        {
+          "date": "1985-06-24",
+          "contests": 1,
+          "note": "1 ballots (scrutini) in the joint session",
+          "source": "camera_presidenti_1985"
+        },
+        {
+          "date": "1992-05-13",
+          "contests": 16,
+          "note": "16 ballots (scrutini) in the joint session",
+          "source": "camera_presidenti_1992"
+        },
+        {
+          "date": "1999-05-13",
+          "contests": 1,
+          "note": "1 ballots (scrutini) in the joint session",
+          "source": "camera_presidenti_1999"
+        },
+        {
+          "date": "2006-05-08",
+          "contests": 4,
+          "note": "4 ballots (scrutini) in the joint session",
+          "source": "camera_presidenti_2006"
+        },
+        {
+          "date": "2013-04-18",
+          "contests": 6,
+          "note": "6 ballots (scrutini) in the joint session",
+          "source": "camera_presidenti_2013"
+        },
+        {
+          "date": "2015-01-29",
+          "contests": 4,
+          "note": "4 ballots (scrutini) in the joint session",
+          "source": "camera_presidenti_2015"
+        },
+        {
+          "date": "2022-01-24",
+          "contests": 8,
+          "note": "8 ballots (scrutini) in the joint session",
+          "source": "camera_presidenti_2022"
+        }
+      ]
+    },
+    {
+      "key": "suppletive",
+      "tier": "national",
+      "name": "Elezioni suppletive della Camera e del Senato",
+      "name_en": "Parliamentary by-elections",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1994-03-27",
+      "first_held": "1994-01-01",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "By-elections fill single-member seats that fall vacant: 1994-2005 under the Mattarellum and again from 2018 under the Rosatellum (for example Napoli 2020, Siena 2021, Roma 1 2021, Monza 2023). Before 1994 and 2006-2017 list seats passed to the next candidate.",
+      "source": "nir_costituzione",
+      "match": [
+        {
+          "election_kinds": [
+            "by_election"
+          ],
+          "body_kinds": [
+            "lower_house",
+            "upper_house"
+          ],
+          "iso_pattern": "IT",
+          "valid_from": "1994-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "nir_costituzione",
+          "locator": "https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:costituzione~art60",
+          "called": true,
+          "administered_by": "Ministero dell'Interno",
+          "valid_from": "1994-03-27"
+        }
+      ],
+      "est_votes": 500000,
+      "effort": 3,
+      "dates": []
+    },
+    {
+      "key": "camera_regno",
+      "tier": "national",
+      "name": "Camera dei deputati del Regno d'Italia",
+      "name_en": "Chamber of Deputies of the Kingdom of Italy",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1861-01-27",
+      "valid_to": "1939-03-23",
+      "first_held": "1861-01-27",
+      "earliest_record": "1861-01-27",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "Twenty general elections from 1861 to 1924 (single-member colleges with runoffs, except multi-member scrutinio di lista 1882-1890 and PR 1919-1921, and the Acerbo law's majority prize in 1924), then the plebiscitary single-list ballots of 1929 and 1934; the Chamber was replaced by the unelected Camera dei fasci e delle corporazioni in 1939. The Senate of the Kingdom was appointed. Before 1861, the Kingdom of Sardinia's chamber from 1848 is a predecessor, not this class.",
+      "source": "istat_compendio_1848_1934",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "by_election",
+            "runoff"
+          ],
+          "body_kinds": [
+            "lower_house"
+          ],
+          "iso_pattern": "IT",
+          "valid_to": "1946-06-01"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "istat_compendio_1848_1934",
+          "locator": "https://ebiblio.istat.it/digibib/Elezioni/IST0003262Compendio_stat_elett_ita1848_1934_Vol1.pdf",
+          "period_years": 5,
+          "term_years": 5,
+          "called": true,
+          "administered_by": "Ministero dell'Interno del Regno",
+          "valid_from": "1861-01-27",
+          "valid_to": "1939-03-23"
+        }
+      ],
+      "access": [
+        {
+          "platform": "ISTAT digital library (Compendio 1848-1934)",
+          "url": "https://ebiblio.istat.it/digibib/Elezioni/",
+          "format": "pdf (scanned)",
+          "access": "open",
+          "checked": "2026-11-13",
+          "checked_at": "2026-11-13",
+          "first_date": "1861-01-27",
+          "last_date": "1934-03-25",
+          "source": "istat_compendio_1848_1934",
+          "evidence": "volume I on the electorate and the colleges; volume II's results tables survive as page PDFs at legislature.camera.it/_dati/costituente/documenti/ministerocostituente/"
+        }
+      ],
+      "est_votes": 7000000,
+      "effort": 4,
+      "dates": []
+    },
+    {
+      "key": "comites",
+      "tier": "abroad",
+      "name": "Comitati degli italiani all'estero (COMITES)",
+      "name_en": "Committees of Italians Abroad",
+      "category": "non_territorial",
+      "goal": "national",
+      "first_held": "1986-01-01",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "Each consular district's committee of 12 or 18 members (18 above 100,000 Italian citizens) is elected by the Italians registered abroad there for five years (Law 286/2003 arts. 5 and 8), by post since 2015 and only by those who register to vote. The General Council of Italians Abroad (CGIE) is then chosen indirectly by the committees.",
+      "source": "nir_l286_2003",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "name_pattern": "COMITES|Comitato degli italiani"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "nir_l286_2003",
+          "locator": "https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:legge:2003-10-23;286~art8",
+          "period_years": 5,
+          "term_years": 5,
+          "called": true,
+          "administered_by": "Ministero degli affari esteri e della cooperazione internazionale, through the consulates"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Ministero degli affari esteri (esteri.it) and the consulates",
+          "url": "https://www.esteri.it/it/servizi-opportunita/italiani-all-estero/organismirappresentativi/comites/",
+          "format": "html, pdf",
+          "access": "blocked",
+          "checked": "2026-11-13",
+          "checked_at": "2026-11-13",
+          "source": "comites_montreal_2021",
+          "evidence": "esteri.it answers scripts with a bot challenge; each consulate posts its own district's results as a PDF (Montreal 2021 confirmed)"
+        }
+      ],
+      "est_votes": 200000,
+      "effort": 3,
+      "dates": []
+    },
+    {
+      "key": "presidente_regione",
+      "tier": "region",
+      "name": "Presidente della Regione",
+      "name_en": "Regional presidents",
+      "category": "executive",
+      "goal": "subnational",
+      "valid_from": "1995-04-23",
+      "first_held": "1995-04-23",
+      "earliest_record": "1995-04-23",
+      "measure": {
+        "schemes": [
+          "it.regione"
+        ],
+        "fine": [
+          "it.comune"
+        ]
+      },
+      "note": "Elected directly, the same day and on the same ballot as the council, unless a regional statute says otherwise (Constitution art. 122 since 1999; from 1995 the head of the winning regional list became president). Sicily from 2001, Friuli-Venezia Giulia from 2003, and Sardinia from 2004 elect theirs directly; the Aosta Valley's president, and Bolzano's, are chosen by the council. One round by plurality, except Tuscany's runoff between the top two when nobody reaches 40 percent.",
+      "source": "nir_costituzione",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "office_kinds": [
+            "head_of_government"
+          ],
+          "polity_kinds": [
+            "region"
+          ],
+          "iso_pattern": "IT-*"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "nir_l165_2004",
+          "locator": "https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:legge:2004-07-02;165~art5",
+          "period_years": 5,
+          "term_years": 5,
+          "called": true,
+          "runoff": "none",
+          "runoff_rule": "Tuscany only: a second round between the top two candidates when none reaches 40 percent.",
+          "administered_by": "Each region, with the prefectures",
+          "valid_from": "2004-07-03"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Eligendo open data (Ministero dell'Interno)",
+          "url": "https://dait.interno.gov.it/documenti/opendata/regionali/regionali-{YYYYMMDD}.zip",
+          "format": "zip (txt, csv, xlsx)",
+          "access": "open",
+          "checked": "2026-11-13",
+          "checked_at": "2026-11-13",
+          "first_date": "1995-04-23",
+          "last_date": "2025-11-23",
+          "license": "none stated; open by default under art. 52 of the Codice dell'amministrazione digitale",
+          "finest": "it.comune",
+          "finest_scheme": "it.comune",
+          "source": "eligendo_opendata",
+          "evidence": "president candidate and votes repeated on each list row from 1995"
+        },
+        {
+          "platform": "Regione autonoma Valle d'Aosta, Elezioni: dati e risultati",
+          "url": "https://www.regione.vda.it/amministrazione/Elezioni/Dati_e_risultati/Risultati/Elezioni_regionali/default_i.aspx",
+          "format": "html, pdf",
+          "access": "open",
+          "checked": "2026-11-13",
+          "checked_at": "2026-11-13",
+          "first_date": "2003-06-08",
+          "last_date": "2025-09-28",
+          "source": "vda-regionali",
+          "within": "IT-23",
+          "finest": "it.comune",
+          "finest_scheme": "it.comune",
+          "evidence": "list votes by comune for each regional election"
+        },
+        {
+          "platform": "Sardegna Elezioni",
+          "url": "https://elezioni.regione.sardegna.it/",
+          "format": "html",
+          "access": "open",
+          "checked": "2026-11-13",
+          "checked_at": "2026-11-13",
+          "source": "sardegna_elezioni",
+          "evidence": "the region's results site; years and grain not yet read"
+        },
+        {
+          "platform": "Elezioni in Friuli Venezia Giulia",
+          "url": "https://elezioni.regione.fvg.it/",
+          "format": "html",
+          "access": "open",
+          "checked": "2026-11-13",
+          "checked_at": "2026-11-13",
+          "source": "fvg_elezioni",
+          "evidence": "the region's results site; years and grain not yet read"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "referendum_regionale",
+      "tier": "region",
+      "name": "Referendum regionali",
+      "name_en": "Regional referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "Abrogative, consultative, and statutory referendums each region holds under its statute (Constitution art. 123), such as Lombardy's and Veneto's autonomy referendums of 22 October 2017 and Sardinia's 2011 referendums, plus the consultative referendums on merging or creating municipalities that the regions hold in the affected comuni (art. 133), several dozen a year since 2014. Loaders should hold merger referendums under the region, not the comune.",
+      "source": "nir_costituzione",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "polity_kinds": [
+            "region"
+          ],
+          "iso_pattern": "IT-*"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "nir_costituzione",
+          "locator": "https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:costituzione~art123",
+          "called": true,
+          "administered_by": "Each region"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Regione Lombardia, Referendum per l'autonomia 2017",
+          "url": "https://referendum.regione.lombardia.it/",
+          "format": "html",
+          "access": "open",
+          "checked": "2026-11-13",
+          "checked_at": "2026-11-13",
+          "first_date": "2017-10-22",
+          "last_date": "2017-10-22",
+          "source": "lombardia_referendum_2017",
+          "within": "IT-25",
+          "evidence": "the region's results site for its 22 October 2017 autonomy referendum"
+        }
+      ],
+      "est_votes": 5000000,
+      "effort": 3,
+      "dates": []
+    },
+    {
+      "key": "consiglio_provinciale_autonomo",
+      "tier": "autonomous_province",
+      "name": "Consiglio della Provincia autonoma (Trento, Bolzano)",
+      "name_en": "Provincial councils of Trento and South Tyrol",
+      "category": "legislature",
+      "goal": "subnational",
+      "first_held": "1948-11-28",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "The two provincial councils, elected the same day for five years, together form Trentino-Alto Adige's regional council (statute art. 25 since 2001; until then the regional council was elected and its members sat in their provinces' councils). South Tyrol's 35 seats are by PR with guaranteed Ladin representation; Trento's 35 with a directly elected president since 2003.",
+      "source": "nir_statuto_taa",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "IT-TN",
+          "precedence": 1
+        },
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "IT-BZ",
+          "precedence": 1
+        }
+      ],
+      "cadence": [
+        {
+          "source": "nir_statuto_taa",
+          "locator": "https://www.normattiva.it/uri-res/N2Ls?urn:nir:presidente.repubblica:decreto:1972-08-31;670",
+          "period_years": 5,
+          "term_years": 5,
+          "called": true,
+          "administered_by": "Each autonomous province"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Provincia autonoma di Trento, elezioni precedenti",
+          "url": "https://elezioni.provincia.tn.it/Elezioni-precedenti",
+          "format": "html, pdf",
+          "access": "open",
+          "checked": "2026-11-13",
+          "checked_at": "2026-11-13",
+          "first_date": "2003-10-26",
+          "last_date": "2023-10-22",
+          "source": "trento_elezioni_precedenti",
+          "evidence": "provincial elections 2003, 2008, 2013, and 2018 linked, 2023 on its own site; results filterable by comune"
+        },
+        {
+          "platform": "Provincia autonoma di Bolzano, Landtagswahlen",
+          "url": "https://landtagswahlen.provinz.bz.it/",
+          "format": "html, pdf",
+          "access": "open",
+          "checked": "2026-11-13",
+          "checked_at": "2026-11-13",
+          "source": "bz_landtag",
+          "evidence": "provincial election results; the 2013 results PDF at static.provinz.bz.it/vote/landtag2013/"
+        }
+      ],
+      "est_votes": 600000,
+      "effort": 2,
+      "dates": []
+    },
+    {
+      "key": "presidente_trento",
+      "tier": "autonomous_province",
+      "name": "Presidente della Provincia autonoma di Trento",
+      "name_en": "President of the Autonomous Province of Trento",
+      "category": "executive",
+      "goal": "subnational",
+      "valid_from": "2003-01-01",
+      "first_held": "2003-10-26",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "Elected directly with the provincial council since 2003; South Tyrol's Landeshauptmann is chosen by its council.",
+      "source": "nir_statuto_taa",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "office_kinds": [
+            "head_of_government"
+          ],
+          "iso_pattern": "IT-TN",
+          "precedence": 1
+        }
+      ],
+      "cadence": [
+        {
+          "source": "nir_statuto_taa",
+          "locator": "https://www.normattiva.it/uri-res/N2Ls?urn:nir:presidente.repubblica:decreto:1972-08-31;670",
+          "period_years": 5,
+          "term_years": 5,
+          "called": true,
+          "administered_by": "Provincia autonoma di Trento",
+          "valid_from": "2003-01-01"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Provincia autonoma di Trento, elezioni precedenti",
+          "url": "https://elezioni.provincia.tn.it/Elezioni-precedenti",
+          "format": "html, pdf",
+          "access": "open",
+          "checked": "2026-11-13",
+          "checked_at": "2026-11-13",
+          "first_date": "2003-10-26",
+          "last_date": "2023-10-22",
+          "source": "trento_elezioni_precedenti",
+          "evidence": "provincial elections 2003, 2008, 2013, and 2018 linked, 2023 on its own site; results filterable by comune"
+        }
+      ],
+      "est_votes": 260000,
+      "effort": 2,
+      "dates": []
+    },
+    {
+      "key": "consiglio_provinciale",
+      "tier": "province",
+      "name": "Consiglio provinciale (elezione diretta)",
+      "name_en": "Provincial councils, direct election",
+      "category": "council",
+      "goal": "local",
+      "valid_from": "1951-01-01",
+      "valid_to": "2014-04-08",
+      "first_held": "1951-05-27",
+      "measure": {
+        "unit": "polity",
+        "fine": [
+          "it.comune"
+        ]
+      },
+      "note": "Elected by the voters in single-member colleges with proportional allocation by group from 1951 (Law 122/1951) and with a majority bonus for the president's lists from 1995, for five years (four until the 1960s and 1993-1999). The last direct elections were held in 2011-2013 (Sardinia's provinces until 2010, Sicily's until 2008); Law 56/2014 made the councils indirect.",
+      "source": "nir_l122_1951",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "local"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "county"
+          ],
+          "valid_to": "2014-04-08"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "nir_tuel",
+          "locator": "https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:decreto.legislativo:2000-08-18;267~art51",
+          "period_years": 5,
+          "term_years": 5,
+          "called": true,
+          "month": null,
+          "administered_by": "Ministero dell'Interno through the prefectures",
+          "valid_to": "2014-04-08"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Eligendo open data (Ministero dell'Interno)",
+          "url": "https://dait.interno.gov.it/documenti/opendata/provinciali/provinciali-{YYYYMMDD}.zip",
+          "format": "zip (txt, csv, xlsx)",
+          "access": "open",
+          "checked": "2026-11-13",
+          "checked_at": "2026-11-13",
+          "first_date": "2004-06-12",
+          "last_date": "2011-05-15",
+          "license": "none stated; open by default under art. 52 of the Codice dell'amministrazione digitale",
+          "finest": "it.comune",
+          "finest_scheme": "it.comune",
+          "source": "eligendo_opendata",
+          "evidence": "provinciali zips for ten dates 2004-2011; earlier elections only on Eligendo's archive pages, which answer 403 to scripts"
+        }
+      ],
+      "est_votes": 25000000,
+      "effort": 3,
+      "dates": []
+    },
+    {
+      "key": "presidente_provincia",
+      "tier": "province",
+      "name": "Presidente della Provincia (elezione diretta)",
+      "name_en": "Provincial presidents, direct election",
+      "category": "executive",
+      "goal": "local",
+      "valid_from": "1993-03-25",
+      "valid_to": "2014-04-08",
+      "measure": {
+        "unit": "polity",
+        "fine": [
+          "it.comune"
+        ]
+      },
+      "note": "Elected directly with the council from Law 81/1993 to Law 56/2014, by absolute majority with a runoff between the top two two weeks later.",
+      "source": "nir_l81_1993",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "local",
+            "runoff"
+          ],
+          "office_kinds": [
+            "head_of_government",
+            "governor"
+          ],
+          "polity_kinds": [
+            "county"
+          ],
+          "valid_to": "2014-04-08"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "nir_tuel",
+          "locator": "https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:decreto.legislativo:2000-08-18;267~art51",
+          "period_years": 5,
+          "term_years": 5,
+          "called": true,
+          "runoff": "majority",
+          "runoff_threshold": 0.5,
+          "runoff_rule": "Runoff between the two leading candidates on the second Sunday after the first round.",
+          "administered_by": "Ministero dell'Interno through the prefectures",
+          "valid_from": "1993-03-25",
+          "valid_to": "2014-04-08"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Eligendo open data (Ministero dell'Interno)",
+          "url": "https://dait.interno.gov.it/documenti/opendata/provinciali/provinciali-{YYYYMMDD}.zip",
+          "format": "zip (txt, csv, xlsx)",
+          "access": "open",
+          "checked": "2026-11-13",
+          "checked_at": "2026-11-13",
+          "first_date": "2004-06-12",
+          "last_date": "2011-05-15",
+          "license": "none stated; open by default under art. 52 of the Codice dell'amministrazione digitale",
+          "finest": "it.comune",
+          "finest_scheme": "it.comune",
+          "source": "eligendo_opendata",
+          "evidence": "provinciali zips for ten dates 2004-2011; earlier elections only on Eligendo's archive pages"
+        }
+      ],
+      "est_votes": 25000000,
+      "effort": 3,
+      "dates": []
+    },
+    {
+      "tier": "province",
+      "category": "indirect",
+      "goal": "local",
+      "valid_from": "2014-04-08",
+      "first_held": "2014-10-12",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "nir_l56_2014",
+      "est_votes": 100000,
+      "effort": 5,
+      "access": [
+        {
+          "platform": "Regione Siciliana, Dipartimento delle autonomie locali",
+          "url": "https://www.regione.sicilia.it/istituzioni/regione/strutture-regionali/assessorato-autonomie-locali-funzione-pubblica/dipartimento-autonomie-locali/elezioni-amministrative-presidenti-consigli-liberi-consorzi-comunali-consigli-7",
+          "format": "html",
+          "access": "open",
+          "checked": "2026-11-13",
+          "checked_at": "2026-11-13",
+          "first_date": "2025-04-27",
+          "last_date": "2025-04-27",
+          "source": "sicilia_secondo_livello_2025",
+          "within": "IT-82",
+          "evidence": "Sicily's second-level elections of 27 April 2025"
+        }
+      ],
+      "dates": [],
+      "key": "presidente_provincia_indiretto",
+      "name": "Presidente della Provincia (elezione di secondo grado)",
+      "name_en": "Provincial presidents, indirect election",
+      "note": "Since Law 56/2014 the province's mayors and municipal councillors elect the president for four years (c. 58-59) by a vote weighted by their comuni's population, each province on its own date; Sicily's free consortia follow regional law and held their first such elections on 27 April 2025. Results are posted by each province.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "head_of_government",
+            "governor"
+          ],
+          "polity_kinds": [
+            "county"
+          ],
+          "valid_from": "2014-04-08"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "nir_l56_2014",
+          "locator": "https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:legge:2014-04-07;56",
+          "period_years": 4,
+          "term_years": 4,
+          "called": true,
+          "selection": "elected",
+          "administered_by": "Each province's electoral office",
+          "valid_from": "2014-04-08"
+        }
+      ]
+    },
+    {
+      "tier": "province",
+      "category": "indirect",
+      "goal": "local",
+      "valid_from": "2014-04-08",
+      "first_held": "2014-10-12",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "nir_l56_2014",
+      "est_votes": 100000,
+      "effort": 5,
+      "access": [
+        {
+          "platform": "Regione Siciliana, Dipartimento delle autonomie locali",
+          "url": "https://www.regione.sicilia.it/istituzioni/regione/strutture-regionali/assessorato-autonomie-locali-funzione-pubblica/dipartimento-autonomie-locali/elezioni-amministrative-presidenti-consigli-liberi-consorzi-comunali-consigli-7",
+          "format": "html",
+          "access": "open",
+          "checked": "2026-11-13",
+          "checked_at": "2026-11-13",
+          "first_date": "2025-04-27",
+          "last_date": "2025-04-27",
+          "source": "sicilia_secondo_livello_2025",
+          "within": "IT-82",
+          "evidence": "Sicily's second-level elections of 27 April 2025"
+        }
+      ],
+      "dates": [],
+      "key": "consiglio_provinciale_indiretto",
+      "name": "Consiglio provinciale (elezione di secondo grado)",
+      "name_en": "Provincial councils, indirect election",
+      "note": "Since Law 56/2014 the province's mayors and municipal councillors elect the council for two years (c. 68-69) by a vote weighted by their comuni's population, on lists of sitting mayors and councillors; Sicily's free consortia held their first such elections on 27 April 2025. Results are posted by each province.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "county"
+          ],
+          "valid_from": "2014-04-08"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "nir_l56_2014",
+          "locator": "https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:legge:2014-04-07;56",
+          "period_years": 2,
+          "term_years": 2,
+          "called": true,
+          "selection": "elected",
+          "administered_by": "Each province's electoral office",
+          "valid_from": "2014-04-08"
+        }
+      ]
+    },
+    {
+      "key": "consiglio_metropolitano",
+      "tier": "metropolitan_city",
+      "name": "Consiglio metropolitano",
+      "name_en": "Metropolitan councils",
+      "category": "indirect",
+      "goal": "local",
+      "valid_from": "2014-04-08",
+      "first_held": "2014-09-28",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "Elected for five years by the mayors and councillors of the metropolitan city's comuni with a weighted vote, and again within 60 days of each new council of the capital (Law 56/2014 c. 21 and 25); the metropolitan mayor is the capital's mayor ex officio (c. 19), so no election.",
+      "source": "nir_l56_2014",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "county"
+          ],
+          "name_pattern": "metropolitan",
+          "valid_from": "2014-04-08"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "nir_l56_2014",
+          "locator": "https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:legge:2014-04-07;56",
+          "period_years": 5,
+          "term_years": 5,
+          "called": true,
+          "administered_by": "Each metropolitan city's electoral office",
+          "valid_from": "2014-04-08"
+        }
+      ],
+      "est_votes": 15000,
+      "effort": 5,
+      "dates": []
+    },
+    {
+      "key": "consiglio_comunale",
+      "tier": "comune",
+      "name": "Consiglio comunale",
+      "name_en": "Municipal councils",
+      "category": "council",
+      "goal": "local",
+      "first_held": "1946-03-10",
+      "earliest_record": "1964-11-22",
+      "measure": {
+        "unit": "polity",
+        "fine": [
+          "it.sezione"
+        ]
+      },
+      "finest_note": "comune; polling section in recent Eligendo files",
+      "note": "Every comune elects its council for five years (four from 1993 to 1999) on one Sunday of the ordinary round between 15 April and 15 June, or the next year's round after an early dissolution, so each comune keeps its own cycle and about a fifth vote each year. Comuni up to 15,000 inhabitants: a single round, two-thirds of the seats to the winning mayor's list; larger ones: a majority bonus to the mayor's coalition. Sicily, Sardinia, Friuli-Venezia Giulia, Trentino-Alto Adige, and the Aosta Valley run their own municipal elections.",
+      "source": "nir_l182_1991",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "local"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "source": "nir_l182_1991",
+          "locator": "https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:legge:1991-06-07;182~art1",
+          "period_years": 5,
+          "term_years": 5,
+          "called": true,
+          "administered_by": "Ministero dell'Interno through the prefectures (ordinary-statute regions and Sardinia); the region (Sicily, Friuli-Venezia Giulia, Trentino-Alto Adige, Aosta Valley)",
+          "vacancy_rule": "A council dissolved early (resignations, failure to pass the budget, or infiltration by organized crime) is run by a commissioner until the next ordinary round."
+        }
+      ],
+      "access": [
+        {
+          "platform": "Eligendo open data (Ministero dell'Interno)",
+          "url": "https://dait.interno.gov.it/documenti/opendata/comunali/comunali-{YYYYMMDD}.zip",
+          "format": "zip (txt, csv, xlsx)",
+          "access": "open",
+          "checked": "2026-11-13",
+          "checked_at": "2026-11-13",
+          "first_date": "1964-11-22",
+          "last_date": "2026-06-07",
+          "license": "none stated; open by default under art. 52 of the Codice dell'amministrazione digitale",
+          "finest": "it.sezione",
+          "finest_scheme": "it.sezione",
+          "source": "eligendo_opendata",
+          "evidence": "166 comunali zips from 22 November 1964 to 7 June 2026 (1964-1985 one date per five-year cycle, then every date); 2024 has list votes by polling section"
+        },
+        {
+          "platform": "Regione autonoma Friuli Venezia Giulia, autonomie locali",
+          "url": "https://autonomielocali.regione.fvg.it/aall/opencms/AALL/Elezioni/",
+          "format": "html, pdf",
+          "access": "open",
+          "checked": "2026-11-13",
+          "checked_at": "2026-11-13",
+          "source": "fvg_comunali_2022",
+          "evidence": "a page per round of comunali (2022 confirmed; 2012 and 2013 reports seen)"
+        },
+        {
+          "platform": "Regione autonoma Valle d'Aosta, Elezioni comunali",
+          "url": "https://www.regione.vda.it/amministrazione/Elezioni/Dati_e_risultati/Risultati/Elezioni_comunali/default_i.aspx",
+          "format": "html, pdf",
+          "access": "open",
+          "checked": "2026-11-13",
+          "checked_at": "2026-11-13",
+          "source": "vda_comunali",
+          "within": "IT-23",
+          "finest": "it.comune",
+          "finest_scheme": "it.comune",
+          "evidence": "results by comune of each municipal round (2015 and 2025 seen)"
+        },
+        {
+          "platform": "Provincia autonoma di Bolzano, Gemeindewahlen press export",
+          "url": "https://press.gemeindewahlen.bz.it/",
+          "format": "html",
+          "access": "open",
+          "checked": "2026-11-13",
+          "checked_at": "2026-11-13",
+          "source": "bz_gemeindewahlen",
+          "evidence": "2025 municipal results only"
+        },
+        {
+          "platform": "Provincia autonoma di Trento, elezioni",
+          "url": "https://elezioni.provincia.tn.it/",
+          "format": "html",
+          "access": "open",
+          "checked": "2026-11-13",
+          "checked_at": "2026-11-13",
+          "source": "trento_elezioni_precedenti",
+          "evidence": "2025 municipal results linked from the home page; older rounds not found"
+        },
+        {
+          "platform": "Sardegna Elezioni",
+          "url": "https://elezioni.regione.sardegna.it/",
+          "format": "html",
+          "access": "open",
+          "checked": "2026-11-13",
+          "checked_at": "2026-11-13",
+          "source": "sardegna_elezioni",
+          "evidence": "the region's results site; years not yet read"
+        }
+      ],
+      "est_votes": 28000000,
+      "effort": 2,
+      "dates": []
+    },
+    {
+      "key": "sindaco",
+      "tier": "comune",
+      "name": "Sindaco",
+      "name_en": "Mayors",
+      "category": "executive",
+      "goal": "local",
+      "valid_from": "1993-03-25",
+      "first_held": "1993-06-06",
+      "earliest_record": "1993-06-06",
+      "measure": {
+        "unit": "polity",
+        "fine": [
+          "it.sezione"
+        ]
+      },
+      "note": "Elected directly with the council since Law 81/1993 (before, by the council). Comuni up to 15,000 inhabitants: one round by plurality, a tie going to a runoff (TUEL art. 71); above 15,000: absolute majority, else a runoff between the top two on the second Sunday after (art. 72). Sicily and the other special-statute regions set their own thresholds.",
+      "source": "nir_l81_1993",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "local",
+            "runoff"
+          ],
+          "office_kinds": [
+            "mayor"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "source": "nir_tuel",
+          "locator": "https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:decreto.legislativo:2000-08-18;267~art72",
+          "period_years": 5,
+          "term_years": 5,
+          "called": true,
+          "runoff": "majority",
+          "runoff_threshold": 0.5,
+          "runoff_rule": "Comuni above 15,000 inhabitants: a runoff between the top two on the second Sunday after the first round when nobody wins an absolute majority; smaller comuni elect by plurality.",
+          "administered_by": "Ministero dell'Interno through the prefectures; the special-statute regions for their own comuni"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Eligendo open data (Ministero dell'Interno)",
+          "url": "https://dait.interno.gov.it/documenti/opendata/comunali/comunali-{YYYYMMDD}.zip",
+          "format": "zip (txt, csv, xlsx)",
+          "access": "open",
+          "checked": "2026-11-13",
+          "checked_at": "2026-11-13",
+          "first_date": "1993-06-06",
+          "last_date": "2026-06-07",
+          "license": "none stated; open by default under art. 52 of the Codice dell'amministrazione digitale",
+          "finest": "it.sezione",
+          "finest_scheme": "it.sezione",
+          "source": "eligendo_opendata",
+          "evidence": "comunali zips carry the mayoral candidates and both rounds (TURNO 1 and 2)"
+        },
+        {
+          "platform": "Regione autonoma Friuli Venezia Giulia, autonomie locali",
+          "url": "https://autonomielocali.regione.fvg.it/aall/opencms/AALL/Elezioni/",
+          "format": "html, pdf",
+          "access": "open",
+          "checked": "2026-11-13",
+          "checked_at": "2026-11-13",
+          "source": "fvg_comunali_2022",
+          "evidence": "a page per round of comunali (2022 confirmed; 2012 and 2013 reports seen)"
+        },
+        {
+          "platform": "Regione autonoma Valle d'Aosta, Elezioni comunali",
+          "url": "https://www.regione.vda.it/amministrazione/Elezioni/Dati_e_risultati/Risultati/Elezioni_comunali/default_i.aspx",
+          "format": "html, pdf",
+          "access": "open",
+          "checked": "2026-11-13",
+          "checked_at": "2026-11-13",
+          "source": "vda_comunali",
+          "within": "IT-23",
+          "finest": "it.comune",
+          "finest_scheme": "it.comune",
+          "evidence": "results by comune of each municipal round (2015 and 2025 seen)"
+        },
+        {
+          "platform": "Provincia autonoma di Bolzano, Gemeindewahlen press export",
+          "url": "https://press.gemeindewahlen.bz.it/",
+          "format": "html",
+          "access": "open",
+          "checked": "2026-11-13",
+          "checked_at": "2026-11-13",
+          "source": "bz_gemeindewahlen",
+          "evidence": "2025 municipal results only"
+        },
+        {
+          "platform": "Provincia autonoma di Trento, elezioni",
+          "url": "https://elezioni.provincia.tn.it/",
+          "format": "html",
+          "access": "open",
+          "checked": "2026-11-13",
+          "checked_at": "2026-11-13",
+          "source": "trento_elezioni_precedenti",
+          "evidence": "2025 municipal results linked from the home page; older rounds not found"
+        },
+        {
+          "platform": "Sardegna Elezioni",
+          "url": "https://elezioni.regione.sardegna.it/",
+          "format": "html",
+          "access": "open",
+          "checked": "2026-11-13",
+          "checked_at": "2026-11-13",
+          "source": "sardegna_elezioni",
+          "evidence": "the region's results site; years not yet read"
+        }
+      ],
+      "est_votes": 28000000,
+      "effort": 2,
+      "dates": []
+    },
+    {
+      "key": "municipi",
+      "tier": "circoscrizione",
+      "name": "Consigli e presidenti di municipio e di circoscrizione",
+      "name_en": "Sub-municipal councils and presidents",
+      "category": "council",
+      "goal": "local",
+      "contests_per_unit": 2,
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "Comuni above 250,000 inhabitants, and every metropolitan capital, must divide into districts (TUEL art. 17): Rome's 15 municipi, Milan's 9, Naples' 10, Turin's 8 circoscrizioni, Genoa's 9 municipi, Bologna's 6 quartieri, Florence's 5, Venice's 6 municipalità, and others. Their councils and presidents are elected with the city council; smaller comuni abolished theirs in 2010.",
+      "source": "nir_tuel",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "local",
+            "runoff"
+          ],
+          "polity_kinds": [
+            "submunicipal"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "source": "nir_tuel",
+          "locator": "https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:decreto.legislativo:2000-08-18;267~art17",
+          "period_years": 5,
+          "term_years": 5,
+          "called": true,
+          "administered_by": "The comune, with the prefecture"
+        }
+      ],
+      "access": [],
+      "est_votes": 3000000,
+      "effort": 4,
+      "dates": []
+    },
+    {
+      "key": "referendum_comunale",
+      "tier": "comune",
+      "name": "Referendum comunali",
+      "name_en": "Municipal referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "Consultative, abrogative, or proposing referendums each comune may hold under its statute (TUEL art. 8), such as Rome's 2018 referendum on its transit company; held on the municipality's own schedule and published only by the comune.",
+      "source": "nir_tuel",
+      "match": [
+        {
+          "election_kinds": [
+            "local"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "source": "nir_tuel",
+          "locator": "https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:decreto.legislativo:2000-08-18;267~art8",
+          "called": true,
+          "administered_by": "Each comune"
+        }
+      ],
+      "est_votes": 1000000,
+      "effort": 5,
+      "dates": []
+    },
+    {
+      "key": "referendum_art132",
+      "tier": "comune",
+      "name": "Referendum per il distacco di comuni (art. 132 Cost.)",
+      "name_en": "Referendums on moving municipalities between regions",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "State-run referendums in the comuni asking to leave one region for another (Constitution art. 132, Law 352/1970 arts. 42-45), such as the Valmarecchia comuni in 2006 and Sappada in 2008; a majority of the electorate must approve, then Parliament decides.",
+      "source": "nir_l352_1970",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "source": "nir_costituzione",
+          "locator": "https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:costituzione~art132",
+          "called": true,
+          "administered_by": "Ministero dell'Interno; the Corte di cassazione's central office"
+        }
+      ],
+      "est_votes": 50000,
+      "effort": 4,
+      "dates": []
+    },
+    {
+      "key": "primarie",
+      "tier": "national",
+      "name": "Elezioni primarie",
+      "name_en": "Party primaries",
+      "category": "nominating",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "disposition": "out_of_scope",
+      "disposition_reason": "Primaries (the center-left's since 2005, for prime minister, party leader, mayors, and regional presidents) are organized and counted by the parties; no public body administers or certifies them.",
+      "source": "nir_costituzione",
+      "match": [
+        {
+          "election_kinds": [
+            "primary"
+          ],
+          "iso_pattern": "IT*"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "csm",
+      "tier": "national",
+      "name": "Consiglio superiore della magistratura",
+      "name_en": "Superior Council of the Magistracy",
+      "category": "judicial",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "disposition": "out_of_scope",
+      "disposition_reason": "Two-thirds of its members are elected by the magistrates (a professional ballot) and one-third by Parliament in joint session (Constitution art. 104); neither is a popular election.",
+      "source": "nir_costituzione",
+      "match": [
+        {
+          "name_pattern": "magistratura"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "consorzi_bonifica",
+      "tier": "region",
+      "name": "Consorzi di bonifica",
+      "name_en": "Land reclamation and irrigation consortia",
+      "category": "special_purpose",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "disposition": "out_of_scope",
+      "disposition_reason": "Their assemblies are elected by the landowners who pay the consortium's levies, voting by contribution class in ballots each consortium runs; they are not public elections.",
+      "source": "nir_costituzione",
+      "match": [
+        {
+          "polity_kinds": [
+            "special_district"
+          ],
+          "name_pattern": "bonifica"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "comunita_montane",
+      "tier": "region",
+      "name": "Comunità montane e unioni di comuni",
+      "name_en": "Mountain communities and unions of municipalities",
+      "category": "indirect",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "disposition": "out_of_scope",
+      "disposition_reason": "Their bodies are made up of members the member comuni's councils designate (TUEL arts. 27 and 32); no vote is held or published.",
+      "source": "nir_tuel",
+      "match": [
+        {
+          "name_pattern": "comunit. montan|unione dei comuni|unione montana"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "comun_general_fascia",
+      "tier": "autonomous_province",
+      "name": "Comun general de Fascia",
+      "name_en": "General Community of Fassa (Ladin)",
+      "category": "special_purpose",
+      "goal": "local",
+      "contests_per_unit": 2,
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "The Ladin community of the Fassa valley in Trentino elects its Procurador directly, with a runoff, and its Consei general by PR; last held 4 May 2025.",
+      "source": "trento_fascia_2025",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "local",
+            "runoff"
+          ],
+          "name_pattern": "Fascia|Procurador"
+        }
+      ],
+      "cadence": [
+        {
+          "source": "trento_fascia_2025",
+          "period_years": 5,
+          "term_years": 5,
+          "called": true,
+          "runoff": "majority",
+          "administered_by": "Provincia autonoma di Trento"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Provincia autonoma di Trento, elezioni",
+          "url": "https://elezioni.provincia.tn.it/Elezioni-Comun-general-de-Fascia-2025/Risultati",
+          "format": "html",
+          "access": "open",
+          "checked": "2026-11-13",
+          "checked_at": "2026-11-13",
+          "first_date": "2025-05-04",
+          "last_date": "2025-05-04",
+          "source": "trento_fascia_2025",
+          "evidence": "2025 results page"
+        }
+      ],
+      "est_votes": 5000,
+      "effort": 2,
+      "dates": []
     }
   ]
 }
