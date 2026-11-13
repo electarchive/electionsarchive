@@ -6,6 +6,7 @@ from datetime import date
 from html import unescape
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlencode
 from uuid import UUID
 
 import polars as pl
@@ -59,6 +60,10 @@ BLANK_NOTE = (
 )
 
 
+def iso_text(text: str | None) -> date | None:
+    return None if text is None else day(text)
+
+
 def day(text: str) -> date:
     return date(*map(int, reversed(text.split("."))))
 
@@ -71,16 +76,64 @@ def fold(text: str) -> str:
     return unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode().casefold().replace("-", " ")
 
 
+SPARQL = "https://query.wikidata.org/sparql?"
+HOLDERS = SPARQL + urlencode(
+    {
+        "query": "SELECT ?p ?l ?b ?d ?start ?end WHERE { ?p p:P39 ?st . ?st ps:P39 wd:Q11811941 . "
+        "OPTIONAL { ?st pq:P580 ?start } OPTIONAL { ?st pq:P582 ?end } ?p rdfs:label ?l FILTER(lang(?l) = 'de') "
+        "OPTIONAL { ?p wdt:P569 ?b } OPTIONAL { ?p wdt:P570 ?d } }",
+        "format": "json",
+    }
+)
+POLITICIANS = SPARQL + urlencode(
+    {
+        "query": "SELECT ?p ?l ?b WHERE { ?p wdt:P27 wd:Q39 ; wdt:P106 wd:Q82955 . FILTER EXISTS { ?p wdt:P39 [] } "
+        "?p rdfs:label ?l FILTER(lang(?l) = 'de') OPTIONAL { ?p wdt:P569 ?b } }",
+        "format": "json",
+    }
+)
+WIKIDATA_TITLE = "Members of the Swiss Federal Council (P39 Q11811941) and Swiss politicians"
+LIST_ALIASES = {"Wahlen Fritz Traugott": "Wahlen Friedrich Traugott", "Kläti": "Klöti", "Koechelin": "Koechlin"}
+SURNAMES = {"Brunschwig Graf Martine": "Martine Brunschwig Graf"}
+PICKS = {("05.12.1973", "Schmid"): "Schmid Arthur", ("01.12.1989", "Weber"): "Weber Monika"}
+
+
 def fetch() -> None:
     raw.fetch(SOURCE, PDF, suffix=".pdf")
+    for url in (HOLDERS, POLITICIANS):
+        raw.fetch(SOURCE, url, suffix=".json")
     fetch_pages()
+
+
+def wikidata_rows(url: str) -> list[dict[str, str]]:
+    bindings = json.loads(raw.cached(SOURCE, url).path.read_text(encoding="utf-8"))["results"]["bindings"]
+    return [{key: value["value"] for key, value in row.items()} for row in bindings]
+
+
+def iso(text: str | None) -> date | None:
+    return date.fromisoformat(text[:10]) if text and text[:1].isdigit() else None
+
+
+def candidate_names(lines: list[str]) -> list[str]:
+    start = next(i for i, line in enumerate(lines) if "Wahl des Bundesrates ab 1919 - Stimmen haben erhalten" in line)
+    end = next(
+        i for i, line in enumerate(lines) if i > start and line.strip() == "Mitglieder des Bundesrates seit 1848"
+    )
+    out: list[str] = []
+    for line in lines[start + 1 : end]:
+        row = re.match(r"(\S.*?)(?:\s{2,}|$)", line)
+        if row and not row[1].startswith(("Nom", "Name", "*)")):
+            name = re.sub(r"\s*\(\d+\s*\)", "", row[1]).strip()
+            if name not in out:
+                out.append(name)
+    return out
 
 
 def numbers(line: str, after: int) -> list[tuple[int, int]]:
     return [(m.end(), int(m.group())) for m in NUMBER.finditer(" " * after + line[after:])]
 
 
-def text() -> list[str]:
+def pdf_lines() -> list[str]:
     path = raw.cached(SOURCE, PDF).path
     out = subprocess.run(["pdftotext", "-layout", str(path), "-"], check=True, capture_output=True, text=True).stdout
     return [line.replace("\f", "").replace(" ", " ").rstrip() for line in out.split("\n")]
@@ -119,6 +172,7 @@ def members(lines: list[str]) -> list[dict[str, Any]]:
                     "born": found[0],
                     "elected": found[1],
                     "left": found[2] if len(found) > 2 else None,
+                    "died": found[3] if len(found) > 3 else None,
                 }
             )
     return out
@@ -189,7 +243,7 @@ def read_block(block: list[str]) -> list[dict[str, Any]]:
 
 
 def parse() -> list[dict[str, Any]]:
-    lines = text()
+    lines = pdf_lines()
     people = members(lines)
     out: list[dict[str, Any]] = []
     for block in blocks(lines):
@@ -487,6 +541,45 @@ def emit() -> Path:
     for seat in bulletin_seats:
         seat["source"] = bulletin_url(seat["day"])
     seats = sorted([*pdf_seats, *page_seats, *bulletin_seats], key=lambda seat: seat["day"])
+    lines = pdf_lines()
+    people = members(lines)
+    fulls = {seat["member"]["name"]: seat["full"] for seat in pdf_seats}
+    universe: dict[str, dict[str, Any]] = {}
+    for member in people:
+        universe[fold(member["name"])] = {"name": member["name"], "member": member, "died": iso_text(member["died"])}
+    for each in candidate_names(lines):
+        name_ = LIST_ALIASES.get(each, each)
+        universe.setdefault(fold(name_), {"name": name_, "member": None, "died": None})
+    holders = wikidata_rows(HOLDERS)
+    politicians = wikidata_rows(POLITICIANS)
+
+    def find(label: str, day_: date, text_: str) -> dict[str, Any] | None:
+        if "(" in label:
+            return None
+        base = fold(LIST_ALIASES.get(label, label))
+        hits = [
+            entry
+            for key, entry in universe.items()
+            if (key == base or key.startswith(base + " ")) and (entry["died"] is None or entry["died"] >= day_)
+        ]
+        pick = PICKS.get((text_, label))
+        if pick is not None:
+            hits = [entry for entry in hits if entry["name"] == pick]
+        return hits[0] if len(hits) == 1 else None
+
+    def full_name(entry: dict[str, Any], label: str) -> str:
+        if entry["name"] in fulls:
+            return fulls[entry["name"]]
+        if entry["name"] in SURNAMES:
+            return SURNAMES[entry["name"]]
+        name_, base = entry["name"], fold(LIST_ALIASES.get(label, label))
+        cut = next((n for n in range(1, len(name_) + 1) if fold(name_[:n]) == base), None)
+        if cut is None or cut == len(name_):
+            cut = name_.index(" ")
+        elif name_[cut] == "-":
+            cut = name_.find(" ", cut)
+        return f"{name_[cut:].strip()} {name_[:cut].strip()}"
+
     with connect() as conn:
         cs = Changeset(
             conn,
@@ -561,6 +654,7 @@ def emit() -> Path:
         cs.add("note", entity_id=system, kind="methodology", body_md=SYSTEM_NOTE)
 
         persons: dict[str, UUID] = {}
+        items_of: dict[str, str] = {}
 
         def person(full: str) -> UUID:
             if full not in persons:
@@ -573,6 +667,7 @@ def emit() -> Path:
         values: list[dict[str, Any]] = []
         elections: dict[date, tuple[UUID, str]] = {}
         seat_numbers: dict[date, int] = {}
+        first_contest: dict[tuple[str, date], UUID] = {}
         for seat in seats:
             day_ = seat["day"]
             if day_ not in elections:
@@ -631,6 +726,8 @@ def emit() -> Path:
                 note = caveat(rounds, index - 1)
                 if note:
                     cs.add("note", entity_id=contest, kind="caveat", body_md=note)
+                if index == 1:
+                    first_contest[seat["full"], day_] = contest
                 previous = contest
                 result_set = cs.key(f"{SOURCE}.result_set", key)
                 cs.add(
@@ -667,20 +764,22 @@ def emit() -> Path:
                 for label_, votes in listed:
                     is_winner = fold(label_) == prefix or fold(label_).startswith(prefix + " ")
                     option = cs.key("ch.option", f"{key}:{slug(label_)}")
+                    entry = None if is_winner else find(label_, day_, f"{day_:%d.%m.%Y}")
                     cs.add(
                         "contest_option",
                         id=option,
                         contest_id=contest,
-                        kind="candidate" if is_winner else "write_in",
+                        kind="candidate" if is_winner or entry is not None else "write_in",
                         ballot_label=label_,
                     )
-                    if is_winner:
+                    if is_winner or entry is not None:
                         cs.add(
                             "candidacy",
                             id=cs.key("ch.candidacy", f"{key}:{slug(label_)}"),
-                            person_id=winner_id,
+                            person_id=winner_id if entry is None else person(full_name(entry, label_)),
                             option_id=option,
                         )
+                    if is_winner:
                         won = option
                     value(VOTES, option, votes)
                 if col.get("more"):
@@ -702,6 +801,97 @@ def emit() -> Path:
                     if won is None:
                         raise ValueError(f"{day_}: {seat['full']} not on the last ballot")
                     cs.add("outcome", result_set_id=result_set, option_id=won, kind="elected")
+        wikidata = cs.source("Wikidata", WIKIDATA_TITLE)
+        cs.add(
+            "source",
+            id=wikidata,
+            kind="wikidata",
+            publisher="Wikidata",
+            title=WIKIDATA_TITLE,
+            url="https://www.wikidata.org/wiki/Q11811941",
+            license="CC0 1.0",
+            license_url="https://creativecommons.org/publicdomain/zero/1.0/",
+        )
+        for url in (HOLDERS, POLITICIANS):
+            cs.artifact(raw.cached(SOURCE, url), wikidata)
+
+        by_born: dict[date, list[dict[str, str]]] = {}
+        by_label: dict[str, dict[str, dict[str, str]]] = {}
+        for row in holders:
+            born = iso(row.get("b"))
+            if born is not None:
+                by_born.setdefault(born, []).append(row)
+        for row in [*holders, *politicians]:
+            by_label.setdefault(fold(row["l"]), {})[row["p"].rsplit("/", 1)[1]] = row
+
+        def item_of(full: str, born: str | None) -> str | None:
+            if born is not None:
+                items = {row["p"].rsplit("/", 1)[1] for row in by_born.get(day(born), [])}
+                narrowed = {i for i in items if fold(full).split()[-1] in fold(by_label_of[i])}
+                if len(narrowed) == 1:
+                    return next(iter(narrowed))
+            found = by_label.get(fold(full), {})
+            if len(found) == 1:
+                return next(iter(found))
+            parts = fold(full).split()
+            loose = {
+                i
+                for label, rows in by_label.items()
+                for i, row in rows.items()
+                if label.split()[0][:4] == parts[0][:4] and label.split()[-1:] == parts[-1:]
+            }
+            return next(iter(loose)) if len(loose) == 1 else None
+
+        by_label_of = {row["p"].rsplit("/", 1)[1]: row["l"] for row in [*holders, *politicians]}
+        born_of = {fulls[member["name"]]: member["born"] for member in people if member["name"] in fulls}
+        known = {
+            value: entity
+            for value, entity in conn.execute(
+                "select value, entity_id from external_id where scheme = 'wikidata' and value = any(%s)",
+                [list(by_label_of)],
+            ).fetchall()
+        }
+        linked: set[str] = set()
+        for full, entity in persons.items():
+            item = item_of(full, born_of.get(full))
+            if item is None or item in linked or known.get(item, entity) != entity:
+                continue
+            linked.add(item)
+            cs.add("external_id", entity_id=entity, scheme="wikidata", value=item)
+            items_of[full] = item
+
+        ends: dict[str, list[date | None]] = {}
+        for row in holders:
+            ends.setdefault(row["p"].rsplit("/", 1)[1], []).append(iso(row.get("end")))
+        deaths = {row["p"].rsplit("/", 1)[1]: iso(row.get("d")) for row in holders}
+        tenures: dict[str, tuple[date, date | None, date | None]] = {}
+        for member in people:
+            if member["name"] in fulls:
+                tenures[fulls[member["name"]]] = (
+                    day(member["elected"]),
+                    iso_text(member["left"]),
+                    iso_text(member["died"]),
+                )
+        for seat in seats:
+            tenures.setdefault(seat["full"], (seat["day"], None, None))
+        for full, (start, end, died) in tenures.items():
+            item = items_of.get(full)
+            if end is None and item is not None and None not in ends.get(item, [None]):
+                end = max(d for d in ends[item] if d is not None)
+            if died is None and item is not None:
+                died = deaths.get(item)
+            near = [c for (who, d), c in first_contest.items() if who == full and abs((d - start).days) <= 14]
+            cs.add(
+                "tenure",
+                id=cs.key(f"{SOURCE}.tenure", f"{start}:{slug(full)}"),
+                person_id=persons[full],
+                office_id=office,
+                from_date=start,
+                to_date=end,
+                acquired_via="elected",
+                ended_via=None if end is None else ("died" if end == died else "resigned"),
+                contest_id=near[0] if near else None,
+            )
         cs.frame(
             "result_value",
             pl.DataFrame(
