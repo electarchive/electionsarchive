@@ -988,6 +988,7 @@ export const seats = {
             cross join lateral (
               select sum(y.value) as value from result_rollup y
               where y.result_set_k = rs.k and y.area_k = na.k and y.option_k = o.k and y.measure = 1 and y.count_round = 0
+                and (y.channel = 0 or not exists (select 1 from result_rollup z where z.result_set_k = y.result_set_k and z.area_k = y.area_k and z.option_k = y.option_k and z.measure = y.measure and z.count_round = y.count_round and z.channel = 0))
             ) y
             where o.contest_id = nc.id and y.value is not null
             order by y.value desc limit 1
@@ -1355,6 +1356,7 @@ export const seats = {
             cross join lateral (
               select sum(y.value) as value from result_rollup y
               where y.result_set_k = rs.k and y.area_k = na.k and y.option_k = o.k and y.measure = 1 and y.count_round = 0
+                and (y.channel = 0 or not exists (select 1 from result_rollup z where z.result_set_k = y.result_set_k and z.area_k = y.area_k and z.option_k = y.option_k and z.measure = y.measure and z.count_round = y.count_round and z.channel = 0))
             ) y
             where o.contest_id = nc.id and y.value is not null
             order by y.value desc limit 1
@@ -2087,7 +2089,8 @@ export const seats = {
           select 'list' as tier, o.id, o.party_id, o.kind::text as kind, o.ballot_label,
             (select sum(y.value)::float8 from result_rollup y
               where y.result_set_k = rs.k and y.area_k = c.region_k and y.option_k = o.k
-                and y.measure = 1 and y.count_round = 0) as votes,
+                and y.measure = 1 and y.count_round = 0
+                and (y.channel = 0 or not exists (select 1 from result_rollup z where z.result_set_k = y.result_set_k and z.area_k = y.area_k and z.option_k = y.option_k and z.measure = y.measure and z.count_round = y.count_round and z.channel = 0))) as votes,
             (select max(coalesce(x.seats, 1))::int from outcome x
               where x.result_set_id = rs.id and x.option_id = o.id and x.candidacy_id is null and x.kind in ('won', 'elected')) as seats,
             null::uuid as person, null::text as ballot

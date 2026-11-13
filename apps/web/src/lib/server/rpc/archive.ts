@@ -18072,7 +18072,9 @@ export const elections = {
                   left join lateral (
                     select x.measure, sum(x.value) as value from result_rollup x
                     where x.result_set_k = t.k and x.area_k = t.area and x.option_k = 0
-                      and x.count_round = 0 and x.measure in (2, 3, 4, 5, 14) group by x.measure offset 0
+                      and x.count_round = 0 and x.measure in (2, 3, 4, 5, 14)
+                      and (x.channel = 0 or not exists (select 1 from result_rollup z where z.result_set_k = x.result_set_k and z.area_k = x.area_k and z.option_k = x.option_k and z.measure = x.measure and z.count_round = x.count_round and z.channel = 0))
+                    group by x.measure offset 0
                   ) x on true
                   group by t.root, t.top, t.k
                 ),
@@ -19307,6 +19309,7 @@ export const elections = {
             select sum(v.value) from tops t
             join result_value v on v.result_set_k = t.k and v.unit_k = t.unit_k and v.option_k = o.k
               and v.measure = 1 and v.count_round = 0
+              and (v.channel = 0 or not exists (select 1 from result_value z where z.result_set_k = v.result_set_k and z.unit_k = v.unit_k and z.option_k = v.option_k and z.measure = v.measure and z.count_round = v.count_round and z.channel = 0))
             where t.k = s.k
           ), 0)::float8 as votes,
           x.kinds as outcome,

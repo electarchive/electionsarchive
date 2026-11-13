@@ -1881,7 +1881,8 @@ export async function comparison(ids: Array<string>) {
                 cross join lateral (
                   select r.value, r.count_round from result_rollup r
                   where r.result_set_k = pl.set and r.area_k = pl.area and r.option_k = o.k
-                    and r.measure = 1 offset 0
+                    and r.measure = 1
+                    and (r.channel = 0 or not exists (select 1 from result_rollup z where z.result_set_k = r.result_set_k and z.area_k = r.area_k and z.option_k = r.option_k and z.measure = r.measure and z.count_round = r.count_round and z.channel = 0)) offset 0
                 ) r
                 group by o.contest_id, top, r.count_round
               ) rounds
