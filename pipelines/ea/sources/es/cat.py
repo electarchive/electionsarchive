@@ -1,6 +1,7 @@
 import io
 import json
 import re
+import subprocess
 import unicodedata
 import zipfile
 from collections import Counter, defaultdict
@@ -15,7 +16,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "es.cat"
-VERSION = "1"
+VERSION = "2"
 API = "https://resultats.dadeselectorals.gencat.cat/webelec/api"
 PUBLISHER = "Generalitat de Catalunya"
 TITLE = "Resultats electorals: eleccions al Parlament de Catalunya (Departament de la Presidència)"
@@ -115,6 +116,60 @@ def dhondt(counts: dict[str, int], valid: int, seats: int) -> Counter[str]:
     return Counter(party for *_, party in quotients[:seats])
 
 
+def elected(code: str) -> pl.DataFrame:
+    [url] = [row["urlElectes"] for row in elections() if row["codi"] == code]
+    path = raw.cached(SOURCE, str(url)).path
+    text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True).stdout
+    rows: list[dict[str, object]] = []
+    province = heading = None
+    for line in text.splitlines():
+        line = line.strip()
+        if not line or line.startswith(("eleccions", "Candidats i candidates")) or "Parlament de" in line:
+            continue
+        if line.startswith("Circumscripció de "):
+            province = {value: key for key, value in PROVINCES.items()}[line.removeprefix("Circumscripció de ")]
+            heading = None
+        elif match := re.fullmatch(r"(\d+)\.\s*(.+)", line):
+            assert province is not None and heading is not None, line
+            rows.append({"province": province, "list": heading, "rank": int(match[1]), "name": match[2]})
+        elif line.startswith("Candidatura "):
+            heading = line.removeprefix("Candidatura ")
+        else:
+            heading = f"{heading}{'' if heading and heading.endswith('-') else ' '}{line}"
+    return pl.DataFrame(rows)
+
+
+def words(text: str) -> set[str]:
+    folded = unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode().lower()
+    return set(re.findall(r"[a-z0-9]+", folded)) - {"de", "i", "per", "la", "del", "dels", "catalunya"}
+
+
+def lead(sigles: str) -> str:
+    return re.split(r"[^A-Z]+", sigles.upper().replace(".", ""))[0]
+
+
+def match(heading: str, lists: pl.DataFrame) -> str:
+    sigles = re.search(r"\(([^()]*)\)$", heading)
+    name = re.sub(r"\s*\([^()]*\)$", "", heading)
+    key = party_key(sigles[1] if sigles else "", name)
+    rows = list(lists.filter(pl.col("seats") > 0).iter_rows(named=True))
+    for test in (
+        lambda row: words(row["name"]) == words(name),
+        lambda row: row["party"] == key,
+        lambda row: key.startswith(row["party"]) or row["party"].startswith(key),
+        lambda row: sigles is not None and lead(row["sigles"]) == lead(sigles[1]),
+    ):
+        if len(hits := [row["party"] for row in rows if test(row)]) == 1:
+            return hits[0]
+    scores = sorted(
+        ((len(words(row["name"]) & words(name)) / len(words(row["name"]) | words(name)), row["party"]) for row in rows),
+        reverse=True,
+    )
+    if scores[0][0] < 0.25 or (len(scores) > 1 and scores[1][0] == scores[0][0]):
+        raise ValueError(f"no list matches {heading}")
+    return scores[0][1]
+
+
 def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
     tables: dict[str, list[pl.DataFrame]] = defaultdict(list)
@@ -141,8 +196,25 @@ def parse() -> None:
             won = dhondt(dict(zip(part["party"], part["votes"])), row["valid"], int(part["seats"].sum()))
             if any(won[party] != seats for party, seats in zip(part["party"], part["seats"])):
                 print(f"{code} {row['province']}: D'Hondt with a 3% threshold does not give the declared seats")
+        members = elected(code)
+        members = members.with_columns(
+            party=pl.struct("province", "list").map_elements(
+                lambda row: match(row["list"], lists.filter(pl.col("province") == row["province"])),
+                return_dtype=pl.String,
+            )
+        ).drop("list")
+        if members.select("province", "party", "rank").is_duplicated().any():
+            raise ValueError(f"{code}: two elected members share a list rank")
+        counts = members.group_by("province", "party").agg(named=pl.len())
+        checked = counts.join(lists.select("province", "party", "seats"), on=["province", "party"])
+        kept = checked.filter(pl.col("named") <= pl.col("seats"))
+        for row in checked.join(kept, on=["province", "party"], how="anti").iter_rows(named=True):
+            print(f"{code} {row['province']} {row['party']}: {row['named']} names for {row['seats']} seats, skipped")
+        for row in kept.filter(pl.col("named") < pl.col("seats")).iter_rows(named=True):
+            print(f"{code} {row['province']} {row['party']}: {row['named']} names for {row['seats']} seats")
         pieces = {
             "lists": lists,
+            "elected": members.join(kept.select("province", "party"), on=["province", "party"], how="semi"),
             "provinces": totals,
             "municipalities": accounting(
                 table(code, "MU", "Participació"), province, municipality, pl.col("Nom Municipi").alias("name")
@@ -189,6 +261,14 @@ PROVINCE_METHOD = (
     "which Spanish electoral law counts as valid, are stored apart. The seats are the numbers the file declares for "
     "each list. Votes of residents abroad (CERA) are included."
 )
+ELECTED = (
+    " The elected members of each list, with their places on it, come from the Generalitat's list of members elected "
+    "in each constituency."
+)
+SHORT = (
+    " That list names {named} of the {seats} members elected here, so the others are not named; for any list it "
+    "names more members than the list won seats, none of that list's members are stored."
+)
 DHONDT_DIFFERS = (
     " D'Hondt with a 3% threshold applied to the votes printed here gives a different split from the declared "
     "seats, which are stored as published."
@@ -219,6 +299,7 @@ def emit() -> Path:
     municipality_votes = pl.read_parquet(PARSED / "municipality_votes.parquet")
     mesas = pl.read_parquet(PARSED / "mesas.parquet")
     mesa_votes = pl.read_parquet(PARSED / "mesa_votes.parquet")
+    members = pl.read_parquet(PARSED / "elected.parquet")
     with connect() as conn:
         cs = Changeset(
             conn,
@@ -253,6 +334,9 @@ def emit() -> Path:
         for code, _ in cached():
             for level in LEVELS:
                 cs.artifact(raw.cached(SOURCE, export(code, level)), source)
+        for election in elections():
+            if isinstance(url := election.get("urlElectes"), str):
+                cs.artifact(raw.cached(SOURCE, url), source)
 
         known = dict(
             conn.execute(
@@ -335,6 +419,7 @@ def emit() -> Path:
                 if (value := row[field]) is not None:
                     values.append((str(result_set), str(unit), None, measure, value, channel))
 
+        written: dict[UUID, str] = {}
         newest = max(provinces["year"])
         for code, day in cached():
             year = day.year
@@ -397,11 +482,17 @@ def emit() -> Path:
                         cs.add("note", entity_id=result_set, kind="methodology", body_md=body_md)
                     return result_set
 
-                note = PROVINCE_METHOD
+                declared = members.filter((pl.col("year") == year) & (pl.col("province") == province)).sort(
+                    "party", "rank"
+                )
+                note = PROVINCE_METHOD + ELECTED
+                if declared.height < seats:
+                    note += SHORT.format(named=declared.height, seats=seats)
                 won = dhondt(dict(zip(rows["party"], rows["votes"])), total["valid"], seats)
                 if any(won[party] != count for party, count in zip(rows["party"], rows["seats"])):
                     note += DHONDT_DIFFERS
                 province_set = make_set("province", True, [note])
+                written[province_set] = note
                 unit = province_units[province]
                 tally(province_set, unit, total)
                 for entry in rows.iter_rows(named=True):
@@ -416,6 +507,34 @@ def emit() -> Path:
                             kind="won",
                             seats=entry["seats"],
                         )
+                for member in declared.iter_rows(named=True):
+                    person_key = f"{key}:{member['party']}:{member['rank']}"
+                    person = cs.key(f"{SOURCE}.person", person_key)
+                    if person in cs.minted:
+                        cs.add("person", id=person)
+                        name(person, member["name"], "ca")
+                    option = cs.key(f"{SOURCE}.option", person_key)
+                    cs.add(
+                        "contest_option",
+                        id=option,
+                        contest_id=contest,
+                        kind="candidate",
+                        parent_option_id=options[member["party"]],
+                        party_id=parties[member["party"]],
+                        ballot_label=member["name"],
+                    )
+                    cs.add(
+                        "candidacy",
+                        id=cs.key(f"{SOURCE}.candidacy", person_key),
+                        person_id=person,
+                        option_id=option,
+                        role="list_member",
+                        list_position=member["rank"],
+                        ballot_name=member["name"],
+                        member_of_party_id=parties[member["party"]],
+                        is_independent=False,
+                    )
+                    cs.add("outcome", result_set_id=province_set, option_id=option, kind="elected")
 
                 places = municipalities.filter((pl.col("year") == year) & (pl.col("province") == province))
                 place_votes = municipality_votes.filter((pl.col("year") == year) & (pl.col("province") == province))
@@ -466,26 +585,36 @@ def emit() -> Path:
                     unit, channel = mesa_units[row["mesa"]]
                     values.append((str(mesa_set), str(unit), str(options[row["party"]]), VOTES, row["votes"], channel))
 
-        cs.frame(
-            "reporting_unit",
-            pl.DataFrame(
-                [
-                    {
-                        "id": str(unit),
-                        "polity_id": str(spain),
-                        "scheme_code": scheme,
-                        "code": code,
-                        "parent_id": None if parent is None else str(parent),
-                        "area_relation": relation,
-                        "area_id": None if area is None else str(area),
-                        "kind": kind,
-                    }
-                    for unit, scheme, code, parent, relation, area, kind in unit_rows.values()
-                    if unit in cs.minted
-                ],
-                schema_overrides={"parent_id": pl.String, "area_id": pl.String},
-            ),
-        )
+        for note_id, entity, body_md in conn.execute(
+            "select id, entity_id, body_md from note where entity_id = any(%s) and kind = 'methodology'",
+            (list(written),),
+        ).fetchall():
+            if body_md != written[entity]:
+                cs.add(
+                    "note_drop",
+                    note_id=note_id,
+                    entity_id=entity,
+                    body_md=body_md,
+                    reason="the method note was rewritten",
+                )
+        fresh = [
+            {
+                "id": str(unit),
+                "polity_id": str(spain),
+                "scheme_code": scheme,
+                "code": code,
+                "parent_id": None if parent is None else str(parent),
+                "area_relation": relation,
+                "area_id": None if area is None else str(area),
+                "kind": kind,
+            }
+            for unit, scheme, code, parent, relation, area, kind in unit_rows.values()
+            if unit in cs.minted
+        ]
+        if fresh:
+            cs.frame(
+                "reporting_unit", pl.DataFrame(fresh, schema_overrides={"parent_id": pl.String, "area_id": pl.String})
+            )
         cs.frame(
             "result_value",
             pl.DataFrame(
