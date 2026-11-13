@@ -1,0 +1,24 @@
+{
+  "year": 1877,
+  "day": "1877",
+  "polity": "US-OH",
+  "publisher": "Ohio Senate",
+  "title": "Journal of the Senate of the State of Ohio, 1878, Appendix: abstract of votes cast at the October election, 1877, for governor and lieutenant governor by county",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/journalofsenateo1878ohio/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/journalofsenateo1878ohio"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "governor": "Governor, counties down, a column per candidate (West, Bishop, Bond, Thompson, Johnson, Scattering); the lieutenant governor columns to the right are another office"
+  },
+  "leaves": [
+    959,
+    960,
+    961,
+    962
+  ],
+  "turn": 270,
+  "note": "Leaves are Internet Archive page indexes (printed pages 954 to 957, printed sideways). The election was held October 9, 1877; the archive dates this contest 1877."
+}
