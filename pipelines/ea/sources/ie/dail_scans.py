@@ -1448,6 +1448,12 @@ def emit() -> Path:
                 "select value, entity_id from external_id where scheme = 'ie.dail.party'"
             ).fetchall()
         }
+        for label in DISTINCT:
+            held = strays.get(slug(label))
+            if held is not None:
+                for options in known.values():
+                    if held in options:
+                        options.remove(held)
         parties: dict[str, UUID] = {}
 
         def party_id(label: str) -> UUID:
