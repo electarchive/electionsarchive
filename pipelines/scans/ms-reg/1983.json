@@ -20,6 +20,46 @@
   },
   "pages": [
     {
+      "page": 440,
+      "id": "440-0",
+      "columns": [
+        {
+          "label": "William A. (Bill) Allain (D)",
+          "contest": "governor",
+          "candidate": "William A. Allain"
+        },
+        {
+          "label": "Leon Bramlett (R)",
+          "contest": "governor",
+          "candidate": "Leon Bramlett"
+        },
+        {
+          "label": "Charles Evers (I)",
+          "contest": "governor",
+          "candidate": "Charles Evers"
+        },
+        {
+          "label": "Billy H. Taylor (I)",
+          "contest": "governor",
+          "candidate": "Billie H. Taylor"
+        },
+        {
+          "label": "Helen McMullen Williams (I)",
+          "contest": "governor",
+          "candidate": "Henry McMullen Williams"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.17,
+        0.84,
+        0.86,
+        1.0
+      ],
+      "hint": "Read only the General Election Governor table at the bottom of the page, whose counties are Adams through Bolivar; ignore the primary tables above it.",
+      "bands": 1
+    },
+    {
       "page": 441,
       "id": "441-0",
       "columns": [

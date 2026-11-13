@@ -128,6 +128,65 @@
     },
     {
       "page": 491,
+      "id": "491-p",
+      "columns": [
+        {
+          "label": "Walter Mondale and Geraldine Ferraro (D)",
+          "contest": "president",
+          "candidate": "Walter F. Mondale"
+        },
+        {
+          "label": "Ronald Reagan and George Bush (R)",
+          "contest": "president",
+          "candidate": "Ronald Reagan"
+        },
+        {
+          "label": "David Bergland and Jim Lewis (L)",
+          "contest": "president",
+          "candidate": "David Bergland"
+        },
+        {
+          "label": "Larry Holmes and Gloria LaRiva (I)",
+          "contest": "president",
+          "candidate": "Larry Holmes"
+        },
+        {
+          "label": "Lyndon LaRouche and Billy M. Davis (I)",
+          "contest": "president",
+          "candidate": "Lyndon LaRouche"
+        },
+        {
+          "label": "Mel Mason and Matilde Zimmermann (I)",
+          "contest": "president",
+          "candidate": "Mel Mason"
+        },
+        {
+          "label": "Bob Richards and Maurine Salaman (I)",
+          "contest": "president",
+          "candidate": "Bob Richards"
+        },
+        {
+          "label": "Dennis Serrette and * (I)",
+          "contest": "president",
+          "candidate": "Dennis L. Serrette"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.194,
+        0.12,
+        0.855,
+        0.41
+      ],
+      "hint": "This page continues the President and Vice President table of the previous page, counties Simpson through Yazoo, and ends with the TOTALS row; ignore the United States Senator table.",
+      "bands": 1,
+      "header": [
+        0.0,
+        0.09
+      ]
+    },
+    {
+      "page": 491,
       "id": "491-0",
       "columns": [
         {

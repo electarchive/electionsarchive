@@ -60,6 +60,35 @@
   },
   "pages": [
     {
+      "page": 388,
+      "id": "388-0",
+      "columns": [
+        {
+          "label": "John C. Stennis (D)",
+          "contest": "senate",
+          "candidate": "John C. Stennis"
+        },
+        {
+          "label": "Haley Barbour (R)",
+          "contest": "senate",
+          "candidate": "Haley Barbour"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.2,
+        0.75,
+        0.9,
+        0.975
+      ],
+      "hint": "Read only the United States Senator table at the bottom of the page, whose counties run Adams through Covington; ignore the congressional district tables above it.",
+      "bands": 1,
+      "header": [
+        0.0,
+        0.0463
+      ]
+    },
+    {
       "page": 389,
       "id": "389-0",
       "columns": [
@@ -218,5 +247,8 @@
       ],
       "hint": "Read only the table headed 'Fifth Congressional District'; ignore any other table visible in the image."
     }
-  ]
+  ],
+  "unit_codes": {
+    "Hoimes": "28051"
+  }
 }

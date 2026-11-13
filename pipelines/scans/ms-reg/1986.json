@@ -52,6 +52,31 @@
   },
   "pages": [
     {
+      "page": 431,
+      "id": "431-0",
+      "columns": [
+        {
+          "label": "Jamie L. Whitten (D)",
+          "contest": "house1",
+          "candidate": "Jamie L. Whitten"
+        },
+        {
+          "label": "Larry Cobb(R)",
+          "contest": "house1",
+          "candidate": "Larry Cobb"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.08,
+        0.695,
+        0.9,
+        0.955
+      ],
+      "hint": "Read only the table headed 'First Congressional District' at the bottom of the page, counties Alcorn through Prentiss; ignore the Supreme Court table and the headings above it.",
+      "bands": 1
+    },
+    {
       "page": 432,
       "id": "432-0",
       "columns": [
@@ -98,30 +123,6 @@
         0.597
       ],
       "hint": "Read only the table headed 'Second Congressional District'; ignore any other table visible in the image."
-    },
-    {
-      "page": 432,
-      "id": "432-2",
-      "columns": [
-        {
-          "label": "G. V. (Sonny) Montgomery",
-          "contest": "house3",
-          "candidate": "G.V. (Sonny) Montgomery"
-        },
-        {
-          "label": "Unopposed",
-          "contest": null,
-          "candidate": ""
-        }
-      ],
-      "orientation": "counties_down",
-      "crop": [
-        0.08,
-        0.589,
-        0.861,
-        0.67
-      ],
-      "hint": "Read only the table headed 'Third Congressional District'; ignore any other table visible in the image."
     },
     {
       "page": 432,

@@ -46,7 +46,7 @@
         0.96,
         1.0
       ],
-      "hint": "Read only the table headed 'ELECTIONS SPREADSHEET SUMMARY - OFFICE: U S SENATOR 1 - 1994 GENERAL ELECTION (11/08/1994)'; ignore any other table visible in the image.",
+      "hint": "Read only the table headed 'ELECTIONS SPREADSHEET SUMMARY - OFFICE: U S SENATOR 1 - 1994 GENERAL ELECTION (11/08/1994)'; ignore any other table visible in the image. Each candidate cell prints a vote count followed by a percentage in parentheses; return only the vote count, without the percentage.",
       "bands": 3,
       "header": [
         0.0,
@@ -80,7 +80,7 @@
         0.963,
         1.0
       ],
-      "hint": "Read only the table headed \"OFFICE: U S SENATOR 1 (cont'd)\"; ignore any other table visible in the image.",
+      "hint": "Read only the table headed \"OFFICE: U S SENATOR 1 (cont'd)\"; ignore any other table visible in the image. Each candidate cell prints a vote count followed by a percentage in parentheses; return only the vote count, without the percentage.",
       "bands": 2,
       "header": [
         0.0,
@@ -114,7 +114,10 @@
         0.967,
         0.488
       ],
-      "hint": "Read only the table headed \"OFFICE: U S SENATOR 1 (cont'd)\"; ignore any other table visible in the image."
+      "hint": "Read only the table headed \"OFFICE: U S SENATOR 1 (cont'd)\"; ignore any other table visible in the image. Each candidate cell prints a vote count followed by a percentage in parentheses; return only the vote count, without the percentage."
     }
-  ]
+  ],
+  "unit_codes": {
+    "Penola": "28107"
+  }
 }
