@@ -1,0 +1,26 @@
+{
+ "year": 1926,
+ "day": "1926-11-02",
+ "polity": "US-WI",
+ "publisher": "Wisconsin Legislative Reference Bureau",
+ "title": "The Wisconsin Blue Book 1927, vote by counties (general election 1926-11-02)",
+ "license": "Public record",
+ "file": {
+  "url": "https://search.library.wisc.edu/digital/AUD5FWPOZSCOKV84",
+  "item": "https://search.library.wisc.edu/digital/AUD5FWPOZSCOKV84"
+ },
+ "raw_source": "us.county_volumes",
+ "offices": {
+  "senate": "U.S. Senator, 1926 general election only (not a special election of another year)",
+  "governor": "Governor, 1926 general election only; a column for a joint governor and lieutenant governor ticket counts as governor",
+  "house": "U.S. Representative in Congress, 1926 general election, one table per congressional district"
+ },
+ "leaves": [
+  588,
+  593,
+  596,
+  597,
+  598
+ ],
+ "extend": true
+}

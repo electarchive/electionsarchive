@@ -1,0 +1,21 @@
+{
+ "year": 1924,
+ "day": "1924-11-04",
+ "polity": "US-WI",
+ "publisher": "Wisconsin Legislative Reference Bureau",
+ "title": "The Wisconsin Blue Book 1927, vote by counties (general election 1924-11-04)",
+ "license": "Public record",
+ "file": {
+  "url": "https://search.library.wisc.edu/digital/AUD5FWPOZSCOKV84",
+  "item": "https://search.library.wisc.edu/digital/AUD5FWPOZSCOKV84"
+ },
+ "raw_source": "us.county_volumes",
+ "offices": {
+  "president": "President (presidential electors), 1924 general election only, one column per candidate"
+ },
+ "leaves": [
+  595
+ ],
+ "note": "President 1924 by county as reprinted in the 1927 edition; the 1925 edition prints only elector-by-elector columns.",
+ "extend": true
+}

@@ -1,0 +1,27 @@
+{
+ "year": 1904,
+ "day": "1904-11-08",
+ "polity": "US-WI",
+ "publisher": "Wisconsin Secretary of State",
+ "title": "The Wisconsin Blue Book 1905, vote by counties (general election 1904-11-08)",
+ "license": "Public record",
+ "file": {
+  "url": "https://search.library.wisc.edu/digital/ALVHJTC5U76EDH9D",
+  "item": "https://search.library.wisc.edu/digital/ALVHJTC5U76EDH9D"
+ },
+ "raw_source": "us.county_volumes",
+ "offices": {
+  "house": "U.S. Representative in Congress, 1904 general election, one table per congressional district"
+ },
+ "leaves": [
+  410,
+  411,
+  416,
+  421,
+  425,
+  435,
+  441
+ ],
+ "note": "Only the district summaries that print county rows; the First, Second, Fifth, and Ninth districts print town tables with no county summary.",
+ "extend": true
+}

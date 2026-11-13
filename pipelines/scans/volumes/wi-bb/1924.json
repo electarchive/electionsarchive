@@ -1,0 +1,25 @@
+{
+ "year": 1924,
+ "day": "1924-11-04",
+ "polity": "US-WI",
+ "publisher": "Wisconsin Legislative Reference Bureau",
+ "title": "The Wisconsin Blue Book 1925, vote by counties (general election 1924-11-04)",
+ "license": "Public record",
+ "file": {
+  "url": "https://search.library.wisc.edu/digital/AZFV5VA4RAR4QZ8S",
+  "item": "https://search.library.wisc.edu/digital/AZFV5VA4RAR4QZ8S"
+ },
+ "raw_source": "us.county_volumes",
+ "offices": {
+  "governor": "Governor, 1924 general election only; a column for a joint governor and lieutenant governor ticket counts as governor",
+  "house": "U.S. Representative in Congress, 1924 general election, one table per congressional district"
+ },
+ "leaves": [
+  617,
+  618,
+  626,
+  627,
+  628
+ ],
+ "extend": true
+}

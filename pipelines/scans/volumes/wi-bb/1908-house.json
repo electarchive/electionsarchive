@@ -1,0 +1,23 @@
+{
+ "year": 1908,
+ "day": "1908-11-03",
+ "polity": "US-WI",
+ "publisher": "Wisconsin Secretary of State",
+ "title": "The Wisconsin Blue Book 1909, vote by counties (general election 1908-11-03)",
+ "license": "Public record",
+ "file": {
+  "url": "https://search.library.wisc.edu/digital/AKQ2ESFGDC6BPH9C",
+  "item": "https://search.library.wisc.edu/digital/AKQ2ESFGDC6BPH9C"
+ },
+ "raw_source": "us.county_volumes",
+ "offices": {
+  "house": "U.S. Representative in Congress, 1908 general election, one table per congressional district"
+ },
+ "leaves": [
+  479,
+  483,
+  495
+ ],
+ "note": "Only the district summaries that print county rows; the other districts print town tables with no county summary.",
+ "extend": true
+}

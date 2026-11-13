@@ -1,0 +1,23 @@
+{
+ "year": 1912,
+ "day": "1912-11-05",
+ "polity": "US-WI",
+ "publisher": "Wisconsin Secretary of State",
+ "title": "The Wisconsin Blue Book 1913, vote by counties (general election 1912-11-05)",
+ "license": "Public record",
+ "file": {
+  "url": "https://search.library.wisc.edu/digital/ALGTKLQSRXWSF786",
+  "item": "https://search.library.wisc.edu/digital/ALGTKLQSRXWSF786"
+ },
+ "raw_source": "us.county_volumes",
+ "offices": {
+  "president": "President (presidential electors), 1912 general election only, one column per candidate",
+  "governor": "Governor, 1912 general election only; a column for a joint governor and lieutenant governor ticket counts as governor"
+ },
+ "leaves": [
+  225,
+  271
+ ],
+ "note": "The 1913 edition prints no county table for the 1912 U.S. House; the district summaries there are gubernatorial.",
+ "extend": true
+}

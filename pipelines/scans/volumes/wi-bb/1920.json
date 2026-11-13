@@ -1,0 +1,28 @@
+{
+ "year": 1920,
+ "day": "1920-11-02",
+ "polity": "US-WI",
+ "publisher": "Wisconsin Legislative Reference Bureau",
+ "title": "The Wisconsin Blue Book 1921, vote by counties (general election 1920-11-02)",
+ "license": "Public record",
+ "file": {
+  "url": "https://search.library.wisc.edu/digital/AQEHAMYTSP3ADT86",
+  "item": "https://search.library.wisc.edu/digital/AQEHAMYTSP3ADT86"
+ },
+ "raw_source": "us.county_volumes",
+ "offices": {
+  "president": "President (presidential electors), 1920 general election only, one column per candidate",
+  "senate": "U.S. Senator, 1920 general election only (not a special election of another year)",
+  "house": "U.S. Representative in Congress, 1920 general election, one table per congressional district"
+ },
+ "leaves": [
+  177,
+  222,
+  235,
+  236,
+  237,
+  238
+ ],
+ "note": "Governor 1920 is printed only by towns in the 1921 edition (leaves 178-221), not by county.",
+ "extend": true
+}

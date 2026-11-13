@@ -1,0 +1,28 @@
+{
+ "year": 1914,
+ "day": "1914-11-03",
+ "polity": "US-WI",
+ "publisher": "Wisconsin Secretary of State",
+ "title": "The Wisconsin Blue Book 1915, vote by counties (general election 1914-11-03)",
+ "license": "Public record",
+ "file": {
+  "url": "https://search.library.wisc.edu/digital/AMDGH3X7LTLI3O8A",
+  "item": "https://search.library.wisc.edu/digital/AMDGH3X7LTLI3O8A"
+ },
+ "raw_source": "us.county_volumes",
+ "offices": {
+  "senate": "U.S. Senator, 1914 general election only (not a special election of another year)",
+  "governor": "Governor, 1914 general election only; a column for a joint governor and lieutenant governor ticket counts as governor",
+  "house": "U.S. Representative in Congress, 1914 general election, one table per congressional district"
+ },
+ "leaves": [
+  233,
+  239,
+  240,
+  241,
+  242,
+  243
+ ],
+ "note": "Leaves 240-243 hold the eleven district summaries, two to four per page.",
+ "extend": true
+}
