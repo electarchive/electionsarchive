@@ -22,6 +22,7 @@ PARSED = DATA / "parsed" / SOURCE
 SOURCES = Path(__file__).parent / "cc_elections_sources.tsv"
 BROWSER = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36"
 VOTES, REGISTERED, BALLOTS, VALID, INVALID = 1, 2, 3, 4, 5
+HIGHLAND = "S12000017"
 COUNCILS = {
     "S12000017": (
         "The Highland Council",
@@ -34,6 +35,70 @@ COUNCILS = {
             "declared elected without a poll; where they exceed them, a postal ballot is held in which each elector "
             "may vote for as many candidates as there are places, and the candidates with the most votes are elected. "
             "A community council is not formed when nominations fall short of the scheme's minimum."
+        ),
+    ),
+    "S12000035": (
+        "Argyll and Bute Council",
+        "Argyll and Bute Council Scheme of Establishment for Community Councils 2026",
+        "https://www.argyll-bute.gov.uk/sites/default/files/2026-08/Approved%20CC%20Scheme%20of%20Establishment%202026.pdf",
+        (
+            "Community councils in Argyll and Bute are formed under the council's Scheme of Establishment for Community Councils, made under the Local Government (Scotland) Act 1973. Where the candidates validly nominated do not exceed the places, they are declared elected; where they exceed them, an election is held by postal ballot and each elector may vote for candidates up to the number of places."
+        ),
+    ),
+    "S12000023": (
+        "Orkney Islands Council",
+        "Orkney Islands Council Scheme for Community Councils",
+        "https://www.orkney.gov.uk/media/okmj4oz5/scheme-for-community-councils-2022.pdf",
+        (
+            "Community councils in Orkney are formed under the Orkney Islands Council's Scheme for Community Councils, made under the Local Government (Scotland) Act 1973, and the council's returning officer declares each result. This record is built from the declaration of result, not from the scheme text, which was not read."
+        ),
+    ),
+    "S12000005": (
+        "Clackmannanshire Council",
+        "Clackmannanshire Council Scheme for the Establishment of Community Councils",
+        "https://www.clacks.gov.uk/document/5811.pdf",
+        (
+            "Community councils in Clackmannanshire are formed under the council's scheme, made under the Local Government (Scotland) Act 1973. Where nominations do not exceed the places to be filled, the nominees are declared elected unopposed; where they exceed them, a ballot is held and community councils are elected on the block voting system."
+        ),
+    ),
+    "S12000029": (
+        "South Lanarkshire Council",
+        "South Lanarkshire Council Scheme for Establishment of Community Councils",
+        "https://www.southlanarkshire.gov.uk/downloads/file/9067/scheme-for-establishment-of-community-councils",
+        (
+            "Community councils in South Lanarkshire are formed under the council's scheme for establishment of community councils, made under the Local Government (Scotland) Act 1973. Where the candidates validly nominated exceed the maximum membership for the area, an election is arranged."
+        ),
+    ),
+    "S12000010": (
+        "East Lothian Council",
+        "East Lothian Council community council elections",
+        "https://www.eastlothian.gov.uk/safety-and-community/your-community/get-involved-and-have-your-say/community-council-election",
+        (
+            "Community councils in East Lothian are formed under the council's scheme, made under the Local Government (Scotland) Act 1973, and the council runs the elections. This record is built from the council's notices of results, not from the scheme text, which was not read."
+        ),
+    ),
+    "S12000020": (
+        "The Moray Council",
+        "Moray Council Scheme for the Establishment of Community Councils 2025-2029",
+        "https://www.moray.gov.uk/media/cavjgsgg/file137736.pdf",
+        (
+            "Community councils in Moray are formed under the Moray Council's scheme for the establishment of community councils, made under the Local Government (Scotland) Act 1973, and the council runs the elections."
+        ),
+    ),
+    "S12000041": (
+        "Angus Council",
+        "Angus Council community council elections",
+        "https://www.angus.gov.uk/council_and_democracy/elections_and_voting/election_results/community_council_election_results_0",
+        (
+            "Community councils in Angus are formed under the council's scheme, made under the Local Government (Scotland) Act 1973, and the council runs the elections. This record is built from the council's notices of uncontested elections, not from the scheme text, which was not read."
+        ),
+    ),
+    "S12000013": (
+        "Comhairle nan Eilean Siar",
+        "Comhairle nan Eilean Siar Community Council Revised Scheme of Establishment 2023",
+        "https://www.cne-siar.gov.uk/sites/default/files/2025-04/Community-Council-Revised-Scheme-of-Establishment-2023.pdf",
+        (
+            "Community councils in the Western Isles are formed under the Comhairle's Revised Scheme of Establishment, made under the Local Government (Scotland) Act 1973. Where the candidates validly nominated exceed the maximum number of places, a poll is held by post and each voter may vote for up to the number of places."
         ),
     ),
 }
@@ -258,6 +323,8 @@ def notice(text: str) -> dict:
 def parse() -> None:
     rows = []
     for url, lad, kind in pl.read_csv(SOURCES, separator="\t").rows():
+        if lad != HIGHLAND:
+            continue
         if not _cached(url):
             print(f"not fetched: {url}", file=sys.stderr)
             continue
@@ -339,6 +406,8 @@ def emit() -> Path:
             raise ValueError("publish gb.parliament first")
         schemes = {}
         for lad, (publisher, title, url, _) in COUNCILS.items():
+            if lad not in set(frame["lad"]):
+                continue
             schemes[lad] = cs.source(publisher, title)
             cs.add("source", id=schemes[lad], kind="official_body", publisher=publisher, title=title, url=url)
         sources: dict[str, UUID] = {}
