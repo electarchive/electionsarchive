@@ -44,6 +44,7 @@ PAGE_PREFIXES = (
     "https://www.bassetlaw.gov.uk/council-and-democracy/",
     "https://www.north-norfolk.gov.uk/info/",
     "https://eastcambs.gov.uk/about-council/",
+    "https://www.northleach.gov.uk/",
 )
 HANDWRITTEN = (
     "https://info.ambervalley.gov.uk/docarc/",
@@ -54,6 +55,7 @@ HANDWRITTEN = (
     "/download/downloads/id/8012/",
     "/download/downloads/id/8854/",
     "lanliveryparishcouncil.gov.uk/data/uploads/570_1456565066.pdf",
+    "/ashnggxz/fairford-neighbourhood-development-plan-referendum-declaration-of-result.pdf",
 )
 PAGES = {
     "E06000052": (
