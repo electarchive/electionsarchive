@@ -1737,7 +1737,12 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
           unit.total + Math.min(Math.max(0, totals[index]! - unit.total), open);
       }
     }
-    const coefficients = fit(found, totals, center, residuals, random, widths);
+    const fitted = found.map((unit, index) =>
+      unit.channel === 0
+        ? totals[index]!
+        : Math.max(totals[index]!, typical[index]!),
+    );
+    const coefficients = fit(found, fitted, center, residuals, random, widths);
     const order = coefficients.at(-1)!;
     let votes = 0;
     let still = 0;
@@ -1748,7 +1753,7 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
     let scattered = 0;
     for (const [index, unit] of found.entries()) {
       const final = totals[index]!;
-      const fraction = final > 0 ? Math.min(1, unit.total / final) : 1;
+      const fraction = final > 0 ? Math.min(1, unit.total / fitted[index]!) : 1;
       const prior = unit.hasBaseline
         ? predict(coefficients, unit, center)
         : unit.margin;
