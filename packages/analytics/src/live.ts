@@ -195,6 +195,7 @@ const MODEL = {
     spill: 0.3,
     scatter: 1.2,
     brisk: 0.25,
+    hush: 0.02,
   },
   reported: { common: 0.9, own: 0.3, capped: 0.99 },
   channel: { turnout: 0.35, prior: 0.08, sigma: 1.5, unlisted: 0.02 },
@@ -293,6 +294,8 @@ function split(race: LiveRace, at: string | null) {
   }
   return { race: { ...race, counts, baseline }, sizes };
 }
+
+const HOLDS: Record<string, number> = { ga: 0.002 };
 
 const TAILS: Record<string, number> = {
   ak: 0.4,
@@ -1167,7 +1170,8 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
     isLate && onNight > 0 && latest > 0
       ? Math.max(
           0,
-          MODEL.tail.hold * tailWeight * onNight - (latest - onNight),
+          (HOLDS[race.state] ?? MODEL.tail.hold * tailWeight) * onNight -
+            (latest - onNight),
         ) / latest
       : 0;
   const planned = Math.max(
@@ -1556,6 +1560,7 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
             spill *
             closed *
             settles *
+            Math.min(1, recent / (MODEL.late.hush * tail)) *
             Math.exp(scatter * gaussian(random) - scatter ** 2 / 2);
         }
       }
