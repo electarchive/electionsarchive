@@ -37,3 +37,6 @@ __pycache__
 /.agents/
 .playwright-mcp/
 CLAUDE.local.md
+
+# Stray node compile cache from an unexpanded %h
+%h/
