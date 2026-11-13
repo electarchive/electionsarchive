@@ -29,6 +29,11 @@ ONS_ATTRIBUTION = (
     "Source: Office for National Statistics licensed under the Open Government Licence v.3.0. "
     "Contains OS data © Crown copyright and database right"
 )
+MADE = (
+    "https://www.somerset.gov.uk/planning-buildings-and-land/neighbourhood-planning/"
+    "neighbourhood-plans-in-production-and-made/#"
+)
+DELIVERED = DATA / "inbox" / "manual" / "MF-674"
 PAGE_IMAGES = DATA / "pages" / SOURCE
 SCHEME = "gb.neighborhood_area"
 VOTES, REGISTERED, BALLOTS, INVALID, VOTERS = 1, 2, 3, 5, 14
@@ -163,6 +168,21 @@ def document(url: str) -> None:
         )
 
 
+def delivered(url: str) -> None:
+    try:
+        raw.cached(SOURCE, url)
+    except LookupError:
+        path = DELIVERED / url.removeprefix(MADE)
+        raw.store(
+            SOURCE,
+            url,
+            path.read_bytes(),
+            suffix=".pdf",
+            retrieved_at=datetime.fromtimestamp(path.stat().st_mtime, UTC),
+            media_type="application/pdf",
+        )
+
+
 def suffix(url: str) -> str:
     if url.endswith(".jpg"):
         return ".jpg"
@@ -175,7 +195,9 @@ def fetch() -> None:
     for url in PAGES.values():
         raw.fetch(SOURCE, url, suffix=".html")
     for url in pl.read_csv(ROWS, separator="\t", infer_schema=False)["url"]:
-        if url.startswith(DOCUMENTS) or url.endswith(".docx"):
+        if url.startswith(MADE):
+            delivered(url)
+        elif url.startswith(DOCUMENTS) or url.endswith(".docx"):
             document(url)
         else:
             raw.fetch(SOURCE, url, suffix=suffix(url))
