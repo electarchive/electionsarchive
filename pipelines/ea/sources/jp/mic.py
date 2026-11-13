@@ -100,7 +100,7 @@ def fetch() -> None:
             raw.fetch(SOURCE, url, suffix=suffix(url))
 
 
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 INDEPENDENT = {"", "無所属"}
 STATE_TOTAL = re.compile(r"^(?:[道都府県]計|.+[道都府県] 合計)$")
@@ -529,7 +529,17 @@ DATED = {
     "国民民主党": (("2020-01-01", "Q52729635"), ("9999-12-31", "Q99527550")),
 }
 SMD_RULES = {"formula": "fptp"}
-PR_RULES = {"formula": "dhondt", "lists": {"order": "closed", "vacancy": "next_on_list"}}
+PR_RULES = {
+    "formula": "dhondt",
+    "lists": {
+        "order": "closed",
+        "constituencies": "skip",
+        "tied": "best_loser",
+        "forfeit": 0.1,
+        "exhausted": "elsewhere",
+        "vacancy": "next_on_list",
+    },
+}
 PR_SYSTEM = (
     "Each block's seats go to the party lists by D'Hondt. A list may rank several candidates who also stand in "
     "single-member districts at the same place; among them, seats go in order of each one's district vote as a "
