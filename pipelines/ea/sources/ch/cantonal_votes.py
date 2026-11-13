@@ -109,6 +109,9 @@ SHORT_NOTE = (
     "any commune: the canton reports {registered:,} registered voters, {cast:,} ballots cast, {yes:,} yes, and "
     "{no:,} no."
 )
+UNTYPED_NOTE = (
+    "The source gives this vote's type as 0, so it does not say whether it was a mandatory or an optional referendum."
+)
 TOTALS = ["registered", "cast", "valid", "yes", "no"]
 
 
@@ -357,6 +360,8 @@ def emit() -> Path:
             if kind != "tie_break":
                 cs.add("outcome", result_set_id=result_set, option_id=options[0 if row["accepted"] else 1], kind="won")
             shared = total["valid"] != total["yes"] + total["no"]
+            if kind == "referendum":
+                cs.add("note", entity_id=contest, kind="context", body_md=UNTYPED_NOTE)
             if shared:
                 cs.add("note", entity_id=contest, kind="context", body_md=VALID_NOTE)
             if not complete:
