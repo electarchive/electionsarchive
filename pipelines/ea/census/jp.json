@@ -1,0 +1,1419 @@
+{
+  "polity": "JP",
+  "name": "Japan",
+  "sources": {
+    "constitution": {
+      "title": "日本国憲法",
+      "publisher": "Digital Agency (e-Gov法令検索)",
+      "url": "https://laws.e-gov.go.jp/law/321CONSTITUTION",
+      "kind": "official_body"
+    },
+    "kosen": {
+      "title": "公職選挙法（昭和二十五年法律第百号）",
+      "publisher": "Digital Agency (e-Gov法令検索)",
+      "url": "https://laws.e-gov.go.jp/law/325AC1000000100",
+      "kind": "official_body"
+    },
+    "review-act": {
+      "title": "最高裁判所裁判官国民審査法（昭和二十二年法律第百三十六号）",
+      "publisher": "Digital Agency (e-Gov法令検索)",
+      "url": "https://laws.e-gov.go.jp/law/322AC1000000136",
+      "kind": "official_body"
+    },
+    "chiho": {
+      "title": "地方自治法（昭和二十二年法律第六十七号）",
+      "publisher": "Digital Agency (e-Gov法令検索)",
+      "url": "https://laws.e-gov.go.jp/law/322AC0000000067",
+      "kind": "official_body"
+    },
+    "kaisei": {
+      "title": "日本国憲法の改正手続に関する法律（平成十九年法律第五十一号）",
+      "publisher": "Digital Agency (e-Gov法令検索)",
+      "url": "https://laws.e-gov.go.jp/law/419AC1000000051",
+      "kind": "official_body"
+    },
+    "tokubetsuku": {
+      "title": "大都市地域における特別区の設置に関する法律（平成二十四年法律第八十号）",
+      "publisher": "Digital Agency (e-Gov法令検索)",
+      "url": "https://laws.e-gov.go.jp/law/424AC1000000080",
+      "kind": "official_body"
+    },
+    "act-1994": {
+      "title": "公職選挙法の一部を改正する法律（平成六年法律第百四号）",
+      "publisher": "衆議院",
+      "url": "https://www.shugiin.go.jp/internet/itdb_housei.nsf/html/houritsu/13119941125104.htm",
+      "kind": "official_body"
+    },
+    "mic-shugiin": {
+      "title": "衆議院議員総選挙・最高裁判所裁判官国民審査 結果一覧",
+      "publisher": "総務省",
+      "url": "https://www.soumu.go.jp/senkyo/senkyo_s/data/shugiin/ichiran.html",
+      "kind": "official_body"
+    },
+    "mic-sangiin": {
+      "title": "参議院議員通常選挙 結果一覧",
+      "publisher": "総務省",
+      "url": "https://www.soumu.go.jp/senkyo/senkyo_s/data/sangiin/ichiran.html",
+      "kind": "official_body"
+    },
+    "mic-index": {
+      "title": "選挙関連資料",
+      "publisher": "総務省",
+      "url": "https://www.soumu.go.jp/senkyo/senkyo_s/data/index.html",
+      "kind": "official_body"
+    },
+    "mic-gapei": {
+      "title": "市町村数の変遷と明治・昭和の大合併の特徴",
+      "publisher": "総務省",
+      "url": "https://www.soumu.go.jp/gapei/gapei2.html",
+      "kind": "official_body"
+    },
+    "mlit-n03": {
+      "title": "国土数値情報 行政区域データ (N03)",
+      "publisher": "国土交通省",
+      "url": "https://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-N03-2025.html",
+      "kind": "official_body"
+    },
+    "ndl-ichiran": {
+      "title": "リサーチ・ナビ: 衆議院議員総選挙の結果を調べるには",
+      "publisher": "国立国会図書館",
+      "url": "https://ndlsearch.ndl.go.jp/rnavi/politics/post_204111",
+      "kind": "official_body"
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "日本",
+      "name_en": "Japan",
+      "parent": null,
+      "polity_kind": "sovereign_state",
+      "scheme": "jp.nation",
+      "source": "constitution"
+    },
+    {
+      "key": "prefecture",
+      "name": "都道府県",
+      "name_en": "Prefectures",
+      "parent": "national",
+      "polity_kind": "region",
+      "scheme": "jp.prefecture",
+      "source": "chiho",
+      "counts": [
+        {
+          "date": "1972-05-15",
+          "value": 47,
+          "source": "mlit-n03",
+          "locator": "N03 prefecture codes 01-47; Okinawa (47) returned to Japan on 1972-05-15"
+        }
+      ]
+    },
+    {
+      "key": "municipality",
+      "name": "市町村",
+      "name_en": "Cities, towns, and villages",
+      "parent": "prefecture",
+      "polity_kind": "municipality",
+      "scheme": "jp.municipality",
+      "source": "chiho",
+      "counts": [
+        {
+          "date": "1947-08-01",
+          "value": 10505,
+          "source": "mic-gapei",
+          "locator": "昭和22年 8月 210 1,784 8,511 10,505"
+        },
+        {
+          "date": "1953-10-01",
+          "value": 9868,
+          "source": "mic-gapei",
+          "locator": "昭和28年10月 286 1,966 7,616 9,868"
+        },
+        {
+          "date": "1956-09-30",
+          "value": 3975,
+          "source": "mic-gapei",
+          "locator": "昭和31年 9月 498 1,903 1,574 3,975"
+        },
+        {
+          "date": "1961-06-29",
+          "value": 3472,
+          "source": "mic-gapei",
+          "locator": "昭和36年 6月 556 1,935 981 3,472"
+        },
+        {
+          "date": "1965-04-01",
+          "value": 3392,
+          "source": "mic-gapei",
+          "locator": "昭和40年 4月 560 2,005 827 3,392"
+        },
+        {
+          "date": "1975-04-01",
+          "value": 3257,
+          "source": "mic-gapei",
+          "locator": "昭和50年 4月 643 1,974 640 3,257"
+        },
+        {
+          "date": "1985-04-01",
+          "value": 3253,
+          "source": "mic-gapei",
+          "locator": "昭和60年 4月 651 2,001 601 3,253"
+        },
+        {
+          "date": "1995-04-01",
+          "value": 3234,
+          "source": "mic-gapei",
+          "locator": "平成 7年 4月 663 1,994 577 3,234"
+        },
+        {
+          "date": "1999-04-01",
+          "value": 3229,
+          "source": "mic-gapei",
+          "locator": "平成11年 4月 671 1,990 568 3,229"
+        },
+        {
+          "date": "2002-04-01",
+          "value": 3218,
+          "source": "mic-gapei",
+          "locator": "平成14年 4月 675 1,981 562 3,218"
+        },
+        {
+          "date": "2004-05-01",
+          "value": 3100,
+          "source": "mic-gapei",
+          "locator": "平成16年 5月 695 1,872 533 3,100"
+        },
+        {
+          "date": "2005-04-01",
+          "value": 2395,
+          "source": "mic-gapei",
+          "locator": "平成17年 4月 739 1,317 339 2,395"
+        },
+        {
+          "date": "2006-03-31",
+          "value": 1821,
+          "source": "mic-gapei",
+          "locator": "平成18年 3月 777 846 198 1,821"
+        },
+        {
+          "date": "2010-04-01",
+          "value": 1727,
+          "source": "mic-gapei",
+          "locator": "平成22年 4月 786 757 184 1,727"
+        },
+        {
+          "date": "2014-04-05",
+          "value": 1718,
+          "source": "mic-gapei",
+          "locator": "平成26年 4月 790 745 183 1,718"
+        }
+      ]
+    },
+    {
+      "key": "special_ward",
+      "name": "特別区",
+      "name_en": "Tokyo special wards",
+      "parent": "prefecture",
+      "within": "JP-13",
+      "scheme": "jp.ward",
+      "source": "chiho",
+      "valid_from": "1947-05-03"
+    },
+    {
+      "key": "city_ward",
+      "name": "政令指定都市の行政区",
+      "name_en": "Wards of designated cities",
+      "parent": "municipality",
+      "scheme": "jp.ward",
+      "elects": false,
+      "source": "chiho",
+      "valid_from": "1956-09-01"
+    }
+  ],
+  "classes": [
+    {
+      "key": "shugiin",
+      "tier": "national",
+      "name": "衆議院議員総選挙",
+      "name_en": "House of Representatives general elections",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "constituency",
+        "schemes": [
+          "jp.hor_smd",
+          "jp.hor_block"
+        ],
+        "fine": [
+          "jp.municipality",
+          "jp.ward",
+          "jp.counting_district"
+        ]
+      },
+      "source": "mic-shugiin",
+      "first_held": "1947-04-25",
+      "earliest_record": "1947-04-25",
+      "finest_note": "Ballots from every polling place in a counting district are mixed before counting (公職選挙法 art. 66), so no polling-place results exist; the counting district (municipality, ward, or a numbered piece of a split one) is the finest unit.",
+      "note": "Counted per constituency: 1947-1993 SNTV in multi-member districts; from 1996 the single-member districts plus the 11 PR blocks (300 + 11 to 2012, 295 + 11 in 2014, 289 + 11 since 2017). Pre-1996 district counts are not yet quoted from an official list.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "lower_house"
+          ],
+          "iso_pattern": "JP",
+          "valid_from": "1947-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "called": true,
+          "administered_by": "中央選挙管理会 and the prefectural election commissions",
+          "source": "constitution",
+          "locator": "https://laws.e-gov.go.jp/law/321CONSTITUTION (art. 45: 衆議院議員の任期は、四年とする。但し、衆議院解散の場合には、その期間満了前に終了する; art. 54: general election within 40 days of a dissolution)",
+          "vacancy_rule": "Vacancies are filled from the PR list or by by-elections held on the fourth Sundays of April and October (公職選挙法 art. 33-2)."
+        }
+      ],
+      "access": [
+        {
+          "platform": "総務省 選挙関連資料",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "license": "公共データ利用規約（第1.0版） (PDL 1.0, CC BY 4.0 compatible)",
+          "source": "mic-index",
+          "url": "https://www.soumu.go.jp/senkyo/senkyo_s/data/shugiin/ichiran.html",
+          "format": "xlsx, xls, pdf",
+          "first_date": "2005-09-11",
+          "last_date": "2026-02-08",
+          "finest": "jp.counting_district",
+          "evidence": "Counting-district workbooks 2009-2026; 2005 summary PDFs in Wayback"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1947-04-25"
+        },
+        {
+          "date": "1949-01-23"
+        },
+        {
+          "date": "1952-10-01"
+        },
+        {
+          "date": "1953-04-19"
+        },
+        {
+          "date": "1955-02-27"
+        },
+        {
+          "date": "1958-05-22"
+        },
+        {
+          "date": "1960-11-20"
+        },
+        {
+          "date": "1963-11-21"
+        },
+        {
+          "date": "1967-01-29"
+        },
+        {
+          "date": "1969-12-27"
+        },
+        {
+          "date": "1972-12-10"
+        },
+        {
+          "date": "1976-12-05"
+        },
+        {
+          "date": "1979-10-07"
+        },
+        {
+          "date": "1980-06-22"
+        },
+        {
+          "date": "1983-12-18"
+        },
+        {
+          "date": "1986-07-06"
+        },
+        {
+          "date": "1990-02-18"
+        },
+        {
+          "date": "1993-07-18"
+        },
+        {
+          "date": "1996-10-20",
+          "contests": 311,
+          "seats": 500,
+          "source": "act-1994",
+          "quote": "別表第一: 300 single-member districts; 別表第二: 11 proportional blocks"
+        },
+        {
+          "date": "2000-06-25",
+          "contests": 311,
+          "seats": 480,
+          "source": "act-1994",
+          "quote": "別表第一: 300 single-member districts; 11 blocks, 180 PR seats from the 2000 amendment"
+        },
+        {
+          "date": "2003-11-09",
+          "contests": 311,
+          "seats": 480,
+          "source": "act-1994",
+          "quote": "別表第一 as amended in 2002: 300 districts; 11 blocks"
+        },
+        {
+          "date": "2005-09-11",
+          "contests": 311,
+          "seats": 480,
+          "source": "mic-shugiin",
+          "quote": "第44回 平成17年9月11日"
+        },
+        {
+          "date": "2009-08-30",
+          "contests": 311,
+          "seats": 480,
+          "source": "mic-shugiin",
+          "quote": "第45回 平成21年8月30日"
+        },
+        {
+          "date": "2012-12-16",
+          "contests": 311,
+          "seats": 480,
+          "source": "mic-shugiin",
+          "quote": "第46回 平成24年12月16日"
+        },
+        {
+          "date": "2014-12-14",
+          "contests": 306,
+          "seats": 475,
+          "source": "mic-shugiin",
+          "quote": "第47回 平成26年12月14日"
+        },
+        {
+          "date": "2017-10-22",
+          "contests": 300,
+          "seats": 465,
+          "source": "mic-shugiin",
+          "quote": "第48回 平成29年10月22日"
+        },
+        {
+          "date": "2021-10-31",
+          "contests": 300,
+          "seats": 465,
+          "source": "mic-shugiin",
+          "quote": "第49回 令和3年10月31日"
+        },
+        {
+          "date": "2024-10-27",
+          "contests": 300,
+          "seats": 465,
+          "source": "mic-shugiin",
+          "quote": "第50回 令和6年10月27日"
+        },
+        {
+          "date": "2026-02-08",
+          "contests": 300,
+          "seats": 465,
+          "source": "mic-shugiin",
+          "quote": "第51回 令和8年2月8日"
+        }
+      ],
+      "est_votes": 3000000000,
+      "effort": 5
+    },
+    {
+      "key": "kokumin_shinsa",
+      "tier": "national",
+      "name": "最高裁判所裁判官国民審査",
+      "name_en": "National review of Supreme Court justices",
+      "category": "judicial",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "jp.prefecture"
+        ],
+        "fine": [
+          "jp.municipality"
+        ]
+      },
+      "source": "review-act",
+      "first_held": "1949-01-23",
+      "earliest_record": "1949-01-23",
+      "note": "A retention vote held with each House of Representatives general election: each justice appointed since the last review faces it, and again after ten years (Constitution art. 79); a justice is dismissed when votes for dismissal outnumber those against. One contest per justice.",
+      "match": [
+        {
+          "office_kinds": [
+            "other"
+          ],
+          "iso_pattern": "JP",
+          "name_pattern": "Supreme Court|最高裁判所"
+        }
+      ],
+      "cadence": [
+        {
+          "called": true,
+          "source": "constitution",
+          "locator": "https://laws.e-gov.go.jp/law/321CONSTITUTION (art. 79.2: 最高裁判所の裁判官の任命は、その任命後初めて行はれる衆議院議員総選挙の際国民の審査に付し)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "総務省 選挙関連資料",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "license": "公共データ利用規約（第1.0版） (PDL 1.0, CC BY 4.0 compatible)",
+          "source": "mic-index",
+          "url": "https://www.soumu.go.jp/senkyo/senkyo_s/data/shugiin/ichiran.html",
+          "format": "xlsx, pdf",
+          "first_date": "2009-08-30",
+          "last_date": "2026-02-08",
+          "finest": "jp.prefecture",
+          "evidence": "By prefecture on each general election page; counting districts only in prefectural records"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1949-01-23"
+        },
+        {
+          "date": "1952-10-01"
+        },
+        {
+          "date": "1953-04-19"
+        },
+        {
+          "date": "1955-02-27"
+        },
+        {
+          "date": "1958-05-22"
+        },
+        {
+          "date": "1960-11-20"
+        },
+        {
+          "date": "1963-11-21"
+        },
+        {
+          "date": "1967-01-29"
+        },
+        {
+          "date": "1969-12-27"
+        },
+        {
+          "date": "1972-12-10"
+        },
+        {
+          "date": "1976-12-05"
+        },
+        {
+          "date": "1979-10-07"
+        },
+        {
+          "date": "1980-06-22"
+        },
+        {
+          "date": "1983-12-18"
+        },
+        {
+          "date": "1986-07-06"
+        },
+        {
+          "date": "1990-02-18"
+        },
+        {
+          "date": "1993-07-18"
+        },
+        {
+          "date": "1996-10-20"
+        },
+        {
+          "date": "2000-06-25"
+        },
+        {
+          "date": "2003-11-09"
+        },
+        {
+          "date": "2005-09-11"
+        },
+        {
+          "date": "2009-08-30",
+          "contests": 9,
+          "source": "mic-shugiin",
+          "quote": "第45回 平成21年8月30日 最高裁判所裁判官国民審査"
+        },
+        {
+          "date": "2012-12-16",
+          "contests": 10,
+          "source": "mic-shugiin",
+          "quote": "第46回 平成24年12月16日 最高裁判所裁判官国民審査"
+        },
+        {
+          "date": "2014-12-14",
+          "contests": 5,
+          "source": "mic-shugiin",
+          "quote": "第47回 平成26年12月14日 最高裁判所裁判官国民審査"
+        },
+        {
+          "date": "2017-10-22",
+          "contests": 7,
+          "source": "mic-shugiin",
+          "quote": "第48回 平成29年10月22日 最高裁判所裁判官国民審査"
+        },
+        {
+          "date": "2021-10-31",
+          "contests": 11,
+          "source": "mic-shugiin",
+          "quote": "第49回 令和3年10月31日 最高裁判所裁判官国民審査"
+        },
+        {
+          "date": "2024-10-27",
+          "contests": 6,
+          "source": "mic-shugiin",
+          "quote": "第50回 令和6年10月27日 最高裁判所裁判官国民審査"
+        },
+        {
+          "date": "2026-02-08",
+          "contests": 2,
+          "source": "mic-shugiin",
+          "quote": "第51回 令和8年2月8日 最高裁判所裁判官国民審査"
+        }
+      ]
+    },
+    {
+      "key": "sangiin_senkyoku",
+      "tier": "national",
+      "name": "参議院議員通常選挙（選挙区）",
+      "name_en": "House of Councillors regular elections, prefectural districts",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "constituency",
+        "schemes": [
+          "jp.prefecture"
+        ],
+        "fine": [
+          "jp.municipality",
+          "jp.ward"
+        ]
+      },
+      "source": "mic-sangiin",
+      "first_held": "1947-04-20",
+      "earliest_record": "1947-04-20",
+      "note": "Half the house every three years, SNTV in prefectural districts of 1 to 6 seats; Tottori and Shimane, and Tokushima and Kochi, vote as merged districts since 2016. The 1947 election filled both halves.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "upper_house"
+          ],
+          "contest_kinds": [
+            "body_seats"
+          ],
+          "iso_pattern": "JP"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 3,
+          "phase": 0,
+          "month": 7,
+          "classes": 2,
+          "term_years": 6,
+          "called": false,
+          "administered_by": "中央選挙管理会 and the prefectural election commissions",
+          "source": "constitution",
+          "locator": "https://laws.e-gov.go.jp/law/321CONSTITUTION (art. 46: 参議院議員の任期は、六年とし、三年ごとに議員の半数を改選する); 公職選挙法 art. 32: within 30 days before the term ends",
+          "vacancy_rule": "Vacancies within the first three years are filled at by-elections on the fourth Sundays of April and October (公職選挙法 art. 33-2), or with the next regular election."
+        }
+      ],
+      "access": [
+        {
+          "platform": "総務省 選挙関連資料",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "license": "公共データ利用規約（第1.0版） (PDL 1.0, CC BY 4.0 compatible)",
+          "source": "mic-index",
+          "url": "https://www.soumu.go.jp/senkyo/senkyo_s/data/sangiin/ichiran.html",
+          "format": "xlsx, xls, pdf",
+          "first_date": "2007-07-29",
+          "last_date": "2025-07-20",
+          "finest": "jp.municipality",
+          "evidence": "Three workbooks per prefecture from 2007 (21st) to 2025 (27th)"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1947-04-20"
+        },
+        {
+          "date": "1950-06-04"
+        },
+        {
+          "date": "1953-04-24"
+        },
+        {
+          "date": "1956-07-08"
+        },
+        {
+          "date": "1959-06-02"
+        },
+        {
+          "date": "1962-07-01"
+        },
+        {
+          "date": "1965-07-04"
+        },
+        {
+          "date": "1968-07-07"
+        },
+        {
+          "date": "1971-06-27"
+        },
+        {
+          "date": "1974-07-07"
+        },
+        {
+          "date": "1977-07-10"
+        },
+        {
+          "date": "1980-06-22"
+        },
+        {
+          "date": "1983-06-26"
+        },
+        {
+          "date": "1986-07-06"
+        },
+        {
+          "date": "1989-07-23"
+        },
+        {
+          "date": "1992-07-26"
+        },
+        {
+          "date": "1995-07-23"
+        },
+        {
+          "date": "1998-07-12"
+        },
+        {
+          "date": "2001-07-29"
+        },
+        {
+          "date": "2004-07-11"
+        },
+        {
+          "date": "2007-07-29",
+          "contests": 47,
+          "source": "mic-sangiin",
+          "quote": "第21回 平成19年7月29日"
+        },
+        {
+          "date": "2010-07-11",
+          "contests": 47,
+          "source": "mic-sangiin",
+          "quote": "第22回 平成22年7月11日"
+        },
+        {
+          "date": "2013-07-21",
+          "contests": 47,
+          "source": "mic-sangiin",
+          "quote": "第23回 平成25年7月21日"
+        },
+        {
+          "date": "2016-07-10",
+          "contests": 45,
+          "source": "mic-sangiin",
+          "quote": "第24回 平成28年7月10日"
+        },
+        {
+          "date": "2019-07-21",
+          "contests": 45,
+          "source": "mic-sangiin",
+          "quote": "第25回 令和元年7月21日"
+        },
+        {
+          "date": "2022-07-10",
+          "contests": 45,
+          "source": "mic-sangiin",
+          "quote": "第26回 令和4年7月10日"
+        },
+        {
+          "date": "2025-07-20",
+          "contests": 45,
+          "source": "mic-sangiin",
+          "quote": "第27回 令和7年7月20日"
+        }
+      ],
+      "est_votes": 1500000000,
+      "effort": 5
+    },
+    {
+      "key": "sangiin_hirei",
+      "tier": "national",
+      "name": "参議院議員通常選挙（全国区・比例代表）",
+      "name_en": "House of Councillors regular elections, national tier",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "constituency",
+        "schemes": [
+          "jp.nation"
+        ],
+        "fine": [
+          "jp.municipality"
+        ]
+      },
+      "source": "mic-sangiin",
+      "first_held": "1947-04-20",
+      "earliest_record": "1947-04-20",
+      "note": "One nationwide contest per election: SNTV national constituency (全国区, 1947-1980), closed-list D'Hondt PR (1983-1998), open-list D'Hondt PR (2001-), with a closed priority quota (特定枠) since 2019.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "upper_house"
+          ],
+          "contest_kinds": [
+            "list_allocation"
+          ],
+          "iso_pattern": "JP"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 3,
+          "phase": 0,
+          "month": 7,
+          "classes": 2,
+          "term_years": 6,
+          "called": false,
+          "administered_by": "中央選挙管理会",
+          "source": "constitution",
+          "locator": "https://laws.e-gov.go.jp/law/321CONSTITUTION (art. 46)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "総務省 選挙関連資料",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "license": "公共データ利用規約（第1.0版） (PDL 1.0, CC BY 4.0 compatible)",
+          "source": "mic-index",
+          "url": "https://www.soumu.go.jp/senkyo/senkyo_s/data/sangiin/ichiran.html",
+          "format": "xlsx, xls",
+          "first_date": "2007-07-29",
+          "last_date": "2025-07-20",
+          "finest": "jp.municipality",
+          "evidence": "Party and candidate votes by counting district per prefecture"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1947-04-20"
+        },
+        {
+          "date": "1950-06-04"
+        },
+        {
+          "date": "1953-04-24"
+        },
+        {
+          "date": "1956-07-08"
+        },
+        {
+          "date": "1959-06-02"
+        },
+        {
+          "date": "1962-07-01"
+        },
+        {
+          "date": "1965-07-04"
+        },
+        {
+          "date": "1968-07-07"
+        },
+        {
+          "date": "1971-06-27"
+        },
+        {
+          "date": "1974-07-07"
+        },
+        {
+          "date": "1977-07-10"
+        },
+        {
+          "date": "1980-06-22"
+        },
+        {
+          "date": "1983-06-26"
+        },
+        {
+          "date": "1986-07-06"
+        },
+        {
+          "date": "1989-07-23"
+        },
+        {
+          "date": "1992-07-26"
+        },
+        {
+          "date": "1995-07-23"
+        },
+        {
+          "date": "1998-07-12"
+        },
+        {
+          "date": "2001-07-29"
+        },
+        {
+          "date": "2004-07-11"
+        },
+        {
+          "date": "2007-07-29",
+          "contests": 1,
+          "source": "mic-sangiin",
+          "quote": "第21回 平成19年7月29日"
+        },
+        {
+          "date": "2010-07-11",
+          "contests": 1,
+          "source": "mic-sangiin",
+          "quote": "第22回 平成22年7月11日"
+        },
+        {
+          "date": "2013-07-21",
+          "contests": 1,
+          "source": "mic-sangiin",
+          "quote": "第23回 平成25年7月21日"
+        },
+        {
+          "date": "2016-07-10",
+          "contests": 1,
+          "source": "mic-sangiin",
+          "quote": "第24回 平成28年7月10日"
+        },
+        {
+          "date": "2019-07-21",
+          "contests": 1,
+          "source": "mic-sangiin",
+          "quote": "第25回 令和元年7月21日"
+        },
+        {
+          "date": "2022-07-10",
+          "contests": 1,
+          "source": "mic-sangiin",
+          "quote": "第26回 令和4年7月10日"
+        },
+        {
+          "date": "2025-07-20",
+          "contests": 1,
+          "source": "mic-sangiin",
+          "quote": "第27回 令和7年7月20日"
+        }
+      ],
+      "est_votes": 1500000000,
+      "effort": 5
+    },
+    {
+      "key": "hoketsu",
+      "tier": "national",
+      "name": "衆議院・参議院の補欠選挙及び再選挙",
+      "name_en": "Diet by-elections and reruns",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "fine": [
+          "jp.municipality"
+        ]
+      },
+      "source": "kosen",
+      "locator": "https://laws.e-gov.go.jp/law/325AC1000000100 (art. 33-2: by-elections on the fourth Sunday of April and of October)",
+      "first_held": "1947-01-01",
+      "note": "Held on the unified by-election days in April and October for vacancies that the PR list cannot fill.",
+      "match": [
+        {
+          "election_kinds": [
+            "by_election"
+          ],
+          "body_kinds": [
+            "lower_house",
+            "upper_house"
+          ],
+          "iso_pattern": "JP"
+        }
+      ],
+      "cadence": [
+        {
+          "called": true,
+          "source": "kosen",
+          "locator": "https://laws.e-gov.go.jp/law/325AC1000000100 (art. 33-2)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "総務省 選挙関連資料",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "license": "公共データ利用規約（第1.0版） (PDL 1.0, CC BY 4.0 compatible)",
+          "source": "mic-index",
+          "url": "https://www.soumu.go.jp/senkyo/senkyo_s/data/hoketsu/index.html",
+          "format": "pdf",
+          "evidence": "Recent by-elections listed by MIC; counting-district tables in prefectural records"
+        }
+      ],
+      "est_votes": 20000000,
+      "effort": 3
+    },
+    {
+      "key": "kenpo_kaisei",
+      "tier": "national",
+      "name": "日本国憲法の改正の国民投票",
+      "name_en": "Constitutional amendment referendum",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "question"
+      },
+      "source": "kaisei",
+      "note": "Provided by Constitution art. 96 and the 2007 procedure act (in force 2010); never held.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "iso_pattern": "JP"
+        }
+      ],
+      "cadence": [
+        {
+          "called": true,
+          "source": "constitution",
+          "locator": "https://laws.e-gov.go.jp/law/321CONSTITUTION (art. 96)"
+        }
+      ],
+      "disposition": "blocked",
+      "disposition_reason": "Never held: no amendment has been initiated by the Diet since the 2007 procedure act."
+    },
+    {
+      "key": "shimei",
+      "tier": "national",
+      "name": "内閣総理大臣の指名",
+      "name_en": "Designation of the Prime Minister",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "constitution",
+      "locator": "https://laws.e-gov.go.jp/law/321CONSTITUTION (art. 67)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "The Diet designates the Prime Minister by a vote of its members (Constitution art. 67); party presidential elections are internal. Neither is a public election.",
+      "match": []
+    },
+    {
+      "key": "gyogyo",
+      "tier": "prefecture",
+      "name": "海区漁業調整委員会委員選挙",
+      "name_en": "Sea-area fisheries adjustment commission elections",
+      "category": "special_purpose",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "kosen",
+      "disposition": "out_of_scope",
+      "disposition_reason": "The electorate is licensed fishers under the Fisheries Act, an occupational vote; most seats are uncontested.",
+      "match": []
+    },
+    {
+      "key": "teikoku_gikai",
+      "tier": "national",
+      "name": "帝国議会衆議院議員総選挙",
+      "name_en": "Imperial Diet House of Representatives elections",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "constituency"
+      },
+      "source": "ndl-ichiran",
+      "valid_from": "1890-07-01",
+      "valid_to": "1947-05-03",
+      "first_held": "1890-07-01",
+      "note": "Twenty-two general elections from 1 July 1890 to 10 April 1946 under the Meiji Constitution (restricted male suffrage, manhood suffrage from 1928, women from 1946). The House secretariat's 衆議院議員総選挙一覧 covers the 1st to 31st elections by district and is in NDL Digital Collections.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "lower_house"
+          ],
+          "iso_pattern": "JP",
+          "valid_to": "1947-01-01"
+        }
+      ],
+      "est_votes": 150000000,
+      "effort": 5
+    },
+    {
+      "key": "chiji",
+      "tier": "prefecture",
+      "name": "都道府県知事選挙",
+      "name_en": "Prefectural governors",
+      "category": "executive",
+      "goal": "subnational",
+      "measure": {
+        "unit": "polity",
+        "schemes": [
+          "jp.prefecture"
+        ],
+        "fine": [
+          "jp.municipality",
+          "jp.ward"
+        ]
+      },
+      "source": "chiho",
+      "first_held": "1947-04-05",
+      "note": "Plurality with a quarter of valid votes required (法定得票, else a rerun). Four-year terms on staggered cycles: each election falls when the incumbent's term ends or on resignation, so only some prefectures vote in the unified local elections. Expected counts need MIC's term-expiry list (任期満了日一覧).",
+      "match": [
+        {
+          "office_kinds": [
+            "governor"
+          ],
+          "polity_kinds": [
+            "region"
+          ],
+          "iso_pattern": "JP-*"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "called": true,
+          "source": "chiho",
+          "administered_by": "Prefectural and municipal election commissions",
+          "locator": "https://laws.e-gov.go.jp/law/322AC0000000067 (art. 140: 普通地方公共団体の長の任期は、四年とする)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "総務省 選挙関連資料",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "license": "公共データ利用規約（第1.0版） (PDL 1.0, CC BY 4.0 compatible)",
+          "source": "mic-index",
+          "url": "https://www.soumu.go.jp/senkyo/senkyo_s/data/chiji/index.html",
+          "format": "pdf",
+          "first_date": "2018-01-01",
+          "finest": "jp.prefecture",
+          "evidence": "One-page PDF per election since 2018; counting districts in prefectural records"
+        }
+      ],
+      "est_votes": 1500000000,
+      "effort": 4
+    },
+    {
+      "key": "todofuken_gikai",
+      "tier": "prefecture",
+      "name": "都道府県議会議員選挙",
+      "name_en": "Prefectural assemblies",
+      "category": "council",
+      "goal": "subnational",
+      "measure": {
+        "unit": "polity",
+        "schemes": [
+          "jp.prefecture"
+        ],
+        "fine": [
+          "jp.municipality"
+        ]
+      },
+      "source": "chiho",
+      "first_held": "1947-04-30",
+      "note": "SNTV and plurality in districts of cities, counties, and wards. 41 assemblies vote in the unified local elections each April of years 3 mod 4; Tokyo, Ibaraki, Iwate, Miyagi, Fukushima, and Okinawa vote on their own cycles after early dissolutions.",
+      "match": [
+        {
+          "body_kinds": [
+            "council",
+            "unicameral"
+          ],
+          "polity_kinds": [
+            "region"
+          ],
+          "iso_pattern": "JP-*"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "called": true,
+          "source": "chiho",
+          "administered_by": "Prefectural and municipal election commissions",
+          "locator": "https://laws.e-gov.go.jp/law/322AC0000000067 (art. 93: 議員の任期は、四年とする)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "総務省 選挙関連資料",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "license": "公共データ利用規約（第1.0版） (PDL 1.0, CC BY 4.0 compatible)",
+          "source": "mic-index",
+          "url": "https://www.soumu.go.jp/senkyo/senkyo_s/data/touitsu/index.html",
+          "format": "pdf",
+          "finest": "jp.prefecture",
+          "evidence": "MIC 統一地方選挙結果調 2003-2019 aggregates; prefectural records hold districts"
+        }
+      ],
+      "est_votes": 1500000000,
+      "effort": 5
+    },
+    {
+      "key": "shichoson_cho",
+      "tier": "municipality",
+      "name": "市区町村長選挙",
+      "name_en": "Mayors of cities, towns, villages, and Tokyo special wards",
+      "category": "executive",
+      "goal": "local",
+      "measure": {
+        "unit": "municipality",
+        "schemes": [
+          "jp.municipality",
+          "jp.ward"
+        ]
+      },
+      "source": "chiho",
+      "first_held": "1947-04-05",
+      "note": "About 1,741 offices (1,718 municipalities and the 23 special wards), plurality with the quarter threshold; staggered four-year cycles, about a quarter in the unified local elections. The 20 designated-city mayors are inside this class.",
+      "match": [
+        {
+          "office_kinds": [
+            "mayor"
+          ],
+          "polity_kinds": [
+            "municipality",
+            "submunicipal"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "called": true,
+          "source": "chiho",
+          "administered_by": "Prefectural and municipal election commissions",
+          "locator": "https://laws.e-gov.go.jp/law/322AC0000000067 (art. 140)"
+        }
+      ],
+      "est_votes": 2500000000,
+      "effort": 5
+    },
+    {
+      "key": "shichoson_gikai",
+      "tier": "municipality",
+      "name": "市区町村議会議員選挙",
+      "name_en": "Municipal and special-ward assemblies",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "municipality",
+        "schemes": [
+          "jp.municipality",
+          "jp.ward"
+        ]
+      },
+      "source": "chiho",
+      "first_held": "1947-04-30",
+      "note": "At-large SNTV (designated cities by ward) with a quarter-of-quota threshold; staggered four-year cycles.",
+      "match": [
+        {
+          "body_kinds": [
+            "council",
+            "unicameral"
+          ],
+          "polity_kinds": [
+            "municipality",
+            "submunicipal"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "called": true,
+          "source": "chiho",
+          "administered_by": "Prefectural and municipal election commissions",
+          "locator": "https://laws.e-gov.go.jp/law/322AC0000000067 (art. 93)"
+        }
+      ],
+      "est_votes": 2500000000,
+      "effort": 5
+    },
+    {
+      "key": "jumin_tohyo",
+      "tier": "municipality",
+      "name": "住民投票",
+      "name_en": "Local referendums (ordinance, merger, and special-ward votes)",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "question",
+        "fine": [
+          "jp.ward",
+          "jp.municipality"
+        ]
+      },
+      "source": "tokubetsuku",
+      "first_held": "1996-08-04",
+      "note": "Advisory votes under each municipality's or prefecture's own ordinance (Maki nuclear plant 1996, Okinawa prefecture 1996 and 2019, hundreds of merger votes in 2001-2006), and the binding Osaka special-ward votes under the 2012 act (2015-05-17 and 2020-11-01). Prefectural ones are included here.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "iso_pattern": "JP-*"
+        },
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "called": true,
+          "source": "tokubetsuku",
+          "locator": "https://laws.e-gov.go.jp/law/424AC1000000080 (art. 7: 特別区の設置についての投票)"
+        }
+      ],
+      "est_votes": 10000000,
+      "effort": 4
+    },
+    {
+      "key": "tokubetsu_ho",
+      "tier": "municipality",
+      "name": "地方自治特別法の住民投票",
+      "name_en": "Special-law referendums under Constitution art. 95",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "question"
+      },
+      "source": "constitution",
+      "locator": "https://laws.e-gov.go.jp/law/321CONSTITUTION (art. 95)",
+      "valid_from": "1949-01-01",
+      "first_held": "1949-07-07",
+      "note": "A law applying to one local body needs its residents' consent by vote (Constitution art. 95; 地方自治法 arts. 261-262). Held for about 15 laws in 1949-1952 (Hiroshima and Nagasaki peace cities, international tourism cities, and others); none since. The cities and dates are not yet confirmed from an official list.",
+      "match": [],
+      "est_votes": 3000000,
+      "effort": 4
+    },
+    {
+      "key": "kaishoku",
+      "tier": "municipality",
+      "name": "解職・解散の投票（リコール）",
+      "name_en": "Recall and dissolution votes",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "question"
+      },
+      "source": "chiho",
+      "locator": "https://laws.e-gov.go.jp/law/322AC0000000067 (arts. 76-85: a petition of a third of the electorate forces a vote on dissolving the assembly or removing the head or a member)",
+      "first_held": "1948-01-01",
+      "note": "Called by residents' petitions; mostly in towns and villages, a few in cities and none yet for a governor. Each commission publishes its own.",
+      "match": [
+        {
+          "election_kinds": [
+            "recall"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "called": true,
+          "source": "chiho",
+          "locator": "https://laws.e-gov.go.jp/law/322AC0000000067 (arts. 76-85)"
+        }
+      ],
+      "est_votes": 3000000,
+      "effort": 5
+    },
+    {
+      "key": "kyoiku_iinkai",
+      "tier": "prefecture",
+      "name": "教育委員会委員選挙",
+      "name_en": "Elected boards of education",
+      "category": "special_purpose",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "chiho",
+      "valid_from": "1948-10-05",
+      "valid_to": "1956-10-01",
+      "first_held": "1948-10-05",
+      "note": "Prefectural and municipal boards of education were elected under the 1948 Board of Education Act (elections in 1948, 1950, 1952, and 1954) until the 1956 act made them appointed.",
+      "match": [],
+      "est_votes": 100000000,
+      "effort": 5
+    },
+    {
+      "key": "nogyo_iinkai",
+      "tier": "municipality",
+      "name": "農業委員会委員選挙",
+      "name_en": "Agricultural committee elections",
+      "category": "special_purpose",
+      "goal": "local",
+      "measure": {
+        "unit": "municipality"
+      },
+      "source": "chiho",
+      "valid_from": "1951-01-01",
+      "valid_to": "2016-04-01",
+      "note": "Farmers elected most members of each municipal agricultural committee every three years under the Agricultural Committee Act until the 2016 reform made them appointed; most seats went uncontested.",
+      "match": [],
+      "disposition": "out_of_scope",
+      "disposition_reason": "An occupational electorate (registered farmers) under the Agricultural Committee Act, abolished in 2016; most seats were uncontested and results were kept only by each committee."
+    },
+    {
+      "key": "zaisanku",
+      "tier": "municipality",
+      "name": "財産区議会議員選挙",
+      "name_en": "Property ward assemblies",
+      "category": "special_purpose",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "chiho",
+      "locator": "https://laws.e-gov.go.jp/law/322AC0000000067 (art. 295: 財産区の議会)",
+      "note": "A few hundred property wards (財産区) that hold forests or hot springs for a former village elect an assembly under the Public Offices Election Act; most are uncontested.",
+      "match": [],
+      "est_votes": 200000,
+      "effort": 5
+    }
+  ]
+}

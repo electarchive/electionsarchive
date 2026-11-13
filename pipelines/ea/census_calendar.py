@@ -91,6 +91,7 @@ DAY_RULES = {
     "jul_first_sunday": nth_weekday(7, 6, 1),
     "aug_first_sunday": nth_weekday(8, 6, 1),
     "aug_third_sunday": nth_weekday(8, 6, 3),
+    "may_fourth_sunday": nth_weekday(5, 6, 4),
 }
 
 

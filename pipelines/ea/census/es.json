@@ -1,0 +1,2743 @@
+{
+  "polity": "ES",
+  "name": "Spain",
+  "sources": {
+    "ce1978": {
+      "title": "Constitución Española",
+      "publisher": "Agencia Estatal Boletín Oficial del Estado",
+      "url": "https://www.boe.es/buscar/act.php?id=BOE-A-1978-31229",
+      "kind": "official_body"
+    },
+    "loreg": {
+      "title": "Ley Orgánica 5/1985, de 19 de junio, del Régimen Electoral General (texto consolidado)",
+      "publisher": "Agencia Estatal Boletín Oficial del Estado",
+      "url": "https://www.boe.es/buscar/act.php?id=BOE-A-1985-11672",
+      "kind": "official_body"
+    },
+    "lbrl": {
+      "title": "Ley 7/1985, de 2 de abril, Reguladora de las Bases del Régimen Local (texto consolidado)",
+      "publisher": "Agencia Estatal Boletín Oficial del Estado",
+      "url": "https://www.boe.es/buscar/act.php?id=BOE-A-1985-5392",
+      "kind": "official_body"
+    },
+    "lo-2-2026": {
+      "title": "Ley Orgánica 2/2026, de 30 de junio, de modificación de la LOREG (circunscripción de Formentera)",
+      "publisher": "Agencia Estatal Boletín Oficial del Estado",
+      "url": "https://www.boe.es/buscar/doc.php?id=BOE-A-2026-14329",
+      "kind": "official_body"
+    },
+    "infoelectoral": {
+      "title": "Área de descargas: procesos electorales celebrados",
+      "publisher": "Ministerio del Interior",
+      "url": "https://infoelectoral.interior.gob.es/es/elecciones-celebradas/area-de-descargas/",
+      "kind": "official_body"
+    },
+    "infoelectoral-04": {
+      "title": "Elecciones municipales: ficheros de resultados por mesa (04YYYYMM_MESA.zip, 04YYYYMM_MUNI.zip)",
+      "publisher": "Ministerio del Interior",
+      "url": "https://infoelectoral.interior.gob.es/estaticos/docxl/apliextr/",
+      "kind": "official_body"
+    },
+    "infoelectoral-06": {
+      "title": "Elecciones a cabildos insulares: ficheros de resultados por mesa (06YYYYMM_MESA.zip)",
+      "publisher": "Ministerio del Interior",
+      "url": "https://infoelectoral.interior.gob.es/estaticos/docxl/apliextr/",
+      "kind": "official_body"
+    },
+    "jjgg-1987": {
+      "title": "Ley 1/1987, de 27 de marzo, de Elecciones para las Juntas Generales de los Territorios Históricos de Araba, Bizkaia y Gipuzkoa",
+      "publisher": "Agencia Estatal Boletín Oficial del Estado",
+      "url": "https://www.boe.es/eli/es-pv/l/1987/03/27/1/con",
+      "kind": "official_body"
+    },
+    "euskadi-descargas": {
+      "title": "Descargas de ficheros de resultados de elecciones",
+      "publisher": "Gobierno Vasco",
+      "url": "https://www.euskadi.eus/informacion/descargas-de-ficheros-de-resultados-de-elecciones/web01-a2haukon/es/",
+      "kind": "official_body"
+    },
+    "consells-2009": {
+      "title": "Ley 7/2009, de 11 de diciembre, electoral de los Consejos Insulares",
+      "publisher": "Agencia Estatal Boletín Oficial del Estado",
+      "url": "https://www.boe.es/buscar/act.php?id=BOE-A-2010-1399",
+      "kind": "official_body"
+    },
+    "ine-ccaa": {
+      "title": "Relación de comunidades y ciudades autónomas con sus códigos",
+      "publisher": "Instituto Nacional de Estadística",
+      "url": "https://www.ine.es/daco/daco42/codmun/cod_ccaa.htm",
+      "kind": "official_body"
+    },
+    "ine-prov": {
+      "title": "Relación de provincias con sus códigos",
+      "publisher": "Instituto Nacional de Estadística",
+      "url": "https://www.ine.es/daco/daco42/codmun/cod_provincia.htm",
+      "kind": "official_body"
+    },
+    "ine-2025": {
+      "title": "Estadística del Padrón Continuo / Censo anual de población a 1 de enero de 2025 (nota de prensa)",
+      "publisher": "Instituto Nacional de Estadística",
+      "url": "https://www.ine.es/dyngs/Prensa/CensoVariables2025.htm",
+      "kind": "official_body"
+    },
+    "reg-es-an": {
+      "title": "Parlamento de Andalucía: elecciones y legislaturas",
+      "publisher": "Parlamento de Andalucía",
+      "url": "https://www.parlamentodeandalucia.es/",
+      "kind": "official_body"
+    },
+    "reg-es-ar": {
+      "title": "Gobierno de Aragón: elecciones y legislaturas",
+      "publisher": "Gobierno de Aragón",
+      "url": "https://www.aragon.es/portal-de-elecciones/resultados/anteriores",
+      "kind": "official_body"
+    },
+    "reg-es-as": {
+      "title": "Junta General del Principado de Asturias: elecciones y legislaturas",
+      "publisher": "Junta General del Principado de Asturias",
+      "url": "https://www.jgpa.es/documents/11156/92926/Elecciones+a+la+Junta+General%2C%201983-2019./bac1bfc0-6f99-4d85-9c29-87cc5bf32e68",
+      "kind": "official_body"
+    },
+    "reg-es-ib": {
+      "title": "Parlament de les Illes Balears: elecciones y legislaturas",
+      "publisher": "Parlament de les Illes Balears",
+      "url": "https://www.parlamentib.es/PageHandler/I_legislatura",
+      "kind": "official_body"
+    },
+    "reg-es-cn": {
+      "title": "Parlamento de Canarias: elecciones y legislaturas",
+      "publisher": "Parlamento de Canarias",
+      "url": "https://www.parcan.es/juntaelectoral/2023/anuncios/",
+      "kind": "official_body"
+    },
+    "reg-es-cb": {
+      "title": "Parlamento de Cantabria: elecciones y legislaturas",
+      "publisher": "Parlamento de Cantabria",
+      "url": "https://parlamento-cantabria.es/sites/default/files/5.%20Diputados%20y%20Mesas%20por%20Legislaturas_0.pdf",
+      "kind": "official_body"
+    },
+    "reg-es-cm": {
+      "title": "Cortes de Castilla-La Mancha: elecciones y legislaturas",
+      "publisher": "Cortes de Castilla-La Mancha",
+      "url": "https://www.cortesclm.es/",
+      "kind": "official_body"
+    },
+    "reg-es-ct": {
+      "title": "Parlament de Catalunya: resultats electorals, escons per circumscripció",
+      "publisher": "Generalitat de Catalunya",
+      "url": "https://www.parlament.cat/web/composicio/resultats-electorals/escons/index.html",
+      "kind": "official_body"
+    },
+    "reg-es-vc": {
+      "title": "Corts Valencianes: elecciones y legislaturas",
+      "publisher": "Corts Valencianes",
+      "url": "https://www.cortsvalencianes.es/es/composicion/diputados",
+      "kind": "official_body"
+    },
+    "reg-es-ex": {
+      "title": "Junta de Extremadura: elecciones y legislaturas",
+      "publisher": "Junta de Extremadura",
+      "url": "https://www.juntaex.es/w/elecciones",
+      "kind": "official_body"
+    },
+    "reg-es-ga": {
+      "title": "Parlamento de Galicia: elecciones y legislaturas",
+      "publisher": "Parlamento de Galicia",
+      "url": "https://www.parlamentodegalicia.gal/XuntaElectoral",
+      "kind": "official_body"
+    },
+    "reg-es-md": {
+      "title": "Asamblea de Madrid: elecciones y legislaturas",
+      "publisher": "Asamblea de Madrid",
+      "url": "https://www.asambleamadrid.es/en/la-asamblea/historia",
+      "kind": "official_body"
+    },
+    "reg-es-mc": {
+      "title": "Asamblea Regional de Murcia: elecciones y legislaturas",
+      "publisher": "Asamblea Regional de Murcia",
+      "url": "https://www.asambleamurcia.es/arm/elecciones",
+      "kind": "official_body"
+    },
+    "reg-es-nc": {
+      "title": "Parlamento de Navarra: elecciones y legislaturas",
+      "publisher": "Parlamento de Navarra",
+      "url": "https://parlamentodenavarra.es/es/contenido/referencia-hist%C3%B3rica",
+      "kind": "official_body"
+    },
+    "reg-es-pv": {
+      "title": "Descargas de ficheros de resultados de elecciones",
+      "publisher": "Gobierno Vasco",
+      "url": "https://www.euskadi.eus/informacion/descargas-de-ficheros-de-resultados-de-elecciones/web01-a2haukon/es/",
+      "kind": "official_body"
+    },
+    "reg-es-ri": {
+      "title": "Parlamento de La Rioja: elecciones y legislaturas",
+      "publisher": "Parlamento de La Rioja",
+      "url": "https://www.parlamentodelarioja.es/",
+      "kind": "official_body"
+    },
+    "reg-es-ce": {
+      "title": "Ministerio del Interior: elecciones y legislaturas",
+      "publisher": "Ministerio del Interior",
+      "url": "https://www.interior.gob.es/opencms/es/detalle/articulo/El-Gobierno-convoca-las-elecciones-municipales-y-a-las-asambleas-de-Ceuta-y-Melilla-para-el-28-de-mayo/",
+      "kind": "official_body"
+    },
+    "reg-es-ml": {
+      "title": "Ministerio del Interior: elecciones y legislaturas",
+      "publisher": "Ministerio del Interior",
+      "url": "https://www.interior.gob.es/opencms/es/detalle/articulo/El-Gobierno-convoca-las-elecciones-municipales-y-a-las-asambleas-de-Ceuta-y-Melilla-para-el-28-de-mayo/",
+      "kind": "official_body"
+    },
+    "reg-es-cl": {
+      "title": "Decreto de convocatoria de elecciones a las Cortes de Castilla y León de 2026",
+      "publisher": "Agencia Estatal Boletín Oficial del Estado",
+      "url": "https://boe.es/boe/dias/2026/01/20/pdfs/BOE-A-2026-1260.pdf",
+      "kind": "official_body"
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "España",
+      "name_en": "Spain",
+      "parent": null,
+      "polity_kind": "sovereign_state",
+      "scheme": "es.nation",
+      "source": "ce1978"
+    },
+    {
+      "key": "comunidad",
+      "name": "Comunidades autónomas",
+      "name_en": "Autonomous communities",
+      "parent": "national",
+      "polity_kind": "region",
+      "scheme": "es.comunidad",
+      "source": "ce1978",
+      "counts": [
+        {
+          "date": "2025-01-01",
+          "value": 17,
+          "source": "ine-ccaa",
+          "locator": "Relación de comunidades y ciudades autónomas con sus códigos: codes 01-17 are the 17 comunidades autónomas, 18 and 19 the ciudades autónomas"
+        }
+      ]
+    },
+    {
+      "key": "ciudad_autonoma",
+      "name": "Ciudades autónomas de Ceuta y Melilla",
+      "name_en": "Autonomous cities of Ceuta and Melilla",
+      "parent": "national",
+      "polity_kind": "region",
+      "source": "ce1978",
+      "valid_from": "1995-03-14",
+      "counts": [
+        {
+          "date": "2025-01-01",
+          "value": 2,
+          "source": "ine-ccaa",
+          "locator": "codes 18 Ceuta and 19 Melilla"
+        }
+      ]
+    },
+    {
+      "key": "provincia",
+      "name": "Provincias",
+      "name_en": "Provinces",
+      "parent": "comunidad",
+      "scheme": "es.provincia",
+      "source": "ce1978",
+      "counts": [
+        {
+          "date": "2025-01-01",
+          "value": 50,
+          "source": "ine-prov",
+          "locator": "Relación de provincias con sus códigos: 50 provinces (01-50) plus Ceuta (51) and Melilla (52)"
+        }
+      ]
+    },
+    {
+      "key": "isla",
+      "name": "Islas con cabildo o consell insular",
+      "name_en": "Islands with an island council (cabildo or consell insular)",
+      "parent": "provincia",
+      "scheme": "es.isla",
+      "source": "loreg",
+      "counts": [
+        {
+          "date": "1987-06-10",
+          "value": 7,
+          "source": "infoelectoral-06",
+          "locator": "06198706_MESA.zip to 06202305_MESA.zip: island codes 351 Gran Canaria, 352 Lanzarote, 353 Fuerteventura, 384 Tenerife, 385 La Palma, 386 La Gomera, 387 El Hierro",
+          "within": "ES-CN"
+        },
+        {
+          "date": "2007-05-27",
+          "value": 4,
+          "source": "consells-2009",
+          "locator": "art. 1: the consells of Mallorca, Menorca, and Eivissa; the Formentera council is elected under the general electoral law",
+          "within": "ES-IB"
+        }
+      ]
+    },
+    {
+      "key": "comarca",
+      "name": "Comarcas (consells comarcals, comarcas de Aragón, Conselh Generau d'Aran, El Bierzo)",
+      "name_en": "Comarcas with a council",
+      "parent": "provincia",
+      "source": "lbrl"
+    },
+    {
+      "key": "municipio",
+      "name": "Municipios",
+      "name_en": "Municipalities",
+      "parent": "provincia",
+      "scheme": "es.municipio",
+      "source": "lbrl",
+      "counts": [
+        {
+          "date": "1979-04-03",
+          "value": 7822,
+          "source": "infoelectoral-04",
+          "locator": "04197904_MUNI.zip: 7,822 municipality codes with results in files 05 and 11"
+        },
+        {
+          "date": "2025-01-01",
+          "value": 8132,
+          "source": "ine-2025",
+          "locator": "En 4.386 de los 8.132 municipios existentes a 1 de enero de 2025"
+        }
+      ]
+    },
+    {
+      "key": "entidad_menor",
+      "name": "Entidades de ámbito territorial inferior al municipio (entidades locales menores, concejos, juntas vecinales, parroquias rurales, pedanías)",
+      "name_en": "Sub-municipal local entities (EATIM)",
+      "parent": "municipio",
+      "source": "lbrl"
+    }
+  ],
+  "classes": [
+    {
+      "key": "congreso",
+      "tier": "national",
+      "name": "Elecciones al Congreso de los Diputados",
+      "name_en": "Congress of Deputies general elections",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "constituency",
+        "schemes": [
+          "es.provincia"
+        ],
+        "fine": [
+          "es.municipio",
+          "es.mesa"
+        ]
+      },
+      "source": "infoelectoral",
+      "first_held": "1977-06-15",
+      "earliest_record": "1977-06-15",
+      "note": "350 deputies in 52 constituencies (50 provinces, Ceuta, and Melilla), closed lists with D'Hondt and a 3% threshold per province; Ceuta and Melilla elect one each by plurality (LOREG arts. 161-163). The 1977 election returned the Constituent Cortes under the Ley para la Reforma Política.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "snap"
+          ],
+          "body_kinds": [
+            "lower_house"
+          ],
+          "iso_pattern": "ES",
+          "valid_from": "1977-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "called": true,
+          "administered_by": "Junta Electoral Central; Ministerio del Interior",
+          "source": "ce1978",
+          "locator": "https://www.boe.es/buscar/act.php?id=BOE-A-1978-31229 (art. 68.4: \"El Congreso es elegido por cuatro años\"; art. 115: the Prime Minister may dissolve the Congreso, the Senado, or the Cortes Generales)",
+          "valid_from": "1978-12-29"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Ministerio del Interior, infoelectoral (área de descargas)",
+          "format": "zip (fixed-width DAT)",
+          "access": "browser",
+          "checked_at": "2026-11-13",
+          "license": "Ley 37/2007 reuse under the ministry's aviso legal: cite \"Origen de los datos: Ministerio del Interior\"",
+          "source": "infoelectoral",
+          "url": "https://infoelectoral.interior.gob.es/estaticos/docxl/apliextr/02{YYYYMM}_MESA.zip",
+          "first_date": "1977-06-15",
+          "last_date": "2023-07-23",
+          "finest": "es.mesa",
+          "evidence": "MESA and TOTA zips for all 16 processes (MF-669); mesa files for 1977 and 1979 are empty"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1977-06-15",
+          "contests": 52,
+          "seats": 350,
+          "source": "infoelectoral",
+          "quote": "Congreso Julio 2023,Noviembre 2019,Abril 2019,Junio 2016,Diciembre 2015,Noviembre 2011,Marzo 2008,Marzo 2004,Marzo 2000,Marzo 1996,Junio 1993,Octubre 1989,Junio 1986,Octubre 1982,Marzo 1979,Junio 1977"
+        },
+        {
+          "date": "1979-03-01",
+          "contests": 52,
+          "seats": 350,
+          "source": "infoelectoral",
+          "quote": "Congreso Julio 2023,Noviembre 2019,Abril 2019,Junio 2016,Diciembre 2015,Noviembre 2011,Marzo 2008,Marzo 2004,Marzo 2000,Marzo 1996,Junio 1993,Octubre 1989,Junio 1986,Octubre 1982,Marzo 1979,Junio 1977"
+        },
+        {
+          "date": "1982-10-28",
+          "contests": 52,
+          "seats": 350,
+          "source": "infoelectoral",
+          "quote": "Congreso Julio 2023,Noviembre 2019,Abril 2019,Junio 2016,Diciembre 2015,Noviembre 2011,Marzo 2008,Marzo 2004,Marzo 2000,Marzo 1996,Junio 1993,Octubre 1989,Junio 1986,Octubre 1982,Marzo 1979,Junio 1977"
+        },
+        {
+          "date": "1986-06-22",
+          "contests": 52,
+          "seats": 350,
+          "source": "infoelectoral",
+          "quote": "Congreso Julio 2023,Noviembre 2019,Abril 2019,Junio 2016,Diciembre 2015,Noviembre 2011,Marzo 2008,Marzo 2004,Marzo 2000,Marzo 1996,Junio 1993,Octubre 1989,Junio 1986,Octubre 1982,Marzo 1979,Junio 1977"
+        },
+        {
+          "date": "1989-10-29",
+          "contests": 52,
+          "seats": 350,
+          "source": "infoelectoral",
+          "quote": "Congreso Julio 2023,Noviembre 2019,Abril 2019,Junio 2016,Diciembre 2015,Noviembre 2011,Marzo 2008,Marzo 2004,Marzo 2000,Marzo 1996,Junio 1993,Octubre 1989,Junio 1986,Octubre 1982,Marzo 1979,Junio 1977"
+        },
+        {
+          "date": "1993-06-06",
+          "contests": 52,
+          "seats": 350,
+          "source": "infoelectoral",
+          "quote": "Congreso Julio 2023,Noviembre 2019,Abril 2019,Junio 2016,Diciembre 2015,Noviembre 2011,Marzo 2008,Marzo 2004,Marzo 2000,Marzo 1996,Junio 1993,Octubre 1989,Junio 1986,Octubre 1982,Marzo 1979,Junio 1977"
+        },
+        {
+          "date": "1996-03-03",
+          "contests": 52,
+          "seats": 350,
+          "source": "infoelectoral",
+          "quote": "Congreso Julio 2023,Noviembre 2019,Abril 2019,Junio 2016,Diciembre 2015,Noviembre 2011,Marzo 2008,Marzo 2004,Marzo 2000,Marzo 1996,Junio 1993,Octubre 1989,Junio 1986,Octubre 1982,Marzo 1979,Junio 1977"
+        },
+        {
+          "date": "2000-03-12",
+          "contests": 52,
+          "seats": 350,
+          "source": "infoelectoral",
+          "quote": "Congreso Julio 2023,Noviembre 2019,Abril 2019,Junio 2016,Diciembre 2015,Noviembre 2011,Marzo 2008,Marzo 2004,Marzo 2000,Marzo 1996,Junio 1993,Octubre 1989,Junio 1986,Octubre 1982,Marzo 1979,Junio 1977"
+        },
+        {
+          "date": "2004-03-14",
+          "contests": 52,
+          "seats": 350,
+          "source": "infoelectoral",
+          "quote": "Congreso Julio 2023,Noviembre 2019,Abril 2019,Junio 2016,Diciembre 2015,Noviembre 2011,Marzo 2008,Marzo 2004,Marzo 2000,Marzo 1996,Junio 1993,Octubre 1989,Junio 1986,Octubre 1982,Marzo 1979,Junio 1977"
+        },
+        {
+          "date": "2008-03-09",
+          "contests": 52,
+          "seats": 350,
+          "source": "infoelectoral",
+          "quote": "Congreso Julio 2023,Noviembre 2019,Abril 2019,Junio 2016,Diciembre 2015,Noviembre 2011,Marzo 2008,Marzo 2004,Marzo 2000,Marzo 1996,Junio 1993,Octubre 1989,Junio 1986,Octubre 1982,Marzo 1979,Junio 1977"
+        },
+        {
+          "date": "2011-11-20",
+          "contests": 52,
+          "seats": 350,
+          "source": "infoelectoral",
+          "quote": "Congreso Julio 2023,Noviembre 2019,Abril 2019,Junio 2016,Diciembre 2015,Noviembre 2011,Marzo 2008,Marzo 2004,Marzo 2000,Marzo 1996,Junio 1993,Octubre 1989,Junio 1986,Octubre 1982,Marzo 1979,Junio 1977"
+        },
+        {
+          "date": "2015-12-20",
+          "contests": 52,
+          "seats": 350,
+          "source": "infoelectoral",
+          "quote": "Congreso Julio 2023,Noviembre 2019,Abril 2019,Junio 2016,Diciembre 2015,Noviembre 2011,Marzo 2008,Marzo 2004,Marzo 2000,Marzo 1996,Junio 1993,Octubre 1989,Junio 1986,Octubre 1982,Marzo 1979,Junio 1977"
+        },
+        {
+          "date": "2016-06-26",
+          "contests": 52,
+          "seats": 350,
+          "source": "infoelectoral",
+          "quote": "Congreso Julio 2023,Noviembre 2019,Abril 2019,Junio 2016,Diciembre 2015,Noviembre 2011,Marzo 2008,Marzo 2004,Marzo 2000,Marzo 1996,Junio 1993,Octubre 1989,Junio 1986,Octubre 1982,Marzo 1979,Junio 1977"
+        },
+        {
+          "date": "2019-04-28",
+          "contests": 52,
+          "seats": 350,
+          "source": "infoelectoral",
+          "quote": "Congreso Julio 2023,Noviembre 2019,Abril 2019,Junio 2016,Diciembre 2015,Noviembre 2011,Marzo 2008,Marzo 2004,Marzo 2000,Marzo 1996,Junio 1993,Octubre 1989,Junio 1986,Octubre 1982,Marzo 1979,Junio 1977"
+        },
+        {
+          "date": "2019-11-10",
+          "contests": 52,
+          "seats": 350,
+          "source": "infoelectoral",
+          "quote": "Congreso Julio 2023,Noviembre 2019,Abril 2019,Junio 2016,Diciembre 2015,Noviembre 2011,Marzo 2008,Marzo 2004,Marzo 2000,Marzo 1996,Junio 1993,Octubre 1989,Junio 1986,Octubre 1982,Marzo 1979,Junio 1977"
+        },
+        {
+          "date": "2023-07-23",
+          "contests": 52,
+          "seats": 350,
+          "source": "infoelectoral",
+          "quote": "Congreso Julio 2023,Noviembre 2019,Abril 2019,Junio 2016,Diciembre 2015,Noviembre 2011,Marzo 2008,Marzo 2004,Marzo 2000,Marzo 1996,Junio 1993,Octubre 1989,Junio 1986,Octubre 1982,Marzo 1979,Junio 1977"
+        }
+      ]
+    },
+    {
+      "key": "senado",
+      "tier": "national",
+      "name": "Elecciones al Senado",
+      "name_en": "Senate elections (directly elected senators)",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "constituency",
+        "schemes": [
+          "es.provincia",
+          "es.isla"
+        ],
+        "fine": [
+          "es.mesa"
+        ]
+      },
+      "source": "loreg",
+      "locator": "https://www.boe.es/buscar/act.php?id=BOE-A-1985-11672 (arts. 161 and 165-166)",
+      "first_held": "1977-06-15",
+      "earliest_record": "1977-06-15",
+      "note": "Limited vote: 4 seats in each of the 47 mainland provinces (voters mark up to 3), 3 in Gran Canaria, Mallorca, and Tenerife (up to 2), 2 in Ceuta and Melilla, and 1 in each smaller island district, 208 in all; counted as 59 constituencies, with Ibiza and Formentera one district. Ley Orgánica 2/2026 (in force 2026-07-03) makes Formentera its own district, so 60 from the next general election. Senators designated by the regional parliaments are the class senado_autonomico.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "snap"
+          ],
+          "body_kinds": [
+            "upper_house"
+          ],
+          "iso_pattern": "ES",
+          "valid_from": "1977-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "called": true,
+          "administered_by": "Junta Electoral Central; Ministerio del Interior",
+          "source": "ce1978",
+          "locator": "https://www.boe.es/buscar/act.php?id=BOE-A-1978-31229 (art. 69.6: \"El Senado es elegido por cuatro años\")",
+          "valid_from": "1978-12-29"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Ministerio del Interior, infoelectoral (área de descargas)",
+          "format": "zip (fixed-width DAT)",
+          "access": "browser",
+          "checked_at": "2026-11-13",
+          "license": "Ley 37/2007 reuse under the ministry's aviso legal: cite \"Origen de los datos: Ministerio del Interior\"",
+          "source": "infoelectoral",
+          "url": "https://infoelectoral.interior.gob.es/estaticos/docxl/apliextr/03{YYYYMM}_MESA.zip",
+          "first_date": "1977-06-15",
+          "last_date": "2023-07-23",
+          "finest": "es.mesa",
+          "evidence": "MESA and TOTA zips for all 16 processes, candidate rows (MF-669)"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1977-06-15",
+          "contests": 59,
+          "seats": 207,
+          "source": "loreg",
+          "quote": "Art. 161.2 and 165: each mainland province elects four, Gran Canaria, Mallorca, and Tenerife three, the other islands one, and Ceuta and Melilla two each",
+          "note": "1977 elected 207 under the Real Decreto-ley 20/1977, with the King appointing 41 more."
+        },
+        {
+          "date": "1979-03-01",
+          "contests": 59,
+          "seats": 208,
+          "source": "loreg",
+          "quote": "Art. 161.2 and 165: each mainland province elects four, Gran Canaria, Mallorca, and Tenerife three, the other islands one, and Ceuta and Melilla two each"
+        },
+        {
+          "date": "1982-10-28",
+          "contests": 59,
+          "seats": 208,
+          "source": "loreg",
+          "quote": "Art. 161.2 and 165: each mainland province elects four, Gran Canaria, Mallorca, and Tenerife three, the other islands one, and Ceuta and Melilla two each"
+        },
+        {
+          "date": "1986-06-22",
+          "contests": 59,
+          "seats": 208,
+          "source": "loreg",
+          "quote": "Art. 161.2 and 165: each mainland province elects four, Gran Canaria, Mallorca, and Tenerife three, the other islands one, and Ceuta and Melilla two each"
+        },
+        {
+          "date": "1989-10-29",
+          "contests": 59,
+          "seats": 208,
+          "source": "loreg",
+          "quote": "Art. 161.2 and 165: each mainland province elects four, Gran Canaria, Mallorca, and Tenerife three, the other islands one, and Ceuta and Melilla two each"
+        },
+        {
+          "date": "1993-06-06",
+          "contests": 59,
+          "seats": 208,
+          "source": "loreg",
+          "quote": "Art. 161.2 and 165: each mainland province elects four, Gran Canaria, Mallorca, and Tenerife three, the other islands one, and Ceuta and Melilla two each"
+        },
+        {
+          "date": "1996-03-03",
+          "contests": 59,
+          "seats": 208,
+          "source": "loreg",
+          "quote": "Art. 161.2 and 165: each mainland province elects four, Gran Canaria, Mallorca, and Tenerife three, the other islands one, and Ceuta and Melilla two each"
+        },
+        {
+          "date": "2000-03-12",
+          "contests": 59,
+          "seats": 208,
+          "source": "loreg",
+          "quote": "Art. 161.2 and 165: each mainland province elects four, Gran Canaria, Mallorca, and Tenerife three, the other islands one, and Ceuta and Melilla two each"
+        },
+        {
+          "date": "2004-03-14",
+          "contests": 59,
+          "seats": 208,
+          "source": "loreg",
+          "quote": "Art. 161.2 and 165: each mainland province elects four, Gran Canaria, Mallorca, and Tenerife three, the other islands one, and Ceuta and Melilla two each"
+        },
+        {
+          "date": "2008-03-09",
+          "contests": 59,
+          "seats": 208,
+          "source": "loreg",
+          "quote": "Art. 161.2 and 165: each mainland province elects four, Gran Canaria, Mallorca, and Tenerife three, the other islands one, and Ceuta and Melilla two each"
+        },
+        {
+          "date": "2011-11-20",
+          "contests": 59,
+          "seats": 208,
+          "source": "loreg",
+          "quote": "Art. 161.2 and 165: each mainland province elects four, Gran Canaria, Mallorca, and Tenerife three, the other islands one, and Ceuta and Melilla two each"
+        },
+        {
+          "date": "2015-12-20",
+          "contests": 59,
+          "seats": 208,
+          "source": "loreg",
+          "quote": "Art. 161.2 and 165: each mainland province elects four, Gran Canaria, Mallorca, and Tenerife three, the other islands one, and Ceuta and Melilla two each"
+        },
+        {
+          "date": "2016-06-26",
+          "contests": 59,
+          "seats": 208,
+          "source": "loreg",
+          "quote": "Art. 161.2 and 165: each mainland province elects four, Gran Canaria, Mallorca, and Tenerife three, the other islands one, and Ceuta and Melilla two each"
+        },
+        {
+          "date": "2019-04-28",
+          "contests": 59,
+          "seats": 208,
+          "source": "loreg",
+          "quote": "Art. 161.2 and 165: each mainland province elects four, Gran Canaria, Mallorca, and Tenerife three, the other islands one, and Ceuta and Melilla two each"
+        },
+        {
+          "date": "2019-11-10",
+          "contests": 59,
+          "seats": 208,
+          "source": "loreg",
+          "quote": "Art. 161.2 and 165: each mainland province elects four, Gran Canaria, Mallorca, and Tenerife three, the other islands one, and Ceuta and Melilla two each"
+        },
+        {
+          "date": "2023-07-23",
+          "contests": 59,
+          "seats": 208,
+          "source": "loreg",
+          "quote": "Art. 161.2 and 165: each mainland province elects four, Gran Canaria, Mallorca, and Tenerife three, the other islands one, and Ceuta and Melilla two each"
+        }
+      ],
+      "est_votes": 370000000,
+      "effort": 3
+    },
+    {
+      "key": "senado_autonomico",
+      "tier": "comunidad",
+      "name": "Senadores designados por las Asambleas Legislativas",
+      "name_en": "Senators designated by the regional parliaments",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "ce1978",
+      "locator": "https://www.boe.es/buscar/act.php?id=BOE-A-1978-31229 (art. 69.5)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Each regional parliament designates one senator plus one per million residents by a vote of its members (Constitution art. 69.5; LOREG art. 165.4); there is no popular vote.",
+      "match": []
+    },
+    {
+      "key": "ep",
+      "tier": "national",
+      "name": "Elecciones al Parlamento Europeo en España",
+      "name_en": "European Parliament elections in Spain",
+      "category": "legislature",
+      "goal": "ep",
+      "measure": {
+        "unit": "constituency",
+        "schemes": [
+          "es.provincia"
+        ],
+        "fine": [
+          "es.mesa"
+        ]
+      },
+      "source": "infoelectoral",
+      "first_held": "1987-06-10",
+      "earliest_record": "1987-06-10",
+      "note": "One national constituency, closed lists, D'Hondt, no threshold (LOREG art. 214). The 1986-1987 delegation was appointed by the Cortes. The EU pipelines carry the 1994-2019 elections on the window's Thursday, not Spain's Sunday polling day.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "EU",
+          "within": null,
+          "precedence": 5
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 4,
+          "month": 6,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "Junta Electoral Central; Ministerio del Interior",
+          "source": "loreg",
+          "locator": "https://www.boe.es/buscar/act.php?id=BOE-A-1985-11672 (Título VI, arts. 210-227)",
+          "valid_from": "1987-01-01"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Ministerio del Interior, infoelectoral (área de descargas)",
+          "format": "zip (fixed-width DAT)",
+          "access": "browser",
+          "checked_at": "2026-11-13",
+          "license": "Ley 37/2007 reuse under the ministry's aviso legal: cite \"Origen de los datos: Ministerio del Interior\"",
+          "source": "infoelectoral",
+          "url": "https://infoelectoral.interior.gob.es/estaticos/docxl/apliextr/07{YYYYMM}_MESA.zip",
+          "first_date": "1987-06-10",
+          "last_date": "2024-06-09",
+          "finest": "es.mesa",
+          "evidence": "MESA and TOTA zips for all 9 processes (MF-669)"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1987-06-10",
+          "contests": 1,
+          "seats": 60,
+          "source": "infoelectoral",
+          "quote": "Parlamento Europeo Junio 2024,Mayo 2019,Mayo 2014,Junio 2009,Junio 2004,Junio 1999,Junio 1994,Junio 1989,Junio 1987"
+        },
+        {
+          "date": "1989-06-15",
+          "contests": 1,
+          "seats": 60,
+          "source": "infoelectoral",
+          "quote": "Parlamento Europeo Junio 2024,Mayo 2019,Mayo 2014,Junio 2009,Junio 2004,Junio 1999,Junio 1994,Junio 1989,Junio 1987"
+        },
+        {
+          "date": "1994-06-12",
+          "contests": 1,
+          "seats": 64,
+          "source": "infoelectoral",
+          "quote": "Parlamento Europeo Junio 2024,Mayo 2019,Mayo 2014,Junio 2009,Junio 2004,Junio 1999,Junio 1994,Junio 1989,Junio 1987"
+        },
+        {
+          "date": "1999-06-13",
+          "contests": 1,
+          "seats": 64,
+          "source": "infoelectoral",
+          "quote": "Parlamento Europeo Junio 2024,Mayo 2019,Mayo 2014,Junio 2009,Junio 2004,Junio 1999,Junio 1994,Junio 1989,Junio 1987"
+        },
+        {
+          "date": "2004-06-13",
+          "contests": 1,
+          "seats": 54,
+          "source": "infoelectoral",
+          "quote": "Parlamento Europeo Junio 2024,Mayo 2019,Mayo 2014,Junio 2009,Junio 2004,Junio 1999,Junio 1994,Junio 1989,Junio 1987"
+        },
+        {
+          "date": "2009-06-07",
+          "contests": 1,
+          "seats": 50,
+          "source": "infoelectoral",
+          "quote": "Parlamento Europeo Junio 2024,Mayo 2019,Mayo 2014,Junio 2009,Junio 2004,Junio 1999,Junio 1994,Junio 1989,Junio 1987"
+        },
+        {
+          "date": "2014-05-25",
+          "contests": 1,
+          "seats": 54,
+          "source": "infoelectoral",
+          "quote": "Parlamento Europeo Junio 2024,Mayo 2019,Mayo 2014,Junio 2009,Junio 2004,Junio 1999,Junio 1994,Junio 1989,Junio 1987"
+        },
+        {
+          "date": "2019-05-26",
+          "contests": 1,
+          "seats": 54,
+          "source": "infoelectoral",
+          "quote": "Parlamento Europeo Junio 2024,Mayo 2019,Mayo 2014,Junio 2009,Junio 2004,Junio 1999,Junio 1994,Junio 1989,Junio 1987"
+        },
+        {
+          "date": "2024-06-09",
+          "contests": 1,
+          "seats": 61,
+          "source": "infoelectoral",
+          "quote": "Parlamento Europeo Junio 2024,Mayo 2019,Mayo 2014,Junio 2009,Junio 2004,Junio 1999,Junio 1994,Junio 1989,Junio 1987"
+        }
+      ]
+    },
+    {
+      "key": "referendums",
+      "tier": "national",
+      "name": "Referéndums nacionales",
+      "name_en": "National referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "question",
+        "fine": [
+          "es.provincia",
+          "es.mesa"
+        ]
+      },
+      "source": "infoelectoral",
+      "first_held": "1976-12-15",
+      "earliest_record": "1976-12-15",
+      "note": "Consultative referendums (Constitution art. 92) and the constitutional ones (arts. 167-168): 1976 Political Reform (under the Fundamental Laws), 1978 Constitution, 1986 NATO, and 2005 European Constitution.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "iso_pattern": "ES",
+          "valid_from": "1976-12-01"
+        }
+      ],
+      "cadence": [
+        {
+          "called": true,
+          "administered_by": "Junta Electoral Central; Ministerio del Interior",
+          "source": "ce1978",
+          "locator": "https://www.boe.es/buscar/act.php?id=BOE-A-1978-31229 (art. 92: consultative referendum called by the King on the Prime Minister's proposal, authorized by the Congreso)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Ministerio del Interior, infoelectoral (área de descargas)",
+          "format": "zip (fixed-width DAT)",
+          "access": "browser",
+          "checked_at": "2026-11-13",
+          "license": "Ley 37/2007 reuse under the ministry's aviso legal: cite \"Origen de los datos: Ministerio del Interior\"",
+          "source": "infoelectoral",
+          "url": "https://infoelectoral.interior.gob.es/estaticos/docxl/apliextr/01{YYYYMM}_MESA.zip",
+          "first_date": "1976-12-15",
+          "last_date": "2005-02-20",
+          "finest": "es.mesa",
+          "evidence": "1976 by province only; 1978 TOTA; 1986 and 2005 by mesa (MF-669)"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1976-12-15",
+          "contests": 1,
+          "source": "infoelectoral",
+          "quote": "Referéndum Febrero 2005,Marzo 1986,Diciembre 1978,Diciembre 1976"
+        },
+        {
+          "date": "1978-12-06",
+          "contests": 1,
+          "source": "infoelectoral",
+          "quote": "Referéndum Febrero 2005,Marzo 1986,Diciembre 1978,Diciembre 1976"
+        },
+        {
+          "date": "1986-03-12",
+          "contests": 1,
+          "source": "infoelectoral",
+          "quote": "Referéndum Febrero 2005,Marzo 1986,Diciembre 1978,Diciembre 1976"
+        },
+        {
+          "date": "2005-02-20",
+          "contests": 1,
+          "source": "infoelectoral",
+          "quote": "Referéndum Febrero 2005,Marzo 1986,Diciembre 1978,Diciembre 1976"
+        }
+      ]
+    },
+    {
+      "key": "presidente_gobierno",
+      "tier": "national",
+      "name": "Investidura del Presidente del Gobierno",
+      "name_en": "Investiture of the Prime Minister",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "ce1978",
+      "locator": "https://www.boe.es/buscar/act.php?id=BOE-A-1978-31229 (art. 99)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "The Congreso invests the Prime Minister by a vote of its members (Constitution art. 99); regional presidents and mayors are chosen the same way by their chambers and councils (LOREG art. 196). These are parliamentary votes, not elections.",
+      "match": []
+    },
+    {
+      "key": "primarias",
+      "tier": "national",
+      "name": "Primarias de partidos",
+      "name_en": "Party primaries",
+      "category": "nominating",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "loreg",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Parties run their own primaries under their statutes; the state neither administers nor publishes them.",
+      "match": []
+    },
+    {
+      "key": "sindicales",
+      "tier": "national",
+      "name": "Elecciones sindicales y a cámaras agrarias",
+      "name_en": "Works council and agricultural chamber elections",
+      "category": "special_purpose",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "loreg",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Workplace representation (Estatuto de los Trabajadores) and agricultural chamber votes are professional and workplace ballots, not public elections.",
+      "match": []
+    },
+    {
+      "key": "cortes_republica",
+      "tier": "national",
+      "name": "Elecciones a Cortes de la Segunda República",
+      "name_en": "Cortes of the Second Republic",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "constituency"
+      },
+      "source": "ce1978",
+      "valid_from": "1931-06-28",
+      "valid_to": "1939-04-01",
+      "first_held": "1931-06-28",
+      "note": "Constituent Cortes 1931 and Cortes 1933 and 1936, elected by provincial and city constituencies with a majoritarian list vote and a second round where no list reached the threshold. The Congreso's historical deputies archive covers 1810-1977.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "unicameral",
+            "lower_house"
+          ],
+          "iso_pattern": "ES",
+          "valid_to": "1939-04-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1931-06-28"
+        },
+        {
+          "date": "1933-11-19"
+        },
+        {
+          "date": "1936-02-16"
+        }
+      ],
+      "est_votes": 25000000,
+      "effort": 4
+    },
+    {
+      "key": "cortes_historicas",
+      "tier": "national",
+      "name": "Elecciones a Cortes, 1810-1923",
+      "name_en": "Cortes elections, 1810-1923 (Cádiz, Isabelline, Sexenio, and Restoration)",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "constituency"
+      },
+      "source": "ce1978",
+      "valid_from": "1810-01-01",
+      "valid_to": "1923-09-13",
+      "note": "From the Cortes of Cádiz to the 1923 election before Primo de Rivera's coup, mostly single-member districts with census or manhood suffrage (universal male from 1890). The Congreso's historical deputies archive lists members; vote counts sit in the Diario de Sesiones' actas.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "lower_house",
+            "upper_house",
+            "unicameral"
+          ],
+          "iso_pattern": "ES",
+          "valid_to": "1923-09-13"
+        }
+      ],
+      "est_votes": 40000000,
+      "effort": 5
+    },
+    {
+      "key": "tercio_familiar",
+      "tier": "national",
+      "name": "Procuradores en Cortes por el tercio familiar",
+      "name_en": "Family-representation members of the Francoist Cortes",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "constituency"
+      },
+      "source": "ce1978",
+      "valid_from": "1967-01-01",
+      "valid_to": "1977-06-15",
+      "note": "Two per province, elected by heads of family and married women in 1967 and 1971 under the Ley Orgánica del Estado (1967).",
+      "match": [],
+      "dates": [
+        {
+          "date": "1967-10-10"
+        },
+        {
+          "date": "1971-10-29"
+        }
+      ],
+      "est_votes": 12000000,
+      "effort": 4
+    },
+    {
+      "key": "referendums_franquistas",
+      "tier": "national",
+      "name": "Referéndums de 1947 y 1966",
+      "name_en": "Francoist referendums (1947 Succession Law, 1966 Organic Law of the State)",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "question"
+      },
+      "source": "ce1978",
+      "valid_from": "1947-07-06",
+      "valid_to": "1976-12-15",
+      "note": "Held under the Ley de Referéndum Nacional of 1945; results by province appear in the BOE proclamations.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "iso_pattern": "ES",
+          "valid_to": "1976-12-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1947-07-06"
+        },
+        {
+          "date": "1966-12-14"
+        }
+      ],
+      "est_votes": 35000000,
+      "effort": 2
+    },
+    {
+      "key": "parlamentos",
+      "tier": "comunidad",
+      "name": "Elecciones a los parlamentos autonómicos",
+      "name_en": "Regional parliament elections",
+      "category": "legislature",
+      "goal": "subnational",
+      "measure": {
+        "unit": "constituency",
+        "schemes": [
+          "es.provincia",
+          "es.isla",
+          "es.comunidad"
+        ],
+        "fine": [
+          "es.municipio",
+          "es.mesa"
+        ]
+      },
+      "source": "loreg",
+      "locator": "https://www.boe.es/buscar/act.php?id=BOE-A-1985-11672 (art. 42)",
+      "first_held": "1979-04-03",
+      "earliest_record": "1980-03-09",
+      "note": "Counted per constituency. Each statute of autonomy and regional electoral law sets the system: closed lists with D'Hondt and a 3-5% threshold, by province in most communities, by island in Canarias (plus a regional list since 2019) and Illes Balears, and one district in the single-province communities. The 13 communities that first voted on 8 May 1983 hold their elections on the fourth Sunday of May with the municipal elections unless their president dissolves early (LOREG art. 42.3); Andalucía, Cataluña, Galicia, and País Vasco keep their own calendars. Navarra's Parlamento Foral was first elected on 3 April 1979.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "snap"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "ES-*",
+          "polity_kinds": [
+            "region"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "called": true,
+          "administered_by": "Each community's government and electoral board",
+          "source": "loreg",
+          "locator": "https://www.boe.es/buscar/act.php?id=BOE-A-1985-11672 (art. 42.1-42.3)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Gobierno Vasco, descargas de resultados",
+          "url": "https://www.euskadi.eus/contenidos/informacion/w_em_descargas/es_def/adjuntos/csv/P{YY}_c.zip",
+          "format": "csv, xls",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "first_date": "1980-03-09",
+          "last_date": "2024-04-21",
+          "finest": "es.mesa",
+          "within": "ES-PV",
+          "source": "euskadi-descargas",
+          "evidence": "Every Parlamento Vasco election by mesa (loaded as es.euskadi)"
+        },
+        {
+          "platform": "Generalitat de Catalunya, resultats electorals",
+          "url": "https://resultats.dadeselectorals.gencat.cat/webelec/api",
+          "format": "csv in zip",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "first_date": "1980-03-20",
+          "last_date": "2024-05-12",
+          "finest": "es.mesa",
+          "within": "ES-CT",
+          "license": "Llicència oberta d'ús d'informació - Catalunya",
+          "evidence": "All 14 Parlament elections, mesa from 1988 (loaded as es.cat)"
+        },
+        {
+          "platform": "Gobierno de Aragón, Aragón Open Data",
+          "url": "https://opendata.aragon.es/GA_OD_Core/download?resource_id=380&formato=csv",
+          "format": "csv",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "first_date": "1983-05-08",
+          "last_date": "2026-02-08",
+          "finest": "es.mesa",
+          "within": "ES-AR",
+          "license": "CC BY 4.0",
+          "evidence": "12 Cortes de Aragón elections, mesa for 7 (loaded as es.aragon)"
+        },
+        {
+          "platform": "Parlamento de Canarias, datos abiertos",
+          "url": "https://www.parcan.es/api/resultados_electorales/{YYYY}/{circunscripcion}?format=csv",
+          "format": "csv, json",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "first_date": "1999-05-13",
+          "last_date": "2023-05-28",
+          "finest": "es.municipio",
+          "within": "ES-CN",
+          "license": "ODC PDDL",
+          "evidence": "1999-2023 by municipality within island constituency"
+        },
+        {
+          "platform": "Gobierno de La Rioja, datos abiertos",
+          "url": "https://ias1.larioja.org/opendata/download?r=Y2Q9MzczfGNmPTAz",
+          "format": "csv",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "first_date": "1983-05-08",
+          "last_date": "2023-05-28",
+          "finest": "es.municipio",
+          "within": "ES-RI",
+          "evidence": "All 11 elections by municipality in one file"
+        },
+        {
+          "platform": "Gobierno de Navarra, datos abiertos",
+          "url": "https://datosabiertos.navarra.es/es/dataset/resultados-de-las-elecciones-al-parlamento-de-navarra-agrupados-por-municipios",
+          "format": "csv",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "finest": "es.municipio",
+          "within": "ES-NC",
+          "license": "CC BY 4.0",
+          "evidence": "Parlamento de Navarra by municipality; range not opened"
+        },
+        {
+          "platform": "Junta de Castilla-La Mancha, datos abiertos",
+          "url": "https://datosabiertos.castillalamancha.es/",
+          "format": "csv, xlsx",
+          "access": "manual",
+          "checked_at": "2026-11-13",
+          "first_date": "1983-05-08",
+          "last_date": "2023-05-28",
+          "within": "ES-CM",
+          "evidence": "One CSV per election 1983-2023 listed on datos.gob.es; the host resets TLS from abroad"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1979-04-03",
+          "contests": 1,
+          "regions": {
+            "NC": 1
+          },
+          "source": "reg-es-nc"
+        },
+        {
+          "date": "1980-03-09",
+          "contests": 3,
+          "regions": {
+            "PV": 3
+          },
+          "source": "reg-es-pv",
+          "quote": "Parlamento Vasco zips P80 to P24, one CirP file per election with the three territories"
+        },
+        {
+          "date": "1980-03-20",
+          "contests": 4,
+          "regions": {
+            "CT": 4
+          },
+          "source": "reg-es-ct",
+          "quote": "la circumscripció de Barcelona n'elegeix 85, la de Girona 17, la de Lleida 15 i la de Tarragona 18."
+        },
+        {
+          "date": "1981-10-20",
+          "contests": 4,
+          "regions": {
+            "GA": 4
+          },
+          "source": "reg-es-ga"
+        },
+        {
+          "date": "1982-05-23",
+          "contests": 8,
+          "regions": {
+            "AN": 8
+          },
+          "source": "reg-es-an"
+        },
+        {
+          "date": "1983-05-08",
+          "contests": 45,
+          "regions": {
+            "AR": 3,
+            "AS": 3,
+            "IB": 4,
+            "CN": 7,
+            "CB": 1,
+            "CM": 5,
+            "VC": 3,
+            "EX": 2,
+            "MD": 1,
+            "MC": 5,
+            "NC": 1,
+            "RI": 1,
+            "CL": 9
+          },
+          "source": "reg-es-ar",
+          "quote": "Seleccionar el proceso electoral que desees analizar entre todas las elecciones a Cortes de Aragón, desde 1983 hasta 2026.",
+          "note": "Also ES-AS, ES-CB, ES-CL, ES-CM, ES-CN, ES-EX, ES-IB, ES-MC, ES-MD, ES-NC, ES-RI, ES-VC; each community's own source is in the research section."
+        },
+        {
+          "date": "1984-02-26",
+          "contests": 3,
+          "regions": {
+            "PV": 3
+          },
+          "source": "reg-es-pv",
+          "quote": "Parlamento Vasco zips P80 to P24, one CirP file per election with the three territories"
+        },
+        {
+          "date": "1984-04-29",
+          "contests": 4,
+          "regions": {
+            "CT": 4
+          },
+          "source": "reg-es-ct",
+          "quote": "la circumscripció de Barcelona n'elegeix 85, la de Girona 17, la de Lleida 15 i la de Tarragona 18."
+        },
+        {
+          "date": "1985-11-24",
+          "contests": 4,
+          "regions": {
+            "GA": 4
+          },
+          "source": "reg-es-ga"
+        },
+        {
+          "date": "1986-06-22",
+          "contests": 8,
+          "regions": {
+            "AN": 8
+          },
+          "source": "reg-es-an"
+        },
+        {
+          "date": "1986-11-30",
+          "contests": 3,
+          "regions": {
+            "PV": 3
+          },
+          "source": "reg-es-pv",
+          "quote": "Parlamento Vasco zips P80 to P24, one CirP file per election with the three territories"
+        },
+        {
+          "date": "1987-06-10",
+          "contests": 45,
+          "regions": {
+            "AR": 3,
+            "AS": 3,
+            "IB": 4,
+            "CN": 7,
+            "CB": 1,
+            "CM": 5,
+            "VC": 3,
+            "EX": 2,
+            "MD": 1,
+            "MC": 5,
+            "NC": 1,
+            "RI": 1,
+            "CL": 9
+          },
+          "source": "reg-es-ar",
+          "quote": "Seleccionar el proceso electoral que desees analizar entre todas las elecciones a Cortes de Aragón, desde 1983 hasta 2026.",
+          "note": "Also ES-AS, ES-CB, ES-CL, ES-CM, ES-CN, ES-EX, ES-IB, ES-MC, ES-MD, ES-NC, ES-RI, ES-VC; each community's own source is in the research section."
+        },
+        {
+          "date": "1988-05-29",
+          "contests": 4,
+          "regions": {
+            "CT": 4
+          },
+          "source": "reg-es-ct",
+          "quote": "la circumscripció de Barcelona n'elegeix 85, la de Girona 17, la de Lleida 15 i la de Tarragona 18."
+        },
+        {
+          "date": "1989-12-17",
+          "contests": 4,
+          "regions": {
+            "GA": 4
+          },
+          "source": "reg-es-ga"
+        },
+        {
+          "date": "1990-06-23",
+          "contests": 8,
+          "regions": {
+            "AN": 8
+          },
+          "source": "reg-es-an"
+        },
+        {
+          "date": "1990-10-28",
+          "contests": 3,
+          "regions": {
+            "PV": 3
+          },
+          "source": "reg-es-pv",
+          "quote": "Parlamento Vasco zips P80 to P24, one CirP file per election with the three territories"
+        },
+        {
+          "date": "1991-05-26",
+          "contests": 45,
+          "regions": {
+            "AR": 3,
+            "AS": 3,
+            "IB": 4,
+            "CN": 7,
+            "CB": 1,
+            "CM": 5,
+            "VC": 3,
+            "EX": 2,
+            "MD": 1,
+            "MC": 5,
+            "NC": 1,
+            "RI": 1,
+            "CL": 9
+          },
+          "source": "reg-es-ar",
+          "quote": "Seleccionar el proceso electoral que desees analizar entre todas las elecciones a Cortes de Aragón, desde 1983 hasta 2026.",
+          "note": "Also ES-AS, ES-CB, ES-CL, ES-CM, ES-CN, ES-EX, ES-IB, ES-MC, ES-MD, ES-NC, ES-RI, ES-VC; each community's own source is in the research section."
+        },
+        {
+          "date": "1992-03-15",
+          "contests": 4,
+          "regions": {
+            "CT": 4
+          },
+          "source": "reg-es-ct",
+          "quote": "la circumscripció de Barcelona n'elegeix 85, la de Girona 17, la de Lleida 15 i la de Tarragona 18."
+        },
+        {
+          "date": "1993-10-17",
+          "contests": 4,
+          "regions": {
+            "GA": 4
+          },
+          "source": "reg-es-ga"
+        },
+        {
+          "date": "1994-06-12",
+          "contests": 8,
+          "regions": {
+            "AN": 8
+          },
+          "source": "reg-es-an"
+        },
+        {
+          "date": "1994-10-23",
+          "contests": 3,
+          "regions": {
+            "PV": 3
+          },
+          "source": "reg-es-pv",
+          "quote": "Parlamento Vasco zips P80 to P24, one CirP file per election with the three territories"
+        },
+        {
+          "date": "1995-05-28",
+          "contests": 45,
+          "regions": {
+            "AR": 3,
+            "AS": 3,
+            "IB": 4,
+            "CN": 7,
+            "CB": 1,
+            "CM": 5,
+            "VC": 3,
+            "EX": 2,
+            "MD": 1,
+            "MC": 5,
+            "NC": 1,
+            "RI": 1,
+            "CL": 9
+          },
+          "source": "reg-es-ar",
+          "quote": "Seleccionar el proceso electoral que desees analizar entre todas las elecciones a Cortes de Aragón, desde 1983 hasta 2026.",
+          "note": "Also ES-AS, ES-CB, ES-CL, ES-CM, ES-CN, ES-EX, ES-IB, ES-MC, ES-MD, ES-NC, ES-RI, ES-VC; each community's own source is in the research section."
+        },
+        {
+          "date": "1995-11-19",
+          "contests": 4,
+          "regions": {
+            "CT": 4
+          },
+          "source": "reg-es-ct",
+          "quote": "la circumscripció de Barcelona n'elegeix 85, la de Girona 17, la de Lleida 15 i la de Tarragona 18."
+        },
+        {
+          "date": "1996-03-03",
+          "contests": 8,
+          "regions": {
+            "AN": 8
+          },
+          "source": "reg-es-an"
+        },
+        {
+          "date": "1997-10-19",
+          "contests": 4,
+          "regions": {
+            "GA": 4
+          },
+          "source": "reg-es-ga"
+        },
+        {
+          "date": "1998-10-25",
+          "contests": 3,
+          "regions": {
+            "PV": 3
+          },
+          "source": "reg-es-pv",
+          "quote": "Parlamento Vasco zips P80 to P24, one CirP file per election with the three territories"
+        },
+        {
+          "date": "1999-06-13",
+          "contests": 45,
+          "regions": {
+            "AR": 3,
+            "AS": 3,
+            "IB": 4,
+            "CN": 7,
+            "CB": 1,
+            "CM": 5,
+            "VC": 3,
+            "EX": 2,
+            "MD": 1,
+            "MC": 5,
+            "NC": 1,
+            "RI": 1,
+            "CL": 9
+          },
+          "source": "reg-es-ar",
+          "quote": "Seleccionar el proceso electoral que desees analizar entre todas las elecciones a Cortes de Aragón, desde 1983 hasta 2026.",
+          "note": "Also ES-AS, ES-CB, ES-CL, ES-CM, ES-CN, ES-EX, ES-IB, ES-MC, ES-MD, ES-NC, ES-RI, ES-VC; each community's own source is in the research section."
+        },
+        {
+          "date": "1999-10-17",
+          "contests": 4,
+          "regions": {
+            "CT": 4
+          },
+          "source": "reg-es-ct",
+          "quote": "la circumscripció de Barcelona n'elegeix 85, la de Girona 17, la de Lleida 15 i la de Tarragona 18."
+        },
+        {
+          "date": "2000-03-12",
+          "contests": 8,
+          "regions": {
+            "AN": 8
+          },
+          "source": "reg-es-an"
+        },
+        {
+          "date": "2001-05-13",
+          "contests": 3,
+          "regions": {
+            "PV": 3
+          },
+          "source": "reg-es-pv",
+          "quote": "Parlamento Vasco zips P80 to P24, one CirP file per election with the three territories"
+        },
+        {
+          "date": "2001-10-21",
+          "contests": 4,
+          "regions": {
+            "GA": 4
+          },
+          "source": "reg-es-ga"
+        },
+        {
+          "date": "2003-05-25",
+          "contests": 45,
+          "regions": {
+            "AR": 3,
+            "AS": 3,
+            "IB": 4,
+            "CN": 7,
+            "CB": 1,
+            "CM": 5,
+            "VC": 3,
+            "EX": 2,
+            "MD": 1,
+            "MC": 5,
+            "NC": 1,
+            "RI": 1,
+            "CL": 9
+          },
+          "source": "reg-es-ar",
+          "quote": "Seleccionar el proceso electoral que desees analizar entre todas las elecciones a Cortes de Aragón, desde 1983 hasta 2026.",
+          "note": "Also ES-AS, ES-CB, ES-CL, ES-CM, ES-CN, ES-EX, ES-IB, ES-MC, ES-MD, ES-NC, ES-RI, ES-VC; each community's own source is in the research section."
+        },
+        {
+          "date": "2003-11-16",
+          "contests": 4,
+          "regions": {
+            "CT": 4
+          },
+          "source": "reg-es-ct",
+          "quote": "la circumscripció de Barcelona n'elegeix 85, la de Girona 17, la de Lleida 15 i la de Tarragona 18."
+        },
+        {
+          "date": "2004-03-14",
+          "contests": 8,
+          "regions": {
+            "AN": 8
+          },
+          "source": "reg-es-an"
+        },
+        {
+          "date": "2005-04-17",
+          "contests": 3,
+          "regions": {
+            "PV": 3
+          },
+          "source": "reg-es-pv",
+          "quote": "Parlamento Vasco zips P80 to P24, one CirP file per election with the three territories"
+        },
+        {
+          "date": "2005-06-19",
+          "contests": 4,
+          "regions": {
+            "GA": 4
+          },
+          "source": "reg-es-ga"
+        },
+        {
+          "date": "2006-11-01",
+          "contests": 4,
+          "regions": {
+            "CT": 4
+          },
+          "source": "reg-es-ct",
+          "quote": "la circumscripció de Barcelona n'elegeix 85, la de Girona 17, la de Lleida 15 i la de Tarragona 18."
+        },
+        {
+          "date": "2007-05-27",
+          "contests": 45,
+          "regions": {
+            "AR": 3,
+            "AS": 3,
+            "IB": 4,
+            "CN": 7,
+            "CB": 1,
+            "CM": 5,
+            "VC": 3,
+            "EX": 2,
+            "MD": 1,
+            "MC": 5,
+            "NC": 1,
+            "RI": 1,
+            "CL": 9
+          },
+          "source": "reg-es-ar",
+          "quote": "Seleccionar el proceso electoral que desees analizar entre todas las elecciones a Cortes de Aragón, desde 1983 hasta 2026.",
+          "note": "Also ES-AS, ES-CB, ES-CL, ES-CM, ES-CN, ES-EX, ES-IB, ES-MC, ES-MD, ES-NC, ES-RI, ES-VC; each community's own source is in the research section."
+        },
+        {
+          "date": "2008-03-09",
+          "contests": 8,
+          "regions": {
+            "AN": 8
+          },
+          "source": "reg-es-an"
+        },
+        {
+          "date": "2009-03-01",
+          "contests": 7,
+          "regions": {
+            "GA": 4,
+            "PV": 3
+          },
+          "source": "reg-es-ga",
+          "note": "Also ES-PV; each community's own source is in the research section."
+        },
+        {
+          "date": "2010-11-28",
+          "contests": 4,
+          "regions": {
+            "CT": 4
+          },
+          "source": "reg-es-ct",
+          "quote": "la circumscripció de Barcelona n'elegeix 85, la de Girona 17, la de Lleida 15 i la de Tarragona 18."
+        },
+        {
+          "date": "2011-05-22",
+          "contests": 45,
+          "regions": {
+            "AR": 3,
+            "AS": 3,
+            "IB": 4,
+            "CN": 7,
+            "CB": 1,
+            "CM": 5,
+            "VC": 3,
+            "EX": 2,
+            "MD": 1,
+            "MC": 5,
+            "NC": 1,
+            "RI": 1,
+            "CL": 9
+          },
+          "source": "reg-es-ar",
+          "quote": "Seleccionar el proceso electoral que desees analizar entre todas las elecciones a Cortes de Aragón, desde 1983 hasta 2026.",
+          "note": "Also ES-AS, ES-CB, ES-CL, ES-CM, ES-CN, ES-EX, ES-IB, ES-MC, ES-MD, ES-NC, ES-RI, ES-VC; each community's own source is in the research section."
+        },
+        {
+          "date": "2012-03-25",
+          "contests": 8,
+          "regions": {
+            "AN": 8
+          },
+          "source": "reg-es-an"
+        },
+        {
+          "date": "2012-10-21",
+          "contests": 7,
+          "regions": {
+            "GA": 4,
+            "PV": 3
+          },
+          "source": "reg-es-ga",
+          "note": "Also ES-PV; each community's own source is in the research section."
+        },
+        {
+          "date": "2012-11-25",
+          "contests": 4,
+          "regions": {
+            "CT": 4
+          },
+          "source": "reg-es-ct",
+          "quote": "la circumscripció de Barcelona n'elegeix 85, la de Girona 17, la de Lleida 15 i la de Tarragona 18."
+        },
+        {
+          "date": "2015-03-22",
+          "contests": 8,
+          "regions": {
+            "AN": 8
+          },
+          "source": "reg-es-an"
+        },
+        {
+          "date": "2015-05-24",
+          "contests": 45,
+          "regions": {
+            "AR": 3,
+            "AS": 3,
+            "IB": 4,
+            "CN": 7,
+            "CB": 1,
+            "CM": 5,
+            "VC": 3,
+            "EX": 2,
+            "MD": 1,
+            "MC": 5,
+            "NC": 1,
+            "RI": 1,
+            "CL": 9
+          },
+          "source": "reg-es-ar",
+          "quote": "Seleccionar el proceso electoral que desees analizar entre todas las elecciones a Cortes de Aragón, desde 1983 hasta 2026.",
+          "note": "Also ES-AS, ES-CB, ES-CL, ES-CM, ES-CN, ES-EX, ES-IB, ES-MC, ES-MD, ES-NC, ES-RI, ES-VC; each community's own source is in the research section."
+        },
+        {
+          "date": "2015-09-27",
+          "contests": 4,
+          "regions": {
+            "CT": 4
+          },
+          "source": "reg-es-ct",
+          "quote": "la circumscripció de Barcelona n'elegeix 85, la de Girona 17, la de Lleida 15 i la de Tarragona 18."
+        },
+        {
+          "date": "2016-09-25",
+          "contests": 7,
+          "regions": {
+            "GA": 4,
+            "PV": 3
+          },
+          "source": "reg-es-ga",
+          "note": "Also ES-PV; each community's own source is in the research section."
+        },
+        {
+          "date": "2017-12-21",
+          "contests": 4,
+          "regions": {
+            "CT": 4
+          },
+          "source": "reg-es-ct",
+          "quote": "la circumscripció de Barcelona n'elegeix 85, la de Girona 17, la de Lleida 15 i la de Tarragona 18."
+        },
+        {
+          "date": "2018-12-02",
+          "contests": 8,
+          "regions": {
+            "AN": 8
+          },
+          "source": "reg-es-an"
+        },
+        {
+          "date": "2019-04-28",
+          "contests": 3,
+          "regions": {
+            "VC": 3
+          },
+          "source": "reg-es-vc",
+          "quote": "En la XI legislatura han sido elegidos 35 diputados y diputadas por la circunscripción de Alicante, 24 diputados y diputadas por la de Castellón y 40 diputados y diputadas por la de Valencia."
+        },
+        {
+          "date": "2019-05-26",
+          "contests": 39,
+          "regions": {
+            "AR": 3,
+            "AS": 3,
+            "IB": 4,
+            "CN": 8,
+            "CB": 1,
+            "CM": 5,
+            "EX": 2,
+            "MD": 1,
+            "MC": 1,
+            "NC": 1,
+            "RI": 1,
+            "CL": 9
+          },
+          "source": "reg-es-ar",
+          "quote": "Seleccionar el proceso electoral que desees analizar entre todas las elecciones a Cortes de Aragón, desde 1983 hasta 2026.",
+          "note": "Also ES-AS, ES-CB, ES-CL, ES-CM, ES-CN, ES-EX, ES-IB, ES-MC, ES-MD, ES-NC, ES-RI; each community's own source is in the research section."
+        },
+        {
+          "date": "2020-07-12",
+          "contests": 7,
+          "regions": {
+            "GA": 4,
+            "PV": 3
+          },
+          "source": "reg-es-ga",
+          "note": "Also ES-PV; each community's own source is in the research section."
+        },
+        {
+          "date": "2021-02-14",
+          "contests": 4,
+          "regions": {
+            "CT": 4
+          },
+          "source": "reg-es-ct",
+          "quote": "la circumscripció de Barcelona n'elegeix 85, la de Girona 17, la de Lleida 15 i la de Tarragona 18."
+        },
+        {
+          "date": "2021-05-04",
+          "contests": 1,
+          "regions": {
+            "MD": 1
+          },
+          "source": "reg-es-md"
+        },
+        {
+          "date": "2022-02-13",
+          "contests": 9,
+          "regions": {
+            "CL": 9
+          },
+          "source": "reg-es-cl"
+        },
+        {
+          "date": "2022-06-19",
+          "contests": 8,
+          "regions": {
+            "AN": 8
+          },
+          "source": "reg-es-an"
+        },
+        {
+          "date": "2023-05-28",
+          "contests": 33,
+          "regions": {
+            "AR": 3,
+            "AS": 3,
+            "IB": 4,
+            "CN": 8,
+            "CB": 1,
+            "CM": 5,
+            "VC": 3,
+            "EX": 2,
+            "MD": 1,
+            "MC": 1,
+            "NC": 1,
+            "RI": 1
+          },
+          "source": "reg-es-ar",
+          "quote": "Seleccionar el proceso electoral que desees analizar entre todas las elecciones a Cortes de Aragón, desde 1983 hasta 2026.",
+          "note": "Also ES-AS, ES-CB, ES-CM, ES-CN, ES-EX, ES-IB, ES-MC, ES-MD, ES-NC, ES-RI, ES-VC; each community's own source is in the research section."
+        },
+        {
+          "date": "2024-02-18",
+          "contests": 4,
+          "regions": {
+            "GA": 4
+          },
+          "source": "reg-es-ga"
+        },
+        {
+          "date": "2024-04-21",
+          "contests": 3,
+          "regions": {
+            "PV": 3
+          },
+          "source": "reg-es-pv",
+          "quote": "Parlamento Vasco zips P80 to P24, one CirP file per election with the three territories"
+        },
+        {
+          "date": "2024-05-12",
+          "contests": 4,
+          "regions": {
+            "CT": 4
+          },
+          "source": "reg-es-ct",
+          "quote": "la circumscripció de Barcelona n'elegeix 85, la de Girona 17, la de Lleida 15 i la de Tarragona 18."
+        },
+        {
+          "date": "2025-12-21",
+          "contests": 2,
+          "regions": {
+            "EX": 2
+          },
+          "source": "reg-es-ex",
+          "quote": "con 36 diputados por la circunscripción de Badajoz y 29 por la de Cáceres."
+        },
+        {
+          "date": "2026-02-08",
+          "contests": 3,
+          "regions": {
+            "AR": 3
+          },
+          "source": "reg-es-ar",
+          "quote": "Seleccionar el proceso electoral que desees analizar entre todas las elecciones a Cortes de Aragón, desde 1983 hasta 2026."
+        },
+        {
+          "date": "2026-03-15",
+          "contests": 9,
+          "regions": {
+            "CL": 9
+          },
+          "source": "reg-es-cl"
+        },
+        {
+          "date": "2026-05-17",
+          "contests": 8,
+          "regions": {
+            "AN": 8
+          },
+          "source": "reg-es-an"
+        }
+      ]
+    },
+    {
+      "key": "estatutos",
+      "tier": "comunidad",
+      "name": "Referéndums de estatutos de autonomía",
+      "name_en": "Regional statute and autonomy-initiative referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "question",
+        "schemes": [
+          "es.comunidad"
+        ]
+      },
+      "source": "ce1978",
+      "locator": "https://www.boe.es/buscar/act.php?id=BOE-A-1978-31229 (arts. 151 and 152.2)",
+      "first_held": "1979-10-25",
+      "note": "Statutes of autonomy approved by referendum under art. 151 (Basque Country and Cataluña 1979, Galicia 1980, Andalucía 1981) and their reforms under art. 152.2 (Cataluña 2006, Andalucía 2007), plus Andalucía's autonomy-initiative referendum of 28 February 1980. The ministry's download area does not carry them; results are in the BOE proclamations and the regional governments' archives.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "iso_pattern": "ES-*"
+        }
+      ],
+      "cadence": [
+        {
+          "called": true,
+          "source": "ce1978",
+          "locator": "https://www.boe.es/buscar/act.php?id=BOE-A-1978-31229 (art. 152.2)"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1979-10-25",
+          "note": "País Vasco and Cataluña"
+        },
+        {
+          "date": "1980-02-28",
+          "note": "Andalucía, autonomy initiative under art. 151"
+        },
+        {
+          "date": "1980-12-21",
+          "note": "Galicia"
+        },
+        {
+          "date": "1981-10-20",
+          "note": "Andalucía"
+        },
+        {
+          "date": "2006-06-18",
+          "note": "Cataluña"
+        },
+        {
+          "date": "2007-02-18",
+          "note": "Andalucía"
+        }
+      ],
+      "est_votes": 20000000,
+      "effort": 2
+    },
+    {
+      "key": "asambleas_ceuta_melilla",
+      "tier": "ciudad_autonoma",
+      "name": "Elecciones a las Asambleas de Ceuta y Melilla",
+      "name_en": "Ceuta and Melilla assembly elections",
+      "category": "legislature",
+      "goal": "subnational",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "loreg",
+      "first_held": "1995-05-28",
+      "note": "25 members each, elected with the municipal elections under the LOREG's municipal rules (Statutes of Autonomy, Leyes Orgánicas 1/1995 and 2/1995); the ministry files them as municipalities 51001 and 52001 of the municipal process. Before 1995 they were municipal councils.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "general"
+          ],
+          "polity_kinds": [
+            "region"
+          ],
+          "iso_pattern": "ES-CE",
+          "precedence": 1
+        },
+        {
+          "election_kinds": [
+            "local",
+            "general"
+          ],
+          "polity_kinds": [
+            "region"
+          ],
+          "iso_pattern": "ES-ML",
+          "precedence": 1
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 3,
+          "month": 5,
+          "day_rule": "may_fourth_sunday",
+          "term_years": 4,
+          "called": false,
+          "source": "loreg",
+          "locator": "https://www.boe.es/buscar/act.php?id=BOE-A-1985-11672 (art. 42.3: \"Las elecciones se realizan el cuarto domingo de mayo del año que corresponda y los mandatos, de cuatro años, terminan en todo caso el día anterior al de la celebración de las siguientes elecciones\")",
+          "valid_from": "1995-03-14",
+          "administered_by": "Juntas Electorales; Ministerio del Interior"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Ministerio del Interior, infoelectoral (área de descargas)",
+          "format": "zip (fixed-width DAT)",
+          "access": "browser",
+          "checked_at": "2026-11-13",
+          "license": "Ley 37/2007 reuse under the ministry's aviso legal: cite \"Origen de los datos: Ministerio del Interior\"",
+          "source": "infoelectoral",
+          "url": "https://infoelectoral.interior.gob.es/estaticos/docxl/apliextr/04{YYYYMM}_MESA.zip",
+          "first_date": "1995-05-28",
+          "last_date": "2023-05-28",
+          "finest": "es.mesa",
+          "evidence": "Inside the municipal MESA zips as municipalities 51001 and 52001"
+        }
+      ],
+      "est_votes": 1000000,
+      "effort": 1
+    },
+    {
+      "key": "consells_comarcals",
+      "tier": "comarca",
+      "name": "Consejos comarcales (Cataluña, Aragón, El Bierzo)",
+      "name_en": "Comarcal councils",
+      "category": "indirect",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "lbrl",
+      "locator": "https://www.boe.es/buscar/act.php?id=BOE-A-1985-5392 (art. 42)",
+      "note": "Seats are allotted to parties from the municipal election results in each comarca and filled by councillors the parties name (Catalan Llei 6/1987 and its successors; Aragonese comarcalization laws from 1993); the Generalitat publishes the allocation as its own process.",
+      "match": [],
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 3,
+          "month": 5,
+          "day_rule": "may_fourth_sunday",
+          "term_years": 4,
+          "called": false,
+          "source": "loreg",
+          "locator": "https://www.boe.es/buscar/act.php?id=BOE-A-1985-11672 (art. 42.3: \"Las elecciones se realizan el cuarto domingo de mayo del año que corresponda y los mandatos, de cuatro años, terminan en todo caso el día anterior al de la celebración de las siguientes elecciones\")",
+          "valid_from": "1994-04-01",
+          "administered_by": "Juntas Electorales from the municipal results"
+        }
+      ],
+      "est_votes": 0,
+      "effort": 2
+    },
+    {
+      "key": "conselh_aran",
+      "tier": "comarca",
+      "name": "Eleccions al Conselh Generau d'Aran",
+      "name_en": "General Council of Aran elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "constituency"
+      },
+      "source": "lbrl",
+      "first_held": "1991-05-26",
+      "note": "13 members elected directly in six terçons with the municipal elections (Llei 16/1990 del règim especial de la Val d'Aran; Llei 1/2015). The Generalitat's results service publishes it as its own process.",
+      "match": [
+        {
+          "name_pattern": "Conselh Generau|Val d.Aran",
+          "election_kinds": [
+            "local",
+            "general"
+          ],
+          "within": "ES-CT"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 3,
+          "month": 5,
+          "day_rule": "may_fourth_sunday",
+          "term_years": 4,
+          "called": false,
+          "source": "loreg",
+          "locator": "https://www.boe.es/buscar/act.php?id=BOE-A-1985-11672 (art. 42.3: \"Las elecciones se realizan el cuarto domingo de mayo del año que corresponda y los mandatos, de cuatro años, terminan en todo caso el día anterior al de la celebración de las siguientes elecciones\")",
+          "valid_from": "1991-01-01",
+          "administered_by": "Junta Electoral de Zona de Vielha",
+          "within": "ES-CT"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Generalitat de Catalunya, resultats electorals",
+          "url": "https://resultats.dadeselectorals.gencat.cat/webelec/api",
+          "format": "csv in zip",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "within": "ES-CT",
+          "evidence": "Listed among the Generalitat's processes; not opened"
+        }
+      ],
+      "est_votes": 40000,
+      "effort": 1
+    },
+    {
+      "key": "diputaciones",
+      "tier": "provincia",
+      "name": "Elección de Diputados Provinciales",
+      "name_en": "Provincial councils (diputaciones), seat allocation by judicial district",
+      "category": "indirect",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "loreg",
+      "locator": "https://www.boe.es/buscar/act.php?id=BOE-A-1985-11672 (arts. 202-209)",
+      "first_held": "1979-04-03",
+      "note": "38 common-regime provincial councils (25 to 51 members by population, art. 204): the provincial electoral board apportions seats to each judicial district, then to parties by D'Hondt on their municipal votes there, and the parties' councillors elect the deputies. None in the single-province communities or Navarra; the Basque provinces have juntas generales and the islands cabildos and consells. The ministry's type 10 files give the votes and seats by judicial district.",
+      "match": [],
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 3,
+          "month": 5,
+          "day_rule": "may_fourth_sunday",
+          "term_years": 4,
+          "called": false,
+          "source": "loreg",
+          "locator": "https://www.boe.es/buscar/act.php?id=BOE-A-1985-11672 (art. 42.3: \"Las elecciones se realizan el cuarto domingo de mayo del año que corresponda y los mandatos, de cuatro años, terminan en todo caso el día anterior al de la celebración de las siguientes elecciones\")",
+          "valid_from": "1994-04-01",
+          "administered_by": "Juntas Electorales Provinciales from the municipal results"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Ministerio del Interior, infoelectoral (área de descargas)",
+          "format": "zip (fixed-width DAT)",
+          "access": "browser",
+          "checked_at": "2026-11-13",
+          "license": "Ley 37/2007 reuse under the ministry's aviso legal: cite \"Origen de los datos: Ministerio del Interior\"",
+          "source": "infoelectoral",
+          "url": "https://infoelectoral.interior.gob.es/estaticos/docxl/apliextr/04{YYYYMM}_MESA.zip",
+          "first_date": "1987-06-10",
+          "last_date": "2023-05-28",
+          "finest": "es.provincia",
+          "evidence": "Files 0510/0610 (by judicial district) and 0710/0810 (by Diputación) inside the municipal zips"
+        }
+      ],
+      "est_votes": 0,
+      "effort": 2
+    },
+    {
+      "key": "juntas_generales",
+      "tier": "provincia",
+      "name": "Elecciones a Juntas Generales de Araba, Bizkaia y Gipuzkoa",
+      "name_en": "Basque provincial assemblies (Juntas Generales)",
+      "category": "legislature",
+      "goal": "subnational",
+      "measure": {
+        "unit": "polity",
+        "fine": [
+          "es.municipio",
+          "es.mesa"
+        ]
+      },
+      "source": "jjgg-1987",
+      "first_held": "1979-04-03",
+      "earliest_record": "1979-04-03",
+      "note": "51 members per territory, closed lists by district (Ley 1/1987), elected with the municipal elections; 153 members in all and 12 districts in 2023.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "general"
+          ],
+          "name_pattern": "Juntas Generales",
+          "within": "ES-PV"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 3,
+          "month": 5,
+          "day_rule": "may_fourth_sunday",
+          "term_years": 4,
+          "called": false,
+          "source": "loreg",
+          "locator": "https://www.boe.es/buscar/act.php?id=BOE-A-1985-11672 (art. 42.3: \"Las elecciones se realizan el cuarto domingo de mayo del año que corresponda y los mandatos, de cuatro años, terminan en todo caso el día anterior al de la celebración de las siguientes elecciones\")",
+          "valid_from": "1994-04-01",
+          "administered_by": "Gobierno Vasco and the Juntas Electorales de Territorio Histórico",
+          "within": "ES-PV"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Gobierno Vasco, descargas de resultados",
+          "url": "https://www.euskadi.eus/contenidos/informacion/w_em_descargas/es_def/adjuntos/csv/J{YY}_c.zip",
+          "format": "csv, xls",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "first_date": "1979-04-03",
+          "last_date": "2023-05-28",
+          "finest": "es.mesa",
+          "within": "ES-PV",
+          "source": "euskadi-descargas",
+          "evidence": "J79 to J23; J23 holds 2,694 mesa rows, 12 districts, and the 153 elected"
+        }
+      ],
+      "est_votes": 12000000,
+      "effort": 1
+    },
+    {
+      "key": "cabildos",
+      "tier": "isla",
+      "name": "Elecciones a Cabildos Insulares",
+      "name_en": "Canary Islands island councils (cabildos)",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity",
+        "schemes": [
+          "es.isla"
+        ],
+        "fine": [
+          "es.municipio",
+          "es.mesa"
+        ]
+      },
+      "source": "loreg",
+      "locator": "https://www.boe.es/buscar/act.php?id=BOE-A-1985-11672 (art. 201)",
+      "first_held": "1979-04-03",
+      "earliest_record": "1987-06-10",
+      "note": "Seven island councils elected in a separate ballot with the municipal elections, closed lists, D'Hondt with 5% of the island; the head of the most voted list presides (LOREG art. 201). The ministry lists the 1983 process with no files, and its 1979 files hold only the Canarias total.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "general"
+          ],
+          "within": "ES-CN",
+          "name_pattern": "Cabildo"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 3,
+          "month": 5,
+          "day_rule": "may_fourth_sunday",
+          "term_years": 4,
+          "called": false,
+          "source": "loreg",
+          "locator": "https://www.boe.es/buscar/act.php?id=BOE-A-1985-11672 (art. 42.3: \"Las elecciones se realizan el cuarto domingo de mayo del año que corresponda y los mandatos, de cuatro años, terminan en todo caso el día anterior al de la celebración de las siguientes elecciones\")",
+          "valid_from": "1994-04-01",
+          "administered_by": "Juntas Electorales; Ministerio del Interior",
+          "within": "ES-CN"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Ministerio del Interior, infoelectoral (área de descargas)",
+          "format": "zip (fixed-width DAT)",
+          "access": "browser",
+          "checked_at": "2026-11-13",
+          "license": "Ley 37/2007 reuse under the ministry's aviso legal: cite \"Origen de los datos: Ministerio del Interior\"",
+          "source": "infoelectoral",
+          "url": "https://infoelectoral.interior.gob.es/estaticos/docxl/apliextr/06{YYYYMM}_MESA.zip",
+          "first_date": "1987-06-10",
+          "last_date": "2023-05-28",
+          "finest": "es.mesa",
+          "evidence": "MESA and TOTA for 1987-2023; 1979 TOTA with the Canarias total only; 1983 listed with no files"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1979-04-03",
+          "contests": 7,
+          "source": "infoelectoral",
+          "quote": "Cabildos Mayo 2023,Mayo 2019,Mayo 2015,Mayo 2011,Mayo 2007,Mayo 2003,Junio 1999,Mayo 1995,Mayo 1991,Junio 1987,Mayo 1983,Abril 1979"
+        },
+        {
+          "date": "1983-05-08",
+          "contests": 7,
+          "source": "infoelectoral",
+          "quote": "Cabildos Mayo 2023,Mayo 2019,Mayo 2015,Mayo 2011,Mayo 2007,Mayo 2003,Junio 1999,Mayo 1995,Mayo 1991,Junio 1987,Mayo 1983,Abril 1979"
+        },
+        {
+          "date": "1987-06-10",
+          "contests": 7,
+          "source": "infoelectoral",
+          "quote": "Cabildos Mayo 2023,Mayo 2019,Mayo 2015,Mayo 2011,Mayo 2007,Mayo 2003,Junio 1999,Mayo 1995,Mayo 1991,Junio 1987,Mayo 1983,Abril 1979"
+        },
+        {
+          "date": "1991-05-26",
+          "contests": 7,
+          "source": "infoelectoral",
+          "quote": "Cabildos Mayo 2023,Mayo 2019,Mayo 2015,Mayo 2011,Mayo 2007,Mayo 2003,Junio 1999,Mayo 1995,Mayo 1991,Junio 1987,Mayo 1983,Abril 1979"
+        },
+        {
+          "date": "1995-05-28",
+          "contests": 7,
+          "source": "infoelectoral",
+          "quote": "Cabildos Mayo 2023,Mayo 2019,Mayo 2015,Mayo 2011,Mayo 2007,Mayo 2003,Junio 1999,Mayo 1995,Mayo 1991,Junio 1987,Mayo 1983,Abril 1979"
+        },
+        {
+          "date": "1999-06-13",
+          "contests": 7,
+          "source": "infoelectoral",
+          "quote": "Cabildos Mayo 2023,Mayo 2019,Mayo 2015,Mayo 2011,Mayo 2007,Mayo 2003,Junio 1999,Mayo 1995,Mayo 1991,Junio 1987,Mayo 1983,Abril 1979"
+        },
+        {
+          "date": "2003-05-25",
+          "contests": 7,
+          "source": "infoelectoral",
+          "quote": "Cabildos Mayo 2023,Mayo 2019,Mayo 2015,Mayo 2011,Mayo 2007,Mayo 2003,Junio 1999,Mayo 1995,Mayo 1991,Junio 1987,Mayo 1983,Abril 1979"
+        },
+        {
+          "date": "2007-05-27",
+          "contests": 7,
+          "source": "infoelectoral",
+          "quote": "Cabildos Mayo 2023,Mayo 2019,Mayo 2015,Mayo 2011,Mayo 2007,Mayo 2003,Junio 1999,Mayo 1995,Mayo 1991,Junio 1987,Mayo 1983,Abril 1979"
+        },
+        {
+          "date": "2011-05-22",
+          "contests": 7,
+          "source": "infoelectoral",
+          "quote": "Cabildos Mayo 2023,Mayo 2019,Mayo 2015,Mayo 2011,Mayo 2007,Mayo 2003,Junio 1999,Mayo 1995,Mayo 1991,Junio 1987,Mayo 1983,Abril 1979"
+        },
+        {
+          "date": "2015-05-24",
+          "contests": 7,
+          "source": "infoelectoral",
+          "quote": "Cabildos Mayo 2023,Mayo 2019,Mayo 2015,Mayo 2011,Mayo 2007,Mayo 2003,Junio 1999,Mayo 1995,Mayo 1991,Junio 1987,Mayo 1983,Abril 1979"
+        },
+        {
+          "date": "2019-05-26",
+          "contests": 7,
+          "source": "infoelectoral",
+          "quote": "Cabildos Mayo 2023,Mayo 2019,Mayo 2015,Mayo 2011,Mayo 2007,Mayo 2003,Junio 1999,Mayo 1995,Mayo 1991,Junio 1987,Mayo 1983,Abril 1979"
+        },
+        {
+          "date": "2023-05-28",
+          "contests": 7,
+          "source": "infoelectoral",
+          "quote": "Cabildos Mayo 2023,Mayo 2019,Mayo 2015,Mayo 2011,Mayo 2007,Mayo 2003,Junio 1999,Mayo 1995,Mayo 1991,Junio 1987,Mayo 1983,Abril 1979"
+        }
+      ],
+      "est_votes": 10000000,
+      "effort": 1
+    },
+    {
+      "key": "consells_insulars",
+      "tier": "isla",
+      "name": "Elecciones a los Consells Insulars",
+      "name_en": "Balearic island councils (consells insulars)",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity",
+        "schemes": [
+          "es.isla"
+        ],
+        "fine": [
+          "es.municipio"
+        ]
+      },
+      "source": "consells-2009",
+      "first_held": "2007-05-27",
+      "note": "Mallorca, Menorca, and Eivissa elect their consells directly since 2007, with the Balearic Parliament, closed lists by island (Ley 8/2007, then Ley 7/2009); Formentera's consell is also its municipal council and is elected under the LOREG's municipal rules. From 1979 to 2003 the consells were formed from each island's members of the Balearic Parliament.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "general"
+          ],
+          "within": "ES-IB",
+          "name_pattern": "Consell"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 3,
+          "month": 5,
+          "day_rule": "may_fourth_sunday",
+          "term_years": 4,
+          "called": false,
+          "source": "consells-2009",
+          "locator": "https://www.boe.es/buscar/act.php?id=BOE-A-2010-1399 (art. 6: called by decree of the President of the Illes Balears)",
+          "valid_from": "2007-01-01",
+          "administered_by": "Govern de les Illes Balears",
+          "within": "ES-IB"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Govern de les Illes Balears, processos electorals",
+          "url": "https://www.caib.es/sites/processoselectorals/ca/",
+          "format": "html",
+          "access": "browser",
+          "checked_at": "2026-11-13",
+          "within": "ES-IB",
+          "evidence": "Result pages load their tables by script; no file link found"
+        }
+      ],
+      "est_votes": 2500000,
+      "effort": 3
+    },
+    {
+      "key": "municipales",
+      "tier": "municipio",
+      "name": "Elecciones municipales",
+      "name_en": "Municipal council elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "municipality",
+        "schemes": [
+          "es.municipio"
+        ],
+        "fine": [
+          "es.mesa"
+        ]
+      },
+      "source": "loreg",
+      "locator": "https://www.boe.es/buscar/act.php?id=BOE-A-1985-11672 (arts. 179-180 and 184)",
+      "first_held": "1979-04-03",
+      "earliest_record": "1979-04-03",
+      "note": "Counted per municipality with results in the ministry's files (05 and 11): closed lists with D'Hondt and 5% above 250 residents, open lists with a limited vote (5 seats, 4 marks) for 101-250, and 3 councillors for 100 or fewer since 2011. Mayors are then chosen by the council (art. 196). Ceuta and Melilla are their own class from 1995.",
+      "match": [
+        {
+          "election_kinds": [
+            "local"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "valid_from": "1979-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 3,
+          "month": 5,
+          "day_rule": "may_fourth_sunday",
+          "term_years": 4,
+          "called": false,
+          "source": "loreg",
+          "locator": "https://www.boe.es/buscar/act.php?id=BOE-A-1985-11672 (art. 42.3: \"Las elecciones se realizan el cuarto domingo de mayo del año que corresponda y los mandatos, de cuatro años, terminan en todo caso el día anterior al de la celebración de las siguientes elecciones\")",
+          "valid_from": "1994-04-01",
+          "administered_by": "Juntas Electorales de Zona; Ministerio del Interior"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Ministerio del Interior, infoelectoral (área de descargas)",
+          "format": "zip (fixed-width DAT)",
+          "access": "browser",
+          "checked_at": "2026-11-13",
+          "license": "Ley 37/2007 reuse under the ministry's aviso legal: cite \"Origen de los datos: Ministerio del Interior\"",
+          "source": "infoelectoral",
+          "url": "https://infoelectoral.interior.gob.es/estaticos/docxl/apliextr/04{YYYYMM}_MESA.zip",
+          "first_date": "1979-04-03",
+          "last_date": "2023-05-28",
+          "finest": "es.mesa",
+          "evidence": "MUNI and TOTA for 1979 and 1983, MESA and TOTA for 1987-2023 (MF-669); files 11 and 12 hold municipalities under 250 residents"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1979-04-03",
+          "contests": 7822,
+          "source": "infoelectoral-04",
+          "quote": "04197904: 7,822 distinct province and municipality codes in files 05 (district 99) and 11"
+        },
+        {
+          "date": "1983-05-08",
+          "contests": 7780,
+          "source": "infoelectoral-04",
+          "quote": "04198305: 7,780 distinct province and municipality codes in files 05 (district 99) and 11"
+        },
+        {
+          "date": "1987-06-10",
+          "contests": 8062,
+          "source": "infoelectoral-04",
+          "quote": "04198706: 8,062 distinct province and municipality codes in files 05 (district 99) and 11"
+        },
+        {
+          "date": "1991-05-26",
+          "contests": 8060,
+          "source": "infoelectoral-04",
+          "quote": "04199105: 8,060 distinct province and municipality codes in files 05 (district 99) and 11"
+        },
+        {
+          "date": "1995-05-28",
+          "contests": 8067,
+          "source": "infoelectoral-04",
+          "quote": "04199505: 8,067 distinct province and municipality codes in files 05 (district 99) and 11"
+        },
+        {
+          "date": "1999-06-13",
+          "contests": 8036,
+          "source": "infoelectoral-04",
+          "quote": "04199906: 8,036 distinct province and municipality codes in files 05 (district 99) and 11"
+        },
+        {
+          "date": "2003-05-25",
+          "contests": 8070,
+          "source": "infoelectoral-04",
+          "quote": "04200305: 8,070 distinct province and municipality codes in files 05 (district 99) and 11"
+        },
+        {
+          "date": "2007-05-27",
+          "contests": 8077,
+          "source": "infoelectoral-04",
+          "quote": "04200705: 8,077 distinct province and municipality codes in files 05 (district 99) and 11"
+        },
+        {
+          "date": "2011-05-22",
+          "contests": 8084,
+          "source": "infoelectoral-04",
+          "quote": "04201105: 8,084 distinct province and municipality codes in files 05 (district 99) and 11"
+        },
+        {
+          "date": "2015-05-24",
+          "contests": 8093,
+          "source": "infoelectoral-04",
+          "quote": "04201505: 8,093 distinct province and municipality codes in files 05 (district 99) and 11"
+        },
+        {
+          "date": "2019-05-26",
+          "contests": 8121,
+          "source": "infoelectoral-04",
+          "quote": "04201905: 8,121 distinct province and municipality codes in files 05 (district 99) and 11"
+        },
+        {
+          "date": "2023-05-28",
+          "contests": 8087,
+          "source": "infoelectoral-04",
+          "quote": "04202305: 8,087 distinct province and municipality codes in files 05 (district 99) and 11"
+        }
+      ],
+      "est_votes": 265000000,
+      "effort": 3
+    },
+    {
+      "key": "concejo_abierto",
+      "tier": "municipio",
+      "name": "Alcaldes de concejo abierto",
+      "name_en": "Directly elected mayors of open-council municipalities",
+      "category": "executive",
+      "goal": "local",
+      "measure": {
+        "unit": "municipality"
+      },
+      "source": "loreg",
+      "locator": "https://www.boe.es/buscar/act.php?id=BOE-A-1985-11672 (art. 179.2: \"En estos municipios los electores eligen directamente al Alcalde por sistema mayoritario\")",
+      "first_held": "1979-04-03",
+      "note": "Municipalities governed by open council (LBRL art. 29: until 2011 every municipality under 100 residents, since Ley Orgánica 2/2011 only those that keep it by tradition or choice) elect only a mayor, by plurality, with the municipal elections. The open council of all residents then governs.",
+      "match": [
+        {
+          "election_kinds": [
+            "local"
+          ],
+          "office_kinds": [
+            "mayor"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "valid_from": "1979-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 3,
+          "month": 5,
+          "day_rule": "may_fourth_sunday",
+          "term_years": 4,
+          "called": false,
+          "source": "loreg",
+          "locator": "https://www.boe.es/buscar/act.php?id=BOE-A-1985-11672 (art. 42.3: \"Las elecciones se realizan el cuarto domingo de mayo del año que corresponda y los mandatos, de cuatro años, terminan en todo caso el día anterior al de la celebración de las siguientes elecciones\")",
+          "valid_from": "1994-04-01",
+          "administered_by": "Juntas Electorales de Zona"
+        }
+      ],
+      "est_votes": 200000,
+      "effort": 3
+    },
+    {
+      "key": "consultas_municipales",
+      "tier": "municipio",
+      "name": "Consultas populares municipales",
+      "name_en": "Municipal referendums (consultas populares)",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "question"
+      },
+      "source": "lbrl",
+      "locator": "https://www.boe.es/buscar/act.php?id=BOE-A-1985-5392 (art. 71: the mayor may call a popular consultation with the council's absolute majority and the national Government's authorization)",
+      "note": "Rare and ad hoc; the Government authorizes each one. Catalan municipal consultations under the Generalitat's own laws and the 2014 and 2017 Catalan votes are not referendums under art. 71 (the 2014 and 2017 ones were suspended and annulled by the Constitutional Court).",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "valid_from": "1979-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "called": true,
+          "source": "lbrl",
+          "locator": "https://www.boe.es/buscar/act.php?id=BOE-A-1985-5392 (art. 71)"
+        }
+      ],
+      "est_votes": 100000,
+      "effort": 4
+    },
+    {
+      "key": "entidades_menores",
+      "tier": "entidad_menor",
+      "name": "Elecciones a alcaldes pedáneos y juntas vecinales (entidades locales menores)",
+      "name_en": "Sub-municipal entities: pedáneo mayors, neighborhood boards, and Navarre concejos",
+      "category": "executive",
+      "goal": "local",
+      "measure": {
+        "unit": "submunicipal"
+      },
+      "source": "loreg",
+      "locator": "https://www.boe.es/buscar/act.php?id=BOE-A-1985-11672 (art. 199.2: \"Los Alcaldes Pedáneos son elegidos directamente por los vecinos de la correspondiente entidad local por sistema mayoritario\")",
+      "first_held": "1979-04-03",
+      "note": "The pedáneo mayor of each entidad local menor is elected by plurality with the municipal elections; the board's members are apportioned from the municipal votes in the entity's sections (art. 199), unless the community's own law says otherwise (Navarra's concejos, Asturias's parroquias rurales). Most are in Castilla y León (León, Burgos, Palencia), Navarra, Cantabria, Galicia, and Extremadura.",
+      "match": [
+        {
+          "election_kinds": [
+            "local"
+          ],
+          "polity_kinds": [
+            "submunicipal"
+          ],
+          "valid_from": "1979-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 3,
+          "month": 5,
+          "day_rule": "may_fourth_sunday",
+          "term_years": 4,
+          "called": false,
+          "source": "loreg",
+          "locator": "https://www.boe.es/buscar/act.php?id=BOE-A-1985-11672 (art. 42.3: \"Las elecciones se realizan el cuarto domingo de mayo del año que corresponda y los mandatos, de cuatro años, terminan en todo caso el día anterior al de la celebración de las siguientes elecciones\")",
+          "valid_from": "1994-04-01",
+          "administered_by": "Juntas Electorales de Zona; in Navarra the Gobierno de Navarra"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Gobierno de Navarra, datos abiertos (elecciones a concejos)",
+          "url": "https://datosabiertos.navarra.es/es/dataset?q=concejos+elecciones",
+          "format": "csv",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "within": "ES-NC",
+          "evidence": "The Navarra results page lists concejo elections as their own dataset; not opened"
+        }
+      ],
+      "est_votes": 1500000,
+      "effort": 4
+    },
+    {
+      "key": "municipales_historicas",
+      "tier": "municipio",
+      "name": "Elecciones municipales, 1835-1973",
+      "name_en": "Municipal elections before 1979 (liberal, Restoration, Republic, and Francoist family-third councillors)",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "municipality"
+      },
+      "source": "lbrl",
+      "valid_to": "1979-01-01",
+      "note": "Liberal and Restoration councils from the 1835 and 1877 municipal laws; the 12 April 1931 elections that brought the Second Republic, with partial ones in 1931 and 1933; and the councillors elected by heads of family under Franco (1948-1973). No national file; the 1931 results sit in provincial gazettes and the Anuario Estadístico.",
+      "match": [
+        {
+          "election_kinds": [
+            "local"
+          ],
+          "valid_to": "1979-01-01"
+        }
+      ],
+      "est_votes": 30000000,
+      "effort": 5
+    }
+  ]
+}
