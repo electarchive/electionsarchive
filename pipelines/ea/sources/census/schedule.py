@@ -34,7 +34,8 @@ def emit() -> Path:
         for rule in fixed_rules(conn, today, country):
             kind = (
                 "local"
-                if rule["government_kind"] is not None or rule["polity_kind"] not in ("country", "federal_unit")
+                if rule["government_kind"] not in (None, "national")
+                or rule["polity_kind"] not in ("country", "federal_unit", "sovereign_state")
                 else "general"
             )
             for when in occurrences(
