@@ -8,6 +8,7 @@ import type { Counting } from "#lib/server/counting.js";
 import { tally } from "#lib/atlas/electors.js";
 import { ending, partyOn, segments, stand } from "#lib/caucus.js";
 import {
+  ACCESS_LABELS,
   CATEGORY_LABELS,
   COLUMN_LABELS,
   columnGroup,
@@ -447,6 +448,30 @@ async function load(
   if (head === "chambers" && rest.length > 0) {
     return chamber(rest.join("/"));
   }
+  const state = search.get("state");
+  const level = search.get("level");
+  if (
+    head === "coverage" &&
+    rest.length === 1 &&
+    state != null &&
+    level != null
+  ) {
+    const year = search.has("year") ? Number(search.get("year")) : undefined;
+    const found = await call(router.coverage.governments, {
+      polity: rest[0] ?? "",
+      state,
+      level,
+      year,
+    }).catch(() => error(404));
+    return {
+      kind: "coverage_governments" as const,
+      polity: rest[0] ?? "",
+      state,
+      level,
+      year: year ?? null,
+      ...found,
+    };
+  }
   if (head === "coverage" && rest.length === 1) {
     return coverage(rest[0] ?? "");
   }
@@ -853,6 +878,9 @@ function markdown(
     }
     case "coverage": {
       return coverageMarkdown(data, link);
+    }
+    case "coverage_governments": {
+      return governmentsMarkdown(data, link);
     }
     case "methodology": {
       return methodologyMarkdown(data);
@@ -1360,6 +1388,44 @@ const share = (counts: Counts, strict: boolean) =>
     percent: percent(covered(counts, strict) / Math.max(1, counts.total), 1),
   });
 
+function governmentsMarkdown(
+  data: Extract<Data, { kind: "coverage_governments" }>,
+  link: Link,
+) {
+  return [
+    `# ${m.coverage_gov_title({ level: levelLabel(data.polity, data.level), state: data.state })}`,
+    m.coverage_gov_lede(),
+    ...(data.year == null
+      ? []
+      : [m.coverage_gov_year_lede({ year: String(data.year) })]),
+    table(
+      [
+        m.coverage_gov_column_name(),
+        m.coverage_gov_column_population(),
+        m.coverage_gov_column_last(),
+        m.coverage_gov_column_next(),
+        m.coverage_gov_column_cycle(),
+        m.coverage_gov_column_results(),
+        m.coverage_gov_column_access(),
+      ],
+      data.rows.map((row) => [
+        `${link(row.name, row.path)}${row.missing === true ? ` (${m.coverage_gov_missing().toLowerCase()})` : ""}`,
+        row.population == null ? null : count(row.population),
+        row.last,
+        row.next == null ? null : link(date(row.next.date), row.next.path),
+        row.cadence == null
+          ? null
+          : `${row.cadence.url == null ? row.cadence.title : `[${row.cadence.title}](${row.cadence.url})`}${row.cadence.locator == null ? "" : `, ${row.cadence.locator}`}`,
+        row.access == null ? null : (row.access.url ?? row.access.platform),
+        row.access == null ? null : ACCESS_LABELS[row.access.access](),
+      ]),
+    ),
+    ...(data.total > data.rows.length
+      ? [m.coverage_gov_more({ count: count(data.total - data.rows.length) })]
+      : []),
+  ];
+}
+
 function coverageMarkdown(
   data: Extract<Data, { kind: "coverage" }>,
   link: Link,
@@ -1483,6 +1549,25 @@ function coverageMarkdown(
               return `- ${levelLabel(data.polity, note.level)}: ${source == null ? (note.readiness ?? "") : `[${source.publisher ?? ""}, ${source.title}](${source.url})`}. ${note.note}`;
             })
             .join("\n")}`,
+          ...(isUs
+            ? [
+                m.coverage_gov_twin_hint({
+                  levels: new Intl.ListFormat(getLocale(), {
+                    type: "conjunction",
+                  }).format(
+                    [
+                      "county",
+                      "municipality",
+                      "township",
+                      "school",
+                      "college",
+                      "special",
+                      "other",
+                    ].map((key) => `\`${key}\``),
+                  ),
+                }),
+              ]
+            : []),
         ]),
     `## ${m.coverage_glance()}`,
     `${(isUs ? m.coverage_glance_hint_us : m.coverage_glance_hint_country)()} ${m.coverage_glance_none_hint()}`,

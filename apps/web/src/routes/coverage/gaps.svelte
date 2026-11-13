@@ -12,6 +12,7 @@
   import type { Counts, Goal } from "#lib/coverage.js";
   import Bar from "./bar.svelte";
   import Share from "./share.svelte";
+  import Governments from "./governments.svelte";
   import Self from "./gaps.svelte";
   import { levelLabel } from "#lib/coverage.js";
 
@@ -50,6 +51,14 @@
     enabled: rows == null,
   }));
   const depth = $derived(place == null ? 0 : level == null ? 1 : 2);
+  const isTracked = $derived(
+    polity === "us" &&
+      goal === "local" &&
+      depth === 2 &&
+      level != null &&
+      level !== "local_measure",
+  );
+  const isOpenable = $derived(depth < 2 || isTracked);
   const all = $derived.by(() => {
     const named = (rows ?? fetched.data ?? []).map((row) => ({
       row,
@@ -93,7 +102,7 @@
   <div
     role="row"
     aria-level={depth + 1}
-    aria-expanded={depth < 2 ? isOpen : undefined}
+    aria-expanded={isOpenable ? isOpen : undefined}
     class="grid grid-cols-[minmax(0,1fr)_3.5rem_7rem] items-center gap-x-3 bg-card px-3.5 py-1.5 text-sm tabular-nums sm:grid-cols-[minmax(0,1fr)_5rem_16rem] lg:grid-cols-[minmax(0,30rem)_5rem_16rem]"
   >
     <span
@@ -103,7 +112,7 @@
         "ps-10": depth - start === 2,
       })}
     >
-      {#if depth < 2}
+      {#if isOpenable}
         <button
           type="button"
           class="flex items-center gap-1 text-start min-inline-0 hover:underline focus-visible:outline-2 focus-visible:outline-ring"
@@ -163,7 +172,9 @@
       <Bar counts={row} {goal} {polity} class="block-2" />
     </span>
   </div>
-  {#if isOpen}
+  {#if isOpen && isTracked && place != null && level != null}
+    <Governments {polity} {place} {level} year={Number(row.key)} />
+  {:else if isOpen}
     <Self
       {polity}
       {goal}

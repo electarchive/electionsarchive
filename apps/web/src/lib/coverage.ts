@@ -670,6 +670,14 @@ export const CATEGORY_LABELS = {
   not_applicable: m.coverage_reason_inapplicable,
 };
 
+export const ACCESS_LABELS = {
+  open: m.coverage_access_open,
+  browser: m.coverage_access_browser,
+  blocked: m.coverage_access_blocked,
+  manual: m.coverage_access_manual,
+  none: m.coverage_access_none,
+};
+
 export const GRAIN_LABELS: Record<string, () => string> = {
   results: m.coverage_grain_results,
   county: m.coverage_grain_county,

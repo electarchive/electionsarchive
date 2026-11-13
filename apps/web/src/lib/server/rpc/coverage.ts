@@ -80,6 +80,7 @@ const Ready = {
   populationAbsent: v.number(),
 };
 const CATEGORIES = ["known_gap", "blocked", "not_applicable"] as const;
+const ACCESS = ["open", "browser", "blocked", "manual", "none"] as const;
 const Note = v.object({
   goal: v.string(),
   level: v.string(),
@@ -653,6 +654,103 @@ export const coverage = {
           else r.total - r.complete - r."knownGap" - r.blocked end desc, r.key desc
       `);
       return found.rows;
+    }),
+  governments: os
+    .meta(
+      openapi({
+        method: "GET",
+        path: "/coverage/{polity}/governments",
+        summary:
+          "US local governments of one kind in one state, from the Census of Governments: each government's place page, population, the latest year the archive holds its results, its next election date (with the scheduled election, when the archive has one), the statute or charter that sets its election cycle, and where its results are published and how a script can reach them; with a year, only the governments due to vote that year, those the archive lacks first; at most 500, largest first",
+      }),
+    )
+    .input(
+      v.objectAsync({
+        polity: Code,
+        state: v.pipe(v.string(), v.regex(/^[A-Z]{2}$/)),
+        level: v.pipe(v.string(), v.maxLength(40)),
+        year: v.optional(
+          v.pipe(v.number(), v.integer(), v.minValue(1789), v.maxValue(2200)),
+        ),
+      }),
+    )
+    .output(
+      v.object({
+        total: v.number(),
+        rows: v.array(
+          v.object({
+            id: v.string(),
+            name: v.string(),
+            path: v.nullable(v.string()),
+            population: v.nullable(v.number()),
+            missing: v.nullable(v.boolean()),
+            last: v.nullable(v.number()),
+            next: v.nullable(
+              v.object({ date: v.string(), path: v.nullable(v.string()) }),
+            ),
+            cadence: v.nullable(
+              v.object({
+                title: v.string(),
+                url: v.nullable(v.string()),
+                locator: v.nullable(v.string()),
+              }),
+            ),
+            access: v.nullable(
+              v.object({
+                platform: v.string(),
+                url: v.nullable(v.string()),
+                access: v.picklist(ACCESS),
+              }),
+            ),
+          }),
+        ),
+      }),
+    )
+    .handler(async ({ input }) => {
+      const year = input.year ?? null;
+      const found = await db.execute<{
+        total: number;
+        id: string;
+        name: string;
+        path: string | null;
+        population: number | null;
+        missing: boolean | null;
+        last: number | null;
+        next: { date: string; path: string | null } | null;
+        cadence: {
+          title: string;
+          url: string | null;
+          locator: string | null;
+        } | null;
+        access: {
+          platform: string;
+          url: string | null;
+          access: (typeof ACCESS)[number];
+        } | null;
+      }>(sql`
+        select count(*) over ()::int as total, g.id, g.name, g.population, y.missing,
+          (select s.path from slug s where s.entity_id = g.polity_id and s.is_current limit 1) as path,
+          (select max(x.year) from coverage_government_year x where x.government_id = g.id and x.held > 0) as last,
+          case when g.next_date is not null then jsonb_build_object('date', g.next_date::text,
+            'path', (select s.path from slug s where s.entity_id = g.next_election_id and s.is_current limit 1)) end as next,
+          case when c.id is not null then jsonb_build_object('title', coalesce(cs.title, c.locator, ''), 'url', cs.url,
+            'locator', nullif(c.locator, cs.title)) end as cadence,
+          case when a.id is not null then jsonb_build_object('platform', a.platform,
+            'url', case when a.url_pattern !~ '[{}]' then a.url_pattern end, 'access', a.access) end as access
+        from coverage_government g
+          left join coverage_government_year y on y.government_id = g.id and y.year = ${year}::int
+          left join election_cadence c on c.id = g.cadence_id
+          left join source cs on cs.id = c.source_id
+          left join results_access a on a.id = g.access_id
+        where ${input.polity} = 'us' and g.state = ${input.state} and g.kind = ${input.level}
+          and case when ${year}::int is null then g.active else y.expected end
+        order by y.missing desc nulls last, g.population desc nulls last, g.name, g.id
+        limit 500
+      `);
+      return {
+        total: found.rows[0]?.total ?? 0,
+        rows: found.rows.map(({ total: _, ...row }) => row),
+      };
     }),
   known: os
     .meta(
