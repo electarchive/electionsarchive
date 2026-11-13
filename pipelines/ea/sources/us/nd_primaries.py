@@ -17,6 +17,7 @@ PARSED = DATA / "parsed" / SOURCE
 PUBLISHER = "North Dakota Secretary of State"
 MANUAL = MANUALS[(1918, "treasurer")]
 DAYS = {1914: date(1914, 6, 24), 1916: date(1916, 6, 28), 1918: date(1918, 6, 26)}
+PREFERENCE = date(1916, 3, 21)
 GENERALS = {1914: date(1914, 11, 3), 1916: date(1916, 11, 7), 1918: date(1918, 11, 5)}
 PARTIES = {
     "republican": ("Republican", "republican-party"),
@@ -24,6 +25,7 @@ PARTIES = {
     "socialist": ("Socialist", "socialist-party-of-america"),
 }
 TITLES = {
+    "president": "president",
     "senate": "U.S. Senate",
     "governor": "governor",
     "lieutenant-governor": "lieutenant governor",
@@ -97,7 +99,9 @@ def parse() -> None:
             ).fetchall()
         }
     frame = counted.with_columns(
-        day=pl.col("year").replace_strict(DAYS, return_dtype=pl.Date),
+        day=pl.when(pl.col("office") == "president")
+        .then(pl.lit(PREFERENCE))
+        .otherwise(pl.col("year").replace_strict(DAYS, return_dtype=pl.Date)),
         county=pl.col("county").map_elements(lambda c: codes[plain(c)], return_dtype=pl.String),
     )
     PARSED.mkdir(parents=True, exist_ok=True)
@@ -116,8 +120,8 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="North Dakota's 1914, 1916, and 1918 statewide and congressional party primaries by county "
-            "from the 1919 Legislative Manual",
+            summary="North Dakota's 1914, 1916, and 1918 statewide and congressional party primaries and 1916 "
+            "presidential preference primary by county from the 1919 Legislative Manual",
             polity="US",
         )
 
@@ -160,7 +164,7 @@ def emit() -> Path:
                from candidacy cd
                join contest_option o on o.id = cd.option_id
                join external_id x on x.entity_id = o.contest_id and x.scheme = 'us.contest'
-                    and x.value ~ '^\\d{4}-\\d\\d-\\d\\d:ND:([a-z-]+|house:\\d)(:[a-z]+)?$'
+                    and x.value ~ '^\\d{4}-\\d\\d-\\d\\d:(ND:([a-z-]+|house:\\d)(:[a-z]+)?|[A-Z]{2}:president)$'
                join name n on n.entity_id = cd.person_id and n.is_preferred group by 1, 2"""
         ).fetchall():
             if text.split():
@@ -196,11 +200,36 @@ def emit() -> Path:
                     date_to=day,
                     status="held",
                 )
-                name(election, f"{year} North Dakota primary election")
+                name(
+                    election,
+                    f"{year} North Dakota presidential preference primary"
+                    if day == PREFERENCE
+                    else f"{year} North Dakota primary election",
+                )
                 cs.add("slug", path=f"us/nd/{day}-primary", entity_id=election)
             result_set = cs.key(f"{SOURCE}.result_set", key)
             contest = contests.get(key)
-            if contest is None:
+            if contest is None and office == "president":
+                contest = cs.key("us.contest", key)
+                contests[key] = contest
+                magnitude = 1
+                cs.add(
+                    "contest",
+                    id=contest,
+                    election_id=election,
+                    kind="office",
+                    office_id=cs.key("us.office", "president"),
+                    district_area_id=state,
+                    term="full",
+                    magnitude=magnitude,
+                    round_number=1,
+                    party_scope_id=parties[party],
+                    electoral_system_id=fptp,
+                    default_result_kind="counted",
+                )
+                name(contest, f"{year} North Dakota {label} presidential primary")
+                cs.add("slug", path=f"us/nd/{day}-primary/president-{party}", entity_id=contest)
+            elif contest is None:
                 general = contests[f"{GENERALS[year]}:ND:{office}"]
                 ((office_id, body_id, seat_id, district, term, magnitude, system),) = conn.execute(
                     """select office_id, body_id, seat_id, district_area_id, term, magnitude, electoral_system_id
