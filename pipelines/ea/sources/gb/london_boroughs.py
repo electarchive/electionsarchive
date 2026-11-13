@@ -1,9 +1,11 @@
+import csv
 import difflib
 import html
 import itertools
 import re
 import struct
 import subprocess
+import tempfile
 from datetime import date
 from pathlib import Path
 from uuid import UUID
@@ -176,10 +178,195 @@ NAMES = {
     "Khan,lmran": "Khan, Imran",
 }
 DIGITS = str.maketrans({"O": "0", "o": "0", "l": "1", "I": "1", "S": "5"})
+GLC_PUBLISHER = "Greater London Council"
+GLC = {
+    1973: (date(1973, 4, 12), f"{DOWNLOAD}/0f08a697-1ad0-43fb-a74a-8694413960f7/GLCE_1973-4-12.pdf"),
+    1977: (date(1977, 5, 5), f"{DOWNLOAD}/7cda0b8a-b910-49e6-b28d-5c8beb5859ac/GLCE_1977-5-5.pdf"),
+    1981: (date(1981, 5, 7), f"{DOWNLOAD}/48ee651e-78fe-4a29-a8b6-606921ca51ee/GLCE_1981-5-7.pdf"),
+}
+GLC_TOTALS = {
+    1973: (5313470, 1957661, {"LAB": 58, "CON": 32, "LIB": 2}),
+    1977: (5183668, 2242064, {"CON": 64, "LAB": 28}),
+    1981: (5086997, 2250118, {"LAB": 50, "CON": 41, "LIB": 1}),
+}
+GLC_PARTIES = {
+    1973: {
+        "CON": ("Conservative", 92, 743123),
+        "UCON": ("Unofficial Conservative", 1, 485),
+        "LAB": ("Labour", 92, 928034),
+        "INDLAB": ("Independent Labour", 1, 227),
+        "LIB": ("Liberal", 60, 244703),
+        "COMM": ("Communist", 28, 12319),
+        "SPGB": ("Socialist Party of Great Britain", 11, 1612),
+        "IND": ("Independent", 8, 2923),
+        "ACT": ("Action Party for Britain First", 6, 3063),
+        "NATFR": ("National Front", 6, 9536),
+        "ARPSWR": ("Air Road Public Safety White Resident", 1, 57),
+        "IAMR": ("Anti-Mass Redevelopment", 1, 195),
+        "AMSCIP": ("Anti-Motorway, Support Community Involvement in Planning", 1, 143),
+        "GJHH": ("Great Joint Happiness Homes for All", 1, 60),
+        "IAR": ("Independent Anti-Redevelopment", 1, 72),
+        "ICP": ("Independent Centre Party", 1, 202),
+        "IPAGE": ("Independent Parent Action Group for Education", 1, 325),
+        "IRCA": ("Independent Ratepayers and Citizens Association", 1, 5110),
+        "LRDLG": ("Lambeth Residents for Democratic Local Government", 1, 103),
+        "NIP": ("National Independence Party", 1, 2924),
+        "NPC": ("Non-Party Conservationist", 1, 1908),
+        "SRR": ("Surbiton Residents and Ratepayers", 1, 303),
+        "RR": ("The Ratepayers Representative", 1, 234),
+    },
+    1977: {
+        "CON": ("Conservative", 92, 1177390),
+        "INDCON": ("Independent Conservative", 1, 1025),
+        "LAB": ("Labour", 91, 726854),
+        "LABCOOP": ("Labour and Co-operative", 1, 10340),
+        "NATFR": ("National Front", 91, 119060),
+        "LIB": ("Liberal", 90, 174405),
+        "INDLIB": ("Independent Liberal", 3, 878),
+        "ABGLC": ("Abolish GLC", 31, 7869),
+        "COMM": ("Communist", 24, 8267),
+        "NP": ("National Party", 22, 8300),
+        "ENGNAT": ("English Nationalist", 5, 685),
+        "IND": ("Independent", 4, 605),
+        "SIM": ("Socialist (International Marxist)", 4, 1930),
+        "SPGB": ("Socialist Party of Great Britain", 4, 502),
+        "PAP": ("People and Agrarian Party", 2, 1621),
+        "CH": ("Co-operative Housing", 1, 67),
+        "DMWRHO": ("Democratic Monarchist White Resident Home Owner", 1, 51),
+        "E": ("Ecology", 1, 298),
+        "FP": ("Fellowship Party", 1, 552),
+        "MP": ("Medical Practitioner", 1, 290),
+        "NB": ("New Britain", 1, 254),
+        "NETCAT": ("North East Tottenham Campaign Against Traffic", 1, 646),
+        "SR": ("Sales Representative", 1, 175),
+    },
+    1981: {
+        "LAB": ("Labour", 87, 891409),
+        "LABCP": ("Labour and Co-operative", 5, 48048),
+        "CON": ("Conservative", 91, 890432),
+        "CONRB": ("Conservative Right to Buy", 1, 3802),
+        "LIB": ("Liberal", 83, 303368),
+        "LIBFT": ("Liberal Focus Team", 2, 10176),
+        "LIBF": ("Liberal Focus", 2, 6497),
+        "LIBSD": ("Liberal and Social Democrat", 1, 2243),
+        "LIBR": ("Liberal and Radical", 1, 1572),
+        "NF": ("National Front", 41, 21582),
+        "E": ("Ecology", 38, 17515),
+        "SD": ("Social Democrat", 5, 12738),
+        "NNF": ("New National Front", 18, 5877),
+        "COMM": ("Communist", 16, 5275),
+        "CM": ("Constitutional Movement", 23, 4041),
+        "SDA": ("Social Democratic Alliance", 1, 3068),
+        "WRP": ("Workers Revolutionary Party", 16, 2753),
+        "INDSMC": ("Independent - Southall's Mr. Clean", 1, 2619),
+        "SDFP": ("Social Democrat for Paddington", 1, 1845),
+        "SDLM": ("Social Democrat (Labour Moderate)", 1, 1737),
+        "EPR": ("Enoch Powell is Right", 4, 1731),
+        "SLAG": ("Save London Action Group", 13, 1727),
+        "SDP": ("Social Democratic Party", 1, 1544),
+        "ABGLC": ("Abolish the GLC", 7, 1158),
+        "ELWAR": ("East London Workers Against Racism", 3, 867),
+        "NFCM": ("National Front Constitutional Movement", 2, 816),
+        "INP": ("Irish National Party", 3, 793),
+        "CSD": ("Council for Social Democracy", 1, 650),
+        "FPAP": ("Fellowship Party and Anti-Pollution", 1, 637),
+        "IND": ("Independent", 2, 622),
+        "ABR": ("Abolition of Rates", 3, 503),
+        "INDCON": ("Independent Conservative", 1, 362),
+        "NBP": ("New Britain Party", 1, 346),
+        "RAW": ("Ratepayers Watchdog", 1, 317),
+        "FEACM": ("Full Employment and Anti-Common Market", 1, 201),
+        "INDPR": ("Independent - Protect Rights of the Individual", 1, 164),
+        "T": ("Teacher", 1, 162),
+        "WP": ("Workers Party", 1, 145),
+        "SLA": ("Save London Alliance", 1, 126),
+        "RCOMM": ("Revolutionary Communist", 1, 116),
+        "RP": ("Republican Party", 1, 111),
+        "INDAB": ("Independent (Abolitionist)", 1, 103),
+        "SPGB": ("Socialist Party of Great Britain", 1, 83),
+        "AB": ("Abolitionist", 1, 82),
+        "PSDMWR": ("Public Safety, Democratic Monarchist, White Resident", 1, 82),
+        "FRAC": ("Fair Rates, Anti-Corruption", 1, 73),
+    },
+}
+GLC_RESOLVED = {
+    "Conservative": ("gb.parliament.party", "7"),
+    "Labour": ("wikidata", "Q9630"),
+    "Labour and Co-operative": ("wikidata", "Q9630"),
+    "Liberal": ("gb.parliament.party", "18"),
+    "National Front": ("gb.party", "national-front"),
+    "Communist": ("gb.party", "communist-party-of-great-britain"),
+    "Socialist Party of Great Britain": ("gb.party", "socialist-party-of-great-britain"),
+    "Workers Revolutionary Party": ("gb.party", "workers-revolutionary-party"),
+    "Social Democratic Party": ("gb.party", "social-democratic-party-1981"),
+}
+GLC_OCR = {
+    (1973, "OFFCON"): "CON",
+    (1981, "INOCON"): "INDCON",
+    (1981, "CCMM"): "COMM",
+    (1981, "SOFP"): "SDFP",
+}
+GLC_LINES = {
+    (1973, 10, "SOUTH (53,922)"): "CITY OF LONDON AND WESTMINSTER SOUTH (53,922)",
+    (1977, 11, "SOUTH (51,393)"): "CITY OF LONDON AND WESTMINSTER SOUTH (51,393)",
+    (1977, 8, "Egerton, J.R.S. Con peo WF 4"): "Egerton, J.R.S. Con 7,217",
+    (1977, 11, "Porritt, J.E. = 298"): "Porritt, J.E. E 298",
+    (1981, 6, "Ryan, Patrick S. LIB 35947"): "Ryan, Patrick S. LIB 3,947",
+    (1981, 7, "EDMONTON (59,788)"): "EDMONTON (59,288)",
+    (1981, 7, "Smith, William C. CON 7544"): "Smith, William C. CON 7,544",
+    (1981, 9, "Morrell, Frances M. LAB 7+296"): "Morrell, Frances M. LAB 7,296",
+    (1981, 9, "Green, Len csp 650"): "Green, Len CSD 650",
+    (1981, 9, "Fox, Roger 6. SOLM 1,737"): "Fox, Roger G. SDLM 1,737",
+    (1981, 9, "Kramer, Hilary J. LIB 72479"): "Kramer, Hilary J. LIB 7,479",
+    (1981, 10, "Mearing-Smith, Nicholas P. CON 25444"): "Mearing-Smith, Nicholas P. CON 2,444",
+    (1981, 12, "Spencer, Elizabeth N. CON 25458"): "Spencer, Elizabeth N. CON 2,458",
+}
+GLC_DIVISIONS = {
+    "Deptford": "Lewisham Deptford",
+    "Hammersmith North": "North Hammersmith",
+    "Richmond": "Richmond upon Thames",
+    "Southgate": "Enfield Southgate",
+}
+GLC_SHORT = {(1981, "CON"): 3}
+GLC_DROPPED = {
+    (1981, 12, "Bramall, Sir Ashley LAB 9,162"): ["Williams, Brian LIBFT 7,591"],
+}
+GLC_NAMES = {
+    (1973, "Cox tia"): "Cox, L.J.",
+    (1973, "Bonham, Mrs. 1.M.C., J.P."): "Bonham, Mrs. I.M.C., J.P.",
+    (1973, "Bell, W.A.0.J."): "Bell, W.A.O.J.",
+    (1973, "Mcintosh, A.R."): "McIntosh, A.R.",
+    (1973, "Goodwin, Sir Reginald, C.B.E..D.L."): "Goodwin, Sir Reginald, C.B.E., D.L.",
+    (1973, "Plummer, Sir Desmond, T.D., J.P..D.L."): "Plummer, Sir Desmond, T.D., J.P., D.L.",
+    (1977, "Cameron, A.II.S."): "Cameron, A.I.S.",
+    (1977, "Wykes, Mirs. J.K."): "Wykes, Mrs. J.K.",
+    (1977, "Davies, W, M.N."): "Davies, W.M.N.",
+    (1977, "Dah!, D.J."): "Dahl, D.J.",
+    (1977, "Goodwin, Sir Reginald, C:B:E., -D.L."): "Goodwin, Sir Reginald, C.B.E., D.L.",
+    (1981, "Billins, Roger 6G."): "Billins, Roger G.",
+    (1981, "Saul, Ellen I a"): "Saul, Ellen E.",
+    (1981, "Stubbs, Jane"): "Stubbs, Jane O.",
+    (1981, "NcNeeney, Barry K."): "McNeeney, Barry K.",
+    (1981, "Fryer, Reg MM."): "Fryer, Reg M.",
+}
+GLC_NOTES = {
+    1981: " Table 1 prints one digit of Edmonton's electorate illegibly; the electorate of 59,288 is the figure in "
+    "Table 2. The Conservative candidates' votes add up to 890,429, three fewer than the 890,432 in the party table; "
+    "both the page images and the report's own text layer give the votes stored here. One line, Brian Williams "
+    "(Liberal Focus Team) in Bethnal Green and Bow, was missed by the recognition and is taken from the text layer.",
+}
+GLC_METHODOLOGY = (
+    "Read from the Greater London Council's scanned report by optical character recognition of each page at 400 dpi, "
+    "one column at a time. Each electoral division returned one councillor, and the candidate with the most votes "
+    "is the one the report shows as elected. Every party's candidates and votes add up to the report's table of "
+    "candidates and votes by party, the divisions' votes add up to the total of valid ballot papers, their "
+    "electorates add up to the total electorate, and the elected candidates match the printed composition of the "
+    "council. The electoral divisions are the parliamentary constituencies of 1974 to 1983."
+)
 
 
 def fetch() -> None:
-    for _, url in BOOKS.values():
+    for _, url in [*BOOKS.values(), *GLC.values()]:
         raw.fetch(SOURCE, url, suffix=".pdf")
 
 
@@ -506,6 +693,215 @@ def parse() -> None:
     pl.DataFrame(wards).write_parquet(PARSED / "wards.parquet")
     pl.DataFrame(candidates).write_parquet(PARSED / "candidates.parquet")
     print(f"{len(wards)} wards and {len(candidates)} candidates")
+    parse_glc()
+
+
+Word = tuple[float, float, float, float, str]
+
+
+def scan(
+    artifact: raw.Artifact, number: int, crop: tuple[int, int] | None = None
+) -> tuple[tuple[int, int], list[list[Word]]]:
+    folder = PARSED / "ocr"
+    folder.mkdir(parents=True, exist_ok=True)
+    tsv = folder / f"{artifact.sha256}-{number}-{crop[0] if crop else 'page'}.tsv"
+    if not tsv.exists():
+        with tempfile.TemporaryDirectory() as tmp:
+            image = Path(tmp) / "page"
+            window = ["-x", str(crop[0]), "-y", "0", "-W", str(crop[1] - crop[0]), "-H", "100000"] if crop else []
+            subprocess.run(
+                ["pdftoppm", "-r", "400", "-gray", "-png", "-f", str(number), "-l", str(number), "-singlefile"]
+                + window
+                + [str(artifact.path), str(image)],
+                check=True,
+            )
+            subprocess.run(
+                ["tesseract", f"{image}.png", str(tsv.with_suffix("")), "--psm", "6" if crop else "4", "tsv"],
+                check=True,
+                capture_output=True,
+            )
+    rows = list(csv.DictReader(tsv.open(), delimiter="\t", quoting=csv.QUOTE_NONE))
+    top = next(r for r in rows if r["level"] == "1")
+    offset = crop[0] if crop else 0
+    grouped: dict[tuple[str, str, str], list[Word]] = {}
+    for r in rows:
+        if r["level"] == "5" and r["text"].strip():
+            left, upper = int(r["left"]) + offset, int(r["top"])
+            grouped.setdefault((r["block_num"], r["par_num"], r["line_num"]), []).append(
+                (left, upper, left + int(r["width"]), upper + int(r["height"]), r["text"].strip())
+            )
+    return (int(top["width"]) + offset, int(top["height"])), list(grouped.values())
+
+
+def glc_book(year: int, artifact: raw.Artifact) -> tuple[list[dict], list[dict]]:
+    divisions: list[dict] = []
+    candidates: list[dict] = []
+    codes = GLC_PARTIES[year]
+    started = False
+    division: dict | None = None
+    pending = ""
+    for sheet in range(1, pdf_pages(artifact.path) + 1):
+        (width, height), page = scan(artifact, sheet)
+        text = " ".join(w[4] for line in page for w in line)
+        if not started:
+            started = bool(re.search(r"TABLE 1\b", text))
+            if not started:
+                continue
+        elif re.search(r"TABLE [23]\b", text):
+            break
+        words: list[Word] = [w for line in page for w in line]
+        split = min(
+            range(int(width * 0.38), int(width * 0.62), 5),
+            key=lambda x: (sum(w[0] <= x <= w[2] for w in words), abs(x - width / 2)),
+        )
+        for crop in ((0, split), (split, width)):
+            _, column = scan(artifact, sheet, crop)
+            entries: list[tuple[str, list[float]]] = []
+            for line in sorted(column, key=lambda line: min(w[1] for w in line)):
+                tokens = [w[4].replace("|", "I") for w in line]
+                while tokens and (not re.search(r"[A-Za-z0-9]", tokens[-1]) or tokens[-1] == "I" and len(tokens) > 1):
+                    tokens.pop()
+                tokens = [t.replace(",»", ",").replace("»", ",") for t in tokens if t not in ("'", "‘")]
+                joined = GLC_LINES.get((year, sheet, " ".join(tokens)), " ".join(tokens))
+                box = [
+                    min(w[0] for w in line) / width,
+                    min(w[1] for w in line) / height,
+                    max(w[2] for w in line) / width,
+                    max(w[3] for w in line) / height,
+                ]
+                entries.append((joined, box))
+                for dropped in GLC_DROPPED.get((year, sheet, joined), []):
+                    entries.append((dropped, locate(artifact.path, sheet, dropped)))
+            for joined, box in entries:
+                tokens = joined.split()
+                if "Continued" in joined or "ontinued" in joined:
+                    continue
+                head = re.fullmatch(
+                    r"[^A-Z]*([A-Z][A-Z .,'&—-]*[A-Z])\s*[(\[{]\s*([\dOoIl,. ]+?)\s*[)\]}1]?[.,]?\s*[.*]?", joined
+                )
+                if head:
+                    electorate = number(head.group(2).replace(" ", ","))
+                    if electorate is None:
+                        raise ValueError(f"{year} page {sheet}: unread electorate in {joined}")
+                    division = {
+                        "year": year,
+                        "printed": re.sub(r"\s*[—-]\s*", "-", head.group(1).strip()),
+                        "electorate": electorate,
+                        "page": sheet,
+                        "bbox": box,
+                    }
+                    divisions.append(division)
+                    pending = ""
+                    continue
+                if len(tokens) >= 3 and re.fullmatch(r"\d{1,2}", tokens[-2]) and re.fullmatch(r"\d{3}", tokens[-1]):
+                    tokens[-2:] = [tokens[-2] + "," + tokens[-1]]
+                votes = number(re.sub(r"^[^\dOolI]+|[^\dOolI]+$", "", tokens[-1])) if tokens else None
+                party = None
+                for width_ in (2, 1, 3):
+                    if len(tokens) > width_ + 1:
+                        code = re.sub(r"[^A-Za-z]", "", "".join(tokens[-1 - width_ : -1])).upper()
+                        code = GLC_OCR.get((year, code), code)
+                        if code in codes:
+                            party, name = code, " ".join(tokens[: -1 - width_])
+                            break
+                if party is not None and votes is not None:
+                    name = f"{pending} {name}" if pending else name
+                    pending = ""
+                    name = re.sub(r",(?=\S)", ", ", re.sub(r"\s+,", ",", name.strip(" ,'‘’:"))).replace("’", "'")
+                    surname, comma, rest = name.partition(",")
+                    if comma and re.search(r"[A-Z.]1|1\.|[A-Z.]0\.", rest):
+                        rest = rest.translate(str.maketrans({"1": "I", "0": "O"}))
+                    given = rest.split()
+                    for at, word in enumerate(given):
+                        if year == 1981 and word == "WH.":
+                            given[at] = "W."
+                        elif year < 1981 and re.fullmatch(r"[A-Z]{2}\.", word):
+                            given[at] = f"{word[0]}.{word[1]}."
+                    if given and re.fullmatch(r"[A-Z]", given[-1]):
+                        given[-1] += "."
+                    name = f"{surname}{comma} {' '.join(given)}" if comma else name
+                    if division is None:
+                        raise ValueError(f"{year} page {sheet}: candidate before any division: {joined}")
+                    candidates.append(
+                        {
+                            "year": year,
+                            "division": division["printed"],
+                            "name": GLC_NAMES.get((year, name), name),
+                            "party": party,
+                            "votes": votes,
+                            "page": sheet,
+                            "bbox": box,
+                        }
+                    )
+                elif division is not None and joined.endswith(",") and re.match(r"[A-Z][a-z]", joined):
+                    pending = joined
+                elif re.search(r"\d", joined) and len(tokens) >= 2:
+                    print(f"unread line {year} page {sheet}: {joined!r}")
+    return divisions, candidates
+
+
+def locate(path: Path, sheet: int, line: str) -> list[float]:
+    sizes, book = pages(path)
+    first, last = line.split()[0], line.split()[-1]
+    width, height = sizes[sheet - 1]
+    for row in lines(book[sheet - 1]):
+        for start, word in enumerate(row):
+            if word[4] == first:
+                end = next((w for w in row[start:] if w[4] == last), None)
+                if end is not None:
+                    return [word[0] / width, word[1] / height, end[2] / width, end[3] / height]
+    raise ValueError(f"page {sheet}: {line} is not in the text layer")
+
+
+def pdf_pages(path: Path) -> int:
+    info = subprocess.run(["pdfinfo", str(path)], capture_output=True, text=True, check=True).stdout
+    found = re.search(r"Pages:\s+(\d+)", info)
+    if found is None:
+        raise ValueError(f"{path}: no page count")
+    return int(found.group(1))
+
+
+def parse_glc() -> None:
+    divisions, candidates = [], []
+    for year, (_, url) in GLC.items():
+        found, lines_ = glc_book(year, raw.cached(SOURCE, url))
+        electorate, valid, seats = GLC_TOTALS[year]
+        names = [d["printed"] for d in found]
+        problems = []
+        if len(found) != 92 or len(set(names)) != 92:
+            problems.append(f"{len(found)} divisions, {len(set(names))} distinct")
+        if sum(d["electorate"] for d in found) != electorate:
+            problems.append(f"electorate {sum(d['electorate'] for d in found)}, printed {electorate}")
+        if sum(c["votes"] for c in lines_) + sum(v for (y, _), v in GLC_SHORT.items() if y == year) != valid:
+            problems.append(f"votes {sum(c['votes'] for c in lines_)}, printed {valid}")
+        for code, (label, count, votes) in GLC_PARTIES[year].items():
+            mine = [c["votes"] for c in lines_ if c["party"] == code]
+            if (len(mine), sum(mine) + GLC_SHORT.get((year, code), 0)) != (count, votes):
+                problems.append(f"{code}: {len(mine)} candidates and {sum(mine)} votes, printed {count} and {votes}")
+        won: dict[str, int] = {}
+        for d in found:
+            mine = [c for c in lines_ if c["division"] == d["printed"]]
+            votes = [c["votes"] for c in mine]
+            if len(votes) < 2 or votes[0] <= votes[1] or any(a < b for a, b in itertools.pairwise(votes)):
+                problems.append(f"{d['printed']}: votes {votes}")
+            for rank, c in enumerate(mine):
+                c["number"] = rank + 1
+                c["elected"] = rank == 0
+            if mine:
+                family = "LAB" if mine[0]["party"].startswith("LAB") else mine[0]["party"]
+                won[family] = won.get(family, 0) + 1
+        if won != seats:
+            problems.append(f"elected {won}, printed {seats}")
+        for c in lines_:
+            if not re.fullmatch(r"[A-Z][A-Za-z'’ -]+, [A-Z][A-Za-z.,'’ -]*", c["name"]):
+                problems.append(f"name {c['name']!r} on page {c['page']}")
+        if problems:
+            raise ValueError(f"{year}:\n" + "\n".join(problems))
+        divisions += found
+        candidates += lines_
+    pl.DataFrame(divisions).write_parquet(PARSED / "glc_divisions.parquet")
+    pl.DataFrame(candidates).write_parquet(PARSED / "glc_candidates.parquet")
+    print(f"{len(divisions)} GLC divisions and {len(candidates)} candidates")
 
 
 def emit() -> Path:
@@ -518,7 +914,9 @@ def emit() -> Path:
             version=VERSION,
             summary="London borough council elections "
             + ", ".join(map(str, sorted(BOOKS)))
-            + " by ward, from the London Research Centre's reports",
+            + " by ward, and Greater London Council elections "
+            + ", ".join(map(str, sorted(GLC)))
+            + " by electoral division, from the London Research Centre's and the Greater London Council's reports",
             polity="GB",
         )
         outranked = foreign_preferred(conn, cs, SOURCE)
@@ -778,4 +1176,212 @@ def emit() -> Path:
                             value(option, VOTES, line["votes"], line["page"], line["bbox"])
                         if line["elected"]:
                             cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected")
+        london = cs.key("gb.polity", "E12000007")
+        council = cs.key("gb.body", "greater-london-council")
+        if london in cs.minted:
+            raise ValueError("publish gb.london first")
+        if council in cs.minted:
+            cs.add("body", id=council, polity_id=london, kind="unicameral")
+            name(council, "Greater London Council")
+        cs.add("body_size", body_id=council, seats=92, valid_from=GLC[1973][0], valid_to=date(1986, 4, 1))
+        divisions = pl.read_parquet(PARSED / "glc_divisions.parquet")
+        standing = pl.read_parquet(PARSED / "glc_candidates.parquet")
+        constituencies = {
+            fold(text): (code, text)
+            for code, text in conn.execute(
+                "select c.code, n.text from area a join area_code c on c.area_id = a.id"
+                " join name n on n.entity_id = a.id and n.is_preferred"
+                " where a.scheme_code = 'gb.pcon' and c.code like '1974:eng-%%'"
+            ).fetchall()
+        }
+        glc_parties: dict[str, UUID | None] = {}
+        units: set[UUID] = set()
+
+        def glc_party(label: str) -> UUID | None:
+            if label == "Independent":
+                return None
+            if label not in glc_parties:
+                found = cs.key(*GLC_RESOLVED[label]) if label in GLC_RESOLVED else known.get(leh.fold(label))
+                if found is None:
+                    found = cs.key("gb.party", slug(label))
+                    if found in cs.minted and found not in glc_parties.values():
+                        cs.add("party", id=found, kind="party", polity_id=gb)
+                        name(found, label)
+                glc_parties[label] = found
+            return glc_parties[label]
+
+        for year, (day, url) in GLC.items():
+            title = f"Greater London Council Election {year}"
+            source = cs.source(GLC_PUBLISHER, title)
+            if source in cs.minted:
+                cs.add(
+                    "source",
+                    id=source,
+                    kind="compendium",
+                    publisher=GLC_PUBLISHER,
+                    title=title,
+                    url=DATASET,
+                    license="Published by the Greater London Council; the Greater London Authority lists it on the "
+                    "London Datastore with no licence stated",
+                    license_url=None,
+                    attribution=f"{GLC_PUBLISHER}, {title}.",
+                )
+            artifact = raw.cached(SOURCE, url)
+            artifact_id = cs.artifact(artifact, source)
+            page_ids = {}
+
+            def glc_page(number: int) -> UUID:
+                if number not in page_ids:
+                    image = PAGES / f"{artifact.sha256}-{number}.png"
+                    if not image.exists():
+                        PAGES.mkdir(parents=True, exist_ok=True)
+                        subprocess.run(
+                            ["pdftoppm", "-r", "100", "-png", "-f", str(number), "-l", str(number), "-singlefile"]
+                            + [str(artifact.path), str(image.with_suffix(""))],
+                            check=True,
+                        )
+                    width, height = struct.unpack(">II", image.read_bytes()[16:24])
+                    page_ids[number] = cs.page(artifact_id, number)
+                    cs.add(
+                        "source_page",
+                        id=page_ids[number],
+                        artifact_id=artifact_id,
+                        page_number=number,
+                        image_key=f"pages/{SOURCE}/{image.name}",
+                        width=width,
+                        height=height,
+                    )
+                return page_ids[number]
+
+            election = cs.key("gb.election", f"{day}:glc")
+            cs.add(
+                "election",
+                id=election,
+                polity_id=london,
+                kind="general",
+                date_from=day,
+                date_to=day,
+                status="held",
+            )
+            name(election, f"{year} Greater London Council election")
+            cs.add("slug", path=f"gb/london/{day}-glc", entity_id=election)
+            cs.add("note", entity_id=election, kind="methodology", body_md=GLC_METHODOLOGY + GLC_NOTES.get(year, ""))
+            lines = standing.filter(pl.col("year") == year)
+            for division in divisions.filter(pl.col("year") == year).iter_rows(named=True):
+                printed = division["printed"].title().replace(" And ", " and ").replace(" Of ", " of ")
+                code, display = constituencies[fold(GLC_DIVISIONS.get(printed, printed))]
+                area = cs.area("gb.pcon", code)
+                if area in cs.minted:
+                    raise ValueError(f"{code}: no 1974 constituency area")
+                unit = cs.unit("gb.pcon", code)
+                if unit in cs.minted and unit not in units:
+                    units.add(unit)
+                    cs.add(
+                        "reporting_unit",
+                        id=unit,
+                        polity_id=gb,
+                        scheme_code="gb.pcon",
+                        code=code,
+                        area_relation="equals",
+                        area_id=area,
+                        kind="standard",
+                        valid_from=None,
+                    )
+                contest_key = f"{day}:glc:{code}"
+                contest = cs.key("gb.contest", contest_key)
+                cs.add(
+                    "contest",
+                    id=contest,
+                    election_id=election,
+                    kind="body_seats",
+                    body_id=council,
+                    district_area_id=area,
+                    magnitude=1,
+                    round_number=1,
+                    electoral_system_id=systems["fptp"],
+                    default_result_kind="counted",
+                )
+                name(contest, f"{display}, Greater London Council, {year}")
+                cs.add("slug", path=f"gb/london/{day}-glc/{slug(display)}", entity_id=contest)
+                result_set = cs.key(f"{SOURCE}.result_set", contest_key)
+                cs.add(
+                    "result_set",
+                    id=result_set,
+                    election_id=election,
+                    contest_id=contest,
+                    stage="official",
+                    kind="counted",
+                    status="active",
+                    source_id=source,
+                    is_default=contest not in others,
+                    completeness=1,
+                )
+                cs.add(
+                    "citation",
+                    entity_id=result_set,
+                    source_id=source,
+                    locator={"page": division["page"], "division": division["printed"]},
+                )
+
+                def glc_value(option: UUID | None, measure: int, figure: int, number: int, box: list[float]) -> None:
+                    cs.add(
+                        "result_value",
+                        result_set_id=result_set,
+                        unit_id=unit,
+                        option_id=option,
+                        channel=0,
+                        measure=measure,
+                        count_round=0,
+                        flags=DIGITIZED,
+                        value=figure,
+                    )
+                    x0, y0, x1, y1 = box
+                    cs.add(
+                        "value_locator",
+                        result_set_id=result_set,
+                        unit_id=unit,
+                        option_id=option,
+                        channel=0,
+                        measure=measure,
+                        count_round=0,
+                        page_id=glc_page(number),
+                        source_id=None,
+                        x0=x0,
+                        y0=y0,
+                        x1=x1,
+                        y1=y1,
+                    )
+
+                glc_value(None, REGISTERED, division["electorate"], division["page"], division["bbox"])
+                for line in lines.filter(pl.col("division") == division["printed"]).iter_rows(named=True):
+                    option_key = f"{contest_key}:{line['number']}"
+                    label = GLC_PARTIES[year][line["party"]][0]
+                    owner = glc_party(label)
+                    option = cs.key(f"{SOURCE}.option", option_key)
+                    cs.add(
+                        "contest_option",
+                        id=option,
+                        contest_id=contest,
+                        kind="candidate",
+                        party_id=owner,
+                        ballot_label=line["name"],
+                    )
+                    person = cs.key(f"{SOURCE}.person", option_key)
+                    cs.add("person", id=person)
+                    surname, _, rest = line["name"].partition(", ")
+                    forenames = rest.split(", ")[0]
+                    name(person, f"{forenames} {surname}".strip())
+                    cs.add(
+                        "candidacy",
+                        id=cs.key(f"{SOURCE}.candidacy", option_key),
+                        person_id=person,
+                        option_id=option,
+                        role="head",
+                        ballot_name=line["name"],
+                        member_of_party_id=owner,
+                        is_independent=label == "Independent",
+                    )
+                    glc_value(option, VOTES, line["votes"], line["page"], line["bbox"])
+                    if line["elected"]:
+                        cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected")
         return cs.write()
