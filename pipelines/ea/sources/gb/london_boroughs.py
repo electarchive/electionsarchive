@@ -7,7 +7,8 @@ import re
 import struct
 import subprocess
 import tempfile
-from datetime import date
+from collections.abc import Callable
+from datetime import date, datetime
 from pathlib import Path
 from uuid import UUID
 
@@ -896,6 +897,64 @@ GLC_BY_METHODOLOGY = (
     "Lewisham simply as Lewisham; it was caused by the resignation of Alan Herbert, who was elected for Lewisham "
     "West in 1981, and is stored as Lewisham West."
 )
+GLC_BY_EARLY = {1967: 8, 1973: 18, 1977: 16, 1981: 17}
+GLC_BY_EARLY_AREAS = {1964: 1964, 1967: 1967, 1973: 1970}
+GLC_BY_EARLY_HEADS = {
+    "HOLBORN AND ST PANCRAS S~TH": "HOLBORN AND ST PANCRAS SOUTH",
+    "CROYDON NOPTH EAST": "CROYDON NORTH EAST",
+    "LEWISHAH WEST": "LEWISHAM WEST",
+}
+GLC_BY_EARLY_NAMES = {
+    "Simpson, D. H.": "Simpson, D.H.",
+    "Renouf, A.JW.": "Renouf, A.J.W.",
+    "Cridland, VW. Mrs.": "Cridland, V.W. Mrs.",
+    "Freeman, M. L.": "Freeman, M.L.",
+    "BUl')ney, Helen": "Bunney, Helen",
+    "Her·bert, Alan L.": "Herbert, Alan L.",
+    "M. J. Coiner": "M. J. Colner",
+}
+GLC_BY_EARLY_PARTIES = {
+    "CON": "Conservative",
+    "CAN": "Conservative",
+    "LAB": "Labour",
+    "LIB": "Liberal",
+    "COMM": "Communist",
+    "IND": "Independent",
+    "INDLAB": "Independent Labour",
+    "FP": "Fellowship Party",
+    "SPGB": "Socialist Party of Great Britain",
+    "NATFR": "National Front",
+    "NF": "National Front",
+    "CONACM": "Conservative against the Common Market",
+    "CANACM": "Conservative against the Common Market",
+    "UM": "Union Movement",
+    "PW": "Protest for Wingate",
+}
+GLC_BY_TACIT = (1964, 6, "HAMMERSMITH")
+GLC_BY_EARLY_METHODOLOGY = {
+    1964: "Read from the text layer of the London County Council's report on the Greater London Council election of "
+    "1964, checked against the page image. A footnote on page 6, marked against Marjorie McIntosh, elected for "
+    "Hammersmith, records that she died on 6 May 1964 and that Iris M. C. Bonham was elected at an uncontested "
+    "by-election on 18 June 1964. The report gives no party for her, so none is stored.",
+    1967: "Read from the text layer of the Greater London Council's report on its election of 1967, checked against "
+    "the page image. Page 8 prints the Greenwich by-election of 29 June 1967, held after the resignation of Sheila "
+    "Bradley, with the elected candidate set flush and the others indented. One of Greenwich's three seats was "
+    "filled; the report prints no electorate or number voting for it.",
+    1973: "Read from the text layer of the appendix to the Greater London Council's report on its election of 1973, "
+    "which lists the by-elections from April 1970 to April 1973, checked against the page image. Each filled one of "
+    "a borough's seats. The report shows the elected candidate in bold type, and that candidate polled the most "
+    "votes; it prints a percentage voting but no electorate or number voting, so neither is stored.",
+    1977: "Read from the text layer of the appendix to the Greater London Council's report on its election of 1977, "
+    "which lists the by-elections from April 1973 to May 1977, checked against the page image. The electoral "
+    "divisions are the parliamentary constituencies of 1974 to 1983. The report shows the elected candidate in bold "
+    "type, and that candidate polled the most votes; it prints a percentage voting but no electorate or number "
+    "voting, so neither is stored.",
+    1981: "Read from the text layer of the appendix to the Greater London Council's report on its election of 1981, "
+    "which lists the by-elections from May 1977 to May 1981, checked against the page image. The electoral "
+    "divisions are the parliamentary constituencies of 1974 to 1983. The report shows the elected candidate first, "
+    "and that candidate polled the most votes; it prints a percentage poll but no electorate or number voting, so "
+    "neither is stored.",
+}
 
 
 def fetch() -> None:
@@ -2128,6 +2187,7 @@ def parse_glc() -> None:
     print(f"{len(areas)} GLC electoral areas and {len(standing)} candidates, 1964 to 1970")
     parse_ilea()
     parse_glc_by()
+    parse_glc_by_early()
 
 
 SKIPPED = re.compile(
@@ -2539,6 +2599,115 @@ def parse_glc_by() -> None:
     print(f"{len(divisions)} GLC by-elections and {len(candidates)} candidates, 1981 to 1985")
 
 
+def parse_glc_by_early() -> None:
+    areas = pl.read_parquet(PARSED / "glc_areas.parquet")
+    divisions: list[dict] = []
+    candidates: list[dict] = []
+    year, sheet, printed = GLC_BY_TACIT
+    sizes, book = pages(raw.cached(SOURCE, EARLY[year][1]).path)
+    for row in lines(book[sheet - 1]):
+        found = re.fullmatch(
+            r"tDied (\d+ \w+ \d{4}); (.+?), was elected at an uncontested by-election on (\d+) (\w+) (\d{4})\.",
+            " ".join(w[4] for w in row),
+        )
+        if found:
+            day = datetime.strptime(" ".join(found.group(3, 4, 5)), "%d %B %Y").date()
+            divisions.append({"report": year, "printed": printed, "day": day, "page": sheet})
+            candidates.append(
+                {
+                    "printed": printed,
+                    "day": day,
+                    "name": found.group(2),
+                    "party": None,
+                    "votes": None,
+                    "elected": True,
+                    "number": 1,
+                    "page": sheet,
+                    "bbox": ilea_box(row, sizes[sheet - 1]),
+                }
+            )
+    if not divisions:
+        raise ValueError("GLC 1964: no uncontested by-election footnote")
+    for year, sheet in GLC_BY_EARLY.items():
+        url = EARLY[year][1] if year in EARLY else GLC[year][1]
+        sizes, book = pages(raw.cached(SOURCE, url).path)
+        division: dict | None = None
+        for row in lines(book[sheet - 1]):
+            text = " ".join(w[4] for w in row)
+            heading = re.fullmatch(
+                r"([A-Za-z~ ]+?)(?:, [A-Za-z ]+)? \((\d+)\.(\d+)\.(\d{2}|\d{4})[,.] ?[\d.]+%?\)", text
+            ) or re.fullmatch(r"([A-Z ]+) \(By-Election\)", text)
+            if heading:
+                printed = heading.group(1).upper()
+                day = (
+                    date(1900 + int(heading.group(4)[-2:]), int(heading.group(3)), int(heading.group(2)))
+                    if heading.lastindex == 4
+                    else None
+                )
+                division = {
+                    "report": year,
+                    "printed": GLC_BY_EARLY_HEADS.get(printed, printed),
+                    "day": day,
+                    "page": sheet,
+                }
+                divisions.append(division)
+                continue
+            if division is None:
+                continue
+            held = re.fullmatch(r"\(Held (\d+) (\w+) (\d{4})\)", text)
+            if held:
+                division["day"] = datetime.strptime(" ".join(held.groups()), "%d %B %Y").date()
+                continue
+            found = re.fullmatch(r"(.+?)(?: \.\.)* \((\w+)\.\) ([\d,]+)", text) or re.fullmatch(
+                r"(.+?) ([Cc][oa]n ACM|[A-Za-z.]+)\*? ([\d.,]+)", text
+            )
+            if found is None:
+                if re.match(r"[*-]|Printed|Special|I I$|[A-Z]+$|I[A-Z]+I$|\d+$", text):
+                    continue
+                raise ValueError(f"GLC by-elections {year} page {sheet}: unread line {text!r}")
+            name = re.sub(r"^([A-Z][A-Za-z'·)]+)\. ", r"\1, ", found.group(1)) if year == 1981 else found.group(1)
+            party = re.sub(r"[^A-Z]", "", found.group(2).upper())
+            votes = number(found.group(3))
+            if party not in GLC_BY_EARLY_PARTIES or votes is None:
+                raise ValueError(f"GLC by-elections {year} page {sheet}: unread line {text!r}")
+            candidates.append(
+                {
+                    "printed": division["printed"],
+                    "day": division["day"],
+                    "name": GLC_BY_EARLY_NAMES.get(name, name),
+                    "party": GLC_BY_EARLY_PARTIES[party],
+                    "votes": votes,
+                    "elected": not any(
+                        c["day"] == division["day"] and c["printed"] == division["printed"] for c in candidates
+                    ),
+                    "page": sheet,
+                    "bbox": ilea_box(row, sizes[sheet - 1]),
+                }
+            )
+    for division in divisions:
+        mine = [c for c in candidates if c["printed"] == division["printed"] and c["day"] == division["day"]]
+        if division["day"] is None or not mine:
+            raise ValueError(f"GLC by-election {division['printed']}: no date or candidates")
+        if mine[0]["votes"] is not None:
+            for rank, c in enumerate(sorted(mine, key=lambda c: -c["votes"])):
+                c["number"] = rank + 1
+            if mine[0]["number"] != 1:
+                raise ValueError(f"GLC by-election {division['printed']}: first candidate did not poll the most")
+        if division["report"] not in GLC_BY_EARLY_AREAS:
+            division["code"] = None
+            continue
+        match = areas.filter(
+            pl.col("year") == GLC_BY_EARLY_AREAS[division["report"]],
+            pl.col("printed") == division["printed"],
+        )
+        if match.height != 1:
+            raise ValueError(f"GLC by-election {division['printed']}: no borough area")
+        division["code"] = match["code"][0]
+    pl.DataFrame(divisions).write_parquet(PARSED / "glc_by_early_divisions.parquet")
+    pl.DataFrame(candidates).write_parquet(PARSED / "glc_by_early_candidates.parquet")
+    print(f"{len(divisions)} GLC by-elections and {len(candidates)} candidates, 1964 to 1981")
+
+
 def emit() -> Path:
     wards = pl.read_parquet(PARSED / "wards.parquet")
     candidates = pl.read_parquet(PARSED / "candidates.parquet")
@@ -2557,7 +2726,7 @@ def emit() -> Path:
             + " by ward, and Greater London Council elections "
             + ", ".join(map(str, sorted(GLC)))
             + " by electoral division and of 1964, 1967, and 1970 by borough, the Greater London Council "
-            "by-elections of 1981 to 1985, and the Inner London Education Authority election of 1986 by constituency, from the London Research Centre's, the London County "
+            "by-elections of 1964 to 1985, and the Inner London Education Authority election of 1986 by constituency, from the London Research Centre's, the London County "
             "Council's, the Greater London Council's, and the London Residuary Body's reports",
             polity="GB",
         )
@@ -2857,6 +3026,34 @@ def emit() -> Path:
                 glc_parties[label] = found
             return glc_parties[label]
 
+        reports: dict[int, tuple[UUID, Callable[[int], UUID]]] = {}
+
+        def pager(artifact: raw.Artifact, artifact_id: UUID) -> Callable[[int], UUID]:
+            @functools.cache
+            def page(number: int) -> UUID:
+                image = PAGES / f"{artifact.sha256}-{number}.png"
+                if not image.exists():
+                    PAGES.mkdir(parents=True, exist_ok=True)
+                    subprocess.run(
+                        ["pdftoppm", "-r", "100", "-png", "-f", str(number), "-l", str(number), "-singlefile"]
+                        + [str(artifact.path), str(image.with_suffix(""))],
+                        check=True,
+                    )
+                width, height = struct.unpack(">II", image.read_bytes()[16:24])
+                found = cs.page(artifact_id, number)
+                cs.add(
+                    "source_page",
+                    id=found,
+                    artifact_id=artifact_id,
+                    page_number=number,
+                    image_key=f"pages/{SOURCE}/{image.name}",
+                    width=width,
+                    height=height,
+                )
+                return found
+
+            return page
+
         for year, (day, url) in GLC.items():
             title = f"Greater London Council Election {year}"
             source = cs.source(GLC_PUBLISHER, title)
@@ -2875,31 +3072,8 @@ def emit() -> Path:
                 )
             artifact = raw.cached(SOURCE, url)
             artifact_id = cs.artifact(artifact, source)
-            page_ids = {}
-
-            def glc_page(number: int) -> UUID:
-                if number not in page_ids:
-                    image = PAGES / f"{artifact.sha256}-{number}.png"
-                    if not image.exists():
-                        PAGES.mkdir(parents=True, exist_ok=True)
-                        subprocess.run(
-                            ["pdftoppm", "-r", "100", "-png", "-f", str(number), "-l", str(number), "-singlefile"]
-                            + [str(artifact.path), str(image.with_suffix(""))],
-                            check=True,
-                        )
-                    width, height = struct.unpack(">II", image.read_bytes()[16:24])
-                    page_ids[number] = cs.page(artifact_id, number)
-                    cs.add(
-                        "source_page",
-                        id=page_ids[number],
-                        artifact_id=artifact_id,
-                        page_number=number,
-                        image_key=f"pages/{SOURCE}/{image.name}",
-                        width=width,
-                        height=height,
-                    )
-                return page_ids[number]
-
+            glc_page = pager(artifact, artifact_id)
+            reports[year] = (source, glc_page)
             election = cs.key("gb.election", f"{day}:glc")
             cs.add(
                 "election",
@@ -3079,31 +3253,8 @@ def emit() -> Path:
                 )
             artifact = raw.cached(SOURCE, url)
             artifact_id = cs.artifact(artifact, source)
-            page_ids = {}
-
-            def early_page(number: int) -> UUID:
-                if number not in page_ids:
-                    image = PAGES / f"{artifact.sha256}-{number}.png"
-                    if not image.exists():
-                        PAGES.mkdir(parents=True, exist_ok=True)
-                        subprocess.run(
-                            ["pdftoppm", "-r", "100", "-png", "-f", str(number), "-l", str(number), "-singlefile"]
-                            + [str(artifact.path), str(image.with_suffix(""))],
-                            check=True,
-                        )
-                    width, height = struct.unpack(">II", image.read_bytes()[16:24])
-                    page_ids[number] = cs.page(artifact_id, number)
-                    cs.add(
-                        "source_page",
-                        id=page_ids[number],
-                        artifact_id=artifact_id,
-                        page_number=number,
-                        image_key=f"pages/{SOURCE}/{image.name}",
-                        width=width,
-                        height=height,
-                    )
-                return page_ids[number]
-
+            early_page = pager(artifact, artifact_id)
+            reports[year] = (source, early_page)
             election = cs.key("gb.election", f"{day}:glc")
             cs.add(
                 "election",
@@ -3249,30 +3400,7 @@ def emit() -> Path:
             )
         artifact = raw.cached(SOURCE, ILEA_URL)
         artifact_id = cs.artifact(artifact, source)
-        ilea_pages: dict[int, UUID] = {}
-
-        def ilea_page(number: int) -> UUID:
-            if number not in ilea_pages:
-                image = PAGES / f"{artifact.sha256}-{number}.png"
-                if not image.exists():
-                    PAGES.mkdir(parents=True, exist_ok=True)
-                    subprocess.run(
-                        ["pdftoppm", "-r", "100", "-png", "-f", str(number), "-l", str(number), "-singlefile"]
-                        + [str(artifact.path), str(image.with_suffix(""))],
-                        check=True,
-                    )
-                width, height = struct.unpack(">II", image.read_bytes()[16:24])
-                ilea_pages[number] = cs.page(artifact_id, number)
-                cs.add(
-                    "source_page",
-                    id=ilea_pages[number],
-                    artifact_id=artifact_id,
-                    page_number=number,
-                    image_key=f"pages/{SOURCE}/{image.name}",
-                    width=width,
-                    height=height,
-                )
-            return ilea_pages[number]
+        ilea_page = pager(artifact, artifact_id)
 
         election = cs.key("gb.election", f"{ILEA_DAY}:ilea")
         cs.add(
@@ -3544,6 +3672,146 @@ def emit() -> Path:
                         is_independent=False,
                     )
                     by_value(option, VOTES, line["votes"], line["page"], line["bbox"])
+                    if line["elected"]:
+                        cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected")
+        held = pl.read_parquet(PARSED / "glc_by_early_divisions.parquet")
+        standing = pl.read_parquet(PARSED / "glc_by_early_candidates.parquet")
+        for (day,), on_day in held.sort("day").group_by("day", maintain_order=True):
+            spoken = f"{day:%B} {day.day}, {day.year}"
+            seats = []
+            for division in on_day.iter_rows(named=True):
+                printed = division["printed"].title().replace(" And ", " and ").replace(" Upon ", " upon ")
+                if division["code"] is None:
+                    code, display = constituencies[fold(printed)]
+                    seats.append((division, "gb.pcon", code, display))
+                else:
+                    seats.append((division, "gb.lad", division["code"], printed))
+            election = cs.key("gb.election", f"{day}:glc-by")
+            cs.add(
+                "election",
+                id=election,
+                polity_id=london,
+                kind="by_election",
+                date_from=day,
+                date_to=day,
+                status="held",
+            )
+            name(
+                election,
+                f"{seats[0][3]} Greater London Council by-election, {spoken}"
+                if len(seats) == 1
+                else f"Greater London Council by-elections, {spoken}",
+            )
+            cs.add("slug", path=f"gb/london/{day}-glc-by-election", entity_id=election)
+            cs.add(
+                "note",
+                entity_id=election,
+                kind="methodology",
+                body_md=GLC_BY_EARLY_METHODOLOGY[seats[0][0]["report"]],
+            )
+            for division, scheme, code, display in seats:
+                source, report_page = reports[division["report"]]
+                area = cs.area(scheme, code)
+                unit = cs.unit(scheme, code)
+                if area in cs.minted or (unit in cs.minted and unit not in units):
+                    raise ValueError(f"{code}: no {scheme} area or unit")
+                tacit = standing.filter(pl.col("printed") == division["printed"], pl.col("day") == day)
+                tacit = tacit["votes"].is_null().all()
+                contest_key = f"{day}:glc:{code}"
+                contest = cs.key("gb.contest", contest_key)
+                cs.add(
+                    "contest",
+                    id=contest,
+                    election_id=election,
+                    kind="body_seats",
+                    body_id=council,
+                    district_area_id=area,
+                    magnitude=1,
+                    round_number=1,
+                    electoral_system_id=systems["fptp"],
+                    default_result_kind="tacit" if tacit else "counted",
+                )
+                name(contest, f"{display}, Greater London Council by-election, {day.year}")
+                cs.add("slug", path=f"gb/london/{day}-glc-by-election/{slug(display)}", entity_id=contest)
+                result_set = cs.key(f"{SOURCE}.result_set", contest_key)
+                cs.add(
+                    "result_set",
+                    id=result_set,
+                    election_id=election,
+                    contest_id=contest,
+                    stage="official",
+                    kind="tacit" if tacit else "counted",
+                    status="active",
+                    source_id=source,
+                    is_default=contest not in others,
+                    completeness=1,
+                )
+                cs.add(
+                    "citation",
+                    entity_id=result_set,
+                    source_id=source,
+                    locator={"page": division["page"], "division": division["printed"]},
+                )
+                lines_ = standing.filter(pl.col("printed") == division["printed"], pl.col("day") == day)
+                for line in lines_.iter_rows(named=True):
+                    option_key = f"{contest_key}:{line['number']}"
+                    label = line["party"]
+                    owner = None if label is None else glc_party(label)
+                    option = cs.key(f"{SOURCE}.option", option_key)
+                    cs.add(
+                        "contest_option",
+                        id=option,
+                        contest_id=contest,
+                        kind="candidate",
+                        party_id=owner,
+                        ballot_label=line["name"],
+                    )
+                    person = cs.key(f"{SOURCE}.person", option_key)
+                    cs.add("person", id=person)
+                    surname, _, rest = line["name"].partition(", ")
+                    if division["report"] in EARLY:
+                        spoken_name = surname.removeprefix("Mrs ")
+                    else:
+                        spoken_name = " ".join(w for w in [*rest.split(), surname] if w not in {"Mrs.", "Miss"})
+                    name(person, spoken_name)
+                    cs.add(
+                        "candidacy",
+                        id=cs.key(f"{SOURCE}.candidacy", option_key),
+                        person_id=person,
+                        option_id=option,
+                        role="head",
+                        ballot_name=line["name"],
+                        member_of_party_id=owner,
+                        is_independent=label == "Independent",
+                    )
+                    if line["votes"] is not None:
+                        x0, y0, x1, y1 = line["bbox"]
+                        cs.add(
+                            "result_value",
+                            result_set_id=result_set,
+                            unit_id=unit,
+                            option_id=option,
+                            channel=0,
+                            measure=VOTES,
+                            count_round=0,
+                            flags=DIGITIZED,
+                            value=line["votes"],
+                        )
+                        cs.add(
+                            "value_locator",
+                            result_set_id=result_set,
+                            unit_id=unit,
+                            option_id=option,
+                            channel=0,
+                            measure=VOTES,
+                            count_round=0,
+                            page_id=report_page(line["page"]),
+                            source_id=None,
+                            x0=x0,
+                            y0=y0,
+                            x1=x1,
+                            y1=y1,
+                        )
                     if line["elected"]:
                         cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected")
         return cs.write()
