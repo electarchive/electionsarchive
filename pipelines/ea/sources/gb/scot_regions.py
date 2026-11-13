@@ -19,6 +19,12 @@ MODEL = "claude-haiku-5-5"
 PROMPT = "1"
 LONGEST = 1568
 VOLUMES: dict[str, dict] = {
+    "b1974": {
+        "tier": "both",
+        "day": date(1974, 5, 7),
+        "file": "Scottish-Regional-and-District-Elections-1974",
+        "pages": (10, 75),
+    },
     "r1978": {"tier": "region", "day": date(1978, 5, 2), "file": "Scottish-Regional-Elections-1978", "pages": (27, 63)},
     "r1982": {"tier": "region", "day": date(1982, 5, 6), "file": "Scottish-Regional-Elections-1982", "pages": (25, 64)},
     "r1986": {"tier": "region", "day": date(1986, 5, 8), "file": "Scottish-Regional-Elections-1986", "pages": (19, 44)},
