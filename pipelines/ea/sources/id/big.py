@@ -3,13 +3,13 @@ import re
 from datetime import UTC, date, datetime
 from pathlib import Path
 from urllib.parse import urlencode
-from uuid import UUID
+from uuid import UUID, uuid5
 
 import httpx
 import polars as pl
 
 from ea import raw
-from ea.changeset import Changeset
+from ea.changeset import NAMESPACE, Changeset
 from ea.store import DATA, connect
 
 SOURCE = "id.big"
@@ -409,7 +409,7 @@ def emit() -> Path:
                 if english != native:
                     name(entity, english, "en", "english")
         for code, day in SPLIT.items():
-            event = cs.key(f"{SOURCE}.event", f"split:{code}")
+            event = uuid5(NAMESPACE, f"{SOURCE}.event\x1fsplit:{code}")
             cs.add("area_event", id=event, kind="split", date=day, notes=LAWS[code])
             cs.add("area_event_member", event_id=event, area_id=provinces[FROM[code]], role="from")
             cs.add("area_event_member", event_id=event, area_id=provinces[code], role="to")
