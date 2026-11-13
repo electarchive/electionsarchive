@@ -24,6 +24,7 @@ SCHEME = "gb.neighborhood_area"
 VOTES, REGISTERED, BALLOTS, INVALID, VOTERS = 1, 2, 3, 5, 14
 SHARE_ONLY, DIGITIZED = 4, 8
 PAGE_PREFIXES = (
+    "https://www.solihull.gov.uk/planning-and-building-control/",
     "https://buckinghamshire.moderngov.co.uk/mgElectionAreaResults",
     "https://www.stratford.gov.uk/news/",
     "https://www.stratford.gov.uk/planning-building/",
