@@ -1,0 +1,1658 @@
+{
+  "polity": "US-MN",
+  "publisher": "Minnesota Secretary of State",
+  "title": "Legislative Manual of the State of Minnesota 1929, election returns for state officers by precinct (general election 1928-11-06)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.lrl.mn.gov/archive/sessions/electionresults/1928-11-06-g-man.pdf",
+    "item": "https://www.lrl.mn.gov/mngov/electionresults"
+  },
+  "raw_source": "us.mn_lrl",
+  "text_layer": true,
+  "method": "Each county's votes are the Totals row printed at the foot of its precinct table (Grand Totals for Hennepin and Ramsey), read twice, by the scan's text layer and by an OCR pass over each cell, with every disagreement read by eye; every county sum but St. Louis's matches the held state totals. The box is the printed cell.",
+  "caveat": "St. Louis County prints no county total, and the Totals row under its towns matches neither them nor its page: its votes are the sum of the printed Totals rows for Duluth and for the unorganized districts and of the rows of its 145 towns and precincts, and the box is Duluth's. The two Floodwood precincts print no returns, so St. Louis and the county sums fall short of the state totals by 360 votes in each contest: 137 for Nelson, 206 for Shipstead, and 17 for Dunne in the Senate race, and 221 for Christianson, 74 for Lundeen, 44 for Andrew Nelson, and 21 for Bentall in the governor's race.",
+  "contests": {
+    "senate": {
+      "year": 1928,
+      "chamber": "senate",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "MN",
+      "district": null
+    },
+    "governor": {
+      "year": 1928,
+      "chamber": "governor",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "MN",
+      "district": null
+    }
+  },
+  "row_columns": [
+    {
+      "label": "Total Number of Ballots Cast and Counted",
+      "contest": null,
+      "candidate": ""
+    },
+    {
+      "label": "U. S. Senator: Arthur E. Nelson, Republican",
+      "contest": "senate",
+      "candidate": "Arthur E. Nelson"
+    },
+    {
+      "label": "U. S. Senator: Henrik Shipstead, Farmer-Labor",
+      "contest": "senate",
+      "candidate": "Henrik Shipstead"
+    },
+    {
+      "label": "U. S. Senator: Vincent R. Dunne, Workers Communist",
+      "contest": "senate",
+      "candidate": "Vincent R. Dunne"
+    },
+    {
+      "label": "Governor: Theodore Christianson, Republican",
+      "contest": "governor",
+      "candidate": "Theodore Christianson"
+    },
+    {
+      "label": "Governor: Ernest Lundeen, Farmer-Labor",
+      "contest": "governor",
+      "candidate": "Ernest Lundeen"
+    },
+    {
+      "label": "Governor: Andrew Nelson, Democrat",
+      "contest": "governor",
+      "candidate": "Andrew Nelson"
+    },
+    {
+      "label": "Governor: Harris A. Brandborg, Industrial",
+      "contest": "governor",
+      "candidate": "Harris A. Brandborg"
+    },
+    {
+      "label": "Governor: J. O. Bentall, Workers Communist",
+      "contest": "governor",
+      "candidate": "J. O. Bentall"
+    },
+    {
+      "label": "Lieutenant Governor: W. I. Nolan, Republican",
+      "contest": null,
+      "candidate": ""
+    },
+    {
+      "label": "Lieutenant Governor: Thomas J. Meighen, Farmer-Labor",
+      "contest": null,
+      "candidate": ""
+    },
+    {
+      "label": "Lieutenant Governor: Fred Pfaender, Democrat",
+      "contest": null,
+      "candidate": ""
+    }
+  ],
+  "pages": [
+    {
+      "page": 2,
+      "rows": [
+        {
+          "county": "Aitkin",
+          "y": 0.9174
+        }
+      ]
+    },
+    {
+      "page": 4,
+      "rows": [
+        {
+          "county": "Anoka",
+          "y": 0.7352
+        }
+      ]
+    },
+    {
+      "page": 6,
+      "rows": [
+        {
+          "county": "Becker",
+          "y": 0.8165
+        }
+      ]
+    },
+    {
+      "page": 10,
+      "rows": [
+        {
+          "county": "Beltrami",
+          "y": 0.5116
+        },
+        {
+          "county": "Benton",
+          "y": 0.7418
+        }
+      ]
+    },
+    {
+      "page": 12,
+      "rows": [
+        {
+          "county": "Big Stone",
+          "y": 0.4252
+        },
+        {
+          "county": "Blue Earth",
+          "y": 0.845
+        }
+      ]
+    },
+    {
+      "page": 14,
+      "rows": [
+        {
+          "county": "Brown",
+          "y": 0.7631
+        }
+      ]
+    },
+    {
+      "page": 16,
+      "rows": [
+        {
+          "county": "Carlton",
+          "y": 0.7856
+        }
+      ]
+    },
+    {
+      "page": 18,
+      "rows": [
+        {
+          "county": "Carver",
+          "y": 0.7127
+        }
+      ]
+    },
+    {
+      "page": 22,
+      "rows": [
+        {
+          "county": "Cass",
+          "y": 0.5224
+        },
+        {
+          "county": "Chippewa",
+          "y": 0.805
+        }
+      ]
+    },
+    {
+      "page": 24,
+      "rows": [
+        {
+          "county": "Chisago",
+          "y": 0.682
+        }
+      ]
+    },
+    {
+      "page": 26,
+      "rows": [
+        {
+          "county": "Clay",
+          "y": 0.854
+        }
+      ]
+    },
+    {
+      "page": 28,
+      "rows": [
+        {
+          "county": "Clearwater",
+          "y": 0.6627
+        },
+        {
+          "county": "Cook",
+          "y": 0.84
+        }
+      ]
+    },
+    {
+      "page": 30,
+      "rows": [
+        {
+          "county": "Cottonwood",
+          "y": 0.7278
+        }
+      ]
+    },
+    {
+      "page": 32,
+      "rows": [
+        {
+          "county": "Crow Wing",
+          "y": 0.8768
+        }
+      ]
+    },
+    {
+      "page": 34,
+      "rows": [
+        {
+          "county": "Dakota",
+          "y": 0.8425
+        }
+      ]
+    },
+    {
+      "page": 36,
+      "rows": [
+        {
+          "county": "Dodge",
+          "y": 0.5263
+        },
+        {
+          "county": "Douglas",
+          "y": 0.911
+        }
+      ]
+    },
+    {
+      "page": 38,
+      "rows": [
+        {
+          "county": "Faribault",
+          "y": 0.764
+        }
+      ]
+    },
+    {
+      "page": 40,
+      "rows": [
+        {
+          "county": "Fillmore",
+          "y": 0.7966
+        }
+      ]
+    },
+    {
+      "page": 42,
+      "rows": [
+        {
+          "county": "Freeborn",
+          "y": 0.8126
+        }
+      ]
+    },
+    {
+      "page": 44,
+      "rows": [
+        {
+          "county": "Goodhue",
+          "y": 0.8077
+        }
+      ]
+    },
+    {
+      "page": 46,
+      "rows": [
+        {
+          "county": "Grant",
+          "y": 0.7203
+        }
+      ]
+    },
+    {
+      "page": 64,
+      "rows": [
+        {
+          "county": "Hennepin",
+          "y": 0.5549
+        },
+        {
+          "county": "Houston",
+          "y": 0.8264
+        }
+      ]
+    },
+    {
+      "page": 66,
+      "rows": [
+        {
+          "county": "Hubbard",
+          "y": 0.7569
+        }
+      ]
+    },
+    {
+      "page": 68,
+      "rows": [
+        {
+          "county": "Isanti",
+          "y": 0.5517
+        }
+      ]
+    },
+    {
+      "page": 70,
+      "rows": [
+        {
+          "county": "Itasca",
+          "y": 0.8513
+        }
+      ]
+    },
+    {
+      "page": 72,
+      "rows": [
+        {
+          "county": "Jackson",
+          "y": 0.6286
+        },
+        {
+          "county": "Kanabec",
+          "y": 0.8703
+        }
+      ]
+    },
+    {
+      "page": 74,
+      "rows": [
+        {
+          "county": "Kandiyohi",
+          "y": 0.7878
+        }
+      ]
+    },
+    {
+      "page": 76,
+      "rows": [
+        {
+          "county": "Kittson",
+          "y": 0.7462
+        }
+      ]
+    },
+    {
+      "page": 78,
+      "rows": [
+        {
+          "county": "Koochiching",
+          "y": 0.8849
+        }
+      ]
+    },
+    {
+      "page": 80,
+      "rows": [
+        {
+          "county": "Lac qui Parle",
+          "y": 0.6604
+        },
+        {
+          "county": "Lake",
+          "y": 0.8988
+        }
+      ]
+    },
+    {
+      "page": 82,
+      "rows": [
+        {
+          "county": "Lake of the Woods",
+          "y": 0.7277
+        }
+      ]
+    },
+    {
+      "page": 84,
+      "rows": [
+        {
+          "county": "Le Sueur",
+          "y": 0.6171
+        },
+        {
+          "county": "Lincoln",
+          "y": 0.8782
+        }
+      ]
+    },
+    {
+      "page": 86,
+      "rows": [
+        {
+          "county": "Lyon",
+          "y": 0.7424
+        }
+      ]
+    },
+    {
+      "page": 88,
+      "rows": [
+        {
+          "county": "McLeod",
+          "y": 0.6151
+        },
+        {
+          "county": "Mahnomen",
+          "y": 0.8661
+        }
+      ]
+    },
+    {
+      "page": 90,
+      "rows": [
+        {
+          "county": "Marshall",
+          "y": 0.9161
+        }
+      ]
+    },
+    {
+      "page": 92,
+      "rows": [
+        {
+          "county": "Martin",
+          "y": 0.7726
+        }
+      ]
+    },
+    {
+      "page": 94,
+      "rows": [
+        {
+          "county": "Meeker",
+          "y": 0.5813
+        },
+        {
+          "county": "Mille Lacs",
+          "y": 0.8896
+        }
+      ]
+    },
+    {
+      "page": 96,
+      "rows": [
+        {
+          "county": "Morrison",
+          "y": 0.8336
+        }
+      ]
+    },
+    {
+      "page": 98,
+      "rows": [
+        {
+          "county": "Mower",
+          "y": 0.7701
+        }
+      ]
+    },
+    {
+      "page": 100,
+      "rows": [
+        {
+          "county": "Murray",
+          "y": 0.5985
+        },
+        {
+          "county": "Nicollet",
+          "y": 0.8591
+        }
+      ]
+    },
+    {
+      "page": 102,
+      "rows": [
+        {
+          "county": "Nobles",
+          "y": 0.6674
+        }
+      ]
+    },
+    {
+      "page": 104,
+      "rows": [
+        {
+          "county": "Norman",
+          "y": 0.4906
+        },
+        {
+          "county": "Olmsted",
+          "y": 0.9001
+        }
+      ]
+    },
+    {
+      "page": 108,
+      "rows": [
+        {
+          "county": "Otter Tail",
+          "y": 0.7989
+        }
+      ]
+    },
+    {
+      "page": 110,
+      "rows": [
+        {
+          "county": "Pennington",
+          "y": 0.6235
+        }
+      ]
+    },
+    {
+      "page": 112,
+      "rows": [
+        {
+          "county": "Pine",
+          "y": 0.5547
+        },
+        {
+          "county": "Pipestone",
+          "y": 0.8382
+        }
+      ]
+    },
+    {
+      "page": 116,
+      "rows": [
+        {
+          "county": "Polk",
+          "y": 0.7924
+        }
+      ]
+    },
+    {
+      "page": 118,
+      "rows": [
+        {
+          "county": "Pope",
+          "y": 0.7123
+        }
+      ]
+    },
+    {
+      "page": 130,
+      "rows": [
+        {
+          "county": "Ramsey",
+          "y": 0.5567
+        },
+        {
+          "county": "Red Lake",
+          "y": 0.8007
+        }
+      ]
+    },
+    {
+      "page": 132,
+      "rows": [
+        {
+          "county": "Redwood",
+          "y": 0.821
+        }
+      ]
+    },
+    {
+      "page": 134,
+      "rows": [
+        {
+          "county": "Renville",
+          "y": 0.7933
+        }
+      ]
+    },
+    {
+      "page": 136,
+      "rows": [
+        {
+          "county": "Rice",
+          "y": 0.6842
+        },
+        {
+          "county": "Rock",
+          "y": 0.9234
+        }
+      ]
+    },
+    {
+      "page": 138,
+      "rows": [
+        {
+          "county": "Roseau",
+          "y": 0.8244
+        }
+      ]
+    },
+    {
+      "page": 142,
+      "rows": [
+        {
+          "county": "St. Louis",
+          "y": 0.5223
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.5412,
+          "label": "St. Louis towns 1",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.5509,
+          "label": "St. Louis towns 2",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.5606,
+          "label": "St. Louis towns 3",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.57,
+          "label": "St. Louis towns 4",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.5798,
+          "label": "St. Louis towns 5",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.5892,
+          "label": "St. Louis towns 6",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.5989,
+          "label": "St. Louis towns 7",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.6084,
+          "label": "St. Louis towns 8",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.6181,
+          "label": "St. Louis towns 9",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.6278,
+          "label": "St. Louis towns 10",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.6373,
+          "label": "St. Louis towns 11",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.6468,
+          "label": "St. Louis towns 12",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.6564,
+          "label": "St. Louis towns 13",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.6661,
+          "label": "St. Louis towns 14",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.6756,
+          "label": "St. Louis towns 15",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.6853,
+          "label": "St. Louis towns 16",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.6948,
+          "label": "St. Louis towns 17",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.7044,
+          "label": "St. Louis towns 18",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.7139,
+          "label": "St. Louis towns 19",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.7234,
+          "label": "St. Louis towns 20",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.7329,
+          "label": "St. Louis towns 21",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.7426,
+          "label": "St. Louis towns 22",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.7523,
+          "label": "St. Louis towns 23",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.7618,
+          "label": "St. Louis towns 24",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.7714,
+          "label": "St. Louis towns 25",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.7811,
+          "label": "St. Louis towns 26",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.7906,
+          "label": "St. Louis towns 27",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.8001,
+          "label": "St. Louis towns 28",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.8098,
+          "label": "St. Louis towns 29",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.8193,
+          "label": "St. Louis towns 30",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.8289,
+          "label": "St. Louis towns 31",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.8384,
+          "label": "St. Louis towns 32",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.8481,
+          "label": "St. Louis towns 33",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.8578,
+          "label": "St. Louis towns 34",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.8671,
+          "label": "St. Louis towns 35",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.8768,
+          "label": "St. Louis towns 36",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.8865,
+          "label": "St. Louis towns 37",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.8961,
+          "label": "St. Louis towns 38",
+          "half": 0.0045
+        }
+      ]
+    },
+    {
+      "page": 144,
+      "rows": [
+        {
+          "county": "St. Louis",
+          "y": 0.3532,
+          "label": "St. Louis towns 39",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.3629,
+          "label": "St. Louis towns 40",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.3724,
+          "label": "St. Louis towns 41",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.3821,
+          "label": "St. Louis towns 42",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.3913,
+          "label": "St. Louis towns 43",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.401,
+          "label": "St. Louis towns 44",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.4105,
+          "label": "St. Louis towns 45",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.4202,
+          "label": "St. Louis towns 46",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.4296,
+          "label": "St. Louis towns 47",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.4393,
+          "label": "St. Louis towns 48",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.4488,
+          "label": "St. Louis towns 49",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.4584,
+          "label": "St. Louis towns 50",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.4681,
+          "label": "St. Louis towns 51",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.4776,
+          "label": "St. Louis towns 52",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.4872,
+          "label": "St. Louis towns 53",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.4967,
+          "label": "St. Louis towns 54",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.5064,
+          "label": "St. Louis towns 55",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.5159,
+          "label": "St. Louis towns 56",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.5255,
+          "label": "St. Louis towns 57",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.5352,
+          "label": "St. Louis towns 58",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.5447,
+          "label": "St. Louis towns 59",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.5543,
+          "label": "St. Louis towns 60",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.564,
+          "label": "St. Louis towns 61",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.5735,
+          "label": "St. Louis towns 62",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.5832,
+          "label": "St. Louis towns 63",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.5926,
+          "label": "St. Louis towns 64",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.6021,
+          "label": "St. Louis towns 65",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.6117,
+          "label": "St. Louis towns 66",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.6214,
+          "label": "St. Louis towns 67",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.6309,
+          "label": "St. Louis towns 68",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.6406,
+          "label": "St. Louis towns 69",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.6501,
+          "label": "St. Louis towns 70",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.6592,
+          "label": "St. Louis towns 71",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.6692,
+          "label": "St. Louis towns 72",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.6787,
+          "label": "St. Louis towns 73",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.6883,
+          "label": "St. Louis towns 74",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.6978,
+          "label": "St. Louis towns 75",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.7075,
+          "label": "St. Louis towns 76",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.717,
+          "label": "St. Louis towns 77",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.7266,
+          "label": "St. Louis towns 78",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.7361,
+          "label": "St. Louis towns 79",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.7456,
+          "label": "St. Louis towns 80",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.7551,
+          "label": "St. Louis towns 81",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.7647,
+          "label": "St. Louis towns 82",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.7744,
+          "label": "St. Louis towns 83",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.7839,
+          "label": "St. Louis towns 84",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.7934,
+          "label": "St. Louis towns 85",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.8028,
+          "label": "St. Louis towns 86",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.8123,
+          "label": "St. Louis towns 87",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.822,
+          "label": "St. Louis towns 88",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.8316,
+          "label": "St. Louis towns 89",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.8411,
+          "label": "St. Louis towns 90",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.8508,
+          "label": "St. Louis towns 91",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.8603,
+          "label": "St. Louis towns 92",
+          "half": 0.0045
+        }
+      ]
+    },
+    {
+      "page": 146,
+      "rows": [
+        {
+          "county": "St. Louis",
+          "y": 0.3551,
+          "label": "St. Louis towns 93",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.3647,
+          "label": "St. Louis towns 94",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.3742,
+          "label": "St. Louis towns 95",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.3837,
+          "label": "St. Louis towns 96",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.3931,
+          "label": "St. Louis towns 97",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.403,
+          "label": "St. Louis towns 98",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.4123,
+          "label": "St. Louis towns 99",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.4217,
+          "label": "St. Louis towns 100",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.4316,
+          "label": "St. Louis towns 101",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.4412,
+          "label": "St. Louis towns 102",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.4507,
+          "label": "St. Louis towns 103",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.4601,
+          "label": "St. Louis towns 104",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.4698,
+          "label": "St. Louis towns 105",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.4795,
+          "label": "St. Louis towns 106",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.4887,
+          "label": "St. Louis towns 107",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.4983,
+          "label": "St. Louis towns 108",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.5078,
+          "label": "St. Louis towns 109",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.5175,
+          "label": "St. Louis towns 110",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.5272,
+          "label": "St. Louis towns 111",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.5366,
+          "label": "St. Louis towns 112",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.5465,
+          "label": "St. Louis towns 113",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.5561,
+          "label": "St. Louis towns 114",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.5656,
+          "label": "St. Louis towns 115",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.5752,
+          "label": "St. Louis towns 116",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.5847,
+          "label": "St. Louis towns 117",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.5944,
+          "label": "St. Louis towns 118",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.604,
+          "label": "St. Louis towns 119",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.6133,
+          "label": "St. Louis towns 120",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.6233,
+          "label": "St. Louis towns 121",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.6326,
+          "label": "St. Louis towns 122",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.6424,
+          "label": "St. Louis towns 123",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.6517,
+          "label": "St. Louis towns 124",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.6614,
+          "label": "St. Louis towns 125",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.6708,
+          "label": "St. Louis towns 126",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.6805,
+          "label": "St. Louis towns 127",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.6898,
+          "label": "St. Louis towns 128",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.6992,
+          "label": "St. Louis towns 129",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.7091,
+          "label": "St. Louis towns 130",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.7185,
+          "label": "St. Louis towns 131",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.728,
+          "label": "St. Louis towns 132",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.7375,
+          "label": "St. Louis towns 133",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.7471,
+          "label": "St. Louis towns 134",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.7566,
+          "label": "St. Louis towns 135",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.766,
+          "label": "St. Louis towns 136",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.7757,
+          "label": "St. Louis towns 137",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.7852,
+          "label": "St. Louis towns 138",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.7948,
+          "label": "St. Louis towns 139",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.8043,
+          "label": "St. Louis towns 140",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.8137,
+          "label": "St. Louis towns 141",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.8234,
+          "label": "St. Louis towns 142",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.8332,
+          "label": "St. Louis towns 143",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.8427,
+          "label": "St. Louis towns 144",
+          "half": 0.0045
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.852,
+          "label": "St. Louis towns 145",
+          "half": 0.0045
+        }
+      ]
+    },
+    {
+      "page": 148,
+      "rows": [
+        {
+          "county": "Scott",
+          "y": 0.8183
+        },
+        {
+          "county": "St. Louis",
+          "y": 0.5355
+        }
+      ]
+    },
+    {
+      "page": 150,
+      "rows": [
+        {
+          "county": "Sherburne",
+          "y": 0.5187
+        },
+        {
+          "county": "Sibley",
+          "y": 0.8216
+        }
+      ]
+    },
+    {
+      "page": 152,
+      "rows": [
+        {
+          "county": "Stearns",
+          "y": 0.9184
+        }
+      ]
+    },
+    {
+      "page": 154,
+      "rows": [
+        {
+          "county": "Steele",
+          "y": 0.5733
+        },
+        {
+          "county": "Stevens",
+          "y": 0.8549
+        }
+      ]
+    },
+    {
+      "page": 156,
+      "rows": [
+        {
+          "county": "Swift",
+          "y": 0.716
+        }
+      ]
+    },
+    {
+      "page": 158,
+      "rows": [
+        {
+          "county": "Todd",
+          "y": 0.7924
+        }
+      ]
+    },
+    {
+      "page": 160,
+      "rows": [
+        {
+          "county": "Traverse",
+          "y": 0.5476
+        },
+        {
+          "county": "Wabasha",
+          "y": 0.896
+        }
+      ]
+    },
+    {
+      "page": 162,
+      "rows": [
+        {
+          "county": "Wadena",
+          "y": 0.5521
+        },
+        {
+          "county": "Waseca",
+          "y": 0.8049
+        }
+      ]
+    },
+    {
+      "page": 164,
+      "rows": [
+        {
+          "county": "Washington",
+          "y": 0.7457
+        }
+      ]
+    },
+    {
+      "page": 166,
+      "rows": [
+        {
+          "county": "Watonwan",
+          "y": 0.5747
+        },
+        {
+          "county": "Wilkin",
+          "y": 0.9101
+        }
+      ]
+    },
+    {
+      "page": 168,
+      "rows": [
+        {
+          "county": "Winona",
+          "y": 0.7983
+        }
+      ]
+    },
+    {
+      "page": 170,
+      "rows": [
+        {
+          "county": "Wright",
+          "y": 0.7725
+        }
+      ]
+    },
+    {
+      "page": 172,
+      "rows": [
+        {
+          "county": "Yellow Medicine",
+          "y": 0.7212
+        }
+      ]
+    }
+  ]
+}

@@ -39,6 +39,13 @@ class Column(TypedDict):
     party: NotRequired[str]
 
 
+class TotalsRow(TypedDict):
+    county: str
+    y: float
+    label: NotRequired[str]
+    half: NotRequired[float]
+
+
 class Page(TypedDict):
     page: int
     id: NotRequired[str]
@@ -57,6 +64,7 @@ class Page(TypedDict):
     start: NotRequired[Literal["second"]]
     wards: NotRequired[str]
     totals: NotRequired[bool]
+    rows: NotRequired[list[TotalsRow]]
 
 
 class Contest(TypedDict):
@@ -91,6 +99,8 @@ class Manifest(TypedDict):
     restage: NotRequired[bool]
     autorotate: NotRequired[bool]
     caveat: NotRequired[str]
+    method: NotRequired[str]
+    row_columns: NotRequired[list[Column]]
 
 
 class Header(TypedDict):
@@ -1618,7 +1628,9 @@ def emit(name: str) -> Path:
                 ).fetchone()
                 text = (
                     (
-                        "Read from the scan's text layer, every column checked against the printed state total. Each cell's box is its column's band by its row's band, so it is approximate."
+                        manifest["method"]
+                        if "method" in manifest
+                        else "Read from the scan's text layer, every column checked against the printed state total. Each cell's box is its column's band by its row's band, so it is approximate."
                         if manifest.get("text_layer")
                         else "Read from the scan by a vision model. Each cell's box is its column's band by its row's band; its position comes from matching the model's figures to an OCR pass over the same image, so it is approximate."
                     )

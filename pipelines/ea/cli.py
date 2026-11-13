@@ -28,6 +28,7 @@ from ea import (
     prescreen,
     rasters,
     raw,
+    scan_rows,
     scans,
     search,
     statewide,
@@ -164,7 +165,7 @@ def main() -> None:
     )
     scanning.add_argument(
         "action",
-        choices=("prepare", "run", "status", "emit", "layout", "statewide"),
+        choices=("prepare", "run", "status", "emit", "layout", "statewide", "rows"),
         help="render crops and fill held totals, advance the batch reads once, list manifests, "
         "or emit the tables that passed",
     )
@@ -252,6 +253,8 @@ def main() -> None:
                 if args.action == "status"
                 else layout.step(args.name)
                 if args.action == "layout"
+                else scan_rows.step(args.name)
+                if args.action == "rows"
                 else statewide.step(args.name)
                 if args.action == "statewide"
                 else statewide.emit(args.name)
