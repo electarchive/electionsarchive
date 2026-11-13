@@ -2388,6 +2388,118 @@
         0.0,
         0.1386
       ]
+    },
+    {
+      "page": 155,
+      "id": "155-0",
+      "columns": [
+        {
+          "label": "John Ireland.",
+          "contest": "governor",
+          "candidate": "John Ireland"
+        },
+        {
+          "label": "G. W. Jones.",
+          "contest": "governor",
+          "candidate": "George Washington Jones"
+        },
+        {
+          "label": "A. B. Norton.",
+          "contest": "governor",
+          "candidate": "A.B. Norton"
+        },
+        {
+          "label": "Scattering.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.11,
+        0.15,
+        0.676,
+        0.93
+      ],
+      "hint": "Read only the Governor columns of the table 'Returns of an Election held November 4, 1884, for Governor and Lieutenant-Governor, continued'; the county names are at the left.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.155
+      ]
+    },
+    {
+      "page": 156,
+      "id": "156-0",
+      "columns": [
+        {
+          "label": "John Ireland.",
+          "contest": "governor",
+          "candidate": "John Ireland"
+        },
+        {
+          "label": "G. W. Jones.",
+          "contest": "governor",
+          "candidate": "George Washington Jones"
+        },
+        {
+          "label": "A. B. Norton.",
+          "contest": "governor",
+          "candidate": "A.B. Norton"
+        },
+        {
+          "label": "Scattering.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.11,
+        0.15,
+        0.663,
+        0.925
+      ],
+      "hint": "Read only the Governor columns of the table 'Returns of an Election held November 4, 1884, for Governor and Lieutenant-Governor, continued'; the county names are at the left.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.15
+      ]
+    },
+    {
+      "page": 157,
+      "id": "157-0",
+      "columns": [
+        {
+          "label": "John Ireland.",
+          "contest": "governor",
+          "candidate": "John Ireland"
+        },
+        {
+          "label": "G. W. Jones.",
+          "contest": "governor",
+          "candidate": "George Washington Jones"
+        },
+        {
+          "label": "A. B. Norton.",
+          "contest": "governor",
+          "candidate": "A.B. Norton"
+        },
+        {
+          "label": "Scattering.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.11,
+        0.15,
+        0.666,
+        0.53
+      ],
+      "hint": "Read only the Governor columns of the table 'Returns of an Election held November 4, 1884, for Governor and Lieutenant-Governor, continued'; the county names are at the left."
     }
   ]
 }
