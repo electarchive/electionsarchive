@@ -150,6 +150,16 @@ publisher = "North Carolina State Board of Elections"
 url = "https://www.ncsbe.gov/results-data"
 
 [[feed]]
+id = "us.ballots.nc"
+adapter = "us.ballots"
+enabled = false
+params = { state = "NC" }
+poller = "muktedir"
+publisher = "North Carolina State Board of Elections"
+url = "https://www.ncsbe.gov/results-data/absentee-data"
+note = "Per-voter absentee files, loaded once per election by ea parse and emit us.nc_ballots; not polled"
+
+[[feed]]
 id = "us.enr_2026.ok"
 adapter = "us.enr_2026"
 enabled = false
