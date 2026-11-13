@@ -1100,9 +1100,23 @@ function remains(race: LiveRace, stamp: string) {
 export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
   const { race, sizes } = split(given, at);
   const stamp = at ?? race.frames.at(-1)?.at ?? "";
-  const opened = race.frames.find((frame) => sum(frame.totals) > 0)?.at;
-  const cutoff =
+  const opener = race.frames.find((frame) => sum(frame.totals) > 0);
+  const opened = opener?.at;
+  const opening = opener == null ? 0 : sum(opener.totals);
+  const graced =
     opened == null ? null : Date.parse(opened) + MODEL.tail.grace * 86_400_000;
+  const dayOne =
+    graced == null
+      ? undefined
+      : race.frames.findLast((frame) => Date.parse(frame.at) <= graced);
+  const cutoff =
+    opened != null &&
+    graced != null &&
+    Date.parse(stamp) > graced &&
+    dayOne != null &&
+    sum(dayOne.totals) - opening <= MODEL.late.small * opening
+      ? Date.parse(opened)
+      : graced;
   const isLate = cutoff != null && Date.parse(stamp) > cutoff;
   const { found, a, b, widths } = units(race, at, cutoff, sizes);
   const tail = TAILS[race.state] ?? MODEL.tail.share;
