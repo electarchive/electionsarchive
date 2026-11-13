@@ -80,6 +80,7 @@ class Volume(TypedDict):
     extend: NotRequired[bool]
     empty: NotRequired[bool]
     turn: NotRequired[int]
+    turns: NotRequired[dict[str, int]]
     slates: NotRequired[dict[str, Slate]]
 
 
@@ -188,7 +189,8 @@ def requests(volume: Volume, reader: str, leaves: list[int]) -> dict[str, scans.
     text = instructions(volume)
     out: dict[str, scans.Read] = {}
     for leaf in leaves:
-        image = scans.render(manifest, {"page": leaf, **({"turn": volume["turn"]} if "turn" in volume else {})}, 200)
+        turn = volume.get("turns", {}).get(str(leaf), volume.get("turn"))
+        image = scans.render(manifest, {"page": leaf, **({"turn": turn} if turn is not None else {})}, 200)
         media, data = scans.encode(image)
         digest = hashlib.sha256(data + text.encode()).hexdigest()
         blocks: list[ImageBlockParam | TextBlockParam] = [
@@ -283,7 +285,9 @@ def generate(name: str, volume: Volume, pages: dict[int, LayoutPage], folder: Pa
         ids = dict(conn.execute("select value, entity_id from external_id where scheme = 'us.contest'").fetchall())
         for leaf in volume["leaves"]:
             page = pages[leaf]
-            if "turn" in volume:
+            if str(leaf) in volume.get("turns", {}):
+                turns[leaf] = volume["turns"][str(leaf)]
+            elif "turn" in volume:
                 turns[leaf] = volume["turn"]
             elif volume.get("autorotate"):
                 turns[leaf] = scans.orientation(source, leaf, scans.render(source, {"page": leaf, "turn": 0}, 150))
@@ -293,7 +297,11 @@ def generate(name: str, volume: Volume, pages: dict[int, LayoutPage], folder: Pa
                 (
                     table
                     for table in page["tables"]
-                    if table["office"] != "other" and not (table["continued"] and not table["title"])
+                    if table["office"] != "other"
+                    and not (
+                        table["continued"]
+                        and not (table["title"] and any(column["role"] == "candidate" for column in table["columns"]))
+                    )
                 ),
                 key=lambda table: table["y0"],
             )

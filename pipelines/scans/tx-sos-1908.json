@@ -33,8 +33,8 @@
       "columns": [
         {
           "label": "Thos. M. Campbell.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "Thomas M. Campbell"
         },
         {
           "label": "John N. Simpson.",
@@ -107,8 +107,8 @@
       "columns": [
         {
           "label": "Thos. M. Campbell.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "Thomas M. Campbell"
         },
         {
           "label": "John N. Simpson.",
@@ -181,8 +181,8 @@
       "columns": [
         {
           "label": "Thos. M. Campbell.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "Thomas M. Campbell"
         },
         {
           "label": "John N. Simpson.",
@@ -255,8 +255,8 @@
       "columns": [
         {
           "label": "Thos. M. Campbell.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "Thomas M. Campbell"
         },
         {
           "label": "John N. Simpson.",
@@ -4066,6 +4066,122 @@
       ],
       "hint": "This page continues the table of the previous page and prints no headings.",
       "turn": -90
+    },
+    {
+      "page": 793,
+      "id": "793-0",
+      "columns": [
+        {
+          "label": "Carl Schmidt",
+          "contest": "president",
+          "candidate": "August Gillhaus (Socialist Labor)"
+        },
+        {
+          "label": "F. Maiorana",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.063,
+        0.167,
+        0.518,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Returns of an election held November 3, 1908. For Electors for President and Vice-President. Socialist Labor'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1236
+      ]
+    },
+    {
+      "page": 793,
+      "id": "793-1",
+      "columns": [
+        {
+          "label": "Carl Schmidt",
+          "contest": "president",
+          "candidate": "August Gillhaus (Socialist Labor)"
+        },
+        {
+          "label": "F. Maiorana",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.514,
+        0.171,
+        0.968,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Returns of an election held November 3, 1908. For Electors for President and Vice-President. Socialist Labor'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1194
+      ]
+    },
+    {
+      "page": 794,
+      "id": "794-0",
+      "columns": [
+        {
+          "label": "Carl Schmidt.",
+          "contest": "president",
+          "candidate": "August Gillhaus (Socialist Labor)"
+        },
+        {
+          "label": "F. Maiorana.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.012,
+        0.136,
+        0.458,
+        1.0
+      ],
+      "hint": "Read only the table headed 'SOCIALIST AND LABOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1435
+      ]
+    },
+    {
+      "page": 794,
+      "id": "794-1",
+      "columns": [
+        {
+          "label": "Carl Schmidt.",
+          "contest": "president",
+          "candidate": "August Gillhaus (Socialist Labor)"
+        },
+        {
+          "label": "F. Maiorana.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.449,
+        0.14,
+        0.898,
+        0.838
+      ],
+      "hint": "Read only the table headed 'SOCIALIST AND LABOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1719
+      ]
     }
   ]
 }
