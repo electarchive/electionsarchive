@@ -189,6 +189,8 @@ const MODEL = {
     weigh: 1,
     span: 1,
     reach: 5,
+    spill: 0.3,
+    scatter: 1.2,
   },
   reported: { common: 0.9, own: 0.3, capped: 0.99 },
   channel: { turnout: 0.35, prior: 0.08, sigma: 1.5, unlisted: 0.02 },
@@ -1305,6 +1307,7 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
       }),
   );
   const finals = whole.map(() => 0);
+  const spills = whole.map(() => 0);
   const portion = found.map((unit) => {
     const indexes = streamsOf.get(unit.county);
     if (indexes == null) {
@@ -1451,7 +1454,9 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
           unit.total > 0 && complete
             ? unit.total
             : model.unit(unit, cell, tau, surge, random);
+        spills[index] = 0;
         if (isLate && unit.paced != null && unit.total > 0) {
+          const free = finals[index];
           finals[index] = Math.min(
             finals[index],
             Math.max(
@@ -1460,6 +1465,11 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
               unit.total + MODEL.late.reach * (unit.total - unit.paced),
             ),
           );
+          const { spill, scatter } = MODEL.late;
+          spills[index] =
+            Math.max(0, free - finals[index]) *
+            spill *
+            Math.exp(scatter * gaussian(random) - scatter ** 2 / 2);
         }
       }
     }
@@ -1576,7 +1586,7 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
       const extra = reports.has(unit.county)
         ? (pending.get(unit.county) ?? 0) * portion[index]!
         : open == null
-          ? final * later
+          ? final * later + spills[wholeOf.get(unit.county)!]! * portion[index]!
           : Math.max(0, open - remaining);
       const ceiling = 1 - unit.others;
       const local =
