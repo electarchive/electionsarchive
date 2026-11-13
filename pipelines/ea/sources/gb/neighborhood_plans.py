@@ -134,6 +134,22 @@ CONTEXT = {
         "the area were asked whether {council} should use the neighborhood plan to help it decide planning "
         "applications there."
     ),
+    "right_to_build": (
+        "A referendum on a Community Right to Build Order under Schedule 4C of the Town and Country Planning Act "
+        "1990, applying Schedule 4B and the Neighbourhood Planning (Referendums) Regulations 2012. Voters registered "
+        "in the area were asked whether the development in the order should have planning permission; {council} "
+        "makes the order if more than half of those voting say Yes."
+    ),
+    "parish_poll": (
+        "A parish poll under the Local Government Act 1972, demanded at a parish meeting and run by {council}. "
+        "Electors of the parish were asked a single question; the result is advisory to the parish council."
+    ),
+}
+KINDS = {
+    "residential": "referendum",
+    "business": "referendum",
+    "right_to_build": "Community Right to Build Order referendum",
+    "parish_poll": "parish poll",
 }
 WITHIN = (
     "The neighborhood area is not a single parish, so it is shown within {council}'s area rather than drawn on its own."
@@ -424,10 +440,12 @@ def emit() -> Path:
                     status="held",
                 )
                 plural = "s" if polls.height > 1 else ""
-                name(
-                    election,
-                    f"{place} neighborhood planning referendum{plural}, {date.fromisoformat(str(day)):%-d %B %Y}",
+                what = (
+                    "neighborhood planning referendum"
+                    if set(polls["kind"]) <= {"residential", "business"}
+                    else "referendum"
                 )
+                name(election, f"{place} {what}{plural}, {date.fromisoformat(str(day)):%-d %B %Y}")
                 elections[election] = f"{path}/{day}-referendum"
                 cs.add("slug", path=elections[election], entity_id=election)
             elif election not in elections:
@@ -448,9 +466,9 @@ def emit() -> Path:
                 plan = str(row["plan"])
                 key = f"{day}:neighborhood:{code}:{slug(plan)}:{row['kind']}"
                 title = (
-                    f"Decision statement: {plan} {row['kind']} referendum, {day}"
+                    f"Decision statement: {plan} {KINDS[row['kind']]}, {day}"
                     if pdf and "decision" in row["url"].lower()
-                    else f"Declaration of result of poll: {plan} {row['kind']} referendum, {day}"
+                    else f"Declaration of result of poll: {plan} {KINDS[row['kind']]}, {day}"
                     if pdf
                     else "Neighbourhood plan referendum results"
                     if row["url"] in PAGES.values()
@@ -506,8 +524,12 @@ def emit() -> Path:
                     round_number=1,
                     default_result_kind="counted",
                 )
-                cs.add("ballot_question", contest_id=contest, type="mandatory_referendum")
-                label = plan if row["kind"] == "residential" else f"{plan} (business referendum)"
+                cs.add(
+                    "ballot_question",
+                    contest_id=contest,
+                    type="optional_referendum" if row["kind"] == "parish_poll" else "mandatory_referendum",
+                )
+                label = f"{plan} (business referendum)" if row["kind"] == "business" else plan
                 name(contest, label)
                 cs.add("slug", path=f"{elections[election]}/{slug(label)}", entity_id=contest)
                 single = {"it": "it", "makes": "the council makes the plan part of its development plan"}
