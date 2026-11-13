@@ -27,6 +27,7 @@ export type LiveUnitCount = {
   reporting: number | null;
   expected: number | null;
   eevp?: { share: number; total: number } | null;
+  channel?: number;
 };
 
 export type LiveFrame = {
@@ -43,6 +44,13 @@ export type LiveBaseline = {
   shares: Array<number>;
   expected?: number;
   traits?: Array<number>;
+  channels?: Array<LiveChannel>;
+};
+
+export type LiveChannel = {
+  channel: number;
+  share: number;
+  shift: Array<number>;
 };
 
 export type LiveRace = {
@@ -172,7 +180,100 @@ const MODEL = {
     weigh: 1,
   },
   reported: { common: 0.9, own: 0.3, capped: 0.99 },
+  channel: { turnout: 0.35, prior: 0.08, sigma: 1.5, unlisted: 0.02 },
 };
+
+const STREAM = "~";
+
+function split(race: LiveRace, at: string | null) {
+  if (race.counts.every((count) => (count.channel ?? 0) === 0)) {
+    return { race, sizes: new Map<string, number>() };
+  }
+  const latest = new Map<string, string>();
+  for (const count of race.counts) {
+    if (at != null && count.at > at) {
+      continue;
+    }
+    if ((latest.get(count.unitId) ?? "") < count.at) {
+      latest.set(count.unitId, count.at);
+    }
+  }
+  const bases = new Map(race.baseline.map((row) => [row.unitId, row]));
+  const reported = new Map<string, Set<number>>();
+  for (const count of race.counts) {
+    const channel = count.channel ?? 0;
+    if (
+      channel !== 0 &&
+      count.at === latest.get(count.unitId) &&
+      (bases.get(count.unitId)?.channels?.length ?? 0) > 0
+    ) {
+      const set = reported.get(count.unitId) ?? new Set<number>();
+      set.add(channel);
+      reported.set(count.unitId, set);
+    }
+  }
+  const counts: Array<LiveUnitCount> = [];
+  const summed = new Map<string, LiveUnitCount>();
+  for (const count of race.counts) {
+    if (at != null && count.at > at) {
+      continue;
+    }
+    const channel = count.channel ?? 0;
+    if (channel === 0) {
+      if (!reported.has(count.unitId)) {
+        counts.push(count);
+      }
+      continue;
+    }
+    if (reported.has(count.unitId)) {
+      counts.push({
+        ...count,
+        unitId: `${count.unitId}${STREAM}${channel}`,
+        eevp: null,
+      });
+      continue;
+    }
+    const key = `${count.unitId}@${count.at}`;
+    const held = summed.get(key);
+    if (held == null) {
+      const copy = { ...count, votes: [...count.votes], channel: 0 };
+      summed.set(key, copy);
+      counts.push(copy);
+    } else {
+      for (const [index, value] of count.votes.entries()) {
+        held.votes[index] = (held.votes[index] ?? 0) + value;
+      }
+    }
+  }
+  const baseline: Array<LiveBaseline> = [];
+  const sizes = new Map<string, number>();
+  for (const row of race.baseline) {
+    sizes.set(row.unitId, row.expected ?? row.turnout);
+    const channels = reported.get(row.unitId);
+    if (channels == null) {
+      baseline.push(row);
+      continue;
+    }
+    const listed = new Map(
+      (row.channels ?? []).map((item) => [item.channel, item]),
+    );
+    for (const channel of new Set([...listed.keys(), ...channels])) {
+      const item = listed.get(channel);
+      const share = item?.share ?? MODEL.channel.unlisted;
+      baseline.push({
+        unitId: `${row.unitId}${STREAM}${channel}`,
+        label: row.label,
+        turnout: row.turnout * share,
+        ...(row.expected != null && { expected: row.expected * share }),
+        shares: row.shares.map((value, index) =>
+          clamp(value + (item?.shift[index] ?? 0), 0, 1),
+        ),
+        ...(row.traits != null && { traits: row.traits }),
+      });
+    }
+  }
+  return { race: { ...race, counts, baseline }, sizes };
+}
 
 const TAILS: Record<string, number> = {
   ak: 0.4,
@@ -212,6 +313,9 @@ type Unit = {
   hasBaseline: boolean;
   night: Array<number> | null;
   reported: { share: number; total: number } | null;
+  county: string;
+  channel: number;
+  size: number;
 };
 
 function seeded(text: string) {
@@ -326,7 +430,12 @@ function pair(race: LiveRace, latest: Map<string, Array<number>>) {
   return [order[0]?.index ?? 0, order[1]?.index ?? 1] as const;
 }
 
-function units(race: LiveRace, at: string | null, cutoff: number | null) {
+function units(
+  race: LiveRace,
+  at: string | null,
+  cutoff: number | null,
+  sizes: Map<string, number>,
+) {
   const tail = TAILS[race.state] ?? MODEL.tail.share;
   const byUnit = series(race, at);
   const latest = new Map<string, Array<number>>();
@@ -434,8 +543,16 @@ function units(race: LiveRace, at: string | null, cutoff: number | null) {
     const total = sum(counted);
     const base = baselines.get(id);
     const list = byUnit.get(id);
+    const cut = id.lastIndexOf(STREAM);
+    const county = cut === -1 ? id : id.slice(0, cut);
+    const channel = cut === -1 ? 0 : Number(id.slice(cut + 1));
+    const expected =
+      base == null ? 0 : (base.expected ?? base.turnout) / (1 + tail);
     found.push({
       id,
+      county,
+      channel,
+      size: cut === -1 ? expected : (sizes.get(county) ?? 0) / (1 + tail),
       counted,
       total,
       margin: total > 0 ? ((counted[a] ?? 0) - (counted[b] ?? 0)) / total : 0,
@@ -448,7 +565,7 @@ function units(race: LiveRace, at: string | null, cutoff: number | null) {
         1,
       ),
       early: list == null ? null : early(list, a, b),
-      expected: base == null ? 0 : (base.expected ?? base.turnout) / (1 + tail),
+      expected,
       prior: base == null ? 0 : (base.shares[a] ?? 0) - (base.shares[b] ?? 0),
       features: [],
       traits: base?.traits ?? null,
@@ -466,18 +583,27 @@ function units(race: LiveRace, at: string | null, cutoff: number | null) {
   }
   const sized = found.filter((unit) => unit.hasBaseline);
   const weight = sum(sized.map((unit) => unit.expected));
+  const streamed = [
+    ...new Set(
+      sized.map((unit) => unit.channel).filter((value) => value !== 0),
+    ),
+  ].toSorted((x, y) => x - y);
+  const width = Math.max(0, ...sized.map((unit) => unit.traits?.length ?? 0));
+  const widths = [MODEL.priors.size];
+  for (let index = 0; index < width; index += 1) {
+    widths.push(MODEL.priors.trait);
+  }
+  for (const _ of streamed) {
+    widths.push(MODEL.channel.prior);
+  }
   if (weight > 0) {
     const mean =
-      sum(sized.map((unit) => unit.expected * Math.log(unit.expected))) /
-      weight;
+      sum(sized.map((unit) => unit.expected * Math.log(unit.size))) / weight;
     const spread = Math.sqrt(
       sum(
-        sized.map(
-          (unit) => unit.expected * (Math.log(unit.expected) - mean) ** 2,
-        ),
+        sized.map((unit) => unit.expected * (Math.log(unit.size) - mean) ** 2),
       ) / weight,
     );
-    const width = Math.max(0, ...sized.map((unit) => unit.traits?.length ?? 0));
     const scales = Array.from({ length: width }, (_, index) => {
       const known = sized.filter((unit) => unit.traits?.[index] != null);
       const total = sum(known.map((unit) => unit.expected));
@@ -501,13 +627,14 @@ function units(race: LiveRace, at: string | null, cutoff: number | null) {
     });
     for (const unit of sized) {
       unit.features = [
-        spread > 0 ? (Math.log(unit.expected) - mean) / spread : 0,
+        spread > 0 ? (Math.log(unit.size) - mean) / spread : 0,
         ...scales.map(({ middle, deviation }, index) => {
           const value = unit.traits?.[index];
           return value == null || deviation <= 0
             ? 0
             : (value - middle) / deviation;
         }),
+        ...streamed.map((channel) => (unit.channel === channel ? 1 : 0)),
       ];
       unit.sigma =
         MODEL.spread *
@@ -515,10 +642,33 @@ function units(race: LiveRace, at: string | null, cutoff: number | null) {
           (MODEL.sizeRef / unit.expected) ** MODEL.sizeExp,
           MODEL.sizeLow,
           1,
-        );
+        ) *
+        (unit.channel === 0 ? 1 : MODEL.channel.sigma);
     }
   }
-  return { found, a, b };
+  return { found, a, b, widths };
+}
+
+function merged(found: Array<Unit>, a: number, b: number) {
+  const byCounty = new Map<string, Array<number>>();
+  for (const unit of found) {
+    const held = byCounty.get(unit.county);
+    if (held == null) {
+      byCounty.set(unit.county, [...unit.counted]);
+    } else {
+      for (const [index, value] of unit.counted.entries()) {
+        held[index] = (held[index] ?? 0) + value;
+      }
+    }
+  }
+  return [...byCounty].map(([id, counted]) => {
+    const total = sum(counted);
+    return {
+      id,
+      total,
+      margin: total > 0 ? ((counted[a] ?? 0) - (counted[b] ?? 0)) / total : 0,
+    };
+  });
 }
 
 function logcdf(x: number) {
@@ -718,14 +868,10 @@ function fit(
   center: number,
   residual: Array<number>,
   random: (() => number) | null,
+  widths: Array<number>,
 ) {
-  const { swing, slope, size, order, trait } = MODEL.priors;
-  const traits = Math.max(1, ...found.map((unit) => unit.features.length)) - 1;
-  const priors = [swing, slope, size];
-  for (let index = 0; index < traits; index += 1) {
-    priors.push(trait);
-  }
-  priors.push(order);
+  const { swing, slope, order } = MODEL.priors;
+  const priors = [swing, slope, ...widths, order];
   const width = priors.length;
   const matrix = Array.from({ length: width * width }, (_, index) =>
     index % (width + 1) === 0 ? 1 / priors[index / (width + 1)]! ** 2 : 0,
@@ -741,7 +887,7 @@ function fit(
     }
   };
   const features = (unit: Unit) =>
-    Array.from({ length: traits + 1 }, (_, index) => unit.features[index] ?? 0);
+    widths.map((_, index) => unit.features[index] ?? 0);
   for (const [index, unit] of found.entries()) {
     if (!unit.hasBaseline || unit.total <= 0) {
       continue;
@@ -839,13 +985,14 @@ function lean(found: Array<Unit>, a: number, b: number, coming: number) {
   return { mean, sd: Math.sqrt(variance + MODEL.late.drift ** 2), spread, own };
 }
 
-export function estimate({ race, at }: EstimateInput): LiveEstimate {
+export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
+  const { race, sizes } = split(given, at);
   const stamp = at ?? race.frames.at(-1)?.at ?? "";
   const opened = race.frames.find((frame) => sum(frame.totals) > 0)?.at;
   const cutoff =
     opened == null ? null : Date.parse(opened) + MODEL.tail.grace * 86_400_000;
   const isLate = cutoff != null && Date.parse(stamp) > cutoff;
-  const { found, a, b } = units(race, at, cutoff);
+  const { found, a, b, widths } = units(race, at, cutoff, sizes);
   const tail = TAILS[race.state] ?? MODEL.tail.share;
   const counted = sum(found.map((unit) => unit.total));
   const empty: LiveEstimate = {
@@ -964,7 +1111,7 @@ export function estimate({ race, at }: EstimateInput): LiveEstimate {
       leader: leader.id,
       runnerUp: runnerUp.id,
       winProbability: { [leader.id]: 1, [runnerUp.id]: 0 },
-      units: found.map((unit) => ({
+      units: merged(found, a, b).map((unit) => ({
         unitId: unit.id,
         expectedTotal: { low: unit.total, mid: unit.total, high: unit.total },
         projectedMargin: {
@@ -997,9 +1144,60 @@ export function estimate({ race, at }: EstimateInput): LiveEstimate {
   const scale = found.map((unit) =>
     unit.hasBaseline ? clamp((median / unit.expected) ** 0.15, 0.6, 1.8) : 1,
   );
-  const model = race.baseline.some((row) => row.expected != null)
-    ? turnout(found, 0, MODEL.turnout)
-    : turnout(found, MODEL.same.center, MODEL.same.spread);
+  const isExpected = race.baseline.some((row) => row.expected != null);
+  const streamsOf = new Map<string, Array<number>>();
+  for (const [index, unit] of found.entries()) {
+    if (unit.channel !== 0) {
+      streamsOf.set(unit.county, [
+        ...(streamsOf.get(unit.county) ?? []),
+        index,
+      ]);
+    }
+  }
+  const whole: Array<Unit> = [
+    ...found.filter((unit) => unit.channel === 0),
+    ...[...streamsOf].map(([county, indexes]) => {
+      const members = indexes.map((index) => found[index]!);
+      const counted = race.options.map((_, option) =>
+        sum(members.map((unit) => unit.counted[option] ?? 0)),
+      );
+      const total = sum(counted);
+      const expected = members[0]!.size;
+      return {
+        ...members[0]!,
+        id: county,
+        counted,
+        total,
+        expected,
+        channel: 0,
+        hasBaseline: members.some((unit) => unit.hasBaseline),
+        settled: Math.min(...members.map((unit) => unit.settled)),
+        sigma:
+          MODEL.spread *
+          clamp((MODEL.sizeRef / expected) ** MODEL.sizeExp, MODEL.sizeLow, 1),
+      };
+    }),
+  ];
+  const wholeOf = new Map(whole.map((unit, index) => [unit.id, index]));
+  const model = isExpected
+    ? turnout(whole, 0, MODEL.turnout)
+    : turnout(whole, MODEL.same.center, MODEL.same.spread);
+  const models = new Map(
+    [...new Set(found.map((unit) => unit.channel))]
+      .filter((channel) => channel !== 0)
+      .map((channel) => {
+        const members = found.filter((unit) => unit.channel === channel);
+        return [
+          channel,
+          turnout(
+            members,
+            isExpected ? 0 : MODEL.same.center,
+            MODEL.channel.turnout,
+          ),
+        ] as const;
+      }),
+  );
+  const finals = whole.map(() => 0);
   const random = seeded(`${race.id}@${stamp}`);
   const typical = found.map((unit) => {
     if (!unit.hasBaseline) {
@@ -1013,6 +1211,7 @@ export function estimate({ race, at }: EstimateInput): LiveEstimate {
     center,
     scale.map((value) => MODEL.residual * value),
     null,
+    widths,
   );
   let squares = 5 * MODEL.residual ** 2;
   let weights = 5;
@@ -1075,14 +1274,27 @@ export function estimate({ race, at }: EstimateInput): LiveEstimate {
   const restMargins: Array<number> = [];
   const centers: Array<number> = [];
   const spreads: Array<number> = [];
-  const perUnit = found.map(() => ({
+  const counties = [...new Set(found.map((unit) => unit.county))];
+  const slot = new Map(counties.map((county, index) => [county, index]));
+  const perUnit = counties.map(() => ({
     totals: [] as Array<number>,
-    margins: [] as Array<number>,
-    rests: [] as Array<number>,
+    votes: [] as Array<number>,
+    restVotes: [] as Array<number>,
+    restTotals: [] as Array<number>,
+    counted: 0,
+    lead: 0,
   }));
+  for (const unit of found) {
+    const row = perUnit[slot.get(unit.county)!]!;
+    row.counted += unit.total;
+    row.lead += unit.margin * unit.total;
+  }
   const totals = found.map(() => 0);
   for (let draw = 0; draw < MODEL.draws; draw += 1) {
     const { cell, tau } = model.draw(random);
+    const drawn = new Map(
+      [...models].map(([channel, model]) => [channel, model.draw(random)]),
+    );
     const surge = MODEL.surge * gaussian(random);
     const shift = MODEL.shift * gaussian(random);
     const mode = modeScale * gaussian(random);
@@ -1108,15 +1320,50 @@ export function estimate({ race, at }: EstimateInput): LiveEstimate {
             Math.exp(reportedDraw.common + alone * gaussian(random)),
     );
     const fractions: Array<number> = [];
-    for (const [index, unit] of found.entries()) {
+    for (const [index, unit] of whole.entries()) {
       if (unit.hasBaseline) {
-        totals[index] =
+        finals[index] =
           unit.total > 0 && complete
             ? unit.total
             : model.unit(unit, cell, tau, surge, random);
-        if (unit.total > 0) {
-          fractions.push(unit.total / totals[index]);
+      }
+    }
+    for (const [index, unit] of found.entries()) {
+      if (unit.hasBaseline) {
+        if (unit.channel === 0) {
+          totals[index] = finals[wholeOf.get(unit.county)!]!;
+        } else {
+          const pick = drawn.get(unit.channel)!;
+          totals[index] =
+            unit.total > 0 && complete
+              ? unit.total
+              : models
+                  .get(unit.channel)!
+                  .unit(unit, pick.cell, pick.tau, surge, random);
         }
+      }
+    }
+    for (const [county, indexes] of streamsOf) {
+      const final = finals[wholeOf.get(county)!]!;
+      const members = indexes.map((index) => found[index]!);
+      const open = Math.max(0, final - sum(members.map((unit) => unit.total)));
+      const wants = indexes.map((index) =>
+        Math.max(0, totals[index]! - found[index]!.total),
+      );
+      const wanted = sum(wants);
+      const expected = sum(members.map((unit) => unit.expected));
+      for (const [slot, index] of indexes.entries()) {
+        totals[index] =
+          found[index]!.total +
+          open *
+            (wanted > 0
+              ? wants[slot]! / wanted
+              : found[index]!.expected / Math.max(expected, 1));
+      }
+    }
+    for (const [index, unit] of found.entries()) {
+      if (unit.hasBaseline && unit.total > 0) {
+        fractions.push(unit.total / totals[index]!);
       }
     }
     const typicalFraction =
@@ -1141,7 +1388,7 @@ export function estimate({ race, at }: EstimateInput): LiveEstimate {
           unit.total + Math.min(Math.max(0, totals[index]! - unit.total), open);
       }
     }
-    const coefficients = fit(found, totals, center, residuals, random);
+    const coefficients = fit(found, totals, center, residuals, random, widths);
     const order = coefficients.at(-1)!;
     let votes = 0;
     let still = 0;
@@ -1215,13 +1462,17 @@ export function estimate({ race, at }: EstimateInput): LiveEstimate {
       }
       leaned += extra;
       scattered += extra ** 2 * own.variance;
-      perUnit[index]!.totals.push(unitTotal);
-      perUnit[index]!.margins.push(unitTotal > 0 ? unitVotes / unitTotal : 0);
-      perUnit[index]!.rests.push(
-        unitTotal > unit.total
-          ? (unitVotes - countedLead) / (unitTotal - unit.total)
-          : unit.margin,
-      );
+      const row = perUnit[slot.get(unit.county)!]!;
+      if (row.totals.length <= draw) {
+        row.totals.push(0);
+        row.votes.push(0);
+        row.restVotes.push(0);
+        row.restTotals.push(0);
+      }
+      row.totals[draw]! += unitTotal;
+      row.votes[draw]! += unitVotes;
+      row.restVotes[draw]! += unitVotes - countedLead;
+      row.restTotals[draw]! += unitTotal - unit.total;
     }
     finalMargins.push(all > 0 ? votes / all : 0);
     finalTotals.push(all);
@@ -1274,11 +1525,27 @@ export function estimate({ race, at }: EstimateInput): LiveEstimate {
       margin: isModeled ? turn(band(restMargins)) : { low: 0, mid: 0, high: 0 },
     },
     late,
-    units: found.map((unit, index) => ({
-      unitId: unit.id,
-      expectedTotal: band(perUnit[index]!.totals),
-      projectedMargin: turn(band(perUnit[index]!.margins)),
-      remainingMargin: turn(band(perUnit[index]!.rests)),
-    })),
+    units: counties.map((county, index) => {
+      const row = perUnit[index]!;
+      const margin = row.counted > 0 ? row.lead / row.counted : 0;
+      return {
+        unitId: county,
+        expectedTotal: band(row.totals),
+        projectedMargin: turn(
+          band(
+            row.totals.map((total, draw) =>
+              total > 0 ? row.votes[draw]! / total : 0,
+            ),
+          ),
+        ),
+        remainingMargin: turn(
+          band(
+            row.restTotals.map((total, draw) =>
+              total > 0 ? row.restVotes[draw]! / total : margin,
+            ),
+          ),
+        ),
+      };
+    }),
   };
 }
