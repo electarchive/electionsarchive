@@ -88,6 +88,8 @@ Measures are coded in the `measure` table. In a count with several rounds, such 
 
 Maps and tables read rollups, which are sums of values over the areas that a result set's units roll up to. Rollups are derived and rebuildable. The `result_rollup` view combines `result_rollup_sum` and `result_rollup_unit`. `area_day_set` lists, for the places in `area_day_scope`, each result set counted there on each election day, and whether any of its counted values is nonzero. Apply rebuilds a set's rows along with its rollups.
 
+A ballot question's `type` is `initiative`, `mandatory_referendum`, `optional_referendum`, `counter_proposal`, `tie_break`, `plebiscite`, `recall_question`, or `referendum`, the last for a referendum whose source does not say whether it was mandatory or optional.
+
 ### Declared outcomes and engine output
 
 Official outcomes and seats are stored as declared. The engine in `packages/engine` recomputes results from an electoral system's rules and the votes, then compares its answer with the declared outcome. A mismatch raises a flag. The declared record is what the archive publishes.
