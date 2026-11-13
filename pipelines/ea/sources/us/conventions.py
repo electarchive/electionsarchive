@@ -579,6 +579,15 @@ TABLES += [
         "short": True,
     }
 ]
+STAR_RNC = "https://www.loc.gov/resource/sn83045462/{}/ed-1/?sp={}"
+STAR_IMAGE = "https://tile.loc.gov/image-services/iiif/service:ndnp:dlc:{}/full/pct:50/0/default.jpg"
+TABLES += [
+    {"table": "1932:republican:star", "image": STAR_IMAGE.format("batch_dlc_1arp_ver01:data:sn83045462:00280601081:1932061601:0345"), "release": STAR_RNC.format("1932-06-16", 1), "leaves": (1,), "ballot": 1, "transcribed": "conventions_rnc_1932.tsv", "short": True},
+    {"table": "1940:republican:b6", "image": STAR_IMAGE.format("batch_dlc_1picasso_ver01:data:sn83045462:00280602966:1940062801:0138"), "release": STAR_RNC.format("1940-06-28", 5), "leaves": (1,), "ballot": 6, "transcribed": "conventions_rnc_1940.tsv", "short": True},
+    {"table": "1948:republican:b1", "image": STAR_IMAGE.format("batch_dlc_2feininger_ver01:data:sn83045462:00280604495:1948062501:0616"), "release": STAR_RNC.format("1948-06-25", 7), "leaves": (1,), "ballot": 1, "transcribed": "conventions_rnc_1948.tsv", "short": True},
+    {"table": "1948:republican:b2", "image": STAR_IMAGE.format("batch_dlc_2feininger_ver01:data:sn83045462:00280604495:1948062501:0616"), "release": STAR_RNC.format("1948-06-25", 7), "leaves": (1,), "ballot": 2, "transcribed": "conventions_rnc_1948.tsv", "short": True},
+    {"table": "1952:republican:star", "image": STAR_IMAGE.format("batch_dlc_borisgodunov_ver01:data:sn83045462:00280605645:1952071201:0628"), "release": STAR_RNC.format("1952-07-12", 2), "leaves": (1,), "ballot": 1, "transcribed": "conventions_rnc_1952.tsv", "short": True},
+]  # fmt: skip
 NILES = "sim_niles-national-register_{}"
 TABLES += [
     {
@@ -683,6 +692,43 @@ EVENING_STAR_1932_CAVEAT = (
     "945 for Franklin D. Roosevelt, 190½ for Alfred E. Smith, 5½ for Newton D. Baker, 3½ for Albert C. Ritchie, 3 for "
     "George White, and 1 for James M. Cox, 1,148½ votes cast of 1,154; two-thirds, 770, were needed."
 )
+STAR_RNC_DEFAULT = (
+    "The archive has not located a free copy of the official proceedings' roll call, so this ballot is the "
+    "Associated Press table of the roll call that the Washington Evening Star printed on {}. It is a default to be "
+    "superseded by the official proceedings."
+)
+STAR_RNC_CAVEAT = {
+    1932: STAR_RNC_DEFAULT.format("June 16, 1932 (page A-1)")
+    + " The story's own count is 1,126\u00bd for Herbert Hoover, 13 for John J. Blaine, 4\u00bd for Calvin Coolidge, 4 "
+    "for Joseph I. France, 1 for Charles G. Dawes, and 1 for James W. Wadsworth Jr., which the state rows add up to. "
+    "Illinois had 3 delegates absent and Oregon 1; those votes are not stored.",
+    1940: {
+        6: STAR_RNC_DEFAULT.format("June 28, 1940 (image 5 of the Library of Congress scan of that issue)")
+        + " The table is the sixth ballot as first called. Maine and Nebraska passed and the table gives no votes for "
+        "them, so none are stored; Pennsylvania passed and then cast all 72 of its votes for Wendell L. Willkie, as "
+        "the table's note says, and those are stored. Before the result was announced, delegations changed their "
+        "votes and the convention declared 998 votes for Willkie, all that were cast, and then made the vote "
+        "unanimous; that declared tabulation is not divided by state and is not stored. The table's notes give one "
+        "vote each to Frank Gannett (Georgia), Hanford MacNider (Minnesota), and Arthur H. James (Tennessee), and "
+        "one delegate absent in California, Tennessee, and West Virginia and one not voting in Washington and "
+        "Wisconsin; the absent and not-voting votes are not stored. The first five ballots by state are not loaded."
+    },
+    1948: {
+        1: STAR_RNC_DEFAULT.format("June 25, 1948 (image 7 of the Library of Congress scan of that issue)")
+        + " The table's notes give New Jersey's 35 votes to Alfred E. Driscoll, 15 of Tennessee's to B. Carroll "
+        "Reece, and one of the District of Columbia's to Everett M. Dirksen, and two Maine delegates not voting; "
+        "one Tennessee vote is not accounted for. 548 votes were needed to nominate.",
+        2: STAR_RNC_DEFAULT.format("June 25, 1948 (image 7 of the Library of Congress scan of that issue)")
+        + " The table's note gives one Tennessee vote to B. Carroll Reece. The third ballot, on which Thomas E. "
+        "Dewey was nominated unanimously, is not loaded by state.",
+    },
+    1952: STAR_RNC_DEFAULT.format("July 12, 1952 (page A-2)")
+    + " The table prints the final count, after delegations changed their votes, with columns for Dwight D. "
+    "Eisenhower and Robert A. Taft only: 845 and 280 of 1,206. Its note gives the other 81 votes as 77 for Earl "
+    "Warren and 4 for Douglas MacArthur, split among California, North Dakota, Oklahoma, and Wisconsin, without "
+    "saying how; they are not stored. The same table prints the roll as first called, before any change: "
+    "Eisenhower 595, Taft 500, Warren 81, Harold E. Stassen 20, and MacArthur 10, which is not stored.",
+}
 EVENING_STAR_1960_CAVEAT = (
     "The archive has not located a free copy of the official proceedings' roll call, so this ballot is the "
     "Associated Press table of the roll call that the Washington Evening Star printed on July 14, 1960 (page A-8). It "
@@ -861,6 +907,12 @@ PROCEEDINGS += [
     {"party": "democratic", "tables": {1: "2024:democratic"}, "title": "2024 Electronic Roll Call: State by State Breakdown", "publisher": "Democratic National Committee", "city": "Chicago", "days": (date(2024, 8, 19), date(2024, 8, 22)), "ballots": {1: date(2024, 8, 5)}, "umbrella": "2024-01-23:president:democratic", "deciding": 1, "required": None, "method": DNC_2024_METHOD, "caveat": DNC_2024_CAVEAT},
     {"party": "democratic", "tables": {1: "1960:democratic"}, "title": "The Evening Star (Washington, D.C.), July 14, 1960: Roll Call of States", "publisher": "The Evening Star", "kind": "news_agency", "city": "Los Angeles", "days": (date(1960, 7, 11), date(1960, 7, 15)), "ballots": {1: date(1960, 7, 13)}, "deciding": 1, "required": 761, "method": PRESS.format("the Washington Evening Star"), "caveat": EVENING_STAR_1960_CAVEAT},
     {"party": "democratic", "tables": {1: "1956:democratic"}, "title": "Official report of the proceedings of the Democratic National Convention and committee, held at Chicago, Illinois, August 13 to August 17, 1956, resulting in the nomination of Adlai E. Stevenson of Illinois for President and Estes Kefauver of Tennessee for Vice President", "publisher": "Democratic National Committee", "city": "Chicago", "days": (date(1956, 8, 13), date(1956, 8, 17)), "ballots": {1: date(1956, 8, 16)}, "deciding": 1},
+]  # fmt: skip
+PROCEEDINGS += [
+    {"tables": {1: "1932:republican:star"}, "title": "The Evening Star (Washington, D.C.), June 16, 1932: Presidential Ballot", "publisher": "The Evening Star", "kind": "news_agency", "city": "Chicago", "days": (date(1932, 6, 14), date(1932, 6, 16)), "ballots": {1: date(1932, 6, 16)}, "deciding": 1, "required": 578, "method": PRESS.format("the Washington Evening Star"), "caveat": STAR_RNC_CAVEAT[1932]},
+    {"tables": {6: "1940:republican:b6"}, "title": "The Evening Star (Washington, D.C.), June 28, 1940: Sixth Ballot", "publisher": "The Evening Star", "kind": "news_agency", "city": "Philadelphia", "days": (date(1940, 6, 24), date(1940, 6, 28)), "ballots": {6: date(1940, 6, 28)}, "deciding": 6, "required": 501, "method": PRESS.format("the Washington Evening Star"), "caveat": STAR_RNC_CAVEAT[1940]},
+    {"tables": {1: "1948:republican:b1", 2: "1948:republican:b2"}, "title": "The Evening Star (Washington, D.C.), June 25, 1948: First Ballot and Second Ballot", "publisher": "The Evening Star", "kind": "news_agency", "city": "Philadelphia", "days": (date(1948, 6, 21), date(1948, 6, 25)), "ballots": {1: date(1948, 6, 24), 2: date(1948, 6, 24)}, "deciding": None, "required": 548, "method": PRESS.format("the Washington Evening Star"), "caveat": STAR_RNC_CAVEAT[1948]},
+    {"tables": {1: "1952:republican:star"}, "title": "The Evening Star (Washington, D.C.), July 12, 1952: Box Score on First Ballot", "publisher": "The Evening Star", "kind": "news_agency", "city": "Chicago", "days": (date(1952, 7, 7), date(1952, 7, 11)), "ballots": {1: date(1952, 7, 11)}, "deciding": 1, "required": 604, "method": PRESS.format("the Washington Evening Star"), "caveat": STAR_RNC_CAVEAT[1952]},
 ]  # fmt: skip
 TWO_THIRDS = range(1832, 1936)
 REPORTS = {
@@ -1300,6 +1352,33 @@ CANDIDATES = {
     "1904:Pattison": ("Robert E. Pattison", "Q883224"),
     "1904:Williams": ("John Sharp Williams", "Q1701734"),
     "1904:Coler": ("Bird S. Coler", None),
+    "1932:republican:Hoover": ("Herbert Hoover", "Q35236"),
+    "1932:republican:Coolidge": ("Calvin Coolidge", "Q36023"),
+    "1932:republican:Blaine": ("John J. Blaine", "Q773412"),
+    "1932:republican:Dawes": ("Charles G. Dawes", "Q184565"),
+    "1932:republican:France": ("Joseph I. France", "Q366546"),
+    "1932:republican:Wadsworth": ("James W. Wadsworth Jr.", "Q6145741"),
+    "1940:republican:Dewey": ("Thomas E. Dewey", "Q320061"),
+    "1940:republican:Taft": ("Robert A. Taft", "Q519730"),
+    "1940:republican:Willkie": ("Wendell L. Willkie", "Q698714"),
+    "1940:republican:Hoover": ("Herbert Hoover", "Q35236"),
+    "1940:republican:Gannett": ("Frank Gannett", None),
+    "1940:republican:MacNider": ("Hanford MacNider", None),
+    "1940:republican:James": ("Arthur H. James", "Q684820"),
+    "1948:republican:Dewey": ("Thomas E. Dewey", "Q320061"),
+    "1948:republican:Taft": ("Robert A. Taft", "Q519730"),
+    "1948:republican:Stassen": ("Harold E. Stassen", "Q887520"),
+    "1948:republican:Vandenberg": ("Arthur Vandenberg", "Q4388292"),
+    "1948:republican:Warren": ("Earl Warren", "Q311197"),
+    "1948:republican:MacArthur": ("Douglas MacArthur", "Q127417"),
+    "1948:republican:Baldwin": ("Raymond E. Baldwin", "Q885043"),
+    "1948:republican:Martin": ("Joseph W. Martin Jr.", "Q1387262"),
+    "1948:republican:Green": ("Dwight H. Green", "Q339966"),
+    "1948:republican:Driscoll": ("Alfred E. Driscoll", None),
+    "1948:republican:Reece": ("B. Carroll Reece", "Q903196"),
+    "1948:republican:Dirksen": ("Everett M. Dirksen", "Q1382002"),
+    "1952:republican:Eisenhower": ("Dwight D. Eisenhower", "Q9916"),
+    "1952:republican:Taft": ("Robert A. Taft", "Q519730"),
     "1960:democratic:Johnson": ("Lyndon B. Johnson", "Q9640"),
     "1960:democratic:Kennedy": ("John F. Kennedy", "Q9696"),
     "1960:democratic:Stevenson": ("Adlai E. Stevenson II", "Q311719"),
@@ -3059,7 +3138,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="The roll call of the states at the Republican national conventions from 1856 to 1988, the Democratic conventions from 1832 to 1960 and 2008, with the Democratic vice-presidential ballots of 1832, 1835, 1848, 1852, 1856, 1860, 1864, 1872, and 1876 and the Republican ones of 1856, 1860, 1864, 1868, 1872, 1876, 1880, 1884, 1888, 1896, 1900, 1908, 1912, 1916, 1920, 1924, and 1928, and the 2012, 2016, 2020, and 2024 conventions",
+            summary="The roll call of the states at the Republican national conventions from 1856 to 1932, 1940, 1948, 1952, and 1968 to 1988, the Democratic conventions from 1832 to 1960 and 2008, with the Democratic vice-presidential ballots of 1832, 1835, 1848, 1852, 1856, 1860, 1864, 1872, and 1876 and the Republican ones of 1856, 1860, 1864, 1868, 1872, 1876, 1880, 1884, 1888, 1896, 1900, 1908, 1912, 1916, 1920, 1924, and 1928, and the 2012, 2016, 2020, and 2024 conventions",
             polity="US",
         )
 
