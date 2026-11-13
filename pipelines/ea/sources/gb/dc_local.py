@@ -1351,8 +1351,14 @@ def emit() -> Path:
             for url in by_ballot_pages(year):
                 cs.artifact(raw.cached(SOURCE, url), sources[year])
         tacit_sources: dict[int, UUID] = {}
+        noticed = set(tacit_declarations()["url"])
         for year, day in days.items():
-            if year in TACIT:
+            if (
+                year in TACIT
+                and wards.filter(
+                    (pl.col("year") == year) & (pl.col("status") == "tacit") & ~pl.col("source").is_in(list(noticed))
+                ).height
+            ):
                 title = f"Candidate records for uncontested wards, {day}"
                 tacit_sources[year] = cs.source(DC, title)
                 cs.add(
