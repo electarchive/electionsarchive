@@ -23,6 +23,14 @@ SOURCES = Path(__file__).parent / "cc_elections_sources.tsv"
 BROWSER = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36"
 VOTES, REGISTERED, BALLOTS, VALID, INVALID = 1, 2, 3, 4, 5
 HIGHLAND = "S12000017"
+READ = {HIGHLAND, "S12000048", "S12000030", "S12000027"}
+INBOX = DATA / "inbox/manual/MF-668"
+DELIVERED = {
+    "https://www.pkc.gov.uk/media/54467/Pitlochry-CC-WEB-VERSION/pdf/Pitlochry_CC_-_WEB_VERSION.pdf": "Pitlochry_CC_-_WEB_VERSION.pdf",
+    "https://www.pkc.gov.uk/media/55580": "WEB_VERSION_Meigle___Ardler_CC_-_Duly_Elected.pdf",
+    "https://www.stirling.gov.uk/media/dj5bpik0/community-council-election-results-2023.pdf": "community-council-election-results-2023.pdf",
+    "https://www.shetland.gov.uk/downloads/file/11011/notice-of-uncontested-elections-2025": "Notice_of_Uncontest_Elections.pdf",
+}
 COUNCILS = {
     "S12000017": (
         "The Highland Council",
@@ -101,8 +109,45 @@ COUNCILS = {
             "Community councils in the Western Isles are formed under the Comhairle's Revised Scheme of Establishment, made under the Local Government (Scotland) Act 1973. Where the candidates validly nominated exceed the maximum number of places, a poll is held by post and each voter may vote for up to the number of places."
         ),
     ),
+    "S12000048": (
+        "Perth and Kinross Council",
+        "Perth and Kinross Council community council elections and by-elections",
+        "https://www.pkc.gov.uk/article/14908/Community-Council-elections-and-by-elections",
+        (
+            "Community councils in Perth and Kinross are formed under the council's Scheme of Establishment of "
+            "Community Councils, made under the Local Government (Scotland) Act 1973, and the council's returning "
+            "officer for community councils declares each result. This record is built from the council's notices "
+            "that the undernoted members are duly declared elected, not from the scheme text."
+        ),
+    ),
+    "S12000030": (
+        "Stirling Council",
+        "Stirling Council Scheme of Establishment for Community Councils",
+        "https://www.stirling.gov.uk/community-life-and-leisure/your-community/about-community-councils/scheme-of-establishment",
+        (
+            "Community councils in Stirling are formed under the council's Scheme of Establishment, made under the "
+            "Local Government (Scotland) Act 1973. This record is built from the council's list of the community "
+            "councils established in 2023 without a ballot because enough valid nominations were received, not from "
+            "the scheme text. The list gives members only, not the places to be filled."
+        ),
+    ),
+    "S12000027": (
+        "Shetland Islands Council",
+        "Shetland Islands Council community council elections 2025",
+        "https://www.shetland.gov.uk/elections-voting/community-council-elections-2025",
+        (
+            "Community councils in Shetland are formed under the council's Scheme of Establishment for Community "
+            "Councils, made under the Local Government (Scotland) Act 1973, and the council's returning officer "
+            "publishes the result. This record is built from the notice of uncontested community council elections "
+            "of 2025, which lists the candidates declared elected, the places available, and the vacancies left to "
+            "be filled by co-option."
+        ),
+    ),
 }
 ALIASES = {
+    ("S12000030", "Kings Park"): "King's Park",
+    ("S12000027", "Sandsting and Aithsting"): "Aithsting and Sandsting",
+    ("S12000027", "Tingwall, Whiteness and Weisdale"): "Whiteness, Weisdale and Tingwall",
     ("S12000017", "Bettyhill, Strathnaver and Altnahara"): "Bettyhill, Strathnaver and Altnaharra",
     ("S12000017", "Spean Bridge, Roy Bridge and Achnacarry CC"): "Spean Bridge, Roy Bridge and Achnacarry",
     ("S12000017", "Fort Augustus and Glenmorriston"): "Fort Augustus and Glenmoriston",
@@ -111,12 +156,22 @@ ALIASES = {
     ("S12000017", "Grantown-on-Spey and Vicinity"): "Grantown-on-Spey",
 }
 UNSTATED = "The notice does not state how many places the community council had, so the seat count is not recorded."
-SHORT = "Highland Council's notice lists {elected} members elected unopposed to {places} places, leaving {left} vacant."
+SHORT = "{publisher}'s notice lists {elected} members elected unopposed to {places} places, leaving {left} vacant."
 
 
 def fetch() -> None:
     for url in pl.read_csv(SOURCES, separator="\t")["url"]:
         if _cached(url):
+            continue
+        if url in DELIVERED:
+            raw.store(
+                SOURCE,
+                url,
+                (INBOX / DELIVERED[url]).read_bytes(),
+                suffix=".pdf",
+                retrieved_at=datetime.fromtimestamp((INBOX / DELIVERED[url]).stat().st_mtime, UTC),
+                media_type="application/pdf",
+            )
             continue
         if "web.archive.org" in url:
             time.sleep(10)
@@ -273,7 +328,100 @@ def legacy_notice(text: str) -> dict:
     }
 
 
+def perth_notice(text: str) -> dict:
+    flat = " ".join(text.split())
+    head = re.search(
+        r"PERTH AND KINROSS COUNCIL (.+?) COMMUNITY COUNCIL (BY-)?ELECTION \w+ (\d+ \w+ \d{4}) NOTICE", flat
+    )
+    if head is None:
+        raise ValueError("unreadable notice")
+    names, places, left = [], None, None
+    for line in text.splitlines():
+        row = re.fullmatch(r"\s*(?:(\d+)\s{2,})?(.+?), address in community council area(?:\s{2,}(\d+))?\s*", line)
+        if row is None:
+            continue
+        places = int(row.group(1)) if row.group(1) else places
+        left = int(row.group(3)) if row.group(3) else left
+        names.append(row.group(2))
+    if places is None or left is None or places - len(names) != left:
+        raise ValueError(f"places {places}, members {len(names)}, and vacancies left {left} do not agree")
+    return {
+        "council": display(head.group(1)).replace(" And ", " and "),
+        "day": when(head.group(3)),
+        "places": places,
+        "members": names,
+        "by": head.group(2) is not None,
+    }
+
+
+def stirling_list(text: str) -> list[dict]:
+    day = re.search(r"close of nominations on \w+ (\d+ \w+ \d{4})", " ".join(text.split()))
+    start = re.search(r"Established Community Councils[^\n]*\n", text)
+    if not (day and start):
+        raise ValueError("unreadable list")
+    found: dict[str, list[str]] = {}
+    current = ""
+    for line in text[start.end() :].splitlines():
+        cells = [cell for cell in re.split(r"\s{2,}", line.strip()) if cell]
+        if not cells:
+            continue
+        if len(cells) == 2:
+            current = cells[0]
+            found[current] = []
+        elif len(cells) == 1 and current:
+            pass
+        else:
+            raise ValueError(f"unreadable list line {line!r}")
+        found[current].append(cells[-1])
+    return [
+        {"council": council, "day": when(day.group(1)), "places": None, "members": members}
+        for council, members in found.items()
+    ]
+
+
+def shetland_list(text: str) -> list[dict]:
+    day = re.search(r"(\d+ \w+ \d{4}) \(the day of election\)", " ".join(text.split()))
+    table = re.search(r"Address\n(.*?)\n\s*Any person interested", text, re.DOTALL)
+    left = re.search(r"Vacancies\n(.*?)\n\s*Returning Officer", text, re.DOTALL)
+    if not (day and table and left):
+        raise ValueError("unreadable list")
+    found: dict[str, dict] = {}
+    current = ""
+    for line in table.group(1).splitlines():
+        cells = [cell for cell in re.split(r"\s{2,}", line.strip()) if cell]
+        at = next((i for i, cell in enumerate(cells) if re.fullmatch(r"[A-Z][A-Z' -]+", cell)), None)
+        if at is None or len(cells) < at + 3:
+            continue
+        before = cells[:at]
+        if before and before[-1].isdigit():
+            current = " ".join(before[:-1])
+            found[current] = {"places": int(before[-1]), "members": []}
+        elif before:
+            renamed = f"{current} {' '.join(before)}"
+            found[renamed] = found.pop(current)
+            current = renamed
+        found[current]["members"].append(f"{cells[at + 1]} {display(cells[at])}")
+    remaining = {}
+    for line in left.group(1).splitlines():
+        cells = [cell for cell in re.split(r"\s{2,}", line.strip()) if cell]
+        if len(cells) == 2 and cells[1].isdigit():
+            remaining[re.sub(r"\W+", " ", cells[0].replace("&", "and")).lower()] = int(cells[1])
+    reads = []
+    for council, entry in found.items():
+        want = entry["places"] - len(entry["members"])
+        if want != remaining.pop(re.sub(r"\W+", " ", council).lower(), 0):
+            raise ValueError(f"{council}: vacancies left do not agree with {entry['places']} places")
+        reads.append(
+            {"council": council, "day": when(day.group(1)), "places": entry["places"], "members": entry["members"]}
+        )
+    if remaining:
+        raise ValueError(f"vacancies listed for unread councils {sorted(remaining)}")
+    return reads
+
+
 def notice(text: str) -> dict:
+    if "PERTH AND KINROSS COUNCIL" in text:
+        return perth_notice(text)
     if "ELECTION OF COUNCILLORS FOR" in text:
         return legacy_notice(text)
     head = re.search(
@@ -323,7 +471,7 @@ def notice(text: str) -> dict:
 def parse() -> None:
     rows = []
     for url, lad, kind in pl.read_csv(SOURCES, separator="\t").rows():
-        if lad != HIGHLAND:
+        if lad not in READ:
             continue
         if not _cached(url):
             print(f"not fetched: {url}", file=sys.stderr)
@@ -339,34 +487,41 @@ def parse() -> None:
             ranked = sorted(read["candidates"], key=lambda candidate: -candidate["votes"])
             if {c["printed"] for c in ranked[:elected]} != {c["printed"] for c in ranked if c["elected"]}:
                 raise ValueError(f"{url}: the elected candidates are not the top polling ones")
-            candidates = read["candidates"]
+            reads = [(read, read["candidates"])]
+        elif kind == "list":
+            reads = [
+                (read, [{"printed": name, "votes": None, "elected": True} for name in read["members"]])
+                for read in (stirling_list(text) if lad == "S12000030" else shetland_list(text))
+            ]
         else:
             try:
                 read = notice(text)
             except ValueError as error:
                 print(f"unreadable notice: {url}: {error}", file=sys.stderr)
                 continue
-            candidates = [{"printed": name, "votes": None, "elected": True} for name in read["members"]]
-        council = council_name(lad, read["council"])
-        for candidate in candidates:
-            rows.append(
-                {
-                    "url": url,
-                    "lad": lad,
-                    "council": council,
-                    "key": f"{lad}-{slug(council)}",
-                    "day": read["day"],
-                    "places": read["places"],
-                    "printed": candidate["printed"],
-                    "name": proper(str(candidate["printed"])),
-                    "votes": candidate["votes"],
-                    "elected": candidate["elected"],
-                    "electorate": read.get("electorate"),
-                    "ballots": read.get("ballots"),
-                    "rejected": read.get("rejected"),
-                    "valid": read.get("valid"),
-                }
-            )
+            reads = [(read, [{"printed": name, "votes": None, "elected": True} for name in read["members"]])]
+        for read, candidates in reads:
+            council = council_name(lad, read["council"])
+            for candidate in candidates:
+                rows.append(
+                    {
+                        "url": url,
+                        "lad": lad,
+                        "council": council,
+                        "key": f"{lad}-{slug(council)}",
+                        "day": read["day"],
+                        "places": read["places"],
+                        "by": read.get("by", False),
+                        "printed": candidate["printed"],
+                        "name": proper(str(candidate["printed"])),
+                        "votes": candidate["votes"],
+                        "elected": candidate["elected"],
+                        "electorate": read.get("electorate"),
+                        "ballots": read.get("ballots"),
+                        "rejected": read.get("rejected"),
+                        "valid": read.get("valid"),
+                    }
+                )
     frame = pl.DataFrame(rows)
     with connect() as conn:
         known = {
@@ -392,9 +547,9 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Highland community council elections of 2015 to 2026 under the council's scheme of "
-            "establishment: postal ballots from the returning officer's declarations of result, and councils "
-            "formed unopposed from the notices of uncontested election, as tacit sets",
+            summary="Community council elections under council schemes of establishment: Highland 2015 to 2026 "
+            "(postal ballots from the returning officer's declarations of result), and Perth and Kinross, "
+            "Stirling, and Shetland councils formed unopposed from the councils' notices and lists, as tacit sets",
             polity="GB",
         )
 
@@ -415,7 +570,9 @@ def emit() -> Path:
             if url not in set(frame["url"]):
                 continue
             first = frame.filter(pl.col("url") == url).row(0, named=True)
-            label = "Declaration of Result" if kind == "declaration" else "Notice of Uncontested Election"
+            label = {"declaration": "Declaration of Result", "list": "List of Members Elected"}.get(
+                kind, "Notice of Uncontested Election"
+            )
             title = f"{first['council']} Community Council, {label}, {first['day']:%-d %B %Y}"
             publisher = COUNCILS[lad][0]
             sources[url] = cs.source(publisher, title)
@@ -467,6 +624,13 @@ def emit() -> Path:
             election_path = f"{paths[key]}/{day}-local"
             cs.add("slug", path=election_path, entity_id=election)
             cs.add("note", entity_id=election, kind="context", body_md=COUNCILS[lad][3])
+            if first["by"]:
+                cs.add(
+                    "note",
+                    entity_id=election,
+                    kind="context",
+                    body_md="This was a by-election to fill vacancies on an existing community council.",
+                )
             contest = cs.key("gb.contest", contest_key)
             cs.add(
                 "contest",
@@ -504,7 +668,12 @@ def emit() -> Path:
                     "note",
                     entity_id=result_set,
                     kind="caveat",
-                    body_md=SHORT.format(elected=lines.height, places=places, left=places - lines.height),
+                    body_md=SHORT.format(
+                        publisher=COUNCILS[lad][0].removeprefix("The "),
+                        elected=lines.height,
+                        places=places,
+                        left=places - lines.height,
+                    ),
                 )
             for number, line in enumerate(lines.iter_rows(named=True), start=1):
                 option_key = f"{contest_key}:{number}"
