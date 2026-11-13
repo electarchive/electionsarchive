@@ -1132,63 +1132,63 @@ const datedTogether = together(
         kind: string;
         text: string;
       }>(sql`
-      with p as (
-        select * from unnest(${sql.param(chunk.map((pair) => pair.id))}::uuid[], ${sql.param(chunk.map((pair) => pair.on))}::date[], ${sql.param(chunk.map((pair) => pair.h))}::boolean[]) p(entity_id, on_date, h)
-      ),
-      c as materialized (
-        select id, entity_id, kind, text, lang, script, valid, is_preferred, recorded_from
-        from name
-        where entity_id = any(${sql.param(ids)}::uuid[])
-          and (kind in ('official', 'english', 'short', 'abbreviation') or (${withHistory} and kind = 'historical'))
-      ),
-      l as (
-        select distinct on (entity_id) entity_id, lang from c
-        where is_preferred and kind in ('official', 'english')
-        order by entity_id, id
-      ),
-      n as (
-        select distinct on (p.entity_id, p.on_date, p.h) p.entity_id, p.on_date, p.h, c.kind::text as kind, c.text
-        from p
-        join c on c.entity_id = p.entity_id
-          and c.kind in ('official', 'english', 'historical')
-          and (c.kind <> 'historical' or p.h)
-          and (c.kind in ('official', 'english')
-            or (p.on_date is not null and c.valid @> p.on_date and not (lower_inf(c.valid) and upper_inf(c.valid))))
-        left join l on l.entity_id = p.entity_id
-        order by p.entity_id, p.on_date, p.h, coalesce(c.valid @> coalesce(p.on_date, (select name_day())), false) desc,
-          coalesce(c.valid @> coalesce(p.on_date, (select name_day())) and not (lower_inf(c.valid) and upper_inf(c.valid)), false) desc,
-          ${nearest(sql`c`, sql`p.on_date`)} nulls first,
-          coalesce(c.kind = 'english' and c.script = 'Latn' and c.entity_id = any(${sql.param(common)}::uuid[]), false) desc, c.is_preferred desc,
-          c.lang = l.lang desc nulls last,
-          (c.lang = 'en') desc, (c.kind = 'official') desc, c.recorded_from desc, c.id
-      )
-      (select n.entity_id, n.h as historical, n.on_date::text as on, n.kind, coalesce(to_char(d.date, 'FMMonth FMDD, ') || n.text, n.text) as text
-      from n
-      left join lateral (
-        select o.id, o.date_from, o.polity_id from election o
-        where n.text ~ '^[0-9]' and o.id = n.entity_id and o.date_precision = 'day'
-          and n.text like extract(year from o.date_from)::int || ' %'
-        limit 1
-      ) e on true
-      left join lateral (
-        select e.date_from as date
-        where e.id is not null and exists (
-          select from election o
-          join name m on m.entity_id = o.id and m.is_preferred and m.lang = 'en'
-          where o.polity_id = e.polity_id and o.id <> e.id and o.status::text <> 'annulled'
-            and o.date_from >= date_trunc('year', e.date_from)::date
-            and o.date_from < (date_trunc('year', e.date_from) + interval '1 year')::date
-            and o.date_from <> e.date_from
-            and regexp_replace(m.text, '^[A-Z][a-z]+ [0-9]{1,2}, ', '') = n.text
+        with p as (
+          select * from unnest(${sql.param(chunk.map((pair) => pair.id))}::uuid[], ${sql.param(chunk.map((pair) => pair.on))}::date[], ${sql.param(chunk.map((pair) => pair.h))}::boolean[]) p(entity_id, on_date, h)
+        ),
+        c as materialized (
+          select id, entity_id, kind, text, lang, script, valid, is_preferred, recorded_from
+          from name
+          where entity_id = any(${sql.param(ids)}::uuid[])
+            and (kind in ('official', 'english', 'short', 'abbreviation') or (${withHistory} and kind = 'historical'))
+        ),
+        l as (
+          select distinct on (entity_id) entity_id, lang from c
+          where is_preferred and kind in ('official', 'english')
+          order by entity_id, id
+        ),
+        n as (
+          select distinct on (p.entity_id, p.on_date, p.h) p.entity_id, p.on_date, p.h, c.kind::text as kind, c.text
+          from p
+          join c on c.entity_id = p.entity_id
+            and c.kind in ('official', 'english', 'historical')
+            and (c.kind <> 'historical' or p.h)
+            and (c.kind in ('official', 'english')
+              or (p.on_date is not null and c.valid @> p.on_date and not (lower_inf(c.valid) and upper_inf(c.valid))))
+          left join l on l.entity_id = p.entity_id
+          order by p.entity_id, p.on_date, p.h, coalesce(c.valid @> coalesce(p.on_date, (select name_day())), false) desc,
+            coalesce(c.valid @> coalesce(p.on_date, (select name_day())) and not (lower_inf(c.valid) and upper_inf(c.valid)), false) desc,
+            ${nearest(sql`c`, sql`p.on_date`)} nulls first,
+            coalesce(c.kind = 'english' and c.script = 'Latn' and c.entity_id = any(${sql.param(common)}::uuid[]), false) desc, c.is_preferred desc,
+            c.lang = l.lang desc nulls last,
+            (c.lang = 'en') desc, (c.kind = 'official') desc, c.recorded_from desc, c.id
         )
-      ) d on true)
-      union all
-      select p.entity_id, p.h, p.on_date::text, 'abbreviation', short.text
-      from p
-      cross join lateral (select ${abbreviate(sql`p.entity_id`, sql`p.on_date`)} as text) short
-      where p.entity_id = any(array(select entity_id from c where kind in ('short', 'abbreviation')))
-        and short.text is not null
-    `);
+        (select n.entity_id, n.h as historical, n.on_date::text as on, n.kind, coalesce(to_char(d.date, 'FMMonth FMDD, ') || n.text, n.text) as text
+        from n
+        left join lateral (
+          select o.id, o.date_from, o.polity_id from election o
+          where n.text ~ '^[0-9]' and o.id = n.entity_id and o.date_precision = 'day'
+            and n.text like extract(year from o.date_from)::int || ' %'
+          limit 1
+        ) e on true
+        left join lateral (
+          select e.date_from as date
+          where e.id is not null and exists (
+            select from election o
+            join name m on m.entity_id = o.id and m.is_preferred and m.lang = 'en'
+            where o.polity_id = e.polity_id and o.id <> e.id and o.status::text <> 'annulled'
+              and o.date_from >= date_trunc('year', e.date_from)::date
+              and o.date_from < (date_trunc('year', e.date_from) + interval '1 year')::date
+              and o.date_from <> e.date_from
+              and regexp_replace(m.text, '^[A-Z][a-z]+ [0-9]{1,2}, ', '') = n.text
+          )
+        ) d on true)
+        union all
+        select p.entity_id, p.h, p.on_date::text, 'abbreviation', short.text
+        from p
+        cross join lateral (select ${abbreviate(sql`p.entity_id`, sql`p.on_date`)} as text) short
+        where p.entity_id = any(array(select entity_id from c where kind in ('short', 'abbreviation')))
+          and short.text is not null
+      `);
     };
     const byId = Map.groupBy(unique, (pair) => pair.id);
     const size = Math.max(
@@ -1202,7 +1202,7 @@ const datedTogether = together(
       }
       chunks.at(-1)?.push(...pairs);
     }
-    const results = await Promise.all(chunks.map(ask)).catch(
+    const results = await Promise.all(chunks.map((chunk) => ask(chunk))).catch(
       (error: unknown) => {
         release();
         finished.reject(error);
