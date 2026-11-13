@@ -354,17 +354,36 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.177,
-        0.277,
-        0.29,
-        1.0
+        0.095,
+        0.272,
+        0.283,
+        0.945
       ],
-      "hint": "Read only the table headed 'Governor'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        0.2863
-      ]
+      "hint": "Read only the table headed 'Governor'; ignore any other table visible in the image."
+    },
+    {
+      "page": 379,
+      "id": "379-0",
+      "columns": [
+        {
+          "label": "*William C. Marland, Glen Rogers (Democrat)",
+          "contest": "governor",
+          "candidate": "William C. Marland"
+        },
+        {
+          "label": "Rush D. Holt, Weston (Republican)",
+          "contest": "governor",
+          "candidate": "Rush D. Holt"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.095,
+        0.13,
+        0.283,
+        0.648
+      ],
+      "hint": "This page continues the Governor table of the previous page and prints no headings; read only the first two data columns, and the TOTALS row."
     }
   ]
 }

@@ -193,12 +193,13 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.292,
-        0.686,
-        0.858,
-        1.0
+        0.088,
+        0.268,
+        0.291,
+        0.865
       ],
-      "hint": "Read only the table headed 'Governor'; ignore any other table visible in the image."
+      "hint": "Read only the table headed 'Governor'; ignore any other table visible in the image.",
+      "turn": -90
     },
     {
       "page": 347,
@@ -217,36 +218,13 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.292,
-        0.0,
-        0.858,
-        1.0
+        0.088,
+        0.145,
+        0.291,
+        0.748
       ],
-      "hint": "This page continues the table of the previous page and prints no headings."
-    },
-    {
-      "page": 348,
-      "id": "348-0",
-      "columns": [
-        {
-          "label": "*W. W. \"Wally\" Barron (Democratic) Elkins",
-          "contest": "governor",
-          "candidate": "W. W. Barron"
-        },
-        {
-          "label": "Harold E. Neely (Republican) Hinton",
-          "contest": "governor",
-          "candidate": "Harold E. Neely"
-        }
-      ],
-      "orientation": "counties_down",
-      "crop": [
-        0.292,
-        0.0,
-        0.858,
-        1.0
-      ],
-      "hint": "This page continues the table of the previous page and prints no headings."
+      "hint": "This page continues the Governor table of the previous page and prints no headings; read only the first two data columns, and the TOTAL row.",
+      "turn": -90
     },
     {
       "page": 349,
