@@ -6,7 +6,11 @@ import re
 import subprocess
 import unicodedata
 from dataclasses import dataclass
+from datetime import date
+from decimal import Decimal
 from pathlib import Path
+from typing import Any
+from uuid import UUID
 
 import polars as pl
 from anthropic.types import ImageBlockParam, TextBlockParam
@@ -14,7 +18,8 @@ from anthropic.types.message_create_params import MessageCreateParamsNonStreamin
 from PIL import Image
 
 from ea import batch, raw
-from ea.store import DATA
+from ea.changeset import Changeset, slug
+from ea.store import DATA, connect
 
 SOURCE = "jp.mic_chiji"
 INDEX = "https://www.soumu.go.jp/senkyo/senkyo_s/data/chiji/index.html"
@@ -145,7 +150,7 @@ def fetch() -> None:
     print(batch.ensure(SOURCE, "chiji", wanted)[1])
 
 
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 WORD = re.compile(r'<word xMin="([\d.]+)" yMin="([\d.]+)" xMax="([\d.]+)" yMax="([\d.]+)">([^<]*)</word>')
 PAGE = re.compile(r"<page [^>]*>(.*?)</page>", re.DOTALL)
@@ -240,10 +245,10 @@ def name_of(words: list[Word], body: float) -> tuple[str | None, str | None]:
     return " ".join(plain) or None, " ".join(bracketed) or None
 
 
-def candidates(page_words: list[list[Word]]) -> list[dict[str, object]]:
-    rows: list[dict[str, object]] = []
+def candidates(page_words: list[list[Word]], width: float, height: float) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
     header: dict[str, Word] = {}
-    for words in page_words:
+    for page, words in enumerate(page_words, 1):
         marks = {"who": "候", "age": "年齢", "job": "職", "party": "派", "status": "新現", "sex": "性別"}
         found = {
             key: w
@@ -288,7 +293,13 @@ def candidates(page_words: list[list[Word]]) -> list[dict[str, object]]:
             age = next(
                 (w.text for w in band if abs(w.x - header["age"].x) < 12 and re.match(r"^\d{2,3}歳?$", w.text)), None
             )
-            votes = next((w.text for w in row if w.x0 > anchor.x1 and VOTES.match(w.text)), None)
+            cell = next((w for w in row if w.x0 > anchor.x1 and VOTES.match(w.text)), None)
+            votes = None if cell is None else cell.text
+            box = None if cell is None else [cell.x0 / width, cell.y0 / height, cell.x1 / width, cell.y1 / height]
+            tail = next((w for w in row if cell and re.match(r"^\.\d+$", w.text) and 0 <= w.x0 - cell.x1 < 8), None)
+            if votes and cell is not None and tail is not None:
+                votes += tail.text
+                box = [cell.x0 / width, min(cell.y0, tail.y0) / height, tail.x1 / width, max(cell.y1, tail.y1) / height]
             result = next((w.text for w in row if w.text in {"当", "落"}), None)
             sex = next(
                 (
@@ -309,6 +320,8 @@ def candidates(page_words: list[list[Word]]) -> list[dict[str, object]]:
                     "status": anchor.text,
                     "votes": None if votes in {None, "無投票"} else votes.replace(",", ""),
                     "result": result,
+                    "page": page,
+                    "box": box,
                 }
             )
     for order, row in enumerate(rows, 1):
@@ -316,8 +329,156 @@ def candidates(page_words: list[list[Word]]) -> list[dict[str, object]]:
     return rows
 
 
+FIXES = {
+    "之口 里花": "樋之口 里花",
+    "松 佐一": "榑松 佐一",
+    "\ue020渡 啓祐": "樋渡 啓祐",
+    "野口 俊\ue000": "野口 俊邦",
+    "小\ue002 隆史": "小鑓 隆史",
+}
+SCANNED = {
+    "2011-07-31:埼玉県": [("原冨 さとる", "原冨 悟"), ("上田 きよし", "上田 清司"), ("たけだ のぶひろ", "武田 信弘")],
+    "2011-07-03:群馬県": [
+        ("えびね 篤", "海老根 篤"),
+        ("大沢 正明", None),
+        ("後藤 新", None),
+        ("こすげ 啓司", "小菅 啓司"),
+    ],
+    "2011-06-05:青森県": [("山内 たかし", "山内 崇"), ("三村 申吾", None), ("よしまた 洋", "吉俣 洋")],
+    "2011-02-06:愛知県": [
+        ("大村 ひであき", "大村 秀章"),
+        ("しげとく 和彦", "重徳 和彦"),
+        ("みその 愼一郎", "御園 愼一郎"),
+        ("どい 敏彦", "土井 敏彦"),
+        ("薬師寺 みちよ", "齋藤 道代"),
+    ],
+    "2011-01-30:山梨県": [("横内 正明", None), ("大久保 令子", None)],
+    "2010-12-26:宮崎県": [
+        ("宮本 大善", None),
+        ("河野 しゅんじ", "河野 俊嗣"),
+        ("津島 忠勝", None),
+        ("中馬 章一", None),
+    ],
+    "2010-11-28:和歌山県": [
+        ("にさか 吉伸", "仁坂 吉伸"),
+        ("ふじ本 まり子", "藤本 眞利子"),
+        ("ほら よしかず", "洞 佳和"),
+    ],
+    "2010-11-28:愛媛県": [("田中 かつひこ", "田中 克彦"), ("中村 時広", None), ("小松 正幸", None)],
+    "2010-11-28:沖縄県": [("なかいま 弘多", "仲井真 弘多"), ("イハ 洋一", "伊波 洋一"), ("金城 タツロー", "金城 竜郎")],
+}
+PAGES = DATA / "pages" / SOURCE
+
+
+def cleaned(name: str | None) -> str | None:
+    if name is None:
+        return None
+    parts = FIXES.get(name, name).split()
+    if len(parts) > 2 and len(parts[0]) == len(parts[1]) == 1:
+        parts = [parts[0] + parts[1], "".join(parts[2:])]
+    name = " ".join(parts)
+    if re.search(r"[\ue000-\uf8ff]", name):
+        raise ValueError(f"private-use character left in {name!r}")
+    return name
+
+
+def digits(text: str) -> str:
+    return re.sub(r"[^\d.]", "", text)
+
+
+def size(path: Path) -> tuple[float, float]:
+    info = subprocess.run(["pdfinfo", str(path)], check=True, capture_output=True, text=True).stdout
+    match = re.search(r"Page size:\s+([\d.]+) x ([\d.]+)", info)
+    if match is None:
+        raise ValueError(f"{path} has no page size")
+    return float(match[1]), float(match[2])
+
+
+def render(path: Path, page: int, dpi: int) -> Image.Image:
+    png = subprocess.run(
+        ["pdftoppm", "-r", str(dpi), "-gray", "-png", "-f", str(page), "-l", str(page), "-singlefile", str(path)],
+        check=True,
+        capture_output=True,
+    ).stdout
+    return Image.open(io.BytesIO(png))
+
+
+def ocr_boxes(path: Path, page: int) -> list[tuple[str, list[float]]]:
+    image = render(path, page, 300)
+    out = []
+    for left, top, right, bottom in ((0, 0, 1, 1), (0.6, 0.2, 0.9, 0.8), (0.1, 0.55, 0.9, 0.95)):
+        box = (int(image.width * left), int(image.height * top), int(image.width * right), int(image.height * bottom))
+        crop = image.crop(box)
+        for psm in ("4", "11"):
+            tsv = subprocess.run(
+                ["tesseract", "-", "-", "--psm", psm, "-c", "tessedit_char_whitelist=0123456789,.", "tsv"],
+                input=image_bytes(crop),
+                check=True,
+                capture_output=True,
+            ).stdout.decode()
+            lines_: dict[tuple[str, ...], list[tuple[str, float, float, float, float]]] = {}
+            for line in tsv.splitlines()[1:]:
+                cells = line.split("\t")
+                if len(cells) == 12 and cells[11].strip():
+                    x, y, w, h = (float(v) for v in cells[6:10])
+                    x, y = x + box[0], y + box[1]
+                    lines_.setdefault(tuple(cells[1:5]), []).append((cells[11], x, y, x + w, y + h))
+            for words in lines_.values():
+                for i in range(len(words)):
+                    for j in range(i + 1, min(i + 5, len(words) + 1)):
+                        span = words[i:j]
+                        out.append(
+                            (
+                                digits("".join(text for text, *_ in span)),
+                                [
+                                    min(w[1] for w in span) / image.width,
+                                    min(w[2] for w in span) / image.height,
+                                    max(w[3] for w in span) / image.width,
+                                    max(w[4] for w in span) / image.height,
+                                ],
+                            )
+                        )
+    return out
+
+
+def image_bytes(image: Image.Image) -> bytes:
+    buffer = io.BytesIO()
+    image.save(buffer, "PNG")
+    return buffer.getvalue()
+
+
+def locate(found: list[tuple[int, str, list[float]]], value: str | None) -> tuple[int | None, list[float] | None]:
+    if value is None:
+        return None, None
+    want = value.rstrip("0").rstrip(".") if "." in value else value
+    for page, text, box in reversed(found):
+        got = text.rstrip("0").rstrip(".") if "." in text else text
+        if got == want:
+            return page, box
+    return None, None
+
+
+def checked(key: str, figures_: dict[str, str | None], rows: list[dict[str, Any]], unopposed: bool) -> None:
+    if unopposed:
+        if len(rows) != 1 or rows[0]["votes"] is not None:
+            raise ValueError(f"{key}: an unopposed election should list one candidate without votes")
+        return
+    votes = [float(str(row["votes"])) for row in rows]
+    if abs(sum(votes) - float(figures_["valid"] or "nan")) >= 1:
+        raise ValueError(f"{key}: candidate votes sum to {sum(votes)}, valid votes are {figures_['valid']}")
+    winners = [row for row in rows if row["result"] == "当"]
+    if len(winners) != 1 or float(str(winners[0]["votes"])) != max(votes):
+        raise ValueError(f"{key}: the declared winner is not the one leading candidate")
+    cast, valid, invalid = (int(figures_[k] or 0) for k in ("cast", "valid", "invalid"))
+    if cast != valid + invalid:
+        raise ValueError(f"{key}: ballots cast {cast} are not valid {valid} plus invalid {invalid}")
+    if figures_["voters"] and figures_["unreturned"] and int(figures_["voters"]) != cast + int(figures_["unreturned"]):
+        print(f"{key}: voters {figures_['voters']} are not ballots cast plus {figures_['unreturned']} unreturned")
+
+
 def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
+    PAGES.mkdir(parents=True, exist_ok=True)
     elections, people = [], []
     for url, held, prefecture, unopposed in listing():
         artifact = raw.cached(SOURCE, url)
@@ -328,6 +489,51 @@ def parse() -> None:
             continue
         key = f"{held}:{prefecture}"
         unopposed = unopposed or bool(re.search(r"選\s*挙\s*期\s*日\s+無\s*投\s*票", text))
+        if words[0]:
+            width, height = size(artifact.path)
+            found = [
+                (page, digits(w.text), [w.x0 / width, w.y0 / height, w.x1 / width, w.y1 / height])
+                for page, page_words in enumerate(words, 1)
+                for w in page_words
+                if re.match(r"^-?[\d,]+(?:\.\d+)?[人票]?$", w.text)
+            ]
+            figures_ = figures(text)
+            rows = candidates(words, width, height)
+            for row in rows:
+                row["name"], row["legal_name"] = cleaned(row["name"]), cleaned(row["legal_name"])
+        else:
+            found = [(1, t, box) for t, box in ocr_boxes(artifact.path, 1)]
+            read_ = read(artifact.sha256, 1)
+            figures_ = {k: digits(read_[k]) if read_[k] else None for k in FIGURES}
+            figures_["cast"] = str(int(figures_["valid"] or 0) + int(figures_["invalid"] or 0))
+            rows = []
+            for order, ((name, legal), seen) in enumerate(zip(SCANNED[key], read_["candidates"], strict=True), 1):
+                votes = digits(seen["votes"])
+                page, box = locate(found, votes)
+                rows.append(
+                    {
+                        "name": name,
+                        "legal_name": legal,
+                        "sex": seen["sex"],
+                        "age": int(seen["age"]),
+                        "party": seen["party"],
+                        "status": seen["status"],
+                        "votes": votes,
+                        "result": seen["result"] or "落",
+                        "page": page or 1,
+                        "box": box or [0.0, 0.0, 1.0, 1.0],
+                        "order": order,
+                    }
+                )
+        checked(key, figures_, rows, unopposed)
+        boxes = {}
+        for k in FIGURES:
+            page, box = locate(found, figures_[k])
+            boxes[f"{k}_page"], boxes[f"{k}_box"] = page, box
+        for page in range(1, len(words) + 1):
+            image = PAGES / f"{artifact.sha256}-{page}.png"
+            if not image.exists():
+                render(artifact.path, page, 100).save(image)
         elections.append(
             {
                 "key": key,
@@ -336,9 +542,276 @@ def parse() -> None:
                 "held": held,
                 "prefecture": prefecture,
                 "unopposed": unopposed,
-                **figures(text),
+                "pages": len(words),
+                **figures_,
+                **boxes,
             }
         )
-        people.extend({"key": key, **row} for row in candidates(words))
+        people.extend({"key": key, **row} for row in rows)
     pl.DataFrame(elections, infer_schema_length=None).write_parquet(PARSED / f"elections-v{VERSION}.parquet")
     pl.DataFrame(people, infer_schema_length=None).write_parquet(PARSED / f"candidates-v{VERSION}.parquet")
+
+
+PUBLISHER = "総務省"
+TITLE = "知事選挙 選挙結果調"
+LICENSE = "Public Data License 1.0"
+LICENSE_URL = "https://www.digital.go.jp/resources/open_data/public_data_license_v1.0"
+ATTRIBUTION = "出典：総務省ホームページ"
+DIGITIZED = 8
+RULES = {"formula": "fptp", "minimum": {"of": "valid", "share": 0.25}}
+NHK_SPLIT = "2023-01-01"
+WIKIDATA = {
+    "日本共産党": "Q641600",
+    "れいわ新選組": "Q64405573",
+    "日本維新の会": "Q21499745",
+    "幸福実現党": "Q1571486",
+    "みんなの党": "Q1355093",
+    "大阪維新の会": "Q385785",
+}
+NEW_PARTIES = {
+    "Q385785": (("大阪維新の会", "official", None), ("Osaka Restoration Association", "english", None)),
+    "Q39142381": (
+        ("みんなでつくる党", "official", None),
+        ("NHKから国民を守る党", "historical", None),
+        ("The Collaborative Party", "english", None),
+    ),
+    "Q136749137": (
+        ("NHKから国民を守る党", "official", None),
+        ("The Party to Protect the People from NHK", "english", None),
+    ),
+}
+MEASURES = {"registered": 2, "voters": 14, "cast": 3, "valid": 4, "invalid": 5}
+
+
+def party_key(party: str, held: str) -> tuple[str, str] | None:
+    if party == "無所属":
+        return None
+    if party == "NHKから国民を守る党":
+        return "wikidata", "Q39142381" if held < NHK_SPLIT else "Q136749137"
+    if party in WIKIDATA:
+        return "wikidata", WIKIDATA[party]
+    return f"{SOURCE}.party", party
+
+
+def emit() -> Path:
+    elections = pl.read_parquet(PARSED / f"elections-v{VERSION}.parquet").sort("held", "prefecture")
+    people = pl.read_parquet(PARSED / f"candidates-v{VERSION}.parquet")
+    with connect() as conn:
+        prefectures = {
+            native: (iso, english)
+            for iso, native, english in conn.execute(
+                """select p.iso_code, ja.text, en.text from polity p
+                   join name ja on ja.entity_id = p.id and ja.lang = 'ja' and ja.kind = 'official'
+                   join name en on en.entity_id = p.id and en.lang = 'en'
+                   where p.iso_code like 'JP-__'"""
+            )
+        }
+        if len(prefectures) != 47:
+            raise ValueError("run jp.mlit and jp.diet first: Japan's 47 prefectures must exist")
+        cs = Changeset(
+            conn,
+            pipeline=SOURCE,
+            version=VERSION,
+            summary="Japan's prefectural governor elections 2010-2026 from the Ministry of Internal Affairs and "
+            "Communications' election summaries, by prefecture",
+            polity="JP",
+        )
+
+        def name(entity: UUID, text: str, lang: str, kind: str = "official", preferred: bool | None = None) -> None:
+            cs.add(
+                "name",
+                entity_id=entity,
+                text=text,
+                lang=lang,
+                kind=kind,
+                is_preferred=kind == "official" if preferred is None else preferred,
+            )
+
+        japan = cs.polity("JP")
+        source = cs.source(PUBLISHER, TITLE)
+        cs.add(
+            "source",
+            id=source,
+            kind="official_body",
+            publisher=PUBLISHER,
+            title=TITLE,
+            url=INDEX,
+            license=LICENSE,
+            license_url=LICENSE_URL,
+            attribution=ATTRIBUTION,
+            notes="Counts are as the ministry's summaries print them, read from each PDF's text layer; the nine "
+            "summaries of 2010 and 2011 are scans, read from the page images and checked by hand.",
+        )
+        cs.artifact(raw.cached(SOURCE, INDEX), source)
+        system = cs.key(f"{SOURCE}.electoral_system", "governor")
+        cs.add("electoral_system", id=system, polity_id=japan, rules=RULES, rules_version=1)
+        name(system, "First past the post with a legal minimum of a quarter of the valid votes", "en")
+        name(system, "相対多数制（法定得票数は有効投票総数の4分の1）", "ja", "native", False)
+
+        parties: dict[tuple[str, str], UUID] = {}
+        for party, held in people.join(elections.select("key", "held"), on="key").select("party", "held").iter_rows():
+            if party is None or (found := party_key(party, held)) is None or found in parties:
+                continue
+            entity = parties[found] = cs.key(*found)
+            if entity not in cs.minted:
+                continue
+            if found[0] == "wikidata" and found[1] not in NEW_PARTIES:
+                raise ValueError(f"{found[1]} should already exist from jp.diet")
+            cs.add("party", id=entity, kind="party", polity_id=japan)
+            if found[0] == "wikidata":
+                for text, kind, _ in NEW_PARTIES[found[1]]:
+                    name(entity, text, "en" if kind == "english" else "ja", kind, kind in {"official", "english"})
+            else:
+                name(entity, re.sub(r"^\(略称\)", "", party), "ja")
+
+        locators: list[dict[str, object]] = []
+        added: set[UUID] = set()
+        pages_: dict[tuple[str, int], UUID] = {}
+        for row in elections.iter_rows(named=True):
+            held = date.fromisoformat(row["held"])
+            iso, english = prefectures[row["prefecture"]]
+            code = iso[3:]
+            polity = cs.polity(iso)
+            area = cs.area("jp.prefecture", code)
+            office = cs.key("jp.office", f"governor-{code}")
+            if {polity, area, office} & cs.minted:
+                raise ValueError(f"run jp.mlit and jp.diet first: {iso} is missing")
+            artifact = cs.artifact(raw.cached(SOURCE, row["url"]), source)
+            scanned = row["key"] in SCANNED
+            for page in range(1, row["pages"] + 1):
+                image = PAGES / f"{row['sha256']}-{page}.png"
+                width, height = Image.open(image).size
+                pages_[row["key"], page] = cs.page(artifact, page)
+                cs.add(
+                    "source_page",
+                    id=pages_[row["key"], page],
+                    artifact_id=artifact,
+                    page_number=page,
+                    image_key=f"pages/{SOURCE}/{image.name}",
+                    width=width,
+                    height=height,
+                )
+            unit = cs.unit("jp.prefecture", code)
+            if unit in cs.minted and unit not in added:
+                added.add(unit)
+                cs.add(
+                    "reporting_unit",
+                    id=unit,
+                    polity_id=polity,
+                    scheme_code="jp.prefecture",
+                    code=code,
+                    area_relation="equals",
+                    area_id=area,
+                    kind="standard",
+                    valid_from=None,
+                )
+            election = cs.key(f"{SOURCE}.election", row["key"])
+            cs.add(
+                "election", id=election, polity_id=polity, kind="general", date_from=held, date_to=held, status="held"
+            )
+            name(election, f"{held.year} {english} gubernatorial election", "en")
+            name(election, f"{row['prefecture']}知事選挙", "ja", "native", False)
+            path = f"jp/{slug(english)}/{held}-governor"
+            cs.add("slug", path=path, entity_id=election)
+            contest = cs.key(f"{SOURCE}.contest", row["key"])
+            cs.add(
+                "contest",
+                id=contest,
+                election_id=election,
+                kind="office",
+                office_id=office,
+                district_area_id=area,
+                magnitude=1,
+                round_number=1,
+                electoral_system_id=system,
+                default_result_kind="tacit" if row["unopposed"] else "counted",
+            )
+            name(contest, f"{held.year} election for Governor of {english}", "en")
+            cs.add("slug", path=f"{path}/governor", entity_id=contest)
+            result_set = cs.key(f"{SOURCE}.result_set", row["key"])
+            cs.add(
+                "result_set",
+                id=result_set,
+                election_id=election,
+                contest_id=contest,
+                stage="official",
+                kind="tacit" if row["unopposed"] else "counted",
+                source_id=source,
+                status="active",
+                is_default=True,
+                completeness=1,
+            )
+
+            def value(
+                option: UUID | None, measure: int, amount: str, page: int | None, box: list[float] | None
+            ) -> None:
+                cs.add(
+                    "result_value",
+                    result_set_id=result_set,
+                    unit_id=unit,
+                    option_id=option,
+                    channel=0,
+                    measure=measure,
+                    count_round=0,
+                    flags=DIGITIZED if scanned else 0,
+                    value=Decimal(amount),
+                )
+                if page is not None and box is not None:
+                    locators.append(
+                        {
+                            "result_set_id": result_set,
+                            "unit_id": unit,
+                            "option_id": option,
+                            "channel": 0,
+                            "measure": measure,
+                            "count_round": 0,
+                            "page_id": pages_[row["key"], page],
+                            "x0": box[0],
+                            "y0": box[1],
+                            "x1": box[2],
+                            "y1": box[3],
+                        }
+                    )
+
+            if not row["unopposed"]:
+                for key, measure in MEASURES.items():
+                    if row[key] is not None:
+                        value(None, measure, row[key], row[f"{key}_page"], row[f"{key}_box"])
+            for candidate in people.filter(pl.col("key") == row["key"]).sort("order").iter_rows(named=True):
+                legal = candidate["legal_name"] or candidate["name"]
+                tag = f"{code}:{legal.replace(' ', '')}"
+                person = cs.key(f"{SOURCE}.person", tag)
+                if person in cs.minted and person not in added:
+                    added.add(person)
+                    cs.add("person", id=person, gender={"男": "male", "女": "female"}.get(candidate["sex"] or ""))
+                    name(person, legal, "ja")
+                found = None if candidate["party"] is None else party_key(candidate["party"], row["held"])
+                party = None if found is None else parties[found]
+                option = cs.key(f"{SOURCE}.option", f"{row['key']}:{candidate['order']}")
+                cs.add(
+                    "contest_option",
+                    id=option,
+                    contest_id=contest,
+                    kind="candidate",
+                    party_id=party,
+                    ballot_position=candidate["order"],
+                    ballot_label=candidate["name"],
+                )
+                cs.add(
+                    "candidacy",
+                    id=cs.key(f"{SOURCE}.candidacy", f"{row['key']}:{candidate['order']}"),
+                    person_id=person,
+                    option_id=option,
+                    role="head",
+                    ballot_name=candidate["name"],
+                    member_of_party_id=party,
+                    is_independent=party is None,
+                    is_incumbent=candidate["status"] == "現",
+                )
+                if candidate["votes"] is not None:
+                    value(option, 1, candidate["votes"], candidate["page"], candidate["box"])
+                if row["unopposed"] or candidate["result"] == "当":
+                    cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected", seats=1)
+        for locator in locators:
+            cs.add("value_locator", **locator)
+        return cs.write()
