@@ -131,7 +131,7 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.116,
+        0.388,
         0.203,
         0.543,
         1.0
@@ -141,6 +141,10 @@
       "header": [
         0.0,
         0.2296
+      ],
+      "stub": [
+        0.116,
+        0.272
       ]
     },
     {
@@ -175,90 +179,16 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.116,
+        0.388,
         0.0,
         0.543,
         1.0
       ],
-      "hint": "This page continues the table of the previous page and prints no headings."
-    },
-    {
-      "page": 127,
-      "id": "127-0",
-      "columns": [
-        {
-          "label": "Dunn, Rep.",
-          "contest": "governor",
-          "candidate": "Robert C. Dunn"
-        },
-        {
-          "label": "Johnson, Dem.",
-          "contest": "governor",
-          "candidate": "John A. Johnson"
-        },
-        {
-          "label": "Dorsett, Pro.",
-          "contest": "governor",
-          "candidate": "Charles W. Dorsett"
-        },
-        {
-          "label": "Nash, Pub. Own.",
-          "contest": "governor",
-          "candidate": "Jay E. Nash"
-        },
-        {
-          "label": "Anderson, Soc.-Lab.",
-          "contest": "governor",
-          "candidate": "A. W. M. Anderson"
-        }
-      ],
-      "orientation": "counties_down",
-      "crop": [
+      "hint": "This page continues the governor table of the previous page, so it prints no column headings: the five number columns, left to right, are the five data columns listed above, and the county names at the left start with Kandiyohi. Include the Totals row.",
+      "stub": [
         0.116,
-        0.0,
-        0.543,
-        1.0
-      ],
-      "hint": "This page continues the table of the previous page and prints no headings."
-    },
-    {
-      "page": 128,
-      "id": "128-0",
-      "columns": [
-        {
-          "label": "Dunn, Rep.",
-          "contest": "governor",
-          "candidate": "Robert C. Dunn"
-        },
-        {
-          "label": "Johnson, Dem.",
-          "contest": "governor",
-          "candidate": "John A. Johnson"
-        },
-        {
-          "label": "Dorsett, Pro.",
-          "contest": "governor",
-          "candidate": "Charles W. Dorsett"
-        },
-        {
-          "label": "Nash, Pub. Own.",
-          "contest": "governor",
-          "candidate": "Jay E. Nash"
-        },
-        {
-          "label": "Anderson, Soc.-Lab.",
-          "contest": "governor",
-          "candidate": "A. W. M. Anderson"
-        }
-      ],
-      "orientation": "counties_down",
-      "crop": [
-        0.116,
-        0.0,
-        0.543,
-        1.0
-      ],
-      "hint": "This page continues the table of the previous page and prints no headings."
+        0.272
+      ]
     },
     {
       "page": 129,
