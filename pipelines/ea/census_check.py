@@ -58,6 +58,9 @@ with recursive census_polity as (
         rank() over (partition by root, contest_id order by rank desc, precedence desc) as place
     from (select distinct root, contest_id, class_id, rank, precedence from hit) d
 )
+"""
+HELD_SQL = CLASSIFY_SQL + "select class_id, count(distinct contest_id) from top where place = 1 group by class_id"
+CLASSIFY_SQL += """
 select p.iso_code, 'census.unclassified', array_agg(h.contest_id::text order by h.contest_id), count(*)
 from held h
 join polity p on p.id = h.root
@@ -72,6 +75,10 @@ join polity p on p.id = t.root
 group by p.iso_code
 order by 1, 2
 """
+
+
+def held(conn: Connection) -> dict:
+    return dict(conn.execute(HELD_SQL).fetchall())
 
 
 def problems(conn: Connection) -> list[str]:

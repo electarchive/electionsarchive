@@ -41,6 +41,15 @@ DAY_RULES = {
     "mar_second_tuesday": nth_weekday(3, 1, 2),
     "may_third_tuesday": nth_weekday(5, 1, 3),
     "aug_fourth_tuesday": nth_weekday(8, 1, 4),
+    "may_second_monday": nth_weekday(5, 0, 2),
+    "sep_last_tuesday": last_weekday(9, 1),
+    "oct_first_monday": nth_weekday(10, 0, 1),
+    "oct_third_monday": nth_weekday(10, 0, 3),
+    "oct_fourth_monday": nth_weekday(10, 0, 4),
+    "oct_fourth_wednesday": nth_weekday(10, 2, 4),
+    "oct_third_saturday": nth_weekday(10, 5, 3),
+    "nov_first_monday": nth_weekday(11, 0, 1),
+    "nov_first_sunday": nth_weekday(11, 6, 1),
 }
 
 
