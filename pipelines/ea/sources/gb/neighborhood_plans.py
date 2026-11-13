@@ -34,6 +34,7 @@ PAGE_PREFIXES = (
     "https://www.hart.gov.uk/news/",
     "https://www.eastherts.gov.uk/planning-and-building/",
     "https://web.archive.org/web/",
+    "https://new.colchester.gov.uk/elections/",
     "https://www.warwickdc.gov.uk/info/",
     "https://www.ashford.gov.uk/your-council/",
     "https://www.ambervalley.gov.uk/",
