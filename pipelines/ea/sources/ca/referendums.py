@@ -153,7 +153,7 @@ READ_SCHEMA: dict[str, object] = {
                     "district": {"type": "string"},
                     **{measure: {"type": ["integer", "null"]} for measure in MEASURES},
                     "majority": {"type": ["integer", "null"]},
-                    "majority_side": {"type": ["string", "null"], "enum": ["for", "against", None]},
+                    "majority_side": {"type": "string", "enum": ["for", "against", "none"]},
                     "remarks": {"type": "string"},
                 },
                 "required": ["district", *MEASURES, "majority", "majority_side", "remarks"],
