@@ -1,3 +1,4 @@
+import html
 import re
 import subprocess
 import sys
@@ -23,7 +24,18 @@ SOURCES = Path(__file__).parent / "cc_elections_sources.tsv"
 BROWSER = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36"
 VOTES, REGISTERED, BALLOTS, VALID, INVALID = 1, 2, 3, 4, 5
 HIGHLAND = "S12000017"
-READ = {HIGHLAND, "S12000048", "S12000030", "S12000027"}
+READ = {
+    HIGHLAND,
+    "S12000048",
+    "S12000030",
+    "S12000027",
+    "S12000035",
+    "S12000005",
+    "S12000010",
+    "S12000020",
+    "S12000041",
+}
+TRANSCRIBED = Path(__file__).parent / "cc_elections_transcribed.tsv"
 INBOX = DATA / "inbox/manual/MF-668"
 DELIVERED = {
     "https://www.pkc.gov.uk/media/54467/Pitlochry-CC-WEB-VERSION/pdf/Pitlochry_CC_-_WEB_VERSION.pdf": "Pitlochry_CC_-_WEB_VERSION.pdf",
@@ -82,7 +94,7 @@ COUNCILS = {
         "East Lothian Council community council elections",
         "https://www.eastlothian.gov.uk/safety-and-community/your-community/get-involved-and-have-your-say/community-council-election",
         (
-            "Community councils in East Lothian are formed under the council's scheme, made under the Local Government (Scotland) Act 1973, and the council runs the elections. This record is built from the council's notices of results, not from the scheme text, which was not read."
+            "Community councils in East Lothian are formed under the council's Scheme of Establishment of Community Councils, made under the Local Government (Scotland) Act 1973, and the council's returning officer runs the elections. Where nominations do not exceed the places, the nominees are declared elected without a contest; where they exceed them, a ballot is held. This record is built from the council's notices, not from the scheme text, which the council's site no longer serves."
         ),
     ),
     "S12000020": (
@@ -95,10 +107,10 @@ COUNCILS = {
     ),
     "S12000041": (
         "Angus Council",
-        "Angus Council community council elections",
-        "https://www.angus.gov.uk/council_and_democracy/elections_and_voting/election_results/community_council_election_results_0",
+        "Angus Council Scheme for the Establishment of Community Councils 2022",
+        "https://www.angus.gov.uk/sites/default/files/2022-06/Report%20176%20Review%20of%20Scheme%20of%20Community%20Councils_App1.pdf",
         (
-            "Community councils in Angus are formed under the council's scheme, made under the Local Government (Scotland) Act 1973, and the council runs the elections. This record is built from the council's notices of uncontested elections, not from the scheme text, which was not read."
+            "Community councils in Angus are formed under the council's Scheme for the Establishment of Community Councils, made under the Local Government (Scotland) Act 1973. Where the candidates validly nominated number at least half of the maximum membership but no more than the maximum, they are declared elected and no ballot is held; where they exceed the maximum, a poll is held and each elector may vote for candidates up to the number of vacancies, no more than once for each; below half, no community council is formed."
         ),
     ),
     "S12000013": (
@@ -154,8 +166,15 @@ ALIASES = {
     ("S12000017", "Dunvegan"): "Dunvegan and District",
     ("S12000017", "Stromeferry and Achmore"): "Stromeferry",
     ("S12000017", "Grantown-on-Spey and Vicinity"): "Grantown-on-Spey",
+    ("S12000010", "Humbie, East and West Saltoun and Bolton"): "Humbie, East and West Saltoun, Bolton",
+    ("S12000010", "Pencaitland and District"): "Pencaitland",
+    ("S12000035", "Hunter'S Quay"): "Hunters Quay",
+    ("S12000035", "Strachur and District"): "Strachur",
+    ("S12000041", "The Royal Burgh of Arbroath and District"): "Royal Burgh of Arbroath",
+    ("S12000041", "The Royal Burgh of Montrose"): "Royal Burgh of Montrose",
 }
 UNSTATED = "The notice does not state how many places the community council had, so the seat count is not recorded."
+UNVOTED = "The council's results notice names the candidates elected and not elected but gives no vote counts."
 SHORT = "{publisher}'s notice lists {elected} members elected unopposed to {places} places, leaving {left} vacant."
 
 
@@ -186,16 +205,17 @@ def fetch() -> None:
         if response is None:
             print(f"unreachable: {url}", file=sys.stderr)
             continue
-        if response.status_code != 200 or not response.content.startswith(b"%PDF"):
+        page = response.headers.get("content-type", "").startswith("text/html")
+        if response.status_code != 200 or not (response.content.startswith(b"%PDF") or page):
             print(f"not a PDF: {url}", file=sys.stderr)
             continue
         raw.store(
             SOURCE,
             url,
             response.content,
-            suffix=".pdf",
+            suffix=".html" if page else ".pdf",
             retrieved_at=datetime.now(UTC),
-            media_type="application/pdf",
+            media_type="text/html" if page else "application/pdf",
         )
 
 
@@ -207,9 +227,17 @@ def _cached(url: str) -> bool:
     return True
 
 
-def text_of(url: str) -> str:
+def text_of(url: str, mode: str = "-layout") -> str:
     path = raw.cached(SOURCE, url).path
-    return subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True).stdout
+    if path.suffix == ".html":
+        page = re.sub(r"<(script|style)\b.*?</\1>", " ", path.read_text(), flags=re.DOTALL)
+        return " ".join(html.unescape(re.sub(r"<[^>]+>", " ", page)).split())
+    return subprocess.run(["pdftotext", mode, str(path), "-"], capture_output=True, text=True, check=True).stdout
+
+
+def surname_first(printed: str) -> str:
+    surname, forenames = (part.strip() for part in printed.split(",", 1))
+    return f"{display(forenames) if forenames.isupper() else forenames} {display(surname)}"
 
 
 def when(text: str) -> date:
@@ -419,6 +447,209 @@ def shetland_list(text: str) -> list[dict]:
     return reads
 
 
+def argyll_notices(text: str) -> list[dict]:
+    reads = {}
+    for chunk in text.split("NOTICE OF UNCONTESTED ELECTION")[1:]:
+        flat = " ".join(chunk.split())
+        head = re.search(r"COMMUNITY COUNCILLORS FOR (.+?) COMMUNITY COUNCIL ELECTION DAY – (\d+ \w+ \d{4})", flat)
+        stated = re.search(r"\n\s*\((\d+)\)\s*(?:\n|$)", chunk)
+        rows: list[list] = []
+        for line in chunk.splitlines():
+            row = re.fullmatch(r" +(\d+)(?: +(\S.*?))?(?: {2,}\S.*)?", line)
+            if row:
+                rows.append([int(row.group(1)), row.group(2) or ""])
+            elif rows and rows[-1][1].endswith(",") and line.strip():
+                rows[-1][1] += " " + re.split(r" {2,}", line.strip())[0]
+        if not (head and stated and rows):
+            raise ValueError("unreadable notice")
+        places = int(stated.group(1))
+        if [number for number, _ in rows] != list(range(1, places + 1)):
+            raise ValueError(f"{head.group(1)}: numbered lines do not run to {places}")
+        names = [name for _, name in rows if name]
+        read = {
+            "council": display(head.group(1).replace("’", "'")).replace(" And ", " and "),
+            "day": when(head.group(2)),
+            "places": places,
+            "members": names,
+        }
+        if reads.setdefault(read["council"], read) != read:
+            raise ValueError(f"{read['council']}: two different notices")
+    return list(reads.values())
+
+
+def argyll_declaration(text: str) -> dict:
+    head = re.search(r"DECLARATION OF RESULT (.+?) COMMUNITY COUNCIL DATE OF ELECTION - (\d+ \w+ \d{4})", text)
+    body = re.search(r"Number of Votes Cast Result (.+?) And I do hereby declare", text)
+    rejected = re.search(r"ballot papers rejected totalled (\d+)", text)
+    received = re.search(r"number of ballot papers received was ([\d,]+)", text)
+    if not (head and body and rejected and received):
+        raise ValueError("unreadable declaration")
+    rows = list(
+        re.finditer(
+            r"([A-Z][A-Z’'-]+(?: [A-Z][A-Z’'-]+)*, .+?) (\d+)( ELECTED)?(?= [A-Z][A-Z’'-]+[ ,]|$)", body.group(1)
+        )
+    )
+    if " ".join(row.group(0) for row in rows) != body.group(1):
+        raise ValueError("unreadable candidate lines")
+    candidates = [
+        {
+            "printed": row.group(1),
+            "name": surname_first(row.group(1)),
+            "votes": int(row.group(2)),
+            "elected": bool(row.group(3)),
+        }
+        for row in rows
+    ]
+    return {
+        "council": display(head.group(1)).replace(" And ", " and "),
+        "day": when(head.group(2)),
+        "places": sum(1 for candidate in candidates if candidate["elected"]),
+        "candidates": candidates,
+        "electorate": None,
+        "ballots": int(received.group(1).replace(",", "")),
+        "rejected": int(rejected.group(1)),
+        "valid": None,
+    }
+
+
+def clacks_notice(text: str) -> dict:
+    head = re.search(r"UNCONTESTED ELECTION\s+(.+?)\s+COMMUNITY COUNCIL\s", text, re.DOTALL)
+    body = re.search(r"\n\s*Name\s*\n(.*?)\n\s*\.{10,}", text, re.DOTALL)
+    day = re.search(r"Depute Returning Officer\s+(\d+ \w+ \d{4})", text)
+    if not (head and body and day):
+        raise ValueError("unreadable notice")
+    return {
+        "council": display(" ".join(head.group(1).split())).replace(" And ", " and "),
+        "day": when(day.group(1)),
+        "places": None,
+        "members": [line.strip() for line in body.group(1).splitlines() if line.strip()],
+    }
+
+
+def clacks_declaration(text: str) -> dict:
+    head = re.search(r"CONTESTED ELECTION\s+(.+?) COMMUNITY COUNCIL\s", text)
+    body = re.search(r"Candidate Name\s+Votes Cast Result\s*\n(.*?)\n\s*\*", text, re.DOTALL)
+    rejected = re.search(r"Rejected Votes\s+(\d+)", text)
+    received = re.search(r"No\. Ballot Papers\s+([\d,]+)\s*\n\s*Received", text)
+    day = re.search(r"Date:\s*(\d+ \w+ \d{4})", text)
+    if not (head and body and rejected and received and day):
+        raise ValueError("unreadable declaration")
+    candidates, tied = [], []
+    for line in body.group(1).splitlines():
+        row = re.fullmatch(r"\s*(.+?)\s{2,}(\d+)\s+(Elected|Not Elected)\s*(\*)?\s*", line)
+        if row is None:
+            raise ValueError(f"unreadable candidate line {line!r}")
+        candidates.append({"printed": row.group(1), "votes": int(row.group(2)), "elected": row.group(3) == "Elected"})
+        if row.group(4):
+            tied.append(row.group(1))
+    return {
+        "council": display(head.group(1)).replace(" And ", " and "),
+        "day": when(day.group(1)),
+        "places": sum(1 for candidate in candidates if candidate["elected"]),
+        "candidates": candidates,
+        "electorate": None,
+        "ballots": int(received.group(1).replace(",", "")),
+        "rejected": int(rejected.group(1)),
+        "valid": None,
+        "tied": tied,
+    }
+
+
+def lothian_list(text: str) -> list[dict]:
+    day = re.search(r"duly elected from (\d+ \w+ \d{4})", text)
+    if day is None:
+        raise ValueError("unreadable list")
+    reads: list[dict] = []
+    lines: list[str] = []
+    for line in [line.strip() for line in text[day.end() :].splitlines()[1:] if line.strip()]:
+        stated = re.fullmatch(r"\((\d+) places? – (\d+) vacanc(?:y|ies)\)", line)
+        if stated is None:
+            lines.append(line)
+            continue
+        council = lines.pop()
+        if council == "Community Council":
+            council = f"{lines.pop()} {council}"
+        if glued := re.fullmatch(r"(.*[a-z])([A-Z].* Community Council)", council):
+            lines.append(glued.group(1))
+            council = glued.group(2)
+        if reads:
+            reads[-1]["members"] = lines
+        elif lines:
+            raise ValueError(f"names before the first council {lines}")
+        lines = []
+        reads.append(
+            {
+                "council": council,
+                "day": when(day.group(1)),
+                "places": int(stated.group(1)),
+                "left": int(stated.group(2)),
+                "members": [],
+            }
+        )
+    if not reads:
+        raise ValueError("unreadable list")
+    reads[-1]["members"] = lines
+    for read in reads:
+        if read["places"] - len(read["members"]) != read.pop("left"):
+            raise ValueError(
+                f"{read['council']}: places and vacancies do not agree with {len(read['members'])} members"
+            )
+    return reads
+
+
+def lothian_results(text: str) -> dict:
+    head = re.search(r"ELECTIONS - (\d+ \w+ \d{4})\s+RESULTS OF THE ELECTION FOR (.+?) COMMUNITY COUNCIL", text)
+    body = re.search(r"\n\s*Elected\s*\n(.*?)\n\s*Not Elected\s*\n(.*?)\n\s*\d+ \w+ \d{4}", text, re.DOTALL)
+    if not (head and body):
+        raise ValueError("unreadable results")
+    candidates = [
+        {"printed": line.strip(), "name": surname_first(line.strip()), "votes": None, "elected": elected}
+        for elected, block in ((True, body.group(1)), (False, body.group(2)))
+        for line in block.splitlines()
+        if line.strip()
+    ]
+    return {
+        "council": display(head.group(2)),
+        "day": when(head.group(1)),
+        "places": sum(1 for candidate in candidates if candidate["elected"]),
+        "candidates": candidates,
+        "unvoted": True,
+    }
+
+
+def angus_notice(text: str) -> list[dict]:
+    day = re.search(r"Returning Officer \(Community Council Elections\)\s+(\d+ \w+ \d{4})", text)
+    if day is None:
+        raise ValueError("unreadable notice")
+    reads: list[dict] = []
+    columns: list[int] = []
+    for line in text.splitlines():
+        if "Community Council Area" in line and "surname" in line:
+            columns = [line.index(label) for label in ("Number", "Candidate’s surname", "Other names", "Candidate’s")]
+            columns[3] = line.index("Candidate’s", columns[1] + 1)
+            continue
+        if not columns or not line.strip() or "Printed and published" in line:
+            continue
+        if re.match(r"\s*\d\.", line):
+            columns = []
+            continue
+        cells = [(found.start(), found.group(0)) for found in re.finditer(r"\S+(?: \S+)*", line)]
+        sorted_cells: list[list[str]] = [[], [], [], [], []]
+        for start, cell in cells:
+            sorted_cells[min(range(5), key=lambda i: abs(start - ([0, *columns])[i]))].append(cell)
+        area, places, surname, forenames, _ = (" ".join(cell) for cell in sorted_cells)
+        if not surname and not forenames:
+            continue
+        if area:
+            if not places.isdigit():
+                raise ValueError(f"unreadable area line {line!r}")
+            reads.append({"council": area, "day": when(day.group(1)), "places": int(places), "members": []})
+        if not (surname and forenames and reads):
+            raise ValueError(f"unreadable candidate line {line!r}")
+        reads[-1]["members"].append({"printed": f"{surname}, {forenames}", "name": f"{forenames} {surname}"})
+    return reads
+
+
 def notice(text: str) -> dict:
     if "PERTH AND KINROSS COUNCIL" in text:
         return perth_notice(text)
@@ -468,6 +699,75 @@ def notice(text: str) -> dict:
     return {"council": head.group(1), "day": when(day.group(1)), "places": places, "members": names}
 
 
+def counted(url: str, read: dict) -> list[tuple[dict, list[dict]]]:
+    elected = sum(candidate["elected"] for candidate in read["candidates"])
+    if elected != min(read["places"], len(read["candidates"])):
+        raise ValueError(f"{url}: {elected} elected to {read['places']} places")
+    if read.get("valid") is not None and read["ballots"] != read["valid"] + read["rejected"]:
+        raise ValueError(f"{url}: ballots do not add up")
+    if not read.get("unvoted"):
+        ranked = sorted(read["candidates"], key=lambda candidate: -candidate["votes"])
+        if {c["printed"] for c in ranked[:elected]} != {c["printed"] for c in ranked if c["elected"]}:
+            raise ValueError(f"{url}: the elected candidates are not the top polling ones")
+    return [(read, read["candidates"])]
+
+
+def tacit(reads: list[dict]) -> list[tuple[dict, list[dict]]]:
+    return [
+        (
+            read,
+            [
+                {"votes": None, "elected": True, **(member if isinstance(member, dict) else {"printed": member})}
+                for member in read["members"]
+            ],
+        )
+        for read in reads
+    ]
+
+
+def transcribed(url: str) -> list[dict]:
+    frame = pl.read_csv(TRANSCRIBED, separator="\t", infer_schema=False).filter(pl.col("url") == url)
+    if frame.is_empty():
+        raise ValueError("no transcription")
+    return [
+        {
+            "council": row["council"],
+            "day": date.fromisoformat(row["day"]),
+            "places": int(row["places"]) if row["places"] else None,
+            "members": row["members"].split("; "),
+        }
+        for row in frame.iter_rows(named=True)
+    ]
+
+
+def reads_of(url: str, lad: str, kind: str) -> list[tuple[dict, list[dict]]]:
+    if kind == "transcribed":
+        return tacit(transcribed(url))
+    text = text_of(url)
+    if lad == "S12000035":
+        if kind == "page":
+            return counted(url, argyll_declaration(text))
+        return tacit(
+            [
+                {**read, "members": [{"printed": m, "name": surname_first(m)} for m in read["members"]]}
+                for read in argyll_notices(text)
+            ]
+        )
+    if lad == "S12000005":
+        return counted(url, clacks_declaration(text)) if kind == "declaration" else tacit([clacks_notice(text)])
+    if lad == "S12000010":
+        if kind == "declaration":
+            return counted(url, lothian_results(text))
+        return tacit(lothian_list(text_of(url, "-raw")))
+    if lad == "S12000041":
+        return tacit(angus_notice(text))
+    if kind == "declaration":
+        return counted(url, declaration(text))
+    if kind == "list":
+        return tacit(stirling_list(text) if lad == "S12000030" else shetland_list(text))
+    return tacit([notice(text)])
+
+
 def parse() -> None:
     rows = []
     for url, lad, kind in pl.read_csv(SOURCES, separator="\t").rows():
@@ -476,30 +776,13 @@ def parse() -> None:
         if not _cached(url):
             print(f"not fetched: {url}", file=sys.stderr)
             continue
-        text = text_of(url)
-        if kind == "declaration":
-            read = declaration(text)
-            elected = sum(candidate["elected"] for candidate in read["candidates"])
-            if elected != min(read["places"], len(read["candidates"])):
-                raise ValueError(f"{url}: {elected} elected to {read['places']} places")
-            if read["ballots"] != read["valid"] + read["rejected"]:
-                raise ValueError(f"{url}: ballots do not add up")
-            ranked = sorted(read["candidates"], key=lambda candidate: -candidate["votes"])
-            if {c["printed"] for c in ranked[:elected]} != {c["printed"] for c in ranked if c["elected"]}:
-                raise ValueError(f"{url}: the elected candidates are not the top polling ones")
-            reads = [(read, read["candidates"])]
-        elif kind == "list":
-            reads = [
-                (read, [{"printed": name, "votes": None, "elected": True} for name in read["members"]])
-                for read in (stirling_list(text) if lad == "S12000030" else shetland_list(text))
-            ]
-        else:
-            try:
-                read = notice(text)
-            except ValueError as error:
-                print(f"unreadable notice: {url}: {error}", file=sys.stderr)
-                continue
-            reads = [(read, [{"printed": name, "votes": None, "elected": True} for name in read["members"]])]
+        try:
+            reads = reads_of(url, lad, kind)
+        except ValueError as error:
+            if kind != "notice" or lad != HIGHLAND:
+                raise ValueError(f"{url}: {error}") from error
+            print(f"unreadable notice: {url}: {error}", file=sys.stderr)
+            continue
         for read, candidates in reads:
             council = council_name(lad, read["council"])
             for candidate in candidates:
@@ -513,13 +796,15 @@ def parse() -> None:
                         "places": read["places"],
                         "by": read.get("by", False),
                         "printed": candidate["printed"],
-                        "name": proper(str(candidate["printed"])),
+                        "name": candidate.get("name") or proper(str(candidate["printed"])),
                         "votes": candidate["votes"],
                         "elected": candidate["elected"],
                         "electorate": read.get("electorate"),
                         "ballots": read.get("ballots"),
                         "rejected": read.get("rejected"),
                         "valid": read.get("valid"),
+                        "unvoted": read.get("unvoted", False),
+                        "tied": candidate["printed"] in read.get("tied", ()),
                     }
                 )
     frame = pl.DataFrame(rows)
@@ -548,8 +833,10 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary="Community council elections under council schemes of establishment: Highland 2015 to 2026 "
-            "(postal ballots from the returning officer's declarations of result), and Perth and Kinross, "
-            "Stirling, and Shetland councils formed unopposed from the councils' notices and lists, as tacit sets",
+            "(postal ballots from the returning officer's declarations of result), Argyll and Bute's Cove and "
+            "Kilcreggan and Clackmannanshire's Dollar polls, East Lothian's Dunbar result, and councils formed "
+            "unopposed in Perth and Kinross, Stirling, Shetland, Argyll and Bute, Clackmannanshire, East Lothian, "
+            "Moray, and Angus from the councils' notices and lists, as tacit sets",
             polity="GB",
         )
 
@@ -598,7 +885,7 @@ def emit() -> Path:
             assert isinstance(day, date)
             first = lines.row(0, named=True)
             lad, url, places = first["lad"], first["url"], first["places"]
-            tacit = first["votes"] is None
+            tacit = first["votes"] is None and not first["unvoted"]
             polity = cs.key("gb.polity", key)
             body = cs.key("gb.body", key)
             area = cs.area(SCHEME, key)
@@ -659,8 +946,17 @@ def emit() -> Path:
                 status="active",
                 source_id=sources[url],
                 is_default=True,
-                completeness=1,
+                completeness=0 if first["unvoted"] else 1,
             )
+            if first["unvoted"]:
+                cs.add("note", entity_id=result_set, kind="caveat", body_md=UNVOTED)
+            if tied := lines.filter(pl.col("tied"))["name"].to_list():
+                cs.add(
+                    "note",
+                    entity_id=result_set,
+                    kind="context",
+                    body_md=f"{' and '.join(tied)} tied on {lines.filter(pl.col('tied'))['votes'][0]} votes; the declaration records that the tie was settled by cutting a pack of cards.",
+                )
             if tacit and places is None:
                 cs.add("note", entity_id=result_set, kind="caveat", body_md=UNSTATED)
             elif tacit and lines.height < places:
@@ -715,7 +1011,7 @@ def emit() -> Path:
                     )
                 if line["elected"]:
                     cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected")
-            if tacit:
+            if tacit or first["unvoted"]:
                 continue
             for measure, field in (
                 (REGISTERED, "electorate"),
@@ -723,6 +1019,8 @@ def emit() -> Path:
                 (VALID, "valid"),
                 (INVALID, "rejected"),
             ):
+                if first[field] is None:
+                    continue
                 cs.add(
                     "result_value",
                     result_set_id=result_set,
