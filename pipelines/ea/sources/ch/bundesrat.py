@@ -1,3 +1,4 @@
+import json
 import re
 import subprocess
 import unicodedata
@@ -238,6 +239,23 @@ PAGES = {
     date(2025, 3, 12): BASE + "ratsbetrieb/wahlen/ersatzwahl-br-amherd",
 }
 HTML_TITLE = "Bundesratswahlen: Wahlen im Rückblick"
+BULLETIN = "https://ws.parlament.ch/odata.svc/Transcript"
+BULLETIN_TITLE = "Amtliches Bulletin: Vereinigte Bundesversammlung"
+BULLETIN_DAYS = {
+    date(2018, 12, 5): {"Amherd Viola": "LEUTHARD", "Keller-Sutter Karin": "SCHNEIDER-AMMANN"},
+    date(2022, 12, 7): {"Rösti Albert": "MAURER", "Baume-Schneider Elisabeth": "SOMMARUGA"},
+}
+RESULT = "Ergebnis der Wahl - Résultat du scrutin"
+BULLETIN_COUNTS = {
+    "present": r"Ausgeteilte Wahlzettel - Bulletins délivrés",
+    "cast": r"eingelangt - rentrés",
+    "blank": r"leer - blancs",
+    "invalid": r"ungültig - nuls",
+    "valid": r"gültig - valables",
+    "required": r"absolutes Mehr - Majorité absolue",
+}
+ELECTED = re.compile(r"Es wird gewählt - Est élue?\s*(\S.*?) \.\.\. mit (\d+) Stimmen")
+LISTED = re.compile(r"(\S.*?) \.\.\. (\d+)")
 COUNTS = {
     "Ausgeteilte Wahlzettel": "present",
     "Eingegangene Wahlzettel": "cast",
@@ -259,9 +277,18 @@ NAMES_HEAD = re.compile(r"^\|?\s*(Stimmen haben erhalten|Ont obtenu des voix)")
 WON = re.compile(r"^(Gewählt ist|Est élue?)\s*:?\s*\|?\s*(.*?)\s*\|?$")
 
 
+def bulletin_url(day: date) -> str:
+    return (
+        f"{BULLETIN}?$filter=MeetingDate eq '{day:%Y%m%d}' and Language eq 'DE' and MeetingCouncilAbbreviation eq 'V'"
+        "&$select=ID,SortOrder,Text&$orderby=SortOrder&$top=400&$format=json"
+    )
+
+
 def fetch_pages() -> None:
     for url in PAGES.values():
         raw.fetch(SOURCE, url, suffix=".html")
+    for day_ in BULLETIN_DAYS:
+        raw.fetch(SOURCE, bulletin_url(day_), suffix=".json")
 
 
 def flatten(html: str) -> list[str]:
@@ -379,6 +406,56 @@ def parse_pages() -> list[dict[str, Any]]:
     return out
 
 
+def read_bulletin(day_: date) -> list[dict[str, Any]]:
+    entries = json.loads(raw.cached(SOURCE, bulletin_url(day_)).path.read_text())["d"]
+    entries = entries["results"] if isinstance(entries, dict) else entries
+    body = " ".join(re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", entry["Text"])) for entry in entries)
+    body = re.sub(r"\[PAGE \d+\]|\[GZ\]|\[NB\]", " ", body)
+    body = re.sub(r"\s+", " ", body)
+    seats: list[dict[str, Any]] = []
+    rounds: list[dict[str, Any]] = []
+    for chunk in body.split(RESULT)[1:]:
+        col: dict[str, Any] = {"names": [], "more": None}
+        for key, label in BULLETIN_COUNTS.items():
+            found = re.search(label + r" \.\.\. (\d+)", chunk)
+            if found:
+                col[key] = int(found[1])
+        elected = ELECTED.search(chunk)
+        if elected:
+            col["winner"] = int(elected[2])
+        heading = re.search(
+            r"Ferner haben Stimmen erhalten-Ont en outre obtenu des voix|Stimmen haben erhalten - Ont obtenu des voix",
+            chunk,
+        )
+        if heading:
+            region = chunk[heading.end() :].split("[VS]")[0]
+            for label, votes in LISTED.findall(region):
+                if label in OTHERS:
+                    col["more"] = int(votes)
+                else:
+                    col["names"].append((label.strip(), int(votes)))
+        rounds.append(col)
+        if elected:
+            winner = re.sub(r"\s+", " ", elected[1]).strip()
+            if winner in BULLETIN_DAYS[day_]:
+                surname, given = winner.split(" ", 1)
+                seats.append(
+                    {
+                        "day": day_,
+                        "date": f"{day_:%d.%m.%Y}",
+                        "winner": winner,
+                        "surname": winner,
+                        "full": f"{given} {surname}",
+                        "replaced": BULLETIN_DAYS[day_][winner],
+                        "rounds": rounds,
+                    }
+                )
+            rounds = []
+    if [seat["winner"] for seat in seats] != list(BULLETIN_DAYS[day_]):
+        raise ValueError(f"{day_}: expected {list(BULLETIN_DAYS[day_])}, found {[seat['winner'] for seat in seats]}")
+    return seats
+
+
 def caveat(rounds: list[dict[str, Any]], index: int) -> str | None:
     col = rounds[index]
     counted = col.get("winner", 0) + sum(v for _, v in col["names"]) + (col.get("more") or 0)
@@ -406,7 +483,10 @@ def emit() -> Path:
     for seat in page_seats:
         seat["source"] = PAGES[seat["day"]]
         seat["full"] = seat["winner"]
-    seats = sorted([*pdf_seats, *page_seats], key=lambda seat: seat["day"])
+    bulletin_seats = [seat for day_ in BULLETIN_DAYS for seat in read_bulletin(day_)]
+    for seat in bulletin_seats:
+        seat["source"] = bulletin_url(seat["day"])
+    seats = sorted([*pdf_seats, *page_seats, *bulletin_seats], key=lambda seat: seat["day"])
     with connect() as conn:
         cs = Changeset(
             conn,
@@ -424,6 +504,7 @@ def emit() -> Path:
         for title, url, urls in (
             (PDF_TITLE, PDF, [PDF]),
             (HTML_TITLE, ARCHIVE, list(PAGES.values())),
+            (BULLETIN_TITLE, BULLETIN, [bulletin_url(day_) for day_ in BULLETIN_DAYS]),
         ):
             source = cs.source(PUBLISHER, title)
             cs.add(
@@ -513,7 +594,7 @@ def emit() -> Path:
             election, path = elections[day_]
             number_ = seat_numbers[day_] = seat_numbers.get(day_, 0) + 1
             winner_id = person(seat["full"])
-            prefix = fold(seat["surname"] if seat["source"] == PDF else seat["full"])
+            prefix = fold(seat["surname"] if "surname" in seat else seat["full"])
             rounds = seat["rounds"]
             previous = None
             for index, col in enumerate(rounds, 1):
