@@ -299,6 +299,8 @@ function split(race: LiveRace, at: string | null) {
 
 const HOLDS: Record<string, number> = { ga: 0.002 };
 
+const NIGHTS: Record<string, number> = { ga: 0.0075 };
+
 const TAILS: Record<string, number> = {
   ak: 0.4,
   az: 0.3,
@@ -1390,7 +1392,9 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
         planned,
         (MODEL.late.carry * recent * closed + MODEL.late.base) * settles,
       )
-    : planned;
+    : isLate
+      ? planned
+      : Math.min(planned, NIGHTS[race.state] ?? planned);
   const fitted = whole.map((unit) => {
     const target = reports.get(unit.id);
     return target == null || !unit.hasBaseline
