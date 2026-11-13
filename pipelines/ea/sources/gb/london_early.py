@@ -76,6 +76,17 @@ METHODOLOGY = (
     "counts them in. Candidate names are printed as surname and forenames or initials."
 )
 NOTES = {
+    1964: "The report's results pages omit West Hill ward, Wandsworth, which elected three councillors from 12,015 "
+    "electors, so its contest is not recorded. The results pages label the three councillors elected for Upton ward, "
+    "Newham, as Liberals, while the state of the parties counts no Liberals in Newham and ten Independents; in "
+    "Croydon they give the Conservatives 24 councillors where the state of the parties prints 21, and the R and "
+    "Con/R candidates 15 where it prints 18 Independents; in Merton, 24 Conservatives and 4 R against 25 and 3; and "
+    "in Hammersmith, 6 Conservatives and 54 Labour against 7 and 53. The labels are stored as the results pages "
+    "give them. In 17 wards the candidates' votes exceed what the scanned table's number voting allows, and in "
+    "Chislehurst, Bromley, and Beddington South, Sutton, a party's candidates are not listed in vote order; the "
+    "votes are stored as printed. Newham's ward electorates add up to 179,960, 90 more than its printed total of "
+    "179,870. Mrs P. J. L. Holroyde, a Liberal candidate in Hampton ward, Richmond upon Thames, is footnoted as "
+    "convicted of shoplifting during the campaign and as having said she would resign if elected.",
     1968: "Thirty seats were filled unopposed and are stored without votes. The report prints the votes of Clissold "
     "and Defoe wards, Hackney, as corrected after an examination ordered by the County Court found a uniform error "
     "of 500 votes for every candidate polling over 500, which did not change the result; its summary by wards gives "
@@ -118,10 +129,111 @@ NOTES = {
     "and Peter W. Shonk tied on 1,072 votes for the second seat and Boyd was elected by lot. The Wallington North "
     "poll was deferred to 19 June 1986.",
 }
+METHODOLOGY_1964 = (
+    "Read from the London County Council's report as the London Datastore publishes it: its scanned tables give "
+    "each ward's councillors to be elected, electors, and number voting, and its results pages, a later typed "
+    "transcription, give each ward's candidates in vote order with party, votes, and the elected in bold. Each "
+    "borough's ward electorates add up to its printed total, each ward's elected candidates number its councillors "
+    "to be elected, and each borough's elected councillors by party match the report's table of the state of the "
+    "parties in the new councils except where the note says otherwise. The report prints no table of candidates and "
+    "votes by party and no key to its party codes; it counts the R (Ratepayers and Residents Associations) and Con/R "
+    "candidates it elected among Independents. Candidate names are printed as initials or forenames before the "
+    "surname."
+)
 POSTPONED = (
     "The poll in this ward was countermanded after the death of a candidate and held later, as the report notes."
 )
 BOOKS: dict[int, dict] = {
+    1964: {
+        "day": date(1964, 5, 7),
+        "publisher": "London County Council",
+        "methodology": METHODOLOGY_1964,
+        "url": f"{DOWNLOAD}/6139a24b-b165-4790-8ae5-7896f9b8e08f/LBCE_1964-5-7.pdf",
+        "candidates": (13, 62),
+        "wards": (3, 9),
+        "seats": True,
+        "forenames": True,
+        "titled": True,
+        "figures": {(5, "10059"): "10,059", (6, "15.728"): "15,728"},
+        "electorate_residual": {"Newham": -90},
+        "absent": {("Wandsworth", "West Hill")},
+        "names": {
+            "pymmes": "Pymmes",
+            "Arkley East.": "Arkley East",
+            "Winch more Hill": "Winchmore Hill",
+            "Col ham-Cowley": "Colham-Cowley",
+            "HounslowWest": "Hounslow West",
+            "Clerkenwell.": "Clerkenwell",
+            "Red cliffe": "Redcliffe",
+            "Blackheath and Lewisham": "Blackheath and Lewisham Village",
+            "Little IIford": "Little Ilford",
+            "IIford": "Ilford",
+            "High Street.": "High Street",
+            "Coning ham": "Coningham",
+            "Starch Green I": "Starch Green",
+        },
+        "columns": ["Con", "Lab", "Lib", "Ind", "Comm"],
+        "merged": {"R": "Ind", "Con/R": "Ind"},
+        "offsets": {
+            "Croydon": {"Con": -3, "Ind": 3},
+            "Hammersmith": {"Con": 1, "Lab": -1},
+            "Merton": {"Con": 1, "Ind": -1},
+            "Newham": {"Lib": -3, "Ind": 3},
+        },
+        "state": {
+            "Barking": {"Lab": 45, "Ind": 4, "Total": 49},
+            "Barnet": {"Con": 37, "Lab": 13, "Lib": 6, "Total": 56},
+            "Bexley": {"Con": 17, "Lab": 39, "Total": 56},
+            "Brent": {"Con": 26, "Lab": 34, "Total": 60},
+            "Bromley": {"Con": 38, "Lab": 15, "Lib": 7, "Total": 60},
+            "Camden": {"Con": 26, "Lab": 34, "Total": 60},
+            "Croydon": {"Con": 21, "Lab": 21, "Ind": 18, "Total": 60},
+            "Ealing": {"Con": 26, "Lab": 34, "Total": 60},
+            "Enfield": {"Con": 29, "Lab": 31, "Total": 60},
+            "Greenwich": {"Con": 11, "Lab": 49, "Total": 60},
+            "Hackney": {"Lab": 60, "Total": 60},
+            "Hammersmith": {"Con": 7, "Lab": 53, "Total": 60},
+            "Haringey": {"Con": 19, "Lab": 41, "Total": 60},
+            "Harrow": {"Con": 36, "Lab": 20, "Total": 56},
+            "Havering": {"Con": 16, "Lab": 27, "Ind": 12, "Total": 55},
+            "Hillingdon": {"Con": 24, "Lab": 36, "Total": 60},
+            "Hounslow": {"Con": 12, "Lab": 48, "Total": 60},
+            "Islington": {"Lab": 60, "Total": 60},
+            "Kensington and Chelsea": {"Con": 46, "Lab": 14, "Total": 60},
+            "Kingston upon Thames": {"Con": 40, "Lab": 20, "Total": 60},
+            "Lambeth": {"Con": 18, "Lab": 42, "Total": 60},
+            "Lewisham": {"Con": 15, "Lab": 45, "Total": 60},
+            "Merton": {"Con": 25, "Lab": 26, "Ind": 3, "Total": 54},
+            "Newham": {"Lab": 50, "Ind": 10, "Total": 60},
+            "Redbridge": {"Con": 45, "Lab": 15, "Total": 60},
+            "Richmond upon Thames": {"Con": 41, "Lab": 12, "Ind": 1, "Total": 54},
+            "Southwark": {"Con": 6, "Lab": 54, "Total": 60},
+            "Sutton": {"Con": 30, "Lab": 17, "Ind": 4, "Total": 51},
+            "Tower Hamlets": {"Lab": 55, "Ind": 2, "Comm": 3, "Total": 60},
+            "Waltham Forest": {"Con": 3, "Lab": 36, "Ind": 9, "Total": 48},
+            "Wandsworth": {"Con": 13, "Lab": 47, "Total": 60},
+            "Westminster": {"Con": 41, "Lab": 19, "Total": 60},
+        },
+        "parties": {
+            "Lab": ("Labour", None, None),
+            "Con": ("Conservative", None, None),
+            "Lib": ("Liberal", None, None),
+            "Comm": ("Communist", None, None),
+            "R": ("Ratepayers and Residents Associations", None, None),
+            "New Lib": ("New Liberal", None, None),
+            "Con/R": ("Conservative and Ratepayers", None, None),
+            "BNP": ("British National Party (1960)", None, None),
+            "UM": ("Union Movement", None, None),
+            "Ind Lab": ("Independent Labour", None, None),
+            "Ind Con": ("Independent Conservative", None, None),
+            "Ind Lib": ("Independent Liberal", None, None),
+            "Ind Comm": ("Independent Communist", None, None),
+            "Rad Lib": ("Radical Liberal", None, None),
+            "ILP": ("Independent Labour Party", None, None),
+            "Ind P/Lab": ("Ind P/Lab", None, None),
+            "Ind": ("Independent", None, None),
+        },
+    },
     1968: {
         "day": date(1968, 5, 9),
         "url": f"{DOWNLOAD}/05a66a06-d5a5-4b50-9318-1087d2e32d67/LBCE_1968-5-9.pdf",
@@ -1224,6 +1336,7 @@ BOROUGHS = {
     "Westminster, City of": "E09000033",
 }
 CODES = {
+    "Com": "Comm",
     "ResT": "Res T",
     "N.F": "NF",
     "VCL": "YCL",
@@ -1826,6 +1939,40 @@ def closed(page: list[Word]) -> list[Word]:
     return out
 
 
+def table1(year: int, sizes: list[tuple[float, float]], book: list[list[Word]]) -> dict[str, list[tuple]]:
+    first, last = BOOKS[year]["wards"]
+    order = BOOKS[year]["state"]
+    found: dict[str, list[tuple]] = {name: [] for name in order}
+    count = 0
+    for number in range(first, last + 1):
+        half = sizes[number - 1][0] / 2
+        page = book[number - 1]
+        for column in ([w for w in page if w[0] < half], [w for w in page if w[0] >= half]):
+            rows = [[w for w in row if re.search(r"[A-Za-z0-9]", w[4])] for row in lb.lines(column)]
+            rows = [row for row in rows if row]
+            starts = sorted(row[0][0] for row in rows if re.search(r"\d{1,3},\d{3}", " ".join(w[4] for w in row)))
+            indent = starts[len(starts) // 2] if starts else 0
+            pending = ""
+            for words in rows:
+                text = " ".join(w[4] for w in words)
+                at = next((i for i, w in enumerate(words) if re.fullmatch(r"\d{1,3},\d{3}", w[4])), None)
+                if at is None or at == 0 or not re.fullmatch(r"\d{1,2}", words[at - 1][4]):
+                    if abs(words[0][0] - indent) < 4 and not re.search(r"\d", text) and not borough_of(text):
+                        pending = f"{pending} {text}".strip()
+                    else:
+                        pending = ""
+                    continue
+                name = f"{pending} {' '.join(w[4] for w in words[: at - 1])}"
+                name = re.sub(r"\((Royal Borough|City of)\)|-continued", "", name).strip()
+                pending = ""
+                electorate = words[at]
+                seats = int(words[at - 1][4])
+                figure = int(electorate[4].replace(",", ""))
+                found[list(order)[count]].append((name or "Total", figure, number, list(electorate[:4]), {}, seats))
+                count += not name
+    return found
+
+
 def match(heads: list[str], listed: list[str]) -> list[int]:
     pairs = sorted(
         (
@@ -1865,7 +2012,7 @@ def parse() -> None:
         heads = viewed(year, sizes, book) if year in READS else table2(year, sizes, book)
         if "ocr" in spec and year not in READS:
             reread(year, heads)
-        stats = table3(year, book)
+        stats = table1(year, sizes, book) if spec.get("seats") else table3(year, book)
         for (borough, printed_), (renamed, extra, electorate, seats, share) in spec.get("inserted", {}).items():
             rows = stats[borough]
             index = next(i for i, r in enumerate(rows) if r[0] == printed_)
@@ -1873,6 +2020,8 @@ def parse() -> None:
             box = [upper[0], (upper[1] + lower[1]) / 2, upper[2], (upper[3] + lower[3]) / 2]
             rows[index] = (renamed, *rows[index][1:])
             rows.insert(index + 1, (extra, electorate, rows[index][2], box, share, seats))
+        absent = spec.get("absent", set())
+        gone: dict[str, int] = {}
         sizes_: dict[str, int | None] = {}
         bad = []
         for borough, rows in stats.items():
@@ -1882,7 +2031,11 @@ def parse() -> None:
             if len(total) != 1 or sum(r[1] for r in listed) + residual != total[0][1]:
                 bad.append(f"{year} {borough}: electorate {sum(r[1] for r in listed)} against total {total[:1]}")
                 continue
-            stats[borough] = listed
+            if total[0][5] is not None and spec.get("seats") and sum(r[5] for r in listed) != total[0][5]:
+                bad.append(f"{year} {borough}: {sum(r[5] for r in listed)} seats against total {total[:1]}")
+                continue
+            stats[borough] = [r for r in listed if (borough, r[0]) not in absent]
+            gone[borough] = sum(r[5] for r in listed if (borough, r[0]) in absent)
             sizes_[borough] = total[0][5]
         if bad:
             raise ValueError("\n".join(bad))
@@ -1926,7 +2079,7 @@ def parse() -> None:
                         print(f"{year} {borough} {name}: elected not at the top")
                     if len(votes) > seats and votes[seats - 1] == votes[seats]:
                         print(f"{year} {borough} {name}: tie for the last seat {votes}")
-                if not tacit:
+                if not tacit and row[4]:
                     total = sum(votes)
                     mine_ = {"Con": 0, "Lab": 0, "Lib": 0, "Others": 0}
                     for line in lines_:
@@ -1977,7 +2130,9 @@ def parse() -> None:
                             "la_code": code,
                             "ward": name,
                             "number": rank + 1,
-                            "name": trailing(line["name"], "aliases" in spec)
+                            "name": forenames(line["name"])
+                            if spec.get("forenames")
+                            else trailing(line["name"], "aliases" in spec)
                             if spec.get("trailing")
                             else initials(line["name"])
                             if spec.get("initials")
@@ -1992,21 +2147,26 @@ def parse() -> None:
         problems = [
             f"{code}: {seen.get(code)} against {figures[1:]}"
             for code, figures in printed.items()
-            if tuple(seen.get(code, [0, 0])) != (figures[1], figures[2] + spec.get("residual", {}).get(code, 0))
+            if figures[1] is not None
+            and tuple(seen.get(code, [0, 0])) != (figures[1], figures[2] + spec.get("residual", {}).get(code, 0))
         ]
         problems += [f"unknown party {code}" for code in seen if code not in printed]
         for borough, won in elected.items():
-            if sizes_[borough] not in (None, sum(won.values())):
+            if sizes_[borough] not in (None, sum(won.values()) + gone.get(borough, 0)):
                 problems.append(f"{borough}: {sum(won.values())} elected, printed {sizes_[borough]} seats")
             if "state" not in spec:
                 continue
             table = spec["state"][borough]
-            if sum(won.values()) != table["Total"]:
+            if sum(won.values()) + gone.get(borough, 0) != table["Total"]:
                 problems.append(f"{borough}: {sum(won.values())} elected, printed {table['Total']}")
             for party_, column in spec["merged"].items():
                 won[column] = won.get(column, 0) + won.pop(party_, 0)
+            for column, offset in spec.get("offsets", {}).get(borough, {}).items():
+                won[column] = won.get(column, 0) + offset
             for column in spec["columns"]:
-                if won.get(column, 0) != table.get(column, 0):
+                if won.get(column, 0) > table.get(column, 0) or (
+                    not gone.get(borough) and won.get(column, 0) != table.get(column, 0)
+                ):
                     problems.append(f"{borough} {column}: {won.get(column, 0)} elected, printed {table.get(column, 0)}")
             for party_, count in won.items():
                 if count and party_ not in spec["columns"] and party_ not in spec["merged"]:
@@ -2206,6 +2366,8 @@ PEOPLE = {
     ".erooks W. F.": "Brooks, W. F.",
     "Carl ton P. A. Mrs": "Carlton, Mrs P. A.",
     "King G. ,A.": "King, G. A.",
+    "Countess of Lucan": "Lucan, Countess of",
+    "J. Grieve Smith": "Grieve Smith, J.",
 }
 TITLES = {"Mrs", "Miss", "Dr", "Sir", "Lady", "The", "Major", "Col.", "St.", "de", "la"}
 
@@ -2228,6 +2390,26 @@ def initials(text: str) -> str:
                 out.append(f"{char}.")
     text = f"{surname}, {' '.join(out)}" if out else surname
     return PEOPLE.get(text, text)
+
+
+PARTICLES = {"de", "De", "der", "van", "Van", "von", "le", "Le", "la", "La", "du", "Du", "da", "St."}
+
+
+def forenames(text: str) -> str:
+    text = PEOPLE.get(text, text).rstrip("*").lstrip("_ ")
+    if "," in text:
+        return text
+    suffix = " ".join(re.findall(r"\(\w+\.?\)", text))
+    tokens = re.sub(r"\.(?=[A-Za-z])", ". ", re.sub(r"\s*\(\w+\.?\)", "", text)).split()
+    index = len(tokens) - 1
+    while index > 0 and tokens[index - 1] in PARTICLES:
+        index -= 1
+    rest = [{"Mrs.": "Mrs", "Dr.": "Dr", "Mr.": "Mr"}.get(t, t) for t in tokens[:index]]
+    if any(not re.fullmatch(r"[A-Z]\.|[A-Z][a-z]+\.?|J-P\.", t) and t not in PARTICLES for t in rest):
+        print(f"NAME {text!r}")
+    surname = " ".join(tokens[index:])
+    out = f"{surname}, {' '.join(rest)}" if rest else surname
+    return f"{out}, {suffix}" if suffix else out
 
 
 HONORIFICS = {
@@ -2297,6 +2479,7 @@ def trailing(text: str, noisy: bool = False) -> str:
 
 
 UNRELATED = {"Senior Citizens"}
+RESOLVED = {**lb.GLC_RESOLVED, "British National Party (1960)": ("wikidata", "Q4970528")}
 
 
 def person(text: str) -> tuple[str, str]:
@@ -2361,8 +2544,8 @@ def emit() -> Path:
                 return None
             if label not in party_ids:
                 found = (
-                    cs.key(*lb.GLC_RESOLVED[label])
-                    if label in lb.GLC_RESOLVED
+                    cs.key(*RESOLVED[label])
+                    if label in RESOLVED
                     else None
                     if label in UNRELATED
                     else known.get(leh.fold(label))
