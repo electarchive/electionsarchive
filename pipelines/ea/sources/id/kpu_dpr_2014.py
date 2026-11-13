@@ -1,9 +1,12 @@
 import csv
 import io
+import itertools
 import re
 import subprocess
+from dataclasses import dataclass, field
 from datetime import date
 from pathlib import Path
+from statistics import median
 from uuid import UUID
 
 import polars as pl
@@ -15,7 +18,7 @@ from ea.sources.id.kpu_pilpres import PROVINCES
 from ea.store import DATA
 
 SOURCE = "id.kpu_dpr_2014"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 KPU = "Komisi Pemilihan Umum Republik Indonesia"
 JDIH = "https://jdih.kpu.go.id/data/data_kepkpu/"
@@ -57,10 +60,66 @@ DAPILS = 77
 DAY = date(2014, 4, 9)
 COLUMNS = (("number", 140), ("province", 230), ("dapil", 335), ("party", 365), ("label", 505), ("dct", 535))
 COLUMNS += (("name", 740), ("votes", 790), ("rank", 10_000))
+DRIVE = "https://drive.google.com/uc?export=download&id="
+GORONTALO = (
+    "https://gorontalo.kpu.go.id/public/gorontalo/dmdocument/"
+    "1631175987REKAPITULASI-HASIL-PENGHITUNGAN-PEROLEHAN-SUARA-DPR-RI-DAPIL-GORONTALO-TAHUN-2014-UPLOAD.pdf"
+)
+CERTIFICATE = "Model DC-1 DPR: Sertifikat Rekapitulasi Hasil Penghitungan Perolehan Suara di Tingkat Provinsi"
+CERTIFICATE_LICENSE = "Public record: official certificate, no license stated"
+CERTIFICATES = {
+    "SULAWESI SELATAN I": (
+        f"{DRIVE}1oYq0bmhY8MeQav5CBSR4MM1qJCsaKVvW",
+        "Komisi Pemilihan Umum Provinsi Sulawesi Selatan",
+        CERTIFICATE,
+        ("73.71", "73.06", "73.05", "73.04", "73.03", "73.01"),
+        (3, 8),
+    ),
+    "SULAWESI SELATAN II": (
+        f"{DRIVE}1KLIKW25BQBJeC6TglOzwJXwu7-cDtaE3",
+        "Komisi Pemilihan Umum Provinsi Sulawesi Selatan",
+        CERTIFICATE,
+        ("73.07", "73.08", "73.09", "73.02", "73.10", "73.11", "73.12", "73.13", "73.72"),
+        (3, 8),
+    ),
+    "SULAWESI SELATAN III": (
+        f"{DRIVE}1WX8wiZN7twukjOSp3_wG5KAapguMreRO",
+        "Komisi Pemilihan Umum Provinsi Sulawesi Selatan",
+        CERTIFICATE,
+        ("73.14", "73.16", "73.17", "73.22", "73.24", "73.18", "73.26", "73.15", "73.73"),
+        (3, 8),
+    ),
+    "GORONTALO": (
+        GORONTALO,
+        "Komisi Pemilihan Umum Provinsi Gorontalo",
+        CERTIFICATE,
+        ("75.71", "75.03", "75.01", "75.05", "75.02", "75.04"),
+        (3, 8),
+    ),
+    "DI YOGYAKARTA": (
+        f"{DRIVE}16BwThFUdoLXwtgjWnW8rhKn8ZptjrdVW",
+        "Komisi Pemilihan Umum Daerah Istimewa Yogyakarta",
+        "Data Hasil Pemilu Tahun 2014",
+        ("34.71", "34.02", "34.01", "34.04", "34.03"),
+        (73, 76),
+    ),
+}
+CORRECTIONS = {("DI YOGYAKARTA", 3, 7, "34.04"): (684, 1684)}
+EDGE = 230
+FIGURE = re.compile(r"\d{1,3}(?:[.,]\d{3})+|\d+|-")
+RUNNING = {"DataHasilPemilu2014", "DaerahIstimewaYogyakarta"}
+BANNER = re.compile(
+    r"Halaman|MODEL DC|PROVINSI|DAERAH PEMILIHAN|NAMA/TANDA|RINCIAN|^\(|KAB\.|JUMLAH AKHIR|DAN SUARA CALON|^NO\.|"
+    r"Perolehan Suara|^Calon$|Kota Yk|Kulon|Gunung|Bantul Sleman|^Bantul|^Progo|^Kidul"
+)
+SUMMARY = (("Sah Seluruh", "valid"), ("Sah dan Tidak", "ballots"), ("Tidak Sah", "invalid"))
+CODES = {"votes": 1, "registered": 2, "ballots": 3, "valid": 4, "invalid": 5, "voters": 14}
 
 
 def fetch() -> None:
     for url, _ in DECREES.values():
+        raw.fetch(SOURCE, url, suffix=".pdf")
+    for url, *_ in CERTIFICATES.values():
         raw.fetch(SOURCE, url, suffix=".pdf")
 
 
@@ -153,6 +212,245 @@ def _elected() -> pl.DataFrame:
     return elected.drop("row")
 
 
+@dataclass
+class Word:
+    page: int
+    box: tuple[float, float, float, float]
+    text: str
+
+
+@dataclass
+class Line:
+    page: int
+    middle: float
+    label: list[Word] = field(default_factory=list)
+    values: list[Word] = field(default_factory=list)
+
+    @property
+    def text(self) -> str:
+        return " ".join(word.text for word in self.label)
+
+
+def _figure(text: str) -> int:
+    return 0 if text == "-" else int(text.replace(".", "").replace(",", ""))
+
+
+def _running(words: list[Word]) -> set[int]:
+    dropped: set[int] = set()
+    for start in range(len(words)):
+        joined = ""
+        for end in range(start, len(words)):
+            joined += words[end].text
+            if joined in RUNNING:
+                dropped.update(range(start, end + 1))
+            if len(joined) >= max(len(text) for text in RUNNING):
+                break
+    return dropped
+
+
+def _lines(path: Path, first: int, last: int) -> list[Line]:
+    out = subprocess.run(
+        ["pdftotext", "-f", str(first), "-l", str(last), "-tsv", str(path), "-"],
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout
+    words: list[Word] = []
+    for row in csv.DictReader(io.StringIO(out), delimiter="\t", quoting=csv.QUOTE_NONE):
+        if row["level"] == "5" and row["text"].strip():
+            left, top, width, height = (float(row[key]) for key in ("left", "top", "width", "height"))
+            words.append(Word(int(row["page_num"]), (left, top, left + width, top + height), row["text"].strip()))
+    grouped: list[list[Word]] = []
+    for word in sorted(words, key=lambda word: (word.page, word.box[1], word.box[0])):
+        middle = (word.box[1] + word.box[3]) / 2
+        if grouped and grouped[-1][0].page == word.page:
+            previous = grouped[-1][0]
+            if abs((previous.box[1] + previous.box[3]) / 2 - middle) < 3.5:
+                grouped[-1].append(word)
+                continue
+        grouped.append([word])
+    lines: list[Line] = []
+    for group in grouped:
+        group.sort(key=lambda word: word.box[0])
+        dropped = _running(group)
+        line = Line(group[0].page, (group[0].box[1] + group[0].box[3]) / 2)
+        for index, word in enumerate(group):
+            if index in dropped or word.box[2] < 60:
+                continue
+            if word.box[0] < EDGE:
+                line.label.append(word)
+            elif FIGURE.fullmatch(word.text):
+                line.values.append(word)
+        if len(line.values) == 1:
+            line.values = []
+        if (line.label or line.values) and not BANNER.search(line.text):
+            lines.append(line)
+    return lines
+
+
+def _certificate(dapil: str, path: Path) -> tuple[list[dict[str, object]], list[str]]:
+    _, _, _, codes, (first, last) = CERTIFICATES[dapil]
+    width = len(codes) + 1
+    lines = _lines(path, 1 if first == 3 else first, last)
+    full: dict[int, list[list[float]]] = {}
+    for line in lines:
+        if len(line.values) == width and not _counting(line):
+            full.setdefault(line.page, []).append([word.box[2] for word in line.values])
+    rights = {page: [median(column) for column in zip(*rows, strict=True)] for page, rows in full.items()}
+
+    def cells(line: Line) -> dict[int, Word]:
+        right = rights[line.page]
+        placed: dict[int, Word] = {}
+        slack = min(after - before for before, after in itertools.pairwise(right)) / 2
+        for word in line.values:
+            if word.box[0] > right[-1]:
+                continue
+            column = min(range(width), key=lambda index: abs(right[index] - word.box[2]))
+            if abs(right[column] - word.box[2]) > slack or column in placed:
+                raise ValueError(f"{dapil} page {line.page}: cannot place {word.text} in {line.text!r}")
+            placed[column] = word
+        return placed
+
+    rows: list[dict[str, object]] = []
+    problems: list[str] = []
+
+    def emit(measure: str, party: int | None, number: int | None, name: str | None, line: Line) -> None:
+        placed = cells(line)
+        total = placed.get(width - 1)
+        if total is None or sum(_figure(word.text) for column, word in placed.items() if column < width - 1) != _figure(
+            total.text
+        ):
+            problems.append(
+                f"{dapil} page {line.page}: {measure} {party}/{number} {name or line.text!r} does not add up"
+            )
+        for column, code in enumerate((*codes, None)):
+            word = placed.get(column)
+            rows.append(
+                {
+                    "dapil": dapil,
+                    "unit": code,
+                    "measure": measure,
+                    "party": party,
+                    "candidate": number,
+                    "name": name,
+                    "value": 0 if word is None else _figure(word.text),
+                    "page": line.page,
+                    "box": None if word is None else list(word.box),
+                }
+            )
+
+    start = next(index for index, line in enumerate(lines) if "NOMOR/NAMA" in line.text.upper())
+    summary: list[Line] = []
+    tallies = 0
+    for line in lines[:start]:
+        if not line.values or _counting(line):
+            continue
+        if line.label and line.label[-1].text == "JML":
+            tallies += 1
+            if tallies in (5, 10):
+                emit("registered" if tallies == 5 else "voters", None, None, None, line)
+        elif measure := next((measure for phrase, measure in SUMMARY if phrase in line.text), None):
+            emit(measure, None, None, None, line)
+
+    blocks: list[list[Line]] = [[]]
+    waiting = ""
+    for line in lines[start:]:
+        text = line.text.lower()
+        if _counting(line) or "nomor/nama" in text or ("suara calon" in text and not line.values):
+            continue
+        if "jumlah" in text and not line.values:
+            waiting = text
+            continue
+        if "seluruh" in waiting and line.values and not line.label:
+            summary.append(line)
+            break
+        blocks[-1].append(line)
+        if line.values and ("jumlah" in text or (waiting and not line.label)):
+            blocks.append([])
+            waiting = ""
+    parties = iter(PARTIES)
+    for block in blocks:
+        if not any(line.values for line in block):
+            continue
+        party = next(parties)
+        anchors: list[tuple[Line, list[Word], list[Line]]] = []
+        fragments: list[Line] = []
+        for line in block[:-1]:
+            number = line.label[0].text.rstrip(".") if line.label and line.label[0].box[0] < 100 else ""
+            if line.values and not line.label and anchors and not anchors[-1][1]:
+                anchors[-1] = (anchors[-1][0], line.values, anchors[-1][2])
+            elif line.values or number.isdigit():
+                anchors.append((line, line.values, []))
+            elif line.label:
+                fragments.append(line)
+        for fragment in fragments:
+            nearest = min(
+                anchors,
+                key=lambda anchor: abs(anchor[0].middle - fragment.middle) + (anchor[0].page != fragment.page) * 10_000,
+            )
+            nearest[2].append(fragment)
+        previous = 0
+        for position, (line, values, extra) in enumerate(anchors):
+            if not values:
+                continue
+            words_ = [
+                word
+                for part in sorted([line, *extra], key=lambda part: part.middle)
+                for word in sorted(part.label, key=lambda word: word.box[0])
+            ]
+            numbers = [word for word in words_ if word.box[0] < 100 and word.text.rstrip(".").isdigit()]
+            text = " ".join(word.text for word in words_ if word not in numbers)
+            expected = previous + 1 if position else party
+            printed = int(numbers[0].text.rstrip(".")) if numbers else expected
+            if position and not text and not any(_figure(word.text) for word in values):
+                previous = printed
+                continue
+            if printed != expected and not (position and previous < printed <= 12):
+                raise ValueError(f"{dapil} page {line.page}: row {printed} {text!r} where {expected} was expected")
+            if position:
+                previous = printed
+            emit("votes", party, printed if position else None, text, Line(line.page, line.middle, line.label, values))
+        total = Line(block[-1].page, block[-1].middle, block[-1].label, block[-1].values)
+        emit("total", party, None, None, total)
+        for code in (*codes, None):
+            parts = [row for row in rows if row["party"] == party and row["unit"] == code]
+            listed = sum(int(row["value"]) for row in parts if row["measure"] == "votes")  # ty: ignore[invalid-argument-type]
+            if listed != next(int(row["value"]) for row in parts if row["measure"] == "total"):  # ty: ignore[invalid-argument-type]
+                problems.append(f"{dapil} party {party} column {code}: rows add to {listed}, not the printed total")
+    if next(parties, None) is not None:
+        raise ValueError(f"{dapil}: fewer than {len(PARTIES)} party blocks")
+    for line in summary:
+        emit("valid", None, None, None, line)
+    return rows, problems
+
+
+def _counting(line: Line) -> bool:
+    words = [*line.label, *line.values]
+    if len(words) > 2 and all(word.text.isdigit() and int(word.text) <= 20 for word in words):
+        return True
+    numbers = [_figure(word.text) for word in line.values if word.text != "-"]
+    return len(numbers) > 2 and numbers == list(range(numbers[0], numbers[0] + len(numbers)))
+
+
+def _reconcile(dapil: str, frame: pl.DataFrame, elected: pl.DataFrame) -> None:
+    def column(measure: str) -> dict[str | None, int]:
+        found = frame.filter(pl.col("measure") == measure).group_by("unit").agg(pl.col("value").sum())
+        return dict(found.rows())
+
+    valid, invalid, ballots = column("valid"), column("invalid"), column("ballots")
+    if valid != column("total"):
+        raise ValueError(f"{dapil}: party totals {column('total')} do not add to the valid votes {valid}")
+    if ballots and any(ballots[unit] != valid[unit] + invalid[unit] for unit in ballots):
+        raise ValueError(f"{dapil}: valid and invalid votes do not add to the ballots")
+    totals = frame.filter(pl.col("unit").is_null() & (pl.col("measure") == "votes") & pl.col("candidate").is_not_null())
+    for party, number, name, votes in elected.select("party", "candidate", "name", "votes").rows():
+        found = totals.filter((pl.col("party") == party) & (pl.col("candidate") == number))
+        if found.height != 1:
+            raise ValueError(f"{dapil}: elected {party}/{number} {name} is not on the certificate")
+        if found["value"][0] != votes:
+            print(f"{dapil}: {party}/{number} {name} has {found['value'][0]} on the certificate, {votes} in decree 416")
+
+
 def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
     seats = _seats()
@@ -180,6 +478,26 @@ def parse() -> None:
             raise ValueError(f"{key}: {party}/{number} is not elected in {dapil}")
     seats.write_parquet(PARSED / "seats.parquet")
     elected.write_parquet(PARSED / "elected.parquet")
+    certificates: list[dict[str, object]] = []
+    for dapil, (url, *_) in CERTIFICATES.items():
+        rows, problems = _certificate(dapil, raw.cached(SOURCE, url).path)
+        frame = pl.DataFrame(rows, infer_schema_length=None).with_columns(flags=pl.lit(0, pl.Int16))
+        for (where, party, number, code), (printed, value) in CORRECTIONS.items():
+            if where != dapil:
+                continue
+            match = (pl.col("party") == party) & (pl.col("candidate") == number) & (pl.col("unit") == code)
+            if frame.filter(match & (pl.col("measure") == "votes"))["value"].to_list() != [printed]:
+                raise ValueError(f"{dapil}: {party}/{number} in {code} no longer reads {printed}")
+            frame = frame.with_columns(
+                value=pl.when(match).then(value).otherwise(pl.col("value")),
+                flags=pl.when(match).then(1).otherwise(pl.col("flags")).cast(pl.Int16),
+            )
+            problems = [problem for problem in problems if f"{party}/{number}" not in problem and code not in problem]
+        if problems:
+            raise ValueError("\n".join(problems))
+        _reconcile(dapil, frame, elected.filter(pl.col("dapil") == dapil))
+        certificates.extend(frame.filter(pl.col("unit").is_not_null() & (pl.col("measure") != "total")).to_dicts())
+    pl.DataFrame(certificates, infer_schema_length=None).write_parquet(PARSED / "certificates.parquet")
     national = seats.group_by("party").agg(pl.col("seats").sum()).sort("party")
     print(f"{seats['dapil'].n_unique()} dapils, {elected.height} elected; seats {dict(national.rows())}")
 
@@ -199,6 +517,18 @@ METHODOLOGY = (
     "of Model E-1 DPR to KPU decree 411/2014, which the KPU legal database does not carry (its copy holds only the DPD "
     "lampiran), so this set holds the elected members' votes alone and records completeness 0. The ten parties over "
     "the threshold won 560 seats; PBB and PKPI won none."
+)
+CERTIFIED = (
+    "Votes of every party and candidate by regency and city, with the registered voters, turnout, and valid and "
+    "invalid votes, from the provincial commission's Model DC-1 DPR, the certificate of the provincial "
+    "recapitulation. Declared seats and the elected members come from KPU decree 416/2014, which follows the national "
+    "recapitulation of the same figures. A party's own votes (ballots marked for the party alone) sit on its party "
+    "line; its total is that line plus its candidates' votes."
+)
+DIY = (
+    "The figures come from the provincial commission's book Data Hasil Pemilu Tahun 2014, which transcribes the "
+    "certificate. The book prints 684 votes in Sleman for PKS candidate 7 (Achmad Baihaqi); his printed total of 4,444 "
+    "and the party's printed Sleman total of 51,298 both require 1,684, which is stored and flagged as derived."
 )
 REPLACED = (
     "KPU replaced members it first declared elected in decree 416/2014 who died, resigned, or no longer met the "
@@ -228,7 +558,8 @@ def emit() -> Path:
             version=VERSION,
             summary=(
                 "Indonesia's 2014 House of Representatives (DPR) election: declared seats in all 77 districts and the "
-                "560 elected members with their votes, as amended"
+                "560 elected members with their votes, as amended, and every party's and candidate's votes by regency in "
+                f"{len(CERTIFICATES)} districts from the provincial certificates"
             ),
             polity="ID",
         )
@@ -259,11 +590,29 @@ def emit() -> Path:
             )
             artifacts[key] = cs.artifact(raw.cached(SOURCE, url), found)
 
+        certificates = pl.read_parquet(PARSED / "certificates.parquet")
+        urls = {key: url for key, (url, _) in DECREES.items()}
+        for dapil, (url, publisher, title, *_) in CERTIFICATES.items():
+            urls[dapil] = url
+            title = f"{title}, Daerah Pemilihan {_title(dapil)}"
+            found = sources[dapil] = cs.source(publisher, title)
+            cs.add(
+                "source",
+                id=found,
+                kind="official_body",
+                publisher=publisher,
+                title=title,
+                url=url,
+                license=CERTIFICATE_LICENSE,
+                license_url=None,
+            )
+            artifacts[dapil] = cs.artifact(raw.cached(SOURCE, url), found)
+
         pages: dict[tuple[str, int], tuple[UUID, int, int]] = {}
 
         def page(key: str, number: int) -> tuple[UUID, int, int]:
             if (key, number) not in pages:
-                cached = raw.cached(SOURCE, DECREES[key][0])
+                cached = raw.cached(SOURCE, urls[key])
                 image = DATA / "pages" / SOURCE / f"{cached.sha256}-{number}.png"
                 if not image.exists():
                     image.parent.mkdir(parents=True, exist_ok=True)
@@ -345,6 +694,25 @@ def emit() -> Path:
             if count == 1 and province not in SPANNING
         }
         replaced = {(dapil, party, number) for dapil, party, number, *_ in REPLACEMENTS}
+        kabkota: dict[str, UUID] = {}
+
+        def regency(code: str) -> UUID:
+            if code not in kabkota:
+                found = kabkota[code] = cs.unit("id.kabkota", code)
+                if found in cs.minted:
+                    cs.add(
+                        "reporting_unit",
+                        id=found,
+                        polity_id=indonesia,
+                        scheme_code="id.kabkota",
+                        code=code,
+                        area_relation="equals",
+                        area_id=cs.area("id.kabkota", code, DAY),
+                        kind="standard",
+                        valid_from=None,
+                    )
+            return kabkota[code]
+
         for dapil, province in sorted(districts.rows()):
             key = f"{day}:dpr:{_slug(dapil)}"
             title = _title(dapil)
@@ -388,6 +756,7 @@ def emit() -> Path:
             if swaps:
                 cs.add("note", entity_id=contest, kind="caveat", body_md=REPLACED)
             result_set = cs.key(f"{SOURCE}.result_set", key)
+            counted = certificates.filter(pl.col("dapil") == dapil)
             cs.add(
                 "result_set",
                 id=result_set,
@@ -396,11 +765,17 @@ def emit() -> Path:
                 stage="certified",
                 kind="counted",
                 status="active",
-                source_id=sources["416"],
+                source_id=sources[dapil] if counted.height else sources["416"],
                 is_default=True,
-                completeness=0,
+                completeness=1 if counted.height else 0,
             )
-            cs.add("note", entity_id=result_set, kind="methodology", body_md=METHODOLOGY)
+            if counted.height:
+                cs.add("note", entity_id=result_set, kind="methodology", body_md=CERTIFIED)
+                cs.add("citation", entity_id=result_set, source_id=sources["416"], locator={"pages": "6-21"})
+                if dapil == "DI YOGYAKARTA":
+                    cs.add("note", entity_id=result_set, kind="caveat", body_md=DIY)
+            else:
+                cs.add("note", entity_id=result_set, kind="methodology", body_md=METHODOLOGY)
             members = elected.filter(pl.col("dapil") == dapil)
 
             def candidate(
@@ -435,7 +810,39 @@ def emit() -> Path:
                 cs.add("outcome", result_set_id=result_set, option_id=option, kind=outcome, seats=None)
                 return option, candidacy
 
-            for party in sorted(won):
+            def record(dapil: str, option: UUID | None, rows: pl.DataFrame) -> None:
+                for code, measure, value, flags, number_, box in rows.select(
+                    "unit", "measure", "value", "flags", "page", "box"
+                ).rows():
+                    fact = {
+                        "result_set_id": result_set,
+                        "unit_id": regency(code),
+                        "option_id": option,
+                        "channel": 0,
+                        "measure": CODES[measure],
+                        "count_round": 0,
+                    }
+                    cs.add("result_value", **fact, flags=flags, value=value)
+                    if box is None:
+                        cs.add("value_locator", **fact, page_id=None, source_id=sources[dapil])
+                        continue
+                    found, width, height = page(dapil, number_)
+                    x0, y0, x1, y1 = (side * 100 / 72 for side in box)
+                    cs.add(
+                        "value_locator",
+                        **fact,
+                        page_id=found,
+                        source_id=None,
+                        x0=x0 / width,
+                        y0=y0 / height,
+                        x1=x1 / width,
+                        y1=y1 / height,
+                    )
+
+            if counted.height:
+                record(dapil, None, counted.filter(pl.col("party").is_null()))
+            listing = sorted(set(counted["party"].drop_nulls())) if counted.height else sorted(won)
+            for party in listing:
                 listed = cs.key("id.option", f"{key}:{party}")
                 cs.add(
                     "contest_option",
@@ -446,12 +853,44 @@ def emit() -> Path:
                     ballot_position=party,
                     ballot_label=None,
                 )
-                cs.add("outcome", result_set_id=result_set, option_id=listed, kind="won", seats=won[party])
+                cs.add(
+                    "outcome",
+                    result_set_id=result_set,
+                    option_id=listed,
+                    kind="won" if won.get(party) else "lost",
+                    seats=won.get(party, 0),
+                )
+                chosen = members.filter(pl.col("party") == party)
+                if counted.height:
+                    legend = cs.key("id.option", f"{key}:{party}:party")
+                    cs.add(
+                        "contest_option",
+                        id=legend,
+                        contest_id=contest,
+                        kind="legend",
+                        parent_option_id=listed,
+                        party_id=parties[party],
+                        ballot_position=None,
+                        ballot_label=None,
+                    )
+                    lines = counted.filter(pl.col("party") == party)
+                    record(dapil, legend, lines.filter(pl.col("candidate").is_null()))
+                    names = dict(chosen.select("candidate", "name").rows())
+                    for number in sorted(set(lines["candidate"].drop_nulls())):
+                        votes = lines.filter(pl.col("candidate") == number)
+                        option, _ = candidate(
+                            party,
+                            number,
+                            names.get(number, votes["name"][0]),
+                            str(number),
+                            listed,
+                            "elected" if number in names and (dapil, party, number) not in replaced else "lost",
+                        )
+                        record(dapil, option, votes)
                 for number, ballot, votes, number_, box in (
-                    members.filter(pl.col("party") == party)
-                    .sort("candidate")
-                    .select("candidate", "name", "votes", "page", "box")
-                    .rows()
+                    []
+                    if counted.height
+                    else chosen.sort("candidate").select("candidate", "name", "votes", "page", "box").rows()
                 ):
                     option, _ = candidate(
                         party,
