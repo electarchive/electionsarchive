@@ -983,6 +983,31 @@ MANUALS = {
         "https://digitalhorizonsonline.org/digital/api/collection/ndbb/id/22730/download",
         "https://digitalhorizonsonline.org/digital/collection/ndbb/id/22387",
     ),
+    (1918, "lieutenant-governor"): (
+        "North Dakota Legislative Manual 1919",
+        "https://digitalhorizonsonline.org/digital/api/collection/ndbb/id/22730/download",
+        "https://digitalhorizonsonline.org/digital/collection/ndbb/id/22387",
+    ),
+    (1918, "auditor"): (
+        "North Dakota Legislative Manual 1919",
+        "https://digitalhorizonsonline.org/digital/api/collection/ndbb/id/22730/download",
+        "https://digitalhorizonsonline.org/digital/collection/ndbb/id/22387",
+    ),
+    (1918, "attorney-general"): (
+        "North Dakota Legislative Manual 1919",
+        "https://digitalhorizonsonline.org/digital/api/collection/ndbb/id/22730/download",
+        "https://digitalhorizonsonline.org/digital/collection/ndbb/id/22387",
+    ),
+    (1918, "insurance-commissioner"): (
+        "North Dakota Legislative Manual 1919",
+        "https://digitalhorizonsonline.org/digital/api/collection/ndbb/id/22730/download",
+        "https://digitalhorizonsonline.org/digital/collection/ndbb/id/22387",
+    ),
+    (1918, "public-service-commissioner"): (
+        "North Dakota Legislative Manual 1919",
+        "https://digitalhorizonsonline.org/digital/api/collection/ndbb/id/22730/download",
+        "https://digitalhorizonsonline.org/digital/collection/ndbb/id/22387",
+    ),
 }
 MANUAL_READS = {
     (1918, 9, "foster"): 578,
@@ -990,6 +1015,14 @@ MANUAL_READS = {
     (1918, 9, "slope"): 576,
     (1918, 10, "eddy"): 253,
     (1918, 10, "ramsey"): 843,
+    (1918, 7, "stutsman"): 1753,
+    (1918, 11, "traill"): 1147,
+    (1918, 13, "richland"): 1597,
+    (1918, 20, "adams"): 239,
+    (1918, 20, "barnes"): 727,
+    (1918, 20, "dunn"): 359,
+    (1918, 20, "mchenry"): 595,
+    (1918, 22, "adams"): 236,
 }
 UNREAD = {
     (1922, "public-service-commissioner"),
