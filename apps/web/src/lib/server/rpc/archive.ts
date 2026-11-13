@@ -1634,6 +1634,126 @@ async function labeled(rows: Promise<Surveyed>, key: string, date: string) {
   return remember(`children:${key}`, async () => label(await rows, date));
 }
 
+async function seat(
+  contest: string,
+  place: { id: string; k: number },
+  area: { id: string; k: number },
+  date: string,
+) {
+  const ks = await setsOf(contest);
+  if (ks.length === 0) {
+    return null;
+  }
+  const { pool, valued } = countingFor(ks);
+  const counts = (k: SQL, id: SQL) => sql`(
+    exists (
+      select from result_rollup_sum r
+      where r.area_k = ${k} and r.result_set_k = any(${pool}) and r.measure = any(${COUNTED})
+    )
+    or ${valued(k)}
+    or ${id} in (select c.district_area_id from result_set s join contest c on c.id = s.contest_id where s.k = any(${pool}))
+  )`;
+  const shape = (id: SQL) => sql`
+    select g.geom from area_geometry g where g.area_id = ${id}
+    order by g.valid @> ${date}::date desc, upper(g.valid) desc nulls first limit 1
+  `;
+  const [found, labels] = await Promise.all([
+    db.execute<{
+      yes: boolean;
+      no: boolean;
+      texts: Array<string | null> | null;
+    }>(sql`
+      with kin as materialized (
+        select a.id, a.k from area_parent p join area a on a.id = p.area_id
+        where p.parent_id = ${place.id}::uuid and p.valid @> ${date}::date
+        limit 5001
+      ),
+      rolled as materialized (
+        select coalesce(bool_or(r.value <> 0), false) as voted
+        from unnest(${pool}) as s(k) cross join lateral (
+          select x.value from result_rollup x
+          where x.result_set_k = s.k and x.area_k = ${area.k} and x.measure = any(${COUNTED}) offset 0
+        ) r
+        having count(*) > 0
+      ),
+      me as materialized (${shape(sql`${place.id}::uuid`)}),
+      it as materialized (${shape(sql`${area.id}::uuid`)}),
+      flags as materialized (
+        select
+          (select count(*) from kin) <= 5000 as small,
+          exists (select from kin where kin.k = ${area.k} and ${counts(sql`kin.k`, sql`kin.id`)}) as inside,
+          (select count(*) from (select from kin where kin.k <> ${area.k} and ${counts(sql`kin.k`, sql`kin.id`)} limit 2) z) as others,
+          exists (
+            select from rolled
+            where not exists (
+              with recursive anc(id) as (
+                select ${place.id}::uuid
+                union
+                select p.parent_id from area_parent p join anc on p.area_id = anc.id
+              )
+              select from anc where anc.id = ${area.id}::uuid
+            )
+            and (
+              rolled.voted
+              or not exists (select from me)
+              or coalesce((
+                select case
+                  when not g.geom && me.geom then ST_Area(g.geom) = 0
+                  when ST_Covers(me.geom, g.geom) then true
+                  when not ST_Intersects(me.geom, g.geom) then ST_Area(g.geom) = 0
+                  else ST_Area(ST_Intersection(g.geom, me.geom)) >= 0.01 * ST_Area(g.geom)
+                end
+                from me cross join it g
+              ), true)
+            )
+          ) as rooted,
+          exists (
+            select from result_rollup_unit u
+            join reporting_unit ru on ru.k = u.unit_k
+            join reporting_unit_area m on m.unit_id = ru.id and m.area_id = ${place.id}::uuid and m.valid @> ${date}::date
+            where u.result_set_k = any(${pool}) and u.area_k = ${area.k}
+          ) as linked,
+          exists (select from area_parent p where p.area_id = ${area.id}::uuid and p.valid @> ${date}::date) as parented,
+          exists (
+            select from area_parent p join kin on kin.id = p.parent_id
+            where p.area_id = ${area.id}::uuid and p.valid @> ${date}::date
+          ) as nested,
+          exists (select from area a where a.k = ${area.k} and a.scheme_code = 'world.country') as abroad
+      )
+      select
+        small and (inside and others > 0 or not inside and others = 0 and rooted) as yes,
+        small and not linked and not abroad and parented and not inside
+          and (others = 2 and not nested or others = 0 and not rooted) as no,
+        array(
+          select n.text from (
+            select kin.id from kin where kin.k < ${area.k}
+            union
+            select a.id from (
+              select r.area_k as k from result_rollup_sum r
+              where r.result_set_k = any(${pool}) and r.measure = any(${COUNTED}) and r.area_k < ${area.k}
+              union
+              select u.area_k from result_rollup_unit u where u.result_set_k = any(${pool}) and u.area_k < ${area.k}
+            ) r
+            join area a on a.k = r.k
+          ) x
+          left join name n on n.entity_id = x.id and n.kind in ('official', 'english')
+        ) as texts
+      from flags
+    `),
+    names([area.id], date),
+  ]);
+  const row = found.rows[0];
+  if (row?.no === true) {
+    return null;
+  }
+  const base = segment(labels.full.get(area.id) ?? "");
+  return row?.yes === true &&
+    base !== "unnamed" &&
+    (row.texts ?? []).every((text) => segment(text ?? "") !== base)
+    ? base
+    : undefined;
+}
+
 function countingFor(ks: Array<number>) {
   const pool = sql`${sql.param(ks)}::int[]`;
   const valued = (k: SQL) => sql`
@@ -1682,27 +1802,28 @@ function countingFor(ks: Array<number>) {
   return { pool, valued, counted };
 }
 
+async function setsOf(contest: string | Array<string>) {
+  const [sets, held] = await Promise.all([
+    db.execute<{ k: number }>(sql`
+      with recursive grp(id) as (
+        select unnest(${sql.param([contest].flat())}::uuid[])
+        union all
+        select c.id from contest c join grp on c.allocation_parent_id = grp.id
+      )
+      select rs.k from grp cross join lateral (select * from result_set x where x.contest_id = grp.id and x.status <> 'withdrawn' and ${served("x")} offset 0) rs
+    `),
+    Promise.all([contest].flat().map(async (id) => convention(id))),
+  ]);
+  return [...sets.rows.map((row) => row.k), ...held.flat().map((row) => row.k)];
+}
+
 async function shallow(
   contest: string | Array<string>,
   area: { id: string; k: number },
   isRoot: boolean,
   date: string,
 ) {
-  const sets = await db.execute<{ k: number }>(sql`
-    with recursive grp(id) as (
-      select unnest(${sql.param([contest].flat())}::uuid[])
-      union all
-      select c.id from contest c join grp on c.allocation_parent_id = grp.id
-    )
-    select rs.k from grp cross join lateral (select * from result_set x where x.contest_id = grp.id and x.status <> 'withdrawn' and ${served("x")} offset 0) rs
-  `);
-  const held = await Promise.all(
-    [contest].flat().map(async (id) => convention(id)),
-  );
-  const ks = [
-    ...sets.rows.map((row) => row.k),
-    ...held.flat().map((row) => row.k),
-  ];
+  const ks = await setsOf(contest);
   if (ks.length === 0) {
     return;
   }
@@ -13076,6 +13197,10 @@ export const contests = {
       const locate = async ({ row, place }: (typeof placed)[number]) => {
         if (!row.voted && !(await reaches(place.id, area.id, day))) {
           return null;
+        }
+        const quick = await seat(row.id, place, area, day);
+        if (quick !== undefined) {
+          return quick;
         }
         const kids = await children(row.id, place, true, day);
         return kids.find((kid) => kid.k === area.k)?.segment ?? null;
