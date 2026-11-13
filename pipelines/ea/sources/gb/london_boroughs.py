@@ -459,9 +459,207 @@ GLC_METHODOLOGY = (
     "council. The electoral divisions are the parliamentary constituencies of 1974 to 1983."
 )
 
+EARLY = {
+    1964: (date(1964, 4, 9), f"{DOWNLOAD}/df4ffa06-63f1-4d4e-9617-f9faa0e64853/GLC_1964-4-9.pdf", (5, 7), 8),
+    1967: (date(1967, 4, 13), f"{DOWNLOAD}/c14ad292-2609-414a-a997-b613fe0d1794/GLC_1967-4-13.pdf", (5, 8), 9),
+    1970: (date(1970, 4, 9), f"{DOWNLOAD}/2fb55c6a-48f9-4d38-96df-ade095871445/GLCE_1970-4-9.pdf", (5, 9), 11),
+}
+EARLY_TOTALS = {
+    1964: (5466756, 2413600, 7543699, {"CON": 36, "LAB": 64}),
+    1967: (5319023, 2187789, 6862340, {"CON": 82, "LAB": 18}),
+    1970: (5524384, 1943780, 6166936, {"CON": 65, "LAB": 35}),
+}
+EARLY_PARTIES = {
+    1964: {
+        "CON": ("Conservative", 100, 3147805),
+        "LAB": ("Labour", 100, 3467634),
+        "LIB": ("Liberal", 86, 775385),
+        "COMM": ("Communist", 36, 102649),
+        "IND": ("Independent", 9, 19983),
+        "RA": ("Ratepayers' Association", 3, 17574),
+        "NEWLIB": ("New Liberal", 3, 7421),
+        "CHRIND": ("Christian Independent", 1, 2895),
+        "UM": ("Union Movement", 2, 2353),
+    },
+    1967: {
+        "CON": ("Conservative", 100, 3726692),
+        "LAB": ("Labour", 100, 2374991),
+        "LIB": ("Liberal", 100, 622019),
+        "COMM": ("Communist", 38, 78958),
+        "SPGB": ("Socialist Party of Great Britain", 14, 13021),
+        "IND": ("Independent", 10, 14614),
+        "CWP": ("Commonwealth Party of Great Britain", 4, 2854),
+        "NUCT": ("National Union of Council Tenants", 4, 7909),
+        "ITRPA": ("Islington Tenants and Ratepayers Political Association", 3, 3733),
+        "NF": ("National Front", 3, 5519),
+        "UM": ("Union Movement", 3, 5127),
+        "U": ("Unionist", 2, 3019),
+        "INDC": ("Independent Carnaby", 2, 1640),
+        "ELP": ("European Labour Party", 1, 664),
+        "JHNFP": ("John Hampden New Freedom Party", 1, 1580),
+    },
+    1970: {
+        "CON": ("Conservative", 100, 3183781),
+        "LAB": ("Labour", 100, 2494118),
+        "LIB": ("Liberal", 98, 335818),
+        "ULIB": ("Unofficial Liberal", 6, 4432),
+        "HBR": ("Homes Before Roads", 85, 81215),
+        "COMM": ("Communist", 40, 42906),
+        "UM": ("Union Movement", 32, 10432),
+        "SPGB": ("Socialist Party of Great Britain", 14, 5945),
+        "IND": ("Independent", 5, 2614),
+        "BC": ("Bread and Circus", 3, 595),
+        "ARPSWR": ("Air Road Public Safety White Resident", 1, 366),
+        "ANP": ("All-Night Party", 1, 133),
+        "CNPA": ("Campaign for Non-Political Awareness", 1, 154),
+        "JHNFP": ("John Hampden New Freedom Party", 1, 552),
+        "MPD": ("Movement of People's Democracy", 1, 405),
+        "POW": ("Powellite", 1, 854),
+        "RR": ("Rent Rebel", 1, 1551),
+        "YORR": ("Your Own Resident and Ratepayer", 1, 1065),
+    },
+}
+EARLY_SHORT = {(1967, "LAB"): 300, (1967, "INDC"): -100}
+EARLY_CODES = {"CAN": "CON", "NEWLIB": "NEWLIB", "CHRLND": "CHRIND", "UMM": "UM"}
+EARLY_OTHERS = {
+    ("BARKING", "Bailey H. J."): "MPD",
+    ("BROMLEY", "Hansford-Miller F. H. Dr."): "JHNFP",
+    ("HAMMERSMITH", "Coney M. P."): "POW",
+    ("HARINGEY", "Cooper F. J. Miss"): "BC",
+    ("HARINGEY", "Borowski K."): "BC",
+    ("HARINGEY", "Kibble S. L."): "BC",
+    ("HARINGEY", "Whittaker M."): "CNPA",
+    ("HARINGEY", "Kerner P."): "ANP",
+    ("KINGSTON UPON THAMES", "Scruby E."): "YORR",
+    ("LAMBETH", "Boaks W. G."): "ARPSWR",
+    ("TOWER HAMLETS", "O'Dell W."): "RR",
+}
+EARLY_LINES = {
+    (1967, 6, 0): [
+        "H. W. Cutler, O.B.E. .. (Con.) 39,791",
+        "Captain W. E. Jones .. (Con.) 39,405",
+    ],
+    (1967, 6, 1): [
+        "D. Currie .. .. .. (Lib.) 3,959",
+        "H. B. Collins .. .. (Comm.) 1,458",
+    ],
+}
+EARLY_NAMES = {
+    "Charles Prendergast,B.E. M.": "Charles Prendergast, B.E.M.",
+    "IIItyd Harrington": "Illtyd Harrington",
+    "Mrs E. L. Prod ham": "Mrs E. L. Prodham",
+    "Mrs Marjorie Mcintosh, B.A·t": "Mrs Marjorie McIntosh, B.A.",
+    "Mrs A. MeV. Forbes-Cockell": "Mrs A. McV. Forbes-Cockell",
+    "Mrs A. L1. Grieves": "Mrs A. Ll. Grieves",
+    "Lt.-Col. Andrew Jardine D.L., J.P.": "Lt.-Col. Andrew Jardine, D.L., J.P.",
+    "Wh ittaker M.": "Whittaker M.",
+    "O'DeIIW.": "O'Dell W.",
+    "Mrs P. F.lnman": "Mrs P. F. Inman",
+    "William W.livingston": "William W. Livingston",
+    "R. H.lnsoll": "R. H. Insoll",
+    "Mrs J.1. Tatch": "Mrs J. I. Tatch",
+    "D. A. Co berman": "D. A. Coberman",
+    "L. A. Vito ria": "L. A. Vitoria",
+    "Miss B. Chan non": "Miss B. Channon",
+    "Edgar E. Reed.": "Edgar E. Reed",
+    "D. M. Fielding, J.P•": "D. M. Fielding, J.P.",
+    "Mrs Evelyn Denington, C.B.E., Han. F.R.I.B.A.": "Mrs Evelyn Denington, C.B.E., Hon. F.R.I.B.A.",
+    "KingW. A.": "King W. A.",
+    "Taylor Ruby G. N. Mrs.O.B.E.": "Taylor Ruby G. N. Mrs., O.B.E.",
+    "Rowlandson SirGraham, M.B.E., J.P.": "Rowlandson Sir Graham, M.B.E., J.P.",
+    "Foley G·. P.": "Foley G. P.",
+    "Jardine Andrew Lt-Col. D.L., J.P.": "Jardine Andrew Lt-Col., D.L., J.P.",
+    "Denington Evelyn Mrs. C.B.E., Han F.R.I.B.A.": "Denington Evelyn Mrs., C.B.E., Hon. F.R.I.B.A.",
+    "Grieves Anna Mrs. LI": "Grieves Anna Mrs. Ll.",
+    "Lang 0: M.": "Lang D. M.",
+    "Hodson E. l.": "Hodson E. L.",
+    "Bottom ley J.": "Bottomley J.",
+    "Bryden W. M": "Bryden W. M.",
+    "McLennan G": "McLennan G.",
+    "Plummer Desmond T.D., J.P.": "Plummer Desmond, T.D., J.P.",
+    "Goodwin Sir Reginald, C.B.E., D.l.": "Goodwin Sir Reginald, C.B.E., D.L.",
+}
+EARLY_SEATS = {
+    "E09000002": 2,
+    "E09000003": 4,
+    "E09000004": 3,
+    "E09000005": 4,
+    "E09000006": 4,
+    "E09000007": 3,
+    "E09000008": 4,
+    "E09000009": 4,
+    "E09000010": 3,
+    "E09000011": 3,
+    "E09000012": 3,
+    "E09000013": 3,
+    "E09000014": 3,
+    "E09000015": 3,
+    "E09000016": 3,
+    "E09000017": 3,
+    "E09000018": 3,
+    "E09000019": 3,
+    "E09000020": 3,
+    "E09000021": 2,
+    "E09000022": 4,
+    "E09000023": 4,
+    "E09000024": 2,
+    "E09000025": 3,
+    "E09000026": 3,
+    "E09000027": 2,
+    "E09000028": 4,
+    "E09000029": 2,
+    "E09000030": 2,
+    "E09000031": 3,
+    "E09000032": 4,
+    "westminster-city-of-london": 4,
+}
+EARLY_AREA = "westminster-city-of-london"
+EARLY_SOURCES = {
+    1964: ("London County Council", "General Election of Greater London Councillors, 9 April 1964"),
+    1967: ("Greater London Council", "General Election of Greater London Councillors, 13 April 1967"),
+    1970: ("Greater London Council", "Greater London Council Election, 9 April 1970"),
+}
+EARLY_AREA_NAME = "City of Westminster with the City of London and the Temples"
+EARLY_TITLES = {
+    "Mrs",
+    "Mrs.",
+    "Miss",
+    "Sir",
+    "Dr.",
+    "(Dr.)",
+    "Colonel",
+    "Lt.-Col.",
+    "Lt-Cmdr.",
+    "Captain",
+    "Lieut-Colonel",
+}
+EARLY_METHODOLOGY = (
+    "Read from the text layer of the Greater London Council's scanned report, with each line placed by its position "
+    "on the page. Each London borough elected two, three, or four councillors by block vote, and the City of London "
+    "and the Temples voted with the City of Westminster. Every party's candidates and votes add up to the report's "
+    "table of votes by party, the candidates' votes add up to the printed total of votes counted, each borough's "
+    "electorate and number voting come from the report's table of electors and add up to its printed totals, and "
+    "the elected candidates match the printed composition of the council."
+)
+EARLY_NOTES = {
+    1964: " The report shows the elected candidates in heavy type, set flush with the borough's heading; the other "
+    "candidates are indented. Each borough's number of elected candidates matches its seats in the 1970 report.",
+    1967: " The report shows the elected candidates in heavy type, set flush with the borough's heading; the other "
+    "candidates are indented. Two lines on page 6 are unreadable in the text layer and were read from the page "
+    "image. The report's table of votes by party gives Labour 2,374,991 votes and Independent Carnaby 1,640, but its "
+    "candidates' votes, read twice and checked on the page images, add up to 2,374,691 and 1,740; the candidates' "
+    "votes are stored as printed. The Greenwich by-election of 29 June 1967, printed on page 8, is not part of this election.",
+    1970: " The report prints the elected candidates in bold above a gap; how many each borough elected, and of "
+    "which party, is taken from the report's summary of results by borough. Eleven candidates are marked only as "
+    "other; each is given the description in the report's table of votes by party whose candidate count and votes "
+    "they alone match. Candidates marked U. Lib. stood as Unofficial Liberals.",
+}
+
 
 def fetch() -> None:
     for _, url in [*BOOKS.values(), *GLC.values()]:
+        raw.fetch(SOURCE, url, suffix=".pdf")
+    for _, url, _, _ in EARLY.values():
         raw.fetch(SOURCE, url, suffix=".pdf")
 
 
@@ -1298,6 +1496,216 @@ def parse_glc() -> None:
     pl.DataFrame(divisions).write_parquet(PARSED / "glc_divisions.parquet")
     pl.DataFrame(candidates).write_parquet(PARSED / "glc_candidates.parquet")
     print(f"{len(divisions)} GLC divisions and {len(candidates)} candidates")
+    areas, standing = parse_glc_early()
+    pl.DataFrame(areas).write_parquet(PARSED / "glc_areas.parquet")
+    pl.DataFrame(standing).write_parquet(PARSED / "glc_early_candidates.parquet")
+    print(f"{len(areas)} GLC electoral areas and {len(standing)} candidates, 1964 to 1970")
+
+
+SKIPPED = re.compile(
+    r"TABLE|Number of votes|Greater London Counci|Successful candidates|heavy type|General Election|in bold|"
+    r"votes cast in each|Candidates with party|election.{0,3}\(continued\)|\((Royal|ROYAL) (Borough|BOROUGH)\)|"
+    r"^\((?i:with the)|^(added|TEMPLES ADDED|Temples added)\)$|Died|by-election|^\d+$|^I$|^\d+ April 19"
+)
+
+
+def early_name(text: str) -> str:
+    tokens = text.split()
+    while tokens and not re.search(r"[A-Za-z0-9]", tokens[-1]):
+        tokens.pop()
+    if tokens and tokens[-1].endswith(".."):
+        tokens[-1] = tokens[-1].rstrip(".")
+        if re.fullmatch(r"([A-Za-z]{1,3}\.)+[A-Za-z]{1,3}", tokens[-1]):
+            tokens[-1] += "."
+    text = " ".join(tokens).rstrip(" ,·").replace("’", "'")
+    text = EARLY_NAMES.get(text, text)
+    head, comma, tail = text.partition(",")
+    return re.sub(r"(?<=\b[A-Z]\.)(?=[A-Z])", " ", head) + comma + tail
+
+
+def early_person(year: int, text: str) -> str:
+    text = re.sub(r"\s*\([^)]*\)", "", text)
+    head = text.split(",")[0].split()
+    if year == 1970:
+        head = [
+            word
+            for word in head
+            if word.rstrip(".") not in {"Mrs", "Miss", "Dr", "Sir", "The", "Hon", "Rev", "Canon", "Lt-Col"}
+        ]
+        head = [*head[1:], head[0]]
+    else:
+        while len(head) > 2 and head[0] in EARLY_TITLES | {"The", "Rev."}:
+            head = head[1:]
+        if len(head) == 2 and head[0] in EARLY_TITLES:
+            head = head[1:]
+    return " ".join(re.sub(r"\.(?=$)", "", word) if re.fullmatch(r"Mrs\.|Dr\.", word) else word for word in head)
+
+
+def glc_early(year: int, artifact: raw.Artifact) -> tuple[list[dict], list[dict]]:
+    sizes, book = pages(artifact.path)
+    first, last = EARLY[year][2]
+    codes = EARLY_PARTIES[year]
+    areas: dict[str, dict] = {}
+    candidates: list[dict] = []
+    area: dict | None = None
+    for sheet in range(first, last + 1):
+        width, height = sizes[sheet - 1]
+        for side in (0, 1):
+            pending: tuple[float, str, list[float]] | None = None
+            column = [w for w in book[sheet - 1] if (w[0] < width / 2) == (side == 0)]
+            for row in lines(column):
+                box = [
+                    min(w[0] for w in row) / width,
+                    min(w[1] for w in row) / height,
+                    max(w[2] for w in row) / width,
+                    max(w[3] for w in row) / height,
+                ]
+                joined = " ".join(w[4] for w in row)
+                for text in EARLY_LINES.get((year, sheet, side), [joined]) if "~" in joined else [joined]:
+                    if "By-Election" in text:
+                        return list(areas.values()), candidates
+                    if SKIPPED.search(text) or not re.search(r"[A-Za-z0-9]", text):
+                        continue
+                    text = text.replace("RrCHMOND", "RICHMOND")
+                    heading = re.fullmatch(
+                        r"[t†]?([A-Z][A-Za-z ,.&'-]*?)(?: \((?:City|CITY) (?:of|OF)\))?(?: - Continued)?", text
+                    )
+                    if heading and heading.group(1).isupper() and len(heading.group(1)) > 3:
+                        printed = heading.group(1).replace("RED BRIDGE", "REDBRIDGE")
+                        printed = re.sub(
+                            r"\s+", " ", printed.replace("CRO YDON", "CROYDON").replace("S UTTON", "SUTTON")
+                        )
+                        area = areas.setdefault(
+                            printed, {"year": year, "printed": printed, "x": row[0][0], "page": sheet}
+                        )
+                        pending = None
+                        continue
+                    found = (
+                        re.fullmatch(r"(.*?)\s+(\S+)\s+(\d[\d,.]*)", text)
+                        if year == 1970
+                        else re.fullmatch(r"(.*)\(([^)]*)\)\s*(\d[\d,.]*)", text)
+                    )
+                    if area is None:
+                        continue
+                    if found is None:
+                        pending = (
+                            (pending[0], f"{pending[1]} {text}", pending[2]) if pending else (row[0][0], text, box)
+                        )
+                        continue
+                    start, prefix, top = pending or (row[0][0], "", box)
+                    pending = None
+                    name = f"{prefix} {found.group(1)}".strip() if not prefix.endswith("-") else prefix + found.group(1)
+                    name = early_name(name)
+                    code = re.sub(r"[^A-Za-z0-9]", "", found.group(2)).upper()
+                    if year == 1970 and code == "LIB" and name.endswith(" U."):
+                        name, code = name.removesuffix(" U."), "ULIB"
+                    if year == 1970 and code in {"O", "0", "A"}:
+                        code = EARLY_OTHERS.get((area["printed"], name), code)
+                    code = EARLY_CODES.get(code, code)
+                    votes = number(found.group(3))
+                    if code not in codes or votes is None:
+                        raise ValueError(f"{year} page {sheet}: unread line {text!r}")
+                    candidates.append(
+                        {
+                            "year": year,
+                            "area": area["printed"],
+                            "name": name,
+                            "party": code,
+                            "votes": votes,
+                            "flush": start - area["x"] < 9,
+                            "page": sheet,
+                            "bbox": [min(top[0], box[0]), top[1], max(top[2], box[2]), box[3]],
+                        }
+                    )
+    return list(areas.values()), candidates
+
+
+def early_code(printed: str) -> str:
+    folded = fold(printed)
+    if "westminster" in folded:
+        return EARLY_AREA
+    found = {fold(k): v for k, v in BOROUGHS.items()} | {"barking": "E09000002", "hammersmith": "E09000013"}
+    return found[folded]
+
+
+def early_statistics(year: int, book: list[list[Word]], sizes: list[tuple[float, float]]) -> dict[str, dict]:
+    sheet = EARLY[year][3]
+    width, height = sizes[sheet - 1]
+    pattern = (
+        r"([A-Za-z][A-Za-z &']*?)\s+[\d,]+[.,]\d\s+\S+\s+(\d{2,3},\d{3})\s+(\d{2,3},\d{3})\s+\d.*"
+        if year == 1970
+        else r"([A-Za-z][A-Za-z ,.'&]*?)[\s.,·\"]*\s(\d{2,3},\d{3})\s+(\d{2,3},\d{3})(?:\s*\{?\(a\))?\s+\d.*"
+    )
+    found: dict[str, dict] = {}
+    for row in lines(book[sheet - 1]):
+        match = re.fullmatch(pattern, " ".join(w[4] for w in row))
+        if match is None or re.search(r"London \(c\)|^Total", match.group(1)):
+            continue
+        code = early_code(match.group(1))
+        figures = []
+        for text in match.group(2, 3):
+            word = next(w for w in row if w[4] == text)
+            figures.append((number(text), [word[0] / width, word[1] / height, word[2] / width, word[3] / height]))
+        found[code] = {"electorate": figures[0][0], "electorate_bbox": figures[0][1]}
+        found[code] |= {"voting": figures[1][0], "voting_bbox": figures[1][1], "stats_page": sheet}
+    if year == 1970:
+        split = [
+            row
+            for row in lines(book[sheet])
+            if re.fullmatch(r"(-|\d+) (-|\d+) \S+ \S+ \S+ \S+ \S+ \S+", " ".join(w[4] for w in row))
+        ]
+        for code, row in zip(found, split[:32], strict=True):
+            con, lab = (0 if w[4] == "-" else int(w[4]) for w in row[:2])
+            found[code]["split"] = {"CON": con, "LAB": lab}
+    return found
+
+
+def parse_glc_early() -> tuple[list[dict], list[dict]]:
+    areas, candidates = [], []
+    for year, (_, url, _, _) in EARLY.items():
+        artifact = raw.cached(SOURCE, url)
+        sizes, book = pages(artifact.path)
+        stats = early_statistics(year, book, sizes)
+        found, lines_ = glc_early(year, artifact)
+        electorate, voting, total, composition = EARLY_TOTALS[year]
+        problems = []
+        if len(found) != 32 or set(stats) != set(EARLY_SEATS):
+            problems.append(f"{len(found)} areas, statistics for {len(stats)}")
+        if sum(a["electorate"] for a in stats.values()) != electorate:
+            problems.append(f"electorate {sum(a['electorate'] for a in stats.values())}, printed {electorate}")
+        if sum(a["voting"] for a in stats.values()) != voting:
+            problems.append(f"voting {sum(a['voting'] for a in stats.values())}, printed {voting}")
+        short = sum(v for (y, _), v in EARLY_SHORT.items() if y == year)
+        if sum(c["votes"] for c in lines_) + short != total:
+            problems.append(f"votes {sum(c['votes'] for c in lines_)}, printed {total}")
+        for code, (label, count, votes) in EARLY_PARTIES[year].items():
+            mine = [c["votes"] for c in lines_ if c["party"] == code]
+            if (len(mine), sum(mine) + EARLY_SHORT.get((year, code), 0)) != (count, votes):
+                problems.append(f"{code}: {len(mine)} candidates and {sum(mine)} votes, printed {count} and {votes}")
+        won: dict[str, int] = {}
+        for area in found:
+            code = early_code(area["printed"])
+            seats = EARLY_SEATS[code]
+            mine = [c for c in lines_ if c["area"] == area["printed"]]
+            for rank, c in enumerate(mine):
+                c["number"] = rank + 1
+                c["elected"] = rank < seats if year == 1970 else c["flush"]
+            elected = [c for c in mine if c["elected"]]
+            others = [c["votes"] for c in mine if not c["elected"]]
+            if len(elected) != seats or min(c["votes"] for c in elected) <= max(others):
+                problems.append(f"{area['printed']}: {len(elected)} elected of {seats}")
+            parties = {p: sum(c["party"] == p for c in elected) for p in ("CON", "LAB")}
+            if year == 1970 and parties != stats[code]["split"]:
+                problems.append(f"{area['printed']}: elected {parties}, printed {stats[code]['split']}")
+            for c in elected:
+                won[c["party"]] = won.get(c["party"], 0) + 1
+            areas.append(area | stats[code] | {"code": code, "seats": seats})
+        if won != composition:
+            problems.append(f"elected {won}, printed {composition}")
+        if problems:
+            raise ValueError(f"{year}:\n" + "\n".join(problems))
+        candidates += lines_
+    return areas, candidates
 
 
 def emit() -> Path:
@@ -1312,7 +1720,8 @@ def emit() -> Path:
             + ", ".join(map(str, sorted(BOOKS)))
             + " by ward, and Greater London Council elections "
             + ", ".join(map(str, sorted(GLC)))
-            + " by electoral division, from the London Research Centre's and the Greater London Council's reports",
+            + " by electoral division and of 1964, 1967, and 1970 by borough, from the London Research Centre's, "
+            "the London County Council's, and the Greater London Council's reports",
             polity="GB",
         )
         outranked = foreign_preferred(conn, cs, SOURCE)
@@ -1778,6 +2187,203 @@ def emit() -> Path:
                         is_independent=label == "Independent",
                     )
                     glc_value(option, VOTES, line["votes"], line["page"], line["bbox"])
+                    if line["elected"]:
+                        cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected")
+        first, end = EARLY[1964][0], GLC[1973][0]
+        cs.add("body_size", body_id=council, seats=100, valid_from=first, valid_to=end)
+        if conn.execute("select 1 from scheme where code = 'gb.glc_area'").fetchone() is None:
+            cs.add("scheme", code="gb.glc_area", polity_id=gb, kind="electoral_district", rank=2, noun="electoral area")
+        joined = cs.area("gb.glc_area", EARLY_AREA)
+        if joined in cs.minted:
+            cs.add("area", id=joined, scheme_code="gb.glc_area")
+            name(joined, EARLY_AREA_NAME)
+            cs.add("area_code", area_id=joined, code=EARLY_AREA, valid_from=first, valid_to=end)
+            cs.add(
+                "area_parent", area_id=joined, parent_id=cs.area("gb.country", "ENG"), valid_from=None, valid_to=None
+            )
+        for code in ("E09000033", "E09000001"):
+            cs.add("area_membership", area_id=cs.area("gb.lad", code), parent_id=joined, valid_from=first, valid_to=end)
+        joined_unit = cs.unit("gb.glc_area", EARLY_AREA)
+        if joined_unit in cs.minted:
+            cs.add(
+                "reporting_unit",
+                id=joined_unit,
+                polity_id=gb,
+                scheme_code="gb.glc_area",
+                code=EARLY_AREA,
+                area_relation="equals",
+                area_id=joined,
+                kind="standard",
+                valid_from=None,
+            )
+            name(joined_unit, EARLY_AREA_NAME)
+        areas = pl.read_parquet(PARSED / "glc_areas.parquet")
+        standing = pl.read_parquet(PARSED / "glc_early_candidates.parquet")
+        for year, (day, url, _, _) in EARLY.items():
+            publisher, title = EARLY_SOURCES[year]
+            source = cs.source(publisher, title)
+            if source in cs.minted:
+                cs.add(
+                    "source",
+                    id=source,
+                    kind="compendium",
+                    publisher=publisher,
+                    title=title,
+                    url=DATASET,
+                    license=f"Published by the {publisher}; the Greater London Authority lists it on the London "
+                    "Datastore with no licence stated",
+                    license_url=None,
+                    attribution=f"{publisher}, {title}.",
+                )
+            artifact = raw.cached(SOURCE, url)
+            artifact_id = cs.artifact(artifact, source)
+            page_ids = {}
+
+            def early_page(number: int) -> UUID:
+                if number not in page_ids:
+                    image = PAGES / f"{artifact.sha256}-{number}.png"
+                    if not image.exists():
+                        PAGES.mkdir(parents=True, exist_ok=True)
+                        subprocess.run(
+                            ["pdftoppm", "-r", "100", "-png", "-f", str(number), "-l", str(number), "-singlefile"]
+                            + [str(artifact.path), str(image.with_suffix(""))],
+                            check=True,
+                        )
+                    width, height = struct.unpack(">II", image.read_bytes()[16:24])
+                    page_ids[number] = cs.page(artifact_id, number)
+                    cs.add(
+                        "source_page",
+                        id=page_ids[number],
+                        artifact_id=artifact_id,
+                        page_number=number,
+                        image_key=f"pages/{SOURCE}/{image.name}",
+                        width=width,
+                        height=height,
+                    )
+                return page_ids[number]
+
+            election = cs.key("gb.election", f"{day}:glc")
+            cs.add(
+                "election",
+                id=election,
+                polity_id=london,
+                kind="general",
+                date_from=day,
+                date_to=day,
+                status="held",
+            )
+            name(election, f"{year} Greater London Council election")
+            cs.add("slug", path=f"gb/london/{day}-glc", entity_id=election)
+            cs.add("note", entity_id=election, kind="methodology", body_md=EARLY_METHODOLOGY + EARLY_NOTES[year])
+            lines = standing.filter(pl.col("year") == year)
+            for area_row in areas.filter(pl.col("year") == year).iter_rows(named=True):
+                code = area_row["code"]
+                joint = code == EARLY_AREA
+                area = joined if joint else cs.area("gb.lad", code)
+                unit = joined_unit if joint else cs.unit("gb.lad", code)
+                if not joint and (area in cs.minted or unit in cs.minted):
+                    raise ValueError(f"{code}: publish gb.leap first")
+                display = (
+                    "Westminster"
+                    if joint
+                    else area_row["printed"].title().replace(" And ", " and ").replace(" Upon ", " upon ")
+                )
+                contest_key = f"{day}:glc:{code}"
+                contest = cs.key("gb.contest", contest_key)
+                cs.add(
+                    "contest",
+                    id=contest,
+                    election_id=election,
+                    kind="body_seats",
+                    body_id=council,
+                    district_area_id=area,
+                    magnitude=area_row["seats"],
+                    round_number=1,
+                    electoral_system_id=systems["block"],
+                    default_result_kind="counted",
+                )
+                name(contest, f"{display}, Greater London Council, {year}")
+                cs.add("slug", path=f"gb/london/{day}-glc/{slug(display)}", entity_id=contest)
+                result_set = cs.key(f"{SOURCE}.result_set", contest_key)
+                cs.add(
+                    "result_set",
+                    id=result_set,
+                    election_id=election,
+                    contest_id=contest,
+                    stage="official",
+                    kind="counted",
+                    status="active",
+                    source_id=source,
+                    is_default=contest not in others,
+                    completeness=1,
+                )
+                cs.add(
+                    "citation",
+                    entity_id=result_set,
+                    source_id=source,
+                    locator={"page": area_row["page"], "area": area_row["printed"]},
+                )
+
+                def early_value(option: UUID | None, measure: int, figure: int, number: int, box: list[float]) -> None:
+                    cs.add(
+                        "result_value",
+                        result_set_id=result_set,
+                        unit_id=unit,
+                        option_id=option,
+                        channel=0,
+                        measure=measure,
+                        count_round=0,
+                        flags=DIGITIZED,
+                        value=figure,
+                    )
+                    x0, y0, x1, y1 = box
+                    cs.add(
+                        "value_locator",
+                        result_set_id=result_set,
+                        unit_id=unit,
+                        option_id=option,
+                        channel=0,
+                        measure=measure,
+                        count_round=0,
+                        page_id=early_page(number),
+                        source_id=None,
+                        x0=x0,
+                        y0=y0,
+                        x1=x1,
+                        y1=y1,
+                    )
+
+                early_value(
+                    None, REGISTERED, area_row["electorate"], area_row["stats_page"], area_row["electorate_bbox"]
+                )
+                early_value(None, BALLOTS, area_row["voting"], area_row["stats_page"], area_row["voting_bbox"])
+                for line in lines.filter(pl.col("area") == area_row["printed"]).iter_rows(named=True):
+                    option_key = f"{contest_key}:{line['number']}"
+                    label = EARLY_PARTIES[year][line["party"]][0]
+                    owner = glc_party(label)
+                    option = cs.key(f"{SOURCE}.option", option_key)
+                    cs.add(
+                        "contest_option",
+                        id=option,
+                        contest_id=contest,
+                        kind="candidate",
+                        party_id=owner,
+                        ballot_label=line["name"],
+                    )
+                    person = cs.key(f"{SOURCE}.person", option_key)
+                    cs.add("person", id=person)
+                    name(person, early_person(year, line["name"]))
+                    cs.add(
+                        "candidacy",
+                        id=cs.key(f"{SOURCE}.candidacy", option_key),
+                        person_id=person,
+                        option_id=option,
+                        role="head",
+                        ballot_name=line["name"],
+                        member_of_party_id=owner,
+                        is_independent=label == "Independent",
+                    )
+                    early_value(option, VOTES, line["votes"], line["page"], line["bbox"])
                     if line["elected"]:
                         cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected")
         return cs.write()
