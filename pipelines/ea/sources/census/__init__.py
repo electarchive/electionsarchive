@@ -46,8 +46,8 @@ def emit(cc: str) -> str:
 
         sources: dict[str, UUID] = {}
         for tag, source in spec["sources"].items():
-            id = sources[tag] = cs.source(source["publisher"], source["title"])
-            if id in cs.minted:
+            id = cs.source(source["publisher"], source["title"])
+            if id in cs.minted and id not in sources.values():
                 cs.add(
                     "source",
                     id=id,
@@ -57,6 +57,7 @@ def emit(cc: str) -> str:
                     url=source["url"],
                     notes=source.get("note"),
                 )
+            sources[tag] = id
 
         tiers = {tier["key"]: mint("census_tier", tier["key"]) for tier in spec["tiers"]}
         for tier in spec["tiers"]:
