@@ -6163,9 +6163,10 @@ async function tabulate(
     party: string | null;
     person: string | null;
     color: string | null;
+    ballot: string | null;
   }>(sql`
     select c.id as contest, rs.id is not null as "isRecorded", rs.kind is not distinct from 'tacit' as "isTacit",
-      w.kind, coalesce(w.party, h.party) as party, w.person,
+      w.kind, coalesce(w.party, h.party) as party, w.person, w.ballot,
       (select pc.color from party_color pc where pc.party_id = coalesce(w.party, h.party)
         order by pc.valid @> e.date_from desc, upper(pc.valid) desc nulls first limit 1) as color
     from contest c
@@ -6175,7 +6176,8 @@ async function tabulate(
       where rs.contest_id = c.id and ${latest("rs")} order by rs.stage desc limit 1
     ) rs on true
     left join lateral (
-      select x.kind::text as kind, coalesce(pm.into_id, o.party_id) as party, coalesce(m.into_id, cy.person_id) as person
+      select x.kind::text as kind, coalesce(pm.into_id, o.party_id) as party, coalesce(m.into_id, cy.person_id) as person,
+        o.ballot_label as ballot
       from outcome x
       join contest_option o on o.id = x.option_id
       left join entity_merge pm on pm.entity_id = o.party_id
@@ -6254,6 +6256,7 @@ async function tabulate(
                       ? null
                       : (winners.short.get(row.party) ??
                         winners.full.get(row.party))) ??
+                    row.ballot ??
                     "",
                   color: row.color,
                   person: row.person,

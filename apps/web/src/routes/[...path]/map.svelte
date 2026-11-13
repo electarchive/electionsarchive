@@ -1754,6 +1754,18 @@
   ) =>
     painted.get(declared?.party ?? "") ??
     swatch(declared?.color, `party:${declared?.party}`);
+  const rolled = (row: {
+    valid: number;
+    leader: number | null;
+    declared?: { person: string | null; party: string | null } | null;
+    delegates?: { first: Array<[number, number]> } | null;
+  }) =>
+    row.valid === 0 &&
+    row.leader == null &&
+    row.declared?.person == null &&
+    row.declared?.party == null
+      ? (row.delegates?.first[0]?.[0] ?? null)
+      : null;
   const parties = $derived(
     (isTally ? [] : places.legend)
       .map((item, index) => ({ index, name: names[index] ?? item.label }))
@@ -2114,12 +2126,23 @@
         continue;
       }
       if (row.leader == null) {
+        const lead = rolled(row);
         if (
           (view === "winner" || view === "split") &&
           only == null &&
-          row.declared != null
+          (lead != null || row.declared != null)
         ) {
-          result.push([row.k, read(marginShade(declare(row.declared), SAFE))]);
+          result.push([
+            row.k,
+            read(
+              marginShade(
+                lead == null
+                  ? declare(row.declared)
+                  : (colors[lead] ?? "var(--muted-foreground)"),
+                SAFE,
+              ),
+            ),
+          ]);
         }
         continue;
       }
@@ -5179,19 +5202,19 @@
             })}</span
       >
     {/if}
-    {#if current.valid === 0 && (current.leader != null || current.declared != null)}
+    {const chief = $derived(current.leader ?? rolled(current))}
+    {#if current.valid === 0 && (chief != null || current.declared != null)}
       <span
         class="flex items-center gap-2 text-[0.8125rem]"
-        style:--party={current.leader == null
+        style:--party={chief == null
           ? declare(current.declared)
-          : colors[current.leader]}
+          : colors[chief]}
       >
         <span class="rounded-xs bg-(--party) chip block-2.5 inline-2.5"></span>
         <span class="font-semibold"
-          >{current.leader == null
+          >{chief == null
             ? current.declared?.label
-            : (places.legend[current.leader]?.label ??
-              names[current.leader])}</span
+            : (places.legend[chief]?.label ?? names[chief])}</span
         >
         {#if current.delegates?.first[0] != null}
           <span class="font-figures text-muted-foreground tabular-nums"
