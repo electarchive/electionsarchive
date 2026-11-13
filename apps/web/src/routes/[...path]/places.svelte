@@ -1030,6 +1030,20 @@
                         )}{/if}</span
                     >
                   </span>
+                {:else if row.declared != null && row.declared.person == null && row.declared.party == null && row.delegates?.first[0] != null}
+                  <span class="flex items-center gap-1.5">
+                    <Name
+                      class="relative z-1 truncate font-semibold max-inline-40"
+                      tabindex={-1}
+                      label={titles[row.delegates.first[0][0]] ?? ""}
+                      color={colors[row.delegates.first[0][0]]}
+                      person={places.legend[row.delegates.first[0][0]]?.person}
+                      party={places.legend[row.delegates.first[0][0]]?.party}
+                    />
+                    <span class="text-[0.8125rem] text-muted-foreground"
+                      >{@render status(row)}</span
+                    >
+                  </span>
                 {:else if row.declared != null}
                   <span class="flex items-center gap-1.5">
                     <Name
