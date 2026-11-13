@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
+import { allocate } from "./allocation.ts";
 import acre from "./fixtures/acre-2022-lists.json" with { type: "json" };
 import germany from "./fixtures/germany-2025-lists.json" with { type: "json" };
 import germanyEuropean from "./fixtures/germany-ep-2024-lists.json" with { type: "json" };
 import italy from "./fixtures/italy-2022-lists.json" with { type: "json" };
+import councillors from "./fixtures/japan-councillors-2019-2022-lists.json" with { type: "json" };
 import japan from "./fixtures/japan-representatives-2024-lists.json" with { type: "json" };
 import zurich from "./fixtures/zurich-2023-lists.json" with { type: "json" };
 import { cover, fill, proclaim } from "./lists.ts";
@@ -80,6 +82,31 @@ describe("tied closed-list ranks", () => {
       seats += list.seats;
     }
     expect(seats).toBe(176);
+  });
+});
+
+describe("ranked candidates first", () => {
+  it("reproduces the House of Councillors' 2019 and 2022 national members, priority candidates (特定枠) first", () => {
+    const rules = {
+      order: "open",
+      ranked: "first",
+      exhausted: "vacant",
+      vacancy: "next_on_list",
+    } as const;
+    for (const { year, seats, parties } of councillors) {
+      const { seats: won } = allocate(
+        { formula: "dhondt" },
+        seats,
+        parties.map(({ party, votes }) => ({ id: party, votes })),
+      );
+      for (const { party, seats: declaredSeats, members } of parties) {
+        const label = `${year} ${party}`;
+        expect(won[party] ?? 0, label).toBe(declaredSeats);
+        expect(fill(rules, declaredSeats, members.toReversed()), label).toEqual(
+          { elected: declared(members), short: 0, tie: undefined },
+        );
+      }
+    }
   });
 });
 

@@ -1,0 +1,1843 @@
+[
+  {
+    "year": 2019,
+    "seats": 50,
+    "parties": [
+      {
+        "party": "自由民主党",
+        "votes": 17712373.119,
+        "seats": 19,
+        "members": [
+          { "id": "三木とおる", "rank": 1, "votes": null, "elected": true },
+          { "id": "三浦靖", "rank": 2, "votes": null, "elected": true },
+          {
+            "id": "つげ芳文",
+            "rank": null,
+            "votes": 600189.903,
+            "elected": true
+          },
+          {
+            "id": "山田太郎",
+            "rank": null,
+            "votes": 540077.96,
+            "elected": true
+          },
+          {
+            "id": "和田まさむね",
+            "rank": null,
+            "votes": 288080.0,
+            "elected": true
+          },
+          {
+            "id": "佐藤まさひさ",
+            "rank": null,
+            "votes": 237432.095,
+            "elected": true
+          },
+          {
+            "id": "佐藤のぶあき",
+            "rank": null,
+            "votes": 232548.956,
+            "elected": true
+          },
+          {
+            "id": "橋本聖子",
+            "rank": null,
+            "votes": 225617.0,
+            "elected": true
+          },
+          {
+            "id": "山田としお",
+            "rank": null,
+            "votes": 217619.597,
+            "elected": true
+          },
+          {
+            "id": "ありむら治子",
+            "rank": null,
+            "votes": 206221.0,
+            "elected": true
+          },
+          {
+            "id": "宮本しゅうじ",
+            "rank": null,
+            "votes": 202122.0,
+            "elected": true
+          },
+          {
+            "id": "石田まさひろ",
+            "rank": null,
+            "votes": 189893.0,
+            "elected": true
+          },
+          {
+            "id": "北村経夫",
+            "rank": null,
+            "votes": 178210.0,
+            "elected": true
+          },
+          {
+            "id": "本田あきこ",
+            "rank": null,
+            "votes": 159596.151,
+            "elected": true
+          },
+          {
+            "id": "えとうせいいち",
+            "rank": null,
+            "votes": 154578.0,
+            "elected": true
+          },
+          {
+            "id": "羽生田たかし",
+            "rank": null,
+            "votes": 152807.948,
+            "elected": true
+          },
+          {
+            "id": "宮崎まさお",
+            "rank": null,
+            "votes": 137502.0,
+            "elected": true
+          },
+          {
+            "id": "山東昭子",
+            "rank": null,
+            "votes": 133645.785,
+            "elected": true
+          },
+          {
+            "id": "赤池まさあき",
+            "rank": null,
+            "votes": 131727.208,
+            "elected": true
+          },
+          {
+            "id": "ひがなつみ",
+            "rank": null,
+            "votes": 114596.0,
+            "elected": false
+          },
+          {
+            "id": "中田宏",
+            "rank": null,
+            "votes": 112581.303,
+            "elected": false
+          },
+          {
+            "id": "田中まさし",
+            "rank": null,
+            "votes": 100005.187,
+            "elected": false
+          },
+          {
+            "id": "おだち源幸",
+            "rank": null,
+            "votes": 92882.0,
+            "elected": false
+          },
+          {
+            "id": "木村よしお",
+            "rank": null,
+            "votes": 92419.856,
+            "elected": false
+          },
+          {
+            "id": "井上よしゆき",
+            "rank": null,
+            "votes": 87946.669,
+            "elected": false
+          },
+          {
+            "id": "小川しんじ",
+            "rank": null,
+            "votes": 85266.022,
+            "elected": false
+          },
+          {
+            "id": "山本左近",
+            "rank": null,
+            "votes": 78236.224,
+            "elected": false
+          },
+          {
+            "id": "かくた充由",
+            "rank": null,
+            "votes": 75241.505,
+            "elected": false
+          },
+          {
+            "id": "丸山和也",
+            "rank": null,
+            "votes": 58587.0,
+            "elected": false
+          },
+          {
+            "id": "糸川まさあき",
+            "rank": null,
+            "votes": 36311.527,
+            "elected": false
+          },
+          {
+            "id": "くま田あつし",
+            "rank": null,
+            "votes": 29961.0,
+            "elected": false
+          },
+          {
+            "id": "水口なおと",
+            "rank": null,
+            "votes": 24504.222,
+            "elected": false
+          },
+          {
+            "id": "森本勝也",
+            "rank": null,
+            "votes": 23450.657,
+            "elected": false
+          }
+        ]
+      },
+      {
+        "party": "立憲民主党",
+        "votes": 7917720.945,
+        "seats": 8,
+        "members": [
+          {
+            "id": "岸まきこ",
+            "rank": null,
+            "votes": 157849.0,
+            "elected": true
+          },
+          {
+            "id": "みずおか俊一",
+            "rank": null,
+            "votes": 148309.0,
+            "elected": true
+          },
+          {
+            "id": "小沢まさひと",
+            "rank": null,
+            "votes": 144751.0,
+            "elected": true
+          },
+          {
+            "id": "吉川さおり",
+            "rank": null,
+            "votes": 143472.0,
+            "elected": true
+          },
+          {
+            "id": "もりやたかし",
+            "rank": null,
+            "votes": 104339.413,
+            "elected": true
+          },
+          { "id": "川田龍平", "rank": null, "votes": 94702.0, "elected": true },
+          { "id": "石川大我", "rank": null, "votes": 73799.0, "elected": true },
+          { "id": "須藤元気", "rank": null, "votes": 73787.0, "elected": true },
+          {
+            "id": "市井紗耶香",
+            "rank": null,
+            "votes": 50415.298,
+            "elected": false
+          },
+          {
+            "id": "奥村まさよし",
+            "rank": null,
+            "votes": 32024.0,
+            "elected": false
+          },
+          {
+            "id": "若林ともこ",
+            "rank": null,
+            "votes": 31683.757,
+            "elected": false
+          },
+          {
+            "id": "おしどりマコ",
+            "rank": null,
+            "votes": 29072.0,
+            "elected": false
+          },
+          {
+            "id": "ふじた幸久",
+            "rank": null,
+            "votes": 28919.215,
+            "elected": false
+          },
+          {
+            "id": "斉藤りえ",
+            "rank": null,
+            "votes": 23002.0,
+            "elected": false
+          },
+          {
+            "id": "佐藤かおり",
+            "rank": null,
+            "votes": 20200.177,
+            "elected": false
+          },
+          {
+            "id": "中村ゆきこ",
+            "rank": null,
+            "votes": 13422.369,
+            "elected": false
+          },
+          {
+            "id": "今泉まお",
+            "rank": null,
+            "votes": 11991.0,
+            "elected": false
+          },
+          {
+            "id": "おまた一平",
+            "rank": null,
+            "votes": 10140.0,
+            "elected": false
+          },
+          {
+            "id": "白沢みき",
+            "rank": null,
+            "votes": 9483.26,
+            "elected": false
+          },
+          {
+            "id": "まのさとし",
+            "rank": null,
+            "votes": 9008.343,
+            "elected": false
+          },
+          {
+            "id": "しおみ俊次",
+            "rank": null,
+            "votes": 5115.0,
+            "elected": false
+          },
+          {
+            "id": "深貝とおる",
+            "rank": null,
+            "votes": 4529.113,
+            "elected": false
+          }
+        ]
+      },
+      {
+        "party": "国民民主党",
+        "votes": 3481078.4,
+        "seats": 3,
+        "members": [
+          {
+            "id": "田村まみ",
+            "rank": null,
+            "votes": 260324.0,
+            "elected": true
+          },
+          {
+            "id": "いそざき哲史",
+            "rank": null,
+            "votes": 258507.0,
+            "elected": true
+          },
+          {
+            "id": "浜野よしふみ",
+            "rank": null,
+            "votes": 256928.785,
+            "elected": true
+          },
+          {
+            "id": "石上としお",
+            "rank": null,
+            "votes": 192586.679,
+            "elected": false
+          },
+          {
+            "id": "田中ひさや",
+            "rank": null,
+            "votes": 143492.942,
+            "elected": false
+          },
+          {
+            "id": "大島九州男",
+            "rank": null,
+            "votes": 87740.0,
+            "elected": false
+          },
+          {
+            "id": "山下ようこ",
+            "rank": null,
+            "votes": 35938.867,
+            "elected": false
+          },
+          {
+            "id": "円より子",
+            "rank": null,
+            "votes": 24709.0,
+            "elected": false
+          },
+          {
+            "id": "ひめいゆみこ",
+            "rank": null,
+            "votes": 21006.0,
+            "elected": false
+          },
+          {
+            "id": "小山田つね子",
+            "rank": null,
+            "votes": 8306.0,
+            "elected": false
+          },
+          { "id": "鈴木覚", "rank": null, "votes": 5923.855, "elected": false },
+          {
+            "id": "酒井リョースケ",
+            "rank": null,
+            "votes": 4379.272,
+            "elected": false
+          },
+          { "id": "中沢健", "rank": null, "votes": 4058.0, "elected": false },
+          {
+            "id": "藤川たけと",
+            "rank": null,
+            "votes": 2472.0,
+            "elected": false
+          }
+        ]
+      },
+      {
+        "party": "公明党",
+        "votes": 6536336.451,
+        "seats": 7,
+        "members": [
+          {
+            "id": "山本かなえ",
+            "rank": null,
+            "votes": 594288.947,
+            "elected": true
+          },
+          {
+            "id": "山本ひろし",
+            "rank": null,
+            "votes": 471759.555,
+            "elected": true
+          },
+          {
+            "id": "若松かねしげ",
+            "rank": null,
+            "votes": 342356.0,
+            "elected": true
+          },
+          {
+            "id": "かわの義博",
+            "rank": null,
+            "votes": 328659.0,
+            "elected": true
+          },
+          {
+            "id": "新妻ひでき",
+            "rank": null,
+            "votes": 281832.0,
+            "elected": true
+          },
+          {
+            "id": "平木だいさく",
+            "rank": null,
+            "votes": 183869.0,
+            "elected": true
+          },
+          {
+            "id": "塩田ひろあき",
+            "rank": null,
+            "votes": 15178.0,
+            "elected": true
+          },
+          { "id": "高橋次郎", "rank": null, "votes": 7577.0, "elected": false },
+          { "id": "奈良直記", "rank": null, "votes": 5413.0, "elected": false },
+          { "id": "西田義光", "rank": null, "votes": 3986.0, "elected": false },
+          { "id": "藤井伸城", "rank": null, "votes": 3249.0, "elected": false },
+          { "id": "竹島正人", "rank": null, "votes": 3106.0, "elected": false },
+          {
+            "id": "角田健一郎",
+            "rank": null,
+            "votes": 2924.278,
+            "elected": false
+          },
+          { "id": "坂本道応", "rank": null, "votes": 2438.0, "elected": false },
+          {
+            "id": "村中克也",
+            "rank": null,
+            "votes": 2163.335,
+            "elected": false
+          },
+          { "id": "塩崎剛", "rank": null, "votes": 1996.336, "elected": false },
+          { "id": "国分隆作", "rank": null, "votes": 1623.0, "elected": false }
+        ]
+      },
+      {
+        "party": "日本維新の会",
+        "votes": 4907844.388,
+        "seats": 5,
+        "members": [
+          {
+            "id": "鈴木宗男",
+            "rank": null,
+            "votes": 220742.675,
+            "elected": true
+          },
+          {
+            "id": "むろい邦彦",
+            "rank": null,
+            "votes": 87188.0,
+            "elected": true
+          },
+          {
+            "id": "梅村さとし",
+            "rank": null,
+            "votes": 58269.522,
+            "elected": true
+          },
+          { "id": "しばた巧", "rank": null, "votes": 53938.0, "elected": true },
+          {
+            "id": "やながせ裕文",
+            "rank": null,
+            "votes": 53086.0,
+            "elected": true
+          },
+          {
+            "id": "藤巻健史",
+            "rank": null,
+            "votes": 51619.511,
+            "elected": false
+          },
+          {
+            "id": "山口かずゆき",
+            "rank": null,
+            "votes": 42231.776,
+            "elected": false
+          },
+          {
+            "id": "くしだ久子",
+            "rank": null,
+            "votes": 32296.0,
+            "elected": false
+          },
+          {
+            "id": "くわはらくみこ",
+            "rank": null,
+            "votes": 20721.0,
+            "elected": false
+          },
+          {
+            "id": "奥田まり",
+            "rank": null,
+            "votes": 20478.0,
+            "elected": false
+          },
+          {
+            "id": "森口あゆみ",
+            "rank": null,
+            "votes": 19333.904,
+            "elected": false
+          },
+          {
+            "id": "空本せいき",
+            "rank": null,
+            "votes": 12772.0,
+            "elected": false
+          },
+          {
+            "id": "あらき大樹",
+            "rank": null,
+            "votes": 8577.0,
+            "elected": false
+          },
+          {
+            "id": "いわぶち美智子",
+            "rank": null,
+            "votes": 8137.0,
+            "elected": false
+          }
+        ]
+      },
+      {
+        "party": "日本共産党",
+        "votes": 4483411.183,
+        "seats": 4,
+        "members": [
+          { "id": "小池晃", "rank": null, "votes": 158621.0, "elected": true },
+          {
+            "id": "山下よしき",
+            "rank": null,
+            "votes": 48932.48,
+            "elected": true
+          },
+          {
+            "id": "井上さとし",
+            "rank": null,
+            "votes": 42982.44,
+            "elected": true
+          },
+          { "id": "紙智子", "rank": null, "votes": 34696.013, "elected": true },
+          {
+            "id": "仁比そうへい",
+            "rank": null,
+            "votes": 33360.0,
+            "elected": false
+          },
+          {
+            "id": "山本のりこ",
+            "rank": null,
+            "votes": 32816.665,
+            "elected": false
+          },
+          {
+            "id": "しいばかずゆき",
+            "rank": null,
+            "votes": 16728.218,
+            "elected": false
+          },
+          {
+            "id": "梅村さえこ",
+            "rank": null,
+            "votes": 15357.129,
+            "elected": false
+          },
+          {
+            "id": "山本千代子",
+            "rank": null,
+            "votes": 7573.462,
+            "elected": false
+          },
+          {
+            "id": "ふなやま由美",
+            "rank": null,
+            "votes": 5364.0,
+            "elected": false
+          },
+          {
+            "id": "佐藤ちひろ",
+            "rank": null,
+            "votes": 4199.426,
+            "elected": false
+          },
+          { "id": "原純子", "rank": null, "votes": 3671.0, "elected": false },
+          { "id": "藤本友里", "rank": null, "votes": 3414.0, "elected": false },
+          {
+            "id": "伊藤りち子",
+            "rank": null,
+            "votes": 3079.612,
+            "elected": false
+          },
+          {
+            "id": "有坂ちひろ",
+            "rank": null,
+            "votes": 2787.721,
+            "elected": false
+          },
+          { "id": "田辺健一", "rank": null, "votes": 2677.0, "elected": false },
+          {
+            "id": "青山了介",
+            "rank": null,
+            "votes": 2600.721,
+            "elected": false
+          },
+          {
+            "id": "まつざき真琴",
+            "rank": null,
+            "votes": 2581.0,
+            "elected": false
+          },
+          {
+            "id": "大野聖美",
+            "rank": null,
+            "votes": 2170.469,
+            "elected": false
+          },
+          { "id": "島袋恵祐", "rank": null, "votes": 2162.0, "elected": false },
+          {
+            "id": "伊藤達也",
+            "rank": null,
+            "votes": 2152.164,
+            "elected": false
+          },
+          {
+            "id": "小久保剛志",
+            "rank": null,
+            "votes": 1200.134,
+            "elected": false
+          },
+          { "id": "下奥奈歩", "rank": null, "votes": 936.0, "elected": false },
+          { "id": "沼上徳光", "rank": null, "votes": 647.0, "elected": false },
+          {
+            "id": "住寄聡美",
+            "rank": null,
+            "votes": 582.529,
+            "elected": false
+          },
+          { "id": "鎌野祥二", "rank": null, "votes": 419.0, "elected": false }
+        ]
+      },
+      {
+        "party": "社会民主党",
+        "votes": 1046011.52,
+        "seats": 1,
+        "members": [
+          {
+            "id": "吉田ただとも",
+            "rank": null,
+            "votes": 149287.0,
+            "elected": true
+          },
+          {
+            "id": "仲村みお",
+            "rank": null,
+            "votes": 98681.52,
+            "elected": false
+          },
+          {
+            "id": "矢野あつ子",
+            "rank": null,
+            "votes": 21391.0,
+            "elected": false
+          },
+          {
+            "id": "大椿ゆうこ",
+            "rank": null,
+            "votes": 15445.0,
+            "elected": false
+          }
+        ]
+      },
+      {
+        "party": "れいわ新選組",
+        "votes": 2280252.75,
+        "seats": 2,
+        "members": [
+          { "id": "ふなごやすひこ", "rank": 1, "votes": null, "elected": true },
+          { "id": "木村英子", "rank": 2, "votes": null, "elected": true },
+          {
+            "id": "山本太郎",
+            "rank": null,
+            "votes": 991756.597,
+            "elected": false
+          },
+          {
+            "id": "はすいけ透",
+            "rank": null,
+            "votes": 20557.2,
+            "elected": false
+          },
+          {
+            "id": "大西つねき",
+            "rank": null,
+            "votes": 19842.0,
+            "elected": false
+          },
+          {
+            "id": "やすとみ歩",
+            "rank": null,
+            "votes": 8632.076,
+            "elected": false
+          },
+          {
+            "id": "渡辺てる子",
+            "rank": null,
+            "votes": 5073.675,
+            "elected": false
+          },
+          {
+            "id": "辻村ちひろ",
+            "rank": null,
+            "votes": 4070.549,
+            "elected": false
+          },
+          {
+            "id": "三井よしふみ",
+            "rank": null,
+            "votes": 3907.939,
+            "elected": false
+          }
+        ]
+      },
+      {
+        "party": "ＮＨＫから国民を守る党",
+        "votes": 987885.326,
+        "seats": 1,
+        "members": [
+          {
+            "id": "立花孝志",
+            "rank": null,
+            "votes": 130233.367,
+            "elected": true
+          },
+          { "id": "浜田聡", "rank": null, "votes": 9308.959, "elected": false },
+          { "id": "岡本介伸", "rank": null, "votes": 4269.0, "elected": false },
+          { "id": "熊丸英治", "rank": null, "votes": 2850.0, "elected": false }
+        ]
+      },
+      {
+        "party": "オリーブの木",
+        "votes": 167897.997,
+        "seats": 0,
+        "members": [
+          {
+            "id": "黒川あつひこ",
+            "rank": null,
+            "votes": 12246.0,
+            "elected": false
+          },
+          {
+            "id": "若林アキ",
+            "rank": null,
+            "votes": 10031.888,
+            "elected": false
+          },
+          {
+            "id": "小川まなぶ",
+            "rank": null,
+            "votes": 4475.347,
+            "elected": false
+          },
+          {
+            "id": "天木直人",
+            "rank": null,
+            "votes": 4271.762,
+            "elected": false
+          }
+        ]
+      },
+      {
+        "party": "幸福実現党",
+        "votes": 202278.772,
+        "seats": 0,
+        "members": [
+          {
+            "id": "釈りょうこ",
+            "rank": null,
+            "votes": 30356.0,
+            "elected": false
+          },
+          {
+            "id": "及川幸久",
+            "rank": null,
+            "votes": 8290.772,
+            "elected": false
+          },
+          {
+            "id": "松島ひろのり",
+            "rank": null,
+            "votes": 4678.0,
+            "elected": false
+          }
+        ]
+      },
+      {
+        "party": "労働の解放をめざす労働者党",
+        "votes": 80055.927,
+        "seats": 0,
+        "members": [
+          { "id": "伊藤恵子", "rank": 1, "votes": null, "elected": false },
+          {
+            "id": "林ひろよし",
+            "rank": null,
+            "votes": 18000.0,
+            "elected": false
+          },
+          {
+            "id": "吉村ふみお",
+            "rank": null,
+            "votes": 2810.0,
+            "elected": false
+          },
+          {
+            "id": "菊池里志",
+            "rank": null,
+            "votes": 1353.928,
+            "elected": false
+          }
+        ]
+      },
+      {
+        "party": "安楽死制度を考える会",
+        "votes": 269052.0,
+        "seats": 0,
+        "members": [
+          { "id": "佐野秀光", "rank": null, "votes": 35611.0, "elected": false }
+        ]
+      }
+    ]
+  },
+  {
+    "year": 2022,
+    "seats": 50,
+    "parties": [
+      {
+        "party": "自由民主党",
+        "votes": 18256245.412,
+        "seats": 18,
+        "members": [
+          { "id": "藤井一博", "rank": 1, "votes": null, "elected": true },
+          { "id": "梶原大介", "rank": 2, "votes": null, "elected": true },
+          { "id": "赤松健", "rank": null, "votes": 528053.0, "elected": true },
+          {
+            "id": "長谷川ひではる",
+            "rank": null,
+            "votes": 414371.02,
+            "elected": true
+          },
+          {
+            "id": "青山繁晴",
+            "rank": null,
+            "votes": 373786.0,
+            "elected": true
+          },
+          {
+            "id": "片山さつき",
+            "rank": null,
+            "votes": 298091.51,
+            "elected": true
+          },
+          {
+            "id": "足立としゆき",
+            "rank": null,
+            "votes": 247755.055,
+            "elected": true
+          },
+          {
+            "id": "自見はなこ",
+            "rank": null,
+            "votes": 213369.0,
+            "elected": true
+          },
+          {
+            "id": "藤木しんや",
+            "rank": null,
+            "votes": 187740.202,
+            "elected": true
+          },
+          {
+            "id": "山田宏",
+            "rank": null,
+            "votes": 175871.715,
+            "elected": true
+          },
+          {
+            "id": "とものうりお",
+            "rank": null,
+            "votes": 174335.0,
+            "elected": true
+          },
+          {
+            "id": "山谷えり子",
+            "rank": null,
+            "votes": 172640.169,
+            "elected": true
+          },
+          {
+            "id": "井上よしゆき",
+            "rank": null,
+            "votes": 165062.175,
+            "elected": true
+          },
+          {
+            "id": "進藤金日子",
+            "rank": null,
+            "votes": 150759.0,
+            "elected": true
+          },
+          {
+            "id": "今井絵理子",
+            "rank": null,
+            "votes": 148630.162,
+            "elected": true
+          },
+          {
+            "id": "あだちまさし",
+            "rank": null,
+            "votes": 138994.642,
+            "elected": true
+          },
+          {
+            "id": "神谷まさゆき",
+            "rank": null,
+            "votes": 127188.459,
+            "elected": true
+          },
+          {
+            "id": "おち俊之",
+            "rank": null,
+            "votes": 118710.034,
+            "elected": true
+          },
+          {
+            "id": "小川かつみ",
+            "rank": null,
+            "votes": 118222.945,
+            "elected": false
+          },
+          {
+            "id": "木村よしお",
+            "rank": null,
+            "votes": 113873.825,
+            "elected": false
+          },
+          {
+            "id": "ウトタカシ",
+            "rank": null,
+            "votes": 101840.71,
+            "elected": false
+          },
+          {
+            "id": "そのだ修光",
+            "rank": null,
+            "votes": 93380.0,
+            "elected": false
+          },
+          {
+            "id": "水おち敏栄",
+            "rank": null,
+            "votes": 82920.0,
+            "elected": false
+          },
+          {
+            "id": "ふじすえ健三",
+            "rank": null,
+            "votes": 74972.0,
+            "elected": false
+          },
+          {
+            "id": "いわき光英",
+            "rank": null,
+            "votes": 63714.0,
+            "elected": false
+          },
+          {
+            "id": "河村けんいち",
+            "rank": null,
+            "votes": 59007.679,
+            "elected": false
+          },
+          {
+            "id": "吉岡しんたろう",
+            "rank": null,
+            "votes": 55804.0,
+            "elected": false
+          },
+          {
+            "id": "えりアルフィヤ",
+            "rank": null,
+            "votes": 54646.0,
+            "elected": false
+          },
+          {
+            "id": "おだちもとゆき",
+            "rank": null,
+            "votes": 24576.0,
+            "elected": false
+          },
+          {
+            "id": "むこう山じゅん",
+            "rank": null,
+            "votes": 20638.0,
+            "elected": false
+          },
+          {
+            "id": "有里まほ",
+            "rank": null,
+            "votes": 18561.0,
+            "elected": false
+          },
+          {
+            "id": "高原あきこ",
+            "rank": null,
+            "votes": 17542.622,
+            "elected": false
+          },
+          {
+            "id": "遠藤奈央子",
+            "rank": null,
+            "votes": 7762.0,
+            "elected": false
+          }
+        ]
+      },
+      {
+        "party": "立憲民主党",
+        "votes": 6771945.011,
+        "seats": 7,
+        "members": [
+          {
+            "id": "つじもと清美",
+            "rank": null,
+            "votes": 428859.769,
+            "elected": true
+          },
+          {
+            "id": "鬼木まこと",
+            "rank": null,
+            "votes": 171619.697,
+            "elected": true
+          },
+          {
+            "id": "古賀ちかげ",
+            "rank": null,
+            "votes": 144344.0,
+            "elected": true
+          },
+          {
+            "id": "しば慎一",
+            "rank": null,
+            "votes": 127382.292,
+            "elected": true
+          },
+          {
+            "id": "村田きょうこ",
+            "rank": null,
+            "votes": 125340.85,
+            "elected": true
+          },
+          { "id": "青木愛", "rank": null, "votes": 123742.0, "elected": true },
+          {
+            "id": "石橋みちひろ",
+            "rank": null,
+            "votes": 111703.0,
+            "elected": true
+          },
+          {
+            "id": "白しんくん",
+            "rank": null,
+            "votes": 84242.0,
+            "elected": false
+          },
+          {
+            "id": "石川まさとし",
+            "rank": null,
+            "votes": 48702.805,
+            "elected": false
+          },
+          {
+            "id": "有田芳生",
+            "rank": null,
+            "votes": 46715.0,
+            "elected": false
+          },
+          {
+            "id": "堀越けいにん",
+            "rank": null,
+            "votes": 39631.0,
+            "elected": false
+          },
+          {
+            "id": "くりした善行",
+            "rank": null,
+            "votes": 39555.0,
+            "elected": false
+          },
+          {
+            "id": "はたともこ",
+            "rank": null,
+            "votes": 18208.635,
+            "elected": false
+          },
+          {
+            "id": "要友紀子",
+            "rank": null,
+            "votes": 17529.0,
+            "elected": false
+          },
+          {
+            "id": "森永みき",
+            "rank": null,
+            "votes": 10055.0,
+            "elected": false
+          },
+          {
+            "id": "かわの麻美",
+            "rank": null,
+            "votes": 7941.0,
+            "elected": false
+          },
+          {
+            "id": "さわむらけいこ",
+            "rank": null,
+            "votes": 7602.0,
+            "elected": false
+          },
+          {
+            "id": "木村正弘",
+            "rank": null,
+            "votes": 7101.466,
+            "elected": false
+          },
+          { "id": "田中勝一", "rank": null, "votes": 4503.0, "elected": false },
+          { "id": "菅原美香", "rank": null, "votes": 2773.0, "elected": false }
+        ]
+      },
+      {
+        "party": "日本維新の会",
+        "votes": 7845995.352,
+        "seats": 8,
+        "members": [
+          {
+            "id": "石井あきら",
+            "rank": null,
+            "votes": 123279.274,
+            "elected": true
+          },
+          {
+            "id": "石井みつこ",
+            "rank": null,
+            "votes": 74118.112,
+            "elected": true
+          },
+          { "id": "松野明美", "rank": null, "votes": 55608.0, "elected": true },
+          {
+            "id": "中条きよし",
+            "rank": null,
+            "votes": 47420.0,
+            "elected": true
+          },
+          {
+            "id": "猪瀬直樹",
+            "rank": null,
+            "votes": 44211.978,
+            "elected": true
+          },
+          {
+            "id": "金子みちひと",
+            "rank": null,
+            "votes": 36944.0,
+            "elected": true
+          },
+          {
+            "id": "くしだ誠一",
+            "rank": null,
+            "votes": 35842.0,
+            "elected": true
+          },
+          { "id": "青島健太", "rank": null, "votes": 33553.0, "elected": true },
+          {
+            "id": "上野ほたる",
+            "rank": null,
+            "votes": 29095.0,
+            "elected": false
+          },
+          {
+            "id": "神谷ゆり",
+            "rank": null,
+            "votes": 27215.249,
+            "elected": false
+          },
+          {
+            "id": "後藤ひとし",
+            "rank": null,
+            "votes": 24874.182,
+            "elected": false
+          },
+          {
+            "id": "森口あゆみ",
+            "rank": null,
+            "votes": 23664.322,
+            "elected": false
+          },
+          {
+            "id": "岸口みのる",
+            "rank": null,
+            "votes": 22399.0,
+            "elected": false
+          },
+          {
+            "id": "松浦大悟",
+            "rank": null,
+            "votes": 20222.0,
+            "elected": false
+          },
+          {
+            "id": "飯田サトシ",
+            "rank": null,
+            "votes": 19522.0,
+            "elected": false
+          },
+          {
+            "id": "井上一徳",
+            "rank": null,
+            "votes": 18370.158,
+            "elected": false
+          },
+          {
+            "id": "山口かずゆき",
+            "rank": null,
+            "votes": 18175.008,
+            "elected": false
+          },
+          {
+            "id": "石田たかし",
+            "rank": null,
+            "votes": 17408.867,
+            "elected": false
+          },
+          {
+            "id": "西川やすお",
+            "rank": null,
+            "votes": 16722.0,
+            "elected": false
+          },
+          {
+            "id": "中川けんいち",
+            "rank": null,
+            "votes": 14986.577,
+            "elected": false
+          },
+          {
+            "id": "水ノ上なるあき",
+            "rank": null,
+            "votes": 11701.0,
+            "elected": false
+          },
+          {
+            "id": "木内たかたね",
+            "rank": null,
+            "votes": 11313.0,
+            "elected": false
+          },
+          {
+            "id": "小林さとる",
+            "rank": null,
+            "votes": 9370.0,
+            "elected": false
+          },
+          {
+            "id": "西郷隆太郎",
+            "rank": null,
+            "votes": 8637.0,
+            "elected": false
+          },
+          {
+            "id": "八田もりしげ",
+            "rank": null,
+            "votes": 8346.0,
+            "elected": false
+          },
+          {
+            "id": "中村ゆうき",
+            "rank": null,
+            "votes": 6143.625,
+            "elected": false
+          }
+        ]
+      },
+      {
+        "party": "公明党",
+        "votes": 6181431.937,
+        "seats": 6,
+        "members": [
+          {
+            "id": "竹内しんじ",
+            "rank": null,
+            "votes": 437228.0,
+            "elected": true
+          },
+          {
+            "id": "よこやま信一",
+            "rank": null,
+            "votes": 415178.606,
+            "elected": true
+          },
+          {
+            "id": "谷あい正明",
+            "rank": null,
+            "votes": 351413.0,
+            "elected": true
+          },
+          {
+            "id": "くぼたてつや",
+            "rank": null,
+            "votes": 349359.32,
+            "elected": true
+          },
+          {
+            "id": "熊野せいし",
+            "rank": null,
+            "votes": 269048.0,
+            "elected": true
+          },
+          {
+            "id": "上田いさむ",
+            "rank": null,
+            "votes": 268403.0,
+            "elected": true
+          },
+          {
+            "id": "宮崎まさる",
+            "rank": null,
+            "votes": 9695.0,
+            "elected": false
+          },
+          {
+            "id": "中北京子",
+            "rank": null,
+            "votes": 9640.398,
+            "elected": false
+          },
+          { "id": "水島春香", "rank": null, "votes": 9058.0, "elected": false },
+          { "id": "河合綾", "rank": null, "votes": 5417.599, "elected": false },
+          { "id": "中嶋健二", "rank": null, "votes": 2786.0, "elected": false },
+          { "id": "塩野正貴", "rank": null, "votes": 1717.0, "elected": false },
+          { "id": "深澤淳", "rank": null, "votes": 1212.0, "elected": false },
+          {
+            "id": "伊大知孝一",
+            "rank": null,
+            "votes": 797.0,
+            "elected": false
+          },
+          {
+            "id": "奈良直記",
+            "rank": null,
+            "votes": 738.014,
+            "elected": false
+          },
+          { "id": "淀屋伸雄", "rank": null, "votes": 730.0, "elected": false },
+          { "id": "光延康治", "rank": null, "votes": 426.0, "elected": false }
+        ]
+      },
+      {
+        "party": "国民民主党",
+        "votes": 3159625.89,
+        "seats": 3,
+        "members": [
+          {
+            "id": "竹詰ひとし",
+            "rank": null,
+            "votes": 238956.023,
+            "elected": true
+          },
+          {
+            "id": "はまぐち誠",
+            "rank": null,
+            "votes": 234744.965,
+            "elected": true
+          },
+          {
+            "id": "かわいたかのり",
+            "rank": null,
+            "votes": 211783.997,
+            "elected": true
+          },
+          {
+            "id": "矢田わか子",
+            "rank": null,
+            "votes": 159929.004,
+            "elected": false
+          },
+          {
+            "id": "山下ようこ",
+            "rank": null,
+            "votes": 22311.0,
+            "elected": false
+          },
+          {
+            "id": "上松正和",
+            "rank": null,
+            "votes": 20790.0,
+            "elected": false
+          },
+          {
+            "id": "たるい良和",
+            "rank": null,
+            "votes": 16373.229,
+            "elected": false
+          },
+          {
+            "id": "きどかおり",
+            "rank": null,
+            "votes": 16078.0,
+            "elected": false
+          },
+          {
+            "id": "河辺よしろう",
+            "rank": null,
+            "votes": 3822.0,
+            "elected": false
+          }
+        ]
+      },
+      {
+        "party": "日本共産党",
+        "votes": 3618342.792,
+        "seats": 3,
+        "members": [
+          {
+            "id": "田村智子",
+            "rank": null,
+            "votes": 112132.341,
+            "elected": true
+          },
+          {
+            "id": "にひそうへい",
+            "rank": null,
+            "votes": 36098.53,
+            "elected": true
+          },
+          {
+            "id": "いわぶち友",
+            "rank": null,
+            "votes": 35392.0,
+            "elected": true
+          },
+          {
+            "id": "大門みきし",
+            "rank": null,
+            "votes": 31570.0,
+            "elected": false
+          },
+          {
+            "id": "たけだ良介",
+            "rank": null,
+            "votes": 23370.641,
+            "elected": false
+          },
+          {
+            "id": "山本のりこ",
+            "rank": null,
+            "votes": 11736.82,
+            "elected": false
+          },
+          { "id": "小山さき", "rank": null, "votes": 6618.0, "elected": false },
+          {
+            "id": "今村あゆみ",
+            "rank": null,
+            "votes": 5768.646,
+            "elected": false
+          },
+          {
+            "id": "片山和子",
+            "rank": null,
+            "votes": 4646.951,
+            "elected": false
+          },
+          {
+            "id": "佐々木とし子",
+            "rank": null,
+            "votes": 4635.0,
+            "elected": false
+          },
+          {
+            "id": "吉田恭子",
+            "rank": null,
+            "votes": 4174.277,
+            "elected": false
+          },
+          {
+            "id": "西田さえ子",
+            "rank": null,
+            "votes": 3674.0,
+            "elected": false
+          },
+          {
+            "id": "丸本ゆみこ",
+            "rank": null,
+            "votes": 2654.0,
+            "elected": false
+          },
+          {
+            "id": "渡邉喜代子",
+            "rank": null,
+            "votes": 2199.0,
+            "elected": false
+          },
+          {
+            "id": "上里清美",
+            "rank": null,
+            "votes": 2141.184,
+            "elected": false
+          },
+          {
+            "id": "花木のりあき",
+            "rank": null,
+            "votes": 1488.0,
+            "elected": false
+          },
+          { "id": "片岡朗", "rank": null, "votes": 1453.0, "elected": false },
+          {
+            "id": "高橋まきこ",
+            "rank": null,
+            "votes": 1416.76,
+            "elected": false
+          },
+          { "id": "赤田勝紀", "rank": null, "votes": 1258.0, "elected": false },
+          {
+            "id": "冨田直樹",
+            "rank": null,
+            "votes": 1164.007,
+            "elected": false
+          },
+          { "id": "西澤博", "rank": null, "votes": 968.268, "elected": false },
+          { "id": "細野真理", "rank": null, "votes": 872.0, "elected": false },
+          {
+            "id": "堀川朗子",
+            "rank": null,
+            "votes": 736.367,
+            "elected": false
+          },
+          { "id": "深田秀美", "rank": null, "votes": 583.0, "elected": false },
+          { "id": "来田時子", "rank": null, "votes": 495.0, "elected": false }
+        ]
+      },
+      {
+        "party": "れいわ新選組",
+        "votes": 2319156.016,
+        "seats": 2,
+        "members": [
+          { "id": "天畠大輔", "rank": 1, "votes": null, "elected": true },
+          {
+            "id": "水道橋博士",
+            "rank": null,
+            "votes": 117794.0,
+            "elected": true
+          },
+          {
+            "id": "大島九州男",
+            "rank": null,
+            "votes": 28123.0,
+            "elected": false
+          },
+          {
+            "id": "長谷川ういこ",
+            "rank": null,
+            "votes": 21826.374,
+            "elected": false
+          },
+          { "id": "つじ恵", "rank": null, "votes": 18393.0, "elected": false },
+          {
+            "id": "はすいけ透",
+            "rank": null,
+            "votes": 17684.0,
+            "elected": false
+          },
+          {
+            "id": "よだかれん",
+            "rank": null,
+            "votes": 14821.0,
+            "elected": false
+          },
+          {
+            "id": "高井たかし",
+            "rank": null,
+            "votes": 13326.841,
+            "elected": false
+          },
+          {
+            "id": "キムテヨン",
+            "rank": null,
+            "votes": 13041.0,
+            "elected": false
+          }
+        ]
+      },
+      {
+        "party": "社会民主党",
+        "votes": 1258501.715,
+        "seats": 1,
+        "members": [
+          {
+            "id": "福島みずほ",
+            "rank": null,
+            "votes": 216984.0,
+            "elected": true
+          },
+          {
+            "id": "宮城イチロー",
+            "rank": null,
+            "votes": 22309.0,
+            "elected": false
+          },
+          {
+            "id": "おかざき彩子",
+            "rank": null,
+            "votes": 17466.0,
+            "elected": false
+          },
+          {
+            "id": "山口わか子",
+            "rank": null,
+            "votes": 13793.548,
+            "elected": false
+          },
+          {
+            "id": "大椿ゆうこ",
+            "rank": null,
+            "votes": 10390.0,
+            "elected": false
+          },
+          { "id": "秋葉忠利", "rank": null, "votes": 6623.0, "elected": false },
+          { "id": "久保孝喜", "rank": null, "votes": 4518.0, "elected": false },
+          {
+            "id": "村田しゅんいち",
+            "rank": null,
+            "votes": 2519.167,
+            "elected": false
+          }
+        ]
+      },
+      {
+        "party": "ＮＨＫ党",
+        "votes": 1253872.467,
+        "seats": 1,
+        "members": [
+          {
+            "id": "ガーシー",
+            "rank": null,
+            "votes": 287714.767,
+            "elected": true
+          },
+          {
+            "id": "山本太郎",
+            "rank": null,
+            "votes": 53351.732,
+            "elected": false
+          },
+          {
+            "id": "黒川あつひこ",
+            "rank": null,
+            "votes": 22595.0,
+            "elected": false
+          },
+          {
+            "id": "さいとう健一郎",
+            "rank": null,
+            "votes": 22426.13,
+            "elected": false
+          },
+          {
+            "id": "くぼた学",
+            "rank": null,
+            "votes": 17947.257,
+            "elected": false
+          },
+          {
+            "id": "西村ひとし",
+            "rank": null,
+            "votes": 6564.622,
+            "elected": false
+          },
+          {
+            "id": "そえだしんや",
+            "rank": null,
+            "votes": 4555.701,
+            "elected": false
+          },
+          {
+            "id": "高橋理洋",
+            "rank": null,
+            "votes": 2905.258,
+            "elected": false
+          },
+          { "id": "上妻敬二", "rank": null, "votes": 817.0, "elected": false }
+        ]
+      },
+      {
+        "party": "参政党",
+        "votes": 1768385.409,
+        "seats": 1,
+        "members": [
+          {
+            "id": "神谷そうへい",
+            "rank": null,
+            "votes": 159433.516,
+            "elected": true
+          },
+          {
+            "id": "武田邦彦",
+            "rank": null,
+            "votes": 128257.022,
+            "elected": false
+          },
+          {
+            "id": "松田学",
+            "rank": null,
+            "votes": 73672.871,
+            "elected": false
+          },
+          {
+            "id": "吉野敏明",
+            "rank": null,
+            "votes": 25463.0,
+            "elected": false
+          },
+          { "id": "赤尾由美", "rank": null, "votes": 11344.0, "elected": false }
+        ]
+      },
+      {
+        "party": "幸福実現党",
+        "votes": 148020.0,
+        "seats": 0,
+        "members": [
+          { "id": "釈量子", "rank": null, "votes": 18358.0, "elected": false }
+        ]
+      },
+      {
+        "party": "ごぼうの党",
+        "votes": 193724.387,
+        "seats": 0,
+        "members": [
+          { "id": "奥野卓志", "rank": 1, "votes": null, "elected": false },
+          { "id": "川村拓司", "rank": 2, "votes": null, "elected": false },
+          { "id": "今吉由泰", "rank": 3, "votes": null, "elected": false },
+          { "id": "今西孝太", "rank": 4, "votes": null, "elected": false },
+          { "id": "﨑村峰徳", "rank": 5, "votes": null, "elected": false },
+          { "id": "首藤昌弘", "rank": 6, "votes": null, "elected": false },
+          { "id": "高崎圭悟", "rank": 7, "votes": null, "elected": false },
+          { "id": "斎藤和干", "rank": 8, "votes": null, "elected": false },
+          { "id": "鴨田幸司", "rank": null, "votes": 4133.0, "elected": false },
+          {
+            "id": "立花恵理子",
+            "rank": null,
+            "votes": 3130.312,
+            "elected": false
+          },
+          { "id": "佐藤玲乃", "rank": null, "votes": 2176.0, "elected": false }
+        ]
+      },
+      {
+        "party": "日本第一党",
+        "votes": 109045.614,
+        "seats": 0,
+        "members": [
+          {
+            "id": "桜井誠",
+            "rank": null,
+            "votes": 24077.505,
+            "elected": false
+          },
+          {
+            "id": "中村かずひろ",
+            "rank": null,
+            "votes": 8056.109,
+            "elected": false
+          }
+        ]
+      },
+      {
+        "party": "新党くにもり",
+        "votes": 77861.0,
+        "seats": 0,
+        "members": [
+          {
+            "id": "本間奈々",
+            "rank": null,
+            "votes": 13563.0,
+            "elected": false
+          },
+          { "id": "三輪和雄", "rank": null, "votes": 2391.0, "elected": false }
+        ]
+      },
+      {
+        "party": "維新政党・新風",
+        "votes": 65107.0,
+        "seats": 0,
+        "members": [
+          { "id": "魚谷哲央", "rank": null, "votes": 8158.0, "elected": false }
+        ]
+      }
+    ]
+  }
+]

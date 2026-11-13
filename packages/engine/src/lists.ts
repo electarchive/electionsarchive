@@ -46,38 +46,45 @@ export function fill(
         constituency.votes >= forfeit * constituency.valid),
   );
   const isBestLoser = lists.order === "closed" && lists.tied === "best_loser";
+  const first =
+    lists.ranked === "first"
+      ? eligible.filter(({ rank }) => rank != null).toSorted(byRank)
+      : [];
+  const rest =
+    first.length > 0
+      ? eligible.filter((candidate) => !first.includes(candidate))
+      : eligible;
   let ordered: Array<Candidate>;
   switch (lists.order) {
     case "closed": {
-      ordered = eligible.toSorted(
+      ordered = rest.toSorted(
         isBestLoser ? (a, b) => byRank(a, b) || ratio(b) - ratio(a) : byRank,
       );
       break;
     }
     case "open": {
-      ordered = eligible.toSorted(byVotes);
+      ordered = rest.toSorted(byVotes);
       break;
     }
     case "share": {
-      ordered = eligible.toSorted(
+      ordered = rest.toSorted(
         (a, b) => (b.share ?? 0) - (a.share ?? 0) || byVotes(a, b),
       );
       break;
     }
     case "flexible": {
       const reach = (lists.quota ?? 1) * quotient;
-      const preferred = eligible
+      const preferred = rest
         .filter(({ votes }) => (votes ?? 0) >= reach)
         .toSorted(byVotes);
       const chosen = new Set(preferred);
       ordered = [
         ...preferred,
-        ...eligible
-          .filter((candidate) => !chosen.has(candidate))
-          .toSorted(byRank),
+        ...rest.filter((candidate) => !chosen.has(candidate)).toSorted(byRank),
       ];
     }
   }
+  ordered = [...first, ...ordered];
   const last = ordered[seats - 1];
   const next = ordered[seats];
   const standing = (candidate: Candidate) =>
@@ -90,8 +97,9 @@ export function fill(
     (lists.order === "open" || lists.order === "share" || isBestLoser) &&
     last != null &&
     next != null &&
+    !first.includes(last) &&
     standing(last) === standing(next)
-      ? ordered.filter((candidate) => standing(candidate) === standing(last))
+      ? rest.filter((candidate) => standing(candidate) === standing(last))
       : [];
   return {
     elected: ordered
