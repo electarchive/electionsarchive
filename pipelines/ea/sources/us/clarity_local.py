@@ -409,7 +409,15 @@ TOWNSHIP_KEYS = (
     "township-board",
     "fiscal-officer",
 )
-PLACE_KEYS = ("mayor", "president", "council", "council-president", "board-of-trustees", "law-director")
+PLACE_KEYS = (
+    "mayor",
+    "president",
+    "council",
+    "council-president",
+    "board-of-trustees",
+    "law-director",
+    "board-of-education",
+)
 BODIES = (
     "council",
     "board-of-education",
@@ -580,7 +588,8 @@ def parse() -> None:
                 plain = _plain(text)
                 if election in PLACED:
                     plain = f"CITY OF {PLACED[election]} {plain}"
-                if SKIPPED.search(plain):
+                schools = election in PLACED and "BOARD OF EDUCATION" in plain
+                if SKIPPED.search(plain) and not schools:
                     continue
                 choices = list(node.iter("Choice"))
                 if not choices or any(not (choice.get("totalVotes") or "0").isdigit() for choice in choices):
@@ -593,6 +602,8 @@ def parse() -> None:
                 township_word = re.search(r"\bTOWNSHIP\b|\bTWP\b", plain) is not None
                 if question:
                     key = "question"
+                elif schools:
+                    key = "board-of-education"
                 elif "PRESIDENT" in plain and "COUNCIL" in plain:
                     key = "council-president"
                 elif "PRESIDENT" in plain:
