@@ -13713,7 +13713,8 @@ def emit_state(frame: pl.DataFrame, state: str, snapshot: Snapshot, offices: Off
                join external_id x on x.entity_id = p.id and x.scheme = %s
                join changeset c on c.id = x.changeset_id
                where c.pipeline = %s and x.value like %s
-                 and not exists (select from candidacy ca where ca.person_id = p.id and ca.id <> all(%s::uuid[]))""",
+                 and not exists (select from candidacy ca where ca.person_id = p.id and ca.id <> all(%s::uuid[]))
+                 and not exists (select from entity_merge m where m.into_id = p.id)""",
             [f"{SOURCE}.person", SOURCE, f"{state}:%", retiring],
         ).fetchall():
             if str(person) not in used:
