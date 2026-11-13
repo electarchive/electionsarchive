@@ -671,7 +671,9 @@ def registry() -> list[dict]:
         rows = list(csv.DictReader((line for line in f if not line.startswith("#")), delimiter="\t"))
     for i, row in enumerate(rows):
         problem = (
-            f"category {row['category']!r} is not one of {', '.join(CATEGORIES)}"
+            f"has {len(row[None])} extra columns after ref"
+            if None in row
+            else f"category {row['category']!r} is not one of {', '.join(CATEGORIES)}"
             if row["category"] not in CATEGORIES
             else f"grain {row['grain']!r} is not one of {', '.join(GRAINS)}"
             if row["grain"] not in GRAINS
