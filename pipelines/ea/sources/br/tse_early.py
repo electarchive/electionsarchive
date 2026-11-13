@@ -27,6 +27,7 @@ DAYS = {
     1958: (date(1958, 10, 3),),
     1960: (date(1960, 10, 3),),
     1962: (date(1962, 10, 7),),
+    1965: (date(1965, 10, 3),),
     1966: (date(1966, 11, 15),),
     1970: (date(1970, 11, 15),),
     1974: (date(1974, 11, 15),),
@@ -34,7 +35,7 @@ DAYS = {
     1982: (date(1982, 11, 15),),
     1986: (date(1986, 11, 15),),
     1989: (date(1989, 11, 15), date(1989, 12, 17)),
-    1990: (date(1990, 10, 3),),
+    1990: (date(1990, 10, 3), date(1990, 11, 25)),
 }
 FOLDERS = {
     "candidates": "votacao_candidato_uf",
@@ -116,7 +117,17 @@ COLUMNS = {
     ],
     "seats": ["generated", "hour", "year", "election", "uf", "ue", "ue_label", "cargo", "office", "seats"],
 }
-OFFICES = {"1": "president", "2": "vice-president", "5": "senate", "6": "chamber"}
+OFFICES = {
+    "1": "president",
+    "2": "vice-president",
+    "3": "governor",
+    "4": "vice-governor",
+    "5": "senate",
+    "6": "chamber",
+    "7": "assembly",
+    "8": "assembly",
+}
+LISTS = ("6", "7", "8")
 SPELLED = {"Fernando de Noronha": "FN", "Iguaçu": "IG", "Ponta Porã": "PP"}
 LABELS = {
     "FN": "Fernando de Noronha",
@@ -170,6 +181,16 @@ QUOTIENT_1945 = (
     "every seat left over goes to the list with the most votes. Each list's seats go to its candidates in order of "
     "personal votes."
 )
+GOVERNOR = (
+    "The governor was elected by a plurality of the votes cast in the state, with no runoff. Until the 1960s most "
+    "states elected the vice governor separately, also by plurality; from 1982 the two ran on one ticket."
+)
+GOVERNOR_1965 = (
+    "Constitutional Amendment 13 of 1965 required the governor and vice governor to win an absolute majority of the "
+    "votes. When no candidate did, the state's Legislative Assembly chose between the two leading candidates, as "
+    "Congress did for the president under Amendment 9 of 1964."
+)
+NO_MAJORITY = "No candidate won the absolute majority required, and the electoral court's file declares no one elected."
 LEFTOVERS = (
     "Under the 1945 rule the votes in the electoral court's file give {computed}; the court declared {declared}. "
     "The seats are stored as declared."
@@ -243,10 +264,11 @@ def parse() -> None:
         if (year, "parties") in FILES:
             frames["parties"].append(
                 read(year, "parties")
-                .filter(pl.col("cargo") == "6")
+                .filter(pl.col("cargo").is_in(LISTS))
                 .select(
                     "year",
                     "uf",
+                    "cargo",
                     party=pl.when(~pl.col("party").str.starts_with("#")).then(pl.col("party").str.strip_chars()),
                     party_number=pl.when(~pl.col("party_number").str.starts_with("-")).then(pl.col("party_number")),
                     party_label=pl.when(~pl.col("party_label").str.starts_with("#")).then(pl.col("party_label")),
@@ -256,7 +278,7 @@ def parse() -> None:
             )
             frames["seats"].append(
                 read(year, "seats")
-                .filter(pl.col("cargo").is_in(["5", "6"]))
+                .filter(pl.col("cargo").is_in(["3", "4", "5", *LISTS]))
                 .select("year", "uf", "cargo", seats=count("seats"))
             )
         frames["detail"].append(
@@ -363,8 +385,9 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary=(
-                "Brazil's presidential elections of 1945–1960 and 1989 and its Chamber of Deputies and Senate "
-                "elections of 1945–1990, by state and territory"
+                "Brazil's presidential elections of 1945–1960 and 1989, its Chamber of Deputies and Senate "
+                "elections of 1945–1990, and its gubernatorial and state assembly elections of 1947–1990, by state "
+                "and territory"
             ),
             polity="BR",
         )
@@ -445,11 +468,65 @@ def emit() -> Path:
             name(vice, "Vice-Presidente da República", "pt", "native")
         chamber = cs.key("br.body", "chamber-of-deputies")
         senate = cs.key("br.body", "senate")
+        guanabara = cs.key(f"{SOURCE}.polity", "GB")
+        if guanabara in cs.minted:
+            cs.add("polity", id=guanabara, kind="federal_unit", iso_code=None)
+            cs.add("slug", path="br/gb", entity_id=guanabara)
+            cs.add(
+                "polity_parent",
+                polity_id=guanabara,
+                parent_id=brazil,
+                valid_from=date(1960, 4, 21),
+                valid_to=date(1975, 3, 15),
+            )
+            cs.add(
+                "polity_territory",
+                polity_id=guanabara,
+                area_id=areas[("br.uf_1963", "GB")],
+                valid_from=date(1960, 4, 21),
+                valid_to=date(1975, 3, 15),
+            )
+            name(guanabara, "Guanabara")
+            name(guanabara, "Estado da Guanabara", "pt", "native")
+        vices = set(candidates.filter(pl.col("cargo") == "4")["uf"])
+        governors: dict[str, UUID] = {}
+        deputies: dict[str, UUID] = {}
+        assemblies: dict[str, UUID] = {}
+        for uf in sorted(set(candidates.filter(pl.col("cargo").is_in(["3", "4", "7", "8"]))["uf"])):
+            polity = guanabara if uf == "GB" else cs.polity(f"BR-{uf}")
+            where = label(1990, uf)
+            governors[uf] = cs.key("br.office", f"governor:{uf}")
+            if governors[uf] in cs.minted:
+                cs.add("office", id=governors[uf], polity_id=polity, kind="governor")
+                name(governors[uf], f"Governor of {where}")
+            if uf in vices:
+                deputies[uf] = cs.key("br.office", f"vice-governor:{uf}")
+                if deputies[uf] in cs.minted:
+                    cs.add("office", id=deputies[uf], polity_id=polity, kind="other")
+                    name(deputies[uf], f"Vice Governor of {where}")
+            assemblies[uf] = cs.key("br.body", f"assembly:{uf}")
+            if assemblies[uf] in cs.minted:
+                cs.add("body", id=assemblies[uf], polity_id=polity, kind="unicameral")
+                name(assemblies[uf], f"Legislative Assembly of {where}")
+                name(assemblies[uf], f"Assembleia Legislativa do Estado da {where}", "pt", "native")
 
         systems: dict[str, UUID] = {}
         for key, rules, title, methodology in (
             ("presidential-two-round", None, None, None),
             ("senate-plurality", None, None, None),
+            ("governor-two-round", None, None, None),
+            (
+                "governor-plurality",
+                {"formula": "fptp"},
+                "Brazilian gubernatorial plurality system, 1947–1986",
+                GOVERNOR,
+            ),
+            (
+                "governor-majority-1965",
+                {"formula": "contingent", "majority": 0.5, "chooser": "legislature", "among": 2},
+                "Brazilian gubernatorial absolute-majority system, 1965",
+                GOVERNOR_1965,
+            ),
             (
                 "presidential-plurality",
                 {"formula": "fptp"},
@@ -491,7 +568,7 @@ def emit() -> Path:
         elections: dict[tuple[int, str], UUID] = {}
         paths: dict[tuple[int, str], str] = {}
         for year, days in DAYS.items():
-            if len(days) == 2:
+            if year == 1989:
                 cycle = cs.key("br.election", f"{days[0]}:presidential-election")
                 cs.add(
                     "election",
@@ -539,6 +616,21 @@ def emit() -> Path:
             name(elections[(year, "1")], f"{year} Brazilian general election")
             name(elections[(year, "1")], f"Eleições de {year}", "pt", "native")
             cs.add("slug", path=paths[(year, "1")], entity_id=elections[(year, "1")])
+            if len(days) == 2:
+                elections[(year, "2")] = cs.key("br.election", str(days[1]))
+                paths[(year, "2")] = f"br/{days[1]}-runoff"
+                cs.add(
+                    "election",
+                    id=elections[(year, "2")],
+                    polity_id=brazil,
+                    parent_id=elections[(year, "1")],
+                    kind="runoff",
+                    date_from=days[1],
+                    date_to=days[1],
+                    status="held",
+                )
+                name(elections[(year, "2")], f"{year} Brazilian gubernatorial elections, second round")
+                cs.add("slug", path=paths[(year, "2")], entity_id=elections[(year, "2")])
 
         parties: dict[str, UUID] = {}
         by_abbreviation: dict[tuple[int, str], UUID] = {}
@@ -602,6 +694,7 @@ def emit() -> Path:
             ).iter_rows()
         }
         legends = parties_file.filter(pl.col("legend") > 0)
+        second = set(candidates.filter(pl.col("round") == "2").select("year", "cargo", "uf").unique().rows())
         values: list[tuple[str, UUID, UUID | None, UUID, int]] = []
         for (year, round, cargo), contest_rows in sorted(
             candidates.group_by("year", "round", "cargo"), key=lambda item: str(item[0])
@@ -617,9 +710,12 @@ def emit() -> Path:
                     ((str(uf), frame) for (uf,), frame in contest_rows.group_by("uf")), key=lambda item: item[0]
                 )
             )
-            runoff = len(DAYS[year]) == 2
-            suffix = f", {'second' if round == '2' else 'first'} round" if runoff else ""
             for uf, rows in groups:
+                runoff = year == 1989 or (year, cargo, uf) in second
+                suffix = f", {'second' if round == '2' else 'first'} round" if runoff else ""
+                legend_rows = legends.filter(
+                    (pl.col("year") == year) & (pl.col("uf") == uf) & (pl.col("cargo") == cargo)
+                )
                 rows = rows.sort("votes", "name", descending=[True, False], nulls_last=True)
                 where = "" if national else label(year, uf)
                 place_slug = slug(where.removeprefix("the "))
@@ -634,6 +730,25 @@ def emit() -> Path:
                         f"{day}:vice-president",
                         "vice-president",
                         f"{year} Brazilian vice-presidential election",
+                    )
+                elif office == "governor":
+                    key, path, title = (
+                        f"{day}:governor:{uf}",
+                        f"governor-{place_slug}",
+                        f"{year} gubernatorial election in {where}{suffix}",
+                    )
+                elif office == "vice-governor":
+                    key, path, title = (
+                        f"{day}:vice-governor:{uf}",
+                        f"vice-governor-{place_slug}",
+                        f"{year} vice-gubernatorial election in {where}",
+                    )
+                elif office == "assembly":
+                    noun = "Legislative Chamber" if cargo == "8" else "Legislative Assembly"
+                    key, path, title = (
+                        f"{day}:assembly:{uf}",
+                        f"{slug(noun)}-{place_slug}",
+                        f"{year} {noun} election in {where}",
                     )
                 elif office == "senate":
                     key, path, title = (
@@ -650,16 +765,24 @@ def emit() -> Path:
                 elected = rows.filter(pl.col("status") == "ELEITO")
                 if national:
                     elected = elected.unique("name")
-                magnitude = 1 if national else elected.height
+                single = national or office in ("governor", "vice-governor")
+                proportional = office in ("chamber", "assembly")
+                magnitude = 1 if single else elected.height
                 declared = seats_file.get((year, uf, cargo))
-                if office == "chamber" and declared is not None and declared > 0:
+                if proportional and declared is not None and declared > 0:
                     magnitude = declared
-                listed = office == "chamber" or (office == "senate" and year in SUBLEGENDA)
+                listed = proportional or (office == "senate" and year in SUBLEGENDA)
                 system = (
                     "presidential-two-round"
                     if national and year == 1989
                     else "presidential-plurality"
                     if national
+                    else "governor-two-round"
+                    if office == "governor" and year == 1990
+                    else "governor-majority-1965"
+                    if single and year == 1965
+                    else "governor-plurality"
+                    if single
                     else "senate-sublegenda"
                     if office == "senate" and year in SUBLEGENDA
                     else "senate-plurality"
@@ -686,10 +809,8 @@ def emit() -> Path:
                     values_rows = rows
                 override = None
                 mismatch = None
-                if office == "chamber":
-                    counted = int(rows["votes"].fill_null(0).clip(0).sum()) + int(
-                        legends.filter((pl.col("year") == year) & (pl.col("uf") == uf))["legend"].sum()
-                    )
+                if proportional:
+                    counted = int(rows["votes"].fill_null(0).clip(0).sum()) + int(legend_rows["legend"].sum())
                     _, _, _, blank, null = totals.get((year, round, cargo, uf), (None,) * 5)
                     extra = max(blank or 0, 0) + (max(null or 0, 0) if year < 1966 else 0)
                     if counted and year < 1950:
@@ -697,9 +818,7 @@ def emit() -> Path:
                             pl.concat(
                                 [
                                     rows.select("pool", votes=pl.col("votes").fill_null(0).clip(0)),
-                                    legends.filter((pl.col("year") == year) & (pl.col("uf") == uf)).select(
-                                        "pool", votes="legend"
-                                    ),
+                                    legend_rows.select("pool", votes="legend"),
                                 ]
                             )
                             .drop_nulls("pool")
@@ -722,20 +841,27 @@ def emit() -> Path:
                     "contest",
                     id=contest,
                     election_id=elections[(year, round)],
-                    kind="office" if national else "body_seats" if office == "senate" else "list_allocation",
-                    office_id=president if office == "president" else vice if office == "vice-president" else None,
-                    body_id=senate if office == "senate" else chamber if office == "chamber" else None,
+                    kind="office" if single else "body_seats" if office == "senate" else "list_allocation",
+                    office_id={
+                        "president": president,
+                        "vice-president": vice,
+                        "governor": governors.get(uf),
+                        "vice-governor": deputies.get(uf),
+                    }.get(office),
+                    body_id={"senate": senate, "chamber": chamber, "assembly": assemblies.get(uf)}.get(office),
                     district_area_id=nation if national else areas[place(year, uf)],
                     magnitude=magnitude,
                     round_number=int(round),
-                    previous_round_id=cs.key("br.contest", f"{DAYS[year][0]}:president") if round == "2" else None,
+                    previous_round_id=cs.key("br.contest", key.replace(str(day), str(DAYS[year][0])))
+                    if round == "2"
+                    else None,
                     electoral_system_id=systems[system],
                     rules_override=override,
                     default_result_kind="counted",
                 )
                 name(contest, title)
                 cs.add("slug", path=f"{paths[(year, round)]}/{path}", entity_id=contest)
-                if office == "chamber" and declared is not None and declared != elected.height:
+                if proportional and declared is not None and declared != elected.height:
                     cs.add(
                         "note",
                         entity_id=contest,
@@ -744,6 +870,8 @@ def emit() -> Path:
                     )
                 if mismatch is not None:
                     cs.add("note", entity_id=contest, kind="caveat", body_md=mismatch)
+                if single and not national and elected.height == 0 and not runoff:
+                    cs.add("note", entity_id=contest, kind="caveat", body_md=NO_MAJORITY)
                 result_set = cs.key(f"{SOURCE}.result_set", key)
                 cs.add(
                     "result_set",
@@ -762,10 +890,8 @@ def emit() -> Path:
                 legend_options: dict[tuple[str, str], UUID] = {}
                 if listed:
                     pools = set(rows["pool"].drop_nulls())
-                    if office == "chamber":
-                        pools |= set(
-                            legends.filter((pl.col("year") == year) & (pl.col("uf") == uf))["pool"].drop_nulls()
-                        )
+                    if proportional:
+                        pools |= set(legend_rows["pool"].drop_nulls())
                     for group in sorted(pools):
                         coalition = alliances.get((year, cargo, uf, group)) if "/" in group else None
                         lists[group] = cs.key("br.option", f"{key}:list:{group}")
@@ -778,10 +904,9 @@ def emit() -> Path:
                             alliance_id=coalition,
                             ballot_label=group.replace("/", " / "),
                         )
-                    if office == "chamber":
+                    if proportional:
                         for group, abbreviation, legend in (
-                            legends.filter((pl.col("year") == year) & (pl.col("uf") == uf))
-                            .group_by("pool", "party")
+                            legend_rows.group_by("pool", "party")
                             .agg(pl.col("legend").sum())
                             .sort("pool", "party", nulls_last=True)
                             .iter_rows()
@@ -807,6 +932,7 @@ def emit() -> Path:
 
                 options: dict[tuple[str | None, str | None, int], UUID] = {}
                 won: dict[str, int] = {}
+                used: set[str] = set()
                 for row in rows.iter_rows(named=True):
                     group = row["pool"]
                     entry = (row["name"], None if national else group, 0 if national else row["entry"])
@@ -814,13 +940,20 @@ def emit() -> Path:
                         suffix = f"unnamed:{group}:{row['entry']}"
                     else:
                         suffix = slug(row["name"]) + (f":{group}" if not national and row["lists"] > 1 else "")
+                        if suffix in used and not national and row["lists"] == 1:
+                            suffix = f"{suffix}:{group}"
+                        while suffix in used:
+                            suffix = f"{suffix}:{row['entry'] + 2}"
+                    used.add(suffix)
                     party = by_abbreviation.get((year, row["party"].upper())) if row["party"] else None
                     option = options[entry] = cs.key("br.option", f"{key}:{suffix}")
                     cs.add(
                         "contest_option",
                         id=option,
                         contest_id=contest,
-                        kind="ticket" if national and year == 1989 else "candidate",
+                        kind="ticket"
+                        if (national and year == 1989) or (office == "governor" and year >= 1982)
+                        else "candidate",
                         parent_option_id=lists.get(group) if listed and group else None,
                         party_id=party,
                         alliance_id=alliances.get((year, cargo, uf, group))
