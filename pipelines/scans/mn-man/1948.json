@@ -76,13 +76,17 @@
         0.287,
         0.041,
         0.458,
-        0.98
+        0.947
       ],
       "hint": "Read only the table headed 'President: Presidential Electors (general election 1948)'; ignore any other table visible in the image.",
       "bands": 3,
       "header": [
         0.0,
         0.3248
+      ],
+      "stub": [
+        0.028,
+        0.088
       ]
     },
     {
@@ -130,13 +134,17 @@
         0.448,
         0.041,
         0.549,
-        0.98
+        0.947
       ],
       "hint": "Read only the table headed 'U.S. Senator in Congress (general election 1948)'; ignore any other table visible in the image.",
       "bands": 3,
       "header": [
         0.0,
         0.3248
+      ],
+      "stub": [
+        0.028,
+        0.088
       ]
     },
     {
@@ -174,13 +182,17 @@
         0.538,
         0.041,
         0.64,
-        0.98
+        0.947
       ],
       "hint": "Read only the table headed 'Governor (general election 1948)'; ignore any other table visible in the image.",
       "bands": 3,
       "header": [
         0.0,
         0.3248
+      ],
+      "stub": [
+        0.028,
+        0.088
       ]
     }
   ]
