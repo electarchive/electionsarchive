@@ -35,7 +35,13 @@ def fetch() -> None:
 
 
 LAYOUTS: dict[str, tuple[tuple[str, int, int], ...]] = {
-    "03": (("list", 9, 14), ("abbrev", 15, 64), ("name", 65, 214), ("province_head", 215, 220)),
+    "03": (
+        ("list", 9, 14),
+        ("abbrev", 15, 64),
+        ("name", 65, 214),
+        ("province_head", 215, 220),
+        ("national_head", 227, 232),
+    ),
     "04": (
         ("round", 9, 9),
         ("province", 10, 11),
@@ -140,6 +146,7 @@ COUNTS = {
     "list_votes",
     "list",
     "province_head",
+    "national_head",
     "position",
 }
 
