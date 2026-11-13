@@ -116,7 +116,20 @@ def montgomery_tn(path: Path) -> tuple[list[Race], str | None]:
     return [
         (
             office["Name"].strip(),
-            [(line["Candidate"]["Name"].strip(), [("", line["Total"])]) for line in office["Votes"].values()],
+            [
+                (
+                    line["Candidate"]["Name"].strip(),
+                    split(
+                        line["Total"],
+                        [
+                            ("Election Day", line["E"]),
+                            ("Paper Absentee", line["A"]),
+                            ("Walk-In Early Voting", line["W"]),
+                        ],
+                    ),
+                )
+                for line in office["Votes"].values()
+            ],
             (0, 0),
         )
         for office in data["Offices"].values()
