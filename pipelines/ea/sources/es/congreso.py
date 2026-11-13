@@ -164,6 +164,7 @@ RECODED = (
     " The file codes {votes:,} votes in this province's mesas to {coded}, which the province results count for "
     "{listed}; they are stored under {listed}."
 )
+NO_CENSUS = " The file prints a census of zero for {units}; their registered voters are left out."
 OVER = " In {count} units the ballots cast exceed the registered voters, as the file prints them."
 
 
@@ -453,10 +454,13 @@ def emit() -> Path:
                 BLANK: row["blank"],
             }
             for measure, value in figures.items():
-                values.append((str(result_set), str(unit), None, measure, value, channel))
+                if measure != REGISTERED or value:
+                    values.append((str(result_set), str(unit), None, measure, value, channel))
 
         def over(frame: pl.DataFrame, votes: pl.DataFrame) -> str:
-            count = frame.filter(pl.col("list_votes") + pl.col("blank") + pl.col("invalid") > pl.col("census")).height
+            count = frame.filter(
+                (pl.col("census") > 0) & (pl.col("list_votes") + pl.col("blank") + pl.col("invalid") > pl.col("census"))
+            ).height
             sums = (
                 votes.group_by("code")
                 .agg(pl.col("votes").sum())
@@ -464,6 +468,8 @@ def emit() -> Path:
                 .filter(pl.col("votes") != pl.col("list_votes"))
             )
             text = OVER.format(count=count) if count else ""
+            if missing := frame.filter(pl.col("census") == 0).height:
+                text += NO_CENSUS.format(units=f"{missing:,} unit{'' if missing == 1 else 's'}")
             if sums.height:
                 diff = int((sums["votes"] - sums["list_votes"]).sum())
                 text += SUMS_DIFFER.format(count=sums.height, diff=abs(diff), direction="more" if diff > 0 else "fewer")
