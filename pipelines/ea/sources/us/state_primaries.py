@@ -3660,6 +3660,15 @@ def parse() -> None:
     )
 
 
+def name_key(text: str) -> tuple[str, str] | None:
+    words = [
+        word
+        for word in re.sub(r"\(.*?\)|\".*?\"|,", " ", text).lower().split()
+        if word.strip(".") not in ("jr", "sr", "ii", "iii", "iv")
+    ]
+    return (words[0][0], slug(words[-1])) if words else None
+
+
 def emit() -> Path:
     lines = pl.read_parquet(PARSED / "lines.parquet")
     with connect() as conn:
@@ -3877,16 +3886,16 @@ def emit() -> Path:
             [f"{SOURCE}.result_set"],
         ).fetchall():
             earlier.setdefault(result_set, []).append((option, kind, seats, notes))
-        named: dict[UUID, list[tuple[UUID, UUID | None, str | None]]] = {}
-        for contest, option, party, label in conn.execute(
-            """select o.contest_id, o.id, o.party_id, o.ballot_label from contest_option o
+        named: dict[UUID, list[tuple[UUID, UUID | None, str | None, UUID, UUID]]] = {}
+        for contest, option, party, label, candidacy, person in conn.execute(
+            """select o.contest_id, o.id, o.party_id, o.ballot_label, d.id, d.person_id from contest_option o
                join external_id x on x.entity_id = o.id and x.scheme = 'us.option'
                join changeset g on g.id = o.changeset_id
-               where x.value ~ '^20[0-9-]+:NY:' and g.pipeline = %s and exists (
-                 select 1 from candidacy d where d.option_id = o.id)""",
+               join candidacy d on d.option_id = o.id and d.role = 'head'
+               where x.value ~ '^20[0-9-]+:NY:' and g.pipeline = %s""",
             [SOURCE],
         ).fetchall():
-            named.setdefault(contest, []).append((option, party, label))
+            named.setdefault(contest, []).append((option, party, label, candidacy, person))
         methods: dict[UUID, str] = dict(
             conn.execute(
                 """select n.entity_id, n.body_md from note n
@@ -4235,6 +4244,7 @@ def emit() -> Path:
                     cs.add("note", entity_id=old[0], kind="caveat", body_md=EMPTY)
             threshold = 50 if state in ("TX", "FL", "SC", "AL") else 40 if day.year < 2018 else 30
             nominated: dict[str, bool] = {}
+            heads: dict[UUID, tuple[UUID, UUID, str]] = {}
             shared = [
                 (words[0][0], slug(words[-1]))
                 for words in (
@@ -4305,6 +4315,8 @@ def emit() -> Path:
                 )
                 for role, text, person in people:
                     candidacy = cs.key("us.candidacy", f"{base}:{person}:{role}")
+                    if role == "head":
+                        heads[option] = (person, candidacy, choice)
                     if person in old_people:
                         retire("us.candidacy", f"{base}:{old_people[person]}:{role}", candidacy)
                     cs.add(
@@ -4319,8 +4331,19 @@ def emit() -> Path:
                 options[(state, day, office, code, party, choice)] = option
             if state == "NY" and not parted:
                 built = {options[(state, day, office, code, party, choice)] for choice in rows["choice"]}
-                for option, party_id, label in named.get(contest, []):
-                    if option not in built:
+                same: dict[tuple[str, str], list[UUID]] = {}
+                for option in built:
+                    if option in heads and (found := name_key(heads[option][2])) is not None:
+                        same.setdefault(found, []).append(option)
+                for option, party_id, label, candidacy, person in named.get(contest, []):
+                    found = name_key(label or "")
+                    twin = same.get(found, []) if found is not None else []
+                    if option not in built and len(twin) == 1:
+                        survivor, survivor_candidacy, _ = heads[twin[0]]
+                        cs.merge(option, twin[0])
+                        cs.merge(candidacy, survivor_candidacy)
+                        cs.merge(person, survivor)
+                    elif option not in built:
                         cs.add(
                             "contest_option",
                             id=option,
