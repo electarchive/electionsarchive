@@ -35,6 +35,7 @@ PAGE_PREFIXES = (
     "https://www.hart.gov.uk/news/",
     "https://www.eastherts.gov.uk/planning-and-building/",
     "https://web.archive.org/web/",
+    "https://eatonbray.com/news/",
     "https://new.colchester.gov.uk/elections/",
     "https://www.warwickdc.gov.uk/info/",
     "https://www.ashford.gov.uk/your-council/",
@@ -60,6 +61,7 @@ PAGE_PREFIXES = (
     "https://www.north-herts.gov.uk/baldock-",
 )
 HANDWRITTEN = (
+    "https://maulden-pc.gov.uk/wp-content/uploads/2023/12/Declaration-of-Results-NPR-Maulden-1.jpg",
     "https://info.ambervalley.gov.uk/docarc/",
     "/ashby_de_la_zouch_neighbourhood_plan_referendum_result/",
     "/ellistown_and_battleflat_neighbourhood_plan_referendum_result/",
