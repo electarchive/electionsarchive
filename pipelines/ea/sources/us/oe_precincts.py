@@ -64,6 +64,13 @@ COUNTIES = {
     ("MI", "stjosephs"): "stjoseph",
 }
 MICHIGAN = "2022/20221108__mi__general__precinct.csv"
+OFFICE = {
+    ("OH", 2012): (
+        "Ohio Secretary of State",
+        "November 6, 2012 General Election Official Results, Precinct Level",
+        "https://web.archive.org/web/20201029104059id_/https://www.sos.state.oh.us/globalassets/elections/2012/gen/2012statewidebyprecinct.xlsx",
+    ),
+}
 PLACE_WORDS = r"\b(charter|township|twp|precinc\w*|pct|city|village|of|the)\b"
 PLACE_KINDS = ("city", "township|twp", "village")
 MI_OFFICES = {
@@ -147,14 +154,47 @@ def url(state: str, path: str) -> str:
     return openelections.REPOSITORY.format(state=state.lower(), commit=openelections.COMMITS[state], path=path)
 
 
+def offices() -> list[tuple[str, int, str]]:
+    return [(state, year, link) for (state, year), (_, _, link) in OFFICE.items() if not ONLY or state in ONLY]
+
+
 def fetch() -> None:
     for state, _, path in picks():
         raw.fetch(SOURCE, url(state, path), suffix=".csv")
+    for _, _, link in offices():
+        raw.fetch(SOURCE, link, suffix=".xlsx")
+
+
+def ohio(content: bytes) -> pl.DataFrame:
+    sheet = pl.read_excel(io.BytesIO(content), sheet_name="Master", has_header=False, infer_schema_length=0)
+    heads, names = sheet.row(0), sheet.row(1)
+    office = ""
+    rows = []
+    for index, column in enumerate(sheet.columns):
+        office = re.sub(r"\s+", " ", heads[index]).strip() if index >= 8 and heads[index] else office
+        named = re.fullmatch(r"(.+?)\s*(?:\((\w+)\)(\*)?)?", (names[index] or "").strip())
+        if index < 8 or not named or named[3]:
+            continue
+        district = re.search(r"District (\d+)", office)
+        rows.append(
+            sheet.slice(4).select(
+                county="column_0",
+                precinct=pl.concat_str("column_2", "column_1", separator=" "),
+                office=pl.lit(re.sub(r" - District \d+", "", office)),
+                district=pl.lit(district[1] if district else None, pl.String),
+                party=pl.lit(named[2], pl.String),
+                candidate=pl.lit(named[1]),
+                votes=column,
+            )
+        )
+    frame = pl.concat(rows)
+    return frame.filter(pl.col("votes").cast(pl.Int64).sum().over("county", "precinct", "office", "district") > 0)
 
 
 def parse() -> None:
     frame = lines(
         [(state, year, path, raw.cached(SOURCE, url(state, path)).path.read_bytes()) for state, year, path in picks()]
+        + [(state, year, link, raw.cached(SOURCE, link).path.read_bytes()) for state, year, link in offices()]
     )
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.write_parquet(PARSED / "lines.parquet")
@@ -175,11 +215,15 @@ def lines(files: list[tuple[str, int, str, bytes]]) -> pl.DataFrame:
     frames = []
     for state, year, path, text in files:
         bare = state == "PA" and b"county" not in text[:200].lower()
-        frame = pl.read_csv(
-            io.BytesIO(text.replace(b"\r\n", b"\n").replace(b"\r", b"\n")),
-            infer_schema_length=0,
-            truncate_ragged_lines=True,
-            has_header=not bare,
+        frame = (
+            ohio(text)
+            if path.endswith(".xlsx")
+            else pl.read_csv(
+                io.BytesIO(text.replace(b"\r\n", b"\n").replace(b"\r", b"\n")),
+                infer_schema_length=0,
+                truncate_ragged_lines=True,
+                has_header=not bare,
+            )
         )
         if bare:
             frame = frame.select(
@@ -309,7 +353,7 @@ def emit() -> Path:
             version=VERSION,
             summary="President, U.S. Senate, U.S. House, governor, statewide office, and state legislative general "
             "elections by precinct 2000–2014, and Michigan's 2022 statewide offices, legislature, and Proposal 22-3 by "
-            "precinct, from OpenElections",
+            "precinct, from OpenElections, and precinct files from state election offices",
             polity="US",
         )
         filled = {
@@ -487,6 +531,9 @@ def emit() -> Path:
                         ).cast(pl.Int16, strict=False)
                     ),
                     code=pl.concat_str("year", "state", "fips", pl.lit(""), "precinct", separator=":"),
+                    source=pl.when(pl.col("path").str.starts_with("https://"))
+                    .then(pl.concat_str("state", "year", separator=":"))
+                    .otherwise("state"),
                 ),
                 michigan.select(
                     "year",
@@ -510,6 +557,7 @@ def emit() -> Path:
                     code=pl.struct("fips", "precinct").map_elements(
                         lambda row: units[(row["fips"], row["precinct"])], return_dtype=pl.String
                     ),
+                    source="state",
                 ),
             ]
         )
@@ -540,9 +588,21 @@ def emit() -> Path:
             )
             .with_columns(candidate=pl.when("writein").then(pl.lit("WRITE-INS")).otherwise("candidate"))
             .filter(pl.col("measure") > 0)
-            .group_by("year", "chamber", "day", "special", "state", "district", "code", "fips", "candidate", "measure")
+            .group_by(
+                "year",
+                "chamber",
+                "day",
+                "special",
+                "state",
+                "district",
+                "code",
+                "fips",
+                "candidate",
+                "measure",
+                "source",
+            )
             .agg(pl.col("writein").any(), pl.col("votes").sum())
-            .with_columns(kind=pl.lit("precinct"), source="state")
+            .with_columns(kind=pl.lit("precinct"))
         )
         keyed = returns.with_columns(
             key=pl.concat_str(
@@ -577,6 +637,21 @@ def emit() -> Path:
                         license="No license stated: facts published with attribution, raw files not redistributed",
                     )
             cs.artifact(raw.cached(SOURCE, url(state, path)), sources[state])
+        for state, year, link in offices():
+            publisher, title, _ = OFFICE[(state, year)]
+            key = f"{state}:{year}"
+            sources[key] = cs.source(publisher, title)
+            if sources[key] in cs.minted:
+                cs.add(
+                    "source",
+                    id=sources[key],
+                    kind="official_body",
+                    publisher=publisher,
+                    title=title,
+                    url=link.split("id_/", 1)[-1],
+                    license="Public record",
+                )
+            cs.artifact(raw.cached(SOURCE, link), sources[key])
         medsl.attach(cs, conn, returns, sources, REDONE)
         used = set(pl.concat(cs.frames["result_value"])["unit_id"].unique()) if cs.frames.get("result_value") else set()
         counties = {
@@ -611,7 +686,9 @@ def emit() -> Path:
             .group_by("code")
             .agg(pl.col("state").first(), pl.col("fips").first(), pl.col("day").min())
             .with_columns(
-                id=pl.col("code").map_elements(lambda code: str(cs.unit("us.precinct", code)), return_dtype=pl.String)
+                id=pl.struct("code", "day").map_elements(
+                    lambda row: str(cs.unit("us.precinct", row["code"], row["day"])), return_dtype=pl.String
+                )
             )
             .filter(pl.col("id").is_in(list(used)) | pl.col("code").is_in(list(shaped)))
         )
