@@ -281,7 +281,9 @@ def archive(conn: Connection, feed: str) -> tuple[int, int, set[str]]:
     sources: list[tuple[str, Callable[[Path], Iterator[Row]], bool]] = [
         (key, lambda path: page(path.read_bytes()), False) for key in captures
     ]
-    sources += [(url, lambda path, found=found: pdf(path, *found), True) for url, found in FL_PDFS.items() if url in held]
+    sources += [
+        (url, lambda path, found=found: pdf(path, *found), True) for url, found in FL_PDFS.items() if url in held
+    ]
     sources += [
         (key, lambda path: daily(path.read_bytes()), False) for key in sorted(held) if key.endswith("#county-day")
     ]
