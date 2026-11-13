@@ -28614,7 +28614,8 @@ export const parties = {
           select pp.polity_id from polity_parent pp join below on pp.parent_id = below.id
         ),
         mine as materialized (
-          select o.id as option, o.contest_id, c.allocation_parent_id as parent, c.election_id
+          select o.id as option, o.contest_id, c.allocation_parent_id as parent, c.election_id,
+            case when c.party_scope_id is null then c.kind::text end as kind
           from contest_option o join contest c on c.id = o.contest_id
           where not c.notional and o.party_id in (select id from family) and (
             ${input.within ?? null}::uuid is null or exists (
@@ -28629,17 +28630,6 @@ export const parties = {
           select c.id, c.allocation_parent_id, c.election_id from up
           cross join lateral (select * from contest c where c.id = up.parent offset 0) c
         ),
-        won as (
-          select w.contest_id, coalesce(bool_or(w.kind in ('body_seats', 'list_allocation')), false) as chamber, sum(w.seats)::int as seats
-          from (
-            select m.contest_id, m.option, case when c.party_scope_id is null then c.kind::text end as kind, max(coalesce(x.seats, 1)) as seats
-            from mine m join contest c on c.id = m.contest_id
-            join outcome x on x.option_id = m.option and x.candidacy_id is null and x.kind in ('elected', 'won')
-            join result_set rs on rs.id = x.result_set_id and ${latest("rs")}
-            group by m.contest_id, m.option, c.kind, c.party_scope_id
-          ) w
-          group by w.contest_id
-        ),
         tops as (
           select up.id, case when ${input.within ?? null}::uuid is null then coalesce(e.parent_id, e.id) else e.id end as election,
             e.date_from, ${CYCLE} as year
@@ -28649,19 +28639,38 @@ export const parties = {
               select from contest p join election pe on pe.id = p.election_id
               where p.id = up.parent and pe.polity_id in (select id from below)
             ) end
+        ),
+        picked as (
+          select t.election, min(t.date_from) as day, min(t.year) as year, count(distinct t.id)::int as races,
+            count(*) over ()::int as total, min(min(t.year)) over ()::int as first, max(min(t.year)) over ()::int as last
+          from tops t
+          group by t.election
+          order by min(t.date_from) desc nulls last, count(distinct t.id) desc
+          limit 200
+        ),
+        won as (
+          select w.contest_id, coalesce(bool_or(w.kind in ('body_seats', 'list_allocation')), false) as chamber, sum(w.seats)::int as seats
+          from (
+            select m.contest_id, m.kind, x.seats
+            from mine m
+            cross join lateral (
+              select max(coalesce(x.seats, 1)) as seats from outcome x
+              join result_set rs on rs.id = x.result_set_id and ${latest("rs")}
+              where x.option_id = m.option and x.candidacy_id is null and x.kind in ('elected', 'won')
+            ) x
+            where x.seats is not null and m.contest_id in (select t.id from tops t join picked p on p.election = t.election)
+          ) w
+          group by w.contest_id
         )
-        select t.election, min(t.date_from)::text as date, min(t.year) as year,
-          count(distinct t.id)::int as races,
+        select p.election, p.day::text as date, p.year, p.races,
           count(distinct w.contest_id) filter (where not w.chamber)::int as won,
           coalesce(sum(w.seats) filter (where w.chamber), 0)::int as seats,
-          count(*) over ()::int as total,
-          min(min(t.year)) over ()::int as first,
-          max(min(t.year)) over ()::int as last
-        from tops t
+          p.total, p.first, p.last
+        from picked p
+        left join tops t on t.election = p.election
         left join won w on w.contest_id = t.id
-        group by t.election
-        order by min(t.date_from) desc nulls last, count(distinct t.id) desc
-        limit 200
+        group by p.election, p.day, p.year, p.races, p.total, p.first, p.last
+        order by p.day desc nulls last, p.races desc
       `);
       const ids = found.rows.map((row) => row.election);
       const [labels, slugs] = await Promise.all([names(ids), paths(ids)]);
