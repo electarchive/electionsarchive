@@ -152,6 +152,7 @@ url = "https://www.ncsbe.gov/results-data"
 [[feed]]
 id = "us.enr_2026.ok"
 adapter = "us.enr_2026"
+enabled = false
 params = { state = "OK" }
 poller = "muktedir"
 publisher = "Oklahoma State Election Board"
@@ -177,6 +178,7 @@ url = "https://elections.ri.gov/elections/previous-election-results"
 [[feed]]
 id = "us.enr_2026.sc"
 adapter = "us.enr_2026"
+enabled = false
 interval = 180
 params = { state = "SC" }
 poller = "muktedir"
@@ -357,6 +359,7 @@ url = "https://www.elections.alaska.gov/enr/26GENR/"
 [[feed]]
 id = "us.enr_2026.hi"
 adapter = "us.enr_2026"
+enabled = false
 params = { state = "HI" }
 publisher = "Hawaii Office of Elections"
 url = "https://elections.hawaii.gov/election-results/"
@@ -364,6 +367,7 @@ url = "https://elections.hawaii.gov/election-results/"
 [[feed]]
 id = "us.enr_2026.wy"
 adapter = "us.enr_2026"
+enabled = false
 interval = 120
 params = { state = "WY" }
 poller = "muktedir"
@@ -682,6 +686,7 @@ url = "https://apps.npr.org/2026-election-results/delaware.html"
 [[feed]]
 id = "us.npr.fl"
 adapter = "us.npr"
+enabled = false
 interval = 60
 note = "Unofficial Associated Press tabulation republished by NPR for Florida's statewide offices, U.S. House seats, and statewide measures; U.S. Senate and governor by county; pages show it only where no official feed has a current count"
 params = { state = "FL" }
@@ -700,6 +705,7 @@ url = "https://apps.npr.org/2026-election-results/georgia.html"
 [[feed]]
 id = "us.npr.hi"
 adapter = "us.npr"
+enabled = false
 interval = 60
 note = "Unofficial Associated Press tabulation republished by NPR for Hawaii's statewide offices, U.S. House seats, and statewide measures; U.S. Senate and governor by county; pages show it only where no official feed has a current count"
 params = { state = "HI" }
@@ -754,6 +760,7 @@ url = "https://apps.npr.org/2026-election-results/kansas.html"
 [[feed]]
 id = "us.npr.ky"
 adapter = "us.npr"
+enabled = false
 interval = 60
 note = "Unofficial Associated Press tabulation republished by NPR for Kentucky's statewide offices, U.S. House seats, and statewide measures; U.S. Senate and governor by county; pages show it only where no official feed has a current count"
 params = { state = "KY" }
@@ -871,6 +878,7 @@ url = "https://apps.npr.org/2026-election-results/nebraska.html"
 [[feed]]
 id = "us.npr.nh"
 adapter = "us.npr"
+enabled = false
 interval = 60
 note = "Unofficial Associated Press tabulation republished by NPR for New Hampshire's statewide offices, U.S. House seats, and statewide measures; U.S. Senate and governor by county; pages show it only where no official feed has a current count"
 params = { state = "NH" }
@@ -925,6 +933,7 @@ url = "https://apps.npr.org/2026-election-results/ohio.html"
 [[feed]]
 id = "us.npr.ok"
 adapter = "us.npr"
+enabled = false
 interval = 60
 note = "Unofficial Associated Press tabulation republished by NPR for Oklahoma's statewide offices, U.S. House seats, and statewide measures; U.S. Senate and governor by county; pages show it only where no official feed has a current count"
 params = { state = "OK" }
@@ -961,6 +970,7 @@ url = "https://apps.npr.org/2026-election-results/rhode-island.html"
 [[feed]]
 id = "us.npr.sc"
 adapter = "us.npr"
+enabled = false
 interval = 60
 note = "Unofficial Associated Press tabulation republished by NPR for South Carolina's statewide offices, U.S. House seats, and statewide measures; U.S. Senate and governor by county; pages show it only where no official feed has a current count"
 params = { state = "SC" }
@@ -988,6 +998,7 @@ url = "https://apps.npr.org/2026-election-results/tennessee.html"
 [[feed]]
 id = "us.npr.tx"
 adapter = "us.npr"
+enabled = false
 interval = 60
 note = "Unofficial Associated Press tabulation republished by NPR for Texas's statewide offices, U.S. House seats, and statewide measures; U.S. Senate and governor by county; pages show it only where no official feed has a current count"
 params = { state = "TX" }
@@ -1051,6 +1062,7 @@ url = "https://apps.npr.org/2026-election-results/west-virginia.html"
 [[feed]]
 id = "us.npr.wy"
 adapter = "us.npr"
+enabled = false
 interval = 60
 note = "Unofficial Associated Press tabulation republished by NPR for Wyoming's statewide offices, U.S. House seats, and statewide measures; U.S. Senate and governor by county; pages show it only where no official feed has a current count"
 params = { state = "WY" }

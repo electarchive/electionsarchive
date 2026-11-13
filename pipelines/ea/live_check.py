@@ -368,7 +368,9 @@ def feed_view(feed_id: str, contest: str | None) -> int:
 
 
 def run() -> int:
-    feeds = tomllib.loads(FEEDS.read_text())["feed"]
+    listed_feeds = tomllib.loads(FEEDS.read_text())["feed"]
+    feeds = [f for f in listed_feeds if f.get("enabled", True)]
+    retired = [f for f in listed_feeds if not f.get("enabled", True)]
     rows: list[tuple[str, str, str]] = []
     now = datetime.now(UTC)
 
@@ -500,8 +502,15 @@ def run() -> int:
         feed_id = covered.get(state)
         waiting_id = pending.get(state) if feed_id is None else None
         listed = any(isinstance(f.get("params"), dict) and f["params"].get("state") == state for f in feeds)
+        closed = next(
+            (f["id"] for f in retired if isinstance(f.get("params"), dict) and f["params"].get("state") == state),
+            None,
+        )
         if feed_id:
             reason = f"feed {feed_id}"
+        elif closed and not listed:
+            rows.append(("green", f"state {state}", f"feed {closed} disabled after certification"))
+            continue
         elif waiting_id:
             reason = f"feed {waiting_id} waiting for polls to close"
         else:
