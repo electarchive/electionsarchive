@@ -5203,6 +5203,10 @@
       >
     {/if}
     {const chief = $derived(current.leader ?? rolled(current))}
+    {const tally = $derived(
+      current.delegates?.first.find(([index]) => index === chief) ??
+        current.delegates?.first[0],
+    )}
     {#if current.valid === 0 && (chief != null || current.declared != null)}
       <span
         class="flex items-center gap-2 text-[0.8125rem]"
@@ -5216,10 +5220,10 @@
             ? current.declared?.label
             : (places.legend[chief]?.label ?? names[chief])}</span
         >
-        {#if current.delegates?.first[0] != null}
+        {#if current.delegates != null && tally != null}
           <span class="font-figures text-muted-foreground tabular-nums"
             >{m.map_delegates({
-              votes: count(current.delegates.first[0][1]),
+              votes: count(tally[1]),
               total: count(current.delegates.total),
             })}</span
           >
