@@ -1207,16 +1207,18 @@ def emit() -> Path:
                 known = {}
                 clash = set()
                 roots = conn.execute(
-                    """select o.id, ca.ballot_name, ca.person_id, x.value, ca.id, ca.is_independent, h.pipeline = %s
+                    """select o.id, ca.ballot_name, ca.person_id, min(x.value), ca.id, ca.is_independent, h.pipeline = %s
                        from contest_option o
                        join candidacy ca on ca.option_id = o.id
                        join changeset h on h.id = ca.changeset_id
                        left join external_id x on x.entity_id = o.id and x.scheme = 'us.option'
                        where o.contest_id = %s and o.parent_option_id is null and ca.role = 'head'
-                         and o.kind in ('candidate', 'ticket', 'write_in')""",
+                         and o.kind in ('candidate', 'ticket', 'write_in')
+                       group by o.id, ca.id, h.pipeline""",
                     [SOURCE, contest],
                 ).fetchall()
                 held: dict[UUID, tuple[UUID, str, bool]] = {}
+                lines: dict[tuple[str, str], list[tuple[UUID, UUID, UUID, str | None, bool]]] = defaultdict(list)
                 for option_id, ballot_name, person_id, option_value, candidacy_id, independent, ours in roots:
                     if not ballot_name:
                         continue
@@ -1225,12 +1227,25 @@ def emit() -> Path:
                         for w in re.sub(r"[^a-z ]", "", slug(ballot_name).replace("-", " ")).split()
                         if w not in SUFFIXES
                     ]
-                    token = (words[0], words[-1])
-                    if token in known:
-                        clash.add(token)
-                    known[token] = (option_id, person_id, option_value)
+                    lines[words[0], words[-1]].append((option_id, person_id, candidacy_id, option_value, ours))
                     if ours:
                         held[option_id] = (candidacy_id, ballot_name, independent)
+                for token, found in lines.items():
+                    others = [line for line in found if not line[4]]
+                    if len(found) > 1 and len(others) == 1:
+                        survivor_option, survivor_person, survivor_candidacy, _, _ = others[0]
+                        for option_id, person_id, candidacy_id, _, _ in found:
+                            if option_id == survivor_option:
+                                continue
+                            cs.merge(option_id, survivor_option)
+                            cs.merge(candidacy_id, survivor_candidacy)
+                            if person_id != survivor_person:
+                                cs.merge(person_id, survivor_person)
+                            held.pop(option_id, None)
+                        found = [others[0]]
+                    if len({line[0] for line in found}) > 1:
+                        clash.add(token)
+                    known[token] = (found[-1][0], found[-1][1], found[-1][3])
                 peers = {}
                 outside: dict[tuple[str, ...], UUID | None] = {}
                 if year_peers_for != day.year:
