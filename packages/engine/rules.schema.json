@@ -439,6 +439,12 @@
               ],
               "type": "string"
             },
+            "ranked": {
+              "enum": [
+                "first"
+              ],
+              "type": "string"
+            },
             "forfeit": {
               "type": "number",
               "minimum": 0,
@@ -888,6 +894,12 @@
             "tied": {
               "enum": [
                 "best_loser"
+              ],
+              "type": "string"
+            },
+            "ranked": {
+              "enum": [
+                "first"
               ],
               "type": "string"
             },
@@ -1403,6 +1415,12 @@
             "tied": {
               "enum": [
                 "best_loser"
+              ],
+              "type": "string"
+            },
+            "ranked": {
+              "enum": [
+                "first"
               ],
               "type": "string"
             },
