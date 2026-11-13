@@ -1,1 +1,47 @@
 volume	page	number	field	surname	value
+b1974	10	highland:10	checked		
+b1974	12	grampian:6	checked		
+b1974	19	lothian:27	checked		
+b1974	28	dumfries-and-galloway:15	checked		
+b1974	29	orkney:8	checked		
+b1974	29	orkney:9	checked		
+b1974	31	western-isles:18	checked		
+b1974	31	western-isles:21	checked		
+b1974	32	caithness:2	checked		
+b1974	34	skye-and-lochalsh:7	checked		
+b1974	34	inverness:10	checked		
+b1974	39	kincardine-and-deeside:2	checked		
+b1974	40	kincardine-and-deeside:7	checked		
+b1974	40	kincardine-and-deeside:11	checked		
+b1974	48	west-lothian:1	checked		
+b1974	48	west-lothian:6	checked		
+b1974	49	west-lothian:13	checked		
+b1974	49	city-of-edinburgh:7	checked		
+b1974	50	city-of-edinburgh:20	checked		
+b1974	51	city-of-edinburgh:63	checked		
+b1974	53	clackmannan:4	checked		
+b1974	54	stirling:20	checked		
+b1974	54	falkirk:5	checked		
+b1974	58	argyll-and-bute:12	checked		
+b1974	62	city-of-glasgow:64	checked		
+b1974	65	motherwell:2	checked		
+b1974	66	motherwell:30	checked		
+b1974	68	renfrew:2	checked		
+b1974	69	renfrew:10	checked		
+b1974	74	stewartry:11	checked		
+b1974	13	grampian:14	surname	Whitston|Whitson	Whitson
+b1974	19	lothian:36	surname	Cheson|Matheson	Hutcheson
+b1974	24	strathclyde:37	percent	Elliot	0.6
+b1974	26	strathclyde:92	surname	McLauglin|McLaughlin	McLauglin
+b1974	33	sutherland:1	surname	Clune|Clunie	Clunie
+b1974	34	inverness:11	surname	Bauchope|Bauchop	Bauchop
+b1974	38	city-of-aberdeen:4	surname	Ramsay|Ramsey	Ramsey
+b1974	42	city-of-dundee:23	surname	Carneron|Cameron	Cameron
+b1974	43	city-of-dundee:39	percent	Burnett	19.9
+b1974	61	city-of-glasgow:24	percent	Hughes	35.5
+b1974	73	kyle-and-carrick:25	surname	Stevenson|Stevenston	Stevenston
+b1974	41	city-of-dundee:4	note		No election due to death of candidate
+b1974	41	angus:3	initials	Riley	J
+b1974	41	angus:3	surname	Riley	O'Riley
+b1974	41	angus:3	checked		
+b1974	41	city-of-dundee:4	checked		

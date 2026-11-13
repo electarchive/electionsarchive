@@ -28,6 +28,7 @@ MODEL = "claude-haiku-5-5"
 PROMPT = "1"
 COLUMN_PROMPT = "2"
 CHECK_PROMPT = "3"
+NAMES_PROMPT = "3"
 LONGEST = 1568
 VOLUMES: dict[str, dict] = {
     "b1974": {
@@ -104,17 +105,20 @@ COLUMN_SYSTEM = (
 READ_SYSTEM_1974 = (
     "You read one spread of a printed book of the 1974 Scottish regional and district elections by Bochel and "
     "Denver. The spread holds two printed pages, each with two columns: read each column from top to bottom, "
-    "left page first. A council heading is a title in capitals such as GRAMPIAN REGION or a district name such as "
-    "Kirkcaldy District; report it once where it appears and set council on each division to the latest heading "
-    "in reading order, null when none appears on this spread. Divisions have no names: each starts with its "
-    "number, the word Electorate and the electorate, so put the number in number and leave name as an empty "
-    "string. Candidate names are listed at the left in order, and the parties, votes, and percentages are listed "
-    "at the right in the same order; pair them line by line. Each candidate line has an optional title such as "
-    "Lord or Sir, the initials or given names, and the surname; set party to the label printed at the right "
-    "(Con, Lab, SNP, Ind, Lib, Comm, or similar). Unopposed candidates have the word Unopposed instead of votes. "
-    "Majority is the figure after Maj. and turnout the figure after Turnout, without the percent sign. Copy "
-    "names and every figure exactly as printed, digits only, without thousands separators. Leave a figure null "
-    "when it is not printed. Skip page numbers, running titles, and commentary text."
+    "left page first. A council heading is a title in capitals such as GRAMPIAN REGION or ISLANDS AREAS, or a "
+    "district name such as Kirkcaldy District; report it once where it appears and set council on each division "
+    "to the latest heading in reading order, null when none appears on this spread. Each division starts at the "
+    "left margin with its number printed with a full stop, such as 12., then, in some councils, its place name "
+    "(such as Moat/Polwarth or St. Magnus, which may wrap onto the line above), then the word Electorate and the "
+    "electorate. Put the printed number in number, digits only and never the electorate, and the place name in "
+    "name, or an empty string when none is printed. Candidate names are listed at the left in order, and the "
+    "parties, votes, and percentages are listed at the right in the same order; pair them line by line. Each "
+    "candidate line has an optional title such as Lord or Sir, the initials or given names, and the surname; set "
+    "party to the label printed at the right (Con, Lab, SNP, Ind, Lib, Comm, or similar). Unopposed candidates have "
+    "the word Unopposed instead of votes. Majority is the figure after Maj. and turnout the figure after Turnout, "
+    "without the percent sign. Copy names and every figure exactly as printed, digits only, without thousands "
+    "separators, and a share printed as .6 as 0.6. Leave a figure null when it is not printed. Skip page numbers, "
+    "running titles, and commentary text."
 )
 READ_SCHEMA: dict[str, object] = {
     "type": "object",
@@ -184,12 +188,12 @@ def check_key(sha256: str, page: int, side: str, council: str, division: str) ->
     return f"anthropic-batch:{MODEL}/{CHECK_PROMPT}/{sha256}/{page}{side}/{council}/{division}"
 
 
-def read_key(sha256: str, page: int, side: str = "") -> str:
-    return f"anthropic-batch:{MODEL}/{COLUMN_PROMPT if side else PROMPT}/{sha256}/{page}{side}"
+def read_key(sha256: str, page: int, side: str = "", prompt: str = "") -> str:
+    return f"anthropic-batch:{MODEL}/{prompt or (COLUMN_PROMPT if side else PROMPT)}/{sha256}/{page}{side}"
 
 
-def vision(sha256: str, page: int, side: str = "") -> dict:
-    message = json.loads(raw.cached(SOURCE, read_key(sha256, page, side)).path.read_text())
+def vision(sha256: str, page: int, side: str = "", prompt: str = "") -> dict:
+    message = json.loads(raw.cached(SOURCE, read_key(sha256, page, side, prompt)).path.read_text())
     return json.loads(next(block["text"] for block in message["content"] if block["type"] == "text"))
 
 
@@ -250,6 +254,7 @@ def halves(image: Image.Image) -> dict[str, Image.Image]:
 
 def fetch() -> None:
     reads: dict[str, batch.Want] = {}
+    names: dict[str, batch.Want] = {}
     columns: dict[str, batch.Want] = {}
     for volume, spec in VOLUMES.items():
         artifact = raw.fetch(SOURCE, url(volume), suffix=".pdf")
@@ -262,12 +267,17 @@ def fetch() -> None:
                         columns[read_key(artifact.sha256, page, side)] = request(
                             crop, COLUMN_SYSTEM, "Read the councils and divisions in this column."
                         )
+            if volume == "b1974":
+                names[read_key(artifact.sha256, page, prompt=NAMES_PROMPT)] = request(
+                    image, READ_SYSTEM_1974, "Read the councils and divisions on this spread."
+                )
             reads[read_key(artifact.sha256, page)] = request(
                 image,
                 READ_SYSTEM_1974 if volume == "b1974" else READ_SYSTEM,
                 "Read the councils and divisions on this page.",
             )
     print(batch.ensure(SOURCE, "volumes", reads)[1])
+    print(batch.ensure(SOURCE, "names", names)[1])
     print(batch.ensure(SOURCE, "columns", columns)[1])
     doubts = PARSED / "doubts.tsv"
     if not doubts.exists():
@@ -395,10 +405,37 @@ def share(text: str | None) -> float | None:
     return float(match[0]) if match else None
 
 
+BOOK_1974 = {
+    "argyll-and-bute": "Argyll",
+    "strathkelvin": "Bishopbriggs and Kirkintilloch",
+    "cumbernauld-and-kilsyth": "Cumbernauld",
+    "clydesdale": "Lanark",
+    "wigtown": "Merrick",
+    "stewartry": "Stewarry",
+    "ettrick-and-lauderdale": "Ettrick &",
+}
+RENAMED_1974 = ("argyll-and-bute", "strathkelvin", "clydesdale", "wigtown")
+ORDER_1974 = [
+    "caithness", "sutherland", "ross-and-cromarty", "skye-and-lochalsh", "lochaber", "inverness",
+    "badenoch-and-strathspey", "nairn", "moray", "banff-and-buchan", "gordon", "city-of-aberdeen",
+    "kincardine-and-deeside", "angus", "city-of-dundee", "perth-and-kinross", "kirkcaldy", "north-east-fife",
+    "dunfermline", "west-lothian", "city-of-edinburgh", "midlothian", "east-lothian", "clackmannan", "stirling",
+    "falkirk", "tweeddale", "ettrick-and-lauderdale", "roxburgh", "berwickshire", "argyll-and-bute", "dumbarton",
+    "city-of-glasgow", "clydebank", "bearsden-and-milngavie", "strathkelvin", "cumbernauld-and-kilsyth",
+    "monklands", "motherwell", "hamilton", "east-kilbride", "eastwood", "clydesdale", "renfrew", "inverclyde",
+    "cunninghame", "kilmarnock-and-loudoun", "kyle-and-carrick", "cumnock-and-doon-valley", "wigtown",
+    "stewartry", "nithsdale", "annandale-and-eskdale",
+]  # fmt: skip
+
+
 def councils(volume: str) -> list[tuple[str, str, str]]:
+    regions = [(key, label, key) for key, label, _ in REGIONS]
+    districts = {slug(label): (label, region) for region, labels in DISTRICTS.items() for label in labels}
     if VOLUMES[volume]["tier"] == "region":
-        return [(key, label, key) for key, label, _ in REGIONS]
-    return [(slug(label), label, region) for region, labels in DISTRICTS.items() for label in labels]
+        return regions
+    if VOLUMES[volume]["tier"] == "both":
+        return regions + [(key, districts[key][0], districts[key][1]) for key in ORDER_1974]
+    return [(key, label, region) for key, (label, region) in districts.items()]
 
 
 def number(text: str | None) -> tuple[int, str] | None:
@@ -565,7 +602,8 @@ def issues(division: dict, lines: list[dict]) -> list[str]:
             found.append(f"{line['surname']} {line['votes']} against {line['percent']}%")
     if division["electorate"] and division["turnout"] is not None:
         computed = (total + (division["rejected"] or 0)) / division["electorate"] * 100
-        if abs(computed - division["turnout"]) > 0.15:
+        slack = 2.5 if division["rejected"] is None and division["volume"] == "b1974" else 0.15
+        if not -0.15 <= division["turnout"] - computed <= slack:
             found.append(f"turnout {computed:.1f}%, printed {division['turnout']}")
     return found
 
@@ -628,11 +666,121 @@ def checked(volume: str, item: dict) -> dict | None:
     )
 
 
+def sequence_1974(volume: str) -> tuple[list[dict], list[str]]:
+    sha = raw.cached(SOURCE, url(volume)).sha256
+    first, last = VOLUMES[volume]["pages"]
+    items: list[dict] = []
+    gaps: list[str] = []
+    previous = 0
+    for page in range(first, last + 1):
+        divisions = vision(sha, page)["divisions"]
+        twins = vision(sha, page, prompt=NAMES_PROMPT)["divisions"]
+        if len(twins) != len(divisions):
+            gaps.append(f"{volume}\t{page}\t\tthe two readings find {len(divisions)} and {len(twins)} divisions")
+            twins = [None] * len(divisions)
+        for division, twin in zip(divisions, twins, strict=True):
+            parsed = number(division["number"])
+            expected = previous + 1
+            other = number(twin["number"]) if twin else None
+            if (parsed is None or parsed[0] > 120) and other is not None and other[0] == expected:
+                parsed = other
+            elif parsed is None or parsed[0] > 120:
+                gaps.append(f"{volume}\t{page}\t{expected}\tnumber read as {division['number']}")
+                parsed = (expected, "")
+            elif parsed[0] not in (1, expected) or parsed[1]:
+                gaps.append(f"{volume}\t{page}\t{division['number']}\tfollows {previous}")
+            previous = parsed[0]
+            items.append({**division, "page": page, "parsed": parsed})
+            if twin is not None and other == parsed:
+                items[-1]["twin"] = {**twin, "page": page, "parsed": parsed}
+    return items, gaps
+
+
+def fixed(division: dict, lines: list[dict], fix: dict) -> list[dict]:
+    field, value = fix["field"], fix["value"]
+    if fix["surname"]:
+        line = next((line for line in lines if line["surname"] in fix["surname"].split("|")), None)
+        if line is None:
+            raise ValueError(f"correction matches no candidate: {fix}")
+        line[field] = int(value) if field == "votes" else float(value) if field == "percent" else value
+    elif field == "drop":
+        lines = [line for line in lines if line["surname"] != value]
+    elif field == "note":
+        division[field] = value
+    elif field != "checked":
+        division[field] = float(value) if field == "turnout" else int(value) if value else None
+    return lines
+
+
+def parse_1974(volume: str, fixes: dict[tuple[str, int, str], list[dict]]) -> tuple[list[dict], list[dict], list[str]]:
+    bodies = councils(volume)
+    items, gaps = sequence_1974(volume)
+    chains: list[list[dict]] = []
+    for item in items:
+        if item["parsed"][0] == 1:
+            chains.append([])
+        chains[-1].append(item)
+    if len(chains) != len(bodies):
+        raise ValueError(f"{volume}: the reading finds {len(chains)} councils, not {len(bodies)}")
+    divisions: list[dict] = []
+    candidates: list[dict] = []
+    problems = list(gaps)
+    for index, (chain, (key, label, region)) in enumerate(zip(chains, bodies, strict=True)):
+        printed = BOOK_1974.get(key, label)
+        heading = chain[0]["council"]
+        if heading is not None and printed.lower().split()[0] not in heading.lower():
+            problems.append(f"{volume}\t{chain[0]['page']}\t1\t{label}\theading read as {heading}")
+        first = len(divisions)
+        for item in chain:
+            readings = [normal(volume, one) for one in (item, item.get("twin")) if one]
+            division, lines, found = settle(readings)
+            for fix in fixes.pop((volume, item["page"], f"{key}:{division['number']}"), []):
+                lines = fixed(division, lines, fix)
+                found = [] if fix["field"] == "checked" else issues(division, lines)
+            division |= {"council": key, "region": region, "tier": "region" if index < len(REGIONS) else "district"}
+            problems += [f"{volume}\t{item['page']}\t{division['number']}\t{label}\t{issue}" for issue in found]
+            divisions.append(division)
+            candidates += [
+                {"volume": volume, "council": key, "number": division["number"], "order": order, **line}
+                for order, line in enumerate(lines)
+            ]
+        if sum(1 for division in divisions[first:] if division["name"]) * 3 < len(chain):
+            for division in divisions[first:]:
+                division["name"] = None
+    return divisions, candidates, problems
+
+
+def parse_book(volume: str, fixes: dict[tuple[str, int, str], list[dict]]) -> None:
+    try:
+        divisions, candidates, problems = parse_1974(volume, fixes)
+    except ValueError as error:
+        divisions, candidates, problems = [], [], [str(error)]
+    folder = PARSED / volume
+    folder.mkdir(parents=True, exist_ok=True)
+    for old in folder.glob("*.parquet"):
+        old.unlink()
+    frame = pl.DataFrame(divisions, infer_schema_length=None)
+    if divisions:
+        duplicates = frame.group_by("volume", "council", "number").len().filter(pl.col("len") > 1)
+        for row in duplicates.iter_rows(named=True):
+            problems.append(f"{row['volume']}\t\t{row['number']}\t{row['council']}\trepeated")
+        frame.write_parquet(folder / "divisions.parquet")
+        pl.DataFrame(candidates, infer_schema_length=None).write_parquet(folder / "candidates.parquet")
+    (folder / "problems.tsv").write_text("".join(f"{problem}\n" for problem in problems))
+    if fixes:
+        raise ValueError(f"corrections that match nothing: {sorted(fixes)}")
+    print(f"{volume}: {len(divisions)} divisions, {len(candidates)} candidates, {len(problems)} problems")
+
+
 def parse() -> None:
     corrections = pl.read_csv(CORRECTIONS, separator="\t", infer_schema_length=0).iter_rows(named=True)
     fixes: dict[tuple[str, int, str], list[dict]] = {}
     for fix in corrections:
         fixes.setdefault((fix["volume"], int(fix["page"]), fix["number"]), []).append(fix)
+    book = {key: fix for key, fix in fixes.items() if key[0] == "b1974"}
+    for key in book:
+        del fixes[key]
+    parse_book("b1974", book)
     divisions: list[dict] = []
     candidates: list[dict] = []
     problems: list[str] = []
@@ -732,8 +880,7 @@ def parse() -> None:
     )
 
 
-def kind(volume: str) -> str:
-    return "region" if VOLUMES[volume]["tier"] == "region" else "district"
+TITLES_BY_TIER = {"region": "Regional", "district": "District", "both": "Regional and District"}
 
 
 def party_of(label: str, year: int) -> tuple[str, str] | None:
@@ -754,16 +901,22 @@ def party_of(label: str, year: int) -> tuple[str, str] | None:
 
 
 def emit() -> Path:
-    divisions = pl.read_parquet(PARSED / "divisions.parquet")
-    lines = pl.read_parquet(PARSED / "candidates.parquet")
+    clean = [
+        folder
+        for folder in (PARSED, PARSED / "b1974")
+        if (folder / "problems.tsv").exists() and not (folder / "problems.tsv").read_text()
+    ]
+    divisions = pl.concat([pl.read_parquet(folder / "divisions.parquet") for folder in clean], how="diagonal_relaxed")
+    lines = pl.concat([pl.read_parquet(folder / "candidates.parquet") for folder in clean], how="diagonal_relaxed")
+    volumes = {volume: VOLUMES[volume] for volume in divisions["volume"].unique(maintain_order=True)}
     with connect() as conn:
         cs = Changeset(
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Scottish regional and islands council elections 1978 to 1994 and district council elections "
-            "1977 to 1992 by electoral division and ward, from Bochel and Denver's results volumes, with the nine "
-            "regional and 53 district councils as bodies",
+            summary="Scottish regional, islands, and district council elections 1974 to 1994 by electoral division "
+            "and ward, from Bochel and Denver's results volumes, with the nine regional, three islands, and 53 "
+            "district councils as bodies",
             polity="GB-SCT",
         )
 
@@ -794,9 +947,8 @@ def emit() -> Path:
         paths = {path for (path,) in conn.execute("select path from slug where path like 'gb/%%'").fetchall()}
 
         sources: dict[str, UUID] = {}
-        for volume in ROUNDS:
-            spec = VOLUMES[volume]
-            title = f"The Scottish {kind(volume).title()} Elections {spec['day'].year}: Results and Statistics"
+        for volume, spec in volumes.items():
+            title = f"The Scottish {TITLES_BY_TIER[spec['tier']]} Elections {spec['day'].year}: Results and Statistics"
             sources[volume] = cs.source(PUBLISHER, title)
             cs.add(
                 "source",
@@ -815,12 +967,12 @@ def emit() -> Path:
                 polity, body = cs.key("gb.polity", code), cs.key("gb.body", code)
                 if cs.minted & {polity, body}:
                     raise ValueError(f"{code}: islands council not in the archive")
-                path, council = conn.execute(
+                path, label_text = conn.execute(
                     "select (select path from slug where entity_id = %s order by is_current desc limit 1),"
                     " (select text from name where entity_id = %s and is_preferred limit 1)",
                     [polity, body],
                 ).fetchall()[0]
-                bodies[key] = (polity, body, path, council)
+                bodies[key] = (polity, body, path, label_text)
                 continue
             bodies[key] = council(
                 cs,
@@ -846,23 +998,25 @@ def emit() -> Path:
                     f"gb/{key}-district",
                 )
 
-        for volume in ROUNDS:
-            day = VOLUMES[volume]["day"]
+        for volume, spec in volumes.items():
+            day = spec["day"]
             year = day.year
-            tier = kind(volume)
             national = cs.key("gb.election", f"{day}:local:sct")
             cs.add("election", id=national, polity_id=scotland, kind="local", date_from=day, date_to=day, status="held")
             name(
                 national,
-                f"{year} Scottish regional and islands council elections"
-                if tier == "region"
-                else f"{year} Scottish district council elections",
+                {
+                    "region": f"{year} Scottish regional and islands council elections",
+                    "district": f"{year} Scottish district council elections",
+                    "both": f"{year} Scottish regional, islands, and district council elections",
+                }[spec["tier"]],
             )
             cs.add("slug", path=f"gb/scotland/{day}-local", entity_id=national)
             held = divisions.filter(pl.col("volume") == volume)
             for (key,), rows in held.group_by("council", maintain_order=True):
                 polity, body, path, council_name = bodies[key]
                 region = rows["region"][0]
+                tier = rows["tier"][0]
                 scheme = "gb.scot_division" if tier == "region" else "gb.ward"
                 noun = "division" if tier == "region" else "ward"
                 election = cs.key("gb.election", f"{day}:local:{tier}:{key}")
@@ -879,6 +1033,14 @@ def emit() -> Path:
                 name(election, f"{year} {council_name} election")
                 cs.add("slug", path=f"{path}/{day}-local", entity_id=election)
                 cs.add("note", entity_id=election, kind="methodology", body_md=METHOD)
+                if volume == "b1974" and key in RENAMED_1974:
+                    cs.add(
+                        "note",
+                        entity_id=election,
+                        kind="caveat",
+                        body_md=f"The volume heads this council “{BOOK_1974[key]} District”; it took its present "
+                        "name after the election.",
+                    )
                 empty = []
                 for row in rows.iter_rows(named=True):
                     standing = lines.filter(
@@ -886,7 +1048,10 @@ def emit() -> Path:
                     ).sort("order")
                     shown = f"{noun.title()} {row['number']}" + (f" ({display(row['name'])})" if row["name"] else "")
                     if standing.height == 0:
-                        empty.append(shown)
+                        printed = row["note"] or ""
+                        empty.append(
+                            shown if "no candidate" in printed.lower() or not printed else f"{shown} ({printed})"
+                        )
                         continue
                     area_key = f"{tier}:{key}:{year}:{row['number']}"
                     area = cs.area(scheme, area_key)
