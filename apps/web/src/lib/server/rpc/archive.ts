@@ -14467,9 +14467,41 @@ async function contingency(contest: { id: string; date: string | null }) {
       appointed += row.value;
     }
   }
+  const leaders = new Map<number, { winner: string | null; votes: number }>();
+  if (parsed.output.districts) {
+    const districts = await db.execute<{
+      unit: number;
+      option: number;
+      votes: number;
+    }>(sql`
+      select v.unit_k as unit, v.option_k as option, sum(v.value)::float8 as votes
+      from result_set rs
+      join result_value v on v.result_set_k = rs.k
+      join reporting_unit u on u.k = v.unit_k
+      join scheme s on s.code = u.scheme_code and s.kind = 'electoral_district'
+      where rs.contest_id = ${contest.id}::uuid and rs.status = 'active' and ${served("rs")}
+        and v.measure = 1 and v.count_round = 0 and v.channel = 0 and v.option_k <> 0
+      group by 1, 2
+    `);
+    for (const row of districts.rows) {
+      const held = leaders.get(row.unit);
+      if (held == null || row.votes > held.votes) {
+        leaders.set(row.unit, { winner: String(row.option), votes: row.votes });
+      } else if (row.votes === held.votes) {
+        held.winner = null;
+      }
+    }
+  }
   const decided = elect(
-    { ...parsed.output, districts: false },
-    { options, appointed: appointed > 0 ? appointed : (totals.get(root) ?? 0) },
+    { ...parsed.output, districts: leaders.size > 0 },
+    {
+      options,
+      appointed: appointed > 0 ? appointed : (totals.get(root) ?? 0),
+      districts: leaders
+        .values()
+        .map(({ winner }) => ({ winner, weight: 1 }))
+        .toArray(),
+    },
   );
   if (decided.outcome !== "contingent") {
     return null;
