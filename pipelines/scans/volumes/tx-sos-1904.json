@@ -64,7 +64,7 @@
     },
     "republican": {
       "candidate": "Roosevelt",
-      "elector": 1,
+      "elector": 16,
       "of": 18
     },
     "people s": {
@@ -74,12 +74,12 @@
     },
     "prohibition": {
       "candidate": "Swallow",
-      "elector": 1,
+      "elector": 12,
       "of": 18
     },
     "socialist": {
       "candidate": "Debs",
-      "elector": 1,
+      "elector": 2,
       "of": 18
     },
     "socialist and labor": {
