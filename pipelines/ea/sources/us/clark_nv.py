@@ -947,14 +947,17 @@ def emit() -> Path:
                 if answers:
                     outcome = "won"
                 elif party in PARTY_TITLES or (
-                    "PRIMARY" in row["election_label"].upper()
+                    "PRIMAR" in row["election_label"].upper()
                     and not (len(chosen) == 1 and tally.get(chosen[0], 0) * 2 > total)
                 ):
                     outcome = "advanced"
                 else:
                     outcome = "elected"
-                for candidate in chosen:
-                    cs.add("outcome", result_set_id=result_set, option_id=options[candidate], kind=outcome, seats=None)
+                if outcome != "elected" or magnitude is None or len(chosen) <= magnitude:
+                    for candidate in chosen:
+                        cs.add(
+                            "outcome", result_set_id=result_set, option_id=options[candidate], kind=outcome, seats=None
+                        )
 
             unit_ids: dict[str, UUID] = {}
             for precinct in frame["precinct"].unique().to_list():
@@ -1129,13 +1132,16 @@ def emit() -> Path:
                     "advanced"
                     if row["party"] in PARTY_TITLES
                     or (
-                        "PRIMARY" in row["election_label"].upper()
+                        "PRIMAR" in row["election_label"].upper()
                         and not (len(picked) == 1 and tally.get(picked[0], 0) * 2 > total)
                     )
                     else "elected"
                 )
-                for candidate in picked:
-                    cs.add("outcome", result_set_id=result_set, option_id=chosen[candidate], kind=outcome, seats=None)
+                if outcome != "elected" or magnitude is None or len(picked) <= magnitude:
+                    for candidate in picked:
+                        cs.add(
+                            "outcome", result_set_id=result_set, option_id=chosen[candidate], kind=outcome, seats=None
+                        )
             unit_ids = {}
             for precinct in frame["precinct"].unique().to_list():
                 unit_code = f"{day}:NV:{FIPS}:CLARK:{precinct}"
