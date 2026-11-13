@@ -704,7 +704,7 @@ def emit() -> Path:
                 label = cs_label(province)
                 name(contest, f"{year} Regional Representative Council election in {label}", "en", "english")
                 name(contest, f"Pemilihan Umum Anggota DPD Tahun {year} Provinsi {label}")
-                cs.add("slug", path=f"id/{day}-general/dpd/{slug(label)}", entity_id=contest)
+                cs.add("slug", path=f"id/{day}-general/dpd-{slug(label)}", entity_id=contest)
                 origin = workbooks[province] if year == 2019 else DECREES["1207"][0]
                 if year == 2019:
                     source(
