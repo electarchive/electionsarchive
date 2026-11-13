@@ -1,4 +1,5 @@
 import io
+import re
 import zipfile
 from datetime import date
 from pathlib import Path
@@ -8,14 +9,17 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset
+from ea.sources.us import census_decennial
 from ea.sources.us.cog import SAIPE, TYPES, URL
 from ea.store import connect
 
 SOURCE = "us.census_population"
-VERSION = "1"
+VERSION = "2"
 PUBLISHER = "U.S. Census Bureau"
 UNITS = "2022 Census of Governments: Government Units List"
 DISTRICTS = "Small Area Income and Poverty Estimates: 2022 School District Estimates"
+SCHOOL_LEVELS = {"950", "960", "970"}
+CENSUS_DAY = date(2020, 4, 1)
 SCHEMES = {"county": "us.county", "municipality": "us.place", "township": "us.town"}
 
 
@@ -47,6 +51,25 @@ def districts() -> pl.DataFrame:
     )
 
 
+def decennial() -> pl.DataFrame:
+    rows = []
+    for folder in census_decennial._states(2020):
+        path = raw.cached(census_decennial.SOURCE, census_decennial._zip(2020, folder)).path
+        with zipfile.ZipFile(path) as archive:
+            names = archive.namelist()
+            geo = archive.read(next(n for n in names if "geo" in n)).decode("latin-1").splitlines()
+            segment = archive.read(next(n for n in names if re.search(r"000012020\.pl$", n))).decode("latin-1")
+        counts = {}
+        for line in segment.splitlines():
+            fields = line.split("|")
+            counts[fields[4]] = int(fields[5])
+        for line in geo:
+            fields = line.split("|")
+            if fields[2] in SCHOOL_LEVELS and fields[4] == "00":
+                rows.append((fields[9], counts[fields[7]], fields[2]))
+    return pl.DataFrame(rows, schema=["code", "value", "sumlev"], orient="row")
+
+
 def emit() -> Path:
     with connect() as conn:
         codes: dict[tuple[str, str], list[tuple[str, date | None, date | None]]] = {}
@@ -69,7 +92,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Census Bureau population estimates for US counties, incorporated places, and towns and townships "
+            summary="Census Day 2020 population of school districts from the P.L. 94-171 summary files, and Census Bureau population estimates for US counties, incorporated places, and towns and townships "
             "from the 2022 Government Units List, and for school districts from the 2022 SAIPE school district "
             "estimates, joined by FIPS code",
             polity="US",
@@ -133,6 +156,35 @@ def emit() -> Path:
                     "value": value,
                     "source_id": str(saipe),
                     "locator": f"ussd22.xls, district {code}",
+                }
+            )
+        pl_source = cs.source(PUBLISHER, census_decennial.TITLES[2020])
+        if conn.execute("select from source where id = %s", [pl_source]).fetchone() is None:
+            cs.add(
+                "source",
+                id=pl_source,
+                kind="official_body",
+                publisher=PUBLISHER,
+                title=census_decennial.TITLES[2020],
+                url=census_decennial.ROOTS[2020],
+                license=census_decennial.LICENSE,
+                notes="One zip per state; table P1 (total population), cell P0010001, joined to the geographic "
+                "header by logical record, summary levels 040, 050, 060, 160, 950, 960, and 970, geographic "
+                "component 00.",
+            )
+        for code, value, sumlev in decennial().iter_rows():
+            found = area("us.school_district", code, CENSUS_DAY)
+            if found is None or not value:
+                missing.append("school 2020")
+                continue
+            rows.append(
+                {
+                    "area_id": found,
+                    "date": CENSUS_DAY,
+                    "date_precision": "day",
+                    "value": value,
+                    "source_id": str(pl_source),
+                    "locator": f"P.L. 94-171 2020, table P1, summary level {sumlev}, GEOID {code}",
                 }
             )
         frame = pl.DataFrame(rows).with_columns(pl.col("date").cast(pl.Date), kind=pl.lit("population"))
