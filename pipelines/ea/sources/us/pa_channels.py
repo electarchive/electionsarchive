@@ -6,7 +6,7 @@ from pathlib import Path
 import polars as pl
 
 from ea import raw
-from ea.changeset import Changeset
+from ea.changeset import Changeset, slug
 from ea.sources.us import medsl, openelections
 from ea.store import DATA, connect
 
@@ -16,8 +16,14 @@ PARSED = DATA / "parsed" / SOURCE
 API = "https://www.electionreturns.pa.gov/api/ElectionReturn/"
 LANDING = "https://www.electionreturns.pa.gov/"
 PUBLISHER = "Pennsylvania Department of State"
-TITLE = "Election returns by county and vote type, 2020, 2022, and 2024 general elections"
-ELECTIONS = {date(2020, 11, 3): "83", date(2022, 11, 8): "94", date(2024, 11, 5): "105"}
+TITLE = "Election returns by county and vote type, 2020 through 2024 general and municipal elections"
+ELECTIONS = {
+    date(2020, 11, 3): "83",
+    date(2021, 11, 2): "84",
+    date(2022, 11, 8): "94",
+    date(2023, 11, 7): "100",
+    date(2024, 11, 5): "105",
+}
 OFFICES = {
     "1": "president",
     "2": "senate",
@@ -28,6 +34,14 @@ OFFICES = {
     "11": "house",
     "12": "senate",
     "13": "house",
+    "8": "judicial",
+    "9": "judicial",
+    "10": "judicial",
+}
+JUDICIAL = {
+    "8": "justice-of-the-supreme-court",
+    "9": "judge-of-the-superior-court",
+    "10": "judge-of-the-commonwealth-court",
 }
 CHANNELS = {"ElectionDayVotes": 1, "MailInVotes": 3, "ProvisionalVotes": 5}
 
@@ -47,7 +61,7 @@ def county_url(office: str, district: str, election: str) -> str:
 def districts(office: str, election: str) -> list[str]:
     content = raw.cached(SOURCE, office_url(office, election)).path.read_bytes()
     text = json.loads(content) if content.strip() else ""
-    return re.findall(r"\$\$(\d+)\$\$", text) if text else []
+    return list(dict.fromkeys(re.findall(r"\$\$(\d+)\$\$", text))) if text else []
 
 
 def urls() -> list[str]:
@@ -71,6 +85,7 @@ def parse() -> None:
     with connect() as conn:
         fips = openelections.counties(conn)["PA"]
     rows = []
+    untied: set[tuple[date, str]] = set()
     for day, election in ELECTIONS.items():
         for office, chamber in OFFICES.items():
             for district in districts(office, election):
@@ -81,22 +96,53 @@ def parse() -> None:
                     for county in counties:
                         for name, candidates in county.items():
                             for candidate in candidates:
-                                total = int(candidate["Votes"] or 0)
-                                split = {channel: int(candidate[key] or 0) for key, channel in CHANNELS.items()}
-                                if sum(split.values()) != total:
-                                    raise ValueError(f"{day} {label} {name} {candidate['CandidateName']}: channels")
-                                for channel, votes in split.items():
-                                    rows.append(
+                                if candidate.get("IsRetention") == "1":
+                                    surname, _, given = candidate["CandidateName"].partition(",")
+                                    chamber = f"{JUDICIAL[office]}-retention-{slug(given.split()[0])}-{slug(surname)}"
+                                    total = int(candidate["YesVotes"] or 0) + int(candidate["NoVotes"] or 0)
+                                    cells = [
                                         (
-                                            day,
-                                            chamber if office not in {"12", "13"} else f"{chamber}:{seat}:g",
-                                            seat if office == "11" else None,
-                                            name,
-                                            candidate["CandidateName"].strip().upper(),
-                                            channel,
-                                            votes,
+                                            who,
+                                            {
+                                                channel: int(candidate[key.replace("Votes", f"{word}Votes")] or 0)
+                                                for key, channel in CHANNELS.items()
+                                            },
                                         )
+                                        for who, word in (("YES", "Yes"), ("NO", "No"))
+                                    ]
+                                else:
+                                    chamber = (
+                                        JUDICIAL[office]
+                                        if office in JUDICIAL
+                                        else OFFICES[office]
+                                        if office not in {"12", "13"}
+                                        else f"{OFFICES[office]}:{seat}:g"
                                     )
+                                    total = int(candidate["Votes"] or 0)
+                                    cells = [
+                                        (
+                                            candidate["CandidateName"].strip().upper(),
+                                            {channel: int(candidate[key] or 0) for key, channel in CHANNELS.items()},
+                                        )
+                                    ]
+                                if sum(sum(split.values()) for _, split in cells) != total:
+                                    untied.add((day, chamber))
+                                    continue
+                                for who, split in cells:
+                                    for channel, votes in split.items():
+                                        rows.append(
+                                            (
+                                                day,
+                                                chamber,
+                                                seat if office == "11" else None,
+                                                name.removesuffix(" (Retention)"),
+                                                who,
+                                                channel,
+                                                votes,
+                                            )
+                                        )
+    rows = [row for row in rows if (row[0], row[1]) not in untied]
+    print("untied, left out:", sorted(untied))
     frame = pl.DataFrame(
         rows,
         schema={
@@ -141,7 +187,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Pennsylvania's 2020, 2022, and 2024 general elections by county and vote type (election day, mail-in, and provisional), from the Department of State's official returns",
+            summary="Pennsylvania's 2020 through 2024 general and municipal elections by county and vote type (election day, mail-in, and provisional), from the Department of State's official returns",
             polity="US-PA",
         )
         source = cs.source(PUBLISHER, TITLE)
