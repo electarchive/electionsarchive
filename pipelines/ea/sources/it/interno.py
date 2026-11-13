@@ -1241,6 +1241,7 @@ def emit() -> Path:
                 body_id=chamber,
                 district_area_id=college_ids[code],
                 allocation_parent_id=national,
+                magnitude=sum(count for (college, _), count in seats.items() if college == code),
                 electoral_system_id=systems["camera-proportional"],
                 default_result_kind="counted",
             )
