@@ -173,7 +173,7 @@ def _diff(conn: Connection, stage: Stage) -> dict[str, dict[str, int]]:
                     """s.is_preferred and exists (
                          select from public.name p join changeset c on c.id = p.changeset_id and c.pipeline = {pipeline}
                          where not p.is_preferred and {loose} and not exists (
-                           select from public.name q join changeset o on o.id = q.changeset_id and o.pipeline = {pipeline}
+                           select from public.name q join changeset o on o.id = q.changeset_id and o.pipeline in ({pipeline}, 'identity')
                            where q.entity_id = p.entity_id and q.lang = p.lang and q.script is not distinct from p.script
                              and q.is_preferred and q.valid_from is null and q.valid_to is null))"""
                 ).format(
@@ -188,10 +188,11 @@ def _diff(conn: Connection, stage: Stage) -> dict[str, dict[str, int]]:
                 else sql.SQL("false")
             )
             query = sql.SQL(
-                """select count(*) filter (where not {present} and not exists (select from public.{target} p where p.id = {derived})),
-                          count(*) filter (where not {present} and {stranded}),
+                """select count(*) filter (where not {present} and not ({stranded})
+                                              and not exists (select from public.{target} p where p.id = {derived})),
+                          count(*) filter (where not {present} and ({stranded})),
                           count(*) filter (where {present} or exists (select from public.{target} p where p.id = {derived})
-                                              and not {stranded})
+                                              and not ({stranded}))
                    from {staged} s"""
             ).format(
                 present=_present(conn, table, columns),
@@ -336,7 +337,7 @@ def _promote_stranded(conn: Connection, stage: Stage, columns: list[str]) -> Non
                      from public.name p join changeset c on c.id = p.changeset_id and c.pipeline = %s
                      join {} s on s.is_preferred and {}
                      where not p.is_preferred and not exists (
-                       select from public.name q join changeset o on o.id = q.changeset_id and o.pipeline = %s
+                       select from public.name q join changeset o on o.id = q.changeset_id and o.pipeline in (%s, 'identity')
                        where q.entity_id = p.entity_id and q.lang = p.lang and q.script is not distinct from p.script
                          and q.is_preferred and q.valid_from is null and q.valid_to is null)
                      order by p.entity_id, p.lang, p.script, p.recorded_from desc, p.id) pick
