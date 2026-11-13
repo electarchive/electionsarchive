@@ -158,7 +158,7 @@ const MODEL = {
   partial: 0.05,
   residual: 0.04,
   spike: 0.003,
-  priors: { swing: 0.1, slope: 0.15, size: 0.015, order: 0.15, trait: 0.015 },
+  priors: { swing: 0.1, slope: 0.15, size: 0.01, order: 0.15, trait: 0.015 },
   turnout: 0.12,
   same: { center: 0.06, spread: 0.08 },
   drift: 0.06,
@@ -711,6 +711,19 @@ function units(
           1,
         ) *
         (unit.channel === 0 ? 1 : MODEL.channel.sigma);
+    }
+  }
+  const seen = found.filter((unit) => unit.hasBaseline && unit.total > 0);
+  if (seen.length > 0) {
+    for (let index = 0; index < 1 + width; index += 1) {
+      const values = seen.map((unit) => unit.features[index] ?? 0);
+      const low = Math.min(...values);
+      const high = Math.max(...values);
+      for (const unit of found) {
+        if (unit.total <= 0 && unit.features.length > index) {
+          unit.features[index] = clamp(unit.features[index]!, low, high);
+        }
+      }
     }
   }
   return { found, a, b, widths };
