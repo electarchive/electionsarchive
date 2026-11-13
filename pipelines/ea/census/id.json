@@ -1,0 +1,901 @@
+{
+  "polity": "ID",
+  "name": "Indonesia",
+  "sources": {
+    "uu7-2017": {
+      "title": "Undang-Undang Nomor 7 Tahun 2017 tentang Pemilihan Umum",
+      "publisher": "Badan Pemeriksa Keuangan (JDIH BPK)",
+      "url": "https://peraturan.bpk.go.id/Details/37644/uu-no-7-tahun-2017",
+      "kind": "official_body"
+    },
+    "uu10-2016": {
+      "title": "Undang-Undang Nomor 10 Tahun 2016 tentang Perubahan Kedua atas Undang-Undang Nomor 1 Tahun 2015 (pemilihan gubernur, bupati, dan walikota)",
+      "publisher": "Badan Pemeriksa Keuangan (JDIH BPK)",
+      "url": "https://peraturan.bpk.go.id/Details/37311/uu-no-10-tahun-2016",
+      "kind": "official_body"
+    },
+    "uu1-2015": {
+      "title": "Undang-Undang Nomor 1 Tahun 2015 tentang Penetapan Perppu 1/2014 tentang Pemilihan Gubernur, Bupati, dan Walikota",
+      "publisher": "Badan Pemeriksa Keuangan (JDIH BPK)",
+      "url": "https://peraturan.bpk.go.id/Details/37341/uu-no-1-tahun-2015",
+      "kind": "official_body"
+    },
+    "uu3-2024": {
+      "title": "Undang-Undang Nomor 3 Tahun 2024 tentang Perubahan Kedua atas Undang-Undang Nomor 6 Tahun 2014 tentang Desa",
+      "publisher": "Badan Pemeriksa Keuangan (JDIH BPK)",
+      "url": "https://peraturan.bpk.go.id/Details/283617/uu-no-3-tahun-20248",
+      "kind": "official_body"
+    },
+    "kpt360-2024": {
+      "title": "Keputusan KPU Nomor 360 Tahun 2024 tentang Penetapan Hasil Pemilihan Umum Presiden dan Wakil Presiden, Anggota DPR, DPD, DPRD Provinsi, dan DPRD Kabupaten/Kota Secara Nasional dalam Pemilihan Umum Tahun 2024",
+      "publisher": "Komisi Pemilihan Umum",
+      "url": "https://jdih.kpu.go.id/data/data_kepkpu/2024kpt360.pdf",
+      "kind": "official_body"
+    },
+    "kpt1205-2024": {
+      "title": "Keputusan KPU Nomor 1205 Tahun 2024 tentang Penetapan Perolehan Kursi Partai Politik Peserta Pemilihan Umum Anggota DPR Tahun 2024",
+      "publisher": "Komisi Pemilihan Umum",
+      "url": "https://jdih.kpu.go.id/data/data_kepkpu/2024kpt1205.pdf",
+      "kind": "official_body"
+    },
+    "kpt1207-2024": {
+      "title": "Keputusan KPU Nomor 1207 Tahun 2024 tentang Penetapan Calon Terpilih dan Calon Pengganti Antarwaktu Anggota Dewan Perwakilan Daerah dalam Pemilihan Umum Tahun 2024",
+      "publisher": "Komisi Pemilihan Umum",
+      "url": "https://jdih.kpu.go.id/data/data_kepkpu/2024kpt1207.pdf",
+      "kind": "official_body"
+    },
+    "kpt987-2019": {
+      "title": "Keputusan KPU Nomor 987/PL.01.8-Kpt/06/KPU/V/2019 tentang Penetapan Hasil Pemilihan Umum 2019 Secara Nasional",
+      "publisher": "Komisi Pemilihan Umum",
+      "url": "https://jdih.kpu.go.id/data/data_kepkpu/KPT%20987%20THN%202019.pdf",
+      "kind": "official_body"
+    },
+    "kpt416-2014": {
+      "title": "Keputusan KPU Nomor 416/Kpts/KPU/Tahun 2014 tentang Penetapan Perolehan Kursi Partai Politik dan Calon Terpilih Anggota DPR Pemilu 2014",
+      "publisher": "Komisi Pemilihan Umum",
+      "url": "https://jdih.kpu.go.id/data/data_kepkpu/SK_KPU_416_Penetapan_Kursi_Calon_Terpilih_1452014.pdf",
+      "kind": "official_body"
+    },
+    "opendata": {
+      "title": "Portal Open Data KPU",
+      "publisher": "Komisi Pemilihan Umum",
+      "url": "https://opendata.kpu.go.id/",
+      "kind": "official_body"
+    },
+    "jdih-kpu": {
+      "title": "JDIH KPU: Keputusan KPU",
+      "publisher": "Komisi Pemilihan Umum",
+      "url": "https://jdih.kpu.go.id/",
+      "kind": "official_body"
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "Republik Indonesia",
+      "name_en": "Indonesia",
+      "parent": null,
+      "polity_kind": "sovereign_state",
+      "scheme": "id.nation",
+      "source": "uu7-2017"
+    },
+    {
+      "key": "provinsi",
+      "name": "Provinsi",
+      "name_en": "Provinces",
+      "parent": "national",
+      "polity_kind": "region",
+      "scheme": "id.provinsi",
+      "source": "uu7-2017",
+      "counts": [
+        {
+          "date": "2019-04-17",
+          "value": 34,
+          "source": "kpt987-2019",
+          "locator": "Lampiran I: Model DC1-PPWP, 34 provinces plus abroad"
+        },
+        {
+          "date": "2024-02-14",
+          "value": 38,
+          "source": "kpt360-2024",
+          "locator": "Lampiran I (2024kpt360_L1.pdf): 38 provinces plus abroad"
+        }
+      ]
+    },
+    {
+      "key": "kabkota",
+      "name": "Kabupaten/Kota",
+      "name_en": "Regencies and cities",
+      "parent": "provinsi",
+      "polity_kind": "county",
+      "scheme": "id.kabkota",
+      "source": "uu10-2016"
+    },
+    {
+      "key": "desa",
+      "name": "Desa",
+      "name_en": "Villages",
+      "parent": "kabkota",
+      "polity_kind": "submunicipal",
+      "source": "uu3-2024"
+    }
+  ],
+  "classes": [
+    {
+      "key": "presiden",
+      "tier": "national",
+      "name": "Pemilihan Umum Presiden dan Wakil Presiden",
+      "name_en": "President and vice president, direct",
+      "category": "executive",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "id.nation"
+        ],
+        "fine": [
+          "id.provinsi",
+          "id.kabkota",
+          "id.tps"
+        ]
+      },
+      "source": "uu7-2017",
+      "locator": "https://peraturan.bpk.go.id/Details/37644/uu-no-7-tahun-2017 (Pasal 416: over 50% of the vote and at least 20% in more than half the provinces, else a runoff)",
+      "first_held": "2004-07-05",
+      "earliest_record": "2004-07-05",
+      "note": "Joint tickets elected directly since 2004; the 2004 election went to a runoff on 20 September. Before 2004 the MPR chose the president (class mpr_presiden).",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "ID"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 4,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "Komisi Pemilihan Umum",
+          "source": "uu7-2017",
+          "locator": "https://peraturan.bpk.go.id/Details/37644/uu-no-7-tahun-2017 (Pasal 167 ayat 1: Pemilu dilaksanakan setiap 5 (lima) tahun sekali)",
+          "runoff": true
+        }
+      ],
+      "access": [
+        {
+          "platform": "Portal Open Data KPU",
+          "url": "https://opendata.kpu.go.id/ds/140",
+          "format": "xlsx",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "license": "Portal disclaimer: free use without altering the content and with the source credited",
+          "first_date": "2019-04-17",
+          "last_date": "2019-04-17",
+          "finest": "id.provinsi",
+          "source": "opendata",
+          "evidence": "2019 president by province and abroad"
+        },
+        {
+          "platform": "JDIH KPU",
+          "url": "https://jdih.kpu.go.id/data/data_kepkpu/2024kpt360_L1.pdf",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "first_date": "2024-02-14",
+          "last_date": "2024-02-14",
+          "finest": "id.provinsi",
+          "source": "jdih-kpu",
+          "evidence": "Lampiran I of decree 360/2024, text layer"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2004-07-05"
+        },
+        {
+          "date": "2004-09-20",
+          "election_kind": "runoff"
+        },
+        {
+          "date": "2009-07-08"
+        },
+        {
+          "date": "2014-07-09"
+        },
+        {
+          "date": "2019-04-17",
+          "contests": 1,
+          "source": "kpt987-2019",
+          "quote": "Lampiran I: hasil Pemilu Presiden dan Wakil Presiden, Model DC1-PPWP"
+        },
+        {
+          "date": "2024-02-14",
+          "contests": 1,
+          "source": "kpt360-2024",
+          "quote": "Lampiran I: hasil Pemilu Presiden dan Wakil Presiden"
+        }
+      ],
+      "est_votes": 800000000,
+      "effort": 2
+    },
+    {
+      "key": "mpr_presiden",
+      "tier": "national",
+      "name": "Pemilihan Presiden oleh MPR",
+      "name_en": "President chosen by the People's Consultative Assembly",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "uu7-2017",
+      "valid_to": "2004-01-01",
+      "first_held": "1945-08-18",
+      "note": "The PPKI (1945), the MPRS (1963, 1967, 1968), and the MPR (1973-1998) installed one candidate by acclamation; the only contested vote was 20 October 1999 (Abdurrahman Wahid 373, Megawati Soekarnoputri 313). In 2001 the MPR installed Megawati without a contested vote.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "ID"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1999-10-20"
+        }
+      ],
+      "est_votes": 700,
+      "effort": 2
+    },
+    {
+      "key": "dpr",
+      "tier": "national",
+      "name": "Pemilihan Umum Anggota Dewan Perwakilan Rakyat",
+      "name_en": "House of Representatives (DPR)",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "constituency",
+        "schemes": [
+          "id.dapil_dpr"
+        ],
+        "fine": [
+          "id.kabkota",
+          "id.tps"
+        ]
+      },
+      "source": "uu7-2017",
+      "first_held": "1955-09-29",
+      "earliest_record": "1955-09-29",
+      "note": "Open-list PR in multi-member dapil: 69 in 2004 (550 seats), 77 in 2009 and 2014 (560), 80 in 2019 (575), 84 in 2024 (580). The 1955 election and the New Order elections of 1971-1997 used provincial lists under the PPI and LPU. Counts before 2014 are not yet quoted from a decree.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "lower_house"
+          ],
+          "iso_pattern": "ID"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 4,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "Komisi Pemilihan Umum",
+          "source": "uu7-2017",
+          "locator": "https://peraturan.bpk.go.id/Details/37644/uu-no-7-tahun-2017 (Pasal 167 ayat 1: Pemilu dilaksanakan setiap 5 (lima) tahun sekali)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Portal Open Data KPU",
+          "url": "https://opendata.kpu.go.id/ds/46",
+          "format": "xlsx",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "license": "Portal disclaimer: free use without altering the content and with the source credited",
+          "first_date": "2019-04-17",
+          "last_date": "2019-04-17",
+          "finest": "id.kabkota",
+          "source": "opendata",
+          "evidence": "2019 DD1-DPR certificates by regency for 78 of 80 dapil; seats per party per dapil in ds/46"
+        },
+        {
+          "platform": "JDIH KPU",
+          "url": "https://jdih.kpu.go.id/data/data_kepkpu/2024kpt360_L3.pdf",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "first_date": "2014-04-09",
+          "last_date": "2024-02-14",
+          "finest": "id.dapil_dpr",
+          "source": "jdih-kpu",
+          "evidence": "National decrees with dapil lampiran: 416/2014, 987/2019, 360 and 1205/2024"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1955-09-29"
+        },
+        {
+          "date": "1971-07-03"
+        },
+        {
+          "date": "1977-05-02"
+        },
+        {
+          "date": "1982-05-04"
+        },
+        {
+          "date": "1987-04-23"
+        },
+        {
+          "date": "1992-06-09"
+        },
+        {
+          "date": "1997-05-29"
+        },
+        {
+          "date": "1999-06-07"
+        },
+        {
+          "date": "2004-04-05"
+        },
+        {
+          "date": "2009-04-09"
+        },
+        {
+          "date": "2014-04-09",
+          "contests": 77,
+          "seats": 560,
+          "source": "kpt416-2014",
+          "quote": "Model E-5 DPR: perolehan kursi partai politik di 77 daerah pemilihan, 560 kursi"
+        },
+        {
+          "date": "2019-04-17",
+          "contests": 80,
+          "seats": 575,
+          "source": "kpt987-2019",
+          "quote": "Lampiran II: 80 daerah pemilihan DPR (987_L.II.1 to 987_L.II.80), 575 kursi"
+        },
+        {
+          "date": "2024-02-14",
+          "contests": 84,
+          "seats": 580,
+          "source": "kpt1205-2024",
+          "quote": "Perolehan kursi partai politik di 84 daerah pemilihan, 580 kursi"
+        }
+      ],
+      "est_votes": 1200000000,
+      "effort": 3
+    },
+    {
+      "key": "dpd",
+      "tier": "national",
+      "name": "Pemilihan Umum Anggota Dewan Perwakilan Daerah",
+      "name_en": "Regional Representative Council (DPD)",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "constituency",
+        "schemes": [
+          "id.provinsi"
+        ],
+        "fine": [
+          "id.kabkota",
+          "id.tps"
+        ]
+      },
+      "source": "uu7-2017",
+      "locator": "https://peraturan.bpk.go.id/Details/37644/uu-no-7-tahun-2017 (Pasal 196: four members per province)",
+      "first_held": "2004-04-05",
+      "earliest_record": "2004-04-05",
+      "note": "Four non-party members per province by single non-transferable vote: 128 seats in 2004, 132 in 2009 and 2014, 136 in 2019, and 152 in 2024.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "upper_house"
+          ],
+          "iso_pattern": "ID"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 4,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "Komisi Pemilihan Umum",
+          "source": "uu7-2017",
+          "locator": "https://peraturan.bpk.go.id/Details/37644/uu-no-7-tahun-2017 (Pasal 167 ayat 1: Pemilu dilaksanakan setiap 5 (lima) tahun sekali)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Portal Open Data KPU",
+          "url": "https://opendata.kpu.go.id/",
+          "format": "xlsx",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "license": "Portal disclaimer: free use without altering the content and with the source credited",
+          "first_date": "2019-04-17",
+          "last_date": "2019-04-17",
+          "finest": "id.kabkota",
+          "source": "opendata",
+          "evidence": "DD1-DPD workbooks for 32 of 34 provinces in 9 datasets"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2004-04-05"
+        },
+        {
+          "date": "2009-04-09"
+        },
+        {
+          "date": "2014-04-09"
+        },
+        {
+          "date": "2019-04-17",
+          "contests": 34,
+          "seats": 136,
+          "source": "kpt987-2019",
+          "quote": "Lampiran III: DPD by province, 987_L.III.1 to 987_L.III.34, four members each"
+        },
+        {
+          "date": "2024-02-14",
+          "contests": 38,
+          "seats": 152,
+          "source": "kpt1207-2024",
+          "quote": "Calon terpilih anggota DPD in 38 provinces, four each"
+        }
+      ],
+      "est_votes": 700000000,
+      "effort": 3
+    },
+    {
+      "key": "konstituante",
+      "tier": "national",
+      "name": "Pemilihan Umum Anggota Konstituante",
+      "name_en": "Constituent Assembly",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "constituency"
+      },
+      "source": "uu7-2017",
+      "valid_from": "1955-01-01",
+      "valid_to": "1959-07-05",
+      "first_held": "1955-12-15",
+      "note": "Elected once, 15 December 1955, by PR in electoral districts (520 seats); dissolved by the decree of 5 July 1959.",
+      "match": [
+        {
+          "body_kinds": [
+            "constituent_assembly"
+          ],
+          "iso_pattern": "ID"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1955-12-15"
+        }
+      ],
+      "est_votes": 38000000,
+      "effort": 4
+    },
+    {
+      "key": "dprd_provinsi",
+      "tier": "provinsi",
+      "name": "Pemilihan Umum Anggota DPRD Provinsi",
+      "name_en": "Provincial legislatures (DPRD provinsi, including Aceh's DPRA)",
+      "category": "legislature",
+      "goal": "subnational",
+      "measure": {
+        "unit": "constituency",
+        "fine": [
+          "id.kabkota",
+          "id.tps"
+        ]
+      },
+      "source": "uu7-2017",
+      "first_held": "1957-06-01",
+      "note": "Open-list PR in provincial dapil (301 in 2024 across 38 provinces), held with the DPR since 1971; the first regional councils were elected in 1957-1958. Papua's appointed seats are not elected.",
+      "match": [
+        {
+          "body_kinds": [
+            "council",
+            "unicameral"
+          ],
+          "polity_kinds": [
+            "region"
+          ],
+          "iso_pattern": "ID-*"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 4,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "Komisi Pemilihan Umum",
+          "source": "uu7-2017",
+          "locator": "https://peraturan.bpk.go.id/Details/37644/uu-no-7-tahun-2017 (Pasal 167 ayat 1: Pemilu dilaksanakan setiap 5 (lima) tahun sekali)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Portal Open Data KPU",
+          "url": "https://opendata.kpu.go.id/ds/74",
+          "format": "xlsx",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "license": "Portal disclaimer: free use without altering the content and with the source credited",
+          "first_date": "2019-04-17",
+          "last_date": "2019-04-17",
+          "source": "opendata",
+          "evidence": "2019 seats per party per dapil only; votes in each provincial KPU's decree"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1971-07-03"
+        },
+        {
+          "date": "1977-05-02"
+        },
+        {
+          "date": "1982-05-04"
+        },
+        {
+          "date": "1987-04-23"
+        },
+        {
+          "date": "1992-06-09"
+        },
+        {
+          "date": "1997-05-29"
+        },
+        {
+          "date": "1999-06-07"
+        },
+        {
+          "date": "2004-04-05"
+        },
+        {
+          "date": "2009-04-09"
+        },
+        {
+          "date": "2014-04-09"
+        },
+        {
+          "date": "2019-04-17"
+        },
+        {
+          "date": "2024-02-14"
+        }
+      ],
+      "est_votes": 1100000000,
+      "effort": 5
+    },
+    {
+      "key": "dprd_kabkota",
+      "tier": "kabkota",
+      "name": "Pemilihan Umum Anggota DPRD Kabupaten/Kota",
+      "name_en": "Regency and city councils (DPRD kabupaten/kota)",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "constituency",
+        "fine": [
+          "id.tps"
+        ]
+      },
+      "source": "uu7-2017",
+      "first_held": "1957-06-01",
+      "note": "Open-list PR in about 2,325 dapil in 508 regencies and cities (Jakarta's administrative cities have no council), held with the DPR; each regency or city KPU declares its own result.",
+      "match": [
+        {
+          "body_kinds": [
+            "council",
+            "unicameral"
+          ],
+          "polity_kinds": [
+            "county",
+            "municipality"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 4,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "Komisi Pemilihan Umum",
+          "source": "uu7-2017",
+          "locator": "https://peraturan.bpk.go.id/Details/37644/uu-no-7-tahun-2017 (Pasal 167 ayat 1: Pemilu dilaksanakan setiap 5 (lima) tahun sekali)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Portal Open Data KPU",
+          "url": "https://opendata.kpu.go.id/ds/33",
+          "format": "xlsx",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "license": "Portal disclaimer: free use without altering the content and with the source credited",
+          "first_date": "2019-04-17",
+          "last_date": "2019-04-17",
+          "source": "opendata",
+          "evidence": "2019 seats per party per dapil only"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1971-07-03"
+        },
+        {
+          "date": "1977-05-02"
+        },
+        {
+          "date": "1982-05-04"
+        },
+        {
+          "date": "1987-04-23"
+        },
+        {
+          "date": "1992-06-09"
+        },
+        {
+          "date": "1997-05-29"
+        },
+        {
+          "date": "1999-06-07"
+        },
+        {
+          "date": "2004-04-05"
+        },
+        {
+          "date": "2009-04-09"
+        },
+        {
+          "date": "2014-04-09"
+        },
+        {
+          "date": "2019-04-17"
+        },
+        {
+          "date": "2024-02-14"
+        }
+      ],
+      "est_votes": 1100000000,
+      "effort": 8
+    },
+    {
+      "key": "pilkada_gubernur",
+      "tier": "provinsi",
+      "name": "Pemilihan Gubernur dan Wakil Gubernur",
+      "name_en": "Governors",
+      "category": "executive",
+      "goal": "subnational",
+      "measure": {
+        "unit": "polity",
+        "schemes": [
+          "id.provinsi"
+        ],
+        "fine": [
+          "id.kabkota"
+        ]
+      },
+      "source": "uu10-2016",
+      "first_held": "2005-06-01",
+      "note": "Direct since June 2005 (the DPRD chose governors before), in staggered contests to 2014 and in national waves since 2015; 37 governors in 2024 (Yogyakarta's governor is the Sultan). Plurality since 2015, with an empty-box option against a single ticket; Jakarta needs over 50% else a runoff.",
+      "match": [
+        {
+          "office_kinds": [
+            "governor"
+          ],
+          "polity_kinds": [
+            "region"
+          ],
+          "iso_pattern": "ID-*"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "KPU provinsi and KPU kabupaten/kota",
+          "source": "uu10-2016",
+          "locator": "https://peraturan.bpk.go.id/Details/37311/uu-no-10-tahun-2016 (Pasal 201: simultaneous waves in 2015, 2017, and 2018, and a national simultaneous election in November 2024)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Portal Open Data KPU",
+          "url": "https://opendata.kpu.go.id/",
+          "format": "xlsx",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "license": "Portal disclaimer: free use without altering the content and with the source credited",
+          "first_date": "2006-01-01",
+          "last_date": "2018-12-31",
+          "source": "opendata",
+          "evidence": "Winners with their votes and the contest total for 2006-2008, 2010, 2017, and 2018 (ds/12-17)"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2015-12-09"
+        },
+        {
+          "date": "2017-02-15"
+        },
+        {
+          "date": "2018-06-27"
+        },
+        {
+          "date": "2020-12-09"
+        },
+        {
+          "date": "2024-11-27"
+        }
+      ],
+      "est_votes": 400000000,
+      "effort": 5
+    },
+    {
+      "key": "pilkada_bupati_walikota",
+      "tier": "kabkota",
+      "name": "Pemilihan Bupati dan Wakil Bupati, serta Walikota dan Wakil Walikota",
+      "name_en": "Regents and mayors",
+      "category": "executive",
+      "goal": "local",
+      "measure": {
+        "unit": "polity",
+        "schemes": [
+          "id.kabkota"
+        ]
+      },
+      "source": "uu10-2016",
+      "first_held": "2005-06-01",
+      "note": "Direct since June 2005; 508 regents and mayors in the 2024 wave. Each regency or city KPU declares its own result.",
+      "match": [
+        {
+          "office_kinds": [
+            "mayor",
+            "head_of_government"
+          ],
+          "polity_kinds": [
+            "county",
+            "municipality"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "KPU provinsi and KPU kabupaten/kota",
+          "source": "uu10-2016",
+          "locator": "https://peraturan.bpk.go.id/Details/37311/uu-no-10-tahun-2016 (Pasal 201: simultaneous waves in 2015, 2017, and 2018, and a national simultaneous election in November 2024)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Portal Open Data KPU",
+          "url": "https://opendata.kpu.go.id/",
+          "format": "xlsx",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "license": "Portal disclaimer: free use without altering the content and with the source credited",
+          "first_date": "2006-01-01",
+          "last_date": "2018-12-31",
+          "source": "opendata",
+          "evidence": "Winners only, ds/12-17"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2015-12-09"
+        },
+        {
+          "date": "2017-02-15"
+        },
+        {
+          "date": "2018-06-27"
+        },
+        {
+          "date": "2020-12-09"
+        },
+        {
+          "date": "2024-11-27"
+        }
+      ],
+      "est_votes": 600000000,
+      "effort": 6
+    },
+    {
+      "key": "pilkades",
+      "tier": "desa",
+      "name": "Pemilihan Kepala Desa",
+      "name_en": "Village heads",
+      "category": "executive",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "uu3-2024",
+      "locator": "https://peraturan.bpk.go.id/Details/283617/uu-no-3-tahun-20248 (Pasal 39: eight-year term, at most two terms)",
+      "note": "About 75,000 desa elect a head (kelurahan heads are appointed civil servants), simultaneously within each regency on dates the regency sets (UU 6/2014 Pasal 31), for six-year terms until April 2024 and eight-year terms since. Regencies run them through ad hoc committees; results are announced by each village's committee and rarely published.",
+      "match": [
+        {
+          "office_kinds": [
+            "mayor",
+            "muhtar",
+            "other"
+          ],
+          "polity_kinds": [
+            "submunicipal"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "term_years": 8,
+          "called": false,
+          "administered_by": "Regency governments through village election committees",
+          "source": "uu3-2024",
+          "locator": "https://peraturan.bpk.go.id/Details/283617/uu-no-3-tahun-20248 (Pasal 39)"
+        }
+      ],
+      "est_votes": 120000000,
+      "effort": 8
+    },
+    {
+      "key": "referendum",
+      "tier": "national",
+      "name": "Referendum",
+      "name_en": "Referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "question"
+      },
+      "source": "uu7-2017",
+      "note": "No national referendum provision since the 1985 referendum law was repealed in 1999. The 1999 East Timor popular consultation was a UN ballot in a territory that left Indonesia.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "iso_pattern": "ID*"
+        }
+      ],
+      "disposition": "out_of_scope",
+      "disposition_reason": "No referendum has been held under Indonesian law; the 1999 East Timor consultation was run by the United Nations and belongs to Timor-Leste."
+    }
+  ]
+}
