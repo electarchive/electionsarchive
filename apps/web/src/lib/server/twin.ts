@@ -6806,6 +6806,14 @@ function placesMarkdown(
       places.rows.map((row) => {
         const before =
           row.leader == null ? null : (row.earlier?.[row.leader] ?? null);
+        const rolled =
+          row.valid === 0 &&
+          row.leader == null &&
+          row.declared?.person == null &&
+          row.declared?.party == null
+            ? (row.delegates?.first[0]?.[0] ?? null)
+            : null;
+        const shown = rolled == null ? row : { ...row, leader: rolled };
         return [
           link(row.name, row.path),
           ...((isTally || row.isTally === true) &&
@@ -6816,7 +6824,7 @@ function placesMarkdown(
                 count(Math.round((row.shares[row.leader] ?? 0) * row.valid)),
               ]
             : row.held == null
-              ? leading(row, places.legend)
+              ? leading(shown, places.legend)
               : [
                   `${m.map_split_key()} (${row.held
                     .map(
