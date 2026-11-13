@@ -8,7 +8,7 @@ import urllib.request
 from collections import defaultdict
 from datetime import date
 
-from ea import coverage, coverage_countries, readiness
+from ea import census_check, coverage, coverage_countries, readiness
 from ea.store import connect
 
 BASE = os.environ.get("EA_BASE", "http://localhost:5173")
@@ -414,7 +414,7 @@ def check() -> str:
     with connect() as conn:
         behind = coverage_countries.record(conn)
         conn.commit()
-        problems = database(conn) + pages(conn)
+        problems = database(conn) + pages(conn) + census_check.problems(conn)
         if behind:
             build = conn.execute("select commit from coverage_build").fetchone()
             assert build is not None
