@@ -1227,6 +1227,7 @@ def emit() -> Path:
         section_ids = {code: str(cs.unit("br.secao", code, opened)) for code in section_units["section"]}
         section_id = pl.col("section").replace_strict(section_ids)
         abroad_section = pl.col("uf") == "ZZ"
+        unlocated = pl.col("uf").is_in(["ZZ", "VT"])
         cs.frame(
             "reporting_unit",
             section_units.select(
@@ -1234,8 +1235,8 @@ def emit() -> Path:
                 polity_id=pl.lit(str(brazil)),
                 scheme_code=pl.lit("br.secao"),
                 code="section",
-                area_relation=pl.when(abroad_section).then(pl.lit("unlocated")).otherwise(pl.lit("within")),
-                area_id=pl.when(~abroad_section).then(
+                area_relation=pl.when(unlocated).then(pl.lit("unlocated")).otherwise(pl.lit("within")),
+                area_id=pl.when(~unlocated).then(
                     pl.col("municipality").replace_strict(
                         {code: str(area) for code, area in areas.items()}, default=None
                     )
@@ -1382,6 +1383,7 @@ def emit() -> Path:
             .agg(pl.col("name").sort_by("accents", "year").last())
             .iter_rows()
         )
+        respelled: dict[UUID, tuple[UUID, str]] = {}
         for name_id, entity, value, text in conn.execute(
             """
             select n.id, n.entity_id, x.value, n.text from external_id x
@@ -1389,19 +1391,14 @@ def emit() -> Path:
             join changeset c on c.id = n.changeset_id and c.pipeline = %s
             where x.scheme = 'br.tse_history.person'
               and not exists (select from entity_merge m where m.entity_id = x.entity_id)
+            order by x.value
             """,
             [SOURCE],
         ).fetchall():
             if value in spelled and proper(spelled[value]) != text:
-                cs.add(
-                    "name",
-                    id=name_id,
-                    entity_id=entity,
-                    text=proper(spelled[value]),
-                    lang="pt",
-                    kind="official",
-                    is_preferred=True,
-                )
+                respelled[name_id] = (entity, proper(spelled[value]))
+        for name_id, (entity, text) in respelled.items():
+            cs.add("name", id=name_id, entity_id=entity, text=text, lang="pt", kind="official", is_preferred=True)
         options: dict[str, str] = {}
         result_sets: dict[str, str] = {}
         section_sets: dict[str, str] = {}
