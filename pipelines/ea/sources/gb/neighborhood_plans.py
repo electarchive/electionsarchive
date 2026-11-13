@@ -49,6 +49,8 @@ PAGE_PREFIXES = (
     "https://www.northantslive.news/news/",
     "https://www.southdowns.gov.uk/planning/",
     "https://longhoughton-pc.gov.uk/news/",
+    "https://www.york.gov.uk/planning-policy/",
+    "https://www.york.gov.uk/elections-1/",
 )
 HANDWRITTEN = (
     "https://info.ambervalley.gov.uk/docarc/",
@@ -60,6 +62,7 @@ HANDWRITTEN = (
     "/download/downloads/id/8854/",
     "lanliveryparishcouncil.gov.uk/data/uploads/570_1456565066.pdf",
     "/ashnggxz/fairford-neighbourhood-development-plan-referendum-declaration-of-result.pdf",
+    "/Burghwallis%20NP/Declaration%20of%20Results",
 )
 PAGES = {
     "E06000052": (
@@ -114,7 +117,7 @@ WITHIN = (
 
 
 def is_page(url: str) -> bool:
-    if url.split("?")[0].endswith((".pdf", ".doc")):
+    if url.split("?")[0].endswith((".pdf", ".doc")) or url.startswith("https://www.york.gov.uk/downloads/file/"):
         return False
     return url in PAGES.values() or "/w/" in url or url.startswith(PAGE_PREFIXES) or url.endswith(HTML)
 
