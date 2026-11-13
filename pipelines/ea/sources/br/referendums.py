@@ -2,7 +2,9 @@ import html
 import re
 import struct
 import subprocess
+import unicodedata
 from datetime import date
+from itertools import pairwise
 from pathlib import Path
 from uuid import UUID, uuid5
 
@@ -32,7 +34,36 @@ MANAGEMENT_2005 = (
     "relatorio_gestao_referendo_2005/relatorio_gestao_2005.pdf"
 )
 STATES_2005 = Path(__file__).with_name("referendum_2005_states.tsv")
+MUNICIPALITIES_2005 = Path(__file__).with_name("referendum_2005_municipalities.tsv")
 PAGE_2005 = 194
+PAGES_2005 = (PAGE_2005, 196, 197, 198)
+GRID_2005 = {
+    196: (
+        False,
+        (1042, 1104, 1166, 1228, 1290, 1352, 1414, 1476, 1538, 1600, 1662, 1724, 1786)
+        + (1848, 1910, 1972, 2034, 2097, 2160, 2222, 2284, 2346, 2408, 2470, 2532, 2594),
+    ),
+    197: (
+        True,
+        (714, 778, 838, 901, 964, 1026, 1088, 1150, 1212, 1274, 1336, 1398, 1460, 1522, 1584)
+        + (1646, 1708, 1770, 1832, 1894, 1956, 2018, 2080, 2142, 2204, 2266, 2328, 2390, 2452, 2515, 2578),
+    ),
+    198: (
+        True,
+        (714, 776, 838, 902, 964, 1025, 1088, 1150, 1212, 1274, 1336, 1398, 1460, 1522, 1584)
+        + (1646, 1708, 1770, 1832, 1894, 1956),
+    ),
+}
+GRID_COLUMNS_2005 = {
+    "registered": (1300, 1482),
+    "voters": (1482, 1662),
+    "yes": (2386, 2604),
+    "no": (2712, 2888),
+    "blank": (3002, 3146),
+    "null": (3290, 3436),
+}
+GRID_WIDTH, GRID_HEIGHT = 4678, 3306
+MUNICIPAL_ALIASES_2005 = {("RJ", "Campos"): "Campos dos Goytacazes"}
 ROWS_2005 = (
     0.3117,
     0.3286,
@@ -159,10 +190,23 @@ NOTE_2005_STATES = (
     "blank, and 1,604,307 null votes, the same as the proclamation. The table's 122,042,615 registered voters are "
     "210 fewer than the proclamation's 122,042,825. No ballots were annulled or counted separately."
 )
+NOTE_2005_MUNICIPALITIES = (
+    'Results for the state capitals and the municipalities with more than 200,000 voters from the table "Quadro '
+    'geral/Capitais e municípios com mais de 200.000 eleitores" (last updated 22 November 2005) on pages 194 to 196 '
+    "of the TSE's management report on the 2005 referendum, read from the scanned table. It lists 75 municipalities: "
+    "the 26 capitals and Brasília, and 48 other municipalities. In every row the registered voters equal the ballots "
+    "cast plus abstentions, the ballots cast equal the valid, blank, and null votes, and the valid votes equal the "
+    "Yes and No votes. No ballots were annulled or counted separately. Municipalities with fewer voters are not in "
+    "the table."
+)
 TEXT_1963 = "Do you approve the Additional Act that institutes the parliamentary system?"
 TEXT_1963_PT = "Aprova o ato adicional que institui o Parlamentarismo?"
 TEXT_2005 = "Should the trade in firearms and ammunition be banned in Brazil?"
 TEXT_2005_PT = "O comércio de armas de fogo e munição deve ser proibido no Brasil?"
+
+
+def folded(label: str) -> str:
+    return re.sub(r"[^a-z]+", " ", unicodedata.normalize("NFKD", label).encode("ascii", "ignore").decode().lower())
 
 
 def text_of(path: Path) -> str:
@@ -293,29 +337,50 @@ def parse() -> None:
         ).stdout
     ):
         raise ValueError("2005: the state table is not on the expected page")
+    municipalities_2005 = pl.read_csv(MUNICIPALITIES_2005, separator="\t")
+    if municipalities_2005.select(pl.col("uf", "municipality").n_unique()).row(0) != (27, 75):
+        raise ValueError("2005: unexpected municipalities")
+    if municipalities_2005.filter(
+        (pl.col("registered") != pl.col("voters") + pl.col("abstentions"))
+        | (pl.col("voters") != pl.col("valid") + pl.col("blank") + pl.col("null"))
+        | (pl.col("valid") != pl.col("yes") + pl.col("no"))
+    ).height:
+        raise ValueError("2005: a municipal row does not add up")
+    rows = []
+    for page, (_, lines) in GRID_2005.items():
+        rows += [(page, top, bottom) for top, bottom in pairwise(lines)]
+    if municipalities_2005.height != len(rows) or [row[0] for row in rows] != municipalities_2005["page"].to_list():
+        raise ValueError("2005: the municipal table does not have one row per grid line")
+    municipalities_2005.with_columns(
+        top=pl.Series([row[1] for row in rows]), bottom=pl.Series([row[2] for row in rows])
+    ).write_parquet(PARSED / "municipalities_2005.parquet")
     PAGES.mkdir(parents=True, exist_ok=True)
-    image = PAGES / f"{management.sha256}-{PAGE_2005}.png"
-    if not image.exists():
-        subprocess.run(
-            [
-                "pdftoppm",
-                "-r",
-                "100",
-                "-png",
-                "-f",
-                str(PAGE_2005),
-                "-l",
-                str(PAGE_2005),
-                "-singlefile",
-                str(management.path),
-                str(image.with_suffix("")),
-            ],
-            check=True,
-        )
-    width, height = struct.unpack(">II", image.read_bytes()[16:24])
-    pl.DataFrame(
-        [{"page": PAGE_2005, "image": f"pages/{SOURCE}/{image.name}", "width": width, "height": height}]
-    ).write_parquet(PARSED / "pages_2005.parquet")
+    pages = []
+    for page in PAGES_2005:
+        image = PAGES / f"{management.sha256}-{page}.png"
+        if not image.exists():
+            subprocess.run(
+                [
+                    "pdftoppm",
+                    "-r",
+                    "100",
+                    "-png",
+                    "-f",
+                    str(page),
+                    "-l",
+                    str(page),
+                    "-singlefile",
+                    str(management.path),
+                    str(image.with_suffix("")),
+                ],
+                check=True,
+            )
+        width, height = struct.unpack(">II", image.read_bytes()[16:24])
+        pages.append({"page": page, "image": f"pages/{SOURCE}/{image.name}", "width": width, "height": height})
+    pl.DataFrame(pages).write_parquet(PARSED / "pages_2005.parquet")
+    states_2005.with_columns(y0=pl.Series(ROWS_2005[:-1]), y1=pl.Series(ROWS_2005[1:])).write_parquet(
+        PARSED / "states_2005.parquet"
+    )
     states_2005.with_columns(y0=pl.Series(ROWS_2005[:-1]), y1=pl.Series(ROWS_2005[1:])).write_parquet(
         PARSED / "states_2005.parquet"
     )
@@ -396,7 +461,8 @@ def emit() -> Path:
     states_1963 = pl.read_parquet(PARSED / "states_1963.parquet")
     states_1993 = pl.read_parquet(PARSED / "states_1993.parquet")
     states_2005 = pl.read_parquet(PARSED / "states_2005.parquet")
-    page_2005 = pl.read_parquet(PARSED / "pages_2005.parquet").row(0, named=True)
+    municipalities_2005 = pl.read_parquet(PARSED / "municipalities_2005.parquet")
+    pages_2005 = pl.read_parquet(PARSED / "pages_2005.parquet")
     with connect() as conn:
         cs = Changeset(
             conn,
@@ -435,19 +501,24 @@ def emit() -> Path:
         management = add_source(
             "Relatório de Gestão – Referendo 2005",
             MANAGEMENT_2005,
-            notes="Page 192: Quadro geral dos resultados no Brasil por estado, last updated 22 November 2005.",
+            notes=(
+                "Quadro geral dos resultados no Brasil por estado and Quadro geral/Capitais e municípios com mais de "
+                "200.000 eleitores, last updated 22 November 2005."
+            ),
         )
         management_artifact = cs.artifact(raw.cached(SOURCE, MANAGEMENT_2005), management)
-        management_page = cs.page(management_artifact, page_2005["page"])
-        cs.add(
-            "source_page",
-            id=management_page,
-            artifact_id=management_artifact,
-            page_number=page_2005["page"],
-            image_key=page_2005["image"],
-            width=page_2005["width"],
-            height=page_2005["height"],
-        )
+        management_pages = {}
+        for page in pages_2005.iter_rows(named=True):
+            management_pages[page["page"]] = cs.page(management_artifact, page["page"])
+            cs.add(
+                "source_page",
+                id=management_pages[page["page"]],
+                artifact_id=management_artifact,
+                page_number=page["page"],
+                image_key=page["image"],
+                width=page["width"],
+                height=page["height"],
+            )
 
         system = cs.key("br.electoral_system", "national-consultation")
         cs.add("electoral_system", id=system, polity_id=brazil, rules={"formula": "referendum"}, rules_version=1)
@@ -756,7 +827,77 @@ def emit() -> Path:
                 key = (str(result_set), unit, None if option is None else str(option), measure)
                 values.append((*key, state[column], DIGITIZED))
                 x0, x1 = COLUMNS_2005[column]
-                locators.append((*key, str(management_page), x0, state["y0"], x1, state["y1"]))
+                locators.append((*key, str(management_pages[PAGE_2005]), x0, state["y0"], x1, state["y1"]))
+
+        areas = {}
+        for code, area, uf, label in conn.execute(
+            "select distinct on (ru.code) ru.code, ru.area_id, uf.code, n.text from reporting_unit ru "
+            "join name n on n.entity_id = ru.area_id and n.is_preferred "
+            "join area_parent ap on ap.area_id = ru.area_id join area_code uf on uf.area_id = ap.parent_id "
+            "where ru.scheme_code = 'br.municipality' and ru.area_relation = 'equals' order by ru.code"
+        ).fetchall():
+            areas[uf, folded(label)] = (code, area)
+        result_set = result_set_for(
+            election,
+            contest,
+            f"{D2005}:municipalities",
+            management,
+            False,
+            round(municipalities_2005["voters"].sum() / row["voters"], 4),
+            NOTE_2005_MUNICIPALITIES,
+        )
+        outcomes(result_set, options, row["first"] if row["first_votes"] > row["second_votes"] else row["second"])
+        for town in municipalities_2005.iter_rows(named=True):
+            found = areas.get(
+                (
+                    town["uf"],
+                    folded(MUNICIPAL_ALIASES_2005.get((town["uf"], town["municipality"]), town["municipality"])),
+                )
+            )
+            if found is None:
+                raise ValueError(f"2005: no municipality for {town['municipality']}, {town['uf']}")
+            code, area = found
+            unit = cs.unit("br.municipality", code, D2005)
+            if unit in cs.minted:
+                cs.add(
+                    "reporting_unit",
+                    id=unit,
+                    polity_id=brazil,
+                    scheme_code="br.municipality",
+                    code=code,
+                    area_relation="equals",
+                    area_id=area,
+                    kind="standard",
+                    valid_from=D2005,
+                    valid_to=date(2005, 11, 1),
+                )
+            rotated, _ = GRID_2005[town["page"]]
+            for column, option, measure in (
+                ("yes", options["yes"], VOTES),
+                ("no", options["no"], VOTES),
+                ("registered", None, REGISTERED),
+                ("voters", None, VOTERS),
+                ("blank", None, BLANK),
+                ("null", None, INVALID),
+            ):
+                key = (str(result_set), str(unit), None if option is None else str(option), measure)
+                values.append((*key, town[column], DIGITIZED))
+                left, right = GRID_COLUMNS_2005[column]
+                if rotated:
+                    box = (
+                        town["top"] / GRID_HEIGHT,
+                        1 - right / GRID_WIDTH,
+                        town["bottom"] / GRID_HEIGHT,
+                        1 - left / GRID_WIDTH,
+                    )
+                else:
+                    box = (
+                        left / GRID_WIDTH,
+                        town["top"] / GRID_HEIGHT,
+                        right / GRID_WIDTH,
+                        town["bottom"] / GRID_HEIGHT,
+                    )
+                locators.append((*key, str(management_pages[town["page"]]), *box))
 
         cs.frame(
             "result_value",
