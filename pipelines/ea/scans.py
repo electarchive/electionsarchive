@@ -1049,7 +1049,12 @@ def given_conflict(label: str, name: str, held: list[tuple[str, str, int | None]
     before = before[: before.index(surnames[0])]
     fulls = {word for word in before if len(word) > 1}
     given = {word for word in known if len(word) > 1 and word != surnames[0]}
-    return bool(fulls) and bool(given) and not fulls & known
+    return bool(fulls) and bool(given) and not any(abbreviates(word, other) for word in fulls for other in known)
+
+
+def abbreviates(short: str, full: str) -> bool:
+    letters = iter(full)
+    return short[0] == full[0] and all(letter in letters for letter in short)
 
 
 def match(labels: list[str], held: list[tuple[str, str, int | None]], contest: str) -> tuple[list[Column], list[str]]:
