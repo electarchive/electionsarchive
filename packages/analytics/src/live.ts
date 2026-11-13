@@ -1509,8 +1509,8 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
     const firm = amount - (amount - MODEL.tail.firm) * tailWeight ** 2;
     const kept = isTail ? Math.min(left, held) : 0;
     const deviate = gaussian(random);
-    const later =
-      kept * Math.exp(firm * deviate - firm ** 2 / 2) +
+    const holding = kept * Math.exp(firm * deviate - firm ** 2 / 2);
+    const carrying =
       (left - kept) * Math.exp(amount * deviate - amount ** 2 / 2);
     const tilt =
       (learned?.mean ?? 0) +
@@ -1580,6 +1580,21 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
         }
       }
     }
+    let unpaced = 0;
+    for (const [index, unit] of whole.entries()) {
+      if (
+        drained > 0 &&
+        unit.hasBaseline &&
+        unit.paced == null &&
+        unit.total > 0 &&
+        !reports.has(unit.id)
+      ) {
+        unpaced += finals[index]! - unit.total;
+      }
+    }
+    const later =
+      holding +
+      Math.max(0, carrying - (drained * unpaced) / Math.max(1, latest));
     for (const [index, unit] of found.entries()) {
       if (unit.hasBaseline) {
         if (unit.channel === 0) {
@@ -1683,12 +1698,19 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
           ? tilt
           : tilt + own.shift + Math.sqrt(own.variance) * gaussian(random);
       const expect = (learned?.mean ?? 0) + own.shift;
+      const leaning = learned != null && unit.paced == null ? remaining : 0;
       const lead = clamp(
-        (margin + shift * reach + mode * (1 - fraction)) * final - countedLead,
+        (margin + shift * reach + mode * (1 - fraction)) * final -
+          countedLead +
+          leaning * drift,
         -room,
         room,
       );
-      const steady = clamp(margin * final - countedLead, -room, room);
+      const steady = clamp(
+        margin * final - countedLead + leaning * expect,
+        -room,
+        room,
+      );
       const open = opens[index];
       const extra = reports.has(unit.county)
         ? (pending.get(unit.county) ?? 0) * portion[index]!
