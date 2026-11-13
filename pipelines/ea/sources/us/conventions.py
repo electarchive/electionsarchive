@@ -567,6 +567,18 @@ TABLES += [
         "short": True,
     }
 ]
+EVENING_STAR_1960 = "https://www.loc.gov/resource/sn83045462/1960-07-14/ed-1/?sp=8"
+TABLES += [
+    {
+        "table": "1960:democratic",
+        "image": "https://tile.loc.gov/image-services/iiif/service:ndnp:dlc:batch_dlc_bergman_ver01:data:sn83045462:00280608889:1960071401:0960/full/pct:50/0/default.jpg",
+        "release": EVENING_STAR_1960,
+        "leaves": (1,),
+        "ballot": 1,
+        "transcribed": "conventions_los_angeles_1960.tsv",
+        "short": True,
+    }
+]
 NILES = "sim_niles-national-register_{}"
 TABLES += [
     {
@@ -670,6 +682,18 @@ EVENING_STAR_1932_CAVEAT = (
     "state are not loaded. Pennsylvania's 76 votes include 5½ not recorded for a candidate. The printed totals are "
     "945 for Franklin D. Roosevelt, 190½ for Alfred E. Smith, 5½ for Newton D. Baker, 3½ for Albert C. Ritchie, 3 for "
     "George White, and 1 for James M. Cox, 1,148½ votes cast of 1,154; two-thirds, 770, were needed."
+)
+EVENING_STAR_1960_CAVEAT = (
+    "The archive has not located a free copy of the official proceedings' roll call, so this ballot is the "
+    "Associated Press table of the roll call that the Washington Evening Star printed on July 14, 1960 (page A-8). It "
+    "is a default to be superseded by the official proceedings. The table gives columns for Lyndon B. Johnson, John F. "
+    "Kennedy, Adlai E. Stevenson II, and Stuart Symington and one column for all others, 140\u00bd votes, which it "
+    "does not divide by state; those votes are not stored, so they count among each delegation's votes not recorded "
+    "for a candidate. Its note gives the others as Robert B. Meyner 43, Hubert H. Humphrey 41\u00bd, George A. "
+    "Smathers 30, Ross R. Barnett 23, Herschel C. Loveless 1\u00bd, Edmund G. Brown \u00bd, Orval E. Faubus \u00bd, "
+    "and Albert D. Rosellini \u00bd. The Virgin Islands' row prints 7 votes and 4 cast for Kennedy. Missouri switched "
+    "its 39 votes from Symington to Kennedy at the end of the roll call, but the convention ruled the switch not "
+    "recorded, so the official total stood at 806 for Kennedy, and the table gives Missouri's votes to Symington."
 )
 NILES_1835 = (
     "The archive has found no free copy of a separate report of this convention's proceedings; the roll is the "
@@ -835,6 +859,7 @@ PROCEEDINGS += [
     {"party": "democratic", "tables": {1: "1948:democratic"}, "title": "Democracy at work, being the official report of the Democratic National Convention, Philadelphia, Pennsylvania, July 12 to July 14, inclusive, 1948, resulting in the nomination of Harry S. Truman of Missouri for President and Alben W. Barkley of Kentucky for Vice-President", "publisher": "Local Democratic Political Committee of Pennsylvania", "city": "Philadelphia", "days": (date(1948, 7, 12), date(1948, 7, 14)), "ballots": {1: date(1948, 7, 14)}, "deciding": 1},
     {"party": "democratic", "tables": {1: "2008:democratic"}, "title": "Roll Call Vote for President of the United States, 2008 Democratic National Convention: Final Vote Tally, as compiled by the Office of the Secretary", "publisher": "Democratic National Committee, Office of the Secretary", "city": "Denver", "days": (date(2008, 8, 25), date(2008, 8, 28)), "ballots": {1: date(2008, 8, 27)}, "deciding": 1, "method": SHEET_METHOD, "caveat": SHEET_CAVEAT},
     {"party": "democratic", "tables": {1: "2024:democratic"}, "title": "2024 Electronic Roll Call: State by State Breakdown", "publisher": "Democratic National Committee", "city": "Chicago", "days": (date(2024, 8, 19), date(2024, 8, 22)), "ballots": {1: date(2024, 8, 5)}, "umbrella": "2024-01-23:president:democratic", "deciding": 1, "required": None, "method": DNC_2024_METHOD, "caveat": DNC_2024_CAVEAT},
+    {"party": "democratic", "tables": {1: "1960:democratic"}, "title": "The Evening Star (Washington, D.C.), July 14, 1960: Roll Call of States", "publisher": "The Evening Star", "kind": "news_agency", "city": "Los Angeles", "days": (date(1960, 7, 11), date(1960, 7, 15)), "ballots": {1: date(1960, 7, 13)}, "deciding": 1, "required": 761, "method": PRESS.format("the Washington Evening Star"), "caveat": EVENING_STAR_1960_CAVEAT},
     {"party": "democratic", "tables": {1: "1956:democratic"}, "title": "Official report of the proceedings of the Democratic National Convention and committee, held at Chicago, Illinois, August 13 to August 17, 1956, resulting in the nomination of Adlai E. Stevenson of Illinois for President and Estes Kefauver of Tennessee for Vice President", "publisher": "Democratic National Committee", "city": "Chicago", "days": (date(1956, 8, 13), date(1956, 8, 17)), "ballots": {1: date(1956, 8, 16)}, "deciding": 1},
 ]  # fmt: skip
 TWO_THIRDS = range(1832, 1936)
@@ -1275,6 +1300,9 @@ CANDIDATES = {
     "1904:Pattison": ("Robert E. Pattison", "Q883224"),
     "1904:Williams": ("John Sharp Williams", "Q1701734"),
     "1904:Coler": ("Bird S. Coler", None),
+    "1960:democratic:Johnson": ("Lyndon B. Johnson", "Q9640"),
+    "1960:democratic:Kennedy": ("John F. Kennedy", "Q9696"),
+    "1960:democratic:Stevenson": ("Adlai E. Stevenson II", "Q311719"),
     "1948:democratic:Truman": ("Harry S. Truman", "Q11613"),
     "1948:democratic:Russell": ("Richard B. Russell Jr.", "Q718415"),
     "1948:democratic:McNutt": ("Paul V. McNutt", "Q887892"),
@@ -3031,7 +3059,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="The roll call of the states at the Republican national conventions from 1856 to 1988, the Democratic conventions from 1832 to 1956 and 2008, with the Democratic vice-presidential ballots of 1832, 1835, 1848, 1852, 1856, 1860, 1864, 1872, and 1876 and the Republican ones of 1856, 1860, 1864, 1868, 1872, 1876, 1880, 1884, 1888, 1896, 1900, 1908, 1912, 1916, 1920, 1924, and 1928, and the 2012, 2016, 2020, and 2024 conventions",
+            summary="The roll call of the states at the Republican national conventions from 1856 to 1988, the Democratic conventions from 1832 to 1960 and 2008, with the Democratic vice-presidential ballots of 1832, 1835, 1848, 1852, 1856, 1860, 1864, 1872, and 1876 and the Republican ones of 1856, 1860, 1864, 1868, 1872, 1876, 1880, 1884, 1888, 1896, 1900, 1908, 1912, 1916, 1920, 1924, and 1928, and the 2012, 2016, 2020, and 2024 conventions",
             polity="US",
         )
 
