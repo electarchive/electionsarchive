@@ -3,9 +3,11 @@ import re
 import subprocess
 import sys
 import time
+import zipfile
 from datetime import UTC, date, datetime
 from pathlib import Path
 from uuid import UUID
+from xml.etree import ElementTree
 
 import httpx
 import polars as pl
@@ -34,6 +36,7 @@ READ = {
     "S12000010",
     "S12000020",
     "S12000041",
+    "S12000029",
 }
 TRANSCRIBED = Path(__file__).parent / "cc_elections_transcribed.tsv"
 INBOX = DATA / "inbox/manual/MF-668"
@@ -172,7 +175,11 @@ ALIASES = {
     ("S12000035", "Strachur and District"): "Strachur",
     ("S12000041", "The Royal Burgh of Arbroath and District"): "Royal Burgh of Arbroath",
     ("S12000041", "The Royal Burgh of Montrose"): "Royal Burgh of Montrose",
+    ("S12000029", "Sandford and Upper Avondale"): "Sandford/Upper Avondale",
+    ("S12000029", "Rigside and Douglas Water"): "Douglas Water and Rigside",
 }
+ODT = "application/vnd.oasis.opendocument.text"
+TITLES = ("Mr", "Mrs", "Ms", "Miss", "Dr", "Rev")
 UNSTATED = "The notice does not state how many places the community council had, so the seat count is not recorded."
 UNVOTED = "The council's results notice names the candidates elected and not elected but gives no vote counts."
 SHORT = "{publisher}'s notice lists {elected} members elected unopposed to {places} places, leaving {left} vacant."
@@ -205,18 +212,18 @@ def fetch() -> None:
         if response is None:
             print(f"unreachable: {url}", file=sys.stderr)
             continue
-        page = response.headers.get("content-type", "").startswith("text/html")
-        if response.status_code != 200 or not (response.content.startswith(b"%PDF") or page):
-            print(f"not a PDF: {url}", file=sys.stderr)
+        if response.content.startswith(b"%PDF"):
+            suffix, media = ".pdf", "application/pdf"
+        elif response.content.startswith(b"PK") and ODT.encode() in response.content[:100]:
+            suffix, media = ".odt", ODT
+        elif response.headers.get("content-type", "").startswith("text/html"):
+            suffix, media = ".html", "text/html"
+        else:
+            suffix, media = None, None
+        if response.status_code != 200 or suffix is None or media is None:
+            print(f"not a document: {url}", file=sys.stderr)
             continue
-        raw.store(
-            SOURCE,
-            url,
-            response.content,
-            suffix=".html" if page else ".pdf",
-            retrieved_at=datetime.now(UTC),
-            media_type="text/html" if page else "application/pdf",
-        )
+        raw.store(SOURCE, url, response.content, suffix=suffix, retrieved_at=datetime.now(UTC), media_type=media)
 
 
 def _cached(url: str) -> bool:
@@ -232,6 +239,36 @@ def text_of(url: str, mode: str = "-layout") -> str:
     if path.suffix == ".html":
         page = re.sub(r"<(script|style)\b.*?</\1>", " ", path.read_text(), flags=re.DOTALL)
         return " ".join(html.unescape(re.sub(r"<[^>]+>", " ", page)).split())
+    if path.suffix == ".odt":
+        office = "{urn:oasis:names:tc:opendocument:xmlns:%s:1.0}"
+        text_ns, table_ns = office % "text", office % "table"
+        lines = []
+
+        def spoken(element: ElementTree.Element) -> str:
+            parts = [element.text or ""]
+            for child in element:
+                if child.tag == text_ns + "s":
+                    parts.append(" " * int(child.get(text_ns + "c", "1")))
+                elif child.tag in (text_ns + "tab", text_ns + "line-break"):
+                    parts.append(" ")
+                else:
+                    parts.append(spoken(child))
+                parts.append(child.tail or "")
+            return "".join(parts)
+
+        def walk(element: ElementTree.Element) -> None:
+            if element.tag == table_ns + "table-row":
+                cells = element.iter(table_ns + "table-cell")
+                lines.append("\t".join(" ".join(spoken(cell).split()) for cell in cells))
+            elif element.tag in (text_ns + "p", text_ns + "h"):
+                lines.append(" ".join(spoken(element).split()))
+            else:
+                for child in element:
+                    walk(child)
+
+        with zipfile.ZipFile(path) as document:
+            walk(ElementTree.fromstring(document.read("content.xml")))
+        return "\n".join(lines)
     return subprocess.run(["pdftotext", mode, str(path), "-"], capture_output=True, text=True, check=True).stdout
 
 
@@ -699,6 +736,75 @@ def notice(text: str) -> dict:
     return {"council": head.group(1), "day": when(day.group(1)), "places": places, "members": names}
 
 
+def lanarkshire_results(text: str) -> dict:
+    head = re.search(
+        r" ([A-Z][^:]*?) Community Council Election \d{4} \1 Community Council Election (?:\d{4} )?\w+day "
+        r"(\d+ \w+ \d{4}) Results? of Ballot",
+        text,
+    )
+    body = re.search(r"Candidate Votes Elected (.*?) and I declare", text)
+    if not (head and body):
+        raise ValueError("unreadable results page")
+    rows = list(re.finditer(r"(.+?) ?, (.+?) (\d+) (Yes|No)(?: |$)", body.group(1)))
+    if "".join(row.group(0) for row in rows).strip() != body.group(1):
+        raise ValueError("unreadable results table")
+    candidates = [
+        {
+            "printed": f"{row.group(1)}, {row.group(2)}",
+            "name": f"{row.group(2)} {row.group(1)}",
+            "votes": int(row.group(3)),
+            "elected": row.group(4) == "Yes",
+        }
+        for row in rows
+    ]
+    return {
+        "council": head.group(1),
+        "day": when(head.group(2)),
+        "places": sum(1 for candidate in candidates if candidate["elected"]),
+        "candidates": candidates,
+    }
+
+
+def lanarkshire_list(text: str) -> list[dict]:
+    sections = re.split(r"\n(?=[^\n]+ Community Council - Election Results of Uncontested Election\n)", text)
+    dates = [when(day) for day in re.findall(r"elected to the Community Council as from \w+ (\d+ \w+ \d{4})", text)]
+    day = max(set(dates), key=dates.count)
+    reads = []
+    for section in sections[1:]:
+        head = re.match(r"(.+?) Community Council - Election", section)
+        counts = re.search(
+            r"there were (\d+) candidates.? nomination papers received\. There is provision for (\d+) elected places.*?"
+            r"as from \w+ (\d+ \w+ \d{4})",
+            section,
+        )
+        if not (head and counts):
+            raise ValueError("unreadable notice section")
+        members = []
+        for number, printed in re.findall(r"^(\d+)\t(.+)$", section, re.MULTILINE):
+            title, name = printed.split(" ", 1)
+            if int(number) != len(members) + 1 or title not in TITLES:
+                raise ValueError(f"unreadable member line {printed!r}")
+            members.append({"printed": printed, "name": name})
+        received, places = int(counts.group(1)), int(counts.group(2))
+        if len(members) != received or received > places:
+            raise ValueError(f"{head.group(1)}: {len(members)} members, {received} nominated, {places} places")
+        stated = when(counts.group(3))
+        reads.append(
+            {
+                "council": head.group(1),
+                "day": day,
+                "places": places,
+                "members": members,
+                "caveat": None
+                if stated == day
+                else f"The council's 2022 notice dates this council's members as elected from {stated:%-d %B %Y}, "
+                f"but it is headed 2022, the council lists this council among its 2022 uncontested elections, and "
+                f"every other council in the notice is dated {day:%-d %B %Y}, so the election is dated {day:%-d %B %Y}.",
+            }
+        )
+    return reads
+
+
 def counted(url: str, read: dict) -> list[tuple[dict, list[dict]]]:
     elected = sum(candidate["elected"] for candidate in read["candidates"])
     if elected != min(read["places"], len(read["candidates"])):
@@ -761,6 +867,8 @@ def reads_of(url: str, lad: str, kind: str) -> list[tuple[dict, list[dict]]]:
         return tacit(lothian_list(text_of(url, "-raw")))
     if lad == "S12000041":
         return tacit(angus_notice(text))
+    if lad == "S12000029":
+        return counted(url, lanarkshire_results(text)) if kind == "results" else tacit(lanarkshire_list(text))
     if kind == "declaration":
         return counted(url, declaration(text))
     if kind == "list":
@@ -805,9 +913,10 @@ def parse() -> None:
                         "valid": read.get("valid"),
                         "unvoted": read.get("unvoted", False),
                         "tied": candidate["printed"] in read.get("tied", ()),
+                        "caveat": read.get("caveat"),
                     }
                 )
-    frame = pl.DataFrame(rows)
+    frame = pl.DataFrame(rows, infer_schema_length=None)
     with connect() as conn:
         known = {
             code
@@ -836,7 +945,8 @@ def emit() -> Path:
             "(postal ballots from the returning officer's declarations of result), Argyll and Bute's Cove and "
             "Kilcreggan and Clackmannanshire's Dollar polls, East Lothian's Dunbar result, and councils formed "
             "unopposed in Perth and Kinross, Stirling, Shetland, Argyll and Bute, Clackmannanshire, East Lothian, "
-            "Moray, and Angus from the councils' notices and lists, as tacit sets",
+            "Moray, Angus, and South Lanarkshire from the councils' notices and lists, as tacit sets, with South "
+            "Lanarkshire's 2026 polls from the council's results pages",
             polity="GB",
         )
 
@@ -857,9 +967,13 @@ def emit() -> Path:
             if url not in set(frame["url"]):
                 continue
             first = frame.filter(pl.col("url") == url).row(0, named=True)
-            label = {"declaration": "Declaration of Result", "list": "List of Members Elected"}.get(
-                kind, "Notice of Uncontested Election"
-            )
+            label = {
+                "declaration": "Declaration of Result",
+                "results": "Results of Ballot",
+                "list": "Notice of Results of Uncontested Election"
+                if lad == "S12000029"
+                else "List of Members Elected",
+            }.get(kind, "Notice of Uncontested Election")
             title = f"{first['council']} Community Council, {label}, {first['day']:%-d %B %Y}"
             publisher = COUNCILS[lad][0]
             sources[url] = cs.source(publisher, title)
@@ -957,6 +1071,8 @@ def emit() -> Path:
                     kind="context",
                     body_md=f"{' and '.join(tied)} tied on {lines.filter(pl.col('tied'))['votes'][0]} votes; the declaration records that the tie was settled by cutting a pack of cards.",
                 )
+            if first["caveat"]:
+                cs.add("note", entity_id=result_set, kind="caveat", body_md=first["caveat"])
             if tacit and places is None:
                 cs.add("note", entity_id=result_set, kind="caveat", body_md=UNSTATED)
             elif tacit and lines.height < places:
