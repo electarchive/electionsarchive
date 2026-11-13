@@ -1,7 +1,9 @@
 import re
 import time
 from datetime import date
+from html import unescape
 from pathlib import Path
+from typing import TypedDict
 from urllib.parse import quote
 from uuid import UUID
 
@@ -13,7 +15,7 @@ from ea.sources.gb import umit
 from ea.store import DATA, connect
 
 SOURCE = "gb.devolved_by"
-VERSION = "1"
+VERSION = "4"
 PARSED = DATA / "parsed" / SOURCE
 VOTES, REGISTERED, INVALID = 1, 2, 5
 PAGE = "https://en.wikipedia.org/w/index.php?title={}&action=raw"
@@ -222,18 +224,104 @@ CORRECTIONS = {
         ),
     ),
 }
+WAYBACK = "https://web.archive.org/web/{}id_/{}"
+
+
+class Official(TypedDict):
+    publisher: str
+    title: str
+    url: str
+    archive: str | None
+    registered: int | None
+    rejected: int | None
+    votes: tuple[int, ...]
+    text: str
+    note: str
+
+
+OFFICIAL: dict[str, Official] = {
+    "hamilton": {
+        "publisher": "South Lanarkshire Council",
+        "title": "Declaration of Result, Hamilton, Larkhall and Stonehouse Constituency By-election, 5 June 2025",
+        "url": "https://www.southlanarkshire.gov.uk/info/200237/elections/2282/scottish_parliamentary_by-election_-_hamilton_larkhall_and_stonehouse_-_thursday_5_june_2025/2",
+        "archive": WAYBACK.format(
+            "20251119054621",
+            "https://www.southlanarkshire.gov.uk/info/200237/elections/2282/scottish_parliamentary_by-election_-_hamilton_larkhall_and_stonehouse_-_thursday_5_june_2025/2",
+        ),
+        "registered": 61485,
+        "rejected": 46,
+        "votes": (8559, 7957, 7088, 1621, 695, 533, 278, 219, 109, 50),
+        "text": "Electorate 61,485 Total votes cast (per verification sheet) 27,155",
+        "note": (
+            "The returning officer's declaration prints an electorate of 61,485, 27,155 total votes including 46 "
+            "rejected ballot papers (7 for more than one candidate, 39 unmarked or void for uncertainty), and a "
+            "42.2 percent poll."
+        ),
+    },
+    "caerphilly": {
+        "publisher": "Caerphilly County Borough Council",
+        "title": "Caerphilly Senedd By-Election - 23 October 2025, declaration",
+        "url": "https://www.caerphilly.gov.uk/my-council/voting-and-elections/election-results/caerphilly-senedd-by-election-23-october-2025",
+        "archive": WAYBACK.format(
+            "20251024185609",
+            "https://www.caerphilly.gov.uk/my-council/voting-and-elections/election-results/caerphilly-senedd-by-election-23-october-2025",
+        ),
+        "registered": None,
+        "rejected": 50,
+        "votes": (15961, 12113, 3713, 690, 516, 497, 117, 79),
+        "text": "The total number of ballot papers rejected was 50",
+        "note": (
+            "The returning officer's declaration prints 33,686 as the votes cast, which is the sum of the "
+            "candidates' votes, and 50 rejected ballot papers (20 for more than one candidate, 30 unmarked or void "
+            "for uncertainty). It prints no electorate; the 66,895 is from Wikipedia."
+        ),
+    },
+    "shetland": {
+        "publisher": "Shetland Islands Council",
+        "title": "Scottish Parliamentary By-Election 2019, Shetland Islands Constituency, 29 August 2019",
+        "url": "https://www.shetland.gov.uk/election-results/scottish-parliamentary-election-2019",
+        "archive": WAYBACK.format(
+            "20250413122014", "https://www.shetland.gov.uk/election-results/scottish-parliamentary-election-2019"
+        ),
+        "registered": None,
+        "rejected": 11,
+        "votes": (5659, 3822, 1286, 425, 189, 152, 134, 66, 60, 31),
+        "text": "The total number of ballot papers rejected was 11",
+        "note": (
+            "The council's results page prints 11,835 votes cast, which is the candidates' 11,824 votes plus the 11 "
+            "rejected ballot papers it prints, and a 66.5 percent turnout. It prints no electorate."
+        ),
+    },
+    "ettrick": {
+        "publisher": "Scottish Borders Council",
+        "title": "Scottish Parliament by-election 2017, Ettrick, Roxburghshire, Berwickshire",
+        "url": "https://www.scotborders.gov.uk/info/20071/election_results/610/scottish_parliament_election_results/3",
+        "archive": None,
+        "registered": 55395,
+        "rejected": None,
+        "votes": (20658, 11320, 3406, 3196),
+        "text": "Total Electorate: 55,395",
+        "note": (
+            "The council's results page prints an electorate of 55,395 and 38,653 total votes cast, 73 more than "
+            "the candidates' 38,580 votes. It prints no rejected-paper count, so none is stored."
+        ),
+    },
+}
 NOTES = {
     "anniesland": (
         "The candidates' votes sum to 20,221 but Wikipedia's election box prints a turnout of 20,211. The percentages "
-        "match a BBC News listing, so the candidate votes are kept as printed and no turnout is stored."
+        "match a BBC News listing, so the candidate votes are kept as printed and no turnout is stored. The "
+        "returning officer's declaration could not be reached to settle the 10 votes' difference."
     ),
     "donside": (
-        "The candidates' votes sum to 23,378 and Wikipedia's election box prints a turnout of 23,396. It prints no "
-        "rejected-paper count, so the 18 votes' difference is left unexplained and no turnout is stored."
+        "The candidates' votes sum to 23,378 and Wikipedia's election box prints a turnout of 23,396. Neither "
+        "Wikipedia nor any source found prints a rejected-paper count, and Aberdeen City Council's declaration could "
+        "not be reached, so the 18 votes' difference is left unexplained and no turnout is stored."
     ),
-    "caerphilly": (
-        "The candidates' votes sum to the 33,686 that Wikipedia's election box prints as the turnout, and the box "
-        "prints 50 rejected papers separately, so the turnout figure counts valid votes only."
+    "dunfermline": (
+        "Fife Council's declaration could not be reached. Cara Hilton's 10,275 votes are used because they agree "
+        "with the 2,873 majority over the SNP's 7,402 that The Scotsman reported and with Lib Dem Voice's count-night "
+        "listing, while the election box's 10,279 does not."
     ),
 }
 
@@ -241,6 +329,9 @@ NOTES = {
 def fetch() -> None:
     for *_, page, _ in BY_ELECTIONS:
         raw.fetch(SOURCE, PAGE.format(quote(page, safe=",_")), suffix=".wiki")
+        time.sleep(1)
+    for official in OFFICIAL.values():
+        raw.fetch(SOURCE, official["archive"] or official["url"], suffix=".html")
         time.sleep(1)
 
 
@@ -277,6 +368,13 @@ def fields(block: str) -> tuple[str, dict[str, str]]:
     return kind.group(1).strip(), found
 
 
+def official_text(key: str) -> str:
+    official = OFFICIAL[key]
+    html = Path(raw.cached(SOURCE, official["archive"] or official["url"]).path).read_text()
+    html = re.sub(r"<script.*?</script>|<style.*?</style>", "", html, flags=re.DOTALL)
+    return re.sub(r"\s+", " ", unescape(re.sub(r"<[^>]+>", " ", html)))
+
+
 def count(text: str | None) -> int | None:
     digits = re.sub(r"[^\d]", "", text or "")
     return int(digits) if digits else None
@@ -289,7 +387,7 @@ def parse() -> None:
     for key, day, country, constituency, area, page, title in BY_ELECTIONS:
         text = Path(raw.cached(SOURCE, PAGE.format(quote(page, safe=",_"))).path).read_text()
         chosen = False
-        printed = {}
+        printed: dict[str, int | None] = {}
         for block in templates(text):
             kind, found = fields(block)
             if kind.startswith("begin"):
@@ -321,6 +419,19 @@ def parse() -> None:
                 printed["rejected"] = count(found.get("votes"))
             elif kind.startswith("turnout"):
                 printed["turnout"] = count(found.get("votes"))
+        if key in OFFICIAL:
+            official = OFFICIAL[key]
+            page_text = official_text(key)
+            mine = sorted(int(line["votes"] or 0) for line in lines if line["key"] == key)
+            assert official["text"] in page_text, key
+            assert mine == sorted(official["votes"]), key
+            assert all(f"{votes:,}" in page_text or f" {votes} " in page_text for votes in official["votes"]), key
+            if official["registered"] is not None:
+                assert printed.get("registered") in (None, official["registered"]), key
+                printed["registered"] = official["registered"]
+            if official["rejected"] is not None:
+                assert printed.get("rejected") in (None, official["rejected"]), key
+                printed["rejected"] = official["rejected"]
         totals.append(
             {
                 "key": key,
@@ -354,7 +465,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Scottish Parliament and Senedd constituency by-elections 2000-2025, from Wikipedia's election boxes",
+            summary="Scottish Parliament and Senedd constituency by-elections 2000-2025, from Wikipedia's election boxes and returning officers' declarations where reachable",
             polity="GB",
         )
 
@@ -386,6 +497,19 @@ def emit() -> Path:
                 attribution=f"Wikipedia contributors, “{title}”",
             )
             cs.artifact(raw.cached(SOURCE, PAGE.format(quote(row["page"], safe=",_"))), sources[row["key"]])
+
+        declared: dict[str, UUID] = {}
+        for key, official in OFFICIAL.items():
+            declared[key] = cs.source(official["publisher"], official["title"])
+            cs.add(
+                "source",
+                id=declared[key],
+                kind="official_body",
+                publisher=official["publisher"],
+                title=official["title"],
+                url=official["url"],
+            )
+            cs.artifact(raw.cached(SOURCE, official["archive"] or official["url"]), declared[key])
 
         parties: dict[str, UUID] = {}
 
@@ -464,23 +588,41 @@ def emit() -> Path:
                     stage="official",
                     kind="counted",
                     status="active",
-                    source_id=sources[row["key"]],
+                    source_id=declared.get(row["key"], sources[row["key"]]),
                     is_default=True,
                     completeness=1,
                 )
-                cs.add(
-                    "note",
-                    entity_id=result_set,
-                    kind="caveat",
-                    body_md="The figures are transcribed from the election box on Wikipedia's article, which cites "
-                    "press reports and the returning officer's results; they have not been checked against the "
-                    "returning officer's declaration. The candidates' votes sum to the printed turnout "
-                    "(votes plus rejected papers) except where a note says otherwise.",
-                )
+                official = OFFICIAL.get(row["key"])
+                if official is None:
+                    cs.add(
+                        "note",
+                        entity_id=result_set,
+                        kind="caveat",
+                        body_md="The figures are transcribed from the election box on Wikipedia's article, which "
+                        "cites press reports and the returning officer's results; they have not been checked against "
+                        "the returning officer's declaration, which could not be reached. The candidates' votes sum "
+                        "to the printed turnout (votes plus rejected papers) except where a note says otherwise.",
+                    )
+                else:
+                    cs.add(
+                        "note",
+                        entity_id=result_set,
+                        kind="caveat",
+                        body_md="The candidates' votes were checked against the returning officer's declaration "
+                        f"published by {official['publisher']} and agree with Wikipedia's election box. "
+                        + official["note"],
+                    )
                 if row["key"] in NOTES:
                     cs.add("note", entity_id=result_set, kind="caveat", body_md=NOTES[row["key"]])
 
-                def value(option: UUID | None, measure: int, amount: int | None, result_set: UUID = result_set) -> None:
+                def value(
+                    option: UUID | None,
+                    measure: int,
+                    amount: int | None,
+                    result_set: UUID = result_set,
+                    stated: bool = False,
+                    row: dict = row,
+                ) -> None:
                     if amount is None:
                         return
                     cs.add(
@@ -494,9 +636,24 @@ def emit() -> Path:
                         flags=0,
                         value=amount,
                     )
+                    cs.add(
+                        "value_locator",
+                        result_set_id=result_set,
+                        unit_id=unit,
+                        option_id=option,
+                        channel=0,
+                        measure=measure,
+                        count_round=0,
+                        source_id=declared[row["key"]] if stated else sources[row["key"]],
+                    )
 
-                value(None, REGISTERED, row["registered"])
-                value(None, INVALID, row["rejected"])
+                value(
+                    None,
+                    REGISTERED,
+                    row["registered"],
+                    stated=official is not None and official["registered"] is not None,
+                )
+                value(None, INVALID, row["rejected"], stated=official is not None and official["rejected"] is not None)
                 for line in candidates.filter(pl.col("key") == row["key"]).iter_rows(named=True):
                     option_key = f"{contest_key}:{slug(line['candidate'])}"
                     option = cs.key("gb.option", option_key)
@@ -519,9 +676,24 @@ def emit() -> Path:
                         member_of_party_id=party,
                         is_independent=party is None,
                     )
-                    value(option, VOTES, line["votes"])
+                    value(option, VOTES, line["votes"], stated=official is not None)
                     if line["correction"] is not None:
                         cs.add("note", entity_id=contest, kind="context", body_md=line["correction"])
                     if line["elected"]:
                         cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected")
+        noted = {(row["entity_id"], row["body_md"]) for row in cs.rows["note"]}
+        entities = [row["id"] for table in ("result_set", "contest") for row in cs.rows[table]]
+        for note, entity, text in conn.execute(
+            """select n.id, n.entity_id, n.body_md from note n join changeset c on c.id = n.changeset_id
+               where n.entity_id = any(%s) and c.pipeline = %s""",
+            [entities, SOURCE],
+        ).fetchall():
+            if (entity, text) not in noted:
+                cs.add(
+                    "note_drop",
+                    note_id=note,
+                    entity_id=entity,
+                    body_md=text,
+                    reason="The note is reworded or no longer applies after the check against declarations.",
+                )
         return cs.write()
