@@ -541,6 +541,7 @@ GLC_RESOLVED = {
     "Liberal": ("gb.parliament.party", "18"),
     "National Front": ("gb.party", "national-front"),
     "Communist": ("gb.party", "communist-party-of-great-britain"),
+    "Communist Party of Great Britain": ("gb.party", "communist-party-of-great-britain"),
     "Socialist Party of Great Britain": ("gb.party", "socialist-party-of-great-britain"),
     "Workers Revolutionary Party": ("gb.party", "workers-revolutionary-party"),
     "Social Democratic Party": ("gb.party", "social-democratic-party-1981"),
@@ -860,6 +861,40 @@ ILEA_METHODOLOGY = (
     "electorate of Bow and Poplar to 60,320 and Inner London's to 1,728,604; the corrected figures are stored. The "
     "report gives no number voting by constituency. It marks the result in Southwark and Bermondsey, which the Alliance "
     "won, with an inquiry pending."
+)
+
+GLC_BY_PAGES = (20, 21)
+GLC_BY_PARTIES = {
+    code: ILEA_PARTIES[code][0] for code in ("LAB", "CON", "SDPLIB", "LIBSDP", "LIBAFT", "NF", "COMM", "RLS")
+} | {
+    "E": "Ecology",
+    "ABGLC": "Abolish the GLC",
+    "COMMGB": "Communist Party of Great Britain",
+    "GLAML": "Gaitskell Labourite against Marxist Labour",
+    "INDCON": "Independent Conservative",
+    "PAA": "Pro-Abolition Alliance",
+    "RCOMM": "Revolutionary Communist",
+}
+GLC_BY_CODES = ILEA_CODES | {"SDPLID": "SDPLIB", "LFFISDP": "LIBSDP"}
+GLC_BY_NAMES = {
+    "Wall, AlanJ.": "Wall, Alan J.",
+    "Russell, Peter EN.": "Russell, Peter F.N.",
+    "Pearson, Stephen 1.": "Pearson, Stephen J.",
+    "Harris, Steve 1.": "Harris, Steve J.",
+    "Cook:, David J.S.": "Cook, David J.S.",
+    "Colerick:, George A.": "Colerick, George A.",
+}
+GLC_BY_DIVISIONS = {"Lewisham": "Lewisham West"}
+GLC_BY_METHODOLOGY = (
+    "Read from the text layer of Appendix B of the London Residuary Body's report on the Inner London Education "
+    "Authority elections of 1986, which lists every by-election to the Greater London Council from May 1981 until "
+    "the council's abolition, with the names checked against the page images. Each electoral division returned one "
+    "councillor, and the report shows the elected candidate in bold type, set flush with the division's heading; "
+    "the elected candidate polled the most votes in every case. The report prints each division's electorate and "
+    "percentage poll but no number voting, so no turnout count is stored. The electoral divisions are the "
+    "parliamentary constituencies of 1974 to 1983. The report heads the by-election of 20 September 1984 in "
+    "Lewisham simply as Lewisham; it was caused by the resignation of Alan Herbert, who was elected for Lewisham "
+    "West in 1981, and is stored as Lewisham West."
 )
 
 
@@ -2092,6 +2127,7 @@ def parse_glc() -> None:
     pl.DataFrame(standing).write_parquet(PARSED / "glc_early_candidates.parquet")
     print(f"{len(areas)} GLC electoral areas and {len(standing)} candidates, 1964 to 1970")
     parse_ilea()
+    parse_glc_by()
 
 
 SKIPPED = re.compile(
@@ -2423,6 +2459,86 @@ def parse_ilea() -> None:
     print(f"{len(rows)} ILEA constituencies and {len(candidates)} candidates, 1986")
 
 
+def parse_glc_by() -> None:
+    artifact = raw.cached(SOURCE, ILEA_URL)
+    sizes, book = pages(artifact.path)
+    held = pl.read_parquet(PARSED / "glc_candidates.parquet").filter(pl.col("year") == 1981, pl.col("elected"))
+    sitting = {fold(r["division"]): r["name"].split(",")[0] for r in held.iter_rows(named=True)}
+    divisions: list[dict] = []
+    candidates: list[dict] = []
+    problems = []
+    for sheet in range(GLC_BY_PAGES[0], GLC_BY_PAGES[1] + 1):
+        width = sizes[sheet - 1][0]
+        for side in (0, 1):
+            division: dict | None = None
+            column = [w for w in book[sheet - 1] if (w[0] < width / 2) == (side == 0)]
+            for row in lines(column):
+                text = " ".join(w[4] for w in row)
+                if re.fullmatch(r"[A-Z][A-Z ]{4,}", text):
+                    division = {"printed": text, "page": sheet, "x": row[0][0]}
+                    divisions.append(division)
+                    continue
+                if division is None:
+                    continue
+                dated = re.fullmatch(r"\((\d+)\.(\d+)\.(\d+),\s*[\d. ]+%?,\s*([\d,]+)\)", text)
+                if dated:
+                    d, m, y, registered = dated.groups()
+                    division |= {
+                        "day": date(1900 + int(y), int(m), int(d)),
+                        "electorate": number(registered),
+                        "electorate_bbox": ilea_box([row[-1]], sizes[sheet - 1]),
+                    }
+                    continue
+                cause = re.fullmatch(r"Resignation of (.+) \(([A-Z]+)\)", text)
+                if cause:
+                    division["cause"] = (cause.group(1), cause.group(2))
+                    continue
+                found = re.fullmatch(r"(.+?)\s+([A-Za-z]+)(?:\s*\*)?\s+(\d[\d,]*)", text)
+                if found is None or "day" not in division or "cause" in division:
+                    continue
+                name = GLC_BY_NAMES.get(found.group(1), found.group(1))
+                code = found.group(2).upper()
+                code = GLC_BY_CODES.get(code, code)
+                votes = number(found.group(3))
+                if (
+                    code not in GLC_BY_PARTIES
+                    or votes is None
+                    or not re.fullmatch(r"[A-Z][A-Za-z'’ -]+, [A-Z].*", name)
+                ):
+                    raise ValueError(f"GLC by-elections page {sheet}: unread line {text!r}")
+                candidates.append(
+                    {
+                        "division": division["printed"],
+                        "day": division["day"],
+                        "name": name,
+                        "party": code,
+                        "votes": votes,
+                        "elected": row[0][0] - division["x"] < 4,
+                        "page": sheet,
+                        "bbox": ilea_box(row, sizes[sheet - 1]),
+                    }
+                )
+    for division in divisions:
+        division.pop("x")
+        mine = [c for c in candidates if c["division"] == division["printed"]]
+        for rank, c in enumerate(sorted(mine, key=lambda c: -c["votes"])):
+            c["number"] = rank + 1
+        elected = [c for c in mine if c["elected"]]
+        if len(elected) != 1 or elected[0]["number"] != 1 or "cause" not in division:
+            problems.append(f"{division['printed']}: {len(elected)} elected, {len(mine)} candidates")
+            continue
+        printed = division["printed"].title().replace(" And ", " and ")
+        held_by = sitting.get(fold(GLC_BY_DIVISIONS.get(printed, printed)))
+        if held_by is None or not division["cause"][0].startswith(held_by):
+            problems.append(f"{division['printed']}: caused by {division['cause'][0]}, 1981 winner {held_by}")
+        division["cause"] = f"{division['cause'][0]} ({division['cause'][1]})"
+    if problems:
+        raise ValueError("GLC by-elections:\n" + "\n".join(problems))
+    pl.DataFrame(divisions).write_parquet(PARSED / "glc_by_divisions.parquet")
+    pl.DataFrame(candidates).write_parquet(PARSED / "glc_by_candidates.parquet")
+    print(f"{len(divisions)} GLC by-elections and {len(candidates)} candidates, 1981 to 1985")
+
+
 def emit() -> Path:
     wards = pl.read_parquet(PARSED / "wards.parquet")
     candidates = pl.read_parquet(PARSED / "candidates.parquet")
@@ -2440,8 +2556,8 @@ def emit() -> Path:
             + ", ".join(map(str, sorted(BOOKS)))
             + " by ward, and Greater London Council elections "
             + ", ".join(map(str, sorted(GLC)))
-            + " by electoral division and of 1964, 1967, and 1970 by borough, and the Inner London Education "
-            "Authority election of 1986 by constituency, from the London Research Centre's, the London County "
+            + " by electoral division and of 1964, 1967, and 1970 by borough, the Greater London Council "
+            "by-elections of 1981 to 1985, and the Inner London Education Authority election of 1986 by constituency, from the London Research Centre's, the London County "
             "Council's, the Greater London Council's, and the London Residuary Body's reports",
             polity="GB",
         )
@@ -3303,4 +3419,131 @@ def emit() -> Path:
                 ilea_value(option, VOTES, line["votes"], line["page"], line["bbox"])
                 if line["elected"]:
                     cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected")
+        held = pl.read_parquet(PARSED / "glc_by_divisions.parquet")
+        standing = pl.read_parquet(PARSED / "glc_by_candidates.parquet")
+        for (day,), on_day in held.sort("day").group_by("day", maintain_order=True):
+            spoken = f"{day:%B} {day.day}, {day.year}"
+            seats = []
+            for division in on_day.iter_rows(named=True):
+                printed = division["printed"].title().replace(" And ", " and ")
+                seats.append((division, *constituencies[fold(GLC_BY_DIVISIONS.get(printed, printed))]))
+            election = cs.key("gb.election", f"{day}:glc-by")
+            cs.add(
+                "election",
+                id=election,
+                polity_id=london,
+                kind="by_election",
+                date_from=day,
+                date_to=day,
+                status="held",
+            )
+            name(
+                election,
+                f"{seats[0][2]} Greater London Council by-election, {spoken}"
+                if len(seats) == 1
+                else f"Greater London Council by-elections, {spoken}",
+            )
+            cs.add("slug", path=f"gb/london/{day}-glc-by-election", entity_id=election)
+            causes = " ".join(f"{display} was vacated by the resignation of {d['cause']}." for d, _, display in seats)
+            cs.add("note", entity_id=election, kind="methodology", body_md=f"{GLC_BY_METHODOLOGY} {causes}")
+            for division, code, display in seats:
+                area = cs.area("gb.pcon", code)
+                unit = cs.unit("gb.pcon", code)
+                if unit in cs.minted and unit not in units:
+                    raise ValueError(f"{code}: no 1974 constituency unit")
+                contest_key = f"{day}:glc:{code}"
+                contest = cs.key("gb.contest", contest_key)
+                cs.add(
+                    "contest",
+                    id=contest,
+                    election_id=election,
+                    kind="body_seats",
+                    body_id=council,
+                    district_area_id=area,
+                    magnitude=1,
+                    round_number=1,
+                    electoral_system_id=systems["fptp"],
+                    default_result_kind="counted",
+                )
+                name(contest, f"{display}, Greater London Council by-election, {day.year}")
+                cs.add("slug", path=f"gb/london/{day}-glc-by-election/{slug(display)}", entity_id=contest)
+                result_set = cs.key(f"{SOURCE}.result_set", contest_key)
+                cs.add(
+                    "result_set",
+                    id=result_set,
+                    election_id=election,
+                    contest_id=contest,
+                    stage="official",
+                    kind="counted",
+                    status="active",
+                    source_id=source,
+                    is_default=contest not in others,
+                    completeness=1,
+                )
+                cs.add(
+                    "citation",
+                    entity_id=result_set,
+                    source_id=source,
+                    locator={"page": division["page"], "appendix": "B", "division": division["printed"]},
+                )
+
+                def by_value(option: UUID | None, measure: int, figure: int, number: int, box: list[float]) -> None:
+                    cs.add(
+                        "result_value",
+                        result_set_id=result_set,
+                        unit_id=unit,
+                        option_id=option,
+                        channel=0,
+                        measure=measure,
+                        count_round=0,
+                        flags=DIGITIZED,
+                        value=figure,
+                    )
+                    x0, y0, x1, y1 = box
+                    cs.add(
+                        "value_locator",
+                        result_set_id=result_set,
+                        unit_id=unit,
+                        option_id=option,
+                        channel=0,
+                        measure=measure,
+                        count_round=0,
+                        page_id=ilea_page(number),
+                        source_id=None,
+                        x0=x0,
+                        y0=y0,
+                        x1=x1,
+                        y1=y1,
+                    )
+
+                by_value(None, REGISTERED, division["electorate"], division["page"], division["electorate_bbox"])
+                for line in standing.filter(pl.col("division") == division["printed"]).iter_rows(named=True):
+                    option_key = f"{contest_key}:{line['number']}"
+                    owner = glc_party(GLC_BY_PARTIES[line["party"]])
+                    option = cs.key(f"{SOURCE}.option", option_key)
+                    cs.add(
+                        "contest_option",
+                        id=option,
+                        contest_id=contest,
+                        kind="candidate",
+                        party_id=owner,
+                        ballot_label=line["name"],
+                    )
+                    person = cs.key(f"{SOURCE}.person", option_key)
+                    cs.add("person", id=person)
+                    surname, _, forenames = line["name"].partition(", ")
+                    name(person, f"{forenames} {surname}")
+                    cs.add(
+                        "candidacy",
+                        id=cs.key(f"{SOURCE}.candidacy", option_key),
+                        person_id=person,
+                        option_id=option,
+                        role="head",
+                        ballot_name=line["name"],
+                        member_of_party_id=owner,
+                        is_independent=False,
+                    )
+                    by_value(option, VOTES, line["votes"], line["page"], line["bbox"])
+                    if line["elected"]:
+                        cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected")
         return cs.write()
