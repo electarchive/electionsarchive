@@ -59,6 +59,8 @@ def stage_url(member: str, name: str, url: str) -> str:
 def fetch() -> None:
     if "SCOT_BY" in os.environ:
         return fetch_by()
+    if "SCOT_YEAR" in os.environ:
+        return fetch_hist()
     for url, suffix in ((EMB, ".xlsx"), (INDEX, ".html"), (BUNDLE, ".zip")):
         raw.fetch(SOURCE, url, suffix=suffix)
     path = raw.cached(SOURCE, BUNDLE).path
@@ -493,6 +495,8 @@ def read_other(text: str, declared: str) -> Stages:
 def parse() -> None:
     if "SCOT_BY" in os.environ:
         return parse_by()
+    if "SCOT_YEAR" in os.environ:
+        return parse_hist()
     emb = pl.read_excel(raw.cached(SOURCE, EMB).path, sheet_name="RawDetails", engine="calamine")
     features = [
         feature
@@ -789,6 +793,8 @@ def party_of(cs: Changeset, parties: dict[str, UUID], label: str | None) -> UUID
 def emit() -> Path:
     if "SCOT_BY" in os.environ:
         return emit_by()
+    if "SCOT_YEAR" in os.environ:
+        return emit_hist()
     units = pl.read_parquet(PARSED / "units.parquet").filter(pl.col("status") == "loaded")
     totals = pl.read_parquet(PARSED / "totals.parquet")
     shapes = {code: (geom, point) for code, geom, point in pl.read_parquet(PARSED / "shapes.parquet").rows()}
@@ -1546,6 +1552,302 @@ def emit_by() -> Path:
                     kind=candidate["outcome"],
                     notes=f"Elected at stage {candidate['stage_elected']}." if candidate["elected"] else None,
                 )
+            for row in lines.filter(pl.col("number") == 0).iter_rows(named=True):
+                cs.add(
+                    "result_value",
+                    result_set_id=result_set,
+                    unit_id=unit,
+                    option_id=None,
+                    channel=0,
+                    measure=EXHAUSTED,
+                    count_round=row["stage"],
+                    flags=0,
+                    value=Decimal(row["votes"]),
+                )
+        return cs.write()
+
+
+STAGES = Path(__file__).with_name("scot_council_stages.tsv")
+HIST = PARSED / "hist"
+
+
+def stage_rows() -> list[dict[str, str]]:
+    year = os.environ["SCOT_YEAR"]
+    return [
+        row
+        for row in pl.read_csv(STAGES, separator="\t", infer_schema=False).iter_rows(named=True)
+        if row["year"] == year
+    ]
+
+
+def fetch_hist() -> None:
+    for row in stage_rows():
+        try:
+            raw.cached(SOURCE, row["url"])
+        except LookupError:
+            try:
+                raw.fetch(SOURCE, row["url"], suffix=".pdf")
+            except httpx.HTTPError as error:
+                print(f"{row['council']} {row['ward']}: {row['url']}: {error}")
+            time.sleep(4 if "web.archive.org" in row["url"] else 1)
+
+
+def parse_hist() -> None:
+    from ea.sources.gb import leap_scot
+
+    year = int(os.environ["SCOT_YEAR"])
+    held = pl.read_parquet(leap_scot.PARSED / "candidates.parquet").filter(pl.col("year") == year)
+    contests: dict[tuple[str, tuple[int, ...] | frozenset[str]], list[str]] = {}
+    for (council, ward_code), lines in held.group_by("council", "ward_code"):
+        if lines["votes"].sum():
+            contests.setdefault((council, tuple(sorted(lines["votes"].to_list()))), []).append(ward_code)
+            contests.setdefault((council, frozenset(name_key(name) for name in lines["name"])), []).append(ward_code)
+    units: list[dict[str, str | int | None]] = []
+    totals: list[dict[str, str | int | bool | None]] = []
+    taken: set[str] = set()
+    for row in stage_rows():
+        council, locator = row["council"], row["url"]
+        try:
+            path = raw.cached(SOURCE, locator).path
+        except LookupError:
+            units.append({"council": council, "ward": row["ward"], "locator": locator, "status": "not fetched"})
+            continue
+        text = pdf_text(path)
+        facts, rows, exhausted, dropped, odd, _ = read_stages(text)
+        ballots = re.search(r"Ballot Papers Received\s+(" + NUMBER + ")", text)
+        first = [(label, votes, outcome) for number, label, votes, outcome in rows if number == 1]
+        found = contests.get((council, tuple(sorted(int(votes) for _, votes, _ in first))), [])
+        if not found:
+            found = contests.get((council, frozenset(name_key(label) for label, _, _ in first)), [])
+        found = [code for code in found if code not in taken]
+        status = "loaded"
+        ward_code = found[0] if len(found) == 1 else None
+        lines = held.filter(pl.col("ward_code") == ward_code).sort("number") if ward_code else held.clear()
+        by_name = {name_key(line["name"]): line for line in lines.iter_rows(named=True)}
+        by_votes = {line["votes"]: line for line in lines.iter_rows(named=True)}
+        matched = {
+            label: line
+            for label, votes, _ in first
+            if (line := by_name.get(name_key(label)) or by_votes.get(int(votes))) is not None
+        }
+        elected = {label for _, label, _, outcome in rows if outcome == "Elected"}
+        stages = sorted({number for number, _, _, _ in rows})
+        if odd:
+            status = f"unread lines: {odd[:3]}"
+        elif ward_code is None:
+            status = f"{len(found)} wards with these first preferences"
+        elif len(matched) != len(first) or len({line["number"] for line in matched.values()}) != len(first):
+            status = "candidates do not match one to one"
+        elif elected != {label for label, line in matched.items() if line["elected"]}:
+            status = "elected differ from the first preferences held"
+        elif len(elected) != facts.get("seats"):
+            status = "elected do not fill the seats"
+        else:
+            for number in stages:
+                total = exhausted.get(number, Decimal(0)) + sum(
+                    (votes for at, _, votes, _ in rows if at == number), Decimal(0)
+                )
+                if total != facts["valid"]:
+                    status = f"stage {number} sums to {total}, not {facts['valid']}"
+                    break
+        differs = "; ".join(
+            f"{label} {votes} for {matched[label]['votes']}"
+            for label, votes, _ in first
+            if status == "loaded" and int(votes) != matched[label]["votes"]
+        )
+        if ward_code and status == "loaded":
+            taken.add(ward_code)
+        units.append(
+            {
+                "council": council,
+                "ward": row["ward"],
+                "locator": locator,
+                "status": status,
+                "ward_code": ward_code,
+                "seats": int(facts["seats"]) if "seats" in facts else None,
+                "ballots": str(Decimal(ballots.group(1).replace(",", ""))) if ballots else None,
+                "valid": str(facts.get("valid")),
+                "quota": str(facts.get("quota")),
+                "differs": differs or None,
+            }
+        )
+        if status != "loaded":
+            continue
+        for number, label, votes, _ in rows:
+            line = matched[label]
+            totals.append(
+                {
+                    "ward_code": ward_code,
+                    "number": line["number"],
+                    "name": label,
+                    "elected": label in elected,
+                    "outcome": "elected"
+                    if label in elected
+                    else ("eliminated" if name_key(label) in dropped else "lost"),
+                    "stage": number,
+                    "votes": str(votes),
+                }
+            )
+        for number in stages:
+            totals.append(
+                {
+                    "ward_code": ward_code,
+                    "number": 0,
+                    "name": None,
+                    "elected": False,
+                    "outcome": None,
+                    "stage": number,
+                    "votes": str(exhausted.get(number, Decimal(0))),
+                }
+            )
+    frame = pl.DataFrame(units, infer_schema_length=None)
+    print(frame.group_by("status").len().sort("len", descending=True).rows())
+    wanted = held.filter(pl.col("votes") > 0, pl.col("council").is_in({row["council"] for row in stage_rows()}))
+    print("unmatched", sorted(set(wanted["ward_code"]) - taken))
+    HIST.mkdir(parents=True, exist_ok=True)
+    frame.write_parquet(HIST / f"units{year}.parquet")
+    pl.DataFrame(totals, infer_schema_length=None).write_parquet(HIST / f"totals{year}.parquet")
+
+
+def emit_hist() -> Path:
+    from ea.sources.gb import leap_scot
+
+    year = int(os.environ["SCOT_YEAR"])
+    day = leap_scot.DAYS[year]
+    units = pl.read_parquet(HIST / f"units{year}.parquet").filter(pl.col("status") == "loaded")
+    totals = pl.read_parquet(HIST / f"totals{year}.parquet")
+    held = pl.read_parquet(leap_scot.PARSED / "candidates.parquet").filter(pl.col("year") == year)
+    pages = {row["council"]: row["page"] for row in stage_rows()}
+    with connect() as conn:
+        cs = Changeset(
+            conn,
+            pipeline=SOURCE,
+            version=VERSION,
+            summary=f"Scottish council elections of {day.day} {day:%B %Y} by ward with every STV stage, from the "
+            "councils' eCount reports, superseding the first preferences from the Local Elections Archive Project",
+            polity="GB-SCT",
+        )
+
+        def held_key(entity: UUID, what: str) -> UUID:
+            if entity in cs.minted:
+                raise ValueError(f"{what} is not held; publish gb.leap_scot first")
+            return entity
+
+        sources: dict[str, UUID] = {}
+        for unit_row in units.sort("ward_code").iter_rows(named=True):
+            council, ward_code = unit_row["council"], unit_row["ward_code"]
+            lines = held.filter(pl.col("ward_code") == ward_code).sort("number")
+            code = lines["la_code"][0]
+            body = held_key(cs.key("gb.body", code), code)
+            election = held_key(cs.key("gb.election", f"{day}:local:{code}"), code)
+            unit = held_key(cs.unit("gb.ward", ward_code), ward_code)
+            contest_key = f"{day}:local:{ward_code}"
+            contest = held_key(cs.key("gb.contest", contest_key), contest_key)
+            named = conn.execute(
+                "select n.text from name n where n.entity_id = %s and n.is_preferred", [body]
+            ).fetchone()
+            if named is None:
+                raise ValueError(f"{code} has no name")
+            authority = named[0]
+            if council not in sources:
+                title = f"Local government election {day.day} {day:%B %Y}: eCount reports"
+                sources[council] = cs.source(authority, title)
+                cs.add(
+                    "source",
+                    id=sources[council],
+                    kind="official_body",
+                    publisher=authority,
+                    title=title,
+                    url=pages[council],
+                    license="Open Government Licence v3.0",
+                    license_url=OGL,
+                    attribution=authority,
+                    notes="The returning officer's Candidate Votes per Stage report for each ward, as produced by "
+                    "the Scottish eCount system and published by the council.",
+                )
+            source = sources[council]
+            previous = cs.key("gb.leap_scot.result_set", contest_key)
+            for values in conn.execute(
+                """select id, election_id, contest_id, stage, kind, source_id, as_of, completeness
+                   from result_set where id = %s""",
+                [previous],
+            ).fetchall():
+                cs.add(
+                    "result_set",
+                    **dict(
+                        zip(
+                            ("id", "election_id", "contest_id", "stage", "kind", "source_id", "as_of", "completeness"),
+                            values,
+                            strict=True,
+                        )
+                    ),
+                    status="superseded",
+                    is_default=False,
+                )
+            result_set = cs.key("gb.scot_council.result_set", contest_key)
+            cs.add(
+                "result_set",
+                id=result_set,
+                election_id=election,
+                contest_id=contest,
+                stage="official",
+                kind="counted",
+                status="active",
+                source_id=source,
+                is_default=True,
+                supersedes_id=previous,
+                completeness=1,
+            )
+            cs.add("citation", entity_id=result_set, source_id=source, locator={"file": unit_row["locator"]})
+            cs.artifact(raw.cached(SOURCE, unit_row["locator"]), source)
+            cs.add(
+                "note",
+                entity_id=result_set,
+                kind="methodology",
+                body_md="The stages are the council's own eCount report (Candidate Votes per Stage). Stage 1 equals "
+                "the first preferences in the earlier set from the Local Elections Archive Project, the elected "
+                "equal its elected, and every stage sums to the valid votes.",
+            )
+            for measure, amount in (
+                (BALLOTS, unit_row["ballots"]),
+                (VALID, unit_row["valid"]),
+                (QUOTA, unit_row["quota"]),
+            ):
+                if amount is not None:
+                    cs.add(
+                        "result_value",
+                        result_set_id=result_set,
+                        unit_id=unit,
+                        option_id=None,
+                        channel=0,
+                        measure=measure,
+                        count_round=0,
+                        flags=0,
+                        value=Decimal(amount),
+                    )
+            lines = totals.filter(pl.col("ward_code") == ward_code)
+            for candidate in (
+                lines.filter(pl.col("number") > 0)
+                .select("number", "outcome")
+                .unique(maintain_order=True, subset=["number"])
+                .iter_rows(named=True)
+            ):
+                option = held_key(cs.key("gb.leap_scot.option", f"{contest_key}:{candidate['number']}"), contest_key)
+                for row in lines.filter(pl.col("number") == candidate["number"]).sort("stage").iter_rows(named=True):
+                    cs.add(
+                        "result_value",
+                        result_set_id=result_set,
+                        unit_id=unit,
+                        option_id=option,
+                        channel=0,
+                        measure=VOTES,
+                        count_round=row["stage"],
+                        flags=0,
+                        value=Decimal(row["votes"]),
+                    )
+                    if Decimal(row["votes"]) == 0 and row["stage"] > 1 and candidate["outcome"] != "elected":
+                        break
+                cs.add("outcome", result_set_id=result_set, option_id=option, kind=candidate["outcome"])
             for row in lines.filter(pl.col("number") == 0).iter_rows(named=True):
                 cs.add(
                     "result_value",
