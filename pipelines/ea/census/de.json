@@ -3471,7 +3471,32 @@
       "effort": 5
     },
     {
-      "dates": [],
+      "dates": [
+        {
+          "date": "1925-03-29",
+          "contests": 1,
+          "note": "First round; the whole Reich voted as one constituency.",
+          "source": "sj-reich-1932"
+        },
+        {
+          "date": "1925-04-26",
+          "contests": 1,
+          "note": "Second round.",
+          "source": "sj-reich-1932"
+        },
+        {
+          "date": "1932-03-13",
+          "contests": 1,
+          "note": "First round.",
+          "source": "sj-reich-1932"
+        },
+        {
+          "date": "1932-04-10",
+          "contests": 1,
+          "note": "Second round.",
+          "source": "sj-reich-1932"
+        }
+      ],
       "key": "reichspraesident",
       "tier": "reich",
       "name": "Wahl des Reichspräsidenten",
@@ -3504,7 +3529,25 @@
       "effort": 3
     },
     {
-      "dates": [],
+      "dates": [
+        {
+          "date": "1926-06-20",
+          "contests": 1,
+          "note": "Referendum on the expropriation of the princes.",
+          "source": "sj-reich-1930"
+        },
+        {
+          "date": "1929-12-22",
+          "contests": 1,
+          "note": "Referendum on the Law against the Enslavement of the German People (Young Plan).",
+          "source": "sj-reich-1930"
+        },
+        {
+          "date": "1933-11-12",
+          "through": "1938-04-10",
+          "note": "Three plebiscites: 12 November 1933 (withdrawal from the League of Nations), 19 August 1934 (merging the offices of president and chancellor), and 10 April 1938 (the Anschluss of Austria). Not yet counted from an official table."
+        }
+      ],
       "key": "reich_volksentscheid",
       "tier": "reich",
       "name": "Volksentscheide im Deutschen Reich",
