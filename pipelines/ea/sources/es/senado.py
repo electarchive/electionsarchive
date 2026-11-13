@@ -327,6 +327,15 @@ def emit() -> Path:
             cs.add(
                 "scheme", code="es.isla", polity_id=spain, kind="electoral_district", rank=3, noun="island constituency"
             )
+        if conn.execute("select 1 from boundary_set where scheme_code = 'es.isla'").fetchone() is None:
+            cs.add(
+                "boundary_set",
+                scheme_code="es.isla",
+                vintage="2025",
+                valid_from=None,
+                valid_to=None,
+                as_of=date(2025, 1, 1),
+            )
         for code, label in sorted(island_names.items()):
             area = cs.area("es.isla", code)
             if area not in cs.minted:
@@ -676,26 +685,24 @@ def emit() -> Path:
         print(f"{contests} contests, {elected_total} senators elected")
         print(f"the candidate file's elected flags differ in {len(relabeled)} contests: {relabeled}")
         print(f"the most-voted candidates are not the elected ones in {len(mismatched)} contests: {mismatched}")
-        cs.frame(
-            "reporting_unit",
-            pl.DataFrame(
-                [
-                    {
-                        "id": str(unit),
-                        "polity_id": str(spain),
-                        "scheme_code": scheme,
-                        "code": code,
-                        "parent_id": None if parent is None else str(parent),
-                        "area_relation": relation,
-                        "area_id": None if area is None else str(area),
-                        "kind": kind,
-                    }
-                    for unit, scheme, code, parent, relation, area, kind in unit_rows.values()
-                    if unit in cs.minted
-                ],
-                schema_overrides={"parent_id": pl.String, "area_id": pl.String},
-            ),
-        )
+        units = [
+            {
+                "id": str(unit),
+                "polity_id": str(spain),
+                "scheme_code": scheme,
+                "code": code,
+                "parent_id": None if parent is None else str(parent),
+                "area_relation": relation,
+                "area_id": None if area is None else str(area),
+                "kind": kind,
+            }
+            for unit, scheme, code, parent, relation, area, kind in unit_rows.values()
+            if unit in cs.minted
+        ]
+        if units:
+            cs.frame(
+                "reporting_unit", pl.DataFrame(units, schema_overrides={"parent_id": pl.String, "area_id": pl.String})
+            )
         cs.frame(
             "result_value",
             pl.DataFrame(
