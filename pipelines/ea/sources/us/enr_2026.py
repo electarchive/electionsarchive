@@ -2172,13 +2172,6 @@ def partition(sums: dict[tuple[UUID, UUID, int], int]) -> dict[tuple[UUID, UUID,
     return kept
 
 
-def totals(sums: dict[tuple[UUID, UUID, int], int]) -> dict[tuple[UUID, UUID], int]:
-    kept: dict[tuple[UUID, UUID], int] = {}
-    for (unit, option, _), votes in sums.items():
-        kept[(unit, option)] = kept.get((unit, option), 0) + votes
-    return kept
-
-
 def emit():
     frame = pl.read_parquet(PARSED / "results.parquet").filter(pl.col("scope") == "")
     pages = json.loads((PARSED / "pages.json").read_text())
@@ -2199,8 +2192,7 @@ def emit():
 
         tallies, unmatched = plan(conn, frame, scatter)
         sources: dict[str, UUID] = {}
-        for state, contest_key, contest, split, reporting, stamp in tallies:
-            sums = totals(split)
+        for state, contest_key, contest, sums, reporting, stamp in tallies:
             election = conn.execute("select election_id from contest where id = %s", [contest]).fetchone()[0]
             if state not in sources:
                 publisher, site, _ = OFFICIAL[state]
@@ -2236,9 +2228,9 @@ def emit():
                 and (
                     frames[0][3] > as_of
                     or {
-                        (unit, option): int(value)
-                        for unit, option, value in conn.execute(
-                            """select u.id, o.id, v.value from result_value v join reporting_unit u on u.k = v.unit_k
+                        (unit, option, channel): int(value)
+                        for unit, option, channel, value in conn.execute(
+                            """select u.id, o.id, v.channel, v.value from result_value v join reporting_unit u on u.k = v.unit_k
                            join contest_option o on o.k = v.option_k where v.result_set_k = %s and v.measure = 1""",
                             [frames[0][1]],
                         ).fetchall()
@@ -2285,13 +2277,13 @@ def emit():
                 completeness=reporting[0] / reporting[1] if reporting[1] else None,
             )
             cs.add("note", entity_id=result_set, kind="methodology", body_md=NOTE)
-            for (unit, option), votes in sums.items():
+            for (unit, option, channel), votes in sums.items():
                 cs.add(
                     "result_value",
                     result_set_id=result_set,
                     unit_id=unit,
                     option_id=option,
-                    channel=0,
+                    channel=channel,
                     measure=1,
                     count_round=0,
                     flags=0,
