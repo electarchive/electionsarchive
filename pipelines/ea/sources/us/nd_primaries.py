@@ -40,6 +40,17 @@ ERRATA = {
     (1914, "democratic", "M. F. Hegge"),
     (1914, "democratic", "Scott Cameron"),
     (1914, "democratic", "Sam A. Hall"),
+    (1916, "republican", "A. T. Kraabel"),
+    (1916, "republican", "Oscar J. Sorlie"),
+    (1916, "republican", "Thomas Hall"),
+    (1916, "republican", "Carl O. Jorgenson"),
+    (1916, "republican", "Carl R. Kositzky"),
+    (1916, "republican", "M. P. Johnson"),
+    (1916, "republican", "W. H. Mann"),
+    (1916, "democratic", "G. S. Wooledge"),
+    (1916, "democratic", "John Harvey"),
+    (1916, "democratic", "Charles Hein"),
+    (1916, "socialist", "John Fleckten"),
 }
 
 
@@ -136,7 +147,7 @@ def emit() -> Path:
                from candidacy cd
                join contest_option o on o.id = cd.option_id
                join external_id x on x.entity_id = o.contest_id and x.scheme = 'us.contest'
-                    and x.value ~ '^\\d{4}-\\d\\d-\\d\\d:ND:[a-z-]+$' and x.value !~ ':house'
+                    and x.value ~ '^\\d{4}-\\d\\d-\\d\\d:ND:[a-z-]+(:[a-z]+)?$' and x.value !~ ':house'
                join name n on n.entity_id = cd.person_id and n.is_preferred group by 1, 2"""
         ).fetchall():
             if text.split():
