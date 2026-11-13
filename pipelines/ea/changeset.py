@@ -15,7 +15,7 @@ from psycopg import sql
 
 from ea.checks import FACTS, KEYS
 from ea.raw import Artifact
-from ea.store import DATA, Connection
+from ea.store import DATA, Connection, checkout
 
 NAMESPACE = uuid5(NAMESPACE_URL, "https://electionsarchive.com/")
 CHUNK = 200_000
@@ -155,6 +155,7 @@ class Changeset:
             "kind": kind,
             "summary": summary,
             "scope": {"polity": polity},
+            "emitted_by": checkout(),
         }
         self.rows: dict[str, list[dict[str, object]]] = {}
         self.frames: dict[str, list[pl.DataFrame]] = {}

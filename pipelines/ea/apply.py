@@ -12,7 +12,7 @@ from psycopg.types.json import Jsonb
 
 from ea import checks, coverage_tables, covers, search, touched
 from ea.checks import FACTS, KEYS, Stage
-from ea.store import DATA, Connection, connect
+from ea.store import DATA, Connection, connect, provenance
 
 MERGE_LOCK = 1700949316
 DERIVED_IDS = {"name", "note", "label", "citation", "flag", "ballot_question_text"}
@@ -2064,6 +2064,7 @@ def publish(conn: Connection, changeset_id: str, reviewer: str | None = None) ->
     ).fetchone()
     if us is not None and us[0]:
         coverage_tables.request()
+    provenance("publish", changeset_id, "published")
 
 
 def revert(conn: Connection, changeset_id: str, reason: str, reviewer: str | None = None) -> None:
@@ -2436,6 +2437,12 @@ def revert(conn: Connection, changeset_id: str, reason: str, reviewer: str | Non
 
 
 def apply(folder: Path) -> str:
+    status = _apply(folder)
+    provenance("apply", json.loads((folder / "manifest.json").read_text())["id"], status)
+    return status
+
+
+def _apply(folder: Path) -> str:
     manifest = json.loads((folder / "manifest.json").read_text())
     changeset_id: str = manifest["id"]
     tables: list[str] = manifest["tables"]
