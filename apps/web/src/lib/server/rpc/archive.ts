@@ -1050,6 +1050,9 @@ const datedRunning = new Map<
   Promise<{ label: string; short: string | null }>
 >();
 
+const DATED_CHUNKS = 4;
+const DATED_CHUNK_MIN = 300;
+
 const datedTogether = together(
   async (
     asks: Array<{
@@ -1102,8 +1105,6 @@ const datedTogether = together(
       await Promise.all(waits);
       return (at: number) => lookup(asks[at]?.historical ?? false);
     }
-    const ids = [...new Set(unique.map((pair) => pair.id))];
-    const withHistory = unique.some((pair) => pair.h);
     const finished = Promise.withResolvers<void>();
     const keys = unique.map((pair) => ({
       slot: `${scope}${pair.h}|${pair.id}|${pair.on ?? ""}`,
@@ -1121,15 +1122,18 @@ const datedTogether = together(
       settled.catch(() => {});
       datedRunning.set(slot, settled);
     }
-    const query = db.execute<{
-      entity_id: string;
-      historical: boolean;
-      on: string | null;
-      kind: string;
-      text: string;
-    }>(sql`
+    const ask = (chunk: typeof unique) => {
+      const ids = [...new Set(chunk.map((pair) => pair.id))];
+      const withHistory = chunk.some((pair) => pair.h);
+      return db.execute<{
+        entity_id: string;
+        historical: boolean;
+        on: string | null;
+        kind: string;
+        text: string;
+      }>(sql`
       with p as (
-        select * from unnest(${sql.param(unique.map((pair) => pair.id))}::uuid[], ${sql.param(unique.map((pair) => pair.on))}::date[], ${sql.param(unique.map((pair) => pair.h))}::boolean[]) p(entity_id, on_date, h)
+        select * from unnest(${sql.param(chunk.map((pair) => pair.id))}::uuid[], ${sql.param(chunk.map((pair) => pair.on))}::date[], ${sql.param(chunk.map((pair) => pair.h))}::boolean[]) p(entity_id, on_date, h)
       ),
       c as materialized (
         select id, entity_id, kind, text, lang, script, valid, is_preferred, recorded_from
@@ -1185,12 +1189,27 @@ const datedTogether = together(
       where p.entity_id = any(array(select entity_id from c where kind in ('short', 'abbreviation')))
         and short.text is not null
     `);
-    const result = await query.catch((error: unknown) => {
-      release();
-      finished.reject(error);
-      throw error;
-    });
-    for (const row of result.rows) {
+    };
+    const byId = Map.groupBy(unique, (pair) => pair.id);
+    const size = Math.max(
+      DATED_CHUNK_MIN,
+      Math.ceil(unique.length / DATED_CHUNKS),
+    );
+    const chunks: Array<typeof unique> = [[]];
+    for (const pairs of byId.values()) {
+      if ((chunks.at(-1)?.length ?? 0) >= size) {
+        chunks.push([]);
+      }
+      chunks.at(-1)?.push(...pairs);
+    }
+    const results = await Promise.all(chunks.map(ask)).catch(
+      (error: unknown) => {
+        release();
+        finished.reject(error);
+        throw error;
+      },
+    );
+    for (const row of results.flatMap((result) => result.rows)) {
       const key = `${row.historical}|${row.entity_id}|${row.on ?? ""}`;
       const entry = found.get(key) ?? { label: "", short: null };
       if (row.kind === "abbreviation") {
