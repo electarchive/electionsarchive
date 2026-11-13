@@ -15,6 +15,7 @@ import httpx
 from ea.sources.us import (
     alameda_rov_live,
     as_live,
+    ballots,
     civicapi,
     clarity_local_live,
     county_live,
@@ -96,6 +97,10 @@ def sync() -> str:
 def poll(feed: str, adapter: str, params: dict[str, str], client: httpx.Client) -> str:
     fetched_at = datetime.now(UTC)
     pages: dict[str, tuple[bytes, str]] = {}
+    if adapter == "us.ballots":
+        pages = ballots.collect(client)
+        with connect() as conn:
+            return ballots.poll(conn, feed, pages, fetched_at, RAW / feed / f"{fetched_at:%Y%m%dT%H%M%SZ}")
     if adapter == "us.enr_2026":
         enr_2026.collect(
             client, {params["state"]}, lambda _, url, content, suffix: pages.update({url: (content, suffix)})
