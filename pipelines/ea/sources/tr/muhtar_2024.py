@@ -13,6 +13,7 @@ from datetime import UTC, date, datetime
 from pathlib import Path
 from typing import NamedTuple
 from urllib.parse import quote
+from uuid import UUID
 
 from ea import raw
 from ea.changeset import Changeset
@@ -686,14 +687,15 @@ def emit() -> Path:
 
     codes = [row["muhtarlik_id"] for _, _, joined in plans for row in joined.values()]
     with connect() as conn:
-        names = dict(
-            conn.execute(
-                """select c.code, n.text from area a join area_code c on c.area_id = a.id
-                   join name n on n.entity_id = a.id and n.is_preferred
-                   where a.scheme_code = 'tr.mahalle' and c.code = any(%s)""",
-                [codes],
-            ).fetchall()
-        )
+        areas: dict[str, UUID] = {}
+        names: dict[str, str] = {}
+        for code, area, name in conn.execute(
+            """select e.value, a.id, n.text from area a join external_id e on e.entity_id = a.id
+               join name n on n.entity_id = a.id and n.is_preferred
+               where a.scheme_code = 'tr.mahalle' and e.scheme = 'tr.ysk.muhtarlik.2024' and e.value = any(%s)""",
+            [codes],
+        ).fetchall():
+            areas[code], names[code] = area, name
         cs = Changeset(
             conn,
             pipeline=SOURCE,
@@ -731,7 +733,7 @@ def emit() -> Path:
                     election_id=election,
                     kind="office",
                     office_id=office,
-                    district_area_id=cs.area("tr.mahalle", code, DAY),
+                    district_area_id=areas[code],
                     magnitude=1,
                     round_number=1,
                     default_result_kind="counted",

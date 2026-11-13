@@ -52,7 +52,7 @@ from ea.store import DATA, connect
 
 SOURCE = "tr.ysk_sandik"
 BALLOT_BOX_DAYS = {"2014-03-30", "2019-03-31", "2024-03-31"}
-VERSION = "25"
+VERSION = "26"
 PARSED = DATA / "parsed" / SOURCE
 SITE = "https://sonuc.ysk.gov.tr"
 PUBLISHER = "Yüksek Seçim Kurulu (YSK)"
@@ -793,23 +793,32 @@ def emit() -> Path:
             for id, valid_from, valid_to in spans
         ]
         print(f"{len(earlier)} earlier muhtarlık IDs on areas with no 2024 muhtarlık, {unmatched} unmatched")
+        spans = [
+            (current[id], int(code), valid_from, valid_to)
+            for id, code, valid_from, valid_to in dated.select(
+                "muhtarlik_id", "code", "valid_from", "valid_to"
+            ).iter_rows()
+        ] + [(area, int(code), valid_from, valid_to) for area, code, valid_from, valid_to in earlier]
+        ids = pl.DataFrame(
+            [
+                (area, f"tr.ysk.muhtarlik.{year}", str(code))
+                for area, code, valid_from, valid_to in spans
+                for year, day in ysk_muhtarlik.DAYS.items()
+                if valid_from <= day and (valid_to is None or day < valid_to)
+            ],
+            schema=["entity_id", "scheme", "value"],
+            orient="row",
+        )
+        if (
+            ids.select("scheme", "value").is_duplicated().any()
+            or ids.select("scheme", "entity_id").is_duplicated().any()
+        ):
+            raise ValueError("a YSK muhtarlık ID names two areas, or an area holds two IDs, in one election")
+        cs.frame("external_id", ids)
+        print("YSK muhtarlık IDs per election:", ids.group_by("scheme").len().sort("scheme").rows())
         cs.frame(
             "area_code",
-            pl.concat(
-                [
-                    dated.select(
-                        area_id=pl.col("muhtarlik_id").replace_strict(current),
-                        code=pl.col("code").cast(pl.String),
-                        valid_from="valid_from",
-                        valid_to="valid_to",
-                    ),
-                    pl.DataFrame(
-                        earlier,
-                        schema={"area_id": pl.String, "code": pl.String, "valid_from": pl.Date, "valid_to": pl.Date},
-                        orient="row",
-                    ),
-                ]
-            ),
+            pl.DataFrame(schema={"area_id": pl.String, "code": pl.String, "valid_from": pl.Date, "valid_to": pl.Date}),
         )
         cs.add(
             "scheme",
@@ -828,12 +837,7 @@ def emit() -> Path:
         } | {(2024, id): kind for id, kind in register.select("muhtarlik_id", "kind").iter_rows()}
         spans_of: dict[str, list[tuple[date, str]]] = {}
         ends: dict[str, date | None] = {}
-        for area, code, valid_from, valid_to in [
-            (current[id], int(code), valid_from, valid_to)
-            for id, code, valid_from, valid_to in dated.select(
-                "muhtarlik_id", "code", "valid_from", "valid_to"
-            ).iter_rows()
-        ] + [(area, int(code), valid_from, valid_to) for area, code, valid_from, valid_to in earlier]:
+        for area, code, valid_from, valid_to in spans:
             for year, day in ysk_muhtarlik.DAYS.items():
                 if valid_from <= day and (valid_to is None or day < valid_to):
                     spans_of.setdefault(area, []).append((day, kind_of[(year, code)]))
@@ -900,12 +904,22 @@ def emit() -> Path:
             f"{len(memberships)} belde mahalles linked to their belde, {sum(unlinked.values())} in "
             f"{len(unlinked)} beldes with no tr.belde area open on 2024-03-31: {sorted(unlinked)}"
         )
+        coded_areas = [
+            area
+            for (area,) in conn.execute(
+                """select distinct c.area_id::text from area_code c join area a on a.id = c.area_id
+                   join changeset s on s.id = c.changeset_id
+                   where a.scheme_code = 'tr.mahalle' and s.pipeline = %s order by 1""",
+                [SOURCE],
+            ).fetchall()
+        ]
         cs.manifest["scope"] = {
             "polity": "TR",
             "replaces": {"area_parent": ["tr.oveo"]},
             "drops": {
                 table: {"areas": sorted(spans_of), "from": "2009-01-01"} for table in ("area_kind", "area_membership")
-            },
+            }
+            | {"area_code": {"areas": coded_areas, "from": "2009-01-01"}},
         }
         tuik = pl.read_csv(TUIK, separator="\t", infer_schema_length=0).filter(pl.col("tuik_code").is_not_null())
         cs.frame(
