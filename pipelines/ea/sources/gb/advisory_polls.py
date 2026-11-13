@@ -11,7 +11,7 @@ from ea.changeset import Changeset, slug
 from ea.store import connect
 
 SOURCE = "gb.advisory_polls"
-VERSION = "1"
+VERSION = "2"
 VOTES, REGISTERED, BALLOTS = 1, 2, 3
 IPSOS = (
     "https://www.ipsos.com/sites/default/files/migrations/en-uk/files/Assets/Docs/Archive/Polls/"
@@ -20,6 +20,7 @@ IPSOS = (
 BBC = "https://web.archive.org/web/20100808062848if_/http://news.bbc.co.uk/2/hi/uk_news/england/manchester/7778110.stm"
 HANSARD = "https://api.parliament.uk/historic-hansard/commons/1994/mar/22/engagements"
 WIKIPEDIA = "https://en.wikipedia.org/wiki/1994_Strathclyde_water_referendum"
+EVALUATION = "https://www.gov.scot/publications/health-board-elections-alternative-pilots-final-report-statutory-evaluation/pages/"
 SOURCES = {
     "ipsos": (
         IPSOS,
@@ -49,7 +50,36 @@ SOURCES = {
         "Wikipedia",
         "1994 Strathclyde water referendum",
     ),
+    "evaluation": (
+        f"{EVALUATION}4/",
+        ".html",
+        "official_body",
+        "Scottish Government",
+        "Health Board Elections and Alternative Pilots: Final Report, 3 Selections of Candidates (2012)",
+    ),
+    "evaluation-introduction": (
+        f"{EVALUATION}2/",
+        ".html",
+        "official_body",
+        "Scottish Government",
+        "Health Board Elections and Alternative Pilots: Final Report, 1 Introduction (2012)",
+    ),
 }
+HEALTH_DAY = date(2010, 6, 10)
+HEALTH_BOARDS = [
+    ("fife", "NHS Fife", "S12000015", 12, 60, 39761),
+    ("dumfries-and-galloway", "NHS Dumfries and Galloway", "S12000006", 10, 70, 26516),
+]
+HEALTH_CONTEXT = (
+    "One of two pilot elections under the Health Boards (Membership and Elections) (Scotland) Act 2009. Voting was "
+    "by post only, by single transferable vote, with the whole board area as one ward, and 16- and 17-year-olds "
+    "could vote. The poll closed at 4pm on 10 June 2010. The elected members joined the board's appointed members."
+)
+HEALTH_CAVEAT = (
+    "The Scottish Government's statutory evaluation gives {candidates} candidates, {seats} members elected, and "
+    "{ballots:,} ballots returned. No declaration with each candidate's votes or the names of those elected was "
+    "found, so only the ballots returned are stored."
+)
 GM_BOROUGHS = {
     "E08000001": ("Bolton", 20529, 76910),
     "E08000002": ("Bury", 16563, 64001),
@@ -162,7 +192,8 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary="Council-run advisory polls: the Strathclyde water referendum of 1994, the Edinburgh congestion "
-            "charging referendum of 2005, and the Greater Manchester congestion charge referendum of 2008",
+            "charging referendum of 2005, and the Greater Manchester congestion charge referendum of 2008; and the "
+            "ballots returned in the 2010 NHS Fife and NHS Dumfries and Galloway board elections",
             polity="GB",
         )
 
@@ -297,4 +328,85 @@ def emit() -> Path:
                             flags=0,
                             value=value,
                         )
+
+        stv = cs.key("gb.electoral_system", "stv")
+        if stv in cs.minted:
+            raise ValueError("publish gb.leap_scot first")
+        evaluation = printed("evaluation")
+        for key, label, code, seats, candidates, ballots in HEALTH_BOARDS:
+            if not {str(ballots), str(candidates)} <= evaluation:
+                raise ValueError(f"{key}: {ballots} or {candidates} is not printed in the evaluation")
+            polity = cs.key("gb.polity", f"health-board:{key}")
+            body = cs.key("gb.body", f"health-board:{key}")
+            area = cs.area("gb.counting_area", code)
+            path = f"gb/{slug(label)}"
+            if polity in cs.minted:
+                cs.add("polity", id=polity, kind="special_district", iso_code=None)
+                cs.add("polity_parent", polity_id=polity, parent_id=cs.polity("GB-SCT"))
+                cs.add("polity_territory", polity_id=polity, area_id=area)
+                name(polity, label)
+                cs.add("slug", path=path, entity_id=polity)
+            if body in cs.minted:
+                cs.add("body", id=body, polity_id=polity, kind="council")
+                name(body, f"{label} Board")
+            election = cs.key("gb.election", f"{HEALTH_DAY}:health-board:{key}")
+            cs.add(
+                "election",
+                id=election,
+                polity_id=polity,
+                kind="local",
+                date_from=HEALTH_DAY,
+                date_to=HEALTH_DAY,
+                status="held",
+            )
+            name(election, f"2010 {label} Board election")
+            election_path = f"{path}/{HEALTH_DAY}-local"
+            cs.add("slug", path=election_path, entity_id=election)
+            cs.add("note", entity_id=election, kind="context", body_md=HEALTH_CONTEXT)
+            contest = cs.key("gb.contest", f"{HEALTH_DAY}:health-board:{key}")
+            cs.add(
+                "contest",
+                id=contest,
+                election_id=election,
+                kind="body_seats",
+                body_id=body,
+                district_area_id=area,
+                magnitude=seats,
+                round_number=1,
+                electoral_system_id=stv,
+                default_result_kind="counted",
+            )
+            name(contest, f"{label} Board, 2010")
+            cs.add("slug", path=f"{election_path}/board", entity_id=contest)
+            result_set = cs.key("gb.advisory_polls.result_set", f"health-board:{key}")
+            cs.add(
+                "result_set",
+                id=result_set,
+                election_id=election,
+                contest_id=contest,
+                stage="official",
+                kind="counted",
+                status="active",
+                source_id=sources["evaluation"],
+                is_default=True,
+                completeness=1,
+            )
+            cs.add("citation", entity_id=result_set, source_id=sources["evaluation-introduction"])
+            cs.add(
+                "note",
+                entity_id=result_set,
+                kind="caveat",
+                body_md=HEALTH_CAVEAT.format(candidates=candidates, seats=seats, ballots=ballots),
+            )
+            cs.add(
+                "result_value",
+                result_set_id=result_set,
+                unit_id=cs.unit("gb.counting_area", code),
+                option_id=None,
+                channel=0,
+                measure=BALLOTS,
+                count_round=0,
+                flags=0,
+                value=ballots,
+            )
         return cs.write()
