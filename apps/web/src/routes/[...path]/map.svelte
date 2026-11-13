@@ -5204,8 +5204,9 @@
     {/if}
     {const chief = $derived(current.leader ?? rolled(current))}
     {const tally = $derived(
-      current.delegates?.first.find(([index]) => index === chief) ??
-        current.delegates?.first[0],
+      chief == null
+        ? current.delegates?.first[0]
+        : current.delegates?.first.find(([index]) => index === chief),
     )}
     {#if current.valid === 0 && (chief != null || current.declared != null)}
       <span
