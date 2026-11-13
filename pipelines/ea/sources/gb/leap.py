@@ -24,38 +24,38 @@ PAGES = DATA / "inbox" / "manual" / "MF-105"
 PAGE_YEARS = (2002, 2003, 2004, 2005)
 PAGE_CODES = {"Bedfordshire": "E10000001"}
 SCOTLAND = {
-    "Aberdeen",
-    "Aberdeenshire",
-    "Angus",
-    "Argyll and Bute",
-    "Clackmannanshire",
-    "Dumfries and Galloway",
-    "Dundee",
-    "East Ayrshire",
-    "East Dunbartonshire",
-    "East Lothian",
-    "East Renfrewshire",
-    "Edinburgh",
-    "Eilean Siar",
-    "Falkirk",
-    "Fife",
-    "Glasgow",
-    "Highland",
-    "Inverclyde",
-    "Midlothian",
-    "Moray",
-    "North Ayrshire",
-    "North Lanarkshire",
-    "Orkney",
-    "Perth and Kinross",
-    "Renfrewshire",
-    "Scottish Borders",
-    "Shetland",
-    "South Ayrshire",
-    "South Lanarkshire",
-    "Stirling",
-    "West Dunbartonshire",
-    "West Lothian",
+    "Aberdeen": "S12000033",
+    "Aberdeenshire": "S12000034",
+    "Angus": "S12000041",
+    "Argyll and Bute": "S12000035",
+    "Clackmannanshire": "S12000005",
+    "Dumfries and Galloway": "S12000006",
+    "Dundee": "S12000042",
+    "East Ayrshire": "S12000008",
+    "East Dunbartonshire": "S12000045",
+    "East Lothian": "S12000010",
+    "East Renfrewshire": "S12000011",
+    "Edinburgh": "S12000036",
+    "Eilean Siar": "S12000013",
+    "Falkirk": "S12000014",
+    "Fife": "S12000047",
+    "Glasgow": "S12000049",
+    "Highland": "S12000017",
+    "Inverclyde": "S12000018",
+    "Midlothian": "S12000019",
+    "Moray": "S12000020",
+    "North Ayrshire": "S12000021",
+    "North Lanarkshire": "S12000050",
+    "Orkney": "S12000023",
+    "Perth and Kinross": "S12000048",
+    "Renfrewshire": "S12000038",
+    "Scottish Borders": "S12000026",
+    "Shetland": "S12000027",
+    "South Ayrshire": "S12000028",
+    "South Lanarkshire": "S12000029",
+    "Stirling": "S12000030",
+    "West Dunbartonshire": "S12000039",
+    "West Lothian": "S12000040",
 }
 SITE = "https://www.andrewteale.me.uk"
 FILES = {
@@ -261,7 +261,9 @@ def parse() -> None:
             if title is None:
                 raise ValueError(f"{url}: no title")
             council = html.unescape(title.group(1))
-            if council in PAGE_CODES:
+            if council in SCOTLAND:
+                la_code = SCOTLAND[council]
+            elif council in PAGE_CODES:
                 la_code = PAGE_CODES[council]
             elif council in known:
                 codes = known[council]
@@ -271,8 +273,6 @@ def parse() -> None:
                 la_code = min(
                     choices, key=lambda code: min(abs(seen - held) for seen, value in codes.items() if value == code)
                 )
-            elif council in SCOTLAND:
-                continue
             else:
                 raise ValueError(f"{held} {council}: no council code")
             consolidated = re.search(r'id="consol">.*?<table>(.*?)</table>', page, re.DOTALL)
@@ -410,7 +410,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary=f"English and Welsh council elections {', '.join(map(str, years))} by ward, from Andrew Teale's "
+            summary=f"English, Scottish, and Welsh council elections {', '.join(map(str, years))} by ward, from Andrew Teale's "
             "Local Elections Archive Project",
             polity="GB",
         )
@@ -502,6 +502,19 @@ def emit() -> Path:
                 )
                 name(national, f"{year} local elections in England and Wales")
                 cs.add("slug", path=f"gb/{day}-local", entity_id=national)
+            national_sct = cs.key("gb.election", f"{day}:local:sct")
+            if year == 2003 and national_sct in cs.minted:
+                cs.add(
+                    "election",
+                    id=national_sct,
+                    polity_id=cs.polity("GB-SCT"),
+                    kind="local",
+                    date_from=day,
+                    date_to=day,
+                    status="held",
+                )
+                name(national_sct, f"{year} Scottish local elections")
+                cs.add("slug", path=f"gb/scotland/{day}-local", entity_id=national_sct)
             held = candidates.filter(pl.col("year") == year)
             council_wards = dict(held.group_by("la_code").agg(pl.col("ward").n_unique()).iter_rows())
             nameless = set(
@@ -571,7 +584,7 @@ def emit() -> Path:
                         "election",
                         id=election,
                         polity_id=polity,
-                        parent_id=national,
+                        parent_id=national_sct if code.startswith("S") else national,
                         kind="by_election" if code in only_by else "local",
                         date_from=day,
                         date_to=day,
