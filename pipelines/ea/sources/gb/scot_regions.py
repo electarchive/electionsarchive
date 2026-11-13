@@ -100,6 +100,21 @@ COLUMN_SYSTEM = (
     "figure exactly as printed, digits only, without thousands separators. Leave a figure null when it is not "
     "printed. Put a line such as LAB gain from IND in note. Skip page numbers and running titles."
 )
+READ_SYSTEM_1974 = (
+    "You read one spread of a printed book of the 1974 Scottish regional and district elections by Bochel and "
+    "Denver. The spread holds two printed pages, each with two columns: read each column from top to bottom, "
+    "left page first. A council heading is a title in capitals such as GRAMPIAN REGION or a district name such as "
+    "Kirkcaldy District; report it once where it appears and set council on each division to the latest heading "
+    "in reading order, null when none appears on this spread. Divisions have no names: each starts with its "
+    "number, the word Electorate and the electorate, so put the number in number and leave name as an empty "
+    "string. Candidate names are listed at the left in order, and the parties, votes, and percentages are listed "
+    "at the right in the same order; pair them line by line. Each candidate line has an optional title such as "
+    "Lord or Sir, the initials or given names, and the surname; set party to the label printed at the right "
+    "(Con, Lab, SNP, Ind, Lib, Comm, or similar). Unopposed candidates have the word Unopposed instead of votes. "
+    "Majority is the figure after Maj. and turnout the figure after Turnout, without the percent sign. Copy "
+    "names and every figure exactly as printed, digits only, without thousands separators. Leave a figure null "
+    "when it is not printed. Skip page numbers, running titles, and commentary text."
+)
 READ_SCHEMA: dict[str, object] = {
     "type": "object",
     "properties": {
@@ -220,13 +235,16 @@ def fetch() -> None:
                 capture_output=True,
             ).stdout
             image = Image.open(io.BytesIO(png))
-            middle = gutter(image)
-            for side, box in (("L", (0, 0, middle, image.height)), ("R", (middle, 0, image.width, image.height))):
-                columns[read_key(artifact.sha256, page, side)] = request(
-                    image.crop(box), COLUMN_SYSTEM, "Read the councils and divisions in this column."
-                )
+            if volume != "b1974":
+                middle = gutter(image)
+                for side, box in (("L", (0, 0, middle, image.height)), ("R", (middle, 0, image.width, image.height))):
+                    columns[read_key(artifact.sha256, page, side)] = request(
+                        image.crop(box), COLUMN_SYSTEM, "Read the councils and divisions in this column."
+                    )
             reads[read_key(artifact.sha256, page)] = request(
-                image, READ_SYSTEM, "Read the councils and divisions on this page."
+                image,
+                READ_SYSTEM_1974 if volume == "b1974" else READ_SYSTEM,
+                "Read the councils and divisions on this page.",
             )
     print(batch.ensure(SOURCE, "volumes", reads)[1])
     print(batch.ensure(SOURCE, "columns", columns)[1])
