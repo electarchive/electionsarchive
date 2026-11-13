@@ -1,3 +1,4 @@
+import io
 import re
 import subprocess
 from datetime import date, timedelta
@@ -5,9 +6,11 @@ from pathlib import Path
 from uuid import UUID
 
 import polars as pl
+from PIL import Image
 
 from ea import raw
 from ea.changeset import Changeset, slug
+from ea.sources.us import house_books
 from ea.store import DATA, Connection, connect
 
 SOURCE = "us.ms_sos"
@@ -25,6 +28,11 @@ REPORTS = {
     date(2019, 11, 5): "https://sos.ms.gov/elections/electionresults/2019General/Certified%20Results/"
     "Electoral%20Vote%20Report%20(Amended).pdf",
 }
+SCANS = {
+    date(2007, 11, 6): "https://web.archive.org/web/20080306045210id_/http://www.sos.state.ms.us/elections/2007/"
+    "Electoral%20Results/Electoral%20Vote%20Report.pdf",
+}
+PAGES = DATA / "pages" / SOURCE
 REPORT_TITLE = "Electoral Vote Assignment"
 DISTRICTS = "us.ms_house_district"
 OFFICES = {
@@ -47,7 +55,7 @@ CANDIDATE = re.compile(r"^(\S.*?)\s{2,}([A-Z][a-z]+)\s+(\d[\d\s]*)$")
 
 
 def fetch() -> None:
-    for link in [*FILES.values(), *REPORTS.values()]:
+    for link in [*FILES.values(), *REPORTS.values(), *SCANS.values()]:
         raw.fetch(SOURCE, link, suffix=".pdf")
 
 
@@ -93,22 +101,119 @@ def parse_reports() -> None:
                         "won": int(won),
                     }
                 )
-        frame = pl.DataFrame(rows).filter(pl.col("day") == day)
-        if sorted(set(frame["district"])) != list(range(1, 123)) or frame.height != 122 * len(printed):
-            raise ValueError(f"{day}: districts {frame['district'].n_unique()}, rows {frame.height}")
-        summed = frame.group_by("candidate").agg(pl.col("votes").sum(), pl.col("won").sum())
-        for candidate, votes, won in summed.iter_rows():
-            if printed[candidate] != (votes, won):
-                raise ValueError(f"{day} {candidate}: {votes} votes and {won} districts, printed {printed[candidate]}")
-        leaders = frame.with_columns(
-            top=pl.col("votes") == pl.col("votes").max().over("district"),
-        )
-        if leaders.filter(pl.col("top").cast(pl.Int64) != pl.col("won")).height:
-            raise ValueError(
-                f"{day}: a district's electoral vote is not its plurality: {leaders.filter(pl.col('top').cast(pl.Int64) != pl.col('won'))}"
-            )
+        check_report(day, pl.DataFrame(rows).filter(pl.col("day") == day), printed)
+    frame = pl.concat([pl.DataFrame(rows), parse_scans()], how="diagonal_relaxed")
     PARSED.mkdir(parents=True, exist_ok=True)
-    pl.DataFrame(rows).write_parquet(PARSED / "districts.parquet")
+    frame.write_parquet(PARSED / "districts.parquet")
+
+
+def check_report(day: date, frame: pl.DataFrame, printed: dict[str, tuple[int, int]]) -> None:
+    if sorted(set(frame["district"])) != list(range(1, 123)) or frame.height != 122 * len(printed):
+        raise ValueError(f"{day}: districts {frame['district'].n_unique()}, rows {frame.height}")
+    summed = frame.group_by("candidate").agg(pl.col("votes").sum(), pl.col("won").sum())
+    for candidate, votes, won in summed.iter_rows():
+        if printed[candidate] != (votes, won):
+            raise ValueError(f"{day} {candidate}: {votes} votes and {won} districts, printed {printed[candidate]}")
+    leaders = frame.with_columns(
+        top=pl.col("votes") == pl.col("votes").max().over("district"),
+    )
+    if leaders.filter(pl.col("top").cast(pl.Int64) != pl.col("won")).height:
+        raise ValueError(
+            f"{day}: a district's electoral vote is not its plurality: {leaders.filter(pl.col('top').cast(pl.Int64) != pl.col('won'))}"
+        )
+
+
+def parse_scans() -> pl.DataFrame:
+    rows: list[dict[str, object]] = []
+    PAGES.mkdir(parents=True, exist_ok=True)
+    line = re.compile(r"^State House Of Rep (\d{3}) ((?:[A-Z][A-Za-z.]* )+)(\S+)(?: (.*))?$")
+    total = re.compile(r"^(.+?) ([\d,]+) (\d+) \d+%$")
+    totals: dict[date, dict[str, tuple[int, int]]] = {}
+    for day, link in SCANS.items():
+        scan = raw.cached(SOURCE, link)
+        printed = totals.setdefault(day, {})
+        number = 0
+        while not printed:
+            number += 1
+            image = PAGES / f"{scan.sha256}-{number}.png"
+            if not image.exists():
+                subprocess.run(
+                    ["pdftoppm", "-r", "300", "-gray", "-png", "-f", str(number), "-l", str(number), "-singlefile"]
+                    + [str(scan.path), str(image.with_suffix(""))],
+                    check=True,
+                )
+            with Image.open(image) as rendered:
+                width, height = rendered.size
+            words = pl.read_csv(
+                io.StringIO(
+                    subprocess.run(
+                        ["tesseract", str(image), "stdout", "--psm", "6", "tsv"],
+                        capture_output=True,
+                        text=True,
+                        check=True,
+                    ).stdout
+                ),
+                separator="\t",
+                quote_char=None,
+                schema_overrides={"text": pl.String},
+            ).filter(pl.col("conf") >= 0, pl.col("text").str.strip_chars() != "")
+            lines = words.group_by("block_num", "par_num", "line_num", maintain_order=True).agg(
+                "text", "left", "top", "width", "height"
+            )
+            texts = [" ".join(cells) for cells in lines["text"]]
+            found_rows: list[tuple[re.Match[str], list[int], list[int], list[int], list[int]]] = []
+            for text, (_, _, _, _, left, top, wide, high) in zip(texts, lines.iter_rows(), strict=True):
+                if found := line.match(text):
+                    found_rows.append((found, left, top, wide, high))
+                elif (found := total.match(text)) and not text.startswith("Candidate"):
+                    printed[found[1]] = (int(found[2].replace(",", "")), int(found[3]))
+            column = [
+                (left[at], left[at] + wide[at])
+                for found, left, _, wide, _ in found_rows
+                if found[3].isdigit() and (at := 5 + len(found[2].split()))
+            ]
+            x0, x1 = min(a for a, _ in column), max(b for _, b in column)
+            for found, left, top, wide, high in found_rows:
+                at = 5 + len(found[2].split())
+                box = (left[at], top[at], left[at] + wide[at], top[at] + high[at])
+                votes = found[3]
+                if not votes.isdigit():
+                    box = (x0, top[at - 1], x1, top[at - 1] + high[at - 1])
+                    with Image.open(image) as rendered:
+                        buffer = io.BytesIO()
+                        rendered.crop((box[0] - 12, box[1] - 12, box[2] + 12, box[3] + 12)).save(buffer, "PNG")
+                    votes = (
+                        subprocess.run(
+                            ["tesseract", "stdin", "stdout", "--psm", "7", "-c", "tessedit_char_whitelist=0123456789"],
+                            input=buffer.getvalue(),
+                            capture_output=True,
+                            check=True,
+                        )
+                        .stdout.decode()
+                        .strip()
+                    )
+                rows.append(
+                    {
+                        "day": day,
+                        "district": int(found[1]),
+                        "candidate": found[2].strip(),
+                        "votes": int(votes),
+                        "read": {"1": 1, "l": 1, "I": 1, "|": 1, "0": 0, "O": 0}.get(found[4] or ""),
+                        "page": number,
+                        "x0": box[0] / width,
+                        "y0": box[1] / height,
+                        "x1": box[2] / width,
+                        "y1": box[3] / height,
+                    }
+                )
+    frame = pl.DataFrame(rows).with_columns(
+        won=(pl.col("votes") == pl.col("votes").max().over("day", "district")).cast(pl.Int64)
+    )
+    if (wrong := frame.filter(pl.col("read").is_not_null() & (pl.col("read") != pl.col("won")))).height:
+        raise ValueError(f"a printed electoral vote is not the district's plurality: {wrong}")
+    for day, printed in totals.items():
+        check_report(day, frame.filter(pl.col("day") == day), printed)
+    return frame.drop("read")
 
 
 def parse() -> None:
@@ -205,7 +310,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Mississippi's statewide general elections of 2023 by county, and the 2015 and 2019 governor"
+            summary="Mississippi's statewide general elections of 2023 by county, and the 2007, 2015, and 2019 governor"
             " elections by House district",
             polity="US",
         )
@@ -363,6 +468,24 @@ def attach_reports(cs: Changeset, conn: Connection) -> None:
     )
     for link in REPORTS.values():
         cs.artifact(raw.cached(SOURCE, link), source)
+    pages: dict[tuple[date, int], UUID] = {}
+    for day, link in SCANS.items():
+        scan = raw.cached(SOURCE, link)
+        artifact = cs.artifact(scan, source)
+        for (number,) in frame.filter(pl.col("day") == day).select("page").unique().sort("page").iter_rows():
+            image = PAGES / f"{scan.sha256}-{number}.png"
+            with Image.open(image) as rendered:
+                width, height = rendered.size
+            pages[(day, number)] = cs.page(artifact, number)
+            cs.add(
+                "source_page",
+                id=pages[(day, number)],
+                artifact_id=artifact,
+                page_number=number,
+                image_key=f"pages/{SOURCE}/{image.name}",
+                width=width,
+                height=height,
+            )
     ((state,),) = conn.execute(
         """select u.id from reporting_unit u
            join polity_territory t on t.area_id = u.area_id
@@ -420,15 +543,27 @@ def attach_reports(cs: Changeset, conn: Connection) -> None:
                 valid_from=day,
                 valid_to=day + timedelta(days=1),
             )
-        for candidate, district, votes in lines.select("candidate", "district", "votes").iter_rows():
-            cs.add(
-                "result_value",
-                result_set_id=result_set,
-                unit_id=cs.unit(DISTRICTS, f"{day.year}-{district:03d}"),
-                option_id=options[re.sub(r"[^a-z]", "", candidate.split()[-1].lower())],
-                channel=0,
-                measure=1,
-                count_round=0,
-                flags=0,
-                value=votes,
-            )
+        for candidate, district, votes, number, *box in lines.select(
+            "candidate", "district", "votes", "page", "x0", "y0", "x1", "y1"
+        ).iter_rows():
+            fact = {
+                "result_set_id": result_set,
+                "unit_id": cs.unit(DISTRICTS, f"{day.year}-{district:03d}"),
+                "option_id": options[re.sub(r"[^a-z]", "", candidate.split()[-1].lower())],
+                "channel": 0,
+                "measure": 1,
+                "count_round": 0,
+            }
+            cs.add("result_value", **fact, flags=0 if number is None else house_books.DIGITIZED, value=votes)
+            if number is not None:
+                x0, y0, x1, y1 = box
+                cs.add(
+                    "value_locator",
+                    **fact,
+                    page_id=pages[(day, number)],
+                    source_id=None,
+                    x0=x0,
+                    y0=y0,
+                    x1=x1,
+                    y1=y1,
+                )
