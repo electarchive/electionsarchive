@@ -913,6 +913,20 @@ def emit() -> Path:
                 " where c.pipeline = 'gb.mnis' and n.is_preferred"
             ).fetchall()
         }
+        unnamed = {
+            entity
+            for (entity,) in conn.execute(
+                "select e.id from entity e join person p on p.id = e.id where e.retired_by is null"
+                " and not exists (select from name n where n.entity_id = e.id and n.is_preferred)"
+                " and e.id = any(%s)",
+                [list(survivors)],
+            ).fetchall()
+        }
+
+        def licensed(id: UUID) -> dict[str, object]:
+            row = conn.execute("select license, license_url from source where id = %s", [id]).fetchone()
+            return {} if row is None else {"license": row[0], "license_url": row[1]}
+
         cautions: dict[UUID, list[tuple[UUID, str]]] = {}
         for id, entity, text in conn.execute(
             "select n.id, n.entity_id, n.body_md from note n join changeset c on c.id = n.changeset_id"
@@ -1032,7 +1046,15 @@ def emit() -> Path:
         printed_sources = {}
         for tag, (publisher, title, url) in PRINTED.items():
             printed_sources[tag] = cs.source(publisher, title)
-            cs.add("source", id=printed_sources[tag], kind="official_body", publisher=publisher, title=title, url=url)
+            cs.add(
+                "source",
+                id=printed_sources[tag],
+                kind="official_body",
+                publisher=publisher,
+                title=title,
+                url=url,
+                **licensed(printed_sources[tag]),
+            )
             cs.artifact(raw.cached(SOURCE, url), printed_sources[tag])
 
         old = cs.area("gb.nation", "GBI")
@@ -1132,6 +1154,7 @@ def emit() -> Path:
                         publisher="Electoral Commission",
                         title="Register of political parties: Reform UK (PP7931)",
                         url=REFORM_PAGE,
+                        **licensed(registered),
                         notes="Registered on 5 February 2019 as The Brexit Party; the change of name to Reform UK was "
                         "authorized on 6 January 2021.",
                     )
@@ -1488,13 +1511,13 @@ def emit() -> Path:
                             )
                         if persons[identity] in cs.minted or (
                             persons[identity] in named
-                            and persons[identity] not in survivors
+                            and (persons[identity] not in survivors or persons[identity] in unnamed)
                             and persons[identity] not in sitting
                         ):
                             name(persons[identity], full)
                         if (
                             persons[identity] in restaged
-                            or persons[identity] in survivors
+                            or (persons[identity] in survivors and persons[identity] not in unnamed)
                             or persons[identity] in sitting
                         ):
                             stale = []
@@ -1513,6 +1536,7 @@ def emit() -> Path:
                                     is_preferred=False,
                                     valid_from=None,
                                 )
+                        unnamed.discard(persons[identity])
                     printed, relabel, cited = RELABELED.get(
                         (start, unit_code, line["candidate"]), (line["party"], None, False)
                     )
@@ -1651,6 +1675,7 @@ def emit() -> Path:
                 publisher="Electoral Commission",
                 title="Register of political parties: Scottish Unionist Party (PP120)",
                 url=REGISTER_PAGE,
+                **licensed(register),
                 notes="Registered on 28 June 2000 and deregistered on 6 November 2009; fielded candidates in Scotland.",
             )
             cs.artifact(raw.cached(SOURCE, REGISTER), register)
