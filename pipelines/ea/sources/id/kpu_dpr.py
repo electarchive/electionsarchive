@@ -1,12 +1,17 @@
+import base64
 import html
+import io
 import re
 import subprocess
 from pathlib import Path
 
 import httpx
 import polars as pl
+from anthropic.types import ImageBlockParam, TextBlockParam
+from anthropic.types.message_create_params import MessageCreateParamsNonStreaming
+from PIL import Image
 
-from ea import raw
+from ea import batch, raw
 from ea.store import DATA
 
 SOURCE = "id.kpu_dpr"
@@ -80,6 +85,92 @@ def fetch() -> None:
         raw.fetch(SOURCE, url, suffix=".pdf")
     for url in SCANS.values():
         raw.fetch(SOURCE, url, suffix=".pdf")
+    transcribe()
+
+
+MODEL = "claude-haiku-5-5"
+SYSTEM = (
+    "You transcribe scanned Indonesian election certificates (Model DD1-DPR) exactly. Copy every printed table row "
+    "in order, including section headers, party rows, candidate rows, and total rows. Numbers use a period as the "
+    "thousands separator; copy them digit for digit without separators. Leave a cell empty when it is blank or "
+    "struck through. Never compute or guess a figure."
+)
+SCHEMA: dict[str, object] = {
+    "type": "object",
+    "properties": {
+        "dapil": {"type": "string"},
+        "columns": {"type": "array", "items": {"type": "string"}},
+        "rows": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "number": {"type": "string"},
+                    "label": {"type": "string"},
+                    "sex": {"type": "string"},
+                    "cells": {"type": "array", "items": {"type": "string"}},
+                },
+                "required": ["number", "label", "sex", "cells"],
+                "additionalProperties": False,
+            },
+        },
+    },
+    "required": ["dapil", "columns", "rows"],
+    "additionalProperties": False,
+}
+TEXT = (
+    "Transcribe this certificate page. `columns` are the unit names across the top (regencies or cities) in order, "
+    "then JUMLAH AKHIR. For each row give the printed number (party ballot number, candidate list number, or empty), "
+    "the label (party or candidate name, or the row's text), the sex column (LK, PR, JML, or empty), and one cell "
+    "per column in the same order as `columns`."
+)
+
+
+def _scan_pages(dapil: str) -> list[Path]:
+    folder = PARSED / "scans" / re.sub(r"\W+", "_", dapil.lower())
+    if not folder.exists():
+        folder.mkdir(parents=True)
+        subprocess.run(
+            ["pdftoppm", "-r", "200", "-gray", "-png", str(_path(SCANS[dapil])), str(folder / "p")], check=True
+        )
+    return sorted(folder.glob("p-*.png"))
+
+
+def transcribe() -> None:
+    price_in, price_out = batch.PRICES[MODEL]
+    wanted: dict[str, batch.Want] = {}
+    for dapil in SCANS:
+        for page in _scan_pages(dapil):
+            image = Image.open(page)
+            image.thumbnail((2400, 2400))
+            buffer = io.BytesIO()
+            image.save(buffer, "PNG")
+            wanted[f"{dapil}/{page.stem}"] = (
+                MessageCreateParamsNonStreaming(
+                    model=MODEL,
+                    max_tokens=16000,
+                    system=SYSTEM,
+                    messages=[
+                        {
+                            "role": "user",
+                            "content": [
+                                ImageBlockParam(
+                                    type="image",
+                                    source={
+                                        "type": "base64",
+                                        "media_type": "image/png",
+                                        "data": base64.b64encode(buffer.getvalue()).decode(),
+                                    },
+                                ),
+                                TextBlockParam(type="text", text=TEXT),
+                            ],
+                        }
+                    ],
+                    output_config={"effort": "low", "format": {"type": "json_schema", "schema": SCHEMA}},
+                ),
+                (image.width * image.height / 750 * price_in + 8000 * price_out) / 1e6,
+            )
+    print(batch.ensure(SOURCE, "scans", wanted)[1])
 
 
 MEASURES = {
