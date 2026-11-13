@@ -286,7 +286,8 @@ def emit() -> Path:
         cs.add("area_code", area_id=nation, code="ES", valid_from=None)
         name(nation, "Spain", "en")
         name(nation, "España", "es", "native")
-        cs.add("polity_territory", polity_id=spain, area_id=nation)
+        if conn.execute("select 1 from polity_territory where polity_id = %s", [spain]).fetchone() is None:
+            cs.add("polity_territory", polity_id=spain, area_id=nation)
         geometry(nation, layers["nation"]["geom"][0], None)
 
         ids: dict[tuple[str, str], UUID] = {("nation", "ES"): nation}
