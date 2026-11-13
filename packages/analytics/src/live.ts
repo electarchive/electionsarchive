@@ -176,6 +176,7 @@ const MODEL = {
     grace: 1,
     pace: 13,
     hold: 0.01,
+    firm: 0.5,
   },
   late: {
     prior: 0.1,
@@ -1162,6 +1163,13 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
         ) / latest
       : 0;
   const tailWeight = Math.min(1, tail / MODEL.tail.share);
+  const held =
+    isLate && onNight > 0 && latest > 0
+      ? Math.max(
+          0,
+          MODEL.tail.hold * tailWeight * onNight - (latest - onNight),
+        ) / latest
+      : 0;
   const planned = Math.max(
     Math.min(
       tail *
@@ -1172,12 +1180,7 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
         ? Infinity
         : Math.max(0, tail * onNight - (latest - onNight)) / latest,
     ),
-    isLate && onNight > 0 && latest > 0
-      ? Math.max(
-          0,
-          MODEL.tail.hold * tailWeight * onNight - (latest - onNight),
-        ) / latest
-      : 0,
+    held,
   );
   const complete =
     isLate &&
@@ -1485,7 +1488,12 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
     const shift = MODEL.shift * gaussian(random);
     const mode = modeScale * gaussian(random);
     const amount = isTail ? MODEL.late.amount : MODEL.tail.spread;
-    const later = left * Math.exp(amount * gaussian(random) - amount ** 2 / 2);
+    const firm = amount - (amount - MODEL.tail.firm) * tailWeight ** 2;
+    const kept = isTail ? Math.min(left, held) : 0;
+    const deviate = gaussian(random);
+    const later =
+      kept * Math.exp(firm * deviate - firm ** 2 / 2) +
+      (left - kept) * Math.exp(amount * deviate - amount ** 2 / 2);
     const tilt =
       (learned?.mean ?? 0) +
       (learned?.sd ?? MODEL.tail.lean) * gaussian(random);
