@@ -36,6 +36,23 @@ def last_weekday(month: int, weekday: int) -> Callable[[int], date]:
     return day
 
 
+def easter(year: int) -> date:
+    a, b, c = year % 19, year // 100, year % 100
+    d, e = b // 4, b % 4
+    g = (8 * b + 13) // 25
+    h = (19 * a + b - d - g + 15) % 30
+    i, k = c // 4, c % 4
+    m = (32 + 2 * e + 2 * i - h - k) % 7
+    n = (a + 11 * h + 22 * m) // 451
+    month, day = divmod(h + m - 7 * n + 114, 31)
+    return date(year, month, day + 1)
+
+
+def apr_last_sunday_unless_easter(year: int) -> date:
+    when = last_weekday(4, 6)(year)
+    return nth_weekday(5, 6, 1)(year) if when == easter(year) else when
+
+
 DAY_RULES = {
     "nov_tuesday_after_first_monday": tuesday_after_first_monday(11),
     "mar_second_tuesday": nth_weekday(3, 1, 2),
@@ -50,6 +67,10 @@ DAY_RULES = {
     "oct_third_saturday": nth_weekday(10, 5, 3),
     "nov_first_monday": nth_weekday(11, 0, 1),
     "nov_first_sunday": nth_weekday(11, 6, 1),
+    "oct_second_last_sunday": lambda year: last_weekday(10, 6)(year) - timedelta(days=7),
+    "mar_first_sunday": nth_weekday(3, 6, 1),
+    "may_first_sunday": nth_weekday(5, 6, 1),
+    "apr_last_sunday_unless_easter": apr_last_sunday_unless_easter,
 }
 
 
