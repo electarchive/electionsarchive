@@ -33,6 +33,7 @@
     columnGoal,
     STRICT,
   } from "#lib/coverage.js";
+  import Classes from "#routes/coverage/classes.svelte";
   import Share from "#routes/coverage/share.svelte";
   import Tone from "#routes/coverage/tone.svelte";
 
@@ -1457,6 +1458,24 @@
         </div>
       </section>
     {/each}
+
+    {#if !isUs && data.classes.length > 0}
+      <section
+        aria-labelledby="coverage-classes"
+        class="grid gap-3 bg-card px-3.5 pbs-4 pbe-4"
+      >
+        <hgroup class="grid gap-1">
+          <h2 id="coverage-classes" class="text-lg font-bold">
+            {m.coverage_classes()}
+          </h2>
+          <p class="text-sm text-muted-foreground max-inline-[72ch]">
+            {m.coverage_classes_hint()}
+            {m.coverage_classes_legend()}
+          </p>
+        </hgroup>
+        <Classes classes={data.classes} />
+      </section>
+    {/if}
 
     {#if data.tiers.length > 0}
       <section aria-labelledby="coverage-where" class="grid gap-px bg-border">

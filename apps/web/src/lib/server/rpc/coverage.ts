@@ -311,6 +311,75 @@ async function summaries(polity: string | null) {
   return found.rows;
 }
 
+const STATUSES = ["held", "queued", "blocked", "out_of_scope", "open"] as const;
+const CensusClass = v.object({
+  key: v.string(),
+  name: v.string(),
+  tier: v.string(),
+  tierName: v.string(),
+  category: v.string(),
+  goal: v.string(),
+  from: v.nullable(v.number()),
+  to: v.nullable(v.number()),
+  status: v.picklist(STATUSES),
+  reason: v.nullable(v.string()),
+  share: v.nullable(v.number()),
+  next: v.nullable(v.string()),
+});
+type ClassRow = v.InferOutput<typeof CensusClass>;
+
+async function censusClasses(polity: string | null) {
+  const found = await db.execute<
+    Omit<ClassRow, "status"> & {
+      polity: string;
+      disposition: "blocked" | "out_of_scope" | null;
+      held: boolean;
+      queued: boolean;
+    }
+  >(sql`
+    with recursive depth as (
+      select t.id, 0 as depth from census_tier t where t.parent_tier_id is null
+      union all
+      select t.id, d.depth + 1 from census_tier t join depth d on t.parent_tier_id = d.id
+    )
+    select lower(p.iso_code) as polity, k.key, coalesce(k.name_en, k.name) as name, t.key as tier,
+      coalesce(t.name_en, t.name) as "tierName", k.category::text as category, k.goal,
+      extract(year from k.valid_from)::int as "from", extract(year from k.valid_to)::int as "to",
+      k.disposition::text as disposition, k.disposition_reason as reason,
+      exists (
+        select 1 from contest_class cc join contest c on c.id = cc.contest_id join election e on e.id = c.election_id
+        where cc.class_id = k.id and not c.notional and e.status <> 'scheduled' and e.date_from <= current_date
+      ) as held,
+      (select sum(g.complete)::float8 / nullif(sum(g.total), 0) from coverage_goal g
+        where g.polity = lower(p.iso_code) and g.goal = k.goal and g.level = k.key) as share,
+      least(
+        (select min(d.date) from census_date d where d.class_id = k.id and d.date > current_date),
+        (select min(e.date_from) from contest_class cc join contest c on c.id = cc.contest_id join election e on e.id = c.election_id
+          where cc.class_id = k.id and e.date_from > current_date)
+      )::text as next,
+      exists (
+        select 1 from coverage_polity cp cross join jsonb_array_elements(cp.classes) x
+        where cp.polity = lower(p.iso_code) and x ->> 'key' = k.key and x ->> 'status' = 'queued'
+      ) as queued
+    from census_class k
+    join census_tier t on t.id = k.tier_id
+    join depth d on d.id = t.id
+    join polity p on p.id = k.polity_id
+    where ${polity}::text is null or p.iso_code = upper(${polity})
+    order by polity, d.depth, t.key, k.valid_to is not null, k.key
+  `);
+  return found.rows.map(
+    ({ polity, disposition, held, queued, ...row }): [string, ClassRow] => [
+      polity,
+      {
+        ...row,
+        status: held ? "held" : (disposition ?? (queued ? "queued" : "open")),
+        reason: held ? null : row.reason,
+      },
+    ],
+  );
+}
+
 function tightestHalf(sorted: Array<[number, number]>) {
   let total = 0;
   for (const [, count] of sorted) {
@@ -339,7 +408,7 @@ export const coverage = {
         method: "GET",
         path: "/coverage",
         summary:
-          "Coverage of every country the archive holds: its span, elections, contests, finest reporting unit, and how far each tier (national, regional, and local elections, referendums, and the European Parliament; for the US federal, statewide, state legislative, and local contests since 2000) is counted, as the share of races with results at each race's own constituency or district (US local governments: election years with any results); a race still to vote counts once it is in the archive with its candidates or options in full (upcoming), and once its date passes it needs results",
+          "Coverage of every country the archive holds: its span, elections, contests, finest reporting unit, and how far each tier (national, regional, and local elections, referendums, and the European Parliament; for the US federal, statewide, state legislative, and local contests since 2000) is counted, as the share of races with results at each race's own constituency or district (US local governments: election years with any results); a race still to vote counts once it is in the archive with its candidates or options in full (upcoming), and once its date passes it needs results; each country also lists its census classes of election (by tier, with status: held, queued, blocked, out of scope, or open; the reason for blocked and out-of-scope classes; the share counted; and the next scheduled date)",
       }),
     )
     .output(
@@ -359,6 +428,7 @@ export const coverage = {
             ...v.omit(Summary, ["regions", "levels", "notes", "sources"])
               .entries,
             uncounted: v.number(),
+            classes: v.array(CensusClass),
             tiers: v.array(
               v.object({ key: v.string(), cell: v.nullable(v.object(counts)) }),
             ),
@@ -367,7 +437,7 @@ export const coverage = {
       }),
     )
     .handler(async ({ input }) => {
-      const [status, polities, totals] = await Promise.all([
+      const [status, polities, totals, classes] = await Promise.all([
         build(),
         summaries(null),
         db.execute<{
@@ -381,6 +451,7 @@ export const coverage = {
           from election e join contest c on c.election_id = e.id
           where e.date_from >= '1700-01-01' and e.date_from <= current_date and e.status <> 'scheduled' and not c.notional
         `),
+        censusClasses(null),
       ]);
       const found = await db.execute<{ polity: string } & Row>(sql`
         select g.polity, g.goal, g.level, case when g.year < 2000 then 'before' when g.year < 2016 then 'mid' else 'late' end as era, array_agg(distinct g.year order by g.year) as years,
@@ -406,6 +477,9 @@ export const coverage = {
           contests: polity.contests,
           finest: polity.finest,
           finestNoun: polity.finestNoun,
+          classes: classes.flatMap(([key, row]) =>
+            key === polity.polity ? [row] : [],
+          ),
           uncounted: polity.notes.filter(
             (note) =>
               note.category == null &&
@@ -451,7 +525,7 @@ export const coverage = {
         method: "GET",
         path: "/coverage/{polity}",
         summary:
-          "One country's coverage by tier (polity is a lowercase ISO code, or eu): national, regional, and local elections, referendums, and the European Parliament (for the US: federal, statewide, state legislative, local, and turnout), each with counts at every grain (any results, by constituency or county, finer, and map shapes; for the US split before 2000 and from 2000, with precinct results split into 2000–2015 and 2016 on; precinct shapes are their own tier, counting each precinct once per state and year, deduplicated across sources, with the target from 2016) for the tier and for each kind of election in it, plus the cited sources of the denominators and what is left uncounted; complete includes upcoming, the races still to vote that the archive holds with their candidates or options in full, and pending counts those still short of them",
+          "One country's coverage by tier (polity is a lowercase ISO code, or eu): national, regional, and local elections, referendums, and the European Parliament (for the US: federal, statewide, state legislative, local, and turnout), each with counts at every grain (any results, by constituency or county, finer, and map shapes; for the US split before 2000 and from 2000, with precinct results split into 2000–2015 and 2016 on; precinct shapes are their own tier, counting each precinct once per state and year, deduplicated across sources, with the target from 2016) for the tier and for each kind of election in it, plus the cited sources of the denominators and what is left uncounted; complete includes upcoming, the races still to vote that the archive holds with their candidates or options in full, and pending counts those still short of them; classes lists every census class of election by tier, including those with nothing held, with its status (held, queued, blocked, out of scope, or open), the reason for blocked and out-of-scope classes, the share counted, and the next scheduled date",
       }),
     )
     .input(v.objectAsync({ polity: Code }))
@@ -462,6 +536,7 @@ export const coverage = {
         commit: v.nullable(v.string()),
         stale: v.boolean(),
         summary: Summary,
+        classes: v.array(CensusClass),
         tiers: v.array(
           v.object({
             key: v.string(),
@@ -494,9 +569,10 @@ export const coverage = {
       }),
     )
     .handler(async ({ input }) => {
-      const [status, [summary]] = await Promise.all([
+      const [status, [summary], classes] = await Promise.all([
         build(),
         summaries(input.polity),
+        censusClasses(input.polity),
       ]);
       if (summary == null) {
         throw new ORPCError("NOT_FOUND");
@@ -583,6 +659,7 @@ export const coverage = {
       return {
         ...status,
         summary,
+        classes: classes.map(([, row]) => row),
         tiers: tiers(input.polity, found.rows, summary.levels),
         readiness,
         unshaped,

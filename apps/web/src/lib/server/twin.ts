@@ -1426,6 +1426,45 @@ function governmentsMarkdown(
   ];
 }
 
+const CLASS_STATUS = {
+  held: m.coverage_class_held,
+  queued: m.coverage_class_queued,
+  blocked: m.coverage_class_blocked,
+  out_of_scope: m.coverage_class_out_of_scope,
+  open: m.coverage_class_open,
+};
+
+function classesMarkdown(
+  classes: Extract<Data, { kind: "coverage" }>["classes"],
+  depth: string,
+) {
+  const tiers = new Map<string, Array<string>>();
+  for (const row of classes) {
+    const years =
+      row.from == null && row.to == null
+        ? ""
+        : ` (${row.from ?? ""}–${row.to ?? ""})`;
+    const parts = [
+      CLASS_STATUS[row.status](),
+      ...(row.share == null
+        ? []
+        : [m.coverage_class_counted({ share: percent(row.share, 0) })]),
+      ...(row.next == null
+        ? []
+        : [m.coverage_class_next({ date: date(row.next) })]),
+    ];
+    const lines = tiers.get(row.tierName) ?? [];
+    lines.push(
+      `- ${row.name}${years}: ${parts.join("; ")}${row.reason == null ? "" : `. ${row.reason}`}`,
+    );
+    tiers.set(row.tierName, lines);
+  }
+  return [...tiers].flatMap(([tier, lines]) => [
+    `${depth} ${tier}`,
+    lines.join("\n"),
+  ]);
+}
+
 function coverageMarkdown(
   data: Extract<Data, { kind: "coverage" }>,
   link: Link,
@@ -1827,6 +1866,13 @@ function coverageMarkdown(
         }),
       ];
     }),
+    ...(isUs || data.classes.length === 0
+      ? []
+      : [
+          `## ${m.coverage_classes()}`,
+          `${m.coverage_classes_hint()} ${m.coverage_classes_legend()}`,
+          ...classesMarkdown(data.classes, "###"),
+        ]),
     `## ${m.coverage_where()}`,
     m.coverage_column_note(),
     ...data.tiers.flatMap((tier) => {
@@ -1929,6 +1975,20 @@ function overviewMarkdown(
       ]),
     ),
     m.coverage_overview_note(),
+    ...(data.polities.some((polity) => polity.classes.length > 0)
+      ? [
+          `## ${m.coverage_classes()}`,
+          `${m.coverage_classes_overview_hint()} ${m.coverage_classes_legend()}`,
+          ...data.polities.flatMap((polity) =>
+            polity.classes.length === 0
+              ? []
+              : [
+                  `### ${link(polity.name, `coverage/${polity.polity}`)}`,
+                  ...classesMarkdown(polity.classes, "####"),
+                ],
+          ),
+        ]
+      : []),
     `## ${m.coverage_overview_done()}`,
     m.coverage_overview_done_body(),
     m.coverage_overview_explain_count(),

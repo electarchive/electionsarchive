@@ -15,6 +15,7 @@
     TIER_LABELS,
   } from "#lib/coverage.js";
   import Bar from "./bar.svelte";
+  import Classes from "./classes.svelte";
   import Share from "./share.svelte";
 
   const { data }: { data: PageData } = $props();
@@ -32,6 +33,10 @@
     const timer = setInterval(() => void invalidateAll(), 5000);
     return () => clearInterval(timer);
   });
+
+  const censused = $derived(
+    data.polities.filter((polity) => polity.classes.length > 0),
+  );
 
   const built = $derived(
     data.builtAt == null
@@ -178,6 +183,39 @@
         {m.coverage_overview_note()}
       </p>
     </section>
+    {#if censused.length > 0}
+      <section
+        aria-labelledby="coverage-classes"
+        class="grid gap-2 bg-card px-3.5 pbs-4 pbe-4"
+      >
+        <h2 id="coverage-classes" class="text-lg font-bold">
+          {m.coverage_classes()}
+        </h2>
+        <p class="text-sm text-muted-foreground max-inline-[72ch]">
+          {m.coverage_classes_overview_hint()}
+          {m.coverage_classes_legend()}
+        </p>
+        <div class="grid gap-px overflow-clip rounded-sm border bg-border">
+          {#each censused as polity (polity.polity)}
+            <details class="group bg-card">
+              <summary
+                class="flex cursor-pointer flex-wrap items-baseline gap-x-3 px-3 py-2 focus-visible:outline-2 focus-visible:outline-ring"
+              >
+                <span class="text-[0.9375rem] font-bold">{polity.name}</span>
+                <span class="text-xs text-muted-foreground tabular-nums"
+                  >{m.coverage_classes_count({
+                    count: count(polity.classes.length),
+                  })}</span
+                >
+              </summary>
+              <div class="px-3 pbe-3">
+                <Classes classes={polity.classes} />
+              </div>
+            </details>
+          {/each}
+        </div>
+      </section>
+    {/if}
     <section
       aria-labelledby="coverage-explain"
       class="grid gap-2 bg-card px-3.5 pbs-4 pbe-4"
