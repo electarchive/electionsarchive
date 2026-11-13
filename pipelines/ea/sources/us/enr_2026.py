@@ -1565,7 +1565,7 @@ def countywide(key: str) -> bool:
     return rest[0].isdigit() or rest[-1] == "g" or any("judicial" in part for part in rest)
 
 
-def static(conn: Connection, query: str, params: Sequence[object] = ()) -> list[tuple]:
+def static(conn: Connection, query: str, params: Sequence[object] | None = None) -> list[tuple]:
     key = (query, repr(params))
     held = STATIC.get(key)
     if held is not None and time.monotonic() - held[0] < STATIC_EVERY:
