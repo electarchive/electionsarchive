@@ -16,7 +16,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "es.cat"
-VERSION = "2"
+VERSION = "3"
 API = "https://resultats.dadeselectorals.gencat.cat/webelec/api"
 PUBLISHER = "Generalitat de Catalunya"
 TITLE = "Resultats electorals: eleccions al Parlament de Catalunya (Departament de la Presidència)"
@@ -37,6 +37,124 @@ WIKIDATA = {
     "PACMA": "Q82558",
     "ERC": "Q150068",
 }
+DOGC = "https://portaldogc.gencat.cat/utilsEADOP/AppJava/PdfProviderServlet?documentId={}&type=01&language=ca_ES"
+DOGC_TITLE = "Diari Oficial de la Generalitat de Catalunya: proclamations of members elected to the Parlament"
+PROCLAIMED: dict[tuple[str, str], tuple[tuple[int, ...], dict[str, list[str]]]] = {
+    ("A19841", "17"): (
+        (234980, 233638),
+        {
+            "CIU": [
+                "Arcadi Calzada i Salavedra",
+                "Concepció Ferrer i Casals",
+                "Pompeu Pascual i Busquets",
+                "Ricard Masó i Llunes",
+                "Jordi Martínez i Planas",
+                "Trinitat Neras i Plaja",
+                "Josep Moliner i Florensa",
+                "Josep Oriol Suñer i Carbó",
+                "Josep Montalat i Cufí",
+                "Federic Martínez Ibáñez",
+                "Pere Casals i Lezcano",
+            ]
+        },
+    ),
+    ("A19881", "17"): (
+        (25962, 52426),
+        {
+            "CIU": [
+                "Arcadi Calzada i Salavedra",
+                "Ricard Masó i Llunes",
+                "Josep Oriol Suñer i Carbó",
+                "Jordi Martínez i Planas",
+                "Trinitat Neras i Plaja",
+                "Josep Moliner i Florensa",
+                "Josep Montalat i Cufí",
+                "Marta Gràcia Bosch i Agustí",
+                "Frederic Martínez i Ibañez",
+                "Pere Casals i Lezcano",
+                "Josep Coll i Bertran",
+            ],
+            "PSC": [
+                "Joaquim Nadal i Farreras",
+                "Lluís Medir i Huerta",
+                "Manel Nadal i Farreras",
+                "Daniel Terradellas i Redon",
+                "Arseni Gibert i Bosch",
+            ],
+            "ERC": ["Marçal Casanovas i Guerri"],
+        },
+    ),
+    ("A19881", "43"): (
+        (25961,),
+        {
+            "PSC": [
+                "Joan Reventós i Carner",
+                "Joan M. Abelló i Alfonso",
+                "Ramon Aleu i Jornet",
+                "Martí Carnicer i Vidal",
+                "Dionisio Garcia i Guillamon",
+            ],
+            "CIU": [
+                "Josep Laporte i Salas",
+                "Josep Sendra i Navarro",
+                "Joan-Josep Martí i Ferré",
+                "Enric Vendrell i Duran",
+                "Joan Descals i Esquius",
+                "Vicenç de Paul Gonzàlez Castells",
+                "Joan-Antoni Mur i Borràs",
+                "Josep-Joan Grau i Folch",
+                "Miquel-Àngel Marimon i Fort",
+                "Francesc Vernet i Mateu",
+            ],
+            "AP": ["José Curto Casado"],
+            "IC": ["Víctor Gimeno Sanz"],
+            "ERC": ["Joan Manel Sabanza i March"],
+        },
+    ),
+    ("A20061", "17"): (
+        (433711,),
+        {"ERC": ["Pere Vigo i Sallent", "Maria Mercè Roca i Perich", "Carme Capdevila i Palau", "Pere Bosch i Cuenca"]},
+    ),
+    ("A20061", "25"): ((433709,), {"PSCCPC": ["Joaquim Llena Cortina", "Agnès Pardell Vea", "Marta Camps Torrens"]}),
+    ("A20151", "08"): (
+        (704870,),
+        {
+            "PSC": [
+                "Miquel Iceta Llorens",
+                "Eva Maria Granados Galiano",
+                "Ferran Pedret i Santos",
+                "Alícia Romero Llano",
+                "Jordi Terrades i Santacreu",
+                "Assumpta Escarp Gibert",
+                "David Pérez Ibáñez",
+                "Esther Niubó Cidoncha",
+                "Pol Gibert Horcas",
+                "Marta Moreta Rovira",
+                "Raúl Moreno Montaña",
+                "Eva Maria Martínez Morales",
+            ]
+        },
+    ),
+    ("A20151", "25"): ((704834,), {"CS": ["Jorge Soler González", "Javier Rivas Escamilla"]}),
+    ("A20241", "08"): (
+        (987024,),
+        {
+            "PP": [
+                "Alejandro Fernández Álvarez",
+                "Manuel Reyes López",
+                "María Ángeles Esteller Ruedas",
+                "Santiago (Santi) Rodríguez Serra",
+                "Rosa del Amo Hernández",
+                "Hugo Manchón García",
+                "Juan Fernández Benítez",
+                "Eva García Rodríguez",
+                "Miriam Casanova Domènech",
+                "Alberto Villagrasa Gil",
+                "Cristian Escribano Ramírez",
+            ]
+        },
+    ),
+}
 
 
 def elections() -> list[dict[str, object]]:
@@ -56,6 +174,9 @@ def fetch() -> None:
             raw.fetch(SOURCE, export(str(code), level), suffix=".zip")
         if isinstance(url := election.get("urlElectes"), str):
             raw.fetch(SOURCE, url, suffix=".pdf")
+    for documents, _ in PROCLAIMED.values():
+        for document in documents:
+            raw.fetch(SOURCE, DOGC.format(document), suffix=".pdf")
 
 
 def cached() -> list[tuple[str, date]]:
@@ -170,6 +291,37 @@ def match(heading: str, lists: pl.DataFrame) -> str:
     return scores[0][1]
 
 
+def same(a: str, b: str) -> float:
+    return len(words(a) & words(b)) / len(words(a) | words(b))
+
+
+def proclaimed(code: str, members: pl.DataFrame) -> pl.DataFrame:
+    members = members.with_columns(key=pl.col("rank").cast(pl.String), proclaimed=pl.lit(False))
+    rows: list[dict[str, object]] = []
+    for (election, province), (_, lists) in PROCLAIMED.items():
+        if election != code:
+            continue
+        for party, names in lists.items():
+            listed = members.filter((pl.col("province") == province) & (pl.col("party") == party))
+            taken: set[str] = set()
+            for rank, name in enumerate(names, 1):
+                scores = sorted(
+                    (
+                        (same(name, row["name"]), row["key"])
+                        for row in listed.iter_rows(named=True)
+                        if row["key"] not in taken
+                    ),
+                    reverse=True,
+                )
+                key = scores[0][1] if scores and scores[0][0] >= 0.5 else f"dogc{rank}"
+                taken.add(key)
+                rows.append(
+                    {"province": province, "rank": rank, "name": name, "party": party, "key": key, "proclaimed": True}
+                )
+            members = members.filter((pl.col("province") != province) | (pl.col("party") != party))
+    return pl.concat([members, pl.DataFrame(rows, schema=members.schema)]) if rows else members
+
+
 def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
     tables: dict[str, list[pl.DataFrame]] = defaultdict(list)
@@ -203,6 +355,7 @@ def parse() -> None:
                 return_dtype=pl.String,
             )
         ).drop("list")
+        members = proclaimed(code, members)
         if members.select("province", "party", "rank").is_duplicated().any():
             raise ValueError(f"{code}: two elected members share a list rank")
         counts = members.group_by("province", "party").agg(named=pl.len())
@@ -264,6 +417,11 @@ PROVINCE_METHOD = (
 ELECTED = (
     " The elected members of each list, with their places on it, come from the Generalitat's list of members elected "
     "in each constituency."
+)
+PROCLAIMED_NOTE = (
+    " The Generalitat's list is incomplete or wrong for {lists}, so those members, in the order the board names them, "
+    "come instead from the provincial electoral board's proclamation of elected members in the Diari Oficial de la "
+    "Generalitat de Catalunya."
 )
 SHORT = (
     " That list names {named} of the {seats} members elected here, so the others are not named; for any list it "
@@ -337,6 +495,21 @@ def emit() -> Path:
         for election in elections():
             if isinstance(url := election.get("urlElectes"), str):
                 cs.artifact(raw.cached(SOURCE, url), source)
+        gazette = cs.source(PUBLISHER, DOGC_TITLE)
+        cs.add(
+            "source",
+            id=gazette,
+            kind="official_body",
+            publisher=PUBLISHER,
+            title=DOGC_TITLE,
+            url="https://dogc.gencat.cat/",
+            license="Llicència oberta d'ús d'informació – Catalunya (or CC0), per the Generalitat's legal notice",
+            license_url="https://tramits.gencat.cat/ca/ajuda/avis_legal/",
+            attribution="Font: Diari Oficial de la Generalitat de Catalunya.",
+        )
+        for documents, _ in PROCLAIMED.values():
+            for document in documents:
+                cs.artifact(raw.cached(SOURCE, DOGC.format(document)), gazette)
 
         known = dict(
             conn.execute(
@@ -486,6 +659,12 @@ def emit() -> Path:
                     "party", "rank"
                 )
                 note = PROVINCE_METHOD + ELECTED
+                fixed = rows.join(declared.filter("proclaimed").select("party").unique(), on="party", how="semi")
+                if fixed.height:
+                    labels = [f"{entry['name']} ({entry['sigles']})" for entry in fixed.iter_rows(named=True)]
+                    note += PROCLAIMED_NOTE.format(
+                        lists=labels[0] if len(labels) == 1 else ", ".join(labels[:-1]) + f", and {labels[-1]}"
+                    )
                 if declared.height < seats:
                     note += SHORT.format(named=declared.height, seats=seats)
                 won = dhondt(dict(zip(rows["party"], rows["votes"])), total["valid"], seats)
@@ -508,7 +687,7 @@ def emit() -> Path:
                             seats=entry["seats"],
                         )
                 for member in declared.iter_rows(named=True):
-                    person_key = f"{key}:{member['party']}:{member['rank']}"
+                    person_key = f"{key}:{member['party']}:{member['key']}"
                     person = cs.key(f"{SOURCE}.person", person_key)
                     if person in cs.minted:
                         cs.add("person", id=person)
@@ -585,6 +764,34 @@ def emit() -> Path:
                     unit, channel = mesa_units[row["mesa"]]
                     values.append((str(mesa_set), str(unit), str(options[row["party"]]), VOTES, row["votes"], channel))
 
+        orphans = conn.execute(
+            """select o.id, array_remove(array_agg(y.id), null), array_remove(array_agg(y.person_id), null)
+               from contest_option o
+               join changeset c on c.id = o.changeset_id and c.pipeline = %s
+               join entity e on e.id = o.id and e.retired_by is null
+               left join candidacy y on y.option_id = o.id
+               where o.kind = 'candidate' and o.contest_id = any(%s) and o.id <> all(%s)
+                 and not exists (select 1 from result_value v where v.option_k = o.k)
+               group by o.id""",
+            [
+                SOURCE,
+                list({row["contest_id"] for row in cs.rows["contest_option"]}),
+                [row["id"] for row in cs.rows["contest_option"]],
+            ],
+        ).fetchall()
+        reason = (
+            "The Generalitat's list of elected members named this member wrongly for the list; the provincial "
+            "electoral board's proclamation in the DOGC replaces it."
+        )
+        staged = {row["person_id"] for row in cs.rows["candidacy"]}
+        for option, candidacies, people in orphans:
+            for candidacy in candidacies:
+                cs.add("entity_retirement", entity_id=candidacy, reason=reason)
+            cs.add("entity_retirement", entity_id=option, reason=reason)
+            for person in people:
+                if person not in staged:
+                    cs.add("entity_retirement", entity_id=person, reason=reason)
+        print(f"{len(orphans)} candidate options retired")
         for note_id, entity, body_md in conn.execute(
             "select id, entity_id, body_md from note where entity_id = any(%s) and kind = 'methodology'",
             (list(written),),
