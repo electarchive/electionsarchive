@@ -856,7 +856,11 @@ def borough_of(text: str) -> str | None:
         for name in BOROUGHS:
             if fold(name) == key:
                 return name
-    return None
+    if "," in text or len(text) > 40 or any(re.fullmatch(r"[\d.%()]+", t) for t in text.split()):
+        return None
+    key = fold(re.sub(r"(?i)\s*-\s*con\w*\s*$", "", boxed)).replace("0", "o")
+    scored = max((difflib.SequenceMatcher(None, key, fold(name)).ratio(), name) for name in BOROUGHS)
+    return scored[1] if scored[0] >= 0.85 and len(key) >= 5 else None
 
 
 def columns(words: list[Word], width: float, rightmost: bool = False) -> list[list[Word]]:
@@ -1034,7 +1038,7 @@ def table2(year: int, sizes: list[tuple[float, float]], book: list[list[Word]]) 
                 letters = re.sub(r"[^A-Za-z]", "", head)
                 first = re.sub(r"[^A-Za-z]", "", head.split()[0]) if head.split() else ""
                 if len(letters) >= 3 and len(first) >= 2 and sum(c.isupper() for c in first) / len(first) > 0.6:
-                    if borough is None:
+                    if borough is None or re.match(r"TABLE \d", head):
                         continue
                     left = row[0][0]
                     if cont and ward is not None:
@@ -1094,6 +1098,28 @@ def reread(year: int, heads: list[dict]) -> None:
     print(f"{year}: {changed} names taken from the second reading")
 
 
+def joined(row: list[Word], fixes: dict[str, tuple[str, str]]) -> list[Word]:
+    text = " ".join(w[4] for w in row)
+    for start, (bad, good) in fixes.items():
+        if text.startswith(start):
+            texts = [w[4] for w in row]
+            for i in range(len(row)):
+                for j in range(i + 1, len(row) + 1):
+                    if " ".join(texts[i:j]) == bad:
+                        row = [*row[:i], (row[i][0], row[i][1], row[j - 1][2], row[i][3], good), *row[j:]]
+                        break
+                else:
+                    continue
+                break
+    out: list[Word] = []
+    for w in row:
+        if out and re.fullmatch(r"\d{1,3}", out[-1][4]) and re.fullmatch(r"[,.]\d{3}", w[4]):
+            out[-1] = (out[-1][0], min(out[-1][1], w[1]), w[2], max(out[-1][3], w[3]), out[-1][4] + w[4])
+        else:
+            out.append(w)
+    return out
+
+
 def table3(year: int, book: list[list[Word]]) -> dict[str, list[tuple]]:
     first, last = BOOKS[year]["wards"]
     found: dict[str, list[tuple]] = {}
@@ -1105,11 +1131,11 @@ def table3(year: int, book: list[list[Word]]) -> dict[str, list[tuple]]:
         marks = sorted(((w[0] + w[2]) / 2, w[4]) for w in page if re.fullmatch(r"\([1-9]\)|\(f\$\)|\(6\)'?", w[4]))
         shares_x = [x for x, _ in marks[-4:]]
         pending = ""
-        rows_ = [knit(row) for row in lb.lines(page)]
+        rows_ = [joined(row, BOOKS[year].get("summary", {})) for row in lb.lines(page)]
         for index, row in enumerate(rows_):
             text = " ".join(w[4] for w in row)
             named = borough_of(text)
-            if named and (re.match(r"[A-Z]{2}", text) or not re.search(r"\d", text)):
+            if named and (re.match(r"[^a-z]*[A-Z]{2}", text) or not re.search(r"\d", text)):
                 borough = named
                 found.setdefault(borough, [])
                 pending = ""
@@ -1143,7 +1169,7 @@ def table3(year: int, book: list[list[Word]]) -> dict[str, list[tuple]]:
                     pending = f"{pending} {name}".strip()
                 continue
             name, pending = f"{pending} {name}".strip(), ""
-            if re.search(r"(?i)\btotal$", name) or any(w[4].lower() == "total" for w in row):
+            if re.search(r"(?i)\btot[a-z]{2,3}$", name) or any(w[4].lower() == "total" for w in row):
                 name = "Total"
             if not name:
                 continue
@@ -1159,21 +1185,6 @@ def table3(year: int, book: list[list[Word]]) -> dict[str, list[tuple]]:
                         share[("Con", "Lab", "Lib", "Others")[column]] = float(w[4])
             rows.append((name, lb.number(electorate[4].strip(",.'")), number, list(electorate[:4]), share, seats))
     return found
-
-
-def knit(row: list[Word]) -> list[Word]:
-    out: list[Word] = []
-    for word in row:
-        if (
-            out
-            and re.fullmatch(r"\d{1,3}", out[-1][4])
-            and re.fullmatch(r",\d{3}", word[4])
-            and word[0] - out[-1][2] < 4
-        ):
-            last = out.pop()
-            word = (last[0], min(last[1], word[1]), word[2], max(last[3], word[3]), last[4] + word[4])
-        out.append(word)
-    return out
 
 
 def match(heads: list[str], listed: list[str]) -> list[int]:
@@ -1218,7 +1229,8 @@ def parse() -> None:
         for borough, rows in stats.items():
             total = [r for r in rows if fold(r[0]) == "total"]
             listed = [r for r in rows if fold(r[0]) != "total"]
-            if len(total) != 1 or sum(r[1] for r in listed) != total[0][1]:
+            residual = spec.get("electorate_residual", {}).get(borough, 0)
+            if len(total) != 1 or sum(r[1] for r in listed) + residual != total[0][1]:
                 bad.append(f"{year} {borough}: electorate {sum(r[1] for r in listed)} against total {total[:1]}")
                 continue
             stats[borough] = listed
