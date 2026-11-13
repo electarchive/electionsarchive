@@ -584,6 +584,28 @@ def _geometry(stage: Stage) -> list[tuple[str, sql.Composed]]:
     ]
 
 
+def _elections(stage: Stage) -> list[tuple[str, sql.Composed]]:
+    if "election" not in stage.tables:
+        return []
+    return [
+        (
+            "election.empty",
+            sql.SQL(
+                """select s.id, null::uuid, jsonb_build_object('date_from', s.date_from)
+                   from {elections} s
+                   where s.status = 'held'
+                     and not exists (select from public.election p where p.id = s.id)
+                     and not exists (select from {contests} c where c.election_id = s.id)
+                     and not exists (select from {children} e where e.parent_id = s.id)"""
+            ).format(
+                elections=stage.staged("election"),
+                contests=stage.either("contest", "election_id"),
+                children=stage.either("election", "parent_id"),
+            ),
+        )
+    ]
+
+
 def _kinds(stage: Stage) -> list[tuple[str, sql.Composed]]:
     if "area_kind" not in stage.tables:
         return []
@@ -1221,6 +1243,7 @@ def queries(conn: Connection, stage: Stage) -> list[tuple[str, sql.Composed]]:
         *_outcomes(stage),
         *_dropped(stage),
         *_geometry(stage),
+        *_elections(stage),
         *_kinds(stage),
         *_country_names(stage),
         *_seated(stage),
@@ -1266,7 +1289,14 @@ def run(conn: Connection, stage: Stage) -> list[Finding]:
             Finding(
                 code,
                 "warning"
-                if code in ("membership.overlap", "party.before_founding", "name.capitals", "translation.held")
+                if code
+                in (
+                    "membership.overlap",
+                    "party.before_founding",
+                    "name.capitals",
+                    "translation.held",
+                    "election.empty",
+                )
                 else "error",
                 entity_id,
                 result_set_id,
