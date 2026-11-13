@@ -92,10 +92,33 @@ ELECTIONS = [
         tuple(date(2015, 1, day) for day in (29, 30, 30, 31)),
     ),
 ]
+TERMS_URL = "https://www.camera.it/temiap/2015/02/04/OCD177-859.pdf"
+TERMS_NOTE = (
+    "Oath and end dates are from the Camera dei deputati's table of presidential elections, which prints the oath "
+    "date, the nominal expiry of the term, and the resignation date where the term ended early. A term that ended by "
+    "resignation as printed there is stored as resigned, at the resignation date. Napolitano's second term is printed "
+    "there as ending on 14 January 2014, which is a misprint for 14 January 2015: the same table convenes Parliament "
+    "on 14 January 2015 for the election of his successor."
+)
+TERMS: dict[int, tuple[date, date, str]] = {
+    1948: (date(1948, 5, 12), date(1955, 5, 11), "term_end"),
+    1955: (date(1955, 5, 11), date(1962, 5, 11), "term_end"),
+    1962: (date(1962, 5, 11), date(1964, 12, 6), "resigned"),
+    1964: (date(1964, 12, 29), date(1971, 12, 29), "term_end"),
+    1971: (date(1971, 12, 29), date(1978, 6, 15), "resigned"),
+    1978: (date(1978, 7, 9), date(1985, 6, 29), "resigned"),
+    1985: (date(1985, 7, 3), date(1992, 4, 28), "resigned"),
+    1992: (date(1992, 5, 28), date(1999, 5, 15), "resigned"),
+    1999: (date(1999, 5, 18), date(2006, 5, 15), "resigned"),
+    2006: (date(2006, 5, 15), date(2013, 4, 22), "resigned"),
+    2013: (date(2013, 4, 22), date(2015, 1, 14), "resigned"),
+    2015: (date(2015, 2, 3), date(2022, 2, 3), "term_end"),
+}
 SPECIAL = re.compile(r"(Voti\s+dispersi|Schede\s+bianche|Schede\s+nulle)", re.IGNORECASE)
 
 
 def fetch() -> None:
+    raw.fetch(SOURCE, TERMS_URL, suffix=".pdf")
     for item in ELECTIONS:
         raw.fetch(SOURCE, item.url, suffix=".pdf" if item.days else ".html")
 
@@ -345,6 +368,21 @@ def emit() -> Path:
         if {unit, assembly, president, system} & cs.minted:
             raise ValueError("publish it.camera before it.presidente")
 
+        terms_source = cs.source(
+            "Camera dei deputati", "Elezioni dei Presidenti della Repubblica, tabella riepilogativa"
+        )
+        cs.add(
+            "source",
+            id=terms_source,
+            kind="official_body",
+            publisher="Camera dei deputati",
+            title="Elezioni dei Presidenti della Repubblica, tabella riepilogativa",
+            url=TERMS_URL,
+            license=LICENSE,
+            notes=TERMS_NOTE,
+        )
+        cs.artifact(raw.cached(SOURCE, TERMS_URL), terms_source)
+        previous_tenure: UUID | None = None
         result_sets: dict[tuple[int, int], str] = {}
         options: dict[str, str] = {}
         artifacts: dict[int, UUID] = {}
@@ -472,6 +510,21 @@ def emit() -> Path:
                         )
                         if number == rows["ballot"].max():
                             cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected")
+                            oath, ended, how = TERMS[year]
+                            tenure = cs.key(f"{SOURCE}.tenure", f"{days[0]}:president")
+                            cs.add(
+                                "tenure",
+                                id=tenure,
+                                person_id=winner,
+                                office_id=president,
+                                from_date=oath,
+                                to_date=ended,
+                                acquired_via="elected",
+                                contest_id=contest,
+                                ended_via=how,
+                                succeeds_tenure_id=previous_tenure,
+                            )
+                            previous_tenure = tenure
 
         located = values.filter(
             pl.struct("year", "ballot").map_elements(
