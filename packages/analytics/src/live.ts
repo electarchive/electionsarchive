@@ -1154,8 +1154,9 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
   const isTail =
     complete ||
     (isLate && onNight > 0 && latest - onNight <= MODEL.late.small * onNight);
+  const settles = Math.min(1, tail / MODEL.tail.share);
   const left = isTail
-    ? Math.max(planned, MODEL.late.carry * recent + MODEL.late.base)
+    ? Math.max(planned, (MODEL.late.carry * recent + MODEL.late.base) * settles)
     : planned;
   const outstanding = found.map((unit) => {
     if (!isTail || unit.reported == null) {
@@ -1469,6 +1470,7 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
           spills[index] =
             Math.max(0, free - finals[index]) *
             spill *
+            settles *
             Math.exp(scatter * gaussian(random) - scatter ** 2 / 2);
         }
       }
