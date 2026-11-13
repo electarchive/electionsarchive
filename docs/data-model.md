@@ -64,7 +64,7 @@ External IDs link an entity to an identifier in another system, such as Wikidata
 
 Facts that can change in the world carry valid time. Base tables hold only identity that does not change. Names, codes, parent areas, geometry, colors, seat counts, and memberships live in child tables with valid time.
 
-Valid-time columns are `valid_from` and `valid_to`, each with a `date_precision` of `day`, `month`, `year`, or `unknown`. `valid_to` is exclusive, and a null value means the span is open. Each table also has a generated `valid` daterange. Versioned tables use a temporal key written as `valid without overlaps`, so the database rejects overlapping versions.
+Valid-time columns are `valid_from` and `valid_to`, each with a `date_precision` of `day`, `month`, `year`, or `unknown`. `valid_to` is exclusive, and a null value means the span is open. Each table also has a `valid` daterange built from them: on a table whose temporal key holds `valid`, the `ea_valid` trigger sets it on insert and update, because logical replication refuses deletes on a table whose replica identity holds a generated column; elsewhere it is a stored generated column. Versioned tables use a temporal key written as `valid without overlaps`, so the database rejects overlapping versions.
 
 Event dates, such as elections and tenure events, carry a date and a precision. An event date can also record its original calendar (`gregorian`, `julian`, `rumi`, `hijri`, or `french_republican`) and the text as printed.
 

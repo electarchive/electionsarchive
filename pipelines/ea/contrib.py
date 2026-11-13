@@ -1848,7 +1848,7 @@ def _schema(conn: Connection, table: str) -> dict[str, tuple[str, bool, list[str
                                                           where enumtypid = t.oid order by enumsortorder) end
                from pg_attribute a join pg_type t on t.oid = a.atttypid
                where a.attrelid = %s::regclass and a.attnum > 0 and not a.attisdropped and a.attgenerated = ''
-                 and a.attname not in ('changeset_id', 'recorded_from') order by a.attnum""",
+                 and a.attname not in ('changeset_id', 'recorded_from', 'valid') order by a.attnum""",
             [f"public.{table}"],
         ).fetchall()
     }
