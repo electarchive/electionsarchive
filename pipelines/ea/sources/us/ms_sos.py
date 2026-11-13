@@ -51,11 +51,43 @@ PARTIES = {
     "Libertarian": "libertarian-party",
     "Constitution": "constitution-party",
 }
+SAMPLE_BALLOT = (
+    "https://web.archive.org/web/20080305194659id_/http://www.sos.state.ms.us/elections/2007/Forms/"
+    "07%20GE%20Sample%20Ballot%20_4_.pdf"
+)
+BALLOT = {
+    "Governor": [("Haley Barbour", "Republican"), ("John Arthur Eaves, Jr.", "Democrat")],
+    "Lieutenant Governor": [("Phil Bryant", "Republican"), ("James R. 'Jamie' Franks, Jr.", "Democrat")],
+    "Secretary of State": [("Delbert Hosemann", "Republican"), ("Robert H. 'Rob' Smith", "Democrat")],
+    "Attorney General": [("Jim Hood", "Democrat"), ("Al Hopkins", "Republican")],
+    "Auditor": [("Stacey E. Pickering", "Republican"), ("Mike Sumrall", "Democrat")],
+    "Treasurer": [("Shawn O'Hara", "Democrat"), ("Tate Reeves", "Republican")],
+    "Commissioner of Agriculture and Commerce": [
+        ("Rickey L. Cole", "Democrat"),
+        ("Lester Spell", "Republican"),
+        ("Paul Leslie Riley", "Constitution"),
+    ],
+    "Commissioner of Insurance": [("Gary Anderson", "Democrat"), ("Mike Chaney", "Republican")],
+}
+
+
+CORRECTED = {
+    (date(2007, 11, 6), "Lieutenant Governor", 75, "franks"): 2226,
+    (date(2007, 11, 6), "Auditor", 7, "sumrall"): 767,
+}
+
+
+def surname(name: str) -> str:
+    words = [re.sub(r"[^a-z]", "", word.lower()) for word in name.replace(",", " ").split()]
+    return [word for word in words if word and word not in {"jr", "sr"}][-1]
+
+
+SURNAMES = {office: {surname(name): name for name, _ in names} for office, names in BALLOT.items()}
 CANDIDATE = re.compile(r"^(\S.*?)\s{2,}([A-Z][a-z]+)\s+(\d[\d\s]*)$")
 
 
 def fetch() -> None:
-    for link in [*FILES.values(), *REPORTS.values(), *SCANS.values()]:
+    for link in [*FILES.values(), *REPORTS.values(), *SCANS.values(), SAMPLE_BALLOT]:
         raw.fetch(SOURCE, link, suffix=".pdf")
 
 
@@ -73,7 +105,7 @@ def parse_reports() -> None:
     for day, link in REPORTS.items():
         districts: list[int] = []
         office: str | None = None
-        printed: dict[str, tuple[int, int]] = {}
+        printed: dict[str, tuple[int, int | None]] = {}
         for line in pdf_text(link).splitlines():
             if "MISSISSIPPI SECRETARY OF STATE" in line and "Rep " in line:
                 districts = [int(found) for found in re.findall(r"Rep (\d+)", line)]
@@ -87,13 +119,14 @@ def parse_reports() -> None:
             numbers = found[3].split()
             pairs = numbers[: 2 * len(districts)]
             if len(numbers) == 2 * len(districts) + 3:
-                printed[found[1]] = (int(numbers[-3].replace(",", "")), int(float(numbers[-2])))
+                printed[surname(found[1])] = (int(numbers[-3].replace(",", "")), int(float(numbers[-2])))
             elif len(numbers) != 2 * len(districts):
                 raise ValueError(f"{day} {found[1]}: {len(numbers)} numbers for districts {districts}")
             for district, votes, won in zip(districts, pairs[::2], pairs[1::2], strict=True):
                 rows.append(
                     {
                         "day": day,
+                        "office": "Governor",
                         "district": district,
                         "candidate": found[1],
                         "party": found[2],
@@ -107,13 +140,17 @@ def parse_reports() -> None:
     frame.write_parquet(PARSED / "districts.parquet")
 
 
-def check_report(day: date, frame: pl.DataFrame, printed: dict[str, tuple[int, int]]) -> None:
+def check_report(day: date, frame: pl.DataFrame, printed: dict[str, tuple[int, int | None]]) -> None:
     if sorted(set(frame["district"])) != list(range(1, 123)) or frame.height != 122 * len(printed):
-        raise ValueError(f"{day}: districts {frame['district'].n_unique()}, rows {frame.height}")
+        raise ValueError(f"{day}: districts {frame['district'].n_unique()}, rows {frame.height}, printed {printed}")
     summed = frame.group_by("candidate").agg(pl.col("votes").sum(), pl.col("won").sum())
+    complete = sum(won or 0 for _, won in printed.values()) == 122
     for candidate, votes, won in summed.iter_rows():
-        if printed[candidate] != (votes, won):
-            raise ValueError(f"{day} {candidate}: {votes} votes and {won} districts, printed {printed[candidate]}")
+        expected, districts = printed[surname(candidate)]
+        if votes != expected or (complete and won != districts):
+            raise ValueError(
+                f"{day} {candidate}: {votes} votes and {won} districts, printed {expected} and {districts}"
+            )
     leaders = frame.with_columns(
         top=pl.col("votes") == pl.col("votes").max().over("district"),
     )
@@ -123,18 +160,34 @@ def check_report(day: date, frame: pl.DataFrame, printed: dict[str, tuple[int, i
         )
 
 
+def scan_row(text: str) -> tuple[int, str, int, str, str | None] | None:
+    tokens = text.split()
+    if tokens[:4] != ["State", "House", "Of", "Rep"] or len(tokens) < 7 or not re.fullmatch(r"\d{3}", tokens[4]):
+        return None
+    at = 5
+    while at < len(tokens) and re.fullmatch(r"[^\w'\"‘’“”]+", tokens[at]):
+        at += 1
+    start = at
+    while at < len(tokens) and re.fullmatch(r"[A-Z'\"‘’“”][^\s\d]*", tokens[at]):
+        at += 1
+    if at == start or at == len(tokens):
+        return None
+    name = " ".join(tokens[start:at])
+    if len(tokens[at]) == 1 and at + 1 < len(tokens) and re.fullmatch(r"\d{2,}", tokens[at + 1]):
+        at += 1
+    return int(tokens[4]), name, at, tokens[at], tokens[at + 1] if at + 1 < len(tokens) else None
+
+
 def parse_scans() -> pl.DataFrame:
     rows: list[dict[str, object]] = []
     PAGES.mkdir(parents=True, exist_ok=True)
-    line = re.compile(r"^State House Of Rep (\d{3}) ((?:[A-Z][A-Za-z.]* )+)(\S+)(?: (.*))?$")
-    total = re.compile(r"^(.+?) ([\d,]+) (\d+) \d+%$")
-    totals: dict[date, dict[str, tuple[int, int]]] = {}
+    total = re.compile(r"^(.+?) (\d[\d,]*) (\S+) \S*%$")
+    totals: dict[tuple[date, str], dict[str, tuple[int, int | None]]] = {}
     for day, link in SCANS.items():
         scan = raw.cached(SOURCE, link)
-        printed = totals.setdefault(day, {})
-        number = 0
-        while not printed:
-            number += 1
+        info = subprocess.run(["pdfinfo", str(scan.path)], capture_output=True, text=True, check=True).stdout
+        (count,) = re.findall(r"^Pages:\s+(\d+)", info, re.MULTILINE)
+        for number in range(1, int(count) + 1):
             image = PAGES / f"{scan.sha256}-{number}.png"
             if not image.exists():
                 subprocess.run(
@@ -161,22 +214,30 @@ def parse_scans() -> pl.DataFrame:
                 "text", "left", "top", "width", "height"
             )
             texts = [" ".join(cells) for cells in lines["text"]]
-            found_rows: list[tuple[re.Match[str], list[int], list[int], list[int], list[int]]] = []
+            named = [surname(found[1]) for text in texts if (found := scan_row(text))]
+            office = max(BALLOT, key=lambda office: sum(name in SURNAMES[office] for name in named))
+            if sum(name in SURNAMES[office] for name in named) * 2 < len(named) or not named:
+                raise ValueError(f"{day} page {number}: no office has the candidates {named}")
+            printed = totals.setdefault((day, office), {})
+            found_rows: list[
+                tuple[tuple[int, str, int, str, str | None], list[int], list[int], list[int], list[int]]
+            ] = []
             for text, (_, _, _, _, left, top, wide, high) in zip(texts, lines.iter_rows(), strict=True):
-                if found := line.match(text):
-                    found_rows.append((found, left, top, wide, high))
+                if row := scan_row(text):
+                    found_rows.append((row, left, top, wide, high))
                 elif (found := total.match(text)) and not text.startswith("Candidate"):
-                    printed[found[1]] = (int(found[2].replace(",", "")), int(found[3]))
+                    printed[surname(found[1])] = (
+                        int(found[2].replace(",", "")),
+                        int(found[3]) if found[3].isdigit() else None,
+                    )
             column = [
                 (left[at], left[at] + wide[at])
-                for found, left, _, wide, _ in found_rows
-                if found[3].isdigit() and (at := 5 + len(found[2].split()))
+                for (_, _, at, votes, _), left, _, wide, _ in found_rows
+                if votes.isdigit()
             ]
             x0, x1 = min(a for a, _ in column), max(b for _, b in column)
-            for found, left, top, wide, high in found_rows:
-                at = 5 + len(found[2].split())
+            for (district, name, at, votes, read), left, top, wide, high in found_rows:
                 box = (left[at], top[at], left[at] + wide[at], top[at] + high[at])
-                votes = found[3]
                 if not votes.isdigit():
                     box = (x0, top[at - 1], x1, top[at - 1] + high[at - 1])
                     with Image.open(image) as rendered:
@@ -195,10 +256,11 @@ def parse_scans() -> pl.DataFrame:
                 rows.append(
                     {
                         "day": day,
-                        "district": int(found[1]),
-                        "candidate": found[2].strip(),
-                        "votes": int(votes),
-                        "read": {"1": 1, "l": 1, "I": 1, "|": 1, "0": 0, "O": 0}.get(found[4] or ""),
+                        "office": office,
+                        "district": district,
+                        "candidate": SURNAMES[office][surname(name)],
+                        "votes": CORRECTED.get((day, office, district, surname(name)), int(votes)),
+                        "read": {"1": 1, "0": 0}.get(read or ""),
                         "page": number,
                         "x0": box[0] / width,
                         "y0": box[1] / height,
@@ -207,12 +269,12 @@ def parse_scans() -> pl.DataFrame:
                     }
                 )
     frame = pl.DataFrame(rows).with_columns(
-        won=(pl.col("votes") == pl.col("votes").max().over("day", "district")).cast(pl.Int64)
+        won=(pl.col("votes") == pl.col("votes").max().over("day", "office", "district")).cast(pl.Int64)
     )
     if (wrong := frame.filter(pl.col("read").is_not_null() & (pl.col("read") != pl.col("won")))).height:
         raise ValueError(f"a printed electoral vote is not the district's plurality: {wrong}")
-    for day, printed in totals.items():
-        check_report(day, frame.filter(pl.col("day") == day), printed)
+    for (day, office), printed in totals.items():
+        check_report(day, frame.filter(pl.col("day") == day, pl.col("office") == office), printed)
     return frame.drop("read")
 
 
@@ -310,8 +372,8 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Mississippi's statewide general elections of 2023 by county, and the 2007, 2015, and 2019 governor"
-            " elections by House district",
+            summary="Mississippi's statewide general elections of 2023 by county, the 2015 and 2019 governor elections"
+            " by House district, and the 2007 statewide elections by House district",
             polity="US",
         )
 
@@ -486,8 +548,32 @@ def attach_reports(cs: Changeset, conn: Connection) -> None:
                 width=width,
                 height=height,
             )
-    ((state,),) = conn.execute(
-        """select u.id from reporting_unit u
+    ballot = cs.source(PUBLISHER, "Official sample ballot")
+    cs.add(
+        "source",
+        id=ballot,
+        kind="official_body",
+        publisher=PUBLISHER,
+        title="Official sample ballot",
+        url="https://www.sos.ms.gov/elections-voting",
+        license="Public record",
+    )
+    cs.artifact(raw.cached(SOURCE, SAMPLE_BALLOT), ballot)
+    people: dict[str, set[UUID]] = {}
+    for person, ballot_name in conn.execute(
+        """select distinct ca.person_id, ca.ballot_name from candidacy ca
+           join contest_option co on co.id = ca.option_id
+           join contest c on c.id = co.contest_id
+           join office o on o.id = c.office_id
+           join polity p on p.id = o.polity_id and p.iso_code = 'US-MS'"""
+    ).fetchall():
+        people.setdefault(re.sub(r"[^a-z]", "", ballot_name.lower()), set()).add(person)
+    fptp = cs.key("us.electoral_system", "fptp")
+    parties = {label: cs.key("us.party", key) for label, key in PARTIES.items()}
+    if cs.minted & {fptp, *parties.values()}:
+        raise ValueError("the fptp system and the national parties must exist")
+    ((state, area),) = conn.execute(
+        """select u.id, u.area_id from reporting_unit u
            join polity_territory t on t.area_id = u.area_id
            join polity p on p.id = t.polity_id and p.iso_code = 'US-MS'
            where u.scheme_code = 'us.state'"""
@@ -500,22 +586,81 @@ def attach_reports(cs: Changeset, conn: Connection) -> None:
         rank=3,
         noun="house district",
     )
-    for (day,), lines in frame.group_by("day", maintain_order=True):
-        ((contest, election),) = conn.execute(
-            """select c.id, c.election_id
-               from contest c join election e on e.id = c.election_id
-               join office o on o.id = c.office_id and o.kind = 'governor'
-               join polity p on p.id = o.polity_id and p.iso_code = 'US-MS'
-               where e.date_from = %s and c.round_number = 1""",
-            [day],
-        ).fetchall()
-        options: dict[str, UUID] = {
-            re.sub(r"[^a-z]", "", label.split()[-1].lower()): option
-            for option, label in conn.execute(
-                "select id, ballot_label from contest_option where contest_id = %s and kind = 'candidate'", [contest]
+    placed: set[date] = set()
+    for (day, office), lines in frame.group_by("day", "office", maintain_order=True):
+        office_slug = slug(office)
+        contest_key = f"{day}:MS:{office_slug}"
+        if office == "Governor":
+            ((contest, election),) = conn.execute(
+                """select c.id, c.election_id
+                   from contest c join election e on e.id = c.election_id
+                   join office o on o.id = c.office_id and o.kind = 'governor'
+                   join polity p on p.id = o.polity_id and p.iso_code = 'US-MS'
+                   where e.date_from = %s and c.round_number = 1""",
+                [day],
             ).fetchall()
-        }
-        result_set = cs.key(f"{SOURCE}.result_set", f"{day}:MS:governor:{DISTRICTS}")
+            options: dict[str, UUID] = {
+                surname(label): option
+                for option, label in conn.execute(
+                    "select id, ballot_label from contest_option where contest_id = %s and kind = 'candidate'",
+                    [contest],
+                ).fetchall()
+            }
+        else:
+            election = cs.key("us.election", f"{day}:MS")
+            office_id = cs.key("us.office", f"{office_slug}:MS")
+            contest = cs.key("us.contest", contest_key)
+            if cs.minted & {election, office_id}:
+                raise ValueError(f"{contest_key}: the election and office must exist")
+            cs.add(
+                "contest",
+                id=contest,
+                election_id=election,
+                kind="office",
+                office_id=office_id,
+                district_area_id=area,
+                term="full",
+                magnitude=1,
+                round_number=1,
+                electoral_system_id=fptp,
+                default_result_kind="counted",
+            )
+            cs.add(
+                "name",
+                entity_id=contest,
+                text=f"{day.year} Mississippi {office} election",
+                lang="en",
+                kind="official",
+                is_preferred=True,
+            )
+            cs.add("slug", path=f"us/ms/{day}-general/{office_slug}", entity_id=contest)
+            options = {}
+            for candidate, label in BALLOT[office]:
+                known = people.get(re.sub(r"[^a-z]", "", candidate.lower()), set())
+                person = next(iter(known)) if len(known) == 1 else cs.key(f"{SOURCE}.person", f"MS:{slug(candidate)}")
+                if person in cs.minted:
+                    cs.add("person", id=person)
+                    cs.add("name", entity_id=person, text=candidate, lang="en", kind="official", is_preferred=True)
+                option = cs.key("us.option", f"{contest_key}:{person}")
+                cs.add(
+                    "contest_option",
+                    id=option,
+                    contest_id=contest,
+                    kind="candidate",
+                    party_id=parties[label],
+                    ballot_label=candidate,
+                )
+                cs.add(
+                    "candidacy",
+                    id=cs.key("us.candidacy", f"{contest_key}:{person}:head"),
+                    person_id=person,
+                    option_id=option,
+                    role="head",
+                    ballot_name=candidate,
+                    is_independent=False,
+                )
+                options[surname(candidate)] = option
+        result_set = cs.key(f"{SOURCE}.result_set", f"{contest_key}:{DISTRICTS}")
         cs.add(
             "result_set",
             id=result_set,
@@ -525,10 +670,19 @@ def attach_reports(cs: Changeset, conn: Connection) -> None:
             kind="counted",
             status="active",
             source_id=source,
-            is_default=False,
+            is_default=office != "Governor",
             completeness=1,
         )
-        for district in range(1, 123):
+        if office != "Governor":
+            summed = lines.group_by("candidate").agg(pl.col("votes").sum()).sort("votes", descending=True)
+            cs.add(
+                "outcome",
+                result_set_id=result_set,
+                option_id=options[surname(summed["candidate"][0])],
+                kind="elected",
+                seats=1,
+            )
+        for district in range(1, 123) if day not in placed else []:
             code = f"{day.year}-{district:03d}"
             cs.add(
                 "reporting_unit",
@@ -543,13 +697,14 @@ def attach_reports(cs: Changeset, conn: Connection) -> None:
                 valid_from=day,
                 valid_to=day + timedelta(days=1),
             )
+        placed.add(day)
         for candidate, district, votes, number, *box in lines.select(
             "candidate", "district", "votes", "page", "x0", "y0", "x1", "y1"
         ).iter_rows():
             fact = {
                 "result_set_id": result_set,
                 "unit_id": cs.unit(DISTRICTS, f"{day.year}-{district:03d}"),
-                "option_id": options[re.sub(r"[^a-z]", "", candidate.split()[-1].lower())],
+                "option_id": options[surname(candidate)],
                 "channel": 0,
                 "measure": 1,
                 "count_round": 0,
