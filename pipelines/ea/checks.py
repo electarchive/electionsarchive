@@ -1234,19 +1234,24 @@ def _census(stage: Stage) -> list[tuple[str, sql.Composed]]:
         matches = _live(
             stage, "census_match", "id", "class_id", "precedence", "valid_from", "valid_to", *CENSUS_SELECTORS
         )
+        classes = stage.either("census_class", "id", "polity_id")
         found.append(
             (
                 "census.match_overlap",
                 sql.SQL(
                     """select a.id, null::uuid, jsonb_build_object('class', a.class_id, 'other', b.id, 'other_class', b.class_id)
-                       from {matches} a join {matches} b on b.class_id <> a.class_id and (a.staged or b.staged)
+                       from {matches} a
+                       join {classes} ca on ca.id = a.class_id
+                       join {matches} b on b.class_id <> a.class_id and (a.staged or b.staged)
                          and (not b.staged or b.id::text > a.id::text)
                          and coalesce(a.precedence, 0) = coalesce(b.precedence, 0)
                          and daterange(a.valid_from, a.valid_to, '[)') && daterange(b.valid_from, b.valid_to, '[)')
                          and {same}
+                       join {classes} cb on cb.id = b.class_id and cb.polity_id = ca.polity_id
                        where a.staged"""
                 ).format(
                     matches=matches,
+                    classes=classes,
                     same=sql.SQL(" and ").join(
                         sql.SQL("a.{0} is not distinct from b.{0}").format(sql.Identifier(column))
                         for column in CENSUS_SELECTORS
