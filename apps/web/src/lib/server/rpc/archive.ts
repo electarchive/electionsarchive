@@ -2805,6 +2805,18 @@ async function listOptions(ks: Array<number>, contests: Array<string>) {
       ), newest as materialized (
         select rs.id from held h
         cross join lateral (select rs.id from result_set rs where rs.contest_id = h.id and ${latest("rs")} offset 0) rs
+      ), heads as materialized (
+        select cy.option_id, cy.person_id, cy.is_independent, cy.is_incumbent from candidacy cy
+        where cy.option_id = any(array(select id from base)) and cy.role = 'head'
+      ), merged as materialized (
+        select m.entity_id, m.into_id from entity_merge m
+        where m.entity_id = any(array(select person_id from heads))
+      ), hd as materialized (
+        select x.option_id, bool_or(x.is_independent) as independent, bool_or(x.is_incumbent) as incumbent,
+          case when count(*) = 1 then (array_agg(coalesce(m.into_id, x.person_id)))[1] end as person,
+          array_agg(x.person_id) as people, array_agg(m.into_id) as intos
+        from heads x left join merged m on m.entity_id = x.person_id
+        group by x.option_id
       ), covered as (${covered(sql`select id from held`)})
       select o.k, o.id, o.contest_id as contest, o.kind::text, coalesce(pm.into_id, o.party_id) as party, o.ballot_label as label, o.candidate_count as candidates,
         o.alliance_id as alliance, o.parent_option_id is not null as is_line,
@@ -2837,13 +2849,7 @@ async function listOptions(ks: Array<number>, contests: Array<string>) {
       from base o
       left join post ps on ps.id = o.contest_id
       left join entity_merge pm on pm.entity_id = o.party_id
-      left join lateral (
-        select bool_or(cy.is_independent) as independent, bool_or(cy.is_incumbent) as incumbent,
-          case when count(*) = 1 then (array_agg(coalesce(m.into_id, cy.person_id)))[1] end as person,
-          array_agg(cy.person_id) as people, array_agg(m.into_id) as intos
-        from candidacy cy left join entity_merge m on m.entity_id = cy.person_id
-        where cy.option_id = o.id and cy.role = 'head'
-      ) hd on true
+      left join hd on hd.option_id = o.id
       left join lateral (${pooledIds(sql`o.id`, sql`o.parent_option_id`, sql`o.kind::text`)}) pf on true
       left join lateral (
         select (array_agg(x.kind order by array_position(array['elected', 'advanced', 'won', 'tied', 'withdrew', 'disqualified']::outcome_kind[], x.kind)) filter (where x.kind <> 'declined'))[1] as kind,
