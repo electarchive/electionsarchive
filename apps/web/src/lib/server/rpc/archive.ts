@@ -870,11 +870,14 @@ const Places = v.nullable(
 
 const { legend: fullLegend, ...leanEntries } = v.unwrap(Places).entries;
 
+const leanRow = v.omit(v.object(PlaceRow.pipe[0].entries), ["path"]).entries;
+
 const Lean = v.object({
   ...leanEntries,
   rows: v.array(
     v.object({
-      ...PlaceRow.pipe[0].entries,
+      ...leanRow,
+      from: v.number(),
       shares: Spread,
       earlier: v.nullable(Spread),
     }),
@@ -20057,6 +20060,7 @@ export const elections = {
       v.object({
         noun: v.nullable(v.string()),
         before: v.nullable(v.object({ path: v.string(), date: v.string() })),
+        suffix: v.string(),
         groups: v.array(
           v.object({ k: v.nullable(v.number()), name: v.string() }),
         ),
@@ -20111,7 +20115,7 @@ export const elections = {
             group: v.nullable(v.number()),
             tier: v.picklist(TIERS),
             person: v.optional(v.string()),
-            entry: v.number(),
+            entry: v.optional(v.number()),
             label: v.nullable(v.string()),
             isLed: v.boolean(),
             share: v.nullable(v.number()),
@@ -20353,6 +20357,7 @@ export const elections = {
       const empty = {
         noun: null,
         before: null,
+        suffix: "",
         groups: [],
         entries: [],
         legend: [],
@@ -20809,6 +20814,12 @@ export const elections = {
           ? { valid, share: null, margin: null }
           : { valid, share: own / valid, margin: (own - rival) / valid };
       };
+      const position0 = new Map(rows.map((row, at) => [row, at]));
+      const tail = (() => {
+        const last = (path: string) => path.slice(path.lastIndexOf("/"));
+        const found = rows[0] == null ? "" : last(rows[0].path);
+        return rows.every((row) => last(row.path) === found) ? found : "";
+      })();
       const nation = territory.rows[0];
       const maps =
         nation == null
@@ -20859,7 +20870,7 @@ export const elections = {
                                             number,
                                           ]),
                                     name: labels.full.get(at) ?? "",
-                                    path: row.path,
+                                    from: position0.get(row) ?? 0,
                                     contest: true,
                                     isRemainder: false,
                                     valid,
@@ -21013,18 +21024,19 @@ export const elections = {
         const old = then.get(row.place);
         const { share, margin } = split(row.tally, key(row));
         return {
-          path: row.path,
+          path: tail === "" ? row.path : row.path.slice(0, -tail.length),
           at: area.get(row.shaped ?? "")?.k ?? null,
           group: row.group == null ? null : (index.get(row.group) ?? null),
           tier: row.tier,
           person: row.party == null ? (row.person ?? undefined) : undefined,
-          entry: slot(
-            row.party ?? undefined,
-            labels.short.get(row.party ?? "") ??
-              labels.full.get(row.party ?? "") ??
-              undefined,
-            row.color ?? undefined,
-          ),
+          entry:
+            slot(
+              row.party ?? undefined,
+              labels.short.get(row.party ?? "") ??
+                labels.full.get(row.party ?? "") ??
+                undefined,
+              row.color ?? undefined,
+            ) || undefined,
           label:
             labels.full.get(row.person ?? "") ??
             labels.full.get(row.party ?? "") ??
@@ -21039,6 +21051,7 @@ export const elections = {
         noun: nouns.rows[0]?.noun ?? null,
         before:
           before == null ? null : { path: before.path, date: before.date },
+        suffix: tail,
         entries: pool,
         legend: legend.map((item) => ({
           label: item.label,

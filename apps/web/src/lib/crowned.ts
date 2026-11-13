@@ -3,7 +3,12 @@ import type { router } from "#lib/server/rpc/router.js";
 
 type Wire = InferRouterOutputs<typeof router>["elections"]["winners"];
 
-type Place = Wire["maps"][number]["places"] & {
+type Place = Omit<Wire["maps"][number]["places"], "rows"> & {
+  rows: Array<
+    Omit<Wire["maps"][number]["places"]["rows"][number], "from"> & {
+      path: string;
+    }
+  >;
   legend: ReturnType<typeof withLegend>[number]["places"]["legend"];
 };
 
@@ -19,22 +24,33 @@ export function withLegend(winners: Wire | undefined) {
         ? `person:${item.person ?? ""}`
         : `party:${item.party}`,
   }));
+  const rows = winners?.rows ?? [];
+  const suffix = winners?.suffix ?? "";
   return (winners?.maps ?? []).map((entry) => ({
     ...entry,
-    places: { ...entry.places, legend },
+    places: {
+      ...entry.places,
+      legend,
+      rows: entry.places.rows.map(({ from, ...row }) => ({
+        ...row,
+        path: `${rows[from]?.path ?? ""}${suffix}`,
+      })),
+    },
   }));
 }
 
 export function withEntries(winners: Wire | undefined) {
   const entries = winners?.entries ?? [];
+  const suffix = winners?.suffix ?? "";
   return (winners?.rows ?? []).map((row) => {
     const { entry, prior, ...rest } = row;
     const before = prior == null ? undefined : entries[prior];
     return {
       ...rest,
-      party: entries[entry]?.party,
-      short: entries[entry]?.short,
-      color: entries[entry]?.color,
+      path: `${rest.path}${suffix}`,
+      party: entries[entry ?? 0]?.party,
+      short: entries[entry ?? 0]?.short,
+      color: entries[entry ?? 0]?.color,
       prior:
         prior == null
           ? undefined
