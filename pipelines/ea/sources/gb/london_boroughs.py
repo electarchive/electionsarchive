@@ -544,6 +544,7 @@ GLC_RESOLVED = {
     "Socialist Party of Great Britain": ("gb.party", "socialist-party-of-great-britain"),
     "Workers Revolutionary Party": ("gb.party", "workers-revolutionary-party"),
     "Social Democratic Party": ("gb.party", "social-democratic-party-1981"),
+    "Green": ("gb.party", "green-party"),
 }
 GLC_OCR = {
     (1973, "OFFCON"): "CON",
@@ -804,6 +805,62 @@ EARLY_NOTES = {
     "other; each is given the description in the report's table of votes by party whose candidate count and votes "
     "they alone match. Candidates marked U. Lib. stood as Unofficial Liberals.",
 }
+
+
+ILEA_DAY = date(1986, 5, 8)
+ILEA_URL = f"{DOWNLOAD}/93e12583-576d-419a-a227-fa431a67e4c0/ILEADE_1986-5-8.pdf"
+ILEA_PUBLISHER = "London Residuary Body"
+ILEA_TITLE = "Inner London Education Authority Direct Elections, 8 May 1986"
+ILEA_PAGES = (6, 8)
+ILEA_STATS = {"electorate": 10, "votes": 11, "rejected": 12}
+ILEA_ERRATA = (2, {"bowandpoplar": "60,320"})
+ILEA_TOTALS = (1728604, 1407312, 18888, {"LAB": 45, "CON": 11, "ALLIANCE": 2})
+ILEA_PARTIES = {
+    "LAB": ("Labour", 58, 664520),
+    "CON": ("Conservative", 58, 427826),
+    "SDPLIB": ("Social Democratic Party", 30, 153435),
+    "LIBSDP": ("Liberal", 21, 91276),
+    "LIBFT": ("Liberal Focus Team", 4, 32952),
+    "LIBAFT": ("Liberal Alliance Focus Team", 3, 23017),
+    "GRE": ("Green", 7, 7155),
+    "IND": ("Independent", 3, 2306),
+    "INDLAB": ("Independent Labour", 1, 1714),
+    "COMM": ("Communist", 2, 1654),
+    "RLS": ("Reform London Schools", 2, 710),
+    "NF": ("National Front", 1, 425),
+    "H": ("Humanist", 1, 322),
+}
+ILEA_ALLIANCE = {"SDPLIB", "LIBSDP", "LIBFT", "LIBAFT"}
+ILEA_CODES = {"SDPUB": "SDPLIB", "UBSDP": "LIBSDP", "LIBAFF": "LIBAFT"}
+ILEA_NAMES = {
+    "Soskin, David G.F.AX": "Soskin, David G.F.A.X.",
+    "MaHone, Ronald S.": "Mallone, Ronald S.",
+    "Bames, Rosemary S.": "Barnes, Rosemary S.",
+    "Kearney, Neil 1.": "Kearney, Neil J.",
+    "McGregor, Edn'l D.": "McGregor, Edna D.",
+    "Pringle, Alexander 1.S.": "Pringle, Alexander J.S.",
+    "Berry, Christopher 1.": "Berry, Christopher J.",
+    "Tuck, Robin TJ.": "Tuck, Robin T.J.",
+    "Argyropulo, Dernitri C.": "Argyropulo, Demitri C.",
+    "Monk:, Stuart A.": "Monk, Stuart A.",
+    "Brown, CUve W.B.": "Brown, Clive W.B.",
+    "lng, Wilfred D.": "Ing, Wilfred D.",
+    "Brarnall, Ashley": "Bramall, Ashley",
+}
+ILEA_METHODOLOGY = (
+    "Read from the text layer of the London Residuary Body's report, with each line placed by its position on the "
+    "page; names the text layer garbled were checked against the page images. Each of Inner London's 29 "
+    "parliamentary constituencies of 1983 elected two members by block vote, and the report shows the elected "
+    "candidates in bold type, set flush with the constituency's heading. Every party's candidates and votes add up "
+    "to the report's table of candidates and votes by party, each constituency's votes by Alliance, Conservative, "
+    "Labour, and other candidates match its row in Table 2, the rejected ballot papers add up to the printed total, "
+    "and the elected candidates match the printed membership of the authority. The report codes the Alliance "
+    "candidates SDPLIB (Social Democratic Party), LIBSDP (Liberal), and Liberal Focus Team or Liberal Alliance Focus "
+    "Team; all of them stood for the SDP–Liberal Alliance. A page of errata bound into the report corrects the "
+    "electorate of Bow and Poplar to 60,320 and Inner London's to 1,728,604; the corrected figures are stored. The "
+    "report gives no number voting by constituency. It marks the result in Southwark and Bermondsey, which the Alliance "
+    "won, with an inquiry pending."
+)
 
 
 def fetch() -> None:
@@ -2034,6 +2091,7 @@ def parse_glc() -> None:
     pl.DataFrame(areas).write_parquet(PARSED / "glc_areas.parquet")
     pl.DataFrame(standing).write_parquet(PARSED / "glc_early_candidates.parquet")
     print(f"{len(areas)} GLC electoral areas and {len(standing)} candidates, 1964 to 1970")
+    parse_ilea()
 
 
 SKIPPED = re.compile(
@@ -2242,6 +2300,129 @@ def parse_glc_early() -> tuple[list[dict], list[dict]]:
     return areas, candidates
 
 
+def ilea_box(row: list[Word], size: tuple[float, float]) -> list[float]:
+    width, height = size
+    return [
+        min(w[0] for w in row) / width,
+        min(w[1] for w in row) / height,
+        max(w[2] for w in row) / width,
+        max(w[3] for w in row) / height,
+    ]
+
+
+def parse_ilea() -> None:
+    artifact = raw.cached(SOURCE, ILEA_URL)
+    sizes, book = pages(artifact.path)
+    seats: dict[str, dict] = {}
+    candidates: list[dict] = []
+    for sheet in range(ILEA_PAGES[0], ILEA_PAGES[1] + 1):
+        width = sizes[sheet - 1][0]
+        for side in (0, 1):
+            seat: dict | None = None
+            column = [w for w in book[sheet - 1] if (w[0] < width / 2) == (side == 0)]
+            for row in lines(column):
+                text = " ".join(w[4] for w in row).replace("Ho1born", "Holborn")
+                heading = re.fullmatch(r"([A-Z][A-Z&,.' ]+?)(?: \*)?", text)
+                if heading and len(heading.group(1)) > 5:
+                    printed = heading.group(1)
+                    seat = seats.setdefault(fold(printed), {"printed": printed, "page": sheet, "x": row[0][0]})
+                    continue
+                found = re.fullmatch(r"(.+?)\s+(LIB AFT|[A-Za-z]+)\s+(\d[\d,]*)", text)
+                if seat is None or found is None:
+                    continue
+                name = re.sub(r"[\s<]+$", "", found.group(1))
+                name = ILEA_NAMES.get(name, name)
+                code = found.group(2).replace(" ", "").upper()
+                code = ILEA_CODES.get(code, code)
+                votes = number(found.group(3))
+                if code not in ILEA_PARTIES or votes is None or not re.fullmatch(r"[A-Z][A-Za-z'’ -]+, [A-Z].*", name):
+                    raise ValueError(f"ILEA page {sheet}: unread line {text!r}")
+                candidates.append(
+                    {
+                        "seat": fold(seat["printed"]),
+                        "name": name,
+                        "party": code,
+                        "votes": votes,
+                        "flush": row[0][0] - seat["x"] < 4,
+                        "page": sheet,
+                        "bbox": ilea_box(row, sizes[sheet - 1]),
+                    }
+                )
+    figures: dict[str, dict[str, tuple[list[int | None], list[list[float]]]]] = {}
+    for kind, sheet in ILEA_STATS.items():
+        figures[kind] = {}
+        for row in lines(book[sheet - 1]):
+            text = " ".join(w[4] for w in row)
+            label = re.sub(r"[\d,.\s]+$", "", text)
+            close = difflib.get_close_matches(fold(label.replace("1", "l")), seats, n=1, cutoff=0.8)
+            if re.search(r"[A-Z]{4}", label) or not close:
+                continue
+            key = close[0]
+            cells = [w for w in row if re.fullmatch(r"[\d,]+", w[4])]
+            figures[kind][key] = ([number(w[4]) for w in cells], [ilea_box([w], sizes[sheet - 1]) for w in cells])
+    errata_sheet, errata = ILEA_ERRATA
+    electorate, total, rejected, membership = ILEA_TOTALS
+    problems = []
+    if len(seats) != 29 or any(len(figures[k]) != 29 for k in figures):
+        problems.append(f"{len(seats)} constituencies, {[len(v) for v in figures.values()]} statistics rows")
+    rows: list[dict] = []
+    won: dict[str, int] = {}
+    for key, seat in seats.items():
+        mine = [c for c in candidates if c["seat"] == key]
+        for rank, c in enumerate(sorted(mine, key=lambda c: -c["votes"])):
+            c["number"] = rank + 1
+            c["elected"] = c["flush"]
+        elected = [c for c in mine if c["elected"]]
+        if len(elected) != 2 or min(c["votes"] for c in elected) <= max(c["votes"] for c in mine if not c["elected"]):
+            problems.append(f"{seat['printed']}: {len(elected)} elected")
+        for c in elected:
+            family = "ALLIANCE" if c["party"] in ILEA_ALLIANCE else c["party"]
+            won[family] = won.get(family, 0) + 1
+        groups = [
+            sum(c["votes"] for c in mine if c["party"] in ILEA_ALLIANCE),
+            sum(c["votes"] for c in mine if c["party"] == "CON"),
+            sum(c["votes"] for c in mine if c["party"] == "LAB"),
+            sum(c["votes"] for c in mine if c["party"] not in ILEA_ALLIANCE | {"CON", "LAB"}),
+        ]
+        groups = [*groups[:3], *([groups[3]] if groups[3] else []), sum(groups)]
+        if figures["votes"][key][0] != groups:
+            problems.append(f"{seat['printed']}: votes {groups}, Table 2 {figures['votes'][key][0]}")
+        registered, registered_box = figures["electorate"][key][0][-1], figures["electorate"][key][1][-1]
+        registered_page = ILEA_STATS["electorate"]
+        if key in errata:
+            registered_page = errata_sheet
+            registered = number(errata[key])
+            registered_box = locate(artifact.path, errata_sheet, errata[key])
+        rows.append(
+            seat
+            | {
+                "key": key,
+                "electorate": registered,
+                "electorate_page": registered_page,
+                "electorate_bbox": registered_box,
+                "rejected": figures["rejected"][key][0][-1],
+                "rejected_bbox": figures["rejected"][key][1][-1],
+            }
+        )
+    if sum(r["electorate"] for r in rows) != electorate:
+        problems.append(f"electorate {sum(r['electorate'] for r in rows)}, printed {electorate}")
+    if sum(r["rejected"] for r in rows) != rejected:
+        problems.append(f"rejected {sum(r['rejected'] for r in rows)}, printed {rejected}")
+    if sum(c["votes"] for c in candidates) != total:
+        problems.append(f"votes {sum(c['votes'] for c in candidates)}, printed {total}")
+    for code, (_, count, votes) in ILEA_PARTIES.items():
+        mine = [c["votes"] for c in candidates if c["party"] == code]
+        if (len(mine), sum(mine)) != (count, votes):
+            problems.append(f"{code}: {len(mine)} candidates and {sum(mine)} votes, printed {count} and {votes}")
+    if won != membership:
+        problems.append(f"elected {won}, printed {membership}")
+    if problems:
+        raise ValueError("ILEA 1986:\n" + "\n".join(problems))
+    pl.DataFrame(rows).write_parquet(PARSED / "ilea_constituencies.parquet")
+    pl.DataFrame(candidates).write_parquet(PARSED / "ilea_candidates.parquet")
+    print(f"{len(rows)} ILEA constituencies and {len(candidates)} candidates, 1986")
+
+
 def emit() -> Path:
     wards = pl.read_parquet(PARSED / "wards.parquet")
     candidates = pl.read_parquet(PARSED / "candidates.parquet")
@@ -2254,8 +2435,9 @@ def emit() -> Path:
             + ", ".join(map(str, sorted(BOOKS)))
             + " by ward, and Greater London Council elections "
             + ", ".join(map(str, sorted(GLC)))
-            + " by electoral division and of 1964, 1967, and 1970 by borough, from the London Research Centre's, "
-            "the London County Council's, and the Greater London Council's reports",
+            + " by electoral division and of 1964, 1967, and 1970 by borough, and the Inner London Education "
+            "Authority election of 1986 by constituency, from the London Research Centre's, the London County "
+            "Council's, the Greater London Council's, and the London Residuary Body's reports",
             polity="GB",
         )
         outranked = foreign_preferred(conn, cs, SOURCE)
@@ -2925,4 +3107,195 @@ def emit() -> Path:
                     early_value(option, VOTES, line["votes"], line["page"], line["bbox"])
                     if line["elected"]:
                         cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected")
+        authority = cs.key("gb.body", "inner-london-education-authority")
+        if authority in cs.minted:
+            cs.add("body", id=authority, polity_id=london, kind="unicameral")
+            name(authority, "Inner London Education Authority")
+        cs.add("body_size", body_id=authority, seats=58, valid_from=ILEA_DAY, valid_to=date(1990, 4, 1))
+        source = cs.source(ILEA_PUBLISHER, ILEA_TITLE)
+        if source in cs.minted:
+            cs.add(
+                "source",
+                id=source,
+                kind="compendium",
+                publisher=ILEA_PUBLISHER,
+                title=ILEA_TITLE,
+                url=DATASET,
+                license=f"Published by the {ILEA_PUBLISHER}; the Greater London Authority lists it on the London "
+                "Datastore with no licence stated",
+                license_url=None,
+                attribution=f"{ILEA_PUBLISHER}, {ILEA_TITLE}.",
+            )
+        artifact = raw.cached(SOURCE, ILEA_URL)
+        artifact_id = cs.artifact(artifact, source)
+        ilea_pages: dict[int, UUID] = {}
+
+        def ilea_page(number: int) -> UUID:
+            if number not in ilea_pages:
+                image = PAGES / f"{artifact.sha256}-{number}.png"
+                if not image.exists():
+                    PAGES.mkdir(parents=True, exist_ok=True)
+                    subprocess.run(
+                        ["pdftoppm", "-r", "100", "-png", "-f", str(number), "-l", str(number), "-singlefile"]
+                        + [str(artifact.path), str(image.with_suffix(""))],
+                        check=True,
+                    )
+                width, height = struct.unpack(">II", image.read_bytes()[16:24])
+                ilea_pages[number] = cs.page(artifact_id, number)
+                cs.add(
+                    "source_page",
+                    id=ilea_pages[number],
+                    artifact_id=artifact_id,
+                    page_number=number,
+                    image_key=f"pages/{SOURCE}/{image.name}",
+                    width=width,
+                    height=height,
+                )
+            return ilea_pages[number]
+
+        election = cs.key("gb.election", f"{ILEA_DAY}:ilea")
+        cs.add(
+            "election",
+            id=election,
+            polity_id=london,
+            kind="general",
+            date_from=ILEA_DAY,
+            date_to=ILEA_DAY,
+            status="held",
+        )
+        name(election, "1986 Inner London Education Authority election")
+        cs.add("slug", path=f"gb/london/{ILEA_DAY}-ilea", entity_id=election)
+        cs.add("note", entity_id=election, kind="methodology", body_md=ILEA_METHODOLOGY)
+        alliance = cs.key(f"{SOURCE}.alliance", f"{ILEA_DAY}:sdp-liberal")
+        cs.add("alliance", id=alliance, kind="electoral_alliance", election_id=election)
+        cs.add("name", entity_id=alliance, text="SDP–Liberal Alliance", lang="en", kind="official", is_preferred=True)
+        for member in ("Liberal", "Social Democratic Party"):
+            cs.add("alliance_member", alliance_id=alliance, party_id=glc_party(member), role=None)
+        cs.add("citation", entity_id=alliance, source_id=source, locator={"page": 4})
+        pcon_1983 = {
+            fold(text): (code, text)
+            for code, text in conn.execute(
+                "select c.code, n.text from area a join area_code c on c.area_id = a.id"
+                " join name n on n.entity_id = a.id and n.is_preferred"
+                " where a.scheme_code = 'gb.pcon' and c.code like '1983:eng-%%'"
+            ).fetchall()
+        }
+        standing = pl.read_parquet(PARSED / "ilea_candidates.parquet")
+        for seat in pl.read_parquet(PARSED / "ilea_constituencies.parquet").iter_rows(named=True):
+            code, display = pcon_1983[seat["key"]]
+            area = cs.area("gb.pcon", code)
+            if area in cs.minted:
+                raise ValueError(f"{code}: no 1983 constituency area")
+            unit = cs.unit("gb.pcon", code)
+            if unit in cs.minted and unit not in units:
+                units.add(unit)
+                cs.add(
+                    "reporting_unit",
+                    id=unit,
+                    polity_id=gb,
+                    scheme_code="gb.pcon",
+                    code=code,
+                    area_relation="equals",
+                    area_id=area,
+                    kind="standard",
+                    valid_from=None,
+                )
+            contest_key = f"{ILEA_DAY}:ilea:{code}"
+            contest = cs.key("gb.contest", contest_key)
+            cs.add(
+                "contest",
+                id=contest,
+                election_id=election,
+                kind="body_seats",
+                body_id=authority,
+                district_area_id=area,
+                magnitude=2,
+                round_number=1,
+                electoral_system_id=systems["block"],
+                default_result_kind="counted",
+            )
+            name(contest, f"{display}, Inner London Education Authority, 1986")
+            cs.add("slug", path=f"gb/london/{ILEA_DAY}-ilea/{slug(display)}", entity_id=contest)
+            result_set = cs.key(f"{SOURCE}.result_set", contest_key)
+            cs.add(
+                "result_set",
+                id=result_set,
+                election_id=election,
+                contest_id=contest,
+                stage="official",
+                kind="counted",
+                status="active",
+                source_id=source,
+                is_default=contest not in others,
+                completeness=1,
+            )
+            cs.add(
+                "citation",
+                entity_id=result_set,
+                source_id=source,
+                locator={"page": seat["page"], "constituency": seat["printed"]},
+            )
+
+            def ilea_value(option: UUID | None, measure: int, figure: int, number: int, box: list[float]) -> None:
+                cs.add(
+                    "result_value",
+                    result_set_id=result_set,
+                    unit_id=unit,
+                    option_id=option,
+                    channel=0,
+                    measure=measure,
+                    count_round=0,
+                    flags=DIGITIZED,
+                    value=figure,
+                )
+                x0, y0, x1, y1 = box
+                cs.add(
+                    "value_locator",
+                    result_set_id=result_set,
+                    unit_id=unit,
+                    option_id=option,
+                    channel=0,
+                    measure=measure,
+                    count_round=0,
+                    page_id=ilea_page(number),
+                    source_id=None,
+                    x0=x0,
+                    y0=y0,
+                    x1=x1,
+                    y1=y1,
+                )
+
+            ilea_value(None, REGISTERED, seat["electorate"], seat["electorate_page"], seat["electorate_bbox"])
+            ilea_value(None, INVALID, seat["rejected"], ILEA_STATS["rejected"], seat["rejected_bbox"])
+            for line in standing.filter(pl.col("seat") == seat["key"]).iter_rows(named=True):
+                option_key = f"{contest_key}:{line['number']}"
+                label = ILEA_PARTIES[line["party"]][0]
+                owner = glc_party(label)
+                option = cs.key(f"{SOURCE}.option", option_key)
+                cs.add(
+                    "contest_option",
+                    id=option,
+                    contest_id=contest,
+                    kind="candidate",
+                    party_id=owner,
+                    alliance_id=alliance if line["party"] in ILEA_ALLIANCE else None,
+                    ballot_label=line["name"],
+                )
+                person = cs.key(f"{SOURCE}.person", option_key)
+                cs.add("person", id=person)
+                surname, _, forenames = line["name"].partition(", ")
+                name(person, f"{forenames.removeprefix('Dr ')} {surname}")
+                cs.add(
+                    "candidacy",
+                    id=cs.key(f"{SOURCE}.candidacy", option_key),
+                    person_id=person,
+                    option_id=option,
+                    role="head",
+                    ballot_name=line["name"],
+                    member_of_party_id=owner,
+                    is_independent=label == "Independent",
+                )
+                ilea_value(option, VOTES, line["votes"], line["page"], line["bbox"])
+                if line["elected"]:
+                    cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected")
         return cs.write()
