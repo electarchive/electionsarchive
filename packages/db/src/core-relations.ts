@@ -113,6 +113,8 @@ export const relations = defineRelations(schema, (r) => ({
 		}),
 		bodyApportionments: r.many.bodyApportionment(),
 		bodyChambers: r.many.bodyChamber(),
+		bodyCompositions: r.many.bodyComposition(),
+		bodyCompositionParties: r.many.bodyCompositionParty(),
 		bodyEvents: r.many.bodyEvent(),
 		bodiesViaBodySize: r.many.body({
 			alias: "body_id_changeset_id_via_bodySize"
@@ -572,6 +574,7 @@ export const relations = defineRelations(schema, (r) => ({
 	},
 	party: {
 		allianceMembers: r.many.allianceMember(),
+		bodyCompositionParties: r.many.bodyCompositionParty(),
 		candidacies: r.many.candidacy(),
 		candidacyNominations: r.many.candidacyNomination(),
 		contests: r.many.contest(),
@@ -708,6 +711,7 @@ export const relations = defineRelations(schema, (r) => ({
 		areaUniverses: r.many.areaUniverse(),
 		ballotQuestionTexts: r.many.ballotQuestionText(),
 		bodyChambers: r.many.bodyChamber(),
+		bodyCompositions: r.many.bodyComposition(),
 		bodyEvents: r.many.bodyEvent(),
 		citations: r.many.citation(),
 		financeSummaries: r.many.financeSummary(),
@@ -1030,6 +1034,7 @@ export const relations = defineRelations(schema, (r) => ({
 		bodyChambersOfBodyId: r.many.bodyChamber({
 			alias: "bodyChamber_ofBodyId_body_id"
 		}),
+		bodyCompositions: r.many.bodyComposition(),
 		bodyEvents: r.many.bodyEvent(),
 		changesetsViaBodySize: r.many.changeset({
 			from: r.body.id.through(r.bodySize.bodyId),
@@ -1140,6 +1145,35 @@ export const relations = defineRelations(schema, (r) => ({
 		source: r.one.source({
 			from: r.bodyChamber.sourceId,
 			to: r.source.id
+		}),
+	},
+	bodyComposition: {
+		body: r.one.body({
+			from: r.bodyComposition.bodyId,
+			to: r.body.id
+		}),
+		changeset: r.one.changeset({
+			from: r.bodyComposition.changesetId,
+			to: r.changeset.id
+		}),
+		source: r.one.source({
+			from: r.bodyComposition.sourceId,
+			to: r.source.id
+		}),
+		bodyCompositionParties: r.many.bodyCompositionParty(),
+	},
+	bodyCompositionParty: {
+		changeset: r.one.changeset({
+			from: r.bodyCompositionParty.changesetId,
+			to: r.changeset.id
+		}),
+		bodyComposition: r.one.bodyComposition({
+			from: r.bodyCompositionParty.compositionId,
+			to: r.bodyComposition.id
+		}),
+		party: r.one.party({
+			from: r.bodyCompositionParty.partyId,
+			to: r.party.id
 		}),
 	},
 	bodyEvent: {

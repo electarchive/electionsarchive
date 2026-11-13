@@ -158,6 +158,8 @@ An `office` is a post in a polity or body. A `seat` is a place a contest fills. 
 
 A `tenure` is one person's term in an office or seat. It records how the person acquired the office (`acquired_via`, such as `elected` or `appointed`) and how the term ended (`ended_via`, such as `term_end` or `resigned`). The `tenure_event` table records dated events within a term, and `tenure_affiliation` records the party or parliamentary group the member sat with. A `government` is a cabinet, with a `caretaker` flag. `government_party` records each party's role in it.
 
+A `body_composition` is a dated snapshot of how a body's seats are held between elections, as a source reports it once a year or after a by-election or defection. Its `body_composition_party` rows name a party, or an unnamed `independent`, `other`, or `vacant` bucket where the source does not split seats further, and they sum to the snapshot's `seats`. A `role` (`head`, `member`, or `support`, shared with `government_party`) marks the parties running the body; the rest are in opposition. `control` is `majority`, `minority`, `coalition`, `noc` (no overall control), or `mayor`, with the source's own wording in `control_label` and `control_derived` set when the archive computed it from the seats. Councils use these tables, and `government` stays for cabinets.
+
 Being elected is an outcome, and being seated is a tenure. A winner who never takes up a seat keeps the declared outcome and gains no tenure.
 
 ### Election census
@@ -225,6 +227,7 @@ The schema in `packages/db/src/core.ts` is the complete reference. This table li
 | `election_cadence`, `results_access`                                                                                       | When a government votes under the law, and where its results appear and how a script reaches them                         |
 | `census_tier`, `census_tier_count`, `census_class`, `census_match`, `census_date`                                          | A polity's tiers of government and their unit counts, its classes of election, how contests map to them, and listed dates |
 | `government`, `government_party`                                                                                           | A cabinet and the parties in it                                                                                           |
+| `body_composition`, `body_composition_party`                                                                               | A body's seats by party on a date, and who controls it                                                                    |
 | `name`, `external_id`, `slug`                                                                                              | A name, an identifier in another system, and a URL path                                                                   |
 | `note`, `translation`, `label`, `flag`                                                                                     | Prose, translations, outside assessments, and failed checks or caveats                                                    |
 | `source`, `source_artifact`, `source_page`, `citation`                                                                     | A source, its cached files and page images, and its link to an entity                                                     |

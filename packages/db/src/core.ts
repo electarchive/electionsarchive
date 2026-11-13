@@ -63,6 +63,8 @@ export const resultsPlatformAccess = pgEnum("results_platform_access", ["open", 
 export const censusCategory = pgEnum("census_category", ["legislature", "executive", "council", "special_purpose", "judicial", "law_enforcement", "non_territorial", "indirect", "direct_democracy", "nominating"])
 export const censusDisposition = pgEnum("census_disposition", ["blocked", "out_of_scope"])
 export const censusAccessRole = pgEnum("census_access_role", ["administers", "publishes"])
+export const bodyControl = pgEnum("body_control", ["majority", "minority", "coalition", "noc", "mayor"])
+export const compositionBucket = pgEnum("composition_bucket", ["independent", "other", "vacant"])
 
 
 export const activity = pgTable("activity", {
@@ -719,6 +721,66 @@ export const bodySizePart = pgTable("body_size_part", {
 	}),
 	index("body_size_part_changeset_id_idx").using("btree", table.changesetId.asc().nullsLast()),
 ]);
+
+export const bodyComposition = pgTable("body_composition", {
+	id: uuid().primaryKey(),
+	bodyId: uuid("body_id").notNull(),
+	asOf: date("as_of").notNull(),
+	asOfPrecision: datePrecision("as_of_precision").default("day").notNull(),
+	seats: integer().notNull(),
+	control: bodyControl(),
+	controlLabel: text("control_label"),
+	controlDerived: boolean("control_derived").default(false).notNull(),
+	sourceId: uuid("source_id").notNull(),
+	locator: text().notNull(),
+	changesetId: uuid("changeset_id").notNull(),
+	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => [
+	foreignKey({
+		columns: [table.bodyId],
+		foreignColumns: [body.id],
+		name: "body_composition_body_id_fkey"
+	}).onDelete("cascade"),
+	foreignKey({
+		columns: [table.changesetId],
+		foreignColumns: [changeset.id],
+		name: "body_composition_changeset_id_fkey"
+	}),
+	foreignKey({
+		columns: [table.sourceId],
+		foreignColumns: [source.id],
+		name: "body_composition_source_id_fkey"
+	}),
+	index("body_composition_changeset_id_idx").using("btree", table.changesetId.asc().nullsLast()),
+	unique("body_composition_body_id_as_of_source_id_key").on(table.bodyId, table.asOf, table.sourceId),check("body_composition_check", sql`((NOT control_derived) OR (control IS NOT NULL))`),check("body_composition_seats_check", sql`(seats >= 0)`),]);
+export const bodyCompositionParty = pgTable("body_composition_party", {
+	id: uuid().primaryKey(),
+	compositionId: uuid("composition_id").notNull(),
+	partyId: uuid("party_id"),
+	bucket: compositionBucket(),
+	seats: integer().notNull(),
+	role: governmentPartyRole(),
+	changesetId: uuid("changeset_id").notNull(),
+	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => [
+	foreignKey({
+		columns: [table.changesetId],
+		foreignColumns: [changeset.id],
+		name: "body_composition_party_changeset_id_fkey"
+	}),
+	foreignKey({
+		columns: [table.compositionId],
+		foreignColumns: [bodyComposition.id],
+		name: "body_composition_party_composition_id_fkey"
+	}).onDelete("cascade"),
+	foreignKey({
+		columns: [table.partyId],
+		foreignColumns: [party.id],
+		name: "body_composition_party_party_id_fkey"
+	}),
+	index("body_composition_party_changeset_id_idx").using("btree", table.changesetId.asc().nullsLast()),
+	index("body_composition_party_party_idx").using("btree", table.partyId.asc().nullsLast()),
+	unique("body_composition_party_composition_id_party_id_bucket_key").on(table.compositionId, table.partyId, table.bucket).nullsNotDistinct(),check("body_composition_party_check", sql`(num_nonnulls(party_id, bucket) = 1)`),check("body_composition_party_check1", sql`((bucket IS DISTINCT FROM 'vacant'::composition_bucket) OR (role IS NULL))`),check("body_composition_party_seats_check", sql`(seats >= 0)`),]);
 
 export const boundarySet = pgTable("boundary_set", {
 	id: uuid().default(sql`uuidv7()`).primaryKey(),

@@ -32,6 +32,8 @@ SWEEPABLE = {
     "census_class": "id",
     "census_match": "id",
     "census_date": "id",
+    "body_composition": "id",
+    "body_composition_party": "id",
     "note": "entity_id",
 }
 TIMEOUT = "20min"
@@ -1236,6 +1238,55 @@ def _census(stage: Stage) -> list[tuple[str, sql.Composed]]:
     return found
 
 
+def _composition(stage: Stage) -> list[tuple[str, sql.Composed]]:
+    if "body_composition" not in stage.tables and "body_composition_party" not in stage.tables:
+        return []
+    compositions = stage.either("body_composition", "id", "body_id", "as_of", "seats", "control")
+    parties = (
+        _live(stage, "body_composition_party", "id", "composition_id", "seats", "role")
+        if "body_composition_party" in stage.tables
+        else stage.either("body_composition_party", "id", "composition_id", "seats", "role")
+    )
+    touched = sql.SQL(" union ").join(
+        sql.SQL("select {} from {}").format(sql.Identifier(column), stage.staged(table))
+        for table, column in (("body_composition", "id"), ("body_composition_party", "composition_id"))
+        if table in stage.tables
+    )
+    return [
+        (
+            "composition.seats",
+            sql.SQL(
+                """select c.id, null::uuid, jsonb_build_object('seats', c.seats, 'counted', coalesce(sum(p.seats), 0))
+                   from {compositions} c left join {parties} p on p.composition_id = c.id
+                   where c.id in ({touched})
+                   group by c.id, c.seats having coalesce(sum(p.seats), 0) <> c.seats"""
+            ).format(compositions=compositions, parties=parties, touched=touched),
+        ),
+        (
+            "composition.size",
+            sql.SQL(
+                """select c.id, null::uuid, jsonb_build_object('body', c.body_id, 'as_of', c.as_of, 'seats', c.seats,
+                                                             'body_size', z.seats)
+                   from {compositions} c join {sizes} z on z.body_id = c.body_id
+                     and daterange(z.valid_from, z.valid_to, '[)') @> c.as_of
+                   where c.id in ({touched}) and z.seats <> c.seats"""
+            ).format(
+                compositions=compositions,
+                sizes=stage.either("body_size", "body_id", "seats", "valid_from", "valid_to"),
+                touched=touched,
+            ),
+        ),
+        (
+            "composition.role",
+            sql.SQL(
+                """select distinct c.id, null::uuid, jsonb_build_object('control', c.control)
+                   from {compositions} c join {parties} p on p.composition_id = c.id
+                   where c.id in ({touched}) and p.role is not null and (c.control is null or c.control = 'noc')"""
+            ).format(compositions=compositions, parties=parties, touched=touched),
+        ),
+    ]
+
+
 def queries(conn: Connection, stage: Stage) -> list[tuple[str, sql.Composed]]:
     return [
         *_references(conn, stage),
@@ -1255,6 +1306,7 @@ def queries(conn: Connection, stage: Stage) -> list[tuple[str, sql.Composed]]:
         *_cadence(stage),
         *_figures(stage),
         *_census(stage),
+        *_composition(stage),
     ]
 
 
@@ -1296,6 +1348,7 @@ def run(conn: Connection, stage: Stage) -> list[Finding]:
                     "name.capitals",
                     "translation.held",
                     "election.empty",
+                    "composition.size",
                 )
                 else "error",
                 entity_id,

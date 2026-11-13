@@ -94,6 +94,8 @@ ARTIFACT_TABLES = frozenset(
         "body",
         "body_size",
         "body_size_part",
+        "body_composition",
+        "body_composition_party",
         "body_chamber",
         "body_event",
         "body_apportionment",
