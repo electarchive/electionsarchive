@@ -74,6 +74,7 @@ DAY_RULES = {
     "oct_first_sunday": nth_weekday(10, 6, 1),
     "oct_last_sunday": last_weekday(10, 6),
     "mar_last_sunday": last_weekday(3, 6),
+    "may_first_thursday": nth_weekday(5, 3, 1),
 }
 
 
@@ -127,11 +128,15 @@ def fixed_rules(conn: Connection, today: date, country: str = "US") -> list[dict
 
 def class_next_date(conn: Connection, class_id: UUID, after: date) -> date | None:
     rows = conn.execute(
-        """select day_rule, period_years, phase from election_cadence
+        """select day_rule, period_years, phase, valid_from, valid_to from election_cadence
            where class_id = %s and not called and (valid_to is null or valid_to > %s)""",
         [class_id, after],
     ).fetchall()
-    return min((d for d in (next_date(*row, after) for row in rows) if d is not None), default=None)
+    dates = (
+        next(occurrences(rule, period, phase, after, None, start, end), None)
+        for rule, period, phase, start, end in rows
+    )
+    return min((d for d in dates if d is not None), default=None)
 
 
 def certify_for(conn: Connection, polity_id: UUID, when: date) -> tuple[int, list[str]]:
