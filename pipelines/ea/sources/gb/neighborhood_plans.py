@@ -452,7 +452,7 @@ def emit() -> Path:
                 unit_code = f"{code}:{slug(re.sub(r'(?i) neighbourhood (plan )?area$', '', area_name))}"
                 unit = cs.unit(SCHEME, unit_code)
                 district = drawn.get(unit_code) if row["area"] is None else cs.area("gb.parish", row["area"])
-                if (unit in cs.minted or unit_code in drawn) and unit not in added:
+                if (unit in cs.minted or unit_code in drawn or district is not None) and unit not in added:
                     added.add(unit)
                     cs.add(
                         "reporting_unit",
