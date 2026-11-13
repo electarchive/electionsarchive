@@ -68,11 +68,6 @@ def main() -> None:
     )
     contributing.add_argument("--author", type=UUID, help="user id of the human author or key owner")
     contributing.add_argument("--agent", action="store_true", help="the author is an agent acting for --author")
-    census = commands.add_parser(
-        "census", help="the election census: due lists scheduled elections with their results-ticket After: dates"
-    )
-    census.add_argument("action", choices=("due",))
-    census.add_argument("--json", action="store_true")
     commands.add_parser("coarse", help="refresh the simplified copies of heavy area geometries used for overlaps")
     commands.add_parser("straddle", help="refresh which contest-map areas straddle their district's boundary")
     commands.add_parser("tiles", help="build one PMTiles archive per boundary set").add_argument(
@@ -145,7 +140,11 @@ def main() -> None:
         "or with 'mark' write the classes a --queued file names into coverage_polity, "
         "or with 'open' list the classes that are neither held nor dispositioned, ranked by estimated votes over effort",
     )
-    census.add_argument("targets", nargs="+", help="two-letter polity codes, open, or mark")
+    census.add_argument(
+        "targets",
+        nargs="+",
+        help="two-letter polity codes, open, mark, or due (scheduled elections with their After: dates)",
+    )
     census.add_argument("--json", action="store_true", help="with open, print JSON")
     census.add_argument("--queued", help="a file whose class:<cc>/<key> mentions mark classes as queued on the page")
     portal = commands.add_parser(
@@ -235,6 +234,9 @@ def main() -> None:
         case "apply":
             print(apply(args.changeset))
         case "census":
+            if args.targets == ["due"]:
+                print(census_calendar.show(args.json))
+                return
             from ea import census
 
             print(census.run(args.targets, args.json, args.queued))
@@ -310,8 +312,6 @@ def main() -> None:
                 parser.error("contrib compile needs a payload and --author")
             with connect() as conn:
                 print(contrib.compile_file(conn, args.payload, args.author, "agent" if args.agent else "user"))
-        case "census":
-            print(census_calendar.show(args.json))
         case "coarse":
             with connect() as conn:
                 print(display.coarsen(conn))
