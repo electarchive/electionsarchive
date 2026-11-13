@@ -101,6 +101,8 @@ These are the checks in the current code:
 - **Geometry** (`geometry.valid`) checks that polygons are valid.
 - **Scope** (`scope.polity`, `scope.owner`) checks that the diff touches only what the manifest declares, and that a pipeline never changes a row that another pipeline or a person last wrote.
 
+Apply and publish print each check's code and running time to stderr. Each check runs under a 20-minute statement timeout. A check that exceeds it fails the apply with an error naming the check and the changeset, so a pathological query never holds a transaction open for hours. A check reaches the public tables only through the ids that the changeset stages, so its cost grows with the changeset rather than the archive.
+
 Some checks run at apply time, and some run in the engine's golden tests. The engine recomputes seat allocations from the rules and compares them with the official seats. Declared seats are stored as published, and the engine's output is compared against them, never written over them.
 
 ## Re-emits and result sets
