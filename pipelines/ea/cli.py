@@ -127,6 +127,14 @@ def main() -> None:
         "(rebuild: all of them), "
         "check them against the cited counts, the pages, their twins, and REST, or write world-gaps.md there",
     ).add_argument("polity", choices=("us", "refresh", "rebuild", "check", "world", *coverage_countries.countries()))
+    census = commands.add_parser(
+        "census",
+        help="write .agents/spec/coverage/{cc}-census.md from the census tables, keeping its Research section, "
+        "or with 'open' list the classes that are neither held nor dispositioned, ranked by estimated votes over effort",
+    )
+    census.add_argument("targets", nargs="+", help="two-letter polity codes, or open")
+    census.add_argument("--json", action="store_true", help="with open, print JSON")
+    census.add_argument("--queued", help="a file whose class:<cc>/<key> mentions mark classes as queued on the page")
     portal = commands.add_parser(
         "portals",
         help="find a state's county results portals and emit them with the rest of results_access as a us.results_access "
@@ -213,6 +221,10 @@ def main() -> None:
     match args.command:
         case "apply":
             print(apply(args.changeset))
+        case "census":
+            from ea import census
+
+            print(census.run(args.targets, args.json, args.queued))
         case "portals":
             print(
                 portals.load(Path(args.target))
