@@ -39,7 +39,7 @@ COUNTIES = {
     "01089": (
         "Madison",
         "Madison County Probate Judge",
-        {99698: 236509, 104812: 258859, 105842: 260168, 115408: 301506, 115628: 301607, 127070: 379241},
+        {99698: 236509, 104812: 258859, 105842: 260168, 115408: 301506, 115628: 301607, 127070: 379241, 20260922: 0},
     ),
     "17043": (
         "DuPage",
@@ -340,8 +340,15 @@ IOWA = {
 COUNTIES |= {
     code: (name, "Iowa Secretary of State", {election: version}) for code, (name, election, version) in IOWA.items()
 }
+PDFS = {
+    20260922: (
+        "https://www.huntsvilleal.gov/wp-content/uploads/2026/11/2026-RUNOFF-MUNICIPAL-ELECTION-RESULTS-9.22.2026.pdf",
+        "Huntsville Municipal Runoff Election",
+    )
+}
 PLACED = {election: "HUNTSVILLE" for election in COUNTIES["01089"][2]}
 DATES = {
+    20260922: date(2026, 9, 22),
     105201: date(2020, 11, 3),
     109015: date(2021, 4, 6),
     49399: date(2013, 11, 5),
@@ -442,17 +449,59 @@ TOTALS = (
 
 
 def url(county: str, election: int, version: int) -> str:
+    if election in PDFS:
+        return PDFS[election][0]
     return CLARITY.format(state=STATES[county[:2]], county=COUNTIES[county][0], election=election, version=version)
 
 
 def fetch() -> None:
     for county, (_, _, elections) in COUNTIES.items():
         for election, version in elections.items():
-            raw.fetch(SOURCE, url(county, election, version), suffix=".zip")
+            raw.fetch(SOURCE, url(county, election, version), suffix=".pdf" if election in PDFS else ".zip")
     for link in (*SUBDIVISIONS.values(), *PLACES.values()):
         raw.fetch(SOURCE, link, suffix=".zip")
     for link in CANVASSES:
         raw.fetch(SOURCE, link, suffix=".pdf")
+
+
+def _pdf_root(path: Path, name: str) -> ElementTree.Element:
+    lines = subprocess.run(
+        ["pdftotext", "-layout", str(path), "-"], check=True, capture_output=True, text=True
+    ).stdout.splitlines()
+    title = next(line for line in lines if "City Council" in line)
+    contest = title[title.index("City Council") :].strip()
+    header = next(line for line in lines if "Over Votes" in line)
+    names = [
+        (match.start(), match.end(), match.group())
+        for match in re.finditer(r"\S+(?: \S+)*?(?=  |$)", header[: header.index("Over Votes")])
+    ]
+    root = ElementTree.Element("ElectionResult")
+    ElementTree.SubElement(root, "ElectionName").text = name
+    node = ElementTree.SubElement(root, "Contest", key="1", text=contest, voteFor="1")
+    rows: dict[str, dict[str, int]] = {}
+    totals: dict[str, int] = {}
+    for line in lines:
+        label = re.sub(r"^\s*\d+\s+", "", line[:70]).strip().upper()
+        cells = [(match.start(), int(match.group())) for match in re.finditer(r"\d+", line[80:])]
+        cells = [(start + 80, count) for start, count in cells]
+        if label.startswith("TOTAL VOTES") and not label.endswith("PROVISIONAL BALLOTS"):
+            for start, count in cells:
+                for first, last, who in names:
+                    if first - 2 <= start <= last:
+                        totals[who] = count
+            continue
+        if not label or "TOTAL" in label or "PCT" in label or "%" in label or not cells[:-1]:
+            continue
+        for start, count in cells[:-1]:
+            for first, last, who in names:
+                if first - 2 <= start <= last:
+                    rows.setdefault(who, {})[label] = count
+    for _, _, who in names:
+        choice = ElementTree.SubElement(node, "Choice", text=who, totalVotes=str(totals[who]))
+        kind = ElementTree.SubElement(choice, "VoteType", name="Election Day")
+        for place, count in rows.get(who, {}).items():
+            ElementTree.SubElement(kind, "Precinct", name=place, votes=str(count))
+    return root
 
 
 def _shapes(link: str) -> list[tuple[Mapping[str, object], str, tuple[float, ...]]]:
@@ -516,8 +565,11 @@ def parse() -> None:
         listed = munis[county]
         names = sorted({entry[0] for entry in listed}, key=len, reverse=True)
         for election, version in elections.items():
-            with zipfile.ZipFile(raw.cached(SOURCE, url(county, election, version)).path) as archive:
-                root = ElementTree.fromstring(archive.read("detail.xml"))
+            if election in PDFS:
+                root = _pdf_root(raw.cached(SOURCE, url(county, election, version)).path, PDFS[election][1])
+            else:
+                with zipfile.ZipFile(raw.cached(SOURCE, url(county, election, version)).path) as archive:
+                    root = ElementTree.fromstring(archive.read("detail.xml"))
             day = DATES.get(election) or datetime.strptime(root.findtext("ElectionDate") or "", "%m/%d/%Y").date()
             title = root.findtext("ElectionName") or ""
             if "PRIMARY" in title.upper():
