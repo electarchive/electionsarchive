@@ -18070,9 +18070,9 @@ export const elections = {
                     max(x.value) filter (where x.measure = 5) as invalid
                   from tiers t
                   left join lateral (
-                    select x.measure, x.value from result_rollup x
+                    select x.measure, sum(x.value) as value from result_rollup x
                     where x.result_set_k = t.k and x.area_k = t.area and x.option_k = 0
-                      and x.channel = 0 and x.count_round = 0 and x.measure in (2, 3, 4, 5, 14) offset 0
+                      and x.count_round = 0 and x.measure in (2, 3, 4, 5, 14) group by x.measure offset 0
                   ) x on true
                   group by t.root, t.top, t.k
                 ),
@@ -19292,7 +19292,7 @@ export const elections = {
           select s.k, v.unit_k from sets s
           cross join lateral (
             select distinct v.unit_k from result_value v
-            where v.result_set_k = s.k and v.measure = 1 and v.channel = 0 and v.count_round = 0
+            where v.result_set_k = s.k and v.measure = 1 and v.count_round = 0
           ) v
         ),
         tops as materialized (
@@ -19306,7 +19306,7 @@ export const elections = {
           coalesce((
             select sum(v.value) from tops t
             join result_value v on v.result_set_k = t.k and v.unit_k = t.unit_k and v.option_k = o.k
-              and v.measure = 1 and v.channel = 0 and v.count_round = 0
+              and v.measure = 1 and v.count_round = 0
             where t.k = s.k
           ), 0)::float8 as votes,
           x.kinds as outcome,

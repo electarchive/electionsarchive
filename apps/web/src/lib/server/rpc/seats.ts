@@ -985,9 +985,11 @@ export const seats = {
           join result_set rs on rs.contest_id = nc.id and rs.is_default and rs.stage = 'notional'
           cross join lateral (
             select o.id, o.k, o.party_id from contest_option o
-            join result_rollup y on y.result_set_k = rs.k and y.area_k = na.k and y.option_k = o.k
-              and y.measure = 1 and y.channel = 0 and y.count_round = 0
-            where o.contest_id = nc.id
+            cross join lateral (
+              select sum(y.value) as value from result_rollup y
+              where y.result_set_k = rs.k and y.area_k = na.k and y.option_k = o.k and y.measure = 1 and y.count_round = 0
+            ) y
+            where o.contest_id = nc.id and y.value is not null
             order by y.value desc limit 1
           ) o
           where nc.notional and nc.id in (select prior from paired)
@@ -1350,9 +1352,11 @@ export const seats = {
           join result_set rs on rs.contest_id = nc.id and rs.is_default and rs.stage = 'notional'
           cross join lateral (
             select o.id, o.k, o.party_id, y.value as votes from contest_option o
-            join result_rollup y on y.result_set_k = rs.k and y.area_k = na.k and y.option_k = o.k
-              and y.measure = 1 and y.channel = 0 and y.count_round = 0
-            where o.contest_id = nc.id
+            cross join lateral (
+              select sum(y.value) as value from result_rollup y
+              where y.result_set_k = rs.k and y.area_k = na.k and y.option_k = o.k and y.measure = 1 and y.count_round = 0
+            ) y
+            where o.contest_id = nc.id and y.value is not null
             order by y.value desc limit 1
           ) o
           where nc.notional and nc.id in (select prior from paired)
@@ -2083,7 +2087,7 @@ export const seats = {
           select 'list' as tier, o.id, o.party_id, o.kind::text as kind, o.ballot_label,
             (select sum(y.value)::float8 from result_rollup y
               where y.result_set_k = rs.k and y.area_k = c.region_k and y.option_k = o.k
-                and y.measure = 1 and y.channel = 0 and y.count_round = 0) as votes,
+                and y.measure = 1 and y.count_round = 0) as votes,
             (select max(coalesce(x.seats, 1))::int from outcome x
               where x.result_set_id = rs.id and x.option_id = o.id and x.candidacy_id is null and x.kind in ('won', 'elected')) as seats,
             null::uuid as person, null::text as ballot
