@@ -14,7 +14,7 @@ from ea.sources.fr.cdsp import SOURCE as CDSP
 from ea.store import DATA, connect
 
 SOURCE = "fr.regionales_communes"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 STATIC = "https://static.data.gouv.fr"
 WORKBOOKS = {
@@ -135,6 +135,47 @@ def read_workbook(year: int, round_: int) -> tuple[list[dict[str, object]], list
     return totals, votes
 
 
+def read_corse(round_: int) -> tuple[list[dict[str, object]], list[dict[str, object]]]:
+    detail = regionales.sheet(regionales.CORSE_FILES[round_], 2)
+    header_at = next(i for i, row in enumerate(detail) if row[0] == "Code du département")
+    header = detail[header_at]
+    heads = [regionales.corse_head(str(cell)) for cell in detail[header_at - 1] if cell not in (None, "")]
+    first = header.index("Exprimés") + 1
+    totals: list[dict[str, object]] = []
+    votes: list[dict[str, object]] = []
+    for row in detail[header_at + 1 :]:
+        if row[0] not in ("2A", "2B"):
+            continue
+        code = commune_code(str(row[0]), str(row[2]).strip())
+        totals.append(
+            {
+                "year": 2017,
+                "round": round_,
+                "commune": code,
+                "label": clean(row[3]),
+                "registered": regionales.number(row[header.index("Inscrits")]),
+                "voters": regionales.number(row[header.index("Votants")]),
+                "invalid": None,
+                "valid": regionales.number(row[header.index("Exprimés")]),
+                "blank": regionales.number(row[header.index("Blancs")]),
+                "null": regionales.number(row[header.index("Nuls")]),
+            }
+        )
+        for index, head in enumerate(heads):
+            votes.append(
+                {
+                    "year": 2017,
+                    "round": round_,
+                    "commune": code,
+                    "nuance": None,
+                    "short": None,
+                    "head": fold(head),
+                    "votes": regionales.number(row[first + 2 * index]),
+                }
+            )
+    return totals, votes
+
+
 def read_bureaux(year: int, round_: int) -> tuple[list[dict[str, object]], list[dict[str, object]]]:
     election = f"{year}_regi_t{round_}"
     general = (
@@ -193,6 +234,10 @@ def parse() -> None:
             found_totals, found_votes = read_workbook(year, round_)
             totals += found_totals
             votes += found_votes
+    for round_ in (1, 2):
+        found_totals, found_votes = read_corse(round_)
+        totals += found_totals
+        votes += found_votes
     for year in BUREAUX:
         for round_ in (1, 2):
             found_totals, found_votes = read_bureaux(year, round_)
@@ -219,7 +264,7 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary=(
-                "French regional elections of 2004, 2010, 2015, and 2021, both rounds, by commune, from the Interior "
+                "French regional elections of 2004, 2010, 2015, and 2021 and the Corsican territorial election of 2017, both rounds, by commune, from the Interior "
                 "Ministry's results files"
             ),
             polity="FR",
@@ -236,6 +281,11 @@ def emit() -> Path:
             raise ValueError("aggregated source is not in the database")
         for year in BUREAUX:
             sources[year] = aggregated
+        sources[2017] = cs.source("Ministère de l'Intérieur", "Élections territoriales de Corse 2017")
+        if sources[2017] in cs.minted:
+            raise ValueError("source for 2017 is not in the database")
+        for file_url in regionales.CORSE_FILES.values():
+            cs.artifact(raw.cached(regionales.SOURCE, file_url), sources[2017])
 
         known = {
             code
@@ -249,7 +299,9 @@ def emit() -> Path:
         for commune in sorted(totals["commune"].unique()):
             commune = str(commune)
             if commune not in known:
-                label = next(labels[year, commune] for year in (2010, 2004, 2015, 2021) if (year, commune) in labels)
+                label = next(
+                    labels[year, commune] for year in (2010, 2004, 2015, 2017, 2021) if (year, commune) in labels
+                )
                 area = cs.area("fr.commune", commune)
                 cs.add("area", id=area, scheme_code="fr.commune")
                 cs.add("area_code", area_id=area, code=commune, valid_from=None, valid_to=None)
@@ -453,7 +505,7 @@ def emit() -> Path:
                         "note",
                         entity_id=result_set,
                         kind="methodology",
-                        body_md=METHOD if year in WORKBOOKS else METHOD_BUREAUX,
+                        body_md=METHOD if year in WORKBOOKS or year == 2017 else METHOD_BUREAUX,
                     )
                     if drift:
                         cs.add("note", entity_id=result_set, kind="caveat", body_md=DRIFT.format(votes=drift))
