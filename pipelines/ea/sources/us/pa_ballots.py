@@ -38,7 +38,7 @@ STAGES = {
     "Total returned ballots": "returned",
     "Total recorded ballots": "accepted",
     "Total cancelled ballots": "rejected",
-    "Ballots not returned": "remaining",
+    "Ballots not returned": "unreturned",
 }
 POSTAL = 3
 
