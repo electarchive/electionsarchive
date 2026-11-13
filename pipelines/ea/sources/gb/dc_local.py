@@ -41,6 +41,7 @@ BY_BALLOTS = (
 BY_ELSEWHERE = ("local.city-of-london.", "local.isles-of-scilly.")
 BY = PARSED / "by"
 DECLARATIONS = Path(__file__).with_name("by_declarations.tsv")
+TACIT_DECLARATIONS = Path(__file__).with_name("tacit_declarations.tsv")
 RESULTS = "https://candidates.democracyclub.org.uk/media/csv-archives/results-{day}.csv"
 ARCHIVED = {2018, 2019, 2023}
 SAMPLED = {2026}
@@ -367,6 +368,10 @@ def declarations() -> pl.DataFrame:
     return pl.read_csv(DECLARATIONS, separator="\t", infer_schema_length=0)
 
 
+def tacit_declarations() -> pl.DataFrame:
+    return pl.read_csv(TACIT_DECLARATIONS, separator="\t", infer_schema_length=0).fill_null("")
+
+
 def by_years() -> list[int]:
     return sorted({int(year) for year in os.environ["DC_BY"].split(",")}, reverse=True)
 
@@ -527,6 +532,9 @@ def fetch() -> None:
                         raise
                     time.sleep(30)
             time.sleep(3)
+        if year in TACIT:
+            for url in tacit_declarations()["url"].unique().sort():
+                polite(url, ".pdf" if url.lower().split("?")[0].endswith(".pdf") else ".html")
         for key in (f"wd{year % 100}", f"lad{year % 100}", *(["ced26"] if year == 2026 else [])):
             for url in layer_pages(key):
                 raw.fetch(SOURCE, url, suffix=".geojson")
@@ -967,6 +975,25 @@ def parse() -> None:
                 elected = [line for line in record["candidacies"] if line["elected"]]
                 if record["uncontested"] and record["replaced_by"] is None and elected:
                     uncontested.append((record, elected))
+            declared: dict[str, dict[str, str]] = {}
+            renamed: dict[str, str] = {}
+            for row in (
+                tacit_declarations()
+                .filter(pl.col("ballot").str.contains(f".{year}-", literal=True))
+                .iter_rows(named=True)
+            ):
+                declared.setdefault(row["ballot"], {})[row["person_id"]] = row["url"]
+                if row["name"]:
+                    renamed[row["person_id"]] = row["name"]
+            for record, elected in uncontested:
+                if (named := declared.pop(record["ballot_paper_id"], None)) is not None and set(named) != {
+                    str(line["person"]["id"]) for line in elected
+                }:
+                    raise ValueError(f"{record['ballot_paper_id']}: the council's notice names other candidates")
+                if named is not None:
+                    record["declared"] = next(iter(named.values()))
+            if declared:
+                raise ValueError(f"tacit_declarations.tsv lists ballots that are not uncontested: {sorted(declared)}")
             tacit = (
                 pl.DataFrame(
                     [
@@ -975,6 +1002,7 @@ def parse() -> None:
                             "winners": len(elected),
                             "source": (record["sopn"] or {}).get("source_url")
                             or (record["sopn"] or {}).get("uploaded_file")
+                            or record.get("declared")
                             or "",
                             "seats": record["winner_count"],
                         }
@@ -1012,7 +1040,7 @@ def parse() -> None:
                         {
                             "ballot": record["ballot_paper_id"],
                             "person_id": str(line["person"]["id"]),
-                            "person_name": line["person"]["name"],
+                            "person_name": renamed.get(str(line["person"]["id"]), line["person"]["name"]),
                             "party_name": line["party_name"],
                             "votes": None,
                             "elected": True,
@@ -1379,6 +1407,8 @@ def emit() -> Path:
                 )
                 cs.artifact(raw.cached(SOURCE, CROYDON[year]), leeds_sources[(CROYDON_CODE, year)])
         declared = set(declarations()["url"]) if by_mode else set()
+        notices = {row["url"]: row["title"] for row in tacit_declarations().iter_rows(named=True)}
+        cited: set[UUID] = set()
         council_rows: dict[tuple[str, int, str], list[dict[str, object]]] = {}
         for row in (
             pl.read_parquet(PARSED / "leeds.parquet").filter(pl.col("year").is_in(list(full))).iter_rows(named=True)
@@ -1655,11 +1685,29 @@ def emit() -> Path:
                 sets = []
                 tacit = ward["status"] == "tacit"
                 withdrawn = ward["status"] not in ("loaded", "tacit")
+                tacit_source = tacit_sources.get(year)
+                if tacit and ward["source"] in notices:
+                    tacit_source = cs.source(council_name, notices[ward["source"]])
+                    if tacit_source not in foreign and tacit_source not in cited:
+                        cited.add(tacit_source)
+                        cs.add(
+                            "source",
+                            id=tacit_source,
+                            kind="official_body",
+                            publisher=council_name,
+                            title=notices[ward["source"]],
+                            url=ward["source"],
+                            notes="The returning officer's notice that the candidates for these wards were elected "
+                            "unopposed, published by the council (copied from the Internet Archive where the "
+                            "council's page is gone). Democracy Club's record of these wards links no statement of "
+                            "persons nominated; the names were checked against its record.",
+                        )
+                        cs.artifact(raw.cached(SOURCE, ward["source"]), tacit_source)
                 if not differing:
                     sets.append(
                         (
                             cs.key("gb.dc_local.result_set", contest_key),
-                            tacit_sources[year] if tacit else source,
+                            tacit_source if tacit else source,
                             council is None and not withdrawn and contest not in handbook and year not in CROSS_CHECKS,
                             {"ballot_paper_id": ward["ballot"], "council_source": ward["source"]},
                             ward["spoilt"],
@@ -1714,7 +1762,10 @@ def emit() -> Path:
                         "citation",
                         entity_id=result_set,
                         source_id=source,
-                        locator={"ballot_paper_id": ward["ballot"], "statement_of_persons_nominated": ward["source"]}
+                        locator={
+                            "ballot_paper_id": ward["ballot"],
+                            "notice" if ward["source"] in notices else "statement_of_persons_nominated": ward["source"],
+                        }
                         if tacit
                         else locator,
                     )
@@ -1850,6 +1901,6 @@ def emit() -> Path:
                     valid_to=end,
                     as_of=day,
                 )
-        if 2019 in full and defaults.get(2019) != 5044:
-            raise ValueError(f"{defaults.get(2019)} default result sets for 2019, not 5,044")
+        if 2019 in full and defaults.get(2019) != 5072:
+            raise ValueError(f"{defaults.get(2019)} default result sets for 2019, not 5,072")
         return cs.write()
