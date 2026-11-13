@@ -95,6 +95,16 @@
       "publisher": "Ministère de l'Intérieur and Centre de données socio-politiques (Sciences Po), on data.gouv.fr",
       "url": "https://www.data.gouv.fr/datasets/elections-cantonales-1988-2011"
     },
+    "interieur-cn2008": {
+      "title": "Elections cantonales 2008 – Résultats",
+      "publisher": "Ministère de l'Intérieur, on data.gouv.fr",
+      "url": "https://www.data.gouv.fr/datasets/53699383a3a729239d2041f7"
+    },
+    "interieur-cn2011": {
+      "title": "Elections cantonales 2011 – Résultats",
+      "publisher": "Ministère de l'Intérieur, on data.gouv.fr",
+      "url": "https://www.data.gouv.fr/datasets/53699385a3a729239d2041fb"
+    },
     "interieur-dep2015": {
       "title": "Nouvelles élections départementales",
       "publisher": "Ministère de l'Intérieur",
@@ -1584,8 +1594,8 @@
             "974": 24,
             "976": 10
           },
-          "source": "cdsp-cantonales",
-          "quote": "cdsp_cant2008t1_canton.csv (first round): 2020 distinct cantons in 100 départements."
+          "source": "interieur-cn2008",
+          "quote": "Sheet Cantons T1: 2020 cantons in 100 départements; sheet Elus: 2020 councillors elected."
         },
         {
           "date": "2011-03-20",
@@ -1692,8 +1702,8 @@
             "974": 25,
             "976": 10
           },
-          "source": "cdsp-cantonales",
-          "quote": "cdsp_cant2011t1_canton.csv (first round): 2026 distinct cantons in 100 départements."
+          "source": "interieur-cn2011",
+          "quote": "Sheet Cantons T1: 2026 cantons in 100 départements; sheet Elus: 2026 councillors elected."
         },
         {
           "date": "2015-03-22",

@@ -22,6 +22,8 @@ STATIC = "https://static.data.gouv.fr/resources"
 D15 = f"{STATIC}/elections-departementales-2015"
 D21 = f"{STATIC}/elections-departementales-2021-resultats-du"
 ROUNDS = {
+    2008: (date(2008, 3, 9), date(2008, 3, 16)),
+    2011: (date(2011, 3, 20), date(2011, 3, 27)),
     2015: (date(2015, 3, 22), date(2015, 3, 29)),
     2021: (date(2021, 6, 20), date(2021, 6, 27)),
 }
@@ -35,6 +37,10 @@ CANDIDATES = {
     (2015, 1): f"{D15}-candidatures-1er-tour/community/20150309-124441/Dep_15_Candidatures_T1_c_09_03_2015.xlsx",
     (2015, 2): f"{D15}-candidatures-2eme-tour/20150325-111447/Dep_15_Candidatures_T2.xlsx",
 }
+CANTONALES = {
+    2008: "https://static.data.gouv.fr/b9/a40c29e78c4d2f7720665671e6a5c972094dc492b13e6d2de740dce2fcc937.xls",
+    2011: "https://static.data.gouv.fr/34/2a57a8195976f4406c9d73ebab3cc506084617616da83b033edfd6d2ecfad9.xls",
+}
 CONTOURS = f"{STATIC}/contours-des-cantons-electoraux-departementaux-2015/20150220-161605/Cartes_cantons_2015.zip"
 COG = "https://www.insee.fr/fr/statistiques/fichier/7766585/v_departement_2024.csv"
 LAYERS = {"CANTON_FRANCE": 27572, "Guadeloupe": 32620, "La R": 32740, "Mayotte": 32738}
@@ -42,7 +48,7 @@ TOLERANCE = 10
 
 
 def fetch() -> None:
-    for url in (*RESULTS.values(), *CANDIDATES.values(), CONTOURS, COG):
+    for url in (*RESULTS.values(), *CANDIDATES.values(), *CANTONALES.values(), CONTOURS, COG):
         raw.fetch(SOURCE, url, suffix=Path(url).suffix)
 
 
@@ -127,6 +133,80 @@ def read(year: int, round_: int) -> tuple[list[dict[str, object]], list[dict[str
     return totals, binomes
 
 
+def cantonales(year: int) -> tuple[list[dict[str, object]], list[dict[str, object]]]:
+    path = raw.cached(SOURCE, CANTONALES[year]).path
+    winners: dict[tuple[str, int], str] = {}
+    for row in pl.read_excel(path, sheet_name="Elus", engine="calamine", infer_schema_length=0).iter_rows(named=True):
+        if row["Dpt"] is None:
+            continue
+        match = MEMBER.fullmatch(" ".join(str(row["Désignation"]).split()))
+        if match is None:
+            raise ValueError(f"{year} elected member not understood: {row}")
+        canton = f"{department(row['Dpt'])}{str(row['Canton']).strip().zfill(2)}"
+        winners[canton, int(row["Tour"])] = match.group(2)
+    totals: list[dict[str, object]] = []
+    candidates: list[dict[str, object]] = []
+    for round_ in (1, 2):
+        frame = pl.read_excel(
+            path, sheet_name=f"Cantons T{round_}", engine="calamine", has_header=False, infer_schema_length=0
+        )
+        rows = [list(row) for row in frame.iter_rows()]
+        header = [str(cell).strip() if cell is not None else "" for cell in rows[0]]
+        first = header.index("Sexe")
+        for row in rows[1:]:
+            if row[0] is None:
+                continue
+            dep = department(row[0])
+            number_ = str(row[2]).strip()
+            if len(number_) > 2:
+                raise ValueError(f"{year} canton number {dep} {number_}")
+            canton = f"{dep}{number_.zfill(2)}"
+            entry: dict[str, object] = {
+                "year": year,
+                "round": round_,
+                "dep": dep,
+                "dep_label": str(row[1]).strip(),
+                "canton": canton,
+                "label": " ".join(str(row[3]).split()),
+                "registered": number(row[header.index("Inscrits")]),
+                "voters": number(row[header.index("Votants")]),
+                "invalid": number(row[header.index("Blancs et nuls")]),
+                "valid": number(row[header.index("Exprimés")]),
+            }
+            totals.append(entry)
+            winner = winners.pop((canton, round_), None)
+            found = 0
+            for order, offset in enumerate(range(first, len(row), 7), 1):
+                sex, surname, forename, nuance, votes = row[offset : offset + 5]
+                if surname is None or str(surname).strip() == "":
+                    continue
+                surname = " ".join(str(surname).split())
+                forename = " ".join(str(forename or "").split()) or None
+                label = " ".join(part for part in (surname, forename) if part)
+                found += label == winner
+                candidates.append(
+                    {
+                        "year": year,
+                        "round": round_,
+                        "canton": canton,
+                        "order": order,
+                        "panel": None,
+                        "nuance": str(nuance).strip(),
+                        "binome": label,
+                        "votes": number(votes),
+                        "elected": label == winner,
+                        "sex": "female" if str(sex).strip() == "F" else "male",
+                        "surname": surname,
+                        "forename": forename,
+                    }
+                )
+            if winner is not None and found != 1:
+                raise ValueError(f"{year} {canton} round {round_}: elected {winner} matched {found} candidates")
+    if winners:
+        raise ValueError(f"{year} elected members without a canton row: {winners}")
+    return totals, candidates
+
+
 def contours() -> pl.DataFrame:
     features: list[tuple[str, int, str, str | None]] = []
     with zipfile.ZipFile(raw.cached(SOURCE, CONTOURS).path) as archive:
@@ -183,6 +263,10 @@ def parse() -> None:
         found_totals, found_binomes = read(year, round_)
         totals += found_totals
         binomes += found_binomes
+    for year in CANTONALES:
+        found_totals, found_binomes = cantonales(year)
+        totals += found_totals
+        binomes += found_binomes
     PARSED.mkdir(parents=True, exist_ok=True)
     pl.DataFrame(totals, infer_schema_length=None).write_parquet(PARSED / "totals.parquet")
     pl.DataFrame(binomes, infer_schema_length=None).write_parquet(PARSED / "binomes.parquet")
@@ -193,10 +277,15 @@ def parse() -> None:
 
 
 REDISTRICTING = date(2015, 3, 22)
+BEFORE = date(2011, 3, 20)
+SINGLE = date(2016, 1, 1)
+QUALIFY = {2008: 10, 2011: 8, 2015: 8, 2021: 8}
 CORSICA = date(2018, 1, 1)
 ALSACE = date(2021, 1, 1)
 LICENSE = ("Licence Ouverte v1.0", "https://www.etalab.gouv.fr/licence-ouverte-open-licence")
 DATASETS = {
+    2008: ("Elections cantonales 2008 – Résultats", "https://www.data.gouv.fr/datasets/53699383a3a729239d2041f7"),
+    2011: ("Elections cantonales 2011 – Résultats", "https://www.data.gouv.fr/datasets/53699385a3a729239d2041fb"),
     2015: ("Élections départementales 2015", "https://www.data.gouv.fr/datasets/55103071c751df04f9882845"),
     2021: ("Élections départementales 2021", "https://www.data.gouv.fr/datasets/60d1fa73986a6e7da8017808"),
 }
@@ -205,6 +294,7 @@ ENGLISH = {
     "Corse-du-Sud": "Corse-du-Sud",
     "Haute-Corse": "Haute-Corse",
     "La Réunion": "Réunion",
+    "Guyane": "French Guiana",
 }
 NUANCES = {
     "BC-EXG": "Binôme d'extrême gauche",
@@ -240,6 +330,44 @@ NUANCES = {
     "BC-UXD": "Binôme d'union de l'extrême droite",
     "BC-EXD": "Binôme d'extrême droite",
 }
+CANTONAL_NUANCES = {
+    "EXG": "Extrême gauche",
+    "COM": "Parti communiste français",
+    "PG": "Parti de gauche",
+    "SOC": "Parti socialiste",
+    "RDG": "Parti radical de gauche",
+    "DVG": "Divers gauche",
+    "VEC": "Europe Écologie-Les Verts",
+    "ECO": "Écologistes",
+    "REG": "Régionalistes",
+    "AUT": "Autres",
+    "UDFD": "UDF-Mouvement démocrate",
+    "MODM": "Mouvement démocrate",
+    "M-NC": "Majorité présidentielle-Nouveau Centre",
+    "M": "Majorité présidentielle",
+    "UMP": "Union pour un mouvement populaire",
+    "DVD": "Divers droite",
+    "FN": "Front national",
+    "EXD": "Extrême droite",
+}
+SMALL = {"de", "du", "des", "la", "le", "les", "lès", "lez", "sur", "sous", "en", "et", "aux", "au", "à", "d", "l"}
+ROMAN = re.compile(r"(?=[ivx])x{0,3}(ix|iv|v?i{0,3})")
+CANTONAL_NOTE = (
+    "Until 2015 each canton elected one general councillor for six years, and each département renewed half of "
+    "its cantons every three years. A candidate was elected in the first round with an absolute majority of the "
+    "valid votes and a number of votes at least equal to a quarter of the registered voters. Otherwise a second "
+    "round was held a week later among the candidates who won at least {share} percent of the registered voters "
+    "(the top two if fewer qualified), and the candidate with the most votes was elected."
+)
+CANTONAL_METHOD = (
+    "Results by canton from the Interior Ministry's results file. The file reports blank and null ballots together, "
+    "so they are stored as one invalid count."
+)
+CANTONAL_ROUND_ONE_NOTE = (
+    "No candidate won both an absolute majority of the valid votes and a quarter of the registered voters, so a "
+    "second round was held. Candidates who stood again are marked as advancing; candidates who won at least {share} "
+    "percent of the registered voters but did not stand again are marked as withdrawn."
+)
 SYSTEM_NOTE = (
     "Since 2015 each canton elects a pair of councillors, one woman and one man, who stand together as a binôme on "
     "one ballot, each with a substitute of the same sex. A binôme is elected in the first round if it wins an "
@@ -257,11 +385,36 @@ ROUND_ONE_NOTE = (
     "second round was held. Binômes that stood again are marked as advancing; binômes that won at least 12.5 "
     "percent of the registered voters but did not stand again are marked as withdrawn."
 )
+CONFLICTS = {(2008, "1134"), (2011, "8119")}
+CONFLICT_NOTE = (
+    "The Interior Ministry's results file lists {elected} as elected, but its vote counts, which match its "
+    "commune-level file, give more votes to {leader}. The counts are stored as published, and no outcome is "
+    "recorded until an official proclamation settles which candidate was elected."
+)
 MISSING_NOTE = (
     "The leading binôme won an absolute majority of the valid votes but fewer votes than a quarter of the "
     "registered voters, so a second round was due. The Interior Ministry's second-round files do not include this "
     "canton, so no outcome is recorded."
 )
+
+
+def cased(label: str) -> str:
+    words = re.split(r"([ \-'()/])", label.lower())
+    return "".join(
+        word.upper()
+        if ROMAN.fullmatch(word)
+        else word
+        if word in SMALL and any(w.strip(" -'()/") for w in words[:index])
+        else word[:1].upper() + word[1:]
+        for index, word in enumerate(words)
+    )
+
+
+def people(entry: dict[str, object]) -> list[tuple[str, str, str | None]]:
+    if entry.get("surname") is None:
+        return members(str(entry["binome"]))
+    forename = entry["forename"]
+    return [(str(entry["sex"]), str(entry["surname"]), None if forename is None else str(forename))]
 
 
 def members(binome: str) -> list[tuple[str, str, str | None]]:
@@ -298,8 +451,9 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary=(
-                "French departmental elections of 2015 and 2021, both rounds, by canton, with each binôme and the "
-                "elected pairs, from the Interior Ministry's results files, and the 2015 cantons with their contours"
+                "French cantonal elections of 2008 and 2011 and departmental elections of 2015 and 2021, both "
+                "rounds, by canton, with each candidate or binôme and those elected, from the Interior Ministry's "
+                "results files, the cantons in use before 2015, and the 2015 cantons with their contours"
             ),
             polity="FR",
         )
@@ -324,6 +478,8 @@ def emit() -> Path:
             for (file_year, _), file_url in [*RESULTS.items(), *CANDIDATES.items()]:
                 if file_year == year:
                     cs.artifact(raw.cached(SOURCE, file_url), sources[year])
+            if year in CANTONALES:
+                cs.artifact(raw.cached(SOURCE, CANTONALES[year]), sources[year])
         contours_source = cs.source("Ministère de l'Intérieur", "Contours des cantons électoraux départementaux 2015")
         cs.add(
             "source",
@@ -354,13 +510,11 @@ def emit() -> Path:
 
         cs.add("scheme", code="fr.canton", polity_id=france, kind="electoral_district", rank=2, noun="canton")
         cs.add("boundary_set", scheme_code="fr.canton", vintage="2015", valid_from=REDISTRICTING, as_of=REDISTRICTING)
+        recent = totals.filter((pl.col("round") == 1) & (pl.col("year") >= REDISTRICTING.year)).sort("year")
         labels: dict[str, str] = {}
-        for row in totals.filter(pl.col("round") == 1).sort("year").iter_rows(named=True):
+        for row in recent.iter_rows(named=True):
             labels.setdefault(str(row["canton"]), str(row["label"]))
-        latest = {
-            str(row["canton"]): str(row["label"])
-            for row in totals.filter(pl.col("round") == 1).sort("year").iter_rows(named=True)
-        }
+        latest = {str(row["canton"]): str(row["label"]) for row in recent.iter_rows(named=True)}
         departments = {str(code): str(dep) for code, dep in totals.select("canton", "dep").unique().iter_rows()}
         missing = sorted(set(labels) - set(shapes))
         if missing:
@@ -404,6 +558,37 @@ def emit() -> Path:
             )
             name(units[code], latest[code])
 
+        earlier = totals.filter((pl.col("round") == 1) & (pl.col("year") < REDISTRICTING.year)).sort("year")
+        old_labels = {str(row["canton"]): cased(str(row["label"])) for row in earlier.iter_rows(named=True)}
+        old_areas: dict[str, UUID] = {}
+        old_units: dict[str, UUID] = {}
+        for code in sorted(old_labels):
+            old_areas[code] = cs.area("fr.canton", code, BEFORE)
+            cs.add("area", id=old_areas[code], scheme_code="fr.canton")
+            cs.add("area_code", area_id=old_areas[code], code=code, valid_from=None, valid_to=REDISTRICTING)
+            cs.add(
+                "area_parent",
+                area_id=old_areas[code],
+                parent_id=cs.area("fr.departement", departments[code], date(2024, 1, 1)),
+                valid_from=None,
+                valid_to=REDISTRICTING,
+            )
+            name(old_areas[code], old_labels[code])
+            old_units[code] = cs.unit("fr.canton", code, BEFORE)
+            cs.add(
+                "reporting_unit",
+                id=old_units[code],
+                polity_id=france,
+                scheme_code="fr.canton",
+                code=code,
+                area_relation="equals",
+                area_id=old_areas[code],
+                kind="standard",
+                valid_from=None,
+                valid_to=REDISTRICTING,
+            )
+            name(old_units[code], old_labels[code])
+
         corsica = cs.key("fr.regionales.polity", "94")
         polities: dict[str, UUID] = {}
         paths: dict[str, str] = {}
@@ -416,7 +601,15 @@ def emit() -> Path:
             polities[dep] = cs.key(f"{SOURCE}.polity", dep)
             cs.add("polity", id=polities[dep], kind="county", iso_code=None)
             name(polities[dep], label)
-            ending = CORSICA if dep in ("2A", "2B") else ALSACE if dep in ("67", "68") else None
+            ending = (
+                CORSICA
+                if dep in ("2A", "2B")
+                else ALSACE
+                if dep in ("67", "68")
+                else SINGLE
+                if dep in ("972", "973")
+                else None
+            )
             cs.add("polity_parent", polity_id=polities[dep], parent_id=france, valid_from=None, valid_to=ending)
             cs.add(
                 "polity_territory",
@@ -431,6 +624,8 @@ def emit() -> Path:
             cs.add("body", id=bodies[dep], polity_id=polities[dep], kind="council")
             name(bodies[dep], f"Conseil départemental {of}", "fr", "official")
             name(bodies[dep], f"Departmental Council of {ENGLISH.get(label, label)}", "en", "english")
+            if earlier.filter(pl.col("dep") == dep).height:
+                name(bodies[dep], f"Conseil général {of}", "fr", "historical")
             if dep in ("2A", "2B"):
                 cs.add(
                     "polity_relation",
@@ -474,19 +669,43 @@ def emit() -> Path:
         )
         name(system, "French departmental binomial two-round system", "en")
         cs.add("note", entity_id=system, kind="methodology", body_md=SYSTEM_NOTE)
+        systems = {year: system for year in ROUNDS if year >= REDISTRICTING.year}
+        for year in CANTONALES:
+            share = f"{100 / QUALIFY[year]:g}"
+            systems[year] = cs.key(f"{SOURCE}.electoral_system", f"single-member-two-round-{share}")
+            if share in {f"{100 / QUALIFY[other]:g}" for other in CANTONALES if other < year}:
+                continue
+            cs.add(
+                "electoral_system",
+                id=systems[year],
+                polity_id=france,
+                rules={
+                    "formula": "two_round",
+                    "minimum": {"share": 0.25, "of": "registered"},
+                    "qualify": {"share": 1 / QUALIFY[year], "of": "registered"},
+                },
+                rules_version=1,
+            )
+            name(systems[year], f"French cantonal two-round system, {share} percent threshold", "en")
+            cs.add("note", entity_id=systems[year], kind="methodology", body_md=CANTONAL_NOTE.format(share=share))
 
         nuances: dict[tuple[int, str], UUID] = {}
         for year in ROUNDS:
             for code in sorted(binomes.filter(pl.col("year") == year)["nuance"].unique()):
                 nuances[year, code] = cs.key(f"{SOURCE}.nuance", f"{year}:{code}")
                 cs.add("party", id=nuances[year, code], kind="nuance", polity_id=france)
-                name(nuances[year, code], NUANCES[code])
+                if year in CANTONALES:
+                    name(nuances[year, code], "Les Verts" if (year, code) == (2008, "VEC") else CANTONAL_NUANCES[code])
+                else:
+                    name(nuances[year, code], NUANCES[code])
                 name(nuances[year, code], code, "fr", "abbreviation")
 
         persons: dict[str, UUID] = {}
         values: list[dict[str, object]] = []
         sizes: dict[UUID, list[tuple[int, date]]] = {}
         for year, days in ROUNDS.items():
+            cantonal = year in CANTONALES
+            word = "cantonal" if cantonal else "departmental"
             umbrella = cs.key(f"{SOURCE}.election", str(year))
             cs.add(
                 "election",
@@ -497,9 +716,9 @@ def emit() -> Path:
                 date_to=days[1],
                 status="held",
             )
-            name(umbrella, f"{year} French departmental elections", "en")
-            name(umbrella, f"Élections départementales de {year}", "fr", "native")
-            cs.add("slug", path=f"fr/{days[0]}-departmental", entity_id=umbrella)
+            name(umbrella, f"{year} French {word} elections", "en")
+            name(umbrella, f"Élections {'cantonales' if cantonal else 'départementales'} de {year}", "fr", "native")
+            cs.add("slug", path=f"fr/{days[0]}-{word}", entity_id=umbrella)
             year_totals = totals.filter(pl.col("year") == year)
             year_binomes = binomes.filter(pl.col("year") == year)
             for dep in sorted(year_totals["dep"].unique()):
@@ -517,7 +736,11 @@ def emit() -> Path:
                         if merged
                         else len(cantons)
                     )
-                    sizes[body].append((2 * count, days[0]))
+                    if not cantonal:
+                        sizes[body].append((2 * count, days[0]))
+                    elif not sizes[body]:
+                        older = totals.filter((pl.col("year") < REDISTRICTING.year) & (pl.col("dep") == dep))
+                        sizes[body].append((older["canton"].n_unique(), days[0]))
                 elections: dict[int, UUID] = {}
                 for round_ in (1, 2):
                     if not year_totals.filter((pl.col("dep") == dep) & (pl.col("round") == round_)).height:
@@ -537,14 +760,16 @@ def emit() -> Path:
                         status="held",
                     )
                     suffix = ", second round" if round_ == 2 else ""
-                    name(elections[round_], f"{year} {place} departmental election{suffix}", "en")
+                    name(elections[round_], f"{year} {place} {word} election{suffix}", "en")
                     cs.add(
                         "slug",
                         path=f"{path}/{day}-{'general' if round_ == 1 else 'runoff'}",
                         entity_id=elections[round_],
                     )
+                district_areas, district_units = (old_areas, old_units) if cantonal else (areas, units)
+                seats = 1 if cantonal else 2
                 for code in cantons:
-                    label = latest[code]
+                    label = old_labels[code] if cantonal else latest[code]
                     rounds = {
                         round_: year_binomes.filter((pl.col("canton") == code) & (pl.col("round") == round_)).sort(
                             "order"
@@ -570,11 +795,11 @@ def emit() -> Path:
                             election_id=elections[round_],
                             kind="body_seats",
                             body_id=body,
-                            district_area_id=areas[code],
-                            magnitude=2,
+                            district_area_id=district_areas[code],
+                            magnitude=seats,
                             round_number=round_,
                             previous_round_id=previous,
-                            electoral_system_id=system,
+                            electoral_system_id=systems[year],
                             default_result_kind="counted",
                         )
                         round_word = "first" if round_ == 1 else "second"
@@ -598,53 +823,74 @@ def emit() -> Path:
                             is_default=True,
                             completeness=1,
                         )
-                        cs.add("note", entity_id=result_set, kind="methodology", body_md=METHOD)
+                        cs.add(
+                            "note",
+                            entity_id=result_set,
+                            kind="methodology",
+                            body_md=CANTONAL_METHOD if cantonal else METHOD,
+                        )
                         if round_ == 1 and decisive == 2:
-                            cs.add("note", entity_id=result_set, kind="context", body_md=ROUND_ONE_NOTE)
+                            cs.add(
+                                "note",
+                                entity_id=result_set,
+                                kind="context",
+                                body_md=CANTONAL_ROUND_ONE_NOTE.format(share=f"{100 / QUALIFY[year]:g}")
+                                if cantonal
+                                else ROUND_ONE_NOTE,
+                            )
                         if decisive is None:
                             cs.add("note", entity_id=result_set, kind="caveat", body_md=MISSING_NOTE)
+                        conflict = round_ == decisive and (year, code) in CONFLICTS
+                        if conflict:
+                            cs.add(
+                                "note",
+                                entity_id=result_set,
+                                kind="caveat",
+                                body_md=CONFLICT_NOTE.format(
+                                    elected=entries.filter(pl.col("elected"))["binome"].item(),
+                                    leader=entries.sort("votes", descending=True)["binome"][0],
+                                ),
+                            )
                         registered = int(total["registered"])
                         runoff = {
                             (surname, forename)
                             for entry in rounds[2].iter_rows(named=True)
-                            for _, surname, forename in members(entry["binome"])
+                            for _, surname, forename in people(entry)
                         }
                         qualified = {
                             entry["binome"]
                             for entry in entries.iter_rows(named=True)
-                            if entry["votes"] * 8 >= registered
+                            if entry["votes"] * QUALIFY[year] >= registered
                         }
                         if len(qualified) < 2:
                             qualified |= set(entries.sort("votes", descending=True).head(2)["binome"])
                         for field, measure in (
-                            ("registered", 2),
-                            ("voters", 14),
-                            ("valid", 4),
-                            ("null", 5),
-                            ("blank", 6),
+                            (("registered", 2), ("voters", 14), ("valid", 4), ("invalid", 5))
+                            if cantonal
+                            else (("registered", 2), ("voters", 14), ("valid", 4), ("null", 5), ("blank", 6))
                         ):
                             values.append(
                                 {
                                     "result_set_id": str(result_set),
-                                    "unit_id": str(units[code]),
+                                    "unit_id": str(district_units[code]),
                                     "option_id": None,
                                     "measure": measure,
                                     "value": total[field],
                                 }
                             )
                         for entry in entries.iter_rows(named=True):
-                            panel = int(entry["panel"])
+                            panel = int(entry["panel"] if entry["panel"] is not None else entry["order"])
                             option = cs.key(f"{SOURCE}.option", f"{contest_key}:{panel}")
                             cs.add(
                                 "contest_option",
                                 id=option,
                                 contest_id=contest,
-                                kind="ticket",
+                                kind="candidate" if cantonal else "ticket",
                                 party_id=nuances[year, entry["nuance"]],
-                                ballot_position=panel,
+                                ballot_position=entry["panel"],
                                 ballot_label=entry["binome"],
                             )
-                            for position, (gender, surname, forename) in enumerate(members(entry["binome"]), 1):
+                            for position, (gender, surname, forename) in enumerate(people(entry), 1):
                                 person_key = f"{year}:{code}:{surname}:{forename}"
                                 if person_key not in persons:
                                     persons[person_key] = cs.key(f"{SOURCE}.person", person_key)
@@ -656,18 +902,16 @@ def emit() -> Path:
                                     person_id=persons[person_key],
                                     option_id=option,
                                     role="head" if position == 1 else "running_mate",
-                                    list_position=position,
+                                    list_position=None if cantonal else position,
                                     ballot_name=" ".join(part for part in (surname, forename) if part),
                                     member_of_party_id=None,
                                     is_independent=False,
                                 )
-                            if decisive is None:
+                            if decisive is None or conflict:
                                 kind: str | None = None
                             elif round_ == decisive:
                                 kind = "elected" if entry["elected"] else "lost"
-                            elif any(
-                                (surname, forename) in runoff for _, surname, forename in members(entry["binome"])
-                            ):
+                            elif any((surname, forename) in runoff for _, surname, forename in people(entry)):
                                 kind = "advanced"
                             elif entry["binome"] in qualified:
                                 kind = "withdrew"
@@ -679,12 +923,12 @@ def emit() -> Path:
                                     result_set_id=result_set,
                                     option_id=option,
                                     kind=kind,
-                                    seats=2 if kind == "elected" else None,
+                                    seats=seats if kind == "elected" else None,
                                 )
                             values.append(
                                 {
                                     "result_set_id": str(result_set),
-                                    "unit_id": str(units[code]),
+                                    "unit_id": str(district_units[code]),
                                     "option_id": str(option),
                                     "measure": 1,
                                     "value": entry["votes"],
@@ -697,6 +941,8 @@ def emit() -> Path:
                     end = CORSICA
                 if end is None and body in (bodies.get("67"), bodies.get("68")):
                     end = ALSACE
+                if end is None and body in (bodies.get("972"), bodies.get("973")):
+                    end = SINGLE
                 cs.add("body_size", body_id=body, seats=seats, valid_from=start, valid_to=end)
         cs.frame(
             "result_value",
