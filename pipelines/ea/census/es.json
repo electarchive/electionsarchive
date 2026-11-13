@@ -341,8 +341,7 @@
       "match": [
         {
           "election_kinds": [
-            "general",
-            "snap"
+            "general"
           ],
           "body_kinds": [
             "lower_house"
@@ -517,8 +516,7 @@
       "match": [
         {
           "election_kinds": [
-            "general",
-            "snap"
+            "general"
           ],
           "body_kinds": [
             "upper_house"
@@ -1097,8 +1095,7 @@
       "match": [
         {
           "election_kinds": [
-            "general",
-            "snap"
+            "general"
           ],
           "body_kinds": [
             "unicameral"
@@ -2474,7 +2471,8 @@
           "polity_kinds": [
             "municipality"
           ],
-          "valid_from": "1979-01-01"
+          "valid_from": "1979-01-01",
+          "within": null
         }
       ],
       "cadence": [
@@ -2608,7 +2606,8 @@
           "polity_kinds": [
             "municipality"
           ],
-          "valid_from": "1979-01-01"
+          "valid_from": "1979-01-01",
+          "within": null
         }
       ],
       "cadence": [
@@ -2649,7 +2648,8 @@
           "polity_kinds": [
             "municipality"
           ],
-          "valid_from": "1979-01-01"
+          "valid_from": "1979-01-01",
+          "within": null
         }
       ],
       "cadence": [
@@ -2684,7 +2684,8 @@
           "polity_kinds": [
             "submunicipal"
           ],
-          "valid_from": "1979-01-01"
+          "valid_from": "1979-01-01",
+          "within": null
         }
       ],
       "cadence": [
