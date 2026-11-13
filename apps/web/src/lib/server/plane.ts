@@ -1,3 +1,4 @@
+import type { SQL } from "drizzle-orm";
 import registry from "@ea/db/projections";
 import { sql } from "drizzle-orm";
 import { PgDialect } from "drizzle-orm/pg-core";
@@ -183,44 +184,75 @@ export const parted = async (
   if (insets.length === 0) {
     return;
   }
-  const spread = sql`
+  const name = schemes[scheme.split(".", 1)[0] ?? ""] ?? fallback;
+  const covered = sql.raw(
+    insets
+      .flatMap((inset) => inset.within)
+      .map(
+        ([west, south, east, north]) =>
+          `g.geom && ST_MakeEnvelope(${west}, ${south}, ${east}, ${north}, 4326)`,
+      )
+      .join(" or "),
+  );
+  const membership = sql`
+    select a.scheme_code as scheme, array_agg(g.area_id::text) as ids
+    from (
+      select distinct g.area_id from area_geometry g
+      where (${covered}) and not isempty(g.valid)
+    ) g
+    join area a on a.id = g.area_id
+    group by a.scheme_code
+  `;
+  const spread = (ids: Array<string>, isWide: boolean) => sql`
     select a.k, ${part(scheme, "g.geom")} as part, ST_X(o.point) as x, ST_Y(o.point) as y,
       lower(g.valid)::text as "from", upper(g.valid)::text as until
     from (
       select g.area_id, g.geom, g.label_point, g.valid from area_geometry g
-      where (${sql.raw(
-        insets
-          .flatMap((inset) => inset.within)
-          .map(
-            ([west, south, east, north]) =>
-              `g.geom && ST_MakeEnvelope(${west}, ${south}, ${east}, ${north}, 4326)`,
-          )
-          .join(" or "),
-      )}) and not isempty(g.valid)
-      offset 0
+      where (${covered}) and not isempty(g.valid)
+        ${isWide ? sql`offset 0` : sql`and g.area_id = any(${sql.param(ids)}::uuid[])`}
     ) g
     join area a on a.id = g.area_id
     cross join lateral (select coalesce(g.label_point, ST_PointOnSurface(g.geom)) as point) o
-    where a.scheme_code = ${scheme}
+    where ${isWide ? sql`g.area_id = any(${sql.param(ids)}::uuid[])` : sql`true`}
   `;
+  const hash = (query: SQL) =>
+    createHash("sha256")
+      .update(dialect.sqlToQuery(query).sql)
+      .digest("base64url");
   const [everyDay, own, held] = await Promise.all([
     remember(
       `parted:${scheme}`,
-      async () =>
-        (
-          await db.execute<{
-            k: number;
-            part: number;
-            x: number;
-            y: number;
-            from: string | null;
-            until: string | null;
-          }>(spread)
-        ).rows,
+      async () => {
+        const members = await remember(
+          `parted-members:${name}`,
+          async () =>
+            Object.fromEntries(
+              (
+                await db.execute<{ scheme: string; ids: Array<string> }>(
+                  membership,
+                )
+              ).rows.map((row) => [row.scheme, row.ids]),
+            ),
+          true,
+          `parted-members-${hash(membership)}-undated`,
+          true,
+        );
+        const ids = members[scheme] ?? [];
+        return ids.length === 0
+          ? []
+          : (
+              await db.execute<{
+                k: number;
+                part: number;
+                x: number;
+                y: number;
+                from: string | null;
+                until: string | null;
+              }>(spread(ids, ids.length > 500))
+            ).rows;
+      },
       false,
-      `parted-${createHash("sha256")
-        .update(JSON.stringify(dialect.sqlToQuery(spread)))
-        .digest("base64url")}-undated`,
+      `parted-${hash(sql`${spread([], false)}${spread([], true)}`)}-undated`,
       true,
     ),
     db.execute<{ mine: number | null }>(sql`
