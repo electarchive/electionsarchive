@@ -18,6 +18,7 @@ import psycopg
 from psycopg.types.json import Json
 
 from ea import coverage, coverage_countries, raw, readiness, statewide_table
+from ea.census_calendar import next_date
 from ea.sources.us.clerk import LEGISLATORS
 from ea.store import ROOT, connect
 
@@ -1335,11 +1336,8 @@ def build(full: bool = False) -> str:
             )
             if found is not None:
                 g["next_date"], g["next_election_id"] = found
-            elif rule is not None and rule.day_rule == "nov_tuesday_after_first_monday":
-                year = today.year + (g["phase"] - today.year) % g["period"]
-                while (day := date(year, 11, 2 + -date(year, 11, 1).weekday() % 7)) <= today:
-                    year += g["period"]
-                g["next_date"] = day
+            elif rule is not None:
+                g["next_date"] = next_date(rule.day_rule, g["period"], g["phase"], today)
         years = held.get(g.get("held_key") or g["polity_id"] or "", {})
         for year in sorted(set(years) | set(range(2000, today.year + 1))):
             era = g["era"]
