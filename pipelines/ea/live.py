@@ -137,6 +137,12 @@ def poll(feed: str, adapter: str, params: dict[str, str], client: httpx.Client) 
             record(conn, feed, fetched_at, None, None, None, "unchanged", "waiting: no result pages yet")
             return "waiting: no result pages yet"
         digest = hashlib.sha256(params.get("revision", "").encode())
+        if "state" in params:
+            published = conn.execute(
+                "select count(*) from external_id where scheme = 'us.contest' and value like %s",
+                [f"{enr_2026.DAY}:{params['state']}:%"],
+            ).fetchall()
+            digest.update(f"published={published}".encode())
         for url in sorted(pages):
             if not url.endswith(enr_2026.LISTINGS):
                 digest.update(url.encode() + b"\0" + pages[url][0])
