@@ -187,6 +187,8 @@ const MODEL = {
     amount: 1.2,
     small: 0.03,
     weigh: 1,
+    span: 1,
+    reach: 5,
   },
   reported: { common: 0.9, own: 0.3, capped: 0.99 },
   channel: { turnout: 0.35, prior: 0.08, sigma: 1.5, unlisted: 0.02 },
@@ -323,6 +325,7 @@ type Unit = {
   sigma: number;
   hasBaseline: boolean;
   night: Array<number> | null;
+  paced: number | null;
   reported: { share: number; total: number } | null;
   county: string;
   channel: number;
@@ -523,6 +526,22 @@ function units(
     }
   }
   const clock = Date.parse(now);
+  const start = clock - MODEL.late.span * 86_400_000;
+  const paces = new Map<string, number>();
+  if (cutoff != null && start > cutoff) {
+    for (const [id, list] of byUnit) {
+      let then: LiveUnitCount | null = null;
+      for (const count of list) {
+        if (
+          Date.parse(count.at) <= start &&
+          (then == null || count.at > then.at)
+        ) {
+          then = count;
+        }
+      }
+      paces.set(id, then == null ? 0 : sum(then.votes));
+    }
+  }
   const [a, b] = pair(race, latest);
   const pooled =
     byUnit.has(race.id) && race.baseline.every((row) => row.unitId !== race.id);
@@ -590,6 +609,7 @@ function units(
       sigma: MODEL.spread,
       hasBaseline: base != null && base.turnout > 0,
       night: nights.get(id) ?? null,
+      paced: paces.get(id) ?? null,
       reported: reported.get(id) ?? null,
       floor: 0,
     });
@@ -1247,6 +1267,9 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
         channel: 0,
         hasBaseline: members.some((unit) => unit.hasBaseline),
         settled: Math.min(...members.map((unit) => unit.settled)),
+        paced: members.some((unit) => unit.paced == null)
+          ? null
+          : sum(members.map((unit) => unit.paced ?? 0)),
         sigma:
           MODEL.spread *
           clamp((MODEL.sizeRef / expected) ** MODEL.sizeExp, MODEL.sizeLow, 1),
@@ -1428,6 +1451,16 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
           unit.total > 0 && complete
             ? unit.total
             : model.unit(unit, cell, tau, surge, random);
+        if (isLate && unit.paced != null && unit.total > 0) {
+          finals[index] = Math.min(
+            finals[index],
+            Math.max(
+              unit.total,
+              unit.floor,
+              unit.total + MODEL.late.reach * (unit.total - unit.paced),
+            ),
+          );
+        }
       }
     }
     for (const [index, unit] of found.entries()) {
