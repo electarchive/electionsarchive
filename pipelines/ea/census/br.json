@@ -225,6 +225,134 @@
       "publisher": "IBGE (source: Tribunal Superior Eleitoral)",
       "url": "https://seculoxx.ibge.gov.br/images/seculoxx/arquivos_download/representacao_politica/1983/rep_polit_1983m_aeb_262.pdf",
       "kind": "official_body"
+    },
+    "ibge-dtb-2025": {
+      "title": "Divisão Territorial Brasileira 2025 (DTB_2025.zip, RELATORIO_DTB_BRASIL_2025_MUNICIPIOS), data base 31/12/2025",
+      "publisher": "IBGE",
+      "url": "https://geoftp.ibge.gov.br/organizacao_do_territorio/estrutura_territorial/divisao_territorial/2025/DTB_2025.zip",
+      "note": "The municipal report lists 5,571 codes in 27 federal units: 5,569 municipalities, plus Brasília (the Federal District, code 5300108) and the state district of Fernando de Noronha (2605459).",
+      "kind": "official_body"
+    },
+    "lei-9504": {
+      "title": "Lei nº 9.504, de 30 de setembro de 1997 (Lei das Eleições)",
+      "publisher": "Presidência da República (Planalto)",
+      "url": "https://www.planalto.gov.br/ccivil_03/leis/l9504.htm",
+      "kind": "official_body"
+    },
+    "eca": {
+      "title": "Lei nº 8.069, de 13 de julho de 1990 (Estatuto da Criança e do Adolescente), art. 139",
+      "publisher": "Presidência da República (Planalto)",
+      "url": "https://www.planalto.gov.br/ccivil_03/leis/l8069.htm",
+      "kind": "official_body"
+    },
+    "cf91": {
+      "title": "Constituição da República dos Estados Unidos do Brasil de 1891",
+      "publisher": "Presidência da República (Planalto)",
+      "url": "https://www.planalto.gov.br/ccivil_03/constituicao/constituicao91.htm",
+      "kind": "official_body"
+    },
+    "tse-suplementares": {
+      "title": "Eleições suplementares (calendars of supplementary elections, 2007 to 2026)",
+      "publisher": "Tribunal Superior Eleitoral",
+      "url": "https://www.tse.jus.br/eleicoes/eleicoes-suplementares",
+      "kind": "official_body"
+    },
+    "tse-plebiscitos": {
+      "title": "Plebiscito e referendo (Plebiscitos 2018, Plebiscitos 2016, Plebiscitos no Estado do Pará, Plebiscito 1993, Referendo 2005, Referendo 1963)",
+      "publisher": "Tribunal Superior Eleitoral",
+      "url": "https://www.tse.jus.br/eleicoes/plebiscitos-e-referendos/plebiscito-e-referendo",
+      "kind": "official_body"
+    },
+    "tse-plebiscitos-2016": {
+      "title": "Plebiscitos 2016 (municipal plebiscites held with the 2016 municipal elections)",
+      "publisher": "Tribunal Superior Eleitoral",
+      "url": "https://www.tse.jus.br/eleicoes/plebiscitos-e-referendos/plebiscito-2016/plebiscitos-2016",
+      "kind": "official_body"
+    },
+    "tse-glossario-referendo": {
+      "title": "Glossário Eleitoral: Referendo",
+      "publisher": "Tribunal Superior Eleitoral",
+      "url": "https://www.tse.jus.br/servicos-eleitorais/glossario/termos/referendo",
+      "kind": "official_body"
+    },
+    "tse-glossario-plebiscito": {
+      "title": "Glossário Eleitoral: Plebiscito",
+      "publisher": "Tribunal Superior Eleitoral",
+      "url": "https://www.tse.jus.br/servicos-eleitorais/glossario/termos/plebiscito",
+      "kind": "official_body"
+    },
+    "tse-res-23355": {
+      "title": "Resolução nº 23.355, de 18 de agosto de 2011 (propaganda in the plebiscites on dividing Pará)",
+      "publisher": "Tribunal Superior Eleitoral",
+      "url": "https://sintse.tse.jus.br/documentos/2011/Ago/24/diario-da-justica-eletronico-tse/resolucao-no-23-355-de-18-de-agosto-de-2011-dispoe",
+      "kind": "official_body"
+    },
+    "tse-noronha-2026": {
+      "title": "Eleitores de Fernando de Noronha elegem 7 conselheiros distritais",
+      "publisher": "Tribunal Regional Eleitoral de Pernambuco",
+      "url": "https://www.tre-pe.jus.br/comunicacao/noticias/2026/Outubro/eleitores-de-fernando-de-noronha-elegem-7-conselheiros-distritais",
+      "kind": "official_body"
+    },
+    "tse-dados-abertos": {
+      "title": "Portal de Dados Abertos do TSE (resultados, candidatos, eleitorado)",
+      "publisher": "Tribunal Superior Eleitoral",
+      "url": "https://dadosabertos.tse.jus.br/",
+      "note": "Licensed CC BY. Results by municipality and zone from 1994 (general) and 1996 (municipal); by polling section from 2008 for municipal and 2010 for general elections in every state, earlier for some.",
+      "kind": "official_body"
+    },
+    "tse-early": {
+      "title": "Repositório de dados eleitorais: votacao_candidato_uf, votacao_partido_uf, and detalhe_votacao_uf, 1945 to 1990",
+      "publisher": "Tribunal Superior Eleitoral",
+      "url": "https://cdn.tse.jus.br/estatistica/sead/odsele/votacao_candidato_uf/",
+      "kind": "official_body"
+    },
+    "tse-munzona-2004": {
+      "title": "detalhe_votacao_munzona_2004.zip (municipal cycle 2004, with the supplementary elections of its term)",
+      "publisher": "Tribunal Superior Eleitoral",
+      "url": "https://cdn.tse.jus.br/estatistica/sead/odsele/detalhe_votacao_munzona/detalhe_votacao_munzona_2004.zip",
+      "kind": "official_body"
+    },
+    "tse-munzona-2008": {
+      "title": "detalhe_votacao_munzona_2008.zip (municipal cycle 2008, with the supplementary elections of its term)",
+      "publisher": "Tribunal Superior Eleitoral",
+      "url": "https://cdn.tse.jus.br/estatistica/sead/odsele/detalhe_votacao_munzona/detalhe_votacao_munzona_2008.zip",
+      "kind": "official_body"
+    },
+    "tse-munzona-2012": {
+      "title": "detalhe_votacao_munzona_2012.zip (municipal cycle 2012, with the supplementary elections of its term)",
+      "publisher": "Tribunal Superior Eleitoral",
+      "url": "https://cdn.tse.jus.br/estatistica/sead/odsele/detalhe_votacao_munzona/detalhe_votacao_munzona_2012.zip",
+      "kind": "official_body"
+    },
+    "tse-munzona-2016": {
+      "title": "detalhe_votacao_munzona_2016.zip (municipal cycle 2016, with the supplementary elections of its term)",
+      "publisher": "Tribunal Superior Eleitoral",
+      "url": "https://cdn.tse.jus.br/estatistica/sead/odsele/detalhe_votacao_munzona/detalhe_votacao_munzona_2016.zip",
+      "kind": "official_body"
+    },
+    "tse-munzona-2020": {
+      "title": "detalhe_votacao_munzona_2020.zip (municipal cycle 2020, with the supplementary elections of its term)",
+      "publisher": "Tribunal Superior Eleitoral",
+      "url": "https://cdn.tse.jus.br/estatistica/sead/odsele/detalhe_votacao_munzona/detalhe_votacao_munzona_2020.zip",
+      "kind": "official_body"
+    },
+    "tse-munzona-2024": {
+      "title": "detalhe_votacao_munzona_2024.zip (municipal cycle 2024, with the supplementary elections of its term)",
+      "publisher": "Tribunal Superior Eleitoral",
+      "url": "https://cdn.tse.jus.br/estatistica/sead/odsele/detalhe_votacao_munzona/detalhe_votacao_munzona_2024.zip",
+      "kind": "official_body"
+    },
+    "tse-munzona-2018": {
+      "title": "detalhe_votacao_munzona_2018.zip (general cycle 2018, with the supplementary state elections of its term)",
+      "publisher": "Tribunal Superior Eleitoral",
+      "url": "https://cdn.tse.jus.br/estatistica/sead/odsele/detalhe_votacao_munzona/detalhe_votacao_munzona_2018.zip",
+      "kind": "official_body"
+    },
+    "tse-munzona-2022": {
+      "title": "detalhe_votacao_munzona_2022.zip (general cycle 2022, with the supplementary state elections of its term)",
+      "publisher": "Tribunal Superior Eleitoral",
+      "url": "https://cdn.tse.jus.br/estatistica/sead/odsele/detalhe_votacao_munzona/detalhe_votacao_munzona_2022.zip",
+      "kind": "official_body"
     }
   },
   "tiers": [
@@ -240,14 +368,43 @@
       "name": "States and Federal District",
       "parent": "national",
       "polity_kind": "federal_unit",
-      "source": "ibge-1947-gov"
+      "source": "ibge-dtb-2025",
+      "counts": [
+        {
+          "date": "2025-12-31",
+          "value": 27,
+          "source": "ibge-dtb-2025"
+        }
+      ]
+    },
+    {
+      "key": "state_district",
+      "name": "State district of Fernando de Noronha",
+      "parent": "state",
+      "within": "BR-PE",
+      "source": "ibge-dtb-2025",
+      "counts": [
+        {
+          "date": "2025-12-31",
+          "value": 1,
+          "source": "ibge-dtb-2025",
+          "within": "BR-PE"
+        }
+      ]
     },
     {
       "key": "municipality",
       "name": "Municipalities",
       "parent": "state",
       "polity_kind": "municipality",
-      "source": "tse-mun-1996"
+      "source": "ibge-dtb-2025",
+      "counts": [
+        {
+          "date": "2025-12-31",
+          "value": 5569,
+          "source": "ibge-dtb-2025"
+        }
+      ]
     }
   ],
   "classes": [
@@ -278,7 +435,8 @@
           "office_kinds": [
             "head_of_state"
           ],
-          "iso_pattern": "BR"
+          "iso_pattern": "BR",
+          "valid_from": "1945-01-01"
         }
       ],
       "dates": [
@@ -381,7 +539,40 @@
           "source": "tse-cand",
           "quote": "consulta_cand_2026, DS_CARGO Presidente: two candidates '2º TURNO' in round 1, and two NR_TURNO 2 rows"
         }
-      ]
+      ],
+      "first_held": "1945-12-02",
+      "note": "Direct, two rounds since 1989 (an absolute majority of valid votes, or a runoff on the last Sunday of October between the top two). Terms of five years from 1946 and 1988, four since 1994. Earlier presidents are the classes president_1891 (direct, 1894 to 1930) and president_indirect.",
+      "cadence": [
+        {
+          "source": "cf88",
+          "period_years": 4,
+          "phase": 2,
+          "month": 10,
+          "day_rule": "oct_first_sunday",
+          "term_years": 4,
+          "valid_from": "1998-01-01",
+          "called": false,
+          "administered_by": "Tribunal Superior Eleitoral and the regional electoral courts",
+          "runoff": "majority",
+          "runoff_rule": "oct_last_sunday",
+          "locator": "https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art77"
+        }
+      ],
+      "access": [
+        {
+          "url": "https://dadosabertos.tse.jus.br/",
+          "platform": "TSE Portal de Dados Abertos",
+          "format": "csv",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "source": "tse-dados-abertos",
+          "license": "CC BY",
+          "first_date": "1945-12-02",
+          "finest": "br.secao",
+          "evidence": "votes by state from 1945 (votacao_candidato_uf), by municipality and zone from 1994, and by polling section from 2002"
+        }
+      ],
+      "finest_note": "polling section (seção eleitoral)"
     },
     {
       "key": "camara",
@@ -408,7 +599,8 @@
           "body_kinds": [
             "lower_house"
           ],
-          "iso_pattern": "BR"
+          "iso_pattern": "BR",
+          "valid_from": "1945-01-01"
         }
       ],
       "dates": [
@@ -558,7 +750,36 @@
           "through": "1990-12-31",
           "note": "These elections aren't counted yet. IBGE's statistical yearbooks don't print seats or results for them. The TSE's 1986 results volume is in the Câmara dos Deputados library, and the TSE's 1990 seat resolution covers 1990."
         }
-      ]
+      ],
+      "first_held": "1945-12-02",
+      "cadence": [
+        {
+          "source": "lei-9504",
+          "period_years": 4,
+          "phase": 2,
+          "month": 10,
+          "day_rule": "oct_first_sunday",
+          "term_years": 4,
+          "valid_from": "1998-01-01",
+          "called": false,
+          "administered_by": "Tribunal Superior Eleitoral and the regional electoral courts"
+        }
+      ],
+      "access": [
+        {
+          "url": "https://dadosabertos.tse.jus.br/",
+          "platform": "TSE Portal de Dados Abertos",
+          "format": "csv",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "source": "tse-dados-abertos",
+          "license": "CC BY",
+          "first_date": "1945-12-02",
+          "finest": "br.secao",
+          "evidence": "candidate and party votes by state from 1945, by municipality and zone from 1994, and by polling section"
+        }
+      ],
+      "finest_note": "polling section (seção eleitoral)"
     },
     {
       "key": "senado",
@@ -585,7 +806,8 @@
           "body_kinds": [
             "upper_house"
           ],
-          "iso_pattern": "BR"
+          "iso_pattern": "BR",
+          "valid_from": "1945-01-01"
         }
       ],
       "dates": [
@@ -737,7 +959,38 @@
           "through": "1990-12-31",
           "note": "These elections aren't counted yet. IBGE's statistical yearbooks don't print seats or results for them. The TSE's 1986 results volume is in the Câmara dos Deputados library, and the TSE's 1990 seat resolution covers 1990."
         }
-      ]
+      ],
+      "first_held": "1945-12-02",
+      "note": "Each state and the Federal District elects three senators for eight-year terms, renewed alternately by one third and two thirds every four years, by plurality. The 1978 senators chosen by state electoral colleges are the class senado_indirect.",
+      "cadence": [
+        {
+          "source": "lei-9504",
+          "period_years": 4,
+          "phase": 2,
+          "month": 10,
+          "day_rule": "oct_first_sunday",
+          "term_years": 8,
+          "valid_from": "1998-01-01",
+          "called": false,
+          "administered_by": "Tribunal Superior Eleitoral and the regional electoral courts",
+          "classes": 2
+        }
+      ],
+      "access": [
+        {
+          "url": "https://dadosabertos.tse.jus.br/",
+          "platform": "TSE Portal de Dados Abertos",
+          "format": "csv",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "source": "tse-dados-abertos",
+          "license": "CC BY",
+          "first_date": "1945-12-02",
+          "finest": "br.secao",
+          "evidence": "candidate votes by state from 1945, by municipality and zone from 1994, and by polling section"
+        }
+      ],
+      "finest_note": "polling section (seção eleitoral)"
     },
     {
       "key": "governor",
@@ -760,7 +1013,10 @@
           "office_kinds": [
             "governor"
           ],
-          "iso_pattern": "BR-*"
+          "polity_kinds": [
+            "federal_unit"
+          ],
+          "valid_from": "1945-01-01"
         }
       ],
       "dates": [
@@ -885,12 +1141,45 @@
           "through": "1990-12-31",
           "note": "These elections aren't counted yet. IBGE's statistical yearbooks don't print seats or results for them. The TSE's 1986 results volume is in the Câmara dos Deputados library, and the TSE's 1990 seat resolution covers 1990."
         }
-      ]
+      ],
+      "first_held": "1947-01-19",
+      "note": "Direct in 1947 to 1965 and since 1982, two rounds since 1990. Guanabara (1960 to 1975) counts with the states. From 1966 to 1978 governors were chosen indirectly (class governor_indirect).",
+      "cadence": [
+        {
+          "source": "cf88",
+          "period_years": 4,
+          "phase": 2,
+          "month": 10,
+          "day_rule": "oct_first_sunday",
+          "term_years": 4,
+          "valid_from": "1998-01-01",
+          "called": false,
+          "administered_by": "Tribunal Superior Eleitoral and the regional electoral courts",
+          "runoff": "majority",
+          "runoff_rule": "oct_last_sunday",
+          "locator": "https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art28"
+        }
+      ],
+      "access": [
+        {
+          "url": "https://dadosabertos.tse.jus.br/",
+          "platform": "TSE Portal de Dados Abertos",
+          "format": "csv",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "source": "tse-dados-abertos",
+          "license": "CC BY",
+          "first_date": "1947-01-19",
+          "finest": "br.secao",
+          "evidence": "votes by state from 1947, by municipality and zone from 1994, and by polling section"
+        }
+      ],
+      "finest_note": "polling section (seção eleitoral)"
     },
     {
       "key": "assemblies",
       "tier": "state",
-      "name": "State assembly elections",
+      "name": "State assembly and Federal District legislative chamber elections",
       "category": "legislature",
       "goal": "subnational",
       "measure": {
@@ -907,7 +1196,10 @@
           "body_kinds": [
             "unicameral"
           ],
-          "iso_pattern": "BR-*"
+          "polity_kinds": [
+            "federal_unit"
+          ],
+          "valid_from": "1945-01-01"
         }
       ],
       "dates": [
@@ -1054,12 +1346,42 @@
           "through": "1990-12-31",
           "note": "These elections aren't counted yet. IBGE's statistical yearbooks don't print seats or results for them. The TSE's 1986 results volume is in the Câmara dos Deputados library, and the TSE's 1990 seat resolution covers 1990."
         }
-      ]
+      ],
+      "first_held": "1947-01-19",
+      "note": "Legislative assemblies of the states, Guanabara's (1960 to 1975), and since 1990 the Federal District's Câmara Legislativa, by open-list proportional representation.",
+      "cadence": [
+        {
+          "source": "lei-9504",
+          "period_years": 4,
+          "phase": 2,
+          "month": 10,
+          "day_rule": "oct_first_sunday",
+          "term_years": 4,
+          "valid_from": "1998-01-01",
+          "called": false,
+          "administered_by": "Tribunal Superior Eleitoral and the regional electoral courts"
+        }
+      ],
+      "access": [
+        {
+          "url": "https://dadosabertos.tse.jus.br/",
+          "platform": "TSE Portal de Dados Abertos",
+          "format": "csv",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "source": "tse-dados-abertos",
+          "license": "CC BY",
+          "first_date": "1947-01-19",
+          "finest": "br.secao",
+          "evidence": "candidate and party votes by state from 1947, by municipality and zone from 1994, and by polling section"
+        }
+      ],
+      "finest_note": "polling section (seção eleitoral)"
     },
     {
       "key": "municipal",
       "tier": "municipality",
-      "name": "Municipal elections",
+      "name": "Municipal elections (mayors and councils), 1996 onward",
       "category": "council",
       "goal": "local",
       "measure": {
@@ -1070,19 +1392,32 @@
       "match": [
         {
           "election_kinds": [
-            "local"
+            "local",
+            "runoff"
           ],
           "body_kinds": [
-            "council"
-          ]
+            "council",
+            "unicameral"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "within": null,
+          "valid_from": "1996-01-01"
         },
         {
           "election_kinds": [
-            "local"
+            "local",
+            "runoff"
           ],
           "office_kinds": [
             "mayor"
-          ]
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "within": null,
+          "valid_from": "1996-01-01"
         }
       ],
       "dates": [
@@ -1163,7 +1498,1088 @@
           "source": "tse-mun-2024",
           "quote": "Participaram das eleições deste ano 5.569 cidades"
         }
+      ],
+      "first_held": "1996-10-03",
+      "cadence": [
+        {
+          "source": "lei-9504",
+          "period_years": 4,
+          "phase": 0,
+          "month": 10,
+          "day_rule": "oct_first_sunday",
+          "term_years": 4,
+          "valid_from": "1998-01-01",
+          "called": false,
+          "administered_by": "Tribunal Superior Eleitoral and the regional electoral courts",
+          "government_kind": "municipality",
+          "runoff": "threshold",
+          "runoff_threshold": 200000,
+          "runoff_rule": "oct_last_sunday; mayors only, in municipalities with more than 200,000 voters"
+        }
+      ],
+      "access": [
+        {
+          "url": "https://dadosabertos.tse.jus.br/",
+          "platform": "TSE Portal de Dados Abertos",
+          "format": "csv",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "source": "tse-dados-abertos",
+          "license": "CC BY",
+          "first_date": "1996-10-03",
+          "finest": "br.secao",
+          "evidence": "candidate and party votes by municipality and zone for every cycle from 1996 (votacao_candidato_munzona), by polling section from 2008"
+        }
+      ],
+      "finest_note": "polling section (seção eleitoral)"
+    },
+    {
+      "key": "referendums",
+      "tier": "national",
+      "name": "National referendums and plebiscites",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "br.uf"
+        ]
+      },
+      "note": "Called by Congress (Constitution art. 14 and Law 9.709 of 1998): the 1963 referendum on the parliamentary system, the 1993 plebiscite on the form (republic or monarchy) and system (presidential or parliamentary) of government, two questions, and the 2005 referendum on banning the sale of firearms. Each question counts once.",
+      "source": "tse-plebiscitos",
+      "valid_from": "1961-09-02",
+      "first_held": "1963-01-06",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "iso_pattern": "BR"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1963-01-06",
+          "source": "tse-glossario-referendo",
+          "quote": "REFERENDO – SISTEMA DE GOVERNO – 6 de janeiro de 1963 Sim 2.073.582 Não 9.457.448",
+          "contests": 1
+        },
+        {
+          "date": "1993-04-21",
+          "source": "tse-glossario-plebiscito",
+          "quote": "em 21 de abril de 1993, realizou-se plebiscito para definição da forma e sistema de governo da República",
+          "contests": 2
+        },
+        {
+          "date": "2005-10-23",
+          "source": "tse-glossario-referendo",
+          "quote": "no dia 23 de outubro de 2005, houve o referendo sobre a proibição da comercialização de armas de fogo e munições",
+          "contests": 1
+        }
       ]
+    },
+    {
+      "key": "vice_president",
+      "tier": "national",
+      "name": "Vice-presidential elections (separate ballot, 1950 to 1960)",
+      "category": "executive",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "br.uf"
+        ]
+      },
+      "note": "Under the 1946 Constitution the vice president was elected on a separate ballot on the presidential election day; since 1966 the vice president runs on the president's ticket.",
+      "source": "cf46",
+      "valid_from": "1946-09-18",
+      "valid_to": "1964-04-11",
+      "first_held": "1950-10-03",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "office_kinds": [
+            "other"
+          ],
+          "iso_pattern": "BR",
+          "name_pattern": "vice",
+          "valid_to": "1964-04-11"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1950-10-03",
+          "source": "tse-cronologia",
+          "quote": "1950 [5] | Eleição direta 3 de outubro",
+          "contests": 1
+        },
+        {
+          "date": "1955-10-03",
+          "source": "tse-cronologia",
+          "quote": "1955 [8] | Eleição direta 3 de outubro",
+          "contests": 1
+        },
+        {
+          "date": "1960-10-03",
+          "source": "tse-cronologia",
+          "quote": "1960 [11] | Eleição direta 3 de outubro",
+          "contests": 1
+        }
+      ]
+    },
+    {
+      "key": "vice_governor",
+      "tier": "state",
+      "name": "Vice-gubernatorial elections (separate ballot, 1947 to 1965)",
+      "category": "executive",
+      "goal": "subnational",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "States whose constitutions created a vice governor elected it on its own ballot, on the gubernatorial election day, until the 1966 indirect elections; since 1982 the vice governor runs on the governor's ticket. Not every state had the office, so this class has no enumerated counts.",
+      "source": "tse-cronologia",
+      "valid_from": "1947-01-01",
+      "valid_to": "1966-01-01",
+      "first_held": "1947-01-19",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "office_kinds": [
+            "other"
+          ],
+          "polity_kinds": [
+            "federal_unit"
+          ],
+          "name_pattern": "vice",
+          "valid_to": "1966-01-01"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "president_indirect",
+      "tier": "national",
+      "name": "Indirect presidential elections (Congress and the electoral college)",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "Presidents chosen by Congress (1964, 1966, and 1969) or by the electoral college of Congress and state delegates (1974, 1978, and 1985), with each member's vote recorded in the congressional journal. Also the presidents chosen by the constituent assemblies of 1891 and 1934, which the court's chronology does not list.",
+      "source": "tse-cronologia",
+      "valid_from": "1964-04-11",
+      "valid_to": "1985-01-16",
+      "first_held": "1964-04-11",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "BR"
+        }
+      ],
+      "est_votes": 700,
+      "effort": 2,
+      "dates": [
+        {
+          "date": "1964-04-11",
+          "source": "tse-cronologia",
+          "quote": "1964 | Eleição indireta [14] 11 de abril",
+          "contests": 1
+        },
+        {
+          "date": "1966-10-03",
+          "source": "tse-cronologia",
+          "quote": "1966 | Eleição indireta [17] 3 de outubro",
+          "contests": 1
+        },
+        {
+          "date": "1969-10-25",
+          "source": "tse-cronologia",
+          "quote": "1969 | Eleição indireta [21] 25 de outubro",
+          "contests": 1
+        },
+        {
+          "date": "1974-01-15",
+          "source": "tse-cronologia",
+          "quote": "1974 | Eleição indireta [26] 15 de janeiro",
+          "contests": 1
+        },
+        {
+          "date": "1978-10-15",
+          "source": "tse-cronologia",
+          "quote": "1978 | Eleição indireta [29] 15 de outubro",
+          "contests": 1
+        },
+        {
+          "date": "1985-01-15",
+          "source": "tse-cronologia",
+          "quote": "1985 | Eleição indireta [33] 15 de janeiro",
+          "contests": 1
+        }
+      ]
+    },
+    {
+      "key": "governor_indirect",
+      "tier": "state",
+      "name": "Indirect gubernatorial elections (state assemblies and electoral colleges)",
+      "category": "indirect",
+      "goal": "subnational",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "Governors chosen by the state assemblies (1966) or by state electoral colleges (1970, 1974, and 1978), and since 1988 by an assembly when both governor and vice governor leave office in the last two years of the term. Each assembly's journal records the vote.",
+      "source": "tse-cronologia",
+      "valid_from": "1966-01-01",
+      "first_held": "1966-09-03",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "governor"
+          ],
+          "polity_kinds": [
+            "federal_unit"
+          ]
+        }
+      ],
+      "est_votes": 3000,
+      "effort": 4,
+      "dates": [
+        {
+          "date": "1966-09-03",
+          "source": "tse-cronologia",
+          "quote": "1966 | Eleição indireta [18] 3 de setembro"
+        },
+        {
+          "date": "1970-10-03",
+          "source": "tse-cronologia",
+          "quote": "1970 | Eleição indireta [23] 3 de outubro"
+        },
+        {
+          "date": "1974-10-03",
+          "source": "tse-cronologia",
+          "quote": "1974 | Eleição indireta [27] 3 de outubro"
+        },
+        {
+          "date": "1978-09-01",
+          "source": "tse-cronologia",
+          "quote": "1978 | Eleição indireta [30] 1º de setembro"
+        }
+      ]
+    },
+    {
+      "key": "senado_indirect",
+      "tier": "state",
+      "name": "Senators chosen by state electoral colleges (1978)",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "In 1978 one of each state's two Senate seats was filled by the state electoral college that chose the governor (Decree-Law 1.540 of 1977), alongside the direct vote for the other.",
+      "source": "tse-cronologia",
+      "valid_from": "1977-04-14",
+      "valid_to": "1980-11-19",
+      "first_held": "1978-09-01",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "body_kinds": [
+            "upper_house"
+          ],
+          "iso_pattern": "BR"
+        }
+      ],
+      "est_votes": 1500,
+      "effort": 4,
+      "dates": [
+        {
+          "date": "1978-09-01",
+          "source": "tse-cronologia",
+          "quote": "1978 | Eleição indireta [30] 1º de setembro ... colégio eleitoral (composto de membros da respectiva Assembleia Legislativa e de delegados das câmaras municipais do respectivo estado)"
+        }
+      ]
+    },
+    {
+      "key": "congress_1933",
+      "tier": "national",
+      "name": "Constituent Assembly (1933) and Chamber of Deputies and state assemblies (1934)",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "The first elections run by the Electoral Justice, under the 1932 Electoral Code (secret ballot, women voting): 214 constituent deputies on 3 May 1933 (plus 40 class representatives chosen by unions and employers), and federal and state deputies on 14 October 1934. The court's Boletim Eleitoral published the results.",
+      "source": "tse-cronologia",
+      "valid_from": "1932-02-24",
+      "valid_to": "1937-11-10",
+      "first_held": "1933-05-03",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "constituent_assembly",
+            "lower_house",
+            "unicameral"
+          ],
+          "valid_from": "1932-01-01",
+          "valid_to": "1937-11-10"
+        }
+      ],
+      "est_votes": 1400000,
+      "effort": 4,
+      "dates": [
+        {
+          "date": "1933-05-03",
+          "source": "tse-cronologia",
+          "quote": "1933 [1] | _ | Eleição direta 3 de maio ... Foram postos em disputa 214 vagas para o cargo de Deputado Federal."
+        },
+        {
+          "date": "1934-10-14",
+          "source": "tse-cronologia",
+          "quote": "1934 [2] | _ | Eleição direta 14 de outubro | _ | Eleição direta 14 de outubro"
+        }
+      ]
+    },
+    {
+      "key": "president_1891",
+      "tier": "national",
+      "name": "Direct presidential elections of the First Republic (1894 to 1930)",
+      "category": "executive",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "The 1891 Constitution had the president and vice president elected by direct vote on 1 March of the last year of the four-year term, counted by Congress; the 1919 election followed President-elect Rodrigues Alves's death. Results are in the congressional counting reports.",
+      "source": "cf91",
+      "locator": "https://www.planalto.gov.br/ccivil_03/constituicao/constituicao91.htm#art47",
+      "valid_from": "1891-02-24",
+      "valid_to": "1930-10-24",
+      "first_held": "1894-03-01",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "special"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "BR",
+          "valid_to": "1931-01-01"
+        }
+      ],
+      "est_votes": 1000000,
+      "effort": 4,
+      "cadence": [
+        {
+          "source": "cf91",
+          "period_years": 4,
+          "phase": 2,
+          "month": 3,
+          "term_years": 4,
+          "valid_from": "1891-02-24",
+          "valid_to": "1930-10-24",
+          "called": false,
+          "runoff_rule": "Congress chooses between the top two when no one has an absolute majority",
+          "locator": "https://www.planalto.gov.br/ccivil_03/constituicao/constituicao91.htm#art47"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "congress_1890",
+      "tier": "national",
+      "name": "Chamber of Deputies and Senate elections of the First Republic (1890 to 1930)",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "Deputies were elected by the states every three years by direct vote, and senators (three per state, nine-year terms) one third at a time; each chamber verified its own members' returns, published in its annals.",
+      "source": "cf91",
+      "valid_from": "1890-09-15",
+      "valid_to": "1930-10-24",
+      "first_held": "1890-09-15",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "lower_house",
+            "upper_house",
+            "constituent_assembly"
+          ],
+          "iso_pattern": "BR",
+          "valid_to": "1931-01-01"
+        }
+      ],
+      "est_votes": 800000,
+      "effort": 5,
+      "dates": []
+    },
+    {
+      "key": "empire_chamber",
+      "tier": "national",
+      "name": "Chamber of Deputies of the Empire (1824 to 1889)",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "Two-stage elections (parish voters chose electors, who chose deputies) until the 1881 Saraiva Law made them direct. Senators were appointed by the emperor from lists of three the same electors drew up, and provincial assemblies (from 1834) were elected the same way; all of them published only in parliamentary annals and provincial reports.",
+      "source": "tse-cronologia",
+      "valid_from": "1824-03-25",
+      "valid_to": "1889-11-15",
+      "match": [],
+      "est_votes": 150000,
+      "effort": 5,
+      "dates": []
+    },
+    {
+      "key": "state_supplementary",
+      "tier": "state",
+      "name": "Supplementary gubernatorial and Senate elections",
+      "category": "executive",
+      "goal": "subnational",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "When the electoral courts annul an election winning more than half the votes, or remove an elected governor or senator, a new direct election follows (Electoral Code art. 224). The TSE's general-election files carry two: Mato Grosso's Senate seat on 2020-11-15 and Roraima's governorship on 2026-06-21. The gubernatorial elections of Amazonas (2017-08-06 and 2017-08-27) and Tocantins (2018-06-03 and 2018-06-24) are in its calendars but not its files.",
+      "source": "tse-suplementares",
+      "valid_from": "1988-10-05",
+      "first_held": "2017-08-06",
+      "match": [
+        {
+          "election_kinds": [
+            "by_election",
+            "special"
+          ],
+          "office_kinds": [
+            "governor"
+          ],
+          "polity_kinds": [
+            "federal_unit"
+          ]
+        },
+        {
+          "election_kinds": [
+            "by_election",
+            "special"
+          ],
+          "body_kinds": [
+            "upper_house"
+          ],
+          "iso_pattern": "BR",
+          "valid_from": "1988-10-05"
+        }
+      ],
+      "est_votes": 1500000,
+      "effort": 2,
+      "access": [
+        {
+          "url": "https://dadosabertos.tse.jus.br/",
+          "platform": "TSE Portal de Dados Abertos",
+          "format": "csv",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "source": "tse-dados-abertos",
+          "license": "CC BY",
+          "first_date": "2020-11-15",
+          "finest": "br.secao",
+          "evidence": "CD_TIPO_ELEICAO 1 rows of detalhe_votacao_munzona_2018 (MT Senate) and _2022 (RR governor)"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2020-11-15",
+          "source": "tse-munzona-2018",
+          "quote": "1 | Eleição Extraordinária | 15/11/2020 | 1 | MT | Senador | Eleição Suplementar Senador - MT",
+          "contests": 1
+        },
+        {
+          "date": "2026-06-21",
+          "source": "tse-munzona-2022",
+          "quote": "1 | Eleição Extraordinária | 21/06/2026 | 1 | RR | Governador | Eleição Suplementar Governador 2026",
+          "contests": 1
+        }
+      ]
+    },
+    {
+      "key": "municipal_supplementary",
+      "tier": "municipality",
+      "name": "Supplementary municipal elections (mayors and councils)",
+      "category": "executive",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "New elections the regional electoral courts call when a mayor's election is annulled or the elected ticket is removed (Electoral Code art. 224), and rarely for a council. Counted per first round from the TSE's municipal files, which carry 646 from 2004 to 2026 (635 for mayor and 11 for council; 9 more were runoffs). A council's indirect election of a mayor when both offices fall vacant in the term's last two years is not counted here.",
+      "source": "tse-suplementares",
+      "valid_from": "1988-10-05",
+      "first_held": "2004-01-01",
+      "match": [
+        {
+          "election_kinds": [
+            "by_election",
+            "special"
+          ],
+          "office_kinds": [
+            "mayor"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "within": null
+        },
+        {
+          "election_kinds": [
+            "by_election",
+            "special"
+          ],
+          "body_kinds": [
+            "council",
+            "unicameral"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "within": null
+        }
+      ],
+      "est_votes": 1000000,
+      "effort": 2,
+      "access": [
+        {
+          "url": "https://dadosabertos.tse.jus.br/",
+          "platform": "TSE Portal de Dados Abertos",
+          "format": "csv",
+          "access": "open",
+          "checked_at": "2026-11-13",
+          "source": "tse-dados-abertos",
+          "license": "CC BY",
+          "first_date": "2004-01-01",
+          "finest": "br.secao",
+          "evidence": "CD_TIPO_ELEICAO 1 (Eleição Extraordinária) rows in each municipal cycle's munzona and section files"
+        }
+      ],
+      "finest_note": "polling section (seção eleitoral)",
+      "dates": [
+        {
+          "date": "2004-01-01",
+          "precision": "year",
+          "contests": 8,
+          "source": "tse-munzona-2004",
+          "quote": "8 first rounds with CD_TIPO_ELEICAO 1 dated 2004 in detalhe_votacao_munzona_2004"
+        },
+        {
+          "date": "2005-01-01",
+          "precision": "year",
+          "contests": 18,
+          "source": "tse-munzona-2004",
+          "quote": "18 first rounds with CD_TIPO_ELEICAO 1 dated 2005 in detalhe_votacao_munzona_2004"
+        },
+        {
+          "date": "2006-01-01",
+          "precision": "year",
+          "contests": 24,
+          "source": "tse-munzona-2004",
+          "quote": "24 first rounds with CD_TIPO_ELEICAO 1 dated 2006 in detalhe_votacao_munzona_2004"
+        },
+        {
+          "date": "2007-01-01",
+          "precision": "year",
+          "contests": 9,
+          "source": "tse-munzona-2004",
+          "quote": "9 first rounds with CD_TIPO_ELEICAO 1 dated 2007 in detalhe_votacao_munzona_2004"
+        },
+        {
+          "date": "2008-01-01",
+          "precision": "year",
+          "contests": 6,
+          "source": "tse-munzona-2004",
+          "quote": "4 first rounds with CD_TIPO_ELEICAO 1 dated 2008 in detalhe_votacao_munzona_2004; 2 first rounds with CD_TIPO_ELEICAO 1 dated 2008 in detalhe_votacao_munzona_2008"
+        },
+        {
+          "date": "2009-01-01",
+          "precision": "year",
+          "contests": 64,
+          "source": "tse-munzona-2008",
+          "quote": "64 first rounds with CD_TIPO_ELEICAO 1 dated 2009 in detalhe_votacao_munzona_2008"
+        },
+        {
+          "date": "2010-01-01",
+          "precision": "year",
+          "contests": 44,
+          "source": "tse-munzona-2008",
+          "quote": "44 first rounds with CD_TIPO_ELEICAO 1 dated 2010 in detalhe_votacao_munzona_2008"
+        },
+        {
+          "date": "2011-01-01",
+          "precision": "year",
+          "contests": 35,
+          "source": "tse-munzona-2008",
+          "quote": "35 first rounds with CD_TIPO_ELEICAO 1 dated 2011 in detalhe_votacao_munzona_2008"
+        },
+        {
+          "date": "2012-01-01",
+          "precision": "year",
+          "contests": 4,
+          "source": "tse-munzona-2008",
+          "quote": "4 first rounds with CD_TIPO_ELEICAO 1 dated 2012 in detalhe_votacao_munzona_2008"
+        },
+        {
+          "date": "2013-01-01",
+          "precision": "year",
+          "contests": 75,
+          "source": "tse-munzona-2012",
+          "quote": "75 first rounds with CD_TIPO_ELEICAO 1 dated 2013 in detalhe_votacao_munzona_2012"
+        },
+        {
+          "date": "2014-01-01",
+          "precision": "year",
+          "contests": 19,
+          "source": "tse-munzona-2012",
+          "quote": "19 first rounds with CD_TIPO_ELEICAO 1 dated 2014 in detalhe_votacao_munzona_2012"
+        },
+        {
+          "date": "2015-01-01",
+          "precision": "year",
+          "contests": 19,
+          "source": "tse-munzona-2012",
+          "quote": "19 first rounds with CD_TIPO_ELEICAO 1 dated 2015 in detalhe_votacao_munzona_2012"
+        },
+        {
+          "date": "2017-01-01",
+          "precision": "year",
+          "contests": 56,
+          "source": "tse-munzona-2016",
+          "quote": "56 first rounds with CD_TIPO_ELEICAO 1 dated 2017 in detalhe_votacao_munzona_2016"
+        },
+        {
+          "date": "2018-01-01",
+          "precision": "year",
+          "contests": 60,
+          "source": "tse-munzona-2016",
+          "quote": "60 first rounds with CD_TIPO_ELEICAO 1 dated 2018 in detalhe_votacao_munzona_2016"
+        },
+        {
+          "date": "2019-01-01",
+          "precision": "year",
+          "contests": 46,
+          "source": "tse-munzona-2016",
+          "quote": "46 first rounds with CD_TIPO_ELEICAO 1 dated 2019 in detalhe_votacao_munzona_2016"
+        },
+        {
+          "date": "2020-01-01",
+          "precision": "year",
+          "contests": 7,
+          "source": "tse-munzona-2016",
+          "quote": "7 first rounds with CD_TIPO_ELEICAO 1 dated 2020 in detalhe_votacao_munzona_2016"
+        },
+        {
+          "date": "2021-01-01",
+          "precision": "year",
+          "contests": 55,
+          "source": "tse-munzona-2020",
+          "quote": "55 first rounds with CD_TIPO_ELEICAO 1 dated 2021 in detalhe_votacao_munzona_2020"
+        },
+        {
+          "date": "2022-01-01",
+          "precision": "year",
+          "contests": 20,
+          "source": "tse-munzona-2020",
+          "quote": "20 first rounds with CD_TIPO_ELEICAO 1 dated 2022 in detalhe_votacao_munzona_2020"
+        },
+        {
+          "date": "2023-01-01",
+          "precision": "year",
+          "contests": 22,
+          "source": "tse-munzona-2020",
+          "quote": "22 first rounds with CD_TIPO_ELEICAO 1 dated 2023 in detalhe_votacao_munzona_2020"
+        },
+        {
+          "date": "2024-01-01",
+          "precision": "year",
+          "contests": 12,
+          "source": "tse-munzona-2020",
+          "quote": "12 first rounds with CD_TIPO_ELEICAO 1 dated 2024 in detalhe_votacao_munzona_2020"
+        },
+        {
+          "date": "2025-01-01",
+          "precision": "year",
+          "contests": 21,
+          "source": "tse-munzona-2024",
+          "quote": "21 first rounds with CD_TIPO_ELEICAO 1 dated 2025 in detalhe_votacao_munzona_2024"
+        },
+        {
+          "date": "2026-01-01",
+          "precision": "year",
+          "contests": 22,
+          "source": "tse-munzona-2024",
+          "quote": "22 first rounds with CD_TIPO_ELEICAO 1 dated 2026 in detalhe_votacao_munzona_2024"
+        }
+      ]
+    },
+    {
+      "key": "municipal_1947",
+      "tier": "municipality",
+      "name": "Municipal elections before 1996 (mayors and councils, 1947 to 1992)",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "Until 1970 each state set its own municipal calendar, so the TSE's chronology lists the days on which some states voted; from 1972 the elections were nationwide (with capitals, spas, and national-security municipalities appointing mayors until 1985). The TSE's open data starts in 1996; earlier results are in the regional courts' archives and state gazettes.",
+      "source": "tse-cronologia",
+      "valid_from": "1946-09-18",
+      "valid_to": "1996-01-01",
+      "first_held": "1947-01-19",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "runoff",
+            "general"
+          ],
+          "body_kinds": [
+            "council",
+            "unicameral"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "within": null,
+          "valid_to": "1996-01-01"
+        },
+        {
+          "election_kinds": [
+            "local",
+            "runoff",
+            "general"
+          ],
+          "office_kinds": [
+            "mayor"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "within": null,
+          "valid_to": "1996-01-01"
+        }
+      ],
+      "est_votes": 70000000,
+      "effort": 5,
+      "dates": [
+        {
+          "date": "1947-01-19",
+          "source": "tse-cronologia",
+          "quote": "1947 | ... | Eleição direta [4] 19 de janeiro ... Eleição no Distrito Federal para 50 vereadores"
+        },
+        {
+          "date": "1950-10-03",
+          "source": "tse-cronologia",
+          "quote": "1950 [5] | ... | Eleição direta [6] 3 de outubro"
+        },
+        {
+          "date": "1954-10-03",
+          "source": "tse-cronologia",
+          "quote": "1954 | ... | Eleição direta [7] 3 de outubro"
+        },
+        {
+          "date": "1955-10-03",
+          "source": "tse-cronologia",
+          "quote": "1955 [8] | ... | Eleição direta [9] 3 de outubro"
+        },
+        {
+          "date": "1958-10-03",
+          "source": "tse-cronologia",
+          "quote": "1958 | ... | Eleição direta [10] 3 de outubro"
+        },
+        {
+          "date": "1960-10-03",
+          "source": "tse-cronologia",
+          "quote": "1960 [11] | ... | Eleição direta [12] 3 de outubro"
+        },
+        {
+          "date": "1962-10-07",
+          "source": "tse-cronologia",
+          "quote": "1962 | ... | Eleição direta [13] 7 de outubro"
+        },
+        {
+          "date": "1965-10-03",
+          "source": "tse-cronologia",
+          "quote": "1965 | ... | Eleição direta [16] 3 de outubro"
+        },
+        {
+          "date": "1966-11-15",
+          "source": "tse-cronologia",
+          "quote": "1966 | ... | Eleição direta [19] 15 de novembro"
+        },
+        {
+          "date": "1968-11-15",
+          "source": "tse-cronologia",
+          "quote": "1968 | ... | Eleição direta [20] 15 de novembro"
+        },
+        {
+          "date": "1969-11-30",
+          "source": "tse-cronologia",
+          "quote": "1969 | ... | Eleição direta [22] 30 de novembro"
+        },
+        {
+          "date": "1970-11-15",
+          "source": "tse-cronologia",
+          "quote": "1970 | ... | Eleição direta [24] 15 de novembro"
+        },
+        {
+          "date": "1972-11-15",
+          "source": "tse-cronologia",
+          "quote": "1972 | ... | Eleição direta [25] 15 de novembro"
+        },
+        {
+          "date": "1976-11-15",
+          "source": "tse-cronologia",
+          "quote": "1976 | ... | Eleição direta 15 de novembro e 20 de dezembro [28]"
+        },
+        {
+          "date": "1976-12-20",
+          "source": "tse-cronologia",
+          "quote": "1976 | ... | Eleição direta 15 de novembro e 20 de dezembro [28]"
+        },
+        {
+          "date": "1982-11-15",
+          "source": "tse-cronologia",
+          "quote": "1982 | ... | Eleição direta [32] 15 de novembro"
+        },
+        {
+          "date": "1985-11-15",
+          "source": "tse-cronologia",
+          "quote": "1985 | ... | Eleição direta [34] 15 de novembro"
+        },
+        {
+          "date": "1986-11-15",
+          "source": "tse-cronologia",
+          "quote": "1986 | ... | Eleição direta [35] 15 de novembro"
+        },
+        {
+          "date": "1988-11-15",
+          "source": "tse-cronologia",
+          "quote": "1988 | ... | Eleição direta [37] 15 de novembro"
+        },
+        {
+          "date": "1989-04-16",
+          "source": "tse-cronologia",
+          "quote": "1989 | ... | Eleição direta 16 de abril e 15 de novembro (1º turno) e 17 de dezembro (2º turno) [39]"
+        },
+        {
+          "date": "1989-11-15",
+          "source": "tse-cronologia",
+          "quote": "1989 | ... | Eleição direta 16 de abril e 15 de novembro (1º turno) e 17 de dezembro (2º turno) [39]"
+        },
+        {
+          "date": "1992-10-03",
+          "source": "tse-cronologia",
+          "quote": "1992 | ... | Eleição direta [40] 3 de outubro (1º turno) 15 de novembro (2º turno)"
+        }
+      ]
+    },
+    {
+      "key": "state_plebiscites",
+      "tier": "state",
+      "name": "State plebiscites and referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "Plebiscites on dividing a state are called by Congress (Constitution art. 18, § 3, and Law 9.709 of 1998) and run by the Electoral Justice for the state's voters: Pará voted on 11 December 2011 on creating Carajás and Tapajós, two questions. Other state consultations follow the state constitution.",
+      "source": "tse-plebiscitos",
+      "valid_from": "1988-10-05",
+      "first_held": "2011-12-11",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "polity_kinds": [
+            "federal_unit"
+          ]
+        }
+      ],
+      "est_votes": 3600000,
+      "effort": 3,
+      "dates": [
+        {
+          "date": "2011-12-11",
+          "source": "tse-res-23355",
+          "quote": "consultas plebiscitárias sobre a divisão do Estado do Pará para a criação do Estado do Carajás e/ou do Estado do Tapajós, convocadas por meio dos Decretos Legislativos nº 136/2011 e nº 137/2011",
+          "note": "The resolution names the two questions; the date is the polling day the TSE announced, to be confirmed against the results when loaded.",
+          "contests": 2
+        }
+      ]
+    },
+    {
+      "key": "municipal_plebiscites",
+      "tier": "municipality",
+      "name": "Municipal plebiscites and referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "Plebiscites on creating, merging, or splitting municipalities (Constitution art. 18, § 4), run by the regional electoral courts, and since Constitutional Amendment 111 of 2021 local questions a council sends to the court at least 90 days before a municipal election, voted with it (art. 14, § 12). The TSE lists municipal plebiscites held with the 2016 and 2018 elections; five municipalities voted on local questions on 6 October 2024 (Belo Horizonte, Dois Lajeados, Governador Edison Lobão, São Luís, and São Luiz).",
+      "source": "tse-plebiscitos",
+      "valid_from": "1988-10-05",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "within": null
+        }
+      ],
+      "est_votes": 1500000,
+      "effort": 3,
+      "dates": []
+    },
+    {
+      "key": "noronha_council",
+      "tier": "state_district",
+      "name": "Fernando de Noronha District Council",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "Seven district councillors elected by direct vote for four years with the general elections, run by the Pernambuco regional electoral court; the state appoints the district's administrator. 3,701 voters in 2026.",
+      "source": "tse-noronha-2026",
+      "match": [],
+      "est_votes": 3000,
+      "effort": 3,
+      "cadence": [
+        {
+          "source": "tse-noronha-2026",
+          "period_years": 4,
+          "phase": 2,
+          "month": 10,
+          "day_rule": "oct_first_sunday",
+          "term_years": 4,
+          "valid_from": "2026-01-01",
+          "called": false,
+          "administered_by": "Tribunal Regional Eleitoral de Pernambuco",
+          "within": "BR-PE",
+          "government_kind": "state_district"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "conselho_tutelar",
+      "tier": "municipality",
+      "name": "Child protection council elections (conselhos tutelares)",
+      "category": "special_purpose",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "Every municipality has at least one five-member conselho tutelar, elected by the municipality's voters on one national day every four years, the first Sunday of October after the presidential election (2015, 2019, and 2023; next 2027). The municipal children's rights council runs it under a municipal law, with voting machines lent by the electoral courts; over 1.5 million people voted in more than 5,000 municipalities in 2023.",
+      "source": "eca",
+      "valid_from": "2012-07-25",
+      "first_held": "2015-10-04",
+      "disposition": "blocked",
+      "disposition_reason": "No central publisher: each municipality's children's rights council declares its own results, and neither the electoral courts nor the human rights ministry publishes candidate votes.",
+      "match": [],
+      "cadence": [
+        {
+          "government_kind": "municipality",
+          "source": "eca",
+          "period_years": 4,
+          "phase": 3,
+          "month": 10,
+          "day_rule": "oct_first_sunday",
+          "term_years": 4,
+          "valid_from": "2015-01-01",
+          "called": false,
+          "administered_by": "Municipal children's rights council (CMDCA)"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "justice_of_peace",
+      "tier": "municipality",
+      "name": "Justices of the peace",
+      "category": "judicial",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "The 1988 Constitution (art. 98, II) provides for a paid justice of the peace elected by direct vote for four years; states have not organized the elections, and the courts keep appointing them.",
+      "source": "cf88",
+      "valid_from": "1988-10-05",
+      "disposition": "blocked",
+      "disposition_reason": "No election held: the direct elections art. 98, II, provides for await state laws, and justices of the peace are appointed meanwhile.",
+      "match": [],
+      "dates": []
+    },
+    {
+      "key": "parlasur",
+      "tier": "national",
+      "name": "Mercosur Parliament",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "note": "The 2005 protocol foresaw direct elections; Paraguay and Argentina held them, but Brazil's members are still chosen by Congress from among its own.",
+      "source": "tse-cronologia",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Never held in Brazil: Congress appoints Brazil's members of the Mercosur Parliament.",
+      "match": [],
+      "dates": []
+    },
+    {
+      "key": "nonstate_votes",
+      "tier": "municipality",
+      "name": "Party primaries, professional councils, school principals, and university rectors",
+      "category": "nominating",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "Party prévias, elections to the bar association and the professional councils, school-community elections of public school principals, and university rector consultations.",
+      "source": "lei-9504",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Party-internal, professional, or workplace votes that no electoral court runs or certifies.",
+      "match": [],
+      "dates": []
     }
   ]
 }
