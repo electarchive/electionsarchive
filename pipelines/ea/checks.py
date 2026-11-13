@@ -1318,16 +1318,17 @@ def _composition(stage: Stage) -> list[tuple[str, sql.Composed]]:
         (
             "composition.seats",
             sql.SQL(
-                """select c.id, null::uuid, jsonb_build_object('seats', c.seats, 'counted', coalesce(sum(p.seats), 0))
+                """select c.body_id, null::uuid, jsonb_build_object('composition', c.id, 'seats', c.seats,
+                                                             'counted', coalesce(sum(p.seats), 0))
                    from {compositions} c left join {parties} p on p.composition_id = c.id
                    where c.id in ({touched})
-                   group by c.id, c.seats having coalesce(sum(p.seats), 0) <> c.seats"""
+                   group by c.id, c.body_id, c.seats having coalesce(sum(p.seats), 0) <> c.seats"""
             ).format(compositions=compositions, parties=parties, touched=touched),
         ),
         (
             "composition.size",
             sql.SQL(
-                """select c.id, null::uuid, jsonb_build_object('body', c.body_id, 'as_of', c.as_of, 'seats', c.seats,
+                """select c.body_id, null::uuid, jsonb_build_object('composition', c.id, 'as_of', c.as_of, 'seats', c.seats,
                                                              'body_size', z.seats)
                    from {compositions} c join {sizes} z on z.body_id = c.body_id
                      and daterange(z.valid_from, z.valid_to, '[)') @> c.as_of
@@ -1341,7 +1342,7 @@ def _composition(stage: Stage) -> list[tuple[str, sql.Composed]]:
         (
             "composition.role",
             sql.SQL(
-                """select distinct c.id, null::uuid, jsonb_build_object('control', c.control)
+                """select distinct c.body_id, null::uuid, jsonb_build_object('composition', c.id, 'control', c.control)
                    from {compositions} c join {parties} p on p.composition_id = c.id
                    where c.id in ({touched}) and p.role is not null and (c.control is null or c.control = 'noc')"""
             ).format(compositions=compositions, parties=parties, touched=touched),
