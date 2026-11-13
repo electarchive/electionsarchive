@@ -715,5 +715,7 @@
   },
   "unit_codes": {
     "ramsay": "27123"
-  }
+  },
+  "authoritative": "Source: the Legislative Manual's official returns, whose county columns add up to the printed state total; John M. Drexler (district 4) is 2,000 lower in the FEC figure (54,221 against the printed 52,221).",
+  "authoritative_loose": true
 }
