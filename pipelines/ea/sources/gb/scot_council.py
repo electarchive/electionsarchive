@@ -102,7 +102,8 @@ def fetch() -> None:
         time.sleep(2)
 
 
-SEATS = {"Ward 1 Barraigh agus Bhatarsaigh": 2, "Ward 6 Sgìr’ Ùige agus Carlabhagh": 2}
+SEATS = {"Ward 1 Barraigh agus Bhatarsaigh": 2, "Ward 6 Sgìr’ Ùige agus Carlabhagh": 2, "Ward 1 -North Isles": 3}
+VACANT = {"Ward 1 -North Isles": "only two candidates were nominated, so one seat was left vacant"}
 ARRANGEMENTS = "https://www.legislation.gov.uk/ssi/2021/369/schedule/made"
 CHECKED: dict[str, str] = {
     "S12000005": "https://www.clacks.gov.uk/document/6700.pdf",
@@ -1027,7 +1028,9 @@ def emit() -> Path:
                         kind="context",
                         body_md=f"The ward returns {unit_row['seats']} councillors under the [Na h-Eileanan an Iar "
                         f"(Electoral Arrangements) Regulations 2021]({ARRANGEMENTS}), but only one candidate was "
-                        "nominated, so one seat was left vacant.",
+                        "nominated, so one seat was left vacant."
+                        if unit_row["emb_ward"] not in VACANT
+                        else f"The ward returns {unit_row['seats']} councillors, but {VACANT[unit_row['emb_ward']]}.",
                     )
             elif emb_only:
                 cs.add("citation", entity_id=result_set, source_id=emb_source, locator={"ward": unit_row["emb_ward"]})
