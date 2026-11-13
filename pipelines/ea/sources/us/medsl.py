@@ -735,6 +735,7 @@ def attach(
     restage: bool = False,
     accepted: frozenset[str] = frozenset(),
     shortfall: str | None = None,
+    scope: str | None = None,
 ) -> None:
     declared = declared or {}
     tag = str(cs.manifest["pipeline"])
@@ -925,10 +926,43 @@ def attach(
             .group_by("option")
             .agg(pl.col("votes").sum())
         )
+        if scope is not None:
+            figures: dict[tuple[bool, int, int], dict[str, int]] = {}
+            scoped = [counties[code][0] for code in lines["code"].unique() if code in counties]
+            for default, k, level, option, votes in conn.execute(
+                """select rs.is_default, rs.k, (u.id <> all(%s::uuid[]))::int, o.id::text, sum(v.value)::bigint
+                   from result_set rs join result_value v on v.result_set_k = rs.k and v.measure = 1
+                        and v.count_round = %s
+                   join reporting_unit u on u.k = v.unit_k
+                        and (u.id = any(%s::uuid[]) or u.parent_id = any(%s::uuid[]))
+                   join contest_option o on o.k = v.option_k
+                   where rs.contest_id = %s and rs.status = 'active' group by 1, 2, 3, 4""",
+                [scoped, first, scoped, scoped, contest],
+            ).fetchall():
+                figures.setdefault((not default, level, k), {})[option] = votes
+            sets = sorted(figures)
+            sets = [k for k in sets if not k[0]] or sets
+            mismatches = [
+                [
+                    f"{label} {int(tallies.filter(pl.col('option') == str(option))['votes'].sum())} against {figures[k].get(str(option))}"
+                    for option, kind, label, _, _ in known
+                    if kind in ("candidate", "ticket")
+                    and int(tallies.filter(pl.col("option") == str(option))["votes"].sum())
+                    != figures[k].get(str(option), 0)
+                ]
+                for k in sets
+            ]
+            if not sets or all(mismatches) or missing:
+                print(
+                    f"{key}: the county figures do not tie ({'; '.join(min(mismatches, key=len, default=[])) or 'no county figure'}), skipped"
+                )
+                continue
         overcounted = undercounted = held_back = False
         shorts: list[float] = []
         for option, kind, label, _, fec in known:
             medsl = int(tallies.filter(pl.col("option") == str(option))["votes"].sum())
+            if scope is not None:
+                continue
             if kind in ("candidate", "ticket") and fec:
                 shorts.append((fec - medsl) / fec * 100)
             if kind in ("candidate", "ticket") and fec and abs(medsl - fec) > max(100, fec * 0.02):
@@ -972,6 +1006,7 @@ def attach(
         if (
             key not in declared
             and not emptied
+            and scope is None
             and (
                 max(known, key=lambda option: option[4] or 0)[0]
                 != max(known, key=lambda option: int(pooled.filter(pl.col("option") == str(option[0]))["votes"].sum()))[
@@ -996,6 +1031,7 @@ def attach(
             continue
         if (
             authoritative is None
+            and scope is None
             and counted.filter(pl.col("candidate").is_in(list(picked)))["votes"].sum() > official * 1.1
             and not (
                 any(fec for *_, fec in known)
@@ -1011,9 +1047,11 @@ def attach(
         ):
             print(f"{key}: the county sum exceeds the official total by over 10 percent, skipped")
             continue
-        if (authoritative is None or strict) and counted.filter(pl.col("candidate").is_in(list(picked)))[
-            "votes"
-        ].sum() < official * 0.5:
+        if (
+            scope is None
+            and (authoritative is None or strict)
+            and counted.filter(pl.col("candidate").is_in(list(picked)))["votes"].sum() < official * 0.5
+        ):
             print(f"{key}: the county sum covers under half the official total, skipped")
             continue
         unmatched.extend(missing)
@@ -1110,7 +1148,7 @@ def attach(
             kind="counted",
             status="active",
             source_id=sources[lines["source"][0]],
-            is_default=key in declared or inherited or emptied or (held is not None and held[0]),
+            is_default=scope is None and (key in declared or inherited or emptied or (held is not None and held[0])),
             completeness=1
             if authoritative is not None
             else round(
@@ -1122,6 +1160,8 @@ def attach(
             winner, caveat = declared[key]
             cs.add("outcome", result_set_id=result_set, option_id=picked[winner], kind="won")
             cs.add("note", entity_id=result_set, kind="caveat", body_md=caveat)
+        if scope is not None:
+            cs.add("note", entity_id=result_set, kind="caveat", body_md=scope)
         if uniform:
             counted_votes = int(counted.filter(pl.col("candidate").is_in(list(picked)))["votes"].sum())
             cs.add(

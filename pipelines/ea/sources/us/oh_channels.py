@@ -146,5 +146,5 @@ def emit() -> Path:
             )
         for url in FILES.values():
             cs.artifact(raw.cached(SOURCE, url), source)
-        medsl.attach(cs, conn, frame, {"OH": source})
+        medsl.attach(cs, conn, frame, {"OH": source}, scope="Franklin County only, by ballot type.")
         return cs.write()
