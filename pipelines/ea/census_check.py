@@ -8,17 +8,26 @@ with recursive census_polity as (
 ), tree(root, id) as (
     select polity_id, polity_id from census_polity
     union
-    select tree.root, pp.polity_id from polity_parent pp join tree on pp.parent_id = tree.id
+    select tree.root, pp.polity_id from polity_parent pp
+    join tree on pp.parent_id = tree.id
+    join polity child on child.id = pp.polity_id
+    where child.kind <> 'sovereign_state'
+), scoped as (
+    select tree.root, c.id from tree join election e on e.polity_id = tree.id join contest c on c.election_id = e.id
+    union
+    select tree.root, c.id from tree join body b on b.polity_id = tree.id join contest c on c.body_id = b.id
+    union
+    select tree.root, c.id from tree join office o on o.polity_id = tree.id join contest c on c.office_id = o.id
 ), held as (
-    select tree.root, c.id as contest_id, c.kind as contest_kind, c.body_id, c.office_id, e.kind as election_kind,
+    select scoped.root, c.id as contest_id, c.kind as contest_kind, c.body_id, c.office_id, e.kind as election_kind,
         e.date_from, b.kind as body_kind, o.kind as office_kind, op.id as unit_polity_id, op.kind as unit_polity_kind,
         op.iso_code as unit_iso, a.scheme_code,
         (select ac.code from area_code ac where ac.area_id = c.district_area_id
             order by ac.valid_from desc nulls last limit 1) as area_code,
         (select n.text from name n where n.entity_id = coalesce(c.body_id, c.office_id) and n.is_preferred limit 1) as label
-    from tree
-    join election e on e.polity_id = tree.id
-    join contest c on c.election_id = e.id
+    from scoped
+    join contest c on c.id = scoped.id
+    join election e on e.id = c.election_id
     left join body b on b.id = c.body_id
     left join office o on o.id = c.office_id
     left join polity op on op.id = coalesce(b.polity_id, o.polity_id, e.polity_id)
