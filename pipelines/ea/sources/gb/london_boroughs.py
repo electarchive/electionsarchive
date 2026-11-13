@@ -1,5 +1,6 @@
 import csv
 import difflib
+import functools
 import html
 import itertools
 import re
@@ -27,6 +28,7 @@ DIGITIZED = 8
 PUBLISHER = "London Research Centre"
 Word = tuple[float, float, float, float, str]
 TITLES = {
+    1990: "London Borough Council Elections 3 May 1990",
     1994: "London Borough Council Elections 5 May 1994, including results from the European Elections",
     1998: "London Borough Council Elections May 1998, including the Greater London Authority referendum results",
 }
@@ -48,9 +50,20 @@ NOTES = {
     "and corrected on the page image where they disagreed. The report's summary page gives 30 fewer ballot papers "
     "than its ward voting statistics, which are stored as printed."
 }
+METHODOLOGY_1990 = (
+    "Read by character recognition of the London Research Centre's scanned report, which has no usable text layer: "
+    "each page was read at several resolutions and a figure was accepted only where the readings agreed, and the rest "
+    "were checked by eye against the page images. The report lists each ward's candidates in vote order, and the "
+    "candidates with the most votes, as many as the ward's seats, are shown as elected. Every party's London-wide "
+    "votes, candidates, and seats add up to the report's party table, each ward's seats and electorate come from its "
+    "ward voting statistics, and each ward's ballot papers equal its valid plus rejected papers. The statistics "
+    "print Croydon's Heathfield ward with fewer valid ballot papers than its leading candidates' votes; both are "
+    "stored as printed."
+)
 DATASET = "https://data.london.gov.uk/dataset/london-borough-council-elections-1998-24r9z"
 DOWNLOAD = "https://data.london.gov.uk/download/24r9z"
 BOOKS = {
+    1990: (date(1990, 5, 3), f"{DOWNLOAD}/afda4d3b-5211-4410-886a-16af9d569c8c/LBCE_1990-5-3.pdf"),
     1994: (date(1994, 5, 5), f"{DOWNLOAD}/8a8faadf-3660-4617-864c-f4aa683f20e8/LBCE_1994-5-5.pdf"),
     1998: (date(1998, 5, 7), f"{DOWNLOAD}/6559d43c-4ea0-4b58-b705-94f84c3a549a/LBCE_1998-5-7.pdf"),
 }
@@ -99,7 +112,56 @@ OCR_CODES = {
     "lO": "LD",
     "ILiB": "ILIB",
 }
+SCANNED = {1990: (10, 86, 109, 142)}
 PARTIES = {
+    1990: {
+        "LAB": "Labour",
+        "LABCP": "Labour and Co-operative",
+        "CON": "Conservative",
+        "CONAU": "Conservative",
+        "LD": "Liberal Democrat",
+        "LDFT": "Liberal Democrat",
+        "LDHT": "Liberal Democrat",
+        "LDSDP": "Liberal Democrat",
+        "LDST": "Liberal Democrat",
+        "SDPLD": "Liberal Democrat",
+        "LDBT": "Liberal Democrat",
+        "GRE": "Green",
+        "SDP": "Social Democratic Party",
+        "REA": "Residents' Association",
+        "VAL": "Valley Party",
+        "INDRE": "Independent Resident",
+        "IND": "Independent",
+        "TENRES": "Tenants and Residents",
+        "CAMC": "Camden Charter",
+        "INDLLT": "Independent Labour",
+        "INDCON": "Independent Conservative",
+        "CC": "Community Campaign",
+        "INDLIB": "Independent Liberal",
+        "INDLAB": "Independent Labour",
+        "COMM": "Communist",
+        "BN": "British National Party",
+        "CREP": "Community Representative",
+        "INDAPT": "Independent against Poll Tax",
+        "ICP": "International Communist Party",
+        "DC": "Democrats and Commonwealth",
+        "TLR": "Tenants, Leaseholders and Residents",
+        "RLGG": "Monster Raving Looney",
+        "F": "Fellowship",
+        "ISCG": "Isleworth South Community Group",
+        "FRM": "Friends of Rainham Marshes",
+        "INDTEN": "Independent Tenant",
+        "ACLA": "Asian Council on Local Affairs",
+        "REAP": "Residents' Action Party",
+        "SOC": "Socialist",
+        "COMMGB": "Communist Party of Great Britain",
+        "NW": "Nursery Workers' Candidate",
+        "CORP": "Corrective Party",
+        "PC": "People's Choice",
+        "INDI": "Independent Islamic",
+        "TEN": "Tenants' Representative",
+        "DCOMM": "Democratic Communist",
+    },
     1994: {
         "LAB": "Labour",
         "LABCP": "Labour and Co-operative",
@@ -170,6 +232,54 @@ PARTIES = {
     },
 }
 TOTALS = {
+    1990: {
+        "LAB": (2320553, 1878, 898),
+        "LABCP": (57277, 36, 27),
+        "CON": (2322959, 1849, 729),
+        "CONAU": (2847, 2, 2),
+        "LD": (487986, 914, 107),
+        "LDFT": (319539, 284, 114),
+        "LDHT": (6926, 6, 3),
+        "LDSDP": (3385, 3, 2),
+        "LDST": (1975, 4, 2),
+        "SDPLD": (1648, 1, 1),
+        "LDBT": (1394, 2, 0),
+        "GRE": (151838, 431, 0),
+        "SDP": (43531, 113, 4),
+        "REA": (39828, 28, 19),
+        "VAL": (14838, 60, 0),
+        "INDRE": (14378, 12, 6),
+        "IND": (13539, 37, 0),
+        "TENRES": (8861, 19, 0),
+        "CAMC": (4162, 22, 0),
+        "INDLLT": (2028, 3, 0),
+        "INDCON": (1710, 3, 0),
+        "CC": (1061, 4, 0),
+        "INDLIB": (1022, 3, 0),
+        "INDLAB": (878, 5, 0),
+        "COMM": (852, 9, 0),
+        "BN": (851, 7, 0),
+        "CREP": (769, 2, 0),
+        "INDAPT": (656, 3, 0),
+        "ICP": (554, 3, 0),
+        "DC": (549, 7, 0),
+        "TLR": (527, 4, 0),
+        "RLGG": (445, 6, 0),
+        "F": (415, 1, 0),
+        "ISCG": (398, 1, 0),
+        "FRM": (271, 2, 0),
+        "INDTEN": (248, 1, 0),
+        "ACLA": (246, 3, 0),
+        "REAP": (237, 2, 0),
+        "SOC": (109, 3, 0),
+        "COMMGB": (101, 1, 0),
+        "NW": (82, 1, 0),
+        "CORP": (79, 3, 0),
+        "PC": (79, 1, 0),
+        "INDI": (77, 1, 0),
+        "TEN": (77, 1, 0),
+        "DCOMM": (66, 1, 0),
+    },
     1994: {
         "LAB": (2304065, 1888, 1019),
         "LABCP": (44576, 29, 24),
@@ -239,8 +349,48 @@ TOTALS = {
         "ILIB": (15, 1, 0),
     },
 }
+LINES = {
+    (14, "Lockington, Betty M. LD ty"): "Lockington, Betty M. LD 449",
+    (21, "Gibbons, Jean F. LAB $27"): "Gibbons, Jean F. LAB 527",
+    (22, "Deshmukh, Sadashivrao N. LAB LAT?"): "Deshmukh, Sadashivrao N. LAB 1,177",
+    (27, "Rowley, Simon J. LD 44]"): "Rowley, Simon J. LD 441",
+    (40, "Aitken, Penelope A. SDP Zit"): "Aitken, Penelope A. SDP 277",
+    (44, "Ferguson, Jonas LAB Fz"): "Ferguson, Jonas LAB 712",
+    (56, "Macdonald-Weissenborn, Leslie M.LD 233"): "Macdonald-Weissenborn, Leslie M. LD 233",
+    (57, "Mutimer, William S. LAB 55/"): "Mutimer, William S. LAB 557",
+    (57, "Twigg, David J. LDFT L279"): "Twigg, David J. LDFT 1,279",
+    (59, "Waring, Amanda J.D. LAB __si1940"): "Waring, Amanda J.D. LAB 1,940",
+    (62, "Poole, Beverly H. CON 51]"): "Poole, Beverly H. CON 511",
+    (63, "Searle, David CON L177"): "Searle, David CON 1,177",
+    (63, "Sommerfeld, Inge-Lore LD 225)"): "Sommerfeld, Inge-Lore LD 225",
+    (79, "McNair, Christine M. LDFT Tl"): "McNair, Christine M. LDFT 751",
+    (79, "Anas, Muhammed 297"): "Anas, Muhammed CC 297",
+    (79, "Islam, Sirajul LAB LVF"): "Islam, Sirajul LAB 1,177",
+    (86, "Haynes, Harry CON L317"): "Haynes, Harry CON 1,317",
+    (27, "Perera, Panadure A.C LAB 1471"): "Perera, Panadure A.C LAB 1,871",
+    (40, "Webb, Edward C. CON 1355"): "Webb, Edward C. CON 1,353",
+    (40, "Chestnutt, Kathleen LD 243"): "Chestnutt, Kathleen LD 233",
+    (53, "Tibbs, David C. SDP 590"): "Tibbs, David C. LDSDP 590",
+    (72, "Cobb, Steven A. LAB 7718"): "Cobb, Steven A. LAB 778",
+    (75, "Daws, Kevin LDFT 152"): "Daws, Kevin LDFT 752",
+    (84, "Crawford, James C.M.L. CON S212"): "Crawford, James C.M.L. CON 3,212",
+}
+WARD_SEATS: dict[tuple[int, str, str], int] = {(1990, "Barking and Dagenham", "Village"): 3}
+MISPRINTED = {(1990, "Croydon", "Heathfield")}
+TOTAL_FIXES = {("Southwark", 4): 67954, ("Richmond upon Thames", 2): 52}
+VOTING: dict[tuple[str, str], dict[int | str, int | None]] = {
+    ("Redbridge", "Fairlop"): {0: 371, 1: 11000, 2: 3, 3: 8586, 4: 4265, 5: 497, 6: 4220, 7: 45},
+    ("Camden", "Grafton Ad"): {0: 44, 1: 6900, 2: 2, 3: 4291, 4: 2002, 5: 467, 6: 1985, 7: 17},
+    ("Greenwich", "Blackheath"): {0: 149, 1: 6000, 2: 2, 3: 5068, 4: 2824, 5: 557, 6: 2784, 7: 40},
+    ("Hackney", "Haggerston"): {4: 2016},
+    ("Havering", "Gidea Park"): {4: 2838},
+    ("Southwark", "Liddle"): {"pct": None},
+    ("Bexley", "Thamesmead East"): {5: 333},
+    ("Harrow", "Roxbourne"): {5: 551},
+}
 WARDS = {
     "Addlscombe": "Addiscombe",
+    "Amos": "Arnos",
     "Redel iffe": "Redcliffe",
     "Surblton Hili": "Surbiton Hill",
     "Wood cote": "Woodcote",
@@ -1171,27 +1321,400 @@ def fixed(found: pl.DataFrame) -> pl.DataFrame:
     return pl.DataFrame(rows, infer_schema_length=None)
 
 
+READ_FIXES = {
+    r"\blan\b": "Ian",
+    r"\blain\b": "Iain",
+    r"\bErn?est\b": "Ernest",
+    r"\bEmest\b": "Ernest",
+    r"\bMihael\b": "Michael",
+    r"Bailcy": "Bailey",
+    r"Comwall": "Cornwall",
+    r"MclIsaac": "McIsaac",
+    r"Mazhar-UI": "Mazhar-Ul",
+    r" 1\.$": " J.",
+    r"§S\.": "S.",
+    r"A:S\.": "A.S.",
+}
+
+
+def dotted(name: str) -> str:
+    for pattern, fixed in READ_FIXES.items():
+        name = re.sub(pattern, fixed, name)
+    surname, comma, rest = name.partition(",")
+    words = []
+    for word in rest.split():
+        if re.fullmatch(r"[A-Z](?:[A-Z.]*[A-Z])\.?,?", word) and not word.startswith("Mc"):
+            word = ".".join(re.findall(r"[A-Z]", word)) + "."
+        elif re.fullmatch(r"[A-Z]-[A-Z]{2,}", word):
+            word = word[:2] + ".".join(word[2:]) + "."
+        elif re.fullmatch(r"[A-Z],", word):
+            word = word[0] + "."
+        words.append(word)
+    return surname + comma + " " + " ".join(words) if words else name
+
+
+@functools.cache
+def text_layer(path: Path) -> tuple[list[tuple[float, float]], list[list[tuple[float, float, float, float, str]]]]:
+    return pages(path)
+
+
+def scanned_lines(
+    artifact: raw.Artifact, sheet: int, columns: bool, dpi: int = 400
+) -> tuple[tuple[int, int], list[list[Word]]]:
+    size, page = scan(artifact, sheet, dpi=dpi)
+    if not columns:
+        return size, sorted(page, key=lambda line: min(w[1] for w in line))
+    sizes, book = text_layer(artifact.path)
+    scale = size[0] / sizes[sheet - 1][0]
+    words = [w for w in book[sheet - 1] if re.search(r"\w", w[4])]
+    middle = sizes[sheet - 1][0] / 2
+    clear = [x for x in range(int(middle * 0.76), int(middle * 1.24)) if not any(w[0] <= x <= w[2] for w in words)]
+    runs = [list(run) for _, run in itertools.groupby(clear, key=lambda x: x - clear.index(x))]
+    nearest = min(runs, key=lambda run: min(abs(x - middle) for x in run))
+    split = int(scale * (nearest[0] + nearest[-1]) / 2)
+    out: list[list[Word]] = []
+    for crop in ((0, split), (split, size[0])):
+        _, column = scan(artifact, sheet, crop, 80 * dpi // 400, dpi)
+        out += sorted(column, key=lambda line: min(w[1] for w in line))
+    return size, out
+
+
+def box(line: list[Word], size: tuple[int, int]) -> list[float]:
+    return [
+        min(w[0] for w in line) / size[0],
+        min(w[1] for w in line) / size[1],
+        max(w[2] for w in line) / size[0],
+        max(w[3] for w in line) / size[1],
+    ]
+
+
+def count(text: str) -> int | None:
+    text = text.translate(DIGITS).replace("$", "5").replace(":", ",")
+    return int(re.sub(r"[,.]", "", text)) if re.fullmatch(r"\d{1,3}(?:[,.]?\d{3})*|\d{1,3}", text) else None
+
+
+def results_scanned(artifact: raw.Artifact, codes: set[str], first: int, last: int, dpi: int = 400) -> pl.DataFrame:
+    folded = {fold(b): b for b in BOROUGHS} | {"cityofwestminster": "Westminster"}
+    out = []
+    borough = ward = None
+    order = 0
+    after_head = False
+    for sheet in range(first, last + 1):
+        size, rows = scanned_lines(artifact, sheet, True, dpi)
+        for row in rows:
+            tokens = [w[4].replace("|", "I").replace("’", "'") for w in row if re.search(r"[A-Za-z0-9]", w[4])]
+            while len(tokens) > 3 and tokens[-1] == "I":
+                tokens.pop()
+            line = LINES.get((sheet, " ".join(tokens)), " ".join(tokens))
+            tokens = line.split()
+            heading = re.sub(r"\s*[-—–]*\s*continued$", "", line, flags=re.IGNORECASE)
+            if fold(heading) in folded:
+                borough, ward = folded[fold(heading)], None
+                continue
+            if not tokens or "Research Centre" in line or "Table 2" in line:
+                continue
+            if after_head and not re.search(r"\d", line) and re.fullmatch(r"[A-Z][A-Za-z' ]+", line):
+                continue
+            after_head = False
+            if re.fullmatch(r"[A-Z][A-Z0-9 .'&()-]*[A-Z.)],", line):
+                ward = {"borough": borough, "ward": line[:-1], "page": sheet, "column": 0, "status": ""}
+                order = 0
+                after_head = True
+                continue
+            if len(tokens) >= 3 and (tokens[-1].lower() == "unopposed" or count(tokens[-1]) is not None):
+                votes = None if tokens[-1].lower() == "unopposed" else count(tokens[-1])
+                code = tokens[-2].upper()
+                if code in codes and ward is not None:
+                    order += 1
+                    out.append(
+                        ward
+                        | {
+                            "order": order,
+                            "name": " ".join(tokens[:-2]),
+                            "party": code,
+                            "votes": votes,
+                            "line_page": sheet,
+                            "bbox": box(row, size),
+                        }
+                    )
+                    continue
+            head = re.fullmatch(r"([A-Z][A-Z0-9 .'&()-]*[A-Z.)'V]),+\s+(\S.*)", line)
+            if head and borough is not None:
+                ward = {"borough": borough, "ward": head.group(1), "page": sheet, "column": 0, "status": ""}
+                order = 0
+                after_head = True
+                continue
+            print(f"unread line on page {sheet}: {line}")
+    return pl.DataFrame(out, schema_overrides={"votes": pl.Int64})
+
+
+def cells_of(tokens: list[str]) -> list[int | None]:
+    cells = [t for t in tokens if t != "*"]
+    values = [count(t) if "." not in t or "," in t else None for t in cells]
+    if len(cells) > 5:
+        tenths = cells[5].translate(DIGITS).replace(".", "")
+        values[5] = int(tenths) if tenths.isdigit() and len(tenths) >= 2 else None
+    return values
+
+
+def rereads(artifact: raw.Artifact, sheet: int) -> list[list[str]]:
+    folder = PARSED / "ocr"
+    out = []
+    for dpi, psm in ((300, 4), (600, 4), (400, 6)):
+        txt = folder / f"{artifact.sha256}-{sheet}-{dpi}-{psm}.txt"
+        if not txt.exists():
+            with tempfile.TemporaryDirectory() as tmp:
+                image = Path(tmp) / "page"
+                subprocess.run(
+                    ["pdftoppm", "-r", str(dpi), "-gray", "-png", "-f", str(sheet), "-l", str(sheet), "-singlefile"]
+                    + [str(artifact.path), str(image)],
+                    check=True,
+                )
+                subprocess.run(
+                    ["tesseract", f"{image}.png", str(image), "--psm", str(psm), "tsv"], check=True, capture_output=True
+                )
+                found = list(csv.DictReader((image.with_suffix(".tsv")).open(), delimiter="\t", quoting=csv.QUOTE_NONE))
+            lines_: dict[tuple[str, str, str], list[tuple[int, str]]] = {}
+            for r in found:
+                if r["level"] == "5" and r["text"].strip():
+                    lines_.setdefault((r["block_num"], r["par_num"], r["line_num"]), []).append(
+                        (int(r["left"]), r["text"].strip())
+                    )
+            txt.write_text("\n".join(" ".join(t for _, t in sorted(v)) for v in lines_.values()))
+        out.append(txt.read_text().splitlines())
+    return out
+
+
+def agreed(own: list[int | None], others: list[list[int | None]]) -> list[int | None]:
+    voted = list(own)
+    for i in range(len(own)):
+        tally: dict[int, int] = {}
+        for reading in [own, *others]:
+            if i < len(reading) and (cell := reading[i]) is not None:
+                tally[cell] = tally.get(cell, 0) + 1
+        if tally:
+            best = max(tally.values())
+            if own[i] is None or tally.get(own[i], 0) < best:
+                voted[i] = next(v for v, n in tally.items() if n == best)
+    return voted
+
+
+def statistics_scanned(artifact: raw.Artifact, first: int, last: int) -> pl.DataFrame:
+    folded = {fold(b): b for b in BOROUGHS} | {"cityofwestminster": "Westminster"}
+    left: list[tuple[str, str, list[int | None], int, list[float], bool]] = []
+    right: list[tuple[str, list[int | None], int, list[float], bool]] = []
+    borough = None
+    for sheet in range(first, last + 1):
+        size, rows = scanned_lines(artifact, sheet, False)
+        text = " ".join(" ".join(w[4] for w in row) for row in rows[:8])
+        alternatives = rereads(artifact, sheet)
+        if "Rejected ballot papers" in text:
+            kind = "right"
+        elif "Ballot papers" in text:
+            kind = "left"
+        else:
+            raise ValueError(f"page {sheet} is neither half of Table 5")
+        for row in rows:
+            tokens = [w[4] for w in row]
+            line = " ".join(tokens)
+            if fold(line) in folded and kind == "left":
+                borough = folded[fold(line)]
+                continue
+            if not re.search(r"\d", line) or re.match(r"[(\d*]|Table|Ward|Area", line) or "Research Centre" in line:
+                continue
+            total = re.search(r"\btotal\b", line) is not None
+            if kind == "left":
+                if borough is None:
+                    continue
+                start = next((i for i, t in enumerate(tokens) if i > 0 and re.match(r"[\d*]", t)), None)
+                if start is None:
+                    continue
+                name = " ".join(tokens[:start]).removesuffix(" total").strip()
+                values = cells_of(tokens[start:])
+                if len(values) == 8 and not total:
+                    prefix = fold(name)
+                    others = []
+                    for reading in alternatives:
+                        for other in reading:
+                            words = other.split()
+                            if fold(" ".join(words[: len(name.split())])) == prefix:
+                                found = cells_of(words[len(name.split()) :])
+                                if len(found) == 8:
+                                    others.append(found)
+                    values = agreed(values, others)
+                left.append((borough, name, values, sheet, box(row, size), total))
+            elif len(tokens) >= 4:
+                percent = tokens[-1].replace(".", "")
+                right.append(
+                    (
+                        line,
+                        [count(tokens[-2]), int(percent) if percent.isdigit() else None],
+                        sheet,
+                        box(row, size),
+                        total,
+                    )
+                )
+    out = []
+    groups = [list(g) for _, g in itertools.groupby(left, key=lambda row: row[0])]
+    pieces: list[list[tuple[str, list[int | None], int, list[float], bool]]] = [[]]
+    for row in right:
+        pieces[-1].append(row)
+        if row[4]:
+            pieces.append([])
+    tail = groups[-1]
+    ends = [i for i, row in enumerate(tail) if row[5]]
+    if len(ends) == 2:
+        groups[-1:] = [tail[: ends[0] + 1], [("Greater London", *row[1:]) for row in tail[ends[0] + 1 :]]]
+    if len(groups) != len(pieces) - 1:
+        raise ValueError(f"{len(groups)} boroughs on the left of Table 5, {len(pieces) - 1} on the right")
+    for group, piece in zip(groups, pieces, strict=False):
+        rows = [row for row in group if row[5] or row[2][3] is not None or row[2][4] is not None]
+        if len(rows) != len(piece):
+            raise ValueError(f"{group[0][0]}: {len(rows)} rows on the left of Table 5, {len(piece)} on the right")
+        for (borough, name, values, sheet, bbox, total), (line, tail, page, rbox, rtotal) in zip(
+            rows, piece, strict=True
+        ):
+            if fold(line)[:3] != fold(name)[:3]:
+                print(f"right-hand row {line!r} against {borough} {name}")
+            out.append(
+                {
+                    "borough": borough,
+                    "ward": name,
+                    "total": total,
+                    "values": values,
+                    "valid": tail[0],
+                    "valid_pct": tail[1],
+                    "page": sheet,
+                    "box": bbox,
+                    "rejected_page": page,
+                    "rejected_box": rbox,
+                }
+            )
+        for borough, name, values, sheet, bbox, total in (row for row in group if row not in rows):
+            out.append({"borough": borough, "ward": name, "total": False, "values": values, "page": sheet, "box": bbox})
+    print(f"{len(left)} left rows, {len(right)} right rows")
+    return pl.DataFrame(out)
+
+
+def statistics_checked(artifact: raw.Artifact, first: int, last: int) -> pl.DataFrame:
+    table = statistics_scanned(artifact, first, last)
+    out = []
+    problems = []
+    for borough, rows in table.group_by("borough", maintain_order=True):
+        wards = [r for r in rows.iter_rows(named=True) if not r["total"]]
+        total = next((r for r in rows.iter_rows(named=True) if r["total"]), None)
+        fixed_cells = []
+        for r in wards:
+            v = (r["values"] + [None] * 8)[:8]
+            key = (borough[0], r["ward"])
+            fixed = VOTING.get(key, {})
+            v = [fixed.get(i, x) for i, x in enumerate(v)]
+            fixed_cells.append(v)
+            valid = fixed.get("valid", r["valid"])
+            pct = fixed["pct"] if "pct" in fixed else r["valid_pct"]
+            row = {
+                "borough": borough[0],
+                "ward": r["ward"],
+                "seats": v[2],
+                "electorate": v[3],
+                "ballots": v[4],
+                "on_day": v[6],
+                "postal": v[7],
+                "valid": valid,
+                "invalid": None if v[4] is None or valid is None else v[4] - valid,
+                "turnout_page": r["page"],
+                "turnout_box": r["box"],
+                "rejected_page": r["rejected_page"],
+                "rejected_box": r["rejected_box"],
+            }
+            out.append(row)
+            if v[3] is None:
+                continue
+            if None in (v[3], v[4], v[6], v[7], valid) or v[6] + v[7] != v[4]:
+                problems.append(f"{key}: {v} valid {valid}")
+            elif v[5] is not None and abs(v[4] / v[3] * 1000 - v[5]) > 1.01:
+                problems.append(f"{key}: turnout {v[4] / v[3] * 100:.1f} against {v[5] / 10}")
+            elif pct is not None and abs(valid / v[4] * 1000 - pct) > 1.01:
+                problems.append(f"{key}: valid {valid} of {v[4]} against {pct}")
+        if borough[0] == "Greater London":
+            continue
+        if total is not None:
+            t = (total["values"] + [None] * 8)[:8]
+            t = [TOTAL_FIXES.get((borough[0], i), x) for i, x in enumerate(t)]
+            sums = {i: sum(c[i] or 0 for c in fixed_cells) for i in (2, 3, 4, 6, 7)}
+            for i, got in sums.items():
+                if got != t[i]:
+                    problems.append(f"{borough[0]} column {i + 1}: wards add up to {got}, printed {t[i]}")
+    found = pl.DataFrame(out)
+    summary = {
+        "electorate": (4960826, found["electorate"].sum()),
+        "ballots": (2389455, found["ballots"].sum()),
+        "on_day": (2360229, found["on_day"].sum()),
+        "postal": (29226, found["postal"].sum()),
+        "valid": (2383990, found["valid"].sum()),
+        "invalid": (5465, found["invalid"].sum()),
+    }
+    for column, (printed, got) in summary.items():
+        if printed != got:
+            problems.append(f"{column}: wards add up to {got}, printed {printed}")
+    if problems:
+        raise ValueError("\n".join(problems))
+    return found
+
+
+def reorder(heads: list[str], rows: list[dict]) -> list[dict]:
+    letters = str.maketrans({"0": "o", "5": "s", "1": "i"})
+    left = list(rows)
+    out = []
+    for head, row in zip(heads, rows, strict=True):
+        printed = fold(re.sub(r"[^\w')]+$", "", head).translate(letters))
+        match = max(
+            left,
+            key=lambda r: (
+                difflib.SequenceMatcher(None, printed, fold(WARDS.get(r["ward"], r["ward"]))).ratio()
+                + (row is r) * 0.01
+            ),
+        )
+        left.remove(match)
+        out.append(match)
+    return out
+
+
 def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
     candidates, wards = [], []
+    problems: list[str] = []
     for year, (day, url) in BOOKS.items():
-        sizes, book = pages(raw.cached(SOURCE, url).path)
-        stats = statistics_1994(book, sizes) if year == 1994 else statistics(book, sizes)
-        found = (
-            results_1994(book, set(PARTIES[year]), sizes, expected(stats))
-            if year == 1994
-            else results(book, set(PARTIES[year]), sizes)
-        )
-        if year == 1994:
-            found = fixed(found)
+        artifact = raw.cached(SOURCE, url)
+        if year in SCANNED:
+            first, last, left, right = SCANNED[year]
+            stats = statistics_checked(artifact, left, right)
+            found = results_scanned(artifact, set(PARTIES[year]), first, last)
+        else:
+            sizes, book = pages(artifact.path)
+            stats = statistics_1994(book, sizes) if year == 1994 else statistics(book, sizes)
+            found = (
+                results_1994(book, set(PARTIES[year]), sizes, expected(stats))
+                if year == 1994
+                else results(book, set(PARTIES[year]), sizes)
+            )
+            if year == 1994:
+                found = fixed(found)
         found = found.with_columns(name_printed=pl.col("name")).with_columns(
-            pl.col("name").map_elements(lambda n: NAMES.get(n, person(n)), return_dtype=pl.String)
+            pl.col("name").map_elements(
+                lambda n: NAMES.get(n, dotted(person(n)) if year in SCANNED else person(n)), return_dtype=pl.String
+            )
         )
         printed = TOTALS[year]
         groups = found.group_by("party").agg(votes=pl.col("votes").sum(), count=pl.len())
-        for code, votes, count in groups.iter_rows():
-            if (votes, count) != printed[code][:2]:
-                raise ValueError(f"{year} {code}: {votes} votes and {count} candidates, printed {printed[code][:2]}")
+        seen = {code: (votes, count) for code, votes, count in groups.iter_rows()}
+        differing = [
+            f"{code}: {seen.get(code)} against printed {printed[code][:2]}"
+            for code in printed
+            if seen.get(code) != printed[code][:2]
+        ]
+        if differing:
+            raise ValueError(f"{year} party table:\n" + "\n".join(differing))
         heads = found.select("borough", "ward", "page", "column").unique(maintain_order=True)
         elected: dict[str, int] = {}
         for borough, code in BOROUGHS.items():
@@ -1201,9 +1724,10 @@ def parse() -> None:
                 raise ValueError(
                     f"{year} {borough}: {mine.height} wards in the results, {listed.height} in the statistics"
                 )
-            for number_, (head, row) in enumerate(
-                zip(mine.iter_rows(named=True), listed.iter_rows(named=True), strict=True)
-            ):
+            rows_ = listed.rows(named=True)
+            if year in SCANNED:
+                rows_ = reorder(mine["ward"].to_list(), rows_)
+            for number_, (head, row) in enumerate(zip(mine.iter_rows(named=True), rows_, strict=True)):
                 printed_name = re.sub(r"[^\w')]+$", "", head["ward"])
                 name = WARDS.get(row["ward"], row["ward"])
                 if re.search(r"\d", name):
@@ -1218,15 +1742,15 @@ def parse() -> None:
                     & (pl.col("column") == head["column"])
                 ).sort("order")
                 votes = lines_["votes"].to_list()
-                seats = row["seats"]
                 tacit = all(v is None for v in votes)
+                seats = len(votes) if tacit else WARD_SEATS.get((year, borough, name), row["seats"])
                 if not tacit:
                     if any(a < b for a, b in itertools.pairwise(votes)):
-                        raise ValueError(f"{year} {borough} {name}: votes out of order {votes}")
+                        problems.append(f"{year} {borough} {name}: votes out of order {votes}")
                     if len(votes) > seats and votes[seats - 1] == votes[seats]:
-                        raise ValueError(f"{year} {borough} {name}: tie for the last seat")
-                    if max(votes) > row["valid"]:
-                        raise ValueError(f"{year} {borough} {name}: a candidate has more votes than valid ballots")
+                        problems.append(f"{year} {borough} {name}: tie for the last seat")
+                    if max(votes) > row["valid"] and (year, borough, name) not in MISPRINTED:
+                        problems.append(f"{year} {borough} {name}: a candidate has more votes than valid ballots")
                 if len(votes) < seats:
                     raise ValueError(f"{year} {borough} {name}: {len(votes)} candidates for {seats} seats")
                 wards.append(
@@ -1287,6 +1811,8 @@ def parse() -> None:
         }
         if wrong:
             raise ValueError(f"{year} elected by party differs from the printed table: {wrong}")
+    if problems:
+        raise ValueError("\n".join(problems))
     pl.DataFrame(wards).write_parquet(PARSED / "wards.parquet")
     pl.DataFrame(candidates).write_parquet(PARSED / "candidates.parquet")
     print(f"{len(wards)} wards and {len(candidates)} candidates")
@@ -1294,21 +1820,29 @@ def parse() -> None:
 
 
 def scan(
-    artifact: raw.Artifact, number: int, crop: tuple[int, int] | None = None
+    artifact: raw.Artifact, number: int, crop: tuple[int, int] | None = None, pad: int = 0, dpi: int = 400
 ) -> tuple[tuple[int, int], list[list[Word]]]:
     folder = PARSED / "ocr"
     folder.mkdir(parents=True, exist_ok=True)
-    tsv = folder / f"{artifact.sha256}-{number}-{crop[0] if crop else 'page'}.tsv"
+    tsv = (
+        folder
+        / f"{artifact.sha256}-{number}-{crop[0] if crop else 'page'}{'-padded' if pad else ''}{f'-{dpi}' if dpi != 400 else ''}.tsv"
+    )
     if not tsv.exists():
         with tempfile.TemporaryDirectory() as tmp:
             image = Path(tmp) / "page"
             window = ["-x", str(crop[0]), "-y", "0", "-W", str(crop[1] - crop[0]), "-H", "100000"] if crop else []
             subprocess.run(
-                ["pdftoppm", "-r", "400", "-gray", "-png", "-f", str(number), "-l", str(number), "-singlefile"]
+                ["pdftoppm", "-r", str(dpi), "-gray", "-png", "-f", str(number), "-l", str(number), "-singlefile"]
                 + window
                 + [str(artifact.path), str(image)],
                 check=True,
             )
+            if pad:
+                subprocess.run(
+                    ["magick", f"{image}.png", "-bordercolor", "white", "-border", f"{pad}x{pad}", f"{image}.png"],
+                    check=True,
+                )
             subprocess.run(
                 ["tesseract", f"{image}.png", str(tsv.with_suffix("")), "--psm", "6" if crop else "4", "tsv"],
                 check=True,
@@ -1316,11 +1850,11 @@ def scan(
             )
     rows = list(csv.DictReader(tsv.open(), delimiter="\t", quoting=csv.QUOTE_NONE))
     top = next(r for r in rows if r["level"] == "1")
-    offset = crop[0] if crop else 0
+    offset = (crop[0] if crop else 0) - pad
     grouped: dict[tuple[str, str, str], list[Word]] = {}
     for r in rows:
         if r["level"] == "5" and r["text"].strip():
-            left, upper = int(r["left"]) + offset, int(r["top"])
+            left, upper = int(r["left"]) + offset, int(r["top"]) - pad
             grouped.setdefault((r["block_num"], r["par_num"], r["line_num"]), []).append(
                 (left, upper, left + int(r["width"]), upper + int(r["height"]), r["text"].strip())
             )
@@ -1854,7 +2388,12 @@ def emit() -> Path:
                 )
                 name(election, f"{year} {council} election")
                 cs.add("slug", path=f"{path}/{day}-local", entity_id=election)
-                cs.add("note", entity_id=election, kind="methodology", body_md=METHODOLOGY + NOTES.get(year, ""))
+                cs.add(
+                    "note",
+                    entity_id=election,
+                    kind="methodology",
+                    body_md=METHODOLOGY_1990 if year in SCANNED else METHODOLOGY + NOTES.get(year, ""),
+                )
                 for ward in held.filter(pl.col("la_code") == code).iter_rows(named=True):
                     display = ward["ward"]
                     ward_key = f"{code}:{slug(display)}:{year}"
