@@ -562,6 +562,13 @@ export const READY_COUNTS: Record<string, typeof m.coverage_ready_of> = {
   local_measure: m.coverage_ready_of_measures,
 };
 
+export const READY_GOVERNMENT_KINDS: Record<string, string> = {
+  county_office: "county",
+  municipal: "municipality",
+  school_board: "school",
+  special_district: "special",
+};
+
 export const LEVELS: Record<string, () => string> = {
   president: m.coverage_level_president,
   us_senate: m.coverage_level_us_senate,

@@ -20,6 +20,7 @@
     label,
     levelLabel,
     READY_COUNTS,
+    READY_GOVERNMENT_KINDS,
     READY_LEVELS,
     measures,
     REASONS,
@@ -951,8 +952,15 @@
                   >
                     {#each short as state (state.state)}
                       <li class="flex flex-wrap items-center gap-x-1.5">
+                        {const kind = READY_GOVERNMENT_KINDS[row.level]}
                         <span
-                          ><span class="font-semibold">{state.state}</span>
+                          >{#if kind != null}<a
+                              href={`${resolve("/[...path]", { path: `coverage/${data.polity}.md` })}?state=${state.state}&level=${kind}`}
+                              class="font-semibold underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-ring"
+                              >{state.state}</a
+                            >{:else}<span class="font-semibold"
+                              >{state.state}</span
+                            >{/if}
                           {count(state.complete)}/{count(state.total)}</span
                         >
                         {#each READY.filter((part) => (part.reason === "knownGap" || part.reason === "blocked") && state[part.reason] > 0) as part (part.reason)}
