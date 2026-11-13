@@ -27,6 +27,11 @@ SWEEPABLE = {
     "party_affiliation": "party_id",
     "election_cadence": "id",
     "results_access": "id",
+    "census_tier": "id",
+    "census_tier_count": "id",
+    "census_class": "id",
+    "census_match": "id",
+    "census_date": "id",
     "note": "entity_id",
 }
 TIMEOUT = "20min"
@@ -1028,6 +1033,163 @@ def _figures(stage: Stage) -> list[tuple[str, sql.Composed]]:
     ]
 
 
+CENSUS_SELECTORS: tuple[LiteralString, ...] = (
+    "election_kinds",
+    "contest_kinds",
+    "body_kinds",
+    "office_kinds",
+    "polity_kinds",
+    "within_polity_id",
+    "iso_pattern",
+    "schemes",
+    "except_codes",
+    "name_pattern",
+    "body_id",
+    "office_id",
+)
+
+
+def _live(stage: Stage, table: str, *columns: LiteralString) -> sql.Composable:
+    staged = sql.SQL(", ").join(
+        sql.Identifier(column)
+        if column in stage.tables[table]
+        else sql.SQL("null as {}").format(sql.Identifier(column))
+        for column in columns
+    )
+    return sql.SQL(
+        """(select true as staged, {staged} from {table}
+            union all
+            select false, {public} from public.{name} p join changeset c on c.id = p.changeset_id
+            where not exists (select from {table} x where x.id = p.id){swept})"""
+    ).format(
+        staged=staged,
+        table=stage.staged(table),
+        public=sql.SQL(", ").join(sql.SQL("p.{}").format(sql.Identifier(column)) for column in columns),
+        name=sql.Identifier(table),
+        swept=sql.SQL(" and c.pipeline <> {}").format(sql.Literal(stage.pipeline))
+        if table in stage.sweeps
+        else sql.SQL(""),
+    )
+
+
+def _census(stage: Stage) -> list[tuple[str, sql.Composed]]:
+    found: list[tuple[str, sql.Composed]] = []
+    if "census_tier_count" in stage.tables:
+        found.append(
+            (
+                "census.count_source",
+                sql.SQL(
+                    """select s.id, null::uuid, jsonb_build_object('tier', s.tier_id, 'source', s.source_id, 'kind', o.kind)
+                       from {staged} s join {sources} o on o.id = s.source_id
+                       where o.kind <> 'official_body'"""
+                ).format(staged=stage.staged("census_tier_count"), sources=stage.either("source", "id", "kind")),
+            )
+        )
+    if "census_tier" in stage.tables:
+        tiers = _live(stage, "census_tier", "id", "polity_id", "parent_tier_id")
+        found += [
+            (
+                "census.tier_parent",
+                sql.SQL(
+                    """select t.id, null::uuid, jsonb_build_object('parent', t.parent_tier_id, 'polity', t.polity_id,
+                                                                 'parent_polity', p.polity_id)
+                       from {tiers} t left join {tiers} p on p.id = t.parent_tier_id
+                       where t.staged and t.parent_tier_id is not null
+                         and p.polity_id is distinct from t.polity_id"""
+                ).format(tiers=tiers),
+            ),
+            (
+                "census.tier_cycle",
+                sql.SQL(
+                    """with recursive t as (select * from {tiers}),
+                       up (start, id, path) as (
+                         select t.id, t.parent_tier_id, array[t.id] from t where t.staged and t.parent_tier_id is not null
+                         union all
+                         select up.start, t.parent_tier_id, up.path || up.id
+                         from up join t on t.id = up.id
+                         where t.parent_tier_id is not null and not up.id = any(up.path))
+                       select distinct start, null::uuid, jsonb_build_object('path', path)
+                       from up where id = start"""
+                ).format(tiers=tiers),
+            ),
+        ]
+    if "census_class" in stage.tables:
+        found.append(
+            (
+                "census.class_tier",
+                sql.SQL(
+                    """select s.id, null::uuid, jsonb_build_object('key', s.key, 'tier', s.tier_id, 'polity', s.polity_id,
+                                                                 'tier_polity', t.polity_id)
+                       from {staged} s left join {tiers} t on t.id = s.tier_id
+                       where t.polity_id is distinct from s.polity_id"""
+                ).format(staged=stage.staged("census_class"), tiers=stage.either("census_tier", "id", "polity_id")),
+            )
+        )
+    if "census_match" in stage.tables:
+        matches = _live(
+            stage, "census_match", "id", "class_id", "precedence", "valid_from", "valid_to", *CENSUS_SELECTORS
+        )
+        found.append(
+            (
+                "census.match_overlap",
+                sql.SQL(
+                    """select a.id, null::uuid, jsonb_build_object('class', a.class_id, 'other', b.id, 'other_class', b.class_id)
+                       from {matches} a join {matches} b on b.class_id <> a.class_id and (a.staged or b.staged)
+                         and (not b.staged or b.id::text > a.id::text)
+                         and coalesce(a.precedence, 0) = coalesce(b.precedence, 0)
+                         and daterange(a.valid_from, a.valid_to, '[)') && daterange(b.valid_from, b.valid_to, '[)')
+                         and {same}
+                       where a.staged"""
+                ).format(
+                    matches=matches,
+                    same=sql.SQL(" and ").join(
+                        sql.SQL("a.{0} is not distinct from b.{0}").format(sql.Identifier(column))
+                        for column in CENSUS_SELECTORS
+                    ),
+                ),
+            )
+        )
+    if "census_date" in stage.tables:
+        dates = _live(
+            stage,
+            "census_date",
+            "id",
+            "class_id",
+            "within_polity_id",
+            "date",
+            "date_precision",
+            "through",
+            "election_kind",
+        )
+        found += [
+            (
+                "census.date_duplicate",
+                sql.SQL(
+                    """select a.id, null::uuid, jsonb_build_object('class', a.class_id, 'date', a.date, 'other', b.id)
+                       from {dates} a join {dates} b on b.id <> a.id and b.class_id = a.class_id
+                         and b.within_polity_id is not distinct from a.within_polity_id
+                         and b.date = a.date and b.election_kind is not distinct from a.election_kind
+                         and (not b.staged or b.id::text > a.id::text)
+                       where a.staged"""
+                ).format(dates=dates),
+            ),
+            (
+                "census.date_outside",
+                sql.SQL(
+                    """select s.id, null::uuid, jsonb_build_object('class', s.class_id, 'date', s.date,
+                                                                 'valid_from', k.valid_from, 'valid_to', k.valid_to)
+                       from {dates} s join {classes} k on k.id = s.class_id
+                       where s.staged and not daterange(k.valid_from, k.valid_to, '[)') && daterange(
+                         s.date,
+                         (coalesce(s.through, s.date) + case coalesce(s.date_precision::text, 'day')
+                           when 'year' then interval '1 year' when 'month' then interval '1 month' else interval '1 day' end)::date,
+                         '[)')"""
+                ).format(dates=dates, classes=stage.either("census_class", "id", "valid_from", "valid_to")),
+            ),
+        ]
+    return found
+
+
 def queries(conn: Connection, stage: Stage) -> list[tuple[str, sql.Composed]]:
     return [
         *_references(conn, stage),
@@ -1045,6 +1207,7 @@ def queries(conn: Connection, stage: Stage) -> list[tuple[str, sql.Composed]]:
         *_held_translations(stage),
         *_cadence(stage),
         *_figures(stage),
+        *_census(stage),
     ]
 
 

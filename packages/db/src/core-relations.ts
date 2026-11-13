@@ -317,6 +317,13 @@ export const relations = defineRelations(schema, (r) => ({
 		}),
 		translations: r.many.translation(),
 		unitAreaDrops: r.many.unitAreaDrop(),
+		censusClasses: r.many.censusClass(),
+		censusDates: r.many.censusDate(),
+		censusMatches: r.many.censusMatch(),
+		censusTiers: r.many.censusTier(),
+		censusTierCounts: r.many.censusTierCount(),
+		electionCadences: r.many.electionCadence(),
+		resultsAccesses: r.many.resultsAccess(),
 	},
 	comment: {
 		activities: r.many.activity(),
@@ -676,6 +683,9 @@ export const relations = defineRelations(schema, (r) => ({
 			from: r.scheme.polityId,
 			to: r.polity.id
 		}),
+		censusClasses: r.many.censusClass(),
+		censusTiers: r.many.censusTier(),
+		resultsAccesses: r.many.resultsAccess(),
 	},
 	areaCode: {
 		area: r.one.area({
@@ -737,6 +747,22 @@ export const relations = defineRelations(schema, (r) => ({
 		translations: r.many.translation(),
 		sourcePages: r.many.sourcePage(),
 		valueLocators: r.many.valueLocator(),
+		censusClassesBoundarySourceId: r.many.censusClass({
+			alias: "censusClass_boundarySourceId_source_id"
+		}),
+		censusClassesSourceId: r.many.censusClass({
+			alias: "censusClass_sourceId_source_id"
+		}),
+		censusDates: r.many.censusDate(),
+		censusTiers: r.many.censusTier(),
+		censusTierCounts: r.many.censusTierCount(),
+		electionCadences: r.many.electionCadence(),
+		resultsAccessesBoundarySourceId: r.many.resultsAccess({
+			alias: "resultsAccess_boundarySourceId_source_id"
+		}),
+		resultsAccessesSourceId: r.many.resultsAccess({
+			alias: "resultsAccess_sourceId_source_id"
+		}),
 	},
 	areaEvent: {
 		changeset: r.one.changeset({
@@ -1022,6 +1048,8 @@ export const relations = defineRelations(schema, (r) => ({
 		representationGaps: r.many.representationGap(),
 		seats: r.many.seat(),
 		tenures: r.many.tenure(),
+		censusMatches: r.many.censusMatch(),
+		electionCadences: r.many.electionCadence(),
 	},
 	polity: {
 		bodies: r.many.body(),
@@ -1067,6 +1095,18 @@ export const relations = defineRelations(schema, (r) => ({
 			alias: "entity_id_polity_id_via_searchDocument"
 		}),
 		searchDocuments: r.many.searchDocument(),
+		censusClasses: r.many.censusClass(),
+		censusDates: r.many.censusDate(),
+		censusMatches: r.many.censusMatch(),
+		censusTiersPolityId: r.many.censusTier({
+			alias: "censusTier_polityId_polity_id"
+		}),
+		censusTiersWithinPolityId: r.many.censusTier({
+			alias: "censusTier_withinPolityId_polity_id"
+		}),
+		censusTierCounts: r.many.censusTierCount(),
+		electionCadences: r.many.electionCadence(),
+		resultsAccesses: r.many.resultsAccess(),
 	},
 	bodyApportionment: {
 		area: r.one.area({
@@ -1267,6 +1307,7 @@ export const relations = defineRelations(schema, (r) => ({
 			from: r.electoralSystem.polityId,
 			to: r.polity.id
 		}),
+		electionCadences: r.many.electionCadence(),
 	},
 	office: {
 		contests: r.many.contest(),
@@ -1289,6 +1330,8 @@ export const relations = defineRelations(schema, (r) => ({
 		}),
 		statewideOfficeYears: r.many.statewideOfficeYear(),
 		tenures: r.many.tenure(),
+		censusMatches: r.many.censusMatch(),
+		electionCadences: r.many.electionCadence(),
 	},
 	seat: {
 		contests: r.many.contest(),
@@ -2111,6 +2154,188 @@ export const relations = defineRelations(schema, (r) => ({
 		user: r.one.users({
 			from: r.watch.userId,
 			to: r.users.id
+		}),
+	},
+	censusClass: {
+		sourceBoundarySourceId: r.one.source({
+			from: r.censusClass.boundarySourceId,
+			to: r.source.id,
+			alias: "censusClass_boundarySourceId_source_id"
+		}),
+		changeset: r.one.changeset({
+			from: r.censusClass.changesetId,
+			to: r.changeset.id
+		}),
+		scheme: r.one.scheme({
+			from: r.censusClass.finestSchemeCode,
+			to: r.scheme.code
+		}),
+		polity: r.one.polity({
+			from: r.censusClass.polityId,
+			to: r.polity.id
+		}),
+		sourceSourceId: r.one.source({
+			from: r.censusClass.sourceId,
+			to: r.source.id,
+			alias: "censusClass_sourceId_source_id"
+		}),
+		censusTier: r.one.censusTier({
+			from: r.censusClass.tierId,
+			to: r.censusTier.id
+		}),
+		censusDates: r.many.censusDate(),
+		censusMatches: r.many.censusMatch(),
+		electionCadences: r.many.electionCadence(),
+		resultsAccesses: r.many.resultsAccess(),
+	},
+	censusTier: {
+		censusClasses: r.many.censusClass(),
+		changeset: r.one.changeset({
+			from: r.censusTier.changesetId,
+			to: r.changeset.id
+		}),
+		censusTier: r.one.censusTier({
+			from: r.censusTier.parentTierId,
+			to: r.censusTier.id,
+			alias: "censusTier_parentTierId_censusTier_id"
+		}),
+		censusTiers: r.many.censusTier({
+			alias: "censusTier_parentTierId_censusTier_id"
+		}),
+		polityPolityId: r.one.polity({
+			from: r.censusTier.polityId,
+			to: r.polity.id,
+			alias: "censusTier_polityId_polity_id"
+		}),
+		scheme: r.one.scheme({
+			from: r.censusTier.schemeCode,
+			to: r.scheme.code
+		}),
+		source: r.one.source({
+			from: r.censusTier.sourceId,
+			to: r.source.id
+		}),
+		polityWithinPolityId: r.one.polity({
+			from: r.censusTier.withinPolityId,
+			to: r.polity.id,
+			alias: "censusTier_withinPolityId_polity_id"
+		}),
+		censusTierCounts: r.many.censusTierCount(),
+	},
+	censusDate: {
+		changeset: r.one.changeset({
+			from: r.censusDate.changesetId,
+			to: r.changeset.id
+		}),
+		censusClass: r.one.censusClass({
+			from: r.censusDate.classId,
+			to: r.censusClass.id
+		}),
+		source: r.one.source({
+			from: r.censusDate.sourceId,
+			to: r.source.id
+		}),
+		polity: r.one.polity({
+			from: r.censusDate.withinPolityId,
+			to: r.polity.id
+		}),
+	},
+	censusMatch: {
+		body: r.one.body({
+			from: r.censusMatch.bodyId,
+			to: r.body.id
+		}),
+		changeset: r.one.changeset({
+			from: r.censusMatch.changesetId,
+			to: r.changeset.id
+		}),
+		censusClass: r.one.censusClass({
+			from: r.censusMatch.classId,
+			to: r.censusClass.id
+		}),
+		office: r.one.office({
+			from: r.censusMatch.officeId,
+			to: r.office.id
+		}),
+		polity: r.one.polity({
+			from: r.censusMatch.withinPolityId,
+			to: r.polity.id
+		}),
+	},
+	censusTierCount: {
+		changeset: r.one.changeset({
+			from: r.censusTierCount.changesetId,
+			to: r.changeset.id
+		}),
+		source: r.one.source({
+			from: r.censusTierCount.sourceId,
+			to: r.source.id
+		}),
+		censusTier: r.one.censusTier({
+			from: r.censusTierCount.tierId,
+			to: r.censusTier.id
+		}),
+		polity: r.one.polity({
+			from: r.censusTierCount.withinPolityId,
+			to: r.polity.id
+		}),
+	},
+	electionCadence: {
+		body: r.one.body({
+			from: r.electionCadence.bodyId,
+			to: r.body.id
+		}),
+		changeset: r.one.changeset({
+			from: r.electionCadence.changesetId,
+			to: r.changeset.id
+		}),
+		censusClass: r.one.censusClass({
+			from: r.electionCadence.classId,
+			to: r.censusClass.id
+		}),
+		electoralSystem: r.one.electoralSystem({
+			from: r.electionCadence.electoralSystemId,
+			to: r.electoralSystem.id
+		}),
+		office: r.one.office({
+			from: r.electionCadence.officeId,
+			to: r.office.id
+		}),
+		polity: r.one.polity({
+			from: r.electionCadence.polityId,
+			to: r.polity.id
+		}),
+		source: r.one.source({
+			from: r.electionCadence.sourceId,
+			to: r.source.id
+		}),
+	},
+	resultsAccess: {
+		sourceBoundarySourceId: r.one.source({
+			from: r.resultsAccess.boundarySourceId,
+			to: r.source.id,
+			alias: "resultsAccess_boundarySourceId_source_id"
+		}),
+		changeset: r.one.changeset({
+			from: r.resultsAccess.changesetId,
+			to: r.changeset.id
+		}),
+		censusClass: r.one.censusClass({
+			from: r.resultsAccess.classId,
+			to: r.censusClass.id
+		}),
+		scheme: r.one.scheme({
+			from: r.resultsAccess.finestSchemeCode,
+			to: r.scheme.code
+		}),
+		polity: r.one.polity({
+			from: r.resultsAccess.polityId,
+			to: r.polity.id
+		}),
+		sourceSourceId: r.one.source({
+			from: r.resultsAccess.sourceId,
+			to: r.source.id,
+			alias: "resultsAccess_sourceId_source_id"
 		}),
 	},
 }))

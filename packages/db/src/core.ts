@@ -60,6 +60,9 @@ export const seatCategory = pgEnum("seat_category", ["elected", "appointed", "ex
 export const cadenceSelection = pgEnum("cadence_selection", ["elected", "appointed", "landowner", "town_meeting", "abolished"])
 export const cadenceRunoff = pgEnum("cadence_runoff", ["none", "majority", "threshold", "instant"])
 export const resultsPlatformAccess = pgEnum("results_platform_access", ["open", "browser", "blocked", "manual", "none"])
+export const censusCategory = pgEnum("census_category", ["legislature", "executive", "council", "special_purpose", "judicial", "law_enforcement", "non_territorial", "indirect", "direct_democracy", "nominating"])
+export const censusDisposition = pgEnum("census_disposition", ["blocked", "out_of_scope"])
+export const censusAccessRole = pgEnum("census_access_role", ["administers", "publishes"])
 
 
 export const activity = pgTable("activity", {
@@ -1134,6 +1137,7 @@ export const coverageGoal = pgTable("coverage_goal", {
 	pending: integer().default(0).notNull(),
 	blocked: integer().default(0).notNull(),
 	inapplicable: integer().default(0).notNull(),
+	classId: uuid("class_id"),
 }, (table) => [
 	primaryKey({ columns: [table.polity, table.goal, table.state, table.level, table.year], name: "coverage_goal_pkey"}),
 ]);
@@ -1153,6 +1157,11 @@ export const coverageGovernment = pgTable("coverage_government", {
 	month: integer(),
 	basis: text().notNull(),
 	populationBasis: text("population_basis"),
+	nextDate: date("next_date"),
+	nextElectionId: uuid("next_election_id"),
+	cadenceId: uuid("cadence_id"),
+	accessId: uuid("access_id"),
+	classId: uuid("class_id"),
 }, (table) => [
 	index("coverage_government_polity_idx").using("btree", table.polityId.asc().nullsLast()),
 	index("coverage_government_state_idx").using("btree", table.state.asc().nullsLast(), table.kind.asc().nullsLast()),
@@ -1188,6 +1197,7 @@ export const coveragePolity = pgTable("coverage_polity", {
 	levels: jsonb().default([]).notNull(),
 	notes: jsonb().default([]).notNull(),
 	sources: jsonb().default({}).notNull(),
+	classes: jsonb().default([]).notNull(),
 });
 
 export const crosswalk = pgTable("crosswalk", {
@@ -1321,6 +1331,11 @@ export const electionCadence = pgTable("election_cadence", {
 	locator: text().notNull(),
 	changesetId: uuid("changeset_id").notNull(),
 	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
+	classId: uuid("class_id"),
+	electoralSystemId: uuid("electoral_system_id"),
+	called: boolean().default(false).notNull(),
+	vacancyRule: text("vacancy_rule"),
+	certifyDays: integer("certify_days"),
 }, (table) => [
 	foreignKey({
 		columns: [table.bodyId],
@@ -1331,6 +1346,16 @@ export const electionCadence = pgTable("election_cadence", {
 		columns: [table.changesetId],
 		foreignColumns: [changeset.id],
 		name: "election_cadence_changeset_id_fkey"
+	}),
+	foreignKey({
+		columns: [table.classId],
+		foreignColumns: [censusClass.id],
+		name: "election_cadence_class_id_fkey"
+	}),
+	foreignKey({
+		columns: [table.electoralSystemId],
+		foreignColumns: [electoralSystem.id],
+		name: "election_cadence_electoral_system_id_fkey"
 	}),
 	foreignKey({
 		columns: [table.officeId],
@@ -1347,8 +1372,9 @@ export const electionCadence = pgTable("election_cadence", {
 		foreignColumns: [source.id],
 		name: "election_cadence_source_id_fkey"
 	}),
+	index("election_cadence_class_idx").using("btree", table.classId.asc().nullsLast()),
 	index("election_cadence_polity_idx").using("btree", table.polityId.asc().nullsLast(), table.governmentKind.asc().nullsLast()),
-check("election_cadence_check", sql`((phase IS NULL) OR ((period_years IS NOT NULL) AND ((phase >= 0) AND (phase <= (period_years - 1)))))`),check("election_cadence_check1", sql`((government_kind IS NOT NULL) OR ((function IS NULL) AND (name_pattern IS NULL)))`),check("election_cadence_check2", sql`((valid_to IS NULL) OR (valid_from IS NULL) OR (valid_to > valid_from))`),check("election_cadence_classes_check", sql`(classes >= 1)`),check("election_cadence_month_check", sql`((month >= 1) AND (month <= 12))`),check("election_cadence_period_years_check", sql`((period_years >= 1) AND (period_years <= 8))`),]);
+check("election_cadence_certify_days_check", sql`((certify_days >= 0) AND (certify_days <= 366))`),check("election_cadence_check", sql`((phase IS NULL) OR ((period_years IS NOT NULL) AND ((phase >= 0) AND (phase <= (period_years - 1)))))`),check("election_cadence_check1", sql`((government_kind IS NOT NULL) OR ((function IS NULL) AND (name_pattern IS NULL)))`),check("election_cadence_check2", sql`((valid_to IS NULL) OR (valid_from IS NULL) OR (valid_to > valid_from))`),check("election_cadence_classes_check", sql`(classes >= 1)`),check("election_cadence_month_check", sql`((month >= 1) AND (month <= 12))`),check("election_cadence_period_years_check", sql`((period_years >= 1) AND (period_years <= 8))`),]);
 
 export const electoralSystem = pgTable("electoral_system", {
 	id: uuid().default(sql`uuidv7()`).primaryKey(),
@@ -2815,11 +2841,31 @@ export const resultsAccess = pgTable("results_access", {
 	sourceId: uuid("source_id"),
 	changesetId: uuid("changeset_id").notNull(),
 	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
+	classId: uuid("class_id"),
+	role: censusAccessRole().default("publishes").notNull(),
+	license: text(),
+	finestSchemeCode: text("finest_scheme_code"),
+	boundarySourceId: uuid("boundary_source_id"),
 }, (table) => [
+	foreignKey({
+		columns: [table.boundarySourceId],
+		foreignColumns: [source.id],
+		name: "results_access_boundary_source_id_fkey"
+	}),
 	foreignKey({
 		columns: [table.changesetId],
 		foreignColumns: [changeset.id],
 		name: "results_access_changeset_id_fkey"
+	}),
+	foreignKey({
+		columns: [table.classId],
+		foreignColumns: [censusClass.id],
+		name: "results_access_class_id_fkey"
+	}),
+	foreignKey({
+		columns: [table.finestSchemeCode],
+		foreignColumns: [scheme.code],
+		name: "results_access_finest_scheme_code_fkey"
 	}),
 	foreignKey({
 		columns: [table.polityId],
@@ -2831,8 +2877,254 @@ export const resultsAccess = pgTable("results_access", {
 		foreignColumns: [source.id],
 		name: "results_access_source_id_fkey"
 	}),
+	index("results_access_class_idx").using("btree", table.classId.asc().nullsLast()),
 	index("results_access_polity_idx").using("btree", table.polityId.asc().nullsLast()),
 check("results_access_check", sql`((valid_to IS NULL) OR (valid_from IS NULL) OR (valid_to > valid_from))`),]);
+
+export const censusTier = pgTable("census_tier", {
+	id: uuid().primaryKey(),
+	polityId: uuid("polity_id").notNull(),
+	key: text().notNull(),
+	name: text().notNull(),
+	nameEn: text("name_en"),
+	parentTierId: uuid("parent_tier_id"),
+	withinPolityId: uuid("within_polity_id"),
+	polityKind: polityKind("polity_kind"),
+	schemeCode: text("scheme_code"),
+	elects: boolean().default(true).notNull(),
+	validFrom: date("valid_from"),
+	validTo: date("valid_to"),
+	sourceId: uuid("source_id").notNull(),
+	locator: text().notNull(),
+	changesetId: uuid("changeset_id").notNull(),
+	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => [
+	foreignKey({
+		columns: [table.changesetId],
+		foreignColumns: [changeset.id],
+		name: "census_tier_changeset_id_fkey"
+	}),
+	foreignKey({
+		columns: [table.parentTierId],
+		foreignColumns: [table.id],
+		name: "census_tier_parent_tier_id_fkey"
+	}),
+	foreignKey({
+		columns: [table.polityId],
+		foreignColumns: [polity.id],
+		name: "census_tier_polity_id_fkey"
+	}),
+	foreignKey({
+		columns: [table.schemeCode],
+		foreignColumns: [scheme.code],
+		name: "census_tier_scheme_code_fkey"
+	}),
+	foreignKey({
+		columns: [table.sourceId],
+		foreignColumns: [source.id],
+		name: "census_tier_source_id_fkey"
+	}),
+	foreignKey({
+		columns: [table.withinPolityId],
+		foreignColumns: [polity.id],
+		name: "census_tier_within_polity_id_fkey"
+	}),
+	index("census_tier_parent_idx").using("btree", table.parentTierId.asc().nullsLast()),
+	unique("census_tier_polity_id_key_key").on(table.polityId, table.key),check("census_tier_check", sql`(parent_tier_id IS DISTINCT FROM id)`),check("census_tier_check1", sql`((valid_to IS NULL) OR (valid_from IS NULL) OR (valid_to > valid_from))`),]);
+
+export const censusTierCount = pgTable("census_tier_count", {
+	id: uuid().primaryKey(),
+	tierId: uuid("tier_id").notNull(),
+	withinPolityId: uuid("within_polity_id"),
+	date: date().notNull(),
+	datePrecision: datePrecision("date_precision").default("day").notNull(),
+	value: integer().notNull(),
+	sourceId: uuid("source_id").notNull(),
+	locator: text().notNull(),
+	changesetId: uuid("changeset_id").notNull(),
+	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => [
+	foreignKey({
+		columns: [table.changesetId],
+		foreignColumns: [changeset.id],
+		name: "census_tier_count_changeset_id_fkey"
+	}),
+	foreignKey({
+		columns: [table.sourceId],
+		foreignColumns: [source.id],
+		name: "census_tier_count_source_id_fkey"
+	}),
+	foreignKey({
+		columns: [table.tierId],
+		foreignColumns: [censusTier.id],
+		name: "census_tier_count_tier_id_fkey"
+	}),
+	foreignKey({
+		columns: [table.withinPolityId],
+		foreignColumns: [polity.id],
+		name: "census_tier_count_within_polity_id_fkey"
+	}),
+	unique("census_tier_count_tier_id_within_polity_id_date_source_id_key").on(table.tierId, table.withinPolityId, table.date, table.sourceId).nullsNotDistinct(),check("census_tier_count_value_check", sql`(value >= 0)`),]);
+
+export const censusClass = pgTable("census_class", {
+	id: uuid().primaryKey(),
+	polityId: uuid("polity_id").notNull(),
+	tierId: uuid("tier_id").notNull(),
+	key: text().notNull(),
+	name: text().notNull(),
+	nameEn: text("name_en"),
+	category: censusCategory().notNull(),
+	goal: text().notNull(),
+	validFrom: date("valid_from"),
+	validTo: date("valid_to"),
+	firstHeld: date("first_held"),
+	earliestRecord: date("earliest_record"),
+	contestsPerUnit: integer("contests_per_unit").default(1).notNull(),
+	measure: jsonb().default({}).notNull(),
+	finestSchemeCode: text("finest_scheme_code"),
+	finestNote: text("finest_note"),
+	boundarySourceId: uuid("boundary_source_id"),
+	disposition: censusDisposition(),
+	dispositionReason: text("disposition_reason"),
+	estVotes: bigint("est_votes", { mode: 'number' }),
+	effort: smallint(),
+	note: text(),
+	sourceId: uuid("source_id").notNull(),
+	locator: text().notNull(),
+	changesetId: uuid("changeset_id").notNull(),
+	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => [
+	foreignKey({
+		columns: [table.boundarySourceId],
+		foreignColumns: [source.id],
+		name: "census_class_boundary_source_id_fkey"
+	}),
+	foreignKey({
+		columns: [table.changesetId],
+		foreignColumns: [changeset.id],
+		name: "census_class_changeset_id_fkey"
+	}),
+	foreignKey({
+		columns: [table.finestSchemeCode],
+		foreignColumns: [scheme.code],
+		name: "census_class_finest_scheme_code_fkey"
+	}),
+	foreignKey({
+		columns: [table.polityId],
+		foreignColumns: [polity.id],
+		name: "census_class_polity_id_fkey"
+	}),
+	foreignKey({
+		columns: [table.sourceId],
+		foreignColumns: [source.id],
+		name: "census_class_source_id_fkey"
+	}),
+	foreignKey({
+		columns: [table.tierId],
+		foreignColumns: [censusTier.id],
+		name: "census_class_tier_id_fkey"
+	}),
+	index("census_class_tier_idx").using("btree", table.tierId.asc().nullsLast()),
+	unique("census_class_polity_id_key_key").on(table.polityId, table.key),check("census_class_check", sql`((disposition IS NULL) OR (btrim(COALESCE(disposition_reason, ''::text)) <> ''::text))`),check("census_class_check1", sql`((valid_to IS NULL) OR (valid_from IS NULL) OR (valid_to > valid_from))`),check("census_class_contests_per_unit_check", sql`(contests_per_unit >= 1)`),check("census_class_effort_check", sql`((effort >= 1) AND (effort <= 5))`),check("census_class_est_votes_check", sql`(est_votes >= 0)`),check("census_class_goal_check", sql`(goal = ANY (ARRAY['national'::text, 'subnational'::text, 'local'::text, 'referendums'::text, 'ep'::text]))`),check("census_class_measure_check", sql`(jsonb_typeof(measure) = 'object'::text)`),]);
+
+export const censusMatch = pgTable("census_match", {
+	id: uuid().primaryKey(),
+	classId: uuid("class_id").notNull(),
+	electionKinds: electionKind("election_kinds").array(),
+	contestKinds: contestKind("contest_kinds").array(),
+	bodyKinds: bodyKind("body_kinds").array(),
+	officeKinds: officeKind("office_kinds").array(),
+	polityKinds: polityKind("polity_kinds").array(),
+	withinPolityId: uuid("within_polity_id"),
+	isoPattern: text("iso_pattern"),
+	schemes: text().array(),
+	exceptCodes: text("except_codes").array(),
+	namePattern: text("name_pattern"),
+	bodyId: uuid("body_id"),
+	officeId: uuid("office_id"),
+	precedence: integer().default(0).notNull(),
+	validFrom: date("valid_from"),
+	validTo: date("valid_to"),
+	changesetId: uuid("changeset_id").notNull(),
+	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => [
+	foreignKey({
+		columns: [table.bodyId],
+		foreignColumns: [body.id],
+		name: "census_match_body_id_fkey"
+	}),
+	foreignKey({
+		columns: [table.changesetId],
+		foreignColumns: [changeset.id],
+		name: "census_match_changeset_id_fkey"
+	}),
+	foreignKey({
+		columns: [table.classId],
+		foreignColumns: [censusClass.id],
+		name: "census_match_class_id_fkey"
+	}),
+	foreignKey({
+		columns: [table.officeId],
+		foreignColumns: [office.id],
+		name: "census_match_office_id_fkey"
+	}),
+	foreignKey({
+		columns: [table.withinPolityId],
+		foreignColumns: [polity.id],
+		name: "census_match_within_polity_id_fkey"
+	}),
+	index("census_match_class_idx").using("btree", table.classId.asc().nullsLast()),
+check("census_match_check", sql`(num_nonnulls(election_kinds, contest_kinds, body_kinds, office_kinds, polity_kinds, iso_pattern, name_pattern, body_id, office_id) > 0)`),check("census_match_check1", sql`((valid_to IS NULL) OR (valid_from IS NULL) OR (valid_to > valid_from))`),]);
+
+export const censusDate = pgTable("census_date", {
+	id: uuid().primaryKey(),
+	classId: uuid("class_id").notNull(),
+	withinPolityId: uuid("within_polity_id"),
+	date: date().notNull(),
+	datePrecision: datePrecision("date_precision").default("day").notNull(),
+	through: date(),
+	electionKind: electionKind("election_kind"),
+	contests: integer(),
+	seats: integer(),
+	regions: jsonb(),
+	deferred: date().array(),
+	note: text(),
+	sourceId: uuid("source_id"),
+	locator: text(),
+	quote: text(),
+	changesetId: uuid("changeset_id").notNull(),
+	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => [
+	foreignKey({
+		columns: [table.changesetId],
+		foreignColumns: [changeset.id],
+		name: "census_date_changeset_id_fkey"
+	}),
+	foreignKey({
+		columns: [table.classId],
+		foreignColumns: [censusClass.id],
+		name: "census_date_class_id_fkey"
+	}),
+	foreignKey({
+		columns: [table.sourceId],
+		foreignColumns: [source.id],
+		name: "census_date_source_id_fkey"
+	}),
+	foreignKey({
+		columns: [table.withinPolityId],
+		foreignColumns: [polity.id],
+		name: "census_date_within_polity_id_fkey"
+	}),
+	index("census_date_class_idx").using("btree", table.classId.asc().nullsLast(), table.date.asc().nullsLast()),
+check("census_date_check", sql`((through IS NULL) OR (through >= date))`),check("census_date_check1", sql`((through IS NULL) OR (contests IS NULL))`),check("census_date_check2", sql`((contests IS NULL) OR (source_id IS NOT NULL))`),check("census_date_check3", sql`((source_id IS NULL) OR (btrim(COALESCE(locator, ''::text)) <> ''::text) OR (btrim(COALESCE(quote, ''::text)) <> ''::text))`),check("census_date_contests_check", sql`(contests >= 0)`),check("census_date_regions_check", sql`((regions IS NULL) OR (jsonb_typeof(regions) = 'object'::text))`),check("census_date_seats_check", sql`(seats >= 0)`),]);
+
+export const contestClass = pgTable("contest_class", {
+	contestId: uuid("contest_id").primaryKey(),
+	classId: uuid("class_id").notNull(),
+	rank: smallint().notNull(),
+}, (table) => [
+	index("contest_class_class_idx").using("btree", table.classId.asc().nullsLast()),
+]);
 
 export const rollupCoverage = pgTable("rollup_coverage", {
 	resultSetK: integer("result_set_k").notNull(),
