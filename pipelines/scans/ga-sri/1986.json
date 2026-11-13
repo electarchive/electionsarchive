@@ -1,0 +1,484 @@
+{
+  "polity": "US-GA",
+  "publisher": "Georgia Secretary of State",
+  "title": "Official State of Georgia Tabulation by Counties, general election held 1986-11-04",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706928_0280/micro_IA40706928_0280.pdf",
+    "item": "https://archive.org/details/micro_IA40706928_0280"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "governor": {
+      "year": 1986,
+      "chamber": "governor",
+      "day": "1986-11-04",
+      "special": false,
+      "state": "GA",
+      "district": null
+    },
+    "senate": {
+      "year": 1986,
+      "chamber": "senate",
+      "day": "1986-11-04",
+      "special": false,
+      "state": "GA",
+      "district": null
+    },
+    "house1": {
+      "year": 1986,
+      "chamber": "house",
+      "day": "1986-11-04",
+      "special": false,
+      "state": "GA",
+      "district": 1
+    },
+    "house2": {
+      "year": 1986,
+      "chamber": "house",
+      "day": "1986-11-04",
+      "special": false,
+      "state": "GA",
+      "district": 2
+    },
+    "house3": {
+      "year": 1986,
+      "chamber": "house",
+      "day": "1986-11-04",
+      "special": false,
+      "state": "GA",
+      "district": 3
+    },
+    "house4": {
+      "year": 1986,
+      "chamber": "house",
+      "day": "1986-11-04",
+      "special": false,
+      "state": "GA",
+      "district": 4
+    },
+    "house5": {
+      "year": 1986,
+      "chamber": "house",
+      "day": "1986-11-04",
+      "special": false,
+      "state": "GA",
+      "district": 5
+    },
+    "house6": {
+      "year": 1986,
+      "chamber": "house",
+      "day": "1986-11-04",
+      "special": false,
+      "state": "GA",
+      "district": 6
+    },
+    "house7": {
+      "year": 1986,
+      "chamber": "house",
+      "day": "1986-11-04",
+      "special": false,
+      "state": "GA",
+      "district": 7
+    },
+    "house8": {
+      "year": 1986,
+      "chamber": "house",
+      "day": "1986-11-04",
+      "special": false,
+      "state": "GA",
+      "district": 8
+    },
+    "house9": {
+      "year": 1986,
+      "chamber": "house",
+      "day": "1986-11-04",
+      "special": false,
+      "state": "GA",
+      "district": 9
+    },
+    "house10": {
+      "year": 1986,
+      "chamber": "house",
+      "day": "1986-11-04",
+      "special": false,
+      "state": "GA",
+      "district": 10
+    }
+  },
+  "pages": [
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "Joe Frank Harris",
+          "contest": "governor",
+          "candidate": "Joe Frank Harris"
+        },
+        {
+          "label": "Guy Davis",
+          "contest": "governor",
+          "candidate": "Guy Davis"
+        },
+        {
+          "label": "Zell Miller",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.13,
+        0.065,
+        0.84,
+        0.931
+      ],
+      "hint": "Read only the table headed 'Governor' (Democratic Joe Frank Harris, Republican Guy Davis) with the Lieutenant Governor Zell Miller column; ignore the percentage columns.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.03
+      ]
+    },
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Wyche Fowler, Jr.",
+          "contest": "senate",
+          "candidate": "Wyche Fowler Jr."
+        },
+        {
+          "label": "Wyche Fowler, Jr.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Mack Mattingly",
+          "contest": "senate",
+          "candidate": "Mack Mattingly"
+        },
+        {
+          "label": "Mack Mattingly",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.13,
+        0.065,
+        0.84,
+        0.931
+      ],
+      "hint": "Read only the table headed 'United States Senate'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.03
+      ]
+    },
+    {
+      "page": 13,
+      "id": "13-0",
+      "columns": [
+        {
+          "label": "DEMOCRATIC Lindsay Thomas",
+          "contest": "house1",
+          "candidate": "Lindsay Thomas"
+        },
+        {
+          "label": "100.00%",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.123,
+        0.539,
+        0.836,
+        0.786
+      ],
+      "hint": "Read only the table headed 'CONSOLIDATED RETURNS FOR U.S. REPRESENTATIVE FROM GEORGIA GENERAL ELECTION — NOVEMBER 4, 1986 FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 14,
+      "id": "14-0",
+      "columns": [
+        {
+          "label": "DEMOCRATIC Charles Hatcher",
+          "contest": "house2",
+          "candidate": "Charles Hatcher"
+        },
+        {
+          "label": "%",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.246,
+        0.096,
+        0.734,
+        0.537
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 14,
+      "id": "14-1",
+      "columns": [
+        {
+          "label": "DEMOCRATIC Richard Ray",
+          "contest": "house3",
+          "candidate": "Richard Ray"
+        },
+        {
+          "label": "%",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.24,
+        0.529,
+        0.725,
+        0.879
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 15,
+      "id": "15-0",
+      "columns": [
+        {
+          "label": "DEMOCRATIC Ben Jones",
+          "contest": "house4",
+          "candidate": "Ben Lewis Jones"
+        },
+        {
+          "label": "DEMOCRATIC Ben Jones %",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "REPUBLICAN Pat Swindall",
+          "contest": "house4",
+          "candidate": "Pat Swindall"
+        },
+        {
+          "label": "REPUBLICAN Pat Swindall %",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.13,
+        0.088,
+        0.835,
+        0.222
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 15,
+      "id": "15-1",
+      "columns": [
+        {
+          "label": "DEMOCRATIC John Lewis",
+          "contest": "house5",
+          "candidate": "John Lewis"
+        },
+        {
+          "label": "DEMOCRATIC John Lewis %",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "REPUBLICAN Portia A. Scott",
+          "contest": "house5",
+          "candidate": "Portia A. Scott"
+        },
+        {
+          "label": "REPUBLICAN Portia A. Scott %",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.131,
+        0.214,
+        0.835,
+        0.375
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 15,
+      "id": "15-2",
+      "columns": [
+        {
+          "label": "DEMOCRATIC Crandle Bray",
+          "contest": "house6",
+          "candidate": "Clifton Crandle Bray"
+        },
+        {
+          "label": "DEMOCRATIC Crandle Bray %",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "REPUBLICAN Newt Gingrich",
+          "contest": "house6",
+          "candidate": "Newt Gingrich"
+        },
+        {
+          "label": "REPUBLICAN Newt Gingrich %",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.127,
+        0.367,
+        0.838,
+        0.658
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 15,
+      "id": "15-3",
+      "columns": [
+        {
+          "label": "DEMOCRATIC George (Buddy) Darden",
+          "contest": "house7",
+          "candidate": "George (Buddy) Darden"
+        },
+        {
+          "label": "DEMOCRATIC George (Buddy) Darden %",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "REPUBLICAN Joe Morecraft",
+          "contest": "house7",
+          "candidate": "Joseph C. Morecraft III"
+        },
+        {
+          "label": "REPUBLICAN Joe Morecraft %",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.131,
+        0.65,
+        0.841,
+        0.85
+      ],
+      "hint": "Read only the table headed 'SEVENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 16,
+      "id": "16-0",
+      "columns": [
+        {
+          "label": "J. Roy Rowland (Democratic)",
+          "contest": "house8",
+          "candidate": "J. Roy Rowland"
+        },
+        {
+          "label": "% (Rowland)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Eddie McDowell (Republican)",
+          "contest": "house8",
+          "candidate": "Eddie McDowell"
+        },
+        {
+          "label": "% (McDowell)",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.134,
+        0.074,
+        0.859,
+        0.511
+      ],
+      "hint": "Read only the table headed 'EIGHTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 16,
+      "id": "16-1",
+      "columns": [
+        {
+          "label": "Ed Jenkins (Democratic)",
+          "contest": "house9",
+          "candidate": "Ed Jenkins"
+        },
+        {
+          "label": "%",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.239,
+        0.503,
+        0.723,
+        0.842
+      ],
+      "hint": "Read only the table headed 'NINTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 17,
+      "id": "17-0",
+      "columns": [
+        {
+          "label": "Doug Barnard, Jr.",
+          "contest": "house10",
+          "candidate": "Doug Barnard Jr."
+        },
+        {
+          "label": "%",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Jim Hill",
+          "contest": "house10",
+          "candidate": "James Polk Hill"
+        },
+        {
+          "label": "%",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.123,
+        0.076,
+        0.829,
+        0.281
+      ],
+      "hint": "Read only the table headed 'TENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    }
+  ]
+}
