@@ -25,6 +25,8 @@ FOLD = "trim(regexp_replace(lower(unaccent({})), '[^a-z]+', ' ', 'g'))"
 
 
 def region_departements(code: str) -> set[str]:
+    if code not in NEW_REGIONS and code not in OLD_REGIONS:
+        return departement("fr.departement", code)
     parts = NEW_REGIONS[code][1] if code in NEW_REGIONS else (code,)
     return {dept for part in parts for dept in OLD_REGIONS[part][1].split()}
 

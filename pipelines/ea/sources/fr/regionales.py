@@ -11,11 +11,11 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import NAMESPACE, Changeset, slug
-from ea.sources.fr.names import person_name
+from ea.sources.fr.names import head_parts, person_name
 from ea.store import DATA, connect
 
 SOURCE = "fr.regionales"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 STATIC = "https://static.data.gouv.fr"
 R15 = f"{STATIC}/resources/elections-regionales-2015-et-des-assemblees-de-corse-de-guyane-et-de-martinique-resultats"
@@ -956,6 +956,14 @@ def emit() -> Path:
                 name(nuances[year, code], code, "fr", "abbreviation")
 
         persons: dict[str, UUID] = {}
+        spellings: dict[UUID, str] = {}
+        owned = {
+            row[0]
+            for row in conn.execute(
+                "select p.id from person p join changeset c on c.id = p.changeset_id where c.pipeline = %s",
+                [SOURCE],
+            ).fetchall()
+        }
 
         def person_for(head: str) -> UUID:
             forename, surname = head_name(head)
@@ -964,7 +972,8 @@ def emit() -> Path:
                 persons[key] = cs.key(f"{SOURCE}.person", key)
                 if persons[key] in cs.minted:
                     cs.add("person", id=persons[key])
-                    name(persons[key], person_name(forename, surname))
+            if persons[key] in cs.minted or persons[key] in owned:
+                spellings[persons[key]] = person_name(*head_parts(head))
             return persons[key]
 
         bodies: dict[str, UUID] = {}
@@ -1368,4 +1377,6 @@ def emit() -> Path:
                 flags=pl.lit(0, pl.Int16),
             ),
         )
+        for person, text in spellings.items():
+            name(person, text)
         return cs.write()
