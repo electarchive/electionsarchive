@@ -39,7 +39,7 @@ POLLING_PLACES = {
     year: f"{TSE}eleitorado_locais_votacao/eleitorado_local_votacao_{year}.zip"
     for year in (2010, 2014, 2018, 2022, 2026)
 }
-SECTION_YEARS = (2018, 2026)
+SECTION_YEARS = (2014, 2018, 2026)
 SECTIONS = {
     year: {key: f"{TSE}votacao_secao/votacao_secao_{year}_{key}.zip" for key in ("BR", *UFS)} for year in SECTION_YEARS
 }
@@ -52,7 +52,7 @@ SECTION_NAMES = {
     "7": "state deputies",
     "8": "district deputies",
 }
-SECTION_OFFICES = {2018: ("1", "3", "5"), 2026: ("1", "3", "5", "6", "7", "8")}
+SECTION_OFFICES = {2014: ("1", "3", "5"), 2018: ("1", "3", "5"), 2026: ("1", "3", "5", "6", "7", "8")}
 COUNTRIES = {
     "BOSNIAEHERZ": "BIH",
     "BRAZZAVILLE": "COG",
@@ -131,6 +131,7 @@ DROPPED = {
         "they count as annulled votes."
     )
 }
+SHORTFALL = 50
 SENATORS = {1994: 2, 1998: 1, 2002: 2, 2006: 1, 2010: 2, 2014: 1, 2018: 2, 2022: 1, 2026: 2}
 SCHEDULED = {2026: date(2026, 10, 25)}
 FEED = "https://resultados.tse.jus.br/oficial/ele2026/"
@@ -570,6 +571,38 @@ def unpack(url: str, suffix: str = ".csv") -> list[Path]:
     return paths
 
 
+def numbered(year: int) -> pl.DataFrame:
+    roster = scan(year, "roster").filter(
+        (pl.col("CD_TIPO_ELEICAO") == "2") & pl.col("CD_CARGO").is_in(SECTION_OFFICES[year])
+    )
+    pairs = (
+        roster.select(
+            contest=pl.concat_str(
+                pl.lit(str(year)),
+                "NR_TURNO",
+                "CD_CARGO",
+                pl.when(pl.col("CD_CARGO") == "1").then(pl.lit("BR")).otherwise(pl.col("SG_UF")),
+                separator=":",
+            ),
+            choice="NR_CANDIDATO",
+            sequence="SQ_CANDIDATO",
+        )
+        .unique()
+        .collect()
+    )
+    known = pl.read_parquet(PARSED / "votes.parquet").select("contest", sequence="candidate").unique()
+    pairs = (
+        pairs.join(known.with_columns(held=pl.lit(True)), on=["contest", "sequence"], how="left")
+        .with_columns(held=pl.col("held").fill_null(False))
+        .filter(pl.col("held") | ~pl.col("held").any().over("contest", "choice"))
+        .drop("held")
+    )
+    ambiguous = pairs.filter(pairs.select("contest", "choice").is_duplicated())
+    if ambiguous.height:
+        raise ValueError(f"a number names two candidates in a {year} contest: {ambiguous.head(5)}")
+    return pairs
+
+
 def sections(year: int) -> None:
     municipality = pl.col("CD_MUNICIPIO").str.zfill(5)
     section = pl.concat_str(
@@ -587,12 +620,14 @@ def sections(year: int) -> None:
     for key, url in SECTIONS[year].items():
         for path in unpack(url):
             parts.append(PARSED / f"tally_{year}_{key}.parquet")
-            pl.scan_csv(path, separator=";", infer_schema=False).filter(wanted).select(
+            table = pl.scan_csv(path, separator=";", infer_schema=False)
+            present = table.collect_schema().names()
+            table.filter(wanted).select(
                 contest=contest,
                 municipality=municipality,
                 section=section,
                 choice=pl.col("NR_VOTAVEL"),
-                candidate=pl.col("SQ_CANDIDATO"),
+                candidate=pl.col("SQ_CANDIDATO") if "SQ_CANDIDATO" in present else pl.lit(None, pl.String),
                 votes=pl.col("QT_VOTOS").cast(pl.Int64),
             ).sink_parquet(parts[-1])
             path.unlink()
@@ -605,7 +640,19 @@ def sections(year: int) -> None:
         .then(pl.lit("legend"))
         .otherwise(pl.lit("nominal"))
     )
-    tally = pl.scan_parquet(parts).with_columns(kind=kind)
+    tally = pl.scan_parquet(parts)
+    if tally.select(pl.col("candidate").is_null().all()).collect().item():
+        tally = tally.join(numbered(year).lazy(), on=["contest", "choice"], how="left").with_columns(
+            candidate=pl.when(pl.col("choice").is_in(["95", "96", "97"]))
+            .then(pl.lit("-1"))
+            .otherwise(pl.col("sequence"))
+        )
+    tally = tally.with_columns(kind=kind)
+    unnamed = (
+        tally.filter(pl.col("candidate").is_null()).select("contest", "choice").unique().collect(engine="streaming")
+    )
+    if unnamed.height:
+        raise ValueError(f"section choices with no candidate on the roster: {unnamed}")
     stray = (
         tally.filter((pl.col("kind") == "nominal") & pl.col("candidate").str.starts_with("-"))
         .select("contest", "choice", "candidate")
@@ -646,8 +693,8 @@ def sections(year: int) -> None:
                     field: pl.col(column).cast(pl.Int64) if column in present else pl.lit(0, pl.Int64)
                     for field, column in counts.items()
                 },
-                opened=pl.col("ST_SECAO_INSTALADA") != "Não",
-                annulled=pl.col("ST_SECAO_ANULADA") == "Sim",
+                opened=pl.col("ST_SECAO_INSTALADA") != "Não" if "ST_SECAO_INSTALADA" in present else pl.lit(True),
+                annulled=pl.col("ST_SECAO_ANULADA") == "Sim" if "ST_SECAO_ANULADA" in present else pl.lit(False),
             )
             .collect()
         )
@@ -744,10 +791,16 @@ def sections(year: int) -> None:
     )
     measures = ["registered", "voters", "blank", "null"]
     totals = sheet.group_by("contest", "municipality").agg(pl.col(measures).sum())
-    known = pl.read_parquet(PARSED / "candidates.parquet").filter(
-        (pl.col("outcome").fill_null("") != "disqualified") | ~pl.col("contest").is_in(scope)
+    missing = (
+        rolled.select("contest", "candidate")
+        .unique()
+        .join(municipal.select("contest", "candidate").unique(), on=["contest", "candidate"], how="anti")
     )
-    missing = rolled.select("contest", "candidate").unique().join(known, on=["contest", "candidate"], how="anti")
+    known = (
+        pl.read_parquet(PARSED / "candidates.parquet")
+        .filter((pl.col("outcome").fill_null("") != "disqualified") | ~pl.col("contest").is_in(scope))
+        .join(missing, on=["contest", "candidate"], how="anti")
+    )
     rejected = (
         rolled.join(missing, on=["contest", "candidate"], how="semi")
         .group_by("contest", "municipality")
@@ -763,9 +816,10 @@ def sections(year: int) -> None:
             pl.any_horizontal(
                 pl.col(field).fill_null(-1) != pl.col(f"{field}_sections").fill_null(-1)
                 for field in measures
-                if field != "null"
+                if field not in ("null", "registered")
             )
             | ~(pl.col("null") - pl.col("null_sections")).is_between(0, pl.col("rejected"))
+            | ~(pl.col("registered") - pl.col("registered_sections")).is_between(0, SHORTFALL)
         )
     )
     differ = differ.join(missing, on=["contest", "candidate"], how="anti")
