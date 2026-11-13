@@ -55,7 +55,7 @@ The main steps take a registry name, except `apply`, `publish`, and `revert`, wh
 - `uv run ea revert <changeset-id> "<reason>" [--reviewer <user-id>]` rejects an unpublished changeset, or undoes a published one that no later changeset builds on.
 - `uv run ea raw {verify,license,pin,retire}` maintains the raw cache, as described above.
 - `uv run ea fixtures` exports the engine's golden-test fixtures from the database.
-- `uv run ea rollup <set>...` recomputes the area rollups of the named result sets. `--affected` rebuilds every set whose rollups are missing at its district.
+- `uv run ea rollup <set>...` recomputes the area rollups of the named result sets. `--affected` rebuilds every set whose rollups are missing at its district. `--scope <sets>` lists the places with at least that many rolled-up result sets in `area_day_scope` and rebuilds their rows in `area_day_set`.
 - `uv run ea covers` fills the `contest_cover` table that contest pages read. It stores a row for every contest that has none, then compares a sample of up to 5,000 stored rows with the live query, and logs and deletes any row that differs. A publish, a revert, and `ea rollup` each delete the rows of the contests they could have changed, so run it after a batch of publishes.
 - `uv run ea coverage` measures a polity's coverage against its official goals and writes the report, with subcommands for the United States (`us`), each supported country, and the coverage tables the app reads (`refresh` and `rebuild`).
 - `uv run ea tiles [scheme]` builds one PMTiles archive per boundary set, with geometry only.

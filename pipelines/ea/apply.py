@@ -15,6 +15,16 @@ from ea.checks import FACTS, KEYS, Stage
 from ea.store import DATA, Connection, connect, provenance
 
 MERGE_LOCK = 1700949316
+COUNTED = (
+    "votes",
+    "list_votes",
+    "electoral_votes",
+    "state_delegate_equivalents",
+    "caucus_delegates",
+    "pledged_delegates",
+    "automatic_delegates",
+    "delegation",
+)
 DERIVED_IDS = {"name", "note", "label", "citation", "flag", "ballot_question_text"}
 
 
@@ -478,7 +488,11 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
             )
             for fact in (
                 table,
-                *(("result_rollup_sum", "result_rollup_unit", "rollup_coverage") if table == "result_value" else ()),
+                *(
+                    ("result_rollup_sum", "result_rollup_unit", "rollup_coverage", "area_day_set")
+                    if table == "result_value"
+                    else ()
+                ),
             ):
                 conn.execute(
                     sql.SQL("delete from public.{} where result_set_k = any(%s)").format(sql.Identifier(fact)),
@@ -1455,6 +1469,7 @@ def _rollup(
     conn.execute("delete from result_rollup_sum where result_set_k = any(%s)", [stale])
     conn.execute("delete from result_rollup_unit where result_set_k = any(%s)", [stale])
     conn.execute("delete from rollup_coverage where result_set_k = any(%s)", [stale])
+    conn.execute("delete from area_day_set where result_set_k = any(%s)", [stale])
     facts = (
         sql.SQL("select distinct result_set_id from {}").format(stage.staged("result_value"))
         if stage is not None and "result_value" in stage.tables
@@ -1603,6 +1618,65 @@ def _rollup(
             group by v.result_set_k, area.k, area.id, v.option_k, v.channel, v.measure, v.count_round"""
         ).format(facts=facts, stale=sql.Literal(stale))
     )
+    _days(
+        conn,
+        sql.SQL("r.result_set_k in (select k from result_set where id in ({facts}) or k = any({stale}))").format(
+            facts=facts, stale=sql.Literal(stale)
+        ),
+    )
+
+
+def _days(conn: Connection, where: sql.Composable) -> None:
+    conn.execute(
+        sql.SQL(
+            """insert into area_day_set (area_k, day, result_set_k, voted)
+               select r.area_k, e.date_from, r.result_set_k, bool_or(r.value <> 0)
+               from (
+                 select r.result_set_k, r.area_k, r.value from result_rollup_sum r
+                 join area_day_scope d on d.area_k = r.area_k
+                 where {where} and r.measure = any(array(select id from measure where code = any({counted})))
+                 union all
+                 select r.result_set_k, r.area_k, v.value from result_rollup_unit r
+                 join area_day_scope d on d.area_k = r.area_k
+                 join result_value v on v.result_set_k = r.result_set_k and v.unit_k = r.unit_k
+                 where {where} and v.measure = any(array(select id from measure where code = any({counted})))
+               ) r
+               join result_set x on x.k = r.result_set_k
+               join election e on e.id = x.election_id
+               group by r.area_k, e.date_from, r.result_set_k"""
+        ).format(where=where, counted=sql.Literal(list(COUNTED)))
+    )
+
+
+def scope(conn: Connection, threshold: int) -> int:
+    with conn.transaction():
+        conn.execute("lock table area_day_set in share row exclusive mode")
+        wanted = [
+            area
+            for (area,) in conn.execute(
+                """select area_k from (
+                     select area_k, result_set_k from result_rollup_sum
+                     union
+                     select area_k, result_set_k from result_rollup_unit
+                   ) r group by area_k having count(*) >= %s order by area_k""",
+                [threshold],
+            ).fetchall()
+        ]
+        dropped = conn.execute(
+            "delete from area_day_scope where area_k <> all(%s) returning area_k", [wanted]
+        ).fetchall()
+        conn.execute("delete from area_day_set where area_k <> all(%s)", [wanted])
+        added = [
+            area
+            for (area,) in conn.execute(
+                "insert into area_day_scope select unnest(%s::int[]) on conflict do nothing returning area_k", [wanted]
+            ).fetchall()
+        ]
+        if added:
+            conn.execute("delete from area_day_set where area_k = any(%s)", [added])
+            _days(conn, sql.SQL("r.area_k = any({})").format(sql.Literal(added)))
+    print(f"{len(wanted)} areas in scope, {len(added)} added, {len(dropped)} dropped")
+    return len(wanted)
 
 
 def rollup(conn: Connection, sets: list[int], affected: bool) -> int:
@@ -2374,7 +2448,7 @@ def revert(conn: Connection, changeset_id: str, reason: str, reviewer: str | Non
                or polity_id in (select id from polity where changeset_id = %(id)s)""",
             {"id": changeset_id},
         )
-        for table in (*FACTS, "result_rollup_sum", "result_rollup_unit", "rollup_coverage"):
+        for table in (*FACTS, "result_rollup_sum", "result_rollup_unit", "rollup_coverage", "area_day_set"):
             conn.execute(
                 sql.SQL(
                     "delete from {} where result_set_k in (select k from result_set rs where rs.changeset_id = %s"

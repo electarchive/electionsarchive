@@ -235,6 +235,20 @@ export const areaCode = pgTable("area_code", {
 	index("area_code_code_idx").using("btree", table.code.asc().nullsLast()),
 ]);
 
+export const areaDayScope = pgTable("area_day_scope", {
+	areaK: integer("area_k").primaryKey(),
+});
+
+export const areaDaySet = pgTable("area_day_set", {
+	areaK: integer("area_k").notNull(),
+	day: date().notNull(),
+	resultSetK: integer("result_set_k").notNull(),
+	voted: boolean().notNull(),
+}, (table) => [
+	primaryKey({ columns: [table.areaK, table.day, table.resultSetK], name: "area_day_set_pkey"}),
+	index("area_day_set_result_set_k_idx").using("btree", table.resultSetK.asc().nullsLast()),
+]);
+
 export const areaEvent = pgTable("area_event", {
 	id: uuid().default(sql`uuidv7()`).primaryKey(),
 	kind: areaEventKind().notNull(),

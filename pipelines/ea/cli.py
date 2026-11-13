@@ -33,7 +33,7 @@ from ea import (
     tiles,
     touched,
 )
-from ea.apply import apply, publish, revert, rollup
+from ea.apply import apply, publish, revert, rollup, scope
 from ea.store import DATA, connect
 
 
@@ -115,6 +115,12 @@ def main() -> None:
     rolling = commands.add_parser("rollup", help="recompute the area rollups of result sets")
     rolling.add_argument("sets", nargs="*", type=int, help="result_set k values")
     rolling.add_argument("--affected", action="store_true", help="add every set with no rollup at its district")
+    rolling.add_argument(
+        "--scope",
+        type=int,
+        metavar="SETS",
+        help="list the areas with at least this many rolled-up sets in area_day_scope and rebuild their area_day_set rows",
+    )
     commands.add_parser("merged", help="list rows anywhere in the database that still reference a merged entity")
     commands.add_parser(
         "capitals",
@@ -396,7 +402,10 @@ def main() -> None:
                 print(f"total\t{counts.total()}")
         case "rollup":
             with connect() as conn:
-                rollup(conn, args.sets, args.affected)
+                if args.scope is not None:
+                    scope(conn, args.scope)
+                if args.sets or args.affected:
+                    rollup(conn, args.sets, args.affected)
         case "publish":
             with connect() as conn:
                 publish(conn, args.changeset_id, args.reviewer)

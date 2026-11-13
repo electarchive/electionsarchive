@@ -86,7 +86,7 @@ Channels partition a total. The channel codes are `all` (0), `election_day` (1),
 
 Measures are coded in the `measure` table. In a count with several rounds, such as an instant-runoff count, each candidate's running total at the end of count _n_ is stored under count round _n_. Option 0 holds unit-level accounting, such as registered voters for a unit.
 
-Maps and tables read rollups, which are sums of values over the areas that a result set's units roll up to. Rollups are derived and rebuildable. The `result_rollup` view combines `result_rollup_sum` and `result_rollup_unit`.
+Maps and tables read rollups, which are sums of values over the areas that a result set's units roll up to. Rollups are derived and rebuildable. The `result_rollup` view combines `result_rollup_sum` and `result_rollup_unit`. `area_day_set` lists, for the places in `area_day_scope`, each result set counted there on each election day, and whether any of its counted values is nonzero. Apply rebuilds a set's rows along with its rollups.
 
 ### Declared outcomes and engine output
 
