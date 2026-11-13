@@ -1779,8 +1779,10 @@ async function shallow(
           or not exists (select from me)
           or coalesce((
             select case
-              when g.geom && me.geom then ST_Area(ST_Intersection(g.geom, me.geom)) >= 0.01 * ST_Area(g.geom)
-              else ST_Area(g.geom) = 0
+              when not g.geom && me.geom then ST_Area(g.geom) = 0
+              when ST_Covers(me.geom, g.geom) then true
+              when not ST_Intersects(me.geom, g.geom) then ST_Area(g.geom) = 0
+              else ST_Area(ST_Intersection(g.geom, me.geom)) >= 0.01 * ST_Area(g.geom)
             end
             from me cross join lateral (
               select g.geom from area_geometry g where g.area_id = a.id
