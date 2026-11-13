@@ -337,7 +337,7 @@ BOOKS: dict[int, dict] = {
             "Carshalton St. Hel ier South": "Carshalton St. Helier South",
             "Wa II ington Sou th": "Wallington South",
             "L:ann Hall": "Cann Hall",
-            ") Ley ton": "Leyton",
+            "Ley ton": "Leyton",
             "r Balham": "Balham",
             "Earlsf ield": "Earlsfield",
             "~utney": "Putney",
@@ -1113,7 +1113,7 @@ def joined(row: list[Word], fixes: dict[str, tuple[str, str]]) -> list[Word]:
                 break
     out: list[Word] = []
     for w in row:
-        if out and re.fullmatch(r"\d{1,3}", out[-1][4]) and re.fullmatch(r"[,.]\d{3}", w[4]):
+        if out and re.fullmatch(r"\d{1,3}", out[-1][4]) and re.fullmatch(r"[,.]\d{3}", w[4]) and w[0] - out[-1][2] < 4:
             out[-1] = (out[-1][0], min(out[-1][1], w[1]), w[2], max(out[-1][3], w[3]), out[-1][4] + w[4])
         else:
             out.append(w)
@@ -1143,11 +1143,11 @@ def table3(year: int, book: list[list[Word]]) -> dict[str, list[tuple]]:
             if borough is None:
                 continue
             figures = [w for w in row if re.fullmatch(r"\d{1,3}[,.]\d{3}", w[4].translate(lb.DIGITS).strip(",.'"))]
-            name = " ".join(w[4] for w in row if w[0] < cut and not re.fullmatch(r"[\d.,%()]+", w[4])).strip(" *}")
+            name = " ".join(w[4] for w in row if w[0] < cut and not re.fullmatch(r"['\d.,%()]+", w[4])).strip(" *}")
             rows = found[borough]
             if not figures:
                 after = rows_[index + 1] if index + 1 < len(rows_) else []
-                ahead = " ".join(w[4] for w in after if w[0] < cut and not re.fullmatch(r"[\d.,%()]+", w[4]))
+                ahead = " ".join(w[4] for w in after if w[0] < cut and not re.fullmatch(r"['\d.,%()]+", w[4]))
                 before = rows_[index - 1] if index else []
                 nearer = bool(after and before) and after[0][3] - row[0][3] < row[0][3] - before[0][3] - 1
                 indent = bool(after) and after[0][0] - row[0][0] > 6
@@ -1175,7 +1175,7 @@ def table3(year: int, book: list[list[Word]]) -> dict[str, list[tuple]]:
                 continue
             electorate = figures[0]
             before = [w for w in row if w[2] < electorate[0] and re.fullmatch(r"[1-3]", w[4])]
-            seats = int(before[-1][4]) if before else None
+            seats = int(before[-1][4]) if before and "ocr" in BOOKS[year] else None
             share: dict[str, float] = {}
             for w in row:
                 if w[0] > electorate[2] and re.fullmatch(r"\d{1,3}\.\d", w[4]):
