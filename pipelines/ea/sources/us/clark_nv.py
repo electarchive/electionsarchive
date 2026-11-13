@@ -611,6 +611,7 @@ def emit() -> Path:
         owners: dict[tuple[UUID, str], UUID] = {}
         districts: set[str] = set()
         seen: set[str] = set()
+        emptied: list[str] = []
         minted_units: set[str] = set()
         values: list[pl.DataFrame] = []
         known_names: dict[tuple[UUID, date], dict[UUID, list]] = {}
@@ -953,7 +954,9 @@ def emit() -> Path:
                     outcome = "advanced"
                 else:
                     outcome = "elected"
-                if outcome != "elected" or magnitude is None or len(chosen) <= magnitude:
+                if outcome == "elected" and magnitude is not None and len(chosen) > magnitude:
+                    emptied.append(str(result_set))
+                else:
                     for candidate in chosen:
                         cs.add(
                             "outcome", result_set_id=result_set, option_id=options[candidate], kind=outcome, seats=None
@@ -1137,7 +1140,9 @@ def emit() -> Path:
                     )
                     else "elected"
                 )
-                if outcome != "elected" or magnitude is None or len(picked) <= magnitude:
+                if outcome == "elected" and magnitude is not None and len(picked) > magnitude:
+                    emptied.append(str(result_set))
+                else:
                     for candidate in picked:
                         cs.add(
                             "outcome", result_set_id=result_set, option_id=chosen[candidate], kind=outcome, seats=None
@@ -1240,4 +1245,7 @@ def emit() -> Path:
         print(report)
         if values:
             cs.frame("result_value", pl.concat(values))
+        if emptied:
+            scope = cs.manifest.get("scope")
+            cs.manifest["scope"] = {**(scope if isinstance(scope, dict) else {}), "clears": emptied}
         return cs.write()
