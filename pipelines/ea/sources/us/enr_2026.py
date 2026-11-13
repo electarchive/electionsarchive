@@ -432,6 +432,8 @@ CLARITY_HOST = "results.enr.clarityelections.com"
 CLARITY_CHALLENGE = {202, 403, 405}
 CLARITY_EVERY = 300
 CLARITY_CHALLENGED_EVERY = 3600
+STATIC_EVERY = 3600
+STATIC: dict[tuple[str, str], tuple[float, list[tuple]]] = {}
 clarity_admitted: set[str] = set()
 
 
@@ -1563,6 +1565,16 @@ def countywide(key: str) -> bool:
     return rest[0].isdigit() or rest[-1] == "g" or any("judicial" in part for part in rest)
 
 
+def static(conn: Connection, query: str, params: Sequence[object] = ()) -> list[tuple]:
+    key = (query, repr(params))
+    held = STATIC.get(key)
+    if held is not None and time.monotonic() - held[0] < STATIC_EVERY:
+        return held[1]
+    rows = conn.execute(query, params).fetchall()
+    STATIC[key] = (time.monotonic(), rows)
+    return rows
+
+
 def plan(
     conn: Connection, frame: pl.DataFrame, scatter: Callable[[str, UUID], UUID | None], also: Sequence[str] = ()
 ) -> tuple[list[tuple[str, str, UUID, dict[tuple[UUID, UUID, int], int], tuple[int, int], str | None]], list[str]]:
@@ -1619,20 +1631,21 @@ def plan(
     frame = frame.filter(~pl.col("office").is_in(["other", "state"]))
     counties: dict[tuple[str, str], UUID] = {}
     codes: dict[tuple[str, str], str] = {}
-    for code, text, id in conn.execute(
+    for code, text, id in static(
+        conn,
         """select u.code, n.text, u.id from reporting_unit u
            join name n on n.entity_id = u.area_id and n.kind = 'short'
            where u.scheme_code = 'us.county' and u.code ~ %s order by u.code""",
         [f"^({'|'.join(FIPS.values())})"],
-    ).fetchall():
+    ):
         counties.setdefault((code[:2], plain(text)), id)
         counties[(code[:2], code)] = id
         codes.setdefault((code[:2], plain(text)), code)
-    for code, id in conn.execute(
-        "select code, id from reporting_unit where scheme_code in ('us.sldl', 'us.sldu') and code like 'AK:%'"
-    ).fetchall():
+    for code, id in static(
+        conn, "select code, id from reporting_unit where scheme_code in ('us.sldl', 'us.sldu') and code like 'AK:%'"
+    ):
         counties[("02", code)] = id
-    for code, id in conn.execute("select code, id from reporting_unit where scheme_code = 'us.state'").fetchall():
+    for code, id in static(conn, "select code, id from reporting_unit where scheme_code = 'us.state'"):
         counties[(code, code)] = id
     work: list[tuple[str, str, UUID, pl.DataFrame, UUID | None]] = []
     local_keys: set[str] = set()
@@ -1738,15 +1751,16 @@ def plan(
             towns.setdefault(owner, []).append(
                 [w for w in slug(text).split("-") if (len(w) > 2 or w.isdigit()) and w not in STOP | PLACE_WORDS]
             )
-        for code, county in conn.execute(
+        for code, county in static(
+            conn,
             """select u.code, c.code from reporting_unit u
                join area_geometry g on g.area_id = u.area_id and g.valid @> current_date
                join reporting_unit c on c.scheme_code = 'us.county' and c.code like %s
                join area_geometry cg on cg.area_id = c.area_id and cg.valid @> current_date and cg.geom && g.geom
                where u.scheme_code = 'us.school_district' and u.code = any(%s)
                  and st_area(st_intersection(g.geom, cg.geom)) > 0.02 * st_area(g.geom)""",
-            [FIPS[state] + "%", list(schools)],
-        ).fetchall():
+            [FIPS[state] + "%", sorted(schools)],
+        ):
             schools[code].add(county)
         for code, county in SCHOOL_COUNTIES.items():
             if code in schools:
