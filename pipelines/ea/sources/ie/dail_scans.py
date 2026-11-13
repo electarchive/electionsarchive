@@ -1321,6 +1321,16 @@ def contest(entry: dict, areas: dict[int, dict[frozenset[str], str]]) -> dict:
     chosen = winners(candidates, elected)
     if chosen is None:
         raise LookupError("elected names do not match the candidates one to one")
+    seats = amounts(table["seats"])[0]
+    if len(chosen) < seats:
+        quota = droop(table, merged["valid"])
+        reached = {
+            index
+            for index, row in enumerate(candidates)
+            if quota is not None and row["results"] and (row["results"][-1] or 0) >= quota
+        }
+        if len(reached) == seats and chosen <= reached:
+            chosen = reached
     if len(chosen) != amounts(table["seats"])[0]:
         raise LookupError(f"{len(chosen)} elected for {table['seats']} seats")
     for index, row in enumerate(candidates):
