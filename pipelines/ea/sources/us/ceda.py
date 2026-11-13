@@ -78,6 +78,62 @@ PRECINCT = (
     "own precinct results instead, summed across voting methods."
 )
 WRITE_IN_WON = {"200400473": (date(2002, 6, 4), "alged:643000_2002_6_long beach_CA_Mayor_mayor_1")}
+SPELLINGS = {
+    ("201201112", "201203722"): "201203837",
+    ("201201112", "201203721"): "201203842",
+    ("201201164", "201204557"): "201203872",
+    ("201201424", "201204784"): "201204878",
+    ("201401429", "201404244"): "201405396",
+    ("201801995", "201806352"): "201805868",
+}
+FULLERTON = {"race": "202202050-sd0614730"}
+PACIFICA = {"race": "202201439-0654806", "code": "0654806", "area": "2", "writeins": 0}
+MOVED = {
+    "202205515": FULLERTON,
+    "202205516": FULLERTON,
+    "202205517": FULLERTON,
+    "202203678": PACIFICA,
+    "202203680": PACIFICA,
+}
+CANVASSED = {
+    "202001106": (
+        2,
+        {"sanchez", "lewis"},
+        set(),
+        "https://www.sbcvote.com/elect/resources/results11_2020/sov-dist.pdf",
+    ),
+    "201401674": (
+        2,
+        {"robertson", "sheaffer"},
+        set(),
+        "https://www.sbcvote.com/elect/resources/sov/Nov2014_CertifiedResults_SSOV_StateDistricts.pdf",
+    ),
+    "201201164": (
+        2,
+        {"winter", "jaeger"},
+        set(),
+        "https://slocounty.ca.gov/departments/clerk-recorder/forms-documents/elections-and-voting/past-elections/general-elections/2012-11-06-presidential-general/reports-and-results/statement-of-votes-cast-report-pleasant-valley-joi",
+    ),
+    "201401429": (
+        3,
+        {"baddeley", "chlebowski", "ellis"},
+        set(),
+        "https://electionstats.sonomacounty.ca.gov/eng/contests/view/1055",
+    ),
+    "201400543": (
+        1,
+        {"abrams"},
+        set(),
+        "https://patch.com/california/benicia/solano-county-supes-appoint-krishna-abrams-district-attorney",
+    ),
+    "201800180": (
+        1,
+        {"harry"},
+        set(),
+        "https://www.lakeconews.com/news/59134-registrar-of-voters-releases-final-ballot-count-for-november-election-measure-l-wins-passage",
+    ),
+}
+CANVASS = "The California Elections Data Archive flags more winners than this contest has seats, so the winners shown follow {}."
 MISDATED = "A contest the California Elections Data Archive dated to the wrong year, now held under its election day"
 RCV = "This contest was decided by ranked-choice voting; the archive shows the votes as the data archive reports them."
 DISTRICT = (
@@ -828,7 +884,20 @@ def takeovers(conn, frame: pl.DataFrame) -> tuple[dict[str, Taken], set[str], pl
 
 
 def emit() -> Path:
-    frame = pl.read_parquet(PARSED / "candidates.parquet")
+    frame = pl.read_parquet(PARSED / "candidates.parquet").update(
+        pl.DataFrame(
+            [{"candidate": candidate} | moved for candidate, moved in MOVED.items()],
+            schema={
+                "candidate": pl.String,
+                "race": pl.String,
+                "code": pl.String,
+                "area": pl.String,
+                "writeins": pl.Int64,
+            },
+        ),
+        on="candidate",
+        how="left",
+    )
     into: dict[tuple[str, str], str] = {}
     ballots: dict[tuple[str, str], list[str]] = {}
     looser: list[str] = []
@@ -868,6 +937,12 @@ def emit() -> Path:
             for candidate in cluster - {canonical}:
                 into[(race, candidate)] = canonical
             ballots[(race, canonical)] = sorted({spelled[c] for c in cluster} - {spelled[canonical]})
+    spelled = dict(
+        frame.filter(pl.col("race").is_in([race for race, _ in SPELLINGS])).select("candidate", "name").iter_rows()
+    )
+    for (race, away), canonical in SPELLINGS.items():
+        into[(race, away)] = canonical
+        ballots[(race, canonical)] = sorted({*ballots.get((race, canonical), []), spelled[away]})
     if into:
         frame = (
             frame.join(
@@ -893,6 +968,25 @@ def emit() -> Path:
             .drop("into")
         )
     print(f"{len(into)} county spellings merged into {len(ballots)} candidates")
+    frame = frame.update(
+        pl.DataFrame(
+            [
+                (
+                    race,
+                    candidate,
+                    CANVASSED[race][0],
+                    "1" if surname(text) in CANVASSED[race][1] else "3" if surname(text) in CANVASSED[race][2] else "2",
+                )
+                for race, candidate, text in frame.filter(pl.col("race").is_in(list(CANVASSED)))
+                .select("race", "candidate", "name")
+                .iter_rows()
+            ],
+            schema={"race": pl.String, "candidate": pl.String, "magnitude": pl.Int16, "elected": pl.String},
+            orient="row",
+        ),
+        on=["race", "candidate"],
+        how="left",
+    )
     over = (
         frame.group_by("race")
         .agg((pl.col("elected") == "1").sum().alias("won"), pl.col("magnitude").first())
@@ -1435,6 +1529,8 @@ def emit() -> Path:
                 kind="methodology",
                 body_md=METHOD if reported is None else f"{METHOD} {PRECINCT}",
             )
+            if race in CANVASSED:
+                cs.add("note", entity_id=result_set, kind="context", body_md=CANVASS.format(CANVASSED[race][3]))
 
             winners = (
                 {option["surname"] for option in taken_over["options"] if option["elected"]}
@@ -1568,9 +1664,11 @@ def emit() -> Path:
                 [[scheme for scheme, _, _ in absorbed], [value for _, value, _ in absorbed]],
             ).fetchall()
         }
+        folded: set[UUID] = set()
         for scheme, value, survivor in absorbed:
             if (duplicate := held_ids.get((scheme, value))) is not None and duplicate != survivor:
                 cs.merge(duplicate, survivor)
+                folded.add(duplicate)
         for election, live in conn.execute(
             """select c.election_id, array_agg(c.id) from contest c join entity n on n.id = c.id and n.retired_by is null
                join entity v on v.id = c.election_id and v.retired_by is null
@@ -1623,7 +1721,7 @@ def emit() -> Path:
         )
         print(f"{stale} taken-over contests keep an ALGED partial-district caveat that CEDA's district does not need")
         for contest in emitted:
-            for option in old_options.get(contest, set()) - kept_options:
+            for option in old_options.get(contest, set()) - kept_options - folded:
                 candidacies = [
                     candidacy
                     for (candidacy,) in conn.execute(
