@@ -12,6 +12,45 @@ SOURCE = "us.election_cadence"
 VERSION = "3"
 TSV = ROOT / "pipelines/ea/sources/us/election_cadence.tsv"
 VILLAGE = "^VILLAGE OF "
+OFFICIAL_HOSTS = frozenset(
+    {
+        "oscn.net",
+        "nmonesource.com",
+        "lldc.mainelegislature.org",
+        "media.rivcocob.org",
+        "harrisvotes.com",
+        "elections.mctx.org",
+        "galvestonvotes.org",
+        "sariverauthority.org",
+        "huntregional.org",
+        "rpmh.net",
+        "parkcitieswater.com",
+        "evergreenuwcd.org",
+        "hcuwcd1.org",
+        "pbuwcd.com",
+        "wgcd.net",
+        "postoaksavannahgcd.specialdistrict.org",
+        "desertwater.specialdistrict.org",
+        "avek.specialdistrict.org",
+        "pcwa.net",
+        "bdvwa.org",
+        "zone7water.com",
+        "yourscvwater.com",
+        "garlandcounty.org",
+        "wellscounty.org",
+        "accgov.com",
+        "gwinnettcounty.com",
+        "northbergen.org",
+        "ucnj.com",
+        "academyisd.net",
+        "cfisd.net",
+        "galenaparkisd.com",
+        "hawkinsisd.org",
+        "katyisd.org",
+        "killeenisd.org",
+        "cityoftyler.org",
+    }
+)
 COLUMNS = ("selection", "period_years", "phase", "month", "day_rule", "valid_from", "valid_to")
 
 
@@ -68,7 +107,9 @@ def emit() -> Path:
                     cs.add(
                         "source",
                         id=id,
-                        kind="official_body" if host.endswith((".gov", ".us")) else "compendium",
+                        kind="official_body"
+                        if host.endswith((".gov", ".us")) or host in OFFICIAL_HOSTS
+                        else "compendium",
                         publisher=host,
                         title=title,
                         url=url,
