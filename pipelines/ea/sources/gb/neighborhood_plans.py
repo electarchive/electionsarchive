@@ -1,4 +1,5 @@
 import html
+import json
 import re
 import struct
 import subprocess
@@ -19,6 +20,15 @@ SOURCE = "gb.neighborhood_plans"
 VERSION = "1"
 ROWS = Path(__file__).with_name("neighborhood_referendums.tsv")
 SCANS = Path(__file__).with_name("neighborhood_scans.tsv")
+AREAS = Path(__file__).with_name("neighborhood_areas.tsv")
+SERVICES = "https://services1.arcgis.com/ESMARspQHYMw9BZ9/arcgis/rest/services"
+ONS = "Office for National Statistics"
+ONS_LICENSE = "Open Government Licence v3.0"
+ONS_LICENSE_URL = "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+ONS_ATTRIBUTION = (
+    "Source: Office for National Statistics licensed under the Open Government Licence v.3.0. "
+    "Contains OS data © Crown copyright and database right"
+)
 PAGE_IMAGES = DATA / "pages" / SOURCE
 SCHEME = "gb.neighborhood_area"
 VOTES, REGISTERED, BALLOTS, INVALID, VOTERS = 1, 2, 3, 5, 14
@@ -125,6 +135,11 @@ WITHIN = (
 )
 
 
+def parishes(layer: str, field: str, codes: str) -> str:
+    listed = ",".join(f"'{code}'" for code in codes.split())
+    return f"{SERVICES}/{layer}/FeatureServer/0/query?where={field}+in+({listed})&outFields=*&outSR=27700&f=geojson"
+
+
 def is_page(url: str) -> bool:
     if url.split("?")[0].endswith((".pdf", ".doc")) or url.startswith("https://www.york.gov.uk/downloads/file/"):
         return False
@@ -164,6 +179,9 @@ def fetch() -> None:
             document(url)
         else:
             raw.fetch(SOURCE, url, suffix=suffix(url))
+    for row in pl.read_csv(AREAS, separator="\t", infer_schema=False).iter_rows(named=True):
+        raw.fetch(SOURCE, parishes(row["layer"], row["field"], row["parishes"]), suffix=".geojson")
+        raw.fetch(SOURCE, row["designation"], suffix=".pdf" if row["designation"].endswith(".pdf") else ".html")
 
 
 def printed(url: str) -> tuple[str, bool, set[str]]:
@@ -253,8 +271,109 @@ def emit() -> Path:
             if found is None:
                 raise ValueError(f"{code}: the council has no name or slug")
             councils[code] = (found[0], found[1])
-        elections: dict[UUID, str] = {}
         added: set[UUID] = set()
+        drawn: dict[str, UUID] = {}
+        layers: dict[str, UUID] = {}
+        for row in pl.read_csv(AREAS, separator="\t", infer_schema=False).iter_rows(named=True):
+            layer, field = row["layer"], row["field"]
+            if layer not in layers:
+                layers[layer] = cs.source(ONS, row["title"])
+                cs.add(
+                    "source",
+                    id=layers[layer],
+                    kind="official_body",
+                    publisher=ONS,
+                    title=row["title"],
+                    url=f"{SERVICES}/{layer}/FeatureServer/0",
+                    license=ONS_LICENSE,
+                    license_url=ONS_LICENSE_URL,
+                    attribution=ONS_ATTRIBUTION,
+                )
+            artifact = raw.cached(SOURCE, parishes(layer, field, row["parishes"]))
+            cs.artifact(artifact, layers[layer])
+            features = {
+                {key.upper(): value for key, value in feature["properties"].items()}[field]: feature
+                for feature in json.loads(artifact.path.read_text())["features"]
+            }
+            codes = row["parishes"].split()
+            if sorted(features) != sorted(codes):
+                raise ValueError(f"{row['unit']}: {layer} has {sorted(features)}, not {codes}")
+            shape = conn.execute(
+                """with u as (select st_union(st_makevalid(st_force2d(st_setsrid(st_geomfromgeojson(g), 27700))))
+                                as geom from unnest(%s::text[]) g)
+                   select encode(st_asewkb(st_transform(
+                            st_multi(st_collectionextract(st_makevalid(geom), 3)), 4326)), 'hex'),
+                          encode(st_asewkb(st_transform(st_pointonsurface(geom), 4326)), 'hex')
+                   from u""",
+                [[json.dumps(features[code]["geometry"]) for code in codes]],
+            ).fetchone()
+            assert shape is not None
+            area = drawn[row["unit"]] = cs.area(SCHEME, row["unit"])
+            if area in cs.minted:
+                cs.add("area", id=area, scheme_code=SCHEME)
+                cs.add("area_code", area_id=area, code=row["unit"], valid_from=None, valid_to=None)
+            lads = row["councils"].split()
+            for lad in lads:
+                cs.add(
+                    "area_parent" if len(lads) == 1 else "area_membership",
+                    area_id=area,
+                    parent_id=cs.area("gb.lad", lad),
+                    valid_from=None,
+                    valid_to=None,
+                    **({} if len(lads) == 1 else {"partial": True}),
+                )
+            name(area, row["name"])
+            cs.add(
+                "area_geometry",
+                area_id=area,
+                valid_from=None,
+                valid_to=None,
+                geom=shape[0],
+                label_point=shape[1],
+                quality="official",
+                source_id=layers[layer],
+            )
+            labels = [
+                {key.upper(): value for key, value in features[code]["properties"].items()}[field[:-2] + "NM"]
+                for code in codes
+            ]
+            listed = (
+                labels[0]
+                if len(labels) == 1
+                else f"{', '.join(labels[:-1])}{',' if len(labels) > 2 else ''} and {labels[-1]}"
+            )
+            cs.add(
+                "note",
+                entity_id=area,
+                kind="methodology",
+                body_md=f"The neighborhood area designated on {date.fromisoformat(row['designated']):%-d %B %Y}: the "
+                f"{'parish' if len(labels) == 1 else 'parishes'} of {listed} as they stood then. The shape is the "
+                f"union of the ONS shapes of {'that parish' if len(labels) == 1 else 'those parishes'} in "
+                f"{row['title']}.",
+            )
+            designation = cs.source(row["publisher"], row["document"])
+            if designation not in added:
+                added.add(designation)
+                cs.add(
+                    "source",
+                    id=designation,
+                    kind="official_body",
+                    publisher=row["publisher"],
+                    title=row["document"],
+                    url=row["designation"],
+                )
+                cs.artifact(raw.cached(SOURCE, row["designation"]), designation)
+            cs.add("citation", entity_id=area, source_id=designation)
+        if drawn and conn.execute("select 1 from boundary_set where scheme_code = %s", [SCHEME]).fetchone() is None:
+            cs.add(
+                "boundary_set",
+                scheme_code=SCHEME,
+                vintage="designated",
+                valid_from=None,
+                valid_to=None,
+                as_of="2026-11-13",
+            )
+        elections: dict[UUID, str] = {}
         pages: dict[tuple[str, int], UUID] = {}
         for (day, code), polls in table.group_by(["day", "council"], maintain_order=True):
             council_name, path = councils[str(code)]
@@ -332,17 +451,17 @@ def emit() -> Path:
                             )
                 unit_code = f"{code}:{slug(re.sub(r'(?i) neighbourhood (plan )?area$', '', area_name))}"
                 unit = cs.unit(SCHEME, unit_code)
-                if unit in cs.minted and unit not in added:
+                district = drawn.get(unit_code) if row["area"] is None else cs.area("gb.parish", row["area"])
+                if (unit in cs.minted or unit_code in drawn) and unit not in added:
                     added.add(unit)
-                    parish = row["area"]
                     cs.add(
                         "reporting_unit",
                         id=unit,
                         polity_id=cs.key("gb.polity", str(code)),
                         scheme_code=SCHEME,
                         code=unit_code,
-                        area_relation="within" if parish is None else "equals",
-                        area_id=cs.area("gb.lad", str(code)) if parish is None else cs.area("gb.parish", parish),
+                        area_relation="within" if district is None else "equals",
+                        area_id=cs.area("gb.lad", str(code)) if district is None else district,
                         kind="standard",
                         valid_from=None,
                     )
@@ -353,7 +472,7 @@ def emit() -> Path:
                     id=contest,
                     election_id=election,
                     kind="ballot_question",
-                    district_area_id=None if row["area"] is None else cs.area("gb.parish", row["area"]),
+                    district_area_id=district,
                     electoral_system_id=system,
                     round_number=1,
                     default_result_kind="counted",
@@ -363,8 +482,21 @@ def emit() -> Path:
                 name(contest, label)
                 cs.add("slug", path=f"{elections[election]}/{slug(label)}", entity_id=contest)
                 context = CONTEXT[str(row["kind"])].format(council=council_name)
-                if row["area"] is None:
+                if district is None:
                     context = f"{context} {WITHIN.format(council=council_name)}"
+                elif unit_code in drawn:
+                    stale = f"{context} {WITHIN.format(council=council_name)}"
+                    for (note,) in conn.execute(
+                        "select id from note where entity_id = %s and kind = 'context' and body_md = %s",
+                        [contest, stale],
+                    ).fetchall():
+                        cs.add(
+                            "note_drop",
+                            note_id=note,
+                            entity_id=contest,
+                            body_md=stale,
+                            reason="The neighborhood area is now drawn on its own.",
+                        )
                 cs.add("note", entity_id=contest, kind="context", body_md=context)
                 options = [cs.key("gb.neighborhood_plans.option", f"{key}:{position}") for position in range(2)]
                 for position, (option, answer) in enumerate(zip(options, ("Yes", "No"), strict=True)):
