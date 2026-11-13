@@ -34,12 +34,18 @@ TITLES = {
     "insurance-commissioner": "insurance commissioner",
     "commissioner-of-agriculture": "commissioner of agriculture and labor",
     "railroad-commissioner": "railroad commissioner",
+    **{f"house:{n}": f"U.S. House District {n}" for n in range(1, 4)},
 }
+SAME = {"H. Halverson": "Halvor Halvorson"}
 ERRATA = {
     (1914, "republican", "Thomas Hall"),
     (1914, "democratic", "M. F. Hegge"),
     (1914, "democratic", "Scott Cameron"),
     (1914, "democratic", "Sam A. Hall"),
+    (1914, "democratic", "H. Halverson"),
+    (1914, "socialist", "J. A. Williams"),
+    (1914, "socialist", "J. E. Kulstad"),
+    (1914, "socialist", "J. L. Koeppler"),
     (1916, "republican", "A. T. Kraabel"),
     (1916, "republican", "Oscar J. Sorlie"),
     (1916, "republican", "Thomas Hall"),
@@ -103,8 +109,8 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="North Dakota's 1914, 1916, and 1918 statewide party primaries by county from the 1919 "
-            "Legislative Manual",
+            summary="North Dakota's 1914, 1916, and 1918 statewide and congressional party primaries by county "
+            "from the 1919 Legislative Manual",
             polity="US",
         )
 
@@ -147,7 +153,7 @@ def emit() -> Path:
                from candidacy cd
                join contest_option o on o.id = cd.option_id
                join external_id x on x.entity_id = o.contest_id and x.scheme = 'us.contest'
-                    and x.value ~ '^\\d{4}-\\d\\d-\\d\\d:ND:[a-z-]+(:[a-z]+)?$' and x.value !~ ':house'
+                    and x.value ~ '^\\d{4}-\\d\\d-\\d\\d:ND:([a-z-]+|house:\\d)(:[a-z]+)?$'
                join name n on n.entity_id = cd.person_id and n.is_preferred group by 1, 2"""
         ).fetchall():
             if text.split():
@@ -189,8 +195,9 @@ def emit() -> Path:
             contest = contests.get(key)
             if contest is None:
                 general = contests[f"{GENERALS[year]}:ND:{office}"]
-                ((office_id, body_id, seat_id, term, magnitude, system),) = conn.execute(
-                    "select office_id, body_id, seat_id, term, magnitude, electoral_system_id from contest where id = %s",
+                ((office_id, body_id, seat_id, district, term, magnitude, system),) = conn.execute(
+                    """select office_id, body_id, seat_id, district_area_id, term, magnitude, electoral_system_id
+                       from contest where id = %s""",
                     [general],
                 ).fetchall()
                 contest = cs.key("us.contest", key)
@@ -203,7 +210,7 @@ def emit() -> Path:
                     office_id=office_id,
                     body_id=body_id,
                     seat_id=seat_id,
-                    district_area_id=state,
+                    district_area_id=district if office.startswith("house") else state,
                     term=term,
                     magnitude=magnitude,
                     round_number=1,
@@ -214,7 +221,7 @@ def emit() -> Path:
                 name(
                     contest, f"{year} {TITLES[office][:1].upper() + TITLES[office][1:]} {label} primary in North Dakota"
                 )
-                cs.add("slug", path=f"us/nd/{day}-primary/{office}-{party}", entity_id=contest)
+                cs.add("slug", path=f"us/nd/{day}-primary/{office.replace(':', '-')}-{party}", entity_id=contest)
             else:
                 ((magnitude,),) = conn.execute("select magnitude from contest where id = %s", [contest]).fetchall()
             options = conn.execute(
@@ -231,10 +238,11 @@ def emit() -> Path:
                 if matches:
                     option = matches[0]
                 else:
+                    known_as = SAME.get(candidate, candidate)
                     known = {
                         one
-                        for one in people.get(plain(candidate), set())
-                        | people.get(f"{plain(candidate.split()[0])[:1]}|{surname(candidate)}", set())
+                        for one in people.get(plain(known_as), set())
+                        | people.get(f"{plain(known_as.split()[0])[:1]}|{surname(known_as)}", set())
                         if one in made or min((abs(other - year) for other in years[one]), default=99) <= 30
                     }
                     person = chosen.get(plain(candidate)) or (
