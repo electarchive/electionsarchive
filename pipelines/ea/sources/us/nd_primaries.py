@@ -35,8 +35,9 @@ TITLES = {
     "commissioner-of-agriculture": "commissioner of agriculture and labor",
     "railroad-commissioner": "railroad commissioner",
     **{f"house:{n}": f"U.S. House District {n}" for n in range(1, 4)},
+    "public-service-commissioner": "railroad commissioner",
 }
-SAME = {"H. Halverson": "Halvor Halvorson"}
+SAME = {"H. Halverson": "Halvor Halvorson", "Frank Milhollan": "Frank Milholland"}
 ERRATA = {
     (1914, "republican", "Thomas Hall"),
     (1914, "democratic", "M. F. Hegge"),
@@ -57,6 +58,10 @@ ERRATA = {
     (1916, "democratic", "John Harvey"),
     (1916, "democratic", "Charles Hein"),
     (1916, "socialist", "John Fleckten"),
+    (1918, "republican", "Lyman D. Page"),
+    (1918, "republican", "Geo. P. Hommes"),
+    (1918, "republican", "John O. Hanchett"),
+    (1918, "democratic", "Fred Bartholomew"),
 }
 
 
