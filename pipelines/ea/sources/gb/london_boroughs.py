@@ -2426,6 +2426,11 @@ def parse_ilea() -> None:
 def emit() -> Path:
     wards = pl.read_parquet(PARSED / "wards.parquet")
     candidates = pl.read_parquet(PARSED / "candidates.parquet")
+    for year in BOOKS:
+        listed = candidates.filter(pl.col("year") == year).height
+        printed = sum(count for _, count, _ in TOTALS[year].values())
+        if listed != printed or wards.filter(pl.col("year") == year).is_empty():
+            raise ValueError(f"{year}: {listed} parsed candidates against {printed} printed; run ea parse {SOURCE}")
     with connect() as conn:
         cs = Changeset(
             conn,
