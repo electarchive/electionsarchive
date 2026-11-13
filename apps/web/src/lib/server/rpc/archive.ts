@@ -28768,14 +28768,14 @@ export const parties = {
             and coalesce(c.body_id, c.office_id) is not null and not c.notional
             and ((select polity from home) is null or coalesce(b.polity_id, f.polity_id) = (select polity from home))
         ),
+        reached(id, parent) as (
+          select c.id, c.allocation_parent_id from contest_option o join contest c on c.id = o.contest_id
+          where o.party_id in (select id from ours)
+          union
+          select c.id, c.allocation_parent_id from reached r join contest c on c.id = r.parent
+        ),
         entered as materialized (
-          select distinct grp, seat from candidates k
-          where exists (
-            with recursive t(id) as (
-              select k.id union all select c.id from contest c join t on c.allocation_parent_id = t.id
-            )
-            select from t join contest_option o on o.contest_id = t.id where o.party_id in (select id from ours)
-          )
+          select distinct k.grp, k.seat from candidates k join reached r on r.id = k.id
         ),
         roots as materialized (
           select c.id, n.grp, n.seat, e.date_from as date, ${CYCLE} as year, c.round_number as round, a.k as area,
@@ -28890,24 +28890,23 @@ export const parties = {
                     o.party_id in (select id from ours)
                     or o.party_id is null and ${fused(sql`o.id`, sql`o.contest_id`)} in (select id from family)
                   ) as mine,
-                  max(coalesce(x.seats, 1)) as seats
+                  max(coalesce(o.seats, 1)) as seats
                 from roots r
                 join lateral (
                   with recursive t(id) as (
                     select r.id union all select c.id from contest c join t on c.allocation_parent_id = t.id
                   )
-                  select id from t
-                ) sub on true
-                join contest_option o on o.contest_id = sub.id
-                join outcome x on x.option_id = o.id and x.kind in ('elected', 'won')
-                join result_set rs on rs.id = x.result_set_id and ${latest("rs")}
-                where (not exists (select from contest k where k.allocation_parent_id = sub.id)
-                  or sub.id = r.id and not exists (select from contest k where k.allocation_parent_id = r.id))
-                  and not (o.kind = 'list' and ${pooled(sql`o.id`)})
-                  and not (o.parent_option_id is not null and not ${pooled(sql`o.parent_option_id`)} and exists (
-                    select from outcome y join result_set ry on ry.id = y.result_set_id and ${latest("ry")}
-                    where y.option_id = o.parent_option_id and y.kind in ('elected', 'won') and y.candidacy_id is null
-                  ))
+                  select o.id, o.contest_id, o.party_id, x.seats from t
+                  join contest_option o on o.contest_id = t.id
+                  join outcome x on x.option_id = o.id and x.kind in ('elected', 'won')
+                  join result_set rs on rs.id = x.result_set_id and ${latest("rs")}
+                  where not exists (select from contest k where k.allocation_parent_id = t.id)
+                    and not (o.kind = 'list' and ${pooled(sql`o.id`)})
+                    and not (o.parent_option_id is not null and not ${pooled(sql`o.parent_option_id`)} and exists (
+                      select from outcome y join result_set ry on ry.id = y.result_set_id and ${latest("ry")}
+                      where y.option_id = o.parent_option_id and y.kind in ('elected', 'won') and y.candidacy_id is null
+                    ))
+                ) o on true
                 group by r.id, o.id
               ) w
               group by w.root
