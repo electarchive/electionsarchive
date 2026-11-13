@@ -1287,7 +1287,8 @@ def emit() -> Path:
                 else "block"
                 if magnitude != 1
                 else "two_round"
-                if race in majority or code in runoff_places or (len(code) == 5 and key != "board-of-education")
+                if race in majority
+                or (day.month != 11 and (code in runoff_places or (len(code) == 5 and key != "board-of-education")))
                 else "fptp"
             ]
             cs.add(
