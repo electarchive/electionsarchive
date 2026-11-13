@@ -8598,6 +8598,7 @@ def emit() -> Path:
             summary="Statewide ballot measures by county, 1996–2024, from state election offices' official returns",
             polity="US",
         )
+        cs.manifest["scope"] = {"polity": "US", "sweeps": ["note"]}
 
         def name(entity: UUID, text: str) -> None:
             cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)

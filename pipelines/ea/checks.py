@@ -27,6 +27,7 @@ SWEEPABLE = {
     "party_affiliation": "party_id",
     "election_cadence": "id",
     "results_access": "id",
+    "note": "entity_id",
 }
 TIMEOUT = "20min"
 RULES = Draft7Validator(json.loads((ROOT / "packages" / "engine" / "rules.schema.json").read_text()))
@@ -109,6 +110,20 @@ class Stage:
         )
 
     def swept(self, table: str) -> sql.Composable:
+        if table == "note":
+            return sql.SQL(
+                """p.changeset_id = c.id and c.pipeline = {pipeline}
+                   and exists (select from {staged} s where s.entity_id = p.entity_id and s.kind = p.kind)
+                   and not exists (select from {staged} s where {same})"""
+            ).format(
+                pipeline=sql.Literal(self.pipeline),
+                staged=self.staged(table),
+                same=sql.SQL(" and ").join(
+                    sql.SQL("s.{0} is not distinct from p.{0}").format(sql.Identifier(column))
+                    for column in self.tables[table]
+                    if column != "id"
+                ),
+            )
         return sql.SQL(
             "p.changeset_id = c.id and c.pipeline = {} and not exists (select from {} s where s.{key} = p.{key})"
         ).format(sql.Literal(self.pipeline), self.staged(table), key=sql.Identifier(SWEEPABLE[table]))
