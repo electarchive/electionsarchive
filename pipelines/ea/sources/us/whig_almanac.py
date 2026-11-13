@@ -63,6 +63,8 @@ UNREAD = {("NY", f"Ward {ward}"): 54 for ward in (*WARDS, "XVIII")} | {
     ("LA", "Bossier"): 58,
 }
 BEFORE = {("LA", "bossier"): "caddo"}
+BLOCKS = {("LA", "avoyelles")}
+LABELLED = ("LA",)
 NAMES = {
     **{("NY", f"Ward {ward}"): "36061" for ward in (*WARDS, "XVIII")},
     ("NY", "New-York City"): "36061",
@@ -582,7 +584,7 @@ def build() -> None:
                 continue
             page = None
             for row in kept:
-                if pages[row] != page:
+                if pages[row] != page or row in BLOCKS:
                     page = pages[row]
                     text += [f"@{page}", f"# {state}", f"0 | {', '.join(used)}"]
                 text.append(f"{NAMED[row]} | {' '.join(str(settled.get((*row, year, c)) or 0) for c in used)}")
