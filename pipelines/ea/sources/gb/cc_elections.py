@@ -211,18 +211,25 @@ def legacy_notice(text: str) -> dict:
 def notice(text: str) -> dict:
     if "ELECTION OF COUNCILLORS FOR" in text:
         return legacy_notice(text)
-    head = re.search(r"Election Of Community Councillors for\s+(.+?)\s+NOTICE IS HEREBY GIVEN", text, re.DOTALL)
-    day = re.search(r"with effect from 12 noon on \w+\s+(\d+\s+\w+\s+\d{4})", " ".join(text.split()))
+    head = re.search(
+        r"Election Of Community Councillors for\s+(.+?)\s+(?:Election Day.*?)?NOTICE IS HERE?BY GIVEN",
+        text,
+        re.DOTALL | re.IGNORECASE,
+    ) or re.search(r"Notice of Uncontested Election\s+(.+? Community Council)\s", text)
+    day = re.search(r"with effect from (?:12 noon on )?\w+\s+(\d+\s+\w+\s+\d{4})", " ".join(text.split()))
     table = re.search(r"\n([^\n]*Forename[^\n]*)\n(.*?)\n\s*\*Where", text, re.DOTALL)
     if not (head and day and table):
         raise ValueError("unreadable notice")
     header = table.group(1)
     surname_first = header.index("Surname") < header.index("Forename")
-    total = "Membership" in text[: table.start(2)]
+    total = "Membership" in text[: table.end(1)]
+    received = "Nominations" in text[: table.end(2)]
     names, places, left = [], None, None
     for line in table.group(2).splitlines():
         cells = [cell for cell in re.split(r"\s{2,}", line.strip()) if cell]
-        if not cells or cells[0].startswith(("Vacancies", "Membership", "remaining")):
+        if not cells or cells[0].startswith(("Vacancies", "Membership", "remaining", "Received")):
+            continue
+        if all(re.fullmatch(r"\(\d+/\d+/\d{4}\)", cell) for cell in cells):
             continue
         numbers = []
         while cells and cells[0].isdigit():
@@ -237,6 +244,12 @@ def notice(text: str) -> dict:
             raise ValueError(f"unreadable member line {line!r}")
         surname, forename = cells if surname_first else cells[::-1]
         names.append(f"{forename} {surname}")
+    if received:
+        if left != 0 or not names:
+            raise ValueError(f"nominations received with {left} vacancies left")
+        return {"council": head.group(1), "day": when(day.group(1)), "places": None, "members": names}
+    if places is not None and left == places == len(names):
+        left = 0
     if places is None or left is None or places - len(names) != left:
         raise ValueError(f"places {places}, members {len(names)}, and vacancies left {left} do not agree")
     return {"council": head.group(1), "day": when(day.group(1)), "places": places, "members": names}
