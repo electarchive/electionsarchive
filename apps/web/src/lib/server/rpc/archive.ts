@@ -12923,14 +12923,28 @@ export const contests = {
         polls as materialized (
           select id from days union select election from lower
         ),
+        scoped as materialized (
+          select exists (select from area_day_scope where area_k = ${area.k}) as inside
+        ),
         here as materialized (
           select r.result_set_k as k from result_rollup_sum r
-          where r.area_k = ${area.k} and r.measure = any(${COUNTED})
+          where r.area_k = ${area.k} and r.measure = any(${COUNTED}) and not (select inside from scoped)
           union
-          select u.result_set_k from result_rollup_unit u where u.area_k = ${area.k}
+          select u.result_set_k from result_rollup_unit u where u.area_k = ${area.k} and not (select inside from scoped)
         ),
         sets as materialized (
-          select x.k, x.contest_id from here
+          select x.k, x.contest_id, d.voted from area_day_set d
+          cross join lateral (
+            select x.k, x.contest_id from result_set x
+            where x.k = d.result_set_k and x.status <> 'withdrawn' and ${served("x")}
+              and x.election_id = any(array(select id from polls))
+            offset 0
+          ) x
+          where d.area_k = ${area.k}
+            and d.day = any(array(select ${day}::date union select e.date_from from election e where e.id in (select election from lower)))
+            and (select inside from scoped)
+          union all
+          select x.k, x.contest_id, null from here
           cross join lateral (
             select x.k, x.contest_id from result_set x
             where x.k = here.k and x.status <> 'withdrawn' and ${served("x")}
@@ -12938,14 +12952,14 @@ export const contests = {
           ) x
           where (select count(*) from here) <= (select count(*) from polls)
           union all
-          select x.k, x.contest_id from result_set x
+          select x.k, x.contest_id, null from result_set x
           join here on here.k = x.k
           where x.election_id = any(array(select id from polls)) and x.status <> 'withdrawn' and ${served("x")}
             and (select count(*) from here) > (select count(*) from polls)
         ),
         matched as materialized (
-          select c.id as top, c.parent, s.k
-          from (select k, contest_id as id from sets union all select s.k, a.top from sets s join anc a on a.id = s.contest_id) s
+          select c.id as top, c.parent, s.k, s.voted
+          from (select k, contest_id as id, voted from sets union all select s.k, a.top, s.voted from sets s join anc a on a.id = s.contest_id) s
           cross join lateral (
             select c.id, c.allocation_parent_id as parent, c.election_id from contest c
             where c.id = s.id and not c.notional and c.id not in (select id from own) offset 0
@@ -12955,10 +12969,12 @@ export const contests = {
         hits as (
           select m.top, m.parent, bool_or(r.voted) as voted from matched m
           cross join lateral (
-            select bool_or(r.value <> 0) as voted from result_rollup r
-            where r.result_set_k = m.k and r.area_k = ${area.k} and r.measure = any(${COUNTED})
+            select m.voted where m.voted is not null
+            union all
+            select bool_or(r.value <> 0) from result_rollup r
+            where m.voted is null and r.result_set_k = m.k and r.area_k = ${area.k} and r.measure = any(${COUNTED})
             having count(*) > 0
-          ) r
+          ) r(voted)
           group by m.top, m.parent
         )
         select h.top as id, h.parent, s.path, h.voted
