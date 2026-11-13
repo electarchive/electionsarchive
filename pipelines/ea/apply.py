@@ -339,6 +339,21 @@ def _rank_preferred(conn: Connection, stage: Stage) -> None:
     )
 
 
+def _outranked(stage: Stage) -> sql.Composed:
+    return sql.SQL(
+        """select id from (
+             select id, pipeline, tier, first_value(tier) over w as top, row_number() over w as rank
+             from (select p.id, p.entity_id, p.lang, p.script, p.recorded_from, c.pipeline,
+                          case when c.pipeline = 'identity' then 2 when p.kind = 'official' then 1 else 0 end as tier
+                   from public.name p join changeset c on c.id = p.changeset_id
+                   where p.is_preferred and p.valid_from is null and p.valid_to is null
+                     and p.entity_id in (select entity_id from {staged})) p
+             window w as (partition by entity_id, lang, script order by tier desc, pipeline = {pipeline}, recorded_from, id)
+           ) ranked
+           where rank > 1 and (pipeline = {pipeline} or tier < top)"""
+    ).format(staged=stage.staged("name"), pipeline=sql.Literal(stage.pipeline))
+
+
 def _promote_stranded(conn: Connection, stage: Stage, columns: list[str]) -> None:
     conn.execute(
         sql.SQL(
@@ -347,9 +362,10 @@ def _promote_stranded(conn: Connection, stage: Stage, columns: list[str]) -> Non
                      from public.name p join changeset c on c.id = p.changeset_id and c.pipeline = %s
                      join {} s on s.is_preferred and {}
                      where not p.is_preferred and not exists (
-                       select from public.name q join changeset o on o.id = q.changeset_id and o.pipeline in (%s, 'identity')
+                       select from public.name q join changeset o on o.id = q.changeset_id
                        where q.entity_id = p.entity_id and q.lang = p.lang and q.script is not distinct from p.script
-                         and q.is_preferred and q.valid_from is null and q.valid_to is null)
+                         and q.is_preferred and q.valid_from is null and q.valid_to is null
+                         and (o.pipeline in (%s, 'identity') or c.pipeline <> 'identity' and (q.kind = 'official' or p.kind <> 'official')))
                      order by p.entity_id, p.lang, p.script, p.recorded_from desc, p.id) pick
                where n.id = pick.id"""
         ).format(
@@ -2138,26 +2154,6 @@ def publish(conn: Connection, changeset_id: str, reviewer: str | None = None) ->
         for table in reversed(deferred):
             _sweep(conn, stage, table)
         if "name" in stage.tables:
-            conn.execute(
-                sql.SQL(
-                    """update public.name p set is_preferred = false from public.name q, changeset c, changeset o
-                       where %s <> 'identity' and p.is_preferred and p.valid_from is null and p.valid_to is null
-                         and o.id = p.changeset_id and o.pipeline = %s
-                         and exists (select from {} s where s.entity_id = p.entity_id and s.text = p.text
-                                     and s.lang = p.lang and s.is_preferred)
-                         and q.entity_id = p.entity_id and q.lang = p.lang and q.script is not distinct from p.script
-                         and q.is_preferred and q.text <> p.text and q.valid_from is null and q.valid_to is null
-                         and c.id = q.changeset_id and c.pipeline = 'identity'
-                         and (regexp_replace(lower(unaccent(p.text)), '[^a-z0-9]', '', 'g')
-                                = regexp_replace(lower(unaccent(q.text)), '[^a-z0-9]', '', 'g')
-                              or exists (select from public.name r join changeset i on i.id = r.changeset_id
-                                         where i.pipeline = 'identity' and r.entity_id = p.entity_id
-                                           and r.lang = p.lang and r.script is not distinct from p.script
-                                           and r.text = p.text and not r.is_preferred
-                                           and r.valid_from is null and r.valid_to is null))"""
-                ).format(stage.staged("name")),
-                [stage.pipeline, stage.pipeline],
-            )
             conflicts = conn.execute(
                 sql.SQL(
                     """select distinct p.entity_id::text, p.text, c.pipeline, q.text from public.name p
@@ -2178,6 +2174,11 @@ def publish(conn: Connection, changeset_id: str, reviewer: str | None = None) ->
                         f"{changeset_id}\t{entity}\t{source}\t{text}\tidentity\t{curated}\n"
                         for entity, text, source, curated in conflicts
                     )
+            conn.execute("select set_config('ea.repointing', 'on', true)")
+            conn.execute(
+                sql.SQL("update public.name set is_preferred = false where id in ({})").format(_outranked(stage))
+            )
+            conn.execute("select set_config('ea.repointing', 'off', true)")
         stray = checks.merged(conn, changeset_id, set(stage.tables))
         if stray:
             raise ValueError(
@@ -2859,8 +2860,13 @@ def _apply(folder: Path) -> str:
             )
         findings = checks.run(conn, stage)
         diff = _diff(conn, stage)
-        if not findings and all(
-            change["insert"] == change["update"] == change["delete"] == 0 for change in diff.values()
+        if (
+            not findings
+            and all(change["insert"] == change["update"] == change["delete"] == 0 for change in diff.values())
+            and not (
+                "name" in stage.tables
+                and conn.execute(sql.SQL("select exists ({})").format(_outranked(stage))).fetchone() == (True,)
+            )
         ):
             conn.rollback()
             return "unchanged"
