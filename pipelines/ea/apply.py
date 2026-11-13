@@ -400,7 +400,26 @@ def _hold(conn: Connection, stage: Stage, table: str, matched: sql.Composable, k
     )
 
 
-def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
+def _sweep(conn: Connection, stage: Stage, table: str) -> None:
+    conn.execute(
+        sql.SQL("delete from public.{} p using changeset c where {}").format(sql.Identifier(table), stage.swept(table))
+    )
+
+
+def _deferred(conn: Connection, stage: Stage) -> list[str]:
+    referenced = {
+        parent
+        for (parent,) in conn.execute(
+            """select distinct confrelid::regclass::text from pg_constraint
+               where contype = 'f' and conrelid <> confrelid
+                 and conrelid::regclass::text = any(%s) and confrelid::regclass::text = any(%s)""",
+            [list(stage.tables), stage.sweeps],
+        ).fetchall()
+    }
+    return [table for table in stage.tables if table in referenced]
+
+
+def _publish_table(conn: Connection, stage: Stage, table: str, deferred: list[str]) -> None:
     columns = stage.tables[table]
     staged = stage.staged(table)
     target = sql.Identifier(table)
@@ -535,8 +554,8 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
             [stage.pipeline, stage.pipeline],
         )
         conn.execute("select set_config('ea.repointing', 'off', true)")
-    if table in stage.sweeps:
-        conn.execute(sql.SQL("delete from public.{} p using changeset c where {}").format(target, stage.swept(table)))
+    if table in stage.sweeps and table not in deferred:
+        _sweep(conn, stage, table)
     if table == "row_drop":
         for id, relation, key in conn.execute(
             sql.SQL("select id::text, relation, key from {} order by id").format(staged)
@@ -2112,8 +2131,11 @@ def publish(conn: Connection, changeset_id: str, reviewer: str | None = None) ->
                          and not exists (select from public.source o where o.id = d.source_id and o.kind = 'official_body')"""
                 ).format(staged=stage.staged("result_set"), official=official, group=sql.SQL(group))
             )
+        deferred = _deferred(conn, stage)
         for table in stage.tables:
-            _publish_table(conn, stage, table)
+            _publish_table(conn, stage, table, deferred)
+        for table in reversed(deferred):
+            _sweep(conn, stage, table)
         if "name" in stage.tables:
             conn.execute(
                 sql.SQL(

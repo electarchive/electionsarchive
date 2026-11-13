@@ -360,7 +360,7 @@
       ]
     },
     {
-      "key": "local",
+      "key": "belediye",
       "name": "Belediyeler",
       "name_en": "Municipalities: metropolitan, provincial, district, and town (belde)",
       "parent": "ilce",
@@ -1322,7 +1322,7 @@
     },
     {
       "key": "local",
-      "tier": "local",
+      "tier": "belediye",
       "name": "Mayoral elections",
       "category": "executive",
       "goal": "local",
@@ -1428,7 +1428,8 @@
           "called": false,
           "administered_by": "Yüksek Seçim Kurulu through the provincial and district election boards",
           "valid_from": "1988-12-07",
-          "vacancy_rule": "A vacant mayoralty is filled by the council from its members; a rerun follows an annulment, a council falling below half its members, or a new municipality, on the first Sunday 60 days after notice, unless the next general local election is within a year (Law 2972 art. 29)."
+          "vacancy_rule": "A vacant mayoralty is filled by the council from its members; a rerun follows an annulment, a council falling below half its members, or a new municipality, on the first Sunday 60 days after notice, unless the next general local election is within a year (Law 2972 art. 29).",
+          "government_kind": "local"
         }
       ],
       "access": [
@@ -1461,7 +1462,7 @@
     },
     {
       "key": "belediye_meclisi",
-      "tier": "local",
+      "tier": "belediye",
       "name": "Belediye meclisi",
       "name_en": "Municipal councils",
       "category": "council",
@@ -1512,7 +1513,8 @@
           "called": false,
           "administered_by": "Yüksek Seçim Kurulu through the provincial and district election boards",
           "valid_from": "1988-12-07",
-          "vacancy_rule": "Seats pass to the list's substitutes; a by-election follows when membership falls below half (Law 2972 art. 29)."
+          "vacancy_rule": "Seats pass to the list's substitutes; a by-election follows when membership falls below half (Law 2972 art. 29).",
+          "government_kind": "local"
         }
       ],
       "access": [
