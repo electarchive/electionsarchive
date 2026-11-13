@@ -1021,6 +1021,20 @@ def official_totals(manifest: Manifest) -> dict[str, int | None]:
 GENERIC_NAMES = {"votes"}
 
 
+def given_conflict(label: str, name: str, held: list[tuple[str, str, int | None]]) -> bool:
+    texts = [text for held_name, text, _ in held if held_name == name]
+    known = set(slug(name).split()).union(*(set(slug(text).split()) for text in texts))
+    plain = re.sub(r"\([^)]*\)", " ", label)
+    surnames = [word for word in known if len(word) > 1 and word in slug(plain).split()]
+    if len(surnames) != 1:
+        return False
+    before = slug(plain).split()
+    before = before[: before.index(surnames[0])]
+    fulls = {word for word in before if len(word) > 1}
+    given = {word for word in known if len(word) > 1 and word != surnames[0]}
+    return bool(fulls) and bool(given) and not fulls & known
+
+
 def match(labels: list[str], held: list[tuple[str, str, int | None]], contest: str) -> tuple[list[Column], list[str]]:
     surnames: list[tuple[str, set[str]]] = []
     for name, text, _ in held:
@@ -1045,6 +1059,8 @@ def match(labels: list[str], held: list[tuple[str, str, int | None]], contest: s
                 if any(difflib.get_close_matches(word, options_, n=1, cutoff=0.85) for word in words)
             ]
         found_options = list(dict.fromkeys(found_options))
+        if len(found_options) == 1 and given_conflict(label, found_options[0], held):
+            found_options = []
         if len(found_options) == 1:
             columns.append({"label": label, "contest": contest, "candidate": found_options[0]})
         else:

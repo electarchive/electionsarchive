@@ -85,512 +85,1532 @@
   "pages": [
     {
       "page": 19,
-      "discover": "househouse1",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 20,
-      "discover": "househouse1",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 21,
-      "discover": "househouse1",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 22,
-      "discover": "househouse1",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 23,
-      "discover": "househouse1",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 24,
-      "discover": "househouse1",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 25,
-      "discover": "househouse1",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 26,
-      "discover": "househouse1",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 27,
-      "discover": "househouse1",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 28,
-      "discover": "househouse1",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 29,
-      "discover": "househouse1",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 30,
-      "discover": "househouse2",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 31,
-      "discover": "househouse2",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 32,
-      "discover": "househouse2",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 33,
-      "discover": "househouse2",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 34,
-      "discover": "househouse2",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 35,
-      "discover": "househouse2",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 36,
-      "discover": "househouse2",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 37,
-      "discover": "househouse2",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 38,
-      "discover": "househouse2",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 39,
-      "discover": "househouse2",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 40,
-      "discover": "househouse2",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 41,
-      "discover": "househouse2",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 42,
-      "discover": "househouse3",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 43,
-      "discover": "househouse3",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 44,
-      "discover": "househouse3",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 45,
-      "discover": "househouse3",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 46,
-      "discover": "house['house3', 'house5']",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 47,
-      "discover": "house['house3', 'house5']",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 48,
-      "discover": "house['house3', 'house5']",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 49,
-      "discover": "house['house3', 'house5']",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 50,
-      "discover": "house['house3', 'house5']",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 51,
-      "discover": "house['house3', 'house5']",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 52,
-      "discover": "house['house3', 'house5']",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 53,
-      "discover": "house['house3', 'house5']",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 54,
-      "discover": "house['house3', 'house5']",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 55,
-      "discover": "house['house3', 'house5']",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 56,
-      "discover": "house['house3', 'house5']",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 57,
-      "discover": "househouse4",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 58,
-      "discover": "househouse4",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 59,
-      "discover": "househouse4",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 60,
-      "discover": "househouse4",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 61,
-      "discover": "househouse4",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 62,
-      "discover": "househouse4",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 63,
-      "discover": "househouse6",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 64,
-      "discover": "househouse6",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 65,
-      "discover": "househouse6",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 66,
-      "discover": "househouse6",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 67,
-      "discover": "househouse6",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 68,
-      "discover": "househouse6",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 69,
-      "discover": "househouse6",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 70,
-      "discover": "househouse6",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 71,
-      "discover": "househouse6",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 72,
-      "discover": "househouse6",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 73,
-      "discover": "househouse6",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 74,
-      "discover": "househouse6",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 75,
-      "discover": "househouse6",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 76,
-      "discover": "househouse6",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 77,
-      "discover": "househouse6",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 78,
-      "discover": "househouse6",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 79,
-      "discover": "househouse7",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 80,
-      "discover": "househouse7",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 81,
-      "discover": "househouse7",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 82,
-      "discover": "househouse7",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 83,
-      "discover": "househouse7",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 84,
-      "discover": "househouse7",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 85,
-      "discover": "househouse7",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 86,
-      "discover": "househouse7",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 87,
-      "discover": "househouse7",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 88,
-      "discover": "househouse7",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 89,
-      "discover": "househouse7",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 90,
-      "discover": "househouse7",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 91,
-      "discover": "househouse7",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 92,
-      "discover": "househouse7",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 93,
-      "discover": "househouse8",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 94,
-      "discover": "househouse8",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 95,
-      "discover": "househouse8",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 96,
-      "discover": "househouse8",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 97,
-      "discover": "househouse8",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 98,
-      "discover": "househouse8",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 99,
-      "discover": "househouse8",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 100,
-      "discover": "househouse8",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 101,
-      "discover": "househouse8",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 102,
-      "discover": "househouse8",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 103,
-      "discover": "househouse8",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 104,
-      "discover": "househouse9",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 105,
-      "discover": "househouse9",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 106,
-      "discover": "househouse9",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 107,
-      "discover": "househouse9",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 108,
-      "discover": "househouse9",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 109,
-      "discover": "househouse9",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 110,
-      "discover": "househouse9",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 111,
-      "discover": "househouse9",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 112,
-      "discover": "househouse9",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 113,
-      "discover": "househouse9",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 114,
-      "discover": "househouse9",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 115,
-      "discover": "househouse9",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 116,
-      "discover": "househouse9",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 117,
-      "discover": "househouse9",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 118,
-      "discover": "househouse9",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 119,
-      "discover": "househouse9",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     },
     {
       "page": 120,
-      "discover": "househouse9",
+      "discover": [
+        "house1",
+        "house2",
+        "house3",
+        "house4",
+        "house5",
+        "house6",
+        "house7",
+        "house8",
+        "house9"
+      ],
       "totals": true
     }
   ]
