@@ -167,6 +167,39 @@ def _diff(conn: Connection, stage: Stage) -> dict[str, dict[str, int]]:
                           count(*) filter (where p.is_current)
                    from {} s left join public.slug p on p.path = s.path and p.entity_id = s.entity_id"""
             ).format(staged)
+        elif table in DERIVED_IDS:
+            stranded = (
+                sql.SQL(
+                    """s.is_preferred and exists (
+                         select from public.name p join changeset c on c.id = p.changeset_id and c.pipeline = {pipeline}
+                         where not p.is_preferred and {loose} and not exists (
+                           select from public.name q join changeset o on o.id = q.changeset_id and o.pipeline = {pipeline}
+                           where q.entity_id = p.entity_id and q.lang = p.lang and q.script is not distinct from p.script
+                             and q.is_preferred and q.valid_from is null and q.valid_to is null))"""
+                ).format(
+                    loose=sql.SQL(" and ").join(
+                        sql.SQL("p.{0} is not distinct from s.{0}").format(sql.Identifier(column))
+                        for column in columns
+                        if column != "is_preferred"
+                    ),
+                    pipeline=sql.Literal(stage.pipeline),
+                )
+                if table == "name" and "is_preferred" in columns
+                else sql.SQL("false")
+            )
+            query = sql.SQL(
+                """select count(*) filter (where not {present} and not exists (select from public.{target} p where p.id = {derived})),
+                          count(*) filter (where not {present} and {stranded}),
+                          count(*) filter (where {present} or exists (select from public.{target} p where p.id = {derived})
+                                              and not {stranded})
+                   from {staged} s"""
+            ).format(
+                present=_present(conn, table, columns),
+                derived=_derived(stage, table, columns),
+                stranded=stranded,
+                target=target,
+                staged=staged,
+            )
         else:
             query = sql.SQL(
                 "select count(*) filter (where not {present}), 0, count(*) filter (where {present}) from {staged} s"
@@ -274,6 +307,49 @@ def _insert_absent(
             """insert into public.{} (id, {}) select {}, {} from (select distinct {} from {} s where {}) s
                on conflict (id) do nothing"""
         ).format(sql.Identifier(table), listed, _derived(stage, table, columns), listed, listed, source, absent)
+    )
+
+
+def _rank_preferred(conn: Connection, stage: Stage) -> None:
+    conn.execute(
+        sql.SQL(
+            """update public.name n set is_preferred = false
+               from (select p.id, row_number() over (
+                         partition by p.entity_id, p.lang, p.script
+                         order by s.entity_id is not null desc, p.recorded_from desc, p.id) as rank
+                     from public.name p join changeset c on c.id = p.changeset_id and c.pipeline = %s
+                     left join (select distinct entity_id, text, lang from {0} where is_preferred) s
+                       on s.entity_id = p.entity_id and s.text = p.text and s.lang = p.lang
+                     where p.is_preferred and p.valid_from is null and p.valid_to is null
+                       and p.entity_id in (select entity_id from {0})) ranked
+               where n.id = ranked.id and ranked.rank > 1"""
+        ).format(stage.staged("name")),
+        [stage.pipeline],
+    )
+
+
+def _promote_stranded(conn: Connection, stage: Stage, columns: list[str]) -> None:
+    conn.execute(
+        sql.SQL(
+            """update public.name n set is_preferred = true
+               from (select distinct on (p.entity_id, p.lang, p.script) p.id
+                     from public.name p join changeset c on c.id = p.changeset_id and c.pipeline = %s
+                     join {} s on s.is_preferred and {}
+                     where not p.is_preferred and not exists (
+                       select from public.name q join changeset o on o.id = q.changeset_id and o.pipeline = %s
+                       where q.entity_id = p.entity_id and q.lang = p.lang and q.script is not distinct from p.script
+                         and q.is_preferred and q.valid_from is null and q.valid_to is null)
+                     order by p.entity_id, p.lang, p.script, p.recorded_from desc, p.id) pick
+               where n.id = pick.id"""
+        ).format(
+            stage.staged("name"),
+            sql.SQL(" and ").join(
+                sql.SQL("p.{0} is not distinct from s.{0}").format(sql.Identifier(column))
+                for column in columns
+                if column != "is_preferred"
+            ),
+        ),
+        [stage.pipeline, stage.pipeline],
     )
 
 
@@ -425,6 +501,8 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
                 """update public.name p set is_preferred = false from {} s, changeset c
                    where s.is_preferred and p.is_preferred and p.entity_id = s.entity_id and p.lang = s.lang
                      and p.text <> s.text and p.valid_from is null and p.valid_to is null{}{}
+                     and not exists (select from {} x where x.entity_id = p.entity_id and x.text = p.text
+                                     and x.lang = p.lang and x.is_preferred)
                      and c.id = p.changeset_id
                      and (c.pipeline = %s or (%s = 'identity'
                           and regexp_replace(lower(unaccent(p.text)), '[^a-z0-9]', '', 'g')
@@ -437,6 +515,7 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
                 sql.SQL(
                     "".join(f" and s.{column} is null" for column in ("valid_from", "valid_to") if column in columns)
                 ),
+                staged,
             ),
             [stage.pipeline, stage.pipeline],
         )
@@ -553,21 +632,7 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
                 sql.SQL("s.id is null and not {}").format(_present(conn, table, compared)),
             )
         if table == "name" and "is_preferred" in columns:
-            conn.execute(
-                sql.SQL(
-                    """update public.name n set is_preferred = false
-                       from (select p.id, row_number() over (
-                                 partition by p.entity_id, p.lang, p.script
-                                 order by s.entity_id is not null desc, p.recorded_from desc, p.id) as rank
-                             from public.name p join changeset c on c.id = p.changeset_id and c.pipeline = %s
-                             left join (select distinct entity_id, text, lang from {0} where is_preferred) s
-                               on s.entity_id = p.entity_id and s.text = p.text and s.lang = p.lang
-                             where p.is_preferred and p.valid_from is null and p.valid_to is null
-                               and p.entity_id in (select entity_id from {0})) ranked
-                       where n.id = ranked.id and ranked.rank > 1"""
-                ).format(staged),
-                [stage.pipeline],
-            )
+            _rank_preferred(conn, stage)
         return
     if table == "translation":
         compared = [column for column in columns if column not in ("source_md5", "lang")]
@@ -1331,9 +1396,13 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
             ).fetchall(),
         )
         kept = sql.SQL(" and not {}").format(guard)
+    if table == "name" and "is_preferred" in columns:
+        _promote_stranded(conn, stage, columns)
     _insert_absent(
         conn, stage, table, columns, staged, sql.SQL("not {}{}").format(_present(conn, table, columns), kept)
     )
+    if table == "name" and "is_preferred" in columns:
+        _rank_preferred(conn, stage)
 
 
 def _rollup(
