@@ -39,7 +39,7 @@ POLLING_PLACES = {
     year: f"{TSE}eleitorado_locais_votacao/eleitorado_local_votacao_{year}.zip"
     for year in (2010, 2014, 2018, 2022, 2026)
 }
-SECTION_YEARS = (2014, 2018, 2026)
+SECTION_YEARS = (2010, 2014, 2018, 2026)
 SECTIONS = {
     year: {key: f"{TSE}votacao_secao/votacao_secao_{year}_{key}.zip" for key in ("BR", *UFS)} for year in SECTION_YEARS
 }
@@ -52,7 +52,12 @@ SECTION_NAMES = {
     "7": "state deputies",
     "8": "district deputies",
 }
-SECTION_OFFICES = {2014: ("1", "3", "5"), 2018: ("1", "3", "5"), 2026: ("1", "3", "5", "6", "7", "8")}
+SECTION_OFFICES = {
+    2010: ("1", "3", "5"),
+    2014: ("1", "3", "5"),
+    2018: ("1", "3", "5"),
+    2026: ("1", "3", "5", "6", "7", "8"),
+}
 COUNTRIES = {
     "BOSNIAEHERZ": "BIH",
     "BRAZZAVILLE": "COG",
@@ -571,7 +576,7 @@ def unpack(url: str, suffix: str = ".csv") -> list[Path]:
     return paths
 
 
-def numbered(year: int) -> pl.DataFrame:
+def numbered(year: int, voted: pl.DataFrame) -> pl.DataFrame:
     roster = scan(year, "roster").filter(
         (pl.col("CD_TIPO_ELEICAO") == "2") & pl.col("CD_CARGO").is_in(SECTION_OFFICES[year])
     )
@@ -586,10 +591,12 @@ def numbered(year: int) -> pl.DataFrame:
             ),
             choice="NR_CANDIDATO",
             sequence="SQ_CANDIDATO",
+            replaced=pl.col("DS_SIT_TOT_TURNO") == "SUBSTITUÍDO",
         )
         .unique()
         .collect()
     )
+    pairs = pairs.filter(~pl.col("replaced") | ~pairs.select("contest", "choice").is_duplicated()).drop("replaced")
     known = pl.read_parquet(PARSED / "votes.parquet").select("contest", sequence="candidate").unique()
     pairs = (
         pairs.join(known.with_columns(held=pl.lit(True)), on=["contest", "sequence"], how="left")
@@ -597,7 +604,10 @@ def numbered(year: int) -> pl.DataFrame:
         .filter(pl.col("held") | ~pl.col("held").any().over("contest", "choice"))
         .drop("held")
     )
-    ambiguous = pairs.filter(pairs.select("contest", "choice").is_duplicated())
+    ambiguous = pairs.filter(pairs.select("contest", "choice").is_duplicated()).join(
+        voted, on=["contest", "choice"], how="semi"
+    )
+    pairs = pairs.unique(["contest", "choice"], keep="first", maintain_order=True)
     if ambiguous.height:
         raise ValueError(f"a number names two candidates in a {year} contest: {ambiguous.head(5)}")
     return pairs
@@ -642,17 +652,13 @@ def sections(year: int) -> None:
     )
     tally = pl.scan_parquet(parts)
     if tally.select(pl.col("candidate").is_null().all()).collect().item():
-        tally = tally.join(numbered(year).lazy(), on=["contest", "choice"], how="left").with_columns(
+        voted = tally.filter(pl.col("votes") > 0).select("contest", "choice").unique().collect(engine="streaming")
+        tally = tally.join(numbered(year, voted).lazy(), on=["contest", "choice"], how="left").with_columns(
             candidate=pl.when(pl.col("choice").is_in(["95", "96", "97"]))
             .then(pl.lit("-1"))
             .otherwise(pl.col("sequence"))
         )
     tally = tally.with_columns(kind=kind)
-    unnamed = (
-        tally.filter(pl.col("candidate").is_null()).select("contest", "choice").unique().collect(engine="streaming")
-    )
-    if unnamed.height:
-        raise ValueError(f"section choices with no candidate on the roster: {unnamed}")
     stray = (
         tally.filter((pl.col("kind") == "nominal") & pl.col("candidate").str.starts_with("-"))
         .select("contest", "choice", "candidate")
@@ -780,7 +786,7 @@ def sections(year: int) -> None:
         .filter(pl.col("municipal") > 0)
     )
     rolled = (
-        tally.filter(pl.col("kind") == "nominal")
+        tally.filter((pl.col("kind") == "nominal") & pl.col("candidate").is_not_null())
         .group_by("contest", "municipality", "candidate")
         .agg(pl.col("votes").sum())
         .filter(pl.col("votes") > 0)
@@ -802,7 +808,17 @@ def sections(year: int) -> None:
         .join(missing, on=["contest", "candidate"], how="anti")
     )
     rejected = (
-        rolled.join(missing, on=["contest", "candidate"], how="semi")
+        pl.concat(
+            [
+                rolled.join(missing, on=["contest", "candidate"], how="semi").select(
+                    "contest", "municipality", "votes"
+                ),
+                tally.filter((pl.col("kind") == "nominal") & pl.col("candidate").is_null())
+                .group_by("contest", "municipality")
+                .agg(pl.col("votes").sum())
+                .collect(engine="streaming"),
+            ]
+        )
         .group_by("contest", "municipality")
         .agg(rejected=pl.col("votes").sum())
     )
@@ -872,7 +888,7 @@ def sections(year: int) -> None:
                 candidate=pl.when(pl.col("kind").is_in(["nominal", "legend"])).then(pl.col("candidate")),
                 measure=pl.when(pl.col("kind") == "blank")
                 .then(6)
-                .when((pl.col("kind") == "null") | pl.col("annulled").fill_null(False))
+                .when((pl.col("kind") == "null") | pl.col("annulled").fill_null(False) | pl.col("candidate").is_null())
                 .then(5)
                 .otherwise(1),
                 value="votes",
@@ -889,6 +905,7 @@ def sections(year: int) -> None:
         ],
         how="vertical_relaxed",
     ).with_columns(pl.col("measure").cast(pl.Int16))
+    values = values.group_by("contest", "section", "candidate", "measure").agg(pl.col("value").sum())
 
     registry: list[pl.DataFrame] = []
     with zipfile.ZipFile(raw.cached(SOURCE, POLLING_PLACES[year]).path) as archive:
