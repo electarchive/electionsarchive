@@ -12896,16 +12896,16 @@ export const contests = {
           select c.id from contest c join own on c.allocation_parent_id = own.id
         ),
         candidates as materialized (
-          select c.id, c.allocation_parent_id as parent
+          select c.id, c.allocation_parent_id as parent, c.election_id
           from contest c
           join tree on tree.id = c.election_id
           join election e on e.id = c.election_id and e.date_from = ${day}::date
           where c.id not in (select id from own) and not c.notional
         ),
-        grp(id, top) as (
-          select id, id from candidates
+        grp(id, top, election) as (
+          select id, id, election_id from candidates
           union all
-          select g.id, grp.top from contest g join grp on g.allocation_parent_id = grp.id
+          select g.id, grp.top, g.election_id from contest g join grp on g.allocation_parent_id = grp.id
         ),
         here as materialized (
           select r.result_set_k as k from result_rollup_sum r
@@ -12913,10 +12913,20 @@ export const contests = {
           union
           select u.result_set_k from result_rollup_unit u where u.area_k = ${area.k}
         ),
+        byel as materialized (
+          select x.k, x.contest_id from result_set x
+          where x.election_id = any(array(select distinct election from grp)) and x.status <> 'withdrawn' and ${served("x")}
+        ),
         matched as materialized (
           select grp.top, x.k from here
           join result_set x on x.k = here.k and x.status <> 'withdrawn' and ${served("x")}
           join grp on grp.id = x.contest_id
+          where (select count(*) from here) <= (select count(*) from grp)
+          union all
+          select grp.top, b.k from byel b
+          join here on here.k = b.k
+          join grp on grp.id = b.contest_id
+          where (select count(*) from here) > (select count(*) from grp)
         ),
         hits as (
           select m.top, bool_or(r.voted) as voted from matched m
