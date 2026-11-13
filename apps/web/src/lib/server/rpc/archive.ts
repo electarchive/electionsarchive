@@ -430,7 +430,7 @@ const vacated = (body: SQL, live: SQL = alive(body)) => sql`
 const roster = (body: SQL) => sql`
   tb as materialized (
     select t.id, t.acquired_via, t.succeeds_tenure_id, t.seat_id, t.from_date, t.to_date, t.ended_via,
-      t.contest_id, t.person_id, ${VOTING} and not ${UNDATED} as live
+      t.contest_id, t.person_id, ${VOTING} as voting, ${UNDATED} as undated, ${VOTING} and not ${UNDATED} as live
     from tenure t where t.body_id = ${body}
   ),
   lt as (select * from tb where tb.live),
@@ -25812,7 +25812,6 @@ export const bodies = {
         makeup,
         upcoming,
         changes,
-        late,
         apportioned,
         pairs,
       ] = await Promise.all([
@@ -25974,7 +25973,7 @@ export const bodies = {
         `),
         db.execute<{
           date: string;
-          kind: "in" | "out" | "switch" | "rename";
+          kind: "in" | "out" | "switch" | "rename" | "late";
           from: string | null;
           to: string | null;
           cause: string | null;
@@ -26143,14 +26142,14 @@ export const bodies = {
               ) then 'rename' else 'switch' end, o.was, o.key, null
             from ordered o join e on e.id = o.tenure_id where o.n > 1 and o.key is distinct from o.was
           )
-          select day::text as date, kind, "from", "to", cause, count(*)::int as members
-          from events group by 1, 2, 3, 4, 5 order by 1, 2, 6 desc, 3, 4, 5
-        `),
-        db.execute<{ start: string; to: string | null }>(sql`
-          select t.from_date::text as start, t.to_date::text as to
-          from tenure t
-          where t.body_id = ${input.id}::uuid and ${VOTING}
-            and (${UNDATED} or t.id in (select v.id from (${vacated(sql`${input.id}::uuid`)}) v where v.shadow))
+          select * from (
+            select 0 as part, day::text as date, kind, "from", "to", cause, count(*)::int as members
+            from events group by 2, 3, 4, 5, 6
+            union all
+            select 1, d.from_date::text, 'late', null, d.to_date::text, null, 0
+            from tb d where d.voting and (d.undated or d.id in (select v.id from v where v.shadow))
+          ) q
+          order by part, date, kind, members desc, "from", "to", cause
         `),
         db.execute<{ start: string; seats: number; seceded: number }>(sql`
           select s.start::text as start, sum(a.seats)::int as seats,
@@ -26188,12 +26187,25 @@ export const bodies = {
           ),
       ]);
       const home = slugs.get(body.polity) ?? null;
+      const shifts: Array<
+        Omit<(typeof changes.rows)[number], "kind"> & {
+          kind: Exclude<(typeof changes.rows)[number]["kind"], "late">;
+        }
+      > = [];
+      const undated = new Map<string, Array<string | null>>();
+      for (const row of changes.rows) {
+        if (row.kind === "late") {
+          undated.set(row.date, [...(undated.get(row.date) ?? []), row.to]);
+        } else {
+          shifts.push({ ...row, kind: row.kind });
+        }
+      }
       const held = [
         ...new Set([
           ...makeup.rows.flatMap((row) =>
             [row.party, row.caucus].filter((party) => party != null),
           ),
-          ...changes.rows.flatMap((row) =>
+          ...shifts.flatMap((row) =>
             [row.from, row.to].flatMap(
               (key) =>
                 key
@@ -26271,9 +26283,7 @@ export const bodies = {
             start,
             apportioned: entitled.get(start)?.seats ?? null,
             seceded: entitled.get(start)?.seceded ?? 0,
-            undated: late.rows
-              .filter((row) => row.start === start)
-              .map((row) => row.to),
+            undated: undated.get(start) ?? [],
             parties: rows.map((row) => ({
               party: row.party,
               caucus: row.caucus,
@@ -26283,7 +26293,7 @@ export const bodies = {
             })),
           }))
           .toArray(),
-        changes: changes.rows,
+        changes: shifts,
         parties: held.map((id) => ({
           ...(colors.get(id) ?? { id, label: "", short: null, color: null }),
           lean: lean.get(id) ?? null,
