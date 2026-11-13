@@ -57,11 +57,12 @@ def main() -> None:
         w.writerow(["capture", "page_updated", "row_updated", "county", *COLUMNS])
         for url in urls:
             artifact = raw.cached(SOURCE, url)
+            capture = url.split("/web/")[1][:14]
             page, rows = parse(artifact.path.read_text(encoding="utf-8"))
             if not rows:
                 print(f"skipped {url}: no table")
             for r in rows:
-                w.writerow([PATTERN.match(url).group(1), page, *r])
+                w.writerow([capture, page, *r])
                 count += 1
     print(f"{len(urls)} captures, {count} rows -> {OUT}")
 
