@@ -6,8 +6,39 @@ from ea.store import ROOT, connect
 
 VERSION = "1"
 FOLDER = ROOT / "pipelines/ea/census"
-SELECTORS = ("election_kinds", "contest_kinds", "body_kinds", "office_kinds", "schemes", "except_codes")
+SELECTORS = ("election_kinds", "contest_kinds", "body_kinds", "office_kinds", "polity_kinds", "schemes", "except_codes")
 TABLES = ["census_tier", "census_tier_count", "census_class", "census_match", "census_date"]
+CADENCE = (
+    "selection",
+    "period_years",
+    "phase",
+    "month",
+    "day_rule",
+    "classes",
+    "term_years",
+    "partisan",
+    "runoff",
+    "runoff_threshold",
+    "runoff_rule",
+    "administered_by",
+    "valid_from",
+    "valid_to",
+    "called",
+    "vacancy_rule",
+    "certify_days",
+)
+CLASS_FIELDS = (
+    "name_en",
+    "valid_from",
+    "valid_to",
+    "first_held",
+    "earliest_record",
+    "contests_per_unit",
+    "disposition",
+    "disposition_reason",
+    "est_votes",
+    "effort",
+)
 
 
 def array(values: list[str]) -> str:
@@ -33,7 +64,6 @@ def emit(cc: str) -> str:
             "contest and seat counts",
             polity=spec["polity"],
         )
-        cs.manifest["scope"] = {"polity": spec["polity"], "sweeps": [t for t in TABLES if t != "census_tier_count"]}
         polity = cs.polity(spec["polity"])
         if polity in cs.minted:
             raise ValueError(f"polity {spec['polity']} is not in the archive")
@@ -67,11 +97,29 @@ def emit(cc: str) -> str:
                 polity_id=polity,
                 key=tier["key"],
                 name=tier["name"],
+                name_en=tier.get("name_en"),
                 parent_tier_id=tiers[tier["parent"]] if tier.get("parent") else None,
+                within_polity_id=region(tier["within"]) if tier.get("within") else None,
                 polity_kind=tier.get("polity_kind"),
+                scheme_code=tier["scheme"] if tier.get("scheme") in schemes else None,
+                elects=tier.get("elects", True),
+                valid_from=tier.get("valid_from"),
+                valid_to=tier.get("valid_to"),
                 source_id=sources[tier["source"]],
                 locator=spec["sources"][tier["source"]]["url"],
             )
+            for count in tier.get("counts", []):
+                cs.add(
+                    "census_tier_count",
+                    id=mint("census_tier_count", tier["key"], count.get("within"), count["date"], count["source"]),
+                    tier_id=tiers[tier["key"]],
+                    within_polity_id=region(count["within"]) if count.get("within") else None,
+                    date=count["date"],
+                    date_precision=count.get("precision", "day"),
+                    value=count["value"],
+                    source_id=sources[count["source"]],
+                    locator=count.get("locator") or spec["sources"][count["source"]]["url"],
+                )
 
         for entry in spec["classes"]:
             key = entry["key"]
@@ -93,26 +141,64 @@ def emit(cc: str) -> str:
                 measure=measure,
                 finest_scheme_code=max(known, key=lambda code: rank[code]) if known else None,
                 finest_note=entry.get("finest_note"),
+                boundary_source_id=sources[entry["boundary_source"]] if entry.get("boundary_source") else None,
                 note=entry.get("note"),
                 source_id=sources[entry["source"]],
-                locator=spec["sources"][entry["source"]]["url"],
+                locator=entry.get("locator") or spec["sources"][entry["source"]]["url"],
+                **{field: entry[field] for field in CLASS_FIELDS if field in entry},
             )
-            for number, match in enumerate(entry["match"]):
+            for number, rule in enumerate(entry.get("cadence", [])):
+                cs.add(
+                    "election_cadence",
+                    id=mint("election_cadence", key, number),
+                    polity_id=region(rule["within"]) if rule.get("within") else polity,
+                    class_id=id,
+                    government_kind=entry["tier"],
+                    function=key,
+                    source_id=sources[rule["source"]],
+                    locator=rule.get("locator") or spec["sources"][rule["source"]]["url"],
+                    **{field: rule[field] for field in CADENCE if field in rule},
+                )
+            for number, row in enumerate(entry.get("access", [])):
+                cs.add(
+                    "results_access",
+                    id=mint("results_access", key, number),
+                    polity_id=region(row["within"]) if row.get("within") else polity,
+                    class_id=id,
+                    role=row.get("role", "publishes"),
+                    platform=row["platform"],
+                    url_pattern=row["url"],
+                    format=row["format"],
+                    access=row["access"],
+                    first_date=row.get("first_date"),
+                    last_date=row.get("last_date"),
+                    checked_at=row["checked_at"],
+                    evidence=row.get("evidence"),
+                    license=row.get("license"),
+                    finest_scheme_code=row["finest"] if row.get("finest") in schemes else None,
+                    source_id=sources[row["source"]] if row.get("source") else None,
+                )
+            for number, match in enumerate(entry.get("match", [])):
                 cs.add(
                     "census_match",
                     id=mint("census_match", key, number),
                     class_id=id,
-                    within_polity_id=polity,
+                    within_polity_id=(region(match["within"]) if match["within"] else None)
+                    if "within" in match
+                    else polity,
                     iso_pattern=match.get("iso_pattern"),
+                    name_pattern=match.get("name_pattern"),
+                    precedence=match.get("precedence", 0),
                     valid_from=match.get("valid_from"),
                     valid_to=match.get("valid_to"),
                     **{column: array(match[column]) for column in SELECTORS if column in match},
                 )
-            for row in entry["dates"]:
+            for row in entry.get("dates", []):
                 fields = {
                     "class_id": id,
                     "date": row["date"],
                     "date_precision": row.get("precision", "day"),
+                    "election_kind": row.get("election_kind"),
                     "through": row.get("through"),
                     "contests": row.get("contests"),
                     "seats": row.get("seats"),
@@ -143,4 +229,8 @@ def emit(cc: str) -> str:
                         locator=spec["sources"][state["source"]]["url"],
                         quote=state["quote"],
                     )
+        cs.manifest["scope"] = {
+            "polity": spec["polity"],
+            "sweeps": [t for t in [*TABLES, "election_cadence", "results_access"] if t in cs.rows],
+        }
         return str(cs.write())

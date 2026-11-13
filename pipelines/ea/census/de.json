@@ -28,29 +28,736 @@
       "publisher": "Bundesministerium der Justiz (gesetze-im-internet.de)",
       "url": "https://www.gesetze-im-internet.de/euwg/__2.html",
       "kind": "official_body"
+    },
+    "gg": {
+      "title": "Grundgesetz für die Bundesrepublik Deutschland",
+      "publisher": "Bundesministerium der Justiz (gesetze-im-internet.de)",
+      "url": "https://www.gesetze-im-internet.de/gg/",
+      "kind": "official_body",
+      "note": "Art. 28 (local elections, EU citizens), Art. 29 and 118 (territorial referendums), Art. 39 (Bundestag term), Art. 54 (Federal Convention), Art. 63 (election of the Chancellor)."
+    },
+    "bt-bundesversammlung": {
+      "title": "Stichwort: Die Bundesversammlung. Die Wahl der Bundespräsidentin oder des Bundespräsidenten",
+      "publisher": "Deutscher Bundestag",
+      "url": "https://www.btg-bestellservice.de/pdf/20205000.pdf",
+      "kind": "official_body",
+      "note": "Section 'Die Bundespräsidenten seit 1949 im Überblick' lists each Federal Convention with its date and every ballot (Wahlgang)."
+    },
+    "bt-volkskammer": {
+      "title": "Erste frei gewählte DDR-Volkskammer",
+      "publisher": "Deutscher Bundestag",
+      "url": "https://www.bundestag.de/parlament/geschichte/parlamentarismus/10_volkskammer/10_volkskammer-200884",
+      "kind": "official_body"
+    },
+    "bt-datenhandbuch-6-1": {
+      "title": "Datenhandbuch zur Geschichte des Deutschen Bundestages, Kapitel 6.1: Wahl und Amtszeit der Bundeskanzler",
+      "publisher": "Deutscher Bundestag",
+      "url": "https://www.bundestag.de/resource/blob/196244/Kapitel_06_01_Wahl_und_Amtszeit_der_Bundeskanzler.pdf",
+      "kind": "official_body",
+      "note": "Lists each election of the Federal Chancellor with its ballots (Wahlgänge) and the yes, no, and abstention counts; the 6 May 2025 election of Friedrich Merz took two ballots."
+    },
+    "sgb4": {
+      "title": "Sozialgesetzbuch (SGB) Viertes Buch, §§ 43 to 66 (Wahlen der Selbstverwaltungsorgane)",
+      "publisher": "Bundesministerium der Justiz (gesetze-im-internet.de)",
+      "url": "https://www.gesetze-im-internet.de/sgb_4/__45.html",
+      "kind": "official_body"
+    },
+    "sj-reich-1932": {
+      "title": "Statistisches Jahrbuch für das Deutsche Reich 1932, XX. Wahlen und Abstimmungen",
+      "publisher": "Statistisches Reichsamt",
+      "url": "https://digi.bib.uni-mannheim.de/fileadmin/statjahrb/514401303_1932/pdf/514401303_0585.pdf",
+      "kind": "official_body",
+      "note": "Digitized by the Universitätsbibliothek Mannheim, one PDF per page. Printed pages 541 to 546: Reichstag elections 1919 to 1932 and by Wahlkreis (scan pages 0585 to 0587), Landtag elections in the German states (0588 and 0589), and the 1932 Reich President election by Wahlkreis (0590)."
+    },
+    "sj-reich-1930": {
+      "title": "Statistisches Jahrbuch für das Deutsche Reich 1930, Wahlen und Abstimmungen",
+      "publisher": "Statistisches Reichsamt",
+      "url": "https://digi.bib.uni-mannheim.de/fileadmin/statjahrb/514401303_1930/pdf/514401303_0611.pdf",
+      "kind": "official_body",
+      "note": "Digitized by the Universitätsbibliothek Mannheim. The index lists 'Zweiter Volksentscheid am 22. Dezember 1929'; scan page 0611 holds the table for the Gesetz gegen die Versklavung des Deutschen Volkes."
+    },
+    "sj-ddr-1956": {
+      "title": "Statistisches Jahrbuch der Deutschen Demokratischen Republik 1956, VII. Wahlen und Volksvertretungen",
+      "publisher": "Staatliche Zentralverwaltung für Statistik",
+      "url": "https://digi.bib.uni-mannheim.de/fileadmin/statjahrb/514402644_1956/pdf/514402644_0157.pdf",
+      "kind": "official_body",
+      "note": "Digitized by the Universitätsbibliothek Mannheim. Scan page 0157: 1. Volksentscheid im Land Sachsen am 30. Juni 1946; 2. Landtagswahlen am 20. Oktober 1946 (Brandenburg, Mecklenburg, Sachsen-Anhalt, Thüringen, Sachsen); 3. Volkskammerwahlen am 15. Oktober 1950. Scan page 0158: 4. Volksbefragung vom 3. bis 6. Juni 1951; 5. Volkskammerwahlen am 17. Oktober 1954 by Bezirk."
+    },
+    "bpb-ddr-1990": {
+      "title": "Parteiensystem und Wahlen in der DDR. Eine Analyse der Volkskammerwahl vom 18. März 1990 und der Kommunalwahlen vom 6. Mai 1990",
+      "publisher": "Bundeszentrale für politische Bildung (Aus Politik und Zeitgeschichte)",
+      "url": "https://www.bpb.de/shop/zeitschriften/apuz/archiv/535293/parteiensystem-und-wahlen-in-der-ddr-eine-analyse-der-volkskammerwahl-vom-18-maerz-1990-und-der-kommunalwahlen-vom-6-mai-1990/",
+      "kind": "official_body"
+    },
+    "destatis-vg-2025": {
+      "title": "Gemeindeverzeichnis: Verwaltungsgliederung in Deutschland am 31.12.2025 (Jahr)",
+      "publisher": "Statistisches Bundesamt (Destatis)",
+      "url": "https://www.destatis.de/DE/Themen/Laender-Regionen/Regionales/Gemeindeverzeichnis/Administrativ/Archiv/Verwaltungsgliederung/31122025_Jahr.html",
+      "kind": "official_body",
+      "note": "GV-ISys annual edition, Gebietsstand 31.12.2025, published August 2026. Sheet 2 gives per Land: Regierungsbezirke, Kreise insgesamt (kreisfreie Städte, Landkreise), Gemeinden insgesamt, and Gemeindeverbände; Deutschland: 19 Regierungsbezirke, 400 Kreise (106 kreisfreie Städte, 294 Landkreise), 10,753 Gemeinden, 1,203 Gemeindeverbände. Berlin and Hamburg count as one Gemeinde and one kreisfreie Stadt each, Bremen as two."
+    },
+    "berlin-bezirke": {
+      "title": "ALKIS Berlin Bezirke",
+      "publisher": "Senatsverwaltung für Stadtentwicklung, Bauen und Wohnen Berlin",
+      "url": "https://gdi.berlin.de/services/wfs/alkis_bezirke",
+      "kind": "official_body"
+    },
+    "hamburg-bezirke": {
+      "title": "WFS ALKIS Verwaltungsgrenzen Hamburg: Bezirke",
+      "publisher": "Landesbetrieb Geoinformation und Vermessung Hamburg",
+      "url": "https://geodienste.hamburg.de/HH_WFS_Verwaltungsgrenzen",
+      "kind": "official_body"
+    },
+    "bremen-beiraete": {
+      "title": "Wahl-ABC: Beiräte",
+      "publisher": "Freie Hansestadt Bremen, Landeswahlleiter",
+      "url": "https://www.wahlen.bremen.de/wissenswertes/wahl-abc/beiraete-7392",
+      "kind": "official_body"
+    },
+    "bw-kw": {
+      "title": "Kommunalwahlen",
+      "publisher": "Statistisches Landesamt Baden-Württemberg",
+      "url": "https://www.statistik-bw.de/Wahlen/Kommunal/",
+      "kind": "official_body"
+    },
+    "by-kw": {
+      "title": "Kommunalwahlen",
+      "publisher": "Bayerisches Landesamt für Statistik",
+      "url": "https://www.statistik.bayern.de/wahlen/kommunalwahlen/index.html",
+      "kind": "official_body"
+    },
+    "bb-kw": {
+      "title": "Kommunalwahlen in Brandenburg",
+      "publisher": "Amt für Statistik Berlin-Brandenburg",
+      "url": "https://www.statistik-berlin-brandenburg.de/kommunalwahlen-brandenburg",
+      "kind": "official_body"
+    },
+    "he-kw": {
+      "title": "Kommunalwahlen: Allgemeine Informationen",
+      "publisher": "Hessisches Ministerium des Innern, Landeswahlleiter",
+      "url": "https://wahlen.hessen.de/kommunalwahlen/allgemeine-informationen",
+      "kind": "official_body"
+    },
+    "mv-kw": {
+      "title": "Kommunalwahlen in Mecklenburg-Vorpommern",
+      "publisher": "Landesamt für innere Verwaltung Mecklenburg-Vorpommern, Landeswahlleiter",
+      "url": "https://www.laiv-mv.de/Wahlen/Kommunalwahlen/",
+      "kind": "official_body"
+    },
+    "ni-kw": {
+      "title": "Niedersächsisches Kommunalverfassungsgesetz (NKomVG)",
+      "publisher": "Niedersächsisches Ministerium für Inneres und Sport",
+      "url": "https://www.mi.niedersachsen.de/download/112321",
+      "kind": "official_body"
+    },
+    "by-bezwg": {
+      "title": "Bezirkswahlgesetz (BezWG)",
+      "publisher": "Bayerische Staatskanzlei (gesetze-bayern.de)",
+      "url": "https://www.gesetze-bayern.de/Content/Document/BayBezWG/true",
+      "kind": "official_body"
+    },
+    "by-glkrwg": {
+      "title": "Gemeinde- und Landkreiswahlgesetz (GLKrWG)",
+      "publisher": "Bayerische Staatskanzlei (gesetze-bayern.de)",
+      "url": "https://www.gesetze-bayern.de/Content/Document/BayGLKrWG/true",
+      "kind": "official_body"
+    },
+    "nw-kwahlg": {
+      "title": "Gesetz über die Kommunalwahlen im Lande Nordrhein-Westfalen (Kommunalwahlgesetz)",
+      "publisher": "Ministerium des Innern des Landes Nordrhein-Westfalen (recht.nrw.de)",
+      "url": "https://recht.nrw.de/lrgv/gesetz/28062025-bekanntmachung-der-neufassung-des-kommunalwahlgesetzes-kommunalwahlgesetz/",
+      "kind": "official_body",
+      "note": "§ 14 Abs. 1: Der Wahltag für die allgemeinen Kommunalwahlen wird von dem für Inneres zuständigen Ministerium festgelegt und bekannt gemacht. § 14 Abs. 2: Die allgemeinen Kommunalwahlen finden im vorletzten oder letzten Monat der laufenden Wahlperiode statt."
+    },
+    "nw-go": {
+      "title": "Gemeindeordnung für das Land Nordrhein-Westfalen (GO NRW)",
+      "publisher": "Ministerium des Innern des Landes Nordrhein-Westfalen (recht.nrw.de)",
+      "url": "https://recht.nrw.de/system/files/BH/6784-23268.htm",
+      "kind": "official_body",
+      "note": "§ 42 Abs. 1: Die Ratsmitglieder werden ... für die Dauer von fünf Jahren gewählt. § 65 Abs. 1: Der Bürgermeister wird ... auf die Dauer von fünf Jahren nach den Grundsätzen der Mehrheitswahl zugleich mit dem Rat gewählt. § 36: Bezirksvertretungen. § 27: Integrationsrat in Gemeinden mit mindestens 5 000 ausländischen Einwohnern."
+    },
+    "nw-kro": {
+      "title": "Kreisordnung für das Land Nordrhein-Westfalen (KrO NRW)",
+      "publisher": "Ministerium des Innern des Landes Nordrhein-Westfalen (recht.nrw.de)",
+      "url": "https://recht.nrw.de/system/files/BH/4063-25700.htm",
+      "kind": "official_body",
+      "note": "§ 27 Abs. 1: Die Kreistagsmitglieder werden ... auf die Dauer von fünf Jahren gewählt. § 44 Abs. 1: Der Landrat wird von den Bürgern der kreisangehörigen Gemeinden ... auf die Dauer von fünf Jahren nach den Grundsätzen der Mehrheitswahl zugleich mit dem Kreistag gewählt."
+    },
+    "nw-kw-2025": {
+      "title": "Kommunalwahlen 2025 in Nordrhein-Westfalen, Hefte 2.1, 3, and 4",
+      "publisher": "IT.NRW und Landeswahlleiterin Nordrhein-Westfalen",
+      "url": "https://www.wahlergebnisse.nrw/kommunalwahlen/2025/KW25_Heft_4.pdf",
+      "kind": "official_body",
+      "note": "General local elections of 14 September 2025 with mayoral and Landrat runoffs on 28 September 2025; Heft 4 gives council results by Gemeinde."
+    },
+    "rp-kw": {
+      "title": "Strukturbericht Kommunalwahlen 2024",
+      "publisher": "Die Landeswahlleiterin Rheinland-Pfalz",
+      "url": "https://www.wahlen.rlp.de/fileadmin/wahlen.rlp.de/dokumente-wahlen/kw/Strukturbericht_2024_fertig-1.pdf",
+      "kind": "official_body",
+      "note": "Kommunalwahlen of 9 June 2024, held with the European election; Stadtrat and Kreistag results from 1948."
+    },
+    "sl-kw": {
+      "title": "Europa- und Kommunalwahlen 2024 (vorläufige Ergebnisse), Einzelschriften 142",
+      "publisher": "Statistisches Landesamt Saarland",
+      "url": "https://www.statistischebibliothek.de/mir/servlets/MCRFileNodeServlet/SLHeft_derivate_00012234/SL%20Einzelschriften%20142%20(%20Europa%20und%20Kommunalwahlen%202024%20vorl.%20Ergebnisse).pdf",
+      "kind": "official_body",
+      "note": "Kommunalwahlen of 9 June 2024 (Gemeinderäte, Kreistage, Regionalversammlung, Ortsräte), held with the European election."
+    },
+    "sn-gemo": {
+      "title": "Gemeindeordnung für den Freistaat Sachsen (SächsGemO)",
+      "publisher": "Sächsische Staatskanzlei (REVOSax)",
+      "url": "https://www.revosax.sachsen.de/vorschrift/2754.1",
+      "kind": "official_body",
+      "note": "§ 33 Abs. 1: Die Wahlperiode des Gemeinderats beträgt fünf Jahre. § 48 Abs. 1: Der Bürgermeister wird von den Bürgern in allgemeiner, unmittelbarer, freier, gleicher und geheimer Wahl gewählt. § 51 Abs. 3: Die Amtszeit des Bürgermeisters beträgt sieben Jahre."
+    },
+    "st-kw": {
+      "title": "Kabinett stimmt Termin für Kommunalwahlen am 9. Juni im Jahr 2024 zu",
+      "publisher": "Staatskanzlei und Ministerium für Kultur des Landes Sachsen-Anhalt",
+      "url": "https://presse.sachsen-anhalt.de/wp-content/uploads/pdf/staatskanzlei_13_06_2023_Pressemitteilung_kabinett-stimmt-termin-fuer-kommunalwahlen-am-9-juni-im-jahr-2024-zu.pdf",
+      "kind": "official_body",
+      "note": "The cabinet set 9 June 2024 for the Kommunalwahlen (Kreistage, Gemeinderäte, Ortschaftsräte)."
+    },
+    "sh-gkwg": {
+      "title": "Gemeinde- und Kreiswahlgesetz (GKWG) Schleswig-Holstein",
+      "publisher": "Landesregierung Schleswig-Holstein (gesetze-rechtsprechung.sh.juris.de)",
+      "url": "https://www.gesetze-rechtsprechung.sh.juris.de/jportal/?quelle=jlink&query=KomWG+SH&psml=bsshoprod.psml&max=true",
+      "kind": "official_body",
+      "note": "Die Vertretungen der Gemeinden und der Kreise werden auf fünf Jahre gewählt. Die Wahlzeit beginnt jeweils am 1. Juni. Die Gemeindewahlen und die Kreiswahlen finden im letzten Maimonat einer Wahlzeit an einem von der Landesregierung zu bestimmenden Sonntag statt."
+    },
+    "sh-go": {
+      "title": "Gemeindeordnung für Schleswig-Holstein (GO), § 57",
+      "publisher": "Landesregierung Schleswig-Holstein (gesetze-rechtsprechung.sh.juris.de)",
+      "url": "https://www.gesetze-rechtsprechung.sh.juris.de/jportal/?quelle=jlink&query=GemO+SH+%C2%A7+57&psml=bsshoprod.psml&max=true",
+      "kind": "official_body",
+      "note": "Die Amtszeit der Bürgermeisterin oder des Bürgermeisters beträgt nach näherer Regelung in der Hauptsatzung mindestens sechs und höchstens acht Jahre."
+    },
+    "th-kw": {
+      "title": "Kommunalwahlen 2024 in Thüringen, Pressemitteilung 150/2024",
+      "publisher": "Thüringer Landesamt für Statistik",
+      "url": "https://statistik.thueringen.de/presse/2024/pr_150_24.pdf",
+      "kind": "official_body",
+      "note": "Kommunalwahlen of 26 May 2024 (Gemeinderäte, Stadträte, Kreistage, Bürgermeister, Landräte), runoffs on 9 June 2024."
+    },
+    "hb-wahlen": {
+      "title": "Wahlen im Land Bremen",
+      "publisher": "Freie Hansestadt Bremen, Landeswahlleiter",
+      "url": "https://www.wahlen.bremen.de/",
+      "kind": "official_body",
+      "note": "The Stadtbürgerschaft of the city of Bremen is formed from the Bürgerschaft members elected in the city, and the Stadtverordnetenversammlung Bremerhaven is elected on the same day, every four years (last 14 May 2023)."
+    },
+    "he-direkt": {
+      "title": "Direktwahlen: Allgemeine Informationen",
+      "publisher": "Hessisches Ministerium des Innern, Landeswahlleiter",
+      "url": "https://wahlen.hessen.de/kommunalwahlen/direktwahlen",
+      "kind": "official_body"
+    },
+    "be-wahlen": {
+      "title": "Wahlen in Berlin",
+      "publisher": "Amt für Statistik Berlin-Brandenburg",
+      "url": "https://www.statistik-berlin-brandenburg.de/wahlen-berlin",
+      "kind": "official_body",
+      "note": "Termine: 20. September 2026, Abgeordnetenhaus, Bezirksverordnetenversammlungen, Turnus 5 Jahre. Statistics on Europawahlen, Bundestagswahlen, Abgeordnetenhaus- und Bezirksverordnetenversammlungswahlen sowie Volksentscheiden in Berlin."
+    },
+    "hh-bv": {
+      "title": "Bezirksversammlungswahlen 2024 in Hamburg",
+      "publisher": "Statistisches Amt für Hamburg und Schleswig-Holstein (Statistik Nord)",
+      "url": "https://www.statistik-nord.de/wahlen/wahlen-in-hamburg/bezirksversammlungswahlen",
+      "kind": "official_body",
+      "note": "Die Wahlen zu den sieben Hamburger Bezirksversammlungen fanden am 9. Juni 2024 statt. Earlier elections listed: 2019, 2014, 2011, 2008, 2004, 2001; the site also covers Hamburg's Volksentscheide."
+    },
+    "mehr-demokratie-ve": {
+      "title": "Volksentscheide aufgrund von Volksbegehren in Deutschland (Übersicht nach Bundesländern)",
+      "publisher": "Mehr Demokratie e.V.",
+      "url": "https://www.mehr-demokratie.de/fileadmin/pdf/Uebersicht-Volksentscheide-BL.pdf",
+      "kind": "compendium"
+    },
+    "he-kw-2026": {
+      "title": "Kommunalwahlen: Allgemeine Kommunalwahlen am 15. März 2026",
+      "publisher": "Hessisches Ministerium des Innern, Landeswahlleiter",
+      "url": "https://wahlen.hessen.de/kommunalwahlen",
+      "kind": "official_body",
+      "note": "Die Wahlen der Gemeindevertretungen, Kreistage, Orts- und Ausländerbeiräte fanden am 15. März 2026 statt."
+    },
+    "vrs-2024": {
+      "title": "Amtliches Wahlergebnis der Regionalwahl 2024",
+      "publisher": "Verband Region Stuttgart",
+      "url": "https://www.region-stuttgart.org/fileadmin/Verband_Region_Stuttgart/Presseinformationen/2024/PM__20240712_Amtliches_Wahlergebnis_Regionalwahl_2024.pdf",
+      "kind": "official_body",
+      "note": "The Regionalversammlung is elected every five years with the municipal and district councils; the election of 9 June 2024 chose 92 regional councilors, turnout 67.21 percent."
     }
   },
   "tiers": [
     {
       "key": "national",
-      "name": "Federal Republic of Germany",
+      "name": "Bundesrepublik Deutschland",
       "parent": null,
       "polity_kind": "sovereign_state",
-      "source": "bwl-ergebnisse"
+      "source": "bwl-ergebnisse",
+      "name_en": "Federal Republic of Germany",
+      "scheme": "de.nation",
+      "valid_from": "1949-05-23"
     },
     {
       "key": "land",
       "name": "Länder",
       "parent": "national",
       "polity_kind": "federal_unit",
-      "source": "bwl-ltw"
+      "source": "bwl-ltw",
+      "name_en": "Federal states (Länder)",
+      "scheme": "de.land",
+      "counts": [
+        {
+          "date": "2025-12-31",
+          "value": 16,
+          "source": "destatis-vg-2025",
+          "locator": "https://www.destatis.de/DE/Themen/Laender-Regionen/Regionales/Gemeindeverzeichnis/Administrativ/Archiv/Verwaltungsgliederung/31122025_Jahr.xlsx?__blob=publicationFile"
+        }
+      ]
+    },
+    {
+      "key": "reich",
+      "name": "Deutsches Reich",
+      "name_en": "German Reich (1871–1945)",
+      "parent": null,
+      "polity_kind": "historical_state",
+      "valid_from": "1871-01-18",
+      "valid_to": "1945-05-08",
+      "source": "bwl-ergebnisse"
+    },
+    {
+      "key": "ddr",
+      "name": "Deutsche Demokratische Republik",
+      "name_en": "German Democratic Republic (1949–1990)",
+      "parent": null,
+      "polity_kind": "historical_state",
+      "valid_from": "1949-10-07",
+      "valid_to": "1990-10-03",
+      "source": "bt-volkskammer"
+    },
+    {
+      "key": "functional",
+      "name": "Träger der Sozialversicherung",
+      "name_en": "Social insurance carriers (non-territorial)",
+      "parent": "national",
+      "source": "sgb4"
+    },
+    {
+      "key": "regierungsbezirk",
+      "name": "Regierungsbezirke",
+      "name_en": "Government regions (state administrative districts; not elected)",
+      "parent": "land",
+      "elects": false,
+      "source": "destatis-vg-2025",
+      "counts": [
+        {
+          "within": "DE-NW",
+          "date": "2025-12-31",
+          "value": 5,
+          "source": "destatis-vg-2025",
+          "locator": "https://www.destatis.de/DE/Themen/Laender-Regionen/Regionales/Gemeindeverzeichnis/Administrativ/Archiv/Verwaltungsgliederung/31122025_Jahr.xlsx?__blob=publicationFile"
+        },
+        {
+          "within": "DE-HE",
+          "date": "2025-12-31",
+          "value": 3,
+          "source": "destatis-vg-2025",
+          "locator": "https://www.destatis.de/DE/Themen/Laender-Regionen/Regionales/Gemeindeverzeichnis/Administrativ/Archiv/Verwaltungsgliederung/31122025_Jahr.xlsx?__blob=publicationFile"
+        },
+        {
+          "within": "DE-BW",
+          "date": "2025-12-31",
+          "value": 4,
+          "source": "destatis-vg-2025",
+          "locator": "https://www.destatis.de/DE/Themen/Laender-Regionen/Regionales/Gemeindeverzeichnis/Administrativ/Archiv/Verwaltungsgliederung/31122025_Jahr.xlsx?__blob=publicationFile"
+        },
+        {
+          "within": "DE-BY",
+          "date": "2025-12-31",
+          "value": 7,
+          "source": "destatis-vg-2025",
+          "locator": "https://www.destatis.de/DE/Themen/Laender-Regionen/Regionales/Gemeindeverzeichnis/Administrativ/Archiv/Verwaltungsgliederung/31122025_Jahr.xlsx?__blob=publicationFile"
+        }
+      ]
+    },
+    {
+      "key": "bezirk_by",
+      "name": "Bezirke (Bayern)",
+      "name_en": "Bavarian districts (Bezirke), the third tier of local self-government",
+      "parent": "land",
+      "within": "DE-BY",
+      "source": "destatis-vg-2025",
+      "counts": [
+        {
+          "within": "DE-BY",
+          "date": "2025-12-31",
+          "value": 7,
+          "source": "destatis-vg-2025",
+          "locator": "https://www.destatis.de/DE/Themen/Laender-Regionen/Regionales/Gemeindeverzeichnis/Administrativ/Archiv/Verwaltungsgliederung/31122025_Jahr.xlsx?__blob=publicationFile"
+        }
+      ]
+    },
+    {
+      "key": "landkreis",
+      "name": "Landkreise",
+      "name_en": "Rural districts (Landkreise), including Region Hannover, Städteregion Aachen, and Regionalverband Saarbrücken",
+      "parent": "land",
+      "polity_kind": "county",
+      "scheme": "de.kreis",
+      "source": "destatis-vg-2025",
+      "counts": [
+        {
+          "within": "DE-SH",
+          "date": "2025-12-31",
+          "value": 11,
+          "source": "destatis-vg-2025",
+          "locator": "https://www.destatis.de/DE/Themen/Laender-Regionen/Regionales/Gemeindeverzeichnis/Administrativ/Archiv/Verwaltungsgliederung/31122025_Jahr.xlsx?__blob=publicationFile"
+        },
+        {
+          "within": "DE-NI",
+          "date": "2025-12-31",
+          "value": 37,
+          "source": "destatis-vg-2025",
+          "locator": "https://www.destatis.de/DE/Themen/Laender-Regionen/Regionales/Gemeindeverzeichnis/Administrativ/Archiv/Verwaltungsgliederung/31122025_Jahr.xlsx?__blob=publicationFile"
+        },
+        {
+          "within": "DE-NW",
+          "date": "2025-12-31",
+          "value": 31,
+          "source": "destatis-vg-2025",
+          "locator": "https://www.destatis.de/DE/Themen/Laender-Regionen/Regionales/Gemeindeverzeichnis/Administrativ/Archiv/Verwaltungsgliederung/31122025_Jahr.xlsx?__blob=publicationFile"
+        },
+        {
+          "within": "DE-HE",
+          "date": "2025-12-31",
+          "value": 21,
+          "source": "destatis-vg-2025",
+          "locator": "https://www.destatis.de/DE/Themen/Laender-Regionen/Regionales/Gemeindeverzeichnis/Administrativ/Archiv/Verwaltungsgliederung/31122025_Jahr.xlsx?__blob=publicationFile"
+        },
+        {
+          "within": "DE-RP",
+          "date": "2025-12-31",
+          "value": 24,
+          "source": "destatis-vg-2025",
+          "locator": "https://www.destatis.de/DE/Themen/Laender-Regionen/Regionales/Gemeindeverzeichnis/Administrativ/Archiv/Verwaltungsgliederung/31122025_Jahr.xlsx?__blob=publicationFile"
+        },
+        {
+          "within": "DE-BW",
+          "date": "2025-12-31",
+          "value": 35,
+          "source": "destatis-vg-2025",
+          "locator": "https://www.destatis.de/DE/Themen/Laender-Regionen/Regionales/Gemeindeverzeichnis/Administrativ/Archiv/Verwaltungsgliederung/31122025_Jahr.xlsx?__blob=publicationFile"
+        },
+        {
+          "within": "DE-BY",
+          "date": "2025-12-31",
+          "value": 71,
+          "source": "destatis-vg-2025",
+          "locator": "https://www.destatis.de/DE/Themen/Laender-Regionen/Regionales/Gemeindeverzeichnis/Administrativ/Archiv/Verwaltungsgliederung/31122025_Jahr.xlsx?__blob=publicationFile"
+        },
+        {
+          "within": "DE-SL",
+          "date": "2025-12-31",
+          "value": 6,
+          "source": "destatis-vg-2025",
+          "locator": "https://www.destatis.de/DE/Themen/Laender-Regionen/Regionales/Gemeindeverzeichnis/Administrativ/Archiv/Verwaltungsgliederung/31122025_Jahr.xlsx?__blob=publicationFile"
+        },
+        {
+          "within": "DE-BB",
+          "date": "2025-12-31",
+          "value": 14,
+          "source": "destatis-vg-2025",
+          "locator": "https://www.destatis.de/DE/Themen/Laender-Regionen/Regionales/Gemeindeverzeichnis/Administrativ/Archiv/Verwaltungsgliederung/31122025_Jahr.xlsx?__blob=publicationFile"
+        },
+        {
+          "within": "DE-MV",
+          "date": "2025-12-31",
+          "value": 6,
+          "source": "destatis-vg-2025",
+          "locator": "https://www.destatis.de/DE/Themen/Laender-Regionen/Regionales/Gemeindeverzeichnis/Administrativ/Archiv/Verwaltungsgliederung/31122025_Jahr.xlsx?__blob=publicationFile"
+        },
+        {
+          "within": "DE-SN",
+          "date": "2025-12-31",
+          "value": 10,
+          "source": "destatis-vg-2025",
+          "locator": "https://www.destatis.de/DE/Themen/Laender-Regionen/Regionales/Gemeindeverzeichnis/Administrativ/Archiv/Verwaltungsgliederung/31122025_Jahr.xlsx?__blob=publicationFile"
+        },
+        {
+          "within": "DE-ST",
+          "date": "2025-12-31",
+          "value": 11,
+          "source": "destatis-vg-2025",
+          "locator": "https://www.destatis.de/DE/Themen/Laender-Regionen/Regionales/Gemeindeverzeichnis/Administrativ/Archiv/Verwaltungsgliederung/31122025_Jahr.xlsx?__blob=publicationFile"
+        },
+        {
+          "within": "DE-TH",
+          "date": "2025-12-31",
+          "value": 17,
+          "source": "destatis-vg-2025",
+          "locator": "https://www.destatis.de/DE/Themen/Laender-Regionen/Regionales/Gemeindeverzeichnis/Administrativ/Archiv/Verwaltungsgliederung/31122025_Jahr.xlsx?__blob=publicationFile"
+        }
+      ]
+    },
+    {
+      "key": "gemeindeverband",
+      "name": "Gemeindeverbände",
+      "name_en": "Municipal associations (Ämter, Verbandsgemeinden, Samtgemeinden, Verwaltungsgemeinschaften, Verwaltungsverbände)",
+      "parent": "landkreis",
+      "source": "destatis-vg-2025",
+      "counts": [
+        {
+          "within": "DE-SH",
+          "date": "2025-12-31",
+          "value": 83,
+          "source": "destatis-vg-2025",
+          "locator": "https://www.destatis.de/DE/Themen/Laender-Regionen/Regionales/Gemeindeverzeichnis/Administrativ/Archiv/Verwaltungsgliederung/31122025_Jahr.xlsx?__blob=publicationFile"
+        },
+        {
+          "within": "DE-NI",
+          "date": "2025-12-31",
+          "value": 114,
+          "source": "destatis-vg-2025",
+          "locator": "https://www.destatis.de/DE/Themen/Laender-Regionen/Regionales/Gemeindeverzeichnis/Administrativ/Archiv/Verwaltungsgliederung/31122025_Jahr.xlsx?__blob=publicationFile"
+        },
+        {
+          "within": "DE-RP",
+          "date": "2025-12-31",
+          "value": 129,
+          "source": "destatis-vg-2025",
+          "locator": "https://www.destatis.de/DE/Themen/Laender-Regionen/Regionales/Gemeindeverzeichnis/Administrativ/Archiv/Verwaltungsgliederung/31122025_Jahr.xlsx?__blob=publicationFile"
+        },
+        {
+          "within": "DE-BW",
+          "date": "2025-12-31",
+          "value": 270,
+          "source": "destatis-vg-2025",
+          "locator": "https://www.destatis.de/DE/Themen/Laender-Regionen/Regionales/Gemeindeverzeichnis/Administrativ/Archiv/Verwaltungsgliederung/31122025_Jahr.xlsx?__blob=publicationFile"
+        },
+        {
+          "within": "DE-BY",
+          "date": "2025-12-31",
+          "value": 311,
+          "source": "destatis-vg-2025",
+          "locator": "https://www.destatis.de/DE/Themen/Laender-Regionen/Regionales/Gemeindeverzeichnis/Administrativ/Archiv/Verwaltungsgliederung/31122025_Jahr.xlsx?__blob=publicationFile"
+        },
+        {
+          "within": "DE-BB",
+          "date": "2025-12-31",
+          "value": 52,
+          "source": "destatis-vg-2025",
+          "locator": "https://www.destatis.de/DE/Themen/Laender-Regionen/Regionales/Gemeindeverzeichnis/Administrativ/Archiv/Verwaltungsgliederung/31122025_Jahr.xlsx?__blob=publicationFile"
+        },
+        {
+          "within": "DE-MV",
+          "date": "2025-12-31",
+          "value": 76,
+          "source": "destatis-vg-2025",
+          "locator": "https://www.destatis.de/DE/Themen/Laender-Regionen/Regionales/Gemeindeverzeichnis/Administrativ/Archiv/Verwaltungsgliederung/31122025_Jahr.xlsx?__blob=publicationFile"
+        },
+        {
+          "within": "DE-SN",
+          "date": "2025-12-31",
+          "value": 70,
+          "source": "destatis-vg-2025",
+          "locator": "https://www.destatis.de/DE/Themen/Laender-Regionen/Regionales/Gemeindeverzeichnis/Administrativ/Archiv/Verwaltungsgliederung/31122025_Jahr.xlsx?__blob=publicationFile"
+        },
+        {
+          "within": "DE-ST",
+          "date": "2025-12-31",
+          "value": 18,
+          "source": "destatis-vg-2025",
+          "locator": "https://www.destatis.de/DE/Themen/Laender-Regionen/Regionales/Gemeindeverzeichnis/Administrativ/Archiv/Verwaltungsgliederung/31122025_Jahr.xlsx?__blob=publicationFile"
+        },
+        {
+          "within": "DE-TH",
+          "date": "2025-12-31",
+          "value": 80,
+          "source": "destatis-vg-2025",
+          "locator": "https://www.destatis.de/DE/Themen/Laender-Regionen/Regionales/Gemeindeverzeichnis/Administrativ/Archiv/Verwaltungsgliederung/31122025_Jahr.xlsx?__blob=publicationFile"
+        }
+      ]
+    },
+    {
+      "key": "gemeinde",
+      "name": "Gemeinden",
+      "name_en": "Municipalities (Gemeinden), including the 106 kreisfreie Städte",
+      "parent": "landkreis",
+      "polity_kind": "municipality",
+      "scheme": "de.gemeinde",
+      "source": "destatis-vg-2025",
+      "counts": [
+        {
+          "within": "DE-SH",
+          "date": "2025-12-31",
+          "value": 1104,
+          "source": "destatis-vg-2025",
+          "locator": "https://www.destatis.de/DE/Themen/Laender-Regionen/Regionales/Gemeindeverzeichnis/Administrativ/Archiv/Verwaltungsgliederung/31122025_Jahr.xlsx?__blob=publicationFile"
+        },
+        {
+          "within": "DE-HH",
+          "date": "2025-12-31",
+          "value": 1,
+          "source": "destatis-vg-2025",
+          "locator": "https://www.destatis.de/DE/Themen/Laender-Regionen/Regionales/Gemeindeverzeichnis/Administrativ/Archiv/Verwaltungsgliederung/31122025_Jahr.xlsx?__blob=publicationFile"
+        },
+        {
+          "within": "DE-NI",
+          "date": "2025-12-31",
+          "value": 941,
+          "source": "destatis-vg-2025",
+          "locator": "https://www.destatis.de/DE/Themen/Laender-Regionen/Regionales/Gemeindeverzeichnis/Administrativ/Archiv/Verwaltungsgliederung/31122025_Jahr.xlsx?__blob=publicationFile"
+        },
+        {
+          "within": "DE-HB",
+          "date": "2025-12-31",
+          "value": 2,
+          "source": "destatis-vg-2025",
+          "locator": "https://www.destatis.de/DE/Themen/Laender-Regionen/Regionales/Gemeindeverzeichnis/Administrativ/Archiv/Verwaltungsgliederung/31122025_Jahr.xlsx?__blob=publicationFile"
+        },
+        {
+          "within": "DE-NW",
+          "date": "2025-12-31",
+          "value": 396,
+          "source": "destatis-vg-2025",
+          "locator": "https://www.destatis.de/DE/Themen/Laender-Regionen/Regionales/Gemeindeverzeichnis/Administrativ/Archiv/Verwaltungsgliederung/31122025_Jahr.xlsx?__blob=publicationFile"
+        },
+        {
+          "within": "DE-HE",
+          "date": "2025-12-31",
+          "value": 421,
+          "source": "destatis-vg-2025",
+          "locator": "https://www.destatis.de/DE/Themen/Laender-Regionen/Regionales/Gemeindeverzeichnis/Administrativ/Archiv/Verwaltungsgliederung/31122025_Jahr.xlsx?__blob=publicationFile"
+        },
+        {
+          "within": "DE-RP",
+          "date": "2025-12-31",
+          "value": 2300,
+          "source": "destatis-vg-2025",
+          "locator": "https://www.destatis.de/DE/Themen/Laender-Regionen/Regionales/Gemeindeverzeichnis/Administrativ/Archiv/Verwaltungsgliederung/31122025_Jahr.xlsx?__blob=publicationFile"
+        },
+        {
+          "within": "DE-BW",
+          "date": "2025-12-31",
+          "value": 1101,
+          "source": "destatis-vg-2025",
+          "locator": "https://www.destatis.de/DE/Themen/Laender-Regionen/Regionales/Gemeindeverzeichnis/Administrativ/Archiv/Verwaltungsgliederung/31122025_Jahr.xlsx?__blob=publicationFile"
+        },
+        {
+          "within": "DE-BY",
+          "date": "2025-12-31",
+          "value": 2056,
+          "source": "destatis-vg-2025",
+          "locator": "https://www.destatis.de/DE/Themen/Laender-Regionen/Regionales/Gemeindeverzeichnis/Administrativ/Archiv/Verwaltungsgliederung/31122025_Jahr.xlsx?__blob=publicationFile"
+        },
+        {
+          "within": "DE-SL",
+          "date": "2025-12-31",
+          "value": 52,
+          "source": "destatis-vg-2025",
+          "locator": "https://www.destatis.de/DE/Themen/Laender-Regionen/Regionales/Gemeindeverzeichnis/Administrativ/Archiv/Verwaltungsgliederung/31122025_Jahr.xlsx?__blob=publicationFile"
+        },
+        {
+          "within": "DE-BE",
+          "date": "2025-12-31",
+          "value": 1,
+          "source": "destatis-vg-2025",
+          "locator": "https://www.destatis.de/DE/Themen/Laender-Regionen/Regionales/Gemeindeverzeichnis/Administrativ/Archiv/Verwaltungsgliederung/31122025_Jahr.xlsx?__blob=publicationFile"
+        },
+        {
+          "within": "DE-BB",
+          "date": "2025-12-31",
+          "value": 413,
+          "source": "destatis-vg-2025",
+          "locator": "https://www.destatis.de/DE/Themen/Laender-Regionen/Regionales/Gemeindeverzeichnis/Administrativ/Archiv/Verwaltungsgliederung/31122025_Jahr.xlsx?__blob=publicationFile"
+        },
+        {
+          "within": "DE-MV",
+          "date": "2025-12-31",
+          "value": 724,
+          "source": "destatis-vg-2025",
+          "locator": "https://www.destatis.de/DE/Themen/Laender-Regionen/Regionales/Gemeindeverzeichnis/Administrativ/Archiv/Verwaltungsgliederung/31122025_Jahr.xlsx?__blob=publicationFile"
+        },
+        {
+          "within": "DE-SN",
+          "date": "2025-12-31",
+          "value": 418,
+          "source": "destatis-vg-2025",
+          "locator": "https://www.destatis.de/DE/Themen/Laender-Regionen/Regionales/Gemeindeverzeichnis/Administrativ/Archiv/Verwaltungsgliederung/31122025_Jahr.xlsx?__blob=publicationFile"
+        },
+        {
+          "within": "DE-ST",
+          "date": "2025-12-31",
+          "value": 218,
+          "source": "destatis-vg-2025",
+          "locator": "https://www.destatis.de/DE/Themen/Laender-Regionen/Regionales/Gemeindeverzeichnis/Administrativ/Archiv/Verwaltungsgliederung/31122025_Jahr.xlsx?__blob=publicationFile"
+        },
+        {
+          "within": "DE-TH",
+          "date": "2025-12-31",
+          "value": 605,
+          "source": "destatis-vg-2025",
+          "locator": "https://www.destatis.de/DE/Themen/Laender-Regionen/Regionales/Gemeindeverzeichnis/Administrativ/Archiv/Verwaltungsgliederung/31122025_Jahr.xlsx?__blob=publicationFile"
+        }
+      ]
+    },
+    {
+      "key": "bezirk_be",
+      "name": "Bezirke (Berlin)",
+      "name_en": "Berlin boroughs",
+      "parent": "land",
+      "within": "DE-BE",
+      "polity_kind": "submunicipal",
+      "scheme": "de.bezirk",
+      "source": "berlin-bezirke",
+      "counts": [
+        {
+          "within": "DE-BE",
+          "date": "2026-11-13",
+          "value": 12,
+          "source": "berlin-bezirke"
+        }
+      ]
+    },
+    {
+      "key": "bezirk_hh",
+      "name": "Bezirke (Hamburg)",
+      "name_en": "Hamburg boroughs",
+      "parent": "land",
+      "within": "DE-HH",
+      "polity_kind": "submunicipal",
+      "scheme": "de.bezirk",
+      "source": "hamburg-bezirke",
+      "counts": [
+        {
+          "within": "DE-HH",
+          "date": "2026-11-13",
+          "value": 7,
+          "source": "hamburg-bezirke"
+        }
+      ]
+    },
+    {
+      "key": "ortsteil",
+      "name": "Ortschaften, Ortsbezirke, Stadtbezirke",
+      "name_en": "Sub-municipal units with elected councils (Ortschaften, Ortsbezirke, Stadtbezirke, Bremen's Beiratsbereiche)",
+      "parent": "gemeinde",
+      "polity_kind": "submunicipal",
+      "source": "bremen-beiraete"
+    },
+    {
+      "key": "regionalverband",
+      "name": "Regionalverbände und höhere Kommunalverbände mit direkt gewählter Versammlung",
+      "name_en": "Regional associations with a directly elected assembly (Verband Region Stuttgart, Regionalverband Ruhr, Bezirksverband Pfalz)",
+      "parent": "land",
+      "source": "vrs-2024"
     }
   ],
   "classes": [
     {
       "key": "bundestag",
       "tier": "national",
-      "name": "Bundestag elections",
+      "name": "Wahl zum Deutschen Bundestag",
       "category": "legislature",
       "goal": "national",
       "measure": {
@@ -247,6 +954,32 @@
           "note": "Seats from bwl-ergebnisse Table 12, row 2025 Insg. 630. Wkr. 276 there is directly won seats, not constituencies. Early election, per Table 1.",
           "source": "bwl-wahlkreise-2025",
           "quote": "Das Bundesgebiet ist derzeit in 299 Wahlkreise eingeteilt. Table of Anzahl Wahlkreise per Land: Baden-Württemberg 38; Bayern 47; Berlin 12; Brandenburg 10; Bremen 2; Hamburg 6; Hessen 22; Mecklenburg-Vorpommern 6; Niedersachsen 30; Nordrhein-Westfalen 64; Rheinland-Pfalz 15; Saarland 4; Sachsen 16; Sachsen-Anhalt 8; Schleswig-Holstein 11; Thüringen 8"
+        }
+      ],
+      "name_en": "Bundestag elections",
+      "first_held": "1949-08-14",
+      "earliest_record": "1949-08-14",
+      "cadence": [
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "called": true,
+          "administered_by": "Die Bundeswahlleiterin",
+          "source": "gg",
+          "locator": "https://www.gesetze-im-internet.de/gg/art_39.html"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Die Bundeswahlleiterin, open data",
+          "url": "https://www.bundeswahlleiterin.de/bundestagswahlen/2025/ergebnisse/opendata.html",
+          "format": "CSV and XML",
+          "access": "open",
+          "first_date": "1949-08-14",
+          "checked_at": "2026-11-13T00:00:00Z",
+          "license": "Datenlizenz Deutschland – Namensnennung – Version 2.0",
+          "finest": "de.wahlbezirk",
+          "evidence": "Polling-district files from 2017 to 2025; constituency files (btw_kerg.zip) back to 1949."
         }
       ]
     },
@@ -2194,13 +2927,27 @@
           },
           "source": "bwl-ltw",
           "quote": "Table 1, 20.09.2026: MV 9.; BE 20."
+        },
+        {
+          "date": "1946-10-20",
+          "contests": 5,
+          "regions": {
+            "BB": 1,
+            "MV": 1,
+            "ST": 1,
+            "TH": 1,
+            "SN": 1
+          },
+          "note": "The five Landtage of the Soviet zone, which the Federal Returning Officer's Table 1 leaves out.",
+          "source": "sj-ddr-1956",
+          "quote": "2. Landtagswahlen am 20. Oktober 1946: Brandenburg, Mecklenburg, Sachsen-Anhalt, Thüringen, Sachsen"
         }
       ]
     },
     {
       "key": "ep",
       "tier": "national",
-      "name": "European Parliament elections in Germany",
+      "name": "Europawahl in Deutschland",
       "category": "legislature",
       "goal": "ep",
       "measure": {
@@ -2219,7 +2966,8 @@
           "body_kinds": [
             "unicameral"
           ],
-          "iso_pattern": "EU"
+          "iso_pattern": "EU",
+          "within": null
         }
       ],
       "dates": [
@@ -2293,7 +3041,1613 @@
           "source": "euwg-2",
           "quote": "Listenwahlvorschläge können für ein Land oder als gemeinsame Liste für alle Länder aufgestellt werden. … Jeder Wahlvorschlag erhält so viele Sitze, wie sich nach Teilung seiner gesamten Stimmen im Wahlgebiet durch einen Zuteilungsdivisor ergeben."
         }
+      ],
+      "name_en": "European Parliament elections in Germany",
+      "first_held": "1979-06-10",
+      "earliest_record": "1979-06-10",
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 4,
+          "term_years": 5,
+          "administered_by": "Die Bundeswahlleiterin",
+          "source": "euwg-2"
+        }
       ]
+    },
+    {
+      "dates": [
+        {
+          "date": "1949-09-12",
+          "election_kind": "indirect",
+          "contests": 2,
+          "source": "bt-bundesversammlung",
+          "quote": "1. Bundesversammlung vom 12. September 1949 in Bonn: 2 Wahlgange"
+        },
+        {
+          "date": "1954-07-17",
+          "election_kind": "indirect",
+          "contests": 1,
+          "source": "bt-bundesversammlung",
+          "quote": "2. Bundesversammlung vom 17. Juli 1954 in Berlin: 1 Wahlgang"
+        },
+        {
+          "date": "1959-07-01",
+          "election_kind": "indirect",
+          "contests": 2,
+          "source": "bt-bundesversammlung",
+          "quote": "3. Bundesversammlung vom 1. Juli 1959 in Berlin: 2 Wahlgange"
+        },
+        {
+          "date": "1964-07-01",
+          "election_kind": "indirect",
+          "contests": 1,
+          "source": "bt-bundesversammlung",
+          "quote": "4. Bundesversammlung vom 1. Juli 1964 in Berlin: 1 Wahlgang"
+        },
+        {
+          "date": "1969-03-05",
+          "election_kind": "indirect",
+          "contests": 3,
+          "source": "bt-bundesversammlung",
+          "quote": "5. Bundesversammlung vom 5. März 1969 in Berlin: 3 Wahlgange"
+        },
+        {
+          "date": "1974-05-15",
+          "election_kind": "indirect",
+          "contests": 1,
+          "source": "bt-bundesversammlung",
+          "quote": "6. Bundesversammlung vom 15. Mai 1974 in Bonn: 1 Wahlgang"
+        },
+        {
+          "date": "1979-05-23",
+          "election_kind": "indirect",
+          "contests": 1,
+          "source": "bt-bundesversammlung",
+          "quote": "7. Bundesversammlung vom 23. Mai 1979 in Bonn: 1 Wahlgang"
+        },
+        {
+          "date": "1984-05-23",
+          "election_kind": "indirect",
+          "contests": 1,
+          "source": "bt-bundesversammlung",
+          "quote": "8. Bundesversammlung vom 23. Mai 1984 in Bonn: 1 Wahlgang"
+        },
+        {
+          "date": "1989-05-23",
+          "election_kind": "indirect",
+          "contests": 1,
+          "source": "bt-bundesversammlung",
+          "quote": "9. Bundesversammlung vom 23. Mai 1989 in Bonn: 1 Wahlgang"
+        },
+        {
+          "date": "1994-05-23",
+          "election_kind": "indirect",
+          "contests": 3,
+          "source": "bt-bundesversammlung",
+          "quote": "10. Bundesversammlung vom 23. Mai 1994 in Berlin: 3 Wahlgange"
+        },
+        {
+          "date": "1999-05-23",
+          "election_kind": "indirect",
+          "contests": 2,
+          "source": "bt-bundesversammlung",
+          "quote": "11. Bundesversammlung vom 23. Mai 1999 in Berlin: 2 Wahlgange"
+        },
+        {
+          "date": "2004-05-23",
+          "election_kind": "indirect",
+          "contests": 1,
+          "source": "bt-bundesversammlung",
+          "quote": "12. Bundesversammlung vom 23. Mai 2004 in Berlin: 1 Wahlgang"
+        },
+        {
+          "date": "2009-05-23",
+          "election_kind": "indirect",
+          "contests": 1,
+          "source": "bt-bundesversammlung",
+          "quote": "13. Bundesversammlung vom 23. Mai 2009 in Berlin: 1 Wahlgang"
+        },
+        {
+          "date": "2010-06-30",
+          "election_kind": "indirect",
+          "contests": 3,
+          "source": "bt-bundesversammlung",
+          "quote": "14. Bundesversammlung vom 30. Juni 2010 in Berlin: 3 Wahlgange"
+        },
+        {
+          "date": "2012-03-18",
+          "election_kind": "indirect",
+          "contests": 1,
+          "source": "bt-bundesversammlung",
+          "quote": "15. Bundesversammlung vom 18. März 2012 in Berlin: 1 Wahlgang"
+        },
+        {
+          "date": "2017-02-12",
+          "election_kind": "indirect",
+          "contests": 1,
+          "source": "bt-bundesversammlung",
+          "quote": "16. Bundesversammlung vom 12. Februar 2017 in Berlin: 1 Wahlgang"
+        },
+        {
+          "date": "2022-02-13",
+          "election_kind": "indirect",
+          "contests": 1,
+          "source": "bt-bundesversammlung",
+          "quote": "17. Bundesversammlung vom 13. Februar 2022 in Berlin: 1 Wahlgang"
+        }
+      ],
+      "key": "bundesversammlung",
+      "tier": "national",
+      "name": "Wahl des Bundespräsidenten durch die Bundesversammlung",
+      "name_en": "Election of the Federal President by the Federal Convention",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "ballot"
+      },
+      "first_held": "1949-09-12",
+      "earliest_record": "1949-09-12",
+      "note": "Counted per ballot (Wahlgang): a third ballot is held when no candidate wins an absolute majority in the first two. The Federal Convention is the Bundestag plus an equal number of members chosen by the Landtage.",
+      "source": "bt-bundesversammlung",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "DE"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": true,
+          "runoff": "majority",
+          "runoff_rule": "Absolute majority in the first two ballots; a plurality elects in the third (Art. 54 Abs. 6 GG).",
+          "administered_by": "Präsident des Deutschen Bundestages",
+          "vacancy_rule": "On early end of term the Convention meets within 30 days (Art. 54 Abs. 4 GG), as in 2010 and 2012.",
+          "source": "gg",
+          "locator": "https://www.gesetze-im-internet.de/gg/art_54.html"
+        }
+      ]
+    },
+    {
+      "dates": [],
+      "key": "kanzlerwahl",
+      "tier": "national",
+      "name": "Wahl des Bundeskanzlers durch den Bundestag",
+      "name_en": "Election of the Federal Chancellor by the Bundestag",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "ballot"
+      },
+      "first_held": "1949-09-15",
+      "note": "Secret ballot of the Bundestag on the Federal President's proposal (Art. 63 GG), with further ballots when the first fails, and constructive votes of no confidence (Art. 67 GG, 1972 and 1982). The Bundestag's plenary records and Datenhandbuch give each ballot's yes, no, and abstention counts.",
+      "source": "bt-datenhandbuch-6-1",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "head_of_government"
+          ],
+          "iso_pattern": "DE"
+        }
+      ],
+      "est_votes": 25000,
+      "effort": 1
+    },
+    {
+      "dates": [],
+      "key": "neugliederung",
+      "tier": "land",
+      "name": "Volksabstimmungen zur Neugliederung des Bundesgebietes",
+      "name_en": "Territorial referendums on the boundaries of the Länder",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "question"
+      },
+      "first_held": "1951-12-09",
+      "note": "Held under Art. 29 and 118 GG: the Südweststaat vote of 9 December 1951 that formed Baden-Württemberg, the Baden vote of 7 June 1970, the Oldenburg and Schaumburg-Lippe votes of 19 January 1975, and the Berlin–Brandenburg merger vote of 5 May 1996. The Saar statute referendum of 23 October 1955 preceded the Saar's accession.",
+      "source": "gg",
+      "locator": "https://www.gesetze-im-internet.de/gg/art_29.html",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "iso_pattern": "DE"
+        }
+      ],
+      "est_votes": 8000000,
+      "effort": 3
+    },
+    {
+      "dates": [],
+      "key": "sozialwahl",
+      "tier": "functional",
+      "name": "Sozialversicherungswahlen (Sozialwahl)",
+      "name_en": "Social insurance self-government elections",
+      "category": "non_territorial",
+      "goal": "national",
+      "measure": {
+        "unit": "carrier"
+      },
+      "note": "Every six years (2011, 2017, 2023, next 2029) the insured and employers elect the boards (Vertreterversammlung, Verwaltungsrat) of the pension, health, and accident insurance carriers; most carriers settle by agreed lists without a vote (Friedenswahl), and a few hold postal ballots (Urwahl). Run by each carrier's election committee under the Federal Commissioner for Social Insurance Elections, who publishes a final report.",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Functional self-government of social insurance carriers with lists of unions and employer and insured-persons' associations, like chamber and workplace votes; no territorial office and no party lists.",
+      "source": "sgb4"
+    },
+    {
+      "dates": [
+        {
+          "date": "1871-03-03",
+          "contests": 382,
+          "seats": 382,
+          "source": "bwl-ergebnisse",
+          "quote": "Table 17, Ergebnisse der Wahlen zum Reichstag am 3. März 1871: Gesamtzahl der Abgeordneten 382"
+        },
+        {
+          "date": "1874-01-10",
+          "contests": 397,
+          "seats": 397,
+          "source": "bwl-ergebnisse",
+          "quote": "Table 17, Ergebnisse der Wahlen zum Reichstag am 10. Januar 1874: Gesamtzahl der Abgeordneten 397"
+        },
+        {
+          "date": "1877-01-10",
+          "contests": 397,
+          "seats": 397,
+          "source": "bwl-ergebnisse",
+          "quote": "Table 17, Ergebnisse der Wahlen zum Reichstag am 10. Januar 1877: Gesamtzahl der Abgeordneten 397"
+        },
+        {
+          "date": "1878-06-30",
+          "contests": 397,
+          "seats": 397,
+          "source": "bwl-ergebnisse",
+          "quote": "Table 17, Ergebnisse der Wahlen zum Reichstag am 30. Juni 1878: Gesamtzahl der Abgeordneten 397"
+        },
+        {
+          "date": "1881-10-27",
+          "contests": 397,
+          "seats": 397,
+          "source": "bwl-ergebnisse",
+          "quote": "Table 17, Ergebnisse der Wahlen zum Reichstag am 27. Oktober 1881: Gesamtzahl der Abgeordneten 397"
+        },
+        {
+          "date": "1884-10-28",
+          "contests": 397,
+          "seats": 397,
+          "source": "bwl-ergebnisse",
+          "quote": "Table 17, Ergebnisse der Wahlen zum Reichstag am 28. Oktober 1884: Gesamtzahl der Abgeordneten 397"
+        },
+        {
+          "date": "1887-02-21",
+          "contests": 397,
+          "seats": 397,
+          "source": "bwl-ergebnisse",
+          "quote": "Table 17, Ergebnisse der Wahlen zum Reichstag am 21. Februar 1887: Gesamtzahl der Abgeordneten 397"
+        },
+        {
+          "date": "1890-02-20",
+          "contests": 397,
+          "seats": 397,
+          "source": "bwl-ergebnisse",
+          "quote": "Table 17, Ergebnisse der Wahlen zum Reichstag am 20. Februar 1890: Gesamtzahl der Abgeordneten 397"
+        },
+        {
+          "date": "1893-06-15",
+          "contests": 397,
+          "seats": 397,
+          "source": "bwl-ergebnisse",
+          "quote": "Table 17, Ergebnisse der Wahlen zum Reichstag am 15. Juni 1893: Gesamtzahl der Abgeordneten 397"
+        },
+        {
+          "date": "1898-06-16",
+          "contests": 397,
+          "seats": 397,
+          "source": "bwl-ergebnisse",
+          "quote": "Table 17, Ergebnisse der Wahlen zum Reichstag am 16. Juni 1898: Gesamtzahl der Abgeordneten 397"
+        },
+        {
+          "date": "1903-06-16",
+          "contests": 397,
+          "seats": 397,
+          "source": "bwl-ergebnisse",
+          "quote": "Table 17, Ergebnisse der Wahlen zum Reichstag am 16. Juni 1903: Gesamtzahl der Abgeordneten 397"
+        },
+        {
+          "date": "1907-01-25",
+          "contests": 397,
+          "seats": 397,
+          "source": "bwl-ergebnisse",
+          "quote": "Table 17, Ergebnisse der Wahlen zum Reichstag am 25. Januar 1907: Gesamtzahl der Abgeordneten 397"
+        },
+        {
+          "date": "1912-01-12",
+          "contests": 397,
+          "seats": 397,
+          "source": "bwl-ergebnisse",
+          "quote": "Table 17, Ergebnisse der Wahlen zum Reichstag am 12. Januar 1912: Gesamtzahl der Abgeordneten 397"
+        },
+        {
+          "date": "1919-01-19",
+          "seats": 421,
+          "source": "bwl-ergebnisse",
+          "quote": "Table 18, Ergebnisse der Wahlen zur Nationalversammlung am 19. Januar 1919: Gesamtzahl der Abgeordneten 421"
+        },
+        {
+          "date": "1920-06-06",
+          "seats": 459,
+          "source": "bwl-ergebnisse",
+          "quote": "Table 18, Ergebnisse der Wahlen zum Reichstag am 6. Juni 1920: Gesamtzahl der Abgeordneten 459"
+        },
+        {
+          "date": "1924-05-04",
+          "seats": 472,
+          "source": "bwl-ergebnisse",
+          "quote": "Table 18, Ergebnisse der Wahlen zum Reichstag am 4. Mai 1924: Gesamtzahl der Abgeordneten 472"
+        },
+        {
+          "date": "1924-12-07",
+          "seats": 493,
+          "source": "bwl-ergebnisse",
+          "quote": "Table 18, Ergebnisse der Wahlen zum Reichstag am 7. Dez. 1924: Gesamtzahl der Abgeordneten 493"
+        },
+        {
+          "date": "1928-05-20",
+          "seats": 491,
+          "source": "bwl-ergebnisse",
+          "quote": "Table 18, Ergebnisse der Wahlen zum Reichstag am 20. Mai 1928: Gesamtzahl der Abgeordneten 491"
+        },
+        {
+          "date": "1930-09-14",
+          "seats": 577,
+          "source": "bwl-ergebnisse",
+          "quote": "Table 18, Ergebnisse der Wahlen zum Reichstag am 14. Sept. 1930: Gesamtzahl der Abgeordneten 577"
+        },
+        {
+          "date": "1932-07-31",
+          "seats": 608,
+          "source": "bwl-ergebnisse",
+          "quote": "Table 18, Ergebnisse der Wahlen zum Reichstag am 31. Juli 1932: Gesamtzahl der Abgeordneten 608"
+        },
+        {
+          "date": "1932-11-06",
+          "seats": 584,
+          "source": "bwl-ergebnisse",
+          "quote": "Table 18, Ergebnisse der Wahlen zum Reichstag am 6. Nov. 1932: Gesamtzahl der Abgeordneten 584"
+        },
+        {
+          "date": "1933-03-05",
+          "seats": 647,
+          "source": "bwl-ergebnisse",
+          "quote": "Table 18, Ergebnisse der Wahlen zum Reichstag am 5. März 1933: Gesamtzahl der Abgeordneten 647"
+        }
+      ],
+      "key": "reichstag",
+      "tier": "reich",
+      "name": "Wahlen zum Reichstag und zur Nationalversammlung",
+      "name_en": "Reichstag and National Assembly elections (1871–1933)",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1871-01-18",
+      "valid_to": "1933-11-12",
+      "first_held": "1871-03-03",
+      "earliest_record": "1871-03-03",
+      "measure": {
+        "unit": "constituency"
+      },
+      "note": "Empire 1871–1912: single-member constituencies (Reichstagswahlkreise) with a runoff (Stichwahl) when no candidate won a majority, counted per constituency. 1919 National Assembly and Weimar Reichstag 1920–1933: list proportional representation in 35 Wahlkreise with a national remainder list, counted per election until the Wahlkreis counts are cited. The single-list votes of 1933 (November), 1936, and 1938 are not free elections and are not listed. Tables 17 and 18 of the Federal Returning Officer's compendium give dates, electorate, votes, and seats.",
+      "source": "bwl-ergebnisse",
+      "locator": "https://www.bundeswahlleiterin.de/dam/jcr/397735e3-0585-46f6-a0b5-2c60c5b83de6/btw_ab49_gesamt.pdf#page=140",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff"
+          ],
+          "body_kinds": [
+            "lower_house",
+            "constituent_assembly"
+          ],
+          "iso_pattern": "DE",
+          "valid_to": "1933-11-12",
+          "precedence": 1
+        }
+      ],
+      "est_votes": 410000000,
+      "effort": 5
+    },
+    {
+      "dates": [],
+      "key": "reichspraesident",
+      "tier": "reich",
+      "name": "Wahl des Reichspräsidenten",
+      "name_en": "Reich President elections (1925 and 1932)",
+      "category": "executive",
+      "goal": "national",
+      "valid_from": "1919-08-14",
+      "valid_to": "1934-08-02",
+      "first_held": "1925-03-29",
+      "measure": {
+        "unit": "round"
+      },
+      "note": "Direct popular election under Art. 41 of the Weimar Constitution, in two rounds: 29 March and 26 April 1925, and 13 March and 10 April 1932. Friedrich Ebert (1919) was chosen by the National Assembly.",
+      "source": "sj-reich-1932",
+      "locator": "https://digi.bib.uni-mannheim.de/fileadmin/statjahrb/514401303_1932/pdf/514401303_0590.pdf",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "DE",
+          "valid_to": "1934-08-02"
+        }
+      ],
+      "est_votes": 150000000,
+      "effort": 3
+    },
+    {
+      "dates": [],
+      "key": "reich_volksentscheid",
+      "tier": "reich",
+      "name": "Volksentscheide im Deutschen Reich",
+      "name_en": "Reich referendums (1926–1938)",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "valid_from": "1919-08-14",
+      "valid_to": "1945-05-08",
+      "first_held": "1926-06-20",
+      "measure": {
+        "unit": "question"
+      },
+      "note": "Weimar Volksentscheide on the expropriation of the princes (20 June 1926) and the Young Plan (22 December 1929), and the plebiscites of 12 November 1933, 19 August 1934, and 10 April 1938.",
+      "source": "sj-reich-1930",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "iso_pattern": "DE",
+          "valid_to": "1945-05-08",
+          "precedence": 1
+        }
+      ],
+      "est_votes": 150000000,
+      "effort": 3
+    },
+    {
+      "dates": [],
+      "key": "reich_landtage",
+      "tier": "reich",
+      "name": "Landtagswahlen der Länder des Deutschen Reiches",
+      "name_en": "Landtag elections of the states of the Reich (1919–1933)",
+      "category": "legislature",
+      "goal": "subnational",
+      "valid_from": "1918-11-09",
+      "valid_to": "1934-01-30",
+      "first_held": "1919-01-12",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "Elections to the parliaments of Prussia, Bavaria, Saxony, Württemberg, Baden, Thuringia, Hesse, Hamburg, and the other states under Weimar, ended by the Gleichschaltung of 1933 and the abolition of the Landtage on 30 January 1934. The Empire's state diets (Prussia's three-class franchise among them) are earlier and not yet surveyed.",
+      "source": "sj-reich-1932",
+      "locator": "https://digi.bib.uni-mannheim.de/fileadmin/statjahrb/514401303_1932/pdf/514401303_0588.pdf",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "unicameral",
+            "lower_house"
+          ],
+          "iso_pattern": "DE-*",
+          "valid_to": "1934-01-30",
+          "precedence": 1
+        }
+      ],
+      "est_votes": 250000000,
+      "effort": 5
+    },
+    {
+      "dates": [
+        {
+          "date": "1950-10-15",
+          "note": "Single list of the National Front.",
+          "source": "sj-ddr-1956",
+          "quote": "3. Volkskammerwahlen am 15. Oktober 1950"
+        },
+        {
+          "date": "1954-10-17",
+          "note": "Single list of the National Front, by Bezirk.",
+          "source": "sj-ddr-1956",
+          "locator": "https://digi.bib.uni-mannheim.de/fileadmin/statjahrb/514402644_1956/pdf/514402644_0158.pdf",
+          "quote": "5. Volkskammerwahlen am 17. Oktober 1954"
+        },
+        {
+          "date": "1990-03-18",
+          "contests": 15,
+          "seats": 400,
+          "source": "bt-volkskammer",
+          "quote": "Mit den freien Volkskammerwahlen am 18. März 1990 … Die 400 Abgeordneten der Volkskammer wurden nach den Grundsätzen des Verhältniswahlrechts gewählt. Das Wahlgebiet wurde in 15 Wahlkreise eingeteilt."
+        }
+      ],
+      "key": "volkskammer",
+      "tier": "ddr",
+      "name": "Wahlen zur Volkskammer der DDR",
+      "name_en": "GDR People's Chamber elections (1950–1990)",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1949-10-07",
+      "valid_to": "1990-10-03",
+      "first_held": "1950-10-15",
+      "measure": {
+        "unit": "constituency"
+      },
+      "note": "From 1950 to 1986 a single list of the National Front, with no choice between candidates; the free election of 18 March 1990 used list proportional representation in 15 constituencies (the 14 Bezirke and East Berlin) without a threshold, electing 400 members.",
+      "source": "bt-volkskammer",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "DE",
+          "valid_from": "1950-01-01",
+          "valid_to": "1990-10-03"
+        }
+      ],
+      "est_votes": 12400000,
+      "effort": 3
+    },
+    {
+      "dates": [],
+      "key": "ddr_kommunal",
+      "tier": "ddr",
+      "name": "Wahlen zu den örtlichen Volksvertretungen der DDR",
+      "name_en": "GDR local assembly elections (Bezirkstage, Kreistage, city and municipal assemblies)",
+      "category": "council",
+      "goal": "local",
+      "valid_from": "1949-10-07",
+      "valid_to": "1990-10-03",
+      "first_held": "1950-10-15",
+      "measure": {
+        "unit": "assembly"
+      },
+      "note": "Single lists of the National Front from 1950 to 1989 (the falsified count of 7 May 1989 among them); the free Kommunalwahlen of 6 May 1990 elected the Kreistage, city assemblies, and Gemeindevertretungen that carried over into the new Länder. The Bezirkstage were not re-elected in 1990 and ended with the Länder in October 1990. The Soviet zone's Gemeinde and Kreistag elections of September and October 1946 precede the GDR.",
+      "source": "bpb-ddr-1990",
+      "match": [
+        {
+          "election_kinds": [
+            "local"
+          ],
+          "iso_pattern": "DE-*",
+          "valid_from": "1949-10-07",
+          "valid_to": "1990-10-03",
+          "precedence": 1
+        }
+      ],
+      "est_votes": 12000000,
+      "effort": 4
+    },
+    {
+      "dates": [],
+      "key": "ddr_abstimmungen",
+      "tier": "ddr",
+      "name": "Volksbefragungen und Volksentscheide der DDR",
+      "name_en": "GDR plebiscites (1951 and 1968)",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "valid_from": "1949-10-07",
+      "valid_to": "1990-10-03",
+      "first_held": "1951-06-03",
+      "measure": {
+        "unit": "question"
+      },
+      "note": "The Volksbefragung of 3 to 6 June 1951 against remilitarization and the constitutional Volksentscheid of 6 April 1968; neither offered a free choice.",
+      "source": "sj-ddr-1956",
+      "locator": "https://digi.bib.uni-mannheim.de/fileadmin/statjahrb/514402644_1956/pdf/514402644_0158.pdf",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "iso_pattern": "DE",
+          "valid_from": "1949-10-07",
+          "valid_to": "1990-10-03",
+          "precedence": 1
+        }
+      ],
+      "est_votes": 23000000,
+      "effort": 3
+    },
+    {
+      "dates": [],
+      "key": "gemeinderat",
+      "tier": "gemeinde",
+      "name": "Wahlen der Gemeinderäte, Stadträte, Gemeindevertretungen und Stadtverordnetenversammlungen",
+      "name_en": "Municipal council elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "municipality",
+        "schemes": [
+          "de.gemeinde"
+        ]
+      },
+      "contests_per_unit": 1,
+      "note": "Every municipality elects its council (Gemeinderat, Stadtrat, Gemeindevertretung, Stadtverordnetenversammlung, Rat) by list proportional representation, in Baden-Württemberg, Bavaria, Hesse, Rhineland-Palatinate, and other Länder with panachage and cumulation; EU citizens vote (Art. 28 GG). Each Land fixes its own term and day: five years everywhere except Bavaria (six years, March) and Bremen (four years, with the Bürgerschaft). Berlin and Hamburg have no municipal council; their parliaments act as both. Cadence rows from Rhineland-Palatinate, Saarland, Saxony-Anhalt, Schleswig-Holstein, and Thuringia cite results publications or statute excerpts, not the full statute text.",
+      "source": "destatis-vg-2025",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "runoff"
+          ],
+          "body_kinds": [
+            "council",
+            "unicameral"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 4,
+          "source": "bw-kw",
+          "within": "DE-BW"
+        },
+        {
+          "period_years": 6,
+          "phase": 4,
+          "month": 3,
+          "source": "by-glkrwg",
+          "locator": "https://www.gesetze-bayern.de/Content/Document/BayGLKrWG-9",
+          "within": "DE-BY"
+        },
+        {
+          "period_years": 5,
+          "phase": 4,
+          "source": "bb-kw",
+          "within": "DE-BB"
+        },
+        {
+          "period_years": 5,
+          "phase": 1,
+          "source": "he-kw",
+          "within": "DE-HE"
+        },
+        {
+          "period_years": 5,
+          "phase": 4,
+          "source": "mv-kw",
+          "within": "DE-MV"
+        },
+        {
+          "period_years": 5,
+          "phase": 1,
+          "source": "ni-kw",
+          "within": "DE-NI"
+        },
+        {
+          "period_years": 5,
+          "phase": 0,
+          "month": 9,
+          "source": "nw-kwahlg",
+          "within": "DE-NW"
+        },
+        {
+          "period_years": 5,
+          "phase": 4,
+          "month": 6,
+          "source": "rp-kw",
+          "within": "DE-RP"
+        },
+        {
+          "period_years": 5,
+          "phase": 4,
+          "month": 6,
+          "source": "sl-kw",
+          "within": "DE-SL"
+        },
+        {
+          "period_years": 5,
+          "phase": 4,
+          "source": "sn-gemo",
+          "within": "DE-SN"
+        },
+        {
+          "period_years": 5,
+          "phase": 4,
+          "source": "st-kw",
+          "within": "DE-ST"
+        },
+        {
+          "period_years": 5,
+          "phase": 3,
+          "month": 5,
+          "source": "sh-gkwg",
+          "within": "DE-SH"
+        },
+        {
+          "period_years": 5,
+          "phase": 4,
+          "source": "th-kw",
+          "within": "DE-TH"
+        },
+        {
+          "period_years": 4,
+          "phase": 3,
+          "month": 5,
+          "source": "hb-wahlen",
+          "within": "DE-HB"
+        }
+      ],
+      "access": [
+        {
+          "within": "DE-BW",
+          "platform": "Statistisches Landesamt Baden-Württemberg",
+          "url": "https://www.statistik-bw.de/Wahlen/Kommunal/",
+          "format": "HTML and XLSX",
+          "access": "open",
+          "checked_at": "2026-11-13T00:00:00Z",
+          "finest": "de.gemeinde"
+        },
+        {
+          "within": "DE-BY",
+          "platform": "Bayerisches Landesamt für Statistik",
+          "url": "https://www.statistik.bayern.de/wahlen/kommunalwahlen/index.html",
+          "format": "HTML and XLSX",
+          "access": "open",
+          "checked_at": "2026-11-13T00:00:00Z",
+          "finest": "de.gemeinde"
+        },
+        {
+          "within": "DE-BB",
+          "platform": "Amt für Statistik Berlin-Brandenburg",
+          "url": "https://www.statistik-berlin-brandenburg.de/kommunalwahlen-brandenburg",
+          "format": "XLSX",
+          "access": "open",
+          "checked_at": "2026-11-13T00:00:00Z",
+          "finest": "de.gemeinde",
+          "evidence": "The Kommunalwahlen page offers XLSX results by Gemeinde, including Verbandsgemeindeversammlungen."
+        },
+        {
+          "within": "DE-NW",
+          "platform": "IT.NRW und Landeswahlleiterin Nordrhein-Westfalen",
+          "url": "https://www.wahlergebnisse.nrw/kommunalwahlen/",
+          "format": "PDF and HTML",
+          "access": "open",
+          "checked_at": "2026-11-13T00:00:00Z",
+          "finest": "de.gemeinde",
+          "source": "nw-kw-2025"
+        },
+        {
+          "within": "DE-RP",
+          "platform": "Die Landeswahlleiterin Rheinland-Pfalz",
+          "url": "https://www.wahlen.rlp.de/",
+          "format": "PDF",
+          "access": "open",
+          "checked_at": "2026-11-13T00:00:00Z",
+          "source": "rp-kw"
+        },
+        {
+          "within": "DE-ST",
+          "platform": "Statistisches Landesamt Sachsen-Anhalt",
+          "url": "https://wahlergebnisse.sachsen-anhalt.de/",
+          "format": "HTML",
+          "access": "open",
+          "checked_at": "2026-11-13T00:00:00Z",
+          "source": "st-kw"
+        }
+      ],
+      "est_votes": 30000000,
+      "effort": 4
+    },
+    {
+      "dates": [],
+      "key": "kreistag",
+      "tier": "landkreis",
+      "name": "Kreistagswahlen",
+      "name_en": "District council (Kreistag) elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "county",
+        "schemes": [
+          "de.kreis"
+        ]
+      },
+      "contests_per_unit": 1,
+      "note": "All 294 Landkreise elect a Kreistag on the Land's local election day, for the same term as the municipal councils (six years in Bavaria, five elsewhere); the 106 kreisfreie Städte have no Kreistag. Region Hannover, the Städteregion Aachen, and the Regionalverband Saarbrücken elect their assemblies the same way.",
+      "source": "destatis-vg-2025",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "runoff"
+          ],
+          "body_kinds": [
+            "council",
+            "unicameral"
+          ],
+          "polity_kinds": [
+            "county"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 4,
+          "source": "bw-kw",
+          "within": "DE-BW"
+        },
+        {
+          "period_years": 6,
+          "phase": 4,
+          "month": 3,
+          "source": "by-glkrwg",
+          "locator": "https://www.gesetze-bayern.de/Content/Document/BayGLKrWG-9",
+          "within": "DE-BY"
+        },
+        {
+          "period_years": 5,
+          "phase": 4,
+          "source": "bb-kw",
+          "within": "DE-BB"
+        },
+        {
+          "period_years": 5,
+          "phase": 1,
+          "source": "he-kw",
+          "within": "DE-HE"
+        },
+        {
+          "period_years": 5,
+          "phase": 4,
+          "source": "mv-kw",
+          "within": "DE-MV"
+        },
+        {
+          "period_years": 5,
+          "phase": 1,
+          "source": "ni-kw",
+          "within": "DE-NI"
+        },
+        {
+          "period_years": 5,
+          "phase": 0,
+          "month": 9,
+          "source": "nw-kwahlg",
+          "within": "DE-NW"
+        },
+        {
+          "period_years": 5,
+          "phase": 4,
+          "month": 6,
+          "source": "rp-kw",
+          "within": "DE-RP"
+        },
+        {
+          "period_years": 5,
+          "phase": 4,
+          "month": 6,
+          "source": "sl-kw",
+          "within": "DE-SL"
+        },
+        {
+          "period_years": 5,
+          "phase": 4,
+          "source": "sn-gemo",
+          "within": "DE-SN"
+        },
+        {
+          "period_years": 5,
+          "phase": 4,
+          "source": "st-kw",
+          "within": "DE-ST"
+        },
+        {
+          "period_years": 5,
+          "phase": 3,
+          "month": 5,
+          "source": "sh-gkwg",
+          "within": "DE-SH"
+        },
+        {
+          "period_years": 5,
+          "phase": 4,
+          "source": "th-kw",
+          "within": "DE-TH"
+        }
+      ],
+      "est_votes": 22000000,
+      "effort": 3
+    },
+    {
+      "dates": [],
+      "key": "buergermeister",
+      "tier": "gemeinde",
+      "name": "Direktwahl der Bürgermeister und Oberbürgermeister",
+      "name_en": "Direct mayoral elections",
+      "category": "executive",
+      "goal": "local",
+      "measure": {
+        "unit": "municipality",
+        "schemes": [
+          "de.gemeinde"
+        ]
+      },
+      "note": "Every Land elects its full-time mayors directly, with a runoff (a plurality second ballot in Saxony); terms run from five years (North Rhine-Westphalia) to ten, and most mayoral elections fall on their own dates rather than the general local election day. Honorary mayors are elected directly in some Länder and by the council in others. Bremen's and Bremerhaven's mayors are chosen by their assemblies.",
+      "source": "destatis-vg-2025",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "runoff"
+          ],
+          "office_kinds": [
+            "mayor"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "term_years": 8,
+          "runoff": "majority",
+          "runoff_rule": "Stichwahl between the top two on the second to fourth Sunday after the first ballot (GemO § 45 Abs. 2).",
+          "source": "bw-kw",
+          "within": "DE-BW"
+        },
+        {
+          "term_years": 6,
+          "runoff": "majority",
+          "runoff_rule": "Stichwahl between the top two on the second Sunday after the first ballot (GLKrWG Art. 46).",
+          "source": "by-kw",
+          "within": "DE-BY"
+        },
+        {
+          "term_years": 8,
+          "runoff": "majority",
+          "source": "bb-kw",
+          "within": "DE-BB"
+        },
+        {
+          "term_years": 6,
+          "runoff": "majority",
+          "source": "he-direkt",
+          "within": "DE-HE"
+        },
+        {
+          "runoff": "majority",
+          "runoff_rule": "Runoff two weeks after the first ballot.",
+          "source": "mv-kw",
+          "within": "DE-MV"
+        },
+        {
+          "runoff": "majority",
+          "source": "ni-kw",
+          "within": "DE-NI"
+        },
+        {
+          "term_years": 5,
+          "runoff": "majority",
+          "runoff_rule": "Stichwahl between the top two on the second Sunday after the first ballot.",
+          "source": "nw-go",
+          "within": "DE-NW"
+        },
+        {
+          "term_years": 8,
+          "runoff": "majority",
+          "source": "rp-kw",
+          "within": "DE-RP"
+        },
+        {
+          "runoff": "majority",
+          "source": "sl-kw",
+          "within": "DE-SL"
+        },
+        {
+          "term_years": 7,
+          "runoff": "majority",
+          "runoff_rule": "A second ballot (zweiter Wahlgang) open to new candidates, decided by plurality.",
+          "source": "sn-gemo",
+          "locator": "https://www.revosax.sachsen.de/vorschrift/2754.1#p51",
+          "within": "DE-SN"
+        },
+        {
+          "term_years": 7,
+          "runoff": "majority",
+          "source": "st-kw",
+          "within": "DE-ST"
+        },
+        {
+          "runoff": "majority",
+          "source": "sh-go",
+          "within": "DE-SH"
+        },
+        {
+          "term_years": 6,
+          "runoff": "majority",
+          "runoff_rule": "Stichwahl two weeks after the first ballot.",
+          "source": "th-kw",
+          "within": "DE-TH"
+        }
+      ],
+      "est_votes": 25000000,
+      "effort": 5
+    },
+    {
+      "dates": [],
+      "key": "landrat",
+      "tier": "landkreis",
+      "name": "Direktwahl der Landräte",
+      "name_en": "Direct elections of district executives (Landräte)",
+      "category": "executive",
+      "goal": "local",
+      "measure": {
+        "unit": "county",
+        "schemes": [
+          "de.kreis"
+        ]
+      },
+      "note": "Landräte are elected directly in Bavaria, Hesse, Mecklenburg-Vorpommern, Lower Saxony, North Rhine-Westphalia, Rhineland-Palatinate, Saarland, Saxony, Saxony-Anhalt, and Thuringia; in Baden-Württemberg, Brandenburg, and Schleswig-Holstein the Kreistag chooses them.",
+      "source": "destatis-vg-2025",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "runoff"
+          ],
+          "office_kinds": [
+            "mayor",
+            "other"
+          ],
+          "polity_kinds": [
+            "county"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "term_years": 6,
+          "runoff": "majority",
+          "runoff_rule": "Stichwahl between the top two on the second Sunday after the first ballot (GLKrWG Art. 46).",
+          "source": "by-kw",
+          "within": "DE-BY"
+        },
+        {
+          "term_years": 6,
+          "runoff": "majority",
+          "source": "he-direkt",
+          "within": "DE-HE"
+        },
+        {
+          "runoff": "majority",
+          "runoff_rule": "Runoff two weeks after the first ballot.",
+          "source": "mv-kw",
+          "within": "DE-MV"
+        },
+        {
+          "runoff": "majority",
+          "source": "ni-kw",
+          "within": "DE-NI"
+        },
+        {
+          "term_years": 8,
+          "runoff": "majority",
+          "source": "rp-kw",
+          "within": "DE-RP"
+        },
+        {
+          "runoff": "majority",
+          "source": "sl-kw",
+          "within": "DE-SL"
+        },
+        {
+          "term_years": 7,
+          "runoff": "majority",
+          "source": "st-kw",
+          "within": "DE-ST"
+        },
+        {
+          "term_years": 6,
+          "runoff": "majority",
+          "runoff_rule": "Stichwahl two weeks after the first ballot.",
+          "source": "th-kw",
+          "within": "DE-TH"
+        },
+        {
+          "term_years": 5,
+          "runoff": "majority",
+          "runoff_rule": "Stichwahl between the top two on the second Sunday after the first ballot.",
+          "source": "nw-kro",
+          "within": "DE-NW"
+        },
+        {
+          "term_years": 7,
+          "runoff": "majority",
+          "source": "sn-gemo",
+          "within": "DE-SN"
+        }
+      ],
+      "est_votes": 15000000,
+      "effort": 4
+    },
+    {
+      "dates": [],
+      "key": "bvv_berlin",
+      "tier": "bezirk_be",
+      "name": "Wahlen zu den Bezirksverordnetenversammlungen",
+      "name_en": "Berlin borough assembly elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "borough",
+        "schemes": [
+          "de.bezirk"
+        ]
+      },
+      "contests_per_unit": 1,
+      "note": "Held with every Abgeordnetenhaus election (including the full repeat of 12 February 2023); EU citizens and 16-year-olds vote. Each of the 12 assemblies has 55 members.",
+      "source": "be-wahlen",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "local"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "iso_pattern": "DE-BE",
+          "schemes": [
+            "de.bezirk"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "within": "DE-BE",
+          "period_years": 5,
+          "phase": 1,
+          "term_years": 5,
+          "called": true,
+          "administered_by": "Landeswahlleiter für Berlin",
+          "source": "be-wahlen"
+        }
+      ],
+      "access": [
+        {
+          "within": "DE-BE",
+          "platform": "Amt für Statistik Berlin-Brandenburg",
+          "url": "https://www.statistik-berlin-brandenburg.de/wahlen-berlin",
+          "format": "XLSX and CSV",
+          "access": "open",
+          "checked_at": "2026-11-13T00:00:00Z",
+          "finest": "de.wahlbezirk"
+        }
+      ],
+      "est_votes": 1700000,
+      "effort": 2
+    },
+    {
+      "dates": [],
+      "key": "bezirksversammlung_hamburg",
+      "tier": "bezirk_hh",
+      "name": "Wahlen zu den Bezirksversammlungen",
+      "name_en": "Hamburg borough assembly elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "borough",
+        "schemes": [
+          "de.bezirk"
+        ]
+      },
+      "contests_per_unit": 1,
+      "note": "Held with the Bürgerschaft until 2011 and with the European election since 2014.",
+      "source": "hh-bv",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "runoff"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "iso_pattern": "DE-HH"
+        }
+      ],
+      "cadence": [
+        {
+          "within": "DE-HH",
+          "period_years": 5,
+          "phase": 4,
+          "term_years": 5,
+          "administered_by": "Landeswahlleitung Hamburg",
+          "source": "hh-bv"
+        }
+      ],
+      "access": [
+        {
+          "within": "DE-HH",
+          "platform": "Statistik Nord",
+          "url": "https://www.statistik-nord.de/wahlen/wahlen-in-hamburg/bezirksversammlungswahlen",
+          "format": "XLSX and PDF",
+          "access": "open",
+          "first_date": "2001-09-23",
+          "checked_at": "2026-11-13T00:00:00Z"
+        }
+      ],
+      "est_votes": 700000,
+      "effort": 2
+    },
+    {
+      "dates": [],
+      "key": "bezirkstag_bayern",
+      "tier": "bezirk_by",
+      "name": "Bezirkswahlen in Bayern",
+      "name_en": "Bavarian district assembly (Bezirkstag) elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "bezirk"
+      },
+      "contests_per_unit": 1,
+      "note": "The seven Bezirkstage are elected for five years together with the Landtag, by Stimmkreis with first and second votes like the Landtag.",
+      "source": "by-bezwg",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "local"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "iso_pattern": "DE-BY",
+          "name_pattern": "Bezirkstag"
+        }
+      ],
+      "cadence": [
+        {
+          "within": "DE-BY",
+          "period_years": 5,
+          "phase": 3,
+          "term_years": 5,
+          "called": true,
+          "administered_by": "Landeswahlleiter des Freistaates Bayern",
+          "source": "by-bezwg",
+          "locator": "https://www.gesetze-bayern.de/Content/Document/BayBezWG-1"
+        }
+      ],
+      "est_votes": 13000000,
+      "effort": 2
+    },
+    {
+      "dates": [],
+      "key": "regionalversammlung",
+      "tier": "regionalverband",
+      "name": "Wahlen der Regionalversammlung Stuttgart, der Verbandsversammlung des Regionalverbands Ruhr und des Bezirkstags Pfalz",
+      "name_en": "Regional assembly elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "region"
+      },
+      "contests_per_unit": 1,
+      "first_held": "1994-06-12",
+      "note": "Three regional bodies above the Kreise elect their assemblies directly with the local elections: the Verband Region Stuttgart since 1994 (92 members in 2024), the Bezirksverband Pfalz's Bezirkstag, and the Regionalverband Ruhr since 13 September 2020. The Regionalversammlung of the Regionalverband Saarbrücken, Region Hannover's Regionsversammlung, and the Städteregionstag Aachen count with the Kreistage.",
+      "source": "vrs-2024",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "runoff"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "name_pattern": "(Regionalversammlung|Verbandsversammlung|Bezirkstag Pfalz)"
+        }
+      ],
+      "cadence": [
+        {
+          "within": "DE-BW",
+          "period_years": 5,
+          "phase": 4,
+          "term_years": 5,
+          "source": "vrs-2024"
+        },
+        {
+          "within": "DE-NW",
+          "period_years": 5,
+          "phase": 0,
+          "term_years": 5,
+          "source": "nw-kw-2025"
+        },
+        {
+          "within": "DE-RP",
+          "period_years": 5,
+          "phase": 4,
+          "term_years": 5,
+          "source": "rp-kw"
+        }
+      ],
+      "est_votes": 4500000,
+      "effort": 1
+    },
+    {
+      "dates": [],
+      "key": "gemeindeverband_rat",
+      "tier": "gemeindeverband",
+      "name": "Wahlen der Verbandsgemeinderäte, Samtgemeinderäte und Verbandsgemeindeversammlungen",
+      "name_en": "Municipal association council elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "municipal association"
+      },
+      "contests_per_unit": 1,
+      "note": "Of the 1,203 Gemeindeverbände, only the Verbandsgemeinden of Rhineland-Palatinate and Saxony-Anhalt, the Samtgemeinden of Lower Saxony, and Brandenburg's Verbandsgemeinden (since 2024) elect a council directly, with the local elections, and the first three also elect a Bürgermeister directly; Ämter, Verwaltungsgemeinschaften, and Verwaltungsverbände are run by delegates of their member municipalities.",
+      "source": "destatis-vg-2025",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "runoff"
+          ],
+          "name_pattern": "(Verbandsgemeinde|Samtgemeinde)"
+        }
+      ],
+      "est_votes": 4000000,
+      "effort": 4
+    },
+    {
+      "dates": [],
+      "key": "ministerpraesidentenwahl",
+      "tier": "land",
+      "name": "Wahl der Ministerpräsidenten, Regierenden Bürgermeister und Präsidenten des Senats durch die Landtage",
+      "name_en": "Election of state premiers by the Landtage",
+      "category": "indirect",
+      "goal": "subnational",
+      "measure": {
+        "unit": "ballot"
+      },
+      "first_held": "1946-12-16",
+      "note": "Each Landtag elects the head of the Land government by secret ballot, with further ballots when the first fails (for example Hesse 2008 and Thuringia 2020 and 2024); the Landtag's plenary records give each ballot's counts.",
+      "source": "bwl-ltw",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "head_of_government"
+          ],
+          "iso_pattern": "DE-*"
+        }
+      ],
+      "est_votes": 30000,
+      "effort": 3
+    },
+    {
+      "dates": [],
+      "key": "ortsbeirat",
+      "tier": "ortsteil",
+      "name": "Wahlen der Ortschaftsräte, Ortsbeiräte, Ortsräte, Bezirksvertretungen und Beiräte",
+      "name_en": "Sub-municipal council elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "submunicipal"
+      },
+      "note": "Elected with the municipal councils where the municipality's main statute creates them: Ortschaftsräte (BW, SN, ST, TH), Ortsbeiräte (HE, BB, MV, RP, SH), Ortsräte and Stadtbezirksräte (NI, SL), Bezirksvertretungen in NRW's kreisfreie Städte, Munich's Bezirksausschüsse, and Bremen's 22 Beiräte (directly elected with the Bürgerschaft since 1991). No national register counts the units.",
+      "source": "bremen-beiraete",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "runoff"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "submunicipal"
+          ],
+          "precedence": -1
+        }
+      ],
+      "est_votes": 15000000,
+      "effort": 5
+    },
+    {
+      "dates": [],
+      "key": "ortsvorsteher",
+      "tier": "ortsteil",
+      "name": "Direktwahl der Ortsvorsteher und Ortsbürgermeister",
+      "name_en": "Direct elections of sub-municipal executives",
+      "category": "executive",
+      "goal": "local",
+      "measure": {
+        "unit": "submunicipal"
+      },
+      "note": "Directly elected Ortsvorsteher in Rhineland-Palatinate's Ortsbezirke and Ortsteilbürgermeister in Thuringia; elsewhere the Ortschaftsrat or Ortsbeirat chooses its chair.",
+      "source": "bremen-beiraete",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "runoff"
+          ],
+          "office_kinds": [
+            "mayor",
+            "other"
+          ],
+          "polity_kinds": [
+            "submunicipal"
+          ]
+        }
+      ],
+      "est_votes": 1500000,
+      "effort": 5
+    },
+    {
+      "dates": [],
+      "key": "volksentscheide",
+      "tier": "land",
+      "name": "Volksentscheide und Volksabstimmungen in den Ländern",
+      "name_en": "State referendums (Volksentscheide)",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "question"
+      },
+      "first_held": "1946-06-30",
+      "note": "Constitutional referendums and Volksentscheide after a Volksbegehren in every Land, from Saxony's expropriation vote of 30 June 1946 and the 1946 to 1947 votes on the first Land constitutions; Bavaria, Berlin, and Hamburg hold most. Results are published by each Land's returning officer and statistics office; no official compilation lists them all.",
+      "source": "mehr-demokratie-ve",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "iso_pattern": "DE-*"
+        }
+      ],
+      "est_votes": 60000000,
+      "effort": 3
+    },
+    {
+      "dates": [],
+      "key": "buergerentscheide",
+      "tier": "gemeinde",
+      "name": "Bürgerentscheide in Gemeinden, Kreisen und Bezirken",
+      "name_en": "Local referendums (Bürgerentscheide)",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "question"
+      },
+      "note": "Allowed in every Land's municipal code (for example Bavaria's GO Art. 18a and Baden-Württemberg's GemO § 21) and in Berlin's and Hamburg's boroughs; results stay with each municipality, and no Land office keeps a full list.",
+      "source": "by-glkrwg",
+      "locator": "https://www.gesetze-bayern.de/Content/Document/BayGO-18a",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum",
+            "local"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "polity_kinds": [
+            "municipality",
+            "county",
+            "submunicipal"
+          ]
+        }
+      ],
+      "est_votes": 5000000,
+      "effort": 5
+    },
+    {
+      "dates": [],
+      "key": "auslaenderbeirat",
+      "tier": "gemeinde",
+      "name": "Wahlen der Ausländerbeiräte, Integrationsräte und Beiräte für Migration und Integration",
+      "name_en": "Foreign residents' advisory council elections",
+      "category": "non_territorial",
+      "goal": "local",
+      "measure": {
+        "unit": "municipality"
+      },
+      "note": "Statutory advisory councils elected by foreign residents: Hesse's Ausländerbeiräte (with the Kommunalwahl, last 15 March 2026), North Rhine-Westphalia's Integrationsräte (with the Kommunalwahl), and Rhineland-Palatinate's Beiräte für Migration und Integration, plus optional councils elsewhere.",
+      "source": "he-kw-2026",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "runoff"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "name_pattern": "(Ausländerbeirat|Integrationsrat|Migration)"
+        }
+      ],
+      "est_votes": 300000,
+      "effort": 4
+    },
+    {
+      "dates": [],
+      "key": "kammerwahlen",
+      "tier": "functional",
+      "name": "Kammer-, Betriebsrats-, Personalrats- und Hochschulwahlen",
+      "name_en": "Chamber, workplace, and university elections",
+      "category": "non_territorial",
+      "goal": "local",
+      "measure": {},
+      "disposition": "out_of_scope",
+      "disposition_reason": "Workplace and professional-chamber votes (IHK, Handwerkskammern, medical and legal chambers, works and staff councils, university bodies) run by the bodies themselves for their members, not by the electoral authorities for a territorial electorate.",
+      "source": "sgb4"
+    },
+    {
+      "dates": [],
+      "key": "kirchen_parteien",
+      "tier": "functional",
+      "name": "Kirchenwahlen und parteiinterne Abstimmungen",
+      "name_en": "Church and party-internal votes",
+      "category": "non_territorial",
+      "goal": "local",
+      "measure": {},
+      "disposition": "out_of_scope",
+      "disposition_reason": "Private and religious bodies: parish council elections of the churches and party member ballots and primaries (Mitgliederentscheide), which no public authority runs or certifies.",
+      "source": "gg"
+    },
+    {
+      "dates": [],
+      "key": "beiraete_sonstige",
+      "tier": "gemeinde",
+      "name": "Jugendgemeinderäte und Seniorenbeiräte",
+      "name_en": "Youth and senior advisory councils",
+      "category": "non_territorial",
+      "goal": "local",
+      "measure": {},
+      "disposition": "out_of_scope",
+      "disposition_reason": "Optional advisory bodies set up by individual municipalities, elected under local rules without an electoral authority or published official returns.",
+      "source": "destatis-vg-2025"
     }
   ]
 }
