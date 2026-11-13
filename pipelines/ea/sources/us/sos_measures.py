@@ -1600,6 +1600,18 @@ ND_EARLY_FILES = {
     date(1936, 11, 3): "1936-11-03-general",
     date(1938, 6, 28): "1938-06-28-primary",
     date(1938, 11, 8): "1938-11-08-general",
+    date(1939, 7, 11): "1939-07-11-special",
+    date(1940, 6, 25): "1940-06-25-primary",
+    date(1940, 11, 5): "1940-11-05-general",
+    date(1942, 6, 30): "1942-06-30-primary",
+    date(1942, 11, 3): "1942-11-03-general",
+    date(1944, 6, 27): "1944-06-27-primary",
+    date(1944, 11, 7): "1944-11-07-general",
+    date(1946, 6, 25): "1946-06-25-primary",
+    date(1946, 11, 5): "1946-11-05-general",
+    date(1948, 6, 29): "1948-06-29-primary",
+    date(1948, 11, 2): "1948-11-02-general",
+    date(1950, 6, 27): "1950-06-27-primary",
 }
 ND_MANUAL = "https://digitalhorizonsonline.org/digital/api/collection/ndbb/id/22730/download"
 ND_COUNCIL = "https://ndlegis.gov/files/resource/library/measuresbeforethevoters.pdf"
@@ -1902,6 +1914,186 @@ ND_EARLY_MEASURES = {
     (date(1938, 11, 8), "1"): ("Initiated measure", "Repeal of the Liquor Control Act", ND_INIT, 98478, 160365),
     (date(1938, 11, 8), "2"): ("Initiated measure", "Old-age assistance minimum pension", ND_INIT, 154367, 78427),
     (date(1938, 11, 8), "3"): ("Referred measure", "Licensing of creameries and cream stations", ND_REF, 97019, 106718),
+    (date(1939, 7, 11), "1"): ("Initiated measure", "Municipal liquor stores", ND_INIT, 41814, 170538),
+    (date(1939, 7, 11), "2"): (
+        "Initiated measure",
+        "Gasoline and vehicle taxes to old-age assistance",
+        ND_INIT,
+        39789,
+        172513,
+    ),
+    (date(1939, 7, 11), "3"): ("Initiated measure", "Gross income tax", ND_INIT, 36117, 168976),
+    (date(1939, 7, 11), "4"): ("Referred measure", "Repeal of the Grain Storage Commissioner", ND_REF, 41152, 165851),
+    (date(1940, 6, 25), "1"): (
+        "Constitutional amendment",
+        "County consolidation and county manager government",
+        ND_LEGIS,
+        67804,
+        64519,
+    ),
+    (date(1940, 6, 25), "2"): (
+        "Constitutional amendment",
+        "Signatures for initiative and referendum petitions",
+        ND_LEGIS,
+        61573,
+        64636,
+    ),
+    (date(1940, 6, 25), "3"): (
+        "Constitutional amendment",
+        "Reasons required in recall petitions",
+        ND_LEGIS,
+        60049,
+        62501,
+    ),
+    (date(1940, 6, 25), "4"): ("Constitutional amendment", "Highway user taxes for highways", ND_INIT, 91149, 49324),
+    (date(1940, 6, 25), "5"): ("Constitutional amendment", "Public Service Commission name", ND_INIT, 67294, 57239),
+    (date(1940, 6, 25), "6"): ("Initiated measure", "State Board of Finance and Administration", ND_INIT, 53908, 71101),
+    (date(1940, 6, 25), "7"): ("Initiated measure", "Sales tax revenue for schools and welfare", ND_INIT, 77962, 55810),
+    (date(1940, 6, 25), "8"): (
+        "Initiated measure",
+        "Sales tax split between school equalization and welfare",
+        ND_INIT,
+        79393,
+        52731,
+    ),
+    (date(1940, 6, 25), "9"): ("Initiated measure", "Funds for distressed schools", ND_INIT, 64415, 59913),
+    (date(1940, 6, 25), "10"): ("Initiated measure", "Per pupil payments to schools", ND_INIT, 57675, 58333),
+    (date(1940, 11, 5), "1"): (
+        "Constitutional amendment",
+        "Graduated land tax with homestead exemption",
+        ND_INIT,
+        94250,
+        154521,
+    ),
+    (date(1940, 11, 5), "2"): ("Initiated measure", "Three classes of property for taxation", ND_INIT, 91396, 156901),
+    (date(1940, 11, 5), "3"): (
+        "Initiated measure",
+        "Abatement of taxes on excessive valuation",
+        ND_INIT,
+        63213,
+        166864,
+    ),
+    (date(1942, 6, 30), "1"): (
+        "Constitutional amendment",
+        "Taxation of land acquired by the Bank of North Dakota",
+        ND_LEGIS,
+        59362,
+        67872,
+    ),
+    (date(1942, 6, 30), "2"): (
+        "Constitutional amendment",
+        "Signatures for initiating constitutional amendments",
+        ND_LEGIS,
+        52275,
+        69904,
+    ),
+    (date(1942, 6, 30), "3"): (
+        "Constitutional amendment",
+        "Signatures for initiating and referring measures",
+        ND_LEGIS,
+        53925,
+        70927,
+    ),
+    (date(1942, 6, 30), "4"): ("Constitutional amendment", "Graduated land tax on farms", ND_INIT, 62726, 80202),
+    (date(1942, 6, 30), "5"): ("Initiated measure", "Three classes of property for taxation", ND_INIT, 58314, 77249),
+    (date(1942, 11, 3), "1"): ("Initiated measure", "Alcohol sales in restaurants", ND_INIT, 84049, 85733),
+    (date(1942, 11, 3), "2"): ("Referred measure", "Posting of butterfat prices", ND_REF, 92344, 56589),
+    (date(1944, 6, 27), "1"): ("Constitutional amendment", "Sale of school and public lands", ND_LEGIS, 56033, 48641),
+    (date(1944, 6, 27), "2"): ("Constitutional amendment", "School equalization fund", ND_LEGIS, 47026, 61200),
+    (date(1944, 6, 27), "3"): ("Initiated measure", "Repeal of the state income tax", ND_INIT, 50378, 60355),
+    (date(1944, 11, 7), "1"): ("Constitutional amendment", "Legislators' expense allowance", ND_LEGIS, 85212, 86340),
+    (date(1944, 11, 7), "2"): ("Constitutional amendment", "Municipal liquor stores", ND_LEGIS, 85874, 100726),
+    (date(1944, 11, 7), "3"): ("Initiated measure", "Highway bonds to match federal funds", ND_INIT, 128421, 48253),
+    (date(1944, 11, 7), "4"): (
+        "Initiated measure",
+        "Alcohol sales where other commodities are sold",
+        ND_INIT,
+        94071,
+        97058,
+    ),
+    (date(1946, 6, 25), "1"): (
+        "Constitutional amendment",
+        "County manager government by assessed valuation",
+        ND_LEGIS,
+        48937,
+        60573,
+    ),
+    (date(1946, 6, 25), "2"): (
+        "Constitutional amendment",
+        "Veterans' rehabilitation fund levy",
+        ND_LEGIS,
+        48121,
+        69362,
+    ),
+    (date(1946, 6, 25), "3"): ("Referred measure", "Assessed valuation of property", ND_REF, 56988, 70983),
+    (date(1946, 11, 5), "1"): ("Constitutional amendment", "Legislators' pay", ND_LEGIS, 66265, 80970),
+    (date(1946, 11, 5), "2"): ("Initiated measure", "Gasoline tax refunds", ND_INIT, 88102, 76337),
+    (date(1946, 11, 5), "3"): (
+        "Initiated measure",
+        "Alcohol sales where other commodities are sold",
+        ND_INIT,
+        86114,
+        82332,
+    ),
+    (date(1948, 6, 29), "1"): (
+        "Constitutional amendment",
+        "Statewide levy for institutional buildings",
+        ND_LEGIS,
+        64747,
+        100853,
+    ),
+    (date(1948, 6, 29), "2"): (
+        "Constitutional amendment",
+        "World War II veterans' bonus bonds",
+        ND_LEGIS,
+        126573,
+        55377,
+    ),
+    (date(1948, 6, 29), "3"): ("Initiated measure", "Religious dress of public schoolteachers", ND_INIT, 104133, 92771),
+    (date(1948, 6, 29), "4"): ("Initiated measure", "Ban on parking meters", ND_INIT, 96192, 93670),
+    (date(1948, 6, 29), "5"): (
+        "Initiated measure",
+        "Repeal of the ban on alcohol sales where other commodities are sold",
+        ND_INIT,
+        92717,
+        100612,
+    ),
+    (date(1948, 6, 29), "6"): ("Referred measure", "Restrictions on labor unions", ND_REF, 85206, 60976),
+    (date(1948, 6, 29), "7"): ("Referred measure", "Union shop", ND_REF, 105192, 53515),
+    (date(1948, 11, 2), "1"): ("Constitutional amendment", "Municipal liquor stores", ND_LEGIS, 84857, 127529),
+    (date(1948, 11, 2), "2"): (
+        "Constitutional amendment",
+        "Salaries of legislators and constitutional officers",
+        ND_LEGIS,
+        77348,
+        110179,
+    ),
+    (date(1948, 11, 2), "3"): (
+        "Constitutional amendment",
+        "Veterans' rehabilitation fund levy",
+        ND_LEGIS,
+        71729,
+        112719,
+    ),
+    (date(1948, 11, 2), "4"): ("Constitutional amendment", "Medical center levy", ND_LEGIS, 108133, 86262),
+    (date(1948, 11, 2), "5"): ("Initiated measure", "Parking meters", ND_INIT, 89483, 112227),
+    (date(1950, 6, 27), "1"): ("Constitutional amendment", "School for the Blind", ND_LEGIS, 74927, 77092),
+    (date(1950, 6, 27), "2"): ("Constitutional amendment", "Graduated land tax", ND_INIT, 38561, 110567),
+    (date(1950, 6, 27), "3"): (
+        "Initiated measure",
+        "State income tax exemptions and joint returns",
+        ND_INIT,
+        74528,
+        79013,
+    ),
+    (date(1950, 6, 27), "4"): (
+        "Initiated measure",
+        "Municipal and county option on liquor sales",
+        ND_INIT,
+        48250,
+        116235,
+    ),
+    (date(1950, 6, 27), "5"): ("Referred measure", "Gasoline tax increase", ND_REF, 29045, 127016),
 }
 ND_EARLY_METHOD = (
     "County returns from the North Dakota Secretary of State's official abstract of the votes, as posted with a "
@@ -7502,7 +7694,7 @@ def north_dakota_early() -> list[dict[str, object]]:
                     }
                 )
     if len({(row["day"], row["number"]) for row in rows}) != len(ND_EARLY_MEASURES):
-        raise ValueError("ND 1918-1938: measures missing from nd_measures_early.tsv")
+        raise ValueError("ND 1918-1950: measures missing from nd_measures_early.tsv")
     return rows
 
 
@@ -8632,7 +8824,7 @@ def emit() -> Path:
                     METHODOLOGY_FACTS
                     if state == "CA" and day.year < 1998
                     else ND_EARLY_METHOD
-                    if state == "ND" and day.year < 1940
+                    if state == "ND" and day.year < 1952
                     else METHODOLOGY.format(publisher=PUBLISHERS[state][0])
                 )
                 + (MAINE if state == "ME" else "")
@@ -8659,7 +8851,7 @@ def emit() -> Path:
                         else AK_STATEWIDE_NOTE
                         if state == "AK"
                         else ND_EARLY_NOTE
-                        if state == "ND" and day.year < 1940
+                        if state == "ND" and day.year < 1952
                         else ND_2004_NOTE
                         if state == "ND"
                         else KS_2010_NOTE
