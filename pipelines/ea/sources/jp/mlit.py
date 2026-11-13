@@ -14,7 +14,7 @@ from ea.changeset import Changeset
 from ea.store import DATA, connect
 
 SOURCE = "jp.mlit"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 BASE = "https://nlftp.mlit.go.jp/ksj/gml/data/N03"
 LANDING = "https://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-N03-2026.html"
@@ -516,7 +516,7 @@ def emit() -> Path:
                     source_id=source,
                     **span(
                         row["valid_from"],
-                        shapes[index + 1]["valid_from"] if index + 1 < len(shapes) else row["valid_to"],
+                        shapes[index + 1]["valid_from"] if index + 1 < len(shapes) else rows[-1]["valid_to"],
                     ),
                 )
         for number, (native, english, members) in enumerate(BLOCKS, 1):
