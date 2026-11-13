@@ -1648,6 +1648,7 @@ def emit() -> Path:
         for state, day, publisher, title, page, address in ROUNDS:
             first = min(when for other, when, *_ in ROUNDS if other == state)
             runoff = day != first
+            fptp, block = cs.key("us.electoral_system", "fptp"), cs.key("us.electoral_system", "block")
             system = cs.key("us.electoral_system", "fptp" if state == "SD" else SYSTEMS.get(state, "fptp"))
             source = cs.source(publisher, title)
             if source in cs.minted:
@@ -1811,7 +1812,7 @@ def emit() -> Path:
                     previous_round_id=cs.key("us.contest", contest_key.replace(str(day), str(first), 1))
                     if runoff
                     else None,
-                    electoral_system_id=system,
+                    electoral_system_id=block if (magnitude or 1) > 1 and system == fptp else system,
                     default_result_kind="counted",
                     party_scope_id=cs.key("us.party", party_key),
                 )

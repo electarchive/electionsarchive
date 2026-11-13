@@ -50,7 +50,7 @@ def emit(
             existing[govmint.fold(text)] = (polity, area, path, code)
         slugs = dict(conn.execute("select path, entity_id from slug where path like %s", [f"us/{lower}/%"]).fetchall())
         cs = Changeset(conn, pipeline=source_id, version=version, summary=summary, polity=f"US-{state}")
-        system = cs.key("us.electoral_system", "fptp")
+        plurality = {False: cs.key("us.electoral_system", "fptp"), True: cs.key("us.electoral_system", "block")}
         source_ids: dict[str, UUID] = {}
         for url, (publisher, title) in sources.items():
             source_ids[url] = cs.source(publisher, title)
@@ -139,7 +139,7 @@ def emit(
                 district_area_id=area,
                 magnitude=first["vote"],
                 round_number=1,
-                electoral_system_id=system,
+                electoral_system_id=plurality[(first["vote"] or 1) > 1],
                 default_result_kind="tacit" if first.get("tacit") else "counted",
                 term="remainder" if remainder else "full",
             )

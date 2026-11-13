@@ -38,7 +38,7 @@ def races(
     slugs = dict(
         conn.execute("select path, entity_id from slug where path like %s", [f"us/{state.lower()}/%"]).fetchall()
     )
-    system = cs.key("us.electoral_system", "fptp")
+    plurality = {False: cs.key("us.electoral_system", "fptp"), True: cs.key("us.electoral_system", "block")}
     parent = cs.key("us.election", f"{day}:{state}")
     if parent in cs.minted:
         raise SystemExit("state election missing")
@@ -116,7 +116,7 @@ def races(
             district_area_id=area,
             magnitude=first["seats"],
             round_number=1,
-            electoral_system_id=system,
+            electoral_system_id=plurality[(first["seats"] or 1) > 1],
             default_result_kind="tacit" if first.get("tacit") else result_kind,
             term="remainder" if first["unexpired"] else "full",
         )
