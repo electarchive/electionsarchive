@@ -27,6 +27,7 @@ BASE = "https://www.electionscentre.co.uk/wp-content/uploads/2015/10"
 MODEL = "claude-haiku-5-5"
 PROMPT = "1"
 COLUMN_PROMPT = "2"
+CHECK_PROMPT = "3"
 LONGEST = 1568
 VOLUMES: dict[str, dict] = {
     "b1974": {
@@ -172,8 +173,15 @@ READ_SCHEMA: dict[str, object] = {
 }
 
 
+ROUNDS = [volume for volume, spec in VOLUMES.items() if spec["tier"] != "both"]
+
+
 def url(volume: str) -> str:
     return f"{BASE}/{VOLUMES[volume]['file']}.pdf"
+
+
+def check_key(sha256: str, page: int, side: str, council: str, division: str) -> str:
+    return f"anthropic-batch:{MODEL}/{CHECK_PROMPT}/{sha256}/{page}{side}/{council}/{division}"
 
 
 def read_key(sha256: str, page: int, side: str = "") -> str:
@@ -221,6 +229,25 @@ def gutter(image: Image.Image) -> int:
     return max(range(low, high), key=lambda x: sum(light[x - 6 : x + 7]))
 
 
+def rendered(artifact: raw.Artifact, page: int) -> Image.Image:
+    png = subprocess.run(
+        ["pdftoppm", "-r", "200", "-gray", "-png", "-f", str(page), "-l", str(page), "-singlefile"]
+        + [str(artifact.path)],
+        check=True,
+        capture_output=True,
+    ).stdout
+    return Image.open(io.BytesIO(png))
+
+
+def halves(image: Image.Image) -> dict[str, Image.Image]:
+    middle = gutter(image)
+    return {
+        "": image,
+        "L": image.crop((0, 0, middle, image.height)),
+        "R": image.crop((middle, 0, image.width, image.height)),
+    }
+
+
 def fetch() -> None:
     reads: dict[str, batch.Want] = {}
     columns: dict[str, batch.Want] = {}
@@ -228,19 +255,13 @@ def fetch() -> None:
         artifact = raw.fetch(SOURCE, url(volume), suffix=".pdf")
         first, last = spec["pages"]
         for page in range(first, last + 1):
-            png = subprocess.run(
-                ["pdftoppm", "-r", "200", "-gray", "-png", "-f", str(page), "-l", str(page), "-singlefile"]
-                + [str(artifact.path)],
-                check=True,
-                capture_output=True,
-            ).stdout
-            image = Image.open(io.BytesIO(png))
+            image = rendered(artifact, page)
             if volume != "b1974":
-                middle = gutter(image)
-                for side, box in (("L", (0, 0, middle, image.height)), ("R", (middle, 0, image.width, image.height))):
-                    columns[read_key(artifact.sha256, page, side)] = request(
-                        image.crop(box), COLUMN_SYSTEM, "Read the councils and divisions in this column."
-                    )
+                for side, crop in halves(image).items():
+                    if side:
+                        columns[read_key(artifact.sha256, page, side)] = request(
+                            crop, COLUMN_SYSTEM, "Read the councils and divisions in this column."
+                        )
             reads[read_key(artifact.sha256, page)] = request(
                 image,
                 READ_SYSTEM_1974 if volume == "b1974" else READ_SYSTEM,
@@ -248,6 +269,29 @@ def fetch() -> None:
             )
     print(batch.ensure(SOURCE, "volumes", reads)[1])
     print(batch.ensure(SOURCE, "columns", columns)[1])
+    doubts = PARSED / "doubts.tsv"
+    if not doubts.exists():
+        return
+    checks: dict[str, batch.Want] = {}
+    for (volume, page), rows in pl.read_csv(doubts, separator="\t", infer_schema_length=0).group_by(
+        "volume", "page", maintain_order=True
+    ):
+        artifact = raw.cached(SOURCE, url(str(volume)))
+        crops = halves(rendered(artifact, int(str(page))))
+        for row in rows.iter_rows(named=True):
+            label = next(name for key, name, _ in councils(row["volume"]) if key == row["council"])
+            noun = "electoral division" if VOLUMES[row["volume"]]["tier"] == "region" else "ward"
+            where = "column" if row["side"] else "page"
+            checks[check_key(artifact.sha256, int(row["page"]), row["side"] or "", row["council"], row["number"])] = (
+                request(
+                    crops[row["side"] or ""].copy(),
+                    COLUMN_SYSTEM,
+                    f"Read only {noun} {row['number']} of {label} on this {where}, and return that one entry in "
+                    "divisions. Read every figure slowly and check that the votes match the printed majority and "
+                    "percentages.",
+                )
+            )
+    print(batch.ensure(SOURCE, "checks", checks)[1])
 
 
 REGIONS = [
@@ -390,7 +434,7 @@ def ordered(volume: str, sides: tuple[str, ...]) -> list[dict]:
         for side in sides:
             for division in vision(sha, page, side)["divisions"]:
                 parsed = number(division["number"])
-                item = {**division, "page": page, "parsed": parsed}
+                item = {**division, "page": page, "parsed": parsed, "side": side}
                 if parsed is None:
                     (chains[-1] if chains else out).append(item)
                     continue
@@ -408,13 +452,50 @@ def ordered(volume: str, sides: tuple[str, ...]) -> list[dict]:
     return out
 
 
-def assigned(volume: str, sides: tuple[str, ...]) -> tuple[list[dict], int]:
-    index = -1
+def folded(text: str) -> str:
+    text = re.sub(r"[^A-Z ]", " ", text.upper().replace("&", " AND "))
+    text = re.sub(r"\b(DISTRICT|REGIONAL|REGION|COUNCIL|ISLANDS AREA|ISLANDS|AREA|THE|CITY OF)\b", " ", text)
+    return " ".join(text.split())
+
+
+ALIASES = {
+    "NAIRNSHIRE": "nairn",
+    "LANARK": "clydesdale",
+    "KILMARNOCK AND LOUDON": "kilmarnock-and-loudoun",
+    "EILEAN SIAR": "western-isles",
+    "COMHAIRLE NAN EILEAN": "western-isles",
+}
+
+
+def heading(volume: str, text: str | None, used: set[str]) -> str | None:
+    text = folded(text or "")
+    if not text:
+        return None
+    if text in ALIASES:
+        return ALIASES[text]
+    bodies = councils(volume)
+    exact = next((key for key, label, _ in bodies if folded(label) == text), None)
+    if exact is not None:
+        return exact
+    inside = [key for key, label, _ in bodies if re.search(rf"\b{folded(label)}\b", text)]
+    if inside:
+        return max(inside, key=len)
+    if VOLUMES[volume]["tier"] == "district":
+        region = next((key for key, label, _ in REGIONS if re.search(rf"\b{folded(label)}\b", text)), None)
+        return next((key for key, _, home in bodies if home == region and key not in used), None)
+    return None
+
+
+def assigned(volume: str, sides: tuple[str, ...]) -> list[dict]:
+    order = [key for key, _, _ in councils(volume)]
+    current: str | None = None
+    lost = False
+    used: set[str] = set()
     merged: list[dict] = []
     for item in ordered(volume, sides):
         parsed = item["parsed"]
         if parsed is None or (merged and merged[-1]["parsed"] == parsed):
-            if not merged:
+            if not merged or lost:
                 continue
             previous = merged[-1]
             for field in ("electorate", "turnout", "rejected", "majority", "note"):
@@ -425,10 +506,20 @@ def assigned(volume: str, sides: tuple[str, ...]) -> tuple[list[dict], int]:
                 c for c in item["candidates"] if (c["surname"], c["votes"]) not in seen
             ]
             continue
-        if parsed == (1, ""):
-            index += 1
-        merged.append({**item, "index": index})
-    return merged, index + 1
+        guessed = False
+        if parsed == (1, "") or current is None:
+            named = heading(volume, item["council"], used)
+            guessed = named is None
+            after = order[order.index(current) + 1 :] if current in order else order
+            current = named or next((key for key in [*after, *order] if key not in used), order[-1])
+            used.add(current)
+            lost = False
+        elif merged and merged[-1]["council_key"] == current and parsed[0] < merged[-1]["parsed"][0]:
+            lost = True
+        if lost:
+            continue
+        merged.append({**item, "council_key": current, "guessed": guessed})
+    return merged
 
 
 def normal(volume: str, item: dict) -> tuple[dict, list[dict]]:
@@ -483,7 +574,57 @@ def figures(division: dict, lines: list[dict]) -> tuple:
     return (
         division["electorate"],
         division["rejected"],
-        tuple(sorted((leh.fold(line["surname"]), line["votes"]) for line in lines)),
+        tuple(sorted((leh.fold(line["surname"]), line["votes"] or 0) for line in lines)),
+    )
+
+
+def aligned(readings: list[tuple[dict, list[dict]]]) -> None:
+    for division, lines in readings:
+        for other, other_lines in readings:
+            if division["rejected"] is None and other["rejected"] is not None:
+                division["rejected"] = other["rejected"]
+            for line in lines:
+                for twin in other_lines:
+                    short, long = leh.fold(twin["surname"]), leh.fold(line["surname"])
+                    if line["votes"] == twin["votes"] and short and long.endswith(f" {short}"):
+                        line["surname"] = twin["surname"]
+
+
+def settle(readings: list[tuple[dict, list[dict]]]) -> tuple[dict, list[dict], list[str]]:
+    aligned(readings)
+    groups: dict[tuple, list[tuple[dict, list[dict]]]] = {}
+    for reading in readings:
+        groups.setdefault(figures(*reading), []).append(reading)
+    ranked = sorted(groups.values(), key=lambda group: (-len(group), len(issues(*group[0]))))
+    best = ranked[0][0]
+    found = issues(*best)
+    for division, _ in readings:
+        best[0]["electorate"] = best[0]["electorate"] or division["electorate"]
+        best[0]["name"] = best[0]["name"] or division["name"]
+    if len(ranked) == 1 or len(ranked[0]) > len(ranked[1]):
+        return best[0], best[1], found
+    clean = [group[0] for group in ranked if not issues(*group[0])]
+    if len(clean) == 1:
+        return clean[0][0], clean[0][1], []
+    return best[0], best[1], [*found, "readings differ: " + " and ".join(str(key) for key in groups)]
+
+
+def checked(volume: str, item: dict) -> dict | None:
+    key = check_key(
+        raw.cached(SOURCE, url(volume)).sha256, item["page"], item["side"], item["council_key"], item["number"]
+    )
+    if key not in raw.keys(SOURCE):
+        return None
+    message = json.loads(raw.cached(SOURCE, key).path.read_text())
+    read = json.loads(next(block["text"] for block in message["content"] if block["type"] == "text"))
+    wanted = number(item["number"])
+    return next(
+        (
+            {**division, "page": item["page"], "parsed": wanted}
+            for division in read["divisions"]
+            if number(division["number"]) == wanted
+        ),
+        None,
     )
 
 
@@ -495,76 +636,100 @@ def parse() -> None:
     divisions: list[dict] = []
     candidates: list[dict] = []
     problems: list[str] = []
-    for volume in VOLUMES:
-        bodies = councils(volume)
-        columns, found = assigned(volume, ("L", "R"))
-        if found != len(bodies):
-            raise ValueError(f"{volume}: the column reading finds {found} councils, not {len(bodies)}")
-        pages, _ = assigned(volume, ("",))
+    doubts: list[dict] = []
+    for volume in ROUNDS:
+        bodies = {key: (label, region) for key, label, region in councils(volume)}
+        columns = assigned(volume, ("L", "R"))
+        pages = assigned(volume, ("",))
         unmatched = {id(item) for item in pages}
+        settled: list[tuple[dict, list[dict]]] = []
         for item in columns:
-            key, label, region = bodies[item["index"]]
-            division, lines = normal(volume, item)
-            where = f"{volume}\t{item['page']}\t{division['number']}\t{label}"
+            key = item["council_key"]
             surnames = {leh.fold(c["surname"]) for c in item["candidates"]}
             twin = max(
                 (
                     other
                     for other in pages
                     if id(other) in unmatched
+                    and other["council_key"] == key
                     and other["parsed"] == item["parsed"]
                     and abs(other["page"] - item["page"]) <= 1
                 ),
                 key=lambda other: len(surnames & {leh.fold(c["surname"]) for c in other["candidates"]}),
                 default=None,
             )
-            mine = issues(division, lines)
+            items = [item]
             if twin is not None:
                 unmatched.discard(id(twin))
-                other, other_lines = normal(volume, twin)
-                theirs = issues(other, other_lines)
-                if figures(division, lines) != figures(other, other_lines):
-                    if len(theirs) < len(mine):
-                        division, lines, mine = other, other_lines, theirs
-                    elif len(theirs) == len(mine):
-                        mine = [*mine, f"readings differ: {figures(division, lines)} and {figures(other, other_lines)}"]
-                division["electorate"] = division["electorate"] or other["electorate"]
-                division["name"] = division["name"] or other["name"]
+                items.append(twin)
+            settled.append((item, items))
+        settled += [(item, [item]) for item in pages if id(item) in unmatched and item["candidates"]]
+        for item, items in settled:
+            key = item["council_key"]
+            label, region = bodies[key]
+            third = checked(volume, item)
+            readings = [normal(volume, one) for one in [*items, *([third] if third else [])]]
+            division, lines, mine = settle(readings)
+            if item["guessed"] and all(one["guessed"] for one in items):
+                mine.append("council heading not read")
+            if (
+                len(readings) == 1
+                and len(lines) > 1
+                and not mine
+                and division["majority"] is None
+                and all(line["percent"] is None for line in lines)
+            ):
+                mine = ["read once, with no majority or shares to check it"]
             for fix in fixes.pop((volume, item["page"], division["number"]), []):
                 if fix["surname"]:
                     line = next(line for line in lines if line["surname"] == fix["surname"])
                     line[fix["field"]] = int(fix["value"]) if fix["field"] == "votes" else fix["value"]
                 elif fix["field"] == "drop":
                     lines = [line for line in lines if line["surname"] != fix["value"]]
-                else:
+                elif fix["field"] != "checked":
                     division[fix["field"]] = int(fix["value"]) if fix["value"] else None
                 mine = [] if fix["field"] == "checked" else issues(division, lines)
-            problems += [f"{where}\t{issue}" for issue in mine]
+            if mine:
+                problems += [f"{volume}\t{item['page']}\t{division['number']}\t{label}\t{issue}" for issue in mine]
+                if third is None:
+                    doubts.append(
+                        {
+                            "volume": volume,
+                            "page": item["page"],
+                            "side": item["side"],
+                            "council": key,
+                            "number": item["number"],
+                        }
+                    )
+                continue
             division |= {"council": key, "region": region}
             divisions.append(division)
             for order, line in enumerate(lines):
                 candidates.append(
                     {"volume": volume, "council": key, "number": division["number"], "order": order, **line}
                 )
-        for item in pages:
-            if id(item) in unmatched and item["candidates"]:
-                problems.append(
-                    f"{volume}\t{item['page']}\t{item['number']}\t?\tonly in the page reading: "
-                    + ", ".join(c["surname"] for c in item["candidates"])
-                )
+        for key in bodies.keys() - {division["council"] for division in divisions if division["volume"] == volume}:
+            problems.append(f"{volume}\t\t\t{bodies[key][0]}\tno division read")
     if fixes:
         raise ValueError(f"corrections that match nothing: {sorted(fixes)}")
     frame = pl.DataFrame(divisions, infer_schema_length=None)
     duplicates = frame.group_by("volume", "council", "number").len().filter(pl.col("len") > 1)
     for row in duplicates.iter_rows(named=True):
         problems.append(f"{row['volume']}\t\t{row['number']}\t{row['council']}\trepeated")
+    keep = frame.join(duplicates.select("volume", "council", "number"), on=["volume", "council", "number"], how="anti")
+    lines = pl.DataFrame(candidates, infer_schema_length=None).join(
+        keep.select("volume", "council", "number"), on=["volume", "council", "number"], how="semi"
+    )
     PARSED.mkdir(parents=True, exist_ok=True)
-    frame.write_parquet(PARSED / "divisions.parquet")
-    pl.DataFrame(candidates, infer_schema_length=None).write_parquet(PARSED / "candidates.parquet")
+    keep.write_parquet(PARSED / "divisions.parquet")
+    lines.write_parquet(PARSED / "candidates.parquet")
+    pl.DataFrame(doubts, schema=["volume", "page", "side", "council", "number"]).write_csv(
+        PARSED / "doubts.tsv", separator="\t"
+    )
     (PARSED / "problems.tsv").write_text("".join(f"{problem}\n" for problem in problems))
-    print(f"{len(divisions)} divisions, {len(candidates)} candidates, {len(problems)} problems")
-    if problems:
-        raise SystemExit(f"resolve the problems in {PARSED / 'problems.tsv'} with {CORRECTIONS.name}")
+    print(
+        f"{keep.height} divisions kept, {lines.height} candidates, {len(problems)} problems, {len(doubts)} to read again"
+    )
 
 
 def kind(volume: str) -> str:
@@ -629,7 +794,8 @@ def emit() -> Path:
         paths = {path for (path,) in conn.execute("select path from slug where path like 'gb/%%'").fetchall()}
 
         sources: dict[str, UUID] = {}
-        for volume, spec in VOLUMES.items():
+        for volume in ROUNDS:
+            spec = VOLUMES[volume]
             title = f"The Scottish {kind(volume).title()} Elections {spec['day'].year}: Results and Statistics"
             sources[volume] = cs.source(PUBLISHER, title)
             cs.add(
@@ -680,8 +846,8 @@ def emit() -> Path:
                     f"gb/{key}-district",
                 )
 
-        for volume, spec in VOLUMES.items():
-            day = spec["day"]
+        for volume in ROUNDS:
+            day = VOLUMES[volume]["day"]
             year = day.year
             tier = kind(volume)
             national = cs.key("gb.election", f"{day}:local:sct")
