@@ -195,7 +195,7 @@ const MODEL = {
   },
   reported: { common: 0.9, own: 0.3, capped: 0.99 },
   channel: { turnout: 0.35, prior: 0.08, sigma: 1.5, unlisted: 0.02 },
-  floor: { slack: 0.98 },
+  floor: { slack: 0.98, met: 0.99, closed: 0 },
   remaining: { spread: 0.2, stale: 3 },
 };
 
@@ -1172,9 +1172,6 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
     complete ||
     (isLate && onNight > 0 && latest - onNight <= MODEL.late.small * onNight);
   const settles = Math.min(1, tail / MODEL.tail.share);
-  const left = isTail
-    ? Math.max(planned, (MODEL.late.carry * recent + MODEL.late.base) * settles)
-    : planned;
   const outstanding = found.map((unit) => {
     if (!isTail || unit.reported == null) {
       return null;
@@ -1300,6 +1297,23 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
     floor: (floors.get(unit.id) ?? 0) / (1 + tail),
   }));
   const wholeOf = new Map(whole.map((unit, index) => [unit.id, index]));
+  const floored = whole.filter((unit) => unit.floor > 0);
+  const flooredVotes = sum(floored.map((unit) => unit.total));
+  const met =
+    isTail && flooredVotes > 0
+      ? sum(
+          floored
+            .filter((unit) => unit.total >= MODEL.floor.slack * unit.floor)
+            .map((unit) => unit.total),
+        ) / flooredVotes
+      : 0;
+  const closed = met >= MODEL.floor.met ? MODEL.floor.closed : 1;
+  const left = isTail
+    ? Math.max(
+        planned,
+        (MODEL.late.carry * recent * closed + MODEL.late.base) * settles,
+      )
+    : planned;
   const fitted = whole.map((unit) => {
     const target = reports.get(unit.id);
     return target == null || !unit.hasBaseline
@@ -1480,13 +1494,15 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
             Math.max(
               unit.total,
               unit.floor,
-              unit.total + MODEL.late.reach * (unit.total - unit.paced),
+              unit.total +
+                MODEL.late.reach * closed * (unit.total - unit.paced),
             ),
           );
           const { spill, scatter } = MODEL.late;
           spills[index] =
             Math.max(0, free - finals[index]) *
             spill *
+            closed *
             settles *
             Math.exp(scatter * gaussian(random) - scatter ** 2 / 2);
         }
