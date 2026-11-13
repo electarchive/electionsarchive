@@ -58,6 +58,8 @@ ERRATA = {
     (1916, "democratic", "John Harvey"),
     (1916, "democratic", "Charles Hein"),
     (1916, "socialist", "John Fleckten"),
+    (1916, "republican", "Frederic T. Cuthbert"),
+    (1916, "democratic", "Charles Simon"),
     (1918, "republican", "Lyman D. Page"),
     (1918, "republican", "Geo. P. Hommes"),
     (1918, "republican", "John O. Hanchett"),
