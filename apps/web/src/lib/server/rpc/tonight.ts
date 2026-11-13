@@ -6,6 +6,7 @@ import * as v from "valibot";
 import type { Family, Seat } from "#lib/live/nation.js";
 import type { Summary } from "#lib/live/summary.js";
 import { chamber, seat, sides, STATES } from "#lib/live/nation.js";
+import { countsAt } from "#lib/live/standing.js";
 import { summarize } from "#lib/live/summary.js";
 import { remember } from "#lib/server/cache.js";
 import { liveDb as db } from "#lib/server/db/index.js";
@@ -383,13 +384,7 @@ export const tonight = {
       const placed = pairing == null ? null : seat(summary, held, pairing);
       const frame = race.frames.at(-1) ?? null;
       const brief = describe(summary, placed, pairing);
-      const latest = new Map<string, (typeof race.counts)[number]>();
-      for (const count of race.counts) {
-        const before = latest.get(count.unitId);
-        if (before == null || before.at <= count.at) {
-          latest.set(count.unitId, count);
-        }
-      }
+      const latest = countsAt(race, null);
       const named = new Map(race.units.map((unit) => [unit.id, unit.name]));
       const band = estimate?.margin;
       const flip = summary.favorite?.id === estimate?.leader ? 1 : -1;

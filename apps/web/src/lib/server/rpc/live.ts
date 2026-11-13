@@ -1,5 +1,6 @@
 import type {
   LiveBaseline,
+  LiveChannel,
   LiveElection,
   LiveFrame,
   LiveOffice,
@@ -18,6 +19,7 @@ import { createHash } from "node:crypto";
 import * as v from "valibot";
 import { CLOSES, eastern } from "#lib/live/closes.js";
 import { isDistricted, placeScheme } from "#lib/live/format.js";
+import { countsAt } from "#lib/live/standing.js";
 import { rule } from "#lib/measure.js";
 import { baseLocale, getLocale } from "#lib/paraglide/runtime.js";
 import { side, UNAFFILIATED } from "#lib/party.js";
@@ -473,6 +475,8 @@ function scanners(note: string | null) {
 }
 
 const TOP = /^(?:senate(?:-special)?|governor|house-(?:\d+|at-large))$/u;
+const SPLIT = ["president", "senate", "senate-special", "governor"];
+
 const STATEWIDE = [
   "senate",
   "senate-special",
@@ -540,7 +544,7 @@ const nights = new Map<string, Kept<Awaited<ReturnType<typeof night>>>>();
 
 type Replayed = {
   totals: Array<[string, number]>;
-  units: Array<[string, Array<[string, number]>]>;
+  units: Array<[string, Array<[string, number, number]>]>;
   told: Array<[string, number, number]>;
 };
 
@@ -580,7 +584,7 @@ async function framed(ks: Array<number>) {
     return {
       values: new Map<
         number,
-        Array<{ unit: string; option: string; votes: number }>
+        Array<{ unit: string; option: string; channel: number; votes: number }>
       >(),
       told: new Map<
         number,
@@ -589,11 +593,17 @@ async function framed(ks: Array<number>) {
     };
   }
   const [values, told] = await Promise.all([
-    db.execute<{ k: number; unit: string; option: string; votes: number }>(sql`
-      select v.frame_k as k, v.unit_id as unit, coalesce(o.parent_option_id, o.id) as option, sum(v.votes)::float8 as votes
+    db.execute<{
+      k: number;
+      unit: string;
+      option: string;
+      channel: number;
+      votes: number;
+    }>(sql`
+      select v.frame_k as k, v.unit_id as unit, coalesce(o.parent_option_id, o.id) as option, v.channel, sum(v.votes)::float8 as votes
       from live.value v join contest_option o on o.id = v.option_id
       where v.frame_k = any(${sql.param(ks)}::bigint[])
-      group by 1, 2, 3
+      group by 1, 2, 3, 4
     `),
     db.execute<{
       k: number;
@@ -619,19 +629,19 @@ function extend(
 ) {
   for (const k of ks.slice(kept.ks.length)) {
     const totals = new Map<string, number>();
-    const pairs = new Map<string, Array<[string, number]>>();
+    const pairs = new Map<string, Array<[string, number, number]>>();
     for (const row of byK.values.get(k) ?? []) {
       const option = intern(row.option);
       const unit = intern(row.unit);
       totals.set(option, (totals.get(option) ?? 0) + row.votes);
       const held = pairs.get(unit) ?? [];
-      held.push([option, row.votes]);
+      held.push([option, row.votes, row.channel]);
       pairs.set(unit, held);
     }
     const units: Replayed["units"] = [];
     for (const [unit, votes] of pairs) {
       const key = votes
-        .map(([option, value]) => `${option}:${value}`)
+        .map(([option, value, channel]) => `${option}:${channel}:${value}`)
         .toSorted((x, y) => x.localeCompare(y, "en"))
         .join(";");
       if (kept.last.get(unit) !== key) {
@@ -834,6 +844,41 @@ async function baselines(
     date,
     generals.rows.map((row) => row.suffix),
   );
+  const cutoff = `${Number(date.slice(0, 4)) - 5}${date.slice(4)}`;
+  const recent = generals.rows.filter(({ suffix }) => suffix >= cutoff);
+  const mixed = wanted.flatMap((row) => {
+    const parts = row.path.split("/");
+    return row.seats.length + row.presidents.length === 0
+      ? []
+      : recent.flatMap(({ suffix }, age) =>
+          [...new Set([parts.at(-1) ?? "", ...SPLIT])].map((seat) => ({
+            contest: row.id,
+            path: `${parts[0]}/${parts[1]}/${suffix}/${seat}`,
+            rank:
+              (seat === parts.at(-1) ? 0 : 1000) +
+              age * 10 +
+              SPLIT.indexOf(seat),
+          })),
+        );
+  });
+  const splits = db.execute<{ path: string; k: number }>(sql`
+    select s.path, x.k from slug s join contest c on c.id = s.entity_id cross join lateral (
+      select rs.k from result_set rs
+      where rs.contest_id = c.id and rs.stage in ('official', 'certified') and rs.status = 'active' and rs.kind = 'counted'
+        and exists (
+          select from result_value v join reporting_unit u on u.k = v.unit_k
+          where v.result_set_k = rs.k and v.measure = 1 and v.channel <> 0 and u.scheme_code in ('us.county', 'us.county_part')
+        )
+        and (
+          select count(*) filter (where t.votes >= 0.05 * t.whole) from (
+            select sum(v.value) as votes, sum(sum(v.value)) over () as whole
+            from result_value v where v.result_set_k = rs.k and v.measure = 1 group by v.option_k
+          ) t
+        ) >= 2
+      order by rs.is_default desc, rs.stage = 'certified' desc, rs.k limit 1
+    ) x
+    where s.path = any(${sql.param([...new Set(mixed.map((row) => row.path))])}::text[]) and s.is_current
+  `);
   const candidates = await db.execute<{
     path: string;
     id: string;
@@ -868,7 +913,8 @@ async function baselines(
     ];
   });
   if (pairs.length === 0) {
-    return { lines: [], ratios: await scaling };
+    await splits;
+    return { lines: [], channels: [], ratios: await scaling };
   }
   const priorsDistricted = pairs.flatMap((pair) =>
     wanted.some(
@@ -894,15 +940,29 @@ async function baselines(
     ) x
   `);
   const priorOf = new Map(picked.rows.map((row) => [row.k, row.prior]));
+  const splitOf = new Map((await splits).rows.map((row) => [row.path, row.k]));
+  const mixOf = new Map(
+    [
+      ...Map.groupBy(
+        mixed.filter((row) => splitOf.has(row.path)),
+        (row) => row.contest,
+      ),
+    ].flatMap(([contest, rows]) => {
+      const best = rows.toSorted((x, y) => x.rank - y.rank)[0];
+      const k = best == null ? undefined : splitOf.get(best.path);
+      return k == null ? [] : [[contest, k] as const];
+    }),
+  );
   const found = await db.execute<{
     k: number;
     unit: string;
+    channel: number;
     party: string | null;
     votes: number;
   }>(sql`
     with counted as materialized (
-      select v.result_set_k as k, v.unit_k, v.option_k, v.value from result_value v
-      where v.result_set_k = any(${sql.param(picked.rows.map((row) => row.k))}::int[]) and v.measure = 1
+      select v.result_set_k as k, v.unit_k, v.option_k, v.channel, v.value from result_value v
+      where v.result_set_k = any(${sql.param([...new Set([...picked.rows.map((row) => row.k), ...mixOf.values()])])}::int[]) and v.measure = 1
     ), lines as (
       select c.option_k, sum(c.value) as votes from counted c group by 1
     ), tops as (
@@ -924,7 +984,7 @@ async function baselines(
     )
     select c.k, case when u.scheme_code in ('us.county_part', 'us.cd') then u.parent_id
         when u.scheme_code = 'us.ak_house_district' then ${LIVE_DISTRICT} else u.id end as unit,
-      coalesce(a.parent_party_id, lead.party) as party, sum(c.value)::float8 as votes
+      c.channel, coalesce(a.parent_party_id, lead.party) as party, sum(c.value)::float8 as votes
     from counted c join reporting_unit u on u.k = c.unit_k
       and (u.scheme_code in ('us.county', 'us.ak_house_district') or u.scheme_code = 'us.county_part' and u.parent_id is not null
         or (u.scheme_code = 'us.state' and u.code in ('60', '66', '69', '72', '78')
@@ -933,10 +993,36 @@ async function baselines(
     join contest_option o on o.k = c.option_k
     join lead on lead.top = coalesce(o.parent_option_id, o.id)
     left join party_affiliation a on a.party_id = lead.party and a.kind = 'regional_branch' and a.valid @> ${date}::date
-    group by 1, 2, 3
+    group by 1, 2, 3, 4
   `);
-  const byPrior = Map.groupBy(found.rows, (row) => priorOf.get(row.k) ?? "");
+  const summed = new Map<string, (typeof found.rows)[number]>();
+  for (const row of found.rows) {
+    if (!priorOf.has(row.k)) {
+      continue;
+    }
+    const key = `${row.k}|${row.unit}|${row.party ?? ""}`;
+    const held = summed.get(key);
+    if (held == null) {
+      summed.set(key, { ...row, channel: 0 });
+    } else {
+      held.votes += row.votes;
+    }
+  }
+  const byPrior = Map.groupBy(
+    summed.values(),
+    (row) => priorOf.get(row.k) ?? "",
+  );
+  const bySplit = Map.groupBy(found.rows, (row) => row.k);
   return {
+    channels: [...mixOf].flatMap(([contest, k]) =>
+      (bySplit.get(k) ?? []).map((row) => ({
+        contest,
+        unit: row.unit,
+        channel: row.channel,
+        party: row.party,
+        votes: row.votes,
+      })),
+    ),
     lines: pairs.flatMap((pair) =>
       (byPrior.get(pair.prior) ?? []).map((row) => ({
         contest: pair.contest,
@@ -1265,7 +1351,7 @@ async function night(
       order by t.contest, t.option, t.as_of desc, t.k desc
     `),
     remember(
-      `live:fixed:v5:${found.path}|${found.rest}|${detail}${slot}|${roster}`,
+      `live:fixed:v7:${found.path}|${found.rest}|${detail}${slot}|${roster}`,
       async () => {
         const [choices, incumbents, settled, prior, drawn, placed, lone] =
           await Promise.all([
@@ -1402,6 +1488,7 @@ async function night(
   const byContest = Map.groupBy(frames.rows, (row) => row.contest);
   const declinedBy = Map.groupBy(declined.rows, (row) => row.contest);
   const priorBy = Map.groupBy(prior.lines, (row) => row.contest);
+  const channelBy = Map.groupBy(prior.channels, (row) => row.contest);
   const settledBy = Map.groupBy(settled, (row) => row.contest);
   const drawnBy = Map.groupBy(drawn, (row) => row.contest);
   const badges = new Map<string, NonNullable<LiveOption["party"]>>();
@@ -1429,7 +1516,7 @@ async function night(
     const seen = new Set<string>(
       (drawnBy.get(row.id) ?? []).map((line) => fold(line.unit)),
     );
-    const current = new Map<string, Array<number>>();
+    const current = new Map<string, Map<number, Array<number>>>();
     const outstanding = new Map<string, { share: number; total: number }>();
     const members = new Map<string, Set<string>>();
     let front: (typeof mine)[number] | undefined;
@@ -1444,16 +1531,18 @@ async function night(
           totals[position] = (totals[position] ?? 0) + votes;
         }
       }
-      const byUnit = new Map<string, Array<number>>();
+      const byUnit = new Map<string, Map<number, Array<number>>>();
       for (const [unit, pairs] of entry?.units ?? []) {
-        for (const [option, value] of pairs) {
+        for (const [option, value, channel] of pairs) {
           const position = index.get(option);
           if (position == null) {
             continue;
           }
-          const votes = byUnit.get(unit) ?? own.map(() => 0);
+          const split = byUnit.get(unit) ?? new Map<number, Array<number>>();
+          const votes = split.get(channel) ?? own.map(() => 0);
           votes[position] = (votes[position] ?? 0) + value;
-          byUnit.set(unit, votes);
+          split.set(channel, votes);
+          byUnit.set(unit, split);
         }
       }
       if (frame.isHeadline) {
@@ -1491,15 +1580,19 @@ async function night(
       }
       for (const unit of touched) {
         seen.add(unit);
-        const votes = own.map(() => 0);
+        const split = new Map<number, Array<number>>();
+        let isSplit = true;
         let expected = 0;
         let weighed = 0;
         let isTold = true;
         for (const member of members.get(unit) ?? []) {
-          for (const [position, value] of (
-            current.get(member) ?? []
-          ).entries()) {
-            votes[position] = (votes[position] ?? 0) + value;
+          for (const [channel, values] of current.get(member) ?? []) {
+            isSplit &&= channel !== 0;
+            const votes = split.get(channel) ?? own.map(() => 0);
+            for (const [position, value] of values.entries()) {
+              votes[position] = (votes[position] ?? 0) + value;
+            }
+            split.set(channel, votes);
           }
           const told = outstanding.get(member);
           if (told == null) {
@@ -1513,17 +1606,32 @@ async function night(
           isTold && expected > 0
             ? { share: weighed / expected, total: expected }
             : null;
-        const key = `${votes.join(",")}|${eevp?.share ?? ""}:${eevp?.total ?? ""}`;
+        const rows: Array<[number, Array<number>]> = isSplit
+          ? [...split].toSorted(([x], [y]) => x - y)
+          : [
+              [
+                0,
+                own.map((_, position) =>
+                  sumOf(
+                    [...split.values()].map((votes) => votes[position] ?? 0),
+                  ),
+                ),
+              ],
+            ];
+        const key = `${rows.map(([channel, votes]) => `${channel}=${votes.join(",")}`).join(";")}|${eevp?.share ?? ""}:${eevp?.total ?? ""}`;
         if (last.get(unit) !== key) {
           last.set(unit, key);
-          counts.push({
-            unitId: unit,
-            at: frame.at,
-            votes,
-            reporting: null,
-            expected: null,
-            eevp,
-          });
+          for (const [channel, votes] of rows) {
+            counts.push({
+              unitId: unit,
+              at: frame.at,
+              votes,
+              reporting: null,
+              expected: null,
+              eevp,
+              ...(channel !== 0 && { channel }),
+            });
+          }
         }
       }
     }
@@ -1623,15 +1731,61 @@ async function night(
       }
       return {
         units,
+        credit,
         usable:
           all > 0 && overall.filter((votes) => votes >= 0.05 * all).length >= 2,
       };
     };
     const fromSeat = allot(seats);
-    const chosen =
-      fromSeat.usable || presidents.length === 0
-        ? fromSeat.units
-        : allot(presidents).units;
+    const { units: chosen, credit } =
+      fromSeat.usable || presidents.length === 0 ? fromSeat : allot(presidents);
+    const mixes = new Map<string, Array<LiveChannel>>();
+    for (const [unit, unitLines] of Map.groupBy(
+      channelBy.get(row.id) ?? [],
+      (line) => fold(line.unit),
+    )) {
+      let total = 0;
+      const all = own.map(() => 0);
+      const byChannel = new Map<
+        number,
+        { total: number; votes: Array<number> }
+      >();
+      for (const line of unitLines) {
+        const held = byChannel.get(line.channel) ?? {
+          total: 0,
+          votes: own.map(() => 0),
+        };
+        held.total += line.votes;
+        total += line.votes;
+        const positions =
+          line.party == null ? [] : (credit.get(line.party) ?? []);
+        for (const position of positions) {
+          held.votes[position] =
+            (held.votes[position] ?? 0) + line.votes / positions.length;
+          all[position] = (all[position] ?? 0) + line.votes / positions.length;
+        }
+        byChannel.set(line.channel, held);
+      }
+      if (total <= 0 || byChannel.size < 2 || byChannel.has(0)) {
+        continue;
+      }
+      mixes.set(
+        unit,
+        [...byChannel]
+          .filter(([, held]) => held.total > 0)
+          .toSorted(([x], [y]) => x - y)
+          .map(([channel, held]) => ({
+            channel,
+            share: Math.round((held.total / total) * 1e6) / 1e6,
+            shift: held.votes.map(
+              (votes, position) =>
+                Math.round(
+                  (votes / held.total - (all[position] ?? 0) / total) * 1e6,
+                ) / 1e6,
+            ),
+          })),
+      );
+    }
     const grouped = [...chosen].map(
       ([unit, value]) =>
         [
@@ -1652,9 +1806,10 @@ async function night(
       }
     }
     const fallback = presidential > 0 ? midterm / presidential : null;
-    const baseline = grouped.map(([unit, value]) => {
+    const baseline = grouped.map(([unit, value]): LiveBaseline => {
       seen.add(unit);
       const traits = traitsOf.get(unit);
+      const channels = mixes.get(unit);
       return {
         unitId: unit,
         label: unitOf.get(unit)?.name ?? "",
@@ -1667,6 +1822,7 @@ async function night(
           ),
         }),
         ...(traits != null && { traits }),
+        ...(channels != null && { channels }),
       };
     });
     const final = settledBy.get(row.id) ?? [];
@@ -1896,18 +2052,13 @@ function countyRace(race: LiveRace): LiveRace {
       : [],
   );
   const ids = new Set(units.map((unit) => unit.id));
-  const latest = new Map<string, LiveUnitCount>();
-  for (const row of race.counts) {
-    const held = latest.get(row.unitId);
-    if (ids.has(row.unitId) && (held == null || held.at <= row.at)) {
-      latest.set(row.unitId, row);
-    }
-  }
   const last = race.frames.at(-1);
   return {
     ...race,
     units,
-    counts: [...latest.values()],
+    counts: [...countsAt(race, null).values()].filter((row) =>
+      ids.has(row.unitId),
+    ),
     frames: last == null ? [] : [last],
     baseline: race.baseline.flatMap((row): Array<LiveBaseline> =>
       ids.has(row.unitId)
@@ -2164,7 +2315,7 @@ export const live = {
         method: "GET",
         path: "/live/election",
         summary:
-          "Unofficial election night counts as the official feeds publish them: each race's running totals and county counts at every update, the prior result the estimate compares against, and the estimate itself",
+          "Unofficial election night counts as the official feeds publish them: each race's running totals and county counts at every update (one row per vote channel where the feed splits a county's count by ballot type), the prior result the estimate compares against, and the estimate itself",
       }),
     )
     .input(v.objectAsync({ path: Path }))

@@ -166,8 +166,16 @@ export function countsAt(race: LiveRace, at: string | null) {
       continue;
     }
     const held = latest.get(row.unitId);
-    if (held == null || held.at <= row.at) {
-      latest.set(row.unitId, row);
+    const isSplit = (row.channel ?? 0) !== 0;
+    if (held == null || held.at < row.at || (held.at === row.at && !isSplit)) {
+      latest.set(
+        row.unitId,
+        isSplit ? { ...row, votes: [...row.votes], channel: 0 } : row,
+      );
+    } else if (held.at === row.at) {
+      for (const [position, value] of row.votes.entries()) {
+        held.votes[position] = (held.votes[position] ?? 0) + value;
+      }
     }
   }
   return latest;

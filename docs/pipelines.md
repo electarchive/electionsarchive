@@ -170,6 +170,8 @@ Live workers poll official machine-readable feeds where they exist, and official
 
 Where a feed splits its counts by ballot type, as Clarity's `VoteType` and Enhanced Voting's `groupName` do, `live.value` keeps one row per channel, using the core channel codes (1 election day, 2 early, 3 postal, 5 provisional). A unit in a frame has either a single row on channel 0 or the full split, never both. The label map in `enr_2026.CHANNELS` turns host labels into channels; a label missing from the map puts that unit on channel 0, and an issue is filed for the feed. Readers that want one total per unit sum the rows across channels. `ea live backfill [--feed id]` rebuilds stored frames by ballot type from their cached raw files, and leaves any frame whose rebuilt totals differ from what it holds.
 
+`live.election` passes the split on as one count per unit, update, and channel, and gives each county baseline the channel mix of the most recent certified result from the same state within the last five years, split by channel: the same office if it was contested, otherwise the president, Senate, or governor race. Each channel's share is its part of the county's votes, and its shift is its share for each option minus the county's share for that option. The live model fits a county with both as one stream per channel; `countsAt()` in `src/lib/live/standing.ts` sums the channels back into one count per unit for the map and tables.
+
 ## Adding a source
 
 Follow these steps to add a source. The example uses a hypothetical source, `xx.example`.
