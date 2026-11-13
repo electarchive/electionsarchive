@@ -8464,7 +8464,7 @@ export const contests = {
                 "house_delegations",
                 "senate",
               ]),
-              finalists: v.number(),
+              finalists: v.array(v.string()),
             }),
           ),
         ),
@@ -8906,7 +8906,7 @@ export const contests = {
           having (select count(distinct channel) from facts) > 1
         `),
         isRoot ? explain(contest, contest.place?.k ?? null) : [],
-        contingency(contest.id),
+        contingency(contest),
       ]);
       const [
         { last, round, derived, seats: elects, isShallow } = {
@@ -14406,7 +14406,7 @@ async function poll(contest: string | null, k: number | null, isAsked = true) {
   };
 }
 
-async function contingency(contest: string) {
+async function contingency(contest: { id: string; date: string | null }) {
   const found = await db.execute<{
     rules: unknown;
     area: number;
@@ -14417,12 +14417,12 @@ async function contingency(contest: string) {
     with own as (
       select coalesce(es.rules, '{}') || coalesce(c.rules_override, '{}') as rules
       from contest c left join electoral_system es on es.id = c.electoral_system_id
-      where c.id = ${contest}::uuid
+      where c.id = ${contest.id}::uuid
         and (coalesce(es.rules, '{}') || coalesce(c.rules_override, '{}')) ->> 'formula' = 'contingent'
     ),
     chosen as (
       select rs.k from result_set rs
-      where rs.contest_id = ${contest}::uuid and ${latest("rs")} and exists (select from own)
+      where rs.contest_id = ${contest.id}::uuid and ${latest("rs")} and exists (select from own)
       order by array_position(${STAGES}, rs.stage)
       limit 1
     )
@@ -14471,9 +14471,39 @@ async function contingency(contest: string) {
     { ...parsed.output, districts: false },
     { options, appointed: appointed > 0 ? appointed : (totals.get(root) ?? 0) },
   );
-  return decided.outcome === "contingent"
-    ? { chooser: decided.chooser, finalists: decided.finalists.length }
-    : null;
+  if (decided.outcome !== "contingent") {
+    return null;
+  }
+  const named = await db.execute<{
+    k: number;
+    person: string | null;
+    party: string | null;
+    label: string | null;
+  }>(sql`
+    select o.k, o.party_id as party, o.ballot_label as label,
+      (select cy.person_id from candidacy cy where cy.option_id = o.id order by cy.role <> 'head' limit 1) as person
+    from contest_option o
+    where o.contest_id = ${contest.id}::uuid
+      and o.k = any(${decided.finalists.map(Number)}::int[])
+  `);
+  const labels = await names(
+    named.rows.flatMap((row) =>
+      [row.person, row.party].filter((id) => id != null),
+    ),
+    contest.date,
+  );
+  const byK = new Map(named.rows.map((row) => [String(row.k), row]));
+  return {
+    chooser: decided.chooser,
+    finalists: decided.finalists.flatMap((id) => {
+      const row = byK.get(id);
+      const label =
+        labels.full.get(row?.person ?? "") ??
+        row?.label ??
+        labels.full.get(row?.party ?? "");
+      return label == null || label === "" ? [] : [label];
+    }),
+  };
 }
 
 async function explain(

@@ -505,7 +505,12 @@ export function recordLede(
 }
 
 export function contingency(held: NonNullable<Page["contest"]["contingent"]>) {
-  const values = { count: count(held.finalists) };
+  const values = {
+    count: count(held.finalists.length),
+    names: new Intl.ListFormat(getLocale(), { type: "conjunction" }).format(
+      held.finalists,
+    ),
+  };
   return {
     legislature: m.contingent_legislature,
     lower_house: m.contingent_lower_house,
