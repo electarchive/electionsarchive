@@ -244,6 +244,24 @@ def _insert_absent(
     conn: Connection, stage: Stage, table: str, columns: list[str], source: sql.Composable, absent: sql.Composable
 ) -> None:
     listed = sql.SQL(", ").join(map(sql.Identifier, columns))
+    if table == "scheme":
+        updated = [column for column in columns if column != "code"]
+        conn.execute(
+            sql.SQL(
+                """insert into public.scheme ({}) select distinct {} from {} s where {}
+                   on conflict (code) do update set ({}) = row({}) where ({}) is distinct from ({})"""
+            ).format(
+                listed,
+                listed,
+                source,
+                absent,
+                sql.SQL(", ").join(map(sql.Identifier, updated)),
+                sql.SQL(", ").join(sql.SQL("excluded.{}").format(sql.Identifier(c)) for c in updated),
+                sql.SQL(", ").join(sql.SQL("scheme.{}").format(sql.Identifier(c)) for c in updated),
+                sql.SQL(", ").join(sql.SQL("excluded.{}").format(sql.Identifier(c)) for c in updated),
+            )
+        )
+        return
     if table not in DERIVED_IDS:
         conn.execute(
             sql.SQL("insert into public.{} ({}) select distinct {} from {} s where {}").format(
