@@ -24,9 +24,9 @@ ABBREVIATED = re.compile(r"\b[A-Z][.-][A-Z]|\b[A-Z]\.|\s(De|Du|Des)$")
 FOLD = "trim(regexp_replace(lower(unaccent({})), '[^a-z]+', ' ', 'g'))"
 
 
-def region_departements(code: str) -> set[str]:
-    if code not in NEW_REGIONS and code not in OLD_REGIONS:
-        return departement("fr.departement", code)
+def region_departements(scheme: str, code: str) -> set[str]:
+    if scheme == "fr.departement":
+        return departement(scheme, code)
     parts = NEW_REGIONS[code][1] if code in NEW_REGIONS else (code,)
     return {dept for part in parts for dept in OLD_REGIONS[part][1].split()}
 
@@ -66,16 +66,17 @@ def emit() -> Path:
         split: dict[UUID, set[tuple[str, tuple[str, ...]]]] = defaultdict(set)
         shown: dict[UUID, str] = {}
         rows = conn.execute(
-            f"""select cy.person_id, cy.ballot_name, ac.code, n.text, {FOLD.format("n.text")}
+            f"""select cy.person_id, cy.ballot_name, a.scheme_code, ac.code, n.text, {FOLD.format("n.text")}
                from candidacy cy
                join changeset c on c.id = cy.changeset_id and c.pipeline = 'fr.regionales'
                join contest_option o on o.id = cy.option_id
                join contest k on k.id = o.contest_id
-               join area_code ac on ac.area_id = k.district_area_id
+               join area a on a.id = k.district_area_id
+               join area_code ac on ac.area_id = a.id
                join name n on n.entity_id = cy.person_id and n.is_preferred"""
         ).fetchall()
-        for person, ballot, region, raw, text in rows:
-            heads[person] |= region_departements(region)
+        for person, ballot, scheme, region, raw, text in rows:
+            heads[person] |= region_departements(scheme, region)
             shown[person] = raw
             forename, surname = head_parts(ballot)
             full = " ".join(words(person_name(forename, surname)))
