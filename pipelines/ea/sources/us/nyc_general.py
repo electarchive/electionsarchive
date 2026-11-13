@@ -327,6 +327,7 @@ OFFICES = re.compile(
     r"^(Mayor|City Comptroller|Public Advocate|Borough President|Member of the City Council|District Attorney|"
     r"Surrogate|Judge of the Civil Court|Justice of the Supreme Court)"
 )
+CONTESTS = set(os.environ.get("NYC_CONTESTS", "").split(",")) - {""}
 QUESTION_DAYS = set(os.environ.get("NYC_QUESTIONS", "").split(",")) - {""}
 STATE = {
     "President/Vice President": ("electoral_college", "us.state"),
@@ -940,6 +941,8 @@ def emit() -> Path:
                     if contest_key is None:
                         raise ValueError(f"{day}: {title} has no contest key")
                     contest_key = contest_key[0]
+                    if CONTESTS and str(contest) not in CONTESTS:
+                        continue
                 else:
                     contest_key = (
                         f"{day}:new-york-city:{seat_path}"
@@ -1269,10 +1272,19 @@ def emit() -> Path:
                     peers.setdefault(token, person_id)
 
                 result_set = cs.key(f"{SOURCE}.result_set", contest_key)
+                held_elsewhere = (
+                    bool(CONTESTS)
+                    and conn.execute(
+                        """select from result_set r join changeset h on h.id = r.changeset_id
+                       where r.contest_id = %s and r.is_default and h.pipeline <> %s""",
+                        [contest, SOURCE],
+                    ).fetchone()
+                    is not None
+                )
                 for prior in conn.execute(
                     """select id, election_id, contest_id, stage, kind, source_id, completeness from result_set
-                       where contest_id = %s and is_default and id <> %s and not %s""",
-                    [contest, result_set, partial and not whole],
+                       where contest_id = %s and is_default and id <> %s and not %s and not %s""",
+                    [contest, result_set, partial and not whole, held_elsewhere],
                 ).fetchall():
                     cs.add(
                         "result_set",
@@ -1295,7 +1307,7 @@ def emit() -> Path:
                     kind="counted",
                     status="active",
                     source_id=source,
-                    is_default=whole or not partial,
+                    is_default=(whole or not partial) and not held_elsewhere,
                     completeness=completeness,
                 )
                 declared = {}
