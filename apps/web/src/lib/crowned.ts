@@ -63,8 +63,13 @@ export function withEntries(winners: Wire | undefined) {
 
 export function crowned(places: Place) {
   const size = places.legend.length;
-  const dense = (spread: Array<[number, number]>) => {
-    const found = new Map(spread);
+  const dense = (spread: Array<number>) => {
+    const found = new Map<number, number>();
+    for (const [at, index] of spread.entries()) {
+      if (at % 2 === 0) {
+        found.set(index, (spread[at + 1] ?? 0) / 1e5);
+      }
+    }
     return Array.from({ length: size }, (_, index) => found.get(index) ?? 0);
   };
   return {

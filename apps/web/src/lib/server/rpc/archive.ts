@@ -823,11 +823,11 @@ const PlaceRow = v.pipe(
   }),
 );
 
-const Spread = v.array(v.tuple([v.number(), FINE]));
+const Spread = v.array(v.number());
 
 const sparse = (values: Array<number>) =>
   values.flatMap((value, index) =>
-    value === 0 ? [] : [[index, value] as [number, number]],
+    value === 0 ? [] : [index, Math.round(value * 1e5)],
   );
 
 const Places = v.nullable(
