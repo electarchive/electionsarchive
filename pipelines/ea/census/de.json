@@ -3558,7 +3558,9 @@
             "unicameral",
             "lower_house"
           ],
-          "iso_pattern": "DE-*",
+          "polity_kinds": [
+            "federal_unit"
+          ],
           "valid_to": "1934-01-30",
           "precedence": 1
         }
