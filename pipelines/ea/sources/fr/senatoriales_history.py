@@ -20,6 +20,12 @@ STATIC = "https://static.data.gouv.fr/resources"
 DATASETS = "https://www.data.gouv.fr/datasets"
 SENAT = "https://data.senat.fr/data/senateurs"
 DAYS = {
+    1992: date(1992, 9, 27),
+    1995: date(1995, 9, 24),
+    1998: date(1998, 9, 27),
+    2001: date(2001, 9, 23),
+    2004: date(2004, 9, 26),
+    2008: date(2008, 9, 21),
     2011: date(2011, 9, 25),
     2014: date(2014, 9, 28),
     2017: date(2017, 9, 24),
@@ -27,6 +33,36 @@ DAYS = {
     2023: date(2023, 9, 24),
 }
 YEARS: dict[int, dict[str, str]] = {
+    1992: {
+        "dataset": f"{DATASETS}/elections-senatoriales-1992-resultats-572092",
+        "results": "https://static.data.gouv.fr/12/b5c4a60f1fcddaefb3de0880e1a1e231d5a2928e63e1203036572ba332fa95.xls",
+        "suffix": ".xls",
+    },
+    1995: {
+        "dataset": f"{DATASETS}/elections-senatoriales-1995-resultats-572094",
+        "results": "https://static.data.gouv.fr/90/655c00be65605db73f3fc1b0be16c6b863e5d1c9c3c2b41e549507473e0162.xls",
+        "suffix": ".xls",
+    },
+    1998: {
+        "dataset": f"{DATASETS}/elections-senatoriales-1998-resultats-572096",
+        "results": "https://static.data.gouv.fr/47/da7da33b9521ab16c8bc28e9d615bd5cac54f7dcc1f8c35e4d5b396c6ab353.xls",
+        "suffix": ".xls",
+    },
+    2001: {
+        "dataset": f"{DATASETS}/elections-senatoriales-2001-resultats-572098",
+        "results": "https://static.data.gouv.fr/47/a29bd3dafe3ce3dd2fe8767e1a41085affa6b24d0059a3089d4881ced64892.xls",
+        "suffix": ".xls",
+    },
+    2004: {
+        "dataset": f"{DATASETS}/elections-senatoriales-2004-resultats-572105",
+        "results": "https://static.data.gouv.fr/72/882366ea8d7963ca9f70bc4b43fcaf7846bc8838a0f3d3bff8ff090bd492c8.xls",
+        "suffix": ".xls",
+    },
+    2008: {
+        "dataset": f"{DATASETS}/elections-senatoriales-2008-resultats-572107",
+        "results": "https://static.data.gouv.fr/fa/bef0cfbf8c2b73b973a69ede89c024ac31134655422a57767e11ad5d7889ab.xls",
+        "suffix": ".xls",
+    },
     2011: {
         "dataset": f"{DATASETS}/elections-senatoriales-2011-resultats-572109",
         "results": "https://static.data.gouv.fr/6a/11effa497299567a95fc6b4da265ae95dbfbba45b048562eb7b727674f2957.xls",
@@ -63,6 +99,12 @@ NOTE = (
     "deputies, senators, regional and departmental councilors, and delegates of the municipal councils. Half of the "
     "348 seats are renewed every three years. On {day} {seats} senators were elected."
 )
+EARLY_NOTE = (
+    "Senators are elected by an electoral college in each department, made up of the department's deputies, "
+    "regional and general councilors, and delegates of the municipal councils. Before the 2003 reform senators "
+    "served nine years and a third of the seats was renewed every three years; the reform cut the term to six years "
+    "and moved to renewal by halves from 2011. On {day} {seats} senators were elected."
+)
 ACCOUNTING = {"registered": 2, "voters": 14, "valid": 4, "blank": 6, "null": 5, "blank_null": 5}
 FIELDS = {
     "registered": ("inscrits",),
@@ -95,6 +137,10 @@ STARTS = {
 }
 SEX = {"M": "male", "F": "female", "MASCULIN": "male", "FEMININ": "female"}
 SHEETS = {
+    **{
+        year: {"maj1": "Maj T1", "maj2": "Maj T2", "prop": "Prop", "elected": "Elus"}
+        for year in (1992, 1995, 1998, 2001, 2004, 2008)
+    },
     2011: {"maj1": "Maj T1", "maj2": "Maj T2", "prop": "Prop", "elected": "Elus"},
     2014: {"maj1": "Maj T1", "maj2": "Maj T2", "prop": "Prop", "elected": "Elus"},
     2017: {"maj1": "MAJ T1", "maj2": "MAJ T2", "prop": "PROP", "elected": "Elus"},
@@ -348,6 +394,32 @@ def senate_elected(year: int, members: pl.DataFrame, singles: pl.DataFrame) -> p
     return pl.DataFrame(found, schema={"unit": pl.String, "surname": pl.String, "forename": pl.String})
 
 
+def resolve_elected(elected: pl.DataFrame, options: list[dict]) -> pl.DataFrame:
+    names: dict[tuple[str, str], tuple[str, str]] = {}
+    heads: dict[str, list[str]] = {}
+    for option in options:
+        if option["proportional"] and option["surname"] is None and option["head"]:
+            _, surname, forename = split_name(option["head"])
+            if not forename:
+                heads.setdefault(option["unit"], []).append(surname)
+                continue
+        else:
+            surname, forename = option["surname"], option["forename"]
+        if surname:
+            names[(option["unit"], norm(f"{surname}{forename or ''}"))] = (surname, forename or "")
+    records = []
+    for row in elected.iter_rows(named=True):
+        full = norm(f"{row['surname']}{row['forename']}")
+        found = names.get((row["unit"], full))
+        if found is None:
+            matches = [h for h in heads.get(row["unit"], []) if full.startswith(norm(h))]
+            found = (matches[0], "") if len(matches) == 1 else None
+        if found is not None:
+            row = {**row, "surname": found[0], "forename": found[1]}
+        records.append(row)
+    return pl.DataFrame(records, schema=elected.schema)
+
+
 def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
     for year in YEARS:
@@ -362,7 +434,7 @@ def parse() -> None:
         if year in CANDIDATE_SHEETS:
             members, singles = read_candidates(year)
         if "elected" in SHEETS[year]:
-            elected = read_elected(year, sheets)
+            elected = resolve_elected(read_elected(year, sheets), options)
         else:
             chosen = senate_elected(year, members, singles)
             elected = chosen.with_columns(round=pl.lit(None, pl.Int64), sex=pl.lit(None, pl.String))
@@ -465,7 +537,9 @@ def emit() -> Path:
             "note",
             entity_id=election,
             kind="context",
-            body_md=NOTE.format(day=f"{when:%-d} {MONTHS_EN[when.month]} {when.year}", seats=elected.height),
+            body_md=(NOTE if year >= 2011 else EARLY_NOTE).format(
+                day=f"{when:%-d} {MONTHS_EN[when.month]} {when.year}", seats=elected.height
+            ),
         )
         runoff = cs.key("fr.election", f"{when}:senate:2")
         cs.add(
