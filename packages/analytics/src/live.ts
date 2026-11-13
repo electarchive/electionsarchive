@@ -173,6 +173,7 @@ const MODEL = {
   pause: 2,
   moving: 0.1,
   still: { span: 1, share: 0.02 },
+  waiting: 0.15,
   shift: 0.028,
   volatility: { scale: 0.9, prior: 0.1, weight: 0.02, calm: 0.2 },
   surge: 0.14,
@@ -354,6 +355,7 @@ type Unit = {
   reported: { share: number; total: number } | null;
   county: string;
   channel: number;
+  mix: Map<number, number>;
   size: number;
   floor: number;
 };
@@ -638,6 +640,9 @@ function units(
       id,
       county,
       channel,
+      mix: new Map(
+        (base?.channels ?? []).map((item) => [item.channel, item.share]),
+      ),
       size: cut === -1 ? expected : (sizes.get(county) ?? 0) / (1 + tail),
       counted,
       total,
@@ -727,7 +732,13 @@ function units(
             ? 0
             : (value - middle) / deviation;
         }),
-        ...streamed.map((channel) => (unit.channel === channel ? 1 : 0)),
+        ...streamed.map((channel) =>
+          unit.channel === 0
+            ? (unit.mix.get(channel) ?? 0)
+            : unit.channel === channel
+              ? 1
+              : 0,
+        ),
       ];
       unit.sigma =
         MODEL.spread *
@@ -1398,7 +1409,14 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
         expected,
         channel: 0,
         hasBaseline: members.some((unit) => unit.hasBaseline),
-        settled: Math.min(...members.map((unit) => unit.settled)),
+        settled: members.some(
+          (unit) =>
+            unit.hasBaseline &&
+            unit.total <= 0 &&
+            unit.expected >= MODEL.waiting * expected,
+        )
+          ? MODEL.moving
+          : Math.min(...members.map((unit) => unit.settled)),
         paced: members.some((unit) => unit.paced == null)
           ? null
           : sum(members.map((unit) => unit.paced ?? 0)),
