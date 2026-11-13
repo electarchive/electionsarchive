@@ -880,9 +880,8 @@ def assess(merged: dict, table: dict) -> list[str]:
 
 def settle(table: dict, shaped: dict, cells: dict | None) -> dict:
     merged = merge(shaped, cells)
-    printed = len(
-        {word for heading in table["counts"] for word in ORDINALS if heading.lower().startswith(word.lower())}
-    )
+    words = {word for heading in table["counts"] for word in ORDINALS if heading.lower().startswith(word.lower())}
+    printed = len(words | {"First"}) if words else 0
     if table["complete"] and 0 < printed < merged["counts"]:
         merged["counts"] = printed
         for row in merged["rows"]:
@@ -890,6 +889,23 @@ def settle(table: dict, shaped: dict, cells: dict | None) -> dict:
     merged["valid"] = valid = poll(merged, table)
     repair(merged, valid)
     merged["changes"] = solve(merged, valid) if valid else []
+    return merged
+
+
+CORRECTED = {(1977, "p024"): {"CRUISE": {9: 6629}, "WOODS": {9: 7352}}}
+
+
+def correct(year: int, page: str, merged: dict) -> dict:
+    for key, fixes in CORRECTED.get((year, page), {}).items():
+        for row in merged["rows"]:
+            if key in row["label"].upper():
+                for count, value in fixes.items():
+                    row["results"][count] = value
+                    for results, moved in row["reads"]:
+                        if count < len(results):
+                            results[count] = value
+                        if count - 1 < len(moved):
+                            moved[count - 1] = value - row["results"][count - 1]
     return merged
 
 
@@ -904,9 +920,9 @@ def tables(year: int) -> list[dict]:
         shaped = page_grid(table)
         best = max(built, key=lambda cells: overlap(shaped, cells), default=None)
         cells = best if best is not None and overlap(shaped, best) >= 0.5 else None
-        merged = settle(table, shaped, cells)
+        merged = correct(year, page.stem, settle(table, shaped, cells))
         if cells is not None and assess(merged, table):
-            alone = settle(table, shaped, None)
+            alone = correct(year, page.stem, settle(table, shaped, None))
             if not assess(alone, table):
                 merged, cells = alone, None
         found.append(
