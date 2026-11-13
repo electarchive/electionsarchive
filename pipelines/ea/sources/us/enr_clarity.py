@@ -23,6 +23,7 @@ from ea.changeset import NAMESPACE, Changeset, slug
 from ea.encoding import DOUBLED, repair, restorer, sweep
 from ea.labelpoint import label_point
 from ea.offices import Offices
+from ea.sources.us.enr_clarity_twins import _person
 from ea.store import DATA, connect
 
 SOURCE = "us.enr_clarity"
@@ -1470,6 +1471,90 @@ def family(source: str) -> list[str]:
     return found
 
 
+def _cede(conn: Connection, cs: Changeset, source: str, ceded: Mapping[str, UUID]) -> tuple[Counter[str], set[UUID]]:
+    report: Counter[str] = Counter()
+    merged: set[UUID] = set()
+    pairs = {
+        contest: ceded[value]
+        for value, contest in conn.execute(
+            """select x.value, x.entity_id from external_id x join contest c on c.id = x.entity_id
+               join changeset g on g.id = c.changeset_id
+               where x.scheme = 'us.contest' and x.value = any(%s) and g.pipeline = %s
+                 and not exists (select from entity_retirement t where t.entity_id = c.id)""",
+            [list(ceded), source],
+        ).fetchall()
+        if contest != ceded[value]
+    }
+    options: dict[UUID, list[tuple[UUID, str, str | None, UUID | None]]] = {}
+    for contest, option, kind, label, person in conn.execute(
+        """select o.contest_id, o.id, o.kind::text, coalesce(y.ballot_name, o.ballot_label), y.person_id
+           from contest_option o left join candidacy y on y.option_id = o.id and y.role = 'head'
+           where o.contest_id = any(%s) and o.parent_option_id is null""",
+        [[*pairs, *pairs.values()]],
+    ).fetchall():
+        options.setdefault(contest, []).append((option, kind, label, person))
+
+    def keyed(kind: str, label: str | None) -> str | None:
+        if kind != "candidate" or re.search(r"(?i)write|scatter|^uncertified$", label or ""):
+            return None
+        return _person(label or "")
+
+    for contest, target in pairs.items():
+        theirs: dict[str | None, list[tuple[UUID, UUID | None]]] = {}
+        pooled: dict[str, list[UUID]] = {}
+        for option, kind, label, person in options.get(target, []):
+            theirs.setdefault(keyed(kind, label), []).append((option, person))
+            pooled.setdefault(kind, []).append(option)
+        ours = [(option, kind, person, keyed(kind, label)) for option, kind, label, person in options.get(contest, [])]
+
+        def match(key: str) -> list[tuple[UUID, UUID | None]]:
+            if key in theirs:
+                return theirs[key]
+            first, _, last = key.partition(" ")
+            return [
+                found
+                for other, entries in theirs.items()
+                if other is not None and other.partition(" ")[0] == first
+                for found in entries
+                if (them := other.partition(" ")[2]).startswith(last)
+                or last.startswith(them)
+                or SequenceMatcher(None, last, them).ratio() >= 0.8
+            ]
+
+        found = {key: match(key) for *_, key in ours if key is not None}
+        if not found or not all(len(entries) == 1 for entries in found.values()):
+            report["contests whose candidates do not match"] += 1
+            continue
+        cs.merge(contest, target)
+        merged.add(contest)
+        report["contests merged into the school district's own body"] += 1
+        for option, kind, person, key in ours:
+            if key is not None:
+                other, holder = found[key][0]
+                cs.merge(option, other)
+                if person is not None and holder is not None and person != holder:
+                    cs.merge(person, holder)
+            elif kind != "candidate" and len(pooled.get(kind, [])) == 1:
+                cs.merge(option, pooled[kind][0])
+            else:
+                report["unmatched write-in or uncertified lines carried along"] += 1
+    elections: dict[UUID, set[UUID]] = {}
+    for election, contest, into in conn.execute(
+        """select c.election_id, c.id, t.election_id from contest c
+           left join contest t on t.id = (%s::jsonb ->> c.id::text)::uuid
+           where c.election_id in (select election_id from contest where id = any(%s))
+             and not exists (select from entity_merge m where m.entity_id = c.id)
+             and not exists (select from entity_retirement t where t.entity_id = c.id)""",
+        [json.dumps({str(contest): str(target) for contest, target in pairs.items()}), list(pairs)],
+    ).fetchall():
+        elections.setdefault(election, set()).add(into if contest in cs.survivors else election)
+    for election, targets in elections.items():
+        if len(targets) == 1 and (target := next(iter(targets))) != election:
+            cs.merge(election, target)
+            report["elections merged"] += 1
+    return report, merged
+
+
 def _pieces(
     source: str, family: list[str], contests: pl.DataFrame, lines: pl.DataFrame, alias_codes: Mapping[str, list[str]]
 ) -> tuple[
@@ -1880,6 +1965,25 @@ def emit(
             taken.setdefault((held_on, value), set()).add(
                 ("*" if key is None else ":".join(key.split(":")[2:5]), pipeline)
             )
+        boarded: dict[tuple[object, str], dict[tuple[str, bool], UUID]] = {}
+        for held_on, value, district, term, contest in conn.execute(
+            """select e.date_from, x.value, a.code, c.term::text, c.id from contest c
+               join election e on e.id = c.election_id
+               join external_id x on x.entity_id = c.body_id and x.scheme = 'us.body'
+               left join area_code a on a.area_id = c.district_area_id
+               where x.value like any(%s)
+                 and not exists (select from entity_retirement t where t.entity_id = c.id)
+                 and not exists (select from entity_merge m where m.entity_id = c.id)
+                 and exists (select from result_set r join changeset g on g.id = r.changeset_id
+                             where r.contest_id = c.id and r.status <> 'withdrawn' and g.pipeline <> all(%s))""",
+            [[f"{st}:sd%" for st in states], [source, *siblings]],
+        ).fetchall():
+            parts = (district or "").split(":")
+            boarded.setdefault((held_on, value.replace(":sd", ":", 1)), {})[
+                (parts[3].rsplit("-", 1)[-1] if len(parts) > 3 else "*", term == "remainder")
+            ] = contest
+        ceded: dict[str, UUID] = {}
+        held_back: set[str] = set()
         bodies = {
             value
             for (value,) in conn.execute(
@@ -2265,6 +2369,19 @@ def emit(
                     "board-of-commissioners": ("county-board",),
                 }.get(office_key, (office_key,))
             }
+            if scheme == "us.school_district" and not question:
+                held_seat = (slug(seat).rsplit("-", 1)[-1] if seat else "*", bool(first["remainder"]))
+                if holder := next(
+                    (
+                        boarded[(day, alias)][held_seat]
+                        for alias in aliases
+                        if held_seat in boarded.get((day, alias), {})
+                    ),
+                    None,
+                ):
+                    ceded[contest_key] = holder
+                    skipped["held under the school district's own body"] += 1
+                    continue
             if not question and contest_key in keyed and "whole" in rows.columns and rows["whole"].all():
                 existing = cs.key("us.contest", contest_key)
                 found_options = [
@@ -2400,6 +2517,7 @@ def emit(
                 or (question and clash(asked.get((day, code), set())))
             ):
                 skipped["held by another pipeline"] += 1
+                held_back.add(contest_key)
                 continue
             shares = dict(made[(scheme, code)][2]) if (scheme, code) in made else {code[:5]: 1.0}
             for other in alias_codes.get(code, []) if scheme == "us.special_district" else []:
@@ -2980,6 +3098,23 @@ def emit(
             + f"; plurality under TEC 11.057: {sum(plurality.values())} contests in {len(plurality)} districts, "
             f"{len(runoff_schools)} districts excluded for having a runoff"
         )
+        report, merged = _cede(conn, cs, source, ceded)
+        if report:
+            print(", ".join(f"{reason} {count}" for reason, count in report.most_common()))
+        last = {
+            result_set
+            for (result_set,) in conn.execute(
+                """select r.id from result_set r join changeset g on g.id = r.changeset_id
+                   join external_id x on x.entity_id = r.contest_id and x.scheme = 'us.contest'
+                   where g.pipeline = %s and r.status = 'active' and r.is_default and x.value = any(%s)
+                     and r.contest_id <> all(%s)
+                     and not exists (select from result_set o where o.contest_id = r.contest_id and o.id <> r.id
+                                     and o.status = 'active' and o.is_default)""",
+                [source, [*held_back, *ceded], list(merged)],
+            ).fetchall()
+        }
+        if last:
+            print(f"{len(last)} sets stay active: no other source's default holds their contest")
         columns = ("id", "election_id", "contest_id", "stage", "kind", "source_id", "is_default", "completeness")
         for row in conn.execute(
             f"""select distinct {", ".join(f"r.{column}" for column in columns)} from result_set r
@@ -2989,6 +3124,8 @@ def emit(
                   and split_part(x.value, ':', 2) = any(%s)""",
             [source, emitted, emitted_sets, states],
         ).fetchall():
+            if row[0] in last:
+                continue
             cs.add("result_set", **dict(zip(columns, row, strict=True)) | {"is_default": False}, status="withdrawn")
             cs.add("note", entity_id=row[0], kind="caveat", body_md=WITHDRAWN)
         states_of = {row["county_fips"]: row["state"] for row in listed}
