@@ -4,8 +4,10 @@ import html
 import io
 import re
 import subprocess
-from collections.abc import Iterator
-from datetime import date, datetime, timedelta
+import zipfile
+from collections import Counter
+from collections.abc import Callable, Iterator
+from datetime import UTC, date, datetime, time, timedelta
 from pathlib import Path
 from uuid import UUID
 from zoneinfo import ZoneInfo
@@ -19,6 +21,8 @@ SOURCE = "us.ballots"
 EASTERN = ZoneInfo("America/New_York")
 FL_STATS = "https://electionfiles.floridados.gov/countyballotreportfiles/Stats_{number}_{kind}.txt"
 FL_PAGE = "https://countyfilesvbm-ev.floridados.gov/VoteByMailEarlyVotingReports/PublicStats"
+FL_REPORTS = "https://countyfilesvbm-ev.floridados.gov/VoteByMailEarlyVotingReports/PublicReports"
+FL_EARLY = "https://countyfilesvbm-ev.floridados.gov/VoteByMailEarlyVotingReports/ViewArchive?name=EVL_{number}.zip"
 FL_PDFS = {
     "https://fldoswebumbracoprod.blob.core.windows.net/media/703948/gen-2020.pdf": date(2020, 11, 3),
     "https://files.floridados.gov/media/706191/2022-ge-rptstatuscountsarchive-ev-vbm.pdf": date(2022, 11, 8),
@@ -117,6 +121,60 @@ def pdf(path: Path, day: date) -> Iterator[Row]:
         )
 
 
+def early(client: httpx.Client, number: str) -> raw.Artifact:
+    listing = client.get(FL_REPORTS)
+    listing.raise_for_status()
+    names = {
+        code: cells(row)[0]
+        for row in re.findall(r"(?s)<tr.*?</tr>", listing.text)
+        for code in re.findall(rf"ViewReport\?name=([A-Z]{{3}})_EVL_{number}\.txt", row)
+    }
+    url = FL_EARLY.format(number=number)
+    response = client.get(url, timeout=600)
+    response.raise_for_status()
+    seen: set[str] = set()
+    voters: Counter[tuple[str, str, str, str]] = Counter()
+    with zipfile.ZipFile(io.BytesIO(response.content)) as archive:
+        for member in archive.infolist():
+            with archive.open(member) as handle:
+                for line in io.TextIOWrapper(handle, encoding="latin-1", newline=""):
+                    row = line.rstrip("\r\n").split("\t")
+                    if row[0] != "EVtrs" or row[5] in seen:
+                        continue
+                    seen.add(row[5])
+                    voters[(names[row[1]], row[3], row[4], row[17])] += 1
+    lines = ["CountyName\tElectionDate\tElectionName\tDateofEarlyVote\tVoters"]
+    lines += ["\t".join([*key, str(count)]) for key, count in sorted(voters.items())]
+    return raw.store(
+        SOURCE,
+        f"{url}#county-day",
+        ("\n".join(lines) + "\n").encode(),
+        suffix=".tsv",
+        retrieved_at=datetime.now(UTC),
+        media_type="text/tab-separated-values",
+    )
+
+
+def daily(content: bytes) -> Iterator[Row]:
+    totals: Counter[tuple[date, str, str]] = Counter()
+    rows = csv.DictReader(io.StringIO(content.decode()), delimiter="\t")
+    for row in sorted(rows, key=lambda row: datetime.strptime(row["DateofEarlyVote"], "%m/%d/%Y")):
+        kind = kind_of(re.sub(r" Election$", "", row["ElectionName"]))
+        if kind is None:
+            continue
+        day = datetime.strptime(row["ElectionDate"], "%m/%d/%Y").date()
+        totals[(day, kind, row["CountyName"])] += int(row["Voters"])
+        voted = datetime.strptime(row["DateofEarlyVote"], "%m/%d/%Y").date()
+        yield (
+            day,
+            kind,
+            row["CountyName"],
+            2,
+            datetime.combine(voted, time(23, 59, 59), EASTERN),
+            totals[(day, kind, row["CountyName"])],
+        )
+
+
 def collect(client: httpx.Client) -> dict[str, tuple[bytes, str]]:
     response = client.get(FL_PAGE)
     response.raise_for_status()
@@ -196,15 +254,21 @@ def archive(conn: Connection, feed: str) -> tuple[int, int, set[str]]:
         (key for key in held if key.startswith("https://web.archive.org/web/") and "PublicStats" in key),
         key=lambda key: key.split("/")[4],
     )
-    sources = [(key, None) for key in captures] + [(url, day) for url, day in FL_PDFS.items() if url in held]
+    sources: list[tuple[str, Callable[[Path], Iterator[Row]], bool]] = [
+        (key, lambda path: page(path.read_bytes()), False) for key in captures
+    ]
+    sources += [(url, lambda path, day=day: pdf(path, day), True) for url, day in FL_PDFS.items() if url in held]
+    sources += [
+        (key, lambda path: daily(path.read_bytes()), False) for key in sorted(held) if key.endswith("#county-day")
+    ]
     fetches = written = 0
     missing: set[str] = set()
-    for key, day in sources:
+    for key, parse, final in sources:
         artifact = raw.cached(SOURCE, key)
         if artifact.sha256 in done:
             continue
         done.add(artifact.sha256)
-        rows = list(page(artifact.path.read_bytes()) if day is None else pdf(artifact.path, day))
+        rows = list(parse(artifact.path))
         fetch = conn.execute(
             """insert into live.fetch (feed_id, fetched_at, as_of, sha256, path, status, detail)
                values (%s, %s, %s, %s, %s, 'frame', %s) returning id""",
@@ -214,10 +278,12 @@ def archive(conn: Connection, feed: str) -> tuple[int, int, set[str]]:
                 max((row[4] for row in rows), default=None),
                 artifact.sha256,
                 key,
-                "archived report",
+                "per-voter early voting file, totaled by county and vote day"
+                if key.endswith("#county-day")
+                else "archived report",
             ],
         ).fetchall()[0][0]
-        count, lost = write(conn, feed, fetch, rows, final=day is not None)
+        count, lost = write(conn, feed, fetch, rows, final=final)
         fetches += 1
         written += count
         missing |= lost
