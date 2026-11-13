@@ -1,4 +1,7 @@
+import base64
 import difflib
+import io
+import json
 import re
 import struct
 import subprocess
@@ -7,8 +10,11 @@ from pathlib import Path
 from uuid import UUID
 
 import polars as pl
+from anthropic.types import ImageBlockParam, TextBlockParam
+from anthropic.types.message_create_params import MessageCreateParamsNonStreaming
+from PIL import Image
 
-from ea import raw
+from ea import batch, raw
 from ea.changeset import Changeset, slug
 from ea.names import foreign_preferred
 from ea.sources.gb import leh
@@ -20,6 +26,44 @@ VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 DOWNLOAD = lb.DOWNLOAD
 PUBLISHER = "Greater London Council"
+MODEL = "claude-haiku-5-5"
+PROMPT = "1"
+LONGEST = 1568
+READS = {1982: (f"{DOWNLOAD}/575f3aa9-8b89-4096-a7bb-ffc893bcfff9/LBCE_1982-5-6.pdf", (7, 68))}
+READ_SYSTEM = (
+    "You read one page of Table 1, Election results by ward, from the Greater London Council's report on the London "
+    "borough council elections of 6 May 1982. The page has two columns: read the left column from top to bottom, "
+    "then the right column. Return every heading and candidate line in that order. A borough heading is a borough "
+    "name in capitals, often boxed, or a line such as CROYDON - continued at the top of a column. A ward heading is "
+    "a ward name in capitals above its candidates. A candidate line has the surname, forenames or initials, the "
+    "party code, and the votes. Copy text exactly as printed, including punctuation in names. Give the party code "
+    "exactly as printed (such as CON, LAB, LIBSDP, SDPLIB, or LABCP) and the votes as printed with their commas, or "
+    "the word printed instead of a figure (such as Unopposed). Say whether each candidate's name is indented "
+    "relative to the first candidate of the ward: the elected are flush left and the others are indented. Skip the "
+    "table title, the running footer, and the page number."
+)
+READ_SCHEMA: dict[str, object] = {
+    "type": "object",
+    "properties": {
+        "rows": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "kind": {"type": "string", "enum": ["borough", "ward", "candidate"]},
+                    "text": {"type": "string"},
+                    "party": {"type": ["string", "null"]},
+                    "votes": {"type": ["string", "null"]},
+                    "indented": {"type": ["boolean", "null"]},
+                },
+                "required": ["kind", "text", "party", "votes", "indented"],
+                "additionalProperties": False,
+            },
+        }
+    },
+    "required": ["rows"],
+    "additionalProperties": False,
+}
 INDEPENDENT = {"Independent", "Citizen", "Electrician", "Labourer", "Theatrical Agent", "Retired Garage Proprietor"}
 METHODOLOGY = (
     "Read from the text layer of the Greater London Council's scanned report, with a second reading by optical "
@@ -845,9 +889,60 @@ ALIASES = {"cityofwestminster": "westminster", "exley": "bexley"}
 Word = tuple[float, float, float, float, str]
 
 
+def read_key(sha256: str, page: int) -> str:
+    return f"anthropic-batch:{MODEL}/{PROMPT}/{sha256}/{page}"
+
+
+def vision(sha256: str, page: int) -> list[dict]:
+    message = json.loads(raw.cached(lb.SOURCE, read_key(sha256, page)).path.read_text())
+    return json.loads(next(block["text"] for block in message["content"] if block["type"] == "text"))["rows"]
+
+
 def fetch() -> None:
     for spec in BOOKS.values():
         raw.fetch(lb.SOURCE, spec["url"], suffix=".pdf")
+    price_in, price_out = batch.PRICES[MODEL]
+    for year, (url, (first, last)) in READS.items():
+        artifact = raw.fetch(lb.SOURCE, url, suffix=".pdf")
+        wanted: dict[str, batch.Want] = {}
+        for page in range(first, last + 1):
+            png = subprocess.run(
+                ["pdftoppm", "-r", "200", "-gray", "-png", "-f", str(page), "-l", str(page), "-singlefile"]
+                + [str(artifact.path)],
+                check=True,
+                capture_output=True,
+            ).stdout
+            image = Image.open(io.BytesIO(png))
+            image.thumbnail((LONGEST, LONGEST))
+            buffer = io.BytesIO()
+            image.save(buffer, "PNG")
+            params = MessageCreateParamsNonStreaming(
+                model=MODEL,
+                max_tokens=8000,
+                system=READ_SYSTEM,
+                messages=[
+                    {
+                        "role": "user",
+                        "content": [
+                            ImageBlockParam(
+                                type="image",
+                                source={
+                                    "type": "base64",
+                                    "media_type": "image/png",
+                                    "data": base64.b64encode(buffer.getvalue()).decode(),
+                                },
+                            ),
+                            TextBlockParam(type="text", text="Read the headings and candidates on this page."),
+                        ],
+                    }
+                ],
+                output_config={"effort": "low", "format": {"type": "json_schema", "schema": READ_SCHEMA}},
+            )
+            wanted[read_key(artifact.sha256, page)] = (
+                params,
+                (image.width * image.height / 750 * price_in + 4000 * price_out) / 1e6,
+            )
+        print(batch.ensure(lb.SOURCE, f"lbce{year}", wanted)[1])
 
 
 def fold(text: str) -> str:
