@@ -459,6 +459,14 @@ BOOKS: dict[int, dict] = {
         "day": date(1986, 5, 8),
         "url": f"{DOWNLOAD}/860bbb06-09d8-4f3f-bd84-b60e442a61e8/LBCE_1986-5-8.pdf",
         "publisher": "London Residuary Body",
+        "methodology": "Read from the text layer of the London Residuary Body's scanned report, with a second "
+        "reading of candidate names by optical character recognition at 300 dpi and the page images checked where "
+        "the two differ. The report lists each ward's candidates in vote order. Every party's London-wide "
+        "candidates, votes, and elected add up to the report's table of candidates and votes by party, each "
+        "borough's elected councillors match its seats in the summary of results by wards, and each ward's "
+        "electorate comes from that summary, whose ward figures add up to each borough's printed total. Party "
+        "labels marked in the report as Labour and Co-operative or as Alliance candidates are stored under the "
+        "party the report names. Candidate names are printed as surname and forenames.",
         "candidates": (7, 75),
         "wards": (77, 93),
         "byelections": {"holytrinity", "hestonwest"},
@@ -1632,8 +1640,9 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary="London borough council elections "
-            + ", ".join(map(str, sorted(BOOKS)))
-            + " by ward, from the Greater London Council's reports",
+            + ", ".join(map(str, sorted(BOOKS)[:-1]))
+            + f", and {max(BOOKS)} by ward, from the reports of the Greater London Council and its successor, "
+            "the London Residuary Body",
             polity="GB",
         )
         outranked = foreign_preferred(conn, cs, SOURCE)
@@ -1775,7 +1784,7 @@ def emit() -> Path:
                 )
                 name(election, f"{year} {council} election")
                 cs.add("slug", path=f"{path}/{day}-local", entity_id=election)
-                cs.add("note", entity_id=election, kind="methodology", body_md=METHODOLOGY)
+                cs.add("note", entity_id=election, kind="methodology", body_md=spec.get("methodology", METHODOLOGY))
                 if year in NOTES:
                     cs.add("note", entity_id=election, kind="context", body_md=NOTES[year])
                 for ward in held.filter(pl.col("la_code") == code).iter_rows(named=True):
