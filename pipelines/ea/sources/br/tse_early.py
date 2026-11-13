@@ -162,6 +162,18 @@ QUOTIENT = (
     "candidates in order of personal votes. Blank votes counted as valid for the quotient, and so did null votes "
     "until the Electoral Code of 1965."
 )
+QUOTIENT_1945 = (
+    "Each state elects its deputies at large from open lists (Decreto-Lei 7.586 of 1945, revived for the elections "
+    "of January 1947). Voters choose a candidate or a party (a legend vote). Parties may join an alliance, which runs "
+    "as one list. The electoral quotient is the valid votes, blank votes included, divided by the seats and rounded "
+    "to a whole number, a fraction of one half or less dropped. Each list takes one seat per full quotient, and "
+    "every seat left over goes to the list with the most votes. Each list's seats go to its candidates in order of "
+    "personal votes."
+)
+LEFTOVERS = (
+    "Under the 1945 rule the votes in the electoral court's file give {computed}; the court declared {declared}. "
+    "The seats are stored as declared."
+)
 UNNAMED = "Unnamed candidate"
 NO_NAME = "The electoral court's file gives no name for {count} candidates; their votes are kept."
 REPEATED = (
@@ -293,6 +305,20 @@ def parse() -> None:
     pl.concat(frames["parties"]).write_parquet(PARSED / "parties.parquet")
     pl.concat(frames["detail"]).write_parquet(PARSED / "detail.parquet")
     pl.concat(frames["seats"]).write_parquet(PARSED / "seats.parquet")
+
+
+def leftovers(votes: dict[str, int], seats: int, valid: int) -> dict[str, int]:
+    whole, part = divmod(valid, seats)
+    quotient = whole + (2 * part > seats)
+    won = {group: value // quotient for group, value in votes.items()}
+    won[max(votes, key=lambda group: votes[group])] += seats - sum(won.values())
+    return {group: count for group, count in won.items() if count}
+
+
+def listing(seats: dict[str, int]) -> str:
+    return ", ".join(
+        f"{group.replace('/', ' / ')} {count}" for group, count in sorted(seats.items(), key=lambda item: -item[1])
+    )
 
 
 def slug(text: str) -> str:
@@ -435,6 +461,17 @@ def emit() -> Path:
                 {"formula": "winner_take_all"},
                 "Brazilian Senate sublegenda system, 1966–1986",
                 SUBLEGENDAS,
+            ),
+            (
+                "open-list-quotient-1945",
+                {
+                    "formula": "hare",
+                    "quotaRounding": "half_down",
+                    "leftovers": "most_votes",
+                    "lists": {"order": "open", "vacancy": "next_by_votes"},
+                },
+                "Brazilian open-list proportional representation, 1945–1947",
+                QUOTIENT_1945,
             ),
             (
                 "open-list-quotient-1950",
@@ -629,10 +666,8 @@ def emit() -> Path:
                     if office == "senate"
                     else "open-list-quotient-1950"
                     if year >= 1950
-                    else None
+                    else "open-list-quotient-1945"
                 )
-                if system is None:
-                    continue
                 if national:
                     values_rows = rows
                     rows = (
@@ -650,13 +685,32 @@ def emit() -> Path:
                 else:
                     values_rows = rows
                 override = None
+                mismatch = None
                 if office == "chamber":
                     counted = int(rows["votes"].fill_null(0).clip(0).sum()) + int(
                         legends.filter((pl.col("year") == year) & (pl.col("uf") == uf))["legend"].sum()
                     )
                     _, _, _, blank, null = totals.get((year, round, cargo, uf), (None,) * 5)
                     extra = max(blank or 0, 0) + (max(null or 0, 0) if year < 1966 else 0)
-                    if counted:
+                    if counted and year < 1950:
+                        votes = (
+                            pl.concat(
+                                [
+                                    rows.select("pool", votes=pl.col("votes").fill_null(0).clip(0)),
+                                    legends.filter((pl.col("year") == year) & (pl.col("uf") == uf)).select(
+                                        "pool", votes="legend"
+                                    ),
+                                ]
+                            )
+                            .drop_nulls("pool")
+                            .group_by("pool")
+                            .agg(pl.col("votes").sum())
+                        )
+                        computed = leftovers(dict(votes.iter_rows()), magnitude, counted + max(blank or 0, 0))
+                        elected_seats = dict(elected.drop_nulls("pool").group_by("pool").len().iter_rows())
+                        if computed != elected_seats:
+                            mismatch = LEFTOVERS.format(computed=listing(computed), declared=listing(elected_seats))
+                    elif counted:
                         override = {
                             "threshold": {
                                 "percent": float(f"{100 * (counted + extra) / counted / magnitude:.6f}"),
@@ -688,6 +742,8 @@ def emit() -> Path:
                         kind="caveat",
                         body_md=SEATS_NOTE.format(elected=elected.height, seats=declared),
                     )
+                if mismatch is not None:
+                    cs.add("note", entity_id=contest, kind="caveat", body_md=mismatch)
                 result_set = cs.key(f"{SOURCE}.result_set", key)
                 cs.add(
                     "result_set",
