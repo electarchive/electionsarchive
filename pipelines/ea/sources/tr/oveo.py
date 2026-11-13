@@ -266,7 +266,8 @@ def emit() -> Path:
             ("tr.okul", 4, "polling place", "precinct"),
             ("tr.sandik", 5, "ballot box", "precinct"),
         ):
-            cs.add("scheme", code=code, polity_id=turkey, kind=kind, rank=rank, noun=noun)
+            extra = {"kinds": {"mahalle": "neighborhood", "koy": "village"}} if code == "tr.mahalle" else {}
+            cs.add("scheme", code=code, polity_id=turkey, kind=kind, rank=rank, noun=noun, **extra)
 
         def names(frame: pl.DataFrame, entity: pl.Expr) -> pl.DataFrame:
             return frame.select(
