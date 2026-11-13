@@ -28,6 +28,7 @@ SECTIONS = {
 }
 NO_OUTCOME = {("LA", 1979)}
 INFOBOX = {("AR", 1990)}
+REDO = ["a55de721-5980-5842-bc11-ee26db16aad7"]
 API = "https://en.wikipedia.org/w/api.php?"
 CHUNK = 20
 
@@ -41,13 +42,14 @@ def contests() -> list[tuple[str, int, str]]:
                where e.date_from < '2000-01-01' and e.kind = 'general'
                  and exists (select from result_set_history h join result_set_drop d
                              on h.id = d.result_set_id and h.superseded_by = d.changeset_id where h.contest_id = c.id)
-                 and not exists (select from result_set r join changeset k on k.id = r.changeset_id
-                                 where r.contest_id = c.id and k.pipeline = %s)
-                 and not exists (select from result_set r join changeset k on k.id = r.changeset_id
-                                 where r.contest_id = c.id and r.is_default
-                                   and coalesce(r.completeness, 1) >= 0.98 and k.pipeline not like 'us.nyc%%')
+                 and (c.id = any(%s::uuid[]) or (
+                   not exists (select from result_set r join changeset k on k.id = r.changeset_id
+                               where r.contest_id = c.id and k.pipeline = %s)
+                   and not exists (select from result_set r join changeset k on k.id = r.changeset_id
+                                   where r.contest_id = c.id and r.is_default
+                                     and coalesce(r.completeness, 1) >= 0.98 and k.pipeline not like 'us.nyc%%')))
                order by 1, 2""",
-            [SOURCE],
+            [REDO, SOURCE],
         ).fetchall()
 
 
@@ -172,6 +174,9 @@ def tables(text: str) -> list[tuple[str, int, list[dict[str, Any]], str | None]]
         if re.search(r"lieutenant|ticket", body[:1500], re.IGNORECASE):
             continue
         mated = re.search(r"running mate", body[:1500], re.IGNORECASE) is not None
+        candidate_at = re.search(r"candidate|nominee", body[:1500], re.IGNORECASE)
+        party_at = re.search(r"\bparty\b", body[:1500], re.IGNORECASE)
+        named_first = candidate_at is not None and party_at is not None and candidate_at.start() < party_at.start()
         rows: list[dict[str, Any]] = []
         listed, total = 0, None
         for row in body.split("\n|-")[1:]:
@@ -199,6 +204,8 @@ def tables(text: str) -> list[tuple[str, int, list[dict[str, Any]], str | None]]
                 continue
             listed += votes
             percent = next((cell for cell in row_cells[number + 1 :] if "%" in cell), None)
+            if named_first and not mated and len(before) > 1:
+                before = [before[-1], before[-2]]
             rows.append(
                 {
                     "name": before[-1],
@@ -555,6 +562,10 @@ def emit() -> Path:
             version=VERSION,
             summary="Governor general election totals by state, 1865 to 1999, from the English Wikipedia's articles",
             polity="US",
+        )
+        cs.remainders(
+            "A party column in the article's table read as the candidate name",
+            pattern=r"^((democratic|republican|reform) party|independent)$",
         )
 
         def name(entity: UUID, text: str) -> None:
