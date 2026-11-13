@@ -1,6 +1,7 @@
 import io
 import json
 import re
+import subprocess
 import zipfile
 from collections import Counter
 from collections.abc import Mapping
@@ -349,6 +350,29 @@ DATES = {
     10445: date(2009, 4, 7),
     8819: date(2008, 11, 4),
 }
+CITY = "City of Huntsville"
+CANVASSES = {
+    "https://web.archive.org/web/20240925053250id_/https://www.huntsvilleal.gov/wp-content/uploads/2024/09/2024-MUNICIPAL-ELECTION-RESULTS.pdf": (
+        date(2024, 8, 27),
+        (
+            ("council", "District 1", ("Devyn S Keith", "Reggie McKenzie", "Michelle Watkins")),
+            (
+                "board-of-education",
+                "District 1",
+                ('Will "Chill Will" Culver', "Claudia Harris", "Chaundra M. Jones", "Pat King"),
+            ),
+            ("council", "District 5", ("Kim Caudle Lewis", "John Merideth")),
+            ("board-of-education", "District 5", ("Zara R Broadenax", "Carlos Mathews")),
+        ),
+    ),
+    "https://web.archive.org/web/20250421085528id_/https://www.huntsvilleal.gov/wp-content/uploads/2024/10/2024-Municipal-Runoff-Election-Results.pdf": (
+        date(2024, 9, 24),
+        (
+            ("council", "District 1", ("Devyn S Keith", "Michelle Watkins")),
+            ("board-of-education", "District 1", ("Chaundra M. Jones", "Pat King")),
+        ),
+    ),
+}
 RENAMED = {
     "2009-04-07:IL": "0001-01-01:IL",
     **{
@@ -381,6 +405,7 @@ TOWNSHIP_KEYS = (
 PLACE_KEYS = ("mayor", "president", "council", "council-president", "board-of-trustees", "law-director")
 BODIES = (
     "council",
+    "board-of-education",
     "board-of-trustees",
     "township-board",
     "board-of-supervisors",
@@ -406,6 +431,10 @@ UNNAMED = (
     "No winner is recorded: the county reported only a write-in total for this office and named no write-in "
     "candidate, so these returns do not show who won."
 )
+CANVASS = (
+    "Votes are the {publisher}'s official results by district, each candidate's total over the precincts, absentee "
+    "ballots, and provisional ballots counted, as printed in the city's results sheet."
+)
 TOTALS = (
     "Votes are the {publisher}'s election night reporting results, counted as one total for the whole jurisdiction "
     "because the county's precincts do not add up to its total or are already in the archive under other names."
@@ -422,6 +451,8 @@ def fetch() -> None:
             raw.fetch(SOURCE, url(county, election, version), suffix=".zip")
     for link in (*SUBDIVISIONS.values(), *PLACES.values()):
         raw.fetch(SOURCE, link, suffix=".zip")
+    for link in CANVASSES:
+        raw.fetch(SOURCE, link, suffix=".pdf")
 
 
 def _shapes(link: str) -> list[tuple[Mapping[str, object], str, tuple[float, ...]]]:
@@ -649,6 +680,70 @@ def parse() -> None:
                         "runoff": runoff,
                     }
                 )
+    for link, (day, races) in CANVASSES.items():
+        text = subprocess.run(
+            ["pdftotext", "-layout", str(raw.cached(SOURCE, link).path), "-"],
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout
+        sums = {
+            label: [int(number) for number in re.findall(r"\b\d+\b", line)]
+            for line in text.splitlines()
+            if (label := re.sub(r"\s+", " ", re.sub(r"[\d%.]+", "", line)).strip())
+            in ("Total Votes Before Provisional Ballots", "Provisional Ballots Counted", "Total Votes")
+        }
+        widths = [len(names) + 1 for _, _, names in races]
+        if any(len(found) != sum(widths) for found in sums.values()) or any(
+            before + late != total
+            for before, late, total in zip(
+                sums["Total Votes Before Provisional Ballots"],
+                sums["Provisional Ballots Counted"],
+                sums["Total Votes"],
+                strict=True,
+            )
+        ):
+            raise ValueError(f"{link} does not read as {widths} columns")
+        found = iter(sums["Total Votes"])
+        election = int(day.strftime("%Y%m%d"))
+        runoff = "Runoff" in link
+        for key, seat, names in races:
+            votes = [next(found) for _ in names]
+            if sum(votes) != next(found):
+                raise ValueError(f"{link} {key} {seat} does not add up")
+            contest = f"{key}:{slug(seat)}"
+            lines.extend(
+                {
+                    "county": "01089",
+                    "election": election,
+                    "contest": contest,
+                    "choice": name,
+                    "was": name,
+                    "party": None,
+                    "place": None,
+                    "votes": count,
+                }
+                for name, count in zip(names, votes, strict=True)
+            )
+            contests.append(
+                {
+                    "county": "01089",
+                    "publisher": CITY,
+                    "election": election,
+                    "contest": contest,
+                    "day": day,
+                    "title": f"{day.year} Municipal {'Runoff ' if runoff else ''}Election",
+                    "text": f"{'City Council' if key == 'council' else 'Board of Education'} {seat}",
+                    "key": key,
+                    "scheme": "us.place",
+                    "code": "0137000",
+                    "seat": seat,
+                    "remainder": False,
+                    "magnitude": 1,
+                    "variant": None,
+                    "runoff": runoff,
+                }
+            )
     groups: dict[tuple[object, ...], list[dict[str, object]]] = {}
     for row in contests:
         groups.setdefault(
@@ -731,7 +826,9 @@ def parse() -> None:
         .group_by("county", "election", "contest")
         .agg((pl.col("votes") == pl.col("counted")).all().alias("balanced"))
     )
-    contests_frame = contests_frame.join(checked, on=["county", "election", "contest"], how="left")
+    contests_frame = contests_frame.join(checked, on=["county", "election", "contest"], how="left").with_columns(
+        balanced=pl.col("balanced") & (pl.col("publisher") != CITY)
+    )
     print(
         f"{contests_frame.height} contests, {contests_frame.filter('balanced').height} with precincts that add up; "
         f"{contests_frame.filter(pl.col('key') == 'question').height} questions; "
@@ -911,6 +1008,18 @@ def emit() -> Path:
                 )
             for election, version in elections.items():
                 cs.artifact(raw.cached(SOURCE, url(county, election, version)), sources[county])
+        canvass = cs.source(CITY, "Municipal election results")
+        cs.add(
+            "source",
+            id=canvass,
+            kind="official_body",
+            publisher=CITY,
+            title="Municipal election results",
+            url="https://www.huntsvilleal.gov/",
+            license="Public record",
+        )
+        for link in CANVASSES:
+            cs.artifact(raw.cached(SOURCE, link), canvass)
         made = pl.read_parquet(PARSED / "polities.parquet")
         repeated = set(made.filter(pl.col("display").is_duplicated())["display"].to_list())
         for scheme, code, display, geom in made.iter_rows():
@@ -1101,6 +1210,7 @@ def emit() -> Path:
                     "mayor": f"Mayor of {place}",
                     "president": f"{place} President",
                     "council": f"{place} Council",
+                    "board-of-education": f"{place} City Board of Education",
                     "council-president": f"{place} Council President",
                     "board-of-trustees": f"{place} Board of Trustees",
                     "township-board": f"{place} Board of Trustees",
@@ -1205,7 +1315,7 @@ def emit() -> Path:
                 stage="certified",
                 kind="counted",
                 status="active",
-                source_id=sources[row["county"]],
+                source_id=canvass if row["publisher"] == CITY else sources[row["county"]],
                 is_default=True,
                 completeness=1,
             )
@@ -1213,7 +1323,9 @@ def emit() -> Path:
                 "note",
                 entity_id=result_set,
                 kind="methodology",
-                body_md=(METHOD if precise else TOTALS).format(publisher=row["publisher"]),
+                body_md=(CANVASS if row["publisher"] == CITY else METHOD if precise else TOTALS).format(
+                    publisher=row["publisher"]
+                ),
             )
             totals = (
                 counted.filter(pl.col("place").is_null())
