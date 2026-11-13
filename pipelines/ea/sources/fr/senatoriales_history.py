@@ -1,3 +1,5 @@
+import csv
+import json
 import os
 import re
 import unicodedata
@@ -19,6 +21,8 @@ PARSED = DATA / "parsed" / SOURCE
 STATIC = "https://static.data.gouv.fr/resources"
 DATASETS = "https://www.data.gouv.fr/datasets"
 SENAT = "https://data.senat.fr/data/senateurs"
+SENAT_SITE = "http://www.senat.fr"
+WAYBACK = "http://web.archive.org/web"
 DAYS = {
     1992: date(1992, 9, 27),
     1995: date(1995, 9, 24),
@@ -66,11 +70,15 @@ YEARS: dict[int, dict[str, str]] = {
     2011: {
         "dataset": f"{DATASETS}/elections-senatoriales-2011-resultats-572109",
         "results": "https://static.data.gouv.fr/6a/11effa497299567a95fc6b4da265ae95dbfbba45b048562eb7b727674f2957.xls",
+        "candidates": f"{WAYBACK}/20120125020945id_/{SENAT_SITE}/senatoriales_2011/opendata/CANDIDATS_PROP.csv",
+        "candidates_suffix": ".csv",
         "suffix": ".xls",
     },
     2014: {
         "dataset": f"{DATASETS}/elections-senatoriales-2014-resultats",
         "results": f"{STATIC}/Senatoriales_2014.xlsx",
+        "candidates": f"{WAYBACK}/20210518003852id_/{SENAT_SITE}/senatoriales_2014/json/flux.json",
+        "candidates_suffix": ".json",
         "suffix": ".xlsx",
     },
     2017: {
@@ -135,7 +143,17 @@ STARTS = {
     "nuance liste",
     "nuance candidat",
 }
-SEX = {"M": "male", "F": "female", "MASCULIN": "male", "FEMININ": "female"}
+SEX = {
+    "M": "male",
+    "F": "female",
+    "M.": "male",
+    "MME": "female",
+    "MASCULIN": "male",
+    "FEMININ": "female",
+    "MONSIEUR": "male",
+    "MADAME": "female",
+    "MADEMOISELLE": "female",
+}
 SHEETS = {
     **{
         year: {"maj1": "Maj T1", "maj2": "Maj T2", "prop": "Prop", "elected": "Elus"}
@@ -170,6 +188,10 @@ UNIT_ALIASES = {
 def norm(text: object) -> str:
     stripped = "".join(c for c in unicodedata.normalize("NFKD", str(text)) if not unicodedata.combining(c))
     return re.sub(r"[^a-z]", "", stripped.casefold())
+
+
+def label_key(label: str) -> str:
+    return norm(label.replace("Œ", "OE").replace("œ", "oe"))
 
 
 def text(value: object) -> str | None:
@@ -216,7 +238,7 @@ def fetch() -> None:
     for config in YEARS.values():
         for key in ("results", "candidates"):
             if key in config:
-                raw.fetch(SOURCE, config[key], suffix=config["suffix"])
+                raw.fetch(SOURCE, config[key], suffix=config.get(f"{key}_suffix", config["suffix"]))
     for url in SENATE_BASE.values():
         raw.fetch(SOURCE, url, suffix=".csv")
 
@@ -354,6 +376,60 @@ def read_candidates(year: int) -> tuple[pl.DataFrame, pl.DataFrame]:
     )
 
 
+def read_rosters(year: int) -> pl.DataFrame:
+    path = raw.cached(SOURCE, YEARS[year]["candidates"]).path
+    members: list[dict] = []
+    if year == 2011:
+        positions: dict[tuple[str, str | None], int] = {}
+        with path.open(encoding="latin1", newline="") as handle:
+            reader = csv.reader(handle, delimiter=";")
+            header = [c.strip() for c in next(reader)]
+            for values in reader:
+                row = dict(zip(header, values))
+                unit = unit_code(row["Code circonscription"])
+                label = text(row["Libelle abrégé liste"])
+                positions[(unit, label)] = positions.get((unit, label), 0) + 1
+                members.append(
+                    {
+                        "unit": unit,
+                        "deposit": None,
+                        "list_label": label,
+                        "nuance": None,
+                        "position": positions[(unit, label)],
+                        "sex": SEX.get(row["Qualité"].strip().upper()),
+                        "surname": text(row["Nom"]),
+                        "forename": text(row["Prénom"]),
+                        "born": day(row["Date de naissance"]),
+                    }
+                )
+    else:
+        for circonscription in json.loads(path.read_text()):
+            if circonscription["type"] != "Proportionnelle":
+                continue
+            unit = (
+                "ZZ"
+                if circonscription["codeCirconscription"] == "997"
+                else unit_code(circonscription["codeCirconscription"])
+            )
+            for roster in circonscription["listes"]:
+                for candidate in roster["candidats"]:
+                    members.append(
+                        {
+                            "unit": unit,
+                            "deposit": roster["numero"],
+                            "list_label": text(roster["libelle"]),
+                            "nuance": text(roster["codeNuancePolitique"]),
+                            "position": candidate["numero"],
+                            "sex": SEX.get(candidate["qualite"].upper()),
+                            "surname": text(candidate["nom"]),
+                            "forename": text(candidate["prenom"]),
+                            "born": None,
+                        }
+                    )
+    schema = {"deposit": pl.Int64, "position": pl.Int64, "born": pl.Date}
+    return pl.DataFrame(members, schema_overrides=schema, infer_schema_length=None)
+
+
 def senate_elected(year: int, members: pl.DataFrame, singles: pl.DataFrame) -> pl.DataFrame:
     when = DAYS[year]
     mandates = pl.read_csv(
@@ -422,7 +498,7 @@ def resolve_elected(elected: pl.DataFrame, options: list[dict]) -> pl.DataFrame:
 
 def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
-    for year in YEARS:
+    for year, config in YEARS.items():
         sheets = workbook(year, "results")
         accounting: list[dict] = []
         options: list[dict] = []
@@ -433,6 +509,8 @@ def parse() -> None:
         members = singles = pl.DataFrame()
         if year in CANDIDATE_SHEETS:
             members, singles = read_candidates(year)
+        elif "candidates" in config:
+            members = read_rosters(year)
         if "elected" in SHEETS[year]:
             elected = resolve_elected(read_elected(year, sheets), options)
         else:
@@ -583,12 +661,12 @@ def emit() -> Path:
         by_roster: dict[tuple[str, str], list[dict]] = {}
         for row in members.sort("position").iter_rows(named=True) if members.height else []:
             by_roster.setdefault(
-                (row["unit"], str(row["deposit"]) if row["deposit"] is not None else norm(row["list_label"])), []
+                (row["unit"], str(row["deposit"]) if row["deposit"] is not None else label_key(row["list_label"])), []
             ).append(row)
         roster_by_label = {
-            (row["unit"], norm(row["list_label"])): (
+            (row["unit"], label_key(row["list_label"])): (
                 row["unit"],
-                str(row["deposit"]) if row["deposit"] is not None else norm(row["list_label"]),
+                str(row["deposit"]) if row["deposit"] is not None else label_key(row["list_label"]),
             )
             for row in members.iter_rows(named=True)
         }
@@ -693,7 +771,7 @@ def emit() -> Path:
                     roster = by_roster.get(
                         (code, str(entry["deposit"]))
                         if entry["deposit"] is not None
-                        else roster_by_label.get((code, norm(entry["list_label"])), ("", "")),
+                        else roster_by_label.get((code, label_key(entry["list_label"])), ("", "")),
                         [],
                     )
                     listed = [
