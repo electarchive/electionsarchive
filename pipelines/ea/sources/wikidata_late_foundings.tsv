@@ -1,21 +1,40 @@
 party	polity	name	item	inception	precision	earliest	evidence
-047942f1-3645-53eb-b2af-e248d22ff95c	BR	Democratas	Q1185830	2007-03-28	day	1994-10-03	option
+047942f1-3645-53eb-b2af-e248d22ff95c	BR	Democratas	Q1185830	2007-03-28	day	1986-11-15	option
+6ec07fd5-7ae4-5f0c-85ef-15a4f169e6db	BR	Humanist Party of Solidarity	Q2453205	1997-03-20	day	1996-10-03	option
 e5739d74-35aa-513d-b11c-6e0c4f95aa7e	BR	Partido Geral dos Trabalhadores	Q3056426	1995-01-01	year	1994-10-03	option
+01a13ba1-d3a6-7084-b7c4-4e64cbc94125	BR	Partido Renovador Trabalhista Brasileiro	Q2453861	1997-01-01	year	1996-10-03	option
+0dc5d670-ab1a-55aa-9c8c-0b010ef06dcd	BR	Partido Republicano Progressista	Q960955	1991-11-22	day	1990-10-03	option
+01a13ba1-d3a6-7084-b7c4-4e5f807b02ce	BR	Partido Social Cristão	Q2626213	1990-01-01	year	1986-11-15	option
 6c61632c-c14e-55f7-a823-101a3a0685cb	BR	Partido Social Trabalhista	Q28678919	1996-01-01	year	1994-10-03	option
+0ceace95-0cf1-5f77-a522-d02b0eabf623	BR	Partido da Reedificacao da Ordem Nacional	Q1636064	1990-10-30	day	1989-11-15	option
 01a13fb9-5ed7-71fc-acca-7e4894cbac62	CA	Co-operative Commonwealth Federation	Q1104026	1932-01-01	year	1930-07-08	option
 01a13fb6-eb6e-74dc-99cc-2a95bf8c0b13	CA	New Democratic Party	Q130765	1961-08-03	day	1961-05-29	option
 01a13fb9-5ed7-71fc-acca-7e2bff7a1d88	CA	Progressive	Q2112263	1920-03-03	day	1891-03-05	option
 01a13fb9-5ed7-71fc-acca-7e36dad16d63	CA	United Farmers	Q2622935	1926-01-01	year	1919-10-17	option
+6ee0453e-220d-500e-8341-69ef47caaf8e	CA-ON	Communist Party of Canada (Ontario)	Q3366202	1940-01-01	year	1929-10-30	option
+1042e33d-61a2-57df-ac97-e5088f6b416e	CA-QC	Option nationale - Pour l'indépendance du Québec	Q3354491	2011-10-31	day	1997-04-28	option
+b8aa945f-3cae-58fe-8e45-60ff09e35810	CA-QC	Parti république du Québec	Q3366703	2007-01-01	year	1983-06-20	option
 cebf578a-7153-5c4d-91a0-b76d7a6f1b10	CH	Christlichsoziale Partei	Q667725	1997-06-21	day	1971-10-31	option
 01a13b7e-b158-7755-a39c-0b15339b6e61	CH	FDP.Die Liberalen	Q202638	2009-01-01	day	1919-10-26	option
 01a13b7e-b158-7755-a39c-0b132619751d	CH	GRÜNE Schweiz	Q659739	1983-01-01	year	1975-10-26	option
 982921e2-d348-5128-a7ef-3d4a6d69204d	CH	Landesring der Unabhängigen	Q550295	1936-01-01	year	1935-10-27	option
 01a13b7e-b158-7755-a39c-0b11725ceb8f	CH	Schweizerische Volkspartei	Q385258	1971-09-22	day	1919-10-26	option
-01a13bb5-c6e1-7410-816e-3b24305503a8	DE	Bündnis 90/Die Grünen	Q49766	1993-05-14	day	1980-10-05	option
+01a13bb5-c6e1-7410-816e-3b24305503a8	DE	Bündnis 90/Die Grünen	Q49766	1993-05-14	day	1980-03-16	option
+01a13bc4-54a3-704e-abec-9cd940d8cde0	DE	Bündnis für Innovation & Gerechtigkeit	Q1020875	2010-01-01	year	1997-09-21	option
 01a13bb5-c6e1-7410-816e-3b3ad0e24ae7	DE	Bürgerrechtsbewegung Solidarität	Q897197	1992-01-01	year	1987-01-25	option
-01a13bb5-c6e1-7410-816e-3b28cf8ec1ca	DE	Die Linke	Q49764	2007-06-16	day	1990-12-02	option
+3ab01de0-677c-5186-98b4-2c641f624096	DE	Deutsche Mitte	Q32860410	2013-10-03	day	1993-09-19	option
+a331de03-82d9-5bce-8a1f-a23df1e38408	DE	Die Grauen – Für alle Generationen	Q34065989	2017-05-13	day	1991-01-20	option
+01a13bb5-c6e1-7410-816e-3b28cf8ec1ca	DE	Die Linke	Q49764	2007-06-16	day	1990-10-14	option
+21605304-2028-54c0-8428-0dcc38c30c10	DE	Die MittelstandsPartei	Q1214847	1997-01-01	year	1975-04-13	option
+01a13bb5-c6e1-7410-816e-3b2599d640df	DE	Freie Demokratische Partei	Q13124	1948-12-12	day	1946-10-13	option
+01a13bb5-c6e1-7410-816e-3b29049511af	DE	Freie Wähler	Q327389	2009-01-24	day	1994-09-25	option
+a11c2108-6035-56a6-95c2-567706ec0a91	DE	Partei der Nichtwähler	Q2054247	1998-01-01	year	1996-03-24	option
+07a713b5-b5b6-5c19-8be8-8b9c771399d0	DE	RENTNER Partei Deutschland	Q2144386	2002-01-01	year	2000-05-14	option
 01a13bb5-c6e1-7410-816e-3b393483b578	DE	Sozialistische Gleichheitspartei, Vierte Internationale	Q896251	1997-01-01	year	1990-12-02	option
 ee08bd4e-780b-528e-aeb1-b90ac15e12a3	DE	The Greens	Q18761823	1980-01-13	day	1979-06-07	option
+49fc1249-64ee-5d3c-8d0c-d439b71ffa60	DE	UNABHÄNGIGE für bürgernahe Demokratie	Q2492228	2002-01-01	year	1986-10-12	option
+530008a3-a83d-58b7-b24f-f78867473c1d	DE-BE	Sozialistische Einheitspartei Westberlins	Q76867	1962-01-01	year	1954-12-05	option
+bd73b6ee-fd9e-5648-a9c8-e96cf6bd5bcd	DE-SN	FREIE SACHSEN	Q108916704	2021-02-26	day	2009-08-30	option
 01a13bdd-fee2-723d-9a74-75bc20b30366	EU	Confederal Group of the European United Left/Nordic Green Left	Q753711	1995-01-06	day	1994-01-01	name
 20efc1d5-9476-5b44-a8fc-f54529f5cbae	EU	European Conservatives and Reformists Group	Q1345559	2009-06-22	day	2009-01-01	name
 bceae0bf-7552-5397-a17b-d381462bff85	EU	Group for the European United Left	Q5413380	1989-07-25	day	1989-01-01	name
@@ -74,24 +93,22 @@ a3660c4e-5465-5e3b-b3c7-a51ac05bccfe	IT	Democrazia Nazionale	Q3705337	1977-01-01
 530d39c9-2732-50dd-b806-fcbf34e9b54f	IT	Democrazia è Libertà – La Margherita	Q1141788	2002-03-24	day	2001-05-13	option
 e6b68b22-e54c-5858-a050-ed6df271ebea	IT	Left, Ecology and Freedom	Q286140	2009-12-20	day	2009-06-04	option
 e598bbed-f242-5883-a4d1-be5965f4a898	IT	National Alliance	Q662849	1995-01-27	day	1994-03-27	option
+0cb036ee-e21a-5e13-8ebe-d15bd72a11cd	IT	Partito Socialista Italiano di Unità Proletaria	Q2755002	1964-01-12	day	1946-06-02	option
 18067f0f-dad9-5adc-a90c-b65720b62952	IT	Party of Italian Communists	Q1428001	1998-10-11	day	1996-05-15	tenure_affiliation
 8c7c443a-62cd-5054-b46b-791ab39669be	IT	The People of Freedom	Q47720	2009-03-29	day	2008-04-13	option
+55ca99d8-7f43-579c-aaaa-3fc2b03d8f0a	IT	Union of the Centre	Q47781	2002-12-06	day	1995-04-23	option
 c7ca5ee1-ba76-555b-908a-1b9fecef87b4	PL	URP Real politics union	Q1584987	2011-03-25	day	2009-06-04	option
 01a13c0c-c7c5-74b3-a52f-540d0f6e2f76	TR	Adalet Partisi	Q97210769	2023-10-09	day	2023-05-14	option
 01a13dfc-a279-73f2-957b-1a15a210f39b	TR	Demokrat Parti	Q2067217	2007-05-27	day	1984-03-25	option
 01a140e3-5bde-7618-a844-44749ee044e9	TR	Demokratik Bölgeler Partisi	Q809719	2008-05-03	day	1999-04-01	tenure_affiliation
-01a14094-d257-77f4-bbc1-a31aabba0f58	TR	Demokratik Parti	Q5255699	1970-12-18	day	1968-06-02	option
 01a13c0c-c7c5-74b3-a52f-53fcc007ed15	TR	Genç Parti	Q1502746	2002-08-03	day	1994-03-27	option
-01a13c0c-c7c5-74b3-a52f-540fbe04b447	TR	Halkların Demokratik Partisi	Q15123187	2012-10-15	day	1984-03-25	option
 01a13c0c-c7c5-74b3-a52f-540299da8bfb	TR	Halkların Eşitlik ve Demokrasi Partisi	Q725173	2012-11-30	day	2012-11-25	name
-01a13c0c-c7c4-706f-b020-30c52aa5f9a5	TR	Millet Partisi	Q936433	1992-01-01	year	1984-03-25	option
-01a13c0c-c7c5-74b3-a52f-5410856cdc71	TR	Saadet Partisi	Q1637009	2001-07-20	day	1989-03-26	option
-01a140b4-719b-7707-acd9-40cc537e44fb	TR	Sosyaldemokrat Halkçı Parti	Q929507	1985-01-01	year	1984-03-25	option
+01a13c0c-c7c4-706f-b020-30c52aa5f9a5	TR	Millet Partisi	Q936433	1992-01-01	year	1986-09-28	option
 be100421-ce48-51c7-b6cf-1d626ff843fa	TR	Yeni Parti	Q140644267	2026-07-24	day	2026-07-01	tenure_affiliation
 01a13afb-20af-70c4-bd13-85b9442f155a	US	Alliance Party	Q96371808	2018-10-14	day	1984-11-06	option
 01a140b6-4200-765b-84e3-e471f22a44b2	US	Anti-Masonic Party	Q574701	1828-01-01	year	1823-12-01	tenure_affiliation
 01a13afb-20af-70c4-bd13-85bb38d84405	US	Constitution Party	Q1128321	1991-01-01	year	1954-11-02	option
-01a13afb-20af-70c4-bd13-85bcf33685ce	US	Democratic Party	Q29552	1828-01-08	day	1809-04-10	option
+01a13afb-20af-70c4-bd13-85bcf33685ce	US	Democratic Party	Q29552	1828-01-08	day	1823-12-01	tenure_affiliation
 01a140b6-4201-75b8-a22d-15ce52d1d2ae	US	Democratic-Republican Party	Q42186	1791-01-01	year	1789-03-04	tenure_affiliation
 01a140b6-4201-75b8-a22d-15cf08d12f50	US	Federalist Party	Q42189	1792-01-01	year	1787-01-01	option
 e86f615f-d6bc-5e47-b064-673bc2cf667b	US	Free Soil Party	Q1346993	1848-01-01	year	1847-12-06	tenure_affiliation
