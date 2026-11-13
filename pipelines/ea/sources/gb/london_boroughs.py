@@ -25,7 +25,9 @@ PAGES = DATA / "pages" / SOURCE
 VOTES, REGISTERED, BALLOTS, VALID, INVALID = 1, 2, 3, 4, 5
 DIGITIZED = 8
 PUBLISHER = "London Research Centre"
+Word = tuple[float, float, float, float, str]
 TITLES = {
+    1994: "London Borough Council Elections 5 May 1994, including results from the European Elections",
     1998: "London Borough Council Elections May 1998, including the Greater London Authority referendum results",
 }
 PARTY_NAMES = {
@@ -41,9 +43,15 @@ METHODOLOGY = (
     "rejected papers. Candidate names are printed as surname and initials or forenames; a few the text layer garbled "
     "were checked against the page images."
 )
+NOTES = {
+    1994: " In the 1994 report the text layer reads some 7s as 1s; every figure was checked against the party table "
+    "and corrected on the page image where they disagreed. The report's summary page gives 30 fewer ballot papers "
+    "than its ward voting statistics, which are stored as printed."
+}
 DATASET = "https://data.london.gov.uk/dataset/london-borough-council-elections-1998-24r9z"
 DOWNLOAD = "https://data.london.gov.uk/download/24r9z"
 BOOKS = {
+    1994: (date(1994, 5, 5), f"{DOWNLOAD}/8a8faadf-3660-4617-864c-f4aa683f20e8/LBCE_1994-5-5.pdf"),
     1998: (date(1998, 5, 7), f"{DOWNLOAD}/6559d43c-4ea0-4b58-b705-94f84c3a549a/LBCE_1998-5-7.pdf"),
 }
 BOROUGHS = {
@@ -80,8 +88,50 @@ BOROUGHS = {
     "Wandsworth": "E09000032",
     "Westminster": "E09000033",
 }
-OCR_CODES = {"LO": "LD", "ILiB": "ILIB"}
+OCR_CODES = {
+    "INO": "IND",
+    "Ir~D": "IND",
+    "CFe": "CFC",
+    "SOP": "SDP",
+    "CON.": "CON",
+    "LO": "LD",
+    "lD": "LD",
+    "lO": "LD",
+    "ILiB": "ILIB",
+}
 PARTIES = {
+    1994: {
+        "LAB": "Labour",
+        "LABCP": "Labour and Co-operative",
+        "CON": "Conservative",
+        "LD": "Liberal Democrat",
+        "REA": "Residents' Association",
+        "IRE": "Independent Resident",
+        "TR": "Tenants and Residents",
+        "GRE": "Green",
+        "IND": "Independent",
+        "BNP": "British National Party",
+        "ILD": "Independent Liberal Democrat",
+        "SDP": "Social Democratic Party",
+        "ILAB": "Independent Labour",
+        "IDEM": "Independent Democrat",
+        "MLAB": "Militant Labour",
+        "LFT": "Liberal Focus Team",
+        "CMC": "Camden Charter",
+        "TW": "Third Way",
+        "F": "Fellowship",
+        "IC": "Isleworth Community",
+        "HC": "Hampstead Charter",
+        "NLP": "Natural Law Party",
+        "COM": "Communist",
+        "II": "Island Independent",
+        "PC": "The People's Choice",
+        "CGB": "Communist Party of Great Britain",
+        "KC": "Kilburn Charter",
+        "MRL": "Monster Raving Looney",
+        "NF": "National Front",
+        "CFC": "Chocolate Fudge Cake Party",
+    },
     1998: {
         "LAB": "Labour",
         "LABCP": "Labour and Co-operative",
@@ -120,6 +170,38 @@ PARTIES = {
     },
 }
 TOTALS = {
+    1994: {
+        "LAB": (2304065, 1888, 1019),
+        "LABCP": (44576, 29, 24),
+        "CON": (1756760, 1839, 519),
+        "LD": (1194207, 1621, 323),
+        "REA": (46654, 35, 21),
+        "IRE": (12636, 11, 6),
+        "TR": (2624, 7, 0),
+        "GRE": (52602, 219, 0),
+        "IND": (17280, 67, 0),
+        "BNP": (13731, 19, 0),
+        "ILD": (10204, 17, 0),
+        "SDP": (6020, 7, 4),
+        "ILAB": (5230, 10, 1),
+        "IDEM": (2882, 18, 0),
+        "MLAB": (2001, 7, 0),
+        "LFT": (1497, 2, 0),
+        "CMC": (1342, 5, 0),
+        "TW": (977, 3, 0),
+        "F": (468, 1, 0),
+        "IC": (452, 1, 0),
+        "HC": (442, 2, 0),
+        "NLP": (426, 10, 0),
+        "COM": (388, 5, 0),
+        "II": (386, 1, 0),
+        "PC": (355, 3, 0),
+        "CGB": (336, 5, 0),
+        "KC": (296, 1, 0),
+        "MRL": (231, 3, 0),
+        "NF": (203, 1, 0),
+        "CFC": (175, 1, 0),
+    },
     1998: {
         "LAB": (1755944, 1905, 1040),
         "LABCP": (13649, 12, 10),
@@ -176,6 +258,19 @@ NAMES = {
     "Theodorus, Tarik 11.": "Theodorus, Tarik I.L.",
     "Graber,lngeborg": "Graber, Ingeborg",
     "Khan,lmran": "Khan, Imran",
+    "cummins. Mark": "Cummins, Mark",
+}
+SUMMARY = {1994: (5838, 1917, 4872088, 2246209, 2240669)}
+SEATS = {("Bexley", "Falconwood"): 1}
+FIXES = {
+    ("Brent", "Queen's Park", "Crabb"): (857, "LAB"),
+    ("Brent", "Queen's Park", "cummins"): (751, "LD"),
+    ("Brent", "St Raphael's", "Etienne"): (1179, "LAB"),
+    ("Brent", "Stonebridge", "Moloney"): (794, "LAB"),
+    ("Brent", "Stonebridge", "Persaud"): (751, "LAB"),
+    ("Bromley", "Lawrie Park and Kent House", "Foister"): (1277, "CON"),
+    ("Merton", "Lower Morden", "Gallant"): (1417, "LAB"),
+    ("Greenwich", "Burrage", "Duvall"): (743, "LAB"),
 }
 DIGITS = str.maketrans({"O": "0", "o": "0", "l": "1", "I": "1", "S": "5"})
 GLC_PUBLISHER = "Greater London Council"
@@ -580,6 +675,280 @@ def results(
     return pl.DataFrame(out)
 
 
+STATUS = re.compile(
+    r"\bno changes?\b|\bnew wards?\b|\brevised wards?\b|\bgains? fro[mn]\b|\bextra seats?\b|\bunchanged\b",
+    re.IGNORECASE,
+)
+
+
+def rejected_row(row: list[Word], width: float, height: float) -> dict | None:
+    cells = [w for w in row if re.fullmatch(r"[\dOoalIS,.]+", w[4])]
+    for start in range(len(cells) - 7):
+        figures = cells[start : start + 8]
+        text = [w[4].translate(DIGITS).replace("a", "0").replace(",", "") for w in figures[:7]]
+        if figures[-1][0] - figures[0][0] < 400 and all(t.isdigit() for t in text):
+            if sum(int(t) for t in text[:4]) != int(text[4]):
+                continue
+            return {
+                "rejected": int(text[4]),
+                "valid": int(text[6]),
+                "box": [
+                    figures[0][0] / width,
+                    min(w[1] for w in figures) / height,
+                    figures[7][2] / width,
+                    max(w[3] for w in figures) / height,
+                ],
+            }
+    return None
+
+
+def statistics_1994(book: list[list[Word]], sizes: list[tuple[float, float]]) -> pl.DataFrame:
+    folded = {fold(b): b for b in BOROUGHS} | {"cityofwestminster": "Westminster"}
+    out = []
+    later: list[dict] = []
+    borough = None
+    for index, page in enumerate(book):
+        width, height = sizes[index]
+        body = [w for w in page if 40 < w[0] < 560]
+        text = " ".join(w[4] for w in body)
+        if not 193 <= index < 225:
+            continue
+        rejected_page = "Rejected ballot papers" in text[:200]
+        rows = lines(body)
+        starts = sorted(
+            row[0][0] for row in rows if len(row) >= 6 and all(re.fullmatch(r"[\d,.]+", w[4]) for w in row[-5:])
+        )
+        if starts:
+            body = [w for w in body if w[0] > starts[len(starts) // 2] - 15]
+        for row in lines(body):
+            if rejected_page and (found := rejected_row(row, width, height)) is not None:
+                later.append(found | {"page": index + 1})
+                continue
+            split = len(row)
+            while split > 1 and re.fullmatch(r"[\d,.]+", row[split - 1][4]):
+                split -= 1
+            label, values = row[:split], row[split:]
+            name = re.sub(r"\s*-\s*continued$", "", " ".join(w[4] for w in label))
+            if fold(name) in folded and not values:
+                borough = folded[fold(name)]
+                continue
+            if (
+                rejected_page
+                or borough is None
+                or not label
+                or not values
+                or name in ("Ward", "London", "Greater London")
+            ):
+                continue
+            if "Research Centre" in " ".join(w[4] for w in row):
+                continue
+            numbers = [int(w[4].replace(",", "")) if re.fullmatch(r"\d[\d,]*", w[4]) else None for w in values]
+            if "uncontested" in [w[4].lower() for w in values]:
+                out.append({"borough": borough, "ward": name, "seats": numbers[0]})
+                continue
+            if len(values) == 5 and (borough, name) in SEATS:
+                numbers = [SEATS[borough, name], *numbers]
+                values = [values[0], *values]
+            if len(values) != 6:
+                if len(values) > 2:
+                    print(f"unreadable statistics row: {borough} {name} {[w[4] for w in values]}")
+                continue
+            seats, electorate, voting, _, polling, postal = numbers
+            box = [
+                row[0][0] / width,
+                min(w[1] for w in row) / height,
+                row[-1][2] / width,
+                max(w[3] for w in row) / height,
+            ]
+            if folded.get(fold(name)) == borough and numbers[0] is not None and numbers[0] > 3:
+                continue
+            if None in (*numbers[:3], *numbers[4:]):
+                raise ValueError(f"{borough} {name}: unread figure in {[w[4] for w in values]}")
+            if voting != (polling or 0) + (postal or 0):
+                raise ValueError(
+                    f"{borough} {name}: {voting} ballot papers, {polling} at polling stations and {postal} postal"
+                )
+            out.append(
+                {
+                    "borough": borough,
+                    "ward": name,
+                    "seats": seats,
+                    "electorate": electorate,
+                    "ballots": voting,
+                    "turnout_page": index + 1,
+                    "turnout_box": box,
+                }
+            )
+    at = 0
+    total = 0
+    for name in dict.fromkeys(row["borough"] for row in out):
+        wards = [row for row in out if row["borough"] == name]
+        mine = later[at : at + len(wards) + 1]
+        at += len(wards) + 1
+        total += mine[-1]["valid"] if mine else 0
+        if len(mine) != len(wards) + 1 or mine[-1]["valid"] != sum(r["valid"] for r in mine[:-1]):
+            raise ValueError(f"{name}: rejected ballot papers rows do not sum to the borough total")
+        for row, found in zip(wards, mine, strict=False):
+            if row["ballots"] != found["valid"] + found["rejected"]:
+                raise ValueError(
+                    f"{name} {row['ward']}: {row['ballots']} ballot papers, {found['valid']} valid and "
+                    f"{found['rejected']} rejected"
+                )
+            row |= {
+                "valid": found["valid"],
+                "invalid": found["rejected"],
+                "rejected_page": found["page"],
+                "rejected_box": found["box"],
+            }
+    if len(later) - at > 1 or len(later) > at and later[at]["valid"] != total:
+        raise ValueError(f"{len(later) - at} unmatched rejected ballot papers rows")
+    return pl.DataFrame(out, infer_schema_length=None)
+
+
+def expected(stats: pl.DataFrame) -> dict[str, list[str]]:
+    return {borough: group["ward"].to_list() for (borough,), group in stats.group_by("borough", maintain_order=True)}
+
+
+def column_split(body: list[Word]) -> float:
+    edges = sorted(w[2] for w in body if re.fullmatch(r"\d{1,3}(?:,\d{3})*", w[4]) and w[0] > 150)
+    groups: list[list[float]] = []
+    for edge in edges:
+        if groups and edge - groups[-1][-1] < 8:
+            groups[-1].append(edge)
+        else:
+            groups.append([edge])
+    columns = [g for g in groups if len(g) >= 3]
+    if len(columns) >= 2:
+        return columns[0][-1] + 3
+    return 1e9 if not columns or columns[0][0] < 400 else 0.0
+
+
+def results_1994(
+    book: list[list[Word]], codes: set[str], sizes: list[tuple[float, float]], expected: dict[str, list[str]]
+) -> pl.DataFrame:
+    folded = {fold(b): b for b in BOROUGHS} | {"cityofwestminster": "Westminster"}
+    out = []
+    borough = None
+    ward = None
+    order = 0
+    reading = False
+    seen = {name: 0 for name in BOROUGHS}
+    for index, page in enumerate(book):
+        size = sizes[index]
+        body = [w for w in page if 8 < w[0] < 545]
+        rows = lines(body)
+        text = [" ".join(w[4] for w in row) for row in rows]
+        if text and "Ward Voting Statistics" in text[0]:
+            break
+        if len(text) > 1 and fold(text[0]) in folded and re.search(r"administration|control", text[1], re.IGNORECASE):
+            borough, ward, reading = folded[fold(text[0])], None, False
+            continue
+        if borough is None:
+            continue
+        top = min((w[1] for w in body if re.fullmatch(r"\W*Results", w[4])), default=None)
+        if top is not None:
+            reading = True
+            body = [w for w in body if w[1] > top - 2 and not re.fullmatch(r"\W*Results", w[4])]
+        if not reading:
+            continue
+        split = column_split(body)
+        for column in (0, 1):
+            column_rows = lines([w for w in body if (w[0] < split) == (column == 0)])
+            for at, row in enumerate(column_rows):
+                row = [w for w in row if re.search(r"[A-Za-z0-9]", w[4]) and w[4] != "r-"]
+                if not row:
+                    continue
+                words = [w[4] for w in row]
+                line = " ".join(words)
+                if (
+                    line == "Results"
+                    or "Research Centre" in line
+                    or re.search(r"Elections? May 1994|Eledions May 1994", line)
+                ):
+                    continue
+                if STATUS.search(line):
+                    if number(words[-1]) is not None:
+                        print(f"status line with a figure on page {index + 1}: {line}")
+                    continue
+                kept = len(words)
+                while kept > 3 and (
+                    number(words[kept - 1]) is None or OCR_CODES.get(words[kept - 2], words[kept - 2]) not in codes
+                ):
+                    kept -= 1
+                words, row = words[:kept], row[:kept]
+                if len(words) >= 3 and words[-2] in OCR_CODES:
+                    words[-2] = OCR_CODES[words[-2]]
+                votes = None if words[-1] == "Unopposed" else number(words[-1])
+                if len(words) >= 3 and words[-2] in codes and (votes is not None or words[-1] == "Unopposed"):
+                    if ward is None:
+                        raise ValueError(f"candidate before any ward on page {index + 1}: {line}")
+                    order += 1
+                    out.append(
+                        ward
+                        | {
+                            "order": order,
+                            "name": " ".join(words[:-2]),
+                            "party": words[-2],
+                            "votes": votes,
+                            "raw_votes": words[-1],
+                            "line_page": index + 1,
+                            "y": round(row[0][1], 1),
+                            "bbox": [
+                                row[0][0] / size[0],
+                                min(w[1] for w in row) / size[1],
+                                row[-1][2] / size[0],
+                                max(w[3] for w in row) / size[1],
+                            ],
+                        }
+                    )
+                    continue
+                if STATUS.search(line):
+                    continue
+                following = next(
+                    (
+                        " ".join(w[4] for w in later)
+                        for later in column_rows[at + 1 :]
+                        if re.search(r"[a-z]{3}", " ".join(w[4] for w in later))
+                    ),
+                    "",
+                )
+                if STATUS.search(following):
+                    pending = expected[borough][seen[borough] : seen[borough] + 3]
+                    shape = fold(line)
+                    exact = shape in [fold(name) for name in pending]
+                    empty = ward is not None and order == 0 and ward["page"] == index + 1
+                    if not pending or not exact and (len(line) <= 3 or empty or shape == fold(borough)):
+                        continue
+                    scores = [
+                        (
+                            fold(name) == shape,
+                            difflib.SequenceMatcher(None, shape, fold(name)).find_longest_match().size
+                            / max(len(fold(name)), 1),
+                            difflib.SequenceMatcher(None, shape, fold(name)).ratio(),
+                        )
+                        for name in pending
+                    ]
+                    if max(scores)[1] < 0.7:
+                        print(f"ward header read by position on page {index + 1}: {line} as {pending[0]}")
+                        chosen = 0
+                    else:
+                        chosen = scores.index(max(scores))
+                    seen[borough] += chosen + 1
+                    ward = {
+                        "borough": borough,
+                        "ward": pending[chosen],
+                        "printed": line,
+                        "page": index + 1,
+                        "column": column,
+                    }
+                    order = 0
+                    continue
+                if len(words) < 3 or not re.search(r"[A-Za-z]{3}", line):
+                    continue
+                print(f"unread line on page {index + 1}: {line}")
+    return pl.DataFrame(out)
+
+
 def person(text: str) -> str:
     text = re.sub(r"\s*;\s*", ", ", text.replace("~", "")).strip()
     surname, _, rest = text.partition(",")
@@ -591,16 +960,34 @@ def person(text: str) -> str:
     return f"{surname.strip()}, {' '.join(words)}" if words else surname.strip()
 
 
+def fixed(found: pl.DataFrame) -> pl.DataFrame:
+    rows = found.to_dicts()
+    used = set()
+    for row in rows:
+        key = (row["borough"], row["ward"], re.split(r"[,.]", row["name"])[0].strip())
+        if key in FIXES:
+            row["votes"], row["party"] = FIXES[key]
+            used.add(key)
+    if used != set(FIXES):
+        raise ValueError(f"corrections not applied: {sorted(set(FIXES) - used)}")
+    return pl.DataFrame(rows, infer_schema_length=None)
+
+
 def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
     candidates, wards = [], []
     for year, (day, url) in BOOKS.items():
         sizes, book = pages(raw.cached(SOURCE, url).path)
-        stats = statistics(book, sizes)
+        stats = statistics_1994(book, sizes) if year == 1994 else statistics(book, sizes)
         found = (
-            results(book, set(PARTIES[year]), sizes)
-            .with_columns(name_printed=pl.col("name"))
-            .with_columns(pl.col("name").map_elements(lambda n: NAMES.get(n, person(n)), return_dtype=pl.String))
+            results_1994(book, set(PARTIES[year]), sizes, expected(stats))
+            if year == 1994
+            else results(book, set(PARTIES[year]), sizes)
+        )
+        if year == 1994:
+            found = fixed(found)
+        found = found.with_columns(name_printed=pl.col("name")).with_columns(
+            pl.col("name").map_elements(lambda n: NAMES.get(n, person(n)), return_dtype=pl.String)
         )
         printed = TOTALS[year]
         groups = found.group_by("party").agg(votes=pl.col("votes").sum(), count=pl.len())
@@ -683,6 +1070,18 @@ def parse() -> None:
                             "bbox": line["bbox"],
                         }
                     )
+        if year in SUMMARY:
+            mine = pl.DataFrame([w for w in wards if w["year"] == year])
+            held = mine.filter(~pl.col("tacit"))
+            figures = (
+                found.height,
+                mine["seats"].sum(),
+                held["electorate"].sum(),
+                held["ballots"].sum(),
+                held["valid"].sum(),
+            )
+            if figures != SUMMARY[year]:
+                raise ValueError(f"{year} totals {figures} differ from the printed summary {SUMMARY[year]}")
         wrong = {
             code: (elected.get(code, 0), seats)
             for code, (_, _, seats) in printed.items()
@@ -694,9 +1093,6 @@ def parse() -> None:
     pl.DataFrame(candidates).write_parquet(PARSED / "candidates.parquet")
     print(f"{len(wards)} wards and {len(candidates)} candidates")
     parse_glc()
-
-
-Word = tuple[float, float, float, float, str]
 
 
 def scan(
@@ -1049,7 +1445,7 @@ def emit() -> Path:
                 )
                 name(election, f"{year} {council} election")
                 cs.add("slug", path=f"{path}/{day}-local", entity_id=election)
-                cs.add("note", entity_id=election, kind="methodology", body_md=METHODOLOGY)
+                cs.add("note", entity_id=election, kind="methodology", body_md=METHODOLOGY + NOTES.get(year, ""))
                 for ward in held.filter(pl.col("la_code") == code).iter_rows(named=True):
                     display = ward["ward"]
                     ward_key = f"{code}:{slug(display)}:{year}"
