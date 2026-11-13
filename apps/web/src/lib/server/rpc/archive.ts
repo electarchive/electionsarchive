@@ -14484,7 +14484,7 @@ async function contingency(contest: { id: string; date: string | null }) {
       (select cy.person_id from candidacy cy where cy.option_id = o.id order by cy.role <> 'head' limit 1) as person
     from contest_option o
     where o.contest_id = ${contest.id}::uuid
-      and o.k = any(${decided.finalists.map(Number)}::int[])
+      and o.k = any(${sql.param(decided.finalists.map(Number))}::int[])
   `);
   const labels = await names(
     named.rows.flatMap((row) =>
