@@ -175,6 +175,7 @@ const MODEL = {
     local: 0.05,
     grace: 1,
     pace: 13,
+    hold: 0.01,
   },
   late: {
     prior: 0.1,
@@ -1149,14 +1150,23 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
             ),
         ) / latest
       : 0;
-  const planned = Math.min(
-    tail *
-      Math.exp(
-        -Math.max(0, days - MODEL.tail.grace) / (MODEL.tail.pace * tail),
-      ),
-    onNight <= 0 || latest <= 0
-      ? Infinity
-      : Math.max(0, tail * onNight - (latest - onNight)) / latest,
+  const tailWeight = Math.min(1, tail / MODEL.tail.share);
+  const planned = Math.max(
+    Math.min(
+      tail *
+        Math.exp(
+          -Math.max(0, days - MODEL.tail.grace) / (MODEL.tail.pace * tail),
+        ),
+      onNight <= 0 || latest <= 0
+        ? Infinity
+        : Math.max(0, tail * onNight - (latest - onNight)) / latest,
+    ),
+    isLate && onNight > 0 && latest > 0
+      ? Math.max(
+          0,
+          MODEL.tail.hold * tailWeight * onNight - (latest - onNight),
+        ) / latest
+      : 0,
   );
   const complete =
     isLate &&
@@ -1178,7 +1188,7 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
       : 0;
   const fade =
     1 - drained * Math.max(0, 1 - recent / (MODEL.late.brisk * tail));
-  const settles = Math.min(1, tail / MODEL.tail.share) * fade;
+  const settles = tailWeight * fade;
   const outstanding = found.map((unit) => {
     if (!isTail || unit.reported == null) {
       return null;
