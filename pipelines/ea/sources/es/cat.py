@@ -16,7 +16,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "es.cat"
-VERSION = "3"
+VERSION = "4"
 API = "https://resultats.dadeselectorals.gencat.cat/webelec/api"
 PUBLISHER = "Generalitat de Catalunya"
 TITLE = "Resultats electorals: eleccions al Parlament de Catalunya (Departament de la Presidència)"
@@ -111,11 +111,177 @@ PROCLAIMED: dict[tuple[str, str], tuple[tuple[int, ...], dict[str, list[str]]]] 
             "ERC": ["Joan Manel Sabanza i March"],
         },
     ),
+    ("A19881", "25"): (
+        (25967,),
+        {
+            "CIU": [
+                "Jaume Manel Oronich i Miravet",
+                "Josep Borràs i Gené",
+                "Teresa Ribes i Utge",
+                "Francesc Guasch i Fernàndez",
+                "Miquel Padilla i Díaz",
+                "Josep M. Graells i Forcada",
+                "Jaume Aligué i Escudé",
+                "Francesc Xavier Bada i Amatller",
+                "Maria Pilar Busquets i Medan",
+            ],
+            "PSC": [
+                "Antoni Siurana i Zaragoza",
+                "Pere Ayguadé i Ayguadé",
+                "Joan Ganyet i Solé",
+                "Maria Teresa Utges i Nogues",
+            ],
+            "AP": ["Víctor M. Colomé Farré"],
+        },
+    ),
+    ("A19951", "17"): (
+        (136167,),
+        {
+            "PSC": [
+                "Manel Nadal i Farreras",
+                "Daniel Terradellas i Redon",
+                "Martí Sans i Pairuto",
+                "Pere Jordi Piella i Vilaregut",
+                "Marina Geli i Fàbrega",
+            ]
+        },
+    ),
+    ("A20031", "08"): (
+        (314360,),
+        {
+            "PP": [
+                "Josep Piqué i Camps",
+                "Dolors Nadal i Aymerich",
+                "M. Belén Pajares Ribas",
+                "Francesc Vendrell i Bayona",
+                "M. Dolors Montserrat i Culleré",
+                "Daniel Sirera i Bellés",
+                "Josep Llobet Navarro",
+                "Eva García Rodríguez",
+                "M. Angeles Olano García",
+                "Rafael López Rueda",
+                "Santiago Rodríguez Serra",
+            ]
+        },
+    ),
+    ("A20031", "43"): (
+        (314362,),
+        {"ERC": ["Ernest Benach i Pascual", "Marta Cid i Pañella", "Sergi de los Ríos i Martínez"]},
+    ),
     ("A20061", "17"): (
         (433711,),
         {"ERC": ["Pere Vigo i Sallent", "Maria Mercè Roca i Perich", "Carme Capdevila i Palau", "Pere Bosch i Cuenca"]},
     ),
     ("A20061", "25"): ((433709,), {"PSCCPC": ["Joaquim Llena Cortina", "Agnès Pardell Vea", "Marta Camps Torrens"]}),
+    ("A20061", "08"): (
+        (399805,),
+        {
+            "CIU": [
+                "Artur Mas i Gavarró",
+                "Núria De Gispert i Català",
+                "Felip Puig i Godes",
+                "Meritxell Borràs i Solé",
+                "Ramon Espadaler i Parcerisas",
+                "Lluís Corominas i Diaz",
+                "Antoni Castellà i Clavé",
+                "Irene Rigau i Oliver",
+                "Antoni Fernàndez i Teixidó",
+                "Maria Pilar Pifarré i Matas",
+                "Ramon Camp i Batalla",
+                "Marta Llorens i Garcia",
+                "Oriol Pujol i Ferrusola",
+                "Francesc Homs i Molist",
+                "Ma. Glòria Renom i Vallbona",
+                "Josep Rull i Andreu",
+                "Joana Ortega i Alemany",
+                "Josep Lluís Cleries i Gonzàlez",
+                "Anna Figueras i Ibañez",
+                "Joan Recasens i Guinot",
+                "Jordi Turull i Negre",
+                "Assumpció Laïlla i Jou",
+                "Joan Raventós i Pujadó",
+                "Ma. Rosa Fortuny i Torroella",
+                "Esteve Orriols i Sendra",
+                "Joan Morell i Comas",
+                "Benet Maimí i Pou",
+            ],
+            "PP": [
+                "Josep Piqué i Camps",
+                "Montserrat Nebrera González",
+                "Francesc Vendrell i Bayona",
+                "Mª Dolors Montserrat i Culleré",
+                "Belén Pajares Ribas",
+                "Daniel Sirera i Bellés",
+                "Carina Mejías Sánchez",
+                "Santiago Rodríguez Serra",
+                "Mª Ángeles Olano García",
+                "Rafael López Rueda",
+            ],
+        },
+    ),
+    ("A20061", "43"): (
+        (399805,),
+        {"ERC": ["Ernest Benach i Pascual", "Josep Bargalló i Valls", "Marta Cid i Pañella"]},
+    ),
+    ("A20101", "08"): (
+        (567126,),
+        {
+            "CIU": [
+                "Artur Mas i Gavarró",
+                "Joana Ortega i Alemany",
+                "Felip Puig i Godes",
+                "Meritxell Borràs i Solé",
+                "Ramon Espadaler i Parcerisas",
+                "Oriol Pujol i Ferrusola",
+                "Antoni Castellà i Clavé",
+                "Lluís Recoder i Miralles",
+                "Irene Rigau i Oliver",
+                "Neus Munté i Fernàndez",
+                "Lluís Corominas i Díaz",
+                "Núria de Gispert i Català",
+                "Francesc Homs i Molist",
+                "Antoni Fernàndez i Teixidó",
+                "Cristina Iniesta i Blasco",
+                "Josep Rull i Andreu",
+                "Josep Maria Vila d'Abadal i Serra",
+                "Josep Lluís Cleries i Gonzàlez",
+                "Maria Glòria Renom i Vallbona",
+                "Marta Llorens i Garcia",
+                "Jordi Turull i Negre",
+                "Joan Recasens i Guinot",
+                "David Bonvehí i Torras",
+                "Anna Figueras i Ibáñez",
+                "Montserrat Ribera i Puig",
+                "Joan Morell i Comas",
+                "Assumpció Laïlla i Jou",
+                "Jordi Cuminal i Roquet",
+                "Pere Regull i Riba",
+                "M. Mercè Jou i Torras",
+                "Gerard M. Figueras i Albà",
+                "Dolors Gordi i Julià",
+                "Francesc Bragulat i Bosom",
+                "Maria Senserrich i Guitart",
+                "Roger Montañola i Busquets",
+            ]
+        },
+    ),
+    ("A20121", "08"): (
+        (627162,),
+        {
+            "ICVEUIA": [
+                "Joan Herrera Torres",
+                "Dolors Camats Luis",
+                "Juan Miguel Mena Arca",
+                "Jaume Bosch Mestres",
+                "Marta Ribas Frias",
+                "Laura Massana Mas",
+                "Salvador Milà Solsona",
+                "Lorena Vicioso Adrià",
+                "David Compañon Costa",
+                "Josep Vendrell Gardeñes",
+            ]
+        },
+    ),
     ("A20151", "08"): (
         (704870,),
         {
@@ -136,6 +302,32 @@ PROCLAIMED: dict[tuple[str, str], tuple[tuple[int, ...], dict[str, list[str]]]] 
         },
     ),
     ("A20151", "25"): ((704834,), {"CS": ["Jorge Soler González", "Javier Rivas Escamilla"]}),
+    ("A20211", "08"): (
+        (894181,),
+        {
+            "CUPG": [
+                "Dolors Sabater Puig",
+                "Carles Riera Albert",
+                "Eulàlia Reguant Cura",
+                "Xavier Pellicer Pareja",
+                "Basharat (Basha) Changue Canalejo",
+            ]
+        },
+    ),
+    ("A20211", "17"): (
+        (894132,),
+        {
+            "JXCAT": [
+                "Gemma Geis i Carreras",
+                "Marta Madrenas i Mir",
+                "Salvador Vergés i Tejero",
+                "Francesc Xavier Ten i Costa",
+                "Maria Antònia Batlle i Andreu",
+                "Ferran Roquer i Padrosa",
+                "Jordi Munell i Garcia",
+            ]
+        },
+    ),
     ("A20241", "08"): (
         (987024,),
         {
