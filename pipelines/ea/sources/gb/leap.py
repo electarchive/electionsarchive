@@ -344,6 +344,14 @@ def parse() -> None:
                         }
                     )
     frame = pl.DataFrame(rows)
+    corrections = pl.read_csv(Path(__file__).with_name("leap_corrections.tsv"), separator="\t").select(
+        "year", "council", "ward", "name", fixed="votes"
+    )
+    frame = (
+        frame.join(corrections, on=["year", "council", "ward", "name"], how="left")
+        .with_columns(votes=pl.coalesce("fixed", "votes"))
+        .drop("fixed")
+    )
     shared = (
         frame.filter(pl.col("ward_code").is_not_null())
         .group_by("year", "la_code", "ward_code")
