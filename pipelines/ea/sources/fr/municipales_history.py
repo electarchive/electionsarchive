@@ -103,6 +103,23 @@ LAYOUTS = {
         + ["p1", "p2"],
     ),
 }
+CITIES = {"75056": "Paris", "69123": "Lyon", "13055": "Marseille"}
+SECTOR_NOTE = (
+    "Paris, Lyon, and Marseille elect their councils by sector. Each sector holds its own list election under the "
+    "municipal list rules, and one ballot fills two sets of seats: the sector's share of the city council, and the "
+    "additional members of the sector's arrondissement council. Each sector's city council seats are recorded here "
+    "as a contest of the city council for that sector."
+)
+SECTOR_SEATS = {
+    2001: "The ministry's file for 2001 gives no seats, so no seats are recorded for the sectors.",
+    2008: "The ministry's file for 2008 gives each list's city council and arrondissement council seats as one "
+    "combined figure, so no seats are recorded for the sectors.",
+}
+ARRONDISSEMENT_NOTE = (
+    "Elected on the same ballot as the sector's city council seats, whose contest holds the votes. This contest "
+    "records only the arrondissement council seats each list won, as printed in the ministry's file; the city "
+    "councilors elected in the sector also sit on the arrondissement council."
+)
 RENUMBERED = {"97123": "97701", "97127": "97801"}
 NUANCES = {
     "LGA": "Liste de gauche",
@@ -192,6 +209,9 @@ def number(value: str | None) -> int | None:
 def code_of(dept: str, commune: str) -> str | None:
     dept = dept.strip().upper()
     commune = commune.strip()
+    city = f"{dept.zfill(2)}{commune[:3]}"
+    if city in CITIES and re.fullmatch(r"\d{3}SR\d{2}", commune):
+        return f"{city}{commune[3:]}"
     if not commune.isdigit():
         return None
     if dept == "ZM":
@@ -430,6 +450,7 @@ def parse() -> None:
                                 "surname": entry.get("surname"),
                                 "forename": entry.get("forename"),
                                 "seats": number(entry.get("seats")),
+                                "sector_seats": number(entry.get("sector_seats")),
                                 "votes": number(entry["votes"]),
                             }
                         )
@@ -478,7 +499,8 @@ def emit() -> Path:
         total = sum(int(str(entry["seats"] or 0)) for entry in entries)
         if total:
             sizes[code] = total
-    communes = sorted({code for _, code in by_unit})
+    plm = os.environ.get("MUN_PLM") == "1"
+    communes = [] if plm else sorted({code for _, code in by_unit if "SR" not in code})
     with connect() as conn:
         paths = {
             str(code): str(path).removeprefix("fr/")
@@ -580,6 +602,62 @@ def emit() -> Path:
             pending.add(path)
             paths[code] = path
             return path
+
+        def lists_for(
+            key: str,
+            code: str,
+            contest: UUID,
+            result_set: UUID,
+            unit: UUID,
+            entries: list[dict[str, object]],
+            won: bool,
+        ) -> None:
+            for entry in entries:
+                panel = int(str(entry["panel"]))
+                option = cs.key(f"{SOURCE}.option", f"{key}:{panel}")
+                cs.add(
+                    "contest_option",
+                    id=option,
+                    contest_id=contest,
+                    kind="list",
+                    party_id=nuances.get(str(entry["nuance"])),
+                    ballot_position=entry["printed"],
+                    ballot_label=entry["list_label"] or entry["short"],
+                )
+                values.append(
+                    {
+                        "result_set_id": str(result_set),
+                        "unit_id": str(unit),
+                        "option_id": str(option),
+                        "measure": 1,
+                        "value": entry["votes"],
+                    }
+                )
+                if won and entry["seats"]:
+                    cs.add("outcome", result_set_id=result_set, option_id=option, kind="won", seats=entry["seats"])
+                if entry["surname"] is not None:
+                    person_key = f"{year}:{code}:{entry['surname']}:{entry['forename']}"
+                    if person_key not in persons:
+                        persons[person_key] = cs.key(f"{SOURCE}.person", person_key)
+                        if persons[person_key] in cs.minted:
+                            cs.add(
+                                "person",
+                                id=persons[person_key],
+                                gender={"F": "female", "M": "male"}.get(str(entry["sex"])),
+                            )
+                            name(
+                                persons[person_key],
+                                person_name(str(entry["forename"] or ""), str(entry["surname"])),
+                            )
+                    cs.add(
+                        "candidacy",
+                        id=cs.key(f"{SOURCE}.candidacy", f"{key}:{panel}:1"),
+                        person_id=persons[person_key],
+                        option_id=option,
+                        role="head",
+                        list_position=1,
+                        ballot_name=f"{entry['surname']} {entry['forename'] or ''}".strip(),
+                    )
 
         def commune(code: str, label: str) -> tuple[str, UUID, UUID, UUID, UUID]:
             path = f"fr/{path_of(code, label)}"
@@ -703,54 +781,185 @@ def emit() -> Path:
                                 "value": row[field],
                             }
                         )
-                for entry in list_rows.get((round_, code), []):
-                    panel = int(str(entry["panel"]))
-                    option = cs.key(f"{SOURCE}.option", f"{key}:{panel}")
-                    cs.add(
-                        "contest_option",
-                        id=option,
-                        contest_id=contest,
-                        kind="list",
-                        party_id=nuances.get(str(entry["nuance"])),
-                        ballot_position=entry["printed"],
-                        ballot_label=entry["list_label"] or entry["short"],
-                    )
-                    values.append(
-                        {
-                            "result_set_id": str(result_set),
-                            "unit_id": str(unit),
-                            "option_id": str(option),
-                            "measure": 1,
-                            "value": entry["votes"],
-                        }
-                    )
-                    if entry["seats"]:
-                        cs.add("outcome", result_set_id=result_set, option_id=option, kind="won", seats=entry["seats"])
-                    if entry["surname"] is not None:
-                        person_key = f"{year}:{code}:{entry['surname']}:{entry['forename']}"
-                        if person_key not in persons:
-                            persons[person_key] = cs.key(f"{SOURCE}.person", person_key)
-                            if persons[person_key] in cs.minted:
-                                cs.add(
-                                    "person",
-                                    id=persons[person_key],
-                                    gender={"F": "female", "M": "male"}.get(str(entry["sex"])),
-                                )
-                                name(
-                                    persons[person_key],
-                                    person_name(str(entry["forename"] or ""), str(entry["surname"])),
-                                )
-                        cs.add(
-                            "candidacy",
-                            id=cs.key(f"{SOURCE}.candidacy", f"{key}:{panel}:1"),
-                            person_id=persons[person_key],
-                            option_id=option,
-                            role="head",
-                            list_position=1,
-                            ballot_name=f"{entry['surname']} {entry['forename'] or ''}".strip(),
-                        )
+                lists_for(key, code, contest, result_set, unit, list_rows.get((round_, code), []), True)
                 previous = contest
-        small_communes = sorted({code for _, code in small_units})
+        for city, city_label in CITIES.items():
+            sectors = sorted({code for _, code in by_unit if code.startswith(f"{city}SR")})
+            if not sectors:
+                continue
+            path, area, _, polity, body = commune(city, city_label)
+            counted = year in (2014, 2020)
+            if counted:
+                cs.add(
+                    "body_size",
+                    body_id=body,
+                    seats=sum(sizes[sector] for sector in sectors),
+                    valid_from=days[0],
+                    valid_to=NEXT[year] - timedelta(days=1),
+                )
+            elections = {}
+            for round_ in (1, 2):
+                if not any((round_, sector) in by_unit for sector in sectors):
+                    continue
+                day = days[round_ - 1]
+                kind = "local" if round_ == 1 else "runoff"
+                elections[round_] = cs.key(f"{SOURCE}.election", f"{year}:{city}:{round_}")
+                cs.add(
+                    "election",
+                    id=elections[round_],
+                    polity_id=polity,
+                    parent_id=umbrella if round_ == 1 else elections[1],
+                    kind=kind,
+                    date_from=day,
+                    date_to=day,
+                    status="held",
+                )
+                name(
+                    elections[round_],
+                    f"{year} {city_label} municipal election" + (", second round" if round_ == 2 else ""),
+                    "en",
+                )
+                cs.add("slug", path=f"{path}/{day}-{kind}", entity_id=elections[round_])
+            cs.add("note", entity_id=elections[1], kind="methodology", body_md=SECTOR_NOTE)
+            if not counted:
+                cs.add("note", entity_id=elections[1], kind="caveat", body_md=SECTOR_SEATS[year])
+            for sector in sectors:
+                number_ = int(sector[-2:])
+                merged = city == "75056" and number_ <= 4
+                start = date(2020, 3, 15) if merged and year == 2020 else None
+                end = date(2020, 3, 14) if merged and year < 2020 else date(2026, 3, 14)
+                sector_label = f"{city_label} secteur {number_}"
+                if merged and year == 2020:
+                    sector_label = "Paris Centre"
+                sector_area = cs.area("fr.secteur", sector, on=days[0])
+                if sector_area in cs.minted:
+                    cs.add("area", id=sector_area, scheme_code="fr.secteur")
+                    cs.add("area_code", area_id=sector_area, code=sector, valid_from=start, valid_to=end)
+                    cs.add("area_parent", area_id=sector_area, parent_id=area, valid_from=start, valid_to=end)
+                    name(sector_area, sector_label)
+                sector_unit = cs.unit("fr.secteur", sector, on=days[0])
+                if sector_unit in cs.minted:
+                    cs.add(
+                        "reporting_unit",
+                        id=sector_unit,
+                        polity_id=france,
+                        scheme_code="fr.secteur",
+                        code=sector,
+                        area_relation="equals",
+                        area_id=sector_area,
+                        kind="standard",
+                        valid_from=start,
+                        valid_to=end,
+                    )
+                sector_body = cs.key(f"{SOURCE}.body", sector if end.year == 2026 else f"{sector}:1983")
+                if sector_body in cs.minted:
+                    cs.add("body", id=sector_body, polity_id=polity, kind="unicameral")
+                    name(sector_body, f"{sector_label} council", "en")
+                    name(sector_body, f"Conseil d'arrondissement, {sector_label}", "fr", "native")
+                previous = None
+                for round_, election in elections.items():
+                    if (round_, sector) not in by_unit:
+                        continue
+                    day = days[round_ - 1]
+                    kind = "local" if round_ == 1 else "runoff"
+                    ordinal = "first" if round_ == 1 else "second"
+                    key = f"{year}:{sector}:{round_}"
+                    contest = cs.key(f"{SOURCE}.contest", key)
+                    cs.add(
+                        "contest",
+                        id=contest,
+                        election_id=election,
+                        kind="list_allocation",
+                        body_id=body,
+                        district_area_id=sector_area,
+                        magnitude=sizes.get(sector) if counted else None,
+                        round_number=round_,
+                        previous_round_id=previous,
+                        electoral_system_id=system,
+                        default_result_kind="counted",
+                    )
+                    name(contest, f"{year} {city_label} municipal election, {sector_label}, {ordinal} round", "en")
+                    cs.add(
+                        "slug", path=f"{path}/{day}-{kind}/conseil-municipal-secteur-{number_:02d}", entity_id=contest
+                    )
+                    result_set = cs.key(f"{SOURCE}.result_set", key)
+                    cs.add(
+                        "result_set",
+                        id=result_set,
+                        election_id=election,
+                        contest_id=contest,
+                        stage="official",
+                        kind="counted",
+                        status="active",
+                        source_id=source,
+                        is_default=True,
+                        completeness=1,
+                    )
+                    row = by_unit[round_, sector]
+                    for field, measure in ACCOUNTING:
+                        if row[field] is not None:
+                            values.append(
+                                {
+                                    "result_set_id": str(result_set),
+                                    "unit_id": str(sector_unit),
+                                    "option_id": None,
+                                    "measure": measure,
+                                    "value": row[field],
+                                }
+                            )
+                    entries = list_rows.get((round_, sector), [])
+                    lists_for(key, sector, contest, result_set, sector_unit, entries, counted)
+                    previous = contest
+                    seated = [entry for entry in entries if entry["sector_seats"]]
+                    if not counted or not seated:
+                        continue
+                    contest = cs.key(f"{SOURCE}.contest", f"{key}:arrondissement")
+                    cs.add(
+                        "contest",
+                        id=contest,
+                        election_id=election,
+                        kind="list_allocation",
+                        body_id=sector_body,
+                        district_area_id=sector_area,
+                        magnitude=sum(int(str(entry["sector_seats"])) for entry in seated),
+                        round_number=round_,
+                        default_result_kind="counted",
+                    )
+                    name(contest, f"{year} {city_label} municipal election, {sector_label} council", "en")
+                    cs.add("slug", path=f"{path}/{day}-{kind}/conseil-arrondissement-{number_:02d}", entity_id=contest)
+                    cs.add("note", entity_id=contest, kind="caveat", body_md=ARRONDISSEMENT_NOTE)
+                    result_set = cs.key(f"{SOURCE}.result_set", f"{key}:arrondissement")
+                    cs.add(
+                        "result_set",
+                        id=result_set,
+                        election_id=election,
+                        contest_id=contest,
+                        stage="official",
+                        kind="counted",
+                        status="active",
+                        source_id=source,
+                        is_default=True,
+                        completeness=None,
+                    )
+                    for entry in seated:
+                        option = cs.key(f"{SOURCE}.option", f"{key}:arrondissement:{entry['panel']}")
+                        cs.add(
+                            "contest_option",
+                            id=option,
+                            contest_id=contest,
+                            kind="list",
+                            party_id=nuances.get(str(entry["nuance"])),
+                            ballot_position=entry["printed"],
+                            ballot_label=entry["list_label"] or entry["short"],
+                        )
+                        cs.add(
+                            "outcome",
+                            result_set_id=result_set,
+                            option_id=option,
+                            kind="won",
+                            seats=entry["sector_seats"],
+                        )
+        small_communes = [] if plm else sorted({code for _, code in small_units})
         for code in small_communes:
             elected = {
                 round_: sum(1 for entry in candidate_rows.get((round_, code), []) if entry["elected"])
