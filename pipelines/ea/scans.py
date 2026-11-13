@@ -180,7 +180,12 @@ SUFFIX_WORDS = {"jr", "sr", "ii", "iii", "iv"}
 ABBREVIATION = re.compile(r"^(mt|w|e|n|s|no|so)\.? ", re.IGNORECASE)
 EXPANDED = {"mt": "mount", "w": "west", "e": "east", "n": "north", "s": "south", "no": "north", "so": "south"}
 WARDED = re.compile(r"\b(wards?|soldiers?'?)\b", re.IGNORECASE)
-WARD = re.compile(r"[\s,.:\-]*\b(wards?|precincts?)\b.*$", re.IGNORECASE)
+WARD = re.compile(
+    r"[\s,.:;\-\"'“”„〃]*(\b\d+(st|d|nd|rd|th)\b|\b(wards?|precincts?|districts?|dist|rep)\b).*$", re.IGNORECASE
+)
+CONTINUED = re.compile(
+    r"[\s,.:;\-\"'“”„〃]*(\d+(st|d|nd|rd|th)\b|(wards?|precincts?|districts?|dist|rep)\b)", re.IGNORECASE
+)
 SCHEMA: dict[str, object] = {
     "type": "object",
     "properties": {
@@ -809,14 +814,11 @@ def cells(
                 if towns and not any(row["values"]):
                     heading = row["label"]
                     continue
-                named = (
-                    f"{heading} {row['label']}"
-                    if towns and re.match(r"\s*(wards?|precincts?)\b", row["label"], re.IGNORECASE)
-                    else row["label"]
-                )
+                named = f"{heading} {row['label']}" if towns and CONTINUED.match(row["label"]) else row["label"]
                 heading = WARD.sub("", named)
                 if (
                     SUBTOTAL.match(slug(row["label"]))
+                    or (towns and slug(row["label"]).endswith(" county"))
                     or row["label"].strip() in {"%", "%."}
                     or (spec.get("subtotals") and re.fullmatch(r"totals?", slug(row["label"])))
                 ):

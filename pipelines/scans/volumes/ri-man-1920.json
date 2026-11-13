@@ -1,0 +1,26 @@
+{
+  "year": 1920,
+  "day": "1920-11-02",
+  "polity": "US-RI",
+  "publisher": "Rhode Island Secretary of State",
+  "title": "Manual, with Rules and Orders, for the Use of the General Assembly of the State of Rhode Island, 1921: elections of November 2, 1920, president and governor by towns",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/manualwithruleso00rhod/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/manualwithruleso00rhod"
+  },
+  "raw_source": "us.scans",
+  "unit_scheme": "town",
+  "offices": {
+    "president": "Presidential electors, vote of Rhode Island by cities and towns; one column per party",
+    "governor": "Governor, vote by towns, representative districts, and voting districts; one column per candidate"
+  },
+  "leaves": [
+    265,
+    275,
+    276,
+    277,
+    278,
+    279
+  ]
+}

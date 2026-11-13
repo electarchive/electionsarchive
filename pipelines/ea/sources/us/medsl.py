@@ -783,6 +783,8 @@ def attach(
             tried.append(at_large)
         if day.day == 1:
             tried += [k.replace(str(day), f"{day:%Y-%m}", 1) for k in tried]
+            if day.month == 1:
+                tried += [k.replace(str(day), str(day.year), 1) for k in tried if str(day) in k]
         key = next((k for k in tried if k in contests), None)
         if key is None or key in taken:
             print(
