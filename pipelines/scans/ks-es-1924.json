@@ -111,6 +111,45 @@
   },
   "pages": [
     {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Coolidge and Dawes",
+          "contest": "president",
+          "candidate": "Calvin Coolidge (Republican)"
+        },
+        {
+          "label": "Davis and Bryan",
+          "contest": "president",
+          "candidate": "John W. Davis (Democratic)"
+        },
+        {
+          "label": "LaFollette and Wheeler",
+          "contest": "president",
+          "candidate": "Robert La Follette (Progressive)"
+        },
+        {
+          "label": "Scattering",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.085,
+        0.291,
+        0.901,
+        1.0
+      ],
+      "hint": "Read only the table headed 'ELECTORS OF PRESIDENT AND VICE PRESIDENT.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2426
+      ]
+    },
+    {
       "page": 3,
       "id": "3-0",
       "columns": [
@@ -121,8 +160,8 @@
         },
         {
           "label": "Democrat. Davis and Bryan",
-          "contest": "president",
-          "candidate": "John W. Davis (Democratic)"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "Independent. LaFollette and Wheeler",
@@ -568,8 +607,8 @@
         },
         {
           "label": "Democrat. Davis and Bryan.",
-          "contest": "president",
-          "candidate": "John W. Davis (Democratic)"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "Independent. LaFollette and Wheeler.",
