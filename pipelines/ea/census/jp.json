@@ -1085,7 +1085,8 @@
         "fine": [
           "jp.municipality",
           "jp.ward"
-        ]
+        ],
+        "cycle": true
       },
       "source": "chiho",
       "first_held": "1947-04-05",
@@ -1142,7 +1143,8 @@
         ],
         "fine": [
           "jp.municipality"
-        ]
+        ],
+        "cycle": true
       },
       "source": "chiho",
       "first_held": "1947-04-30",
@@ -1197,7 +1199,8 @@
         "schemes": [
           "jp.municipality",
           "jp.ward"
-        ]
+        ],
+        "cycle": true
       },
       "source": "chiho",
       "first_held": "1947-04-05",
@@ -1239,7 +1242,8 @@
         "schemes": [
           "jp.municipality",
           "jp.ward"
-        ]
+        ],
+        "cycle": true
       },
       "source": "chiho",
       "first_held": "1947-04-30",
