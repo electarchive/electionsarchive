@@ -74,6 +74,8 @@
   "about_maker_body": "Elections Archive is made by [Firat Ciftci](https://www.firatciftci.com). The source code is on [GitHub](https://github.com/electarchive/electionsarchive).",
   "about_contact_title": "Contact",
   "about_contact_body": "Write to [hello@electionsarchive.com](mailto:hello@electionsarchive.com). To report a wrong number, use the [data error form](https://github.com/electarchive/electionsarchive/issues/new?template=data-error.yml) on GitHub.",
+  "about_tribal_title": "Tribal nations",
+  "about_tribal_body": "Results for a tribal nation come only from what that nation's own election body publishes openly, and they are credited to it. News tallies and Bureau of Indian Affairs files are never used in their place. A nation can ask us to withdraw or limit its data at any time, and we will honor the request. Write to [hello@electionsarchive.com](mailto:hello@electionsarchive.com).",
   "license_title": "License",
   "license_lede": "The data is free to reuse under CC BY 4.0, and the code is free software under the AGPL. Credit the archive and its sources, and you can use the data for anything.",
   "license_data_title": "Data",

@@ -48,6 +48,11 @@ function sections(slug: Project): Array<Section> {
           body: m.about_maker_body(),
         },
         {
+          id: "tribal",
+          title: m.about_tribal_title(),
+          body: m.about_tribal_body(),
+        },
+        {
           id: "contact",
           title: m.about_contact_title(),
           body: m.about_contact_body(),
