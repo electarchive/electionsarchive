@@ -55,6 +55,12 @@ PARTIES = {
     "badischer_landbund": (None, "Badischer Landbund", "BLB"),
     "rheinhessische_landliste": (None, "Rheinhessische Landliste", "RHL"),
     "bauern_schaffende": (None, "Bauern und schaffende Berufe", "BsB"),
+    "dvfp": ("Q541427", "Deutschvölkische Freiheitspartei", "DVFP"),
+    "nationalliberale_vereinigung": (None, "Nationalliberale Vereinigung", "NLV"),
+    "deutscher_bauernbund": (None, "Deutscher Bauernbund", "DBB"),
+    "sh_landespartei": ("de.party:SHLP", "Schleswig-Holsteinische Landespartei", "SHLP"),
+    "rheinhessische_bauernschaft": (None, "Rheinhessische Bauernschaft", "RHB"),
+    "gasthofsgewerbe": (None, "Bayerisches Gasthofsgewerbe", "BGG"),
 }
 BLOCS = {"kampffront"}
 JOINT = {
@@ -79,10 +85,117 @@ JOINT = {
         ("bbmb", "wirtschaftspartei"),
     ),
     "aufwertung": ("Deutschsoziale Partei und Reichsbund für Aufwertung", ("deutschsoziale",)),
+    "vvv": ("Vaterländisch-völkische Vereinigung", ("dnvp",)),
+    "vvr": ("Vaterländisch-völkischer Rechtsblock", ("dnvp",)),
+    "dnvp_vvb": ("Deutschnationale Volkspartei und Völkisch-vaterländischer Block", ("dnvp",)),
+    "dvp_nlp": ("Deutsche Volkspartei – Nationalliberale Partei", ("dvp",)),
+    "ddp_bauernbund": ("Deutsche demokratische Partei und Deutscher Bauernbund", ("ddp", "deutscher_bauernbund")),
+    "deutscher_block": ("Deutscher Block in Bayern", ("ddp", "deutscher_bauernbund")),
+    "landliste": ("Landliste", ("landbund", "nationalliberale_vereinigung")),
+    "hessischer_bauernbund_bauernschaft": (
+        "Hessischer Bauernbund und Rheinhessische Bauernschaft",
+        ("hessischer_bauernbund", "rheinhessische_bauernschaft"),
+    ),
+    "bbmb_gasthof": (
+        "Bayerischer Bauern- und Mittelstandsbund und Bayerisches Gasthofsgewerbe",
+        ("bbmb", "gasthofsgewerbe"),
+    ),
 }
 OTHERS = "Andere Parteien"
 
 ELECTIONS: dict[date, dict[str, Any]] = {
+    date(1924, 5, 4): {
+        "english": "May 1924 German federal election",
+        "german": "Reichstagswahl Mai 1924",
+        "item": "fr-das-d",
+        "year": "1924-1925",
+        "edition": "1924/25",
+        "volume": 44,
+        "printed": "390 and 391",
+        "seats": 472,
+        "pages": {
+            443: {
+                "top": 0.232,
+                "registered": (0.303, 0.370),
+                "cast": (0.372, 0.432),
+                "valid": (0.478, 0.545),
+                "dnvp": (0.560, 0.626),
+                "dvfp": (0.668, 0.727),
+                "dvp": (0.782, 0.826),
+                "zentrum": (0.860, 0.917),
+            },
+            444: {
+                "top": 0.228,
+                "ddp": (0.122, 0.177),
+                "spd": (0.222, 0.290),
+                "kpd": (0.338, 0.405),
+                "bvp": (0.465, 0.530),
+                "landliste": (0.585, 0.642),
+                "wirtschaftspartei": (0.693, 0.767),
+                "others": (0.795, 0.866),
+            },
+        },
+        "lists": {
+            **{wk: {"bvp": "deutschsoziale"} for wk in (*range(1, 12), *range(14, 19), 20, 21, 23, 28, 29, 30)},
+            2: {"bvp": "deutschsoziale", "landliste": "nationalliberale_vereinigung"},
+            3: {"bvp": "deutschsoziale", "landliste": "nationalliberale_vereinigung"},
+            4: {"bvp": "deutschsoziale", "landliste": "nationalliberale_vereinigung"},
+            5: {"bvp": "deutschsoziale", "landliste": "nationalliberale_vereinigung"},
+            10: {"bvp": "deutschsoziale", "ddp": "ddp_bauernbund"},
+            12: {"dnvp": "vvv", "landliste": "landbund"},
+            13: {"wirtschaftspartei": "sh_landespartei"},
+            14: {"bvp": "deutschsoziale", "wirtschaftspartei": "dhp"},
+            15: {"bvp": "deutschsoziale", "wirtschaftspartei": "dhp"},
+            16: {"bvp": "deutschsoziale", "wirtschaftspartei": "dhp"},
+            24: {"dvp": "dvp_nlp", "ddp": "deutscher_block", "wirtschaftspartei": "bbmb_gasthof"},
+            25: {"dvp": "dvp_nlp", "ddp": "deutscher_block", "wirtschaftspartei": "bbmb"},
+            26: {"dnvp": "dnvp_nlb", "ddp": "deutscher_block"},
+            27: {"ddp": "deutscher_block"},
+            28: {"bvp": "deutschsoziale", "landliste": "nationalliberale_vereinigung"},
+            29: {"bvp": "deutschsoziale", "landliste": "nationalliberale_vereinigung"},
+            30: {"bvp": "deutschsoziale", "landliste": "nationalliberale_vereinigung"},
+            31: {"dnvp": "vvr", "landliste": "wuerttemberg_landbund"},
+            32: {"landliste": "badischer_landbund"},
+            33: {"dnvp": "dnvp_vvb", "landliste": "hessischer_bauernbund_bauernschaft"},
+            34: {"wirtschaftspartei": "dhp"},
+        },
+        "won": {
+            "dnvp": 95,
+            "dvfp": 32,
+            "dvp": 45,
+            "zentrum": 65,
+            "ddp": 28,
+            "spd": 100,
+            "kpd": 62,
+            "bvp": 16,
+            "deutschsoziale": 4,
+            "landliste": 10,
+            "bbmb_wp": 10,
+            "dhp": 5,
+        },
+        "caveat": (
+            "The table counts each list where it stood, and the national totals beneath it equal the sums of the "
+            "Wahlkreise. Oppeln (Wahlkreis 9) includes the supplementary elections of 21 September 1924, and Dresden-"
+            "Bautzen (Wahlkreis 28) the repeat vote in Dittmannsdorf held the same day. One column holds the "
+            "Bayerische Volkspartei (Wahlkreise 24 to 27) and the Deutschsoziale Partei elsewhere. The Landliste "
+            "(national list 17) column holds its member lists: the Nationalliberale Vereinigung, the Landbund, the "
+            "Württembergischer Bauern- und Weingärtnerbund, the Badischer Landbund, and the Hessischer Bauernbund "
+            "with the Rheinhessische Bauernschaft; the marker on Wahlkreis 7 (Breslau) is illegible in the scan, so "
+            "its 3,012 votes are credited to the Landliste. Its 10 seats are the Landliste's. A further column "
+            "holds the lists joined to the Bayerische Bauern- und Mittelstandsbund's national list 8, which are the "
+            "Wirtschaftspartei des deutschen Mittelstandes and its regional affiliates (the Hausbesitz und "
+            "Gewerbeverband in Wahlkreis 10, the Rheinischer Wirtschaftsbund in Wahlkreise 20 to 23, the Bayerischer "
+            "Mittelstandsbund in Wahlkreis 26, and the Wirtschaftliche Vereinigungen of the Württemberg and Baden "
+            "middle classes in Wahlkreise 31 and 32, all counted here under the Wirtschaftspartei), and the lists "
+            "joined to the Deutsch-Hannoversche Partei's national list 9. National list 8 won 10 seats, held here by "
+            "the joint list of the Bayerischer Bauern- und Mittelstandsbund and the Wirtschaftspartei, and list 9 "
+            "won 5. In Wahlkreis 24 the cell joins the Bayerischer Bauern- und Mittelstandsbund (98,096) and the "
+            "Bayerisches Gasthofsgewerbe (2,594). In Wahlkreis 27 (Pfalz) the Vereinigte nationale Rechte stood as "
+            "one list; the Reichsamt credits 60,000 of its votes to the Deutsche Volkspartei and the remaining "
+            "23,542 to the Deutschnationale Volkspartei, as shown. The Deutschvölkische Freiheitspartei column is "
+            "the national list 23 of the völkisch movement."
+        ),
+    },
     date(1924, 12, 7): {
         "english": "December 1924 German federal election",
         "german": "Reichstagswahl Dezember 1924",
