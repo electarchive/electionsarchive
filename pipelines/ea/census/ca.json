@@ -340,6 +340,13 @@
       "note": "41 rows on 2026-11-14: Montréal 19, Québec 6, Sherbrooke 4, Lévis 3, Longueuil 3, Saguenay 3, Grenville-sur-la-Rouge 2, Métis-sur-Mer 1.",
       "kind": "official_body"
     },
+    "mtl-charter": {
+      "title": "Charter of Ville de Montréal, metropolis of Québec (CQLR c C-11.4), schedule of boroughs",
+      "publisher": "Québec Official Publisher",
+      "url": "https://www.legisquebec.gouv.qc.ca/en/document/cs/C-11.4",
+      "note": "Lists the 19 boroughs of Montréal, in place since the January 1, 2006 demergers (27 boroughs before). The ministry's directory counts 41 boroughs in all eight boroughed municipalities, but only Montréal's elect borough mayors and councillors.",
+      "kind": "official_body"
+    },
     "mtl-results": {
       "title": "Élections municipales - Résultats détaillés",
       "publisher": "Ville de Montréal",
@@ -629,9 +636,9 @@
       "source": "mtl-results",
       "counts": [
         {
-          "date": "2026-11-14",
-          "value": 41,
-          "source": "qc-mamh-arr",
+          "date": "2006-01-01",
+          "value": 19,
+          "source": "mtl-charter",
           "within": "CA-QC"
         }
       ]
@@ -6204,6 +6211,7 @@
       "measure": {
         "unit": "polity"
       },
+      "contests_per_unit": 2,
       "note": "Montréal's 19 boroughs elect borough mayors and borough councillors on the municipal ballot. The other seven boroughed municipalities (Québec, Sherbrooke, Lévis, Longueuil, Saguenay, Grenville-sur-la-Rouge, and Métis-sur-Mer) seat city councillors on their borough councils, so those 22 boroughs hold no separate borough election; only Montréal's class is confirmed to be held.",
       "source": "mtl-results",
       "match": [
