@@ -1206,6 +1206,16 @@ def emit() -> Path:
                         kind="caveat",
                         body_md=f"The book prints no candidate for {', '.join(empty)}; those seats are left out.",
                     )
+        staged = {(str(row["entity_id"]), row["body_md"]) for row in cs.rows.get("note", [])}
+        for note, entity, body in conn.execute(
+            """select n.id, n.entity_id, n.body_md from note n join changeset c on c.id = n.changeset_id
+               where c.pipeline = %s and n.kind = 'caveat'""",
+            [SOURCE],
+        ).fetchall():
+            if (str(entity), body) not in staged:
+                cs.add(
+                    "note_drop", note_id=note, entity_id=entity, body_md=body, reason="The caveat no longer applies."
+                )
         return cs.write()
 
 
