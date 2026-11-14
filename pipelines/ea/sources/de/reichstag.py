@@ -18,7 +18,7 @@ VERSION = "1"
 TSV = Path(__file__).with_name("reichstag.tsv")
 PAGES = DATA / "pages" / SOURCE
 PUBLISHER = "Statistisches Reichsamt"
-ARCHIVE = "https://archive.org/download/per_statistisches-jahrbuch-fur-das-deutsche-reich_statistisches-jahrbuch-fr-das-deutsc_{year}_{volume}/page/n{leaf}.jpg"
+ARCHIVE = "https://archive.org/download/per_statistisches-jahrbuch-fur-das-deutsche-reich_statistisches-jahrbuch-{item}_{year}_{volume}/page/n{leaf}.jpg"
 VOTES, REGISTERED, CAST, VALID = 1, 2, 3, 4
 DIGITIZED = 8
 WIDTH = 1400
@@ -39,12 +39,93 @@ PARTIES = {
     "bauernpartei": ("Q871964", "Deutsche Bauernpartei", "DBP"),
     "wuerttemberg_landbund": ("Q2596896", "Württembergischer Bauern- und Weingärtnerbund", "Landbund"),
     "kampffront": ("Q179260", "Kampffront Schwarz-Weiß-Rot", "KSWR"),
+    "dhp": ("Q567550", "Deutsch-Hannoversche Partei", "DHP"),
+    "kvp": ("Q548022", "Konservative Volkspartei", "KVP"),
+    "saechsisches_landvolk": ("Q27926490", "Sächsisches Landvolk", "SLV"),
 }
 BLOCS = {"kampffront"}
-JOINT = {"zentrum_bvp": ("Zentrum und Bayerische Volkspartei", ("zentrum", "bvp"))}
+JOINT = {
+    "zentrum_bvp": ("Zentrum und Bayerische Volkspartei", ("zentrum", "bvp")),
+    "kvp_dhp": ("Konservative Volkspartei und Deutsch-Hannoversche Partei", ("kvp", "dhp")),
+    "dvp_staatspartei": ("Einheitsliste Deutsche Volkspartei – Deutsche Staatspartei", ("dvp", "staatspartei")),
+}
 OTHERS = "Andere Parteien"
 
 ELECTIONS: dict[date, dict[str, Any]] = {
+    date(1930, 9, 14): {
+        "english": "1930 German federal election",
+        "german": "Reichstagswahl 1930",
+        "year": 1931,
+        "volume": 50,
+        "printed": "546 and 547",
+        "seats": 577,
+        "pages": {
+            593: {
+                "top": 0.215,
+                "registered": (0.335, 0.405),
+                "cast": (0.408, 0.476),
+                "valid": (0.505, 0.575),
+                "spd": (0.578, 0.636),
+                "dnvp": (0.668, 0.728),
+                "zentrum": (0.757, 0.8165),
+                "kpd": (0.849, 0.905),
+            },
+            594: {
+                "top": 0.222,
+                "wirtschaftspartei": (0.297, 0.353),
+                "dvp": (0.092, 0.150),
+                "staatspartei": (0.188, 0.257),
+                "nsdap": (0.393, 0.450),
+                "landvolk": (0.492, 0.555),
+                "kvp": (0.597, 0.645),
+                "csvd": (0.685, 0.736),
+                "others": (0.776, 0.844),
+            },
+        },
+        "lists": {
+            14: {"kvp": "kvp_dhp"},
+            15: {"kvp": "dhp"},
+            16: {"kvp": "dhp"},
+            24: {"zentrum": "bvp"},
+            25: {"zentrum": "bvp"},
+            26: {"zentrum": "bvp"},
+            27: {"zentrum": "zentrum_bvp"},
+            28: {"landvolk": "saechsisches_landvolk"},
+            29: {"landvolk": "saechsisches_landvolk"},
+            30: {"landvolk": "saechsisches_landvolk"},
+            31: {"staatspartei": "dvp_staatspartei"},
+            32: {"staatspartei": "dvp_staatspartei"},
+        },
+        "won": {
+            "spd": 143,
+            "dnvp": 41,
+            "zentrum": 68,
+            "bvp": 19,
+            "kpd": 77,
+            "dvp": 30,
+            "staatspartei": 20,
+            "wirtschaftspartei": 23,
+            "nsdap": 107,
+            "landvolk": 19,
+            "dhp": 3,
+            "kvp": 4,
+            "csvd": 14,
+            "bauernpartei": 6,
+            "wuerttemberg_landbund": 3,
+        },
+        "caveat": (
+            "The table counts each list where it stood, and the national totals beneath it equal the sums of the "
+            "Wahlkreise. The Konservative Volkspartei and the Deutsch-Hannoversche Partei share a column: the Deutsch-"
+            "Hannoversche Partei stood alone in Wahlkreise 15 and 16, the two ran a joint list in Wahlkreis 14 "
+            "(Weser-Ems), and the Konservative Volkspartei stood alone elsewhere. The Bayerische Volkspartei stood in "
+            "Wahlkreise 24 to 26, and the joint list of the Zentrum and the Bayerische Volkspartei in Wahlkreis 27 "
+            "(Pfalz) is counted by the Reichsamt with the Zentrum. The Sächsisches Landvolk stood in Wahlkreise 28 to "
+            "30 on the national list of the Landvolk, whose 19 seats include any won there. In Wahlkreise 31 and 32 "
+            "(Württemberg and Baden) the Deutsche Volkspartei and the Deutsche Staatspartei ran a joint list, which "
+            "the Reichsamt counts with the Staatspartei. The Deutsche Bauernpartei (6 seats) and the Württembergischer "
+            "Bauern- und Weingärtnerbund (3 seats) are counted under other parties."
+        ),
+    },
     date(1932, 7, 31): {
         "english": "July 1932 German federal election",
         "german": "Reichstagswahl Juli 1932",
@@ -182,7 +263,7 @@ NOTE = (
 
 def url(day: date, leaf: int) -> str:
     spec = ELECTIONS[day]
-    return ARCHIVE.format(year=spec["year"], volume=spec["volume"], leaf=leaf)
+    return ARCHIVE.format(item=spec.get("item", "fr-das-deutsc"), year=spec["year"], volume=spec["volume"], leaf=leaf)
 
 
 def title(day: date) -> str:
