@@ -560,6 +560,13 @@
       "note": "Duvergier lists the decree by its title in the table of the volume's June 1793 acts.",
       "kind": "compendium"
     },
+    "ap-1793-06-27": {
+      "title": "Décret du 27 juin 1793 (séance du matin) sur l'envoi de la Déclaration des droits et de l'acte constitutionnel et la convocation des assemblées primaires, Archives parlementaires, 1re série, t. 67, pp. 558-559",
+      "publisher": "Archives parlementaires de 1787 à 1860, 1re série, t. 67 (Paris: Dupont, 1895)",
+      "url": "https://archive.org/details/archives-parlementaires_1969_67",
+      "note": "Art. 2: the assemblies are convened within eight days at the latest of receiving the decree; art. 5: each sends its procès-verbal and one envoy to Paris for 10 August, when the count is proclaimed (art. 6). No voting day is fixed.",
+      "kind": "official_body"
+    },
     "duv-1795-08-22": {
       "title": "Décret du 5 fructidor an III (22 août 1795), art. 1 (convocation des assemblées primaires pour l'acte constitutionnel), and décret du 1er vendémiaire an IV (23 septembre 1795) declaring the decrees of 5 and 13 fructidor accepted (Bulletin des lois, 1re série, Bull. 181)",
       "publisher": "Duvergier, Collection complète des lois, décrets, ordonnances, règlemens et avis du Conseil d'État, t. 8 (A. Guyot)",
@@ -4053,9 +4060,9 @@
           "date": "1793-01-01",
           "precision": "year",
           "contests": 1,
-          "source": "duv-1793-06-27",
-          "quote": "Décret qui ordonne la convocation des assemblées primaires pour la présentation à l'acceptation du peuple de la déclaration des droits de l'homme et du citoyen et de l'acte constitutionnel.",
-          "note": "Constitution of 1793; primary assemblies convened by the decree of 27-28 June 1793. Duvergier lists the decree by title only, and the Internet Archive holds no Moniteur reprint for 1793, so the text that sets the meeting days is not read and the year stays."
+          "source": "ap-1793-06-27",
+          "quote": "Les assemblées primaires, convoquées dans la huitaine au plus tard, à compter du jour de la réception du présent décret.",
+          "note": "Constitution of 1793; the decree of 27 June 1793 (Duvergier lists it as 27-28 June) convenes the primary assemblies within eight days of receiving it, with the count proclaimed on 10 August. The text fixes no voting day, so the year stays."
         },
         {
           "date": "1795-09-06",
@@ -4155,7 +4162,7 @@
         "unit": "question"
       },
       "valid_to": "1958-09-01",
-      "note": "Constitutional plebiscites of the Revolution and the Napoleonic era (1793, 1795, 1799, 1802, 1804, and 1815), the Second Empire plebiscites of December 1851, November 1852, and May 1870, and the referendums of 21 October 1945 (two questions), 5 May 1946, and 13 October 1946. The 1860 annexation plebiscites of Nice and Savoy are counted as well. The Revolution and Napoleonic votes were taken by primary assemblies or registers open for days or weeks, so most carry a year, and 1795 a range. The 1799, 1804, and 1815 texts give per-place windows without a calendar day, and the 1793 convening text is not read.",
+      "note": "Constitutional plebiscites of the Revolution and the Napoleonic era (1793, 1795, 1799, 1802, 1804, and 1815), the Second Empire plebiscites of December 1851, November 1852, and May 1870, and the referendums of 21 October 1945 (two questions), 5 May 1946, and 13 October 1946. The 1860 annexation plebiscites of Nice and Savoy are counted as well. The Revolution and Napoleonic votes were taken by primary assemblies or registers open for days or weeks, so most carry a year, and 1795 a range. The 1799, 1804, and 1815 texts give per-place windows without a calendar day, and the 1793 decree gives only an eight-day window from receipt and a 10 August proclamation.",
       "source": "elysee-presidents",
       "match": [
         {
