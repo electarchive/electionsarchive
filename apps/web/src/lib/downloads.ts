@@ -9,6 +9,7 @@ export const SHARED_FILES = [
   "SHA256SUMS",
   "manifest.json",
   "ATTRIBUTION.md",
+  "gaps.csv",
 ] as const;
 
 const SHARED_LABELS: Record<(typeof SHARED_FILES)[number], () => string> = {
@@ -16,6 +17,7 @@ const SHARED_LABELS: Record<(typeof SHARED_FILES)[number], () => string> = {
   SHA256SUMS: m.downloads_shared_sums,
   "manifest.json": m.downloads_shared_manifest,
   "ATTRIBUTION.md": m.downloads_shared_attribution,
+  "gaps.csv": m.downloads_shared_gaps,
 };
 
 export const sharedLabel = (file: (typeof SHARED_FILES)[number]) =>
@@ -24,7 +26,7 @@ export const sharedLabel = (file: (typeof SHARED_FILES)[number]) =>
 export const quickstart = (calver: string) => [
   {
     text: m.downloads_step_download(),
-    code: `gh release download data-${calver} -R electarchive/electionsarchive -p '*.parquet' -p electionsarchive.sql -p SHA256SUMS`,
+    code: `gh release download data-${calver} -R electarchive/electionsarchive -p '*.parquet' -p electionsarchive.sql -p gaps.csv -p SHA256SUMS`,
   },
   {
     text: m.downloads_step_verify(),

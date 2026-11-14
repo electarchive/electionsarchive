@@ -124,6 +124,7 @@ export const SHARED = [
   "manifest.json",
   "ATTRIBUTION.md",
   "SHA256SUMS",
+  "gaps.csv",
 ] as const;
 
 const summaryOf = (value: unknown) => {
