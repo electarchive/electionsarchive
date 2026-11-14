@@ -1,0 +1,331 @@
+{
+  "polity": "US-MD",
+  "publisher": "Maryland Secretary of State",
+  "title": "Maryland Manual 1938, general election returns (general election 1938-11-08)",
+  "license": "Public record",
+  "file": {
+    "url": "https://msa.maryland.gov/megafile/msa/speccol/sc2900/sc2908/000001/000158/pdf/am158--{page}.pdf",
+    "item": "https://msa.maryland.gov/megafile/msa/speccol/sc2900/sc2908/000001/000158/html/index.html"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "governor": {
+      "year": 1938,
+      "chamber": "governor",
+      "day": "1938-11-08",
+      "special": false,
+      "state": "MD",
+      "district": null
+    },
+    "senate": {
+      "year": 1938,
+      "chamber": "senate",
+      "day": "1938-11-08",
+      "special": false,
+      "state": "MD",
+      "district": null
+    },
+    "house1": {
+      "year": 1938,
+      "chamber": "house",
+      "day": "1938-11-08",
+      "special": false,
+      "state": "MD",
+      "district": 1
+    },
+    "house2": {
+      "year": 1938,
+      "chamber": "house",
+      "day": "1938-11-08",
+      "special": false,
+      "state": "MD",
+      "district": 2
+    },
+    "house3": {
+      "year": 1938,
+      "chamber": "house",
+      "day": "1938-11-08",
+      "special": false,
+      "state": "MD",
+      "district": 3
+    },
+    "house4": {
+      "year": 1938,
+      "chamber": "house",
+      "day": "1938-11-08",
+      "special": false,
+      "state": "MD",
+      "district": 4
+    },
+    "house5": {
+      "year": 1938,
+      "chamber": "house",
+      "day": "1938-11-08",
+      "special": false,
+      "state": "MD",
+      "district": 5
+    },
+    "house6": {
+      "year": 1938,
+      "chamber": "house",
+      "day": "1938-11-08",
+      "special": false,
+      "state": "MD",
+      "district": 6
+    }
+  },
+  "pages": [
+    {
+      "page": 320,
+      "id": "320-0",
+      "columns": [
+        {
+          "label": "Brune",
+          "contest": "governor",
+          "candidate": "Herbert Brune"
+        },
+        {
+          "label": "Eyman",
+          "contest": "governor",
+          "candidate": "David W. Eyman"
+        },
+        {
+          "label": "Gordon",
+          "contest": "governor",
+          "candidate": "Samuel Gordon"
+        },
+        {
+          "label": "Gwin",
+          "contest": "governor",
+          "candidate": "Joshua C. Gwin"
+        },
+        {
+          "label": "Kadish",
+          "contest": "governor",
+          "candidate": "Robert Kadish"
+        },
+        {
+          "label": "Nice",
+          "contest": "governor",
+          "candidate": "Harry W. Nice"
+        },
+        {
+          "label": "O'Conor",
+          "contest": "governor",
+          "candidate": "Herbert O'Conor"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.037,
+        0.79,
+        0.222,
+        0.947
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR OF MARYLAND'; ignore any other table visible in the image."
+    },
+    {
+      "page": 321,
+      "id": "321-0",
+      "columns": [
+        {
+          "label": "Gilman",
+          "contest": "senate",
+          "candidate": "Elisabeth Gilman"
+        },
+        {
+          "label": "Hunt",
+          "contest": "senate",
+          "candidate": "George W. Hunt"
+        },
+        {
+          "label": "Lang",
+          "contest": "senate",
+          "candidate": "Frank N. H. Lang"
+        },
+        {
+          "label": "Leser",
+          "contest": "senate",
+          "candidate": "Oscar Leser"
+        },
+        {
+          "label": "Straw",
+          "contest": "senate",
+          "candidate": "Harry Straw"
+        },
+        {
+          "label": "Tydings",
+          "contest": "senate",
+          "candidate": "Millard E. Tydings"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.017,
+        0.756,
+        0.207,
+        0.91
+      ],
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR FROM MARYLAND'; ignore any other table visible in the image."
+    },
+    {
+      "page": 325,
+      "id": "325-0",
+      "columns": [
+        {
+          "label": "Gibson",
+          "contest": "house1",
+          "candidate": "Charles H. Gibson"
+        },
+        {
+          "label": "Goldsborough",
+          "contest": "house1",
+          "candidate": "T. Alan Goldsborough"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.038,
+        0.831,
+        0.183,
+        0.906
+      ],
+      "hint": "Read only the table headed 'First Congressional District of Maryland'; ignore any other table visible in the image."
+    },
+    {
+      "page": 325,
+      "id": "325-1",
+      "columns": [
+        {
+          "label": "Arlt",
+          "contest": "house2",
+          "candidate": "Eric Arlt"
+        },
+        {
+          "label": "Cole",
+          "contest": "house2",
+          "candidate": "William P. Cole, Jr."
+        },
+        {
+          "label": "Mezger",
+          "contest": "house2",
+          "candidate": "Irving H. Mezger"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.015,
+        0.898,
+        0.204,
+        0.967
+      ],
+      "hint": "Read only the table headed 'Second Congressional District of Maryland'; ignore any other table visible in the image."
+    },
+    {
+      "page": 326,
+      "id": "326-0",
+      "columns": [
+        {
+          "label": "D'Alesandro",
+          "contest": "house3",
+          "candidate": "Thomas D'Alesandro, Jr."
+        },
+        {
+          "label": "Janetzke",
+          "contest": "house3",
+          "candidate": "John A. Janetzke, Jr."
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.059,
+        0.787,
+        0.211,
+        0.855
+      ],
+      "hint": "Read only the table headed 'Third Congressional District of Maryland'; ignore any other table visible in the image."
+    },
+    {
+      "page": 326,
+      "id": "326-1",
+      "columns": [
+        {
+          "label": "Ellison",
+          "contest": "house4",
+          "candidate": "Daniel Ellison"
+        },
+        {
+          "label": "Kennedy",
+          "contest": "house4",
+          "candidate": "Ambrose J. Kennedy"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.059,
+        0.847,
+        0.211,
+        0.914
+      ],
+      "hint": "Read only the table headed 'Fourth Congressional District of Maryland'; ignore any other table visible in the image."
+    },
+    {
+      "page": 327,
+      "id": "327-0",
+      "columns": [
+        {
+          "label": "Elliott",
+          "contest": "house5",
+          "candidate": "David L. Elliott"
+        },
+        {
+          "label": "Gambrill",
+          "contest": "house5",
+          "candidate": "Stephen W. Gambrill"
+        },
+        {
+          "label": "Love",
+          "contest": "house5",
+          "candidate": "A. Kingsley Love"
+        },
+        {
+          "label": "Torvestad",
+          "contest": "house5",
+          "candidate": "John N. Torvestad"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.122,
+        0.791,
+        0.968,
+        0.9
+      ],
+      "hint": "Read only the table headed 'Fifth Congressional District of Maryland'; ignore any other table visible in the image."
+    },
+    {
+      "page": 327,
+      "id": "327-1",
+      "columns": [
+        {
+          "label": "Byron",
+          "contest": "house6",
+          "candidate": "William D. Byron"
+        },
+        {
+          "label": "Stewart",
+          "contest": "house6",
+          "candidate": "A. Charles Stewart"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.122,
+        0.892,
+        0.868,
+        0.979
+      ],
+      "hint": "Read only the table headed 'Sixth Congressional District of Maryland'; ignore any other table visible in the image."
+    }
+  ]
+}

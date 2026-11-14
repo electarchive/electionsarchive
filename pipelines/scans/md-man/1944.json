@@ -1,0 +1,271 @@
+{
+  "polity": "US-MD",
+  "publisher": "Maryland Secretary of State",
+  "title": "Maryland Manual 1945-46, general election returns (general election 1944-11-07)",
+  "license": "Public record",
+  "file": {
+    "url": "https://msa.maryland.gov/megafile/msa/speccol/sc2900/sc2908/000001/000161/pdf/am161--{page}.pdf",
+    "item": "https://msa.maryland.gov/megafile/msa/speccol/sc2900/sc2908/000001/000161/html/index.html"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1944,
+      "chamber": "president",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "MD",
+      "district": null
+    },
+    "senate": {
+      "year": 1944,
+      "chamber": "senate",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "MD",
+      "district": null
+    },
+    "house1": {
+      "year": 1944,
+      "chamber": "house",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "MD",
+      "district": 1
+    },
+    "house2": {
+      "year": 1944,
+      "chamber": "house",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "MD",
+      "district": 2
+    },
+    "house3": {
+      "year": 1944,
+      "chamber": "house",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "MD",
+      "district": 3
+    },
+    "house4": {
+      "year": 1944,
+      "chamber": "house",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "MD",
+      "district": 4
+    },
+    "house5": {
+      "year": 1944,
+      "chamber": "house",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "MD",
+      "district": 5
+    },
+    "house6": {
+      "year": 1944,
+      "chamber": "house",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "MD",
+      "district": 6
+    }
+  },
+  "pages": [
+    {
+      "page": 195,
+      "id": "195-0",
+      "columns": [
+        {
+          "label": "Roosevelt and Truman",
+          "contest": "president",
+          "candidate": "Franklin D. Roosevelt (Democratic)"
+        },
+        {
+          "label": "Dewey and Bricker",
+          "contest": "president",
+          "candidate": "Thomas E. Dewey (Republican)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.016,
+        0.801,
+        0.188,
+        0.91
+      ],
+      "hint": "Read only the table headed 'For Electors for President and Vice-President of the United States'; ignore any other table visible in the image."
+    },
+    {
+      "page": 196,
+      "id": "196-0",
+      "columns": [
+        {
+          "label": "Tydings",
+          "contest": "senate",
+          "candidate": "Millard E. Tydings"
+        },
+        {
+          "label": "Randall",
+          "contest": "senate",
+          "candidate": "Blanchard Randall, Jr."
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.057,
+        0.772,
+        0.211,
+        0.898
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR'; ignore any other table visible in the image."
+    },
+    {
+      "page": 197,
+      "id": "197-0",
+      "columns": [
+        {
+          "label": "Davis",
+          "contest": "house1",
+          "candidate": "Wilmer Fell Davis"
+        },
+        {
+          "label": "Roe",
+          "contest": "house1",
+          "candidate": "Dudley G. Roe"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.037,
+        0.794,
+        0.187,
+        0.866
+      ],
+      "hint": "Read only the table headed 'From the First Congressional District of Maryland, 1944 general election, U.S. Representative in Congress'; ignore any other table visible in the image."
+    },
+    {
+      "page": 197,
+      "id": "197-1",
+      "columns": [
+        {
+          "label": "Baldwin",
+          "contest": "house2",
+          "candidate": "H. Streett Baldwin"
+        },
+        {
+          "label": "McQuaid",
+          "contest": "house2",
+          "candidate": "Wilfred T. McQuaid"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.033,
+        0.858,
+        0.187,
+        0.93
+      ],
+      "hint": "Read only the table headed 'From the Second Congressional District of Maryland, 1944 general election, U.S. Representative in Congress'; ignore any other table visible in the image."
+    },
+    {
+      "page": 197,
+      "id": "197-2",
+      "columns": [
+        {
+          "label": "Benson",
+          "contest": "house3",
+          "candidate": "John W. Benson"
+        },
+        {
+          "label": "D'Alesandro",
+          "contest": "house3",
+          "candidate": "Thomas D'Alesandro, Jr."
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.033,
+        0.922,
+        0.187,
+        0.98
+      ],
+      "hint": "Read only the table headed 'From the Third Congressional District of Maryland, 1944 general election, U.S. Representative in Congress'; ignore any other table visible in the image."
+    },
+    {
+      "page": 198,
+      "id": "198-0",
+      "columns": [
+        {
+          "label": "Ellison",
+          "contest": "house4",
+          "candidate": "Daniel Ellison"
+        },
+        {
+          "label": "Fallon",
+          "contest": "house4",
+          "candidate": "George H. Fallon"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.055,
+        0.763,
+        0.205,
+        0.826
+      ],
+      "hint": "Read only the table headed 'From the Fourth Congressional District of Maryland'; ignore any other table visible in the image."
+    },
+    {
+      "page": 198,
+      "id": "198-1",
+      "columns": [
+        {
+          "label": "Sasscer",
+          "contest": "house5",
+          "candidate": "Lansdale G. Sasscer"
+        },
+        {
+          "label": "Weidemeyer",
+          "contest": "house5",
+          "candidate": "C. Maurice Weidemeyer"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.055,
+        0.818,
+        0.208,
+        0.902
+      ],
+      "hint": "Read only the table headed 'From the Fifth Congressional District of Maryland'; ignore any other table visible in the image."
+    },
+    {
+      "page": 198,
+      "id": "198-2",
+      "columns": [
+        {
+          "label": "Beall",
+          "contest": "house6",
+          "candidate": "J. Glenn Beall"
+        },
+        {
+          "label": "McMullen",
+          "contest": "house6",
+          "candidate": "Daniel F. McMullen"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.055,
+        0.894,
+        0.208,
+        0.951
+      ],
+      "hint": "Read only the table headed 'From the Sixth Congressional District of Maryland'; ignore any other table visible in the image."
+    }
+  ]
+}

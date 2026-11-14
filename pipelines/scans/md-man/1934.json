@@ -1,0 +1,336 @@
+{
+  "polity": "US-MD",
+  "publisher": "Maryland Secretary of State",
+  "title": "Maryland Manual 1934, general election returns (general election 1934-11-06)",
+  "license": "Public record",
+  "file": {
+    "url": "https://msa.maryland.gov/megafile/msa/speccol/sc2900/sc2908/000001/000151/pdf/am151--{page}.pdf",
+    "item": "https://msa.maryland.gov/megafile/msa/speccol/sc2900/sc2908/000001/000151/html/index.html"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "governor": {
+      "year": 1934,
+      "chamber": "governor",
+      "day": "1934-11-06",
+      "special": false,
+      "state": "MD",
+      "district": null
+    },
+    "senate": {
+      "year": 1934,
+      "chamber": "senate",
+      "day": "1934-11-06",
+      "special": false,
+      "state": "MD",
+      "district": null
+    },
+    "house1": {
+      "year": 1934,
+      "chamber": "house",
+      "day": "1934-11-06",
+      "special": false,
+      "state": "MD",
+      "district": 1
+    },
+    "house2": {
+      "year": 1934,
+      "chamber": "house",
+      "day": "1934-11-06",
+      "special": false,
+      "state": "MD",
+      "district": 2
+    },
+    "house3": {
+      "year": 1934,
+      "chamber": "house",
+      "day": "1934-11-06",
+      "special": false,
+      "state": "MD",
+      "district": 3
+    },
+    "house4": {
+      "year": 1934,
+      "chamber": "house",
+      "day": "1934-11-06",
+      "special": false,
+      "state": "MD",
+      "district": 4
+    },
+    "house5": {
+      "year": 1934,
+      "chamber": "house",
+      "day": "1934-11-06",
+      "special": false,
+      "state": "MD",
+      "district": 5
+    },
+    "house6": {
+      "year": 1934,
+      "chamber": "house",
+      "day": "1934-11-06",
+      "special": false,
+      "state": "MD",
+      "district": 6
+    }
+  },
+  "pages": [
+    {
+      "page": 261,
+      "id": "261-0",
+      "columns": [
+        {
+          "label": "Ritchie",
+          "contest": "governor",
+          "candidate": "Albert C. Ritchie"
+        },
+        {
+          "label": "Nice",
+          "contest": "governor",
+          "candidate": "Harry W. Nice"
+        },
+        {
+          "label": "Mitchell",
+          "contest": "governor",
+          "candidate": "Broadus Mitchell"
+        },
+        {
+          "label": "Ades",
+          "contest": "governor",
+          "candidate": "Bernard Ades"
+        },
+        {
+          "label": "Galatian",
+          "contest": "governor",
+          "candidate": "Harry B. Galantian"
+        },
+        {
+          "label": "Gillespie",
+          "contest": "governor",
+          "candidate": "William A. Gillespe"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.037,
+        0.791,
+        0.193,
+        0.979
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR OF MARYLAND'; ignore any other table visible in the image."
+    },
+    {
+      "page": 262,
+      "id": "262-0",
+      "columns": [
+        {
+          "label": "Radcliffe",
+          "contest": "senate",
+          "candidate": "George L. Radcliffe"
+        },
+        {
+          "label": "France",
+          "contest": "senate",
+          "candidate": "Joseph Irwin France"
+        },
+        {
+          "label": "Gilman",
+          "contest": "senate",
+          "candidate": "Elisabeth Gilman"
+        },
+        {
+          "label": "Gale",
+          "contest": "senate",
+          "candidate": "Samuel Gale"
+        },
+        {
+          "label": "Lang",
+          "contest": "senate",
+          "candidate": "Ada Smith Lang"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.049,
+        0.774,
+        0.201,
+        0.959
+      ],
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR FROM MARYLAND'; ignore any other table visible in the image."
+    },
+    {
+      "page": 266,
+      "id": "266-0",
+      "columns": [
+        {
+          "label": "T. Alan Goldsborough, Democratic",
+          "contest": "house1",
+          "candidate": "T. Alan Goldsborough"
+        },
+        {
+          "label": "H. Burdett Messenger, Republican",
+          "contest": "house1",
+          "candidate": "H. Burdett Messenger"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.051,
+        0.812,
+        0.201,
+        0.896
+      ],
+      "hint": "Read only the table headed 'First Congressional District of Maryland'; ignore any other table visible in the image."
+    },
+    {
+      "page": 266,
+      "id": "266-1",
+      "columns": [
+        {
+          "label": "William P. Cole, Jr., Democratic",
+          "contest": "house2",
+          "candidate": "William P. Cole, Jr."
+        },
+        {
+          "label": "Theodore F. Brown, Republican",
+          "contest": "house2",
+          "candidate": "Theodore F. Brown"
+        },
+        {
+          "label": "Oswald S. Hunt, Socialist",
+          "contest": "house2",
+          "candidate": "Oswald S. Hunt"
+        },
+        {
+          "label": "Edgar R. McShane, Independent",
+          "contest": "house2",
+          "candidate": "Edgar R. McShane"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.051,
+        0.888,
+        0.201,
+        0.992
+      ],
+      "hint": "Read only the table headed 'Second Congressional District of Maryland'; ignore any other table visible in the image."
+    },
+    {
+      "page": 267,
+      "id": "267-0",
+      "columns": [
+        {
+          "label": "Palmisano",
+          "contest": "house3",
+          "candidate": "Vincent L. Palmisano"
+        },
+        {
+          "label": "Porter",
+          "contest": "house3",
+          "candidate": "F. Stanley Porter"
+        },
+        {
+          "label": "Neistadt",
+          "contest": "house3",
+          "candidate": "Samuel M. Neistadt"
+        }
+      ],
+      "orientation": "counties_across",
+      "crop": [
+        0.032,
+        0.786,
+        0.193,
+        0.878
+      ],
+      "hint": "Read only the table headed 'Third Congressional District of Maryland'; ignore any other table visible in the image."
+    },
+    {
+      "page": 267,
+      "id": "267-1",
+      "columns": [
+        {
+          "label": "Kennedy",
+          "contest": "house4",
+          "candidate": "Ambrose J. Kennedy"
+        },
+        {
+          "label": "Stockdale",
+          "contest": "house4",
+          "candidate": "William J. Stocksdale"
+        },
+        {
+          "label": "Riches",
+          "contest": "house4",
+          "candidate": "Naomi Riches"
+        }
+      ],
+      "orientation": "counties_across",
+      "crop": [
+        0.032,
+        0.87,
+        0.193,
+        0.954
+      ],
+      "hint": "Read only the table headed 'Fourth Congressional District of Maryland'; ignore any other table visible in the image."
+    },
+    {
+      "page": 268,
+      "id": "268-0",
+      "columns": [
+        {
+          "label": "Gambrill",
+          "contest": "house5",
+          "candidate": "Stephen W. Gambrill"
+        },
+        {
+          "label": "Wilmer",
+          "contest": "house5",
+          "candidate": "Joseph Allison Wilmer"
+        },
+        {
+          "label": "Angel",
+          "contest": "house5",
+          "candidate": "Samuel R. Angel"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.046,
+        0.784,
+        0.196,
+        0.897
+      ],
+      "hint": "Read only the table headed 'Fifth Congressional District of Maryland'; ignore any other table visible in the image."
+    },
+    {
+      "page": 268,
+      "id": "268-1",
+      "columns": [
+        {
+          "label": "Lewis",
+          "contest": "house6",
+          "candidate": "David J. Lewis"
+        },
+        {
+          "label": "Zihlman",
+          "contest": "house6",
+          "candidate": "Frederick N. Zihlman"
+        },
+        {
+          "label": "Boyer",
+          "contest": "house6",
+          "candidate": "Merl Claude Boyer"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.046,
+        0.889,
+        0.198,
+        0.969
+      ],
+      "hint": "Read only the table headed 'Sixth Congressional District of Maryland'; ignore any other table visible in the image."
+    }
+  ]
+}

@@ -1,0 +1,301 @@
+{
+  "polity": "US-MD",
+  "publisher": "Maryland Secretary of State",
+  "title": "Maryland Manual 1926, general election returns (general election 1926-11-02)",
+  "license": "Public record",
+  "file": {
+    "url": "https://msa.maryland.gov/megafile/msa/speccol/sc2900/sc2908/000001/000137/pdf/am137--{page}.pdf",
+    "item": "https://msa.maryland.gov/megafile/msa/speccol/sc2900/sc2908/000001/000137/html/index.html"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "governor": {
+      "year": 1926,
+      "chamber": "governor",
+      "day": "1926-11-02",
+      "special": false,
+      "state": "MD",
+      "district": null
+    },
+    "senate": {
+      "year": 1926,
+      "chamber": "senate",
+      "day": "1926-11-02",
+      "special": false,
+      "state": "MD",
+      "district": null
+    },
+    "house1": {
+      "year": 1926,
+      "chamber": "house",
+      "day": "1926-11-02",
+      "special": false,
+      "state": "MD",
+      "district": 1
+    },
+    "house2": {
+      "year": 1926,
+      "chamber": "house",
+      "day": "1926-11-02",
+      "special": false,
+      "state": "MD",
+      "district": 2
+    },
+    "house3": {
+      "year": 1926,
+      "chamber": "house",
+      "day": "1926-11-02",
+      "special": false,
+      "state": "MD",
+      "district": 3
+    },
+    "house4": {
+      "year": 1926,
+      "chamber": "house",
+      "day": "1926-11-02",
+      "special": false,
+      "state": "MD",
+      "district": 4
+    },
+    "house5": {
+      "year": 1926,
+      "chamber": "house",
+      "day": "1926-11-02",
+      "special": false,
+      "state": "MD",
+      "district": 5
+    },
+    "house6": {
+      "year": 1926,
+      "chamber": "house",
+      "day": "1926-11-02",
+      "special": false,
+      "state": "MD",
+      "district": 6
+    }
+  },
+  "pages": [
+    {
+      "page": 251,
+      "id": "251-0",
+      "columns": [
+        {
+          "label": "Ritchie",
+          "contest": "governor",
+          "candidate": "Albert C. Ritchie"
+        },
+        {
+          "label": "Mullikin",
+          "contest": "governor",
+          "candidate": "Addison E. Mullikin"
+        },
+        {
+          "label": "Dill",
+          "contest": "governor",
+          "candidate": "P. G'ustave Dill"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.022,
+        0.814,
+        0.228,
+        0.963
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR OF MARYLAND'; ignore any other table visible in the image."
+    },
+    {
+      "page": 252,
+      "id": "252-0",
+      "columns": [
+        {
+          "label": "Tydings",
+          "contest": "senate",
+          "candidate": "Millard E. Tydings"
+        },
+        {
+          "label": "Weller",
+          "contest": "senate",
+          "candidate": "Ovington E. Weller"
+        },
+        {
+          "label": "Toole",
+          "contest": "senate",
+          "candidate": "William A. Toole"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.027,
+        0.798,
+        0.233,
+        0.931
+      ],
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR'; ignore any other table visible in the image."
+    },
+    {
+      "page": 256,
+      "id": "256-0",
+      "columns": [
+        {
+          "label": "Goldsborough",
+          "contest": "house1",
+          "candidate": "T. Alan Goldsborough"
+        },
+        {
+          "label": "Towers",
+          "contest": "house1",
+          "candidate": "Lawrence B. Towers"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.025,
+        0.866,
+        0.226,
+        0.955
+      ],
+      "hint": "Read only the table headed 'First Congressional District of Maryland'; ignore any other table visible in the image."
+    },
+    {
+      "page": 257,
+      "id": "257-0",
+      "columns": [
+        {
+          "label": "Cole",
+          "contest": "house2",
+          "candidate": "William P. Cole, jr."
+        },
+        {
+          "label": "Clark",
+          "contest": "house2",
+          "candidate": "Linwood L. Clark"
+        },
+        {
+          "label": "Schneider",
+          "contest": "house2",
+          "candidate": "Richard T. Schneider"
+        }
+      ],
+      "orientation": "counties_across",
+      "crop": [
+        0.015,
+        0.796,
+        0.218,
+        0.841
+      ],
+      "hint": "Read only the table headed 'Second Congressional District of Maryland.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 257,
+      "id": "257-1",
+      "columns": [
+        {
+          "label": "Palmisano",
+          "contest": "house3",
+          "candidate": "Vincent L. Palmisano"
+        },
+        {
+          "label": "McGinity",
+          "contest": "house3",
+          "candidate": "John J. McGinity"
+        },
+        {
+          "label": "Neustadt",
+          "contest": "house3",
+          "candidate": "Samuel M. Neistadt"
+        }
+      ],
+      "orientation": "counties_across",
+      "crop": [
+        0.015,
+        0.833,
+        0.22,
+        0.89
+      ],
+      "hint": "Read only the table headed 'Third Congressional District of Maryland'; ignore any other table visible in the image."
+    },
+    {
+      "page": 257,
+      "id": "257-2",
+      "columns": [
+        {
+          "label": "Linthicum",
+          "contest": "house4",
+          "candidate": "J. Charles Linthicum"
+        },
+        {
+          "label": "Diehl",
+          "contest": "house4",
+          "candidate": "Julius F. Diehl"
+        },
+        {
+          "label": "Taylor",
+          "contest": "house4",
+          "candidate": "Clarence H. Taylor"
+        }
+      ],
+      "orientation": "counties_across",
+      "crop": [
+        0.015,
+        0.882,
+        0.208,
+        0.944
+      ],
+      "hint": "Read only the table headed 'Fourth Congressional District of Maryland.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 257,
+      "id": "257-3",
+      "columns": [
+        {
+          "label": "Gambrill",
+          "contest": "house5",
+          "candidate": "Stephen W. Gambrill"
+        },
+        {
+          "label": "Mudd",
+          "contest": "house5",
+          "candidate": "Thomas B. R. Mudd"
+        }
+      ],
+      "orientation": "counties_across",
+      "crop": [
+        0.015,
+        0.936,
+        0.21,
+        0.992
+      ],
+      "hint": "Read only the table headed 'Fifth Congressional District of Maryland.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 258,
+      "id": "258-0",
+      "columns": [
+        {
+          "label": "Mish",
+          "contest": "house6",
+          "candidate": "Frank W. Mish"
+        },
+        {
+          "label": "Zihlman",
+          "contest": "house6",
+          "candidate": "Frederick N. Zihlman"
+        },
+        {
+          "label": "Myers",
+          "contest": "house6",
+          "candidate": "Charles L. Myers"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.031,
+        0.774,
+        0.233,
+        0.841
+      ],
+      "hint": "Read only the table headed 'Sixth Congressional District of Maryland.'; ignore any other table visible in the image."
+    }
+  ]
+}

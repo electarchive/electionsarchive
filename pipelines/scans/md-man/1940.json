@@ -1,0 +1,306 @@
+{
+  "polity": "US-MD",
+  "publisher": "Maryland Secretary of State",
+  "title": "Maryland Manual 1940-41, general election returns (general election 1940-11-05)",
+  "license": "Public record",
+  "file": {
+    "url": "https://msa.maryland.gov/megafile/msa/speccol/sc2900/sc2908/000001/000159/pdf/am159--{page}.pdf",
+    "item": "https://msa.maryland.gov/megafile/msa/speccol/sc2900/sc2908/000001/000159/html/index.html"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1940,
+      "chamber": "president",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "MD",
+      "district": null
+    },
+    "senate": {
+      "year": 1940,
+      "chamber": "senate",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "MD",
+      "district": null
+    },
+    "house1": {
+      "year": 1940,
+      "chamber": "house",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "MD",
+      "district": 1
+    },
+    "house2": {
+      "year": 1940,
+      "chamber": "house",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "MD",
+      "district": 2
+    },
+    "house3": {
+      "year": 1940,
+      "chamber": "house",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "MD",
+      "district": 3
+    },
+    "house4": {
+      "year": 1940,
+      "chamber": "house",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "MD",
+      "district": 4
+    },
+    "house5": {
+      "year": 1940,
+      "chamber": "house",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "MD",
+      "district": 5
+    },
+    "house6": {
+      "year": 1940,
+      "chamber": "house",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "MD",
+      "district": 6
+    }
+  },
+  "pages": [
+    {
+      "page": 301,
+      "id": "301-0",
+      "columns": [
+        {
+          "label": "Aiken & Orange",
+          "contest": "president",
+          "candidate": "Labor Party of Maryland"
+        },
+        {
+          "label": "Browder & Ford",
+          "contest": "president",
+          "candidate": "Communist"
+        },
+        {
+          "label": "Roosevelt & Wallace",
+          "contest": "president",
+          "candidate": "Franklin D. Roosevelt (Democratic)"
+        },
+        {
+          "label": "Thomas & Krueger",
+          "contest": "president",
+          "candidate": "Norman Thomas (Socialist)"
+        },
+        {
+          "label": "Willkie & McNary",
+          "contest": "president",
+          "candidate": "Wendell Willkie (Republican)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.023,
+        0.852,
+        0.208,
+        0.946
+      ],
+      "hint": "Read only the table headed 'For Vice President of the United States'; ignore any other table visible in the image."
+    },
+    {
+      "page": 325,
+      "id": "325-0",
+      "columns": [
+        {
+          "label": "Abbott",
+          "contest": "senate",
+          "candidate": "Edwin B. Abbott"
+        },
+        {
+          "label": "Blumberg",
+          "contest": "senate",
+          "candidate": "Albert E. Blumberg"
+        },
+        {
+          "label": "Elliott",
+          "contest": "senate",
+          "candidate": "David L. Elliott"
+        },
+        {
+          "label": "Kadish",
+          "contest": "senate",
+          "candidate": "Robert Kadish"
+        },
+        {
+          "label": "Nice",
+          "contest": "senate",
+          "candidate": "Harry W. Nice"
+        },
+        {
+          "label": "Radcliffe",
+          "contest": "senate",
+          "candidate": "George L. Radcliffe"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.1,
+        0.871,
+        0.811,
+        0.958
+      ],
+      "hint": "Read only the table headed 'For United States Senator from Maryland'; ignore any other table visible in the image."
+    },
+    {
+      "page": 329,
+      "id": "329-0",
+      "columns": [
+        {
+          "label": "Duer",
+          "contest": "house1",
+          "candidate": "Robert F. Duer"
+        },
+        {
+          "label": "Ward",
+          "contest": "house1",
+          "candidate": "David J. Ward"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.172,
+        0.791,
+        0.728,
+        0.867
+      ],
+      "hint": "Read only the table headed 'From the First Congressional District of Maryland'; ignore any other table visible in the image."
+    },
+    {
+      "page": 329,
+      "id": "329-1",
+      "columns": [
+        {
+          "label": "Brown",
+          "contest": "house2",
+          "candidate": "Theodore F. Brown"
+        },
+        {
+          "label": "Cole",
+          "contest": "house2",
+          "candidate": "William P. Cole, Jr."
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.172,
+        0.859,
+        0.728,
+        0.925
+      ],
+      "hint": "Read only the table headed 'From the Second Congressional District of Maryland'; ignore any other table visible in the image."
+    },
+    {
+      "page": 329,
+      "id": "329-2",
+      "columns": [
+        {
+          "label": "D'Alesandro",
+          "contest": "house3",
+          "candidate": "Thomas D'Alesandro, Jr."
+        },
+        {
+          "label": "Janetzke",
+          "contest": "house3",
+          "candidate": "John A. Janetzke"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.172,
+        0.917,
+        0.728,
+        0.971
+      ],
+      "hint": "Read only the table headed 'From the Third Congressional District of Maryland'; ignore any other table visible in the image."
+    },
+    {
+      "page": 330,
+      "id": "330-0",
+      "columns": [
+        {
+          "label": "Ellison",
+          "contest": "house4",
+          "candidate": "Daniel J. Ellison"
+        },
+        {
+          "label": "Meyer",
+          "contest": "house4",
+          "candidate": "John A. Meyer"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.065,
+        0.773,
+        0.198,
+        0.833
+      ],
+      "hint": "Read only the table headed 'From the Fourth Congressional District of Maryland'; ignore any other table visible in the image."
+    },
+    {
+      "page": 330,
+      "id": "330-1",
+      "columns": [
+        {
+          "label": "Sasscer",
+          "contest": "house5",
+          "candidate": "Lansdale G. Sasscer"
+        },
+        {
+          "label": "Torvestad",
+          "contest": "house5",
+          "candidate": "John N. Torvestad"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.052,
+        0.825,
+        0.198,
+        0.902
+      ],
+      "hint": "Read only the table headed 'From the Fifth Congressional District of Maryland'; ignore any other table visible in the image."
+    },
+    {
+      "page": 330,
+      "id": "330-2",
+      "columns": [
+        {
+          "label": "Byron",
+          "contest": "house6",
+          "candidate": "William D. Byron"
+        },
+        {
+          "label": "Johnson",
+          "contest": "house6",
+          "candidate": "Walter P. Johnson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.051,
+        0.894,
+        0.197,
+        0.959
+      ],
+      "hint": "Read only the table headed 'From the Sixth Congressional District of Maryland'; ignore any other table visible in the image."
+    }
+  ]
+}

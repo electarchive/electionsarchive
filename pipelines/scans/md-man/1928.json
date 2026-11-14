@@ -1,0 +1,512 @@
+{
+  "polity": "US-MD",
+  "publisher": "Maryland Secretary of State",
+  "title": "Maryland Manual 1929, general election returns (general election 1928-11-06)",
+  "license": "Public record",
+  "file": {
+    "url": "https://msa.maryland.gov/megafile/msa/speccol/sc2900/sc2908/000001/000146/pdf/am146--{page}.pdf",
+    "item": "https://msa.maryland.gov/megafile/msa/speccol/sc2900/sc2908/000001/000146/html/index.html"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1928,
+      "chamber": "president",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "MD",
+      "district": null
+    },
+    "senate": {
+      "year": 1928,
+      "chamber": "senate",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "MD",
+      "district": null
+    },
+    "house1": {
+      "year": 1928,
+      "chamber": "house",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "MD",
+      "district": 1
+    },
+    "house2": {
+      "year": 1928,
+      "chamber": "house",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "MD",
+      "district": 2
+    },
+    "house3": {
+      "year": 1928,
+      "chamber": "house",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "MD",
+      "district": 3
+    },
+    "house4": {
+      "year": 1928,
+      "chamber": "house",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "MD",
+      "district": 4
+    },
+    "house5": {
+      "year": 1928,
+      "chamber": "house",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "MD",
+      "district": 5
+    },
+    "house6": {
+      "year": 1928,
+      "chamber": "house",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "MD",
+      "district": 6
+    }
+  },
+  "pages": [
+    {
+      "page": 231,
+      "id": "231-0",
+      "columns": [
+        {
+          "label": "Towers",
+          "contest": "president",
+          "candidate": "Herbert C. Hoover"
+        },
+        {
+          "label": "Allen",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Butler",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Wade",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Stephan",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Gatch",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Littlepage",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Foltz",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.079,
+        0.857,
+        0.896,
+        0.995
+      ],
+      "hint": "Read only the table headed 'REPUBLICAN PARTY. Candidates for President, Herbert Hoover; Vice-President, Charles Curtis; Presidential Electors'; ignore any other table visible in the image."
+    },
+    {
+      "page": 232,
+      "id": "232-0",
+      "columns": [
+        {
+          "label": "Furst",
+          "contest": "president",
+          "candidate": "Alfred E. Smith"
+        },
+        {
+          "label": "Dennis",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Har'n'ton",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Graham",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Welsnat",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Beer",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Fowler",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Barrick",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.013,
+        0.864,
+        0.228,
+        0.966
+      ],
+      "hint": "Read only the table headed 'DEMOCRATIC PARTY - Candidates for Presidential Electors'; ignore any other table visible in the image."
+    },
+    {
+      "page": 233,
+      "id": "233-0",
+      "columns": [
+        {
+          "label": "Munro",
+          "contest": "president",
+          "candidate": "Norman Thomas"
+        },
+        {
+          "label": "Hostetter",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Sch'ider",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Niemeyer",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Loraine",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Baker",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Smiley",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Orman",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.012,
+        0.865,
+        0.222,
+        0.96
+      ],
+      "hint": "Read only the table headed 'SOCIALIST PARTY - FOR PRESIDENTIAL ELECTORS'; ignore any other table visible in the image."
+    },
+    {
+      "page": 234,
+      "id": "234-0",
+      "columns": [
+        {
+          "label": "Laebowitz",
+          "contest": "president",
+          "candidate": "William Foster"
+        },
+        {
+          "label": "Chatzky",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Samuelson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Kra",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Fuman",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Sherman",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Isaacs",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Swee",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.013,
+        0.834,
+        0.229,
+        0.928
+      ],
+      "hint": "Read only the table headed \"WORKERS' PARTY\"; ignore any other table visible in the image."
+    },
+    {
+      "page": 235,
+      "id": "235-0",
+      "columns": [
+        {
+          "label": "Freedman",
+          "contest": "president",
+          "candidate": "Verne Reynolds"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.013,
+        0.862,
+        0.227,
+        0.958
+      ],
+      "hint": "Read only the table headed 'LABOR PARTY'; ignore any other table visible in the image."
+    },
+    {
+      "page": 236,
+      "id": "236-0",
+      "columns": [
+        {
+          "label": "Bruce (Democratic)",
+          "contest": "senate",
+          "candidate": "William Cabell Bruce"
+        },
+        {
+          "label": "Goldsborough (Republican)",
+          "contest": "senate",
+          "candidate": "Phillips Lee Goldsborough"
+        },
+        {
+          "label": "Toole (Socialist)",
+          "contest": "senate",
+          "candidate": "Socialist"
+        },
+        {
+          "label": "Stevens (Labor)",
+          "contest": "senate",
+          "candidate": "Labor"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.794,
+        0.213,
+        0.951
+      ],
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR FROM MARYLAND'; ignore any other table visible in the image."
+    },
+    {
+      "page": 237,
+      "id": "237-0",
+      "columns": [
+        {
+          "label": "Goldsborough",
+          "contest": "house1",
+          "candidate": "T. Alan Goldsborough"
+        },
+        {
+          "label": "Marine",
+          "contest": "house1",
+          "candidate": "A. Stengle Marine"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.037,
+        0.784,
+        0.215,
+        0.853
+      ],
+      "hint": "Read only the table headed 'First Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 237,
+      "id": "237-1",
+      "columns": [
+        {
+          "label": "Cole",
+          "contest": "house2",
+          "candidate": "William P. Cole, jr."
+        },
+        {
+          "label": "Clark",
+          "contest": "house2",
+          "candidate": "Linwood L. Clark"
+        },
+        {
+          "label": "Taylor",
+          "contest": "house2",
+          "candidate": "Clarence H. Taylor"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.036,
+        0.845,
+        0.214,
+        0.921
+      ],
+      "hint": "Read only the table headed 'Second Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 237,
+      "id": "237-2",
+      "columns": [
+        {
+          "label": "Palmisano",
+          "contest": "house3",
+          "candidate": "Vincent L. Palmisano"
+        },
+        {
+          "label": "Hill",
+          "contest": "house3",
+          "candidate": "John Philip Hill"
+        },
+        {
+          "label": "Neistadt",
+          "contest": "house3",
+          "candidate": "Samuel L. Neistadt"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.035,
+        0.913,
+        0.215,
+        0.965
+      ],
+      "hint": "Read only the table headed 'Third Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 238,
+      "id": "238-0",
+      "columns": [
+        {
+          "label": "Linthicum",
+          "contest": "house4",
+          "candidate": "J. Charles Linthicum"
+        },
+        {
+          "label": "Brandau",
+          "contest": "house4",
+          "candidate": "John P. Brandau"
+        },
+        {
+          "label": "Anthony",
+          "contest": "house4",
+          "candidate": "Amon F. Anthony"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.028,
+        0.786,
+        0.207,
+        0.846
+      ],
+      "hint": "Read only the table headed 'Fourth Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 238,
+      "id": "238-1",
+      "columns": [
+        {
+          "label": "Gambrill",
+          "contest": "house5",
+          "candidate": "Stephen W. Gambrill"
+        },
+        {
+          "label": "Metzerott",
+          "contest": "house5",
+          "candidate": "Oliver Metzerott"
+        },
+        {
+          "label": "Dill",
+          "contest": "house5",
+          "candidate": "Gustav P. Dill"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.028,
+        0.838,
+        0.207,
+        0.916
+      ],
+      "hint": "Read only the table headed 'Fifth Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 238,
+      "id": "238-2",
+      "columns": [
+        {
+          "label": "Lewis",
+          "contest": "house6",
+          "candidate": "David J. Lewis"
+        },
+        {
+          "label": "Zihlman",
+          "contest": "house6",
+          "candidate": "Frederick N. Zihlman"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.028,
+        0.908,
+        0.207,
+        0.967
+      ],
+      "hint": "Read only the table headed 'Sixth Congressional District'; ignore any other table visible in the image."
+    }
+  ]
+}
