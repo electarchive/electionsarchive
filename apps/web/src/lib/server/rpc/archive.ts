@@ -1543,7 +1543,7 @@ async function tallies(k: number) {
       }
       const found = await db.execute<{ id: string }>(sql`
         select distinct rs.contest_id as id from (
-          select x.result_set_k from result_rollup_sum x where x.area_k = ${k} and x.measure = any(${COUNTED})
+          select x.result_set_k from result_rollup_sum x where x.area_k = ${k} and x.measure + 0 = any(${COUNTED})
           union
           select u.result_set_k from result_rollup_unit u
           where u.area_k = ${k}
