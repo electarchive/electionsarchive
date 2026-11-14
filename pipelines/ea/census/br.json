@@ -379,6 +379,24 @@
       "url": "http://bd.camara.leg.br/bd/handle/bdcamara/31679",
       "kind": "official_body"
     },
+    "decreto-157-1842": {
+      "title": "Decreto n. 157 de 4 de maio de 1842 (instructions for the general and provincial elections), art. 34, Collecção das Leis do Império do Brasil 1842, tomo 5, parte 2, p. 261",
+      "publisher": "Coleção das Leis do Império, via Câmara dos Deputados, Biblioteca Digital",
+      "url": "https://bd.camara.leg.br/bd/handle/bdcamara/18299",
+      "kind": "official_body"
+    },
+    "lei-387-1846": {
+      "title": "Lei n. 387 de 19 de agosto de 1846 (regulates the elections of senators, deputies, and provincial assembly members), art. 40, Collecção das Leis do Império do Brasil 1846, tomo 8, parte 1, p. 21",
+      "publisher": "Coleção das Leis do Império, via Câmara dos Deputados, Biblioteca Digital",
+      "url": "https://bd.camara.leg.br/bd/handle/bdcamara/18299",
+      "kind": "official_body"
+    },
+    "aviso-imperio-1849": {
+      "title": "Aviso of the Ministry of the Empire of 30 April 1849 on the qualification for the first-stage election, Collecção das Leis do Império do Brasil 1849, parte 1, p. 166",
+      "publisher": "Coleção das Leis do Império, via Câmara dos Deputados, Biblioteca Digital",
+      "url": "https://bd.camara.leg.br/bd/handle/bdcamara/18299",
+      "kind": "official_body"
+    },
     "decreto-1082-1860": {
       "title": "Decreto n. 1.082 de 18 de agosto de 1860 (alters Lei 387 of 1846 and Decreto 842 of 1855), art. 1, par. 16",
       "publisher": "Coleção das Leis do Império, via Câmara dos Deputados, Legislação Informatizada",
@@ -2136,8 +2154,9 @@
         {
           "date": "1842-01-01",
           "precision": "year",
-          "source": "wp-eleicoes-br",
-          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+          "source": "decreto-157-1842",
+          "note": "Chamber election year. The decree issued after the dissolution leaves the polling day to orders sent to each province, with first-stage voting no sooner than five weeks after the orders reach the farthest parish, so no single day is fixed.",
+          "quote": "Com as Ordens, que acompanharem este Decreto para as presentes Eleições, irá tambem a que marcar o dia da Eleição em cada Provincia."
         },
         {
           "date": "1844-01-01",
@@ -2146,16 +2165,16 @@
           "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
         },
         {
-          "date": "1847-01-01",
-          "precision": "year",
-          "source": "wp-eleicoes-br",
-          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+          "date": "1847-11-07",
+          "source": "lei-387-1846",
+          "note": "Polling day of the first stage, the first Sunday of November in the fourth year of the legislature, when parish voters chose the electors who then chose the deputies. A ministerial notice of 12 August 1848 (Collecção das Leis, 1848, part 3, p. 115) confirms the parish boards met on the first Sunday of November 1847.",
+          "quote": "A eleição de Eleitores em todo o Imperio será no 1.º Domingo do mez de Novembro do 4.º anno de cada Legislatura."
         },
         {
-          "date": "1849-01-01",
-          "precision": "year",
-          "source": "wp-eleicoes-br",
-          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+          "date": "1849-08-05",
+          "source": "aviso-imperio-1849",
+          "note": "Polling day of the first stage, fixed after the dissolution of the Chamber, when parish voters chose the electors who then chose the deputies. The convoking decree is not in the Collecção; the Empire Ministry's notice names the day.",
+          "quote": "deverá servir para a eleição a que tem de proceder-se no dia 5 de Agosto proximo futuro"
         },
         {
           "date": "1853-01-01",
