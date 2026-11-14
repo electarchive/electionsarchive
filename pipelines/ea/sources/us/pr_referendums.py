@@ -4,6 +4,7 @@ import subprocess
 import unicodedata
 from datetime import UTC, date, datetime
 from pathlib import Path
+from typing import Any
 from uuid import UUID
 
 from ea import raw
@@ -18,7 +19,7 @@ SITE = "https://electionspuertorico.org/cgi-bin/events.cgi"
 
 OPTION, BLANK, VOID, VALID, ADDIN = "option", "blank", "void", "valid", "addin"
 
-EVENTS = [
+EVENTS: list[dict[str, Any]] = [
     {
         "query": "evento=1967",
         "day": date(1967, 7, 23),
@@ -189,7 +190,7 @@ EVENTS = [
 ]
 
 
-def url(event: dict) -> str:
+def url(event: dict[str, Any]) -> str:
     return f"{SITE}?{event['query']}"
 
 
@@ -221,7 +222,7 @@ def number(text: str) -> int:
     return int(text.replace(",", ""))
 
 
-def read(event: dict) -> tuple[dict[str, dict[str, int]], dict[str, int], dict[str, int]]:
+def read(event: dict[str, Any]) -> tuple[dict[str, dict[str, int]], dict[str, int], dict[str, int]]:
     text = raw.cached(SOURCE, url(event)).path.read_text(encoding="latin-1")
     layout = event["layout"]
     width = sum(2 if pct else 1 for _, _, pct in layout) + 1
