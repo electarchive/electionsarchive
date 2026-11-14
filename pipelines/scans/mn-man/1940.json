@@ -15,7 +15,9 @@
       "day": "1940-11-05",
       "special": false,
       "state": "MN",
-      "district": null
+      "district": null,
+      "accept": "The Manual's Renville County cell for Willkie is blank in the printed table, so the county figures total 6,196 below the printed statewide total; the statewide default keeps the full count.",
+      "keep_default": true
     },
     "senate": {
       "year": 1940,
