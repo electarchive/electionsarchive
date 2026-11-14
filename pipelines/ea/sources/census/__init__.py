@@ -9,6 +9,7 @@ FOLDER = ROOT / "pipelines/ea/census"
 SELECTORS = ("election_kinds", "contest_kinds", "body_kinds", "office_kinds", "polity_kinds", "schemes", "except_codes")
 TABLES = ["census_tier", "census_tier_count", "census_class", "census_match", "census_date"]
 CADENCE = (
+    "name_pattern",
     "selection",
     "period_years",
     "phase",
@@ -45,8 +46,8 @@ def array(values: list[str]) -> str:
     return "{" + ",".join(json.dumps(value) for value in values) + "}"
 
 
-def emit(cc: str) -> str:
-    spec = json.loads((FOLDER / f"{cc}.json").read_text())
+def emit(cc: str, spec: dict | None = None) -> str:
+    spec = spec or json.loads((FOLDER / f"{cc}.json").read_text())
     pipeline = f"census.{cc}"
 
     def mint(table: str, *parts: object) -> UUID:
@@ -55,6 +56,25 @@ def emit(cc: str) -> str:
     with connect() as conn:
         schemes = {code for (code,) in conn.execute("select code from scheme")}
         rank = dict(conn.execute("select code, rank from scheme").fetchall())
+        refs = {
+            row[field]
+            for entry in spec["classes"]
+            for row in [*entry.get("match", []), *entry.get("cadence", [])]
+            for field in ("body", "office")
+            if isinstance(row.get(field), str)
+        }
+        pairs = [ref.split(":", 1) for ref in sorted(refs) if ":" in ref]
+        entities: dict[str, object] = {
+            f"{scheme}:{value}": entity
+            for scheme, value, entity in conn.execute(
+                "select e.scheme, e.value, e.entity_id from external_id e"
+                " join unnest(%s::text[], %s::text[]) r(scheme, value) using (scheme, value)",
+                [[p[0] for p in pairs], [p[1] for p in pairs]],
+            )
+        }
+        entities |= {ref: UUID(ref) for ref in refs if ref not in entities and len(ref) == 36}
+        if missing := sorted(refs - entities.keys()):
+            raise ValueError(f"{pipeline}: no entity for {', '.join(missing)}")
         cs = Changeset(
             conn,
             pipeline=pipeline,
@@ -87,6 +107,7 @@ def emit(cc: str) -> str:
                     title=source["title"],
                     url=source["url"],
                     notes=source.get("note"),
+                    license=source.get("license"),
                 )
             sources[tag] = id
 
@@ -167,11 +188,13 @@ def emit(cc: str) -> str:
             for number, rule in enumerate(entry.get("cadence", [])):
                 cs.add(
                     "election_cadence",
-                    id=mint("election_cadence", key, number),
-                    polity_id=region(rule["within"]) if rule.get("within") else polity,
+                    id=rule.get("id") or mint("election_cadence", key, number),
+                    polity_id=rule.get("polity_id") or (region(rule["within"]) if rule.get("within") else polity),
                     class_id=id,
                     government_kind=rule.get("government_kind", entry["tier"]),
-                    function=key,
+                    function=rule.get("function", key),
+                    body_id=entities[rule["body"]] if rule.get("body") else None,
+                    office_id=entities[rule["office"]] if rule.get("office") else None,
                     source_id=sources[rule["source"]],
                     locator=rule.get("locator") or spec["sources"][rule["source"]]["url"],
                     **{field: rule[field] for field in CADENCE if field in rule},
@@ -205,6 +228,8 @@ def emit(cc: str) -> str:
                     else polity,
                     iso_pattern=match.get("iso_pattern"),
                     name_pattern=match.get("name_pattern"),
+                    body_id=entities[match["body"]] if match.get("body") else None,
+                    office_id=entities[match["office"]] if match.get("office") else None,
                     precedence=match.get("precedence", 0),
                     valid_from=match.get("valid_from"),
                     valid_to=match.get("valid_to"),

@@ -336,12 +336,12 @@ def measure(conn, day: str) -> dict:
         if kind == "school" and county is not None:
             schools[county].append((len(places), name))
         places.append((GOVERNMENTS[kind], st, name, population, due, polity, county, government))
-    from ea.coverage_tables import JUDICIAL
+    from ea.coverage import chosen, cycles
 
     judged = {st for (st,) in conn.execute(JUDGED_SQL, params)}
     judges: dict[str, int] = {}
-    for st, period in JUDICIAL.items():
-        if st in judged and st not in MARCH_JUDGES and (year - (2001 if st == "PA" else 2000)) % period == 0:
+    for (key, st), rule in cycles(conn).items():
+        if key == "judicial" and st in judged and st not in MARCH_JUDGES and chosen(rule, year) == "elected":
             judges[st] = len(places)
             places.append(("judicial", st, st, 0, True, None, None, None))
     held: dict[int, list[tuple[bool, bool]]] = defaultdict(list)
@@ -605,7 +605,7 @@ def markdown(day: str) -> str:
             " A measure is ready with two answers and its official wording. Places outside a level's cited list (the territories' delegates, governors, and legislatures) are left out. Other statewide offices are expected from the due-office schedule in"
             " `statewide_table.py` (each office's term and last elections); the other counts cite the sources in the file."
             " Statewide judicial races (supreme and appellate courts, including those elected by district) count by state: a"
-            " state is expected when `coverage_tables.JUDICIAL` has it electing judges that year and the archive holds a"
+            " state is expected when its judicial cadence in the US census has it electing judges that year and the archive holds a"
             " November statewide judicial race there two or four years earlier, and it is ready when the archive holds at"
             " least one of its Nov 3 judicial races and every one is ready. Local judicial races (trial courts, justices of"
             " the peace) have no cited count, so they are measured against the races the archive holds. Local ballot measures"

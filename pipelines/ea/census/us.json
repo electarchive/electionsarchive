@@ -1,0 +1,334 @@
+{
+  "polity": "US",
+  "name": "the United States",
+  "sources": {
+    "cog": {
+      "publisher": "U.S. Census Bureau",
+      "title": "2022 Census of Governments: Organization, Individual Government Units",
+      "url": "https://www2.census.gov/programs-surveys/gus/datasets/2022/govt_units_2022.ZIP",
+      "kind": "official_body",
+      "note": "Govt_Units_2022_Final.xlsx: one row per county, municipal, township, independent school district, and special district government, active or not, which the counts here tally by state"
+    },
+    "constitution": {
+      "publisher": "Library of Congress",
+      "title": "Constitution of the United States (Constitution Annotated)",
+      "url": "https://constitution.congress.gov/constitution/",
+      "kind": "official_body"
+    },
+    "usc3": {
+      "publisher": "Office of the Law Revision Counsel",
+      "title": "3 U.S.C. §§ 1 and 21: time of appointing electors and election day",
+      "url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title3-section1&num=0&edition=prelim",
+      "kind": "official_body"
+    },
+    "usc2": {
+      "publisher": "Office of the Law Revision Counsel",
+      "title": "2 U.S.C. § 7: time of election of Representatives",
+      "url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title2-section7&num=0&edition=prelim",
+      "kind": "official_body"
+    },
+    "bots-governors": {
+      "publisher": "The Council of State Governments",
+      "title": "The Book of the States 2022, Table 4.1: The Governors",
+      "url": "https://bookofthestates.org/tables/2022-4-1",
+      "kind": "compendium"
+    },
+    "bots-executives": {
+      "publisher": "The Council of State Governments",
+      "title": "The Book of the States 2022, Table 6.1: State Executive Branch Officials to be Elected, 2022-2026",
+      "url": "https://bookofthestates.org/tables/2022-6-1",
+      "kind": "compendium"
+    },
+    "bots-legislators": {
+      "publisher": "The Council of State Governments",
+      "title": "The Book of the States 2022, Table 6.2: State Legislature Members to be Elected, 2022-2026",
+      "url": "https://bookofthestates.org/tables/2022-6-2",
+      "kind": "compendium"
+    },
+    "bots-courts": {
+      "publisher": "The Council of State Governments",
+      "title": "The Book of the States 2022, Table 5.6: Selection and Retention of Appellate Court Judges",
+      "url": "https://bookofthestates.org/tables/2022-5-6",
+      "kind": "compendium"
+    },
+    "nj-constitution": {
+      "publisher": "New Jersey Legislature",
+      "title": "Constitution of the State of New Jersey (1947)",
+      "url": "https://www.njleg.state.nj.us/constitution",
+      "kind": "official_body"
+    },
+    "electors-1824": {
+      "publisher": "Encyclopaedia Britannica",
+      "title": "United States presidential election of 1824",
+      "url": "https://www.britannica.com/event/United-States-presidential-election-of-1824",
+      "kind": "compendium"
+    },
+    "electors-sc": {
+      "publisher": "Wikipedia",
+      "title": "1860 United States presidential election in South Carolina",
+      "url": "https://en.wikipedia.org/wiki/1860_United_States_presidential_election_in_South_Carolina",
+      "kind": "compendium"
+    },
+    "electors-de": {
+      "publisher": "Wikipedia",
+      "title": "1828 United States presidential election",
+      "url": "https://en.wikipedia.org/wiki/1828_United_States_presidential_election",
+      "kind": "compendium"
+    },
+    "electors-la": {
+      "publisher": "Wikipedia",
+      "title": "United States presidential elections in Louisiana",
+      "url": "https://en.wikipedia.org/wiki/United_States_presidential_elections_in_Louisiana",
+      "kind": "compendium"
+    },
+    "electors-fl": {
+      "publisher": "Wikipedia",
+      "title": "1868 United States presidential election in Florida",
+      "url": "https://en.wikipedia.org/wiki/1868_United_States_presidential_election_in_Florida",
+      "kind": "compendium"
+    },
+    "ncsl-measures": {
+      "publisher": "National Conference of State Legislatures",
+      "title": "Statewide Ballot Measures Database",
+      "url": "https://www.ncsl.org/elections-and-campaigns/statewide-ballot-measures-database",
+      "kind": "compendium"
+    },
+    "ncsl-primaries": {
+      "publisher": "National Conference of State Legislatures",
+      "title": "State Primary Election Types",
+      "url": "https://www.ncsl.org/elections-and-campaigns/state-primary-election-types",
+      "kind": "compendium"
+    }
+  },
+  "tiers": [
+    {"key": "national", "name": "United States", "parent": null, "polity_kind": "sovereign_state", "source": "constitution"},
+    {"key": "state", "name": "States, the District of Columbia, and territories", "parent": "national", "polity_kind": "federal_unit", "source": "constitution"},
+    {"key": "county", "name": "County governments", "parent": "state", "polity_kind": "county", "source": "cog", "cog": "county"},
+    {"key": "municipality", "name": "Municipal governments", "parent": "county", "polity_kind": "municipality", "source": "cog", "cog": "municipality"},
+    {"key": "township", "name": "Town and township governments", "parent": "county", "polity_kind": "municipality", "source": "cog", "cog": "township"},
+    {"key": "school_district", "name": "Independent school districts", "parent": "state", "polity_kind": "school_district", "source": "cog", "cog": "school"},
+    {"key": "special_district", "name": "Special district governments", "parent": "state", "polity_kind": "special_district", "source": "cog", "cog": "special"}
+  ],
+  "classes": [
+    {
+      "key": "president",
+      "tier": "national",
+      "name": "Presidential electors",
+      "category": "executive",
+      "goal": "national",
+      "source": "usc3",
+      "locator": "3 U.S.C. §§ 1 and 21(1); U.S. Const. art. II, § 1, cl. 2",
+      "earliest_record": "1824-01-01",
+      "note": "One statewide slate per state (Maine by district from 1972 and Nebraska from 1992 add one per district). Legislatures appointed the electors in some states and years, so those states have no popular vote then.",
+      "match": [
+        {"within": null, "contest_kinds": ["elector_slate", "delegate_allocation"], "precedence": 5},
+        {"within": null, "office": "us.office:president", "precedence": 1},
+        {"within": null, "office": "us.office:vice_president", "precedence": 1}
+      ],
+      "cadence": [
+        {"government_kind": null, "function": null, "office": "us.office:president", "period_years": 4, "phase": 0, "month": 11, "day_rule": "nov_tuesday_after_first_monday", "term_years": 4, "valid_from": "1845-01-23", "source": "usc3", "locator": "3 U.S.C. § 1 and § 21(1): electors are appointed on election day, the Tuesday next after the first Monday in November every fourth year (uniform day from the Act of January 23, 1845)"}
+      ],
+      "appointed": [
+        {"states": "DE", "period_years": 4, "phase": 0, "valid_to": "1829-01-01", "source": "electors-de", "locator": "Delaware's legislature chose its electors through 1828 (with South Carolina, the only two states to do so that year)"},
+        {"states": "GA LA NY VT", "period_years": 4, "phase": 0, "valid_to": "1825-01-01", "source": "electors-1824", "locator": "In 1824 the legislatures of Delaware, Georgia, Louisiana, New York, South Carolina, and Vermont chose the electors; the other eighteen states held a popular vote"},
+        {"states": "SC", "period_years": 4, "phase": 0, "valid_to": "1861-01-01", "source": "electors-sc", "locator": "South Carolina's legislature chose the state's electors through 1860, the last state to do so"},
+        {"states": "LA", "period_years": 4, "phase": 0, "valid_from": "1864-01-01", "valid_to": "1865-01-01", "source": "electors-la", "locator": "1864: Louisiana's Union legislature named electors without a popular vote, and Congress did not count their votes"},
+        {"states": "FL", "period_years": 4, "phase": 0, "valid_from": "1868-01-01", "valid_to": "1869-01-01", "source": "electors-fl", "locator": "1868: Florida's legislature chose the state's electors; no popular vote was held"}
+      ]
+    },
+    {
+      "key": "us_senate",
+      "tier": "national",
+      "name": "U.S. Senate",
+      "category": "legislature",
+      "goal": "national",
+      "source": "constitution",
+      "locator": "U.S. Const. art. I, § 3, cl. 1-2 and amend. XVII",
+      "note": "Two senators per state in three classes, one class elected every second year for six-year terms; popular election from 1914 under the Seventeenth Amendment.",
+      "match": [{"within": null, "body": "us.body:senate"}],
+      "senate": {
+        "phases": {"I": 2, "II": 4, "III": 0},
+        "valid_from": "1913-04-08",
+        "admitted": {"AK": "1959-01-03", "HI": "1959-08-21"},
+        "source": "constitution",
+        "locator": "U.S. Const. art. I, § 3, cl. 2 (senators divided into three classes, one class chosen every second year) and amend. XVII (popular election, ratified April 8, 1913); a state admitted later joins at its first regular election"
+      }
+    },
+    {
+      "key": "us_house",
+      "tier": "national",
+      "name": "U.S. House of Representatives",
+      "category": "legislature",
+      "goal": "national",
+      "source": "constitution",
+      "locator": "U.S. Const. art. I, § 2, cl. 1; 2 U.S.C. § 7",
+      "note": "Every seat every second year; the seats per state follow each decennial apportionment.",
+      "match": [{"within": null, "body": "us.body:house"}],
+      "cadence": [
+        {"government_kind": null, "function": null, "body": "us.body:house", "period_years": 2, "phase": 0, "month": 11, "day_rule": "nov_tuesday_after_first_monday", "term_years": 2, "source": "usc2", "locator": "2 U.S.C. § 7: the Tuesday next after the first Monday in November in every even numbered year; U.S. Const. art. I, § 2, cl. 1: members chosen every second year"}
+      ]
+    },
+    {
+      "key": "governor",
+      "tier": "state",
+      "name": "Governors",
+      "category": "executive",
+      "goal": "subnational",
+      "source": "bots-governors",
+      "note": "Four-year terms everywhere but New Hampshire and Vermont; the year in the four-year cycle differs by state.",
+      "match": [{"within": null, "office_kinds": ["governor"], "polity_kinds": ["federal_unit", "region"], "precedence": 2}],
+      "governors": [
+        {"states": "AL AK AZ CA CO CT FL GA HI ID IA KS ME MD MA MI MN NE NV NM NY OH OK OR PA SC SD TN TX WI WY GU VI", "period_years": 4, "phase": 2, "term_years": 4},
+        {"states": "DE IN MO MT NC ND UT WA WV PR", "period_years": 4, "phase": 0, "term_years": 4},
+        {"states": "NH VT", "period_years": 2, "phase": 0, "term_years": 2},
+        {"states": "VA NJ", "period_years": 4, "phase": 1, "term_years": 4},
+        {"states": "KY MS", "period_years": 4, "phase": 3, "term_years": 4},
+        {"states": "LA", "period_years": 4, "phase": 3, "term_years": 4, "day_rule": null, "month": 10},
+        {"states": "AR", "period_years": 2, "phase": 0, "term_years": 2, "valid_to": "1985-01-01", "locator": "Arkansas governors served two-year terms until Amendment 63 (1984), elected in even years through 1984"},
+        {"states": "AR", "period_years": 4, "phase": 2, "term_years": 4, "valid_from": "1985-01-01", "locator": "Arkansas Amendment 63 (1984): four-year terms from the 1986 election"},
+        {"states": "RI", "period_years": 2, "phase": 0, "term_years": 2, "valid_to": "1993-01-01", "locator": "Rhode Island governors served two-year terms through the 1992 election"},
+        {"states": "RI", "period_years": 4, "phase": 2, "term_years": 4, "valid_from": "1993-01-01", "locator": "Rhode Island's 1992 amendment: four-year terms from the 1994 election"},
+        {"states": "IL", "period_years": 4, "phase": 0, "term_years": 4, "valid_to": "1977-01-01", "locator": "Illinois elected governors in presidential years through 1976; the 1970 constitution gave the 1976 winner a two-year term"},
+        {"states": "IL", "period_years": 4, "phase": 2, "term_years": 4, "valid_from": "1977-01-01", "locator": "Illinois Const. 1970 art. V, § 2 and transition schedule: governors elected in midterm years from 1978"},
+        {"states": "AS", "period_years": 4, "phase": 0, "term_years": 4, "valid_from": "1978-01-01", "locator": "American Samoa's first elected governor took office in January 1978; regular four-year elections from 1980"}
+      ]
+    },
+    {
+      "key": "statewide_exec",
+      "tier": "state",
+      "name": "Other statewide executive offices",
+      "category": "executive",
+      "goal": "subnational",
+      "source": "bots-executives",
+      "note": "Lieutenant governors, attorneys general, secretaries of state, treasurers, auditors, and other offices elected statewide, plus the Council of the District of Columbia.",
+      "match": [{"within": null, "polity_kinds": ["federal_unit", "region"]}]
+    },
+    {
+      "key": "judicial",
+      "tier": "state",
+      "name": "State supreme courts",
+      "category": "judicial",
+      "goal": "subnational",
+      "source": "bots-courts",
+      "note": "Justices chosen by partisan or nonpartisan election, or retained by retention election; appointed courts hold no elections.",
+      "match": [{"within": null, "name_pattern": "justice|judge|court", "polity_kinds": ["federal_unit", "region"]}],
+      "judges": [
+        {"states": "AL AK AZ AR CA CO FL GA ID IL IN IA KS KY LA MD MI MN MS MO MT NE NV NM NC ND OH OK OR TN TX UT WA WV WY", "period_years": 2, "phase": 0},
+        {"states": "PA", "period_years": 2, "phase": 1, "month": 11},
+        {"states": "WI", "period_years": 1, "phase": 0, "month": 4}
+      ]
+    },
+    {
+      "key": "state_upper",
+      "tier": "state",
+      "name": "State senates and unicameral legislatures",
+      "category": "legislature",
+      "goal": "subnational",
+      "source": "bots-legislators",
+      "match": [{"within": null, "body_kinds": ["upper_house", "unicameral"], "polity_kinds": ["federal_unit", "region"], "precedence": 2}],
+      "chambers": [
+        {"states": "LA MS VA", "period_years": 4, "phase": 3, "term_years": 4},
+        {"states": "NJ", "period_years": 4, "phase": 1, "term_years": 4, "valid_from": "2012-01-01", "valid_to": "2022-01-01", "source": "nj-constitution", "locator": "N.J. Const. art. IV, § II, ¶ 1: senators serve four-year terms, except a two-year first term after each decennial census, so the 2011 apportionment set elections in 2011, 2013, 2017, and 2021"},
+        {"states": "NJ", "period_years": 4, "phase": 3, "term_years": 4, "valid_from": "2022-01-01", "valid_to": "2032-01-01", "source": "nj-constitution", "locator": "N.J. Const. art. IV, § II, ¶ 1: after the 2021 two-year term, senators elected in 2023 and 2027 serve four-year terms until the post-2030 census term"}
+      ]
+    },
+    {
+      "key": "state_lower",
+      "tier": "state",
+      "name": "State houses and assemblies",
+      "category": "legislature",
+      "goal": "subnational",
+      "source": "bots-legislators",
+      "match": [{"within": null, "body_kinds": ["lower_house"], "polity_kinds": ["federal_unit", "region"], "precedence": 2}],
+      "chambers": [
+        {"states": "LA MS", "period_years": 4, "phase": 3, "term_years": 4},
+        {"states": "VA NJ", "period_years": 2, "phase": 1, "term_years": 2}
+      ]
+    },
+    {
+      "key": "statewide_measure",
+      "tier": "state",
+      "name": "Statewide ballot measures",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "source": "ncsl-measures",
+      "match": [{"within": null, "contest_kinds": ["ballot_question"], "polity_kinds": ["sovereign_state", "federal_unit", "region"], "precedence": 4}]
+    },
+    {
+      "key": "party",
+      "tier": "state",
+      "name": "Party offices",
+      "category": "nominating",
+      "goal": "subnational",
+      "source": "ncsl-primaries",
+      "note": "State and county party committee members and convention delegates chosen on the primary ballot.",
+      "match": [{"within": null, "name_pattern": "\\mParty\\M"}]
+    },
+    {
+      "key": "county",
+      "tier": "county",
+      "name": "County offices",
+      "category": "council",
+      "goal": "local",
+      "source": "cog",
+      "match": [{"within": null, "polity_kinds": ["county"]}]
+    },
+    {
+      "key": "municipal",
+      "tier": "municipality",
+      "name": "Municipal offices",
+      "category": "council",
+      "goal": "local",
+      "source": "cog",
+      "match": [{"within": null, "polity_kinds": ["municipality"]}]
+    },
+    {
+      "key": "township",
+      "tier": "township",
+      "name": "Town and township offices",
+      "category": "council",
+      "goal": "local",
+      "source": "cog",
+      "note": "The archive files towns and townships as municipalities, so their held contests classify as municipal; the class carries the Census roster and its cadence."
+    },
+    {
+      "key": "school",
+      "tier": "school_district",
+      "name": "School boards",
+      "category": "special_purpose",
+      "goal": "local",
+      "source": "cog",
+      "match": [
+        {"within": null, "polity_kinds": ["school_district"], "precedence": 1},
+        {"within": null, "name_pattern": "school|education", "polity_kinds": ["county", "municipality", "special_district"], "precedence": 1}
+      ]
+    },
+    {
+      "key": "special_district",
+      "tier": "special_district",
+      "name": "Special district boards",
+      "category": "special_purpose",
+      "goal": "local",
+      "source": "cog",
+      "match": [{"within": null, "polity_kinds": ["special_district"]}]
+    },
+    {
+      "key": "local_judicial",
+      "tier": "state",
+      "name": "Trial and district courts",
+      "category": "judicial",
+      "goal": "local",
+      "source": "bots-courts",
+      "match": [{"within": null, "polity_kinds": ["judicial_district"]}]
+    },
+    {
+      "key": "local_measure",
+      "tier": "county",
+      "name": "Local ballot measures",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "source": "cog",
+      "match": [{"within": null, "contest_kinds": ["ballot_question"], "precedence": 3}]
+    }
+  ]
+}
