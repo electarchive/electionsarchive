@@ -464,14 +464,21 @@ export function apportion(
   );
   const isAlternative = (threshold: Threshold, id: string) => {
     const { alternative } = threshold;
-    return (
-      alternative != null &&
-      (alternative.lists == null || alternative.lists.includes(id)) &&
-      regionShares.some(
-        (shares) => (shares.get(id) ?? 0) >= alternative.percent,
-      )
-    );
+    if (
+      alternative == null ||
+      (alternative.lists != null && !alternative.lists.includes(id))
+    )
+      return false;
+    return alternative.scope === "national"
+      ? (nationalVotes.get(id) ?? 0) * 100 >= alternative.percent * nationalBase
+      : regionShares.some(
+          (shares) => (shares.get(id) ?? 0) >= alternative.percent,
+        );
   };
+  let most = 0;
+  for (const { votes } of entries) most = Math.max(most, votes);
+  const isLeader = (threshold: Threshold, id: string) =>
+    threshold.leader === true && most > 0 && contestVotes.get(id) === most;
   const isRegional = (id: string) =>
     listThresholds.some((threshold) => isAlternative(threshold, id));
   const counts = (id: string) =>
@@ -534,7 +541,8 @@ export function apportion(
         (threshold) =>
           isExempt(threshold, id, group) ||
           passes(threshold, id, threshold.percent) ||
-          isAlternative(threshold, id),
+          isAlternative(threshold, id) ||
+          isLeader(threshold, id),
       );
     if (isPasses && (!isInCoalition || counts(id))) qualified.add(id);
   }

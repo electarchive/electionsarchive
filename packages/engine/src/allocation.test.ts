@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { allocate, distribute, qualify } from "./allocation.ts";
+import { allocate, apportion, distribute, qualify } from "./allocation.ts";
 import brazilChamber from "./fixtures/brazil-chamber-1945-1947.json" with { type: "json" };
+import canarias2015 from "./fixtures/canarias-2015.json" with { type: "json" };
+import canarias2023 from "./fixtures/canarias-2023.json" with { type: "json" };
 import germany from "./fixtures/germany-2025.json" with { type: "json" };
 import germanyEuropean from "./fixtures/germany-ep-2024.json" with { type: "json" };
 import italyCamera from "./fixtures/italy-camera-1948-1992.json" with { type: "json" };
@@ -311,6 +313,54 @@ describe("golden elections", () => {
           expect(allocation.seats[id] ?? 0, `${district}: ${id}`).toBe(
             declared,
           );
+      }
+    });
+  }
+
+  for (const { election, parliament, island, regional } of [
+    {
+      election: "2015",
+      parliament: canarias2015,
+      island: {
+        percent: 30,
+        level: "list",
+        scope: "contest",
+        leader: true,
+        alternative: { percent: 6, scope: "national" },
+      },
+      regional: undefined,
+    },
+    {
+      election: "2023",
+      parliament: canarias2023,
+      island: {
+        percent: 15,
+        level: "list",
+        scope: "contest",
+        alternative: { percent: 4, scope: "national" },
+      },
+      regional: { percent: 4, level: "list", scope: "contest" },
+    },
+  ] as const) {
+    it(`reproduces the Parlamento de Canarias ${election} on every island and the regional list`, () => {
+      const islands = parliament.districts.filter(
+        ({ name }) => name !== "Autonómica",
+      );
+      const national = islands.map(({ entries, valid }) => ({
+        entries,
+        valid,
+      }));
+      for (const { name, seats, valid, entries } of parliament.districts) {
+        const isRegional = name === "Autonómica";
+        const allocation = apportion(
+          { formula: "dhondt", threshold: isRegional ? regional : island },
+          seats,
+          entries,
+          isRegional ? { valid } : { valid, national },
+        );
+        expect(allocation.tie, name).toBeUndefined();
+        for (const { id, declared } of entries)
+          expect(allocation.seats[id] ?? 0, `${name}: ${id}`).toBe(declared);
       }
     });
   }

@@ -1,0 +1,357 @@
+{
+  "districts": [
+    {
+      "name": "El Hierro",
+      "seats": 3,
+      "valid": 6036,
+      "entries": [
+        {
+          "id": "COALICIÓN CANARIA-AGRUPACIÓN HERREÑA INDEPENDIENTE",
+          "votes": 2521,
+          "declared": 2
+        },
+        {
+          "id": "PARTIDO SOCIALISTA OBRERO ESPAÑOL",
+          "votes": 1335,
+          "declared": 1
+        },
+        { "id": "PARTIDO POPULAR", "votes": 1034, "declared": 0 },
+        { "id": "PODEMOS", "votes": 403, "declared": 0 },
+        { "id": "NUEVA CANARIAS", "votes": 392, "declared": 0 },
+        {
+          "id": "INICIATIVA POR EL HIERRO-IZQUIERDA UNIDA CANARIA-LOS VERDES-ALTERNATIVA REPUBLICANA:CANARIAS DECIDE",
+          "votes": 128,
+          "declared": 0
+        },
+        {
+          "id": "CIUDADANOS-PARTIDO DE LA CIUDADANIA",
+          "votes": 85,
+          "declared": 0
+        },
+        {
+          "id": "PARTIDO ANIMALISTA CONTRA EL MALTRATO ANIMAL",
+          "votes": 46,
+          "declared": 0
+        },
+        {
+          "id": "MOVIMIENTO POR LA UNIDAD DEL PUEBLO CANARIO",
+          "votes": 6,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Fuerteventura",
+      "seats": 7,
+      "valid": 35007,
+      "entries": [
+        {
+          "id": "COALICIÓN CANARIA-PARTIDO NACIONALISTA CANARIO",
+          "votes": 9824,
+          "declared": 3
+        },
+        {
+          "id": "PARTIDO SOCIALISTA OBRERO ESPAÑOL",
+          "votes": 6103,
+          "declared": 2
+        },
+        { "id": "PARTIDO POPULAR", "votes": 4754, "declared": 1 },
+        { "id": "PODEMOS", "votes": 4264, "declared": 1 },
+        { "id": "UNIDOS", "votes": 2429, "declared": 0 },
+        { "id": "NUEVA CANARIAS", "votes": 2347, "declared": 0 },
+        {
+          "id": "ASAMBLEAS MUNICIPALES DE FUERTEVENTURA",
+          "votes": 1447,
+          "declared": 0
+        },
+        {
+          "id": "CIUDADANOS-PARTIDO DE LA CIUDADANIA",
+          "votes": 1436,
+          "declared": 0
+        },
+        {
+          "id": "ALTERNATIVA NACIONALISTA CANARIA",
+          "votes": 603,
+          "declared": 0
+        },
+        {
+          "id": "CANARIAS DECIDE: IZQUIERDA UNIDA CANARIA-LOS VERDES-UNIDAD DEL PUEBLO-ALTERNATIVA REPUBLICANA",
+          "votes": 488,
+          "declared": 0
+        },
+        {
+          "id": "PARTIDO ANIMALISTA CONTRA EL MALTRATO ANIMAL",
+          "votes": 345,
+          "declared": 0
+        },
+        { "id": "UNIÓN PROGRESO Y DEMOCRACIA", "votes": 265, "declared": 0 },
+        {
+          "id": "MOVIMIENTO POR LA UNIDAD DEL PUEBLO CANARIO",
+          "votes": 69,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Gran Canaria",
+      "seats": 15,
+      "valid": 390880,
+      "entries": [
+        { "id": "PARTIDO POPULAR", "votes": 79684, "declared": 4 },
+        { "id": "NUEVA CANARIAS", "votes": 72033, "declared": 4 },
+        {
+          "id": "PARTIDO SOCIALISTA OBRERO ESPAÑOL",
+          "votes": 68442,
+          "declared": 3
+        },
+        { "id": "PODEMOS", "votes": 66636, "declared": 3 },
+        {
+          "id": "CIUDADANOS-PARTIDO DE LA CIUDADANIA",
+          "votes": 24607,
+          "declared": 0
+        },
+        {
+          "id": "COALICIÓN CANARIA-PARTIDO NACIONALISTA CANARIO",
+          "votes": 24408,
+          "declared": 1
+        },
+        { "id": "UNIDOS", "votes": 23437, "declared": 0 },
+        {
+          "id": "CANARIAS DECIDE: IZQUIERDA UNIDA CANARIA-LOS VERDES-UNIDAD DEL PUEBLO-ALTERNATIVA REPUBLICANA",
+          "votes": 7249,
+          "declared": 0
+        },
+        {
+          "id": "PARTIDO ANIMALISTA CONTRA EL MALTRATO ANIMAL",
+          "votes": 4072,
+          "declared": 0
+        },
+        { "id": "UNIÓN PROGRESO Y DEMOCRACIA", "votes": 3596, "declared": 0 },
+        { "id": "MAS POR TELDE", "votes": 3390, "declared": 0 },
+        {
+          "id": "PARTIDO COMUNISTA DEL PUEBLO CANARIO",
+          "votes": 1135,
+          "declared": 0
+        },
+        { "id": "VOX", "votes": 964, "declared": 0 },
+        { "id": "POR UN MUNDO MAS JUSTO", "votes": 930, "declared": 0 },
+        {
+          "id": "ALTERNATIVA NACIONALISTA CANARIA",
+          "votes": 854,
+          "declared": 0
+        },
+        {
+          "id": "MOVIMIENTO POR LA UNIDAD DEL PUEBLO CANARIO",
+          "votes": 765,
+          "declared": 0
+        },
+        {
+          "id": "AGRUPACIÓN DE ELECTORES RECORTES 0 GRAN CANARIA",
+          "votes": 762,
+          "declared": 0
+        },
+        { "id": "ESCAÑOS EN BLANCO", "votes": 597, "declared": 0 },
+        {
+          "id": "SOLIDARIDAD Y AUTOGESTION INTERNACIONALISTA",
+          "votes": 330,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "La Gomera",
+      "seats": 4,
+      "valid": 11847,
+      "entries": [
+        { "id": "AGRUPACION SOCIALISTA GOMERA", "votes": 5090, "declared": 3 },
+        {
+          "id": "PARTIDO SOCIALISTA OBRERO ESPAÑOL",
+          "votes": 1946,
+          "declared": 1
+        },
+        {
+          "id": "COALICIÓN CANARIA-PARTIDO NACIONALISTA CANARIO",
+          "votes": 1245,
+          "declared": 0
+        },
+        { "id": "PARTIDO POPULAR", "votes": 1219, "declared": 0 },
+        { "id": "PODEMOS", "votes": 1039, "declared": 0 },
+        { "id": "NUEVA CANARIAS", "votes": 703, "declared": 0 },
+        {
+          "id": "CIUDADANOS-PARTIDO DE LA CIUDADANIA",
+          "votes": 241,
+          "declared": 0
+        },
+        {
+          "id": "CANARIAS DECIDE: IZQUIERDA UNIDA CANARIA-LOS VERDES-UNIDAD DEL PUEBLO-ALTERNATIVA REPUBLICANA",
+          "votes": 147,
+          "declared": 0
+        },
+        {
+          "id": "PARTIDO ANIMALISTA CONTRA EL MALTRATO ANIMAL",
+          "votes": 86,
+          "declared": 0
+        },
+        {
+          "id": "MOVIMIENTO POR LA UNIDAD DEL PUEBLO CANARIO",
+          "votes": 15,
+          "declared": 0
+        },
+        { "id": "UNIÓN PROGRESO Y DEMOCRACIA", "votes": 11, "declared": 0 }
+      ]
+    },
+    {
+      "name": "Lanzarote",
+      "seats": 8,
+      "valid": 45662,
+      "entries": [
+        {
+          "id": "COALICIÓN CANARIA-PARTIDO NACIONALISTA CANARIO",
+          "votes": 10148,
+          "declared": 3
+        },
+        {
+          "id": "PARTIDO SOCIALISTA OBRERO ESPAÑOL",
+          "votes": 9571,
+          "declared": 2
+        },
+        { "id": "PODEMOS", "votes": 6715, "declared": 1 },
+        { "id": "PARTIDO POPULAR", "votes": 5941, "declared": 1 },
+        { "id": "NUEVA CANARIAS", "votes": 3787, "declared": 1 },
+        { "id": "UNIDOS", "votes": 3300, "declared": 0 },
+        {
+          "id": "CIUDADANOS-PARTIDO DE LA CIUDADANIA",
+          "votes": 2782,
+          "declared": 0
+        },
+        {
+          "id": "CANARIAS DECIDE: IZQUIERDA UNIDA CANARIA-LOS VERDES-UNIDAD DEL PUEBLO-ALTERNATIVA REPUBLICANA",
+          "votes": 1023,
+          "declared": 0
+        },
+        {
+          "id": "PARTIDO ANIMALISTA CONTRA EL MALTRATO ANIMAL",
+          "votes": 570,
+          "declared": 0
+        },
+        {
+          "id": "ALTERNATIVA NACIONALISTA CANARIA",
+          "votes": 350,
+          "declared": 0
+        },
+        { "id": "UNIÓN PROGRESO Y DEMOCRACIA", "votes": 197, "declared": 0 },
+        {
+          "id": "MOVIMIENTO POR LA UNIDAD DEL PUEBLO CANARIO",
+          "votes": 138,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "La Palma",
+      "seats": 8,
+      "valid": 41740,
+      "entries": [
+        {
+          "id": "COALICIÓN CANARIA-PARTIDO NACIONALISTA CANARIO",
+          "votes": 12632,
+          "declared": 3
+        },
+        { "id": "PARTIDO POPULAR", "votes": 10327, "declared": 3 },
+        {
+          "id": "PARTIDO SOCIALISTA OBRERO ESPAÑOL",
+          "votes": 10253,
+          "declared": 2
+        },
+        { "id": "PODEMOS", "votes": 2725, "declared": 0 },
+        {
+          "id": "CIUDADANOS-PARTIDO DE LA CIUDADANIA",
+          "votes": 1830,
+          "declared": 0
+        },
+        { "id": "NUEVA CANARIAS", "votes": 1180, "declared": 0 },
+        {
+          "id": "CANARIAS DECIDE: IZQUIERDA UNIDA CANARIA-LOS VERDES-UNIDAD DEL PUEBLO-ALTERNATIVA REPUBLICANA",
+          "votes": 1080,
+          "declared": 0
+        },
+        { "id": "UNIÓN PROGRESO Y DEMOCRACIA", "votes": 440, "declared": 0 },
+        {
+          "id": "PARTIDO ANIMALISTA CONTRA EL MALTRATO ANIMAL",
+          "votes": 366,
+          "declared": 0
+        },
+        {
+          "id": "AGRUPACION DE ELECTORES RECORTES CERO",
+          "votes": 94,
+          "declared": 0
+        },
+        {
+          "id": "MOVIMIENTO POR LA UNIDAD DEL PUEBLO CANARIO",
+          "votes": 60,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Tenerife",
+      "seats": 15,
+      "valid": 384558,
+      "entries": [
+        {
+          "id": "COALICIÓN CANARIA-PARTIDO NACIONALISTA CANARIO",
+          "votes": 106291,
+          "declared": 6
+        },
+        {
+          "id": "PARTIDO SOCIALISTA OBRERO ESPAÑOL",
+          "votes": 84454,
+          "declared": 4
+        },
+        { "id": "PARTIDO POPULAR", "votes": 67248, "declared": 3 },
+        { "id": "PODEMOS", "votes": 51424, "declared": 2 },
+        {
+          "id": "CIUDADANOS-PARTIDO DE LA CIUDADANIA",
+          "votes": 23457,
+          "declared": 0
+        },
+        { "id": "NUEVA CANARIAS", "votes": 13231, "declared": 0 },
+        {
+          "id": "CANARIAS DECIDE: IZQUIERDA UNIDA CANARIA-LOS VERDES-UNIDAD DEL PUEBLO-ALTERNATIVA REPUBLICANA",
+          "votes": 10060,
+          "declared": 0
+        },
+        {
+          "id": "PARTIDO ANIMALISTA CONTRA EL MALTRATO ANIMAL",
+          "votes": 5827,
+          "declared": 0
+        },
+        {
+          "id": "ALTERNATIVA NACIONALISTA CANARIA",
+          "votes": 3833,
+          "declared": 0
+        },
+        { "id": "COALICIÓN ELECTORAL UNIDOS", "votes": 3714, "declared": 0 },
+        { "id": "UNIÓN PROGRESO Y DEMOCRACIA", "votes": 3317, "declared": 0 },
+        { "id": "POR UN MUNDO MAS JUSTO", "votes": 907, "declared": 0 },
+        { "id": "VOX", "votes": 851, "declared": 0 },
+        { "id": "ESCAÑOS EN BLANCO", "votes": 766, "declared": 0 },
+        {
+          "id": "PARTIDO COMUNISTA DEL PUEBLO DE CANARIAS",
+          "votes": 730,
+          "declared": 0
+        },
+        {
+          "id": "MOVIMIENTO POR LA UNIDAD DEL PUEBLO CANARIO",
+          "votes": 729,
+          "declared": 0
+        },
+        {
+          "id": "AGRUPACION DE ELECTORES RECORTES CERO",
+          "votes": 644,
+          "declared": 0
+        }
+      ]
+    }
+  ]
+}

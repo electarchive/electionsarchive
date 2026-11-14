@@ -61,6 +61,9 @@
                 "bestLoser": {
                   "type": "boolean"
                 },
+                "leader": {
+                  "type": "boolean"
+                },
                 "requires": {
                   "type": "object",
                   "properties": {
@@ -96,7 +99,11 @@
                       "maximum": 100
                     },
                     "scope": {
-                      "const": "region"
+                      "enum": [
+                        "region",
+                        "national"
+                      ],
+                      "type": "string"
                     },
                     "lists": {
                       "type": "array",
@@ -164,6 +171,9 @@
                   "bestLoser": {
                     "type": "boolean"
                   },
+                  "leader": {
+                    "type": "boolean"
+                  },
                   "requires": {
                     "type": "object",
                     "properties": {
@@ -199,7 +209,11 @@
                         "maximum": 100
                       },
                       "scope": {
-                        "const": "region"
+                        "enum": [
+                          "region",
+                          "national"
+                        ],
+                        "type": "string"
                       },
                       "lists": {
                         "type": "array",
@@ -544,6 +558,9 @@
                 "bestLoser": {
                   "type": "boolean"
                 },
+                "leader": {
+                  "type": "boolean"
+                },
                 "requires": {
                   "type": "object",
                   "properties": {
@@ -579,7 +596,11 @@
                       "maximum": 100
                     },
                     "scope": {
-                      "const": "region"
+                      "enum": [
+                        "region",
+                        "national"
+                      ],
+                      "type": "string"
                     },
                     "lists": {
                       "type": "array",
@@ -647,6 +668,9 @@
                   "bestLoser": {
                     "type": "boolean"
                   },
+                  "leader": {
+                    "type": "boolean"
+                  },
                   "requires": {
                     "type": "object",
                     "properties": {
@@ -682,7 +706,11 @@
                         "maximum": 100
                       },
                       "scope": {
-                        "const": "region"
+                        "enum": [
+                          "region",
+                          "national"
+                        ],
+                        "type": "string"
                       },
                       "lists": {
                         "type": "array",
@@ -1004,6 +1032,9 @@
                 "bestLoser": {
                   "type": "boolean"
                 },
+                "leader": {
+                  "type": "boolean"
+                },
                 "requires": {
                   "type": "object",
                   "properties": {
@@ -1039,7 +1070,11 @@
                       "maximum": 100
                     },
                     "scope": {
-                      "const": "region"
+                      "enum": [
+                        "region",
+                        "national"
+                      ],
+                      "type": "string"
                     },
                     "lists": {
                       "type": "array",
@@ -1107,6 +1142,9 @@
                   "bestLoser": {
                     "type": "boolean"
                   },
+                  "leader": {
+                    "type": "boolean"
+                  },
                   "requires": {
                     "type": "object",
                     "properties": {
@@ -1142,7 +1180,11 @@
                         "maximum": 100
                       },
                       "scope": {
-                        "const": "region"
+                        "enum": [
+                          "region",
+                          "national"
+                        ],
+                        "type": "string"
                       },
                       "lists": {
                         "type": "array",
