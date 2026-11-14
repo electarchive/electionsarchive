@@ -617,6 +617,19 @@ TABLES += [
     }
     for ballot in range(93, 104)
 ]
+EVENING_STAR_1924_JULY_3 = "batch_dlc_carmichael_ver01:data:sn83045462:00280657566:1924070301:0370"
+TABLES += [
+    {
+        "table": f"1924:democratic:b{ballot}",
+        "image": f"https://tile.loc.gov/image-services/iiif/service:ndnp:dlc:{EVENING_STAR_1924_JULY_3}/full/pct:50/0/default.jpg",
+        "release": "https://www.loc.gov/resource/sn83045462/1924-07-03/ed-1/?sp=4",
+        "leaves": (1,),
+        "ballot": ballot,
+        "transcribed": "conventions_new_york_1924.tsv",
+        "short": True,
+    }
+    for ballot in range(31, 51)
+]
 EVENING_STAR_1924_JULY_4 = "batch_dlc_carmichael_ver01:data:sn83045462:00280657566:1924070401:0396"
 TABLES += [
     {
@@ -838,6 +851,22 @@ EVENING_STAR_1924_CAVEAT = (
     "Davis was nominated by acclamation after the roll call, so that table has no printed totals. Delegations whose "
     "named votes fall short of their size are shown as not recorded. Totals are the printed ones. Where a printed "
     "total differs from the state rows, the rows are stored as printed and the ballot's own note says so."
+)
+EVENING_STAR_1924_JULY_3_CAVEAT = (
+    "The archive has not located a free copy of the official proceedings' roll call of these ballots, so they are the "
+    "state-by-state tables the Washington Evening Star printed on July 3, 1924 (page 4), for the 31st through the "
+    "50th ballot. They are defaults to be superseded by the official proceedings. Each table gives, for every "
+    "delegation, its votes for six named candidates, and a note under each table splits the scattering votes by "
+    "candidate and state; those entries are stored too, with Absent entries left out. The columns change from "
+    "ballot to ballot as candidates fall out of the table into the note. The Star does not date each ballot; all are "
+    "stored under July 2, 1924, the day of the sessions it summarizes. Delegations whose named votes fall short of "
+    "their size are shown as not recorded. Totals are the printed ones. Where a printed total differs from the state "
+    "rows, the rows are stored as printed and the ballot's own note says so. Some tables print fractions as decimals "
+    "(Connecticut's 4.9 and 9.1 on the 41st through 47th ballots); they are stored as printed. The Star's note spells "
+    "Gerard's name Girard on the 35th and 36th ballots; it is stored as Gerard. The 'J. Davis' of the Star's Illinois "
+    "and Pennsylvania entries is not identified. The 'Mayor Jackson (of Burlington, Va.)' of the 39th ballot, "
+    "Homer S. Cummings, Thomas J. Spellacy, Edward I. Edwards, William A. Gaston, and Doheny are named in the Star's "
+    "notes without further identification."
 )
 EVENING_STAR_1924_JULY_4_CAVEAT = (
     "The archive has not located a free copy of the official proceedings' roll call of these ballots, so they are the "
@@ -1061,6 +1090,7 @@ PROCEEDINGS += [
     {"party": "democratic", "tables": {1: "2008:democratic"}, "title": "Roll Call Vote for President of the United States, 2008 Democratic National Convention: Final Vote Tally, as compiled by the Office of the Secretary", "publisher": "Democratic National Committee, Office of the Secretary", "city": "Denver", "days": (date(2008, 8, 25), date(2008, 8, 28)), "ballots": {1: date(2008, 8, 27)}, "deciding": 1, "method": SHEET_METHOD, "caveat": SHEET_CAVEAT},
     {"party": "democratic", "tables": {1: "2024:democratic"}, "title": "2024 Electronic Roll Call: State by State Breakdown", "publisher": "Democratic National Committee", "city": "Chicago", "days": (date(2024, 8, 19), date(2024, 8, 22)), "ballots": {1: date(2024, 8, 5)}, "umbrella": "2024-01-23:president:democratic", "deciding": 1, "required": None, "method": DNC_2024_METHOD, "caveat": DNC_2024_CAVEAT},
     {"party": "democratic", "tables": {1: "1960:democratic"}, "title": "The Evening Star (Washington, D.C.), July 14, 1960: Roll Call of States", "publisher": "The Evening Star", "kind": "news_agency", "city": "Los Angeles", "days": (date(1960, 7, 11), date(1960, 7, 15)), "ballots": {1: date(1960, 7, 13)}, "deciding": 1, "required": 761, "method": PRESS.format("the Washington Evening Star"), "caveat": EVENING_STAR_1960_CAVEAT},
+    {"party": "democratic", "tables": {n: f"1924:democratic:b{n}" for n in range(31, 51)}, "title": "The Evening Star (Washington, D.C.), July 3, 1924: Details of Balloting in Democratic Convention Wednesday and Today", "publisher": "The Evening Star", "kind": "news_agency", "city": "New York", "days": (date(1924, 6, 24), date(1924, 7, 9)), "ballots": dict.fromkeys(range(31, 51), date(1924, 7, 2)), "deciding": None, "required": 732, "method": PRESS.format("the Washington Evening Star"), "caveat": EVENING_STAR_1924_JULY_3_CAVEAT},
     {"party": "democratic", "tables": {n: f"1924:democratic:b{n}" for n in range(51, 64)}, "title": "The Evening Star (Washington, D.C.), July 4, 1924: Details of Balloting in Democratic Convention Showing Late Trends", "publisher": "The Evening Star", "kind": "news_agency", "city": "New York", "days": (date(1924, 6, 24), date(1924, 7, 9)), "ballots": dict.fromkeys(range(51, 64), date(1924, 7, 3)), "deciding": None, "required": 732, "method": PRESS.format("the Washington Evening Star"), "caveat": EVENING_STAR_1924_JULY_4_CAVEAT},
     {"party": "democratic", "tables": {n: f"1924:democratic:b{n}" for n in range(64, 75)}, "title": "The Evening Star (Washington, D.C.), July 5, 1924: Details of Balloting in Democratic Convention Showing Late Trends", "publisher": "The Evening Star", "kind": "news_agency", "city": "New York", "days": (date(1924, 6, 24), date(1924, 7, 9)), "ballots": dict.fromkeys(range(64, 75), date(1924, 7, 4)), "deciding": None, "required": 732, "method": PRESS.format("the Washington Evening Star"), "caveat": EVENING_STAR_1924_JULY_5_CAVEAT},
     {"party": "democratic", "tables": {n: f"1924:democratic:b{n}" for n in range(93, 104)}, "title": "The Evening Star (Washington, D.C.), July 9, 1924: Ballots Ninety-Three Through One Hundred and Three", "publisher": "The Evening Star", "kind": "news_agency", "city": "New York", "days": (date(1924, 6, 24), date(1924, 7, 9)), "ballots": dict.fromkeys(range(93, 104), date(1924, 7, 9)), "deciding": None, "required": 732, "method": PRESS.format("the Washington Evening Star"), "caveat": EVENING_STAR_1924_CAVEAT},
@@ -1513,6 +1543,11 @@ CANDIDATES = {
     "1924:democratic:M. A. Coolidge": ("M. A. Coolidge", None),
     "1924:democratic:Kevin": ("J. Richard Kevin", None),
     "1924:democratic:Walsh (Mass.)": ("Walsh (Mass.)", None),
+    "1924:democratic:Gaston": ("William A. Gaston", None),
+    "1924:democratic:Doheny": ("Doheny", None),
+    "1924:democratic:Spellacy": ("Thomas J. Spellacy", None),
+    "1924:democratic:Edwards": ("Edward I. Edwards", None),
+    "1924:democratic:Mayor Jackson": ("Mayor Jackson (of Burlington, Va.)", None),
     "1932:democratic:Smith": ("Alfred E. Smith", "Q430714"),
     "1932:democratic:Ritchie": ("Albert C. Ritchie", None),
     "1932:democratic:Baker": ("Newton D. Baker", None),
@@ -2945,6 +2980,108 @@ MISPRINTS = {
             "column Underwood": (37.5, 38.5, "the printed figure differs from the state figures"),
             "column Glass": (25, 25.5, "the printed figure differs from the state figures"),
         },
+    ),
+    "1924:democratic:b32": (
+        "The Star's table for this ballot disagrees with itself: the IL row adds to 63, against a delegation of 58; McAdoo's printed total is 415.5, against 418.5 in the state rows. The rows are stored as printed.",
+        {
+            "IL": (58, 63, "the printed figure differs from the state figures"),
+            "column McAdoo": (415.5, 418.5, "the printed figure differs from the state figures"),
+        },
+    ),
+    "1924:democratic:b33": (
+        "The Star's table for this ballot disagrees with itself: McAdoo's printed total is 404.5, against 402.5 in the state rows; Smith's printed total is 310.5, against 280.5 in the state rows; Robinson's printed total is 24, against 23 in the state rows. The rows are stored as printed. The Robinson 1 the note gives for Nebraska appears in the table as a Ralston 1 on the Nebraska row; the Massachusetts Smith figure prints as 3 and is stored as printed, with William A. Gaston's half vote beside it.",
+        {
+            "column McAdoo": (404.5, 402.5, "the printed figure differs from the state figures"),
+            "column Smith": (310.5, 280.5, "the printed figure differs from the state figures"),
+            "column Robinson": (24, 23, "the printed figure differs from the state figures"),
+        },
+    ),
+    "1924:democratic:b34": (
+        "The Star's table for this ballot disagrees with itself: McAdoo's printed total is 445, against 441 in the state rows; Smith's printed total is 311, against 309 in the state rows; Davis (W. Va.)'s printed total is 107.5, against 107 in the state rows. The rows are stored as printed. The Star's scattering total of 115 does not match its own note, whose entries add to 107. One half vote is printed as absent.",
+        {
+            "column McAdoo": (445, 441, "the printed figure differs from the state figures"),
+            "column Smith": (311, 309, "the printed figure differs from the state figures"),
+            "column Davis (W. Va.)": (107.5, 107, "the printed figure differs from the state figures"),
+        },
+    ),
+    "1924:democratic:b35": (
+        "The Star's table for this ballot disagrees with itself: McAdoo's printed total is 439.5, against 439 in the state rows. The rows are stored as printed.",
+        {"column McAdoo": (439.5, 439, "the printed figure differs from the state figures")},
+    ),
+    "1924:democratic:b36": (
+        "The Star's table for this ballot disagrees with itself: the NC row adds to 24.5, against a delegation of 24; McAdoo's printed total is 429, against 439 in the state rows; Davis (W. Va.)'s printed total is 106.5, against 107 in the state rows. The rows are stored as printed.",
+        {
+            "NC": (24, 24.5, "the printed figure differs from the state figures"),
+            "column McAdoo": (429, 439, "the printed figure differs from the state figures"),
+            "column Davis (W. Va.)": (106.5, 107, "the printed figure differs from the state figures"),
+        },
+    ),
+    "1924:democratic:b38": (
+        "The Star's table for this ballot disagrees with itself: Davis (W. Va.)'s printed total is 105, against 106 in the state rows. The rows are stored as printed.",
+        {"column Davis (W. Va.)": (105, 106, "the printed figure differs from the state figures")},
+    ),
+    "1924:democratic:b39": (
+        "The Star's table for this ballot disagrees with itself: Cox's printed total is 56, against 55 in the state rows. The rows are stored as printed.",
+        {"column Cox": (56, 55, "the printed figure differs from the state figures")},
+    ),
+    "1924:democratic:b40": (
+        "The Star's table for this ballot disagrees with itself: McAdoo's printed total is 505.5, against 503.5 in the state rows; Smith's printed total is 316, against 317.5 in the state rows; Davis (W. Va.)'s printed total is 70, against 70.5 in the state rows; Underwood's printed total is 41.5, against 39.5 in the state rows. The rows are stored as printed.",
+        {
+            "column McAdoo": (505.5, 503.5, "the printed figure differs from the state figures"),
+            "column Smith": (316, 317.5, "the printed figure differs from the state figures"),
+            "column Davis (W. Va.)": (70, 70.5, "the printed figure differs from the state figures"),
+            "column Underwood": (41.5, 39.5, "the printed figure differs from the state figures"),
+        },
+    ),
+    "1924:democratic:b41": (
+        "The Star's table for this ballot disagrees with itself: McAdoo's printed total is 504.9, against 501.9 in the state rows. The rows are stored as printed.",
+        {"column McAdoo": (504.9, 501.9, "the printed figure differs from the state figures")},
+    ),
+    "1924:democratic:b42": (
+        "The Star's table for this ballot disagrees with itself: the NH row adds to 9, against a delegation of 8; Smith's printed total is 313.6, against 318.6 in the state rows. The rows are stored as printed. One half vote is printed as absent, from Colorado.",
+        {
+            "NH": (8, 9, "the printed figure differs from the state figures"),
+            "column Smith": (313.6, 318.6, "the printed figure differs from the state figures"),
+        },
+    ),
+    "1924:democratic:b44": (
+        "The Star's table for this ballot disagrees with itself: McAdoo's printed total is 484.4, against 483.4 in the state rows; Underwood's printed total is 39, against 40 in the state rows. The rows are stored as printed.",
+        {
+            "column McAdoo": (484.4, 483.4, "the printed figure differs from the state figures"),
+            "column Underwood": (39, 40, "the printed figure differs from the state figures"),
+        },
+    ),
+    "1924:democratic:b45": (
+        "The Star's table for this ballot disagrees with itself: McAdoo's printed total is 483.4, against 483.3 in the state rows. The rows are stored as printed.",
+        {"column McAdoo": (483.4, 483.3, "the printed figure differs from the state figures")},
+    ),
+    "1924:democratic:b46": (
+        "The Star's table for this ballot disagrees with itself: the ND row adds to 11, against a delegation of 10; McAdoo's printed total is 486.9, against 485.9 in the state rows; Underwood's printed total is 37.5, against 38.5 in the state rows. The rows are stored as printed.",
+        {
+            "ND": (10, 11, "the printed figure differs from the state figures"),
+            "column McAdoo": (486.9, 485.9, "the printed figure differs from the state figures"),
+            "column Underwood": (37.5, 38.5, "the printed figure differs from the state figures"),
+        },
+    ),
+    "1924:democratic:b47": (
+        "The Star's table for this ballot disagrees with itself: the ME row adds to 14, against a delegation of 12; the ND row adds to 11, against a delegation of 10; McAdoo's printed total is 484.4, against 486.4 in the state rows; Davis (W. Va.)'s printed total is 70.1, against 70.5 in the state rows. The rows are stored as printed.",
+        {
+            "ME": (12, 14, "the printed figure differs from the state figures"),
+            "ND": (10, 11, "the printed figure differs from the state figures"),
+            "column McAdoo": (484.4, 486.4, "the printed figure differs from the state figures"),
+            "column Davis (W. Va.)": (70.1, 70.5, "the printed figure differs from the state figures"),
+        },
+    ),
+    "1924:democratic:b49": (
+        "The Star's table for this ballot disagrees with itself: the ND row adds to 11, against a delegation of 10; Davis (W. Va.)'s printed total is 63.5, against 61 in the state rows. The rows are stored as printed. The North Carolina 2½ is stored with Underwood, as the table's note gives it, though the printed Davis total of 63.5 exceeds its state rows by that amount.",
+        {
+            "ND": (10, 11, "the printed figure differs from the state figures"),
+            "column Davis (W. Va.)": (63.5, 61, "the printed figure differs from the state figures"),
+        },
+    ),
+    "1924:democratic:b50": (
+        "The Star's table for this ballot disagrees with itself: Underwood's printed total is 42.5, against 38.5 in the state rows. The rows are stored as printed. The Maine row's 5 prints under the Cox column but is counted with Underwood, whose Maine vote was 5 on the 49th ballot; the printed Cox total of 54 leaves it out. The Underwood column prints no figures for Alaska, Hawaii, and Porto Rico, so its state rows add to less than its printed total.",
+        {"column Underwood": (42.5, 38.5, "the printed figure differs from the state figures")},
     ),
 }
 NAMES = {re.sub(r"[^a-z]", "", re.sub(r" \(.*\)|, U\.S\.", "", name).lower()): code for name, code in PLACES.items()}
