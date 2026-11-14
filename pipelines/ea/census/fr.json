@@ -568,9 +568,21 @@
       "kind": "compendium"
     },
     "moniteur-an8": {
-      "title": "Gazette nationale ou Le Moniteur universel, frimaire an VIII (December 1799): Boulay de la Meurthe's draft on the manner of presenting the constitution to the people, and the report that the registers were open in Paris under the loi du 23 frimaire",
+      "title": "Gazette nationale ou Le Moniteur universel, n° 85, 25 frimaire an VIII (16 December 1799): the resolution of 23 frimaire an VIII (14 December 1799) on the manner of presenting the constitution to the people (arts. 1-5), the consuls' arrêté opening two registers per depositary, and the report that the registers were open in Paris",
       "publisher": "Le Moniteur universel (Agasse), reprint, an VII-an VIII",
       "url": "https://archive.org/details/gazettenationale1799panc",
+      "kind": "official_body"
+    },
+    "moniteur-an8-result": {
+      "title": "Gazette nationale ou Le Moniteur universel, pluviôse an VIII (February 1800): speech of 24 pluviôse an VIII (13 February 1800) by Rœderer presenting to the Sénat conservateur the count of the votes on the constitution, 3,012,569 for and 1,562 against",
+      "publisher": "Le Moniteur universel (Agasse), reprint, an VIII",
+      "url": "https://archive.org/details/gazettenationale18001panc",
+      "kind": "official_body"
+    },
+    "moniteur-an13": {
+      "title": "Gazette nationale ou Le Moniteur universel, 6 frimaire an XIII (27 November 1804): procès-verbal of the Sénat's count of the votes on hereditary imperial power, extract of the register of 15 brumaire an XIII (6 November 1804), reporting that the registers were opened under the decree of 29 floréal an XII",
+      "publisher": "Le Moniteur universel (Agasse), reprint, messidor an XII-an XIII",
+      "url": "https://archive.org/details/gazettenationale1804panc",
       "kind": "official_body"
     },
     "moniteur-an10": {
@@ -4043,7 +4055,7 @@
           "contests": 1,
           "source": "duv-1793-06-27",
           "quote": "Décret qui ordonne la convocation des assemblées primaires pour la présentation à l'acceptation du peuple de la déclaration des droits de l'homme et du citoyen et de l'acte constitutionnel.",
-          "note": "Constitution of 1793; primary assemblies convened by the decree of 27-28 June 1793. The voting days are not yet read."
+          "note": "Constitution of 1793; primary assemblies convened by the decree of 27-28 June 1793. Duvergier lists the decree by title only, and the Internet Archive holds no Moniteur reprint for 1793, so the text that sets the meeting days is not read and the year stays."
         },
         {
           "date": "1795-09-06",
@@ -4057,8 +4069,8 @@
           "precision": "year",
           "contests": 1,
           "source": "moniteur-an8",
-          "quote": "Les registres d'acceptation, et de non-acceptation de la constitution sont ouverts à Paris dans les divers lieux de dépôt indiqués par la loi du 23 frimaire.",
-          "note": "Constitution of the year VIII, voted by registers opened under the loi du 23 frimaire an VIII (14 December 1799) over December 1799 and January 1800; no single voting day."
+          "quote": "Le délai pour voter dans chaque département est de quinze jours, à dater de celui où l'acte constitutionnel est parvenu à l'administration centrale. Il est de trois jours pour chaque commune, à dater de celui où l'acte constitutionnel est parvenu au chef-lieu du canton.",
+          "note": "Constitution of the year VIII, voted by registers opened under the loi du 23 frimaire an VIII (14 December 1799), art. 3: 15 days per department from the act's arrival at the central administration and 3 days per commune from its arrival at the canton seat, so no single voting day. Rœderer reported 3,012,569 for and 1,562 against to the Sénat on 24 pluviôse an VIII (13 February 1800)."
         },
         {
           "date": "1802-01-01",
@@ -4072,9 +4084,9 @@
           "date": "1804-01-01",
           "precision": "year",
           "contests": 1,
-          "source": "duv-1815-04-22",
-          "quote": "conformément à ce qui a été fait en l'an 8, en l'an 10 et en l'an 12, pour la présentation des constitutions à l'acceptation du peuple français",
-          "note": "Hereditary empire, voted by registers in the year XII; the decree of 1815 names the year XII procedure, and the convening text of 1804 is not in the volumes read so far."
+          "source": "moniteur-an13",
+          "quote": "Conformément au décret du 29 floréal, ces registres ont été ouverts au secrétariat de toutes les administrations et de toutes les municipalités, aux greffes de tous les tribunaux, chez tous les juges de paix et chez tous les notaires.",
+          "note": "Hereditary empire (sénatus-consulte of 28 floréal an XII, 18 May 1804, art. 142), voted by registers opened under the decree of 29 floréal an XII (19 May 1804). The Sénat's procès-verbal counted 3,524,254 voters and 3,521,675 for before drafting the sénatus-consulte of 15 brumaire an XIII (6 November 1804) and gives no opening or closing day; the 29 floréal decree text is not in the volumes read, so the year stays."
         },
         {
           "date": "1815-01-01",
@@ -4082,7 +4094,7 @@
           "contests": 1,
           "source": "duv-1815-04-22",
           "quote": "Ces registres s'ouvriront deux jours au plus tard après la réception du Bulletin des Lois, et resteront ouverts pendant dix jours.",
-          "note": "Acte additionnel aux constitutions de l'Empire, voted by registers under the decree of 22 April 1815; no single voting day."
+          "note": "Acte additionnel aux constitutions de l'Empire, voted by registers under the decree of 22 April 1815 (Bulletin 19, n° 113): opened at most two days after the Bulletin reached each place and kept open ten days, so no single voting day. The next decree in the same Bulletin (n° 114) convened the Champ de Mai assembly for 26 May 1815 to count the votes."
         },
         {
           "date": "1851-12-20",
@@ -4143,7 +4155,7 @@
         "unit": "question"
       },
       "valid_to": "1958-09-01",
-      "note": "Constitutional plebiscites of the Revolution and the Napoleonic era (1793, 1795, 1799, 1802, 1804, and 1815), the Second Empire plebiscites of December 1851, November 1852, and May 1870, and the referendums of 21 October 1945 (two questions), 5 May 1946, and 13 October 1946. The 1860 annexation plebiscites of Nice and Savoy are counted as well. The Revolution and Napoleonic votes were taken by primary assemblies or registers open for days or weeks, so most carry a year, and 1795 a range; 1804 has no convening text in the volumes read so far.",
+      "note": "Constitutional plebiscites of the Revolution and the Napoleonic era (1793, 1795, 1799, 1802, 1804, and 1815), the Second Empire plebiscites of December 1851, November 1852, and May 1870, and the referendums of 21 October 1945 (two questions), 5 May 1946, and 13 October 1946. The 1860 annexation plebiscites of Nice and Savoy are counted as well. The Revolution and Napoleonic votes were taken by primary assemblies or registers open for days or weeks, so most carry a year, and 1795 a range. The 1799, 1804, and 1815 texts give per-place windows without a calendar day, and the 1793 convening text is not read.",
       "source": "elysee-presidents",
       "match": [
         {
