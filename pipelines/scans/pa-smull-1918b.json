@@ -1,0 +1,343 @@
+{
+  "polity": "US-PA",
+  "publisher": "Pennsylvania Senate (Smull's Legislative Hand Book)",
+  "title": "Smull's Legislative Hand Book, 1919, general election 1918-11-05, Representatives in Congress at large by county",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/smullslegislativ1919unse/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/smullslegislativ1919unse"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "house": {
+      "year": 1918,
+      "chamber": "house",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "PA",
+      "district": 0
+    }
+  },
+  "pages": [
+    {
+      "page": 809,
+      "id": "809-0",
+      "columns": [
+        {
+          "label": "William J. Burke, Republican.",
+          "contest": "house",
+          "candidate": "William Joseph Burke"
+        },
+        {
+          "label": "Thomas S. Crago, Republican.",
+          "contest": "house",
+          "candidate": "Thomas Spencer Crago"
+        },
+        {
+          "label": "Thomas S. Crago, Washington.",
+          "contest": "house",
+          "candidate": "Thomas Spencer Crago"
+        },
+        {
+          "label": "Mahlon M. Garland, Republican.",
+          "contest": "house",
+          "candidate": "Mahlon Morris Garland"
+        },
+        {
+          "label": "Anderson H. Walters, Republican.",
+          "contest": "house",
+          "candidate": "Anderson Howell Walters"
+        },
+        {
+          "label": "Anderson H. Walters, Washington.",
+          "contest": "house",
+          "candidate": "Anderson Howell Walters"
+        },
+        {
+          "label": "Joseph F. Gorman, Democratic.",
+          "contest": "house",
+          "candidate": "Joseph F. Gorman"
+        },
+        {
+          "label": "Fred Ikeler, Democratic.",
+          "contest": "house",
+          "candidate": "Fred Ikeler"
+        },
+        {
+          "label": "Fred Ikeler, Fair Play.",
+          "contest": "house",
+          "candidate": "Fred Ikeler"
+        },
+        {
+          "label": "J. Calvin Strayer, Democratic.",
+          "contest": "house",
+          "candidate": "J. Calvin Strayer"
+        },
+        {
+          "label": "J. Calvin Strayer, Fair Play.",
+          "contest": "house",
+          "candidate": "J. Calvin Strayer"
+        },
+        {
+          "label": "Samuel R. Tarner, Democratic.",
+          "contest": "house",
+          "candidate": "Samuel R. Tarner"
+        },
+        {
+          "label": "Samuel R. Tarner, Fair Play.",
+          "contest": "house",
+          "candidate": "Samuel R. Tarner"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.06,
+        0.94,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Official vote for four Representatives in Congress-at-large, November 5, 1918'; ignore any other table visible in the image.",
+      "turn": -90
+    },
+    {
+      "page": 810,
+      "id": "810-0",
+      "columns": [
+        {
+          "label": "William J. Burke, Republican.",
+          "contest": "house",
+          "candidate": "William Joseph Burke"
+        },
+        {
+          "label": "Thomas S. Crago, Republican.",
+          "contest": "house",
+          "candidate": "Thomas Spencer Crago"
+        },
+        {
+          "label": "Thomas S. Crago, Washington.",
+          "contest": "house",
+          "candidate": "Thomas Spencer Crago"
+        },
+        {
+          "label": "Mahlon M. Garland, Republican.",
+          "contest": "house",
+          "candidate": "Mahlon Morris Garland"
+        },
+        {
+          "label": "Anderson H. Walters, Republican.",
+          "contest": "house",
+          "candidate": "Anderson Howell Walters"
+        },
+        {
+          "label": "Anderson H. Walters, Washington.",
+          "contest": "house",
+          "candidate": "Anderson Howell Walters"
+        },
+        {
+          "label": "Joseph F. Gorman, Democratic.",
+          "contest": "house",
+          "candidate": "Joseph F. Gorman"
+        },
+        {
+          "label": "Fred Ikeler, Democratic.",
+          "contest": "house",
+          "candidate": "Fred Ikeler"
+        },
+        {
+          "label": "Fred Ikeler, Fair Play.",
+          "contest": "house",
+          "candidate": "Fred Ikeler"
+        },
+        {
+          "label": "J. Calvin Strayer, Democratic.",
+          "contest": "house",
+          "candidate": "J. Calvin Strayer"
+        },
+        {
+          "label": "J. Calvin Strayer, Fair Play.",
+          "contest": "house",
+          "candidate": "J. Calvin Strayer"
+        },
+        {
+          "label": "Samuel R. Tarner, Democratic.",
+          "contest": "house",
+          "candidate": "Samuel R. Tarner"
+        },
+        {
+          "label": "Samuel R. Tarner, Fair Play.",
+          "contest": "house",
+          "candidate": "Samuel R. Tarner"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.0,
+        0.94,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings; it ends in the Total row.",
+      "turn": -90
+    },
+    {
+      "page": 811,
+      "id": "811-0",
+      "columns": [
+        {
+          "label": "Cora M. Bixler, Socialist.",
+          "contest": "house",
+          "candidate": "Cora M. Bixler"
+        },
+        {
+          "label": "John C. Euler, Socialist.",
+          "contest": "house",
+          "candidate": "John C. Euler"
+        },
+        {
+          "label": "Henry W. Schlegel, Socialist.",
+          "contest": "house",
+          "candidate": "Henry W. Schlegel"
+        },
+        {
+          "label": "Harry T. Vaughn, Socialist.",
+          "contest": "house",
+          "candidate": "Harry T. Vaughn"
+        },
+        {
+          "label": "O. D. Brubaker, Prohibition.",
+          "contest": "house",
+          "candidate": "O. D. Brubaker"
+        },
+        {
+          "label": "Albert Gaddis, Prohibition.",
+          "contest": "house",
+          "candidate": "Albert Gaddis"
+        },
+        {
+          "label": "Elisha Kent Kane, Prohibition.",
+          "contest": "house",
+          "candidate": "Elisha Kent Kane"
+        },
+        {
+          "label": "E. L. McKee, Prohibition.",
+          "contest": "house",
+          "candidate": "E. L. McKee"
+        },
+        {
+          "label": "John W. Dix, Single Tax.",
+          "contest": "house",
+          "candidate": "John W. Dix"
+        },
+        {
+          "label": "Oliver McKnight, Single Tax.",
+          "contest": "house",
+          "candidate": "Oliver McKnight"
+        },
+        {
+          "label": "Calvin B. Power, Single Tax.",
+          "contest": "house",
+          "candidate": "Calvin B. Power"
+        },
+        {
+          "label": "Lewis Ryan, Single Tax.",
+          "contest": "house",
+          "candidate": "Lewis Ryan"
+        },
+        {
+          "label": "Scattering.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.059,
+        0.357,
+        0.951,
+        1.0
+      ],
+      "hint": "Read only the table headed 'REPRESENTATIVES IN CONGRESS AT LARGE\u2014Continued.'; ignore any other table visible in the image.",
+      "turn": -90
+    },
+    {
+      "page": 812,
+      "id": "812-0",
+      "columns": [
+        {
+          "label": "Cora M. Bixler, Socialist.",
+          "contest": "house",
+          "candidate": "Cora M. Bixler"
+        },
+        {
+          "label": "John C. Euler, Socialist.",
+          "contest": "house",
+          "candidate": "John C. Euler"
+        },
+        {
+          "label": "Henry W. Schlegel, Socialist.",
+          "contest": "house",
+          "candidate": "Henry W. Schlegel"
+        },
+        {
+          "label": "Harry T. Vaughn, Socialist.",
+          "contest": "house",
+          "candidate": "Harry T. Vaughn"
+        },
+        {
+          "label": "O. D. Brubaker, Prohibition.",
+          "contest": "house",
+          "candidate": "O. D. Brubaker"
+        },
+        {
+          "label": "Albert Gaddis, Prohibition.",
+          "contest": "house",
+          "candidate": "Albert Gaddis"
+        },
+        {
+          "label": "Elisha Kent Kane, Prohibition.",
+          "contest": "house",
+          "candidate": "Elisha Kent Kane"
+        },
+        {
+          "label": "E. L. McKee, Prohibition.",
+          "contest": "house",
+          "candidate": "E. L. McKee"
+        },
+        {
+          "label": "John W. Dix, Single Tax.",
+          "contest": "house",
+          "candidate": "John W. Dix"
+        },
+        {
+          "label": "Oliver McKnight, Single Tax.",
+          "contest": "house",
+          "candidate": "Oliver McKnight"
+        },
+        {
+          "label": "Calvin B. Power, Single Tax.",
+          "contest": "house",
+          "candidate": "Calvin B. Power"
+        },
+        {
+          "label": "Lewis Ryan, Single Tax.",
+          "contest": "house",
+          "candidate": "Lewis Ryan"
+        },
+        {
+          "label": "Scattering.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.059,
+        0.0,
+        0.951,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings.",
+      "turn": -90
+    }
+  ]
+}
