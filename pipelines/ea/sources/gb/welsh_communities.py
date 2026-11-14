@@ -60,7 +60,11 @@ ALIASES = {
     ("W06000021", "Llanfoist"): "Llanfoist Fawr",
 }
 UNREGISTERED = {("W06000010", "Trelech a'r Betws"), ("W06000003", "Betws-y-Coed"), ("W06000021", "Llangybi Fawr")}
-WARD_NAMES = {"Grifithstown East": "Griffithstown East", "Grifithstown West": "Griffithstown West"}
+WARD_NAMES = {
+    "Abersychan and Cwmavon": "Abersychan & Cwmavon",
+    "Grifithstown East": "Griffithstown East",
+    "Grifithstown West": "Griffithstown West",
+}
 PARTIES: dict[str, str | None] = {
     "": None,
     "Independent": "independent",
@@ -82,7 +86,18 @@ PARTIES: dict[str, str | None] = {
     "Wales Green Party/Plaid Werdd Cymru": "Q3499324",
     "Welsh Conservative Party": "Q9626",
     "Liberal Democrats": "Q9624",
+    "Welsh Liberal Democrats": "Q9624",
+    "Welsh Labour/Llafur Cymr": "Q9630",
 }
+BY_CONTEXT = (
+    "A by-election to fill a casual vacancy on a Welsh community or town council, held between the five-yearly "
+    "elections, by block vote where a ward has more than one seat. Where only as many candidates are nominated as "
+    "there are vacancies, those nominated are declared elected without a poll."
+)
+NO_WARD = (
+    "Torfaen County Borough Council's page names no ward for this by-election, so the contest is recorded against "
+    "the whole council area."
+)
 CAVEATS = {
     "Abergavenny (Cantref) - results": (
         "Monmouthshire County Council's page lists Bryony Nicholson three times: twice with 432 votes and no "
@@ -211,6 +226,65 @@ def torfaen(page: str) -> list[dict]:
     return reads
 
 
+def torfaen_by_elections(page: str) -> list[dict]:
+    reads: list[dict] = []
+    end = page.index("<h2>Community Council Elections 2022")
+    sections = re.findall(r"<h2>([^<]*?\d{4})</h2>(.*?)(?=<h2|$)", page[:end], re.DOTALL)
+    for title, body in sections:
+        title = html.unescape(title)
+        council, when = found(r"^(.+?) (?:Town|Community) Councils? Elections? - (.+)$", title).groups()
+        day = datetime.strptime(when, "%d %B %Y").date()
+        for heading, part in re.findall(r"(?:<h3>(.*?)</h3>)?(.*?)(?=<h3>|$)", body, re.DOTALL):
+            if "<table" not in part:
+                continue
+            ward = re.sub(r"\s*-\s*Uncontested$", "", flat(heading)) if heading else None
+            uncontested = heading != "" and flat(heading).endswith("Uncontested")
+            ward = re.sub(r"\s+Ward$", "", ward) if ward else None
+            ward = WARD_NAMES.get(ward, ward)
+            candidates: list[dict] = []
+            for row in re.findall(r"<tr>(.*?)</tr>", part, re.DOTALL):
+                cells = [flat(cell) for cell in re.findall(r"<td>(.*?)</td>", row, re.DOTALL)]
+                if not cells:
+                    continue
+                printed = cells[0]
+                if uncontested:
+                    candidates.append(
+                        {
+                            "printed": printed,
+                            "name": proper(printed),
+                            "description": cells[2],
+                            "votes": None,
+                            "elected": True,
+                        }
+                    )
+                    continue
+                votes = re.fullmatch(r"(\d+)( \(ELECTED\))?", cells[2])
+                if votes is None:
+                    raise ValueError(f"Torfaen {title}: {cells[2]}")
+                candidates.append(
+                    {
+                        "printed": printed,
+                        "name": surname_first(printed),
+                        "description": cells[1],
+                        "votes": int(votes.group(1)),
+                        "elected": votes.group(2) is not None,
+                    }
+                )
+            reads.append(
+                {
+                    "council": re.sub(r"\s+", " ", council),
+                    "ward": ward,
+                    "day": day,
+                    "by": True,
+                    "caveat": None if ward else NO_WARD,
+                    "places": None if uncontested else sum(1 for candidate in candidates if candidate["elected"]),
+                    "turnout": None,
+                    "candidates": candidates,
+                }
+            )
+    return reads
+
+
 def carmarthenshire(page: str) -> list[dict]:
     reads = []
     for panel in page.split('<div class="panel panel-default">')[1:]:
@@ -326,7 +400,7 @@ def moderngov(url: str) -> list[dict]:
 
 
 READERS = {
-    "torfaen": lambda url: torfaen(text_of(url)),
+    "torfaen": lambda url: torfaen(text_of(url)) + torfaen_by_elections(text_of(url)),
     "carmarthenshire": lambda url: carmarthenshire(text_of(url)),
     "moderngov": moderngov,
 }
@@ -369,6 +443,8 @@ def parse() -> None:
                         "scheme": scheme,
                         "code": code,
                         "ward": read["ward"],
+                        "day": read.get("day", DAY),
+                        "by": read.get("by", False),
                         "places": read["places"],
                         "turnout": read["turnout"],
                         "electorate": read.get("electorate"),
@@ -384,10 +460,10 @@ def parse() -> None:
     if unknown:
         raise ValueError(f"no council in the register: {sorted(unknown)}")
     frame = pl.DataFrame(rows, infer_schema_length=None)
-    if clash := frame.group_by("key", "ward").agg(pl.col("url").n_unique()).filter(pl.col("url") > 1).rows():
+    if clash := frame.group_by("key", "ward", "day").agg(pl.col("url").n_unique()).filter(pl.col("url") > 1).rows():
         raise ValueError(f"two sources for one ward: {clash}")
-    contests = frame.select("key", "ward").unique().height
-    uncontested = frame.filter(pl.col("votes").is_null()).select("key", "ward").unique().height
+    contests = frame.select("key", "ward", "day").unique().height
+    uncontested = frame.filter(pl.col("votes").is_null()).select("key", "ward", "day").unique().height
     print(
         f"{frame['key'].n_unique()} councils, {contests} contests ({uncontested} uncontested), "
         f"{frame.height} candidates",
@@ -404,8 +480,8 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Welsh community and town council elections of 5 May 2022, ward by ward, from the principal "
-            "councils' published results: polls with votes, and wards filled unopposed as tacit sets",
+            summary="Welsh community and town council elections of 5 May 2022 and later by-elections, ward by ward, from "
+            "the principal councils' published results: polls with votes, and wards filled unopposed as tacit sets",
             polity="GB",
         )
 
@@ -457,36 +533,49 @@ def emit() -> Path:
 
         people: dict[str, UUID] = {}
         elections: set[str] = set()
-        for (key, ward), lines in frame.group_by("key", "ward", maintain_order=True):
+        added: set[UUID] = set()
+        for (key, ward, day), lines in frame.group_by("key", "ward", "day", maintain_order=True):
             assert isinstance(key, str)
             first = lines.row(0, named=True)
+            by = first["by"]
             places = first["places"]
             tacit = first["votes"] is None
             polity = cs.key("gb.polity", key)
             council_area = cs.area(first["scheme"], first["code"])
-            election_key = f"{DAY}:wcc:{key}"
+            election_key = f"{day}:wcc:{key}"
             election = cs.key("gb.election", election_key)
-            election_path = f"{paths[key]}/{DAY}-local"
-            if key not in elections:
-                elections.add(key)
+            election_path = f"{paths[key]}/{day}-local"
+            if election_key not in elections:
+                elections.add(election_key)
                 cs.add(
-                    "election", id=election, polity_id=polity, kind="local", date_from=DAY, date_to=DAY, status="held"
+                    "election",
+                    id=election,
+                    polity_id=polity,
+                    kind="by_election" if by else "local",
+                    date_from=day,
+                    date_to=day,
+                    status="held",
                 )
-                name(election, f"{DAY.year} {bodies[key]} election")
+                name(
+                    election,
+                    f"{bodies[key]} by-election, {day.day} {day:%B %Y}" if by else f"{day.year} {bodies[key]} election",
+                )
                 cs.add("slug", path=election_path, entity_id=election)
-                cs.add("note", entity_id=election, kind="context", body_md=CONTEXT)
+                cs.add("note", entity_id=election, kind="context", body_md=BY_CONTEXT if by else CONTEXT)
             if ward is None:
                 scheme, code, area = first["scheme"], first["code"], council_area
             else:
                 scheme, code = WARDS, f"{key}:{slug(ward)}"
                 area = cs.area(WARDS, code)
-                if area in cs.minted:
+                if area in cs.minted and area not in added:
+                    added.add(area)
                     cs.add("area", id=area, scheme_code=WARDS)
                     cs.add("area_code", area_id=area, code=code, valid_from=None, valid_to=None)
                     cs.add("area_parent", area_id=area, parent_id=council_area, valid_from=None, valid_to=None)
-                name(area, ward)
+                    name(area, ward)
             unit = cs.unit(scheme, code)
-            if unit in cs.minted:
+            if unit in cs.minted and unit not in added:
+                added.add(unit)
                 cs.add(
                     "reporting_unit",
                     id=unit,
@@ -513,7 +602,8 @@ def emit() -> Path:
                 electoral_system_id=systems["fptp" if places == 1 else "block"],
                 default_result_kind="tacit" if tacit else "counted",
             )
-            name(contest, f"{bodies[key]}, {ward} ward, {DAY.year}" if ward else f"{bodies[key]}, {DAY.year}")
+            label = f"by-election, {day.day} {day:%B %Y}" if by else str(day.year)
+            name(contest, f"{bodies[key]}, {ward} ward, {label}" if ward else f"{bodies[key]}, {label}")
             cs.add("slug", path=f"{election_path}/{slug(ward) if ward else 'council'}", entity_id=contest)
             source = sources[first["url"]]
             cs.add("citation", entity_id=contest, source_id=source)
