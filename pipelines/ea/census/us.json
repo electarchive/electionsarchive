@@ -371,6 +371,7 @@
     "leg-law-vt": {"publisher": "Vermont General Assembly", "title": "Constitution of the State of Vermont, Chapter II", "url": "https://legislature.vermont.gov/statutes/constitution-of-the-state-of-vermont/", "kind": "official_body"},
     "leg-law-wa": {"publisher": "Washington State Legislature", "title": "Washington State Constitution, Article II", "url": "https://leg.wa.gov/media/wkimuffa/statecon.pdf", "kind": "official_body"},
     "leg-law-wi": {"publisher": "Wisconsin Legislature", "title": "Wisconsin Constitution, Article IV", "url": "https://docs.legis.wisconsin.gov/document/wisconsinconstitution/IV,5", "kind": "official_body"},
+    "leg-law-il": {"publisher": "Illinois General Assembly, Legislative Reference Bureau", "title": "Constitution of the State of Illinois, Article IV", "url": "https://www.ilga.gov/commission/lrb/con4.htm", "kind": "official_body"},
     "leg-law-wy": {"publisher": "Wyoming Secretary of State", "title": "Constitution of the State of Wyoming, Article 3", "url": "https://sos.wyo.gov/Forms/Publications/WYConstitution.pdf", "kind": "official_body"},
     "const-nm": {
       "publisher": "New Mexico Secretary of State",
@@ -1016,6 +1017,7 @@
         "VT": {"source": "leg-law-vt", "locator": "Ch. II, §§ 44 and 46: senators are elected biennially, and their term is two years"},
         "WA": {"source": "leg-law-wa", "locator": "Art. II, § 6: senators are elected for the term of four years, one half of their number retiring every two years"},
         "WI": {"source": "leg-law-wi", "locator": "Art. IV, § 5: senators are chosen alternately from the odd and even-numbered districts for the term of 4 years"},
+        "IL": {"source": "leg-law-il", "locator": "Art. IV, § 2(a): one senator per legislative district, divided into three groups after each decennial redistricting with terms of 4-4-2, 4-2-4, and 2-4-4 years, so seats are up in each even-numbered year"},
         "WY": {"source": "leg-law-wy", "locator": "Art. 3, § 2: senators are elected for the term of four years, in two classes"}
       },
       "chambers": [
@@ -1023,8 +1025,8 @@
         {"states": "AZ CT GA ID ME NC RI SD VT", "period_years": 2, "phase": 0, "term_years": 2},
         {"states": "MA", "period_years": 2, "phase": 0, "term_years": 2},
         {"states": "NH NY GU VI", "period_years": 2, "phase": 0, "term_years": 2, "locator": "Table 6.2, {name} row: the whole senate is elected in every even-numbered year of 2022 to 2026"},
-        {"states": "AK CA CO DE FL IA KY MN MO MT ND NE NV OH OK OR PA TX UT WA WI WV WY", "period_years": 2, "phase": 0, "term_years": 4},
-        {"states": "AR HI IL IN TN", "period_years": 2, "phase": 0, "term_years": 4, "locator": "Table 6.2, {name} row: staggered four-year terms, with seats up in each even-numbered year"},
+        {"states": "AK CA CO DE FL IA IL KY MN MO MT ND NE NV OH OK OR PA TX UT WA WI WV WY", "period_years": 2, "phase": 0, "term_years": 4},
+        {"states": "AR HI IN TN", "period_years": 2, "phase": 0, "term_years": 4, "locator": "Table 6.2, {name} row: staggered four-year terms, with seats up in each even-numbered year"},
         {"states": "AL MD MI", "period_years": 4, "phase": 2, "term_years": 4},
         {"states": "KS NM SC", "period_years": 4, "phase": 0, "term_years": 4},
         {"states": "PR", "period_years": 4, "phase": 0, "term_years": 4, "locator": "Table 6.2, {name} row: the whole senate is elected in 2024, none in 2022 or 2026"},
@@ -1084,13 +1086,14 @@
         "VT": {"source": "leg-law-vt", "locator": "Ch. II, §§ 44 and 46: senators are elected biennially, and their term is two years"},
         "WA": {"source": "leg-law-wa", "locator": "Art. II, § 5: representatives are elected biennially, and their term of office is two years"},
         "WI": {"source": "leg-law-wi", "locator": "Art. IV, § 4: members of the assembly are chosen biennially on the Tuesday succeeding the first Monday of November in even-numbered years"},
+        "IL": {"source": "leg-law-il", "locator": "Art. IV, § 2(b): one representative from each representative district is elected every two years for a term of two years"},
         "WY": {"source": "leg-law-wy", "locator": "Art. 3, § 2: representatives are elected for the term of two years"}
       },
       "chambers": [
         {"states": "LA MS", "period_years": 4, "phase": 3, "term_years": 4},
-        {"states": "AK AZ CA CO CT DE FL GA ID IA KS KY MA ME MI MN MO MT NC NH NM NV OH OK OR PA RI SC SD TX UT VT WA WI WV WY", "period_years": 2, "phase": 0, "term_years": 2},
+        {"states": "AK AZ CA CO CT DE FL GA ID IA IL KS KY MA ME MI MN MO MT NC NH NM NV OH OK OR PA RI SC SD TX UT VT WA WI WV WY", "period_years": 2, "phase": 0, "term_years": 2},
         {"states": "ND", "period_years": 2, "phase": 0, "term_years": 4},
-        {"states": "AR HI IL IN NY TN AS", "period_years": 2, "phase": 0, "term_years": 2, "locator": "Table 6.2, {name} row: the whole house is elected in every even-numbered year of 2022 to 2026"},
+        {"states": "AR HI IN NY TN AS", "period_years": 2, "phase": 0, "term_years": 2, "locator": "Table 6.2, {name} row: the whole house is elected in every even-numbered year of 2022 to 2026"},
         {"states": "AL MD", "period_years": 4, "phase": 2, "term_years": 4},
         {"states": "PR", "period_years": 4, "phase": 0, "term_years": 4, "locator": "Table 6.2, {name} row: the whole house is elected in 2024, none in 2022 or 2026"},
         {"states": "MP", "period_years": 2, "phase": 0, "term_years": 2, "source": "cnmi-constitution", "locator": "CNMI Const. art. II, § 2: representatives serve two-year terms"},
