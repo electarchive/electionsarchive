@@ -1027,6 +1027,7 @@ def _publish_table(conn: Connection, stage: Stage, table: str, deferred: list[st
                         'name_drop', 'external_id_drop', 'note_drop', 'entity_subtype_drop', 'unit_area_drop',
                         'entity_merge_drop', 'option_drop')
                      and (c.conrelid::regclass::text, a.attname) <> (%s, 'id')
+                     and (c.conrelid::regclass::text, a.attname) <> ('entity_merge', 'entity_id')
                      and (c.conrelid::regclass::text, c.confrelid::regclass::text)
                        <> ('candidacy_nomination', 'candidacy')""",
                 [["entity", kind], kind],
