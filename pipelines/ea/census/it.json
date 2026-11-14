@@ -186,8 +186,8 @@
       "url": "https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:legge:1991-06-07;182"
     },
     "comuni_decentramento": {
-      "title": "Official pages and documents of ten comuni on their sub-municipal districts, read 2026-11-14: Bologna (\"sei Quartieri cittadini\", Programmi obiettivo dei Quartieri 2020-2022, archivio-bilancio.comune.bologna.it/wp-content/uploads/Bilancio2020/PO_Quartieri_2020_2022.pdf), Venezia (six Municipalità named in art. 22 of the Statuto, dait.interno.gov.it/documenti/statuti/statuto-comune-ve-venezia.pdf), Roma (15 municipi, comune.roma.it/web/it/mappa-dei-municipi.page), Milano (nove consigli di municipio, comune.milano.it/en/-/politiche-per-il-decentramento.-la-giunta-nei-nove-consigli-di-municipio-un-assessore-per-ognuna-delle-prime-sedute), Napoli (\"dieci Municipalità\", comune.napoli.it/amministrazione/municipalita/), Torino (8 circoscrizioni, decentramento.comune.torino.it), Genova (\"nove Municipi\", comune.genova.it/amministrazione/municipi), Firenze (\"5 quartieri\", comune.firenze.it/amministrazione/quartieri), Verona (\"otto Circoscrizioni\", comune.verona.it/Novita/Notizie/Vivere-le-Circoscrizioni), and Palermo (eight circoscrizione councils, comune.palermo.it/amministrazione/organi-di-governo/)",
-      "publisher": "Comuni of Roma, Milano, Napoli, Torino, Genova, Firenze, Verona, Palermo, Bologna, and Venezia",
+      "title": "Official pages and documents of eleven comuni on their sub-municipal districts, read 2026-11-14: Bologna (\"sei Quartieri cittadini\", Programmi obiettivo dei Quartieri 2020-2022, archivio-bilancio.comune.bologna.it/wp-content/uploads/Bilancio2020/PO_Quartieri_2020_2022.pdf), Venezia (six Municipalità named in art. 22 of the Statuto, dait.interno.gov.it/documenti/statuti/statuto-comune-ve-venezia.pdf), Roma (15 municipi, comune.roma.it/web/it/mappa-dei-municipi.page), Milano (nove consigli di municipio, comune.milano.it/en/-/politiche-per-il-decentramento.-la-giunta-nei-nove-consigli-di-municipio-un-assessore-per-ognuna-delle-prime-sedute), Napoli (\"dieci Municipalità\", comune.napoli.it/amministrazione/municipalita/), Torino (8 circoscrizioni, decentramento.comune.torino.it), Genova (\"nove Municipi\", comune.genova.it/amministrazione/municipi), Firenze (\"5 quartieri\", comune.firenze.it/amministrazione/quartieri), Verona (\"otto Circoscrizioni\", comune.verona.it/Novita/Notizie/Vivere-le-Circoscrizioni), Palermo (eight circoscrizione councils, comune.palermo.it/amministrazione/organi-di-governo/), and Trieste (statuto art. 91 leaves the number to the Regolamento del decentramento; the comune publishes seven circoscrizione sites, primacircoscrizione through settimacircoscrizione.comune.trieste.it, whose notices style the seventh \"VII Circoscrizione amministrativa\")",
+      "publisher": "Comuni of Roma, Milano, Napoli, Torino, Genova, Firenze, Verona, Palermo, Bologna, Venezia, and Trieste",
       "kind": "official_body",
       "url": "https://www.comune.roma.it/web/it/mappa-dei-municipi.page"
     },
@@ -581,9 +581,9 @@
       "counts": [
         {
           "date": "2026-11-14",
-          "value": 84,
+          "value": 91,
           "source": "comuni_decentramento",
-          "locator": "Verified cities only: Roma 15, Milano 9, Napoli 10, Torino 8, Genova 9, Firenze 5, Verona 8, Palermo 8, Bologna 6, Venezia 6. Not yet verified from an official document: Bari, Catania, Messina, Padova, and Trieste"
+          "locator": "Verified cities only: Roma 15, Milano 9, Napoli 10, Torino 8, Genova 9, Firenze 5, Verona 8, Palermo 8, Bologna 6, Venezia 6, Trieste 7. Not yet verified from an official document: Bari, Catania, Messina, and Padova"
         }
       ]
     },
