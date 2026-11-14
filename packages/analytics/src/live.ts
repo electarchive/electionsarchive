@@ -217,7 +217,7 @@ const MODEL = {
     lull: 0.5,
     stir: 0.01,
     spill: 0.3,
-    cap: 2,
+    cap: 1.5,
     scatter: 1.2,
     brisk: 0.25,
     hush: 0.02,
