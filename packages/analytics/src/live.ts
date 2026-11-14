@@ -1261,10 +1261,21 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
             }
             const end = Date.parse(frame.at);
             const begin = Date.parse(list[index - 1]!.at);
+            const half = MODEL.late.half * 86_400_000;
+            const from = Math.max(begin, lookback);
+            const top = Math.min(end, idled);
             return (
               Math.max(0, sum(frame.totals) - sum(list[index - 1]!.totals)) *
-              Math.min(1, (end - lookback) / Math.max(1, end - begin)) *
-              0.5 ** (Math.max(0, idled - end) / 86_400_000 / MODEL.late.half)
+              (end - begin <= half
+                ? Math.min(1, (end - lookback) / Math.max(1, end - begin)) *
+                  0.5 ** (Math.max(0, idled - end) / half)
+                : (Math.max(0, end - Math.max(from, idled)) +
+                    (top > from
+                      ? (half / Math.LN2) *
+                        (0.5 ** ((idled - top) / half) -
+                          0.5 ** ((idled - from) / half))
+                      : 0)) /
+                  (end - begin))
             );
           }),
         ) / latest
