@@ -94,10 +94,10 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.034,
-        0.806,
-        0.218,
-        0.919
+        0.141714,
+        0.191756,
+        0.909143,
+        0.662495
       ],
       "hint": "Read only the table headed 'President and Vice President of the United States, November 2, 1948'; ignore any other table visible in the image."
     },
@@ -118,10 +118,10 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.018,
-        0.794,
-        0.11,
-        0.858
+        0.074644,
+        0.142329,
+        0.45812,
+        0.408872
       ],
       "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image.",
       "wards": "24510"
@@ -148,10 +148,10 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.112,
-        0.794,
-        0.206,
-        0.856
+        0.466097,
+        0.142329,
+        0.85755,
+        0.40037
       ],
       "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image.",
       "wards": "24510"
@@ -178,10 +178,10 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.018,
-        0.85,
-        0.11,
-        0.919
+        0.074644,
+        0.375601,
+        0.45812,
+        0.662847
       ],
       "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image.",
       "wards": "24510"
@@ -203,10 +203,10 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.112,
-        0.848,
-        0.206,
-        0.923
+        0.466097,
+        0.367098,
+        0.85755,
+        0.679482
       ],
       "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image.",
       "wards": "24510"
@@ -233,10 +233,10 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.018,
-        0.911,
-        0.11,
-        0.971
+        0.074644,
+        0.629575,
+        0.45812,
+        0.879113
       ],
       "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image.",
       "wards": "24510"
@@ -258,10 +258,10 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.112,
-        0.915,
-        0.206,
-        0.971
+        0.466097,
+        0.646211,
+        0.85755,
+        0.879113
       ],
       "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image.",
       "wards": "24510"

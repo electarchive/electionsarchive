@@ -105,10 +105,10 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.025,
-        0.834,
-        0.205,
-        0.939
+        0.104383,
+        0.308364,
+        0.854095,
+        0.745818
       ],
       "hint": "Read only the table headed 'FOR PRESIDENT AND VICE PRESIDENT OF THE UNITED STATES'; ignore any other table visible in the image."
     },
@@ -129,10 +129,10 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.034,
-        0.809,
-        0.216,
-        0.945
+        0.141542,
+        0.204097,
+        0.89931,
+        0.770666
       ],
       "hint": "Read only the table headed 'FOR UNITED STATES SENATOR'; ignore any other table visible in the image."
     },
@@ -153,10 +153,10 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.02,
-        0.77,
-        0.116,
-        0.97
+        0.083045,
+        0.04126,
+        0.483276,
+        0.874774
       ],
       "hint": "Read only the First Congressional District table in the left column of the page, every county row through its Totals row.",
       "wards": "24510"
@@ -178,10 +178,10 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.11,
-        0.778,
-        0.204,
-        0.856
+        0.458478,
+        0.074557,
+        0.850058,
+        0.399928
       ],
       "hint": "Read only the table headed 'Fourth Congressional District'; ignore any other table visible in the image.",
       "wards": "24510"
@@ -203,10 +203,10 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.022,
-        0.832,
-        0.113,
-        0.881
+        0.091696,
+        0.299674,
+        0.470588,
+        0.5038
       ],
       "hint": "Read only the table headed 'Second Congressional District'; ignore any other table visible in the image.",
       "wards": "24510"
@@ -228,10 +228,10 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.11,
-        0.848,
-        0.204,
-        0.918
+        0.458478,
+        0.366269,
+        0.850058,
+        0.658342
       ],
       "hint": "Read only the table headed 'Fifth Congressional District'; ignore any other table visible in the image.",
       "wards": "24510"
@@ -253,10 +253,10 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.022,
-        0.873,
-        0.113,
-        0.953
+        0.091696,
+        0.470503,
+        0.470588,
+        0.804198
       ],
       "hint": "Read only the table headed 'Third Congressional District'; ignore any other table visible in the image.",
       "wards": "24510"
@@ -278,10 +278,10 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.126,
-        0.784,
-        0.22,
-        0.879
+        0.524741,
+        0.10047,
+        0.915995,
+        0.495844
       ],
       "hint": "Read only the table headed 'Seventh Congressional District'; ignore any other table visible in the image.",
       "wards": "24510"
@@ -303,10 +303,10 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.035,
-        0.785,
-        0.13,
-        0.841
+        0.14557,
+        0.104445,
+        0.541427,
+        0.337911
       ],
       "hint": "Read only the table headed 'Sixth Congressional District'; ignore any other table visible in the image.",
       "wards": "24510"

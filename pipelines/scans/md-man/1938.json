@@ -117,10 +117,10 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.038,
-        0.774,
-        0.22,
-        0.982
+        0.158392,
+        0.058631,
+        0.915485,
+        0.924982
       ],
       "hint": "Read only the table headed 'FOR GOVERNOR OF MARYLAND'; ignore any other table visible in the image."
     },
@@ -161,10 +161,10 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.023,
-        0.774,
-        0.204,
-        0.984
+        0.095882,
+        0.058608,
+        0.849412,
+        0.933333
       ],
       "hint": "Read only the table headed 'FOR UNITED STATES SENATOR FROM MARYLAND'; ignore any other table visible in the image."
     },
@@ -185,10 +185,10 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.038,
-        0.831,
-        0.183,
-        0.906
+        0.158235,
+        0.295847,
+        0.763529,
+        0.608232
       ],
       "hint": "Read only the table headed 'First Congressional District of Maryland'; ignore any other table visible in the image.",
       "wards": "24510"
@@ -215,10 +215,10 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.015,
-        0.898,
-        0.204,
-        0.967
+        0.062353,
+        0.575156,
+        0.851176,
+        0.862551
       ],
       "hint": "Read only the table headed 'Second Congressional District of Maryland'; ignore any other table visible in the image.",
       "wards": "24510"
@@ -240,10 +240,10 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.059,
-        0.787,
-        0.211,
-        0.855
+        0.245882,
+        0.112491,
+        0.88,
+        0.395909
       ],
       "hint": "Read only the table headed 'Third Congressional District of Maryland'; ignore any other table visible in the image.",
       "wards": "24510"
@@ -265,10 +265,10 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.059,
-        0.847,
-        0.211,
-        0.914
+        0.245882,
+        0.362308,
+        0.88,
+        0.641709
       ],
       "hint": "Read only the table headed 'Fourth Congressional District of Maryland'; ignore any other table visible in the image.",
       "wards": "24510"
@@ -300,10 +300,10 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.02,
-        0.774,
-        0.2,
-        0.973
+        0.083285,
+        0.058238,
+        0.83343,
+        0.887578
       ],
       "hint": "Read only the table headed 'Fifth Congressional District of Maryland'; ignore any other table visible in the image.",
       "wards": "24510"
@@ -325,10 +325,10 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.02,
-        0.774,
-        0.2,
-        0.973
+        0.083285,
+        0.058238,
+        0.83343,
+        0.887578
       ],
       "hint": "Read only the table headed 'Sixth Congressional District of Maryland'; ignore any other table visible in the image.",
       "wards": "24510"
