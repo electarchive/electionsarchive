@@ -190,10 +190,16 @@ const refreshHandle: Handle = async ({ event, resolve }) =>
     : resolve(event);
 
 const timingHandle: Handle = async ({ event, resolve }) => {
+  const start = performance.now();
   const response = await resolve(event);
-  const entries = timing(event.locals);
-  if (entries != null) {
-    response.headers.set("server-timing", entries);
+  const entries = [
+    timing(event.locals),
+    event.url.pathname.startsWith("/rpc/")
+      ? `rpc;dur=${(performance.now() - start).toFixed(1)}`
+      : null,
+  ].filter((entry) => entry != null);
+  if (entries.length > 0) {
+    response.headers.set("server-timing", entries.join(", "));
   }
   return response;
 };
