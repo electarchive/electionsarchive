@@ -5555,6 +5555,20 @@ async function places(
       .filter((kid) => kid.scheme === level.code && !loose.has(kid.k))
       .map((kid) => kid.parent ?? kid.id),
   );
+  const shownIds = new Set(
+    found
+      .filter((kid) => kid.scheme === level.code && !loose.has(kid.k))
+      .map((kid) => kid.id),
+  );
+  const nested = allocated.rows.filter(
+    (row) =>
+      !shownIds.has(row.area) && row.parent != null && shownIds.has(row.parent),
+  );
+  const placing = anchors(
+    [...shownKs, ...nested.map((row) => row.k)],
+    contest.date ?? "infinity",
+  );
+  placing.catch(() => null);
   const naming = remember(
     `children:${childrenKey(contest.id, area, isRoot, day, true)}:${level.code}`,
     async () =>
@@ -5697,10 +5711,6 @@ async function places(
       owner: null,
     }));
   const parents = new Map(shown.map((kid) => [kid.id, kid.k]));
-  const nested = allocated.rows.filter(
-    (row) =>
-      !parents.has(row.area) && row.parent != null && parents.has(row.parent),
-  );
   const nestedNames = await names(
     nested.map((row) => row.area),
     contest.date,
@@ -5769,10 +5779,7 @@ async function places(
       grouping,
       round,
     ),
-    anchors(
-      listed.map((row) => row.k),
-      contest.date ?? "infinity",
-    ),
+    placing,
     redrawn(
       [...shown.map((kid) => kid.id), ...nested.map((row) => row.area)].filter(
         () => spread.size === 0,
@@ -10117,8 +10124,11 @@ export const contests = {
             and exists (select from area_geometry h where h.area_id = g.area_id and lower(h.valid) > upper(g.valid))
         `),
         db.execute<{ reach: Array<string> | null }>(sql`
+          select k.reach from contest_cover k where k.id = ${contest.root}::uuid
+          union all
           select ${reached} as reach from contest c join election e on e.id = c.election_id
           where c.id = ${contest.root}::uuid
+            and not exists (select from contest_cover k where k.id = ${contest.root}::uuid)
         `),
       ]);
       const fence =
