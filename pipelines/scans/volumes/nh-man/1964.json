@@ -1,0 +1,21 @@
+{
+  "year": 1964,
+  "day": "1964-11-03",
+  "polity": "US-NH",
+  "publisher": "New Hampshire Secretary of State",
+  "title": "Manual for the General Court of New Hampshire 1965, general election returns, summary by counties (general election 1964-11-03)",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/manualforgeneral39newh/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/manualforgeneral39newh"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "president": "Electors of President and Vice-President: one column per ticket (printed as the presidential and vice-presidential candidates, for example \"Dewey and Warren, r\"); name is the presidential candidate's surname; only the 1964 general election summary by counties (ten county rows and a totals row); skip checklist, ballots cast, absentee, state stores, and beverages tables",
+    "governor": "Governor; only the 1964 general election summary by counties (ten county rows and a totals row); skip checklist, ballots cast, absentee, state stores, and beverages tables"
+  },
+  "leaves": [
+    680
+  ],
+  "note": "Leaves are Internet Archive page indexes (printed page 641)."
+}

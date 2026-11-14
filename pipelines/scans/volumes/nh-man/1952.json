@@ -1,0 +1,21 @@
+{
+  "year": 1952,
+  "day": "1952-11-04",
+  "polity": "US-NH",
+  "publisher": "New Hampshire Secretary of State",
+  "title": "Manual for the General Court of New Hampshire 1953, general election returns, summary by counties (general election 1952-11-04)",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/manualforgeneral33newh/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/manualforgeneral33newh"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "president": "Electors of President and Vice-President: one column per ticket (printed as the presidential and vice-presidential candidates, for example \"Dewey and Warren, r\"); name is the presidential candidate's surname; only the 1952 general election summary by counties (ten county rows and a totals row); skip checklist, ballots cast, absentee, state stores, and beverages tables",
+    "governor": "Governor; only the 1952 general election summary by counties (ten county rows and a totals row); skip checklist, ballots cast, absentee, state stores, and beverages tables"
+  },
+  "leaves": [
+    639
+  ],
+  "note": "Leaves are Internet Archive page indexes (printed page 614)."
+}
