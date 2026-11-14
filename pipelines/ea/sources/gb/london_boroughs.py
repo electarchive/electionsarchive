@@ -1,7 +1,9 @@
+import base64
 import csv
 import difflib
 import functools
 import html
+import io
 import itertools
 import re
 import struct
@@ -13,8 +15,11 @@ from pathlib import Path
 from uuid import UUID
 
 import polars as pl
+from anthropic.types import ImageBlockParam, TextBlockParam
+from anthropic.types.message_create_params import MessageCreateParamsNonStreaming
+from PIL import Image
 
-from ea import raw
+from ea import batch, raw
 from ea.changeset import Changeset, slug
 from ea.names import foreign_preferred
 from ea.sources.gb import leap, leh
@@ -956,12 +961,138 @@ GLC_BY_EARLY_METHODOLOGY = {
     "neither is stored.",
 }
 
+BY_MODEL = "claude-haiku-5-5"
+BY_LONGEST = 1568
+BY_SYSTEM = (
+    "You read the by-elections section of one borough from the London Research Centre's report on the London "
+    "borough council elections of May 1998. The section has two columns: read the whole left column from top to "
+    "bottom, then the whole right column. A by-election can start at the foot of the left column and continue at "
+    "the top of the right column, so return the rows in reading order and do not repeat any. Row kinds: ward is a "
+    "ward name in bold with a status such as No change or LAB gain from CON at the right; date is the polling day "
+    "printed under it; candidate is a line with the name (surname, forenames), the party code, and the votes; "
+    "cause is the line such as Resignation of Smith, John A (LAB) or Death of ... that closes the by-election. "
+    "Copy names exactly as printed. The italic figure 1 has a long flag and can look like a 7: a 7 has a flat top "
+    "bar, a 1 does not. Give votes as printed with their commas, or the word printed instead of a figure (such as "
+    "Unopposed). Say whether each candidate line is printed in bold (the elected are bold). Skip the section "
+    "heading, the running footer, and the page number."
+)
+BY_SCHEMA: dict[str, object] = {
+    "type": "object",
+    "properties": {
+        "rows": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "kind": {"type": "string", "enum": ["ward", "date", "candidate", "cause"]},
+                    "text": {"type": "string"},
+                    "status": {"type": ["string", "null"]},
+                    "party": {"type": ["string", "null"]},
+                    "votes": {"type": ["string", "null"]},
+                    "bold": {"type": ["boolean", "null"]},
+                },
+                "required": ["kind", "text", "status", "party", "votes", "bold"],
+                "additionalProperties": False,
+            },
+        }
+    },
+    "required": ["rows"],
+    "additionalProperties": False,
+}
+
 
 def fetch() -> None:
     for _, url in [*BOOKS.values(), *GLC.values()]:
         raw.fetch(SOURCE, url, suffix=".pdf")
     for _, url, _, _ in EARLY.values():
         raw.fetch(SOURCE, url, suffix=".pdf")
+    print(batch.ensure(SOURCE, "lbce1998-by", by_requests())[1])
+
+
+def by_regions(book: list[list[Word]]) -> list[tuple[str, int, float, float]]:
+    folded = {fold(b): b for b in BOROUGHS} | {"cityofwestminster": "Westminster"}
+    out: list[tuple[str, int, float, float]] = []
+    borough = None
+    within = False
+    for index, page in enumerate(book):
+        body = [w for w in page if 40 < w[0] < 560]
+        rows = lines(body)
+        text = [" ".join(w[4] for w in row) for row in rows]
+        if text and re.match(r"(?:Rejected b|B)allot papers|Ward voting statistics", text[0]):
+            break
+        if len(text) > 1 and fold(text[0]) in folded and re.search(r"administration|control", text[1], re.IGNORECASE):
+            borough, within = folded[fold(text[0])], False
+            continue
+        split = min(
+            (w[1] for row in rows for w in row if re.fullmatch(r"By-elections?", w[4]) and w[0] < 60), default=None
+        )
+        if split is not None:
+            within = True
+        if not within or borough is None:
+            continue
+        top = 0.0 if split is None else split - 3
+        words = [w for w in body if w[1] > top and w[3] < 795]
+        if words:
+            out.append((borough, index + 1, top, max(w[3] for w in words) + 6))
+    return out
+
+
+def by_key(sha256: str, page: int, read: str) -> str:
+    return f"anthropic-batch:{BY_MODEL}/by-{read}/{sha256}/{page}"
+
+
+def by_images(path: Path, page: int, width: float, top: float, bottom: float) -> list[bytes]:
+    png = subprocess.run(
+        ["pdftoppm", "-r", "300", "-gray", "-png", "-f", str(page), "-l", str(page), "-singlefile", str(path)],
+        check=True,
+        capture_output=True,
+    ).stdout
+    image = Image.open(io.BytesIO(png))
+    scale = image.width / width
+    out = []
+    for left, right in ((36, 563), (36, 302), (298, 563)):
+        crop = image.crop((int(left * scale), int(top * scale), int(right * scale), int(bottom * scale)))
+        crop.thumbnail((BY_LONGEST, BY_LONGEST))
+        buffer = io.BytesIO()
+        crop.save(buffer, "PNG")
+        out.append(buffer.getvalue())
+    return out
+
+
+def by_requests() -> dict[str, batch.Want]:
+    artifact = raw.cached(SOURCE, BOOKS[1998][1])
+    sizes, book = pages(artifact.path)
+    price_in, price_out = batch.PRICES[BY_MODEL]
+    wanted: dict[str, batch.Want] = {}
+    for borough, page, top, bottom in by_regions(book):
+        whole, left, right = by_images(artifact.path, page, sizes[page - 1][0], top, bottom)
+        for read, images, prompt in (
+            ("whole", [whole], f"{borough}, page {page}: read the rows of this section."),
+            (
+                "columns",
+                [left, right],
+                f"{borough}, page {page}: the first image is the left column and the second the right column; "
+                + "read the rows.",
+            ),
+        ):
+            content: list[ImageBlockParam | TextBlockParam] = [
+                ImageBlockParam(
+                    type="image",
+                    source={"type": "base64", "media_type": "image/png", "data": base64.b64encode(data).decode()},
+                )
+                for data in images
+            ]
+            content.append(TextBlockParam(type="text", text=prompt))
+            params = MessageCreateParamsNonStreaming(
+                model=BY_MODEL,
+                max_tokens=8000,
+                system=BY_SYSTEM,
+                messages=[{"role": "user", "content": content}],
+                output_config={"effort": "low", "format": {"type": "json_schema", "schema": BY_SCHEMA}},
+            )
+            pixels = sum(Image.open(io.BytesIO(data)).size[0] * Image.open(io.BytesIO(data)).size[1] for data in images)
+            wanted[by_key(artifact.sha256, page, read)] = (params, (pixels / 750 * price_in + 3000 * price_out) / 1e6)
+    return wanted
 
 
 def pages(path: Path) -> tuple[list[tuple[float, float]], list[list[tuple[float, float, float, float, str]]]]:
