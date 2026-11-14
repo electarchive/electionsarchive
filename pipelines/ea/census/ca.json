@@ -539,6 +539,24 @@
       "url": "https://news.novascotia.ca/en/2015/11/27/amendments-municipal-elections-act-will-make-voting-easier",
       "kind": "official_body"
     },
+    "ns-education-act-excerpts": {
+      "title": "Excerpts from the Education Act relating to elections (section 48: school board elections concurrent with the regular municipal elections)",
+      "publisher": "Province of Nova Scotia",
+      "url": "https://bac-lac.wayback.archive-it.org/web/20061124043028/https://www.gov.ns.ca/snsmr/pdf/elections/EducationActrefs.pdf",
+      "kind": "official_body"
+    },
+    "ns-reg-142-2000": {
+      "title": "N.S. Reg. 142/2000, Municipal Elections Act Forms (Form 11B, school board nomination under section 13 of the Education Act)",
+      "publisher": "Royal Gazette Part II, Vol. 24, No. 18, 8 September 2000",
+      "url": "https://novascotia.ca/just/Regulations/rg2/2000/RG2-2000-09-08.pdf",
+      "kind": "official_body"
+    },
+    "ns-2004-release": {
+      "title": "Nomination deadline approaching for school board elections",
+      "publisher": "Province of Nova Scotia",
+      "url": "https://news.novascotia.ca/en/2004/09/10/nomination-deadline-approaching-school-board-elections",
+      "kind": "official_body"
+    },
     "pe-assembly-history": {
       "title": "Our History and Timeline",
       "publisher": "Legislative Assembly of Prince Edward Island",
@@ -7300,7 +7318,7 @@
       "measure": {
         "unit": "polity"
       },
-      "note": "The seven English-language regional school boards were elected for four years on the municipal voting day (15 October 2016 was the last) and were replaced by regional centres for education on 1 April 2018 (Education Reform Act, Bill 72). The Conseil scolaire acadien provincial kept its elections (class ns_csap).",
+      "note": "The seven English-language regional school boards were elected for four years on the municipal voting day (15 October 2016 was the last) and were replaced by regional centres for education on 1 April 2018 (Education Reform Act, Bill 72). Education Act section 48(1) put their election concurrently with the regular municipal elections; the cadence is read from 2000. The Conseil scolaire acadien provincial kept its elections (class ns_csap).",
       "source": "ns-bill-72",
       "match": [
         {
@@ -7324,16 +7342,16 @@
         {
           "within": "CA-NS",
           "government_kind": "school",
-          "source": "ns-2015-release",
+          "source": "ns-education-act-excerpts",
           "period_years": 4,
           "phase": 0,
           "month": 10,
           "term_years": 4,
           "day_rule": "oct_third_saturday",
-          "valid_from": "2016-01-01",
+          "valid_from": "2000-01-01",
           "valid_to": "2018-04-01",
           "called": false,
-          "locator": "Provincial release of 27 November 2015: the next municipal and school board elections take place on 15 October 2016; Bill 72 (2018) took effect on 1 April 2018 and replaced the school boards other than the CSAP. The row starts at 2016 because earlier cycles were not read"
+          "locator": "Education Act section 48(1): the election of members of a school board takes place concurrently with and as part of the regular municipal elections. Form 11B in N.S. Reg. 142/2000 (8 September 2000) is the school board nomination paper under section 13 for the 2000 election; the 2004 release gives school board elections on 16 October 2004 and the 2008 release 18 October 2008 (both third Saturdays); the provincial release of 27 November 2015 gives 15 October 2016. Bill 72 (2018) took effect on 1 April 2018 and replaced the school boards other than the CSAP. Cycles before 2000 were not read"
         }
       ],
       "est_votes": 300000,
@@ -7393,7 +7411,7 @@
       "measure": {
         "unit": "polity"
       },
-      "note": "The upper house was elected, instead of appointed, from 1862 and merged with the House of Assembly in 1893 into the single Legislative Assembly, where each of the 15 districts elects one Assemblyman and one Councillor (those Councillor seats are part of the provincial general election, not this class). Candidates and voters needed property. No statute with a fixed election calendar has been read.",
+      "note": "The upper house was elected, instead of appointed, from 1862 and merged with the House of Assembly in 1893 into the single Legislative Assembly, where each of the 15 districts elects one Assemblyman and one Councillor (those Councillor seats are part of the provincial general election, not this class). Candidates and voters needed property. The 1862 Act (introduced by Thomas Heath Haviland, royal assent reported to the Assembly on 2 December 1862) made the Council 13 members, four from each county and one from Charlottetown; its text, the councillors' term, and the election years were not found in any source read (Campbell's 1875 history, the Assembly's timeline, the 2015 White Paper on Democratic Renewal, and the Canadian Parliamentary Review give none), so no cadence or dates are recorded.",
       "source": "pe-assembly-history",
       "valid_from": "1862-01-01",
       "valid_to": "1893-01-01",
