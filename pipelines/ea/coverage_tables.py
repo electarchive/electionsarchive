@@ -43,50 +43,6 @@ BALANCES = {
     "2028410": "2028412",
 }
 OFFSETS = {"us_house": 2, "state_lower": 2, "us_senate": 6}
-JUDICIAL = {
-    **dict.fromkeys(
-        [
-            "AL",
-            "AK",
-            "AZ",
-            "AR",
-            "CA",
-            "CO",
-            "FL",
-            "GA",
-            "ID",
-            "IL",
-            "IN",
-            "IA",
-            "KS",
-            "KY",
-            "LA",
-            "MD",
-            "MI",
-            "MN",
-            "MS",
-            "MO",
-            "MT",
-            "NE",
-            "NV",
-            "NM",
-            "NC",
-            "ND",
-            "OH",
-            "OK",
-            "OR",
-            "TN",
-            "TX",
-            "UT",
-            "WA",
-            "WV",
-            "WY",
-        ],
-        2,
-    ),
-    "PA": 2,
-    "WI": 1,
-}
 KNOWN = {("GA", 2025, "statewide_exec", "general"): 2}
 DECIDED_EARLIER = {
     "FL": (
@@ -373,6 +329,9 @@ CADENCE_SQL = """
 select s.iso_code, e.government_kind, e.function, e.name_pattern, e.polity_id::text, e.selection::text,
        e.period_years, e.phase, e.month, e.day_rule, extract(year from e.valid_from)::int, e.id::text
 from election_cadence e join polity s on s.id = e.polity_id
+where e.class_id is null or e.class_id in (
+    select k.id from census_class k join polity p on p.id = k.polity_id where p.iso_code = 'US' and k.goal = 'local'
+)
 """
 CADENCE_STAMP_SQL = """
 select (select count(*) || max(changeset_id::text) from election_cadence),
@@ -389,6 +348,17 @@ select p.iso_code, e.date_from, e.id::text from election e join polity p on p.id
 where e.status = 'scheduled' and e.kind = 'local' and e.date_from > current_date and p.iso_code like 'US-%'
 order by e.date_from
 """
+
+
+CLASSES = {
+    "county": "county",
+    "municipality": "municipal",
+    "township": "township",
+    "school": "school",
+    "college": "school",
+    "special": "special_district",
+}
+CLASSES_SQL = "select k.key, k.id from census_class k join polity p on p.id = k.polity_id where p.iso_code = 'US'"
 
 
 class Rule(NamedTuple):
@@ -924,6 +894,8 @@ def build(full: bool = False) -> str:
                     held[polity][int(year)] = values
         polities = {str(pid): (kind, code, name, st) for pid, kind, code, name, st in conn.execute(POLITIES_SQL)}
         rules = cadence_rules(conn)
+        judges = {st: rule for (key, st), rule in coverage.cycles(conn).items() if key == "judicial"}
+        census_classes = dict(conn.execute(CLASSES_SQL).fetchall())
         access: dict[str, str] = {}
         for pid, aid, iso in conn.execute(ACCESS_SQL):
             access.setdefault(pid, aid)
@@ -969,8 +941,8 @@ def build(full: bool = False) -> str:
             current["expected"] = cell["held"]
 
     known = dict(KNOWN)
-    for st, period in JUDICIAL.items():
-        for year in range(2000 + (st == "PA"), today.year + 1, period):
+    for st, rule in judges.items():
+        for year in (year for year in range(2000, today.year + 1) if coverage.chosen(rule, year) == "elected"):
             retained = any(
                 "us.retention" in c.get("pipelines", "")
                 for (s, y, level, _), c in by_key.items()
@@ -1536,7 +1508,8 @@ def build(full: bool = False) -> str:
         conn.execute("delete from coverage_government")
         with conn.cursor().copy(
             "copy coverage_government (id, state, county, kind, name, function, population, population_basis, active,"
-            " polity_id, period, phase, month, basis, next_date, next_election_id, cadence_id, access_id) from stdin"
+            " polity_id, period, phase, month, basis, next_date, next_election_id, cadence_id, access_id, class_id)"
+            " from stdin"
         ) as copy:
             for g in governments:
                 copy.write_row(
@@ -1563,6 +1536,7 @@ def build(full: bool = False) -> str:
                             "access_id",
                         )
                     ]
+                    + [census_classes.get(CLASSES.get(g["kind"], ""))]
                 )
         with conn.cursor().copy(
             "copy coverage_government_year (government_id, year, expected, held, missing, precinct, precincts, shaped)"

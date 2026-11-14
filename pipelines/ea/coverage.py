@@ -623,26 +623,18 @@ SENATE_SQL = """
 select s.label from seat s join external_id e on e.entity_id = s.body_id and e.scheme = 'us.body' and e.value = 'senate'
 """
 
-LEGISLATIVE_POPULAR_GAPS = {1824: {"DE", "GA", "LA", "NY", "SC", "VT"}, 1828: {"DE", "SC"}, 1864: {"LA"}, 1868: {"FL"}}
 SECESSION_STATES = ("AL", "AR", "FL", "GA", "LA", "MS", "NC", "SC", "TX", "TN", "VA")
-CLASS_OFFSET = {"I": 2, "II": 4, "III": 0}
-GOVERNOR_CYCLES = {
-    "midterm": "AL AK AZ CA CO CT FL GA HI ID IL IA KS ME MD MA MI MN NE NV NM NY OH OK OR PA SC SD TN TX WI WY GU VI",
-    "presidential": "DE IN MO MT NC ND UT WA WV PR",
-    "biennial": "NH VT",
-    "virginia": "VA NJ",
-    "kentucky": "KY MS LA",
-}
-GOVERNOR_YEARS = {
-    "AR": [*range(1974, 1986, 2), *range(1986, LAST + 1, 4)],
-    "RI": [*range(1974, 1994, 2), *range(1994, LAST + 1, 4)],
-    "IL": [1976, *range(1978, LAST + 1, 4)],
-    "AS": [*range(1980, LAST + 1, 4)],
-}
-ODD_LEGISLATURES = {
-    2023: {"LA": 2019, "MS": 2019, "VA": 2019, ("NJ", "state_lower"): 2019, ("NJ", "state_upper"): 2021},
-    2025: {("NJ", "state_lower"): 2021, ("VA", "state_lower"): 2021},
-}
+CADENCE_FROM = 1974
+HELD_THROUGH = 2022
+CYCLES_SQL = """
+select k.key, substr(p.iso_code, 4), c.selection::text, c.name_pattern, c.period_years, c.phase, c.valid_from,
+    c.valid_to
+from election_cadence c
+join census_class k on k.id = c.class_id
+join polity cp on cp.id = k.polity_id and cp.iso_code = 'US'
+join polity p on p.id = c.polity_id and p.iso_code like 'US-%%'
+where k.goal <> 'local'
+"""
 
 
 def era(year: int) -> str:
@@ -763,14 +755,24 @@ def owner(level: str, pipelines: set[str]) -> str:
     return "local" if level in LOCAL else "state and federal"
 
 
-def governor_years(st: str) -> set[int]:
-    if st in GOVERNOR_YEARS:
-        return set(GOVERNOR_YEARS[st])
-    for cycle, states in GOVERNOR_CYCLES.items():
-        if st in states.split():
-            start = {"midterm": 1974, "presidential": 1976, "biennial": 1974, "virginia": 1977, "kentucky": 1975}[cycle]
-            return set(range(start, LAST + 1, 2 if cycle == "biennial" else 4))
-    return set()
+def cycles(conn: Connection) -> dict[tuple[str, str], list[tuple]]:
+    found: dict[tuple[str, str], list[tuple]] = defaultdict(list)
+    for key, st, *rule in conn.execute(CYCLES_SQL):
+        found[(key, st)].append(tuple(rule))
+    return found
+
+
+def chosen(rules: list[tuple], year: int, label: str = "") -> str | None:
+    day = date(year, 11, 1)
+    for selection, pattern, period, phase, start, end in rules:
+        if (
+            (start is None or day >= start)
+            and (end is None or day < end)
+            and (pattern is None or re.search(pattern, label))
+            and (period is None or (year - phase) % period == 0)
+        ):
+            return selection
+    return None
 
 
 def matrix(conn: Connection, scope: list[str], members: list[dict], last: int = LAST) -> list[dict]:
@@ -880,10 +882,11 @@ def matrix(conn: Connection, scope: list[str], members: list[dict], last: int = 
     districts = list(conn.execute(DISTRICTS_SQL))
     at_large = {(st, year): n for st, year, n in conn.execute(AT_LARGE_SQL)}
     seats = [label for (label,) in conn.execute(SENATE_SQL)]
+    cycle = cycles(conn)
 
     expected: dict[tuple, int] = defaultdict(int)
     for year, st in electors:
-        if year >= 1824 and st not in LEGISLATIVE_POPULAR_GAPS.get(year, set()) and not (st == "SC" and year <= 1860):
+        if year >= 1824 and chosen(cycle[("president", st)], year) != "appointed":
             expected[(st, year, "president", "general")] += (
                 1 + (2 if st == "ME" and year >= 1972 else 0) + (3 if st == "NE" and year >= 1992 else 0)
             )
@@ -897,22 +900,22 @@ def matrix(conn: Connection, scope: list[str], members: list[dict], last: int = 
             )
     by_name = {name: st for st, name in states.values()}
     for label in seats:
-        name, _, numeral = label.rpartition(" Class ")
+        name = label.rpartition(" Class ")[0]
         st = by_name[name]
-        first = 1960 if st in ("AK", "HI") else 1914
-        for year in range(first, LAST + 1):
-            if year % 6 == CLASS_OFFSET[numeral]:
+        for year in range(1789, LAST + 1):
+            if chosen(cycle[("us_senate", st)], year, label) == "elected":
                 expected[(st, year, "us_senate", "general")] += 1
 
     for (st, year, level, stage), cell in held.items():
-        if level == "governor" and stage == "general" and year < 1974:
+        if level == "governor" and stage == "general" and year < CADENCE_FROM:
             expected[(st, year, level, stage)] = max(expected[(st, year, level, stage)], 1)
     for st, _ in states.values():
-        for year in governor_years(st):
-            expected[(st, year, "governor", "general")] = 1
+        for year in range(CADENCE_FROM, LAST + 1):
+            if chosen(cycle[("governor", st)], year) == "elected":
+                expected[(st, year, "governor", "general")] = 1
 
     for (st, year, level, stage), cell in list(held.items()):
-        if level in ("state_upper", "state_lower") and stage == "general" and 1967 <= year <= 2022:
+        if level in ("state_upper", "state_lower") and stage == "general" and 1967 <= year <= HELD_THROUGH:
             expected[(st, year, level, stage)] = max(expected[(st, year, level, stage)], cell["held"])
 
     def chamber(st: str, year: int, level: str) -> int:
@@ -936,9 +939,10 @@ def matrix(conn: Connection, scope: list[str], members: list[dict], last: int = 
 
     for st, _ in states.values():
         for level in ("state_upper", "state_lower"):
-            for year, sources in ODD_LEGISLATURES.items():
-                source = sources.get((st, level), sources.get(st))
-                if source:
+            years = [year for year in range(1789, LAST + 1) if chosen(cycle[(level, st)], year) == "elected"]
+            for year in years:
+                if year > HELD_THROUGH and year % 2:
+                    source = year - 4 if year - 4 in years else max(y for y in years if y < year)
                     expected[(st, year, level, "general")] = proxy(st, source, year, level)
             counts = {year: chamber(st, year, level) for year in (2016, 2018, 2020, 2022)}
             if level == "state_lower" and all(counts[y] for y in (2018, 2020, 2022)):
