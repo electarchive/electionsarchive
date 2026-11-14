@@ -2,8 +2,10 @@ import html
 import re
 import subprocess
 import sys
+import time
 from datetime import UTC, date, datetime
 from pathlib import Path
+from urllib.parse import urljoin
 from uuid import UUID
 
 import httpx
@@ -21,7 +23,7 @@ WARDS = "gb.parish_ward"
 PARSED = DATA / "parsed" / SOURCE
 DAY = date(2022, 5, 5)
 BROWSER = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36"
-VOTES = 1
+VOTES, REGISTERED, INVALID = 1, 2, 5
 COUNCILS = {
     "W06000020": (
         "Torfaen County Borough Council",
@@ -29,7 +31,28 @@ COUNCILS = {
         "https://www.torfaen.gov.uk/en/about-the-council/elections/elections-results/community-council",
         "torfaen",
     ),
+    "W06000010": (
+        "Carmarthenshire County Council",
+        "Community Councillor Results, Local Elections 2022",
+        "https://www.carmarthenshire.gov.wales/council-democracy/elections-voting/local-elections-2022/community-councillor-results/",
+        "carmarthenshire",
+    ),
+    "W06000003": (
+        "Conwy County Borough Council",
+        "Election results by community area, Local Government Elections, 5 May 2022",
+        "https://modgovpub-eng.secure.conwy.gov.uk/mgElectionElectionAreaResults.aspx?Page=all&EID=104&RPID=20212970",
+        "moderngov",
+    ),
 }
+ALIASES = {
+    ("W06000010", "Cwarter Bach"): "Quarter Bach",
+    ("W06000010", "Dyffryn Cennen"): "Cyngor Bro Dyffryn Cennen",
+    ("W06000010", "Llanddowror and Llanmiloe"): "Llanddowror",
+    ("W06000010", "Llansteffan & Llanybri"): "Llansteffan",
+    ("W06000003", "Bay of Colwyn"): "Colwyn Bay",
+    ("W06000003", "Towyn and Kinmel Bay"): "Kinmel Bay and Towyn",
+}
+UNREGISTERED = {("W06000010", "Trelech a'r Betws"), ("W06000003", "Betws-y-Coed")}
 WARD_NAMES = {"Grifithstown East": "Griffithstown East", "Grifithstown West": "Griffithstown West"}
 PARTIES: dict[str, str | None] = {
     "": None,
@@ -37,32 +60,60 @@ PARTIES: dict[str, str | None] = {
     "Welsh Labour": "Q9630",
     "Welsh Labour/Llafur Cymru": "Q9630",
     "Welsh Conservative Party Candidate": "Q9626",
+    "Plaid Cymru – The Party of Wales": "Q10691",
+    "Welsh Labour / Llafur Cymru": "Q9630",
+    "Independent / Annibynnol": "independent",
+    "Welsh Liberal Democrats / Democratiaid Rhyddfrydol Cymru": "Q9624",
+    "Reform UK": "Q104721252",
+    "Gwlad - Wales Can be Better": "Q75321093",
+    "Ceidwadwyr Cymreig / Welsh Conservatives": "Q9626",
+    "Annibynnol": "independent",
+    "Annibynnol / Independent": "independent",
+    "Plaid Cymru - The Party of Wales": "Q10691",
+    "Welsh Conservative Party Candidate / Ymgeisydd Plaid Geidwadol Cymru": "Q9626",
+    "Labour and Co-operative Party / Llafur a'r Blaid Gydweithredol": "Q9630",
+    "Wales Green Party/Plaid Werdd Cymru": "Q3499324",
 }
 CONTEXT = (
     "Wales's community and town councils are elected every five years on the day of the principal council "
     "elections, ward by ward where a community is warded, by block vote. Where no more candidates are nominated "
     "than there are seats, those nominated are declared elected without a poll."
 )
+SHORT = "{publisher}'s results list {elected} candidates declared elected unopposed to {places} seats, leaving {left} unfilled."
 UNSTATED = (
     "{publisher}'s results list the candidates declared elected unopposed but not how many seats the ward has, "
     "so any seat left unfilled is not recorded."
 )
 
 
+def areas(url: str) -> list[str]:
+    links = re.findall(r'href="(mgElectionAreaResults\.aspx[^"]+)"', raw.cached(SOURCE, url).path.read_text())
+    return [urljoin(url, html.unescape(link)) for link in dict.fromkeys(links)]
+
+
 def fetch() -> None:
-    for _, _, url, _ in COUNCILS.values():
-        try:
-            raw.cached(SOURCE, url)
-            continue
-        except LookupError:
-            pass
-        response = httpx.get(url, headers={"User-Agent": BROWSER}, timeout=90, follow_redirects=True)
-        response.raise_for_status()
-        if response.content.startswith(b"%PDF"):
-            suffix, media = ".pdf", "application/pdf"
-        else:
-            suffix, media = ".html", "text/html"
-        raw.store(SOURCE, url, response.content, suffix=suffix, retrieved_at=datetime.now(UTC), media_type=media)
+    for _, _, url, reader in COUNCILS.values():
+        store(url)
+        if reader == "moderngov":
+            for page in areas(url):
+                if store(page):
+                    time.sleep(1)
+
+
+def store(url: str) -> bool:
+    try:
+        raw.cached(SOURCE, url)
+        return False
+    except LookupError:
+        pass
+    response = httpx.get(url, headers={"User-Agent": BROWSER}, timeout=90, follow_redirects=True)
+    response.raise_for_status()
+    if response.content.startswith(b"%PDF"):
+        suffix, media = ".pdf", "application/pdf"
+    else:
+        suffix, media = ".html", "text/html"
+    raw.store(SOURCE, url, response.content, suffix=suffix, retrieved_at=datetime.now(UTC), media_type=media)
+    return True
 
 
 def text_of(url: str) -> str:
@@ -70,6 +121,13 @@ def text_of(url: str) -> str:
     if path.suffix == ".html":
         return path.read_text()
     return subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True).stdout
+
+
+def found(pattern: str, text: str, flags: int = 0) -> re.Match[str]:
+    match = re.search(pattern, text, flags)
+    if match is None:
+        raise ValueError(f"{pattern} not found in {text[:200]}")
+    return match
 
 
 def flat(fragment: str) -> str:
@@ -97,7 +155,7 @@ def torfaen(page: str) -> list[dict]:
             for row in re.findall(r"<tr>(.*?)</tr>", body, re.DOTALL)
         ]
         rows = [row for row in rows if row]
-        candidates = []
+        candidates: list[dict] = []
         for cells in rows:
             if uncontested:
                 printed, _, description = cells
@@ -130,14 +188,121 @@ def torfaen(page: str) -> list[dict]:
                 "council": council,
                 "ward": ward,
                 "places": None if uncontested else sum(1 for candidate in candidates if candidate["elected"]),
-                "turnout": int(turnout.group(1)) if turnout else None,
+                "turnout": turnout.group(1) if turnout else None,
                 "candidates": candidates,
             }
         )
     return reads
 
 
-READERS = {"torfaen": torfaen}
+def carmarthenshire(page: str) -> list[dict]:
+    reads = []
+    for panel in page.split('<div class="panel panel-default">')[1:]:
+        title = flat(found(r'<h2 class="panel-title">(.*?)</h2>', panel, re.DOTALL).group(1))
+        council, ward = found(r"^(.+?)(?: \((.+?)(?: Ward)?\))?$", title).groups()
+        summary = flat(panel[panel.index("<h2>Summary") :].split("<h2>Downloads")[0])
+        places = int(found(r"Number of Councillors to be elected : (\d+)", summary).group(1))
+        uncontested = "This ward is uncontested" in summary
+        table = found(r"<tbody>(.*?)</tbody>", panel, re.DOTALL).group(1)
+        rows = [
+            [flat(cell) for cell in re.findall(r"<td>(.*?)</td>", row, re.DOTALL)]
+            for row in re.findall(r"<tr>(.*?)</tr>", table, re.DOTALL)
+        ]
+        elected = set()
+        if not uncontested:
+            block = panel[panel.index("<strong>Elected:</strong>") :].split("</p>")[0]
+            elected = {flat(entry).split("/")[0].strip() for entry in block.split("<br />")[1:] if flat(entry)}
+        candidates: list[dict] = []
+        for cells in rows:
+            if not cells[0]:
+                continue
+            printed, description = cells[0], cells[1]
+            candidates.append(
+                {
+                    "printed": printed,
+                    "name": surname_first(printed),
+                    "description": description,
+                    "votes": None if uncontested else int(cells[2]),
+                    "elected": uncontested or printed in elected,
+                }
+            )
+        if not uncontested:
+            total = int(found(r"Total votes: (\d+)", summary).group(1))
+            if total != sum(int(candidate["votes"]) for candidate in candidates) or len(elected) != places:
+                raise ValueError(f"Carmarthenshire {title}: totals or elected do not agree")
+            if elected - {candidate["printed"] for candidate in candidates}:
+                raise ValueError(f"Carmarthenshire {title}: elected not among candidates")
+        turnout = re.search(r"Turnout : ([\d.]+)%", summary)
+        reads.append(
+            {
+                "council": council,
+                "ward": ward,
+                "places": places,
+                "turnout": turnout.group(1) if turnout else None,
+                "candidates": candidates,
+            }
+        )
+    return reads
+
+
+def moderngov(url: str) -> list[dict]:
+    reads = []
+    for page_url in areas(url):
+        page = re.sub(r"<script\b.*?</script>", " ", text_of(page_url), flags=re.DOTALL)
+        caption = flat(found(r'<caption\s+class="mgSectionTitle"\s*>(.*?)</caption>', page, re.DOTALL).group(1))
+        english = list(re.finditer(r"/\s*([^/(]+?) (?:Town|Community|City) Counci?l?\b", caption))[-1]
+        council = english.group(1)
+        ward = re.search(r"\(([^()]+?)\)\s*- results$", caption[english.end() :])
+        ward = re.sub(r"\s+[Ww]ard$", "", ward.group(1).strip()) if ward else None
+        table = page[page.index('class="mgStatsTable') :].split("</table>")[0]
+        candidates: list[dict] = []
+        for row in re.findall(r"<tr\s+class=\"mgTable(?:Odd|Even)Row\"\s*>(.*?)</tr>", table, re.DOTALL):
+            printed, description, count, _, outcome = (
+                flat(cell) for cell in re.findall(r"<td[^>]*>(.*?)</td>", row, re.DOTALL)
+            )
+            candidates.append(
+                {
+                    "printed": printed,
+                    "name": printed,
+                    "description": description,
+                    "votes": None if count == "No contest" else int(count.replace(",", "")),
+                    "elected": outcome == "Elected",
+                }
+            )
+        summary = flat(page[page.index("Voting Summary") :].split("</table>")[0]) if "Voting Summary" in page else ""
+
+        def figure(label: str) -> int | None:
+            found = re.search(rf"{label} ([\d,]+)", summary)
+            return int(found.group(1).replace(",", "")) if found else None
+
+        places = figure("Seats")
+        if candidates[0]["votes"] is not None:
+            if figure("Total votes") != sum(int(candidate["votes"]) for candidate in candidates):
+                raise ValueError(f"{caption}: total votes do not agree")
+            if places != sum(1 for candidate in candidates if candidate["elected"]):
+                raise ValueError(f"{caption}: seats and elected do not agree")
+        turnout = re.search(r"Turnout ([\d.]+)%", summary)
+        reads.append(
+            {
+                "council": council,
+                "ward": ward,
+                "places": places,
+                "turnout": turnout.group(1) if turnout else None,
+                "electorate": figure("Electorate"),
+                "counted": figure("Number of ballot papers included in the count"),
+                "rejected": figure("Number of ballot papers rejected"),
+                "url": page_url,
+                "candidates": candidates,
+            }
+        )
+    return reads
+
+
+READERS = {
+    "torfaen": lambda url: torfaen(text_of(url)),
+    "carmarthenshire": lambda url: carmarthenshire(text_of(url)),
+    "moderngov": moderngov,
+}
 
 
 def parse() -> None:
@@ -155,11 +320,15 @@ def parse() -> None:
         ).fetchall()
     known = {(lad, fold(name)): (key, scheme, code) for lad, name, key, scheme, code in councils}
     rows = []
+    unknown = set()
     for lad, (_, _, url, reader) in COUNCILS.items():
-        for read in READERS[reader](text_of(url)):
-            found = known.get((lad, fold(read["council"])))
+        for read in READERS[reader](url):
+            found = known.get((lad, fold(ALIASES.get((lad, read["council"]), read["council"]))))
+            if (lad, read["council"]) in UNREGISTERED:
+                continue
             if found is None:
-                raise ValueError(f"{lad} {read['council']}: no council in the register")
+                unknown.add((lad, read["council"]))
+                continue
             key, scheme, code = found
             for number, candidate in enumerate(read["candidates"], start=1):
                 if candidate["description"] not in PARTIES:
@@ -175,10 +344,16 @@ def parse() -> None:
                         "ward": read["ward"],
                         "places": read["places"],
                         "turnout": read["turnout"],
+                        "electorate": read.get("electorate"),
+                        "counted": read.get("counted"),
+                        "rejected": read.get("rejected"),
+                        "page": read.get("url", url),
                         "number": number,
                         **candidate,
                     }
                 )
+    if unknown:
+        raise ValueError(f"no council in the register: {sorted(unknown)}")
     frame = pl.DataFrame(rows, infer_schema_length=None)
     if clash := frame.group_by("key", "ward").agg(pl.col("url").n_unique()).filter(pl.col("url") > 1).rows():
         raise ValueError(f"two sources for one ward: {clash}")
@@ -222,7 +397,8 @@ def emit() -> Path:
                 continue
             sources[url] = cs.source(publisher, title)
             cs.add("source", id=sources[url], kind="official_body", publisher=publisher, title=title, url=url)
-            cs.artifact(raw.cached(SOURCE, url), sources[url])
+            for page in frame.filter(pl.col("url") == url)["page"].unique().sort():
+                cs.artifact(raw.cached(SOURCE, page), sources[url])
         keys = sorted(set(frame["key"]))
         paths = dict(
             conn.execute(
@@ -328,13 +504,44 @@ def emit() -> Path:
             publisher = COUNCILS[first["lad"]][0]
             if tacit and places is None:
                 cs.add("note", entity_id=result_set, kind="caveat", body_md=UNSTATED.format(publisher=publisher))
-            if first["turnout"] is not None:
+            elif tacit and lines.height < places:
+                cs.add(
+                    "note",
+                    entity_id=result_set,
+                    kind="caveat",
+                    body_md=SHORT.format(
+                        publisher=publisher, elected=lines.height, places=places, left=places - lines.height
+                    ),
+                )
+            if first["counted"] is not None:
+                cs.add(
+                    "note",
+                    entity_id=result_set,
+                    kind="context",
+                    body_md=f"{publisher} prints {first['counted']:,} ballot papers included in the count and a "
+                    f"turnout of {first['turnout']}%.",
+                )
+            elif first["turnout"] is not None:
                 cs.add(
                     "note",
                     entity_id=result_set,
                     kind="context",
                     body_md=f"{publisher} gives turnout as {first['turnout']}% and prints no ballot or electorate counts.",
                 )
+            if not tacit:
+                for measure, field in ((REGISTERED, "electorate"), (INVALID, "rejected")):
+                    if first[field] is not None:
+                        cs.add(
+                            "result_value",
+                            result_set_id=result_set,
+                            unit_id=unit,
+                            option_id=None,
+                            channel=0,
+                            measure=measure,
+                            count_round=0,
+                            flags=0,
+                            value=first[field],
+                        )
             for line in lines.iter_rows(named=True):
                 option_key = f"{contest_key}:{line['number']}"
                 person_key = f"{key}:{slug(line['name'])}"
