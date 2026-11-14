@@ -1,0 +1,93 @@
+{
+  "polity": "US-IN",
+  "publisher": "Indiana Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "extend": true,
+  "title": "Report of the Secretary of State of the State of Indiana for the year ending October 31, 1880: Official Vote of the State of Indiana at the October and November Elections, 1880 (fold-out sheet)",
+  "file": {
+    "url": "https://archive.org/download/reportofsecretar1880indi/page/n{page}_w4000.jpg",
+    "item": "https://archive.org/details/reportofsecretar1880indi"
+  },
+  "contests": {
+    "governor": {
+      "year": 1880,
+      "chamber": "governor",
+      "day": "1880-11-02",
+      "special": false,
+      "state": "IN",
+      "district": null
+    },
+    "president": {
+      "year": 1880,
+      "chamber": "president",
+      "day": "1880-11-02",
+      "special": false,
+      "state": "IN",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 136,
+      "id": "136-0",
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.19,
+        0.215,
+        1.0
+      ],
+      "turn": 0,
+      "hint": "Counties down the left, one row per county in the order printed, ending with the Totals row. This is one fold-out sheet with many columns; read only the named columns, counted from the left of the table (not the county names): the first three columns, under 'For Governor.' (Albert G. Porter, Franklin Landers, Richard Gregg). Ignore the Lieutenant Governor columns.",
+      "columns": [
+        {
+          "label": "Albert G. Porter.",
+          "contest": "governor",
+          "candidate": "Albert Porter"
+        },
+        {
+          "label": "Franklin Landers.",
+          "contest": "governor",
+          "candidate": "Franklin Landers"
+        },
+        {
+          "label": "Richard Gregg.",
+          "contest": "governor",
+          "candidate": "Richard Gregg"
+        }
+      ]
+    },
+    {
+      "page": 136,
+      "id": "136-1",
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.19,
+        1.0,
+        1.0
+      ],
+      "turn": 0,
+      "hint": "Counties down the left, one row per county in the order printed, ending with the Totals row. This is one fold-out sheet with many columns; read only the named columns, counted from the left of the table (not the county names): the last three columns, under 'For President.' (James A. Garfield, Winfield S. Hancock, James B. Weaver); ignore every column to their left.",
+      "columns": [
+        {
+          "label": "James A. Garfield.",
+          "contest": "president",
+          "candidate": "James Garfield"
+        },
+        {
+          "label": "Winfield S. Hancock.",
+          "contest": "president",
+          "candidate": "Winfield Hancock"
+        },
+        {
+          "label": "James B. Weaver.",
+          "contest": "president",
+          "candidate": "James Weaver"
+        }
+      ]
+    }
+  ],
+  "note": "Leaves 136-137 are Internet Archive page indexes of the fold-out; leaf 136 holds the whole table and leaf 137 only the clipped left margin. The October governor election and the November presidential election are both dated 1880-11-02 as the archive dates the contests."
+}
