@@ -1,4 +1,5 @@
 import base64
+import csv
 import html
 import io
 import re
@@ -25,13 +26,16 @@ VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 VOTES, REGISTERED, BALLOTS, INVALID = 1, 2, 3, 5
 OGL = "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
-DOVER, KENT, EPSOM, SURREY, BEDFORD, CALDERDALE = (
+PAGES = DATA / "pages" / SOURCE
+DIGITIZED = 8
+DOVER, KENT, EPSOM, SURREY, BEDFORD, CALDERDALE, SHEPWAY = (
     "E07000108",
     "E10000016",
     "E07000208",
     "E10000030",
     "E06000055",
     "E08000033",
+    "E07000112",
 )
 DOVER_SITE = "https://www.dover.gov.uk/asset-library"
 EPSOM_SITE = "https://www.epsom-ewell.gov.uk/sites/default/files/documents/council/elections-and-voting"
@@ -239,6 +243,24 @@ FILES: list[dict] = [
         "notes": "The borough council's summary, ward by ward, with each candidate's name, description, and votes, the "
         "elected candidate, the electorate, the seats, the ballot papers, and the percentage poll.",
     },
+    {
+        "file": "https://www.folkestone-hythe.gov.uk/downloads/file/1229/shepway-district-council-results-1973-to-2011",
+        "parser": "shepway",
+        "code": SHEPWAY,
+        "day": None,
+        "kind": "academic",
+        "publisher": "The Elections Centre, Plymouth University",
+        "title": "Shepway District Council Election Results 1973-2011",
+        "license": None,
+        "notes": "Colin Rallings and Michael Thrasher's ward-by-ward results of every Shepway District Council "
+        "election from 1973 to 2011, a scan with no text layer, published on Folkestone and Hythe District Council's "
+        "website. It is not an official canvass: the Elections Centre says the results of the years after the 1973 "
+        "reorganisation were collected by Alan Willis largely from local newspaper reports, and those from the "
+        "mid-1980s on from the council. It prints each ward's electorate and seats, each candidate's name, party, "
+        "and votes, the elected candidates in bold, and the turnout as a percentage, but no ballot count, so turnout "
+        "is not stored. It gives no polling days; each election is dated to the day England's district councils "
+        "polled that year. Figures were read from the scan by OCR and checked against the printed vote shares.",
+    },
 ]
 CALDERDALE_ELECTIONS = {
     2: (date(1999, 5, 6), "Election of Local Councillors 1999"),
@@ -262,6 +284,28 @@ SURREY_DAYS = {
 HELD = {(SURREY, 2005)}
 KENT_DAYS = {1997: date(1997, 5, 1), 2001: date(2001, 6, 7)}
 DOVER_DIVISIONS = {"Deal East", "Deal West", "Dover Central", "Dover Rural", "Dover South", "Dover West", "Sandwich"}
+SHEPWAY_DAYS = {
+    1973: date(1973, 6, 7),
+    1976: date(1976, 5, 6),
+    1979: date(1979, 5, 3),
+    1983: date(1983, 5, 5),
+    1987: date(1987, 5, 7),
+    1991: date(1991, 5, 2),
+    1995: date(1995, 5, 4),
+    1999: date(1999, 5, 6),
+}
+SCAN_DPI = 300
+SCAN_COLUMNS = ((180, 870), (880, 1570), (1580, 2270))
+SCAN_ROWS = (150, 3250)
+SCAN_PARTIES = {
+    "Con": "Conservative",
+    "Lab": "Labour",
+    "Lib": "Liberal",
+    "LD": "Liberal Democrat",
+    "Lib/SDP": "SDP/Lib All",
+    "Ind": "Independent",
+}
+JUNK = re.compile(r"^[^A-Za-z]*(?:[|_=\"'.:,;]\s*)+")
 MONTHS = {
     month: index
     for index, month in enumerate(
@@ -283,6 +327,7 @@ PARTIES = {
     **dict.fromkeys(
         (
             "Labour Party",
+            "Labour",
             "Lab",
             "The Labour Party Candidate",
             "Labour Party Candidate",
@@ -334,6 +379,7 @@ PARTIES = {
     "British National Party": ("gb.party", "british-national-party"),
     "BNP": ("gb.party", "british-national-party"),
     "Communist": ("wikidata", "Q592068"),
+    "Liberal": ("wikidata", "Q622441"),
 }
 INDEPENDENT = {"Independent", "Ind"}
 
@@ -756,19 +802,213 @@ def calderdale() -> tuple[list[dict], list[dict]]:
     return rows, wards
 
 
+def ocr_lines(image: Image.Image, left: int, top: int) -> list[list[dict]]:
+    with tempfile.NamedTemporaryFile(suffix=".png") as handle:
+        image.save(handle.name)
+        out = subprocess.run(
+            ["tesseract", handle.name, "-", "--psm", "6", "tsv"], capture_output=True, text=True, check=True
+        ).stdout
+    grouped: dict[tuple[str, str, str], list[dict]] = {}
+    for row in csv.DictReader(io.StringIO(out), delimiter="\t", quoting=csv.QUOTE_NONE):
+        if row["level"] == "5" and row["text"].strip():
+            x, y, width, height = (int(row[key]) for key in ("left", "top", "width", "height"))
+            word = {"text": row["text"], "box": (left + x, top + y, left + x + width, top + y + height)}
+            grouped.setdefault((row["block_num"], row["par_num"], row["line_num"]), []).append(word)
+    return list(grouped.values())
+
+
+def ink(image: Image.Image, x: int, y: int) -> bool:
+    value = image.getpixel((x, y))
+    return isinstance(value, int | float) and value < 128
+
+
+def stroke(image: Image.Image, words: list[dict]) -> float:
+    runs: list[int] = []
+    for word in words:
+        x0, y0, x1, y1 = word["box"]
+        crop = image.crop((x0, y0, x1, y1))
+        for y in range(crop.height):
+            run = 0
+            for x in range(crop.width):
+                if ink(crop, x, y):
+                    run += 1
+                elif run:
+                    runs.append(run)
+                    run = 0
+            if run:
+                runs.append(run)
+    return sum(runs) / max(len(runs), 1)
+
+
+def superscript(image: Image.Image, words: list[dict]) -> int:
+    x0 = min(w["box"][0] for w in words)
+    y0 = min(w["box"][1] for w in words)
+    x1 = max(w["box"][2] for w in words)
+    y1 = max(w["box"][3] for w in words)
+    crop = image.crop((x0, y0, x1 + 40, y1))
+    middle = crop.height // 2
+    edge = max(
+        (x for x in range(crop.width) if any(ink(crop, x, y) for y in range(middle, crop.height))),
+        default=0,
+    )
+    tail = crop.crop((edge + 1, 0, crop.width, middle + 2))
+    if not any(ink(tail, x, y) for x in range(tail.width) for y in range(tail.height)):
+        return 1
+    big = Image.new("L", (tail.width * 4 + 80, tail.height * 4 + 80), 255)
+    big.paste(tail.resize((tail.width * 4, tail.height * 4)), (40, 40))
+    with tempfile.NamedTemporaryFile(suffix=".png") as handle:
+        big.save(handle.name)
+        digit = subprocess.run(
+            ["tesseract", handle.name, "-", "--psm", "10", "-c", "tessedit_char_whitelist=23456"],
+            capture_output=True,
+            text=True,
+            check=True,
+        ).stdout.strip()
+    if not digit.isdigit():
+        raise ValueError(f"unreadable seat count beside {' '.join(w['text'] for w in words)}")
+    return int(digit)
+
+
+def scan_name(text: str) -> str:
+    tokens = [t for t in text.replace("*", " ").split() if t != "Ms."]
+    initials = [t for t in tokens if re.fullmatch(r"[A-Z]\.", t)]
+    surname = " ".join(t for t in tokens if t not in initials)
+    return " ".join([*initials, surname])
+
+
+def shepway(entry: dict) -> tuple[list[dict], list[dict]]:
+    path = str(raw.cached(SOURCE, entry["file"]).path)
+    rows: list[dict] = []
+    wards: list[dict] = []
+    year = 0
+    errors: list[str] = []
+    with tempfile.TemporaryDirectory() as folder:
+        subprocess.run(
+            ["pdftoppm", "-r", str(SCAN_DPI), "-gray", "-png", "-f", "3", "-l", "10", path, f"{folder}/page"],
+            check=True,
+            capture_output=True,
+        )
+        for image_path in sorted(Path(folder).glob("page-*.png")):
+            page = int(image_path.stem.split("-")[1])
+            image = Image.open(image_path).convert("L")
+            size = image.size
+            for left, right in SCAN_COLUMNS:
+                state, heading, pending = "heading", [], ""
+                for line in ocr_lines(image.crop((left, SCAN_ROWS[0], right, SCAN_ROWS[1])), left, SCAN_ROWS[0]):
+                    text = " ".join(w["text"] for w in line)
+                    title = re.search(r"Shepway - (\d{4})", text)
+                    if title:
+                        year = int(title[1])
+                        state, heading = "heading", []
+                        continue
+                    if year not in SHEPWAY_DAYS:
+                        continue
+                    if state == "heading":
+                        if re.search(r"vote share$", text):
+                            joined = " ".join(w["text"] for w in heading)
+                            at = max(i for i, w in enumerate(heading) if re.search(r"\(\d[\d,]*\)", w["text"]))
+                            electorate = int(found(r"\((\d[\d,]*)\)", heading[at]["text"])[1].replace(",", ""))
+                            name = joined[: joined.rindex("(" + found(r"\((\d[\d,]*)\)", heading[at]["text"])[1])]
+                            ward = {
+                                "name": JUNK.sub("", name).strip(),
+                                "code": entry["code"],
+                                "day": SHEPWAY_DAYS[year],
+                                "registered": electorate,
+                                "seats": superscript(image, heading[at:]),
+                                "registered_box": fraction(heading[at]["box"], size),
+                                "page": page,
+                            }
+                            wards.append(ward)
+                            state = "candidates"
+                        else:
+                            heading += line
+                        continue
+                    turnout = re.search(r"Turnout ([\d.]+) (\S+)$", text)
+                    if turnout:
+                        state, heading = "heading", []
+                        continue
+                    text = re.sub(r" [|l]\.", " I.", JUNK.sub("", text))
+                    match = re.fullmatch(
+                        r"(.*?[A-Z]\.?(?: Ms\.)?\*?) ((?!Ms\.|\*)\D+?) =?\s*(\d[\d,]*) (\S+)",
+                        re.sub(r"([a-z])([A-Z]\.)", r"\1 \2", text),
+                    )
+                    if match is None:
+                        if re.fullmatch(r"[A-Za-z' -]+-", text):
+                            pending = text
+                            continue
+                        errors.append(f"Shepway {year} page {page}: {text}")
+                        continue
+                    words_ = [w for w in line if any(c.isalpha() for c in w["text"])][: len(match[1].split())]
+                    votes_word = next(w for w in line if w["text"].replace(",", "") == match[3].replace(",", ""))
+                    rows.append(
+                        candidate(
+                            entry,
+                            wards[-1],
+                            page,
+                            scan_name(pending + match[1]),
+                            SCAN_PARTIES.get(match[2], match[2]),
+                            int(match[3].replace(",", "")),
+                            False,
+                        )
+                        | {"stroke": stroke(image, words_), "share": match[4], "box": fraction(votes_word["box"], size)}
+                    )
+                    pending = ""
+    for ward in wards:
+        lines_ = [row for row in rows if row["at"] is ward]
+        seats = ward["seats"]
+        if all(row["votes"] == 0 for row in lines_):
+            if len(lines_) != seats:
+                errors.append(f"Shepway {ward['day']} {ward['name']}: {len(lines_)} unopposed for {seats} seats")
+            for row in lines_:
+                row.update(votes=None, elected=True)
+            continue
+        shared = [row for row in lines_ if re.fullmatch(r"\d+\.\d", row["share"])]
+        total = sum(row["votes"] for row in shared)
+        for row in shared:
+            if abs(100 * row["votes"] / total - float(row["share"])) > 0.051:
+                errors.append(
+                    f"Shepway {ward['day']} {ward['name']}: {row['name']} {row['votes']} is not {row['share']}%"
+                )
+        ranked = sorted(lines_, key=lambda row: -row["stroke"])
+        bold, plain = ranked[:seats], ranked[seats:]
+        if len(lines_) < seats or min(r["stroke"] for r in bold) - max((r["stroke"] for r in plain), default=0) < 0.2:
+            errors.append(f"Shepway {ward['day']} {ward['name']}: bold names unclear")
+        for row in bold:
+            row["elected"] = True
+    if errors:
+        raise ValueError("\n".join(errors))
+    for row in rows:
+        del row["stroke"], row["share"]
+    return rows, wards
+
+
+def fraction(box: tuple[int, int, int, int], size: tuple[int, int]) -> list[float]:
+    return [
+        round(box[0] / size[0], 5),
+        round(box[1] / size[1], 5),
+        round(box[2] / size[0], 5),
+        round(box[3] / size[1], 5),
+    ]
+
+
 def parse() -> None:
     rows: list[dict] = []
     wards: list[dict] = []
     for entry in FILES:
+        if entry["parser"] == "shepway":
+            continue
         parser = {"kent-2001": kent_2001, "kent-handbook": kent_handbook, "surrey": surrey}.get(entry["parser"], table)
         found_rows, found_wards = parser(entry)
         for ward in found_wards:
             ward.setdefault("day", entry["day"])
         rows += found_rows
         wards += found_wards
-    found_rows, found_wards = calderdale()
-    rows += found_rows
-    wards += found_wards
+    for found_rows, found_wards in (
+        calderdale(),
+        *(shepway(entry) for entry in FILES if entry["parser"] == "shepway"),
+    ):
+        rows += found_rows
+        wards += found_wards
     for row in rows:
         ward = row.pop("at")
         row["name"] = FIXES.get(row["name"], re.sub(r"(\w)- (\w)", r"\1-\2", row["name"]))
@@ -815,6 +1055,7 @@ def parse() -> None:
                 "ballots": ballots,
                 "rejected": rejected,
                 "over": over,
+                "registered_box": info.get("registered_box"),
             }
         )
     frame = frame.join(pl.DataFrame(extra, infer_schema_length=None), on=["code", "day", "ward"], how="left")
@@ -860,7 +1101,7 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary="English council elections from 1965 to 2001 by ward, from council-published results in Dover, "
-            "Kent, Epsom and Ewell, Surrey, Bedford, and Calderdale",
+            "Kent, Epsom and Ewell, Surrey, Bedford, Calderdale, and Shepway",
             polity="GB",
         )
         outranked = foreign_preferred(conn, cs, SOURCE)
@@ -882,21 +1123,82 @@ def emit() -> Path:
             raise ValueError("a party this pipeline links is not in the archive")
 
         sources: dict[str, UUID] = {}
+        artifacts: dict[str, tuple[raw.Artifact, UUID]] = {}
         for entry in FILES:
             sources[entry["file"]] = cs.source(entry["publisher"], entry["title"])
+            licensed = entry.get("license", "Open Government Licence v3.0") is not None
             cs.add(
                 "source",
                 id=sources[entry["file"]],
-                kind="official_body",
+                kind=entry.get("kind", "official_body"),
                 publisher=entry["publisher"],
                 title=entry["title"],
                 url=entry["file"],
-                license="Open Government Licence v3.0",
-                license_url=OGL,
-                attribution="Contains public sector information licensed under the Open Government Licence v3.0.",
+                license="Open Government Licence v3.0" if licensed else None,
+                license_url=OGL if licensed else None,
+                attribution="Contains public sector information licensed under the Open Government Licence v3.0."
+                if licensed
+                else None,
                 notes=entry["notes"],
             )
-            cs.artifact(raw.cached(SOURCE, entry["file"]), sources[entry["file"]])
+            artifact = raw.cached(SOURCE, entry["file"])
+            artifacts[entry["file"]] = (artifact, cs.artifact(artifact, sources[entry["file"]]))
+        page_ids: dict[tuple[str, int], UUID] = {}
+
+        def page(file: str, number: int) -> UUID:
+            if (file, number) not in page_ids:
+                artifact, artifact_id = artifacts[file]
+                image = PAGES / f"{artifact.sha256}-{number}.png"
+                if not image.exists():
+                    PAGES.mkdir(parents=True, exist_ok=True)
+                    subprocess.run(
+                        ["pdftoppm", "-r", "100", "-png", "-f", str(number), "-l", str(number), "-singlefile"]
+                        + [str(artifact.path), str(image.with_suffix(""))],
+                        check=True,
+                    )
+                width, height = Image.open(image).size
+                page_ids[(file, number)] = cs.page(artifact_id, number)
+                cs.add(
+                    "source_page",
+                    id=page_ids[(file, number)],
+                    artifact_id=artifact_id,
+                    page_number=number,
+                    image_key=f"pages/{SOURCE}/{image.name}",
+                    width=width,
+                    height=height,
+                )
+            return page_ids[(file, number)]
+
+        def figure(result_set: UUID, unit: UUID, option: UUID | None, measure: int, value: int, line: dict, box):
+            cs.add(
+                "result_value",
+                result_set_id=result_set,
+                unit_id=unit,
+                option_id=option,
+                channel=0,
+                measure=measure,
+                count_round=0,
+                flags=DIGITIZED if box is not None else 0,
+                value=value,
+            )
+            if box is None:
+                return
+            cs.add(
+                "value_locator",
+                result_set_id=result_set,
+                unit_id=unit,
+                option_id=option,
+                channel=0,
+                measure=measure,
+                count_round=0,
+                page_id=page(line["file"], line["page"]),
+                source_id=None,
+                x0=box[0],
+                y0=box[1],
+                x1=box[2],
+                y1=box[3],
+            )
+
         calderdale_source = cs.source("Calderdale Council", "Election results, 1999 and 2000")
         cs.add(
             "source",
@@ -949,7 +1251,7 @@ def emit() -> Path:
                         date_to=day,
                         status="held",
                     )
-                    wales = day.year in (1985, 1987, 1989, 1991, 1993, 1995)
+                    wales = day.year in (1976, 1979, 1983, 1985, 1987, 1989, 1991, 1993, 1995)
                     name(national, f"{day.year} local elections in England{' and Wales' if wales else ''}")
                     cs.add("slug", path=f"gb/{day}-local", entity_id=national)
             election = cs.key("gb.election", f"{stamp}:local:{code}")
@@ -974,6 +1276,13 @@ def emit() -> Path:
                         election,
                         f"Only the {wards} divisions in Epsom and Ewell are loaded, from the borough council's "
                         "history of the county elections; the county's other divisions are not in the archive yet.",
+                    )
+                if code == SHEPWAY:
+                    caveat(
+                        election,
+                        "These results come from the Elections Centre's compilation of Shepway results, read from a "
+                        "scan; for the early years it relied largely on local newspaper reports, not the council's "
+                        "declarations.",
                     )
                 if precision == "month" and not by:
                     caveat(election, f"The source gives the month of the poll, {day:%B %Y}, not the day.")
@@ -1080,17 +1389,7 @@ def emit() -> Path:
                         is_independent=description in INDEPENDENT,
                     )
                     if not tacit:
-                        cs.add(
-                            "result_value",
-                            result_set_id=result_set,
-                            unit_id=unit,
-                            option_id=option,
-                            channel=0,
-                            measure=VOTES,
-                            count_round=0,
-                            flags=0,
-                            value=line["votes"],
-                        )
+                        figure(result_set, unit, option, VOTES, line["votes"], line, line.get("box"))
                     if line["elected"] or tacit:
                         cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected")
                 if tacit:
@@ -1108,15 +1407,6 @@ def emit() -> Path:
                 for measure, field in ((REGISTERED, "registered"), (BALLOTS, "ballots"), (INVALID, "rejected")):
                     if first[field] is None:
                         continue
-                    cs.add(
-                        "result_value",
-                        result_set_id=result_set,
-                        unit_id=unit,
-                        option_id=None,
-                        channel=0,
-                        measure=measure,
-                        count_round=0,
-                        flags=0,
-                        value=first[field],
-                    )
+                    box = first.get("registered_box") if measure == REGISTERED else None
+                    figure(result_set, unit, None, measure, first[field], first, box)
         return cs.write()
