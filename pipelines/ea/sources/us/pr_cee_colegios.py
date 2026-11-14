@@ -156,8 +156,8 @@ def emit() -> Path:
                 cs.add("result_set", **dict(zip(columns, prior, strict=True)), is_default=False)
             for option, kind, seats in conn.execute(
                 """select o.option_id, o.kind, o.seats from outcome o
-                   join result_set rs on rs.id = o.result_set_id and rs.is_default where rs.contest_id = %s and rs.id <> %s""",
-                [contest, result_set],
+                   join result_set rs on rs.id = o.result_set_id and rs.is_default where rs.contest_id = %s""",
+                [contest],
             ).fetchall():
                 cs.add("outcome", result_set_id=result_set, option_id=option, kind=kind, seats=seats)
             cs.add(
