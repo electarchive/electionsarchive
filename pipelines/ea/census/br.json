@@ -353,6 +353,12 @@
       "publisher": "Tribunal Superior Eleitoral",
       "url": "https://cdn.tse.jus.br/estatistica/sead/odsele/detalhe_votacao_munzona/detalhe_votacao_munzona_2022.zip",
       "kind": "official_body"
+    },
+    "wp-eleicoes-br": {
+      "title": "Eleições no Brasil (navigation template listing each general election year)",
+      "publisher": "Wikipedia",
+      "url": "https://pt.wikipedia.org/wiki/Predefini%C3%A7%C3%A3o:Elei%C3%A7%C3%B5es_no_Brasil",
+      "kind": "community"
     }
   },
   "tiers": [
@@ -1641,7 +1647,7 @@
       "measure": {
         "unit": "contest"
       },
-      "note": "States whose constitutions created a vice governor elected it on its own ballot, on the gubernatorial election day, until the 1966 indirect elections; since 1982 the vice governor runs on the governor's ticket. Not every state had the office, so this class has no enumerated counts.",
+      "note": "States whose constitutions created a vice governor elected it on its own ballot, on the gubernatorial election day, until the 1966 indirect elections; since 1982 the vice governor runs on the governor's ticket. Not every state had the office, so this class has no enumerated counts. No state-level election dates are published: the TSE chronology lists only the federal calendar and the constitutions of each state set their own, so dates are a gap.",
       "source": "tse-cronologia",
       "valid_from": "1947-01-01",
       "valid_to": "1966-01-01",
@@ -1934,7 +1940,92 @@
       ],
       "est_votes": 800000,
       "effort": 5,
-      "dates": []
+      "dates": [
+        {
+          "date": "1890-01-01",
+          "precision": "year",
+          "source": "wp-eleicoes-br",
+          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+        },
+        {
+          "date": "1893-01-01",
+          "precision": "year",
+          "source": "wp-eleicoes-br",
+          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+        },
+        {
+          "date": "1896-01-01",
+          "precision": "year",
+          "source": "wp-eleicoes-br",
+          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+        },
+        {
+          "date": "1899-01-01",
+          "precision": "year",
+          "source": "wp-eleicoes-br",
+          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+        },
+        {
+          "date": "1903-01-01",
+          "precision": "year",
+          "source": "wp-eleicoes-br",
+          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+        },
+        {
+          "date": "1906-01-01",
+          "precision": "year",
+          "source": "wp-eleicoes-br",
+          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+        },
+        {
+          "date": "1909-01-01",
+          "precision": "year",
+          "source": "wp-eleicoes-br",
+          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+        },
+        {
+          "date": "1912-01-01",
+          "precision": "year",
+          "source": "wp-eleicoes-br",
+          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+        },
+        {
+          "date": "1915-01-01",
+          "precision": "year",
+          "source": "wp-eleicoes-br",
+          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+        },
+        {
+          "date": "1918-01-01",
+          "precision": "year",
+          "source": "wp-eleicoes-br",
+          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+        },
+        {
+          "date": "1921-01-01",
+          "precision": "year",
+          "source": "wp-eleicoes-br",
+          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+        },
+        {
+          "date": "1924-01-01",
+          "precision": "year",
+          "source": "wp-eleicoes-br",
+          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+        },
+        {
+          "date": "1927-01-01",
+          "precision": "year",
+          "source": "wp-eleicoes-br",
+          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+        },
+        {
+          "date": "1930-01-01",
+          "precision": "year",
+          "source": "wp-eleicoes-br",
+          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+        }
+      ]
     },
     {
       "key": "empire_chamber",
@@ -1952,7 +2043,140 @@
       "match": [],
       "est_votes": 150000,
       "effort": 5,
-      "dates": []
+      "dates": [
+        {
+          "date": "1826-01-01",
+          "precision": "year",
+          "source": "wp-eleicoes-br",
+          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+        },
+        {
+          "date": "1830-01-01",
+          "precision": "year",
+          "source": "wp-eleicoes-br",
+          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+        },
+        {
+          "date": "1834-01-01",
+          "precision": "year",
+          "source": "wp-eleicoes-br",
+          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+        },
+        {
+          "date": "1838-01-01",
+          "precision": "year",
+          "source": "wp-eleicoes-br",
+          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+        },
+        {
+          "date": "1840-01-01",
+          "precision": "year",
+          "source": "wp-eleicoes-br",
+          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+        },
+        {
+          "date": "1842-01-01",
+          "precision": "year",
+          "source": "wp-eleicoes-br",
+          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+        },
+        {
+          "date": "1844-01-01",
+          "precision": "year",
+          "source": "wp-eleicoes-br",
+          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+        },
+        {
+          "date": "1847-01-01",
+          "precision": "year",
+          "source": "wp-eleicoes-br",
+          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+        },
+        {
+          "date": "1849-01-01",
+          "precision": "year",
+          "source": "wp-eleicoes-br",
+          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+        },
+        {
+          "date": "1853-01-01",
+          "precision": "year",
+          "source": "wp-eleicoes-br",
+          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+        },
+        {
+          "date": "1856-01-01",
+          "precision": "year",
+          "source": "wp-eleicoes-br",
+          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+        },
+        {
+          "date": "1860-01-01",
+          "precision": "year",
+          "source": "wp-eleicoes-br",
+          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+        },
+        {
+          "date": "1863-01-01",
+          "precision": "year",
+          "source": "wp-eleicoes-br",
+          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+        },
+        {
+          "date": "1867-01-01",
+          "precision": "year",
+          "source": "wp-eleicoes-br",
+          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+        },
+        {
+          "date": "1869-01-01",
+          "precision": "year",
+          "source": "wp-eleicoes-br",
+          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+        },
+        {
+          "date": "1872-01-01",
+          "precision": "year",
+          "source": "wp-eleicoes-br",
+          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+        },
+        {
+          "date": "1876-01-01",
+          "precision": "year",
+          "source": "wp-eleicoes-br",
+          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+        },
+        {
+          "date": "1878-01-01",
+          "precision": "year",
+          "source": "wp-eleicoes-br",
+          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+        },
+        {
+          "date": "1881-01-01",
+          "precision": "year",
+          "source": "wp-eleicoes-br",
+          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+        },
+        {
+          "date": "1884-01-01",
+          "precision": "year",
+          "source": "wp-eleicoes-br",
+          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+        },
+        {
+          "date": "1886-01-01",
+          "precision": "year",
+          "source": "wp-eleicoes-br",
+          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+        },
+        {
+          "date": "1889-01-01",
+          "precision": "year",
+          "source": "wp-eleicoes-br",
+          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+        }
+      ]
     },
     {
       "key": "state_supplementary",
