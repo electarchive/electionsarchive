@@ -1,0 +1,79 @@
+{
+  "polity": "US-NH",
+  "publisher": "New Hampshire Secretary of State",
+  "title": "Manual for the General Court of New Hampshire 1953, general election returns, summary by counties (general election 1952-11-04)",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/manualforgeneral33newh/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/manualforgeneral33newh"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1952,
+      "chamber": "president",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "NH",
+      "district": null
+    },
+    "governor": {
+      "year": 1952,
+      "chamber": "governor",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "NH",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 639,
+      "id": "639-0",
+      "columns": [
+        {
+          "label": "Eisenhower and Nixon, r",
+          "contest": "president",
+          "candidate": "Dwight D. Eisenhower (Republican)"
+        },
+        {
+          "label": "Stevenson and Sparkman, d",
+          "contest": "president",
+          "candidate": "Adlai Stevenson (Democratic)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.112,
+        0.15,
+        0.553,
+        0.544
+      ],
+      "hint": "Read only the table headed 'Summary by Counties: For Electors of President and Vice-President'; ignore any other table visible in the image."
+    },
+    {
+      "page": 639,
+      "id": "639-1",
+      "columns": [
+        {
+          "label": "Gregg, Hugh, r",
+          "contest": "governor",
+          "candidate": "Hugh Gregg"
+        },
+        {
+          "label": "Craig, William H., d",
+          "contest": "governor",
+          "candidate": "William H. Craig"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.112,
+        0.536,
+        0.553,
+        0.889
+      ],
+      "hint": "Read only the table headed 'Summary by Counties: Governor'; ignore any other table visible in the image."
+    }
+  ]
+}

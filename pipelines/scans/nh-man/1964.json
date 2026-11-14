@@ -1,0 +1,79 @@
+{
+  "polity": "US-NH",
+  "publisher": "New Hampshire Secretary of State",
+  "title": "Manual for the General Court of New Hampshire 1965, general election returns, summary by counties (general election 1964-11-03)",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/manualforgeneral39newh/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/manualforgeneral39newh"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1964,
+      "chamber": "president",
+      "day": "1964-11-03",
+      "special": false,
+      "state": "NH",
+      "district": null
+    },
+    "governor": {
+      "year": 1964,
+      "chamber": "governor",
+      "day": "1964-11-03",
+      "special": false,
+      "state": "NH",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 680,
+      "id": "680-0",
+      "columns": [
+        {
+          "label": "Goldwater and Miller, r",
+          "contest": "president",
+          "candidate": "Barry Goldwater (Republican)"
+        },
+        {
+          "label": "Johnson and Humphrey, d",
+          "contest": "president",
+          "candidate": "Lyndon B. Johnson (Democratic)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.08,
+        0.108,
+        0.511,
+        0.408
+      ],
+      "hint": "Read only the table headed 'SUMMARY BY COUNTIES November 3, 1964 (For Electors of President and Vice-President)'; ignore any other table visible in the image."
+    },
+    {
+      "page": 680,
+      "id": "680-1",
+      "columns": [
+        {
+          "label": "Pillsbury, r",
+          "contest": "governor",
+          "candidate": "John Pillsbury"
+        },
+        {
+          "label": "King, d",
+          "contest": "governor",
+          "candidate": "John W. King"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.693,
+        0.465,
+        0.897,
+        0.754
+      ],
+      "hint": "Read only the table headed 'SUMMARY BY COUNTIES November 3, 1964 (For Governor)'; ignore any other table visible in the image."
+    }
+  ]
+}

@@ -1,0 +1,141 @@
+{
+  "polity": "US-NH",
+  "publisher": "New Hampshire Secretary of State",
+  "title": "Manual for the General Court of New Hampshire 1969, general election returns, summary by counties (general election 1968-11-05)",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/manualforgeneral41newh/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/manualforgeneral41newh"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1968,
+      "chamber": "president",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "NH",
+      "district": null
+    },
+    "governor": {
+      "year": 1968,
+      "chamber": "governor",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "NH",
+      "district": null
+    },
+    "senate": {
+      "year": 1968,
+      "chamber": "senate",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "NH",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 748,
+      "id": "748-0",
+      "columns": [
+        {
+          "label": "Nixon and Agnew, r",
+          "contest": "president",
+          "candidate": "Richard Nixon (Republican)"
+        },
+        {
+          "label": "Humphrey and Muskie, d",
+          "contest": "president",
+          "candidate": "Hubert H. Humphrey (Democratic)"
+        },
+        {
+          "label": "New Party",
+          "contest": "president",
+          "candidate": "New Party"
+        },
+        {
+          "label": "Wallace and Griffin",
+          "contest": "president",
+          "candidate": "George Wallace (American Independent)"
+        },
+        {
+          "label": "Halstead and Boutelle",
+          "contest": "president",
+          "candidate": "Socialist Workers"
+        },
+        {
+          "label": "Scattering",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.104,
+        0.12,
+        0.913,
+        0.442
+      ],
+      "hint": "Read only the table headed 'SUMMARY BY COUNTIES November 5, 1968'; ignore any other table visible in the image."
+    },
+    {
+      "page": 760,
+      "id": "760-0",
+      "columns": [
+        {
+          "label": "Peterson, r",
+          "contest": "governor",
+          "candidate": "Walter R. Peterson"
+        },
+        {
+          "label": "Bussiere, d",
+          "contest": "governor",
+          "candidate": "Emile R. Bussiere"
+        },
+        {
+          "label": "Scattering",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.067,
+        0.126,
+        0.59,
+        0.439
+      ],
+      "hint": "Read only the table headed 'Governor'; ignore any other table visible in the image."
+    },
+    {
+      "page": 760,
+      "id": "760-1",
+      "columns": [
+        {
+          "label": "Cotton, r",
+          "contest": "senate",
+          "candidate": "Norris Cotton"
+        },
+        {
+          "label": "King, d",
+          "contest": "senate",
+          "candidate": "John W. King"
+        },
+        {
+          "label": "Scattering",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.577,
+        0.13,
+        0.879,
+        0.439
+      ],
+      "hint": "Read only the table headed 'Senator'; ignore any other table visible in the image."
+    }
+  ]
+}

@@ -1,0 +1,111 @@
+{
+  "polity": "US-NH",
+  "publisher": "New Hampshire Secretary of State",
+  "title": "Manual for the General Court of New Hampshire 1961, general election returns, summary by counties (general election 1960-11-08)",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/manualforgeneral37newh/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/manualforgeneral37newh"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1960,
+      "chamber": "president",
+      "day": "1960-11-08",
+      "special": false,
+      "state": "NH",
+      "district": null
+    },
+    "governor": {
+      "year": 1960,
+      "chamber": "governor",
+      "day": "1960-11-08",
+      "special": false,
+      "state": "NH",
+      "district": null
+    },
+    "senate": {
+      "year": 1960,
+      "chamber": "senate",
+      "day": "1960-11-08",
+      "special": false,
+      "state": "NH",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 597,
+      "id": "597-0",
+      "columns": [
+        {
+          "label": "Nixon and Lodge, r",
+          "contest": "president",
+          "candidate": "Richard Nixon (Republican)"
+        },
+        {
+          "label": "Kennedy and Johnson, d",
+          "contest": "president",
+          "candidate": "John F. Kennedy (Democratic)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.115,
+        0.123,
+        0.54,
+        0.417
+      ],
+      "hint": "Read only the table headed 'Summary by Counties, November 8, 1960: For Electors of President and Vice-President'; ignore any other table visible in the image."
+    },
+    {
+      "page": 597,
+      "id": "597-1",
+      "columns": [
+        {
+          "label": "Powell, r",
+          "contest": "governor",
+          "candidate": "Wesley Powell"
+        },
+        {
+          "label": "Boutin, d",
+          "contest": "governor",
+          "candidate": "Bernard L. Boutin"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.619,
+        0.471,
+        0.782,
+        0.759
+      ],
+      "hint": "Read only the table headed 'Summary by Counties, November 8, 1960: Governor'; ignore any other table visible in the image."
+    },
+    {
+      "page": 597,
+      "id": "597-2",
+      "columns": [
+        {
+          "label": "Bridges, r",
+          "contest": "senate",
+          "candidate": "Styles Bridges"
+        },
+        {
+          "label": "Hill, d",
+          "contest": "senate",
+          "candidate": "Herbert W. Hill"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.768,
+        0.471,
+        0.925,
+        0.759
+      ],
+      "hint": "Read only the table headed 'Summary by Counties, November 8, 1960: U. S. Senator'; ignore any other table visible in the image."
+    }
+  ]
+}
