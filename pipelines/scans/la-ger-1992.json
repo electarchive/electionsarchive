@@ -1,0 +1,166 @@
+{
+  "polity": "US-LA",
+  "publisher": "Louisiana Secretary of State",
+  "title": "General Election Returns, November 3, 1992",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706945_0380/micro_IA40706945_0380.pdf",
+    "item": "https://archive.org/details/micro_IA40706945_0380"
+  },
+  "raw_source": "us.sri",
+  "contests": {
+    "president": {
+      "year": 1992,
+      "chamber": "president",
+      "day": "1992-11-03",
+      "special": false,
+      "state": "LA",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "Democra",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republi",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "America",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Equal J",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Indepen",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Justice",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Liberta",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Louisia",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "More Pe",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Natural",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Prudenc",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.108,
+        0.279,
+        0.889,
+        1.0
+      ],
+      "hint": "Read only the table headed 'OFFICE: Presidential Electors (One to be Elected)'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0666
+      ]
+    },
+    {
+      "page": 5,
+      "id": "5-0",
+      "columns": [
+        {
+          "label": "Democra",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republi",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "America",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Equal J",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Indepen",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Justice",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Liberta",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Louisia",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "More Pe",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Natural",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Prudenc",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.108,
+        0.0,
+        0.889,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings."
+    }
+  ]
+}
