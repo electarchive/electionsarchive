@@ -833,7 +833,7 @@ def parse() -> None:
                 and all(line["percent"] is None for line in lines)
             ):
                 mine = ["read once, with no majority or shares to check it"]
-            for fix in fixes.pop((volume, item["page"], division["number"]), []):
+            for fix in fixes.pop((volume, item["page"], f"{key}:{division['number']}"), []):
                 lines = fixed(division, lines, fix)
                 mine = [] if fix["field"] == "checked" else issues(division, lines)
             if mine:
