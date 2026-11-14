@@ -18,7 +18,7 @@ import {
 } from "node:fs/promises";
 import path from "node:path";
 import * as v from "valibot";
-import type { Prose } from "#lib/contrib.js";
+import type { Prose } from "#lib/prose.js";
 import type { Reads } from "#lib/server/reads.js";
 import { natural } from "#lib/format.js";
 import { pollsClose } from "#lib/live/closes.js";

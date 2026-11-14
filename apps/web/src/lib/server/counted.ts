@@ -1,7 +1,7 @@
 import { getRequestEvent } from "$app/server";
 import { sql } from "drizzle-orm";
-import { roles } from "#lib/server/contrib.js";
 import { liveDb as db } from "#lib/server/db/index.js";
+import { isAdmin } from "#lib/server/roles.js";
 import { names } from "#lib/server/rpc/archive.js";
 
 const UTC = sql.raw(`'YYYY-MM-DD"T"HH24:MI:SS"Z"'`);
@@ -30,19 +30,19 @@ export type Counted = {
 };
 
 async function shown() {
-  const [found, role] = await Promise.all([
+  const [found, admin] = await Promise.all([
     db.execute<{ isShown: boolean }>(sql`
       select coalesce((select shown from live.switch where name = 'results'), false) as "isShown"
     `),
     (async () => {
       try {
-        return await roles(getRequestEvent().locals.user?.id);
+        return await isAdmin(getRequestEvent().locals.user?.id);
       } catch {
-        return { admin: false, reviewer: false };
+        return false;
       }
     })(),
   ]);
-  return { isShown: found.rows[0]?.isShown ?? false, isAdmin: role.admin };
+  return { isShown: found.rows[0]?.isShown ?? false, isAdmin: admin };
 }
 
 async function tally(contest: string, date: string): Promise<Tally | null> {

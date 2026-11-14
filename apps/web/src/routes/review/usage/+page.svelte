@@ -1,5 +1,4 @@
 <script lang="ts">
-  import Tabs from "#routes/review/tabs.svelte";
   import { count, date } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import type { PageData } from "./$types";
@@ -12,7 +11,7 @@
 </script>
 
 <svelte:head>
-  <title>{m.usage_title()} | {m.review_title()}</title>
+  <title>{m.usage_title()}</title>
   <meta name="robots" content="noindex" />
 </svelte:head>
 
@@ -32,8 +31,7 @@
 {/snippet}
 
 <main class="mx-auto px-4 pbs-6 pbe-24 max-inline-5xl max-sm:px-3">
-  <h1 class="title">{m.review_title()}</h1>
-  <Tabs current="usage" />
+  <h1 class="title">{m.usage_title()}</h1>
   {#if !data.allowed}
     <p class="mbs-4 text-sm text-muted-foreground">{m.usage_forbidden()}</p>
   {:else if data.report == null}

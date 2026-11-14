@@ -1,6 +1,5 @@
 import type { InferRouterOutputs } from "@orpc/server";
 import type { RequestEvent } from "@sveltejs/kit";
-import { READ_ONLY } from "$app/env/public";
 import { error, isHttpError, isRedirect, redirect } from "@sveltejs/kit";
 import type { Column, Counts, Tier } from "#lib/coverage.js";
 import type { Counted } from "#lib/server/counted.js";
@@ -649,7 +648,7 @@ export async function twin(
   }
   const varies = asked == null ? "Accept, User-Agent" : "Accept";
   if (
-    /^\/(?:agents|proposals|bounties|recent|changelog|downloads(?:\/\d{4}\.\d{2}(?:\.\d{2})?)?)$/.test(
+    /^\/(?:agents|recent|changelog|downloads(?:\/\d{4}\.\d{2}(?:\.\d{2})?)?)$/.test(
       url.pathname,
     )
   ) {
@@ -664,7 +663,7 @@ export async function twin(
     return response;
   }
   if (
-    /^\/(?:api|rpc|lab|_app|llms\.txt|robots\.txt|sitemap\.xml|sitemaps|og|agents|proposals|bounties|recent|watchlist|history|changelog|downloads)(?:\/|\.|$)/.test(
+    /^\/(?:api|rpc|lab|_app|llms\.txt|robots\.txt|sitemap\.xml|sitemaps|og|agents|recent|history|changelog|downloads)(?:\/|\.|$)/.test(
       url.pathname,
     )
   ) {
@@ -1352,12 +1351,6 @@ function knownMarkdown(known: Known, link: Link, isFull: boolean) {
                   )
                   .map((part) => `, ${part}`)
                   .join("")}): ${entry.note}`,
-                entry.bounty == null || READ_ONLY
-                  ? ""
-                  : link(
-                      m.polity_known_bounty({ number: entry.bounty }),
-                      `bounties/${entry.bounty}`,
-                    ),
                 entry.category === "not_applicable" || entry.count === 0
                   ? ""
                   : m.polity_known_races({ count: count(entry.count) }),

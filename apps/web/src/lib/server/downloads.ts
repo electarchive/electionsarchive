@@ -4,9 +4,9 @@ import * as v from "valibot";
 import { describe, fileUrl, latestUrl, tag } from "#lib/downloads.js";
 import { m } from "#lib/paraglide/messages.js";
 import { remember } from "#lib/server/cache.js";
-import { twinResponse } from "#lib/server/contrib-twins.js";
 import { db } from "#lib/server/db/index.js";
 import { releaseMarkdown } from "#lib/server/downloads-markdown.js";
+import { twinResponse } from "#lib/server/formats.js";
 
 const UTC = `'YYYY-MM-DD"T"HH24:MI:SS"Z"'`;
 const PAGE = 50;

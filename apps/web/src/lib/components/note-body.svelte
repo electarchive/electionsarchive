@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Prose } from "#lib/contrib.js";
+  import type { Prose } from "#lib/prose.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
 

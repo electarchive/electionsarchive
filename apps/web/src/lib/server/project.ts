@@ -2,7 +2,7 @@ import type { Project } from "#lib/projects.js";
 import { m } from "#lib/paraglide/messages.js";
 import { PROJECTS } from "#lib/projects.js";
 
-const UPDATED = "2026-11-01";
+const UPDATED = "2026-11-14";
 const SLUGS = new Set<string>(PROJECTS);
 
 type Section = { id: string; title: string; body: string; isCite?: boolean };
@@ -166,11 +166,6 @@ function sections(slug: Project): Array<Section> {
           isCite: true,
         },
         {
-          id: "contributions",
-          title: m.license_contributions_title(),
-          body: m.license_contributions_body(),
-        },
-        {
           id: "code",
           title: m.license_code_title(),
           body: m.license_code_body(),
@@ -183,21 +178,6 @@ function sections(slug: Project): Array<Section> {
           id: "today",
           title: m.contribute_today_title(),
           body: m.contribute_today_body(),
-        },
-        {
-          id: "how",
-          title: m.contribute_how_title(),
-          body: m.contribute_how_body(),
-        },
-        {
-          id: "agents",
-          title: m.contribute_agents_title(),
-          body: m.contribute_agents_body(),
-        },
-        {
-          id: "limits",
-          title: m.contribute_limits_title(),
-          body: m.contribute_limits_body(),
         },
       ];
     }
@@ -217,11 +197,6 @@ function sections(slug: Project): Array<Section> {
           id: "accounts",
           title: m.privacy_accounts_title(),
           body: m.privacy_accounts_body(),
-        },
-        {
-          id: "contributions",
-          title: m.privacy_contributions_title(),
-          body: m.privacy_contributions_body(),
         },
         {
           id: "updates",
@@ -253,11 +228,6 @@ function sections(slug: Project): Array<Section> {
           id: "accounts",
           title: m.terms_accounts_title(),
           body: m.terms_accounts_body(),
-        },
-        {
-          id: "contributions",
-          title: m.terms_contributions_title(),
-          body: m.terms_contributions_body(),
         },
         {
           id: "liability",

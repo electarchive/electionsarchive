@@ -1,4 +1,3 @@
-import { READ_ONLY } from "$app/env/public";
 import { home } from "#lib/server/pages.js";
 import type { RequestHandler } from "./$types";
 
@@ -20,9 +19,9 @@ Pages follow the place, then the election, then the contest, then the reporting 
 
 ## API
 
-- [REST API](${origin}/api/v1/openapi.json): OpenAPI description of the REST API, for reading${READ_ONLY ? " and searching" : ", searching, and proposing changes"}.
-- [MCP server](${origin}/mcp): the same tools over MCP. ${READ_ONLY ? "Reading needs no key. Contributions open after launch." : "Reading needs no key; proposing changes needs an API key, sent in the x-api-key header."}
-- [Skill](${origin}/agents/skill.md): ${READ_ONLY ? "how to connect, and the data model in one page." : "how to propose a change: the data model, the evidence rule, the workflow, and every operation, with worked examples."}
+- [REST API](${origin}/api/v1/openapi.json): OpenAPI description of the REST API, for reading and searching.
+- [MCP server](${origin}/mcp): the same tools over MCP. Reading needs no key.
+- [Skill](${origin}/agents/skill.md): how to connect, and the data model in one page.
 - [Connect your agent](${origin}/agents): the skill, MCP setup for each client, example questions, and every tool; also as [Markdown](${origin}/agents.md) and [JSON](${origin}/agents.json).
 
 ## About
@@ -30,7 +29,7 @@ Pages follow the place, then the election, then the contest, then the reporting 
 - [License](${origin}/license.md): the data is CC BY 4.0 unless a source's own license differs (each result set records it), the code is AGPL-3.0, and how to cite.
 - [Downloads](${origin}/downloads): every release of the whole archive as Parquet and CSV files, with what each release holds, its changes, checksums, and a DuckDB quickstart; also as [Markdown](${origin}/downloads.md) and [JSON](${origin}/downloads.json). ${origin}/downloads/latest/<file> always points to that file in the newest release.
 - [Architecture](${origin}/architecture.md): how data gets into the archive and how it comes out.
-- [Contribute](${origin}/contribute.md): how to report errors today and how proposals will work.
+- [Contribute](${origin}/contribute.md): how to report a mistake or suggest a source.
 - [About](${origin}/about.md), [Privacy](${origin}/privacy.md), and [Terms of use](${origin}/terms.md).
 
 ## Countries

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
-  import type { Prose } from "#lib/contrib.js";
+  import type { Prose } from "#lib/prose.js";
   import Export from "#lib/components/export.svelte";
   import Measured from "#lib/components/measured.svelte";
   import NoteBody from "#lib/components/note-body.svelte";

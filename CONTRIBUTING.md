@@ -2,7 +2,7 @@
 
 Thanks for helping. There are three ways in, and each has its own path:
 
-- **A wrong number, name, or shape on the site.** Open the page with the mistake, choose Edit, and cite your source. Your proposal goes to review and, once accepted, is published as a changeset like any other. You don't need this repository for that. If you can't fix it yourself, open a [data error issue](https://github.com/electarchive/electionsarchive/issues/new?template=data-error.yml).
+- **A wrong number, name, or shape on the site.** Open a [data error issue](https://github.com/electarchive/electionsarchive/issues/new?template=data-error.yml). Link the page and a source that shows the right value.
 - **A source we don't have yet.** Open a [new source issue](https://github.com/electarchive/electionsarchive/issues/new?template=new-source.yml) before writing a pipeline, so we can tell you whether it is already planned or partly loaded. Then read [docs/pipelines.md](docs/pipelines.md).
 - **Code.** Bug fixes and small improvements can go straight to a pull request. For anything larger, such as a new page, a schema change, or a new API surface, open an issue first and describe the change.
 
@@ -59,7 +59,7 @@ Keep each pull request to one change, and say how you checked it: the page you l
 
 ## Conventions
 
-- **Every write goes through a changeset.** Nothing writes to the core tables directly: pipelines emit changesets, people submit proposals that become changesets, and `ea apply` publishes them after the checks pass. See [docs/data-model.md](docs/data-model.md).
+- **Every write goes through a changeset.** Nothing writes to the core tables directly: pipelines emit changesets, and `ea apply` publishes them after the checks pass. See [docs/data-model.md](docs/data-model.md).
 - **Every number has a source.** A result set names its source, and numbers read from scans also record the page and the bounding box they came from.
 - **Declared results stay as declared.** Official outcomes and seat counts are stored as the authority published them. The engine in `packages/engine` recomputes seats only to compare against them.
 - **Svelte 5 with runes, strict TypeScript.** No `any`; use `unknown` and narrow it.

@@ -2,8 +2,6 @@ import { on } from "svelte/events";
 
 export const finder = $state({ isOpen: false, value: "" });
 
-export const editable = $state<{ entity: string | null }>({ entity: null });
-
 export function summon(value = "") {
   const proxy = document.createElement("input");
   proxy.type = "text";

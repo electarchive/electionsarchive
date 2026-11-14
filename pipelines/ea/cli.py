@@ -15,7 +15,6 @@ from ea import (
     cache,
     census_calendar,
     checks,
-    contrib,
     coverage,
     coverage_check,
     coverage_countries,
@@ -25,7 +24,6 @@ from ea import (
     layout,
     names,
     portals,
-    prescreen,
     rasters,
     raw,
     scan_rows,
@@ -58,17 +56,6 @@ def main() -> None:
     commands.add_parser(
         "touched", help="backfill changeset_entity, the records each published changeset touched, from the core tables"
     ).add_argument("table", nargs="?", help="one core table, or entity for creations; all of them by default")
-    contributing = commands.add_parser(
-        "contrib",
-        help="compile a contribution payload into a changeset folder, serve the proposal_job queue, "
-        "or prescreen open proposals with a Haiku batch (set ANTHROPIC_API_KEY)",
-    )
-    contributing.add_argument("action", choices=("compile", "serve", "prescreen"))
-    contributing.add_argument(
-        "payload", nargs="?", type=Path, help="payload JSON, as contributions.md (Payload) describes"
-    )
-    contributing.add_argument("--author", type=UUID, help="user id of the human author or key owner")
-    contributing.add_argument("--agent", action="store_true", help="the author is an agent acting for --author")
     commands.add_parser("coarse", help="refresh the simplified copies of heavy area geometries used for overlaps")
     commands.add_parser("straddle", help="refresh which contest-map areas straddle their district's boundary")
     commands.add_parser("tiles", help="build one PMTiles archive per boundary set").add_argument(
@@ -110,7 +97,6 @@ def main() -> None:
         action="store_true",
         help="instead of building, write a changeset that records the built release --calver in the release table",
     )
-    commands.add_parser("bounties", help="sync the bounties from the known coverage gaps")
     commands.add_parser("parties", help="rebuild the precomputed party pages the app serves")
     commands.add_parser("mosaics", help="rebuild the precomputed national map mosaics the app serves")
     commands.add_parser("records", help="rebuild the precomputed election records of the largest polities")
@@ -324,15 +310,6 @@ def main() -> None:
         case "touched":
             with connect() as conn:
                 touched.backfill(conn, args.table)
-        case "contrib" if args.action == "serve":
-            contrib.serve()
-        case "contrib" if args.action == "prescreen":
-            prescreen.run()
-        case "contrib":
-            if args.payload is None or args.author is None:
-                parser.error("contrib compile needs a payload and --author")
-            with connect() as conn:
-                print(contrib.compile_file(conn, args.payload, args.author, "agent" if args.agent else "user"))
         case "coarse":
             with connect() as conn:
                 print(display.coarsen(conn))
@@ -370,10 +347,6 @@ def main() -> None:
             from ea import release
 
             print(release.record(args.calver) if args.record else release.build(args.calver))
-        case "bounties":
-            from ea import bounties
-
-            print(bounties.sync())
         case "parties":
             subprocess.run(
                 ["node", "scripts/party-pages.js"], cwd=Path(__file__).resolve().parents[2] / "apps" / "web", check=True

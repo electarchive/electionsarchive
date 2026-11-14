@@ -6,9 +6,9 @@
   import CiteBody from "#lib/components/cite-body.svelte";
   import ShareImage from "#lib/components/share-image.svelte";
   import { Button } from "#lib/components/ui/button/index.js";
-  import { channelLabel, measureLabel } from "#lib/contrib.js";
   import {
     bytes,
+    channelLabel,
     contestLabel,
     countryName,
     dataset,
@@ -16,6 +16,7 @@
     electionLabel,
     formulaLabel,
     latestUrl,
+    measureLabel,
     questionLabel,
     quickstart,
     SHARED_FILES,

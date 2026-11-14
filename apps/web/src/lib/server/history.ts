@@ -1,11 +1,9 @@
 import { error } from "@sveltejs/kit";
 import { sql } from "drizzle-orm";
 import * as v from "valibot";
-import type { HistoryEntry } from "#lib/contrib.js";
-import type { TalkEntity } from "#lib/server/talk.js";
+import type { HistoryEntry } from "#lib/changes.js";
 import { db } from "#lib/server/db/index.js";
 import { names } from "#lib/server/rpc/archive.js";
-import { publicPattern } from "#lib/server/talk.js";
 
 const PAGE = 50;
 
@@ -25,18 +23,31 @@ const QUIET = new Set([
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/u;
 
+const publicPattern = /^[a-z]{2}_[0-7][0-9a-hjkmnp-tv-z]{25}$/u;
+
+export const PublicId = v.pipe(
+  v.string(),
+  v.trim(),
+  v.toLowerCase(),
+  v.check(
+    (value) =>
+      publicPattern.test(value) || v.is(v.pipe(v.string(), v.uuid()), value),
+    "Give a public ID such as pt_46ye3p1ss3bqyrkaj53sqz5g8f, or a UUID.",
+  ),
+);
+
 export const Before = v.pipe(v.string(), v.isoTimestamp());
 
 const columns = sql`
   c.id::text as changeset, to_char(c.published_at at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') as at,
-  c.author_kind::text as author_kind, c.pipeline, c.summary, ce.role::text as role,
-  p.number, p.title, p.state::text as state,
-  coalesce(f.display_name, f.handle) as author, f.handle, p.agent_name as agent
+  c.author_kind::text as author_kind, c.pipeline, c.summary, ce.role::text as role
 `;
 
-async function record(publicId: string): Promise<TalkEntity> {
+type Entity = { id: string; type: string; public_id: string; name: string };
+
+async function record(publicId: string): Promise<Entity> {
   const { rows } = await db.execute<
-    Omit<TalkEntity, "name"> & { former: string | null }
+    Omit<Entity, "name"> & { former: string | null }
   >(sql`
     select e.id, e.type::text as type, ea_public_id(e.type, e.id) as public_id,
            (select h.text from name_history h
@@ -67,8 +78,6 @@ export async function history(publicId: string, before: string | null) {
     select ${columns}
     from changeset_entity ce
     join changeset c on c.id = ce.changeset_id
-    left join proposal p on p.head_changeset_id = c.id
-    left join profile f on f.user_id = p.author_user_id
     where ce.entity_id = ${entity.id}::uuid
       and c.status = 'published'
       and (${before}::timestamptz is null or c.published_at < ${before}::timestamptz)
@@ -164,8 +173,6 @@ export async function change(publicId: string, changeset: string) {
     select ${columns}
     from changeset_entity ce
     join changeset c on c.id = ce.changeset_id
-    left join proposal p on p.head_changeset_id = c.id
-    left join profile f on f.user_id = p.author_user_id
     where ce.entity_id = ${entity.id}::uuid and ce.changeset_id = ${changeset}::uuid
       and c.status = 'published'
   `);

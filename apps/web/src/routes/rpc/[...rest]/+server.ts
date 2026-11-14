@@ -1,9 +1,9 @@
 import { RPCHandler } from "@orpc/server/fetch";
 import { isRead } from "#lib/rpc-reads.js";
-import { served } from "#lib/server/rpc/router.js";
+import { router } from "#lib/server/rpc/router.js";
 import type { RequestHandler } from "./$types";
 
-const handler = new RPCHandler(served, {
+const handler = new RPCHandler(router, {
   allowMethods: (method, _procedure, path) =>
     method === "GET"
       ? isRead(path[0])

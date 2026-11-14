@@ -189,9 +189,6 @@ TERMS = {
     "coverage": "how much of the elections the archive holds",
     "map": "a geographic map",
     "shapes": "boundary geometries for areas",
-    "watchlist": "elections or pages a user follows",
-    "proposal": "a suggested edit someone submits for review",
-    "bounty": "a requested data task others can take on",
     "workbench": "the site's tool for building custom tables and charts",
 }
 

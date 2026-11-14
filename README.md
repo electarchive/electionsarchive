@@ -25,7 +25,7 @@ Elections Archive holds results for more than 960,000 contests in 224,000 electi
 - **Declared, then checked.** Official winners and seats are stored as declared. A seat engine, tested against real elections, recomputes them for comparison and never overwrites them.
 - **Live on election night.** Returns update as counties report, and every race has a share card that redraws as the count moves.
 - **Built for agents.** Every page is also Markdown and JSON, the REST API is described by OpenAPI, and an MCP server and an agent skill expose the same data.
-- **Open to corrections.** Anyone can propose a fix with a citation. Proposals, evidence, and decisions are public.
+- **Open to corrections.** Anyone can report a mistake or suggest a source through a GitHub issue form, and every fix is published as a changeset that cites its source.
 
 ## What's inside
 
@@ -94,16 +94,14 @@ In any other client:
 }
 ```
 
-Reading needs no key. Proposing changes needs one from [your settings](https://electionsarchive.com/settings/keys). The [agents page](https://electionsarchive.com/agents) has setup for other clients and example questions.
+Reading needs no key. A key from [your settings](https://electionsarchive.com/settings/keys) gives your agent higher limits. The [agents page](https://electionsarchive.com/agents) has setup for other clients and example questions.
 
 ## How the data gets in
 
 ```mermaid
 flowchart LR
   S["Official results, books, and scans"] --> P["Pipelines<br>fetch, parse, emit"]
-  U["People and agents"] --> X["Proposals"]
   P --> C["Changesets"]
-  X --> C
   C --> A{"Checks and review"}
   A --> D[("Postgres + PostGIS")]
   D --> W["Website"]
@@ -112,7 +110,7 @@ flowchart LR
   D --> B["Bulk releases"]
 ```
 
-One database is the source of truth, and the only way to write to it is a changeset. Each source has a pipeline that fetches the official files into a raw cache, parses them, and emits a changeset; people and agents propose changesets the same way. Every changeset passes the same checks before it is published. Scanned books are digitized page by page, and each figure keeps its page and position. [docs/pipelines.md](docs/pipelines.md) walks through the whole workflow with Canada's federal elections as the example, and [docs/architecture.md](docs/architecture.md) and [docs/data-model.md](docs/data-model.md) cover the rest.
+One database is the source of truth, and the only way to write to it is a changeset. Each source has a pipeline that fetches the official files into a raw cache, parses them, and emits a changeset. Every changeset passes the same checks before it is published. Scanned books are digitized page by page, and each figure keeps its page and position. [docs/pipelines.md](docs/pipelines.md) walks through the whole workflow with Canada's federal elections as the example, and [docs/architecture.md](docs/architecture.md) and [docs/data-model.md](docs/data-model.md) cover the rest.
 
 ## Run it locally
 

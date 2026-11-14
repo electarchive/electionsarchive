@@ -524,3 +524,37 @@ export function describe(release: Release, locale?: string) {
     version: release.calver,
   });
 }
+
+const measures: Record<string, () => string> = {
+  votes: m.measure_votes,
+  registered: m.measure_registered,
+  ballots_cast: m.measure_ballots_cast,
+  valid: m.measure_valid,
+  invalid: m.measure_invalid,
+  blank: m.measure_blank,
+  voters: m.measure_voters,
+  present: m.measure_present,
+  seats: m.measure_seats,
+  list_votes: m.measure_list_votes,
+  electoral_votes: m.measure_electoral_votes,
+  state_delegate_equivalents: m.measure_state_delegate_equivalents,
+  caucus_delegates: m.measure_caucus_delegates,
+};
+
+export const measureLabel = (code: string) =>
+  measures[code]?.() ?? code.replaceAll("_", " ");
+
+const channels: Record<string, () => string> = {
+  election_day: m.channel_election_day,
+  early: m.channel_early,
+  postal: m.channel_postal,
+  abroad: m.channel_abroad,
+  provisional: m.channel_provisional,
+  mobile: m.channel_mobile,
+  prison: m.channel_prison,
+  customs: m.channel_customs,
+  special_rules: m.channel_special_rules,
+};
+
+export const channelLabel = (code: string) =>
+  channels[code]?.() ?? code.replaceAll("_", " ");

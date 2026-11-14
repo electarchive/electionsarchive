@@ -1,6 +1,5 @@
 <script lang="ts">
   import { browser } from "$app/env";
-  import { READ_ONLY } from "$app/env/public";
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
@@ -8,8 +7,6 @@
   import { createQuery } from "@tanstack/svelte-query";
   import { Await, Island, load, peek } from "svelte-islands";
   import { on } from "svelte/events";
-  import EditPanel from "#lib/components/contrib/edit-panel.svelte";
-  import TalkLink from "#lib/components/contrib/talk-link.svelte";
   import Disclosure from "#lib/components/disclosure.svelte";
   import Name from "#lib/components/name.svelte";
   import Standing from "#lib/components/standing.svelte";
@@ -74,7 +71,6 @@
 
   const {
     id,
-    talk,
     unit: path,
     contest,
     lists,
@@ -89,7 +85,6 @@
     live,
   }: {
     id: string;
-    talk: { id: string; open: number } | null;
     unit: string;
     contest: Awaited<
       Extract<PageServerData, { kind: "contest" }>["body"]
@@ -1455,18 +1450,6 @@
       <Wording wording={contest.wording} />
     {/if}
   </div>
-  {#if !READ_ONLY}
-    <div
-      class="col-start-1 row-start-1 flex gap-2 self-start justify-self-end md:col-start-2"
-    >
-      <TalkLink {talk} compact />
-      <EditPanel
-        entity={id}
-        label={contest.name}
-        title={m.edit_title_contest()}
-      />
-    </div>
-  {/if}
   {#if contest.series.length > 1}
     <Series series={contest.series} isScoped={contest.isScoped} />
   {/if}

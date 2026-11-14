@@ -66,11 +66,6 @@ export const variables = defineEnvVars({
     description:
       "Cloudflare API token with Email Sending Write permission on that account",
   },
-  NOTIFY_TOKEN: {
-    schema: optional,
-    description:
-      "Bearer token the notification timer sends to POST /internal/notifications",
-  },
   PROJECTION_TOKEN: {
     schema: optional,
     description:

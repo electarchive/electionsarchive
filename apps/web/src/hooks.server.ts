@@ -43,7 +43,7 @@ const REFRESH = "x-ea-refresh";
 const LOOPBACK = new Set(["127.0.0.1", "::1", "::ffff:127.0.0.1"]);
 
 const WRITABLE =
-  /^\/(?:api\/auth|rpc|api\/v1|mcp|sign-in|sign-up|sign-out|forgot-password|reset-password|verify-email|settings\/profile|settings\/keys|unsubscribe)(?:\/|$)/u;
+  /^\/(?:api\/auth|rpc|api\/v1|mcp|sign-in|sign-up|sign-out|forgot-password|reset-password|verify-email|settings\/account|settings\/keys)(?:\/|$)/u;
 
 const FORM_TYPES = new Set([
   "application/x-www-form-urlencoded",
@@ -51,8 +51,6 @@ const FORM_TYPES = new Set([
   "text/plain",
   "application/x-sveltekit-formdata",
 ]);
-
-const ONE_CLICK = /^\/unsubscribe\/[0-9a-f]{64}$/u;
 
 function preloaded(html: string, view: App.Locals["view"]) {
   const files = view == null ? undefined : preloads[view];
@@ -85,8 +83,7 @@ const csrfHandle: Handle = async ({ event, resolve }) => {
     !dev &&
     !SAFE.has(request.method) &&
     (type == null || FORM_TYPES.has(type)) &&
-    request.headers.get("origin") !== url.origin &&
-    !(request.method === "POST" && ONE_CLICK.test(url.pathname))
+    request.headers.get("origin") !== url.origin
   ) {
     return new Response(
       `Cross-site ${request.method} form submissions are forbidden`,

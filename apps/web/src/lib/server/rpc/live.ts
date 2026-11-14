@@ -25,7 +25,6 @@ import { rule } from "#lib/measure.js";
 import { baseLocale, getLocale } from "#lib/paraglide/runtime.js";
 import { side, UNAFFILIATED } from "#lib/party.js";
 import { os, remember } from "#lib/server/cache.js";
-import { roles } from "#lib/server/contrib.js";
 import adjacent from "#lib/server/county-neighbors.json";
 import counties from "#lib/server/county-traits.json";
 import { liveDb as db } from "#lib/server/db/index.js";
@@ -37,6 +36,7 @@ import {
 import { estimates } from "#lib/server/live-estimates.js";
 import { unopposed } from "#lib/server/live-unopposed.js";
 import { localizeNames } from "#lib/server/names.js";
+import { isAdmin } from "#lib/server/roles.js";
 import { names } from "#lib/server/rpc/archive.js";
 import { landing, NIGHT, rehearsal } from "#lib/server/rpc/rehearsal.js";
 import { Path } from "#lib/server/territory.js";
@@ -732,11 +732,11 @@ async function stored() {
 }
 
 async function switches() {
-  const [found, role] = await Promise.all([
+  const [found, admin] = await Promise.all([
     stored(),
-    roles(getRequestEvent().locals.user?.id),
+    isAdmin(getRequestEvent().locals.user?.id),
   ]);
-  return role.admin ? { ...found, results: true, forecasts: true } : found;
+  return admin ? { ...found, results: true, forecasts: true } : found;
 }
 
 function office(seat: string): LiveOffice {

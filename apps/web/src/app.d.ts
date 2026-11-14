@@ -18,7 +18,6 @@ declare global {
     }
     interface PageData {
       user: { name: string; email: string } | null;
-      unread: number;
     }
     interface PageState {
       saved?: boolean;

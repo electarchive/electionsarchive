@@ -11,7 +11,6 @@ import { isCrawler } from "#lib/server/guard.js";
 import { archive, call, capped, soon } from "#lib/server/pages.js";
 import { memo, part, weigh } from "#lib/server/parts.js";
 import { router } from "#lib/server/rpc/router.js";
-import { talkLink } from "#lib/server/talk.js";
 import type { PageServerLoad } from "./$types";
 import { isLocalOf, sourceOf, upOf, UPPER } from "./polity-source.js";
 import { isCaucused, seatingOf } from "./seating.js";
@@ -542,7 +541,7 @@ export const load: PageServerLoad = async ({
               .catch(() => null),
             "preload",
           );
-    const [streamed, sections, talk] = await Promise.all([
+    const [streamed, sections] = await Promise.all([
       stream(
         {
           body,
@@ -556,7 +555,6 @@ export const load: PageServerLoad = async ({
         { budget },
       ),
       stream(data.sections, { budget }),
-      talkLink(data.id),
     ]);
     if (
       [...Object.values(streamed), ...Object.values(sections)].some(
@@ -565,7 +563,7 @@ export const load: PageServerLoad = async ({
     ) {
       setHeaders({ "cache-control": "private, no-cache" });
     }
-    return { ...data, ...streamed, sections, talk };
+    return { ...data, ...streamed, sections };
   }
   if (data.kind === "election") {
     const asked = params.path

@@ -5,9 +5,8 @@ import {
   changeMarkdown,
   formatOf,
   twinResponse,
-} from "#lib/server/contrib-twins.js";
-import { change } from "#lib/server/history.js";
-import { PublicId } from "#lib/server/talk.js";
+} from "#lib/server/formats.js";
+import { change, PublicId } from "#lib/server/history.js";
 import type { RequestHandler } from "./$types";
 
 export const GET: RequestHandler = async ({ params, url }) => {
@@ -28,7 +27,7 @@ export const GET: RequestHandler = async ({ params, url }) => {
     origin: url.origin,
     page: `/history/${found.entity.public_id}/${params.changeset}`,
     title: m.history_change_title({
-      summary: found.entry.title ?? found.entry.summary,
+      summary: found.entry.summary,
       name: found.entity.name,
     }),
     subtitle: m.history_lede(),

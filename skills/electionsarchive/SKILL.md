@@ -27,7 +27,7 @@ The archive holds election results down to the smallest reporting unit, from eac
 - **Names** carry a kind (official, native, english, ballot, short, …), a language, and optional valid dates; one is preferred. **Notes** are Markdown with a kind (context, caveat, methodology, editorial) and a language. **Sources** are documents; **citations** tie a source to a record.
 - **Valid time** is when something was true in the world, with a precision (day, month, year, unknown).
 
-The archive launched on November 2, 2026, and is read-only for now: every page, REST endpoint, and MCP read tool works, and contributions open later.
+The archive launched on November 2, 2026. Every page, REST endpoint, and MCP tool reads it; none changes it.
 
 ## Reading
 

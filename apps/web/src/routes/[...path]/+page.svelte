@@ -240,7 +240,6 @@
     {#if data.kind === "contest"}
       <data.View
         id={data.id}
-        talk={data.talk}
         unit={data.unit}
         head={data.head}
         body={data.body}

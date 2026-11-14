@@ -1,0 +1,3 @@
+drop table notification, notification_setting, email_send, comment, watch, thread, activity, bounty, proposal_job, proposal_revision, proposal, profile, account_limit, upload_page, upload, archive_capture;--> statement-breakpoint
+drop function account_limited(uuid, account_limit_kind), contributor_level(uuid), activity_fanout(), proposal_job_notify(), upload_notify();--> statement-breakpoint
+drop type activity_kind, proposal_job_kind, proposal_job_status, proposal_state, upload_status, archive_capture_status, thread_kind, thread_status, watch_target, account_limit_kind, bounty_status, notification_reason, digest_cadence, email_kind, email_status;

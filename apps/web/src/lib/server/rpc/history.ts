@@ -1,8 +1,7 @@
 import { openapi } from "@orpc/openapi";
 import * as v from "valibot";
-import { Before, change, history } from "#lib/server/history.js";
+import { Before, change, history, PublicId } from "#lib/server/history.js";
 import { reader, run } from "#lib/server/rpc/keyed.js";
-import { PublicId } from "#lib/server/talk.js";
 
 export const histories = {
   list: reader
@@ -11,7 +10,7 @@ export const histories = {
         method: "GET",
         path: "/history/{id}",
         summary:
-          "A record's history by its public ID: every published changeset that touched it, pipeline imports and contributions alike, newest first, 50 a page, with its author, summary, role, and proposal; pass before=next for older entries",
+          "A record's history by its public ID: every published changeset that touched it, newest first, 50 a page, with its pipeline, summary, and role; pass before=next for older entries",
       }),
     )
     .input(v.object({ id: PublicId, before: v.optional(Before) }))

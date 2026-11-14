@@ -1,7 +1,6 @@
 import { error, redirect } from "@sveltejs/kit";
 import * as v from "valibot";
-import { Before, history } from "#lib/server/history.js";
-import { PublicId } from "#lib/server/talk.js";
+import { Before, history, PublicId } from "#lib/server/history.js";
 import type { PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ params, url, setHeaders }) => {

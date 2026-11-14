@@ -1,9 +1,7 @@
 <script lang="ts">
-  import { READ_ONLY } from "$app/env/public";
   import Term from "#lib/components/term.svelte";
   import { date } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
-  import { cn } from "#lib/utils.js";
   import type { PageServerData } from "./$types";
   import Preview from "./preview.svelte";
 
@@ -25,14 +23,11 @@
 
 {#if drilled && head.path != null}
   <Preview
-    class={cn(
-      "justify-self-start text-[0.9375rem] font-semibold underline decoration-border underline-offset-4 hover:decoration-foreground",
-      { "max-md:pe-32": !READ_ONLY },
-    )}
+    class="justify-self-start text-[0.9375rem] font-semibold underline decoration-border underline-offset-4 hover:decoration-foreground"
     path={head.path}>{head.name}</Preview
   >
 {/if}
-<h1 class={cn("title", { "max-md:pe-32": !READ_ONLY })} data-scope-title>
+<h1 class="title" data-scope-title>
   {(drilled ? heading : head.name).replaceAll("\u2014", "\u2060—")}
 </h1>
 <p

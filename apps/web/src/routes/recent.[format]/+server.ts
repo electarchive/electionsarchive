@@ -1,23 +1,17 @@
-import { READ_ONLY } from "$app/env/public";
 import { m } from "#lib/paraglide/messages.js";
+import { atomEntries, recent, recentFilters } from "#lib/server/feeds.js";
 import {
   feedMarkdown,
   formatOf,
   FORMATS,
   twinResponse,
-} from "#lib/server/contrib-twins.js";
-import {
-  atomEntries,
-  filtersFrom,
-  recent,
-  RecentFilters,
-} from "#lib/server/feeds.js";
+} from "#lib/server/formats.js";
 import type { RequestHandler } from "./$types";
 
 export const GET: RequestHandler = async ({ params, url }) => {
   const format = formatOf(params.format, FORMATS);
-  const lede = READ_ONLY ? m.recent_lede_read_only() : m.recent_lede();
-  const found = await recent(filtersFrom(RecentFilters, url.searchParams));
+  const lede = m.recent_lede();
+  const found = await recent(recentFilters(url.searchParams));
   const title =
     found.polity == null
       ? m.recent_heading()

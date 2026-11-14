@@ -1,6 +1,5 @@
 <script lang="ts">
   import { browser } from "$app/env";
-  import { READ_ONLY } from "$app/env/public";
   import { goto, invalidateAll } from "$app/navigation";
   import { page } from "$app/state";
   import { useQueryClient } from "@tanstack/svelte-query";
@@ -9,8 +8,6 @@
   import { toast } from "svelte-sonner";
   import type { Primed } from "#lib/primed.js";
   import { arrive } from "#lib/arrive.js";
-  import EditPanel from "#lib/components/contrib/edit-panel.svelte";
-  import TalkLink from "#lib/components/contrib/talk-link.svelte";
   import { m } from "#lib/paraglide/messages.js";
   import { prime } from "#lib/primed.js";
   import type { PageData, PageServerData } from "./$types";
@@ -19,7 +16,6 @@
 
   const {
     id,
-    talk,
     unit,
     head,
     body,
@@ -34,7 +30,6 @@
     live,
   }: {
     id: string;
-    talk: { id: string; open: number } | null;
     unit: string;
     head: Extract<PageServerData, { kind: "contest" }>["head"];
     body: Extract<PageServerData, { kind: "contest" }>["body"];
@@ -129,7 +124,6 @@
   {#snippet children(opened)}
     <ContestBody
       {id}
-      {talk}
       {unit}
       contest={opened.contest}
       lists={opened.lists}
@@ -153,18 +147,6 @@
       >
         <ContestTitle {head} />
       </div>
-      {#if !READ_ONLY}
-        <div
-          class="col-start-1 row-start-1 flex gap-2 self-start justify-self-end md:col-start-2"
-        >
-          <TalkLink {talk} compact />
-          <EditPanel
-            entity={id}
-            label={head.name}
-            title={m.edit_title_contest()}
-          />
-        </div>
-      {/if}
     </header>
     {@render skeleton()}
   {/snippet}

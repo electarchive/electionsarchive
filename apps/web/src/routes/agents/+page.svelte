@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { READ_ONLY } from "$app/env/public";
   import { CopyIcon } from "@lucide/svelte";
   import { toast } from "svelte-sonner";
   import { connect, INSTALL } from "#lib/agents.js";
@@ -25,9 +24,7 @@
     { href: "/agents/skill.md", label: m.agents_skill(), text: "skill.md" },
     { href: "/llms.txt", label: "llms.txt", text: "llms.txt" },
   ]);
-  const lede = $derived(
-    READ_ONLY ? m.agents_lede_read_only() : m.agents_lede(),
-  );
+  const lede = m.agents_lede();
 
   function copyText(text: string) {
     void copy(text).then(() => toast.success(m.agents_copied()));
@@ -159,9 +156,6 @@
           >
             <dt>
               <code class="font-figures font-semibold">{tool.name}</code>
-              {#if tool.isKeyed}<span class="text-xs text-muted-foreground"
-                  >{m.agents_key()}</span
-                >{/if}
             </dt>
             <dd class="text-pretty text-muted-foreground">
               {tool.description}

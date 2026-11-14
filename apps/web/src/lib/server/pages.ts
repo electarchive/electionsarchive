@@ -2,7 +2,7 @@ import { getRequestEvent } from "$app/server";
 import { call as invoke, ORPCError } from "@orpc/server";
 import { error, redirect } from "@sveltejs/kit";
 import { sql } from "drizzle-orm";
-import type { Prose } from "#lib/contrib.js";
+import type { Prose } from "#lib/prose.js";
 import { effective, stand } from "#lib/caucus.js";
 import { compactPlaces } from "#lib/compare.js";
 import { headline } from "#lib/coverage.js";

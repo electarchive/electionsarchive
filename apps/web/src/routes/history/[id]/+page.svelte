@@ -1,8 +1,7 @@
 <script lang="ts">
-  import type { HistoryEntry } from "#lib/contrib.js";
-  import RecordTabs from "#lib/components/contrib/record-tabs.svelte";
+  import type { HistoryEntry } from "#lib/changes.js";
+  import { importedBy, roleLabel } from "#lib/changes.js";
   import Moment from "#lib/components/moment.svelte";
-  import { historyByline, roleLabel, stateLabel } from "#lib/contrib.js";
   import { date } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { localDay } from "#lib/zone.svelte.js";
@@ -39,7 +38,11 @@
 <main class="mx-auto px-4 pbs-6 pbe-24 max-inline-3xl max-sm:px-3">
   <header class="grid gap-3">
     <h1 class="title text-balance">{data.entity.name}</h1>
-    <RecordTabs entity={data.entity} current="history" />
+    <p class="text-sm">
+      <a class="underline underline-offset-4" href="/id/{data.entity.id}"
+        >{m.history_record()}</a
+      >
+    </p>
   </header>
 
   {#if data.entries.length === 0}
@@ -70,7 +73,7 @@
                   <a
                     class="text-pretty underline-offset-4 hover:underline"
                     href="/history/{data.entity.public_id}/{entry.changeset}"
-                    >{entry.title ?? entry.summary}</a
+                    >{entry.summary}</a
                   >
                   <span
                     class="flex flex-wrap gap-x-3 text-xs text-muted-foreground"
@@ -78,25 +81,7 @@
                     <span class="font-semibold text-foreground"
                       >{roleLabel[entry.role]()}</span
                     >
-                    {#if entry.handle == null}
-                      <span>{historyByline(entry)}</span>
-                    {:else}
-                      <a
-                        class="underline-offset-4 hover:text-foreground hover:underline"
-                        href="/contributors/{entry.handle}"
-                        >{historyByline(entry)}</a
-                      >
-                    {/if}
-                    {#if entry.number != null}
-                      <a
-                        class="underline-offset-4 hover:text-foreground hover:underline"
-                        href="/proposals/{entry.number}"
-                        >{m.history_proposal({ number: entry.number })}</a
-                      >
-                      {#if entry.state != null && entry.state !== "published"}
-                        <span>{stateLabel[entry.state]()}</span>
-                      {/if}
-                    {/if}
+                    <span>{importedBy(entry.pipeline)}</span>
                   </span>
                 </div>
               </li>

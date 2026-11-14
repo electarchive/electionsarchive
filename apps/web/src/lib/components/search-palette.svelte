@@ -18,9 +18,7 @@
   import MapPinIcon from "@lucide/svelte/icons/map-pin";
   import MonitorIcon from "@lucide/svelte/icons/monitor";
   import MoonIcon from "@lucide/svelte/icons/moon";
-  import PencilIcon from "@lucide/svelte/icons/pencil";
   import SearchIcon from "@lucide/svelte/icons/search";
-  import SquarePenIcon from "@lucide/svelte/icons/square-pen";
   import SunIcon from "@lucide/svelte/icons/sun";
   import UserIcon from "@lucide/svelte/icons/user";
   import VoteIcon from "@lucide/svelte/icons/vote";
@@ -33,12 +31,11 @@
   import Logo from "#lib/components/logo.svelte";
   import * as Dialog from "#lib/components/ui/dialog/index.js";
   import { date } from "#lib/format.js";
-  import { keep } from "#lib/linked.js";
   import { palette } from "#lib/palette.svelte.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
   import { orpc } from "#lib/rpc.js";
-  import { editable, finder } from "#lib/search.svelte.js";
+  import { finder } from "#lib/search.svelte.js";
   import { cn } from "#lib/utils.js";
 
   type Hit = InferRouterOutputs<Router>["search"]["query"][number];
@@ -232,29 +229,6 @@
                 toast.success(m.export_copied()),
               ),
           },
-          ...(editable.entity == null
-            ? []
-            : [
-                {
-                  kind: "command" as const,
-                  key: "edit",
-                  label: m.cmd_edit(),
-                  icon: PencilIcon,
-                  run: () => keep({ edit: "" }),
-                },
-                ...(page.data.user == null
-                  ? []
-                  : [
-                      {
-                        kind: "command" as const,
-                        key: "workspace",
-                        label: m.ws_open(),
-                        icon: SquarePenIcon,
-                        run: () =>
-                          void goto(resolve(`/edit?record=${editable.entity}`)),
-                      },
-                    ]),
-              ]),
           ...(parent == null
             ? []
             : [

@@ -1,15 +1,13 @@
-import { READ_ONLY } from "$app/env/public";
 import { connect, INSTALL } from "#lib/agents.js";
 import { m } from "#lib/paraglide/messages.js";
-import { formatOf, twinResponse } from "#lib/server/contrib-twins.js";
+import { formatOf, twinResponse } from "#lib/server/formats.js";
 import { tools } from "#lib/server/mcp.js";
 import type { RequestHandler } from "./$types";
 
 export const GET: RequestHandler = ({ params, url }) => {
   const format = formatOf(params.format, ["md", "json"]);
   const setup = connect(url.origin);
-  const lede = READ_ONLY ? m.agents_lede_read_only() : m.agents_lede();
-  const listed = READ_ONLY ? tools.filter((tool) => !tool.isKeyed) : tools;
+  const lede = m.agents_lede();
   const links = {
     skill: `${url.origin}/agents/skill.md`,
     openapi: `${url.origin}/api/v1/openapi.json`,
@@ -63,10 +61,10 @@ export const GET: RequestHandler = ({ params, url }) => {
       }
       lines.push(
         "",
-        `## ${m.agents_tools_count({ count: listed.length })}`,
+        `## ${m.agents_tools_count({ count: tools.length })}`,
         "",
       );
-      for (const tool of listed) {
+      for (const tool of tools) {
         lines.push(`- \`${tool.name}\`: ${tool.description}`);
       }
       lines.push(
@@ -89,7 +87,7 @@ export const GET: RequestHandler = ({ params, url }) => {
         note: body,
       })),
       questions: setup.questions,
-      tools: listed.map(({ name, description }) => ({ name, description })),
+      tools,
       openapi: links.openapi,
       rest: links.rest,
       llms: links.llms,

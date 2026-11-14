@@ -1,20 +1,17 @@
 <script lang="ts">
   import type ArrowLeftRightIcon from "@lucide/svelte/icons/arrow-left-right";
   import type { Snippet } from "svelte";
-  import { READ_ONLY } from "$app/env/public";
   import { afterNavigate } from "$app/navigation";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
   import {
-    AtSignIcon,
-    BellIcon,
     ChevronRightIcon,
-    EyeIcon,
     KeyRoundIcon,
     LogInIcon,
     LogOutIcon,
     MonitorIcon,
     MoonIcon,
+    SettingsIcon,
     SunIcon,
     UserIcon,
   } from "@lucide/svelte";
@@ -126,30 +123,12 @@
         <DropdownMenu.Separator />
         <DropdownMenu.Item>
           {#snippet child({ props })}
-            <a {...props} href={resolve("/settings/profile")}>
-              <AtSignIcon class="text-muted-foreground" />
-              {m.profile_nav()}
+            <a {...props} href={resolve("/settings/account")}>
+              <SettingsIcon class="text-muted-foreground" />
+              {m.settings_account_title()}
             </a>
           {/snippet}
         </DropdownMenu.Item>
-        {#if !READ_ONLY}
-          <DropdownMenu.Item>
-            {#snippet child({ props })}
-              <a {...props} href={resolve("/settings/notifications")}>
-                <BellIcon class="text-muted-foreground" />
-                {m.notify_settings_title()}
-              </a>
-            {/snippet}
-          </DropdownMenu.Item>
-          <DropdownMenu.Item>
-            {#snippet child({ props })}
-              <a {...props} href={resolve("/watchlist")}>
-                <EyeIcon class="text-muted-foreground" />
-                {m.watchlist_title()}
-              </a>
-            {/snippet}
-          </DropdownMenu.Item>
-        {/if}
         <DropdownMenu.Item>
           {#snippet child({ props })}
             <a {...props} href={resolve("/settings/keys")}>
@@ -258,20 +237,10 @@
           <div
             class="grid grid-cols-[repeat(auto-fit,minmax(6.5rem,1fr))] gap-2"
           >
-            <Button href={resolve("/settings/profile")} size="sm">
-              <AtSignIcon />
-              {m.profile_nav()}
+            <Button href={resolve("/settings/account")} size="sm">
+              <SettingsIcon />
+              {m.settings_account_title()}
             </Button>
-            {#if !READ_ONLY}
-              <Button href={resolve("/settings/notifications")} size="sm">
-                <BellIcon />
-                {m.notify_settings_nav()}
-              </Button>
-              <Button href={resolve("/watchlist")} size="sm">
-                <EyeIcon />
-                {m.watchlist_title()}
-              </Button>
-            {/if}
             <Button href={resolve("/settings/keys")} size="sm">
               <KeyRoundIcon />
               {m.keys_nav()}

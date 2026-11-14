@@ -1,5 +1,4 @@
 import type { AnyProcedure } from "@orpc/server";
-import { READ_ONLY } from "$app/env/public";
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
 import {
@@ -10,178 +9,77 @@ import { getOpenAPIMeta } from "@orpc/openapi";
 import { call, ORPCError } from "@orpc/server";
 import { ValibotToJsonSchemaConverter } from "@orpc/valibot";
 import * as v from "valibot";
-import { roles } from "#lib/server/contrib.js";
 import { keyOwner } from "#lib/server/rpc/keyed.js";
-import { contributions, router } from "#lib/server/rpc/router.js";
+import { router } from "#lib/server/rpc/router.js";
 import { count, introduce } from "#lib/server/usage.js";
-
-type Access = "read" | "key" | "admin";
 
 const TOOLS: Array<{
   name: string;
   procedure: AnyProcedure;
-  access: Access;
   description?: string;
 }> = [
   {
     name: "search",
     procedure: router.search.query,
-    access: "read",
     description:
       "Search the archive's polities, elections, contests, people, parties, chambers, and places by name; start here to find IDs",
   },
-  { name: "list_polities", procedure: router.polities.list, access: "read" },
-  { name: "get_polity", procedure: router.polities.get, access: "read" },
-  { name: "get_election", procedure: router.elections.get, access: "read" },
-  { name: "get_contest", procedure: router.contests.get, access: "read" },
+  { name: "list_polities", procedure: router.polities.list },
+  { name: "get_polity", procedure: router.polities.get },
+  { name: "get_election", procedure: router.elections.get },
+  { name: "get_contest", procedure: router.contests.get },
   {
     name: "get_election_indices",
     procedure: router.indices.election,
-    access: "read",
   },
   {
     name: "get_polity_indices",
     procedure: router.indices.polity,
-    access: "read",
   },
   {
     name: "get_contest_indices",
     procedure: router.indices.contest,
-    access: "read",
   },
   {
     name: "get_unmapped_units",
     procedure: router.contests.ledger,
-    access: "read",
   },
   {
     name: "get_live_results",
     procedure: router.tonight.results,
-    access: "read",
   },
-  { name: "get_live_race", procedure: router.tonight.race, access: "read" },
-  { name: "get_person", procedure: router.people.get, access: "read" },
-  { name: "get_party", procedure: router.parties.get, access: "read" },
+  { name: "get_live_race", procedure: router.tonight.race },
+  { name: "get_person", procedure: router.people.get },
+  { name: "get_party", procedure: router.parties.get },
   {
     name: "get_party_elections",
     procedure: router.parties.elections,
-    access: "read",
   },
-  { name: "get_chamber", procedure: router.bodies.get, access: "read" },
+  { name: "get_chamber", procedure: router.bodies.get },
   {
     name: "get_chamber_members",
     procedure: router.bodies.members,
-    access: "read",
   },
-  { name: "get_page_path", procedure: router.entities.path, access: "read" },
+  { name: "get_page_path", procedure: router.entities.path },
   {
     name: "get_coverage_gaps",
     procedure: router.coverage.gaps,
-    access: "read",
   },
-  { name: "list_bounties", procedure: router.bounties.list, access: "read" },
-  { name: "get_bounty", procedure: router.bounties.get, access: "read" },
-  { name: "get_editable", procedure: router.agents.editable, access: "read" },
-  { name: "get_result_cells", procedure: router.agents.cells, access: "read" },
-  { name: "describe_ops", procedure: router.agents.ops, access: "read" },
-  {
-    name: "find_open_proposals",
-    procedure: router.proposals.list,
-    access: "read",
-  },
-  { name: "get_proposal", procedure: router.proposals.get, access: "read" },
-  { name: "get_talk", procedure: router.talk.list, access: "read" },
-  { name: "get_topic", procedure: router.talk.topic, access: "read" },
-  {
-    name: "list_contributors",
-    procedure: router.contributors.list,
-    access: "read",
-  },
-  {
-    name: "get_contributor",
-    procedure: router.contributors.get,
-    access: "read",
-  },
-  { name: "get_history", procedure: router.histories.list, access: "read" },
-  { name: "get_change", procedure: router.histories.change, access: "read" },
+  { name: "get_history", procedure: router.histories.list },
+  { name: "get_change", procedure: router.histories.change },
   {
     name: "recent_changes",
     procedure: router.recentChanges.list,
-    access: "read",
   },
-  { name: "whoami", procedure: router.agents.whoami, access: "key" },
-  { name: "get_watchlist", procedure: router.watches.list, access: "key" },
-  { name: "watch", procedure: router.watches.add, access: "key" },
-  { name: "unwatch", procedure: router.watches.remove, access: "key" },
-  { name: "claim_bounty", procedure: router.claims.claim, access: "key" },
-  { name: "release_bounty", procedure: router.claims.release, access: "key" },
-  {
-    name: "draft_proposal",
-    procedure: router.proposals.create,
-    access: "key",
-    description:
-      "Draft a proposal from ops and evidence (call describe_ops first) and check it: waits up to 60 s for the compile and checks, then returns the proposal with its tier, findings, and diff, or the compile errors with op paths",
-  },
-  { name: "check_proposal", procedure: router.proposals.check, access: "key" },
-  {
-    name: "submit_proposal",
-    procedure: router.proposals.submit,
-    access: "key",
-  },
-  {
-    name: "revise_proposal",
-    procedure: router.proposals.revise,
-    access: "key",
-  },
-  {
-    name: "withdraw_proposal",
-    procedure: router.proposals.withdraw,
-    access: "key",
-  },
-  { name: "comment", procedure: router.talk.comment, access: "key" },
-  { name: "set_topic_status", procedure: router.talk.status, access: "key" },
-  {
-    name: "accept_suggestion",
-    procedure: router.proposals.accept,
-    access: "key",
-  },
-  { name: "upload_document", procedure: router.uploads.create, access: "key" },
-  {
-    name: "upload_changeset",
-    procedure: router.proposals.upload,
-    access: "key",
-  },
-  { name: "get_upload", procedure: router.uploads.get, access: "key" },
-  {
-    name: "get_upload_page",
-    procedure: router.uploads.page,
-    access: "key",
-    description:
-      "One rendered page of a ready upload as an image, to read before marking an evidence region",
-  },
-  { name: "review_queue", procedure: router.admin.queue, access: "admin" },
-  { name: "get_review", procedure: router.admin.proposal, access: "admin" },
-  { name: "decide_proposal", procedure: router.admin.decide, access: "admin" },
-  {
-    name: "write_prereview",
-    procedure: router.admin.prereview,
-    access: "admin",
-  },
-  { name: "revert_proposal", procedure: router.admin.revert, access: "admin" },
 ];
 
 const LIVE =
   " On election night, get_live_results has the national picture and every race, and get_live_race has one race in full.";
 
 const INSTRUCTIONS =
-  "electionsarchive.com holds election results, candidates, parties, chambers, and boundaries, with every number traced to a source." +
-  LIVE +
-  " Look before you write: find IDs with search and the get_ tools, read a record's editable rows with get_editable, and check find_open_proposals so you don't duplicate work. Every change is a proposal: describe_ops explains the payload, ops, and evidence; draft_proposal compiles and checks it; submit_proposal sends it to review. Cite evidence for every fact, quoting the source exactly. Write tools need an API key from https://electionsarchive.com/settings/keys, sent as x-api-key or a Bearer token.";
-
-const READING =
   "electionsarchive.com holds election results, candidates, parties, chambers, and boundaries, with every number traced to a source. Find IDs with search, then read records with the get_ tools." +
   LIVE +
-  " The archive is read-only for now: no tool changes it.";
+  " Every tool only reads; none changes the archive.";
 
 const WAIT_MS = 25_000;
 
@@ -198,14 +96,6 @@ const NARROW: Record<string, string> = {
 
 const SLOW = Symbol("slow");
 
-const closed = new Set<unknown>(
-  READ_ONLY
-    ? Object.values(contributions).flatMap((family): Array<unknown> =>
-        Object.values(family),
-      )
-    : [],
-);
-
 const converter = new ValibotToJsonSchemaConverter();
 
 const Shape = v.looseObject({
@@ -215,8 +105,7 @@ const Shape = v.looseObject({
   ),
 });
 
-const catalog = TOOLS.filter((tool) => !closed.has(tool.procedure)).map(
-  (tool) => {
+const catalog = TOOLS.map((tool) => {
     const input = tool.procedure["~orpc"].inputSchemas?.at(-1);
     const converted: unknown =
       input == null ? {} : converter.convert(input, "input")[0];
@@ -236,8 +125,7 @@ const catalog = TOOLS.filter((tool) => !closed.has(tool.procedure)).map(
         inputSchema: { ...schema, type: "object" as const },
       },
     };
-  },
-);
+});
 
 const byName = new Map(catalog.map((tool) => [tool.name, tool]));
 
@@ -254,8 +142,6 @@ const Issues = v.object({
     }),
   ),
 });
-
-const Image = v.object({ data: v.string() });
 
 function failure(text: string) {
   return { isError: true, content: [{ type: "text" as const, text }] };
@@ -279,23 +165,20 @@ function explain(message: string, data: unknown) {
 function build(
   headers: Headers,
   owner: { keyId: string; userId: string } | null,
-  isStaff: boolean,
 ) {
   const server = new Server(
     { name: "electionsarchive", title: "electionsarchive.com", version: "1" },
     {
       capabilities: { tools: {} },
-      instructions: READ_ONLY ? READING : INSTRUCTIONS,
+      instructions: INSTRUCTIONS,
     },
   );
   server.setRequestHandler(ListToolsRequestSchema, () => ({
-    tools: catalog
-      .filter((tool) => tool.access !== "admin" || isStaff)
-      .map((tool) => tool.listing),
+    tools: catalog.map((tool) => tool.listing),
   }));
   server.setRequestHandler(CallToolRequestSchema, async (request) => {
     const tool = byName.get(request.params.name);
-    if (tool == null || (!isStaff && tool.access === "admin")) {
+    if (tool == null) {
       return failure(`There is no tool named ${request.params.name}.`);
     }
     count(headers, owner, tool.name);
@@ -326,17 +209,6 @@ function build(
           "The archive is still working on that answer and will keep it ready. Call the tool again in a minute.",
         );
       }
-      if (tool.name === "get_upload_page" && v.is(Image, output)) {
-        return {
-          content: [
-            {
-              type: "image" as const,
-              data: output.data,
-              mimeType: "image/png",
-            },
-          ],
-        };
-      }
       const text = JSON.stringify(output);
       if (text.length > LARGEST) {
         return failure(
@@ -361,14 +233,9 @@ function build(
 
 export async function handle(request: Request) {
   const { headers } = request;
-  let isStaff = false;
   let owner: Awaited<ReturnType<typeof keyOwner>> = null;
   try {
     owner = await keyOwner(headers);
-    if (owner != null) {
-      const allowed = await roles(owner.userId);
-      isStaff = allowed.admin || allowed.reviewer;
-    }
   } catch (error_) {
     if (error_ instanceof ORPCError) {
       return Response.json(
@@ -386,10 +253,9 @@ export async function handle(request: Request) {
     }
     throw error_;
   }
-  const server = build(headers, owner, isStaff);
+  const server = build(headers, owner);
   const transport = new WebStandardStreamableHTTPServerTransport({
     enableJsonResponse: true,
-    maxRequestBodySize: 30 * 1024 ** 2,
   });
   await server.connect(transport);
   try {
@@ -404,10 +270,7 @@ export async function handle(request: Request) {
   }
 }
 
-export const tools = catalog
-  .filter((tool) => tool.access !== "admin")
-  .map((tool) => ({
-    name: tool.name,
-    description: tool.listing.description,
-    isKeyed: tool.access === "key",
-  }));
+export const tools = catalog.map((tool) => ({
+  name: tool.name,
+  description: tool.listing.description,
+}));

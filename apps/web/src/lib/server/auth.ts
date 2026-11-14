@@ -7,7 +7,6 @@ import {
   GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET,
 } from "$app/env/private";
-import { READ_ONLY } from "$app/env/public";
 import { getRequestEvent } from "$app/server";
 import { apiKey } from "@better-auth/api-key";
 import { drizzleAdapter } from "@better-auth/drizzle-adapter";
@@ -22,7 +21,7 @@ import { randomUUID } from "node:crypto";
 import { PROJECT } from "#lib/constants.js";
 import { m } from "#lib/paraglide/messages.js";
 import { baseLocale, getLocale, locales } from "#lib/paraglide/runtime.js";
-import { authDb, db } from "#lib/server/db/index.js";
+import { authDb } from "#lib/server/db/index.js";
 import { sendEmail } from "#lib/server/email.js";
 import { createRateLimiter } from "#lib/server/ratelimit.js";
 
@@ -208,23 +207,11 @@ export const auth = betterAuth({
         const roles = await authDb.execute<{ role: string }>(
           sql`select role from user_role where user_id = ${user.id}`,
         );
-        const limits = READ_ONLY
-          ? null
-          : await db.execute<{ id: string }>(sql`
-            select id from account_limit where set_by = ${user.id} or lifted_by = ${user.id} limit 1
-          `);
-        if (roles.rows.length > 0 || (limits?.rows.length ?? 0) > 0) {
+        if (roles.rows.length > 0) {
           throw APIError.fromStatus("FORBIDDEN", {
             code: "STAFF_ACCOUNT",
             message: m.delete_account_staff(),
           });
-        }
-        if (!READ_ONLY) {
-          await db.execute(sql`
-            delete from proposal p
-            where p.author_user_id = ${user.id} and p.submitted_at is null
-              and not exists (select from bounty b where b.fulfilled_by_proposal = p.id)
-          `);
         }
       },
     },

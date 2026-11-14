@@ -1,5 +1,5 @@
 import { m } from "#lib/paraglide/messages.js";
-import { formatOf, FORMATS, twinResponse } from "#lib/server/contrib-twins.js";
+import { formatOf, FORMATS, twinResponse } from "#lib/server/formats.js";
 import { changelog } from "#lib/server/site.js";
 import { REPOSITORY } from "#lib/site.js";
 import type { RequestHandler } from "./$types";

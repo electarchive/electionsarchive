@@ -1,6 +1,5 @@
 export const READS = [
   "bodies",
-  "bounties",
   "contests",
   "coverage",
   "elections",

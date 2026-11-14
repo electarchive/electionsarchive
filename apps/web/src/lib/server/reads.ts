@@ -15,7 +15,7 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/iu;
 const UUIDS = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/giu;
 const TABLES: Array<[RegExp, string]> = [
   [/\bcoverage_\w+/iu, "coverage"],
-  [/\b(?:changeset|changeset_entity|proposal\w*)\b/iu, "changesets"],
+  [/\b(?:changeset|changeset_entity)\b/iu, "changesets"],
   [/\btranslation\b/iu, "translation"],
 ];
 const SCANNED = new Set([25, 114, 1009, 1043, 2950, 2951, 3802]);

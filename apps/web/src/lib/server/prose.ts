@@ -1,7 +1,7 @@
 import { sql } from "drizzle-orm";
 import * as v from "valibot";
-import { origins } from "#lib/contrib.js";
 import { getLocale } from "#lib/paraglide/runtime.js";
+import { origins } from "#lib/prose.js";
 
 export const proseEntries = {
   body: v.string(),

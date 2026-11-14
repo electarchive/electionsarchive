@@ -6,7 +6,7 @@ Include what you found, where (a URL, an API route, an MCP tool, or a file and l
 
 ## Scope
 
-In scope: the code in this repository and the services it runs at electionsarchive.com, including sign-in, API keys, uploads, proposals and review, the REST API, and the MCP server. Only the latest commit on `main` and the live site are supported.
+In scope: the code in this repository and the services it runs at electionsarchive.com, including sign-in, API keys, the REST API, and the MCP server. Only the latest commit on `main` and the live site are supported.
 
 Out of scope:
 
