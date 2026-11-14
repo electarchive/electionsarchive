@@ -451,6 +451,20 @@
       "publisher": "Sénat",
       "url": "https://archives.senat.fr/fileadmin/cru-1741249238/Histoire/Collections_precieuses_de_la_Bibliotheque_du_Senat/Mini_site_Archives/PDF/FR_SENAT_IR_66S_election_senatoriales_3eR.pdf",
       "kind": "official_body"
+    },
+    "wiki-fr-senatoriales": {
+      "title": "Senate (French Third Republic), table of senatorial elections 1876-1938; Élections sénatoriales françaises de 1946, 1948, 1952, and 1955",
+      "publisher": "Wikipedia (English and French)",
+      "url": "https://en.wikipedia.org/wiki/Senate_(French_Third_Republic)",
+      "note": "Day of each renewal, checked against the dossier dates in the Senate archives inventory (66S), which names the years 1879 through 1938; the Fourth Republic days come from the infobox of each election's French page.",
+      "kind": "compendium"
+    },
+    "wiki-fr-presidentielles": {
+      "title": "Élection présidentielle française de 1873 à 1953 (one page per election)",
+      "publisher": "Vikipédia (French Wikipedia)",
+      "url": "https://fr.wikipedia.org/wiki/Liste_des_pr%C3%A9sidents_de_la_R%C3%A9publique_fran%C3%A7aise",
+      "note": "Day of each election by the National Assembly or the Congress at Versailles, from the infobox of each election's page; the day of the final ballot where the Congress sat over two days.",
+      "kind": "compendium"
     }
   },
   "tiers": [
@@ -3386,21 +3400,153 @@
       "dates": [
         {
           "date": "1876-01-30",
+          "contests": 1,
           "source": "senat-archives-66s",
           "note": "First election of the Senate."
         },
         {
-          "date": "1879-01-01",
-          "precision": "month",
-          "source": "senat-archives-66s",
-          "note": "First renewal by thirds, in January 1879."
+          "date": "1879-01-05",
+          "contests": 1,
+          "source": "wiki-fr-senatoriales",
+          "note": "Series B."
         },
         {
-          "date": "1882-01-01",
-          "through": "1939-12-31",
-          "source": "senat-archives-66s",
-          "quote": "Les élections sont organisées tous les trois ans dans un tiers des départements",
-          "note": "Triennial renewals, in early January and, after the law of 7 July 1929, in October; the date is fixed by presidential decree. Not yet counted from an official table."
+          "date": "1882-01-08",
+          "contests": 1,
+          "source": "wiki-fr-senatoriales",
+          "note": "Series C."
+        },
+        {
+          "date": "1885-01-25",
+          "contests": 1,
+          "source": "wiki-fr-senatoriales",
+          "note": "Series A."
+        },
+        {
+          "date": "1888-01-05",
+          "contests": 1,
+          "source": "wiki-fr-senatoriales",
+          "note": "Series B."
+        },
+        {
+          "date": "1891-01-04",
+          "contests": 1,
+          "source": "wiki-fr-senatoriales",
+          "note": "Series C."
+        },
+        {
+          "date": "1894-01-07",
+          "contests": 1,
+          "source": "wiki-fr-senatoriales",
+          "note": "Series A."
+        },
+        {
+          "date": "1897-01-03",
+          "contests": 1,
+          "source": "wiki-fr-senatoriales",
+          "note": "Series B."
+        },
+        {
+          "date": "1900-01-28",
+          "contests": 1,
+          "source": "wiki-fr-senatoriales",
+          "note": "Series C."
+        },
+        {
+          "date": "1903-01-04",
+          "contests": 1,
+          "source": "wiki-fr-senatoriales",
+          "note": "Series A."
+        },
+        {
+          "date": "1906-01-07",
+          "contests": 1,
+          "source": "wiki-fr-senatoriales",
+          "note": "Series B."
+        },
+        {
+          "date": "1909-01-03",
+          "contests": 1,
+          "source": "wiki-fr-senatoriales",
+          "note": "Series C."
+        },
+        {
+          "date": "1912-01-07",
+          "contests": 1,
+          "source": "wiki-fr-senatoriales",
+          "note": "Series A."
+        },
+        {
+          "date": "1920-01-11",
+          "contests": 1,
+          "source": "wiki-fr-senatoriales",
+          "note": "Series A, B, and C together, the 1915 and 1918 renewals having been postponed by the war."
+        },
+        {
+          "date": "1921-01-09",
+          "contests": 1,
+          "source": "wiki-fr-senatoriales",
+          "note": "Series A."
+        },
+        {
+          "date": "1924-01-06",
+          "contests": 1,
+          "source": "wiki-fr-senatoriales",
+          "note": "Series B."
+        },
+        {
+          "date": "1927-01-09",
+          "contests": 1,
+          "source": "wiki-fr-senatoriales",
+          "note": "Series C."
+        },
+        {
+          "date": "1929-10-20",
+          "contests": 1,
+          "source": "wiki-fr-senatoriales",
+          "note": "Series A, the first renewal in October under the law of 7 July 1929."
+        },
+        {
+          "date": "1932-10-16",
+          "contests": 1,
+          "source": "wiki-fr-senatoriales",
+          "note": "Series B."
+        },
+        {
+          "date": "1935-10-20",
+          "contests": 1,
+          "source": "wiki-fr-senatoriales",
+          "note": "Series C."
+        },
+        {
+          "date": "1938-10-23",
+          "contests": 1,
+          "source": "wiki-fr-senatoriales",
+          "note": "Series A."
+        },
+        {
+          "date": "1946-12-08",
+          "contests": 1,
+          "source": "wiki-fr-senatoriales",
+          "note": "First Council of the Republic."
+        },
+        {
+          "date": "1948-11-07",
+          "contests": 1,
+          "source": "wiki-fr-senatoriales",
+          "note": "Renewal of the Council, whose members became senators."
+        },
+        {
+          "date": "1952-05-18",
+          "contests": 1,
+          "source": "wiki-fr-senatoriales",
+          "note": "Renewal."
+        },
+        {
+          "date": "1955-06-19",
+          "contests": 1,
+          "source": "wiki-fr-senatoriales",
+          "note": "Renewal."
         }
       ],
       "key": "senat_avant_1958",
@@ -3415,8 +3561,8 @@
       "valid_from": "1876-01-30",
       "valid_to": "1958-10-04",
       "first_held": "1876-01-30",
-      "note": "The Third Republic Senate was elected in each département by a college of deputies, general and arrondissement councillors, and municipal delegates, renewed by thirds every three years (with 75 life senators until 1884); the Council of the Republic of the Fourth Republic was elected by similar colleges from 1946.",
-      "source": "elysee-presidents",
+      "note": "The Third Republic Senate was elected in each département by a college of deputies, general and arrondissement councillors, and municipal delegates, renewed by thirds every three years, in January and, after the law of 7 July 1929, in October (with 75 life senators until 1884); the Council of the Republic of the Fourth Republic was elected by similar colleges from 1946.",
+      "source": "wiki-fr-senatoriales",
       "match": [
         {
           "election_kinds": [
@@ -3483,6 +3629,108 @@
           "note": "Thiers, elected by the National Assembly."
         },
         {
+          "date": "1873-05-24",
+          "contests": 1,
+          "source": "wiki-fr-presidentielles",
+          "note": "Mac-Mahon, elected by the National Assembly."
+        },
+        {
+          "date": "1879-01-30",
+          "contests": 1,
+          "source": "wiki-fr-presidentielles",
+          "note": "Grévy."
+        },
+        {
+          "date": "1885-12-28",
+          "contests": 1,
+          "source": "wiki-fr-presidentielles",
+          "note": "Grévy, reelected."
+        },
+        {
+          "date": "1887-12-03",
+          "contests": 1,
+          "source": "wiki-fr-presidentielles",
+          "note": "Sadi Carnot."
+        },
+        {
+          "date": "1894-06-27",
+          "contests": 1,
+          "source": "wiki-fr-presidentielles",
+          "note": "Casimir-Perier."
+        },
+        {
+          "date": "1895-01-17",
+          "contests": 1,
+          "source": "wiki-fr-presidentielles",
+          "note": "Félix Faure."
+        },
+        {
+          "date": "1899-02-18",
+          "contests": 1,
+          "source": "wiki-fr-presidentielles",
+          "note": "Loubet."
+        },
+        {
+          "date": "1906-01-17",
+          "contests": 1,
+          "source": "wiki-fr-presidentielles",
+          "note": "Fallières, final ballot."
+        },
+        {
+          "date": "1913-01-17",
+          "contests": 1,
+          "source": "wiki-fr-presidentielles",
+          "note": "Poincaré."
+        },
+        {
+          "date": "1920-01-17",
+          "contests": 1,
+          "source": "wiki-fr-presidentielles",
+          "note": "Deschanel."
+        },
+        {
+          "date": "1920-09-23",
+          "contests": 1,
+          "source": "wiki-fr-presidentielles",
+          "note": "Millerand."
+        },
+        {
+          "date": "1924-06-13",
+          "contests": 1,
+          "source": "wiki-fr-presidentielles",
+          "note": "Doumergue, final ballot."
+        },
+        {
+          "date": "1931-05-13",
+          "contests": 1,
+          "source": "wiki-fr-presidentielles",
+          "note": "Doumer."
+        },
+        {
+          "date": "1932-05-10",
+          "contests": 1,
+          "source": "wiki-fr-presidentielles",
+          "note": "Lebrun."
+        },
+        {
+          "date": "1939-04-05",
+          "contests": 1,
+          "source": "wiki-fr-presidentielles",
+          "note": "Lebrun, reelected."
+        },
+        {
+          "date": "1947-01-16",
+          "contests": 1,
+          "source": "wiki-fr-presidentielles",
+          "note": "Auriol."
+        },
+        {
+          "date": "1953-12-23",
+          "contests": 1,
+          "source": "wiki-fr-presidentielles",
+          "note": "Coty, elected on the 13th ballot after the Congress opened on 17 December."
+        },
+        {
           "date": "1958-12-21",
           "contests": 1,
           "source": "elysee-presidents",
@@ -3501,7 +3749,7 @@
       "valid_from": "1871-08-31",
       "valid_to": "1962-11-06",
       "note": "Third and Fourth Republic presidents were elected by the deputies and senators meeting as the Congress at Versailles (Thiers by the National Assembly in 1871); de Gaulle was elected on 21 December 1958 by a college of about 80,000 parliamentarians, councillors, and municipal delegates. The 1962 referendum introduced direct election.",
-      "source": "elysee-presidents",
+      "source": "wiki-fr-presidentielles",
       "match": [
         {
           "election_kinds": [
