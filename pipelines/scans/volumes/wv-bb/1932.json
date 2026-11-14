@@ -29,5 +29,32 @@
     665,
     666,
     667
-  ]
+  ],
+  "slates": {
+    "democratic": {
+      "candidate": "Roosevelt",
+      "elector": 1,
+      "of": 8
+    },
+    "republican": {
+      "candidate": "Hoover",
+      "elector": 1,
+      "of": 8
+    },
+    "socialist": {
+      "candidate": "Thomas",
+      "elector": 1,
+      "of": 8
+    },
+    "communist": {
+      "candidate": "Foster",
+      "elector": 1,
+      "of": 8
+    },
+    "prohibition": {
+      "candidate": "Upshaw",
+      "elector": 1,
+      "of": 8
+    }
+  }
 }
