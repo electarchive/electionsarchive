@@ -78,13 +78,67 @@ GROUPED = {
         ("Abersychan", "New Inn", "Panteg", "Pen Tranch", "Pontymoile", "Trevethin"),
     ),
 }
+ENGLISH_AUTHORITIES = {"E07000011": "Huntingdonshire", "E06000051": "Shropshire", "E06000054": "Wiltshire"}
 ENGLISH_GROUPED = {
-    ("E07000011", "Huntingdonshire"): ("Great and Little Gidding", ("Great Gidding", "Little Gidding")),
+    ("E07000011", "Great and Little Gidding"): ("Great Gidding", "Little Gidding"),
+    ("E06000051", "Acton Burnell, Frodesley, Pitchford, Ruckley and Langley"): (
+        "Acton Burnell",
+        "Frodesley",
+        "Pitchford",
+        "Ruckley and Langley",
+    ),
+    ("E06000051", "All Stretton, Smethcott and Woolstaston"): ("All Stretton", "Smethcott", "Woolstaston"),
+    ("E06000051", "Alveley and Romsley"): ("Alveley", "Romsley"),
+    ("E06000051", "Aston Botterell, Burwarton and Cleobury North"): ("Aston Botterell", "Burwarton", "Cleobury North"),
+    ("E06000051", "Bedstone and Bucknell"): ("Bedstone", "Bucknell"),
+    ("E06000051", "Billingsley, Deuxhill, Glazeley and Middleton Scriven"): (
+        "Billingsley",
+        "Deuxhill",
+        "Glazeley",
+        "Middleton Scriven",
+    ),
+    ("E06000051", "Church Preen, Hughley and Kenley"): ("Church Preen", "Hughley", "Kenley"),
+    ("E06000051", "Cockshutt-cum-Petton"): ("Cockshutt", "Petton"),
+    ("E06000051", "Cressage, Harley and Sheinton"): ("Cressage", "Harley", "Sheinton"),
+    ("E06000051", "Easthope, Shipton and Stanton Long"): ("Easthope", "Shipton", "Stanton Long"),
+    ("E06000051", "Eaton-under-Heywood and Hope Bowdler"): ("Eaton-under-Heywood", "Hope Bowdler"),
+    ("E06000051", "Great Ness and Little Ness"): ("Great Ness", "Little Ness"),
+    ("E06000051", "Hopton Cangeford and Stoke St Milborough"): ("Hopton Cangeford", "Stoke St. Milborough"),
+    ("E06000051", "Leebotwood and Longnor"): ("Leebotwood", "Longnor"),
+    ("E06000051", "Mainstone with Colebatch"): ("Mainstone", "Colebatch"),
+    ("E06000051", "Milson and Neen Sollars"): ("Milson", "Neen Sollars"),
+    ("E06000051", "Morville, Acton Round, Aston Eyre, Monkhopton and Upton Cressett"): (
+        "Morville",
+        "Acton Round",
+        "Aston Eyre",
+        "Monkhopton",
+        "Upton Cressett",
+    ),
+    ("E06000051", "Myndtown, Norbury, Ratlinghope and Wentnor"): ("Myndtown", "Norbury", "Ratlinghope", "Wentnor"),
+    ("E06000051", "Stottesdon and Sidbury"): ("Stottesdon", "Sidbury"),
+    ("E06000051", "Worfield and Rudge"): ("Worfield", "Rudge"),
+    ("E06000054", "Berwick Bassett and Winterbourne Monkton"): ("Berwick Bassett", "Winterbourne Monkton"),
+    ("E06000054", "Broad Hinton and Winterbourne Bassett"): ("Broad Hinton", "Winterbourne Bassett"),
+    ("E06000054", "Charlton St Peter and Wilsford"): ("Charlton St Peter", "Wilsford"),
+    ("E06000054", "Heytesbury Imber and Knook"): ("Heytesbury", "Knook"),
+    ("E06000054", "Kennet Valley"): ("Fyfield", "West Overton"),
+    ("E06000054", "Upper Deverills"): ("Brixton Deverill", "Kingston Deverill"),
+}
+ENGLISH_GROUP_COUNCILS = {
+    (
+        "E06000054",
+        "Berwick Bassett and Winterbourne Monkton",
+    ): "Berwick Bassett and Winterbourne Monkton Joint Parish Council",
+    ("E06000054", "Broad Hinton and Winterbourne Bassett"): "Broad Hinton and Winterbourne Basset Parish Council",
+    ("E06000054", "Charlton St Peter and Wilsford"): "Charlton St Peter and Wilsford Joint Parish Council",
+    ("E06000054", "Upper Deverills"): "Upper Deverills Joint Parish Council",
 }
 GROUP_SCHEMES = {
     "W": ("gb.community_group", "group of communities", "communities", "Community Council"),
     "E": ("gb.parish_group", "group of parishes", "parishes", "Parish Council"),
 }
+WILTSHIRE_COUNCILS = "https://cms.wiltshire.gov.uk/mgParishCouncilDetails.aspx?bcr=1"
+SHROPSHIRE_COUNCILS = "https://shropshire.gov.uk/committee-services/mgParishCouncilDetails.aspx?bcr=1"
 HUNTINGDONSHIRE_COUNCILS = "https://democracy.huntingdonshire.gov.uk/moderngov/mgParishCouncilDetails.aspx?bcr=1"
 ENGLISH = Path(__file__).with_name("parish_councils.tsv")
 ENGLISH_INBOX = DATA / "inbox" / SOURCE / "councils"
@@ -115,6 +169,12 @@ GROUP_SOURCES = {
             f"https://web.archive.org/web/20250814134725id_/{DENBIGHSHIRE_COUNCIL}",
         ),
     ],
+    "Shropshire": [
+        ("Shropshire Council", "Parish council contact details", SHROPSHIRE_COUNCILS, SHROPSHIRE_COUNCILS),
+    ],
+    "Wiltshire": [
+        ("Wiltshire Council", "Parish councils", WILTSHIRE_COUNCILS, WILTSHIRE_COUNCILS),
+    ],
     "Huntingdonshire": [
         (
             "Huntingdonshire District Council",
@@ -132,6 +192,14 @@ GROUP_EVIDENCE = {
     "Denbighshire": (
         "Denbighshire's register of city, town, and community councils lists one Tremeirchion Cwm & Waen council, "
         "and the Welsh Government's precept table shows no separate council for any of the three communities"
+    ),
+    "Shropshire": (
+        "Shropshire Council's register of town and parish councils lists one council named for these parishes, and "
+        "its 2025 results list each of them as an electoral area of that council"
+    ),
+    "Wiltshire": (
+        "Wiltshire Council's register of parish councils lists one council named for these parishes, and its 2025 "
+        "results list each of them as an electoral area of that council"
     ),
     "Huntingdonshire": (
         "Huntingdonshire's register of town and parish councils lists one Great and Little Gidding Parish Council "
@@ -492,10 +560,12 @@ def emit() -> Path:
         groups = [
             (authorities[authority], authority, label, members)
             for (authority, _), (label, members) in sorted(GROUPED.items())
-        ] + [(lad, authority, label, members) for (lad, authority), (label, members) in sorted(ENGLISH_GROUPED.items())]
+        ] + [
+            (lad, ENGLISH_AUTHORITIES[lad], label, members) for (lad, label), members in sorted(ENGLISH_GROUPED.items())
+        ]
         for lad, authority, label, members in groups:
             scheme, _, plural, style = GROUP_SCHEMES[lad[0]]
-            council = f"{label} {style}"
+            council = ENGLISH_GROUP_COUNCILS.get((lad, label), f"{label} {style}")
             keys = []
             for member in members:
                 found = communities.get((lad, fold(member)), set())
@@ -571,6 +641,8 @@ def emit() -> Path:
         listings: dict[str, UUID] = {}
         for publisher, title, url in english.select("publisher", "title", "url").unique(maintain_order=True).rows():
             listings[url] = cs.source(publisher, title)
+            if any(listings[url] in sources for sources in evidence.values()):
+                continue
             cs.add(
                 "source",
                 id=listings[url],
