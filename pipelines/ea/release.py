@@ -514,12 +514,24 @@ def build(calver: str | None = None) -> str:
         "files": writer.files,
     }
     (folder / "manifest.json").write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n")
+    tables: dict[str, list[str]] = defaultdict(list)
+    for entry in writer.files:
+        if str(entry["file"]).endswith(".parquet"):
+            tables[str(entry["table"])].append(str(entry["file"]))
+    (folder / "electionsarchive.sql").write_text(
+        "".join(
+            f'create or replace view "{table}" as select * from read_parquet(['
+            + ", ".join(f"'{name}'" for name in sorted(names))
+            + "], union_by_name = true);\n"
+            for table, names in sorted(tables.items())
+        )
+    )
     sums = [f"{entry['sha256']}  {entry['file']}" for entry in writer.files]
-    for name in ("ATTRIBUTION.md", "manifest.json"):
+    for name in ("ATTRIBUTION.md", "manifest.json", "electionsarchive.sql"):
         sums.append(f"{hashlib.sha256((folder / name).read_bytes()).hexdigest()}  {name}")
     (folder / "SHA256SUMS").write_text("\n".join(sums) + "\n")
     size = sum(int(str(entry["bytes"])) for entry in writer.files)
-    return f"{folder}: {len(writer.files) + 3} files, {size / (1 << 30):.2f} GiB"
+    return f"{folder}: {len(writer.files) + 4} files, {size / (1 << 30):.2f} GiB"
 
 
 def record(calver: str | None = None) -> str:
