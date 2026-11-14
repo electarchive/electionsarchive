@@ -1,5 +1,7 @@
+import csv
 import functools
 import html
+import io
 import re
 import struct
 import subprocess
@@ -121,7 +123,30 @@ GWYNEDD_POLLS = (
     "https://www.gwynedd.llyw.cymru/cy/Cyngor/Dogfennau-Cyngor/Pleidleisio-ac-etholiadau/Etholiad-Tref-Cymuned-2022/"
     "Canlyniadau-Etholiad-2022.pdf"
 )
+GWYNEDD_NOMINATED = (
+    "https://www.gwynedd.llyw.cymru/cy/Cyngor/Dogfennau-Cyngor/Pleidleisio-ac-etholiadau/Etholiad-Tref-Cymuned-2022/"
+    "Statnom-Cymuned.pdf"
+)
+GWYNEDD_WARDS = {
+    "Gwalia": "Llangywer",
+    "Aberangell": "Mawddwy",
+    "Dwyrain/East (Tywyn)": "Tywyn",
+    "Morfa": "Tywyn",
+    "Gorllewin/West (Tywyn)": "Tywyn",
+    "Tanygrisiau": "Ffestiniog",
+    "Hendre (Caernarfon)": "Caernarfon",
+}
+NOMINATED = (
+    "Gwynedd Council's notice of uncontested election does not list this ward and no poll was held in it (the "
+    "notice of poll covers eight other wards), so the candidates are taken from the statement of persons nominated, "
+    "where they stand validly nominated for no more than the ward's seats, and are recorded as returned unopposed."
+)
 SCANS = {
+    GWYNEDD_NOMINATED: (
+        "Gwynedd Council",
+        "Datganiad am y Personau a Enwebwyd / Statement of Persons Nominated, community and town councillors, "
+        "5 May 2022",
+    ),
     GWYNEDD_POLLS: (
         "Gwynedd Council",
         "Datganiad Canlyniad y Pleidleisio / Declaration of Result of Poll, community and town councillors, 5 May 2022",
@@ -207,6 +232,8 @@ PARTIES: dict[str, str | None] = {
     "Green Party/Plaid Werdd": "Q3499324",
     "The Green Party / Plaid Werdd": "Q3499324",
     "Labour and Co-operative Party / Llafur a’r Blaid Gydweithredol": "Q9630",
+    "Independant": "independent",
+    "Labour and Co-operative Party": "Q9630",
 }
 
 
@@ -683,6 +710,100 @@ def gwynedd_polls() -> list[dict]:
     return reads
 
 
+def gwynedd_nominated() -> list[dict]:
+    path = raw.cached(SOURCE, GWYNEDD_NOMINATED).path
+    out = subprocess.run(["pdftotext", "-tsv", str(path), "-"], capture_output=True, text=True, check=True).stdout
+    pages: dict[int, list[dict]] = {}
+    for word in csv.DictReader(io.StringIO(out), delimiter="\t", quoting=csv.QUOTE_NONE):
+        if word["level"] == "5":
+            pages.setdefault(int(word["page_num"]), []).append(word)
+    reads: list[dict] = []
+    for number, words in sorted(pages.items()):
+        text = " ".join(word["text"] for word in words)
+        top = max(float(word["top"]) for word in words if word["text"] == "blaenorol)") + 10
+        bottom = min(float(word["top"]) for word in words if word["text"] == "Mae’r")
+        body = [word for word in words if top < float(word["top"]) < bottom]
+        lines: dict[int, list[str]] = {}
+        for word in body:
+            if float(word["left"]) < 145:
+                lines.setdefault(round(float(word["top"])), []).append(word["text"])
+        if not lines:
+            continue
+        rows = sorted(lines.items())
+        pairs = [(rows[k], rows[k + 1]) for k in range(0, len(rows) - 1, 2)] if len(rows) % 2 == 0 else None
+        described: dict[int, list[str]] = {}
+        for word in body:
+            left = float(word["left"])
+            if pairs and 300 < left < 495:
+                middle = float(word["top"])
+                near = min(range(len(pairs)), key=lambda i: abs((pairs[i][0][0] + pairs[i][1][0]) / 2 - middle))
+                described.setdefault(near, []).append(word["text"])
+            elif left > 715:
+                raise ValueError(f"Gwynedd statement page {number}: a nomination is marked invalid or withdrawn")
+        reads.append(
+            {
+                "ward": welsh_title(found(r"ELECTORAL WARD - (.*?) Dydd", text).group(1)),
+                "seats": int(found(r"Election of (\d+) Community", text).group(1)),
+                "page": number,
+                "candidates": None
+                if pairs is None
+                else [
+                    {
+                        "printed": f"{' '.join(surname[1])} {' '.join(forenames[1])}",
+                        "name": f"{' '.join(forenames[1])} {' '.join(surname[1])}",
+                        "description": " ".join(described.get(index, [])),
+                        "votes": None,
+                        "elected": True,
+                    }
+                    for index, (surname, forenames) in enumerate(pairs)
+                ],
+            }
+        )
+    return reads
+
+
+def gwynedd_seats(reads: list[dict]) -> list[dict]:
+    names = communities("W06000002")
+    by_ward = {fold(read["ward"]): read["council"] for read in reads if read["ward"]}
+    entries = gwynedd_nominated()
+    for entry in entries:
+        ward = entry["ward"]
+        entry["council"] = by_ward.get(fold(ward)) or names.get(fold(ward)) or GWYNEDD_WARDS[ward]
+    for entry in entries:
+        ward, council = entry["ward"], entry["council"]
+        single = sum(1 for other in entries if other["council"] == council) == 1
+        matches = [
+            read
+            for read in reads
+            if read["council"] == council and (read["ward"] is None or fold(read["ward"]) == fold(ward) or single)
+        ]
+        if matches:
+            for read in matches:
+                elected = sum(1 for candidate in read["candidates"] if candidate["elected"])
+                if elected > entry["seats"] or (read["places"] is not None and read["places"] != entry["seats"]):
+                    raise ValueError(f"Gwynedd {council} {ward}: {elected} elected to {entry['seats']} seats")
+                read["places"] = entry["seats"]
+            continue
+        candidates = entry["candidates"]
+        if candidates is None or len(candidates) > entry["seats"]:
+            raise ValueError(f"Gwynedd {council} {ward}: no unopposed return can be read")
+        reads.append(
+            {
+                "council": council,
+                "ward": ward,
+                "places": entry["seats"],
+                "turnout": None,
+                "source": GWYNEDD_NOMINATED,
+                "url": GWYNEDD_NOMINATED,
+                "caveat": NOMINATED,
+                "candidates": candidates,
+            }
+        )
+    if missing := [(read["council"], read["ward"]) for read in reads if read["places"] is None]:
+        raise ValueError(f"Gwynedd: no seat count for {missing}")
+    return reads
+
+
 def flintshire(url: str) -> list[dict]:
     names = communities("W06000005")
     reads: list[dict] = []
@@ -1032,7 +1153,7 @@ READERS = {
     "moderngov": moderngov,
     "flintshire": flintshire,
     "vale": vale,
-    "gwynedd": lambda url: unwarded(gwynedd(url) + gwynedd_polls(), "W06000002"),
+    "gwynedd": lambda url: unwarded(gwynedd_seats(gwynedd(url) + gwynedd_polls()), "W06000002"),
     "ceredigion": ceredigion,
     "bridgend": bridgend,
 }
