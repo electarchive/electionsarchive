@@ -18,6 +18,10 @@ RESTRICTED = {
     "us.algara": "compiled from CQ Press and ICPSR's United States Historical Election Returns",
     "us.algara_federal": "compiled from CQ Press and ICPSR's United States Historical Election Returns",
 }
+# Sources whose files carry a stated license on the publisher's own pages, whether or not a source row cites them.
+STATED = {
+    "jp.ndl": "Public domain (Public Domain Mark, National Diet Library Digital Collections)",
+}
 # The first rule a license matches sets its class; a file cited under several licenses takes the strictest.
 CLASSES = [
     (
@@ -146,6 +150,8 @@ def license() -> str:
         with raw.locked(folder.name) as index:
             for entry in index.values():
                 licenses = cited.get(f"raw/{folder.name}/{entry['file']}", {None})
+                if folder.name in STATED:
+                    licenses = licenses - {None} | {STATED[folder.name]}
                 kind = max((_class(text) for text in licenses), key=STRICTNESS.index)
                 if folder.name in RESTRICTED:
                     kind = "restricted"
