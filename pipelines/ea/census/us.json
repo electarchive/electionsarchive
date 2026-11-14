@@ -210,6 +210,60 @@
       "url": "https://www.oregonlegislature.gov/bills_laws/lawsstatutes/orcons.html",
       "kind": "official_body"
     },
+    "const-ca": {
+      "publisher": "California Legislative Counsel",
+      "title": "California Constitution, article VI",
+      "url": "https://leginfo.legislature.ca.gov/faces/codes_displayText.xhtml?lawCode=CONS&article=VI",
+      "kind": "official_body"
+    },
+    "const-il": {
+      "publisher": "Illinois General Assembly",
+      "title": "Illinois Constitution, article VI",
+      "url": "https://www.ilga.gov/commission/lrb/con6.htm",
+      "kind": "official_body"
+    },
+    "const-mi": {
+      "publisher": "Michigan Legislature",
+      "title": "Michigan Constitution of 1963, article VI, section 2",
+      "url": "https://www.legislature.mi.gov/Laws/MCL?objectName=mcl-Article-VI-2",
+      "kind": "official_body"
+    },
+    "const-wv": {
+      "publisher": "West Virginia Legislature",
+      "title": "Constitution of West Virginia",
+      "url": "https://www.wvlegislature.gov/WVCODE/WV_CON.cfm",
+      "kind": "official_body"
+    },
+    "const-ky": {
+      "publisher": "Kentucky Legislature",
+      "title": "Constitution of Kentucky, sections 117 and 119",
+      "url": "https://apps.legislature.ky.gov/law/constitution/Constitution/ViewConstitution?rsn=136",
+      "kind": "official_body"
+    },
+    "const-tx": {
+      "publisher": "Texas Legislature",
+      "title": "Texas Constitution, article V",
+      "url": "https://statutes.capitol.texas.gov/Docs/CN/htm/CN.5.htm",
+      "kind": "official_body"
+    },
+    "const-wi": {
+      "publisher": "Wisconsin Legislature",
+      "title": "Wisconsin Constitution, article VII, section 4",
+      "url": "https://docs.legis.wisconsin.gov/document/wisconsinconstitution/vii,4",
+      "kind": "official_body"
+    },
+    "const-la": {
+      "publisher": "Louisiana State Senate",
+      "title": "Constitution of Louisiana, article V",
+      "url": "https://senate.la.gov/Documents/Constitution/article5.htm",
+      "kind": "official_body"
+    },
+    "const-la-leg": {
+      "publisher": "Louisiana State Senate",
+      "title": "Constitution of Louisiana, article III",
+      "url": "https://senate.la.gov/Documents/Constitution/article3.htm",
+      "kind": "official_body"
+    },
     "const-wa": {
       "publisher": "Washington State Legislature",
       "title": "Washington State Constitution",
@@ -498,7 +552,15 @@
         "OH": {"source": "const-oh", "locator": "Ohio Const. art. IV, § 6(A)(1): justices are elected statewide for six-year terms"},
         "OR": {"source": "const-or", "locator": "Or. Const. art. VII (Amended), § 1: justices are chosen by the voters for six-year terms"},
         "WA": {"source": "const-wa", "locator": "Wash. Const. art. IV, § 3: justices are elected statewide for six-year terms"},
-        "PA": {"source": "const-pa", "locator": "Pa. Const. art. V, §§ 2, 13, and 15: justices are elected, then face retention votes, for ten-year terms"}
+        "PA": {"source": "const-pa", "locator": "Pa. Const. art. V, §§ 2, 13, and 15: justices are elected, then face retention votes, for ten-year terms"},
+        "KY": {"source": "const-ky", "locator": "Ky. Const. §§ 117 and 119: justices are elected on a nonpartisan basis for eight-year terms"},
+        "TX": {"source": "const-tx", "locator": "Tex. Const. art. V, § 2(c): justices are elected statewide at a general election and hold office six years, three of them chosen every two years"},
+        "WI": {"source": "const-wi", "locator": "Wis. Const. art. VII, § 4(1): justices are elected for ten-year terms, one justice each year"},
+        "LA": {"source": "const-la", "locator": "La. Const. art. V, § 3: a supreme court justice serves a ten-year term"},
+        "CA": {"source": "const-ca", "locator": "Cal. Const. art. VI, § 16(a): justices of the Supreme Court are elected at large at general elections for 12-year terms"},
+        "IL": {"source": "const-il", "locator": "Ill. Const. art. VI, §§ 10 and 12: justices are elected for ten-year terms, then face retention votes"},
+        "MI": {"source": "const-mi", "locator": "Mich. Const. art. VI, § 2: seven justices are elected at nonpartisan elections to eight-year terms"},
+        "WV": {"source": "const-wv", "locator": "W. Va. Const. art. VIII, § 2: justices are elected by the voters of the state for twelve-year terms"}
       },
       "judges": [
         {"states": "AL AK AZ AR CA CO FL GA ID IL IN IA KS KY LA MD MI MN MS MO MT NE NV NM NC ND OH OK OR TN TX UT WA WV WY", "period_years": 2, "phase": 0},
@@ -515,7 +577,8 @@
       "source": "bots-legislators",
       "match": [{"within": null, "body_kinds": ["upper_house", "unicameral"], "polity_kinds": ["federal_unit", "region"], "precedence": 2}],
       "laws": {
-        "VA": {"source": "const-va", "locator": "Va. Const. art. IV, § 2: senators are elected quadrennially on the Tuesday after the first Monday in November"}
+        "VA": {"source": "const-va", "locator": "Va. Const. art. IV, § 2: senators are elected quadrennially on the Tuesday after the first Monday in November"},
+        "LA": {"source": "const-la-leg", "locator": "La. Const. art. III, § 4(C): a member of the legislature is elected for a four-year term"}
       },
       "chambers": [
         {"states": "LA MS VA", "period_years": 4, "phase": 3, "term_years": 4},
@@ -534,7 +597,8 @@
       "match": [{"within": null, "body_kinds": ["lower_house"], "polity_kinds": ["federal_unit", "region"], "precedence": 2}],
       "laws": {
         "VA": {"source": "const-va", "locator": "Va. Const. art. IV, § 3: delegates are elected biennially on the Tuesday after the first Monday in November"},
-        "NJ": {"source": "nj-constitution", "locator": "N.J. Const. art. IV, § II, ¶ 4: Assembly members serve two-year terms ending at noon on the second Tuesday in January two years after"}
+        "NJ": {"source": "nj-constitution", "locator": "N.J. Const. art. IV, § II, ¶ 4: Assembly members serve two-year terms ending at noon on the second Tuesday in January two years after"},
+        "LA": {"source": "const-la-leg", "locator": "La. Const. art. III, § 4(C): a member of the legislature is elected for a four-year term"}
       },
       "chambers": [
         {"states": "LA MS", "period_years": 4, "phase": 3, "term_years": 4},
