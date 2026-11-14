@@ -51,6 +51,7 @@
     m.method_margin_size(),
     m.method_margin_traits(),
     m.method_margin_order(),
+    m.method_margin_neighbors(),
   ];
   const limits = [
     m.method_limit_pause(),
