@@ -2655,6 +2655,7 @@
   "versus_verdict_parties": "{a} a terminé devant {b} dans {one} des {total} scrutins où les deux partis se sont présentés.",
   "polity_kind_special_district": "Districts spéciaux",
   "polity_kind_judicial_district": "Districts judiciaires",
+  "polity_kind_tribal_nation": "Nations autochtones",
   "coverage_upcoming": "À venir, prêts",
   "coverage_upcoming_def": "Le vote n'a pas encore eu lieu et l'archive contient déjà tout sauf les résultats : le poste ou le siège, le district, le mode de scrutin, et chaque candidat avec son parti ou, pour une question référendaire, ses réponses possibles et son libellé officiel. Ces scrutins sont considérés comme couverts jusqu'au jour de l'élection. Dès le lendemain, il leur faut des résultats.",
   "coverage_upcoming_of": "{count} à venir et prêts",
