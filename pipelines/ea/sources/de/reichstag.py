@@ -61,6 +61,11 @@ PARTIES = {
     "sh_landespartei": ("de.party:SHLP", "Schleswig-Holsteinische Landespartei", "SHLP"),
     "rheinhessische_bauernschaft": (None, "Rheinhessische Bauernschaft", "RHB"),
     "gasthofsgewerbe": (None, "Bayerisches Gasthofsgewerbe", "BGG"),
+    "volksrecht": ("Q896602", "Reichspartei für Volksrecht und Aufwertung", "VRP"),
+    "cnmp": (None, "Christlich-Nationale Mittelstandspartei", "CNMP"),
+    "pfarrer_greber": (None, "Pfarrer-Greber-Partei", "PGP"),
+    "csr": (None, "Christlich-Soziale Reichspartei", "CSRP"),
+    "kratofiel": (None, "Beamtengruppe Kratofiel", "Kratofiel"),
 }
 BLOCS = {"kampffront"}
 JOINT = {
@@ -99,6 +104,48 @@ JOINT = {
     "bbmb_gasthof": (
         "Bayerischer Bauern- und Mittelstandsbund und Bayerisches Gasthofsgewerbe",
         ("bbmb", "gasthofsgewerbe"),
+    ),
+    "ddp_volksrecht": (
+        "Deutsche Demokratische Partei und Reichspartei für Volksrecht und Aufwertung",
+        ("ddp", "volksrecht"),
+    ),
+    "wp_greber": (
+        "Reichspartei des deutschen Mittelstandes und Pfarrer-Greber-Partei",
+        ("wirtschaftspartei", "pfarrer_greber"),
+    ),
+    "landvolk_cnmp_dhp": (
+        (
+            "Christlich-Nationale Bauern- und Landvolkpartei, Christlich-Nationale Mittelstandspartei und "
+            "Deutsch-Hannoversche Partei"
+        ),
+        ("landvolk", "cnmp", "dhp"),
+    ),
+    "landvolk_cnmp": (
+        "Christlich-Nationale Bauern- und Landvolkpartei und Christlich-Nationale Mittelstandspartei",
+        ("landvolk", "cnmp"),
+    ),
+    "landvolk_dhp": (
+        "Christlich-Nationale Bauern- und Landvolkpartei und Deutsch-Hannoversche Partei",
+        ("landvolk", "dhp"),
+    ),
+    "landvolk_slv": (
+        "Christlich-Nationale Bauern- und Landvolkpartei und Sächsisches Landvolk",
+        ("landvolk", "saechsisches_landvolk"),
+    ),
+    "landvolk_cnmp_slv": (
+        (
+            "Christlich-Nationale Bauern- und Landvolkpartei, Christlich-Nationale Mittelstandspartei und "
+            "Sächsisches Landvolk"
+        ),
+        ("landvolk", "cnmp", "saechsisches_landvolk"),
+    ),
+    "volksrecht_csr_kratofiel": (
+        "Reichspartei für Volksrecht und Aufwertung, Christlich-Soziale Reichspartei und Beamtengruppe Kratofiel",
+        ("volksrecht", "csr", "kratofiel"),
+    ),
+    "volksrecht_kratofiel": (
+        "Reichspartei für Volksrecht und Aufwertung und Beamtengruppe Kratofiel",
+        ("volksrecht", "kratofiel"),
     ),
 }
 OTHERS = "Andere Parteien"
@@ -274,6 +321,98 @@ ELECTIONS: dict[date, dict[str, Any]] = {
             "Wirtschaftspartei's 17 seats include members of the Bayerischer Bauern- und Mittelstandsbund elected on "
             "its national list. In Wahlkreis 26 (Franken) the Deutschnationale Volkspartei ran a joint list with the "
             "Nationalliberale Landespartei Bayern."
+        ),
+    },
+    date(1928, 5, 20): {
+        "english": "1928 German federal election",
+        "german": "Reichstagswahl 1928",
+        "year": 1929,
+        "volume": 48,
+        "printed": "484 and 485",
+        "seats": 491,
+        "pages": {
+            535: {
+                "top": 0.255,
+                "registered": (0.300, 0.368),
+                "cast": (0.372, 0.446),
+                "valid": (0.480, 0.551),
+                "spd": (0.552, 0.618),
+                "dnvp": (0.645, 0.712),
+                "zentrum": (0.752, 0.818),
+                "dvp": (0.843, 0.903),
+            },
+            536: {
+                "top": 0.245,
+                "kpd": (0.100, 0.169),
+                "ddp": (0.200, 0.262),
+                "wirtschaftspartei": (0.312, 0.375),
+                "nsdap": (0.417, 0.476),
+                "bauernpartei": (0.513, 0.569),
+                "landvolk": (0.619, 0.670),
+                "volksrecht": (0.716, 0.771),
+                "others": (0.806, 0.861),
+            },
+        },
+        "lists": {
+            **{wk: {"ddp": "ddp_volksrecht"} for wk in (10, 23, 26)},
+            2: {"ddp": "ddp_volksrecht", "landvolk": "landvolk_cnmp_dhp"},
+            3: {"ddp": "ddp_volksrecht", "landvolk": "landvolk_cnmp_dhp"},
+            4: {"ddp": "ddp_volksrecht", "landvolk": "landvolk_cnmp"},
+            14: {"ddp": "ddp_volksrecht", "landvolk": "landvolk_dhp"},
+            15: {"landvolk": "landvolk_dhp"},
+            16: {"landvolk": "landvolk_dhp"},
+            20: {"wirtschaftspartei": "wp_greber"},
+            21: {"wirtschaftspartei": "wp_greber"},
+            24: {"zentrum": "bvp", "bauernpartei": "bbmb", "volksrecht": "volksrecht_csr_kratofiel"},
+            25: {"zentrum": "bvp", "bauernpartei": "bbmb", "volksrecht": "volksrecht_csr_kratofiel"},
+            26: {"zentrum": "bvp", "bauernpartei": "bbmb", "volksrecht": "volksrecht_kratofiel"},
+            27: {"zentrum": "zentrum_bvp", "volksrecht": "volksrecht_kratofiel"},
+            28: {"landvolk": "landvolk_slv"},
+            29: {"landvolk": "landvolk_cnmp_slv"},
+            30: {"ddp": "ddp_volksrecht", "landvolk": "landvolk_slv"},
+            31: {"landvolk": "wuerttemberg_landbund"},
+            34: {"landvolk": "landvolk_dhp"},
+            35: {"landvolk": "landvolk_cnmp"},
+        },
+        "won": {
+            "spd": 153,
+            "dnvp": 73,
+            "zentrum": 62,
+            "bvp": 16,
+            "dvp": 45,
+            "kpd": 54,
+            "ddp": 25,
+            "wirtschaftspartei": 23,
+            "nsdap": 12,
+            "bauernpartei": 8,
+            "wuerttemberg_landbund": 3,
+            "landvolk": 10,
+            "dhp": 3,
+            "saechsisches_landvolk": 2,
+            "volksrecht": 2,
+        },
+        "caveat": (
+            "The table counts each list where it stood, and the national totals beneath it equal the sums of the "
+            "Wahlkreise. Many cells sum a party's list and the regional lists joined (angeschlossen) to its national "
+            "list, which the Reichsamt splits in its notes; each such cell is stored as one joint list. The Deutsche "
+            "Demokratische Partei column holds the Reichspartei für Volksrecht und Aufwertung where it was joined to "
+            "national list 6 (Wahlkreise 2, 3, 4, 10, 14, 23, 26, and 30; 26,252 votes in all). The "
+            "Wirtschaftspartei column holds the Pfarrer-Greber-Partei in Wahlkreise 20 and 21 (1,516 and 7,996), "
+            "and in Wahlkreis 23 (Düsseldorf West) the sum of two Wirtschaftspartei lists, Geck (16,899) and Bredt "
+            "(31,319). One column holds the Christlich-Nationale Bauern- und Landvolkpartei (national list 15) with "
+            "the Christlich-Nationale Mittelstandspartei and the Deutsch-Hannoversche Partei joined to it, the "
+            "Sächsisches Landvolk (Wahlkreise 28 to 30), and the Landbund (national list 14), which stood only in "
+            "Württemberg as the Bauern- und Weingärtnerbund; the national split is Landbund 199,513, Landvolkpartei "
+            "571,586, Mittelstandspartei 9,933, Deutsch-Hannoversche Partei 195,375, and Sächsisches Landvolk "
+            "127,648. Of the 13 members elected on the Landvolkpartei's lists, the Reichsamt names 3 as Deutsch-"
+            "Hannoversche Partei (2 in the Wahlkreise and 1 in the Wahlkreisverbände), so 10 are counted for the "
+            "Landvolkpartei. The Bayerische Volkspartei stood in Wahlkreise 24 to 26 in the Zentrum column, and the "
+            "joint list of the Zentrum and the Bayerische Volkspartei in Wahlkreis 27 (Pfalz) is counted by the "
+            "Reichsamt with the Zentrum (Zentrum 3,710,747 and Bayerische Volkspartei 945,306 nationally). The "
+            "Deutsche Bauernpartei stood in Bavaria (Wahlkreise 24 to 26) as the Bayerischer Bauern- und "
+            "Mittelstandsbund, and its 8 seats include those won there. In Wahlkreise 24 to 27 the Volksrechtpartei "
+            "column holds joint lists with the Beamtengruppe Kratofiel, and in Wahlkreise 24 and 25 also with the "
+            "Christlich-Soziale Reichspartei."
         ),
     },
     date(1930, 9, 14): {
