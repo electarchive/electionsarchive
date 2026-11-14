@@ -591,6 +591,19 @@ TABLES += [
         "short": True,
     }
 ]
+EVENING_STAR_1920_JULY_4 = "batch_dlc_dalek_ver01:data:sn83045462:0028065677A:1920070401:0368"
+TABLES += [
+    {
+        "table": f"1920:democratic:b{ballot}",
+        "image": f"https://tile.loc.gov/image-services/iiif/service:ndnp:dlc:{EVENING_STAR_1920_JULY_4}/full/pct:50/0/default.jpg",
+        "release": "https://www.loc.gov/resource/sn83045462/1920-07-04/ed-1/?sp=14",
+        "leaves": (1,),
+        "ballot": ballot,
+        "transcribed": "conventions_san_francisco_1920.tsv",
+        "short": True,
+    }
+    for ballot in range(3, 19)
+]
 EVENING_STAR_1960 = "https://www.loc.gov/resource/sn83045462/1960-07-14/ed-1/?sp=8"
 TABLES += [
     {
@@ -774,6 +787,17 @@ EVENING_STAR_1928_CAVEAT = (
     "named in the table. The table gives one and a half Kansas votes and one Mississippi vote as not voting, which "
     "are not stored. The Star's text misprints some fractions, which were read against each delegation's size."
 )
+EVENING_STAR_1920_CAVEAT = (
+    "The archive has not located a free copy of the official proceedings' roll call of these ballots, so they are the "
+    "state-by-state tables the Washington Evening Star printed on July 4, 1920 (page 14). They are defaults to be "
+    "superseded by the official proceedings. Each table gives, for every delegation, its votes for William G. "
+    "McAdoo, James M. Cox, A. Mitchell Palmer, and a scattering column; only the first three are stored, and the "
+    "scattering votes, which the Star lists by candidate in a note under each table, are shown as not recorded. "
+    "Delegations whose named votes fall short of their size are likewise shown as not recorded. Totals are the "
+    "printed ones. Where a printed total differs from the state rows, the rows are stored as printed, except two "
+    "cells that stand in the wrong column against the printed totals: Mississippi's 20 on the fourth ballot, printed "
+    "under McAdoo, is stored for Cox, and Georgia's 28 on the eleventh, printed under Cox, is stored for Palmer."
+)
 EVENING_STAR_1960_CAVEAT = (
     "The archive has not located a free copy of the official proceedings' roll call, so this ballot is the "
     "Associated Press table of the roll call that the Washington Evening Star printed on July 14, 1960 (page A-8). It "
@@ -952,6 +976,7 @@ PROCEEDINGS += [
     {"party": "democratic", "tables": {1: "2008:democratic"}, "title": "Roll Call Vote for President of the United States, 2008 Democratic National Convention: Final Vote Tally, as compiled by the Office of the Secretary", "publisher": "Democratic National Committee, Office of the Secretary", "city": "Denver", "days": (date(2008, 8, 25), date(2008, 8, 28)), "ballots": {1: date(2008, 8, 27)}, "deciding": 1, "method": SHEET_METHOD, "caveat": SHEET_CAVEAT},
     {"party": "democratic", "tables": {1: "2024:democratic"}, "title": "2024 Electronic Roll Call: State by State Breakdown", "publisher": "Democratic National Committee", "city": "Chicago", "days": (date(2024, 8, 19), date(2024, 8, 22)), "ballots": {1: date(2024, 8, 5)}, "umbrella": "2024-01-23:president:democratic", "deciding": 1, "required": None, "method": DNC_2024_METHOD, "caveat": DNC_2024_CAVEAT},
     {"party": "democratic", "tables": {1: "1960:democratic"}, "title": "The Evening Star (Washington, D.C.), July 14, 1960: Roll Call of States", "publisher": "The Evening Star", "kind": "news_agency", "city": "Los Angeles", "days": (date(1960, 7, 11), date(1960, 7, 15)), "ballots": {1: date(1960, 7, 13)}, "deciding": 1, "required": 761, "method": PRESS.format("the Washington Evening Star"), "caveat": EVENING_STAR_1960_CAVEAT},
+    {"party": "democratic", "tables": {n: f"1920:democratic:b{n}" for n in range(3, 19)}, "title": "The Evening Star (Washington, D.C.), July 4, 1920: Detailed Ballots Show How State Delegations Voted", "publisher": "The Evening Star", "kind": "news_agency", "city": "San Francisco", "days": (date(1920, 6, 28), date(1920, 7, 6)), "ballots": dict.fromkeys(range(3, 19), date(1920, 7, 3)), "deciding": None, "required": 730, "method": PRESS.format("the Washington Evening Star"), "caveat": EVENING_STAR_1920_CAVEAT},
     {"party": "democratic", "tables": {1: "1928:democratic"}, "title": "The Evening Star (Washington, D.C.), June 29, 1928: Vote Cast on Ballot", "publisher": "The Evening Star", "kind": "news_agency", "city": "Houston", "days": (date(1928, 6, 26), date(1928, 6, 29)), "ballots": {1: date(1928, 6, 28)}, "deciding": 1, "required": 733, "method": PRESS.format("the Washington Evening Star"), "caveat": EVENING_STAR_1928_CAVEAT},
     {"party": "democratic", "tables": {1: "1956:democratic"}, "title": "Official report of the proceedings of the Democratic National Convention and committee, held at Chicago, Illinois, August 13 to August 17, 1956, resulting in the nomination of Adlai E. Stevenson of Illinois for President and Estes Kefauver of Tennessee for Vice President", "publisher": "Democratic National Committee", "city": "Chicago", "days": (date(1956, 8, 13), date(1956, 8, 17)), "ballots": {1: date(1956, 8, 16)}, "deciding": 1},
 ]  # fmt: skip
@@ -2199,6 +2224,33 @@ TOTALS = {
     "1864:democratic": {"Thomas H. Seymour": 23.5},
 }
 MISPRINTS = {
+    "1920:democratic:b3": (
+        "The printed total for Palmer is 257.5, against 254.5 in the state rows. The rows are stored as printed.",
+        {"column Palmer": (257.5, 254.5, "the state figures add to 254.5")},
+    ),
+    "1920:democratic:b4": (
+        "The printed total for McAdoo is 335, against 339 in the state rows. The rows are stored as printed.",
+        {"column McAdoo": (335, 339, "the state figures add to 339")},
+    ),
+    "1920:democratic:b10": (
+        "The printed total for McAdoo is 385, against 384 in the state rows. The rows are stored as printed.",
+        {"column McAdoo": (385, 384, "the state figures add to 384")},
+    ),
+    "1920:democratic:b17": (
+        "The printed total for McAdoo is 332, against 335 in the state rows. The printed total for Cox is 442, against 439 in the state rows. The rows are stored as printed.",
+        {
+            "column McAdoo": (332, 335, "the state figures add to 335"),
+            "column Cox": (442, 439, "the state figures add to 439"),
+        },
+    ),
+    "1920:democratic:b18": (
+        "The printed total for McAdoo is 330, against 330.5 in the state rows. The printed total for Cox is 456, against 458 in the state rows. The printed total for Palmer is 174, against 174.5 in the state rows. The rows are stored as printed.",
+        {
+            "column McAdoo": (330, 330.5, "the state figures add to 330.5"),
+            "column Cox": (456, 458, "the state figures add to 458"),
+            "column Palmer": (174, 174.5, "the state figures add to 174.5"),
+        },
+    ),
     "1932:democratic:b3": (
         "The printed total for Albert C. Ritchie is 23\u00bd, against 21\u00bd in the state rows. The table gives Indiana 2 for Ritchie; the rows are stored as printed.",
         {"column Ritchie": (23.5, 21.5, "the state figures add to 21\u00bd")},
