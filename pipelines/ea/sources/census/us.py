@@ -134,6 +134,8 @@ def emit() -> str:
                 rule = {k: v for k, v in group.items() if k != "states"}
                 if "locator" not in rule:
                     rule.update(laws.get(st, {}))
+                if "{name}" in rule.get("locator", ""):
+                    rule["locator"] = rule["locator"].format(name=names[st])
                 entry["cadence"].append(
                     {
                         "within": f"US-{st}",
