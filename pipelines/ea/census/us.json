@@ -103,6 +103,120 @@
       "url": "https://www.njleg.state.nj.us/constitution",
       "kind": "official_body"
     },
+    "const-az": {
+      "publisher": "Arizona Legislature",
+      "title": "Arizona Constitution, article VI",
+      "url": "https://www.azleg.gov/const/6/37.htm",
+      "kind": "official_body"
+    },
+    "const-ar": {
+      "publisher": "Arkansas Judiciary",
+      "title": "Arkansas Supreme Court",
+      "url": "https://arcourts.gov/courts/supreme-court",
+      "kind": "official_body"
+    },
+    "const-fl": {
+      "publisher": "Florida Senate",
+      "title": "Constitution of the State of Florida",
+      "url": "https://www.flsenate.gov/Laws/Constitution",
+      "kind": "official_body"
+    },
+    "const-id": {
+      "publisher": "Idaho Legislature",
+      "title": "Idaho Constitution, article V",
+      "url": "https://legislature.idaho.gov/statutesrules/idconst/ArtV/Sect6",
+      "kind": "official_body"
+    },
+    "const-ia": {
+      "publisher": "Iowa State Judicial Nominating Commission",
+      "title": "Constitutional amendment on judicial selection",
+      "url": "https://iowajnc.gov/about/constitutional-amendment",
+      "kind": "official_body"
+    },
+    "const-ks": {
+      "publisher": "Kansas Office of the Revisor of Statutes",
+      "title": "Kansas Constitution, article 3",
+      "url": "https://ksrevisor.gov/kanconst/093_003_0005.html",
+      "kind": "official_body"
+    },
+    "const-md": {
+      "publisher": "Maryland State Archives",
+      "title": "Maryland Constitution, article IV",
+      "url": "https://msa.maryland.gov/msa/mdmanual/43const/html/04art4.html",
+      "kind": "official_body"
+    },
+    "const-mn": {
+      "publisher": "Minnesota Office of the Revisor of Statutes",
+      "title": "Minnesota Constitution",
+      "url": "https://www.revisor.mn.gov/constitution/",
+      "kind": "official_body"
+    },
+    "const-mo": {
+      "publisher": "Missouri Office of the Revisor of Statutes",
+      "title": "Missouri Constitution, article V, section 19",
+      "url": "https://revisor.mo.gov/main/OneSection.aspx?section=V+++19",
+      "kind": "official_body"
+    },
+    "const-mt": {
+      "publisher": "Montana Legislature",
+      "title": "Montana Constitution, article VII",
+      "url": "https://mca.legmt.gov/bills/2005/mca/const/VII/8.htm",
+      "kind": "official_body"
+    },
+    "const-ne": {
+      "publisher": "Nebraska Legislature",
+      "title": "Nebraska Constitution, article V, section 21",
+      "url": "https://nebraskalegislature.gov/laws/articles.php?article=V-21",
+      "kind": "official_body"
+    },
+    "const-nv": {
+      "publisher": "Nevada Legislature",
+      "title": "Nevada Constitution",
+      "url": "https://www.leg.state.nv.us/const/NVConst.html",
+      "kind": "official_body"
+    },
+    "const-nc": {
+      "publisher": "North Carolina General Assembly",
+      "title": "North Carolina Constitution, article IV",
+      "url": "https://www.ncleg.gov/Laws/Constitution/Article4",
+      "kind": "official_body"
+    },
+    "const-nd": {
+      "publisher": "North Dakota Legislative Branch",
+      "title": "North Dakota Constitution, article VI",
+      "url": "https://ndlegis.gov/constit/a06.pdf",
+      "kind": "official_body"
+    },
+    "const-oh": {
+      "publisher": "State of Ohio",
+      "title": "Ohio Constitution, article IV, section 6",
+      "url": "https://codes.ohio.gov/ohio-constitution/section-4.6",
+      "kind": "official_body"
+    },
+    "const-or": {
+      "publisher": "Oregon Legislature",
+      "title": "Oregon Constitution",
+      "url": "https://www.oregonlegislature.gov/bills_laws/lawsstatutes/orcons.html",
+      "kind": "official_body"
+    },
+    "const-wa": {
+      "publisher": "Washington State Legislature",
+      "title": "Washington State Constitution",
+      "url": "https://leg.wa.gov/state-laws-and-rules/washington-state-constitution/",
+      "kind": "official_body"
+    },
+    "const-pa": {
+      "publisher": "Pennsylvania General Assembly",
+      "title": "Constitution of the Commonwealth of Pennsylvania",
+      "url": "https://www.legis.state.pa.us/WU01/LI/LI/CT/HTM/00/00.htm",
+      "kind": "official_body"
+    },
+    "const-va": {
+      "publisher": "Virginia Division of Legislative Automated Systems",
+      "title": "Constitution of Virginia, article IV",
+      "url": "https://law.lis.virginia.gov/constitution/article4/section2/",
+      "kind": "official_body"
+    },
     "electors-1824": {
       "publisher": "Encyclopaedia Britannica",
       "title": "United States presidential election of 1824",
@@ -344,6 +458,26 @@
       "source": "bots-courts",
       "note": "Justices chosen by partisan or nonpartisan election, or retained by retention election; appointed courts hold no elections.",
       "match": [{"within": null, "name_pattern": "justice|judge|court", "polity_kinds": ["federal_unit", "region"]}],
+      "laws": {
+        "AZ": {"source": "const-az", "locator": "Ariz. Const. art. VI, §§ 37-38: justices are appointed from nominating commission lists and face retention elections"},
+        "AR": {"source": "const-ar", "locator": "Ark. Const. amend. 80, § 16: justices are elected statewide on nonpartisan ballots to eight-year terms"},
+        "FL": {"source": "const-fl", "locator": "Fla. Const. art. V, §§ 10-11: justices are appointed from nominating commission lists and face retention votes for six-year terms"},
+        "ID": {"source": "const-id", "locator": "Idaho Const. art. V, § 6: justices are elected statewide for six-year terms"},
+        "IA": {"source": "const-ia", "locator": "Iowa Const. art. V, §§ 16-17: justices are appointed from nominating commission lists and face retention votes"},
+        "KS": {"source": "const-ks", "locator": "Kan. Const. art. 3, §§ 2 and 5: justices are appointed from nominating commission lists and face retention votes for six-year terms"},
+        "MD": {"source": "const-md", "locator": "Md. Const. art. IV, §§ 5A and 14: justices are appointed, then face retention votes every ten years"},
+        "MN": {"source": "const-mn", "locator": "Minn. Const. art. VI, § 7: justices are elected for six-year terms"},
+        "MO": {"source": "const-mo", "locator": "Mo. Const. art. V, §§ 19 and 25: justices are chosen under the nonpartisan court plan and face retention votes for twelve-year terms"},
+        "MT": {"source": "const-mt", "locator": "Mont. Const. art. VII, §§ 7-8: justices are elected for eight-year terms"},
+        "NE": {"source": "const-ne", "locator": "Neb. Const. art. V, § 21: justices are appointed from nominating commission lists and face retention votes after three years and every six years"},
+        "NV": {"source": "const-nv", "locator": "Nev. Const. art. 6, § 3: justices are elected statewide for six-year terms"},
+        "NC": {"source": "const-nc", "locator": "N.C. Const. art. IV, § 16: justices are elected statewide for eight-year terms"},
+        "ND": {"source": "const-nd", "locator": "N.D. Const. art. VI, §§ 2 and 7: justices are elected statewide for ten-year terms"},
+        "OH": {"source": "const-oh", "locator": "Ohio Const. art. IV, § 6(A)(1): justices are elected statewide for six-year terms"},
+        "OR": {"source": "const-or", "locator": "Or. Const. art. VII (Amended), § 1: justices are chosen by the voters for six-year terms"},
+        "WA": {"source": "const-wa", "locator": "Wash. Const. art. IV, § 3: justices are elected statewide for six-year terms"},
+        "PA": {"source": "const-pa", "locator": "Pa. Const. art. V, §§ 2, 13, and 15: justices are elected, then face retention votes, for ten-year terms"}
+      },
       "judges": [
         {"states": "AL AK AZ AR CA CO FL GA ID IL IN IA KS KY LA MD MI MN MS MO MT NE NV NM NC ND OH OK OR TN TX UT WA WV WY", "period_years": 2, "phase": 0},
         {"states": "PA", "period_years": 2, "phase": 1, "month": 11},
@@ -358,6 +492,9 @@
       "goal": "subnational",
       "source": "bots-legislators",
       "match": [{"within": null, "body_kinds": ["upper_house", "unicameral"], "polity_kinds": ["federal_unit", "region"], "precedence": 2}],
+      "laws": {
+        "VA": {"source": "const-va", "locator": "Va. Const. art. IV, § 2: senators are elected quadrennially on the Tuesday after the first Monday in November"}
+      },
       "chambers": [
         {"states": "LA MS VA", "period_years": 4, "phase": 3, "term_years": 4},
         {"states": "MP", "period_years": 2, "phase": 0, "term_years": 4, "source": "cnmi-constitution", "locator": "CNMI Const. art. II, § 2: nine senators, three per senatorial district, serve staggered four-year terms, so a third or two thirds of the seats are up at each even-year election"},
@@ -373,6 +510,10 @@
       "goal": "subnational",
       "source": "bots-legislators",
       "match": [{"within": null, "body_kinds": ["lower_house"], "polity_kinds": ["federal_unit", "region"], "precedence": 2}],
+      "laws": {
+        "VA": {"source": "const-va", "locator": "Va. Const. art. IV, § 3: delegates are elected biennially on the Tuesday after the first Monday in November"},
+        "NJ": {"source": "nj-constitution", "locator": "N.J. Const. art. IV, § II, ¶ 4: Assembly members serve two-year terms ending at noon on the second Tuesday in January two years after"}
+      },
       "chambers": [
         {"states": "LA MS", "period_years": 4, "phase": 3, "term_years": 4},
         {"states": "MP", "period_years": 2, "phase": 0, "term_years": 2, "source": "cnmi-constitution", "locator": "CNMI Const. art. II, § 2: representatives serve two-year terms"},
