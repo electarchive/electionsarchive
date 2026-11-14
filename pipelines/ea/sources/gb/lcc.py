@@ -5,6 +5,7 @@ import struct
 import subprocess
 from datetime import date
 from pathlib import Path
+from typing import Any
 from uuid import UUID
 
 import polars as pl
@@ -51,6 +52,14 @@ METHODOLOGY = (
     "letters are stored as printed: P for the Progressives and M for the Moderates (named the Municipal Reform "
     "Party from 1906), ILP for the Independent Labour Party, and I for independents. The letters L and S are "
     "kept on the ballot label without a party link. Aldermen, chosen by the council, are not included."
+)
+BY_METHODOLOGY = (
+    "A by-election printed in The London Manual under its electoral division, as scanned by Google Books and held "
+    "on the Internet Archive. The Manual gives the date only as far as month or year, prints no electorate, and for "
+    "some by-elections names the member returned without votes; where it says the member was elected unopposed the "
+    "contest is stored as tacit, and where it is silent no uncontested return is assumed. Party letters are stored "
+    "as printed, and a candidate printed with no letter has no party. The figures were read from the page images "
+    "and checked against the Internet Archive's text recognition and the other editions that reprint them."
 )
 NOTES = {
     (1904, "west-newington"): "One digit of H. C. Gibbons's vote is damaged in the 1905 edition; the 1907 edition's "
@@ -142,6 +151,7 @@ def image(item: str, page: int, dpi: int = 300) -> Path:
 
 
 TRANSCRIBED = Path(__file__).with_name("lcc_transcribed.tsv")
+BY_ELECTIONS = Path(__file__).with_name("lcc_by_elections.tsv")
 
 
 def figure(text: str) -> int | None:
@@ -265,6 +275,7 @@ def parse() -> None:
                     }
                 )
     PARSED.mkdir(parents=True, exist_ok=True)
+    parse_by_elections()
     pl.DataFrame(divisions).write_parquet(PARSED / "divisions.parquet")
     pl.DataFrame(candidates).write_parquet(PARSED / "candidates.parquet")
     frame = pl.DataFrame(candidates)
@@ -278,6 +289,58 @@ def parse() -> None:
     )
 
 
+def parse_by_elections() -> None:
+    rows = list(csv.DictReader(BY_ELECTIONS.open(), delimiter="\t"))
+    streams = {item: stream(item) for item in {PRIMARY[int(row["edition"])] for row in rows}}
+    found = []
+    for key in dict.fromkeys((row["edition"], row["division"], row["date_from"]) for row in rows):
+        mine = [row for row in rows if (row["edition"], row["division"], row["date_from"]) == key]
+        words = streams[PRIMARY[int(key[0])]]
+        voted = [(number, int(row["votes"])) for number, row in enumerate(mine, 1) if row["votes"]]
+        reads: dict[int, tuple[int, list[float], bool]] = {}
+        for exact in (True, False):
+            for start in range(len(words)):
+                if reads or not voted:
+                    break
+                first = locate(words, start, voted[0][1], 1)
+                if first is None or (exact and not first[1]):
+                    continue
+                position, trial = start, {}
+                for number, votes in voted:
+                    hit = locate(words, position, votes, 40)
+                    if hit is None:
+                        continue
+                    position = hit[0] + 1
+                    page, word, width, height = words[hit[0]]
+                    box = [word[1] / width, word[2] / height, word[3] / width, word[4] / height]
+                    trial[number] = (page, box, hit[1])
+                if len(trial) == len(voted) or (exact and len(trial) > len(reads) and len(trial) * 2 > len(voted)):
+                    reads = trial
+        for number, row in enumerate(mine, 1):
+            seen = reads.get(number)
+            found.append(
+                {
+                    **row,
+                    "edition": int(row["edition"]),
+                    "seats": int(row["seats"]),
+                    "number": number,
+                    "votes": int(row["votes"]) if row["votes"] else None,
+                    "elected": row["elected"] == "1",
+                    "party": row["party"] or None,
+                    "page": seen[0] if seen else None,
+                    "box": seen[1] if seen else None,
+                    "agree": int(seen[2]) if seen else 0,
+                }
+            )
+    frame = pl.DataFrame(found)
+    frame.write_parquet(PARSED / "by_elections.parquet")
+    print(
+        frame.group_by("edition").agg(
+            pl.len(), (pl.col("agree") > 0).sum().alias("ocr"), pl.col("votes").is_not_null().sum().alias("voted")
+        )
+    )
+
+
 def person_name(printed: str) -> str:
     return re.sub(r",? (M\.P\.|J\.P\.|\(Ald\.\))", "", printed).strip()
 
@@ -285,6 +348,7 @@ def person_name(printed: str) -> str:
 def emit() -> Path:
     divisions = pl.read_parquet(PARSED / "divisions.parquet")
     standing = pl.read_parquet(PARSED / "candidates.parquet")
+    by = pl.read_parquet(PARSED / "by_elections.parquet")
     if divisions.height != 58 * len(DAYS):
         raise ValueError(f"run ea parse {SOURCE}")
     with connect() as conn:
@@ -292,8 +356,8 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="London County Council elections of 1898, 1904, and 1907 by electoral division, from The London "
-            "Manual",
+            summary="London County Council elections of 1898, 1904, and 1907 by electoral division, and the by-elections "
+            "of 1899 to 1906, from The London Manual",
             polity="GB",
         )
         outranked = foreign_preferred(conn, cs, SOURCE)
@@ -398,7 +462,65 @@ def emit() -> Path:
             path = f"gb/{COUNTY}/{day}-lcc"
             cs.add("slug", path=path, entity_id=election)
             cs.add("note", entity_id=election, kind="methodology", body_md=METHODOLOGY)
+            jobs: list[dict[str, Any]] = []
             for division in divisions.filter(pl.col("year") == year).iter_rows(named=True):
+                jobs.append(
+                    {
+                        "division": division["division"],
+                        "election": election,
+                        "path": path,
+                        "contest_key": f"{day}:lcc:{division['division']}",
+                        "label": str(year),
+                        "lines": standing.filter(
+                            (pl.col("year") == year) & (pl.col("division") == division["division"])
+                        ),
+                        "electorate": division["electorate"],
+                        "page": division["page"],
+                        "box": division["box"],
+                        "unopposed": None,
+                    }
+                )
+            for key, lines in by.filter(pl.col("edition") == year).group_by(
+                "division", "date_from", maintain_order=True
+            ):
+                first = lines.row(0, named=True)
+                code = f"1885:eng-{first['division']}"
+                display = displays[code]
+                by_key = f"{first['date_from']}:lcc:by:{first['division']}"
+                by_election = cs.key("gb.election", by_key)
+                by_path = f"gb/{COUNTY}/{first['date_from']}-lcc-by-{first['division']}"
+                cs.add(
+                    "election",
+                    id=by_election,
+                    polity_id=polity,
+                    kind="by_election",
+                    date_from=date.fromisoformat(first["date_from"]),
+                    date_to=date.fromisoformat(first["date_to"]),
+                    date_precision=first["precision"],
+                    status="held",
+                )
+                when = first["context"].split(",")[0].split(":")[0].rstrip(".")
+                name(by_election, f"{display} London County Council by-election, {when}")
+                cs.add("slug", path=by_path, entity_id=by_election)
+                cs.add("note", entity_id=by_election, kind="methodology", body_md=BY_METHODOLOGY)
+                cs.add("note", entity_id=by_election, kind="context", body_md=first["context"])
+                jobs.append(
+                    {
+                        "division": first["division"],
+                        "election": by_election,
+                        "path": by_path,
+                        "contest_key": by_key,
+                        "label": f"by-election, {when}",
+                        "lines": lines,
+                        "electorate": None,
+                        "page": next(iter(lines["page"].drop_nulls()), None),
+                        "box": None,
+                        "unopposed": first["kind"],
+                    }
+                )
+            for job in jobs:
+                division, lines = job, job["lines"]
+                election, path, contest_key = job["election"], job["path"], job["contest_key"]
                 code = f"1885:eng-{division['division']}"
                 district = cs.area("gb.pcon", code)
                 if district in cs.minted:
@@ -418,10 +540,8 @@ def emit() -> Path:
                         kind="standard",
                         valid_from=None,
                     )
-                lines = standing.filter((pl.col("year") == year) & (pl.col("division") == division["division"]))
-                tacit = lines["votes"].is_null().all()
+                tacit = job["unopposed"] == "unopposed" if job["unopposed"] else lines["votes"].is_null().all()
                 seats = int(lines["elected"].sum())
-                contest_key = f"{day}:lcc:{division['division']}"
                 contest = cs.key("gb.contest", contest_key)
                 cs.add(
                     "contest",
@@ -435,7 +555,7 @@ def emit() -> Path:
                     electoral_system_id=block,
                     default_result_kind="tacit" if tacit else "counted",
                 )
-                name(contest, f"{display}, London County Council, {year}")
+                name(contest, f"{display}, London County Council, {job['label']}")
                 cs.add("slug", path=f"{path}/{slug(display)}", entity_id=contest)
                 result_set = cs.key(f"{SOURCE}.result_set", contest_key)
                 cs.add(
@@ -448,7 +568,7 @@ def emit() -> Path:
                     status="active",
                     source_id=source,
                     is_default=contest not in others,
-                    completeness=1,
+                    completeness=0 if job["unopposed"] == "unstated" else 1,
                 )
                 locator: dict[str, object] = {"division": display}
                 if division["page"] is not None:
@@ -456,7 +576,13 @@ def emit() -> Path:
                 cs.add("citation", entity_id=result_set, source_id=source, locator=locator)
                 if (year, division["division"]) in NOTES:
                     caveat(result_set, NOTES[year, division["division"]])
-                if not tacit:
+                if job["unopposed"] == "unstated":
+                    caveat(
+                        result_set,
+                        "The Manual prints the member returned without votes and does not say whether the seat was "
+                        "contested.",
+                    )
+                if not tacit and not lines["votes"].is_null().any():
                     won = [line["votes"] for line in lines.iter_rows(named=True) if line["elected"]]
                     lost = [line["votes"] for line in lines.iter_rows(named=True) if not line["elected"]]
                     if lost and min(won) < max(lost):
@@ -497,7 +623,8 @@ def emit() -> Path:
                         y1=y1,
                     )
 
-                value(None, REGISTERED, division["electorate"], division["page"], division["box"])
+                if division["electorate"] is not None:
+                    value(None, REGISTERED, division["electorate"], division["page"], division["box"])
                 for line in lines.iter_rows(named=True):
                     option_key = f"{contest_key}:{line['number']}"
                     letter = line["party"]
