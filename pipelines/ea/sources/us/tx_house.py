@@ -15,17 +15,18 @@ SOURCE = "us.tx_house"
 VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 PUBLISHER = tx_elchist.PUBLISHER
-TITLE = "Texas election history: U.S. House primaries and runoffs by county, 2000–2014"
+TITLE = "Texas election history: U.S. House primaries and runoffs by county, 1992–2014"
 PAGE = re.compile(r"^(?:U\. ?S\. Representative District (\d+)|(President/Vice-President))$")
 PARTIES = {"DEM": "democratic", "REP": "republican"}
+EARLY = (1, 3, 53, 55)
 
 
 def pages() -> list[tuple[int, int, int | None]]:
     return [
         (election, race, int(found[1]) if found[1] else None)
-        for election in tx_elchist.PRIMARIES
+        for election in (*EARLY, *tx_elchist.PRIMARIES)
         for race, title in tx_elchist.races(election)
-        if (found := PAGE.match(title))
+        if (found := PAGE.match(title)) and (election not in EARLY or found[2])
     ]
 
 
@@ -118,7 +119,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Texas's 2000–2014 U.S. House and presidential primaries and runoffs by county",
+            summary="Texas's 1992–2014 U.S. House and presidential primaries and runoffs by county",
             polity="US-TX",
         )
         source = cs.source(PUBLISHER, TITLE)
