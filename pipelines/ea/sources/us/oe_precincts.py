@@ -64,12 +64,70 @@ COUNTIES = {
     ("MI", "stjosephs"): "stjoseph",
 }
 MICHIGAN = "2022/20221108__mi__general__precinct.csv"
+MARYLAND = (
+    "Allegany",
+    "Anne_Arundel",
+    "Baltimore",
+    "Baltimore_City",
+    "Calvert",
+    "Caroline",
+    "Carroll",
+    "Cecil",
+    "Charles",
+    "Dorchester",
+    "Frederick",
+    "Garrett",
+    "Harford",
+    "Howard",
+    "Kent",
+    "Montgomery",
+    "Prince_Georges",
+    "Queen_Annes",
+    "Saint_Marys",
+    "Somerset",
+    "Talbot",
+    "Washington",
+    "Wicomico",
+    "Worcester",
+)
+MD_CHANNELS = {
+    "Early Votes": ("early", 2),
+    "Absentees Votes": ("absentee", 3),
+    "Second Absentees Votes": ("second-absentee", 3),
+    "2nd Absentees Votes": ("second-absentee", 3),
+    "Provisional Votes": ("provisional", 5),
+}
+
+
+def maryland_files(year: int) -> tuple[str, ...]:
+    links = []
+    for county in MARYLAND:
+        name = county.replace("Saint_", "St._") if year >= 2008 else county
+        pair = (
+            (f"{name}_By_Precinct_General_{year}.csv", f"{name}_General_{year}.csv")
+            if year < 2008
+            else (f"{name}_By_Precinct_{year}_General.csv", f"{name}_County_{year}_General.csv")
+        )
+        links += [f"https://elections.maryland.gov/elections/archive/{year}/election_data/{file}" for file in pair]
+    return tuple(links)
+
+
 OFFICE = {
     ("OH", 2012): (
         "Ohio Secretary of State",
         "November 6, 2012 General Election Official Results, Precinct Level",
-        "https://web.archive.org/web/20201029104059id_/https://www.sos.state.oh.us/globalassets/elections/2012/gen/2012statewidebyprecinct.xlsx",
+        (
+            "https://web.archive.org/web/20201029104059id_/https://www.sos.state.oh.us/globalassets/elections/2012/gen/2012statewidebyprecinct.xlsx",
+        ),
     ),
+    **{
+        ("MD", year): (
+            "Maryland State Board of Elections",
+            f"{year} Presidential General Election Results by Precinct and by County",
+            maryland_files(year),
+        )
+        for year in (2004, 2008, 2012)
+    },
 }
 PLACE_WORDS = r"\b(charter|township|twp|precinc\w*|pct|city|village|of|the)\b"
 PLACE_KINDS = ("city", "township|twp", "village")
@@ -155,14 +213,19 @@ def url(state: str, path: str) -> str:
 
 
 def offices() -> list[tuple[str, int, str]]:
-    return [(state, year, link) for (state, year), (_, _, link) in OFFICE.items() if not ONLY or state in ONLY]
+    return [
+        (state, year, link)
+        for (state, year), (_, _, links) in OFFICE.items()
+        for link in links
+        if not ONLY or state in ONLY
+    ]
 
 
 def fetch() -> None:
     for state, _, path in picks():
         raw.fetch(SOURCE, url(state, path), suffix=".csv")
     for _, _, link in offices():
-        raw.fetch(SOURCE, link, suffix=".xlsx")
+        raw.fetch(SOURCE, link, suffix=Path(link).suffix)
 
 
 def ohio(content: bytes) -> pl.DataFrame:
@@ -189,6 +252,50 @@ def ohio(content: bytes) -> pl.DataFrame:
         )
     frame = pl.concat(rows)
     return frame.filter(pl.col("votes").cast(pl.Int64).sum().over("county", "precinct", "office", "district") > 0)
+
+
+def maryland(path: str, content: bytes) -> pl.DataFrame:
+    named = re.match(r"(.+?)_(By_Precinct|County|General)_", path.rsplit("/", 1)[-1])
+    if not named:
+        raise ValueError(f"{path}: no county in the file name")
+    sheet = pl.read_csv(io.BytesIO(content.decode("cp1252", errors="replace").encode()), infer_schema_length=0).rename(
+        lambda column: column.strip()
+    )
+    sheet = sheet.filter(pl.col("Office Name").str.contains(r"(?i)^president (and|-)|senator|congress"))
+    base = {
+        "county": pl.lit(named[1].replace("_", " ")),
+        "office": pl.col("Office Name").str.strip_chars(),
+        "district": pl.col("Office District"),
+        "party": pl.col("Party"),
+        "candidate": pl.when(pl.col("Write-In?") == "Y")
+        .then(pl.lit("Write-in"))
+        .otherwise(pl.col("Candidate Name" if "Candidate Name" in sheet.columns else "Candidate")),
+    }
+    if "Election Precinct" in sheet.columns:
+        return sheet.select(
+            **base,
+            precinct=pl.concat_str("Election District", "Election Precinct", separator="-"),
+            votes="Election Night Votes",
+            channel=pl.lit(1, pl.Int16),
+            kind=pl.lit("precinct"),
+        )
+    counted = [column for column in MD_CHANNELS if column in sheet.columns]
+    number = [
+        pl.col(column).cast(pl.Float64, strict=False).fill_null(0) for column in ("Election Night Votes", *counted)
+    ]
+    off = sheet.filter(pl.sum_horizontal(number) != pl.col("Total Votes").cast(pl.Float64))
+    if off.height:
+        raise ValueError(f"{path}: ballot types do not add up to the total: {off.head(3)}")
+    return pl.concat(
+        sheet.select(
+            **base,
+            precinct=pl.lit(MD_CHANNELS[column][0]),
+            votes=column,
+            channel=pl.lit(MD_CHANNELS[column][1], pl.Int16),
+            kind=pl.lit("aggregate"),
+        )
+        for column in counted
+    )
 
 
 def parse() -> None:
@@ -218,6 +325,8 @@ def lines(files: list[tuple[str, int, str, bytes]]) -> pl.DataFrame:
         frame = (
             ohio(text)
             if path.endswith(".xlsx")
+            else maryland(path, text)
+            if "elections.maryland.gov" in path
             else pl.read_csv(
                 io.BytesIO(text.replace(b"\r\n", b"\n").replace(b"\r", b"\n")),
                 infer_schema_length=0,
@@ -319,6 +428,8 @@ def lines(files: list[tuple[str, int, str, bytes]]) -> pl.DataFrame:
                 party=(pl.col("party") if "party" in frame.columns else pl.lit(None, pl.String)).str.strip_chars(),
                 candidate=pl.col("candidate").fill_null("").str.strip_chars(),
                 votes=pl.col("votes").str.replace_all(r"[,\s]", "").cast(pl.Float64, strict=False).cast(pl.Int64),
+                channel=pl.col("channel") if "channel" in frame.columns else pl.lit(0, pl.Int16),
+                kind=pl.col("kind") if "kind" in frame.columns else pl.lit("precinct"),
             )
         )
     frame = pl.concat(frames).filter(
@@ -524,13 +635,17 @@ def emit() -> Path:
                     "fips",
                     "candidate",
                     "votes",
+                    "channel",
+                    "kind",
                     special=office.str.contains("special|unexpired") & pl.col("seat").is_null(),
                     district=pl.when(pl.col("chamber") == "house").then(
                         pl.coalesce(
                             pl.col("district").fill_null("").str.extract(r"(\d+)"), office.str.extract(r"(\d+)")
                         ).cast(pl.Int16, strict=False)
                     ),
-                    code=pl.concat_str("year", "state", "fips", pl.lit(""), "precinct", separator=":"),
+                    code=pl.when(pl.col("kind") == "aggregate")
+                    .then(pl.concat_str("state", "year", "fips", "precinct", separator=":"))
+                    .otherwise(pl.concat_str("year", "state", "fips", pl.lit(""), "precinct", separator=":")),
                     source=pl.when(pl.col("path").str.starts_with("https://"))
                     .then(pl.concat_str("state", "year", separator=":"))
                     .otherwise("state"),
@@ -552,6 +667,8 @@ def emit() -> Path:
                     fips="fips",
                     candidate="candidate",
                     votes="votes",
+                    channel="channel",
+                    kind="kind",
                     special=pl.lit(False),
                     district=pl.lit(None, pl.Int16),
                     code=pl.struct("fips", "precinct").map_elements(
@@ -600,9 +717,10 @@ def emit() -> Path:
                 "candidate",
                 "measure",
                 "source",
+                "channel",
+                "kind",
             )
             .agg(pl.col("writein").any(), pl.col("votes").sum())
-            .with_columns(kind=pl.lit("precinct"))
         )
         keyed = returns.with_columns(
             key=pl.concat_str(
@@ -640,17 +758,18 @@ def emit() -> Path:
         for state, year, link in offices():
             publisher, title, _ = OFFICE[(state, year)]
             key = f"{state}:{year}"
-            sources[key] = cs.source(publisher, title)
-            if sources[key] in cs.minted:
-                cs.add(
-                    "source",
-                    id=sources[key],
-                    kind="official_body",
-                    publisher=publisher,
-                    title=title,
-                    url=link.split("id_/", 1)[-1],
-                    license="Public record",
-                )
+            if key not in sources:
+                sources[key] = cs.source(publisher, title)
+                if sources[key] in cs.minted:
+                    cs.add(
+                        "source",
+                        id=sources[key],
+                        kind="official_body",
+                        publisher=publisher,
+                        title=title,
+                        url=link.rsplit("/", 1)[0] + "/index.html" if state == "MD" else link.split("id_/", 1)[-1],
+                        license="Public record",
+                    )
             cs.artifact(raw.cached(SOURCE, link), sources[key])
         medsl.attach(cs, conn, returns, sources, REDONE)
         used = set(pl.concat(cs.frames["result_value"])["unit_id"].unique()) if cs.frames.get("result_value") else set()
@@ -684,10 +803,15 @@ def emit() -> Path:
         minted = (
             returns.filter(~pl.col("code").is_in(list(existing)))
             .group_by("code")
-            .agg(pl.col("state").first(), pl.col("fips").first(), pl.col("day").min())
+            .agg(pl.col("state").first(), pl.col("fips").first(), pl.col("day").min(), pl.col("kind").first())
             .with_columns(
-                id=pl.struct("code", "day").map_elements(
-                    lambda row: str(cs.unit("us.precinct", row["code"], row["day"])), return_dtype=pl.String
+                id=pl.struct("code", "day", "kind").map_elements(
+                    lambda row: str(
+                        cs.unit("us.aggregate", row["code"])
+                        if row["kind"] == "aggregate"
+                        else cs.unit("us.precinct", row["code"], row["day"])
+                    ),
+                    return_dtype=pl.String,
                 )
             )
             .filter(pl.col("id").is_in(list(used)) | pl.col("code").is_in(list(shaped)))
@@ -699,7 +823,9 @@ def emit() -> Path:
                 polity_id=pl.col("state").map_elements(
                     lambda state: str(cs.polity(f"US-{state}")), return_dtype=pl.String
                 ),
-                scheme_code=pl.lit("us.precinct"),
+                scheme_code=pl.when(pl.col("kind") == "aggregate")
+                .then(pl.lit("us.aggregate"))
+                .otherwise(pl.lit("us.precinct")),
                 code="code",
                 parent_id=pl.col("fips").replace_strict({code: str(unit) for code, (unit, _) in counties.items()}),
                 area_relation=pl.when(pl.col("code").is_in(list(shaped)))
@@ -709,7 +835,7 @@ def emit() -> Path:
                     shaped,
                     default=pl.col("fips").replace_strict({code: str(area) for code, (_, area) in counties.items()}),
                 ),
-                kind=pl.lit("standard"),
+                kind=pl.when(pl.col("kind") == "aggregate").then(pl.lit("aggregate")).otherwise(pl.lit("standard")),
                 valid_from="day",
                 valid_to=pl.col("day") + timedelta(days=1),
             ),
