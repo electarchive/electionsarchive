@@ -23845,17 +23845,21 @@ export const polities = {
         input?.kinds ??
         (parent == null ? ["sovereign_state", "supranational"] : null);
       const limit = input?.limit ?? 100;
-      const result = await db.execute<{
-        id: string;
-        kind: string;
-        iso_code: string | null;
-        path: string;
-        elections: number;
-        within: number;
-        first: number | null;
-        last: number | null;
-        latest: string | null;
-      }>(sql`
+      const found = await remember(
+        `polities:${JSON.stringify([kinds, parent, limit, input?.cursor ?? ""])}`,
+        async () =>
+          (
+            await db.execute<{
+              id: string;
+              kind: string;
+              iso_code: string | null;
+              path: string;
+              elections: number;
+              within: number;
+              first: number | null;
+              last: number | null;
+              latest: string | null;
+            }>(sql`
         with recursive picked as materialized (
           select p.id, p.kind, p.iso_code, s.path
           from polity p join slug s on s.entity_id = p.id and s.is_current
@@ -23898,8 +23902,13 @@ export const polities = {
         left join own o on o.polity_id = p.id
         left join nested i on i.top = p.id
         order by p.path
-      `);
-      const rows = result.rows.slice(0, limit);
+      `)
+          ).rows,
+        false,
+        undefined,
+        true,
+      );
+      const rows = found.slice(0, limit);
       const ids = rows.flatMap((row) =>
         row.latest == null ? [row.id] : [row.id, row.latest],
       );
@@ -23923,7 +23932,7 @@ export const polities = {
                   path: slugs.get(row.latest) ?? null,
                 },
         })),
-        next: result.rows.length > limit ? (rows.at(-1)?.path ?? null) : null,
+        next: found.length > limit ? (rows.at(-1)?.path ?? null) : null,
       };
     }),
   get: os
