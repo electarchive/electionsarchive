@@ -16,7 +16,7 @@ SOURCE = "us.hi_oha"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 SUMMARY = "https://files.hawaii.gov/elections/files/results/{year}/general/summary.txt"
-YEARS = range(2004, 2015, 2)
+YEARS = range(2004, 2017, 2)
 OFFSETS = {2004: 39, 2006: 29}
 PUBLISHER = "Hawaii Office of Elections"
 TITLE = "Election results"
@@ -155,7 +155,7 @@ def emit() -> Path:
         pipeline=SOURCE,
         version=VERSION,
         parsed=PARSED,
-        summary="Hawaii's Office of Hawaiian Affairs trustee elections 2004–2014 from the Office of Elections' final "
+        summary="Hawaii's Office of Hawaiian Affairs trustee elections 2004–2016 from the Office of Elections' final "
         "summary files",
         cite=cite,
         method=METHOD,
