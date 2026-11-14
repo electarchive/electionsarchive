@@ -303,7 +303,6 @@ function split(race: LiveRace, at: string | null) {
         unitId,
         votes: [...count.votes],
         channel: stream,
-        ...(stream !== 0 && { eevp: null }),
       };
       summed.set(key, copy);
       counts.push(copy);
@@ -1740,22 +1739,6 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
       );
   const settles = tailWeight * fade;
   const stays = HOLDS[race.state] == null ? tailWeight : 1;
-  const outstanding = found.map((unit) => {
-    if (!isTail || unit.reported == null) {
-      return null;
-    }
-    const { share, total } = unit.reported;
-    const isCapped = share >= MODEL.reported.capped;
-    return {
-      open: isCapped
-        ? (1 - MODEL.reported.capped) * Math.max(total, unit.total)
-        : Math.max(0, total - Math.max(share * total, unit.total)),
-      isCapped,
-    };
-  });
-  const told = sum(
-    found.map((unit, index) => (outstanding[index] == null ? 0 : unit.total)),
-  );
   const late =
     isLate && night != null
       ? {
@@ -1764,7 +1747,6 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
             (_, index) =>
               (shown.at(-1)!.totals[index] ?? 0) - (night.totals[index] ?? 0),
           ),
-          isReported: told >= counted / 2,
         }
       : null;
   if (race.certified != null) {
@@ -2011,6 +1993,25 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
     const all = sum(indexes.map((index) => found[index]!.expected));
     return all > 0 ? unit.expected / all : 1 / indexes.length;
   });
+  const outstanding = found.map((unit, index) => {
+    if (!isTail || unit.reported == null) {
+      return null;
+    }
+    const { share, total } = unit.reported;
+    const isCapped = share >= MODEL.reported.capped;
+    const indexes = streamsOf.get(unit.county);
+    const counted =
+      indexes == null
+        ? unit.total
+        : sum(indexes.map((index) => found[index]!.total));
+    const open = isCapped
+      ? (1 - MODEL.reported.capped) * Math.max(total, counted)
+      : Math.max(0, total - Math.max(share * total, counted));
+    return { open: open * portion[index]!, isCapped };
+  });
+  const told = sum(
+    found.map((unit, index) => (outstanding[index] == null ? 0 : unit.total)),
+  );
   const sized = whole.filter(
     (unit) => unit.hasBaseline && unit.total > 0 && !reports.has(unit.id),
   );
@@ -2197,14 +2198,21 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
             capped: random(),
           }
         : null;
-    const opens = outstanding.map((open) =>
-      open == null || reportedDraw == null
-        ? null
-        : open.isCapped
-          ? (open.open * (reportedDraw.capped + random())) / 2
-          : open.open *
-            Math.exp(reportedDraw.common + alone * gaussian(random)),
-    );
+    const factors = new Map<string, number>();
+    const opens = outstanding.map((open, index) => {
+      if (open == null || reportedDraw == null) {
+        return null;
+      }
+      const unit = found[index]!;
+      const key = unit.channel === 0 ? unit.id : unit.county;
+      const factor =
+        factors.get(key) ??
+        (open.isCapped
+          ? (reportedDraw.capped + random()) / 2
+          : Math.exp(reportedDraw.common + alone * gaussian(random)));
+      factors.set(key, factor);
+      return open.open * factor;
+    });
     const fractions: Array<number> = [];
     const pending = new Map<string, number>();
     for (const [index, unit] of whole.entries()) {
@@ -2620,7 +2628,7 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
       votes: band(restVotes),
       margin: isModeled ? turn(band(restMargins)) : { low: 0, mid: 0, high: 0 },
     },
-    late,
+    late: late == null ? null : { ...late, isReported: told >= counted / 2 },
     units: counties.map((county, index) => {
       const row = perUnit[index]!;
       const margin = row.counted > 0 ? row.lead / row.counted : 0;
