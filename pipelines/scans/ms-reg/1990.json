@@ -23,7 +23,9 @@
       "day": "1990-11-06",
       "special": false,
       "state": "MS",
-      "district": 1
+      "district": 1,
+      "accept": "The Register's table omits Yalobusha County, which was in the district; its 21 counties sum to the printed totals (Whitten 42,676, Bowlin 23,250), 992 and 400 votes under the certified district totals, so the district default keeps the certified figures.",
+      "keep_default": true
     },
     "house2": {
       "year": 1990,
