@@ -1,0 +1,779 @@
+{
+  "polity": "US-MN",
+  "publisher": "Minnesota Secretary of State",
+  "title": "Legislative Manual of the State of Minnesota 1925, election returns for state officers by precinct (general election 1924-11-04)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.lrl.mn.gov/archive/sessions/electionresults/1924-11-04-g-man.pdf",
+    "item": "https://www.lrl.mn.gov/mngov/electionresults"
+  },
+  "raw_source": "us.mn_lrl",
+  "text_layer": true,
+  "method": "Each county's votes are the Totals row printed at the foot of its precinct table (Grand Totals where a county spans several tables), read twice, by the scan's text layer and by an OCR pass over each cell, with every disagreement read by eye. The box is the printed cell.",
+  "caveat": "The county Totals rows add to 8,630 for Birmingham in the Senate race, against 8,620 held, and to 407,502 for Christianson and 365,979 for Olson in the governor's race, against 406,692 and 366,029 held. Every county figure was checked against the page; Pennington County's Totals row prints 34 for Birmingham. The other eight candidates' county rows add exactly to the held totals.",
+  "contests": {
+    "senate": {
+      "year": 1924,
+      "chamber": "senate",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "MN",
+      "district": null
+    },
+    "governor": {
+      "year": 1924,
+      "chamber": "governor",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "MN",
+      "district": null
+    }
+  },
+  "row_columns": [
+    {
+      "label": "Total number of ballots cast",
+      "contest": null,
+      "candidate": null
+    },
+    {
+      "label": "Thomas D. Schall, Republican",
+      "contest": "senate",
+      "candidate": "Thomas D. Schall"
+    },
+    {
+      "label": "Magnus Johnson, Farmer-Labor",
+      "contest": "senate",
+      "candidate": "Magnus Johnson"
+    },
+    {
+      "label": "John J. Farrell, Democrat",
+      "contest": "senate",
+      "candidate": "John J. Farrell"
+    },
+    {
+      "label": "Thomas Keefe, Independent",
+      "contest": "senate",
+      "candidate": "Thomas Keefe"
+    },
+    {
+      "label": "Merrill Birmingham, Independent",
+      "contest": "senate",
+      "candidate": "Merrill Birmingham"
+    },
+    {
+      "label": "Theodore Christianson, Republican",
+      "contest": "governor",
+      "candidate": "Theodore Christianson"
+    },
+    {
+      "label": "Floyd B. Olson, Farmer-Labor",
+      "contest": "governor",
+      "candidate": "Floyd B. Olson"
+    },
+    {
+      "label": "Carlos Avery, Democrat",
+      "contest": "governor",
+      "candidate": "Carlos Avery"
+    },
+    {
+      "label": "Oscar Anderson, Industrial",
+      "contest": "governor",
+      "candidate": "Oscar Anderson"
+    },
+    {
+      "label": "Michael Ferch, Independent",
+      "contest": "governor",
+      "candidate": "Michael Ferch"
+    },
+    {
+      "label": "Lieutenant governor",
+      "contest": null,
+      "candidate": null
+    },
+    {
+      "label": "Lieutenant governor",
+      "contest": null,
+      "candidate": null
+    },
+    {
+      "label": "Lieutenant governor",
+      "contest": null,
+      "candidate": null
+    }
+  ],
+  "pages": [
+    {
+      "page": 2,
+      "rows": [
+        {
+          "county": "Aitkin",
+          "y": 0.8981
+        }
+      ]
+    },
+    {
+      "page": 4,
+      "rows": [
+        {
+          "county": "Anoka",
+          "y": 0.6776
+        }
+      ]
+    },
+    {
+      "page": 6,
+      "rows": [
+        {
+          "county": "Becker",
+          "y": 0.7692
+        }
+      ]
+    },
+    {
+      "page": 10,
+      "rows": [
+        {
+          "county": "Beltrami",
+          "y": 0.4608
+        },
+        {
+          "county": "Benton",
+          "y": 0.6899
+        },
+        {
+          "county": "Big Stone",
+          "y": 0.9281
+        }
+      ]
+    },
+    {
+      "page": 12,
+      "rows": [
+        {
+          "county": "Blue Earth",
+          "y": 0.7662
+        }
+      ]
+    },
+    {
+      "page": 14,
+      "rows": [
+        {
+          "county": "Brown",
+          "y": 0.7296
+        }
+      ]
+    },
+    {
+      "page": 16,
+      "rows": [
+        {
+          "county": "Carlton",
+          "y": 0.7523
+        }
+      ]
+    },
+    {
+      "page": 18,
+      "rows": [
+        {
+          "county": "Carver",
+          "y": 0.6067
+        }
+      ]
+    },
+    {
+      "page": 20,
+      "rows": [
+        {
+          "county": "Cass",
+          "y": 0.8371
+        }
+      ]
+    },
+    {
+      "page": 22,
+      "rows": [
+        {
+          "county": "Chippewa",
+          "y": 0.5768
+        },
+        {
+          "county": "Chisago",
+          "y": 0.8362
+        }
+      ]
+    },
+    {
+      "page": 24,
+      "rows": [
+        {
+          "county": "Clay",
+          "y": 0.796
+        }
+      ]
+    },
+    {
+      "page": 26,
+      "rows": [
+        {
+          "county": "Clearwater",
+          "y": 0.6102
+        },
+        {
+          "county": "Cook",
+          "y": 0.7786
+        }
+      ]
+    },
+    {
+      "page": 28,
+      "rows": [
+        {
+          "county": "Cottonwood",
+          "y": 0.6989
+        }
+      ]
+    },
+    {
+      "page": 30,
+      "rows": [
+        {
+          "county": "Crow Wing",
+          "y": 0.8611
+        }
+      ]
+    },
+    {
+      "page": 32,
+      "rows": [
+        {
+          "county": "Dakota",
+          "y": 0.8034
+        }
+      ]
+    },
+    {
+      "page": 34,
+      "rows": [
+        {
+          "county": "Dodge",
+          "y": 0.5236
+        },
+        {
+          "county": "Douglas",
+          "y": 0.9023
+        }
+      ]
+    },
+    {
+      "page": 36,
+      "rows": [
+        {
+          "county": "Faribault",
+          "y": 0.7251
+        }
+      ]
+    },
+    {
+      "page": 38,
+      "rows": [
+        {
+          "county": "Fillmore",
+          "y": 0.7326
+        }
+      ]
+    },
+    {
+      "page": 40,
+      "rows": [
+        {
+          "county": "Freeborn",
+          "y": 0.7465
+        }
+      ]
+    },
+    {
+      "page": 42,
+      "rows": [
+        {
+          "county": "Goodhue",
+          "y": 0.7779
+        }
+      ]
+    },
+    {
+      "page": 44,
+      "rows": [
+        {
+          "county": "Grant",
+          "y": 0.6806
+        }
+      ]
+    },
+    {
+      "page": 58,
+      "rows": [
+        {
+          "county": "Hennepin",
+          "y": 0.8964
+        }
+      ]
+    },
+    {
+      "page": 60,
+      "rows": [
+        {
+          "county": "Houston",
+          "y": 0.5147
+        },
+        {
+          "county": "Hubbard",
+          "y": 0.8743
+        }
+      ]
+    },
+    {
+      "page": 62,
+      "rows": [
+        {
+          "county": "Isanti",
+          "y": 0.5165
+        }
+      ]
+    },
+    {
+      "page": 64,
+      "rows": [
+        {
+          "county": "Itasca",
+          "y": 0.8338
+        }
+      ]
+    },
+    {
+      "page": 66,
+      "rows": [
+        {
+          "county": "Jackson",
+          "y": 0.6104
+        },
+        {
+          "county": "Kanabec",
+          "y": 0.8374
+        }
+      ]
+    },
+    {
+      "page": 68,
+      "rows": [
+        {
+          "county": "Kandiyohi",
+          "y": 0.7694
+        }
+      ]
+    },
+    {
+      "page": 70,
+      "rows": [
+        {
+          "county": "Kittson",
+          "y": 0.7294
+        }
+      ]
+    },
+    {
+      "page": 72,
+      "rows": [
+        {
+          "county": "Koochiching",
+          "y": 0.8763
+        }
+      ]
+    },
+    {
+      "page": 74,
+      "rows": [
+        {
+          "county": "Lac qui Parle",
+          "y": 0.6752
+        },
+        {
+          "county": "Lake",
+          "y": 0.9051
+        }
+      ]
+    },
+    {
+      "page": 76,
+      "rows": [
+        {
+          "county": "Lake of the Woods",
+          "y": 0.7322
+        }
+      ]
+    },
+    {
+      "page": 78,
+      "rows": [
+        {
+          "county": "Le Sueur",
+          "y": 0.6253
+        },
+        {
+          "county": "Lincoln",
+          "y": 0.8715
+        }
+      ]
+    },
+    {
+      "page": 80,
+      "rows": [
+        {
+          "county": "Lyon",
+          "y": 0.7221
+        }
+      ]
+    },
+    {
+      "page": 82,
+      "rows": [
+        {
+          "county": "McLeod",
+          "y": 0.6096
+        },
+        {
+          "county": "Mahnomen",
+          "y": 0.8464
+        }
+      ]
+    },
+    {
+      "page": 84,
+      "rows": [
+        {
+          "county": "Marshall",
+          "y": 0.8814
+        }
+      ]
+    },
+    {
+      "page": 86,
+      "rows": [
+        {
+          "county": "Martin",
+          "y": 0.7222
+        }
+      ]
+    },
+    {
+      "page": 88,
+      "rows": [
+        {
+          "county": "Meeker",
+          "y": 0.5821
+        },
+        {
+          "county": "Mille Lacs",
+          "y": 0.8776
+        }
+      ]
+    },
+    {
+      "page": 90,
+      "rows": [
+        {
+          "county": "Morrison",
+          "y": 0.8343
+        }
+      ]
+    },
+    {
+      "page": 92,
+      "rows": [
+        {
+          "county": "Mower",
+          "y": 0.7629
+        }
+      ]
+    },
+    {
+      "page": 94,
+      "rows": [
+        {
+          "county": "Murray",
+          "y": 0.602
+        },
+        {
+          "county": "Nicollet",
+          "y": 0.8488
+        }
+      ]
+    },
+    {
+      "page": 96,
+      "rows": [
+        {
+          "county": "Nobles",
+          "y": 0.6731
+        }
+      ]
+    },
+    {
+      "page": 98,
+      "rows": [
+        {
+          "county": "Norman",
+          "y": 0.4908
+        },
+        {
+          "county": "Olmsted",
+          "y": 0.8904
+        }
+      ]
+    },
+    {
+      "page": 102,
+      "rows": [
+        {
+          "county": "Otter Tail",
+          "y": 0.7936
+        }
+      ]
+    },
+    {
+      "page": 104,
+      "rows": [
+        {
+          "county": "Pennington",
+          "y": 0.6141
+        }
+      ]
+    },
+    {
+      "page": 106,
+      "rows": [
+        {
+          "county": "Pine",
+          "y": 0.5439
+        },
+        {
+          "county": "Pipestone",
+          "y": 0.8129
+        }
+      ]
+    },
+    {
+      "page": 110,
+      "rows": [
+        {
+          "county": "Polk",
+          "y": 0.7788
+        }
+      ]
+    },
+    {
+      "page": 112,
+      "rows": [
+        {
+          "county": "Pope",
+          "y": 0.691
+        }
+      ]
+    },
+    {
+      "page": 124,
+      "rows": [
+        {
+          "county": "Ramsey",
+          "y": 0.5189
+        },
+        {
+          "county": "Red Lake",
+          "y": 0.7631
+        }
+      ]
+    },
+    {
+      "page": 126,
+      "rows": [
+        {
+          "county": "Redwood",
+          "y": 0.7851
+        }
+      ]
+    },
+    {
+      "page": 128,
+      "rows": [
+        {
+          "county": "Renville",
+          "y": 0.7566
+        }
+      ]
+    },
+    {
+      "page": 130,
+      "rows": [
+        {
+          "county": "Rice",
+          "y": 0.6745
+        },
+        {
+          "county": "Rock",
+          "y": 0.914
+        }
+      ]
+    },
+    {
+      "page": 132,
+      "rows": [
+        {
+          "county": "Roseau",
+          "y": 0.8
+        }
+      ]
+    },
+    {
+      "page": 142,
+      "rows": [
+        {
+          "county": "St. Louis",
+          "y": 0.5339
+        },
+        {
+          "county": "Scott",
+          "y": 0.8099
+        }
+      ]
+    },
+    {
+      "page": 144,
+      "rows": [
+        {
+          "county": "Sherburne",
+          "y": 0.5106
+        },
+        {
+          "county": "Sibley",
+          "y": 0.8102
+        }
+      ]
+    },
+    {
+      "page": 146,
+      "rows": [
+        {
+          "county": "Stearns",
+          "y": 0.8461
+        }
+      ]
+    },
+    {
+      "page": 148,
+      "rows": [
+        {
+          "county": "Steele",
+          "y": 0.5688
+        },
+        {
+          "county": "Stevens",
+          "y": 0.841
+        }
+      ]
+    },
+    {
+      "page": 150,
+      "rows": [
+        {
+          "county": "Swift",
+          "y": 0.7087
+        }
+      ]
+    },
+    {
+      "page": 152,
+      "rows": [
+        {
+          "county": "Todd",
+          "y": 0.7554
+        }
+      ]
+    },
+    {
+      "page": 154,
+      "rows": [
+        {
+          "county": "Traverse",
+          "y": 0.5213
+        },
+        {
+          "county": "Wabasha",
+          "y": 0.854
+        }
+      ]
+    },
+    {
+      "page": 156,
+      "rows": [
+        {
+          "county": "Wadena",
+          "y": 0.5548
+        },
+        {
+          "county": "Waseca",
+          "y": 0.8066
+        }
+      ]
+    },
+    {
+      "page": 158,
+      "rows": [
+        {
+          "county": "Washington",
+          "y": 0.7249
+        }
+      ]
+    },
+    {
+      "page": 160,
+      "rows": [
+        {
+          "county": "Watonwan",
+          "y": 0.5797
+        },
+        {
+          "county": "Wilkin",
+          "y": 0.9115
+        }
+      ]
+    },
+    {
+      "page": 162,
+      "rows": [
+        {
+          "county": "Winona",
+          "y": 0.7811
+        }
+      ]
+    },
+    {
+      "page": 164,
+      "rows": [
+        {
+          "county": "Wright",
+          "y": 0.7282
+        }
+      ]
+    },
+    {
+      "page": 166,
+      "rows": [
+        {
+          "county": "Yellow Medicine",
+          "y": 0.7089
+        }
+      ]
+    }
+  ]
+}
