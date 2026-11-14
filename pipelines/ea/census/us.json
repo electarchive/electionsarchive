@@ -15,6 +15,12 @@
       "url": "https://history.house.gov/Institution/Session-Dates/All/",
       "kind": "official_body"
     },
+    "history-house-vacancies": {
+      "publisher": "Office of the Historian, U.S. House of Representatives",
+      "title": "Vacancies in the Office of Speaker of the House",
+      "url": "https://history.house.gov/People/Office/Speaker-Vacancies/",
+      "kind": "official_body"
+    },
     "crs-rl30857": {
       "publisher": "Congressional Research Service",
       "title": "Speakers of the House: Elections, 1913-2023 (RL30857)",
@@ -623,7 +629,7 @@
       "locator": "U.S. Const. art. I, § 2, cl. 5: the House of Representatives chooses their Speaker and other Officers",
       "first_held": "1789-04-01",
       "earliest_record": "1913-04-07",
-      "note": "The House elects its Speaker by roll call of its members: at the opening of every Congress (119 from 1789 to 2025), and again whenever the chair falls vacant (1936, 1940, 1962, 1989, 2015, and October 2023 in the record held since 1913). The first Congress opened March 4, 1789, but the House lacked a quorum and chose its Speaker on April 1; dates listed here are the opening days the House Historian's session table gives. Several ballots in one day count as separate contests of the same election. Vacancy elections before 1913 are not yet enumerated.",
+      "note": "The House elects its Speaker by roll call of its members: at the opening of every Congress (119 from 1789 to 2025), and again whenever the chair falls vacant (1814, 1820, 1834, 1869, and 1876 before 1913, then 1936, 1940, 1962, 1989, 2015, and October 2023). The first Congress opened March 4, 1789, but the House lacked a quorum and chose its Speaker on April 1; dates listed here are the opening days the House Historian's session table gives. Several ballots in one day count as separate contests of the same election. Vacancy elections before 1913 follow the House Historian's list of vacancies in the office; the 1869 election of Theodore Pomeroy lasted one day.",
       "match": [
         {
           "within": null,
@@ -632,7 +638,7 @@
         }
       ],
       "dates": [
-        {"date": "1789-03-04", "source": "history-house-sessions", "quote": "First session of the Congress opens, when the House elects its Speaker"},
+        {"date": "1789-04-01", "source": "history-house-vacancies", "quote": "The first Congress opened March 4, 1789, but the House lacked a quorum and chose its Speaker on April 1"},
         {"date": "1791-10-24", "source": "history-house-sessions", "quote": "First session of the Congress opens, when the House elects its Speaker"},
         {"date": "1793-12-02", "source": "history-house-sessions", "quote": "First session of the Congress opens, when the House elects its Speaker"},
         {"date": "1795-12-07", "source": "history-house-sessions", "quote": "First session of the Congress opens, when the House elects its Speaker"},
@@ -645,9 +651,11 @@
         {"date": "1809-05-22", "source": "history-house-sessions", "quote": "First session of the Congress opens, when the House elects its Speaker"},
         {"date": "1811-11-04", "source": "history-house-sessions", "quote": "First session of the Congress opens, when the House elects its Speaker"},
         {"date": "1813-05-24", "source": "history-house-sessions", "quote": "First session of the Congress opens, when the House elects its Speaker"},
+        {"date": "1814-01-19", "source": "history-house-vacancies", "quote": "Speaker elected outside the opening of a Congress (vacancy)"},
         {"date": "1815-12-04", "source": "history-house-sessions", "quote": "First session of the Congress opens, when the House elects its Speaker"},
         {"date": "1817-12-01", "source": "history-house-sessions", "quote": "First session of the Congress opens, when the House elects its Speaker"},
         {"date": "1819-12-06", "source": "history-house-sessions", "quote": "First session of the Congress opens, when the House elects its Speaker"},
+        {"date": "1820-11-15", "source": "history-house-vacancies", "quote": "Speaker elected outside the opening of a Congress (vacancy)"},
         {"date": "1821-12-03", "source": "history-house-sessions", "quote": "First session of the Congress opens, when the House elects its Speaker"},
         {"date": "1823-12-01", "source": "history-house-sessions", "quote": "First session of the Congress opens, when the House elects its Speaker"},
         {"date": "1825-12-05", "source": "history-house-sessions", "quote": "First session of the Congress opens, when the House elects its Speaker"},
@@ -655,6 +663,7 @@
         {"date": "1829-12-07", "source": "history-house-sessions", "quote": "First session of the Congress opens, when the House elects its Speaker"},
         {"date": "1831-12-05", "source": "history-house-sessions", "quote": "First session of the Congress opens, when the House elects its Speaker"},
         {"date": "1833-12-02", "source": "history-house-sessions", "quote": "First session of the Congress opens, when the House elects its Speaker"},
+        {"date": "1834-06-02", "source": "history-house-vacancies", "quote": "Speaker elected outside the opening of a Congress (vacancy)"},
         {"date": "1835-12-07", "source": "history-house-sessions", "quote": "First session of the Congress opens, when the House elects its Speaker"},
         {"date": "1837-09-04", "source": "history-house-sessions", "quote": "First session of the Congress opens, when the House elects its Speaker"},
         {"date": "1839-12-02", "source": "history-house-sessions", "quote": "First session of the Congress opens, when the House elects its Speaker"},
@@ -672,10 +681,12 @@
         {"date": "1863-12-07", "source": "history-house-sessions", "quote": "First session of the Congress opens, when the House elects its Speaker"},
         {"date": "1865-12-04", "source": "history-house-sessions", "quote": "First session of the Congress opens, when the House elects its Speaker"},
         {"date": "1867-03-04", "source": "history-house-sessions", "quote": "First session of the Congress opens, when the House elects its Speaker"},
+        {"date": "1869-03-03", "source": "history-house-vacancies", "quote": "Speaker elected outside the opening of a Congress (vacancy)"},
         {"date": "1869-03-04", "source": "history-house-sessions", "quote": "First session of the Congress opens, when the House elects its Speaker"},
         {"date": "1871-03-04", "source": "history-house-sessions", "quote": "First session of the Congress opens, when the House elects its Speaker"},
         {"date": "1873-12-01", "source": "history-house-sessions", "quote": "First session of the Congress opens, when the House elects its Speaker"},
         {"date": "1875-12-06", "source": "history-house-sessions", "quote": "First session of the Congress opens, when the House elects its Speaker"},
+        {"date": "1876-12-04", "source": "history-house-vacancies", "quote": "Speaker elected outside the opening of a Congress (vacancy)"},
         {"date": "1877-10-15", "source": "history-house-sessions", "quote": "First session of the Congress opens, when the House elects its Speaker"},
         {"date": "1879-03-18", "source": "history-house-sessions", "quote": "First session of the Congress opens, when the House elects its Speaker"},
         {"date": "1881-12-05", "source": "history-house-sessions", "quote": "First session of the Congress opens, when the House elects its Speaker"},
