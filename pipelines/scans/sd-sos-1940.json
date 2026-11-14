@@ -1,0 +1,147 @@
+{
+  "polity": "US-SD",
+  "publisher": "South Dakota Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "title": "Official election returns and registration figures for South Dakota, general election November 5, 1940",
+  "file": {
+    "url": "https://sdsos.gov/elections-voting/assets/historicalelectiondata/1940G.pdf"
+  },
+  "contests": {
+    "house1": {
+      "year": 1940,
+      "chamber": "house",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "SD",
+      "district": 1
+    },
+    "house2": {
+      "year": 1940,
+      "chamber": "house",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "SD",
+      "district": 2
+    },
+    "president": {
+      "year": 1940,
+      "chamber": "president",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "SD",
+      "district": null
+    },
+    "governor": {
+      "year": 1940,
+      "chamber": "governor",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "SD",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "columns": [
+        {
+          "label": "Mundt Rep.",
+          "contest": "house1",
+          "candidate": "Karl Mundt"
+        },
+        {
+          "label": "Fosheim Dem.",
+          "contest": "house1",
+          "candidate": "Oscar Fosheim"
+        },
+        {
+          "label": "Case Rep.",
+          "contest": "house2",
+          "candidate": "Francis Case"
+        },
+        {
+          "label": "Watwood Dem.",
+          "contest": "house2",
+          "candidate": "Arthur W. Watwood"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.15,
+        0.115,
+        0.86,
+        0.96
+      ],
+      "hint": "Read only the table headed 'CONGRESSMAN'. It has four vote columns: Congressman 1st Dist. (Mundt, Fosheim) and Congressman 2nd Dist. (Case, Watwood); each county has figures in one district's columns only, and the other district's cells are dotted leaders.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.07
+      ]
+    },
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Republican (Willkie & McNary)",
+          "contest": "president",
+          "candidate": "Wendell Willkie (Republican)"
+        },
+        {
+          "label": "Democratic (Roosevelt & Wallace)",
+          "contest": "president",
+          "candidate": "Franklin D. Roosevelt (Democratic)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.17,
+        0.105,
+        0.88,
+        0.96
+      ],
+      "hint": "Read only the table headed 'PRESIDENTIAL ELECTORS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.121
+      ]
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "Bushfield Rep.",
+          "contest": "governor",
+          "candidate": "Harlan J. Bushfield"
+        },
+        {
+          "label": "Bicknell Dem.",
+          "contest": "governor",
+          "candidate": "Lewis W. Bicknell"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.13,
+        0.105,
+        0.86,
+        0.96
+      ],
+      "hint": "Read only the table headed 'GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.075
+      ]
+    }
+  ],
+  "unit_codes": {
+    "Washington": "SD:washington",
+    "Armstrong (No election held)": "46001"
+  }
+}

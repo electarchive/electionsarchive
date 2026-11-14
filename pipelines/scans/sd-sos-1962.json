@@ -1,0 +1,125 @@
+{
+  "polity": "US-SD",
+  "publisher": "South Dakota Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "title": "Official election returns by counties for the state of South Dakota, general election November 6, 1962",
+  "file": {
+    "url": "https://sdsos.gov/elections-voting/assets/historicalelectiondata/1962G.pdf"
+  },
+  "contests": {
+    "house1": {
+      "year": 1962,
+      "chamber": "house",
+      "day": "1962-11-06",
+      "special": false,
+      "state": "SD",
+      "district": 1
+    },
+    "house2": {
+      "year": 1962,
+      "chamber": "house",
+      "day": "1962-11-06",
+      "special": false,
+      "state": "SD",
+      "district": 2
+    },
+    "governor": {
+      "year": 1962,
+      "chamber": "governor",
+      "day": "1962-11-06",
+      "special": false,
+      "state": "SD",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "Rep. Ben Reifel",
+          "contest": "house1",
+          "candidate": "Ben Reifel"
+        },
+        {
+          "label": "Dem. Ralph A. Nauman",
+          "contest": "house1",
+          "candidate": "Ralph A. Nauman"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.12,
+        0.02,
+        0.98,
+        0.935
+      ],
+      "hint": "Read only the table headed 'CONGRESSMEN--FIRST DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.075
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "Rep. E. Y. Berry",
+          "contest": "house2",
+          "candidate": "E. Y. Berry"
+        },
+        {
+          "label": "Dem. M. W. Morrie Clarkson",
+          "contest": "house2",
+          "candidate": "M. W. (Morrie) Clarkson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.05,
+        0.055,
+        0.99,
+        0.97
+      ],
+      "hint": "Read only the table headed 'CONGRESSMEN--SECOND DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.078
+      ]
+    },
+    {
+      "page": 5,
+      "id": "5-0",
+      "columns": [
+        {
+          "label": "Rep. Archie Gubbrud",
+          "contest": "governor",
+          "candidate": "Archie M. Gubbrud"
+        },
+        {
+          "label": "Dem. Ralph Herseth",
+          "contest": "governor",
+          "candidate": "Ralph Herseth"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.12,
+        0.02,
+        0.98,
+        0.935
+      ],
+      "hint": "Read only the table headed 'GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.075
+      ]
+    }
+  ]
+}

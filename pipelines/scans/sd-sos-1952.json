@@ -1,0 +1,143 @@
+{
+  "polity": "US-SD",
+  "publisher": "South Dakota Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "title": "South Dakota election statistics, general election November 4, 1952",
+  "file": {
+    "url": "https://sdsos.gov/elections-voting/assets/historicalelectiondata/1952G.pdf"
+  },
+  "contests": {
+    "house1": {
+      "year": 1952,
+      "chamber": "house",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "SD",
+      "district": 1
+    },
+    "house2": {
+      "year": 1952,
+      "chamber": "house",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "SD",
+      "district": 2
+    },
+    "president": {
+      "year": 1952,
+      "chamber": "president",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "SD",
+      "district": null
+    },
+    "governor": {
+      "year": 1952,
+      "chamber": "governor",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "SD",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "columns": [
+        {
+          "label": "Harold O. Lovre Rep.",
+          "contest": "house1",
+          "candidate": "Harold O. Lovre"
+        },
+        {
+          "label": "Goldie Wells Dem.",
+          "contest": "house1",
+          "candidate": "Goldie Wells"
+        },
+        {
+          "label": "E. Y. Berry Rep.",
+          "contest": "house2",
+          "candidate": "E. Y. Berry"
+        },
+        {
+          "label": "George A. Bangs Dem.",
+          "contest": "house2",
+          "candidate": "George A. (Arch) Bangs"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.15,
+        0.11,
+        0.86,
+        0.955
+      ],
+      "hint": "Read only the table headed 'CONGRESSMEN'. It has four vote columns: First District (Lovre, Wells) and Second District (Berry, Bangs); each county has figures in one district's columns only, and the other district's cells are dashed.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.071
+      ]
+    },
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Republican (Eisenhower & Nixon)",
+          "contest": "president",
+          "candidate": "Dwight D. Eisenhower (Republican)"
+        },
+        {
+          "label": "Democratic (Stevenson & Sparkman)",
+          "contest": "president",
+          "candidate": "Adlai Stevenson (Democratic)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.13,
+        0.1,
+        0.84,
+        0.955
+      ],
+      "hint": "Read only the table headed 'PRESIDENTIAL ELECTORS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.116
+      ]
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "Sigurd Anderson Rep.",
+          "contest": "governor",
+          "candidate": "Sigurd Anderson"
+        },
+        {
+          "label": "Sherman A. Iverson Dem.",
+          "contest": "governor",
+          "candidate": "Sherman A. Iverson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.14,
+        0.125,
+        0.86,
+        0.935
+      ],
+      "hint": "Read only the table headed 'GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.074
+      ]
+    }
+  ]
+}
