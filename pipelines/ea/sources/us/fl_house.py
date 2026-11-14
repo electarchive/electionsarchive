@@ -14,8 +14,12 @@ SUMMARY = "Florida's House results by county from the Division of Elections' tab
 STATE = "FL"
 FIPS = "12"
 ITEMS = {
-    1980: ("micro_IA40706905_0253", date(1980, 11, 4), range(9, 11)),
+    1980: ("micro_IA40706905_0253", date(1980, 11, 4), (9, 10, 18, 19)),
 }
+CHANNELS = {
+    (1980, page): (3, "tca-80-1055", "Absentee ballots counted under Civil Action TCA 80-1055") for page in (18, 19)
+}
+REREAD = tuple(f"1980-11-04:FL:house:{district}" for district in range(1, 16))
 VOLUMES = {
     year: (f"https://archive.org/download/{item}/{item}.pdf", f"https://archive.org/details/{item}", day, pages)
     for year, (item, day, pages) in ITEMS.items()

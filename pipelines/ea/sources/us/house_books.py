@@ -104,6 +104,7 @@ def parse(source: ModuleType) -> None:
         ]:
             raise ValueError(f"{year}: the two reads lay out different tables")
         for page in pages:
+            channel = getattr(source, "CHANNELS", {}).get((year, page), (0, "", ""))[0]
             tokens: list[tuple[str, tuple[int, int, int, int]]] = []
             words: list[tuple[str, tuple[int, int, int, int]]] = []
             for dpi, psm, threshold in (
@@ -196,10 +197,10 @@ def parse(source: ModuleType) -> None:
                     ):
                         failed.append(f"{year} district {where} row {r}: the plurality does not fit")
                 for c in range(int(columns[0] == "Plurality"), len(columns)):
-                    column = columns_by.setdefault((year, where, known.index(columns[c])), [])
+                    column = columns_by.setdefault((year, where, known.index(columns[c]), channel), [])
                     column.extend(settled.get((k, c), -(10**9)) for k in lines)
                     if total is not None:
-                        printed[(year, where, known.index(columns[c]))] = settled.get((total, c), -1)
+                        printed[(year, where, known.index(columns[c]), channel)] = settled.get((total, c), -1)
                 if year in getattr(source, "TRANSPOSED", ()):
                     for r, c, county, value, again in cells:
                         if r == total or (r, c) not in settled:
@@ -264,6 +265,7 @@ def parse(source: ModuleType) -> None:
                                 "votes": votes,
                                 "box": None if box is None else list(box),
                                 "located": how,
+                                "channel": channel,
                             }
                         )
                     continue
@@ -661,13 +663,14 @@ def parse(source: ModuleType) -> None:
                             "votes": votes,
                             "box": None if box is None else list(box),
                             "located": how,
+                            "channel": channel,
                         }
                     )
-    for (year, district, c), column in columns_by.items():
+    for (year, district, c, channel), column in columns_by.items():
         if (
             (year, district) not in source.ERRATA
-            and (year, district, c) in printed
-            and sum(column) != printed[(year, district, c)]
+            and (year, district, c, channel) in printed
+            and sum(column) != printed[(year, district, c, channel)]
         ):
             failed.append(f"{year} district {district} column {c}: the column does not add up")
     frame = pl.DataFrame(rows, infer_schema_length=None)
@@ -683,13 +686,15 @@ def parse(source: ModuleType) -> None:
             r["box"]
             for r in rows
             if r["box"] is not None
-            and (r["year"], r["district"], r["column"]) == (row["year"], row["district"], row["column"])
+            and (r["year"], r["district"], r["column"], r["channel"])
+            == (row["year"], row["district"], row["column"], row["channel"])
         ]
         same_row = [
             r["box"]
             for r in rows
             if r["box"] is not None
-            and (r["year"], r["district"], r["county"]) == (row["year"], row["district"], row["county"])
+            and (r["year"], r["district"], r["county"], r["channel"])
+            == (row["year"], row["district"], row["county"], row["channel"])
         ]
         if not same_column or not same_row:
             continue
@@ -714,6 +719,8 @@ def emit(source: ModuleType) -> Path:
     frame = pl.read_parquet(raw.parsed(source.SOURCE) / "values.parquet")
     if "state" not in frame.columns:
         frame = frame.with_columns(state=pl.lit(source.STATE))
+    if "channel" not in frame.columns:
+        frame = frame.with_columns(channel=pl.lit(0))
     names = getattr(source, "NAMES", {})
     frame = frame.with_columns(
         county=pl.struct("state", "county").map_elements(
@@ -1045,6 +1052,7 @@ def emit(source: ModuleType) -> Path:
                 ).fetchall()
             }
             units: dict[str, UUID] = {}
+            codes: dict[str, tuple[str, UUID]] = {}
             for county in lines["county"].unique(maintain_order=True):
                 code, parent, area = counties.get((county, county)) or counties[(fips[where], _plain(county))]
                 if district > 0 and (
@@ -1058,6 +1066,7 @@ def emit(source: ModuleType) -> Path:
                     if part in held:
                         part = f"{day}:{part.split(':', 1)[1]}"
                     units[county] = cs.unit("us.county_part", part)
+                    codes[county] = (part, area)
                     if part in parts:
                         continue
                     parts.add(part)
@@ -1083,14 +1092,43 @@ def emit(source: ModuleType) -> Path:
                     )
                 else:
                     units[county] = parent
-            for (county, option), cells in lines.group_by("county", "option", maintain_order=True):
+                    codes[county] = (code, area)
+            for (county, option, channel), cells in lines.group_by("county", "option", "channel", maintain_order=True):
                 unit = units[str(county)]
+                if channel:
+                    _, suffix, label = source.CHANNELS[(int(year), int(cells["page"][0]))]
+                    place, area = codes[str(county)]
+                    aggregate = f"{where}:{place}:{suffix}:{day}"
+                    unit = cs.unit("us.aggregate", aggregate)
+                    if aggregate not in parts:
+                        parts.add(aggregate)
+                        cs.add(
+                            "reporting_unit",
+                            id=unit,
+                            polity_id=state,
+                            scheme_code="us.aggregate",
+                            code=aggregate,
+                            parent_id=units[str(county)],
+                            area_relation="within",
+                            area_id=area,
+                            kind="aggregate",
+                            valid_from=day,
+                            valid_to=day + timedelta(days=1),
+                        )
+                        cs.add(
+                            "name",
+                            entity_id=unit,
+                            text=f"{county}: {label}",
+                            lang="en",
+                            kind="official",
+                            is_preferred=True,
+                        )
                 cs.add(
                     "result_value",
                     result_set_id=result_set,
                     unit_id=unit,
                     option_id=UUID(str(option)),
-                    channel=0,
+                    channel=int(channel),
                     measure=1,
                     count_round=first,
                     flags=(DIGITIZED if "box" in frame.columns else 0) | (DERIVED if cells.height > 1 else 0),
@@ -1105,7 +1143,7 @@ def emit(source: ModuleType) -> Path:
                     result_set_id=result_set,
                     unit_id=unit,
                     option_id=UUID(str(option)),
-                    channel=0,
+                    channel=int(channel),
                     measure=1,
                     count_round=first,
                     page_id=page,
