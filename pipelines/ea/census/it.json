@@ -510,6 +510,12 @@
           "locator": "https://www.istat.it/storage/ASI/2025/capitoli/C01.pdf (Prospetto 1.1, Italia, column 2011, census date)"
         },
         {
+          "date": "2021-12-31",
+          "value": 7904,
+          "source": "istat_asi_2025_c01",
+          "locator": "https://www.istat.it/storage/ASI/2025/capitoli/C01.pdf (Prospetto 1.1, Italia, column 2021, census reference of 31 December 2021)"
+        },
+        {
           "date": "2022-12-31",
           "value": 7904,
           "source": "istat_asi_2025_c01",
