@@ -444,6 +444,7 @@ type Unit = {
   paced: number | null;
   pacedLead: number | null;
   before: number | null;
+  beforeLead: number | null;
   earlier: number | null;
   rate: number | null;
   step: number;
@@ -671,6 +672,7 @@ function units(
   const earliers = new Map<string, number>();
   const rates = new Map<string, number>();
   const leads = new Map<string, number>();
+  const beforeLeads = new Map<string, number>();
   const sinces = new Map<string, Array<number>>();
   const [a, b] = pair(race, latest);
   if (cutoff != null && clock > cutoff && start <= cutoff) {
@@ -730,6 +732,14 @@ function units(
         point([list], start, (votes) => (votes[a] ?? 0) - (votes[b] ?? 0)),
       );
       befores.set(id, point([list], start - day));
+      beforeLeads.set(
+        id,
+        point(
+          [list],
+          start - day,
+          (votes) => (votes[a] ?? 0) - (votes[b] ?? 0),
+        ),
+      );
       earliers.set(id, point([list], start - 2 * day));
       let then: { time: number; value: number } | null = null;
       let flow = 0;
@@ -837,6 +847,7 @@ function units(
       paced: paces.get(id) ?? null,
       pacedLead: leads.get(id) ?? null,
       before: befores.get(id) ?? null,
+      beforeLead: beforeLeads.get(id) ?? null,
       earlier: earliers.get(id) ?? null,
       rate: rates.get(id) ?? null,
       step: stepped.get(id) ?? total,
@@ -1855,6 +1866,9 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
         before: members.some((unit) => unit.before == null)
           ? null
           : sum(members.map((unit) => unit.before ?? 0)),
+        beforeLead: members.some((unit) => unit.beforeLead == null)
+          ? null
+          : sum(members.map((unit) => unit.beforeLead ?? 0)),
         earlier: members.some((unit) => unit.earlier == null)
           ? null
           : sum(members.map((unit) => unit.earlier ?? 0)),
@@ -2430,13 +2444,20 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
                 total: sum(unit.since),
                 lead: (unit.since[a] ?? 0) - (unit.since[b] ?? 0),
               };
-      const fresh = anchor == null ? 0 : unit.total - anchor.total;
+      const back =
+        unit.pacedLead != null && unit.before != null && unit.beforeLead != null
+          ? { total: unit.before, lead: unit.beforeLead }
+          : null;
+      const origin =
+        [anchor, back].find(
+          (from) =>
+            from != null &&
+            unit.total - from.total > MODEL.late.fresh * unit.total,
+        ) ?? null;
+      const fresh = origin == null ? 0 : unit.total - origin.total;
       const recent =
-        isLate &&
-        unit.channel === 0 &&
-        anchor != null &&
-        fresh > MODEL.late.fresh * unit.total
-          ? (countedLead - anchor.lead) / fresh
+        isLate && unit.channel === 0 && origin != null
+          ? (countedLead - origin.lead) / fresh
           : null;
       const toward = remaining * (recent ?? 0);
       const aimed =
