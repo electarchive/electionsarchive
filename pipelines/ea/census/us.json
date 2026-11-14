@@ -1269,6 +1269,7 @@
         "unit": "polity"
       },
       "source": "bia-fr",
+      "match": [{"within": null, "name_pattern": "Board|Chapter|Commissioner", "polity_kinds": ["tribal_nation"]}],
       "note": "Navajo chapters, school boards, and the Board of Election Supervisors; Cherokee Nation districts; Eastern Band townships and school board. Rules: (1) load a nation's results only from what its own election body publishes openly; (2) cite that body as the source; (3) never use news tallies, tribal newspapers included, or BIA files in their place, and a nation whose body publishes nothing openly gets a gap row; (4) honor any nation's request to withdraw or limit its data. Each nation's constitution or election code sets its own calendar, recorded with that nation's load."
     },
     {
