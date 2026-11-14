@@ -339,6 +339,7 @@ def emit() -> Path:
             ).fetchall()
         )
         persons: dict[str, UUID] = {}
+        written: set[tuple[str, str]] = set()
         latest = dict(
             candidates.filter(pl.col("wikidata").is_not_null())
             .sort("year")
@@ -501,6 +502,7 @@ def emit() -> Path:
                 )
                 for body_md in notes:
                     cs.add("note", entity_id=result_set, kind="methodology", body_md=body_md)
+                    written.add((str(result_set), body_md))
                 for number, count in seats.items():
                     cs.add("outcome", result_set_id=result_set, option_id=options[number], kind="won", seats=count)
                 return result_set
@@ -680,15 +682,30 @@ def emit() -> Path:
                 flush=True,
             )
 
-        cs.frame(
-            "reporting_unit",
-            pl.DataFrame(
-                list(unit_rows.values()),
-                schema_overrides={"parent_id": pl.String, "area_id": pl.String},
-            ),
-        )
+        if unit_rows:
+            cs.frame(
+                "reporting_unit",
+                pl.DataFrame(
+                    list(unit_rows.values()),
+                    schema_overrides={"parent_id": pl.String, "area_id": pl.String},
+                ),
+            )
         cs.frame(
             "result_value",
             pl.concat(value_frames).with_columns(count_round=pl.lit(0, pl.Int16), flags=pl.lit(0, pl.Int16)),
         )
+        for note, entity, body in conn.execute(
+            """select n.id, n.entity_id, n.body_md from note n
+               join changeset w on w.id = n.changeset_id and w.pipeline = %s
+               where n.kind = 'methodology' and n.entity_id in (select id from result_set)""",
+            [SOURCE],
+        ).fetchall():
+            if (str(entity), body) not in written:
+                cs.add(
+                    "note_drop",
+                    note_id=note,
+                    entity_id=entity,
+                    body_md=body,
+                    reason="the methodology note was rewritten",
+                )
         return cs.write()
