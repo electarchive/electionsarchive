@@ -1,0 +1,21 @@
+{
+  "year": 1897,
+  "day": "1897-11-02",
+  "polity": "US-OH",
+  "publisher": "Ohio Secretary of State",
+  "title": "Ohio Election Statistics for 1897, general election 1897-11-02",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/ohioelectionsta00statgoog/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/ohioelectionsta00statgoog"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "governor": "Governor by county with pluralities, counties down, the table continues on the next leaf"
+  },
+  "leaves": [
+    497,
+    498
+  ],
+  "autorotate": true
+}

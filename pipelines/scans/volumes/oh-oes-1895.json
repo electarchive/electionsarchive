@@ -1,0 +1,21 @@
+{
+  "year": 1895,
+  "day": "1895-11-05",
+  "polity": "US-OH",
+  "publisher": "Ohio Secretary of State",
+  "title": "Ohio Election Statistics for 1895, general election 1895-11-05",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/ohioelectionsta00statgoog/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/ohioelectionsta00statgoog"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "governor": "Governor 1895 by county with total vote; the same table prints the 1894 Secretary of State columns, which are not read"
+  },
+  "leaves": [
+    26,
+    27
+  ],
+  "autorotate": true
+}
