@@ -241,7 +241,7 @@ const MODEL = {
     gate: { full: 0.6, off: 0.8 },
   },
   floor: { slack: 0.98, met: 0.99, closed: 0 },
-  remaining: { spread: 0.2, stale: 3 },
+  remaining: { spread: 0.2, stale: 3, lean: 0.5 },
   outlier: 0.01,
   pool: { from: 0.3, shrink: 1, share: 1, matched: 0.4 },
 };
@@ -2224,7 +2224,9 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
           Math.max(0, target - unit.total) *
             Math.exp(spread * gaussian(random) - spread ** 2 / 2),
         );
-        finals[index] = unit.total;
+        const reported = pending.get(unit.id)!;
+        finals[index] = unit.total + MODEL.remaining.lean * reported;
+        pending.set(unit.id, (1 - MODEL.remaining.lean) * reported);
       } else if (unit.hasBaseline) {
         finals[index] =
           unit.total > 0 && complete
@@ -2367,6 +2369,23 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
             )
           : 0,
       );
+      const grown = indexes.map((index) => {
+        const unit = found[index]!;
+        const from =
+          unit.paced ?? (unit.since == null ? null : sum(unit.since));
+        return from == null ? null : Math.max(0, unit.total - from);
+      });
+      const growth = sum(grown.map((value) => value ?? 0));
+      if (
+        isLate &&
+        reports.has(county) &&
+        growth > 0 &&
+        grown.every((value) => value != null)
+      ) {
+        for (const slot of shares.keys()) {
+          shares[slot] = grown[slot]! / growth;
+        }
+      }
       const wanted = sum(wants);
       const shared = sum(shares);
       const open =
