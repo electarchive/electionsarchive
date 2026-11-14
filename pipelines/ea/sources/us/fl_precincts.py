@@ -1,3 +1,4 @@
+import io
 import os
 import re
 import unicodedata
@@ -6,6 +7,7 @@ from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 
 import polars as pl
+import shapefile
 
 from ea import raw
 from ea.changeset import Changeset
@@ -19,6 +21,22 @@ INBOX = DATA / "inbox" / "manual" / "precincts-fl"
 PUBLISHER = "Florida Division of Elections"
 TITLE = "Precinct-Level Election Results"
 LANDING = "https://dos.fl.gov/elections/data-statistics/elections-data/precinct-level-election-results/"
+LEGISLATURE = "Florida Legislature"
+PLAN = "2000 General Election Precinct Plan (precinct00_pl)"
+PLAN_URL = "http://www.leg.state.fl.us/data/redistricting_data/ArcViewShapfiles/precinct00_pl.zip"
+PRESIDENT_2000 = {
+    "R": "GEORGE W. BUSH",
+    "D": "AL GORE",
+    "GRE": "RALPH NADER",
+    "REF": "PAT BUCHANAN",
+    "LIB": "HARRY BROWNE",
+    "LAW": "JOHN HAGELIN",
+    "WWP": "MONICA MOOREHEAD",
+    "CPF": "HOWARD PHILLIPS",
+    "SPF": "DAVID MCREYNOLDS",
+    "SWP": "JAMES HARRIS",
+    "WRI": "WRITE-INS",
+}
 FILES = {
     date(2012, 11, 6): "https://dos.fl.gov/media/697204/precinctlevelelectionresults2012gen.zip",
     date(2014, 11, 4): "https://dos.fl.gov/media/697201/precinctlevelelectionresults2014gen.zip",
@@ -55,6 +73,7 @@ COLUMNS = [
 
 
 def fetch() -> None:
+    raw.fetch(SOURCE, PLAN_URL, suffix=".zip")
     for url in FILES.values():
         try:
             raw.cached(SOURCE, url)
@@ -161,35 +180,79 @@ def parse() -> None:
             district=pl.when(pl.col("chamber") == "house").then("district"),
         )
     )
+    frame = pl.concat([frame, legislature(frame.schema)], how="diagonal_relaxed")
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.write_parquet(PARSED / "precincts.parquet")
     print(frame.group_by("year").agg(pl.col("code").n_unique()).rows())
 
 
+def legislature(schema: pl.Schema) -> pl.DataFrame:
+    day = date(2000, 11, 7)
+    with zipfile.ZipFile(raw.cached(SOURCE, PLAN_URL).path) as archive:
+        reader = shapefile.Reader(dbf=io.BytesIO(archive.read("precinct00_pl.dbf")))
+        names = [field[0] for field in reader.fields[1:]]
+        rows = []
+        for record in reader.iterRecords():
+            row = {name: str(value).strip() for name, value in zip(names, record or [], strict=True)}
+            total = int(row["G00PRE_V"])
+            if not total:
+                continue
+            county = row["FLID"][:5]
+            code = f"{day}:FL:{county}:{row['COUNTY'].upper()}:{row['PRECINCT']}"
+            counted = 0
+            for party, candidate in PRESIDENT_2000.items():
+                share = float(row[f"G00PRE_{party}"]) * total / 100
+                if abs(share - round(share)) > 0.01:
+                    raise ValueError(f"{code} {party}: {share} is not a whole count")
+                counted += round(share)
+                rows.append((code, county, candidate, party == "WRI", round(share)))
+            if counted != total:
+                raise ValueError(f"{code}: {counted} against {total}")
+    frame = pl.DataFrame(
+        rows, schema=["code", "county_code", "candidate", "writein", "votes"], orient="row"
+    ).with_columns(
+        day=pl.lit(day),
+        chamber=pl.lit("president"),
+        district=pl.lit(None, pl.Int16),
+        measure=pl.lit(1, pl.Int16),
+        year=pl.lit(day.year, pl.Int32),
+        special=pl.lit(False),
+        state=pl.lit("FL"),
+        kind=pl.lit("precinct"),
+        source=pl.lit("FL"),
+    )
+    if frame["code"].n_unique() * len(PRESIDENT_2000) != frame.height:
+        raise ValueError("duplicate precinct codes in precinct00_pl")
+    return frame.select([pl.col(name).cast(dtype) for name, dtype in schema.items()])
+
+
 def emit() -> Path:
-    frame = pl.read_parquet(PARSED / "precincts.parquet").filter(pl.col("year") == int(os.environ["FL_YEAR"]))
+    year = int(os.environ["FL_YEAR"])
+    frame = pl.read_parquet(PARSED / "precincts.parquet").filter(pl.col("year") == year)
     with connect() as conn:
         cs = Changeset(
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Florida's presidential, federal, statewide, and legislative general elections by precinct, 2012 and 2014",
+            summary="Florida's 2000 presidential election by precinct, from the Legislature's precinct plan"
+            if year == 2000
+            else "Florida's presidential, federal, statewide, and legislative general elections by precinct, 2012 and 2014",
             polity="US-FL",
         )
-        source = cs.source(PUBLISHER, TITLE)
+        publisher, title, landing = (LEGISLATURE, PLAN, PLAN_URL) if year == 2000 else (PUBLISHER, TITLE, LANDING)
+        source = cs.source(publisher, title)
         if source in cs.minted:
             cs.add(
                 "source",
                 id=source,
                 kind="official_body",
-                publisher=PUBLISHER,
-                title=TITLE,
-                url=LANDING,
+                publisher=publisher,
+                title=title,
+                url=landing,
                 license="Public record",
             )
-        for day, url in FILES.items():
-            if day.year == int(os.environ["FL_YEAR"]):
-                cs.artifact(raw.cached(SOURCE, url), source)
+        for url in [PLAN_URL] if year == 2000 else [url for day, url in FILES.items() if day.year == year]:
+            cs.artifact(raw.cached(SOURCE, url), source)
         cs.scope_units("us.precinct", "____-__-__:FL:%")
         counties = {
             code: (unit, area)
@@ -206,8 +269,8 @@ def emit() -> Path:
                    join changeset g on g.id = r.changeset_id and g.pipeline <> %s
                    join result_value v on v.result_set_k = r.k
                    join reporting_unit u on u.k = v.unit_k and u.scheme_code = 'us.precinct'
-                   where x.scheme = 'us.contest' and x.value ~ '^201[24]-..-..:FL:'""",
-                [SOURCE],
+                   where x.scheme = 'us.contest' and x.value ~ %s""",
+                [SOURCE, f"^{year}-..-..:FL:"],
             ).fetchall()
         }
         frame = frame.filter(
@@ -228,7 +291,9 @@ def emit() -> Path:
         cs.frame(
             "reporting_unit",
             units.select(
-                id=pl.col("code").map_elements(lambda code: str(cs.unit("us.precinct", code)), return_dtype=pl.String),
+                id=pl.struct("code", "day").map_elements(
+                    lambda row: str(cs.unit("us.precinct", row["code"], row["day"])), return_dtype=pl.String
+                ),
                 polity_id=pl.col("state").map_elements(
                     lambda state: str(cs.polity(f"US-{state}")), return_dtype=pl.String
                 ),
