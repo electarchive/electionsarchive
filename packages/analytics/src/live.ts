@@ -212,6 +212,7 @@ const MODEL = {
   channel: { turnout: 0.35, prior: 0.08, sigma: 1.5, unlisted: 0.02 },
   floor: { slack: 0.98, met: 0.99, closed: 0 },
   remaining: { spread: 0.2, stale: 3 },
+  outlier: 0.01,
 };
 
 const STREAM = "~";
@@ -861,7 +862,18 @@ function turnout(found: Array<Unit>, center: number, spread: number) {
         for (const unit of reported) {
           const { done, open } = components(unit, tau, pi, scale);
           const top = Math.max(done, open);
-          log += top + Math.log(Math.exp(done - top) + Math.exp(open - top));
+          const kept =
+            Math.log(1 - MODEL.outlier) +
+            top +
+            Math.log(Math.exp(done - top) + Math.exp(open - top));
+          const raw = Math.log(unit.total / unit.expected);
+          const stray =
+            Math.log(MODEL.outlier) -
+            (raw * raw) / 2 -
+            Math.log(Math.sqrt(2 * Math.PI));
+          const high = Math.max(kept, stray);
+          log +=
+            high + Math.log(Math.exp(kept - high) + Math.exp(stray - high));
         }
         logs.push(log);
       }
