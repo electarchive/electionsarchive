@@ -492,6 +492,9 @@ def images(path: Path) -> list[Image.Image]:
 def fetch() -> None:
     raw.fetch(SOURCE, wayback("20251221232954", INDEX), suffix=".html")
     raw.fetch(SOURCE, wayback(DEMON_STAMP, DEMON), suffix=".html")
+    raw.fetch(SOURCE, wayback(DEMON_BY_STAMP, DEMON_BY), suffix=".html")
+    for *_, url, _, _, _ in BY_2003.values():
+        raw.fetch(SOURCE, url, suffix=".html")
     price_in, price_out = batch.PRICES[MODEL]
     wanted: dict[str, batch.Want] = {}
     for *_, stamp, url in FILES:
@@ -1060,6 +1063,142 @@ def demon_1999(path: Path) -> dict[str, list[tuple[str, int]]]:
     return out
 
 
+DEMON_BY = "http://www.election.demon.co.uk/lordsbe.html"
+DEMON_BY_STAMP = "20110515145637"
+DEMON_PARTIES = {"C": "Conservative", "Lab": "Labour", "L Dem": "Liberal Democrat"}
+WINNERS_2003 = (
+    "The Clerk of the Parliaments announced only the successful candidate and the number of valid ballot papers to "
+    "the House. The paper giving every candidate's votes was laid in the Printed Paper Office and the Library and "
+    "has not been found online, so this set covers the elected only; a second result set holds Election Demon's "
+    "transcription of that paper with every candidate."
+)
+COMPILED_2003 = {
+    "house": (
+        "Every candidate's votes at each stage, as Election Demon (David Boothroyd) transcribed them from the Clerk of "
+        "the Parliaments' paper of complete results (archived copy); its 423 valid ballots match those the Clerk "
+        "announced to the House. The Clerk excluded tied candidates with the fewest votes one at a time in "
+        "alphabetical order over 42 stages, but the transcription rolls each run of tied exclusions into one stage, "
+        "so count round n here is its nth of 18 stages, not the Clerk's. The exhausted measure holds its "
+        "non-transferable papers, and the 37 candidates with no first-preference votes, listed by name only, hold 0 "
+        "in round 1. Its transfers from stage 5 to stage 6 omit a gain of 1 for the Earl of Cranbrook, whose stage totals "
+        "of 8 and 9 it prints, and every stage sums to 423 with them."
+    ),
+    "labour": (
+        "Every candidate's votes, as Election Demon (David Boothroyd) recorded them from the Clerk of the Parliaments' "
+        "paper of complete results (archived copy): 2 for Lord Grantchester and 1 for Viscount Hanworth, which sum "
+        "to the 3 valid ballots the Clerk announced to the House, and none for the 9 other declared candidates."
+    ),
+}
+BY_2003: dict[str, tuple[str, str, str, str, int, str]] = {
+    "house": (
+        "2003-03-25",
+        "2003-03-26",
+        f"{HANSARD}/2003/mar/27/hereditary-peers-by-election",
+        "following the death of the Viscount of Oxfuird",
+        423,
+        "Four hundred and twenty-three",
+    ),
+    "labour": (
+        "2003-10-28",
+        "2003-10-30",
+        f"{HANSARD}/2003/oct/30/hereditary-peers-by-election",
+        "following the death of Lord Milner of Leeds",
+        3,
+        "Three",
+    ),
+}
+WINNER_2003 = {"house": "Viscount Ullswater", "labour": "Lord Grantchester"}
+
+
+def demon_2003_house(path: Path) -> tuple[list[tuple[str, str | None, list[float]]], list[float], tuple[int, int, int]]:
+    text = path.read_text(encoding="latin-1")
+    facts = re.search(r"there were (\d+) people eligible to vote, of whom (\d+) cast votes; (\d+) ballot papers", text)
+    if facts is None:
+        raise ValueError("Election Demon 2003: no turnout")
+    eligible, cast, spoilt = (int(number) for number in facts.groups())
+    names: list[str] = []
+    labels: list[str] = []
+    stages: dict[str, list[str]] = {}
+    for part in text.split("<TH WIDTH=100 ALIGN=LEFT>Candidate</TH>")[1:]:
+        head, body = part.split("</TR>", 1)
+        heads = re.findall(r"<TH[^>]*>(.*?)</TH>", head)
+        cells = [
+            [html.unescape(line).strip() for line in re.split(r"<BR>", cell, flags=re.IGNORECASE)]
+            for cell in re.findall(r"<TD[^>]*>(.*?)</TD>", body.split("</TABLE>", 1)[0], re.DOTALL)
+        ]
+        if names and cells[0] != names:
+            raise ValueError("Election Demon 2003: candidate columns disagree")
+        names, labels = cells[0], cells[1]
+        for column, (heading, cell) in enumerate(zip(heads[1:], cells[2 : len(heads) + 1], strict=True)):
+            stage = heading if heading != "Elim." else f"{heads[column]}+"
+            cell = cell + [""] * (len(names) - len(cell))
+            if stages.setdefault(stage, cell) != cell:
+                raise ValueError(f"Election Demon 2003: stage {stage} printed twice and differs")
+    order = list(dict.fromkeys(stage for stage in stages if not stage.endswith("+")))
+    rows = [index for index, label in enumerate(names) if label and label != "Not transferrable"]
+    exhausted_row = names.index("Not transferrable")
+    tallies: list[list[float]] = [[] for _ in rows]
+    exhausted: list[float] = []
+    for number, stage in enumerate(order):
+        cell = stages[stage]
+        for tally, row in zip(tallies, rows, strict=True):
+            if cell[row]:
+                if len(tally) != number:
+                    raise ValueError(f"Election Demon 2003: {names[row]} returns at {stage}")
+                tally.append(float(cell[row]))
+        exhausted.append(float(cell[exhausted_row] or 0))
+        if sum(tally[number] for tally in tallies if len(tally) > number) + exhausted[number] != cast - spoilt:
+            raise ValueError(f"Election Demon 2003: stage {stage} does not sum to {cast - spoilt}")
+        if number:
+            moved = stages[f"{order[number - 1]}+"]
+            for tally, row in zip(tallies, rows, strict=True):
+                after = tally[number] if len(tally) > number else 0.0
+                if (
+                    len(tally) >= number
+                    and after != tally[number - 1] + float(moved[row] or 0)
+                    and (names[row], stage) != ("Earl of Cranbrook", "VI")
+                ):
+                    raise ValueError(f"Election Demon 2003: {names[row]} transfer at {stage}")
+    out: list[tuple[str, str | None, list[float]]] = [
+        (names[row].replace("Magdãla", "Magdala"), DEMON_PARTIES.get(labels[row]) if row < len(labels) else None, tally)
+        for row, tally in zip(rows, tallies, strict=True)
+    ]
+    zeros = re.search(r"Candidates who obtained no first preference votes(.*?)Back to main page", text, re.DOTALL)
+    if zeros is None:
+        raise ValueError("Election Demon 2003: no zero list")
+    for line in re.split(r"<BR>|<P>", zeros[1], flags=re.IGNORECASE):
+        line = html.unescape(re.sub(r"<[^>]+>", "", line)).strip()
+        if line:
+            found = re.fullmatch(r"(.+?)(?: \((C|XB|Lab|L Dem)\))?", line)
+            if found is None:
+                raise ValueError(f"Election Demon 2003: {line}")
+            out.append((found[1], DEMON_PARTIES.get(found[2] or ""), [0.0]))
+    if len(out) != 81:
+        raise ValueError(f"Election Demon 2003: {len(out)} candidates, not 81")
+    return out, exhausted, (eligible, spoilt, cast - spoilt)
+
+
+def demon_2003_labour(path: Path) -> list[tuple[str, str | None, list[float]]]:
+    text = " ".join(html.unescape(path.read_text(encoding="latin-1")).split())
+    found = re.search(
+        r"At a byelection on 28th-30th October 2003, (Lord Grantchester) \(Lab\) was elected with 2 votes to 1 for "
+        r"(Viscount Hanworth) \(Lab\)\. (.+?) also declared themselves candidates but received no votes\.",
+        text,
+    )
+    if found is None:
+        raise ValueError("Election Demon 2003 Labour: no note")
+    out: list[tuple[str, str | None, list[float]]] = [(found[1], "Labour", [2.0]), (found[2], "Labour", [1.0])]
+    for item in re.split(r", | and ", found[3]):
+        named = re.fullmatch(r"(?:the )?(.+?) \((C|XB|Lab|L Dem|Ind)\)", item)
+        if named is None:
+            raise ValueError(f"Election Demon 2003 Labour: {item}")
+        label = named[1][0].upper() + named[1][1:]
+        out.append((label, DEMON_PARTIES.get(named[2]), [0.0]))
+    if len(out) != 11:
+        raise ValueError(f"Election Demon 2003 Labour: {len(out)} candidates")
+    return out
+
+
 def core(label: str) -> str:
     text = re.sub(r"\(.*?\)", "", label).strip(" ,")
     if "," in text:
@@ -1080,7 +1219,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="House of Lords hereditary peers' elections of 1999 and by-elections 2004-2023, from the Clerk of the Parliaments",
+            summary="House of Lords hereditary peers' elections of 1999 and by-elections 2003-2023, from the Clerk of the Parliaments",
             polity="GB",
         )
 
@@ -1467,6 +1606,155 @@ def emit() -> Path:
             for option, votes in options:
                 values.append((full, units[group], option, VOTES, 1, votes))
             values.append((full, units[group], None, VALID, 1, valid))
+        by_artifact = raw.cached(SOURCE, wayback(DEMON_BY_STAMP, DEMON_BY))
+        by_title = "House of Lords Act: Hereditary Peers Byelection, March 2003"
+        by_source = cs.source("Election Demon", by_title)
+        cs.add(
+            "source",
+            id=by_source,
+            kind="aggregator",
+            publisher="Election Demon",
+            title=by_title,
+            url=DEMON_BY,
+            license=None,
+        )
+        cs.artifact(by_artifact, by_source)
+        house, house_exhausted, (house_eligible, house_spoilt, house_valid) = demon_2003_house(by_artifact.path)
+        for group, (day, until, url, vacancy, valid, words) in BY_2003.items():
+            artifact = raw.cached(SOURCE, url)
+            text = " ".join(re.sub(r"<[^>]+>", " ", artifact.path.read_text()).split())
+            title = re.search(r"HL Deb \d+ \w+ 2003 vol \d+ cc?[\d-]+", text)
+            if title is None:
+                raise ValueError(f"2003 {group}: no column reference")
+            if f"{words} Lords completed valid ballot papers" not in text:
+                raise ValueError(f"2003 {group}: {valid} valid ballots not printed")
+            winner = WINNER_2003[group]
+            if f"The successful candidate was {winner}." not in text:
+                raise ValueError(f"2003 {group}: {winner} not announced")
+            source = cs.source(PUBLISHER, f"Hereditary Peers' By-election, {title[0]}")
+            cs.add(
+                "source",
+                id=source,
+                kind="official_body",
+                publisher=PUBLISHER,
+                title=f"Hereditary Peers' By-election, {title[0]}",
+                url=url,
+                license=LICENSE,
+            )
+            cs.artifact(artifact, source)
+            if group == "house":
+                candidates, exhausted, facts = house, house_exhausted, (house_eligible, house_spoilt, house_valid)
+                compiled_source = by_source
+            else:
+                candidates, exhausted, facts = demon_2003_labour(demon_artifact.path), [0.0], (None, None, valid)
+                compiled_source = compiled
+            if facts[2] != valid:
+                raise ValueError(f"2003 {group}: Election Demon has {facts[2]} valid ballots, Hansard {valid}")
+            held, closed = date.fromisoformat(day), date.fromisoformat(until)
+            noun, electorate = GROUPS[group]
+            key = f"{day}:lords:{group}"
+            election = cs.key("gb.election", key)
+            cs.add(
+                "election", id=election, polity_id=gb, kind="by_election", date_from=held, date_to=closed, status="held"
+            )
+            name(election, f"{noun} hereditary peers' by-election, {held:%-d}-{closed:%-d %B %Y}")
+            path = f"gb/{day}-lords-{group}-by-election"
+            cs.add("slug", path=path, entity_id=election)
+            cs.add(
+                "note",
+                entity_id=election,
+                kind="context",
+                body_md=f"An election by {electorate} to a seat in the House of Lords reserved for hereditary "
+                f"peers under section 2 of the House of Lords Act 1999, held {vacancy}.",
+            )
+            contest = cs.key("gb.contest", key)
+            cs.add(
+                "contest",
+                id=contest,
+                election_id=election,
+                kind="body_seats",
+                body_id=lords,
+                magnitude=1,
+                electoral_system_id=systems["av"],
+                round_number=1,
+                default_result_kind="counted",
+            )
+            name(contest, f"{noun} hereditary peers (seat)")
+            cs.add("slug", path=f"{path}/count", entity_id=contest)
+            result_set = cs.key(f"{SOURCE}.result_set", key)
+            cs.add(
+                "result_set",
+                id=result_set,
+                election_id=election,
+                contest_id=contest,
+                stage="official",
+                kind="counted",
+                status="active",
+                source_id=source,
+                is_default=True,
+                completeness=0,
+            )
+            cs.add("citation", entity_id=result_set, source_id=source)
+            cs.add("note", entity_id=result_set, kind="caveat", body_md=WINNERS_2003)
+            values.append((result_set, units[group], None, VALID, 1, valid))
+            full = cs.key(f"{SOURCE}.result_set", f"{key}:demon")
+            cs.add(
+                "result_set",
+                id=full,
+                election_id=election,
+                contest_id=contest,
+                stage="official",
+                kind="counted",
+                status="active",
+                source_id=compiled_source,
+                is_default=False,
+                completeness=1,
+            )
+            cs.add("citation", entity_id=full, source_id=compiled_source)
+            cs.add("note", entity_id=full, kind="caveat", body_md=COMPILED_2003[group])
+            rounds = max(len(tally) for _, _, tally in candidates)
+            finalists = [label for label, _, tally in candidates if len(tally) == rounds]
+            elected = max(finalists, key=lambda label: next(t for n, _, t in candidates if n == label)[-1])
+            if elected != winner:
+                raise ValueError(f"2003 {group}: Election Demon elects {elected}, Hansard {winner}")
+            for position, (label, member, tally) in enumerate(candidates, 1):
+                option_key = f"{key}:{label}"
+                option = cs.key(f"{SOURCE}.option", option_key)
+                cs.add(
+                    "contest_option",
+                    id=option,
+                    contest_id=contest,
+                    kind="candidate",
+                    ballot_position=position,
+                    party_id=parties.get(member or ""),
+                    ballot_label=label,
+                )
+                person = cs.key(f"{SOURCE}.person", option_key)
+                if person in cs.minted:
+                    cs.add("person", id=person)
+                    name(person, label)
+                cs.add(
+                    "candidacy",
+                    id=cs.key(f"{SOURCE}.candidacy", option_key),
+                    person_id=person,
+                    option_id=option,
+                    role="head",
+                    ballot_name=label,
+                    member_of_party_id=parties.get(member or ""),
+                )
+                if label == winner:
+                    cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected")
+                outcome = "elected" if label == winner else "lost" if len(tally) == rounds else "eliminated"
+                cs.add("outcome", result_set_id=full, option_id=option, kind=outcome)
+                for number, votes in enumerate(tally, 1):
+                    values.append((full, units[group], option, VOTES, number, votes))
+            eligible, spoilt, _ = facts
+            for measure, number in ((VALID, valid), (INVALID, spoilt), (REGISTERED, eligible)):
+                if number is not None:
+                    values.append((full, units[group], None, measure, 1 if measure == VALID else 0, number))
+            for number, figure in enumerate(exhausted, 1):
+                if group == "house":
+                    values.append((full, units[group], None, EXHAUSTED, number, figure))
         staged = {(row["entity_id"], row["body_md"]) for row in cs.rows["note"] if row["kind"] == "caveat"}
         for note, entity, text in conn.execute(
             """select n.id, n.entity_id, n.body_md from note n join changeset c on c.id = n.changeset_id
