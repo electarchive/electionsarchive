@@ -457,6 +457,16 @@ def emit() -> Path:
         path = f"pl/{day}-local"
         cs.add("slug", path=path, entity_id=election)
 
+        sizes = {
+            (ELECTIONS[held], row["woj"]): row["elected"]
+            for held in ELECTIONS
+            if (PARSED / f"{held}.parquet").exists()
+            for row in pl.read_parquet(PARSED / f"{held}.parquet")
+            .group_by("woj")
+            .agg(pl.col("elected").sum())
+            .iter_rows(named=True)
+        }
+        days = sorted({start for start, _ in sizes})
         unit_rows: dict[UUID, dict[str, str | None]] = {}
         values: list[tuple[str, str, str | None, int, int]] = []
         gminas = Counter[str]()
@@ -521,8 +531,8 @@ def emit() -> Path:
             cs.add("body", id=body, polity_id=region, kind="council")
             name(body, f"Assembly of {english.replace(' Voivodeship', '')} Voivodeship")
             name(body, native[code], "pl", "native")
-            seats_total = int(frame.filter(pl.col("woj") == code)["elected"].sum())
-            cs.add("body_size", body_id=body, seats=seats_total, valid_from=day)
+            for start, end in zip(days, [*days[1:], None]):
+                cs.add("body_size", body_id=body, seats=sizes[(start, code)], valid_from=start, valid_to=end)
             region_unit = cs.unit("pl.wojewodztwo", code)
             unit_rows[region_unit] = {
                 "scheme_code": "pl.wojewodztwo",
