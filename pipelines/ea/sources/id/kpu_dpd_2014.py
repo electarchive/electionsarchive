@@ -159,6 +159,12 @@ def _read(stem: str) -> dict[str, object]:
     return json.loads("".join(block["text"] for block in message["content"] if block["type"] == "text"))
 
 
+def _figures(read: dict[str, object]) -> list[tuple[object, object]]:
+    rows = read["rows"]
+    assert isinstance(rows, list)
+    return [(row["number"], row["votes"]) for row in rows] + [("total", read["total"])]
+
+
 def _elected() -> dict[str, list[tuple[str, int, int]]]:
     text = subprocess.run(
         ["pdftotext", "-layout", str(raw.cached(SOURCE, ELECTED[0]).path), "-"],
@@ -242,16 +248,19 @@ def parse() -> None:
     for page in _pages():
         read = _read(page.stem)
         label = re.sub(r"\s*DPD\s*$", "", str(read["province"]).upper()).strip()
-        province = difflib.get_close_matches(label, names, n=1, cutoff=0.6)
+        label = ALIASES.get(label, label)
+        province = [label] if label in names else difflib.get_close_matches(label, names, n=1, cutoff=0.6)
         if not province:
             raise ValueError(f"{page.stem}: no province for {label}")
+        if pages.get(province[0]) and _figures(pages[province[0]][-1][1]) == _figures(read):
+            continue
         pages.setdefault(province[0], []).append((page, read))
     if set(pages) != set(names):
         raise ValueError(f"missing provinces {set(names) - set(pages)}")
     candidates: list[dict[str, object]] = []
     results: list[dict[str, object]] = []
     for province in names:
-        rows: list[tuple[Path, int, str, int, int | None]] = []
+        rows: list[tuple[Path, int, str, int | None, int | None]] = []
         carried = 0
         grand: int | None = None
         for part, (page, read) in enumerate(pages[province]):
@@ -259,22 +268,28 @@ def parse() -> None:
             assert isinstance(listed, list)
             for row in listed:
                 number, votes = _number(row["number"]), _number(row["votes"])
-                if number is None or votes is None:
+                if not str(row["name"]).strip():
+                    if votes is not None:
+                        raise ValueError(f"{page.stem}: unnamed row with votes {row}")
+                    continue
+                if number is None:
                     raise ValueError(f"{page.stem}: unreadable row {row}")
                 rows.append((page, number, str(row["name"]).strip(), votes, _number(row["rank"])))
             total = _number(read["total"])
             if part == 0 and len(pages[province]) > 1:
                 carried = total or 0
-                if carried != sum(row[3] for row in rows):
-                    raise ValueError(f"{province}: page 1 carries {carried}, rows sum {sum(row[3] for row in rows)}")
+                if carried != sum(row[3] or 0 for row in rows):
+                    raise ValueError(
+                        f"{province}: page 1 carries {carried}, rows sum {sum(row[3] or 0 for row in rows)}"
+                    )
             else:
                 grand = total
-        if [row[1] for row in rows] != list(range(1, len(rows) + 1)):
+        if [row[1] for row in rows] != sorted({row[1] for row in rows}):
             raise ValueError(f"{province}: candidate numbers {[row[1] for row in rows]}")
-        summed = sum(row[3] for row in rows)
+        summed = sum(row[3] or 0 for row in rows)
         if grand != summed:
             raise ValueError(f"{province}: printed total {grand}, rows sum {summed}")
-        ranked = sorted(rows, key=lambda row: -row[3])
+        ranked = sorted((row for row in rows if row[3] is not None), key=lambda row: -(row[3] or 0))
         if len({row[3] for row in ranked[:5]}) != 5:
             raise ValueError(f"{province}: tie near fourth place")
         top = ranked[:4]
@@ -286,7 +301,8 @@ def parse() -> None:
         declared = {votes: name for name, votes, _ in elected[province]}
         by_page: dict[Path, list[tuple[int, int]]] = {}
         for index, row in enumerate(rows):
-            by_page.setdefault(row[0], []).append((index, row[3]))
+            if row[3] is not None:
+                by_page.setdefault(row[0], []).append((index, row[3]))
         located: dict[int, list[float] | None] = {}
         for page, entries in by_page.items():
             read = next(read for found, read in pages[province] if found == page)
@@ -297,16 +313,18 @@ def parse() -> None:
             if page == pages[province][-1][0]:
                 located[len(rows)] = boxes[-1]
         for index, (page, number, name, votes, _) in enumerate(rows):
-            is_elected = votes in {row[3] for row in top}
+            is_elected = votes is not None and votes in {row[3] for row in top}
             candidates.append(
                 {
                     "province": province,
                     "number": number,
-                    "name": declared[votes] if is_elected else name,
+                    "name": declared[votes] if is_elected and votes is not None else name,
                     "votes": votes,
                     "elected": is_elected,
                 }
             )
+            if votes is None:
+                continue
             results.append(
                 {
                     "province": province,
