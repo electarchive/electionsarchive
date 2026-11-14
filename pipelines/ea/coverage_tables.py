@@ -323,7 +323,6 @@ def request() -> None:
 
 
 WORKERS = 8
-CADENCE = "pipelines/ea/sources/us/election_cadence.tsv"
 CADENCE_SQL = """
 select s.iso_code, e.government_kind, e.function, e.name_pattern, e.polity_id::text, e.selection::text,
        e.period_years, e.phase, e.month, e.day_rule, extract(year from e.valid_from)::int, e.id::text
@@ -372,7 +371,6 @@ class Rule(NamedTuple):
     month: int | None
     day_rule: str | None
     since: int | None
-    cited: bool
     id: str | None
 
 
@@ -390,35 +388,12 @@ def cadence_rules(conn: psycopg.Connection) -> tuple[dict[str, list[Rule]], dict
             month,
             day_rule,
             since,
-            True,
             rule_id,
         )
         for iso, kind, function, pattern, polity, selection, period, phase, month, day_rule, since, rule_id in (
             conn.execute(CADENCE_SQL)
         )
     ]
-    with (ROOT / CADENCE).open(newline="") as f:
-        for row in csv.DictReader((line for line in f if not line.startswith("#")), delimiter="\t"):
-            cited = bool(row["locator"] and row["url"])
-            if cited and not row["government"]:
-                continue
-            rules.append(
-                Rule(
-                    row["state"],
-                    row["government_kind"] or None,
-                    row["function"] or None,
-                    re.compile(row["name_pattern"], re.IGNORECASE) if row["name_pattern"] else None,
-                    row["government"] or None,
-                    row["selection"],
-                    int(row["period_years"]) if row["period_years"] else None,
-                    int(row["phase"]) if row["phase"] else None,
-                    int(row["month"]) if row["month"] else None,
-                    row["day_rule"] or None,
-                    int(row["valid_from"][:4]) if row["valid_from"] else None,
-                    cited,
-                    None,
-                )
-            )
     classes: dict[str, list[Rule]] = defaultdict(list)
     own: dict[object, Rule] = {}
     for r in rules:
@@ -739,7 +714,7 @@ def build(full: bool = False) -> str:
     countries_code = digest(COUNTRY_INPUTS)
     cog_files = sorted(raw.parsed("us.cog").glob("*.parquet"))
     local_code = (
-        digest(("pipelines/ea/coverage_tables.py", CADENCE))
+        digest(("pipelines/ea/coverage_tables.py",))
         + ":"
         + ":".join(f"{f.name}{f.stat().st_mtime_ns}" for f in cog_files)
     )
@@ -1257,7 +1232,7 @@ def build(full: bool = False) -> str:
                 g["period"], g["phase"] = period, g["phase"] % period
             elif calendar is not None and period is not None:
                 g["period"], g["phase"] = period, phase
-                g["basis"] = "state calendar" if calendar.cited else "estimated state calendar"
+                g["basis"] = "state calendar"
             elif common:
                 g["period"], g["phase"] = common[0]
             else:
@@ -1265,7 +1240,6 @@ def build(full: bool = False) -> str:
         if (
             calendar is not None
             and calendar.period == 2
-            and calendar.cited
             and g["period"] == 1
             and g["era"] is None
             and g["basis"].startswith("own")
