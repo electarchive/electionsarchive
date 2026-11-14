@@ -15,7 +15,7 @@ from ea.sources.gb import umit
 from ea.store import DATA, connect
 
 SOURCE = "gb.devolved_by"
-VERSION = "5"
+VERSION = "6"
 PARSED = DATA / "parsed" / SOURCE
 VOTES, REGISTERED, INVALID = 1, 2, 5
 PAGE = "https://en.wikipedia.org/w/index.php?title={}&action=raw"
@@ -275,6 +275,24 @@ OFFICIAL: dict[str, Official] = {
             "The returning officer's declaration prints 33,686 as the votes cast, which is the sum of the "
             "candidates' votes, and 50 rejected ballot papers (20 for more than one candidate, 30 unmarked or void "
             "for uncertainty). It prints no electorate; the 66,895 is from Wikipedia."
+        ),
+    },
+    "alyn": {
+        "publisher": "Flintshire County Council",
+        "title": "Election results for Alyn and Deeside, 6 February 2018",
+        "url": "https://cyfarfodyddpwyllgor.siryfflint.gov.uk/mgElectionAreaResults.aspx?ID=595&RPID=0&LLL=1",
+        "archive": WAYBACK.format(
+            "20211203135820",
+            "https://cyfarfodyddpwyllgor.siryfflint.gov.uk/mgElectionAreaResults.aspx?ID=595&RPID=0&LLL=1",
+        ),
+        "registered": None,
+        "rejected": 39,
+        "votes": (11267, 4722, 1176, 1059, 353),
+        "text": "Cyfanswm Pleidleisiau 18577 Nifer y papurau pleidleisio a wrthodwyd 39",
+        "note": (
+            "Flintshire County Council's results page (Welsh version) prints 18,577 votes, the sum of the "
+            "candidates' votes, and 39 rejected ballot papers (24 unmarked or void for uncertainty, 14 for more "
+            "than one candidate, 1 identifiable). It prints no electorate."
         ),
     },
     "shetland": {
