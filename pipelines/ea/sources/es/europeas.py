@@ -30,6 +30,11 @@ FIRST_NOTE = (
     "regional elections, after its accession on 1 January 1986. The ministry's control file prints 13 June 1987; "
     "the election day here is the date of the vote."
 )
+SYSTEM = (
+    "Closed party lists in one national constituency. Seats go by the D'Hondt method to the lists, with no "
+    "threshold, under the provisions on European Parliament elections in the Ley Orgánica 5/1985 del Régimen "
+    "Electoral General; the lists are closed and blocked, and a vacancy goes to the next candidate on the list."
+)
 PROVINCE_METHOD = (
     "List votes, registered voters, blank ballots, and null ballots by province from the Ministry of the Interior's "
     "data files, with the votes of residents abroad (CERA) counted in their province. Spain elects its members of the "
@@ -347,6 +352,45 @@ def emit() -> Path:
             .agg(pl.col("name").last())
             .iter_rows()
         )
+        system = cs.key("es.electoral_system", "european-parliament")
+        cs.add(
+            "electoral_system",
+            id=system,
+            polity_id=spain,
+            rules={"formula": "dhondt", "lists": {"order": "closed", "vacancy": "next_on_list"}},
+            rules_version=1,
+        )
+        name(system, "European Parliament closed-list D'Hondt system in Spain")
+        cs.add("note", entity_id=system, kind="methodology", body_md=SYSTEM)
+        kept = (
+            "election_id",
+            "kind",
+            "office_id",
+            "body_id",
+            "district_area_id",
+            "seat_id",
+            "boundary_set_id",
+            "magnitude",
+            "party_scope_id",
+            "round_number",
+            "previous_round_id",
+            "allocation_parent_id",
+            "rules_override",
+            "default_result_kind",
+            "term",
+            "notional",
+        )
+        for row in conn.execute(
+            """select c.id, c.election_id, c.kind, c.office_id, c.body_id, c.district_area_id, c.seat_id,
+                      c.boundary_set_id, c.magnitude, c.party_scope_id, c.round_number, c.previous_round_id,
+                      c.allocation_parent_id, c.rules_override, c.default_result_kind, c.term, c.notional
+               from contest c join election e on e.id = c.election_id
+               join polity p on p.id = e.polity_id and p.iso_code = 'ES'
+               where c.body_id = %s and c.electoral_system_id is distinct from %s and c.id <> %s""",
+            [parliament, system, cs.key("es.contest", f"{days[int(FIRST[:4])]}:european-parliament")],
+        ):
+            cs.add("contest", id=row[0], **dict(zip(kept, row[1:], strict=True)), electoral_system_id=system)
+
         unit_rows: dict[UUID, dict[str, str | None]] = {}
         parties: dict[str, UUID] = {}
         value_frames: list[pl.DataFrame] = []
@@ -392,6 +436,7 @@ def emit() -> Path:
                     body_id=parliament,
                     district_area_id=member_state,
                     magnitude=national["seats"],
+                    electoral_system_id=system,
                     default_result_kind="counted",
                 )
                 name(contest, f"{year} European Parliament election in Spain")
