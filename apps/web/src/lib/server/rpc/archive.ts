@@ -1864,6 +1864,47 @@ async function setsOf(contest: string | Array<string>) {
   return [...sets.rows.map((row) => row.k), ...held.flat().map((row) => row.k)];
 }
 
+const OFFSPRING = 10_000;
+
+function holds(valid: string, date: string) {
+  const [from, to] = valid.slice(1, -1).split(",", 2);
+  return (
+    valid !== "empty" &&
+    (from === "" || from == null || from <= date) &&
+    (to === "" || to == null || date < to)
+  );
+}
+
+async function offspring(parent: string) {
+  return remember(
+    `offspring:${parent}`,
+    async () => {
+      const many = await db.execute<{ n: number }>(sql`
+        select count(*)::int as n from (
+          select from area_parent p where p.parent_id = ${parent}::uuid limit ${OFFSPRING}
+        ) z
+      `);
+      if ((many.rows[0]?.n ?? 0) >= OFFSPRING) {
+        return null;
+      }
+      const found = await db.execute<{
+        id: string;
+        k: number;
+        scheme: string;
+        valid: string;
+      }>(sql`
+        select a.id, a.k, a.scheme_code as scheme, p.valid::text as valid
+        from area_parent p join area a on a.id = p.area_id
+        where p.parent_id = ${parent}::uuid
+      `);
+      return found.rows;
+    },
+    false,
+    undefined,
+    true,
+  );
+}
+
 async function shallow(
   contest: string | Array<string>,
   area: { id: string; k: number },
@@ -1906,21 +1947,37 @@ async function shallow(
     from area_parent p join area a on a.id = p.area_id
     where p.valid @> ${date}::date and ${within}
   `;
-  const kidsOf = async (parents: Array<string>, within: SQL) => {
-    const isLazy =
-      ks.length < 100 &&
-      (
-        await db.execute<{ n: number }>(sql`
-          select count(*)::int as n from (
-            select from area_parent p where p.parent_id = any(${sql.param(parents)}::uuid[]) limit 10000
-          ) z
-        `)
-      ).rows[0]?.n === 10_000;
+  const kidsOf = async (parents: Array<string>, except: Array<string>) => {
+    const within = sql`
+      p.parent_id = any(${sql.param(parents)}::uuid[])
+        and a.scheme_code <> all(${sql.param(except)}::text[])
+    `;
+    const lists = await Promise.all(
+      parents.map(async (parent) => offspring(parent)),
+    );
+    let total = 0;
+    for (const list of lists) {
+      total += list?.length ?? OFFSPRING;
+    }
+    if (total >= OFFSPRING) {
+      return db.execute<{ id: string; k: number; scheme: string }>(
+        ks.length < 100 ? lazy(within) : counted(wide(within)),
+      );
+    }
+    const rows = lists
+      .flatMap((list) => list ?? [])
+      .filter((row) => !except.includes(row.scheme) && holds(row.valid, date));
     return db.execute<{ id: string; k: number; scheme: string }>(
-      isLazy ? lazy(within) : counted(wide(within)),
+      counted(sql`
+        select * from unnest(
+          ${sql.param(rows.map((row) => row.id))}::uuid[],
+          ${sql.param(rows.map((row) => row.k))}::int[],
+          ${sql.param(rows.map((row) => row.scheme))}::text[]
+        ) as kids(id, k, scheme)
+      `),
     );
   };
-  let found = await kidsOf([area.id], sql`p.parent_id = ${area.id}::uuid`);
+  let found = await kidsOf([area.id], []);
   const lone = Map.groupBy(found.rows, (row) => row.scheme)
     .values()
     .filter((group) => group.length === 1)
@@ -1930,10 +1987,7 @@ async function shallow(
   if (lone.length > 0) {
     const through = await kidsOf(
       lone,
-      sql`
-        p.parent_id = any(${sql.param(lone)}::uuid[])
-          and a.scheme_code <> all(${sql.param(found.rows.map((row) => row.scheme))}::text[])
-      `,
+      found.rows.map((row) => row.scheme),
     );
     for (const row of through.rows) {
       deeper.add(row.id);
