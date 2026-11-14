@@ -1976,6 +1976,8 @@
   "map_unopposed": "Ohne Gegenkandidat",
   "map_runoff": "Stichwahl",
   "map_runoff_line": "Niemand erreichte {bar}, daher Stichwahl am {date}",
+  "map_runoff_spread_line": "Niemand erreichte landesweit {bar} und {share} in mehr als {reach} von {units}. Daher folgte am {date} eine Stichwahl.",
+  "map_runoff_spread_line_inclusive": "Niemand erreichte landesweit {bar} und {share} in mindestens {reach} von {units}. Daher folgte am {date} eine Stichwahl.",
   "map_runoff_dated": "Stichwahl am {date}",
   "map_runoff_pending": "Noch kein Stichwahlergebnis",
   "scatter_lede": "Jeder Kreis steht für einen Ort, die Größe richtet sich nach den Stimmen. Die horizontale Achse zeigt den Vorsprung zwischen {a} und {b} ({from}), die vertikale Achse, wie stark sich dieser Vorsprung bis {to} verschoben hat. Umrandete Kreise wechselten zur anderen Seite.",

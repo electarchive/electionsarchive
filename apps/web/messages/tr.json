@@ -1976,6 +1976,8 @@
   "map_unopposed": "Rakipsiz",
   "map_runoff": "İkinci tur",
   "map_runoff_line": "Hiçbir aday {bar} oranına ulaşamadı, bu yüzden {date} tarihinde ikinci tura gidildi",
+  "map_runoff_spread_line": "Hiçbir aday hem ülke genelinde {bar} oranına hem de {units} içinde {reach} kesimden fazlasında {share} oy oranına ulaşamadı, bu yüzden {date} tarihinde ikinci tura gidildi",
+  "map_runoff_spread_line_inclusive": "Hiçbir aday hem ülke genelinde {bar} oranına hem de {units} içinde en az {reach} kesimde {share} oy oranına ulaşamadı, bu yüzden {date} tarihinde ikinci tura gidildi",
   "map_runoff_dated": "{date} tarihinde ikinci tura kaldı",
   "map_runoff_pending": "İkinci tur sonuçları henüz yok",
   "scatter_lede": "Her daire bir yeri gösterir, büyüklüğü oy sayısına göre belirlenir. Yatay eksen, {from} seçiminde {a} ile {b} arasındaki farkı gösterir. Dikey eksen, bu farkın {to} seçimine kadar ne kadar değiştiğini gösterir. Çerçeveli daireler el değiştiren yerleri gösterir.",

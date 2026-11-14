@@ -2016,6 +2016,8 @@
   "map_unopposed": "Candidatura única",
   "map_runoff": "Segundo turno",
   "map_runoff_line": "Ninguém alcançou {bar}, então houve segundo turno em {date}",
+  "map_runoff_spread_line": "Ninguém alcançou {bar} no país e {share} em mais de {reach} de {units}, então houve segundo turno em {date}",
+  "map_runoff_spread_line_inclusive": "Ninguém alcançou {bar} no país e {share} em pelo menos {reach} de {units}, então houve segundo turno em {date}",
   "map_runoff_dated": "Teve segundo turno em {date}",
   "map_runoff_pending": "Sem resultados do segundo turno",
   "scatter_lede": "Cada círculo é um lugar, com tamanho proporcional aos votos. O eixo horizontal mostra a margem entre {a} e {b} em {from}; o eixo vertical mostra quanto essa margem mudou até {to}. Círculos com contorno trocaram de vencedor.",
