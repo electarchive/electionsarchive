@@ -24,5 +24,6 @@
     424,
     425
   ],
-  "autorotate": true
+  "autorotate": true,
+  "create": true
 }

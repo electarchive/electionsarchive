@@ -1,0 +1,136 @@
+{
+  "polity": "US-OH",
+  "publisher": "Ohio Secretary of State",
+  "title": "Ohio Election Statistics for 1904, general election 1904-11-08",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/ohioelectionsta01statgoog/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/ohioelectionsta01statgoog"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1904,
+      "chamber": "president",
+      "day": "1904-11-08",
+      "special": false,
+      "state": "OH",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 937,
+      "id": "937-0",
+      "columns": [
+        {
+          "label": "Theodore Roosevelt (Rep.)",
+          "contest": "president",
+          "candidate": "Theodore Roosevelt (Republican)"
+        },
+        {
+          "label": "Alton B. Parker (Dem.)",
+          "contest": "president",
+          "candidate": "Alton B. Parker (Democratic)"
+        },
+        {
+          "label": "Silas C. Swallow (Pro.)",
+          "contest": "president",
+          "candidate": "Silas Swallow (Prohibition)"
+        },
+        {
+          "label": "Eugene V. Debs (Soc.)",
+          "contest": "president",
+          "candidate": "Eugene V. Debs (Socialist)"
+        },
+        {
+          "label": "Charles H. Corregan (Soc. Lab.)",
+          "contest": "president",
+          "candidate": "Charles Corregan (Socialist Labor)"
+        },
+        {
+          "label": "Thomas E. Watson (Peo.)",
+          "contest": "president",
+          "candidate": "Thomas Watson (Populist)"
+        },
+        {
+          "label": "Plurality Rep. (Roosevelt)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality Dem. (Parker)",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.112,
+        0.091,
+        0.935,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENTIAL ELECTORS, 1904.'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.2365
+      ]
+    },
+    {
+      "page": 938,
+      "id": "938-0",
+      "columns": [
+        {
+          "label": "Theodore Roosevelt",
+          "contest": "president",
+          "candidate": "Theodore Roosevelt (Republican)"
+        },
+        {
+          "label": "Alton B. Parker",
+          "contest": "president",
+          "candidate": "Alton B. Parker (Democratic)"
+        },
+        {
+          "label": "Silas C. Swallow",
+          "contest": "president",
+          "candidate": "Silas Swallow (Prohibition)"
+        },
+        {
+          "label": "Eugene V. Debs",
+          "contest": "president",
+          "candidate": "Eugene V. Debs (Socialist)"
+        },
+        {
+          "label": "Charles H. Corregan",
+          "contest": "president",
+          "candidate": "Charles Corregan (Socialist Labor)"
+        },
+        {
+          "label": "Thomas E. Watson",
+          "contest": "president",
+          "candidate": "Thomas Watson (Populist)"
+        },
+        {
+          "label": "Roosevelt",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Parker",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.169,
+        0.347,
+        0.829,
+        0.877
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENTIAL ELECTORS, 1904\u2014Concluded'; ignore any other table visible in the image."
+    }
+  ]
+}

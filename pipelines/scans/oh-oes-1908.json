@@ -1,0 +1,556 @@
+{
+  "polity": "US-OH",
+  "publisher": "Ohio Secretary of State",
+  "title": "Ohio Election Statistics for 1908, general election 1908-11-03",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/ohioelectionsta01statgoog/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/ohioelectionsta01statgoog"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1908,
+      "chamber": "president",
+      "day": "1908-11-03",
+      "special": false,
+      "state": "OH",
+      "district": null
+    },
+    "governor": {
+      "year": 1908,
+      "chamber": "governor",
+      "day": "1908-11-03",
+      "special": false,
+      "state": "OH",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 418,
+      "id": "418-0",
+      "columns": [
+        {
+          "label": "William H. Taft (Rep.)",
+          "contest": "president",
+          "candidate": "William Howard Taft (Republican)"
+        },
+        {
+          "label": "William J. Bryan (Dem.)",
+          "contest": "president",
+          "candidate": "William Jennings Bryan (Democratic)"
+        },
+        {
+          "label": "Eugene V. Debs (Soc.)",
+          "contest": "president",
+          "candidate": "Eugene V. Debs (Socialist)"
+        },
+        {
+          "label": "Eugene W. Chafin (Pro.)",
+          "contest": "president",
+          "candidate": "Eugene Chafin (Prohibition)"
+        },
+        {
+          "label": "Thomas Hisgen (Ind.)",
+          "contest": "president",
+          "candidate": "Thomas Hisgen (Independence)"
+        },
+        {
+          "label": "Thomas E. Watson (Peo.)",
+          "contest": "president",
+          "candidate": "Thomas Watson (People's)"
+        },
+        {
+          "label": "August Gillhaus (Soc. Lab.)",
+          "contest": "president",
+          "candidate": "August Gillhaus (Socialist Labor)"
+        },
+        {
+          "label": "Pluralities Rep. (William H. Taft)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Pluralities Dem. (William J. Bryan)",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.074,
+        0.096,
+        0.918,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENTIAL ELECTORS, 1908.'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 3,
+      "header": [
+        0.0,
+        0.4192
+      ]
+    },
+    {
+      "page": 419,
+      "id": "419-0",
+      "columns": [
+        {
+          "label": "William H. Taft.",
+          "contest": "president",
+          "candidate": "William Howard Taft (Republican)"
+        },
+        {
+          "label": "William J. Bryan.",
+          "contest": "president",
+          "candidate": "William Jennings Bryan (Democratic)"
+        },
+        {
+          "label": "Eugene V. Debs.",
+          "contest": "president",
+          "candidate": "Eugene V. Debs (Socialist)"
+        },
+        {
+          "label": "Eugene W. Chafin.",
+          "contest": "president",
+          "candidate": "Eugene Chafin (Prohibition)"
+        },
+        {
+          "label": "Thomas Hisgen.",
+          "contest": "president",
+          "candidate": "Thomas Hisgen (Independence)"
+        },
+        {
+          "label": "Thomas E. Watson.",
+          "contest": "president",
+          "candidate": "Thomas Watson (People's)"
+        },
+        {
+          "label": "August Gillhaus.",
+          "contest": "president",
+          "candidate": "August Gillhaus (Socialist Labor)"
+        },
+        {
+          "label": "William H. Taft.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "William J. Bryan.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.072,
+        0.512,
+        0.916,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENTIAL ELECTORS, 1908\u2014Continued.'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 2,
+      "header": [
+        0.0,
+        -0.0656
+      ]
+    },
+    {
+      "page": 420,
+      "id": "420-0",
+      "columns": [
+        {
+          "label": "Rep. William H. Taft",
+          "contest": "president",
+          "candidate": "William Howard Taft (Republican)"
+        },
+        {
+          "label": "Dem. William J. Bryan",
+          "contest": "president",
+          "candidate": "William Jennings Bryan (Democratic)"
+        },
+        {
+          "label": "Soc. Eugene V. Debs",
+          "contest": "president",
+          "candidate": "Eugene V. Debs (Socialist)"
+        },
+        {
+          "label": "Pro. Eugene W. Chafin",
+          "contest": "president",
+          "candidate": "Eugene Chafin (Prohibition)"
+        },
+        {
+          "label": "Ind. Thomas Hisgen",
+          "contest": "president",
+          "candidate": "Thomas Hisgen (Independence)"
+        },
+        {
+          "label": "Peo. Thomas E. Watson",
+          "contest": "president",
+          "candidate": "Thomas Watson (People's)"
+        },
+        {
+          "label": "Soc. Lab. August Gillhaus",
+          "contest": "president",
+          "candidate": "August Gillhaus (Socialist Labor)"
+        },
+        {
+          "label": "Pluralities Rep. William H. Taft",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Pluralities Dem. William J. Bryan",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.074,
+        0.497,
+        0.916,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENTIAL ELECTORS, 1908\u2014Continued.'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 2,
+      "header": [
+        0.0,
+        -0.0437
+      ]
+    },
+    {
+      "page": 421,
+      "id": "421-0",
+      "columns": [
+        {
+          "label": "William H. Taft Rep.",
+          "contest": "president",
+          "candidate": "William Howard Taft (Republican)"
+        },
+        {
+          "label": "William J. Bryan Dem.",
+          "contest": "president",
+          "candidate": "William Jennings Bryan (Democratic)"
+        },
+        {
+          "label": "Eugene V. Debs Soc.",
+          "contest": "president",
+          "candidate": "Eugene V. Debs (Socialist)"
+        },
+        {
+          "label": "Eugene W. Chafin Pro.",
+          "contest": "president",
+          "candidate": "Eugene Chafin (Prohibition)"
+        },
+        {
+          "label": "Thomas Higgen Ind.",
+          "contest": "president",
+          "candidate": "Thomas Hisgen (Independence)"
+        },
+        {
+          "label": "Thomas E. Watson Peo.",
+          "contest": "president",
+          "candidate": "Thomas Watson (People's)"
+        },
+        {
+          "label": "August Gillhaus Soc. Lab.",
+          "contest": "president",
+          "candidate": "August Gillhaus (Socialist Labor)"
+        },
+        {
+          "label": "Pluralities Rep. William H. Taft",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Pluralities Dem. William J. Bryan",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.074,
+        0.467,
+        0.917,
+        0.929
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENTIAL ELECTORS 1908\u2014Concluded.'; ignore any other table visible in the image.",
+      "turn": -90
+    },
+    {
+      "page": 422,
+      "id": "422-0",
+      "columns": [
+        {
+          "label": "Rep. Andrew L. Harris",
+          "contest": "governor",
+          "candidate": "Andrew L. Harris"
+        },
+        {
+          "label": "Dem. Judson Harmon",
+          "contest": "governor",
+          "candidate": "Judson Harmon"
+        },
+        {
+          "label": "Soc. Robert Bandlow",
+          "contest": "governor",
+          "candidate": "Robert Bandlow"
+        },
+        {
+          "label": "Pro. John B. Martin",
+          "contest": "governor",
+          "candidate": "John B. Martin"
+        },
+        {
+          "label": "Ind. Andrew F. Otte",
+          "contest": "governor",
+          "candidate": "Andrew F. Otte"
+        },
+        {
+          "label": "Peo.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Soc. Lab. John Kircher",
+          "contest": "governor",
+          "candidate": "John Kircher"
+        },
+        {
+          "label": "Pluralities Rep. Andrew L. Harris",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Pluralities Dem. Judson Harmon",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Vote Cast in State",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.072,
+        0.159,
+        0.916,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTE CAST FOR CANDIDATES FOR GOVERNOR OF OHIO, AND TOTAL VOTE CAST IN STATE AT THE ELECTION HELD NOVEMBER 3, 1908, BY COUNTIES, WITH PLURALITIES OF CANDIDATES.'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 2,
+      "header": [
+        0.0,
+        0.4019
+      ]
+    },
+    {
+      "page": 423,
+      "id": "423-0",
+      "columns": [
+        {
+          "label": "Rep. Andrew L. Harris",
+          "contest": "governor",
+          "candidate": "Andrew L. Harris"
+        },
+        {
+          "label": "Dem. Judson Harmon",
+          "contest": "governor",
+          "candidate": "Judson Harmon"
+        },
+        {
+          "label": "Soc. Robert Bandlow",
+          "contest": "governor",
+          "candidate": "Robert Bandlow"
+        },
+        {
+          "label": "Pro. John B. Martin",
+          "contest": "governor",
+          "candidate": "John B. Martin"
+        },
+        {
+          "label": "Ind. Andrew F. Otte",
+          "contest": "governor",
+          "candidate": "Andrew F. Otte"
+        },
+        {
+          "label": "Peo.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Soc. Lab. John Kircher",
+          "contest": "governor",
+          "candidate": "John Kircher"
+        },
+        {
+          "label": "Plurality Rep. Andrew L. Harris",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality Dem. Judson Harmon",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Vote Cast in State",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.122,
+        0.519,
+        0.895,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTE FOR GOVERNOR\u2014Continued.'; ignore any other table visible in the image.",
+      "turn": -90
+    },
+    {
+      "page": 424,
+      "id": "424-0",
+      "columns": [
+        {
+          "label": "Rep. Andrew L. Harris",
+          "contest": "governor",
+          "candidate": "Andrew L. Harris"
+        },
+        {
+          "label": "Dem. Judson Harmon",
+          "contest": "governor",
+          "candidate": "Judson Harmon"
+        },
+        {
+          "label": "Soc. Robert Bandlow",
+          "contest": "governor",
+          "candidate": "Robert Bandlow"
+        },
+        {
+          "label": "Pro. John B. Martin",
+          "contest": "governor",
+          "candidate": "John B. Martin"
+        },
+        {
+          "label": "Ind. Andrew F. Otte",
+          "contest": "governor",
+          "candidate": "Andrew F. Otte"
+        },
+        {
+          "label": "Peo.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Soc. Lab. John Kircher",
+          "contest": "governor",
+          "candidate": "John Kircher"
+        },
+        {
+          "label": "Pluralities Rep. Andrew L. Harris",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Pluralities Dem. Judson Harmon",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Vote Cast in State.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.074,
+        0.5,
+        0.918,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTE FOR GOVERNOR\u2014Continued.'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 2,
+      "header": [
+        0.0,
+        -0.05
+      ]
+    },
+    {
+      "page": 425,
+      "id": "425-0",
+      "columns": [
+        {
+          "label": "Andrew L. Harris.",
+          "contest": "governor",
+          "candidate": "Andrew L. Harris"
+        },
+        {
+          "label": "Judson Harmon.",
+          "contest": "governor",
+          "candidate": "Judson Harmon"
+        },
+        {
+          "label": "Robert Bandlow.",
+          "contest": "governor",
+          "candidate": "Robert Bandlow"
+        },
+        {
+          "label": "John B. Martin.",
+          "contest": "governor",
+          "candidate": "John B. Martin"
+        },
+        {
+          "label": "Andrew F. Otte.",
+          "contest": "governor",
+          "candidate": "Andrew F. Otte"
+        },
+        {
+          "label": "Peo.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John Kircher.",
+          "contest": "governor",
+          "candidate": "John Kircher"
+        },
+        {
+          "label": "Rep. (Pluralities) Andrew L. Harris.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Dem. (Pluralities) Judson Harmon.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Vote Cast in State.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.076,
+        0.483,
+        0.92,
+        0.932
+      ],
+      "hint": "Read only the table headed 'VOTE FOR GOVERNOR\u2014Concluded.'; ignore any other table visible in the image.",
+      "turn": -90
+    }
+  ]
+}

@@ -1,0 +1,141 @@
+{
+  "polity": "US-OH",
+  "publisher": "Ohio Secretary of State",
+  "title": "Ohio Election Statistics for 1896, general election 1896-11-03",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/ohioelectionsta00statgoog/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/ohioelectionsta00statgoog"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1896,
+      "chamber": "president",
+      "day": "1896-11-03",
+      "special": false,
+      "state": "OH",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 243,
+      "id": "243-0",
+      "columns": [
+        {
+          "label": "Republican. William McKinley.",
+          "contest": "president",
+          "candidate": "William McKinley (Republican)"
+        },
+        {
+          "label": "Democratic. William J. Bryan.",
+          "contest": "president",
+          "candidate": "William Jennings Bryan (Democratic / Populist)"
+        },
+        {
+          "label": "Peoples. William J. Bryan.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Prohibition. Joshua Levering.",
+          "contest": "president",
+          "candidate": "Joshua Levering (Prohibition)"
+        },
+        {
+          "label": "Nat. Pa'y. Charles E. Bentley.",
+          "contest": "president",
+          "candidate": "Charles Bentley (National Prohibition)"
+        },
+        {
+          "label": "Soc. Labor. Charles H. Matchett.",
+          "contest": "president",
+          "candidate": "Charles Matchett (Socialist Labor)"
+        },
+        {
+          "label": "Nat Dem. John M Palmer.",
+          "contest": "president",
+          "candidate": "John Palmer (National Democrat)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.204,
+        0.146,
+        0.697,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENTIAL ELECTORS.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2119
+      ]
+    },
+    {
+      "page": 244,
+      "id": "244-0",
+      "columns": [
+        {
+          "label": "Republican. William McKinley.",
+          "contest": "president",
+          "candidate": "William McKinley (Republican)"
+        },
+        {
+          "label": "Democratic. William J. Bryan.",
+          "contest": "president",
+          "candidate": "William Jennings Bryan (Democratic / Populist)"
+        },
+        {
+          "label": "Peoples. William J. Bryan.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Prohibition. Joshua Levering.",
+          "contest": "president",
+          "candidate": "Joshua Levering (Prohibition)"
+        },
+        {
+          "label": "National Party. Charles E. Bentley.",
+          "contest": "president",
+          "candidate": "Charles Bentley (National Prohibition)"
+        },
+        {
+          "label": "Socialist Labor. Charles H. Matchett.",
+          "contest": "president",
+          "candidate": "Charles Matchett (Socialist Labor)"
+        },
+        {
+          "label": "National Democratic. John M. Palmer.",
+          "contest": "president",
+          "candidate": "John Palmer (National Democrat)"
+        },
+        {
+          "label": "Pluralities Republican. McKinley.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Pluralities Democratic. Bryan.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.14,
+        0.12,
+        0.803,
+        0.793
+      ],
+      "hint": "Read only the table headed 'Vote for Presidential Electors\u2014Concluded.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2377
+      ]
+    }
+  ]
+}
