@@ -79,7 +79,9 @@
       "day": "1962-11-06",
       "special": false,
       "state": "MN",
-      "district": null
+      "district": null,
+      "accept": "These are the county figures of the State Canvassing Board's report as the Manual prints them, adding up to 619,704 for Rolvaag and 619,646 for Andersen. The recount that decided the election ended at 619,842 to 619,751, and the statewide default keeps the recount totals.",
+      "keep_default": true
     }
   },
   "pages": [

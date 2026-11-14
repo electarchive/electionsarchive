@@ -15,7 +15,8 @@
       "day": "1906-11-06",
       "special": false,
       "state": "MN",
-      "district": null
+      "district": null,
+      "accept": "The Manual prints 4,646 votes for O. E. Lofthus, and its county figures add up to that total; the statewide figure held before this table, 6,516, came from a compilation."
     },
     "house1": {
       "year": 1906,
@@ -534,5 +535,6 @@
       ],
       "hint": "Read only the table headed 'NINTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
     }
-  ]
+  ],
+  "empty": true
 }

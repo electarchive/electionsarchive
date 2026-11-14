@@ -63,7 +63,8 @@
       "day": "1970-11-03",
       "special": false,
       "state": "MN",
-      "district": 8
+      "district": 8,
+      "accept": "Each county's House vote is within 3 percent of its vote for governor, so no county accounts for the 5,000 votes; the district default keeps the printed total, which the Clerk of the House's statistics repeat."
     },
     "house5": {
       "year": 1970,
@@ -87,7 +88,9 @@
       "day": "1970-11-03",
       "special": false,
       "state": "MN",
-      "district": null
+      "district": null,
+      "accept": "The Manual's county table has no column for Jack O. Kirkham, credited with 961 votes statewide, so his votes are not in these county figures; the statewide default keeps them.",
+      "keep_default": true
     }
   },
   "pages": [
