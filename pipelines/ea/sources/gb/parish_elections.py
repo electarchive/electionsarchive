@@ -251,7 +251,6 @@ ALIASES = {
     ("E07000181", "Asthal"): "Asthall",
 }
 GROUPED = {
-    ("E07000011", "Great and Little Gidding"),
     ("E07000071", "Abberton and Langenhoe"),
     ("E07000071", "Winstred Hundred"),
 }
@@ -958,18 +957,18 @@ READERS = {
 def parse() -> None:
     with connect() as conn:
         parishes = conn.execute(
-            """select pc.code, n.text, pe.value, c.code
+            """select pc.code, n.text, pe.value, a.scheme_code, c.code
                from area a join area_code c on c.area_id = a.id
                join area_parent p on p.area_id = a.id join area_code pc on pc.area_id = p.parent_id
                join name n on n.entity_id = a.id and n.lang = 'en'
                join polity_territory pt on pt.area_id = a.id and pt.valid @> %s::date
                join external_id pe on pe.entity_id = pt.polity_id and pe.scheme = 'gb.polity'
-               where a.scheme_code = 'gb.parish' and pc.code = any(%s)""",
+               where a.scheme_code in ('gb.parish', 'gb.parish_group') and pc.code = any(%s)""",
             [date(2026, 5, 7), sorted(COUNCILS)],
         ).fetchall()
-    known: dict[tuple[str, str], set[tuple[str, str]]] = {}
-    for lad, name, key, code in parishes:
-        known.setdefault((lad, fold(name)), set()).add((key, code))
+    known: dict[tuple[str, str], set[tuple[str, str, str]]] = {}
+    for lad, name, key, scheme, code in parishes:
+        known.setdefault((lad, fold(name)), set()).add((key, scheme, code))
     rows = []
     misses: list[str] = []
     for lad, council in COUNCILS.items():
@@ -980,9 +979,19 @@ def parse() -> None:
             if len(found) != 1:
                 misses.append(f"{lad} {read['parish']}: {len(found)} parishes")
                 continue
-            key, code = next(iter(found))
+            key, scheme, code = next(iter(found))
             for position, candidate in enumerate(read.pop("candidates"), start=1):
-                rows.append({**read, "key": key, "code": code, "day": council["day"], "number": position, **candidate})
+                rows.append(
+                    {
+                        **read,
+                        "key": key,
+                        "scheme": scheme,
+                        "code": code,
+                        "day": council["day"],
+                        "number": position,
+                        **candidate,
+                    }
+                )
     if misses:
         raise ValueError("; ".join(misses))
     frame = pl.DataFrame(rows, infer_schema_length=None)
@@ -1075,7 +1084,7 @@ def emit() -> Path:
             places = first["places"]
             tacit = first["votes"] is None
             polity = cs.key("gb.polity", key)
-            parish_area = cs.area("gb.parish", first["code"])
+            parish_area = cs.area(first["scheme"], first["code"])
             election_key = f"{day}:pc:{key}"
             election = cs.key("gb.election", election_key)
             election_path = f"{paths[key]}/{day}-local"
@@ -1088,7 +1097,7 @@ def emit() -> Path:
                 cs.add("slug", path=election_path, entity_id=election)
                 cs.add("note", entity_id=election, kind="context", body_md=CONTEXT)
             if ward is None:
-                scheme, code, area = "gb.parish", first["code"], parish_area
+                scheme, code, area = first["scheme"], first["code"], parish_area
             else:
                 scheme, code = WARDS, f"{key}:{slug(ward)}"
                 area = cs.area(WARDS, code)

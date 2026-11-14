@@ -78,7 +78,14 @@ GROUPED = {
         ("Abersychan", "New Inn", "Panteg", "Pen Tranch", "Pontymoile", "Trevethin"),
     ),
 }
-GROUP_SCHEME = "gb.community_group"
+ENGLISH_GROUPED = {
+    ("E07000011", "Huntingdonshire"): ("Great and Little Gidding", ("Great Gidding", "Little Gidding")),
+}
+GROUP_SCHEMES = {
+    "W": ("gb.community_group", "group of communities", "communities", "Community Council"),
+    "E": ("gb.parish_group", "group of parishes", "parishes", "Parish Council"),
+}
+HUNTINGDONSHIRE_COUNCILS = "https://democracy.huntingdonshire.gov.uk/moderngov/mgParishCouncilDetails.aspx?bcr=1"
 ENGLISH = Path(__file__).with_name("parish_councils.tsv")
 ENGLISH_INBOX = DATA / "inbox" / SOURCE / "councils"
 ELECTIONS = "gb.parish_elections"
@@ -108,6 +115,14 @@ GROUP_SOURCES = {
             f"https://web.archive.org/web/20250814134725id_/{DENBIGHSHIRE_COUNCIL}",
         ),
     ],
+    "Huntingdonshire": [
+        (
+            "Huntingdonshire District Council",
+            "Town and parish councils",
+            HUNTINGDONSHIRE_COUNCILS,
+            HUNTINGDONSHIRE_COUNCILS,
+        ),
+    ],
 }
 GROUP_EVIDENCE = {
     "Torfaen": (
@@ -117,6 +132,10 @@ GROUP_EVIDENCE = {
     "Denbighshire": (
         "Denbighshire's register of city, town, and community councils lists one Tremeirchion Cwm & Waen council, "
         "and the Welsh Government's precept table shows no separate council for any of the three communities"
+    ),
+    "Huntingdonshire": (
+        "Huntingdonshire's register of town and parish councils lists one Great and Little Gidding Parish Council "
+        "and no council for either parish alone"
     ),
 }
 
@@ -413,9 +432,7 @@ def emit() -> Path:
             ).fetchall()
         )
         communities: dict[tuple[str, str], set[str]] = {}
-        for code, english, welsh in (
-            frame.filter(pl.col("code").str.starts_with("W04")).select("code", "name", "name_cy").rows()
-        ):
+        for code, english, welsh in frame.select("code", "name", "name_cy").rows():
             for text in (english, welsh):
                 if text:
                     communities.setdefault((lads[code], fold(text)), set()).add(root[code])
@@ -451,10 +468,10 @@ def emit() -> Path:
             base = re.sub(r"\s+(Town|City)$", "", council)
             name(body, f"{base} {style.group(1) if style else 'Community'} Council")
         print(f"{len(served)} community councils", file=sys.stderr)
-        if conn.execute("select 1 from scheme where code = %s", [GROUP_SCHEME]).fetchone() is None:
-            cs.add(
-                "scheme", code=GROUP_SCHEME, polity_id=gb, kind="administrative", rank=4, noun="group of communities"
-            )
+        existing = {row[0] for row in conn.execute("select code from scheme where code like 'gb.%%_group'")}
+        for scheme, noun, _, _ in GROUP_SCHEMES.values():
+            if scheme not in existing:
+                cs.add("scheme", code=scheme, polity_id=gb, kind="administrative", rank=4, noun=noun)
         evidence: dict[str, list[object]] = {}
         for authority, entries in GROUP_SOURCES.items():
             for publisher, title, url, copy in entries:
@@ -472,8 +489,13 @@ def emit() -> Path:
                 cs.artifact(raw.cached(SOURCE, copy), source)
                 evidence.setdefault(authority, []).append(source)
         group_spans = set()
-        for (authority, council), (label, members) in sorted(GROUPED.items()):
-            lad = authorities[authority]
+        groups = [
+            (authorities[authority], authority, label, members)
+            for (authority, _), (label, members) in sorted(GROUPED.items())
+        ] + [(lad, authority, label, members) for (lad, authority), (label, members) in sorted(ENGLISH_GROUPED.items())]
+        for lad, authority, label, members in groups:
+            scheme, _, plural, style = GROUP_SCHEMES[lad[0]]
+            council = f"{label} {style}"
             keys = []
             for member in members:
                 found = communities.get((lad, fold(member)), set())
@@ -486,7 +508,7 @@ def emit() -> Path:
             codes = [code for code in spans if root[code] in keys]
             if len(codes) != len(keys):
                 raise ValueError(f"{council}: a member community was recoded")
-            group_spans |= {spans[code] for code in codes}
+            group_spans |= {(scheme, *spans[code]) for code in codes}
             first, last = spans[codes[0]]
             if any(spans[code] != (first, last) for code in codes):
                 raise ValueError(f"{council}: member communities span different layers")
@@ -502,9 +524,9 @@ def emit() -> Path:
             assert row is not None
             geom, point = row
             code = f"{lad}:{slug(label)}"
-            area = cs.area(GROUP_SCHEME, code)
+            area = cs.area(scheme, code)
             if area in cs.minted:
-                cs.add("area", id=area, scheme_code=GROUP_SCHEME)
+                cs.add("area", id=area, scheme_code=scheme)
                 cs.add("area_code", area_id=area, code=code, valid_from=None, valid_to=None)
                 cs.add("area_parent", area_id=area, parent_id=cs.area("gb.lad", lad), valid_from=None, valid_to=None)
             name(area, label)
@@ -523,9 +545,9 @@ def emit() -> Path:
                 "note",
                 entity_id=area,
                 kind="methodology",
-                body_md=f"The communities of {', '.join(names[:-1])}{',' if len(names) > 2 else ''} and {names[-1]}, "
-                f"which {label} Community Council serves; {GROUP_EVIDENCE[authority]}. The shape is the union of the "
-                "ONS shapes of those communities.",
+                body_md=f"The {plural} of {', '.join(names[:-1])}{',' if len(names) > 2 else ''} and {names[-1]}, "
+                f"which {council} serves; {GROUP_EVIDENCE[authority]}. The shape is the union of the ONS shapes of "
+                f"those {plural}.",
             )
             polity = cs.key("gb.polity", code)
             if polity in cs.minted:
@@ -538,13 +560,13 @@ def emit() -> Path:
             taken[path] = polity
             cs.add("slug", path=path, entity_id=polity)
             cs.add("polity_territory", polity_id=polity, area_id=area, valid_from=LAYERS[first][4], valid_to=ends(last))
-            for source in [precepts, *evidence[authority]]:
+            for source in ([precepts] if lad.startswith("W") else []) + evidence[authority]:
                 cs.add("citation", entity_id=polity, source_id=source)
             body = cs.key("gb.body", code)
             if body in cs.minted:
                 cs.add("body", id=body, polity_id=polity, kind="council")
-            name(body, f"{label} Community Council")
-        print(f"{len(GROUPED)} grouped councils, {len(served)} communities with a council", file=sys.stderr)
+            name(body, council)
+        print(f"{len(groups)} grouped councils, {len(served)} communities with a council", file=sys.stderr)
         english = pl.read_csv(ENGLISH, separator="\t")
         listings: dict[str, UUID] = {}
         for publisher, title, url in english.select("publisher", "title", "url").unique(maintain_order=True).rows():
@@ -577,16 +599,16 @@ def emit() -> Path:
             cs.add("citation", entity_id=body, source_id=listings[url])
         print(f"{english.height} English parish and town councils", file=sys.stderr)
         group_plans = {
-            vintage: id
-            for id, vintage in conn.execute(
-                "select id, vintage from boundary_set where scheme_code = %s", [GROUP_SCHEME]
+            (scheme, vintage): id
+            for id, scheme, vintage in conn.execute(
+                "select id, scheme_code, vintage from boundary_set where scheme_code like 'gb.%%_group'"
             ).fetchall()
         }
-        for first, last in sorted(group_spans):
+        for scheme, first, last in sorted(group_spans):
             cs.add(
                 "boundary_set",
-                **({"id": group_plans[str(first)]} if str(first) in group_plans else {}),
-                scheme_code=GROUP_SCHEME,
+                **({"id": group_plans[(scheme, str(first))]} if (scheme, str(first)) in group_plans else {}),
+                scheme_code=scheme,
                 vintage=str(first),
                 valid_from=LAYERS[first][4],
                 valid_to=ends(last),
