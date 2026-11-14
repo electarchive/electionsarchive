@@ -173,10 +173,24 @@ function split(block: string, room: number) {
   return chunks;
 }
 
+function withHeadings(blocks: Array<string>) {
+  const joined: Array<string> = [];
+  let heads: Array<string> = [];
+  for (const block of blocks) {
+    if (/^#{1,6} [^\n]*$/u.test(block)) {
+      heads.push(block);
+    } else {
+      joined.push([...heads, block].join("\n\n"));
+      heads = [];
+    }
+  }
+  return heads.length === 0 ? joined : [...joined, heads.join("\n\n")];
+}
+
 export function markdownPages(blocks: Array<string>) {
   const pages: Array<Array<string>> = [];
   let size = 0;
-  for (const block of blocks) {
+  for (const block of withHeadings(blocks)) {
     const page = pages.at(-1);
     const room = page == null ? 0 : TEXT - size - 2;
     if (page != null && block.length <= room) {
