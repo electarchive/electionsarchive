@@ -202,6 +202,7 @@ const MODEL = {
     span: 1,
     reach: 5,
     lull: 0.25,
+    stir: 0.01,
     spill: 0.3,
     scatter: 1.2,
     brisk: 0.25,
@@ -355,6 +356,7 @@ type Unit = {
   paced: number | null;
   before: number | null;
   earlier: number | null;
+  step: number;
   reported: { share: number; total: number } | null;
   county: string;
   channel: number;
@@ -487,6 +489,7 @@ function units(
   const nights = new Map<string, Array<number>>();
   const changed = new Map<string, string>();
   const waits = new Map<string, number>();
+  const stepped = new Map<string, number>();
   const reported = new Map<string, { share: number; total: number }>();
   let now = at ?? "";
   for (const [id, list] of byUnit) {
@@ -533,13 +536,16 @@ function units(
     }
     const steps: Array<number> = [];
     let last = -1;
+    let step = 0;
     for (const count of list.toSorted((x, y) => x.at.localeCompare(y.at))) {
       const value = sum(count.votes);
       if (value !== last) {
         steps.push(Date.parse(count.at));
+        step = Math.abs(value - Math.max(0, last));
         last = value;
       }
     }
+    stepped.set(id, step);
     const gaps = steps
       .slice(1)
       .map((time, index) => (time - steps[index]!) / 60_000)
@@ -677,6 +683,7 @@ function units(
       paced: paces.get(id) ?? null,
       before: befores.get(id) ?? null,
       earlier: earliers.get(id) ?? null,
+      step: stepped.get(id) ?? total,
       reported: reported.get(id) ?? null,
       floor: 0,
     });
@@ -1435,6 +1442,12 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
       );
       const total = sum(counted);
       const expected = members[0]!.size;
+      const isWaiting = members.some(
+        (unit) =>
+          unit.hasBaseline &&
+          unit.total <= 0 &&
+          unit.expected >= MODEL.waiting * expected,
+      );
       return {
         ...members[0]!,
         id: county,
@@ -1443,14 +1456,10 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
         expected,
         channel: 0,
         hasBaseline: members.some((unit) => unit.hasBaseline),
-        settled: members.some(
-          (unit) =>
-            unit.hasBaseline &&
-            unit.total <= 0 &&
-            unit.expected >= MODEL.waiting * expected,
-        )
+        settled: isWaiting
           ? MODEL.moving
           : Math.min(...members.map((unit) => unit.settled)),
+        step: isWaiting ? total : Math.max(...members.map((unit) => unit.step)),
         paced: members.some((unit) => unit.paced == null)
           ? null
           : sum(members.map((unit) => unit.paced ?? 0)),
@@ -1683,14 +1692,15 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
           unit.total > 0 && complete
             ? unit.total
             : model.unit(unit, cell, tau, surge, random);
-        if (
-          isLate &&
-          unit.paced == null &&
-          unit.settled === 1 &&
-          unit.total > 0
-        ) {
+        if (isLate && unit.paced == null && unit.total > 0) {
+          const stirred =
+            unit.settled === 1
+              ? 0
+              : Math.min(1, unit.step / (MODEL.late.stir * unit.total));
           finals[index] =
-            unit.total + (finals[index] - unit.total) * tailWeight;
+            unit.total +
+            (finals[index] - unit.total) *
+              (tailWeight + (1 - tailWeight) * stirred);
         }
         spills[index] = 0;
         if (isLate && unit.paced != null && unit.total > 0) {
