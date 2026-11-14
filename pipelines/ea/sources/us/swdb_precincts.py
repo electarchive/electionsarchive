@@ -58,7 +58,7 @@ KINDS = ("srprec", "mprec")
 BROKEN = {("P14", "mprec")}
 TOLERANCE = 0.00002
 VEST = {"G16", "G20"}
-RELEASED_VEST = {"G20": ("06001", "06037", "06059", "06095")}
+RELEASED_VEST = {"G20": ("06001", "06059", "06095")}
 RELEASED_SRPREC = {"G14": ("06037",), "G18": ("06037",), "G24": ("06037",)}
 OVERLAP = 0.02
 
@@ -354,6 +354,18 @@ def emit() -> Path:
             if code in fresh and id == str(uuid5(NAMESPACE, f"area:us.precinct@None\x1f{code}")):
                 del moved[(code, kind)]
                 fresh.discard(code)
+        kept = {code for code, _ in shown} | set(moved.values())
+        for code, id in conn.execute(
+            """select c.code, a.id::text from area a join area_code c on c.area_id = a.id
+               join changeset s on s.id = c.changeset_id where a.scheme_code = 'us.precinct' and s.pipeline = %s""",
+            [SOURCE],
+        ).fetchall():
+            if code not in kept and id not in kept:
+                cs.add(
+                    "entity_retirement",
+                    entity_id=id,
+                    reason="No Statewide Database layer is released onto us.precinct for this precinct and day",
+                )
         restricted: dict[tuple[str, str, str], str] = {}
         for (election, kind), urls in files().items():
             year = 2000 + int(election[1:])
