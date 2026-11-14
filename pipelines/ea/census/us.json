@@ -262,6 +262,48 @@
       "url": "https://www.wvlegislature.gov/WVCODE/WV_CON.cfm",
       "kind": "official_body"
     },
+    "const-ak": {
+      "publisher": "Alaska Legislature",
+      "title": "Constitution of the State of Alaska, article IV",
+      "url": "https://akleg.gov/docs/pdf/Alaska_Constitution.pdf",
+      "kind": "official_body"
+    },
+    "const-co": {
+      "publisher": "Colorado Office of Legislative Legal Services",
+      "title": "Colorado Constitution, article VI",
+      "url": "https://olls.info/crs/crs2026-title-00.pdf",
+      "kind": "official_body"
+    },
+    "const-ga": {
+      "publisher": "Georgia Secretary of State",
+      "title": "Constitution of the State of Georgia, article VI",
+      "url": "https://sos.ga.gov/sites/default/files/2023-08/Georgia%20Constitution%20-%20Electronic%20Version%20-%20January%2C%202023.pdf",
+      "kind": "official_body"
+    },
+    "const-ms": {
+      "publisher": "Mississippi Secretary of State",
+      "title": "Constitution of the State of Mississippi",
+      "url": "https://sos.ms.gov/content/documents/ed_pubs/pubs/Mississippi_Constitution.pdf",
+      "kind": "official_body"
+    },
+    "const-nm": {
+      "publisher": "New Mexico Secretary of State",
+      "title": "Constitution of the State of New Mexico, article VI",
+      "url": "https://sos.nm.gov/wp-content/uploads/2025/01/NM_Constitution_-2025-for-SOS.pdf",
+      "kind": "official_body"
+    },
+    "const-ok": {
+      "publisher": "Oklahoma State Senate",
+      "title": "Oklahoma Constitution, article VII-B",
+      "url": "https://oksenate.gov/sites/default/files/2019-12/oc7B.pdf",
+      "kind": "official_body"
+    },
+    "const-wy": {
+      "publisher": "Wyoming Secretary of State",
+      "title": "Constitution of the State of Wyoming, article 5",
+      "url": "https://sos.wyo.gov/Forms/Publications/WYConstitution.pdf",
+      "kind": "official_body"
+    },
     "const-ky": {
       "publisher": "Kentucky Legislature",
       "title": "Constitution of Kentucky, sections 117 and 119",
@@ -638,7 +680,13 @@
         "CA": {"source": "const-ca", "locator": "Cal. Const. art. VI, § 16(a): justices of the Supreme Court are elected at large at general elections for 12-year terms"},
         "IL": {"source": "const-il", "locator": "Ill. Const. art. VI, §§ 10 and 12: justices are elected for ten-year terms, then face retention votes"},
         "MI": {"source": "const-mi", "locator": "Mich. Const. art. VI, § 2: seven justices are elected at nonpartisan elections to eight-year terms"},
-        "WV": {"source": "const-wv", "locator": "W. Va. Const. art. VIII, § 2: justices are elected by the voters of the state for twelve-year terms"}
+        "WV": {"source": "const-wv", "locator": "W. Va. Const. art. VIII, § 2: justices are elected by the voters of the state for twelve-year terms"},
+        "AK": {"source": "const-ak", "locator": "Alaska Const. art. IV, §§ 5 and 6: justices are appointed from judicial council nominations and face approval votes after three years, then every tenth year"},
+        "CO": {"source": "const-co", "locator": "Colo. Const. art. VI, §§ 7 and 25: justices serve ten-year terms and stand for retention at the general election before a term expires"},
+        "GA": {"source": "const-ga", "locator": "Ga. Const. art. VI, § VII, ¶ I: justices are elected on a nonpartisan basis for six-year terms"},
+        "NM": {"source": "const-nm", "locator": "N.M. Const. art. VI, § 33: justices face nonpartisan retention votes every eighth year, after an initial partisan election"},
+        "OK": {"source": "const-ok", "locator": "Okla. Const. art. VII-B, § 2: justices seek retention at the general election before a six-year term expires"},
+        "WY": {"source": "const-wy", "locator": "Wyo. Const. art. 5, § 4(f)-(g): justices serve eight-year terms and stand for retention at the general election after their first year in office"}
       },
       "judges": [
         {"states": "AL AK AZ AR CA CO FL GA ID IL IN IA KS KY LA MD MI MN MS MO MT NE NV NM NC ND OH OK OR TN TX UT WA WV WY", "period_years": 2, "phase": 0},
@@ -656,7 +704,8 @@
       "match": [{"within": null, "body_kinds": ["upper_house", "unicameral"], "polity_kinds": ["federal_unit", "region"], "precedence": 2}],
       "laws": {
         "VA": {"source": "const-va", "locator": "Va. Const. art. IV, § 2: senators are elected quadrennially on the Tuesday after the first Monday in November"},
-        "LA": {"source": "const-la-leg", "locator": "La. Const. art. III, § 4(C): a member of the legislature is elected for a four-year term"}
+        "LA": {"source": "const-la-leg", "locator": "La. Const. art. III, § 4(C): a member of the legislature is elected for a four-year term"},
+        "MS": {"source": "const-ms", "locator": "Miss. Const. art. 7, § 252: the term of all elective officers is four years, with a general election every four years"}
       },
       "chambers": [
         {"states": "LA MS VA", "period_years": 4, "phase": 3, "term_years": 4},
@@ -680,7 +729,8 @@
       "laws": {
         "VA": {"source": "const-va", "locator": "Va. Const. art. IV, § 3: delegates are elected biennially on the Tuesday after the first Monday in November"},
         "NJ": {"source": "nj-constitution", "locator": "N.J. Const. art. IV, § II, ¶ 4: Assembly members serve two-year terms ending at noon on the second Tuesday in January two years after"},
-        "LA": {"source": "const-la-leg", "locator": "La. Const. art. III, § 4(C): a member of the legislature is elected for a four-year term"}
+        "LA": {"source": "const-la-leg", "locator": "La. Const. art. III, § 4(C): a member of the legislature is elected for a four-year term"},
+        "MS": {"source": "const-ms", "locator": "Miss. Const. art. 7, § 252: the term of all elective officers is four years, with a general election every four years"}
       },
       "chambers": [
         {"states": "LA MS", "period_years": 4, "phase": 3, "term_years": 4},
