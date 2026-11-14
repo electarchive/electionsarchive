@@ -24,6 +24,7 @@ DEBATES = {
 FIRST = (date(1921, 6, 11), date(1921, 6, 20))
 CONTESTED = date(1925, 5, 1)
 OPENED = date(1921, 6, 7)
+UNDATED = {"1934-04-27_670_137", "1949-06-24_1461_143"}
 DISSOLVED = date(1973, 7, 18)
 METHODOLOGY = (
     "The 24 elected members of the Senate of Northern Ireland were chosen by the members of the House of Commons of "
@@ -155,9 +156,8 @@ def emit() -> Path:
                     height=height,
                 )
             pages[file] = (page, points_wide, points_high)
-        for file, volume in DEBATES.items():
-            debates = cs.artifact(raw.cached(SOURCE, HANSARD.format(file)), hansard)
-            cs.add("note", entity_id=debates, kind="context", body_md=f"{volume}.")
+        for file in DEBATES:
+            cs.artifact(raw.cached(SOURCE, HANSARD.format(file)), hansard)
         nation = cs.area("gb.country", "NIR", on=CONTESTED)
         island = cs.area("gb.country", "IRL", on=OPENED)
         if nation in cs.minted or island in cs.minted:
@@ -245,6 +245,14 @@ def emit() -> Path:
                     body_md=f"No notice of this return was found in The Belfast Gazette. The Senate's journal records "
                     f"the new senator taking the oath on {day.day} {day:%B} {day.year}, so the election was held in "
                     f"{day.year} on or before that day.",
+                )
+            if UNDATED & set(group["file"]):
+                cs.add(
+                    "note",
+                    entity_id=result_set,
+                    kind="caveat",
+                    body_md="The Clerk of the Crown's notice prints no date, so the election is dated by the issue of "
+                    "The Belfast Gazette that carried it; it was held on or before that day.",
                 )
             if general and day.year == 1925:
                 cs.add("note", entity_id=result_set, kind="caveat", body_md=DEVOTO)

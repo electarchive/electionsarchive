@@ -1,27 +1,235 @@
 file	notice_date	kind	seq	name	style	replaces	cause	bbox
-1921_Senate	1921-06-11	general	1	The Duke of Abercorn	The Duke of Abercorn, D.L.				
-1921_Senate	1921-06-11	general	2	Henry Bruce Wright Armstrong	Henry Bruce Wright Armstrong, Esquire, D.L.				
-1921_Senate	1921-06-11	general	3	Maxwell Richard Crosbie Ward	Viscount Bangor, O.B.E., D.L.				
-1921_Senate	1921-06-11	general	4	Harold Adrian Milne Barbour	Harold Adrian Milne Barbour, Esquire				
-1921_Senate	1921-06-11	general	5	Hugh Thom Barrie	The Right Honourable Hugh Thom Barrie, D.L.				
-1921_Senate	1921-06-11	general	6	Basil Stanlake Brooke	Sir Basil Stanlake Brooke, Bart., M.C.				
-1921_Senate	1921-06-11	general	7	Robert Gordon Sharman-Crawford	Colonel the Right Honourable Robert Gordon Sharman-Crawford, C.B.E., D.L.				
-1921_Senate	1921-06-11	general	8	Joseph Cunningham	Joseph Cunningham, Esquire				
-1921_Senate	1921-06-11	general	9	Samuel Cunningham	The Right Honourable Samuel Cunningham				
-1921_Senate	1921-06-11	general	10	James Hill Dickson	James Hill Dickson, Esquire				
-1921_Senate	1921-06-11	general	11	Frederick Temple-Hamilton-Temple Blackwood	The Marquess of Dufferin and Ava, D.S.O., D.L.				
-1921_Senate	1921-06-11	general	12	Adam Duffin	Adam Duffin, Esquire, LL.D.				
-1921_Senate	1921-06-11	general	13	Thomas MacGregor Greer	Thomas MacGregor Greer, Esquire				
-1921_Senate	1921-06-11	general	14	James Johnston	The Right Honourable Sir James Johnston				
-1921_Senate	1921-06-11	general	15	James Graham Leslie	James Graham Leslie, Esquire, D.L.				
-1921_Senate	1921-06-11	general	16	The Marquess of Londonderry	The Right Honourable the Marquess of Londonderry, K.G., M.V.O., H.M.L.				
-1921_Senate	1921-06-11	general	17	John Andrew Long	John Andrew Long, Esquire				
-1921_Senate	1921-06-11	general	18	William John McDowell	William John McDowell, Esquire				
-1921_Senate	1921-06-11	general	19	Algernon William John Clotworthy Foster-Skeffington	Viscount Massereene and Ferrard, D.S.O., H.M.L.				
-1921_Senate	1921-06-11	general	20	Robert David Perceval-Maxwell	Colonel Robert David Perceval-Maxwell, D.S.O., D.L.				
-1921_Senate	1921-06-11	general	21	Viscount Pirrie	Lord Pirrie, K.P., H.M.L.				
-1921_Senate	1921-06-11	general	22	John Porter Porter	John Porter Porter, Esquire, D.L.				
-1921_Senate	1921-06-11	general	23	Thomas Sinclair	Colonel Thomas Sinclair, C.B., M.D., F.R.C.S.				
-1921_Senate	1921-06-11	general	24	Joseph Andrew Woods	Joseph Andrew Woods, Esquire				
+1921_Senate	1921-06-11	general	1	The Duke of Abercorn	The Duke of Abercorn, D.L.			
+1921_Senate	1921-06-11	general	2	Henry Bruce Wright Armstrong	Henry Bruce Wright Armstrong, Esquire, D.L.			
+1921_Senate	1921-06-11	general	3	Maxwell Richard Crosbie Ward	Viscount Bangor, O.B.E., D.L.			
+1921_Senate	1921-06-11	general	4	Harold Adrian Milne Barbour	Harold Adrian Milne Barbour, Esquire			
+1921_Senate	1921-06-11	general	5	Hugh Thom Barrie	The Right Honourable Hugh Thom Barrie, D.L.			
+1921_Senate	1921-06-11	general	6	Basil Stanlake Brooke	Sir Basil Stanlake Brooke, Bart., M.C.			
+1921_Senate	1921-06-11	general	7	Robert Gordon Sharman-Crawford	Colonel the Right Honourable Robert Gordon Sharman-Crawford, C.B.E., D.L.			
+1921_Senate	1921-06-11	general	8	Joseph Cunningham	Joseph Cunningham, Esquire			
+1921_Senate	1921-06-11	general	9	Samuel Cunningham	The Right Honourable Samuel Cunningham			
+1921_Senate	1921-06-11	general	10	James Hill Dickson	James Hill Dickson, Esquire			
+1921_Senate	1921-06-11	general	11	Frederick Temple-Hamilton-Temple Blackwood	The Marquess of Dufferin and Ava, D.S.O., D.L.			
+1921_Senate	1921-06-11	general	12	Adam Duffin	Adam Duffin, Esquire, LL.D.			
+1921_Senate	1921-06-11	general	13	Thomas MacGregor Greer	Thomas MacGregor Greer, Esquire			
+1921_Senate	1921-06-11	general	14	James Johnston	The Right Honourable Sir James Johnston			
+1921_Senate	1921-06-11	general	15	James Graham Leslie	James Graham Leslie, Esquire, D.L.			
+1921_Senate	1921-06-11	general	16	The Marquess of Londonderry	The Right Honourable the Marquess of Londonderry, K.G., M.V.O., H.M.L.			
+1921_Senate	1921-06-11	general	17	John Andrew Long	John Andrew Long, Esquire			
+1921_Senate	1921-06-11	general	18	William John McDowell	William John McDowell, Esquire			
+1921_Senate	1921-06-11	general	19	Algernon William John Clotworthy Foster-Skeffington	Viscount Massereene and Ferrard, D.S.O., H.M.L.			
+1921_Senate	1921-06-11	general	20	Robert David Perceval-Maxwell	Colonel Robert David Perceval-Maxwell, D.S.O., D.L.			
+1921_Senate	1921-06-11	general	21	Viscount Pirrie	Lord Pirrie, K.P., H.M.L.			
+1921_Senate	1921-06-11	general	22	John Porter Porter	John Porter Porter, Esquire, D.L.			
+1921_Senate	1921-06-11	general	23	Thomas Sinclair	Colonel Thomas Sinclair, C.B., M.D., F.R.C.S.			
+1921_Senate	1921-06-11	general	24	Joseph Andrew Woods	Joseph Andrew Woods, Esquire			
 1922_Senate	1922-04-12	casual	1	Hugh de Fellenberg Montgomery	Hugh de Fellenberg Montgomery, Esquire	Sir Basil Stanlake Brooke, Baronet	resigned	
 1922_Senate	1922-06-30	casual	1	John Clements Glendinning	John Clements Glendinning, Esquire	Hugh Thom Barrie	deceased	
+1923-06-22_104_236	1923-06-18	casual	1	Emerson Crawford Herdman	Sir Emerson Crawford Herdman, K.B.E.	His Grace, the Duke of Abercorn, K.P.		61,421,266,524
+1924-05-02_149_757	1924-04-26	casual	1	Thomas James Dixon	Sir Thomas James Dixon, Baronet	Adam Duffin, Esquire	deceased	61,637,266,721
+1924-05-30_153_809	1924-05-24	casual	1	William Frederick Coates	Sir William Frederick Coates, Baronet	The Right Honourable Sir James Johnston	deceased	282,571,487,672
+1925-05-22_204_165	1925-05-15	casual	1	James Edward Caulfield	James Edward Caulfield, commonly known as Viscount Charlemont	The Right Honourable Hugh de Fellenberg Montgomery	deceased	62,577,269,685
+1925-05-22_204_165	1925-05-15	casual	2	George Smith Clark	Sir George Smith Clark, Baronet	The Right Honourable The Viscount Pirrie, K.P.	deceased	62,711,268,803
+1925-07-17_212_221	1925-07-16	general	1	Frederick Temple-Hamilton-Temple Blackwood	Frederick Temple-Hamilton-Temple Blackwood, commonly known as the Marquess of Dufferin and Ava			47,537,253,798
+1925-07-17_212_221	1925-07-16	general	2	Samuel Cunningham	The Right Honourable Samuel Cunningham			47,537,253,798
+1925-07-17_212_221	1925-07-16	general	3	James Hill Dickson	James Hill Dickson			47,537,253,798
+1925-07-17_212_221	1925-07-16	general	4	Thomas James Dixon	Sir Thomas James Dixon, Baronet			47,537,253,798
+1925-07-17_212_221	1925-07-16	general	5	Robert Dorman	Robert Dorman			47,537,253,798
+1925-07-17_212_221	1925-07-16	general	6	Algernon William John Clotworthy Foster-Skeffington	Algernon William Clotworthy John Foster Skeffington, commonly known as Viscount Massereene and Ferrard			47,537,253,798
+1925-07-17_212_221	1925-07-16	general	7	John Clements Glendinning	John Clements Glendinning			47,537,253,798
+1925-07-17_212_221	1925-07-16	general	8	Thomas MacGregor Greer	Thomas MacGregor Greer			47,537,253,798
+1925-07-17_212_221	1925-07-16	general	9	Emerson Crawford Herdman	Sir Emerson Crawford Herdman, K.B.E.			47,537,253,798
+1925-07-17_212_221	1925-07-16	general	10	John Andrew Long	John Andrew Long			47,537,253,798
+1925-07-17_212_221	1925-07-16	general	11	Robert Gordon Sharman-Crawford	Colonel The Right Honourable Robert Gordon Sharman-Crawford			47,537,253,798
+1925-07-17_212_221	1925-07-16	general	12	Maxwell Richard Crosbie Ward	Maxwell Richard Crosbie Ward, commonly known as Viscount Bangor			47,537,253,798
+1925-11-13_229_337	1925-11-11	casual	1	William Barclay	William Barclay, Esquire	Joseph Andrew Woods, Esquire	deceased	271,702,478,792
+1928-04-06_354_328	1928-04-05	casual	1	Hercules Arthur Pakenham	Colonel Hercules Arthur Pakenham	Thomas MacGregor Greer, Esquire	deceased	282,470,480,566
+1929-03-29_405_359	1929-03-22	casual	1	Edward Sullivan Murphy	Edward Sullivan Murphy, Esquire, King's Counsel	Sir William Frederick Coates, Baronet	resigned	53,626,260,711
+1929-06-21_417_735	1929-06-20	general	1	Henry Bruce Wright Armstrong	Henry Bruce Wright Armstrong			62,595,267,801
+1929-06-21_417_735	1929-06-20	general	2	William Barclay	William Barclay			62,595,267,801
+1929-06-21_417_735	1929-06-20	general	3	Thomas Joseph Campbell	Thomas Joseph Campbell			62,595,267,801
+1929-06-21_417_735	1929-06-20	general	4	James Edward Caulfield	James Edward Caulfield, commonly known as Viscount Charlemont			62,595,267,801
+1929-06-21_417_735	1929-06-20	general	5	George Smith Clark	Sir George Smith Clark, Baronet			62,595,267,801
+1929-06-21_417_735	1929-06-20	general	6	Joseph Cunningham	Joseph Cunningham			62,595,267,801
+1929-06-21_417_735	1929-06-20	general	7	James Graham Leslie	James Graham Leslie			62,595,267,801
+1929-06-21_417_735	1929-06-20	general	8	Thomas Stanislaus McAllister	Thomas Stanislaus McAllister			62,595,267,801
+1929-06-21_417_735	1929-06-20	general	9	William John McDowell	William John McDowell			62,595,267,801
+1929-06-21_417_735	1929-06-20	general	10	John McHugh	John McHugh			62,595,267,801
+1929-06-21_417_735	1929-06-20	general	11	John Porter Porter	John Porter Porter			62,595,267,801
+1929-06-21_417_735	1929-06-20	general	12	Thomas Sinclair	Colonel Thomas Sinclair			62,595,267,801
+1929-08-02_423_911	1929-07-30	casual	1	Andrew Quigley	Andrew Quigley, Esquire	William John M'Dowell, Esquire	deceased	44,516,251,608
+1929-08-02_423_911	1929-07-30	casual	2	Arthur Frederick Dobbs	Major Arthur Frederick Dobbs	The Right Honourable The Viscount Massereene and Ferrard	resigned	44,516,251,608
+1930-10-31_488_1289	1930-10-24	casual	1	Thomas Robert Lavery	Thomas Robert Lavery, Esquire	The Most Honourable The Marquess of Dufferin and Ava	deceased	65,398,272,484
+1933-06-30_627_875	1933-06-24	general	1	Samuel Cunningham	The Right Hon. Samuel Cunningham			46,414,474,821
+1933-06-30_627_875	1933-06-24	general	2	James Hill Dickson	James Hill Dickson			46,414,474,821
+1933-06-30_627_875	1933-06-24	general	3	Thomas James Dixon	The Right Hon. Sir Thomas James Dixon			46,414,474,821
+1933-06-30_627_875	1933-06-24	general	4	James Woods Gyle	James Woods Gyle			46,414,474,821
+1933-06-30_627_875	1933-06-24	general	5	Emerson Crawford Herdman	Sir Emerson Crawford Herdman			46,414,474,821
+1933-06-30_627_875	1933-06-24	general	6	Thomas Robert Lavery	Thomas Robert Lavery			46,414,474,821
+1933-06-30_627_875	1933-06-24	general	7	John Andrew Long	John Andrew Long			46,414,474,821
+1933-06-30_627_875	1933-06-24	general	8	Thomas McLaughlin	Thomas McLaughlin			46,414,474,821
+1933-06-30_627_875	1933-06-24	general	9	James McMahon	James McMahon			46,414,474,821
+1933-06-30_627_875	1933-06-24	general	10	Maxwell Richard Crosbie Ward	Richard Crosbie Maxwell, Viscount Bangor			46,414,474,821
+1933-06-30_627_875	1933-06-24	general	11	Hercules Arthur Pakenham	Hercules Arthur Pakenham			46,414,474,821
+1933-06-30_627_875	1933-06-24	general	12	Robert Gordon Sharman-Crawford	The Right Hon. Robert Gordon Sharman-Crawford			46,414,474,821
+1934-04-27_670_137	1934-04-27	casual	1	Robert McBride	Robert McBride, Esquire	Colonel the Right Honourable Robert Gordon Sharman-Crawford	deceased	276,645,481,702
+1934-06-29_679_220	1934-06-26	casual	1	John Clements Glendinning	John Clements Glendinning, Esquire	Thomas Joseph Campbell, Esquire	resigned	55,55,262,138
+1935-01-11_707_13	1935-01-09	casual	1	Joseph Davison	Sir Joseph Davison	James W. Gyle, Esquire	deceased	272,599,477,685
+1935-01-11_707_13	1935-01-09	casual	2	John Robert Perceval-Maxwell	John Robert Perceval-Maxwell, Esquire	Robert McBride, Esquire	deceased	272,698,478,794
+1935-05-03_723_141	1935-04-30	casual	1	William Gibson	William Gibson, Esquire, Medical Doctor	Sir George Clark, Baronet	deceased	54,388,260,504
+1936-06-05_780_206	1936-05-29	casual	1	Roland Thomas Nugent	Sir Roland Thomas Nugent	James MacMahon, Esquire	deceased	63,59,268,151
+1937-04-30_827_134	1937-04-23	casual	1	Arthur Frederick Dobbs	Arthur Frederick Dobbs, Esquire	Colonel Hercules Arthur Pakenham, C.M.G.	deceased	67,461,272,556
+1937-06-25_835_187	1937-06-22	general	1	William Barclay	William Barclay			260,598,465,804
+1937-06-25_835_187	1937-06-22	general	2	John Charters Boyle	John Charters Boyle			260,598,465,804
+1937-06-25_835_187	1937-06-22	general	3	James Edward Caulfield	James Edward Caulfield, Viscount Charlemont			260,598,465,804
+1937-06-25_835_187	1937-06-22	general	4	Joseph Cunningham	Joseph Cunningham			260,598,465,804
+1937-06-25_835_187	1937-06-22	general	5	Hugh Duff	Hugh Duff			260,598,465,804
+1937-06-25_835_187	1937-06-22	general	6	William Gibson	William Gibson			260,598,465,804
+1937-06-25_835_187	1937-06-22	general	7	John Clements Glendinning	John Clements Glendinning			260,598,465,804
+1937-06-25_835_187	1937-06-22	general	8	James Graham Leslie	James Graham Leslie			260,598,465,804
+1937-06-25_835_187	1937-06-22	general	9	Thomas Stanislaus McAllister	Thomas Stanislaus McAllister			260,598,465,804
+1937-06-25_835_187	1937-06-22	general	10	John McHugh	John McHugh			260,598,465,804
+1937-06-25_835_187	1937-06-22	general	11	Joseph Maguire	Joseph Maguire			260,598,465,804
+1937-06-25_835_187	1937-06-22	general	12	Thomas Sinclair	Thomas Sinclair			260,598,465,804
+1937-12-17_860_429	1937-12-16	casual	1	John Hanna Robb	The Right Honourable John Hanna Robb, K.C.	The Right Honourable The Viscount Charlemont	resigned	46,502,253,597
+1938-10-28_905_371	1938-10-25	casual	1	Henry Taylor	Henry Taylor, Esquire	James Hill Dickson, Esquire	deceased	267,479,472,570
+1940-02-02_971_27	1940-01-26	casual	1	William Sinclair Kingan	William Sinclair Kingan, Esquire	Thomas R. Lavery, Esquire	deceased	54,410,258,506
+1940-07-05_993_201	1940-07-03	casual	1	William Ernest Stevenson	William Ernest Stevenson, Esquire	Hugh Duff, Esquire	deceased	273,741,479,814
+1940-12-27_1018_407	1940-12-24	casual	1	George Whaley	George Whaley, Esquire	Colonel Thomas Sinclair	deceased	279,610,483,702
+1941-06-27_1044_155	1941-06-23	general	1	Samuel Cunningham	The Right Honourable Samuel Cunningham			42,403,246,667
+1941-06-27_1044_155	1941-06-23	general	2	Joseph Davison	The Right Honourable Sir Joseph Davison			42,403,246,667
+1941-06-27_1044_155	1941-06-23	general	3	Thomas James Dixon	The Right Honourable Sir Thomas James Dixon, Bt.			42,403,246,667
+1941-06-27_1044_155	1941-06-23	general	4	Arthur Frederick Dobbs	Major Arthur Frederick Dobbs			42,403,246,667
+1941-06-27_1044_155	1941-06-23	general	5	Emerson Crawford Herdman	Sir Emerson Crawford Herdman, K.B.E.			42,403,246,667
+1941-06-27_1044_155	1941-06-23	general	6	William Sinclair Kingan	William Sinclair Kingan, Esq.			42,403,246,667
+1941-06-27_1044_155	1941-06-23	general	7	John Andrew Long	John Andrew Long, Esq.			42,403,246,667
+1941-06-27_1044_155	1941-06-23	general	8	Thaddeus Lynch	Thaddeus Lynch, Esq.			42,403,246,667
+1941-06-27_1044_155	1941-06-23	general	9	Thomas McLaughlin	Thomas McLaughlin, Esq.			42,403,246,667
+1941-06-27_1044_155	1941-06-23	general	10	Roland Thomas Nugent	Sir Roland Thomas Nugent			42,403,246,667
+1941-06-27_1044_155	1941-06-23	general	11	Henry Taylor	Henry Taylor, Esq.			42,403,246,667
+1941-06-27_1044_155	1941-06-23	general	12	Maxwell Richard Crosbie Ward	Maxwell Richard Crosbie Ward, Viscount Bangor			42,403,246,667
+1941-09-12_1055_225	1941-09-08	casual	1	John Robert Perceval-Maxwell	John Robert Perceval-Maxwell, Esquire	John A. Long, Esquire	deceased	260,617,464,701
+1942-12-25_1122_339	1942-12-18	casual	1	Gerald Browne	Gerald Browne, Esquire	Dr. William Gibson	resigned	270,754,473,825
+1943-06-04_1145_122	1943-06-02	casual	1	Robert Corkey	Professor The Right Honourable Robert Corkey	The Rt. Hon. John Hanna Robb, K.C.		71,300,277,374
+1944-05-12_1194_96	1944-05-09	casual	1	James Gerrard Lennon	James Gerrard Lennon, Esquire	Thomas McLaughlin, Esquire	deceased	62,320,266,382
+1945-04-27_1244_93	1945-04-25	casual	1	Kennedy Stewart	Kennedy Stewart, Esquire	The Rt. Hon. Samuel Cunningham	resigned	56,599,260,667
+1945-08-10_1259_181	1945-08-10	casual	1	William Ernest Stevenson	William Ernest Stevenson, Esquire	Major John R. Perceval-Maxwell	resigned	57,614,260,689
+1945-08-31_1262_197	1945-08-25	general	1	William Barclay	William Barclay, Esquire			50,491,254,667
+1945-08-31_1262_197	1945-08-25	general	2	John Charters Boyle	Major John C. Boyle			50,491,254,667
+1945-08-31_1262_197	1945-08-25	general	3	Gerald Browne	Gerald Browne, Esquire			50,491,254,667
+1945-08-31_1262_197	1945-08-25	general	4	Robert Corkey	The Right Reverend The Right Honourable Professor Robert Corkey			50,491,254,667
+1945-08-31_1262_197	1945-08-25	general	5	Joseph Cunningham	Joseph Cunningham, Esquire			50,491,254,667
+1945-08-31_1262_197	1945-08-25	general	6	John Clements Glendinning	John Clements Glendinning, Esquire			50,491,254,667
+1945-08-31_1262_197	1945-08-25	general	7	James Graham Leslie	The Right Honourable James G. Leslie			50,491,254,667
+1945-08-31_1262_197	1945-08-25	general	8	Thomas Stanislaus McAllister	Thomas Stanislaus McAllister, Esquire			50,491,254,667
+1945-08-31_1262_197	1945-08-25	general	9	Joseph Maguire	Joseph Maguire, Esquire			50,491,254,667
+1945-08-31_1262_197	1945-08-25	general	10	Thomas Nelson	Thomas Nelson, Esquire			50,491,254,667
+1945-08-31_1262_197	1945-08-25	general	11	William James Smyth	William James Smyth, Esquire			50,491,254,667
+1945-08-31_1262_197	1945-08-25	general	12	William McConnell Wilton	William McConnell Wilton, Esquire			50,491,254,667
+1945-10-26_1270_247	1945-10-25	casual	1	Henry Fleming	Henry Fleming, Esquire	William Barclay, Esquire	deceased	45,356,249,420
+1946-03-15_1290_65	1946-03-13	casual	1	William Moore Wallis Clark	William Moore Wallis Clark, Esquire	John Clements Glendinning, Esquire	resigned	42,495,246,572
+1947-01-31_1336_28	1947-01-30	casual	1	John Kennedy McCormick	John Kennedy McCormick, Esquire	William Sinclair Kingan, Esquire	deceased	80,598,283,667
+1948-09-03_1419_215	1948-08-30	casual	1	Alexander Wilson Hungerford	Sir Alexander Wilson Hungerford	The Right Honourable Sir Joseph Davison	deceased	267,434,472,507
+1949-03-25_1448_67	1949-03-23	casual	1	James Edward Hamilton	James Edward, Marquis of Hamilton	Sir Emerson Crawford Herdman, K.B.E.	deceased	43,478,248,553
+1949-06-17_1460_139	1949-06-13	general	1	Maxwell Richard Crosbie Ward	The Right Honourable the Viscount Bangor, O.B.E.			270,540,474,701
+1949-06-17_1460_139	1949-06-13	general	2	Arthur Frederick Dobbs	Major Arthur Frederick Dobbs, D.L., J.P.			270,540,474,701
+1949-06-17_1460_139	1949-06-13	general	3	James Edward Hamilton	The Marquis of Hamilton, D.L.			270,540,474,701
+1949-06-17_1460_139	1949-06-13	general	4	Alexander Wilson Hungerford	Sir Alexander Wilson Hungerford			270,540,474,701
+1949-06-17_1460_139	1949-06-13	general	5	James Gerrard Lennon	James Gerrard Lennon, Esq.			270,540,474,701
+1949-06-17_1460_139	1949-06-13	general	6	Louis Dominic Lynch	Louis D. Lynch, Esq., B.A.			270,540,474,701
+1949-06-17_1460_139	1949-06-13	general	7	John Kennedy McCormick	John Kennedy McCormick, Esq.			270,540,474,701
+1949-06-17_1460_139	1949-06-13	general	8	Roland Thomas Nugent	Major the Right Honourable Sir Roland Nugent, D.L., J.P.			270,540,474,701
+1949-06-17_1460_139	1949-06-13	general	9	Patrick Joseph O'Hare	Patrick O'Hare, Esq.			270,540,474,701
+1949-06-17_1460_139	1949-06-13	general	10	William Ernest Stevenson	William Ernest Stevenson, Esq.			270,540,474,701
+1949-06-17_1460_139	1949-06-13	general	11	Henry Taylor	Henry Taylor, Esq., M.B.E., J.P.			270,540,474,701
+1949-06-17_1460_139	1949-06-13	general	12	Kennedy Stewart	Kennedy Stewart, Esq.			270,540,474,701
+1949-06-24_1461_143	1949-06-24	casual	1	David Bill	David Bill, Esquire	The Rt. Hon. James Graham Leslie, H.M.L.	deceased	50,434,255,499
+1949-11-18_1482_261	1949-11-16	casual	1	Henry Sacheverell Carleton Richardson	Henry Sacheverell Carleton Richardson, Esquire	Senator Thomas Nelson	resigned	42,533,247,618
+1950-02-24_1496_47	1950-02-22	casual	1	Herbert Quin	Herbert Quin, Esquire, C.B.E.	Senator William James Smyth	deceased	44,404,249,471
+1950-06-23_1513_153	1950-06-21	casual	1	Marion Janet Greeves	Mrs. Marion Janet Greeves	Major John Charters Boyle, D.L.	deceased	56,444,261,518
+1950-06-23_1513_153	1950-06-21	casual	2	John McNally	John McNally, Esq.	Mr. Thomas Stanislaus McAllister	deceased	56,444,261,549
+1950-12-08_1537_313	1950-12-06	casual	1	Alexander Robert Gisborne Gordon	Lieutenant Colonel Alexander Robert Gisborne Gordon, D.S.O., D.L.	The Right Honourable The Viscount Bangor, O.B.E., D.L.	deceased	56,655,260,742
+1951-03-16_1551_63	1951-03-14	casual	1	George Anthony Clark	Sir George Anthony Clark, Baronet	Senator Gerald Browne, M.B.E.	deceased	48,440,254,519
+1951-08-24_1574_199	1951-08-22	casual	1	Charles Bradley	Charles Bradley, Esquire	Senator Joseph Maguire	deceased	265,389,470,456
+1953-05-29_1666_137	1953-05-26	general	1	David Bill	David Bill, Esquire			50,442,255,609
+1953-05-29_1666_137	1953-05-26	general	2	Charles Bradley	Charles Bradley, Esquire			50,442,255,609
+1953-05-29_1666_137	1953-05-26	general	3	George Anthony Clark	Sir George Anthony Clark, Bart.			50,442,255,609
+1953-05-29_1666_137	1953-05-26	general	4	William Moore Wallis Clark	William Moore Wallis Clarke, Esquire			50,442,255,609
+1953-05-29_1666_137	1953-05-26	general	5	Robert Corkey	The Very Rev. the Rt. Hon. Robert Corkey			50,442,255,609
+1953-05-29_1666_137	1953-05-26	general	6	Joseph Cunningham	Joseph Cunningham, Esquire			50,442,255,609
+1953-05-29_1666_137	1953-05-26	general	7	John Patrick Donaghy	John Patrick Donaghy, Esquire			50,442,255,609
+1953-05-29_1666_137	1953-05-26	general	8	Henry Fleming	Henry Fleming, Esquire, M.B.E.			50,442,255,609
+1953-05-29_1666_137	1953-05-26	general	9	Marion Janet Greeves	Mrs. Marion Janet Greeves, M.B.E.			50,442,255,609
+1953-05-29_1666_137	1953-05-26	general	10	Patrick Francis McGill	Patrick Francis McGill, Esquire			50,442,255,609
+1953-05-29_1666_137	1953-05-26	general	11	Herbert Quin	Herbert Quin, Esquire, C.B.E.			50,442,255,609
+1953-05-29_1666_137	1953-05-26	general	12	Henry Sacheverell Carleton Richardson	Lt. Col. Henry Sacheverell Carleton Richardson, O.B.E., D.L.			50,442,255,609
+1954-04-30_1714_105	1954-04-26	casual	1	James Huey Hamill Pollock	James Huey Hamill Pollock, Esquire	Senator William Ernest Stevenson	resigned	259,580,464,661
+1955-04-01_1762_103	1955-03-25	casual	1	James Bailie	James Bailie, Esquire	Senator Major Arthur Frederick Dobbs, D.L., J.P.	deceased	55,572,259,643
+1955-04-22_1765_121	1955-04-18	casual	1	Samuel Wilson Boyd	Samuel Wilson Boyd, Esquire	Senator Kennedy Stewart	resigned	51,564,255,639
+1956-04-20_1817_108	1956-04-17	casual	1	Robert Armstrong	Robert Armstrong, Esq., M.B.E., J.P.	Senator Henry Fleming, M.B.E., J.P.	deceased	295,413,499,490
+1956-11-23_1848_309	1956-11-21	casual	1	Alexander McConnell	Alexander McConnell, Esquire	Senator David Bill	resigned	61,636,266,716
+1957-02-22_1861_53	1957-02-20	casual	1	Albert James Walmsley	Albert James Walmsley, Esquire	Senator Lt.-Col. H. S. C. Richardson, O.B.E., D.L.	resigned	64,326,269,388
+1957-02-22_1861_53	1957-02-20	casual	2	Daniel Ritchie McGladdery	Daniel Richie McGladdery, Esquire	Senator Henry Taylor, M.B.E., J.P.	deceased	64,409,268,471
+1957-05-24_1874_133	1957-05-21	general	1	James Edward Hamilton	His Grace the Duke of Abercorn			275,458,480,631
+1957-05-24_1874_133	1957-05-21	general	2	James Bailie	James Bailie, Esquire			275,458,480,631
+1957-05-24_1874_133	1957-05-21	general	3	Samuel Wilson Boyd	Samuel Wilson Boyd, Esquire			275,458,480,631
+1957-05-24_1874_133	1957-05-21	general	4	James Glencairn Cunningham	Lt.-Col. James Glencairn Cunningham			275,458,480,631
+1957-05-24_1874_133	1957-05-21	general	5	Joseph Fisher	Joseph Fisher, Esquire			275,458,480,631
+1957-05-24_1874_133	1957-05-21	general	6	Alexander Robert Gisborne Gordon	Lt.-Col. The Rt. Hon. Alexander Robert Gisborne Gordon			275,458,480,631
+1957-05-24_1874_133	1957-05-21	general	7	James Gerrard Lennon	James Gerrard Lennon, Esquire			275,458,480,631
+1957-05-24_1874_133	1957-05-21	general	8	John Kennedy McCormick	John Kennedy McCormick, Esquire			275,458,480,631
+1957-05-24_1874_133	1957-05-21	general	9	Daniel Ritchie McGladdery	Daniel Ritchie McGladdery, Esquire			275,458,480,631
+1957-05-24_1874_133	1957-05-21	general	10	Roland Thomas Nugent	Major the Rt. Hon. Sir Roland Nugent			275,458,480,631
+1957-05-24_1874_133	1957-05-21	general	11	Patrick Joseph O'Hare	Patrick Joseph O'Hare, Esquire			275,458,480,631
+1957-05-24_1874_133	1957-05-21	general	12	William Stewart	William Stewart, Esquire			275,458,480,631
+1957-07-26_1883_206	1957-07-19	casual	1	John Aloysius McGlade	John Aloysius McGlade, Esquire	Senator Charles Bradley	deceased	75,431,278,500
+1958-10-31_1949_331	1958-10-24	casual	1	John Stewart Johnston	John Stewart Johnston, Esquire	Senator John Kennedy McCormick	deceased	256,489,460,567
+1961-03-17_2073_87	1961-03-14	casual	1	Daniel Stewart Thomas Bingham	Lieutenant-Colonel The Right Honourable Daniel Stewart Thomas Bingham, Baron Glentoran	Senator The Right Honourable Sir Roland Nugent, H.M.L.		44,541,250,641
+1961-06-02_2084_185	1961-05-29	general	1	George Anthony Clark	Sir George Anthony Clark, Baronet			53,561,258,719
+1961-06-02_2084_185	1961-05-29	general	2	Victor Alexander Cooke	Victor Alexander Cooke, Esquire			53,561,258,719
+1961-06-02_2084_185	1961-05-29	general	3	Robert Corkey	The Very Rev. The Rt Hon. Prof. Robert Corkey			53,561,258,719
+1961-06-02_2084_185	1961-05-29	general	4	Joseph Cunningham	Joseph Cunningham, Esquire			53,561,258,719
+1961-06-02_2084_185	1961-05-29	general	5	John Patrick Donaghy	John Patrick Donaghy, Esquire			53,561,258,719
+1961-06-02_2084_185	1961-05-29	general	6	John Cherry Drennan	John Cherry Drennan, Esquire			53,561,258,719
+1961-06-02_2084_185	1961-05-29	general	7	Marion Janet Greeves	Mrs. Marion Janet Greeves			53,561,258,719
+1961-06-02_2084_185	1961-05-29	general	8	Patrick Francis McGill	Patrick Francis McGill, Esquire			53,561,258,719
+1961-06-02_2084_185	1961-05-29	general	9	John Aloysius McGlade	John Aloysius McGlade, Esquire			53,561,258,719
+1961-06-02_2084_185	1961-05-29	general	10	Herbert Quin	Herbert Quin, Esquire			53,561,258,719
+1961-06-02_2084_185	1961-05-29	general	11	Arnold Peart Schofield	Arnold Peart Schofield, Esquire			53,561,258,719
+1961-06-02_2084_185	1961-05-29	general	12	Albert James Walmsley	Albert James Walmsley, Esquire			53,561,258,719
+1962-08-03_2145_291	1962-07-31	casual	1	John Eccles Nixon Barnhill	John Eccles Nixon Barnhill, Esquire	Senator His Grace The Duke of Abercorn, H.M.L.	resigned	52,730,257,824
+1962-12-28_2166_494	1962-12-21	casual	1	Samuel Rodgers	Samuel Rodgers, Esquire	Senator Samuel Wilson Boyd, J.P.	resigned	58,526,261,590
+1963-11-22_2218_411	1963-11-15	casual	1	Samuel Kinghan	Samuel Kinghan, Esquire, J.P.	Senator Joseph Fisher	deceased	51,753,257,823
+1964-08-14_2261_271	1964-08-06	casual	1	John Lawson Ormrod Andrews	The Right Honourable John Lawson Ormrod Andrews	Senator Lieutenant Colonel the Right Honourable Alexander Robert Gisborne Gordon, C.B.E., D.S.O., D.L.	resigned	273,341,478,449
+1964-10-23_2272_361	1964-10-20	casual	1	Robert George Grosvenor	Lord Robert George Grosvenor	Senator Albert James Walmsley	resigned	275,345,480,393
+1965-06-11_2308_201	1965-06-04	general	1	John Lawson Ormrod Andrews	The Right Honourable John Lawson Ormrod Andrews			59,477,264,662
+1965-06-11_2308_201	1965-06-04	general	2	James Bailie	James Bailie, Esquire			59,477,264,662
+1965-06-11_2308_201	1965-06-04	general	3	John Eccles Nixon Barnhill	John Eccles Nixon Barnhill, Esquire			59,477,264,662
+1965-06-11_2308_201	1965-06-04	general	4	Daniel Stewart Thomas Bingham	Colonel The Right Honourable Lord Glentoran			59,477,264,662
+1965-06-11_2308_201	1965-06-04	general	5	Norman Kennedy	Norman Kennedy, Esquire			59,477,264,662
+1965-06-11_2308_201	1965-06-04	general	6	Samuel Kinghan	Samuel Kinghan, Esquire			59,477,264,662
+1965-06-11_2308_201	1965-06-04	general	7	James Gerrard Lennon	James Gerrard Lennon, Esquire			59,477,264,662
+1965-06-11_2308_201	1965-06-04	general	8	Daniel Ritchie McGladdery	Daniel Ritchie McGladdery, Esquire			59,477,264,662
+1965-06-11_2308_201	1965-06-04	general	9	Patrick Francis Mallon	Patrick Francis Mallon, Esquire			59,477,264,662
+1965-06-11_2308_201	1965-06-04	general	10	Patrick Joseph O'Hare	Patrick Joseph O'Hare, Esquire			59,477,264,662
+1965-06-11_2308_201	1965-06-04	general	11	Samuel Rodgers	Samuel Rodgers, Esquire			59,477,264,662
+1965-06-11_2308_201	1965-06-04	general	12	William Stewart	William Stewart, Esquire			59,477,264,662
+1966-02-18_2346_49	1966-02-11	casual	1	Nelson Elder	Nelson Elder, Esquire	Senator Joseph Cunningham	deceased	48,467,254,538
+1966-03-04_2348_69	1966-02-24	casual	1	James Glencairn Cunningham	James Glencairn Cunningham, Esquire	Senator the Very Reverend the Right Honourable Professor Robert Corkey, M.A., D.Phil., D.D.	deceased	43,566,248,668
+1967-06-30_2427_237	1967-06-27	casual	1	David Alexander McClelland	David Alexander McClelland, Esquire	Senator John Aloysius McGlade	deceased	56,714,261,806
+1967-12-01_2455_438	1967-11-23	casual	1	John Stewart Johnston	John Stewart Johnston, Esquire	Senator James Bailie	deceased	65,305,270,385
+1968-07-19_2495_249	1968-07-17	casual	1	William Wilson	William Wilson, Esquire	Senator His Grace The Duke of Westminster, D.L., T.D., J.P.	resigned	268,534,472,629
+1969-06-13_2555_211	1969-06-06	general	1	William Millar Cameron	William Millar Cameron, Esquire			267,618,472,829
+1969-06-13_2555_211	1969-06-06	general	2	James Glencairn Cunningham	Lieut.-Colonel James Glencairn Cunningham			267,618,472,829
+1969-06-13_2555_211	1969-06-06	general	3	John Cherry Drennan	John Cherry Drennan, Esquire			267,618,472,829
+1969-06-13_2555_211	1969-06-06	general	4	Nelson Elder	Nelson Elder, Esquire			267,618,472,829
+1969-06-13_2555_211	1969-06-06	general	5	Archibald Dunlop Gibson	Archibald Dunlop Gibson, Esquire			267,618,472,829
+1969-06-13_2555_211	1969-06-06	general	6	William James Morgan	The Right Honourable William James Morgan			267,618,472,829
+1969-06-13_2555_211	1969-06-06	general	7	David Alexander McClelland	David Alexander McClelland, Esquire			267,618,472,829
+1969-06-13_2555_211	1969-06-06	general	8	Charles McCullough	Charles McCullough, Esquire			267,618,472,829
+1969-06-13_2555_211	1969-06-06	general	9	Patrick Francis McGill	Dr. Patrick Francis McGill			267,618,472,829
+1969-06-13_2555_211	1969-06-06	general	10	Patrick Gerard Wilson	Patrick Gerard Wilson, Esquire			267,618,472,829
+1969-06-13_2555_211	1969-06-06	general	11	William Wilson	Major William Wilson			267,618,472,829
+1969-06-13_2555_211	1969-06-06	general	12	Claude James Wilton	Claude James Wilton, Esquire			267,618,472,829
+1970-11-13_2663_443	1970-11-05	casual	1	Harold Ian McClure	Harold Ian McClure, Esquire	Senator The Right Honourable William Morgan, J.P.	resigned	51,357,257,449
+1970-11-27_2666_488	1970-11-24	casual	1	Edith Ashover Taggart	Mrs. Edith Ashover Taggart	Senator Dr. Samuel Rodgers	deceased	73,79,276,159
