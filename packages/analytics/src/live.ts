@@ -1204,7 +1204,7 @@ function ordered(coefficients: Float64Array, unit: Unit, lanes: Array<Lane>) {
   );
 }
 
-function gap(unit: Unit, fraction: number, bent: boolean) {
+function unseen(unit: Unit, fraction: number, bent: boolean) {
   const left = Math.max(0, 1 - fraction);
   return bent && unit.channel === 0 ? left * left : left;
 }
@@ -1296,7 +1296,7 @@ function fit(
         unit.prior - center,
         ...features(unit),
         ...lanes.map(() => 0),
-        gap(unit, fraction, bent),
+        unseen(unit, fraction, bent),
       ],
       unit.margin - unit.prior - unit.pool,
       residual[index]! ** 2 + partial(fraction),
@@ -1919,7 +1919,7 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
     }
     const predicted =
       predict(first, unit, center) +
-      ordered(first, unit, lanes) * gap(unit, Math.min(1, fraction), bent);
+      ordered(first, unit, lanes) * unseen(unit, Math.min(1, fraction), bent);
     squares +=
       Math.max(
         0,
@@ -2257,7 +2257,7 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
       if (unit.total > 0) {
         const noise = partial(fraction);
         const order = ordered(coefficients, unit, lanes);
-        const observed = unit.margin - order * gap(unit, fraction, bent);
+        const observed = unit.margin - order * unseen(unit, fraction, bent);
         const precision = 1 / priorVariance + (noise > 0 ? 1 / noise : 1e12);
         const weight = noise > 0 ? 1 / noise / precision : 1;
         const mean =
