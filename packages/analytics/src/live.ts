@@ -207,6 +207,7 @@ const MODEL = {
     weigh: 1,
     span: 1,
     reach: 1.75,
+    ramp: 3,
     memory: 2,
     patience: 0.5,
     lull: 0.5,
@@ -1814,6 +1815,11 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
         earlier: members.some((unit) => unit.earlier == null)
           ? null
           : sum(members.map((unit) => unit.earlier ?? 0)),
+        night: members.some((unit) => unit.night == null)
+          ? null
+          : race.options.map((_, option) =>
+              sum(members.map((unit) => unit.night?.[option] ?? 0)),
+            ),
         rate: members.some((unit) => unit.rate == null)
           ? null
           : sum(members.map((unit) => unit.rate ?? 0)),
@@ -2117,6 +2123,20 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
           finals[index] =
             unit.total +
             (finals[index] - unit.total) * (stays + (1 - stays) * stirred);
+          const elapsed =
+            (Date.parse(stamp) - cutoff) / (MODEL.late.span * 86_400_000);
+          if (unit.night != null && elapsed > 0 && elapsed < 1) {
+            const capped = Math.max(
+              unit.total,
+              unit.floor,
+              unit.total +
+                (MODEL.late.reach * (unit.total - sum(unit.night))) / elapsed,
+            );
+            if (capped < finals[index]) {
+              finals[index] -=
+                elapsed ** MODEL.late.ramp * (finals[index] - capped);
+            }
+          }
         }
         spills[index] = 0;
         if (isLate && unit.paced != null && unit.total > 0) {
