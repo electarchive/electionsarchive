@@ -378,6 +378,12 @@
       "publisher": "Câmara dos Deputados, Coordenação de Arquivo",
       "url": "http://bd.camara.leg.br/bd/handle/bdcamara/31679",
       "kind": "official_body"
+    },
+    "decreto-1082-1860": {
+      "title": "Decreto n. 1.082 de 18 de agosto de 1860 (alters Lei 387 of 1846 and Decreto 842 of 1855), art. 1, par. 16",
+      "publisher": "Coleção das Leis do Império, via Câmara dos Deputados, Legislação Informatizada",
+      "url": "https://www2.camara.leg.br/legin/fed/decret/1824-1899/decreto-1082-18-agosto-1860-554666-publicacaooriginal-73531-pl.html",
+      "kind": "official_body"
     }
   },
   "tiers": [
@@ -2158,10 +2164,10 @@
           "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
         },
         {
-          "date": "1860-01-01",
-          "precision": "year",
-          "source": "wp-eleicoes-br",
-          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+          "date": "1860-12-30",
+          "source": "decreto-1082-1860",
+          "note": "Polling day of the first stage, the last Sunday of December 1860, when parish voters chose the electors of the next legislature.",
+          "quote": "A eleição de Eleitores da proxima Legislatura terá lugar na ultima dominga do mez de Dezembro deste anno."
         },
         {
           "date": "1863-08-09",
