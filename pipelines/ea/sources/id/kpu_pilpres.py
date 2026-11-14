@@ -16,7 +16,7 @@ from ea.changeset import Changeset
 from ea.store import DATA, connect
 
 SOURCE = "id.kpu_pilpres"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 KPU = "Komisi Pemilihan Umum Republik Indonesia"
 JDIH = "https://jdih.kpu.go.id/data/data_kepkpu/"
@@ -571,18 +571,17 @@ SYSTEM_TWO = (
     "also asks for at least 20 percent in more than half of the provinces, but the Constitutional Court held in "
     "decision 50/PUU-XII/2014 that this condition does not apply when only two tickets stand."
 )
-SYSTEM_2024 = (
-    "No electoral system is attached: UU 7/2017 art. 416 elects a ticket with over 50 percent of the valid votes and "
-    "at least 20 percent in more than half of the provinces, else the top two meet in a runoff, and the archive's "
-    "rules cannot yet express the provincial condition. Prabowo Subianto and Gibran Rakabuming Raka took 58.59 "
-    "percent nationally and at least 20 percent in every province, and KPU decree 504/2024 declared them elected."
-)
-SYSTEM_2004 = (
-    "No electoral system is attached: UU 23/2003 art. 66(2) elects a ticket with over 50 percent of the valid votes and "
-    "at least 20 percent in more than half of the provinces, else the top two meet in a second round (art. 67), and "
-    "the archive's rules cannot yet express the provincial condition. No ticket passed 50 percent, so Susilo Bambang "
-    "Yudhoyono and Jusuf Kalla, and Megawati Soekarnoputri and Hasyim Muzadi, went on to the second round of "
-    "20 September 2004."
+RULES_SPREAD = {
+    "formula": "two_round",
+    "majority": 0.5,
+    "advance": 2,
+    "spread": {"scheme": "id.provinsi", "share": 0.2, "units": {"share": 0.5, "strict": True}},
+}
+SYSTEM_SPREAD = (
+    "A ticket is elected with over 50 percent of the valid votes and at least 20 percent of the valid votes in more "
+    "than half of the provinces (UU 23/2003 art. 66(2) in 2004, UU 7/2017 art. 416(1) from 2019); otherwise the two "
+    "tickets with the most votes meet in a second round, which the most votes win. The Constitutional Court held in "
+    "decision 50/PUU-XII/2014 that the provincial condition does not apply when only two tickets stand."
 )
 NOTES = {
     2004: (
@@ -646,6 +645,9 @@ def emit() -> Path:
         two = cs.key("id.electoral_system", "presiden:two-tickets")
         cs.add("electoral_system", id=two, polity_id=indonesia, rules={"formula": "two_round"}, rules_version=1)
         cs.add("note", entity_id=two, kind="methodology", body_md=SYSTEM_TWO)
+        spread = cs.key("id.electoral_system", "presiden:spread")
+        cs.add("electoral_system", id=spread, polity_id=indonesia, rules=RULES_SPREAD, rules_version=1)
+        cs.add("note", entity_id=spread, kind="methodology", body_md=SYSTEM_SPREAD)
 
         units: dict[str, UUID] = {}
 
@@ -784,7 +786,7 @@ def emit() -> Path:
                 magnitude=1,
                 round_number=1,
                 previous_round_id=None,
-                electoral_system_id=None if year in (2004, 2024) else two,
+                electoral_system_id=spread if year in (2004, 2024) else two,
                 default_result_kind="counted",
             )
             first = ", first round" if year == 2004 else ""
@@ -793,10 +795,6 @@ def emit() -> Path:
                 contest, f"Pemilihan Umum Presiden dan Wakil Presiden Tahun {year}{' Putaran Pertama' if first else ''}"
             )
             cs.add("slug", path=f"{path}/president", entity_id=contest)
-            if year == 2024:
-                cs.add("note", entity_id=contest, kind="caveat", body_md=SYSTEM_2024)
-            if year == 2004:
-                cs.add("note", entity_id=contest, kind="caveat", body_md=SYSTEM_2004)
             source = {2004: RULING_2004[0], 2014: RULING_2014[0], 2019: CERTIFICATE[0], 2024: LAMPIRAN_2024[0]}[year]
             result_set = cs.key(f"{SOURCE}.result_set", contest_key)
             cs.add(
@@ -880,4 +878,18 @@ def emit() -> Path:
                 low = [label for label in PROVINCES if cells[label, winner] < 0.2 * cells[label, None]]
                 if low:
                     raise ValueError(f"2024: the winner is under 20 percent in {low}")
+        for note, entity, body in conn.execute(
+            """select n.id, n.entity_id, n.body_md from note n
+               join contest c on c.id = n.entity_id
+               join changeset w on w.id = n.changeset_id and w.pipeline = %s
+               where n.kind = 'caveat'""",
+            [SOURCE],
+        ).fetchall():
+            cs.add(
+                "note_drop",
+                note_id=note,
+                entity_id=entity,
+                body_md=body,
+                reason="the contest now carries an electoral system with the provincial condition",
+            )
         return cs.write()
