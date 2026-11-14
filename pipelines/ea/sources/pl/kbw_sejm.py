@@ -66,7 +66,21 @@ NATION_METHOD = (
     "are the national list members the candidate file marks as elected from the national list, and positions are "
     "the national list positions it prints."
 )
+LINKED = (
+    " For 1991 only the constituency lists linked to the national list count, which the file shows as the "
+    "constituency lists with a candidate on the national list; these sums equal the Państwowa Komisja Wyborcza's "
+    "national list figures (Monitor Polski 1991 nr 41 poz. 288)."
+)
 BASE = "https://danewyborcze.kbw.gov.pl/dane"
+NATIONAL_BLOCS_1991 = {
+    41: "41-49-58-62",
+    49: "41-49-58-62",
+    58: "41-49-58-62",
+    62: "41-49-58-62",
+    20: "20-48",
+    48: "20-48",
+}
+MINORITIES_1991 = {20, 48, 55}
 PARSED = raw.parsed(SOURCE)
 ELECTIONS = {
     1991: date(1991, 10, 27),
@@ -235,13 +249,25 @@ def hare(votes: dict[int, int], seats: int) -> Counter[int]:
     return won
 
 
-def pooled(votes: dict[int, int], blocs: dict[int, str], seats: int) -> Counter[int]:
-    groups: dict[str, dict[int, int]] = {}
+def pooled(
+    votes: dict[int, int], blocs: dict[int, str], seats: int, divisors: list[float] | None = None
+) -> Counter[str]:
+    groups = Counter()
     for number, count in votes.items():
-        groups.setdefault(f"bloc {blocs[number]}" if blocs.get(number) else f"list {number}", {})[number] = count
+        groups[f"bloc {blocs[number]}" if blocs.get(number) else f"list {number}"] += count
+    names = list(groups)
+    won = (
+        dhondt(dict(enumerate(groups.values())), seats, divisors)
+        if divisors
+        else hare(dict(enumerate(groups.values())), seats)
+    )
+    return Counter({names[group]: share for group, share in won.items()})
+
+
+def bloc_seats(seats: dict[int, int], blocs: dict[int, str]) -> Counter[str]:
     won = Counter()
-    for group, share in hare({i: sum(g.values()) for i, g in enumerate(groups.values())}, seats).items():
-        won.update(hare(list(groups.values())[group], share))
+    for number, count in seats.items():
+        won[f"bloc {blocs[number]}" if blocs.get(number) else f"list {number}"] += count
     return won
 
 
@@ -638,9 +664,12 @@ def load_early(year: int) -> dict[str, pl.DataFrame]:
         print(f"{year} national list {row['list']}: {row['name']} shares position {row['national']}")
     if candidates.filter(pl.col("national_elected") & pl.col("national").is_null()).height:
         raise ValueError("a national list member has no national list position")
+    linked = (
+        lists.join(national.select("district", "list").unique(), on=["district", "list"]) if year == 1991 else lists
+    )
     nation = (
-        lists.group_by("list")
-        .agg(pl.col("votes").sum())
+        linked.group_by("list")
+        .agg(pl.col("votes").sum(), (pl.col("seats") > 0).sum().alias("districts"))
         .join(labels, on="list")
         .join(national.group_by("list").agg(pl.col("national_elected").sum().cast(pl.Int64).alias("seats")), on="list")
     )
@@ -1211,9 +1240,11 @@ def check(year: int, loaded: dict[str, pl.DataFrame]) -> dict[str, pl.DataFrame]
         divisors = [1.4, *range(3, 2 * row["magnitude"], 2)] if year == 2001 else None
         if year == 1991:
             blocs = dict(zip(part["list"], part["bloc"]))
-            won = pooled(dict(zip(part["list"], part["votes"])), blocs, row["magnitude"])
-        else:
-            won = dhondt(dict(zip(part["list"], part["votes"])), row["magnitude"], divisors)
+            declared = bloc_seats(dict(zip(part["list"], part["seats"])), blocs)
+            if pooled(dict(zip(part["list"], part["votes"])), blocs, row["magnitude"]) != declared:
+                print(f"{year} district {row['district']}: Hare-Niemeyer does not give the declared bloc seats")
+            continue
+        won = dhondt(dict(zip(part["list"], part["votes"])), row["magnitude"], divisors)
         if any(won[list_] != seats for list_, seats in zip(part["list"], part["seats"])):
             print(f"{year} district {row['district']}: the divisor method does not give the declared seats")
     seated = candidates.group_by("district", "list").agg(pl.col("elected").sum().alias("won"))
@@ -1256,17 +1287,28 @@ def check(year: int, loaded: dict[str, pl.DataFrame]) -> dict[str, pl.DataFrame]
             raise ValueError("national list seats do not sum to 69")
         valid = nation["votes"].sum()
         if year == 1991:
-            districts_won = lists.filter(pl.col("seats") > 0).group_by("list").len()
-            wide = nation.join(districts_won, on="list", how="left").filter(
-                (pl.col("votes") * 100 >= valid * 5) | (pl.col("len").fill_null(0) >= 5)
+            valid = lists["votes"].sum()
+            group = pl.col("list").replace_strict(NATIONAL_BLOCS_1991, default=pl.col("list").cast(pl.String))
+            wide = nation.with_columns(
+                pooled=pl.col("votes").sum().over(group), won=pl.col("districts").sum().over(group)
+            ).filter(
+                (pl.col("pooled") * 100 >= valid * 5)
+                | (pl.col("won") >= 5)
+                | pl.col("list").is_in(list(MINORITIES_1991))
             )
-            won = dhondt(dict(zip(wide["list"], wide["votes"])), 69, [1.4, *range(3, 138, 2)])
+            won = pooled(dict(zip(wide["list"], wide["votes"])), NATIONAL_BLOCS_1991, 69, [1.4, *range(3, 138, 2)])
+            declared = bloc_seats(dict(zip(nation["list"], nation["seats"])), NATIONAL_BLOCS_1991)
+            for group in sorted(set(won) | set(declared)):
+                if won[group] != declared[group]:
+                    print(f"{year} national {group}: {won[group]} by the formula, {declared[group]} declared")
         else:
             wide = nation.filter(pl.col("votes") * 100 >= valid * 7)
             won = dhondt(dict(zip(wide["list"], wide["votes"])), 69)
-        for row in nation.iter_rows(named=True):
-            if won[row["list"]] != row["seats"]:
-                print(f"{year} national list {row['list']}: {won[row['list']]} by the formula, {row['seats']} declared")
+            for row in nation.iter_rows(named=True):
+                if won[row["list"]] != row["seats"]:
+                    print(
+                        f"{year} national list {row['list']}: {won[row['list']]} by the formula, {row['seats']} declared"
+                    )
     units = units.join(loaded["registry"], on=["gmina", "commission"], how="left")
     return {
         "districts": districts,
@@ -1457,23 +1499,31 @@ def emit() -> Path:
             body = (
                 "391 of the 460 members in 37 constituencies of 7 to 17 seats, by the Hare-Niemeyer method with no "
                 "threshold, with voters choosing one candidate on one list (Ordynacja wyborcza do Sejmu of 28 June "
-                "1991). Lists could be joined in a bloc within a constituency, which took seats as one list before "
-                "sharing them among its lists. The other 69 members came from national lists."
+                "1991, arts. 93 to 96). Lists could be joined in a bloc within a constituency, which took seats as "
+                "one list; the bloc's seats went to its lists in proportion to their votes unless the committees' "
+                "declaration set another split (art. 75), and in several constituencies it did. The other 69 "
+                "members came from national lists."
             )
             national_system = cs.key("pl.electoral_system", "sejm-1991-national")
             national_rules = {
                 "formula": "modified_sainte_lague",
                 "firstDivisor": 1.4,
                 "lists": {"order": "closed", "vacancy": "next_on_list"},
+                "pooling": "alliance",
                 "threshold": {"level": "list", "scope": "contest", "percent": 5, "constituencies": 5},
             }
             national_label = "Sejm national list modified Sainte-Laguë system (1991)"
             national_body = (
                 "69 members from national lists, shared by the modified Sainte-Laguë method (divisors 1.4, 3, 5, and "
-                "so on) among committees that won 5 percent of the votes nationally or seats in at least 5 "
-                "constituencies, by the votes their constituency lists won nationally, and filled in list order "
-                "(Ordynacja wyborcza do Sejmu of 28 June 1991). The declared shares are stored as declared; they "
-                "do not all follow from the constituency list totals by this method."
+                "so on) and filled in list order, skipping candidates who won a constituency seat (Ordynacja wyborcza "
+                "do Sejmu of 28 June 1991, arts. 100 and 101). A national list's votes are those of the constituency "
+                "lists linked to it. Lists shared seats if their linked lists won seats in at least 5 constituencies "
+                "or 5 percent of the votes for all constituency lists, and national minority committees always "
+                "did. National lists could be joined in a bloc that took seats as one list and split them by the "
+                "committees' declaration: in 1991 the Konfederacja Polski Niepodległej with the Blok "
+                "Ludowo-Chrześcijański, the Polski Związek Zachodni, and the Polska Partia Ekologiczna - Zieloni, "
+                "and the Mniejszość Niemiecka with the Białoruski Komitet Wyborczy (Monitor Polski 1991 nr 41 poz. "
+                "288)."
             )
         elif early:
             system = cs.key("pl.electoral_system", "sejm-1993")
@@ -1806,17 +1856,28 @@ def emit() -> Path:
             name(contest, "National list")
             name(contest, "Lista ogólnopolska", "pl", "native")
             cs.add("slug", path=f"{path}/sejm/kraj", entity_id=contest)
-            nation_set = make_set(contest, key, "nation", True, 1, NATION_METHOD)
+            nation_set = make_set(contest, key, "nation", True, 1, NATION_METHOD + (LINKED if day.year == 1991 else ""))
             put(nation_set, nation, {column: int(accounting[column].sum()) for _, column in figures})
             options = {}
+            blocs = {}
+            for bloc in sorted(set(NATIONAL_BLOCS_1991.values()) if day.year == 1991 else ()):
+                alliance = blocs[bloc] = cs.key("pl.alliance", f"{key}:bloc:{bloc}")
+                cs.add("alliance", id=alliance, kind="apparentement", election_id=election)
+                members = nation_lists.filter(pl.col("list").replace_strict(NATIONAL_BLOCS_1991, default=None) == bloc)
+                lists_named = ", ".join(str(n) for n in sorted(members["list"]))
+                name(alliance, f"Bloc of national lists {lists_named}")
+                for member in sorted({party_for(committee) for committee in members["committee"]}):
+                    cs.add("alliance_member", alliance_id=alliance, party_id=member, role=None)
             for row in nation_lists.sort("votes", descending=True).iter_rows(named=True):
                 option = options[row["list"]] = cs.key(f"{SOURCE}.option", f"{key}:{row['list']}")
+                bloc = NATIONAL_BLOCS_1991.get(row["list"]) if day.year == 1991 else None
                 cs.add(
                     "contest_option",
                     id=option,
                     contest_id=contest,
                     kind="list",
                     party_id=party_for(row["committee"]),
+                    alliance_id=None if bloc is None else blocs[bloc],
                     ballot_label=" ".join(row["committee"].split()),
                 )
                 values.append((str(nation_set), str(nation), str(option), VOTES, row["votes"]))
