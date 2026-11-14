@@ -1,4 +1,5 @@
 import html
+import io
 import json
 import re
 import struct
@@ -11,6 +12,7 @@ from uuid import UUID
 
 import httpx
 import polars as pl
+import shapefile
 
 from ea import raw
 from ea.changeset import Changeset, slug
@@ -33,6 +35,10 @@ MADE = (
     "https://www.somerset.gov.uk/planning-buildings-and-land/neighbourhood-planning/"
     "neighbourhood-plans-in-production-and-made/#"
 )
+OS = "Ordnance Survey"
+ROADS = "OS VectorMap District, {tile} tile"
+ROADS_URL = "https://api.os.uk/downloads/v1/products/VectorMapDistrict/downloads?area={tile}&format=ESRI%C2%AE+Shapefile&redirect"
+ROADS_ATTRIBUTION = "Contains OS data © Crown copyright and database right 2026"
 DELIVERED = DATA / "inbox" / "manual" / "MF-674"
 PAGE_IMAGES = DATA / "pages" / SOURCE
 SCHEME = "gb.neighborhood_area"
@@ -223,6 +229,29 @@ def fetch() -> None:
     for row in pl.read_csv(AREAS, separator="\t", infer_schema=False).iter_rows(named=True):
         raw.fetch(SOURCE, parishes(row["layer"], row["field"], row["parishes"]), suffix=".geojson")
         raw.fetch(SOURCE, row["designation"], suffix=suffix(row["designation"]))
+        if row["cut"]:
+            raw.fetch(SOURCE, ROADS_URL.format(tile=row["tile"]), suffix=".zip")
+
+
+def carriageway(path: Path, tile: str, road: str) -> str:
+    with zipfile.ZipFile(path) as archive:
+        stem = f"OS VectorMap District (ESRI Shape File) {tile}/data/{tile}_Road"
+        reader = shapefile.Reader(
+            shp=io.BytesIO(archive.read(f"{stem}.shp")),
+            shx=io.BytesIO(archive.read(f"{stem}.shx")),
+            dbf=io.BytesIO(archive.read(f"{stem}.dbf")),
+        )
+        lines = [
+            [list(point) for point in shape.points]
+            for record, shape in zip(reader.records(), reader.shapes(), strict=True)
+            if record is not None
+            and shape is not None
+            and record["ROADNUMBER"] == road
+            and str(record["CLASSIFICA"]).endswith("Dual Carriageway")
+        ]
+    if not lines:
+        raise ValueError(f"{tile}: no dual carriageway on the {road}")
+    return json.dumps({"type": "MultiLineString", "coordinates": lines})
 
 
 def printed(url: str) -> tuple[str, bool, set[str]]:
@@ -346,14 +375,40 @@ def emit() -> Path:
             codes = row["parishes"].split()
             if sorted(features) != sorted(codes):
                 raise ValueError(f"{row['unit']}: {layer} has {sorted(features)}, not {codes}")
+            road = None
+            if row["cut"]:
+                roads = raw.cached(SOURCE, ROADS_URL.format(tile=row["tile"]))
+                road = cs.source(OS, ROADS.format(tile=row["tile"]))
+                if road not in added:
+                    added.add(road)
+                    cs.add(
+                        "source",
+                        id=road,
+                        kind="official_body",
+                        publisher=OS,
+                        title=ROADS.format(tile=row["tile"]),
+                        url=ROADS_URL.format(tile=row["tile"]),
+                        license=ONS_LICENSE,
+                        license_url=ONS_LICENSE_URL,
+                        attribution=ROADS_ATTRIBUTION,
+                    )
+                    cs.artifact(roads, road)
             shape = conn.execute(
-                """with u as (select st_union(st_makevalid(st_force2d(st_setsrid(st_geomfromgeojson(g), 27700))))
-                                as geom from unnest(%s::text[]) g)
+                """with p as (select st_union(st_makevalid(st_force2d(st_setsrid(st_geomfromgeojson(g), 27700))))
+                                as geom from unnest(%s::text[]) g),
+                   u as (select coalesce((select st_union(d.geom) from st_dump(st_split(p.geom,
+                                  st_setsrid(st_geomfromgeojson(%s::text), 27700))) d
+                                where st_intersects(d.geom, st_setsrid(st_makepoint(%s::float8, %s::float8), 27700))), p.geom) as geom
+                         from p)
                    select encode(st_asewkb(st_transform(
                             st_multi(st_collectionextract(st_makevalid(geom), 3)), 4326)), 'hex'),
                           encode(st_asewkb(st_transform(st_pointonsurface(geom), 4326)), 'hex')
                    from u""",
-                [[json.dumps(features[code]["geometry"]) for code in codes]],
+                [
+                    [json.dumps(features[code]["geometry"]) for code in codes],
+                    None if road is None else carriageway(roads.path, row["tile"], row["cut"]),
+                    *([None, None] if road is None else [float(value) for value in row["keep"].split()]),
+                ],
             ).fetchone()
             assert shape is not None
             area = drawn[row["unit"]] = cs.area(SCHEME, row["unit"])
@@ -396,12 +451,19 @@ def emit() -> Path:
                 kind="methodology",
                 body_md=f"The neighborhood area designated on {date.fromisoformat(row['designated']):%-d %B %Y}: "
                 + (
-                    f"the parish of {listed} as it stood then. The shape is the ONS shape of that parish in "
-                    if len(labels) == 1
-                    else f"the parishes of {listed} as they stood then. The shape is the union of the ONS shapes of "
-                    "those parishes in "
-                )
-                + f"{row['title']}.",
+                    f"the parts of the parishes of {listed} {row['side']} of the {row['cut']}, as they stood then. "
+                    "The shape is the union of the ONS shapes of those parishes in "
+                    f"{row['title']}, cut along the {row['cut']}'s carriageway as drawn in "
+                    f"{ROADS.format(tile=row['tile'])}."
+                    if row["cut"]
+                    else (
+                        f"the parish of {listed} as it stood then. The shape is the ONS shape of that parish in "
+                        if len(labels) == 1
+                        else f"the parishes of {listed} as they stood then. The shape is the union of the ONS shapes "
+                        "of those parishes in "
+                    )
+                    + f"{row['title']}."
+                ),
             )
             designation = cs.source(row["publisher"], row["document"])
             if designation not in added:
@@ -416,6 +478,8 @@ def emit() -> Path:
                 )
                 cs.artifact(raw.cached(SOURCE, row["designation"]), designation)
             cs.add("citation", entity_id=area, source_id=designation)
+            if road is not None:
+                cs.add("citation", entity_id=area, source_id=road)
         if drawn and conn.execute("select 1 from boundary_set where scheme_code = %s", [SCHEME]).fetchone() is None:
             cs.add(
                 "boundary_set",
