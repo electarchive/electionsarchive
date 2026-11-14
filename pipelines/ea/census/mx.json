@@ -207,6 +207,13 @@
    "publisher": "Instituto Tlaxcalteca de Elecciones (ITE)",
    "url": "https://ite.org.mx/",
    "kind": "official_body"
+  },
+  "ine_rem_2025": {
+   "title": "Régimen Electoral Mexicano 2024-2025: Proceso Electoral Extraordinario del Poder Judicial de la Federación (section 12, Casilla de votación)",
+   "publisher": "Instituto Nacional Electoral",
+   "url": "https://ine.mx/wp-content/uploads/2025/05/Regimen-Electoral-Mexicano-2025_VF.pdf",
+   "kind": "official_body",
+   "note": "Read 2026-11-14. Pages 28-29 list the 19 entities whose local judicial election (PELPJ) was concurrent with the federal one on 1 June 2025 and used the casilla seccional única: Aguascalientes, Baja California, Coahuila, Colima, Chihuahua, Ciudad de México, Durango, Estado de México, Michoacán, Nayarit, Quintana Roo, San Luis Potosí, Sonora, Tabasco, Tamaulipas, Tlaxcala, Veracruz, Yucatán, and Zacatecas; the other 13 held only the federal election."
   }
  },
  "tiers": [
@@ -2201,7 +2208,7 @@
    "measure": {
     "unit": "office"
    },
-   "note": "The 2024 reform requires each state to elect its high court magistrates, judicial discipline tribunal, and judges (CPEUM art. 116 III). Some states voted on 1 June 2025 with the federal judicial election; the rest, and the posts not renewed in 2025, vote on the first Sunday of June 2028 under the decree of 2 June 2026.",
+   "note": "The 2024 reform requires each state to elect its high court magistrates, judicial discipline tribunal, and judges (CPEUM art. 116 III). Nineteen states voted on 1 June 2025 with the federal judicial election; the rest, and the posts not renewed in 2025, vote on the first Sunday of June 2028 under the decree of 2 June 2026.",
    "source": "cpeum",
    "locator": "https://www.diputados.gob.mx/LeyesBiblio/pdf/CPEUM.pdf (art. 116 III; transitorio tercero of DOF 02-06-2026)",
    "est_votes": 10000000,
@@ -2244,8 +2251,105 @@
     {
      "date": "2025-06-01",
      "contests": null,
-     "source": "cpeum",
-     "note": "The states that held their first judicial election with the federal one; the list is not yet enumerated."
+     "source": "ine_rem_2025",
+     "note": "19 states held their first judicial election with the federal one (INE, Régimen Electoral Mexicano 2024-2025, p. 29); the other 13 hold theirs later.",
+     "states": {
+      "MX-AGU": {
+       "constituencies": null,
+       "source": "ine_rem_2025",
+       "quote": "Aguascalientes, Baja California, Coahuila de Zaragoza, Colima, Chihuahua, Ciudad de México, Durango, Estado de México, Michoacán de Ocampo, Nayarit, Quintana Roo, San Luis Potosí, Sonora, Tabasco, Tamaulipas, Tlaxcala, Veracruz, Yucatán, Zacatecas"
+      },
+      "MX-BCN": {
+       "constituencies": null,
+       "source": "ine_rem_2025",
+       "quote": "Aguascalientes, Baja California, Coahuila de Zaragoza, Colima, Chihuahua, Ciudad de México, Durango, Estado de México, Michoacán de Ocampo, Nayarit, Quintana Roo, San Luis Potosí, Sonora, Tabasco, Tamaulipas, Tlaxcala, Veracruz, Yucatán, Zacatecas"
+      },
+      "MX-COA": {
+       "constituencies": null,
+       "source": "ine_rem_2025",
+       "quote": "Aguascalientes, Baja California, Coahuila de Zaragoza, Colima, Chihuahua, Ciudad de México, Durango, Estado de México, Michoacán de Ocampo, Nayarit, Quintana Roo, San Luis Potosí, Sonora, Tabasco, Tamaulipas, Tlaxcala, Veracruz, Yucatán, Zacatecas"
+      },
+      "MX-COL": {
+       "constituencies": null,
+       "source": "ine_rem_2025",
+       "quote": "Aguascalientes, Baja California, Coahuila de Zaragoza, Colima, Chihuahua, Ciudad de México, Durango, Estado de México, Michoacán de Ocampo, Nayarit, Quintana Roo, San Luis Potosí, Sonora, Tabasco, Tamaulipas, Tlaxcala, Veracruz, Yucatán, Zacatecas"
+      },
+      "MX-CHH": {
+       "constituencies": null,
+       "source": "ine_rem_2025",
+       "quote": "Aguascalientes, Baja California, Coahuila de Zaragoza, Colima, Chihuahua, Ciudad de México, Durango, Estado de México, Michoacán de Ocampo, Nayarit, Quintana Roo, San Luis Potosí, Sonora, Tabasco, Tamaulipas, Tlaxcala, Veracruz, Yucatán, Zacatecas"
+      },
+      "MX-CMX": {
+       "constituencies": null,
+       "source": "ine_rem_2025",
+       "quote": "Aguascalientes, Baja California, Coahuila de Zaragoza, Colima, Chihuahua, Ciudad de México, Durango, Estado de México, Michoacán de Ocampo, Nayarit, Quintana Roo, San Luis Potosí, Sonora, Tabasco, Tamaulipas, Tlaxcala, Veracruz, Yucatán, Zacatecas"
+      },
+      "MX-DUR": {
+       "constituencies": null,
+       "source": "ine_rem_2025",
+       "quote": "Aguascalientes, Baja California, Coahuila de Zaragoza, Colima, Chihuahua, Ciudad de México, Durango, Estado de México, Michoacán de Ocampo, Nayarit, Quintana Roo, San Luis Potosí, Sonora, Tabasco, Tamaulipas, Tlaxcala, Veracruz, Yucatán, Zacatecas"
+      },
+      "MX-MEX": {
+       "constituencies": null,
+       "source": "ine_rem_2025",
+       "quote": "Aguascalientes, Baja California, Coahuila de Zaragoza, Colima, Chihuahua, Ciudad de México, Durango, Estado de México, Michoacán de Ocampo, Nayarit, Quintana Roo, San Luis Potosí, Sonora, Tabasco, Tamaulipas, Tlaxcala, Veracruz, Yucatán, Zacatecas"
+      },
+      "MX-MIC": {
+       "constituencies": null,
+       "source": "ine_rem_2025",
+       "quote": "Aguascalientes, Baja California, Coahuila de Zaragoza, Colima, Chihuahua, Ciudad de México, Durango, Estado de México, Michoacán de Ocampo, Nayarit, Quintana Roo, San Luis Potosí, Sonora, Tabasco, Tamaulipas, Tlaxcala, Veracruz, Yucatán, Zacatecas"
+      },
+      "MX-NAY": {
+       "constituencies": null,
+       "source": "ine_rem_2025",
+       "quote": "Aguascalientes, Baja California, Coahuila de Zaragoza, Colima, Chihuahua, Ciudad de México, Durango, Estado de México, Michoacán de Ocampo, Nayarit, Quintana Roo, San Luis Potosí, Sonora, Tabasco, Tamaulipas, Tlaxcala, Veracruz, Yucatán, Zacatecas"
+      },
+      "MX-ROO": {
+       "constituencies": null,
+       "source": "ine_rem_2025",
+       "quote": "Aguascalientes, Baja California, Coahuila de Zaragoza, Colima, Chihuahua, Ciudad de México, Durango, Estado de México, Michoacán de Ocampo, Nayarit, Quintana Roo, San Luis Potosí, Sonora, Tabasco, Tamaulipas, Tlaxcala, Veracruz, Yucatán, Zacatecas"
+      },
+      "MX-SLP": {
+       "constituencies": null,
+       "source": "ine_rem_2025",
+       "quote": "Aguascalientes, Baja California, Coahuila de Zaragoza, Colima, Chihuahua, Ciudad de México, Durango, Estado de México, Michoacán de Ocampo, Nayarit, Quintana Roo, San Luis Potosí, Sonora, Tabasco, Tamaulipas, Tlaxcala, Veracruz, Yucatán, Zacatecas"
+      },
+      "MX-SON": {
+       "constituencies": null,
+       "source": "ine_rem_2025",
+       "quote": "Aguascalientes, Baja California, Coahuila de Zaragoza, Colima, Chihuahua, Ciudad de México, Durango, Estado de México, Michoacán de Ocampo, Nayarit, Quintana Roo, San Luis Potosí, Sonora, Tabasco, Tamaulipas, Tlaxcala, Veracruz, Yucatán, Zacatecas"
+      },
+      "MX-TAB": {
+       "constituencies": null,
+       "source": "ine_rem_2025",
+       "quote": "Aguascalientes, Baja California, Coahuila de Zaragoza, Colima, Chihuahua, Ciudad de México, Durango, Estado de México, Michoacán de Ocampo, Nayarit, Quintana Roo, San Luis Potosí, Sonora, Tabasco, Tamaulipas, Tlaxcala, Veracruz, Yucatán, Zacatecas"
+      },
+      "MX-TAM": {
+       "constituencies": null,
+       "source": "ine_rem_2025",
+       "quote": "Aguascalientes, Baja California, Coahuila de Zaragoza, Colima, Chihuahua, Ciudad de México, Durango, Estado de México, Michoacán de Ocampo, Nayarit, Quintana Roo, San Luis Potosí, Sonora, Tabasco, Tamaulipas, Tlaxcala, Veracruz, Yucatán, Zacatecas"
+      },
+      "MX-TLA": {
+       "constituencies": null,
+       "source": "ine_rem_2025",
+       "quote": "Aguascalientes, Baja California, Coahuila de Zaragoza, Colima, Chihuahua, Ciudad de México, Durango, Estado de México, Michoacán de Ocampo, Nayarit, Quintana Roo, San Luis Potosí, Sonora, Tabasco, Tamaulipas, Tlaxcala, Veracruz, Yucatán, Zacatecas"
+      },
+      "MX-VER": {
+       "constituencies": null,
+       "source": "ine_rem_2025",
+       "quote": "Aguascalientes, Baja California, Coahuila de Zaragoza, Colima, Chihuahua, Ciudad de México, Durango, Estado de México, Michoacán de Ocampo, Nayarit, Quintana Roo, San Luis Potosí, Sonora, Tabasco, Tamaulipas, Tlaxcala, Veracruz, Yucatán, Zacatecas"
+      },
+      "MX-YUC": {
+       "constituencies": null,
+       "source": "ine_rem_2025",
+       "quote": "Aguascalientes, Baja California, Coahuila de Zaragoza, Colima, Chihuahua, Ciudad de México, Durango, Estado de México, Michoacán de Ocampo, Nayarit, Quintana Roo, San Luis Potosí, Sonora, Tabasco, Tamaulipas, Tlaxcala, Veracruz, Yucatán, Zacatecas"
+      },
+      "MX-ZAC": {
+       "constituencies": null,
+       "source": "ine_rem_2025",
+       "quote": "Aguascalientes, Baja California, Coahuila de Zaragoza, Colima, Chihuahua, Ciudad de México, Durango, Estado de México, Michoacán de Ocampo, Nayarit, Quintana Roo, San Luis Potosí, Sonora, Tabasco, Tamaulipas, Tlaxcala, Veracruz, Yucatán, Zacatecas"
+      }
+     }
     },
     {
      "date": "2028-06-04",
