@@ -181,7 +181,7 @@ const MODEL = {
   tail: {
     share: 0.035,
     spread: 0.5,
-    lean: 0.06,
+    lean: 0.15,
     local: 0.05,
     grace: 1,
     pace: 13,
@@ -2009,7 +2009,7 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
         continue;
       }
       if (!isTail) {
-        spent += isLate ? finals[index]! - unit.total + spills[index]! : 0;
+        spent += finals[index]! - unit.total + spills[index]!;
       } else if (unit.paced == null && unit.total > 0) {
         spent += drained * (finals[index]! - unit.total);
       }
