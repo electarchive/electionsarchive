@@ -1,4 +1,5 @@
 import io
+import os
 import re
 from collections import defaultdict
 from datetime import UTC, date, datetime
@@ -19,7 +20,7 @@ DOWNLOADS = Path.home() / "Downloads" / "florida"
 EXTRACT = "https://results.elections.myflorida.com/ResultsExtract.Asp?ElectionDate={day:%-m/%-d/%Y}&OfficialResults=Y"
 PUBLISHER = "Florida Division of Elections"
 TITLE = "Election results extracts"
-DAYS = [date(year, 11, 2 + (-date(year, 11, 1).weekday()) % 7) for year in range(1982, 2015, 2)]
+DAYS = [date(year, 11, 2 + (-date(year, 11, 1).weekday()) % 7) for year in (1978, *range(1982, 2015, 2))]
 FEDERAL = {"PRE": "president", "USS": "senate", "USR": "house", "GOV": "governor"}
 OFFICES = {
     "SEC": ("Secretary of State", "secretary-of-state"),
@@ -102,12 +103,14 @@ def parse() -> None:
 
 def emit() -> Path:
     frame = pl.read_parquet(PARSED / "lines.parquet")
+    days = [day for day in DAYS if str(day.year) in os.environ.get("FL_SOS_YEARS", str(day.year)).split(",")]
+    frame = frame.filter(pl.col("day").is_in(days))
     with connect() as conn:
         cs = Changeset(
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Florida's federal and statewide general elections by county, 1982–2014",
+            summary="Florida's federal and statewide general elections by county, 1978–2014",
             polity="US",
         )
 
@@ -124,7 +127,7 @@ def emit() -> Path:
             url="https://results.elections.myflorida.com/",
             license="Public record",
         )
-        for day in DAYS:
+        for day in days:
             cs.artifact(raw.cached(SOURCE, EXTRACT.format(day=day)), source)
 
         filled = {
