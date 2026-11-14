@@ -3,13 +3,15 @@ import json
 import re
 import sys
 import unicodedata
-from datetime import date
+from datetime import UTC, date, datetime
 from pathlib import Path
+from uuid import UUID
 
 import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset
+from ea.sources.licenses import COUNCIL, PUBLIC_RECORD
 from ea.store import DATA, connect
 
 SOURCE = "gb.parish"
@@ -77,6 +79,9 @@ GROUPED = {
     ),
 }
 GROUP_SCHEME = "gb.community_group"
+ENGLISH = Path(__file__).with_name("parish_councils.tsv")
+ENGLISH_INBOX = DATA / "inbox" / SOURCE / "councils"
+ELECTIONS = "gb.parish_elections"
 TORFAEN_RESULTS = "https://www.torfaen.gov.uk/en/about-the-council/elections/elections-results/community-council"
 DENBIGHSHIRE_COUNCIL = "https://moderngov.denbighshire.gov.uk/mgParishCouncilDetails.aspx?ID=267&LLL=0"
 GROUP_SOURCES = {
@@ -133,6 +138,19 @@ def fetch() -> None:
     for entries in GROUP_SOURCES.values():
         for _, _, _, copy in entries:
             raw.fetch(SOURCE, copy, suffix=".xml" if copy.endswith(".xml") else ".html")
+    for file in sorted(ENGLISH_INBOX.glob("*.html")):
+        content = file.read_bytes()
+        url = re.match(rb"<!-- URL: (\S+) -->", content)
+        if url is None:
+            raise ValueError(f"{file} has no URL header")
+        raw.store(
+            SOURCE,
+            url.group(1).decode(),
+            content,
+            suffix=".html",
+            retrieved_at=datetime.fromtimestamp(file.stat().st_mtime, UTC),
+            media_type="text/html",
+        )
 
 
 def parse_precepts() -> pl.DataFrame:
@@ -448,7 +466,7 @@ def emit() -> Path:
                     publisher=publisher,
                     title=title,
                     url=url,
-                    license=LICENSE if publisher == "legislation.gov.uk" else None,
+                    license=LICENSE if publisher == "legislation.gov.uk" else PUBLIC_RECORD,
                     license_url=LICENSE_URL if publisher == "legislation.gov.uk" else None,
                 )
                 cs.artifact(raw.cached(SOURCE, copy), source)
@@ -527,6 +545,37 @@ def emit() -> Path:
                 cs.add("body", id=body, polity_id=polity, kind="council")
             name(body, f"{label} Community Council")
         print(f"{len(GROUPED)} grouped councils, {len(served)} communities with a council", file=sys.stderr)
+        english = pl.read_csv(ENGLISH, separator="\t")
+        listings: dict[str, UUID] = {}
+        for publisher, title, url in english.select("publisher", "title", "url").unique(maintain_order=True).rows():
+            listings[url] = cs.source(publisher, title)
+            cs.add(
+                "source",
+                id=listings[url],
+                kind="official_body",
+                publisher=publisher,
+                title=title,
+                url=url,
+                license=COUNCIL,
+            )
+            try:
+                artifact = raw.cached(SOURCE, url)
+            except LookupError:
+                artifact = raw.cached(ELECTIONS, url)
+            cs.artifact(artifact, listings[url])
+        for lad, code, council, url in english.select("lad", "code", "council", "url").rows():
+            if lads.get(code) != lad:
+                raise ValueError(f"{council}: {code} is not in {lad}")
+            key = root[code]
+            if key in served:
+                raise ValueError(f"{council} and {served[key]} serve one parish")
+            served[key] = council
+            body = cs.key("gb.body", key)
+            if body in cs.minted:
+                cs.add("body", id=body, polity_id=polities[key], kind="council")
+            name(body, council)
+            cs.add("citation", entity_id=body, source_id=listings[url])
+        print(f"{english.height} English parish and town councils", file=sys.stderr)
         group_plans = {
             vintage: id
             for id, vintage in conn.execute(
