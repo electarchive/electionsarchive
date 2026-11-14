@@ -2159,6 +2159,17 @@ def publish(conn: Connection, changeset_id: str, reviewer: str | None = None) ->
                          and not exists (select from public.source o where o.id = d.source_id and o.kind = 'official_body')"""
                 ).format(staged=stage.staged("result_set"), official=official, group=sql.SQL(group))
             )
+        if "name" in stage.tables and stage.pipeline != "identity":
+            conn.execute(
+                sql.SQL(
+                    """delete from {} s using public.name_drop d, changeset dc
+                       where d.entity_id = s.entity_id and d.text = s.text
+                         and dc.id = d.changeset_id and dc.pipeline <> %s
+                         and not exists (select from public.name n join changeset c on c.id = n.changeset_id
+                                         where n.entity_id = s.entity_id and n.text = s.text and c.pipeline <> %s)"""
+                ).format(stage.staged("name")),
+                [stage.pipeline, stage.pipeline],
+            )
         deferred = _deferred(conn, stage)
         for table in stage.tables:
             _publish_table(conn, stage, table, deferred)
