@@ -3929,6 +3929,7 @@
   "ws_qtype_optional_referendum": "Optional referendum",
   "ws_qtype_plebiscite": "Plebiscite",
   "ws_qtype_recall_question": "Recall question",
+  "ws_qtype_referendum": "Referendum",
   "ws_contest_area": "District (optional)",
   "ws_contest_office": "Office (optional)",
   "ws_contest_body": "Body (optional)",

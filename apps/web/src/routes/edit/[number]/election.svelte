@@ -80,6 +80,7 @@
     optional_referendum: m.ws_qtype_optional_referendum,
     plebiscite: m.ws_qtype_plebiscite,
     recall_question: m.ws_qtype_recall_question,
+    referendum: m.ws_qtype_referendum,
   };
   const optionKindLabel: Record<OptionKind, () => string> = {
     candidate: m.ws_okind_candidate,

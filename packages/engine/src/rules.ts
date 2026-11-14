@@ -276,6 +276,7 @@ export const rules = v.variant("formula", [
               "counter_proposal",
               "plebiscite",
               "recall_question",
+              "referendum",
             ]),
           ),
         ),
