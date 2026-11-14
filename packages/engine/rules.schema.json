@@ -1875,7 +1875,8 @@
                   "optional_referendum",
                   "counter_proposal",
                   "plebiscite",
-                  "recall_question"
+                  "recall_question",
+                  "referendum"
                 ],
                 "type": "string"
               }

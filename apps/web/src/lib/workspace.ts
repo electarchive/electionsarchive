@@ -67,6 +67,7 @@ export const questionTypes = [
   "optional_referendum",
   "plebiscite",
   "recall_question",
+  "referendum",
 ] as const;
 
 export const relationKinds = [

@@ -1413,7 +1413,14 @@ OPTION_KINDS: dict[str, tuple[str, ...]] = {
     "list_allocation": ("list", "others"),
     "ballot_question": ("answer",),
 }
-QUESTION_TYPES = ("initiative", "mandatory_referendum", "optional_referendum", "plebiscite", "recall_question")
+QUESTION_TYPES = (
+    "initiative",
+    "mandatory_referendum",
+    "optional_referendum",
+    "plebiscite",
+    "recall_question",
+    "referendum",
+)
 
 RELATION_KINDS = (
     "merged_into",
