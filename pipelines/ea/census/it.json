@@ -149,6 +149,12 @@
       "url": "https://www.regione.vda.it/amministrazione/Elezioni/Dati_e_risultati/Risultati/Elezioni_regionali/default_i.aspx",
       "kind": "official_body"
     },
+    "istat_italia_in_cifre_2011": {
+      "title": "Italia in cifre 2011: numero di comuni dal 1861 al 2010",
+      "publisher": "Istituto nazionale di statistica (ISTAT)",
+      "url": "https://www.istat.it/wp-content/uploads/2011/06/italiaincifre2011.pdf",
+      "kind": "official_body"
+    },
     "istat_codici_2026": {
       "title": "Codici statistici delle unità amministrative territoriali: comuni, città metropolitane, province e regioni (codici al 21 febbraio 2026)",
       "publisher": "Istituto nazionale di statistica (ISTAT)",
@@ -467,6 +473,24 @@
       "scheme": "it.comune",
       "source": "istat_codici_2026",
       "counts": [
+        {
+          "date": "1951-11-04",
+          "value": 7810,
+          "source": "istat_italia_in_cifre_2011",
+          "locator": "https://www.istat.it/wp-content/uploads/2011/06/italiaincifre2011.pdf (Numero di comuni dal 1861 al 2010, census year)"
+        },
+        {
+          "date": "1971-10-24",
+          "value": 8056,
+          "source": "istat_italia_in_cifre_2011",
+          "locator": "https://www.istat.it/wp-content/uploads/2011/06/italiaincifre2011.pdf (Numero di comuni dal 1861 al 2010, census year)"
+        },
+        {
+          "date": "1991-10-20",
+          "value": 8100,
+          "source": "istat_italia_in_cifre_2011",
+          "locator": "https://www.istat.it/wp-content/uploads/2011/06/italiaincifre2011.pdf (Numero di comuni dal 1861 al 2010, census year)"
+        },
         {
           "date": "2026-02-21",
           "value": 7894,
