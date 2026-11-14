@@ -384,6 +384,12 @@
       "publisher": "Coleção das Leis do Império, via Câmara dos Deputados, Legislação Informatizada",
       "url": "https://www2.camara.leg.br/legin/fed/decret/1824-1899/decreto-1082-18-agosto-1860-554666-publicacaooriginal-73531-pl.html",
       "kind": "official_body"
+    },
+    "lei-1355-1866": {
+      "title": "Lei n. 1.355 de 19 de setembro de 1866, art. 1",
+      "publisher": "Coleção das Leis do Império, via Câmara dos Deputados, Legislação Informatizada",
+      "url": "https://www2.camara.leg.br/legin/fed/leimp/1824-1899/lei-1355-19-setembro-1866-554057-publicacaooriginal-72494-pl.html",
+      "kind": "official_body"
     }
   },
   "tiers": [
@@ -2176,10 +2182,10 @@
           "quote": "Decreto n. 3.093 de 12 de maio de 1863: \"designando, na fórma do art. 4.º da Lei n. 387 de 19 de Agosto de 1846, o dia 9 de Agosto deste anno para se proceder em todo o Imperio á eleição dos Eleitores que teem de eleger os novos Deputados.\""
         },
         {
-          "date": "1867-01-01",
-          "precision": "year",
-          "source": "wp-eleicoes-br",
-          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+          "date": "1867-02-03",
+          "source": "lei-1355-1866",
+          "note": "Polling day of the first stage, the first Sunday of February 1867, when parish voters chose the electors who then chose the deputies; postponed by statute from the first Sunday of November 1866.",
+          "quote": "As Assembléas Parochiaes, que, na fórma da Lei nº 387 de 19 de Agosto de 1846, tem de reunir-se na primeira Dominga de Novembro deste anno, a fim de procederem á eleição para Deputados Geraes da proxima futura Legislatura, são adiadas para a primeira Dominga de Fevereiro do anno proximo futuro."
         },
         {
           "date": "1869-01-31",
