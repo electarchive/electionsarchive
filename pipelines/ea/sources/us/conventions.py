@@ -791,9 +791,18 @@ EVENING_STAR_1920_CAVEAT = (
     "The archive has not located a free copy of the official proceedings' roll call of these ballots, so they are the "
     "state-by-state tables the Washington Evening Star printed on July 4, 1920 (page 14). They are defaults to be "
     "superseded by the official proceedings. Each table gives, for every delegation, its votes for William G. "
-    "McAdoo, James M. Cox, A. Mitchell Palmer, and a scattering column; only the first three are stored, and the "
-    "scattering votes, which the Star lists by candidate in a note under each table, are shown as not recorded. "
-    "Delegations whose named votes fall short of their size are likewise shown as not recorded. Totals are the "
+    "McAdoo, James M. Cox, A. Mitchell Palmer, and a scattering column. A note under each table splits the scattering "
+    "votes by candidate and state, and those entries are stored too, with Absent entries left out. Entries in the "
+    "notes were read against each state's scattering figure. A few notes name the wrong state: on the fourth to eighth "
+    "and the twelfth to fourteenth ballots the notes give Marshall's Indiana votes under Maryland, and they are stored "
+    "for Indiana; Gerard's Nevada vote on the third ballot is stored for New Mexico, Smith's Mississippi vote on the "
+    "fourth for Missouri, Owen's Mississippi votes on the sixth for Missouri, and Cummings's Mississippi vote on the "
+    "tenth for Massachusetts, each where the state's scattering figure fits. Five entries that would take a delegation "
+    "above its size are left out: Marshall's 2 from Florida on the third ballot, Owen's 1 from West Virginia on the "
+    "fourth and fifth, Cummings's 1 from the Canal Zone on the thirteenth, and Davis's 1 from South Carolina on the "
+    "fourteenth. Some states' note entries add to more or less than their scattering figure, and the notes' own "
+    "candidate totals do not always match their entries; the entries are stored as printed and the candidate "
+    "totals are not. Delegations whose named votes fall short of their size are shown as not recorded. Totals are the "
     "printed ones. Where a printed total differs from the state rows, the rows are stored as printed, except two "
     "cells that stand in the wrong column against the printed totals: Mississippi's 20 on the fourth ballot, printed "
     "under McAdoo, is stored for Cox, and Georgia's 28 on the eleventh, printed under Cox, is stored for Palmer."
@@ -1378,6 +1387,9 @@ CANDIDATES = {
     "1920:democratic:Wood": ("Leonard Wood", None),
     "1920:democratic:Hearst": ("William Randolph Hearst", "Q294931"),
     "1920:democratic:Colby": ("Bainbridge Colby", None),
+    "1920:democratic:Marshall": ("Thomas R. Marshall", None),
+    "1920:democratic:Clark": ("Clark", None),
+    "1920:democratic:Bryan": ("William Jennings Bryan", None),
     "1920:democratic:Daniels": ("Josephus Daniels", None),
     "1924:democratic:McAdoo": ("William G. McAdoo", "Q741058"),
     "1924:democratic:Smith": ("Alfred E. Smith", "Q430714"),
