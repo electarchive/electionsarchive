@@ -127,8 +127,13 @@ OVER = (
 def read_archive() -> tuple[list[dict[str, str]], list[list[str]]]:
     with tarfile.open(raw.cached(SOURCE, ARCHIVE).path) as archive:
         members = {Path(m.name).name: m for m in archive.getmembers()}
-        votes = archive.extractfile(members[DIPUTADOS]).read().decode("latin-1")
-        candidates = archive.extractfile(members[CANDIDATOS]).read().decode("latin-1")
+        texts = []
+        for name in (DIPUTADOS, CANDIDATOS):
+            member = archive.extractfile(members[name])
+            if member is None:
+                raise ValueError(f"{name} is not a file in the archive")
+            texts.append(member.read().decode("latin-1"))
+        votes, candidates = texts
     lines = votes.splitlines()
     start = next(i for i, line in enumerate(lines) if line.startswith("ESTADO|"))
     rows = [
