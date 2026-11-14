@@ -334,6 +334,27 @@
       "url": "https://www.smi.sachsen.de/kommunalwahlen-5261.html",
       "kind": "official_body",
       "note": "Erhält im ersten Wahlgang keine Bewerberin oder kein Bewerber die absolute Mehrheit, findet frühestens zwei und spätestens vier Wochen später ein zweiter Wahlgang statt (§ 44a KomWG); gewählt ist, wer die höchste Stimmenzahl erhält. Der zweite Wahlgang ist keine Stichwahl unter den beiden Erstplatzierten."
+    },
+    "bw-sudwest": {
+      "title": "Entstehung des Südweststaats",
+      "publisher": "Landesregierung Baden-Württemberg (baden-wuerttemberg.de)",
+      "url": "https://www.baden-wuerttemberg.de/de/unser-land/geschichte/entstehung-des-suedweststaats",
+      "kind": "official_body",
+      "note": "Dates the Südweststaat vote of 9 December 1951 and the Baden vote of 7 June 1970."
+    },
+    "nla-nds-1975": {
+      "title": "Aus den Magazinen des Landesarchivs (Februar 2025)",
+      "publisher": "Niedersächsisches Landesarchiv",
+      "url": "https://nla.niedersachsen.de/startseite/landesgeschichte/aus_den_magazinen_des_landesarchivs/2025/aus-den-magazinen-des-landesarchivs-februar-2025-238584.html",
+      "kind": "official_body",
+      "note": "Dates the Oldenburg and Schaumburg-Lippe votes of 19 January 1975."
+    },
+    "bpb-1996": {
+      "title": "5. Mai 1996, Deutschland-Chronik bis 2000",
+      "publisher": "Bundeszentrale für politische Bildung",
+      "url": "https://www.bpb.de/themen/zeit-kulturgeschichte/deutschland-chronik/132377/5-mai-1996/",
+      "kind": "official_body",
+      "note": "Berlin–Brandenburg merger vote of 5 May 1996 failed in Brandenburg."
     }
   },
   "tiers": [
@@ -3293,7 +3314,31 @@
       "effort": 1
     },
     {
-      "dates": [],
+      "dates": [
+        {
+          "date": "1951-12-09",
+          "contests": 1,
+          "note": "Südweststaat vote on merging Baden, Württemberg-Baden, and Württemberg-Hohenzollern.",
+          "source": "bw-sudwest"
+        },
+        {
+          "date": "1970-06-07",
+          "contests": 1,
+          "note": "Baden vote on remaining in Baden-Württemberg.",
+          "source": "bw-sudwest"
+        },
+        {
+          "date": "1975-01-19",
+          "note": "Oldenburg, Schaumburg-Lippe, and Rhineland-Palatinate votes held on one day.",
+          "source": "nla-nds-1975"
+        },
+        {
+          "date": "1996-05-05",
+          "contests": 1,
+          "note": "Berlin–Brandenburg merger vote.",
+          "source": "bpb-1996"
+        }
+      ],
       "key": "neugliederung",
       "tier": "land",
       "name": "Volksabstimmungen zur Neugliederung des Bundesgebietes",
