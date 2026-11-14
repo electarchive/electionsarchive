@@ -26,6 +26,7 @@ import { baseLocale, getLocale } from "#lib/paraglide/runtime.js";
 import { side, UNAFFILIATED } from "#lib/party.js";
 import { os, remember } from "#lib/server/cache.js";
 import { roles } from "#lib/server/contrib.js";
+import adjacent from "#lib/server/county-neighbors.json";
 import counties from "#lib/server/county-traits.json";
 import { liveDb as db } from "#lib/server/db/index.js";
 import {
@@ -41,6 +42,7 @@ import { landing, NIGHT, rehearsal } from "#lib/server/rpc/rehearsal.js";
 import { Path } from "#lib/server/territory.js";
 
 const TRAITS: Record<string, Array<number>> = counties;
+const NEIGHBORS: Record<string, Array<string>> = adjacent;
 const STAMP_MS = 5000;
 const REFRESH_MS = 30_000;
 const LAPSE_MS = 3 * 60 * 60 * 1000;
@@ -1538,6 +1540,23 @@ async function night(
       return traits == null ? [] : [[row.id, traits] as const];
     }),
   );
+  const countyIds = new Map(
+    held.rows.flatMap((row) =>
+      row.scheme === "us.county" ? [[row.code, row.id] as const] : [],
+    ),
+  );
+  const neighborsOf = new Map(
+    held.rows.flatMap((row) => {
+      const ids =
+        row.scheme === "us.county"
+          ? (NEIGHBORS[row.code] ?? []).flatMap((code) => {
+              const id = countyIds.get(code);
+              return id == null ? [] : [id];
+            })
+          : [];
+      return ids.length === 0 ? [] : [[row.id, ids] as const];
+    }),
+  );
   const byContest = Map.groupBy(frames.rows, (row) => row.contest);
   const declinedBy = Map.groupBy(declined.rows, (row) => row.contest);
   const priorBy = Map.groupBy(prior.lines, (row) => row.contest);
@@ -1919,9 +1938,13 @@ async function night(
           ]
         : [],
     );
+    const position = new Map(grouped.map(([unit], index) => [unit, index]));
     const baseline = grouped.map(([unit, value]): LiveBaseline => {
       seen.add(unit);
       const traits = traitsOf.get(unit);
+      const neighbors = neighborsOf
+        .get(unit)
+        ?.flatMap((id) => position.get(id) ?? []);
       const channels = mixes.get(unit);
       const floor = floors.get(unit);
       return {
@@ -1936,6 +1959,7 @@ async function night(
           ),
         }),
         ...(traits != null && { traits }),
+        ...(neighbors != null && neighbors.length > 0 && { neighbors }),
         ...(channels != null && { channels }),
         ...(floor != null && { floor }),
       };
