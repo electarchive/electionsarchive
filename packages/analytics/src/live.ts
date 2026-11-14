@@ -228,6 +228,7 @@ const MODEL = {
     idle: 0.75,
     trickle: 0.01,
     follow: 0.5,
+    tailFollow: 0.6,
     rest: 0.5,
     fresh: 0.005,
     settle: 4,
@@ -2559,7 +2560,11 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
           ? modeled
           : !isLate || (recent - unit.margin) * (modeled - toward) > 0
             ? toward
-            : modeled + MODEL.late.follow * (toward - modeled);
+            : modeled +
+              (tailOf(race) > MODEL.tail.share
+                ? MODEL.late.tailFollow
+                : MODEL.late.follow) *
+                (toward - modeled);
       const lead = clamp(
         aimed + (shift * reach + mode * unread) * final + leaning * drift,
         -room,
