@@ -280,9 +280,12 @@ def artifact(manifest: Manifest, spec: Page) -> raw.Artifact:
 def render(manifest: Manifest, spec: Page, dpi: int) -> Image.Image:
     source = artifact(manifest, spec)
     if source.path.suffix == ".pdf":
+        each = "{page}" in spec.get("url", manifest["file"]["url"])
+        leaf = 1 if each else spec["page"]
         with tempfile.TemporaryDirectory() as folder:
             subprocess.run(
-                ["pdftoppm", "-r", str(dpi), "-gray", "-png", "-f", str(spec["page"]), "-l", str(spec["page"])]
+                ["pdftoppm", "-r", str(dpi), "-gray", "-png", "-f", str(leaf), "-l", str(leaf)]
+                + (["-cropbox"] if each else [])
                 + ["-singlefile", str(source.path), f"{folder}/p"],
                 check=True,
             )

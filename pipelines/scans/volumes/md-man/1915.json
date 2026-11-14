@@ -1,0 +1,20 @@
+{
+  "year": 1915,
+  "day": "1915",
+  "polity": "US-MD",
+  "publisher": "Maryland Secretary of State",
+  "title": "Maryland Manual 1915-16 (Archives of Maryland vol. 126), election returns (general election 1915)",
+  "license": "Public record",
+  "file": {
+    "url": "https://msa.maryland.gov/megafile/msa/speccol/sc2900/sc2908/000001/000126/pdf/am126--{page}.pdf",
+    "item": "https://msa.maryland.gov/megafile/msa/speccol/sc2900/sc2908/000001/000126/html/am126--249.html"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "governor": "Governor"
+  },
+  "leaves": [
+    249,
+    250
+  ]
+}

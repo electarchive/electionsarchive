@@ -1,0 +1,23 @@
+{
+  "year": 1914,
+  "day": "1914-11-03",
+  "polity": "US-MD",
+  "publisher": "Maryland Secretary of State",
+  "title": "Maryland Manual 1914-15 (Archives of Maryland vol. 125), election returns (general election 1914)",
+  "license": "Public record",
+  "file": {
+    "url": "https://msa.maryland.gov/megafile/msa/speccol/sc2900/sc2908/000001/000125/pdf/am125--{page}.pdf",
+    "item": "https://msa.maryland.gov/megafile/msa/speccol/sc2900/sc2908/000001/000125/html/am125--237.html"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "senate": "U.S. Senator",
+    "house": "U.S. Representative in Congress (Congressional Candidates, Sixty-third or Sixty-fourth Congress), one table per congressional district; district is the district number. A table for the Sixty-third Congress printed in a 1914 volume is a special election"
+  },
+  "leaves": [
+    237,
+    238,
+    239,
+    240
+  ]
+}

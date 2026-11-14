@@ -1,0 +1,55 @@
+{
+  "year": 1916,
+  "day": "1916-11-07",
+  "polity": "US-MD",
+  "publisher": "Maryland Secretary of State",
+  "title": "Maryland Manual 1916-17 (Archives of Maryland vol. 127), election returns (general election 1916)",
+  "license": "Public record",
+  "file": {
+    "url": "https://msa.maryland.gov/megafile/msa/speccol/sc2900/sc2908/000001/000127/pdf/am127--{page}.pdf",
+    "item": "https://msa.maryland.gov/megafile/msa/speccol/sc2900/sc2908/000001/000127/html/am127--258.html"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "senate": "U.S. Senator",
+    "house": "U.S. Representative in Congress (Congressional Candidates, Sixty-third or Sixty-fourth Congress), one table per congressional district; district is the district number. A table for the Sixty-third Congress printed in a 1914 volume is a special election",
+    "president": "Electors for President and Vice President: tables of county rows with one column per elector, one table per party; name is the elector's name and party the party printed over the electors"
+  },
+  "leaves": [
+    258,
+    259,
+    260,
+    262,
+    263,
+    264,
+    265,
+    266
+  ],
+  "slates": {
+    "democratic": {
+      "candidate": "Wilson",
+      "elector": 1,
+      "of": 8
+    },
+    "republican": {
+      "candidate": "Hughes",
+      "elector": 1,
+      "of": 8
+    },
+    "labor": {
+      "candidate": "Reimer",
+      "elector": 1,
+      "of": 8
+    },
+    "prohibition": {
+      "candidate": "Hanly",
+      "elector": 1,
+      "of": 8
+    },
+    "socialist": {
+      "candidate": "Benson",
+      "elector": 1,
+      "of": 8
+    }
+  }
+}
