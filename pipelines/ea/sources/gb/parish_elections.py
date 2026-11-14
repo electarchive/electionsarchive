@@ -2,6 +2,7 @@ import html
 import re
 import subprocess
 import sys
+import zipfile
 from datetime import UTC, date, datetime
 from pathlib import Path
 from uuid import UUID
@@ -278,6 +279,75 @@ COUNCILS["E06000059/2024-06"] = {
     "footnote": True,
     "reader": "notices+dorset",
 }
+WARRINGTON = "https://www.warrington.gov.uk"
+COUNCILS["E06000007/2024"] = {
+    "day": date(2024, 5, 2),
+    "publisher": "Warrington Borough Council",
+    "title": "Election results 2024: parish council election results, and the notice of uncontested election, parish councils, 2 May 2024",
+    "url": f"{WARRINGTON}/election-results-2024",
+    "pages": [f"{WARRINGTON}/election-results-2024"],
+    "files": [
+        f"{WARRINGTON}/sites/default/files/2024-04/Notice%20of%20uncontested%20election%20-%20Parish%20councils%20-%20Election%202%20May%202024.pdf"
+    ],
+    "polled": {
+        "Culcheth and Glazebury": ("Culcheth and Glazebury", "Glazebury & Mee Brow"),
+        "Poulton with Fearnhead - Longbarn and Fearnhead": ("Poulton with Fearnhead", "Longbarn & Fearnhead"),
+    },
+    "reader": "notices+warrington",
+}
+COUNCILS["E08000018/2024"] = {
+    "day": date(2024, 5, 2),
+    "publisher": "Rotherham Metropolitan Borough Council",
+    "title": "Parish Council Election Results: 2 May 2024, and the notices of uncontested election, parish councils",
+    "url": "https://www.rotherham.gov.uk/elections-voting/parish-council-election-result-3-may-2024",
+    "pages": [
+        "https://www.rotherham.gov.uk/elections-voting/parish-council-election-result-3-may-2024/2",
+        "https://www.rotherham.gov.uk/elections-voting/parish-council-election-result-3-may-2024/4",
+        "https://www.rotherham.gov.uk/elections-voting/parish-council-election-result-3-may-2024/5",
+        "https://www.rotherham.gov.uk/elections-voting/parish-council-election-result-3-may-2024/6",
+    ],
+    "documents": [
+        "https://www.rotherham.gov.uk/downloads/file/3572/aston-cum-aughton-west-ward-of-aston-cum-aughton-parish-council-notice-of-uncontested-election",
+        "https://www.rotherham.gov.uk/downloads/file/3573/firbeck-parish-council-notice-of-uncontested-election",
+        "https://www.rotherham.gov.uk/downloads/file/3574/hellaby-parish-council-notice-of-uncontested-election",
+        "https://www.rotherham.gov.uk/downloads/file/3575/harthill-with-woodall-parish-council-notice-of-uncontested-election",
+        "https://www.rotherham.gov.uk/downloads/file/3576/dalton-north-ward-of-dalton-parish-council-notice-of-uncontested-election",
+        "https://www.rotherham.gov.uk/downloads/file/3577/laughton-en-le-morthen-parish-council-notice-of-uncontested-election",
+        "https://www.rotherham.gov.uk/downloads/file/3578/dalton-east-ward-of-dalton-parish-council-notice-of-uncontested-election",
+        "https://www.rotherham.gov.uk/downloads/file/3579/dinnington-park-avenue-ward-of-dinnington-st-john-s-town-council-notice-of-uncontested-election",
+        "https://www.rotherham.gov.uk/downloads/file/3580/letwell-parish-council-notice-of-uncontested-election",
+        "https://www.rotherham.gov.uk/downloads/file/3581/thrybergh-south-ward-of-thrybergh-parish-council-notice-of-uncontested-election",
+        "https://www.rotherham.gov.uk/downloads/file/3582/bramley-south-ward-of-bramley-parish-council-notice-of-uncontested-election",
+        "https://www.rotherham.gov.uk/downloads/file/3583/wickersley-south-ward-of-wickersley-parish-council-notice-of-uncontested-election",
+        "https://www.rotherham.gov.uk/downloads/file/3584/kiveton-park-ward-of-wales-parish-council-notice-of-uncontested-election",
+        "https://www.rotherham.gov.uk/downloads/file/3585/treeton-parish-council-notice-of-uncontested-election",
+        "https://www.rotherham.gov.uk/downloads/file/3586/anston-south-ward-of-anston-parish-council-notice-of-uncontested-election",
+        "https://www.rotherham.gov.uk/downloads/file/3587/catcliffe-parish-council-notice-of-uncontested-election",
+        "https://www.rotherham.gov.uk/downloads/file/3588/thorpe-salvin-parish-council-notice-of-uncontested-election",
+        "https://www.rotherham.gov.uk/downloads/file/3589/orgreave-parish-council-notice-of-uncontested-election",
+        "https://www.rotherham.gov.uk/downloads/file/3590/aston-cum-aughton-south-ward-of-aston-cum-aughton-parish-council-notice-of-uncontested-election",
+        "https://www.rotherham.gov.uk/downloads/file/3591/thurcroft-north-ward-of-thurcroft-parish-council-notice-of-uncontested-election",
+        "https://www.rotherham.gov.uk/downloads/file/3592/bramley-west-ward-of-bramley-parish-council-notice-of-uncontested-election",
+        "https://www.rotherham.gov.uk/downloads/file/3593/thrybergh-north-ward-of-thrybergh-parish-council-notice-of-uncontested-election",
+        "https://www.rotherham.gov.uk/downloads/file/3594/todwick-parish-council-notice-of-uncontested-election",
+        "https://www.rotherham.gov.uk/downloads/file/3595/woodsetts-parish-council-notice-of-uncontested-election",
+        "https://www.rotherham.gov.uk/downloads/file/3596/wales-ward-of-wales-parish-council-notice-of-uncontested-election",
+        "https://www.rotherham.gov.uk/downloads/file/3597/anston-north-ward-of-anston-parish-council-notice-of-uncontested-election",
+        "https://www.rotherham.gov.uk/downloads/file/3598/bramley-north-ward-of-bramley-parish-council-notice-of-uncontested-election",
+        "https://www.rotherham.gov.uk/downloads/file/3599/maltby-west-ward-of-maltby-town-council-notice-of-uncontested-election",
+        "https://www.rotherham.gov.uk/downloads/file/3600/wickersley-north-ward-of-wickersley-parish-council-notice-of-uncontested-election",
+        "https://www.rotherham.gov.uk/downloads/file/3601/brampton-bierlow-parish-council-notice-of-uncontested-election",
+        "https://www.rotherham.gov.uk/downloads/file/3602/ravenfield-parish-council-notice-of-uncontested-election",
+        "https://www.rotherham.gov.uk/downloads/file/3603/waverley-community-council-notice-of-uncontested-election",
+        "https://www.rotherham.gov.uk/downloads/file/3604/thurcroft-south-ward-of-thurcroft-parish-council-notice-of-uncontested-election",
+        "https://www.rotherham.gov.uk/downloads/file/3605/dalton-south-ward-of-dalton-parish-council-notice-of-uncontested-election",
+        "https://www.rotherham.gov.uk/downloads/file/3606/aston-cum-aughton-north-ward-of-aston-cum-aughton-parish-council-notice-of-uncontested-election",
+        "https://www.rotherham.gov.uk/downloads/file/3607/whiston-parish-council-notice-of-uncontested-election",
+        "https://www.rotherham.gov.uk/downloads/file/3608/ulley-parish-council-notice-of-uncontested-election",
+    ],
+    "reader": "rotherham",
+}
+DOCX = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
 POST_NOMINALS = re.compile(r"^(?:[A-Z]{2,5}\.\s+)+")
 BROWSER = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36"
 PARTIES: dict[str, str | None] = {
@@ -305,6 +375,7 @@ ALIASES = {
     ("E06000052", "St Dominic"): "St. Dominick",
     ("E06000052", "St Michael Penkivel"): "St. Michael Penkevil",
     ("E06000059", "Iwerne Courtney"): "Iwerne Courtney or Shroton",
+    ("E08000018", "Anston"): "North and South Anston",
     ("E06000059", "Winfrith Newburgh and East Knighton"): "Winfrith Newburgh",
 }
 GROUPED = {
@@ -343,16 +414,18 @@ def store(council: dict, url: str) -> None:
         pass
     response = httpx.get(url, headers={"User-Agent": BROWSER}, timeout=120, follow_redirects=True)
     response.raise_for_status()
-    pdf = url not in council.get("pages", [])
-    if pdf != response.content.startswith(b"%PDF"):
-        raise ValueError(f"{url} is not the expected {'PDF' if pdf else 'page'}")
+    kind = "page" if url in council.get("pages", []) else "docx" if url in council.get("documents", []) else "pdf"
+    if (kind == "pdf") != response.content.startswith(b"%PDF") or (kind == "docx") != response.content.startswith(
+        b"PK"
+    ):
+        raise ValueError(f"{url} is not the expected {kind}")
     raw.store(
         SOURCE,
         url,
         response.content,
-        suffix=".pdf" if pdf else ".html",
+        suffix={"page": ".html", "docx": ".docx", "pdf": ".pdf"}[kind],
         retrieved_at=datetime.now(UTC),
-        media_type="application/pdf" if pdf else "text/html",
+        media_type={"page": "text/html", "docx": DOCX, "pdf": "application/pdf"}[kind],
     )
 
 
@@ -361,7 +434,12 @@ def fetch() -> None:
         for url in council.get("pages", []):
             store(council, url)
         link(council)
-        for url in council.get("files", []) + council.get("polls", []) + council.get("summary", []):
+        for url in [
+            *council.get("files", []),
+            *council.get("polls", []),
+            *council.get("summary", []),
+            *council.get("documents", []),
+        ]:
             store(council, url)
         if "inbox" not in council:
             continue
@@ -823,6 +901,168 @@ def dorset(lad: str, council: dict) -> list[dict]:
     return reads
 
 
+def warrington(lad: str, council: dict) -> list[dict]:
+    url = council["pages"][0]
+    page = Path(raw.cached(SOURCE, url).path).read_text(encoding="utf-8")
+    section = page.split("<h2>Parish council election results</h2>")[1].split("Police and Crime Commissioner")[0]
+    reads = []
+    for heading, body in re.findall(r"<h3>(.*?)</h3>(.*?)(?=<h3>|$)", section, re.DOTALL):
+        area = re.fullmatch(r"(.+?) (?:Parish|Town) Council(?: - (.+?))? \(tu?r?nout [\d.]+%\)", text(heading))
+        if area is None:
+            raise ValueError(f"{url}: cannot read {text(heading)}")
+        printed = f"{area.group(1)} - {area.group(2)}" if area.group(2) else area.group(1)
+        parish, ward = council["polled"].get(printed, (area.group(1), area.group(2)))
+        candidates = []
+        lots = []
+        for line in re.findall(r"<p>(.*?)</p>", body, re.DOTALL):
+            found = re.fullmatch(
+                r"(.+?)(?:, (.+?))? - ([\d,]+)(?: votes)?( \(elected(?: - via drawn lot)?\))?", text(line)
+            )
+            if found is None:
+                raise ValueError(f"{url}: cannot read {text(line)}")
+            if found.group(4) and "lot" in found.group(4):
+                lots.append(found.group(1))
+            candidates.append(
+                {
+                    "printed": found.group(1),
+                    "name": found.group(1),
+                    "description": found.group(2) or "",
+                    "votes": count(found.group(3)),
+                    "elected": found.group(4) is not None,
+                }
+            )
+        reads.append(
+            {
+                "lad": lad,
+                "url": url,
+                "page": None,
+                "style": None,
+                "parish": parish,
+                "ward": ward,
+                "places": sum(1 for candidate in candidates if candidate["elected"]),
+                "electorate": None,
+                "ballots": None,
+                "rejected": None,
+                "total": None,
+                "remark": f"{' and '.join(lots)} elected after drawing lots." if lots else None,
+                "candidates": candidates,
+            }
+        )
+    return reads
+
+
+def rotherham_area(heading: str) -> tuple[str, str | None]:
+    heading = re.sub(r" on Thursday .+$", "", " ".join(heading.replace("`", "'").split()))
+    found = re.fullmatch(r"(?:(.+?) Ward of )?(.+?) (?:Town Parish|Parish|Town|Community) Council", heading)
+    if found is None:
+        raise ValueError(f"cannot read {heading}")
+    return found.group(2), found.group(1)
+
+
+def rotherham(lad: str, council: dict) -> list[dict]:
+    reads = []
+    for url in council["documents"]:
+        document = zipfile.ZipFile(raw.cached(SOURCE, url).path).read("word/document.xml").decode()
+
+        def paragraphs(xml: str) -> list[str]:
+            found = (
+                html.unescape("".join(re.findall(r"<w:t(?: [^>]*)?>([^<]*)</w:t>", part)))
+                for part in re.findall(r"<w:p[ >].*?</w:p>", xml, re.DOTALL)
+            )
+            return [" ".join(line.split()) for line in found if line.strip()]
+
+        declaration = next(line for line in paragraphs(document) if line.startswith("I, "))
+        if "no candidates were nominated" in declaration:
+            continue
+        area = re.search(r"duly elected (?:a )?(?:Parish )?Councillors? (?:for|to) (.+?)\.?$", declaration)
+        if area is None:
+            raise ValueError(f"{url}: cannot read {declaration}")
+        parish, ward = rotherham_area(area.group(1))
+        candidates = []
+        for row in re.findall(r"<w:tr[ >].*?</w:tr>", document, re.DOTALL)[1:]:
+            cells = [paragraphs(cell) for cell in re.findall(r"<w:tc>.*?</w:tc>", row, re.DOTALL)]
+            if len(cells[0]) != 2:
+                raise ValueError(f"{url}: cannot read {cells[0]}")
+            surname, forenames = cells[0]
+            candidates.append(
+                {
+                    "printed": f"{surname}, {forenames}",
+                    "name": f"{forenames} {display(surname)}",
+                    "description": " ".join(cells[2]),
+                    "votes": None,
+                    "elected": True,
+                }
+            )
+        reads.append(
+            {
+                "lad": lad,
+                "url": url,
+                "page": None,
+                "style": None,
+                "parish": parish,
+                "ward": ward,
+                "places": None,
+                "electorate": None,
+                "ballots": None,
+                "rejected": None,
+                "total": None,
+                "remark": None,
+                "candidates": candidates,
+            }
+        )
+    for url in council["pages"]:
+        page = Path(raw.cached(SOURCE, url).path).read_text(encoding="utf-8")
+        heading = re.search(r"Election of a Borough Councillor for(.+?) on Thursday", text(page))
+        table = re.search(r"<tbody>(.*?)</tbody>", page, re.DOTALL)
+        if heading is None or table is None:
+            raise ValueError(f"{url}: no result")
+        parish, ward = rotherham_area(heading.group(1))
+        body = text(page)
+        declared = re.search(r"And I do hereby declare that (.+?) are duly elected", body)
+        figures = re.search(
+            r"Total (\d+) Vacant Seats: (\d+) Electorate: ([\d,]+) Ballot Papers Issued: ([\d,]+)", body
+        )
+        if declared is None or figures is None:
+            raise ValueError(f"{url}: no declaration")
+        elected = {fold(name.replace("\u2019", "'")) for name in re.split(r", | and ", declared.group(1))}
+        candidates = []
+        for row in re.findall(r"<tr>(.*?)</tr>", table.group(1), re.DOTALL):
+            cells = [text(cell).replace("`", "'") for cell in re.findall(r"<td[^>]*>(.*?)</td>", row, re.DOTALL)]
+            printed, _, known = cells[0].partition(" commonly known as ")
+            name = surname_first(printed)
+            candidates.append(
+                {
+                    "printed": f"{printed} commonly known as {known}" if known else printed,
+                    "name": surname_first(known) if known else name,
+                    "description": cells[1],
+                    "votes": count(cells[2]),
+                    "elected": fold(name) in elected,
+                }
+            )
+        if sum(1 for candidate in candidates if candidate["elected"]) != len(elected) or len(elected) != int(
+            figures.group(2)
+        ):
+            raise ValueError(f"{url}: elected names do not match")
+        reads.append(
+            {
+                "lad": lad,
+                "url": url,
+                "page": None,
+                "style": None,
+                "parish": parish,
+                "ward": ward,
+                "places": int(figures.group(2)),
+                "electorate": count(figures.group(3)),
+                "ballots": count(figures.group(4)),
+                "rejected": int(figures.group(1)),
+                "total": None,
+                "remark": None,
+                "candidates": candidates,
+            }
+        )
+    return reads
+
+
 def person(printed: str, order: str) -> str:
     if order == "comma":
         return surname_first(printed)
@@ -1166,6 +1406,8 @@ READERS = {
     "colchester": colchester,
     "colchester_poll": colchester_poll,
     "dorset": dorset,
+    "warrington": warrington,
+    "rotherham": rotherham,
 }
 
 
