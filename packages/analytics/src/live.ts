@@ -398,6 +398,7 @@ type Unit = {
   sigma: number;
   hasBaseline: boolean;
   night: Array<number> | null;
+  since: Array<number> | null;
   paced: number | null;
   pacedLead: number | null;
   before: number | null;
@@ -628,7 +629,14 @@ function units(
   const earliers = new Map<string, number>();
   const rates = new Map<string, number>();
   const leads = new Map<string, number>();
+  const sinces = new Map<string, Array<number>>();
   const [a, b] = pair(race, latest);
+  if (cutoff != null && clock > cutoff && start <= cutoff) {
+    for (const [id, list] of byUnit) {
+      const then = list.findLast((count) => Date.parse(count.at) <= start);
+      sinces.set(id, then?.votes ?? []);
+    }
+  }
   if (cutoff != null && start > cutoff) {
     const seen = race.frames
       .map((frame) => Date.parse(frame.at))
@@ -783,6 +791,7 @@ function units(
       sigma: MODEL.spread,
       hasBaseline: base != null && base.turnout > 0,
       night: nights.get(id) ?? null,
+      since: sinces.get(id) ?? null,
       paced: paces.get(id) ?? null,
       pacedLead: leads.get(id) ?? null,
       before: befores.get(id) ?? null,
@@ -2284,22 +2293,33 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
           : tilt + own.shift + Math.sqrt(own.variance) * gaussian(random);
       const expect = (learned?.mean ?? 0) + own.shift;
       const leaning = learned != null && unit.paced == null ? remaining : 0;
-      const fresh = unit.total - (unit.paced ?? unit.total);
+      const modeled = margin * final - countedLead;
+      const anchor =
+        unit.pacedLead != null
+          ? { total: unit.paced ?? unit.total, lead: unit.pacedLead }
+          : unit.since == null
+            ? null
+            : {
+                total: sum(unit.since),
+                lead: (unit.since[a] ?? 0) - (unit.since[b] ?? 0),
+              };
+      const fresh = anchor == null ? 0 : unit.total - anchor.total;
       const recent =
         isLate &&
         unit.channel === 0 &&
-        unit.pacedLead != null &&
+        anchor != null &&
         fresh > MODEL.late.fresh * unit.total
-          ? (countedLead - unit.pacedLead) / fresh
+          ? (countedLead - anchor.lead) / fresh
           : null;
-      const modeled = margin * final - countedLead;
       const toward = remaining * (recent ?? 0);
       const aimed =
         recent == null
           ? modeled
           : (recent - unit.margin) * (modeled - toward) > 0
             ? toward
-            : modeled + MODEL.late.follow * (toward - modeled);
+            : unit.pacedLead == null
+              ? modeled
+              : modeled + MODEL.late.follow * (toward - modeled);
       const lead = clamp(
         aimed +
           (shift * reach + mode * (1 - fraction)) * final +
