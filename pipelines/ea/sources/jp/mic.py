@@ -1,9 +1,11 @@
 import re
 import subprocess
 import unicodedata
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import date
 from decimal import Decimal
+from itertools import pairwise
 from pathlib import Path
 from uuid import UUID
 
@@ -31,6 +33,7 @@ ELECTIONS = {
 ANCHOR = re.compile(r'<a [^>]*href="([^"]+)"[^>]*>(.*?)</a>', re.DOTALL)
 SEATS_LABEL = "党派別議席配分表（比例代表）"
 WINNERS_LABEL = "候補者別得票数（小選挙区）"
+ELECTED_LABEL = "党派別当選人数（比例代表）"
 
 
 def page(url: str) -> str:
@@ -64,6 +67,7 @@ class Listing:
     pr: list[tuple[str, str]]
     seats: str
     winners: str
+    elected: str
 
 
 def listing(number: int) -> Listing:
@@ -85,7 +89,8 @@ def listing(number: int) -> Listing:
             (pr if label.endswith("選挙区") else smd).append((label, url))
     seats = next(url for url, label in links if SEATS_LABEL in label)
     winners = next(url for url, label in links if WINNERS_LABEL in label)
-    return Listing(index, towns, [url for url, _ in subpages], smd, pr, seats, winners)
+    elected = next(url for url, label in links if ELECTED_LABEL in label)
+    return Listing(index, towns, [url for url, _ in subpages], smd, pr, seats, winners, elected)
 
 
 def fetch() -> None:
@@ -96,7 +101,7 @@ def fetch() -> None:
             if re.search(r"shikuchouson_\d+\.html$", url):
                 raw.fetch(SOURCE, url, suffix=".html")
         found = listing(number)
-        for url in [*(url for _, url in found.smd + found.pr), found.seats, found.winners]:
+        for url in [*(url for _, url in found.smd + found.pr), found.seats, found.winners, found.elected]:
             raw.fetch(SOURCE, url, suffix=suffix(url))
 
 
@@ -117,6 +122,15 @@ PARTIAL_PR = {
 }
 RENAMED = {("2021-10-31", "NHK党"): "NHKと裁判してる党弁護士法72条違反で"}
 SWAPPED = {("2017-10-22", "滋賀県", 3): (0, 2, 1)}
+LISTED = {
+    ("2012-12-16", "北関東", "小高 真由美"): "小高 まゆみ",
+    ("2012-12-16", "南関東", "河野 敏久"): "かわの としひさ",
+    ("2012-12-16", "東京都", "杉村 康之"): "すぎむら やすゆき",
+    ("2012-12-16", "東海", "井桁 亮"): "いげた まこと",
+    ("2012-12-16", "近畿", "三橋 真記"): "みはし まき",
+    ("2021-10-31", "東京都", ""): "辻 清人",
+    ("2021-10-31", "中国", "やじま 秀平"): "矢島 秀平",
+}
 ALIASES = {
     ("2017-10-22", "群馬県", 4, "福田 たつお"): "福田 達夫",
     ("2017-10-22", "岐阜県", 1, "浅井 里江"): "吉田 りえ",
@@ -263,6 +277,7 @@ def parse() -> None:
     smd_votes: list[dict] = []
     pr_votes: list[dict] = []
     seats: list[dict] = []
+    lists: list[dict] = []
     for number, held in ELECTIONS.items():
         found = listing(number)
         text = book_text(found.winners)
@@ -302,6 +317,43 @@ def parse() -> None:
                     )
                 votes = votes or block_votes.get((block, party), Decimal(0))
                 seats.append({"held": held, "block": block, "party": party, "votes": str(votes), "seats": won})
+        path = raw.cached(SOURCE, found.elected).path
+        books = (
+            list_pages(path)
+            if path.suffix == ".pdf"
+            else [x for sheet in sheets(path) for x in list_sheet(grid(path, sheet))]
+        )
+        won = {(row["block"], row["party"]): row["seats"] for row in seats if row["held"] == held}
+        stood = [row for row in candidates if row["held"] == held]
+        shares = ratios(stood)
+        merged: dict[tuple[str, str], list[Member]] = {}
+        for block, party, members in books:
+            merged.setdefault((block, RENAMED.get((held, party), party)), []).extend(members)
+        for (block, party), members in merged.items():
+            ranks = sorted(member[2] for member in members if member[2])
+            if (block, party) not in won or ranks != list(range(1, won[block, party] + 1)):
+                raise ValueError(f"{held} {block} {party}: elected ranks {ranks}, declared {won.get((block, party))}")
+            members = [(m[0], LISTED.get((held, block, m[1]), m[1]), *m[2:]) for m in members]
+            pool = [row for row in stood if BLOCK_OF[row["prefecture"]] == block]
+            rows = dual_rows(members, pool, party, shares)
+            for index, (position, name, rank, smd, _) in enumerate(members):
+                if smd and index not in rows:
+                    raise ValueError(f"{held} {block} {party} {name}: no district row")
+                row = rows.get(index)
+                if not (row or name):
+                    raise ValueError(f"{held} {block} {party}: list position {position} has no name")
+                lists.append(
+                    {
+                        "held": held,
+                        "block": block,
+                        "party": party,
+                        "position": position,
+                        "name": row["name"] if row else name,
+                        "rank": rank,
+                        "prefecture": row["prefecture"] if row else None,
+                        "district": row["district"] if row else None,
+                    }
+                )
         listed = {(block, party) for block, party in block_votes}
         if missing := {(row["block"], row["party"]) for row in seats if row["held"] == held} - listed:
             raise ValueError(f"{held}: allocation parties not in the vote tables: {missing}")
@@ -310,6 +362,7 @@ def parse() -> None:
     pl.DataFrame(smd_votes).write_parquet(PARSED / f"smd-v{VERSION}.parquet")
     pl.DataFrame(pr_votes).write_parquet(PARSED / f"pr-v{VERSION}.parquet")
     pl.DataFrame(seats).write_parquet(PARSED / f"seats-v{VERSION}.parquet")
+    pl.DataFrame(lists).write_parquet(PARSED / f"lists-v{VERSION}.parquet")
 
 
 def book_text(url: str) -> str:
@@ -385,6 +438,133 @@ def allocation(url: str) -> dict[str, dict[str, tuple[Decimal, int]]]:
                         votes = amount(row[quotient])
                     blocks[block][party] = (votes, seats + (1 if row[rank] else 0))
     return blocks
+
+
+Member = tuple[int, str, int | None, str | None, str | None]
+
+
+def ratios(rows: list[dict]) -> dict[int, set[str]]:
+    best: dict[tuple[str, int], Decimal] = {}
+    for row in rows:
+        place = (row["prefecture"], row["district"])
+        best[place] = max(best.get(place, Decimal(0)), Decimal(row["votes"]))
+    found = {}
+    for row in rows:
+        share = Decimal(row["votes"]) * 100 / best[row["prefecture"], row["district"]]
+        found[id(row)] = {
+            f"{share:.3f}",
+            f"{share.quantize(Decimal('0.001'), rounding='ROUND_DOWN')}",
+        }
+    return found
+
+
+def dual_rows(members: list[Member], pool: list[dict], party: str, shares: dict) -> dict[int, dict]:
+    found: dict[int, dict] = {}
+    free = list(pool)
+
+    def settle(test: Callable[[Member, dict], bool]) -> None:
+        for index, member in enumerate(members):
+            if member[3] and index not in found:
+                hits = [row for row in free if row["result"] == member[3] and test(member, row)]
+                if len(hits) == 1:
+                    found[index] = hits[0]
+                    free.remove(hits[0])
+
+    def ours(row: dict) -> bool:
+        return party_name(row["party"]) == party
+
+    def overlap(member: Member, row: dict) -> bool:
+        return len(set(plain(member[1])) & set(plain(row["name"]))) * 2 >= len(set(plain(member[1]))) > 0
+
+    settle(lambda member, row: plain(row["name"]) == plain(member[1]))
+    settle(lambda member, row: member[3] == "落" and ours(row) and member[4] in shares[id(row)])
+    settle(lambda member, row: ours(row) and overlap(member, row))
+    return found
+
+
+def list_sheet(rows: list[list[str]]) -> list[tuple[str, str, list[Member]]]:
+    found: list[tuple[str, str, list[Member]]] = []
+    block = ""
+    columns: list[tuple[int, list[Member]]] = []
+    layout: dict[int, tuple[int, int]] = {}
+    for row in rows:
+        if match := re.match(r"^(.+?)選挙区$", row[0]):
+            block = match[1]
+        elif "政党等名" in row:
+            columns = []
+            for j, cell in enumerate(row):
+                if cell == "政党等名":
+                    members: list[Member] = []
+                    party = party_name(next(text for text in row[j + 1 :] if text))
+                    found.append((block, party, members))
+                    columns.append((j, members))
+        elif "名簿" in row:
+            layout = {j: (row.index("順位", j), row.index("小選挙区", j)) for j, _ in columns}
+        elif layout:
+            for j, members in columns:
+                if row[j].isdigit():
+                    rank, smd = layout[j]
+                    members.append(
+                        (
+                            int(row[j]),
+                            person_name(row[j + 1]),
+                            int(row[rank]) if row[rank] else None,
+                            row[smd] or None,
+                            row[smd + 1] or None,
+                        )
+                    )
+    return found
+
+
+def list_pages(path: Path) -> list[tuple[str, str, list[Member]]]:
+    tsv = subprocess.run(["pdftotext", "-tsv", str(path), "-"], check=True, capture_output=True, text=True).stdout
+    pages: dict[str, list[tuple[float, float, float, str]]] = {}
+    for line in tsv.splitlines()[1:]:
+        cells = line.split("\t")
+        if cells[0] == "5" and cells[11].strip():
+            word = unicodedata.normalize("NFKC", cells[11]).strip()
+            pages.setdefault(cells[1], []).append((float(cells[6]), float(cells[7]), float(cells[8]), word))
+    found: list[tuple[str, str, list[Member]]] = []
+    for words in pages.values():
+        block = next(match[1] for *_, word in words if (match := re.match(r"^(.+?)選挙区$", word)))
+        heads = sorted((x, y, w) for x, y, w, word in words if word == "名簿")
+        end = min((y for _, y, _, word in words if word.startswith(("(注)", "※"))), default=float("inf"))
+        for index, (x0, header, width) in enumerate(heads):
+            x1 = heads[index + 1][0] - 3 if index + 1 < len(heads) else float("inf")
+            column = sorted(((y, x, w, word) for x, y, w, word in words if x0 - 3 <= x < x1), key=lambda item: item[:2])
+            labels = [item for item in column if item[3] == "名" and item[0] < header - 5]
+            if not labels:
+                continue
+            label = min(labels)
+            rank_x = next(x for y, x, _, word in column if word == "順位" and abs(y - header) < 3)
+            smd_x = next(x for y, x, _, word in column if word == "小選挙区" and abs(y - header) < 3)
+            votes = min(y for _, y, _, word in words if "得" in word and label[0] < y < header)
+            party = party_name(
+                "".join(word for y, x, _, word in column if label[0] - 2 <= y < votes - 2 and x > label[1] + label[2])
+            )
+            lines: list[list[tuple[float, float, str]]] = []
+            last = -10.0
+            for y, x, w, word in column:
+                if header + 4 < y < end - 2:
+                    if y - last > 3:
+                        lines.append([])
+                        last = y
+                    lines[-1].append((x, w, word))
+            members: list[Member] = []
+            for line in lines:
+                line.sort()
+                if not line[0][2].isdigit() or line[0][0] > x0 + width:
+                    raise ValueError(f"{path.name} {block} {party}: no list number in {line}")
+                glyphs = [item for item in line[1:] if item[0] < smd_x - 2 and not item[2].isdigit()]
+                name = glyphs[0][2] if glyphs else ""
+                for (x, w, _), (after, _, word) in pairwise(glyphs):
+                    name += (" " if after - x - w > 10 else "") + word
+                rank = next((int(word) for x, _, word in line if rank_x - 2 <= x < smd_x - 2 and word.isdigit()), None)
+                smd = next((word for x, _, word in line if x >= smd_x - 2 and word in {"当", "落"}), None)
+                ratio = next((word for x, _, word in line if x >= smd_x - 2 and word not in {"当", "落"}), None)
+                members.append((int(line[0][2]), name, rank, smd, ratio))
+            found.append((block, party, members))
+    return found
 
 
 FIXES = {
@@ -556,7 +736,9 @@ SMD_METHOD = (
 )
 PR_BLOCK_METHOD = (
     "Party list votes and seats for the block from the ministry's seat allocation table (党派別議席配分表) in the "
-    "結果調 book."
+    "結果調 book. List members, their list ranks (名簿順位), and the members elected come from its table of "
+    "winners by party (党派別当選人数). Dual candidates are matched to their district candidacy by name, or by "
+    "their 惜敗率 where the list prints the name differently, and carry their district ballot name."
 )
 PR_PLACE_METHOD = (
     "Party list votes by counting district from the ministry's tables by municipality. The counting districts add "
@@ -594,6 +776,7 @@ def emit() -> Path:
     smd = pl.read_parquet(PARSED / f"smd-v{VERSION}.parquet")
     pr = pl.read_parquet(PARSED / f"pr-v{VERSION}.parquet")
     seats = pl.read_parquet(PARSED / f"seats-v{VERSION}.parquet")
+    lists = pl.read_parquet(PARSED / f"lists-v{VERSION}.parquet")
     codes = {native: f"{number:02d}" for number, (native, _) in enumerate(PREFECTURES, 1)}
     english = {native: name for native, name in PREFECTURES}
     blocks = {native: (f"{number:02d}", name) for number, (native, name, _) in enumerate(BLOCKS, 1)}
@@ -604,7 +787,7 @@ def emit() -> Path:
             version=VERSION,
             summary="Japan's House of Representatives general elections 2009-2026 from the Ministry of Internal "
             "Affairs and Communications: district candidates and party lists by counting district, with declared "
-            "winners and block seats",
+            "winners, block seats, list members, and the list members elected",
             polity="JP",
         )
 
@@ -680,7 +863,7 @@ def emit() -> Path:
         for number, held in ELECTIONS.items():
             day = date.fromisoformat(held)
             found = listing(number)
-            for url in [found.index, found.towns, *found.subpages, found.seats, found.winners]:
+            for url in [found.index, found.towns, *found.subpages, found.seats, found.winners, found.elected]:
                 cs.artifact(raw.cached(SOURCE, url), source)
             for _, url in found.smd + found.pr:
                 cs.artifact(raw.cached(SOURCE, url), source)
@@ -863,6 +1046,34 @@ def emit() -> Path:
                     values.append((block_set, block_unit, option, Decimal(row["votes"])))
                     if row["seats"]:
                         cs.add("outcome", result_set_id=block_set, option_id=option, kind="won", seats=row["seats"])
+                for row in lists.filter((pl.col("held") == held) & (pl.col("block") == block)).iter_rows(named=True):
+                    member = party(row["party"], held)
+                    home = codes[row["prefecture"]] if row["prefecture"] else f"pr{block_code}"
+                    person = cs.key(f"{SOURCE}.person", f"{home}:{plain(row['name'])}")
+                    if person in cs.minted and person not in added:
+                        added.add(person)
+                        cs.add("person", id=person)
+                        name(person, row["name"], "ja")
+                    candidacy = cs.key(f"{SOURCE}.candidacy", f"{key}:{row['party']}:{plain(row['name'])}")
+                    cs.add(
+                        "candidacy",
+                        id=candidacy,
+                        person_id=person,
+                        option_id=options[row["party"]],
+                        role="list_member",
+                        list_position=row["position"],
+                        ballot_name=row["name"],
+                        member_of_party_id=member,
+                        is_independent=member is None,
+                    )
+                    if row["rank"]:
+                        cs.add(
+                            "outcome",
+                            result_set_id=block_set,
+                            option_id=options[row["party"]],
+                            candidacy_id=candidacy,
+                            kind="elected",
+                        )
                 previous = None
                 for row in local.iter_rows(named=True):
                     place, previous = place_unit(row["prefecture"], row["place"], previous)
