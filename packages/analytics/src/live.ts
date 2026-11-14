@@ -197,13 +197,13 @@ const MODEL = {
     baseGrace: 7,
     baseLife: 6,
     window: 2,
-    carry: 0.6,
+    carry: 0.8,
     half: 0.75,
     amount: 1.2,
     small: 0.03,
     weigh: 1,
     span: 1,
-    reach: 5,
+    reach: 6,
     lull: 0.5,
     stir: 0.01,
     spill: 0.3,
@@ -212,6 +212,8 @@ const MODEL = {
     hush: 0.02,
     idle: 0.75,
     trickle: 0.01,
+    soak: 0.5,
+    fresh: 0.5,
   },
   reported: { common: 0.9, own: 0.3, capped: 0.99 },
   channel: { turnout: 0.35, prior: 0.08, sigma: 1.5, unlisted: 0.02 },
@@ -315,6 +317,8 @@ function split(race: LiveRace, at: string | null) {
 
 const HOLDS: Record<string, number> = { ga: 0.002 };
 
+const CANVASS: Record<string, number> = { pa: 0.005 };
+
 const NIGHTS: Record<string, number> = { ga: 0.0075 };
 
 const STILLS: Record<string, string> = { ga: "2021-03-25", wi: "2012-01-01" };
@@ -363,6 +367,7 @@ type Unit = {
   before: number | null;
   earlier: number | null;
   step: number;
+  lag: { at: number; step: number; growth: number; pace: number } | null;
   reported: { share: number; total: number } | null;
   county: string;
   channel: number;
@@ -585,36 +590,64 @@ function units(
   const paces = new Map<string, number>();
   const befores = new Map<string, number>();
   const earliers = new Map<string, number>();
+  const lags = new Map<string, NonNullable<Unit["lag"]>>();
   if (cutoff != null && start > cutoff) {
     const seen = race.frames
       .map((frame) => Date.parse(frame.at))
       .filter((time) => time <= clock)
       .toSorted((x, y) => x - y);
-    for (const [id, list] of byUnit) {
-      const value = (time: number) => {
-        let then: LiveUnitCount | null = null;
-        for (const count of list) {
-          if (
-            Date.parse(count.at) <= time &&
-            (then == null || count.at > then.at)
-          ) {
-            then = count;
+    const day = MODEL.late.span * 86_400_000;
+    const value = (lists: Array<Array<LiveUnitCount>>, time: number) =>
+      sum(
+        lists.map((list) => {
+          let then: LiveUnitCount | null = null;
+          for (const count of list) {
+            if (
+              Date.parse(count.at) <= time &&
+              (then == null || count.at > then.at)
+            ) {
+              then = count;
+            }
           }
-        }
-        return then == null ? 0 : sum(then.votes);
-      };
-      const point = (time: number) => {
-        const low = seen.findLast((frame) => frame <= time);
-        const high = seen.find((frame) => frame > time) ?? clock;
-        if (low == null || high <= low) {
-          return value(time);
-        }
-        const from = value(low);
-        return from + ((value(high) - from) * (time - low)) / (high - low);
-      };
-      paces.set(id, point(start));
-      befores.set(id, point(start - MODEL.late.span * 86_400_000));
-      earliers.set(id, point(start - 2 * MODEL.late.span * 86_400_000));
+          return then == null ? 0 : sum(then.votes);
+        }),
+      );
+    const point = (lists: Array<Array<LiveUnitCount>>, time: number) => {
+      const low = seen.findLast((frame) => frame <= time);
+      const high = seen.find((frame) => frame > time) ?? clock;
+      if (low == null || high <= low) {
+        return value(lists, time);
+      }
+      const from = value(lists, low);
+      return from + ((value(lists, high) - from) * (time - low)) / (high - low);
+    };
+    const groups = new Map<string, Array<string>>();
+    for (const [id, list] of byUnit) {
+      paces.set(id, point([list], start));
+      befores.set(id, point([list], start - day));
+      earliers.set(id, point([list], start - 2 * day));
+      const cut = id.lastIndexOf(STREAM);
+      const county = cut === -1 ? id : id.slice(0, cut);
+      groups.set(county, [...(groups.get(county) ?? []), id]);
+    }
+    for (const [county, ids] of groups) {
+      const lists = ids.map((id) => byUnit.get(id)!);
+      const pre =
+        Math.max(...ids.map((id) => Date.parse(changed.get(id) ?? now))) - 1;
+      if (pre - day > cutoff) {
+        const then = value(lists, pre);
+        const back = point(lists, pre - day);
+        const prior = point(lists, pre - 2 * day);
+        lags.set(county, {
+          at: pre,
+          step: Math.max(0, value(lists, clock) - then),
+          growth: Math.max(0, then - back),
+          pace: Math.max(
+            0,
+            Math.min(back - prior, prior - point(lists, pre - 3 * day)),
+          ),
+        });
+      }
     }
   }
   const [a, b] = pair(race, latest);
@@ -693,6 +726,7 @@ function units(
       before: befores.get(id) ?? null,
       earlier: earliers.get(id) ?? null,
       step: stepped.get(id) ?? total,
+      lag: lags.get(county) ?? null,
       reported: reported.get(id) ?? null,
       floor: 0,
     });
@@ -1324,6 +1358,10 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
             (latest - onNight),
         ) / latest
       : 0;
+  const canvass = isLate
+    ? (CANVASS[race.state] ?? 0) *
+      Math.exp(-Math.max(0, days - MODEL.late.baseGrace) / MODEL.late.baseLife)
+    : 0;
   const planned = Math.max(
     Math.min(
       tail *
@@ -1334,7 +1372,7 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
         ? Infinity
         : Math.max(0, tail * onNight - (latest - onNight)) / latest,
     ),
-    held,
+    held + canvass,
   );
   const complete =
     isLate &&
@@ -1770,7 +1808,7 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
           const free = finals[index];
           const growth = unit.total - unit.paced;
           const steady = Math.min(growth, priorPace(unit));
-          finals[index] = Math.min(
+          const capped = Math.min(
             finals[index],
             Math.max(
               unit.total,
@@ -1782,9 +1820,32 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
                   (steady + (1 - drained) * sustained * (growth - steady)),
             ),
           );
+          if (unit.lag != null) {
+            const before = Math.min(unit.lag.growth, unit.lag.pace);
+            const ahead =
+              MODEL.late.reach *
+                closed *
+                fade *
+                (before +
+                  (1 - drained) * sustained * (unit.lag.growth - before)) -
+              unit.lag.step;
+            const grown = capped - unit.total;
+            finals[index] = Math.max(
+              unit.total,
+              Math.min(unit.floor, capped),
+              capped -
+                MODEL.late.soak *
+                  0.5 **
+                    ((Date.parse(stamp) - unit.lag.at) /
+                      (MODEL.late.fresh * 86_400_000)) *
+                  Math.max(0, grown - Math.max(0, ahead)),
+            );
+          } else {
+            finals[index] = capped;
+          }
           const { spill, scatter } = MODEL.late;
           spills[index] =
-            Math.max(0, free - finals[index]) *
+            Math.max(0, free - capped) *
             spill *
             closed *
             settles *
