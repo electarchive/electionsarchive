@@ -1,0 +1,1069 @@
+{
+ "polity": "US-WV",
+ "publisher": "George W. Atkinson and Alvaro F. Gibbens",
+ "license": "Public domain",
+ "raw_source": "us.scans",
+ "file": {
+  "url": "https://archive.org/download/prominentmenofwe00atki/page/n{page}.jpg",
+  "item": "https://archive.org/details/prominentmenofwe00atki"
+ },
+ "title": "Prominent Men of West Virginia (1890), Congressional elections from 1864 to 1878, by counties",
+ "contests": {
+  "h1864-1": {
+   "year": 1864,
+   "chamber": "house",
+   "day": "1864-12",
+   "special": false,
+   "state": "WV",
+   "district": 1
+  },
+  "h1864-2": {
+   "year": 1864,
+   "chamber": "house",
+   "day": "1864-12",
+   "special": false,
+   "state": "WV",
+   "district": 2
+  },
+  "h1864-3": {
+   "year": 1864,
+   "chamber": "house",
+   "day": "1864-12",
+   "special": false,
+   "state": "WV",
+   "district": 3
+  },
+  "h1866-1": {
+   "year": 1866,
+   "chamber": "house",
+   "day": "1866-10",
+   "special": false,
+   "state": "WV",
+   "district": 1
+  },
+  "h1866-2": {
+   "year": 1866,
+   "chamber": "house",
+   "day": "1866-10",
+   "special": false,
+   "state": "WV",
+   "district": 2
+  },
+  "h1866-3": {
+   "year": 1866,
+   "chamber": "house",
+   "day": "1866-10",
+   "special": false,
+   "state": "WV",
+   "district": 3
+  },
+  "h1868-1": {
+   "year": 1868,
+   "chamber": "house",
+   "day": "1868-10",
+   "special": false,
+   "state": "WV",
+   "district": 1
+  },
+  "h1868-2": {
+   "year": 1868,
+   "chamber": "house",
+   "day": "1868-10",
+   "special": false,
+   "state": "WV",
+   "district": 2
+  },
+  "h1868-3": {
+   "year": 1868,
+   "chamber": "house",
+   "day": "1868-10",
+   "special": false,
+   "state": "WV",
+   "district": 3
+  },
+  "h1870-1": {
+   "year": 1870,
+   "chamber": "house",
+   "day": "1870-10",
+   "special": false,
+   "state": "WV",
+   "district": 1
+  },
+  "h1870-2": {
+   "year": 1870,
+   "chamber": "house",
+   "day": "1870-10",
+   "special": false,
+   "state": "WV",
+   "district": 2
+  },
+  "h1870-3": {
+   "year": 1870,
+   "chamber": "house",
+   "day": "1870-10",
+   "special": false,
+   "state": "WV",
+   "district": 3
+  },
+  "h1872-1": {
+   "year": 1872,
+   "chamber": "house",
+   "day": "1872-08",
+   "special": false,
+   "state": "WV",
+   "district": 1
+  },
+  "h1872-3": {
+   "year": 1872,
+   "chamber": "house",
+   "day": "1872-08",
+   "special": false,
+   "state": "WV",
+   "district": 3
+  },
+  "h1874-1": {
+   "year": 1874,
+   "chamber": "house",
+   "day": "1874-11",
+   "special": false,
+   "state": "WV",
+   "district": 1
+  },
+  "h1874-2": {
+   "year": 1874,
+   "chamber": "house",
+   "day": "1874-11",
+   "special": false,
+   "state": "WV",
+   "district": 2
+  },
+  "h1874-3": {
+   "year": 1874,
+   "chamber": "house",
+   "day": "1874-11",
+   "special": false,
+   "state": "WV",
+   "district": 3
+  },
+  "h1876-1": {
+   "year": 1876,
+   "chamber": "house",
+   "day": "1876-12",
+   "special": false,
+   "state": "WV",
+   "district": 1
+  },
+  "h1876-2": {
+   "year": 1876,
+   "chamber": "house",
+   "day": "1876-12",
+   "special": false,
+   "state": "WV",
+   "district": 2
+  },
+  "h1876-3": {
+   "year": 1876,
+   "chamber": "house",
+   "day": "1876-12",
+   "special": false,
+   "state": "WV",
+   "district": 3
+  },
+  "h1878-1": {
+   "year": 1878,
+   "chamber": "house",
+   "day": "1878-10",
+   "special": false,
+   "state": "WV",
+   "district": 1
+  },
+  "h1878-2": {
+   "year": 1878,
+   "chamber": "house",
+   "day": "1878-10",
+   "special": false,
+   "state": "WV",
+   "district": 2
+  },
+  "h1878-3": {
+   "year": 1878,
+   "chamber": "house",
+   "day": "1878-10",
+   "special": false,
+   "state": "WV",
+   "district": 3
+  }
+ },
+ "pages": [
+  {
+   "page": 133,
+   "id": "133-a",
+   "turn": 270,
+   "orientation": "counties_down",
+   "crop": [
+    0.02,
+    0.09,
+    0.418,
+    0.93
+   ],
+   "bands": 2,
+   "columns": [
+    {
+     "label": "1864 First Dist. C. D. Hubbard, Republican",
+     "contest": "h1864-1",
+     "candidate": "Chester Dorman Hubbard"
+    },
+    {
+     "label": "1864 First Dist. Samuel Crane, Democrat",
+     "contest": "h1864-1",
+     "candidate": "Samuel Crane"
+    },
+    {
+     "label": "1864 Second Dist. Geo. R. Latham, Republican",
+     "contest": "h1864-2",
+     "candidate": "George Robert Latham"
+    },
+    {
+     "label": "1864 Second Dist. Fontain Smith",
+     "contest": "h1864-2",
+     "candidate": "Fontain Smith"
+    },
+    {
+     "label": "1864 Second Dist. Wm. B. Zinn",
+     "contest": "h1864-2",
+     "candidate": "William B. Zinn"
+    },
+    {
+     "label": "1864 Second Dist. W. S. Richardson, Independent",
+     "contest": "h1864-2",
+     "candidate": "W. S. Richardson"
+    },
+    {
+     "label": "1864 Third Dist. K. V. Whaley, Republican",
+     "contest": "h1864-3",
+     "candidate": "Kellian Van Rensalear Whaley"
+    },
+    {
+     "label": "1864 Third Dist. John M. Phelps, Democrat",
+     "contest": "h1864-3",
+     "candidate": "John M. Phelps"
+    }
+   ],
+   "header": [
+    0.0,
+    0.43
+   ]
+  },
+  {
+   "page": 133,
+   "id": "133-b",
+   "turn": 270,
+   "orientation": "counties_down",
+   "crop": [
+    0.418,
+    0.09,
+    0.66,
+    0.93
+   ],
+   "bands": 2,
+   "columns": [
+    {
+     "label": "1866 First Dist. C. D. Hubbard, Republican",
+     "contest": "h1866-1",
+     "candidate": "Chester Dorman Hubbard"
+    },
+    {
+     "label": "1866 First Dist. D. D. Johnson, Democrat",
+     "contest": "h1866-1",
+     "candidate": "D. D. Johnson"
+    },
+    {
+     "label": "1866 Second Dist. B. M. Kitchen, Republican",
+     "contest": "h1866-2",
+     "candidate": "Bethuel Middleton Kitchen"
+    },
+    {
+     "label": "1866 Second Dist. E. W. Andrews, Democrat",
+     "contest": "h1866-2",
+     "candidate": "E. W. Andrews"
+    },
+    {
+     "label": "1866 Third Dist. Daniel Polsley, Republican",
+     "contest": "h1866-3",
+     "candidate": "Daniel Haymond Polsley"
+    },
+    {
+     "label": "1866 Third Dist. John H. Oley, Democrat",
+     "contest": "h1866-3",
+     "candidate": "John H. Oley"
+    }
+   ],
+   "stub": [
+    0.02,
+    0.13
+   ],
+   "header": [
+    0.0,
+    0.43
+   ]
+  },
+  {
+   "page": 133,
+   "id": "133-c",
+   "turn": 270,
+   "orientation": "counties_down",
+   "crop": [
+    0.66,
+    0.09,
+    0.91,
+    0.93
+   ],
+   "bands": 2,
+   "columns": [
+    {
+     "label": "1868 First Dist. I. H. Duval, Republican",
+     "contest": "h1868-1",
+     "candidate": "Isaac Harding Duval"
+    },
+    {
+     "label": "1868 First Dist. H. S. Walker, Democrat",
+     "contest": "h1868-1",
+     "candidate": "H. S. Walker"
+    },
+    {
+     "label": "1868 Second Dist. Jas. C. McGrew, Republican",
+     "contest": "h1868-2",
+     "candidate": "James Clark McGrew"
+    },
+    {
+     "label": "1868 Second Dist. Wm. G. Brown, Democrat",
+     "contest": "h1868-2",
+     "candidate": "William G. Brown"
+    },
+    {
+     "label": "1868 Third Dist. John S. Witcher, Republican",
+     "contest": "h1868-3",
+     "candidate": "John Seashoal Witcher"
+    },
+    {
+     "label": "1868 Third Dist. Chas. P. T. Moore, Democrat",
+     "contest": "h1868-3",
+     "candidate": "Charles P. J. Moore"
+    }
+   ],
+   "stub": [
+    0.02,
+    0.13
+   ],
+   "header": [
+    0.0,
+    0.43
+   ]
+  },
+  {
+   "page": 134,
+   "id": "134-a",
+   "turn": 270,
+   "orientation": "counties_down",
+   "crop": [
+    0.05,
+    0.0,
+    0.455,
+    0.87
+   ],
+   "bands": 2,
+   "columns": [
+    {
+     "label": "1864 First Dist. C. D. Hubbard, Republican",
+     "contest": "h1864-1",
+     "candidate": "Chester Dorman Hubbard"
+    },
+    {
+     "label": "1864 First Dist. Samuel Crane, Democrat",
+     "contest": "h1864-1",
+     "candidate": "Samuel Crane"
+    },
+    {
+     "label": "1864 Second Dist. Geo. R. Latham, Republican",
+     "contest": "h1864-2",
+     "candidate": "George Robert Latham"
+    },
+    {
+     "label": "1864 Second Dist. Fontain Smith",
+     "contest": "h1864-2",
+     "candidate": "Fontain Smith"
+    },
+    {
+     "label": "1864 Second Dist. Wm. B. Zinn",
+     "contest": "h1864-2",
+     "candidate": "William B. Zinn"
+    },
+    {
+     "label": "1864 Second Dist. W. S. Richardson, Independent",
+     "contest": "h1864-2",
+     "candidate": "W. S. Richardson"
+    },
+    {
+     "label": "1864 Third Dist. K. V. Whaley, Republican",
+     "contest": "h1864-3",
+     "candidate": "Kellian Van Rensalear Whaley"
+    },
+    {
+     "label": "1864 Third Dist. John M. Phelps, Democrat",
+     "contest": "h1864-3",
+     "candidate": "John M. Phelps"
+    }
+   ],
+   "hint": "The column headings are printed on the previous page and are not on this page; the columns keep the same order. Read the Total row."
+  },
+  {
+   "page": 134,
+   "id": "134-b",
+   "turn": 270,
+   "orientation": "counties_down",
+   "crop": [
+    0.455,
+    0.0,
+    0.695,
+    0.87
+   ],
+   "bands": 2,
+   "columns": [
+    {
+     "label": "1866 First Dist. C. D. Hubbard, Republican",
+     "contest": "h1866-1",
+     "candidate": "Chester Dorman Hubbard"
+    },
+    {
+     "label": "1866 First Dist. D. D. Johnson, Democrat",
+     "contest": "h1866-1",
+     "candidate": "D. D. Johnson"
+    },
+    {
+     "label": "1866 Second Dist. B. M. Kitchen, Republican",
+     "contest": "h1866-2",
+     "candidate": "Bethuel Middleton Kitchen"
+    },
+    {
+     "label": "1866 Second Dist. E. W. Andrews, Democrat",
+     "contest": "h1866-2",
+     "candidate": "E. W. Andrews"
+    },
+    {
+     "label": "1866 Third Dist. Daniel Polsley, Republican",
+     "contest": "h1866-3",
+     "candidate": "Daniel Haymond Polsley"
+    },
+    {
+     "label": "1866 Third Dist. John H. Oley, Democrat",
+     "contest": "h1866-3",
+     "candidate": "John H. Oley"
+    }
+   ],
+   "stub": [
+    0.05,
+    0.165
+   ],
+   "hint": "The column headings are printed on the previous page and are not on this page; the columns keep the same order. Read the Total row."
+  },
+  {
+   "page": 134,
+   "id": "134-c",
+   "turn": 270,
+   "orientation": "counties_down",
+   "crop": [
+    0.695,
+    0.0,
+    0.94,
+    0.87
+   ],
+   "bands": 2,
+   "columns": [
+    {
+     "label": "1868 First Dist. I. H. Duval, Republican",
+     "contest": "h1868-1",
+     "candidate": "Isaac Harding Duval"
+    },
+    {
+     "label": "1868 First Dist. H. S. Walker, Democrat",
+     "contest": "h1868-1",
+     "candidate": "H. S. Walker"
+    },
+    {
+     "label": "1868 Second Dist. Jas. C. McGrew, Republican",
+     "contest": "h1868-2",
+     "candidate": "James Clark McGrew"
+    },
+    {
+     "label": "1868 Second Dist. Wm. G. Brown, Democrat",
+     "contest": "h1868-2",
+     "candidate": "William G. Brown"
+    },
+    {
+     "label": "1868 Third Dist. John S. Witcher, Republican",
+     "contest": "h1868-3",
+     "candidate": "John Seashoal Witcher"
+    },
+    {
+     "label": "1868 Third Dist. Chas. P. T. Moore, Democrat",
+     "contest": "h1868-3",
+     "candidate": "Charles P. J. Moore"
+    }
+   ],
+   "stub": [
+    0.05,
+    0.165
+   ],
+   "hint": "The column headings are printed on the previous page and are not on this page; the columns keep the same order. Read the Total row."
+  },
+  {
+   "page": 135,
+   "id": "135-a",
+   "turn": 270,
+   "orientation": "counties_down",
+   "crop": [
+    0.02,
+    0.1,
+    0.365,
+    0.93
+   ],
+   "bands": 2,
+   "columns": [
+    {
+     "label": "1870 First Dist. John J. Davis",
+     "contest": "h1870-1",
+     "candidate": "John James Davis"
+    },
+    {
+     "label": "1870 First Dist. Nathan Goff",
+     "contest": "h1870-1",
+     "candidate": "Nathan Jr. Goff"
+    },
+    {
+     "label": "1870 Second Dist. C. D. Downey",
+     "contest": "h1870-2",
+     "candidate": "O. P. Downey"
+    },
+    {
+     "label": "1870 Second Dist. Jas. C. McGrew",
+     "contest": "h1870-2",
+     "candidate": "James Clark McGrew"
+    },
+    {
+     "label": "1870 Third Dist. Frank Hereford",
+     "contest": "h1870-3",
+     "candidate": "Frank Hereford"
+    },
+    {
+     "label": "1870 Third Dist. John S. Witcher",
+     "contest": "h1870-3",
+     "candidate": "Witcher"
+    }
+   ],
+   "header": [
+    0.0,
+    0.43
+   ]
+  },
+  {
+   "page": 135,
+   "id": "135-b",
+   "turn": 270,
+   "orientation": "counties_down",
+   "crop": [
+    0.365,
+    0.1,
+    0.655,
+    0.93
+   ],
+   "bands": 2,
+   "columns": [
+    {
+     "label": "1872 First Dist. Benj. Wilson",
+     "contest": "h1872-1",
+     "candidate": "Benjamin Wilson"
+    },
+    {
+     "label": "1872 First Dist. J. J. Davis",
+     "contest": "h1872-1",
+     "candidate": "Jon J. Davis"
+    },
+    {
+     "label": "1872 Second Dist. W. H. Lamon",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "1872 Second Dist. Alex. Boteler",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "1872 Second Dist. J. M. Hagans",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "1872 Second Dist. J. B. Walker",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "1872 Third Dist. Frank Hereford",
+     "contest": "h1872-3",
+     "candidate": "Frank Hereford"
+    },
+    {
+     "label": "1872 Third Dist. J. B. Walker",
+     "contest": "h1872-3",
+     "candidate": "J. B. Walker"
+    }
+   ],
+   "stub": [
+    0.02,
+    0.11
+   ],
+   "header": [
+    0.0,
+    0.43
+   ]
+  },
+  {
+   "page": 135,
+   "id": "135-c",
+   "turn": 270,
+   "orientation": "counties_down",
+   "crop": [
+    0.655,
+    0.1,
+    0.905,
+    0.93
+   ],
+   "bands": 2,
+   "columns": [
+    {
+     "label": "1874 First Dist. Benj. Wilson",
+     "contest": "h1874-1",
+     "candidate": "Benjamin Wilson"
+    },
+    {
+     "label": "1874 First Dist. Nathan Goff",
+     "contest": "h1874-1",
+     "candidate": "Nathan Jr. Goff"
+    },
+    {
+     "label": "1874 Second Dist. Chas. J. Faulkner",
+     "contest": "h1874-2",
+     "candidate": "Charles J. Faulkner"
+    },
+    {
+     "label": "1874 Second Dist. Alex. R. Boteler",
+     "contest": "h1874-2",
+     "candidate": "Alexander R. Boteler"
+    },
+    {
+     "label": "1874 Third Dist. Frank Hereford",
+     "contest": "h1874-3",
+     "candidate": "Frank Hereford"
+    },
+    {
+     "label": "1874 Third Dist. John S. Witcher",
+     "contest": "h1874-3",
+     "candidate": "John D. Witcher"
+    }
+   ],
+   "stub": [
+    0.02,
+    0.11
+   ],
+   "header": [
+    0.0,
+    0.43
+   ]
+  },
+  {
+   "page": 136,
+   "id": "136-a",
+   "turn": 270,
+   "orientation": "counties_down",
+   "crop": [
+    0.05,
+    0.0,
+    0.4,
+    0.835
+   ],
+   "bands": 2,
+   "columns": [
+    {
+     "label": "1870 First Dist. John J. Davis",
+     "contest": "h1870-1",
+     "candidate": "John James Davis"
+    },
+    {
+     "label": "1870 First Dist. Nathan Goff",
+     "contest": "h1870-1",
+     "candidate": "Nathan Jr. Goff"
+    },
+    {
+     "label": "1870 Second Dist. C. D. Downey",
+     "contest": "h1870-2",
+     "candidate": "O. P. Downey"
+    },
+    {
+     "label": "1870 Second Dist. Jas. C. McGrew",
+     "contest": "h1870-2",
+     "candidate": "James Clark McGrew"
+    },
+    {
+     "label": "1870 Third Dist. Frank Hereford",
+     "contest": "h1870-3",
+     "candidate": "Frank Hereford"
+    },
+    {
+     "label": "1870 Third Dist. John S. Witcher",
+     "contest": "h1870-3",
+     "candidate": "Witcher"
+    }
+   ],
+   "hint": "The column headings are printed on the previous page and are not on this page; the columns keep the same order. Read the Total row. Ignore the footnote marks (*, \u2020, \u2021) before some numbers."
+  },
+  {
+   "page": 136,
+   "id": "136-b",
+   "turn": 270,
+   "orientation": "counties_down",
+   "crop": [
+    0.4,
+    0.0,
+    0.69,
+    0.835
+   ],
+   "bands": 2,
+   "columns": [
+    {
+     "label": "1872 First Dist. Benj. Wilson",
+     "contest": "h1872-1",
+     "candidate": "Benjamin Wilson"
+    },
+    {
+     "label": "1872 First Dist. J. J. Davis",
+     "contest": "h1872-1",
+     "candidate": "Jon J. Davis"
+    },
+    {
+     "label": "1872 Second Dist. W. H. Lamon",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "1872 Second Dist. Alex. Boteler",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "1872 Second Dist. J. M. Hagans",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "1872 Second Dist. J. B. Walker",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "1872 Third Dist. Frank Hereford",
+     "contest": "h1872-3",
+     "candidate": "Frank Hereford"
+    },
+    {
+     "label": "1872 Third Dist. J. B. Walker",
+     "contest": "h1872-3",
+     "candidate": "J. B. Walker"
+    }
+   ],
+   "stub": [
+    0.05,
+    0.15
+   ],
+   "hint": "The column headings are printed on the previous page and are not on this page; the columns keep the same order. Read the Total row. Ignore the footnote marks (*, \u2020, \u2021) before some numbers."
+  },
+  {
+   "page": 136,
+   "id": "136-c",
+   "turn": 270,
+   "orientation": "counties_down",
+   "crop": [
+    0.69,
+    0.0,
+    0.94,
+    0.835
+   ],
+   "bands": 2,
+   "columns": [
+    {
+     "label": "1874 First Dist. Benj. Wilson",
+     "contest": "h1874-1",
+     "candidate": "Benjamin Wilson"
+    },
+    {
+     "label": "1874 First Dist. Nathan Goff",
+     "contest": "h1874-1",
+     "candidate": "Nathan Jr. Goff"
+    },
+    {
+     "label": "1874 Second Dist. Chas. J. Faulkner",
+     "contest": "h1874-2",
+     "candidate": "Charles J. Faulkner"
+    },
+    {
+     "label": "1874 Second Dist. Alex. R. Boteler",
+     "contest": "h1874-2",
+     "candidate": "Alexander R. Boteler"
+    },
+    {
+     "label": "1874 Third Dist. Frank Hereford",
+     "contest": "h1874-3",
+     "candidate": "Frank Hereford"
+    },
+    {
+     "label": "1874 Third Dist. John S. Witcher",
+     "contest": "h1874-3",
+     "candidate": "John D. Witcher"
+    }
+   ],
+   "stub": [
+    0.05,
+    0.15
+   ],
+   "hint": "The column headings are printed on the previous page and are not on this page; the columns keep the same order. Read the Total row. Ignore the footnote marks (*, \u2020, \u2021) before some numbers."
+  },
+  {
+   "page": 137,
+   "id": "137-a",
+   "turn": 270,
+   "orientation": "counties_down",
+   "crop": [
+    0.02,
+    0.1,
+    0.505,
+    0.93
+   ],
+   "bands": 2,
+   "columns": [
+    {
+     "label": "1876 First Dist. Benj. Wilson",
+     "contest": "h1876-1",
+     "candidate": "Benjamin Wilson"
+    },
+    {
+     "label": "1876 First Dist. C. F. Scott",
+     "contest": "h1876-1",
+     "candidate": "G. F. Scott"
+    },
+    {
+     "label": "1876 Second Dist. B. F. Martin",
+     "contest": "h1876-2",
+     "candidate": "Benjamin Franklin Martin"
+    },
+    {
+     "label": "1876 Second Dist. W. H. Lamon",
+     "contest": "h1876-2",
+     "candidate": "Ward H. Lamon"
+    },
+    {
+     "label": "1876 Third Dist. John E. Kenna",
+     "contest": "h1876-3",
+     "candidate": "John Edward Kenna"
+    },
+    {
+     "label": "1876 Third Dist. Benj. F. Redmond",
+     "contest": "h1876-3",
+     "candidate": "Benjamin J. Redmund"
+    }
+   ],
+   "header": [
+    0.0,
+    0.43
+   ]
+  },
+  {
+   "page": 137,
+   "id": "137-b",
+   "turn": 270,
+   "orientation": "counties_down",
+   "crop": [
+    0.505,
+    0.1,
+    0.91,
+    0.93
+   ],
+   "bands": 2,
+   "columns": [
+    {
+     "label": "1878 First Dist. Benj. Wilson",
+     "contest": "h1878-1",
+     "candidate": "Benjamin Wilson"
+    },
+    {
+     "label": "1878 First Dist. John R. Hubbard",
+     "contest": "h1878-1",
+     "candidate": "J. R. Hubbard"
+    },
+    {
+     "label": "1878 First Dist. James Bassell",
+     "contest": "h1878-1",
+     "candidate": "James Bassell"
+    },
+    {
+     "label": "1878 Second Dist. B. F. Martin",
+     "contest": "h1878-2",
+     "candidate": "Benjamin Franklin Martin"
+    },
+    {
+     "label": "1878 Second Dist. F. A. Burr",
+     "contest": "h1878-2",
+     "candidate": "F. A. Burr"
+    },
+    {
+     "label": "1878 Second Dist. J. H. Thompson",
+     "contest": "h1878-2",
+     "candidate": "J. H. Thompson"
+    },
+    {
+     "label": "1878 Third Dist. John E. Kenna",
+     "contest": "h1878-3",
+     "candidate": "John Edward Kenna"
+    },
+    {
+     "label": "1878 Third Dist. H. G. Walker",
+     "contest": "h1878-3",
+     "candidate": "H. I. Walker"
+    },
+    {
+     "label": "1878 Third Dist. Seth Bungarner",
+     "contest": "h1878-3",
+     "candidate": "Seth Burngasner"
+    }
+   ],
+   "stub": [
+    0.02,
+    0.12
+   ],
+   "header": [
+    0.0,
+    0.43
+   ]
+  },
+  {
+   "page": 138,
+   "id": "138-a",
+   "turn": 270,
+   "orientation": "counties_down",
+   "crop": [
+    0.05,
+    0.0,
+    0.54,
+    0.86
+   ],
+   "bands": 2,
+   "columns": [
+    {
+     "label": "1876 First Dist. Benj. Wilson",
+     "contest": "h1876-1",
+     "candidate": "Benjamin Wilson"
+    },
+    {
+     "label": "1876 First Dist. C. F. Scott",
+     "contest": "h1876-1",
+     "candidate": "G. F. Scott"
+    },
+    {
+     "label": "1876 Second Dist. B. F. Martin",
+     "contest": "h1876-2",
+     "candidate": "Benjamin Franklin Martin"
+    },
+    {
+     "label": "1876 Second Dist. W. H. Lamon",
+     "contest": "h1876-2",
+     "candidate": "Ward H. Lamon"
+    },
+    {
+     "label": "1876 Third Dist. John E. Kenna",
+     "contest": "h1876-3",
+     "candidate": "John Edward Kenna"
+    },
+    {
+     "label": "1876 Third Dist. Benj. F. Redmond",
+     "contest": "h1876-3",
+     "candidate": "Benjamin J. Redmund"
+    }
+   ],
+   "hint": "The column headings are printed on the previous page and are not on this page; the columns keep the same order. Read the Total row. The Total row is the last row, below the rule, and has no label."
+  },
+  {
+   "page": 138,
+   "id": "138-b",
+   "turn": 270,
+   "orientation": "counties_down",
+   "crop": [
+    0.54,
+    0.0,
+    0.94,
+    0.86
+   ],
+   "bands": 2,
+   "columns": [
+    {
+     "label": "1878 First Dist. Benj. Wilson",
+     "contest": "h1878-1",
+     "candidate": "Benjamin Wilson"
+    },
+    {
+     "label": "1878 First Dist. John R. Hubbard",
+     "contest": "h1878-1",
+     "candidate": "J. R. Hubbard"
+    },
+    {
+     "label": "1878 First Dist. James Bassell",
+     "contest": "h1878-1",
+     "candidate": "James Bassell"
+    },
+    {
+     "label": "1878 Second Dist. B. F. Martin",
+     "contest": "h1878-2",
+     "candidate": "Benjamin Franklin Martin"
+    },
+    {
+     "label": "1878 Second Dist. F. A. Burr",
+     "contest": "h1878-2",
+     "candidate": "F. A. Burr"
+    },
+    {
+     "label": "1878 Second Dist. J. H. Thompson",
+     "contest": "h1878-2",
+     "candidate": "J. H. Thompson"
+    },
+    {
+     "label": "1878 Third Dist. John E. Kenna",
+     "contest": "h1878-3",
+     "candidate": "John Edward Kenna"
+    },
+    {
+     "label": "1878 Third Dist. H. G. Walker",
+     "contest": "h1878-3",
+     "candidate": "H. I. Walker"
+    },
+    {
+     "label": "1878 Third Dist. Seth Bungarner",
+     "contest": "h1878-3",
+     "candidate": "Seth Burngasner"
+    }
+   ],
+   "stub": [
+    0.05,
+    0.14
+   ],
+   "hint": "The column headings are printed on the previous page and are not on this page; the columns keep the same order. Read the Total row. The Total row is the last row, below the rule, and has no label."
+  }
+ ]
+}

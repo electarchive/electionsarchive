@@ -9,6 +9,31 @@
  },
  "title": "Prominent Men of West Virginia (1890), State elections for Governor from 1864 to 1888, by counties",
  "contests": {
+  "g1864": {
+   "year": 1864,
+   "chamber": "governor",
+   "day": "1864-10-27",
+   "special": false,
+   "state": "WV",
+   "district": null,
+   "create": true
+  },
+  "g1866": {
+   "year": 1866,
+   "chamber": "governor",
+   "day": "1866",
+   "special": false,
+   "state": "WV",
+   "district": null
+  },
+  "g1870": {
+   "year": 1870,
+   "chamber": "governor",
+   "day": "1870",
+   "special": false,
+   "state": "WV",
+   "district": null
+  },
   "g1868": {
    "year": 1868,
    "chamber": "governor",
@@ -74,18 +99,18 @@
    "columns": [
     {
      "label": "1864 A. I. Boreman, No opposition",
-     "contest": null,
-     "candidate": ""
+     "contest": "g1864",
+     "candidate": "Arthur I. Boreman"
     },
     {
      "label": "1866 A. I. Boreman, Republican",
-     "contest": null,
-     "candidate": ""
+     "contest": "g1866",
+     "candidate": "Arthur I. Boreman"
     },
     {
      "label": "1866 Ben H. Smith, Democrat",
-     "contest": null,
-     "candidate": ""
+     "contest": "g1866",
+     "candidate": "Benjamin H. Smith"
     },
     {
      "label": "1868 W. E. Stevenson, Republican",
@@ -99,13 +124,13 @@
     },
     {
      "label": "1870 J. J. Jacob, Democrat",
-     "contest": null,
-     "candidate": ""
+     "contest": "g1870",
+     "candidate": "John J. Jacob"
     },
     {
      "label": "1870 W. E. Stevenson, Republican",
-     "contest": null,
-     "candidate": ""
+     "contest": "g1870",
+     "candidate": "William E. Stevenson"
     },
     {
      "label": "1872 J. J. Jacob, Ind. Democrat",
@@ -206,18 +231,18 @@
    "columns": [
     {
      "label": "1864 A. I. Boreman, No opposition",
-     "contest": null,
-     "candidate": ""
+     "contest": "g1864",
+     "candidate": "Arthur I. Boreman"
     },
     {
      "label": "1866 A. I. Boreman, Republican",
-     "contest": null,
-     "candidate": ""
+     "contest": "g1866",
+     "candidate": "Arthur I. Boreman"
     },
     {
      "label": "1866 Ben H. Smith, Democrat",
-     "contest": null,
-     "candidate": ""
+     "contest": "g1866",
+     "candidate": "Benjamin H. Smith"
     },
     {
      "label": "1868 W. E. Stevenson, Republican",
@@ -231,13 +256,13 @@
     },
     {
      "label": "1870 J. J. Jacob, Democrat",
-     "contest": null,
-     "candidate": ""
+     "contest": "g1870",
+     "candidate": "John J. Jacob"
     },
     {
      "label": "1870 W. E. Stevenson, Republican",
-     "contest": null,
-     "candidate": ""
+     "contest": "g1870",
+     "candidate": "William E. Stevenson"
     },
     {
      "label": "1872 J. J. Jacob, Ind. Democrat",
