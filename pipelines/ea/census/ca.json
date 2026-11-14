@@ -6198,13 +6198,13 @@
     {
       "key": "qc_borough",
       "tier": "submunicipal",
-      "name": "Montréal borough mayors and borough councils",
+      "name": "Quebec borough mayors and borough councils",
       "category": "council",
       "goal": "local",
       "measure": {
         "unit": "polity"
       },
-      "note": "Montréal's 19 boroughs elect their mayors and borough councillors on the municipal ballot.",
+      "note": "Montréal's 19 boroughs elect borough mayors and borough councillors on the municipal ballot. The other seven boroughed municipalities (Québec, Sherbrooke, Lévis, Longueuil, Saguenay, Grenville-sur-la-Rouge, and Métis-sur-Mer) seat city councillors on their borough councils, so those 22 boroughs hold no separate borough election; only Montréal's class is confirmed to be held.",
       "source": "mtl-results",
       "match": [
         {
