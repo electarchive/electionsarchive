@@ -133,10 +133,10 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.028,
-        0.842,
-        0.958,
-        0.991
+        0.004,
+        0.76,
+        0.237,
+        0.999
       ],
       "hint": "Read only the table headed 'FOR PRESIDENTIAL ELECTORS'; ignore any other table visible in the image."
     },
@@ -187,10 +187,10 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.0,
-        0.814,
-        0.234,
-        0.993
+        0.003,
+        0.763,
+        0.236,
+        0.999
       ],
       "hint": "Read only the table headed 'LABOR PARTY OF MARYLAND (Socialist Labor Party) FOR PRESIDENTIAL ELECTORS'; ignore any other table visible in the image."
     },
