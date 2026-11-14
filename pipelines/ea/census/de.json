@@ -4637,7 +4637,7 @@
             "council"
           ],
           "within": "DE-BY",
-          "name_pattern": "Bezirkstag"
+          "name_pattern": "Bezirkstag|District Assembly"
         }
       ],
       "cadence": [
