@@ -1,0 +1,91 @@
+electorate	date_from	date_to	seats	valid_ballots	rank	ballot_label	votes	url
+house	1999-10-27	1999-10-28	15	631	1	C. Mar	570	https://api.parliament.uk/historic-hansard/lords/1999/oct/29/hereditary-peers-elections
+house	1999-10-27	1999-10-28	15	631	2	L. Strabolgi	558	https://api.parliament.uk/historic-hansard/lords/1999/oct/29/hereditary-peers-elections
+house	1999-10-27	1999-10-28	15	631	3	L. Elton	558	https://api.parliament.uk/historic-hansard/lords/1999/oct/29/hereditary-peers-elections
+house	1999-10-27	1999-10-28	15	631	4	L. Lyell	547	https://api.parliament.uk/historic-hansard/lords/1999/oct/29/hereditary-peers-elections
+house	1999-10-27	1999-10-28	15	631	5	L. Skelmersdale	544	https://api.parliament.uk/historic-hansard/lords/1999/oct/29/hereditary-peers-elections
+house	1999-10-27	1999-10-28	15	631	6	L. Aberdare	530	https://api.parliament.uk/historic-hansard/lords/1999/oct/29/hereditary-peers-elections
+house	1999-10-27	1999-10-28	15	631	7	L. Brougham and Vaux	525	https://api.parliament.uk/historic-hansard/lords/1999/oct/29/hereditary-peers-elections
+house	1999-10-27	1999-10-28	15	631	8	V. Falkland	519	https://api.parliament.uk/historic-hansard/lords/1999/oct/29/hereditary-peers-elections
+house	1999-10-27	1999-10-28	15	631	9	L. Colwyn	488	https://api.parliament.uk/historic-hansard/lords/1999/oct/29/hereditary-peers-elections
+house	1999-10-27	1999-10-28	15	631	10	V. Oxfuird	482	https://api.parliament.uk/historic-hansard/lords/1999/oct/29/hereditary-peers-elections
+house	1999-10-27	1999-10-28	15	631	11	L. Reay	471	https://api.parliament.uk/historic-hansard/lords/1999/oct/29/hereditary-peers-elections
+house	1999-10-27	1999-10-28	15	631	12	L. Geddes	461	https://api.parliament.uk/historic-hansard/lords/1999/oct/29/hereditary-peers-elections
+house	1999-10-27	1999-10-28	15	631	13	V. Simon	453	https://api.parliament.uk/historic-hansard/lords/1999/oct/29/hereditary-peers-elections
+house	1999-10-27	1999-10-28	15	631	14	L. Methuen	421	https://api.parliament.uk/historic-hansard/lords/1999/oct/29/hereditary-peers-elections
+house	1999-10-27	1999-10-28	15	631	15	L. Ampthill	418	https://api.parliament.uk/historic-hansard/lords/1999/oct/29/hereditary-peers-elections
+labour	1999-11-03	1999-11-04	2	17	1	L. Milner of Leeds	8	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+labour	1999-11-03	1999-11-04	2	17	2	L. Rea	7	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+liberal_democrat	1999-11-03	1999-11-04	3	20	1	E. Russell	17	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+liberal_democrat	1999-11-03	1999-11-04	3	20	2	L. Avebury	13	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+liberal_democrat	1999-11-03	1999-11-04	3	20	3	L. Addington	10	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+crossbench	1999-11-03	1999-11-04	28	105	1	B. Darcy de Knayth	85	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+crossbench	1999-11-03	1999-11-04	28	105	2	L. Freyberg	82	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+crossbench	1999-11-03	1999-11-04	28	105	3	L. St. John of Bletso	81	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+crossbench	1999-11-03	1999-11-04	28	105	4	L. Northbourne	78	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+crossbench	1999-11-03	1999-11-04	28	105	5	E. Sandwich	78	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+crossbench	1999-11-03	1999-11-04	28	105	6	V. Allenby of Megiddo	75	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+crossbench	1999-11-03	1999-11-04	28	105	7	V. Tenby	74	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+crossbench	1999-11-03	1999-11-04	28	105	8	L. Palmer	72	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+crossbench	1999-11-03	1999-11-04	28	105	9	V. Slim	72	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+crossbench	1999-11-03	1999-11-04	28	105	10	V. Bledisloe	70	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+crossbench	1999-11-03	1999-11-04	28	105	11	L. Monson	70	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+crossbench	1999-11-03	1999-11-04	28	105	12	V. Brookeborough	68	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+crossbench	1999-11-03	1999-11-04	28	105	13	L. Bridges	68	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+crossbench	1999-11-03	1999-11-04	28	105	14	Ly. Saltoun of Abernethy	64	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+crossbench	1999-11-03	1999-11-04	28	105	15	L. Hylton	64	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+crossbench	1999-11-03	1999-11-04	28	105	16	E. Baldwin of Bewdley	63	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+crossbench	1999-11-03	1999-11-04	28	105	17	E. Carnarvon	58	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+crossbench	1999-11-03	1999-11-04	28	105	18	E. Listowel	58	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+crossbench	1999-11-03	1999-11-04	28	105	19	L. Moran	57	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+crossbench	1999-11-03	1999-11-04	28	105	20	B. Strange	53	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+crossbench	1999-11-03	1999-11-04	28	105	21	E. Erroll	52	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+crossbench	1999-11-03	1999-11-04	28	105	22	L. Walpole	52	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+crossbench	1999-11-03	1999-11-04	28	105	23	V. Craigavon	51	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+crossbench	1999-11-03	1999-11-04	28	105	24	B. Wharton	48	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+crossbench	1999-11-03	1999-11-04	28	105	25	V. Colville of Culross	47	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+crossbench	1999-11-03	1999-11-04	28	105	26	V. Waverley	47	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+crossbench	1999-11-03	1999-11-04	28	105	27	L. Greenway	47	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+crossbench	1999-11-03	1999-11-04	28	105	28	E. Rosslyn	45	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+conservative	1999-11-03	1999-11-04	42	204	1	E. Ferrers	190	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+conservative	1999-11-03	1999-11-04	42	204	2	L. Strathclyde	174	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+conservative	1999-11-03	1999-11-04	42	204	3	L. Trefgarne	173	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+conservative	1999-11-03	1999-11-04	42	204	4	L. Denham	169	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+conservative	1999-11-03	1999-11-04	42	204	5	L. Mancroft	168	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+conservative	1999-11-03	1999-11-04	42	204	6	E. Howe	165	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+conservative	1999-11-03	1999-11-04	42	204	7	L. Brabazon of Tara	165	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+conservative	1999-11-03	1999-11-04	42	204	8	E. Caithness	161	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+conservative	1999-11-03	1999-11-04	42	204	9	L. Henley	160	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+conservative	1999-11-03	1999-11-04	42	204	10	L. Glenarthur	157	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+conservative	1999-11-03	1999-11-04	42	204	11	L. Astor of Hever	151	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+conservative	1999-11-03	1999-11-04	42	204	12	V. Astor	146	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+conservative	1999-11-03	1999-11-04	42	204	13	E. Courtown	143	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+conservative	1999-11-03	1999-11-04	42	204	14	E. Peel	142	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+conservative	1999-11-03	1999-11-04	42	204	15	L. Moynihan	137	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+conservative	1999-11-03	1999-11-04	42	204	16	E. Attlee	135	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+conservative	1999-11-03	1999-11-04	42	204	17	V. Goschen	132	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+conservative	1999-11-03	1999-11-04	42	204	18	D. Montrose	127	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+conservative	1999-11-03	1999-11-04	42	204	19	L. Burnham	127	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+conservative	1999-11-03	1999-11-04	42	204	20	L. Vivian	126	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+conservative	1999-11-03	1999-11-04	42	204	21	E. Northesk	126	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+conservative	1999-11-03	1999-11-04	42	204	22	E. Selborne	125	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+conservative	1999-11-03	1999-11-04	42	204	23	V. Bridgeman	125	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+conservative	1999-11-03	1999-11-04	42	204	24	L. Luke	124	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+conservative	1999-11-03	1999-11-04	42	204	25	E. Lindsay	116	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+conservative	1999-11-03	1999-11-04	42	204	26	L. Lucas (of Crudwell and Dingwall)	115	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+conservative	1999-11-03	1999-11-04	42	204	27	L. Montagu of Beaulieu	113	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+conservative	1999-11-03	1999-11-04	42	204	28	E. Home	113	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+conservative	1999-11-03	1999-11-04	42	204	29	L. Glentoran	104	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+conservative	1999-11-03	1999-11-04	42	204	30	E. Onslow	99	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+conservative	1999-11-03	1999-11-04	42	204	31	L. Crathorne	97	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+conservative	1999-11-03	1999-11-04	42	204	32	L. Willoughby de Broke	96	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+conservative	1999-11-03	1999-11-04	42	204	33	L. Inglewood	95	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+conservative	1999-11-03	1999-11-04	42	204	34	L. Northbrook	95	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+conservative	1999-11-03	1999-11-04	42	204	35	L. Swinfen	95	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+conservative	1999-11-03	1999-11-04	42	204	36	E. Shrewsbury	95	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+conservative	1999-11-03	1999-11-04	42	204	37	L. Selsdon	94	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+conservative	1999-11-03	1999-11-04	42	204	38	E. Liverpool	93	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+conservative	1999-11-03	1999-11-04	42	204	39	E. Arran	90	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+conservative	1999-11-03	1999-11-04	42	204	40	E. Dundee	90	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+conservative	1999-11-03	1999-11-04	42	204	41	L. Mowbray and Stourton	88	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
+conservative	1999-11-03	1999-11-04	42	204	42	L. Rotherwick	88	https://api.parliament.uk/historic-hansard/lords/1999/nov/05/hereditary-peers-elections
