@@ -2,12 +2,39 @@ import io
 import zipfile
 from collections import Counter
 from datetime import date
+from pathlib import Path
+from uuid import UUID
 
 import polars as pl
 
 from ea import raw
+from ea.changeset import Changeset, slug
+from ea.names import display
+from ea.store import connect
 
 SOURCE = "pl.kbw_sejm"
+VERSION = "1"
+PUBLISHER = "Krajowe Biuro Wyborcze"
+TITLE = "Dane wyborcze: wybory do Sejmu"
+PAGE = "https://danewyborcze.kbw.gov.pl/"
+VOTES, REGISTERED, BALLOTS, VALID, INVALID = 1, 2, 3, 4, 5
+ITEMS = {"PRAWO I SPRAWIEDLIWOŚĆ": "Q156874", "KONFEDERACJA WOLNOŚĆ I NIEPODLEGŁOŚĆ": "Q61568052"}
+METHOD = (
+    "List votes, declared seats, and elected members by constituency from the Krajowe Biuro Wyborcze's data files "
+    "for the Sejm. Accounting is summed from the polling districts, whose counts the file prints: voters entitled to "
+    "vote, ballots taken from the urn, and valid votes for lists; invalid is the ballots cast less the valid votes "
+    "for lists, which counts both invalid ballots and invalid votes on valid ballots. Seats go to lists that passed "
+    "the threshold (5 percent for a committee, 8 percent for a coalition, none for national minorities) by the "
+    "D'Hondt method, and each elected member is the candidate the file marks as elected."
+)
+GMINA_METHOD = (
+    "List votes and accounting summed from the polling districts of each gmina, with votes from abroad and ships "
+    "each in one unit. Polling districts whose file rows print no counts are left out."
+)
+OBWOD_METHOD = (
+    "List votes and accounting by polling district (obwód głosowania) as the file prints them. Polling districts "
+    "are described by streets and addresses, not mapped, so they have no area."
+)
 BASE = "https://danewyborcze.kbw.gov.pl/dane"
 PARSED = raw.parsed(SOURCE)
 ELECTIONS = {2023: date(2023, 10, 15)}
@@ -235,3 +262,326 @@ def parse() -> None:
         frame = pl.concat(frames, how="diagonal")
         frame.write_parquet(PARSED / f"{name}.parquet")
         print(f"{name}: {frame.height} rows")
+
+
+def emit() -> Path:
+    frames = {
+        name: pl.read_parquet(PARSED / f"{name}.parquet")
+        for name in ("districts", "lists", "candidates", "units", "unit_votes")
+    }
+    districts, lists, candidates, units, unit_votes = (
+        frames[name] for name in ("districts", "lists", "candidates", "units", "unit_votes")
+    )
+    [day] = units["day"].unique()
+    with connect() as conn:
+        cs = Changeset(
+            conn,
+            pipeline=SOURCE,
+            version=VERSION,
+            summary=(
+                f"Sejm election of {day.year} by constituency, gmina, and polling district, with committees, "
+                "candidates, declared seats, and elected members, from the Krajowe Biuro Wyborcze's data files"
+            ),
+            polity="PL",
+        )
+
+        def name(entity: UUID, text: str, lang: str = "en", kind: str = "official") -> None:
+            cs.add("name", entity_id=entity, text=text, lang=lang, kind=kind, is_preferred=kind == "official")
+
+        poland = cs.polity("PL")
+        sejm = cs.key("pl.body", "sejm")
+        if sejm in cs.minted:
+            raise ValueError("publish pl.parlament first")
+        source = cs.source(PUBLISHER, TITLE)
+        cs.add(
+            "source",
+            id=source,
+            kind="official_body",
+            publisher=PUBLISHER,
+            title=TITLE,
+            url=PAGE,
+            license="Official public record, no license stated",
+            attribution="Źródło danych: Państwowa Komisja Wyborcza, Krajowe Biuro Wyborcze.",
+        )
+        for kind in FILES[day.year]:
+            cs.artifact(raw.cached(SOURCE, url(day.year, kind)), source)
+        for code, kind, rank, noun in (
+            ("pl.okreg_sejm", "electoral_district", 2, "Sejm constituency"),
+            ("pl.obwod", "precinct", 4, "polling district"),
+        ):
+            if conn.execute("select 1 from scheme where code = %s", (code,)).fetchone() is None:
+                cs.add("scheme", code=code, polity_id=poland, kind=kind, rank=rank, noun=noun)
+
+        system = cs.key("pl.electoral_system", "sejm")
+        cs.add(
+            "electoral_system",
+            id=system,
+            polity_id=poland,
+            rules={
+                "formula": "dhondt",
+                "lists": {"order": "open", "vacancy": "next_on_list"},
+                "threshold": {"level": "list", "scope": "contest", "percent": 5},
+            },
+            rules_version=1,
+        )
+        name(system, "Sejm open-list D'Hondt system")
+        cs.add(
+            "note",
+            entity_id=system,
+            kind="methodology",
+            body_md=(
+                "460 members in 41 constituencies of 7 to 20 seats, by the D'Hondt method over lists that pass a "
+                "national threshold of 5 percent for a committee and 8 percent for a coalition (national minority "
+                "committees are exempt), with voters choosing one candidate on one list (Kodeks wyborczy, arts. "
+                "196-206). The threshold stored is the committee figure."
+            ),
+        )
+
+        by_item = dict(
+            conn.execute(
+                """select x.value, x.entity_id from external_id x join party p on p.id = x.entity_id
+                   where x.scheme = 'wikidata' and p.polity_id = %s
+                   and not exists (select from entity_merge m where m.entity_id = p.id)""",
+                (poland,),
+            ).fetchall()
+        )
+        existing = {row[0] for row in conn.execute("select id from party where polity_id = %s", (poland,))}
+        parties: dict[str, UUID] = {}
+
+        def party_for(committee: str) -> UUID:
+            label = " ".join(committee.split())
+            if label in parties:
+                return parties[label]
+            item = next((code for text, code in ITEMS.items() if label.endswith(text)), None)
+            if item is not None and item in by_item:
+                party = parties[label] = by_item[item]
+                return party
+            party = parties[label] = cs.key("pl.party", slug(label))
+            if party not in existing:
+                cs.add("party", id=party, kind="party", polity_id=poland)
+                name(party, label, "pl")
+                existing.add(party)
+            return party
+
+        election = cs.key("pl.election", f"{day}:general")
+        cs.add("election", id=election, polity_id=poland, kind="general", date_from=day, date_to=day, status="held")
+        name(election, f"{day.year} Polish parliamentary election")
+        name(election, f"Wybory parlamentarne {day.year}", "pl", "native")
+        path = f"pl/{day}-general"
+        cs.add("slug", path=path, entity_id=election)
+
+        accounting = units.filter(pl.col("valid").is_not_null()).with_columns(
+            ballots=pl.col("cast"), unusable=pl.col("cast") - pl.col("valid")
+        )
+        figures = (
+            (REGISTERED, "electors"),
+            (BALLOTS, "cast"),
+            (VALID, "valid"),
+            (INVALID, "unusable"),
+        )
+        unit_rows: dict[UUID, dict[str, str | None]] = {}
+        values: list[tuple[str, str, str | None, int, int]] = []
+        areas = {
+            code[:6]: area
+            for code, area in conn.execute(
+                "select c.code, a.id from area a join area_code c on c.area_id = a.id where a.scheme_code = 'pl.gmina'"
+            ).fetchall()
+        }
+        counts = Counter(
+            code[:6]
+            for (code,) in conn.execute(
+                "select c.code from area a join area_code c on c.area_id = a.id where a.scheme_code = 'pl.gmina'"
+            ).fetchall()
+        )
+        gmina_units: dict[str, UUID] = {}
+
+        def gmina_unit(code: str) -> UUID:
+            if code not in gmina_units:
+                unit = gmina_units[code] = cs.unit("pl.gmina", code)
+                area = areas.get(code) if counts[code] == 1 else None
+                unit_rows[unit] = {
+                    "scheme_code": "pl.gmina",
+                    "code": code,
+                    "parent_id": None,
+                    "area_relation": "equals" if area is not None else "unlocated",
+                    "area_id": None if area is None else str(area),
+                    "kind": "standard" if code.isdigit() else "aggregate",
+                }
+            return gmina_units[code]
+
+        def put(result_set: UUID, unit: UUID, row: dict[str, int]) -> None:
+            for measure, column in figures:
+                if row[column] is not None:
+                    values.append((str(result_set), str(unit), None, measure, row[column]))
+
+        def make_set(contest: UUID, key: str, label: str, default: bool, completeness: float, note: str) -> UUID:
+            result_set = cs.key(f"{SOURCE}.result_set", f"{key}:{label}")
+            cs.add(
+                "result_set",
+                id=result_set,
+                election_id=election,
+                contest_id=contest,
+                stage="official",
+                kind="counted",
+                status="active",
+                source_id=source,
+                is_default=default,
+                completeness=completeness,
+            )
+            cs.add("note", entity_id=result_set, kind="methodology", body_md=note)
+            return result_set
+
+        for entry in districts.sort("district").iter_rows(named=True):
+            number = entry["district"]
+            key = f"{day}:{number}"
+            part = lists.filter(pl.col("district") == number).sort("votes", descending=True)
+            contest = cs.key(f"{SOURCE}.contest", key)
+            cs.add(
+                "contest",
+                id=contest,
+                election_id=election,
+                kind="list_allocation",
+                body_id=sejm,
+                magnitude=entry["magnitude"],
+                electoral_system_id=system,
+                default_result_kind="counted",
+            )
+            name(contest, f"Constituency {number} ({entry['seat']})")
+            name(contest, f"Okręg wyborczy nr {number} ({entry['seat']})", "pl", "native")
+            cs.add("slug", path=f"{path}/sejm/{number}", entity_id=contest)
+            options = {}
+            for row in part.iter_rows(named=True):
+                option = options[row["list"]] = cs.key(f"{SOURCE}.option", f"{key}:{row['list']}")
+                cs.add(
+                    "contest_option",
+                    id=option,
+                    contest_id=contest,
+                    kind="list",
+                    party_id=party_for(row["committee"]),
+                    ballot_label=" ".join(row["committee"].split()),
+                )
+            district_unit = cs.unit("pl.okreg_sejm", key)
+            unit_rows[district_unit] = {
+                "scheme_code": "pl.okreg_sejm",
+                "code": key,
+                "parent_id": None,
+                "area_relation": "unlocated",
+                "area_id": None,
+                "kind": "standard",
+            }
+            here = accounting.filter(pl.col("district") == number)
+            total = {column: int(here[column].sum()) for _, column in figures}
+            official = int(part["votes"].sum())
+            note = METHOD
+            if total["valid"] != official:
+                note += (
+                    f" The polling districts that print counts hold {total['valid']:,} list votes against the "
+                    f"constituency total of {official:,}; the missing votes are in polling districts whose rows print "
+                    "no counts. Both are stored as printed."
+                )
+            district_set = make_set(contest, key, "district", True, 1, note)
+            put(district_set, district_unit, total)
+            for row in part.iter_rows(named=True):
+                values.append((str(district_set), str(district_unit), str(options[row["list"]]), VOTES, row["votes"]))
+                if row["seats"]:
+                    cs.add(
+                        "outcome",
+                        result_set_id=district_set,
+                        option_id=options[row["list"]],
+                        kind="won",
+                        seats=row["seats"],
+                    )
+            elected = Counter()
+            for person_row in candidates.filter(pl.col("district") == number).iter_rows(named=True):
+                tag = f"{key}:{person_row['list']}:{person_row['position']}"
+                person = cs.key(f"{SOURCE}.person", tag)
+                cs.add("person", id=person, gender={"Kobieta": "female", "Mężczyzna": "male"}.get(person_row["sex"]))
+                name(person, display(person_row["name"], "pl"))
+                candidacy = cs.key(f"{SOURCE}.candidacy", tag)
+                cs.add(
+                    "candidacy",
+                    id=candidacy,
+                    person_id=person,
+                    option_id=options[person_row["list"]],
+                    role="list_member",
+                    list_position=person_row["position"],
+                    ballot_name=person_row["name"],
+                    is_independent=False,
+                )
+                if person_row["elected"]:
+                    elected[person_row["list"]] += 1
+                    cs.add(
+                        "outcome",
+                        result_set_id=district_set,
+                        option_id=options[person_row["list"]],
+                        candidacy_id=candidacy,
+                        kind="elected",
+                    )
+            for row in part.iter_rows(named=True):
+                if elected[row["list"]] != row["seats"]:
+                    raise ValueError(f"{key}: list {row['list']} has {elected[row['list']]} elected for {row['seats']}")
+
+            local = units.filter(pl.col("district") == number)
+            votes = unit_votes.filter(
+                pl.col("gmina").is_in(local["gmina"].implode())
+                & pl.col("commission").is_in(local["commission"].implode())
+            ).join(local.select("gmina", "commission"), on=["gmina", "commission"])
+            got = int(votes["votes"].sum())
+            completeness = min(got / official, 1) if official else 1
+            gmina_set = make_set(contest, key, "gmina", False, completeness, GMINA_METHOD)
+            obwod_set = make_set(contest, key, "obwod", False, completeness, OBWOD_METHOD)
+            for code in sorted(set(local["gmina"])):
+                at = accounting.filter((pl.col("district") == number) & (pl.col("gmina") == code))
+                put(gmina_set, gmina_unit(code), {c: int(at[c].sum()) for _, c in figures})
+            for row in votes.group_by("gmina", "list").agg(pl.col("votes").sum()).iter_rows(named=True):
+                values.append(
+                    (str(gmina_set), str(gmina_unit(row["gmina"])), str(options[row["list"]]), VOTES, row["votes"])
+                )
+            for row in local.iter_rows(named=True):
+                unit = cs.unit("pl.obwod", f"{day}:{row['gmina']}:{row['commission']}")
+                unit_rows[unit] = {
+                    "scheme_code": "pl.obwod",
+                    "code": f"{day}:{row['gmina']}:{row['commission']}",
+                    "parent_id": str(gmina_unit(row["gmina"])),
+                    "area_relation": "unlocated",
+                    "area_id": None,
+                    "kind": "aggregate" if not row["gmina"].isdigit() else "standard",
+                }
+                if row["valid"] is not None:
+                    put(obwod_set, unit, {**row, "unusable": row["cast"] - row["valid"]})
+            lookup = {
+                (row["gmina"], row["commission"]): cs.unit("pl.obwod", f"{day}:{row['gmina']}:{row['commission']}")
+                for row in local.iter_rows(named=True)
+            }
+            for row in votes.iter_rows(named=True):
+                values.append(
+                    (
+                        str(obwod_set),
+                        str(lookup[(row["gmina"], row["commission"])]),
+                        str(options[row["list"]]),
+                        VOTES,
+                        row["votes"],
+                    )
+                )
+
+        minted = [
+            {"id": str(unit), "polity_id": str(poland), **row} for unit, row in unit_rows.items() if unit in cs.minted
+        ]
+        cs.frame(
+            "reporting_unit", pl.DataFrame(minted, schema_overrides={"parent_id": pl.String, "area_id": pl.String})
+        )
+        cs.frame(
+            "result_value",
+            pl.DataFrame(
+                values,
+                schema={
+                    "result_set_id": pl.String,
+                    "unit_id": pl.String,
+                    "option_id": pl.String,
+                    "measure": pl.Int16,
+                    "value": pl.Int64,
+                },
+                orient="row",
+            ).with_columns(channel=pl.lit(0, pl.Int16), count_round=pl.lit(0, pl.Int16), flags=pl.lit(0, pl.Int16)),
+        )
+        return cs.write()
