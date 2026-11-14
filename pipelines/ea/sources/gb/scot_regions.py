@@ -3,11 +3,13 @@ import io
 import json
 import re
 import subprocess
+import time
 from collections.abc import Callable
-from datetime import date
+from datetime import UTC, date, datetime
 from pathlib import Path
 from uuid import UUID
 
+import httpx
 import polars as pl
 from anthropic.types import ImageBlockParam, TextBlockParam
 from anthropic.types.message_create_params import MessageCreateParamsNonStreaming
@@ -23,6 +25,7 @@ SOURCE = "gb.scot_regions"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 CORRECTIONS = Path(__file__).with_name("scot_regions_corrections.tsv")
+PRESS_READS = Path(__file__).with_name("scot_regions_press.tsv")
 BASE = "https://www.electionscentre.co.uk/wp-content/uploads/2015/10"
 MODEL = "claude-haiku-5-5"
 PROMPT = "1"
@@ -180,6 +183,59 @@ READ_SCHEMA: dict[str, object] = {
 ROUNDS = [volume for volume, spec in VOLUMES.items() if spec["tier"] != "both"]
 
 
+PRESS: dict[str, dict[str, str]] = {
+    "herald-1988-05-06": {
+        "title": "The Glasgow Herald, 6 May 1988",
+        "id": "2zpAAAAAIBAJ",
+        "sjid": "U1kMAAAAIBAJ",
+        "pg": "448,1355457",
+        "size": "3402x4864",
+        "note": "Page 11, “District Council Elections Results”: each ward's candidates, parties, and votes, with the "
+        "majority, as declared on the night of 5 May 1988.",
+    },
+}
+PRESS_METHOD = (
+    "The results volume's scan skips the page with this council, so the wards are read from The Glasgow Herald's "
+    "results page instead, from Google's scan of the paper, and each checked against the printed majority. The "
+    "paper gives no electorates or rejected ballots. The candidate with the most votes is shown elected."
+)
+
+
+def press_url(paper: str) -> str:
+    spec = PRESS[paper]
+    return f"https://news.google.com/newspapers?id={spec['id']}&sjid={spec['sjid']}&pg={spec['pg']}"
+
+
+def press_page(paper: str) -> None:
+    if press_url(paper) in raw.keys(SOURCE):
+        return
+    spec = PRESS[paper]
+    width, height = (int(side) for side in spec["size"].split("x"))
+    columns, rows = -(-width // 256), -(-height // 256)
+    image = Image.new("L", (columns * 256, rows * 256), 255)
+    tile = 0
+    with httpx.Client(headers={"User-Agent": "Mozilla/5.0"}, timeout=30) as client:
+        for top in range(0, rows, 3):
+            for left in range(0, columns, 3):
+                for row in range(top, min(top + 3, rows)):
+                    for column in range(left, min(left + 3, columns)):
+                        response = client.get(f"{press_url(paper)}&img=1&hl=en&zoom=6&tid={tile}")
+                        response.raise_for_status()
+                        image.paste(Image.open(io.BytesIO(response.content)).convert("L"), (column * 256, row * 256))
+                        tile += 1
+                        time.sleep(0.2)
+    buffer = io.BytesIO()
+    image.crop((0, 0, width, height)).save(buffer, "PNG")
+    raw.store(
+        SOURCE,
+        press_url(paper),
+        buffer.getvalue(),
+        suffix=".png",
+        retrieved_at=datetime.now(UTC),
+        media_type="image/png",
+    )
+
+
 def url(volume: str) -> str:
     return f"{BASE}/{VOLUMES[volume]['file']}.pdf"
 
@@ -253,6 +309,8 @@ def halves(image: Image.Image) -> dict[str, Image.Image]:
 
 
 def fetch() -> None:
+    for paper in PRESS:
+        press_page(paper)
     reads: dict[str, batch.Want] = {}
     names: dict[str, batch.Want] = {}
     columns: dict[str, batch.Want] = {}
@@ -776,6 +834,52 @@ def parse_book(volume: str, fixes: dict[tuple[str, int, str], list[dict]]) -> No
     print(f"{volume}: {len(divisions)} divisions, {len(candidates)} candidates, {len(problems)} problems")
 
 
+def press_reads() -> tuple[list[dict], list[dict], list[str]]:
+    divisions: list[dict] = []
+    candidates: list[dict] = []
+    problems: list[str] = []
+    reads = pl.read_csv(PRESS_READS, separator="\t", infer_schema_length=0)
+    for (volume, paper, council, number), rows in reads.group_by(
+        "volume", "paper", "council", "number", maintain_order=True
+    ):
+        first = rows.row(0, named=True)
+        region = next(region for key, _, region in councils(str(volume)) if key == council)
+        division = {
+            "volume": volume,
+            "tier": VOLUMES[str(volume)]["tier"],
+            "number": number,
+            "name": first["name"],
+            "page": int(first["page"]),
+            "electorate": None,
+            "turnout": None,
+            "rejected": None,
+            "majority": int(first["majority"]),
+            "note": None,
+            "council": council,
+            "region": region,
+            "paper": paper,
+            "bbox": [float(value) for value in first["bbox"].split(",")],
+        }
+        lines = [
+            {
+                "title": None,
+                "initials": line["initials"],
+                "surname": line["surname"],
+                "party": line["party"],
+                "votes": int(line["votes"]),
+                "percent": None,
+            }
+            for line in rows.sort(pl.col("order").cast(pl.Int64)).iter_rows(named=True)
+        ]
+        problems += [f"{volume}\t{paper}\t{number}\t{council}\t{issue}" for issue in issues(division, lines)]
+        divisions.append(division)
+        candidates += [
+            {"volume": volume, "council": council, "number": number, "order": order, **line}
+            for order, line in enumerate(lines)
+        ]
+    return divisions, candidates, problems
+
+
 def parse() -> None:
     corrections = pl.read_csv(CORRECTIONS, separator="\t", infer_schema_length=0).iter_rows(named=True)
     fixes: dict[tuple[str, int, str], list[dict]] = {}
@@ -785,9 +889,7 @@ def parse() -> None:
     for key in book:
         del fixes[key]
     parse_book("b1974", book)
-    divisions: list[dict] = []
-    candidates: list[dict] = []
-    problems: list[str] = []
+    divisions, candidates, problems = press_reads()
     doubts: list[dict] = []
     held: list[dict] = []
     for volume in ROUNDS:
@@ -960,6 +1062,20 @@ def emit() -> Path:
                 notes=SOURCE_NOTE,
             )
             cs.artifact(raw.cached(SOURCE, url(volume)), sources[volume])
+        papers = set(divisions["paper"].drop_nulls().to_list()) if "paper" in divisions.columns else set()
+        for paper in sorted(papers):
+            spec = PRESS[paper]
+            sources[paper] = cs.source("The Glasgow Herald", spec["title"])
+            cs.add(
+                "source",
+                id=sources[paper],
+                kind="news_agency",
+                publisher="The Glasgow Herald",
+                title=spec["title"],
+                url=press_url(paper),
+                notes=spec["note"],
+            )
+            cs.artifact(raw.cached(SOURCE, press_url(paper)), sources[paper])
 
         bodies: dict[str, tuple[UUID, UUID, str, str]] = {}
         for key, label, code in REGIONS:
@@ -1032,7 +1148,8 @@ def emit() -> Path:
                 )
                 name(election, f"{year} {council_name} election")
                 cs.add("slug", path=f"{path}/{day}-local", entity_id=election)
-                cs.add("note", entity_id=election, kind="methodology", body_md=METHOD)
+                pressed = "paper" in rows.columns and rows["paper"].is_not_null().all()
+                cs.add("note", entity_id=election, kind="methodology", body_md=PRESS_METHOD if pressed else METHOD)
                 if volume == "b1974" and key in RENAMED_1974:
                     cs.add(
                         "note",
@@ -1091,6 +1208,8 @@ def emit() -> Path:
                     )
                     name(contest, f"{shown}, {council_name}, {year}")
                     cs.add("slug", path=f"{path}/{day}-local/{noun}-{slug(row['number'])}", entity_id=contest)
+                    paper = row.get("paper")
+                    cited = sources[paper] if paper else sources[volume]
                     result_set = cs.key(f"{SOURCE}.result_set", contest_key)
                     cs.add(
                         "result_set",
@@ -1100,15 +1219,16 @@ def emit() -> Path:
                         stage="official",
                         kind="tacit" if tacit else "counted",
                         status="active",
-                        source_id=sources[volume],
+                        source_id=cited,
                         is_default=True,
                         completeness=1,
                     )
                     cs.add(
                         "citation",
                         entity_id=result_set,
-                        source_id=sources[volume],
-                        locator={"page": row["page"], noun: row["number"]},
+                        source_id=cited,
+                        locator={"page": row["page"], noun: row["number"]}
+                        | ({"bbox": [round(value, 4) for value in row["bbox"]]} if paper else {}),
                     )
                     votes = standing["votes"].to_list()
                     top = None if tacit else max(votes)
