@@ -1,7 +1,7 @@
 {
   "polity": "US-LA",
   "publisher": "Louisiana Secretary of State",
-  "title": "Report of the Secretary of State, 1979\u20131980",
+  "title": "Report of the Secretary of State, 1979–1980",
   "license": "Public record",
   "file": {
     "url": "https://archive.org/download/micro_IA40706905_0363/micro_IA40706905_0363.pdf",
@@ -40,14 +40,6 @@
       "special": false,
       "state": "LA",
       "district": 3
-    },
-    "house4": {
-      "year": 1980,
-      "chamber": "house",
-      "day": "1980-09-13",
-      "special": false,
-      "state": "LA",
-      "district": 4
     },
     "house5": {
       "year": 1980,
@@ -261,13 +253,13 @@
         },
         {
           "label": "Claude \"Buddy\" Leach (Democrat)",
-          "contest": "house4",
-          "candidate": "Claude \"Buddy\" Leach"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "Buddy Roemer (Democrat)",
-          "contest": "house4",
-          "candidate": "Buddy Roemer"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "Jimmy Wilson (Republican)",
