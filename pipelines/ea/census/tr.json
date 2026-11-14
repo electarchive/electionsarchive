@@ -302,49 +302,147 @@
       "title": "TBMM Tutanak Dergisi, dönem 19, cilt 35, 101. Birleşim (8 May 1993)",
       "publisher": "Türkiye Büyük Millet Meclisi",
       "url": "https://www5.tbmm.gov.tr/tutanaklar/TUTANAK/TBMM/d19/c035/tbmm19035101.pdf",
-      "note": "Records the first round on 8 May 1993 (422 voting) and sets the second for 12 May 1993.",
+      "note": "Records the first round on 8 May 1993 (422 voting) and sets the second for 12 May 1993. Dönem 19, cilt 35, birleşimler 102 and 103 record the second round on 12 May and the third on 16 May.",
       "kind": "official_body"
-    },
-    "wiki-tr-1973": {
-      "title": "1973 Türkiye cumhurbaşkanlığı seçimi",
-      "publisher": "Vikipedi (Turkish Wikipedia), round table citing the TBMM minutes",
-      "url": "https://tr.wikipedia.org/wiki/1973_T%C3%BCrkiye_cumhurba%C5%9Fkanl%C4%B1%C4%9F%C4%B1_se%C3%A7imi",
-      "note": "Round table with the date of each of the 15 rounds; the AA history of presidential elections agrees on 13 March to 6 April 1973.",
-      "kind": "compendium"
-    },
-    "wiki-tr-1989": {
-      "title": "1989 Türkiye cumhurbaşkanlığı seçimi",
-      "publisher": "Vikipedi (Turkish Wikipedia), round table citing the TBMM minutes",
-      "url": "https://tr.wikipedia.org/wiki/1989_T%C3%BCrkiye_cumhurba%C5%9Fkanl%C4%B1%C4%9F%C4%B1_se%C3%A7imi",
-      "note": "Round table: 20, 24, and 31 October 1989.",
-      "kind": "compendium"
-    },
-    "wiki-tr-1993": {
-      "title": "1993 Türkiye cumhurbaşkanlığı seçimi",
-      "publisher": "Vikipedi (Turkish Wikipedia), round table citing the TBMM minutes",
-      "url": "https://tr.wikipedia.org/wiki/1993_T%C3%BCrkiye_cumhurba%C5%9Fkanl%C4%B1%C4%9F%C4%B1_se%C3%A7imi",
-      "note": "Round table: 8, 12, and 16 May 1993.",
-      "kind": "compendium"
-    },
-    "wiki-tr-2000": {
-      "title": "2000 Türkiye cumhurbaşkanlığı seçimi",
-      "publisher": "Vikipedi (Turkish Wikipedia), round table citing the TBMM minutes",
-      "url": "https://tr.wikipedia.org/wiki/2000_T%C3%BCrkiye_cumhurba%C5%9Fkanl%C4%B1%C4%9F%C4%B1_se%C3%A7imi",
-      "note": "Round table: 27 April, 1 May, and 5 May 2000.",
-      "kind": "compendium"
-    },
-    "wiki-tr-2007": {
-      "title": "2007 Türkiye cumhurbaşkanlığı seçimi",
-      "publisher": "Vikipedi (Turkish Wikipedia), round table citing the TBMM minutes",
-      "url": "https://tr.wikipedia.org/wiki/2007_T%C3%BCrkiye_cumhurba%C5%9Fkanl%C4%B1%C4%9F%C4%B1_se%C3%A7imi",
-      "note": "Rounds on 20, 24, and 28 August 2007. The April 2007 round, annulled by the Constitutional Court, is not counted.",
-      "kind": "compendium"
     },
     "tbmm-mbk-158": {
       "title": "Temsilciler Meclisi Seçimi Kanunu (Law 158, 13 December 1960), Millî Birlik Komitesi minutes",
       "publisher": "Türkiye Büyük Millet Meclisi",
       "url": "https://www5.tbmm.gov.tr/tutanaklar/TUTANAK/MBK_/d00/c004/mbk_00004052.pdf",
       "note": "Article 4 sets the district delegate boards within 10 days of publication and the provincial boards, which choose the representatives, within 15 days.",
+      "kind": "official_body"
+    },
+    "tbmm-zabit-1923": {
+      "title": "TBMM Zabıt Ceridesi, devre 2, cilt 3, 43. İçtima (29 Teşrinievvel 1339)",
+      "publisher": "Türkiye Büyük Millet Meclisi",
+      "url": "https://www5.tbmm.gov.tr/tutanaklar/TUTANAK/TBMM/d02/c003/tbmm02003043.pdf",
+      "note": "Reisicumhur intihabı, Mustafa Kemal Paşa.",
+      "kind": "official_body"
+    },
+    "tbmm-zabit-1927": {
+      "title": "TBMM Zabıt Ceridesi, devre 3, cilt 1, 1. İnikat (1 Teşrinisani 1927)",
+      "publisher": "Türkiye Büyük Millet Meclisi",
+      "url": "https://www5.tbmm.gov.tr/tutanaklar/TUTANAK/TBMM/d03/c001/tbmm03001001.pdf",
+      "note": "Reisicumhur intihabatı at the first sitting of the term.",
+      "kind": "official_body"
+    },
+    "tbmm-zabit-1931": {
+      "title": "TBMM Zabıt Ceridesi, devre 4, cilt 1, 1. İnikat (4 May 1931)",
+      "publisher": "Türkiye Büyük Millet Meclisi",
+      "url": "https://www5.tbmm.gov.tr/tutanaklar/TUTANAK/TBMM/d04/c001/tbmm04001001.pdf",
+      "note": "Reisicumhur intihabı at the first sitting of the term.",
+      "kind": "official_body"
+    },
+    "tbmm-zabit-1935": {
+      "title": "TBMM Zabıt Ceridesi, devre 5, cilt 1, 1. İnikat (1 Mart 1935)",
+      "publisher": "Türkiye Büyük Millet Meclisi",
+      "url": "https://www5.tbmm.gov.tr/tutanaklar/TUTANAK/TBMM/d05/c001/tbmm05001001.pdf",
+      "note": "Reiscümhur intihabı at the first sitting of the term.",
+      "kind": "official_body"
+    },
+    "tbmm-zabit-1938": {
+      "title": "TBMM Zabıt Ceridesi, devre 5, cilt 27, 4. İçtima (11 Teşrinisani 1938)",
+      "publisher": "Türkiye Büyük Millet Meclisi",
+      "url": "https://www5.tbmm.gov.tr/tutanaklar/TUTANAK/TBMM/d05/c027/tbmm05027003.pdf",
+      "note": "Reisicumhur seçimi after Atatürk's death.",
+      "kind": "official_body"
+    },
+    "tbmm-zabit-1939": {
+      "title": "TBMM Zabıt Ceridesi, devre 6, cilt 1, 1. İnikat (3 Nisan 1939)",
+      "publisher": "Türkiye Büyük Millet Meclisi",
+      "url": "https://www5.tbmm.gov.tr/tutanaklar/TUTANAK/TBMM/d06/c001/tbmm06001001.pdf",
+      "note": "Reisicumhur intihabı at the first sitting of the term; the second sitting's summary records İnönü elected with 413 votes.",
+      "kind": "official_body"
+    },
+    "tbmm-zabit-1943": {
+      "title": "TBMM Zabıt Ceridesi, devre 7, cilt 1, 1. İnikat (8 Mart 1943)",
+      "publisher": "Türkiye Büyük Millet Meclisi",
+      "url": "https://www5.tbmm.gov.tr/tutanaklar/TUTANAK/TBMM/d07/c001/tbmm07001001.pdf",
+      "note": "Reisicumhur seçimi at the first sitting of the term.",
+      "kind": "official_body"
+    },
+    "tbmm-tutanak-1946": {
+      "title": "TBMM Tutanak Dergisi, dönem 8, cilt 1, 1. Birleşim (5 Ağustos 1946)",
+      "publisher": "Türkiye Büyük Millet Meclisi",
+      "url": "https://www5.tbmm.gov.tr/tutanaklar/TUTANAK/TBMM/d08/c001/tbmm08001001.pdf",
+      "note": "Cumhurbaşkanı seçimi at the first sitting; the next sitting's summary records İnönü elected with 386 votes.",
+      "kind": "official_body"
+    },
+    "tbmm-tutanak-1950": {
+      "title": "TBMM Tutanak Dergisi, dönem 9, cilt 1, 1. Birleşim (22 Mayıs 1950)",
+      "publisher": "Türkiye Büyük Millet Meclisi",
+      "url": "https://www5.tbmm.gov.tr/tutanaklar/TUTANAK/TBMM/d09/c001/tbmm09001001.pdf",
+      "note": "Cumhurbaşkanı seçimi at the first sitting of the term.",
+      "kind": "official_body"
+    },
+    "tbmm-tutanak-1954": {
+      "title": "TBMM Tutanak Dergisi, dönem 10, cilt 1, 1. Birleşim (14 Mayıs 1954)",
+      "publisher": "Türkiye Büyük Millet Meclisi",
+      "url": "https://www5.tbmm.gov.tr/tutanaklar/TUTANAK/TBMM/d10/c001/tbmm10001001.pdf",
+      "note": "Reisicumhur intihabı at the first sitting of the term.",
+      "kind": "official_body"
+    },
+    "tbmm-tutanak-1957": {
+      "title": "TBMM Tutanak Dergisi, dönem 11, cilt 1, 1. Birleşim (1 Kasım 1957)",
+      "publisher": "Türkiye Büyük Millet Meclisi",
+      "url": "https://www5.tbmm.gov.tr/tutanaklar/TUTANAK/TBMM/d11/c001/tbmm11001001.pdf",
+      "note": "Reisicumhur intihabı at the first sitting; Bayar elected with 413 votes.",
+      "kind": "official_body"
+    },
+    "tbmm-tutanak-1961": {
+      "title": "TBMM Tutanak Dergisi, term 1, cilt 1, 2. Birleşim (26 Ekim 1961)",
+      "publisher": "Türkiye Büyük Millet Meclisi",
+      "url": "https://www5.tbmm.gov.tr/tutanaklar/TUTANAK/TBMM/t01/c001/tbmm01001002.pdf",
+      "note": "Cumhurbaşkanı seçimi; the 3rd sitting's summary (tbmm01001003.pdf) records Gürsel elected with 434 votes of 607.",
+      "kind": "official_body"
+    },
+    "tbmm-tutanak-1966": {
+      "title": "TBMM Tutanak Dergisi, term 5, cilt 5, 5. Birleşim (28 Mart 1966)",
+      "publisher": "Türkiye Büyük Millet Meclisi",
+      "url": "https://www5.tbmm.gov.tr/tutanaklar/TUTANAK/TBMM/t05/c005/tbmm05005005.pdf",
+      "note": "Cumhurbaşkanı seçimi in the joint sitting.",
+      "kind": "official_body"
+    },
+    "tbmm-tutanak-1973": {
+      "title": "TBMM Tutanak Dergisi, term 12, cilt 12, Birleşik Toplantı 4.-16. Birleşim (13 Mart-6 Nisan 1973)",
+      "publisher": "Türkiye Büyük Millet Meclisi",
+      "url": "https://www5.tbmm.gov.tr/tutanaklar/TUTANAK/TBMM/t12/c012/tbmm12012004.pdf",
+      "note": "Joint sitting of the Senate and the National Assembly; files tbmm12012004 to tbmm12012016 hold the 15 rounds, four on 13 March and two on 16 March.",
+      "kind": "official_body"
+    },
+    "tbmm-tutanak-1980": {
+      "title": "TBMM Tutanak Dergisi, term 19, cilt 19, Birleşik Toplantı 7.-109. Birleşim (25 Mart-21 Ağustos 1980)",
+      "publisher": "Türkiye Büyük Millet Meclisi",
+      "url": "https://www5.tbmm.gov.tr/tutanaklar/TUTANAK/TBMM/t19/c019/tbmm19019007.pdf",
+      "note": "Round numbers are read from each sitting's Tasnif Komisyonu report and the next sitting's summary; 115 rounds were held, and the last round was the 115th on 21 August 1980. Later sittings to 11 September 1980 had no quorum.",
+      "kind": "official_body"
+    },
+    "tbmm-tutanak-1989": {
+      "title": "TBMM Tutanak Dergisi, dönem 18, cilt 33, birleşimler 20, 21, and 24 (20, 24, and 31 Ekim 1989)",
+      "publisher": "Türkiye Büyük Millet Meclisi",
+      "url": "https://www5.tbmm.gov.tr/tutanaklar/TUTANAK/TBMM/d18/c033/tbmm18033020.pdf",
+      "note": "Rounds one to three: 285 voting on 20 October, 284 on 24 October, and 285 on 31 October.",
+      "kind": "official_body"
+    },
+    "tbmm-tutanak-2000": {
+      "title": "TBMM Tutanak Dergisi, dönem 21, yasama yılı 2, birleşimler 86 to 89 (25 Nisan-5 Mayıs 2000)",
+      "publisher": "Türkiye Büyük Millet Meclisi",
+      "url": "https://cdn.tbmm.gov.tr/TbmmWeb/Tutanak20230120/21/2/86/abd23ca0-8a96-4856-b278-a0ea748c8ff8.pdf",
+      "note": "The 25 April summary records the first round on 27 April; the 1 May sitting records the second (532 voting) and sets the third for 5 May.",
+      "kind": "official_body"
+    },
+    "tbmm-tutanak-2007-04": {
+      "title": "TBMM Tutanak Dergisi, dönem 22, cilt 155, 96. Birleşim (27 Nisan 2007)",
+      "publisher": "Türkiye Büyük Millet Meclisi",
+      "url": "https://www5.tbmm.gov.tr/tutanaklar/TUTANAK/TBMM/d22/c155/tbmm22155096.pdf",
+      "note": "First round: 361 members voting, 367 votes needed; the Constitutional Court later annulled the round.",
+      "kind": "official_body"
+    },
+    "tbmm-tutanak-2007": {
+      "title": "TBMM Tutanak Dergisi, dönem 23, cilt 1, birleşimler 4 to 6 (20, 24, and 28 Ağustos 2007)",
+      "publisher": "Türkiye Büyük Millet Meclisi",
+      "url": "https://www5.tbmm.gov.tr/tutanaklar/TUTANAK/TBMM/d23/c001/tbmm23001004.pdf",
+      "note": "Rounds one to three: 448 voting on 20 August, 446 on 24 August, and 448 on 28 August.",
       "kind": "official_body"
     }
   },
@@ -924,7 +1022,7 @@
       "measure": {
         "unit": "contest"
       },
-      "note": "The Assembly elected the President for its own term under the 1924 Constitution (art. 31), for seven years by two-thirds majority in the first two rounds under 1961 art. 95 and 1982 art. 102, until the 2007 amendment moved the office to a popular vote. Counted per round of voting. Dates cover the rounds of 1973, 1989, 1993, 2000, and August 2007; rounds of other elections are not yet dated.",
+      "note": "The Assembly elected the President for its own term under the 1924 Constitution (art. 31), for seven years by two-thirds majority in the first two rounds under 1961 art. 95 and 1982 art. 102, until the 2007 amendment moved the office to a popular vote. Counted per round of voting. Dates come from the Assembly's minutes for every election from 1923 to 2007 except 1982, when Evren became President by the constitutional referendum of 7 November 1982 rather than by an Assembly vote and no round is counted. The annulled round of 27 April 2007 is counted.",
       "source": "anayasa_1924",
       "match": [
         {
@@ -982,74 +1080,419 @@
       ],
       "dates": [
         {
+          "date": "1923-10-29",
+          "contests": 1,
+          "source": "tbmm-zabit-1923"
+        },
+        {
+          "date": "1927-11-01",
+          "contests": 1,
+          "source": "tbmm-zabit-1927"
+        },
+        {
+          "date": "1931-05-04",
+          "contests": 1,
+          "source": "tbmm-zabit-1931"
+        },
+        {
+          "date": "1935-03-01",
+          "contests": 1,
+          "source": "tbmm-zabit-1935"
+        },
+        {
+          "date": "1938-11-11",
+          "contests": 1,
+          "source": "tbmm-zabit-1938"
+        },
+        {
+          "date": "1939-04-03",
+          "contests": 1,
+          "source": "tbmm-zabit-1939"
+        },
+        {
+          "date": "1943-03-08",
+          "contests": 1,
+          "source": "tbmm-zabit-1943"
+        },
+        {
+          "date": "1946-08-05",
+          "contests": 1,
+          "source": "tbmm-tutanak-1946"
+        },
+        {
+          "date": "1950-05-22",
+          "contests": 1,
+          "source": "tbmm-tutanak-1950"
+        },
+        {
+          "date": "1954-05-14",
+          "contests": 1,
+          "source": "tbmm-tutanak-1954"
+        },
+        {
+          "date": "1957-11-01",
+          "contests": 1,
+          "source": "tbmm-tutanak-1957"
+        },
+        {
+          "date": "1961-10-26",
+          "contests": 1,
+          "source": "tbmm-tutanak-1961"
+        },
+        {
+          "date": "1966-03-28",
+          "contests": 1,
+          "source": "tbmm-tutanak-1966"
+        },
+        {
           "date": "1973-03-13",
           "contests": 4,
-          "source": "wiki-tr-1973"
+          "source": "tbmm-tutanak-1973"
         },
         {
           "date": "1973-03-16",
           "contests": 2,
-          "source": "wiki-tr-1973"
+          "source": "tbmm-tutanak-1973"
         },
         {
           "date": "1973-03-21",
           "contests": 1,
-          "source": "wiki-tr-1973"
+          "source": "tbmm-tutanak-1973"
         },
         {
-          "date": "1973-03-24",
+          "date": "1973-03-23",
           "contests": 1,
-          "source": "wiki-tr-1973"
+          "source": "tbmm-tutanak-1973"
         },
         {
           "date": "1973-03-26",
           "contests": 1,
-          "source": "wiki-tr-1973"
+          "source": "tbmm-tutanak-1973"
         },
         {
           "date": "1973-03-27",
           "contests": 1,
-          "source": "wiki-tr-1973"
+          "source": "tbmm-tutanak-1973"
         },
         {
           "date": "1973-03-28",
           "contests": 1,
-          "source": "wiki-tr-1973"
+          "source": "tbmm-tutanak-1973"
         },
         {
           "date": "1973-03-30",
           "contests": 1,
-          "source": "wiki-tr-1973"
+          "source": "tbmm-tutanak-1973"
         },
         {
           "date": "1973-04-02",
           "contests": 1,
-          "source": "wiki-tr-1973"
+          "source": "tbmm-tutanak-1973"
         },
         {
           "date": "1973-04-04",
           "contests": 1,
-          "source": "wiki-tr-1973"
+          "source": "tbmm-tutanak-1973"
         },
         {
           "date": "1973-04-06",
           "contests": 1,
-          "source": "wiki-tr-1973"
+          "source": "tbmm-tutanak-1973"
+        },
+        {
+          "date": "1980-03-25",
+          "contests": 2,
+          "source": "tbmm-tutanak-1980"
+        },
+        {
+          "date": "1980-03-26",
+          "contests": 2,
+          "source": "tbmm-tutanak-1980"
+        },
+        {
+          "date": "1980-03-27",
+          "contests": 2,
+          "source": "tbmm-tutanak-1980"
+        },
+        {
+          "date": "1980-03-28",
+          "contests": 2,
+          "source": "tbmm-tutanak-1980"
+        },
+        {
+          "date": "1980-03-31",
+          "contests": 2,
+          "source": "tbmm-tutanak-1980"
+        },
+        {
+          "date": "1980-04-01",
+          "contests": 2,
+          "source": "tbmm-tutanak-1980"
+        },
+        {
+          "date": "1980-04-02",
+          "contests": 2,
+          "source": "tbmm-tutanak-1980"
+        },
+        {
+          "date": "1980-04-03",
+          "contests": 2,
+          "source": "tbmm-tutanak-1980"
+        },
+        {
+          "date": "1980-04-04",
+          "contests": 2,
+          "source": "tbmm-tutanak-1980"
+        },
+        {
+          "date": "1980-04-07",
+          "contests": 2,
+          "source": "tbmm-tutanak-1980"
+        },
+        {
+          "date": "1980-04-08",
+          "contests": 2,
+          "source": "tbmm-tutanak-1980"
+        },
+        {
+          "date": "1980-04-09",
+          "contests": 2,
+          "source": "tbmm-tutanak-1980"
+        },
+        {
+          "date": "1980-04-10",
+          "contests": 3,
+          "source": "tbmm-tutanak-1980"
+        },
+        {
+          "date": "1980-04-11",
+          "contests": 3,
+          "source": "tbmm-tutanak-1980"
+        },
+        {
+          "date": "1980-04-12",
+          "contests": 1,
+          "source": "tbmm-tutanak-1980"
+        },
+        {
+          "date": "1980-04-14",
+          "contests": 3,
+          "source": "tbmm-tutanak-1980"
+        },
+        {
+          "date": "1980-04-15",
+          "contests": 3,
+          "source": "tbmm-tutanak-1980"
+        },
+        {
+          "date": "1980-04-16",
+          "contests": 3,
+          "source": "tbmm-tutanak-1980"
+        },
+        {
+          "date": "1980-04-17",
+          "contests": 3,
+          "source": "tbmm-tutanak-1980"
+        },
+        {
+          "date": "1980-04-21",
+          "contests": 1,
+          "source": "tbmm-tutanak-1980"
+        },
+        {
+          "date": "1980-04-24",
+          "contests": 2,
+          "source": "tbmm-tutanak-1980"
+        },
+        {
+          "date": "1980-04-25",
+          "contests": 2,
+          "source": "tbmm-tutanak-1980"
+        },
+        {
+          "date": "1980-04-28",
+          "contests": 2,
+          "source": "tbmm-tutanak-1980"
+        },
+        {
+          "date": "1980-04-29",
+          "contests": 3,
+          "source": "tbmm-tutanak-1980"
+        },
+        {
+          "date": "1980-04-30",
+          "contests": 3,
+          "source": "tbmm-tutanak-1980"
+        },
+        {
+          "date": "1980-05-01",
+          "contests": 2,
+          "source": "tbmm-tutanak-1980"
+        },
+        {
+          "date": "1980-05-02",
+          "contests": 2,
+          "source": "tbmm-tutanak-1980"
+        },
+        {
+          "date": "1980-05-06",
+          "contests": 2,
+          "source": "tbmm-tutanak-1980"
+        },
+        {
+          "date": "1980-05-07",
+          "contests": 2,
+          "source": "tbmm-tutanak-1980"
+        },
+        {
+          "date": "1980-05-08",
+          "contests": 2,
+          "source": "tbmm-tutanak-1980"
+        },
+        {
+          "date": "1980-05-12",
+          "contests": 2,
+          "source": "tbmm-tutanak-1980"
+        },
+        {
+          "date": "1980-05-13",
+          "contests": 3,
+          "source": "tbmm-tutanak-1980"
+        },
+        {
+          "date": "1980-05-14",
+          "contests": 2,
+          "source": "tbmm-tutanak-1980"
+        },
+        {
+          "date": "1980-05-15",
+          "contests": 2,
+          "source": "tbmm-tutanak-1980"
+        },
+        {
+          "date": "1980-05-20",
+          "contests": 2,
+          "source": "tbmm-tutanak-1980"
+        },
+        {
+          "date": "1980-05-21",
+          "contests": 2,
+          "source": "tbmm-tutanak-1980"
+        },
+        {
+          "date": "1980-05-22",
+          "contests": 2,
+          "source": "tbmm-tutanak-1980"
+        },
+        {
+          "date": "1980-05-28",
+          "contests": 2,
+          "source": "tbmm-tutanak-1980"
+        },
+        {
+          "date": "1980-05-29",
+          "contests": 2,
+          "source": "tbmm-tutanak-1980"
+        },
+        {
+          "date": "1980-06-02",
+          "contests": 1,
+          "source": "tbmm-tutanak-1980"
+        },
+        {
+          "date": "1980-06-03",
+          "contests": 2,
+          "source": "tbmm-tutanak-1980"
+        },
+        {
+          "date": "1980-06-04",
+          "contests": 4,
+          "source": "tbmm-tutanak-1980"
+        },
+        {
+          "date": "1980-06-05",
+          "contests": 4,
+          "source": "tbmm-tutanak-1980"
+        },
+        {
+          "date": "1980-06-06",
+          "contests": 3,
+          "source": "tbmm-tutanak-1980"
+        },
+        {
+          "date": "1980-06-09",
+          "contests": 1,
+          "source": "tbmm-tutanak-1980"
+        },
+        {
+          "date": "1980-06-11",
+          "contests": 2,
+          "source": "tbmm-tutanak-1980"
+        },
+        {
+          "date": "1980-06-12",
+          "contests": 2,
+          "source": "tbmm-tutanak-1980"
+        },
+        {
+          "date": "1980-06-16",
+          "contests": 1,
+          "source": "tbmm-tutanak-1980"
+        },
+        {
+          "date": "1980-06-18",
+          "contests": 1,
+          "source": "tbmm-tutanak-1980"
+        },
+        {
+          "date": "1980-06-24",
+          "contests": 1,
+          "source": "tbmm-tutanak-1980"
+        },
+        {
+          "date": "1980-07-02",
+          "contests": 1,
+          "source": "tbmm-tutanak-1980"
+        },
+        {
+          "date": "1980-07-03",
+          "contests": 2,
+          "source": "tbmm-tutanak-1980"
+        },
+        {
+          "date": "1980-07-16",
+          "contests": 1,
+          "source": "tbmm-tutanak-1980"
+        },
+        {
+          "date": "1980-07-23",
+          "contests": 1,
+          "source": "tbmm-tutanak-1980"
+        },
+        {
+          "date": "1980-08-18",
+          "contests": 1,
+          "source": "tbmm-tutanak-1980"
+        },
+        {
+          "date": "1980-08-21",
+          "contests": 2,
+          "source": "tbmm-tutanak-1980"
         },
         {
           "date": "1989-10-20",
           "contests": 1,
-          "source": "wiki-tr-1989"
+          "source": "tbmm-tutanak-1989"
         },
         {
           "date": "1989-10-24",
           "contests": 1,
-          "source": "wiki-tr-1989"
+          "source": "tbmm-tutanak-1989"
         },
         {
           "date": "1989-10-31",
           "contests": 1,
-          "source": "wiki-tr-1989"
+          "source": "tbmm-tutanak-1989"
         },
         {
           "date": "1993-05-08",
@@ -1066,37 +1509,42 @@
         {
           "date": "1993-05-16",
           "contests": 1,
-          "source": "wiki-tr-1993"
+          "source": "tbmm-tutanak-1993"
         },
         {
           "date": "2000-04-27",
           "contests": 1,
-          "source": "wiki-tr-2000"
+          "source": "tbmm-tutanak-2000"
         },
         {
           "date": "2000-05-01",
           "contests": 1,
-          "source": "wiki-tr-2000"
+          "source": "tbmm-tutanak-2000"
         },
         {
           "date": "2000-05-05",
           "contests": 1,
-          "source": "wiki-tr-2000"
+          "source": "tbmm-tutanak-2000"
+        },
+        {
+          "date": "2007-04-27",
+          "contests": 1,
+          "source": "tbmm-tutanak-2007-04"
         },
         {
           "date": "2007-08-20",
           "contests": 1,
-          "source": "wiki-tr-2007"
+          "source": "tbmm-tutanak-2007"
         },
         {
           "date": "2007-08-24",
           "contests": 1,
-          "source": "wiki-tr-2007"
+          "source": "tbmm-tutanak-2007"
         },
         {
           "date": "2007-08-28",
           "contests": 1,
-          "source": "wiki-tr-2007"
+          "source": "tbmm-tutanak-2007"
         }
       ]
     },
