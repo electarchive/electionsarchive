@@ -120,6 +120,13 @@ def main() -> None:
     )
     crowning.add_argument("target", nargs="?", help="rebuild every child of one election, or of a polity's elections")
     crowning.add_argument("--all", action="store_true", help="rebuild every child of every such election")
+    packaging = commands.add_parser("package", help="check or bulk-load file-first Parquet packages")
+    packaging.add_argument("action", choices=["check", "load"])
+    packaging.add_argument(
+        "keys",
+        nargs="+",
+        help="package keys, such as cz.volby/ps-2021, or cz.volby/ps-2021@v1 to reload a stored version",
+    )
     rolling = commands.add_parser("rollup", help="recompute the area rollups of result sets")
     rolling.add_argument("sets", nargs="*", type=int, help="result_set k values")
     rolling.add_argument("--affected", action="store_true", help="add every set with no rollup at its district")
@@ -436,6 +443,10 @@ def main() -> None:
                 for pipeline, count in counts.most_common():
                     print(f"{pipeline}\t{count}")
                 print(f"total\t{counts.total()}")
+        case "package":
+            from ea import package
+
+            package.run(args.action, args.keys)
         case "rollup":
             with connect() as conn:
                 if args.scope is not None:

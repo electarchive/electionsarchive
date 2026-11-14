@@ -1,0 +1,807 @@
+import hashlib
+import json
+import shutil
+import time
+from collections.abc import Iterable
+from datetime import UTC, datetime
+from io import BytesIO
+from pathlib import Path
+from typing import LiteralString, TypedDict, cast
+from uuid import NAMESPACE_URL, uuid5
+
+import duckdb
+import polars as pl
+from psycopg import Connection, sql
+
+from ea import covers, search, store, touched
+from ea.apply import MERGE_LOCK, _rollup
+from ea.checks import RULES
+from ea.raw import Artifact
+from ea.store import DATA
+
+NAMESPACE = uuid5(NAMESPACE_URL, "https://electionsarchive.com/")
+ROOT = DATA / "packages"
+
+U = pl.String()
+D = pl.Date()
+B = pl.Boolean()
+I16 = pl.Int16()
+I32 = pl.Int32()
+I64 = pl.Int64()
+F = pl.Float64()
+
+TABLES: dict[str, tuple[tuple[str, ...] | None, dict[str, pl.DataType]]] = {
+    "source": (
+        ("id",),
+        {"id": U, "kind": U, "publisher": U, "title": U, "url": U, "license": U, "license_url": U, "attribution": U},
+    ),
+    "source_artifact": (
+        ("id",),
+        {
+            "id": U,
+            "source_id": U,
+            "url": U,
+            "sha256": U,
+            "retrieved_at": pl.Datetime("us", "UTC"),
+            "storage_key": U,
+            "media_type": U,
+            "bytes": I64,
+        },
+    ),
+    "scheme": (
+        ("code",),
+        {"code": U, "polity_id": U, "kind": U, "rank": I16, "noun": U, "kinds": U, "code_system": U},
+    ),
+    "area": (("id",), {"id": U, "scheme_code": U}),
+    "area_code": (None, {"area_id": U, "code": U, "valid_from": D, "valid_to": D}),
+    "area_kind": (None, {"area_id": U, "kind": U, "valid_from": D, "valid_to": D, "source_id": U}),
+    "area_parent": (None, {"area_id": U, "parent_id": U, "valid_from": D, "valid_to": D}),
+    "area_geometry": (
+        None,
+        {
+            "area_id": U,
+            "valid_from": D,
+            "valid_to": D,
+            "geom": U,
+            "label_point": U,
+            "quality": U,
+            "source_id": U,
+        },
+    ),
+    "boundary_set": (
+        ("id",),
+        {"id": U, "scheme_code": U, "vintage": U, "valid_from": D, "valid_to": D, "as_of": D},
+    ),
+    "body": (("id",), {"id": U, "polity_id": U, "kind": U}),
+    "office": (("id",), {"id": U, "polity_id": U, "body_id": U, "kind": U}),
+    "electoral_system": (
+        ("id",),
+        {"id": U, "polity_id": U, "valid_from": D, "valid_to": D, "rules": U, "rules_version": I32},
+    ),
+    "party": (("id",), {"id": U, "kind": U, "polity_id": U}),
+    "person": (("id",), {"id": U, "birth_date": D, "birth_precision": U, "gender": U}),
+    "election": (
+        ("id",),
+        {"id": U, "polity_id": U, "parent_id": U, "kind": U, "date_from": D, "date_to": D, "status": U},
+    ),
+    "contest": (
+        ("id",),
+        {
+            "id": U,
+            "election_id": U,
+            "kind": U,
+            "office_id": U,
+            "body_id": U,
+            "district_area_id": U,
+            "magnitude": I32,
+            "round_number": I16,
+            "previous_round_id": U,
+            "electoral_system_id": U,
+            "default_result_kind": U,
+        },
+    ),
+    "contest_option": (
+        ("id",),
+        {
+            "id": U,
+            "contest_id": U,
+            "kind": U,
+            "parent_option_id": U,
+            "party_id": U,
+            "ballot_position": I32,
+            "ballot_label": U,
+        },
+    ),
+    "candidacy": (
+        ("id",),
+        {
+            "id": U,
+            "person_id": U,
+            "option_id": U,
+            "role": U,
+            "list_position": I32,
+            "ballot_name": U,
+            "member_of_party_id": U,
+            "is_independent": B,
+        },
+    ),
+    "reporting_unit": (
+        ("id",),
+        {
+            "id": U,
+            "polity_id": U,
+            "scheme_code": U,
+            "code": U,
+            "parent_id": U,
+            "area_relation": U,
+            "area_id": U,
+            "kind": U,
+        },
+    ),
+    "result_set": (
+        ("id",),
+        {
+            "id": U,
+            "election_id": U,
+            "contest_id": U,
+            "stage": U,
+            "kind": U,
+            "source_id": U,
+            "status": U,
+            "is_default": B,
+            "completeness": F,
+        },
+    ),
+    "outcome": (None, {"result_set_id": U, "option_id": U, "candidacy_id": U, "kind": U, "seats": I32}),
+    "name": (
+        ("id",),
+        {"id": U, "entity_id": U, "text": U, "lang": U, "kind": U, "is_preferred": B, "source_id": U},
+    ),
+    "note": (("id",), {"id": U, "entity_id": U, "kind": U, "body_md": U, "lang": U}),
+    "slug": (("path",), {"path": U, "entity_id": U, "is_current": B}),
+    "external_id": (None, {"entity_id": U, "scheme": U, "value": U}),
+    "citation": (("id",), {"id": U, "entity_id": U, "source_id": U, "locator": U}),
+}
+FACT = ("result_set_id", "unit_id", "option_id", "channel", "measure", "count_round")
+FACTS: dict[str, dict[str, pl.DataType]] = {
+    "result_value": {
+        "result_set_id": U,
+        "unit_id": U,
+        "option_id": U,
+        "channel": I16,
+        "measure": I16,
+        "count_round": I16,
+        "flags": I16,
+        "value": I64,
+    },
+    "value_locator": {
+        "result_set_id": U,
+        "unit_id": U,
+        "option_id": U,
+        "channel": I16,
+        "measure": I16,
+        "count_round": I16,
+        "page_id": U,
+        "source_id": U,
+        "x0": F,
+        "y0": F,
+        "x1": F,
+        "y1": F,
+    },
+    "declared": {"result_set_id": U, "option_id": U, "measure": I16, "value": I64},
+}
+JSON_COLUMNS = {"kinds", "rules", "locator"}
+
+
+def folder(key: str) -> Path:
+    return ROOT / key
+
+
+class Package:
+    def __init__(self, key: str, pipeline: str, summary: str, depends: Iterable[str] = ()) -> None:
+        self.key = key
+        self.pipeline = pipeline
+        self.summary = summary
+        self.depends = list(depends)
+        self.rows: dict[str, list[dict[str, object]]] = {}
+        self.sources: list[dict[str, object]] = []
+        self.external: set[str] = set()
+        self.accepted: dict[str, str] = {}
+
+    def id(self, kind: str, *parts: object) -> str:
+        return str(uuid5(NAMESPACE, "\x1f".join([self.pipeline, kind, *(str(part) for part in parts)])))
+
+    def add(self, table: str, **row: object) -> None:
+        self.rows.setdefault(table, []).append(row)
+
+    def name(self, entity: str, text: str, lang: str, kind: str, preferred: bool = True) -> None:
+        self.add(
+            "name",
+            id=self.id("name", entity, lang, kind, text),
+            entity_id=entity,
+            text=text,
+            lang=lang,
+            kind=kind,
+            is_preferred=preferred,
+        )
+
+    def artifact(self, artifact: Artifact, source_id: str) -> str:
+        id = str(uuid5(NAMESPACE, f"source_artifact\x1f{source_id}\x1f{artifact.storage_key}"))
+        self.add(
+            "source_artifact",
+            id=id,
+            source_id=source_id,
+            url=artifact.url,
+            sha256=artifact.sha256,
+            retrieved_at=artifact.retrieved_at,
+            storage_key=artifact.storage_key,
+            media_type=artifact.media_type,
+            bytes=artifact.bytes,
+        )
+        self.uses(artifact)
+        return id
+
+    def accept(self, code: str, reason: str) -> None:
+        self.accepted[code] = reason
+
+    def uses(self, artifact: Artifact) -> None:
+        self.sources.append({"url": artifact.url, "sha256": artifact.sha256, "storage_key": artifact.storage_key})
+
+    def write(self) -> Path:
+        out = folder(self.key) / "build"
+        if out.exists():
+            shutil.rmtree(out)
+        out.mkdir(parents=True)
+        counts: dict[str, int] = {}
+        digest = hashlib.sha256()
+        for table, rows in sorted(self.rows.items()):
+            schema = TABLES[table][1] if table in TABLES else FACTS[table]
+            unknown = {column for row in rows for column in row} - set(schema)
+            if unknown:
+                raise ValueError(f"{table} has columns outside the package format: {sorted(unknown)}")
+            frame = pl.DataFrame(
+                [
+                    {
+                        column: json.dumps(row[column])
+                        if column in JSON_COLUMNS and row.get(column) is not None
+                        else row.get(column)
+                        for column in schema
+                    }
+                    for row in rows
+                ],
+                schema=schema,
+                orient="row",
+            )
+            frame.write_parquet(out / f"{table}.parquet", statistics=False)
+            counts[table] = frame.height
+            digest.update(table.encode())
+            digest.update(frame.hash_rows().sort().to_numpy().tobytes())
+        commit = store.checkout()
+        manifest = {
+            "key": self.key,
+            "pipeline": self.pipeline,
+            "summary": self.summary,
+            "depends": self.depends,
+            "external": sorted(self.external),
+            "parser_commit": commit["sha"],
+            "built_at": datetime.now(UTC).isoformat(),
+            "sources": self.sources,
+            "accepted": self.accepted,
+            "tables": counts,
+            "digest": digest.hexdigest(),
+        }
+        (out / "package.json").write_text(json.dumps(manifest, indent=1) + "\n")
+        print(f"{self.key}: " + ", ".join(f"{table} {n:,}" for table, n in counts.items()), flush=True)
+        return out
+
+
+class Manifest(TypedDict):
+    key: str
+    pipeline: str
+    summary: str
+    depends: list[str]
+    external: list[str]
+    parser_commit: str | None
+    built_at: str
+    sources: list[dict[str, str]]
+    accepted: dict[str, str]
+    tables: dict[str, int]
+    digest: str
+
+
+def _manifest(path: Path) -> Manifest:
+    return cast(Manifest, json.loads((path / "package.json").read_text()))
+
+
+def _resolve(key: str) -> Path:
+    name, _, version = key.partition("@")
+    path = folder(name) / (version or "build")
+    if not (path / "package.json").exists():
+        raise LookupError(f"package {key} is not built")
+    return path
+
+
+def _views(con: duckdb.DuckDBPyConnection, path: Path) -> list[str]:
+    manifest = _manifest(path)
+    paths = [path, *(_resolve(str(key)) for key in manifest["depends"])]
+    for table, (_, schema) in [*TABLES.items(), *((t, (None, s)) for t, s in FACTS.items())]:
+        columns = ", ".join(f'"{column}"' for column in schema)
+        types = ", ".join(f'null::{_duck(kind)} as "{column}"' for column, kind in schema.items())
+        for prefix, scope in (("", [path]), ("all_", paths)):
+            files = [str(p / f"{table}.parquet") for p in scope if (p / f"{table}.parquet").exists()]
+            body = (
+                " union all ".join(f"select {columns} from read_parquet('{file}')" for file in files)
+                if files
+                else f"select {types} where false"
+            )
+            con.execute(f'create or replace view "{prefix}{table}" as {body}')
+    con.execute(
+        "create or replace table external as select unnest(?::varchar[]) as id",
+        [list(manifest["external"])],
+    )
+    return [str(key) for key in manifest["depends"]]
+
+
+def _duck(kind: pl.DataType) -> str:
+    text = str(kind)
+    if text.startswith("Datetime"):
+        return "timestamptz"
+    return {"String": "varchar", "Date": "date", "Boolean": "boolean", "Float64": "double"}.get(text, "bigint")
+
+
+REFERENCES = [
+    ("source_artifact", "source_id", "source"),
+    ("scheme", "polity_id", "polity"),
+    ("area", "scheme_code", "scheme"),
+    ("area_code", "area_id", "area"),
+    ("area_kind", "area_id", "area"),
+    ("area_parent", "area_id", "area"),
+    ("area_parent", "parent_id", "area"),
+    ("area_geometry", "area_id", "area"),
+    ("area_geometry", "source_id", "source"),
+    ("boundary_set", "scheme_code", "scheme"),
+    ("body", "polity_id", "polity"),
+    ("office", "body_id", "body"),
+    ("electoral_system", "polity_id", "polity"),
+    ("election", "polity_id", "polity"),
+    ("contest", "election_id", "election"),
+    ("contest", "office_id", "office"),
+    ("contest", "body_id", "body"),
+    ("contest", "district_area_id", "area"),
+    ("contest", "previous_round_id", "contest"),
+    ("contest", "electoral_system_id", "electoral_system"),
+    ("contest_option", "contest_id", "contest"),
+    ("contest_option", "parent_option_id", "contest_option"),
+    ("contest_option", "party_id", "party"),
+    ("candidacy", "person_id", "person"),
+    ("candidacy", "option_id", "contest_option"),
+    ("candidacy", "member_of_party_id", "party"),
+    ("reporting_unit", "polity_id", "polity"),
+    ("reporting_unit", "scheme_code", "scheme"),
+    ("reporting_unit", "area_id", "area"),
+    ("reporting_unit", "parent_id", "reporting_unit"),
+    ("result_set", "election_id", "election"),
+    ("result_set", "contest_id", "contest"),
+    ("result_set", "source_id", "source"),
+    ("outcome", "result_set_id", "result_set"),
+    ("outcome", "option_id", "contest_option"),
+    ("outcome", "candidacy_id", "candidacy"),
+    ("result_value", "result_set_id", "result_set"),
+    ("result_value", "unit_id", "reporting_unit"),
+    ("result_value", "option_id", "contest_option"),
+    ("declared", "result_set_id", "result_set"),
+    ("declared", "option_id", "contest_option"),
+]
+TARGET_KEY = {"scheme": "code", "polity": "id"}
+
+CHECKS = {
+    "unique.fact": """select result_set_id, unit_id, option_id, measure, count(*) as n from result_value
+                      group by all having count(*) > 1""",
+    "fact.negative": "select * from result_value where value < 0",
+    "fact.option_contest": """select v.result_set_id, v.option_id from result_value v
+                              join all_result_set r on r.id = v.result_set_id
+                              join all_contest_option o on o.id = v.option_id
+                              where o.contest_id <> r.contest_id""",
+    "accounting.votes_valid": """with v as (
+                                   select v.result_set_id, v.unit_id,
+                                          sum(value) filter (where measure = 1 and option_id is not null) as votes,
+                                          sum(value) filter (where measure = 4 and option_id is null) as valid
+                                   from result_value v where count_round = 0 group by all)
+                                 select v.* from v join all_result_set r on r.id = v.result_set_id
+                                 join all_contest c on c.id = r.contest_id
+                                 where (c.magnitude = 1 or c.kind = 'list_allocation')
+                                   and v.valid is not null and coalesce(v.votes, 0) <> v.valid""",
+    "accounting.ballots_sum": """with v as (
+                                   select result_set_id, unit_id,
+                                          sum(value) filter (where measure = 3) as ballots_cast,
+                                          sum(value) filter (where measure = 4) as valid,
+                                          sum(value) filter (where measure = 5) as invalid,
+                                          sum(value) filter (where measure = 6) as blank
+                                   from result_value where option_id is null and count_round = 0 group by all)
+                                 select * from v where ballots_cast is not null and valid is not null
+                                   and case when invalid is null and blank is null then valid > ballots_cast
+                                            else valid + coalesce(invalid, 0) + coalesce(blank, 0) <> ballots_cast end""",
+    "accounting.turnout": """with v as (
+                               select result_set_id, unit_id,
+                                      sum(value) filter (where measure = 2) as registered,
+                                      coalesce(sum(value) filter (where measure = 3),
+                                               sum(value) filter (where measure = 14)) as ballots_cast
+                               from result_value where option_id is null and count_round = 0 group by all)
+                             select * from v where ballots_cast > registered""",
+    "accounting.declared": """with got as (
+                                select result_set_id, option_id, measure, sum(value) as summed from result_value
+                                where count_round = 0 group by all)
+                              select d.*, g.summed from declared d left join got g
+                                on g.result_set_id = d.result_set_id and g.option_id is not distinct from d.option_id
+                               and g.measure = d.measure
+                              where g.summed is distinct from d.value""",
+    "outcomes.seats_magnitude": """with s as (
+                                     select result_set_id, sum(seats) as seats from outcome
+                                     where candidacy_id is null and seats is not null group by all)
+                                   select s.*, c.magnitude from s join all_result_set r on r.id = s.result_set_id
+                                   join all_contest c on c.id = r.contest_id
+                                   where c.magnitude is not null and s.seats <> c.magnitude""",
+    "outcomes.list_members": """with m as (
+                                  select result_set_id, option_id, count(*) as members from outcome
+                                  where candidacy_id is not null and kind = 'elected' group by all)
+                                select m.*, w.seats from m join outcome w on w.result_set_id = m.result_set_id
+                                  and w.option_id = m.option_id and w.candidacy_id is null and w.seats is not null
+                                where m.members <> w.seats""",
+    "outcomes.member_off_list": """select o.* from outcome o join all_contest_option p on p.id = o.option_id
+                                   where o.candidacy_id is not null
+                                     and p.kind not in ('list', 'independents', 'others')""",
+    "outcomes.single_winner": """with w as (
+                                   select o.result_set_id, count(*) as winners from outcome o
+                                   join all_result_set r on r.id = o.result_set_id
+                                   join all_contest c on c.id = r.contest_id
+                                   where c.magnitude = 1 and o.kind = 'elected' group by all)
+                                 select * from w where winners > 1""",
+    "result_set.default": """select contest_id, stage, count(*) as n from all_result_set where is_default
+                             group by all having count(*) > 1""",
+    "result_set.empty": """select r.id from result_set r where r.completeness > 0
+                           and not exists (select 1 from result_value v where v.result_set_id = r.id)""",
+    "unit.unlocated_area": """select id, code from reporting_unit
+                              where (area_relation = 'unlocated') <> (area_id is null)""",
+}
+
+
+def check(path: Path) -> list[tuple[str, int, list[tuple[object, ...]]]]:
+    con = duckdb.connect()
+    _views(con, path)
+    findings: list[tuple[str, int, list[tuple[object, ...]]]] = []
+    for table, (key, schema) in TABLES.items():
+        if key is None:
+            continue
+        columns = ", ".join(key)
+        rows = con.execute(f'select {columns}, count(*) from "all_{table}" group by all having count(*) > 1').fetchall()
+        if rows:
+            findings.append((f"unique.{table}", len(rows), rows[:5]))
+    for table, column, target in REFERENCES:
+        target_key = TARGET_KEY.get(target, "id")
+        known = (
+            "select id from external"
+            if target == "polity"
+            else f'select "{target_key}" from "all_{target}" union all select id from external'
+        )
+        rows = con.execute(
+            f'select distinct "{column}" from "{table}" where "{column}" is not null and "{column}" not in ({known})'
+        ).fetchall()
+        if rows:
+            findings.append((f"reference.{table}.{column}", len(rows), rows[:5]))
+    for (rules,) in con.execute("select rules from electoral_system").fetchall():
+        errors = [error.message for error in RULES.iter_errors(json.loads(rules))]
+        if errors:
+            findings.append(("rules.schema", len(errors), [(rules, errors[0])]))
+    for code, query in CHECKS.items():
+        rows = con.execute(query).fetchall()
+        if rows:
+            findings.append((code, len(rows), rows[:5]))
+    return findings
+
+
+def _stage(
+    conn: Connection, table: str, columns: list[str], frame: pl.DataFrame, like: LiteralString | None = None
+) -> str:
+    name = f"pkg_{table}"
+    conn.execute(sql.SQL("drop table if exists {}").format(sql.Identifier(name)))
+    if like is None:
+        conn.execute(
+            sql.SQL("create temp table {} on commit drop as select {} from public.{} limit 0").format(
+                sql.Identifier(name), sql.SQL(", ").join(map(sql.Identifier, columns)), sql.Identifier(table)
+            )
+        )
+    else:
+        conn.execute(sql.SQL("create temp table {} ({}) on commit drop").format(sql.Identifier(name), sql.SQL(like)))
+    buffer = BytesIO()
+    frame.select(columns).write_csv(buffer, include_header=False, null_value="", quote_style="non_numeric")
+    with (
+        conn.cursor() as cursor,
+        cursor.copy(
+            sql.SQL("copy {} ({}) from stdin (format csv)").format(
+                sql.Identifier(name), sql.SQL(", ").join(map(sql.Identifier, columns))
+            )
+        ) as copy,
+    ):
+        view = buffer.getbuffer()
+        for start in range(0, len(view), 1 << 24):
+            copy.write(view[start : start + (1 << 24)])
+    conn.execute(sql.SQL("analyze {}").format(sql.Identifier(name)))
+    return name
+
+
+def _hash(alias: str, columns: list[str]) -> sql.Composable:
+    return sql.SQL("md5(row({})::text)").format(
+        sql.SQL(", ").join(sql.SQL("{}.{}").format(sql.Identifier(alias), sql.Identifier(c)) for c in columns)
+    )
+
+
+def load(conn: Connection, path: Path, accepted: dict[str, object] | None = None) -> str | None:
+    manifest = _manifest(path)
+    key = str(manifest["key"])
+    started = time.monotonic()
+    missing = conn.execute(
+        """select x from unnest(%s::uuid[]) x
+           where not exists (select from entity e where e.id = x) and not exists (select from polity p where p.id = x)""",
+        [manifest["external"]],
+    ).fetchall()
+    if missing:
+        raise ValueError(f"{key} references ids missing from the database: {missing[:5]}")
+    for depend in manifest["depends"]:
+        if conn.execute("select 1 from changeset where scope->>'package' = %s", [depend]).fetchone() is None:
+            raise ValueError(f"{key} depends on {depend}, which is not loaded")
+    prior = conn.execute(
+        """select id, scope->>'digest', (scope->>'version')::int from changeset
+           where scope->>'package' = %s order by created_at""",
+        [key],
+    ).fetchall()
+    if prior and prior[-1][1] == manifest["digest"]:
+        print(f"{key}: version {prior[-1][2]} already loaded, unchanged", flush=True)
+        return None
+    owned = [str(row[0]) for row in prior]
+    version = len(prior) + 1
+    frames = {
+        table: pl.read_parquet(path / f"{table}.parquet")
+        for table in [*TABLES, *FACTS]
+        if (path / f"{table}.parquet").exists()
+    }
+    with conn.transaction():
+        conn.execute("select pg_advisory_xact_lock_shared(hashtext('ea.search'))")
+        conn.execute("select pg_advisory_xact_lock_shared(%s)", [MERGE_LOCK])
+        conn.execute("select pg_advisory_xact_lock(hashtext(%s))", [f"package:{key}"])
+        inserted = conn.execute(
+            """insert into changeset (author_kind, pipeline, pipeline_version, kind, status, summary, scope,
+                                      payload_kind, artifact_keys, checks, published_at)
+               values ('pipeline', %s, %s, 'import', 'published', %s, %s, 'artifacts', %s, %s, now()) returning id::text""",
+            [
+                manifest["pipeline"],
+                manifest["parser_commit"],
+                f"{manifest['summary']} (package {key} v{version})",
+                json.dumps(
+                    {
+                        "package": key,
+                        "version": version,
+                        "digest": manifest["digest"],
+                        "depends": manifest["depends"],
+                        "polity": key.split(".")[0].upper(),
+                    }
+                ),
+                [str(source["storage_key"]) for source in manifest["sources"]],
+                json.dumps({"package": "passed", "accepted": accepted or {}}),
+            ],
+        ).fetchone()
+        if inserted is None:
+            raise RuntimeError(f"{key}: no changeset row")
+        changeset_id = str(inserted[0])
+        conn.execute("select set_config('ea.changeset_id', %s, true)", [changeset_id])
+        sets_before = [
+            k
+            for (k,) in conn.execute(
+                "select k from result_set where changeset_id = any(%s::uuid[])", [owned]
+            ).fetchall()
+        ]
+        staged: dict[str, tuple[str, list[str]]] = {}
+        for table, frame in frames.items():
+            if table in TABLES:
+                columns = list(TABLES[table][1])
+                staged[table] = (_stage(conn, table, columns, frame), columns)
+        moved: list[str] = []
+        if "area_parent" in staged or "area" in staged:
+            moved = [
+                str(id)
+                for (id,) in conn.execute(
+                    sql.SQL(
+                        """select p.area_id from area_parent p where p.changeset_id = any(%s::uuid[])
+                           and {h} not in (select {s} from pkg_area_parent s)"""
+                    ).format(
+                        h=_hash("p", staged["area_parent"][1]) if "area_parent" in staged else sql.SQL("null"),
+                        s=_hash("s", staged["area_parent"][1]) if "area_parent" in staged else sql.SQL("null"),
+                    )
+                    if "area_parent" in staged
+                    else sql.SQL("select null::uuid where false"),
+                    [owned],
+                ).fetchall()
+            ]
+        if sets_before:
+            for table in ("result_value", "value_locator"):
+                conn.execute(
+                    sql.SQL("delete from {} where result_set_k = any(%s)").format(sql.Identifier(table)), [sets_before]
+                )
+        dropped_sets = [
+            k
+            for (k,) in conn.execute(
+                "select k from result_set where changeset_id = any(%s::uuid[]) and id not in (select id from pkg_result_set)"
+                if "result_set" in staged
+                else "select k from result_set where changeset_id = any(%s::uuid[])",
+                [owned],
+            ).fetchall()
+        ]
+        if dropped_sets:
+            for table in ("result_rollup_sum", "result_rollup_unit", "rollup_coverage", "area_day_set"):
+                conn.execute(
+                    sql.SQL("delete from {} where result_set_k = any(%s)").format(sql.Identifier(table)), [dropped_sets]
+                )
+            conn.execute(
+                "delete from flag where result_set_id in (select id from result_set where k = any(%s))", [dropped_sets]
+            )
+        counts: dict[str, list[int]] = {}
+        for table in reversed(TABLES):
+            key_columns = TABLES[table][0]
+            if table not in staged:
+                gone = conn.execute(
+                    sql.SQL("delete from {} where changeset_id = any(%s::uuid[])").format(sql.Identifier(table)),
+                    [owned],
+                ).rowcount
+            elif key_columns is not None:
+                gone = conn.execute(
+                    sql.SQL(
+                        "delete from {t} t where t.changeset_id = any(%s::uuid[]) and ({k}) not in (select {k} from {s})"
+                    ).format(
+                        t=sql.Identifier(table),
+                        k=sql.SQL(", ").join(map(sql.Identifier, key_columns)),
+                        s=sql.Identifier(staged[table][0]),
+                    ),
+                    [owned],
+                ).rowcount
+            else:
+                columns = staged[table][1]
+                gone = conn.execute(
+                    sql.SQL(
+                        "delete from {t} t where t.changeset_id = any(%s::uuid[]) and {h} not in (select {sh} from {s} s)"
+                    ).format(
+                        t=sql.Identifier(table),
+                        h=_hash("t", columns),
+                        sh=_hash("s", columns),
+                        s=sql.Identifier(staged[table][0]),
+                    ),
+                    [owned],
+                ).rowcount
+            counts.setdefault(table, [0, 0])[1] = gone
+        for table in TABLES:
+            if table not in staged:
+                continue
+            name, columns = staged[table]
+            key_columns = TABLES[table][0]
+            listed = sql.SQL(", ").join(map(sql.Identifier, columns))
+            if key_columns is not None:
+                rest = [c for c in columns if c not in key_columns]
+                written = conn.execute(
+                    sql.SQL(
+                        """insert into {t} as t ({c}) select {c} from {s}
+                           on conflict ({k}) do {action}"""
+                    ).format(
+                        t=sql.Identifier(table),
+                        c=listed,
+                        s=sql.Identifier(name),
+                        k=sql.SQL(", ").join(map(sql.Identifier, key_columns)),
+                        action=sql.SQL("update set ({r}) = row({x}) where ({tr}) is distinct from ({x})").format(
+                            r=sql.SQL(", ").join(map(sql.Identifier, rest)),
+                            x=sql.SQL(", ").join(sql.SQL("excluded.{}").format(sql.Identifier(c)) for c in rest),
+                            tr=sql.SQL(", ").join(sql.SQL("t.{}").format(sql.Identifier(c)) for c in rest),
+                        )
+                        if rest
+                        else sql.SQL("nothing"),
+                    )
+                ).rowcount
+            else:
+                lead = columns[0]
+                written = conn.execute(
+                    sql.SQL(
+                        """insert into {t} ({c}) select {c} from {s} s
+                           where {sh} not in (select {h} from {t} t where t.{lead} in (select {lead} from {s}))"""
+                    ).format(
+                        t=sql.Identifier(table),
+                        c=listed,
+                        s=sql.Identifier(name),
+                        sh=_hash("s", columns),
+                        h=_hash("t", columns),
+                        lead=sql.Identifier(lead),
+                    )
+                ).rowcount
+            counts.setdefault(table, [0, 0])[0] = written
+        sets_after: list[int] = []
+        if "result_value" in frames:
+            fact = frames["result_value"]
+            _stage(
+                conn,
+                "result_value",
+                list(FACTS["result_value"]),
+                fact,
+                like="result_set_id uuid, unit_id uuid, option_id uuid, channel smallint, measure smallint,"
+                " count_round smallint, flags smallint, value numeric",
+            )
+            facts = conn.execute(
+                """insert into result_value (result_set_k, unit_k, option_k, channel, measure, count_round, flags, value)
+                   select r.k, u.k, coalesce(o.k, 0), v.channel, v.measure, v.count_round, v.flags, v.value
+                   from pkg_result_value v join result_set r on r.id = v.result_set_id
+                   join reporting_unit u on u.id = v.unit_id left join contest_option o on o.id = v.option_id"""
+            ).rowcount
+            if facts != fact.height:
+                raise ValueError(f"{key}: {fact.height} facts staged, {facts} written")
+            counts["result_value"] = [facts, 0]
+            sets_after = [
+                k
+                for (k,) in conn.execute(
+                    "select distinct r.k from pkg_result_value v join result_set r on r.id = v.result_set_id"
+                )
+            ]
+        if "value_locator" in frames:
+            _stage(
+                conn,
+                "value_locator",
+                list(FACTS["value_locator"]),
+                frames["value_locator"],
+                like="result_set_id uuid, unit_id uuid, option_id uuid, channel smallint, measure smallint,"
+                " count_round smallint, page_id uuid, source_id uuid, x0 real, y0 real, x1 real, y1 real",
+            )
+            conn.execute(
+                """insert into value_locator (result_set_k, unit_k, option_k, channel, measure, count_round,
+                                              page_id, source_id, x0, y0, x1, y1)
+                   select r.k, u.k, coalesce(o.k, 0), v.channel, v.measure, v.count_round, v.page_id, v.source_id,
+                          v.x0, v.y0, v.x1, v.y1
+                   from pkg_value_locator v join result_set r on r.id = v.result_set_id
+                   join reporting_unit u on u.id = v.unit_id left join contest_option o on o.id = v.option_id"""
+            )
+        loaded = time.monotonic()
+        rolled = sorted(set(sets_after) | (set(sets_before) - set(dropped_sets)))
+        _rollup(conn, None, moved, [], rolled)
+        covers.uncover(conn, changeset_id, moved, [], sets=rolled)
+        touched.recorded(conn, changeset_id)
+        search.scope(conn, [changeset_id])
+        search.refresh(conn)
+    copy = folder(key) / f"v{version}"
+    if copy.exists():
+        shutil.rmtree(copy)
+    shutil.copytree(path, copy)
+    changed = ", ".join(f"{t} +{a:,}/-{d:,}" for t, (a, d) in counts.items() if a or d)
+    print(
+        f"{key} v{version} as {changeset_id}: {changed}; facts {loaded - started:.1f}s, "
+        f"rollups and search {time.monotonic() - loaded:.1f}s",
+        flush=True,
+    )
+    return changeset_id
+
+
+def run(command: str, keys: list[str]) -> None:
+    failed = False
+    for key in keys:
+        path = _resolve(key)
+        reasons = _manifest(path).get("accepted", {})
+        findings = check(path)
+        accepted: dict[str, object] = {}
+        blocking = False
+        for code, n, sample in findings:
+            if code in reasons:
+                accepted[code] = {"n": n, "reason": reasons[code], "sample": [list(map(str, row)) for row in sample]}
+                print(f"{key}: {code} {n:,} accepted: {reasons[code]}", flush=True)
+            else:
+                blocking = True
+                print(f"{key}: {code} {n:,} {sample}", flush=True)
+        if blocking:
+            failed = True
+            continue
+        print(f"{key}: checks passed", flush=True)
+        if command == "load":
+            with store.connect() as conn:
+                load(conn, path, accepted)
+    if failed:
+        raise SystemExit(1)
