@@ -1,0 +1,1005 @@
+{
+  "polity": "US-NH",
+  "publisher": "New Hampshire Secretary of State",
+  "title": "Manual for the General Court of New Hampshire 1925, general election returns by town (general election 1924-11-04)",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/manualforgeneral19newh/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/manualforgeneral19newh"
+  },
+  "raw_source": "us.scans",
+  "unit_scheme": "town",
+  "extend": true,
+  "contests": {
+    "president": {
+      "year": 1924,
+      "chamber": "president",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "NH",
+      "district": null
+    },
+    "governor": {
+      "year": 1924,
+      "chamber": "governor",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "NH",
+      "district": null
+    },
+    "senate": {
+      "year": 1924,
+      "chamber": "senate",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "NH",
+      "district": null
+    },
+    "house1": {
+      "year": 1924,
+      "chamber": "house",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "NH",
+      "district": 1
+    },
+    "house2": {
+      "year": 1924,
+      "chamber": "house",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "NH",
+      "district": 2
+    }
+  },
+  "pages": [
+    {
+      "page": 308,
+      "id": "308-0",
+      "columns": [
+        {
+          "label": "Coolidge & Dawes, r",
+          "contest": "president",
+          "candidate": "Calvin Coolidge (Republican)"
+        },
+        {
+          "label": "Davis & Bryan, d",
+          "contest": "president",
+          "candidate": "John W. Davis (Democratic)"
+        },
+        {
+          "label": "LaFollette & Wheeler, p",
+          "contest": "president",
+          "candidate": "Robert La Follette (Progressive)"
+        },
+        {
+          "label": "John G. Winant, r",
+          "contest": "governor",
+          "candidate": "John G. Winant"
+        },
+        {
+          "label": "Fred H. Brown, d",
+          "contest": "governor",
+          "candidate": "Fred H. Brown"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.091,
+        0.114,
+        0.903,
+        0.799
+      ],
+      "hint": "Read only the table headed 'ROCKINGHAM COUNTY'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2438
+      ]
+    },
+    {
+      "page": 309,
+      "id": "309-0",
+      "columns": [
+        {
+          "label": "Coolidge & Dawes, r",
+          "contest": "president",
+          "candidate": "Calvin Coolidge (Republican)"
+        },
+        {
+          "label": "Davis & Bryan, d",
+          "contest": "president",
+          "candidate": "John W. Davis (Democratic)"
+        },
+        {
+          "label": "LaFollette & Wheeler, p",
+          "contest": "president",
+          "candidate": "Robert La Follette (Progressive)"
+        },
+        {
+          "label": "John G. Winant, r",
+          "contest": "governor",
+          "candidate": "John G. Winant"
+        },
+        {
+          "label": "Fred H. Brown, d",
+          "contest": "governor",
+          "candidate": "Fred H. Brown"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.084,
+        0.117,
+        0.893,
+        0.637
+      ],
+      "hint": "Read only the table headed 'STRAFFORD COUNTY'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3192
+      ]
+    },
+    {
+      "page": 310,
+      "id": "310-0",
+      "columns": [
+        {
+          "label": "Coolidge & Dawes, r",
+          "contest": "president",
+          "candidate": "Calvin Coolidge (Republican)"
+        },
+        {
+          "label": "Davis & Bryan, d",
+          "contest": "president",
+          "candidate": "John W. Davis (Democratic)"
+        },
+        {
+          "label": "LaFollette & Wheeler, p",
+          "contest": "president",
+          "candidate": "Robert La Follette (Progressive)"
+        },
+        {
+          "label": "John G. Winant, r",
+          "contest": "governor",
+          "candidate": "John G. Winant"
+        },
+        {
+          "label": "Fred H. Brown, d",
+          "contest": "governor",
+          "candidate": "Fred H. Brown"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.098,
+        0.116,
+        0.909,
+        0.52
+      ],
+      "hint": "Read only the table headed 'BELKNAP COUNTY'; ignore any other table visible in the image."
+    },
+    {
+      "page": 311,
+      "id": "311-0",
+      "columns": [
+        {
+          "label": "Coolidge & Dawes, r",
+          "contest": "president",
+          "candidate": "Calvin Coolidge (Republican)"
+        },
+        {
+          "label": "Davis & Bryan, d",
+          "contest": "president",
+          "candidate": "John W. Davis (Democratic)"
+        },
+        {
+          "label": "LaFollette & Wheeler, p",
+          "contest": "president",
+          "candidate": "Robert La Follette (Progressive)"
+        },
+        {
+          "label": "John G. Winant, r",
+          "contest": "governor",
+          "candidate": "John G. Winant"
+        },
+        {
+          "label": "Fred H. Brown, d",
+          "contest": "governor",
+          "candidate": "Fred H. Brown"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.088,
+        0.113,
+        0.898,
+        0.544
+      ],
+      "hint": "Read only the table headed 'CARROLL COUNTY'; ignore any other table visible in the image."
+    },
+    {
+      "page": 312,
+      "id": "312-0",
+      "columns": [
+        {
+          "label": "Coolidge & Dawes, r",
+          "contest": "president",
+          "candidate": "Calvin Coolidge (Republican)"
+        },
+        {
+          "label": "Davis & Bryan, d",
+          "contest": "president",
+          "candidate": "John W. Davis (Democratic)"
+        },
+        {
+          "label": "LaFollette & Wheeler, p",
+          "contest": "president",
+          "candidate": "Robert La Follette (Progressive)"
+        },
+        {
+          "label": "John G. Winant, r",
+          "contest": "governor",
+          "candidate": "John G. Winant"
+        },
+        {
+          "label": "Fred H. Brown, d",
+          "contest": "governor",
+          "candidate": "Fred H. Brown"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.096,
+        0.092,
+        0.91,
+        0.724
+      ],
+      "hint": "Read only the table headed 'MERRIMACK COUNTY - PRESIDENT and GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2658
+      ]
+    },
+    {
+      "page": 313,
+      "id": "313-0",
+      "columns": [
+        {
+          "label": "Coolidge & Dawes, r",
+          "contest": "president",
+          "candidate": "Calvin Coolidge (Republican)"
+        },
+        {
+          "label": "Davis & Bryan, d",
+          "contest": "president",
+          "candidate": "John W. Davis (Democratic)"
+        },
+        {
+          "label": "LaFollette & Wheeler, p",
+          "contest": "president",
+          "candidate": "Robert La Follette (Progressive)"
+        },
+        {
+          "label": "John G. Winant, r",
+          "contest": "governor",
+          "candidate": "John G. Winant"
+        },
+        {
+          "label": "Fred H. Brown, d",
+          "contest": "governor",
+          "candidate": "Fred H. Brown"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.094,
+        0.096,
+        0.903,
+        0.889
+      ],
+      "hint": "Read only the table headed 'HILLSBOROUGH COUNTY'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2144
+      ]
+    },
+    {
+      "page": 314,
+      "id": "314-0",
+      "columns": [
+        {
+          "label": "Coolidge & Dawes, r",
+          "contest": "president",
+          "candidate": "Calvin Coolidge (Republican)"
+        },
+        {
+          "label": "Davis & Bryan, d",
+          "contest": "president",
+          "candidate": "John W. Davis (Democratic)"
+        },
+        {
+          "label": "LaFollette & Wheeler, p",
+          "contest": "president",
+          "candidate": "Robert La Follette (Progressive)"
+        },
+        {
+          "label": "John G. Winant, r",
+          "contest": "governor",
+          "candidate": "John G. Winant"
+        },
+        {
+          "label": "Fred H. Brown, d",
+          "contest": "governor",
+          "candidate": "Fred H. Brown"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.101,
+        0.088,
+        0.911,
+        0.62
+      ],
+      "hint": "Read only the table headed 'CHESHIRE COUNTY'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3158
+      ]
+    },
+    {
+      "page": 315,
+      "id": "315-0",
+      "columns": [
+        {
+          "label": "Coolidge & Dawes, r",
+          "contest": "president",
+          "candidate": "Calvin Coolidge (Republican)"
+        },
+        {
+          "label": "Davis & Bryan, d",
+          "contest": "president",
+          "candidate": "John W. Davis (Democratic)"
+        },
+        {
+          "label": "LaFollette & Wheeler, p",
+          "contest": "president",
+          "candidate": "Robert La Follette (Progressive)"
+        },
+        {
+          "label": "John G. Winant, r",
+          "contest": "governor",
+          "candidate": "John G. Winant"
+        },
+        {
+          "label": "Fred H. Brown, d",
+          "contest": "governor",
+          "candidate": "Fred H. Brown"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.091,
+        0.095,
+        0.9,
+        0.489
+      ],
+      "hint": "Read only the table headed 'SULLIVAN COUNTY'; ignore any other table visible in the image."
+    },
+    {
+      "page": 316,
+      "id": "316-0",
+      "columns": [
+        {
+          "label": "Coolidge & Dawes, r",
+          "contest": "president",
+          "candidate": "Calvin Coolidge (Republican)"
+        },
+        {
+          "label": "Davis & Bryan, d",
+          "contest": "president",
+          "candidate": "John W. Davis (Democratic)"
+        },
+        {
+          "label": "LaFollette & Wheeler, p",
+          "contest": "president",
+          "candidate": "Robert La Follette (Progressive)"
+        },
+        {
+          "label": "John G. Winant, r",
+          "contest": "governor",
+          "candidate": "John G. Winant"
+        },
+        {
+          "label": "Fred H. Brown, d",
+          "contest": "governor",
+          "candidate": "Fred H. Brown"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.058,
+        0.086,
+        0.87,
+        0.749
+      ],
+      "hint": "Read only the table headed 'GRAFTON COUNTY'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2549
+      ]
+    },
+    {
+      "page": 317,
+      "id": "317-0",
+      "columns": [
+        {
+          "label": "Coolidge & Dawes, r",
+          "contest": "president",
+          "candidate": "Calvin Coolidge (Republican)"
+        },
+        {
+          "label": "Davis & Bryan, d",
+          "contest": "president",
+          "candidate": "John W. Davis (Democratic)"
+        },
+        {
+          "label": "LaFollette & Wheeler, p",
+          "contest": "president",
+          "candidate": "Robert La Follette (Progressive)"
+        },
+        {
+          "label": "John G. Winant, r",
+          "contest": "governor",
+          "candidate": "John G. Winant"
+        },
+        {
+          "label": "Fred H. Brown, d",
+          "contest": "governor",
+          "candidate": "Fred H. Brown"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.117,
+        0.092,
+        0.926,
+        0.581
+      ],
+      "hint": "Read only the table headed 'COOS COUNTY'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3517
+      ]
+    },
+    {
+      "page": 318,
+      "id": "318-0",
+      "columns": [
+        {
+          "label": "Keyes, r",
+          "contest": "senate",
+          "candidate": "Henry W. Keyes"
+        },
+        {
+          "label": "Farrand, d",
+          "contest": "senate",
+          "candidate": "George E. Farrand"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.07,
+        0.102,
+        0.635,
+        0.794
+      ],
+      "hint": "Read only the table headed 'U. S. SENATOR, Rockingham County'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2355
+      ]
+    },
+    {
+      "page": 318,
+      "id": "318-1",
+      "columns": [
+        {
+          "label": "Hale, r",
+          "contest": "house1",
+          "candidate": "Fletcher Hale"
+        },
+        {
+          "label": "Rogers, d",
+          "contest": "house1",
+          "candidate": "William N. Rogers"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.628,
+        0.113,
+        0.879,
+        0.794
+      ],
+      "hint": "Read only the table headed 'CONGRESSMEN, 1st Dist., Rockingham County'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2232
+      ]
+    },
+    {
+      "page": 319,
+      "id": "319-0",
+      "columns": [
+        {
+          "label": "Keyes, r",
+          "contest": "senate",
+          "candidate": "Henry W. Keyes"
+        },
+        {
+          "label": "Farrand, d",
+          "contest": "senate",
+          "candidate": "George E. Farrand"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.366,
+        0.105,
+        0.676,
+        0.606
+      ],
+      "hint": "Read only the table headed 'STRAFFORD COUNTY - U. S. SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3293
+      ]
+    },
+    {
+      "page": 319,
+      "id": "319-1",
+      "columns": [
+        {
+          "label": "Hale, r",
+          "contest": "house1",
+          "candidate": "Fletcher Hale"
+        },
+        {
+          "label": "Rogers, d",
+          "contest": "house1",
+          "candidate": "William N. Rogers"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.66,
+        0.105,
+        0.916,
+        0.606
+      ],
+      "hint": "Read only the table headed 'CONGRESSMEN 1st Dist. - STRAFFORD COUNTY'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3293
+      ]
+    },
+    {
+      "page": 320,
+      "id": "320-0",
+      "columns": [
+        {
+          "label": "Keyes, r",
+          "contest": "senate",
+          "candidate": "Henry W. Keyes"
+        },
+        {
+          "label": "Farrand, d",
+          "contest": "senate",
+          "candidate": "George E. Farrand"
+        },
+        {
+          "label": "Hale, r",
+          "contest": "house1",
+          "candidate": "Fletcher Hale"
+        },
+        {
+          "label": "Rogers, d",
+          "contest": "house1",
+          "candidate": "William N. Rogers"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.083,
+        0.092,
+        0.893,
+        0.499
+      ],
+      "hint": "Read only the table headed 'BELKNAP COUNTY'; ignore any other table visible in the image."
+    },
+    {
+      "page": 321,
+      "id": "321-0",
+      "columns": [
+        {
+          "label": "Keyes, r",
+          "contest": "senate",
+          "candidate": "Henry W. Keyes"
+        },
+        {
+          "label": "Farrand, d",
+          "contest": "senate",
+          "candidate": "George E. Farrand"
+        },
+        {
+          "label": "Hale, r",
+          "contest": "house1",
+          "candidate": "Fletcher Hale"
+        },
+        {
+          "label": "Rogers, d",
+          "contest": "house1",
+          "candidate": "William N. Rogers"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.108,
+        0.107,
+        0.918,
+        0.514
+      ],
+      "hint": "Read only the table headed 'CARROLL COUNTY'; ignore any other table visible in the image."
+    },
+    {
+      "page": 322,
+      "id": "322-0",
+      "columns": [
+        {
+          "label": "Keyes, r",
+          "contest": "senate",
+          "candidate": "Henry W. Keyes"
+        },
+        {
+          "label": "Farrand, d",
+          "contest": "senate",
+          "candidate": "George E. Farrand"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.333,
+        0.106,
+        0.57,
+        0.756
+      ],
+      "hint": "Read only the table headed 'U. S. SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2477
+      ]
+    },
+    {
+      "page": 322,
+      "id": "322-1",
+      "columns": [
+        {
+          "label": "Hale, r",
+          "contest": "house1",
+          "candidate": "Fletcher Hale"
+        },
+        {
+          "label": "Rogers, d",
+          "contest": "house1",
+          "candidate": "William N. Rogers"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.554,
+        0.106,
+        0.731,
+        0.756
+      ],
+      "hint": "Read only the table headed 'CONGRESSMEN 1st Dist.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2477
+      ]
+    },
+    {
+      "page": 322,
+      "id": "322-2",
+      "columns": [
+        {
+          "label": "Wason, r",
+          "contest": "house2",
+          "candidate": "Edward H. Wason"
+        },
+        {
+          "label": "Barry, d",
+          "contest": "house2",
+          "candidate": "William H. Barry"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.715,
+        0.106,
+        0.886,
+        0.756
+      ],
+      "hint": "Read only the table headed 'CONGRESSMEN 2d Dist.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2477
+      ]
+    },
+    {
+      "page": 323,
+      "id": "323-0",
+      "columns": [
+        {
+          "label": "Keyes, r",
+          "contest": "senate",
+          "candidate": "Henry W. Keyes"
+        },
+        {
+          "label": "Farrand, d",
+          "contest": "senate",
+          "candidate": "George E. Farrand"
+        },
+        {
+          "label": "Hale, r",
+          "contest": "house1",
+          "candidate": "Fletcher Hale"
+        },
+        {
+          "label": "Rogers, d",
+          "contest": "house1",
+          "candidate": "William N. Rogers"
+        },
+        {
+          "label": "Wason, r",
+          "contest": "house2",
+          "candidate": "Edward H. Wason"
+        },
+        {
+          "label": "Barry, d",
+          "contest": "house2",
+          "candidate": "William H. Barry"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.114,
+        0.108,
+        0.927,
+        0.909
+      ],
+      "hint": "Read only the table headed 'HILLSBOROUGH COUNTY: U. S. SENATOR AND CONGRESSMEN, 1924 GENERAL ELECTION'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2097
+      ]
+    },
+    {
+      "page": 324,
+      "id": "324-0",
+      "columns": [
+        {
+          "label": "Keyes, r",
+          "contest": "senate",
+          "candidate": "Henry W. Keyes"
+        },
+        {
+          "label": "Farrand, d",
+          "contest": "senate",
+          "candidate": "George E. Farrand"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.104,
+        0.106,
+        0.682,
+        0.64
+      ],
+      "hint": "Read only the table headed 'CHESHIRE COUNTY - U. S. SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.309
+      ]
+    },
+    {
+      "page": 324,
+      "id": "324-1",
+      "columns": [
+        {
+          "label": "Wason, r",
+          "contest": "house2",
+          "candidate": "Edward H. Wason"
+        },
+        {
+          "label": "Barry, d",
+          "contest": "house2",
+          "candidate": "William H. Barry"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.666,
+        0.106,
+        0.919,
+        0.64
+      ],
+      "hint": "Read only the table headed 'CONGRESSMEN 2nd Dist. - CHESHIRE COUNTY'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.309
+      ]
+    },
+    {
+      "page": 325,
+      "id": "325-0",
+      "columns": [
+        {
+          "label": "Keyes, r",
+          "contest": "senate",
+          "candidate": "Henry W. Keyes"
+        },
+        {
+          "label": "Farrand, d",
+          "contest": "senate",
+          "candidate": "George E. Farrand"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.084,
+        0.107,
+        0.65,
+        0.496
+      ],
+      "hint": "Read only the table headed 'U. S. SENATOR - SULLIVAN COUNTY'; ignore any other table visible in the image."
+    },
+    {
+      "page": 325,
+      "id": "325-1",
+      "columns": [
+        {
+          "label": "Wason, r",
+          "contest": "house2",
+          "candidate": "Edward H. Wason"
+        },
+        {
+          "label": "Barry, d",
+          "contest": "house2",
+          "candidate": "William H. Barry"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.636,
+        0.107,
+        0.891,
+        0.496
+      ],
+      "hint": "Read only the table headed 'CONGRESSMEN 2nd Dist. - SULLIVAN COUNTY'; ignore any other table visible in the image."
+    },
+    {
+      "page": 326,
+      "id": "326-0",
+      "columns": [
+        {
+          "label": "Keyes, r",
+          "contest": "senate",
+          "candidate": "Henry W. Keyes"
+        },
+        {
+          "label": "Farrand, d",
+          "contest": "senate",
+          "candidate": "George E. Farrand"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.098,
+        0.106,
+        0.665,
+        0.767
+      ],
+      "hint": "Read only the table headed 'U. S. SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2466
+      ]
+    },
+    {
+      "page": 326,
+      "id": "326-1",
+      "columns": [
+        {
+          "label": "Wason, r",
+          "contest": "house2",
+          "candidate": "Edward H. Wason"
+        },
+        {
+          "label": "Barry, d",
+          "contest": "house2",
+          "candidate": "William H. Barry"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.649,
+        0.106,
+        0.906,
+        0.767
+      ],
+      "hint": "Read only the table headed 'CONGRESSMEN 2nd Dist.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2466
+      ]
+    },
+    {
+      "page": 327,
+      "id": "327-0",
+      "columns": [
+        {
+          "label": "Keyes, r",
+          "contest": "senate",
+          "candidate": "Henry W. Keyes"
+        },
+        {
+          "label": "Farrand, d",
+          "contest": "senate",
+          "candidate": "George E. Farrand"
+        },
+        {
+          "label": "Wason, r",
+          "contest": "house2",
+          "candidate": "Edward H. Wason"
+        },
+        {
+          "label": "Barry, d",
+          "contest": "house2",
+          "candidate": "William H. Barry"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.091,
+        0.106,
+        0.9,
+        0.619
+      ],
+      "hint": "Read only the table headed 'COOS COUNTY'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3411
+      ]
+    }
+  ]
+}

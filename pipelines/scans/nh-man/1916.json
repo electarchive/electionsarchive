@@ -1,0 +1,1121 @@
+{
+  "polity": "US-NH",
+  "publisher": "New Hampshire Secretary of State",
+  "title": "Manual for the General Court of New Hampshire 1917, general election returns by town (general election 1916-11-07)",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/manualforgeneral15newh/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/manualforgeneral15newh"
+  },
+  "raw_source": "us.scans",
+  "unit_scheme": "town",
+  "extend": true,
+  "contests": {
+    "president": {
+      "year": 1916,
+      "chamber": "president",
+      "day": "1916-11-07",
+      "special": false,
+      "state": "NH",
+      "district": null
+    },
+    "governor": {
+      "year": 1916,
+      "chamber": "governor",
+      "day": "1916-11-07",
+      "special": false,
+      "state": "NH",
+      "district": null
+    },
+    "house1": {
+      "year": 1916,
+      "chamber": "house",
+      "day": "1916-11-07",
+      "special": false,
+      "state": "NH",
+      "district": 1
+    },
+    "house2": {
+      "year": 1916,
+      "chamber": "house",
+      "day": "1916-11-07",
+      "special": false,
+      "state": "NH",
+      "district": 2
+    }
+  },
+  "pages": [
+    {
+      "page": 389,
+      "id": "389-0",
+      "columns": [
+        {
+          "label": "Hughes, r.",
+          "contest": "president",
+          "candidate": "Charles Evans Hughes (Republican)"
+        },
+        {
+          "label": "Wilson, d.",
+          "contest": "president",
+          "candidate": "Woodrow Wilson (Democratic)"
+        },
+        {
+          "label": "Benson, s.",
+          "contest": "president",
+          "candidate": "Allan Benson (Socialist)"
+        },
+        {
+          "label": "Hanly, proh.",
+          "contest": "president",
+          "candidate": "James Hanly (Prohibition)"
+        },
+        {
+          "label": "Keyes, r.",
+          "contest": "governor",
+          "candidate": "Henry W. Keyes"
+        },
+        {
+          "label": "Hutchins, d.",
+          "contest": "governor",
+          "candidate": "John C. Hutchins"
+        },
+        {
+          "label": "Keyes, p.",
+          "contest": "governor",
+          "candidate": "Henry W. Keyes"
+        },
+        {
+          "label": "Wilkins, s.",
+          "contest": "governor",
+          "candidate": "William H. Wilkins"
+        },
+        {
+          "label": "Meras, proh.",
+          "contest": "governor",
+          "candidate": "Ralph E. Meras"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.086,
+        0.116,
+        0.925,
+        0.897
+      ],
+      "hint": "Read only the table headed 'ROCKINGHAM COUNTY.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2907
+      ]
+    },
+    {
+      "page": 390,
+      "id": "390-0",
+      "columns": [
+        {
+          "label": "Hughes, r.",
+          "contest": "president",
+          "candidate": "Charles Evans Hughes (Republican)"
+        },
+        {
+          "label": "Wilson, d.",
+          "contest": "president",
+          "candidate": "Woodrow Wilson (Democratic)"
+        },
+        {
+          "label": "Benson, s.",
+          "contest": "president",
+          "candidate": "Allan Benson (Socialist)"
+        },
+        {
+          "label": "Hanly, proh.",
+          "contest": "president",
+          "candidate": "James Hanly (Prohibition)"
+        },
+        {
+          "label": "Keyes, r.",
+          "contest": "governor",
+          "candidate": "Henry W. Keyes"
+        },
+        {
+          "label": "Hutchins, d.",
+          "contest": "governor",
+          "candidate": "John C. Hutchins"
+        },
+        {
+          "label": "Keyes, p.",
+          "contest": "governor",
+          "candidate": "Henry W. Keyes"
+        },
+        {
+          "label": "Wilkins, s.",
+          "contest": "governor",
+          "candidate": "William H. Wilkins"
+        },
+        {
+          "label": "Meras, proh.",
+          "contest": "governor",
+          "candidate": "Ralph E. Meras"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.096,
+        0.116,
+        0.942,
+        0.75
+      ],
+      "hint": "Read only the table headed 'STRAFFORD COUNTY.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3691
+      ]
+    },
+    {
+      "page": 391,
+      "id": "391-0",
+      "columns": [
+        {
+          "label": "Hughes, r.",
+          "contest": "president",
+          "candidate": "Charles Evans Hughes (Republican)"
+        },
+        {
+          "label": "Wilson, d.",
+          "contest": "president",
+          "candidate": "Woodrow Wilson (Democratic)"
+        },
+        {
+          "label": "Benson, s.",
+          "contest": "president",
+          "candidate": "Allan Benson (Socialist)"
+        },
+        {
+          "label": "Hanly, proh.",
+          "contest": "president",
+          "candidate": "James Hanly (Prohibition)"
+        },
+        {
+          "label": "Keyes, r.",
+          "contest": "governor",
+          "candidate": "Henry W. Keyes"
+        },
+        {
+          "label": "Hutchins, d.",
+          "contest": "governor",
+          "candidate": "John C. Hutchins"
+        },
+        {
+          "label": "Keyes, p.",
+          "contest": "governor",
+          "candidate": "Henry W. Keyes"
+        },
+        {
+          "label": "Wilkins, s.",
+          "contest": "governor",
+          "candidate": "William H. Wilkins"
+        },
+        {
+          "label": "Meras, proh.",
+          "contest": "governor",
+          "candidate": "Ralph E. Meras"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.083,
+        0.119,
+        0.923,
+        0.618
+      ],
+      "hint": "Read only the table headed 'BELKNAP COUNTY.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.4609
+      ]
+    },
+    {
+      "page": 392,
+      "id": "392-0",
+      "columns": [
+        {
+          "label": "Hughes, r.",
+          "contest": "president",
+          "candidate": "Charles Evans Hughes (Republican)"
+        },
+        {
+          "label": "Wilson, d.",
+          "contest": "president",
+          "candidate": "Woodrow Wilson (Democratic)"
+        },
+        {
+          "label": "Benson, s.",
+          "contest": "president",
+          "candidate": "Allan Benson (Socialist)"
+        },
+        {
+          "label": "Hanly, proh.",
+          "contest": "president",
+          "candidate": "James Hanly (Prohibition)"
+        },
+        {
+          "label": "Keyes, r.",
+          "contest": "governor",
+          "candidate": "Henry W. Keyes"
+        },
+        {
+          "label": "Hutchins, d.",
+          "contest": "governor",
+          "candidate": "John C. Hutchins"
+        },
+        {
+          "label": "Keyes, p.",
+          "contest": "governor",
+          "candidate": "Henry W. Keyes"
+        },
+        {
+          "label": "Wilkins, s.",
+          "contest": "governor",
+          "candidate": "William H. Wilkins"
+        },
+        {
+          "label": "Meras, proh.",
+          "contest": "governor",
+          "candidate": "Ralph E. Meras"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.079,
+        0.121,
+        0.925,
+        0.617
+      ],
+      "hint": "Read only the table headed 'CARROLL COUNTY.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.4677
+      ]
+    },
+    {
+      "page": 393,
+      "id": "393-0",
+      "columns": [
+        {
+          "label": "Hughes, r.",
+          "contest": "president",
+          "candidate": "Charles Evans Hughes (Republican)"
+        },
+        {
+          "label": "Wilson, d.",
+          "contest": "president",
+          "candidate": "Woodrow Wilson (Democratic)"
+        },
+        {
+          "label": "Benson, s.",
+          "contest": "president",
+          "candidate": "Allan Benson (Socialist)"
+        },
+        {
+          "label": "Hanly, proh.",
+          "contest": "president",
+          "candidate": "James Hanly (Prohibition)"
+        },
+        {
+          "label": "Keyes, r.",
+          "contest": "governor",
+          "candidate": "Henry W. Keyes"
+        },
+        {
+          "label": "Hutchins, d.",
+          "contest": "governor",
+          "candidate": "John C. Hutchins"
+        },
+        {
+          "label": "Keyes, p.",
+          "contest": "governor",
+          "candidate": "Henry W. Keyes"
+        },
+        {
+          "label": "Wilkins, s.",
+          "contest": "governor",
+          "candidate": "William H. Wilkins"
+        },
+        {
+          "label": "Meras, proh.",
+          "contest": "governor",
+          "candidate": "Ralph E. Meras"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.079,
+        0.129,
+        0.929,
+        0.896
+      ],
+      "hint": "Read only the table headed 'MERRIMACK COUNTY.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3038
+      ]
+    },
+    {
+      "page": 394,
+      "id": "394-0",
+      "columns": [
+        {
+          "label": "Hughes, r.",
+          "contest": "president",
+          "candidate": "Charles Evans Hughes (Republican)"
+        },
+        {
+          "label": "Wilson, d.",
+          "contest": "president",
+          "candidate": "Woodrow Wilson (Democratic)"
+        },
+        {
+          "label": "Benson, s.",
+          "contest": "president",
+          "candidate": "Allan Benson (Socialist)"
+        },
+        {
+          "label": "Hanly, proh.",
+          "contest": "president",
+          "candidate": "James Hanly (Prohibition)"
+        },
+        {
+          "label": "Keyes, r.",
+          "contest": "governor",
+          "candidate": "Henry W. Keyes"
+        },
+        {
+          "label": "Hutchins, d.",
+          "contest": "governor",
+          "candidate": "John C. Hutchins"
+        },
+        {
+          "label": "Keyes, s.",
+          "contest": "governor",
+          "candidate": "Henry W. Keyes"
+        },
+        {
+          "label": "Wilkins, s.",
+          "contest": "governor",
+          "candidate": "William H. Wilkins"
+        },
+        {
+          "label": "Meras, proh.",
+          "contest": "governor",
+          "candidate": "Ralph E. Meras"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.075,
+        0.128,
+        0.918,
+        1.0
+      ],
+      "hint": "Read only the table headed 'HILLSBOROUGH COUNTY'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2626
+      ]
+    },
+    {
+      "page": 395,
+      "id": "395-0",
+      "columns": [
+        {
+          "label": "Hughes, r.",
+          "contest": "president",
+          "candidate": "Charles Evans Hughes (Republican)"
+        },
+        {
+          "label": "Wilson, d.",
+          "contest": "president",
+          "candidate": "Woodrow Wilson (Democratic)"
+        },
+        {
+          "label": "Benson, s.",
+          "contest": "president",
+          "candidate": "Allan Benson (Socialist)"
+        },
+        {
+          "label": "Hanly, proh.",
+          "contest": "president",
+          "candidate": "James Hanly (Prohibition)"
+        },
+        {
+          "label": "Keyes, r.",
+          "contest": "governor",
+          "candidate": "Henry W. Keyes"
+        },
+        {
+          "label": "Hutchins, d.",
+          "contest": "governor",
+          "candidate": "John C. Hutchins"
+        },
+        {
+          "label": "Keyes, p.",
+          "contest": "governor",
+          "candidate": "Henry W. Keyes"
+        },
+        {
+          "label": "Wilkins, s.",
+          "contest": "governor",
+          "candidate": "William H. Wilkins"
+        },
+        {
+          "label": "Meras, proh.",
+          "contest": "governor",
+          "candidate": "Ralph E. Meras"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.09,
+        0.142,
+        0.932,
+        0.526
+      ],
+      "hint": "Read only the table headed 'HILLSBOROUGH COUNTY.\u2014Concluded.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 396,
+      "id": "396-0",
+      "columns": [
+        {
+          "label": "Hughes, r.",
+          "contest": "president",
+          "candidate": "Charles Evans Hughes (Republican)"
+        },
+        {
+          "label": "Wilson, d.",
+          "contest": "president",
+          "candidate": "Woodrow Wilson (Democratic)"
+        },
+        {
+          "label": "Benson, s.",
+          "contest": "president",
+          "candidate": "Allan Benson (Socialist)"
+        },
+        {
+          "label": "Hanly, proh.",
+          "contest": "president",
+          "candidate": "James Hanly (Prohibition)"
+        },
+        {
+          "label": "Keyes, r.",
+          "contest": "governor",
+          "candidate": "Henry W. Keyes"
+        },
+        {
+          "label": "Hutchins, d.",
+          "contest": "governor",
+          "candidate": "John C. Hutchins"
+        },
+        {
+          "label": "Keyes, p.",
+          "contest": "governor",
+          "candidate": "Henry W. Keyes"
+        },
+        {
+          "label": "Wilkins, s.",
+          "contest": "governor",
+          "candidate": "William H. Wilkins"
+        },
+        {
+          "label": "Meras, proh.",
+          "contest": "governor",
+          "candidate": "Ralph E. Meras"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.086,
+        0.124,
+        0.932,
+        0.758
+      ],
+      "hint": "Read only the table headed 'CHESHIRE COUNTY.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3644
+      ]
+    },
+    {
+      "page": 397,
+      "id": "397-0",
+      "columns": [
+        {
+          "label": "Hughes, r.",
+          "contest": "president",
+          "candidate": "Charles Evans Hughes (Republican)"
+        },
+        {
+          "label": "Wilson, d.",
+          "contest": "president",
+          "candidate": "Woodrow Wilson (Democratic)"
+        },
+        {
+          "label": "Benson, s.",
+          "contest": "president",
+          "candidate": "Allan Benson (Socialist)"
+        },
+        {
+          "label": "Hanly, proh.",
+          "contest": "president",
+          "candidate": "James Hanly (Prohibition)"
+        },
+        {
+          "label": "Keyes, r.",
+          "contest": "governor",
+          "candidate": "Henry W. Keyes"
+        },
+        {
+          "label": "Hutchins, d.",
+          "contest": "governor",
+          "candidate": "John C. Hutchins"
+        },
+        {
+          "label": "Keyes, p.",
+          "contest": "governor",
+          "candidate": "Henry W. Keyes"
+        },
+        {
+          "label": "Wilkins, s.",
+          "contest": "governor",
+          "candidate": "William H. Wilkins"
+        },
+        {
+          "label": "Meras, proh.",
+          "contest": "governor",
+          "candidate": "Ralph E. Meras"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.095,
+        0.123,
+        0.94,
+        0.606
+      ],
+      "hint": "Read only the table headed 'SULLIVAN COUNTY.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.4907
+      ]
+    },
+    {
+      "page": 398,
+      "id": "398-0",
+      "columns": [
+        {
+          "label": "Hughes, r.",
+          "contest": "president",
+          "candidate": "Charles Evans Hughes (Republican)"
+        },
+        {
+          "label": "Wilson, d.",
+          "contest": "president",
+          "candidate": "Woodrow Wilson (Democratic)"
+        },
+        {
+          "label": "Benson, s.",
+          "contest": "president",
+          "candidate": "Allan Benson (Socialist)"
+        },
+        {
+          "label": "Hanly, proh.",
+          "contest": "president",
+          "candidate": "James Hanly (Prohibition)"
+        },
+        {
+          "label": "Keyes, r.",
+          "contest": "governor",
+          "candidate": "Henry W. Keyes"
+        },
+        {
+          "label": "Hutchins, d.",
+          "contest": "governor",
+          "candidate": "John C. Hutchins"
+        },
+        {
+          "label": "Keyes, p.",
+          "contest": "governor",
+          "candidate": "Henry W. Keyes"
+        },
+        {
+          "label": "Wilkins, s.",
+          "contest": "governor",
+          "candidate": "William H. Wilkins"
+        },
+        {
+          "label": "Meras, proh.",
+          "contest": "governor",
+          "candidate": "Ralph E. Meras"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.083,
+        0.133,
+        0.927,
+        0.876
+      ],
+      "hint": "Read only the table headed 'Grafton County'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2988
+      ]
+    },
+    {
+      "page": 399,
+      "id": "399-0",
+      "columns": [
+        {
+          "label": "Hughes, r.",
+          "contest": "president",
+          "candidate": "Charles Evans Hughes (Republican)"
+        },
+        {
+          "label": "Wilson, d.",
+          "contest": "president",
+          "candidate": "Woodrow Wilson (Democratic)"
+        },
+        {
+          "label": "Benson, s.",
+          "contest": "president",
+          "candidate": "Allan Benson (Socialist)"
+        },
+        {
+          "label": "Hanly, proh.",
+          "contest": "president",
+          "candidate": "James Hanly (Prohibition)"
+        },
+        {
+          "label": "Keyes, r.",
+          "contest": "governor",
+          "candidate": "Henry W. Keyes"
+        },
+        {
+          "label": "Hutchins, d.",
+          "contest": "governor",
+          "candidate": "John C. Hutchins"
+        },
+        {
+          "label": "Keyes, p.",
+          "contest": "governor",
+          "candidate": "Henry W. Keyes"
+        },
+        {
+          "label": "Wilkins, s.",
+          "contest": "governor",
+          "candidate": "William H. Wilkins"
+        },
+        {
+          "label": "Meras, proh.",
+          "contest": "governor",
+          "candidate": "Ralph E. Meras"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.069,
+        0.123,
+        0.911,
+        0.72
+      ],
+      "hint": "Read only the table headed 'COOS COUNTY.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3903
+      ]
+    },
+    {
+      "page": 400,
+      "id": "400-0",
+      "columns": [
+        {
+          "label": "Sulloway, r.",
+          "contest": "house1",
+          "candidate": "Cyrus Adams Sulloway"
+        },
+        {
+          "label": "Woodbury, d.",
+          "contest": "house1",
+          "candidate": "Gordon Woodbury"
+        },
+        {
+          "label": "Kierdorf, s.",
+          "contest": "house1",
+          "candidate": "Lorenz Kierdorf"
+        },
+        {
+          "label": "Newell, proh.",
+          "contest": "house1",
+          "candidate": "Elijah Newell"
+        },
+        {
+          "label": "Yes.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Yes.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.09,
+        0.12,
+        0.937,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2364
+      ]
+    },
+    {
+      "page": 401,
+      "id": "401-0",
+      "columns": [
+        {
+          "label": "Sulloway, r.",
+          "contest": "house1",
+          "candidate": "Cyrus Adams Sulloway"
+        },
+        {
+          "label": "Woodbury, d.",
+          "contest": "house1",
+          "candidate": "Gordon Woodbury"
+        },
+        {
+          "label": "Kierdorf, s",
+          "contest": "house1",
+          "candidate": "Lorenz Kierdorf"
+        },
+        {
+          "label": "Newell, proh.",
+          "contest": "house1",
+          "candidate": "Elijah Newell"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.09,
+        0.34,
+        0.649,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT.\u2014Continued.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        -0.0045
+      ]
+    },
+    {
+      "page": 402,
+      "id": "402-0",
+      "columns": [
+        {
+          "label": "Sulloway, r.",
+          "contest": "house1",
+          "candidate": "Cyrus Adams Sulloway"
+        },
+        {
+          "label": "Woodbury, d.",
+          "contest": "house1",
+          "candidate": "Gordon Woodbury"
+        },
+        {
+          "label": "Kierdorf, s.",
+          "contest": "house1",
+          "candidate": "Lorenz Kierdorf"
+        },
+        {
+          "label": "Newell, proh.",
+          "contest": "house1",
+          "candidate": "Elijah Newell"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.06,
+        0.213,
+        0.613,
+        0.866
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT.\u2014Concluded.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1654
+      ]
+    },
+    {
+      "page": 403,
+      "id": "403-0",
+      "columns": [
+        {
+          "label": "Wason, r.",
+          "contest": "house2",
+          "candidate": "Edward H. Wason"
+        },
+        {
+          "label": "Stevens, d.",
+          "contest": "house2",
+          "candidate": "Raymond B. Stevens"
+        },
+        {
+          "label": "Wason, p.",
+          "contest": "house2",
+          "candidate": "Edward H. Wason"
+        },
+        {
+          "label": "Kunberger, s.",
+          "contest": "house2",
+          "candidate": "Ernest Kunberger"
+        },
+        {
+          "label": "Simonds, proh.",
+          "contest": "house2",
+          "candidate": "Arthur B. Simonds"
+        },
+        {
+          "label": "Yes.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Yes.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.116,
+        0.112,
+        0.956,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Second Congressional District.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2297
+      ]
+    },
+    {
+      "page": 404,
+      "id": "404-0",
+      "columns": [
+        {
+          "label": "Wason, r.",
+          "contest": "house2",
+          "candidate": "Edward H. Wason"
+        },
+        {
+          "label": "Stevens, d.",
+          "contest": "house2",
+          "candidate": "Raymond B. Stevens"
+        },
+        {
+          "label": "Wason, p.",
+          "contest": "house2",
+          "candidate": "Edward H. Wason"
+        },
+        {
+          "label": "Kunberger, s.",
+          "contest": "house2",
+          "candidate": "Ernest Kunberger"
+        },
+        {
+          "label": "Simonds, proh.",
+          "contest": "house2",
+          "candidate": "Arthur B. Simonds"
+        },
+        {
+          "label": "Yes.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Yes.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.044,
+        0.332,
+        0.892,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Second Congressional District.\u2014Continued.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        -0.015
+      ]
+    },
+    {
+      "page": 405,
+      "id": "405-0",
+      "columns": [
+        {
+          "label": "Wason, r.",
+          "contest": "house2",
+          "candidate": "Edward H. Wason"
+        },
+        {
+          "label": "Stevens, d.",
+          "contest": "house2",
+          "candidate": "Raymond B. Stevens"
+        },
+        {
+          "label": "Wason, p.",
+          "contest": "house2",
+          "candidate": "Edward H. Wason"
+        },
+        {
+          "label": "Kunberger, s.",
+          "contest": "house2",
+          "candidate": "Ernest Kunberger"
+        },
+        {
+          "label": "Simonds, proh.",
+          "contest": "house2",
+          "candidate": "Arthur B. Simonds"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.109,
+        0.332,
+        0.673,
+        1.0
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT.\u2014Continued.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        -0.024
+      ]
+    },
+    {
+      "page": 406,
+      "id": "406-0",
+      "columns": [
+        {
+          "label": "Wason, r.",
+          "contest": "house2",
+          "candidate": "Edward H. Wason"
+        },
+        {
+          "label": "Stevens, d.",
+          "contest": "house2",
+          "candidate": "Raymond B. Stevens"
+        },
+        {
+          "label": "Wason, p.",
+          "contest": "house2",
+          "candidate": "Edward H. Wason"
+        },
+        {
+          "label": "Kunberger, s.",
+          "contest": "house2",
+          "candidate": "Ernest Kunberger"
+        },
+        {
+          "label": "Simonds, proh.",
+          "contest": "house2",
+          "candidate": "Arthur B. Simonds"
+        },
+        {
+          "label": "Yes.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Yes.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.069,
+        0.114,
+        0.911,
+        0.726
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT.\u2014Concluded.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3382
+      ]
+    }
+  ]
+}
