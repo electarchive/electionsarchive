@@ -126,9 +126,10 @@ def emit() -> Path:
                 title = row["title"]
                 source = sources.get(url)
                 if source is None:
-                    source = sources[url] = cs.source(council_name, title)
+                    publisher = parish_name if ".parish." in url else council_name
+                    source = sources[url] = cs.source(publisher, title)
                     if source in cs.minted:
-                        cs.add("source", id=source, kind="official_body", publisher=council_name, title=title, url=url)
+                        cs.add("source", id=source, kind="official_body", publisher=publisher, title=title, url=url)
                     cs.artifact(raw.cached(SOURCE, url), source)
                 key = f"{day}:parish_poll:{parish}:{row['question_no']}"
                 contest = cs.key("gb.contest", key)
