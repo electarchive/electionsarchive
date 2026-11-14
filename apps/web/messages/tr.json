@@ -3923,6 +3923,7 @@
   "ws_qtype_optional_referendum": "İsteğe bağlı halkoylaması",
   "ws_qtype_plebiscite": "Plebisit",
   "ws_qtype_recall_question": "Geri çağırma sorusu",
+  "ws_qtype_referendum": "Halkoylaması",
   "ws_contest_area": "Bölge (isteğe bağlı)",
   "ws_contest_office": "Görev (isteğe bağlı)",
   "ws_contest_body": "Kurum (isteğe bağlı)",
