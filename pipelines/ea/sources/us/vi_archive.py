@@ -1,5 +1,5 @@
 import json
-from datetime import timedelta
+from datetime import date, timedelta
 from pathlib import Path
 from urllib.parse import urlencode
 from uuid import UUID
@@ -16,6 +16,14 @@ PARSED = DATA / "parsed" / SOURCE
 HOST = "https://electionarchive.vivote.gov"
 PUBLISHER = "Election System of the Virgin Islands"
 TITLE = "Virgin Islands Elections Database, governor and lieutenant governor"
+CERTIFIED = {
+    date(2010, 11, 2): {"John P. DeJongh and Gregory R. Francis": 18645, "Kenneth E. Mapp and Malik Sekou": 14167}
+}
+CERTIFICATION = (
+    "https://vivote.gov/wp-content/uploads/2023/12/2010-STTJ-General-Election.pdf",
+    "2010 General Election Certification, St. Thomas-St. John District and District of St. Croix",
+    "Governor totals are the St. Croix certification (8,975 and 7,615, https://vivote.gov/wp-content/uploads/2023/12/STX-2010-Gen-Certification.pdf) plus the St. Thomas-St. John certification (9,670 and 6,552), hand-keyed from the scans with absentee and provisional votes. The archive's 2010 general rows hold at-polls votes only.",
+)
 PARTIES = {"Democratic": "democratic-party", "Independent Citizens Movement": "VI:independent-citizens-movement"}
 PSEUDO = {"Total Ballots Cast", "Total Votes Cast", "Registered Voters", "Blank Ballots", "Overvotes/Undervotes"}
 
@@ -34,6 +42,7 @@ def url() -> str:
 
 def fetch() -> None:
     raw.fetch(SOURCE, url(), suffix=".csv")
+    raw.fetch(SOURCE, CERTIFICATION[0], suffix=".pdf")
 
 
 def parse() -> None:
@@ -51,6 +60,14 @@ def parse() -> None:
         frame.with_columns(pl.col("votes").cast(pl.Int64), pl.col("election_date").str.slice(0, 10).str.to_date())
         .group_by("election_date", "election_type", "candidate_name", "candidate_party_name")
         .agg(pl.col("votes").sum())
+        .with_columns(
+            pl.struct("election_date", "candidate_name", "votes")
+            .map_elements(
+                lambda row: CERTIFIED.get(row["election_date"], {}).get(row["candidate_name"], row["votes"]),
+                return_dtype=pl.Int64,
+            )
+            .alias("votes")
+        )
         .sort("election_date", "votes", descending=[False, True])
         .write_parquet(PARSED / "candidates.parquet")
     )
@@ -79,9 +96,20 @@ def emit() -> Path:
             publisher=PUBLISHER,
             title=TITLE,
             url=HOST,
-            notes="Island totals (St. Croix and St. Thomas/St. John) summed to the territory; the archive's precinct rows agree with them.",
+            notes="Island totals (St. Croix and St. Thomas/St. John) summed to the territory; the archive's precinct rows agree with them except in 2010, where they hold at-polls votes only.",
         )
         cs.artifact(raw.cached(SOURCE, url()), source)
+        certified_source = cs.source(PUBLISHER, CERTIFICATION[1])
+        cs.add(
+            "source",
+            id=certified_source,
+            kind="official_body",
+            publisher=PUBLISHER,
+            title=CERTIFICATION[1],
+            url=CERTIFICATION[0],
+            notes=CERTIFICATION[2],
+        )
+        cs.artifact(raw.cached(SOURCE, CERTIFICATION[0]), certified_source)
         systems = {key: cs.key("us.electoral_system", key) for key in ("two_round",)}
         unit, area = conn.execute(
             """select u.id, u.area_id from reporting_unit u join polity_territory t on t.area_id = u.area_id
@@ -145,7 +173,7 @@ def emit() -> Path:
                 stage="certified",
                 kind="counted",
                 status="active",
-                source_id=source,
+                source_id=certified_source if day in CERTIFIED else source,
                 is_default=True,
                 completeness=1,
             )
@@ -232,7 +260,13 @@ def emit() -> Path:
                     status="active",
                     source_id=source,
                     is_default=False,
-                    completeness=1,
+                    completeness=round(
+                        by_precinct["votes"].sum()
+                        / sum(v for k, v in rows.select("candidate_name", "votes").iter_rows() if k in options),
+                        4,
+                    )
+                    if day in CERTIFIED
+                    else 1,
                 )
                 for precinct, candidate, votes in by_precinct.select(
                     "division_name", "candidate_name", "votes"
