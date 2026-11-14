@@ -13,7 +13,7 @@ import polars as pl
 from ea import raw
 from ea.changeset import Changeset
 from ea.sources.gb.cc_elections import display
-from ea.sources.gb.parish import fold, slug
+from ea.sources.gb.parish import ENGLISH_GROUPED, fold, slug
 from ea.sources.licenses import COUNCIL
 from ea.store import DATA, connect
 
@@ -99,7 +99,7 @@ COUNCILS["E07000177/2026-06"] = {
     "day": date(2026, 6, 18),
     "publisher": "Cherwell District Council",
     "title": "Notice of uncontested election, Shipton-on-Cherwell and Thrupp Parish Council, 18 June 2026",
-    "url": "https://www.cherwell.gov.uk/info/11/elections/1319/elections-2026-and-2027/3",
+    "url": "https://www.cherwell.gov.uk/download/downloads/id/18754/notice-of-uncontested-election.pdf",
     "files": ["https://www.cherwell.gov.uk/download/downloads/id/18754/notice-of-uncontested-election.pdf"],
     "reader": "notices",
 }
@@ -258,6 +258,69 @@ COUNCILS["E06000052"] = {
     "order": "upper-first",
     "anchored": True,
     "reader": "notices+declarations",
+}
+SHROPSHIRE_2025 = (
+    "https://elections.shropshire.gov.uk/election-results/town-and-parish-council-elections/"
+    "town-and-parish-council-elections-1-may-2025/"
+)
+COUNCILS["E06000051"] = {
+    "day": date(2025, 5, 1),
+    "publisher": "Shropshire Council",
+    "title": "Town and parish council elections, 1 May 2025: results",
+    "url": SHROPSHIRE_2025,
+    "pages": [SHROPSHIRE_2025],
+    "whole": {"Richards Castle (Shropshire)"},
+    "reader": "shropshire",
+}
+WILTSHIRE = "https://elections.wiltshire.gov.uk"
+COUNCILS["E06000054"] = {
+    "day": date(2025, 5, 1),
+    "publisher": "Wiltshire Council",
+    "title": "Town and parish election results: City, Town and Parish Elections 2025, 1 May 2025",
+    "url": f"{WILTSHIRE}/Home/Election/284",
+    "divisions": f"{WILTSHIRE}/Home/Division/",
+    "inbox": "wiltshire",
+    "files": [f"{WILTSHIRE}/Home/Document/{document}" for document in (7016, 7029, 7190)],
+    "skip": {f"{WILTSHIRE}/Home/Division/8736"},
+    "declared": {
+        f"{WILTSHIRE}/Home/Division/9024": {
+            "file": f"{WILTSHIRE}/Home/Document/7016",
+            "votes": {
+                "Bailey, Mark Andrew William": (417, True),
+                "Evans, Radek Peter": (398, True),
+                "King, Carole": (546, True),
+                "Stallard, Pauline June": (202, False),
+                "Sutton, Michael": (203, True),
+                "Ulatowska, Paulina": (326, True),
+            },
+            "electorate": 3739,
+            "ballots": 929,
+            "rejected": 44,
+        },
+        f"{WILTSHIRE}/Home/Division/8999": {
+            "file": f"{WILTSHIRE}/Home/Document/7029",
+            "votes": {"Alford, Phil": (289, True), "Mitcham, Geoff": (189, False), "Rabey, Saffi": (239, True)},
+            "electorate": 2110,
+            "ballots": 542,
+            "rejected": 12,
+        },
+        f"{WILTSHIRE}/Home/Division/8959": {
+            "file": f"{WILTSHIRE}/Home/Document/7190",
+            "votes": {
+                "D`Arcy, Stephen John": (183, True),
+                "Grant, Gavin": (227, True),
+                "Strange, Ruth Eva": (143, False),
+            },
+            "electorate": 725,
+            "ballots": 348,
+            "rejected": 3,
+        },
+    },
+    "names": {
+        "Scott-Gail Mary Elizabeth": "Mary Elizabeth Scott-Gall",
+        "Tester. Matthew Dufton": "Matthew Dufton Tester",
+    },
+    "reader": "wiltshire",
 }
 DORSET_2024 = (
     "https://www.dorsetcouncil.gov.uk/w/parish-and-town-councils-within-the-dorset-council-area-elections-on-2-may-2024"
@@ -449,6 +512,11 @@ PARTIES: dict[str, str | None] = {
     "The Labour Party Candidate": "Q9630",
     "Labour and Co-operative Party": "Q9630",
     "Labour and Co-operative Party Candidate": "Q9630",
+    "Green": "Q3499324",
+    "Labour and Co-operative": "Q9630",
+    "UK Independence Party": "Q10647",
+    "Heritage Party": "Q105972889",
+    "Homeland Party": "Q119285871",
 }
 ALIASES = {
     ("E07000011", "Kimbolton & Stonely"): "Kimbolton",
@@ -463,6 +531,20 @@ ALIASES = {
     ("E07000221", "Newbold Pacey and Ashorne"): "Newbold Pacey",
     ("E07000221", "Whichford and Ascott"): "Whichford",
     ("E07000221", "Warmington and Arlescote"): "Warmington",
+    ("E06000051", "Ashford Carbonell"): "Ashford Carbonel",
+    ("E06000051", "Clun with Chapel Lawn"): "Clun",
+    ("E06000051", "Ellesmere Town"): "Ellesmere Urban",
+    ("E06000051", "Leighton and Easton Constantine"): "Leighton and Eaton Constantine",
+    ("E06000051", "Ryton and Grindle"): "Ryton",
+    ("E06000051", "Wem"): "Wem Urban",
+    ("E06000051", "Whitchurch"): "Whitchurch Urban",
+    ("E06000054", "Burcombe"): "Burcombe Without",
+    ("E06000054", "Ebbesbourne Wake"): "Ebbesborne Wake",
+    ("E06000054", "Laverstock and Ford"): "Laverstock",
+    ("E06000054", "Stourton"): "Stourton with Gasper",
+    ("E06000054", "Clyffe Pypard and Bushton"): "Clyffe Pypard",
+    ("E06000054", "Luckington and Alderton"): "Luckington",
+    ("E06000054", "Lea, Garsdon & Cleverton"): "Lea and Cleverton",
 }
 GROUPED = {
     ("E07000071", "Abberton and Langenhoe"),
@@ -882,6 +964,135 @@ def swindon(lad: str, council: dict) -> list[dict]:
     return reads
 
 
+def shropshire(lad: str, council: dict) -> list[dict]:
+    url = council["pages"][0]
+    page = Path(raw.cached(SOURCE, url).path).read_text(encoding="utf-8")
+    groups = {
+        fold(member): label for (key, label), members in ENGLISH_GROUPED.items() if key == lad for member in members
+    }
+    reads = []
+    for heading, body in re.findall(
+        r'<div class="result">\s*<h2 class="heading">(.*?)</h2>(.*?)<div class="back-to-top">', page, re.DOTALL
+    ):
+        area = text(heading)
+        found = re.fullmatch(r"(.+?)(?: (?:Town|Parish) Council)? \((.+?)(?: Ward)?\)", area)
+        parish, ward = (area, None) if found is None or area in council["whole"] else found.groups()
+        parish = re.sub(r" (?:Town|Parish) Council$", "", parish)
+        if group := groups.get(fold(parish)):
+            parish, ward = group, area if ward else parish
+        candidates = []
+        for row in re.findall(r'<dl aria-rowindex="\d+" class="row[^"]*" role="row">(.*?)</dl>', body, re.DOTALL):
+            cells = dict(re.findall(r'<dd[^>]*data-key="(\w+)" role="cell">(.*?)</dd>', row, re.DOTALL))
+            known = re.search(r'<small class="aka">Commonly known as: (.*?)</small>', cells["candidate"])
+            printed = text(re.sub(r"<small.*?</small>", "", cells["candidate"])).replace("`", "'")
+            used = text(known.group(1)).replace("`", "'") if known else printed
+            outcome = text(cells["result"])
+            if outcome not in ("Elected", "Uncontested", ""):
+                raise ValueError(f"{url}: {area} result {outcome}")
+            candidates.append(
+                {
+                    "printed": printed,
+                    "name": person(
+                        re.sub(rf"^{re.escape(printed.split()[0])}\b", printed.split()[0], used, flags=re.IGNORECASE),
+                        "upper-first",
+                    ),
+                    "description": text(cells["affiliation"]),
+                    "votes": count(text(cells["votes"])) if "votes" in cells else None,
+                    "elected": outcome != "",
+                }
+            )
+        reads.append(
+            {
+                "lad": lad,
+                "url": url,
+                "page": None,
+                "style": None,
+                "parish": parish,
+                "ward": ward,
+                "places": sum(1 for candidate in candidates if candidate["elected"]) if "votes" in body else None,
+                "electorate": None,
+                "ballots": None,
+                "rejected": None,
+                "total": None,
+                "remark": None,
+                "candidates": candidates,
+            }
+        )
+    return reads
+
+
+def wiltshire(lad: str, council: dict) -> list[dict]:
+    groups = {
+        fold(member): label for (key, label), members in ENGLISH_GROUPED.items() if key == lad for member in members
+    }
+    reads = []
+    for url in sorted(key for key in raw._read(SOURCE) if key.startswith(council["divisions"])):
+        page = Path(raw.cached(SOURCE, url).path).read_text(encoding="utf-8")
+        if f"<a href='{council['url'].removeprefix('https://elections.wiltshire.gov.uk')}'>" not in page:
+            raise ValueError(f"{url}: not the {council['day']} election")
+        table = re.search(r'<table summary="Candidates for.*?</table>', page, re.DOTALL)
+        if table is None or url in council["skip"]:
+            continue
+        declared = council["declared"].get(url)
+        title = re.search(r'<h1 id="title">(.*?)</h1>', page, re.DOTALL)
+        seats = re.search(r"Number of seats: (\d+)", page)
+        assert title is not None and seats is not None
+        area = text(title.group(1))
+        found = re.fullmatch(r"(.+?)(?: JPC)? \((.+)\)", area)
+        parish, ward = found.groups() if found else (area, None)
+        if ward is None and (group := groups.get(fold(parish))):
+            parish, ward = group, parish
+        candidates = []
+        for row in re.findall(r'<tr class="(?:even|odd)[^"]*">(.*?)</tr>', table.group(0), re.DOTALL):
+            cells = dict(re.findall(r'<td class="(\w+)">(.*?)</td>', row, re.DOTALL))
+            printed = text(cells["nom"])
+            votes, elected = (
+                declared["votes"][printed]
+                if declared
+                else (count(text(cells["votes"])), text(cells["elec"]) == "Elected")
+                if "votes" in cells
+                else (None, True)
+            )
+            candidates.append(
+                {
+                    "printed": printed,
+                    "name": council["names"].get(printed) or surname_first(printed.replace("`", "'")),
+                    "description": text(cells["desc"]),
+                    "votes": votes,
+                    "elected": elected,
+                }
+            )
+
+        def figure(pattern: str) -> int | None:
+            value = re.search(pattern, page)
+            return count(value.group(1)) if value else None
+
+        contested = candidates[0]["votes"] is not None
+        figures = declared or {
+            "electorate": figure(r"Electorate: ([\d,]+)"),
+            "ballots": figure(r"Ballot Papers Issued: ([\d,]+)"),
+            "rejected": figure(r'Total spoiled papers:</td><td class="votes">([\d,]+)'),
+        }
+        reads.append(
+            {
+                "lad": lad,
+                "url": declared["file"] if declared else url,
+                "page": None,
+                "style": None,
+                "parish": parish,
+                "ward": ward,
+                "places": count(seats.group(1)),
+                "electorate": figures["electorate"] if contested else None,
+                "ballots": figures["ballots"] if contested else None,
+                "rejected": figures["rejected"] if contested else None,
+                "total": None,
+                "remark": None,
+                "candidates": candidates,
+            }
+        )
+    return reads
+
+
 def rugby(lad: str, council: dict) -> list[dict]:
     url = council["pages"][0]
     page = Path(raw.cached(SOURCE, url).path).read_text(encoding="utf-8")
@@ -1156,7 +1367,9 @@ def person(printed: str, order: str) -> str:
     if order == "comma":
         return surname_first(printed)
     if order == "upper-first":
-        found = re.fullmatch(r"((?:[A-Z][A-Z'\u2019-]+\s+)*[A-Z][A-Z'\u2019-]+)\s+(\S.*)", printed)
+        found = re.fullmatch(
+            r"((?:[A-Z][A-Z\u00c0-\u00de'\u2019-]+\s+)*[A-Z][A-Z\u00c0-\u00de'\u2019-]+)\s+(\S.*)", printed
+        )
         if found is None:
             raise ValueError(f"no surname in {printed}")
         return f"{found.group(2)} {display(found.group(1))}"
@@ -1496,6 +1709,8 @@ READERS = {
     "notices": notices,
     "swindon": swindon,
     "rugby": rugby,
+    "shropshire": shropshire,
+    "wiltshire": wiltshire,
     "declarations": declarations,
     "chorley": chorley,
     "colchester": colchester,
