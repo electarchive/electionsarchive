@@ -9,7 +9,7 @@ from ea.changeset import Changeset, slug
 from ea.store import connect
 
 SOURCE = "us.mp_votecnmi"
-VERSION = "2"
+VERSION = "3"
 PUBLISHER = "Commonwealth Election Commission of the Northern Mariana Islands"
 YEARS = {
     2014: date(2014, 11, 4),
@@ -50,13 +50,88 @@ def fetch() -> None:
             raw.store(SOURCE, url(year), body, suffix=".html", retrieved_at=datetime.now(UTC), media_type="text/html")
 
 
+SECTIONS = {
+    "DELEGATE": None,
+    "GOVERNOR": None,
+    "ABSENTEE VOTING": None,
+    "SENAT": "senate",
+    "HOUSE OF": "house",
+    "MAYOR": "mayor",
+    "ATTORNEY": "attorney-general",
+    "COUNCIL": "municipal-council",
+    "BOARD OF EDUCATION": "board-of-education",
+}
+HOUSE = {1: 6, 2: 2, 3: 6, 4: 2, 5: 2, 6: 1, 7: 1}
+PLACES = {"saipan": "ED[1-5]", "northern-islands": "ED4D", "tinian-and-aguiguan": "ED6", "rota": "ED7"}
+SENATE = {"1": ("1st", "rota"), "2": ("2nd", "tinian-and-aguiguan"), "3": ("3rd", "saipan")}
+
+
+def flat(fragment: str) -> str:
+    return " ".join(html.unescape(re.sub(r"<[^>]+>", " ", fragment)).split())
+
+
+def heads(header: list[str]) -> list[str]:
+    names = [re.sub(r"\s*\(NI\)$", "", text.upper()).replace("ED4D2", "ED4D") for text in header]
+    names = [re.sub(r"\s+", "-", name) for name in names]
+    for district in "1234":
+        split = [name for name in names if re.fullmatch(f"ED{district}[A-D]", name)]
+        if len(split) == 1 and district != "4":
+            names = [f"ED{district}" if name == split[0] else name for name in names]
+        elif split and f"ED{district}" in names:
+            names = [f"ED{district}A" if name == f"ED{district}" else name for name in names]
+    return names
+
+
+def local_tables(page: str) -> list[tuple[str, str | None, bool, list[str], list[tuple[str, list[str], bool]]]]:
+    found_tables = []
+    section = None
+    previous = 0
+    for found in re.finditer(r"<tr[^>]*>(?:(?!</tr>).)*?CANDIDATE/AFFIL", page, flags=re.DOTALL):
+        between = flat(page[max(previous, found.start() - 3000) : found.start()]).upper()
+        hits = [(between.rfind(word), word) for word in SECTIONS if word in between]
+        if hits:
+            section = SECTIONS[max(hits)[1]]
+        grid = []
+        for row in re.finditer(r"<tr.*?</tr>", page[found.start() :], flags=re.DOTALL):
+            cells = re.findall(r"<t[dh][^>]*>(.*?)</t[dh]>", row[0], flags=re.DOTALL)
+            if not cells:
+                continue
+            texts = [flat(cell) for cell in cells]
+            grid.append((texts[0], texts[1:], "#FF0000" in row[0].upper()))
+            previous = found.start() + row.end()
+            if texts[0].upper() == "TOTAL":
+                break
+        if section is None:
+            continue
+        if section == "senate":
+            number = re.findall(r"([123]) ?(?:ST|ND|RD) SENATORIAL", between)[-1]
+            place = f"{SENATE[number][0]}-senatorial-district"
+        elif section == "house":
+            place = "district-" + re.findall(r"DISTRICT (\d)", between)[-1]
+        elif section == "attorney-general":
+            place = None
+        else:
+            tail = between[-80:]
+            place = (
+                "saipan"
+                if "SAIPAN" in tail
+                else "northern-islands"
+                if "NORTHERN ISLANDS" in tail
+                else "tinian-and-aguiguan"
+                if "TINIAN" in tail
+                else "rota"
+            )
+        found_tables.append((section, place, "SPECIAL" in between, heads(grid[0][1]), grid[1:-1]))
+    return found_tables
+
+
 def emit() -> Path:
     with connect() as conn:
         cs = Changeset(
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Northern Mariana Islands governor and delegate elections 2014-2024 by election district, with early and absentee voting",
+            summary="Northern Mariana Islands governor, delegate, Senate, House, mayor, attorney general, municipal council, and Board of Education elections 2014-2024 by election district, with early and absentee voting",
             polity="US-MP",
         )
         (state,) = conn.execute("select id from polity where iso_code = 'US-MP'").fetchone()
@@ -83,6 +158,14 @@ def emit() -> Path:
             )
         two_round = cs.key("us.electoral_system", "two_round")
         persons = {}
+        made = set()
+        parties = {
+            code: entity
+            for code, value in (("DEM", "democratic-party"), ("REP", "republican-party"))
+            for (entity,) in conn.execute(
+                "select entity_id from external_id where scheme = 'us.party' and value = %s", [value]
+            ).fetchall()
+        }
         for year, day in YEARS.items():
             title = f"{year} Election Results"
             source = cs.source(PUBLISHER, title)
@@ -309,5 +392,211 @@ def emit() -> Path:
                             count_round=0,
                             flags=0,
                             value=int(cell.replace(",", "")),
+                        )
+            election = conn.execute(
+                "select c.election_id from contest c join external_id x on x.entity_id = c.id and x.scheme = 'us.contest' and x.value = %s",
+                [f"{day}:MP:house:0"],
+            ).fetchone()[0]
+            for section, place, special, columns, body in local_tables(page):
+                tail = f"{section}:{place}" if place else section
+                contest_key = f"{day}:MP:69:{tail}" + (":special" if special else "")
+                office_name = f"Northern Mariana Islands {section.replace('-', ' ').title().replace(' Of ', ' of ')}"
+                seat_name = f"{office_name}, {(place or '').replace('-', ' ').title().replace(' And ', ' and ')}"
+                if section == "house" and place:
+                    width = f"ED{place[-1]}"
+                elif section == "senate" and place:
+                    width = PLACES[SENATE[place[0]][1]]
+                else:
+                    width = PLACES.get(place or "", "ED")
+                winners = sum(red for _, _, red in body)
+                magnitude = (
+                    HOUSE[int(place[-1])]
+                    if section == "house" and place
+                    else 3
+                    if section == "municipal-council"
+                    else winners
+                )
+                if winners == 0 or winners > magnitude or (section == "house" and winners != magnitude):
+                    raise ValueError(f"{contest_key}: {winners} winners marked for {magnitude} seats")
+                is_body = section not in ("mayor", "attorney-general")
+                if is_body:
+                    holder = cs.key("us.body", f"MP:69:{section}")
+                else:
+                    holder = cs.key("us.office", f"MP:69:{section}")
+                if holder in cs.minted:
+                    raise ValueError(f"{contest_key}: no held body or office")
+                district = area
+                if place:
+                    district = cs.area("us.local_district", f"MP:69:{tail}")
+                    if district in cs.minted and district not in made:
+                        made.add(district)
+                        cs.add("area", id=district, scheme_code="us.local_district")
+                        cs.add("area_code", area_id=district, code=f"MP:69:{tail}", valid_from=None)
+                        cs.add("area_parent", area_id=district, parent_id=area, valid_from=None)
+                        cs.add(
+                            "name",
+                            entity_id=district,
+                            text=seat_name,
+                            lang="en",
+                            kind="official",
+                            is_preferred=True,
+                        )
+                contest = cs.key("us.contest", contest_key)
+                cs.add(
+                    "contest",
+                    id=contest,
+                    election_id=election,
+                    kind="body_seats" if is_body else "office",
+                    office_id=None if is_body else holder,
+                    body_id=holder if is_body else None,
+                    district_area_id=district,
+                    term="remainder" if special else "full",
+                    magnitude=magnitude,
+                    round_number=1,
+                    electoral_system_id=cs.key("us.electoral_system", "fptp" if magnitude == 1 else "block"),
+                    default_result_kind="counted",
+                )
+                title = conn.execute(
+                    """select n.text from contest c join external_id x on x.entity_id = c.id and x.scheme = 'us.contest'
+                       and x.value = %s join name n on n.entity_id = c.id and n.is_preferred""",
+                    [f"2026-11-03:MP:69:{tail}"],
+                ).fetchone()
+                label = (
+                    title[0].removeprefix("2026 ").removesuffix(" election")
+                    if title
+                    else seat_name
+                    if place
+                    else office_name
+                )
+                cs.add(
+                    "name",
+                    entity_id=contest,
+                    text=f"{year} {label} {'special election' if special else 'election'}",
+                    lang="en",
+                    kind="official",
+                    is_preferred=True,
+                )
+                cs.add(
+                    "slug",
+                    path=f"us/mp/{day}-general/{tail.replace(':', '-')}" + ("-special" if special else ""),
+                    entity_id=contest,
+                )
+                result_set = cs.key(f"{SOURCE}.result_set", f"{contest_key}:district")
+                cs.add(
+                    "result_set",
+                    id=result_set,
+                    election_id=election,
+                    contest_id=contest,
+                    stage="certified",
+                    kind="counted",
+                    status="active",
+                    source_id=source,
+                    is_default=True,
+                    completeness=1,
+                )
+                cs.add(
+                    "note",
+                    entity_id=result_set,
+                    kind="methodology",
+                    body_md="Votes by election district as published; early voting and absentee votes are separate aggregate units on their own channels. Winners are the totals the page marks in red as official winners.",
+                )
+                has_early = any(name.startswith("EV") for name in columns)
+                for text, cells, red in body:
+                    if len(cells) != len(columns):
+                        raise ValueError(f"{contest_key}: {text} has {len(cells)} cells for {len(columns)} columns")
+                    values = {
+                        name: int(cell.replace(",", ""))
+                        for name, cell in zip(columns, cells, strict=True)
+                        if name != "%" and cell.replace(",", "").isdigit()
+                    }
+                    total = values.pop("TOTAL")
+                    if sum(values.values()) != total:
+                        raise ValueError(f"{contest_key}: {text} units add to {sum(values.values())}, not {total}")
+                    stray = [
+                        name
+                        for name, value in values.items()
+                        if value and name.startswith("ED") and not re.match(width, name)
+                    ]
+                    if stray:
+                        raise ValueError(f"{contest_key}: {text} has votes in {stray}")
+                    printed = re.sub(r"\*", "", text)
+                    party_code = None
+                    if "/" in printed:
+                        printed, party_code = (part.strip() for part in printed.rsplit("/", 1))
+                    surname, given = (
+                        (part.strip() for part in printed.split(",", 1))
+                        if "," in printed
+                        else re.match(r"([A-Z][A-Z' -]+?)\s+([A-Z][a-z].*)", printed).groups()
+                    )
+                    suffix = re.search(r"\b(Jr|Sr)\.?(?=\s|$)", given)
+                    person_name = f"{re.sub(r'\s+', ' ', given.replace(suffix[0], '')).strip() if suffix else given} {surname.title()}"
+                    if suffix:
+                        person_name += f" {suffix[1]}."
+                    party = parties.get((party_code or "").rstrip(".").upper())
+                    token = slug(person_name)
+                    option = cs.key("us.option", f"{contest_key}:{token}")
+                    cs.add(
+                        "contest_option",
+                        id=option,
+                        contest_id=contest,
+                        kind="candidate",
+                        party_id=party,
+                        ballot_label=person_name,
+                    )
+                    person = persons.setdefault(token, cs.key(f"{SOURCE}.person", f"MP:{token}"))
+                    if person in cs.minted and not any(r["id"] == person for r in cs.rows.get("person", [])):
+                        cs.add("person", id=person)
+                        cs.add(
+                            "name", entity_id=person, text=person_name, lang="en", kind="official", is_preferred=True
+                        )
+                    cs.add(
+                        "candidacy",
+                        id=cs.key("us.candidacy", f"{contest_key}:{token}:head"),
+                        person_id=person,
+                        option_id=option,
+                        role="head",
+                        ballot_name=person_name,
+                        member_of_party_id=party,
+                        is_independent=party is None,
+                        is_incumbent="*" in text,
+                    )
+                    if red:
+                        cs.add(
+                            "outcome",
+                            result_set_id=result_set,
+                            option_id=option,
+                            kind="elected",
+                            seats=1 if is_body else None,
+                        )
+                    for name, value in values.items():
+                        aggregate = name.startswith(("EV", "ABS"))
+                        code = f"MP:{year}:{name}" if aggregate else f"{year}:MP:{name}"
+                        scheme = "us.aggregate" if aggregate else "us.precinct"
+                        if code not in units:
+                            units[code] = cs.unit(scheme, code)
+                            municipio = None if aggregate else municipios[MUNICIPIO.get(name, "69110")]
+                            cs.add(
+                                "reporting_unit",
+                                id=units[code],
+                                polity_id=state,
+                                scheme_code=scheme,
+                                code=code,
+                                parent_id=municipio[0] if municipio else parent,
+                                area_relation="within",
+                                area_id=municipio[1] if municipio else area,
+                                kind="aggregate" if aggregate else "standard",
+                                valid_from=day,
+                                valid_to=day + timedelta(days=1),
+                            )
+                        cs.add(
+                            "result_value",
+                            result_set_id=result_set,
+                            unit_id=units[code],
+                            option_id=option,
+                            channel=(2 if name.startswith("EV") else 3) if aggregate else (1 if has_early else 0),
+                            measure=1,
+                            count_round=0,
+                            flags=0,
+                            value=value,
                         )
         return cs.write()
