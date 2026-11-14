@@ -8,6 +8,7 @@ from pathlib import Path
 from uuid import UUID
 
 import polars as pl
+import shapely
 
 from ea import raw
 from ea.changeset import Changeset, slug
@@ -932,7 +933,94 @@ def parse() -> None:
             print(f"{year} {name}: {frame.height} rows")
 
 
+def emit_okregi() -> Path:
+    districts = pl.read_parquet(PARSED / "2023" / "districts.parquet")
+    members = (
+        pl.read_parquet(PARSED / "2023" / "units.parquet")
+        .filter(pl.col("gmina").str.contains(r"^\d{6}$"))
+        .select(pl.col("gmina").str.slice(0, 4).alias("powiat"), "district")
+        .unique()
+    )
+    if members.group_by("powiat").len()["len"].max() != 1:
+        raise ValueError("a powiat spans two constituencies")
+    with connect() as conn:
+        cs = Changeset(
+            conn,
+            pipeline=SOURCE,
+            version=VERSION,
+            summary=(
+                f"Poland's {districts.height} Sejm constituencies as unions of the powiats and cities with powiat "
+                "rights the electoral code lists for each, with PRG boundaries"
+            ),
+            polity="PL",
+        )
+        law = cs.source(PUBLISHER, TITLE)
+        cs.add(
+            "source",
+            id=law,
+            kind="official_body",
+            publisher=PUBLISHER,
+            title=TITLE,
+            url=PAGE,
+            license="Official public record, no license stated",
+            attribution="Źródło danych: Państwowa Komisja Wyborcza, Krajowe Biuro Wyborcze.",
+        )
+        for address in urls(2023, "districts"):
+            cs.artifact(raw.cached(SOURCE, address), law)
+        rows = conn.execute(
+            "select c.code, ST_AsBinary(g.geom), g.source_id from area a join area_code c on c.area_id = a.id"
+            " join area_geometry g on g.area_id = a.id where a.scheme_code = 'pl.powiat'"
+        ).fetchall()
+        shapes = {code: shapely.from_wkb(geom) for code, geom, _ in rows}
+        [prg] = {source for _, _, source in rows}
+        missing = set(members["powiat"]) - set(shapes)
+        if missing:
+            raise ValueError(f"powiats without a shape: {sorted(missing)}")
+        if set(shapes) - set(members["powiat"]):
+            raise ValueError(f"powiats in no constituency: {sorted(set(shapes) - set(members['powiat']))}")
+        for entry in districts.sort("district").iter_rows(named=True):
+            number = entry["district"]
+            parts = members.filter(pl.col("district") == number)["powiat"].to_list()
+            regions = {code[:2] for code in parts}
+            if len(regions) != 1:
+                raise ValueError(f"constituency {number} spans voivodeships {sorted(regions)}")
+            shape = shapely.set_srid(shapely.union_all([shapes[code] for code in parts], grid_size=1e-7), 4326)
+            area = cs.area("pl.okreg_sejm", str(number))
+            cs.add("area", id=area, scheme_code="pl.okreg_sejm")
+            cs.add("area_code", area_id=area, code=str(number), valid_from=None)
+            cs.add("area_parent", area_id=area, parent_id=cs.area("pl.wojewodztwo", regions.pop()), valid_from=None)
+            for text, lang, kind in (
+                (f"Okręg wyborczy nr {number} ({entry['seat']})", "pl", "official"),
+                (f"Sejm constituency {number} ({entry['seat']})", "en", "english"),
+            ):
+                cs.add("name", entity_id=area, text=text, lang=lang, kind=kind, is_preferred=kind == "official")
+            cs.add(
+                "area_geometry",
+                area_id=area,
+                valid_from=None,
+                geom=shapely.to_wkb(shape, hex=True, include_srid=True),
+                label_point=shapely.to_wkb(
+                    shapely.set_srid(max(shapely.get_parts(shape), key=shapely.area).representative_point(), 4326),
+                    hex=True,
+                    include_srid=True,
+                ),
+                quality="official",
+                source_id=prg,
+            )
+        cs.add(
+            "boundary_set",
+            scheme_code="pl.okreg_sejm",
+            vintage="2001",
+            valid_from=None,
+            valid_to=None,
+            as_of=ELECTIONS[2023],
+        )
+        return cs.write()
+
+
 def emit() -> Path:
+    if os.environ["SEJM_YEAR"] == "okregi":
+        return emit_okregi()
     frames = {
         name: pl.read_parquet(PARSED / os.environ["SEJM_YEAR"] / f"{name}.parquet")
         for name in ("districts", "lists", "candidates", "units", "unit_votes")
@@ -1143,8 +1231,8 @@ def emit() -> Path:
                 "scheme_code": "pl.okreg_sejm",
                 "code": key,
                 "parent_id": None,
-                "area_relation": "unlocated",
-                "area_id": None,
+                "area_relation": "equals",
+                "area_id": str(cs.area("pl.okreg_sejm", str(number))),
                 "kind": "standard",
             }
             here = accounting.filter(pl.col("district") == number)
@@ -1243,7 +1331,9 @@ def emit() -> Path:
                 )
 
         minted = [
-            {"id": str(unit), "polity_id": str(poland), **row} for unit, row in unit_rows.items() if unit in cs.minted
+            {"id": str(unit), "polity_id": str(poland), **row}
+            for unit, row in unit_rows.items()
+            if unit in cs.minted or row["scheme_code"] == "pl.okreg_sejm"
         ]
         cs.frame(
             "reporting_unit", pl.DataFrame(minted, schema_overrides={"parent_id": pl.String, "area_id": pl.String})
