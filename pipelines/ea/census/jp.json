@@ -2152,7 +2152,9 @@
       "note": "Prefectural and municipal boards of education were elected under the 1948 Board of Education Act (elections in 1948, 1950, 1952, and 1954) until the 1956 act made them appointed.",
       "match": [],
       "est_votes": 100000000,
-      "effort": 5
+      "effort": 5,
+      "disposition": "blocked",
+      "disposition_reason": "The official canvasses exist only in print (the National Election Administration Commission's 1948 prefectural board results and the Local Autonomy Agency's 1952 prefectural and municipal results); no online scan or text was found, so the class waits on a library copy."
     },
     {
       "key": "nogyo_iinkai",
