@@ -35,6 +35,13 @@ DECREES = {
         f"{JDIH}2024kpt1060.pdf",
         f"Keputusan KPU Nomor 1060 Tahun 2024 tentang Perubahan Kedua atas {RESULTS}",
     ),
+    "1562": (
+        f"{JDIH}2023kpt1562.pdf",
+        (
+            "Keputusan KPU Nomor 1562 Tahun 2023 tentang Daftar Calon Tetap Anggota Dewan Perwakilan Rakyat dalam "
+            "Pemilihan Umum Tahun 2024"
+        ),
+    ),
     "1205": (
         f"{JDIH}2024kpt1205.pdf",
         (
@@ -68,6 +75,8 @@ DECREES = {
     },
 }
 AMENDMENTS = ("1208", "1309", "1349", "1368", "1401")
+DCT_PARTY = re.compile(r"^\s+(\d{1,2})\s{3,}\S")
+DCT_ROW = re.compile(r"^\s{0,10}(\d{1,2})\s+(?:\S.*?\s{2,})?([LP])(?:\s{2,}\S.*|\s*)$")
 ALIASES = {"KALIMANTAN TMUR": "KALIMANTAN TIMUR"}
 VOTES = re.compile(r"\d{1,3}(?:[.,]\d{3})*")
 ROMAN = re.compile(r"[IVXL]+\*?")
@@ -314,6 +323,27 @@ def _match(pool: pl.DataFrame, dapil: str, number: int, votes: int) -> int:
     return int(found["party"][0])
 
 
+def _sex() -> pl.DataFrame:
+    path = raw.cached(SOURCE, DECREES["1562"][0]).path
+    text = subprocess.run(["pdftotext", "-layout", str(path), "-"], check=True, capture_output=True, text=True).stdout
+    rows: list[tuple[str, int, int, str]] = []
+    dapil = party = None
+    listing = False
+    for line in text.split("\n"):
+        if found := re.search(r"DAERAH PEMILIHAN\s*:\s*(.+?)\s*$", line):
+            dapil, party, listing = found.group(1), None, False
+        elif dapil is not None and party is None and (head := DCT_PARTY.match(line)) and "NAMA" not in line:
+            party = int(head.group(1))
+        elif "(5)" in line:
+            listing = True
+        elif listing and party is not None:
+            if row := DCT_ROW.match(line):
+                rows.append((dapil, party, int(row.group(1)), row.group(2)))
+            elif "JUMLAH TOTAL" in line:
+                listing, party = False, None
+    return pl.DataFrame(rows, schema=["dapil", "party", "candidate", "sex"], orient="row")
+
+
 def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
     frames = {key: pl.DataFrame(_votes(key), infer_schema_length=None) for key in ("360", "1050", "1060")}
@@ -418,6 +448,14 @@ def parse() -> None:
         print(f"{dapil}: {sorted(out)} replaced by {sorted(into)}")
     results.write_parquet(PARSED / "results.parquet")
     seats.write_parquet(PARSED / "seats.parquet")
+    sex = _sex()
+    candidates = results.filter(pl.col("measure") == "candidate").select("dapil", "party", "candidate")
+    if (
+        candidates.join(sex, on=["dapil", "party", "candidate"], how="anti").height
+        or sex.select("dapil", "party", "candidate").is_duplicated().any()
+    ):
+        raise ValueError("the DCT does not give exactly one sex for every candidate")
+    sex.write_parquet(PARSED / "sex.parquet")
     pl.DataFrame(
         [
             {"dapil": dapil, "party": party, "candidate": number}
@@ -479,6 +517,9 @@ def emit() -> Path:
     seats = pl.read_parquet(PARSED / "seats.parquet")
     elected = set(pl.read_parquet(PARSED / "elected.parquet").rows())
     replaced = set(pl.read_parquet(PARSED / "replaced.parquet")["dapil"])
+    sexes = {
+        (dapil, party, number): sex for dapil, party, number, sex in pl.read_parquet(PARSED / "sex.parquet").rows()
+    }
     with connect() as conn:
         cs = Changeset(
             conn,
@@ -675,8 +716,8 @@ def emit() -> Path:
                     .rows()
                 ):
                     person = cs.key(f"{SOURCE}.person", f"2024:{key}:{party}:{number}")
+                    cs.add("person", id=person, gender={"L": "male", "P": "female"}[sexes[dapil, party, number]])
                     if person in cs.minted:
-                        cs.add("person", id=person, gender=None)
                         name(person, ballot)
                     option = options[party, number] = cs.key("id.option", f"{key}:{party}:{number}")
                     cs.add(
