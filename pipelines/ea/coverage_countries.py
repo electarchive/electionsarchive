@@ -320,6 +320,7 @@ def counted(cc: str, iso: str, k: dict, cadence: list[tuple], counts: list[tuple
     today = date.today()
     per = k["per"] or 1
     years: dict[int, dict[str, int]] = defaultdict(dict)
+    spread: set[int] = set()
     for within, period, phase, lo, hi in cadence:
         if phase is None and not k["cycle"]:
             continue
@@ -328,15 +329,16 @@ def counted(cc: str, iso: str, k: dict, cadence: list[tuple], counts: list[tuple
         scope = None if within == iso else within
         reg = region(cc, None, None, None, scope) if scope else ""
         share = 0.0
-        step = 1 if k["cycle"] else period
-        for year in range(start + (0 if k["cycle"] else (phase - start) % period), end + 1, step):
+        step = period if phase is not None else 1
+        for year in range(start + (0 if phase is None else (phase - start) % period), end + 1, step):
             found = [value for tier, w, day, value in counts if tier == k["tier"] and w == scope and day.year <= year]
             if not found:
                 continue
-            if k["cycle"]:
+            if phase is None:
                 share += found[-1] * per / period
                 years[year][reg] = n = round(share)
                 share -= n
+                spread.add(year)
             else:
                 years[year][reg] = found[-1] * per
     return [
@@ -345,7 +347,7 @@ def counted(cc: str, iso: str, k: dict, cadence: list[tuple], counts: list[tuple
             "contests": sum(regions.values()),
             "regions": {reg: n for reg, n in regions.items() if reg},
             "note": "Expected each year as the official count of units over the statutory term, since each unit keeps its own cycle."
-            if k["cycle"]
+            if year in spread
             else "Expected from the official count of units and the statutory cycle.",
         }
         for year, regions in sorted(years.items())
