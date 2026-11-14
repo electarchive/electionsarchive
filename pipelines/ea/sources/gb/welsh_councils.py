@@ -324,6 +324,22 @@ def emit() -> Path:
             polity="GB",
         )
         outranked = foreign_preferred(conn, cs, SOURCE)
+        for note, entity, text in conn.execute(
+            """select n.id, n.entity_id, n.body_md from note n join changeset c on c.id = n.changeset_id
+               where c.pipeline = %s and n.kind = 'caveat' and n.body_md like '%%; no party is linked.'""",
+            [SOURCE],
+        ).fetchall():
+            if any(
+                f"“{label}”" in text
+                for label in ("Independent Tennant", "Uplands Neighbourhood Independent", "Independents@Swansea")
+            ):
+                cs.add(
+                    "note_drop",
+                    note_id=note,
+                    entity_id=entity,
+                    body_md=text,
+                    reason="The label is an independent group, so the candidate is independent",
+                )
 
         def name(entity: UUID, label: str) -> None:
             if entity in outranked and entity not in cs.minted:
