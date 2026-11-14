@@ -14,7 +14,7 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "wikidata"
-VERSION = "18"
+VERSION = "19"
 TITLE = "Political parties and their colors"
 HAND_COLORS = Path(__file__).with_name("tr_party_colors.tsv")
 HAND_POSITIONS = Path(__file__).with_name("tr_party_positions.tsv")
@@ -33,6 +33,27 @@ COUNTRIES = {
     "CH": "Q39",
     "GB": "Q145",
     "PL": "Q36",
+    "BE": "Q31",
+    "BG": "Q219",
+    "CY": "Q229",
+    "CZ": "Q213",
+    "DK": "Q35",
+    "EE": "Q191",
+    "ES": "Q29",
+    "FI": "Q33",
+    "GR": "Q41",
+    "HR": "Q224",
+    "HU": "Q28",
+    "LT": "Q37",
+    "LU": "Q32",
+    "LV": "Q211",
+    "MT": "Q233",
+    "NL": "Q55",
+    "PT": "Q45",
+    "RO": "Q218",
+    "SE": "Q34",
+    "SI": "Q215",
+    "SK": "Q214",
     "EU": None,
 }
 LANGUAGES = '"en", "mul", "fr", "de", "it", "pt", "tr", "ga", "rm"'
@@ -730,7 +751,7 @@ def emit() -> Path:
         unlinked: dict[UUID, str] = {}
         claims: dict[str, list[tuple[int, int, UUID]]] = defaultdict(list)
         for party, iso, kind, full, short, codes, first, last, options in parties:
-            scope = iso.split("-")[0]
+            scope = (iso or "").split("-")[0]
             if scope not in COUNTRIES:
                 continue
             forced = next((name for name in full + short + codes if (iso, name) in MATCHES), None)
