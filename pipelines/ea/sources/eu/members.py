@@ -1,11 +1,12 @@
 from pathlib import Path
+from uuid import UUID
 
 from ea.changeset import Changeset
 from ea.sources.eu.gisco import STATES
 from ea.store import connect
 
 SOURCE = "eu.members"
-VERSION = "1"
+VERSION = "2"
 NATIVES = {
     "AT": ("Q40", "de", "Österreich"),
     "BG": ("Q219", "bg", "България"),
@@ -48,8 +49,21 @@ def emit() -> Path:
                 [union],
             )
         }
+        owned = {
+            iso
+            for (iso,) in conn.execute(
+                """select p.iso_code from polity_territory t join polity p on p.id = t.polity_id
+                   join changeset c on c.id = t.changeset_id where c.pipeline = %s""",
+                [SOURCE],
+            )
+        }
+        nations: dict[str, UUID] = dict(
+            conn.execute(
+                "select c.code, a.id from area a join area_code c on c.area_id = a.id where a.scheme_code = lower(c.code) || '.nation'"
+            ).fetchall()
+        )
         for iso, (_, accession, _, label) in STATES.items():
-            if iso == "GB" or iso in parented:
+            if iso == "GB":
                 continue
             polity = cs.polity(iso)
             if polity in cs.minted:
@@ -59,6 +73,10 @@ def emit() -> Path:
                 cs.add("name", entity_id=polity, text=native, lang=lang, kind="native", is_preferred=False)
                 cs.add("slug", path=iso.lower(), entity_id=polity)
                 cs.add("external_id", entity_id=polity, scheme="wikidata", value=wikidata)
-                cs.add("polity_territory", polity_id=polity, area_id=cs.area("eu.member_state", iso))
-            cs.add("polity_parent", polity_id=polity, parent_id=union, valid_from=accession)
+            if polity in cs.minted or iso in owned:
+                cs.add(
+                    "polity_territory", polity_id=polity, area_id=nations.get(iso) or cs.area("eu.member_state", iso)
+                )
+            if iso not in parented:
+                cs.add("polity_parent", polity_id=polity, parent_id=union, valid_from=accession)
         return cs.write()
