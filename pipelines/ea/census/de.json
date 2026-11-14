@@ -4119,7 +4119,8 @@
         "unit": "municipality",
         "schemes": [
           "de.gemeinde"
-        ]
+        ],
+        "cycle": true
       },
       "note": "Every Land elects its full-time mayors directly, with a runoff (a plurality second ballot in Saxony); terms run from five years (North Rhine-Westphalia) to ten, and most mayoral elections fall on their own dates rather than the general local election day. Honorary mayors are elected directly in some Länder and by the council in others. Bremen's and Bremerhaven's mayors are chosen by their assemblies.",
       "source": "destatis-vg-2025",
@@ -4143,50 +4144,62 @@
           "runoff": "majority",
           "runoff_rule": "Stichwahl between the top two on the second to fourth Sunday after the first ballot (GemO § 45 Abs. 2).",
           "source": "bw-kw",
-          "within": "DE-BW"
+          "within": "DE-BW",
+          "period_years": 8
         },
         {
           "term_years": 6,
           "runoff": "majority",
           "runoff_rule": "Stichwahl between the top two on the second Sunday after the first ballot (GLKrWG Art. 46).",
           "source": "by-kw",
-          "within": "DE-BY"
+          "within": "DE-BY",
+          "period_years": 6
         },
         {
           "term_years": 8,
           "runoff": "majority",
           "source": "bb-kw",
-          "within": "DE-BB"
+          "within": "DE-BB",
+          "period_years": 8
         },
         {
           "term_years": 6,
           "runoff": "majority",
           "source": "he-direkt",
-          "within": "DE-HE"
+          "within": "DE-HE",
+          "period_years": 6
         },
         {
           "runoff": "majority",
           "runoff_rule": "Runoff two weeks after the first ballot.",
           "source": "mv-kw",
-          "within": "DE-MV"
+          "within": "DE-MV",
+          "term_years": 8,
+          "locator": "KV M-V § 38 and § 116 Abs. 2 (seven to nine years, set by Hauptsatzung; eight used)",
+          "period_years": 8
         },
         {
           "runoff": "majority",
           "source": "ni-kw",
-          "within": "DE-NI"
+          "within": "DE-NI",
+          "term_years": 8,
+          "locator": "NKomVG § 80 (eight years since 2025)",
+          "period_years": 8
         },
         {
           "term_years": 5,
           "runoff": "majority",
           "runoff_rule": "Stichwahl between the top two on the second Sunday after the first ballot.",
           "source": "nw-go",
-          "within": "DE-NW"
+          "within": "DE-NW",
+          "period_years": 5
         },
         {
           "term_years": 8,
           "runoff": "majority",
           "source": "rp-kw",
-          "within": "DE-RP"
+          "within": "DE-RP",
+          "period_years": 8
         },
         {
           "term_years": 10,
@@ -4200,25 +4213,31 @@
           "runoff_rule": "A second ballot (zweiter Wahlgang) two to four weeks later, decided by plurality among the first-ballot candidates (KomWG § 44a).",
           "source": "sn-smi",
           "locator": "https://www.revosax.sachsen.de/vorschrift/2754.1#p51",
-          "within": "DE-SN"
+          "within": "DE-SN",
+          "period_years": 7
         },
         {
           "term_years": 7,
           "runoff": "majority",
           "source": "st-go",
-          "within": "DE-ST"
+          "within": "DE-ST",
+          "period_years": 7
         },
         {
           "runoff": "majority",
           "source": "sh-go",
-          "within": "DE-SH"
+          "within": "DE-SH",
+          "term_years": 7,
+          "locator": "GO § 57 (six to eight years, set by Hauptsatzung; seven used)",
+          "period_years": 7
         },
         {
           "term_years": 6,
           "runoff": "majority",
           "runoff_rule": "Stichwahl two weeks after the first ballot.",
           "source": "th-kwg",
-          "within": "DE-TH"
+          "within": "DE-TH",
+          "period_years": 6
         }
       ],
       "est_votes": 25000000,
@@ -4236,7 +4255,8 @@
         "unit": "county",
         "schemes": [
           "de.kreis"
-        ]
+        ],
+        "cycle": true
       },
       "note": "Landräte are elected directly in Bavaria, Hesse, Mecklenburg-Vorpommern, Lower Saxony, North Rhine-Westphalia, Rhineland-Palatinate, Saarland, Saxony, Saxony-Anhalt, and Thuringia; in Baden-Württemberg, Brandenburg, and Schleswig-Holstein the Kreistag chooses them.",
       "source": "destatis-vg-2025",
@@ -4261,30 +4281,39 @@
           "runoff": "majority",
           "runoff_rule": "Stichwahl between the top two on the second Sunday after the first ballot (GLKrWG Art. 46).",
           "source": "by-kw",
-          "within": "DE-BY"
+          "within": "DE-BY",
+          "period_years": 6
         },
         {
           "term_years": 6,
           "runoff": "majority",
           "source": "he-direkt",
-          "within": "DE-HE"
+          "within": "DE-HE",
+          "period_years": 6
         },
         {
           "runoff": "majority",
           "runoff_rule": "Runoff two weeks after the first ballot.",
           "source": "mv-kw",
-          "within": "DE-MV"
+          "within": "DE-MV",
+          "term_years": 8,
+          "locator": "KV M-V § 38 and § 116 Abs. 2 (seven to nine years, set by Hauptsatzung; eight used)",
+          "period_years": 8
         },
         {
           "runoff": "majority",
           "source": "ni-kw",
-          "within": "DE-NI"
+          "within": "DE-NI",
+          "term_years": 8,
+          "locator": "NKomVG § 80 (eight years since 2025)",
+          "period_years": 8
         },
         {
           "term_years": 8,
           "runoff": "majority",
           "source": "rp-lko",
-          "within": "DE-RP"
+          "within": "DE-RP",
+          "period_years": 8
         },
         {
           "term_years": 10,
@@ -4296,28 +4325,32 @@
           "term_years": 7,
           "runoff": "majority",
           "source": "st-go",
-          "within": "DE-ST"
+          "within": "DE-ST",
+          "period_years": 7
         },
         {
           "term_years": 6,
           "runoff": "majority",
           "runoff_rule": "Stichwahl two weeks after the first ballot.",
           "source": "th-kwg",
-          "within": "DE-TH"
+          "within": "DE-TH",
+          "period_years": 6
         },
         {
           "term_years": 5,
           "runoff": "majority",
           "runoff_rule": "Stichwahl between the top two on the second Sunday after the first ballot.",
           "source": "nw-kro",
-          "within": "DE-NW"
+          "within": "DE-NW",
+          "period_years": 5
         },
         {
           "term_years": 7,
           "runoff": "majority",
           "runoff_rule": "A second ballot (zweiter Wahlgang) two to four weeks later, decided by plurality among the first-ballot candidates (KomWG § 44a).",
           "source": "sn-smi",
-          "within": "DE-SN"
+          "within": "DE-SN",
+          "period_years": 7
         }
       ],
       "est_votes": 15000000,
