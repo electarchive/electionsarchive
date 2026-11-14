@@ -18405,14 +18405,17 @@ export const elections = {
                   select e.id, tree.root from election e join tree on e.parent_id = tree.id
                 ),
                 candidates as (
-                  select tree.root, c.id as contest, rs.k, a.k as area, c.kind = 'body_seats' as "isSeat" from contest c
-                  join tree on tree.id = c.election_id
+                  select tree.root, c.id as contest, rs.k, a.k as area, c.kind = 'body_seats' as "isSeat" from tree
+                  cross join lateral (
+                    select c.id, c.kind, c.district_area_id, c.election_id from contest c
+                    where c.election_id = tree.id and c.body_id = ${chamber}::uuid and c.kind in ('body_seats', 'list_allocation') and c.allocation_parent_id is null and not c.notional
+                      and c.previous_round_id is null
+                    offset 0
+                  ) c
                   join election e on e.id = c.election_id
                   join result_set rs on rs.contest_id = c.id and ${latest("rs")}
                   join area a on a.id = c.district_area_id
-                  where c.body_id = ${chamber}::uuid and c.kind in ('body_seats', 'list_allocation') and c.allocation_parent_id is null and not c.notional
-                    and c.previous_round_id is null
-                    and ${within == null ? sql`true` : inside(within, sql`c.district_area_id`, sql`e.date_from`)}
+                  where ${within == null ? sql`true` : inside(within, sql`c.district_area_id`, sql`e.date_from`)}
                 ),
                 seats as (
                   select root, contest, k, area from candidates d
