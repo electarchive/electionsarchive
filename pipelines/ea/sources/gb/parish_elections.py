@@ -95,6 +95,14 @@ COUNCILS: dict[str, dict] = {
         "reader": "notices",
     },
 }
+COUNCILS["E07000177/2026-06"] = {
+    "day": date(2026, 6, 18),
+    "publisher": "Cherwell District Council",
+    "title": "Notice of uncontested election, Shipton-on-Cherwell and Thrupp Parish Council, 18 June 2026",
+    "url": "https://www.cherwell.gov.uk/info/11/elections/1319/elections-2026-and-2027/3",
+    "files": ["https://www.cherwell.gov.uk/download/downloads/id/18754/notice-of-uncontested-election.pdf"],
+    "reader": "notices",
+}
 COUNCILS["E06000030"] = {
     "day": date(2026, 5, 7),
     "publisher": "Swindon Borough Council",
