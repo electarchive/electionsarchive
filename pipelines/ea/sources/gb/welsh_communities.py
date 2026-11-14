@@ -15,7 +15,8 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset
-from ea.sources.gb.cc_elections import display, proper, surname_first
+from ea.names import display
+from ea.sources.gb.cc_elections import proper, surname_first
 from ea.sources.gb.parish import fold, slug
 from ea.store import DATA, connect
 
@@ -70,6 +71,18 @@ COUNCILS = {
         "Result of Uncontested Election, town and community councillors, 5 May 2022",
         "https://www.valeofglamorgan.gov.uk/en/our_council/Council-Structure/Elections/Local-Government-Election.aspx",
         "vale",
+    ),
+    "W06000008": (
+        "Ceredigion County Council",
+        "Town and Community Council Notices and Results, Local Elections 2022",
+        "https://www.ceredigion.llyw.cymru/your-council/voting-elections/election-results/local-elections-2022/town-and-community-council-notices-and-results/",
+        "ceredigion",
+    ),
+    "W06000013": (
+        "Bridgend County Borough Council",
+        "Election results: Town and Community Election results, 2022",
+        "https://www.bridgend.gov.uk/council/elections/election-results",
+        "bridgend",
     ),
 }
 VALE = (
@@ -142,6 +155,11 @@ ALIASES = {
     ("W06000014", "St Brides Major"): "St. Bride's Major",
     ("W06000014", "St Donats"): "St. Donats",
     ("W06000014", "Welsh St Donats"): "Welsh St. Donats",
+    ("W06000008", "Llanrhystud"): "Llanrhystyd",
+    ("W06000008", "Llancynfelin"): "Llangynfelyn",
+    ("W06000008", "Llanllwchaearn"): "Llanllwchaiarn",
+    ("W06000008", "Ferwig"): "Y Ferwig",
+    ("W06000013", "St. Brides Minor"): "St. Bride's Minor",
 }
 UNREGISTERED = {("W06000010", "Trelech a'r Betws"), ("W06000003", "Betws-y-Coed"), ("W06000021", "Llangybi Fawr")}
 WARD_NAMES = {
@@ -180,7 +198,24 @@ PARTIES: dict[str, str | None] = {
     "Welsh Liberal Democrats - Democratiaid Rhyddfrydol Cymru": "Q9624",
     "Welsh Liberal Democrats- Democratiaid Rhyddfrydol Cymru": "Q9624",
     "Welsh Conservative Party Candidate/ Ymgeisydd Plaid Geidwadol Cymru": "Q9626",
+    "Llafur Cymru / Welsh Labour": "Q9630",
+    "Welsh Labour Party/Llafur Cymru": "Q9630",
+    "Welsh Labour – Llafur Cymru": "Q9630",
+    "Independent Candidate": "independent",
+    "Plaid Cymru": "Q10691",
+    "Gwlad": "Q75321093",
+    "Green Party/Plaid Werdd": "Q3499324",
+    "The Green Party / Plaid Werdd": "Q3499324",
+    "Labour and Co-operative Party / Llafur a’r Blaid Gydweithredol": "Q9630",
 }
+
+
+def normal(description: str) -> str:
+    folded = description.casefold().replace("–", "-").replace("’", "'")
+    return " ".join(re.sub(r"\s*([/-])\s*", r" \1 ", folded).split())
+
+
+DESCRIPTIONS = {normal(key): key for key in PARTIES}
 BY_CONTEXT = (
     "A by-election to fill a casual vacancy on a Welsh community or town council, held between the five-yearly "
     "elections, by block vote where a ward has more than one seat. Where only as many candidates are nominated as "
@@ -211,6 +246,18 @@ GWYNEDD_CAVEATS = {
         "the annotation."
     ),
 }
+FURTHER = (
+    "Too few candidates were nominated for this ward by 5 April 2022 to fill its seats at the election of 5 May 2022, "
+    "so a further election was called. Nominations closed at 4pm on {deadline}, and Bridgend County Borough Council's "
+    "result of uncontested election is dated {dated}. The notice names no polling day, so the election carries the "
+    "notice's date."
+)
+FURTHER_CONTEXT = (
+    "A further election for the seats on a Welsh community or town council left unfilled at the ordinary election of "
+    "5 May 2022. Where only as many candidates are nominated as there are vacancies, those nominated are declared "
+    "elected without a poll."
+)
+BRIDGEND_WARDS: dict[str, str] = {}
 CONTEXT = (
     "Wales's community and town councils are elected every five years on the day of the principal council "
     "elections, ward by ward where a community is warded, by block vote. Where no more candidates are nominated "
@@ -228,6 +275,16 @@ def areas(url: str) -> list[str]:
     return [urljoin(url, html.unescape(link)) for link in dict.fromkeys(links)]
 
 
+def documents(url: str, reader: str) -> list[str]:
+    page = raw.cached(SOURCE, url).path.read_text()
+    if reader == "bridgend":
+        start = page.index("Town and Community Election results")
+        start = found(r">\s*2022\s*</button>\s*</h2>", page[start:]).end() + start
+        page = page[start : page.index("<h2", start)]
+    links = re.findall(r'href="([^"]+\.pdf)"', page)
+    return [urljoin(url, html.unescape(link)) for link in dict.fromkeys(links)]
+
+
 def fetch() -> None:
     for url in SCANS:
         try:
@@ -242,6 +299,10 @@ def fetch() -> None:
         store(url)
         if reader == "moderngov":
             for page in areas(url):
+                if store(page):
+                    time.sleep(1)
+        if reader in ("ceredigion", "bridgend"):
+            for page in documents(url, reader):
                 if store(page):
                     time.sleep(1)
 
@@ -724,6 +785,247 @@ def unwarded(reads: list[dict], lad: str) -> list[dict]:
     return reads
 
 
+NUMBERS = {
+    word: number
+    for number, word in enumerate(
+        ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve"]
+    )
+}
+
+
+def chunks(line: str) -> list[tuple[float, str]]:
+    return [(match.start() + len(match.group()) / 2, match.group()) for match in re.finditer(r"\S+(?: \S+)*", line)]
+
+
+def caps(text: str) -> str:
+    return display(text).replace("'R ", "'r ") if text.isupper() else text
+
+
+def forenames_first(printed: str) -> str:
+    surname, forenames = (part.strip() for part in printed.split(",", 1))
+    return " ".join([*(display(word) if word.isupper() else word for word in forenames.split()), display(surname)])
+
+
+def canonical(description: str) -> str:
+    return DESCRIPTIONS.get(normal(description), description)
+
+
+def place(text: str) -> tuple[str, str | None]:
+    english = " ".join(text.split()).split(" / ")[-1]
+    council, ward = found(r"^(.+?)(?: \((.+)\))?$", english).groups()
+    return caps(council), caps(ward) if ward else None
+
+
+def ceredigion(url: str) -> list[dict]:
+    reads = []
+    for document in documents(url, "ceredigion"):
+        text = text_of(document)
+        lines = text.splitlines()
+        if "RESULT OF UNCONTESTED ELECTION" in text:
+            start = next(i for i, line in enumerate(lines) if line.strip() == "Town/Community")
+            end = next(i for i, line in enumerate(lines) if line.strip().startswith("Ethol"))
+            council, ward = place(" ".join(lines[start + 1 : end]))
+            places = int(found(r"^\s*Ethol\s+(\d+)\s", lines[end]).group(1))
+            head = next(i for i, line in enumerate(lines) if "Candidate name" in line)
+            candidates: list[dict] = []
+            for line in lines[head + 1 :]:
+                if "Dyddiedig" in line:
+                    break
+                parts = chunks(line)
+                if not parts:
+                    continue
+                name = " ".join(part for center, part in parts if center < 90)
+                description = " ".join(part for center, part in parts if center >= 90)
+                if "," not in name:
+                    raise ValueError(f"{document}: {line}")
+                candidates.append(
+                    {
+                        "printed": name,
+                        "name": forenames_first(name),
+                        "description": canonical(description),
+                        "votes": None,
+                        "elected": True,
+                    }
+                )
+            reads.append(
+                {
+                    "council": council,
+                    "ward": ward,
+                    "places": places,
+                    "turnout": None,
+                    "url": document,
+                    "candidates": candidates,
+                }
+            )
+            continue
+        start = next(i for i, line in enumerate(lines) if "Cyngor Tref / Cymuned" in line)
+        end = next(i for i, line in enumerate(lines) if line.strip() == "Town / Community Council")
+        council, ward = place(" ".join(lines[start + 1 : end]))
+        places = NUMBERS[found(r"Returning Officer at the Election of (\w+)", text).group(1).lower()]
+        head = next(i for i, line in enumerate(lines) if "Surname" in line and "Other Names" in line)
+        stop = next(i for i, line in enumerate(lines) if "Yr oedd nifer" in line)
+        columns = [lines[head].index(label) + len(label) / 2 for label in ("Surname", "Other Names", "Description")]
+        bounds = [(columns[0] + columns[1]) / 2, (columns[1] + columns[2]) / 2, columns[2] + 35]
+        rows: list[list[list[str]]] = []
+        for line in lines[head + 1 : stop]:
+            parts = chunks(line)
+            if not parts:
+                continue
+            if re.fullmatch(r"\d+", parts[-1][1]) and parts[-1][0] > bounds[2]:
+                rows.append([[], [], [], [], []])
+            if not rows:
+                raise ValueError(f"{document}: {line}")
+            for center, part in parts:
+                column = sum(center > bound for bound in bounds)
+                if column == 3 and not re.fullmatch(r"\d+", part):
+                    column = 4
+                rows[-1][column].append(part)
+        candidates = []
+        for surname, others, description, votes, flags in rows:
+            surname_text, forenames = " ".join(surname), " ".join(others)
+            printed = f"{surname_text}, {forenames}"
+            plain_surname = re.sub(r"\s*\(.*?\)", "", surname_text)
+            plain_forenames = re.sub(r"\s*\(.*?\)", "", forenames)
+            candidates.append(
+                {
+                    "printed": printed,
+                    "name": f"{plain_forenames} {display(plain_surname)}",
+                    "description": canonical(" ".join(description)),
+                    "votes": int(votes[0]),
+                    "elected": "ETHOLWYD / ELECTED" in flags,
+                }
+            )
+        if sum(1 for candidate in candidates if candidate["elected"]) != places:
+            raise ValueError(f"{document}: seats and elected do not agree")
+        reads.append(
+            {
+                "council": council,
+                "ward": ward,
+                "places": places,
+                "turnout": None,
+                "rejected": int(found(r"TOTAL\W+(\d+)", text).group(1)),
+                "url": document,
+                "candidates": candidates,
+            }
+        )
+    return reads
+
+
+def bridgend(url: str) -> list[dict]:
+    reads = []
+    empty = []
+    for document in documents(url, "bridgend"):
+        text = text_of(document)
+        lines = text.splitlines()
+        if "DECLARATION OF RESULT OF POLL" in text:
+            area = found(r"^\s*(\S.*? (?:Town|Community) Council(?: - .+?)?)\s*$", text, re.MULTILINE).group(1)
+            head = next(i for i, line in enumerate(lines) if "ENW / NAME" in line)
+            split = lines[head].index("Disgrifiad") - 1
+            candidates = []
+            for line in lines[head + 1 :]:
+                if line.startswith("Felly"):
+                    break
+                if not line.strip():
+                    continue
+                printed = line[:split].strip()
+                description, elected, votes = found(r"^(.*?)\s*(\(E\)\s+)?([\d,]+)$", line[split:].strip()).groups()
+                candidates.append(
+                    {
+                        "printed": printed,
+                        "name": forenames_first(printed),
+                        "description": canonical(description or ""),
+                        "votes": int(votes.replace(",", "")),
+                        "elected": elected is not None,
+                    }
+                )
+            declared = found(
+                r"Therefore, I give public notice that (.+?),? (?:is|are) duly elected", " ".join(text.split())
+            )
+            if len([n for n in declared.group(1).split(", ") if n]) != sum(1 for c in candidates if c["elected"]):
+                raise ValueError(f"{document}: declared and elected do not agree: {declared.group(1)}")
+            cast = int(
+                found(r"The total number of votes cast across .+? was ([\d,]+)", " ".join(text.split()))
+                .group(1)
+                .replace(",", "")
+            )
+            rejected = int(found(r"The total number of ballot papers rejected was (\d+)", text).group(1))
+            turnout = found(r"% Turnout: ([\d.]+)", text).group(1)
+            day, by, note = DAY, False, None
+            places = sum(1 for candidate in candidates if candidate["elected"])
+            context = (
+                f"Bridgend County Borough Council prints a total of {cast:,} votes cast across the ward, "
+                f"{rejected:,} ballot papers rejected, and a turnout of {turnout}%."
+            )
+        else:
+            joined = " ".join(text.split())
+            start = next(i for i, line in enumerate(lines) if "For the Area of" in line)
+            area = next(line.strip() for line in lines[start + 1 :] if line.strip())
+            places = int(found(r"Election of (\d+) Councillor", text).group(1))
+            deadline = datetime.strptime(
+                found(r"namely 4pm on \w+,? (\d+)(?:st|nd|rd|th)? (\w+ \d{4})", joined).expand(r"\1 \2"), "%d %B %Y"
+            ).date()
+            dated = datetime.strptime(
+                found(r"Dated / Dyddiedig: \w+,? (\d+ \w+ \d{4})", joined).group(1), "%d %B %Y"
+            ).date()
+            if "no person stood validly nominated" in joined:
+                empty.append((area, deadline))
+                continue
+            head = next(i for i, line in enumerate(lines) if "HOME ADDRESS" in line)
+            address = lines[head].index("HOME ADDRESS")
+            column = lines[head].index("DESCRIPTION") - 3
+            candidates = []
+            for line in lines[head + 2 :]:
+                if "Shephard" in line or "Returning Officer" in line:
+                    break
+                if not line.strip():
+                    continue
+                name = line[:address].strip()
+                description = " ".join(part for center, part in chunks(line) if center - len(part) / 2 >= column)
+                if name:
+                    candidates.append(
+                        {
+                            "printed": name,
+                            "name": forenames_first(name),
+                            "description": description,
+                            "votes": None,
+                            "elected": True,
+                        }
+                    )
+                elif description:
+                    candidates[-1]["description"] = f"{candidates[-1]['description']} {description}".strip()
+            for candidate in candidates:
+                candidate["description"] = canonical(str(candidate["description"]))
+            further = deadline.month == 5
+            day, by = (dated, True) if further else (DAY, False)
+            note = (
+                FURTHER.format(deadline=f"{deadline.day} {deadline:%B %Y}", dated=f"{dated.day} {dated:%B %Y}")
+                if further
+                else None
+            )
+            context, rejected = None, None
+        council, ward = found(r"^(.+?) (?:Town|Community) Council(?: [-–] (.+?))?$", " ".join(area.split())).groups()
+        ward = re.sub(r"\s+Ward$", "", ward) if ward else None
+        reads.append(
+            {
+                "council": council,
+                "ward": BRIDGEND_WARDS.get(ward, ward),
+                "day": day,
+                "by": by,
+                "places": places,
+                "turnout": None,
+                "rejected": rejected,
+                "url": document,
+                "caveat": note,
+                "context": context,
+                "election_context": FURTHER_CONTEXT if by else None,
+                "candidates": candidates,
+            }
+        )
+    for area, deadline in empty:
+        print(f"Bridgend: no one nominated by {deadline}: {area}", file=sys.stderr)
+    return reads
+
+
 READERS = {
     "torfaen": lambda url: torfaen(text_of(url)) + torfaen_by_elections(text_of(url)),
     "carmarthenshire": lambda url: carmarthenshire(text_of(url)),
@@ -731,6 +1033,8 @@ READERS = {
     "flintshire": flintshire,
     "vale": vale,
     "gwynedd": lambda url: unwarded(gwynedd(url) + gwynedd_polls(), "W06000002"),
+    "ceredigion": ceredigion,
+    "bridgend": bridgend,
 }
 
 
@@ -783,6 +1087,8 @@ def parse() -> None:
                         "rejected_page": read.get("rejected_page"),
                         "rejected_box": read.get("rejected_box"),
                         "caveat": read.get("caveat"),
+                        "context": read.get("context"),
+                        "election_context": read.get("election_context"),
                         "number": number,
                         **candidate,
                     }
@@ -935,7 +1241,12 @@ def emit() -> Path:
                     f"{bodies[key]} by-election, {day.day} {day:%B %Y}" if by else f"{day.year} {bodies[key]} election",
                 )
                 cs.add("slug", path=election_path, entity_id=election)
-                cs.add("note", entity_id=election, kind="context", body_md=BY_CONTEXT if by else CONTEXT)
+                cs.add(
+                    "note",
+                    entity_id=election,
+                    kind="context",
+                    body_md=first["election_context"] or (BY_CONTEXT if by else CONTEXT),
+                )
             if ward is None:
                 scheme, code, area = first["scheme"], first["code"], council_area
             else:
@@ -1008,7 +1319,9 @@ def emit() -> Path:
                 )
             if first["caveat"]:
                 cs.add("note", entity_id=result_set, kind="caveat", body_md=first["caveat"])
-            if first["counted"] is not None:
+            if first["context"]:
+                cs.add("note", entity_id=result_set, kind="context", body_md=first["context"])
+            elif first["counted"] is not None:
                 cs.add(
                     "note",
                     entity_id=result_set,
