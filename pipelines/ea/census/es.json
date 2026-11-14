@@ -1091,6 +1091,8 @@
         "unit": "question"
       },
       "source": "ce1978",
+      "disposition": "blocked",
+      "disposition_reason": "No official canvass is published for either vote: the 1947 Succession Law and 1966 Organic Law of the State carry only national totals or percentages in their own preambles and in the Junta Central del Censo declarations, the BOE day indexes of December 1966 and July 1947 list no provincial table, and the provincial boards' certifications were never compiled in an open series.",
       "valid_from": "1947-07-06",
       "valid_to": "1976-12-15",
       "note": "Held under the Ley de Referéndum Nacional of 1945; results by province appear in the BOE proclamations.",
