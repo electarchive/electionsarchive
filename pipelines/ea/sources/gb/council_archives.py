@@ -403,6 +403,12 @@ SHEPWAY_PRESS = {
         "Result of Hawkinge and Paddlesworth by-election",
         "Hawkinge & Paddlesworth",
     ),
+    "https://web.archive.org/web/20021118142153id_/http://www.shepway.gov.uk:80/html/press_releases/"
+    "st_mary_in_the_marsh_results.asp": (
+        date(2002, 10, 24),
+        "Result of St Mary in the Marsh ward by-election",
+        "St. Mary In The Marsh",
+    ),
 }
 SHEPWAY_PRESS_NOTES = (
     "A Shepway District Council press release giving the result of a district council by-election, with each "
@@ -1163,7 +1169,7 @@ def shepway_press() -> tuple[list[dict], list[dict]]:
     rows: list[dict] = []
     wards: list[dict] = []
     for url, (day, _, ward_name) in SHEPWAY_PRESS.items():
-        content = text(Path(raw.cached(SOURCE, url).path).read_text(encoding="latin-1"))
+        content = text(Path(raw.cached(SOURCE, url).path).read_text(encoding="latin-1").replace("<li>", "· "))
         entry = {"code": SHEPWAY, "file": url, "day": day}
         if ward_name is None:
             body = content.split("Results for Hythe Town Council")[0]
@@ -1187,7 +1193,10 @@ def shepway_press() -> tuple[list[dict], list[dict]]:
                     ward_name,
                     int(found(r"Eligible to vote: (\d+)", content)[1]),
                     float(found(r"Turnout: ([\d.]+) per cent", content)[1]),
-                    re.findall(r"· (.+?) - (Conservative|Liberal Democrat|Labour) (\d+) votes( ELECTED)?", content),
+                    re.findall(
+                        r"· (.+?) [-–] (Conservative|Liberal Democrat|Labour|UK Independence Party) (\d+) votes( ELECTED)?",
+                        content,
+                    ),
                 )
             ]
         for ward_name_, electorate, percent, candidates in found_lines:
