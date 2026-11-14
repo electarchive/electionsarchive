@@ -42,6 +42,24 @@ TOTAL_ROW = re.compile(r"(合計|[都道府県]計|県計)$")
 SUBTOTAL_ROW = re.compile(r"計$")
 DROPPED: list[dict] = []
 UNCONFIRMED: list[dict] = []
+BOOK_VOTES = {
+    ("2025-07-20", "兵庫県"): {
+        "きし 文男": "28250",
+        "うらき けんご": "13533",
+        "ふじわら せいや": "273844",
+        "かだ 裕之": "285451",
+        "高橋 ひであき": "30638.043",
+        "多田 ひとみ": "225402",
+        "前田 みさ": "46703",
+        "米村 明美": "85452",
+        "高橋 みつお": "339822.908",
+        "立花 孝志": "157005",
+        "よしひら 敏孝": "275301",
+        "泉 房穂": "822407",
+        "金田 峰生": "87748",
+    }
+}
+DISTRICT_UNIT = "@district"
 ALIASES = {
     "緑の党グリーンズジャパン": "緑の党",
     "民進": "民進党",
@@ -1051,6 +1069,30 @@ def parse(numbers: list[int] | None = None) -> None:
             if all(confirmed(text, Decimal(c["votes"]), c["result"]) for c in more):
                 candidates += more
                 smd_votes += votes
+            elif (held, district) in BOOK_VOTES:
+                book = BOOK_VOTES[held, district]
+                if {c["name"] for c in more} != set(book):
+                    raise ValueError(
+                        f"{held} {district}: book names {sorted(book)} against {[c['name'] for c in more]}"
+                    )
+                for candidate in more:
+                    candidate["votes"] = book[candidate["name"]]
+                top = sorted(more, key=lambda c: Decimal(c["votes"]), reverse=True)
+                for candidate in more:
+                    candidate["result"] = "当" if candidate in top[:won] else "落"
+                if not all(confirmed(text, Decimal(c["votes"]), c["result"]) for c in more):
+                    raise ValueError(f"{held} {district}: book votes not found in the book text")
+                candidates += more
+                smd_votes += [
+                    {
+                        "held": held,
+                        "district": district,
+                        "place": DISTRICT_UNIT,
+                        "order": c["order"],
+                        "votes": c["votes"],
+                    }
+                    for c in more
+                ]
             else:
                 print(f"UNCONFIRMED {held} {district}: the municipal file disagrees with the book")
                 UNCONFIRMED.append({"held": held, "district": district})
@@ -1121,6 +1163,11 @@ PR_PLACE_METHOD = (
 )
 PR_ENGINE = (
     "The declared seats differ from a plain D'Hondt count on the party totals. Declared, then D'Hondt alone: {moved}."
+)
+BOOK_CAVEAT = (
+    "The ministry's workbook by counting district for this district stops at 99.4 percent of the count and its "
+    "candidate totals disagree with the 結果調 book, so the candidate totals here are the book's, loaded at the "
+    "district level only, with no counting-district values."
 )
 BY_ELECTION = (
     "{count} of this district's seats fill a vacancy for the remainder of a term, and the ministry's tables count "
@@ -1312,6 +1359,8 @@ def emit() -> Path:
                     completeness=1,
                 )
                 cs.add("note", entity_id=result_set, kind="methodology", body_md=SMD_METHOD)
+                if (held, district) in BOOK_VOTES:
+                    cs.add("note", entity_id=result_set, kind="caveat", body_md=BOOK_CAVEAT)
                 if district in by_election:
                     cs.add(
                         "note",
@@ -1354,6 +1403,11 @@ def emit() -> Path:
                 for row in smd.filter((pl.col("held") == held) & (pl.col("district") == district)).iter_rows(
                     named=True
                 ):
+                    if row["place"] == DISTRICT_UNIT:
+                        values.append(
+                            (result_set, prefecture_unit(prefectures[0]), options[row["order"]], Decimal(row["votes"]))
+                        )
+                        continue
                     place, previous = place_unit(prefectures, row["place"], previous)
                     values.append((result_set, place, options[row["order"]], Decimal(row["votes"])))
 
