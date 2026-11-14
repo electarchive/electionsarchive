@@ -4250,7 +4250,8 @@
           "term_years": 10,
           "runoff": "majority",
           "source": "sl-ksvg",
-          "within": "DE-SL"
+          "within": "DE-SL",
+          "period_years": 10
         },
         {
           "term_years": 7,
@@ -4364,7 +4365,8 @@
           "term_years": 10,
           "runoff": "majority",
           "source": "sl-ksvg",
-          "within": "DE-SL"
+          "within": "DE-SL",
+          "period_years": 10
         },
         {
           "term_years": 7,
