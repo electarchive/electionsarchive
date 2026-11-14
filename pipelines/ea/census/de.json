@@ -376,6 +376,34 @@
       "url": "https://www.bundestag.de/blob/276668/39aa97d8f3abe4e472ca39123e9cc0d6/die_kommunalwahlen_in_der_ddr_vom_7__mai_1989-data.pdf",
       "kind": "official_body",
       "note": "Gives 7 May 1989 as the date of the last Einheitswahl of the GDR's local assemblies."
+    },
+    "gbl-ddr-1957-wahl": {
+      "title": "Verordnung über die Durchführung der Wahlen zu den örtlichen Volksvertretungen am 23. Juni 1957 (Vom 9. April 1957), Gesetzblatt der DDR Teil I 1957 S. 230",
+      "publisher": "Regierung der DDR",
+      "url": "https://www.gvoon.de/art/dokumente/1957/gesetzblatt-gbl-ddr-teil-1-1957/pdf/gesetzblatt-gbl-ddr-teil-1-1957-seite_230.pdf",
+      "kind": "official_body",
+      "note": "Gesetzblatt page on the gvoon.de document archive: sets the elections to the Kreistage, Stadtverordnetenversammlungen, Stadtbezirksversammlungen, and Gemeindevertretungen for 23 June 1957."
+    },
+    "gbl-ddr-1961-wahl": {
+      "title": "Beschluß über die Ausschreibung der Wahlen zu den örtlichen Volksvertretungen 1961, Gesetzblatt der DDR Teil I 1961 S. 157",
+      "publisher": "Staatsrat der DDR",
+      "url": "https://www.gvoon.de/art/dokumente/1961/gesetzblatt-gbl-ddr-teil-1-1961/pdf/gesetzblatt-gbl-ddr-teil-1-1961-seite_157.pdf",
+      "kind": "official_body",
+      "note": "Gesetzblatt page on the gvoon.de document archive: \"Als Wahltermin wird der 17. September 1961 festgelegt.\""
+    },
+    "ddr-staatsrat-1965": {
+      "title": "Beschluß des Staatsrates der DDR über die Durchführung der Wahlen zu den Kreistagen, Stadtverordnetenversammlungen, Stadtbezirksversammlungen und Gemeindevertretungen im Jahre 1965 (2 July 1965)",
+      "publisher": "Staatsrat der DDR",
+      "url": "https://www.verfassungen.de/ddr/wahltag65.htm",
+      "kind": "official_body",
+      "note": "Text on verfassungen.de: \"Als Wahltermin wird der 10. Oktober 1965 festgelegt.\""
+    },
+    "gbl-ddr-1968-volksentscheid": {
+      "title": "Gesetz zur Durchführung eines Volksentscheides über die Verfassung der Deutschen Demokratischen Republik (26 March 1968), Gesetzblatt der DDR Teil I 1968 S. 192",
+      "publisher": "Volkskammer der DDR",
+      "url": "https://www.gvoon.de/art/dokumente/1968/gesetzblatt-gbl-ddr-teil-1-1968/pdf/gesetzblatt-gbl-ddr-teil-1-1968-seite_192.pdf",
+      "kind": "official_body",
+      "note": "Gesetzblatt page on the gvoon.de document archive: par. 1 sets the Volksentscheid on the Verfassung for 6 April 1968. One question."
     }
   },
   "tiers": [
@@ -3874,6 +3902,24 @@
     },
     {
       "dates": [
+        {
+          "date": "1957-06-23",
+          "contests": 1,
+          "note": "Elections to the Kreistage, Stadtverordnetenversammlungen, Stadtbezirksversammlungen, and Gemeindevertretungen on single lists of the National Front.",
+          "source": "gbl-ddr-1957-wahl"
+        },
+        {
+          "date": "1961-09-17",
+          "contests": 1,
+          "note": "Elections to the Kreistage, Stadtverordnetenversammlungen, Stadtbezirksversammlungen, and Gemeindevertretungen on single lists of the National Front.",
+          "source": "gbl-ddr-1961-wahl"
+        },
+        {
+          "date": "1965-10-10",
+          "contests": 1,
+          "note": "Elections to the Kreistage, Stadtverordnetenversammlungen, Stadtbezirksversammlungen, and Gemeindevertretungen on single lists of the National Front.",
+          "source": "ddr-staatsrat-1965"
+        },
         {
           "date": "1989-05-07",
           "contests": 1,
