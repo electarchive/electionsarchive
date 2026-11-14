@@ -161,7 +161,11 @@ def refresh(conn: Connection, scheme_code: str, as_of: date, mask: str) -> int:
                    set geom_hash = excluded.geom_hash, mask_version = excluded.mask_version, geom = excluded.geom""",
             {"mask": mask, "areas": [area for area, _, _ in part], "valids": [valid for _, valid, _ in part]},
         )
-        conn.execute("update display.clipped set geom = null where geom is not null and ST_IsEmpty(geom)")
+        conn.execute(
+            """update display.clipped set geom = null
+               where area_id = any(%s) and geom is not null and ST_IsEmpty(geom)""",
+            [[area for area, _, _ in part]],
+        )
         conn.commit()
         part = []
         points = 0
