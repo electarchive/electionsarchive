@@ -42,31 +42,31 @@ BALANCES = {
     "2148003": "2148006",
     "2028410": "2028412",
 }
-KNOWN = {("GA", 2025, "statewide_exec", "general"): 2}
-DECIDED_EARLIER = {
-    "FL": (
-        "2026-08-18",
-        "Florida Statutes sections 100.061 and 105.051: a universal primary contest, or a nonpartisan race in which one candidate wins a majority, is decided at the primary and is left off the general election ballot",
-    ),
-}
-CANCELED = {
-    "06037": (
-        "Los Angeles County Registrar-Recorder/County Clerk, tentative list of canceled elections for November 3, 2026 (appointment in lieu of election due to insufficiency of candidates), https://content.lavote.gov/docs/rrcc/documents/canceled-elections-november-2026-tentative.pdf",
-        [
-            "El Rancho",
-            "El Segundo",
-            "Manhattan Beach",
-            "San Marino",
-            "Walnut Valley",
-            "West Covina",
-            "El Monte City",
-            "Gorman Joint",
-            "Hawthorne",
-            "Hermosa Beach City",
-            "Rosemead",
-        ],
-    ),
-}
+CENSUS_DATES_SQL = """
+select k.key, p.iso_code, d.date, d.election_kind::text, d.contests, d.regions, d.note, d.locator, d.quote,
+       (select e.value from external_id e where e.entity_id = d.within_polity_id and e.scheme = 'us.polity') as ref
+from census_date d
+join census_class k on k.id = d.class_id
+join polity c on c.id = k.polity_id and c.iso_code = 'US'
+left join polity p on p.id = d.within_polity_id
+where d.within_polity_id is not null
+"""
+
+
+def census_dates(conn) -> tuple[dict, dict, dict]:
+    known: dict[tuple[str, int, str, str], int] = {}
+    decided: dict[str, tuple[str, str]] = {}
+    canceled: dict[str, tuple[str, list[str]]] = {}
+    for key, iso, day, kind, contests, regions, note, locator, quote, ref in conn.execute(CENSUS_DATES_SQL):
+        if regions is not None and "decided_earlier" in regions:
+            decided[iso[3:]] = (day.isoformat(), quote)
+        elif regions is not None and "canceled" in regions:
+            canceled[ref.removeprefix("county:")] = (f"{locator}", regions["canceled"])
+        elif contests is not None and iso is not None:
+            known[(iso[3:], day.year, key, kind)] = contests
+    return known, decided, canceled
+
+
 ACRONYMS = {"MUD", "ISD", "CISD", "PUD", "USD", "CSD", "WCID", "GCD", "CDD", "SID", "MSD", "UD", "LID", "FWSD"}
 ABBREVIATIONS = {
     "SCH": "SCHOOL",
@@ -904,6 +904,7 @@ def build(full: bool = False) -> str:
         scheduled: dict[str, list[tuple[date, str]]] = defaultdict(list)
         for iso, day, eid in conn.execute(SCHEDULED_SQL):
             scheduled[iso[3:]].append((day, eid))
+        census_known = census_dates(conn)[0]
         timings["load"] = time.monotonic() - clock
         clock = time.monotonic()
 
@@ -940,7 +941,7 @@ def build(full: bool = False) -> str:
             )
             current["expected"] = cell["held"]
 
-    known = dict(KNOWN)
+    known = dict(census_known)
     for st, rule in judges.items():
         for year in (year for year in range(2000, today.year + 1) if coverage.chosen(rule, year) == "elected"):
             retained = any(

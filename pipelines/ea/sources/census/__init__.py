@@ -64,10 +64,7 @@ def emit(cc: str, spec: dict | None = None) -> str:
             if isinstance(row.get(field), str)
         }
         refs |= {
-            row["within"]
-            for entry in spec["classes"]
-            for row in entry.get("dates", [])
-            if ":" in row.get("within", "")
+            row["within"] for entry in spec["classes"] for row in entry.get("dates", []) if ":" in row.get("within", "")
         }
         pairs = [ref.split(":", 1) for ref in sorted(refs) if ":" in ref]
         entities: dict[str, object] = {
@@ -264,7 +261,10 @@ def emit(cc: str, spec: dict | None = None) -> str:
                         "quote": row.get("quote"),
                     }
                 cs.add(
-                    "census_date", id=mint("census_date", key, within, row["date"], row.get("through")), **fields, **cited
+                    "census_date",
+                    id=mint("census_date", key, within, row["date"], row.get("through")),
+                    **fields,
+                    **cited,
                 )
                 for iso, state in (row.get("states") or {}).items():
                     cs.add(
