@@ -189,6 +189,7 @@ const MODEL = {
     pace: 13,
     hold: 0.01,
     firm: 0.5,
+    lag: 2,
   },
   late: {
     prior: 0.1,
@@ -1624,6 +1625,15 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
         ) / latest
       : 0;
   const daily = dayOne == null ? 0 : sum(dayOne.totals);
+  const pool =
+    opened != null && cutoff === Date.parse(opened) && opening > 0
+      ? Math.min(
+          tail,
+          (latest - opening) /
+            opening /
+            (1 - Math.exp(-days / (MODEL.tail.lag * MODEL.tail.pace * tail))),
+        )
+      : tail;
   const owed = CANVASS[race.state];
   const canvass =
     isLate && owed != null && daily > 0
@@ -1643,13 +1653,13 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
   const planned = Math.max(
     slowing *
       Math.min(
-        tail *
+        pool *
           Math.exp(
             -Math.max(0, days - MODEL.tail.grace) / (MODEL.tail.pace * tail),
           ),
         onNight <= 0 || latest <= 0
           ? Infinity
-          : Math.max(0, tail * onNight - (latest - onNight)) / latest,
+          : Math.max(0, pool * onNight - (latest - onNight)) / latest,
       ),
     held + canvass,
   );
