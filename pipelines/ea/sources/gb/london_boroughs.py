@@ -1,4 +1,5 @@
 import base64
+import calendar
 import csv
 import difflib
 import functools
@@ -119,6 +120,93 @@ OCR_CODES = {
     "ILiB": "ILIB",
 }
 SCANNED = {1990: (10, 86, 109, 142)}
+BY_URL = f"{DOWNLOAD}/47aeedac-ebee-44f6-a0e8-c8a4cb6023ff/LBCBE_1990-5_TO_1994-5.pdf"
+BY_TITLE = "London Borough Council By-elections May 1990 to May 1994"
+BY_YEAR = 1990
+BY_PARTIES = {
+    "AFL": "Anti-federalist League",
+    "BNP": "British National Party",
+    "CC": "Community Campaign",
+    "CEN": "Centre Party",
+    "CGB": "Communist Party of Great Britain",
+    "CMC": "Camden Charter",
+    "COM": "Communist",
+    "CON": "Conservative",
+    "F": "Fellowship",
+    "GRE": "Green",
+    "ICON": "Independent Conservative",
+    "ICP": "International Communist Party",
+    "ILAB": "Independent Labour",
+    "IND": "Independent",
+    "IRE": "Independent Resident",
+    "IT": "Independent Tenant",
+    "LAB": "Labour",
+    "LABCP": "Labour and Co-operative",
+    "LD": "Liberal Democrat",
+    "LDFT": "Liberal Democrat",
+    "LDST": "Liberal Democrat",
+    "LIB": "Liberal",
+    "MILLAB": "Militant Labour",
+    "MRL": "Monster Raving Looney",
+    "NF": "National Front",
+    "REA": "Residents' Association",
+    "RLGG": "Monster Raving Looney",
+    "SDP": "Social Democratic Party",
+    "TEN": "Tenants' Representative",
+    "TR": "Tenants and Residents",
+    "VAL": "Valley Party",
+}
+BY_OCR = {
+    "LND": "IND",
+    "IND.": "IND",
+    "LAB.": "LAB",
+    "LLAB": "ILAB",
+    "LOFT": "LDFT",
+    "LOST": "LDST",
+    "LO": "LD",
+    "CAN": "CON",
+    "LDFF": "LDFT",
+}
+BY_WARDS = {
+    ("E09000025", "Little IIford"): "Little Ilford",
+    ("E09000030", "MillwaJl"): "Millwall",
+}
+BY_NAMES = {
+    "Lewis, Dorothy 1.": "Lewis, Dorothy I.",
+    "Khote, Ahmed 1.": "Khote, Ahmed I.",
+    "Greenwood, Diane 1.": "Greenwood, Diane I.",
+    "Logan, Roger 1.": "Logan, Roger I.",
+    "Taylor, Arthur 1.": "Taylor, Arthur L.",
+    "Baker, Roger C. 1.": "Baker, Roger C.L.",
+    "Baker, Roger c.L.": "Baker, Roger C.L.",
+    "lve, David H.": "Ive, David H.",
+    "o kocha, Dennis": "Okocha, Dennis",
+    "Groombridge, leslie E.": "Groombridge, Leslie E.",
+    "Moseley, Marian o.": "Moseley, Marian O.",
+    "Bruce, Donald o.": "Bruce, Donald O.",
+    "MaHone, Ronald S.": "Mallone, Ronald S.",
+    "Boddington, Robert C.B.": "Boddington, Robert C.H.",
+    "Portet, Alan K.": "Porter, Alan K.",
+    "Smith, Notman": "Smith, Norman",
+    "Raddey, Christopher T.": "Rackley, Christopher T.",
+    "Wltitmarsh, Gary C.": "Whitmarsh, Gary C.",
+    "Bailde, Andrew R.": "Baikie, Andrew R.",
+    "Page, Jeremy P.": "Fage, Jeremy P.",
+    " J. ones, Paul J.": "Jones, Paul J.",
+}
+BY_CAUSE = re.compile(
+    r"(Deaths? of|Resignations? of|Disqualification of|Vacancy|Bankruptcy of|Failure to attend|Resigned|Ceased)",
+    re.IGNORECASE,
+)
+BY_METHODOLOGY = (
+    "Read from the text layer of the London Research Centre's scanned report of the by-elections held for seats on "
+    "the London borough councils from the general elections of May 1990 to December 1993. Each entry names the ward, "
+    "the date, the vacancy's cause, and the candidates in vote order, and the first listed, who polled the most, is "
+    "elected. Each winner's party agrees with the entry's printed result, either no change from the departing "
+    "member's party or a gain. The electorate and turnout tables beside each entry are not stored. Every contest "
+    "is on the ward of the May 1990 elections, which stayed unchanged until May 1994. Candidate names are printed "
+    "as surname and forenames or initials; a few the text layer garbled were checked against the page images."
+)
 PARTIES = {
     1990: {
         "LAB": "Labour",
@@ -1002,7 +1090,7 @@ BY_SCHEMA: dict[str, object] = {
 
 
 def fetch() -> None:
-    for _, url in [*BOOKS.values(), *GLC.values()]:
+    for _, url in [*BOOKS.values(), *GLC.values(), (None, BY_URL)]:
         raw.fetch(SOURCE, url, suffix=".pdf")
     for _, url, _, _ in EARLY.values():
         raw.fetch(SOURCE, url, suffix=".pdf")
@@ -2319,6 +2407,7 @@ def parse_glc() -> None:
     parse_ilea()
     parse_glc_by()
     parse_glc_by_early()
+    parse_by()
 
 
 SKIPPED = re.compile(
@@ -2839,6 +2928,126 @@ def parse_glc_by_early() -> None:
     print(f"{len(divisions)} GLC by-elections and {len(candidates)} candidates, 1964 to 1981")
 
 
+def parse_by() -> None:
+    artifact = raw.cached(SOURCE, BY_URL)
+    sizes, book = pages(artifact.path)
+    wards = pl.read_parquet(PARSED / "wards.parquet").filter(pl.col("year") == BY_YEAR)
+    known = {(r["la_code"], fold(r["ward"])): r["ward"] for r in wards.iter_rows(named=True)}
+    codes = {fold(k): v for k, v in BOROUGHS.items()} | {
+        "westminstercityof": "E09000033",
+        "cityofwestminster": "E09000033",
+    }
+    held: list[dict] = []
+    standing: list[dict] = []
+    problems: list[str] = []
+    borough: str | None = None
+    entry: dict | None = None
+    for sheet in range(14, len(book) + 1):
+        if any(w[4] == "Index" for w in book[sheet - 1][:40]) and any(
+            w[4] == "candidates" for w in book[sheet - 1][:40]
+        ):
+            break
+        for row in lines(book[sheet - 1]):
+            text = re.sub(r"(\s+[I•'.|:])+$", "", " ".join(w[4] for w in row))
+            if re.search(r"by.e\w+ results|centre \d+$", text, re.IGNORECASE):
+                continue
+            head = re.fullmatch(r"(.+?) - continued", text)
+            if fold(head.group(1) if head else text) in codes and (head or len(row) <= 6):
+                borough = fold(head.group(1) if head else text)
+                entry = None
+                continue
+            dated = re.match(r"(.+?)\s+\(([\dlIO]{1,2})\s*([A-Za-z]+)\s*(\d{4})\)", text)
+            if dated and borough is not None:
+                month = difflib.get_close_matches(dated.group(3).title(), calendar.month_name[1:], 1, 0.7)
+                if not month:
+                    problems.append(f"page {sheet}: unread date {text!r}")
+                    continue
+                day = datetime.strptime(
+                    f"{dated.group(2).translate(DIGITS)} {month[0]} {dated.group(4)}", "%d %B %Y"
+                ).date()
+                entry = {"borough": borough, "ward": dated.group(1).strip(), "day": day, "page": sheet, "cause": None}
+                held.append(entry)
+                continue
+            if entry is None:
+                continue
+            if entry["cause"] is None:
+                cause = BY_CAUSE.search(text)
+                if cause:
+                    entry["cause"] = text[cause.start() :]
+                    entry["seats"] = 2 if re.match(r"(Resignations|Deaths)", entry["cause"]) else 1
+                    continue
+            if "result" not in entry:
+                if re.match(r"No change|.* gain from |.*no change", text):
+                    entry["result"] = text
+                continue
+            found = re.fullmatch(r"(.+?)\s+([A-Za-z.]{1,7})\s+(\d[\d,.]*)", text)
+            if found is None or not re.search(r"[A-Za-z]{2}", found.group(1)):
+                continue
+            code = found.group(2).upper()
+            code = BY_OCR.get(code, code)
+            votes = number(found.group(3))
+            if code not in BY_PARTIES or votes is None:
+                problems.append(f"page {sheet}: unread line {text!r}")
+                continue
+            name = re.sub(r"\s*\]\.?", " J.", found.group(1)).replace("] ", "J")
+            name = BY_NAMES.get(name, name)
+            standing.append(
+                {
+                    "key": (entry["borough"], entry["ward"], entry["day"]),
+                    "name": name,
+                    "party": code,
+                    "votes": votes,
+                    "page": sheet,
+                    "bbox": ilea_box(row, sizes[sheet - 1]),
+                }
+            )
+    out_held, out_standing = [], []
+    for e in held:
+        la = codes[e["borough"]]
+        ward = BY_WARDS.get((la, e["ward"])) or known.get((la, fold(e["ward"])))
+        mine = [c for c in standing if c["key"] == (e["borough"], e["ward"], e["day"])]
+        label = f"{e['borough']} {e['ward']} {e['day']}"
+        if ward is None:
+            problems.append(f"{label}: no 1990 ward")
+            continue
+        if "result" not in e or e["cause"] is None or len(mine) < 2:
+            problems.append(f"{label}: result {e.get('result')!r}, cause {e['cause']!r}, {len(mine)} candidates")
+            continue
+        votes = [c["votes"] for c in mine]
+        if votes != sorted(votes, reverse=True) or votes[e["seats"] - 1] == votes[e["seats"]]:
+            problems.append(f"{label}: votes not led by the first candidate: {votes}")
+        first = BY_PARTIES[mine[0]["party"]]
+        gain = re.fullmatch(r"(.+) gain from (.+)", e["result"])
+        departed = re.search(r"\(([A-Za-z]+)\)\s*$", e["cause"])
+        if e["seats"] == 1 and gain and not gain.group(1).startswith(first.split()[0]):
+            problems.append(f"{label}: result {e['result']!r} but first listed is {first}")
+        if e["seats"] == 1 and gain is None and departed:
+            before = BY_PARTIES.get(BY_OCR.get(departed.group(1).upper(), departed.group(1).upper()))
+            if before is None or before.split()[0] != first.split()[0]:
+                problems.append(f"{label}: no change but vacated by {departed.group(1)} and won by {first}")
+        out_held.append(
+            {
+                "la_code": la,
+                "ward": ward,
+                "day": e["day"],
+                "page": e["page"],
+                "cause": e["cause"],
+                "result": e["result"],
+                "seats": e["seats"],
+            }
+        )
+        for rank, c in enumerate(mine):
+            out_standing.append(
+                {"la_code": la, "ward": ward, "day": e["day"], "number": rank + 1, "elected": rank < e["seats"]}
+                | {k: c[k] for k in ("name", "party", "votes", "page", "bbox")}
+            )
+    if problems:
+        raise ValueError("borough by-elections:\n" + "\n".join(problems))
+    pl.DataFrame(out_held).write_parquet(PARSED / "by_held.parquet")
+    pl.DataFrame(out_standing).write_parquet(PARSED / "by_candidates.parquet")
+    print(f"{len(out_held)} borough by-elections and {len(out_standing)} candidates, 1990 to 1994")
+
+
 def emit() -> Path:
     wards = pl.read_parquet(PARSED / "wards.parquet")
     candidates = pl.read_parquet(PARSED / "candidates.parquet")
@@ -2857,7 +3066,7 @@ def emit() -> Path:
             + " by ward, and Greater London Council elections "
             + ", ".join(map(str, sorted(GLC)))
             + " by electoral division and of 1964, 1967, and 1970 by borough, the Greater London Council "
-            "by-elections of 1964 to 1985, and the Inner London Education Authority election of 1986 by constituency, from the London Research Centre's, the London County "
+            "by-elections of 1964 to 1985, the London borough by-elections of 1990 to 1993, and the Inner London Education Authority election of 1986 by constituency, from the London Research Centre's, the London County "
             "Council's, the Greater London Council's, and the London Residuary Body's reports",
             polity="GB",
         )
@@ -2890,9 +3099,11 @@ def emit() -> Path:
         party_ids: dict[str, UUID | None] = {}
 
         def party(year: int, code: str) -> UUID | None:
+            return party_of(code, PARTIES[year][code])
+
+        def party_of(code: str, label: str) -> UUID | None:
             if code == "IND":
                 return None
-            label = PARTIES[year][code]
             if label not in party_ids:
                 found = (
                     cs.key(*leap.RESOLVED[label])
@@ -3943,6 +4154,146 @@ def emit() -> Path:
                             x1=x1,
                             y1=y1,
                         )
+                    if line["elected"]:
+                        cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected")
+        held = pl.read_parquet(PARSED / "by_held.parquet")
+        standing = pl.read_parquet(PARSED / "by_candidates.parquet")
+        source = cs.source(PUBLISHER, BY_TITLE)
+        if source in cs.minted:
+            cs.add(
+                "source",
+                id=source,
+                kind="compendium",
+                publisher=PUBLISHER,
+                title=BY_TITLE,
+                url=DATASET,
+                license="Published by the London Research Centre; the Greater London Authority lists it on the "
+                "London Datastore with no license stated",
+                license_url=None,
+                attribution=f"{PUBLISHER}, {BY_TITLE}.",
+            )
+        artifact = raw.cached(SOURCE, BY_URL)
+        by_page = pager(artifact, cs.artifact(artifact, source))
+        for (day, code), on_day in held.sort("day", "la_code").group_by(["day", "la_code"], maintain_order=True):
+            polity = cs.key("gb.polity", code)
+            body = cs.key("gb.body", code)
+            found = conn.execute(
+                "select s.path, n.text from slug s join name n on n.entity_id = s.entity_id and n.is_preferred"
+                " where s.entity_id = %s order by s.is_current desc limit 1",
+                [polity],
+            ).fetchone()
+            if found is None or cs.minted & {polity, body}:
+                raise ValueError(f"{code}: publish gb.leap first")
+            path, council = found
+            election = cs.key("gb.election", f"{day}:by:{code}")
+            cs.add(
+                "election",
+                id=election,
+                polity_id=polity,
+                kind="by_election",
+                date_from=day,
+                date_to=day,
+                status="held",
+            )
+            spoken = f"{day:%B} {day.day}, {day.year}"
+            name(election, f"{council} by-election{'s' if on_day.height > 1 else ''}, {spoken}")
+            cs.add("slug", path=f"{path}/{day}-by-election", entity_id=election)
+            cs.add("note", entity_id=election, kind="methodology", body_md=BY_METHODOLOGY)
+            for ward in on_day.iter_rows(named=True):
+                display = ward["ward"]
+                ward_key = f"{code}:{slug(display)}:{BY_YEAR}"
+                area = cs.area("gb.ward", ward_key)
+                unit = cs.unit("gb.ward", ward_key)
+                contest_key = f"{day}:by:{ward_key}"
+                contest = cs.key("gb.contest", contest_key)
+                cs.add(
+                    "contest",
+                    id=contest,
+                    election_id=election,
+                    kind="body_seats",
+                    body_id=body,
+                    district_area_id=area,
+                    magnitude=ward["seats"],
+                    round_number=1,
+                    electoral_system_id=systems["fptp" if ward["seats"] == 1 else "block"],
+                    default_result_kind="counted",
+                )
+                name(contest, f"{display} ward by-election, {council}, {day.year}")
+                cs.add("slug", path=f"{path}/{day}-by-election/{slug(display)}", entity_id=contest)
+                result_set = cs.key(f"{SOURCE}.result_set", contest_key)
+                cs.add(
+                    "result_set",
+                    id=result_set,
+                    election_id=election,
+                    contest_id=contest,
+                    stage="official",
+                    kind="counted",
+                    status="active",
+                    source_id=source,
+                    is_default=contest not in others,
+                    completeness=1,
+                )
+                cs.add(
+                    "citation",
+                    entity_id=result_set,
+                    source_id=source,
+                    locator={"page": ward["page"], "ward": display, "cause": ward["cause"]},
+                )
+                for line in standing.filter(
+                    pl.col("la_code") == code, pl.col("ward") == display, pl.col("day") == day
+                ).iter_rows(named=True):
+                    option_key = f"{contest_key}:{line['number']}"
+                    owner = party_of(line["party"], BY_PARTIES[line["party"]])
+                    option = cs.key(f"{SOURCE}.option", option_key)
+                    cs.add(
+                        "contest_option",
+                        id=option,
+                        contest_id=contest,
+                        kind="candidate",
+                        party_id=owner,
+                        ballot_label=line["name"],
+                    )
+                    person = cs.key(f"{SOURCE}.person", option_key)
+                    cs.add("person", id=person)
+                    surname, _, forenames = line["name"].partition(", ")
+                    name(person, f"{forenames} {surname}".strip())
+                    cs.add(
+                        "candidacy",
+                        id=cs.key(f"{SOURCE}.candidacy", option_key),
+                        person_id=person,
+                        option_id=option,
+                        role="head",
+                        ballot_name=line["name"],
+                        member_of_party_id=owner,
+                        is_independent=line["party"] == "IND",
+                    )
+                    x0, y0, x1, y1 = line["bbox"]
+                    cs.add(
+                        "result_value",
+                        result_set_id=result_set,
+                        unit_id=unit,
+                        option_id=option,
+                        channel=0,
+                        measure=VOTES,
+                        count_round=0,
+                        flags=DIGITIZED,
+                        value=line["votes"],
+                    )
+                    cs.add(
+                        "value_locator",
+                        result_set_id=result_set,
+                        unit_id=unit,
+                        option_id=option,
+                        channel=0,
+                        measure=VOTES,
+                        count_round=0,
+                        page_id=by_page(line["page"]),
+                        source_id=None,
+                        x0=x0,
+                        y0=y0,
+                        x1=x1,
+                        y1=y1,
+                    )
                     if line["elected"]:
                         cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected")
         return cs.write()
