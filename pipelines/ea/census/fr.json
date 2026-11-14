@@ -534,6 +534,24 @@
       "note": "Article 2 read on the page image.",
       "kind": "compendium"
     },
+    "duv-1823-12-24": {
+      "title": "Ordonnance du 24 décembre 1823 qui dissout la Chambre des députés, convoque les collèges électoraux du royaume, et fixe l'époque de l'ouverture de la session de 1824 (Bulletin des lois, 7e série, Bull. 646, n° 16100)",
+      "publisher": "Duvergier, Collection complète des lois, décrets, ordonnances, règlemens et avis du Conseil d'État, t. 24 (A. Guyot)",
+      "url": "https://archive.org/details/collectioncompl01frangoog",
+      "kind": "compendium"
+    },
+    "duv-1831-06-25": {
+      "title": "Ordonnance du 25 juin 1831 fixant le lieu de réunion des collèges électoraux 'convoqués pour le 5 juillet par l'ordonnance du 31 mai dernier' (Bulletin des lois, 9e série, Bull. LXXXII, n° 2250); the dissolution ordinance of 31 May 1831 is indexed at p. 319",
+      "publisher": "Duvergier, Collection complète des lois, décrets, ordonnances, règlemens et avis du Conseil d'État, t. 31 (H. Bousquet)",
+      "url": "https://archive.org/details/collectioncompl02frangoog",
+      "kind": "compendium"
+    },
+    "bl-1852-02-13": {
+      "title": "Décret du 13 février 1852 convoquant les collèges électoraux des circonscriptions du Calvados pour les 28 et 29 février, reciting 'le décret du 2 de ce mois, portant convocation des collèges électoraux' and the ordinary scrutin of 29 February and 1 March (Bulletin des lois, 1852, Partie principale)",
+      "publisher": "Bulletin des lois de la République française",
+      "url": "https://archive.org/details/bub_gb_KEmBvs4jnukC",
+      "kind": "official_body"
+    },
     "bl-1834-05-25": {
       "title": "Ordonnance du 25 mai 1834 portant dissolution de la Chambre des députés et convocation des collèges électoraux (Bulletin des lois, 1834, Partie principale)",
       "publisher": "Bulletin des lois du Royaume de France",
@@ -3475,8 +3493,9 @@
         },
         {
           "date": "1852-02-29",
-          "source": "wiki-fr-legislatives",
-          "note": "First Corps législatif; second round 14 March."
+          "source": "bl-1852-02-13",
+          "quote": "prendre part au scrutin ouvert les 29 février et 1er mars suivant",
+          "note": "First Corps législatif, convened by the decree of 2 February 1852; voting on 29 February and 1 March; second round 14 March (not yet read in a decree)."
         },
         {
           "date": "1857-06-21",
@@ -3590,8 +3609,9 @@
         },
         {
           "date": "1824-02-25",
-          "source": "wiki-fr-legislatives",
-          "note": "Second round 6 March."
+          "source": "duv-1823-12-24",
+          "quote": "La Chambre des députés est dissoute. Les collèges électoraux sont convoqués dans tout le royaume : ils se réuniront aux lieux portés par les trois tableaux ci-annexés, ceux d'arrondissement et ceux de département qui n'ont qu'un collège, le 25 février prochain, et les collèges départementaux le 6 mars.",
+          "note": "Ordonnance of 24 December 1823: arrondissement colleges 25 February, department colleges 6 March."
         },
         {
           "date": "1827-11-17",
@@ -3607,7 +3627,9 @@
         },
         {
           "date": "1831-07-05",
-          "source": "wiki-fr-legislatives"
+          "source": "duv-1831-06-25",
+          "quote": "Les collèges électoraux, convoqués pour le 5 juillet par l'ordonnance du 31 mai dernier, se réuniront dans les villes désignées au tableau qui suit",
+          "note": "Dissolution ordinance of 31 May 1831; 5 July for the first-round colleges."
         },
         {
           "date": "1834-06-21",
