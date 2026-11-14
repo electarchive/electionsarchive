@@ -1,3 +1,4 @@
+import html
 import io
 import json
 import os
@@ -1174,6 +1175,13 @@ def emit() -> Path:
 
 BY_ELECTIONS = Path(__file__).with_name("scot_by_elections.tsv")
 BY = PARSED / "by"
+FIFE_PAGE = "https://www.fife.gov.uk/council-and-democracy/elections-and-voting/election-results/local-government-election-results"
+FIFE_SAVED = DATA / "inbox" / "manual" / "MF-642" / "fife-local-government-by-election-results.html"
+FIFE_FIRST = (
+    "local.fife.inverkeithing-and-dalgety-bay.by.2018-09-06",
+    "local.fife.dunfermline-central.by.2019-11-14",
+    "local.fife.rosyth.by.2019-11-14",
+)
 RECODED = {"S12000015": "S12000047", "S12000024": "S12000048", "S12000044": "S12000050", "S12000046": "S12000049"}
 DESCRIPTIONS = (
     (r"independent green voice", "Independent Green Voice"),
@@ -1236,6 +1244,17 @@ def declares(text: str, label: str, votes: Decimal) -> bool:
 
 
 def fetch_by() -> None:
+    try:
+        raw.cached(SOURCE, FIFE_PAGE)
+    except LookupError:
+        raw.store(
+            SOURCE,
+            FIFE_PAGE,
+            FIFE_SAVED.read_bytes(),
+            suffix=".html",
+            retrieved_at=datetime.fromtimestamp(FIFE_SAVED.stat().st_mtime, UTC),
+            media_type="text/html",
+        )
     for row in pl.read_csv(BY_ELECTIONS, separator="\t", infer_schema=False).iter_rows(named=True):
         for url in (row["stages"], row["declaration"]):
             if url is None:
@@ -1248,6 +1267,31 @@ def fetch_by() -> None:
                 except httpx.HTTPError as error:
                     print(f"{row['ballot']}: {url}: {error}")
                 time.sleep(1)
+
+
+def read_first(text: str, ward: str) -> tuple[list[tuple[str, str, Decimal]], str]:
+    plain = html.unescape(re.sub(r"<[^>]+>", "\n", re.sub(r"(?s)<(script|style).*?</\1>", "", text)))
+    lines = [" ".join(line.replace("&", "and").split()) for line in plain.splitlines() if line.strip()]
+    start = next(
+        index + 1
+        for index, line in enumerate(lines)
+        if re.fullmatch(
+            rf"The results for the Local Government By-elections? for (the )?{re.escape(ward)} council ward are:", line
+        )
+    )
+    end = next(index for index in range(start, len(lines)) if "declared as the newly elected" in lines[index])
+    body = [
+        line
+        for line in lines[start : end - 1]
+        if not re.match(r"(Candidate Name|Party|No\. of |st preference votes)", line)
+    ]
+    winner = lines[end - 1].split(",")[0].strip()
+    rows = []
+    for index in range(0, len(body) - 2, 3):
+        rows.append((body[index], body[index + 1], Decimal(body[index + 2].replace(",", ""))))
+    if len(body) % 3 or winner not in {name for name, _, _ in rows}:
+        raise ValueError(f"{ward}: first preference table not read: {body[:6]} {winner}")
+    return rows, winner
 
 
 def parse_by() -> None:
@@ -1376,6 +1420,41 @@ def parse_by() -> None:
             )
         for number in stages:
             totals.append({"key": key, "number": 0, "stage": number, "votes": str(exhausted.get(number, Decimal(0)))})
+    page = raw.cached(SOURCE, FIFE_PAGE).path.read_text()
+    for ballot in FIFE_FIRST:
+        ward = wards[ballot]
+        rows, winner = read_first(page, ward["ons_name"])
+        key = f"{ward['day']}:local:{ward['ward_code']}:by"
+        units.append(
+            {
+                "key": key,
+                "ballot": ballot,
+                "day": ward["day"],
+                "council_code": RECODED.get(ward["la_code"], ward["la_code"]),
+                "ward_code": ward["ward_code"],
+                "ward_name": ward["ons_name"],
+                "stages": FIFE_PAGE,
+                "status": "loaded",
+                "seats": int(ward["seats"]),
+                "valid": str(sum(votes for _, _, votes in rows)),
+                "first_only": True,
+            }
+        )
+        for number, (label, description, votes) in enumerate(rows, start=1):
+            elected = label == winner
+            totals.append(
+                {
+                    "key": key,
+                    "number": number,
+                    "name": label,
+                    "description": description,
+                    "party": national(description),
+                    "elected": elected,
+                    "outcome": "elected" if elected else "lost",
+                    "stage": 1,
+                    "votes": str(votes),
+                }
+            )
     frame = pl.DataFrame(units, infer_schema_length=None)
     print(frame.group_by("status").len().sort("len", descending=True).rows())
     BY.mkdir(parents=True, exist_ok=True)
@@ -1458,7 +1537,10 @@ def emit_by() -> Path:
             name(contest, f"{label} ward by-election, {authority}, {day.year}")
             cs.add("slug", path=f"{path}/{day}-local/{slug(label)}-by-election", entity_id=contest)
             cs.add("external_id", entity_id=contest, scheme="democracyclub.ballot", value=unit_row["ballot"])
-            title = f"{label} ward by-election, {day.day} {day:%B %Y}: count reports"
+            first_only = bool(unit_row["first_only"])
+            title = f"{label} ward by-election, {day.day} {day:%B %Y}: " + (
+                "first preferences" if first_only else "count reports"
+            )
             source = cs.source(authority, title)
             cs.add(
                 "source",
@@ -1470,7 +1552,10 @@ def emit_by() -> Path:
                 license="Open Government Licence v3.0",
                 license_url=OGL,
                 attribution=authority,
-                notes="The returning officer's Candidate Votes per Stage report"
+                notes="The council's results page, which prints each candidate's first preference votes and the "
+                "member declared elected, with no stage table."
+                if first_only
+                else "The returning officer's Candidate Votes per Stage report"
                 + (" and Declaration of Results" if unit_row["declaration"] else "")
                 + ", as published by the council.",
             )
@@ -1562,7 +1647,9 @@ def emit_by() -> Path:
                     result_set_id=result_set,
                     option_id=option,
                     kind=candidate["outcome"],
-                    notes=f"Elected at stage {candidate['stage_elected']}." if candidate["elected"] else None,
+                    notes=f"Elected at stage {candidate['stage_elected']}."
+                    if candidate["elected"] and not first_only
+                    else None,
                 )
             for row in lines.filter(pl.col("number") == 0).iter_rows(named=True):
                 cs.add(
