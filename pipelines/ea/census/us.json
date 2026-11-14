@@ -321,6 +321,9 @@
     "leg-law-nv": {"publisher": "Nevada Legislature", "title": "Nevada Constitution", "url": "https://www.leg.state.nv.us/const/nvconst.html", "kind": "official_body"},
     "leg-law-or": {"publisher": "Oregon Legislature", "title": "Oregon Constitution", "url": "https://www.oregonlegislature.gov/bills_laws/Pages/OrConst.aspx", "kind": "official_body"},
     "leg-law-oh": {"publisher": "Ohio Laws and Administrative Rules", "title": "Ohio Constitution, Article II", "url": "https://codes.ohio.gov/ohio-constitution/article-2", "kind": "official_body"},
+    "leg-law-de": {"publisher": "Delaware Code Online", "title": "Delaware Constitution, Article II", "url": "https://delcode.delaware.gov/constitution/constitution-03.shtml", "kind": "official_body"},
+    "leg-law-ma": {"publisher": "Massachusetts Legislature", "title": "Constitution of the Commonwealth of Massachusetts, Amendments", "url": "https://malegislature.gov/Laws/Constitution", "kind": "official_body"},
+    "leg-law-mo": {"publisher": "Missouri Revisor of Statutes", "title": "Missouri Constitution, Article III", "url": "https://www.revisor.mo.gov/main/OneSection.aspx?section=III++++5&bid=", "kind": "official_body"},
     "const-nm": {
       "publisher": "New Mexico Secretary of State",
       "title": "Constitution of the State of New Mexico, article VI",
@@ -784,14 +787,18 @@
         "NC": {"source": "leg-law-nc", "locator": "Art. II, § 2: the Senate is biennially chosen by ballot"},
         "NV": {"source": "leg-law-nv", "locator": "Art. 4, § 4: the term of senators is four years"},
         "OR": {"source": "leg-law-or", "locator": "Art. IV, § 4(1): senators are elected for the term of four years"},
-        "OH": {"source": "leg-law-oh", "locator": "Art. II, § 2: senators are elected for terms of four years"}
+        "OH": {"source": "leg-law-oh", "locator": "Art. II, § 2: senators are elected for terms of four years"},
+        "DE": {"source": "leg-law-de", "locator": "Art. II, § 2: the Senate is composed of 21 members, who are chosen for 4 years"},
+        "MA": {"source": "leg-law-ma", "locator": "Amendments, art. LXIV, § 1, as amended by art. LXXXII: senators and representatives are elected biennially"},
+        "MO": {"source": "leg-law-mo", "locator": "Art. III, § 5: the senate has 34 members elected for a term of four years; § 11: senators of the even-numbered districts and all representatives are elected in one general election, and senators of the odd-numbered districts two years later"}
       },
       "chambers": [
         {"states": "LA MS VA", "period_years": 4, "phase": 3, "term_years": 4},
         {"states": "ID NC", "period_years": 2, "phase": 0, "term_years": 2},
-        {"states": "AZ CT GA ME MA NH NY RI SD VT GU VI", "period_years": 2, "phase": 0, "term_years": 2, "locator": "Table 6.2, {name} row: the whole senate is elected in every even-numbered year of 2022 to 2026"},
-        {"states": "MN NE NV OH OR", "period_years": 2, "phase": 0, "term_years": 4},
-        {"states": "AK AR CA CO DE FL HI IL IN IA KY MO MT ND OK PA TN TX UT WA WV WI WY", "period_years": 2, "phase": 0, "term_years": 4, "locator": "Table 6.2, {name} row: staggered four-year terms, with seats up in each even-numbered year"},
+        {"states": "MA", "period_years": 2, "phase": 0, "term_years": 2},
+        {"states": "AZ CT GA ME NH NY RI SD VT GU VI", "period_years": 2, "phase": 0, "term_years": 2, "locator": "Table 6.2, {name} row: the whole senate is elected in every even-numbered year of 2022 to 2026"},
+        {"states": "DE MN MO NE NV OH OR", "period_years": 2, "phase": 0, "term_years": 4},
+        {"states": "AK AR CA CO FL HI IL IN IA KY MT ND OK PA TN TX UT WA WV WI WY", "period_years": 2, "phase": 0, "term_years": 4, "locator": "Table 6.2, {name} row: staggered four-year terms, with seats up in each even-numbered year"},
         {"states": "MI", "period_years": 4, "phase": 2, "term_years": 4},
         {"states": "AL MD", "period_years": 4, "phase": 2, "term_years": 4, "locator": "Table 6.2, {name} row: the whole senate is elected in 2022 and 2026, none in 2024"},
         {"states": "KS NM SC PR", "period_years": 4, "phase": 0, "term_years": 4, "locator": "Table 6.2, {name} row: the whole senate is elected in 2024, none in 2022 or 2026"},
@@ -819,12 +826,15 @@
         "NC": {"source": "leg-law-nc", "locator": "Art. II, § 4: the House of Representatives is biennially chosen by ballot"},
         "NV": {"source": "leg-law-nv", "locator": "Art. 4, § 3: members of the Assembly serve two years"},
         "OR": {"source": "leg-law-or", "locator": "Art. IV, § 4(1): representatives are elected for the term of two years"},
-        "OH": {"source": "leg-law-oh", "locator": "Art. II, § 2: representatives are elected biennially, and their term continues two years"}
+        "OH": {"source": "leg-law-oh", "locator": "Art. II, § 2: representatives are elected biennially, and their term continues two years"},
+        "DE": {"source": "leg-law-de", "locator": "Art. II, § 2: the House of Representatives members are chosen for 2 years"},
+        "MA": {"source": "leg-law-ma", "locator": "Amendments, art. LXIV, § 1, as amended by art. LXXXII: senators and representatives are elected biennially"},
+        "MO": {"source": "leg-law-mo", "locator": "Art. III, § 11: the whole number of representatives is elected at each general election, every two years"}
       },
       "chambers": [
         {"states": "LA MS", "period_years": 4, "phase": 3, "term_years": 4},
-        {"states": "ID MI MN NC NV OH OR", "period_years": 2, "phase": 0, "term_years": 2},
-        {"states": "AK AZ AR CA CO CT DE FL GA HI IL IN IA KS KY ME MA MO MT NH NM NY ND OK PA RI SC SD TN TX UT VT WA WV WI WY AS", "period_years": 2, "phase": 0, "term_years": 2, "locator": "Table 6.2, {name} row: the whole house is elected in every even-numbered year of 2022 to 2026"},
+        {"states": "DE ID MA MI MN MO NC NV OH OR", "period_years": 2, "phase": 0, "term_years": 2},
+        {"states": "AK AZ AR CA CO CT FL GA HI IL IN IA KS KY ME MT NH NM NY ND OK PA RI SC SD TN TX UT VT WA WV WI WY AS", "period_years": 2, "phase": 0, "term_years": 2, "locator": "Table 6.2, {name} row: the whole house is elected in every even-numbered year of 2022 to 2026"},
         {"states": "AL MD", "period_years": 4, "phase": 2, "term_years": 4, "locator": "Table 6.2, {name} row: the whole house is elected in 2022 and 2026, none in 2024"},
         {"states": "PR", "period_years": 4, "phase": 0, "term_years": 4, "locator": "Table 6.2, {name} row: the whole house is elected in 2024, none in 2022 or 2026"},
         {"states": "MP", "period_years": 2, "phase": 0, "term_years": 2, "source": "cnmi-constitution", "locator": "CNMI Const. art. II, § 2: representatives serve two-year terms"},
