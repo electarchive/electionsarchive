@@ -37,6 +37,7 @@ QUESTION = (
 )
 SYNOPSIS = "https://archive.org/download/31761115535080/31761115535080.pdf"
 SYNOPSIS_PAGE = "https://archive.org/details/31761115535080"
+ELECTIONS_CANADA_TERMS = "Elections Canada website terms: non-commercial reproduction only, commercial redistribution needs written permission"
 SYNOPSIS_TITLE = "Referendum 92: Official Voting Results, Synopsis (Chief Electoral Officer of Canada)"
 DISTRICTS = Path(__file__).with_name("referendum_1992_districts.tsv")
 TABLE_PAGE = 26
@@ -449,7 +450,7 @@ def emit() -> Path:
             publisher="Elections Canada",
             title=REPORT_TITLE,
             url=REPORT_PAGE,
-            license="Elections Canada website terms: non-commercial reproduction only, commercial redistribution needs written permission",
+            license=ELECTIONS_CANADA_TERMS,
         )
         wording = cs.source("Privy Council Office", WORDING_TITLE)
         cs.add(
@@ -469,7 +470,7 @@ def emit() -> Path:
             publisher="Elections Canada",
             title=SYNOPSIS_TITLE,
             url=SYNOPSIS_PAGE,
-            license="Crown copyright; scanned by the University of Toronto Libraries and served by the Internet Archive",
+            license=ELECTIONS_CANADA_TERMS,
         )
         artifact = cs.artifact(report, elections_canada)
         cs.artifact(raw.cached(SOURCE, WORDING), wording)
