@@ -398,10 +398,10 @@
       "kind": "compendium"
     },
     "electors-la": {
-      "publisher": "Wikipedia",
-      "title": "United States presidential elections in Louisiana",
-      "url": "https://en.wikipedia.org/wiki/United_States_presidential_elections_in_Louisiana",
-      "kind": "compendium"
+      "publisher": "U.S. Government Publishing Office",
+      "title": "Joint Resolution No. 12, declaring certain States not entitled to Representation in the Electoral College, 13 Stat. 567 (February 8, 1865)",
+      "url": "https://www.govinfo.gov/link/statute/13/567",
+      "kind": "official_body"
     },
     "electors-fl": {
       "publisher": "Wikipedia",
@@ -509,7 +509,7 @@
         {"states": "DE", "period_years": 4, "phase": 0, "valid_to": "1829-01-01", "source": "electors-de", "locator": "Delaware's legislature chose its electors through 1828 (with South Carolina, the only two states to do so that year)"},
         {"states": "GA LA NY VT", "period_years": 4, "phase": 0, "valid_to": "1825-01-01", "source": "electors-1824", "locator": "In 1824 the legislatures of Delaware, Georgia, Louisiana, New York, South Carolina, and Vermont chose the electors; the other eighteen states held a popular vote"},
         {"states": "SC", "period_years": 4, "phase": 0, "valid_to": "1861-01-01", "source": "electors-sc", "locator": "South Carolina's legislature chose the state's electors through 1860, the last state to do so"},
-        {"states": "LA", "period_years": 4, "phase": 0, "valid_from": "1864-01-01", "valid_to": "1865-01-01", "source": "electors-la", "locator": "1864: Louisiana's Union legislature named electors without a popular vote, and Congress did not count their votes"},
+        {"states": "LA", "period_years": 4, "phase": 0, "valid_from": "1864-01-01", "valid_to": "1865-01-01", "source": "electors-la", "locator": "1864: Congress resolved that Louisiana, among eleven states, had no valid election of electors on November 8, 1864, so its electoral votes were not counted"},
         {"states": "FL", "period_years": 4, "phase": 0, "valid_from": "1868-01-01", "valid_to": "1869-01-01", "source": "electors-fl", "locator": "1868: Florida's legislature chose the state's electors; no popular vote was held"}
       ]
     },
