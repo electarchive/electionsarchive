@@ -56,6 +56,42 @@
       "url": "https://jdih.kpu.go.id/data/data_kepkpu/SK_KPU_416_Penetapan_Kursi_Calon_Terpilih_1452014.pdf",
       "kind": "official_body"
     },
+    "kep2138-2025": {
+      "title": "Keputusan Menteri Dalam Negeri Nomor 300.2.2-2138 Tahun 2025 tentang Pemberian dan Pemutakhiran Kode, Data Wilayah Administrasi Pemerintahan, dan Pulau, Lampiran A (rekapitulasi per provinsi); amended by 300.2.2-2430 Tahun 2025, which only moves four islands to Aceh Singkil",
+      "publisher": "Kementerian Dalam Negeri (JDIH BPK)",
+      "url": "https://peraturan.bpk.go.id/Download/384753/Lampiran-Kepmen%20300.2.2-2138%20Tahun%202025.pdf",
+      "kind": "official_body"
+    },
+    "kpu-bali-2009": {
+      "title": "KPU Bali: KPU Tetapkan Hasil Pemilu Legislatif 2009 (9 May 2009)",
+      "publisher": "Komisi Pemilihan Umum",
+      "url": "https://bali.kpu.go.id/blog/read/kpu-tetapkan-hasil-pemilu-legislatif-2009",
+      "kind": "official_body"
+    },
+    "kpu-dapil-2004": {
+      "title": "KPU Kepulauan Seribu: Akal-akalan Daerah Pemilihan (69 DPR dapil in 2004)",
+      "publisher": "Komisi Pemilihan Umum",
+      "url": "https://kab-kepulauanseribu.kpu.go.id/public/kab-kepulauanseribu/dmdocuments/1642056323BUKU-003-KPUPS-AKAL-AKALAN_DAERAH_PEMILIHAN.pdf",
+      "kind": "official_body"
+    },
+    "kpu-modul": {
+      "title": "KPU: Bab V Hasil Pemilu (Pemilu 2004 and 2009 results)",
+      "publisher": "Komisi Pemilihan Umum",
+      "url": "https://www.kpu.go.id/dmdocuments/modul_1d.pdf",
+      "kind": "official_body"
+    },
+    "kpu-pilkada": {
+      "title": "KPU Kabupaten Yalimo: Sejarah Pilkada Serentak di Indonesia dari Tahun ke Tahun",
+      "publisher": "Komisi Pemilihan Umum",
+      "url": "https://kab-yalimo.kpu.go.id/blog/read/8247_sejarah-pilkada-serentak-di-indonesia-dari-tahun-ke-tahun",
+      "kind": "official_body"
+    },
+    "kpu-pilkada-2024": {
+      "title": "KPU RI statement on the 2024 simultaneous Pilkada in 545 regions (Kompas TV)",
+      "publisher": "Komisi Pemilihan Umum",
+      "url": "https://www.kompas.tv/nasional/556293/pernyataan-resmi-kpu-atas-pelaksanaan-pilkada-serentak-di-545-daerah-serial-pilkada",
+      "kind": "official_body"
+    },
     "opendata": {
       "title": "Portal Open Data KPU",
       "publisher": "Komisi Pemilihan Umum",
@@ -109,7 +145,15 @@
       "parent": "provinsi",
       "polity_kind": "county",
       "scheme": "id.kabkota",
-      "source": "uu10-2016"
+      "source": "uu10-2016",
+      "counts": [
+        {
+          "date": "2025-04-25",
+          "value": 514,
+          "source": "kep2138-2025",
+          "locator": "Lampiran A, JUMLAH row: 416 kabupaten and 98 kota"
+        }
+      ]
     },
     {
       "key": "desa",
@@ -117,7 +161,15 @@
       "name_en": "Villages",
       "parent": "kabkota",
       "polity_kind": "submunicipal",
-      "source": "uu3-2024"
+      "source": "uu3-2024",
+      "counts": [
+        {
+          "date": "2025-04-25",
+          "value": 75266,
+          "source": "kep2138-2025",
+          "locator": "Lampiran A, JUMLAH row, column DESA: 75.266 (the 8.496 kelurahan appoint their heads and are not counted)"
+        }
+      ]
     }
   ],
   "classes": [
@@ -278,7 +330,7 @@
       "source": "uu7-2017",
       "first_held": "1955-09-29",
       "earliest_record": "1955-09-29",
-      "note": "Open-list PR in multi-member dapil: 69 in 2004 (550 seats), 77 in 2009 and 2014 (560), 80 in 2019 (575), 84 in 2024 (580). The 1955 election and the New Order elections of 1971-1997 used provincial lists under the PPI and LPU. Counts before 2014 are not yet quoted from a decree.",
+      "note": "Open-list PR in multi-member dapil: 69 in 2004 (550 seats), 77 in 2009 and 2014 (560), 80 in 2019 (575), 84 in 2024 (580). The 1955 election and the New Order elections of 1971-1997 used provincial lists under the PPI and LPU.",
       "match": [
         {
           "election_kinds": [
@@ -354,10 +406,18 @@
           "date": "1999-06-07"
         },
         {
-          "date": "2004-04-05"
+          "date": "2004-04-05",
+          "contests": 69,
+          "seats": 550,
+          "source": "kpu-dapil-2004",
+          "quote": "Dalam Pemilu 2004 lalu, 550 kursi DPR diperebutkan dalam 69 daerah pemilihan"
         },
         {
-          "date": "2009-04-09"
+          "date": "2009-04-09",
+          "contests": 77,
+          "seats": 560,
+          "source": "kpu-bali-2009",
+          "quote": "lengkaplah sudah rekapitulasi di 33 Provinsi dan 77 daerah pemilihan"
         },
         {
           "date": "2014-04-09",
@@ -445,10 +505,18 @@
       ],
       "dates": [
         {
-          "date": "2004-04-05"
+          "date": "2004-04-05",
+          "contests": 32,
+          "seats": 128,
+          "source": "kpu-modul",
+          "quote": "Pemilu Anggota DPD tahun 2004 yang memilih 4 wakil masing masing dari 32 provinsi menghasilkan 128 Anggota DPD"
         },
         {
-          "date": "2009-04-09"
+          "date": "2009-04-09",
+          "contests": 33,
+          "seats": 132,
+          "source": "kpu-modul",
+          "quote": "Pemilu Anggota DPD ... 4 wakil masing-masing dari 33 provinsi menghasilkan 132 Anggota DPD"
         },
         {
           "date": "2014-04-09"
@@ -748,19 +816,34 @@
       ],
       "dates": [
         {
-          "date": "2015-12-09"
+          "date": "2015-12-09",
+          "contests": 9,
+          "source": "kpu-pilkada",
+          "quote": "9 provinsi, 224 kabupaten, 36 kota; total 269 daerah"
         },
         {
-          "date": "2017-02-15"
+          "date": "2017-02-15",
+          "contests": 7,
+          "source": "kpu-pilkada",
+          "quote": "7 provinsi, 76 kabupaten, 18 kota; total 101 daerah"
         },
         {
-          "date": "2018-06-27"
+          "date": "2018-06-27",
+          "contests": 17,
+          "source": "kpu-pilkada",
+          "quote": "17 provinsi, 115 kabupaten, 39 kota; total 171 daerah"
         },
         {
-          "date": "2020-12-09"
+          "date": "2020-12-09",
+          "contests": 9,
+          "source": "kpu-pilkada",
+          "quote": "9 provinsi, 224 kabupaten, 37 kota; total 270 daerah"
         },
         {
-          "date": "2024-11-27"
+          "date": "2024-11-27",
+          "contests": 37,
+          "source": "kpu-pilkada-2024",
+          "quote": "545 daerah, terdiri dari 37 provinsi, 415 kabupaten, serta 93 kota"
         }
       ],
       "est_votes": 400000000,
@@ -821,19 +904,34 @@
       ],
       "dates": [
         {
-          "date": "2015-12-09"
+          "date": "2015-12-09",
+          "contests": 260,
+          "source": "kpu-pilkada",
+          "quote": "9 provinsi, 224 kabupaten, 36 kota; total 269 daerah"
         },
         {
-          "date": "2017-02-15"
+          "date": "2017-02-15",
+          "contests": 94,
+          "source": "kpu-pilkada",
+          "quote": "7 provinsi, 76 kabupaten, 18 kota; total 101 daerah"
         },
         {
-          "date": "2018-06-27"
+          "date": "2018-06-27",
+          "contests": 154,
+          "source": "kpu-pilkada",
+          "quote": "17 provinsi, 115 kabupaten, 39 kota; total 171 daerah"
         },
         {
-          "date": "2020-12-09"
+          "date": "2020-12-09",
+          "contests": 261,
+          "source": "kpu-pilkada",
+          "quote": "9 provinsi, 224 kabupaten, 37 kota; total 270 daerah"
         },
         {
-          "date": "2024-11-27"
+          "date": "2024-11-27",
+          "contests": 508,
+          "source": "kpu-pilkada-2024",
+          "quote": "545 daerah, terdiri dari 37 provinsi, 415 kabupaten, serta 93 kota"
         }
       ],
       "est_votes": 600000000,
