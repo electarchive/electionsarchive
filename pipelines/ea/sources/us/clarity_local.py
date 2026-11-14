@@ -1,3 +1,4 @@
+import html
 import io
 import json
 import re
@@ -380,6 +381,16 @@ CANVASSES = {
         ),
     ),
 }
+DECLARED = {
+    "https://www.huntsvilleal.gov/council-certifies-municipal-election-results-and-declares-district-5-runoff-election-on-oct-6/": (
+        date(2020, 8, 25),
+        (("board-of-education", "District 5", "Carlos Matthews – District 5 School Board Member", "Carlos Mathews"),),
+    ),
+    "https://www.huntsvilleal.gov/ryan-renaud-declared-winner-of-huntsville-school-board-seat/": (
+        date(2026, 8, 25),
+        (("board-of-education", "District 4", "Renaud was the only candidate in District 4", "Ryan Renaud"),),
+    ),
+}
 RENAMED = {
     "2009-04-07:IL": "0001-01-01:IL",
     **{
@@ -450,6 +461,10 @@ CANVASS = (
     "Votes are the {publisher}'s official results by district, each candidate's total over the precincts, absentee "
     "ballots, and provisional ballots counted, as printed in the city's results sheet."
 )
+DECLARED_NOTE = (
+    "This seat was not on the ballot, and no votes were cast. The City Council declared the candidate elected, as the "
+    "{publisher}'s announcement reports."
+)
 TOTALS = (
     "Votes are the {publisher}'s election night reporting results, counted as one total for the whole jurisdiction "
     "because the county's precincts do not add up to its total or are already in the archive under other names."
@@ -470,6 +485,8 @@ def fetch() -> None:
         raw.fetch(SOURCE, link, suffix=".zip")
     for link in CANVASSES:
         raw.fetch(SOURCE, link, suffix=".pdf")
+    for link in DECLARED:
+        raw.fetch(SOURCE, link, suffix=".html")
 
 
 def _pdf_root(path: Path, name: str) -> ElementTree.Element:
@@ -741,6 +758,7 @@ def parse() -> None:
                         "magnitude": int(node.get("voteFor") or 1),
                         "variant": None,
                         "runoff": runoff,
+                        "tacit": False,
                     }
                 )
     for link, (day, races) in CANVASSES.items():
@@ -805,6 +823,50 @@ def parse() -> None:
                     "magnitude": 1,
                     "variant": None,
                     "runoff": runoff,
+                    "tacit": False,
+                }
+            )
+    for link, (day, races) in DECLARED.items():
+        page = re.sub(
+            r"\s+",
+            " ",
+            html.unescape(re.sub(r"<[^>]+>", " ", raw.cached(SOURCE, link).path.read_text(errors="replace"))),
+        )
+        election = int(day.strftime("%Y%m%d"))
+        for key, seat, printed, person in races:
+            if printed not in page:
+                raise ValueError(f"{link} does not say {printed!r}")
+            contest = f"{key}:{slug(seat)}"
+            lines.append(
+                {
+                    "county": "01089",
+                    "election": election,
+                    "contest": contest,
+                    "choice": person,
+                    "was": person,
+                    "party": None,
+                    "place": None,
+                    "votes": 0,
+                }
+            )
+            contests.append(
+                {
+                    "county": "01089",
+                    "publisher": CITY,
+                    "election": election,
+                    "contest": contest,
+                    "day": day,
+                    "title": f"{day.year} Municipal Election",
+                    "text": f"Board of Education {seat}",
+                    "key": key,
+                    "scheme": "us.place",
+                    "code": "0137000",
+                    "seat": seat,
+                    "remainder": False,
+                    "magnitude": 1,
+                    "variant": None,
+                    "runoff": False,
+                    "tacit": True,
                 }
             )
     groups: dict[tuple[object, ...], list[dict[str, object]]] = {}
@@ -1081,7 +1143,7 @@ def emit() -> Path:
             url="https://www.huntsvilleal.gov/",
             license="Public record",
         )
-        for link in CANVASSES:
+        for link in (*CANVASSES, *DECLARED):
             cs.artifact(raw.cached(SOURCE, link), canvass)
         made = pl.read_parquet(PARSED / "polities.parquet")
         repeated = set(made.filter(pl.col("display").is_duplicated())["display"].to_list())
@@ -1334,7 +1396,7 @@ def emit() -> Path:
                     electoral_system_id=systems[
                         "two_round" if st == "AL" and magnitude == 1 else "fptp" if magnitude == 1 else "block"
                     ],
-                    default_result_kind="counted",
+                    default_result_kind="tacit" if row["tacit"] else "counted",
                     term="remainder" if row["remainder"] else "full",
                 )
                 name(
@@ -1376,7 +1438,7 @@ def emit() -> Path:
                 election_id=election,
                 contest_id=contest,
                 stage="certified",
-                kind="counted",
+                kind="tacit" if row["tacit"] else "counted",
                 status="active",
                 source_id=canvass if row["publisher"] == CITY else sources[row["county"]],
                 is_default=True,
@@ -1386,9 +1448,15 @@ def emit() -> Path:
                 "note",
                 entity_id=result_set,
                 kind="methodology",
-                body_md=(CANVASS if row["publisher"] == CITY else METHOD if precise else TOTALS).format(
-                    publisher=row["publisher"]
-                ),
+                body_md=(
+                    DECLARED_NOTE
+                    if row["tacit"]
+                    else CANVASS
+                    if row["publisher"] == CITY
+                    else METHOD
+                    if precise
+                    else TOTALS
+                ).format(publisher=row["publisher"]),
             )
             totals = (
                 counted.filter(pl.col("place").is_null())
@@ -1462,6 +1530,9 @@ def emit() -> Path:
                     )
                 ranked.append((votes, option))
             if result_set not in cs.minted and result_set not in zeroed:
+                continue
+            if row["tacit"]:
+                cs.add("outcome", result_set_id=result_set, option_id=ranked[0][1], kind="elected", seats=1)
                 continue
             if question:
                 if len(ranked) == 2 and ranked[0][0] != ranked[1][0]:
