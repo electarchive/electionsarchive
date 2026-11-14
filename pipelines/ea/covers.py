@@ -110,8 +110,14 @@ back(id, depth) as (
 )
 select array(select distinct id from back), array(select id from named), array(select id from merged)"""
 
-DROP = """delete from contest_top
-where contest_id = any(%(contests)s::uuid[]) or inferred && %(named)s::uuid[] or refs && %(merged)s::uuid[]"""
+DROP = """with hit(id) as (
+  select unnest(%(contests)s::uuid[])
+  union select t.contest_id from unnest(%(named)s::uuid[]) n(id)
+        cross join lateral (select contest_id from contest_top where inferred @> array[n.id] offset 0) t
+  union select t.contest_id from unnest(%(merged)s::uuid[]) n(id)
+        cross join lateral (select contest_id from contest_top where refs @> array[n.id] offset 0) t
+)
+delete from contest_top where contest_id = any(array(select id from hit))"""
 
 
 def uncover(
