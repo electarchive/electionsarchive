@@ -4,6 +4,7 @@ import itertools
 import json
 import re
 import time
+from collections.abc import Mapping
 from datetime import UTC, date, datetime
 from pathlib import Path
 from urllib.parse import parse_qs, urlencode, urlparse
@@ -89,7 +90,7 @@ def bundle_url(year: int, secim_turu: int) -> str:
     )
 
 
-def get(client: httpx.Client, path: str, query: dict[str, int]) -> Rows:
+def get(client: httpx.Client, path: str, query: Mapping[str, int | str]) -> Rows:
     url = f"{API}{path}?{urlencode(query)}"
     for wait in (2, 5, 15, 40, 90, 180):
         try:
