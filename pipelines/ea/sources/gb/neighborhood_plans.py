@@ -120,6 +120,7 @@ HTML = (
     "-neighbourhood-planning-referendum-results-15-december-2022",
     "/sherington-neighbourhood-plan",
     "/woughton-community-council-neighbourhood-plan",
+    "/thame-second-neighbourhood-plan-yes-vote/",
 )
 CONTEXT = {
     "residential": (
