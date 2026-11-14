@@ -552,6 +552,12 @@
       "url": "https://www.sg.ch/politik-verwaltung/gemeinden/gemeindeorganisation.html",
       "kind": "official_body"
     },
+    "ti-cancelleria-comunali-2024": {
+      "title": "Elezioni comunali del 14 aprile 2024 (comunicato della Cancelleria dello Stato, 9 febbraio 2024)",
+      "publisher": "Repubblica e Cantone Ticino, Cancelleria dello Stato",
+      "url": "https://www4.ti.ch/tich/area-media/comunicati/dettaglio-comunicato?NEWS_ID=235489",
+      "kind": "official_body"
+    },
     "fr-scom-cg": {
       "title": "Communes dotées d'un conseil général / Gemeinden mit Generalrat: Historique / Übersicht (état au 1er avril 2026)",
       "publisher": "État de Fribourg, Service des communes",
@@ -2750,6 +2756,13 @@
           "value": 31,
           "source": "fr-scom-cg",
           "locator": "Total line \"Conseils généraux (CG) / Generalräte (GR)\", column 2026 (état au 1er avril 2026)"
+        },
+        {
+          "within": "CH-TI",
+          "date": "2024-04-14",
+          "value": 88,
+          "source": "ti-cancelleria-comunali-2024",
+          "locator": "Consigli comunali: 80 contested, 7 tacit, and 1 deferred (Lavizzara), while 9 communes (Vico Morcote, Bedretto, Bosco Gurin, Campo Vallemaggia, Cerentino, Dalpe, Linescio, Aranno, and Mergoscia) have an Assemblea comunale; the nine communes with elections deferred to 2025 for mergers are listed separately and not counted"
         },
         {
           "within": "CH-VD",
