@@ -2352,9 +2352,7 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
           ? modeled
           : (recent - unit.margin) * (modeled - toward) > 0
             ? toward
-            : unit.pacedLead == null
-              ? modeled
-              : modeled + MODEL.late.follow * (toward - modeled);
+            : modeled + MODEL.late.follow * (toward - modeled);
       const lead = clamp(
         aimed +
           (shift * reach + mode * (1 - fraction)) * final +
