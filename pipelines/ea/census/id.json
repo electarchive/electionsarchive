@@ -956,6 +956,8 @@
         "unit": "polity"
       },
       "source": "uu3-2024",
+      "disposition": "blocked",
+      "disposition_reason": "Each village's election committee (panitia pemilihan) tallies and announces its own result under Permendagri 112/2014, and each regency sets its own dates; no national body compiles or publishes the returns, and the 75,000 village results are scattered across regency offices and local news.",
       "locator": "https://peraturan.bpk.go.id/Details/283617/uu-no-3-tahun-20248 (Pasal 39: eight-year term, at most two terms)",
       "note": "About 75,000 desa elect a head (kelurahan heads are appointed civil servants), simultaneously within each regency on dates the regency sets (UU 6/2014 Pasal 31), for six-year terms until April 2024 and eight-year terms since. Regencies run them through ad hoc committees; results are announced by each village's committee and rarely published.",
       "match": [
