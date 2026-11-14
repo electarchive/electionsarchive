@@ -117,10 +117,10 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.037,
-        0.79,
-        0.222,
-        0.947
+        0.038,
+        0.774,
+        0.22,
+        0.982
       ],
       "hint": "Read only the table headed 'FOR GOVERNOR OF MARYLAND'; ignore any other table visible in the image."
     },
@@ -161,10 +161,10 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.017,
-        0.756,
-        0.207,
-        0.91
+        0.023,
+        0.774,
+        0.204,
+        0.984
       ],
       "hint": "Read only the table headed 'FOR UNITED STATES SENATOR FROM MARYLAND'; ignore any other table visible in the image."
     },
@@ -300,10 +300,10 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.122,
-        0.791,
-        0.968,
-        0.9
+        0.02,
+        0.774,
+        0.2,
+        0.973
       ],
       "hint": "Read only the table headed 'Fifth Congressional District of Maryland'; ignore any other table visible in the image.",
       "wards": "24510"
@@ -325,10 +325,10 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.122,
-        0.892,
-        0.868,
-        0.979
+        0.02,
+        0.774,
+        0.2,
+        0.973
       ],
       "hint": "Read only the table headed 'Sixth Congressional District of Maryland'; ignore any other table visible in the image.",
       "wards": "24510"
