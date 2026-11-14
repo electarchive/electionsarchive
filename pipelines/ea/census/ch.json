@@ -9774,7 +9774,9 @@
           "within": "CH-SO",
           "term_years": 4,
           "source": "so-gg",
-          "locator": "GG SO § 89 Abs. 1 lit. a (a Gemeindeparlament is elected at the ballot box); KV SO Art. 61 Abs. 1 (four years)"
+          "locator": "GG SO § 89 Abs. 1 lit. a (a Gemeindeparlament is elected at the ballot box); KV SO Art. 61 Abs. 1 (four years); all communes elected together for the term starting 2025",
+          "period_years": 4,
+          "phase": 1
         },
         {
           "within": "CH-BL",
@@ -9792,7 +9794,9 @@
           "within": "CH-AR",
           "term_years": 4,
           "source": "ar-gg",
-          "locator": "GG AR Art. 7 Abs. 1: members elected by the voters serve the cantonal term, four years"
+          "locator": "GG AR Art. 7 Abs. 1: members elected by the voters serve the cantonal term, four years; Art. 5 Abs. 1: all communes hold their general elections on the same day, and the term begins on 1 June; all communes elected together for the term from 1 June 2023",
+          "period_years": 4,
+          "phase": 3
         },
         {
           "within": "CH-SG",
@@ -9851,8 +9855,10 @@
           "within": "CH-JU",
           "term_years": 5,
           "source": "kv-ju",
-          "locator": "Cst. JU art. 65 (five years); art. 74 (the voters elect the conseillers généraux by proportional representation)",
-          "valid_from": "2010-07-01"
+          "locator": "Cst. JU art. 65 (five years); art. 74 (the voters elect the conseillers généraux by proportional representation); all communes elected together on 23 Oct 2022 (LDP art. 22 al. 2)",
+          "valid_from": "2010-07-01",
+          "period_years": 5,
+          "phase": 2
         },
         {
           "within": "CH-FR",
@@ -10108,7 +10114,8 @@
           "within": "CH-NE",
           "term_years": 4,
           "source": "kv-ne",
-          "locator": "Cst. NE art. 95: the conseil communal serves four years, and each commune decides whether its voters or its conseil général elect it, so no cantonwide popular election applies"
+          "locator": "Cst. NE art. 95: the conseil communal serves four years, and each commune decides whether its voters or its conseil général elect it, so no cantonwide popular election applies",
+          "period_years": 4
         },
         {
           "within": "CH-GE",
