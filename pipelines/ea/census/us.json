@@ -391,9 +391,7 @@
     {"class": "president", "period_years": 4, "source": "constitution", "locator": "U.S. Const. art. II, § 1, cl. 1: the President holds office for a four-year term"},
     {"class": "us_senate", "period_years": 6, "source": "constitution", "locator": "U.S. Const. art. I, § 3, cl. 1: a senator's term is six years"},
     {"class": "governor", "period_years": 4, "source": "bots-governors", "locator": "Table 4.1: a four-year term in 48 states"},
-    {"class": "statewide_exec", "period_years": 4, "source": "bots-executives", "locator": "Table 6.1: most statewide executive officials serve four-year terms"},
-    {"class": "state_upper", "period_years": 4, "source": "bots-legislators", "locator": "Table 6.2: a four-year senate term in most states"},
-    {"class": "state_lower", "period_years": 2, "source": "bots-legislators", "locator": "Table 6.2: a two-year house term in most states"}
+    {"class": "statewide_exec", "period_years": 4, "source": "bots-executives", "locator": "Table 6.1: most statewide executive officials serve four-year terms"}
   ],
   "classes": [
     {
@@ -614,6 +612,10 @@
       },
       "chambers": [
         {"states": "LA MS VA", "period_years": 4, "phase": 3, "term_years": 4},
+        {"states": "AZ CT GA ID ME MA NH NY NC RI SD VT GU VI", "period_years": 2, "phase": 0, "term_years": 2, "locator": "Table 6.2, {name} row: the whole senate is elected in every even-numbered year of 2022 to 2026"},
+        {"states": "AK AR CA CO DE FL HI IL IN IA KY MN MO MT NE NV ND OH OK OR PA TN TX UT WA WV WI WY", "period_years": 2, "phase": 0, "term_years": 4, "locator": "Table 6.2, {name} row: staggered four-year terms, with seats up in each even-numbered year"},
+        {"states": "AL MD MI", "period_years": 4, "phase": 2, "term_years": 4, "locator": "Table 6.2, {name} row: the whole senate is elected in 2022 and 2026, none in 2024"},
+        {"states": "KS NM SC PR", "period_years": 4, "phase": 0, "term_years": 4, "locator": "Table 6.2, {name} row: the whole senate is elected in 2024, none in 2022 or 2026"},
         {"states": "MP", "period_years": 2, "phase": 0, "term_years": 4, "source": "cnmi-constitution", "locator": "CNMI Const. art. II, § 2: nine senators, three per senatorial district, serve staggered four-year terms, so a third or two thirds of the seats are up at each even-year election"},
         {"states": "NJ", "period_years": 4, "phase": 1, "term_years": 4, "valid_from": "2012-01-01", "valid_to": "2022-01-01", "source": "nj-constitution", "locator": "N.J. Const. art. IV, § II, ¶ 1: senators serve four-year terms, except a two-year first term after each decennial census, so the 2011 apportionment set elections in 2011, 2013, 2017, and 2021"},
         {"states": "NJ", "period_years": 4, "phase": 3, "term_years": 4, "valid_from": "2022-01-01", "valid_to": "2032-01-01", "source": "nj-constitution", "locator": "N.J. Const. art. IV, § II, ¶ 1: after the 2021 two-year term, senators elected in 2023 and 2027 serve four-year terms until the post-2030 census term"}
@@ -634,6 +636,9 @@
       },
       "chambers": [
         {"states": "LA MS", "period_years": 4, "phase": 3, "term_years": 4},
+        {"states": "AK AZ AR CA CO CT DE FL GA HI ID IL IN IA KS KY ME MA MI MN MO MT NH NM NY NC ND OH OK OR PA RI SC SD TN TX UT VT WA WV WI WY AS", "period_years": 2, "phase": 0, "term_years": 2, "locator": "Table 6.2, {name} row: the whole house is elected in every even-numbered year of 2022 to 2026"},
+        {"states": "AL MD", "period_years": 4, "phase": 2, "term_years": 4, "locator": "Table 6.2, {name} row: the whole house is elected in 2022 and 2026, none in 2024"},
+        {"states": "PR", "period_years": 4, "phase": 0, "term_years": 4, "locator": "Table 6.2, {name} row: the whole house is elected in 2024, none in 2022 or 2026"},
         {"states": "MP", "period_years": 2, "phase": 0, "term_years": 2, "source": "cnmi-constitution", "locator": "CNMI Const. art. II, § 2: representatives serve two-year terms"},
         {"states": "VA NJ", "period_years": 2, "phase": 1, "term_years": 2}
       ]
