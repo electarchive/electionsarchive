@@ -123,6 +123,7 @@ const EACH = 2;
 const FETCHERS = 6;
 const PREVIEWS = 3;
 const SHED = 24;
+const CROWDED = 36;
 const BURST = 240;
 const RATE = 4;
 const BUDGET = 300;
@@ -433,9 +434,13 @@ function track(response: Response, done: () => void) {
   });
 }
 
-function crawl(pool: string, limit: number, isShared = true) {
+function crawl(pool: string, limit: number, isShared = true, ceiling = SHED) {
   const mine = pools.get(pool) ?? 0;
-  if (mine >= limit || (isShared && crawling >= CRAWLERS) || inFlight >= SHED) {
+  if (
+    mine >= limit ||
+    (isShared && crawling >= CRAWLERS) ||
+    inFlight >= ceiling
+  ) {
     return null;
   }
   pools.set(pool, mine + 1);
@@ -536,7 +541,7 @@ async function admit(request: Request, pathname: string) {
     }
     const release =
       operator.isFetcher === true
-        ? crawl(operator.name, FETCHERS, false)
+        ? crawl(operator.name, FETCHERS, false, CROWDED)
         : crawl(operator.name, EACH);
     return release == null
       ? ({ status: 503 } as const)
@@ -568,10 +573,11 @@ async function admit(request: Request, pathname: string) {
   }
   const key = await keyed(request.headers);
   const scale = key == null ? 1 : KEYED;
-  const outcome = limit(
-    key == null ? bucket(address, version) : `key:${key}`,
-    scale,
-  );
+  const name = key == null ? bucket(address, version) : `key:${key}`;
+  if (key == null && inFlight >= CROWDED && !clients.has(name)) {
+    return { status: 503 } as const;
+  }
+  const outcome = limit(name, scale);
   return typeof outcome === "number"
     ? ({ status: 429, wait: outcome, scale } as const)
     : ({ status: 200, release: outcome } as const);
