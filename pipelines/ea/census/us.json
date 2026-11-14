@@ -60,6 +60,7 @@
     "gov-law-or": {"publisher": "Oregon State Legislature", "title": "Oregon Constitution", "url": "https://www.oregonlegislature.gov/bills_laws/Pages/OrConst.aspx", "kind": "official_body"},
     "gov-law-va": {"publisher": "Virginia Legislative Information System", "title": "Constitution of Virginia", "url": "https://law.lis.virginia.gov/constitution/article5/section1/", "kind": "official_body"},
     "gov-law-gu": {"publisher": "U.S. Government Publishing Office", "title": "48 U.S.C. § 1422: Governor and Lieutenant Governor of Guam", "url": "https://www.govinfo.gov/link/uscode/48/1422", "kind": "official_body"},
+    "gca-5-40": {"publisher": "Compiler of Laws, Guam", "title": "5 GCA Chapter 40: Mayors of Guam (2024 compilation)", "url": "https://statecodesfiles.justia.com/guam/2024/title-5/division-4/chapter-40/chapter-40.pdf", "kind": "official_body"},
     "gov-law-gu-leg": {"publisher": "U.S. Government Publishing Office", "title": "48 U.S.C. § 1423a: Legislature of Guam", "url": "https://www.govinfo.gov/link/uscode/48/1423a", "kind": "official_body"},
     "gov-law-vi": {"publisher": "U.S. Government Publishing Office", "title": "48 U.S.C. § 1591: Governor and Lieutenant Governor of the Virgin Islands", "url": "https://www.govinfo.gov/link/uscode/48/1591", "kind": "official_body"},
     "gov-law-id": {"publisher": "Idaho Legislature", "title": "Constitution of the State of Idaho, Article IV", "url": "https://legislature.idaho.gov/statutesrules/idconst/ArtIV/Sect1", "kind": "official_body"},
@@ -1313,10 +1314,13 @@
       "name": "Guam mayors and vice mayors",
       "category": "council",
       "goal": "local",
-      "source": "gov-law-gu-leg",
-      "locator": "https://www.govinfo.gov/link/uscode/48/1423a",
-      "note": "One mayor and one vice mayor for each of the 19 villages, elected at the island's general election. No cadence is recorded until the Guam Code Annotated term provision is read.",
-      "match": [{"within": "US-GU", "office_kinds": ["mayor", "deputy_mayor"], "polity_kinds": ["municipality"], "precedence": 3}]
+      "source": "gca-5-40",
+      "locator": "5 GCA § 40104",
+      "note": "One mayor and one vice mayor for each of the 19 villages, elected at the island's regular general election in November every fourth year.",
+      "match": [{"within": "US-GU", "office_kinds": ["mayor", "deputy_mayor"], "polity_kinds": ["municipality"], "precedence": 3}],
+      "cadence": [
+        {"within": "US-GU", "government_kind": "municipality", "period_years": 4, "phase": 0, "month": 11, "day_rule": "nov_tuesday_after_first_monday", "term_years": 4, "source": "gca-5-40", "locator": "5 GCA § 40104: an election of Mayors and Vice Mayors at the regular general election in November 1952 and in every fourth year thereafter, for a term of four years; § 40111(a): the term begins on the first Monday in January after the election"}
+      ]
     }
   ]
 }
