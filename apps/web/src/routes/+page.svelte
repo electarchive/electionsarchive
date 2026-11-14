@@ -12,6 +12,7 @@
   import type { PageData } from "./$types";
   import Lead from "./lead.svelte";
   import Strata from "./strata.svelte";
+  import World from "./world.svelte";
 
   const { data }: { data: PageData } = $props();
 
@@ -487,6 +488,52 @@
     {/if}
   </header>
 
+  <section
+    class="grid gap-5 border-be px-3.5 pbs-8 pbe-8"
+    aria-labelledby="map-title"
+  >
+    <div class="grid gap-1.5">
+      <h2 id="map-title" class="heading">{m.home_map_title()}</h2>
+      <p
+        class="text-[0.8125rem] text-pretty text-muted-foreground max-inline-[72ch]"
+      >
+        {m.home_map_lede()}
+      </p>
+    </div>
+    <Island part={data.world} view="world">
+      {#snippet children(map)}
+        <World {map} />
+      {/snippet}
+    </Island>
+    {#if places.length > 0}
+      <div class="grid gap-2 pbs-2">
+        <h3
+          id="places-title"
+          class="text-xs font-semibold text-muted-foreground"
+        >
+          {m.home_places()}
+        </h3>
+        <ul class="columns-2 gap-x-6 text-sm sm:columns-3 lg:columns-5">
+          {#each places as polity (polity.id)}
+            <li
+              class="flex break-inside-avoid flex-wrap items-baseline gap-x-2 py-0.5"
+            >
+              <a
+                class="truncate font-semibold underline decoration-transparent underline-offset-4 hover:decoration-foreground"
+                href={resolve("/[...path]", { path: polity.path })}
+                >{polity.name}</a
+              >
+              <span
+                class="font-figures text-xs whitespace-nowrap text-muted-foreground tabular-nums"
+                >{m.home_since({ year: String(polity.first) })}</span
+              >
+            </li>
+          {/each}
+        </ul>
+      </div>
+    {/if}
+  </section>
+
   {#if data.strata != null}
     <section
       class="grid gap-5 border-be px-3.5 pbs-8 pbe-8"
@@ -602,27 +649,4 @@
       </ul>
     </section>
   </div>
-
-  {#if places.length > 0}
-    <section class="grid gap-3 px-3.5 pbs-6" aria-labelledby="places-title">
-      <h2 id="places-title" class="heading">{m.home_places()}</h2>
-      <ul class="columns-2 gap-x-6 text-sm sm:columns-3 lg:columns-5">
-        {#each places as polity (polity.id)}
-          <li
-            class="flex break-inside-avoid flex-wrap items-baseline gap-x-2 py-0.5"
-          >
-            <a
-              class="truncate font-semibold underline decoration-transparent underline-offset-4 hover:decoration-foreground"
-              href={resolve("/[...path]", { path: polity.path })}
-              >{polity.name}</a
-            >
-            <span
-              class="font-figures text-xs whitespace-nowrap text-muted-foreground tabular-nums"
-              >{m.home_since({ year: String(polity.first) })}</span
-            >
-          </li>
-        {/each}
-      </ul>
-    </section>
-  {/if}
 </main>

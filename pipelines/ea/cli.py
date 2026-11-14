@@ -91,6 +91,7 @@ def main() -> None:
         help="build only the OpenHistoricalMap layers from the daily planet of DATE (YYMMDD, such as 261111)",
     )
     commands.add_parser("glyphs", help="build the basemap label glyphs the app serves")
+    commands.add_parser("worldmap", help="build the home page's world map and Europe inset from Natural Earth")
     commands.add_parser(
         "hexes",
         help="build the hex tile maps the app serves",
@@ -338,6 +339,10 @@ def main() -> None:
                     print(basemap.build(scheme))
         case "glyphs":
             print(basemap.glyphs())
+        case "worldmap":
+            from ea import worldmap
+
+            print(worldmap.build())
         case "hexes":
             from ea import hexes
 
