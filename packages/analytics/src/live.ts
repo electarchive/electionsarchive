@@ -1550,6 +1550,7 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
         1 - (recent * (1 - drained) ** 0.5) / (MODEL.late.brisk * tail),
       );
   const settles = tailWeight * fade;
+  const stays = HOLDS[race.state] == null ? tailWeight : 1;
   const outstanding = found.map((unit) => {
     if (!isTail || unit.reported == null) {
       return null;
@@ -1963,8 +1964,7 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
               : Math.min(1, unit.step / (MODEL.late.stir * unit.total));
           finals[index] =
             unit.total +
-            (finals[index] - unit.total) *
-              (tailWeight + (1 - tailWeight) * stirred);
+            (finals[index] - unit.total) * (stays + (1 - stays) * stirred);
         }
         spills[index] = 0;
         if (isLate && unit.paced != null && unit.total > 0) {
