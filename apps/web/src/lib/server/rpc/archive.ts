@@ -9389,6 +9389,25 @@ export const contests = {
         },
       ] = counted.rows;
       const unitSchemes = async () => {
+        const kept = await db.execute<{
+          schemes: Array<{
+            code: string;
+            noun: string;
+            rank: number;
+            units: number;
+          }>;
+        }>(sql`
+          select coalesce(jsonb_agg(jsonb_build_object('code', u.code, 'noun', sc.noun, 'rank', sc.rank, 'units', u.units) order by u.code) filter (where sc.code is not null), '[]') as schemes
+          from contest_top t
+          left join lateral jsonb_to_recordset(t.units) u(code text, units int) on true
+          left join scheme sc on sc.code = u.code
+          where t.contest_id = ${contest.id}::uuid and t.units is not null
+          group by t.contest_id
+        `);
+        const [stored] = kept.rows;
+        if (stored != null) {
+          return stored.schemes;
+        }
         const active = await db.execute<{ k: number }>(sql`
           select k from result_set where contest_id = ${contest.id}::uuid and status = 'active' and ${served("result_set")}
         `);

@@ -2,7 +2,7 @@ import type { SQL } from "drizzle-orm";
 import { sql } from "drizzle-orm";
 import type { Cover } from "#lib/server/rpc/archive.js";
 import { db } from "#lib/server/db/index.js";
-import { cover, KEPT, topped } from "#lib/server/rpc/archive.js";
+import { cover, KEPT, served, topped } from "#lib/server/rpc/archive.js";
 
 const BATCH = 500;
 const SAMPLE = 5000;
@@ -32,10 +32,26 @@ const own = (ids: Array<string>) => sql`
   where r.id = any(${sql.param(ids)}::uuid[])
 `;
 
+const counts = (root: SQL) => sql`
+  coalesce((
+    select jsonb_agg(jsonb_build_object('code', u.code, 'units', u.units) order by u.code)
+    from (
+      select ru.scheme_code as code, count(*)::int as units
+      from (
+        select distinct v.unit_k from result_set rs
+        cross join lateral (select unit_k from result_value where result_set_k = rs.k offset 0) v
+        where rs.contest_id = ${root} and rs.status = 'active' and ${served("rs")}
+      ) x
+      join reporting_unit ru on ru.k = x.unit_k and ru.area_relation = 'within' and ru.kind = 'standard'
+      group by ru.scheme_code
+    ) u
+  ), '[]')
+`;
+
 const rebuilt = (ids: Array<string>) => {
   const input = own(ids);
   return sql`
-    select i.root, i.k,
+    select i.root, i.k, ${counts(sql`i.root`)} as units,
       coalesce(jsonb_agg(jsonb_build_object(
         'place', t.place, 'person', t.person, 'party', t.party, 'kind', t.kind, 'label', t.label,
         'measure', t.measure, 'votes', t.votes, 'total', t.total, 'won', t.won
@@ -89,10 +105,21 @@ const fillTops = async (ids: Array<string>) =>
   locked(
     "contest_top",
     sql`
-      insert into contest_top (contest_id, area_k, tops, inferred, refs)
-      select b.root, b.k, b.tops, b.inferred, b.refs from (${rebuilt(ids)}) b
+      insert into contest_top (contest_id, area_k, tops, inferred, refs, units)
+      select b.root, b.k, b.tops, b.inferred, b.refs, b.units from (${rebuilt(ids)}) b
       on conflict (contest_id) do nothing
       returning contest_id
+    `,
+    ids.length,
+  );
+
+const fillUnits = async (ids: Array<string>) =>
+  locked(
+    "contest_top",
+    sql`
+      update contest_top t set units = ${counts(sql`t.contest_id`)}
+      where t.contest_id = any(${sql.param(ids)}::uuid[]) and t.units is null
+      returning t.contest_id
     `,
     ids.length,
   );
@@ -133,11 +160,12 @@ type Built = {
   k: number;
   tops: unknown;
   inferred: Array<string>;
+  units: unknown;
 };
 
 async function auditTops() {
   const stored = await db.execute<Built>(sql`
-    select t.contest_id as root, t.area_k as k, t.tops, t.inferred
+    select t.contest_id as root, t.area_k as k, t.tops, t.inferred, t.units
     from contest_top t tablesample bernoulli (1) limit ${SAMPLE}
   `);
   const fresh = new Map<string, Built>();
@@ -152,9 +180,16 @@ async function auditTops() {
   const stale: Array<string> = [];
   for (const row of stored.rows) {
     const now = fresh.get(row.root);
-    const kept = JSON.stringify([row.k, row.tops, row.inferred]);
+    const kept = JSON.stringify([row.k, row.tops, row.inferred, row.units]);
     const current =
-      now == null ? null : JSON.stringify([now.k, now.tops, now.inferred]);
+      now == null
+        ? null
+        : JSON.stringify([
+            now.k,
+            now.tops,
+            now.inferred,
+            row.units == null ? null : now.units,
+          ]);
     if (kept !== current) {
       stale.push(row.root);
       console.error(
@@ -198,9 +233,23 @@ async function refillTops() {
       );
     }
   }
+  const bare = await db.execute<{ id: string }>(sql`
+    select contest_id as id from contest_top where units is null order by contest_id
+  `);
+  let counted = 0;
+  for (let start = 0; start < bare.rows.length; start += BATCH) {
+    counted += await fillUnits(
+      bare.rows.slice(start, start + BATCH).map((row) => row.id),
+    );
+    if (start % (BATCH * 100) === 0) {
+      console.warn(
+        `${Math.min(start + BATCH, bare.rows.length)} of ${bare.rows.length} unit counts`,
+      );
+    }
+  }
   await db.execute(sql`analyze contest_top`);
   const { checked, stale } = await auditTops();
-  return `${built} race tops built, ${orphans.rows.length} orphans removed, ${stale} of ${checked} sampled rows stale and removed, in ${Math.round((Date.now() - started) / 1000)}s`;
+  return `${built} race tops built, ${counted} unit counts filled, ${orphans.rows.length} orphans removed, ${stale} of ${checked} sampled rows stale and removed, in ${Math.round((Date.now() - started) / 1000)}s`;
 }
 
 async function refillCovers() {
