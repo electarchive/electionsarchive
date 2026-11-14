@@ -125,6 +125,109 @@ COUNCILS["E07000181"] = {
     "files": ["https://www.westoxon.gov.uk/media/kykluq1i/2026-notice-of-uncontested-election-parish.pdf"],
     "reader": "notices",
 }
+HART = "https://www.hart.gov.uk"
+COUNCILS["E07000084"] = {
+    "day": date(2026, 5, 7),
+    "publisher": "Basingstoke and Deane Borough Council",
+    "title": "Notices of uncontested election, parish councils, 7 May 2026",
+    "url": "https://www.basingstoke.gov.uk/county-borough-parish-elections",
+    "files": [
+        f"https://www.basingstoke.gov.uk/content/page/{id}/Notice%20of%20Uncontested%20Election%20-%20{name}.pdf"
+        for id, name in (
+            (92922, "Ashmansworth"),
+            (92923, "Bishops%20Green%20Parish%20Ward"),
+            (92924, "Burghclere"),
+            (92925, "East%20Woodhay"),
+            (92926, "Ecchinswell%20Parish%20Ward"),
+            (92927, "Highclere%20Parish%20Ward"),
+            (92928, "Newtown"),
+            (92929, "Penwood%20Parish%20Ward"),
+            (92930, "St%20Mary%20Bourne"),
+        )
+    ],
+    "areas": {
+        "Bishops Green": ("Ecchinswell, Sydmonton and Bishops Green", "Bishops Green"),
+        "Ecchinswell": ("Ecchinswell, Sydmonton and Bishops Green", "Ecchinswell"),
+        "Highclere Parish Ward": ("Highclere", "Highclere"),
+        "Penwood Parish Ward": ("Highclere", "Penwood"),
+    },
+    "reader": "notices",
+}
+COUNCILS["E06000001"] = {
+    "day": date(2026, 5, 7),
+    "publisher": "Hartlepool Borough Council",
+    "title": "Declaration of result of poll, Elwick Parish, 7 May 2026",
+    "url": "https://www.hartlepool.gov.uk/downloads/file/1535/elwick-parish-election-results-7-may-2026",
+    "polls": ["https://www.hartlepool.gov.uk/downloads/file/1535/elwick-parish-election-results-7-may-2026"],
+    "order": "upper-last",
+    "areas": {"ELWICK PARISH": ("Elwick", None)},
+    "reader": "declarations",
+}
+COUNCILS["E07000089"] = {
+    "day": date(2026, 5, 7),
+    "publisher": "Hart District Council",
+    "title": "Notice of uncontested town and parish elections, and the declaration of result for Fleet Town Council, 7 May 2026",
+    "url": f"{HART}/voting-and-elections/7-may-2026-election-results",
+    "files": [
+        f"https://web.archive.org/web/2026id_/{HART}/sites/default/files/2026-04/Notice-of-Uncontested-Town-and-Parish-Elections-2026.pdf"
+    ],
+    "polls": [f"{HART}/sites/default/files/2026-05/7-may-2026-declaration-results-fleet-town-council-calthorpe.pdf"],
+    "order": "upper-first",
+    "areas": {
+        "Calthorpe": ("Fleet", "Calthorpe"),
+        "Fleet Town Council - Ancells": ("Fleet", "Ancells"),
+        "Fleet Town Council - Courtmoor": ("Fleet", "Courtmoor"),
+        "Fleet Town Council - Fleet Central": ("Fleet", "Fleet Central"),
+        "Fleet Town Council - Pondtail": ("Fleet", "Pondtail"),
+        "Church Crookham - Church Crookham East": ("Church Crookham", "Church Crookham East"),
+        "Church Crookham - Gally Hill": ("Church Crookham", "Gally Hill"),
+        "Church Crookham - Queen Elizabeth": ("Church Crookham", "Queen Elizabeth"),
+        "Elvetham Heath - Elvetham Heath East": ("Elvetham Heath", "Elvetham Heath East"),
+        "Elvetham Heath - Elvetham Heath West": ("Elvetham Heath", "Elvetham Heath West"),
+        "Long Sutton & Well": ("Long Sutton", None),
+    },
+    "reader": "notices+declarations",
+}
+COUNCILS["E07000071"] = {
+    "day": date(2026, 5, 7),
+    "publisher": "Colchester City Council",
+    "title": "Parish elections 7 May 2026: notices of uncontested election and the East Mersea declaration of result",
+    "url": "https://new.colchester.gov.uk/elections/upcoming-elections/parish-elections-7-may-2026",
+    "files": [
+        "https://cbccrmdata.blob.core.windows.net/noteattachment/CBC-null-Uncontested-Notices-Uncontested%20Notices.pdf"
+    ],
+    "pages": ["https://new.colchester.gov.uk/elections/2026-election-results/east-mersea-parish-elections-results"],
+    "poll": "East Mersea",
+    "reader": "colchester+colchester_poll",
+}
+COUNCILS["E07000118"] = {
+    "day": date(2026, 5, 7),
+    "publisher": "Chorley Borough Council",
+    "title": "Statement of uncontested elections, parish, 7 May 2026",
+    "url": "https://chorley.gov.uk/downloads/file/1760/statement-of-uncontested-elections-parish",
+    "files": ["https://chorley.gov.uk/downloads/file/1760/statement-of-uncontested-elections-parish"],
+    "areas": {
+        "EUXTON BUCKSHAW VILLAGE Parish Ward": ("Euxton", "Buckshaw Village"),
+        "EUXTON NORTH & EAST Parish Ward": ("Euxton", "North & East"),
+        "EUXTON SOUTH Parish Ward": ("Euxton", "South"),
+        "HEAPEY Parish": ("Heapey", None),
+        "MAWDESLEY Parish": ("Mawdesley", None),
+        "WHEELTON Parish": ("Wheelton", None),
+        "WHITTLE-LE-WOODS EAST Parish Ward": ("Whittle-le-Woods", "East"),
+        "WHITTLE-LE-WOODS WEST Parish Ward": ("Whittle-le-Woods", "West"),
+    },
+    "reader": "chorley",
+}
+COUNCILS["E07000086"] = {
+    "day": date(2026, 5, 7),
+    "publisher": "Eastleigh Borough Council",
+    "title": "Parish and town councils: declaration of results, 7 May 2026",
+    "url": "https://www.eastleigh.gov.uk/media/16662/parish-and-town-councils-declaration-of-results.pdf",
+    "files": ["https://www.eastleigh.gov.uk/media/16662/parish-and-town-councils-declaration-of-results.pdf"],
+    "order": "comma",
+    "reader": "declarations",
+}
+POST_NOMINALS = re.compile(r"^(?:[A-Z]{2,5}\.\s+)+")
 BROWSER = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36"
 PARTIES: dict[str, str | None] = {
     "": None,
@@ -147,7 +250,11 @@ ALIASES = {
     ("E07000011", "Leighton Bromswold"): "Leighton",
     ("E07000181", "Asthal"): "Asthall",
 }
-GROUPED = {("E07000011", "Great and Little Gidding")}
+GROUPED = {
+    ("E07000011", "Great and Little Gidding"),
+    ("E07000071", "Abberton and Langenhoe"),
+    ("E07000071", "Winstred Hundred"),
+}
 CONTEXT = (
     "England's parish and town councils are elected every four years, ward by ward where a parish is warded, by "
     "block vote, on the day of the principal council's elections. Where no more candidates are nominated than there "
@@ -161,7 +268,7 @@ UNSTATED = (
 
 def fetch() -> None:
     for council in COUNCILS.values():
-        for url in council.get("files", []) + council.get("pages", []):
+        for url in council.get("files", []) + council.get("polls", []) + council.get("pages", []):
             try:
                 raw.cached(SOURCE, url)
                 continue
@@ -169,7 +276,7 @@ def fetch() -> None:
                 pass
             response = httpx.get(url, headers={"User-Agent": BROWSER}, timeout=120, follow_redirects=True)
             response.raise_for_status()
-            pdf = url in council.get("files", [])
+            pdf = url not in council.get("pages", [])
             if pdf != response.content.startswith(b"%PDF"):
                 raise ValueError(f"{url} is not the expected {'PDF' if pdf else 'page'}")
             raw.store(
@@ -300,7 +407,7 @@ def surname_first(printed: str) -> str:
 
 def area_of(page: str) -> tuple[str, str, str | None] | None:
     heading = re.search(
-        r"Election of (?:a )?(Parish|Town) Councillors? for(?: the)?\s*\n\s*(.+?)(?:\s*\n\s*|\s+)on(?=\s*\n|\s+(?:\d|Thursday))",
+        r"Election of (?:a )?(?:(Parish|Town) )?Councillors? for(?: the)?\s*\n\s*(.+?)(?:\s*\n\s*|\s+)on(?=\s*\n|\s+(?:\d|Thursday))",
         page,
     )
     if heading is None:
@@ -316,7 +423,7 @@ def area_of(page: str) -> tuple[str, str, str | None] | None:
     if area.isupper():
         area = area.title()
     ward = re.fullmatch(r"(.+?) \((.+)\)", area)
-    return heading.group(1), *((ward.group(1), ward.group(2)) if ward else (area, None))
+    return heading.group(1) or "Parish", *((ward.group(1), ward.group(2)) if ward else (area, None))
 
 
 def notices(lad: str, council: dict) -> list[dict]:
@@ -328,6 +435,7 @@ def notices(lad: str, council: dict) -> list[dict]:
             heading = area_of(page)
             if heading is not None and "(surname first)" in page:
                 style, parish, ward = heading
+                parish, ward = council.get("areas", {}).get(parish, (parish, ward))
                 body = page.split("(surname first)")[1].split("Returning Officer")[0]
                 lines = [re.split(r"\s{2,}", line)[0] for line in body.split("\n")[1:] if line[:1].strip()][:-1]
                 if not lines or len(lines) % 2:
@@ -349,7 +457,7 @@ def notices(lad: str, council: dict) -> list[dict]:
                         "page": number,
                         "style": style,
                         "parish": parish,
-                        "ward": None,
+                        "ward": ward,
                         "uncontested": False,
                         "places": None,
                         "electorate": None,
@@ -370,6 +478,7 @@ def notices(lad: str, council: dict) -> list[dict]:
                 header = 0.0
             else:
                 style, parish, ward = heading
+                parish, ward = council.get("areas", {}).get(parish, (parish, ward))
                 header = max(y for x, y, word in words if word == "Candidate" and x < 260 and y < 300)
                 name_limit, description_x = council.get("columns", (215, 375))
                 read: dict = {
@@ -489,7 +598,7 @@ def swindon(lad: str, council: dict) -> list[dict]:
             candidates.append(
                 {
                     "printed": printed,
-                    "name": f"{surname.group(2)} {display(surname.group(1))}",
+                    "name": f"{POST_NOMINALS.sub('', surname.group(2))} {display(surname.group(1))}",
                     "description": description,
                     "votes": count(figure.group(1)),
                     "elected": figure.group(2) is not None,
@@ -573,7 +682,277 @@ def rugby(lad: str, council: dict) -> list[dict]:
     return reads
 
 
-READERS = {"moderngov": moderngov, "notices": notices, "swindon": swindon, "rugby": rugby}
+def person(printed: str, order: str) -> str:
+    if order == "comma":
+        return surname_first(printed)
+    if order == "upper-first":
+        found = re.fullmatch(r"((?:[A-Z][A-Z'\u2019-]+\s+)*[A-Z][A-Z'\u2019-]+)\s+(\S.*)", printed)
+        if found is None:
+            raise ValueError(f"no surname in {printed}")
+        return f"{found.group(2)} {display(found.group(1))}"
+    found = re.fullmatch(r"(\S.*?)\s+((?:[A-Z][A-Z'\u2019-]+\s?)+)", printed)
+    if found is None:
+        raise ValueError(f"no surname in {printed}")
+    return f"{found.group(1)} {display(found.group(2).strip())}"
+
+
+def declarations(lad: str, council: dict) -> list[dict]:
+    order = council["order"]
+    reads: list[dict] = []
+    for url in council["polls"] if "polls" in council else council["files"]:
+        for number, (page, _) in enumerate(pdf_pages(url), start=1):
+            lines = page.split("\n")
+            if not any("DECLARATION OF RESULT OF POLL" in line for line in lines):
+                continue
+            start = next(i for i, line in enumerate(lines) if "Election of" in line)
+            owner = next(line.strip() for line in reversed(lines[:start]) if line.strip())
+            heading = []
+            for line in lines[start + 1 :]:
+                if not line.strip() or line.strip().startswith("on "):
+                    if heading:
+                        break
+                    continue
+                if line.strip() != "for":
+                    heading.append(line.strip())
+            area = " ".join(heading)
+            if area in council.get("areas", {}):
+                parish, ward = council["areas"][area]
+            else:
+                body = re.fullmatch(r"(.+) (?:Town|Parish) Council", owner)
+                if body is None:
+                    raise ValueError(f"{url} page {number}: no area for {owner} / {area}")
+                parish, ward = body.group(1), area.removesuffix(" Ward")
+            parish, ward = parish.replace("\u2019", "'"), ward and ward.replace("\u2019", "'")
+            top = next(i for i, line in enumerate(lines) if "Votes*" in line)
+            end = next(i for i, line in enumerate(lines) if line.startswith("* If elected"))
+            candidates: list[dict] = []
+            for line in lines[top + 1 : end]:
+                if not line.strip():
+                    continue
+                cells = re.split(r"\s{2,}", line.strip())
+                column_zero = not line[0].isspace()
+                rest = "  ".join(cells[1:] if column_zero else cells)
+                if column_zero:
+                    if candidates and (cells[0][0].islower() or cells[0].lower().startswith("commonly known as")):
+                        candidates[-1]["printed"] += f" {cells[0]}"
+                    else:
+                        printed = cells[0].replace("`", "'")
+                        candidates.append({"printed": printed, "description": "", "votes": None, "elected": False})
+                if rest:
+                    figure = re.fullmatch(r"(?:(.*?)\s{2,})?([\d,]+)(?:\s+(E|Elected))?", rest)
+                    if figure is None or not candidates:
+                        raise ValueError(f"{url} page {number}: cannot read {line.strip()!r}")
+                    candidates[-1] |= {
+                        "description": figure.group(1) or "",
+                        "votes": count(figure.group(2)),
+                        "elected": figure.group(3) is not None,
+                    }
+            declared = re.search(r"declare that(.*?)(?:is|are) duly elected", page, re.DOTALL)
+            marked = any(c["elected"] for c in candidates)
+            for candidate in candidates:
+                found = re.fullmatch(r"(.*?)\s*\(?commonly known as:?\s*(.*?)\)?", candidate["printed"], re.IGNORECASE)
+                main, known = found.groups() if found else (candidate["printed"], None)
+                if not marked and declared and main in " ".join(declared.group(1).split()):
+                    candidate["elected"] = True
+                candidate["name"] = person((known or main).replace("\u2019", "'"), order)
+                if known:
+                    candidate["printed"] = f"{main} commonly known as {known}"
+            figures = re.search(
+                r"Vacant Seats:\s*(\d+)\s+Electorate:\s*([\d,]+)\s+Ballot Papers Issued:\s*([\d,]+)", page
+            )
+            rejected = re.search(r"\n\s+Total\s+(\d+)\s*\n", page)
+            places = int(figures.group(1)) if figures else sum(c["elected"] for c in candidates)
+            if places != sum(c["elected"] for c in candidates):
+                raise ValueError(f"{url} page {number}: {places} seats, other elected count")
+            reads.append(
+                {
+                    "lad": lad,
+                    "url": url,
+                    "page": number,
+                    "style": None,
+                    "parish": parish,
+                    "ward": ward,
+                    "places": places,
+                    "electorate": count(figures.group(2)) if figures else None,
+                    "ballots": count(figures.group(3)) if figures else None,
+                    "rejected": int(rejected.group(1)) if rejected else None,
+                    "total": None,
+                    "remark": None,
+                    "candidates": candidates,
+                }
+            )
+    return reads
+
+
+def chorley(lad: str, council: dict) -> list[dict]:
+    reads: list[dict] = []
+    for url in council["files"]:
+        for number, (page, _) in enumerate(pdf_pages(url), start=1):
+            heading = re.search(
+                r"Election of Parish Councillors to(?: Parish Council)?\s*\n\s*(.+?)\s*\n\s*ON Thursday", page
+            )
+            if heading is None:
+                continue
+            parish, ward = council["areas"][heading.group(1)]
+            body = page.split("Names of persons elected")[1].split("If a candidate")[0].split("\n")[1:]
+            candidates: list[dict] = []
+            for line in body:
+                if not line[:3].strip():
+                    continue
+                cell = re.split(r"\s{2,}", line.strip())[0]
+                if cell.startswith("(Known as"):
+                    candidates[-1]["known"] = cell.removeprefix("(Known as ").removesuffix(")")
+                elif line[0] == " " and line[1] != " ":
+                    candidates.append({"printed": cell, "known": None})
+            if not candidates:
+                raise ValueError(f"{url} page {number}: no names")
+            reads.append(
+                {
+                    "lad": lad,
+                    "url": url,
+                    "page": number,
+                    "style": "Parish",
+                    "parish": parish,
+                    "ward": ward,
+                    "places": None,
+                    "electorate": None,
+                    "ballots": None,
+                    "rejected": None,
+                    "total": None,
+                    "remark": None,
+                    "candidates": [
+                        {
+                            "printed": (
+                                f"{c['printed']} commonly known as {c['known']}" if c["known"] else c["printed"]
+                            ),
+                            "name": c["known"] or surname_first(c["printed"]),
+                            "description": "",
+                            "votes": None,
+                            "elected": True,
+                        }
+                        for c in candidates
+                    ],
+                }
+            )
+    return reads
+
+
+def colchester(lad: str, council: dict) -> list[dict]:
+    reads: list[dict] = []
+    for url in council["files"]:
+        parish = ward = None
+        for number, (page, words) in enumerate(pdf_pages(url), start=1):
+            heading = re.search(r"Election of Parish Councillors to\s*\n\s*(.+?) Parish Council\s*\n", page)
+            if heading:
+                parish, ward = " ".join(heading.group(1).split()), None
+            elif parish is None:
+                continue
+            bottom = min((y for x, y, word in words if word == "Dated"), default=9999.0)
+            read: dict | None = None
+            pending: str | None = None
+            started = False
+            for line in rows_of(words, 0, bottom):
+                label = " ".join(word for _, _, word in line)
+                name = joined(line, 0, 215)
+                if label.startswith("Name of Candidate"):
+                    started = True
+                    ward = pending or ward
+                    pending = None
+                    read = next(
+                        (r for r in reads if r["parish"] == parish and r["ward"] == ward and r["url"] == url), None
+                    )
+                    if read is None:
+                        read = {
+                            "lad": lad,
+                            "url": url,
+                            "page": number,
+                            "style": "Parish",
+                            "parish": parish,
+                            "ward": ward,
+                            "places": None,
+                            "electorate": None,
+                            "ballots": None,
+                            "rejected": None,
+                            "total": None,
+                            "remark": None,
+                            "candidates": [],
+                        }
+                        reads.append(read)
+                    continue
+                if not name and label.endswith(" Ward"):
+                    pending = label.removesuffix(" Ward")
+                    started = False
+                    continue
+                if not started or read is None:
+                    continue
+                candidates = read["candidates"]
+                description = joined(line, 380, 999)
+                if re.fullmatch(r"[A-Z][A-Z'\u2019 -]*", name):
+                    candidates.append({"surname": name, "forenames": "", "description": ""})
+                elif name:
+                    candidates[-1]["forenames"] = f"{candidates[-1]['forenames']} {name}".strip()
+                if description:
+                    candidates[-1]["description"] = f"{candidates[-1]['description']} {description}".strip()
+    for read in reads:
+        for candidate in read["candidates"]:
+            candidate["printed"] = f"{candidate.pop('surname')}, {candidate.pop('forenames')}"
+            candidate["name"] = surname_first(candidate["printed"])
+            candidate |= {"votes": None, "elected": True}
+    return reads
+
+
+def colchester_poll(lad: str, council: dict) -> list[dict]:
+    url = council["pages"][0]
+    page = Path(raw.cached(SOURCE, url).path).read_text(encoding="utf-8")
+    body = page.split("<tbody>")[1].split("</tbody>")[0]
+    candidates = []
+    for row in re.findall(r"<tr>(.*?)</tr>", body, re.DOTALL):
+        name, description, votes = (text(cell) for cell in re.findall(r"<td>(.*?)</td>", row, re.DOTALL))
+        found = re.fullmatch(r"(.*?) commonly known as (.*)", name)
+        printed, known = found.groups() if found else (name, None)
+        figure = re.fullmatch(r"([\d,]+)( Elected)?", votes)
+        if figure is None:
+            raise ValueError(f"{url}: no votes in {votes}")
+        candidates.append(
+            {
+                "printed": f"{printed} commonly known as {known}" if known else printed,
+                "name": surname_first(known or printed),
+                "description": description,
+                "votes": count(figure.group(1)),
+                "elected": figure.group(2) is not None,
+            }
+        )
+    figures = dict(re.findall(r"(Vacant seats|Electorate|Ballot papers issued): ([\d,]+)", text(page)))
+    rejected = re.search(r"<strong>Total</strong></td>\s*<td>(\d+)", page)
+    return [
+        {
+            "lad": lad,
+            "url": url,
+            "page": None,
+            "style": "Parish",
+            "parish": council["poll"],
+            "ward": None,
+            "places": count(figures["Vacant seats"]),
+            "electorate": count(figures["Electorate"]),
+            "ballots": count(figures["Ballot papers issued"]),
+            "rejected": int(rejected.group(1)) if rejected else None,
+            "total": None,
+            "remark": None,
+            "candidates": candidates,
+        }
+    ]
+
+
+READERS = {
+    "moderngov": moderngov,
+    "notices": notices,
+    "swindon": swindon,
+    "rugby": rugby,
+    "declarations": declarations,
+    "chorley": chorley,
+    "colchester": colchester,
+    "colchester_poll": colchester_poll,
+}
 
 
 def parse() -> None:
