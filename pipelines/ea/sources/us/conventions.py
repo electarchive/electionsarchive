@@ -604,6 +604,19 @@ TABLES += [
     }
     for ballot in range(3, 19)
 ]
+EVENING_STAR_1924_JULY_9 = "batch_dlc_carmichael_ver01:data:sn83045462:00280657566:1924070901:0588"
+TABLES += [
+    {
+        "table": f"1924:democratic:b{ballot}",
+        "image": f"https://tile.loc.gov/image-services/iiif/service:ndnp:dlc:{EVENING_STAR_1924_JULY_9}/full/pct:50/0/default.jpg",
+        "release": "https://www.loc.gov/resource/sn83045462/1924-07-09/ed-1/?sp=4",
+        "leaves": (1,),
+        "ballot": ballot,
+        "transcribed": "conventions_new_york_1924.tsv",
+        "short": True,
+    }
+    for ballot in range(93, 104)
+]
 EVENING_STAR_1960 = "https://www.loc.gov/resource/sn83045462/1960-07-14/ed-1/?sp=8"
 TABLES += [
     {
@@ -786,6 +799,19 @@ EVENING_STAR_1928_CAVEAT = (
     "Smith (849\u2154), Walter F. George, James A. Reed, Cordell Hull, Jesse H. Jones, and the other candidates "
     "named in the table. The table gives one and a half Kansas votes and one Mississippi vote as not voting, which "
     "are not stored. The Star's text misprints some fractions, which were read against each delegation's size."
+)
+EVENING_STAR_1924_CAVEAT = (
+    "The archive has not located a free copy of the official proceedings' roll call of these ballots, so they are the "
+    "state-by-state tables the Washington Evening Star printed on July 9, 1924 (page 4), for the 93rd through the "
+    "103rd ballot. They are defaults to be superseded by the official proceedings. Each table gives, for every "
+    "delegation, its votes for six named candidates, and a note under each table splits the scattering votes by "
+    "candidate and state; those entries are stored too, with Absent entries left out, and the 103rd ballot's table "
+    "prints twelve columns and no note. The Star's note spells Gerard's name Girard on the 101st ballot; it is stored "
+    "as Gerard. The Star does not date each ballot; all are stored under July 9, 1924, the day of the edition, "
+    "though the roll calls began the evening before. No totals were announced for the 103rd ballot, because "
+    "Davis was nominated by acclamation after the roll call, so that table has no printed totals. Delegations whose "
+    "named votes fall short of their size are shown as not recorded. Totals are the printed ones. Where a printed "
+    "total differs from the state rows, the rows are stored as printed and the ballot's own note says so."
 )
 EVENING_STAR_1920_CAVEAT = (
     "The archive has not located a free copy of the official proceedings' roll call of these ballots, so they are the "
@@ -985,6 +1011,7 @@ PROCEEDINGS += [
     {"party": "democratic", "tables": {1: "2008:democratic"}, "title": "Roll Call Vote for President of the United States, 2008 Democratic National Convention: Final Vote Tally, as compiled by the Office of the Secretary", "publisher": "Democratic National Committee, Office of the Secretary", "city": "Denver", "days": (date(2008, 8, 25), date(2008, 8, 28)), "ballots": {1: date(2008, 8, 27)}, "deciding": 1, "method": SHEET_METHOD, "caveat": SHEET_CAVEAT},
     {"party": "democratic", "tables": {1: "2024:democratic"}, "title": "2024 Electronic Roll Call: State by State Breakdown", "publisher": "Democratic National Committee", "city": "Chicago", "days": (date(2024, 8, 19), date(2024, 8, 22)), "ballots": {1: date(2024, 8, 5)}, "umbrella": "2024-01-23:president:democratic", "deciding": 1, "required": None, "method": DNC_2024_METHOD, "caveat": DNC_2024_CAVEAT},
     {"party": "democratic", "tables": {1: "1960:democratic"}, "title": "The Evening Star (Washington, D.C.), July 14, 1960: Roll Call of States", "publisher": "The Evening Star", "kind": "news_agency", "city": "Los Angeles", "days": (date(1960, 7, 11), date(1960, 7, 15)), "ballots": {1: date(1960, 7, 13)}, "deciding": 1, "required": 761, "method": PRESS.format("the Washington Evening Star"), "caveat": EVENING_STAR_1960_CAVEAT},
+    {"party": "democratic", "tables": {n: f"1924:democratic:b{n}" for n in range(93, 104)}, "title": "The Evening Star (Washington, D.C.), July 9, 1924: Ballots Ninety-Three Through One Hundred and Three", "publisher": "The Evening Star", "kind": "news_agency", "city": "New York", "days": (date(1924, 6, 24), date(1924, 7, 9)), "ballots": dict.fromkeys(range(93, 104), date(1924, 7, 9)), "deciding": None, "required": 732, "method": PRESS.format("the Washington Evening Star"), "caveat": EVENING_STAR_1924_CAVEAT},
     {"party": "democratic", "tables": {n: f"1920:democratic:b{n}" for n in range(3, 19)}, "title": "The Evening Star (Washington, D.C.), July 4, 1920: Detailed Ballots Show How State Delegations Voted", "publisher": "The Evening Star", "kind": "news_agency", "city": "San Francisco", "days": (date(1920, 6, 28), date(1920, 7, 6)), "ballots": dict.fromkeys(range(3, 19), date(1920, 7, 3)), "deciding": None, "required": 730, "method": PRESS.format("the Washington Evening Star"), "caveat": EVENING_STAR_1920_CAVEAT},
     {"party": "democratic", "tables": {1: "1928:democratic"}, "title": "The Evening Star (Washington, D.C.), June 29, 1928: Vote Cast on Ballot", "publisher": "The Evening Star", "kind": "news_agency", "city": "Houston", "days": (date(1928, 6, 26), date(1928, 6, 29)), "ballots": {1: date(1928, 6, 28)}, "deciding": 1, "required": 733, "method": PRESS.format("the Washington Evening Star"), "caveat": EVENING_STAR_1928_CAVEAT},
     {"party": "democratic", "tables": {1: "1956:democratic"}, "title": "Official report of the proceedings of the Democratic National Convention and committee, held at Chicago, Illinois, August 13 to August 17, 1956, resulting in the nomination of Adlai E. Stevenson of Illinois for President and Estes Kefauver of Tennessee for Vice President", "publisher": "Democratic National Committee", "city": "Chicago", "days": (date(1956, 8, 13), date(1956, 8, 17)), "ballots": {1: date(1956, 8, 16)}, "deciding": 1},
@@ -1411,6 +1438,21 @@ CANDIDATES = {
     "1924:democratic:Harrison": ("Pat Harrison", "Q369437"),
     "1924:democratic:Thompson": ("Thompson", None),
     "1924:democratic:Kendrick": ("John B. Kendrick", "Q437232"),
+    "1924:democratic:Meredith": ("Edwin T. Meredith", None),
+    "1924:democratic:Walsh": ("Walsh", None),
+    "1924:democratic:Gerard": ("James W. Gerard", None),
+    "1924:democratic:Daniels": ("Josephus Daniels", None),
+    "1924:democratic:Hull": ("Hull", None),
+    "1924:democratic:Copeland": ("Copeland", None),
+    "1924:democratic:Roosevelt": ("Franklin D. Roosevelt", "Q8007"),
+    "1924:democratic:Cummings": ("Cummings", None),
+    "1924:democratic:Baker": ("Baker", None),
+    "1924:democratic:Stewart": ("Stewart", None),
+    "1924:democratic:Marshall": ("Marshall", None),
+    "1924:democratic:Owen": ("Owen", None),
+    "1924:democratic:Berry": ("Berry", None),
+    "1924:democratic:Murphree": ("Murphree", None),
+    "1924:democratic:Allen": ("Allen", None),
     "1932:democratic:Smith": ("Alfred E. Smith", "Q430714"),
     "1932:democratic:Ritchie": ("Albert C. Ritchie", None),
     "1932:democratic:Baker": ("Newton D. Baker", None),
@@ -2668,6 +2710,54 @@ MISPRINTS = {
             "been found to settle it."
         ),
         {"VA": (24, 25, "2½, 18½, 2½, and 1½ against a delegation of 24")},
+    ),
+    "1924:democratic:b93": (
+        "The Star's table for this ballot disagrees with itself: McAdoo's printed total is 310, against 314 in the state rows; Ralston's printed total is 196.75, against 196.25 in the state rows; Davis (W. Va.)'s printed total is 69.5, against 68 in the state rows; Underwood's printed total is 45.25, against 44.75 in the state rows; Glass's printed total is 26.5, against 27 in the state rows. The rows are stored as printed.",
+        {
+            "column McAdoo": (310.0, 314.0, "the state figures add to 314"),
+            "column Ralston": (196.75, 196.25, "the state figures add to 196.25"),
+            "column Davis (W. Va.)": (69.5, 68.0, "the state figures add to 68"),
+            "column Underwood": (45.25, 44.75, "the state figures add to 44.75"),
+            "column Glass": (26.5, 27.0, "the state figures add to 27"),
+        },
+    ),
+    "1924:democratic:b94": (
+        "The Star's table for this ballot disagrees with itself: Glass's printed total is 39, against 37 in the state rows. The rows are stored as printed.",
+        {
+            "column Glass": (39.0, 37.0, "the state figures add to 37"),
+        },
+    ),
+    "1924:democratic:b95": (
+        "The Star's table for this ballot disagrees with itself: Underwood's printed total is 44.25, against 42.75 in the state rows. The rows are stored as printed.",
+        {
+            "column Underwood": (44.25, 42.75, "the state figures add to 42.75"),
+        },
+    ),
+    "1924:democratic:b98": (
+        "The Star's table for this ballot disagrees with itself: McAdoo's printed total is 407.5, against 409 in the state rows; Smith's printed total is 354, against 347.5 in the state rows; Davis (W. Va.)'s printed total is 194.75, against 187.75 in the state rows; Underwood's printed total is 37.25, against 38.25 in the state rows. The rows are stored as printed.",
+        {
+            "column McAdoo": (407.5, 409.0, "the state figures add to 409"),
+            "column Smith": (354.0, 347.5, "the state figures add to 347.5"),
+            "column Davis (W. Va.)": (194.75, 187.75, "the state figures add to 187.75"),
+            "column Underwood": (37.25, 38.25, "the state figures add to 38.25"),
+        },
+    ),
+    "1924:democratic:b101": (
+        "The Star's table for this ballot disagrees with itself: Davis (W. Va.)'s printed total is 316, against 315 in the state rows; Walsh's printed total is 98, against 76 in the state rows; Glass's printed total is 59, against 80 in the state rows. The rows are stored as printed.",
+        {
+            "column Davis (W. Va.)": (316.0, 315.0, "the state figures add to 315"),
+            "column Walsh": (98.0, 76.0, "the state figures add to 76"),
+            "column Glass": (59.0, 80.0, "the state figures add to 80"),
+        },
+    ),
+    "1924:democratic:b102": (
+        "The Star's table for this ballot disagrees with itself: the PA row adds to 77, against a delegation of 76; Davis (W. Va.)'s printed total is 415.667, against 416.667 in the state rows; Underwood's printed total is 307, against 318 in the state rows; Smith's printed total is 44, against 43 in the state rows. The rows are stored as printed.",
+        {
+            "PA": (76, 77.0, "the row and its note entries add to 77"),
+            "column Davis (W. Va.)": (415.6666667, 416.666666667, "the state figures add to 416.667"),
+            "column Underwood": (307.0, 318.0, "the state figures add to 318"),
+            "column Smith": (44.0, 43.0, "the state figures add to 43"),
+        },
     ),
 }
 NAMES = {re.sub(r"[^a-z]", "", re.sub(r" \(.*\)|, U\.S\.", "", name).lower()): code for name, code in PLACES.items()}
