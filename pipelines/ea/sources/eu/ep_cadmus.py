@@ -12,7 +12,7 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
-from ea.sources import parlgov
+from ea.sources import licenses, parlgov
 from ea.sources.gb import umit
 from ea.store import DATA, connect
 
@@ -73,6 +73,47 @@ WINDOWS = {
     2009: (date(2009, 6, 4), date(2009, 6, 7)),
     2014: (date(2014, 5, 22), date(2014, 5, 25)),
     2019: (date(2019, 5, 23), date(2019, 5, 26)),
+}
+EARLY = {
+    1979: {"DK", "GB", "IE", "NL"},
+    1984: {"DK", "GB", "IE", "NL"},
+    1989: {"DK", "ES", "GB", "IE", "NL"},
+    1994: {"DK", "GB", "IE", "NL"},
+    1999: {"DK", "GB", "NL"},
+    2004: {"GB", "NL"},
+    2009: {"GB", "NL"},
+    2014: {"GB", "NL"},
+    2019: {"GB", "NL"},
+}
+VOTING_DAYS = {
+    (1999, "IE"): (date(1999, 6, 11), date(1999, 6, 11)),
+    (2004, "IE"): (date(2004, 6, 11), date(2004, 6, 11)),
+    (2004, "CZ"): (date(2004, 6, 11), date(2004, 6, 12)),
+    (2004, "LV"): (date(2004, 6, 12), date(2004, 6, 12)),
+    (2004, "MT"): (date(2004, 6, 12), date(2004, 6, 12)),
+    (2004, "IT"): (date(2004, 6, 12), date(2004, 6, 13)),
+    (2009, "IE"): (date(2009, 6, 5), date(2009, 6, 5)),
+    (2009, "CZ"): (date(2009, 6, 5), date(2009, 6, 6)),
+    (2009, "LV"): (date(2009, 6, 6), date(2009, 6, 6)),
+    (2009, "MT"): (date(2009, 6, 6), date(2009, 6, 6)),
+    (2009, "SK"): (date(2009, 6, 6), date(2009, 6, 6)),
+    (2009, "IT"): (date(2009, 6, 6), date(2009, 6, 7)),
+    (2014, "IE"): (date(2014, 5, 23), date(2014, 5, 23)),
+    (2014, "CZ"): (date(2014, 5, 23), date(2014, 5, 24)),
+    (2014, "LV"): (date(2014, 5, 24), date(2014, 5, 24)),
+    (2014, "MT"): (date(2014, 5, 24), date(2014, 5, 24)),
+    (2014, "SK"): (date(2014, 5, 24), date(2014, 5, 24)),
+    (2019, "IE"): (date(2019, 5, 24), date(2019, 5, 24)),
+    (2019, "CZ"): (date(2019, 5, 24), date(2019, 5, 25)),
+    (2019, "LV"): (date(2019, 5, 25), date(2019, 5, 25)),
+    (2019, "MT"): (date(2019, 5, 25), date(2019, 5, 25)),
+    (2019, "SK"): (date(2019, 5, 25), date(2019, 5, 25)),
+    (1981, "GR"): (date(1981, 10, 18), date(1981, 10, 18)),
+    (1987, "PT"): (date(1987, 7, 19), date(1987, 7, 19)),
+    (1996, "AT"): (date(1996, 10, 13), date(1996, 10, 13)),
+    (1996, "FI"): (date(1996, 10, 20), date(1996, 10, 20)),
+    (2007, "BG"): (date(2007, 5, 20), date(2007, 5, 20)),
+    (2013, "HR"): (date(2013, 4, 14), date(2013, 4, 14)),
 }
 GENERALS = [*(window[0] for window in WINDOWS.values()), date(2024, 6, 6)]
 GROUP_ENDS = {2019: date(2019, 7, 2), 2020: date(2020, 12, 18)}
@@ -368,9 +409,26 @@ UK_SYSTEMS = {
         {"formula": "stv", "quota": "droop"},
     ),
 }
-WINDOW_CAVEAT = (
+
+OLD_WINDOW_CAVEAT = (
     "The source gives only the year of the election. The dates are the European Parliament's voting window for that "
     "year, not the day this country voted."
+)
+
+
+def voting_days(iso: str, year: int) -> tuple[date, date] | None:
+    if (year, iso) in VOTING_DAYS:
+        return VOTING_DAYS[year, iso]
+    window = WINDOWS.get(year)
+    if window is None:
+        return None
+    day = window[0] if iso in EARLY[year] else window[1]
+    return day, day
+
+
+VOTING_NOTE = (
+    "The source gives only the year of the election. The dates are the days this country voted within the European "
+    "Parliament's four-day voting window for that year."
 )
 EUC_NAMES = {
     (1979, "Cotswolds"): "The Cotswolds",
@@ -738,17 +796,17 @@ def emit() -> Path:
         print(f"{len(coalitions)} coalition lists with members named by ParlGov")
         stale = conn.execute(
             """select n.id, n.entity_id from note n join changeset c on c.id = n.changeset_id
-               join external_id x on x.entity_id = n.entity_id and x.scheme = 'eu.election' and x.value like 'GB:%%'
+               join external_id x on x.entity_id = n.entity_id and x.scheme = 'eu.election' and x.value like '%%:%%'
                where c.pipeline = %s and n.body_md = %s""",
-            [SOURCE, WINDOW_CAVEAT],
+            [SOURCE, OLD_WINDOW_CAVEAT],
         ).fetchall()
         for id, entity in stale:
             cs.add(
                 "note_drop",
                 note_id=id,
                 entity_id=entity,
-                body_md=WINDOW_CAVEAT,
-                reason="UK polls for the European Parliament were held on a single day, the Thursday of the window",
+                body_md=OLD_WINDOW_CAVEAT,
+                reason="The note gave the voting window as the election date; the election now carries the day this country voted",
             )
         retired = {
             value: entity
@@ -782,6 +840,16 @@ def emit() -> Path:
             name(umbrella, f"{year} European Parliament election")
             cs.add("slug", path=f"eu/{start}-european-parliament", entity_id=umbrella)
 
+        taken = {
+            row[0]
+            for row in conn.execute(
+                """select r.id from result_set r join changeset c on c.id = r.changeset_id
+                   join external_id x on x.entity_id = r.election_id and x.scheme = 'eu.election'
+                   where c.pipeline <> %s""",
+                [SOURCE],
+            ).fetchall()
+        }
+
         elections: dict[tuple[str, int], tuple[UUID, str]] = {}
         parties: dict[tuple[str, str], UUID] = {}
         units: dict[tuple[str, str], UUID] = {}
@@ -794,9 +862,9 @@ def emit() -> Path:
         frames: list[pl.DataFrame] = []
         for (country, year), by_election in results.group_by(["country", "year"], maintain_order=True):
             iso = ISO[country]
-            window = WINDOWS.get(year)
+            days = voting_days(iso, year)
             election = cs.key("eu.election", f"{iso}:{year}:european-parliament")
-            start = window[0] if window else date(year, 1, 1)
+            start = days[0] if days else date(year, 1, 1)
             path = f"{iso.lower()}/{start}-european-parliament"
             cs.add(
                 "election",
@@ -805,8 +873,8 @@ def emit() -> Path:
                 parent_id=umbrellas.get(year),
                 kind="general",
                 date_from=start,
-                date_to=start if iso == "GB" else window[1] if window else date(year, 12, 31),
-                date_precision="day" if window else "year",
+                date_to=days[1] if days else date(year, 12, 31),
+                date_precision="day" if days else "year",
                 original_text=str(year),
                 status="held",
             )
@@ -818,8 +886,10 @@ def emit() -> Path:
                     entity_id=election,
                     kind="caveat",
                     body_md=(
-                        WINDOW_CAVEAT
-                        if window
+                        VOTING_NOTE
+                        if year in WINDOWS
+                        else "The source gives only the year of the election; the dates are the day this country voted."
+                        if days
                         else "The source gives only the year of the election, which took place between general "
                         "European Parliament elections following the country's accession."
                     ),
@@ -918,6 +988,8 @@ def emit() -> Path:
                     entity_id=contest,
                 )
                 result_set = cs.key("eu.ep_cadmus.result_set", contest_key)
+                if result_set in taken:
+                    continue
                 listed = int(rows["votes"].sum())
                 valid = rows["votes_valid"][0]
                 cs.add(
@@ -951,6 +1023,7 @@ def emit() -> Path:
                         title="United Kingdom European Parliamentary Election results 1979-99: London",
                         url="http://www.election.demon.co.uk/eplon.html",
                         notes="David Boothroyd's compilation of the returning officers' declarations (archived copy).",
+                        license=licenses.UNLICENSED,
                     )
                     cs.artifact(raw.cached(SOURCE, DEMON), demon)
                     cs.add("note", entity_id=result_set, kind="caveat", body_md=replaced[2])
@@ -1056,7 +1129,7 @@ def emit() -> Path:
                             split[label_group] += row["seats"]
                         for member in [party] if party is not None else sorted(members or (), key=str):
                             if group is not None and member is not None:
-                                joined[member][start][group] += row["seats"]
+                                joined[member][WINDOWS[year][0] if year in WINDOWS else start][group] += row["seats"]
                     values.append((str(option), 1, row["votes"]))
                     if row["seats"] is not None:
                         values.append((str(option), 16, row["seats"]))
