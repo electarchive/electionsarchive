@@ -1277,7 +1277,11 @@ def _publish_table(conn: Connection, stage: Stage, table: str, deferred: list[st
                 raise ValueError(f"result set {result_set} does not exist")
             if held != source:
                 raise ValueError(f"result set {result_set} now cites source {held}, not {source}")
-            if not any(term in (license or "").lower() for term in ("icpsr", "held out of releases")):
+            held_license = (license or "").lower()
+            if not (
+                any(term in held_license for term in ("icpsr", "held out of releases"))
+                or held_license.startswith("withdrawn:")
+            ):
                 raise ValueError(f"result set {result_set}: source {source} is not withdrawn for licensing")
             dropping.append(k)
         for relation, column, parent in checks.references(conn):

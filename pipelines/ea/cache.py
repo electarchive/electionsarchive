@@ -20,7 +20,10 @@ RESTRICTED = {
 }
 # The first rule a license matches sets its class; a file cited under several licenses takes the strictest.
 CLASSES = [
-    ("restricted", re.compile(r"ICPSR|All rights reserved|permission .*pending|^Pending:", re.IGNORECASE)),
+    (
+        "restricted",
+        re.compile(r"ICPSR|All rights reserved|permission .*pending|^Pending:|^Withdrawn:|^Limited:", re.IGNORECASE),
+    ),
     ("non-commercial", re.compile(r"non-?commercial|\bBY-NC\b", re.IGNORECASE)),
     ("revocable", re.compile(r"revocable", re.IGNORECASE)),
     ("share-alike", re.compile(r"ShareAlike|BY-SA|ODbL|Open Database License", re.IGNORECASE)),
