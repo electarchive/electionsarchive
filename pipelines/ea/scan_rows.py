@@ -48,21 +48,27 @@ def rules(dark: np.ndarray, top: int, bottom: int, count: int) -> tuple[list[int
         return None
     pitch = float(np.median(gaps))
 
-    def walk(start: float, low: float) -> list[float]:
+    def walk(start: float, low: float, high: float) -> list[float]:
         edges = [start]
         while len(edges) < count:
-            near = [peak for peak in peaks if -low * pitch <= peak - edges[-1] - pitch <= 0.15 * pitch]
+            near = [peak for peak in peaks if -low * pitch <= peak - edges[-1] - pitch <= high * pitch]
             edges.append(min(near, key=lambda peak: abs(peak - edges[-1] - pitch)) if near else edges[-1] + pitch)
         return edges
 
     def strength(edges: list[float]) -> float:
         return sum(float(share[max(0, round(x) - 8) : round(x) + 9].max(initial=0)) for x in edges)
 
-    for low in (0.15, 0.25):
-        best = max((walk(start, low) for peak in peaks for start in (peak, peak - pitch) if start >= 0), key=strength)
-        if strength(best) >= 0.8 * count:
-            break
-    else:
+    best = max(
+        (
+            walk(start, low, high)
+            for low, high in ((0.15, 0.15), (0.25, 0.2))
+            for peak in peaks
+            for start in (peak, peak - pitch)
+            if start >= 0
+        ),
+        key=strength,
+    )
+    if strength(best) < 0.8 * count:
         return None
     return [round(x) for x in (*best, best[-1] + pitch)], strength(best)
 
