@@ -1189,9 +1189,9 @@ def emit() -> Path:
                             values.append((result_set, units[group], option, VOTES, number, votes))
                 if tacit:
                     continue
-                for measure, number in ((VALID, valid), (INVALID, spoilt), (REGISTERED, eligible)):
+                for measure, number, stage in ((VALID, valid, 1), (INVALID, spoilt, 0), (REGISTERED, eligible, 0)):
                     if number is not None:
-                        values.append((result_set, units[group], None, measure, 0, number))
+                        values.append((result_set, units[group], None, measure, stage, number))
                 for kind, measure in (("needed", QUOTA), ("exhausted", EXHAUSTED)):
                     for number, figure in enumerate(count.summary.get(kind, []), 1):
                         if figure is not None and (kind != "exhausted" or stv):
