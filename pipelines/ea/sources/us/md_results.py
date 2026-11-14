@@ -26,6 +26,7 @@ FILES = [
     "1992/results_1992/pregaa.html",
     "1992/results_1992/prepaa.html",
     "1996/results_1996/pregaa.html",
+    "1996/results_1996/prepaa.html",
     "2002/results/g_comptroller.html",
     "2002/results/g_attorney_general.html",
     "2006/results/general/office_Comptroller.html",
@@ -44,6 +45,7 @@ DAYS = {
     (1994, "general"): date(1994, 11, 8),
     (1994, "primary"): date(1994, 9, 13),
     (1996, "general"): date(1996, 11, 5),
+    (1996, "primary"): date(1996, 3, 5),
     (1998, "general"): date(1998, 11, 3),
     (1998, "primary"): date(1998, 9, 15),
     (2002, "general"): date(2002, 11, 5),
@@ -158,7 +160,7 @@ def parse() -> None:
             found = re.search(r"<h2>(.*?)</h2>", table, re.DOTALL)
             heading = re.sub(r"\s+", " ", found[1]).strip() if found else ""
             heading = re.sub(r" Vote For .*", "", heading)
-            if heading not in OFFICES or (stage, OFFICES[heading]) == ("primary", "president"):
+            if heading not in OFFICES:
                 continue
             side = re.search(r"<h3>\s*(Democratic|Republican) Candidate", table)
             cells = [
@@ -392,7 +394,8 @@ def emit() -> Path:
             result_set = cs.key(f"{SOURCE}.result_set", key)
             options = conn.execute(
                 """select id, kind, ballot_label from contest_option
-                   where contest_id = %s and parent_option_id is null and kind in ('candidate', 'ticket', 'write_in')""",
+                   where contest_id = %s and parent_option_id is null
+                   and kind in ('candidate', 'ticket', 'write_in', 'uncommitted')""",
                 [contest],
             ).fetchall()
             columns = (
@@ -438,7 +441,11 @@ def emit() -> Path:
                     matches = [
                         option
                         for option, kind, text in options
-                        if kind != "write_in" and surname(text or "") == surname(candidate)
+                        if (
+                            kind == "uncommitted"
+                            if candidate.startswith("Uncommitted")
+                            else kind not in ("write_in", "uncommitted") and surname(text or "") == surname(candidate)
+                        )
                     ]
                     if len(matches) > 1:
                         raise ValueError(f"{key}: {len(matches)} options for {candidate}")
