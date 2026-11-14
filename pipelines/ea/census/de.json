@@ -4636,7 +4636,7 @@
           "body_kinds": [
             "council"
           ],
-          "iso_pattern": "DE-BY",
+          "within": "DE-BY",
           "name_pattern": "Bezirkstag"
         }
       ],
