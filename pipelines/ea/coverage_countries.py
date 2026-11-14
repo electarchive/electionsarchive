@@ -6,7 +6,7 @@ from collections import Counter, defaultdict
 from datetime import date, timedelta
 from pathlib import Path
 
-from ea import census_check, coverage, readiness
+from ea import census_calendar, census_check, coverage, readiness
 from ea.store import ROOT, connect
 
 CENSUS = Path(__file__).parent / "census"
@@ -413,12 +413,14 @@ def census_spec(conn, cc: str) -> dict:
                 )
                 if first is None or e["year"] < first
             ] + elections
+        upcoming = census_calendar.class_next_date(conn, class_id, date.today())
         levels.append(
             {
                 "class_id": class_id,
                 "key": key,
                 "goal": goal,
                 "label": label,
+                **({"next": upcoming.isoformat()} if upcoming is not None else {}),
                 **({"note": note} if note else {}),
                 **({"fine_note": fine_note} if fine_note else {}),
                 **(measure_ or {}),
