@@ -51,6 +51,48 @@ COUNCILS: dict[str, dict] = {
         ],
         "reader": "notices",
     },
+    "E07000177": {
+        "day": date(2026, 5, 7),
+        "publisher": "Cherwell District Council",
+        "title": "Notices of uncontested parish elections, 7 May 2026",
+        "url": "https://www.cherwell.gov.uk/download/downloads/id/18690/islip.pdf",
+        "files": [
+            f"https://www.cherwell.gov.uk/download/downloads/id/{id}/{name}.pdf"
+            for id, name in (
+                (18711, "barford"),
+                (18710, "bletchingdon"),
+                (18700, "bloxham"),
+                (18715, "broughton"),
+                (18717, "charlton-on-otmoor"),
+                (18699, "deddington"),
+                (18704, "duns-tew"),
+                (18707, "epwell"),
+                (18698, "fencott-and-murcott"),
+                (18716, "finmere"),
+                (18709, "fringford"),
+                (18706, "hethe"),
+                (18702, "horley"),
+                (18701, "hornton"),
+                (18692, "horton-cum-studley"),
+                (18690, "islip"),
+                (18691, "kirtlington"),
+                (18693, "merton"),
+                (18695, "milcombe"),
+                (18703, "north-newington"),
+                (18708, "shenington-with-alkerton"),
+                (18719, "shutford"),
+                (18705, "sibford-ferris"),
+                (18718, "sibford-gower"),
+                (18712, "steeple-aston"),
+                (18694, "stratton-audley"),
+                (18697, "swalcliffe"),
+                (18696, "tadmarton"),
+                (18713, "weston-on-the-green"),
+                (18714, "wroxton"),
+            )
+        ],
+        "reader": "notices",
+    },
 }
 BROWSER = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36"
 PARTIES: dict[str, str | None] = {
@@ -226,6 +268,11 @@ def surname_first(printed: str) -> str:
 def area_of(page: str) -> tuple[str, str, str | None] | None:
     heading = re.search(r"Election of (?:a )?(Parish|Town) Councillors? for\s*\n\s*(.+?)\s*\n\s*on\b", page)
     if heading is None:
+        inline = re.search(
+            r"Election of (Parish) Councillors for\s+(.+?)\s+Parish\s+Council\s+on Thursday", page, re.DOTALL
+        )
+        if inline:
+            return inline.group(1), " ".join(inline.group(2).split()), None
         return None
     area = " ".join(heading.group(2).split())
     ward = re.fullmatch(r"(.+?) \((.+)\)", area)
@@ -239,6 +286,41 @@ def notices(lad: str, council: dict) -> list[dict]:
             if not page.strip():
                 continue
             heading = area_of(page)
+            if heading is not None and "(surname first)" in page:
+                style, parish, ward = heading
+                body = page.split("(surname first)")[1].split("Returning Officer")[0]
+                lines = [re.split(r"\s{2,}", line)[0] for line in body.split("\n")[1:] if line[:1].strip()][:-1]
+                if not lines or len(lines) % 2:
+                    raise ValueError(f"{url} page {number}: odd name lines")
+                candidates = [
+                    {
+                        "printed": f"{surname}, {forenames}".replace("`", "'"),
+                        "known_as": None,
+                        "description": "",
+                        "votes": None,
+                        "elected": True,
+                    }
+                    for surname, forenames in zip(lines[::2], lines[1::2], strict=True)
+                ]
+                reads.append(
+                    {
+                        "lad": lad,
+                        "url": url,
+                        "page": number,
+                        "style": style,
+                        "parish": parish,
+                        "ward": None,
+                        "uncontested": False,
+                        "places": None,
+                        "electorate": None,
+                        "ballots": None,
+                        "rejected": None,
+                        "total": None,
+                        "remark": None,
+                        "candidates": candidates,
+                    }
+                )
+                continue
             if heading is None:
                 if not reads or reads[-1]["url"] != url or not reads[-1]["uncontested"]:
                     raise ValueError(f"{url} page {number}: no heading")
