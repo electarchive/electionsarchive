@@ -1728,13 +1728,23 @@ def stage_rows() -> list[dict[str, str]]:
     ]
 
 
+def xls_text(path: Path) -> str:
+    sheet = pl.read_excel(path, engine="calamine", has_header=False)
+    return "\n".join(
+        "  ".join(re.sub(r"\s+", " ", str(cell)).strip() for cell in row if cell is not None and str(cell).strip())
+        for row in sheet.iter_rows()
+    )
+
+
 def fetch_hist() -> None:
     for row in stage_rows():
         try:
             raw.cached(SOURCE, row["url"])
         except LookupError:
             try:
-                raw.fetch(SOURCE, row["url"], suffix=".pdf")
+                raw.fetch(
+                    SOURCE, row["url"], suffix=".xls" if "highland.gov.uk/downloads/file" in row["url"] else ".pdf"
+                )
             except httpx.HTTPError as error:
                 print(f"{row['council']} {row['ward']}: {row['url']}: {error}")
             time.sleep(4 if "web.archive.org" in row["url"] else 1)
@@ -1760,7 +1770,7 @@ def parse_hist() -> None:
         except LookupError:
             units.append({"council": council, "ward": row["ward"], "locator": locator, "status": "not fetched"})
             continue
-        text = pdf_text(path)
+        text = xls_text(path) if path.suffix == ".xls" else pdf_text(path)
         if "Total Number of Valid Votes" in text and "Number of Vacancies" in text:
             facts, rows, exhausted, dropped, odd, _ = read_wide(text)
         else:
