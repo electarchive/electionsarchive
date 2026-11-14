@@ -200,6 +200,7 @@ const MODEL = {
     baseGrace: 7,
     baseLife: 6,
     cure: { floor: 0.35, life: 0.25 },
+    minor: 0.1,
     window: 1.5,
     carry: 1.1,
     half: 0.75,
@@ -359,6 +360,8 @@ const CANVASS: Record<string, { base: number; late: number }> = {
 };
 
 const NIGHTS: Record<string, number> = { ga: 0.0075 };
+
+const OWED: Record<string, number> = { az: 0.15 };
 
 const STILLS: Record<string, string> = { ga: "2021-03-25", wi: "2012-01-01" };
 
@@ -1952,6 +1955,22 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
   );
   const finals = whole.map(() => 0);
   const spills = whole.map(() => 0);
+  const owedShare = OWED[race.state];
+  const everyone = sum(whole.map((unit) => unit.expected));
+  const owing = whole.map((unit) =>
+    isLate &&
+    !complete &&
+    owedShare != null &&
+    unit.night != null &&
+    unit.expected < MODEL.late.minor * everyone
+      ? sum(unit.night) *
+        (1 +
+          owedShare *
+            Math.exp(
+              -Math.max(0, days - MODEL.late.baseGrace) / MODEL.late.baseLife,
+            ))
+      : 0,
+  );
   const portion = found.map((unit) => {
     const indexes = streamsOf.get(unit.county);
     if (indexes == null) {
@@ -2205,6 +2224,9 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
             Math.min(1, lasting / (MODEL.late.hush * tail)) *
             (1 - drained * fade) *
             Math.exp(scatter * gaussian(random) - scatter ** 2 / 2);
+        }
+        if (finals[index] < owing[index]!) {
+          finals[index] = owing[index]!;
         }
       }
     }
