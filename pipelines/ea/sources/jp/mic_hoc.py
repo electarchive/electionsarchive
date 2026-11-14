@@ -82,6 +82,38 @@ def close(left: list[Decimal], right: list[Decimal]) -> bool:
     return len(left) == len(right) and all(abs(a - b) < Decimal("0.01") for a, b in zip(left, right, strict=True))
 
 
+def list_parts(
+    values: list[tuple[UUID, UUID, UUID, Decimal]], parent: dict[UUID, UUID], legends: set[UUID], special: set[UUID]
+) -> dict[tuple[UUID, UUID, UUID], Decimal]:
+    sums: dict[tuple[UUID, UUID, UUID], Decimal] = {}
+    for result_set, place, option, amount_ in values:
+        sums[result_set, place, option] = sums.get((result_set, place, option), Decimal(0)) + amount_
+    lists = set(parent.values())
+    children: dict[tuple[UUID, UUID, UUID], list[tuple[UUID, UUID, UUID]]] = {}
+    for key in sums:
+        if key[2] in parent:
+            children.setdefault((key[0], key[1], parent[key[2]]), []).append(key)
+    kept = {key: amount_ for key, amount_ in sums.items() if key[2] not in lists}
+    dropped = 0
+    for key, total in sums.items():
+        if key[2] not in lists:
+            continue
+        for allowed in (lambda option: True, lambda option: option not in special, lambda option: option in legends):
+            parts = [part for part in children.get(key, []) if allowed(part[2])]
+            rest = total - sum((sums[part] for part in parts), Decimal(0))
+            if rest >= 0:
+                break
+        for part in children.get(key, []):
+            if part not in parts:
+                del kept[part]
+                dropped += 1
+        if rest > 0:
+            kept[key] = rest
+    if dropped:
+        print(f"dropped {dropped} candidate values whose sums exceed their list totals")
+    return kept
+
+
 def url_of(base: str, href: str) -> str:
     return urljoin(base, href)
 
@@ -641,6 +673,9 @@ def emit() -> Path:
 
         nation = unit("jp.nation", "JP", None, cs.area("jp.nation", "JP"), "equals", japan)
         values: list[tuple[UUID, UUID, UUID, Decimal]] = []
+        parent: dict[UUID, UUID] = {}
+        legends: set[UUID] = set()
+        special: set[UUID] = set()
         for number, (held, index_path, _) in ELECTIONS.items():
             if held not in set(candidates["held"]):
                 continue
@@ -843,6 +878,8 @@ def emit() -> Path:
                     ballot_position=None,
                     ballot_label=None,
                 )
+                parent[legend] = listed
+                legends.add(legend)
                 values.append((national_set, nation, listed, Decimal(row["total"])))
                 values.append((national_set, nation, legend, Decimal(row["party_votes"])))
                 for candidate in people.filter((pl.col("held") == held) & (pl.col("party") == label)).iter_rows(
@@ -879,7 +916,10 @@ def emit() -> Path:
                         kind="elected" if candidate["result"] == "当" else "lost",
                         seats=None,
                     )
-                    if not candidate["special"]:
+                    parent[option] = listed
+                    if candidate["special"]:
+                        special.add(option)
+                    else:
                         values.append((national_set, nation, option, Decimal(candidate["votes"])))
             for row in local.iter_rows(named=True):
                 code = codes_of(row["prefecture"])
@@ -892,10 +932,7 @@ def emit() -> Path:
                 place, _ = place_unit(codes_of(row["prefecture"]), row["place"], None)
                 values.append((place_set, place, options_by[row["party"], row["number"]], Decimal(row["votes"])))
 
-        sums: dict[tuple[UUID, UUID, UUID], Decimal] = {}
-        for result_set, place, option, amount_ in values:
-            sums[result_set, place, option] = sums.get((result_set, place, option), Decimal(0)) + amount_
-        for (result_set, place, option), amount_ in sums.items():
+        for (result_set, place, option), amount_ in list_parts(values, parent, legends, special).items():
             cs.add(
                 "result_value",
                 result_set_id=result_set,

@@ -681,6 +681,8 @@ def emit() -> Path:
             return entity
 
         values: list[tuple[UUID, UUID, UUID, Decimal]] = []
+        parent: dict[UUID, UUID] = {}
+        legends: set[UUID] = set()
         for number, held in ELECTIONS.items():
             day = date.fromisoformat(held)
             local = pr_people.filter(pl.col("held") == held)
@@ -802,6 +804,8 @@ def emit() -> Path:
                     ballot_position=None,
                     ballot_label=None,
                 )
+                parent[legend] = listed
+                legends.add(legend)
                 values.append((national_set, nation, listed, Decimal(row["total"])))
                 values.append((national_set, nation, legend, Decimal(row["party_votes"])))
                 for candidate in people.filter((pl.col("held") == held) & (pl.col("party") == label)).iter_rows(
@@ -837,6 +841,7 @@ def emit() -> Path:
                         kind="elected" if candidate["result"] == "当" else "lost",
                         seats=None,
                     )
+                    parent[option] = listed
                     values.append((national_set, nation, option, Decimal(candidate["votes"])))
             for row in pr.filter(pl.col("held") == held).iter_rows(named=True):
                 place = prefecture_unit(row["prefecture"])
@@ -846,7 +851,7 @@ def emit() -> Path:
                 place = prefecture_unit(row["prefecture"])
                 values.append((place_set, place, options_by[row["party"], row["rank"]], Decimal(row["votes"])))
 
-        for result_set_id, place, option, value in values:
+        for (result_set_id, place, option), value in mic_hoc.list_parts(values, parent, legends, set()).items():
             cs.add(
                 "result_value",
                 result_set_id=result_set_id,
