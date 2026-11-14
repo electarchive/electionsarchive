@@ -425,7 +425,7 @@ def by_records(year: int) -> list[dict[str, object]]:
             }
             for record in page["results"]
             if record["identifier_type"] == "ballot"
-            and date.fromisoformat(record["poll_open_date"]) != POLLING_DAYS[year]
+            and (date.fromisoformat(record["poll_open_date"]) != POLLING_DAYS[year] or ".by." in record["election_id"])
             and not record["election_id"].startswith(BY_ELSEWHERE)
         ]
     return records
@@ -862,7 +862,9 @@ def parse_by() -> None:
         )
         found = name_divisions(found, held)
         found = locate_divisions(found, ced) if year == 2026 and ced is not None else found
-        found = place_divisions(found, held)
+        found = place_divisions(found, held).filter(
+            (pl.col("day") != POLLING_DAYS[year]) | pl.col("la_code").str.starts_with("E10").fill_null(False).not_()
+        )
         found = found.with_columns(
             status=pl.when(pl.col("winners").is_null())
             .then(pl.lit("no Democracy Club result"))
@@ -1272,7 +1274,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary=f"English and Welsh council by-elections {', '.join(map(str, years))} off the May polling day, "
+            summary=f"English and Welsh council by-elections {', '.join(map(str, years))}, "
             "by ward, compiled by Democracy Club from the councils' declarations, with ONS ward and council shapes"
             if by_mode
             else f"English and Welsh council elections {', '.join(map(str, sorted(full)))} by ward and county "
