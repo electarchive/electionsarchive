@@ -73,6 +73,167 @@ HISTORY_PAGES = (
     ("20191016091131", "https://www.cityoflondon.gov.uk/about-the-city/voting-elections/Pages/results.aspx"),
 )
 WARDS_FROM = date(2013, 3, 8)
+OLD_PAGES = "http://www.cityoflondon.gov.uk:80/Corporation/about_us/voting/"
+LEGACY_PAGES = {
+    date(2004, 3, 15): ("20040614033522", OLD_PAGES + "ward_elections_2004.htm"),
+    date(2005, 3, 14): ("20060622215031", OLD_PAGES.replace("www.", "") + "ward_elections_2005.htm"),
+}
+EARLY_PAGES = (
+    ("20051201045521", OLD_PAGES + "aldermanic_by_elections.htm"),
+    ("20070408220607", OLD_PAGES.replace("www.", "") + "aldermanic_by_elections.htm"),
+)
+D = date
+EARLY = (
+    ("alderman", D(2004, 9, 30), D(2004, 9, 30), "Aldersgate", 0, None, [("Nicholas John", "Anstee", None)]),
+    (
+        "alderman",
+        D(2004, 9, 30),
+        D(2004, 10, 1),
+        "Bridge and Bridge Without",
+        0,
+        23.09,
+        [("Alan Robert", "Brumwell", 35), ("Daniel Richard", "Caspi", 65)],
+    ),
+    (
+        "by",
+        D(2004, 9, 22),
+        D(2004, 9, 23),
+        "Lime Street",
+        0,
+        37.93,
+        [("Charles Vernon", "Ashford", 48), ("Mary Lou", "Carrington", 74), ("John Michael", "Welbank", 21)],
+    ),
+    (
+        "by",
+        D(2004, 12, 7),
+        D(2004, 12, 7),
+        "Bridge and Bridge Without",
+        0,
+        18.76,
+        [("Stephen Decatur", "Haines", 25), ("Brian Nicholas", "Harris", 45), ("Richard James Douglas", "Moir", 15)],
+    ),
+    (
+        "alderman",
+        D(2004, 12, 14),
+        D(2004, 12, 14),
+        "Cordwainer",
+        0,
+        43.0,
+        [("Michael Roger", "Gifford", 98), ("Charles Edward", "Lord", 51)],
+    ),
+    (
+        "alderman",
+        D(2005, 4, 28),
+        D(2005, 4, 28),
+        "Walbrook",
+        0,
+        62.65,
+        [
+            ("Martin Courtenay", "Clarke", 8),
+            ("David Robin", "Mauleverer", 40),
+            ("John Richard Cottam", "White", 22),
+            ("David Hugh", "Wootton", 32),
+        ],
+    ),
+    ("alderman", D(2005, 5, 23), D(2005, 5, 23), "Cripplegate", 0, None, [("Gavyn Farr", "Arthur", None)]),
+    (
+        "alderman",
+        D(2005, 5, 24),
+        D(2005, 5, 24),
+        "Castle Baynard",
+        0,
+        15.49,
+        [("Ian David", "Luder", 168), ("John Richard Cottam", "White", 89)],
+    ),
+    (
+        "by",
+        D(2005, 7, 21),
+        D(2005, 7, 21),
+        "Castle Baynard",
+        0,
+        12.82,
+        [("Alex", "Bain-Stewart", 58), ("Nigel Kenneth", "Challis", 133), ("Ian Christopher Norman", "Seaton", 27)],
+    ),
+    (
+        "alderman",
+        D(2005, 7, 22),
+        D(2005, 7, 22),
+        "Aldgate",
+        0,
+        43.24,
+        [("Peter Brodrick", "Kerr-Dineen", 110), ("Peter Keith", "Levene", 146)],
+    ),
+    (
+        "alderman",
+        D(2005, 7, 22),
+        D(2005, 7, 22),
+        "Langbourn",
+        0,
+        37.61,
+        [("Martin Courtenay", "Clarke", 16), ("John Richard Cottam", "White", 36), ("David Hugh", "Wootton", 71)],
+    ),
+    (
+        "alderman",
+        D(2005, 7, 22),
+        D(2005, 7, 22),
+        "Portsoken",
+        0,
+        35.01,
+        [
+            ("Michael David", "Bear", 202),
+            ("William Goodacre", "Campbell-Taylor", 48),
+            ("Giovanni Battista", "Fabrizi", 14),
+        ],
+    ),
+    (
+        "by",
+        D(2005, 10, 20),
+        D(2005, 10, 20),
+        "Cornhill",
+        0,
+        26.5,
+        [
+            ("Stephen Decatur", "Haines", 50),
+            ("Ian Christopher Norman", "Seaton", 24),
+            ("David Arundell Rhodes", "Thorp", 16),
+            ("Jack", "Wigglesworth", 10),
+        ],
+    ),
+    (
+        "by",
+        D(2005, 10, 20),
+        D(2005, 10, 20),
+        "Portsoken",
+        0,
+        38.2,
+        [
+            ("William Goodacre", "Campbell-Taylor", 145),
+            ("Evan Philip", "Millner", 83),
+            ("Richard John Dawson", "Morrison", 80),
+        ],
+    ),
+    ("alderman", D(2006, 4, 28), D(2006, 4, 28), "Lime Street", 1, None, [("John Boothman", "Stuttard", None)]),
+    ("alderman", D(2006, 9, 4), D(2006, 9, 4), "Farringdon Without", 1, None, [("Simon", "Walsh", None)]),
+    (
+        "by",
+        D(2006, 9, 12),
+        D(2006, 9, 12),
+        "Cripplegate",
+        1,
+        None,
+        [("Robert Allan", "Merrett", 75), ("Angela Mary", "Starling", 345)],
+    ),
+    ("by", D(2006, 11, 3), D(2006, 11, 3), "Langbourn", 1, None, [("John", "Chapman", None)]),
+    (
+        "alderman",
+        D(2006, 12, 12),
+        D(2006, 12, 13),
+        "Broad Street",
+        1,
+        44.8,
+        [("David Thomas Rowell", "Lewis", 139), ("John George Stewart", "Scott", 40)],
+    ),
+)
 DAY_FIXES = {
     ("E05009307", date(2017, 8, 7)): (
         date(2019, 8, 6),
@@ -122,8 +283,30 @@ OLD_WARDS = tuple((f"E05{number:06d}", label, page) for number, (_, label, page)
 OLD_CODES = {new: old for (new, *_), (old, *_) in zip(CITY_WARDS, OLD_WARDS, strict=True)}
 NEW_CODES = {old: new for new, old in OLD_CODES.items()}
 CITY_SEATS = 100
-GENERAL_DAYS = (date(2009, 3, 16), date(2013, 3, 21), date(2017, 3, 23), CITY_DAY, date(2025, 3, 20))
+GENERAL_DAYS = (
+    date(2004, 3, 15),
+    date(2005, 3, 14),
+    date(2009, 3, 16),
+    date(2013, 3, 21),
+    date(2017, 3, 23),
+    CITY_DAY,
+    date(2025, 3, 20),
+)
 CITY_NOTES = {
+    date(2004, 3, 15): (
+        "Voters in each ward had as many votes as the ward has seats. The corporation's results page prints each "
+        "candidate's votes and marks the winners; it prints neither the electorate nor the turnout. The wards where "
+        "no more candidates stood than seats are listed apart as uncontested and print no votes. The wards are those "
+        "drawn in 2003, which were replaced on 8 March 2013. The aldermen are elected separately, at ward meetings, "
+        "and are not included."
+    ),
+    date(2005, 3, 14): (
+        "Voters in each ward had as many votes as the ward has seats. The corporation's results page prints each "
+        "candidate's votes and marks the winners; it prints neither the electorate nor the turnout. The wards where "
+        "no more candidates stood than seats are listed as uncontested and print no votes. The wards are those drawn "
+        "in 2003, which were replaced on 8 March 2013. The aldermen are elected separately, at ward meetings, and "
+        "are not included."
+    ),
     date(2009, 3, 16): (
         "Voters in each ward had as many votes as the ward has seats. The corporation's notices of persons elected "
         "print each candidate's votes and mark the winners; they print neither the electorate nor the turnout. In the "
@@ -369,6 +552,9 @@ def fetch() -> None:
         raw.fetch(SOURCE, results_capture(stamp, path), suffix=".html")
         time.sleep(1.2)
     for stamp, url in HISTORY_PAGES:
+        raw.fetch(SOURCE, f"https://web.archive.org/web/{stamp}if_/{url}", suffix=".html")
+        time.sleep(1.2)
+    for stamp, url in [*LEGACY_PAGES.values(), *EARLY_PAGES]:
         raw.fetch(SOURCE, f"https://web.archive.org/web/{stamp}if_/{url}", suffix=".html")
         time.sleep(1.2)
     for url, suffix, _ in SCILLY_PAGES.values():
@@ -1074,13 +1260,172 @@ def history_rows(stamp: str, url: str) -> list[dict[str, object]]:
     return out
 
 
+def flat(path: Path) -> str:
+    text = re.sub(r"(?s)<(script|style).*?</\1>", "", path.read_text(errors="ignore"))
+    return " ".join(html.unescape(re.sub(r"<[^>]+>", " ", text)).replace("\xa0", " ").split())
+
+
+def early_rows() -> list[dict[str, object]]:
+    wards = {label: code for code, label, _ in OLD_WARDS}
+    pages = {
+        stamp: (
+            f"https://web.archive.org/web/{stamp}if_/{url}",
+            flat(raw.cached(SOURCE, f"https://web.archive.org/web/{stamp}if_/{url}").path),
+        )
+        for stamp, url in EARLY_PAGES
+    }
+    out: list[dict[str, object]] = []
+    for kind, day, day_to, label, which, turnout, people in EARLY:
+        page, text = pages[EARLY_PAGES[which][0]]
+        contested = people[0][2] is not None
+        if contested:
+            top = max(votes or 0 for *_, votes in people)
+            if sum(votes == top for *_, votes in people) != 1:
+                raise ValueError(f"{label} {day}: tie for first")
+            if turnout is not None and f"{turnout:g}%" not in text.replace(" %", "%"):
+                raise ValueError(f"{label} {day}: turnout {turnout}")
+        for given, surname, votes in people:
+            pattern = (
+                rf"{re.escape(surname.replace('-', ' ')).replace(chr(92) + ' ', '[ -]')}\W{{1,4}}{votes}\b"
+                if votes
+                else re.escape(surname)
+            )
+            if re.search(pattern, text, flags=re.IGNORECASE) is None or given.split()[0].lower() not in text.lower():
+                raise ValueError(f"{label} {day}: {given} {surname} {votes} not on {page}")
+        for number, (given, surname, votes) in enumerate(people, start=1):
+            out.append(
+                {
+                    "kind": kind,
+                    "day": day,
+                    "day_to": day_to,
+                    "ward_code": wards[label],
+                    "ward": label,
+                    "number": number,
+                    "printed": f"{given} {surname}",
+                    "surname": surname,
+                    "given": given,
+                    "party": "",
+                    "votes": votes,
+                    "elected": not contested or votes == top,
+                    "uncontested": not contested,
+                    "turnout": turnout,
+                    "ballots": None,
+                    "spoilt": None,
+                    "page": page,
+                }
+            )
+    return out
+
+
+def old_surname(printed: str) -> str:
+    printed = re.sub(r"\s+(?:CBE|MBE|OBE)\b.*", "", printed.strip())
+    surname = proper(printed) if printed.isupper() else printed
+    return "Cenci Di Bello" if surname == "Cenci di Bello" else surname
+
+
+def legacy_rows() -> list[dict[str, object]]:
+    wards = {label: code for code, label, _ in OLD_WARDS}
+    wards["Bridge"] = wards["Bridge With / Bridge Without"] = wards["Bridge and Bridge Without"]
+    out: list[dict[str, object]] = []
+    for day, (stamp, url) in LEGACY_PAGES.items():
+        page = f"https://web.archive.org/web/{stamp}if_/{url}"
+        found: dict[str, list[tuple[str, str, int | None, bool | None]]] = {}
+        path = raw.cached(SOURCE, page).path
+        if day.year == 2004:
+            for row in re.findall(r"(?is)<tr[^>]*>(.*?)</tr>", path.read_text(errors="ignore")):
+                parts = [
+                    [
+                        line.strip()
+                        for line in html.unescape(re.sub(r"<[^>]+>", "", re.sub(r"(?i)<br\s*/?>", "\n", cell)))
+                        .replace("\xa0", " ")
+                        .splitlines()
+                        if line.strip()
+                    ]
+                    for cell in re.findall(r"(?is)<td[^>]*>(.*?)</td>", row)
+                ]
+                if len(parts) < 2 or len(parts[0]) != 1 or parts[0][0] not in wards:
+                    continue
+                label = parts[0][0]
+                names = [re.sub(r"\s+,", ",", " ".join(name.split())) for name in parts[1]]
+                if len(parts) >= 3:
+                    votes = [int(v) for v in parts[2]]
+                    seats = sum(line == "E" for line in " ".join(parts[3]).split())
+                    if len(votes) != len(names) or not seats:
+                        raise ValueError(f"{label}: {names} {votes} {parts[3:]}")
+                    cut = sorted(votes, reverse=True)[seats - 1]
+                    flags = [v >= cut for v in votes]
+                    if sum(flags) != seats:
+                        raise ValueError(f"{label}: tie at the cut")
+                    found[label] = [(n, "", v, f) for n, v, f in zip(names, votes, flags, strict=True)]
+                else:
+                    found[label] = [(n, "", None, True) for n in names]
+        else:
+            body = re.sub(r"(?s)<(script|style).*?</\1>", "", path.read_text(errors="ignore"))
+            body = re.sub(r"(?i)</?(?:p|div|tr|td|li|br|h\d)[^>]*>", "\n", body)
+            lines = [
+                " ".join(line.split())
+                for line in html.unescape(re.sub(r"<[^>]+>", "", body)).replace("\xa0", " ").splitlines()
+            ]
+            lines = [line.replace(", MBE (NEE LONGMAN),", " MBE,") for line in lines if line]
+            label, kind = "", ""
+            chunks: dict[str, tuple[str, list[str]]] = {}
+            for line in lines[lines.index("Aldersgate (Uncontested)") :]:
+                if line.startswith("2004 election results"):
+                    break
+                if m := re.fullmatch(r"([A-Z][A-Za-z /]+?) \((Uncontested|Contested[^)]*)\)", line):
+                    label, kind = m.groups()
+                    chunks[label] = (kind, [])
+                else:
+                    chunks[label][1].append(line)
+            for label, (kind, body_lines) in chunks.items():
+                if kind == "Uncontested":
+                    found[label] = [(n, "", None, True) for n in body_lines]
+                    continue
+                items = re.findall(r"([^,\d]+?)\s*,\s*([^,\d]+?)\s+(\d+)\s*(E)?(?=\s|$)", " ".join(body_lines))
+                found[label] = [(f"{n.strip()}, {g.strip()}", "", int(v), e == "E") for n, g, v, e in items]
+                counts = re.search(r"(\d+) for (\d+)", kind, flags=re.IGNORECASE)
+                if (
+                    counts is None
+                    or len(items) != int(counts.group(1))
+                    or sum(bool(i[3]) for i in found[label]) != int(counts.group(2))
+                ):
+                    raise ValueError(f"{label}: {body_lines}")
+        if len(found) != 25:
+            raise ValueError(f"{day}: {len(found)} wards {sorted(found)}")
+        for label, people in found.items():
+            label = "Bridge and Bridge Without" if label.startswith("Bridge") else label
+            uncontested = people[0][2] is None
+            for number, (printed, _, votes, elected) in enumerate(people, start=1):
+                surname, sep, given = printed.partition(",")
+                if not sep or not given.strip():
+                    raise ValueError(f"{label}: no comma in {printed!r}")
+                out.append(
+                    {
+                        "day": day,
+                        "ward_code": wards[label],
+                        "ward": label,
+                        "number": number,
+                        "printed": printed,
+                        "surname": old_surname(surname),
+                        "given": given.strip().title() if given.isupper() else given.strip(),
+                        "party": "",
+                        "votes": votes,
+                        "elected": bool(elected),
+                        "turnout": None,
+                        "uncontested": uncontested,
+                        "page": page,
+                    }
+                )
+    return out
+
+
 def day_fix(row: dict[str, object]) -> tuple[date, str] | None:
     day = row["day"]
     return DAY_FIXES.get((str(row["ward_code"]), day)) if isinstance(day, date) else None
 
 
 def extra_rows() -> list[dict[str, object]]:
-    rows = aldermen_rows() + web_rows()
+    rows = aldermen_rows() + web_rows() + early_rows()
     for row in rows:
         fix = day_fix(row)
         if fix:
@@ -1199,11 +1544,16 @@ def parse() -> None:
                     "page": url,
                 }
             )
+    rows += legacy_rows()
     frame = pl.DataFrame(rows, infer_schema_length=None)
     seats = frame.group_by("day").agg(pl.col("ward_code").n_unique().alias("wards"), pl.col("elected").sum())
     vacant = {day: sum(n for (on, _), (n, _) in CITY_VACANCIES.items() if on == day) for day in seats["day"]}
     seats = seats.with_columns(pl.col("elected") + pl.col("day").replace_strict(vacant, return_dtype=pl.UInt32))
-    if seats.height != len(CITY_NOTICES) + 2 or (seats["wards"] != 25).any() or (seats["elected"] != CITY_SEATS).any():
+    if (
+        seats.height != len(CITY_NOTICES) + len(LEGACY_PAGES) + 2
+        or (seats["wards"] != 25).any()
+        or (seats["elected"] != CITY_SEATS).any()
+    ):
         raise ValueError(f"wards and seats by day: {seats}")
     for ward in frame.group_by("day", "ward_code"):
         lines = ward[1]
@@ -1274,7 +1624,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="City of London Corporation's 2009, 2013, 2017, 2022, and 2025 Common Council ward elections, its aldermanic elections and Common Council by-elections from 2007, and the Council of the Isles of Scilly's 2021 and 2025 elections, from the councils' own results",
+            summary="City of London Corporation's 2004, 2005, 2009, 2013, 2017, 2022, and 2025 Common Council ward elections, its aldermanic elections and Common Council by-elections from September 2004, and the Council of the Isles of Scilly's 2021 and 2025 elections, from the councils' own results",
             polity="GB",
         )
 
@@ -1400,7 +1750,14 @@ def emit() -> Path:
                 vacancy = CITY_VACANCIES.get((day, code))
                 seats = int(lines["elected"].sum()) + (vacancy[0] if vacancy else 0)
                 tacit = bool(lines["uncontested"][0])
-                if day in CITY_NOTICES:
+                if day in LEGACY_PAGES:
+                    stamp = LEGACY_PAGES[day][0]
+                    source = source_of(
+                        lines["page"][0],
+                        "City of London Corporation",
+                        f"Ward elections {day.year} results page, captured {datetime.strptime(stamp[:8], '%Y%m%d'):%-d %B %Y}",
+                    )
+                elif day in CITY_NOTICES:
                     url, archive, title = CITY_NOTICES[day]
                     source = source_of(url, "City of London Corporation", title, archive + url)
                 elif day.year == 2025:
