@@ -250,6 +250,34 @@ COUNCILS["E06000052"] = {
     "anchored": True,
     "reader": "notices+declarations",
 }
+DORSET_2024 = (
+    "https://www.dorsetcouncil.gov.uk/w/parish-and-town-councils-within-the-dorset-council-area-elections-on-2-may-2024"
+)
+COUNCILS["E06000059/2024"] = {
+    "day": date(2024, 5, 2),
+    "publisher": "Dorset Council",
+    "title": "Parish and town councils within the Dorset Council area: elections on 2 May 2024",
+    "url": f"{DORSET_2024}-contested",
+    "pages": [f"https://web.archive.org/web/20250320152355id_/{DORSET_2024}-contested"],
+    "files": [
+        "https://www.dorsetcouncil.gov.uk/documents/35024/4507077/NoUE+-+Parish+and+town+areas+-+2+May+2024+v080424.pdf/f33f7ac6-b8a5-a0fb-7d56-0eec6cd07bba"
+    ],
+    "header": 400,
+    "reader": "notices+dorset",
+}
+COUNCILS["E06000059/2024-06"] = {
+    "day": date(2024, 6, 20),
+    "publisher": "Dorset Council",
+    "title": "Parish councils within the Dorset Council area: elections on 20 June 2024",
+    "url": "https://www.dorsetcouncil.gov.uk/w/parish-councils-within-the-dorset-council-area-elections-on-20-june-2024-uncontested-",
+    "pages": ["https://www.dorsetcouncil.gov.uk/w/chettle-parish-council-election-on-20-june-2024"],
+    "files": [
+        "https://www.dorsetcouncil.gov.uk/documents/d/guest/parish-and-town-councils-notices-of-uncontested-elections-20-june-2024-1"
+    ],
+    "header": 400,
+    "footnote": True,
+    "reader": "notices+dorset",
+}
 POST_NOMINALS = re.compile(r"^(?:[A-Z]{2,5}\.\s+)+")
 BROWSER = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36"
 PARTIES: dict[str, str | None] = {
@@ -276,6 +304,8 @@ ALIASES = {
     ("E06000052", "Lanteglos-by-Fowey"): "Lanteglos",
     ("E06000052", "St Dominic"): "St. Dominick",
     ("E06000052", "St Michael Penkivel"): "St. Michael Penkevil",
+    ("E06000059", "Iwerne Courtney"): "Iwerne Courtney or Shroton",
+    ("E06000059", "Winfrith Newburgh and East Knighton"): "Winfrith Newburgh",
 }
 GROUPED = {
     ("E07000071", "Abberton and Langenhoe"),
@@ -463,13 +493,16 @@ def area_of(page: str) -> tuple[str, str, str | None] | None:
         if inline:
             return inline.group(1), " ".join(inline.group(2).split()), None
         return None
-    area = " ".join(heading.group(2).split())
+    area = " ".join(heading.group(2).split()).replace(" \u2013 ", " - ").replace("`", "'")
     area = re.sub(r"^(?:Parish|Town) of ", "", area)
     area = re.sub(r"(?<=[A-Z]) (?:Parish|Town)$", "", area)
     if area.isupper():
         area = area.title()
-    if council := re.fullmatch(r"(.+?) (?:Parish|Town|City|Community) Council(?: - (.+) Ward)?", area):
+    if council := re.fullmatch(r"(.+?) (?:Parish|Town|City|Community) Council(?: - (.+?)(?: Ward)?)?", area):
         return heading.group(1) or "Parish", council.group(1), council.group(2)
+    if warded := re.fullmatch(r"(.+?) Parish - (.+?)(?: Ward)?", area):
+        return heading.group(1) or "Parish", warded.group(1), warded.group(2)
+    area = area.removesuffix(" Parish")
     ward = re.fullmatch(r"(.+?) \((.+)\)", area)
     return heading.group(1) or "Parish", *((ward.group(1), ward.group(2)) if ward else (area, None))
 
@@ -527,7 +560,9 @@ def notices(lad: str, council: dict) -> list[dict]:
             else:
                 style, parish, ward = heading
                 parish, ward = council.get("areas", {}).get(parish, (parish, ward))
-                header = max(y for x, y, word in words if word == "Candidate" and x < 260 and y < 300)
+                header = max(
+                    y for x, y, word in words if word == "Candidate" and x < 260 and y < council.get("header", 300)
+                )
                 name_limit, description_x = council.get("columns", (215, 375))
                 read: dict = {
                     "lad": lad,
@@ -536,7 +571,7 @@ def notices(lad: str, council: dict) -> list[dict]:
                     "style": style,
                     "parish": parish,
                     "ward": ward,
-                    "uncontested": "UNCONTESTED" in page,
+                    "uncontested": "UNCONTESTED" in page or "Notice of Uncontested Election" in page,
                     "places": None,
                     "electorate": None,
                     "ballots": None,
@@ -548,7 +583,8 @@ def notices(lad: str, council: dict) -> list[dict]:
                 reads.append(read)
             candidates: list[dict] = read["candidates"]
             if read["uncontested"]:
-                bottom = min((y for x, y, word in words if word.startswith(("Dated", "Printed"))), default=9999.0)
+                ends = ("Dated", "Printed", "England,") if council.get("footnote") else ("Dated", "Printed")
+                bottom = min((y - 3 for x, y, word in words if word.startswith(ends)), default=9999.0)
                 for line in rows_of(words, header + 6, bottom):
                     name = joined(line, 0, name_limit)
                     description = joined(line, description_x, 999)
@@ -604,14 +640,17 @@ def notices(lad: str, council: dict) -> list[dict]:
     for read in reads:
         for candidate in read["candidates"]:
             if read.pop("uncontested", None) or "surname" in candidate:
+                forenames = candidate.pop("forenames")
+                known = re.fullmatch(r"(.+?)\s*\(commonly known as (.+)\)", forenames)
                 candidate |= {
-                    "printed": f"{candidate.pop('surname')}, {candidate.pop('forenames')}",
-                    "known_as": None,
+                    "printed": f"{candidate.pop('surname')}, {known.group(1) if known else forenames}",
+                    "known_as": known.group(2) if known else None,
                     "votes": None,
                     "elected": True,
                 }
             printed = candidate["printed"]
-            candidate["name"] = surname_first(candidate["known_as"] or printed)
+            shown = candidate["known_as"] or printed
+            candidate["name"] = surname_first(shown) if "," in shown else shown
             if candidate["known_as"]:
                 candidate["printed"] = f"{printed} commonly known as {candidate['known_as']}"
             del candidate["known_as"]
@@ -722,6 +761,60 @@ def rugby(lad: str, council: dict) -> list[dict]:
                 "electorate": figures["Electorate"],
                 "ballots": figures["Ballot papers issued"],
                 "rejected": None,
+                "total": None,
+                "remark": None,
+                "candidates": candidates,
+            }
+        )
+    return reads
+
+
+def dorset(lad: str, council: dict) -> list[dict]:
+    url = council["pages"][0]
+    page = Path(raw.cached(SOURCE, url).path).read_text(encoding="utf-8")
+    reads = []
+    for heading, body in re.findall(r"<h[23]>(.*?)</h[23]>(.*?)(?=<h[23]>|$)", page, re.DOTALL):
+        area = re.fullmatch(r"(.+?)\s*\((\d+) seats?\)|Results of the (.+?) election on .+", text(heading))
+        if area is None or "<table" not in body:
+            continue
+        council_name, _, ward = (area.group(1) or area.group(3)).partition(" - ")
+        parish = re.sub(r" (?:Parish|Town)(?: Council)?$", "", council_name)
+        tables = re.findall(r"<tbody>(.*?)</tbody>", body, re.DOTALL)
+        candidates = []
+        for row in re.findall(r"<tr>(.*?)</tr>", tables[0], re.DOTALL):
+            cells = re.findall(r"<td[^>]*>(.*?)</td>", row, re.DOTALL)
+            printed, description, votes = (text(cell).replace("`", "'") for cell in cells)
+            known = re.search(r"\(commonly known as (.+)\)$", printed)
+            printed = re.sub(r"\s*\(commonly known as .+\)$", "", printed)
+            surname = re.fullmatch(r"((?:[A-Z][A-Z'\u2019-]+\s+)*[A-Z][A-Z'\u2019-]+)\s+(\S.*)", printed)
+            figure = re.fullmatch(r"(\d+)( ELECTED)?", votes)
+            if surname is None or figure is None:
+                raise ValueError(f"{url}: cannot read {printed} {votes}")
+            candidates.append(
+                {
+                    "printed": f"{printed} commonly known as {known.group(1)}" if known else printed,
+                    "name": known.group(1) if known else f"{surname.group(2)} {display(surname.group(1))}",
+                    "description": description,
+                    "votes": int(figure.group(1)),
+                    "elected": figure.group(2) is not None,
+                }
+            )
+        rejected = re.search(r"<td>Total</td>\s*<td>(\d+)</td>", tables[1])
+        figures = dict(re.findall(r"(vacant seats|electorate|ballot papers issued): (\d+)", text(body)))
+        if rejected is None or int(figures["vacant seats"]) != int(area.group(2) or figures["vacant seats"]):
+            raise ValueError(f"{url}: {council_name} figures")
+        reads.append(
+            {
+                "lad": lad,
+                "url": url,
+                "page": None,
+                "style": "Town" if "Town Council" in council_name else "Parish",
+                "parish": parish,
+                "ward": ward.removesuffix(" Ward") or None,
+                "places": int(figures["vacant seats"]),
+                "electorate": int(figures["electorate"]),
+                "ballots": int(figures["ballot papers issued"]),
+                "rejected": int(rejected.group(1)),
                 "total": None,
                 "remark": None,
                 "candidates": candidates,
@@ -1072,6 +1165,7 @@ READERS = {
     "chorley": chorley,
     "colchester": colchester,
     "colchester_poll": colchester_poll,
+    "dorset": dorset,
 }
 
 
@@ -1090,7 +1184,7 @@ def parse() -> None:
                join polity_territory pt on pt.area_id = a.id and pt.valid @> %s::date
                join external_id pe on pe.entity_id = pt.polity_id and pe.scheme = 'gb.polity'
                where a.scheme_code in ('gb.parish', 'gb.parish_group') and pc.code = any(%s)""",
-                [day, sorted(lad for lad, council in COUNCILS.items() if council["day"] == day)],
+                [day, sorted({entry.split("/")[0] for entry, council in COUNCILS.items() if council["day"] == day})],
             ).fetchall()
         ]
     known: dict[tuple[str, str], set[tuple[str, str, str]]] = {}
@@ -1098,9 +1192,10 @@ def parse() -> None:
         known.setdefault((lad, fold(name)), set()).add((key, scheme, code))
     rows = []
     misses: list[str] = []
-    for lad, council in COUNCILS.items():
-        reads = [read for reader in council["reader"].split("+") for read in READERS[reader](lad, council)]
-        reconcile(lad, council, reads)
+    for entry, council in COUNCILS.items():
+        reads = [read for reader in council["reader"].split("+") for read in READERS[reader](entry, council)]
+        reconcile(entry, council, reads)
+        lad = entry.split("/")[0]
         for read in reads:
             if (lad, read["parish"]) in GROUPED:
                 continue
@@ -1124,8 +1219,8 @@ def parse() -> None:
     if misses:
         raise ValueError("; ".join(misses))
     frame = pl.DataFrame(rows, infer_schema_length=None)
-    contests = frame.select("key", "ward").unique().height
-    uncontested = frame.filter(pl.col("votes").is_null()).select("key", "ward").unique().height
+    contests = frame.select("key", "day", "ward").unique().height
+    uncontested = frame.filter(pl.col("votes").is_null()).select("key", "day", "ward").unique().height
     print(
         f"{frame['key'].n_unique()} councils, {contests} contests ({uncontested} uncontested), "
         f"{frame.height} candidates",
@@ -1207,7 +1302,7 @@ def emit() -> Path:
 
         people: dict[str, UUID] = {}
         elections: set[str] = set()
-        for (key, ward), lines in frame.group_by("key", "ward", maintain_order=True):
+        for (key, _, ward), lines in frame.group_by("key", "day", "ward", maintain_order=True):
             assert isinstance(key, str)
             first = lines.row(0, named=True)
             day = first["day"]
