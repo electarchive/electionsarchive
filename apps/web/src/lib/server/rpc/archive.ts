@@ -808,6 +808,14 @@ const PlaceRow = v.pipe(
         path: v.nullable(v.string()),
         date: v.string(),
         bar: v.nullable(v.number()),
+        spread: v.optional(
+          v.object({
+            share: v.number(),
+            reach: v.number(),
+            isStrict: v.boolean(),
+            noun: v.string(),
+          }),
+        ),
         shares: v.array(FINE),
         winner: v.nullable(v.number()),
         margin: v.nullable(FINE),
@@ -5945,6 +5953,12 @@ async function tabulate(
             runoff: string;
             date: string;
             bar: number | null;
+            spread: {
+              share: number;
+              reach: number;
+              isStrict: boolean;
+              noun: string;
+            } | null;
             person: string | null;
             party: string | null;
             votes: number;
@@ -5967,6 +5981,17 @@ async function tabulate(
             select last.first as contest, last.id as runoff, e.date_from::text as date,
               case when coalesce(f.rules_override ->> 'formula', es.rules ->> 'formula', '') in ('two_round', 'supplementary')
                 then coalesce((f.rules_override ->> 'majority')::float8, (es.rules ->> 'majority')::float8, 0.5) end as bar,
+              (
+                select jsonb_build_object(
+                  'share', (r.spread ->> 'share')::float8,
+                  'reach', (r.spread -> 'units' ->> 'share')::float8,
+                  'isStrict', coalesce((r.spread -> 'units' ->> 'strict')::boolean, false),
+                  'noun', coalesce(s.noun, 'area')
+                )
+                from (select coalesce(f.rules_override -> 'spread', es.rules -> 'spread') as spread) r
+                left join scheme s on s.code = r.spread ->> 'scheme'
+                where coalesce(f.rules_override ->> 'formula', es.rules ->> 'formula', '') = 'two_round' and r.spread is not null
+              ) as spread,
               coalesce(m.into_id, cy.person_id) as person,
               coalesce(pm.into_id, o.party_id, (
                 select l.party_id from contest_option l
@@ -6433,6 +6458,7 @@ async function tabulate(
             path: head == null ? null : (runoffPaths.get(head.runoff) ?? null),
             date: head?.date ?? "",
             bar: head?.bar ?? null,
+            spread: head?.spread ?? null,
             total,
             votes,
             winner,
@@ -6609,6 +6635,7 @@ async function tabulate(
               path: chain.path,
               date: chain.date,
               bar: chain.bar,
+              ...(chain.spread != null && { spread: chain.spread }),
               shares: kept.map((item) =>
                 chain.total > 0
                   ? (chain.votes.get(item.key) ?? 0) / chain.total
