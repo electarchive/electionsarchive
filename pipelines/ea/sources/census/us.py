@@ -128,9 +128,12 @@ def emit() -> str:
         }
 
     def state_rows(entry: dict, field: str, source: str, locate, target) -> None:
+        laws = entry.pop("laws", {})
         for group in entry.pop(field):
             for st in group["states"].split():
                 rule = {k: v for k, v in group.items() if k != "states"}
+                if "locator" not in rule:
+                    rule.update(laws.get(st, {}))
                 entry["cadence"].append(
                     {
                         "within": f"US-{st}",
