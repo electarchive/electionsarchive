@@ -1,0 +1,18 @@
+{
+  "year": 1906,
+  "day": "1906-11-06",
+  "polity": "US-PA",
+  "publisher": "Pennsylvania Senate (Smull's Legislative Hand Book)",
+  "title": "Smull's Legislative Hand Book, 1909, general election 1906-11-06, Governor by county",
+  "license": "Public record",
+  "file": {
+    "url": "manual://MF-664/The_Pennsylvania_Manual.pdf"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "governor": "Governor, counties down, a column per candidate and party line; several party-line columns for one candidate are fused"
+  },
+  "leaves": [
+    557
+  ]
+}
