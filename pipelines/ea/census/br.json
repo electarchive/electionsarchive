@@ -379,6 +379,18 @@
       "url": "http://bd.camara.leg.br/bd/handle/bdcamara/31679",
       "kind": "official_body"
     },
+    "decreto-1832-06-16": {
+      "title": "Decreto de 16 de junho de 1832 (declares that the elections of deputies for the 1834 to 1837 legislature be held between 1 January and 30 June 1833), Collecção das Leis do Imperio do Brazil 1832, parte 1, Actos do Poder Legislativo",
+      "publisher": "Coleção das Leis do Império, via Câmara dos Deputados, Biblioteca Digital",
+      "url": "https://bd.camara.leg.br/bd/handle/bdcamara/18299",
+      "kind": "official_body"
+    },
+    "circular-imperio-1856": {
+      "title": "Circular of the Ministry of the Empire of 30 September 1856 (N. 321, the day on which the electoral colleges meet and the deputies are elected), Collecção das Leis do Imperio do Brazil 1856, parte 3, pp. 329-330",
+      "publisher": "Coleção das Leis do Império, via Câmara dos Deputados, Biblioteca Digital",
+      "url": "https://bd.camara.leg.br/bd/handle/bdcamara/18299",
+      "kind": "official_body"
+    },
     "decreto-157-1842": {
       "title": "Decreto n. 157 de 4 de maio de 1842 (instructions for the general and provincial elections), art. 34, Collecção das Leis do Império do Brasil 1842, tomo 5, parte 2, p. 261",
       "publisher": "Coleção das Leis do Império, via Câmara dos Deputados, Biblioteca Digital",
@@ -2134,10 +2146,11 @@
           "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
         },
         {
-          "date": "1834-01-01",
+          "date": "1833-01-01",
           "precision": "year",
-          "source": "wp-eleicoes-br",
-          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+          "source": "decreto-1832-06-16",
+          "note": "Election year for the Chamber of Deputies of the 1834 to 1837 legislature. The decree fixes only an interval, 1 January to 30 June 1833, in which every province was to hold its elections, so no single polling day is fixed. Contests and seats not yet counted.",
+          "quote": "As eleições dos Deputados, que hão de servir na Legislatura de 1834 a 1837, serão feitas, em todas as Provincias do Imperio, no intervallo, que decorre do primeiro de Janeiro ao ultimo de Junho de 1833."
         },
         {
           "date": "1838-01-01",
@@ -2183,10 +2196,10 @@
           "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
         },
         {
-          "date": "1856-01-01",
-          "precision": "year",
-          "source": "wp-eleicoes-br",
-          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+          "date": "1856-12-03",
+          "source": "circular-imperio-1856",
+          "note": "Polling day of the second stage, when the electoral colleges chose the deputies of the 1857 to 1860 legislature, the first under the single-member district law (Decreto 842 of 1855); the colleges met on 2 December for the preparatory session. The circular does not print the first-stage day, which parish voters held earlier.",
+          "quote": "devem naquelle dia, 2 de Dezembro, reunir-se os Collegios Eleitoraes para celebrar a Sessão preparatoria [...] e no immediato dia 3 do referido mez de Dezembro, se deve proceder á sobredita eleição"
         },
         {
           "date": "1860-12-30",
