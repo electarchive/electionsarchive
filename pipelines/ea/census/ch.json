@@ -478,6 +478,25 @@
       "publisher": "Kanton Thurgau, Thurgauer Rechtsbuch",
       "url": "https://www.rechtsbuch.tg.ch/app/de/texts_of_law/131.1",
       "kind": "official_body"
+    },
+    "bfs-agv-hist": {
+      "title": "Amtliches Gemeindeverzeichnis der Schweiz, historical snapshots of 1 January 1960 to 1 January 2025 (Kantone, Bezirke, Gemeinden; API snapshots)",
+      "publisher": "Bundesamt für Statistik (BFS)",
+      "url": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2025",
+      "kind": "official_body",
+      "note": "One snapshot per year, taken by changing the date parameter; the register starts in 1960 in this form. A commune count is the number of level-3 rows under each canton on 1 January, and a row is added only where the count changed since the year before."
+    },
+    "vd-ce-2006": {
+      "title": "Le Conseil d'Etat convoque les électeurs le 12 mars 2006 (communiqué: renewal of the communal authorities for five years, législature 2006-2011)",
+      "publisher": "État de Vaud, Conseil d'Etat",
+      "url": "https://www.vd.ch/typo3temp/assets/pdfs/le-conseil-detat-convoque-les-electeurs-le-12-mars-2006-1131040024.pdf",
+      "kind": "official_body"
+    },
+    "fr-ville-archives": {
+      "title": "Archives de la Ville de Fribourg: Conseil communal (history of the communal elections since the 1980 law)",
+      "publisher": "Ville de Fribourg, Archives de la Ville",
+      "url": "https://archives.ville-fribourg.ch/ville-de-fribourg-conseil-communal",
+      "kind": "official_body"
     }
   },
   "tiers": [
@@ -630,9 +649,135 @@
       "counts": [
         {
           "within": "CH-AG",
-          "date": "2026-01-01",
+          "date": "1960-01-01",
+          "value": 233,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1960"
+        },
+        {
+          "within": "CH-AG",
+          "date": "1962-01-01",
+          "value": 232,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1962"
+        },
+        {
+          "within": "CH-AG",
+          "date": "1970-01-01",
           "value": 231,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1970"
+        },
+        {
+          "within": "CH-AG",
+          "date": "1983-01-01",
+          "value": 232,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1983"
+        },
+        {
+          "within": "CH-AG",
+          "date": "2002-01-01",
+          "value": 231,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2002"
+        },
+        {
+          "within": "CH-AG",
+          "date": "2006-01-01",
+          "value": 229,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2006"
+        },
+        {
+          "within": "CH-AG",
+          "date": "2010-01-01",
+          "value": 220,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2010"
+        },
+        {
+          "within": "CH-AG",
+          "date": "2012-01-01",
+          "value": 219,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2012"
+        },
+        {
+          "within": "CH-AG",
+          "date": "2013-01-01",
+          "value": 216,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2013"
+        },
+        {
+          "within": "CH-AG",
+          "date": "2014-01-01",
+          "value": 213,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2014"
+        },
+        {
+          "within": "CH-AG",
+          "date": "2018-01-01",
+          "value": 212,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2018"
+        },
+        {
+          "within": "CH-AG",
+          "date": "2019-01-01",
+          "value": 211,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2019"
+        },
+        {
+          "within": "CH-AG",
+          "date": "2020-01-01",
+          "value": 210,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2020"
+        },
+        {
+          "within": "CH-AG",
+          "date": "2022-01-01",
+          "value": 200,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2022"
+        },
+        {
+          "within": "CH-AG",
+          "date": "2023-01-01",
+          "value": 198,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2023"
+        },
+        {
+          "within": "CH-AG",
+          "date": "2024-01-01",
+          "value": 197,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2024"
+        },
+        {
+          "within": "CH-AG",
+          "date": "2026-01-01",
+          "value": 196,
           "source": "bfs-agv-2026"
+        },
+        {
+          "within": "CH-AI",
+          "date": "1960-01-01",
+          "value": 6,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1960"
+        },
+        {
+          "within": "CH-AI",
+          "date": "2023-01-01",
+          "value": 5,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2023"
         },
         {
           "within": "CH-AI",
@@ -642,9 +787,205 @@
         },
         {
           "within": "CH-AR",
+          "date": "1960-01-01",
+          "value": 20,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1960"
+        },
+        {
+          "within": "CH-AR",
           "date": "2026-01-01",
           "value": 20,
           "source": "bfs-agv-2026"
+        },
+        {
+          "within": "CH-BE",
+          "date": "1960-01-01",
+          "value": 492,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1960"
+        },
+        {
+          "within": "CH-BE",
+          "date": "1973-01-01",
+          "value": 491,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1973"
+        },
+        {
+          "within": "CH-BE",
+          "date": "1979-01-01",
+          "value": 409,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1979"
+        },
+        {
+          "within": "CH-BE",
+          "date": "1980-01-01",
+          "value": 410,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1980"
+        },
+        {
+          "within": "CH-BE",
+          "date": "1983-01-01",
+          "value": 412,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1983"
+        },
+        {
+          "within": "CH-BE",
+          "date": "1993-01-01",
+          "value": 414,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1993"
+        },
+        {
+          "within": "CH-BE",
+          "date": "1994-01-01",
+          "value": 401,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1994"
+        },
+        {
+          "within": "CH-BE",
+          "date": "1997-01-01",
+          "value": 400,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1997"
+        },
+        {
+          "within": "CH-BE",
+          "date": "2004-01-01",
+          "value": 398,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2004"
+        },
+        {
+          "within": "CH-BE",
+          "date": "2007-01-01",
+          "value": 396,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2007"
+        },
+        {
+          "within": "CH-BE",
+          "date": "2008-01-01",
+          "value": 395,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2008"
+        },
+        {
+          "within": "CH-BE",
+          "date": "2009-01-01",
+          "value": 392,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2009"
+        },
+        {
+          "within": "CH-BE",
+          "date": "2010-01-01",
+          "value": 388,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2010"
+        },
+        {
+          "within": "CH-BE",
+          "date": "2011-01-01",
+          "value": 383,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2011"
+        },
+        {
+          "within": "CH-BE",
+          "date": "2012-01-01",
+          "value": 382,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2012"
+        },
+        {
+          "within": "CH-BE",
+          "date": "2013-01-01",
+          "value": 379,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2013"
+        },
+        {
+          "within": "CH-BE",
+          "date": "2014-01-01",
+          "value": 362,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2014"
+        },
+        {
+          "within": "CH-BE",
+          "date": "2015-01-01",
+          "value": 356,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2015"
+        },
+        {
+          "within": "CH-BE",
+          "date": "2016-01-01",
+          "value": 352,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2016"
+        },
+        {
+          "within": "CH-BE",
+          "date": "2017-01-01",
+          "value": 351,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2017"
+        },
+        {
+          "within": "CH-BE",
+          "date": "2018-01-01",
+          "value": 347,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2018"
+        },
+        {
+          "within": "CH-BE",
+          "date": "2019-01-01",
+          "value": 346,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2019"
+        },
+        {
+          "within": "CH-BE",
+          "date": "2020-01-01",
+          "value": 342,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2020"
+        },
+        {
+          "within": "CH-BE",
+          "date": "2021-01-01",
+          "value": 339,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2021"
+        },
+        {
+          "within": "CH-BE",
+          "date": "2022-01-01",
+          "value": 338,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2022"
+        },
+        {
+          "within": "CH-BE",
+          "date": "2023-01-01",
+          "value": 337,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2023"
+        },
+        {
+          "within": "CH-BE",
+          "date": "2024-01-01",
+          "value": 335,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2024"
         },
         {
           "within": "CH-BE",
@@ -654,9 +995,37 @@
         },
         {
           "within": "CH-BL",
+          "date": "1960-01-01",
+          "value": 74,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1960"
+        },
+        {
+          "within": "CH-BL",
+          "date": "1972-01-01",
+          "value": 73,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1972"
+        },
+        {
+          "within": "CH-BL",
+          "date": "1994-01-01",
+          "value": 86,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1994"
+        },
+        {
+          "within": "CH-BL",
           "date": "2026-01-01",
           "value": 86,
           "source": "bfs-agv-2026"
+        },
+        {
+          "within": "CH-BS",
+          "date": "1960-01-01",
+          "value": 3,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1960"
         },
         {
           "within": "CH-BS",
@@ -666,9 +1035,282 @@
         },
         {
           "within": "CH-FR",
+          "date": "1960-01-01",
+          "value": 284,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1960"
+        },
+        {
+          "within": "CH-FR",
+          "date": "1968-01-01",
+          "value": 283,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1968"
+        },
+        {
+          "within": "CH-FR",
+          "date": "1970-01-01",
+          "value": 281,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1970"
+        },
+        {
+          "within": "CH-FR",
+          "date": "1971-01-01",
+          "value": 278,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1971"
+        },
+        {
+          "within": "CH-FR",
+          "date": "1973-01-01",
+          "value": 276,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1973"
+        },
+        {
+          "within": "CH-FR",
+          "date": "1975-01-01",
+          "value": 274,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1975"
+        },
+        {
+          "within": "CH-FR",
+          "date": "1976-01-01",
+          "value": 273,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1976"
+        },
+        {
+          "within": "CH-FR",
+          "date": "1977-01-01",
+          "value": 271,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1977"
+        },
+        {
+          "within": "CH-FR",
+          "date": "1978-01-01",
+          "value": 266,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1978"
+        },
+        {
+          "within": "CH-FR",
+          "date": "1981-01-01",
+          "value": 262,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1981"
+        },
+        {
+          "within": "CH-FR",
+          "date": "1982-01-01",
+          "value": 261,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1982"
+        },
+        {
+          "within": "CH-FR",
+          "date": "1983-01-01",
+          "value": 260,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1983"
+        },
+        {
+          "within": "CH-FR",
+          "date": "1989-01-01",
+          "value": 259,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1989"
+        },
+        {
+          "within": "CH-FR",
+          "date": "1991-01-01",
+          "value": 256,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1991"
+        },
+        {
+          "within": "CH-FR",
+          "date": "1992-01-01",
+          "value": 255,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1992"
+        },
+        {
+          "within": "CH-FR",
+          "date": "1993-01-01",
+          "value": 254,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1993"
+        },
+        {
+          "within": "CH-FR",
+          "date": "1995-01-01",
+          "value": 253,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1995"
+        },
+        {
+          "within": "CH-FR",
+          "date": "1996-01-01",
+          "value": 250,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1996"
+        },
+        {
+          "within": "CH-FR",
+          "date": "1997-01-01",
+          "value": 247,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1997"
+        },
+        {
+          "within": "CH-FR",
+          "date": "1998-01-01",
+          "value": 246,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1998"
+        },
+        {
+          "within": "CH-FR",
+          "date": "1999-01-01",
+          "value": 245,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1999"
+        },
+        {
+          "within": "CH-FR",
+          "date": "2000-01-01",
+          "value": 242,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2000"
+        },
+        {
+          "within": "CH-FR",
+          "date": "2001-01-01",
+          "value": 226,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2001"
+        },
+        {
+          "within": "CH-FR",
+          "date": "2002-01-01",
+          "value": 223,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2002"
+        },
+        {
+          "within": "CH-FR",
+          "date": "2003-01-01",
+          "value": 202,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2003"
+        },
+        {
+          "within": "CH-FR",
+          "date": "2004-01-01",
+          "value": 182,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2004"
+        },
+        {
+          "within": "CH-FR",
+          "date": "2005-01-01",
+          "value": 176,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2005"
+        },
+        {
+          "within": "CH-FR",
+          "date": "2006-01-01",
+          "value": 168,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2006"
+        },
+        {
+          "within": "CH-FR",
+          "date": "2011-01-01",
+          "value": 167,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2011"
+        },
+        {
+          "within": "CH-FR",
+          "date": "2012-01-01",
+          "value": 165,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2012"
+        },
+        {
+          "within": "CH-FR",
+          "date": "2013-01-01",
+          "value": 164,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2013"
+        },
+        {
+          "within": "CH-FR",
+          "date": "2014-01-01",
+          "value": 163,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2014"
+        },
+        {
+          "within": "CH-FR",
+          "date": "2016-01-01",
+          "value": 150,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2016"
+        },
+        {
+          "within": "CH-FR",
+          "date": "2017-01-01",
+          "value": 136,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2017"
+        },
+        {
+          "within": "CH-FR",
+          "date": "2020-01-01",
+          "value": 133,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2020"
+        },
+        {
+          "within": "CH-FR",
+          "date": "2021-01-01",
+          "value": 128,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2021"
+        },
+        {
+          "within": "CH-FR",
+          "date": "2022-01-01",
+          "value": 126,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2022"
+        },
+        {
+          "within": "CH-FR",
+          "date": "2025-01-01",
+          "value": 121,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2025"
+        },
+        {
+          "within": "CH-FR",
           "date": "2026-01-01",
           "value": 119,
           "source": "bfs-agv-2026"
+        },
+        {
+          "within": "CH-GE",
+          "date": "1960-01-01",
+          "value": 45,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1960"
         },
         {
           "within": "CH-GE",
@@ -678,15 +1320,288 @@
         },
         {
           "within": "CH-GL",
+          "date": "1960-01-01",
+          "value": 29,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1960"
+        },
+        {
+          "within": "CH-GL",
+          "date": "2004-01-01",
+          "value": 27,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2004"
+        },
+        {
+          "within": "CH-GL",
+          "date": "2007-01-01",
+          "value": 25,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2007"
+        },
+        {
+          "within": "CH-GL",
+          "date": "2011-01-01",
+          "value": 3,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2011"
+        },
+        {
+          "within": "CH-GL",
           "date": "2026-01-01",
           "value": 3,
           "source": "bfs-agv-2026"
         },
         {
           "within": "CH-GR",
+          "date": "1960-01-01",
+          "value": 221,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1960"
+        },
+        {
+          "within": "CH-GR",
+          "date": "1964-01-01",
+          "value": 220,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1964"
+        },
+        {
+          "within": "CH-GR",
+          "date": "1972-01-01",
+          "value": 219,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1972"
+        },
+        {
+          "within": "CH-GR",
+          "date": "1978-01-01",
+          "value": 218,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1978"
+        },
+        {
+          "within": "CH-GR",
+          "date": "1979-01-01",
+          "value": 216,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1979"
+        },
+        {
+          "within": "CH-GR",
+          "date": "1980-01-01",
+          "value": 215,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1980"
+        },
+        {
+          "within": "CH-GR",
+          "date": "1983-01-01",
+          "value": 213,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1983"
+        },
+        {
+          "within": "CH-GR",
+          "date": "1999-01-01",
+          "value": 212,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1999"
+        },
+        {
+          "within": "CH-GR",
+          "date": "2002-01-01",
+          "value": 209,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2002"
+        },
+        {
+          "within": "CH-GR",
+          "date": "2003-01-01",
+          "value": 208,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2003"
+        },
+        {
+          "within": "CH-GR",
+          "date": "2006-01-01",
+          "value": 207,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2006"
+        },
+        {
+          "within": "CH-GR",
+          "date": "2007-01-01",
+          "value": 206,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2007"
+        },
+        {
+          "within": "CH-GR",
+          "date": "2008-01-01",
+          "value": 203,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2008"
+        },
+        {
+          "within": "CH-GR",
+          "date": "2009-01-01",
+          "value": 190,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2009"
+        },
+        {
+          "within": "CH-GR",
+          "date": "2010-01-01",
+          "value": 180,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2010"
+        },
+        {
+          "within": "CH-GR",
+          "date": "2011-01-01",
+          "value": 178,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2011"
+        },
+        {
+          "within": "CH-GR",
+          "date": "2012-01-01",
+          "value": 176,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2012"
+        },
+        {
+          "within": "CH-GR",
+          "date": "2013-01-01",
+          "value": 158,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2013"
+        },
+        {
+          "within": "CH-GR",
+          "date": "2014-01-01",
+          "value": 146,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2014"
+        },
+        {
+          "within": "CH-GR",
+          "date": "2015-01-01",
+          "value": 125,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2015"
+        },
+        {
+          "within": "CH-GR",
+          "date": "2016-01-01",
+          "value": 114,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2016"
+        },
+        {
+          "within": "CH-GR",
+          "date": "2017-01-01",
+          "value": 112,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2017"
+        },
+        {
+          "within": "CH-GR",
+          "date": "2018-01-01",
+          "value": 108,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2018"
+        },
+        {
+          "within": "CH-GR",
+          "date": "2019-01-01",
+          "value": 106,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2019"
+        },
+        {
+          "within": "CH-GR",
+          "date": "2020-01-01",
+          "value": 105,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2020"
+        },
+        {
+          "within": "CH-GR",
+          "date": "2021-01-01",
+          "value": 101,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2021"
+        },
+        {
+          "within": "CH-GR",
+          "date": "2025-01-01",
+          "value": 100,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2025"
+        },
+        {
+          "within": "CH-GR",
           "date": "2026-01-01",
-          "value": 82,
+          "value": 100,
           "source": "bfs-agv-2026"
+        },
+        {
+          "within": "CH-JU",
+          "date": "1979-01-01",
+          "value": 82,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1979"
+        },
+        {
+          "within": "CH-JU",
+          "date": "1997-01-01",
+          "value": 83,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1997"
+        },
+        {
+          "within": "CH-JU",
+          "date": "2009-01-01",
+          "value": 64,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2009"
+        },
+        {
+          "within": "CH-JU",
+          "date": "2013-01-01",
+          "value": 57,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2013"
+        },
+        {
+          "within": "CH-JU",
+          "date": "2018-01-01",
+          "value": 55,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2018"
+        },
+        {
+          "within": "CH-JU",
+          "date": "2019-01-01",
+          "value": 53,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2019"
+        },
+        {
+          "within": "CH-JU",
+          "date": "2023-01-01",
+          "value": 51,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2023"
+        },
+        {
+          "within": "CH-JU",
+          "date": "2024-01-01",
+          "value": 50,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2024"
         },
         {
           "within": "CH-JU",
@@ -696,9 +1611,128 @@
         },
         {
           "within": "CH-LU",
+          "date": "1960-01-01",
+          "value": 107,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1960"
+        },
+        {
+          "within": "CH-LU",
+          "date": "2005-01-01",
+          "value": 103,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2005"
+        },
+        {
+          "within": "CH-LU",
+          "date": "2006-01-01",
+          "value": 97,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2006"
+        },
+        {
+          "within": "CH-LU",
+          "date": "2007-01-01",
+          "value": 96,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2007"
+        },
+        {
+          "within": "CH-LU",
+          "date": "2009-01-01",
+          "value": 88,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2009"
+        },
+        {
+          "within": "CH-LU",
+          "date": "2010-01-01",
+          "value": 87,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2010"
+        },
+        {
+          "within": "CH-LU",
+          "date": "2013-01-01",
+          "value": 83,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2013"
+        },
+        {
+          "within": "CH-LU",
+          "date": "2020-01-01",
+          "value": 82,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2020"
+        },
+        {
+          "within": "CH-LU",
+          "date": "2021-01-01",
+          "value": 80,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2021"
+        },
+        {
+          "within": "CH-LU",
+          "date": "2025-01-01",
+          "value": 79,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2025"
+        },
+        {
+          "within": "CH-LU",
           "date": "2026-01-01",
-          "value": 51,
+          "value": 79,
           "source": "bfs-agv-2026"
+        },
+        {
+          "within": "CH-NE",
+          "date": "1960-01-01",
+          "value": 62,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1960"
+        },
+        {
+          "within": "CH-NE",
+          "date": "2009-01-01",
+          "value": 53,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2009"
+        },
+        {
+          "within": "CH-NE",
+          "date": "2013-01-01",
+          "value": 37,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2013"
+        },
+        {
+          "within": "CH-NE",
+          "date": "2016-01-01",
+          "value": 36,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2016"
+        },
+        {
+          "within": "CH-NE",
+          "date": "2018-01-01",
+          "value": 31,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2018"
+        },
+        {
+          "within": "CH-NE",
+          "date": "2021-01-01",
+          "value": 27,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2021"
+        },
+        {
+          "within": "CH-NE",
+          "date": "2025-01-01",
+          "value": 24,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2025"
         },
         {
           "within": "CH-NE",
@@ -708,9 +1742,23 @@
         },
         {
           "within": "CH-NW",
+          "date": "1960-01-01",
+          "value": 11,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1960"
+        },
+        {
+          "within": "CH-NW",
           "date": "2026-01-01",
           "value": 11,
           "source": "bfs-agv-2026"
+        },
+        {
+          "within": "CH-OW",
+          "date": "1960-01-01",
+          "value": 7,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1960"
         },
         {
           "within": "CH-OW",
@@ -720,9 +1768,107 @@
         },
         {
           "within": "CH-SG",
+          "date": "1960-01-01",
+          "value": 91,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1960"
+        },
+        {
+          "within": "CH-SG",
+          "date": "1965-01-01",
+          "value": 90,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1965"
+        },
+        {
+          "within": "CH-SG",
+          "date": "2005-01-01",
+          "value": 89,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2005"
+        },
+        {
+          "within": "CH-SG",
+          "date": "2007-01-01",
+          "value": 88,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2007"
+        },
+        {
+          "within": "CH-SG",
+          "date": "2009-01-01",
+          "value": 86,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2009"
+        },
+        {
+          "within": "CH-SG",
+          "date": "2010-01-01",
+          "value": 85,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2010"
+        },
+        {
+          "within": "CH-SG",
+          "date": "2013-01-01",
+          "value": 77,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2013"
+        },
+        {
+          "within": "CH-SG",
+          "date": "2023-01-01",
+          "value": 75,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2023"
+        },
+        {
+          "within": "CH-SG",
           "date": "2026-01-01",
           "value": 75,
           "source": "bfs-agv-2026"
+        },
+        {
+          "within": "CH-SH",
+          "date": "1960-01-01",
+          "value": 35,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1960"
+        },
+        {
+          "within": "CH-SH",
+          "date": "1964-01-01",
+          "value": 34,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1964"
+        },
+        {
+          "within": "CH-SH",
+          "date": "2004-01-01",
+          "value": 33,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2004"
+        },
+        {
+          "within": "CH-SH",
+          "date": "2005-01-01",
+          "value": 32,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2005"
+        },
+        {
+          "within": "CH-SH",
+          "date": "2009-01-01",
+          "value": 27,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2009"
+        },
+        {
+          "within": "CH-SH",
+          "date": "2013-01-01",
+          "value": 26,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2013"
         },
         {
           "within": "CH-SH",
@@ -732,9 +1878,114 @@
         },
         {
           "within": "CH-SO",
+          "date": "1960-01-01",
+          "value": 132,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1960"
+        },
+        {
+          "within": "CH-SO",
+          "date": "1961-01-01",
+          "value": 131,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1961"
+        },
+        {
+          "within": "CH-SO",
+          "date": "1973-01-01",
+          "value": 130,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1973"
+        },
+        {
+          "within": "CH-SO",
+          "date": "1993-01-01",
+          "value": 128,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1993"
+        },
+        {
+          "within": "CH-SO",
+          "date": "1994-01-01",
+          "value": 127,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1994"
+        },
+        {
+          "within": "CH-SO",
+          "date": "1995-01-01",
+          "value": 126,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1995"
+        },
+        {
+          "within": "CH-SO",
+          "date": "2006-01-01",
+          "value": 125,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2006"
+        },
+        {
+          "within": "CH-SO",
+          "date": "2010-01-01",
+          "value": 122,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2010"
+        },
+        {
+          "within": "CH-SO",
+          "date": "2011-01-01",
+          "value": 121,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2011"
+        },
+        {
+          "within": "CH-SO",
+          "date": "2012-01-01",
+          "value": 120,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2012"
+        },
+        {
+          "within": "CH-SO",
+          "date": "2013-01-01",
+          "value": 118,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2013"
+        },
+        {
+          "within": "CH-SO",
+          "date": "2014-01-01",
+          "value": 109,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2014"
+        },
+        {
+          "within": "CH-SO",
+          "date": "2021-01-01",
+          "value": 107,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2021"
+        },
+        {
+          "within": "CH-SO",
+          "date": "2024-01-01",
+          "value": 106,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2024"
+        },
+        {
+          "within": "CH-SO",
           "date": "2026-01-01",
           "value": 104,
           "source": "bfs-agv-2026"
+        },
+        {
+          "within": "CH-SZ",
+          "date": "1960-01-01",
+          "value": 30,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1960"
         },
         {
           "within": "CH-SZ",
@@ -744,9 +1995,254 @@
         },
         {
           "within": "CH-TG",
+          "date": "1960-01-01",
+          "value": 201,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1960"
+        },
+        {
+          "within": "CH-TG",
+          "date": "1965-01-01",
+          "value": 199,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1965"
+        },
+        {
+          "within": "CH-TG",
+          "date": "1968-01-01",
+          "value": 197,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1968"
+        },
+        {
+          "within": "CH-TG",
+          "date": "1969-01-01",
+          "value": 194,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1969"
+        },
+        {
+          "within": "CH-TG",
+          "date": "1972-01-01",
+          "value": 188,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1972"
+        },
+        {
+          "within": "CH-TG",
+          "date": "1976-01-01",
+          "value": 186,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1976"
+        },
+        {
+          "within": "CH-TG",
+          "date": "1979-01-01",
+          "value": 183,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1979"
+        },
+        {
+          "within": "CH-TG",
+          "date": "1980-01-01",
+          "value": 181,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1980"
+        },
+        {
+          "within": "CH-TG",
+          "date": "1984-01-01",
+          "value": 179,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1984"
+        },
+        {
+          "within": "CH-TG",
+          "date": "1993-01-01",
+          "value": 178,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1993"
+        },
+        {
+          "within": "CH-TG",
+          "date": "1994-01-01",
+          "value": 177,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1994"
+        },
+        {
+          "within": "CH-TG",
+          "date": "1995-01-01",
+          "value": 143,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1995"
+        },
+        {
+          "within": "CH-TG",
+          "date": "1996-01-01",
+          "value": 111,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1996"
+        },
+        {
+          "within": "CH-TG",
+          "date": "1997-01-01",
+          "value": 103,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1997"
+        },
+        {
+          "within": "CH-TG",
+          "date": "1998-01-01",
+          "value": 90,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1998"
+        },
+        {
+          "within": "CH-TG",
+          "date": "1999-01-01",
+          "value": 81,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1999"
+        },
+        {
+          "within": "CH-TG",
+          "date": "2000-01-01",
+          "value": 80,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2000"
+        },
+        {
+          "within": "CH-TG",
           "date": "2026-01-01",
           "value": 80,
           "source": "bfs-agv-2026"
+        },
+        {
+          "within": "CH-TI",
+          "date": "1960-01-01",
+          "value": 253,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1960"
+        },
+        {
+          "within": "CH-TI",
+          "date": "1973-01-01",
+          "value": 250,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1973"
+        },
+        {
+          "within": "CH-TI",
+          "date": "1977-01-01",
+          "value": 247,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1977"
+        },
+        {
+          "within": "CH-TI",
+          "date": "1995-01-01",
+          "value": 245,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1995"
+        },
+        {
+          "within": "CH-TI",
+          "date": "2002-01-01",
+          "value": 238,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2002"
+        },
+        {
+          "within": "CH-TI",
+          "date": "2005-01-01",
+          "value": 204,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2005"
+        },
+        {
+          "within": "CH-TI",
+          "date": "2006-01-01",
+          "value": 199,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2006"
+        },
+        {
+          "within": "CH-TI",
+          "date": "2007-01-01",
+          "value": 190,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2007"
+        },
+        {
+          "within": "CH-TI",
+          "date": "2009-01-01",
+          "value": 181,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2009"
+        },
+        {
+          "within": "CH-TI",
+          "date": "2010-01-01",
+          "value": 169,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2010"
+        },
+        {
+          "within": "CH-TI",
+          "date": "2011-01-01",
+          "value": 157,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2011"
+        },
+        {
+          "within": "CH-TI",
+          "date": "2013-01-01",
+          "value": 147,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2013"
+        },
+        {
+          "within": "CH-TI",
+          "date": "2014-01-01",
+          "value": 135,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2014"
+        },
+        {
+          "within": "CH-TI",
+          "date": "2017-01-01",
+          "value": 130,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2017"
+        },
+        {
+          "within": "CH-TI",
+          "date": "2018-01-01",
+          "value": 115,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2018"
+        },
+        {
+          "within": "CH-TI",
+          "date": "2021-01-01",
+          "value": 111,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2021"
+        },
+        {
+          "within": "CH-TI",
+          "date": "2022-01-01",
+          "value": 108,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2022"
+        },
+        {
+          "within": "CH-TI",
+          "date": "2023-01-01",
+          "value": 106,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2023"
         },
         {
           "within": "CH-TI",
@@ -756,9 +2252,128 @@
         },
         {
           "within": "CH-UR",
+          "date": "1960-01-01",
+          "value": 20,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1960"
+        },
+        {
+          "within": "CH-UR",
+          "date": "2021-01-01",
+          "value": 19,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2021"
+        },
+        {
+          "within": "CH-UR",
           "date": "2026-01-01",
           "value": 19,
           "source": "bfs-agv-2026"
+        },
+        {
+          "within": "CH-VD",
+          "date": "1960-01-01",
+          "value": 388,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1960"
+        },
+        {
+          "within": "CH-VD",
+          "date": "1962-01-01",
+          "value": 386,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1962"
+        },
+        {
+          "within": "CH-VD",
+          "date": "1970-01-01",
+          "value": 385,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1970"
+        },
+        {
+          "within": "CH-VD",
+          "date": "1999-01-01",
+          "value": 384,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1999"
+        },
+        {
+          "within": "CH-VD",
+          "date": "2002-01-01",
+          "value": 383,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2002"
+        },
+        {
+          "within": "CH-VD",
+          "date": "2003-01-01",
+          "value": 382,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2003"
+        },
+        {
+          "within": "CH-VD",
+          "date": "2005-01-01",
+          "value": 381,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2005"
+        },
+        {
+          "within": "CH-VD",
+          "date": "2007-01-01",
+          "value": 378,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2007"
+        },
+        {
+          "within": "CH-VD",
+          "date": "2008-01-01",
+          "value": 376,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2008"
+        },
+        {
+          "within": "CH-VD",
+          "date": "2009-01-01",
+          "value": 375,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2009"
+        },
+        {
+          "within": "CH-VD",
+          "date": "2012-01-01",
+          "value": 326,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2012"
+        },
+        {
+          "within": "CH-VD",
+          "date": "2013-01-01",
+          "value": 318,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2013"
+        },
+        {
+          "within": "CH-VD",
+          "date": "2017-01-01",
+          "value": 309,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2017"
+        },
+        {
+          "within": "CH-VD",
+          "date": "2021-01-01",
+          "value": 308,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2021"
+        },
+        {
+          "within": "CH-VD",
+          "date": "2022-01-01",
+          "value": 300,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2022"
         },
         {
           "within": "CH-VD",
@@ -768,9 +2383,107 @@
         },
         {
           "within": "CH-VS",
+          "date": "1960-01-01",
+          "value": 169,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1960"
+        },
+        {
+          "within": "CH-VS",
+          "date": "1965-01-01",
+          "value": 168,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1965"
+        },
+        {
+          "within": "CH-VS",
+          "date": "1969-01-01",
+          "value": 167,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1969"
+        },
+        {
+          "within": "CH-VS",
+          "date": "1973-01-01",
+          "value": 163,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1973"
+        },
+        {
+          "within": "CH-VS",
+          "date": "2001-01-01",
+          "value": 160,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2001"
+        },
+        {
+          "within": "CH-VS",
+          "date": "2004-01-01",
+          "value": 158,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2004"
+        },
+        {
+          "within": "CH-VS",
+          "date": "2005-01-01",
+          "value": 153,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2005"
+        },
+        {
+          "within": "CH-VS",
+          "date": "2009-01-01",
+          "value": 143,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2009"
+        },
+        {
+          "within": "CH-VS",
+          "date": "2011-01-01",
+          "value": 141,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2011"
+        },
+        {
+          "within": "CH-VS",
+          "date": "2013-01-01",
+          "value": 135,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2013"
+        },
+        {
+          "within": "CH-VS",
+          "date": "2014-01-01",
+          "value": 134,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2014"
+        },
+        {
+          "within": "CH-VS",
+          "date": "2017-01-01",
+          "value": 126,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2017"
+        },
+        {
+          "within": "CH-VS",
+          "date": "2021-01-01",
+          "value": 122,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2021"
+        },
+        {
+          "within": "CH-VS",
           "date": "2026-01-01",
-          "value": 142,
+          "value": 122,
           "source": "bfs-agv-2026"
+        },
+        {
+          "within": "CH-ZG",
+          "date": "1960-01-01",
+          "value": 11,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1960"
         },
         {
           "within": "CH-ZG",
@@ -780,8 +2493,57 @@
         },
         {
           "within": "CH-ZH",
+          "date": "1960-01-01",
+          "value": 171,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1960"
+        },
+        {
+          "within": "CH-ZH",
+          "date": "2014-01-01",
+          "value": 170,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2014"
+        },
+        {
+          "within": "CH-ZH",
+          "date": "2015-01-01",
+          "value": 169,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2015"
+        },
+        {
+          "within": "CH-ZH",
+          "date": "2016-01-01",
+          "value": 168,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2016"
+        },
+        {
+          "within": "CH-ZH",
+          "date": "2018-01-01",
+          "value": 166,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2018"
+        },
+        {
+          "within": "CH-ZH",
+          "date": "2019-01-01",
+          "value": 162,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2019"
+        },
+        {
+          "within": "CH-ZH",
+          "date": "2023-01-01",
+          "value": 160,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2023"
+        },
+        {
+          "within": "CH-ZH",
           "date": "2026-01-01",
-          "value": 151,
+          "value": 160,
           "source": "bfs-agv-2026"
         }
       ]
@@ -7999,7 +9761,8 @@
           "within": "CH-FR",
           "term_years": 5,
           "source": "fr-lco",
-          "locator": "LCo FR art. 29 al. 1 and 2 (the conseil général is elected at the ballot box for five years); art. 25 names the eight communes that must have one, and art. 26 lets communes above 600 inhabitants adopt one"
+          "locator": "LCo FR art. 29 al. 1 and 2 (the conseil général is elected at the ballot box for five years); art. 25 names the eight communes that must have one, and art. 26 lets communes above 600 inhabitants adopt one",
+          "valid_from": "1986-01-01"
         },
         {
           "within": "CH-SO",
@@ -8058,7 +9821,8 @@
           "within": "CH-VD",
           "term_years": 5,
           "source": "kv-vd",
-          "locator": "Cst-VD art. 144: the voters elect the conseil communal for five years, as a rule by proportional representation"
+          "locator": "Cst-VD art. 144: the voters elect the conseil communal for five years, as a rule by proportional representation",
+          "valid_from": "2006-07-01"
         },
         {
           "within": "CH-NE",
@@ -8072,13 +9836,45 @@
           "period_years": 5,
           "term_years": 5,
           "source": "kv-ge",
-          "locator": "Cst-GE art. 140: each commune's conseil municipal is elected every five years by proportional representation"
+          "locator": "Cst-GE art. 140: each commune's conseil municipal is elected every five years by proportional representation",
+          "valid_from": "2015-06-01"
         },
         {
           "within": "CH-JU",
           "term_years": 5,
           "source": "kv-ju",
-          "locator": "Cst. JU art. 65 (five years); art. 74 (the voters elect the conseillers généraux by proportional representation)"
+          "locator": "Cst. JU art. 65 (five years); art. 74 (the voters elect the conseillers généraux by proportional representation)",
+          "valid_from": "2010-07-01"
+        },
+        {
+          "within": "CH-FR",
+          "term_years": 4,
+          "valid_from": "1982-01-01",
+          "valid_to": "1986-01-01",
+          "source": "fr-lco",
+          "locator": "Before the change, four years: LCo FR art. 56 al. 2 and art. 29 al. 2 (five years); the 1980 law took effect with the communal elections of February 1982, and the Archives de la Ville de Fribourg record communal elections every five years from 1986, so the 1982 councils served four years"
+        },
+        {
+          "within": "CH-VD",
+          "term_years": 4,
+          "valid_to": "2006-07-01",
+          "source": "kv-vd",
+          "locator": "Before the change, four years: Cst-VD art. 178 (the communal authorities are renewed in spring 2006 for the five-year term of art. 144 and 148); the authorities elected in autumn 2001 had been elected for four years and were extended by six months to 30 June 2006"
+        },
+        {
+          "within": "CH-GE",
+          "period_years": 4,
+          "term_years": 4,
+          "valid_to": "2015-06-01",
+          "source": "kv-ge",
+          "locator": "Before the change, four years: Cst-GE art. 140 al. 3 and 141 al. 3 (five years), in force 1 June 2013 and applied from the first renewal after entry into force, the communal elections of April 2015 (term from 1 June 2015); the councils elected in 2011 had served four years"
+        },
+        {
+          "within": "CH-JU",
+          "term_years": 4,
+          "valid_to": "2010-07-01",
+          "source": "kv-ju",
+          "locator": "Before the change, four years: Cst. JU art. 65 al. 1 as amended by the vote of 7 March 2010, in force 1 July 2010 (five years instead of four), with Disposition transitoire art. 14 al. 2: communal authorities elected before then serve to the end of their four-year term"
         }
       ],
       "access": [
@@ -8184,7 +9980,8 @@
           "period_years": 5,
           "term_years": 5,
           "source": "fr-lco",
-          "locator": "LCo FR art. 56 al. 1 and 2: the conseil communal is elected at the ballot box for five years"
+          "locator": "LCo FR art. 56 al. 1 and 2: the conseil communal is elected at the ballot box for five years",
+          "valid_from": "1986-01-01"
         },
         {
           "within": "CH-SO",
@@ -8266,7 +10063,8 @@
           "period_years": 5,
           "term_years": 5,
           "source": "kv-vd",
-          "locator": "Cst-VD art. 148 (five years) and art. 149 (the voters elect the municipalité directly by majority vote in two rounds)"
+          "locator": "Cst-VD art. 148 (five years) and art. 149 (the voters elect the municipalité directly by majority vote in two rounds)",
+          "valid_from": "2006-07-01"
         },
         {
           "within": "CH-VS",
@@ -8286,14 +10084,49 @@
           "period_years": 5,
           "term_years": 5,
           "source": "kv-ge",
-          "locator": "Cst-GE art. 141: the communal executive is elected every five years by majority vote, the first round with the conseil municipal"
+          "locator": "Cst-GE art. 141: the communal executive is elected every five years by majority vote, the first round with the conseil municipal",
+          "valid_from": "2015-06-01"
         },
         {
           "within": "CH-JU",
           "period_years": 5,
           "term_years": 5,
           "source": "kv-ju",
-          "locator": "Cst. JU art. 65 (communal authorities are elected for five years); art. 74 (the voters elect the conseillers communaux)"
+          "locator": "Cst. JU art. 65 (communal authorities are elected for five years); art. 74 (the voters elect the conseillers communaux)",
+          "valid_from": "2010-07-01"
+        },
+        {
+          "within": "CH-FR",
+          "period_years": 4,
+          "term_years": 4,
+          "valid_from": "1982-01-01",
+          "valid_to": "1986-01-01",
+          "source": "fr-lco",
+          "locator": "Before the change, four years: LCo FR art. 56 al. 2 and art. 29 al. 2 (five years); the 1980 law took effect with the communal elections of February 1982, and the Archives de la Ville de Fribourg record communal elections every five years from 1986, so the 1982 councils served four years"
+        },
+        {
+          "within": "CH-VD",
+          "period_years": 4,
+          "term_years": 4,
+          "valid_to": "2006-07-01",
+          "source": "kv-vd",
+          "locator": "Before the change, four years: Cst-VD art. 178 (the communal authorities are renewed in spring 2006 for the five-year term of art. 144 and 148); the authorities elected in autumn 2001 had been elected for four years and were extended by six months to 30 June 2006"
+        },
+        {
+          "within": "CH-GE",
+          "period_years": 4,
+          "term_years": 4,
+          "valid_to": "2015-06-01",
+          "source": "kv-ge",
+          "locator": "Before the change, four years: Cst-GE art. 140 al. 3 and 141 al. 3 (five years), in force 1 June 2013 and applied from the first renewal after entry into force, the communal elections of April 2015 (term from 1 June 2015); the councils elected in 2011 had served four years"
+        },
+        {
+          "within": "CH-JU",
+          "period_years": 4,
+          "term_years": 4,
+          "valid_to": "2010-07-01",
+          "source": "kv-ju",
+          "locator": "Before the change, four years: Cst. JU art. 65 al. 1 as amended by the vote of 7 March 2010, in force 1 July 2010 (five years instead of four), with Disposition transitoire art. 14 al. 2: communal authorities elected before then serve to the end of their four-year term"
         }
       ]
     },
@@ -8481,7 +10314,16 @@
           "period_years": 5,
           "term_years": 5,
           "source": "kv-ju",
-          "locator": "Cst. JU art. 74 (the voters elect the maire by majority vote); art. 65 (five years)"
+          "locator": "Cst. JU art. 74 (the voters elect the maire by majority vote); art. 65 (five years)",
+          "valid_from": "2010-07-01"
+        },
+        {
+          "within": "CH-JU",
+          "period_years": 4,
+          "term_years": 4,
+          "valid_to": "2010-07-01",
+          "source": "kv-ju",
+          "locator": "Before the change, four years: Cst. JU art. 65 al. 1 as amended by the vote of 7 March 2010, in force 1 July 2010 (five years instead of four), with Disposition transitoire art. 14 al. 2: communal authorities elected before then serve to the end of their four-year term"
         }
       ],
       "est_votes": 1800000,
