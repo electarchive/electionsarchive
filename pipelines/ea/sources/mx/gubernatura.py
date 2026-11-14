@@ -10,7 +10,7 @@ import polars as pl
 from ea import raw
 from ea.changeset import Changeset
 from ea.sources.mx import ine
-from ea.sources.mx.ine import ABROAD, BALLOTS, INVALID, PRISON, REGISTERED, VALID, VOTES
+from ea.sources.mx.ine import ABROAD, BALLOTS, EARLY, INVALID, PRISON, REGISTERED, VALID, VOTES
 from ea.store import DATA, connect
 
 SOURCE = "mx.gubernatura"
@@ -18,18 +18,77 @@ VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 
 IEPAC = "Instituto Electoral y de Participación Ciudadana de Yucatán (IEPAC)"
+IEEM = "Instituto Electoral del Estado de México (IEEM)"
 CONGRESO_YUC = "H. Congreso del Estado de Yucatán"
 
 PERSONS = {
     "Q5931901": ("Joaquín Jesús Díaz Mena", "male"),
     "Q6105629": ("Renán Alberto Barrera Concha", "male"),
 }
-GENDERS = {"Vida Aravari Gómez Herrera": "female", "Yamil Jasmín López Manrique": "female"}
+GENDERS = {
+    "Vida Aravari Gómez Herrera": "female",
+    "Yamil Jasmín López Manrique": "female",
+    "Paulina Alejandra Del Moral Vela": "female",
+    "Delfina Gómez Álvarez": "female",
+}
 LOCAL_PARTIES = {
     "NAY": ("YUC", "Nueva Alianza Yucatán", "New Alliance Yucatán"),
+    "NAEM": ("MEX", "Nueva Alianza Estado de México", "New Alliance State of Mexico"),
 }
 
 ELECTIONS: dict[str, dict] = {
+    "MEX-2023": {
+        "state": "15",
+        "iso": "MEX",
+        "day": date(2023, 6, 4),
+        "publisher": IEEM,
+        "title": "Resultados definitivos por casilla de la elección de Gubernatura 2023",
+        "page": "https://www.ieem.org.mx/procesos-electorales/historico-de-procesos-electorales/elecciones-locales.html",
+        "url": "https://www.ieem.org.mx/assets/docs/procesos-electorales/resultados/2023/"
+        "RESULTADOS%20DEFINITIVOS%20%20GUBERNATURA%202023%20POR%20CASILLA.xlsx",
+        "header": 3,
+        "first": "CASILLA",
+        "candidates": [
+            (
+                "Paulina Alejandra Del Moral Vela",
+                ("PAN", "PRI", "PRD", "NAEM"),
+                "Coalición Va por el Estado de México",
+            ),
+            (
+                "Delfina Gómez Álvarez",
+                ("PVEM", "PT", "MORENA"),
+                "Candidatura común Juntos Hacemos Historia en el Estado de México",
+            ),
+        ],
+        "registrations": {
+            "url": "https://ieem.org.mx/consejo_general/cg/2023/AC_23/a{:03d}_23.pdf",
+            "title": "Acuerdo IEEM/CG/{}/2023 del Consejo General del IEEM: registro de la candidatura a la "
+            "Gubernatura",
+            "acuerdos": {
+                "Paulina Alejandra Del Moral Vela": ((52, 42),),
+                "Delfina Gómez Álvarez": ((53, 42),),
+            },
+        },
+        "declaration": {
+            "url": "https://ieem.org.mx/consejo_general/cg/2023/AC_23/a081_23.pdf",
+            "suffix": ".pdf",
+            "publisher": IEEM,
+            "title": "Acuerdo IEEM/CG/81/2023 del Consejo General del IEEM: declaración de validez de la elección "
+            "a la Gubernatura y constancia de mayoría",
+            "locator": {"page": 44, "section": "Cómputo final, and acuerdos segundo to cuarto, pages 58 and 59"},
+            "winner": "Delfina Gómez Álvarez",
+            "total": 6375763,
+            "votes": 3360589,
+        },
+        "caveats": [
+            (
+                "The count file lists 9 casillas annulled by the Tribunal Electoral del Estado de México (rulings "
+                "JI/1/2023, JI/2/2023, and JI/3/2023) and 1 casilla that was not installed, all with zero votes. "
+                "The parties of the candidatura común Juntos Hacemos Historia en el Estado de México shared one "
+                "emblem on the ballot, so their votes are counted as one line."
+            )
+        ],
+    },
     "YUC-2024": {
         "state": "31",
         "iso": "YUC",
@@ -104,7 +163,7 @@ def name_of(candidate: str) -> str:
 
 def fetch() -> None:
     for config in ELECTIONS.values():
-        raw.fetch(SOURCE, config["url"], suffix=".zip")
+        raw.fetch(SOURCE, config["url"], suffix="." + config["url"].rsplit(".", 1)[1])
         raw.fetch(SOURCE, config["declaration"]["url"], suffix=config["declaration"]["suffix"])
         registrations = config["registrations"]
         for numbers in registrations["acuerdos"].values():
@@ -112,7 +171,14 @@ def fetch() -> None:
                 raw.fetch(SOURCE, registrations["url"].format(number), suffix=".pdf")
 
 
-def read(config: dict, member: str) -> list[dict[str, str]]:
+def read(config: dict, member: str | None) -> list[dict[str, str]]:
+    if member is None:
+        grid = pl.read_excel(raw.cached(SOURCE, config["url"]).path, has_header=False).rows()
+        header = [str(c) for c in grid[config["header"]]]
+        return [
+            {k: "" if v is None else str(v) for k, v in zip(header, row, strict=True) if k != "None"}
+            for row in grid[config["header"] + 1 :]
+        ]
     with zipfile.ZipFile(raw.cached(SOURCE, config["url"]).path) as archive:
         inner = next(n for n in archive.namelist() if n.endswith(member))
         text = archive.read(inner).decode("latin-1")
@@ -121,7 +187,7 @@ def read(config: dict, member: str) -> list[dict[str, str]]:
 
 def tail(row: dict[str, str]) -> str:
     kind = row["TIPO_CASILLA"].strip()
-    if kind == "MEC":
+    if kind == "MEC" and "ACTA_CASILLA-MEC" in row:
         return row["ACTA_CASILLA-MEC"].strip().upper()
     if kind == "B":
         return "B"
@@ -130,9 +196,9 @@ def tail(row: dict[str, str]) -> str:
 
 
 def table(config: dict) -> tuple[pl.DataFrame, pl.DataFrame]:
-    rows = read(config, config["member"])
+    rows = read(config, config.get("member"))
     header = list(rows[0])
-    columns = header[header.index("URNA_ELECTRONICA") + 1 : header.index("NUM_VOTOS_VALIDOS")]
+    columns = header[header.index(config.get("first", "URNA_ELECTRONICA")) + 1 : header.index("NUM_VOTOS_VALIDOS")]
     lines = {column for _, parties, _ in config["candidates"] for column in combinations(parties)}
     if set(columns) - lines:
         raise ValueError(f"columns without a candidate: {sorted(set(columns) - lines)}")
@@ -187,10 +253,13 @@ def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
     for key, config in ELECTIONS.items():
         units, votes = table(config)
-        printed = read(config, config["state_file"])[0]
-        inland = units.filter(pl.col("section") > 0)
-        if inland["total"].sum() != ine.number(printed["TOTAL_VOTOS"]):
-            raise ValueError(f"{key}: casillas add to {inland['total'].sum()}, the state file prints {printed}")
+        if "state_file" in config:
+            printed = read(config, config["state_file"])[0]
+            inland = units.filter(pl.col("section") > 0)
+            if inland["total"].sum() != ine.number(printed["TOTAL_VOTOS"]):
+                raise ValueError(f"{key}: casillas add to {inland['total'].sum()}, the state file prints {printed}")
+        elif units["total"].sum() != config["declaration"]["total"]:
+            raise ValueError(f"{key}: casillas add to {units['total'].sum()}, not the declared total")
         units.write_parquet(PARSED / f"{key}_casillas.parquet")
         votes.write_parquet(PARSED / f"{key}_votes.parquet")
         by_option = votes.group_by("option").agg(pl.col("votes").sum()).sort("votes", descending=True)
@@ -341,6 +410,10 @@ def emit() -> Path:
             name(contest, f"Elección de Gubernatura de {spanish} de {year}", "es", "native")
             cs.add("slug", path=f"{path}/governor", entity_id=contest)
 
+            casillas = pl.read_parquet(PARSED / f"{key}_casillas.parquet")
+            votes = pl.read_parquet(PARSED / f"{key}_votes.parquet")
+            counted, rows_count = int(casillas["total"].sum()), casillas.height
+            printed = set(votes["option"])
             heads: dict[str, UUID] = {}
             lines: dict[str, UUID] = {}
             for position, (candidate, group, label) in enumerate(config["candidates"], 1):
@@ -389,8 +462,9 @@ def emit() -> Path:
                     )
                     cs.artifact(raw.cached(SOURCE, url), acuerdo)
                     cs.add("citation", entity_id=candidacy, source_id=acuerdo, locator={"page": page})
-                for column in combinations(group):
-                    if len(group) == 1:
+                columns = [column for column in combinations(group) if column in printed]
+                for column in columns:
+                    if len(columns) == 1:
                         lines[column] = head
                         continue
                     parts = column.split("_")
@@ -414,12 +488,13 @@ def emit() -> Path:
                 ballot_label="Candidatos no registrados",
             )
             lines["NUM_VOTOS_CAN_NREG"] = write_in
-            line_head = {column: heads[c] for c, group, _ in config["candidates"] for column in combinations(group)}
+            line_head = {
+                column: heads[c]
+                for c, group, _ in config["candidates"]
+                for column in combinations(group)
+                if column in printed
+            }
             line_head["NUM_VOTOS_CAN_NREG"] = write_in
-
-            casillas = pl.read_parquet(PARSED / f"{key}_casillas.parquet")
-            votes = pl.read_parquet(PARSED / f"{key}_votes.parquet")
-            counted, rows_count = int(casillas["total"].sum()), casillas.height
 
             def make_set(label: str, default: bool, note: str) -> UUID:
                 result_set = cs.key("mx.result_set", f"{day}:{iso}:governor:{label}")
@@ -465,6 +540,9 @@ def emit() -> Path:
             over = casillas.filter(
                 (pl.col("section") > 0) & (pl.col("registered") > 0) & (pl.col("total") > pl.col("registered"))
             ).sort("section", "casilla")
+            for caveat in config.get("caveats", []):
+                for result_set in (state_set, casilla_set):
+                    cs.add("note", entity_id=result_set, kind="caveat", body_md=caveat)
             if over.height:
                 listed = "; ".join(
                     f"sección {row['section']} {row['casilla']}, {row['total']:,} votes for {row['registered']:,}"
@@ -489,7 +567,15 @@ def emit() -> Path:
             placed, shared = [], 0
             for row in casillas.iter_rows(named=True):
                 section, tail_code = row["section"], row["casilla"]
-                channel = ABROAD if section == 0 else PRISON if tail_code.startswith("P") else 0
+                channel = (
+                    PRISON
+                    if tail_code.startswith(("P", "VPPP"))
+                    else EARLY
+                    if tail_code.startswith("VA")
+                    else ABROAD
+                    if section == 0
+                    else 0
+                )
                 found = federal.get((section, tail_code), [])
                 if section > 0 and len(found) == 1:
                     unit, shared = found[0], shared + 1
