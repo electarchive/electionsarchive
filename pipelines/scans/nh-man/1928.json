@@ -1,0 +1,907 @@
+{
+  "polity": "US-NH",
+  "publisher": "New Hampshire Secretary of State",
+  "title": "Manual for the General Court of New Hampshire 1929, general election returns by town (general election 1928-11-06)",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/manualforgeneral21newh/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/manualforgeneral21newh"
+  },
+  "raw_source": "us.scans",
+  "unit_scheme": "town",
+  "extend": true,
+  "contests": {
+    "president": {
+      "year": 1928,
+      "chamber": "president",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "NH",
+      "district": null
+    },
+    "governor": {
+      "year": 1928,
+      "chamber": "governor",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "NH",
+      "district": null
+    },
+    "house1": {
+      "year": 1928,
+      "chamber": "house",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "NH",
+      "district": 1
+    },
+    "house2": {
+      "year": 1928,
+      "chamber": "house",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "NH",
+      "district": 2
+    }
+  },
+  "pages": [
+    {
+      "page": 404,
+      "id": "404-0",
+      "columns": [
+        {
+          "label": "Hoover & Curtis, r",
+          "contest": "president",
+          "candidate": "Herbert Hoover (Republican)"
+        },
+        {
+          "label": "Smith & Robinson, d",
+          "contest": "president",
+          "candidate": "Al Smith (Democratic)"
+        },
+        {
+          "label": "Foster & Gitlow, w",
+          "contest": "president",
+          "candidate": "William Foster (Communist)"
+        },
+        {
+          "label": "Thomas & Maurer, s",
+          "contest": "president",
+          "candidate": "Norman Thomas (Socialist)"
+        },
+        {
+          "label": "Charles W. Tobey, r",
+          "contest": "governor",
+          "candidate": "Charles W. Tobey"
+        },
+        {
+          "label": "Eaton D. Sargent, d",
+          "contest": "governor",
+          "candidate": "Eaton D. Sargent"
+        },
+        {
+          "label": "Henry C. Iram, w",
+          "contest": "governor",
+          "candidate": "Henry C. Iram"
+        },
+        {
+          "label": "Frank T. Butler, s",
+          "contest": "governor",
+          "candidate": "Frank T. Butler"
+        },
+        {
+          "label": "Total Vote",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.102,
+        0.093,
+        0.877,
+        0.811
+      ],
+      "hint": "Read only the table headed 'ROCKINGHAM COUNTY'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2354
+      ]
+    },
+    {
+      "page": 405,
+      "id": "405-0",
+      "columns": [
+        {
+          "label": "Hoover & Curtis, r",
+          "contest": "president",
+          "candidate": "Herbert Hoover (Republican)"
+        },
+        {
+          "label": "Smith & Robinson, d",
+          "contest": "president",
+          "candidate": "Al Smith (Democratic)"
+        },
+        {
+          "label": "Foster & Gitlow, w",
+          "contest": "president",
+          "candidate": "William Foster (Communist)"
+        },
+        {
+          "label": "Thomas & Maurer, s",
+          "contest": "president",
+          "candidate": "Norman Thomas (Socialist)"
+        },
+        {
+          "label": "Charles W. Tobey, r",
+          "contest": "governor",
+          "candidate": "Charles W. Tobey"
+        },
+        {
+          "label": "Eaton D. Sargent, d",
+          "contest": "governor",
+          "candidate": "Eaton D. Sargent"
+        },
+        {
+          "label": "Henry C. Iram, w",
+          "contest": "governor",
+          "candidate": "Henry C. Iram"
+        },
+        {
+          "label": "Frank T. Butler, s",
+          "contest": "governor",
+          "candidate": "Frank T. Butler"
+        },
+        {
+          "label": "Total Vote",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.124,
+        0.086,
+        0.895,
+        0.626
+      ],
+      "hint": "Read only the table headed 'STRAFFORD COUNTY'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3259
+      ]
+    },
+    {
+      "page": 406,
+      "id": "406-0",
+      "columns": [
+        {
+          "label": "Hoover & Curtis, r",
+          "contest": "president",
+          "candidate": "Herbert Hoover (Republican)"
+        },
+        {
+          "label": "Smith & Robinson, d",
+          "contest": "president",
+          "candidate": "Al Smith (Democratic)"
+        },
+        {
+          "label": "Foster & Gitlow, w",
+          "contest": "president",
+          "candidate": "William Foster (Communist)"
+        },
+        {
+          "label": "Thomas & Maurer, s",
+          "contest": "president",
+          "candidate": "Norman Thomas (Socialist)"
+        },
+        {
+          "label": "Charles W. Tobey, r",
+          "contest": "governor",
+          "candidate": "Charles W. Tobey"
+        },
+        {
+          "label": "Eaton D. Sargent, d",
+          "contest": "governor",
+          "candidate": "Eaton D. Sargent"
+        },
+        {
+          "label": "Henry C. Iram, w",
+          "contest": "governor",
+          "candidate": "Henry C. Iram"
+        },
+        {
+          "label": "Frank T. Butler, s",
+          "contest": "governor",
+          "candidate": "Frank T. Butler"
+        },
+        {
+          "label": "Total Vote",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.094,
+        0.085,
+        0.872,
+        0.525
+      ],
+      "hint": "Read only the table headed 'BELKNAP COUNTY'; ignore any other table visible in the image."
+    },
+    {
+      "page": 407,
+      "id": "407-0",
+      "columns": [
+        {
+          "label": "Hoover & Curtis, r",
+          "contest": "president",
+          "candidate": "Herbert Hoover (Republican)"
+        },
+        {
+          "label": "Smith & Robinson, d",
+          "contest": "president",
+          "candidate": "Al Smith (Democratic)"
+        },
+        {
+          "label": "Foster & Gitlow, w",
+          "contest": "president",
+          "candidate": "William Foster (Communist)"
+        },
+        {
+          "label": "Thomas & Maurer, s",
+          "contest": "president",
+          "candidate": "Norman Thomas (Socialist)"
+        },
+        {
+          "label": "Charles W. Tobey, r",
+          "contest": "governor",
+          "candidate": "Charles W. Tobey"
+        },
+        {
+          "label": "Eaton D. Sargent, d",
+          "contest": "governor",
+          "candidate": "Eaton D. Sargent"
+        },
+        {
+          "label": "Henry C. Iram, w",
+          "contest": "governor",
+          "candidate": "Henry C. Iram"
+        },
+        {
+          "label": "Frank T. Butler, s",
+          "contest": "governor",
+          "candidate": "Frank T. Butler"
+        },
+        {
+          "label": "Total Vote",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.131,
+        0.085,
+        0.905,
+        0.54
+      ],
+      "hint": "Read only the table headed 'CARROLL COUNTY'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.389
+      ]
+    },
+    {
+      "page": 408,
+      "id": "408-0",
+      "columns": [
+        {
+          "label": "Hoover & Curtis, r",
+          "contest": "president",
+          "candidate": "Herbert Hoover (Republican)"
+        },
+        {
+          "label": "Smith & Robinson, d",
+          "contest": "president",
+          "candidate": "Al Smith (Democratic)"
+        },
+        {
+          "label": "Foster & Gitlow, w",
+          "contest": "president",
+          "candidate": "William Foster (Communist)"
+        },
+        {
+          "label": "Thomas & Maurer, s",
+          "contest": "president",
+          "candidate": "Norman Thomas (Socialist)"
+        },
+        {
+          "label": "Charles W. Tobey, r",
+          "contest": "governor",
+          "candidate": "Charles W. Tobey"
+        },
+        {
+          "label": "Eaton D. Sargent, d",
+          "contest": "governor",
+          "candidate": "Eaton D. Sargent"
+        },
+        {
+          "label": "Henry C. Iram, w",
+          "contest": "governor",
+          "candidate": "Henry C. Iram"
+        },
+        {
+          "label": "Frank T. Butler, s",
+          "contest": "governor",
+          "candidate": "Frank T. Butler"
+        },
+        {
+          "label": "Total Vote",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.1,
+        0.099,
+        0.874,
+        0.774
+      ],
+      "hint": "Read only the table headed 'Merrimack County: President and Governor (general election 1928)'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2607
+      ]
+    },
+    {
+      "page": 409,
+      "id": "409-0",
+      "columns": [
+        {
+          "label": "Hoover & Curtis, r",
+          "contest": "president",
+          "candidate": "Herbert Hoover (Republican)"
+        },
+        {
+          "label": "Smith & Robinson, d",
+          "contest": "president",
+          "candidate": "Al Smith (Democratic)"
+        },
+        {
+          "label": "Foster & Gitlow, w",
+          "contest": "president",
+          "candidate": "William Foster (Communist)"
+        },
+        {
+          "label": "Thomas & Maurer, s",
+          "contest": "president",
+          "candidate": "Norman Thomas (Socialist)"
+        },
+        {
+          "label": "Charles W. Tobey, r",
+          "contest": "governor",
+          "candidate": "Charles W. Tobey"
+        },
+        {
+          "label": "Eaton D. Sargent, d",
+          "contest": "governor",
+          "candidate": "Eaton D. Sargent"
+        },
+        {
+          "label": "Henry C. Iram, w",
+          "contest": "governor",
+          "candidate": "Henry C. Iram"
+        },
+        {
+          "label": "Frank T. Butler, s",
+          "contest": "governor",
+          "candidate": "Frank T. Butler"
+        },
+        {
+          "label": "Total Vote",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.137,
+        0.116,
+        0.914,
+        0.944
+      ],
+      "hint": "Read only the table headed 'HILLSBOROUGH COUNTY'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2065
+      ]
+    },
+    {
+      "page": 410,
+      "id": "410-0",
+      "columns": [
+        {
+          "label": "Hoover & Curtis, r",
+          "contest": "president",
+          "candidate": "Herbert Hoover (Republican)"
+        },
+        {
+          "label": "Smith & Robinson, d",
+          "contest": "president",
+          "candidate": "Al Smith (Democratic)"
+        },
+        {
+          "label": "Foster & Gillow, w",
+          "contest": "president",
+          "candidate": "William Foster (Communist)"
+        },
+        {
+          "label": "Thomas & Maurer, s",
+          "contest": "president",
+          "candidate": "Norman Thomas (Socialist)"
+        },
+        {
+          "label": "Charles W. Tobey, r",
+          "contest": "governor",
+          "candidate": "Charles W. Tobey"
+        },
+        {
+          "label": "Eaton D. Sargent, d",
+          "contest": "governor",
+          "candidate": "Eaton D. Sargent"
+        },
+        {
+          "label": "Henry C. Iram, w",
+          "contest": "governor",
+          "candidate": "Henry C. Iram"
+        },
+        {
+          "label": "Frank T. Butler, s",
+          "contest": "governor",
+          "candidate": "Frank T. Butler"
+        },
+        {
+          "label": "Total Vote",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.097,
+        0.099,
+        0.879,
+        0.644
+      ],
+      "hint": "Read only the table headed 'CHESHIRE COUNTY'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3229
+      ]
+    },
+    {
+      "page": 411,
+      "id": "411-0",
+      "columns": [
+        {
+          "label": "Hoover & Curtis, r",
+          "contest": "president",
+          "candidate": "Herbert Hoover (Republican)"
+        },
+        {
+          "label": "Smith & Robinson, d",
+          "contest": "president",
+          "candidate": "Al Smith (Democratic)"
+        },
+        {
+          "label": "Foster & Gitlow, w",
+          "contest": "president",
+          "candidate": "William Foster (Communist)"
+        },
+        {
+          "label": "Thomas & Maurer, s",
+          "contest": "president",
+          "candidate": "Norman Thomas (Socialist)"
+        },
+        {
+          "label": "Charles W. Tobey, r",
+          "contest": "governor",
+          "candidate": "Charles W. Tobey"
+        },
+        {
+          "label": "Eaton D. Sargent, d",
+          "contest": "governor",
+          "candidate": "Eaton D. Sargent"
+        },
+        {
+          "label": "Henry C. Iram, w",
+          "contest": "governor",
+          "candidate": "Henry C. Iram"
+        },
+        {
+          "label": "Frank T. Butler, s",
+          "contest": "governor",
+          "candidate": "Frank T. Butler"
+        },
+        {
+          "label": "Total Vote",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.133,
+        0.094,
+        0.911,
+        0.504
+      ],
+      "hint": "Read only the table headed 'SULLIVAN COUNTY'; ignore any other table visible in the image."
+    },
+    {
+      "page": 412,
+      "id": "412-0",
+      "columns": [
+        {
+          "label": "Hoover & Curtis, r",
+          "contest": "president",
+          "candidate": "Herbert Hoover (Republican)"
+        },
+        {
+          "label": "Smith & Robinson, d",
+          "contest": "president",
+          "candidate": "Al Smith (Democratic)"
+        },
+        {
+          "label": "Foster & Gitlow, w",
+          "contest": "president",
+          "candidate": "William Foster (Communist)"
+        },
+        {
+          "label": "Thomas & Maurer, s",
+          "contest": "president",
+          "candidate": "Norman Thomas (Socialist)"
+        },
+        {
+          "label": "Charles W. Tobey, r",
+          "contest": "governor",
+          "candidate": "Charles W. Tobey"
+        },
+        {
+          "label": "Eaton D. Sargent, d",
+          "contest": "governor",
+          "candidate": "Eaton D. Sargent"
+        },
+        {
+          "label": "Henry C. Iram, w",
+          "contest": "governor",
+          "candidate": "Henry C. Iram"
+        },
+        {
+          "label": "Frank T. Butler, s",
+          "contest": "governor",
+          "candidate": "Frank T. Butler"
+        },
+        {
+          "label": "Total Vote",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.116,
+        0.08,
+        0.898,
+        0.805
+      ],
+      "hint": "Read only the table headed 'GRAFTON COUNTY'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2497
+      ]
+    },
+    {
+      "page": 413,
+      "id": "413-0",
+      "columns": [
+        {
+          "label": "Hoover & Curtis, r",
+          "contest": "president",
+          "candidate": "Herbert Hoover (Republican)"
+        },
+        {
+          "label": "Smith & Robinson, d",
+          "contest": "president",
+          "candidate": "Al Smith (Democratic)"
+        },
+        {
+          "label": "Foster & Gitlow, w",
+          "contest": "president",
+          "candidate": "William Foster (Communist)"
+        },
+        {
+          "label": "Thomas & Maurer, s",
+          "contest": "president",
+          "candidate": "Norman Thomas (Socialist)"
+        },
+        {
+          "label": "Charles W. Tobey, r",
+          "contest": "governor",
+          "candidate": "Charles W. Tobey"
+        },
+        {
+          "label": "Eaton D. Sargent, d",
+          "contest": "governor",
+          "candidate": "Eaton D. Sargent"
+        },
+        {
+          "label": "Henry C. Iram, w",
+          "contest": "governor",
+          "candidate": "Henry C. Iram"
+        },
+        {
+          "label": "Frank T. Butler, s",
+          "contest": "governor",
+          "candidate": "Frank T. Butler"
+        },
+        {
+          "label": "Total Vote",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.113,
+        0.078,
+        0.888,
+        0.596
+      ],
+      "hint": "Read only the table headed 'COOS COUNTY'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3398
+      ]
+    },
+    {
+      "page": 414,
+      "id": "414-0",
+      "columns": [
+        {
+          "label": "Hale, r",
+          "contest": "house1",
+          "candidate": "Fletcher Hale"
+        },
+        {
+          "label": "Keefe, d",
+          "contest": "house1",
+          "candidate": "Francis C. Keefe"
+        },
+        {
+          "label": "Greene, s",
+          "contest": "house1",
+          "candidate": "Charles W. Greene"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.097,
+        0.096,
+        0.887,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.1869
+      ]
+    },
+    {
+      "page": 415,
+      "id": "415-0",
+      "columns": [
+        {
+          "label": "Hale, r",
+          "contest": "house1",
+          "candidate": "Fletcher Hale"
+        },
+        {
+          "label": "Keefe, d",
+          "contest": "house1",
+          "candidate": "Francis C. Keefe"
+        },
+        {
+          "label": "Greene, s",
+          "contest": "house1",
+          "candidate": "Charles W. Greene"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.135,
+        0.285,
+        0.909,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT\u2014Continued'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        -0.0182
+      ]
+    },
+    {
+      "page": 416,
+      "id": "416-0",
+      "columns": [
+        {
+          "label": "Hale, r",
+          "contest": "house1",
+          "candidate": "Fletcher Hale"
+        },
+        {
+          "label": "Keefe, d",
+          "contest": "house1",
+          "candidate": "Francis C. Keefe"
+        },
+        {
+          "label": "Greene, s",
+          "contest": "house1",
+          "candidate": "Charles W. Greene"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.107,
+        0.286,
+        0.893,
+        0.755
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT\u2014Concluded'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        -0.0341
+      ]
+    },
+    {
+      "page": 417,
+      "id": "417-0",
+      "columns": [
+        {
+          "label": "Wason, r",
+          "contest": "house2",
+          "candidate": "Edward H. Wason"
+        },
+        {
+          "label": "Levensaler, d",
+          "contest": "house2",
+          "candidate": "Alfred W. Levensaler"
+        },
+        {
+          "label": "Bourdon, s",
+          "contest": "house2",
+          "candidate": "Eli Bourdon"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.113,
+        0.099,
+        0.89,
+        1.0
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.1931
+      ]
+    },
+    {
+      "page": 418,
+      "id": "418-0",
+      "columns": [
+        {
+          "label": "Wason, r",
+          "contest": "house2",
+          "candidate": "Edward H. Wason"
+        },
+        {
+          "label": "Levensaler, d",
+          "contest": "house2",
+          "candidate": "Alfred W. Levensaler"
+        },
+        {
+          "label": "Bourdon, s",
+          "contest": "house2",
+          "candidate": "Eli Bourdon"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.113,
+        0.294,
+        0.894,
+        1.0
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT\u2014Continued'; ignore any other table visible in the image."
+    },
+    {
+      "page": 419,
+      "id": "419-0",
+      "columns": [
+        {
+          "label": "Wason, r",
+          "contest": "house2",
+          "candidate": "Edward H. Wason"
+        },
+        {
+          "label": "Levensaler, d",
+          "contest": "house2",
+          "candidate": "Alfred W. Levensaler"
+        },
+        {
+          "label": "Bourdon, s",
+          "contest": "house2",
+          "candidate": "Eli Bourdon"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.11,
+        0.297,
+        0.89,
+        1.0
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT \u2014Continued'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        -0.0199
+      ]
+    },
+    {
+      "page": 420,
+      "id": "420-0",
+      "columns": [
+        {
+          "label": "Wason, r",
+          "contest": "house2",
+          "candidate": "Edward H. Wason"
+        },
+        {
+          "label": "Levensaler, d",
+          "contest": "house2",
+          "candidate": "Alfred W. Levensaler"
+        },
+        {
+          "label": "Bourdon, s",
+          "contest": "house2",
+          "candidate": "Eli Bourdon"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.089,
+        0.296,
+        0.872,
+        0.598
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT\u2014Concluded'; ignore any other table visible in the image."
+    }
+  ]
+}

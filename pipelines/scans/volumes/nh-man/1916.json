@@ -1,0 +1,42 @@
+{
+  "year": 1916,
+  "day": "1916-11-07",
+  "polity": "US-NH",
+  "publisher": "New Hampshire Secretary of State",
+  "title": "Manual for the General Court of New Hampshire 1917, general election returns by town (general election 1916-11-07)",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/manualforgeneral15newh/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/manualforgeneral15newh"
+  },
+  "raw_source": "us.scans",
+  "unit_scheme": "town",
+  "mixed": true,
+  "extend": true,
+  "offices": {
+    "president": "Electors of President and Vice-President: one column per ticket (printed as the presidential candidate, or as both candidates, with a party letter); name is the presidential candidate's surname; only the 1916 general election town tables by county (town and ward rows, then a county totals row); label each ward row with its city, for example \"Portsmouth Ward 1\"; skip councilor, state senator, representative to the General Court, county officer, and question tables",
+    "governor": "Governor; only the 1916 general election town tables by county (town and ward rows, then a county totals row); label each ward row with its city, for example \"Portsmouth Ward 1\"; skip councilor, state senator, representative to the General Court, county officer, and question tables",
+    "house": "U.S. Representative in Congress, one table per congressional district (First or Second); district is the congressional district number; only the 1916 general election town tables by county (town and ward rows, then a county totals row); label each ward row with its city, for example \"Portsmouth Ward 1\"; skip councilor, state senator, representative to the General Court, county officer, and question tables"
+  },
+  "leaves": [
+    389,
+    390,
+    391,
+    392,
+    393,
+    394,
+    395,
+    396,
+    397,
+    398,
+    399,
+    400,
+    401,
+    402,
+    403,
+    404,
+    405,
+    406
+  ],
+  "note": "Leaves are Internet Archive page indexes (printed pages 368-385: president and governor by county, then congress by district)."
+}

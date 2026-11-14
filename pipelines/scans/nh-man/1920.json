@@ -1,0 +1,952 @@
+{
+  "polity": "US-NH",
+  "publisher": "New Hampshire Secretary of State",
+  "title": "Manual for the General Court of New Hampshire 1921, general election returns by town (general election 1920-11-02)",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/manualforgeneral17newh/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/manualforgeneral17newh"
+  },
+  "raw_source": "us.scans",
+  "unit_scheme": "town",
+  "extend": true,
+  "contests": {
+    "president": {
+      "year": 1920,
+      "chamber": "president",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "NH",
+      "district": null
+    },
+    "governor": {
+      "year": 1920,
+      "chamber": "governor",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "NH",
+      "district": null
+    },
+    "senate": {
+      "year": 1920,
+      "chamber": "senate",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "NH",
+      "district": null
+    },
+    "house1": {
+      "year": 1920,
+      "chamber": "house",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "NH",
+      "district": 1
+    },
+    "house2": {
+      "year": 1920,
+      "chamber": "house",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "NH",
+      "district": 2
+    }
+  },
+  "pages": [
+    {
+      "page": 274,
+      "id": "274-0",
+      "columns": [
+        {
+          "label": "Harding and Coolidge (Rep.)",
+          "contest": "president",
+          "candidate": "Warren G. Harding (Republican)"
+        },
+        {
+          "label": "Cox and Roosevelt (Dem.)",
+          "contest": "president",
+          "candidate": "James Cox (Democratic)"
+        },
+        {
+          "label": "Debs and Stedman (Soc.)",
+          "contest": "president",
+          "candidate": "Eugene Debs (Socialist)"
+        },
+        {
+          "label": "Albert O. Brown (Rep.)",
+          "contest": "governor",
+          "candidate": "Albert O. Brown"
+        },
+        {
+          "label": "Charles E. Tilton (Dem.)",
+          "contest": "governor",
+          "candidate": "Charles E. Tilton"
+        },
+        {
+          "label": "Francis T. Butler (Soc.)",
+          "contest": "governor",
+          "candidate": "Francis T. Butler"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.041,
+        0.116,
+        0.835,
+        0.914
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENT AND GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3358
+      ]
+    },
+    {
+      "page": 275,
+      "id": "275-0",
+      "columns": [
+        {
+          "label": "Harding and Coolidge (Rep.)",
+          "contest": "president",
+          "candidate": "Warren G. Harding (Republican)"
+        },
+        {
+          "label": "Cox and Roosevelt (Dem.)",
+          "contest": "president",
+          "candidate": "James Cox (Democratic)"
+        },
+        {
+          "label": "Debs and Stedman (Soc.)",
+          "contest": "president",
+          "candidate": "Eugene Debs (Socialist)"
+        },
+        {
+          "label": "Albert O. Brown (Rep.)",
+          "contest": "governor",
+          "candidate": "Albert O. Brown"
+        },
+        {
+          "label": "Charles E. Tilton (Dem.)",
+          "contest": "governor",
+          "candidate": "Charles E. Tilton"
+        },
+        {
+          "label": "Francis T. Butler (Soc.)",
+          "contest": "governor",
+          "candidate": "Francis T. Butler"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.113,
+        0.121,
+        0.907,
+        0.702
+      ],
+      "hint": "Read only the table headed 'STRAFFORD COUNTY'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3597
+      ]
+    },
+    {
+      "page": 276,
+      "id": "276-0",
+      "columns": [
+        {
+          "label": "Harding and Coolidge (Rep.)",
+          "contest": "president",
+          "candidate": "Warren G. Harding (Republican)"
+        },
+        {
+          "label": "Cox and Roosevelt (Dem.)",
+          "contest": "president",
+          "candidate": "James Cox (Democratic)"
+        },
+        {
+          "label": "Debs and Stedman (Soc.)",
+          "contest": "president",
+          "candidate": "Eugene Debs (Socialist)"
+        },
+        {
+          "label": "Albert O. Brown (Rep.)",
+          "contest": "governor",
+          "candidate": "Albert O. Brown"
+        },
+        {
+          "label": "Charles E. Tilton (Dem.)",
+          "contest": "governor",
+          "candidate": "Charles E. Tilton"
+        },
+        {
+          "label": "Francis T. Butler (Soc.)",
+          "contest": "governor",
+          "candidate": "Francis T. Butler"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.1,
+        0.129,
+        0.892,
+        0.577
+      ],
+      "hint": "Read only the table headed 'BELKNAP COUNTY'; ignore any other table visible in the image."
+    },
+    {
+      "page": 277,
+      "id": "277-0",
+      "columns": [
+        {
+          "label": "Harding and Coolidge (Rep.)",
+          "contest": "president",
+          "candidate": "Warren G. Harding (Republican)"
+        },
+        {
+          "label": "Cox and Roosevelt (Dem.)",
+          "contest": "president",
+          "candidate": "James Cox (Democratic)"
+        },
+        {
+          "label": "Debs and Stedman (Soc.)",
+          "contest": "president",
+          "candidate": "Eugene Debs (Socialist)"
+        },
+        {
+          "label": "Albert O. Brown (Rep.)",
+          "contest": "governor",
+          "candidate": "Albert O. Brown"
+        },
+        {
+          "label": "Charles E. Tilton (Dem.)",
+          "contest": "governor",
+          "candidate": "Charles E. Tilton"
+        },
+        {
+          "label": "Francis T. Butler (Soc.)",
+          "contest": "governor",
+          "candidate": "Francis T. Butler"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.103,
+        0.119,
+        0.891,
+        0.574
+      ],
+      "hint": "Read only the table headed 'CARROLL COUNTY'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.4571
+      ]
+    },
+    {
+      "page": 278,
+      "id": "278-0",
+      "columns": [
+        {
+          "label": "Harding and Coolidge (Rep.)",
+          "contest": "president",
+          "candidate": "Warren G. Harding (Republican)"
+        },
+        {
+          "label": "Cox and Roosevelt (Dem.)",
+          "contest": "president",
+          "candidate": "James Cox (Democratic)"
+        },
+        {
+          "label": "Debs and Stedman (Soc.)",
+          "contest": "president",
+          "candidate": "Eugene Debs (Socialist)"
+        },
+        {
+          "label": "Albert O. Brown (Rep.)",
+          "contest": "governor",
+          "candidate": "Albert O. Brown"
+        },
+        {
+          "label": "Charles E. Tilton (Dem.)",
+          "contest": "governor",
+          "candidate": "Charles E. Tilton"
+        },
+        {
+          "label": "Francis T. Butler (Soc.)",
+          "contest": "governor",
+          "candidate": "Francis T. Butler"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.097,
+        0.097,
+        0.888,
+        0.789
+      ],
+      "hint": "Read only the table headed 'MERRIMACK COUNTY'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2977
+      ]
+    },
+    {
+      "page": 279,
+      "id": "279-0",
+      "columns": [
+        {
+          "label": "Harding and Coolidge (Rep.)",
+          "contest": "president",
+          "candidate": "Warren G. Harding (Republican)"
+        },
+        {
+          "label": "Cox and Roosevelt (Dem.)",
+          "contest": "president",
+          "candidate": "James Cox (Democratic)"
+        },
+        {
+          "label": "Debs and Stedman (Soc.)",
+          "contest": "president",
+          "candidate": "Eugene Debs (Socialist)"
+        },
+        {
+          "label": "Albert O. Brown (Rep.)",
+          "contest": "governor",
+          "candidate": "Albert O. Brown"
+        },
+        {
+          "label": "Charles E. Tilton (Dem.)",
+          "contest": "governor",
+          "candidate": "Charles E. Tilton"
+        },
+        {
+          "label": "Francis T. Butler (Soc.)",
+          "contest": "governor",
+          "candidate": "Francis T. Butler"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.09,
+        0.093,
+        0.876,
+        0.922
+      ],
+      "hint": "Read only the table headed 'HILLSBOROUGH COUNTY'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2497
+      ]
+    },
+    {
+      "page": 280,
+      "id": "280-0",
+      "columns": [
+        {
+          "label": "Harding and Coolidge (Rep.)",
+          "contest": "president",
+          "candidate": "Warren G. Harding (Republican)"
+        },
+        {
+          "label": "Cox and Roosevelt (Dem.)",
+          "contest": "president",
+          "candidate": "James Cox (Democratic)"
+        },
+        {
+          "label": "Debs and Stedman (Soc.)",
+          "contest": "president",
+          "candidate": "Eugene Debs (Socialist)"
+        },
+        {
+          "label": "Albert O. Brown (Rep.)",
+          "contest": "governor",
+          "candidate": "Albert O. Brown"
+        },
+        {
+          "label": "Charles E. Tilton (Dem.)",
+          "contest": "governor",
+          "candidate": "Charles E. Tilton"
+        },
+        {
+          "label": "Francis T. Butler (Soc.)",
+          "contest": "governor",
+          "candidate": "Francis T. Butler"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.089,
+        0.1,
+        0.881,
+        0.668
+      ],
+      "hint": "Read only the table headed 'Cheshire County: Vote for President and Governor'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3644
+      ]
+    },
+    {
+      "page": 281,
+      "id": "281-0",
+      "columns": [
+        {
+          "label": "Harding and Coolidge (Rep.)",
+          "contest": "president",
+          "candidate": "Warren G. Harding (Republican)"
+        },
+        {
+          "label": "Cox and Roosevelt (Dem.)",
+          "contest": "president",
+          "candidate": "James Cox (Democratic)"
+        },
+        {
+          "label": "Debs and Stedman (Soc.)",
+          "contest": "president",
+          "candidate": "Eugene Debs (Socialist)"
+        },
+        {
+          "label": "Albert O. Brown (Rep.)",
+          "contest": "governor",
+          "candidate": "Albert O. Brown"
+        },
+        {
+          "label": "Charles E. Tilton (Dem.)",
+          "contest": "governor",
+          "candidate": "Charles E. Tilton"
+        },
+        {
+          "label": "Francis T. Butler (Soc.)",
+          "contest": "governor",
+          "candidate": "Francis T. Butler"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.102,
+        0.106,
+        0.888,
+        0.524
+      ],
+      "hint": "Read only the table headed 'SULLIVAN COUNTY'; ignore any other table visible in the image."
+    },
+    {
+      "page": 282,
+      "id": "282-0",
+      "columns": [
+        {
+          "label": "Harding and Coolidge (Rep.)",
+          "contest": "president",
+          "candidate": "Warren G. Harding (Republican)"
+        },
+        {
+          "label": "Cox and Roosevelt (Dem.)",
+          "contest": "president",
+          "candidate": "James Cox (Democratic)"
+        },
+        {
+          "label": "Debs and Stedman (Soc.)",
+          "contest": "president",
+          "candidate": "Eugene Debs (Socialist)"
+        },
+        {
+          "label": "Albert O. Brown (Rep.)",
+          "contest": "governor",
+          "candidate": "Albert O. Brown"
+        },
+        {
+          "label": "Charles E. Tilton (Dem.)",
+          "contest": "governor",
+          "candidate": "Charles E. Tilton"
+        },
+        {
+          "label": "Francis T. Butler (Soc.)",
+          "contest": "governor",
+          "candidate": "Francis T. Butler"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.097,
+        0.106,
+        0.891,
+        0.799
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENT AND GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3001
+      ]
+    },
+    {
+      "page": 283,
+      "id": "283-0",
+      "columns": [
+        {
+          "label": "Harding and Coolidge (Rep.)",
+          "contest": "president",
+          "candidate": "Warren G. Harding (Republican)"
+        },
+        {
+          "label": "Cox and Roosevelt (Dem.)",
+          "contest": "president",
+          "candidate": "James Cox (Democratic)"
+        },
+        {
+          "label": "Debs and Stedman (Soc.)",
+          "contest": "president",
+          "candidate": "Eugene Debs (Socialist)"
+        },
+        {
+          "label": "Albert O. Brown (Rep.)",
+          "contest": "governor",
+          "candidate": "Albert O. Brown"
+        },
+        {
+          "label": "Charles E. Tilton (Dem.)",
+          "contest": "governor",
+          "candidate": "Charles E. Tilton"
+        },
+        {
+          "label": "Francis T. Butler (Soc.)",
+          "contest": "governor",
+          "candidate": "Francis T. Butler"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.089,
+        0.101,
+        0.878,
+        0.623
+      ],
+      "hint": "Read only the table headed 'COOS COUNTY'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3908
+      ]
+    },
+    {
+      "page": 284,
+      "id": "284-0",
+      "columns": [
+        {
+          "label": "George H. Moses (Rep.)",
+          "contest": "senate",
+          "candidate": "George H. Moses"
+        },
+        {
+          "label": "Raymond B. Stevens (Dem.)",
+          "contest": "senate",
+          "candidate": "Raymond B. Stevens"
+        },
+        {
+          "label": "William H. Wilkins (Soc.)",
+          "contest": "senate",
+          "candidate": "William H. Wilkins"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.334,
+        0.153,
+        0.613,
+        0.876
+      ],
+      "hint": "Read only the table headed 'U. S. Senator'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2863
+      ]
+    },
+    {
+      "page": 285,
+      "id": "285-0",
+      "columns": [
+        {
+          "label": "George H. Moses (Rep.)",
+          "contest": "senate",
+          "candidate": "George H. Moses"
+        },
+        {
+          "label": "Raymond B. Stevens (Dem.)",
+          "contest": "senate",
+          "candidate": "Raymond B. Stevens"
+        },
+        {
+          "label": "William H. Wilkins (Soc.)",
+          "contest": "senate",
+          "candidate": "William H. Wilkins"
+        },
+        {
+          "label": "Sherman E. Burroughs (Rep.)",
+          "contest": "house1",
+          "candidate": "Sherman E. Burroughs"
+        },
+        {
+          "label": "Rosecrans W. Pillsbury (Dem.)",
+          "contest": "house1",
+          "candidate": "Rosecrans W. Pillsbury"
+        },
+        {
+          "label": "Solomon Shechet (Soc.)",
+          "contest": "house1",
+          "candidate": "Solomon Shechet"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.11,
+        0.114,
+        0.896,
+        0.693
+      ],
+      "hint": "Read only the table headed 'STRAFFORD COUNTY'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3592
+      ]
+    },
+    {
+      "page": 286,
+      "id": "286-0",
+      "columns": [
+        {
+          "label": "George H. Moses (Rep.)",
+          "contest": "senate",
+          "candidate": "George H. Moses"
+        },
+        {
+          "label": "Raymond B. Stevens (Dem.)",
+          "contest": "senate",
+          "candidate": "Raymond B. Stevens"
+        },
+        {
+          "label": "William H. Wilkins (Soc.)",
+          "contest": "senate",
+          "candidate": "William H. Wilkins"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.108,
+        0.121,
+        0.641,
+        0.562
+      ],
+      "hint": "Read only the table headed 'U. S. Senator'; ignore any other table visible in the image."
+    },
+    {
+      "page": 287,
+      "id": "287-0",
+      "columns": [
+        {
+          "label": "George H. Moses (Rep.)",
+          "contest": "senate",
+          "candidate": "George H. Moses"
+        },
+        {
+          "label": "Raymond B. Stevens (Dem.)",
+          "contest": "senate",
+          "candidate": "Raymond B. Stevens"
+        },
+        {
+          "label": "William H. Wilkins (Soc.)",
+          "contest": "senate",
+          "candidate": "William H. Wilkins"
+        },
+        {
+          "label": "Sherman E. Burroughs (Rep.)",
+          "contest": "house1",
+          "candidate": "Sherman E. Burroughs"
+        },
+        {
+          "label": "Rosecrans W. Pillsbury (Dem.)",
+          "contest": "house1",
+          "candidate": "Rosecrans W. Pillsbury"
+        },
+        {
+          "label": "Solomon Shechet (Soc.)",
+          "contest": "house1",
+          "candidate": "Solomon Shechet"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.105,
+        0.121,
+        0.894,
+        0.576
+      ],
+      "hint": "Read only the table headed 'CARROLL COUNTY'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.4549
+      ]
+    },
+    {
+      "page": 288,
+      "id": "288-0",
+      "columns": [
+        {
+          "label": "George H. Moses (Rep.)",
+          "contest": "senate",
+          "candidate": "George H. Moses"
+        },
+        {
+          "label": "Raymond B. Stevens (Dem.)",
+          "contest": "senate",
+          "candidate": "Raymond B. Stevens"
+        },
+        {
+          "label": "William H. Wilkins (Soc.)",
+          "contest": "senate",
+          "candidate": "William H. Wilkins"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.115,
+        0.121,
+        0.574,
+        0.821
+      ],
+      "hint": "Read only the table headed 'Merrimack County - U. S. Senator'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2971
+      ]
+    },
+    {
+      "page": 289,
+      "id": "289-0",
+      "columns": [
+        {
+          "label": "George H. Moses (Rep.)",
+          "contest": "senate",
+          "candidate": "George H. Moses"
+        },
+        {
+          "label": "Raymond B. Stevens (Dem.)",
+          "contest": "senate",
+          "candidate": "Raymond B. Stevens"
+        },
+        {
+          "label": "William H. Wilkins (Soc.)",
+          "contest": "senate",
+          "candidate": "William H. Wilkins"
+        },
+        {
+          "label": "Sherman E. Burroughs (Rep.)",
+          "contest": "house1",
+          "candidate": "Sherman E. Burroughs"
+        },
+        {
+          "label": "Edward H. Wason (Rep.)",
+          "contest": "house2",
+          "candidate": "Edward H. Wason"
+        },
+        {
+          "label": "Rosecrans W. Pillsbury (Dem.)",
+          "contest": "house1",
+          "candidate": "Rosecrans W. Pillsbury"
+        },
+        {
+          "label": "Charles J. French (Dem.)",
+          "contest": "house2",
+          "candidate": "Charles J. French"
+        },
+        {
+          "label": "Solomon Shechet (Soc.)",
+          "contest": "house1",
+          "candidate": "Solomon Shechet"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.09,
+        0.114,
+        0.884,
+        0.959
+      ],
+      "hint": "Read only the table headed 'HILLSBOROUGH COUNTY'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2414
+      ]
+    },
+    {
+      "page": 290,
+      "id": "290-0",
+      "columns": [
+        {
+          "label": "George H. Moses (Rep.)",
+          "contest": "senate",
+          "candidate": "George H. Moses"
+        },
+        {
+          "label": "Raymond B. Stevens (Dem.)",
+          "contest": "senate",
+          "candidate": "Raymond B. Stevens"
+        },
+        {
+          "label": "William H. Wilkins (Soc.)",
+          "contest": "senate",
+          "candidate": "William H. Wilkins"
+        },
+        {
+          "label": "Edward H. Wason (Rep.)",
+          "contest": "house2",
+          "candidate": "Edward H. Wason"
+        },
+        {
+          "label": "Charles J. French (Dem.)",
+          "contest": "house2",
+          "candidate": "Charles J. French"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.103,
+        0.108,
+        0.89,
+        0.656
+      ],
+      "hint": "Read only the table headed 'CHESHIRE COUNTY'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3741
+      ]
+    },
+    {
+      "page": 291,
+      "id": "291-0",
+      "columns": [
+        {
+          "label": "George H. Moses (Dem.)",
+          "contest": "senate",
+          "candidate": "George H. Moses"
+        },
+        {
+          "label": "Raymond B. Stevens (Dem.)",
+          "contest": "senate",
+          "candidate": "Raymond B. Stevens"
+        },
+        {
+          "label": "William H. Wilkins (Soc.)",
+          "contest": "senate",
+          "candidate": "William H. Wilkins"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.123,
+        0.118,
+        0.733,
+        0.54
+      ],
+      "hint": "Read only the table headed 'U. S. Senator'; ignore any other table visible in the image."
+    },
+    {
+      "page": 292,
+      "id": "292-0",
+      "columns": [
+        {
+          "label": "George H. Moses (Rep.)",
+          "contest": "senate",
+          "candidate": "George H. Moses"
+        },
+        {
+          "label": "Raymond B. Stevens (Dem.)",
+          "contest": "senate",
+          "candidate": "Raymond B. Stevens"
+        },
+        {
+          "label": "William H. Wilkins (Soc.)",
+          "contest": "senate",
+          "candidate": "William H. Wilkins"
+        },
+        {
+          "label": "Edward H. Wason (Rep.)",
+          "contest": "house2",
+          "candidate": "Edward H. Wason"
+        },
+        {
+          "label": "Charles J. French (Dem.)",
+          "contest": "house2",
+          "candidate": "Charles J. French"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.133,
+        0.121,
+        0.923,
+        0.815
+      ],
+      "hint": "Read only the table headed 'GRAFTON COUNTY'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2968
+      ]
+    },
+    {
+      "page": 293,
+      "id": "293-0",
+      "columns": [
+        {
+          "label": "George H. Moses (Rep.)",
+          "contest": "senate",
+          "candidate": "George H. Moses"
+        },
+        {
+          "label": "Raymond B. Stevens (Dem.)",
+          "contest": "senate",
+          "candidate": "Raymond B. Stevens"
+        },
+        {
+          "label": "William H. Wilkins (Soc.)",
+          "contest": "senate",
+          "candidate": "William H. Wilkins"
+        },
+        {
+          "label": "Edward H. Wason (Rep.)",
+          "contest": "house2",
+          "candidate": "Edward H. Wason"
+        },
+        {
+          "label": "Charles J. French (Dem.)",
+          "contest": "house2",
+          "candidate": "Charles J. French"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.1,
+        0.118,
+        0.886,
+        0.649
+      ],
+      "hint": "Read only the table headed 'COOS COUNTY'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3917
+      ]
+    }
+  ]
+}
