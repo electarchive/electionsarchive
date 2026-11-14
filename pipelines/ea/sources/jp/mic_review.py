@@ -19,6 +19,7 @@ from ea.sources.jp.mic import (
     sheets,
     suffix,
 )
+from ea.sources.jp.mic_book import archived
 from ea.sources.jp.mlit import PREFECTURES
 from ea.store import DATA, connect
 
@@ -34,6 +35,12 @@ NUMBER = re.compile(r"^-?[\d,]+$")
 GAIJI = {"\ue042": "那", "\ue06e": "橋", "\ue050": "菅", "\ue051": "澤"}
 MISMATCH = {("2014-12-14", "東京都"): 6}
 JUSTICES = {
+    "古田 佑紀": ("Q8060620", "Yuki Furuta"),
+    "中川 了滋": ("Q7385293", "Ryoji Nakagawa"),
+    "堀籠 幸男": ("Q8060740", "Yukio Horigome"),
+    "今井 功": ("Q6078899", "Isao Imai"),
+    "津野 修": ("Q7105697", "Osamu Tsuno"),
+    "才口 千晴": ("Q5097274", "Chiharu Saiguchi"),
     "櫻井 龍子": ("Q3454098", "Ryuko Sakurai"),
     "竹内 行夫": ("Q6147609", "Yukio Takeuchi"),
     "涌井 紀夫": ("Q7051329", "Norio Wakui"),
@@ -85,6 +92,16 @@ JUSTICES = {
     "高須 順一": ("Q123282304", "Jun'ichi Takasu"),
     "沖野 眞已": ("Q109597341", "Masami Okino"),
 }
+EARLY = {
+    44: (
+        "2005-09-11",
+        {
+            ELECTORS: "04_01",
+            DISMISSAL: "04_02",
+            BALLOTS: "04_03",
+        },
+    ),
+}
 RULES = {"formula": "referendum", "quorum": 0.01}
 SYSTEM = (
     "Each justice is reviewed at the first House of Representatives general election after appointment, and again at "
@@ -98,11 +115,25 @@ METHOD = (
     "可としない投票数), with registered voters, voters, and ballots cast from its other review tables. A blank name "
     "counts against dismissal. Yes is the vote for dismissal. Valid votes are the two answers together; invalid "
     "votes are the invalid ballots plus the ballots whose mark for this justice was void (記載無効), which the "
-    "ministry counts within its valid ballots. Each justice's national totals were checked against the 結果調 book."
+    "ministry counts within its valid ballots. Each justice's national totals were checked against the printed 合計 row of the 結果調 table (2005) or the "
+    "結果調 book (2009 and after)."
 )
 
 
+def early(number: int) -> dict[str, str]:
+    _, parts = EARLY[number]
+    return {
+        key: archived(
+            "20110520102823",
+            f"http://www.soumu.go.jp/senkyo/senkyo_s/data/shugiin{number}/pdf/h17sousenkyo_050911_{part}.pdf",
+        )
+        for key, part in parts.items()
+    }
+
+
 def links(number: int) -> dict[str, str]:
+    if number in EARLY:
+        return early(number)
     found = anchors(f"{DATA_ROOT}/shugiin{number}/index.html")
     start = next(i for i, (_, label) in enumerate(found) if label == "市区町村別得票数")
     wanted: dict[str, str] = {}
@@ -113,10 +144,14 @@ def links(number: int) -> dict[str, str]:
     return wanted
 
 
+def held_on() -> dict[int, str]:
+    return {number: held for number, (held, _) in EARLY.items()} | ELECTIONS
+
+
 def fetch() -> None:
-    for number in ELECTIONS:
+    for number in held_on():
         for url in links(number).values():
-            raw.fetch(SOURCE, url, suffix=suffix(url))
+            raw.fetch(SOURCE, url, suffix=".pdf" if number in EARLY else suffix(url))
 
 
 def prefecture(text: str) -> str | None:
@@ -145,6 +180,16 @@ def pdf_rows(path: Path) -> list[list[str]]:
             rows.append([found.group(1), *found.group(2).split()])
         else:
             rows.append([cell for cell in re.split(r"\s{20,}", line.strip())])
+    return rows
+
+
+def pdf_table(path: Path) -> list[list[str]]:
+    text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True).stdout
+    rows: list[list[str]] = []
+    for line in unicodedata.normalize("NFKC", text).splitlines():
+        found = re.match(r"^\s*(\d*\s*\D+?)\s+(-?[\d,.]+(?:\s+-?[\d,.]+)*)\s*$", line)
+        if found:
+            rows.append([found.group(1), *found.group(2).split()])
     return rows
 
 
@@ -182,7 +227,7 @@ def dismissal(path: Path) -> list[dict[str, object]]:
 
 
 def by_prefecture(path: Path, columns: dict[str, int]) -> dict[str, dict[str, int]]:
-    rows = xls_rows(path)
+    rows = pdf_table(path) if path.suffix == ".pdf" else xls_rows(path)
     found: dict[str, dict[str, int]] = {}
     for cells in rows:
         if not cells or (place := prefecture(cells[0])) is None or place in found:
@@ -199,15 +244,28 @@ def book_totals(path: Path) -> str:
     return re.sub(r"[\s,]", "", unicodedata.normalize("NFKC", text))
 
 
+def printed_totals(path: Path) -> set[tuple[int, int, int]]:
+    found: set[tuple[int, int, int]] = set()
+    for cells in pdf_table(path):
+        if re.sub(r"\s", "", cells[0]) == "合計":
+            numbers = [count(cell) for cell in cells[1:] if NUMBER.match(cell)]
+            for start in range(0, len(numbers) - 3, 4):
+                found.add((numbers[start], numbers[start + 1], numbers[start + 2]))
+    return found
+
+
 def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
     rows: list[dict[str, object]] = []
-    for number, held in ELECTIONS.items():
+    for number, held in held_on().items():
         files = links(number)
         votes = dismissal(raw.cached(SOURCE, files[DISMISSAL]).path)
         electors = by_prefecture(raw.cached(SOURCE, files[ELECTORS]).path, {"registered": 2, "voters": 5})
         ballots = by_prefecture(raw.cached(SOURCE, files[BALLOTS]).path, {"cast": 0, "valid": 1, "invalid": 2})
-        book = book_totals(raw.cached(SOURCE, files[BOOK]).path)
+        if number in EARLY:
+            book = printed_totals(raw.cached(SOURCE, files[DISMISSAL]).path)
+        else:
+            book = book_totals(raw.cached(SOURCE, files[BOOK]).path)
         justices = list(dict.fromkeys(str(row["justice"]) for row in votes))
         for justice in justices:
             own = [row for row in votes if row["justice"] == justice]
@@ -215,7 +273,12 @@ def parse() -> None:
                 raise ValueError(f"{held} {justice}: {len(own)} prefectures")
             dismiss = sum(int(str(row["dismiss"])) for row in own)
             keep = sum(int(str(row["keep"])) for row in own)
-            if f"{dismiss}{keep}" not in book:
+            void = sum(int(str(row["void"])) for row in own)
+            if isinstance(book, set):
+                missing = (dismiss, keep, void) not in book
+            else:
+                missing = f"{dismiss}{keep}" not in book
+            if missing:
                 raise ValueError(f"{held} {justice}: {dismiss} for dismissal is not in the book")
             for row in own:
                 place = str(row["prefecture"])
@@ -235,7 +298,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Japan's national reviews of Supreme Court justices 2009-2026 by prefecture, from the Ministry of "
+            summary="Japan's national reviews of Supreme Court justices 2005-2026 by prefecture, from the Ministry of "
             "Internal Affairs and Communications' 結果調 tables",
             polity="JP",
         )
@@ -259,8 +322,8 @@ def emit() -> Path:
         cs.add("note", entity_id=system, kind="methodology", body_md=SYSTEM)
         people: set[UUID] = set()
         values: list[tuple[str, str, str | None, int, int]] = []
-        for number, held in ELECTIONS.items():
-            election = cs.key("jp.mic.election", held)
+        for number, held in held_on().items():
+            election = cs.key("jp.mic_book.election" if number in EARLY else "jp.mic.election", held)
             if election in cs.minted:
                 raise ValueError(f"run jp.mic first: no election on {held}")
             for url in links(number).values():
