@@ -1,14 +1,20 @@
+import base64
 import html
+import io
 import re
 import subprocess
+import tempfile
 from collections import Counter
 from datetime import date
 from pathlib import Path
 from uuid import UUID
 
 import polars as pl
+from anthropic.types import ImageBlockParam, TextBlockParam
+from anthropic.types.message_create_params import MessageCreateParamsNonStreaming
+from PIL import Image
 
-from ea import raw
+from ea import batch, raw
 from ea.changeset import Changeset, slug
 from ea.names import display, foreign_preferred
 from ea.store import DATA, connect
@@ -30,6 +36,90 @@ DOVER_SITE = "https://www.dover.gov.uk/asset-library"
 EPSOM_SITE = "https://www.epsom-ewell.gov.uk/sites/default/files/documents/council/elections-and-voting"
 CALDERDALE_SITE = "https://www.calderdale.gov.uk/council/democracy/electionresults/results.jsp"
 CALDERDALE_WARDS = 18
+LEEDS = "E08000035"
+LEEDS_SITE = "https://datamillnorth.org/download/20jwj"
+LEEDS_FILES = {
+    1973: ("m55/1973%20-%20LCC%20Elections%2010%20May%201973.pdf", date(1973, 5, 10)),
+    1975: ("615/1975%20-%20LCC%20Elections%201%20May%201975.pdf", date(1975, 5, 1)),
+    1976: ("ntw/1976%20-%20LCC%20Elections%206%20May%201976.pdf", date(1976, 5, 6)),
+    1978: ("ydt/1978%20-%20LCC%20Elections%204%20May%201978.pdf", date(1978, 5, 4)),
+    1979: ("tep/1979%20-%20LCC%20Elections%203%20May%201979.pdf", date(1979, 5, 3)),
+    1980: ("0zn/1980%20-%20LCC%20Elections%201%20May%201980.pdf", date(1980, 5, 1)),
+    1982: ("yl0/1982%20-%20LCC%20Elections%206%20May%201982.pdf", date(1982, 5, 6)),
+    1983: ("gpd/1983%20-%20LCC%20Elections%205%20May%201983.pdf", date(1983, 5, 5)),
+    1984: ("6x8/1984%20-%20LCC%20Elections%203%20May%201984.pdf", date(1984, 5, 3)),
+    1986: ("ems/1986%20-%20LCC%20Elections%208%20May%201986.pdf", date(1986, 5, 8)),
+    1987: ("1sh/1987%20-%20LCC%20Elections%207%20May%201987.pdf", date(1987, 5, 7)),
+    1988: ("3xt/1988%20-%20LCC%20Elections%205%20May%201988.pdf", date(1988, 5, 5)),
+    1990: ("wxt/1990%20-%20LCC%20Elections%203%20May%201990.pdf", date(1990, 5, 3)),
+    1991: ("szj/1991%20-%20LCC%20Elections%202%20May%201991.pdf", date(1991, 5, 2)),
+    1992: ("wd7/1992%20-%20LCC%20Elections%207%20May%201992.pdf", date(1992, 5, 7)),
+    1994: ("qvl/1994%20-%20LCC%20Elections%205%20May%201994.pdf", date(1994, 5, 5)),
+    1995: ("wme/1985%20-%20LCC%20Elections%204%20May%201985.pdf", date(1995, 5, 4)),
+    1996: ("l95/1996%20-%20LCC%20Elections%202%20May%201996.pdf", date(1996, 5, 2)),
+    1998: ("1xp/1998%20-%20LCC%20Elections%207%20May%201998.pdf", date(1998, 5, 7)),
+    1999: ("gj8/1999%20-%20LCC%20Elections%206%20May%201999.pdf", date(1999, 5, 6)),
+    2000: ("gb1/2000%20-%20LCC%20Elections%204%20May%202000.pdf", date(2000, 5, 4)),
+}
+LEEDS_MODEL = "claude-haiku-5-5"
+LEEDS_LONGEST = 1568
+LEEDS_SPECKS = 40
+LEEDS_TABLES = {1988}
+LEEDS_READS = {
+    "a": "",
+    "b": " Read each handwritten vote figure digit by digit before you write it, and count its digits; where a figure "
+    "was altered, give the one that stands.",
+}
+LEEDS_SYSTEM = (
+    "You read part of a scanned sheet from Leeds City Council giving the result of the poll at a city council "
+    "election, ward by ward. Names are typed; parties and votes are often written by hand. Some years print a table "
+    "with the columns Ward, Name of candidate, Home address, and Description, with the votes written beside each "
+    "name: there, take the ward from the first column and the description as the party. Return every ward block in "
+    "reading order, each column from top to bottom and the columns from left to right. For each ward give the "
+    "heading exactly as printed (such as WARD NO. 3 (Burmantofts & Richmond Hill) or ARMLEY WARD), whether it is "
+    "marked as continued, any printed note on the number of seats (such as TWO VACANCIES), and its box as "
+    "[left, top, right, bottom] in thousandths of the image width and height. For each candidate give the name "
+    "exactly as typed, the party exactly as written (such as LAB, CON, LIB, COMM, NF, ECOL, SDP, LIB DEM, or GRN), "
+    "the votes as the digits written (null if no figure), any mark written beside the name or figure that shows the "
+    "candidate was elected (such as a year, an R, a tick, a ring, or a box) copied as text or null, and any figure "
+    "struck through. Skip the title, seat counts by party, turnout percentages, and other notes."
+)
+LEEDS_SCHEMA: dict[str, object] = {
+    "type": "object",
+    "properties": {
+        "wards": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "heading": {"type": "string"},
+                    "continued": {"type": "boolean"},
+                    "seats_note": {"type": ["string", "null"]},
+                    "box": {"type": "array", "items": {"type": "integer"}},
+                    "candidates": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "name": {"type": "string"},
+                                "party": {"type": ["string", "null"]},
+                                "votes": {"type": ["string", "null"]},
+                                "mark": {"type": ["string", "null"]},
+                                "struck": {"type": ["string", "null"]},
+                            },
+                            "required": ["name", "party", "votes", "mark", "struck"],
+                            "additionalProperties": False,
+                        },
+                    },
+                },
+                "required": ["heading", "continued", "seats_note", "box", "candidates"],
+                "additionalProperties": False,
+            },
+        }
+    },
+    "required": ["wards"],
+    "additionalProperties": False,
+}
 DOVER_NOTES = (
     "Dover District Council's typed summary of the district council election, ward by ward, with each candidate's "
     "name, description, and votes, the elected candidates, the seats, and the turnout as a percentage. It prints no "
@@ -235,6 +325,81 @@ def fetch() -> None:
     for election in CALDERDALE_ELECTIONS:
         for area in range(1, CALDERDALE_WARDS + 1):
             raw.fetch(SOURCE, f"{CALDERDALE_SITE}?election={election}&area={area}", suffix=".html")
+    price_in, price_out = batch.PRICES[LEEDS_MODEL]
+    wanted: dict[str, batch.Want] = {}
+    for year in LEEDS_FILES:
+        path = str(raw.fetch(SOURCE, leeds_url(year), suffix=".pdf").path)
+        for page in range(1, pages(path) + 1):
+            for index, (_, piece) in enumerate(leeds_pieces(leeds_page(path, page), year not in LEEDS_TABLES)):
+                buffer = io.BytesIO()
+                piece.save(buffer, "PNG")
+                for read, extra in LEEDS_READS.items():
+                    params = MessageCreateParamsNonStreaming(
+                        model=LEEDS_MODEL,
+                        max_tokens=8000,
+                        system=LEEDS_SYSTEM + extra,
+                        messages=[
+                            {
+                                "role": "user",
+                                "content": [
+                                    ImageBlockParam(
+                                        type="image",
+                                        source={
+                                            "type": "base64",
+                                            "media_type": "image/png",
+                                            "data": base64.b64encode(buffer.getvalue()).decode(),
+                                        },
+                                    ),
+                                    TextBlockParam(
+                                        type="text",
+                                        text=f"Read every ward on this part of the {LEEDS_FILES[year][1]:%-d %B %Y} sheet.",
+                                    ),
+                                ],
+                            }
+                        ],
+                        output_config={"effort": "low", "format": {"type": "json_schema", "schema": LEEDS_SCHEMA}},
+                    )
+                    estimate = (piece.width * piece.height / 750 * price_in + 4000 * price_out) / 1e6
+                    wanted[leeds_key(read, year, page, index)] = (params, estimate)
+    print(batch.ensure(SOURCE, "leeds", wanted)[1])
+
+
+def leeds_url(year: int) -> str:
+    return f"{LEEDS_SITE}/{LEEDS_FILES[year][0]}"
+
+
+def leeds_key(read: str, year: int, page: int, index: int) -> str:
+    return f"anthropic-batch:{LEEDS_MODEL}/leeds-{read}/{year}/{page}/{index}"
+
+
+def leeds_page(path: str, page: int) -> Image.Image:
+    with tempfile.TemporaryDirectory() as folder:
+        stem = f"{folder}/page"
+        subprocess.run(
+            ["pdftoppm", "-r", "200", "-gray", "-png", "-f", str(page), "-l", str(page), "-singlefile", path, stem],
+            check=True,
+        )
+        return Image.open(f"{stem}.png").convert("L").rotate(90, expand=True)
+
+
+def leeds_pieces(image: Image.Image, split: bool) -> list[tuple[tuple[int, int, int, int], Image.Image]]:
+    width, height = image.size
+    ink = image.crop((0, int(height * 0.08), width, int(height * 0.97))).point(lambda v: 1 if v < 128 else 0)
+    data = ink.tobytes()
+    columns = [sum(data[x : len(data) : width * 2]) for x in range(width)]
+    span = 12
+    window = range(int(width * 0.3), int(width * 0.7) - span)
+    cut = min(window, key=lambda x: (sum(columns[x : x + span]), abs(x - width // 2)))
+    if not split or sum(columns[cut : cut + span]) > LEEDS_SPECKS:
+        boxes = [(0, 0, width, height)]
+    else:
+        boxes = [(0, 0, cut + span // 2, height), (cut + span // 2, 0, width, height)]
+    pieces = []
+    for box in boxes:
+        piece = image.crop(box)
+        piece.thumbnail((LEEDS_LONGEST, LEEDS_LONGEST))
+        pieces.append((box, piece))
+    return pieces
 
 
 def found(pattern: str, content: str, flags: int = 0) -> re.Match[str]:
