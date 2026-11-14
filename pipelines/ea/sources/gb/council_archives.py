@@ -192,6 +192,18 @@ FILES: list[dict] = [
         "rejected ballots, electorate, and ballot papers issued.",
     },
     {
+        "file": "https://www.electionscentre.co.uk/wp-content/uploads/2015/06/Kent-County.pdf",
+        "parser": "kent-handbook",
+        "code": KENT,
+        "day": None,
+        "publisher": "The Elections Centre, University of Plymouth",
+        "title": "Kent County Council Election Results 1973-2009",
+        "notes": "Colin Rallings and Michael Thrasher's results book for the county council's elections, from the Local "
+        "Elections Handbook, with each division's electorate, each candidate's name, party, and votes, and the turnout "
+        "as a percentage. It does not mark the elected candidate; in a single-member division that is the candidate "
+        "with the most votes, listed first. The council's 1997 and 2001 divisions outside Dover district come from it.",
+    },
+    {
         "file": f"{EPSOM_SITE}/BoroughCouncilElectionResults6May1999.pdf",
         "parser": "epsom",
         "code": EPSOM,
@@ -245,6 +257,8 @@ SURREY_DAYS = {
     2001: date(2001, 6, 7),
 }
 HELD = {(SURREY, 2005)}
+KENT_DAYS = {1997: date(1997, 5, 1), 2001: date(2001, 6, 7)}
+DOVER_DIVISIONS = {"Deal East", "Deal West", "Dover Central", "Dover Rural", "Dover South", "Dover West", "Sandwich"}
 MONTHS = {
     month: index
     for index, month in enumerate(
@@ -299,6 +313,7 @@ PARTIES = {
             "Lib Dem",
             "LibDem",
             "Lib.Dem",
+            "LD",
             "Liberal Democrat Focus",
             "Liberal Democrat Focus Team",
             "Liberal Democrat and Focus Team",
@@ -314,9 +329,10 @@ PARTIES = {
     "UK Independence Party": ("wikidata", "Q10647"),
     "UK Ind Party": ("wikidata", "Q10647"),
     "British National Party": ("gb.party", "british-national-party"),
+    "BNP": ("gb.party", "british-national-party"),
     "Communist": ("wikidata", "Q592068"),
 }
-INDEPENDENT = {"Independent"}
+INDEPENDENT = {"Independent", "Ind"}
 
 
 def fetch() -> None:
@@ -635,6 +651,53 @@ def surrey(entry: dict) -> tuple[list[dict], list[dict]]:
     return [row for row in rows if any(row["at"] is ward for ward in kept)], kept
 
 
+def kent_handbook(entry: dict) -> tuple[list[dict], list[dict]]:
+    path = str(raw.cached(SOURCE, entry["file"]).path)
+    rows: list[dict] = []
+    wards: list[dict] = []
+    year = None
+    for page in range(1, pages(path) + 1):
+        page_words = words(path, page)
+        starts = sorted({round(x - 106.1) for x, y, word in page_words if word == "vote"})
+        edges = [start - 4 for start in starts] + [10_000]
+        for index in range(len(starts)):
+            column = [w for w in page_words if edges[index] <= w[0] < edges[index + 1]]
+            ward = None
+            for line in lines(column):
+                text = " ".join(w[2] for w in line)
+                heading = re.fullmatch(r"Kent (\d{4})", text)
+                division = re.fullmatch(r"(.+?) \((\d+)\)", text)
+                if heading:
+                    year = int(heading[1])
+                elif division and year in KENT_DAYS:
+                    name = division[1].replace("&", "and")
+                    ward = (
+                        None
+                        if name in DOVER_DIVISIONS
+                        else {
+                            "name": name,
+                            "code": entry["code"],
+                            "day": KENT_DAYS[year],
+                            "seats": 1,
+                            "registered": int(division[2]),
+                        }
+                    )
+                    if ward:
+                        wards.append(ward)
+                        first = True
+                elif ward and not text.startswith(("vote", "Turnout")):
+                    *label, party, votes, _ = [w[2] for w in line]
+                    if not votes.replace(",", "").isdigit():
+                        raise ValueError(f"Kent handbook page {page}: {text}")
+                    label = " ".join(label).replace("*", "").replace(" Ms.", "")
+                    rows.append(candidate(entry, ward, page, label, party, int(votes.replace(",", "")), first))
+                    first = False
+                elif ward and text.startswith("Turnout"):
+                    ward["turnout"] = float(text.split()[1])
+                    ward = None
+    return rows, wards
+
+
 def text(cell: str) -> str:
     return re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", cell))).strip()
 
@@ -688,7 +751,7 @@ def parse() -> None:
     rows: list[dict] = []
     wards: list[dict] = []
     for entry in FILES:
-        parser = {"kent-2001": kent_2001, "surrey": surrey}.get(entry["parser"], table)
+        parser = {"kent-2001": kent_2001, "kent-handbook": kent_handbook, "surrey": surrey}.get(entry["parser"], table)
         found_rows, found_wards = parser(entry)
         for ward in found_wards:
             ward.setdefault("day", entry["day"])
@@ -897,12 +960,6 @@ def emit() -> Path:
                 name(election, f"{council_name} by-election, {when}" if by else f"{day.year} {council_name} election")
                 cs.add("slug", path=f"{path}/{stamp}-local", entity_id=election)
                 wards = council_lines["ward"].n_unique()
-                if code == KENT:
-                    caveat(
-                        election,
-                        f"Only the {wards} divisions in Dover district are loaded, from Dover District Council's "
-                        "results; the county's other divisions are not in the archive yet.",
-                    )
                 if code == SURREY and not by:
                     caveat(
                         election,
