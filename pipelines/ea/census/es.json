@@ -74,6 +74,12 @@
       "url": "https://www.ine.es/daco/daco42/codmun/cod_provincia.htm",
       "kind": "official_body"
     },
+    "rel-2009": {
+      "title": "Estudio sobre el Registro de Entidades Locales (cuadro: Registro de Entidades Locales inscritas a 05/01/2009)",
+      "publisher": "Ministerio de Política Territorial, Dirección General de Cooperación Local",
+      "url": "https://www.hacienda.gob.es/SGT/catalogo_sefp/219_estudio-registro-entidades-locales-internet.pdf",
+      "kind": "official_body"
+    },
     "ine-2025": {
       "title": "Estadística del Padrón Continuo / Censo anual de población a 1 de enero de 2025 (nota de prensa)",
       "publisher": "Instituto Nacional de Estadística",
@@ -290,7 +296,15 @@
       "name": "Comarcas (consells comarcals, comarcas de Aragón, Conselh Generau d'Aran, El Bierzo)",
       "name_en": "Comarcas with a council",
       "parent": "provincia",
-      "source": "lbrl"
+      "source": "lbrl",
+      "counts": [
+        {
+          "date": "2009-01-05",
+          "value": 81,
+          "source": "rel-2009",
+          "locator": "p. 4, columna COMARCAS, total España: 81 (Cataluña 41, Aragón 32, País Vasco 7 cuadrillas, Castilla y León 1)"
+        }
+      ]
     },
     {
       "key": "municipio",
@@ -319,7 +333,15 @@
       "name": "Entidades de ámbito territorial inferior al municipio (entidades locales menores, concejos, juntas vecinales, parroquias rurales, pedanías)",
       "name_en": "Sub-municipal local entities (EATIM)",
       "parent": "municipio",
-      "source": "lbrl"
+      "source": "lbrl",
+      "counts": [
+        {
+          "date": "2009-01-05",
+          "value": 3725,
+          "source": "rel-2009",
+          "locator": "p. 4, columna EATIMES, total España: 3.725"
+        }
+      ]
     }
   ],
   "classes": [
