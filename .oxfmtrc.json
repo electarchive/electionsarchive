@@ -25,6 +25,7 @@
     ".agents",
     "pipelines",
     "apps/web/src/lib/server/hex/*.json",
+    "apps/web/src/lib/server/world.json",
     "packages/engine/rules.schema.json"
   ]
 }
