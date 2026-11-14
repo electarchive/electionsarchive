@@ -23860,49 +23860,49 @@ export const polities = {
               last: number | null;
               latest: string | null;
             }>(sql`
-        with recursive picked as materialized (
-          select p.id, p.kind, p.iso_code, s.path
-          from polity p join slug s on s.entity_id = p.id and s.is_current
-          where (${kinds == null ? null : sql.param(kinds)}::text[] is null or p.kind::text = any(${kinds == null ? null : sql.param(kinds)}::text[]))
-            and (${parent}::uuid is null or exists (select from polity_parent pp where pp.polity_id = p.id and pp.parent_id = ${parent}::uuid))
-            and s.path > ${input?.cursor ?? ""}
-          order by s.path
-          limit ${limit + 1}
-        ),
-        below(id, top) as (
-          select pp.polity_id, pp.parent_id from polity_parent pp where pp.parent_id in (select id from picked)
-          union
-          select p.polity_id, below.top from polity_parent p join below on p.parent_id = below.id
-        ),
-        ids as materialized (
-          select id from picked union select id from below
-        ),
-        own as materialized (
-          select e.polity_id, count(*)::int as n, min(extract(year from e.date_from))::int as first,
-            max(extract(year from e.date_from))::int as last
-          from ids i
-          cross join lateral (
-            select x.polity_id, x.date_from, x.id from election x where x.polity_id = i.id
-          ) e
-          where not exists (select from entity_merge m where m.entity_id = e.id)
-          group by e.polity_id
-        ),
-        nested as materialized (
-          select b.top, sum(o.n)::int as n from below b join own o on o.polity_id = b.id group by b.top
-        )
-        select p.id, p.kind::text, p.iso_code, p.path, coalesce(o.n, 0) as elections, coalesce(i.n, 0) as within,
-          o.first, o.last,
-          case when o.n is not null then (
-            select e.id from election e where e.polity_id = p.id and e.status = 'held' and e.date_from <= current_date
-              and not exists (select from election x where x.id = e.parent_id and x.polity_id = e.polity_id)
-              and not exists (select from entity_merge m where m.entity_id = e.id)
-            order by e.kind = 'general' desc, e.date_from desc limit 1
-          ) end as latest
-        from picked p
-        left join own o on o.polity_id = p.id
-        left join nested i on i.top = p.id
-        order by p.path
-      `)
+              with recursive picked as materialized (
+                select p.id, p.kind, p.iso_code, s.path
+                from polity p join slug s on s.entity_id = p.id and s.is_current
+                where (${kinds == null ? null : sql.param(kinds)}::text[] is null or p.kind::text = any(${kinds == null ? null : sql.param(kinds)}::text[]))
+                  and (${parent}::uuid is null or exists (select from polity_parent pp where pp.polity_id = p.id and pp.parent_id = ${parent}::uuid))
+                  and s.path > ${input?.cursor ?? ""}
+                order by s.path
+                limit ${limit + 1}
+              ),
+              below(id, top) as (
+                select pp.polity_id, pp.parent_id from polity_parent pp where pp.parent_id in (select id from picked)
+                union
+                select p.polity_id, below.top from polity_parent p join below on p.parent_id = below.id
+              ),
+              ids as materialized (
+                select id from picked union select id from below
+              ),
+              own as materialized (
+                select e.polity_id, count(*)::int as n, min(extract(year from e.date_from))::int as first,
+                  max(extract(year from e.date_from))::int as last
+                from ids i
+                cross join lateral (
+                  select x.polity_id, x.date_from, x.id from election x where x.polity_id = i.id
+                ) e
+                where not exists (select from entity_merge m where m.entity_id = e.id)
+                group by e.polity_id
+              ),
+              nested as materialized (
+                select b.top, sum(o.n)::int as n from below b join own o on o.polity_id = b.id group by b.top
+              )
+              select p.id, p.kind::text, p.iso_code, p.path, coalesce(o.n, 0) as elections, coalesce(i.n, 0) as within,
+                o.first, o.last,
+                case when o.n is not null then (
+                  select e.id from election e where e.polity_id = p.id and e.status = 'held' and e.date_from <= current_date
+                    and not exists (select from election x where x.id = e.parent_id and x.polity_id = e.polity_id)
+                    and not exists (select from entity_merge m where m.entity_id = e.id)
+                  order by e.kind = 'general' desc, e.date_from desc limit 1
+                ) end as latest
+              from picked p
+              left join own o on o.polity_id = p.id
+              left join nested i on i.top = p.id
+              order by p.path
+            `)
           ).rows,
         false,
         undefined,
