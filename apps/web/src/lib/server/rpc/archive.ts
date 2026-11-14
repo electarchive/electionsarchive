@@ -25,7 +25,13 @@ import { pollsClose } from "#lib/live/closes.js";
 import { Rule, rule } from "#lib/measure.js";
 import { m } from "#lib/paraglide/messages.js";
 import { era, independent, side as sideOf, UNAFFILIATED } from "#lib/party.js";
-import { dataVersion, os, remember, versionOf } from "#lib/server/cache.js";
+import {
+  dataVersion,
+  keeps,
+  os,
+  remember,
+  versionOf,
+} from "#lib/server/cache.js";
 import { counting } from "#lib/server/counting.js";
 import { db } from "#lib/server/db/index.js";
 import { logos, withLogos } from "#lib/server/logos.js";
@@ -25157,12 +25163,27 @@ export const polities = {
           const stored = await db.execute<{
             record: Awaited<ReturnType<typeof record>>;
             built: string;
+            mark: string | null;
+            deps: Array<string> | null;
           }>(sql`
-            select record, (extract(epoch from built_at) * 1000000)::int8::text as built
+            select record, (extract(epoch from built_at) * 1000000)::int8::text as built, mark::text as mark, deps
             from polity_record where polity_id = ${input.id}::uuid
           `);
           const row = stored.rows[0];
-          return row != null &&
+          if (row == null) {
+            return record(input);
+          }
+          const kept = await keeps(
+            row.mark == null ? null : Number(row.mark),
+            row.deps,
+          );
+          if (kept === true) {
+            for (const key of row.deps ?? []) {
+              depend(key);
+            }
+            return row.record;
+          }
+          return kept == null &&
             (await isCurrent(
               input.id,
               row.record.parties.map((party) => party.id),

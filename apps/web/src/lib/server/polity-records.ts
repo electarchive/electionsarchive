@@ -1,10 +1,12 @@
 import { sql } from "drizzle-orm";
+import { follow, keeps, traced } from "#lib/server/cache.js";
 import { db } from "#lib/server/db/index.js";
 import { isTouched, touches } from "#lib/server/polity-touched.js";
 import { record } from "#lib/server/rpc/archive.js";
 
 export async function rebuild(targets: Array<string> = []) {
   const started = Date.now();
+  follow();
   const latest = await db.execute<{ upto: string }>(sql`
     select coalesce(max(published_at), now())::text as upto from changeset where status = 'published'
   `);
@@ -24,14 +26,18 @@ export async function rebuild(targets: Array<string> = []) {
   const eligible = listed.rows.map((row) => row.id);
   const isSweep = targets.length === 0;
   let queue = eligible;
+  const held: Array<string> = [];
   if (isSweep) {
     const stored = await db.execute<{
       id: string;
       built: string;
       parties: Array<string>;
+      mark: string | null;
+      deps: Array<string> | null;
     }>(sql`
       select polity_id::text as id, (extract(epoch from built_at) * 1000000)::int8::text as built,
-        array(select p ->> 'id' from jsonb_array_elements(record -> 'parties') p) as parties
+        array(select p ->> 'id' from jsonb_array_elements(record -> 'parties') p) as parties,
+        mark::text as mark, deps
       from polity_record
     `);
     const marks = await touches(
@@ -42,12 +48,24 @@ export async function rebuild(targets: Array<string> = []) {
       sql`select polity_id, record from polity_record`,
     );
     const rows = new Map(stored.rows.map((row) => [row.id, row]));
-    queue = eligible.filter((id) => {
+    queue = [];
+    for (const id of eligible) {
       const row = rows.get(id);
-      return (
-        row == null || isTouched(marks, id, row.parties, Number(row.built))
+      if (row == null) {
+        queue.push(id);
+        continue;
+      }
+      const isStale = isTouched(marks, id, row.parties, Number(row.built));
+      const byKeys = await keeps(
+        row.mark == null ? null : Number(row.mark),
+        row.deps,
       );
-    });
+      if (byKeys === false || (byKeys == null && isStale)) {
+        queue.push(id);
+      } else if (isStale) {
+        held.push(id);
+      }
+    }
   } else if (targets[0] !== "--all") {
     queue = targets;
   }
@@ -58,11 +76,19 @@ export async function rebuild(targets: Array<string> = []) {
     Array.from({ length: 4 }, async () => {
       for (let id = pending.pop(); id != null; id = pending.pop()) {
         try {
-          const found = await record({ id });
+          const found = await traced(async () => record({ id }));
+          const rows = await db.execute<{ id: string }>(sql`
+            select id::text as id from entity
+            where id = any(${sql.param(found.deps ?? [])}::uuid[]) and type in ('party', 'person')
+          `);
+          const named = new Set(rows.rows.map((row) => row.id));
+          const deps =
+            found.deps?.map((key) => (named.has(key) ? `row:${key}` : key)) ??
+            null;
           await db.execute(sql`
-            insert into polity_record (polity_id, record, built_at)
-            values (${id}::uuid, ${JSON.stringify(found)}::jsonb, ${upto}::timestamptz)
-            on conflict (polity_id) do update set record = excluded.record, built_at = excluded.built_at
+            insert into polity_record (polity_id, record, built_at, mark, deps)
+            values (${id}::uuid, ${JSON.stringify(found.value)}::jsonb, ${upto}::timestamptz, ${found.mark}, ${deps == null ? null : sql.param(deps)}::text[])
+            on conflict (polity_id) do update set record = excluded.record, built_at = excluded.built_at, mark = excluded.mark, deps = excluded.deps
           `);
           built += 1;
         } catch (error) {
@@ -79,11 +105,11 @@ export async function rebuild(targets: Array<string> = []) {
     `);
     const bumped = await db.execute<{ polity_id: string }>(sql`
       update polity_record set built_at = ${upto}::timestamptz
-      where built_at < ${upto}::timestamptz and polity_id <> all(${sql.param(failed)}::uuid[])
+      where built_at < ${upto}::timestamptz and polity_id <> all(${sql.param([...failed, ...held])}::uuid[])
       returning polity_id
     `);
     kept = bumped.rows.length;
   }
   await db.execute(sql`analyze polity_record`);
-  return `${built} polity records rebuilt, ${kept} current through ${upto}, ${failed.length} failed, in ${Math.round((Date.now() - started) / 1000)}s`;
+  return `${built} polity records rebuilt, ${kept} current through ${upto}, ${held.length} kept by key versions, ${failed.length} failed, in ${Math.round((Date.now() - started) / 1000)}s`;
 }

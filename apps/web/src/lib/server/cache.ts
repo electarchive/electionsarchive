@@ -527,6 +527,41 @@ async function trace(compute: () => Promise<unknown>): Promise<Traced> {
   return { value, deps: settle(reads), mark, day };
 }
 
+let following = false;
+
+export function follow() {
+  following = true;
+}
+
+async function checked() {
+  if (Date.now() - state.checked >= CHECK) {
+    state.checking ??= refresh();
+    await state.checking;
+  }
+  await shadow.loading;
+}
+
+export async function traced<T>(compute: () => Promise<T>) {
+  await checked();
+  const mark = shadow.seen;
+  if (!TRACING || mark == null) {
+    return { value: await compute(), mark: null, deps: null };
+  }
+  const reads = fresh();
+  const value = await reading.run(reads, compute);
+  return { value, mark, deps: await settle(reads) };
+}
+
+export async function keeps(mark: number | null, deps: Array<string> | null) {
+  if (!CACHE_KEYS || mark == null || deps == null) {
+    return null;
+  }
+  await checked();
+  return (
+    mark <= (shadow.seen ?? 0) && (await isKept(mark, deps, state.today, false))
+  );
+}
+
 async function recent() {
   const result = await db.execute<{ total: string; ids: Array<string> }>(sql`
     select (select count(*) from changeset where status = 'published')::text as total,
@@ -551,6 +586,9 @@ async function touch(ids: Array<string>) {
       select p.parent_id from polity_parent p join up on p.polity_id = up.key
     )
     select key::text as key from up
+    union all
+    select distinct 'row:' || e.id from changeset_entity ce join entity e on e.id = ce.entity_id
+    where ce.changeset_id = any(${sql.param(ids)}::uuid[]) and e.type in ('party', 'person')
     union all
     select 'translation' where exists (
       select from translation where changeset_id = any(${sql.param(ids)}::uuid[])
@@ -681,7 +719,7 @@ async function sync(observed: Array<[string, string]>, stamp: string) {
     if (shadow.epochs.size > VERSIONED) {
       tokens.push([`prune:${shadow.epochs.get("*")}`, "*"]);
     }
-    await bump(pool, ids, tokens, stamp, shadow.total == null);
+    await bump(pool, ids, tokens, stamp, shadow.total == null && !following);
     shadow.mapped = new Set(found.ids);
     shadow.total = found.total;
     const result = await pool.query<{ key: string; epoch: string }>(

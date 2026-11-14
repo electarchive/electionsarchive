@@ -1,8 +1,8 @@
 [Unit]
-Description=Polity records rebuild check every three hours
+Description=Polity records rebuild check every 30 minutes
 
 [Timer]
-OnCalendar=00/3:40
+OnCalendar=*:10,40
 Persistent=true
 
 [Install]
