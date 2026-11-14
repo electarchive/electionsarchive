@@ -2295,13 +2295,14 @@
           "finest": "be.ep_constituency"
         },
         {
-          "platform": "Central Election Commission (CIK)",
-          "url": "https://results.cik.bg/europe2024/rezultati/index.html",
-          "format": "unknown",
-          "access": "blocked",
-          "checked_at": "2026-11-13",
-          "evidence": "cik.bg and results.cik.bg answer scripts with a 403 challenge; search snippets describe 2024 results searchable by polling section.",
-          "within": "BG"
+          "platform": "Central Election Commission (CIK), results.cik.bg",
+          "url": "https://results.cik.bg/europe2024/opendata/",
+          "format": "zip of csv per polling section, xlsx",
+          "access": "open",
+          "checked_at": "2026-11-14",
+          "evidence": "2024 open data as export.zip (one csv per polling section with a p7s signature) and spreadsheet.zip (xlsx by constituency); 12,595 sections in 2024. The 2007 election is at ep2007.cik.bg/results/export.zip as semicolon-delimited txt files (preferences, sections, protocols); archives for 2009, 2014, and 2019 are also listed.",
+          "within": "BG",
+          "finest": "bg.sik"
         },
         {
           "platform": "Ministry of the Interior, Central Electoral Service",
@@ -2352,12 +2353,14 @@
         },
         {
           "platform": "Ministerio del Interior, Infoelectoral",
-          "url": "https://infoelectoral.interior.gob.es/es/elecciones-celebradas/resultados-electorales/",
-          "format": "unknown",
-          "access": "blocked",
-          "checked_at": "2026-11-13",
-          "evidence": "infoelectoral and descargas.interior.gob.es refuse scripts (403, no response through a Spanish exit); datos.gob.es lists EP data 1987 to 2024.",
-          "within": "ES"
+          "url": "https://infoelectoral.interior.gob.es/estaticos/docxl/07_202406_1.zip",
+          "format": "xlsx in zip",
+          "access": "open",
+          "checked_at": "2026-11-14",
+          "evidence": "One zip per election at /estaticos/docxl/07_YYYYMM_1.zip holding an xlsx of results by municipality (community, province, and municipality codes with population); the form lists EP elections 1987, 1989, 1994, 1999, 2004, 2009, 2014, 2019, and 2024. No record-layout file was obtained, and mesa-level data was not confirmed.",
+          "within": "ES",
+          "finest": "es.municipio",
+          "first_date": "1987-06-10"
         },
         {
           "platform": "Statistics Finland, election statistics",
@@ -2372,11 +2375,12 @@
         {
           "platform": "Ministry of the Interior, ekloges.ypes.gr",
           "url": "https://ekloges.ypes.gr/current/e/home/",
-          "format": "unknown",
-          "access": "blocked",
-          "checked_at": "2026-11-13",
-          "evidence": "The site answers scripts with a 403 block page; search snippets show polling-section listings for June 2024.",
-          "within": "GR"
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-14",
+          "evidence": "The ministry site offers no file downloads; the 2024 and 2019 pages (ekloges-prev.singularlogic.eu/2019/) are web pages with a national summary. The archive index lists 1999, 2004, 2009, 2014, and 2019, but the 1999 and 2004 links did not load and 2009 rendered blank, so the earliest year opened is 2014. Polling-section level not confirmed.",
+          "within": "GR",
+          "finest": "gr.electoral_district"
         },
         {
           "platform": "State Electoral Commission (DIP)",
@@ -2409,12 +2413,14 @@
         },
         {
           "platform": "Central Electoral Commission (VRK)",
-          "url": "https://rezultatai.vrk.lt/",
-          "format": "unknown",
-          "access": "blocked",
-          "checked_at": "2026-11-13",
-          "evidence": "vrk.lt and rezultatai.vrk.lt answer scripts with 403; no EP result page seen.",
-          "within": "LT"
+          "url": "https://www.vrk.lt/statiniai/puslapiai/rinkimai/1546/1/2146/rezultatai/DG_1546_1_2146.csv",
+          "format": "csv (2024), html (2004)",
+          "access": "open",
+          "checked_at": "2026-11-14",
+          "evidence": "The 2024 csv gives results by polling district (apylinkė) and party, with turnout csvs also linked. The 2004 archive at vrk.lt/statiniai/puslapiai/rinkimai/2004/euro/ is html pages per district and polling district; no 2004 csv found.",
+          "within": "LT",
+          "finest": "lt.apylinke",
+          "first_date": "2004-06-13"
         },
         {
           "platform": "Ministère de l'Intérieur, elections.public.lu",
@@ -2437,11 +2443,13 @@
         {
           "platform": "Electoral Commission of Malta",
           "url": "https://electoral.gov.mt/ElectionResults/MEP",
-          "format": "unknown",
-          "access": "blocked",
-          "checked_at": "2026-11-13",
-          "evidence": "The site answers scripts with 403; snippets show 2024 turnout by the 13 electoral divisions.",
-          "within": "MT"
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-14",
+          "evidence": "Results pages for 2004, 2009, 2014, 2019, and 2024 list counts 1 to 40 per candidate; the only zone offered is national (MEP), so no district split. No file downloads.",
+          "within": "MT",
+          "finest": "mt.national",
+          "first_date": "2004-06-12"
         },
         {
           "platform": "Kiesraad, open data on data.overheid.nl",
@@ -2476,11 +2484,12 @@
         {
           "platform": "Permanent Electoral Authority (AEP)",
           "url": "https://prezenta.roaep.ro/europarlamentare09062024/",
-          "format": "unknown",
-          "access": "blocked",
-          "checked_at": "2026-11-13",
-          "evidence": "roaep.ro answers scripts with a reCAPTCHA check.",
-          "within": "RO"
+          "format": "csv (turnout), html (results)",
+          "access": "open",
+          "checked_at": "2026-11-14",
+          "evidence": "The 2024 site offers a turnout (presence) csv by polling station (secție) with a download button; results appear by polling station under final data, with no results file obtained. The history page covers 2024 onward and no earlier year loaded, so the earliest EP year is unconfirmed.",
+          "within": "RO",
+          "finest": "ro.sectie"
         },
         {
           "platform": "Valmyndigheten, val.se",
