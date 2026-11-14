@@ -202,7 +202,7 @@ select c.class_id::text, w.iso_code, c.period_years, c.phase, c.valid_from, c.va
 from election_cadence c
 join census_class k on k.id = c.class_id
 join polity w on w.id = c.polity_id
-where k.polity_id = %s and c.period_years is not null and c.phase is not null
+where k.polity_id = %s and c.period_years is not null
 """
 
 COUNTS_SQL = """
@@ -321,19 +321,32 @@ def counted(cc: str, iso: str, k: dict, cadence: list[tuple], counts: list[tuple
     per = k["per"] or 1
     years: dict[int, dict[str, int]] = defaultdict(dict)
     for within, period, phase, lo, hi in cadence:
+        if phase is None and not k["cycle"]:
+            continue
         start = max(d.year for d in (lo, k["from"], date(1800, 1, 1)) if d is not None)
         end = min(d.year - 1 for d in (hi, k["to"], date(today.year + 1, 1, 1)) if d is not None)
         scope = None if within == iso else within
-        for year in range(start + (phase - start) % period, end + 1, period):
+        reg = region(cc, None, None, None, scope) if scope else ""
+        share = 0.0
+        step = 1 if k["cycle"] else period
+        for year in range(start + (0 if k["cycle"] else (phase - start) % period), end + 1, step):
             found = [value for tier, w, day, value in counts if tier == k["tier"] and w == scope and day.year <= year]
-            if found:
-                years[year][region(cc, None, None, None, scope) if scope else ""] = found[-1] * per
+            if not found:
+                continue
+            if k["cycle"]:
+                share += found[-1] * per / period
+                years[year][reg] = n = round(share)
+                share -= n
+            else:
+                years[year][reg] = found[-1] * per
     return [
         {
             "year": year,
             "contests": sum(regions.values()),
             "regions": {reg: n for reg, n in regions.items() if reg},
-            "note": "Expected from the official count of units and the statutory cycle.",
+            "note": "Expected each year as the official count of units over the statutory term, since each unit keeps its own cycle."
+            if k["cycle"]
+            else "Expected from the official count of units and the statutory cycle.",
         }
         for year, regions in sorted(years.items())
     ]
@@ -386,7 +399,11 @@ def census_spec(conn, cc: str) -> dict:
         elections = [merged(entries) for entries in slots.values()]
         if not rows:
             elections = counted(
-                cc, iso, {"per": per, "from": lo, "to": hi, "tier": tier}, cadence.get(class_id, []), counts
+                cc,
+                iso,
+                {"per": per, "from": lo, "to": hi, "tier": tier, "cycle": bool((measure_ or {}).get("cycle"))},
+                cadence.get(class_id, []),
+                counts,
             )
         levels.append(
             {
@@ -530,7 +547,7 @@ def tally(cc: str, data: dict) -> tuple[dict, list[dict], list[dict]]:
                 slot = deferred[day.isoformat()]
             elif by_year:
                 slot = str(day.year)
-                if level.get("cycle"):
+                if level.get("cycle") and slots and day.year >= int(min(slots)):
                     slot = next((y for y in sorted(slots) if int(y) >= day.year), slot)
             else:
                 near = min(dates, key=lambda d: abs(d[0] - day), default=None)
