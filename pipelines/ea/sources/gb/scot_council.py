@@ -11,6 +11,7 @@ import zipfile
 import zlib
 from datetime import UTC, date, datetime
 from decimal import Decimal
+from itertools import pairwise
 from pathlib import Path
 from uuid import UUID
 
@@ -529,6 +530,199 @@ def read_wide(text: str) -> Stages:
         if label not in elected and totals and totals[-1] == 0:
             dropped.add(name_key(label))
     return facts, rows, exhausted, dropped, odd, affiliations
+
+
+def read_estv(path: Path, text: str) -> Stages:
+    facts = {
+        key: Decimal(found.group(1).replace(",", ""))
+        for key, pattern in (
+            ("valid", r"Valid Votes:?\s+(" + NUMBER + ")"),
+            ("seats", r"Number to be elected:?\s+(" + NUMBER + ")"),
+            ("quota", r"Quota:?\s+(" + NUMBER + ")"),
+        )
+        if (found := re.search(pattern, text, re.IGNORECASE)) is not None
+    }
+    if "quota" in facts and facts["quota"] == facts["quota"].to_integral_value():
+        facts["quota"] = facts["quota"].quantize(Decimal(1))
+    markup = subprocess.run(["pdftotext", "-bbox", str(path), "-"], capture_output=True, text=True, check=True).stdout
+    figure = re.compile(NUMBER)
+    Word = tuple[float, float, float, float, str]
+    values: dict[str, dict[int, Decimal]] = {}
+    won: set[str] = set()
+    odd: list[str] = []
+    layout: tuple[list[float], list[int], float | None] | None = None
+    places: list[tuple[float, str]] = []
+
+    def read_table(table: list[Word], bounds: list[float], numbers: list[int], edge: float | None) -> float | None:
+        nonlocal places
+        lead = [
+            word for word in table if bounds[0] <= word[0] < bounds[1] and (figure.fullmatch(word[4]) or word[4] == "-")
+        ]
+        anchors: list[float] = []
+        for middle in sorted((word[1] + word[3]) / 2 for word in lead):
+            if not anchors or middle - anchors[-1] > 3:
+                anchors.append(middle)
+        if not anchors:
+            return None
+        if edge is None:
+            edge = min(word[0] for word in lead)
+        cells: dict[float, list[Word]] = {anchor: [] for anchor in anchors}
+        for word in table:
+            middle = (word[1] + word[3]) / 2
+            if middle < anchors[0] - (6 if word[2] >= edge - 1 else 9):
+                continue
+            anchor = min(anchors, key=lambda value: abs(value - middle))
+            if abs(anchor - middle) <= 14:
+                cells[anchor].append(word)
+        seen: list[tuple[float, str]] = []
+        for anchor in anchors:
+            label = " ".join(
+                word[4]
+                for word in sorted(cells[anchor], key=lambda word: (round(word[1]), word[0]))
+                if word[2] < edge - 1 and word[4] != "-" and not figure.fullmatch(word[4])
+            ).replace("- ", "-")
+            if label.startswith("Non-"):
+                label = "Non-transferable"
+            elif label.endswith("Total"):
+                label = "Total"
+            if not label:
+                label = next((name for at, name in places if abs(at - anchor) < 4), "")
+            seen.append((anchor, label))
+        places = seen
+        counted = [number for number in numbers if number]
+        sums = sorted(
+            (word for anchor, label in seen if label == "Total" for word in cells[anchor] if figure.fullmatch(word[4])),
+            key=lambda word: word[0],
+        )
+        if counted[0] == 1 and len(sums) == len(counted) + 1:
+            counted.insert(1, counted[1] - 1)
+        spans = [(word[0], word[2]) for word in sums] if len(sums) == len(counted) else []
+        for anchor, label in seen:
+            members = cells[anchor]
+            if label == "Total":
+                continue
+            if not label:
+                odd.append(f"unlabeled row at stage {numbers[0]}")
+                continue
+            if any(word[4] == "Elected" for word in members):
+                won.add(label)
+            held = values.setdefault(label, {})
+            found: list[Word]
+            if 0 in numbers:
+                low = bounds[numbers.index(0)]
+                if any(word[0] >= low and figure.fullmatch(word[4]) for word in members):
+                    won.add(label)
+            if spans:
+                for stage, (low, high) in zip(counted, spans, strict=True):
+                    found = [
+                        word
+                        for word in members
+                        if figure.fullmatch(word[4]) and word[0] <= high + 2 and word[2] >= low - 2
+                    ]
+                    if len(found) > 1:
+                        odd.append(f"{label} stage {stage}")
+                    if found:
+                        amount = Decimal(found[0][4].replace(",", ""))
+                        if held.setdefault(stage, amount) != amount:
+                            odd.append(f"{label} stage {stage}: {held[stage]} and {amount}")
+                continue
+            for stage, low, high in zip(numbers, bounds, bounds[1:], strict=False):
+                if stage == 0:
+                    continue
+                inside = [word for word in members if low <= word[0] < high and word[2] >= edge - 1]
+                found = sorted((word for word in inside if figure.fullmatch(word[4])), key=lambda word: word[2])
+                if not found:
+                    if any(word[4] not in ("-", "Elected") for word in inside):
+                        odd.append(f"{label} stage {stage}")
+                    continue
+                amount = Decimal((found[0] if stage == 1 else found[-1])[4].replace(",", ""))
+                if held.setdefault(stage, amount) != amount:
+                    odd.append(f"{label} stage {stage}: {held[stage]} and {amount}")
+        return edge
+
+    for page in markup.split("<page ")[1:]:
+        words: list[Word] = [
+            (float(left), float(top), float(right), float(bottom), html.unescape(word))
+            for left, top, right, bottom, word in re.findall(
+                r'xMin="([\d.]+)" yMin="([\d.]+)" xMax="([\d.]+)" yMax="([\d.]+)">([^<]*)<', page
+            )
+        ]
+        marks = sorted(word[1] for word in words if word[4] in ("©", "Preference", "Page", "Reason"))
+        heads = sorted(
+            (word[1], word[0], int(following[4]))
+            for word, following in pairwise(words)
+            if word[4] == "Stage" and following[4].isdigit() and abs(word[1] - following[1]) < 2
+        )
+        groups: list[list[tuple[float, float, int]]] = []
+        for head in heads:
+            if groups and head[0] - groups[-1][0][0] < 6:
+                groups[-1].append(head)
+            else:
+                groups.append([head])
+        if layout is not None:
+            end = min([groups[0][0][0] - 20] if groups else [], default=float("inf"))
+            end = min([end, *(mark for mark in marks if mark < end)])
+            bounds, numbers, edge = layout
+            read_table([word for word in words if word[1] < end], bounds, numbers, edge)
+            if end < float("inf") or not groups and marks:
+                layout = None
+        for index, group in enumerate(groups):
+            top = group[0][0] - 20
+            end = groups[index + 1][0][0] - 20 if index + 1 < len(groups) else float("inf")
+            closed = [mark for mark in marks if top < mark < end]
+            end = min([end, *closed])
+            columns = sorted((left, stage) for _, left, stage in group if stage > 1)
+            stages = [stage for _, stage in columns]
+            if stages != list(range(stages[0], stages[0] + len(stages))):
+                odd.append(f"stage headers {stages}")
+                layout = None
+                continue
+            header = [
+                word
+                for word in words
+                if top <= word[1] < top + 60 and word[4] in ("Stage", "First", "Preferences", "Candidates")
+            ]
+            first = next((word for word in header if word[4] == "First"), None)
+            bottom = max(word[3] for word in header)
+            bounds = [first[0] - 40] if first else []
+            chosen = [word[0] for word in words if word[4] == "Elected" and top <= word[1] < bottom]
+            bounds += [*(left - 4 for left, _ in columns), *(chosen[0] - 4 for _ in chosen[:1]), float("inf")]
+            numbers = ([1] if first else []) + stages + [0 for _ in chosen[:1]]
+            edge = read_table([word for word in words if bottom < word[1] < end], bounds, numbers, None)
+            layout = (bounds, numbers, edge) if end == float("inf") else None
+    rows: list[tuple[int, str, Decimal, str | None]] = []
+    exhausted: dict[int, Decimal] = {}
+    dropped: set[str] = set()
+    last = max((max(held) for held in values.values() if held), default=0)
+    standing = {
+        label for label, held in values.items() if not label.startswith("Non-") and held.get(last, Decimal(0)) > 0
+    }
+    reached = {
+        label
+        for label, held in values.items()
+        if not label.startswith("Non-") and "quota" in facts and max(held.values(), default=0) >= facts["quota"]
+    }
+    if not won and len(reached | standing) == facts.get("seats"):
+        won = reached | standing
+    elif not won and len(reached) == facts.get("seats"):
+        won = reached
+    for label, held in values.items():
+        stages = sorted(held)
+        if not stages:
+            continue
+        if stages != list(range(1, len(stages) + 1)):
+            odd.append(f"{label} stages {stages}")
+            continue
+        if label.lower().startswith("non-transferable"):
+            exhausted = dict(held)
+            continue
+        for stage in stages:
+            rows.append((stage, label, held[stage], "Elected" if label in won and stage == stages[-1] else None))
+        if label not in won and held[stages[-1]] == 0:
+            dropped.add(name_key(label))
+    for stage in {number for number, _, _, _ in rows} - set(exhausted):
+        exhausted[stage] = Decimal(0)
+    return facts, rows, exhausted, dropped, odd, {}
 
 
 def read_other(text: str, declared: str) -> Stages:
@@ -1743,7 +1937,11 @@ def fetch_hist() -> None:
         except LookupError:
             try:
                 raw.fetch(
-                    SOURCE, row["url"], suffix=".xls" if "highland.gov.uk/downloads/file" in row["url"] else ".pdf"
+                    SOURCE,
+                    row["url"],
+                    suffix=".xls"
+                    if re.search(r"highland\.gov\.uk/downloads/file/.*election-results", row["url"])
+                    else ".pdf",
                 )
             except httpx.HTTPError as error:
                 print(f"{row['council']} {row['ward']}: {row['url']}: {error}")
@@ -1771,7 +1969,9 @@ def parse_hist() -> None:
             units.append({"council": council, "ward": row["ward"], "locator": locator, "status": "not fetched"})
             continue
         text = xls_text(path) if path.suffix == ".xls" else pdf_text(path)
-        if "Total Number of Valid Votes" in text and "Number of Vacancies" in text:
+        if "Number to be elected" in text and "valid votes" in text.lower():
+            facts, rows, exhausted, dropped, odd, _ = read_estv(path, text)
+        elif "Total Number of Valid Votes" in text and "Number of Vacancies" in text:
             facts, rows, exhausted, dropped, odd, _ = read_wide(text)
         else:
             facts, rows, exhausted, dropped, odd, _ = read_stages(text)
@@ -1785,11 +1985,20 @@ def parse_hist() -> None:
         ward_code = found[0] if len(found) == 1 else None
         lines = held.filter(pl.col("ward_code") == ward_code).sort("number") if ward_code else held.clear()
         by_name = {name_key(line["name"]): line for line in lines.iter_rows(named=True)}
-        by_votes = {line["votes"]: line for line in lines.iter_rows(named=True)}
+        by_votes = {
+            (line["votes"], name_key(line["name"].split()[-1]) if line["votes"] in tied else ""): line
+            for tied in [{votes for votes in lines["votes"].to_list() if lines["votes"].to_list().count(votes) > 1}]
+            for line in lines.iter_rows(named=True)
+        }
         matched = {
             label: line
             for label, votes, _ in first
-            if (line := by_name.get(name_key(label)) or by_votes.get(int(votes))) is not None
+            if (
+                line := by_name.get(name_key(label))
+                or by_votes.get((int(votes), ""))
+                or by_votes.get((int(votes), name_key(label.split()[-1])))
+            )
+            is not None
         }
         elected = {label for _, label, _, outcome in rows if outcome == "Elected"}
         stages = sorted({number for number, _, _, _ in rows})
@@ -1879,13 +2088,19 @@ def emit_hist() -> Path:
     totals = pl.read_parquet(HIST / f"totals{year}.parquet")
     held = pl.read_parquet(leap_scot.PARSED / "candidates.parquet").filter(pl.col("year") == year)
     pages = {row["council"]: row["page"] for row in stage_rows()}
+    report = "final count report" if year == 2007 else "eCount report"
+    system = (
+        "the eSTV count software of the electronic count"
+        if year == 2007
+        else "the Scottish eCount system (Candidate Votes per Stage)"
+    )
     with connect() as conn:
         cs = Changeset(
             conn,
             pipeline=SOURCE,
             version=VERSION,
             summary=f"Scottish council elections of {day.day} {day:%B %Y} by ward with every STV stage, from the "
-            "councils' eCount reports, superseding the first preferences from the Local Elections Archive Project",
+            f"councils' {report}s, superseding the first preferences from the Local Elections Archive Project",
             polity="GB-SCT",
         )
 
@@ -1911,7 +2126,7 @@ def emit_hist() -> Path:
                 raise ValueError(f"{code} has no name")
             authority = named[0]
             if council not in sources:
-                title = f"Local government election {day.day} {day:%B %Y}: eCount reports"
+                title = f"Local government election {day.day} {day:%B %Y}: {report}s"
                 sources[council] = cs.source(authority, title)
                 cs.add(
                     "source",
@@ -1923,8 +2138,8 @@ def emit_hist() -> Path:
                     license="Open Government Licence v3.0",
                     license_url=OGL,
                     attribution=authority,
-                    notes="The returning officer's Candidate Votes per Stage report for each ward, as produced by "
-                    "the Scottish eCount system and published by the council.",
+                    notes=f"The returning officer's stage-by-stage count report for each ward, as produced by "
+                    f"{system} and published by the council.",
                 )
             source = sources[council]
             previous = cs.key("gb.leap_scot.result_set", contest_key)
@@ -1965,7 +2180,7 @@ def emit_hist() -> Path:
                 "note",
                 entity_id=result_set,
                 kind="methodology",
-                body_md="The stages are the council's own eCount report (Candidate Votes per Stage). Stage 1 equals "
+                body_md=f"The stages are the council's own {report}, from {system}. Stage 1 equals "
                 "the first preferences in the earlier set from the Local Elections Archive Project, the elected "
                 "equal its elected, and every stage sums to the valid votes.",
             )
