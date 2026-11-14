@@ -352,6 +352,7 @@ def emit() -> Path:
             "IECM's statistical volumes, with the mayors elected as declared",
             polity="MX",
         )
+        offices: set[UUID] = set()
         for scheme in ("mx.entidad", "mx.municipio"):
             if conn.execute("select 1 from scheme where code = %s", (scheme,)).fetchone() is None:
                 raise ValueError("publish mx.mge before mx.alcaldia")
@@ -480,7 +481,8 @@ def emit() -> Path:
                 code = CODES[borough]
                 slug = re.sub(r"[^a-z0-9]+", "-", fold(borough)).strip("-")
                 office = cs.key("mx.office", f"alcalde:{code}")
-                if office in cs.minted:
+                if office in cs.minted and office not in offices:
+                    offices.add(office)
                     cs.add("office", id=office, polity_id=cmx, kind="mayor")
                     name(office, f"Mayor of {borough}")
                     name(office, f"Alcaldía de {borough}", "es", "native")
