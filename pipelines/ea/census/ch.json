@@ -540,6 +540,12 @@
       "url": "https://so.ch/verwaltung/volkswirtschaftsdepartement/amt-fuer-gemeinden/gemeindeorganisation/gemeindeorganisation-einfuehrung/",
       "kind": "official_body"
     },
+    "so-rrb-2004-1866": {
+      "title": "Regierungsratsbeschluss Nr. 2004/1866 vom 7. September 2004: Einberufung der Wahlberechtigten für den Urnengang vom 24. April 2005",
+      "publisher": "Kanton Solothurn, Regierungsrat",
+      "url": "https://rrb.so.ch/beschlussnummer/2004_1866/download/9b39408ad6b24925a5b0aa92933705cd",
+      "kind": "official_body"
+    },
     "ju-com-guide-2023": {
       "title": "Les bases de l'activité communale: guide pratique à l'intention des élues et des élus des communes jurassiennes (June 2023)",
       "publisher": "République et Canton du Jura, Délégué aux affaires communales",
@@ -2693,6 +2699,13 @@
           "value": 16,
           "source": "gr-afg-2024",
           "locator": "Gemeindeparlamente: 16 communes listed"
+        },
+        {
+          "within": "CH-SO",
+          "date": "2004-09-07",
+          "value": 1,
+          "source": "so-rrb-2004-1866",
+          "locator": "Erwägungen: \"Am 24. April 2005 finden die Amtei- und Bezirksbeamtenwahlen sowie die Wahl des Gemeindeparlamentes von Olten statt\"; the decision calls up no other commune's parliament, and the current Amt für Gemeinden page names Olten as the only one"
         },
         {
           "within": "CH-SO",
