@@ -1,0 +1,59 @@
+{
+  "year": 1912,
+  "day": "1912-11-05",
+  "polity": "US-MD",
+  "publisher": "Maryland Secretary of State",
+  "title": "Maryland Manual 1912-13 (Archives of Maryland vol. 123), election returns (general election 1912)",
+  "license": "Public record",
+  "file": {
+    "url": "https://msa.maryland.gov/megafile/msa/speccol/sc2900/sc2908/000001/000123/pdf/am123--{page}.pdf",
+    "item": "https://msa.maryland.gov/megafile/msa/speccol/sc2900/sc2908/000001/000123/html/am123--249.html"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "president": "Electors for President and Vice President: tables of county rows with one column per elector, one table per party; name is the elector's name and party the party printed over the electors",
+    "house": "U.S. Representative in Congress (Congressional Candidates, Sixty-third or Sixty-fourth Congress), one table per congressional district; district is the district number. A table for the Sixty-third Congress printed in a 1914 volume is a special election"
+  },
+  "leaves": [
+    249,
+    250,
+    251,
+    252,
+    253,
+    254,
+    255,
+    256
+  ],
+  "slates": {
+    "republican": {
+      "candidate": "Taft",
+      "elector": 1,
+      "of": 8
+    },
+    "democratic": {
+      "candidate": "Wilson",
+      "elector": 1,
+      "of": 8
+    },
+    "prohibition": {
+      "candidate": "Chafin",
+      "elector": 1,
+      "of": 8
+    },
+    "socialist": {
+      "candidate": "Debs",
+      "elector": 1,
+      "of": 8
+    },
+    "labor": {
+      "candidate": "Reimer",
+      "elector": 1,
+      "of": 8
+    },
+    "progressive": {
+      "candidate": "Roosevelt",
+      "elector": 1,
+      "of": 8
+    }
+  }
+}

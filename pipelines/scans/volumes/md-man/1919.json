@@ -1,0 +1,19 @@
+{
+  "year": 1919,
+  "day": "1919",
+  "polity": "US-MD",
+  "publisher": "Maryland Secretary of State",
+  "title": "Maryland Manual 1920 (Archives of Maryland vol. 130), election returns (general election 1919)",
+  "license": "Public record",
+  "file": {
+    "url": "https://msa.maryland.gov/megafile/msa/speccol/sc2900/sc2908/000001/000130/pdf/am130--{page}.pdf",
+    "item": "https://msa.maryland.gov/megafile/msa/speccol/sc2900/sc2908/000001/000130/html/am130--281.html"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "governor": "Governor (the 1919 general election, printed as returns for 1920)"
+  },
+  "leaves": [
+    281
+  ]
+}
