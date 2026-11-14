@@ -1403,6 +1403,8 @@
       "source": "chiho",
       "first_held": "1947-04-30",
       "note": "At-large SNTV (designated cities by ward) with a quarter-of-quota threshold; staggered four-year cycles.",
+      "disposition": "blocked",
+      "disposition_reason": "No national canvass exists. The Ministry of Internal Affairs and Communications publishes only national totals by party for the unified local elections, plus candidate results for prefectural and designated-city assemblies; candidate votes for the roughly 1,740 city, town, village, and special-ward assemblies sit with each municipal election commission, one site and format apiece.",
       "match": [
         {
           "body_kinds": [
