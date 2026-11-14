@@ -25,7 +25,8 @@
       "day": "1916-11-07",
       "special": false,
       "state": "NH",
-      "district": null
+      "district": null,
+      "accept": "The Manual's printed totals disagree with the sum of its own town returns, which are loaded as printed: Henry W. Keyes 45,929 (printed 45,899, off in Cheshire)."
     },
     "house1": {
       "year": 1916,
@@ -72,7 +73,8 @@
         {
           "label": "Keyes, r.",
           "contest": "governor",
-          "candidate": "Henry W. Keyes"
+          "candidate": "Henry W. Keyes",
+          "official": 45929
         },
         {
           "label": "Hutchins, d.",
@@ -82,7 +84,8 @@
         {
           "label": "Keyes, p.",
           "contest": "governor",
-          "candidate": "Henry W. Keyes"
+          "candidate": "Henry W. Keyes",
+          "official": 45929
         },
         {
           "label": "Wilkins, s.",
@@ -103,11 +106,8 @@
         0.897
       ],
       "hint": "Read only the table headed 'ROCKINGHAM COUNTY.'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        0.2907
-      ]
+      "bands": 1,
+      "wards": "33015"
     },
     {
       "page": 390,
@@ -136,7 +136,8 @@
         {
           "label": "Keyes, r.",
           "contest": "governor",
-          "candidate": "Henry W. Keyes"
+          "candidate": "Henry W. Keyes",
+          "official": 45929
         },
         {
           "label": "Hutchins, d.",
@@ -146,7 +147,8 @@
         {
           "label": "Keyes, p.",
           "contest": "governor",
-          "candidate": "Henry W. Keyes"
+          "candidate": "Henry W. Keyes",
+          "official": 45929
         },
         {
           "label": "Wilkins, s.",
@@ -167,11 +169,8 @@
         0.75
       ],
       "hint": "Read only the table headed 'STRAFFORD COUNTY.'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        0.3691
-      ]
+      "bands": 1,
+      "wards": "33017"
     },
     {
       "page": 391,
@@ -200,7 +199,8 @@
         {
           "label": "Keyes, r.",
           "contest": "governor",
-          "candidate": "Henry W. Keyes"
+          "candidate": "Henry W. Keyes",
+          "official": 45929
         },
         {
           "label": "Hutchins, d.",
@@ -210,7 +210,8 @@
         {
           "label": "Keyes, p.",
           "contest": "governor",
-          "candidate": "Henry W. Keyes"
+          "candidate": "Henry W. Keyes",
+          "official": 45929
         },
         {
           "label": "Wilkins, s.",
@@ -231,11 +232,8 @@
         0.618
       ],
       "hint": "Read only the table headed 'BELKNAP COUNTY.'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        0.4609
-      ]
+      "bands": 1,
+      "wards": "33001"
     },
     {
       "page": 392,
@@ -264,7 +262,8 @@
         {
           "label": "Keyes, r.",
           "contest": "governor",
-          "candidate": "Henry W. Keyes"
+          "candidate": "Henry W. Keyes",
+          "official": 45929
         },
         {
           "label": "Hutchins, d.",
@@ -274,7 +273,8 @@
         {
           "label": "Keyes, p.",
           "contest": "governor",
-          "candidate": "Henry W. Keyes"
+          "candidate": "Henry W. Keyes",
+          "official": 45929
         },
         {
           "label": "Wilkins, s.",
@@ -295,11 +295,8 @@
         0.617
       ],
       "hint": "Read only the table headed 'CARROLL COUNTY.'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        0.4677
-      ]
+      "bands": 1,
+      "wards": "33003"
     },
     {
       "page": 393,
@@ -328,7 +325,8 @@
         {
           "label": "Keyes, r.",
           "contest": "governor",
-          "candidate": "Henry W. Keyes"
+          "candidate": "Henry W. Keyes",
+          "official": 45929
         },
         {
           "label": "Hutchins, d.",
@@ -338,7 +336,8 @@
         {
           "label": "Keyes, p.",
           "contest": "governor",
-          "candidate": "Henry W. Keyes"
+          "candidate": "Henry W. Keyes",
+          "official": 45929
         },
         {
           "label": "Wilkins, s.",
@@ -359,11 +358,8 @@
         0.896
       ],
       "hint": "Read only the table headed 'MERRIMACK COUNTY.'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        0.3038
-      ]
+      "bands": 1,
+      "wards": "33013"
     },
     {
       "page": 394,
@@ -392,7 +388,8 @@
         {
           "label": "Keyes, r.",
           "contest": "governor",
-          "candidate": "Henry W. Keyes"
+          "candidate": "Henry W. Keyes",
+          "official": 45929
         },
         {
           "label": "Hutchins, d.",
@@ -402,7 +399,8 @@
         {
           "label": "Keyes, s.",
           "contest": "governor",
-          "candidate": "Henry W. Keyes"
+          "candidate": "Henry W. Keyes",
+          "official": 45929
         },
         {
           "label": "Wilkins, s.",
@@ -423,11 +421,8 @@
         1.0
       ],
       "hint": "Read only the table headed 'HILLSBOROUGH COUNTY'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        0.2626
-      ]
+      "bands": 1,
+      "wards": "33011"
     },
     {
       "page": 395,
@@ -456,7 +451,8 @@
         {
           "label": "Keyes, r.",
           "contest": "governor",
-          "candidate": "Henry W. Keyes"
+          "candidate": "Henry W. Keyes",
+          "official": 45929
         },
         {
           "label": "Hutchins, d.",
@@ -466,7 +462,8 @@
         {
           "label": "Keyes, p.",
           "contest": "governor",
-          "candidate": "Henry W. Keyes"
+          "candidate": "Henry W. Keyes",
+          "official": 45929
         },
         {
           "label": "Wilkins, s.",
@@ -486,7 +483,9 @@
         0.932,
         0.526
       ],
-      "hint": "Read only the table headed 'HILLSBOROUGH COUNTY.\u2014Concluded.'; ignore any other table visible in the image."
+      "hint": "Read only the table headed 'HILLSBOROUGH COUNTY.—Concluded.'; ignore any other table visible in the image.",
+      "wards": "33011",
+      "bands": 1
     },
     {
       "page": 396,
@@ -515,7 +514,8 @@
         {
           "label": "Keyes, r.",
           "contest": "governor",
-          "candidate": "Henry W. Keyes"
+          "candidate": "Henry W. Keyes",
+          "official": 45929
         },
         {
           "label": "Hutchins, d.",
@@ -525,7 +525,8 @@
         {
           "label": "Keyes, p.",
           "contest": "governor",
-          "candidate": "Henry W. Keyes"
+          "candidate": "Henry W. Keyes",
+          "official": 45929
         },
         {
           "label": "Wilkins, s.",
@@ -546,11 +547,8 @@
         0.758
       ],
       "hint": "Read only the table headed 'CHESHIRE COUNTY.'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        0.3644
-      ]
+      "bands": 1,
+      "wards": "33005"
     },
     {
       "page": 397,
@@ -579,7 +577,8 @@
         {
           "label": "Keyes, r.",
           "contest": "governor",
-          "candidate": "Henry W. Keyes"
+          "candidate": "Henry W. Keyes",
+          "official": 45929
         },
         {
           "label": "Hutchins, d.",
@@ -589,7 +588,8 @@
         {
           "label": "Keyes, p.",
           "contest": "governor",
-          "candidate": "Henry W. Keyes"
+          "candidate": "Henry W. Keyes",
+          "official": 45929
         },
         {
           "label": "Wilkins, s.",
@@ -610,11 +610,8 @@
         0.606
       ],
       "hint": "Read only the table headed 'SULLIVAN COUNTY.'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        0.4907
-      ]
+      "bands": 1,
+      "wards": "33019"
     },
     {
       "page": 398,
@@ -643,7 +640,8 @@
         {
           "label": "Keyes, r.",
           "contest": "governor",
-          "candidate": "Henry W. Keyes"
+          "candidate": "Henry W. Keyes",
+          "official": 45929
         },
         {
           "label": "Hutchins, d.",
@@ -653,7 +651,8 @@
         {
           "label": "Keyes, p.",
           "contest": "governor",
-          "candidate": "Henry W. Keyes"
+          "candidate": "Henry W. Keyes",
+          "official": 45929
         },
         {
           "label": "Wilkins, s.",
@@ -674,11 +673,8 @@
         0.876
       ],
       "hint": "Read only the table headed 'Grafton County'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        0.2988
-      ]
+      "bands": 1,
+      "wards": "33009"
     },
     {
       "page": 399,
@@ -707,7 +703,8 @@
         {
           "label": "Keyes, r.",
           "contest": "governor",
-          "candidate": "Henry W. Keyes"
+          "candidate": "Henry W. Keyes",
+          "official": 45929
         },
         {
           "label": "Hutchins, d.",
@@ -717,7 +714,8 @@
         {
           "label": "Keyes, p.",
           "contest": "governor",
-          "candidate": "Henry W. Keyes"
+          "candidate": "Henry W. Keyes",
+          "official": 45929
         },
         {
           "label": "Wilkins, s.",
@@ -738,11 +736,8 @@
         0.72
       ],
       "hint": "Read only the table headed 'COOS COUNTY.'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        0.3903
-      ]
+      "bands": 1,
+      "wards": "33007"
     },
     {
       "page": 400,
@@ -796,12 +791,8 @@
         0.937,
         1.0
       ],
-      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        0.2364
-      ]
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image. Ward rows sit under their city's name; label each one with the city, for example 'Manchester Ward 9', even when the city's name is printed above the part of the table you are reading.",
+      "bands": 1
     },
     {
       "page": 401,
@@ -835,12 +826,8 @@
         0.649,
         1.0
       ],
-      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT.\u2014Continued.'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        -0.0045
-      ]
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT.—Continued.'; ignore any other table visible in the image. Ward rows sit under their city's name; label each one with the city, for example 'Manchester Ward 9', even when the city's name is printed above the part of the table you are reading.",
+      "bands": 1
     },
     {
       "page": 402,
@@ -874,12 +861,8 @@
         0.613,
         0.866
       ],
-      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT.\u2014Concluded.'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        0.1654
-      ]
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT.—Concluded.'; ignore any other table visible in the image. Ward rows sit under their city's name; label each one with the city, for example 'Manchester Ward 9', even when the city's name is printed above the part of the table you are reading.",
+      "bands": 1
     },
     {
       "page": 403,
@@ -938,12 +921,8 @@
         0.956,
         1.0
       ],
-      "hint": "Read only the table headed 'Second Congressional District.'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        0.2297
-      ]
+      "hint": "Read only the table headed 'Second Congressional District.'; ignore any other table visible in the image. Ward rows sit under their city's name; label each one with the city, for example 'Manchester Ward 9', even when the city's name is printed above the part of the table you are reading.",
+      "bands": 1
     },
     {
       "page": 404,
@@ -1002,12 +981,8 @@
         0.892,
         1.0
       ],
-      "hint": "Read only the table headed 'Second Congressional District.\u2014Continued.'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        -0.015
-      ]
+      "hint": "Read only the table headed 'Second Congressional District.—Continued.'; ignore any other table visible in the image. Ward rows sit under their city's name; label each one with the city, for example 'Manchester Ward 9', even when the city's name is printed above the part of the table you are reading.",
+      "bands": 1
     },
     {
       "page": 405,
@@ -1046,12 +1021,8 @@
         0.673,
         1.0
       ],
-      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT.\u2014Continued.'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        -0.024
-      ]
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT.—Continued.'; ignore any other table visible in the image. Ward rows sit under their city's name; label each one with the city, for example 'Manchester Ward 9', even when the city's name is printed above the part of the table you are reading.",
+      "bands": 1
     },
     {
       "page": 406,
@@ -1110,12 +1081,11 @@
         0.911,
         0.726
       ],
-      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT.\u2014Concluded.'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        0.3382
-      ]
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT.—Concluded.'; ignore any other table visible in the image. Ward rows sit under their city's name; label each one with the city, for example 'Manchester Ward 9', even when the city's name is printed above the part of the table you are reading.",
+      "bands": 1
     }
-  ]
+  ],
+  "unit_codes": {
+    "Wentworth's Loc'n": "33007"
+  }
 }
