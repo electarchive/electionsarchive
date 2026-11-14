@@ -2450,7 +2450,7 @@
      "kr.tupyogu"
     ]
    },
-   "note": "One list per sigungu since 2006, a tenth of the constituency seats (POEA Art. 23(3)), 5 percent threshold (Art. 190-2).",
+   "note": "One list per sigungu since 2006, a tenth of the constituency seats (POEA Art. 23(3)), 3 percent threshold (Art. 190-2).",
    "source": "poea",
    "locator": "https://elaw.klri.re.kr/kor_service/lawViewMultiContent.do?hseq=64713 (Art. 23(3))",
    "est_votes": 26000000,
@@ -2468,9 +2468,7 @@
      "contest_kinds": [
       "list_allocation"
      ],
-     "polity_kinds": [
-      "municipality"
-     ],
+     "name_pattern": "^(?!.*(특별|광역)).*(구|시|군|\\))의회$",
      "valid_from": "2006-01-01"
     }
    ],
