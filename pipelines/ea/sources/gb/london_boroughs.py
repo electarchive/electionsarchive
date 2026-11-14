@@ -490,6 +490,34 @@ WARDS = {
     "Surblton Hili": "Surbiton Hill",
     "Wood cote": "Woodcote",
     "Wood cote and Coulsdon West": "Woodcote and Coulsdon West",
+    "Grafton Ad": "Grafton",
+    "Horsey Vale": "Hornsey Vale",
+    "Here Hill": "Herne Hill",
+    "Clements wood": "Clementswood",
+    "Roschill": "Rosehill",
+    "Rochampton": "Roehampton",
+    "Cold harbour": "Coldharbour",
+    ",. Grove": "Grove",
+    "LadyweII": "Ladywell",
+    "Little IIford": "Little Ilford",
+    "NewTown": "New Town",
+    "St Ja mes Street": "St James Street",
+    "Wandie Valley": "Wandle Valley",
+}
+WARD_KEYS = {
+    ("E09000007", "Grafton", 1990): "grafton-ad",
+    ("E09000014", "Hornsey Vale", 1990): "horsey-vale",
+    ("E09000022", "Herne Hill", 1990): "here-hill",
+    ("E09000026", "Clementswood", 1990): "clements-wood",
+    ("E09000029", "Rosehill", 1990): "roschill",
+    ("E09000032", "Roehampton", 1990): "rochampton",
+    ("E09000011", "Coldharbour", 1994): "cold-harbour",
+    ("E09000023", "Ladywell", 1994): "ladyweii",
+    ("E09000025", "Little Ilford", 1994): "little-iiford",
+    ("E09000025", "New Town", 1994): "newtown",
+    ("E09000031", "St James Street", 1994): "st-ja-mes-street",
+    ("E09000029", "Wandle Valley", 1994): "wandie-valley",
+    ("E09000029", "Wandle Valley", 1998): "wandie-valley",
 }
 NAMES = {
     "Farbe~ Barbara A.": "Farbey, Barbara A.",
@@ -1096,7 +1124,6 @@ LBCE_BY_PARTIES = PARTIES[1998] | {
     "ILIB": "Independent Liberal",
     "LABCP": "Labour and Co-operative",
 }
-LBCE_BY_WARDS = {("E09000025", "Little Ilford"): "Little IIford"}
 LBCE_BY_READS = {
     ("Reid, Katherine M.", "Reid, Katharine M."): "Reid, Katharine M.",
     ("Bean, Angela M.", "Bean, Angels M."): "Bean, Angela M.",
@@ -1714,6 +1741,66 @@ def person(text: str) -> str:
     return f"{surname.strip()}, {' '.join(words)}" if words else surname.strip()
 
 
+MARGIN = re.compile(r"\S*[^\w\s'-]\S*|'\S*|II|DI|ID|UI|Ul|UZ|I|Z|VI|W|Ii|Ut|a|0|fD|1ft")
+TIDY = {
+    r"^Wool lett\b": "Woollett",
+    r"^Seeker Walker\b": "Secker Walker",
+    r"\bP\. e\.$": "P.C.",
+    r"\bH\.e\.$": "H.C.",
+    r"\bc\.F\.$": "C.F.",
+    r"\blain rs\.$": "Iain T.S.",
+    r"\(Jm\)$": "(Jnr)",
+    r"^Col mans\b": "Colmans",
+    r"^Skala r\b": "Skolar",
+    r"^Pad more\b": "Padmore",
+    r"^Wood thorpe-": "Woodthorpe-",
+    r"^C1okie\b": "Clokie",
+    r"^Whitl6ck\b": "Whitlock",
+    r"^Eze-lIoghaJu\b": "Eze-Iloghalu",
+    r"\blIyas\b": "Ilyas",
+    r"\bNeaIG\.$": "Neal G.",
+    r"^AI-": "Al-",
+    r"^EI-": "El-",
+    r"^L' ": "L'",
+    r"^Haley, Mark 0\.1\.$": "Haley, Mark D.I.",
+    r"^Nelson, Harold 1\.S\.$": "Nelson, Harold J.S.",
+    r"^Lewis, Norman S\.1\.$": "Lewis, Norman S.I.",
+    r"^Mason, Mariette 1\.S\.$": "Mason, Mariette T.S.",
+    r"\bPauline a-A\.$": "Pauline O-A.",
+    r"\bGarth pw\.$": "Garth P.W.",
+    r"\bNeil rw$": "Neil T.W.",
+    r"^Mci": "McI",
+    r"^([a-z])(?=[a-z]+,)": lambda m: m.group(1).upper(),
+    r"\bBiII\b": "Bill",
+    r"\blain\b": "Iain",
+    r"\blan\b": "Ian",
+    r"\bl(?=[a-z]|\.|$)": "L",
+    r"(?<= )([A-Z])$": r"\1.",
+}
+
+
+def tidy(text: str) -> str:
+    text = text.replace(";", ",").replace("·", "'")
+    head, comma, rest = text.partition(",")
+    if not comma:
+        head, comma, rest = text.partition(". ")
+        comma = "," if comma else ""
+    words = head.split()
+    while len(words) > 1 and MARGIN.fullmatch(words[0]):
+        words.pop(0)
+    text = f"{' '.join(words)}{comma} {rest.strip()}".strip()
+    for pattern, fixed in TIDY.items():
+        text = re.sub(pattern, fixed, text)
+    surname, comma, rest = text.partition(", ")
+    rest = " ".join(
+        re.sub(r"[a-z]", lambda m: {"e": "C", "r": "T"}.get(m[0], m[0].upper()), word)
+        if re.fullmatch(r"[A-Za-z](?:[.-][A-Za-z])*\.?", word)
+        else word
+        for word in rest.split()
+    )
+    return dotted(person(f"{surname}{comma}{rest}"))
+
+
 def fixed(found: pl.DataFrame) -> pl.DataFrame:
     rows = found.to_dicts()
     used = set()
@@ -2108,7 +2195,10 @@ def parse() -> None:
                 found = fixed(found)
         found = found.with_columns(name_printed=pl.col("name")).with_columns(
             pl.col("name").map_elements(
-                lambda n: NAMES.get(n, dotted(person(n)) if year in SCANNED else person(n)), return_dtype=pl.String
+                lambda n: NAMES.get(
+                    n, dotted(person(n)) if year in SCANNED else (tidy(n) if year == 1994 else person(n))
+                ),
+                return_dtype=pl.String,
             )
         )
         printed = TOTALS[year]
@@ -2137,7 +2227,7 @@ def parse() -> None:
                 printed_name = re.sub(r"[^\w')]+$", "", head["ward"])
                 name = WARDS.get(row["ward"], row["ward"])
                 if re.search(r"\d", name):
-                    name = printed_name
+                    name = WARDS.get(printed_name, printed_name)
                 letters = str.maketrans({"0": "o", "5": "s", "1": "i"})
                 if difflib.SequenceMatcher(None, fold(printed_name.translate(letters)), fold(name)).ratio() < 0.7:
                     raise ValueError(f"{year} {borough}: ward {printed_name} does not match {row['ward']}")
@@ -3134,7 +3224,7 @@ def parse_lbce_by() -> None:
     for r in (
         pl.read_parquet(PARSED / "candidates.parquet").filter(pl.col("year") == 1994, "elected").iter_rows(named=True)
     ):
-        won.setdefault((r["la_code"], r["ward"]), []).append((r["printed"], r["party"]))
+        won.setdefault((r["la_code"], r["ward"]), []).append((r["name"], r["party"]))
     held: list[dict] = []
     standing: list[dict] = []
     problems: list[str] = []
@@ -3187,7 +3277,7 @@ def parse_lbce_by() -> None:
     elected_in: dict[tuple[str, str], list[tuple[str, str]]] = {}
     for index, e in sorted(enumerate(held), key=lambda pair: pair[1].get("day") or date.min):
         la = codes[fold(e["borough"])]
-        ward = LBCE_BY_WARDS.get((la, e["ward"])) or known.get((la, fold(e["ward"])))
+        ward = known.get((la, fold(e["ward"])))
         label = f"{e['borough']} {e['ward']} {e.get('day')}"
         mine = [c for c in standing if c["entry"] == index]
         seats = len(e["causes"])
@@ -3415,12 +3505,12 @@ def emit() -> Path:
                 )
                 for ward in held.filter(pl.col("la_code") == code).iter_rows(named=True):
                     display = ward["ward"]
-                    ward_key = f"{code}:{slug(display)}:{year}"
+                    ward_key = f"{code}:{WARD_KEYS.get((code, display, year), slug(display))}:{year}"
                     ward_area = cs.area("gb.ward", ward_key)
                     if ward_area in cs.minted:
                         cs.add("area", id=ward_area, scheme_code="gb.ward")
                         cs.add("area_parent", area_id=ward_area, parent_id=area, valid_from=None, valid_to=None)
-                        name(ward_area, display)
+                    name(ward_area, display)
                     unit = cs.unit("gb.ward", ward_key)
                     if unit in cs.minted:
                         cs.add(
@@ -3434,7 +3524,7 @@ def emit() -> Path:
                             kind="standard",
                             valid_from=None,
                         )
-                        name(unit, display)
+                    name(unit, display)
                     seats = ward["seats"]
                     tacit = ward["tacit"]
                     contest_key = f"{day}:local:{ward_key}"
@@ -4417,7 +4507,7 @@ def emit() -> Path:
                 cs.add("note", entity_id=election, kind="methodology", body_md=methodology)
                 for ward in on_day.iter_rows(named=True):
                     display = ward["ward"]
-                    ward_key = f"{code}:{slug(display)}:{cycle}"
+                    ward_key = f"{code}:{WARD_KEYS.get((code, display, cycle), slug(display))}:{cycle}"
                     area = cs.area("gb.ward", ward_key)
                     unit = cs.unit("gb.ward", ward_key)
                     contest_key = f"{day}:by:{ward_key}"
