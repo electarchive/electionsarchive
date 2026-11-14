@@ -2003,7 +2003,12 @@ async function shallow(
     `,
   );
   found.rows.push(...unlinked.rows);
-  return { ks, found: found.rows, members: [...members], deeper: [...deeper] };
+  return {
+    ks,
+    found: found.rows.toSorted((a, b) => a.k - b.k),
+    members: [...members],
+    deeper: [...deeper],
+  };
 }
 
 async function survey(
@@ -10348,7 +10353,7 @@ export const contests = {
                          ) w
                        ),
                        tops as (
-                         select * from (select *, (row_number() over (partition by root order by votes desc))::int as place from grouped) g where place <= 3
+                         select * from (select *, (row_number() over (partition by root order by votes desc, key))::int as place from grouped) g where place <= 3
                          union all
                          select *, 1 as place from declared
                        )
@@ -10378,6 +10383,7 @@ export const contests = {
                          )) as party
                          offset 0
                        ) x
+                       order by t.root, t.place, t.label, t.person
                     `),
                   ),
               )
@@ -16713,7 +16719,9 @@ export async function races(
         .toSorted(
           (a, b) =>
             Number(a.key.startsWith("kind:others")) -
-              Number(b.key.startsWith("kind:others")) || b.votes - a.votes,
+              Number(b.key.startsWith("kind:others")) ||
+            b.votes - a.votes ||
+            (a.key < b.key ? -1 : a.key > b.key ? 1 : 0),
         );
       const allot = seatsOf.get(head?.id ?? "");
       const declared =
