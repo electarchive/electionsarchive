@@ -391,6 +391,25 @@ CALDERDALE_NOTES = (
     "Calderdale Council's election results pages, one per ward, with each candidate's surname and forenames, party, "
     "votes, and the elected candidate, and the ward's eligible voters, total turnout, and rejected papers."
 )
+SHEPWAY_NEWS = "https://web.archive.org/web/{}id_/http://www.shepway.gov.uk:80/index/news/"
+SHEPWAY_PRESS = {
+    SHEPWAY_NEWS.format("20011123165035") + "press-releases/by2.htm": (
+        date(2001, 2, 22),
+        "Shepway local by-election results, 22 February 2001",
+        None,
+    ),
+    SHEPWAY_NEWS.format("20010509103419") + "archive/april01/resultofhawkbyelec.htm": (
+        date(2001, 4, 5),
+        "Result of Hawkinge and Paddlesworth by-election",
+        "Hawkinge & Paddlesworth",
+    ),
+}
+SHEPWAY_PRESS_NOTES = (
+    "A Shepway District Council press release giving the result of a district council by-election, with each "
+    "candidate's name, party, and votes, the elected candidate, the ward's electorate, and the turnout as a "
+    "percentage, read from the Internet Archive's capture of the council's website. It prints no ballot count, so "
+    "turnout is not stored."
+)
 SURREY_DAYS = {
     1973: date(1973, 4, 12),
     1977: date(1977, 5, 5),
@@ -518,6 +537,8 @@ def fetch() -> None:
     for election in CALDERDALE_ELECTIONS:
         for area in range(1, CALDERDALE_WARDS + 1):
             raw.fetch(SOURCE, f"{CALDERDALE_SITE}?election={election}&area={area}", suffix=".html")
+    for url in SHEPWAY_PRESS:
+        raw.fetch(SOURCE, url, suffix=".html")
     price_in, price_out = batch.PRICES[LEEDS_MODEL]
     wanted: dict[str, batch.Want] = {}
     for year in LEEDS_FILES:
@@ -1138,6 +1159,52 @@ def calderdale() -> tuple[list[dict], list[dict]]:
     return rows, wards
 
 
+def shepway_press() -> tuple[list[dict], list[dict]]:
+    rows: list[dict] = []
+    wards: list[dict] = []
+    for url, (day, _, ward_name) in SHEPWAY_PRESS.items():
+        content = text(Path(raw.cached(SOURCE, url).path).read_text(encoding="latin-1"))
+        entry = {"code": SHEPWAY, "file": url, "day": day}
+        if ward_name is None:
+            body = content.split("Results for Hythe Town Council")[0]
+            sections = re.findall(
+                r"([A-Z][A-Z ]+?) \((?:eligible to vote: )?(\d+)\) ONE SEAT \([^)]*\) Turnout: ?([\d.]+)% "
+                r"NAME PARTY VOTES (.*?)(?= [A-Z][A-Z ]+ \(|$)",
+                body,
+            )
+            found_lines = [
+                (
+                    ward.title(),
+                    int(electorate),
+                    float(percent),
+                    re.findall(r"(\S.*?) (Lab|Con|Lib Dem) (\d+)( ELECTED)?(?= |$)", lines_),
+                )
+                for ward, electorate, percent, lines_ in sections
+            ]
+        else:
+            found_lines = [
+                (
+                    ward_name,
+                    int(found(r"Eligible to vote: (\d+)", content)[1]),
+                    float(found(r"Turnout: ([\d.]+) per cent", content)[1]),
+                    re.findall(r"· (.+?) - (Conservative|Liberal Democrat|Labour) (\d+) votes( ELECTED)?", content),
+                )
+            ]
+        for ward_name_, electorate, percent, candidates in found_lines:
+            ward = {"name": ward_name_, "code": SHEPWAY, "day": day, "by": True, "seats": 1, "registered": electorate}
+            wards.append(ward)
+            if len(candidates) < 2 or sum(bool(c[3]) for c in candidates) != 1:
+                raise ValueError(f"Shepway {day} {ward_name_}: {candidates}")
+            if sum(int(c[2]) for c in candidates) > percent * electorate / 100 + 1:
+                raise ValueError(f"Shepway {day} {ward_name_}: votes exceed {percent}% of {electorate}")
+            for name, party, votes, elected in candidates:
+                name = re.sub(r"\b[A-Z][A-Z'-]+\b", lambda m: m[0].title(), name.strip())
+                rows.append(candidate(entry, ward, 0, name, party, int(votes), bool(elected)))
+        if len(found_lines) != (3 if ward_name is None else 1):
+            raise ValueError(f"Shepway {day}: {len(found_lines)} wards")
+    return rows, wards
+
+
 def ocr_lines(image: Image.Image, left: int, top: int) -> list[list[dict]]:
     with tempfile.NamedTemporaryFile(suffix=".png") as handle:
         image.save(handle.name)
@@ -1330,6 +1397,7 @@ def fraction(box: tuple[int, int, int, int], size: tuple[int, int]) -> list[floa
 def parse() -> None:
     rows: list[dict] = []
     wards: list[dict] = []
+    handbook = 0
     for entry in FILES:
         if entry["parser"] == "shepway":
             continue
@@ -1337,15 +1405,25 @@ def parse() -> None:
         found_rows, found_wards = parser(entry)
         for ward in found_wards:
             ward.setdefault("day", entry["day"])
+        if entry["parser"] == "kent-handbook":
+            handbook = len(found_rows)
         rows += found_rows
         wards += found_wards
-    for found_rows, found_wards in (
-        calderdale(),
-        leeds(),
-        *(shepway(entry) for entry in FILES if entry["parser"] == "shepway"),
-    ):
+    found_rows, found_wards = calderdale()
+    rows += found_rows
+    wards += found_wards
+    numbers = list(range(len(rows)))
+    blocks = [
+        (leeds(), len(rows)),
+        *((shepway(entry), len(rows) - handbook) for entry in FILES if entry["parser"] == "shepway"),
+    ]
+    blocks.append((shepway_press(), len(rows) + sum(len(block[0]) for block, _ in blocks)))
+    for (found_rows, found_wards), start in blocks:
         rows += found_rows
         wards += found_wards
+        numbers += range(start, start + len(found_rows))
+    for row, number in zip(rows, numbers, strict=True):
+        row["number"] = number
     for row in rows:
         ward = row.pop("at")
         row["name"] = FIXES.get(row["name"], re.sub(r"(\w)- (\w)", r"\1-\2", row["name"]))
@@ -1354,9 +1432,9 @@ def parse() -> None:
             precision=ward.get("precision", "day"),
             by=ward.get("by", False),
             ward=ward["name"],
-            box=ward.get("box"),
+            ward_box=ward.get("box"),
         )
-    frame = pl.DataFrame(rows, infer_schema_length=None).with_row_index("number")
+    frame = pl.DataFrame(rows, infer_schema_length=None)
     figures = {(w["code"], w["day"], w["name"]): w for w in wards}
     extra = []
     for (code, day, ward), group in frame.group_by("code", "day", "ward", maintain_order=True):
@@ -1558,6 +1636,21 @@ def emit() -> Path:
         for url in candidates.filter(pl.col("code") == CALDERDALE)["file"].unique().sort():
             sources[url] = calderdale_source
             cs.artifact(raw.cached(SOURCE, url), calderdale_source)
+        for url, (_, title, _) in SHEPWAY_PRESS.items():
+            sources[url] = cs.source("Shepway District Council", title)
+            cs.add(
+                "source",
+                id=sources[url],
+                kind="official_body",
+                publisher="Shepway District Council",
+                title=title,
+                url=url,
+                license="Open Government Licence v3.0",
+                license_url=OGL,
+                attribution="Contains public sector information licensed under the Open Government Licence v3.0.",
+                notes=SHEPWAY_PRESS_NOTES,
+            )
+            cs.artifact(raw.cached(SOURCE, url), sources[url])
         leeds_source = cs.source("Leeds City Council", "Leeds City Council election results, 1973 to 2000")
         cs.add(
             "source",
@@ -1637,7 +1730,7 @@ def emit() -> Path:
                         f"Only the {wards} divisions in Epsom and Ewell are loaded, from the borough council's "
                         "history of the county elections; the county's other divisions are not in the archive yet.",
                     )
-                if code == SHEPWAY:
+                if code == SHEPWAY and not by:
                     caveat(
                         election,
                         "These results come from the Elections Centre's compilation of Shepway results, read from a "
@@ -1708,8 +1801,8 @@ def emit() -> Path:
                 locator: dict[str, object] = {"ward": ward}
                 if first["page"]:
                     locator["page"] = first["page"]
-                    if first["box"] is not None:
-                        locator["bbox"] = [value / 1000 for value in first["box"]]
+                    if first["ward_box"] is not None:
+                        locator["bbox"] = [value / 1000 for value in first["ward_box"]]
                 else:
                     locator["url"] = first["file"]
                 cs.add("citation", entity_id=result_set, source_id=source, locator=locator)
