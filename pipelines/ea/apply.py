@@ -178,6 +178,7 @@ def _diff(conn: Connection, stage: Stage) -> dict[str, dict[str, int]]:
                    from {} s left join public.slug p on p.path = s.path and p.entity_id = s.entity_id"""
             ).format(staged)
         elif table in DERIVED_IDS:
+            required = _not_null(conn, table)
             stranded = (
                 sql.SQL(
                     """s.is_preferred and exists (
@@ -188,7 +189,9 @@ def _diff(conn: Connection, stage: Stage) -> dict[str, dict[str, int]]:
                              and q.is_preferred and q.valid_from is null and q.valid_to is null))"""
                 ).format(
                     loose=sql.SQL(" and ").join(
-                        sql.SQL("p.{0} is not distinct from s.{0}").format(sql.Identifier(column))
+                        sql.SQL("p.{0} = s.{0}" if column in required else "p.{0} is not distinct from s.{0}").format(
+                            sql.Identifier(column)
+                        )
                         for column in columns
                         if column != "is_preferred"
                     ),
