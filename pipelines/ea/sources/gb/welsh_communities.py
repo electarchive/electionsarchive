@@ -8,6 +8,7 @@ import subprocess
 import sys
 import time
 from datetime import UTC, date, datetime
+from itertools import pairwise
 from pathlib import Path
 from urllib.parse import urljoin
 from uuid import UUID
@@ -921,7 +922,7 @@ def caerphilly(url: str) -> list[dict]:
     names = communities("W06000018")
     reads: list[dict] = []
     parts = text_of(url).split("NOTICE OF UNCONTESTED ELECTION")
-    for before, notice in zip(parts, parts[1:], strict=False):
+    for before, notice in pairwise(parts):
         heading = [line.strip() for line in before.splitlines() if line.strip()][-1]
         council = None
         for piece in reversed([part.strip() for part in heading.split("/")]):
