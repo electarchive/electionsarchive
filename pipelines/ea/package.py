@@ -1,8 +1,9 @@
 import hashlib
 import json
 import shutil
+import threading
 import time
-from collections.abc import Iterable
+from collections.abc import Iterable, Iterator
 from datetime import UTC, datetime
 from io import BytesIO
 from pathlib import Path
@@ -21,6 +22,9 @@ from ea.store import DATA
 
 NAMESPACE = uuid5(NAMESPACE_URL, "https://electionsarchive.com/")
 ROOT = DATA / "packages"
+CHECK_MEMORY = "1GB"
+CHUNK_BYTES = 2 << 20
+SERVER_LIMIT = 3072
 
 U = pl.String()
 D = pl.Date()
@@ -465,8 +469,55 @@ CHECKS = {
 }
 
 
+def _rss(pid: int | str, field: str) -> int:
+    try:
+        for line in Path(f"/proc/{pid}/status").read_text().splitlines():
+            if line.startswith(f"{field}:"):
+                return int(line.split()[1]) >> 10
+    except OSError:
+        pass
+    return 0
+
+
+class Meter:
+    def __init__(self, conn: Connection | None = None) -> None:
+        self.conn = conn
+        self.backend = None if conn is None else conn.info.backend_pid
+        self.server = 0
+        self.tripped = 0
+        self.done = threading.Event()
+        self.reset()
+        if self.backend is not None:
+            threading.Thread(target=self._sample, daemon=True).start()
+
+    def _sample(self) -> None:
+        while not self.done.wait(0.2):
+            self.server = max(self.server, _rss(str(self.backend), "RssAnon"))
+            if self.server > SERVER_LIMIT and not self.tripped and self.conn is not None:
+                self.tripped = self.server
+                self.conn.cancel_safe()
+
+    def reset(self) -> None:
+        Path("/proc/self/clear_refs").write_text("5")
+        self.server = 0
+        self.began = time.monotonic()
+
+    def step(self, label: str) -> str:
+        if self.backend is not None:
+            self.server = max(self.server, _rss(str(self.backend), "RssAnon"))
+        server = f", server {self.server:,} MB" if self.backend is not None else ""
+        text = f"{label} {time.monotonic() - self.began:.1f}s (client peak {_rss('self', 'VmHWM'):,} MB{server})"
+        self.reset()
+        return text
+
+    def close(self) -> None:
+        self.done.set()
+
+
 def check(path: Path) -> list[tuple[str, int, list[tuple[object, ...]]]]:
-    con = duckdb.connect()
+    spill = ROOT / ".duckdb"
+    spill.mkdir(parents=True, exist_ok=True)
+    con = duckdb.connect(config={"memory_limit": CHECK_MEMORY, "threads": 4, "temp_directory": str(spill)})
     _views(con, path)
     findings: list[tuple[str, int, list[tuple[object, ...]]]] = []
     for table, (key, schema) in TABLES.items():
@@ -499,9 +550,16 @@ def check(path: Path) -> list[tuple[str, int, list[tuple[object, ...]]]]:
     return findings
 
 
-def _stage(
-    conn: Connection, table: str, columns: list[str], frame: pl.DataFrame, like: LiteralString | None = None
-) -> str:
+def _chunks(file: Path, columns: list[str]) -> Iterator[bytes]:
+    rows = int(pl.scan_parquet(file).select(pl.len()).collect().item())
+    size = max(1, rows * CHUNK_BYTES // max(1, file.stat().st_size))
+    for frame in pl.scan_parquet(file).select(columns).collect_batches(chunk_size=max(1_000, min(200_000, size))):
+        buffer = BytesIO()
+        frame.write_csv(buffer, include_header=False, null_value="", quote_style="non_numeric")
+        yield buffer.getvalue()
+
+
+def _stage(conn: Connection, table: str, columns: list[str], file: Path, like: LiteralString | None = None) -> int:
     name = f"pkg_{table}"
     conn.execute(sql.SQL("drop table if exists {}").format(sql.Identifier(name)))
     if like is None:
@@ -512,8 +570,6 @@ def _stage(
         )
     else:
         conn.execute(sql.SQL("create temp table {} ({}) on commit drop").format(sql.Identifier(name), sql.SQL(like)))
-    buffer = BytesIO()
-    frame.select(columns).write_csv(buffer, include_header=False, null_value="", quote_style="non_numeric")
     with (
         conn.cursor() as cursor,
         cursor.copy(
@@ -522,11 +578,11 @@ def _stage(
             )
         ) as copy,
     ):
-        view = buffer.getbuffer()
-        for start in range(0, len(view), 1 << 24):
-            copy.write(view[start : start + (1 << 24)])
+        for chunk in _chunks(file, columns):
+            copy.write(chunk)
     conn.execute(sql.SQL("analyze {}").format(sql.Identifier(name)))
-    return name
+    found = conn.execute(sql.SQL("select count(*) from {}").format(sql.Identifier(name))).fetchone()
+    return 0 if found is None else int(found[0])
 
 
 def _hash(alias: str, columns: list[str]) -> sql.Composable:
@@ -535,10 +591,9 @@ def _hash(alias: str, columns: list[str]) -> sql.Composable:
     )
 
 
-def load(conn: Connection, path: Path, accepted: dict[str, object] | None = None) -> str | None:
+def load(conn: Connection, path: Path, meter: Meter, accepted: dict[str, object] | None = None) -> str | None:
     manifest = _manifest(path)
     key = str(manifest["key"])
-    started = time.monotonic()
     missing = conn.execute(
         """select x from unnest(%s::uuid[]) x
            where not exists (select from entity e where e.id = x) and not exists (select from polity p where p.id = x)""",
@@ -559,11 +614,7 @@ def load(conn: Connection, path: Path, accepted: dict[str, object] | None = None
         return None
     owned = [str(row[0]) for row in prior]
     version = len(prior) + 1
-    frames = {
-        table: pl.read_parquet(path / f"{table}.parquet")
-        for table in [*TABLES, *FACTS]
-        if (path / f"{table}.parquet").exists()
-    }
+    files = {table: path / f"{table}.parquet" for table in [*TABLES, *FACTS] if (path / f"{table}.parquet").exists()}
     with conn.transaction():
         conn.execute("select pg_advisory_xact_lock_shared(hashtext('ea.search'))")
         conn.execute("select pg_advisory_xact_lock_shared(%s)", [MERGE_LOCK])
@@ -600,10 +651,11 @@ def load(conn: Connection, path: Path, accepted: dict[str, object] | None = None
             ).fetchall()
         ]
         staged: dict[str, tuple[str, list[str]]] = {}
-        for table, frame in frames.items():
+        for table, file in files.items():
             if table in TABLES:
                 columns = list(TABLES[table][1])
-                staged[table] = (_stage(conn, table, columns, frame), columns)
+                _stage(conn, table, columns, file)
+                staged[table] = (f"pkg_{table}", columns)
         moved: list[str] = []
         if "area_parent" in staged or "area" in staged:
             moved = [
@@ -719,13 +771,12 @@ def load(conn: Connection, path: Path, accepted: dict[str, object] | None = None
                 ).rowcount
             counts.setdefault(table, [0, 0])[0] = written
         sets_after: list[int] = []
-        if "result_value" in frames:
-            fact = frames["result_value"]
-            _stage(
+        if "result_value" in files:
+            rows = _stage(
                 conn,
                 "result_value",
                 list(FACTS["result_value"]),
-                fact,
+                files["result_value"],
                 like="result_set_id uuid, unit_id uuid, option_id uuid, channel smallint, measure smallint,"
                 " count_round smallint, flags smallint, value numeric",
             )
@@ -735,8 +786,8 @@ def load(conn: Connection, path: Path, accepted: dict[str, object] | None = None
                    from pkg_result_value v join result_set r on r.id = v.result_set_id
                    join reporting_unit u on u.id = v.unit_id left join contest_option o on o.id = v.option_id"""
             ).rowcount
-            if facts != fact.height:
-                raise ValueError(f"{key}: {fact.height} facts staged, {facts} written")
+            if facts != rows:
+                raise ValueError(f"{key}: {rows} facts staged, {facts} written")
             counts["result_value"] = [facts, 0]
             sets_after = [
                 k
@@ -744,12 +795,12 @@ def load(conn: Connection, path: Path, accepted: dict[str, object] | None = None
                     "select distinct r.k from pkg_result_value v join result_set r on r.id = v.result_set_id"
                 )
             ]
-        if "value_locator" in frames:
+        if "value_locator" in files:
             _stage(
                 conn,
                 "value_locator",
                 list(FACTS["value_locator"]),
-                frames["value_locator"],
+                files["value_locator"],
                 like="result_set_id uuid, unit_id uuid, option_id uuid, channel smallint, measure smallint,"
                 " count_round smallint, page_id uuid, source_id uuid, x0 real, y0 real, x1 real, y1 real",
             )
@@ -761,7 +812,7 @@ def load(conn: Connection, path: Path, accepted: dict[str, object] | None = None
                    from pkg_value_locator v join result_set r on r.id = v.result_set_id
                    join reporting_unit u on u.id = v.unit_id left join contest_option o on o.id = v.option_id"""
             )
-        loaded = time.monotonic()
+        facts_step = meter.step("facts")
         rolled = sorted(set(sets_after) | (set(sets_before) - set(dropped_sets)))
         _rollup(conn, None, moved, [], rolled)
         covers.uncover(conn, changeset_id, moved, [], sets=rolled)
@@ -774,8 +825,7 @@ def load(conn: Connection, path: Path, accepted: dict[str, object] | None = None
     shutil.copytree(path, copy)
     changed = ", ".join(f"{t} +{a:,}/-{d:,}" for t, (a, d) in counts.items() if a or d)
     print(
-        f"{key} v{version} as {changeset_id}: {changed}; facts {loaded - started:.1f}s, "
-        f"rollups and search {time.monotonic() - loaded:.1f}s",
+        f"{key} v{version} as {changeset_id}: {changed}; {facts_step}, {meter.step('rollups and search')}",
         flush=True,
     )
     return changeset_id
@@ -786,7 +836,9 @@ def run(command: str, keys: list[str]) -> None:
     for key in keys:
         path = _resolve(key)
         reasons = _manifest(path).get("accepted", {})
+        meter = Meter()
         findings = check(path)
+        checked = meter.step("checks")
         accepted: dict[str, object] = {}
         blocking = False
         for code, n, sample in findings:
@@ -799,9 +851,20 @@ def run(command: str, keys: list[str]) -> None:
         if blocking:
             failed = True
             continue
-        print(f"{key}: checks passed", flush=True)
+        print(f"{key}: checks passed, {checked}", flush=True)
         if command == "load":
             with store.connect() as conn:
-                load(conn, path, accepted)
+                meter = Meter(conn)
+                try:
+                    load(conn, path, meter, accepted)
+                except Exception:
+                    if meter.tripped:
+                        raise MemoryError(
+                            f"{key}: the database backend reached {meter.tripped:,} MB, over {SERVER_LIMIT:,} MB, "
+                            "so the load was canceled and rolled back"
+                        ) from None
+                    raise
+                finally:
+                    meter.close()
     if failed:
         raise SystemExit(1)
