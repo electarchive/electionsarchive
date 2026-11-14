@@ -11,8 +11,10 @@ from typing import Any
 from uuid import UUID, uuid5
 
 import polars as pl
+import shapely
 
 from ea import raw
+from ea.boundaries import read as read_boundaries
 from ea.changeset import NAMESPACE, Changeset
 from ea.sources.de.btw import CONSTITUENCIES
 from ea.sources.licenses import PUBLIC_RECORD
@@ -61,6 +63,11 @@ TH_YEARBOOK = "https://statistik.thueringen.de/informationen/jahrbuch/2025/pdf/T
 TH_YEARS = (1994, 1999, 2004, 2009, 2014, 2019, 2024)
 TH_WAHLKREISE = 44
 TH_PUBLISHER = "Thüringer Landesamt für Statistik"
+TH_SHAPES = {
+    2019: f"{TH}/landtagswahlen/informationen/vektor/2019/LW2019_16TH_Wahlkreiseinteilung.zip",
+    2024: f"{TH}/landtagswahlen/informationen/vektor/2024/16TH_L24_Wahlkreiseinteilung.zip",
+}
+TH_SHAPES_TITLE = "Landtagswahlen in Thüringen: Geo-Vektordaten mit Einteilung der Wahlkreise"
 TH_TITLE = "Wahlen in Thüringen: Landtagswahlen 1990 bis 2024, endgültige Ergebnisse nach Wahlkreisen"
 TH_URL = f"{TH}/landtagswahlen/lw_wahlergebnisse.asp"
 TH_1990_SEATS = {"CDU": 44, "SPD": 21, "LL-PDS": 9, "FDP": 9, "NFGRDJ": 6}
@@ -517,6 +524,8 @@ def fetch() -> None:
     for year in TH_YEARS:
         for wk in range(1, TH_WAHLKREISE + 1):
             raw.fetch(SOURCE, th_page(year, wk), suffix=".html")
+    for url in TH_SHAPES.values():
+        raw.fetch(SOURCE, url, suffix=".zip")
 
 
 def history_count(text: str) -> int | None:
@@ -766,6 +775,37 @@ def parse_history() -> None:
     result_frame.write_parquet(PARSED / "history_results.parquet")
     pl.DataFrame(glossary).write_parquet(PARSED / "history_glossary.parquet")
     parse_th(elections, results)
+    parse_th_shapes()
+
+
+def parse_th_shapes() -> None:
+    rows: list[dict[str, object]] = []
+    for year, url in TH_SHAPES.items():
+        with zipfile.ZipFile(raw.cached(SOURCE, url).path) as archive:
+            (member,) = (name for name in archive.namelist() if name.endswith(".gpkg"))
+            path = PARSED / f"th_shapes_{year}.gpkg"
+            path.write_bytes(archive.read(member))
+        features = read_boundaries(path)
+        path.unlink()
+        if len(features) != TH_WAHLKREISE:
+            raise ValueError(f"TH {year}: {len(features)} constituency shapes")
+        for properties, geometry in features:
+            geometry = shapely.set_srid(geometry, 4326)
+            rows.append(
+                {
+                    "year": year,
+                    "wk": f"{int(properties['WK_ID']):02d}",
+                    "name": properties.get("WK") or properties["WK_name"],
+                    "geom": shapely.to_wkb(geometry, hex=True, include_srid=True),
+                    "label_point": shapely.to_wkb(
+                        shapely.set_srid(shapely.point_on_surface(geometry), 4326), hex=True, include_srid=True
+                    ),
+                }
+            )
+    frame = pl.DataFrame(rows)
+    if frame.select("year", "wk").is_duplicated().any():
+        raise ValueError("TH constituency shapes repeat a number")
+    frame.write_parquet(PARSED / "th_shapes.parquet")
 
 
 def th_person(text: str) -> tuple[str, str]:
@@ -1859,6 +1899,22 @@ def emit_history(
         *(th_page(year, wk) for year in TH_YEARS for wk in range(1, TH_WAHLKREISE + 1)),
     ):
         cs.artifact(raw.cached(SOURCE, url), th_source)
+    th_shapes_source = cs.source(TH_PUBLISHER, TH_SHAPES_TITLE)
+    cs.add(
+        "source",
+        id=th_shapes_source,
+        kind="official_body",
+        publisher=TH_PUBLISHER,
+        title=TH_SHAPES_TITLE,
+        url=f"{TH}/landtagswahlen/lw_informationen.asp",
+        license=PUBLIC_RECORD,
+        license_url=None,
+    )
+    for url in TH_SHAPES.values():
+        cs.artifact(raw.cached(SOURCE, url), th_shapes_source)
+    th_shapes = {
+        (row["year"], row["wk"]): row for row in pl.read_parquet(PARSED / "th_shapes.parquet").iter_rows(named=True)
+    }
     th_cons = pl.read_parquet(PARSED / "th_constituencies.parquet")
     th_votes = pl.read_parquet(PARSED / "th_votes.parquet")
     th_members = pl.read_parquet(PARSED / "th_members.parquet")
@@ -1919,6 +1975,20 @@ def emit_history(
             cs.add("area_code", area_id=area, code=wk, valid_from=day, valid_to=following)
             cs.add("area_parent", area_id=area, parent_id=land_area, valid_from=day, valid_to=following)
             cs.add("name", entity_id=area, text=row["name"], lang="de", kind="official", is_preferred=True)
+            shape = th_shapes.get((day.year, wk))
+            if shape is not None:
+                if not folded(shape["name"]).startswith(folded(row["name"])):
+                    raise ValueError(f"TH {day} {wk}: shape {shape['name']} for {row['name']}")
+                cs.add(
+                    "area_geometry",
+                    area_id=area,
+                    valid_from=day,
+                    valid_to=following,
+                    geom=shape["geom"],
+                    label_point=shape["label_point"],
+                    quality="official",
+                    source_id=th_shapes_source,
+                )
             unit = cs.unit(scheme, wk, day)
             cs.add(
                 "reporting_unit",
