@@ -161,11 +161,12 @@ type Built = {
   tops: unknown;
   inferred: Array<string>;
   units: unknown;
+  built_at?: Date;
 };
 
 async function auditTops() {
   const stored = await db.execute<Built>(sql`
-    select t.contest_id as root, t.area_k as k, t.tops, t.inferred, t.units
+    select t.contest_id as root, t.area_k as k, t.tops, t.inferred, t.units, t.built_at
     from contest_top t tablesample bernoulli (1) limit ${SAMPLE}
   `);
   const fresh = new Map<string, Built>();
@@ -193,7 +194,7 @@ async function auditTops() {
     if (kept !== current) {
       stale.push(row.root);
       console.error(
-        `stale contest top ${row.root}: stored ${kept}, live ${current}`,
+        `stale contest top ${row.root}: built ${row.built_at?.toISOString()}, stored ${kept}, live ${current}`,
       );
     }
   }
