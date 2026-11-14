@@ -206,6 +206,13 @@ def emit() -> str:
         lambda name: f"Table 5.6, {name} Supreme Court row: justices chosen or retained by popular election",
         lambda st: {"government_kind": "state", "function": "judicial", "month": None, "day_rule": None},
     )
+    state_rows(
+        classes["statewide_exec"],
+        "executives",
+        "bots-executives",
+        lambda name: f"Table 6.1, {name} row",
+        lambda st: {"government_kind": "state", "function": "statewide_exec"},
+    )
     for level, kinds in (("state_upper", ("upper_house", "unicameral")), ("state_lower", ("lower_house",))):
         state_rows(
             classes[level],
