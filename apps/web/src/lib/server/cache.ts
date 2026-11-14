@@ -109,6 +109,7 @@ export function dataVersion() {
 }
 
 const entries = new Map<string, Entry>();
+const waiting = new Map<string, { hit: Entry; task: () => Promise<void> }>();
 const names = new WeakMap<object, string>();
 const state: {
   version: string;
@@ -689,6 +690,7 @@ function drop(key: string) {
 
   state.size -= entry.size;
   entries.delete(key);
+  waiting.delete(key);
 }
 
 function evict() {
@@ -796,8 +798,6 @@ redis.call('ZADD', KEYS[1], now + tonumber(ARGV[2]), ARGV[3])
 redis.call('PEXPIRE', KEYS[1], ARGV[2])
 return 1
 `;
-const waiting: Array<{ key: string; hit: Entry; task: () => Promise<void> }> =
-  [];
 let renewing = 0;
 
 async function admit() {
@@ -849,14 +849,13 @@ async function claim(slot: string) {
 
 async function drain() {
   while (renewing < RENEWING) {
-    const next = waiting.shift();
-    if (next == null) {
+    const key = waiting.keys().next().value;
+    const next = key == null ? undefined : waiting.get(key);
+    if (key == null || next == null) {
       return;
     }
-    if (
-      entries.get(next.key) !== next.hit ||
-      Date.now() - next.hit.used > RECENT
-    ) {
+    waiting.delete(key);
+    if (Date.now() - next.hit.used > RECENT) {
       next.hit.isRenewing = false;
       continue;
     }
@@ -938,7 +937,7 @@ function renew(
     }
     hit.isRenewing = false;
   };
-  waiting.push({ key, hit, task });
+  waiting.set(key, { hit, task });
   void drain();
 }
 
