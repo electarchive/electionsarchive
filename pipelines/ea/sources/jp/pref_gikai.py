@@ -54,12 +54,18 @@ COMMISSIONS = {
     ),
 }
 RECORDS = {
-    "2023-04-09:栃木県": Record(
-        f"{TOCHIGI}/r05kengi/kekka.html",
-        f"{TOCHIGI}/r05kengi/file/ES_KAIHYO_K_51_1.xls",
-        f"{TOCHIGI}/r05kengi/file/ES_TOHYO_K_51.xls",
-        f"{TOCHIGI}/r05kengi/file/ES_KAIHYO_K_51_3.xls",
-    ),
+    f"{held}:栃木県": Record(
+        f"{TOCHIGI}/{folder}/kekka.html",
+        f"{TOCHIGI}/{folder}/file/ES_KAIHYO_K_51_1.xls",
+        f"{TOCHIGI}/{folder}/file/ES_TOHYO_K_51.xls",
+        f"{TOCHIGI}/{folder}/file/ES_KAIHYO_K_51_3.xls",
+    )
+    for held, folder in (
+        ("2023-04-09", "r05kengi"),
+        ("2019-04-07", "31kengi"),
+        ("2015-04-12", "27kengi"),
+        ("2011-04-10", "23kengi"),
+    )
 }
 PLACE = re.compile(r"^\S+?[市区町村]$")
 THRESHOLD = re.compile(r"法定得票数\(\s*([\d,.]*)\s*\)")
@@ -350,6 +356,84 @@ def emit() -> Path:
 
         added: set[UUID] = set()
         values: list[tuple[UUID, UUID, UUID | None, int, str]] = []
+        municipalities: dict[tuple[str, date], dict[str, tuple[str, bytes]]] = {}
+        plan: dict[tuple[str, str], tuple[UUID, int, date | None]] = {}
+        rounds: dict[str, list[date]] = {}
+        for key in districts["key"].unique():
+            held_text, prefecture = key.split(":")
+            rounds.setdefault(prefecture, []).append(date.fromisoformat(held_text))
+        for prefecture, days in rounds.items():
+            days.sort()
+            code = f"{[native for native, _ in PREFECTURES].index(prefecture) + 1:02d}"
+            for held in days:
+                municipalities[code, held] = {
+                    text: (area_code, wkb)
+                    for area_code, text, wkb in conn.execute(
+                        """select c.code, n.text, st_asbinary(g.geom) from area a
+                           join area_code c on c.area_id = a.id and c.valid @> %s::date
+                           join name n on n.entity_id = a.id and n.lang = 'ja' and n.kind = 'official'
+                             and n.valid @> %s::date
+                           join area_geometry g on g.area_id = a.id and g.valid @> %s::date
+                           where a.scheme_code = 'jp.municipality' and c.code like %s""",
+                        [held, held, held, f"{code}%"],
+                    )
+                }
+            used: dict[str, list[tuple[date, tuple[str, ...]]]] = {}
+            for held in reversed(days):
+                for row in (
+                    districts.filter(pl.col("key") == f"{held}:{prefecture}").sort("order").iter_rows(named=True)
+                ):
+                    missing = [m for m in row["members"] if m not in municipalities[code, held]]
+                    if missing:
+                        raise ValueError(f"{held} {prefecture} {row['district']}: no municipality named {missing}")
+                    used.setdefault(row["district"], []).insert(0, (held, tuple(row["members"])))
+
+            def following(day: date) -> date | None:
+                later = [d for d in days if d > day]
+                return later[0] if later else None
+
+            for n, (district, runs) in enumerate(used.items(), 1):
+                area_code = f"{code}{n:02d}"
+                area = cs.area(SCHEME, area_code)
+                span = {
+                    "valid_from": runs[0][0],
+                    "valid_from_precision": "day",
+                    "valid_to": following(runs[-1][0]),
+                    "valid_to_precision": "day",
+                }
+                cs.add("area", id=area, scheme_code=SCHEME)
+                cs.add("area_code", area_id=area, code=area_code, **span)
+                cs.add("area_parent", area_id=area, parent_id=cs.area("jp.prefecture", code), **span)
+                name(area, f"{district}選挙区", "ja", "official")
+                name(area, f"{english[prefecture]} Prefectural Assembly district {n}", "en", "english", False)
+                changes = [i for i, (_, members) in enumerate(runs) if i == 0 or members != runs[i - 1][1]]
+                for index, i in enumerate(changes):
+                    held, members = runs[i]
+                    ends = runs[changes[index + 1]][0] if index + 1 < len(changes) else span["valid_to"]
+                    shape = mlit.polygons(
+                        mlit.merge([shapely.from_wkb(municipalities[code, held][m][1]) for m in members])
+                    )
+                    shape = shapely.set_srid(shape, 4326)
+                    cs.add(
+                        "area_geometry",
+                        area_id=area,
+                        geom=shapely.to_wkb(shape, hex=True, include_srid=True),
+                        label_point=shapely.to_wkb(
+                            shapely.set_srid(
+                                max(shapely.get_parts(shape), key=shapely.area).representative_point(), 4326
+                            ),
+                            hex=True,
+                            include_srid=True,
+                        ),
+                        quality="official",
+                        source_id=sources[prefecture],
+                        valid_from=held,
+                        valid_from_precision="day",
+                        valid_to=ends,
+                        valid_to_precision="day",
+                    )
+                for held, _ in runs:
+                    plan[f"{held}:{prefecture}", district] = (area, n, following(held))
         for key in districts["key"].unique(maintain_order=True):
             held_text, prefecture = key.split(":")
             held = date.fromisoformat(held_text)
@@ -363,18 +447,6 @@ def emit() -> Path:
             source = sources[prefecture]
             for url in (record.page, record.count, record.turnout, record.winners):
                 cs.artifact(raw.cached(SOURCE, url), source)
-            municipalities = {
-                text: (area_code, wkb)
-                for area_code, text, wkb in conn.execute(
-                    """select c.code, n.text, st_asbinary(g.geom) from area a
-                       join area_code c on c.area_id = a.id and c.valid @> %s::date
-                       join name n on n.entity_id = a.id and n.lang = 'ja' and n.kind = 'official'
-                         and n.valid @> %s::date
-                       join area_geometry g on g.area_id = a.id and g.valid @> %s::date
-                       where a.scheme_code = 'jp.municipality' and c.code like %s""",
-                    [held, held, held, f"{code}%"],
-                )
-            }
             prefecture_unit = cs.unit("jp.prefecture", code)
             election = cs.key(f"{SOURCE}.election", key)
             cs.add(
@@ -388,38 +460,14 @@ def emit() -> Path:
             if rows["members"].list.len().sum() != len({m for ms in rows["members"] for m in ms}):
                 raise ValueError(f"{key}: a municipality sits in two districts")
             for row in rows.iter_rows(named=True):
-                district, n = row["district"], row["order"]
-                area_code = f"{code}{n:02d}"
-                area = cs.area(SCHEME, area_code)
+                district = row["district"]
+                area, n, ends = plan[key, district]
                 span = {
                     "valid_from": held,
                     "valid_from_precision": "day",
-                    "valid_to": None,
+                    "valid_to": ends,
                     "valid_to_precision": "day",
                 }
-                cs.add("area", id=area, scheme_code=SCHEME)
-                cs.add("area_code", area_id=area, code=area_code, **span)
-                cs.add("area_parent", area_id=area, parent_id=cs.area("jp.prefecture", code), **span)
-                name(area, f"{district}選挙区", "ja", "official")
-                name(area, f"{english[prefecture]} Prefectural Assembly district {n}", "en", "english", False)
-                missing = [m for m in row["members"] if m not in municipalities]
-                if missing:
-                    raise ValueError(f"{key} {district}: no municipality named {missing} on {held}")
-                shape = mlit.polygons(mlit.merge([shapely.from_wkb(municipalities[m][1]) for m in row["members"]]))
-                shape = shapely.set_srid(shape, 4326)
-                cs.add(
-                    "area_geometry",
-                    area_id=area,
-                    geom=shapely.to_wkb(shape, hex=True, include_srid=True),
-                    label_point=shapely.to_wkb(
-                        shapely.set_srid(max(shapely.get_parts(shape), key=shapely.area).representative_point(), 4326),
-                        hex=True,
-                        include_srid=True,
-                    ),
-                    quality="official",
-                    source_id=source,
-                    **span,
-                )
                 contest_key = f"{key}:{district}"
                 contest = cs.key(f"{SOURCE}.contest", contest_key)
                 kind = "tacit" if row["unopposed"] else "counted"
@@ -454,7 +502,7 @@ def emit() -> Path:
                 cs.add("note", entity_id=result_set, kind="methodology", body_md=TACIT if row["unopposed"] else METHOD)
                 units: dict[str, UUID] = {}
                 for member in row["members"]:
-                    municipality = municipalities[member][0]
+                    municipality = municipalities[code, held][member][0]
                     unit = units[member] = cs.unit("jp.municipality", municipality)
                     if unit in cs.minted and unit not in added:
                         added.add(unit)
@@ -518,14 +566,14 @@ def emit() -> Path:
                         (pl.col("key") == key) & (pl.col("district") == district) & (pl.col("number") == c["number"])
                     ).iter_rows(named=True):
                         values.append((result_set, units[v["place"]], option, 1, v["votes"]))
-        rounds = sorted({date.fromisoformat(key.split(":")[0]) for key in districts["key"]})
-        for index, start in enumerate(rounds):
+        vintages = sorted({date.fromisoformat(key.split(":")[0]) for key in districts["key"]})
+        for index, start in enumerate(vintages):
             cs.add(
                 "boundary_set",
                 scheme_code=SCHEME,
                 vintage=start.isoformat(),
                 valid_from=start,
-                valid_to=rounds[index + 1] if index + 1 < len(rounds) else None,
+                valid_to=vintages[index + 1] if index + 1 < len(vintages) else None,
                 as_of=start,
             )
         for result_set, unit, option, measure, value in values:
