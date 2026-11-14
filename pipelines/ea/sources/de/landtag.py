@@ -8,13 +8,14 @@ import zipfile
 from datetime import date
 from pathlib import Path
 from typing import Any
-from uuid import UUID
+from uuid import UUID, uuid5
 
 import polars as pl
 
 from ea import raw
-from ea.changeset import Changeset
+from ea.changeset import NAMESPACE, Changeset
 from ea.sources.de.btw import CONSTITUENCIES
+from ea.sources.licenses import PUBLIC_RECORD
 from ea.store import DATA, connect
 
 SOURCE = "de.landtag"
@@ -80,7 +81,7 @@ EARLY_SOURCES = {
         "Bayerisches Landesamt für Statistik",
         "Bayern in Zahlen: Statistisches Jahrbuch für Bayern 2024, VIII. Wahlen, C. Landtagswahl",
         EARLY_BY,
-        None,
+        PUBLIC_RECORD,
     ),
     "HE": (
         "Statistisches Bundesamt",
@@ -98,7 +99,7 @@ EARLY_SOURCES = {
             "Landtag election in table 2"
         ),
         EARLY_BB,
-        None,
+        PUBLIC_RECORD,
     ),
 }
 EARLY_SOURCES["HH"] = EARLY_SOURCES["HE"]
@@ -233,6 +234,32 @@ LAND_INFO = {
     "SN": ("14", "Saxony", ("Landtag of Saxony", "Sächsischer Landtag"), "Landtagswahl in Sachsen"),
     "ST": ("15", "Saxony-Anhalt", None, "Landtagswahl in Sachsen-Anhalt"),
     "TH": ("16", "Thuringia", ("Landtag of Thuringia", "Thüringer Landtag"), "Landtagswahl in Thüringen"),
+    "WB": (
+        "WB",
+        "Württemberg-Baden",
+        ("Landtag of Württemberg-Baden", "Landtag von Württemberg-Baden"),
+        "Landtagswahl in Württemberg-Baden",
+    ),
+    "BA": ("BA", "South Baden", ("Landtag of South Baden", "Badischer Landtag"), "Landtagswahl in Baden"),
+    "WH": (
+        "WH",
+        "Württemberg-Hohenzollern",
+        ("Landtag of Württemberg-Hohenzollern", "Landtag für Württemberg-Hohenzollern"),
+        "Landtagswahl in Württemberg-Hohenzollern",
+    ),
+}
+MERGER = date(1952, 4, 25)
+FORMER = {
+    "WB": ("Württemberg-Baden", "wuerttemberg-baden", date(1945, 9, 19), "day", "Q251660", ("wuerttemberg", "baden")),
+    "BA": ("Baden", "suedbaden", date(1945, 1, 1), "year", "Q261407", ("baden",)),
+    "WH": (
+        "Württemberg-Hohenzollern",
+        "wuerttemberg-hohenzollern",
+        date(1947, 1, 1),
+        "year",
+        "Q262733",
+        ("wuerttemberg",),
+    ),
 }
 HISTORY_OTHERS = ("Wgr./Einzelbew.", "Sonstige")
 HISTORY_RELABELED = {
@@ -252,6 +279,7 @@ HISTORY_RELABELED = {
         ("EAP", "Europäische Arbeiterpartei"),
     ),
 }
+HISTORY_PARTY_KEYS = {("BA", "KP"): "KP|Baden"}
 HISTORY_SKIP = {("BE", date(1946, 10, 20))}
 HISTORY_NOTES = {
     "Stand nach der Wiederholungswahl am 12.03.1961.": "The figures include the repeat vote of 12 March 1961.",
@@ -1599,6 +1627,69 @@ def similar(a: str, b: str) -> bool:
     return bool(left and right) and len(left & right) / min(len(left), len(right)) >= 0.75
 
 
+def land_polity(cs: Changeset, abbreviation: str) -> UUID:
+    if abbreviation in FORMER:
+        return cs.key("de.polity", FORMER[abbreviation][1])
+    return cs.polity(f"DE-{abbreviation}")
+
+
+def former_land(cs: Changeset, abbreviation: str, germany: UUID) -> tuple[UUID, UUID]:
+    native, slug, start, precision, item, predecessors = FORMER[abbreviation]
+    english = LAND_INFO[abbreviation][1]
+    land = land_polity(cs, abbreviation)
+    cs.add("polity", id=land, kind="federal_unit", iso_code=None)
+    cs.add("name", entity_id=land, text=english, lang="en", kind="official", is_preferred=True)
+    cs.add(
+        "name",
+        entity_id=land,
+        text=f"Land {native}" if native == "Baden" else native,
+        lang="de",
+        kind="native",
+        is_preferred=False,
+    )
+    cs.add("slug", path=f"de/{slug}", entity_id=land)
+    cs.add("external_id", entity_id=land, scheme="wikidata", value=item)
+    cs.add(
+        "polity_parent",
+        polity_id=land,
+        parent_id=germany,
+        valid_from=start,
+        valid_from_precision=precision,
+        valid_to=MERGER,
+    )
+    area = cs.area("de.land", abbreviation)
+    cs.add("area", id=area, scheme_code="de.land")
+    cs.add("area_code", area_id=area, code=abbreviation, valid_from=start, valid_to=MERGER)
+    cs.add("area_parent", area_id=area, parent_id=cs.area("de.nation", "DE"), valid_from=start, valid_to=MERGER)
+    cs.add("name", entity_id=area, text=english, lang="en", kind="official", is_preferred=True)
+    cs.add("name", entity_id=area, text=native, lang="de", kind="native", is_preferred=False)
+    cs.add(
+        "polity_territory",
+        polity_id=land,
+        area_id=area,
+        valid_from=start,
+        valid_from_precision=precision,
+        valid_to=MERGER,
+    )
+    successor = cs.polity("DE-BW")
+    olds = [cs.key("de.polity", old) for old in predecessors]
+    if {successor, *olds} & cs.minted:
+        raise ValueError(f"run de.weimar_landtage and de.bundeswahlleiterin first: {abbreviation}")
+    for kind, source, target, day in (
+        ("merged_into", land, successor, MERGER),
+        *(("split_into", old, land, date(1945, 9, 19)) for old in olds),
+    ):
+        cs.add(
+            "polity_relation",
+            id=uuid5(NAMESPACE, f"polity_relation\x1f{source}\x1f{kind}\x1f{target}"),
+            from_polity_id=source,
+            to_polity_id=target,
+            kind=kind,
+            date=day,
+        )
+    return land, area
+
+
 def history_parties(
     cs: Changeset, conn: Any, germany: UUID, results: pl.DataFrame, glossary: pl.DataFrame
 ) -> dict[tuple[str, str], UUID]:
@@ -1608,15 +1699,20 @@ def history_parties(
     anywhere = {label: name_ for (_, label), name_ in full.items()}
     folded = {(state, label.casefold()): name_ for (state, label), name_ in full.items()}
     known: dict[str, list[str]] = {}
-    for value, text_ in conn.execute(
-        "select e.value, n.text from external_id e join name n on n.entity_id = e.entity_id where e.scheme = 'de.party'"
+    owner: dict[str, UUID] = {}
+    for value, text_, polity in conn.execute(
+        "select e.value, n.text, p.polity_id from external_id e join name n on n.entity_id = e.entity_id "
+        "join party p on p.id = e.entity_id where e.scheme = 'de.party'"
     ).fetchall():
         known.setdefault(value, []).append(text_)
+        owner[value] = polity
     used = sorted(set(results.filter(~pl.col("label").is_in(HISTORY_OTHERS)).select("state", "label").iter_rows()))
     clusters: dict[str, list[dict[str, Any]]] = {}
     for state, label in used:
         name_ = full.get((state, label)) or folded.get((state, label.casefold())) or anywhere.get(label) or label
-        group = clusters.setdefault(PARTY_ALIASES.get(label.upper(), label.upper()), [])
+        group = clusters.setdefault(
+            HISTORY_PARTY_KEYS.get((state, label)) or PARTY_ALIASES.get(label.upper(), label.upper()), []
+        )
         for cluster in group:
             if similar(cluster["name"], name_):
                 cluster["members"].append(state)
@@ -1638,15 +1734,24 @@ def history_parties(
                 or (bare and len(group) == 1)
             ):
                 party = cs.key("de.party", key)
-            elif len(by_name.get(cluster["name"].casefold(), ())) == 1:
-                party = cs.key("de.party", next(iter(by_name[cluster["name"].casefold()])))
+            elif (
+                len(
+                    matches := [
+                        value
+                        for value in by_name.get(cluster["name"].casefold(), ())
+                        if owner.get(value, germany) in {germany, *(land_polity(cs, s) for s in cluster["members"])}
+                    ]
+                )
+                == 1
+            ):
+                party = cs.key("de.party", matches[0])
             else:
                 minted_key = key if len(group) == 1 and not names else f"{key}|{cluster['name']}"
                 by_name.setdefault(cluster["name"].casefold(), set()).add(minted_key)
                 party = cs.key("de.party", minted_key)
                 if party in cs.minted:
                     states = set(cluster["members"])
-                    polity = germany if len(states) > 1 else cs.polity(f"DE-{next(iter(states))}")
+                    polity = germany if len(states) > 1 else land_polity(cs, next(iter(states)))
                     cs.add("party", id=party, kind="party", polity_id=polity)
                     cs.add("name", entity_id=party, text=cluster["name"], lang="de", kind="official", is_preferred=True)
                     if cluster["label"] != cluster["name"]:
@@ -1662,7 +1767,8 @@ def history_parties(
                 for state_, label in used:
                     if (
                         state_ == state
-                        and PARTY_ALIASES.get(label.upper(), label.upper()) == key
+                        and (HISTORY_PARTY_KEYS.get((state, label)) or PARTY_ALIASES.get(label.upper(), label.upper()))
+                        == key
                         and (state, label) not in ids
                     ):
                         name_ = (
@@ -1688,13 +1794,24 @@ def emit_history(
     glossary: pl.DataFrame,
 ) -> None:
     held = {(abbreviation, state["day"]) for abbreviation, state in STATES.items()}
-    elections = elections.filter(
-        ~pl.struct("state", "day").map_elements(
-            lambda row: (row["state"], row["day"]) in held | HISTORY_SKIP, return_dtype=pl.Boolean
+    headed = {native: abbreviation for abbreviation, (native, *_) in FORMER.items()}
+    elections = (
+        elections.filter(
+            ~pl.struct("state", "day").map_elements(
+                lambda row: (row["state"], row["day"]) in held | HISTORY_SKIP, return_dtype=pl.Boolean
+            )
         )
-        & (~pl.col("heading").str.contains("ehemaligen Land") | (pl.col("day") == date(1956, 3, 4)))
-    ).sort("state", "day")
+        .with_columns(
+            state=pl.when(pl.col("day") < MERGER)
+            .then(pl.col("heading").str.extract(r"ehemaligen Land (.+) am ").replace_strict(headed, default=None))
+            .fill_null(pl.col("state"))
+        )
+        .sort("state", "day")
+    )
     results = results.join(elections.select("index", "state", "day"), on="index")
+    glossary = pl.concat(
+        [glossary, *(glossary.filter(pl.col("state") == "BW").with_columns(state=pl.lit(code)) for code in FORMER)]
+    )
     party_ids = history_parties(cs, conn, germany, results, glossary)
     source = cs.source(HISTORY_PUBLISHER, HISTORY_TITLE)
     cs.add(
@@ -1732,7 +1849,7 @@ def emit_history(
         publisher=TH_PUBLISHER,
         title=TH_TITLE,
         url=TH_URL,
-        license=None,
+        license=PUBLIC_RECORD,
         license_url=None,
     )
     for url in (
@@ -1911,10 +2028,13 @@ def emit_history(
     units: dict[str, UUID] = {}
     for abbreviation in sorted(days):
         code, english, body_names, native_stem = LAND_INFO[abbreviation]
-        land = cs.polity(f"DE-{abbreviation}")
-        land_area = cs.area("de.land", code)
-        if {land, land_area} & cs.minted:
-            raise ValueError(f"run de.bundeswahlleiterin first: {abbreviation} must exist")
+        if abbreviation in FORMER:
+            land, land_area = former_land(cs, abbreviation, germany)
+        else:
+            land = cs.polity(f"DE-{abbreviation}")
+            land_area = cs.area("de.land", code)
+            if {land, land_area} & cs.minted:
+                raise ValueError(f"run de.bundeswahlleiterin first: {abbreviation} must exist")
         units[abbreviation] = cs.unit("de.land", code)
         cs.add(
             "reporting_unit",
@@ -1925,8 +2045,8 @@ def emit_history(
             area_relation="equals",
             area_id=land_area,
             kind="standard",
-            valid_from=None,
-            valid_to=None,
+            valid_from=FORMER[abbreviation][2] if abbreviation in FORMER else None,
+            valid_to=MERGER if abbreviation in FORMER else None,
         )
         body = cs.key(f"{SOURCE}.body", f"landtag:{abbreviation}")
         if body_names is not None:
@@ -1941,6 +2061,8 @@ def emit_history(
             following = ordered[ordered.index(printed) + 1] if ordered.index(printed) + 1 < len(ordered) else None
             if following == date(2021, 9, 26) and abbreviation == "BE":
                 following = date(2023, 2, 12)
+            if following is None and abbreviation in FORMER:
+                following = MERGER
             cs.add("body_size", body_id=body, seats=row["seats"], valid_from=day, valid_to=following)
             same_year = [other for other in ordered if other.year == day.year]
             label = f"{day:%B} {day.year}" if len(same_year) > 1 else str(day.year)
@@ -1961,7 +2083,7 @@ def emit_history(
             cs.add("election", id=election, polity_id=land, kind="general", date_from=day, date_to=day, status="held")
             cs.add("name", entity_id=election, text=english_name, lang="en", kind="official", is_preferred=True)
             cs.add("name", entity_id=election, text=native, lang="de", kind="native", is_preferred=False)
-            path = f"de/{abbreviation.lower()}/{day}-general"
+            path = f"de/{FORMER[abbreviation][1] if abbreviation in FORMER else abbreviation.lower()}/{day}-general"
             cs.add("slug", path=path, entity_id=election)
 
             row_source = (
@@ -2044,7 +2166,9 @@ def emit_history(
                     "comparable. Each voter had three to five votes, and only valid ballot papers were counted, so "
                     "the numbers of voters and invalid votes are not known."
                 )
-            if "ehemaligen Land" in heading or (heading.startswith("Wahl in West-Berlin") and day.year == 1990):
+            if (abbreviation == "BW" and "ehemaligen Land" in heading) or (
+                heading.startswith("Wahl in West-Berlin") and day.year == 1990
+            ):
                 notes.append(f"The source heads this table \u201c{heading}\u201d; its figures are for the whole Land.")
             if (abbreviation, day) == ("HH", date(1993, 9, 19)):
                 notes.append(
