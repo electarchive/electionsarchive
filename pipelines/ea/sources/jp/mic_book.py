@@ -19,7 +19,7 @@ from PIL import Image
 
 from ea import batch, raw
 from ea.changeset import Changeset, slug
-from ea.sources.jp import mic
+from ea.sources.jp import mic, mic_chiji
 from ea.sources.jp.mic import BLOCK_OF
 from ea.sources.jp.mlit import BLOCKS, PREFECTURES
 from ea.store import DATA, connect
@@ -27,6 +27,7 @@ from ea.store import DATA, connect
 SOURCE = "jp.mic_book"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
+PAGES = DATA / "pages" / SOURCE
 WAYBACK = "https://web.archive.org/web/{stamp}id_/{url}"
 
 
@@ -52,10 +53,11 @@ class Scanned:
     held: str
     file: str
     sections: dict[str, tuple[int, int]]
+    national: tuple[int, int]
 
 
 SCANNED = {
-    43: Scanned("2003-11-09", "000008255748", {"forfeit": (339, 342), "smd": (373, 408), "pr": (420, 452)}),
+    43: Scanned("2003-11-09", "000008255748", {"forfeit": (339, 342), "smd": (373, 408), "pr": (420, 452)}, (179, 180)),
 }
 MODEL = "claude-haiku-5-5"
 PROMPT = "1"
@@ -289,6 +291,12 @@ class Word:
     text: str
 
 
+@dataclass(frozen=True)
+class Crop:
+    width: float
+    height: float
+
+
 def pages(path: Path) -> list[list[Word]]:
     html = subprocess.run(["pdftotext", "-bbox", str(path), "-"], check=True, capture_output=True, text=True).stdout
     out = []
@@ -462,6 +470,369 @@ def pr(book: list[list[Word]], held: str) -> list[dict]:
     return rows
 
 
+SPACE = "\u0793"
+MARK = "\u0664"
+DUAL = "\u3280"
+SEX = {"\u21b5": "男", "\u115a": "女"}
+STATUS = {"\u0ce8": "前", "\u18c2": "新", "\u0c30": "元"}
+OUTCOME = {"\u14b0": "当", "\u2aad": "落"}
+PARTY_HEAD = "\u187d"
+VOTES_HEAD = "\u14e7"
+SETTLED = {
+    "2003-11-09 北海道 9 141,442 name": "はとやま 由紀夫",
+    "2003-11-09 岩手県 4 10,642.653 legal": "髙橋 綱記",
+    "2003-11-09 宮城県 5 6,853 name": "高野 博",
+    "2003-11-09 愛知県 6 97,776 name": "前田 ゆうきち",
+    "2003-11-09 愛知県 7 16,255 name": "坂林 たくみ",
+    "2003-11-09 愛知県 15 14,622 name": "斎藤 ひろむ",
+    "2003-11-09 大阪府 11 8,599 name": "よしたけ 信昭",
+    "2003-11-09 大阪府 13 33,446 name": "吉井 英勝",
+    "2003-11-09 熊本県 2 9,829 name": "まえだ 正治",
+    "2003-11-09 東北 日本共産党 2": "五島 平",
+    "2003-11-09 東北 民主党 17": "斎藤 じゅん",
+    "2003-11-09 北関東 自由民主党 4": "蓮実 進",
+    "2003-11-09 北関東 自由民主党 13": "さとう 勉",
+    "2003-11-09 北関東 自由民主党 35": "百武 公親",
+    "2003-11-09 北関東 民主党 15": "中野 ジョー",
+    "2003-11-09 南関東 自由民主党 26": "江口 かずお",
+    "2003-11-09 東京都 民主党 27": "片山 光代",
+    "2003-11-09 北陸信越 自由民主党 1": "萩山 教嚴",
+    "2003-11-09 北陸信越 自由民主党 18": "吉田 六ざえもん",
+    "2003-11-09 近畿 民主党 38": "北神 けいろう",
+    "2003-11-09 近畿 自由民主党 11": "谷畑 孝",
+    "2003-11-09 近畿 日本共産党 3": "吉井 英勝",
+    "2003-11-09 中国 自由民主党 23": "鈴木 匡信",
+    "2003-11-09 四国 自由民主党 3": "山口 しゅんいち",
+    "2003-11-09 九州 民主党 11": "なら崎 きん弥",
+}
+CONFLICTS: list[str] = []
+
+
+def glyphs(path: Path, first: int, last: int) -> dict[int, tuple[Crop, list[Word]]]:
+    html = subprocess.run(
+        ["pdftotext", "-f", str(first), "-l", str(last), "-bbox", str(path), "-"],
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout
+    out = {}
+    for number, chunk in enumerate(html.split("<page ")[1:], first):
+        width, height = (float(v) for v in re.findall(r'(?:width|height)="([\d.]+)"', chunk)[:2])
+        out[number] = (
+            Crop(width, height),
+            [
+                Word(
+                    float(x0),
+                    float(x1),
+                    float(y0),
+                    float(y1),
+                    "".join(chr(ord(c) + 30) if ord(c) < 0x60 else c for c in text),
+                )
+                for x0, y0, x1, y1, text in WORD.findall(chunk)
+            ],
+        )
+    return out
+
+
+def within(row: list[Word], low: float, high: float) -> list[Word]:
+    return [w for w in row if low <= w.x < high]
+
+
+def boxed(words: list[Word], crop: Crop) -> list[float]:
+    return [
+        min(w.x for w in words) / crop.width,
+        min(w.top for w in words) / crop.height,
+        max(w.right for w in words) / crop.width,
+        max(w.bottom for w in words) / crop.height,
+    ]
+
+
+def coded(words: list[Word]) -> str:
+    seen = {(round(w.x), round(w.bottom), w.text): w for w in words}
+    return re.sub(f"[ {SPACE}\u0201]", "", "".join(w.text for w in seen.values()))
+
+
+def forfeit_layer(book: dict[int, tuple[Crop, list[Word]]], first: int, last: int) -> list[dict]:
+    found = []
+    for number in range(first, last + 1):
+        crop, words = book[number]
+        for row in lines([w for w in words if 200 < w.bottom < 900]):
+            for column, (low, high, value_low, value_high) in enumerate(((88, 110, 205, 262), (336, 360, 455, 510))):
+                district = [w for w in within(row, low, high) if w.text.isdigit()]
+                value = [w for w in within(row, value_low, value_high) if FIGURE.match(w.text)]
+                if district and value:
+                    found.append(
+                        (
+                            number,
+                            column,
+                            row[0].bottom,
+                            int(district[0].text),
+                            value[0].text,
+                            boxed(value, crop),
+                        )
+                    )
+    out = []
+    prefecture = -1
+    for number, _, _, district, value, box in sorted(found, key=lambda f: f[:3]):
+        prefecture += district == 1
+        out.append(
+            {"prefecture": PREFECTURES[prefecture][0], "district": district, "value": value, "page": number, "box": box}
+        )
+    return out
+
+
+def smd_layer(book: dict[int, tuple[Crop, list[Word]]], first: int, last: int) -> list[dict]:
+    out: list[dict] = []
+    prefecture, district = -1, 0
+    for number in range(first, last + 1):
+        crop, words = book[number]
+        rows = lines([w for w in words if 195 < w.bottom < 900])
+        for row in rows:
+            votes = [w for w in within(row, 230, 262) if FIGURE.match(w.text)]
+            if not votes:
+                continue
+            votes += [w for w in within(row, 262, 285) if re.fullmatch(r"\.\d+", w.text)]
+            numbered = [w for w in within(row, 116, 140) if w.text.isdigit()]
+            if numbered:
+                if int(numbered[0].text) == 1:
+                    prefecture += 1
+                elif int(numbered[0].text) != district + 1:
+                    raise ValueError(f"page {number}: district {numbered[0].text} follows {district}")
+                district = int(numbered[0].text)
+            bottom = row[0].bottom
+            ballot = [w for r in rows if bottom - 6 <= r[0].bottom <= bottom + 0.5 for w in within(r, 165, 175)]
+            legal = [w for r in rows if bottom + 0.5 < r[0].bottom <= bottom + 6 for w in within(r, 175, 186)]
+            out.append(
+                {
+                    "prefecture": PREFECTURES[prefecture][0],
+                    "district": district,
+                    "page": number,
+                    "votes": "".join(w.text for w in votes),
+                    "box": boxed(votes, crop),
+                    "result": "当" if any(w.text == MARK for w in within(row, 140, 160)) else "落",
+                    "sex": next(SEX[w.text] for w in within(row, 288, 305)),
+                    "status": next(STATUS[w.text] for w in within(row, 438, 452)),
+                    "dual": any(w.text == DUAL for w in within(row, 530, 545)),
+                    "codes": {"name": coded(ballot), "legal": coded(legal), "party": coded(within(row, 330, 438))},
+                }
+            )
+    return out
+
+
+def pr_layer(book: dict[int, tuple[Crop, list[Word]]], first: int, last: int) -> list[dict]:
+    out: list[dict] = []
+    block, header = -1, None
+    for number in range(first, last + 1):
+        crop, words = book[number]
+        rows = lines([w for w in words if 120 < w.bottom < 800])
+        title = coded([w for w in words if 128 < w.bottom < 140 and w.x < 120])
+        if title != header:
+            block, header = block + 1, title
+        for origin in sorted(w.x for w in words if w.text == PARTY_HEAD):
+            panel = [within(row, origin - 4, origin + 250) for row in rows]
+            panel = [row for row in panel if row]
+            start = next(i for i, row in enumerate(panel) if row[0].text == PARTY_HEAD)
+            votes_row, seats_row = panel[start + 1], panel[start + 2]
+            if votes_row[0].text != VOTES_HEAD:
+                raise ValueError(f"page {number}: no votes row at {origin}")
+            votes = [w for w in within(votes_row, origin + 150, origin + 240) if re.match(r"^[\d,]+", w.text)]
+            seats = [w for w in within(seats_row, origin + 200, origin + 225) if re.match(r"^\d+", w.text)]
+            members = []
+            for row in panel[start + 4 :]:
+                rank = [w for w in within(row, origin + 5, origin + 16) if w.text.isdigit()]
+                if not rank:
+                    continue
+                order = [w for w in within(row, origin + 160, origin + 182) if w.text.isdigit()]
+                mark = [OUTCOME[w.text] for w in within(row, origin + 182, origin + 198) if w.text in OUTCOME]
+                members.append(
+                    {
+                        "rank": int(rank[0].text),
+                        "order": int(order[0].text) if order else None,
+                        "district": mark[0] if mark else None,
+                        "codes": coded(within(row, origin + 30, origin + 155)),
+                        "bottom": row[0].bottom,
+                    }
+                )
+            out.append(
+                {
+                    "block": BLOCKS[block][0],
+                    "page": number,
+                    "votes": votes[0].text.split()[0],
+                    "box": boxed(votes, crop),
+                    "seats": int(seats[0].text.split()[0]),
+                    "codes": coded(within(panel[start], origin + 30, origin + 250)),
+                    "members": members,
+                }
+            )
+    return out
+
+
+def national_layer(book: dict[int, tuple[Crop, list[Word]]], first: int, last: int) -> list[Decimal]:
+    out = []
+    for number in range(first, last + 1):
+        rows = [row for row in lines(book[number][1]) if row[0].bottom < 900 and any(FIGURE.match(w.text) for w in row)]
+        out += [figure(w.text) for w in rows[-1] if FIGURE.match(w.text)]
+    return sorted(out)
+
+
+def ocr_rows(scanned: Scanned, kind: str, number: int) -> dict[int, list[dict]]:
+    first, last = scanned.sections[kind]
+    field = "panels" if kind == "pr" else "rows"
+    return {
+        page: [row for tile in TILES[kind] for row in read(scanned, page, tile, number)[field]]
+        for page in range(first, last + 1)
+    }
+
+
+def tally(votes: str) -> str:
+    return re.sub(r"[^\d,.]", "", unicodedata.normalize("NFKC", votes))
+
+
+def learned(pairs: list[tuple[str, list[str | None]]]) -> dict[str, str]:
+    counts: dict[str, dict[str, int]] = {}
+    for codes, (first, second) in pairs:
+        if first is None or mic.plain(first) != mic.plain(second or ""):
+            continue
+        text = mic.plain(unicodedata.normalize("NFKC", first))
+        if len(text) == len(codes):
+            for code, char in zip(codes, text, strict=True):
+                counts.setdefault(code, {}).setdefault(char, 0)
+                counts[code][char] += 1
+    return {code: max(seen, key=lambda c: seen[c]) for code, seen in counts.items()}
+
+
+def settled(codes: str, reads: list[str | None], cipher: dict[str, str], where: str) -> str:
+    texts = [unicodedata.normalize("NFKC", text) for text in reads if text is not None]
+    decoded = mic.party_name("".join(cipher.get(code, "?") for code in codes))
+    for text in texts:
+        if mic.party_name(text) == decoded:
+            return text
+    if len(texts) == READS and len({mic.party_name(text) for text in texts}) == 1 and "?" in decoded:
+        return texts[0]
+    if where in SETTLED:
+        return SETTLED[where]
+    CONFLICTS.append(f"{where}: reads {texts} against the text layer's {decoded}")
+    return texts[0] if texts else decoded
+
+
+def scanned_parse(scanned: Scanned) -> tuple[list[dict], list[dict], list[dict]]:
+    held = scanned.held
+    path = raw.cached(SOURCE, ESTAT.format(scanned.file)).path
+    first = min(first for first, _ in scanned.sections.values())
+    book = glyphs(path, min(first, scanned.national[0]), max(last for _, last in scanned.sections.values()))
+    forfeits = {(r["prefecture"], r["district"]): r for r in forfeit_layer(book, *scanned.sections["forfeit"])}
+    people = smd_layer(book, *scanned.sections["smd"])
+    panels = pr_layer(book, *scanned.sections["pr"])
+    smd_reads = [ocr_rows(scanned, "smd", number) for number in range(1, READS + 1)]
+    pr_reads = [ocr_rows(scanned, "pr", number) for number in range(1, READS + 1)]
+
+    def matched(rows: list[dict], votes: str) -> dict | None:
+        found = [row for row in rows if tally(row["votes"]) == votes]
+        return found[0] if found else None
+
+    for person in people:
+        person["reads"] = [matched(rows[person["page"]], person["votes"]) for rows in smd_reads]
+    for panel in panels:
+        panel["reads"] = [matched(rows[panel["page"]], panel["votes"]) for rows in pr_reads]
+    pairs: list[tuple[str, list[str | None]]] = []
+    for person in people:
+        for field in ("name", "legal", "party"):
+            texts = [row[field] if row else None for row in person["reads"]]
+            pairs.append((person["codes"][field], texts))
+    for panel in panels:
+        pairs.append((panel["codes"], [row["party"] if row else None for row in panel["reads"]]))
+        for index, member in enumerate(panel["members"]):
+            texts = [
+                row["members"][index]["name"] if row and index < len(row["members"]) else None for row in panel["reads"]
+            ]
+            pairs.append((member["codes"], texts))
+    cipher = learned(pairs)
+
+    districts = []
+    for (prefecture, district), forfeit in forfeits.items():
+        group = [p for p in people if (p["prefecture"], p["district"]) == (prefecture, district)]
+        total = sum(figure(p["votes"]) for p in group)
+        if abs(total - figure(forfeit["value"]) * 10) > 1 or [p["result"] for p in group].count("当") != 1:
+            raise ValueError(f"{held} {prefecture} {district}: {total} against forfeit {forfeit['value']}")
+        for order, person in enumerate(group, 1):
+            where = f"{held} {prefecture} {district} {person['votes']}"
+            name, legal, party = (
+                settled(
+                    person["codes"][field],
+                    [r[field] if r else None for r in person["reads"]],
+                    cipher,
+                    f"{where} {field}",
+                )
+                if person["codes"][field]
+                else None
+                for field in ("name", "legal", "party")
+            )
+            person.update(name=name, legal=legal, party=mic.party_name(party or ""))
+            districts.append(
+                {
+                    "held": held,
+                    "prefecture": prefecture,
+                    "district": district,
+                    "name": name,
+                    "legal": legal,
+                    "party": person["party"],
+                    "status": person["status"],
+                    "order": order,
+                    "page": person["page"],
+                    "votes": str(figure(person["votes"])),
+                    "result": person["result"],
+                    "box": person["box"],
+                }
+            )
+
+    lists, members = [], []
+    totals: dict[str, Decimal] = {}
+    for panel in panels:
+        where = f"{held} {panel['block']}"
+        party = mic.party_name(
+            settled(panel["codes"], [r["party"] if r else None for r in panel["reads"]], cipher, where)
+        )
+        totals[party] = totals.get(party, Decimal(0)) + figure(panel["votes"])
+        lists.append(
+            {
+                "held": held,
+                "block": panel["block"],
+                "party": party,
+                "page": panel["page"],
+                "seats": panel["seats"],
+                "votes": str(figure(panel["votes"])),
+                "box": panel["box"],
+            }
+        )
+        for index, member in enumerate(panel["members"]):
+            texts = [r["members"][index]["name"] if r and index < len(r["members"]) else None for r in panel["reads"]]
+            row = {
+                "rank": member["rank"],
+                "order": member["order"],
+                "district": member["district"],
+                "name": settled(member["codes"], texts, cipher, f"{where} {party} {index + 1}"),
+            }
+            match = dual(people, panel["block"], party, row) if row["district"] else None
+            members.append(
+                {
+                    "held": held,
+                    "block": panel["block"],
+                    "party": party,
+                    "rank": row["rank"],
+                    "name": row["name"],
+                    "prefecture": match["prefecture"] if match else None,
+                    "district_number": match["district"] if match else None,
+                    "elected": row["order"],
+                    "district": row["district"],
+                }
+            )
+    if CONFLICTS:
+        raise ValueError("\n".join(CONFLICTS))
+    if sorted([*totals.values(), sum(totals.values())]) != national_layer(book, *scanned.national):
+        raise ValueError(f"{held}: block list votes {totals} do not add up to the national totals")
+    return districts, lists, members
+
+
 def odd(text: str) -> bool:
     return any(
         not unicodedata.name(ch, "").startswith(("CJK", "HIRAGANA", "KATAKANA")) and ch not in " 々ヶ" for ch in text
@@ -485,6 +856,11 @@ def dual(people: list[dict], block: str, party: str, row: dict) -> dict:
         ),
         reverse=True,
     )
+    surname = [p for p in pool if row["name"].split()[0] in {(p[k] or "").split(" ")[0] for k in ("name", "legal")}]
+    if len(surname) == 1 and scored and scored[0][0] >= 2 and pool[scored[0][1]] not in surname:
+        return surname[0]
+    if len(surname) == 1 and len(scored) > 1 and scored[1][0] == scored[0][0]:
+        return surname[0]
     if not scored or scored[0][0] < 2 or (len(scored) > 1 and scored[1][0] == scored[0][0]):
         raise ValueError(f"{block} {party} {row['name']}: no single district candidate matches")
     return pool[scored[0][1]]
@@ -511,7 +887,13 @@ def parse() -> None:
             for order, row in enumerate(group, 1):
                 districts.append(
                     {key: row[key] for key in ("held", "prefecture", "district", "name", "legal", "party", "status")}
-                    | {"order": order, "page": row["page"], "votes": str(figure(row["value"])), "result": row["result"]}
+                    | {
+                        "order": order,
+                        "page": row["page"],
+                        "votes": str(figure(row["value"])),
+                        "result": row["result"],
+                        "box": None,
+                    }
                 )
         for party in pr(words, book.held):
             if any(
@@ -521,7 +903,7 @@ def parse() -> None:
                 raise ValueError(f"{book.held} {party['block']} {party['party']} appears twice")
             lists.append(
                 {key: party[key] for key in ("held", "block", "party", "page", "seats")}
-                | {"votes": str(figure(party["votes"]))}
+                | {"votes": str(figure(party["votes"])), "box": None}
             )
             for row in party["list"]:
                 row["name"] = LISTED.get((book.held, row["name"]), row["name"])
@@ -541,10 +923,15 @@ def parse() -> None:
                         "district": row["district"],
                     }
                 )
+    for scanned in SCANNED.values():
+        found = scanned_parse(scanned)
+        districts += found[0]
+        lists += found[1]
+        members += found[2]
     PARSED.mkdir(parents=True, exist_ok=True)
-    pl.DataFrame(districts).write_parquet(PARSED / f"districts-v{VERSION}.parquet")
-    pl.DataFrame(lists).write_parquet(PARSED / f"lists-v{VERSION}.parquet")
-    pl.DataFrame(members).write_parquet(PARSED / f"members-v{VERSION}.parquet")
+    pl.DataFrame(districts, infer_schema_length=None).write_parquet(PARSED / f"districts-v{VERSION}.parquet")
+    pl.DataFrame(lists, infer_schema_length=None).write_parquet(PARSED / f"lists-v{VERSION}.parquet")
+    pl.DataFrame(members, infer_schema_length=None).write_parquet(PARSED / f"members-v{VERSION}.parquet")
 
 
 SMD_METHOD = (
@@ -561,6 +948,22 @@ PR_METHOD = (
 )
 
 
+LAYER = {
+    43: " The 2003 book is a PDF whose text layer uses its fonts' internal glyph codes. Figures, district numbers, and "
+    "result marks are read from that layer, and each figure links to its place on the page. Names and parties come "
+    "from two machine reads of the page images, checked against the text layer, and the few that disagreed were "
+    "settled by reading the page."
+}
+PR_METHODS = {
+    43: PR_METHOD.replace(
+        " The book's tables of list votes by prefecture have no text layer and are not loaded.",
+        " The book's table of list votes by prefecture is not loaded yet. Block list votes add up to its national "
+        "totals.",
+    )
+    + LAYER[43]
+}
+
+
 def emit() -> Path:
     districts = pl.read_parquet(PARSED / f"districts-v{VERSION}.parquet")
     lists = pl.read_parquet(PARSED / f"lists-v{VERSION}.parquet")
@@ -573,9 +976,9 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Japan's House of Representatives general election of 2005 from the Ministry of Internal Affairs "
-            "and Communications' 結果調 book: district candidates by district and party lists by block, with declared "
-            "winners, block seats, and elected list members",
+            summary="Japan's House of Representatives general elections of 2003 and 2005 from the Ministry of Internal "
+            "Affairs and Communications' 結果調 books: district candidates by district and party lists by block, with "
+            "declared winners, block seats, and elected list members",
             polity="JP",
         )
 
@@ -623,12 +1026,40 @@ def emit() -> Path:
                 raise ValueError("run jp.mic first")
             return entity
 
-        values: list[tuple[UUID, UUID, UUID, Decimal]] = []
-        for number, book in BOOKS.items():
-            held = book.held
+        values: list[tuple[UUID, UUID, UUID, Decimal, UUID | None, list[float] | None]] = []
+        held_by = {number: book.held for number, book in BOOKS.items()} | {
+            number: scanned.held for number, scanned in SCANNED.items()
+        }
+        for number, held in sorted(held_by.items()):
             day = date.fromisoformat(held)
-            for stamp, url in (book.index, book.book):
-                cs.artifact(raw.cached(SOURCE, archived(stamp, url)), source)
+            pages_: dict[int, UUID] = {}
+            if number in BOOKS:
+                for stamp, url in (BOOKS[number].index, BOOKS[number].book):
+                    cs.artifact(raw.cached(SOURCE, archived(stamp, url)), source)
+            else:
+                cached = raw.cached(SOURCE, ESTAT.format(SCANNED[number].file))
+                artifact = cs.artifact(cached, source)
+                PAGES.mkdir(parents=True, exist_ok=True)
+                used = {
+                    int(page)
+                    for frame in (districts, lists)
+                    for page in frame.filter(pl.col("held") == held)["page"].to_list()
+                }
+                for page in sorted(used):
+                    image = PAGES / f"{cached.sha256}-{page}.png"
+                    if not image.exists():
+                        mic_chiji.render(cached.path, page, 100).save(image)
+                    width, height = Image.open(image).size
+                    pages_[page] = cs.page(artifact, page)
+                    cs.add(
+                        "source_page",
+                        id=pages_[page],
+                        artifact_id=artifact,
+                        page_number=page,
+                        image_key=f"pages/{SOURCE}/{image.name}",
+                        width=width,
+                        height=height,
+                    )
             election = cs.key(f"{SOURCE}.election", held)
             cs.add("election", id=election, polity_id=japan, kind="general", date_from=day, date_to=day, status="held")
             name(election, f"{day.year} Japanese general election")
@@ -684,7 +1115,7 @@ def emit() -> Path:
                     is_default=True,
                     completeness=1,
                 )
-                cs.add("note", entity_id=result_set, kind="methodology", body_md=SMD_METHOD)
+                cs.add("note", entity_id=result_set, kind="methodology", body_md=SMD_METHOD + LAYER.get(number, ""))
                 for row in rows.iter_rows(named=True):
                     option = cs.key(f"{SOURCE}.option", f"{key}:{row['order']}")
                     member = party(row["party"], held)
@@ -710,7 +1141,9 @@ def emit() -> Path:
                     )
                     if row["result"] == "当":
                         cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected", seats=1)
-                    values.append((result_set, unit, option, Decimal(row["votes"])))
+                    values.append(
+                        (result_set, unit, option, Decimal(row["votes"]), pages_.get(row["page"]), row["box"])
+                    )
 
             for block, (block_code, block_english) in blocks.items():
                 key = f"{held}:pr:{block_code}"
@@ -745,7 +1178,7 @@ def emit() -> Path:
                     is_default=True,
                     completeness=1,
                 )
-                cs.add("note", entity_id=block_set, kind="methodology", body_md=PR_METHOD)
+                cs.add("note", entity_id=block_set, kind="methodology", body_md=PR_METHODS.get(number, PR_METHOD))
                 block_votes = {row["party"]: Decimal(row["votes"]) for row in allocated.iter_rows(named=True)}
                 declared_seats = {row["party"]: row["seats"] for row in allocated.iter_rows(named=True)}
                 engine = mic.dhondt(block_votes, size)
@@ -779,7 +1212,9 @@ def emit() -> Path:
                         ballot_position=position,
                         ballot_label=mic.party_label(row["party"]),
                     )
-                    values.append((block_set, block_unit, option, Decimal(row["votes"])))
+                    values.append(
+                        (block_set, block_unit, option, Decimal(row["votes"]), pages_.get(row["page"]), row["box"])
+                    )
                     if row["seats"]:
                         cs.add("outcome", result_set_id=block_set, option_id=option, kind="won", seats=row["seats"])
                     for listed in members.filter(
@@ -818,7 +1253,7 @@ def emit() -> Path:
                                 kind="elected",
                             )
 
-        for result_set, place, option, amount_ in values:
+        for result_set, place, option, amount_, page_id, box in values:
             cs.add(
                 "result_value",
                 result_set_id=result_set,
@@ -830,4 +1265,19 @@ def emit() -> Path:
                 flags=0,
                 value=amount_,
             )
+            if page_id is not None and box is not None:
+                cs.add(
+                    "value_locator",
+                    result_set_id=result_set,
+                    unit_id=place,
+                    option_id=option,
+                    channel=0,
+                    measure=mic.VOTES,
+                    count_round=0,
+                    page_id=page_id,
+                    x0=box[0],
+                    y0=box[1],
+                    x1=box[2],
+                    y1=box[3],
+                )
         return cs.write()
