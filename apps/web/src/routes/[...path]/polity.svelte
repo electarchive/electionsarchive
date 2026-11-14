@@ -156,6 +156,7 @@
     school_district: m.polity_kind_school_district,
     special_district: m.polity_kind_special_district,
     judicial_district: m.polity_kind_judicial_district,
+    tribal_nation: m.polity_kind_tribal_nation,
   };
   const kinds = $derived(
     Object.keys(KINDS).filter(

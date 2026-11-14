@@ -2611,6 +2611,7 @@
   "versus_verdict_parties": "{a} finished ahead of {b} in {one} of the {total} contests where both ran.",
   "polity_kind_special_district": "Special districts",
   "polity_kind_judicial_district": "Judicial districts",
+  "polity_kind_tribal_nation": "Tribal nations",
   "coverage_upcoming": "Upcoming, ready",
   "coverage_upcoming_def": "Still to vote, and the archive already holds everything but the results: the office or seat, the district, the voting system, and every candidate with their party, or for a ballot measure, its answers and official wording. These count as covered until election day. From the next day they need results.",
   "coverage_upcoming_of": "{count} upcoming and ready",

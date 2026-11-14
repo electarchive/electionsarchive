@@ -450,7 +450,7 @@ export const seats = {
             ) as wide,
             (select split_part(s.path, '/', -1) from slug s where s.entity_id = c.id and s.is_current limit 1) as segment
           from body b
-          join polity p on p.id = b.polity_id and p.kind in ('municipality', 'submunicipal', 'county', 'school_district', 'special_district')
+          join polity p on p.id = b.polity_id and p.kind in ('municipality', 'submunicipal', 'county', 'school_district', 'special_district', 'tribal_nation')
           join contest c on c.body_id = b.id
           join election e on e.id = c.election_id and e.status = 'held'
           where b.id = ${id}::uuid and c.allocation_parent_id is null and c.party_scope_id is null

@@ -23808,6 +23808,7 @@ export const polities = {
                 "school_district",
                 "judicial_district",
                 "special_district",
+                "tribal_nation",
               ]),
             ),
           ),
