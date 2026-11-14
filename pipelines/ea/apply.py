@@ -386,42 +386,6 @@ def _promote_stranded(conn: Connection, stage: Stage, columns: list[str]) -> Non
     )
 
 
-def _unheld(stage: Stage, target: sql.Identifier) -> sql.Composable:
-    if stage.pipeline == "contrib":
-        return sql.SQL("")
-    return sql.SQL(" and (select o.pipeline from changeset o where o.id = {}.changeset_id) <> 'contrib'").format(target)
-
-
-def _log_held(stage: Stage, table: str, held: list[tuple[str, object, object]]) -> None:
-    if not held:
-        return
-    print(
-        f"{table}: kept {len(held)} rows a contributor holds over staged updates, "
-        f"first {', '.join(json.dumps(key, default=str) for _, key, _ in held[:3])}"
-    )
-    with (DATA / "logs" / "held.tsv").open("a", encoding="utf-8") as log:
-        log.writelines(
-            f"{changeset}\t{table}\t{json.dumps(key, default=str)}\t{stage.pipeline}\t{json.dumps(values, default=str)}\n"
-            for changeset, key, values in held
-        )
-
-
-def _hold(conn: Connection, stage: Stage, table: str, matched: sql.Composable, key: sql.Composable) -> None:
-    if stage.pipeline == "contrib":
-        return
-    _log_held(
-        stage,
-        table,
-        conn.execute(
-            sql.SQL(
-                """select current_setting('ea.changeset_id'), {key}, to_jsonb(s)
-                   from {staged} s join public.{target} p on {matched} join changeset c on c.id = p.changeset_id
-                   where c.pipeline = 'contrib'"""
-            ).format(key=key, staged=stage.staged(table), target=sql.Identifier(table), matched=matched)
-        ).fetchall(),
-    )
-
-
 def _sweep(conn: Connection, stage: Stage, table: str) -> None:
     conn.execute(
         sql.SQL("delete from public.{} p using changeset c where {}").format(sql.Identifier(table), stage.swept(table))
@@ -623,19 +587,8 @@ def _publish_table(conn: Connection, stage: Stage, table: str, deferred: list[st
                 raise ValueError(f"row_drop {id}: {relation} key matches {dropped} rows")
     if "id" in columns:
         compared = [column for column in columns if column != "id"]
-        if compared:
-            _hold(
-                conn,
-                stage,
-                table,
-                sql.SQL("p.id = s.id and ({}) is distinct from ({})").format(
-                    sql.SQL(", ").join(sql.SQL("p.{}").format(sql.Identifier(c)) for c in compared),
-                    sql.SQL(", ").join(sql.SQL("s.{}").format(sql.Identifier(c)) for c in compared),
-                ),
-                sql.SQL("jsonb_build_object('id', s.id)"),
-            )
         conflict = (
-            sql.SQL("do update set {} where (({}) is distinct from ({}){}){}").format(
+            sql.SQL("do update set {} where (({}) is distinct from ({}){})").format(
                 sql.SQL(", ").join(sql.SQL("{0} = excluded.{0}").format(sql.Identifier(c)) for c in compared),
                 sql.SQL(", ").join(sql.SQL("{}.{}").format(target, sql.Identifier(c)) for c in compared),
                 sql.SQL(", ").join(sql.SQL("excluded.{}").format(sql.Identifier(c)) for c in compared),
@@ -644,7 +597,6 @@ def _publish_table(conn: Connection, stage: Stage, table: str, deferred: list[st
                     if table == "name" and stage.pipeline == "identity"
                     else ""
                 ),
-                _unheld(stage, target),
             )
             if compared
             else sql.SQL("do nothing")
@@ -692,46 +644,28 @@ def _publish_table(conn: Connection, stage: Stage, table: str, deferred: list[st
         return
     if table == "translation":
         compared = [column for column in columns if column not in ("source_md5", "lang")]
-        _hold(
-            conn,
-            stage,
-            table,
-            sql.SQL("p.source_md5 = s.source_md5 and p.lang = s.lang and ({}) is distinct from ({})").format(
-                sql.SQL(", ").join(sql.SQL("p.{}").format(sql.Identifier(c)) for c in compared),
-                sql.SQL(", ").join(sql.SQL("s.{}").format(sql.Identifier(c)) for c in compared),
-            ),
-            sql.SQL("jsonb_build_object('source_md5', s.source_md5, 'lang', s.lang)"),
-        )
         conn.execute(
             sql.SQL(
                 """insert into public.translation ({0}) select {0} from {1}
                    on conflict (source_md5, lang) do update set {2}
                    where ({3}) is distinct from ({4})
-                     and not (excluded.origin = 'machine' and translation.origin <> 'machine'){5}"""
+                     and not (excluded.origin = 'machine' and translation.origin <> 'machine')"""
             ).format(
                 listed,
                 staged,
                 sql.SQL(", ").join(sql.SQL("{0} = excluded.{0}").format(sql.Identifier(c)) for c in compared),
                 sql.SQL(", ").join(sql.SQL("translation.{}").format(sql.Identifier(c)) for c in compared),
                 sql.SQL(", ").join(sql.SQL("excluded.{}").format(sql.Identifier(c)) for c in compared),
-                _unheld(stage, target),
             )
         )
         return
     if table == "external_id":
-        _hold(
-            conn,
-            stage,
-            table,
-            sql.SQL("p.scheme = s.scheme and p.value = s.value and p.entity_id <> s.entity_id"),
-            sql.SQL("jsonb_build_object('scheme', s.scheme, 'value', s.value)"),
-        )
         conn.execute(
             sql.SQL(
                 """insert into public.external_id ({0}) select distinct {0} from {1}
                    on conflict (scheme, value) do update set entity_id = excluded.entity_id
-                   where external_id.entity_id <> excluded.entity_id{2}"""
-            ).format(listed, staged, _unheld(stage, target))
+                   where external_id.entity_id <> excluded.entity_id"""
+            ).format(listed, staged)
         )
         return
     if table == "entity_merge":
@@ -1210,7 +1144,7 @@ def _publish_table(conn: Connection, stage: Stage, table: str, deferred: list[st
         ).fetchall():
             if held != entity:
                 raise ValueError(f"note {note} is not that text on {entity}")
-            if writer != stage.pipeline and stage.pipeline != "contrib":
+            if writer != stage.pipeline:
                 raise ValueError(f"note {note} was written by {writer}, not {stage.pipeline}")
         conn.execute(sql.SQL("delete from public.note where id in (select note_id from {})").format(staged))
     if table == "option_drop":
@@ -1406,12 +1340,11 @@ def _publish_table(conn: Connection, stage: Stage, table: str, deferred: list[st
         conn.execute(
             sql.SQL(
                 """delete from public.{target} p using {staged} s, changeset c
-                   where c.id = p.changeset_id and (c.pipeline = any({writers}) or {contrib}) and {overlaps}"""
+                   where c.id = p.changeset_id and c.pipeline = any({writers}) and {overlaps}"""
             ).format(
                 target=target,
                 staged=staged,
                 writers=stage.writers(table),
-                contrib=sql.Literal(stage.pipeline == "contrib"),
                 overlaps=stage.overlaps(table),
             )
         )
@@ -1434,34 +1367,9 @@ def _publish_table(conn: Connection, stage: Stage, table: str, deferred: list[st
                 )
             print(f"{table}: cleared {sum(row[2] for row in cleared)} rows in {len(cleared)} listed sets")
         conn.execute(sql.SQL("delete from public.{} p using changeset c where {}").format(target, stage.stale(table)))
-    kept = sql.SQL("")
-    if table in stage.temporal and stage.pipeline != "contrib":
-        guard = sql.SQL(
-            "exists (select from public.{} p join changeset c on c.id = p.changeset_id where c.pipeline = 'contrib' and {})"
-        ).format(target, stage.overlaps(table))
-        keys = [*stage.temporal[table], *(column for column in ("valid_from", "valid_to") if column in columns)]
-        _log_held(
-            stage,
-            table,
-            conn.execute(
-                sql.SQL(
-                    "select current_setting('ea.changeset_id'), jsonb_build_object({}), to_jsonb(s) from {} s where not {} and {}"
-                ).format(
-                    sql.SQL(", ").join(
-                        sql.SQL("{}, s.{}").format(sql.Literal(key), sql.Identifier(key)) for key in keys
-                    ),
-                    staged,
-                    _present(conn, table, columns),
-                    guard,
-                )
-            ).fetchall(),
-        )
-        kept = sql.SQL(" and not {}").format(guard)
     if table == "name" and "is_preferred" in columns:
         _promote_stranded(conn, stage, columns)
-    _insert_absent(
-        conn, stage, table, columns, staged, sql.SQL("not {}{}").format(_present(conn, table, columns), kept)
-    )
+    _insert_absent(conn, stage, table, columns, staged, sql.SQL("not {}").format(_present(conn, table, columns)))
     if table == "name" and "is_preferred" in columns:
         _rank_preferred(conn, stage)
 

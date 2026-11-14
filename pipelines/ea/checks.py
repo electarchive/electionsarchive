@@ -882,7 +882,7 @@ def _scope(stage: Stage) -> list[tuple[str, sql.Composed]]:
                            from {staged} s
                            join public.{target} p on p.id = s.id
                            join changeset c on c.id = p.changeset_id
-                           where c.pipeline is distinct from {pipeline} and c.pipeline <> 'contrib'
+                           where c.pipeline is distinct from {pipeline}
                              and ({current}) is distinct from ({incoming})"""
                     ).format(
                         entity=entity,
@@ -909,31 +909,9 @@ def _scope(stage: Stage) -> list[tuple[str, sql.Composed]]:
                              where p.scheme = s.scheme and p.value = s.value and p.entity_id <> s.entity_id limit 1
                            ) p
                            join changeset c on c.id = p.changeset_id
-                           where c.pipeline is distinct from {pipeline} and c.pipeline <> 'contrib'"""
+                           where c.pipeline is distinct from {pipeline}"""
                     ).format(
                         table=sql.Literal(table), staged=stage.staged(table), pipeline=sql.Literal(stage.pipeline)
-                    ),
-                )
-            )
-        if table in stage.temporal and stage.pipeline == "contrib":
-            queries.append(
-                (
-                    "scope.owner",
-                    sql.SQL(
-                        """select distinct null::uuid, null::uuid,
-                                  jsonb_build_object('table', {table}, {key}, p.{column}, 'pipeline', c.pipeline)
-                           from public.{target} p
-                           join {staged} s on {overlaps}
-                           join changeset c on c.id = p.changeset_id
-                           where not c.pipeline = any({writers}) and c.pipeline <> 'contrib'"""
-                    ).format(
-                        table=sql.Literal(table),
-                        key=sql.Literal(stage.temporal[table][0]),
-                        column=sql.Identifier(stage.temporal[table][0]),
-                        target=sql.Identifier(table),
-                        staged=stage.staged(table),
-                        overlaps=stage.overlaps(table),
-                        writers=stage.writers(table),
                     ),
                 )
             )
@@ -941,8 +919,6 @@ def _scope(stage: Stage) -> list[tuple[str, sql.Composed]]:
 
 
 def overlaps(stage: Stage, limit: int | None = None) -> list[tuple[str, sql.Composed]]:
-    if stage.pipeline == "contrib":
-        return []
     queries: list[tuple[str, sql.Composed]] = []
     for table, keys in stage.temporal.items():
         columns = stage.tables[table]
@@ -965,11 +941,9 @@ def overlaps(stage: Stage, limit: int | None = None) -> list[tuple[str, sql.Comp
                                                              'pipeline', c.pipeline, 'changeset_id', c.id)
                                           order by p.valid) as rows
                          from public.{target} p join changeset c on c.id = p.changeset_id
-                         where {overlaps} and not c.pipeline = any({writers}) and c.pipeline <> 'contrib'
+                         where {overlaps} and not c.pipeline = any({writers})
                        ) o
                        where o.rows is not null
-                         and not exists (select from public.{target} p join changeset c on c.id = p.changeset_id
-                                         where c.pipeline = 'contrib' and {overlaps})
                        order by 3{limit}"""
                 ).format(
                     table=sql.Literal(table),
