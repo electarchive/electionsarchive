@@ -1,0 +1,18 @@
+{
+  "year": 1866,
+  "day": "1866",
+  "polity": "US-PA",
+  "publisher": "Pennsylvania Senate (Smull's Legislative Hand Book)",
+  "title": "Smull's Legislative Hand Book, 1866, general election 1866-10-09, Governor by county",
+  "license": "Public record",
+  "file": {
+    "url": "manual://MF-664/Smull_s_Legislative_Hand_Book_and_Manual.pdf"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "governor": "Governor, counties down; the table prints two elections side by side, 1863 (Curtin, Woodward) and 1866 (Geary, Clymer); only the 1866 columns are this volume's contest, the 1863 columns are another office"
+  },
+  "leaves": [
+    149
+  ]
+}

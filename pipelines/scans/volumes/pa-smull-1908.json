@@ -1,0 +1,28 @@
+{
+  "year": 1908,
+  "day": "1908-11-03",
+  "polity": "US-PA",
+  "publisher": "Pennsylvania Senate (Smull's Legislative Hand Book)",
+  "title": "Smull's Legislative Hand Book, 1909, general election 1908-11-03, presidential electors and Representatives in Congress by county",
+  "license": "Public record",
+  "file": {
+    "url": "manual://MF-664/The_Pennsylvania_Manual.pdf"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "president": "Presidential electors, counties down, one column per party ticket headed by its presidential and vice-presidential candidates (vote for the first elector of each ticket)",
+    "house": "Representative in Congress, one table per district, counties down (Philadelphia by ward), a column per candidate and party line; several party-line columns for one candidate are fused"
+  },
+  "leaves": [
+    562,
+    679,
+    680,
+    681,
+    682,
+    683,
+    684,
+    685,
+    686,
+    687
+  ]
+}
