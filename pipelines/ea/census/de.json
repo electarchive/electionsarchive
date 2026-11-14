@@ -370,6 +370,34 @@
       "kind": "official_body",
       "note": "Scan on the Internet Archive. Printed page 634: Volksabstimmung and Reichstag vote of 10 April 1938 by Wahlkreis; the plebiscite is one question, and the total over the old Reich and the former Austria is 49,359,956 valid votes."
     },
+    "bpb-einheitswahl-1950": {
+      "title": "Die ersten Einheitswahlen zur Volkskammer am 15. Oktober 1950",
+      "publisher": "Bundeszentrale für politische Bildung (DDR kompakt)",
+      "url": "https://www.bpb.de/themen/deutsche-teilung/ddr-kompakt/521483/die-ersten-einheitswahlen-zur-volkskammer-am-15-oktober-1950/",
+      "kind": "official_body",
+      "note": "Gives 15 October 1950 as the day of the first Einheitswahl, held for the Volkskammer, Landtage, Kreistage, and Gemeindevertretungen together."
+    },
+    "gbl-ddr-1970": {
+      "title": "Beschluß des Staatsrates über die Durchführung von Wahlen im Jahre 1970, Gesetzblatt der DDR Teil I Nr. 1 vom 5. Januar 1970",
+      "publisher": "Staatsrat der DDR",
+      "url": "https://www.gvoon.de/art/dokumente/1970/gesetzblatt-gbl-ddr-teil-1-1970/pdf/gesetzblatt-gbl-ddr-teil-1-1970-seite_005.pdf",
+      "kind": "official_body",
+      "note": "Scan page 5: the elections to the Kreistage, Stadtverordnetenversammlungen, Stadtbezirksversammlungen, and Gemeindevertretungen are called for 22 March 1970."
+    },
+    "staatsrecht-ddr-1984": {
+      "title": "Staatsrecht der DDR, Lehrbuch, Berlin 1984, pp. 227 and 228",
+      "publisher": "Staatsverlag der DDR",
+      "url": "https://www.gvoon.de/art/dokumente/1984/staatsrecht-ddr-lehrbuch-1984/pdf/staatsrecht-ddr-lehrbuch-1984-seite_228.pdf",
+      "kind": "official_body",
+      "note": "Names the elections to the local assemblies of 19 May 1974 and 20 May 1979."
+    },
+    "nj-ddr-1984": {
+      "title": "Neue Justiz 1984, pp. 78 and 80",
+      "publisher": "Neue Justiz",
+      "url": "https://www.gvoon.de/art/dokumente/1984/zeitschrift-neue-justiz-nj-ddr-1984/pdf/zeitschrift-neue-justiz-nj-ddr-1984-seite_080.pdf",
+      "kind": "official_body",
+      "note": "Names 6 May 1984 as the day of the elections to the Kreistage, Stadtverordnetenversammlungen, Stadtbezirksversammlungen, and Gemeindevertretungen."
+    },
     "bundestag-ddr-1989": {
       "title": "Die Kommunalwahlen in der DDR vom 7. Mai 1989",
       "publisher": "Deutscher Bundestag, Wissenschaftliche Dienste",
@@ -3903,6 +3931,12 @@
     {
       "dates": [
         {
+          "date": "1950-10-15",
+          "contests": 1,
+          "note": "First Einheitswahl; the Kreistage and Gemeindevertretungen were elected with the Volkskammer and Landtage.",
+          "source": "bpb-einheitswahl-1950"
+        },
+        {
           "date": "1957-06-23",
           "contests": 1,
           "note": "Elections to the Kreistage, Stadtverordnetenversammlungen, Stadtbezirksversammlungen, and Gemeindevertretungen on single lists of the National Front.",
@@ -3919,6 +3953,30 @@
           "contests": 1,
           "note": "Elections to the Kreistage, Stadtverordnetenversammlungen, Stadtbezirksversammlungen, and Gemeindevertretungen on single lists of the National Front.",
           "source": "ddr-staatsrat-1965"
+        },
+        {
+          "date": "1970-03-22",
+          "contests": 1,
+          "note": "Kreistage, Stadtverordnetenversammlungen, Stadtbezirksversammlungen, and Gemeindevertretungen.",
+          "source": "gbl-ddr-1970"
+        },
+        {
+          "date": "1974-05-19",
+          "contests": 1,
+          "note": "Local assemblies; the term became five years from 1974.",
+          "source": "staatsrecht-ddr-1984"
+        },
+        {
+          "date": "1979-05-20",
+          "contests": 1,
+          "note": "Local assemblies.",
+          "source": "staatsrecht-ddr-1984"
+        },
+        {
+          "date": "1984-05-06",
+          "contests": 1,
+          "note": "Kreistage, Stadtverordnetenversammlungen, Stadtbezirksversammlungen, and Gemeindevertretungen.",
+          "source": "nj-ddr-1984"
         },
         {
           "date": "1989-05-07",
