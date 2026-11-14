@@ -85,6 +85,13 @@ OPEN_DATA = (
     "Hasil Pemilu Presiden dan Wakil Presiden Tahun 2019 per Provinsi (Open Data KPU)",
 )
 TICKETS = {
+    2004: (
+        (1, "H. Wiranto, S.H.", "Ir. H. Salahuddin Wahid"),
+        (2, "Hj. Megawati Soekarnoputri", "K.H. Hasyim Muzadi"),
+        (3, "Prof. Dr. H. Amin Rais", "Dr. Ir. Siswono Yudo Husodo"),
+        (4, "H. Susilo Bambang Yudhoyono", "Drs. H. Muhammad Yusuf Kalla"),
+        (5, "Dr. H. Hamzah Haz", "H. Agum Gumelar"),
+    ),
     2014: (
         (1, "H. Prabowo Subianto", "Ir. H.M. Hatta Rajasa"),
         (2, "Ir. H. Joko Widodo", "Drs. H.M. Jusuf Kalla"),
@@ -100,6 +107,16 @@ TICKETS = {
     ),
 }
 PERSONS = {
+    "H. Wiranto, S.H.": ("Q731740", "Wiranto"),
+    "Ir. H. Salahuddin Wahid": ("Q12511575", "Salahuddin Wahid"),
+    "Hj. Megawati Soekarnoputri": ("Q76179", "Megawati Soekarnoputri"),
+    "K.H. Hasyim Muzadi": ("Q5680756", "Hasyim Muzadi"),
+    "Prof. Dr. H. Amin Rais": ("Q2202270", "Amien Rais"),
+    "Dr. Ir. Siswono Yudo Husodo": ("Q13097173", "Siswono Yudo Husodo"),
+    "H. Susilo Bambang Yudhoyono": ("Q57405", "Susilo Bambang Yudhoyono"),
+    "Drs. H. Muhammad Yusuf Kalla": ("Q76354", "Jusuf Kalla"),
+    "Dr. H. Hamzah Haz": ("Q76344", "Hamzah Haz"),
+    "H. Agum Gumelar": ("Q4694586", "Agum Gumelar"),
     "H. Prabowo Subianto": ("Q2107268", "Prabowo Subianto"),
     "Ir. H.M. Hatta Rajasa": ("Q4201732", "Hatta Rajasa"),
     "Ir. H. Joko Widodo": ("Q3318231", "Joko Widodo"),
@@ -112,7 +129,7 @@ PERSONS = {
     "H. Ganjar Pranowo, S.H., M.I.P.": ("Q12483474", "Ganjar Pranowo"),
     "Prof. Dr. H. M. Mahfud MD": ("Q6892160", "Mahfud MD"),
 }
-DAYS = {2014: date(2014, 7, 9), 2019: date(2019, 4, 17), 2024: date(2024, 2, 14)}
+DAYS = {2004: date(2004, 7, 5), 2014: date(2014, 7, 9), 2019: date(2019, 4, 17), 2024: date(2024, 2, 14)}
 PROVINCES = {
     "ACEH": "11",
     "SUMATERA UTARA": "12",
@@ -179,6 +196,16 @@ RULING_2014 = (
     ),
 )
 RULING_2014_PAGES = (4580, 4581)
+RULING_2004 = (
+    "https://s.mkri.id/public/content/persidangan/putusan/062_PHPU-B-II_2004.pdf",
+    (
+        "Putusan Mahkamah Konstitusi Nomor 062/PHPU-B-II/2004 tentang Perselisihan Hasil Pemilihan Umum Presiden "
+        "dan Wakil Presiden Tahun 2004"
+    ),
+)
+RULING_2004_PAGE = 4
+RULING_2004_FINDING = 52
+ADVANCED_2004 = {2, 4}
 ORDER_2014 = (*(label for label in PROVINCES if PROVINCES[label] not in {"65", "93", "94", "95", "96"}), ABROAD)
 SHEETS = {
     1: ((11, "registered"), (23, "voters")),
@@ -193,6 +220,7 @@ def fetch() -> None:
         raw.fetch(SOURCE, url, suffix=".pdf")
     raw.fetch(SOURCE, OPEN_DATA[0], suffix=".xlsx")
     raw.fetch(SOURCE, RULING_2014[0], suffix=".pdf")
+    raw.fetch(SOURCE, RULING_2004[0], suffix=".pdf")
 
 
 def _pages(pdf: Path, dpi: int, folder: Path) -> list[Path]:
@@ -388,6 +416,58 @@ def _lampiran_2024() -> list[dict[str, object]]:
     return rows
 
 
+def _ruling_2004() -> list[dict[str, object]]:
+    path = str(raw.cached(SOURCE, RULING_2004[0]).path)
+    page = str(RULING_2004_PAGE)
+    out = subprocess.run(
+        ["pdftotext", "-f", page, "-l", page, "-tsv", path, "-"], check=True, capture_output=True, text=True
+    ).stdout
+    words = sorted(
+        (
+            word
+            for word in csv.DictReader(io.StringIO(out), delimiter="\t", quoting=csv.QUOTE_NONE)
+            if word["level"] == "5" and re.fullmatch(r"\d{1,3}(?:\.\d{3})+", word["text"])
+        ),
+        key=lambda word: float(word["top"]),
+    )
+    tickets = [number for number, *_ in TICKETS[2004]]
+    if len(words) != len(tickets) + 1:
+        raise ValueError(f"2004 ruling page {page}: {len(words)} figures, expected {len(tickets) + 1}")
+    rows: list[dict[str, object]] = []
+    for ticket, word in zip((*tickets, None), words, strict=True):
+        left, top, width, height = (float(word[key]) for key in ("left", "top", "width", "height"))
+        rows.append(
+            {
+                "year": 2004,
+                "unit": TOTAL,
+                "measure": "votes" if ticket else "valid",
+                "ticket": ticket,
+                "value": int(word["text"].replace(".", "")),
+                "url": RULING_2004[0],
+                "page": RULING_2004_PAGE,
+                "box": [left, top, left + width, top + height],
+                "fixed": False,
+            }
+        )
+    votes = {row["ticket"]: int(str(row["value"])) for row in rows}
+    if sum(votes[ticket] for ticket in tickets) != votes[None]:
+        raise ValueError("2004: ticket votes do not sum to the valid votes")
+    if set(sorted(tickets, key=lambda ticket: -votes[ticket])[:2]) != ADVANCED_2004:
+        raise ValueError("2004: the two leading tickets are not the ones sent to the second round")
+    if votes[4] * 2 > votes[None]:
+        raise ValueError("2004: a ticket passed 50 percent in the first round")
+    finding = subprocess.run(
+        ["pdftotext", "-f", str(RULING_2004_FINDING), "-l", str(RULING_2004_FINDING), path, "-"],
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout
+    for ticket in (1, 2):
+        if f"{votes[ticket]:,}".replace(",", ".") not in finding:
+            raise ValueError(f"2004: the court's finding does not state ticket {ticket}'s {votes[ticket]} votes")
+    return rows
+
+
 def _ruling_2014() -> list[dict[str, object]]:
     first, last = RULING_2014_PAGES
     out = subprocess.run(
@@ -448,6 +528,7 @@ def parse() -> None:
     _check_2019(rows)
     declared_2014 = {row["ticket"]: row["value"] for row in _national(2014)}
     rows += _ruling_2014()
+    rows += _ruling_2004()
     declared = {row["ticket"]: row["value"] for row in _national(2024)}
     rows += _lampiran_2024()
     for row in rows:
@@ -467,11 +548,19 @@ def parse() -> None:
                 "ticket": number,
                 "president": president,
                 "vice_president": vice,
-                "elected": number == winner,
+                "outcome": (
+                    "elected"
+                    if number == winner
+                    else "lost"
+                    if winner
+                    else "advanced"
+                    if number in ADVANCED_2004
+                    else "eliminated"
+                ),
             }
             for year, tickets in TICKETS.items()
             for number, president, vice in tickets
-            for winner in [WINNERS[year][2]]
+            for winner in [WINNERS[year][2] if year in WINNERS else None]
         ]
     ).write_parquet(PARSED / "tickets.parquet")
     print(f"{len(rows)} results rows")
@@ -488,7 +577,20 @@ SYSTEM_2024 = (
     "rules cannot yet express the provincial condition. Prabowo Subianto and Gibran Rakabuming Raka took 58.59 "
     "percent nationally and at least 20 percent in every province, and KPU decree 504/2024 declared them elected."
 )
+SYSTEM_2004 = (
+    "No electoral system is attached: UU 23/2003 art. 66(2) elects a ticket with over 50 percent of the valid votes and "
+    "at least 20 percent in more than half of the provinces, else the top two meet in a second round (art. 67), and "
+    "the archive's rules cannot yet express the provincial condition. No ticket passed 50 percent, so Susilo Bambang "
+    "Yudhoyono and Jusuf Kalla, and Megawati Soekarnoputri and Hasyim Muzadi, went on to the second round of "
+    "20 September 2004."
+)
 NOTES = {
+    2004: (
+        "National ticket votes and valid votes as declared in KPU decree 79/SK/KPU/Tahun 2004 of 26 July 2004, which "
+        "Constitutional Court ruling 062/PHPU-B-II/2004 quotes (page 4 of the ruling's PDF). The court's findings "
+        "(page 52) restate the first and second tickets' votes and rejected the challenge. The ticket votes sum to the "
+        "valid votes. The ruling reproduces no provincial table of ticket votes, so only national figures are loaded."
+    ),
     2014: (
         "Ticket votes, valid votes, and invalid votes by province and abroad from KPU's national recapitulation "
         "(Model DD1-PPWP, 22 July 2014), which KPU's legal documentation site does not attach to decree 535/2014. KPU "
@@ -564,7 +666,7 @@ def emit() -> Path:
                         polity_id=indonesia,
                         scheme_code=scheme,
                         code=code,
-                        area_relation="equals" if label in PROVINCES and not spans else "within",
+                        area_relation="within" if label == ABROAD or spans else "equals",
                         area_id=cs.area(scheme, code) if label in PROVINCES and not spans else nation,
                         kind="abroad_mission" if label == ABROAD else "standard",
                         valid_from=None,
@@ -585,8 +687,9 @@ def emit() -> Path:
             CERTIFICATE,
             LAMPIRAN_2024,
             RULING_2014,
+            RULING_2004,
         ):
-            publisher = COURT if url == RULING_2014[0] else KPU
+            publisher = COURT if url in {RULING_2014[0], RULING_2004[0]} else KPU
             sources[url] = cs.source(publisher, title)
             cs.add(
                 "source",
@@ -641,13 +744,13 @@ def emit() -> Path:
         persons: dict[str, UUID] = {}
         for ballot, (item, common) in PERSONS.items():
             persons[ballot] = cs.key("wikidata", item)
-            if persons[ballot] in cs.minted:
+            if persons[ballot] in cs.minted and persons[ballot] not in list(persons.values())[:-1]:
                 cs.add("person", id=persons[ballot])
                 name(persons[ballot], common)
 
         for year, day in sorted(DAYS.items(), reverse=True):
             rows = results.filter(pl.col("year") == year)
-            general = year != 2014
+            general = year not in (2004, 2014)
             election = cs.key("id.election", str(day))
             cs.add(
                 "election",
@@ -681,15 +784,20 @@ def emit() -> Path:
                 magnitude=1,
                 round_number=1,
                 previous_round_id=None,
-                electoral_system_id=None if year == 2024 else two,
+                electoral_system_id=None if year in (2004, 2024) else two,
                 default_result_kind="counted",
             )
-            name(contest, f"{year} Indonesian presidential election", "en", "english")
-            name(contest, f"Pemilihan Umum Presiden dan Wakil Presiden Tahun {year}")
+            first = ", first round" if year == 2004 else ""
+            name(contest, f"{year} Indonesian presidential election{first}", "en", "english")
+            name(
+                contest, f"Pemilihan Umum Presiden dan Wakil Presiden Tahun {year}{' Putaran Pertama' if first else ''}"
+            )
             cs.add("slug", path=f"{path}/president", entity_id=contest)
             if year == 2024:
                 cs.add("note", entity_id=contest, kind="caveat", body_md=SYSTEM_2024)
-            source = {2014: RULING_2014[0], 2019: CERTIFICATE[0], 2024: LAMPIRAN_2024[0]}[year]
+            if year == 2004:
+                cs.add("note", entity_id=contest, kind="caveat", body_md=SYSTEM_2004)
+            source = {2004: RULING_2004[0], 2014: RULING_2014[0], 2019: CERTIFICATE[0], 2024: LAMPIRAN_2024[0]}[year]
             result_set = cs.key(f"{SOURCE}.result_set", contest_key)
             cs.add(
                 "result_set",
@@ -705,8 +813,8 @@ def emit() -> Path:
             )
             cs.add("note", entity_id=result_set, kind="methodology", body_md=NOTES[year])
             options: dict[int, UUID] = {}
-            for number, president, vice, elected in (
-                tickets.filter(pl.col("year") == year).select("ticket", "president", "vice_president", "elected").rows()
+            for number, president, vice, outcome in (
+                tickets.filter(pl.col("year") == year).select("ticket", "president", "vice_president", "outcome").rows()
             ):
                 option = options[number] = cs.key("id.option", f"{contest_key}:{number}")
                 cs.add(
@@ -732,10 +840,11 @@ def emit() -> Path:
                     "outcome",
                     result_set_id=result_set,
                     option_id=option,
-                    kind="elected" if elected else "lost",
+                    kind=outcome,
                     seats=None,
                 )
-            rows = rows.filter(pl.col("unit") != TOTAL)
+            if rows["unit"].n_unique() > 1:
+                rows = rows.filter(pl.col("unit") != TOTAL)
             for label, measure, ticket, value, url, number, box in rows.select(
                 "unit", "measure", "ticket", "value", "url", "page", "box"
             ).rows():
@@ -764,7 +873,7 @@ def emit() -> Path:
                     y1=y1 / height,
                 )
             if year == 2024:
-                winner = tickets.filter((pl.col("year") == year) & pl.col("elected"))["ticket"].item()
+                winner = tickets.filter((pl.col("year") == year) & (pl.col("outcome") == "elected"))["ticket"].item()
                 cells = {
                     (label, ticket): value for label, ticket, value in rows.select("unit", "ticket", "value").rows()
                 }
