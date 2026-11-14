@@ -16,12 +16,13 @@ from ea.sources.jp import mic_chiji
 from ea.store import DATA, connect
 
 SOURCE = "jp.pref_chiji"
-VERSION = "3"
+VERSION = "4"
 PARSED = DATA / "parsed" / SOURCE
 WAYBACK = "https://web.archive.org/web/{stamp}id_/{url}"
 TOCHIGI = "https://www.pref.tochigi.lg.jp/senkyo"
 IBARAKI = "https://www.pref.ibaraki.jp/somu/shichoson/senkyo/senkan"
 WAKAYAMA = "https://www.pref.wakayama.lg.jp/prefg/010600/wsenkan"
+TOKYO = "https://www.senkyo.metro.tokyo.lg.jp/documents/d/senkyo"
 
 
 @dataclass(frozen=True)
@@ -52,6 +53,15 @@ COMMISSIONS = {
         "https://www.pref.tochigi.lg.jp/kensei/kouhou/hp/chosakuken/index.html",
         "出典：栃木県選挙管理委員会",
     ),
+    "東京都": Commission(
+        "東京都選挙管理委員会",
+        "東京都知事選挙 候補者別得票数（全候補）・開票結果内訳・投票結果",
+        "https://www.senkyo.metro.tokyo.lg.jp/election/tochiji-all",
+        "Copyright Tokyo Metropolitan Government (site policy); counts published as facts with attribution, raw files "
+        "not redistributed",
+        "https://www.senkyo.metro.tokyo.lg.jp/policy",
+        "出典：東京都選挙管理委員会",
+    ),
     "和歌山県": Commission(
         "和歌山県選挙管理委員会",
         "和歌山県知事選挙 開票結果集計表・投票結果集計表",
@@ -62,7 +72,27 @@ COMMISSIONS = {
         "出典：和歌山県ホームページ",
     ),
 }
-RECORDS: dict[str, tuple[str, str]] = {
+RECORDS: dict[str, tuple[str, ...]] = {
+    "2024-07-07:東京都": (
+        f"{TOKYO}/r06tochiji_kaihyo_kouhoshatokuhyo_2",
+        f"{TOKYO}/r06tochiji_touhyo_2",
+        f"{TOKYO}/r06tochiji_kaihyo_uchiwake_2",
+    ),
+    "2020-07-05:東京都": (
+        f"{TOKYO}/r02tochiji_kaihyo_kouhoshatokuhyo_2",
+        f"{TOKYO}/r02tochiji_touhyo_2",
+        f"{TOKYO}/r02tochiji_kaihyo_uchiwake_2",
+    ),
+    "2016-07-31:東京都": (
+        f"{TOKYO}/h28tochiji_kaihyo_kouhoshatokuhyo_2",
+        f"{TOKYO}/h28tochiji_touhyo_2",
+        f"{TOKYO}/h28tochiji_kaihyo_uchiwake_2",
+    ),
+    "2014-02-09:東京都": (
+        f"{TOKYO}/tochiji-result2014-detail_2",
+        f"{TOKYO}/tochiji-turnout2014_2",
+        f"{TOKYO}/tochiji-result2014-utiwake_2",
+    ),
     "2025-09-07:茨城県": (
         f"{IBARAKI}/2025tizi/documents/d_kaihyo_k_50_99.xlsx",
         f"{IBARAKI}/2025tizi/documents/d_tohyo_k_50_1.xlsx",
@@ -78,6 +108,10 @@ RECORDS: dict[str, tuple[str, str]] = {
     "2013-09-08:茨城県": (
         f"{IBARAKI}/2013chijisen/documents/d_kaihyo_k_50_02.xls",
         f"{IBARAKI}/2013chijisen/documents/d_tohyo_k_50_1.xls",
+    ),
+    "2024-11-17:栃木県": (
+        f"{TOCHIGI}/r06chiji/file/DS_KAIHYO_K_50.xls",
+        f"{TOCHIGI}/r06chiji/file/DS_TOHYO_K_50.xls",
     ),
     "2020-11-15:栃木県": (
         WAYBACK.format(stamp="20230308052226", url=f"{TOCHIGI}/r02chiji/file/DS_KAIHYO_K_50.xls"),
@@ -115,11 +149,15 @@ RECORDS: dict[str, tuple[str, str]] = {
 FIELDS = ("valid", "invalid", "cast", "unreturned", "voters")
 MEASURES = {"registered": 2, "voters": 14, "cast": 3, "valid": 4, "invalid": 5}
 PLACE = re.compile(r"^\S+?[市町村]$")
+WARD = re.compile(r"^\S+?[区市町村]$")
+XLSX = {f"{TOKYO}/r06tochiji_{name}_2" for name in ("kaihyo_kouhoshatokuhyo", "kaihyo_uchiwake", "touhyo")} | {
+    f"{TOKYO}/r02tochiji_touhyo_2"
+}
 TOTAL = re.compile(r"^県\s*計$")
 
 
 def suffix(url: str) -> str:
-    return Path(url).suffix
+    return Path(url).suffix or (".xlsx" if url in XLSX else ".xls")
 
 
 def fetch() -> None:
@@ -208,6 +246,57 @@ def ibaraki_registered(path: Path) -> dict[str, tuple[str, str]]:
     }
 
 
+def grid(path: Path) -> list[list[str]]:
+    reader = fastexcel.read_excel(str(path))
+    rows = []
+    for sheet in reader.sheet_names:
+        frame = reader.load_sheet(sheet, header_row=None, dtypes="string").to_polars()
+        rows.extend([unicodedata.normalize("NFKC", v or "").strip() for v in row] for row in frame.iter_rows())
+    return rows
+
+
+def tokyo_votes(path: Path, breakdown: Path) -> tuple[list[str], list[dict[str, Any]], dict[str, Any]]:
+    rows = grid(path)
+    names: dict[int, str] = {}
+    votes: dict[str, dict[int, str]] = {}
+    columns: dict[int, int] = {}
+    for i, row in enumerate(rows):
+        numbered = {c: int(v) for c, v in enumerate(row) if v.isdigit()}
+        if numbered and sorted(numbered.values()) == list(range(len(names) + 1, len(names) + len(numbered) + 1)):
+            columns = numbered
+            for c, n in columns.items():
+                names[n] = rows[i + 1][c] + rows[i + 2][c]
+                if not names[n]:
+                    raise ValueError(f"{path}: no name for candidate {n}")
+        elif columns and WARD.match(row[0]):
+            values = {n: row[c] for c, n in columns.items()}
+            if not all(values.values()):
+                raise ValueError(f"{path}: {row[0]} lacks votes for candidates {sorted(columns.values())}")
+            votes.setdefault(row[0], {}).update(values)
+    n = len(names)
+    places, total = [], None
+    for row in cells(breakdown):
+        if row and (WARD.match(row[0]) or row[0] == "★都計"):
+            got, cut, other, valid, invalid, cast, kept, refused, voters = row[1:10]
+            unreturned = str(number(kept) + number(refused))
+            spread = ["0", ""] * n + [got, cut, other, valid, invalid, cast, unreturned, voters]
+            if row[0] == "★都計":
+                total = counts(spread, n)
+                continue
+            if sorted(votes[row[0]]) != list(range(1, n + 1)):
+                raise ValueError(f"{path}: {row[0]} lacks candidates")
+            spread[0 : 2 * n : 2] = [votes[row[0]][k] for k in range(1, n + 1)]
+            places.append({"place": row[0], **counts(spread, n)})
+    if total is None or {p["place"] for p in places} != set(votes):
+        raise ValueError(f"{breakdown} does not cover the candidate table")
+    total["votes"] = [str(sum(Decimal(p["votes"][k]) for p in places)) for k in range(n)]
+    return [names[k] for k in range(1, n + 1)], places, total
+
+
+def tokyo_registered(path: Path) -> dict[str, tuple[str, str]]:
+    return {row[0]: (str(number(row[3])), str(number(row[6]))) for row in cells(path) if row and WARD.match(row[0])}
+
+
 def layout(path: Path) -> list[str]:
     text = subprocess.run(["pdftotext", "-layout", str(path), "-"], check=True, capture_output=True, text=True).stdout
     return unicodedata.normalize("NFKC", text).splitlines()
@@ -243,7 +332,8 @@ def pdf_registered(path: Path) -> dict[str, tuple[str, str]]:
     return out
 
 
-READERS = {
+READERS: dict[str, tuple[Any, Any]] = {
+    "東京都": (tokyo_votes, tokyo_registered),
     "栃木県": (excel_votes, excel_registered),
     "茨城県": (ibaraki_votes, ibaraki_registered),
     "和歌山県": (pdf_votes, pdf_registered),
@@ -255,10 +345,10 @@ def parse() -> None:
     elections = pl.read_parquet(mic_chiji.PARSED / f"elections-v{mic_chiji.VERSION}.parquet")
     people = pl.read_parquet(mic_chiji.PARSED / f"candidates-v{mic_chiji.VERSION}.parquet")
     rows = []
-    for key, (votes_url, turnout_url) in RECORDS.items():
-        votes_path, turnout_path = raw.cached(SOURCE, votes_url).path, raw.cached(SOURCE, turnout_url).path
+    for key, urls in RECORDS.items():
+        votes_path, turnout_path, *extra = (raw.cached(SOURCE, url).path for url in urls)
         votes_reader, turnout_reader = READERS[key.split(":")[1]]
-        names, places, total = votes_reader(votes_path)
+        names, places, total = votes_reader(votes_path, *extra)
         registered = turnout_reader(turnout_path)
         official = elections.filter(pl.col("key") == key).row(0, named=True)
         candidates = people.filter(pl.col("key") == key).sort("order")
@@ -289,7 +379,7 @@ def parse() -> None:
                 raise ValueError(f"{key}: {field} sums to {summed}, the record's total is {total[field]}")
             if official[field] is not None and summed != Decimal(official[field]):
                 raise ValueError(f"{key}: {field} sums to {summed}, the summary prints {official[field]}")
-        rows.extend({"key": key, "votes_url": votes_url, "turnout_url": turnout_url, **p} for p in places)
+        rows.extend({"key": key, "urls": list(urls), **p} for p in places)
     pl.DataFrame(rows, infer_schema_length=None).write_parquet(PARSED / f"municipalities-v{VERSION}.parquet")
 
 
@@ -316,7 +406,7 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary="Japan's prefectural governor elections by municipality from the prefectural election "
-            "commissions' count and turnout tables (Ibaraki, Tochigi, and Wakayama)",
+            "commissions' count and turnout tables (Ibaraki, Tochigi, Tokyo, and Wakayama)",
             polity="JP",
         )
         sources = {}
@@ -360,7 +450,7 @@ def emit() -> Path:
             }
             source = sources[prefecture]
             first = rows.row(0, named=True)
-            for url in (first["votes_url"], first["turnout_url"]):
+            for url in first["urls"]:
                 cs.artifact(raw.cached(SOURCE, url), source)
             result_set = cs.key(f"{SOURCE}.result_set", key)
             cs.add(
