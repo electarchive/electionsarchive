@@ -910,7 +910,8 @@ def emit() -> Path:
                 parties[key] = known[qid]
                 continue
             parties[key] = cs.key(f"{SOURCE}.party", key)
-            cs.add("party", id=parties[key], kind="party", polity_id=catalonia)
+            if parties[key] in cs.minted:
+                cs.add("party", id=parties[key], kind="party", polity_id=catalonia)
             name(parties[key], row["name"], "ca")
             if row["sigles"] and row["sigles"] != row["name"]:
                 name(parties[key], row["sigles"], "ca", "abbreviation")
