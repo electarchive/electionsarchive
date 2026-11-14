@@ -1,0 +1,719 @@
+{
+  "polity": "US-MN",
+  "publisher": "Minnesota Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.mn_lrl",
+  "title": "Legislative Manual of the State of Minnesota 1931, election returns for state officers by precinct (general election 1930-11-04)",
+  "file": {
+    "url": "https://www.lrl.mn.gov/archive/sessions/electionresults/1930-11-04-g-man.pdf",
+    "item": "https://www.lrl.mn.gov/mngov/electionresults"
+  },
+  "contests": {
+    "governor": {
+      "year": 1930,
+      "day": "1930-11-04",
+      "special": false,
+      "state": "MN",
+      "chamber": "governor",
+      "district": null
+    },
+    "senate": {
+      "year": 1930,
+      "day": "1930-11-04",
+      "special": false,
+      "state": "MN",
+      "chamber": "senate",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 2,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 4,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 6,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 8,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 10,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 12,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 14,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 16,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 18,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 20,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 22,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 24,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 26,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 28,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 30,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 32,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 34,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 36,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 38,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 40,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 42,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 44,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 46,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 48,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 50,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 52,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 54,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 56,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 58,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 60,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 62,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 64,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 66,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 68,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 70,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 72,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 74,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 76,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 78,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 80,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 82,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 84,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 86,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 88,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 90,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 92,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 94,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 96,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 98,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 100,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 102,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 104,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 106,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 108,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 110,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 112,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 114,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 116,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 118,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 120,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 122,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 124,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 126,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 128,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 130,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 132,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 134,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 136,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 138,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 140,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 142,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 144,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 146,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 148,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 150,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 152,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 154,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 156,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 158,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 160,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 162,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 164,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 166,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 168,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 170,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    },
+    {
+      "page": 172,
+      "discover": [
+        "governor",
+        "senate"
+      ],
+      "totals": true
+    }
+  ]
+}
