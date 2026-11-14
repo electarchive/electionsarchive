@@ -235,7 +235,7 @@ const MODEL = {
   floor: { slack: 0.98, met: 0.99, closed: 0 },
   remaining: { spread: 0.2, stale: 3 },
   outlier: 0.01,
-  pool: { from: 0.3, shrink: 1, share: 2 },
+  pool: { from: 0.3, shrink: 1, share: 1, matched: 0.4 },
 };
 
 const STREAM = "~";
@@ -1979,9 +1979,8 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
       },
     ];
   });
-  const share =
-    Math.min(1, sum(found.map((unit) => unit.total)) / sum(typical)) **
-    MODEL.pool.share;
+  const reached = Math.min(1, counted / sum(typical));
+  const share = reached ** MODEL.pool.share;
   for (const [index, unit] of found.entries()) {
     if (!unit.hasBaseline || unit.near.size === 0) {
       continue;
@@ -1989,7 +1988,10 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
     let pulled = 0;
     let weight = MODEL.pool.shrink / residual ** 2;
     for (const donor of donors) {
-      if (unit.near.has(donor.unit.county)) {
+      if (
+        unit.near.has(donor.unit.county) &&
+        (reached >= MODEL.pool.matched || donor.unit.channel === unit.channel)
+      ) {
         pulled += donor.weight * donor.off;
         weight += donor.weight;
       }
