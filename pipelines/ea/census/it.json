@@ -394,6 +394,30 @@
       "publisher": "Istituto nazionale di statistica (ISTAT)",
       "url": "https://www.istat.it/storage/ASI/2025/capitoli/C01.pdf",
       "kind": "official_body"
+    },
+    "fvg_autonomie_locali": {
+      "title": "Elezioni comunali: Relazioni e approfondimenti (Relazione2009 and later)",
+      "publisher": "Regione autonoma Friuli Venezia Giulia, Autonomie locali",
+      "url": "https://autonomielocali.regione.fvg.it/aall/export/sites/default/AALL/Elezioni/Approfondimenti/allegati/Relazione2009.pdf",
+      "kind": "official_body"
+    },
+    "sicilia_elezioni": {
+      "title": "Elezioni amministrative: portale elezioni (primo turno)",
+      "publisher": "Regione Siciliana, Assessorato delle autonomie locali",
+      "url": "http://www.elezioni.regione.sicilia.it/",
+      "kind": "official_body"
+    },
+    "taa_bollettino": {
+      "title": "Bollettino Ufficiale della Regione Trentino-Alto Adige (decrees convoking municipal elections)",
+      "publisher": "Regione autonoma Trentino-Alto Adige/Südtirol",
+      "url": "https://bollettino.regione.taa.it/it/ricerca123.aspx",
+      "kind": "official_body"
+    },
+    "vda_affluenza": {
+      "title": "Elezioni: dati e risultati, DatiAffluenza and statistical yearbook",
+      "publisher": "Regione autonoma Valle d'Aosta",
+      "url": "https://www.regione.vda.it/amministrazione/Elezioni/Dati_e_risultati/elezioni/DatiAffluenza_i.aspx",
+      "kind": "official_body"
     }
   },
   "tiers": [
@@ -3024,7 +3048,7 @@
         "cycle": true
       },
       "finest_note": "comune; polling section in recent Eligendo files",
-      "note": "Every comune elects its council for five years (four from 1993 to 1999) on one Sunday of the ordinary round between 15 April and 15 June, or the next year's round after an early dissolution, so each comune keeps its own cycle and about a fifth vote each year. Comuni up to 15,000 inhabitants: a single round, two-thirds of the seats to the winning mayor's list; larger ones: a majority bonus to the mayor's coalition. Sicily, Sardinia, Friuli-Venezia Giulia, Trentino-Alto Adige, and the Aosta Valley run their own municipal elections. Dated rows from 1993 count the comuni in Eligendo's files for each year; the ministry's files cover the ordinary-statute regions and Sardinia, and Sicily, Friuli-Venezia Giulia, Trentino-Alto Adige, and the Aosta Valley only in some years, so those regions' counts are missing until their regional lists are loaded.",
+      "note": "Every comune elects its council for five years (four from 1993 to 1999) on one Sunday of the ordinary round between 15 April and 15 June, or the next year's round after an early dissolution, so each comune keeps its own cycle and about a fifth vote each year. Comuni up to 15,000 inhabitants: a single round, two-thirds of the seats to the winning mayor's list; larger ones: a majority bonus to the mayor's coalition. Sicily, Sardinia, Friuli-Venezia Giulia, Trentino-Alto Adige, and the Aosta Valley run their own municipal elections. Dated rows from 1993 count the comuni in Eligendo's files for each year; the ministry's files cover the ordinary-statute regions and Sardinia, and Sicily, Friuli-Venezia Giulia, Trentino-Alto Adige, and the Aosta Valley only in some years. Where a regional list gives a count (Friuli-Venezia Giulia from 1998, Sicily from 2008, and the Aosta Valley and Trentino-Alto Adige in most years), the row uses it for that region in place of Eligendo's, and its note names the figures; Friuli-Venezia Giulia 1993-1997, Sicily 1993-2007, and the uncertain Trentino-Alto Adige years keep Eligendo's partial count or none.",
       "source": "nir_l182_1991",
       "match": [
         {
@@ -3149,7 +3173,8 @@
             "20": 118
           },
           "source": "eligendo_opendata",
-          "quote": "1,405 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 1993: comunali-19930606.zip, comunali-19931121.zip"
+          "quote": "1,405 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 1993: comunali-19930606.zip, comunali-19931121.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Aosta Valley 3 (Regione autonoma Valle d'Aosta)."
         },
         {
           "date": "1994-01-01",
@@ -3176,15 +3201,16 @@
             "20": 43
           },
           "source": "eligendo_opendata",
-          "quote": "541 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 1994: comunali-19940612.zip, comunali-19941120.zip"
+          "quote": "541 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 1994: comunali-19940612.zip, comunali-19941120.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Aosta Valley 1 (Regione autonoma Valle d'Aosta)."
         },
         {
           "date": "1995-01-01",
           "precision": "year",
-          "contests": 5226,
+          "contests": 5292,
           "regions": {
             "01": 1045,
-            "02": 4,
+            "02": 70,
             "03": 1223,
             "05": 451,
             "06": 167,
@@ -3204,16 +3230,17 @@
             "20": 198
           },
           "source": "eligendo_opendata",
-          "quote": "5,226 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 1995: comunali-19950423.zip, comunali-19950528.zip, comunali-19951119.zip"
+          "quote": "5,226 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 1995: comunali-19950423.zip, comunali-19950528.zip, comunali-19951119.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Aosta Valley 70 (Regione autonoma Valle d'Aosta)."
         },
         {
           "date": "1996-01-01",
           "precision": "year",
-          "contests": 281,
+          "contests": 285,
           "regions": {
             "01": 30,
             "03": 45,
-            "04": 4,
+            "04": 8,
             "05": 21,
             "06": 5,
             "07": 9,
@@ -3232,15 +3259,18 @@
             "20": 14
           },
           "source": "eligendo_opendata",
-          "quote": "281 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 1996: comunali-19960602.zip, comunali-19960609.zip, comunali-19961117.zip, comunali-19961201.zip"
+          "quote": "281 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 1996: comunali-19960602.zip, comunali-19960609.zip, comunali-19961117.zip, comunali-19961201.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Trentino-Alto Adige 8 (Bolzano 2, Trento 6; Bollettino Ufficiale)."
         },
         {
           "date": "1997-01-01",
           "precision": "year",
-          "contests": 1704,
+          "contests": 1716,
           "regions": {
             "01": 128,
+            "02": 5,
             "03": 244,
+            "04": 7,
             "05": 88,
             "06": 40,
             "07": 44,
@@ -3259,16 +3289,20 @@
             "20": 134
           },
           "source": "eligendo_opendata",
-          "quote": "1,704 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 1997: comunali-19970427.zip, comunali-19971116.zip, comunali-19971130.zip"
+          "quote": "1,704 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 1997: comunali-19970427.zip, comunali-19971116.zip, comunali-19971130.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Aosta Valley 5 (Regione autonoma Valle d'Aosta); Trentino-Alto Adige 7 (Bolzano 1, Trento 6; Bollettino Ufficiale)."
         },
         {
           "date": "1998-01-01",
           "precision": "year",
-          "contests": 801,
+          "contests": 824,
           "regions": {
             "01": 46,
+            "02": 1,
             "03": 94,
+            "04": 2,
             "05": 64,
+            "06": 20,
             "07": 7,
             "08": 12,
             "09": 20,
@@ -3285,16 +3319,19 @@
             "20": 51
           },
           "source": "eligendo_opendata",
-          "quote": "801 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 1998: comunali-19980524.zip, comunali-19981129.zip"
+          "quote": "801 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 1998: comunali-19980524.zip, comunali-19981129.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Aosta Valley 1 (Regione autonoma Valle d'Aosta); Trentino-Alto Adige 2 (Bolzano 0, Trento 2; Bollettino Ufficiale); FVG 20 (14 June 14, 15 November 6; Autonomie locali, Regione FVG)."
         },
         {
           "date": "1999-01-01",
           "precision": "year",
-          "contests": 4492,
+          "contests": 4660,
           "regions": {
             "01": 992,
             "03": 1155,
+            "04": 13,
             "05": 405,
+            "06": 155,
             "07": 173,
             "08": 283,
             "09": 226,
@@ -3310,15 +3347,16 @@
             "19": 12
           },
           "source": "eligendo_opendata",
-          "quote": "4,492 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 1999: comunali-19990613.zip"
+          "quote": "4,492 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 1999: comunali-19990613.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Trentino-Alto Adige 13 (Bolzano 3, Trento 10; Bollettino Ufficiale); FVG 155 (Autonomie locali, Regione FVG)."
         },
         {
           "date": "2000-01-01",
           "precision": "year",
-          "contests": 559,
+          "contests": 627,
           "regions": {
             "01": 36,
-            "02": 1,
+            "02": 69,
             "03": 45,
             "04": 6,
             "05": 23,
@@ -3339,16 +3377,19 @@
             "20": 188
           },
           "source": "eligendo_opendata",
-          "quote": "559 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2000: comunali-20000416.zip, comunali-20000430.zip, comunali-20000604.zip, comunali-20001112.zip"
+          "quote": "559 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2000: comunali-20000416.zip, comunali-20000430.zip, comunali-20000604.zip, comunali-20001112.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Aosta Valley 69 (Regione autonoma Valle d'Aosta); FVG 6 (Autonomie locali, Regione FVG)."
         },
         {
           "date": "2001-01-01",
           "precision": "year",
-          "contests": 1265,
+          "contests": 1300,
           "regions": {
             "01": 133,
             "03": 217,
+            "04": 2,
             "05": 67,
+            "06": 33,
             "07": 41,
             "08": 39,
             "09": 30,
@@ -3364,16 +3405,20 @@
             "20": 116
           },
           "source": "eligendo_opendata",
-          "quote": "1,265 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2001: comunali-20010513.zip"
+          "quote": "1,265 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2001: comunali-20010513.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Trentino-Alto Adige 2 (Bolzano 0, Trento 2; Bollettino Ufficiale); FVG 33 (Autonomie locali, Regione FVG)."
         },
         {
           "date": "2002-01-01",
           "precision": "year",
-          "contests": 946,
+          "contests": 975,
           "regions": {
             "01": 68,
+            "02": 4,
             "03": 112,
+            "04": 4,
             "05": 75,
+            "06": 21,
             "07": 16,
             "08": 17,
             "09": 23,
@@ -3390,16 +3435,20 @@
             "20": 60
           },
           "source": "eligendo_opendata",
-          "quote": "946 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2002: comunali-20020526.zip"
+          "quote": "946 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2002: comunali-20020526.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Aosta Valley 4 (Regione autonoma Valle d'Aosta); Trentino-Alto Adige 4 (Bolzano 0, Trento 4; Bollettino Ufficiale); FVG 21 (Autonomie locali, Regione FVG)."
         },
         {
           "date": "2003-01-01",
           "precision": "year",
-          "contests": 492,
+          "contests": 504,
           "regions": {
             "01": 20,
+            "02": 2,
             "03": 60,
+            "04": 3,
             "05": 36,
+            "06": 7,
             "07": 4,
             "08": 5,
             "09": 9,
@@ -3416,16 +3465,18 @@
             "20": 28
           },
           "source": "eligendo_opendata",
-          "quote": "492 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2003: comunali-20030525.zip, comunali-20030608.zip, comunali-20030622.zip"
+          "quote": "492 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2003: comunali-20030525.zip, comunali-20030608.zip, comunali-20030622.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Aosta Valley 2 (Regione autonoma Valle d'Aosta); Trentino-Alto Adige 3 (Bolzano 2, Trento 1; Bollettino Ufficiale); FVG 7 (Autonomie locali, Regione FVG)."
         },
         {
           "date": "2004-01-01",
           "precision": "year",
-          "contests": 4362,
+          "contests": 4514,
           "regions": {
             "01": 956,
             "03": 1129,
             "05": 387,
+            "06": 152,
             "07": 168,
             "08": 277,
             "09": 222,
@@ -3442,16 +3493,20 @@
             "20": 7
           },
           "source": "eligendo_opendata",
-          "quote": "4,362 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2004: comunali-20040612.zip, comunali-20040626.zip"
+          "quote": "4,362 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2004: comunali-20040612.zip, comunali-20040626.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: FVG 152 (Autonomie locali, Regione FVG)."
         },
         {
           "date": "2005-01-01",
           "precision": "year",
-          "contests": 552,
+          "contests": 947,
           "regions": {
             "01": 43,
+            "02": 68,
             "03": 53,
+            "04": 320,
             "05": 25,
+            "06": 7,
             "07": 12,
             "08": 6,
             "09": 5,
@@ -3468,16 +3523,20 @@
             "20": 184
           },
           "source": "eligendo_opendata",
-          "quote": "552 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2005: comunali-20050403.zip, comunali-20050417.zip, comunali-20050508.zip, comunali-20051127.zip"
+          "quote": "552 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2005: comunali-20050403.zip, comunali-20050417.zip, comunali-20050508.zip, comunali-20051127.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Aosta Valley 68 (Regione autonoma Valle d'Aosta); Trentino-Alto Adige 320 (Bolzano 115, Trento 205; Bollettino Ufficiale); FVG 7 (Autonomie locali, Regione FVG)."
         },
         {
           "date": "2006-01-01",
           "precision": "year",
-          "contests": 1265,
+          "contests": 1304,
           "regions": {
             "01": 141,
+            "02": 1,
             "03": 227,
+            "04": 2,
             "05": 69,
+            "06": 36,
             "07": 41,
             "08": 40,
             "09": 30,
@@ -3493,16 +3552,19 @@
             "20": 103
           },
           "source": "eligendo_opendata",
-          "quote": "1,265 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2006: 7 files comunali-20060528.zip to comunali-20061001.zip"
+          "quote": "1,265 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2006: 7 files comunali-20060528.zip to comunali-20061001.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Aosta Valley 1 (Regione autonoma Valle d'Aosta); Trentino-Alto Adige 2 (Bolzano 0, Trento 2; Bollettino Ufficiale); FVG 36 (Autonomie locali, Regione FVG)."
         },
         {
           "date": "2007-01-01",
           "precision": "year",
-          "contests": 838,
+          "contests": 866,
           "regions": {
             "01": 78,
+            "02": 4,
             "03": 116,
             "05": 82,
+            "06": 24,
             "07": 21,
             "08": 16,
             "09": 29,
@@ -3518,16 +3580,20 @@
             "20": 64
           },
           "source": "eligendo_opendata",
-          "quote": "838 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2007: comunali-20070527.zip, comunali-20070610.zip, comunali-20070617.zip, comunali-20070715.zip"
+          "quote": "838 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2007: comunali-20070527.zip, comunali-20070610.zip, comunali-20070617.zip, comunali-20070715.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Aosta Valley 4 (Regione autonoma Valle d'Aosta); FVG 24 (Autonomie locali, Regione FVG)."
         },
         {
           "date": "2008-01-01",
           "precision": "year",
-          "contests": 459,
+          "contests": 616,
           "regions": {
             "01": 34,
+            "02": 1,
             "03": 68,
+            "04": 1,
             "05": 44,
+            "06": 8,
             "07": 10,
             "08": 7,
             "09": 13,
@@ -3540,19 +3606,23 @@
             "16": 43,
             "17": 8,
             "18": 39,
+            "19": 147,
             "20": 34
           },
           "source": "eligendo_opendata",
-          "quote": "459 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2008: comunali-20080413.zip, comunali-20080427.zip, comunali-20080608.zip, comunali-20080615.zip"
+          "quote": "459 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2008: comunali-20080413.zip, comunali-20080427.zip, comunali-20080608.zip, comunali-20080615.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Aosta Valley 1 (Regione autonoma Valle d'Aosta); Trentino-Alto Adige 1 (Bolzano 1, Trento 0; Bollettino Ufficiale); FVG 8 (Autonomie locali, Regione FVG); Sicily 147 (Regione Siciliana, first round)."
         },
         {
           "date": "2009-01-01",
           "precision": "year",
-          "contests": 4098,
+          "contests": 4295,
           "regions": {
             "01": 920,
             "03": 1094,
+            "04": 17,
             "05": 368,
+            "06": 142,
             "07": 153,
             "08": 273,
             "09": 210,
@@ -3565,19 +3635,24 @@
             "16": 67,
             "17": 57,
             "18": 155,
+            "19": 38,
             "20": 12
           },
           "source": "eligendo_opendata",
-          "quote": "4,098 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2009: comunali-20090607.zip, comunali-20091129.zip"
+          "quote": "4,098 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2009: comunali-20090607.zip, comunali-20091129.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Trentino-Alto Adige 17 (Bolzano 5, Trento 12; Bollettino Ufficiale); FVG 142 (Autonomie locali, Regione FVG); Sicily 38 (Regione Siciliana, first round)."
         },
         {
           "date": "2010-01-01",
           "precision": "year",
-          "contests": 638,
+          "contests": 1072,
           "regions": {
             "01": 49,
+            "02": 68,
             "03": 57,
+            "04": 316,
             "05": 30,
+            "06": 9,
             "07": 12,
             "08": 8,
             "09": 8,
@@ -3590,19 +3665,24 @@
             "16": 48,
             "17": 16,
             "18": 52,
+            "19": 41,
             "20": 174
           },
           "source": "eligendo_opendata",
-          "quote": "638 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2010: 5 files comunali-20100328.zip to comunali-20101128.zip"
+          "quote": "638 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2010: 5 files comunali-20100328.zip to comunali-20101128.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Aosta Valley 68 (Regione autonoma Valle d'Aosta); Trentino-Alto Adige 316 (Bolzano 111, Trento 205; Bollettino Ufficiale); FVG 9 (Autonomie locali, Regione FVG); Sicily 41 (Regione Siciliana, first round)."
         },
         {
           "date": "2011-01-01",
           "precision": "year",
-          "contests": 1276,
+          "contests": 1345,
           "regions": {
             "01": 147,
+            "02": 1,
             "03": 237,
+            "04": 1,
             "05": 76,
+            "06": 40,
             "07": 47,
             "08": 46,
             "09": 33,
@@ -3615,19 +3695,24 @@
             "16": 61,
             "17": 27,
             "18": 98,
+            "19": 27,
             "20": 97
           },
           "source": "eligendo_opendata",
-          "quote": "1,276 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2011: comunali-20110515.zip, comunali-20110522.zip, comunali-20111127.zip"
+          "quote": "1,276 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2011: comunali-20110515.zip, comunali-20110522.zip, comunali-20111127.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Aosta Valley 1 (Regione autonoma Valle d'Aosta); Trentino-Alto Adige 1 (Bolzano 0, Trento 1; Bollettino Ufficiale); FVG 40 (Autonomie locali, Regione FVG); Sicily 27 (Regione Siciliana, first round)."
         },
         {
           "date": "2012-01-01",
           "precision": "year",
-          "contests": 841,
+          "contests": 1021,
           "regions": {
             "01": 82,
+            "02": 4,
             "03": 127,
+            "04": 3,
             "05": 86,
+            "06": 26,
             "07": 19,
             "08": 18,
             "09": 30,
@@ -3640,19 +3725,24 @@
             "16": 63,
             "17": 26,
             "18": 86,
+            "19": 147,
             "20": 64
           },
           "source": "eligendo_opendata",
-          "quote": "841 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2012: 5 files comunali-20120506.zip to comunali-20121028.zip"
+          "quote": "841 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2012: 5 files comunali-20120506.zip to comunali-20121028.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Aosta Valley 4 (Regione autonoma Valle d'Aosta); Trentino-Alto Adige 3 (Bolzano 1, Trento 2; Bollettino Ufficiale); FVG 26 (Autonomie locali, Regione FVG); Sicily 147 (Regione Siciliana, first round)."
         },
         {
           "date": "2013-01-01",
           "precision": "year",
-          "contests": 565,
+          "contests": 722,
           "regions": {
             "01": 50,
+            "02": 1,
             "03": 95,
+            "04": 1,
             "05": 47,
+            "06": 13,
             "07": 18,
             "08": 16,
             "09": 17,
@@ -3665,19 +3755,23 @@
             "16": 43,
             "17": 11,
             "18": 42,
+            "19": 142,
             "20": 35
           },
           "source": "eligendo_opendata",
-          "quote": "565 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2013: comunali-20130526.zip, comunali-20131117.zip"
+          "quote": "565 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2013: comunali-20130526.zip, comunali-20131117.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Aosta Valley 1 (Regione autonoma Valle d'Aosta); Trentino-Alto Adige 1 (Bolzano 0, Trento 1; Bollettino Ufficiale); FVG 13 (Autonomie locali, Regione FVG); Sicily 142 (Regione Siciliana, first round)."
         },
         {
           "date": "2014-01-01",
           "precision": "year",
-          "contests": 3920,
+          "contests": 4106,
           "regions": {
             "01": 891,
             "03": 1039,
+            "04": 18,
             "05": 345,
+            "06": 131,
             "07": 144,
             "08": 255,
             "09": 204,
@@ -3690,19 +3784,23 @@
             "16": 64,
             "17": 55,
             "18": 150,
+            "19": 37,
             "20": 18
           },
           "source": "eligendo_opendata",
-          "quote": "3,920 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2014: comunali-20140525.zip, comunali-20141026.zip"
+          "quote": "3,920 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2014: comunali-20140525.zip, comunali-20141026.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Trentino-Alto Adige 18 (Bolzano 7, Trento 11; Bollettino Ufficiale); FVG 131 (Autonomie locali, Regione FVG); Sicily 37 (Regione Siciliana, first round)."
         },
         {
           "date": "2015-01-01",
           "precision": "year",
-          "contests": 682,
+          "contests": 760,
           "regions": {
             "01": 57,
+            "02": 68,
             "03": 67,
             "05": 34,
+            "06": 10,
             "07": 13,
             "08": 8,
             "09": 9,
@@ -3718,16 +3816,20 @@
             "20": 167
           },
           "source": "eligendo_opendata",
-          "quote": "682 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2015: comunali-20150531.zip, comunali-20151115.zip"
+          "quote": "682 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2015: comunali-20150531.zip, comunali-20151115.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Aosta Valley 68 (Regione autonoma Valle d'Aosta); FVG 10 (Autonomie locali, Regione FVG)."
         },
         {
           "date": "2016-01-01",
           "precision": "year",
-          "contests": 1276,
+          "contests": 1375,
           "regions": {
             "01": 156,
+            "02": 1,
             "03": 239,
+            "04": 24,
             "05": 82,
+            "06": 43,
             "07": 49,
             "08": 50,
             "09": 26,
@@ -3740,19 +3842,24 @@
             "16": 59,
             "17": 28,
             "18": 90,
+            "19": 31,
             "20": 99
           },
           "source": "eligendo_opendata",
-          "quote": "1,276 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2016: comunali-20160605.zip, comunali-20161113.zip"
+          "quote": "1,276 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2016: comunali-20160605.zip, comunali-20161113.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Aosta Valley 1 (Regione autonoma Valle d'Aosta); Trentino-Alto Adige 24 (Bolzano 4, Trento 20; Bollettino Ufficiale); FVG 43 (Autonomie locali, Regione FVG); Sicily 31 (Regione Siciliana, first round)."
         },
         {
           "date": "2017-01-01",
           "precision": "year",
-          "contests": 850,
+          "contests": 1015,
           "regions": {
             "01": 96,
+            "02": 4,
             "03": 139,
+            "04": 4,
             "05": 87,
+            "06": 27,
             "07": 19,
             "08": 20,
             "09": 33,
@@ -3765,19 +3872,24 @@
             "16": 54,
             "17": 24,
             "18": 78,
+            "19": 130,
             "20": 64
           },
           "source": "eligendo_opendata",
-          "quote": "850 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2017: comunali-20170611.zip, comunali-20171105.zip"
+          "quote": "850 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2017: comunali-20170611.zip, comunali-20171105.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Aosta Valley 4 (Regione autonoma Valle d'Aosta); Trentino-Alto Adige 4 (Bolzano 4, Trento 0; Bollettino Ufficiale); FVG 27 (Autonomie locali, Regione FVG); Sicily 130 (Regione Siciliana, first round)."
         },
         {
           "date": "2018-01-01",
           "precision": "year",
-          "contests": 628,
+          "contests": 791,
           "regions": {
             "01": 63,
+            "02": 2,
             "03": 102,
+            "04": 2,
             "05": 46,
+            "06": 19,
             "07": 20,
             "08": 18,
             "09": 21,
@@ -3790,19 +3902,23 @@
             "16": 45,
             "17": 13,
             "18": 52,
+            "19": 140,
             "20": 38
           },
           "source": "eligendo_opendata",
-          "quote": "628 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2018: comunali-20180610.zip, comunali-20180729.zip, comunali-20181021.zip"
+          "quote": "628 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2018: comunali-20180610.zip, comunali-20180729.zip, comunali-20181021.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Aosta Valley 2 (Regione autonoma Valle d'Aosta); Trentino-Alto Adige 2 (Bolzano 0, Trento 2; Bollettino Ufficiale); FVG 19 (Autonomie locali, Regione FVG); Sicily 140 (Regione Siciliana, first round)."
         },
         {
           "date": "2019-01-01",
           "precision": "year",
-          "contests": 3693,
+          "contests": 3856,
           "regions": {
             "01": 826,
             "03": 990,
+            "04": 11,
             "05": 321,
+            "06": 118,
             "07": 135,
             "08": 235,
             "09": 189,
@@ -3815,19 +3931,24 @@
             "16": 68,
             "17": 54,
             "18": 143,
+            "19": 34,
             "20": 28
           },
           "source": "eligendo_opendata",
-          "quote": "3,693 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2019: 6 files comunali-20190526.zip to comunali-20191110.zip"
+          "quote": "3,693 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2019: 6 files comunali-20190526.zip to comunali-20191110.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Trentino-Alto Adige 11 (Bolzano 3, Trento 8; Bollettino Ufficiale); FVG 118 (Autonomie locali, Regione FVG); Sicily 34 (Regione Siciliana, first round)."
         },
         {
           "date": "2020-01-01",
           "precision": "year",
-          "contests": 762,
+          "contests": 1171,
           "regions": {
             "01": 75,
+            "02": 67,
             "03": 84,
+            "04": 269,
             "05": 40,
+            "06": 12,
             "07": 16,
             "08": 15,
             "09": 8,
@@ -3840,19 +3961,24 @@
             "16": 49,
             "17": 22,
             "18": 72,
+            "19": 61,
             "20": 156
           },
           "source": "eligendo_opendata",
-          "quote": "762 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2020: comunali-20200920.zip, comunali-20201025.zip"
+          "quote": "762 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2020: comunali-20200920.zip, comunali-20201025.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Aosta Valley 67 (Regione autonoma Valle d'Aosta); Trentino-Alto Adige 269 (Bolzano 113, Trento 156; Bollettino Ufficiale); FVG 12 (Autonomie locali, Regione FVG); Sicily 61 (Regione Siciliana, first round)."
         },
         {
           "date": "2021-01-01",
           "precision": "year",
-          "contests": 1258,
+          "contests": 1349,
           "regions": {
             "01": 152,
+            "02": 1,
             "03": 236,
+            "04": 7,
             "05": 84,
+            "06": 38,
             "07": 52,
             "08": 48,
             "09": 31,
@@ -3865,19 +3991,24 @@
             "16": 56,
             "17": 27,
             "18": 84,
+            "19": 45,
             "20": 98
           },
           "source": "eligendo_opendata",
-          "quote": "1,258 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2021: comunali-20211003.zip, comunali-20211010.zip, comunali-20211107.zip"
+          "quote": "1,258 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2021: comunali-20211003.zip, comunali-20211010.zip, comunali-20211107.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Aosta Valley 1 (Regione autonoma Valle d'Aosta); Trentino-Alto Adige 7 (Bolzano 3, Trento 4; Bollettino Ufficiale); FVG 38 (Autonomie locali, Regione FVG); Sicily 45 (Regione Siciliana, first round)."
         },
         {
           "date": "2022-01-01",
           "precision": "year",
-          "contests": 821,
+          "contests": 984,
           "regions": {
             "01": 92,
+            "02": 5,
             "03": 127,
+            "04": 2,
             "05": 86,
+            "06": 33,
             "07": 20,
             "08": 21,
             "09": 28,
@@ -3890,19 +4021,24 @@
             "16": 50,
             "17": 22,
             "18": 76,
+            "19": 123,
             "20": 65
           },
           "source": "eligendo_opendata",
-          "quote": "821 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2022: comunali-20220612.zip, comunali-20221127.zip"
+          "quote": "821 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2022: comunali-20220612.zip, comunali-20221127.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Aosta Valley 5 (Regione autonoma Valle d'Aosta); Trentino-Alto Adige 2 (Bolzano 1, Trento 1; Bollettino Ufficiale); FVG 33 (Autonomie locali, Regione FVG); Sicily 123 (Regione Siciliana, first round)."
         },
         {
           "date": "2023-01-01",
           "precision": "year",
-          "contests": 639,
+          "contests": 799,
           "regions": {
             "01": 70,
+            "02": 2,
             "03": 106,
+            "04": 3,
             "05": 49,
+            "06": 24,
             "07": 23,
             "08": 21,
             "09": 22,
@@ -3915,19 +4051,24 @@
             "16": 52,
             "17": 14,
             "18": 44,
+            "19": 131,
             "20": 39
           },
           "source": "eligendo_opendata",
-          "quote": "639 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2023: comunali-20230514.zip, comunali-20230528.zip, comunali-20231022.zip"
+          "quote": "639 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2023: comunali-20230514.zip, comunali-20230528.zip, comunali-20231022.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Aosta Valley 2 (Regione autonoma Valle d'Aosta); Trentino-Alto Adige 3 (Bolzano 1, Trento 2; Bollettino Ufficiale); FVG 24 (Autonomie locali, Regione FVG); Sicily 131 (Regione Siciliana, first round)."
         },
         {
           "date": "2024-01-01",
           "precision": "year",
-          "contests": 3552,
+          "contests": 3719,
           "regions": {
             "01": 799,
+            "02": 1,
             "03": 960,
+            "04": 14,
             "05": 309,
+            "06": 114,
             "07": 125,
             "08": 225,
             "09": 185,
@@ -3940,19 +4081,24 @@
             "16": 62,
             "17": 52,
             "18": 133,
+            "19": 38,
             "20": 27
           },
           "source": "eligendo_opendata",
-          "quote": "3,552 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2024: comunali-20240609.zip, comunali-20240728.zip, comunali-20241117.zip"
+          "quote": "3,552 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2024: comunali-20240609.zip, comunali-20240728.zip, comunali-20241117.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Aosta Valley 1 (Regione autonoma Valle d'Aosta); Trentino-Alto Adige 14 (Bolzano 5, Trento 9; Bollettino Ufficiale); FVG 114 (Autonomie locali, Regione FVG); Sicily 38 (Regione Siciliana, first round)."
         },
         {
           "date": "2025-01-01",
           "precision": "year",
-          "contests": 128,
+          "contests": 473,
           "regions": {
             "01": 9,
+            "02": 65,
             "03": 18,
+            "04": 267,
             "05": 9,
+            "06": 4,
             "07": 5,
             "08": 5,
             "10": 3,
@@ -3964,19 +4110,24 @@
             "16": 10,
             "17": 8,
             "18": 19,
+            "19": 9,
             "20": 7
           },
           "source": "eligendo_opendata",
-          "quote": "128 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2025: comunali-20250525.zip, comunali-20250608.zip, comunali-20251123.zip"
+          "quote": "128 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2025: comunali-20250525.zip, comunali-20250608.zip, comunali-20251123.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Aosta Valley 65 (Regione autonoma Valle d'Aosta); Trentino-Alto Adige 267 (Bolzano 111, Trento 156; Bollettino Ufficiale); FVG 4 (Autonomie locali, Regione FVG); Sicily 9 (Regione Siciliana, first round)."
         },
         {
           "date": "2026-01-01",
           "precision": "year",
-          "contests": 809,
+          "contests": 894,
           "regions": {
             "01": 80,
+            "02": 1,
             "03": 93,
+            "04": 2,
             "05": 50,
+            "06": 11,
             "07": 18,
             "08": 16,
             "09": 20,
@@ -3989,10 +4140,12 @@
             "16": 54,
             "17": 16,
             "18": 77,
+            "19": 71,
             "20": 148
           },
           "source": "eligendo_opendata",
-          "quote": "809 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2026: comunali-20260524.zip, comunali-20260607.zip"
+          "quote": "809 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2026: comunali-20260524.zip, comunali-20260607.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Aosta Valley 1 (Regione autonoma Valle d'Aosta); Trentino-Alto Adige 2 (Bolzano 0, Trento 2; Bollettino Ufficiale); FVG 11 (Autonomie locali, Regione FVG); Sicily 71 (Regione Siciliana, first round)."
         }
       ]
     },
@@ -4013,7 +4166,7 @@
         ],
         "cycle": true
       },
-      "note": "Elected directly with the council since Law 81/1993 (before, by the council). Comuni up to 15,000 inhabitants: one round by plurality, a tie going to a runoff (TUEL art. 71); above 15,000: absolute majority, else a runoff between the top two on the second Sunday after (art. 72). Sicily and the other special-statute regions set their own thresholds. Dated rows from 1993 count the comuni in Eligendo's files for each year; the ministry's files cover the ordinary-statute regions and Sardinia, and Sicily, Friuli-Venezia Giulia, Trentino-Alto Adige, and the Aosta Valley only in some years, so those regions' counts are missing until their regional lists are loaded.",
+      "note": "Elected directly with the council since Law 81/1993 (before, by the council). Comuni up to 15,000 inhabitants: one round by plurality, a tie going to a runoff (TUEL art. 71); above 15,000: absolute majority, else a runoff between the top two on the second Sunday after (art. 72). Sicily and the other special-statute regions set their own thresholds. Dated rows from 1993 count the comuni in Eligendo's files for each year; the ministry's files cover the ordinary-statute regions and Sardinia, and Sicily, Friuli-Venezia Giulia, Trentino-Alto Adige, and the Aosta Valley only in some years. Where a regional list gives a count (Friuli-Venezia Giulia from 1998, Sicily from 2008, and the Aosta Valley and Trentino-Alto Adige in most years), the row uses it for that region in place of Eligendo's, and its note names the figures; Friuli-Venezia Giulia 1993-1997, Sicily 1993-2007, and the uncertain Trentino-Alto Adige years keep Eligendo's partial count or none.",
       "source": "nir_l81_1993",
       "match": [
         {
@@ -4141,7 +4294,8 @@
             "20": 118
           },
           "source": "eligendo_opendata",
-          "quote": "1,405 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 1993: comunali-19930606.zip, comunali-19931121.zip"
+          "quote": "1,405 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 1993: comunali-19930606.zip, comunali-19931121.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Aosta Valley 3 (Regione autonoma Valle d'Aosta)."
         },
         {
           "date": "1994-01-01",
@@ -4168,15 +4322,16 @@
             "20": 43
           },
           "source": "eligendo_opendata",
-          "quote": "541 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 1994: comunali-19940612.zip, comunali-19941120.zip"
+          "quote": "541 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 1994: comunali-19940612.zip, comunali-19941120.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Aosta Valley 1 (Regione autonoma Valle d'Aosta)."
         },
         {
           "date": "1995-01-01",
           "precision": "year",
-          "contests": 5226,
+          "contests": 5292,
           "regions": {
             "01": 1045,
-            "02": 4,
+            "02": 70,
             "03": 1223,
             "05": 451,
             "06": 167,
@@ -4196,16 +4351,17 @@
             "20": 198
           },
           "source": "eligendo_opendata",
-          "quote": "5,226 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 1995: comunali-19950423.zip, comunali-19950528.zip, comunali-19951119.zip"
+          "quote": "5,226 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 1995: comunali-19950423.zip, comunali-19950528.zip, comunali-19951119.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Aosta Valley 70 (Regione autonoma Valle d'Aosta)."
         },
         {
           "date": "1996-01-01",
           "precision": "year",
-          "contests": 281,
+          "contests": 285,
           "regions": {
             "01": 30,
             "03": 45,
-            "04": 4,
+            "04": 8,
             "05": 21,
             "06": 5,
             "07": 9,
@@ -4224,15 +4380,18 @@
             "20": 14
           },
           "source": "eligendo_opendata",
-          "quote": "281 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 1996: comunali-19960602.zip, comunali-19960609.zip, comunali-19961117.zip, comunali-19961201.zip"
+          "quote": "281 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 1996: comunali-19960602.zip, comunali-19960609.zip, comunali-19961117.zip, comunali-19961201.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Trentino-Alto Adige 8 (Bolzano 2, Trento 6; Bollettino Ufficiale)."
         },
         {
           "date": "1997-01-01",
           "precision": "year",
-          "contests": 1704,
+          "contests": 1716,
           "regions": {
             "01": 128,
+            "02": 5,
             "03": 244,
+            "04": 7,
             "05": 88,
             "06": 40,
             "07": 44,
@@ -4251,16 +4410,20 @@
             "20": 134
           },
           "source": "eligendo_opendata",
-          "quote": "1,704 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 1997: comunali-19970427.zip, comunali-19971116.zip, comunali-19971130.zip"
+          "quote": "1,704 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 1997: comunali-19970427.zip, comunali-19971116.zip, comunali-19971130.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Aosta Valley 5 (Regione autonoma Valle d'Aosta); Trentino-Alto Adige 7 (Bolzano 1, Trento 6; Bollettino Ufficiale)."
         },
         {
           "date": "1998-01-01",
           "precision": "year",
-          "contests": 801,
+          "contests": 824,
           "regions": {
             "01": 46,
+            "02": 1,
             "03": 94,
+            "04": 2,
             "05": 64,
+            "06": 20,
             "07": 7,
             "08": 12,
             "09": 20,
@@ -4277,16 +4440,19 @@
             "20": 51
           },
           "source": "eligendo_opendata",
-          "quote": "801 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 1998: comunali-19980524.zip, comunali-19981129.zip"
+          "quote": "801 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 1998: comunali-19980524.zip, comunali-19981129.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Aosta Valley 1 (Regione autonoma Valle d'Aosta); Trentino-Alto Adige 2 (Bolzano 0, Trento 2; Bollettino Ufficiale); FVG 20 (14 June 14, 15 November 6; Autonomie locali, Regione FVG)."
         },
         {
           "date": "1999-01-01",
           "precision": "year",
-          "contests": 4492,
+          "contests": 4660,
           "regions": {
             "01": 992,
             "03": 1155,
+            "04": 13,
             "05": 405,
+            "06": 155,
             "07": 173,
             "08": 283,
             "09": 226,
@@ -4302,15 +4468,16 @@
             "19": 12
           },
           "source": "eligendo_opendata",
-          "quote": "4,492 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 1999: comunali-19990613.zip"
+          "quote": "4,492 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 1999: comunali-19990613.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Trentino-Alto Adige 13 (Bolzano 3, Trento 10; Bollettino Ufficiale); FVG 155 (Autonomie locali, Regione FVG)."
         },
         {
           "date": "2000-01-01",
           "precision": "year",
-          "contests": 559,
+          "contests": 627,
           "regions": {
             "01": 36,
-            "02": 1,
+            "02": 69,
             "03": 45,
             "04": 6,
             "05": 23,
@@ -4331,16 +4498,19 @@
             "20": 188
           },
           "source": "eligendo_opendata",
-          "quote": "559 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2000: comunali-20000416.zip, comunali-20000430.zip, comunali-20000604.zip, comunali-20001112.zip"
+          "quote": "559 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2000: comunali-20000416.zip, comunali-20000430.zip, comunali-20000604.zip, comunali-20001112.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Aosta Valley 69 (Regione autonoma Valle d'Aosta); FVG 6 (Autonomie locali, Regione FVG)."
         },
         {
           "date": "2001-01-01",
           "precision": "year",
-          "contests": 1265,
+          "contests": 1300,
           "regions": {
             "01": 133,
             "03": 217,
+            "04": 2,
             "05": 67,
+            "06": 33,
             "07": 41,
             "08": 39,
             "09": 30,
@@ -4356,16 +4526,20 @@
             "20": 116
           },
           "source": "eligendo_opendata",
-          "quote": "1,265 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2001: comunali-20010513.zip"
+          "quote": "1,265 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2001: comunali-20010513.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Trentino-Alto Adige 2 (Bolzano 0, Trento 2; Bollettino Ufficiale); FVG 33 (Autonomie locali, Regione FVG)."
         },
         {
           "date": "2002-01-01",
           "precision": "year",
-          "contests": 946,
+          "contests": 975,
           "regions": {
             "01": 68,
+            "02": 4,
             "03": 112,
+            "04": 4,
             "05": 75,
+            "06": 21,
             "07": 16,
             "08": 17,
             "09": 23,
@@ -4382,16 +4556,20 @@
             "20": 60
           },
           "source": "eligendo_opendata",
-          "quote": "946 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2002: comunali-20020526.zip"
+          "quote": "946 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2002: comunali-20020526.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Aosta Valley 4 (Regione autonoma Valle d'Aosta); Trentino-Alto Adige 4 (Bolzano 0, Trento 4; Bollettino Ufficiale); FVG 21 (Autonomie locali, Regione FVG)."
         },
         {
           "date": "2003-01-01",
           "precision": "year",
-          "contests": 492,
+          "contests": 504,
           "regions": {
             "01": 20,
+            "02": 2,
             "03": 60,
+            "04": 3,
             "05": 36,
+            "06": 7,
             "07": 4,
             "08": 5,
             "09": 9,
@@ -4408,16 +4586,18 @@
             "20": 28
           },
           "source": "eligendo_opendata",
-          "quote": "492 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2003: comunali-20030525.zip, comunali-20030608.zip, comunali-20030622.zip"
+          "quote": "492 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2003: comunali-20030525.zip, comunali-20030608.zip, comunali-20030622.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Aosta Valley 2 (Regione autonoma Valle d'Aosta); Trentino-Alto Adige 3 (Bolzano 2, Trento 1; Bollettino Ufficiale); FVG 7 (Autonomie locali, Regione FVG)."
         },
         {
           "date": "2004-01-01",
           "precision": "year",
-          "contests": 4362,
+          "contests": 4514,
           "regions": {
             "01": 956,
             "03": 1129,
             "05": 387,
+            "06": 152,
             "07": 168,
             "08": 277,
             "09": 222,
@@ -4434,16 +4614,20 @@
             "20": 7
           },
           "source": "eligendo_opendata",
-          "quote": "4,362 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2004: comunali-20040612.zip, comunali-20040626.zip"
+          "quote": "4,362 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2004: comunali-20040612.zip, comunali-20040626.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: FVG 152 (Autonomie locali, Regione FVG)."
         },
         {
           "date": "2005-01-01",
           "precision": "year",
-          "contests": 552,
+          "contests": 947,
           "regions": {
             "01": 43,
+            "02": 68,
             "03": 53,
+            "04": 320,
             "05": 25,
+            "06": 7,
             "07": 12,
             "08": 6,
             "09": 5,
@@ -4460,16 +4644,20 @@
             "20": 184
           },
           "source": "eligendo_opendata",
-          "quote": "552 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2005: comunali-20050403.zip, comunali-20050417.zip, comunali-20050508.zip, comunali-20051127.zip"
+          "quote": "552 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2005: comunali-20050403.zip, comunali-20050417.zip, comunali-20050508.zip, comunali-20051127.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Aosta Valley 68 (Regione autonoma Valle d'Aosta); Trentino-Alto Adige 320 (Bolzano 115, Trento 205; Bollettino Ufficiale); FVG 7 (Autonomie locali, Regione FVG)."
         },
         {
           "date": "2006-01-01",
           "precision": "year",
-          "contests": 1265,
+          "contests": 1304,
           "regions": {
             "01": 141,
+            "02": 1,
             "03": 227,
+            "04": 2,
             "05": 69,
+            "06": 36,
             "07": 41,
             "08": 40,
             "09": 30,
@@ -4485,16 +4673,19 @@
             "20": 103
           },
           "source": "eligendo_opendata",
-          "quote": "1,265 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2006: 7 files comunali-20060528.zip to comunali-20061001.zip"
+          "quote": "1,265 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2006: 7 files comunali-20060528.zip to comunali-20061001.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Aosta Valley 1 (Regione autonoma Valle d'Aosta); Trentino-Alto Adige 2 (Bolzano 0, Trento 2; Bollettino Ufficiale); FVG 36 (Autonomie locali, Regione FVG)."
         },
         {
           "date": "2007-01-01",
           "precision": "year",
-          "contests": 838,
+          "contests": 866,
           "regions": {
             "01": 78,
+            "02": 4,
             "03": 116,
             "05": 82,
+            "06": 24,
             "07": 21,
             "08": 16,
             "09": 29,
@@ -4510,16 +4701,20 @@
             "20": 64
           },
           "source": "eligendo_opendata",
-          "quote": "838 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2007: comunali-20070527.zip, comunali-20070610.zip, comunali-20070617.zip, comunali-20070715.zip"
+          "quote": "838 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2007: comunali-20070527.zip, comunali-20070610.zip, comunali-20070617.zip, comunali-20070715.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Aosta Valley 4 (Regione autonoma Valle d'Aosta); FVG 24 (Autonomie locali, Regione FVG)."
         },
         {
           "date": "2008-01-01",
           "precision": "year",
-          "contests": 459,
+          "contests": 616,
           "regions": {
             "01": 34,
+            "02": 1,
             "03": 68,
+            "04": 1,
             "05": 44,
+            "06": 8,
             "07": 10,
             "08": 7,
             "09": 13,
@@ -4532,19 +4727,23 @@
             "16": 43,
             "17": 8,
             "18": 39,
+            "19": 147,
             "20": 34
           },
           "source": "eligendo_opendata",
-          "quote": "459 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2008: comunali-20080413.zip, comunali-20080427.zip, comunali-20080608.zip, comunali-20080615.zip"
+          "quote": "459 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2008: comunali-20080413.zip, comunali-20080427.zip, comunali-20080608.zip, comunali-20080615.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Aosta Valley 1 (Regione autonoma Valle d'Aosta); Trentino-Alto Adige 1 (Bolzano 1, Trento 0; Bollettino Ufficiale); FVG 8 (Autonomie locali, Regione FVG); Sicily 147 (Regione Siciliana, first round)."
         },
         {
           "date": "2009-01-01",
           "precision": "year",
-          "contests": 4098,
+          "contests": 4295,
           "regions": {
             "01": 920,
             "03": 1094,
+            "04": 17,
             "05": 368,
+            "06": 142,
             "07": 153,
             "08": 273,
             "09": 210,
@@ -4557,19 +4756,24 @@
             "16": 67,
             "17": 57,
             "18": 155,
+            "19": 38,
             "20": 12
           },
           "source": "eligendo_opendata",
-          "quote": "4,098 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2009: comunali-20090607.zip, comunali-20091129.zip"
+          "quote": "4,098 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2009: comunali-20090607.zip, comunali-20091129.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Trentino-Alto Adige 17 (Bolzano 5, Trento 12; Bollettino Ufficiale); FVG 142 (Autonomie locali, Regione FVG); Sicily 38 (Regione Siciliana, first round)."
         },
         {
           "date": "2010-01-01",
           "precision": "year",
-          "contests": 638,
+          "contests": 1072,
           "regions": {
             "01": 49,
+            "02": 68,
             "03": 57,
+            "04": 316,
             "05": 30,
+            "06": 9,
             "07": 12,
             "08": 8,
             "09": 8,
@@ -4582,19 +4786,24 @@
             "16": 48,
             "17": 16,
             "18": 52,
+            "19": 41,
             "20": 174
           },
           "source": "eligendo_opendata",
-          "quote": "638 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2010: 5 files comunali-20100328.zip to comunali-20101128.zip"
+          "quote": "638 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2010: 5 files comunali-20100328.zip to comunali-20101128.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Aosta Valley 68 (Regione autonoma Valle d'Aosta); Trentino-Alto Adige 316 (Bolzano 111, Trento 205; Bollettino Ufficiale); FVG 9 (Autonomie locali, Regione FVG); Sicily 41 (Regione Siciliana, first round)."
         },
         {
           "date": "2011-01-01",
           "precision": "year",
-          "contests": 1276,
+          "contests": 1345,
           "regions": {
             "01": 147,
+            "02": 1,
             "03": 237,
+            "04": 1,
             "05": 76,
+            "06": 40,
             "07": 47,
             "08": 46,
             "09": 33,
@@ -4607,19 +4816,24 @@
             "16": 61,
             "17": 27,
             "18": 98,
+            "19": 27,
             "20": 97
           },
           "source": "eligendo_opendata",
-          "quote": "1,276 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2011: comunali-20110515.zip, comunali-20110522.zip, comunali-20111127.zip"
+          "quote": "1,276 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2011: comunali-20110515.zip, comunali-20110522.zip, comunali-20111127.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Aosta Valley 1 (Regione autonoma Valle d'Aosta); Trentino-Alto Adige 1 (Bolzano 0, Trento 1; Bollettino Ufficiale); FVG 40 (Autonomie locali, Regione FVG); Sicily 27 (Regione Siciliana, first round)."
         },
         {
           "date": "2012-01-01",
           "precision": "year",
-          "contests": 841,
+          "contests": 1021,
           "regions": {
             "01": 82,
+            "02": 4,
             "03": 127,
+            "04": 3,
             "05": 86,
+            "06": 26,
             "07": 19,
             "08": 18,
             "09": 30,
@@ -4632,19 +4846,24 @@
             "16": 63,
             "17": 26,
             "18": 86,
+            "19": 147,
             "20": 64
           },
           "source": "eligendo_opendata",
-          "quote": "841 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2012: 5 files comunali-20120506.zip to comunali-20121028.zip"
+          "quote": "841 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2012: 5 files comunali-20120506.zip to comunali-20121028.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Aosta Valley 4 (Regione autonoma Valle d'Aosta); Trentino-Alto Adige 3 (Bolzano 1, Trento 2; Bollettino Ufficiale); FVG 26 (Autonomie locali, Regione FVG); Sicily 147 (Regione Siciliana, first round)."
         },
         {
           "date": "2013-01-01",
           "precision": "year",
-          "contests": 565,
+          "contests": 722,
           "regions": {
             "01": 50,
+            "02": 1,
             "03": 95,
+            "04": 1,
             "05": 47,
+            "06": 13,
             "07": 18,
             "08": 16,
             "09": 17,
@@ -4657,19 +4876,23 @@
             "16": 43,
             "17": 11,
             "18": 42,
+            "19": 142,
             "20": 35
           },
           "source": "eligendo_opendata",
-          "quote": "565 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2013: comunali-20130526.zip, comunali-20131117.zip"
+          "quote": "565 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2013: comunali-20130526.zip, comunali-20131117.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Aosta Valley 1 (Regione autonoma Valle d'Aosta); Trentino-Alto Adige 1 (Bolzano 0, Trento 1; Bollettino Ufficiale); FVG 13 (Autonomie locali, Regione FVG); Sicily 142 (Regione Siciliana, first round)."
         },
         {
           "date": "2014-01-01",
           "precision": "year",
-          "contests": 3920,
+          "contests": 4106,
           "regions": {
             "01": 891,
             "03": 1039,
+            "04": 18,
             "05": 345,
+            "06": 131,
             "07": 144,
             "08": 255,
             "09": 204,
@@ -4682,19 +4905,23 @@
             "16": 64,
             "17": 55,
             "18": 150,
+            "19": 37,
             "20": 18
           },
           "source": "eligendo_opendata",
-          "quote": "3,920 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2014: comunali-20140525.zip, comunali-20141026.zip"
+          "quote": "3,920 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2014: comunali-20140525.zip, comunali-20141026.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Trentino-Alto Adige 18 (Bolzano 7, Trento 11; Bollettino Ufficiale); FVG 131 (Autonomie locali, Regione FVG); Sicily 37 (Regione Siciliana, first round)."
         },
         {
           "date": "2015-01-01",
           "precision": "year",
-          "contests": 682,
+          "contests": 760,
           "regions": {
             "01": 57,
+            "02": 68,
             "03": 67,
             "05": 34,
+            "06": 10,
             "07": 13,
             "08": 8,
             "09": 9,
@@ -4710,16 +4937,20 @@
             "20": 167
           },
           "source": "eligendo_opendata",
-          "quote": "682 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2015: comunali-20150531.zip, comunali-20151115.zip"
+          "quote": "682 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2015: comunali-20150531.zip, comunali-20151115.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Aosta Valley 68 (Regione autonoma Valle d'Aosta); FVG 10 (Autonomie locali, Regione FVG)."
         },
         {
           "date": "2016-01-01",
           "precision": "year",
-          "contests": 1276,
+          "contests": 1375,
           "regions": {
             "01": 156,
+            "02": 1,
             "03": 239,
+            "04": 24,
             "05": 82,
+            "06": 43,
             "07": 49,
             "08": 50,
             "09": 26,
@@ -4732,19 +4963,24 @@
             "16": 59,
             "17": 28,
             "18": 90,
+            "19": 31,
             "20": 99
           },
           "source": "eligendo_opendata",
-          "quote": "1,276 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2016: comunali-20160605.zip, comunali-20161113.zip"
+          "quote": "1,276 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2016: comunali-20160605.zip, comunali-20161113.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Aosta Valley 1 (Regione autonoma Valle d'Aosta); Trentino-Alto Adige 24 (Bolzano 4, Trento 20; Bollettino Ufficiale); FVG 43 (Autonomie locali, Regione FVG); Sicily 31 (Regione Siciliana, first round)."
         },
         {
           "date": "2017-01-01",
           "precision": "year",
-          "contests": 850,
+          "contests": 1015,
           "regions": {
             "01": 96,
+            "02": 4,
             "03": 139,
+            "04": 4,
             "05": 87,
+            "06": 27,
             "07": 19,
             "08": 20,
             "09": 33,
@@ -4757,19 +4993,24 @@
             "16": 54,
             "17": 24,
             "18": 78,
+            "19": 130,
             "20": 64
           },
           "source": "eligendo_opendata",
-          "quote": "850 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2017: comunali-20170611.zip, comunali-20171105.zip"
+          "quote": "850 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2017: comunali-20170611.zip, comunali-20171105.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Aosta Valley 4 (Regione autonoma Valle d'Aosta); Trentino-Alto Adige 4 (Bolzano 4, Trento 0; Bollettino Ufficiale); FVG 27 (Autonomie locali, Regione FVG); Sicily 130 (Regione Siciliana, first round)."
         },
         {
           "date": "2018-01-01",
           "precision": "year",
-          "contests": 628,
+          "contests": 791,
           "regions": {
             "01": 63,
+            "02": 2,
             "03": 102,
+            "04": 2,
             "05": 46,
+            "06": 19,
             "07": 20,
             "08": 18,
             "09": 21,
@@ -4782,19 +5023,23 @@
             "16": 45,
             "17": 13,
             "18": 52,
+            "19": 140,
             "20": 38
           },
           "source": "eligendo_opendata",
-          "quote": "628 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2018: comunali-20180610.zip, comunali-20180729.zip, comunali-20181021.zip"
+          "quote": "628 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2018: comunali-20180610.zip, comunali-20180729.zip, comunali-20181021.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Aosta Valley 2 (Regione autonoma Valle d'Aosta); Trentino-Alto Adige 2 (Bolzano 0, Trento 2; Bollettino Ufficiale); FVG 19 (Autonomie locali, Regione FVG); Sicily 140 (Regione Siciliana, first round)."
         },
         {
           "date": "2019-01-01",
           "precision": "year",
-          "contests": 3693,
+          "contests": 3856,
           "regions": {
             "01": 826,
             "03": 990,
+            "04": 11,
             "05": 321,
+            "06": 118,
             "07": 135,
             "08": 235,
             "09": 189,
@@ -4807,19 +5052,24 @@
             "16": 68,
             "17": 54,
             "18": 143,
+            "19": 34,
             "20": 28
           },
           "source": "eligendo_opendata",
-          "quote": "3,693 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2019: 6 files comunali-20190526.zip to comunali-20191110.zip"
+          "quote": "3,693 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2019: 6 files comunali-20190526.zip to comunali-20191110.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Trentino-Alto Adige 11 (Bolzano 3, Trento 8; Bollettino Ufficiale); FVG 118 (Autonomie locali, Regione FVG); Sicily 34 (Regione Siciliana, first round)."
         },
         {
           "date": "2020-01-01",
           "precision": "year",
-          "contests": 762,
+          "contests": 1171,
           "regions": {
             "01": 75,
+            "02": 67,
             "03": 84,
+            "04": 269,
             "05": 40,
+            "06": 12,
             "07": 16,
             "08": 15,
             "09": 8,
@@ -4832,19 +5082,24 @@
             "16": 49,
             "17": 22,
             "18": 72,
+            "19": 61,
             "20": 156
           },
           "source": "eligendo_opendata",
-          "quote": "762 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2020: comunali-20200920.zip, comunali-20201025.zip"
+          "quote": "762 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2020: comunali-20200920.zip, comunali-20201025.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Aosta Valley 67 (Regione autonoma Valle d'Aosta); Trentino-Alto Adige 269 (Bolzano 113, Trento 156; Bollettino Ufficiale); FVG 12 (Autonomie locali, Regione FVG); Sicily 61 (Regione Siciliana, first round)."
         },
         {
           "date": "2021-01-01",
           "precision": "year",
-          "contests": 1258,
+          "contests": 1349,
           "regions": {
             "01": 152,
+            "02": 1,
             "03": 236,
+            "04": 7,
             "05": 84,
+            "06": 38,
             "07": 52,
             "08": 48,
             "09": 31,
@@ -4857,19 +5112,24 @@
             "16": 56,
             "17": 27,
             "18": 84,
+            "19": 45,
             "20": 98
           },
           "source": "eligendo_opendata",
-          "quote": "1,258 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2021: comunali-20211003.zip, comunali-20211010.zip, comunali-20211107.zip"
+          "quote": "1,258 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2021: comunali-20211003.zip, comunali-20211010.zip, comunali-20211107.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Aosta Valley 1 (Regione autonoma Valle d'Aosta); Trentino-Alto Adige 7 (Bolzano 3, Trento 4; Bollettino Ufficiale); FVG 38 (Autonomie locali, Regione FVG); Sicily 45 (Regione Siciliana, first round)."
         },
         {
           "date": "2022-01-01",
           "precision": "year",
-          "contests": 821,
+          "contests": 984,
           "regions": {
             "01": 92,
+            "02": 5,
             "03": 127,
+            "04": 2,
             "05": 86,
+            "06": 33,
             "07": 20,
             "08": 21,
             "09": 28,
@@ -4882,19 +5142,24 @@
             "16": 50,
             "17": 22,
             "18": 76,
+            "19": 123,
             "20": 65
           },
           "source": "eligendo_opendata",
-          "quote": "821 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2022: comunali-20220612.zip, comunali-20221127.zip"
+          "quote": "821 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2022: comunali-20220612.zip, comunali-20221127.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Aosta Valley 5 (Regione autonoma Valle d'Aosta); Trentino-Alto Adige 2 (Bolzano 1, Trento 1; Bollettino Ufficiale); FVG 33 (Autonomie locali, Regione FVG); Sicily 123 (Regione Siciliana, first round)."
         },
         {
           "date": "2023-01-01",
           "precision": "year",
-          "contests": 639,
+          "contests": 799,
           "regions": {
             "01": 70,
+            "02": 2,
             "03": 106,
+            "04": 3,
             "05": 49,
+            "06": 24,
             "07": 23,
             "08": 21,
             "09": 22,
@@ -4907,19 +5172,24 @@
             "16": 52,
             "17": 14,
             "18": 44,
+            "19": 131,
             "20": 39
           },
           "source": "eligendo_opendata",
-          "quote": "639 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2023: comunali-20230514.zip, comunali-20230528.zip, comunali-20231022.zip"
+          "quote": "639 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2023: comunali-20230514.zip, comunali-20230528.zip, comunali-20231022.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Aosta Valley 2 (Regione autonoma Valle d'Aosta); Trentino-Alto Adige 3 (Bolzano 1, Trento 2; Bollettino Ufficiale); FVG 24 (Autonomie locali, Regione FVG); Sicily 131 (Regione Siciliana, first round)."
         },
         {
           "date": "2024-01-01",
           "precision": "year",
-          "contests": 3552,
+          "contests": 3719,
           "regions": {
             "01": 799,
+            "02": 1,
             "03": 960,
+            "04": 14,
             "05": 309,
+            "06": 114,
             "07": 125,
             "08": 225,
             "09": 185,
@@ -4932,19 +5202,24 @@
             "16": 62,
             "17": 52,
             "18": 133,
+            "19": 38,
             "20": 27
           },
           "source": "eligendo_opendata",
-          "quote": "3,552 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2024: comunali-20240609.zip, comunali-20240728.zip, comunali-20241117.zip"
+          "quote": "3,552 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2024: comunali-20240609.zip, comunali-20240728.zip, comunali-20241117.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Aosta Valley 1 (Regione autonoma Valle d'Aosta); Trentino-Alto Adige 14 (Bolzano 5, Trento 9; Bollettino Ufficiale); FVG 114 (Autonomie locali, Regione FVG); Sicily 38 (Regione Siciliana, first round)."
         },
         {
           "date": "2025-01-01",
           "precision": "year",
-          "contests": 128,
+          "contests": 473,
           "regions": {
             "01": 9,
+            "02": 65,
             "03": 18,
+            "04": 267,
             "05": 9,
+            "06": 4,
             "07": 5,
             "08": 5,
             "10": 3,
@@ -4956,19 +5231,24 @@
             "16": 10,
             "17": 8,
             "18": 19,
+            "19": 9,
             "20": 7
           },
           "source": "eligendo_opendata",
-          "quote": "128 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2025: comunali-20250525.zip, comunali-20250608.zip, comunali-20251123.zip"
+          "quote": "128 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2025: comunali-20250525.zip, comunali-20250608.zip, comunali-20251123.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Aosta Valley 65 (Regione autonoma Valle d'Aosta); Trentino-Alto Adige 267 (Bolzano 111, Trento 156; Bollettino Ufficiale); FVG 4 (Autonomie locali, Regione FVG); Sicily 9 (Regione Siciliana, first round)."
         },
         {
           "date": "2026-01-01",
           "precision": "year",
-          "contests": 809,
+          "contests": 894,
           "regions": {
             "01": 80,
+            "02": 1,
             "03": 93,
+            "04": 2,
             "05": 50,
+            "06": 11,
             "07": 18,
             "08": 16,
             "09": 20,
@@ -4981,10 +5261,12 @@
             "16": 54,
             "17": 16,
             "18": 77,
+            "19": 71,
             "20": 148
           },
           "source": "eligendo_opendata",
-          "quote": "809 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2026: comunali-20260524.zip, comunali-20260607.zip"
+          "quote": "809 distinct comuni (REGIONE, PROVINCIA, COMUNE) in the first-round rows of Eligendo's open data for 2026: comunali-20260524.zip, comunali-20260607.zip",
+          "note": "Regional counts replacing or adding to Eligendo's: Aosta Valley 1 (Regione autonoma Valle d'Aosta); Trentino-Alto Adige 2 (Bolzano 0, Trento 2; Bollettino Ufficiale); FVG 11 (Autonomie locali, Regione FVG); Sicily 71 (Regione Siciliana, first round)."
         }
       ]
     },
