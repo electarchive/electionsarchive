@@ -80,6 +80,12 @@
       "url": "https://www.hacienda.gob.es/SGT/catalogo_sefp/219_estudio-registro-entidades-locales-internet.pdf",
       "kind": "official_body"
     },
+    "mptmd-local": {
+      "title": "Administración local: las entidades locales existentes en España (página del portal de política territorial; cifras \"en la actualidad\", consultadas el 2026-11-13)",
+      "publisher": "Ministerio de Política Territorial y Memoria Democrática",
+      "url": "https://mptmd.gob.es/portal/politica-territorial/local.html",
+      "kind": "official_body"
+    },
     "ine-2025": {
       "title": "Estadística del Padrón Continuo / Censo anual de población a 1 de enero de 2025 (nota de prensa)",
       "publisher": "Instituto Nacional de Estadística",
@@ -303,6 +309,12 @@
           "value": 81,
           "source": "rel-2009",
           "locator": "p. 4, columna COMARCAS, total España: 81 (Cataluña 41, Aragón 32, País Vasco 7 cuadrillas, Castilla y León 1)"
+        },
+        {
+          "date": "2026-11-13",
+          "value": 83,
+          "source": "mptmd-local",
+          "locator": "Las Comarcas u otras entidades que agrupen varios Municipios: en la actualidad son 83 (Cataluña 42, Aragón 33, País Vasco 7, Castilla y León 1, El Bierzo); date is the day the page was read"
         }
       ]
     },
@@ -340,6 +352,12 @@
           "value": 3725,
           "source": "rel-2009",
           "locator": "p. 4, columna EATIMES, total España: 3.725"
+        },
+        {
+          "date": "2026-11-13",
+          "value": 3676,
+          "source": "mptmd-local",
+          "locator": "Entidades de ámbito territorial inferior al Municipio: en la actualidad son 3.676; date is the day the page was read"
         }
       ]
     }
