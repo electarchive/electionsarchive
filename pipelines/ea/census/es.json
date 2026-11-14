@@ -86,6 +86,12 @@
       "url": "https://www.parlamentodeandalucia.es/",
       "kind": "official_body"
     },
+    "reg-es-an-2026": {
+      "title": "Decreto del Presidente 2/2026, de 23 de marzo, de disolución del Parlamento de Andalucía y de convocatoria de elecciones (BOJA 24 March 2026; BOP Córdoba 27 March 2026)",
+      "publisher": "Junta de Andalucía",
+      "url": "https://bop.dipucordoba.es/visor-pdf/27-03-2026/BOP-A-2026-904.pdf",
+      "kind": "official_body"
+    },
     "reg-es-ar": {
       "title": "Gobierno de Aragón: elecciones y legislaturas",
       "publisher": "Gobierno de Aragón",
@@ -1917,7 +1923,8 @@
           "regions": {
             "AN": 8
           },
-          "source": "reg-es-an"
+          "source": "reg-es-an-2026",
+          "quote": "Se convocan elecciones al Parlamento de Andalucía, que se celebrarán el domingo 17 de mayo de 2026."
         }
       ]
     },
