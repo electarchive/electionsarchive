@@ -189,6 +189,7 @@ const MODEL = {
     pace: 13,
     hold: 0.01,
     firm: 0.5,
+    over: 0.05,
   },
   late: {
     prior: 0.1,
@@ -1855,7 +1856,7 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
         ) / flooredVotes
       : 0;
   const closed = met >= MODEL.floor.met ? MODEL.floor.closed : 1;
-  const left = isTail
+  const pool = isTail
     ? Math.max(
         planned,
         (MODEL.late.carry * lasting * closed +
@@ -1884,6 +1885,10 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
       1,
       sum(fittedBase.map((unit) => unit.expected)) * Math.exp(model.peak),
     );
+  const left = Math.max(
+    held + canvass,
+    pool * Math.max(0, 1 - Math.max(0, progress - 1 - MODEL.tail.over) / tail),
+  );
   const models = new Map(
     [...new Set(found.map((unit) => unit.channel))]
       .filter((channel) => channel !== 0)
