@@ -185,6 +185,12 @@
       "kind": "official_body",
       "url": "https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:legge:1991-06-07;182"
     },
+    "comuni_decentramento": {
+      "title": "Official pages of eight comuni on their sub-municipal districts, read 2026-11-14: Roma (15 municipi, comune.roma.it/web/it/mappa-dei-municipi.page), Milano (nove consigli di municipio, comune.milano.it/en/-/politiche-per-il-decentramento.-la-giunta-nei-nove-consigli-di-municipio-un-assessore-per-ognuna-delle-prime-sedute), Napoli (\"dieci Municipalità\", comune.napoli.it/amministrazione/municipalita/), Torino (8 circoscrizioni, decentramento.comune.torino.it), Genova (\"nove Municipi\", comune.genova.it/amministrazione/municipi), Firenze (\"5 quartieri\", comune.firenze.it/amministrazione/quartieri), Verona (\"otto Circoscrizioni\", comune.verona.it/Novita/Notizie/Vivere-le-Circoscrizioni), and Palermo (eight circoscrizione councils, comune.palermo.it/amministrazione/organi-di-governo/)",
+      "publisher": "Comuni of Roma, Milano, Napoli, Torino, Genova, Firenze, Verona, and Palermo",
+      "kind": "official_body",
+      "url": "https://www.comune.roma.it/web/it/mappa-dei-municipi.page"
+    },
     "nir_tuel": {
       "title": "Decreto legislativo 18 agosto 2000, n. 267, Testo unico delle leggi sull'ordinamento degli enti locali",
       "publisher": "Normattiva (Istituto Poligrafico e Zecca dello Stato)",
@@ -571,7 +577,15 @@
       "name_en": "Sub-municipal districts of the largest cities",
       "parent": "comune",
       "polity_kind": "submunicipal",
-      "source": "nir_tuel"
+      "source": "nir_tuel",
+      "counts": [
+        {
+          "date": "2026-11-14",
+          "value": 72,
+          "source": "comuni_decentramento",
+          "locator": "Verified cities only: Roma 15, Milano 9, Napoli 10, Torino 8, Genova 9, Firenze 5, Verona 8, Palermo 8. Not yet verified from an official page: Bologna (6 quartieri), Venezia (6 municipalità), Bari, Catania, Messina, Padova, and Trieste"
+        }
+      ]
     },
     {
       "key": "abroad",
