@@ -11,7 +11,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "gb.stormont_senate"
-VERSION = "1"
+VERSION = "2"
 PAGES = DATA / "pages" / SOURCE
 NOTICES = Path(__file__).with_suffix(".tsv")
 GAZETTE = "https://www.thegazette.co.uk/Belfast/issue/{}/page/{}/data.pdf"
@@ -24,6 +24,27 @@ DEBATES = {
 FIRST = (date(1921, 6, 11), date(1921, 6, 20))
 CONTESTED = date(1925, 5, 1)
 OPENED = date(1921, 6, 7)
+COMMONS = {
+    "Alexander Robert Gisborne Gordon": "Lt-Col. Rt. Hon. Sir Alexander Robert Gisborne Gordon",
+    "Alexander Wilson Hungerford": "Sir Alexander Wilson Hungerford",
+    "Basil Stanlake Brooke": "Rt. Hon. Sir Basil Stanlake Brooke",
+    "Edward Sullivan Murphy": "Rt. Hon. Edward Sullivan Murphy",
+    "George Anthony Clark": "George Anthony Clark",
+    "Harold Ian McClure": "Dr. Harold Ian McClure",
+    "Herbert Quin": "Herbert Quin",
+    "James Woods Gyle": "James Woods Gyle",
+    "John Hanna Robb": "Rt. Hon. John Hanna Robb",
+    "John Lawson Ormrod Andrews": "Rt. Hon. John Lawson Ormrod Andrews",
+    "John McHugh": "John McHugh",
+    "John Robert Perceval-Maxwell": "Captain John Robert Perceval-Maxwell",
+    "Robert Corkey": "Very Rev. Prof. Rt. Hon. Robert Corkey",
+    "Robert McBride": "Robert McBride",
+    "Samuel Rodgers": "Dr. Samuel Rodgers",
+    "Thomas Joseph Campbell": "Thomas Joseph Campbell",
+    "Thomas Robert Lavery": "Thomas Robert Lavery",
+    "Thomas Stanislaus McAllister": "Thomas Stanislaus McAllister",
+    "William James Morgan": "Rt. Hon. William James Morgan",
+}
 UNDATED = {"1934-04-27_670_137", "1949-06-24_1461_143"}
 DISSOLVED = date(1973, 7, 18)
 METHODOLOGY = (
@@ -295,6 +316,9 @@ def emit() -> Path:
                     if persons[identity] in cs.minted:
                         cs.add("person", id=persons[identity])
                         name(persons[identity], identity)
+                    elif identity in COMMONS:
+                        cs.merge(persons[identity], cs.key("gb.stormont.person", COMMONS[identity]))
+                        persons[identity] = cs.key(f"{SOURCE}.person", identity)
                 cs.add(
                     "contest_option",
                     id=option,
