@@ -178,6 +178,16 @@ export const rules = v.variant("formula", [
         of: v.picklist(["registered", "valid"]),
       }),
     ),
+    spread: v.optional(
+      v.object({
+        scheme: v.string(),
+        share: v.pipe(v.number(), v.minValue(0), v.maxValue(1)),
+        units: v.object({
+          share: v.pipe(v.number(), v.minValue(0), v.maxValue(1)),
+          strict: v.optional(v.boolean(), false),
+        }),
+      }),
+    ),
     tieBreak,
   }),
   v.object({

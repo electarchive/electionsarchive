@@ -4,7 +4,14 @@ type TwoRound = Extract<Rules, { formula: "two_round" }>;
 
 export function advance(
   rules: TwoRound,
-  round: { entries: Array<{ id: string; votes: number }>; registered?: number },
+  round: {
+    entries: Array<{ id: string; votes: number }>;
+    registered?: number;
+    units?: Array<{
+      id: string;
+      entries: Array<{ id: string; votes: number }>;
+    }>;
+  },
 ) {
   let valid = 0;
   for (const { votes } of round.entries) valid += votes;
@@ -21,7 +28,8 @@ export function advance(
     top.votes !== ranked[1]?.votes &&
     top.votes > rules.majority * valid &&
     (rules.minimum == null ||
-      top.votes >= rules.minimum.share * base(rules.minimum.of))
+      top.votes >= rules.minimum.share * base(rules.minimum.of)) &&
+    isSpread(rules, top.id, round.units)
   )
     return { elected: top.id };
   const { qualify } = rules;
@@ -45,4 +53,26 @@ export function advance(
       ? { ids: tied.map(({ id }) => id), seats: rules.advance - above.length }
       : undefined,
   };
+}
+
+function isSpread(
+  rules: TwoRound,
+  id: string,
+  units?: Array<{ id: string; entries: Array<{ id: string; votes: number }> }>,
+) {
+  const { spread } = rules;
+  if (spread == null) return true;
+  if (units == null) throw new Error(`A spread needs ${spread.scheme} units`);
+  let reached = 0;
+  for (const unit of units) {
+    let valid = 0;
+    let votes = 0;
+    for (const entry of unit.entries) {
+      valid += entry.votes;
+      if (entry.id === id) votes += entry.votes;
+    }
+    if (valid > 0 && votes >= spread.share * valid) reached += 1;
+  }
+  const needed = spread.units.share * units.length;
+  return spread.units.strict ? reached > needed : reached >= needed;
 }

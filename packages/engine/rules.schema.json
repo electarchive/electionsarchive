@@ -1591,6 +1591,41 @@
             "of"
           ]
         },
+        "spread": {
+          "type": "object",
+          "properties": {
+            "scheme": {
+              "type": "string"
+            },
+            "share": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "units": {
+              "type": "object",
+              "properties": {
+                "share": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "strict": {
+                  "type": "boolean",
+                  "default": false
+                }
+              },
+              "required": [
+                "share"
+              ]
+            }
+          },
+          "required": [
+            "scheme",
+            "share",
+            "units"
+          ]
+        },
         "tieBreak": {
           "enum": [
             "votes",

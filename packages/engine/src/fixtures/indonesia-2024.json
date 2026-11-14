@@ -1,0 +1,314 @@
+{
+  "elected": "Prabowo Subianto–Gibran Rakabuming Raka",
+  "entries": [
+    { "id": "Anies Baswedan–Muhaimin Iskandar", "votes": 40971906 },
+    { "id": "Prabowo Subianto–Gibran Rakabuming Raka", "votes": 96214691 },
+    { "id": "Ganjar Pranowo–Mahfud MD", "votes": 27040878 }
+  ],
+  "provinces": [
+    {
+      "id": "Aceh",
+      "entries": [
+        { "id": "Anies Baswedan–Muhaimin Iskandar", "votes": 2369534 },
+        { "id": "Prabowo Subianto–Gibran Rakabuming Raka", "votes": 787024 },
+        { "id": "Ganjar Pranowo–Mahfud MD", "votes": 64677 }
+      ]
+    },
+    {
+      "id": "Sumatera Utara",
+      "entries": [
+        { "id": "Anies Baswedan–Muhaimin Iskandar", "votes": 2339620 },
+        { "id": "Prabowo Subianto–Gibran Rakabuming Raka", "votes": 4660408 },
+        { "id": "Ganjar Pranowo–Mahfud MD", "votes": 999528 }
+      ]
+    },
+    {
+      "id": "Sumatera Barat",
+      "entries": [
+        { "id": "Anies Baswedan–Muhaimin Iskandar", "votes": 1744042 },
+        { "id": "Prabowo Subianto–Gibran Rakabuming Raka", "votes": 1217314 },
+        { "id": "Ganjar Pranowo–Mahfud MD", "votes": 124044 }
+      ]
+    },
+    {
+      "id": "Riau",
+      "entries": [
+        { "id": "Anies Baswedan–Muhaimin Iskandar", "votes": 1400093 },
+        { "id": "Prabowo Subianto–Gibran Rakabuming Raka", "votes": 1931113 },
+        { "id": "Ganjar Pranowo–Mahfud MD", "votes": 357298 }
+      ]
+    },
+    {
+      "id": "Jambi",
+      "entries": [
+        { "id": "Anies Baswedan–Muhaimin Iskandar", "votes": 532605 },
+        { "id": "Prabowo Subianto–Gibran Rakabuming Raka", "votes": 1438952 },
+        { "id": "Ganjar Pranowo–Mahfud MD", "votes": 234251 }
+      ]
+    },
+    {
+      "id": "Sumatera Selatan",
+      "entries": [
+        { "id": "Anies Baswedan–Muhaimin Iskandar", "votes": 997299 },
+        { "id": "Prabowo Subianto–Gibran Rakabuming Raka", "votes": 3649651 },
+        { "id": "Ganjar Pranowo–Mahfud MD", "votes": 606681 }
+      ]
+    },
+    {
+      "id": "Bengkulu",
+      "entries": [
+        { "id": "Anies Baswedan–Muhaimin Iskandar", "votes": 229681 },
+        { "id": "Prabowo Subianto–Gibran Rakabuming Raka", "votes": 893499 },
+        { "id": "Ganjar Pranowo–Mahfud MD", "votes": 145570 }
+      ]
+    },
+    {
+      "id": "Lampung",
+      "entries": [
+        { "id": "Anies Baswedan–Muhaimin Iskandar", "votes": 791892 },
+        { "id": "Prabowo Subianto–Gibran Rakabuming Raka", "votes": 3554310 },
+        { "id": "Ganjar Pranowo–Mahfud MD", "votes": 764486 }
+      ]
+    },
+    {
+      "id": "Kepulauan Bangka Belitung",
+      "entries": [
+        { "id": "Anies Baswedan–Muhaimin Iskandar", "votes": 204348 },
+        { "id": "Prabowo Subianto–Gibran Rakabuming Raka", "votes": 529883 },
+        { "id": "Ganjar Pranowo–Mahfud MD", "votes": 151109 }
+      ]
+    },
+    {
+      "id": "Kepulauan Riau",
+      "entries": [
+        { "id": "Anies Baswedan–Muhaimin Iskandar", "votes": 370671 },
+        { "id": "Prabowo Subianto–Gibran Rakabuming Raka", "votes": 641388 },
+        { "id": "Ganjar Pranowo–Mahfud MD", "votes": 140733 }
+      ]
+    },
+    {
+      "id": "DKI Jakarta",
+      "entries": [
+        { "id": "Anies Baswedan–Muhaimin Iskandar", "votes": 2653762 },
+        { "id": "Prabowo Subianto–Gibran Rakabuming Raka", "votes": 2692011 },
+        { "id": "Ganjar Pranowo–Mahfud MD", "votes": 1115138 }
+      ]
+    },
+    {
+      "id": "Jawa Barat",
+      "entries": [
+        { "id": "Anies Baswedan–Muhaimin Iskandar", "votes": 9099674 },
+        { "id": "Prabowo Subianto–Gibran Rakabuming Raka", "votes": 16805854 },
+        { "id": "Ganjar Pranowo–Mahfud MD", "votes": 2820995 }
+      ]
+    },
+    {
+      "id": "Jawa Tengah",
+      "entries": [
+        { "id": "Anies Baswedan–Muhaimin Iskandar", "votes": 2866373 },
+        { "id": "Prabowo Subianto–Gibran Rakabuming Raka", "votes": 12096454 },
+        { "id": "Ganjar Pranowo–Mahfud MD", "votes": 7827335 }
+      ]
+    },
+    {
+      "id": "Daerah Istimewa Yogyakarta",
+      "entries": [
+        { "id": "Anies Baswedan–Muhaimin Iskandar", "votes": 496280 },
+        { "id": "Prabowo Subianto–Gibran Rakabuming Raka", "votes": 1269265 },
+        { "id": "Ganjar Pranowo–Mahfud MD", "votes": 741220 }
+      ]
+    },
+    {
+      "id": "Jawa Timur",
+      "entries": [
+        { "id": "Anies Baswedan–Muhaimin Iskandar", "votes": 4492652 },
+        { "id": "Prabowo Subianto–Gibran Rakabuming Raka", "votes": 16716603 },
+        { "id": "Ganjar Pranowo–Mahfud MD", "votes": 4434805 }
+      ]
+    },
+    {
+      "id": "Banten",
+      "entries": [
+        { "id": "Anies Baswedan–Muhaimin Iskandar", "votes": 2451383 },
+        { "id": "Prabowo Subianto–Gibran Rakabuming Raka", "votes": 4035052 },
+        { "id": "Ganjar Pranowo–Mahfud MD", "votes": 720275 }
+      ]
+    },
+    {
+      "id": "Bali",
+      "entries": [
+        { "id": "Anies Baswedan–Muhaimin Iskandar", "votes": 99233 },
+        { "id": "Prabowo Subianto–Gibran Rakabuming Raka", "votes": 1454640 },
+        { "id": "Ganjar Pranowo–Mahfud MD", "votes": 1127134 }
+      ]
+    },
+    {
+      "id": "Nusa Tenggara Barat",
+      "entries": [
+        { "id": "Anies Baswedan–Muhaimin Iskandar", "votes": 850539 },
+        { "id": "Prabowo Subianto–Gibran Rakabuming Raka", "votes": 2154843 },
+        { "id": "Ganjar Pranowo–Mahfud MD", "votes": 241106 }
+      ]
+    },
+    {
+      "id": "Nusa Tenggara Timur",
+      "entries": [
+        { "id": "Anies Baswedan–Muhaimin Iskandar", "votes": 153446 },
+        { "id": "Prabowo Subianto–Gibran Rakabuming Raka", "votes": 1798753 },
+        { "id": "Ganjar Pranowo–Mahfud MD", "votes": 958505 }
+      ]
+    },
+    {
+      "id": "Kalimantan Barat",
+      "entries": [
+        { "id": "Anies Baswedan–Muhaimin Iskandar", "votes": 718641 },
+        { "id": "Prabowo Subianto–Gibran Rakabuming Raka", "votes": 1964183 },
+        { "id": "Ganjar Pranowo–Mahfud MD", "votes": 534450 }
+      ]
+    },
+    {
+      "id": "Kalimantan Tengah",
+      "entries": [
+        { "id": "Anies Baswedan–Muhaimin Iskandar", "votes": 256811 },
+        { "id": "Prabowo Subianto–Gibran Rakabuming Raka", "votes": 1097070 },
+        { "id": "Ganjar Pranowo–Mahfud MD", "votes": 158788 }
+      ]
+    },
+    {
+      "id": "Kalimantan Selatan",
+      "entries": [
+        { "id": "Anies Baswedan–Muhaimin Iskandar", "votes": 849948 },
+        { "id": "Prabowo Subianto–Gibran Rakabuming Raka", "votes": 1407684 },
+        { "id": "Ganjar Pranowo–Mahfud MD", "votes": 159950 }
+      ]
+    },
+    {
+      "id": "Kalimantan Timur",
+      "entries": [
+        { "id": "Anies Baswedan–Muhaimin Iskandar", "votes": 448046 },
+        { "id": "Prabowo Subianto–Gibran Rakabuming Raka", "votes": 1542346 },
+        { "id": "Ganjar Pranowo–Mahfud MD", "votes": 240143 }
+      ]
+    },
+    {
+      "id": "Kalimantan Utara",
+      "entries": [
+        { "id": "Anies Baswedan–Muhaimin Iskandar", "votes": 72065 },
+        { "id": "Prabowo Subianto–Gibran Rakabuming Raka", "votes": 284209 },
+        { "id": "Ganjar Pranowo–Mahfud MD", "votes": 51451 }
+      ]
+    },
+    {
+      "id": "Sulawesi Utara",
+      "entries": [
+        { "id": "Anies Baswedan–Muhaimin Iskandar", "votes": 119103 },
+        { "id": "Prabowo Subianto–Gibran Rakabuming Raka", "votes": 1229069 },
+        { "id": "Ganjar Pranowo–Mahfud MD", "votes": 283796 }
+      ]
+    },
+    {
+      "id": "Sulawesi Tengah",
+      "entries": [
+        { "id": "Anies Baswedan–Muhaimin Iskandar", "votes": 386743 },
+        { "id": "Prabowo Subianto–Gibran Rakabuming Raka", "votes": 1251313 },
+        { "id": "Ganjar Pranowo–Mahfud MD", "votes": 160594 }
+      ]
+    },
+    {
+      "id": "Sulawesi Selatan",
+      "entries": [
+        { "id": "Anies Baswedan–Muhaimin Iskandar", "votes": 2003081 },
+        { "id": "Prabowo Subianto–Gibran Rakabuming Raka", "votes": 3010726 },
+        { "id": "Ganjar Pranowo–Mahfud MD", "votes": 265948 }
+      ]
+    },
+    {
+      "id": "Sulawesi Tenggara",
+      "entries": [
+        { "id": "Anies Baswedan–Muhaimin Iskandar", "votes": 361585 },
+        { "id": "Prabowo Subianto–Gibran Rakabuming Raka", "votes": 1113344 },
+        { "id": "Ganjar Pranowo–Mahfud MD", "votes": 90727 }
+      ]
+    },
+    {
+      "id": "Gorontalo",
+      "entries": [
+        { "id": "Anies Baswedan–Muhaimin Iskandar", "votes": 227354 },
+        { "id": "Prabowo Subianto–Gibran Rakabuming Raka", "votes": 504662 },
+        { "id": "Ganjar Pranowo–Mahfud MD", "votes": 41508 }
+      ]
+    },
+    {
+      "id": "Sulawesi Barat",
+      "entries": [
+        { "id": "Anies Baswedan–Muhaimin Iskandar", "votes": 223153 },
+        { "id": "Prabowo Subianto–Gibran Rakabuming Raka", "votes": 533757 },
+        { "id": "Ganjar Pranowo–Mahfud MD", "votes": 62514 }
+      ]
+    },
+    {
+      "id": "Maluku",
+      "entries": [
+        { "id": "Anies Baswedan–Muhaimin Iskandar", "votes": 228557 },
+        { "id": "Prabowo Subianto–Gibran Rakabuming Raka", "votes": 665371 },
+        { "id": "Ganjar Pranowo–Mahfud MD", "votes": 186395 }
+      ]
+    },
+    {
+      "id": "Maluku Utara",
+      "entries": [
+        { "id": "Anies Baswedan–Muhaimin Iskandar", "votes": 200459 },
+        { "id": "Prabowo Subianto–Gibran Rakabuming Raka", "votes": 454943 },
+        { "id": "Ganjar Pranowo–Mahfud MD", "votes": 91293 }
+      ]
+    },
+    {
+      "id": "Papua",
+      "entries": [
+        { "id": "Anies Baswedan–Muhaimin Iskandar", "votes": 67592 },
+        { "id": "Prabowo Subianto–Gibran Rakabuming Raka", "votes": 378908 },
+        { "id": "Ganjar Pranowo–Mahfud MD", "votes": 178534 }
+      ]
+    },
+    {
+      "id": "Papua Barat",
+      "entries": [
+        { "id": "Anies Baswedan–Muhaimin Iskandar", "votes": 37459 },
+        { "id": "Prabowo Subianto–Gibran Rakabuming Raka", "votes": 172965 },
+        { "id": "Ganjar Pranowo–Mahfud MD", "votes": 120565 }
+      ]
+    },
+    {
+      "id": "Papua Selatan",
+      "entries": [
+        { "id": "Anies Baswedan–Muhaimin Iskandar", "votes": 41906 },
+        { "id": "Prabowo Subianto–Gibran Rakabuming Raka", "votes": 162852 },
+        { "id": "Ganjar Pranowo–Mahfud MD", "votes": 110003 }
+      ]
+    },
+    {
+      "id": "Papua Tengah",
+      "entries": [
+        { "id": "Anies Baswedan–Muhaimin Iskandar", "votes": 128577 },
+        { "id": "Prabowo Subianto–Gibran Rakabuming Raka", "votes": 638616 },
+        { "id": "Ganjar Pranowo–Mahfud MD", "votes": 335089 }
+      ]
+    },
+    {
+      "id": "Papua Pegunungan",
+      "entries": [
+        { "id": "Anies Baswedan–Muhaimin Iskandar", "votes": 284184 },
+        { "id": "Prabowo Subianto–Gibran Rakabuming Raka", "votes": 838382 },
+        { "id": "Ganjar Pranowo–Mahfud MD", "votes": 175956 }
+      ]
+    },
+    {
+      "id": "Papua Barat Daya",
+      "entries": [
+        { "id": "Anies Baswedan–Muhaimin Iskandar", "votes": 48405 },
+        { "id": "Prabowo Subianto–Gibran Rakabuming Raka", "votes": 209403 },
+        { "id": "Ganjar Pranowo–Mahfud MD", "votes": 99899 }
+      ]
+    }
+  ]
+}
