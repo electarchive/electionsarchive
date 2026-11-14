@@ -141,8 +141,9 @@ PARTICLES = {
     "por",
 }
 SOURCE_NOTE = (
-    "The electoral court publishes results for each polling section. It numbers municipalities with its own codes, "
-    "not IBGE's, and gives polling-place addresses but no coordinates."
+    "The electoral court publishes each candidate's and each party's votes by municipality and electoral zone, and "
+    "turnout, blank, and null votes for the same units. Its files were regenerated from the final totals, after "
+    "later court decisions."
 )
 PRESIDENT = (
     "A candidate wins in the first round with more than half of the valid votes. Blank and null votes do not count "
@@ -632,7 +633,12 @@ def emit() -> Path:
                 "https://dadosabertos.tse.jus.br/dataset/candidatos-2022",
                 None,
             ),
-            (sources["places"], "Eleitorado - 2022", "https://dadosabertos.tse.jus.br/dataset/eleitorado-2022", None),
+            (
+                sources["places"],
+                "Eleitorado - 2022",
+                "https://dadosabertos.tse.jus.br/dataset/eleitorado-2022",
+                "Only the place's name and coordinates are stored, never its address or telephone number.",
+            ),
         ):
             cs.add(
                 "source",
