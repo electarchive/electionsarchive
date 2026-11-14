@@ -1,0 +1,38 @@
+edition	division	date_from	date_to	precision	seats	kind	context	name	party	votes	elected
+1898	bermondsey	1899-01-01	1899-12-31	year	1	unstated	In 1899, in the room of Mr. Thornton (resigned).	A. A. Allen	P		1
+1898	south-west-bethnal-green	1899-01-01	1899-12-31	year	1	unopposed	In 1899, in the room of Mr. B. F. C. Costelloe (deceased).	T. Wiles			1
+1898	city-of-london	1899-01-01	1899-12-31	year	1	unstated	In 1899, in place of the Duke of Leeds.	Lord Alexander Thynne			1
+1898	dulwich	1899-05-01	1899-05-31	month	2	counted	May 1899.	Bryce Grant	M	3028	1
+1898	dulwich	1899-05-01	1899-05-31	month	2	counted	May 1899.	J. Ratcliffe Cousins	M	3011	1
+1898	dulwich	1899-05-01	1899-05-31	month	2	counted	May 1899.	H. E. Ramsay	P	2521	0
+1898	dulwich	1899-05-01	1899-05-31	month	2	counted	May 1899.	A. A. Allen	P	2465	0
+1898	st-george-s-hanover-square	1898-03-04	1901-03-01	unknown	1	unopposed	Undated: on Mr. R. C. Antrobus being elected an alderman.	W. H. C. Payne			1
+1898	st-george	1900-01-01	1900-12-31	year	1	unstated	In 1900, in place of Mr. C. Ballan (resigned).	J. E. Matthews			1
+1898	wandsworth	1899-12-01	1899-12-31	month	1	counted	December 1899, in place of Lord Dunraven (resigned).	Mark Mayhew	P	4477	1
+1898	wandsworth	1899-12-01	1899-12-31	month	1	counted	December 1899, in place of Lord Dunraven (resigned).	Major Darwin		4245	0
+1898	woolwich	1899-01-01	1899-12-31	year	2	unstated	In 1899, in the places of Col. Hughes (resigned) and Mr. A. Penfold (deceased).	W. J. Squires			1
+1898	woolwich	1899-01-01	1899-12-31	year	2	unstated	In 1899, in the places of Col. Hughes (resigned) and Mr. A. Penfold (deceased).	Hon. W. R. W. Peel			1
+1904	paddington-south	1901-04-01	1901-04-30	month	1	unopposed	April 1901, on Sir G. D. Harris being elected an alderman.	H. P. Harris			1
+1904	west-marylebone	1901-07-01	1901-07-31	month	1	counted	July 1901, on the retirement of Lord Farquhar (M).	J. Lewis	P	2075	1
+1904	west-marylebone	1901-07-01	1901-07-31	month	1	counted	July 1901, on the retirement of Lord Farquhar (M).	Sir Cameron Gull		1835	0
+1904	central-finsbury	1901-11-01	1901-11-30	month	1	unopposed	November 1901, on the retirement of Smith (P).	MacDonald	P		1
+1904	mile-end	1902-03-01	1902-03-31	month	1	counted	March 1902.	A. O. Goodrich	M	1194	1
+1904	mile-end	1902-03-01	1902-03-31	month	1	counted	March 1902.	W. Hazell	P	893	0
+1904	st-pancras-east	1902-08-01	1902-08-31	month	1	counted	August 1902.	T. H. W. Idris	P	2490	1
+1904	st-pancras-east	1902-08-01	1902-08-31	month	1	counted	August 1902.	E. Barnes	M	1865	0
+1904	east-marylebone	1904-12-01	1904-12-31	month	1	counted	December 1904, on the resignation of Mr. W. C. Bridgeman (M).	Earl of Essex	M	1822	1
+1904	east-marylebone	1904-12-01	1904-12-31	month	1	counted	December 1904, on the resignation of Mr. W. C. Bridgeman (M).	T. Wheeler	I	514	0
+1904	stepney	1905-01-01	1905-12-31	year	1	counted	In 1905, on the resignation of Lord Malmesbury.	A. O. Goodrich	M	1777	1
+1904	stepney	1905-01-01	1905-12-31	year	1	counted	In 1905, on the resignation of Lord Malmesbury.	Lord Denman	P	1375	0
+1904	stepney	1905-01-01	1905-12-31	year	1	counted	In 1905, on the resignation of Lord Malmesbury.	A. A. Watts	S	111	0
+1907	fulham	1905-01-01	1905-12-31	year	1	counted	In 1905.	C. Cobb	M	4395	1
+1907	fulham	1905-01-01	1905-12-31	year	1	counted	In 1905.	Spender	P	3970	0
+1907	fulham	1905-01-01	1905-12-31	year	1	counted	In 1905.	Clark	L	425	0
+1907	kensington-south	1905-01-01	1905-12-31	year	1	unopposed	In 1905.	Colvile	M		1
+1907	lambeth-north	1905-01-01	1905-12-31	year	1	counted	In 1905.	F. Briant	P	1549	1
+1907	lambeth-north	1905-01-01	1905-12-31	year	1	counted	In 1905.	G. Hinds	M	938	0
+1907	walworth	1906-01-01	1906-12-31	year	2	counted	In 1906.	O. A. Dawes	P	1927	1
+1907	walworth	1906-01-01	1906-12-31	year	2	counted	In 1906.	C. Jesson	P	1879	1
+1907	walworth	1906-01-01	1906-12-31	year	2	counted	In 1906.	F. Oldfield	M	1488	0
+1907	walworth	1906-01-01	1906-12-31	year	2	counted	In 1906.	Lord Henry Bentinck	M	1445	0
+1907	bermondsey	1906-01-01	1906-12-31	year	1	unopposed	In 1906.	Dr. A. Salter	P		1
