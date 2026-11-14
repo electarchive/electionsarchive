@@ -39,6 +39,24 @@
       "url": "https://www.ncsl.org/elections-and-campaigns/primary-runoffs",
       "kind": "compendium"
     },
+    "ga-psc-2025": {
+      "publisher": "Georgia Secretary of State",
+      "title": "November 4, 2025 General Election results: Public Service Commission",
+      "url": "https://results.sos.ga.gov/results/public/Georgia/elections/2025NovGen",
+      "kind": "official_body"
+    },
+    "fl-statutes-100-061": {
+      "publisher": "Florida Legislature",
+      "title": "Florida Statutes sections 100.061 and 105.051",
+      "url": "http://www.leg.state.fl.us/statutes/index.cfm?App_mode=Display_Statute&URL=0100-0199/0100/Sections/0100.061.html",
+      "kind": "official_body"
+    },
+    "la-canceled-2026": {
+      "publisher": "Los Angeles County Registrar-Recorder/County Clerk",
+      "title": "Tentative list of canceled elections for November 3, 2026",
+      "url": "https://content.lavote.gov/docs/rrcc/documents/canceled-elections-november-2026-tentative.pdf",
+      "kind": "official_body"
+    },
     "bots-executives": {
       "publisher": "The Council of State Governments",
       "title": "The Book of the States 2022, Table 6.1: State Executive Branch Officials to be Elected, 2022-2026",
@@ -264,6 +282,16 @@
       "goal": "subnational",
       "source": "bots-executives",
       "note": "Lieutenant governors, attorneys general, secretaries of state, treasurers, auditors, and other offices elected statewide, plus the Council of the District of Columbia.",
+      "dates": [
+        {
+          "date": "2025-11-04",
+          "within": "US-GA",
+          "election_kind": "general",
+          "contests": 2,
+          "source": "ga-psc-2025",
+          "quote": "Public Service Commission, Districts 2 and 3, on the November 4, 2025 general election ballot"
+        }
+      ],
       "match": [{"within": null, "polity_kinds": ["federal_unit", "region"]}]
     },
     {
@@ -343,6 +371,17 @@
       "category": "council",
       "goal": "local",
       "source": "cog",
+      "dates": [
+        {
+          "date": "2026-08-18",
+          "within": "US-FL",
+          "election_kind": "primary",
+          "regions": {"decided_earlier": true},
+          "note": "A universal primary contest, or a nonpartisan race in which one candidate wins a majority, is decided at the primary and is left off the general election ballot.",
+          "source": "fl-statutes-100-061",
+          "quote": "Florida Statutes sections 100.061 and 105.051: a universal primary contest, or a nonpartisan race in which one candidate wins a majority, is decided at the primary and is left off the general election ballot"
+        }
+      ],
       "match": [{"within": null, "polity_kinds": ["municipality"]}]
     },
     {
@@ -361,6 +400,17 @@
       "category": "special_purpose",
       "goal": "local",
       "source": "cog",
+      "dates": [
+        {
+          "date": "2026-11-03",
+          "within": "us.polity:county:06037",
+          "election_kind": "general",
+          "regions": {"canceled": ["El Rancho", "El Segundo", "Manhattan Beach", "San Marino", "Walnut Valley", "West Covina", "El Monte City", "Gorman Joint", "Hawthorne", "Hermosa Beach City", "Rosemead"]},
+          "note": "Appointment in lieu of election due to insufficiency of candidates.",
+          "source": "la-canceled-2026",
+          "quote": "Tentative list of canceled elections for November 3, 2026, school districts: El Rancho, El Segundo, Manhattan Beach, San Marino, Walnut Valley, West Covina, El Monte City, Gorman Joint, Hawthorne, Hermosa Beach City, and Rosemead"
+        }
+      ],
       "match": [
         {"within": null, "polity_kinds": ["school_district"], "precedence": 1},
         {"within": null, "name_pattern": "school|education", "polity_kinds": ["county", "municipality", "special_district"], "precedence": 1}

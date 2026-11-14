@@ -63,6 +63,12 @@ def emit(cc: str, spec: dict | None = None) -> str:
             for field in ("body", "office")
             if isinstance(row.get(field), str)
         }
+        refs |= {
+            row["within"]
+            for entry in spec["classes"]
+            for row in entry.get("dates", [])
+            if ":" in row.get("within", "")
+        }
         pairs = [ref.split(":", 1) for ref in sorted(refs) if ":" in ref]
         entities: dict[str, object] = {
             f"{scheme}:{value}": entity
@@ -236,8 +242,10 @@ def emit(cc: str, spec: dict | None = None) -> str:
                     **{column: array(match[column]) for column in SELECTORS if column in match},
                 )
             for row in entry.get("dates", []):
+                within = row.get("within")
                 fields = {
                     "class_id": id,
+                    "within_polity_id": (entities[within] if ":" in within else region(within)) if within else None,
                     "date": row["date"],
                     "date_precision": row.get("precision", "day"),
                     "election_kind": row.get("election_kind"),
@@ -256,7 +264,7 @@ def emit(cc: str, spec: dict | None = None) -> str:
                         "quote": row.get("quote"),
                     }
                 cs.add(
-                    "census_date", id=mint("census_date", key, None, row["date"], row.get("through")), **fields, **cited
+                    "census_date", id=mint("census_date", key, within, row["date"], row.get("through")), **fields, **cited
                 )
                 for iso, state in (row.get("states") or {}).items():
                     cs.add(
