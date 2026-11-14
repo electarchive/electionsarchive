@@ -129,15 +129,13 @@
         },
         {
           "label": "David Carley (Dem.)",
-          "contest": "governor",
-          "candidate": "David Carley",
-          "party": "Dem."
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "Jack Olson (Rep.)",
-          "contest": "governor",
-          "candidate": "Jack Olson",
-          "party": "Rep."
+          "contest": null,
+          "candidate": ""
         }
       ],
       "orientation": "counties_down",

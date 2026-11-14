@@ -87,7 +87,8 @@
       "day": "1950-11-07",
       "special": false,
       "state": "WI",
-      "district": 8
+      "district": 8,
+      "accept": "The Blue Book prints a Schaal (Soc.) column that totals 1 (Oconto) against 116 in the Clerk of the House's statistics held for the statewide default, so the county cells follow the book and the statewide default keeps its own total."
     },
     "house9": {
       "year": 1950,

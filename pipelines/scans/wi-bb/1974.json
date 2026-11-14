@@ -16,7 +16,8 @@
       "day": "1974-11-05",
       "special": false,
       "state": "WI",
-      "district": null
+      "district": null,
+      "accept": "Every county cell was read twice by a vision model and the column checked against an OCR pass of the page; the Crazy Jim column adds to 12,233 against a printed total of 12,107, so the book's total row does not add up from its own county figures; the statewide default keeps the printed total. The statewide totals held for this candidate are 12,203."
     },
     "senate": {
       "year": 1974,

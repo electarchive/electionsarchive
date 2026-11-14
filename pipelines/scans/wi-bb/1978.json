@@ -23,7 +23,8 @@
       "day": "1978-11-07",
       "special": false,
       "state": "WI",
-      "district": 1
+      "district": 1,
+      "accept": "Every county cell was read twice by a vision model and the column checked against an OCR pass of the page; the Les Aspin column adds to 77,046 against a printed total of 77,146, so the book's total row does not add up from its own county figures; the statewide default keeps the printed total."
     },
     "house2": {
       "year": 1978,

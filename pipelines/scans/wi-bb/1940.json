@@ -16,7 +16,8 @@
       "day": "1940-11-05",
       "special": false,
       "state": "WI",
-      "district": null
+      "district": null,
+      "accept": "Every county cell was read twice by a vision model and the column checked against an OCR pass of the page; the Roosevelt column adds to 704,811 against a printed total of 704,821, so the book's total row does not add up from its own county figures; the statewide default keeps the printed total. The Langlade figure prints a damaged digit and reads 5,190."
     },
     "governor": {
       "year": 1940,

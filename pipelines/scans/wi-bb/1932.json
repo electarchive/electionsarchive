@@ -31,7 +31,8 @@
       "day": "1932-11-08",
       "special": false,
       "state": "WI",
-      "district": 3
+      "district": 3,
+      "accept": "Every county cell was read twice by a vision model and the column checked against an OCR pass of the page; the John J. Boyle column adds to 37,846 against a printed total of 38,646, so the book's total row does not add up from its own county figures; the statewide default keeps the printed total."
     },
     "house4": {
       "year": 1932,
@@ -71,7 +72,8 @@
       "day": "1932-11-08",
       "special": false,
       "state": "WI",
-      "district": 8
+      "district": 8,
+      "accept": "Every county cell was read twice by a vision model and the column checked against an OCR pass of the page; the George J. Schneider column adds to 51,932 against a printed total of 51,887, so the book's total row does not add up from its own county figures; the statewide default keeps the printed total."
     },
     "house9": {
       "year": 1932,
@@ -95,7 +97,8 @@
       "day": "1932-11-08",
       "special": false,
       "state": "WI",
-      "district": null
+      "district": null,
+      "accept": "Every county cell was read twice by a vision model and checked against the page image; the Foster and Ford (Independent Communist) column adds to 3,105 against a printed total of 3,112, and several counties print a blank in that column, so the book's total row does not add up from its own county figures; the statewide default keeps the printed total."
     },
     "senate": {
       "year": 1932,
@@ -228,8 +231,8 @@
         },
         {
           "label": "Walter Pola-kowski (Soc.)",
-          "contest": null,
-          "candidate": ""
+          "contest": "house4",
+          "candidate": "Walter Polakowski"
         },
         {
           "label": "Carl Lester (Ind.)",
@@ -426,13 +429,13 @@
       "columns": [
         {
           "label": "Roose-velt and Garner Dem.",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "Roosevelt (Democratic)"
         },
         {
           "label": "Upshaw and Regan Proh.",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "Prohibition"
         },
         {
           "label": "Hoover and Curtis Rep.",
@@ -446,8 +449,8 @@
         },
         {
           "label": "Foster and Ford Ind. Com.",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "Independent Communist"
         },
         {
           "label": "Reynolds and Aiken Ind. Soc. Labor",

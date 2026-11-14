@@ -15,7 +15,8 @@
       "day": "1944-11-07",
       "special": false,
       "state": "WI",
-      "district": null
+      "district": null,
+      "accept": "Every county cell was read twice by a vision model and the column checked against an OCR pass of the page; the Roosevelt column adds to 651,013 against a printed total of 650,413, so the book's total row does not add up from its own county figures; the statewide default keeps the printed total."
     },
     "governor": {
       "year": 1944,

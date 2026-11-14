@@ -15,7 +15,8 @@
       "day": "1958-11-04",
       "special": false,
       "state": "WI",
-      "district": null
+      "district": null,
+      "accept": "The Blue Book prints Wayne Leverenz (Independent) only as a footnote total of 1,485 votes and gives no county figures, so his votes stay in the statewide default and the county table lists Nelson and Thomson."
     },
     "senate": {
       "year": 1958,
@@ -23,7 +24,8 @@
       "day": "1958-11-04",
       "special": false,
       "state": "WI",
-      "district": null
+      "district": null,
+      "accept": "The Blue Book prints James E. Boulton and Georgia Cozzini (Independents) only as footnote totals and gives no county figures, so their votes stay in the statewide default and the county table lists Proxmire and Steinle."
     },
     "house1": {
       "year": 1958,

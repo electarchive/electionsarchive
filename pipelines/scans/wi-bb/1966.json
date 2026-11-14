@@ -15,7 +15,8 @@
       "day": "1966-11-08",
       "special": false,
       "state": "WI",
-      "district": null
+      "district": null,
+      "accept": "Every county cell was read twice by a vision model and the column checked against an OCR pass of the page; the Warren P. Knowles column adds to 626,047 against a printed total of 626,041, so the book's total row does not add up from its own county figures; the statewide default keeps the printed total."
     },
     "house1": {
       "year": 1966,

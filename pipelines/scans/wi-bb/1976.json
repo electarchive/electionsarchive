@@ -16,7 +16,8 @@
       "day": "1976-11-02",
       "special": false,
       "state": "WI",
-      "district": null
+      "district": null,
+      "accept": "Every county cell was read twice by a vision model and the column checked against an OCR pass of the page; the Carter column adds to 1,040,212 against a printed total of 1,040,232, so the book's total row does not add up from its own county figures; the statewide default keeps the printed total. The table has no columns for Eugene McCarthy or Roger MacBride, so their votes stay in the statewide default; the Gus Hall and Lyndon LaRouche columns are not loaded."
     },
     "senate": {
       "year": 1976,
@@ -24,7 +25,8 @@
       "day": "1976-11-02",
       "special": false,
       "state": "WI",
-      "district": null
+      "district": null,
+      "accept": "Every county cell was read twice by a vision model and the column checked against an OCR pass of the page; the Stanley York column adds to 521,911 against a printed total of 521,902, so the book's total row does not add up from its own county figures; the statewide default keeps the printed total."
     },
     "house1": {
       "year": 1976,
