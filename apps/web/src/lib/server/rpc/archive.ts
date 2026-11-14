@@ -23816,13 +23816,18 @@ export const polities = {
           union
           select p.polity_id, below.top from polity_parent p join below on p.parent_id = below.id
         ),
+        ids as materialized (
+          select id from picked union select id from below
+        ),
         own as materialized (
-          select polity_id, count(*)::int as n, min(extract(year from date_from))::int as first,
-            max(extract(year from date_from))::int as last
-          from election e
-          where e.polity_id in (select id from picked union select id from below)
-            and not exists (select from entity_merge m where m.entity_id = e.id)
-          group by polity_id
+          select e.polity_id, count(*)::int as n, min(extract(year from e.date_from))::int as first,
+            max(extract(year from e.date_from))::int as last
+          from ids i
+          cross join lateral (
+            select x.polity_id, x.date_from, x.id from election x where x.polity_id = i.id
+          ) e
+          where not exists (select from entity_merge m where m.entity_id = e.id)
+          group by e.polity_id
         ),
         nested as materialized (
           select b.top, sum(o.n)::int as n from below b join own o on o.polity_id = b.id group by b.top
