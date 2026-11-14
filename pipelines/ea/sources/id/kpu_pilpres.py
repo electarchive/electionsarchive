@@ -153,6 +153,11 @@ PROVINCES = {
     "PAPUA PEGUNUNGAN": "95",
     "PAPUA BARAT DAYA": "96",
 }
+SPANNING = {
+    "KALIMANTAN TIMUR": (2019, ("64", "65"), "East Kalimantan, including North Kalimantan"),
+    "PAPUA": (2024, ("91", "93", "94", "95"), "Papua, including Central, Highland, and South Papua"),
+    "PAPUA BARAT": (2024, ("92", "96"), "West Papua, including Southwest Papua"),
+}
 ABROAD = "LUAR NEGERI"
 TOTAL = "NASIONAL"
 LAMPIRAN_2024 = (
@@ -162,6 +167,19 @@ LAMPIRAN_2024 = (
         "Peserta Pemilihan Umum Tahun 2024"
     ),
 )
+COURT = "Mahkamah Konstitusi Republik Indonesia"
+RULING_2014 = (
+    (
+        "https://s.mkri.id/public/content/persidangan/putusan/"
+        "putusan_sidang_2045_20140909061631_PUTUSAN_PILPRES_2014__FINAL__wmGABUNG.pdf"
+    ),
+    (
+        "Putusan Mahkamah Konstitusi Nomor 1/PHPU.PRES-XII/2014 tentang Perselisihan Hasil Pemilihan Umum Presiden "
+        "dan Wakil Presiden Tahun 2014"
+    ),
+)
+RULING_2014_PAGES = (4580, 4581)
+ORDER_2014 = (*(label for label in PROVINCES if PROVINCES[label] not in {"65", "93", "94", "95", "96"}), ABROAD)
 SHEETS = {
     1: ((11, "registered"), (23, "voters")),
     3: ((0, "1"), (1, "2"), (2, "valid"), (3, "invalid"), (4, "ballots")),
@@ -174,6 +192,7 @@ def fetch() -> None:
     for url, *_ in (*RESULTS.values(), *WINNERS.values(), CERTIFICATE, LAMPIRAN_2024):
         raw.fetch(SOURCE, url, suffix=".pdf")
     raw.fetch(SOURCE, OPEN_DATA[0], suffix=".xlsx")
+    raw.fetch(SOURCE, RULING_2014[0], suffix=".pdf")
 
 
 def _pages(pdf: Path, dpi: int, folder: Path) -> list[Path]:
@@ -369,16 +388,73 @@ def _lampiran_2024() -> list[dict[str, object]]:
     return rows
 
 
+def _ruling_2014() -> list[dict[str, object]]:
+    first, last = RULING_2014_PAGES
+    out = subprocess.run(
+        ["pdftotext", "-f", str(first), "-l", str(last), "-tsv", str(raw.cached(SOURCE, RULING_2014[0]).path), "-"],
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout
+    words = [
+        word
+        for word in csv.DictReader(io.StringIO(out), delimiter="\t", quoting=csv.QUOTE_NONE)
+        if word["level"] == "5" and re.fullmatch(r"\d{1,3}(?:[.,]\d{3})+", word["text"])
+    ]
+    lines: list[list[dict[str, str]]] = []
+    for word in sorted(words, key=lambda word: (int(word["page_num"]), float(word["top"]))):
+        first_word = lines[-1][0] if lines else None
+        if (
+            first_word
+            and first_word["page_num"] == word["page_num"]
+            and abs(float(word["top"]) - float(first_word["top"])) < 4
+        ):
+            lines[-1].append(word)
+        else:
+            lines.append([word])
+    lines = [sorted(line, key=lambda word: float(word["left"])) for line in lines if len(line) == 4]
+    if len(lines) != len(ORDER_2014) + 1:
+        raise ValueError(f"2014 ruling: {len(lines)} table rows, expected {len(ORDER_2014) + 1}")
+    rows: list[dict[str, object]] = []
+    for label, line in zip((*ORDER_2014, TOTAL), lines, strict=True):
+        for (measure, ticket), word in zip((("votes", 1), ("votes", 2), ("valid", None), ("invalid", None)), line):
+            left, top, width, height = (float(word[key]) for key in ("left", "top", "width", "height"))
+            rows.append(
+                {
+                    "year": 2014,
+                    "unit": label,
+                    "measure": measure,
+                    "ticket": ticket,
+                    "value": int(re.sub(r"[.,]", "", word["text"])),
+                    "url": RULING_2014[0],
+                    "page": int(word["page_num"]),
+                    "box": [left, top, left + width, top + height],
+                    "fixed": False,
+                }
+            )
+    value = {(row["unit"], row["measure"], row["ticket"]): int(str(row["value"])) for row in rows}
+    for label in (*ORDER_2014, TOTAL):
+        if value[label, "votes", 1] + value[label, "votes", 2] != value[label, "valid", None]:
+            raise ValueError(f"2014 {label}: ticket votes do not sum to the valid votes")
+    for key in (("votes", 1), ("votes", 2), ("valid", None), ("invalid", None)):
+        if sum(value[label, *key] for label in ORDER_2014) != value[TOTAL, *key]:
+            raise ValueError(f"2014 {key}: provinces do not sum to the national row")
+    return rows
+
+
 def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
     rows = _certificate()
     _check_2019(rows)
-    rows += _national(2014)
+    declared_2014 = {row["ticket"]: row["value"] for row in _national(2014)}
+    rows += _ruling_2014()
     declared = {row["ticket"]: row["value"] for row in _national(2024)}
     rows += _lampiran_2024()
     for row in rows:
-        if row["year"] == 2024 and row["unit"] == TOTAL and row["ticket"] and declared[row["ticket"]] != row["value"]:
-            raise ValueError(f"2024 ticket {row['ticket']}: lampiran I and decree 360 disagree")
+        if row["unit"] != TOTAL or not row["ticket"] or row["year"] not in (2014, 2024):
+            continue
+        if {2014: declared_2014, 2024: declared}[int(str(row["year"]))][row["ticket"]] != row["value"]:
+            raise ValueError(f"{row['year']} ticket {row['ticket']}: the provincial table and the decree disagree")
     _, _, winner, share = WINNERS[2019]
     votes = [int(str(row["value"])) for row in rows if row["year"] == 2019 and row["unit"] == TOTAL and row["ticket"]]
     if f"{100 * votes[winner - 1] / sum(votes):.2f}".replace(".", ",") != share:
@@ -414,10 +490,15 @@ SYSTEM_2024 = (
 )
 NOTES = {
     2014: (
-        "National ticket votes as declared in KPU decree 535/2014. Its national recapitulation certificate (Model "
-        "DD1-PPWP) is not attached to the decree on KPU's legal documentation site, so no provincial figures are "
-        "loaded. The winner decree 536/2014 states the winning ticket's votes and its 53.15 percent share, and both "
-        "agree with these figures."
+        "Ticket votes, valid votes, and invalid votes by province and abroad from KPU's national recapitulation "
+        "(Model DD1-PPWP, 22 July 2014), which KPU's legal documentation site does not attach to decree 535/2014. KPU "
+        "set the table out in its answer in Constitutional Court ruling 1/PHPU.PRES-XII/2014 (pages 4580 and 4581 of "
+        "the ruling's PDF), which rejected the challenge. The table prints row 23 as Kalimantan Tengah and row 26 as "
+        "Sulawesi Tengah; by their place in KPU's province order they are East Kalimantan and South Sulawesi. Each row "
+        "sums to its valid votes, each column to the national row, and the national row equals decree 535/2014 and "
+        "the 53.15 percent share in the winner decree 536/2014. East Kalimantan includes North Kalimantan, and Papua "
+        "and West Papua include the provinces split from them in 2022, so those three rows lie within the nation "
+        "rather than equal one of today's provinces."
     ),
     2019: (
         "Votes, registered voters, voters, valid and invalid votes, and ballots by province and abroad, from the "
@@ -426,7 +507,8 @@ NOTES = {
         "unit's ticket votes sum to its valid votes and its valid and invalid votes to its ballots, and every column "
         "sums to the certificate's national figure. Two cells the scan left unreadable (Aceh's votes for ticket 1 "
         "and Jambi's invalid votes) are taken from those sums and the workbook. The winner decree 1185/2019 states "
-        "the 55.50 percent share these figures give."
+        "the 55.50 percent share these figures give. Papua and West Papua include the provinces split from them in "
+        "2022."
     ),
     2024: (
         "Ticket votes and valid votes by province and abroad from lampiran I of KPU decree 360/2024 (a text PDF). "
@@ -448,7 +530,7 @@ def emit() -> Path:
             version=VERSION,
             summary=(
                 "Indonesia's direct presidential elections of 2014, 2019, and 2024 from KPU's national result decrees: "
-                "2019 and 2024 by province and abroad, 2014 nationally"
+                "by province and abroad, 2014 from KPU's recapitulation as the Constitutional Court's ruling reproduces it"
             ),
             polity="ID",
         )
@@ -465,12 +547,16 @@ def emit() -> Path:
 
         units: dict[str, UUID] = {}
 
-        def unit(label: str) -> UUID:
-            if label not in units:
-                scheme, code = ("id.provinsi", PROVINCES[label]) if label in PROVINCES else ("id.nation", "ID")
-                if label == ABROAD:
-                    code = "LN"
-                found = units[label] = cs.key(f"{SOURCE}.unit", f"{scheme}:{code}")
+        def unit(label: str, year: int) -> UUID:
+            spans = label in SPANNING and year < SPANNING[label][0]
+            if spans:
+                scheme, code = "id.provinsi", "+".join(SPANNING[label][1])
+            elif label in PROVINCES:
+                scheme, code = "id.provinsi", PROVINCES[label]
+            else:
+                scheme, code = "id.nation", "LN" if label == ABROAD else "ID"
+            if code not in units:
+                found = units[code] = cs.key(f"{SOURCE}.unit", f"{scheme}:{code}")
                 if found in cs.minted:
                     cs.add(
                         "reporting_unit",
@@ -478,15 +564,18 @@ def emit() -> Path:
                         polity_id=indonesia,
                         scheme_code=scheme,
                         code=code,
-                        area_relation="within" if label == ABROAD else "equals",
-                        area_id=cs.area(scheme, code) if label in PROVINCES else nation,
+                        area_relation="equals" if label in PROVINCES and not spans else "within",
+                        area_id=cs.area(scheme, code) if label in PROVINCES and not spans else nation,
                         kind="abroad_mission" if label == ABROAD else "standard",
                         valid_from=None,
                     )
                     if label == ABROAD:
                         name(found, "Luar Negeri")
                         name(found, "Abroad", "en", "english")
-            return units[label]
+                    if spans:
+                        name(found, label.title())
+                        name(found, SPANNING[label][2], "en", "english")
+            return units[code]
 
         sources: dict[str, UUID] = {}
         artifacts: dict[str, UUID] = {}
@@ -495,17 +584,19 @@ def emit() -> Path:
             *((url, title) for url, title, *_ in WINNERS.values()),
             CERTIFICATE,
             LAMPIRAN_2024,
+            RULING_2014,
         ):
-            sources[url] = cs.source(KPU, title)
+            publisher = COURT if url == RULING_2014[0] else KPU
+            sources[url] = cs.source(publisher, title)
             cs.add(
                 "source",
                 id=sources[url],
                 kind="official_body",
-                publisher=KPU,
+                publisher=publisher,
                 title=title,
                 url=url,
-                license="Public record: official decree, no license stated",
-                license_url="https://jdih.kpu.go.id",
+                license=f"Public record: official {'court ruling' if publisher == COURT else 'decree'}, no license stated",
+                license_url="https://www.mkri.id" if publisher == COURT else "https://jdih.kpu.go.id",
             )
             artifacts[url] = cs.artifact(raw.cached(SOURCE, url), sources[url])
 
@@ -598,7 +689,7 @@ def emit() -> Path:
             cs.add("slug", path=f"{path}/president", entity_id=contest)
             if year == 2024:
                 cs.add("note", entity_id=contest, kind="caveat", body_md=SYSTEM_2024)
-            source = {2014: RESULTS[2014][0], 2019: CERTIFICATE[0], 2024: LAMPIRAN_2024[0]}[year]
+            source = {2014: RULING_2014[0], 2019: CERTIFICATE[0], 2024: LAMPIRAN_2024[0]}[year]
             result_set = cs.key(f"{SOURCE}.result_set", contest_key)
             cs.add(
                 "result_set",
@@ -644,14 +735,13 @@ def emit() -> Path:
                     kind="elected" if elected else "lost",
                     seats=None,
                 )
-            if general:
-                rows = rows.filter(pl.col("unit") != TOTAL)
+            rows = rows.filter(pl.col("unit") != TOTAL)
             for label, measure, ticket, value, url, number, box in rows.select(
                 "unit", "measure", "ticket", "value", "url", "page", "box"
             ).rows():
                 fact = {
                     "result_set_id": result_set,
-                    "unit_id": unit(label),
+                    "unit_id": unit(label, year),
                     "option_id": None if ticket is None else options[ticket],
                     "channel": 0,
                     "measure": MEASURES[measure],
