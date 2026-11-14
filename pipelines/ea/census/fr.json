@@ -445,6 +445,12 @@
       "url": "https://www.legifrance.gouv.fr/loda/id/JORFTEXT000027735009",
       "kind": "official_body",
       "note": "Consular councillors elected for six years in May by direct universal suffrage; the Assemblée des Français de l'étranger elected by and among them."
+    },
+    "senat-archives-66s": {
+      "title": "Répertoire numérique des élections sénatoriales de la IIIe République (66S), Archives du Sénat",
+      "publisher": "Sénat",
+      "url": "https://archives.senat.fr/fileadmin/cru-1741249238/Histoire/Collections_precieuses_de_la_Bibliotheque_du_Senat/Mini_site_Archives/PDF/FR_SENAT_IR_66S_election_senatoriales_3eR.pdf",
+      "kind": "official_body"
     }
   },
   "tiers": [
@@ -3377,7 +3383,26 @@
       "effort": 5
     },
     {
-      "dates": [],
+      "dates": [
+        {
+          "date": "1876-01-30",
+          "source": "senat-archives-66s",
+          "note": "First election of the Senate."
+        },
+        {
+          "date": "1879-01-01",
+          "precision": "month",
+          "source": "senat-archives-66s",
+          "note": "First renewal by thirds, in January 1879."
+        },
+        {
+          "date": "1882-01-01",
+          "through": "1939-12-31",
+          "source": "senat-archives-66s",
+          "quote": "Les élections sont organisées tous les trois ans dans un tiers des départements",
+          "note": "Triennial renewals, in early January and, after the law of 7 July 1929, in October; the date is fixed by presidential decree. Not yet counted from an official table."
+        }
+      ],
       "key": "senat_avant_1958",
       "tier": "national",
       "name": "Élections au Sénat (IIIe République) et au Conseil de la République (IVe République)",
@@ -3450,7 +3475,20 @@
       "effort": 2
     },
     {
-      "dates": [],
+      "dates": [
+        {
+          "date": "1871-08-31",
+          "contests": 1,
+          "source": "elysee-presidents",
+          "note": "Thiers, elected by the National Assembly."
+        },
+        {
+          "date": "1958-12-21",
+          "contests": 1,
+          "source": "elysee-presidents",
+          "note": "de Gaulle, elected by a college of about 80,000."
+        }
+      ],
       "key": "president_indirect",
       "tier": "national",
       "name": "Élection du président de la République par le Parlement ou le collège électoral",
@@ -3479,7 +3517,24 @@
       "effort": 2
     },
     {
-      "dates": [],
+      "dates": [
+        {
+          "date": "1945-10-21",
+          "contests": 2,
+          "source": "elysee-presidents",
+          "note": "Two questions."
+        },
+        {
+          "date": "1946-05-05",
+          "contests": 1,
+          "source": "elysee-presidents"
+        },
+        {
+          "date": "1946-10-13",
+          "contests": 1,
+          "source": "elysee-presidents"
+        }
+      ],
       "key": "plebiscites",
       "tier": "national",
       "name": "Plébiscites et référendums avant 1958",
