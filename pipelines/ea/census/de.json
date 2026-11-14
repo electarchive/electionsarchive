@@ -285,6 +285,13 @@
       "url": "https://www.region-stuttgart.org/fileadmin/Verband_Region_Stuttgart/Presseinformationen/2024/PM__20240712_Amtliches_Wahlergebnis_Regionalwahl_2024.pdf",
       "kind": "official_body",
       "note": "The Regionalversammlung is elected every five years with the municipal and district councils; the election of 9 June 2024 chose 92 regional councilors, turnout 67.21 percent."
+    },
+    "sj-reich-1934": {
+      "title": "Statistisches Jahrbuch für das Deutsche Reich 1934, XXI. Wahlen und Abstimmungen",
+      "publisher": "Statistisches Reichsamt",
+      "url": "https://digi.bib.uni-mannheim.de/fileadmin/statjahrb/514401303_1934/pdf/514401303_0598.pdf",
+      "kind": "official_body",
+      "note": "Digitized by the Universitätsbibliothek Mannheim, one PDF per page. Printed page 550 (scan 0598): the Reichstag election and the Volksabstimmung of 12 November 1933 by Wahlkreis; printed page 551 (scan 0599): the Volksabstimmung on the head of state of 19 August 1934 by Stimmkreis."
     }
   },
   "tiers": [
@@ -3544,8 +3551,20 @@
         },
         {
           "date": "1933-11-12",
+          "contests": 1,
+          "note": "Plebiscite on the withdrawal from the League of Nations, held with the single-list Reichstag vote.",
+          "source": "sj-reich-1934"
+        },
+        {
+          "date": "1934-08-19",
+          "contests": 1,
+          "note": "Plebiscite on merging the offices of president and chancellor.",
+          "source": "sj-reich-1934"
+        },
+        {
+          "date": "1938-04-10",
           "through": "1938-04-10",
-          "note": "Three plebiscites: 12 November 1933 (withdrawal from the League of Nations), 19 August 1934 (merging the offices of president and chancellor), and 10 April 1938 (the Anschluss of Austria). Not yet counted from an official table."
+          "note": "Plebiscite and single-list Reichstag vote on the Anschluss of Austria. Not yet counted: the Statistisches Jahrbuch für das Deutsche Reich 1939/40 page was not reachable."
         }
       ],
       "key": "reich_volksentscheid",
@@ -3665,7 +3684,14 @@
       "effort": 3
     },
     {
-      "dates": [],
+      "dates": [
+        {
+          "date": "1990-05-06",
+          "through": "1990-05-06",
+          "note": "Free Kommunalwahlen for the Kreistage, city assemblies, and Gemeindevertretungen; the council count is not yet taken from an official table.",
+          "source": "bpb-ddr-1990"
+        }
+      ],
       "key": "ddr_kommunal",
       "tier": "ddr",
       "name": "Wahlen zu den örtlichen Volksvertretungen der DDR",
@@ -3695,7 +3721,14 @@
       "effort": 4
     },
     {
-      "dates": [],
+      "dates": [
+        {
+          "date": "1951-06-03",
+          "contests": 1,
+          "note": "Volksbefragung against remilitarization, held from 3 to 6 June 1951.",
+          "source": "sj-ddr-1956"
+        }
+      ],
       "key": "ddr_abstimmungen",
       "tier": "ddr",
       "name": "Volksbefragungen und Volksentscheide der DDR",
@@ -4567,7 +4600,14 @@
       "effort": 5
     },
     {
-      "dates": [],
+      "dates": [
+        {
+          "date": "1946-06-30",
+          "contests": 1,
+          "note": "Volksentscheid in the Land Saxony on the expropriation of Nazi and war criminals' property.",
+          "source": "sj-ddr-1956"
+        }
+      ],
       "key": "volksentscheide",
       "tier": "land",
       "name": "Volksentscheide und Volksabstimmungen in den Ländern",
