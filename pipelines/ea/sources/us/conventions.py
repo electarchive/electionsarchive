@@ -580,6 +580,17 @@ TABLES += [
     }
     for ballot in (1, 2, 3)
 ]
+TABLES += [
+    {
+        "table": "1928:democratic",
+        "image": "https://tile.loc.gov/image-services/iiif/service:ndnp:dlc:batch_dlc_keppard_ver01:data:sn83045462:00280659605:1928062901:0347/full/pct:50/0/default.jpg",
+        "release": "https://www.loc.gov/resource/sn83045462/1928-06-29/ed-1/?sp=2",
+        "leaves": (1,),
+        "ballot": 1,
+        "transcribed": "conventions_houston_1928.tsv",
+        "short": True,
+    }
+]
 EVENING_STAR_1960 = "https://www.loc.gov/resource/sn83045462/1960-07-14/ed-1/?sp=8"
 TABLES += [
     {
@@ -753,6 +764,16 @@ STAR_RNC_CAVEAT = {
     "saying how; they are not stored. The same table prints the roll as first called, before any change: "
     "Eisenhower 595, Taft 500, Warren 81, Harold E. Stassen 20, and MacArthur 10, which is not stored.",
 }
+EVENING_STAR_1928_CAVEAT = (
+    "The archive has not located a free copy of the official proceedings' roll call, so this ballot is the "
+    "Associated Press table of the official result that the Washington Evening Star printed on June 29, 1928 (page "
+    "2). It is a default to be superseded by the official proceedings. The table is the official result of the one "
+    "ballot, taking into account the shifts that a few delegations made just before it was announced, and the "
+    "convention then nominated Alfred E. Smith by acclamation; the state rows add up to the printed totals for "
+    "Smith (849\u2154), Walter F. George, James A. Reed, Cordell Hull, Jesse H. Jones, and the other candidates "
+    "named in the table. The table gives one and a half Kansas votes and one Mississippi vote as not voting, which "
+    "are not stored. The Star's text misprints some fractions, which were read against each delegation's size."
+)
 EVENING_STAR_1960_CAVEAT = (
     "The archive has not located a free copy of the official proceedings' roll call, so this ballot is the "
     "Associated Press table of the roll call that the Washington Evening Star printed on July 14, 1960 (page A-8). It "
@@ -931,6 +952,7 @@ PROCEEDINGS += [
     {"party": "democratic", "tables": {1: "2008:democratic"}, "title": "Roll Call Vote for President of the United States, 2008 Democratic National Convention: Final Vote Tally, as compiled by the Office of the Secretary", "publisher": "Democratic National Committee, Office of the Secretary", "city": "Denver", "days": (date(2008, 8, 25), date(2008, 8, 28)), "ballots": {1: date(2008, 8, 27)}, "deciding": 1, "method": SHEET_METHOD, "caveat": SHEET_CAVEAT},
     {"party": "democratic", "tables": {1: "2024:democratic"}, "title": "2024 Electronic Roll Call: State by State Breakdown", "publisher": "Democratic National Committee", "city": "Chicago", "days": (date(2024, 8, 19), date(2024, 8, 22)), "ballots": {1: date(2024, 8, 5)}, "umbrella": "2024-01-23:president:democratic", "deciding": 1, "required": None, "method": DNC_2024_METHOD, "caveat": DNC_2024_CAVEAT},
     {"party": "democratic", "tables": {1: "1960:democratic"}, "title": "The Evening Star (Washington, D.C.), July 14, 1960: Roll Call of States", "publisher": "The Evening Star", "kind": "news_agency", "city": "Los Angeles", "days": (date(1960, 7, 11), date(1960, 7, 15)), "ballots": {1: date(1960, 7, 13)}, "deciding": 1, "required": 761, "method": PRESS.format("the Washington Evening Star"), "caveat": EVENING_STAR_1960_CAVEAT},
+    {"party": "democratic", "tables": {1: "1928:democratic"}, "title": "The Evening Star (Washington, D.C.), June 29, 1928: Vote Cast on Ballot", "publisher": "The Evening Star", "kind": "news_agency", "city": "Houston", "days": (date(1928, 6, 26), date(1928, 6, 29)), "ballots": {1: date(1928, 6, 28)}, "deciding": 1, "required": 733, "method": PRESS.format("the Washington Evening Star"), "caveat": EVENING_STAR_1928_CAVEAT},
     {"party": "democratic", "tables": {1: "1956:democratic"}, "title": "Official report of the proceedings of the Democratic National Convention and committee, held at Chicago, Illinois, August 13 to August 17, 1956, resulting in the nomination of Adlai E. Stevenson of Illinois for President and Estes Kefauver of Tennessee for Vice President", "publisher": "Democratic National Committee", "city": "Chicago", "days": (date(1956, 8, 13), date(1956, 8, 17)), "ballots": {1: date(1956, 8, 16)}, "deciding": 1},
 ]  # fmt: skip
 PROCEEDINGS += [
@@ -1408,6 +1430,20 @@ CANDIDATES = {
     "1948:republican:Dirksen": ("Everett M. Dirksen", "Q1382002"),
     "1952:republican:Eisenhower": ("Dwight D. Eisenhower", "Q9916"),
     "1952:republican:Taft": ("Robert A. Taft", "Q519730"),
+    "1928:democratic:Smith": ("Alfred E. Smith", "Q430714"),
+    "1928:democratic:George": ("Walter F. George", None),
+    "1928:democratic:Reed": ("James A. Reed", None),
+    "1928:democratic:Hull": ("Cordell Hull", "Q202979"),
+    "1928:democratic:Jones": ("Jesse H. Jones", None),
+    "1928:democratic:Watts": ("Watts", None),
+    "1928:democratic:Harrison": ("Pat Harrison", "Q369437"),
+    "1928:democratic:Woollen": ("Evans Woollen", None),
+    "1928:democratic:Donahey": ("Vic Donahey", None),
+    "1928:democratic:Hitchcock": ("Gilbert M. Hitchcock", "Q1487231"),
+    "1928:democratic:Ayres": ("William A. Ayres", None),
+    "1928:democratic:Pomerene": ("Atlee Pomerene", None),
+    "1928:democratic:Thompson": ("Thompson", None),
+    "1928:democratic:Bilbo": ("Theodore G. Bilbo", None),
     "1960:democratic:Johnson": ("Lyndon B. Johnson", "Q9640"),
     "1960:democratic:Kennedy": ("John F. Kennedy", "Q9696"),
     "1960:democratic:Stevenson": ("Adlai E. Stevenson II", "Q311719"),
