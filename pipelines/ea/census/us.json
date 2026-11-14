@@ -60,6 +60,10 @@
     "gov-law-wv": {"publisher": "West Virginia Legislature", "title": "The Constitution of West Virginia", "url": "https://code.wvlegislature.gov/west-virginia-constitution", "kind": "official_body"},
     "gov-law-nd": {"publisher": "North Dakota Legislative Council", "title": "Constitution of North Dakota, Article V", "url": "https://ndlegis.gov/constit/a05.pdf", "kind": "official_body"},
     "gov-law-ut": {"publisher": "Utah Legislature", "title": "Utah Constitution, Article VII", "url": "https://le.utah.gov/xcode/Articlevii/UC_AVII_1800010118000101.pdf", "kind": "official_body"},
+    "exec-law-sc": {"publisher": "South Carolina Legislature", "title": "South Carolina Constitution, Article VI", "url": "https://www.scstatehouse.gov/scconstitution/A06.pdf", "kind": "official_body"},
+    "exec-law-wi": {"publisher": "Wisconsin Legislative Reference Bureau", "title": "Wisconsin Constitution, Article VI", "url": "https://docs.legis.wisconsin.gov/constitution/wi", "kind": "official_body"},
+    "exec-law-md": {"publisher": "Maryland State Archives", "title": "Maryland Manual On-Line: Constitution of Maryland, Articles V and VI", "url": "https://msa.maryland.gov/msa/mdmanual/43const/html/05art5.html", "kind": "official_body"},
+    "exec-law-ny": {"publisher": "New York Department of State", "title": "Constitution of the State of New York, January 1, 2026", "url": "https://dos.ny.gov/system/files/documents/2025/12/constitution-january-1-2026.pdf", "kind": "official_body"},
     "state-codes": {
       "publisher": "National Conference of State Legislatures",
       "title": "Primary Runoffs (the state statutes each row's locator cites)",
@@ -512,6 +516,34 @@
       "category": "executive",
       "goal": "subnational",
       "source": "bots-executives",
+      "laws": {
+        "AZ": {"source": "gov-law-az", "locator": "Art. 5, § 1: the secretary of state, attorney general, treasurer, and superintendent of public instruction are chosen at the general election with the governor, for four-year terms"},
+        "HI": {"source": "gov-law-hi", "locator": "Art. V, § 2: the lieutenant governor is elected at the same time, for the same term, and in the same manner as the governor"},
+        "OH": {"source": "gov-law-oh", "locator": "Art. III, §§ 1-2: the governor, lieutenant governor, auditor, secretary of state, treasurer, and attorney general are elected on the first Tuesday after the first Monday in November for four-year terms"},
+        "SC": {"source": "exec-law-sc", "locator": "Art. VI, § 7: the secretary of state, comptroller general, treasurer, attorney general, and superintendent of education are elected at the general election with the governor"},
+        "VA": {"source": "gov-law-va", "locator": "Art. V, §§ 13 and 15: the lieutenant governor and attorney general are elected at the time and place of choosing the governor, for four-year terms"},
+        "WI": {"source": "exec-law-wi", "locator": "Art. VI, § 1: the secretary of state, treasurer, and attorney general are chosen at the general election for four-year terms"},
+        "VT": {"source": "gov-law-vt", "locator": "Ch. II, §§ 43, 47, and 48: the lieutenant governor, treasurer, secretary of state, and auditor are chosen biennially on the first Tuesday next after the first Monday of November"},
+        "LA": {"source": "gov-law-la", "locator": "Art. IV, § 3(A): the lieutenant governor, secretary of state, attorney general, and treasurer are elected for four-year terms at the time and place of voting for members of the legislature"},
+        "MD": {"source": "exec-law-md", "locator": "Art. V, § 1 (attorney general) and Art. VI (comptroller): elected at the general election for four-year terms; the treasurer is appointed by the General Assembly"},
+        "MA": {"source": "gov-law-ma", "locator": "Amend. art. LXXXII: the lieutenant governor, secretary, treasurer, auditor, and attorney general are elected quadrennially on the Tuesday next after the first Monday in November"},
+        "MO": {"source": "gov-law-mo", "locator": "Art. IV, § 17: the lieutenant governor, secretary of state, treasurer, and attorney general are elected at the presidential elections for four-year terms; the auditor is elected at the midterm"},
+        "NE": {"source": "gov-law-ne", "locator": "Art. IV, § 1: the lieutenant governor, secretary of state, auditor of public accounts, treasurer, and attorney general are chosen at the general election in each alternate even-numbered year, for four-year terms"},
+        "NV": {"source": "gov-law-nv", "locator": "Art. 5, §§ 1 and 17: the lieutenant governor, secretary of state, treasurer, controller, and attorney general are elected at the general election for four-year terms"},
+        "NY": {"source": "exec-law-ny", "locator": "Art. IV, § 1 (lieutenant governor, elected with the governor) and Art. V, § 1 (comptroller and attorney general, elected at the same time and for the same term as the governor)"},
+        "NC": {"source": "gov-law-nc", "locator": "Art. III, §§ 2 and 7: the lieutenant governor and the Council of State officers are elected for four-year terms in the presidential election years"},
+        "MN": {"source": "gov-law-mn", "locator": "Art. V, § 4: the secretary of state, auditor, and attorney general are elected for four-year terms at the same time as the governor"}
+      },
+      "executives": [
+        {"states": "AL AK AZ AR CA CO CT DE FL GA HI ID IL IN IA KS MD MA MI MN NE NV NM NY ND OH OK SC SD TX WI WY", "period_years": 4, "phase": 2, "term_years": 4},
+        {"states": "MT NC UT WA WV OR PA", "period_years": 4, "phase": 0, "term_years": 4},
+        {"states": "MO", "period_years": 4, "phase": 0, "term_years": 4, "name_pattern": "Lieutenant|Secretary of State|Treasurer|Attorney General"},
+        {"states": "MO", "period_years": 4, "phase": 2, "term_years": 4, "name_pattern": "Auditor"},
+        {"states": "VA NJ", "period_years": 4, "phase": 1, "term_years": 4},
+        {"states": "KY MS", "period_years": 4, "phase": 3, "term_years": 4},
+        {"states": "LA", "period_years": 4, "phase": 3, "term_years": 4, "day_rule": null, "month": 10},
+        {"states": "VT", "period_years": 2, "phase": 0, "term_years": 2}
+      ],
       "note": "Lieutenant governors, attorneys general, secretaries of state, treasurers, auditors, and other offices elected statewide, plus the Council of the District of Columbia.",
       "dates": [
         {
