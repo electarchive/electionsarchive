@@ -1786,8 +1786,6 @@
       "source": "chiho",
       "first_held": "1947-04-30",
       "note": "SNTV and plurality in districts of cities, counties, and wards. 41 assemblies vote in the unified local elections each April of years 3 mod 4; Tokyo, Ibaraki, Iwate, Miyagi, Fukushima, and Okinawa vote on their own cycles after early dissolutions. Year entries 2009-2026 count the assemblies whose terms expire that year (MIC 任期満了に関する調); earlier years expect the official count over the term.",
-      "disposition": "blocked",
-      "disposition_reason": "No national canvass with candidate votes exists. The Ministry of Internal Affairs and Communications' 地方選挙結果調 books (2003-2019) hold prefectural assembly statistics only as counts by prefecture (candidates, winners, turnout, party and age tallies) for the April unified elections, not votes by candidate and district; those sit with each of the 47 prefectural election commissions, one site and format apiece.",
       "match": [
         {
           "body_kinds": [
