@@ -3983,6 +3983,7 @@
   "ws_qtype_optional_referendum": "Referendo facultativo",
   "ws_qtype_plebiscite": "Plebiscito",
   "ws_qtype_recall_question": "Pergunta de revogação",
+  "ws_qtype_referendum": "Referendo",
   "ws_contest_area": "Distrito (opcional)",
   "ws_contest_office": "Cargo (opcional)",
   "ws_contest_body": "Órgão (opcional)",

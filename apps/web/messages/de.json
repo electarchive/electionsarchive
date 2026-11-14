@@ -3923,6 +3923,7 @@
   "ws_qtype_optional_referendum": "Fakultatives Referendum",
   "ws_qtype_plebiscite": "Plebiszit",
   "ws_qtype_recall_question": "Abberufungsfrage",
+  "ws_qtype_referendum": "Referendum",
   "ws_contest_area": "Distrikt (optional)",
   "ws_contest_office": "Amt (optional)",
   "ws_contest_body": "Gremium (optional)",
