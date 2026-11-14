@@ -51,6 +51,7 @@ SUMMED_YEARS = {2007, 2011}
 BASE = "https://danewyborcze.kbw.gov.pl/dane"
 PARSED = raw.parsed(SOURCE)
 ELECTIONS = {
+    2005: date(2005, 9, 25),
     2007: date(2007, 10, 21),
     2011: date(2011, 10, 9),
     2015: date(2015, 10, 25),
@@ -58,6 +59,12 @@ ELECTIONS = {
     2023: date(2023, 10, 15),
 }
 FILES: dict[int, dict[str, str | tuple[str, ...]]] = {
+    2005: {
+        "districts": "sejm/okregi2005sejm.xls",
+        "candidates": "sejm/kandsejm2005kom.xls",
+        "unit_lists": "sejm/sejm2005-lis-obw.zip",
+        "district_lists": "sejm/sejm2005-lis-okr.xls",
+    },
     2007: {
         "districts": "sejm/okr%c4%99gi2007sejm.xls",
         "candidates": "sejm/kandsejm2007.xls",
@@ -145,7 +152,7 @@ def table(year: int, kind: str) -> pl.DataFrame:
 
 
 def count(column: str) -> pl.Expr:
-    return pl.col(column).replace("-", None).cast(pl.Int64)
+    return pl.col(column).replace(["-", "x"], None).cast(pl.Int64)
 
 
 PERSON = (
@@ -261,6 +268,108 @@ def seated(lists: pl.DataFrame, candidates: pl.DataFrame) -> pl.DataFrame:
     )
 
 
+def okregi(year: int) -> pl.DataFrame:
+    sizes = table(year, "districts")
+    first, seat, boundary, magnitude = sizes.columns[0], sizes.columns[1], sizes.columns[2], sizes.columns[-1]
+    return sizes.filter(pl.col(first).str.contains(r"^\d+$")).select(
+        count(first).alias("district"),
+        count(magnitude).alias("magnitude"),
+        pl.col(seat).alias("seat"),
+        pl.col(boundary).alias("boundary"),
+    )
+
+
+def load_2005() -> dict[str, pl.DataFrame]:
+    year = 2005
+    gender = {"K": "Kobieta", "M": "Mężczyzna"}
+    candidates = table(year, "candidates").select(
+        count("Nr okr.").alias("district"),
+        count("Nr listy").alias("list"),
+        count("Pozycja").alias("position"),
+        pl.concat_str(pl.col("Imiona"), pl.col("Nazwisko"), separator=" ").alias("name"),
+        pl.col("Płeć").replace_strict(gender).alias("sex"),
+        pl.col("Zawód").alias("occupation"),
+        pl.col("Miejsce zamieszkania").alias("residence"),
+        pl.lit(None, pl.String).alias("membership"),
+        pl.lit(None, pl.String).alias("support"),
+        count("Głosy").alias("votes"),
+        (pl.col("Mandat") == "T").alias("elected"),
+        pl.col("Komitet  wyborczy").alias("committee"),
+    )
+    names = {(d, n): c for d, n, c in candidates.select("district", "list", "committee").unique().iter_rows()}
+    results = table(year, "unit_lists")
+    columns = results.columns[results.columns.index("Głosy ważne") + 1 :]
+    registry = results.select(
+        teryt("TERYT"),
+        count("Numer obwodu").alias("commission"),
+        pl.col("Typ obwodu").alias("kind"),
+        pl.col("7-ma cyfra TERYT").alias("area"),
+        pl.lit(None, pl.String).alias("boundary"),
+    )
+    results = results.select(
+        teryt("TERYT"),
+        count("Numer obwodu").alias("commission"),
+        count("Nr\nokręgu").alias("district"),
+        pl.col("Adres obwodu").alias("seat"),
+        count("Uprawnieni do głosowania").alias("electors"),
+        count("Karty wydane (frekwencja)").alias("issued"),
+        count("Karty ważne (głosy oddane)").alias("cast"),
+        count("Karty ważne (głosy oddane)").alias("valid_ballots"),
+        count("Głosy nieważne").alias("invalid"),
+        count("Głosy ważne").alias("valid"),
+        *(count(column) for column in columns),
+    )
+    unit = ["gmina", "commission"]
+    long = (
+        results.select(*unit, "district", *columns)
+        .unpivot(index=[*unit, "district"], variable_name="column", value_name="votes")
+        .filter(pl.col("votes").is_not_null())
+    )
+    long = long.with_columns(
+        pl.struct("district", "column")
+        .map_elements(lambda row: names[(row["district"], int(row["column"].split(" - ", 1)[0]))], pl.String)
+        .alias("committee")
+    )
+    results = results.drop(columns).join(
+        long.group_by(*unit, "committee")
+        .agg(pl.col("votes").sum())
+        .pivot("committee", index=unit, values="votes", aggregate_function="first"),
+        on=unit,
+        how="left",
+    )
+    totals = table(year, "district_lists")
+    numbered_columns = [column for column in totals.columns if re.match(r"\d+ - ", column)]
+    lists = (
+        totals.filter(pl.col("Okręg wyborczy").str.contains(r"^\d+ - "))
+        .select(
+            pl.col("Okręg wyborczy").str.split(" - ").list.first().cast(pl.Int64).alias("district"),
+            *(count(column) for column in numbered_columns),
+        )
+        .unpivot(index="district", variable_name="list", value_name="votes")
+        .filter(pl.col("votes").is_not_null())
+        .with_columns(pl.col("list").str.split(" - ").list.first().cast(pl.Int64))
+        .group_by("district", "list")
+        .agg(pl.col("votes").sum())
+        .with_columns(
+            pl.struct("district", "list")
+            .map_elements(lambda row: names[(row["district"], row["list"])], pl.String)
+            .alias("committee")
+        )
+    )
+    lists = seated(lists, candidates)
+    districts = okregi(year)
+    off = districts.join(lists.group_by("district").agg(pl.col("seats").sum()), on="district")
+    if off.height != 41 or (off["seats"] != off["magnitude"]).any():
+        raise ValueError("elected members differ from the constituency sizes")
+    return {
+        "results": results,
+        "lists": lists,
+        "districts": districts,
+        "candidates": candidates.drop("committee"),
+        "registry": registry,
+    }
+
+
 def load_2007() -> dict[str, pl.DataFrame]:
     year = 2007
     gender = {"K": "Kobieta", "M": "Mężczyzna"}
@@ -311,14 +420,7 @@ def load_2007() -> dict[str, pl.DataFrame]:
         .join(pl.DataFrame({"committee": list(names.values()), "list": list(names.keys())}), on="committee")
     )
     lists = seated(lists, candidates)
-    sizes = table(year, "districts")
-    first, seat, boundary, magnitude = sizes.columns[0], sizes.columns[1], sizes.columns[2], sizes.columns[-1]
-    districts = sizes.filter(pl.col(first).str.contains(r"^\d+$")).select(
-        count(first).alias("district"),
-        count(magnitude).alias("magnitude"),
-        pl.col(seat).alias("seat"),
-        pl.col(boundary).alias("boundary"),
-    )
+    districts = okregi(year)
     off = districts.join(lists.group_by("district").agg(pl.col("seats").sum()), on="district")
     if off.height != 41 or (off["seats"] != off["magnitude"]).any():
         raise ValueError("elected members differ from the constituency sizes")
@@ -709,7 +811,7 @@ def check(year: int, loaded: dict[str, pl.DataFrame]) -> dict[str, pl.DataFrame]
     }
 
 
-LOADERS = {2007: load_2007, 2011: load_2011, 2015: load_2015, 2019: load_2019, 2023: load_2023}
+LOADERS = {2005: load_2005, 2007: load_2007, 2011: load_2011, 2015: load_2015, 2019: load_2019, 2023: load_2023}
 
 
 def parse() -> None:
