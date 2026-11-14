@@ -107,7 +107,12 @@ def fetch() -> None:
             if re.search(r"shikuchouson_\d+\.html$", url):
                 raw.fetch(SOURCE, url, suffix=".html")
         found = listing(number)
-        for url in [*(url for _, url in found.smd + found.pr + found.turnout), found.seats, found.winners, found.elected]:
+        for url in [
+            *(url for _, url in found.smd + found.pr + found.turnout),
+            found.seats,
+            found.winners,
+            found.elected,
+        ]:
             raw.fetch(SOURCE, url, suffix=suffix(url))
 
 
