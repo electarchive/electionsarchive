@@ -160,6 +160,7 @@ const MODEL = {
   partial: 0.05,
   residual: 0.04,
   spike: 0.003,
+  linear: 2,
   priors: {
     swing: 0.1,
     slope: 0.15,
@@ -1203,6 +1204,53 @@ function ordered(coefficients: Float64Array, unit: Unit, lanes: Array<Lane>) {
   );
 }
 
+function gap(unit: Unit, fraction: number, bent: boolean) {
+  const left = Math.max(0, 1 - fraction);
+  return bent && unit.channel === 0 ? left * left : left;
+}
+
+function stepOf(unit: Unit, total: number) {
+  if (!unit.hasBaseline || unit.total <= 0 || unit.early == null) {
+    return null;
+  }
+  const fraction = Math.min(1, unit.total / total);
+  const first = Math.min(1, unit.early.total / total);
+  const increment =
+    (unit.margin * unit.total - unit.early.margin * unit.early.total) /
+    (unit.total - unit.early.total);
+  return {
+    fraction,
+    slope: (bent: boolean) =>
+      bent && unit.channel === 0 ? fraction * (2 - first - fraction) : fraction,
+    shift: unit.early.margin - increment,
+    variance:
+      MODEL.partial ** 2 *
+      (1 / Math.max(first, 0.05) + 1 / Math.max(0.05, fraction - first)),
+  };
+}
+
+function bends(found: Array<Unit>, totals: Array<number>) {
+  const [bent, straight] = [true, false].map((shape) => {
+    let xx = MODEL.priors.order ** -2;
+    let xy = 0;
+    let yy = 0;
+    let rows = 0;
+    for (const [index, unit] of found.entries()) {
+      const step = unit.channel === 0 ? stepOf(unit, totals[index]!) : null;
+      if (step == null) {
+        continue;
+      }
+      const x = step.slope(shape);
+      xx += (x * x) / step.variance;
+      xy += (x * step.shift) / step.variance;
+      yy += step.shift ** 2 / step.variance;
+      rows += 1;
+    }
+    return { misfit: yy - (xy * xy) / xx, rows };
+  });
+  return straight!.misfit + MODEL.linear * straight!.rows >= bent!.misfit;
+}
+
 function fit(
   found: Array<Unit>,
   totals: Array<number>,
@@ -1211,6 +1259,7 @@ function fit(
   random: (() => number) | null,
   widths: Array<number>,
   lanes: Array<Lane>,
+  bent: boolean,
 ) {
   const { swing, slope, order } = MODEL.priors;
   const priors = [
@@ -1247,27 +1296,22 @@ function fit(
         unit.prior - center,
         ...features(unit),
         ...lanes.map(() => 0),
-        1 - fraction,
+        gap(unit, fraction, bent),
       ],
       unit.margin - unit.prior - unit.pool,
       residual[index]! ** 2 + partial(fraction),
     );
-    if (unit.early != null) {
-      const first = Math.min(1, unit.early.total / totals[index]!);
-      const step = Math.max(0.05, fraction - first);
-      const increment =
-        (unit.margin * unit.total - unit.early.margin * unit.early.total) /
-        (unit.total - unit.early.total);
+    const step = stepOf(unit, totals[index]!);
+    if (step != null) {
+      const slope = step.slope(bent);
       add(
         [
           ...priors.slice(1 + lanes.length).map(() => 0),
-          ...lanes.map((lane) =>
-            lane.channel === unit.channel ? fraction : 0,
-          ),
-          fraction,
+          ...lanes.map((lane) => (lane.channel === unit.channel ? slope : 0)),
+          slope,
         ],
-        unit.early.margin - increment,
-        MODEL.partial ** 2 * (1 / Math.max(first, 0.05) + 1 / step),
+        step.shift,
+        step.variance,
       );
     }
   }
@@ -1855,6 +1899,7 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
     }
     return unit.total > 0 ? Math.max(unit.total, unit.expected) : unit.expected;
   });
+  const bent = bends(found, typical);
   const first = fit(
     found,
     typical,
@@ -1863,6 +1908,7 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
     null,
     widths,
     lanes,
+    bent,
   );
   let squares = 5 * MODEL.residual ** 2;
   let weights = 5;
@@ -1873,7 +1919,7 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
     }
     const predicted =
       predict(first, unit, center) +
-      ordered(first, unit, lanes) * (1 - Math.min(1, fraction));
+      ordered(first, unit, lanes) * gap(unit, Math.min(1, fraction), bent);
     squares +=
       Math.max(
         0,
@@ -2186,6 +2232,7 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
       random,
       widths,
       lanes,
+      bent,
     );
     const fitted = found.map((unit, index) =>
       unit.channel === 0
@@ -2210,7 +2257,7 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
       if (unit.total > 0) {
         const noise = partial(fraction);
         const order = ordered(coefficients, unit, lanes);
-        const observed = unit.margin - order * (1 - fraction);
+        const observed = unit.margin - order * gap(unit, fraction, bent);
         const precision = 1 / priorVariance + (noise > 0 ? 1 / noise : 1e12);
         const weight = noise > 0 ? 1 / noise / precision : 1;
         const mean =
