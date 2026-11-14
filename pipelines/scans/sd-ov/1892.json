@@ -110,13 +110,13 @@
         },
         {
           "label": "Michael J. Dinneen Democrat",
-          "contest": "president",
-          "candidate": "Grover Cleveland (Democratic)"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "John Burke Democrat",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "Grover Cleveland (Democratic)"
         }
       ],
       "orientation": "counties_down",
@@ -139,8 +139,8 @@
       "columns": [
         {
           "label": "Chas. Keith Democrat",
-          "contest": "president",
-          "candidate": "Grover Cleveland (Democratic)"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "John La Fabre Democrat",
@@ -225,7 +225,7 @@
         0.908,
         0.871
       ],
-      "hint": "Read only the table headed 'OFFICIAL VOTE\u2014Continued, November Election, 1892: Governor and Lieutenant Governor'; ignore any other table visible in the image.",
+      "hint": "Read only the table headed 'OFFICIAL VOTE—Continued, November Election, 1892: Governor and Lieutenant Governor'; ignore any other table visible in the image.",
       "bands": 2,
       "header": [
         0.0,
