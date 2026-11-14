@@ -1638,7 +1638,9 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
     isLate && onNight > 0 && latest > onNight
       ? Math.min(
           1,
-          (recent * latest * (Date.parse(stamp) - (cutoff ?? 0))) /
+          (recent *
+            latest *
+            (Date.parse(stamp) - Date.parse(night?.at ?? stamp))) /
             ((latest - onNight) * (Date.parse(stamp) - lookback)),
         )
       : 1;
