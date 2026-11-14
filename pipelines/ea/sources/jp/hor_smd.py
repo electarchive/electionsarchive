@@ -32,10 +32,10 @@ CREDIT = (
 LAW_API = "https://laws.e-gov.go.jp/api/2/law_data/325AC1000000100_{}?response_format=xml"
 ISJ = "https://nlftp.mlit.go.jp/isj/dls/data/{version}/{prefecture}000-{version}.zip"
 FORMER = "https://nlftp.mlit.go.jp/ksj/gml/data/N03/N03-2000/N03-001001_{prefecture}_GML.zip"
-SUFFIX = re.compile(r"(町|新|[一二三四五六七八九十]+丁目|[0-9])")
+SUFFIX = re.compile(r"(町|新|[0-9]+丁目)")
 ESTAT = (
     "https://www.e-stat.go.jp/gis/statmap-search/data?dlserveyId=A00200521{year}"
-    "&code={prefecture:02d}&coordSys=1&format=shape&downloadType=5&datum=2011"
+    "&code={prefecture:02d}&coordSys=1&format=shape&downloadType=5&datum={datum}"
 )
 
 
@@ -49,9 +49,12 @@ class Table:
 
 
 TABLES = {
+    "2013": Table("20170101_428AC0000000094", date(2013, 7, 28), "2013", 2010, "07.0b"),
     "2017": Table("20170716_428AC1000000049", date(2017, 7, 16), "2017", 2015, "11.0b"),
     "2022": Table("20221228_504AC0000000089", date(2022, 12, 28), "2022", 2020, "16.0b"),
 }
+OFFICES = {"2013": "2014"}
+ERRATA = {("2013", "02", 2, "三沢市"): "むつ市", ("2013", "12", 12, "館山市"): "木更津市"}
 ISLANDS = {"1336": "大島支庁", "1338": "三宅支庁", "1340": "八丈支庁", "1342": "小笠原支庁"}
 NUMERALS = {"一": 1, "二": 2, "三": 3, "四": 4, "五": 5, "六": 6, "七": 7, "八": 8, "九": 9}
 
@@ -103,9 +106,21 @@ def annex(table: str) -> list[tuple[str, int, tuple[str, ...]]]:
         elif found := re.fullmatch(r"第([一二三四五六七八九十]+)区", text):
             district, path = kanji(found[1]), []
         elif text:
-            if depth == 0 and path and text.endswith("管内") and not text.startswith(native):
+            if (
+                depth == 0
+                and path
+                and text.endswith("管内")
+                and not text.startswith(native)
+                and not re.search(r"(支庁|振興局)管内$", text)
+            ):
+                depth = 1
+            elif text.endswith("郡"):
+                depth = 0
+            elif depth == 0 and len(path) == 1 and path[0].endswith("郡") and text[-1] in "町村":
                 depth = 1
             path = [*path[:depth], text]
+            if (table, prefecture, district, text) in ERRATA and (prefecture, district, tuple(path)) in entries:
+                path[-1] = ERRATA[table, prefecture, district, text]
             entries.append((prefecture, district, tuple(path)))
     return entries
 
@@ -123,14 +138,23 @@ def fetch() -> None:
 
 
 def estat_url(year: int, prefecture: str) -> str:
-    return ESTAT.format(year=year, prefecture=int(prefecture))
+    return ESTAT.format(year=year, prefecture=int(prefecture), datum=2000 if year == 2010 else 2011)
 
 
 def norm(text: str) -> str:
     text = unicodedata.normalize("NFKC", text)
     for old, new in (("ヶ", "ケ"), ("ヵ", "カ"), ("之", "ノ"), ("桧", "檜"), ("舘", "館"), ("冨", "富"), ("與", "与")):
         text = text.replace(old, new)
+    text = re.sub(
+        r"(?<![一二三四五六七八九十])([一二三四五六七八九]?十[一二三四五六七八九]?|[一二三四五六七八九])丁目",
+        lambda found: f"{kanji(found[1])}丁目",
+        text,
+    )
     return re.sub(r"^(大字|字)", "", text.strip())
+
+
+def offices(text: str) -> str:
+    return re.sub(r"(総合振興局|振興局|支庁)$", "", norm(text))
 
 
 def items(text: str) -> list[tuple[str, str]]:
@@ -167,16 +191,22 @@ class Municipality:
 def municipalities(vintage: str) -> dict[str, Municipality]:
     frame = pl.read_parquet(mlit.PARSED / f"n03_{vintage}.parquet", columns=["layer", "code", "parent", "name"])
     attributes: dict[str, tuple[str, str]] = {}
-    for url in mlit.urls(vintage):
+    for url in [*mlit.urls(vintage), *mlit.urls(OFFICES.get(vintage, vintage))]:
         with zipfile.ZipFile(raw.cached(mlit.SOURCE, url).path) as archive:
             dbf = next(name for name in archive.namelist() if name.endswith(".dbf"))
             reader = shapefile.Reader(dbf=io.BytesIO(archive.read(dbf)), encoding="cp932")
             for record in reader.iterRecords():
                 row = fields(record)
                 attributes[row["N03_007"]] = (row["N03_002"], row["N03_003"])
+    names = dict(
+        pl.read_parquet(mlit.PARSED / f"n03_{OFFICES[vintage]}.parquet", columns=["code", "name"]).iter_rows()
+        if vintage in OFFICES
+        else []
+    )
     found: dict[str, Municipality] = {}
     for layer, code, parent, name in frame.filter(pl.col("layer").is_in(["municipality", "ward"])).iter_rows():
-        subprefecture, county = attributes.get(code, ("", ""))
+        name = names.get(code, name)
+        subprefecture, county = attributes.get(mlit.RECODED.get(code, code), attributes.get(code, ("", "")))
         county = county or ISLANDS.get(code[:4], "")
         found[code] = Municipality(code, parent, name, subprefecture, county, layer == "ward" or name[-1] in "市区")
     return found
@@ -281,12 +311,15 @@ def plan(
         codes: list[str] = []
         if root.endswith("管内"):
             office = root.removeprefix(natives[prefecture]).removesuffix("管内")
-            codes = [
-                town.code
+            members = [
+                town
                 for town in local
-                if norm(office) in (norm(town.subprefecture), norm(town.county)) and not town.city
+                if offices(office) in (offices(town.subprefecture), offices(town.county)) and not town.city
             ]
-            if not codes or len(path) > 1:
+            if len(path) == 2:
+                members = [one([town for town in members if norm(town.name) == norm(path[1])], path[1])]
+            codes = [town.code for town in members]
+            if not codes or len(path) > 2:
                 raise ValueError(f"{table} {prefecture} {district} {path}: subprefecture")
         elif root.endswith("郡"):
             members = [town for town in local if norm(town.county) == norm(root)]
@@ -355,6 +388,14 @@ def assign(
                 if norm(name) not in olds:
                     raise ValueError(f"{table} {unit.code} {unit.name}: no former municipality {name}")
                 shapes_.append((olds[norm(name)], district))
+        elif kind == "table":
+            other = pl.read_parquet(PARSED / f"districts_{text}.parquet", columns=["code", "geom"])
+            shapes_.append(
+                (
+                    shapely.from_wkb(other.filter(pl.col("code") == f"{unit.code[:2]}{district:02d}")["geom"][0]),
+                    district,
+                )
+            )
         elif kind == "chome":
             for name, note in items(text):
                 if "限る" in note:
@@ -429,7 +470,10 @@ def build(table: str) -> pl.DataFrame:
             areas[prefecture] = small_areas(spec.census, prefecture)
             located[prefecture] = points(spec.isj, prefecture)
             olds[prefecture] = former(prefecture) if prefecture in curated else {}
-        local = areas[prefecture].filter(pl.col("unit") == code)
+        stale = areas[prefecture].filter(~pl.col("unit").is_in(list(towns)))
+        shapely.prepare(geometry[code])
+        inside = shapely.contains(geometry[code], shapely.point_on_surface(shapely.from_wkb(stale["geom"].to_numpy())))
+        local = pl.concat([areas[prefecture].filter(pl.col("unit") == code), stale.filter(pl.Series(inside))])
         try:
             chosen, remainder, unit_notes = assign(
                 table,
@@ -496,7 +540,7 @@ def build(table: str) -> pl.DataFrame:
 
 def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
-    for table in TABLES:
+    for table in sorted(TABLES, key=lambda table: TABLES[table].effective, reverse=True):
         frame = build(table)
         print(table, frame.height, "districts")
         frame.write_parquet(PARSED / f"districts_{table}.parquet")
@@ -514,7 +558,8 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary="House of Representatives single-member districts of Japan from the Public Offices Election Act "
-            f"annex 1 ({' and '.join(TABLES)} tables), drawn from N03 administrative areas and census small areas",
+            f"annex 1 ({', '.join(sorted(TABLES)[:-1])}, and {max(TABLES)} tables), drawn from N03 administrative "
+            "areas and census small areas",
             polity="JP",
         )
         law = cs.source(mlit.LAW_PUBLISHER, LAW_TITLE)
