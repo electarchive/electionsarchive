@@ -1028,5 +1028,9 @@ function cached(isStrict: boolean) {
   });
 }
 
+export function versionOf(name: string) {
+  return VERSIONS.get(name);
+}
+
 export const os = cached(false);
 export const strict = cached(true);
