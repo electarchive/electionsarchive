@@ -771,6 +771,9 @@ def dhondt(votes: dict[str, Decimal], seats: int) -> dict[str, int]:
     return won
 
 
+HOR_SMD_FROM = date(2022, 12, 28)
+
+
 def emit() -> Path:
     candidates = pl.read_parquet(PARSED / f"candidates-v{VERSION}.parquet")
     smd = pl.read_parquet(PARSED / f"smd-v{VERSION}.parquet")
@@ -898,6 +901,9 @@ def emit() -> Path:
                     election_id=election,
                     kind="body_seats",
                     body_id=house,
+                    district_area_id=cs.area("jp.hor_smd", f"{codes[str(prefecture)]}{int(district):02d}", day)
+                    if day >= HOR_SMD_FROM
+                    else None,
                     magnitude=1,
                     electoral_system_id=smd_system,
                     default_result_kind="counted",
