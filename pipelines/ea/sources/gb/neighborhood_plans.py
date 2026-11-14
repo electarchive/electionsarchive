@@ -121,6 +121,7 @@ HTML = (
     "/sherington-neighbourhood-plan",
     "/woughton-community-council-neighbourhood-plan",
     "/thame-second-neighbourhood-plan-yes-vote/",
+    "/weston-on-the-green-neighbourhood-plan-referendum",
 )
 CONTEXT = {
     "residential": (
