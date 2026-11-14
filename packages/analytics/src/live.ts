@@ -1697,22 +1697,34 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
         }
       }
     }
+    const shrunk = [...totals];
     for (const [county, indexes] of streamsOf) {
       const final = finals[wholeOf.get(county)!]!;
       const members = indexes.map((index) => found[index]!);
       const open = Math.max(0, final - sum(members.map((unit) => unit.total)));
+      const predicted = sum(indexes.map((index) => totals[index]!));
       const wants = indexes.map((index) =>
         Math.max(0, totals[index]! - found[index]!.total),
       );
+      const shares = indexes.map((index) =>
+        predicted > 0
+          ? Math.max(
+              0,
+              (final * totals[index]!) / predicted - found[index]!.total,
+            )
+          : 0,
+      );
       const wanted = sum(wants);
+      const shared = sum(shares);
       const expected = sum(members.map((unit) => unit.expected));
       for (const [slot, index] of indexes.entries()) {
+        const even = found[index]!.expected / Math.max(expected, 1);
+        shrunk[index] =
+          found[index]!.total +
+          open * (wanted > 0 ? wants[slot]! / wanted : even);
         totals[index] =
           found[index]!.total +
-          open *
-            (wanted > 0
-              ? wants[slot]! / wanted
-              : found[index]!.expected / Math.max(expected, 1));
+          open * (shared > 0 ? shares[slot]! / shared : even);
       }
     }
     for (const [index, unit] of found.entries()) {
@@ -1743,12 +1755,23 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
           unit.total + Math.min(Math.max(0, totals[index]! - unit.total), open);
       }
     }
+    const coefficients = fit(
+      found,
+      found.map((unit, index) =>
+        unit.channel === 0
+          ? totals[index]!
+          : Math.max(shrunk[index]!, typical[index]!),
+      ),
+      center,
+      residuals,
+      random,
+      widths,
+    );
     const fitted = found.map((unit, index) =>
       unit.channel === 0
         ? totals[index]!
         : Math.max(totals[index]!, typical[index]!),
     );
-    const coefficients = fit(found, fitted, center, residuals, random, widths);
     const order = coefficients.at(-1)!;
     let votes = 0;
     let still = 0;
