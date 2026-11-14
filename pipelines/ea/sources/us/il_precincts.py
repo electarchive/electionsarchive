@@ -59,6 +59,21 @@ COUNTIES = {
     "DUPAGE": ("17043", "DuPage County Election Commission", "General election results by precinct"),
     "MADISON": ("17119", "Madison County Clerk", "General election canvass by precinct"),
 }
+AURORA = "Aurora Election Commission"
+AURORA_TITLE = "Statement of votes cast"
+AURORA_FILES = {
+    2008: "https://web.archive.org/web/20160626121538id_/http://auroravotes.org/Media/Default/Election%20Results/results_nov_4_2008_SOVC.pdf",
+    2012: "https://web.archive.org/web/20150522080737id_/http://auroravotes.org/Media/Default/Election%20Results/results_Nov_6_2012_SOVC.pdf",
+}
+AURORA_WILL_2008 = {
+    "WARD 09 PCT 03": (189, 321, 0, 1, 0, 0, 2, 0),
+    "WARD 09 PCT 04": (199, 407, 0, 3, 0, 3, 3, 0),
+    "WARD 09 PCT 05": (323, 644, 1, 1, 0, 1, 6, 0),
+    "WARD 09 PCT 06": (218, 381, 1, 3, 0, 0, 2, 1),
+    "WARD 09 PCT 07": (258, 405, 2, 6, 0, 1, 1, 1),
+    "WARD 09 PCT 08": (229, 427, 0, 1, 0, 1, 0, 0),
+}
+AURORA_2008_NAMES = ("McCAIN", "OBAMA", "McKINNEY", "BARR", "POLACHEK", "BALDWIN", "NADER", "Write-In Votes")
 LOADED: dict[int, list[tuple[str, int, int]]] = {year: [] for year in DAYS}
 OCR_DIGITS = str.maketrans("SslIiBOo", "55111800")
 OFFICES = {
@@ -114,6 +129,9 @@ def fetch() -> None:
         raw.fetch(SOURCE, CHICAGO_DOWNLOAD.format(election=election, contest=contest), suffix=".xls")
     for url in CLERK_FILES.values():
         raw.fetch(SOURCE, url, suffix=Path(url).suffix.lower())
+    for url in AURORA_FILES.values():
+        if url not in raw.keys(SOURCE):
+            wayback(url, ".pdf")
     for (county, _), urls in COUNTY_FILES.items():
         for url in urls:
             if url.startswith("https://web.archive.org/"):
@@ -264,6 +282,47 @@ def suburban(year: int) -> list[tuple[str, str, int]]:
     return found
 
 
+def aurora(year: int, county: str) -> list[tuple[str, str, int]]:
+    if year == 2008:
+        if county != "WILL":
+            return []
+        return [
+            (f"AURORA {precinct}", name, votes)
+            for precinct, counts in AURORA_WILL_2008.items()
+            for name, votes in zip(AURORA_2008_NAMES, counts, strict=True)
+        ]
+    text = subprocess.run(
+        ["pdftotext", "-layout", str(raw.cached(SOURCE, AURORA_FILES[year]).path), "-"],
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout
+    inside: set[str] = set()
+    found: list[tuple[str, str, int]] = []
+    for page in text.split("\f"):
+        lines = page.splitlines()
+        at = next((i for i, line in enumerate(lines) if "OFFICIAL RESULTS" in line), None)
+        if at is None:
+            continue
+        race = lines[at + 1].strip()
+        header = next(line for line in lines[at + 2 :] if line.strip())
+        names = re.split(r"\s{2,}", re.sub(r"Reg\. Voters|Vote For|Times Counted|Total Votes", "", header).strip())
+        for line in lines:
+            if not (match := re.match(r"\s*(Ward \d\d Pct \d\d)\s+(.*)$", line)):
+                continue
+            precinct = f"AURORA {match[1].upper()}"
+            if race == f"RECORDER - {county}" and re.search(r"\d", match[2]):
+                inside.add(precinct)
+            elif race.startswith("PRESIDENT/"):
+                votes = re.findall(r"(\d+)\s+[\d.]+%", match[2])
+                if len(votes) != len(names):
+                    raise ValueError(f"Aurora {year}: {line!r}")
+                found.extend((precinct, name, int(cell)) for name, cell in zip(names, votes, strict=True))
+    if not inside:
+        raise ValueError(f"Aurora {year}: no {county} recorder race")
+    return [row for row in found if row[0] in inside]
+
+
 def lake(year: int) -> list[tuple[str, str, int]]:
     found: list[tuple[str, str, int]] = []
     if year >= 2008:
@@ -324,12 +383,12 @@ def will(year: int) -> list[tuple[str, str, int]]:
                 name = " ".join([*words, last.translate(OCR_DIGITS) if words else last])
                 name = name.replace("!=", "F").replace("DU PAGE", "DUPAGE").replace("J3ALLOT", "BALLOT")
                 found.extend((name, names[str(i + 1)], int(cell)) for i, cell in enumerate(votes))
-        aurora = re.search(r"RESULTS\s+((?:\d+\s+){5}\d+)\s*\n\s*FINAL TOT", text)
-        if aurora is None:
+        found_aurora = re.search(r"RESULTS\s+((?:\d+\s+){5}\d+)\s*\n\s*FINAL TOT", text)
+        if found_aurora is None:
             raise ValueError("Will 2000: no Aurora Election Commission row")
         found.extend(
             ("CITY OF AURORA ELECTION COMMISSION", names[str(i + 1)], int(cell))
-            for i, cell in enumerate(aurora[1].split())
+            for i, cell in enumerate(found_aurora[1].split())
         )
         return found
     with zipfile.ZipFile(raw.cached(SOURCE, COUNTY_FILES["WILL", year][0]).path) as archive:
@@ -351,7 +410,7 @@ def will(year: int) -> list[tuple[str, str, int]]:
                 found.extend(
                     (cells[0], candidate, int(cells[i])) for candidate, i in zip(candidates, columns, strict=True)
                 )
-    return found
+    return found + aurora(year, "WILL")
 
 
 def kane(year: int) -> list[tuple[str, str, int]]:
@@ -375,18 +434,21 @@ def kane(year: int) -> list[tuple[str, str, int]]:
                 and precinct
                 and (
                     match := re.match(
-                        r"\s+(?:[A-Z]{3}\s+)?(\S.*?)\s{2,}\d+\s+[\d.]+%\s+\d+\s+[\d.]+%\s+\d+\s+[\d.]+%\s+(\d+)\s+[\d.]+%",
+                        r"\s+(?:[A-Z]{3}\s+)?(\S.*?)\s{2,}[\d,]+\s+[\d.]+%\s+[\d,]+\s+[\d.]+%\s+[\d,]+\s+[\d.]+%\s+([\d,]+)\s+[\d.]+%",
                         line,
                     )
                 )
             ):
-                found.append((precinct, match[1], int(match[2])))
-        return found
+                found.append((precinct, match[1], int(match[2].replace(",", ""))))
+        return found + aurora(year, "KANE")
     sheets = pl.read_excel(path, sheet_id=0, has_header=False, infer_schema_length=0)
     if year == 2004:
         rows = sheets["KANE & AURORA"].rows()
         columns = [i for i, cell in enumerate(rows[1]) if cell == "PRESIDENT"]
+        county = [i for i, cell in enumerate(rows[1]) if cell == "KANE COUNTY"]
         for row in rows:
+            if re.fullmatch(r"\d{6}", row[0] or "") and row[0] < "999991" and not any(int(row[i] or 0) for i in county):
+                continue
             if re.fullmatch(r"[A-Z]{2}\d{4}|\d{6}", row[0] or ""):
                 found.extend((row[1].strip(), rows[3][i], int(row[i] or 0)) for i in columns)
         return found
@@ -605,8 +667,8 @@ def emit() -> Path:
             version=VERSION,
             summary="Illinois presidential general elections of 2000 through 2012 by precinct in Cook County (the "
             "Chicago Board of Election Commissioners and the Cook County Clerk) and the Lake, Will, Kane, McHenry, "
-            "DuPage, and Madison county election offices where their precinct canvasses tie the State Board's county "
-            "figures, and by county elsewhere (the State Board of Elections)",
+            "DuPage, and Madison county election offices and the Aurora Election Commission where their precinct "
+            "canvasses tie the State Board's county figures, and by county elsewhere (the State Board of Elections)",
             polity="US-IL",
         )
         sources = {}
@@ -656,6 +718,23 @@ def emit() -> Path:
                     if county == "LAKE" and "/cdx/" in link:
                         for page in lake_pages(link):
                             cs.artifact(raw.cached(SOURCE, page), sources[county])
+        aurora_years = [
+            year for year in AURORA_FILES if {COUNTIES["KANE"][0], COUNTIES["WILL"][0]} & set(loaded.get(year, []))
+        ]
+        if aurora_years:
+            sources["AURORA"] = cs.source(AURORA, AURORA_TITLE)
+            if sources["AURORA"] in cs.minted:
+                cs.add(
+                    "source",
+                    id=sources["AURORA"],
+                    kind="official_body",
+                    publisher=AURORA,
+                    title=AURORA_TITLE,
+                    url=AURORA_FILES[aurora_years[-1]],
+                    license="Public record",
+                )
+            for year in aurora_years:
+                cs.artifact(raw.cached(SOURCE, AURORA_FILES[year]), sources["AURORA"])
         for year in CLERK_FILES:
             election, contest = CHICAGO_FILES[year]
             for link in (
@@ -741,6 +820,24 @@ def emit() -> Path:
                 + (
                     f"{listed} {'are' if len(offices) > 1 else 'is'} by precinct from the county's own canvass. "
                     if offices
+                    else ""
+                )
+                + (
+                    "The City of Aurora's precincts come from the Aurora Election Commission's statement of votes "
+                    "cast, split by county with the commission's county recorder contests"
+                    + (
+                        "; Will County's six Aurora precincts (Ward 9, precincts 3 through 8) are transcribed from "
+                        "pages 4 and 5 of the scanned statement. "
+                        if year == 2008
+                        else ". "
+                    )
+                    if year in aurora_years
+                    else ""
+                )
+                + (
+                    "Kane County's sheet lists every Aurora Election Commission precinct; the five that cast no "
+                    "Kane County votes (outside Kane) are left out. "
+                    if year == 2004 and COUNTIES["KANE"][0] in loaded[year]
                     else ""
                 )
                 + "Every other county is the State Board of Elections' county total. "
