@@ -321,9 +321,14 @@ const stray = (candidacy: SQL, option: SQL, contest: SQL) => sql`
     where k.id = ${contest}
   )
 `;
-const paint = (party: SQL, elections: SQL, date: SQL) => sql`
+const paint = (
+  party: SQL,
+  elections: SQL,
+  date: SQL,
+  colors: SQL = sql`party_color`,
+) => sql`
   coalesce(
-    (select pc.color from party_color pc where pc.party_id = ${party} and pc.valid @> ${date}),
+    (select pc.color from ${colors} pc where pc.party_id = ${party} and pc.valid @> ${date}),
     (select pc.color from party_relation r
       left join entity_merge fm on fm.entity_id = r.from_party_id
       left join entity_merge tm on tm.entity_id = r.to_party_id
@@ -511,10 +516,10 @@ const nearest = (alias: SQL, date: SQL) => sql`
   case when ${date} is not null then greatest(lower(${alias}.valid) - ${date}, ${date} - upper(${alias}.valid) + 1, 0) end
 `;
 
-const abbreviate = (party: SQL, date: SQL) => sql`
-  (select a.text from name a
+const abbreviate = (party: SQL, date: SQL, names: SQL = sql`name`) => sql`
+  (select a.text from ${names} a
     left join lateral (
-      select f.text, f.is_preferred, f.valid from name f
+      select f.text, f.is_preferred, f.valid from ${names} f
       where f.entity_id = a.entity_id and f.kind in ('official', 'english')
       order by coalesce(f.valid @> coalesce(${date}, (select name_day())), false) desc,
         coalesce(f.valid @> coalesce(${date}, (select name_day())) and not (lower_inf(f.valid) and upper_inf(f.valid)), false) desc,
@@ -525,7 +530,7 @@ const abbreviate = (party: SQL, date: SQL) => sql`
     where a.entity_id = ${party} and a.kind in ('short', 'abbreviation')
       and not (
         f.is_preferred is false and not (lower_inf(f.valid) and upper_inf(f.valid)) and lower_inf(a.valid) and upper_inf(a.valid)
-        and exists (select from name p where p.entity_id = a.entity_id and p.kind in ('official', 'english') and p.is_preferred)
+        and exists (select from ${names} p where p.entity_id = a.entity_id and p.kind in ('official', 'english') and p.is_preferred)
       )
       and (f.valid is null or (lower_inf(a.valid) and upper_inf(a.valid)) or (lower_inf(f.valid) and upper_inf(f.valid)) or a.valid && f.valid)
     order by (a.kind = 'short') desc, coalesce(a.valid @> coalesce(${date}, (select name_day())), false) desc,
@@ -10544,17 +10549,25 @@ export const contests = {
               party_label: string | null;
               party_short: string | null;
             }>(sql`
-              select p.root, p.party, ${paint(sql`p.party`, sql`e.id`, sql`e.date_from`)} as color,
-                (select n.text from name n where n.entity_id = p.party and n.kind in ('official', 'english')
-                  order by coalesce(n.valid @> e.date_from, false) desc, n.is_preferred desc, (n.lang = 'en') desc,
-                    (n.kind = 'official') desc, n.recorded_from desc, n.id limit 1) as party_label,
-                ${abbreviate(sql`p.party`, sql`e.date_from`)} as party_short
-              from (
+              with p as materialized (
                 select distinct * from unnest(
                   ${sql.param(found.flatMap((row) => (row.party == null ? [] : [row.root])))}::uuid[],
                   ${sql.param(found.flatMap((row) => (row.party == null ? [] : [row.party])))}::uuid[]
                 ) as p(root, party)
-              ) p
+              ),
+              nm as materialized (
+                select * from name
+                where entity_id in (select party from p) and kind in ('official', 'english', 'short', 'abbreviation')
+              ),
+              pcm as materialized (
+                select * from party_color where party_id in (select party from p)
+              )
+              select p.root, p.party, ${paint(sql`p.party`, sql`e.id`, sql`e.date_from`, sql`pcm`)} as color,
+                (select n.text from nm n where n.entity_id = p.party and n.kind in ('official', 'english')
+                  order by coalesce(n.valid @> e.date_from, false) desc, n.is_preferred desc, (n.lang = 'en') desc,
+                    (n.kind = 'official') desc, n.recorded_from desc, n.id limit 1) as party_label,
+                ${abbreviate(sql`p.party`, sql`e.date_from`, sql`nm`)} as party_short
+              from p
               join contest c on c.id = p.root
               join election e on e.id = c.election_id
             `);
