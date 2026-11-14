@@ -84,12 +84,13 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.062,
-        0.801,
-        0.2,
-        0.928
+        0.0,
+        0.753,
+        0.244,
+        0.9390000000000001
       ],
-      "hint": "Read only the table headed 'For Governor of Maryland'; ignore any other table visible in the image."
+      "hint": "Read the governor table to its end: after the counties come six rows breaking down Baltimore City by legislative district (First District to Sixth District), then the Total row.",
+      "wards": "24510"
     },
     {
       "page": 201,
@@ -108,12 +109,13 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.112,
-        0.796,
-        0.708,
-        0.866
+        0.0,
+        0.753,
+        0.243,
+        0.968
       ],
-      "hint": "Read only the table headed 'From the First Congressional District of Maryland'; ignore any other table visible in the image."
+      "hint": "Read only the table headed 'From the First Congressional District of Maryland'; ignore any other table visible in the image.",
+      "wards": "24510"
     },
     {
       "page": 201,
@@ -132,12 +134,13 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.112,
-        0.858,
-        0.708,
-        0.921
+        0.0,
+        0.753,
+        0.243,
+        0.968
       ],
-      "hint": "Read only the table headed 'From the Second Congressional District of Maryland'; ignore any other table visible in the image."
+      "hint": "Read only the table headed 'From the Second Congressional District of Maryland'; ignore any other table visible in the image.",
+      "wards": "24510"
     },
     {
       "page": 201,
@@ -156,12 +159,13 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.112,
-        0.913,
-        0.708,
-        0.966
+        0.0,
+        0.753,
+        0.243,
+        0.968
       ],
-      "hint": "Read only the table headed 'From the Third Congressional District of Maryland'; ignore any other table visible in the image."
+      "hint": "Read only the table headed 'From the Third Congressional District of Maryland'; ignore any other table visible in the image.",
+      "wards": "24510"
     },
     {
       "page": 202,
@@ -185,7 +189,8 @@
         0.21,
         0.822
       ],
-      "hint": "Read only the table headed 'From the Fourth Congressional District of Maryland'; ignore any other table visible in the image."
+      "hint": "Read only the table headed 'From the Fourth Congressional District of Maryland'; ignore any other table visible in the image.",
+      "wards": "24510"
     },
     {
       "page": 202,
@@ -209,7 +214,8 @@
         0.213,
         0.895
       ],
-      "hint": "Read only the table headed 'From the Fifth Congressional District of Maryland'; ignore any other table visible in the image."
+      "hint": "Read only the table headed 'From the Fifth Congressional District of Maryland'; ignore any other table visible in the image.",
+      "wards": "24510"
     },
     {
       "page": 202,
@@ -233,7 +239,32 @@
         0.213,
         0.946
       ],
-      "hint": "Read only the table headed 'From the Sixth Congressional District of Maryland'; ignore any other table visible in the image."
+      "hint": "Read only the table headed 'From the Sixth Congressional District of Maryland'; ignore any other table visible in the image.",
+      "wards": "24510"
     }
-  ]
+  ],
+  "unit_codes": {
+    "Pr. George's": "24033",
+    "Balto. City": "24510",
+    "Balto. Co.": "24005",
+    "Bal. C.": "24510",
+    "Ba. C'y": "24510"
+  },
+  "unit_labels": {
+    "Subtotal counties": "Subtotal",
+    "": "Subtotal",
+    "Tot's": "Totals",
+    "First District": "Baltimore City wards, First District",
+    "Second District": "Baltimore City wards, Second District",
+    "Third District": "Baltimore City wards, Third District",
+    "Fourth District": "Baltimore City wards, Fourth District",
+    "Fifth District": "Baltimore City wards, Fifth District",
+    "Sixth District": "Baltimore City wards, Sixth District",
+    "1st District": "Baltimore City wards, 1st District",
+    "2nd District": "Baltimore City wards, 2nd District",
+    "3rd District": "Baltimore City wards, 3rd District",
+    "4th District": "Baltimore City wards, 4th District",
+    "5th District": "Baltimore City wards, 5th District",
+    "6th District": "Baltimore City wards, 6th District"
+  }
 }

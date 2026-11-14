@@ -145,7 +145,8 @@
         0.187,
         0.866
       ],
-      "hint": "Read only the table headed 'From the First Congressional District of Maryland, 1944 general election, U.S. Representative in Congress'; ignore any other table visible in the image."
+      "hint": "Read only the table headed 'From the First Congressional District of Maryland, 1944 general election, U.S. Representative in Congress'; ignore any other table visible in the image.",
+      "wards": "24510"
     },
     {
       "page": 197,
@@ -169,7 +170,8 @@
         0.187,
         0.93
       ],
-      "hint": "Read only the table headed 'From the Second Congressional District of Maryland, 1944 general election, U.S. Representative in Congress'; ignore any other table visible in the image."
+      "hint": "Read only the table headed 'From the Second Congressional District of Maryland, 1944 general election, U.S. Representative in Congress'; ignore any other table visible in the image.",
+      "wards": "24510"
     },
     {
       "page": 197,
@@ -193,7 +195,8 @@
         0.187,
         0.98
       ],
-      "hint": "Read only the table headed 'From the Third Congressional District of Maryland, 1944 general election, U.S. Representative in Congress'; ignore any other table visible in the image."
+      "hint": "Read only the table headed 'From the Third Congressional District of Maryland, 1944 general election, U.S. Representative in Congress'; ignore any other table visible in the image.",
+      "wards": "24510"
     },
     {
       "page": 198,
@@ -217,7 +220,8 @@
         0.205,
         0.826
       ],
-      "hint": "Read only the table headed 'From the Fourth Congressional District of Maryland'; ignore any other table visible in the image."
+      "hint": "Read only the table headed 'From the Fourth Congressional District of Maryland'; ignore any other table visible in the image.",
+      "wards": "24510"
     },
     {
       "page": 198,
@@ -241,7 +245,8 @@
         0.208,
         0.902
       ],
-      "hint": "Read only the table headed 'From the Fifth Congressional District of Maryland'; ignore any other table visible in the image."
+      "hint": "Read only the table headed 'From the Fifth Congressional District of Maryland'; ignore any other table visible in the image.",
+      "wards": "24510"
     },
     {
       "page": 198,
@@ -265,7 +270,32 @@
         0.208,
         0.951
       ],
-      "hint": "Read only the table headed 'From the Sixth Congressional District of Maryland'; ignore any other table visible in the image."
+      "hint": "Read only the table headed 'From the Sixth Congressional District of Maryland'; ignore any other table visible in the image.",
+      "wards": "24510"
     }
-  ]
+  ],
+  "unit_codes": {
+    "Pr. George's": "24033",
+    "Balto. City": "24510",
+    "Balto. Co.": "24005",
+    "Bal. C.": "24510",
+    "Ba. C'y": "24510"
+  },
+  "unit_labels": {
+    "Subtotal counties": "Subtotal",
+    "": "Subtotal",
+    "Tot's": "Totals",
+    "First District": "Baltimore City wards, First District",
+    "Second District": "Baltimore City wards, Second District",
+    "Third District": "Baltimore City wards, Third District",
+    "Fourth District": "Baltimore City wards, Fourth District",
+    "Fifth District": "Baltimore City wards, Fifth District",
+    "Sixth District": "Baltimore City wards, Sixth District",
+    "1st District": "Baltimore City wards, 1st District",
+    "2nd District": "Baltimore City wards, 2nd District",
+    "3rd District": "Baltimore City wards, 3rd District",
+    "4th District": "Baltimore City wards, 4th District",
+    "5th District": "Baltimore City wards, 5th District",
+    "6th District": "Baltimore City wards, 6th District"
+  }
 }
