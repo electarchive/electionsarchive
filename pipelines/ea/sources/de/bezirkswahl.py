@@ -133,13 +133,12 @@ def parse() -> None:
     path = raw.cached(SOURCE, RESULTS_URL).path
     units: list[dict[str, object]] = []
     votes: list[dict[str, object]] = []
-    columns = {"A": 6, "B": 10, "C": 13, "D": 14, "E": None, "F": None}
     for wk, (_, name, *_rest) in BEZIRKE.items():
         frame = pl.read_excel(path, sheet_name=name, has_header=False, infer_schema_length=0)
         header = [str(cell) for cell in frame.row(0)]
         last = next(i for i, cell in enumerate(header) if cell.startswith("Listenstimmen ungueltige"))
         first = next(i for i, cell in enumerate(header) if cell.startswith("Direktstimmen gueltige")) + 1
-        columns["E"], columns["F"] = last, last + 1
+        columns = {"A": 6, "B": 10, "C": 13, "D": 14, "E": last, "F": last + 1}
         direct = {label(header[i]): i for i in range(first, last)}
         lists = {
             label(match.group(2)): i for i, cell in enumerate(header) if (match := re.fullmatch(r"F(\d+) (.+)", cell))
