@@ -36,6 +36,7 @@ import {
   projectionOf,
   spot,
 } from "#lib/server/plane.js";
+import { isCurrent } from "#lib/server/polity-touched.js";
 import { proseColumns, proseEntries, proseJoin } from "#lib/server/prose.js";
 import { depend, reading } from "#lib/server/reads.js";
 import { Path, Polity } from "#lib/server/territory.js";
@@ -25155,10 +25156,20 @@ export const polities = {
           }
           const stored = await db.execute<{
             record: Awaited<ReturnType<typeof record>>;
+            built: string;
           }>(sql`
-            select record from polity_record where polity_id = ${input.id}::uuid and built_at > (select coalesce(max(published_at), '-infinity') from changeset)
+            select record, (extract(epoch from built_at) * 1000000)::int8::text as built
+            from polity_record where polity_id = ${input.id}::uuid
           `);
-          return stored.rows[0]?.record ?? record(input);
+          const row = stored.rows[0];
+          return row != null &&
+            (await isCurrent(
+              input.id,
+              row.record.parties.map((party) => party.id),
+              Number(row.built),
+            ))
+            ? row.record
+            : record(input);
         })(),
         counting(),
       ]);

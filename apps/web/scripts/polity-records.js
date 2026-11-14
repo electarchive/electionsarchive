@@ -9,7 +9,7 @@ try {
   const { rebuild } = await server.ssrLoadModule(
     "/src/lib/server/polity-records.ts",
   );
-  console.warn(await rebuild());
+  console.warn(await rebuild(process.argv.slice(2)));
 } finally {
   const { db } = await server.ssrLoadModule("/src/lib/server/db/index.ts");
   await db.$client.end();

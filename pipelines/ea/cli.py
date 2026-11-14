@@ -99,7 +99,11 @@ def main() -> None:
     )
     commands.add_parser("parties", help="rebuild the precomputed party pages the app serves")
     commands.add_parser("mosaics", help="rebuild the precomputed national map mosaics the app serves")
-    commands.add_parser("records", help="rebuild the precomputed election records of the largest polities")
+    recording = commands.add_parser(
+        "records", help="rebuild the precomputed election records of the largest polities that changed"
+    )
+    recording.add_argument("polities", nargs="*", help="polity ids to rebuild whether or not they changed")
+    recording.add_argument("--all", action="store_true", help="rebuild every record")
     commands.add_parser("covers", help="fill the precomputed contest covers and race tops that contest pages read")
     crowning = commands.add_parser(
         "crowns", help="refresh the precomputed winner rows of the children of elections with 40 or more children"
@@ -357,7 +361,7 @@ def main() -> None:
             )
         case "records":
             subprocess.run(
-                ["node", "scripts/polity-records.js"],
+                ["node", "scripts/polity-records.js", *(["--all"] if args.all else args.polities)],
                 cwd=Path(__file__).resolve().parents[2] / "apps" / "web",
                 check=True,
             )
