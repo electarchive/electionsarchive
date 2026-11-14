@@ -6303,6 +6303,7 @@
   "downloads_shared_sums": "SHA-256 checksum for every file",
   "downloads_shared_manifest": "Every file with its table, bundle, rows, size, and checksum",
   "downloads_shared_attribution": "The sources, and the credit each license asks for",
+  "downloads_shared_gaps": "Every known gap in the archive, with its reason and the sources checked",
   "downloads_tables": "Tables",
   "downloads_filter": "Filter",
   "downloads_filter_placeholder": "Table, country, or file",
