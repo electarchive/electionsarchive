@@ -123,6 +123,14 @@ def fold(text: str) -> str:
     return " ".join(re.sub(r"[^A-Z0-9]+", " ", plain).split())
 
 
+def shown_name(full: str) -> str:
+    if not any(c.islower() for c in full.replace("ª", "").replace("º", "")):
+        return display(full, "es")
+    return " ".join(
+        display(word, "es") if len(word) > 2 and word.isalpha() and word.isupper() else word for word in full.split()
+    )
+
+
 def wanted() -> list[str]:
     chosen = os.environ.get("ES_SENADO", "")
     return [stamp for stamp in DAYS if not chosen or stamp in chosen.split(",")]
@@ -599,8 +607,8 @@ def emit() -> Path:
                     tag = f"{key}:{person_row['order']}:{person_row['kind']}{person_row['position']}"
                     person = cs.key(f"{SOURCE}.person", tag)
                     cs.add("person", id=person, gender={"M": "male", "F": "female"}.get(person_row["sex"]))
-                    name(person, display(full, "es"))
-                    shown[person] = display(full, "es")
+                    shown[person] = shown_name(full)
+                    name(person, shown[person])
                     candidacy = cs.key(f"{SOURCE}.candidacy", tag)
                     cs.add(
                         "candidacy",
