@@ -6,13 +6,8 @@
   import { m } from "#lib/paraglide/messages.js";
   import { localDay } from "#lib/zone.svelte.js";
 
-  const {
-    entries,
-    label,
-  }: {
-    entries: Array<FeedEntry>;
-    label: string;
-  } = $props();
+  const { entries, label }: { entries: Array<FeedEntry>; label: string } =
+    $props();
 
   const days = $derived.by(() => {
     const grouped: Array<{ day: string; entries: Array<FeedEntry> }> = [];

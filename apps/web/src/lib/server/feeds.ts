@@ -103,13 +103,11 @@ export async function recent(query: v.InferOutput<typeof RecentFilters>) {
   const at = new Map(paths.rows.map((row) => [row.id, row.path]));
   return {
     polity,
-    entries: page.map(
-      (row): FeedEntry => ({
-        ...row,
-        polity: row.polity == null ? null : (full.get(row.polity) ?? null),
-        polity_path: row.polity == null ? null : (at.get(row.polity) ?? null),
-      }),
-    ),
+    entries: page.map((row): FeedEntry => ({
+      ...row,
+      polity: row.polity == null ? null : (full.get(row.polity) ?? null),
+      polity_path: row.polity == null ? null : (at.get(row.polity) ?? null),
+    })),
     next: rows.length > PAGE ? (page.at(-1)?.at ?? null) : null,
   };
 }

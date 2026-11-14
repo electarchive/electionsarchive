@@ -110,10 +110,7 @@ export const actions: Actions = {
     }
     try {
       await auth.api.changeEmail({
-        body: {
-          newEmail: parsed.output,
-          callbackURL: "/settings/account",
-        },
+        body: { newEmail: parsed.output, callbackURL: "/settings/account" },
         headers: request.headers,
       });
     } catch (error) {

@@ -1,11 +1,7 @@
 import { error, redirect } from "@sveltejs/kit";
 import * as v from "valibot";
 import { m } from "#lib/paraglide/messages.js";
-import {
-  changeMarkdown,
-  formatOf,
-  twinResponse,
-} from "#lib/server/formats.js";
+import { changeMarkdown, formatOf, twinResponse } from "#lib/server/formats.js";
 import { change, PublicId } from "#lib/server/history.js";
 import type { RequestHandler } from "./$types";
 

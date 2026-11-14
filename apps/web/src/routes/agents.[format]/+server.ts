@@ -59,11 +59,7 @@ export const GET: RequestHandler = ({ params, url }) => {
       for (const question of setup.questions) {
         lines.push(`- ${question}`);
       }
-      lines.push(
-        "",
-        `## ${m.agents_tools_count({ count: tools.length })}`,
-        "",
-      );
+      lines.push("", `## ${m.agents_tools_count({ count: tools.length })}`, "");
       for (const tool of tools) {
         lines.push(`- \`${tool.name}\`: ${tool.description}`);
       }

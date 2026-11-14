@@ -28,49 +28,22 @@ const TOOLS: Array<{
   { name: "get_polity", procedure: router.polities.get },
   { name: "get_election", procedure: router.elections.get },
   { name: "get_contest", procedure: router.contests.get },
-  {
-    name: "get_election_indices",
-    procedure: router.indices.election,
-  },
-  {
-    name: "get_polity_indices",
-    procedure: router.indices.polity,
-  },
-  {
-    name: "get_contest_indices",
-    procedure: router.indices.contest,
-  },
-  {
-    name: "get_unmapped_units",
-    procedure: router.contests.ledger,
-  },
-  {
-    name: "get_live_results",
-    procedure: router.tonight.results,
-  },
+  { name: "get_election_indices", procedure: router.indices.election },
+  { name: "get_polity_indices", procedure: router.indices.polity },
+  { name: "get_contest_indices", procedure: router.indices.contest },
+  { name: "get_unmapped_units", procedure: router.contests.ledger },
+  { name: "get_live_results", procedure: router.tonight.results },
   { name: "get_live_race", procedure: router.tonight.race },
   { name: "get_person", procedure: router.people.get },
   { name: "get_party", procedure: router.parties.get },
-  {
-    name: "get_party_elections",
-    procedure: router.parties.elections,
-  },
+  { name: "get_party_elections", procedure: router.parties.elections },
   { name: "get_chamber", procedure: router.bodies.get },
-  {
-    name: "get_chamber_members",
-    procedure: router.bodies.members,
-  },
+  { name: "get_chamber_members", procedure: router.bodies.members },
   { name: "get_page_path", procedure: router.entities.path },
-  {
-    name: "get_coverage_gaps",
-    procedure: router.coverage.gaps,
-  },
+  { name: "get_coverage_gaps", procedure: router.coverage.gaps },
   { name: "get_history", procedure: router.histories.list },
   { name: "get_change", procedure: router.histories.change },
-  {
-    name: "recent_changes",
-    procedure: router.recentChanges.list,
-  },
+  { name: "recent_changes", procedure: router.recentChanges.list },
 ];
 
 const LIVE =
@@ -106,25 +79,25 @@ const Shape = v.looseObject({
 });
 
 const catalog = TOOLS.map((tool) => {
-    const input = tool.procedure["~orpc"].inputSchemas?.at(-1);
-    const converted: unknown =
-      input == null ? {} : converter.convert(input, "input")[0];
-    const schema = v.parse(Shape, converted);
-    const strings = new Set(
-      Object.entries(schema.properties)
-        .filter(([, property]) => property.type === "string")
-        .map(([name]) => name),
-    );
-    return {
-      ...tool,
-      strings,
-      listing: {
-        name: tool.name,
-        description:
-          tool.description ?? getOpenAPIMeta(tool.procedure)?.summary ?? "",
-        inputSchema: { ...schema, type: "object" as const },
-      },
-    };
+  const input = tool.procedure["~orpc"].inputSchemas?.at(-1);
+  const converted: unknown =
+    input == null ? {} : converter.convert(input, "input")[0];
+  const schema = v.parse(Shape, converted);
+  const strings = new Set(
+    Object.entries(schema.properties)
+      .filter(([, property]) => property.type === "string")
+      .map(([name]) => name),
+  );
+  return {
+    ...tool,
+    strings,
+    listing: {
+      name: tool.name,
+      description:
+        tool.description ?? getOpenAPIMeta(tool.procedure)?.summary ?? "",
+      inputSchema: { ...schema, type: "object" as const },
+    },
+  };
 });
 
 const byName = new Map(catalog.map((tool) => [tool.name, tool]));
@@ -168,10 +141,7 @@ function build(
 ) {
   const server = new Server(
     { name: "electionsarchive", title: "electionsarchive.com", version: "1" },
-    {
-      capabilities: { tools: {} },
-      instructions: INSTRUCTIONS,
-    },
+    { capabilities: { tools: {} }, instructions: INSTRUCTIONS },
   );
   server.setRequestHandler(ListToolsRequestSchema, () => ({
     tools: catalog.map((tool) => tool.listing),
