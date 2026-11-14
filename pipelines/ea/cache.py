@@ -17,6 +17,7 @@ RESTRICTED = {
     "thea": "awaiting THEA's permission",
     "us.algara": "compiled from CQ Press and ICPSR's United States Historical Election Returns",
     "us.algara_federal": "compiled from CQ Press and ICPSR's United States Historical Election Returns",
+    "id.big_desa": "no license stated; loaded under UU 4/2011 Pasal 42 until BIG confirms",
 }
 # Sources whose files carry a stated license on the publisher's own pages, whether or not a source row cites them.
 STATED = {

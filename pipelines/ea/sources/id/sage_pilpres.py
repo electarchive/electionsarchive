@@ -1,3 +1,4 @@
+import re
 from datetime import date
 from pathlib import Path
 
@@ -5,6 +6,7 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset
+from ea.sources.id import big, big_desa
 from ea.sources.id.kpu_pilpres import PROVINCES
 from ea.store import DATA, connect
 
@@ -18,6 +20,14 @@ DAY = date(2019, 4, 17)
 CONTEST = f"{DAY}:presiden"
 TICKETS = {"WIDODO, Joko": 1, "SUBIANTO, Prabowo": 2}
 OFFICIAL = {1: 85607362, 2: 68650239}
+SPLIT = {"93": "91", "94": "91", "95": "91", "96": "92"}
+RENAMED = {
+    "Maluku Tenggara Barat": "Kepulauan Tanimbar",
+    "Toba Samosir": "Toba",
+    "Mamuju Utara": "Pasangkayu",
+    "Pahuwato": "Pohuwato",
+    "Kota Padang Sidempuan": "Kota Padangsidimpuan",
+}
 NOTE = (
     "Votes for each ticket at {units:,} polling stations (tempat pemungutan suara, TPS) in the 34 provinces of 2019, "
     "from the 2019 Indonesia partition of SAGE (Small-Area Global Elections), which names the Komisi Pemilihan Umum "
@@ -26,9 +36,55 @@ NOTE = (
     "stations. SAGE's registered voters (which sum to {registered:,}, against the certificate's 192,770,611) are not "
     "stored, and its valid-vote totals equal the two tickets' sum at every station, so none is added. Station "
     "codes are SAGE's own sequence numbers, not KPU identifiers. The names are SAGE's. Points are SAGE's geocodes "
-    "of the village name, not surveyed locations, and are blank where SAGE found none. This is a supplement to the "
+    "of the village name, not surveyed locations, and are blank where SAGE found none. Each station is placed in "
+    "the village (BIG, 2026 boundaries) whose regency, district, and village names match SAGE's, or whose regency "
+    "and village names match when that is unique: {villages:,} stations; {regencies:,} more sit in their regency "
+    "only, and {provinces:,} (most of Jawa Timur, where SAGE gives no names) in their province. This is a supplement to the "
     "official provincial set, never the default, and carries no seats or winners."
 )
+
+
+def _bare(text: str | None) -> str:
+    text = re.sub(r"^(KABUPATEN|KOTA)( ADMINISTRASI)?\s+|^(DESA|KELURAHAN)\s+", "", (text or "").upper())
+    return re.sub(r"[^A-Z0-9]", "", text)
+
+
+def _place(stations: pl.DataFrame) -> pl.DataFrame:
+    regencies: dict[tuple[str, bool, str], list[str]] = {}
+    for code, text in (
+        pl.read_parquet(big.PARSED / "areas.parquet").filter(pl.col("layer") == "kabkota").select("code", "name").rows()
+    ):
+        regencies.setdefault((SPLIT.get(code[:2], code[:2]), text.startswith("Kota"), _bare(text)), []).append(code)
+    full: dict[tuple[str, str, str], list[str]] = {}
+    loose: dict[tuple[str, str], list[str]] = {}
+    for code, parent, text, district in (
+        pl.read_parquet(big_desa.PARSED / "villages.parquet").select("code", "parent", "name", "district").rows()
+    ):
+        full.setdefault((parent, _bare(district), _bare(text)), []).append(code)
+        loose.setdefault((parent, _bare(text)), []).append(code)
+    placed = []
+    for province, regency, district, village in (
+        stations.select("province", "regency", "district", "village").unique().rows()
+    ):
+        kabkota = desa = None
+        if regency is not None:
+            label = RENAMED.get(regency, regency)
+            if province.upper() == "DKI JAKARTA" and label.startswith("Jakarta"):
+                label = f"Kota {label}"
+            found = regencies.get((PROVINCES[province.upper()], label.startswith("Kota"), _bare(label)), [])
+            kabkota = found[0] if len(found) == 1 else None
+        if kabkota is not None and village is not None:
+            found = full.get((kabkota, _bare(district), _bare(village)), [])
+            if len(found) != 1:
+                found = loose.get((kabkota, _bare(village)), [])
+            desa = found[0] if len(found) == 1 else None
+        placed.append((province, regency, district, village, kabkota, desa))
+    return stations.join(
+        pl.DataFrame(placed, schema=["province", "regency", "district", "village", "kabkota", "desa"], orient="row"),
+        on=["province", "regency", "district", "village"],
+        how="left",
+        nulls_equal=True,
+    )
 
 
 def fetch() -> None:
@@ -64,8 +120,12 @@ def parse() -> None:
     if unknown:
         raise ValueError(f"unknown provinces {unknown}")
     frame.with_columns(ticket=pl.col("party").replace_strict(TICKETS)).write_parquet(PARSED / "votes.parquet")
+    stations = _place(stations)
     stations.write_parquet(PARSED / "stations.parquet")
-    print(f"{stations.height} stations")
+    print(
+        f"{stations.height} stations: {stations['desa'].count()} in villages, "
+        f"{stations['kabkota'].count() - stations['desa'].count()} in regencies only"
+    )
 
 
 def emit() -> Path:
@@ -78,6 +138,9 @@ def emit() -> Path:
         official=sum(OFFICIAL.values()),
         missing=sum(OFFICIAL.values()) - total,
         registered=votes.unique("NAME5")["reg"].sum(),
+        villages=stations["desa"].count(),
+        regencies=stations["kabkota"].count() - stations["desa"].count(),
+        provinces=stations["kabkota"].null_count(),
     )
     with connect() as conn:
         cs = Changeset(
@@ -129,7 +192,17 @@ def emit() -> Path:
         located = pl.col("longitude").is_not_null()
         stations = stations.with_columns(
             id=pl.col("NAME5").replace_strict(unit_ids),
-            area=pl.col("province").str.to_uppercase().replace_strict({k: v[0] for k, v in province.items()}),
+            area=pl.coalesce(
+                pl.col("desa").replace_strict(
+                    {code: str(cs.area("id.desa", code)) for code in stations["desa"].drop_nulls().unique()},
+                    default=None,
+                ),
+                pl.col("kabkota").replace_strict(
+                    {code: str(cs.area("id.kabkota", code)) for code in stations["kabkota"].drop_nulls().unique()},
+                    default=None,
+                ),
+                pl.col("province").str.to_uppercase().replace_strict({k: v[0] for k, v in province.items()}),
+            ),
             parent=pl.col("province").str.to_uppercase().replace_strict({k: v[1] for k, v in province.items()}),
         )
         cs.frame(
