@@ -357,8 +357,9 @@ MUNICIPALITY_METHOD = (
 )
 MESA_METHOD = (
     "List votes by polling station (mesa) from the Government of Aragón's open data{accounting}, with each mesa on "
-    "its census section or its municipality. The mesa figures add up to {votes:,} list votes, against {official:,} in "
-    "the province results, and the files give no unit for the difference."
+    "the census section of INE's map in force that day or, where there is none (before 2001), its municipality. "
+    "The mesa figures add up to {votes:,} list votes, against {official:,} in the province results, and the files "
+    "give no unit for the difference."
 )
 MESA_ACCOUNTING = ", with registered voters, ballots cast, blank ballots, and null ballots"
 MESA_VOTES_ONLY = ". This year's file holds list votes only, with no registered voters, blank ballots, or null ballots"
@@ -490,11 +491,17 @@ def emit() -> Path:
                 "select c.code, a.id from area a join area_code c on c.area_id = a.id where a.scheme_code = 'es.municipio'"
             ).fetchall()
         )
-        section_areas = dict(
-            conn.execute(
-                "select c.code, a.id from area a join area_code c on c.area_id = a.id where a.scheme_code = 'es.seccion'"
-            ).fetchall()
-        )
+        section_areas = {
+            year: dict(
+                conn.execute(
+                    "select c.code, a.id from area a join area_code c on c.area_id = a.id "
+                    "where a.scheme_code = 'es.seccion' and c.valid @> %(day)s::date and exists "
+                    "(select 1 from area_geometry g where g.area_id = a.id and g.valid @> %(day)s::date)",
+                    {"day": DAYS[year]},
+                ).fetchall()
+            )
+            for year in MESA_YEARS
+        }
         unit_rows: dict[UUID, tuple[UUID, str, str, UUID | None, str, UUID | None, str]] = {}
         province_units: dict[str, UUID] = {}
         for code in PROVINCES:
@@ -713,7 +720,7 @@ def emit() -> Path:
                         )
                     else:
                         parent = municipality_unit(row["municipality"])
-                        section = section_areas.get(row["mesa"][:10]) if year == 2026 else None
+                        section = section_areas[year].get(row["mesa"][:10])
                         area = section or municipality_areas.get(row["municipality"])
                         relation, kind = ("within" if area is not None else "unlocated"), "standard"
                     unit_rows[unit] = (unit, "es.mesa", code, parent, relation, area, kind)
@@ -730,7 +737,13 @@ def emit() -> Path:
         ).fetchall():
             if body not in methods[entity]:
                 cs.add("note_drop", note_id=note_id, entity_id=entity, body_md=body, reason=REWRITTEN)
-        minted_units = [
+        placed = {
+            unit: (relation, None if area is None else str(area))
+            for unit, relation, area in conn.execute(
+                "select id, area_relation::text, area_id from reporting_unit where id = any(%s)", (list(unit_rows),)
+            ).fetchall()
+        }
+        staged_units = [
             {
                 "id": str(unit),
                 "polity_id": str(spain),
@@ -742,12 +755,12 @@ def emit() -> Path:
                 "kind": kind,
             }
             for unit, scheme, code, parent, relation, area, kind in unit_rows.values()
-            if unit in cs.minted
+            if unit in cs.minted or placed.get(unit) != (relation, None if area is None else str(area))
         ]
-        if minted_units:
+        if staged_units:
             cs.frame(
                 "reporting_unit",
-                pl.DataFrame(minted_units, schema_overrides={"parent_id": pl.String, "area_id": pl.String}),
+                pl.DataFrame(staged_units, schema_overrides={"parent_id": pl.String, "area_id": pl.String}),
             )
         cs.frame(
             "result_value",
