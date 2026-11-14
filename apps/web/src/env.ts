@@ -39,6 +39,11 @@ export const variables = defineEnvVars({
     description:
       "Record what each cached result read and log, on each renewal, whether per-polity versions would have kept it correctly",
   },
+  CACHE_KEYS: {
+    schema: (value) => value === "1" || value === "true",
+    description:
+      "Keep a cached result after a publish when none of the polities, parties, or people it read have changed since it was computed",
+  },
   BETTER_AUTH_SECRET: {
     schema: v.pipe(v.string(), v.nonEmpty()),
     description: "Better Auth secret key",

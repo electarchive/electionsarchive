@@ -1,5 +1,5 @@
 import { version as build, building } from "$app/env";
-import { CACHE_SHADOW, PAGES_DATABASE_URL } from "$app/env/private";
+import { CACHE_KEYS, CACHE_SHADOW, PAGES_DATABASE_URL } from "$app/env/private";
 import { os as base, Procedure } from "@orpc/server";
 import { RESP_TYPES } from "@redis/client";
 import { sql } from "drizzle-orm";
@@ -58,7 +58,16 @@ type Entry = {
   isRenewing: boolean;
 };
 
-type Traced = { value: unknown; deps: Deps; isLocal: boolean };
+type Traced = { value: unknown; deps: Deps; mark: number | null; day: string };
+
+type Recalled = {
+  version: string;
+  value: unknown;
+  size: number;
+  deps: Array<string> | null;
+  mark: number | null;
+  day: string;
+};
 
 type Totals = {
   today: string;
@@ -73,6 +82,11 @@ const NONE: Deps = Promise.resolve(null);
 const WIDEST = 50_000;
 const REMEMBERED = 100_000;
 const REPORT = 600_000;
+const FLUSH = 60_000;
+const SAMPLE = 0.02;
+const VERSIONED = 2_000_000;
+const TRACING = CACHE_SHADOW || CACHE_KEYS;
+const MODE = CACHE_KEYS ? "keys" : "shadow";
 const ANCHOR = sql`
   left join lateral (
     select u.k from (
@@ -125,37 +139,44 @@ const state: {
   size: number;
 } = { version: "", today: "", checked: 0, checking: null, size: 0 };
 const shadow: {
-  seq: number;
-  own: Map<string, number>;
-  below: Map<string, number>;
-  seen: Set<string>;
+  epochs: Map<string, number>;
+  seen: number | null;
+  mapped: Set<string>;
+  total: number | null;
+  pending: Array<[string, string]>;
   last: Totals | null;
   loading: Promise<void>;
   anchors: Map<string, Array<string>>;
   interned: Map<string, string>;
   reported: number;
+  flushed: number;
+  sent: Map<string, number>;
 } = {
-  seq: 0,
-  own: new Map(),
-  below: new Map(),
-  seen: new Set(),
+  epochs: new Map(),
+  seen: null,
+  mapped: new Set(),
+  total: null,
+  pending: [],
   last: null,
   loading: Promise.resolve(),
   anchors: new Map(),
   interned: new Map(),
   reported: Date.now(),
+  flushed: Date.now(),
+  sent: new Map(),
 };
 const tally = {
+  computed: 0,
+  restamped: 0,
+  sampled: 0,
   renewed: 0,
   unmarked: 0,
   wide: 0,
   deps: 0,
   same: 0,
   changed: 0,
-  keptOwn: 0,
-  keptBelow: 0,
-  missOwn: 0,
-  missBelow: 0,
+  kept: 0,
+  miss: 0,
   unstable: 0,
 };
 
@@ -198,6 +219,17 @@ async function open() {
       stored_at timestamptz not null default now()
     );
     alter table entry alter column body set storage external;
+    create sequence if not exists epoch start ${Date.now()};
+    create table if not exists bump (
+      key text primary key,
+      epoch bigint not null
+    );
+    create index if not exists bump_epoch_idx on bump (epoch);
+    create table if not exists bumped (
+      changeset_id uuid primary key,
+      epoch bigint not null
+    );
+    insert into bump (key, epoch) values ('*', nextval('epoch')) on conflict do nothing;
   `);
   return pool;
 }
@@ -245,7 +277,7 @@ async function retrieve(slot: string) {
   return stored ?? null;
 }
 
-async function recall(slot: string) {
+async function recall(slot: string): Promise<Recalled | null> {
   try {
     const found = await retrieve(slot);
     if (found == null) {
@@ -269,6 +301,12 @@ async function recall(slot: string) {
         value: parsed.value,
         size: payload.length,
         deps,
+        mark:
+          "mark" in parsed && typeof parsed.mark === "number"
+            ? parsed.mark
+            : null,
+        day:
+          "day" in parsed && typeof parsed.day === "string" ? parsed.day : "",
       };
     }
     return null;
@@ -288,7 +326,7 @@ async function shelve(slot: string, version: string, packed: Buffer) {
 
 async function exclusive(
   slot: string,
-  isWanted: (found: { version: string; value: unknown }) => boolean,
+  isWanted: (found: Recalled) => Promise<boolean>,
   compute: () => Promise<Traced>,
 ): Promise<Traced> {
   const lock = `lock:${slot}`;
@@ -318,11 +356,12 @@ async function exclusive(
     while (idle < GRACE && Date.now() < deadline) {
       await new Promise((resolve) => setTimeout(resolve, 500));
       const found = await recall(slot);
-      if (found != null && isWanted(found)) {
+      if (found != null && (await isWanted(found))) {
         return {
           value: found.value,
           deps: Promise.resolve(found.deps),
-          isLocal: false,
+          mark: found.mark,
+          day: found.day,
         };
       }
       const held = await owner.exists(lock).catch(() => 1);
@@ -336,10 +375,12 @@ function keep(
   version: string,
   value: unknown,
   deps: Array<string> | null,
+  mark: number | null,
+  day: string,
 ) {
   try {
     const payload = serialize(
-      deps == null ? { version, value } : { version, value, deps },
+      deps == null ? { version, value } : { version, value, deps, mark, day },
     );
     if (payload.length <= LARGEST) {
       void pack(payload)
@@ -390,8 +431,9 @@ async function refresh() {
             .join(":");
     state.today = row?.today ?? "";
     state.checked = Date.now();
-    if (CACHE_SHADOW && row != null) {
+    if (TRACING && row != null) {
       observe(row);
+      report();
     }
   } finally {
     state.checking = null;
@@ -475,113 +517,220 @@ async function settle(reads: Reads) {
 }
 
 async function trace(compute: () => Promise<unknown>): Promise<Traced> {
-  if (!CACHE_SHADOW) {
-    return { value: await compute(), deps: NONE, isLocal: true };
+  const mark = shadow.seen;
+  const day = state.today;
+  if (!TRACING) {
+    return { value: await compute(), deps: NONE, mark: null, day };
   }
   const reads = fresh();
   const value = await reading.run(reads, compute);
-  return { value, deps: settle(reads), isLocal: true };
+  return { value, deps: settle(reads), mark, day };
 }
 
 async function recent() {
-  const result = await db.execute<{ id: string }>(sql`
-    select id::text as id from changeset
-    where status = 'published' and published_at > now() - interval '2 days'
+  const result = await db.execute<{ total: string; ids: Array<string> }>(sql`
+    select (select count(*) from changeset where status = 'published')::text as total,
+      array(
+        select id::text from changeset
+        where status = 'published' and published_at > now() - interval '2 days'
+      ) as ids
   `);
-  const found: Array<string> = [];
-  for (const { id } of result.rows) {
-    if (!shadow.seen.has(id)) {
-      shadow.seen.add(id);
-      found.push(id);
-    }
-  }
-  return found;
+  const row = result.rows[0];
+  return { total: Number(row?.total ?? 0), ids: row?.ids ?? [] };
 }
 
-async function touch() {
-  const ids = await recent();
-  const own: Array<string> = [];
-  const below: Array<string> = [];
-  if (ids.length === 0) {
-    return { own, below };
-  }
-  const result = await db.execute<{ key: string; is_own: boolean }>(sql`
+async function touch(ids: Array<string>) {
+  const result = await db.execute<{ key: string }>(sql`
     with recursive own as (
       select distinct coalesce(a.k, e.id) as key
       from changeset_entity ce join entity e on e.id = ce.entity_id ${ANCHOR}
       where ce.changeset_id = any(${sql.param(ids)}::uuid[])
-    ), up(key, is_own) as (
-      select key, true from own
+    ), up(key) as (
+      select key from own
       union
-      select p.parent_id, false from polity_parent p join up on p.polity_id = up.key
+      select p.parent_id from polity_parent p join up on p.polity_id = up.key
     )
-    select key::text as key, bool_or(is_own) as is_own from up group by key
+    select key::text as key from up
     union all
-    select 'translation', true where exists (
+    select 'translation' where exists (
       select from translation where changeset_id = any(${sql.param(ids)}::uuid[])
     )
   `);
-  for (const row of result.rows) {
-    (row.is_own ? own : below).push(row.key);
+  return result.rows.map((row) => row.key);
+}
+
+async function bump(
+  pool: pg.Pool,
+  ids: Array<string>,
+  tokens: Array<[string, string]>,
+  stamp: string,
+  isStart: boolean,
+) {
+  const connection = await pool.connect();
+  try {
+    await connection.query("begin");
+    await connection.query("set local statement_timeout = 120000");
+    await connection.query(
+      "select pg_advisory_xact_lock(hashtext('cache bump'))",
+    );
+    const next = await connection.query<{ epoch: string }>(
+      "select nextval('epoch')::text as epoch",
+    );
+    const epoch = next.rows[0]?.epoch;
+    const won = await connection.query<{ id: string }>(
+      `insert into bumped (changeset_id, epoch) select unnest($1::uuid[]), $2::bigint
+        on conflict do nothing returning changeset_id::text as id`,
+      [ids, epoch],
+    );
+    const marked = await connection.query<{ key: string }>(
+      `with t(token, key) as (select * from unnest($1::text[], $2::text[])),
+        won as (
+          insert into bumped (changeset_id, epoch) select md5(token)::uuid, $3::bigint from t
+          on conflict do nothing returning changeset_id
+        )
+        select t.key from t join won on won.changeset_id = md5(t.token)::uuid`,
+      [tokens.map(([token]) => token), tokens.map(([, key]) => key), epoch],
+    );
+    const stamped = await connection.query(
+      `insert into bumped (changeset_id, epoch) values (md5($1)::uuid, $2::bigint)
+        on conflict do nothing returning 1`,
+      [stamp, epoch],
+    );
+    const keys = marked.rows.map((row) => row.key);
+    if (isStart && stamped.rows.length > 0) {
+      keys.push("*");
+    }
+    if (won.rows.length > 0 && !keys.includes("*")) {
+      keys.push("changesets");
+      const touched = await reading
+        .exit(async () => touch(won.rows.map((row) => row.id)))
+        .catch((error: unknown) => {
+          console.error("The cache could not map changesets to keys:", error);
+          return ["*"];
+        });
+      keys.push(...touched);
+    }
+    const isFloor = keys.includes("*");
+    if (keys.length > 0) {
+      await connection.query(
+        `insert into bump (key, epoch) select distinct unnest($1::text[]), $2::bigint
+          on conflict (key) do update set epoch = excluded.epoch`,
+        [isFloor ? ["*"] : keys, epoch],
+      );
+    }
+    if (isFloor) {
+      await connection.query("delete from bump where epoch < $1::bigint", [
+        epoch,
+      ]);
+    }
+    await connection.query("commit");
+  } catch (error) {
+    await connection.query("rollback").catch(() => null);
+    throw error;
+  } finally {
+    connection.release();
   }
-  return { own, below };
+}
+
+async function sync(observed: Array<[string, string]>, stamp: string) {
+  const tokens = [...shadow.pending, ...observed];
+  shadow.pending = [];
+  try {
+    const pool = await shelf();
+    if (pool == null) {
+      shadow.pending = tokens;
+      shadow.seen = null;
+      return;
+    }
+    const found = await reading.exit(async () => recent());
+    const ids = found.ids.filter((id) => !shadow.mapped.has(id));
+    if (shadow.total != null && found.total !== shadow.total + ids.length) {
+      tokens.push([randomUUID(), "*"]);
+    }
+    if (shadow.epochs.size > VERSIONED) {
+      tokens.push([`prune:${shadow.epochs.get("*")}`, "*"]);
+    }
+    await bump(pool, ids, tokens, stamp, shadow.total == null);
+    shadow.mapped = new Set(found.ids);
+    shadow.total = found.total;
+    const result = await pool.query<{ key: string; epoch: string }>(
+      "select key, epoch::text as epoch from bump where epoch > $1",
+      [shadow.seen ?? -1],
+    );
+    let seen = shadow.seen ?? 0;
+    for (const row of result.rows) {
+      const epoch = Number(row.epoch);
+      shadow.epochs.set(row.key, epoch);
+      seen = Math.max(seen, epoch);
+    }
+    shadow.seen = seen;
+    const floor = shadow.epochs.get("*") ?? 0;
+    if (result.rows.some((row) => row.key === "*")) {
+      for (const [key, epoch] of shadow.epochs) {
+        if (epoch < floor) {
+          shadow.epochs.delete(key);
+        }
+      }
+    }
+  } catch (error) {
+    console.error("The cache could not sync its key versions:", error);
+    shadow.pending = tokens;
+    shadow.seen = null;
+  }
 }
 
 function observe(row: Totals) {
   const last = shadow.last;
   shadow.last = row;
-  if (last == null) {
-    shadow.loading = (async () => {
-      await reading.exit(async () => recent()).catch(() => null);
-    })();
-    return;
+  const tokens: Array<[string, string]> = [];
+  if (last != null && row.rejected !== last.rejected) {
+    tokens.push([`rejected:${row.rejected}`, "changesets"]);
+  }
+  if (last != null && row.built !== last.built) {
+    tokens.push([`coverage:${row.built}`, "coverage"]);
+  }
+  if (last != null && row.named !== last.named) {
+    tokens.push([`named:${row.named}`, "*"]);
   }
   const isPublished =
-    row.published !== last.published || row.latest !== last.latest;
-  const bumped: Array<string> = [];
-  if (isPublished || row.rejected !== last.rejected) {
-    bumped.push("changesets");
-  }
-  if (row.built !== last.built) {
-    bumped.push("coverage");
-  }
-  if (row.named !== last.named) {
-    bumped.push("*");
-  }
-  if (bumped.length === 0) {
+    last == null ||
+    row.published !== last.published ||
+    row.latest !== last.latest;
+  if (!isPublished && tokens.length === 0 && shadow.seen != null) {
     return;
   }
-  shadow.loading = shadow.loading.then(async () => {
-    const touched = isPublished
-      ? await reading
-          .exit(async () => touch())
-          .catch(() => ({ own: ["*"], below: [] }))
-      : { own: [], below: [] };
-    shadow.seq++;
-    for (const key of [...bumped, ...touched.own]) {
-      shadow.own.set(key, shadow.seq);
-      shadow.below.set(key, shadow.seq);
-    }
-    for (const key of touched.below) {
-      shadow.below.set(key, shadow.seq);
-    }
-  });
+  const stamp = `version:${state.version}`;
+  shadow.loading = shadow.loading.then(async () => sync(tokens, stamp));
 }
 
-function holds(
-  deps: Array<string>,
-  versions: Map<string, number>,
-  mark: number,
-) {
-  if ((versions.get("*") ?? 0) > mark) {
+function holds(deps: Array<string>, mark: number) {
+  if ((shadow.epochs.get("*") ?? 0) > mark) {
     return false;
   }
   for (const key of deps) {
-    if ((versions.get(key) ?? 0) > mark) {
+    if ((shadow.epochs.get(key) ?? 0) > mark) {
       return false;
     }
   }
   return true;
+}
+
+async function isKept(
+  mark: number | null,
+  deps: Array<string> | null,
+  day: string,
+  isDated: boolean,
+) {
+  if (
+    !CACHE_KEYS ||
+    mark == null ||
+    deps == null ||
+    (isDated && day !== state.today)
+  ) {
+    return false;
+  }
+  await shadow.loading;
+  return shadow.seen != null && holds(deps, mark);
 }
 
 function same(left: unknown, right: unknown) {
@@ -631,11 +780,25 @@ function sample(old: unknown, value: unknown) {
 }
 
 function report() {
-  if (Date.now() - shadow.reported < REPORT) {
+  const now = Date.now();
+  const owner = client();
+  if (now - shadow.flushed >= FLUSH && owner != null) {
+    shadow.flushed = now;
+    for (const [field, count] of Object.entries(tally)) {
+      const delta = count - (shadow.sent.get(field) ?? 0);
+      if (delta > 0) {
+        shadow.sent.set(field, count);
+        void owner
+          .hIncrBy("cache:tally", `${MODE}.${field}`, delta)
+          .catch(() => null);
+      }
+    }
+  }
+  if (now - shadow.reported < REPORT) {
     return;
   }
-  shadow.reported = Date.now();
-  console.info(`cache shadow: ${JSON.stringify(tally)}`);
+  shadow.reported = now;
+  console.info(`cache ${MODE}: ${JSON.stringify(tally)}`);
 }
 
 async function verify(
@@ -651,20 +814,27 @@ async function verify(
   if (hit.mark == null || deps == null) {
     tally.unmarked += Number(hit.mark == null);
     tally.wide += Number(hit.mark != null);
-    report();
     return;
   }
   tally.deps += deps.length;
-  const isCurrent = !isDated || hit.day === state.today;
-  const keptOwn = isCurrent && holds(deps, shadow.own, hit.mark);
-  const keptBelow = isCurrent && holds(deps, shadow.below, hit.mark);
+  const mark = hit.mark;
+  const held = () =>
+    (!isDated || hit.day === state.today) &&
+    shadow.seen != null &&
+    holds(deps, mark);
   const isSame = same(await hit.value, value);
-  tally.keptOwn += Number(keptOwn);
-  tally.keptBelow += Number(keptBelow);
+  let isHeld = held();
+  if (isHeld && !isSame) {
+    await state.checking;
+    state.checking ??= refresh();
+    await state.checking;
+    await shadow.loading;
+    isHeld = held();
+  }
+  tally.kept += Number(isHeld);
   tally.same += Number(isSame);
   tally.changed += Number(!isSame);
-  report();
-  if (isSame || !keptOwn) {
+  if (isSame || !isHeld) {
     return;
   }
   const again = await reading.exit(compute);
@@ -672,17 +842,15 @@ async function verify(
     tally.unstable++;
     return;
   }
-  tally.missOwn++;
-  tally.missBelow += Number(keptBelow);
+  tally.miss++;
   const old = await hit.value;
   console.warn(
-    `cache shadow miss: ${JSON.stringify({
+    `cache ${MODE} miss: ${JSON.stringify({
       key: key.slice(0, 300),
       deps: deps.length,
-      below: keptBelow,
       origin: hit.origin,
       age: Math.round((Date.now() - hit.born) / 1000),
-      marked: [hit.mark, shadow.seq],
+      marked: [hit.mark, shadow.seen],
       ...sample(old, value),
     })}`,
   );
@@ -727,7 +895,7 @@ function store(
     value: Promise.resolve(),
     deps: NONE,
     version: current(),
-    mark: shadow.seq,
+    mark: null,
     day: state.today,
     born: Date.now(),
     used: Date.now(),
@@ -737,27 +905,34 @@ function store(
     isRenewing: false,
   };
   let recalled = 0;
+  const accept = async (found: Recalled) => {
+    if (found.version === entry.version) {
+      return true;
+    }
+    if (!isStrict) {
+      entry.version = found.version;
+      return true;
+    }
+    const isHeld = await isKept(found.mark, found.deps, found.day, isDated);
+    tally.restamped += Number(isHeld);
+    return isHeld;
+  };
   const traced = (async (): Promise<Traced> => {
     const found = await recall(slot);
-    if (found != null && (found.version === entry.version || !isStrict)) {
-      entry.version = found.version;
+    if (found != null && (await accept(found))) {
       recalled = found.size;
       return {
         value: found.value,
         deps: Promise.resolve(found.deps),
-        isLocal: false,
+        mark: found.mark,
+        day: found.day,
       };
     }
-    return exclusive(
-      slot,
-      (other) => other.version === entry.version || !isStrict,
-      async () => trace(compute),
-    );
+    return exclusive(slot, accept, async () => trace(compute));
   })();
   entry.value = traced.then((found) => {
-    if (!found.isLocal) {
-      entry.mark = null;
-    }
+    entry.mark = found.mark;
+    entry.day = found.day;
     return found.value;
   });
   entry.deps = traced.then(async (found) => found.deps).catch(() => null);
@@ -767,7 +942,14 @@ function store(
       const isFresh = entry.version === current();
       const size =
         isFresh && recalled === 0
-          ? keep(slot, entry.version, value, await entry.deps)
+          ? keep(
+              slot,
+              entry.version,
+              value,
+              await entry.deps,
+              entry.mark,
+              entry.day,
+            )
           : recalled;
       entry.isSettled = true;
       if (entries.get(key) !== entry) {
@@ -777,7 +959,7 @@ function store(
       state.size += size;
       evict();
       if (!isFresh) {
-        renew(key, slot, entry, compute, current, isDated);
+        revalidate(key, slot, entry, compute, current, isDated);
       }
     } catch {
       if (entries.get(key) === entry) {
@@ -881,6 +1063,7 @@ function renew(
   compute: () => Promise<unknown>,
   current: () => string,
   isDated: boolean,
+  isSample = false,
 ) {
   hit.isRenewing = true;
   const attempt = async () => {
@@ -891,15 +1074,20 @@ function renew(
         return null;
       }
       const version = current();
-      const found = await recall(slot);
-      if (found?.version === version) {
+      const found = isSample ? null : await recall(slot);
+      if (
+        found != null &&
+        (found.version === version ||
+          (await isKept(found.mark, found.deps, found.day, isDated)))
+      ) {
+        tally.restamped += Number(found.version !== version);
         if (entries.get(key) === hit) {
           put(key, {
             value: Promise.resolve(found.value),
             deps: Promise.resolve(found.deps),
             version,
-            mark: null,
-            day: state.today,
+            mark: found.mark,
+            day: found.day,
             born: Date.now(),
             used: hit.used,
             origin: "renew",
@@ -910,20 +1098,19 @@ function renew(
         }
         return null;
       }
-      const mark = shadow.seq;
-      const day = state.today;
       const traced = await trace(compute);
       const deps = await traced.deps;
+      tally.computed++;
       const next: Entry = {
         value: Promise.resolve(traced.value),
         deps: Promise.resolve(deps),
         version,
-        mark,
-        day,
+        mark: traced.mark,
+        day: traced.day,
         born: Date.now(),
         used: hit.used,
         origin: "renew",
-        size: keep(slot, version, traced.value, deps),
+        size: keep(slot, version, traced.value, deps, traced.mark, traced.day),
         isSettled: true,
         isRenewing: false,
       };
@@ -938,13 +1125,45 @@ function renew(
   };
   const task = async () => {
     const renewed = await attempt().catch(() => null);
-    if (renewed != null && CACHE_SHADOW) {
+    if (renewed != null && (CACHE_SHADOW || isSample)) {
       await verify(key, hit, renewed.value, compute, isDated).catch(() => null);
     }
     hit.isRenewing = false;
   };
   waiting.set(key, { hit, task });
   void drain();
+}
+
+function revalidate(
+  key: string,
+  slot: string,
+  hit: Entry,
+  compute: () => Promise<unknown>,
+  current: () => string,
+  isDated: boolean,
+) {
+  if (!CACHE_KEYS) {
+    renew(key, slot, hit, compute, current, isDated);
+    return;
+  }
+  hit.isRenewing = true;
+  const version = current();
+  void (async () => {
+    if (!(await isKept(hit.mark, await hit.deps, hit.day, isDated))) {
+      renew(key, slot, hit, compute, current, isDated);
+      return;
+    }
+    hit.version = version;
+    hit.isRenewing = false;
+    tally.restamped++;
+    if (Math.random() >= SAMPLE) {
+      return;
+    }
+    tally.sampled++;
+    renew(key, slot, hit, compute, current, isDated, true);
+  })().catch(() => {
+    renew(key, slot, hit, compute, current, isDated);
+  });
 }
 
 export async function remember<T>(
@@ -963,7 +1182,7 @@ export async function remember<T>(
   const current = isDated
     ? () => `${state.version}:${state.today}`
     : () => state.version;
-  const parent = CACHE_SHADOW ? reading.getStore() : undefined;
+  const parent = TRACING ? reading.getStore() : undefined;
   const hand = async (entry: Entry) => {
     parent?.pending.push(entry.deps);
     return entry.value as Promise<T>;
@@ -982,12 +1201,21 @@ export async function remember<T>(
     hit.used = Date.now();
     const version = current();
     if (isRefresh && hit.version !== version) {
+      if (
+        CACHE_KEYS &&
+        hit.isSettled &&
+        (await isKept(hit.mark, await hit.deps, hit.day, isDated))
+      ) {
+        hit.version = version;
+        tally.restamped++;
+        return hand(hit);
+      }
       const next = store(key, slot, run, true, current, isDated);
       put(key, next);
       return hand(next);
     }
     if (hit.version !== version && hit.isSettled && !hit.isRenewing) {
-      renew(key, slot, hit, run, current, isDated);
+      revalidate(key, slot, hit, run, current, isDated);
     }
     return hand(hit);
   }
