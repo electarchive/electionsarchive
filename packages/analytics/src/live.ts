@@ -694,6 +694,9 @@ function units(
   for (const _ of streamed) {
     widths.push(MODEL.channel.prior);
   }
+  for (const _ of streamed) {
+    widths.push(MODEL.priors.size);
+  }
   if (weight > 0) {
     const mean =
       sum(sized.map((unit) => unit.expected * Math.log(unit.size))) / weight;
@@ -724,21 +727,24 @@ function units(
       return { middle, deviation };
     });
     for (const unit of sized) {
+      const scaled = spread > 0 ? (Math.log(unit.size) - mean) / spread : 0;
+      const weights = streamed.map((channel) =>
+        unit.channel === 0
+          ? (unit.mix.get(channel) ?? 0)
+          : unit.channel === channel
+            ? 1
+            : 0,
+      );
       unit.features = [
-        spread > 0 ? (Math.log(unit.size) - mean) / spread : 0,
+        scaled,
         ...scales.map(({ middle, deviation }, index) => {
           const value = unit.traits?.[index];
           return value == null || deviation <= 0
             ? 0
             : (value - middle) / deviation;
         }),
-        ...streamed.map((channel) =>
-          unit.channel === 0
-            ? (unit.mix.get(channel) ?? 0)
-            : unit.channel === channel
-              ? 1
-              : 0,
-        ),
+        ...weights,
+        ...weights.map((weight) => weight * scaled),
       ];
       unit.sigma =
         MODEL.spread *
