@@ -91,6 +91,12 @@
       "url": "https://bookofthestates.org/tables/2022-5-6",
       "kind": "compendium"
     },
+    "cnmi-constitution": {
+      "publisher": "Commonwealth of the Northern Mariana Islands",
+      "title": "Constitution of the Commonwealth of the Northern Mariana Islands",
+      "url": "https://cnmilaw.org/pdf/supreme/1NMI-101.pdf",
+      "kind": "official_body"
+    },
     "nj-constitution": {
       "publisher": "New Jersey Legislature",
       "title": "Constitution of the State of New Jersey (1947)",
@@ -305,7 +311,8 @@
         {"states": "RI", "period_years": 4, "phase": 2, "term_years": 4, "valid_from": "1993-01-01", "locator": "Rhode Island's 1992 amendment: four-year terms from the 1994 election"},
         {"states": "IL", "period_years": 4, "phase": 0, "term_years": 4, "valid_to": "1977-01-01", "locator": "Illinois elected governors in presidential years through 1976; the 1970 constitution gave the 1976 winner a two-year term"},
         {"states": "IL", "period_years": 4, "phase": 2, "term_years": 4, "valid_from": "1977-01-01", "locator": "Illinois Const. 1970 art. V, § 2 and transition schedule: governors elected in midterm years from 1978"},
-        {"states": "AS", "period_years": 4, "phase": 0, "term_years": 4, "valid_from": "1978-01-01", "locator": "American Samoa's first elected governor took office in January 1978; regular four-year elections from 1980"}
+        {"states": "AS", "period_years": 4, "phase": 0, "term_years": 4, "valid_from": "1978-01-01", "locator": "American Samoa's first elected governor took office in January 1978; regular four-year elections from 1980"},
+        {"states": "MP", "period_years": 4, "phase": 2, "term_years": 4, "valid_from": "2014-01-01", "source": "cnmi-constitution", "locator": "CNMI Const. art. III, § 2: the governor serves a four-year term; elections fell in November 2014, 2018, and 2022, and earlier terms ran on a different schedule"}
       ]
     },
     {
@@ -353,6 +360,7 @@
       "match": [{"within": null, "body_kinds": ["upper_house", "unicameral"], "polity_kinds": ["federal_unit", "region"], "precedence": 2}],
       "chambers": [
         {"states": "LA MS VA", "period_years": 4, "phase": 3, "term_years": 4},
+        {"states": "MP", "period_years": 2, "phase": 0, "term_years": 4, "source": "cnmi-constitution", "locator": "CNMI Const. art. II, § 2: nine senators, three per senatorial district, serve staggered four-year terms, so a third or two thirds of the seats are up at each even-year election"},
         {"states": "NJ", "period_years": 4, "phase": 1, "term_years": 4, "valid_from": "2012-01-01", "valid_to": "2022-01-01", "source": "nj-constitution", "locator": "N.J. Const. art. IV, § II, ¶ 1: senators serve four-year terms, except a two-year first term after each decennial census, so the 2011 apportionment set elections in 2011, 2013, 2017, and 2021"},
         {"states": "NJ", "period_years": 4, "phase": 3, "term_years": 4, "valid_from": "2022-01-01", "valid_to": "2032-01-01", "source": "nj-constitution", "locator": "N.J. Const. art. IV, § II, ¶ 1: after the 2021 two-year term, senators elected in 2023 and 2027 serve four-year terms until the post-2030 census term"}
       ]
@@ -367,6 +375,7 @@
       "match": [{"within": null, "body_kinds": ["lower_house"], "polity_kinds": ["federal_unit", "region"], "precedence": 2}],
       "chambers": [
         {"states": "LA MS", "period_years": 4, "phase": 3, "term_years": 4},
+        {"states": "MP", "period_years": 2, "phase": 0, "term_years": 2, "source": "cnmi-constitution", "locator": "CNMI Const. art. II, § 2: representatives serve two-year terms"},
         {"states": "VA NJ", "period_years": 2, "phase": 1, "term_years": 2}
       ]
     },
