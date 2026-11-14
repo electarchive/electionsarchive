@@ -173,6 +173,12 @@
       "url": "https://www.irishstatutebook.ie/eli/1922/act/1/enacted/en/print.html",
       "kind": "official_body"
     },
+    "seanad-debates-fs": {
+      "title": "Seanad Éireann debates: Senators Elected at Triennial Election (12 Dec 1928, 9 Dec 1931, 12 Dec 1934)",
+      "publisher": "Houses of the Oireachtas",
+      "url": "https://www.oireachtas.ie/en/debates/debate/seanad/1934-12-12/2/",
+      "kind": "official_body"
+    },
     "seanad-1936": {
       "title": "Seanad Eireann (Consequential Provisions) Act, 1936",
       "publisher": "Irish Statute Book (eISB)",
@@ -1503,7 +1509,7 @@
       "valid_from": "1922-12-06",
       "valid_to": "1936-07-03",
       "source": "const-1922",
-      "note": "Under the 1922 Constitution one fourth of the senators were to be elected every three years by the whole Free State as one electoral area (Art. 32); the only such popular vote was in 1925. Later renewals (1928, 1931, and 1934) were by the Dáil and Seanad, not yet checked against the amending Acts. The Seanad was abolished in 1936 (Seanad Eireann (Consequential Provisions) Act 1936).",
+      "note": "Under the 1922 Constitution one fourth of the senators were to be elected every three years by the whole Free State as one electoral area (Art. 32); the only such popular vote was in 1925. The 1928, 1931, and 1934 renewals were votes of Oireachtas members only (Constitution (Amendment No. 6) Act 1928). The Seanad was abolished in 1936 (Seanad Eireann (Consequential Provisions) Act 1936).",
       "match": [
         {
           "election_kinds": [
@@ -1536,8 +1542,32 @@
           "date": "1925-09-17",
           "contests": 1,
           "seats": 19,
-          "note": "Nineteen seats by STV in one national constituency. The 1928, 1931, and 1934 renewals were votes of Oireachtas members, not yet dated from the Acts.",
+          "note": "Nineteen seats by STV in one national constituency.",
           "source": "const-1922"
+        },
+        {
+          "date": "1928-12-12",
+          "contests": 1,
+          "seats": 19,
+          "note": "Triennial renewal by members of the Oireachtas. The date is the first sitting, when the Clerk read the names of the 19 senators returned; the count itself was held shortly before.",
+          "source": "seanad-debates-fs",
+          "quote": "The Clerk read the names of the nineteen Senators duly elected at the Seanad Triennial Election, 1928"
+        },
+        {
+          "date": "1931-12-09",
+          "contests": 1,
+          "seats": 23,
+          "note": "Triennial renewal by members of the Oireachtas. The date is the first sitting, when the Clerk read the 23 names returned; the count itself was held shortly before.",
+          "source": "seanad-debates-fs",
+          "quote": "The following are the names of the Senators duly returned at the Triennial Election, 1931"
+        },
+        {
+          "date": "1934-12-12",
+          "contests": 1,
+          "seats": 23,
+          "note": "Triennial renewal by members of the Oireachtas. The date is the first sitting, when the Clerk read the 23 names returned (some secondary sources say 22); the count itself was held shortly before.",
+          "source": "seanad-debates-fs",
+          "quote": "The following are the names of the Senators duly returned at the Triennial Election, 1934"
         }
       ]
     },
