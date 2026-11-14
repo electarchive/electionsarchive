@@ -604,7 +604,15 @@ def _elections(stage: Stage) -> list[tuple[str, sql.Composed]]:
                 contests=stage.either("contest", "election_id"),
                 children=stage.either("election", "parent_id"),
             ),
-        )
+        ),
+        (
+            "election.stale_scheduled",
+            sql.SQL(
+                """select s.id, null::uuid, jsonb_build_object('date_from', s.date_from, 'date_to', s.date_to)
+                   from {elections} s
+                   where s.status = 'scheduled' and coalesce(s.date_to, s.date_from) < current_date"""
+            ).format(elections=stage.staged("election")),
+        ),
     ]
 
 
@@ -1411,6 +1419,7 @@ def run(conn: Connection, stage: Stage) -> list[Finding]:
                     "name.capitals",
                     "translation.held",
                     "election.empty",
+                    "election.stale_scheduled",
                     "composition.size",
                 )
                 else "error",
