@@ -564,6 +564,18 @@
       "url": "https://ar.ch/fileadmin/user_upload/Departement_Inneres_Sicherheit/DepSekretariat/Gemeinden/GPK_Leitfaden_Mai_2025.pdf",
       "kind": "official_body"
     },
+    "ar-edikt-2008": {
+      "title": "Kantonale Volksabstimmung vom 1. Juni 2008: Edikt (Volksinitiative «Faires Wahlverfahren – Proporz für den Kantonsrat»)",
+      "publisher": "Kanton Appenzell Ausserrhoden, Kantonskanzlei",
+      "url": "https://ar.ch/fileadmin/user_upload/Kantonskanzlei/Rechtsdienst/Volksrechte/Abstimmungen_Wahlen/2008/Edikt_kant._Volksabstimmung_1._Juni_2008.pdf",
+      "kind": "official_body"
+    },
+    "bl-einwohnergemeinden": {
+      "title": "Gemeinden im Kanton: Einwohner- und Bürgergemeinden, Burgerkörperschaften",
+      "publisher": "Kanton Basel-Landschaft, Finanz- und Kirchendirektion",
+      "url": "https://www.baselland.ch/politik-und-behorden/direktionen/finanz-und-kirchendirektion/generalsekretariat/gemeinden/gemeinderecht/einwohner-buerger-und-burgergemeinden",
+      "kind": "official_body"
+    },
     "sg-gemeindeorganisation": {
       "title": "Gemeindeorganisation: Bürgerversammlung oder Parlament",
       "publisher": "Kanton St.Gallen, Amt für Gemeinden",
@@ -2713,6 +2725,20 @@
           "value": 1,
           "source": "so-agem-organisation",
           "locator": "Gemeindeparlament: \"Im Kanton Solothurn hat sich als einzige Gemeinde die Stadt Olten so organisiert\" (page read 14 Nov 2026)"
+        },
+        {
+          "within": "CH-AR",
+          "date": "2008-06-01",
+          "value": 1,
+          "source": "ar-edikt-2008",
+          "locator": "Erläuterungen to the vote of 1 June 2008: proportional representation applies \"bei der Bestellung von Parlamenten (z. B. Kantonsrat oder Einwohnerrat in Herisau)\" and \"Sowohl im Kantonsrat als auch im Einwohnerrat Herisau\"; Herisau is the only commune that introduced Proporz, and the text names no other Einwohnerrat"
+        },
+        {
+          "within": "CH-BL",
+          "date": "2026-11-14",
+          "value": 5,
+          "source": "bl-einwohnergemeinden",
+          "locator": "Ausserordentliche Gemeindeorganisation: \"Im Kanton Basel-Landschaft greifen aktuell fünf Gemeinden auf diese Organisationsform zurück\" (the Einwohnerrat is the Gemeindeparlament); the page does not name them (page read 14 Nov 2026)"
         },
         {
           "within": "CH-AR",
