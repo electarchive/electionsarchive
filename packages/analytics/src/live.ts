@@ -44,6 +44,7 @@ export type LiveBaseline = {
   shares: Array<number>;
   expected?: number;
   traits?: Array<number>;
+  neighbors?: Array<number>;
   channels?: Array<LiveChannel>;
   floor?: number;
 };
@@ -217,6 +218,7 @@ const MODEL = {
   floor: { slack: 0.98, met: 0.99, closed: 0 },
   remaining: { spread: 0.2, stale: 3 },
   outlier: 0.01,
+  pool: { from: 0.3, shrink: 1, share: 2 },
 };
 
 const STREAM = "~";
@@ -351,6 +353,8 @@ type Unit = {
   prior: number;
   features: Array<number>;
   traits: Array<number> | null;
+  near: Set<string>;
+  pool: number;
   settled: number;
   sigma: number;
   hasBaseline: boolean;
@@ -484,6 +488,7 @@ function units(
   at: string | null,
   cutoff: number | null,
   sizes: Map<string, number>,
+  adjacent: Map<string, Set<string>>,
 ) {
   const tail = TAILS[race.state] ?? MODEL.tail.share;
   const byUnit = series(race, at);
@@ -673,6 +678,8 @@ function units(
       prior: base == null ? 0 : (base.shares[a] ?? 0) - (base.shares[b] ?? 0),
       features: [],
       traits: base?.traits ?? null,
+      near: adjacent.get(county) ?? new Set(),
+      pool: 0,
       settled: changed.has(id)
         ? (clock - Date.parse(changed.get(id)!)) / 60_000 >=
             (waits.get(id) ?? MODEL.quiet) || isStill
@@ -1013,7 +1020,10 @@ function partial(fraction: number) {
 
 function predict(coefficients: Float64Array, unit: Unit, center: number) {
   let value =
-    unit.prior + coefficients[0]! + coefficients[1]! * (unit.prior - center);
+    unit.prior +
+    unit.pool +
+    coefficients[0]! +
+    coefficients[1]! * (unit.prior - center);
   for (let index = 2; index < coefficients.length - 1; index += 1) {
     value += coefficients[index]! * (unit.features[index - 2] ?? 0);
   }
@@ -1053,7 +1063,7 @@ function fit(
     const fraction = Math.min(1, unit.total / totals[index]!);
     add(
       [1, unit.prior - center, ...features(unit), 1 - fraction],
-      unit.margin - unit.prior,
+      unit.margin - unit.prior - unit.pool,
       residual[index]! ** 2 + partial(fraction),
     );
     if (unit.early != null) {
@@ -1213,7 +1223,18 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
       ? Date.parse(opened)
       : graced;
   const isLate = cutoff != null && Date.parse(stamp) > cutoff;
-  const { found, a, b, widths } = units(race, at, cutoff, sizes);
+  const adjacent = new Map(
+    given.baseline.map((row) => [
+      row.unitId,
+      new Set(
+        (row.neighbors ?? []).flatMap((index) => {
+          const other = given.baseline[index];
+          return other == null ? [] : [other.unitId];
+        }),
+      ),
+    ]),
+  );
+  const { found, a, b, widths } = units(race, at, cutoff, sizes, adjacent);
   const tail = TAILS[race.state] ?? MODEL.tail.share;
   const counted = sum(found.map((unit) => unit.total));
   const empty: LiveEstimate = {
@@ -1591,6 +1612,40 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
   }
   const residual = Math.max(0.015, Math.sqrt(squares / weights));
   const residuals = scale.map((value) => residual * value);
+  const donors = found.flatMap((unit, index) => {
+    const fraction = Math.min(1, unit.total / typical[index]!);
+    if (!unit.hasBaseline || fraction < MODEL.pool.from) {
+      return [];
+    }
+    const off =
+      unit.margin -
+      predict(first, unit, center) -
+      first.at(-1)! * (1 - fraction);
+    return [
+      {
+        unit,
+        off: off / scale[index]!,
+        weight: 1 / (partial(fraction) / scale[index]! ** 2 + residual ** 2),
+      },
+    ];
+  });
+  const share =
+    Math.min(1, sum(found.map((unit) => unit.total)) / sum(typical)) **
+    MODEL.pool.share;
+  for (const [index, unit] of found.entries()) {
+    if (!unit.hasBaseline || unit.near.size === 0) {
+      continue;
+    }
+    let pulled = 0;
+    let weight = MODEL.pool.shrink / residual ** 2;
+    for (const donor of donors) {
+      if (unit.near.has(donor.unit.county)) {
+        pulled += donor.weight * donor.off;
+        weight += donor.weight;
+      }
+    }
+    unit.pool = (share * scale[index]! * pulled) / weight;
+  }
   let swings = 0;
   let swung = 0;
   for (const unit of based) {
