@@ -20,7 +20,12 @@ PUBLISHER = "Krajowe Biuro Wyborcze"
 TITLE = "Dane wyborcze: wybory do Sejmu"
 PAGE = "https://danewyborcze.kbw.gov.pl/"
 VOTES, REGISTERED, BALLOTS, VALID, INVALID = 1, 2, 3, 4, 5
-ITEMS = {"PRAWO I SPRAWIEDLIWOŚĆ": "Q156874", "KONFEDERACJA WOLNOŚĆ I NIEPODLEGŁOŚĆ": "Q61568052"}
+ITEMS = {
+    "PRAWO I SPRAWIEDLIWOŚĆ": "Q156874",
+    "KONFEDERACJA WOLNOŚĆ I NIEPODLEGŁOŚĆ": "Q61568052",
+    "PLATFORMA OBYWATELSKA RP": "Q156868",
+    "„KUKIZ'15”": "Q20740347",
+}
 METHOD = (
     "List votes, declared seats, and elected members by constituency from the Krajowe Biuro Wyborcze's data files "
     "for the Sejm. Accounting is summed from the polling districts, whose counts the file prints: voters entitled to "
@@ -39,8 +44,15 @@ OBWOD_METHOD = (
 )
 BASE = "https://danewyborcze.kbw.gov.pl/dane"
 PARSED = raw.parsed(SOURCE)
-ELECTIONS = {2019: date(2019, 10, 13), 2023: date(2023, 10, 15)}
-FILES = {
+ELECTIONS = {2015: date(2015, 10, 25), 2019: date(2019, 10, 13), 2023: date(2023, 10, 15)}
+FILES: dict[int, dict[str, str | tuple[str, ...]]] = {
+    2015: {
+        "candidates": "sejm/2015-kand-sejm.xls",
+        "units": "obwody2015parl.xlsx",
+        "unit_lists": "sejm/2015-gl-lis-obw.zip",
+        "unit_candidates": tuple(f"sejm/wyniki_okr_sejm/{district:02}.xlsx" for district in range(1, 42)),
+        "district_lists": "sejm/2015-gl-lis-okr.zip",
+    },
     2019: {
         "districts": "sejmsenat/okregi_sejm_csv.zip",
         "lists": "sejmsenat/wykaz_list_sejm_csv.zip",
@@ -72,25 +84,36 @@ ACCOUNTING = {
 VALID_COLUMN = "Liczba głosów ważnych oddanych łącznie na wszystkie listy kandydatów"
 
 
-def url(year: int, kind: str) -> str:
-    return f"{BASE}/{year}/{FILES[year][kind]}"
+def urls(year: int, kind: str) -> list[str]:
+    files = FILES[year][kind]
+    return [f"{BASE}/{year}/{file}" for file in ([files] if isinstance(files, str) else files)]
 
 
 def fetch() -> None:
     for year in ELECTIONS:
         for kind in FILES[year]:
-            raw.fetch(SOURCE, url(year, kind), suffix=".zip")
+            for address in urls(year, kind):
+                raw.fetch(SOURCE, address, suffix=Path(address).suffix)
 
 
 def tables(year: int, kind: str) -> dict[str, pl.DataFrame]:
-    archive = zipfile.ZipFile(raw.cached(SOURCE, url(year, kind)).path)
     frames = {}
-    for member in archive.namelist():
-        if not member.endswith(".csv"):
-            continue
-        frame = pl.read_csv(io.BytesIO(archive.read(member)), separator=";", infer_schema_length=0)
-        frame = frame.rename({column: column.lstrip("﻿") for column in frame.columns})
-        frames[member] = frame.with_columns(pl.col(pl.String).str.strip_chars().replace("", None))
+    for address in urls(year, kind):
+        path = raw.cached(SOURCE, address).path
+        if path.suffix != ".zip":
+            members = {Path(address).name: path.read_bytes()}
+        else:
+            archive = zipfile.ZipFile(path)
+            members = {member: archive.read(member) for member in archive.namelist()}
+        for member, body in members.items():
+            if member.endswith(".csv"):
+                frame = pl.read_csv(io.BytesIO(body), separator=";", infer_schema_length=0)
+            elif member.endswith((".xls", ".xlsx")):
+                frame = pl.read_excel(io.BytesIO(body), infer_schema_length=0)
+            else:
+                continue
+            frame = frame.rename({column: column.lstrip("\ufeff") for column in frame.columns})
+            frames[member] = frame.with_columns(pl.col(pl.String).str.strip_chars().replace("", None))
     return frames
 
 
@@ -198,6 +221,134 @@ def teryt(column: str) -> pl.Expr:
         .otherwise(code.str.zfill(6))
         .alias("gmina")
     )
+
+
+def numbered(column: str) -> str:
+    return column.split(" - ", 1)[1]
+
+
+def load_2015() -> dict[str, pl.DataFrame]:
+    year = 2015
+    gender = {"K": "Kobieta", "M": "Mężczyzna"}
+    candidates = table(year, "candidates").select(
+        count("Nr okr.").alias("district"),
+        count("Nr listy").alias("list"),
+        count("Poz.").alias("position"),
+        pl.concat_str(pl.col("Imiona"), pl.col("Nazwisko"), separator=" ").alias("name"),
+        pl.col("Płeć").replace_strict(gender).alias("sex"),
+        pl.col("Zawód").alias("occupation"),
+        pl.col("Miejsce zam.").alias("residence"),
+        pl.col("Przynależność do partii politycznej").alias("membership"),
+        pl.lit(None, pl.String).alias("support"),
+        count("Głosy").alias("votes"),
+        (pl.col("Mandat") == "T").alias("elected"),
+        pl.col("Komitet").alias("committee"),
+    )
+    by_district = table(year, "district_lists")
+    columns = by_district.columns[by_district.columns.index("Głosy ważne") + 1 :]
+    lists = (
+        by_district.select(count("Nr okr.").alias("district"), *(count(column) for column in columns))
+        .unpivot(index="district", variable_name="column", value_name="votes")
+        .filter(pl.col("votes").is_not_null())
+        .with_columns(
+            pl.col("column").str.split(" - ").list.first().cast(pl.Int64).alias("list"),
+            pl.col("column").map_elements(numbered, return_dtype=pl.String).alias("committee"),
+        )
+    )
+    seats = candidates.group_by("district", "list").agg(pl.col("elected").sum().cast(pl.Int64).alias("seats"))
+    lists = lists.join(seats, on=["district", "list"], how="left").with_columns(pl.col("seats").fill_null(0))
+    winners = lists.group_by("committee").agg(pl.col("seats").sum() > 0)["committee", "seats"]
+    lists = lists.with_columns(
+        pl.col("committee").is_in(winners.filter(pl.col("seats"))["committee"].implode()).alias("qualified")
+    ).select("district", "list", "committee", "votes", "qualified", "seats")
+    named = candidates.select("district", "list", "committee").unique().join(lists, on=["district", "list"], how="anti")
+    if named.height or candidates.join(lists, on=["district", "list", "committee"], how="anti").height:
+        raise ValueError("candidate committees do not match the constituency lists")
+    candidates = candidates.drop("committee")
+    districts = by_district.select(
+        count("Nr okr.").alias("district"),
+        pl.col("Siedziba OKW").alias("seat"),
+        pl.lit(None, pl.String).alias("boundary"),
+    ).join(lists.group_by("district").agg(pl.col("seats").sum().alias("magnitude")), on="district")
+    results = table(year, "unit_lists")
+    accounting = {
+        "Liczba wyborców": "electors",
+        "Wydane karty": "issued",
+        "Karty wyjęte z urny": "cast",
+        "Karty nieważne": "invalid_ballots",
+        "Karty ważne": "valid_ballots",
+        "Głosy nieważne": "invalid",
+        "Głosy ważne": "valid",
+    }
+    unit = [teryt("TERYT"), count("Nr obw.").alias("commission")]
+    results = results.select(
+        *unit,
+        count("Nr okr.\nSejm").alias("district"),
+        pl.col("Adres").alias("seat"),
+        *(count(column).alias(name) for column, name in accounting.items()),
+        *(
+            count(column).alias(numbered(column))
+            for column in results.columns[results.columns.index("Głosy ważne") + 1 :]
+        ),
+    )
+    pieces, struck = [], []
+    for member, frame in tables(year, "unit_candidates").items():
+        district = int(member.split(".")[0])
+        ballot = candidates.filter(pl.col("district") == district)
+        lookup = {" ".join(row["name"].split()): (row["list"], row["position"]) for row in ballot.iter_rows(named=True)}
+        if len(lookup) != ballot.height:
+            raise ValueError(f"district {district}: two candidates share a name")
+        names = frame.columns[frame.columns.index(f"Sejm - {VALID_COLUMN}") + 1 :]
+        keys, block, at, blanked = [], None, 0, False
+        for header in names:
+            if header.startswith("Razem "):
+                if blanked and keys and keys[-1][1] is not None:
+                    struck.append((district, keys[-1][1]))
+                block, blanked = None, False
+            elif block is None:
+                block, at = header, 0
+            elif " ".join(header.split()) not in lookup:
+                if frame[header].drop_nulls().is_in(["XXXXX"]).all():
+                    blanked = True
+                    print(f"{year} district {district}: {header!r} of {block!r} is struck")
+                else:
+                    raise ValueError(f"district {district}: column {header!r} is not a listed candidate")
+            else:
+                list_, position = lookup[" ".join(header.split())]
+                if position <= at or (keys and at and keys[-1][1] != list_):
+                    raise ValueError(f"district {district}: {header!r} is out of list order")
+                at = position
+                keys.append((header, list_, position))
+        if len(keys) != ballot.height:
+            raise ValueError(f"district {district}: {len(keys)} candidate columns for {ballot.height} candidates")
+        piece = frame.select(
+            teryt("TERYT gminy"),
+            count("Numer obwodu").alias("commission"),
+            *(count(header).alias(str(i)) for i, (header, _, _) in enumerate(keys)),
+        )
+        piece = piece.unpivot(index=["gmina", "commission"], variable_name="i", value_name="votes")
+        index = pl.DataFrame(
+            [(str(i), list_, position) for i, (_, list_, position) in enumerate(keys)],
+            schema={"i": pl.String, "list": pl.Int64, "position": pl.Int64},
+            orient="row",
+        )
+        pieces.append(piece.join(index, on="i").drop("i").with_columns(district=pl.lit(district, pl.Int64)))
+    registry = table(year, "units").select(
+        teryt("TERYT"),
+        count("Nr obw.").alias("commission"),
+        pl.col("Typ_1").alias("kind"),
+        pl.col("Teren").alias("area"),
+        pl.col("Granice").alias("boundary"),
+    )
+    return {
+        "results": results,
+        "lists": lists,
+        "districts": districts.select("district", "magnitude", "seat", "boundary"),
+        "candidates": candidates,
+        "candidate_votes": pl.concat(pieces),
+        "registry": registry,
+        "struck": pl.DataFrame(struck, schema={"district": pl.Int64, "list": pl.Int64}, orient="row"),
+    }
 
 
 def load_2019() -> dict[str, pl.DataFrame]:
@@ -378,7 +529,7 @@ def check(year: int, loaded: dict[str, pl.DataFrame]) -> dict[str, pl.DataFrame]
     }
 
 
-LOADERS = {2019: load_2019, 2023: load_2023}
+LOADERS = {2015: load_2015, 2019: load_2019, 2023: load_2023}
 
 
 def parse() -> None:
@@ -430,7 +581,8 @@ def emit() -> Path:
             attribution="Źródło danych: Państwowa Komisja Wyborcza, Krajowe Biuro Wyborcze.",
         )
         for kind in FILES[day.year]:
-            cs.artifact(raw.cached(SOURCE, url(day.year, kind)), source)
+            for address in urls(day.year, kind):
+                cs.artifact(raw.cached(SOURCE, address), source)
         for code, kind, rank, noun in (
             ("pl.okreg_sejm", "electoral_district", 2, "Sejm constituency"),
             ("pl.obwod", "precinct", 4, "polling district"),
@@ -478,7 +630,7 @@ def emit() -> Path:
             label = " ".join(committee.split())
             if label in parties:
                 return parties[label]
-            item = next((code for text, code in ITEMS.items() if label.endswith(text)), None)
+            item = next((code for text, code in ITEMS.items() if label.upper().endswith(text)), None)
             if item is not None and item in by_item:
                 party = parties[label] = by_item[item]
                 return party
