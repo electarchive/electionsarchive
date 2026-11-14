@@ -1996,6 +1996,18 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
     if (indexes == null) {
       return 1;
     }
+    if (isLate && reports.has(unit.county)) {
+      const grown = indexes.map((index) => {
+        const member = found[index]!;
+        const from =
+          member.paced ?? (member.since == null ? null : sum(member.since));
+        return from == null ? null : Math.max(0, member.total - from);
+      });
+      const growth = sum(grown.map((value) => value ?? 0));
+      if (growth > 0 && grown.every((value) => value != null)) {
+        return grown[indexes.indexOf(found.indexOf(unit))]! / growth;
+      }
+    }
     const all = sum(indexes.map((index) => found[index]!.expected));
     return all > 0 ? unit.expected / all : 1 / indexes.length;
   });
