@@ -3770,6 +3770,18 @@
     {
       "dates": [
         {
+          "date": "1918-12-15",
+          "contests": 1,
+          "note": "Landtag election: Anhalt, the first state assembly (Landesversammlung).",
+          "source": "gonschior-weimar"
+        },
+        {
+          "date": "1918-12-22",
+          "contests": 1,
+          "note": "Landtag election: Braunschweig, the first Landtag.",
+          "source": "gonschior-weimar"
+        },
+        {
           "date": "1919-01-12",
           "contests": 3,
           "note": "Landtag election: Bayern, Württemberg, Baden.",
@@ -4218,6 +4230,18 @@
           "contests": 1,
           "note": "Landtag election: Lübeck.",
           "source": "gonschior-weimar"
+        },
+        {
+          "date": "1933-01-15",
+          "contests": 1,
+          "note": "Landtag election: Lippe.",
+          "source": "gonschior-weimar"
+        },
+        {
+          "date": "1933-03-05",
+          "contests": 1,
+          "note": "Landtag election: Preußen, held with the Reichstag election of 5 March 1933.",
+          "source": "gonschior-weimar"
         }
       ],
       "key": "reich_landtage",
@@ -4228,7 +4252,7 @@
       "goal": "subnational",
       "valid_from": "1918-11-09",
       "valid_to": "1934-01-30",
-      "first_held": "1919-01-12",
+      "first_held": "1918-12-15",
       "measure": {
         "unit": "polity"
       },
