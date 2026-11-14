@@ -3,7 +3,7 @@ import time
 from datetime import date
 from html import unescape
 from pathlib import Path
-from typing import TypedDict
+from typing import NotRequired, TypedDict
 from urllib.parse import quote
 from uuid import UUID
 
@@ -15,7 +15,7 @@ from ea.sources.gb import umit
 from ea.store import DATA, connect
 
 SOURCE = "gb.devolved_by"
-VERSION = "4"
+VERSION = "5"
 PARSED = DATA / "parsed" / SOURCE
 VOTES, REGISTERED, INVALID = 1, 2, 5
 PAGE = "https://en.wikipedia.org/w/index.php?title={}&action=raw"
@@ -235,6 +235,7 @@ class Official(TypedDict):
     registered: int | None
     rejected: int | None
     votes: tuple[int, ...]
+    unlisted: NotRequired[tuple[int, ...]]
     text: str
     note: str
 
@@ -304,6 +305,23 @@ OFFICIAL: dict[str, Official] = {
         "note": (
             "The council's results page prints an electorate of 55,395 and 38,653 total votes cast, 73 more than "
             "the candidates' 38,580 votes. It prints no rejected-paper count, so none is stored."
+        ),
+    },
+    "ynys": {
+        "publisher": "Senedd Cymru",
+        "title": "Election results for Ynys Môn, 1 August 2013",
+        "url": "https://business.senedd.wales/mgElectionAreaResults.aspx?ID=50",
+        "archive": WAYBACK.format("2021", "https://business.senedd.wales/mgElectionAreaResults.aspx?ID=50"),
+        "registered": None,
+        "rejected": 44,
+        "votes": (12601, 3435, 3099, 1843, 348),
+        "unlisted": (309,),
+        "text": "Valid votes cast 21326 Number of ballot papers rejected 44",
+        "note": (
+            "The Senedd's published results print five candidates, 21,326 valid votes (their sum), and 44 rejected "
+            "ballot papers, and omit Stephen Churchman, the sixth nominated candidate. His 309 votes are Wikipedia's "
+            "and make the 21,635 turnout and the 58.2 percent for Plaid Cymru that Senedd Research prints. The "
+            "Senedd page prints no electorate."
         ),
     },
 }
@@ -424,7 +442,7 @@ def parse() -> None:
             page_text = official_text(key)
             mine = sorted(int(line["votes"] or 0) for line in lines if line["key"] == key)
             assert official["text"] in page_text, key
-            assert mine == sorted(official["votes"]), key
+            assert mine == sorted(official["votes"] + official.get("unlisted", ())), key
             assert all(f"{votes:,}" in page_text or f" {votes} " in page_text for votes in official["votes"]), key
             if official["registered"] is not None:
                 assert printed.get("registered") in (None, official["registered"]), key
