@@ -59,7 +59,51 @@ COUNCILS = {
         "https://www.gwynedd.gov.uk/cy/Cyngor/Dogfennau-Cyngor/Pleidleisio-ac-etholiadau/Etholiad-Tref-Cymuned-2022/Uncontested-Cymuned.pdf",
         "gwynedd",
     ),
+    "W06000005": (
+        "Flintshire County Council",
+        "Notice of Uncontested Election, town and community councils, 5 May 2022",
+        "https://www.flintshire.gov.uk/en/PDFFiles/Council-Democracy/Elections-22/Notice-of-Uncontested-Election-TCC.pdf",
+        "flintshire",
+    ),
+    "W06000014": (
+        "Vale of Glamorgan Council",
+        "Result of Uncontested Election, town and community councillors, 5 May 2022",
+        "https://www.valeofglamorgan.gov.uk/en/our_council/Council-Structure/Elections/Local-Government-Election.aspx",
+        "vale",
+    ),
 }
+VALE = (
+    "https://www.valeofglamorgan.gov.uk/Documents/Our%20Council/Council/Elections/Election%20Documents/Nominees/"
+    "{}-Uncontested-Notices.pdf"
+)
+VALE_STEMS = [
+    "Barry",
+    "Colwinston",
+    "Cowbridge",
+    "Dinas-Powys",
+    "Ewenny",
+    "Llanmaes",
+    "Llancarfan",
+    "Llandough",
+    "Llandow",
+    "Llanfair",
+    "Llangan",
+    "Llantwit-Major",
+    "Michaelston-le-Pit",
+    "Penarth",
+    "Pendoylan",
+    "Penllyn",
+    "Peterston-super-Ely",
+    "St-Athan",
+    "St-Brides-Major",
+    "St-Donats",
+    "St-Georges-super-Ely",
+    "St-Nicholas-and-Bonvilston",
+    "Sully",
+    "Welsh-St-Donats",
+    "Wenvoe",
+    "Wick",
+]
 GWYNEDD_POLLS = (
     "https://www.gwynedd.llyw.cymru/cy/Cyngor/Dogfennau-Cyngor/Pleidleisio-ac-etholiadau/Etholiad-Tref-Cymuned-2022/"
     "Canlyniadau-Etholiad-2022.pdf"
@@ -69,6 +113,13 @@ SCANS = {
         "Gwynedd Council",
         "Datganiad Canlyniad y Pleidleisio / Declaration of Result of Poll, community and town councillors, 5 May 2022",
     ),
+}
+SCANS |= {
+    VALE.format(stem): (
+        "Vale of Glamorgan Council",
+        f"Result of Uncontested Election, {stem.replace('-', ' ')}, 5 May 2022",
+    )
+    for stem in VALE_STEMS
 }
 POLLS = Path(__file__).with_name("gwynedd_2022_polls.tsv")
 VOTE_COLUMN = (0.685, 0.955)
@@ -84,6 +135,13 @@ ALIASES = {
     ("W06000002", "LLANYMSTUMDWY"): "Llanystumdwy",
     ("W06000002", "Abermaw"): "Barmouth",
     ("W06000002", "Llangelynin"): "Llangelynnin",
+    ("W06000005", "Trelawnyd & Gwaenysgor"): "Trelawnyd and Gwaenysgor",
+    ("W06000005", "Gwernaffield and Pantymwyn"): "Gwernaffield with Pantymwyn",
+    ("W06000014", "Llanmaes"): "Llan-maes",
+    ("W06000014", "St Athan"): "St. Athan",
+    ("W06000014", "St Brides Major"): "St. Bride's Major",
+    ("W06000014", "St Donats"): "St. Donats",
+    ("W06000014", "Welsh St Donats"): "Welsh St. Donats",
 }
 UNREGISTERED = {("W06000010", "Trelech a'r Betws"), ("W06000003", "Betws-y-Coed"), ("W06000021", "Llangybi Fawr")}
 WARD_NAMES = {
@@ -119,6 +177,7 @@ PARTIES: dict[str, str | None] = {
     "Annibynnol - Independent": "independent",
     "Plaid Cymru-The Party of Wales": "Q10691",
     "Plaid Cymru- The Party of Wales": "Q10691",
+    "Welsh Liberal Democrats - Democratiaid Rhyddfrydol Cymru": "Q9624",
     "Welsh Liberal Democrats- Democratiaid Rhyddfrydol Cymru": "Q9624",
     "Welsh Conservative Party Candidate/ Ymgeisydd Plaid Geidwadol Cymru": "Q9626",
 }
@@ -171,8 +230,15 @@ def areas(url: str) -> list[str]:
 
 def fetch() -> None:
     for url in SCANS:
-        store(url)
+        try:
+            if store(url):
+                time.sleep(1)
+        except httpx.HTTPStatusError as error:
+            if error.response.status_code != 404 or "valeofglamorgan" not in url:
+                raise
     for _, _, url, reader in COUNCILS.values():
+        if reader == "vale":
+            continue
         store(url)
         if reader == "moderngov":
             for page in areas(url):
@@ -556,6 +622,97 @@ def gwynedd_polls() -> list[dict]:
     return reads
 
 
+def flintshire(url: str) -> list[dict]:
+    names = communities("W06000005")
+    reads: list[dict] = []
+    for notice in text_of(url).split("Notice of Uncontested Election")[1:]:
+        heading = " ".join(found(r"^(.*?)Date of Election", notice, re.DOTALL).group(1).split()).replace("`", "'")
+        match = found(r"^(.+?) (?:Community|Town) Council(?: \((.+?)(?: Ward)?\))?$", heading)
+        council, ward = match.group(1), match.group(2)
+        lines = (
+            found(r"address is situated\n(.*?)\n[^\n]*\n\s*Returning Officer", notice, re.DOTALL).group(1).splitlines()
+        )
+        column = (
+            found(r"Description", notice).start() - notice.rfind("\n", 0, found(r"Description", notice).start()) - 1
+        )
+        starts = [number for number, line in enumerate(lines) if line[:1].strip()]
+        if len(starts) % 2:
+            raise ValueError(f"Flintshire {heading}: odd name lines")
+        candidates = []
+        for first, last in zip(starts[::2], [*starts[2::2], len(lines)], strict=True):
+            surname = re.split(r"\s{3,}", lines[first].strip())[0].replace("`", "'")
+            forenames = re.split(r"\s{3,}", lines[first + 1].strip())[0]
+            description = " ".join(
+                part for part in (line[column:].strip() for line in lines[first:last] if len(line) > column) if part
+            )
+            candidates.append(
+                {
+                    "printed": f"{surname} {forenames}",
+                    "name": surname_first(f"{surname}, {forenames}"),
+                    "description": description,
+                    "votes": None,
+                    "elected": True,
+                }
+            )
+        if not candidates:
+            raise ValueError(f"Flintshire {heading}: no candidates")
+        reads.append(
+            {
+                "council": names[fold(ALIASES.get(("W06000005", council), council))],
+                "ward": ward,
+                "places": None,
+                "turnout": None,
+                "candidates": candidates,
+            }
+        )
+    return unwarded(reads, "W06000005")
+
+
+def vale(url: str) -> list[dict]:
+    names = communities("W06000014")
+    reads: list[dict] = []
+    for stem in VALE_STEMS:
+        page = VALE.format(stem)
+        try:
+            text = text_of(page)
+        except LookupError:
+            continue
+        heading = " ".join(found(r"CYMUNED\n(.*?)VALE OF GLAMORGAN", text, re.DOTALL).group(1).split())
+        match = found(r"^(.+?) (?:COMMUNITY|TOWN) COUNCIL - (.+?)(?: WARD)?$", heading)
+        council = welsh_title(match.group(1))
+        ward = welsh_title(match.group(2))
+        block = found(r"ETHOLWYD\n(.*?)\n\s*Dated", text, re.DOTALL).group(1)
+        candidates = []
+        for line in block.split("\n"):
+            words = line.split()
+            if not words:
+                continue
+            cut = next((cut for cut, word in enumerate(words) if not word.isupper()), 0)
+            if not cut:
+                raise ValueError(f"Vale {stem}: cannot split {line}")
+            candidates.append(
+                {
+                    "printed": " ".join(words),
+                    "name": surname_first(f"{' '.join(words[:cut])}, {' '.join(words[cut:])}"),
+                    "description": "",
+                    "votes": None,
+                    "elected": True,
+                }
+            )
+        reads.append(
+            {
+                "council": names[fold(ALIASES.get(("W06000014", council), council))],
+                "ward": ward,
+                "places": None,
+                "turnout": None,
+                "source": page,
+                "url": page,
+                "candidates": candidates,
+            }
+        )
+    return unwarded(reads, "W06000014")
+
+
 def unwarded(reads: list[dict], lad: str) -> list[dict]:
     names = communities(lad)
     counts: dict[str, int] = {}
@@ -571,6 +728,8 @@ READERS = {
     "torfaen": lambda url: torfaen(text_of(url)) + torfaen_by_elections(text_of(url)),
     "carmarthenshire": lambda url: carmarthenshire(text_of(url)),
     "moderngov": moderngov,
+    "flintshire": flintshire,
+    "vale": vale,
     "gwynedd": lambda url: unwarded(gwynedd(url) + gwynedd_polls(), "W06000002"),
 }
 
