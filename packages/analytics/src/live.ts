@@ -218,6 +218,7 @@ const MODEL = {
     stir: 0.01,
     spill: 0.3,
     cap: 1.5,
+    lid: { share: 0.05, reach: 1 },
     scatter: 1.2,
     brisk: 0.25,
     hush: 0.02,
@@ -360,7 +361,7 @@ function split(race: LiveRace, at: string | null) {
 const HOLDS: Record<string, number> = { ga: 0.002 };
 
 const CANVASS: Record<string, { base: number; late: number }> = {
-  pa: { base: 0.0035, late: 0.05 },
+  pa: { base: 0.006, late: 0.05 },
 };
 
 const NIGHTS: Record<string, number> = { ga: 0.0075 };
@@ -2257,7 +2258,7 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
         }
         spills[index] = 0;
         if (isLate && unit.paced != null && unit.total > 0) {
-          const free = finals[index];
+          let free = finals[index];
           const waning =
             isTail || tail <= MODEL.tail.share
               ? 1
@@ -2281,6 +2282,12 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
             ),
           );
           finals[index] = capped;
+          if (CANVASS[race.state] != null && unit.night != null) {
+            const post = unit.total - sum(unit.night);
+            if (post > MODEL.late.lid.share * unit.total) {
+              free = Math.min(free, capped + MODEL.late.lid.reach * post);
+            }
+          }
           const { spill, scatter } = MODEL.late;
           spills[index] =
             Math.max(0, free - capped) *
@@ -2544,8 +2551,13 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
       const extra = reports.has(unit.county)
         ? (pending.get(unit.county) ?? 0) * portion[index]!
         : open == null
-          ? final * later * heft[wholeOf.get(unit.county)!]! +
-            spills[wholeOf.get(unit.county)!]! * portion[index]!
+          ? CANVASS[race.state] != null
+            ? Math.max(
+                final * later * heft[wholeOf.get(unit.county)!]!,
+                spills[wholeOf.get(unit.county)!]! * portion[index]!,
+              )
+            : final * later * heft[wholeOf.get(unit.county)!]! +
+              spills[wholeOf.get(unit.county)!]! * portion[index]!
           : Math.max(0, open - remaining);
       const ceiling = 1 - unit.others;
       const jitter = final > 0 && learned == null ? gaussian(random) : 0;
