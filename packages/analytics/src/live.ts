@@ -221,6 +221,7 @@ const MODEL = {
     idle: 0.75,
     trickle: 0.01,
     follow: 0.5,
+    rest: 0.5,
     fresh: 0.005,
     settle: 4,
   },
@@ -2241,6 +2242,23 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
         spent += drained * (finals[index]! - unit.total);
       }
     }
+    if (
+      isLate &&
+      !isTail &&
+      spent > 0 &&
+      TAILS[race.state] != null &&
+      latest - onNight < tail * onNight
+    ) {
+      const scale = Math.min(1, (carrying * Math.max(1, latest)) / spent);
+      for (const [index, unit] of whole.entries()) {
+        if (!unit.hasBaseline || reports.has(unit.id)) {
+          continue;
+        }
+        finals[index] = unit.total + (finals[index]! - unit.total) * scale;
+        spills[index] = spills[index]! * scale;
+      }
+      spent *= scale;
+    }
     const later =
       holding +
       Math.max(
@@ -2389,7 +2407,9 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
           ? tilt
           : tilt + own.shift + Math.sqrt(own.variance) * gaussian(random);
       const expect = (learned?.mean ?? 0) + own.shift;
-      const leaning = learned != null && unit.paced == null ? remaining : 0;
+      const isPacedLean = learned != null && unit.paced != null && !isTail;
+      const leaning =
+        learned != null && (unit.paced == null || isPacedLean) ? remaining : 0;
       const modeled = margin * final - countedLead;
       const anchor =
         unit.pacedLead != null
@@ -2436,7 +2456,9 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
         final > 0
           ? extra *
             clamp(
-              (countedLead + value) / final + tilt + local,
+              (countedLead + value) / final +
+                (isPacedLean ? MODEL.late.rest : 1) * tilt +
+                local,
               -ceiling,
               ceiling,
             )
