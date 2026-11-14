@@ -44,12 +44,22 @@ CONVENTIONS = {
     (2016, "Republican", "GU"),
     (2016, "Republican", "ND"),
 }
+FULL = {
+    (2016, "Republican", "CO"): (
+        {"Ted Cruz": 30},
+        7,
+        "The article's table lists only the 21 delegates the district conventions chose. The state convention "
+        "chose 13 more at large, all pledged to Ted Cruz, and the 3 automatic delegates were unpledged; the Colorado "
+        "Republican Party's 2016 results, as the article and the Denver Post's report of the state convention give "
+        "them, make 30 pledged to Cruz and 7 unpledged of the 37.",
+    ),
+}
 VOTES = {(2004, "Democratic", "NM"), (2016, "Democratic", "KS"), (2008, "Democratic", "ND"), (2008, "Republican", "ME")}
 ALIASES = {
     "Joe Lieberman": "Joseph Lieberman",
     "Richard Gephardt": "Richard A. Gephardt",
     "Rocky De La Fuente": 'Roque "Rocky" De La Fuente',
-    "Buddy Roemer": "Charles Elson Roemer",
+    "Buddy Roemer": '"Buddy" Roemer',
     "Pat Buchanan": "Patrick Buchanan",
 }
 MONTHS = r"(?:January|February|March|April|May|June|July|August)"
@@ -456,6 +466,13 @@ def parse() -> None:
                 row["delegates"] = row["bound"]
             pool["delegates"] = int(str(pool["bound"] or 0)) + loose
             pool["preference"] = None
+            if (year, party, state) in FULL:
+                counts, rest, _ = FULL[(year, party, state)]
+                for row in event:
+                    if row["kind"] == "candidate":
+                        row["delegates"] = counts.get(str(row["candidate"]), 0)
+                        row["preference"] = None
+                pool["delegates"] = rest
         counted = sum(
             float(str(row["value"]))
             for row in rows
@@ -664,6 +681,8 @@ def emit() -> Path:
                 if "preference" in lines.columns
                 else []
             )
+            if (year, party, state) in FULL:
+                cs.add("note", entity_id=result_set, kind="caveat", body_md=FULL[(year, party, state)][2])
             if convention and leaning:
                 cs.add(
                     "note",
