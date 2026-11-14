@@ -465,6 +465,13 @@
       "url": "https://fr.wikipedia.org/wiki/Liste_des_pr%C3%A9sidents_de_la_R%C3%A9publique_fran%C3%A7aise",
       "note": "Day of each election by the National Assembly or the Congress at Versailles, from the infobox of each election's page; the day of the final ballot where the Congress sat over two days.",
       "kind": "compendium"
+    },
+    "wiki-fr-legislatives": {
+      "title": "Élections législatives françaises de 1815 à 1869 and Plébiscites sous Napoléon III",
+      "publisher": "Wikipedia (French)",
+      "url": "https://fr.wikipedia.org/wiki/Plébiscites_sous_Napoléon_III",
+      "note": "Day of each election and plebiscite, one French page per election. The Assemblée nationale's history pages give no dates for these years and Gallica refuses scripted requests, so the days are not yet checked against the Bulletin des lois or the Moniteur universel.",
+      "kind": "compendium"
     }
   },
   "tiers": [
@@ -3310,7 +3317,38 @@
       "effort": 3
     },
     {
-      "dates": [],
+      "dates": [
+        {
+          "date": "1848-04-23",
+          "source": "wiki-fr-legislatives",
+          "note": "Constituent Assembly; voting on 23 and 24 April."
+        },
+        {
+          "date": "1849-05-13",
+          "source": "wiki-fr-legislatives",
+          "note": "Legislative Assembly; voting on 13 and 14 May."
+        },
+        {
+          "date": "1852-02-29",
+          "source": "wiki-fr-legislatives",
+          "note": "First Corps législatif; second round 14 March."
+        },
+        {
+          "date": "1857-06-21",
+          "source": "wiki-fr-legislatives",
+          "note": "Second round 5 July."
+        },
+        {
+          "date": "1863-05-31",
+          "source": "wiki-fr-legislatives",
+          "note": "Second round 14 June."
+        },
+        {
+          "date": "1869-05-23",
+          "source": "wiki-fr-legislatives",
+          "note": "Voting on 23 and 24 May; second round 7 June."
+        }
+      ],
       "key": "assemblees_1848_1870",
       "tier": "national",
       "name": "Élections aux assemblées de la IIe République et au Corps législatif du Second Empire",
@@ -3323,7 +3361,7 @@
       "valid_from": "1848-04-23",
       "valid_to": "1870-09-04",
       "first_held": "1848-04-23",
-      "note": "The first elections by universal male suffrage: the Constituent Assembly (April 1848) and the Legislative Assembly (May 1849) by département lists, then the Corps législatif of the Second Empire (1852, 1857, 1863, and 1869) in single-member constituencies with official candidates. Dates to be enumerated from an official list.",
+      "note": "The first elections by universal male suffrage: the Constituent Assembly (April 1848) and the Legislative Assembly (May 1849) by département lists, then the Corps législatif of the Second Empire (1852, 1857, 1863, and 1869) in single-member constituencies with official candidates. Days come from one French Wikipedia page per election, not yet checked against the Bulletin des lois.",
       "source": "elysee-presidents",
       "match": [
         {
@@ -3346,7 +3384,78 @@
       "effort": 4
     },
     {
-      "dates": [],
+      "dates": [
+        {
+          "date": "1815-08-14",
+          "source": "wiki-fr-legislatives",
+          "note": "Chambre introuvable; second round 28 August."
+        },
+        {
+          "date": "1816-09-25",
+          "source": "wiki-fr-legislatives",
+          "note": "After the dissolution of 5 September; second round 4 October."
+        },
+        {
+          "date": "1817-09-20",
+          "source": "wiki-fr-legislatives",
+          "note": "Renewal of the first fifth of the départements."
+        },
+        {
+          "date": "1818-10-20",
+          "source": "wiki-fr-legislatives",
+          "note": "Renewal of the second fifth."
+        },
+        {
+          "date": "1819-09-11",
+          "source": "wiki-fr-legislatives",
+          "note": "Renewal of the third fifth."
+        },
+        {
+          "date": "1820-11-04",
+          "source": "wiki-fr-legislatives",
+          "note": "Second round 13 November."
+        },
+        {
+          "date": "1824-02-25",
+          "source": "wiki-fr-legislatives",
+          "note": "Second round 6 March."
+        },
+        {
+          "date": "1827-11-17",
+          "source": "wiki-fr-legislatives",
+          "note": "Second round 24 November."
+        },
+        {
+          "date": "1830-07-05",
+          "source": "wiki-fr-legislatives",
+          "note": "Further rounds 13 and 19 July."
+        },
+        {
+          "date": "1831-07-05",
+          "source": "wiki-fr-legislatives"
+        },
+        {
+          "date": "1834-06-21",
+          "source": "wiki-fr-legislatives"
+        },
+        {
+          "date": "1837-11-04",
+          "source": "wiki-fr-legislatives"
+        },
+        {
+          "date": "1839-03-02",
+          "source": "wiki-fr-legislatives",
+          "note": "Second round 6 March."
+        },
+        {
+          "date": "1842-07-09",
+          "source": "wiki-fr-legislatives"
+        },
+        {
+          "date": "1846-08-01",
+          "source": "wiki-fr-legislatives"
+        }
+      ],
       "key": "chambres_censitaires",
       "tier": "national",
       "name": "Élections à la Chambre des députés censitaire (Restauration et monarchie de Juillet)",
@@ -3358,7 +3467,7 @@
       },
       "valid_from": "1815-08-14",
       "valid_to": "1848-02-24",
-      "note": "Elections by electoral colleges of taxpayers (about 90,000 electors under the Restoration, about 250,000 by 1846). No national series of results is known to us.",
+      "note": "Elections by electoral colleges of taxpayers (about 90,000 electors under the Restoration, about 250,000 by 1846). No national series of results is known to us. Partial renewals of the fifths in 1821 to 1823 and the May 1815 Hundred Days chamber are not enumerated yet.",
       "source": "elysee-presidents",
       "match": [
         {
@@ -3767,6 +3876,35 @@
     {
       "dates": [
         {
+          "date": "1851-12-20",
+          "source": "wiki-fr-legislatives",
+          "note": "Voting on 20 and 21 December.",
+          "contests": 1
+        },
+        {
+          "date": "1852-11-21",
+          "source": "wiki-fr-legislatives",
+          "note": "Voting on 21 and 22 November.",
+          "contests": 1
+        },
+        {
+          "date": "1860-04-15",
+          "source": "wiki-fr-legislatives",
+          "note": "County of Nice annexation; voting on 15 and 16 April.",
+          "contests": 1
+        },
+        {
+          "date": "1860-04-22",
+          "source": "wiki-fr-legislatives",
+          "note": "Savoy annexation; voting on 22 and 23 April.",
+          "contests": 1
+        },
+        {
+          "date": "1870-05-08",
+          "source": "wiki-fr-legislatives",
+          "contests": 1
+        },
+        {
           "date": "1945-10-21",
           "contests": 2,
           "source": "elysee-presidents",
@@ -3793,7 +3931,7 @@
         "unit": "question"
       },
       "valid_to": "1958-09-01",
-      "note": "Constitutional plebiscites of the Revolution and the Napoleonic era (1793, 1795, 1799 to 1800, 1802, 1804, and 1815), the Second Empire plebiscites of December 1851, November 1852, and May 1870, and the referendums of 21 October 1945 (two questions), 5 May 1946, and 13 October 1946.",
+      "note": "Constitutional plebiscites of the Revolution and the Napoleonic era (1793, 1795, 1799 to 1800, 1802, 1804, and 1815), the Second Empire plebiscites of December 1851, November 1852, and May 1870, and the referendums of 21 October 1945 (two questions), 5 May 1946, and 13 October 1946. The 1860 annexation plebiscites of Nice and Savoy are counted as well. The Revolution and First Empire plebiscites are not enumerated yet.",
       "source": "elysee-presidents",
       "match": [
         {
