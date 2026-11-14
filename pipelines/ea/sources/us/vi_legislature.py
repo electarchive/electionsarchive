@@ -1,3 +1,4 @@
+import html
 import json
 import re
 import subprocess
@@ -43,6 +44,12 @@ PARTIES = {
     "Independent Citizens Movement": "VI:independent-citizens-movement",
 }
 REPORTS = {
+    date(2016, 11, 8): (
+        "us.vi_precincts",
+        "https://www.vivote.gov/sites/default/files/officialresults/Election%20Summary%20w-detail.HTM",
+        "2016 General Election Summary with Detail, Official Results",
+        "The summary's total column, which adds early, walk-in, mail, and provisional votes to election day; the archive's 2016 general rows hold election-day votes only.",
+    ),
     date(2020, 11, 3): (
         "us.vi_precincts",
         "https://www.vivote.gov/sites/default/files/officialresults/Official%20Precinct%20Report.pdf",
@@ -56,22 +63,9 @@ REPORTS = {
         "Totals include absentee and provisional ballots, which the archive's 2024 general rows leave out.",
     ),
 }
-SECTIONS = {
-    "legislature of the virgin islands at large": ("legislature", "U.S. Virgin Islands"),
-    "legislature of the virgin islands st croix": ("legislature", "St. Croix"),
-    "legislature of the virgin islands st thomas st john": ("legislature", "St. Thomas/St. John"),
-    "board of education at large": ("board-of-education", "U.S. Virgin Islands"),
-    "board of education stx": ("board-of-education", "St. Croix"),
-    "board of education st croix": ("board-of-education", "St. Croix"),
-    "board of education stt stj": ("board-of-education", "St. Thomas/St. John"),
-    "board of education st thomas st john": ("board-of-education", "St. Thomas/St. John"),
-    "board of elections stx": ("board-of-elections", "St. Croix"),
-    "board of elections st croix": ("board-of-elections", "St. Croix"),
-    "board of elections stj st thomas st john": ("board-of-elections", "St. John"),
-    "board of elections stt st thomas st john": ("board-of-elections", "St. Thomas"),
-}
-CODES = {"DEM": "Democratic", "REP": "Republican", "ICM": "Independent Citizens Movement"}
+CODES = {"DEM": "Democratic", "REP": "Republican", "ICM": "Independent Citizens Movement", "IND": "Independent"}
 ROW = re.compile(r"^(?:([A-Z]{3}) )?(\S.*?\S)\s{2,}([\d,]+)(?:\s|$)")
+DOTTED = re.compile(r"^(.*?\S)(?:\s*\(([A-Z]{3})\))?[\s.]*\s([\d,]+) +\.?\d")
 PSEUDO = {"Total Ballots Cast", "Total Votes Cast", "Registered Voters", "Blank Ballots", "Overvotes/Undervotes"}
 
 
@@ -98,41 +92,69 @@ def district(body: str, name: str) -> str:
     return DISTRICTS[name]
 
 
+def section(title: str) -> tuple[str, str] | None:
+    words = re.findall(r"[a-z]+", title.lower())
+    text = " ".join(words)
+    body = next(
+        (key for key, label in BODIES.items() if label.lower() in text),
+        "legislature" if "senator at large" in text else None,
+    )
+    if body is None:
+        return None
+    if "at large" in text:
+        return body, "U.S. Virgin Islands"
+    if "croix" in text or "stx" in words:
+        return body, "St. Croix"
+    if body == "board-of-elections" and ("st john district" in text or ("stj" in words and "stt" not in words)):
+        return body, "St. John"
+    if body == "board-of-elections" and ("st thomas district" in text or ("stt" in words and "stj" not in words)):
+        return body, "St. Thomas"
+    return body, "St. Thomas/St. John"
+
+
 def report(day: date) -> pl.DataFrame:
     cache, link = REPORTS[day][:2]
-    text = subprocess.run(
-        ["pdftotext", "-layout", str(raw.cached(cache, link).path), "-"], capture_output=True, text=True, check=True
-    ).stdout
+    path = raw.cached(cache, link).path
+    if link.endswith(".pdf"):
+        text = subprocess.run(
+            ["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True
+        ).stdout
+        pattern, heading = ROW, "Vote For"
+    else:
+        text = html.unescape(re.sub(r"<[^>]+>", " ", path.read_text(errors="replace")))
+        pattern, heading = DOTTED, "(VOTE FOR)"
     rows = []
-    section = None
-    previous = ""
-    for line in (line.strip() for line in text.splitlines()):
+    current = None
+    before = ["", ""]
+    for line in (line.strip() if pattern is ROW else " ".join(line.split()) for line in text.splitlines()):
         if not line:
             continue
-        title = " ".join(re.findall(r"[a-z]+", previous.lower()))
-        if line.startswith("Vote For"):
-            section = (title, int(line.split()[-1])) if title in SECTIONS else None
-        elif line.isupper() and line != "TOTAL":
-            section = None
-        elif section is not None and (row := ROW.match(line)) is not None:
-            body, place = SECTIONS[section[0]]
+        if line.startswith(heading):
+            title = before[1] if pattern is ROW or pattern.match(before[0]) else " ".join(before)
+            found = section(title)
+            current = (found, int(line.split()[-1])) if found else None
+        elif current is not None and (row := pattern.match(line)) is not None:
+            (body, place), seats = current
+            name, code = (row[2], row[1]) if pattern is ROW else (row[1], row[2])
             rows.append(
                 {
-                    "contest_id": f"{day}:{section[0]}",
+                    "contest_id": f"{day}:{body}:{place}",
                     "election_date": day,
                     "election_type": "General",
                     "primary_party": None,
                     "body": body,
                     "district_name": place,
-                    "number_seats": section[1],
-                    "candidate_name": "Write-In Votes" if row[2] == "Write-In Totals" else row[2],
-                    "candidate_party_name": CODES.get(row[1] or ""),
+                    "number_seats": seats,
+                    "candidate_name": "Write-In Votes" if name.upper().startswith("WRITE-IN") else name,
+                    "candidate_party_name": CODES.get(code or ""),
                     "votes": int(row[3].replace(",", "")),
                     "is_winner": False,
                     "report": link,
                 }
             )
-        previous = line
+        elif line.isupper() and line != "TOTAL":
+            current = None
+        before = [before[1], line]
     return pl.DataFrame(rows, schema_overrides={"primary_party": pl.String, "candidate_party_name": pl.String})
 
 
@@ -195,7 +217,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Virgin Islands Legislature, Board of Education, and Board of Elections generals, Democratic primaries, and the 2017 special 2010–2024 from the Elections System's archive and its official 2020 and 2024 general reports",
+            summary="Virgin Islands Legislature, Board of Education, and Board of Elections generals, Democratic primaries, and the 2017 special 2010–2024 from the Elections System's archive and its official 2016, 2020, and 2024 general reports",
             polity="US",
         )
 
