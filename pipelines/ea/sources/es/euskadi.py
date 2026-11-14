@@ -92,9 +92,9 @@ def fetch() -> None:
         raw.fetch(SOURCE, url(year), suffix=".zip")
 
 
-def sheets(year: int) -> dict[str, list[list[str]]]:
+def sheets(year: int, source: str = SOURCE, link: str | None = None) -> dict[str, list[list[str]]]:
     found: dict[str, list[list[str]]] = {}
-    with zipfile.ZipFile(raw.cached(SOURCE, url(year)).path) as archive:
+    with zipfile.ZipFile(raw.cached(source, link or url(year)).path) as archive:
         for entry in archive.namelist():
             stem = entry.rsplit("/", 1)[-1].lower()
             if not stem.endswith(".csv"):
@@ -126,7 +126,12 @@ def results(rows: list[list[str]]) -> list[Row]:
         if named:
             while column + size < len(above) and above[column + size].strip() == label:
                 size += 1
-        groups.append((label, column, size))
+        if size > 1:
+            picked = [at for at in range(column, column + size) if not rows[start][at].strip().startswith("%")]
+            if picked:
+                groups.append((label, picked[0], 1))
+        else:
+            groups.append((label, column, size))
         column += size
     out: list[Row] = []
     for raw_row in rows[start + 1 :]:
