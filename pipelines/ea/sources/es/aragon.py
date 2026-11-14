@@ -1,3 +1,5 @@
+import re
+import unicodedata
 from collections import Counter, defaultdict
 from datetime import date
 from pathlib import Path
@@ -11,7 +13,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "es.aragon"
-VERSION = "1"
+VERSION = "2"
 PUBLISHER = "Gobierno de Aragón"
 TITLE = "Elecciones a Cortes de Aragón (Open Data Aragón)"
 PORTAL = "https://opendata.aragon.es/"
@@ -55,6 +57,28 @@ RESOURCES = {
     "mesa_turnout": 380,
     "mesa_lists": 381,
 }
+BOA_PUBLISHER = "Junta Electoral de Aragón"
+BOA_TITLE = "Actas de proclamación y relaciones de diputados electos a Cortes de Aragón (Boletín Oficial de Aragón)"
+BOA_PORTAL = "https://www.boa.aragon.es/"
+BOA_PDF = "https://www.boa.aragon.es/cgi-bin/EBOA/BRSCGI?CMD=VEROBJ&MLKOB="
+BOA = {
+    "000001042": ("499147542524", "BOA 17, 7 June 1983"),
+    "000001057": ("504282293028", "BOA 18, 9 July 1983"),
+    "000005323": ("490959172929", "BOA 92, 5 August 1987"),
+    "000005324": ("490960183736", "BOA 92, 5 August 1987"),
+    "000005325": ("490961194644", "BOA 92, 5 August 1987"),
+    "000013740": ("489831992424", "BOA 80, 1 July 1991"),
+    "000029083": ("454569373625", "BOA 74, 21 June 1995"),
+    "000050617": ("3222941715", "BOA 83, 2 July 1999"),
+    "000080079": ("12268514805", "BOA 74, 20 June 2003"),
+    "000118977": ("204935031212", "BOA 72, 18 June 2007"),
+    "000160297": ("601897850404", "BOA 109, 6 June 2011"),
+    "000197111": ("859084765555", "BOA 108, 9 June 2015"),
+    "000228911": ("1076905222828", "BOA 112, 12 June 2019"),
+    "007933923": ("1282779080505", "BOA 115, 19 June 2023"),
+    "007956299": ("1437358090606", "BOA 38, 25 February 2026"),
+}
+DEPUTIES = Path(__file__).with_name("aragon_deputies.tsv")
 DATASETS = (
     "elecciones-a-cortes-de-aragon-ano-2026-detalle-distrito-mesa-electoral",
     "elecciones-a-cortes-de-aragon-ano-2023-detalle-distrito-mesa-electoral",
@@ -83,6 +107,8 @@ def fetch() -> None:
         raw.fetch(SOURCE, url(kind, year), suffix=".csv")
     for name in DATASETS:
         raw.fetch(SOURCE, CATALOG + name, suffix=".json")
+    for mlkob, _ in BOA.values():
+        raw.fetch(SOURCE, BOA_PDF + mlkob, suffix=".pdf")
 
 
 def repair(text: str) -> str:
@@ -244,6 +270,43 @@ def mesa_tables(year: int, lists: pl.DataFrame) -> tuple[pl.DataFrame, pl.DataFr
     return units, votes.join(ran, on=["province", "party"])
 
 
+PARTICLES = {"de", "del", "la", "las", "los", "y", "i", "e"}
+
+
+def fold(text: str) -> str:
+    plain = unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode()
+    return "".join(char for char in plain.lower() if char.isalnum())
+
+
+def display(text: str) -> str:
+    if text != text.upper():
+        return text
+    words = text.lower().split()
+    return " ".join(
+        word
+        if index and word in PARTICLES
+        else re.sub(r"(^|[-(])(\w)", lambda match: match[1] + match[2].upper(), word)
+        for index, word in enumerate(words)
+    )
+
+
+def deputies(lists: pl.DataFrame) -> pl.DataFrame:
+    frame = pl.read_csv(DEPUTIES, separator="\t", schema_overrides={"province": pl.String, "party": pl.String})
+    frame = frame.with_columns(pl.col("docn").cast(pl.String).str.zfill(9))
+    unknown = set(frame["docn"]) - set(BOA)
+    if unknown:
+        raise ValueError(f"deputies cite unknown BOA documents {sorted(unknown)}")
+    counted = frame.group_by("year", "province", "party").agg(members=pl.len())
+    check = (
+        lists.filter(pl.col("seats") > 0)
+        .join(counted, on=["year", "province", "party"], how="full", coalesce=True)
+        .filter(pl.col("seats").fill_null(0) != pl.col("members").fill_null(0))
+    )
+    if not check.is_empty():
+        raise ValueError(f"elected deputies differ from declared seats:\n{check}")
+    return frame.with_columns(position=pl.int_range(1, pl.len() + 1).over("year", "province", "party"))
+
+
 def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
     tables: dict[str, list[pl.DataFrame]] = defaultdict(list)
@@ -268,6 +331,7 @@ def parse() -> None:
                 pl.col("votes").sum().alias("official"), pl.col("got").sum().alias("sum")
             )
             print(f"{year} {level}: list votes {gap['sum'][0]:,} of {gap['official'][0]:,}")
+    tables["deputies"].append(deputies(pl.concat(tables["lists"])))
     for name, frames in tables.items():
         frame = pl.concat(frames)
         frame.write_parquet(PARSED / f"{name}.parquet")
@@ -298,6 +362,10 @@ MESA_METHOD = (
 )
 MESA_ACCOUNTING = ", with registered voters, ballots cast, blank ballots, and null ballots"
 MESA_VOTES_ONLY = ". This year's file holds list votes only, with no registered voters, blank ballots, or null ballots"
+MEMBERS_NOTE = (
+    " The elected deputies are those the Juntas Electorales Provinciales proclaimed, as printed in {bulletin}, in "
+    "the order printed there."
+)
 LISTS_DIFFER = (
     " In the source, the list votes of this province add up to {lists:,}, against {candidacies:,} votes to "
     "candidacies in its own totals."
@@ -308,6 +376,7 @@ DHONDT_DIFFERS = (
 )
 
 
+REWRITTEN = "The methodology note was rewritten."
 OVER = " In {count} units the ballots cast exceed the registered voters, as the file prints them."
 
 
@@ -327,6 +396,7 @@ def emit() -> Path:
     municipality_votes = pl.read_parquet(PARSED / "municipality_votes.parquet")
     mesas = pl.read_parquet(PARSED / "mesas.parquet")
     mesa_votes = pl.read_parquet(PARSED / "mesa_votes.parquet")
+    members = pl.read_parquet(PARSED / "deputies.parquet")
     with connect() as conn:
         cs = Changeset(
             conn,
@@ -334,7 +404,8 @@ def emit() -> Path:
             version=VERSION,
             summary=(
                 "Cortes de Aragón elections of 1983 to 2026 by province, municipality, and, for 1995, 1999, 2003, "
-                "2007, 2019, 2023, and 2026, polling station, from the Government of Aragón's open data"
+                "2007, 2019, 2023, and 2026, polling station, from the Government of Aragón's open data, with the deputies "
+                "proclaimed elected from the Boletín Oficial de Aragón"
             ),
             polity="ES",
         )
@@ -361,6 +432,22 @@ def emit() -> Path:
         for kind, year in wanted():
             if kind.split("_")[0] in ("province", "municipality", "mesa"):
                 cs.artifact(raw.cached(SOURCE, url(kind, year)), source)
+        boa = cs.source(BOA_PUBLISHER, BOA_TITLE)
+        cs.add(
+            "source",
+            id=boa,
+            kind="official_body",
+            publisher=BOA_PUBLISHER,
+            title=BOA_TITLE,
+            url=BOA_PORTAL,
+            license=None,
+            license_url=None,
+            attribution="Fuente: Boletín Oficial de Aragón.",
+        )
+        for mlkob, _ in BOA.values():
+            cs.artifact(raw.cached(SOURCE, BOA_PDF + mlkob), boa)
+        people: set[UUID] = set()
+        methods: dict[UUID, set[str]] = defaultdict(set)
 
         parties: dict[str, UUID] = {}
         for code, label in sorted(lists.select("party", "name").unique().iter_rows()):
@@ -500,6 +587,7 @@ def emit() -> Path:
                     )
                     for body_md in notes:
                         cs.add("note", entity_id=result_set, kind="methodology", body_md=body_md)
+                        methods[result_set].add(body_md)
                     return result_set
 
                 note = PROVINCE_METHOD
@@ -508,6 +596,10 @@ def emit() -> Path:
                 won = dhondt(dict(zip(rows["party"], rows["votes"])), total["valid"], total["seats"])
                 if any(won[party] != seats for party, seats in zip(rows["party"], rows["seats"])):
                     note += DHONDT_DIFFERS
+                elected = members.filter((pl.col("year") == year) & (pl.col("province") == province))
+                if not elected.is_empty():
+                    bulletins = sorted({BOA[docn][1] for docn in elected["docn"]})
+                    note += MEMBERS_NOTE.format(bulletin=" and ".join(bulletins))
                 province_set = make_set("province", True, 1, [note])
                 unit = province_units[province]
                 accounting(province_set, unit, total)
@@ -523,6 +615,42 @@ def emit() -> Path:
                             kind="won",
                             seats=entry["seats"],
                         )
+                for member in elected.sort("party", "position").iter_rows(named=True):
+                    printed = clean(member["name"])
+                    person = cs.key(f"{SOURCE}.person", fold(printed))
+                    if person not in people:
+                        people.add(person)
+                        if person in cs.minted:
+                            cs.add("person", id=person)
+                            name(person, display(printed), "es")
+                    option = cs.key(f"{SOURCE}.option", f"{key}:{member['party']}:{fold(printed)}")
+                    cs.add(
+                        "contest_option",
+                        id=option,
+                        contest_id=contest,
+                        kind="candidate",
+                        parent_option_id=options[member["party"]],
+                        party_id=parties[member["party"]],
+                        ballot_label=display(printed),
+                    )
+                    candidacy = cs.key(f"{SOURCE}.candidacy", f"{key}:{member['party']}:{fold(printed)}")
+                    cs.add(
+                        "candidacy",
+                        id=candidacy,
+                        person_id=person,
+                        option_id=option,
+                        role="list_member",
+                        ballot_name=printed,
+                        member_of_party_id=parties[member["party"]],
+                        is_independent=False,
+                    )
+                    cs.add(
+                        "citation",
+                        entity_id=candidacy,
+                        source_id=boa,
+                        locator={"boa": BOA[member["docn"]][1], "docn": member["docn"], "page": member["page"]},
+                    )
+                    cs.add("outcome", result_set_id=province_set, option_id=option, kind="elected")
 
                 places = municipalities.filter((pl.col("year") == year) & (pl.col("province") == province))
                 place_votes = municipality_votes.filter((pl.col("year") == year) & (pl.col("province") == province))
@@ -595,26 +723,32 @@ def emit() -> Path:
                     unit, channel = mesa_units[row["mesa"]]
                     values.append((str(mesa_set), str(unit), str(options[row["party"]]), VOTES, row["votes"], channel))
 
-        cs.frame(
-            "reporting_unit",
-            pl.DataFrame(
-                [
-                    {
-                        "id": str(unit),
-                        "polity_id": str(spain),
-                        "scheme_code": scheme,
-                        "code": code,
-                        "parent_id": None if parent is None else str(parent),
-                        "area_relation": relation,
-                        "area_id": None if area is None else str(area),
-                        "kind": kind,
-                    }
-                    for unit, scheme, code, parent, relation, area, kind in unit_rows.values()
-                    if unit in cs.minted
-                ],
-                schema_overrides={"parent_id": pl.String, "area_id": pl.String},
-            ),
-        )
+        for note_id, entity, body in conn.execute(
+            """select n.id, n.entity_id, n.body_md from note n join changeset c on c.id = n.changeset_id
+               where c.pipeline = %s and n.kind = 'methodology' and n.entity_id = any(%s)""",
+            (SOURCE, list(methods)),
+        ).fetchall():
+            if body not in methods[entity]:
+                cs.add("note_drop", note_id=note_id, entity_id=entity, body_md=body, reason=REWRITTEN)
+        minted_units = [
+            {
+                "id": str(unit),
+                "polity_id": str(spain),
+                "scheme_code": scheme,
+                "code": code,
+                "parent_id": None if parent is None else str(parent),
+                "area_relation": relation,
+                "area_id": None if area is None else str(area),
+                "kind": kind,
+            }
+            for unit, scheme, code, parent, relation, area, kind in unit_rows.values()
+            if unit in cs.minted
+        ]
+        if minted_units:
+            cs.frame(
+                "reporting_unit",
+                pl.DataFrame(minted_units, schema_overrides={"parent_id": pl.String, "area_id": pl.String}),
+            )
         cs.frame(
             "result_value",
             pl.DataFrame(
