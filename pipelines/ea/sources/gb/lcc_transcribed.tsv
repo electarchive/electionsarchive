@@ -1,0 +1,732 @@
+year	division	electorate	name	party	votes	elected
+1898	battersea	13198	W. Davies	P	5284	1
+1898	battersea	13198	John Burns, M.P.	P	5126	1
+1898	battersea	13198	Earl of Denbigh	M	3715	0
+1898	battersea	13198	A. T. Quicke	M	3670	0
+1898	bermondsey	10592	Dr. G. J. Cooper	P	2977	1
+1898	bermondsey	10592	J. Thornton	P	2843	1
+1898	bermondsey	10592	W. W. Tyler	M	2028	0
+1898	bermondsey	10592	F. St. J. Morrow	M	1993	0
+1898	north-east-bethnal-green	7772	C. Freak	P	2733	1
+1898	north-east-bethnal-green	7772	E. A. Cornwall	P	2580	1
+1898	north-east-bethnal-green	7772	J. A. Nix	M	1611	0
+1898	north-east-bethnal-green	7772	Sir E. Sassoon	M	1599	0
+1898	south-west-bethnal-green	8801	J. Branch	P	2275	1
+1898	south-west-bethnal-green	8801	B. F. C. Costelloe	P	2155	1
+1898	south-west-bethnal-green	8801	Percy Braby	M	1397	0
+1898	south-west-bethnal-green	8801	H. H. Finch	M	1374	0
+1898	south-west-bethnal-green	8801	A. D. Jones	I	54	0
+1898	bow-and-bromley	10848	W. W. Bruce	P	3082	1
+1898	bow-and-bromley	10848	B. Cooper	P	3018	1
+1898	bow-and-bromley	10848	V. J. H. Walsh	M	2112	0
+1898	bow-and-bromley	10848	A. A'B. Terrell	M	1992	0
+1898	brixton	10855	W. Haydon	M	2944	1
+1898	brixton	10855	C. Jerome	M	2863	1
+1898	brixton	10855	Rev. J. W. Horsley	P	2339	0
+1898	brixton	10855	C. Barclay Heward	P	2323	0
+1898	camberwell-north	11955	R. Strong	P	3477	1
+1898	camberwell-north	11955	H. R. Taylor	P	3318	1
+1898	camberwell-north	11955	Guy Lushington	M	1834	0
+1898	camberwell-north	11955	F. R. Anderton	M	1773	0
+1898	chelsea	13043	J. Jeffrey	P	4044	1
+1898	chelsea	13043	E. J. Horniman	P	3675	1
+1898	chelsea	13043	C. Chapman	M	3673	0
+1898	chelsea	13043	E. L. Meinertzhagen	M	3315	0
+1898	city-of-london	25307	Sir J. C. Dimsdale	M	5893	1
+1898	city-of-london	25307	Duke of Leeds	M	5795	1
+1898	city-of-london	25307	B. L. Cohen, M.P.	M	5780	1
+1898	city-of-london	25307	H. Clarke	M	5780	1
+1898	city-of-london	25307	Hon. A. T. Brassey	P	2413	0
+1898	city-of-london	25307	N. Buxton	P	2396	0
+1898	clapham	15376	Col. A. Rotton	M	4785	1
+1898	clapham	15376	T. L. Corbett	M	4757	1
+1898	clapham	15376	D. Martineau	P	3929	0
+1898	clapham	15376	H. Gosling	P	3842	0
+1898	deptford	15180	Sidney Webb	P	4512	1
+1898	deptford	15180	R. C. Phillimore	P	4487	1
+1898	deptford	15180	H. S. A. Foy	M	3218	0
+1898	deptford	15180	J. M. T. Dumphreys	M	2866	0
+1898	deptford	15180	J. Yallop	L	233	0
+1898	dulwich	13502	W. Matthews	M	3698	1
+1898	dulwich	13502	Capt. Middleton	M	3673	1
+1898	dulwich	13502	G. Hardy	P	2461	0
+1898	dulwich	13502	H. E. Ramsey	P	2447	0
+1898	central-finsbury	9179	P. Rutland	M	2392	1
+1898	central-finsbury	9179	R. M. Beachcroft (Ald.)	M	2286	1
+1898	central-finsbury	9179	Dr. W. F. Blake	P	2267	0
+1898	central-finsbury	9179	Sir A. Hayter	P	1987	0
+1898	central-finsbury	9179	J. E. Woolacott	ILP	382	0
+1898	east-finsbury	6129	J. A. Baker	P	2114	1
+1898	east-finsbury	6129	J. Benson	P	2038	1
+1898	east-finsbury	6129	Walter Smith	M	1391	0
+1898	east-finsbury	6129	W. W. Grantham	M	1338	0
+1898	fulham	15757	Lord Wolverton	M	4494	1
+1898	fulham	15757	E. G. Easton	M	4407	1
+1898	fulham	15757	T. Sadler	P	4048	0
+1898	fulham	15757	B. Morice	P	4043	0
+1898	greenwich	11604	R. S. Jackson	P	3898	1
+1898	greenwich	11604	J. Peppercorn	P	3249	1
+1898	greenwich	11604	Lord Skelmersdale	M	3194	0
+1898	greenwich	11604	Dr. W. E. Ball	M	3190	0
+1898	greenwich	11604	J. M. M'Carthy	ILP	689	0
+1898	hackney-central	8615	T. M'K. Wood	P	3162	1
+1898	hackney-central	8615	James Stuart	P	3125	1
+1898	hackney-central	8615	T. B. Westacott	M	2369	0
+1898	hackney-central	8615	Hon. Claude G. Hay	M	2291	0
+1898	hackney-north	12236	E. B. Forman	M	3507	1
+1898	hackney-north	12236	G. Lampard	P	2783	1
+1898	hackney-north	12236	M. Shaw	P	2566	0
+1898	hackney-north	12236	J. V. Fitzgerald	M	2274	0
+1898	hackney-north	12236	E. Reynolds	I	1779	0
+1898	hackney-south	12130	A. Smith	P	3360	1
+1898	hackney-south	12130	E. Browne	P	3174	1
+1898	hackney-south	12130	C. Steel	M	2484	0
+1898	hackney-south	12130	F. B. Oldfield	M	2452	0
+1898	hackney-south	12130	J. R. Macdonald	ILP	379	0
+1898	haggerston	6784	Lord Monkswell	P	2067	1
+1898	haggerston	6784	G. J. S. Lefevre	P	2060	1
+1898	haggerston	6784	Stanley Boulter	M	862	0
+1898	haggerston	6784	C. F. Shellard	M	839	0
+1898	hammersmith	13974	W. J. Bull	M	4168	1
+1898	hammersmith	13974	E. A. Goulding	M	4121	1
+1898	hammersmith	13974	Earl Russell	P	3197	0
+1898	hammersmith	13974	Sir R. G. Head	P	3164	0
+1898	hampstead	10033	J. S. Fletcher	M	2344	1
+1898	hampstead	10033	E. Bond	M	2277	1
+1898	hampstead	10033	F. Debenham	P	1878	0
+1898	hampstead	10033	H. Wilberforce	P	1873	0
+1898	holborn	12815	J. F. Remnant	M	3117	1
+1898	holborn	12815	Sir J. Dickson-Poynder	M	3011	1
+1898	holborn	12815	A. Hoare (Ald.)	P	1325	0
+1898	hoxton	8209	H. Ward	P	2179	1
+1898	hoxton	8209	H. T. Sawell	P	2157	1
+1898	hoxton	8209	A. Arter	M	1567	0
+1898	hoxton	8209	T. W. Shaw	M	1545	0
+1898	islington-east	10541	A. M. Torrance, J.P.	P	3015	1
+1898	islington-east	10541	J. Laughland	P	2717	1
+1898	islington-east	10541	G. F. Mortimer	M	2495	0
+1898	islington-east	10541	Colonel Alt	M	2306	0
+1898	islington-north	11292	Dr. T. B. Napier	P	3525	1
+1898	islington-north	11292	W. C. Parkinson	P	3228	1
+1898	islington-north	11292	G. B. Clough	M	2880	0
+1898	islington-north	11292	Lord A. Thynne	M	2801	0
+1898	islington-south	7954	G. S. Elliott	I	2377	1
+1898	islington-south	7954	H. J. Williams	P	2172	1
+1898	islington-south	7954	F. Kimber Bull	P	1543	0
+1898	islington-west	7783	W. Goodman	P	2456	1
+1898	islington-west	7783	G. H. Radford	P	2361	1
+1898	islington-west	7783	G. J. Chatterton	M	1431	0
+1898	islington-west	7783	D. H. Kyd	M	1361	0
+1898	kennington	9859	T. A. Organ	P	2672	1
+1898	kennington	9859	J. W. Benn	P	2661	1
+1898	kennington	9859	J. Dixon	M	2526	0
+1898	kennington	9859	J. R. Cousins	M	2471	0
+1898	kennington	9859	N. P. Palmer	L	68	0
+1898	kensington-north	10168	G. E. S. Fryer	M	2319	1
+1898	kensington-north	10168	J. B. Porter	M	2293	1
+1898	kensington-north	10168	J. Lloyd	P	2265	0
+1898	kensington-north	10168	R. B. Doake	P	2209	0
+1898	kensington-south	10848	C. H. Campbell	M	3078	1
+1898	kensington-south	10848	R. A. Robinson	M	3056	1
+1898	kensington-south	10848	S. Mayer	P	648	0
+1898	kensington-south	10848	I. A. Symmons		639	0
+1898	lambeth-north	7372	Lieut.-Col. C. Ford	P	1849	1
+1898	lambeth-north	7372	Frank Smith	P	1557	1
+1898	lambeth-north	7372	Charles Ansell	M	1252	0
+1898	lambeth-north	7372	R. Mortimer	M	1072	0
+1898	lewisham	15431	G. E. Dodson	M	4061	1
+1898	lewisham	15431	T. W. Williams	M	4025	1
+1898	lewisham	15431	J. E. Matthews	P	3037	0
+1898	lewisham	15431	A. C. Arnold	P	3021	0
+1898	limehouse	6838	W. Pearce	P	2336	1
+1898	limehouse	6838	A. L. Leon	P	2142	1
+1898	limehouse	6838	J. R. Pascoe	M	1726	0
+1898	limehouse	6838	W. H. Porter	M	1553	0
+1898	east-marylebone	8119	Lord Farquhar	M	2182	1
+1898	east-marylebone	8119	E. Boulnois, M.P.	M	2089	1
+1898	east-marylebone	8119	J. F. Little	P	1516	0
+1898	east-marylebone	8119	T. Slater	P	1419	0
+1898	west-marylebone	10344	Earl of Hardwicke	M	3035	1
+1898	west-marylebone	10344	E. White	M	2892	1
+1898	west-marylebone	10344	Sir A. W. West	P	2028	0
+1898	west-marylebone	10344	Hon. J. Wallop	P	2015	0
+1898	mile-end	5813	J. R. Seager	P	1711	1
+1898	mile-end	5813	B. Straus	P	1669	1
+1898	mile-end	5813	Major L. Darwin	M	1535	0
+1898	mile-end	5813	G. Bicker-Caarten	M	1492	0
+1898	west-newington	8282	J. D. Gilbert	P	2639	1
+1898	west-newington	8282	J. Piggott	P	2598	1
+1898	west-newington	8282	Dr. Lansdale	M	1383	0
+1898	west-newington	8282	A. A. Bethune	M	1368	0
+1898	west-newington	8282	W. Langley	S	194	0
+1898	norwood	12007	Col. F. Campbell	M	3373	1
+1898	norwood	12007	D. J. White	M	3354	1
+1898	norwood	12007	A. Allen	P	2784	0
+1898	norwood	12007	H. de R. Walker	P	2781	0
+1898	paddington-north	8277	W. Urquhart	M	2142	1
+1898	paddington-north	8277	H. P. Harris	M	2088	1
+1898	paddington-north	8277	A. White	P	1842	0
+1898	paddington-north	8277	W. Stevenson	P	1816	0
+1898	paddington-south	6462	Sir G. D. Harris	M	2190	1
+1898	paddington-south	6462	H. A. Harben	M	2146	1
+1898	paddington-south	6462	C. G. Paddon	P	620	0
+1898	paddington-south	6462	H. C. Biron	P	614	0
+1898	peckham	11998	G. Clarke	P	3201	1
+1898	peckham	11998	F. Verney	P	2849	1
+1898	peckham	11998	W. Scott Scott	M	2664	0
+1898	peckham	11998	W. L. Dowton	M	2356	0
+1898	peckham	11998	J. E. Dobson	ILP	268	0
+1898	poplar	9874	W. Crooks	P	3632	1
+1898	poplar	9874	J. McDougall	P	3310	1
+1898	poplar	9874	J. B. Atlay	M	1585	0
+1898	rotherhithe	9556	A. Pomeroy	P	2778	1
+1898	rotherhithe	9556	H. J. Glanville	P	2650	1
+1898	rotherhithe	9556	W. H. C. Payne	M	2427	0
+1898	rotherhithe	9556	A. Radford	M	2344	0
+1898	st-george-s-hanover-square	10457	R. C. Antrobus	M	3143	1
+1898	st-george-s-hanover-square	10457	Col. Hon. H. Legge	M	3086	1
+1898	st-george-s-hanover-square	10457	L. V. Biggs	P	1038	0
+1898	st-george-s-hanover-square	10457	C. L. Heywood	P	1032	0
+1898	st-george	3867	C. Barrett	P	1510	1
+1898	st-george	3867	C. Balian	P	1458	1
+1898	st-george	3867	J. Abrahams	M	1232	0
+1898	st-george	3867	Dalby Williams	M	1227	0
+1898	st-pancras-east	7470	N. Robinson	P	2952	1
+1898	st-pancras-east	7470	E. Purchese	P	2741	1
+1898	st-pancras-east	7470	E. W. Sinclair-Cox	M	1698	0
+1898	st-pancras-east	7470	A. F. Calvert	M	1575	0
+1898	st-pancras-north	6788	T. H. W. Idris	P	2334	1
+1898	st-pancras-north	6788	D. S. Waterlow	P	2112	1
+1898	st-pancras-north	6788	W. J. Wetenhall	M	2001	0
+1898	st-pancras-north	6788	R. J. Willis	M	1607	0
+1898	st-pancras-north	6788	J. Leighton	I	144	0
+1898	st-pancras-north	6788	A. E. Lucas	I	65	0
+1898	st-pancras-south	6504	Sir J. Hutton	P	2036	1
+1898	st-pancras-south	6504	Sir J. Blundell Maple, M.P.	M	1830	1
+1898	st-pancras-south	6504	J. Macdonald	S	494	0
+1898	st-pancras-west	7137	Dr. W. J. Collins	P	2404	1
+1898	st-pancras-west	7137	Earl Carrington	P	2236	1
+1898	st-pancras-west	7137	G. Barham	M	2017	0
+1898	st-pancras-west	7137	Lord Elcho	M	2002	0
+1898	southwark-west	8421	T. Hunter	P	2578	1
+1898	southwark-west	8421	Edric Bayley	P	2575	1
+1898	southwark-west	8421	Oscar Berry	M	1201	0
+1898	southwark-west	8421	W. C. Copeland	M	1193	0
+1898	stepney	6244	W. C. Steadman	P	1955	1
+1898	stepney	6244	W. B. Yates	P	1855	1
+1898	stepney	6244	Major E. Gordon	M	1648	0
+1898	stepney	6244	H. T. A. Chidgey	M	1534	0
+1898	strand	10526	Major C. Probyn	M	2697	1
+1898	strand	10526	T. W. L. Emden	M	2343	1
+1898	strand	10526	Rev. A. W. Oxford	P	1664	0
+1898	strand	10526	C. Charrington	P	1356	0
+1898	strand	10526	E. C. Keevil	I	327	0
+1898	walworth	7668	R. Spokes	P	2172	1
+1898	walworth	7668	R. Parker	P	2166	1
+1898	walworth	7668	Hugh F. S. Hole	M	1299	0
+1898	walworth	7668	T. H. B.-Hitching	M	1292	0
+1898	wandsworth	20758	Dr. G. B. Longstaff	M	6378	1
+1898	wandsworth	20758	Earl of Dunraven	M	5493	1
+1898	wandsworth	20758	R. Steven	P	4583	0
+1898	wandsworth	20758	A. R. Gridley	P	3951	0
+1898	westminster	7953	L. H. Hayter	M	2212	1
+1898	westminster	7953	R. W. G. Smith	M	2190	1
+1898	westminster	7953	T. Bremner	P	789	0
+1898	whitechapel	5925	H. L. W. Lawson	P	1917	1
+1898	whitechapel	5925	W. C. Johnson	P	1768	1
+1898	whitechapel	5925	L. Campbell-Johnson	M	1322	0
+1898	woolwich	14230	Colonel E. Hughes, M.P.	M	5133	1
+1898	woolwich	14230	A. Penfold	M	4661	1
+1898	woolwich	14230	D. Marsh	P	4360	0
+1898	woolwich	14230	Dr. Lindlow	P	4041	0
+1904	battersea	17128	J. Burns, M.P.	P	5513	1
+1904	battersea	17128	W. Davies	P	5502	1
+1904	battersea	17128	F. D. Thomas	M	2503	0
+1904	bermondsey	12542	G. J. Cooper	P	3221	1
+1904	bermondsey	12542	A. A. Allen	P	3215	1
+1904	bermondsey	12542	T. H. Flood	M	2153	0
+1904	bermondsey	12542	F. R. Anderton	M	2085	0
+1904	north-east-bethnal-green	9263	E. Smith	P	3265	1
+1904	north-east-bethnal-green	9263	E. A. Cornwall	P	2251	1
+1904	north-east-bethnal-green	9263	Dr. McCrae	M	1211	0
+1904	north-east-bethnal-green	9263	S. Deans	M	1163	0
+1904	south-west-bethnal-green	9226	J. Branch	P	2490	1
+1904	south-west-bethnal-green	9226	T. Wiles	P	2458	1
+1904	south-west-bethnal-green	9226	J. H. Keeling	M	955	0
+1904	south-west-bethnal-green	9226	A. Maconachie	M	955	0
+1904	bow-and-bromley	12930	W. W. Bruce	P	3420	1
+1904	bow-and-bromley	12930	B. Cooper	P	3388	1
+1904	bow-and-bromley	12930	H. C. Batchelor	M	1600	0
+1904	bow-and-bromley	12930	Capt. B. Levett	M	1569	0
+1904	brixton	12666	L. Sharp	P	3170	1
+1904	brixton	12666	F. Dolman	P	3420	1
+1904	brixton	12666	W. Haydon	M	2922	0
+1904	brixton	12666	S. Cresswell	M	2911	0
+1904	camberwell-north	14994	H. R. Taylor	P	3670	1
+1904	camberwell-north	14994	R. Bray	P	3563	1
+1904	camberwell-north	14994	T. G. L. Miller	I	1229	0
+1904	chelsea	15451	J. Jeffery	P	4224	1
+1904	chelsea	15451	E. J. Horniman	P	4143	1
+1904	chelsea	15451	Maj.-Gen. Sartorius	M	3471	0
+1904	chelsea	15451	C. Goff	M	3462	0
+1904	city-of-london	26839	Alderman Alliston	M	4907	1
+1904	city-of-london	26839	Sir T. Brooke-Hitching	M	4858	1
+1904	city-of-london	26839	Hon. R. Guinness	M	4799	1
+1904	city-of-london	26839	H. S. Sankey	M	4606	1
+1904	city-of-london	26839	F. W. Buxton	P	2342	0
+1904	city-of-london	26839	Lord Sandhurst	P	2298	0
+1904	clapham	22201	Lieut.-Col. Rotton	M	5910	1
+1904	clapham	22201	T. P. Gaskell	M	5764	1
+1904	clapham	22201	J. G. Kipling	P	5544	0
+1904	clapham	22201	E. C. Pannett	P	5408	0
+1904	deptford	17392	R. C. Phillimore	P		1
+1904	deptford	17392	Sidney Webb	P		1
+1904	dulwich	13178	G. A. Hardy	P	5347	1
+1904	dulwich	13178	T. Gautry	P	4275	1
+1904	dulwich	13178	W. L. Mitchell	M	3548	0
+1904	dulwich	13178	H. C. Gooch	M	3531	0
+1904	central-finsbury	10036	Capt. F. Hemphill	P	2361	1
+1904	central-finsbury	10036	A. B. Russell	P	2338	1
+1904	central-finsbury	10036	R. F. Hoskins	M	1935	0
+1904	central-finsbury	10036	F. H. M. Wayne	M	1914	0
+1904	east-finsbury	6876	J. A. Baker	P	2336	1
+1904	east-finsbury	6876	T. E. Harvey	P	2190	1
+1904	east-finsbury	6876	Enos Howes	M	1772	0
+1904	east-finsbury	6876	W. Smith	M	1618	0
+1904	fulham	23257	P. Lawson	P	6207	1
+1904	fulham	23257	T. Davies	P	6179	1
+1904	fulham	23257	Major Skinner	M	5247	0
+1904	fulham	23257	Lord Lytton	M	5157	0
+1904	greenwich	14615	R. S. Jackson	P		1
+1904	greenwich	14615	F. Warmington	P		1
+1904	hackney-central	10542	T. McKinnon Wood	P	3534	1
+1904	hackney-central	10542	A. J. Shepheard	P	3476	1
+1904	hackney-central	10542	Lord Bingham	M	2120	0
+1904	hackney-central	10542	G. Cartwright	M	2097	0
+1904	hackney-north	14125	G. Lampard	P	4372	1
+1904	hackney-north	14125	J. E. Sears	P	4189	1
+1904	hackney-north	14125	Dr. F. M. Miller	M	3773	0
+1904	hackney-north	14125	W. H. Key	M	3942	0
+1904	hackney-south	15126	E. Browne	P	4318	1
+1904	hackney-south	15126	A. Smith	P	4316	1
+1904	hackney-south	15126	S. Boulter	M	1776	0
+1904	hackney-south	15126	Lieut.-Col. R. M. Craig		1767	0
+1904	haggerston	7858	Lord Monkswell	P	2479	1
+1904	haggerston	7858	J. Stuart	P	2456	1
+1904	haggerston	7858	Major Stokoe	M	1093	0
+1904	haggerston	7858	J. H. S. Lloyd	M	1030	0
+1904	hammersmith	17016	J. Brandon	M	3501	1
+1904	hammersmith	17016	E. Collins	M	3494	1
+1904	hammersmith	17016	J. G. Ritchie	P	3483	0
+1904	hammersmith	17016	F. Whelan	P	3392	0
+1904	hampstead	14088	N. Hanhart	M	3252	1
+1904	hampstead	14088	J. T. Taylor	M	3213	1
+1904	hampstead	14088	W. E. Mullens	P	2893	0
+1904	hampstead	14088	Dr. C. Smith	P	2737	0
+1904	holborn	12212	Sir H. Bliss	M	2670	1
+1904	holborn	12212	Captain Swinton	M	2649	1
+1904	holborn	12212	W. H. Ansell	P	1241	0
+1904	holborn	12212	Aubrey Goodes	P	1169	0
+1904	hoxton	9466	Graham Wallis	P	2436	1
+1904	hoxton	9466	H. Ward	P	2361	1
+1904	hoxton	9466	Dr. J. D. Davies	M	2281	0
+1904	hoxton	9466	E. Gates	M	2124	0
+1904	islington-east	13112	A. M. Torrance	P	4413	1
+1904	islington-east	13112	A. A. Thomas	P	3914	1
+1904	islington-east	13112	A. H. Caesar	M	2416	0
+1904	islington-north	14472	Dr. T. B. Napier	P	3876	1
+1904	islington-north	14472	W. C. Parkinson	P	3858	1
+1904	islington-north	14472	Ald. Tomkins	M	2811	0
+1904	islington-north	14472	J. W. Sharp	M	2771	0
+1904	islington-south	10058	H. J. Williams	P	2536	1
+1904	islington-south	10058	G. Dew	P	2437	1
+1904	islington-south	10058	G. S. Elliott	I	1770	0
+1904	islington-south	10058	S. Lambert	I	1596	0
+1904	islington-south	10058	A. Memory	I	356	0
+1904	islington-west	10693	W. P. Goodman	P	2904	1
+1904	islington-west	10693	G. H. Radford	P	2874	1
+1904	islington-west	10693	A. J. Adams	M	1705	0
+1904	islington-west	10693	H. J. Clarke	M	1695	0
+1904	kennington	12075	S. Collins	P	3394	1
+1904	kennington	12075	J. W. Benn	P	3388	1
+1904	kennington	12075	Canon A. Edwards	M	2460	0
+1904	kensington-north	12974	W. Pope	P	3232	1
+1904	kensington-north	12974	H. L. Jephson	P	3203	1
+1904	kensington-north	12974	W. W. Thompson	M	2914	0
+1904	kensington-north	12974	Baron P. de Worms	M	2858	0
+1904	kensington-south	13923	R. A. Robinson	M	3538	1
+1904	kensington-south	13923	Hon. F. J. N. Thesiger	M	3519	1
+1904	kensington-south	13923	P. Carr	P	682	0
+1904	kensington-south	13923	H. J. Norton	P	660	0
+1904	lambeth-north	8263	W. Wightman	P	1180	1
+1904	lambeth-north	8263	J. Williams	M	1152	1
+1904	lambeth-north	8263	A. Brooks	M	1103	0
+1904	lambeth-north	8263	J. E. Gregory	P	1028	0
+1904	lambeth-north	8263	W. E. Clery	I	422	0
+1904	lambeth-north	8263	J. Clarke	I	419	0
+1904	lambeth-north	8263	W. H. Clarke	L	265	0
+1904	lewisham	24055	J. W. Cleland	P	6297	1
+1904	lewisham	24055	Hon. A. L. Stanley	P	5946	1
+1904	lewisham	24055	J. V. Fitzgerald	M	4557	0
+1904	lewisham	24055	E. L. Hartley	M	4446	0
+1904	limehouse	7640	W. B. Bawn	P	2461	1
+1904	limehouse	7640	A. L. Leon	P	2381	1
+1904	limehouse	7640	Sir C. Elliott	M	1517	0
+1904	limehouse	7640	E. Gray	M	1396	0
+1904	east-marylebone	8743	Lord Ludlow	M	2848	1
+1904	east-marylebone	8743	W. C. Bridgeman	M	2779	1
+1904	east-marylebone	8743	Dr. Fletcher Little	I	1762	0
+1904	east-marylebone	8743	W. Leaf	I	1747	0
+1904	west-marylebone	11578	J. Lewis	P	2708	1
+1904	west-marylebone	11578	W. Bailey	M	2509	1
+1904	west-marylebone	11578	E. White	M	2450	0
+1904	west-marylebone	11578	W. H. Sands	P	2422	0
+1904	mile-end	6400	G. F. Warren	P	2125	1
+1904	mile-end	6400	B. S. Straus	P	2121	1
+1904	mile-end	6400	A. G. Goodrich	M	1559	0
+1904	mile-end	6400	Prof. W. R. Smith	M	1368	0
+1904	mile-end	6400	W. Baxter	I	36	0
+1904	west-newington	10478	J. Piggott	P	3244	1
+1904	west-newington	10478	J. D. Gilbert	P	3029	1
+1904	west-newington	10478	Dr. W. Lansdale	M	1380	0
+1904	west-newington	10478	Major H. C. Gibbons	M	1356	0
+1904	norwood	15257	N. W. Hubbard	P	4328	1
+1904	norwood	15257	G. Shrubsall	P	4233	1
+1904	norwood	15257	E. E. Micholls	M	3922	0
+1904	norwood	15257	A. Chapman	M	3887	0
+1904	paddington-north	11478	R. M. Beachcroft	M	3346	1
+1904	paddington-north	11478	J. Stephens	M	1916	1
+1904	paddington-north	11478	J. Blackwood	P	2393	0
+1904	paddington-north	11478	G. Turner	P	2172	0
+1904	paddington-south	8793	H. A. Harben	M	2608	1
+1904	paddington-south	8793	Sir G. D. Harris	M	2589	1
+1904	paddington-south	8793	J. Kennedy	P	524	0
+1904	paddington-south	8793	D. V. Owen	P	937	0
+1904	peckham	14373	G. C. Clarke	P	3935	1
+1904	peckham	14373	F. W. Verney	P	3871	1
+1904	peckham	14373	J. Somerville	M	1759	0
+1904	peckham	14373	Sir F. Fleming	M	1666	0
+1904	poplar	11058	W. Crooks	P	3565	1
+1904	poplar	11058	J. McDougall	P	3169	1
+1904	poplar	11058	Dr. T. H. Clarke		1891	0
+1904	rotherhithe	10330	A. Pomeroy	P	3108	1
+1904	rotherhithe	10330	H. J. Glanville	P	3029	1
+1904	rotherhithe	10330	J. W. Oake	M	1530	0
+1904	rotherhithe	10330	W. W. Tyler	M	1448	0
+1904	rotherhithe	10330	Rev. W. F. Brown	I	1160	0
+1904	st-george	3951	H. Gosling	P	1350	1
+1904	st-george	3951	J. Smith	P	1263	1
+1904	st-george	3951	G. Foster	M	1095	0
+1904	st-george	3951	H. H. Wells	M	1045	0
+1904	st-george-s-hanover-square	12729	H. J. Greenwood	M	3144	1
+1904	st-george-s-hanover-square	12729	Hon. F. D. Leigh	M	3113	1
+1904	st-george-s-hanover-square	12729	Lord O'Hagan	P	1911	0
+1904	st-george-s-hanover-square	12729	R. G. Webster	P	1852	0
+1904	st-george-s-hanover-square	12729	S. Copp	I	87	0
+1904	st-pancras-east	8713	T. H. W. Idris	P	2751	1
+1904	st-pancras-east	8713	E. Barnes	M	2731	1
+1904	st-pancras-east	8713	D. Hennessey	P	2558	0
+1904	st-pancras-north	8993	Dr. Beaton	P	3045	1
+1904	st-pancras-north	8993	D. S. Waterlow	P	3023	1
+1904	st-pancras-north	8993	W. Low	M	1737	0
+1904	st-pancras-north	8993	H. B. Betterton	M	1695	0
+1904	st-pancras-south	6904	Major H. Gastrell	M	1927	1
+1904	st-pancras-south	6904	F. Goldsmith	M	1808	1
+1904	st-pancras-south	6904	G. Bernard Shaw	P	1461	0
+1904	st-pancras-south	6904	Sir W. N. Geary	P	1412	0
+1904	st-pancras-west	8650	Sir W. J. Collins	P	2889	1
+1904	st-pancras-west	8650	Earl Carrington	P	2769	1
+1904	st-pancras-west	8650	A. F. Buxton	M	1352	0
+1904	st-pancras-west	8650	Dr. W. Smith	M	1341	0
+1904	st-pancras-west	8650	G. H. Baker	I	125	0
+1904	southwark-west	9077	T. Hunter	P	2285	1
+1904	southwark-west	9077	E. Bayley	P	2283	1
+1904	southwark-west	9077	J. T. Scriven	M	1550	0
+1904	southwark-west	9077	Dr. E. M. Judge	M	1547	0
+1904	stepney	10639	W. C. Steadman	P	2004	1
+1904	stepney	10639	Lord Malmesbury	M	1960	1
+1904	stepney	10639	T. M. Kirkwood	M	1942	0
+1904	stepney	10639	H. Spender	P	1874	0
+1904	strand	10639	Lieut.-Col. Probyn	M	2403	1
+1904	strand	10639	Lord Elcho	M	2312	1
+1904	strand	10639	Rev. A. W. Oxford	P	1220	0
+1904	strand	10639	J. S. Hyder	P	1098	0
+1904	walworth	8634	Russell Spokes	P	2484	1
+1904	walworth	8634	Rev. A. W. Jephson	P	2425	1
+1904	walworth	8634	J. E. Youlden	M	1754	0
+1904	walworth	8634	D. P. Smith	M	1641	0
+1904	wandsworth	34453	W. J. Lancaster	M	8526	1
+1904	wandsworth	34453	W. Hunt	M	8342	1
+1904	wandsworth	34453	R. T. Smith	P	6782	0
+1904	wandsworth	34453	E. P. Williams	P	6661	0
+1904	westminster	9460	R. W. Granville-Smith	M	2006	1
+1904	westminster	9460	C. Y. Sturge	M	1955	1
+1904	westminster	9460	C. L. Heywood	P	1192	0
+1904	westminster	9460	C. Duncan	P	1169	0
+1904	woolwich	19514	J. L. Jones	P	6982	1
+1904	woolwich	19514	F. Chambers	P	6869	1
+1904	woolwich	19514	E. A. H. Jay	M	4437	0
+1904	woolwich	19514	J. M. T. Dumphreys	M	4097	0
+1904	whitechapel	5474	H. H. Gordon	I	1616	1
+1904	whitechapel	5474	W. C. Johnson	P	1326	1
+1904	whitechapel	5474	G. L. Bruce	P	1163	0
+1904	whitechapel	5474	Rev. E. C. Carter	M	910	0
+1904	whitechapel	5474	Col. G. B. Hobart	M	710	0
+1907	battersea	22914	W. Davies	P	7250	1
+1907	battersea	22914	A. S. Benn	M	7217	1
+1907	battersea	22914	Ald. J. West	P	6669	0
+1907	battersea	22914	E. Evans	M	6591	0
+1907	battersea	22914	W. H. Humphreys	S	489	0
+1907	battersea	22914	J. Fitzgerald	S	98	0
+1907	battersea	22914	H. Jansen-Neuman	S	42	0
+1907	bermondsey	15648	Dr. A. Salter	P	4197	1
+1907	bermondsey	15648	A. A. Allen, M.P.	P	4195	1
+1907	bermondsey	15648	J. F. V. Fitzgerald	M	3474	0
+1907	bermondsey	15648	J. K. Foster	M	3389	0
+1907	north-east-bethnal-green	11027	Sir E. Cornwall	P	3877	1
+1907	north-east-bethnal-green	11027	E. Smith	P	3777	1
+1907	north-east-bethnal-green	11027	R. A. Robinson	M	1918	0
+1907	north-east-bethnal-green	11027	L. H. Lemon	M	1907	0
+1907	south-west-bethnal-green	9708	Rev. S. Headlam	P	2995	1
+1907	south-west-bethnal-green	9708	P. A. Harris	P	2762	1
+1907	south-west-bethnal-green	9708	R. S. Montefiore	M	1774	0
+1907	south-west-bethnal-green	9708	F. Brinsley-Harper	M	1643	0
+1907	south-west-bethnal-green	9708	J. H. Harley	S	512	0
+1907	bow-and-bromley	14745	W. S. M. Knight	M	3285	1
+1907	bow-and-bromley	14745	H. B. Rowe	M	3212	1
+1907	bow-and-bromley	14745	W. W. Bruce	P	3019	0
+1907	bow-and-bromley	14745	B. Cooper	P	3019	0
+1907	bow-and-bromley	14745	A. A. Watts	S	786	0
+1907	bow-and-bromley	14745	J. Stokes	S	783	0
+1907	bow-and-bromley	14745	S. A. Bird	I	159	0
+1907	brixton	13921	S. J. G. Hoare	M	4997	1
+1907	brixton	13921	W. Haydon	M	4928	1
+1907	brixton	13921	L. Sharp	P	3546	0
+1907	brixton	13921	L. Earle	P	3525	0
+1907	camberwell-north	18204	R. Bray	P	5499	1
+1907	camberwell-north	18204	H. R. Taylor	P	5365	1
+1907	camberwell-north	18204	A. Campbell	M	3545	0
+1907	camberwell-north	18204	W. Edmonds, jun.	M	3472	0
+1907	chelsea	16802	T. C. E. Goff	M	5877	1
+1907	chelsea	16802	R. C. Norman	M	5779	1
+1907	chelsea	16802	E. J. Horniman, M.P.	P	3977	0
+1907	chelsea	16802	J. Jeffery	P	3915	0
+1907	city-of-london	32399	Ald. F. S. Hanson	M	7603	1
+1907	city-of-london	32399	N. L. Cohen	M	7519	1
+1907	city-of-london	32399	W. H. Pownall	M	7484	1
+1907	city-of-london	32399	H. S. Sankey	M	7451	1
+1907	city-of-london	32399	C. R. Buxton	P	1768	0
+1907	city-of-london	32399	F. Debenham	P	1766	0
+1907	city-of-london	32399	G. S. Warmington	P	1719	0
+1907	city-of-london	32399	W. H. Dickinson	P	1646	0
+1907	clapham	28076	J. W. Domoney	M	10200	1
+1907	clapham	28076	Sir C. J. Cooke	M	10155	1
+1907	clapham	28076	A. Glegg	P	7320	0
+1907	clapham	28076	J. G. Kipling	P	7276	0
+1907	deptford	21549	S. Webb	P	6185	1
+1907	deptford	21549	R. C. Phillimore	P	6083	1
+1907	deptford	21549	H. G. Wells	M	5979	0
+1907	deptford	21549	W. F. Barrett	M	5899	0
+1907	deptford	21549	R. R. Fairbairn	I	182	0
+1907	dulwich	16864	H. C. Gooch	M	6689	1
+1907	dulwich	16864	F. Hall	M	6641	1
+1907	dulwich	16864	J. A. Hardy, M.P.	P	5020	0
+1907	dulwich	16864	A. S. Cohn	P	4844	0
+1907	central-finsbury	9733	Capt. Hon. F. Hemphill	P	2806	1
+1907	central-finsbury	9733	A. B. Russell	P	2791	1
+1907	central-finsbury	9733	Capt. G. S. Swinton	M	2508	0
+1907	central-finsbury	9733	M. Chapman	M	2507	0
+1907	east-finsbury	6687	Colonel A. C. Welby	M	2024	1
+1907	east-finsbury	6687	E. Howes	M	2014	1
+1907	east-finsbury	6687	T. Harvey	P	1988	0
+1907	east-finsbury	6687	F. A. Harrison	P	1988	0
+1907	fulham	26409	C. Cobb	M	8413	1
+1907	fulham	26409	E. J. Easton	M	8301	1
+1907	fulham	26409	W. L. Taylor	P	4774	0
+1907	fulham	26409	J. J. Stephenson	L	3139	0
+1907	fulham	26409	J. R. Wall	S	773	0
+1907	greenwich	15987	J. H. Benn	M	6217	1
+1907	greenwich	15987	Lord A. J. Thynne	M	5991	1
+1907	greenwich	15987	D. McCall	P	3727	0
+1907	greenwich	15987	Rev. J. Wilson	P	3545	0
+1907	hackney-central	12809	W. B. Stewart	M	3671	1
+1907	hackney-central	12809	G. Billings	M	3620	1
+1907	hackney-central	12809	A. J. Shepheard	P	3608	0
+1907	hackney-central	12809	W. B. Yates	P	3591	0
+1907	hackney-central	12809	E. C. Fairchild	S	283	0
+1907	hackney-central	12809	F. V. Fisher	S	265	0
+1907	hackney-north	16990	W. H. Key	M	6205	1
+1907	hackney-north	16990	W. R. Greene	M	6153	1
+1907	hackney-north	16990	G. Lampard	P	4617	0
+1907	hackney-north	16990	Ald. E. C. Price	P	4530	0
+1907	hackney-south	18114	T. Chapman	P	5225	1
+1907	hackney-south	18114	W. A. Casson	P	5138	1
+1907	hackney-south	18114	C. Hinckley	M	3325	0
+1907	hackney-south	18114	G. K. Naylor	M	3285	0
+1907	haggerston	10233	Hon. R. Guinness	M	3307	1
+1907	haggerston	10233	Hon. G. Johnstone	M	3131	1
+1907	haggerston	10233	Lord Monkswell	P	3085	0
+1907	haggerston	10233	Mr. S. Gee	P	3026	0
+1907	hammersmith	17949	J. Brandon	M	5850	1
+1907	hammersmith	17949	E. Collins	M	5839	1
+1907	hammersmith	17949	N. W. Shairp	P	2755	0
+1907	hammersmith	17949	E. Camp	P	2709	0
+1907	hammersmith	17949	Dr. Davidson	S	897	0
+1907	hammersmith	17949	J. T. Westcott	S	737	0
+1907	hampstead	15012	J. T. Taylor	M	5577	1
+1907	hampstead	15012	W. Reynolds	M	5508	1
+1907	hampstead	15012	G. L. Bruce	P	3894	0
+1907	hampstead	15012	C. A. McCurdy	P	2878	0
+1907	holborn	12396	E. E. Wild	M	4524	1
+1907	holborn	12396	Hon. H. Lygon	M	4030	1
+1907	holborn	12396	H. D. Woodcock	P	1629	0
+1907	hoxton	12019	Dr. J. Davies	M	3272	1
+1907	hoxton	12019	E. Grey	M	3225	1
+1907	hoxton	12019	H. Ward	P	3112	0
+1907	hoxton	12019	G. Wallis	P	3065	0
+1907	islington-east	15439	C. A. M. Barlow	M	4430	1
+1907	islington-east	15439	P. E. Pilditch	M	4402	1
+1907	islington-east	15439	Ald. E. Smallwood	P	4291	0
+1907	islington-east	15439	A. A. Thomas	P	4257	0
+1907	islington-north	16775	F. L. Dove	M	4924	1
+1907	islington-north	16775	C. K. Murchison	M	4797	1
+1907	islington-north	16775	H. G. Chancellor	P	4200	0
+1907	islington-north	16775	H. J. Glanville	P	4192	0
+1907	islington-south	11465	G. Dew	P	2996	1
+1907	islington-south	11465	H. J. Williams	P	2929	1
+1907	islington-south	11465	S. Lambert	M	2217	0
+1907	islington-south	11465	C. Moffatt	M	2076	0
+1907	islington-south	11465	G. F. Elliott	I	850	0
+1907	islington-south	11465	E. J. James	I	179	0
+1907	islington-west	10060	I. Salmon	M	3326	1
+1907	islington-west	10060	H. J. Clarke	M	3300	1
+1907	islington-west	10060	R. C. Lambert	P	2933	0
+1907	islington-west	10060	A. J. Mundella	P	2900	0
+1907	kennington	11842	Sir J. W. Benn, M.P.	P	3424	1
+1907	kennington	11842	Rev. E. Denny	P	3326	1
+1907	kennington	11842	J. F. Budge	M	2718	0
+1907	kennington	11842	Sir W. H. Porter	M	2666	0
+1907	kennington	11842	J. G. Butler	S	281	0
+1907	kennington	11842	F. Knee	S	235	0
+1907	kensington-north	14770	D. Davis	M	4418	1
+1907	kensington-north	14770	Major C. L. Skinner	M	4382	1
+1907	kensington-north	14770	H. L. Jephson	P	3181	0
+1907	kensington-north	14770	W. Pope	P	3170	0
+1907	kensington-south	14539	A. R. Robinson	M	5869	1
+1907	kensington-south	14539	Dr. E. B. Forman	M	5834	1
+1907	kensington-south	14539	V. Aronson	P	788	0
+1907	kensington-south	14539	Hon. W. J. James	P	770	0
+1907	lambeth-north	8237	F. Briant	P	2360	1
+1907	lambeth-north	8237	F. Smith	L	2249	1
+1907	lambeth-north	8237	J. Williams	M	2080	0
+1907	lambeth-north	8237	G. Hinds	M	2077	0
+1907	lewisham	28217	Lord Lewisham	M	11028	1
+1907	lewisham	28217	A. Pownall	M	10818	1
+1907	lewisham	28217	J. W. Cleland, M.P.	P	7004	0
+1907	lewisham	28217	Hon. N. Primrose	P	6893	0
+1907	lewisham	28217	A. Gee	L	118	0
+1907	limehouse	8022	C. Jackson	M	2141	1
+1907	limehouse	8022	J. L. Williams	M	2026	1
+1907	limehouse	8022	A. L. Leon	P	1957	0
+1907	limehouse	8022	T. L. Knight	P	1935	0
+1907	mile-end	6839	R. H. Montgomery	M	2023	1
+1907	mile-end	6839	E. H. Coumbe	M	2011	1
+1907	mile-end	6839	R. V. Harcourt	P	1988	0
+1907	mile-end	6839	Rev. T. Warren	P	1925	0
+1907	west-newington	12483	E. Spicer	P	3778	1
+1907	west-newington	12483	J. D. Gilbert	P	3759	1
+1907	west-newington	12483	H. Jarvis	M	2700	0
+1907	west-newington	12483	A. Waddell	M	2075	0
+1907	norwood	16278	C. U. Fisher	M	6585	1
+1907	norwood	16278	F. St. J. Morrell	M	6539	1
+1907	norwood	16278	N. W. Hubbard	P	4174	0
+1907	norwood	16278	G. Shrubsall	P	4120	0
+1907	paddington-north	15664	Hon. W. Guinness	M	4711	1
+1907	paddington-north	15664	J. H. Hunter	M	4597	1
+1907	paddington-north	15664	J. Fairbanks	P	3607	0
+1907	paddington-north	15664	G. C. Moberley	P	3453	0
+1907	paddington-south	9582	Sir R. Beachcroft	M	3763	1
+1907	paddington-south	9582	H. P. Harris	M	3709	1
+1907	paddington-south	9582	J. S. Holmes	P	848	0
+1907	paddington-south	9582	A. Y. Mayell	P	816	0
+1907	peckham	18538	T. Gautrey	P	4659	1
+1907	peckham	18538	W. L. Dowton	M	4426	1
+1907	peckham	18538	D. C. Preston	M	4379	0
+1907	peckham	18538	R. Steven	P	4262	0
+1907	peckham	18538	W. T. Kelly	S	499	0
+1907	poplar	13263	W. Crooks, M.P.	P	3504	1
+1907	poplar	13263	Sir J. McDougall	P	3476	1
+1907	poplar	13263	Dr. T. H. Clark	M	2778	0
+1907	poplar	13263	Colonel A. Maude	M	2579	0
+1907	rotherhithe	13199	A. Pomeroy	P	3693	1
+1907	rotherhithe	13199	H. J. Glanville	P	3663	1
+1907	rotherhithe	13199	F. Freemantle	M	3365	0
+1907	rotherhithe	13199	F. E. Eddis	M	3259	0
+1907	st-george-s-hanover-square	13477	Lord Cheylesmore	M	5445	1
+1907	st-george-s-hanover-square	13477	H. J. Greenwood	M	5375	1
+1907	st-george-s-hanover-square	13477	Earl of Craven	P	1384	0
+1907	st-george-s-hanover-square	13477	T. E. Therris	P	1348	0
+1907	st-george	4751	H. Gosling	P	1183	1
+1907	st-george	4751	P. C. C. Simmonds	M	1104	1
+1907	st-george	4751	J. Smith	P	1035	0
+1907	st-george	4751	T. King	I	952	0
+1907	st-george	4751	W. R. Smith	M	881	0
+1907	st-george	4751	J. W. Lynch	I	632	0
+1907	east-marylebone	9411	Lord Duncannon	M	3612	1
+1907	east-marylebone	9411	J. Boyton	M	3562	1
+1907	east-marylebone	9411	Dr. F. Little	P	2446	0
+1907	east-marylebone	9411	F. Gill	P	467	0
+1907	west-marylebone	12255	Lord Bentinck	M	4683	1
+1907	west-marylebone	12255	Earl of Kerry	M	4625	1
+1907	west-marylebone	12255	J. Lewis	P	2434	0
+1907	west-marylebone	12255	Dr. J. Searson	P	2330	0
+1907	st-pancras-east	12470	A. W. Claremont	P	3482	1
+1907	st-pancras-east	12470	Rev. F. Hastings	P	3410	1
+1907	st-pancras-east	12470	E. Barnes	M	3181	0
+1907	st-pancras-east	12470	T. A. Organ	M	3005	0
+1907	st-pancras-east	12470	G. Horne	L	295	0
+1907	st-pancras-north	12162	D. S. Waterlow, M.P.	P	3847	1
+1907	st-pancras-north	12162	Dr. Beaton	P	3824	1
+1907	st-pancras-north	12162	E. J. King	M	3526	0
+1907	st-pancras-north	12162	J. A. Pakenham	M	3501	0
+1907	st-pancras-south	7972	G. Alexander	M	2963	1
+1907	st-pancras-south	7972	F. Goldsmith	M	2897	1
+1907	st-pancras-south	7972	Rev. S. Horne	P	1613	0
+1907	st-pancras-south	7972	C. S. Giddins	P	1583	0
+1907	st-pancras-west	10913	P. Vosper	M	3504	1
+1907	st-pancras-west	10913	F. Cassell	M	3471	1
+1907	st-pancras-west	10913	H. Cohen	P	2461	0
+1907	st-pancras-west	10913	J. C. S. Hanham	P	2442	0
+1907	southwark-west	10726	T. Hunter	P	2998	1
+1907	southwark-west	10726	A. Wilson	P	2953	1
+1907	southwark-west	10726	J. Scriven	M	2746	0
+1907	southwark-west	10726	F. Gillett	M	2649	0
+1907	stepney	6584	A. O. Goodrich	M	2366	1
+1907	stepney	6584	F. L. Harris	M	2292	1
+1907	stepney	6584	L. S. Stettaver	P	1485	0
+1907	stepney	6584	C. Watson	P	1386	0
+1907	strand	10475	Lieut.-Col. A. Probyn	M	3580	1
+1907	strand	10475	Lord Elcho	M	3558	1
+1907	strand	10475	S. F. H. Lamb	P	903	0
+1907	strand	10475	Sir W. Howell	P	895	0
+1907	walworth	11046	C. A. Dawes	P	2823	1
+1907	walworth	11046	C. Jesson	P	2819	1
+1907	walworth	11046	F. Oldfield	M	2337	0
+1907	walworth	11046	J. H. C. Sproule	M	2235	0
+1907	walworth	11046	J. Clarke	S	187	0
+1907	wandsworth	43269	Sir J. W. Lancaster	M	15700	1
+1907	wandsworth	43269	W. Hunt	M	14535	1
+1907	wandsworth	43269	F. G. Kellaway	P	9628	0
+1907	westminster	10664	Hon. W. R. Peel	M	3419	1
+1907	westminster	10664	C. Y. Sturge	M	3392	1
+1907	westminster	10664	W. B. Campbell	P	1299	0
+1907	westminster	10664	E. Herring	P	1298	0
+1907	whitechapel	5630	W. C. Johnson	P	1756	1
+1907	whitechapel	5630	H. H. Gordon	I	1627	1
+1907	whitechapel	5630	E. Hodsoll	M	1211	0
+1907	whitechapel	5630	C. Wertheimer	M	980	0
+1907	whitechapel	5630	A. W. Elkin	I	773	0
+1907	woolwich	22830	J. Squires	M	8904	1
+1907	woolwich	22830	E. A. H. Jay	M	8677	1
+1907	woolwich	22830	Rev. Jenkins-Jones	P	7880	0
+1907	woolwich	22830	G. Lansbury	P	7611	0
