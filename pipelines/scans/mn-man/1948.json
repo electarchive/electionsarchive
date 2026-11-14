@@ -23,7 +23,9 @@
       "day": "1948-11-02",
       "special": false,
       "state": "MN",
-      "district": null
+      "district": null,
+      "accept": "The Manual's county figures for Joseph H. Ball, checked against the scan, add up to 482,801, 3,000 short of its printed total of 485,801, and those for Vincent R. Dunne to 4,950 against 4,951; the statewide default keeps the held totals.",
+      "keep_default": true
     },
     "governor": {
       "year": 1948,
@@ -31,7 +33,9 @@
       "day": "1948-11-02",
       "special": false,
       "state": "MN",
-      "district": null
+      "district": null,
+      "accept": "The Manual's county figures for Charles L. Halsted, checked against the scan, add up to 545,746, 20 short of its printed total of 545,766; the statewide default keeps the held totals.",
+      "keep_default": true
     }
   },
   "pages": [
@@ -181,7 +185,7 @@
       "crop": [
         0.538,
         0.041,
-        0.64,
+        0.626,
         0.947
       ],
       "hint": "Read only the table headed 'Governor (general election 1948)'; ignore any other table visible in the image.",
