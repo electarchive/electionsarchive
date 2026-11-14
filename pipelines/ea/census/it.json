@@ -2954,7 +2954,8 @@
         "unit": "polity",
         "fine": [
           "it.sezione"
-        ]
+        ],
+        "cycle": true
       },
       "finest_note": "comune; polling section in recent Eligendo files",
       "note": "Every comune elects its council for five years (four from 1993 to 1999) on one Sunday of the ordinary round between 15 April and 15 June, or the next year's round after an early dissolution, so each comune keeps its own cycle and about a fifth vote each year. Comuni up to 15,000 inhabitants: a single round, two-thirds of the seats to the winning mayor's list; larger ones: a majority bonus to the mayor's coalition. Sicily, Sardinia, Friuli-Venezia Giulia, Trentino-Alto Adige, and the Aosta Valley run their own municipal elections.",
@@ -3072,7 +3073,8 @@
         "unit": "polity",
         "fine": [
           "it.sezione"
-        ]
+        ],
+        "cycle": true
       },
       "note": "Elected directly with the council since Law 81/1993 (before, by the council). Comuni up to 15,000 inhabitants: one round by plurality, a tie going to a runoff (TUEL art. 71); above 15,000: absolute majority, else a runoff between the top two on the second Sunday after (art. 72). Sicily and the other special-statute regions set their own thresholds.",
       "source": "nir_l81_1993",
@@ -3187,7 +3189,8 @@
       "goal": "local",
       "contests_per_unit": 2,
       "measure": {
-        "unit": "polity"
+        "unit": "polity",
+        "cycle": true
       },
       "note": "Comuni above 250,000 inhabitants, and every metropolitan capital, must divide into districts (TUEL art. 17): Rome's 15 municipi, Milan's 9, Naples' 10, Turin's 8 circoscrizioni, Genoa's 9 municipi, Bologna's 6 quartieri, Florence's 5, Venice's 6 municipalità, and others. Their councils and presidents are elected with the city council; smaller comuni abolished theirs in 2010.",
       "source": "nir_tuel",
