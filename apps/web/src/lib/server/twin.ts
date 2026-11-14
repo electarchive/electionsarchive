@@ -646,7 +646,11 @@ export async function twin(
     return null;
   }
   const varies = asked == null ? "Accept, User-Agent" : "Accept";
-  if (/^\/(?:agents|proposals|bounties|recent|changelog)$/.test(url.pathname)) {
+  if (
+    /^\/(?:agents|proposals|bounties|recent|changelog|downloads(?:\/\d{4}\.\d{2}(?:\.\d{2})?)?)$/.test(
+      url.pathname,
+    )
+  ) {
     const sibling = await fetch(`${url.pathname}.${format}${url.search}`, {
       method: request.method,
     });
@@ -658,7 +662,7 @@ export async function twin(
     return response;
   }
   if (
-    /^\/(?:api|rpc|lab|_app|llms\.txt|robots\.txt|sitemap\.xml|sitemaps|og|agents|proposals|bounties|recent|watchlist|history|changelog)(?:\/|\.|$)/.test(
+    /^\/(?:api|rpc|lab|_app|llms\.txt|robots\.txt|sitemap\.xml|sitemaps|og|agents|proposals|bounties|recent|watchlist|history|changelog|downloads)(?:\/|\.|$)/.test(
       url.pathname,
     )
   ) {

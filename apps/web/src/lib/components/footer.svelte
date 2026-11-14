@@ -27,6 +27,7 @@
       title: m.footer_data(),
       links: [
         { href: resolve("/sources"), label: m.sources_title() },
+        { href: resolve("/downloads"), label: m.downloads_title() },
         {
           href: resolve("/[slug=project]", { slug: "license" }),
           label: m.license_title(),
@@ -207,8 +208,9 @@
         <span class="flex items-center gap-2">
           {#if site.release.doi == null}
             <a
-              href="{REPOSITORY}/releases/tag/data-{site.release.calver}"
-              rel="external"
+              href={resolve("/downloads/[version=calver]", {
+                version: site.release.calver,
+              })}
               class="underline decoration-transparent underline-offset-4 hover:text-foreground hover:decoration-current focus-visible:outline-2 focus-visible:outline-ring"
               aria-label={m.footer_release_download({
                 version: site.release.calver,

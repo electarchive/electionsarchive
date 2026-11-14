@@ -6,10 +6,12 @@ import { createRequire } from "node:module";
 import satori from "satori";
 import { render as markup } from "svelte/server";
 import AgentsScene from "#lib/components/agents-scene.svelte";
+import { countryName, describe } from "#lib/downloads.js";
 import { date, percent } from "#lib/format.js";
 import { m } from "#lib/paraglide/messages.js";
 import { side } from "#lib/party.js";
 import { remember } from "#lib/server/cache.js";
+import { latestCalver, release } from "#lib/server/downloads.js";
 import { archive, home, party, person } from "#lib/server/pages.js";
 import type { RequestHandler } from "./$types";
 
@@ -85,6 +87,34 @@ async function card(segments: Array<string>, search: URLSearchParams) {
       title: m.home_intro(),
       line: m.home_elections({ count: total }),
       bars: [],
+    };
+  }
+  if (head === "downloads" && rest.length <= 1) {
+    const calver = rest[0] ?? (await latestCalver());
+    const found = calver == null ? null : await release(calver);
+    const countries = found?.summary?.countries ?? [];
+    let total = 0;
+    for (const country of countries) {
+      total += country.results;
+    }
+    return {
+      kicker: m.wordmark(),
+      title:
+        rest[0] == null
+          ? m.downloads_title()
+          : m.downloads_release_title({ version: rest[0] }),
+      line: found == null ? m.downloads_lede() : describe(found),
+      bars:
+        total === 0
+          ? []
+          : countries
+              .slice(0, 3)
+              .map((country) => ({
+                key: country.code,
+                label: countryName(country.code, country.name),
+                color: null,
+                share: country.results / total,
+              })),
     };
   }
   if (head === "people" && rest.length === 1) {
