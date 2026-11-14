@@ -24,6 +24,7 @@ ITEMS = {
     "PRAWO I SPRAWIEDLIWOŚĆ": "Q156874",
     "KONFEDERACJA WOLNOŚĆ I NIEPODLEGŁOŚĆ": "Q61568052",
     "PLATFORMA OBYWATELSKA RP": "Q156868",
+    "WYBORCÓW PLATFORMA OBYWATELSKA": "Q156868",
     "„KUKIZ'15”": "Q20740347",
 }
 METHOD = (
@@ -51,6 +52,7 @@ SUMMED_YEARS = {2007, 2011}
 BASE = "https://danewyborcze.kbw.gov.pl/dane"
 PARSED = raw.parsed(SOURCE)
 ELECTIONS = {
+    2001: date(2001, 9, 23),
     2005: date(2005, 9, 25),
     2007: date(2007, 10, 21),
     2011: date(2011, 10, 9),
@@ -59,6 +61,12 @@ ELECTIONS = {
     2023: date(2023, 10, 15),
 }
 FILES: dict[int, dict[str, str | tuple[str, ...]]] = {
+    2001: {
+        "districts": "sejm/okr%c4%99gi2001sejm.xls",
+        "candidates": "sejm/kandsejm2001kom.xls",
+        "unit_lists": "sejm/sejm2001-lis-obw.xls",
+        "district_lists": "sejm/okr-lis-2001.xls",
+    },
     2005: {
         "districts": "sejm/okregi2005sejm.xls",
         "candidates": "sejm/kandsejm2005kom.xls",
@@ -170,9 +178,10 @@ def gmina(column: str) -> pl.Expr:
     return pl.coalesce(pl.col(column).str.zfill(6), pl.col("Powiat")).alias("gmina")
 
 
-def dhondt(votes: dict[int, int], seats: int) -> Counter[int]:
+def dhondt(votes: dict[int, int], seats: int, divisors: list[float] | None = None) -> Counter[int]:
+    divisors = divisors or list(range(1, seats + 1))
     quotients = sorted(
-        ((count / divisor, number) for number, count in votes.items() for divisor in range(1, seats + 1)), reverse=True
+        ((count / divisor, number) for number, count in votes.items() for divisor in divisors), reverse=True
     )
     return Counter(number for _, number in quotients[:seats])
 
@@ -277,6 +286,97 @@ def okregi(year: int) -> pl.DataFrame:
         pl.col(seat).alias("seat"),
         pl.col(boundary).alias("boundary"),
     )
+
+
+def load_2001() -> dict[str, pl.DataFrame]:
+    year = 2001
+    gender = {"K": "Kobieta", "M": "Mężczyzna"}
+    candidates = table(year, "candidates").select(
+        count("Okręg").alias("district"),
+        count("Lista").alias("list"),
+        count("Pozycja").alias("position"),
+        pl.concat_str(pl.col("1. imię"), pl.col("2. imię"), pl.col("Nazwisko"), separator=" ", ignore_nulls=True)
+        .str.replace_all(r"\s+", " ")
+        .alias("name"),
+        pl.col("Płeć").replace_strict(gender).alias("sex"),
+        pl.col("Zawód").alias("occupation"),
+        pl.col("Miejsce\nzamieszkania").alias("residence"),
+        pl.col("Partia").alias("membership"),
+        pl.lit(None, pl.String).alias("support"),
+        count("Głosy").alias("votes"),
+        (pl.col("Mandat") == "T").alias("elected"),
+        pl.col("Komitet wyborczy").alias("committee"),
+    )
+    names = {(d, n): c for d, n, c in candidates.select("district", "list", "committee").unique().iter_rows()}
+
+    def label(row: dict[str, object]) -> str | None:
+        return names.get((row["district"], int(str(row["column"]).split(" - ", 1)[0])))
+
+    def committees(frame: pl.DataFrame, index: list[str], columns: list[str]) -> pl.DataFrame:
+        return (
+            frame.select(*index, "district", *(count(column) for column in columns))
+            .unpivot(index=[*index, "district"], variable_name="column", value_name="votes")
+            .filter(pl.col("votes").is_not_null())
+            .with_columns(pl.struct("district", "column").map_elements(label, pl.String).alias("committee"))
+            .filter(pl.col("committee").is_not_null() | (pl.col("votes") != 0))
+            .group_by(*index, "district", "committee")
+            .agg(pl.col("votes").sum())
+        )
+
+    results = table(year, "unit_lists")
+    columns = results.columns[results.columns.index("Głosy ważne z kart ważnych") + 1 :]
+    registry = results.select(
+        teryt("Kod gminy"),
+        count("Nr obw.").alias("commission"),
+        pl.col("Typ").alias("kind"),
+        pl.col("Teren").alias("area"),
+        pl.lit(None, pl.String).alias("boundary"),
+    )
+    results = results.with_columns(
+        teryt("Kod gminy"), count("Nr obw.").alias("commission"), count("Nr okr.").alias("district")
+    )
+    unit = ["gmina", "commission"]
+    long = committees(results, unit, columns)
+    results = results.select(
+        *unit,
+        "district",
+        pl.col("Adres").alias("seat"),
+        count("Uprawnieni do głosowania").alias("electors"),
+        count("Wydane karty (frekwencja)").alias("issued"),
+        count("Karty wyjęte z urny").alias("cast"),
+        count("Karty nieważne").alias("invalid_ballots"),
+        count("Karty ważne").alias("valid_ballots"),
+        count("Głosy nieważne z kart ważnych").alias("invalid"),
+        count("Głosy ważne z kart ważnych").alias("valid"),
+    ).join(long.pivot("committee", index=unit, values="votes", aggregate_function="first"), on=unit, how="left")
+    totals = table(year, "district_lists").with_columns(count("Nr okr.").alias("district"))
+    lists = committees(totals, [], [column for column in totals.columns if re.match(r"\d+ - ", column)])
+    lists = lists.with_columns(
+        pl.struct("district", "committee")
+        .map_elements(
+            lambda row: next(n for (d, n), c in names.items() if d == row["district"] and c == row["committee"]),
+            pl.Int64,
+        )
+        .alias("list")
+    )
+    lists = seated(lists, candidates)
+    sizes = table(year, "districts")
+    districts = sizes.filter(pl.col("Nr\nokręgu").str.contains(r"^\d+$")).select(
+        count("Nr\nokręgu").alias("district"),
+        count("Liczba\nmandatów").alias("magnitude"),
+        pl.col("Siedziba Okręgowej Komisji Wyborczej").alias("seat"),
+        pl.lit(None, pl.String).alias("boundary"),
+    )
+    off = districts.join(lists.group_by("district").agg(pl.col("seats").sum()), on="district")
+    if off.height != 41 or (off["seats"] != off["magnitude"]).any():
+        raise ValueError("elected members differ from the constituency sizes")
+    return {
+        "results": results,
+        "lists": lists,
+        "districts": districts,
+        "candidates": candidates.drop("committee"),
+        "registry": registry,
+    }
 
 
 def load_2005() -> dict[str, pl.DataFrame]:
@@ -763,9 +863,10 @@ def check(year: int, loaded: dict[str, pl.DataFrame]) -> dict[str, pl.DataFrame]
         raise ValueError("seats do not sum to 460")
     for row in districts.iter_rows(named=True):
         part = lists.filter(pl.col("district") == row["district"], pl.col("qualified"))
-        won = dhondt(dict(zip(part["list"], part["votes"])), row["magnitude"])
+        divisors = [1.4, *range(3, 2 * row["magnitude"], 2)] if year == 2001 else None
+        won = dhondt(dict(zip(part["list"], part["votes"])), row["magnitude"], divisors)
         if any(won[list_] != seats for list_, seats in zip(part["list"], part["seats"])):
-            print(f"{year} district {row['district']}: D'Hondt does not give the declared seats")
+            print(f"{year} district {row['district']}: the divisor method does not give the declared seats")
     seated = candidates.group_by("district", "list").agg(pl.col("elected").sum().alias("won"))
     off = lists.filter(pl.col("seats") > 0).join(seated, on=["district", "list"], how="left")
     off = off.filter(pl.col("won").fill_null(0) != pl.col("seats"))
@@ -811,7 +912,15 @@ def check(year: int, loaded: dict[str, pl.DataFrame]) -> dict[str, pl.DataFrame]
     }
 
 
-LOADERS = {2005: load_2005, 2007: load_2007, 2011: load_2011, 2015: load_2015, 2019: load_2019, 2023: load_2023}
+LOADERS = {
+    2001: load_2001,
+    2005: load_2005,
+    2007: load_2007,
+    2011: load_2011,
+    2015: load_2015,
+    2019: load_2019,
+    2023: load_2023,
+}
 
 
 def parse() -> None:
@@ -872,30 +981,39 @@ def emit() -> Path:
             if conn.execute("select 1 from scheme where code = %s", (code,)).fetchone() is None:
                 cs.add("scheme", code=code, polity_id=poland, kind=kind, rank=rank, noun=noun)
 
-        system = cs.key("pl.electoral_system", "sejm")
-        cs.add(
-            "electoral_system",
-            id=system,
-            polity_id=poland,
-            rules={
+        if day.year == 2001:
+            system = cs.key("pl.electoral_system", "sejm-2001")
+            rules = {
+                "formula": "modified_sainte_lague",
+                "firstDivisor": 1.4,
+                "lists": {"order": "open", "vacancy": "next_on_list"},
+                "threshold": {"level": "list", "scope": "contest", "percent": 5},
+            }
+            label = "Sejm open-list modified Sainte-Laguë system (2001)"
+            body = (
+                "460 members in 41 constituencies of 7 to 19 seats, by the modified Sainte-Laguë method (divisors "
+                "1.4, 3, 5, and so on) over lists that pass a national threshold of 5 percent for a committee and "
+                "8 percent for a coalition (national minority committees are exempt), with voters choosing one "
+                "candidate on one list (Ordynacja wyborcza do Sejmu i Senatu of 12 April 2001). The threshold "
+                "stored is the committee figure."
+            )
+        else:
+            system = cs.key("pl.electoral_system", "sejm")
+            rules = {
                 "formula": "dhondt",
                 "lists": {"order": "open", "vacancy": "next_on_list"},
                 "threshold": {"level": "list", "scope": "contest", "percent": 5},
-            },
-            rules_version=1,
-        )
-        name(system, "Sejm open-list D'Hondt system")
-        cs.add(
-            "note",
-            entity_id=system,
-            kind="methodology",
-            body_md=(
+            }
+            label = "Sejm open-list D'Hondt system"
+            body = (
                 "460 members in 41 constituencies of 7 to 20 seats, by the D'Hondt method over lists that pass a "
                 "national threshold of 5 percent for a committee and 8 percent for a coalition (national minority "
                 "committees are exempt), with voters choosing one candidate on one list (Kodeks wyborczy, arts. "
                 "196-206). The threshold stored is the committee figure."
-            ),
-        )
+            )
+        cs.add("electoral_system", id=system, polity_id=poland, rules=rules, rules_version=1)
+        name(system, label)
+        cs.add("note", entity_id=system, kind="methodology", body_md=body)
 
         by_item = dict(
             conn.execute(
@@ -912,7 +1030,7 @@ def emit() -> Path:
             label = " ".join(committee.split())
             if label in parties:
                 return parties[label]
-            item = next((code for text, code in ITEMS.items() if label.upper().endswith(text)), None)
+            item = next((code for text, code in ITEMS.items() if label.upper().rstrip('"').endswith(text)), None)
             if item is not None and item in by_item:
                 party = parties[label] = by_item[item]
                 return party
