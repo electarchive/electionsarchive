@@ -347,7 +347,7 @@ COUNCILS["E06000059/2024-06"] = {
         "https://www.dorsetcouncil.gov.uk/documents/d/guest/parish-and-town-councils-notices-of-uncontested-elections-20-june-2024-1"
     ],
     "header": 400,
-    "footnote": True,
+    "ends": ("England,",),
     "reader": "notices+dorset",
 }
 WARRINGTON = "https://www.warrington.gov.uk"
@@ -417,6 +417,36 @@ COUNCILS["E08000018/2024"] = {
         "https://www.rotherham.gov.uk/downloads/file/3608/ulley-parish-council-notice-of-uncontested-election",
     ],
     "reader": "rotherham",
+}
+STROUD = "https://www.stroud.gov.uk/media"
+COUNCILS["E07000082/2024"] = {
+    "day": date(2024, 5, 2),
+    "publisher": "Stroud District Council",
+    "title": "Parish election results, and the combined notice of uncontested election, 2 May 2024",
+    "url": "https://www.stroud.gov.uk/council-and-democracy/elections/election-results/",
+    "files": [f"{STROUD}/2o0dycpl/combined-notice-of-uncontested-election.pdf"],
+    "polls": [
+        f"{STROUD}/ufweuaaa/cainscross-cainscross-ward-town-council.pdf",
+        f"{STROUD}/cvapf220/stroud-trinity-ward-town-council.pdf",
+        f"{STROUD}/d3to0c3r/stroud-central-ward-town-council.pdf",
+        f"{STROUD}/zzmczucj/stroud-slade-ward-town-council.pdf",
+        f"{STROUD}/5gpbhu0g/stonehouse-north-ward-town-council.pdf",
+        f"{STROUD}/o3vllwm0/stroud-farmhill-and-paganhill-ward-town-council.pdf",
+    ],
+    "areas": {
+        "Cainscross (Cainscross Ward) Town Council": ("Cainscross", "Cainscross"),
+        "Stroud (Trinity Ward) Town Council": ("Stroud", "Trinity"),
+        "Stroud (Central Ward) Town Council": ("Stroud", "Central"),
+        "Stroud (Slade Ward) Town Council": ("Stroud", "Slade"),
+        "Stonehouse (North Ward) Town Council": ("Stonehouse", "North"),
+        "Stroud (Farmhill and Paganhill Ward) Town Council": ("Stroud", "Farmhill and Paganhill"),
+    },
+    "wards": {("Brimscombe and Thrupp", None): "Brimscombe and Thrupp"},
+    "ends": ("As", "There"),
+    "order": "comma",
+    "anchored": "comma",
+    "bracketed": True,
+    "reader": "notices+declarations",
 }
 STRATFORD = "https://www.stratford.gov.uk/doc"
 COUNCILS["E07000221/2023"] = {
@@ -519,6 +549,8 @@ PARTIES: dict[str, str | None] = {
     "Homeland Party": "Q119285871",
 }
 ALIASES = {
+    ("E07000082", "Bisley"): "Bisley-with-Lypiatt",
+    ("E07000082", "Randwick"): "Randwick and Westrip",
     ("E07000011", "Kimbolton & Stonely"): "Kimbolton",
     ("E07000011", "Leighton Bromswold"): "Leighton",
     ("E07000181", "Asthal"): "Asthall",
@@ -729,7 +761,7 @@ def surname_first(printed: str) -> str:
 
 def area_of(page: str) -> tuple[str, str, str | None] | None:
     heading = re.search(
-        r"Election of (?:a )?(?:(Parish|Town|City) )?Councillors? for(?: the)?\s*\n\s*((?:.+\n\s*){0,2}?.+?)(?:\s*\n\s*|\s+)on(?=\s*\n|\s+(?:\d|Thursday))",
+        r"Election of (?:a )?(?:(Parish|Town|City) )?Councillors? for(?: the)?\s*\n\s*((?:.+\n\s*){0,2}?.+?)(?:(?:\s*\n\s*|\s+)on(?=\s*\n|\s+(?:\d|Thursday))|\s*\n\s*(?=Thursday \d))",
         page,
     )
     if heading is None:
@@ -750,7 +782,9 @@ def area_of(page: str) -> tuple[str, str, str | None] | None:
         return heading.group(1) or "Parish", warded.group(1), warded.group(2)
     area = area.removesuffix(" Parish")
     ward = re.fullmatch(r"(.+?) \((.+)\)", area)
-    return heading.group(1) or "Parish", *((ward.group(1), ward.group(2)) if ward else (area, None))
+    return heading.group(1) or "Parish", *(
+        (ward.group(1), ward.group(2).removesuffix(" Ward")) if ward else (area, None)
+    )
 
 
 def notices(lad: str, council: dict) -> list[dict]:
@@ -806,6 +840,7 @@ def notices(lad: str, council: dict) -> list[dict]:
             else:
                 style, parish, ward = heading
                 parish, ward = council.get("areas", {}).get(parish, (parish, ward))
+                ward = council.get("wards", {}).get((parish, ward), ward)
                 header = max(
                     y for x, y, word in words if word == "Candidate" and x < 260 and y < council.get("header", 300)
                 )
@@ -829,7 +864,7 @@ def notices(lad: str, council: dict) -> list[dict]:
                 reads.append(read)
             candidates: list[dict] = read["candidates"]
             if read["uncontested"]:
-                ends = ("Dated", "Printed", "England,") if council.get("footnote") else ("Dated", "Printed")
+                ends = ("Dated", "Printed", *council.get("ends", ()))
                 bottom = min((y - 3 for x, y, word in words if word.startswith(ends)), default=9999.0)
                 for line in rows_of(words, header + 6, bottom):
                     name = joined(line, 0, name_limit)
@@ -1379,17 +1414,25 @@ def person(printed: str, order: str) -> str:
     return f"{found.group(1)} {display(found.group(2).strip())}"
 
 
-def anchored(words: list[tuple[float, float, str]]) -> list[dict]:
+def anchored(words: list[tuple[float, float, str]], comma: bool = False) -> list[dict]:
     top = next(y for x, y, word in words if word == "Votes*")
     bottom = min(y for x, y, word in words if word == "*" and y > top)
     inside = [(x, y, word) for x, y, word in words if top + 4 < y < bottom - 2]
     anchors = sorted(y for x, y, word in inside if 440 <= x < 510 and re.fullmatch(r"[\d,]+", word))
     cells: list[dict[str, list[tuple[float, float, str]]]] = [{"name": [], "description": []} for _ in anchors]
     elected = [False for _ in anchors]
+    if comma:
+        starts = [
+            line[0][1] for line in rows_of([w for w in inside if w[0] < 250], 0, 9999) if "," in joined(line, 0, 250)
+        ]
+        if len(starts) != len(anchors):
+            raise ValueError(f"{len(starts)} names for {len(anchors)} vote counts")
     for x, y, word in inside:
         nearest = min(range(len(anchors)), key=lambda i: abs(anchors[i] - y))
         if x >= 510 and word in ("E", "Elected"):
             elected[nearest] = True
+        elif x < 250 and comma:
+            cells[max(i for i, start in enumerate(starts) if start <= y + 2)]["name"].append((y, x, word))
         elif x < 440:
             cells[nearest]["name" if x < 250 else "description"].append((y, x, word))
     return [
@@ -1438,18 +1481,19 @@ def declarations(lad: str, council: dict) -> list[dict]:
             parish, ward = parish.replace("\u2019", "'"), ward and ward.replace("\u2019", "'")
             top = next(i for i, line in enumerate(lines) if "Votes*" in line)
             end = next(i for i, line in enumerate(lines) if line.startswith("* If elected"))
-            candidates: list[dict] = anchored(words) if council.get("anchored") else []
-            for line in [] if council.get("anchored") else lines[top + 1 : end]:
-                if not line.strip():
-                    continue
+            candidates: list[dict] = anchored(words, council["anchored"] == "comma") if council.get("anchored") else []
+            block = [] if council.get("anchored") else [line for line in lines[top + 1 : end] if line.strip()]
+            margin = min((len(line) - len(line.lstrip()) for line in block), default=0)
+            for line in block:
                 cells = re.split(r"\s{2,}", line.strip())
-                column_zero = not line[0].isspace()
+                column_zero = not line[margin].isspace()
                 rest = "  ".join(cells[1:] if column_zero else cells)
                 if column_zero:
                     if candidates and (
                         cells[0][0].islower()
                         or cells[0].lower().startswith("commonly known as")
                         or candidates[-1]["printed"].endswith(" commonly known as")
+                        or (order == "comma" and "," not in cells[0])
                     ):
                         candidates[-1]["printed"] += f" {cells[0]}"
                     else:
