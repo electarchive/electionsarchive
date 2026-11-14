@@ -81,16 +81,22 @@ const ANCHOR = sql`
       union all select x.polity_id from body x where e.type = 'body' and x.id = e.id
       union all select x.polity_id from electoral_system x where e.type = 'electoral_system' and x.id = e.id
       union all select x.polity_id from government x where e.type = 'government' and x.id = e.id
-      union all select l.polity_id from contest x join election l on l.id = x.election_id
+      union all select v.k from contest x join election l on l.id = x.election_id
+        left join body b on b.id = x.body_id left join office f on f.id = x.office_id
+        cross join lateral (values (l.polity_id), (b.polity_id), (f.polity_id)) v(k)
         where e.type = 'contest' and x.id = e.id
-      union all select l.polity_id from result_set r join contest x on x.id = r.contest_id join election l on l.id = x.election_id
+      union all select v.k from result_set r join contest x on x.id = r.contest_id join election l on l.id = x.election_id
+        left join body b on b.id = x.body_id left join office f on f.id = x.office_id
+        cross join lateral (values (l.polity_id), (b.polity_id), (f.polity_id)) v(k)
         where e.type = 'result_set' and r.id = e.id
       union all select v.k from contest_option o join contest x on x.id = o.contest_id join election l on l.id = x.election_id
-        cross join lateral (values (l.polity_id), (o.party_id)) v(k)
+        left join body b on b.id = x.body_id left join office f on f.id = x.office_id
+        cross join lateral (values (l.polity_id), (b.polity_id), (f.polity_id), (o.party_id)) v(k)
         where e.type = 'contest_option' and o.id = e.id
       union all select v.k from candidacy d join contest_option o on o.id = d.option_id join contest x on x.id = o.contest_id
         join election l on l.id = x.election_id
-        cross join lateral (values (l.polity_id), (d.person_id), (d.member_of_party_id)) v(k)
+        left join body b on b.id = x.body_id left join office f on f.id = x.office_id
+        cross join lateral (values (l.polity_id), (b.polity_id), (f.polity_id), (d.person_id), (d.member_of_party_id)) v(k)
         where e.type = 'candidacy' and d.id = e.id
       union all select v.k from tenure t left join body b on b.id = t.body_id left join office f on f.id = t.office_id
         cross join lateral (values (coalesce(b.polity_id, f.polity_id)), (t.person_id)) v(k)
