@@ -226,6 +226,7 @@ const MODEL = {
     rest: 0.5,
     fresh: 0.005,
     settle: 4,
+    heft: 0.3,
   },
   reported: { common: 0.9, own: 0.3, capped: 0.99 },
   channel: {
@@ -1996,6 +1997,17 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
     const all = sum(indexes.map((index) => found[index]!.expected));
     return all > 0 ? unit.expected / all : 1 / indexes.length;
   });
+  const sized = whole.filter(
+    (unit) => unit.hasBaseline && unit.total > 0 && !reports.has(unit.id),
+  );
+  const hefted =
+    sum(sized.map((unit) => unit.total)) /
+    Math.max(1, sum(sized.map((unit) => unit.total ** (1 + MODEL.late.heft))));
+  const heft = whole.map((unit) =>
+    isLate && sized.length > 0 && unit.total > 0
+      ? unit.total ** MODEL.late.heft * hefted
+      : 1,
+  );
   const random = seeded(`${race.id}@${stamp}`);
   const typical = found.map((unit) => {
     if (!unit.hasBaseline) {
@@ -2487,7 +2499,8 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
       const extra = reports.has(unit.county)
         ? (pending.get(unit.county) ?? 0) * portion[index]!
         : open == null
-          ? final * later + spills[wholeOf.get(unit.county)!]! * portion[index]!
+          ? final * later * heft[wholeOf.get(unit.county)!]! +
+            spills[wholeOf.get(unit.county)!]! * portion[index]!
           : Math.max(0, open - remaining);
       const ceiling = 1 - unit.others;
       const jitter = final > 0 && learned == null ? gaussian(random) : 0;
