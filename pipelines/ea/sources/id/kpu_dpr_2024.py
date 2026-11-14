@@ -326,7 +326,7 @@ def _match(pool: pl.DataFrame, dapil: str, number: int, votes: int) -> int:
 def _sex() -> pl.DataFrame:
     path = raw.cached(SOURCE, DECREES["1562"][0]).path
     text = subprocess.run(["pdftotext", "-layout", str(path), "-"], check=True, capture_output=True, text=True).stdout
-    rows: list[tuple[str, int, int, str]] = []
+    rows: list[tuple[str | None, int, int, str]] = []
     dapil = party = None
     listing = False
     for line in text.split("\n"):
