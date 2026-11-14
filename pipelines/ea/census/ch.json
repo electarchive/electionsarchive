@@ -576,6 +576,12 @@
       "url": "https://www.baselland.ch/politik-und-behorden/direktionen/finanz-und-kirchendirektion/generalsekretariat/gemeinden/gemeinderecht/einwohner-buerger-und-burgergemeinden",
       "kind": "official_body"
     },
+    "sh-stadtrat-stellvertretung-2026": {
+      "title": "Bericht und Antrag der Spezialkommission «Motion Angela Penkov (SP): Stellvertretungen im Grossen Stadtrat» vom 17. August 2026",
+      "publisher": "Stadt Schaffhausen, Grosser Stadtrat",
+      "url": "https://www.stadt-schaffhausen.ch/_docn/7162093/6_0_Zusammengef%C3%BCgter_Bericht_und_Antrag_20260817.pdf",
+      "kind": "official_body"
+    },
     "sg-gemeindeorganisation": {
       "title": "Gemeindeorganisation: Bürgerversammlung oder Parlament",
       "publisher": "Kanton St.Gallen, Amt für Gemeinden",
@@ -2739,6 +2745,13 @@
           "value": 5,
           "source": "bl-einwohnergemeinden",
           "locator": "Ausserordentliche Gemeindeorganisation: \"Im Kanton Basel-Landschaft greifen aktuell fünf Gemeinden auf diese Organisationsform zurück\" (the Einwohnerrat is the Gemeindeparlament); the page does not name them (page read 14 Nov 2026)"
+        },
+        {
+          "within": "CH-SH",
+          "date": "2026-02-01",
+          "value": 5,
+          "source": "sh-stadtrat-stellvertretung-2026",
+          "locator": "Section b: \"Im Kanton Schaffhausen verfügen die Gemeinden Beringen, Neuhausen am Rheinfall, Schaffhausen, Stein am Rhein und Thayngen über ein kommunales Parlament\" (Stand Anfang Februar 2026), citing Art. 4 lit. c Verfassung Beringen, Art. 5 Ziff. 2 Verfassung Neuhausen, Art. 23 ff. Stadtverfassung, Art. 6 lit. c Verfassung Stein am Rhein, and Art. 5 Ziff. 3 Ortsverfassung Thayngen; the Schaffhausen city parliament is the Grosser Stadtrat, the others are Einwohnerräte; the cantonal Politik page's \"fünf weitere\" beside the canton and city is not used"
         },
         {
           "within": "CH-AR",
