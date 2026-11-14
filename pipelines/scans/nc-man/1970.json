@@ -1,0 +1,377 @@
+{
+  "polity": "US-NC",
+  "publisher": "North Carolina Secretary of State",
+  "title": "North Carolina Manual 1971, votes by county for U.S. House, general election 1970-11-03",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/northcarolinama1971nort/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/northcarolinama1971nort"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "house1": {
+      "year": 1970,
+      "chamber": "house",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "NC",
+      "district": 1
+    },
+    "house2": {
+      "year": 1970,
+      "chamber": "house",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "NC",
+      "district": 2
+    },
+    "house3": {
+      "year": 1970,
+      "chamber": "house",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "NC",
+      "district": 3
+    },
+    "house4": {
+      "year": 1970,
+      "chamber": "house",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "NC",
+      "district": 4
+    },
+    "house5": {
+      "year": 1970,
+      "chamber": "house",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "NC",
+      "district": 5
+    },
+    "house6": {
+      "year": 1970,
+      "chamber": "house",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "NC",
+      "district": 6
+    },
+    "house7": {
+      "year": 1970,
+      "chamber": "house",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "NC",
+      "district": 7
+    },
+    "house8": {
+      "year": 1970,
+      "chamber": "house",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "NC",
+      "district": 8
+    },
+    "house9": {
+      "year": 1970,
+      "chamber": "house",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "NC",
+      "district": 9
+    },
+    "house10": {
+      "year": 1970,
+      "chamber": "house",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "NC",
+      "district": 10
+    },
+    "house11": {
+      "year": 1970,
+      "chamber": "house",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "NC",
+      "district": 11
+    }
+  },
+  "pages": [
+    {
+      "page": 362,
+      "id": "362-0",
+      "columns": [
+        {
+          "label": "Walter B. Jones Democrat",
+          "contest": "house1",
+          "candidate": "Walter B. Jones"
+        },
+        {
+          "label": "Gene Leggett American",
+          "contest": "house1",
+          "candidate": "Gene Leggett"
+        },
+        {
+          "label": "R. Frank Everett Republican",
+          "contest": "house1",
+          "candidate": "R. Frank Everett"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.114,
+        0.176,
+        0.907,
+        0.628
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3805
+      ]
+    },
+    {
+      "page": 362,
+      "id": "362-1",
+      "columns": [
+        {
+          "label": "L. H. Fountain Democrat",
+          "contest": "house2",
+          "candidate": "L. H. Fountain"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.111,
+        0.62,
+        0.904,
+        0.958
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 363,
+      "id": "363-0",
+      "columns": [
+        {
+          "label": "David N. Henderson Democrat",
+          "contest": "house3",
+          "candidate": "David N. Henderson"
+        },
+        {
+          "label": "Herbert H. Howell Republican",
+          "contest": "house3",
+          "candidate": "Herbert H. Howell"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.092,
+        0.199,
+        0.918,
+        0.519
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 363,
+      "id": "363-1",
+      "columns": [
+        {
+          "label": "Nick Galifianakis Democrat",
+          "contest": "house4",
+          "candidate": "Nick Galifianakis"
+        },
+        {
+          "label": "R. (Jack Hawke Republican)",
+          "contest": "house4",
+          "candidate": "R. (Jack) Hawke"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.094,
+        0.511,
+        0.919,
+        0.806
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 364,
+      "id": "364-0",
+      "columns": [
+        {
+          "label": "James G. (Jim) White Democrat",
+          "contest": "house5",
+          "candidate": "James G. (Jim) White"
+        },
+        {
+          "label": "Wilmer (Vinegar) Mizell, Republican",
+          "contest": "house5",
+          "candidate": "Wilmer D. Mizell"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.102,
+        0.21,
+        0.891,
+        0.552
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 364,
+      "id": "364-1",
+      "columns": [
+        {
+          "label": "Richardson Preyer Democrat",
+          "contest": "house6",
+          "candidate": "Richardson Preyer"
+        },
+        {
+          "label": "Lynwood (Lyn) Bullock (A)",
+          "contest": "house6",
+          "candidate": "Lynwood (Lyn) Bullock"
+        },
+        {
+          "label": "Clifton B. (Pete) Barham (R)",
+          "contest": "house6",
+          "candidate": "Clifton B. Barham, Jr."
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.097,
+        0.544,
+        0.895,
+        0.839
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 365,
+      "id": "365-0",
+      "columns": [
+        {
+          "label": "Alton A. Lennon Democrat",
+          "contest": "house7",
+          "candidate": "Alton A. Lennon"
+        },
+        {
+          "label": "Frederick R. Weber Republican",
+          "contest": "house7",
+          "candidate": "Frederick R. Weber"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.078,
+        0.177,
+        0.907,
+        0.499
+      ],
+      "hint": "Read only the table headed 'SEVENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 365,
+      "id": "365-1",
+      "columns": [
+        {
+          "label": "H. Clifton Blue Democrat",
+          "contest": "house8",
+          "candidate": "H. Clifton Blue"
+        },
+        {
+          "label": "Earl B. Ruth Republican",
+          "contest": "house8",
+          "candidate": "Earl B. Ruth"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.081,
+        0.491,
+        0.914,
+        0.853
+      ],
+      "hint": "Read only the table headed 'EIGHTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 366,
+      "id": "366-0",
+      "columns": [
+        {
+          "label": "Cy N. Bahakel Democrat",
+          "contest": "house9",
+          "candidate": "Cy N. Bahakel"
+        },
+        {
+          "label": "Charles R. Jonas Republican",
+          "contest": "house9",
+          "candidate": "Charles Raper Jonas"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.1,
+        0.205,
+        0.893,
+        0.498
+      ],
+      "hint": "Read only the table headed 'NINTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 366,
+      "id": "366-1",
+      "columns": [
+        {
+          "label": "Basil L. Whitener Democrat",
+          "contest": "house10",
+          "candidate": "Basil L. Whitener"
+        },
+        {
+          "label": "James T. (Jim) Broyhill, Republican",
+          "contest": "house10",
+          "candidate": "James T. (Jim) Broyhill"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.1,
+        0.49,
+        0.899,
+        0.83
+      ],
+      "hint": "Read only the table headed 'TENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 367,
+      "id": "367-0",
+      "columns": [
+        {
+          "label": "Roy A. Taylor Democrat",
+          "contest": "house11",
+          "candidate": "Roy A. Taylor"
+        },
+        {
+          "label": "Luke Atkinson Republican",
+          "contest": "house11",
+          "candidate": "Luke Atkinson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.088,
+        0.199,
+        0.921,
+        0.581
+      ],
+      "hint": "Read only the table headed 'ELEVENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    }
+  ]
+}

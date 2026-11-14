@@ -1,0 +1,254 @@
+{
+  "polity": "US-NC",
+  "publisher": "North Carolina Secretary of State",
+  "title": "North Carolina Manual 1975, votes by county for U.S. Senator and U.S. House, general election 1974-11-05",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/northcarolinaman1975nort/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/northcarolinaman1975nort"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "house1": {
+      "year": 1974,
+      "chamber": "house",
+      "day": "1974-11-05",
+      "special": false,
+      "state": "NC",
+      "district": 1
+    },
+    "house2": {
+      "year": 1974,
+      "chamber": "house",
+      "day": "1974-11-05",
+      "special": false,
+      "state": "NC",
+      "district": 2
+    },
+    "house3": {
+      "year": 1974,
+      "chamber": "house",
+      "day": "1974-11-05",
+      "special": false,
+      "state": "NC",
+      "district": 3
+    },
+    "house4": {
+      "year": 1974,
+      "chamber": "house",
+      "day": "1974-11-05",
+      "special": false,
+      "state": "NC",
+      "district": 4
+    },
+    "house5": {
+      "year": 1974,
+      "chamber": "house",
+      "day": "1974-11-05",
+      "special": false,
+      "state": "NC",
+      "district": 5
+    },
+    "house6": {
+      "year": 1974,
+      "chamber": "house",
+      "day": "1974-11-05",
+      "special": false,
+      "state": "NC",
+      "district": 6
+    },
+    "house7": {
+      "year": 1974,
+      "chamber": "house",
+      "day": "1974-11-05",
+      "special": false,
+      "state": "NC",
+      "district": 7
+    }
+  },
+  "pages": [
+    {
+      "page": 818,
+      "id": "818-0",
+      "columns": [
+        {
+          "label": "Walter B. Jones Democrat",
+          "contest": "house1",
+          "candidate": "Walter B. Jones"
+        },
+        {
+          "label": "Harry McMullan Republican",
+          "contest": "house1",
+          "candidate": "Harry McMullan"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.035,
+        0.159,
+        0.929,
+        0.541
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 818,
+      "id": "818-1",
+      "columns": [
+        {
+          "label": "L. H. Fountain Democrat",
+          "contest": "house2",
+          "candidate": "L. H. Fountain"
+        },
+        {
+          "label": "No Opposition",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.037,
+        0.533,
+        0.925,
+        0.812
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 819,
+      "id": "819-0",
+      "columns": [
+        {
+          "label": "David N. Henderson Democrat",
+          "contest": "house3",
+          "candidate": "David N. Henderson"
+        },
+        {
+          "label": "No Opposition",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.067,
+        0.202,
+        0.946,
+        0.478
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL'; ignore any other table visible in the image."
+    },
+    {
+      "page": 819,
+      "id": "819-1",
+      "columns": [
+        {
+          "label": "Ike F. Andrews Democrat",
+          "contest": "house4",
+          "candidate": "Ike Andrews"
+        },
+        {
+          "label": "Ward Purrington Republican",
+          "contest": "house4",
+          "candidate": "Ward Purrington"
+        },
+        {
+          "label": "Michael H. Smedberg Labor",
+          "contest": "house4",
+          "candidate": "Michael Henderson Smedberg"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.064,
+        0.47,
+        0.943,
+        0.693
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 820,
+      "id": "820-0",
+      "columns": [
+        {
+          "label": "Stephen L. Neal Democrat",
+          "contest": "house5",
+          "candidate": "Stephen L. Neal"
+        },
+        {
+          "label": "Wilmer Mizell Republican",
+          "contest": "house5",
+          "candidate": "Wilmer (Vinegar Bend) Mizell"
+        },
+        {
+          "label": "Lauren Eugene Brubaker Labor",
+          "contest": "house5",
+          "candidate": "Lauren Eugene Brubaker"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.051,
+        0.167,
+        0.942,
+        0.397
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 820,
+      "id": "820-1",
+      "columns": [
+        {
+          "label": "Richardson Preyer Democrat",
+          "contest": "house6",
+          "candidate": "Richardson Preyer"
+        },
+        {
+          "label": "R. S. Ritchie Republican",
+          "contest": "house6",
+          "candidate": "R. S. (Steve) Ritchie"
+        },
+        {
+          "label": "Harry Allen Fripp Labor",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.048,
+        0.389,
+        0.939,
+        0.605
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 820,
+      "id": "820-2",
+      "columns": [
+        {
+          "label": "Charles Rose Democrat",
+          "contest": "house7",
+          "candidate": "Charles Rose"
+        },
+        {
+          "label": "No Opposition",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.048,
+        0.597,
+        0.939,
+        0.811
+      ],
+      "hint": "Read only the table headed 'SEVENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    }
+  ]
+}
