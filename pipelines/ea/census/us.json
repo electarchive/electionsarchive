@@ -896,7 +896,8 @@
       "category": "council",
       "goal": "local",
       "source": "cog",
-      "note": "The archive files towns and townships as municipalities, so their held contests classify as municipal; the class carries the Census roster and its cadence."
+      "match": [{"within": null, "polity_kinds": ["municipality"], "name_pattern": "\\mTown(ship)?\\M"}],
+      "note": "The archive files towns and townships as municipalities, so the class takes a municipal contest whose body or office name says town or township; the class carries the Census roster and its cadence."
     },
     {
       "key": "school",
