@@ -25,58 +25,58 @@
       "columns": [
         {
           "label": "Democra",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "Bill Clinton"
         },
         {
           "label": "Republi",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "George Bush"
         },
         {
           "label": "America",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "James Gritz"
         },
         {
           "label": "Equal J",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "Ron Daniels"
         },
         {
           "label": "Indepen",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "John Yiamouyiannis"
         },
         {
           "label": "Justice",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "Lyndon H. LaRouche"
         },
         {
           "label": "Liberta",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "Andre Marrou"
         },
         {
           "label": "Louisia",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "Howard Phillips"
         },
         {
           "label": "More Pe",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "Lenora Fulani"
         },
         {
           "label": "Natural",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "John Hagelin"
         },
         {
           "label": "Prudenc",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "Ross Perot"
         }
       ],
       "orientation": "counties_down",
@@ -99,58 +99,58 @@
       "columns": [
         {
           "label": "Democra",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "Bill Clinton"
         },
         {
           "label": "Republi",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "George Bush"
         },
         {
           "label": "America",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "James Gritz"
         },
         {
           "label": "Equal J",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "Ron Daniels"
         },
         {
           "label": "Indepen",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "John Yiamouyiannis"
         },
         {
           "label": "Justice",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "Lyndon H. LaRouche"
         },
         {
           "label": "Liberta",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "Andre Marrou"
         },
         {
           "label": "Louisia",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "Howard Phillips"
         },
         {
           "label": "More Pe",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "Lenora Fulani"
         },
         {
           "label": "Natural",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "John Hagelin"
         },
         {
           "label": "Prudenc",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "Ross Perot"
         }
       ],
       "orientation": "counties_down",
