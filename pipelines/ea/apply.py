@@ -1000,7 +1000,7 @@ def _publish_table(conn: Connection, stage: Stage, table: str, deferred: list[st
                         [ids],
                     )
             if kind == "area":
-                for owned in ("area_code", "area_geometry"):
+                for owned in ("area_code", "area_geometry", "area_parent"):
                     conn.execute(
                         sql.SQL("delete from public.{} where area_id = any(%s::uuid[])").format(sql.Identifier(owned)),
                         [ids],
