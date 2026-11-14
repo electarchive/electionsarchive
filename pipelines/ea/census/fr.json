@@ -470,7 +470,133 @@
       "title": "Élections législatives françaises de 1815 à 1869 and Plébiscites sous Napoléon III",
       "publisher": "Wikipedia (French)",
       "url": "https://fr.wikipedia.org/wiki/Plébiscites_sous_Napoléon_III",
-      "note": "Day of each election and plebiscite, one French page per election. The Assemblée nationale's history pages give no dates for these years and Gallica refuses scripted requests, so the days are not yet checked against the Bulletin des lois or the Moniteur universel.",
+      "note": "Day of each election and plebiscite, one French page per election. The Bulletin des lois and Moniteur volumes at the Internet Archive confirm the days that name a decree in the date rows; the rest are not yet checked against a decree, because Gallica refuses scripted requests.",
+      "kind": "compendium"
+    },
+    "duv-1815-07-13": {
+      "title": "Ordonnance du 13 juillet 1815 portant dissolution de la Chambre des députés, convocation des collèges électoraux, et règlement provisoire pour les élections (Bulletin des lois, 7e série, Bull. 3, n° 9)",
+      "publisher": "Duvergier, Collection complète des lois, décrets, ordonnances, règlemens et avis du Conseil d'État, t. 20, pp. 4-6 (A. Guyot)",
+      "url": "https://archive.org/details/bub_gb_QkQUAAAAYAAJ",
+      "note": "The edition reprints the official text of the Bulletin des lois with its number.",
+      "kind": "compendium"
+    },
+    "duv-1815-04-30": {
+      "title": "Décret du 30 avril 1815 qui ordonne la réunion des collèges électoraux afin de procéder aux élections des députés à la Chambre des représentants (Bulletin des lois, 6e série, Bull. 24)",
+      "publisher": "Duvergier, Collection complète des lois, décrets, ordonnances, règlemens et avis du Conseil d'État, t. 19 (A. Guyot)",
+      "url": "https://archive.org/details/collectioncompl15frangoog",
+      "note": "Hundred Days; the text names no single voting day because each assembly sat on a day counted from the decree's publication at its chef-lieu.",
+      "kind": "compendium"
+    },
+    "duv-1820-10-11": {
+      "title": "Ordonnance du 11 octobre 1820 portant convocation des collèges électoraux d'arrondissement dans les départements de la quatrième série et des collèges départementaux (Bulletin des lois, 7e série, Bull. 410, n° 9677)",
+      "publisher": "Duvergier, Collection complète des lois, décrets, ordonnances, règlemens et avis du Conseil d'État, t. 23 (A. Guyot)",
+      "url": "https://archive.org/details/collectioncompl00frangoog",
+      "note": "",
+      "kind": "compendium"
+    },
+    "duv-1822-10-09": {
+      "title": "Ordonnance du 9 octobre 1822 portant convocation des collèges électoraux dans les départements de la seconde série (Bulletin des lois, 7e série, Bull. 560, n° 13517)",
+      "publisher": "Duvergier, Collection complète des lois, décrets, ordonnances, règlemens et avis du Conseil d'État, t. 24 (A. Guyot)",
+      "url": "https://archive.org/details/collectioncompl01frangoog",
+      "note": "",
+      "kind": "compendium"
+    },
+    "duv-1823-02-26": {
+      "title": "Ordonnance du 26 février 1823 portant convocation de collèges électoraux afin de compléter les députations du Calvados, du Finistère, de la Vendée, de la Nièvre et du Nord, and ordonnance of the same day moving the Aisne college to 18 March (Bulletin des lois, 7e série, Bull. 590)",
+      "publisher": "Duvergier, Collection complète des lois, décrets, ordonnances, règlemens et avis du Conseil d'État, t. 24 (A. Guyot)",
+      "url": "https://archive.org/details/collectioncompl01frangoog",
+      "note": "Duvergier prints the titles only; the days for the five departments are in the Bulletin and are not yet read.",
+      "kind": "compendium"
+    },
+    "duv-1821-09-06": {
+      "title": "Ordonnance du 6 septembre 1821 portant convocation des collèges électoraux dans les départements de la cinquième série et dans le département des Pyrénées-Orientales (Bulletin des lois, 7e série, Bull. 476)",
+      "publisher": "Duvergier, Collection complète des lois, décrets, ordonnances, règlemens et avis du Conseil d'État, t. 23 (A. Guyot)",
+      "url": "https://archive.org/details/collectioncompl23fran",
+      "note": "Duvergier prints the title only; the voting days are in the Bulletin and are not yet read.",
+      "kind": "compendium"
+    },
+    "bl-1817-08-20": {
+      "title": "Ordonnance du 20 août 1817 portant convocation, pour le 20 septembre prochain, des collèges électoraux des départements y désignés (Bulletin des lois, 7e série, n° 2581)",
+      "publisher": "Bulletin des lois du Royaume de France, 7e série, t. 5",
+      "url": "https://archive.org/details/bub_gb_9CUUAAAAYAAJ",
+      "kind": "official_body"
+    },
+    "bl-1827-11-05": {
+      "title": "Ordonnance du 5 novembre 1827 portant dissolution de la Chambre des députés et convocation des collèges électoraux (Bulletin des lois, 8e série, n° 7399, Bull. 193)",
+      "publisher": "Bulletin des lois du Royaume de France, 8e série, t. 7",
+      "url": "https://archive.org/details/bulletindeslois18frangoog",
+      "kind": "official_body"
+    },
+    "duv-1830-05-16": {
+      "title": "Ordonnance du 16 mai 1830 portant dissolution de la Chambre des députés et convocation des collèges électoraux et des chambres (Bulletin des lois, 8e série, Bull. 354, n° 14,307)",
+      "publisher": "Duvergier, Collection complète des lois, décrets, ordonnances, règlemens et avis du Conseil d'État, t. 30, p. 40 (A. Guyot)",
+      "url": "https://archive.org/details/bub_gb_2pgxAAAAIAAJ",
+      "note": "Article 2 read on the page image.",
+      "kind": "compendium"
+    },
+    "bl-1834-05-25": {
+      "title": "Ordonnance du 25 mai 1834 portant dissolution de la Chambre des députés et convocation des collèges électoraux (Bulletin des lois, 1834, Partie principale)",
+      "publisher": "Bulletin des lois du Royaume de France",
+      "url": "https://archive.org/details/bub_gb_AlZBpelkqeUC",
+      "kind": "official_body"
+    },
+    "bl-1842-06-12": {
+      "title": "Ordonnance du 12 juin 1842 qui dissout la Chambre des députés et convoque les collèges électoraux et les chambres (Bulletin des lois, 9e série, n° 10,015)",
+      "publisher": "Bulletin des lois du Royaume de France, 9e série, t. 24",
+      "url": "https://archive.org/details/bulletindeslois25frangoog",
+      "note": "The 14 July 1842 ordonnance (n° 10,096) names the 12 June ordonnance as the one that convened the chambers for 3 August.",
+      "kind": "official_body"
+    },
+    "bl-1846-07-06": {
+      "title": "Ordonnance du 6 juillet 1846 qui dissout la Chambre des députés et convoque les collèges électoraux et les chambres (Bulletin des lois, 9e série, n° 12,810)",
+      "publisher": "Bulletin des lois du Royaume de France, 9e série, t. 33",
+      "url": "https://archive.org/details/bulletindeslois65frangoog",
+      "kind": "official_body"
+    },
+    "duv-1793-06-27": {
+      "title": "Décret des 27-28 juin 1793 qui ordonne la convocation des assemblées primaires pour la présentation à l'acceptation du peuple de la déclaration des droits de l'homme et du citoyen et de l'acte constitutionnel (Collection Baudouin L. 14, p. 845; Bulletin B. 31, p. 247)",
+      "publisher": "Duvergier, Collection complète des lois, décrets, ordonnances, règlemens et avis du Conseil d'État, t. 5 (A. Guyot)",
+      "url": "https://archive.org/details/bub_gb_C5kxAAAAIAAJ",
+      "note": "Duvergier lists the decree by its title in the table of the volume's June 1793 acts.",
+      "kind": "compendium"
+    },
+    "duv-1795-08-22": {
+      "title": "Décret du 5 fructidor an III (22 août 1795), art. 1 (convocation des assemblées primaires pour l'acte constitutionnel), and décret du 1er vendémiaire an IV (23 septembre 1795) declaring the decrees of 5 and 13 fructidor accepted (Bulletin des lois, 1re série, Bull. 181)",
+      "publisher": "Duvergier, Collection complète des lois, décrets, ordonnances, règlemens et avis du Conseil d'État, t. 8 (A. Guyot)",
+      "url": "https://archive.org/details/bub_gb_4JoxAAAAIAAJ",
+      "note": "",
+      "kind": "compendium"
+    },
+    "moniteur-an8": {
+      "title": "Gazette nationale ou Le Moniteur universel, frimaire an VIII (December 1799): Boulay de la Meurthe's draft on the manner of presenting the constitution to the people, and the report that the registers were open in Paris under the loi du 23 frimaire",
+      "publisher": "Le Moniteur universel (Agasse), reprint, an VII-an VIII",
+      "url": "https://archive.org/details/gazettenationale1799panc",
+      "kind": "official_body"
+    },
+    "moniteur-an10": {
+      "title": "Gazette nationale ou Le Moniteur universel, an X: arrêté des consuls du 20 floréal an X (10 May 1802) opening registers on 'Napoléon Bonaparte sera-t-il consul à vie ?'",
+      "publisher": "Le Moniteur universel (Agasse), reprint, nivôse-prairial an X",
+      "url": "https://archive.org/details/gazettenationale18021panc",
+      "note": "The sénatus-consulte of 14 thermidor an X (2 August 1802) in the same journal (reprint of messidor-fructidor an X, archive.org gazettenationale1802panc) counts 3,577,259 voters and 3,568,885 votes for the life consulate.",
+      "kind": "official_body"
+    },
+    "duv-1861-note": {
+      "title": "Annotation to the Empire's 1861 constitutional text recalling 'les plébiscites des 20 et 21 décembre 1851 et 21 et 22 novembre 1852'",
+      "publisher": "Duvergier, Collection complète des lois, décrets, ordonnances, règlemens et avis du Conseil d'État, t. 61 (A. Guyot)",
+      "url": "https://archive.org/details/collectioncompl03duvegoog",
+      "kind": "compendium"
+    },
+    "duv-1870-note": {
+      "title": "Annotation recalling the sénatus-consulte of 20 April 1870 'confirmé par le plébiscite du 8 mai'",
+      "publisher": "Duvergier, Collection complète des lois, décrets, ordonnances, règlemens et avis du Conseil d'État, t. 71 (A. Guyot)",
+      "url": "https://archive.org/details/collectioncompl16duvegoog",
+      "kind": "compendium"
+    },
+    "duv-1815-04-22": {
+      "title": "Décret du 22 avril 1815 ordonnant la présentation de l'acte additionnel aux constitutions à l'acceptation du peuple français (Bulletin des lois, 6e série, Bull. 19, n° 113)",
+      "publisher": "Duvergier, Collection complète des lois, décrets, ordonnances, règlemens et avis du Conseil d'État, t. 19 (A. Guyot)",
+      "url": "https://archive.org/details/collectioncompl15frangoog",
+      "note": "",
       "kind": "compendium"
     }
   },
@@ -3361,7 +3487,7 @@
       "valid_from": "1848-04-23",
       "valid_to": "1870-09-04",
       "first_held": "1848-04-23",
-      "note": "The first elections by universal male suffrage: the Constituent Assembly (April 1848) and the Legislative Assembly (May 1849) by département lists, then the Corps législatif of the Second Empire (1852, 1857, 1863, and 1869) in single-member constituencies with official candidates. Days come from one French Wikipedia page per election, not yet checked against the Bulletin des lois.",
+      "note": "The first elections by universal male suffrage: the Constituent Assembly (April 1848) and the Legislative Assembly (May 1849) by département lists, then the Corps législatif of the Second Empire (1852, 1857, 1863, and 1869) in single-member constituencies with official candidates. Days come from one French Wikipedia page per election; the convening decrees are not in the Bulletin des lois volumes read so far.",
       "source": "elysee-presidents",
       "match": [
         {
@@ -3386,9 +3512,17 @@
     {
       "dates": [
         {
+          "date": "1815-05-01",
+          "precision": "month",
+          "source": "duv-1815-04-30",
+          "quote": "Quatre jours après la publication du présent décret au chef-lieu du département, les électeurs des collèges de département et d'arrondissement se réuniront en assemblées électorales au chef-lieu de chaque département et de chaque arrondissement.",
+          "note": "Hundred Days Chambre des représentants, convened by the decree of 30 April 1815; each assembly sat four days after the decree was published at its chef-lieu, so May is the month and no single day exists."
+        },
+        {
           "date": "1815-08-14",
-          "source": "wiki-fr-legislatives",
-          "note": "Chambre introuvable; second round 28 August."
+          "source": "duv-1815-07-13",
+          "note": "Chambre introuvable. Ordonnance of 13 July 1815: arrondissement colleges on 14 August, department colleges eight days later (22 August).",
+          "quote": "Les collèges électoraux d'arrondissement se réuniront le 14 août de la présente année. Les collèges électoraux de département se réuniront huit jours après l'ouverture des collèges électoraux d'arrondissement."
         },
         {
           "date": "1816-09-25",
@@ -3397,8 +3531,9 @@
         },
         {
           "date": "1817-09-20",
-          "source": "wiki-fr-legislatives",
-          "note": "Renewal of the first fifth of the départements."
+          "source": "bl-1817-08-20",
+          "note": "Renewal of the first fifth of the départements, convened by the ordonnance of 20 August 1817.",
+          "quote": "Ordonnance du Roi portant Convocation, pour le 20 Septembre prochain, des Collèges électoraux des Départemens y désignés."
         },
         {
           "date": "1818-10-20",
@@ -3412,8 +3547,27 @@
         },
         {
           "date": "1820-11-04",
-          "source": "wiki-fr-legislatives",
-          "note": "Second round 13 November."
+          "source": "duv-1820-10-11",
+          "note": "Fourth series; ordonnance of 11 October 1820: arrondissement colleges 4 November, department colleges 13 November.",
+          "quote": "Les collèges électoraux d'arrondissement, dans les départemens de la quatrième série portés au tableau ci-annexé N° 1, sont convoqués pour le 4 novembre prochain. Les collèges départementaux ... sont convoqués pour le 13 du même mois."
+        },
+        {
+          "date": "1821-01-01",
+          "precision": "year",
+          "source": "duv-1821-09-06",
+          "note": "Partial renewal of the fifth series of départements, with the Pyrénées-Orientales, convened by the ordonnance of 6 September 1821; the voting days are not yet read. Three départements (Gironde, Indre-et-Loire, Basses-Pyrénées) also voted by-elections on 8 March 1821 under the ordonnance of 12 January 1821."
+        },
+        {
+          "date": "1822-11-13",
+          "source": "duv-1822-10-09",
+          "quote": "Sont convoqués, dans les mêmes départemens, les collèges électoraux d'arrondissement, pour le 13 novembre; et les collèges départementaux, pour le 20 du même mois.",
+          "note": "Partial renewal of the départements the ordonnance of 9 October 1822 calls the second series; department colleges 20 November."
+        },
+        {
+          "date": "1823-03-01",
+          "precision": "month",
+          "source": "duv-1823-02-26",
+          "note": "Colleges convened by the ordonnance of 26 February 1823 to complete the deputations of Calvados, Finistère, Vendée, Nièvre, and Nord; a second ordonnance of the same day moved the Aisne college from 6 to 18 March 1823. The days for the other five are not yet read."
         },
         {
           "date": "1824-02-25",
@@ -3422,13 +3576,15 @@
         },
         {
           "date": "1827-11-17",
-          "source": "wiki-fr-legislatives",
-          "note": "Second round 24 November."
+          "source": "bl-1827-11-05",
+          "note": "Ordonnance of 5 November 1827: arrondissement colleges 17 November, department colleges 24 November.",
+          "quote": "Les collèges électoraux sont convoqués dans tout le royaume: ceux d'arrondissement et ceux des départemens qui n'ont qu'un collège, pour le 17 du présent mois; les collèges départementaux, pour le 24"
         },
         {
-          "date": "1830-07-05",
-          "source": "wiki-fr-legislatives",
-          "note": "Further rounds 13 and 19 July."
+          "date": "1830-06-23",
+          "source": "duv-1830-05-16",
+          "quote": "Les collèges électoraux sont convoqués dans tout le royaume: ceux d'arrondissement et ceux des départemens qui n'ont qu'un collège pour le 23 juin 1830, les collèges départementaux pour le 3 juillet et le collège du département de la Corse pour le 20 juillet.",
+          "note": "Ordonnance of 16 May 1830: arrondissement colleges 23 June, department colleges 3 July, Corsica 20 July."
         },
         {
           "date": "1831-07-05",
@@ -3436,7 +3592,9 @@
         },
         {
           "date": "1834-06-21",
-          "source": "wiki-fr-legislatives"
+          "source": "bl-1834-05-25",
+          "quote": "La Chambre des Députés est dissoute. Les collèges électoraux sont convoqués pour le 21 juin prochain, à l'effet d'élire chacun un député. Les deux collèges électoraux de la Corse sont convoqués au même effet pour le 5 juillet prochain.",
+          "note": "Ordonnance of 25 May 1834; Corsica 5 July."
         },
         {
           "date": "1837-11-04",
@@ -3449,11 +3607,15 @@
         },
         {
           "date": "1842-07-09",
-          "source": "wiki-fr-legislatives"
+          "source": "bl-1842-06-12",
+          "quote": "La Chambre des Députés est dissoute. Les collèges électoraux sont convoqués pour le 9 juillet prochain, à l'effet d'élire chacun un député. Les deux collèges électoraux de la Corse sont convoqués au même effet pour le 12 juillet prochain.",
+          "note": "Ordonnance of 12 June 1842; Corsica 12 July."
         },
         {
           "date": "1846-08-01",
-          "source": "wiki-fr-legislatives"
+          "source": "bl-1846-07-06",
+          "quote": "La Chambre des Députés est dissoute. Les collèges électoraux sont convoqués pour le 1er août prochain, à l'effet d'élire chacun un député. Les deux collèges électoraux de la Corse sont convoqués au même effet pour le 8 août prochain.",
+          "note": "Ordonnance of 6 July 1846; Corsica 8 August."
         }
       ],
       "key": "chambres_censitaires",
@@ -3465,9 +3627,9 @@
       "measure": {
         "unit": "election"
       },
-      "valid_from": "1815-08-14",
+      "valid_from": "1815-05-01",
       "valid_to": "1848-02-24",
-      "note": "Elections by electoral colleges of taxpayers (about 90,000 electors under the Restoration, about 250,000 by 1846). No national series of results is known to us. Partial renewals of the fifths in 1821 to 1823 and the May 1815 Hundred Days chamber are not enumerated yet.",
+      "note": "Elections by electoral colleges of taxpayers (about 90,000 electors under the Restoration, about 250,000 by 1846). No national series of results is known to us. Each general election and partial renewal from 1815 to 1846 is listed once, with the day of its first round. The days of 1815 (August), 1817, 1820, 1822, 1827, 1830, 1834, 1842, and 1846 come from the convening ordonnances in the Bulletin des lois or Duvergier's collection; the Hundred Days chamber (May 1815) and the 1821 and 1823 renewals are listed at the precision the decrees give; 1816, 1818, 1819, 1824, 1831, 1837, and 1839 still rest on the French Wikipedia pages because their ordonnances are not in the volumes read so far.",
       "source": "elysee-presidents",
       "match": [
         {
@@ -3876,16 +4038,65 @@
     {
       "dates": [
         {
+          "date": "1793-01-01",
+          "precision": "year",
+          "contests": 1,
+          "source": "duv-1793-06-27",
+          "quote": "Décret qui ordonne la convocation des assemblées primaires pour la présentation à l'acceptation du peuple de la déclaration des droits de l'homme et du citoyen et de l'acte constitutionnel.",
+          "note": "Constitution of 1793; primary assemblies convened by the decree of 27-28 June 1793. The voting days are not yet read."
+        },
+        {
+          "date": "1795-09-06",
+          "contests": 2,
+          "source": "duv-1795-08-22",
+          "quote": "les assemblées primaires seront convoquées ... pour être ouvertes, au plus tard, le 20 fructidor",
+          "note": "Constitution of the year III and the decrees of 5 and 13 fructidor (the two-thirds rule), two questions. Primary assemblies opened by 20 fructidor an III (6 September 1795) at the latest; the Convention declared the decrees accepted on 1 vendémiaire an IV (23 September 1795)."
+        },
+        {
+          "date": "1799-01-01",
+          "precision": "year",
+          "contests": 1,
+          "source": "moniteur-an8",
+          "quote": "Les registres d'acceptation, et de non-acceptation de la constitution sont ouverts à Paris dans les divers lieux de dépôt indiqués par la loi du 23 frimaire.",
+          "note": "Constitution of the year VIII, voted by registers opened under the loi du 23 frimaire an VIII (14 December 1799) over December 1799 and January 1800; no single voting day."
+        },
+        {
+          "date": "1802-01-01",
+          "precision": "year",
+          "contests": 1,
+          "source": "moniteur-an10",
+          "quote": "Le Peuple français sera consulté sur cette question: Napoléon Bonaparte sera-t-il consul à vie?",
+          "note": "Consulate for life, voted by registers under the arrêté of 20 floréal an X (10 May 1802); the sénatus-consulte of 14 thermidor an X (2 August 1802) proclaimed the result."
+        },
+        {
+          "date": "1804-01-01",
+          "precision": "year",
+          "contests": 1,
+          "source": "duv-1815-04-22",
+          "quote": "conformément à ce qui a été fait en l'an 8, en l'an 10 et en l'an 12, pour la présentation des constitutions à l'acceptation du peuple français",
+          "note": "Hereditary empire, voted by registers in the year XII; the decree of 1815 names the year XII procedure, and the convening text of 1804 is not in the volumes read so far."
+        },
+        {
+          "date": "1815-01-01",
+          "precision": "year",
+          "contests": 1,
+          "source": "duv-1815-04-22",
+          "quote": "Ces registres s'ouvriront deux jours au plus tard après la réception du Bulletin des Lois, et resteront ouverts pendant dix jours.",
+          "note": "Acte additionnel aux constitutions de l'Empire, voted by registers under the decree of 22 April 1815; no single voting day."
+        },
+        {
           "date": "1851-12-20",
-          "source": "wiki-fr-legislatives",
+          "source": "duv-1861-note",
           "note": "Voting on 20 and 21 December.",
-          "contests": 1
+          "contests": 1,
+          "quote": "dans les plébicistes des 20 et 21 décembre 1851 et 21 et 22 novembre 1852"
         },
         {
           "date": "1852-11-21",
-          "source": "wiki-fr-legislatives",
+          "source": "duv-1861-note",
           "note": "Voting on 21 and 22 November.",
-          "contests": 1
+          "contests": 1,
+          "quote": "dans les plébicistes des 20 et 21 décembre 1851 et 21 et 22 novembre 1852"
         },
         {
           "date": "1860-04-15",
@@ -3901,8 +4112,9 @@
         },
         {
           "date": "1870-05-08",
-          "source": "wiki-fr-legislatives",
-          "contests": 1
+          "source": "duv-1870-note",
+          "contests": 1,
+          "quote": "sénatus-consulte du 20 avril 1870, confirmé par le plébiscite du 8 mai"
         },
         {
           "date": "1945-10-21",
@@ -3931,7 +4143,7 @@
         "unit": "question"
       },
       "valid_to": "1958-09-01",
-      "note": "Constitutional plebiscites of the Revolution and the Napoleonic era (1793, 1795, 1799 to 1800, 1802, 1804, and 1815), the Second Empire plebiscites of December 1851, November 1852, and May 1870, and the referendums of 21 October 1945 (two questions), 5 May 1946, and 13 October 1946. The 1860 annexation plebiscites of Nice and Savoy are counted as well. The Revolution and First Empire plebiscites are not enumerated yet.",
+      "note": "Constitutional plebiscites of the Revolution and the Napoleonic era (1793, 1795, 1799, 1802, 1804, and 1815), the Second Empire plebiscites of December 1851, November 1852, and May 1870, and the referendums of 21 October 1945 (two questions), 5 May 1946, and 13 October 1946. The 1860 annexation plebiscites of Nice and Savoy are counted as well. The Revolution and Napoleonic votes were taken by primary assemblies or registers open for days or weeks, so most carry a year, and 1795 a range; 1804 has no convening text in the volumes read so far.",
       "source": "elysee-presidents",
       "match": [
         {
