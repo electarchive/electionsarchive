@@ -83,6 +83,13 @@
       "kind": "official_body",
       "note": "Digitized by the Universitätsbibliothek Mannheim. Scan page 0157: 1. Volksentscheid im Land Sachsen am 30. Juni 1946; 2. Landtagswahlen am 20. Oktober 1946 (Brandenburg, Mecklenburg, Sachsen-Anhalt, Thüringen, Sachsen); 3. Volkskammerwahlen am 15. Oktober 1950. Scan page 0158: 4. Volksbefragung vom 3. bis 6. Juni 1951; 5. Volkskammerwahlen am 17. Oktober 1954 by Bezirk."
     },
+    "vs-ddr-1969": {
+      "title": "Die Verfassung der Deutschen Demokratischen Republik: Dokumente, Kommentar, Band 1, Gesamtergebnis des Volksentscheides vom 6. April 1968",
+      "publisher": "Staatsverlag der DDR",
+      "url": "https://www.gvoon.de/art/dokumente/1969/verfassung-ddr-dokumente-kommentar-1969-band-1/pdf/verfassung-ddr-dokumente-kommentar-1969-band-1-seite_191.pdf",
+      "kind": "official_body",
+      "note": "Page 191 prints the Central Voting Commission's result by Bezirk."
+    },
     "bpb-ddr-1990": {
       "title": "Parteiensystem und Wahlen in der DDR. Eine Analyse der Volkskammerwahl vom 18. März 1990 und der Kommunalwahlen vom 6. Mai 1990",
       "publisher": "Bundeszentrale für politische Bildung (Aus Politik und Zeitgeschichte)",
@@ -3915,6 +3922,12 @@
           "contests": 1,
           "note": "Volksbefragung against remilitarization, held from 3 to 6 June 1951.",
           "source": "sj-ddr-1956"
+        },
+        {
+          "date": "1968-04-06",
+          "contests": 1,
+          "note": "Volksentscheid on the socialist constitution.",
+          "source": "vs-ddr-1969"
         }
       ],
       "key": "ddr_abstimmungen",
