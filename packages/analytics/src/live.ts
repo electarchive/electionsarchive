@@ -217,7 +217,7 @@ const MODEL = {
     trickle: 0.01,
     follow: 0.5,
     fresh: 0.005,
-    settle: 6,
+    settle: 4,
   },
   reported: { common: 0.9, own: 0.3, capped: 0.99 },
   channel: {
@@ -1401,6 +1401,37 @@ function remains(race: LiveRace, stamp: string) {
   return targets;
 }
 
+function stalled(counts: Array<LiveUnitCount>, stamp: string) {
+  const held = new Map<string, number>();
+  const steps = new Map<string, number>();
+  for (const count of counts
+    .filter((count) => count.at <= stamp)
+    .toSorted((x, y) => x.at.localeCompare(y.at))) {
+    const key = `${count.unitId}:${count.channel ?? 0}`;
+    const total = sum(count.votes);
+    const added = total - (held.get(key) ?? 0);
+    held.set(key, total);
+    if (added > 0) {
+      steps.set(count.at, (steps.get(count.at) ?? 0) + added);
+    }
+  }
+  let largest = "";
+  let most = 0;
+  for (const [at, added] of steps) {
+    if (added > most) {
+      largest = at;
+      most = added;
+    }
+  }
+  const after = [...steps.keys()].filter((at) => at >= largest);
+  return [...after, stamp].some(
+    (at, index) =>
+      index > 0 &&
+      Date.parse(at) - Date.parse(after[index - 1] ?? at) >=
+        MODEL.late.settle * 3_600_000,
+  );
+}
+
 export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
   const { race, sizes } = split(given, at);
   const stamp = at ?? race.frames.at(-1)?.at ?? "";
@@ -1927,9 +1958,7 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
     race.lateLean == null || gap === 0
       ? null
       : { mean: gap, sd: race.lateLean.sd };
-  const isSettled =
-    opened != null &&
-    Date.parse(stamp) - Date.parse(opened) >= MODEL.late.settle * 3_600_000;
+  const isSettled = stalled(race.counts, stamp);
   const learned = isTail
     ? lean(found, a, b, coming, null)
     : base != null && isSettled
