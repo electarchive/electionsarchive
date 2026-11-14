@@ -365,6 +365,19 @@
       "publisher": "Wikipedia",
       "url": "https://pt.wikipedia.org/wiki/Predefini%C3%A7%C3%A3o:Elei%C3%A7%C3%B5es_no_Brasil",
       "kind": "community"
+    },
+    "tse-almanaque-1r": {
+      "title": "Almanaque de dados eleitorais: Primeira República, 1889-1930 (Quadro 2.1, Calendário eleitoral federal; Tabelas 1.1 and 1.2)",
+      "publisher": "Tribunal Superior Eleitoral",
+      "url": "https://www.tse.jus.br/institucional/catalogo-de-publicacoes/lista-do-catalogo-de-publicacoes/publicacoes/a/almanaque-de-dados-eleitorais-primeira-republica-1889-1930",
+      "note": "Read from the Internet Archive copy of the PDF at https://www.tse.jus.br/institucional/catalogo-de-publicacoes/arquivos/almanaque-de-dados-eleitorais-primeira-republica-1889-1930/@@display-file/file/almanaque_primeira_republica_final.pdf; the live file refuses scripted requests.",
+      "kind": "official_body"
+    },
+    "camara-cronologia": {
+      "title": "Cronologia do funcionamento da Câmara dos Deputados: 1826-1992 (notes 25, 27, 32, 41, 43, 46, 48, 51 and the decrees reproduced in its annex)",
+      "publisher": "Câmara dos Deputados, Coordenação de Arquivo",
+      "url": "http://bd.camara.leg.br/bd/handle/bdcamara/31679",
+      "kind": "official_body"
     }
   },
   "tiers": [
@@ -1948,88 +1961,116 @@
       "effort": 5,
       "dates": [
         {
-          "date": "1890-01-01",
-          "precision": "year",
-          "source": "wp-eleicoes-br",
-          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+          "date": "1890-09-15",
+          "contests": 21,
+          "seats": 205,
+          "note": "Constituent Congress: 205 deputies and 3 senators from each of the 20 states and the Federal District.",
+          "source": "tse-almanaque-1r",
+          "quote": "Quadro 2.1: 15/9/1890 Congresso Nacional Constituinte \"Eleição de 205 deputados e 3 senadores por estado\""
         },
         {
-          "date": "1893-01-01",
-          "precision": "year",
-          "source": "wp-eleicoes-br",
-          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+          "date": "1894-03-01",
+          "contests": 21,
+          "seats": 212,
+          "note": "Counted per state and the Federal District for the Chamber of Deputies; the one-third Senate renewals were held on the same day. Held with the presidential election; Paraná voted on 1895-01-06, Santa Catarina on 1894-10-09, and Rio Grande do Sul on 1894-10-10.",
+          "source": "tse-almanaque-1r",
+          "quote": "Quadro 2.1: 1º/3/1894 Presidente da República / Congresso Nacional \"No Paraná, as eleições se realizaram em 6/1/1895; em Santa Catarina, em 9/10/1894; e, no Rio Grande do Sul, em 10/10/1894\""
         },
         {
-          "date": "1896-01-01",
-          "precision": "year",
-          "source": "wp-eleicoes-br",
-          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+          "date": "1896-12-30",
+          "contests": 21,
+          "seats": 212,
+          "note": "Counted per state and the Federal District for the Chamber of Deputies; the one-third Senate renewals were held on the same day.",
+          "source": "tse-almanaque-1r",
+          "quote": "Quadro 2.1: 30/12/1896 Congresso Nacional"
         },
         {
-          "date": "1899-01-01",
-          "precision": "year",
-          "source": "wp-eleicoes-br",
-          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+          "date": "1899-12-31",
+          "contests": 21,
+          "seats": 212,
+          "note": "Counted per state and the Federal District for the Chamber of Deputies; the one-third Senate renewals were held on the same day.",
+          "source": "tse-almanaque-1r",
+          "quote": "Quadro 2.1: 31/12/1899 Congresso Nacional"
         },
         {
-          "date": "1903-01-01",
-          "precision": "year",
-          "source": "wp-eleicoes-br",
-          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+          "date": "1903-02-18",
+          "contests": 21,
+          "seats": 212,
+          "note": "Counted per state and the Federal District for the Chamber of Deputies; the one-third Senate renewals were held on the same day.",
+          "source": "tse-almanaque-1r",
+          "quote": "Quadro 2.1: 18/2/1903 Congresso Nacional / Vice-presidente da República"
         },
         {
-          "date": "1906-01-01",
-          "precision": "year",
-          "source": "wp-eleicoes-br",
-          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+          "date": "1906-01-30",
+          "contests": 21,
+          "seats": 212,
+          "note": "Counted per state and the Federal District for the Chamber of Deputies; the one-third Senate renewals were held on the same day.",
+          "source": "tse-almanaque-1r",
+          "quote": "Quadro 2.1: 30/1/1906 Congresso Nacional"
         },
         {
-          "date": "1909-01-01",
-          "precision": "year",
-          "source": "wp-eleicoes-br",
-          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+          "date": "1909-01-30",
+          "contests": 21,
+          "seats": 212,
+          "note": "Counted per state and the Federal District for the Chamber of Deputies; the one-third Senate renewals were held on the same day.",
+          "source": "tse-almanaque-1r",
+          "quote": "Quadro 2.1: 30/1/1909 Congresso Nacional"
         },
         {
-          "date": "1912-01-01",
-          "precision": "year",
-          "source": "wp-eleicoes-br",
-          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+          "date": "1912-01-30",
+          "contests": 21,
+          "seats": 212,
+          "note": "Counted per state and the Federal District for the Chamber of Deputies; the one-third Senate renewals were held on the same day.",
+          "source": "tse-almanaque-1r",
+          "quote": "Quadro 2.1: 30/1/1912 Congresso Nacional"
         },
         {
-          "date": "1915-01-01",
-          "precision": "year",
-          "source": "wp-eleicoes-br",
-          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+          "date": "1915-01-30",
+          "contests": 21,
+          "seats": 212,
+          "note": "Counted per state and the Federal District for the Chamber of Deputies; the one-third Senate renewals were held on the same day.",
+          "source": "tse-almanaque-1r",
+          "quote": "Quadro 2.1: 30/1/1915 Congresso Nacional"
         },
         {
-          "date": "1918-01-01",
-          "precision": "year",
-          "source": "wp-eleicoes-br",
-          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+          "date": "1918-03-01",
+          "contests": 21,
+          "seats": 212,
+          "note": "Counted per state and the Federal District for the Chamber of Deputies; the one-third Senate renewals were held on the same day.",
+          "source": "tse-almanaque-1r",
+          "quote": "Quadro 2.1: 1º/3/1918 Presidente da República / Congresso Nacional"
         },
         {
-          "date": "1921-01-01",
-          "precision": "year",
-          "source": "wp-eleicoes-br",
-          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+          "date": "1921-02-20",
+          "contests": 21,
+          "seats": 212,
+          "note": "Counted per state and the Federal District for the Chamber of Deputies; the one-third Senate renewals were held on the same day.",
+          "source": "tse-almanaque-1r",
+          "quote": "Quadro 2.1: 20/2/1921 Congresso Nacional"
         },
         {
-          "date": "1924-01-01",
-          "precision": "year",
-          "source": "wp-eleicoes-br",
-          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+          "date": "1924-02-17",
+          "contests": 21,
+          "seats": 212,
+          "note": "Counted per state and the Federal District for the Chamber of Deputies; the one-third Senate renewals were held on the same day.",
+          "source": "tse-almanaque-1r",
+          "quote": "Quadro 2.1: 17/2/1924 Congresso Nacional"
         },
         {
-          "date": "1927-01-01",
-          "precision": "year",
-          "source": "wp-eleicoes-br",
-          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+          "date": "1927-02-24",
+          "contests": 21,
+          "seats": 212,
+          "note": "Counted per state and the Federal District for the Chamber of Deputies; the one-third Senate renewals were held on the same day.",
+          "source": "tse-almanaque-1r",
+          "quote": "Quadro 2.1: 24/2/1927 Congresso Nacional"
         },
         {
-          "date": "1930-01-01",
-          "precision": "year",
-          "source": "wp-eleicoes-br",
-          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+          "date": "1930-03-01",
+          "contests": 21,
+          "seats": 212,
+          "note": "Counted per state and the Federal District for the Chamber of Deputies; the one-third Senate renewals were held on the same day.",
+          "source": "tse-almanaque-1r",
+          "quote": "Quadro 2.1: 1º/3/1930 Presidente da República / Congresso Nacional"
         }
       ]
     },
@@ -2123,10 +2164,10 @@
           "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
         },
         {
-          "date": "1863-01-01",
-          "precision": "year",
-          "source": "wp-eleicoes-br",
-          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+          "date": "1863-08-09",
+          "source": "camara-cronologia",
+          "note": "Polling day of the first stage, when parish voters chose the electors who then chose the deputies.",
+          "quote": "Decreto n. 3.093 de 12 de maio de 1863: \"designando, na fórma do art. 4.º da Lei n. 387 de 19 de Agosto de 1846, o dia 9 de Agosto deste anno para se proceder em todo o Imperio á eleição dos Eleitores que teem de eleger os novos Deputados.\""
         },
         {
           "date": "1867-01-01",
@@ -2135,16 +2176,16 @@
           "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
         },
         {
-          "date": "1869-01-01",
-          "precision": "year",
-          "source": "wp-eleicoes-br",
-          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+          "date": "1869-01-31",
+          "source": "camara-cronologia",
+          "note": "Polling day of the first stage, the last Sunday of January 1869, when parish voters chose the electors who then chose the deputies.",
+          "quote": "Decreto n. 4.227 de 25 de julho de 1868: \"designando a ultima dominga do mez de Janeiro do mesmo anno para se proceder em todo o Imperio á eleição primaria.\""
         },
         {
-          "date": "1872-01-01",
-          "precision": "year",
-          "source": "wp-eleicoes-br",
-          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+          "date": "1872-08-18",
+          "source": "camara-cronologia",
+          "note": "Polling day of the first stage, when parish voters chose the electors who then chose the deputies.",
+          "quote": "Decreto n. 4.966 de 22 de maio de 1872: \"designando o dia 18 de agosto para se proceder em todo o Imperio á eleição primária.\""
         },
         {
           "date": "1876-01-01",
@@ -2153,34 +2194,34 @@
           "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
         },
         {
-          "date": "1878-01-01",
-          "precision": "year",
-          "source": "wp-eleicoes-br",
-          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+          "date": "1878-08-05",
+          "source": "camara-cronologia",
+          "note": "Polling day of the first stage, when parish voters chose the electors who then chose the deputies.",
+          "quote": "Decreto n. 6.881 de 13 de abril de 1878: \"designando o dia 05 de agosto para se proceder em todo o Império à eleição primária.\""
         },
         {
-          "date": "1881-01-01",
-          "precision": "year",
-          "source": "wp-eleicoes-br",
-          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+          "date": "1881-10-31",
+          "source": "camara-cronologia",
+          "note": "First direct election of deputies, under the Saraiva Law.",
+          "quote": "Decreto n. 8.154 de 30 de junho de 1881: \"designando o dia 31 de outubro para se proceder em todo o Império à eleição geral dos Deputados.\""
         },
         {
-          "date": "1884-01-01",
-          "precision": "year",
-          "source": "wp-eleicoes-br",
-          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+          "date": "1884-12-01",
+          "source": "camara-cronologia",
+          "note": "Direct election of deputies.",
+          "quote": "Decreto n. 9.271 de 3 de setembro de 1884: \"designando o dia 01.12.1884 para se proceder, em todo o Império, à eleição de Deputados.\""
         },
         {
-          "date": "1886-01-01",
-          "precision": "year",
-          "source": "wp-eleicoes-br",
-          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+          "date": "1886-01-15",
+          "source": "camara-cronologia",
+          "note": "Direct election of deputies.",
+          "quote": "Decreto n. 9.501 de 26 de setembro de 1885: \"designando o dia 15.01.1886 para se proceder, em todo o Império, à eleição de Deputados.\""
         },
         {
-          "date": "1889-01-01",
-          "precision": "year",
-          "source": "wp-eleicoes-br",
-          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+          "date": "1889-08-31",
+          "source": "camara-cronologia",
+          "note": "Direct election of deputies, the last of the Empire; the proclamation of the Republic on 15 November 1889 came before the new chamber met.",
+          "quote": "Decreto n. 10.252 de 15 de junho de 1889: \"designando o dia 31 de agosto para se proceder, em todo o Império, à eleição de Deputados.\""
         }
       ]
     },
