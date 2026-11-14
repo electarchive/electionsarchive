@@ -199,6 +199,7 @@ const MODEL = {
     base: 0.002,
     baseGrace: 7,
     baseLife: 6,
+    cure: { floor: 0.35, life: 0.25 },
     window: 1.5,
     carry: 1.1,
     half: 0.75,
@@ -381,6 +382,29 @@ const TAILS: Record<string, number> = {
 };
 
 const MAILED: Record<string, string> = { nv: "2020-06-09" };
+const CURES: Record<string, number> = { nv: 6 };
+
+function cureOf(race: LiveRace) {
+  const after = CURES[race.state];
+  const since = MAILED[race.state];
+  const day = /\d{4}-\d{2}-\d{2}/.exec(race.slug)?.[0];
+  if (after == null || since == null || day == null || day < since) {
+    return null;
+  }
+  let at = Date.parse(day) + after * 86_400_000;
+  for (;;) {
+    const date = new Date(at);
+    const weekday = date.getUTCDay();
+    if (
+      weekday !== 0 &&
+      weekday !== 6 &&
+      !(date.getUTCMonth() === 10 && date.getUTCDate() === 11)
+    ) {
+      return at + 86_400_000;
+    }
+    at += 86_400_000;
+  }
+}
 
 function tailOf(race: LiveRace) {
   const since = MAILED[race.state];
@@ -1646,8 +1670,18 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
             ((latest - onNight) * (Date.parse(stamp) - lookback)),
         )
       : 1;
+  const cureAt = isLate ? cureOf(race) : null;
+  const slowed =
+    cureAt == null
+      ? slowing
+      : Date.parse(stamp) < cureAt
+        ? Math.max(slowing, MODEL.late.cure.floor)
+        : slowing *
+          Math.exp(
+            -(Date.parse(stamp) - cureAt) / 86_400_000 / MODEL.late.cure.life,
+          );
   const planned = Math.max(
-    slowing *
+    slowed *
       Math.min(
         tail *
           Math.exp(
