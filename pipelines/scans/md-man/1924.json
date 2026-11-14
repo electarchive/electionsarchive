@@ -1,0 +1,204 @@
+{
+  "polity": "US-MD",
+  "publisher": "Maryland Secretary of State",
+  "title": "Maryland Manual 1925, general election returns (general election 1924-11-04)",
+  "license": "Public record",
+  "file": {
+    "url": "https://msa.maryland.gov/megafile/msa/speccol/sc2900/sc2908/000001/000136/pdf/am136--{page}.pdf",
+    "item": "https://msa.maryland.gov/megafile/msa/speccol/sc2900/sc2908/000001/000136/html/index.html"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1924,
+      "chamber": "president",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "MD",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 203,
+      "id": "203-0",
+      "columns": [
+        {
+          "label": "Abercrombie",
+          "contest": "president",
+          "candidate": "Calvin Coolidge"
+        },
+        {
+          "label": "Page",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Wharton",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Chamberlain",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Dill",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Prieke",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Curley",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Baker",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.032,
+        0.869,
+        0.228,
+        0.973
+      ],
+      "hint": "Read only the table headed 'FOR PRESIDENTIAL ELECTORS'; ignore any other table visible in the image."
+    },
+    {
+      "page": 204,
+      "id": "204-0",
+      "columns": [
+        {
+          "label": "Given",
+          "contest": "president",
+          "candidate": "John W. Davis"
+        },
+        {
+          "label": "Williams",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Miles",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Carlin",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Ryan",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Smith",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Strange",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "King",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.018,
+        0.858,
+        0.214,
+        0.957
+      ],
+      "hint": "Read only the table headed 'DEMOCRATIC PARTY Candidates'; ignore any other table visible in the image."
+    },
+    {
+      "page": 205,
+      "id": "205-0",
+      "columns": [
+        {
+          "label": "Gilman",
+          "contest": "president",
+          "candidate": "Robert M. La Follette"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.035,
+        0.851,
+        0.225,
+        0.956
+      ],
+      "hint": "Read only the table headed 'PROGRESSIVE PARTY Candidates FOR PRESIDENT Robert M. La Follette, Madison, Dane Co., Wis. FOR VICE-PRESIDENT Burton K. Wheeler, Butte, Montana FOR PRESIDENTIAL ELECTORS'; ignore any other table visible in the image."
+    },
+    {
+      "page": 206,
+      "id": "206-0",
+      "columns": [
+        {
+          "label": "Derner",
+          "contest": "president",
+          "candidate": "Frank Johns"
+        },
+        {
+          "label": "Einhorn",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Gibson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Lang",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Long",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Stevens",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Twigg",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Whitlow",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.014,
+        0.847,
+        0.215,
+        0.946
+      ],
+      "hint": "Read only the table headed 'LABOR PARTY'; ignore any other table visible in the image."
+    }
+  ]
+}

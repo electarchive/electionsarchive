@@ -1,0 +1,264 @@
+{
+  "polity": "US-MD",
+  "publisher": "Maryland Secretary of State",
+  "title": "Maryland Manual 1950, general election returns (general election 1948-11-02)",
+  "license": "Public record",
+  "file": {
+    "url": "https://msa.maryland.gov/megafile/msa/speccol/sc2900/sc2908/000001/000163/pdf/am163--{page}.pdf",
+    "item": "https://msa.maryland.gov/megafile/msa/speccol/sc2900/sc2908/000001/000163/html/index.html"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1948,
+      "chamber": "president",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "MD",
+      "district": null
+    },
+    "house1": {
+      "year": 1948,
+      "chamber": "house",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "MD",
+      "district": 1
+    },
+    "house4": {
+      "year": 1948,
+      "chamber": "house",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "MD",
+      "district": 4
+    },
+    "house2": {
+      "year": 1948,
+      "chamber": "house",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "MD",
+      "district": 2
+    },
+    "house5": {
+      "year": 1948,
+      "chamber": "house",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "MD",
+      "district": 5
+    },
+    "house3": {
+      "year": 1948,
+      "chamber": "house",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "MD",
+      "district": 3
+    },
+    "house6": {
+      "year": 1948,
+      "chamber": "house",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "MD",
+      "district": 6
+    }
+  },
+  "pages": [
+    {
+      "page": 262,
+      "id": "262-0",
+      "columns": [
+        {
+          "label": "Truman Barkley",
+          "contest": "president",
+          "candidate": "Harry S. Truman (Democratic)"
+        },
+        {
+          "label": "Dewey Warren",
+          "contest": "president",
+          "candidate": "Thomas E. Dewey (Republican)"
+        },
+        {
+          "label": "Wallace Taylor",
+          "contest": "president",
+          "candidate": "Henry Wallace (Progressive)"
+        },
+        {
+          "label": "Thomas Smith",
+          "contest": "president",
+          "candidate": "Norman Thomas (Socialist)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.034,
+        0.806,
+        0.218,
+        0.919
+      ],
+      "hint": "Read only the table headed 'President and Vice President of the United States, November 2, 1948'; ignore any other table visible in the image."
+    },
+    {
+      "page": 263,
+      "id": "263-0",
+      "columns": [
+        {
+          "label": "Beck",
+          "contest": "house1",
+          "candidate": "S. Scott Beck, Jr."
+        },
+        {
+          "label": "Miller",
+          "contest": "house1",
+          "candidate": "Edward T. Miller"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.018,
+        0.794,
+        0.11,
+        0.858
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 263,
+      "id": "263-1",
+      "columns": [
+        {
+          "label": "Fallon",
+          "contest": "house4",
+          "candidate": "George H. Fallon"
+        },
+        {
+          "label": "Miller",
+          "contest": "house4",
+          "candidate": "James W. Miller"
+        },
+        {
+          "label": "Camper",
+          "contest": "house4",
+          "candidate": "John E. T. Camper"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.112,
+        0.794,
+        0.206,
+        0.856
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 263,
+      "id": "263-2",
+      "columns": [
+        {
+          "label": "Bolton",
+          "contest": "house2",
+          "candidate": "William P. Bolton"
+        },
+        {
+          "label": "Shipley",
+          "contest": "house2",
+          "candidate": "A. Earl Shipley"
+        },
+        {
+          "label": "Clifford",
+          "contest": "house2",
+          "candidate": "Michael J. Clifford"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.018,
+        0.85,
+        0.11,
+        0.919
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 263,
+      "id": "263-3",
+      "columns": [
+        {
+          "label": "Sasscer",
+          "contest": "house5",
+          "candidate": "Lansdale G. Sasscer"
+        },
+        {
+          "label": "Weidemeyer",
+          "contest": "house5",
+          "candidate": "C. Maurice Weidemeyer"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.112,
+        0.848,
+        0.206,
+        0.923
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 263,
+      "id": "263-4",
+      "columns": [
+        {
+          "label": "Garmatz",
+          "contest": "house3",
+          "candidate": "Edward A. Garmatz"
+        },
+        {
+          "label": "Janetzke",
+          "contest": "house3",
+          "candidate": "John A. Janetzke, Jr."
+        },
+        {
+          "label": "Kulinski",
+          "contest": "house3",
+          "candidate": "Philip C. Kulinski"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.018,
+        0.911,
+        0.11,
+        0.971
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 263,
+      "id": "263-5",
+      "columns": [
+        {
+          "label": "Austin",
+          "contest": "house6",
+          "candidate": "F. Byrne Austin"
+        },
+        {
+          "label": "Beall",
+          "contest": "house6",
+          "candidate": "J. Glenn Beall"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.112,
+        0.915,
+        0.206,
+        0.971
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    }
+  ]
+}

@@ -1,0 +1,412 @@
+{
+  "polity": "US-MD",
+  "publisher": "Maryland Secretary of State",
+  "title": "Maryland Manual 1933, general election returns (general election 1932-11-08)",
+  "license": "Public record",
+  "file": {
+    "url": "https://msa.maryland.gov/megafile/msa/speccol/sc2900/sc2908/000001/000150/pdf/am150--{page}.pdf",
+    "item": "https://msa.maryland.gov/megafile/msa/speccol/sc2900/sc2908/000001/000150/html/index.html"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1932,
+      "chamber": "president",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "MD",
+      "district": null
+    },
+    "senate": {
+      "year": 1932,
+      "chamber": "senate",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "MD",
+      "district": null
+    },
+    "house1": {
+      "year": 1932,
+      "chamber": "house",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "MD",
+      "district": 1
+    },
+    "house2": {
+      "year": 1932,
+      "chamber": "house",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "MD",
+      "district": 2
+    },
+    "house3": {
+      "year": 1932,
+      "chamber": "house",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "MD",
+      "district": 3
+    },
+    "house4": {
+      "year": 1932,
+      "chamber": "house",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "MD",
+      "district": 4
+    },
+    "house5": {
+      "year": 1932,
+      "chamber": "house",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "MD",
+      "district": 5
+    },
+    "house6": {
+      "year": 1932,
+      "chamber": "house",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "MD",
+      "district": 6
+    }
+  },
+  "pages": [
+    {
+      "page": 269,
+      "id": "269-0",
+      "columns": [
+        {
+          "label": "Furst",
+          "contest": "president",
+          "candidate": "Franklin D. Roosevelt"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.022,
+        0.824,
+        0.22,
+        0.985
+      ],
+      "hint": "Read only the table headed 'FOR PRESIDENTIAL ELECTORS'; ignore any other table visible in the image."
+    },
+    {
+      "page": 270,
+      "id": "270-0",
+      "columns": [
+        {
+          "label": "Bibbins",
+          "contest": "president",
+          "candidate": "Herbert C. Hoover"
+        },
+        {
+          "label": "Adkins",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Russell",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Mays",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Stephan",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Levin",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Small",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Harp",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.02,
+        0.83,
+        0.218,
+        1.0
+      ],
+      "hint": "Read only the table headed 'For Presidential Electors'; ignore any other table visible in the image."
+    },
+    {
+      "page": 271,
+      "id": "271-0",
+      "columns": [
+        {
+          "label": "Gilman",
+          "contest": "president",
+          "candidate": "Norman Thomas"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.02,
+        0.804,
+        0.224,
+        0.983
+      ],
+      "hint": "Read only the table headed 'SOCIALIST PARTY CANDIDATES FOR PRESIDENTIAL ELECTORS'; ignore any other table visible in the image."
+    },
+    {
+      "page": 272,
+      "id": "272-0",
+      "columns": [
+        {
+          "label": "Bianco",
+          "contest": "president",
+          "candidate": "Communist"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.022,
+        0.793,
+        0.217,
+        0.994
+      ],
+      "hint": "Read only the table headed 'COMMUNIST PARTY CANDIDATES'; ignore any other table visible in the image."
+    },
+    {
+      "page": 273,
+      "id": "273-0",
+      "columns": [
+        {
+          "label": "Stevens",
+          "contest": "president",
+          "candidate": "Socialist-Labor"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.024,
+        0.846,
+        0.218,
+        0.983
+      ],
+      "hint": "Read only the table headed 'FOR PRESIDENTIAL ELECTORS'; ignore any other table visible in the image."
+    },
+    {
+      "page": 274,
+      "id": "274-0",
+      "columns": [
+        {
+          "label": "Tydings",
+          "contest": "senate",
+          "candidate": "Millard E. Tydings"
+        },
+        {
+          "label": "Williams",
+          "contest": "senate",
+          "candidate": "Wallace Williams"
+        },
+        {
+          "label": "Toole",
+          "contest": "senate",
+          "candidate": "William A. Toole"
+        },
+        {
+          "label": "Bradley",
+          "contest": "senate",
+          "candidate": "Carl Bradley"
+        },
+        {
+          "label": "Twigg",
+          "contest": "senate",
+          "candidate": "Noah S. Twigg"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.036,
+        0.795,
+        0.224,
+        0.947
+      ],
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR FROM MARYLAND'; ignore any other table visible in the image."
+    },
+    {
+      "page": 275,
+      "id": "275-1",
+      "columns": [
+        {
+          "label": "Goldsborough",
+          "contest": "house1",
+          "candidate": "T. Alan Goldsborough"
+        },
+        {
+          "label": "Phoebus",
+          "contest": "house1",
+          "candidate": "Harry T. Phoebus"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.019,
+        0.839,
+        0.21,
+        0.92
+      ],
+      "hint": "Read only the table headed 'First Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 275,
+      "id": "275-2",
+      "columns": [
+        {
+          "label": "Cole",
+          "contest": "house2",
+          "candidate": "William P. Cole, jr."
+        },
+        {
+          "label": "Elliott",
+          "contest": "house2",
+          "candidate": "David L. Elliott"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.019,
+        0.912,
+        0.21,
+        0.974
+      ],
+      "hint": "Read only the table headed 'Second Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 276,
+      "id": "276-0",
+      "columns": [
+        {
+          "label": "Palmisano",
+          "contest": "house3",
+          "candidate": "Vincent L. Palmisano"
+        },
+        {
+          "label": "Ingram",
+          "contest": "house3",
+          "candidate": "R. Palmer Ingram"
+        },
+        {
+          "label": "Neistadt",
+          "contest": "house3",
+          "candidate": "Samuel M. Neiscadt"
+        },
+        {
+          "label": "Potrusuki",
+          "contest": "house3",
+          "candidate": "Walter Potruzuski"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.035,
+        0.816,
+        0.213,
+        0.873
+      ],
+      "hint": "Read only the table headed 'Third Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 276,
+      "id": "276-1",
+      "columns": [
+        {
+          "label": "Kennedy",
+          "contest": "house4",
+          "candidate": "Ambrose J. Kennedy"
+        },
+        {
+          "label": "Sweeney",
+          "contest": "house4",
+          "candidate": "Claude B. Sweezey"
+        },
+        {
+          "label": "Kane",
+          "contest": "house4",
+          "candidate": "James J. Kane"
+        },
+        {
+          "label": "Gattes",
+          "contest": "house4",
+          "candidate": "John Gattes"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.035,
+        0.865,
+        0.213,
+        0.917
+      ],
+      "hint": "Read only the table headed 'Fourth Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 276,
+      "id": "276-2",
+      "columns": [
+        {
+          "label": "Gambrill",
+          "contest": "house5",
+          "candidate": "Stephen W. Gambrill"
+        },
+        {
+          "label": "Love",
+          "contest": "house5",
+          "candidate": "A. Kingsley Love"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.035,
+        0.909,
+        0.22,
+        0.964
+      ],
+      "hint": "Read only the table headed 'Fifth Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 277,
+      "id": "277-0",
+      "columns": [
+        {
+          "label": "Lewis",
+          "contest": "house6",
+          "candidate": "David J. Lewis"
+        },
+        {
+          "label": "Smith",
+          "contest": "house6",
+          "candidate": "Harold C. Smith"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.018,
+        0.78,
+        0.204,
+        0.843
+      ],
+      "hint": "Read only the table headed 'Sixth Congressional District'; ignore any other table visible in the image."
+    }
+  ]
+}

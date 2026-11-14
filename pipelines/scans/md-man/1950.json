@@ -1,0 +1,272 @@
+{
+  "polity": "US-MD",
+  "publisher": "Maryland Secretary of State",
+  "title": "Maryland Manual 1951-52, general election returns (general election 1950-11-07)",
+  "license": "Public record",
+  "file": {
+    "url": "https://msa.maryland.gov/megafile/msa/speccol/sc2900/sc2908/000001/000164/pdf/am164--{page}.pdf",
+    "item": "https://msa.maryland.gov/megafile/msa/speccol/sc2900/sc2908/000001/000164/html/index.html"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "governor": {
+      "year": 1950,
+      "chamber": "governor",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "MD",
+      "district": null
+    },
+    "senate": {
+      "year": 1950,
+      "chamber": "senate",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "MD",
+      "district": null
+    },
+    "house1": {
+      "year": 1950,
+      "chamber": "house",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "MD",
+      "district": 1
+    },
+    "house4": {
+      "year": 1950,
+      "chamber": "house",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "MD",
+      "district": 4
+    },
+    "house5": {
+      "year": 1950,
+      "chamber": "house",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "MD",
+      "district": 5
+    },
+    "house2": {
+      "year": 1950,
+      "chamber": "house",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "MD",
+      "district": 2
+    },
+    "house6": {
+      "year": 1950,
+      "chamber": "house",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "MD",
+      "district": 6
+    },
+    "house3": {
+      "year": 1950,
+      "chamber": "house",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "MD",
+      "district": 3
+    }
+  },
+  "pages": [
+    {
+      "page": 261,
+      "id": "261-0",
+      "columns": [
+        {
+          "label": "Lane",
+          "contest": "governor",
+          "candidate": "William Preston Lane"
+        },
+        {
+          "label": "McKeldin",
+          "contest": "governor",
+          "candidate": "Theodore R. McKeldin"
+        },
+        {
+          "label": "Tydings",
+          "contest": "senate",
+          "candidate": "Millard E. Tydings"
+        },
+        {
+          "label": "Butler",
+          "contest": "senate",
+          "candidate": "John Marshall Butler"
+        },
+        {
+          "label": "Fox",
+          "contest": "senate",
+          "candidate": "Sam Fox"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.01,
+        0.811,
+        0.219,
+        0.942
+      ],
+      "hint": "Read only the table headed 'GOVERNOR \u2014 UNITED STATES SENATOR'; ignore any other table visible in the image."
+    },
+    {
+      "page": 263,
+      "id": "263-0",
+      "columns": [
+        {
+          "label": "Johnson",
+          "contest": "house1",
+          "candidate": "Thomas F. Johnson"
+        },
+        {
+          "label": "Miller",
+          "contest": "house1",
+          "candidate": "Edward T. Miller"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.017,
+        0.792,
+        0.112,
+        0.848
+      ],
+      "hint": "Read only the table headed 'First Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 263,
+      "id": "263-1",
+      "columns": [
+        {
+          "label": "Fallon",
+          "contest": "house4",
+          "candidate": "George H. Fallon"
+        },
+        {
+          "label": "Miller",
+          "contest": "house4",
+          "candidate": "James W. Miller"
+        },
+        {
+          "label": "Jones",
+          "contest": "house4",
+          "candidate": "Marshall Jones"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.113,
+        0.793,
+        0.21,
+        0.853
+      ],
+      "hint": "Read only the table headed 'Fourth Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 263,
+      "id": "263-2",
+      "columns": [
+        {
+          "label": "Sasscer",
+          "contest": "house5",
+          "candidate": "Lansdale G. Sasscer"
+        },
+        {
+          "label": "Carr",
+          "contest": "house5",
+          "candidate": "Thomas S. Carr"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.113,
+        0.845,
+        0.21,
+        0.922
+      ],
+      "hint": "Read only the table headed 'Fifth Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 263,
+      "id": "263-3",
+      "columns": [
+        {
+          "label": "Bolton",
+          "contest": "house2",
+          "candidate": "William P. Bolton"
+        },
+        {
+          "label": "Devereux",
+          "contest": "house2",
+          "candidate": "James P. S. Devereaux"
+        },
+        {
+          "label": "Gerende",
+          "contest": "house2",
+          "candidate": "Thelma Gerende"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.017,
+        0.84,
+        0.112,
+        0.924
+      ],
+      "hint": "Read only the table headed 'Second Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 263,
+      "id": "263-4",
+      "columns": [
+        {
+          "label": "Hartle",
+          "contest": "house6",
+          "candidate": "Russell Peter Hartle"
+        },
+        {
+          "label": "Beall",
+          "contest": "house6",
+          "candidate": "J. Glenn Beall"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.113,
+        0.914,
+        0.21,
+        0.967
+      ],
+      "hint": "Read only the table headed 'Sixth Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 263,
+      "id": "263-5",
+      "columns": [
+        {
+          "label": "Garmatz",
+          "contest": "house3",
+          "candidate": "Edward A. Garmatz"
+        },
+        {
+          "label": "Millo",
+          "contest": "house3",
+          "candidate": "Louis R. Milio"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.017,
+        0.916,
+        0.112,
+        0.967
+      ],
+      "hint": "Read only the table headed 'Third Congressional District'; ignore any other table visible in the image."
+    }
+  ]
+}

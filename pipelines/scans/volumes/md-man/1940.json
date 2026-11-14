@@ -12,9 +12,14 @@
   "raw_source": "us.scans",
   "create": true,
   "offices": {
-    "president": "President (votes for presidential electors by county; when the page prints one column per elector, the column of each party's first elector, the elector at large listed first); only the 1940 general election"
+    "president": "President (votes for presidential electors by county; when the page prints one column per elector, the column of each party's first elector, the elector at large listed first); only the 1940 general election",
+    "senate": "U.S. Senator (United States Senator), not a state senator; only the 1940 general election",
+    "house": "U.S. Representative in Congress, one table per congressional district; district is the congressional district number; only the 1940 general election, not a primary"
   },
   "leaves": [
-    301
+    301,
+    325,
+    329,
+    330
   ]
 }

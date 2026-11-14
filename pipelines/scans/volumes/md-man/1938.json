@@ -3,11 +3,11 @@
   "day": "1938-11-08",
   "polity": "US-MD",
   "publisher": "Maryland Secretary of State",
-  "title": "Maryland Manual 1940-41, general election returns (general election 1938-11-08)",
+  "title": "Maryland Manual 1938, general election returns (general election 1938-11-08)",
   "license": "Public record",
   "file": {
-    "url": "https://msa.maryland.gov/megafile/msa/speccol/sc2900/sc2908/000001/000159/pdf/am159--{page}.pdf",
-    "item": "https://msa.maryland.gov/megafile/msa/speccol/sc2900/sc2908/000001/000159/html/index.html"
+    "url": "https://msa.maryland.gov/megafile/msa/speccol/sc2900/sc2908/000001/000158/pdf/am158--{page}.pdf",
+    "item": "https://msa.maryland.gov/megafile/msa/speccol/sc2900/sc2908/000001/000158/html/index.html"
   },
   "raw_source": "us.scans",
   "create": true,
@@ -17,10 +17,10 @@
     "house": "U.S. Representative in Congress, one table per congressional district; district is the congressional district number; only the 1938 general election, not a primary"
   },
   "leaves": [
-    323,
-    324,
+    320,
+    321,
     325,
-    329,
-    330
+    326,
+    327
   ]
 }

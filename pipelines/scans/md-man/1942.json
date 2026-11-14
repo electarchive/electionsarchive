@@ -1,0 +1,239 @@
+{
+  "polity": "US-MD",
+  "publisher": "Maryland Secretary of State",
+  "title": "Maryland Manual 1943-44, general election returns (general election 1942-11-03)",
+  "license": "Public record",
+  "file": {
+    "url": "https://msa.maryland.gov/megafile/msa/speccol/sc2900/sc2908/000001/000160/pdf/am160--{page}.pdf",
+    "item": "https://msa.maryland.gov/megafile/msa/speccol/sc2900/sc2908/000001/000160/html/index.html"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "governor": {
+      "year": 1942,
+      "chamber": "governor",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "MD",
+      "district": null
+    },
+    "house1": {
+      "year": 1942,
+      "chamber": "house",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "MD",
+      "district": 1
+    },
+    "house2": {
+      "year": 1942,
+      "chamber": "house",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "MD",
+      "district": 2
+    },
+    "house3": {
+      "year": 1942,
+      "chamber": "house",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "MD",
+      "district": 3
+    },
+    "house4": {
+      "year": 1942,
+      "chamber": "house",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "MD",
+      "district": 4
+    },
+    "house5": {
+      "year": 1942,
+      "chamber": "house",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "MD",
+      "district": 5
+    },
+    "house6": {
+      "year": 1942,
+      "chamber": "house",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "MD",
+      "district": 6
+    }
+  },
+  "pages": [
+    {
+      "page": 198,
+      "id": "198-0",
+      "columns": [
+        {
+          "label": "O'Conor",
+          "contest": "governor",
+          "candidate": "Herbert O'Conor"
+        },
+        {
+          "label": "McKeldin",
+          "contest": "governor",
+          "candidate": "Theodore R. McKeldin"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.062,
+        0.801,
+        0.2,
+        0.928
+      ],
+      "hint": "Read only the table headed 'For Governor of Maryland'; ignore any other table visible in the image."
+    },
+    {
+      "page": 201,
+      "id": "201-0",
+      "columns": [
+        {
+          "label": "Ward",
+          "contest": "house1",
+          "candidate": "David J. Ward"
+        },
+        {
+          "label": "Lloyd",
+          "contest": "house1",
+          "candidate": "William H. Lloyd"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.112,
+        0.796,
+        0.708,
+        0.866
+      ],
+      "hint": "Read only the table headed 'From the First Congressional District of Maryland'; ignore any other table visible in the image."
+    },
+    {
+      "page": 201,
+      "id": "201-1",
+      "columns": [
+        {
+          "label": "Baldwin",
+          "contest": "house2",
+          "candidate": "H. Streett Baldwin"
+        },
+        {
+          "label": "Norris",
+          "contest": "house2",
+          "candidate": "George R. Norris"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.112,
+        0.858,
+        0.708,
+        0.921
+      ],
+      "hint": "Read only the table headed 'From the Second Congressional District of Maryland'; ignore any other table visible in the image."
+    },
+    {
+      "page": 201,
+      "id": "201-2",
+      "columns": [
+        {
+          "label": "D'Alesandro",
+          "contest": "house3",
+          "candidate": "Thomas D'Alesandro, Jr."
+        },
+        {
+          "label": "Panetti",
+          "contest": "house3",
+          "candidate": "Edward S. Panetti"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.112,
+        0.913,
+        0.708,
+        0.966
+      ],
+      "hint": "Read only the table headed 'From the Third Congressional District of Maryland'; ignore any other table visible in the image."
+    },
+    {
+      "page": 202,
+      "id": "202-0",
+      "columns": [
+        {
+          "label": "Ellison",
+          "contest": "house4",
+          "candidate": "Daniel Ellison"
+        },
+        {
+          "label": "Wyatt",
+          "contest": "house4",
+          "candidate": "John M. Wyatt"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.053,
+        0.766,
+        0.21,
+        0.822
+      ],
+      "hint": "Read only the table headed 'From the Fourth Congressional District of Maryland'; ignore any other table visible in the image."
+    },
+    {
+      "page": 202,
+      "id": "202-1",
+      "columns": [
+        {
+          "label": "Sasscer",
+          "contest": "house5",
+          "candidate": "Lansdale G. Sasscer"
+        },
+        {
+          "label": "Torvested",
+          "contest": "house5",
+          "candidate": "John Torvestad"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.053,
+        0.814,
+        0.213,
+        0.895
+      ],
+      "hint": "Read only the table headed 'From the Fifth Congressional District of Maryland'; ignore any other table visible in the image."
+    },
+    {
+      "page": 202,
+      "id": "202-2",
+      "columns": [
+        {
+          "label": "Beall",
+          "contest": "house6",
+          "candidate": "J. Glenn Beall"
+        },
+        {
+          "label": "Lee",
+          "contest": "house6",
+          "candidate": "E. Brooke Lee"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.068,
+        0.887,
+        0.213,
+        0.946
+      ],
+      "hint": "Read only the table headed 'From the Sixth Congressional District of Maryland'; ignore any other table visible in the image."
+    }
+  ]
+}

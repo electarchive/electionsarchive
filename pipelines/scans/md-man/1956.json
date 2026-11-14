@@ -1,0 +1,303 @@
+{
+  "polity": "US-MD",
+  "publisher": "Maryland Secretary of State",
+  "title": "Maryland Manual 1957-58, general election returns (general election 1956-11-06)",
+  "license": "Public record",
+  "file": {
+    "url": "https://msa.maryland.gov/megafile/msa/speccol/sc2900/sc2908/000001/000167/pdf/am167--{page}.pdf",
+    "item": "https://msa.maryland.gov/megafile/msa/speccol/sc2900/sc2908/000001/000167/html/index.html"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1956,
+      "chamber": "president",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "MD",
+      "district": null
+    },
+    "senate": {
+      "year": 1956,
+      "chamber": "senate",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "MD",
+      "district": null
+    },
+    "house1": {
+      "year": 1956,
+      "chamber": "house",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "MD",
+      "district": 1
+    },
+    "house3": {
+      "year": 1956,
+      "chamber": "house",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "MD",
+      "district": 3
+    },
+    "house2": {
+      "year": 1956,
+      "chamber": "house",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "MD",
+      "district": 2
+    },
+    "house4": {
+      "year": 1956,
+      "chamber": "house",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "MD",
+      "district": 4
+    },
+    "house5": {
+      "year": 1956,
+      "chamber": "house",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "MD",
+      "district": 5
+    },
+    "house6": {
+      "year": 1956,
+      "chamber": "house",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "MD",
+      "district": 6
+    },
+    "house7": {
+      "year": 1956,
+      "chamber": "house",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "MD",
+      "district": 7
+    }
+  },
+  "pages": [
+    {
+      "page": 325,
+      "id": "325-0",
+      "columns": [
+        {
+          "label": "Eisenhower",
+          "contest": "president",
+          "candidate": "Dwight D. Eisenhower (Republican)"
+        },
+        {
+          "label": "Stevenson",
+          "contest": "president",
+          "candidate": "Adlai Stevenson (Democratic)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.022,
+        0.864,
+        0.204,
+        0.971
+      ],
+      "hint": "Read only the table headed 'President and Vice President of the United States, Counties and Baltimore City'; ignore any other table visible in the image."
+    },
+    {
+      "page": 326,
+      "id": "326-0",
+      "columns": [
+        {
+          "label": "Butler",
+          "contest": "senate",
+          "candidate": "John Marshall Butler"
+        },
+        {
+          "label": "Mahoney",
+          "contest": "senate",
+          "candidate": "George P. Mahoney"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.039,
+        0.852,
+        0.22,
+        0.955
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR'; ignore any other table visible in the image."
+    },
+    {
+      "page": 327,
+      "id": "327-0",
+      "columns": [
+        {
+          "label": "Miller",
+          "contest": "house1",
+          "candidate": "Edward T. Miller"
+        },
+        {
+          "label": "Fox",
+          "contest": "house1",
+          "candidate": "Hamilton P. Fox"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.021,
+        0.81,
+        0.112,
+        0.894
+      ],
+      "hint": "Read only the table headed 'First Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 327,
+      "id": "327-1",
+      "columns": [
+        {
+          "label": "Garmatz",
+          "contest": "house3",
+          "candidate": "Edward A. Garmatz"
+        },
+        {
+          "label": "Kemper",
+          "contest": "house3",
+          "candidate": "Harry Kemper"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.11,
+        0.81,
+        0.202,
+        0.897
+      ],
+      "hint": "Read only the table headed 'Third Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 327,
+      "id": "327-2",
+      "columns": [
+        {
+          "label": "Devereux",
+          "contest": "house2",
+          "candidate": "James P. S. Devereux"
+        },
+        {
+          "label": "Boone",
+          "contest": "house2",
+          "candidate": "A Gordon Boone"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.021,
+        0.886,
+        0.112,
+        0.956
+      ],
+      "hint": "Read only the table headed 'Second Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 327,
+      "id": "327-3",
+      "columns": [
+        {
+          "label": "Fallon",
+          "contest": "house4",
+          "candidate": "George H. Fallon"
+        },
+        {
+          "label": "Hubbard",
+          "contest": "house4",
+          "candidate": "George Denys Hubbard"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.11,
+        0.889,
+        0.202,
+        0.975
+      ],
+      "hint": "Read only the table headed 'Fourth Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 328,
+      "id": "328-0",
+      "columns": [
+        {
+          "label": "Prender- gast",
+          "contest": "house5",
+          "candidate": "William B. Prendergast"
+        },
+        {
+          "label": "Lank- ford",
+          "contest": "house5",
+          "candidate": "Richard E. Lankford"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.036,
+        0.793,
+        0.127,
+        0.888
+      ],
+      "hint": "Read only the table headed 'Fifth Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 328,
+      "id": "328-1",
+      "columns": [
+        {
+          "label": "Hyde",
+          "contest": "house6",
+          "candidate": "Dewitt S. Hyde"
+        },
+        {
+          "label": "Foley",
+          "contest": "house6",
+          "candidate": "John R. Foley"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.125,
+        0.793,
+        0.216,
+        0.879
+      ],
+      "hint": "Read only the table headed 'Sixth Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 328,
+      "id": "328-2",
+      "columns": [
+        {
+          "label": "Friedel",
+          "contest": "house7",
+          "candidate": "Samuel N. Friedel"
+        },
+        {
+          "label": "Halley",
+          "contest": "house7",
+          "candidate": "David A. Halley"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.082,
+        0.88,
+        0.172,
+        0.963
+      ],
+      "hint": "Read only the table headed 'Seventh Congressional District'; ignore any other table visible in the image."
+    }
+  ]
+}

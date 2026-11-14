@@ -1,0 +1,259 @@
+{
+  "polity": "US-MD",
+  "publisher": "Maryland Secretary of State",
+  "title": "Maryland Manual 1930, general election returns (general election 1930-11-04)",
+  "license": "Public record",
+  "file": {
+    "url": "https://msa.maryland.gov/megafile/msa/speccol/sc2900/sc2908/000001/000147/pdf/am147--{page}.pdf",
+    "item": "https://msa.maryland.gov/megafile/msa/speccol/sc2900/sc2908/000001/000147/html/index.html"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "governor": {
+      "year": 1930,
+      "chamber": "governor",
+      "day": "1930-11-04",
+      "special": false,
+      "state": "MD",
+      "district": null
+    },
+    "house1": {
+      "year": 1930,
+      "chamber": "house",
+      "day": "1930-11-04",
+      "special": false,
+      "state": "MD",
+      "district": 1
+    },
+    "house2": {
+      "year": 1930,
+      "chamber": "house",
+      "day": "1930-11-04",
+      "special": false,
+      "state": "MD",
+      "district": 2
+    },
+    "house3": {
+      "year": 1930,
+      "chamber": "house",
+      "day": "1930-11-04",
+      "special": false,
+      "state": "MD",
+      "district": 3
+    },
+    "house4": {
+      "year": 1930,
+      "chamber": "house",
+      "day": "1930-11-04",
+      "special": false,
+      "state": "MD",
+      "district": 4
+    },
+    "house5": {
+      "year": 1930,
+      "chamber": "house",
+      "day": "1930-11-04",
+      "special": false,
+      "state": "MD",
+      "district": 5
+    },
+    "house6": {
+      "year": 1930,
+      "chamber": "house",
+      "day": "1930-11-04",
+      "special": false,
+      "state": "MD",
+      "district": 6
+    }
+  },
+  "pages": [
+    {
+      "page": 240,
+      "id": "240-0",
+      "columns": [
+        {
+          "label": "Ritchie",
+          "contest": "governor",
+          "candidate": "Albert C. Ritchie"
+        },
+        {
+          "label": "Broening",
+          "contest": "governor",
+          "candidate": "William F. Broening"
+        },
+        {
+          "label": "Gilman",
+          "contest": "governor",
+          "candidate": "Elisabeth Gilman"
+        },
+        {
+          "label": "Parker",
+          "contest": "governor",
+          "candidate": "Samuel Parker"
+        },
+        {
+          "label": "Stevens",
+          "contest": "governor",
+          "candidate": "Robert W. Stevens"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.028,
+        0.821,
+        0.21,
+        0.958
+      ],
+      "hint": "Read only the table headed 'CANDIDATES FOR GOVERNOR'; ignore any other table visible in the image."
+    },
+    {
+      "page": 250,
+      "id": "250-0",
+      "columns": [
+        {
+          "label": "Goldsborough",
+          "contest": "house1",
+          "candidate": "T. Alan Goldsborough"
+        },
+        {
+          "label": "Marine",
+          "contest": "house1",
+          "candidate": "A. Stengle Marine"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.029,
+        0.793,
+        0.207,
+        0.866
+      ],
+      "hint": "Read only the table headed 'First Congressional District of Maryland'; ignore any other table visible in the image."
+    },
+    {
+      "page": 250,
+      "id": "250-1",
+      "columns": [
+        {
+          "label": "Cole",
+          "contest": "house2",
+          "candidate": "William P. Cole, jr."
+        },
+        {
+          "label": "Clark",
+          "contest": "house2",
+          "candidate": "Linwood L. Clark"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.029,
+        0.858,
+        0.207,
+        0.924
+      ],
+      "hint": "Read only the table headed 'Second Congressional District of Maryland'; ignore any other table visible in the image."
+    },
+    {
+      "page": 250,
+      "id": "250-2",
+      "columns": [
+        {
+          "label": "Palmisano",
+          "contest": "house3",
+          "candidate": "Vincent L. Palmisano"
+        },
+        {
+          "label": "Hill",
+          "contest": "house3",
+          "candidate": "John Philip Hill"
+        },
+        {
+          "label": "Neistadt",
+          "contest": "house3",
+          "candidate": "Samuel M. Neistadt"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.029,
+        0.916,
+        0.207,
+        0.979
+      ],
+      "hint": "Read only the table headed 'Third Congressional District of Maryland'; ignore any other table visible in the image."
+    },
+    {
+      "page": 251,
+      "id": "251-0",
+      "columns": [
+        {
+          "label": "Linthicum",
+          "contest": "house4",
+          "candidate": "J. Charles Linthicum"
+        },
+        {
+          "label": "Atwood",
+          "contest": "house4",
+          "candidate": "W. O. Atwood"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.027,
+        0.758,
+        0.208,
+        0.806
+      ],
+      "hint": "Read only the table headed 'Fourth Congressional District of Maryland'; ignore any other table visible in the image."
+    },
+    {
+      "page": 251,
+      "id": "251-1",
+      "columns": [
+        {
+          "label": "Gambrill",
+          "contest": "house5",
+          "candidate": "Stephen W. Gambrill"
+        },
+        {
+          "label": "Love",
+          "contest": "house5",
+          "candidate": "A. Kingsley Love"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.027,
+        0.798,
+        0.208,
+        0.868
+      ],
+      "hint": "Read only the table headed 'Fifth Congressional District of Maryland'; ignore any other table visible in the image."
+    },
+    {
+      "page": 251,
+      "id": "251-2",
+      "columns": [
+        {
+          "label": "Lewis",
+          "contest": "house6",
+          "candidate": "David J. Lewis"
+        },
+        {
+          "label": "Zihlman",
+          "contest": "house6",
+          "candidate": "Frederick N. Zihlman"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.027,
+        0.86,
+        0.208,
+        0.913
+      ],
+      "hint": "Read only the table headed 'Sixth Congressional District of Maryland'; ignore any other table visible in the image."
+    }
+  ]
+}
