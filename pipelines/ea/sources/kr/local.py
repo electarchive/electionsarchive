@@ -36,13 +36,13 @@ def _old(day: str) -> bool:
     return day <= "20020613"
 
 
-def _selector(day: str) -> str:
+def _selector(day: str, code: str = ELECTION_CODE) -> str:
     suffix = "GuOld" if _old(day) else "Old"
-    query = {"electionId": "0000000000", "electionCode": day, "subElectionCode": ELECTION_CODE}
+    query = {"electionId": "0000000000", "electionCode": day, "subElectionCode": code}
     return f"{BASE}/bizcommon/selectbox/selectbox_cityCodeBySgJson_{suffix}.json?{urlencode(query)}"
 
 
-def _form(kind: str, day: str, city: str) -> dict[str, str]:
+def _form(kind: str, day: str, city: str, code: str = ELECTION_CODE) -> dict[str, str]:
     top, menu, page = ("EP", "EPEI01", "ep/epei01.jsp") if kind == "winners" else ("VC", "VCCP09", "vc/vccp09.jsp")
     if kind == "winners":
         statement = "EPEI01_#91" if _old(day) else "EPEI01_#1"
@@ -58,7 +58,7 @@ def _form(kind: str, day: str, city: str) -> dict[str, str]:
         "oldElectionType": "0" if _old(day) else "",
         "electionType": "4",
         "electionName": day,
-        "electionCode": ELECTION_CODE,
+        "electionCode": code,
         "cityCode": city,
         "townCode": "-1",
         "sggCityCode": "-1",
