@@ -1,5 +1,6 @@
 import base64
 import csv
+import html
 import io
 import json
 import re
@@ -490,6 +491,7 @@ def images(path: Path) -> list[Image.Image]:
 
 def fetch() -> None:
     raw.fetch(SOURCE, wayback("20251221232954", INDEX), suffix=".html")
+    raw.fetch(SOURCE, wayback(DEMON_STAMP, DEMON), suffix=".html")
     price_in, price_out = batch.PRICES[MODEL]
     wanted: dict[str, batch.Want] = {}
     for *_, stamp, url in FILES:
@@ -975,10 +977,19 @@ BLOCK = (
 WINNERS_1999 = (
     "The Clerk of the Parliaments announced only the successful candidates and their votes to the House. The paper "
     "giving every candidate's votes was laid in the Printed Paper Office and the Library and has not been found "
-    "online, so the unsuccessful candidates are not stored and the votes cover the elected only."
+    "online, so this set covers the elected only; a second result set holds Election Demon's transcription of that "
+    "paper with the unsuccessful candidates."
 )
 TIE_1999 = " The Clerk added that the tie between Lord Strabolgi and Lord Elton was resolved by voters' preferences, which put Lord Strabolgi ahead."
 HANSARD = "https://api.parliament.uk/historic-hansard/lords"
+DEMON = "http://www.election.demon.co.uk/lords.html"
+DEMON_STAMP = "20130121193747"
+DEMON_ORDER = ("house", "conservative", "crossbench", "liberal_democrat", "labour")
+COMPILED_1999 = (
+    "Every candidate's votes, as Election Demon (David Boothroyd) transcribed them from the Clerk of the Parliaments' "
+    "paper of complete results (archived copy). Its votes for the elected candidates match those the Clerk "
+    "announced to the House, which the default result set holds."
+)
 ELECTIONS_1999: dict[str, tuple[str, str, int, int, str, str, str]] = {
     "house": (
         "1999-10-27",
@@ -1028,6 +1039,25 @@ ELECTIONS_1999: dict[str, tuple[str, str, int, int, str, str, str]] = {
 }
 NUMBERS_1999 = {631: "Six hundred and thirty-one"}
 CAVEATS = {("2017-03-21", "house"): SHORT, ("2023-09-19", "crossbench"): BLANK}
+
+
+def demon_1999(path: Path) -> dict[str, list[tuple[str, int]]]:
+    text = path.read_text(encoding="latin-1")
+    tables = re.findall(r"<TABLE><TR><TH[^>]*>Order</TH>(.*?)</TABLE>", text, re.DOTALL)
+    if len(tables) != len(DEMON_ORDER):
+        raise ValueError(f"Election Demon: {len(tables)} result tables")
+    out: dict[str, list[tuple[str, int]]] = {}
+    for group, table in zip(DEMON_ORDER, tables, strict=True):
+        cells = [
+            [html.unescape(line).strip() for line in re.split(r"<BR>", cell, flags=re.IGNORECASE) if line.strip()]
+            for cell in re.findall(r"<TD[^>]*>(.*?)</TD>", table.split("</TR>", 1)[1], re.DOTALL)
+        ]
+        names = [re.sub(r"[*\u2020]+$", "", name).strip() for name in cells[1]]
+        votes = [int(vote) for vote in cells[2]]
+        if [int(order) for order in cells[0]] != list(range(1, len(names) + 1)) or len(votes) != len(names):
+            raise ValueError(f"Election Demon {group}: columns disagree")
+        out[group] = list(zip(names, votes, strict=True))
+    return out
 
 
 def core(label: str) -> str:
@@ -1265,8 +1295,28 @@ def emit() -> Path:
                             values.append((result_set, units[group], None, measure, number, figure))
         rows = list(csv.DictReader((Path(__file__).parent / "lords_peers_1999.tsv").open(), delimiter="\t"))
         cited: set[UUID] = set()
+        demon_artifact = raw.cached(SOURCE, wayback(DEMON_STAMP, DEMON))
+        demon = demon_1999(demon_artifact.path)
+        compiled = cs.source("Election Demon", "House of Lords Elections")
+        cs.add(
+            "source",
+            id=compiled,
+            kind="aggregator",
+            publisher="Election Demon",
+            title="House of Lords Elections",
+            url=DEMON,
+            license=None,
+        )
+        cs.artifact(demon_artifact, compiled)
         for group, (day, until, seats, valid, url, intro, caveat) in ELECTIONS_1999.items():
-            picked = [row for row in rows if row["electorate"] == group]
+            picked = [row for row in rows if row["electorate"] == group and row["url"] != DEMON]
+            losers = [row for row in rows if row["electorate"] == group and row["url"] == DEMON]
+            if [int(row["votes"]) for row in picked] != [votes for _, votes in demon[group][:seats]] or [
+                (row["ballot_label"], int(row["votes"])) for row in losers
+            ] != demon[group][seats:]:
+                raise ValueError(f"1999 {group}: Election Demon disagrees")
+            if [int(row["rank"]) for row in picked + losers] != list(range(1, len(demon[group]) + 1)):
+                raise ValueError(f"1999 {group}: ranks")
             if len(picked) != seats or {
                 (row["date_from"], row["date_to"], int(row["seats"]), int(row["valid_ballots"]), row["url"])
                 for row in picked
@@ -1337,6 +1387,7 @@ def emit() -> Path:
             cs.add("note", entity_id=result_set, kind="caveat", body_md=WINNERS_1999 + caveat)
             if str(valid) not in text and NUMBERS_1999.get(valid, "") not in text:
                 raise ValueError(f"1999 {group}: {valid} valid ballots not printed")
+            options: list[tuple[UUID, int]] = []
             for row in picked:
                 label, votes = row["ballot_label"], int(row["votes"])
                 if not re.search(r"\.\s*".join(map(re.escape, label.split(". "))) + r"\s+" + str(votes) + r"\b", text):
@@ -1368,7 +1419,62 @@ def emit() -> Path:
                 )
                 cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected")
                 values.append((result_set, units[group], option, VOTES, 1, votes))
+                options.append((option, votes))
             values.append((result_set, units[group], None, VALID, 1, valid))
+            for row in losers:
+                label, votes = row["ballot_label"], int(row["votes"])
+                option_key = f"{key}:{label}"
+                option = cs.key(f"{SOURCE}.option", option_key)
+                member = party(label, group)
+                cs.add(
+                    "contest_option",
+                    id=option,
+                    contest_id=contest,
+                    kind="candidate",
+                    ballot_position=int(row["rank"]),
+                    party_id=parties.get(member or ""),
+                    ballot_label=label,
+                )
+                person = cs.key(f"{SOURCE}.person", f"{key}:{label}")
+                if person in cs.minted:
+                    cs.add("person", id=person)
+                    name(person, label)
+                cs.add(
+                    "candidacy",
+                    id=cs.key(f"{SOURCE}.candidacy", option_key),
+                    person_id=person,
+                    option_id=option,
+                    role="head",
+                    ballot_name=label,
+                    member_of_party_id=parties.get(member or ""),
+                )
+                options.append((option, votes))
+            full = cs.key(f"{SOURCE}.result_set", f"{key}:demon")
+            cs.add(
+                "result_set",
+                id=full,
+                election_id=election,
+                contest_id=contest,
+                stage="official",
+                kind="counted",
+                status="active",
+                source_id=compiled,
+                is_default=False,
+                completeness=1,
+            )
+            cs.add("citation", entity_id=full, source_id=compiled)
+            cs.add("note", entity_id=full, kind="caveat", body_md=COMPILED_1999)
+            for option, votes in options:
+                values.append((full, units[group], option, VOTES, 1, votes))
+            values.append((full, units[group], None, VALID, 1, valid))
+        staged = {(row["entity_id"], row["body_md"]) for row in cs.rows["note"] if row["kind"] == "caveat"}
+        for note, entity, text in conn.execute(
+            """select n.id, n.entity_id, n.body_md from note n join changeset c on c.id = n.changeset_id
+               join result_set r on r.id = n.entity_id where c.pipeline = %s and n.kind = 'caveat'""",
+            [SOURCE],
+        ).fetchall():
+            if (entity, text) not in staged:
+                cs.add("note_drop", note_id=note, entity_id=entity, body_md=text, reason="The caveat was rewritten")
         for result_set, unit, option, measure, number, value in values:
             cs.add(
                 "result_value",
