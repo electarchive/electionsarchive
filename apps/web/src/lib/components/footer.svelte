@@ -205,8 +205,17 @@
       </span>
       {#if site.release != null}
         <span class="flex items-center gap-2">
-          {m.footer_release({ version: site.release.calver })}
-          {#if site.release.doi != null}
+          {#if site.release.doi == null}
+            <a
+              href="{REPOSITORY}/releases/tag/data-{site.release.calver}"
+              rel="external"
+              class="underline decoration-transparent underline-offset-4 hover:text-foreground hover:decoration-current focus-visible:outline-2 focus-visible:outline-ring"
+              aria-label={m.footer_release_download({
+                version: site.release.calver,
+              })}>{m.footer_release({ version: site.release.calver })}</a
+            >
+          {:else}
+            {m.footer_release({ version: site.release.calver })}
             <a
               href="https://doi.org/{site.release.doi}"
               rel="external"

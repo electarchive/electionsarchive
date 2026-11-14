@@ -2304,7 +2304,7 @@
   "error_code": "Error {code}",
   "footer_data_as_of": "Data as of {time}",
   "footer_release": "Release {version}",
-  "footer_release_download": "Download release {version} from Zenodo",
+  "footer_release_download": "Download release {version}",
   "footer_version": "Version {version}",
   "footer_version_label": "Version {version}: see what changed",
   "footer_commit": "Commit {sha} on GitHub",
