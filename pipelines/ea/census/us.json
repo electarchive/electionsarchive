@@ -1225,7 +1225,7 @@
         "unit": "polity"
       },
       "source": "bia-fr",
-      "match": [{"within": null, "office_kinds": ["head_of_state"], "polity_kinds": ["tribal_nation"], "precedence": 2}, {"within": null, "name_pattern": "Principal Chief", "polity_kinds": ["tribal_nation"]}],
+      "match": [{"within": null, "office_kinds": ["head_of_state"], "polity_kinds": ["tribal_nation"], "precedence": 2}, {"within": null, "name_pattern": "Principal Chief|Second Chief", "polity_kinds": ["tribal_nation"]}],
       "note": "Chair, president, principal chief, or governor, with the deputy where elected. Rules: (1) load a nation's results only from what its own election body publishes openly; (2) cite that body as the source; (3) never use news tallies, tribal newspapers included, or BIA files in their place, and a nation whose body publishes nothing openly gets a gap row; (4) honor any nation's request to withdraw or limit its data. Each nation's constitution or election code sets its own calendar, recorded with that nation's load."
     },
     {
@@ -1263,7 +1263,7 @@
         "unit": "polity"
       },
       "source": "bia-fr",
-      "match": [{"within": null, "contest_kinds": ["ballot_question"], "polity_kinds": ["tribal_nation"]}],
+      "match": [{"within": null, "contest_kinds": ["ballot_question"], "polity_kinds": ["tribal_nation"], "precedence": 4}],
       "note": "Constitutional and referendum votes the nation itself runs. Rules: (1) load a nation's results only from what its own election body publishes openly; (2) cite that body as the source; (3) never use news tallies, tribal newspapers included, or BIA files in their place, and a nation whose body publishes nothing openly gets a gap row; (4) honor any nation's request to withdraw or limit its data. Each nation's constitution or election code sets its own calendar, recorded with that nation's load."
     },
     {
