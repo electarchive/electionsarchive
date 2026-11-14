@@ -19,7 +19,7 @@ from ea.sources.ca.elections import PROVINCES
 from ea.store import DATA, connect
 
 SOURCE = "ca.referendums"
-VERSION = "3"
+VERSION = "4"
 PARSED = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
 DAY = date(1992, 10, 26)
@@ -125,6 +125,75 @@ VOLUME_TITLE = (
     "Sessional Papers of the Dominion of Canada, 1899, volume 14, Sessional Paper No. 20"
 )
 PLEBISCITE_PAGES = range(45, 355)
+PROCLAMATION = "https://www.canadiana.ca/view/oocihm.59965"
+PROCLAMATION_TITLE = (
+    "Proclamation: prohibition plebiscite, Electoral District of Durham, West Riding, Province of Ontario, Dominion "
+    "of Canada (returning officer, Bowmanville, 1898)"
+)
+PLEBISCITE_QUESTION = (
+    "Are you in favor of the passing of an Act prohibiting the Importation, Manufacture or Sale of Spirits, Wine, "
+    "Ale, Beer, Cider and all other Alcoholic Liquors for use as Beverages?"
+)
+PLEBISCITE_DISTRICTS = Path(__file__).with_name("referendum_1898_districts.tsv")
+RECAP_PAGE = 354
+RECAP = {
+    "35": (154499, 115275, 269774, 576784),
+    "24": (28582, 122614, 151196, 335678),
+    "12": (34646, 5402, 40048, 101492),
+    "13": (26911, 9576, 36487, 90003),
+    "11": (9461, 1146, 10607, 23388),
+    "46": (12419, 2978, 15397, 49262),
+    "59": (5731, 4756, 10487, 35537),
+    "CA": (278487, 264571, 543058, 1236419),
+}
+RECAP_TERRITORIES = ((1708, 1331, 3039, 9522), (3919, 1166, 5085, 11876), (611, 327, 938, 2877))
+RECAP_DRIFT = {"24": (2, 10)}
+RECAP_FIELDS = ("for", "against", "valid", "registered")
+RECAP_COLUMNS = ((1610, 1760), (1935, 2085), (2915, 3065), (3215, 3395))
+RECAP_ROWS = {"35": 960, "24": 999, "12": 1039, "13": 1079, "11": 1119, "46": 1158, "59": 1197, "CA": 1395}
+ERRATA = {
+    "Bothwell",
+    "Huron West",
+    "London",
+    "Ontario North",
+    "Compton",
+    "Dorchester",
+    "Wright",
+    "Kings",
+    "City and County of St. John",
+    "City of St. John",
+    "Burrard",
+}
+PLEBISCITE_SYSTEM = (
+    "A consultative plebiscite under the Prohibition Plebiscite Act (61 Victoria, chapter 51). The question was put "
+    "to the electors on the federal voters' lists in every province and in the North-West Territories, and the "
+    "returns were made to the Clerk of the Crown in Chancery. The Act set no threshold and bound Parliament to "
+    "nothing."
+)
+PLEBISCITE_METHOD = (
+    "Votes by province as the Clerk of the Crown in Chancery printed them in the recapitulation of his report on "
+    "the plebiscite (Sessional Paper No. 20, 1899), with the total of votes for and against stored as valid votes, "
+    "and the voters on the lists. The figures were read from the scanned page and checked: each row's votes for "
+    "and against add to its total, and the rows add to the printed national total. Nova Scotia's votes for are "
+    "34,646; the scan's second digit is worn, and 34,646 is what Nova Scotia's total, its majority, and the national "
+    "total give. The recapitulation prints the North-West Territories as the provisional districts of Alberta, "
+    "Assiniboia, and Saskatchewan, so they have no row here; their electoral districts are in the district result "
+    "set. Its Quebec votes are 2 higher for and 10 higher against than the Quebec districts add to as printed, and "
+    "its electors differ from the sums of the districts' printed figures in Ontario, Quebec, Nova Scotia, and "
+    "Manitoba, several of which the report corrects in footnotes. The report adds that after deducting 1,630 votes "
+    "counted through clerical errors and the double vote in St. John, the majority for prohibition would be 12,286."
+)
+PLEBISCITE_DISTRICT_METHOD = (
+    "Votes in each of the 206 electoral districts as the Clerk of the Crown in Chancery printed them on the totals "
+    "line that closes each district in his report on the plebiscite, read from the scanned volume and checked by "
+    "hand against the page: votes for and against, the total of votes polled (stored as valid votes), and the voters "
+    "on the revised lists. Rejected and spoiled ballots and census population are printed too and not stored. The "
+    "districts are those of the 1892 Representation Act used at the 1896 general election. The for and against "
+    "figures add to the recapitulation's provincial totals everywhere but Quebec, where they are 2 and 10 lower. "
+    "Eleven totals do not add up as printed and are stored as printed: Bothwell, Huron West, London, Ontario North, "
+    "Compton, Dorchester, Wright, Kings (Nova Scotia), City and County of St. John, City of St. John, and Burrard. "
+    "Waterloo North prints no total, and four Prince Edward Island districts print no voters' list figure."
+)
 MODEL = "claude-haiku-5-5"
 PROMPT = "1"
 LONGEST = 1568
@@ -201,6 +270,7 @@ def fetch() -> None:
     raw.fetch(SOURCE, WORDING, suffix=".html")
     raw.fetch(SOURCE, VOLUME, suffix=".html")
     raw.fetch(SOURCE, SYNOPSIS, suffix=".pdf")
+    raw.fetch(SOURCE, PROCLAMATION, suffix=".html")
     images = page_images()
     price_in, price_out = batch.PRICES[MODEL]
     wanted: dict[str, batch.Want] = {}
@@ -275,11 +345,38 @@ def parse() -> None:
                 raise ValueError(f"{row['province']} {column}: the districts do not add to the provincial total")
     if sums.height != provinces.height:
         raise ValueError("a province has no districts")
+    plebiscite = pl.read_csv(
+        PLEBISCITE_DISTRICTS, separator="\t", schema_overrides={"province": pl.String, "page": pl.Int64}
+    ).rename({"polled": "valid", "electors": "registered"})
+    if plebiscite["district"].n_unique() != plebiscite.height:
+        raise ValueError("a 1898 district appears twice")
+    for row in plebiscite.iter_rows(named=True):
+        if (row["valid"] is not None and row["for"] + row["against"] != row["valid"]) != (row["name"] in ERRATA):
+            raise ValueError(f"{row['name']}: the 1898 row's figures do not match the known errata")
+    for code, printed in [*RECAP.items(), *(("61", total) for total in RECAP_TERRITORIES)]:
+        if printed[0] + printed[1] != printed[2]:
+            raise ValueError(f"{code}: the 1898 recapitulation row does not add up")
+    for column in range(4):
+        provinces_total = sum(row[column] for code, row in RECAP.items() if code != "CA")
+        if provinces_total + sum(row[column] for row in RECAP_TERRITORIES) != RECAP["CA"][column]:
+            raise ValueError(f"{RECAP_FIELDS[column]}: the 1898 provinces do not add to the printed total")
+    sums = plebiscite.group_by("province").agg(pl.col("for").sum(), pl.col("against").sum())
+    for row in sums.iter_rows(named=True):
+        printed = (
+            [sum(total[column] for total in RECAP_TERRITORIES) for column in range(2)]
+            if row["province"] == "61"
+            else RECAP[row["province"]]
+        )
+        drift = RECAP_DRIFT.get(row["province"], (0, 0))
+        if (printed[0] - row["for"], printed[1] - row["against"]) != drift:
+            raise ValueError(f"{row['province']}: the 1898 districts do not add to the recapitulation")
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.write_parquet(PARSED / "results.parquet")
     districts.write_parquet(PARSED / "districts.parquet")
+    plebiscite.write_parquet(PARSED / "plebiscite.parquet")
     print(frame)
     print(districts)
+    print(plebiscite)
 
 
 def render(path: Path, sha256: str, number: int, dpi: int) -> tuple[Path, int, int]:
@@ -307,6 +404,19 @@ def render(path: Path, sha256: str, number: int, dpi: int) -> tuple[Path, int, i
     return image, width, height
 
 
+def upright(seq: int) -> tuple[Path, int, int, int, int]:
+    PAGES.mkdir(parents=True, exist_ok=True)
+    scan = raw.cached(SOURCE, page_images()[seq - 1])
+    image = rotated(seq)
+    width, height = image.size
+    path = PAGES / f"{scan.sha256}-upright.png"
+    if not path.exists():
+        image.thumbnail((2400, 2400))
+        image.save(path, "PNG", optimize=True)
+    small_width, small_height = struct.unpack(">II", path.read_bytes()[16:24])
+    return path, small_width, small_height, width, height
+
+
 def emit() -> Path:
     results = pl.read_parquet(PARSED / "results.parquet")
     districts = pl.read_parquet(PARSED / "districts.parquet")
@@ -319,8 +429,10 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary=(
-                "Canada's 1992 federal referendum on the Charlottetown Accord, with the Chief Electoral Officer's "
-                "totals by province and territory and by electoral district"
+                "Canada's federal referendum and plebiscite results: the 1992 referendum on the Charlottetown Accord, "
+                "with the Chief Electoral Officer's totals by province and territory and by electoral district, and "
+                "the 1898 prohibition plebiscite, with the Clerk of the Crown in Chancery's totals by province and by "
+                "electoral district"
             ),
             polity="CA",
         )
@@ -395,7 +507,10 @@ def emit() -> Path:
 
         nation = cs.area("ca.nation", "CA")
         units: dict[str, UUID] = {}
-        for code in results["code"]:
+
+        def province(code: str) -> UUID:
+            if code in units:
+                return units[code]
             scheme, unit_code = ("ca.nation", "CA") if code == "CA" else ("ca.province", code)
             area = nation if code == "CA" else cs.area(scheme, code)
             if area in cs.minted:
@@ -415,6 +530,10 @@ def emit() -> Path:
                 )
                 name(unit, "Canada" if code == "CA" else PROVINCES[code][1])
             units[code] = unit
+            return unit
+
+        for code in results["code"]:
+            province(code)
 
         election = cs.key("ca.referendums.election", str(DAY))
         cs.add("election", id=election, polity_id=canada, kind="referendum", date_from=DAY, date_to=DAY, status="held")
@@ -526,6 +645,147 @@ def emit() -> Path:
                 values.append((*key, row[column]))
                 x0, y0, x1, y1 = box(row["code"], column)
                 locators.append((*key, str(page), x0, y0, x1, y1))
+        plebiscite = pl.read_parquet(PARSED / "plebiscite.parquet")
+        chancery = cs.source("Clerk of the Crown in Chancery", VOLUME_TITLE)
+        cs.add(
+            "source",
+            id=chancery,
+            kind="official_body",
+            publisher="Clerk of the Crown in Chancery",
+            title=VOLUME_TITLE,
+            url=VOLUME,
+            license="Public domain (Crown copyright expired); scanned and served by Canadiana",
+        )
+        proclamation = cs.source("Returning officer, Durham West", PROCLAMATION_TITLE)
+        cs.add(
+            "source",
+            id=proclamation,
+            kind="official_body",
+            publisher="Returning officer, Durham West",
+            title=PROCLAMATION_TITLE,
+            url=PROCLAMATION,
+            license="Public domain; scanned from Toronto Public Library microfiche and served by Canadiana",
+        )
+        volume = cs.artifact(raw.cached(SOURCE, VOLUME), chancery)
+        cs.artifact(raw.cached(SOURCE, PROCLAMATION), proclamation)
+        sheets = {}
+        for seq in sorted({*plebiscite["page"], RECAP_PAGE}):
+            scan, scan_width, scan_height, width, height = upright(seq)
+            sheets[seq] = (cs.page(volume, seq), width, height)
+            cs.add(
+                "source_page",
+                id=sheets[seq][0],
+                artifact_id=volume,
+                page_number=seq,
+                image_key=f"pages/{SOURCE}/{scan.name}",
+                width=scan_width,
+                height=scan_height,
+            )
+        plebiscite_system = cs.key("ca.referendums.electoral_system", "plebiscite-1898")
+        cs.add(
+            "electoral_system",
+            id=plebiscite_system,
+            polity_id=canada,
+            rules={"formula": "referendum"},
+            rules_version=1,
+        )
+        name(plebiscite_system, "Canadian federal prohibition plebiscite of 1898")
+        cs.add("note", entity_id=plebiscite_system, kind="methodology", body_md=PLEBISCITE_SYSTEM)
+        plebiscite_election = cs.key("ca.referendums.election", str(PLEBISCITE))
+        cs.add(
+            "election",
+            id=plebiscite_election,
+            polity_id=canada,
+            kind="referendum",
+            date_from=PLEBISCITE,
+            date_to=PLEBISCITE,
+            status="held",
+        )
+        name(plebiscite_election, "1898 Canadian prohibition plebiscite")
+        name(plebiscite_election, "Plébiscite canadien de 1898 sur la prohibition", "fr", "native")
+        plebiscite_path = f"ca/{PLEBISCITE}-plebiscite"
+        cs.add("slug", path=plebiscite_path, entity_id=plebiscite_election)
+        plebiscite_contest = cs.key("ca.referendums.contest", str(PLEBISCITE))
+        cs.add(
+            "contest",
+            id=plebiscite_contest,
+            election_id=plebiscite_election,
+            kind="ballot_question",
+            electoral_system_id=plebiscite_system,
+            default_result_kind="counted",
+        )
+        cs.add("ballot_question", contest_id=plebiscite_contest, type="plebiscite")
+        name(plebiscite_contest, PLEBISCITE_QUESTION)
+        cs.add("slug", path=f"{plebiscite_path}/question", entity_id=plebiscite_contest)
+        sides = {}
+        for position, (side, label) in enumerate((("for", "For prohibition"), ("against", "Against prohibition")), 1):
+            sides[side] = cs.key("ca.referendums.option", f"{PLEBISCITE}:{side}")
+            cs.add(
+                "contest_option",
+                id=sides[side],
+                contest_id=plebiscite_contest,
+                kind="answer",
+                ballot_position=position,
+                ballot_label=label,
+            )
+        winner = "for" if RECAP["CA"][0] > RECAP["CA"][1] else "against"
+        recap_set = cs.key("ca.referendums.result_set", str(PLEBISCITE))
+        plebiscite_district_set = cs.key("ca.referendums.result_set", f"{PLEBISCITE}:district")
+        for result, default, body in (
+            (recap_set, True, PLEBISCITE_METHOD),
+            (plebiscite_district_set, False, PLEBISCITE_DISTRICT_METHOD),
+        ):
+            cs.add(
+                "result_set",
+                id=result,
+                election_id=plebiscite_election,
+                contest_id=plebiscite_contest,
+                stage="official",
+                kind="counted",
+                status="active",
+                source_id=chancery,
+                is_default=default,
+                completeness=1,
+            )
+            cs.add("note", entity_id=result, kind="methodology", body_md=body)
+            for side, option in sides.items():
+                cs.add("outcome", result_set_id=result, option_id=option, kind="won" if side == winner else "lost")
+        measures = {"for": VOTES, "against": VOTES, "valid": VALID, "registered": REGISTERED}
+        recap_page, recap_width, recap_height = sheets[RECAP_PAGE]
+        for code, printed in RECAP.items():
+            for field, value, (left, right) in zip(RECAP_FIELDS, printed, RECAP_COLUMNS, strict=True):
+                option = sides.get(field)
+                key = (str(recap_set), str(province(code)), None if option is None else str(option), measures[field])
+                values.append((*key, value))
+                row = RECAP_ROWS[code]
+                locators.append(
+                    (
+                        *key,
+                        str(recap_page),
+                        left / recap_width,
+                        (row - 8) / recap_height,
+                        right / recap_width,
+                        (row + 44) / recap_height,
+                    )
+                )
+        for row in plebiscite.iter_rows(named=True):
+            unit = cs.unit("ca.fed", row["district"], PLEBISCITE)
+            if unit in cs.minted:
+                raise ValueError(f"{row['name']}: no 1896 riding unit for {row['district']}")
+            sheet, width, height = sheets[row["page"]]
+            for field, column in zip(RECAP_FIELDS, ("for", "against", "polled", "electors"), strict=True):
+                if row[field] is None:
+                    continue
+                option = sides.get(field)
+                key = (
+                    str(plebiscite_district_set),
+                    str(unit),
+                    None if option is None else str(option),
+                    measures[field],
+                )
+                values.append((*key, row[field]))
+                x0, y0, x1, y1 = map(int, row[f"{column}_box"].split())
+                locators.append((*key, str(sheet), x0 / width, y0 / height, x1 / width, y1 / height))
         cs.frame(
             "result_value",
             pl.DataFrame(
