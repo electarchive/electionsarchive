@@ -2034,9 +2034,14 @@ async function shallow(
   }
   const unlinked = await db.execute<{ id: string; k: number; scheme: string }>(
     sql`
+      with rs as materialized (
+        select rs.k from contest c
+        join result_set rs on rs.contest_id = c.id
+        where c.district_area_id = ${area.id}::uuid
+          and rs.k = any(${sql.param(ks)}::int[])
+      )
       select distinct a.id, a.k, a.scheme_code as scheme
-      from contest c
-      join result_set rs on rs.contest_id = c.id and rs.k = any(${sql.param(ks)}::int[])
+      from rs
       cross join lateral (
         select r.area_k from result_rollup_sum r where r.result_set_k = rs.k and r.measure = any(${COUNTED})
         union
@@ -2044,8 +2049,7 @@ async function shallow(
       ) r
       join area a on a.k = r.area_k
         and a.scheme_code = any(${sql.param([...new Set(found.rows.map((row) => row.scheme))])}::text[])
-      where c.district_area_id = ${area.id}::uuid
-        and a.k <> all(${sql.param(found.rows.map((row) => row.k))}::int[])
+      where a.k <> all(${sql.param(found.rows.map((row) => row.k))}::int[])
         and not exists (select from area_parent p where p.area_id = a.id and p.valid @> ${date}::date)
     `,
   );
