@@ -42,16 +42,127 @@ PARTIES = {
     "dhp": ("Q567550", "Deutsch-Hannoversche Partei", "DHP"),
     "kvp": ("Q548022", "Konservative Volkspartei", "KVP"),
     "saechsisches_landvolk": ("Q27926490", "Sächsisches Landvolk", "SLV"),
+    "nsfb": ("Q164866", "Nationalsozialistische Freiheitsbewegung", "NSFB"),
+    "ddp": ("de.party:DDP", "Deutsche Demokratische Partei", "DDP"),
+    "landbund": ("Q1801975", "Landbund", "Landbund"),
+    "bbmb": ("Q812330", "Bayerischer Bauern- und Mittelstandsbund", "BBMB"),
+    "hessischer_bauernbund": ("Q1615913", "Hessischer Bauernbund", "HBB"),
+    "deutschsoziale": ("Q1206490", "Deutschsoziale Partei", "DSP"),
+    "nlb": (None, "Nationalliberale Landespartei Bayern", "NLB"),
+    "aufbaupartei": (None, "Deutsche Aufwertungs- und Aufbaupartei", "DAAP"),
+    "grossdeutsch_hessen": (None, "Großdeutsch-Hessischer Bund", "GHB"),
+    "bauernliste_ctb": (None, "Bauernliste Coblenz-Trier-Birkenfeld", "Bauernliste"),
+    "badischer_landbund": (None, "Badischer Landbund", "BLB"),
+    "rheinhessische_landliste": (None, "Rheinhessische Landliste", "RHL"),
+    "bauern_schaffende": (None, "Bauern und schaffende Berufe", "BsB"),
 }
 BLOCS = {"kampffront"}
 JOINT = {
     "zentrum_bvp": ("Zentrum und Bayerische Volkspartei", ("zentrum", "bvp")),
     "kvp_dhp": ("Konservative Volkspartei und Deutsch-Hannoversche Partei", ("kvp", "dhp")),
     "dvp_staatspartei": ("Einheitsliste Deutsche Volkspartei – Deutsche Staatspartei", ("dvp", "staatspartei")),
+    "dnvp_nlb": (
+        "Deutschnationale Volkspartei und Nationalliberale Landespartei Bayern",
+        ("dnvp", "nlb"),
+    ),
+    "zentrum_aufbau": ("Zentrum und Deutsche Aufwertungs- und Aufbaupartei", ("zentrum", "aufbaupartei")),
+    "hessischer_bauernbund_landliste": (
+        "Hessischer Bauernbund und Rheinhessische Landliste",
+        ("hessischer_bauernbund", "rheinhessische_landliste"),
+    ),
+    "wp_bauern_schaffende": (
+        "Wirtschaftspartei des deutschen Mittelstandes und Bauern und schaffende Berufe",
+        ("wirtschaftspartei", "bauern_schaffende"),
+    ),
+    "bbmb_wp": (
+        "Bayerischer Bauern- und Mittelstandsbund und Wirtschaftspartei des deutschen Mittelstandes",
+        ("bbmb", "wirtschaftspartei"),
+    ),
+    "aufwertung": ("Deutschsoziale Partei und Reichsbund für Aufwertung", ("deutschsoziale",)),
 }
 OTHERS = "Andere Parteien"
 
 ELECTIONS: dict[date, dict[str, Any]] = {
+    date(1924, 12, 7): {
+        "english": "December 1924 German federal election",
+        "german": "Reichstagswahl Dezember 1924",
+        "item": "fr-das-d",
+        "year": "1924-1925",
+        "edition": "1924/25",
+        "volume": 44,
+        "printed": "392 and 393",
+        "seats": 493,
+        "pages": {
+            445: {
+                "top": 0.245,
+                "registered": (0.276, 0.341),
+                "cast": (0.346, 0.410),
+                "valid": (0.447, 0.513),
+                "dnvp": (0.522, 0.597),
+                "nsfb": (0.636, 0.695),
+                "dvp": (0.733, 0.793),
+                "zentrum": (0.828, 0.887),
+            },
+            446: {
+                "top": 0.247,
+                "ddp": (0.082, 0.146),
+                "spd": (0.188, 0.256),
+                "kpd": (0.298, 0.366),
+                "bvp": (0.418, 0.490),
+                "wirtschaftspartei": (0.535, 0.603),
+                "aufwertung": (0.668, 0.715),
+                "others": (0.758, 0.827),
+            },
+        },
+        "lists": {
+            1: {"wirtschaftspartei": "wp_bauern_schaffende"},
+            2: {"bvp": "dhp"},
+            3: {"bvp": "dhp"},
+            12: {"bvp": "landbund"},
+            14: {"bvp": "dhp"},
+            15: {"bvp": "dhp"},
+            16: {"bvp": "dhp"},
+            17: {"zentrum": "zentrum_aufbau"},
+            19: {"bvp": "grossdeutsch_hessen"},
+            21: {"bvp": "bauernliste_ctb"},
+            24: {"wirtschaftspartei": "bbmb_wp"},
+            25: {"wirtschaftspartei": "bbmb_wp"},
+            26: {"dnvp": "dnvp_nlb", "wirtschaftspartei": "bbmb_wp"},
+            31: {"bvp": "wuerttemberg_landbund"},
+            32: {"bvp": "badischer_landbund"},
+            33: {"bvp": "hessischer_bauernbund_landliste"},
+            34: {"bvp": "dhp"},
+        },
+        "won": {
+            "dnvp": 103,
+            "nsfb": 14,
+            "dvp": 51,
+            "zentrum": 69,
+            "ddp": 32,
+            "spd": 131,
+            "kpd": 45,
+            "bvp": 19,
+            "landbund": 8,
+            "dhp": 4,
+            "wirtschaftspartei": 17,
+        },
+        "caveat": (
+            "The table counts each list where it stood, and the national totals beneath it equal the sums of the "
+            "Wahlkreise. One column holds the Bayerische Volkspartei (Wahlkreise 24 to 27), the Deutsch-Hannoversche "
+            "Partei, the Landbund, and the regional farmers' lists joined to the Landbund's national list: the "
+            "Großdeutsch-Hessischer Bund, the Bauernliste Coblenz-Trier-Birkenfeld, the Württembergischer Bauern- und "
+            "Weingärtnerbund, the Badischer Landbund, and the Hessischer Bauernbund with the Rheinhessische Landliste. "
+            "The Landbund's 8 seats include those won on these regional lists. Several cells sum joined lists, which "
+            "the Reichsamt splits in its notes: Wahlkreis 17, Zentrum 385,654 and Deutsche Aufwertungs- und "
+            "Aufbaupartei 26,554; Wahlkreis 1, Wirtschaftspartei 8,953 and Bauern und schaffende Berufe 14,634; "
+            "Wahlkreis 24, Bayerischer Bauern- und Mittelstandsbund 159,666 and Wirtschaftspartei 8,665; Wahlkreis 25, "
+            "Wirtschaftspartei 18,533 and Bayerischer Bauern- und Mittelstandsbund 100,317; Wahlkreis 26, Bayerischer "
+            "Bauern- und Mittelstandsbund 36,338 and Bayerischer Mittelstandsbund (Wirtschaftspartei) 31,669. The "
+            "Wirtschaftspartei's 17 seats include members of the Bayerischer Bauern- und Mittelstandsbund elected on "
+            "its national list. In Wahlkreis 26 (Franken) the Deutschnationale Volkspartei ran a joint list with the "
+            "Nationalliberale Landespartei Bayern."
+        ),
+    },
     date(1930, 9, 14): {
         "english": "1930 German federal election",
         "german": "Reichstagswahl 1930",
@@ -267,7 +378,8 @@ def url(day: date, leaf: int) -> str:
 
 
 def title(day: date) -> str:
-    return f"Statistisches Jahrbuch für das Deutsche Reich {ELECTIONS[day]['year']}"
+    spec = ELECTIONS[day]
+    return f"Statistisches Jahrbuch für das Deutsche Reich {spec.get('edition', spec['year'])}"
 
 
 def fetch() -> None:
@@ -367,7 +479,12 @@ def emit() -> Path:
             name(reichstag, "Reichstag", "de", "native")
         parties: dict[str, UUID] = {}
         for key, (item, label, short) in PARTIES.items():
-            parties[key] = cs.key("wikidata", item)
+            if item is None:
+                parties[key] = cs.key(f"{SOURCE}.party", key)
+            elif ":" in item:
+                parties[key] = cs.key(*item.split(":", 1))
+            else:
+                parties[key] = cs.key("wikidata", item)
             if parties[key] in cs.minted:
                 cs.add("party", id=parties[key], kind="bloc" if key in BLOCS else "party", polity_id=germany)
                 name(parties[key], label, "de")
