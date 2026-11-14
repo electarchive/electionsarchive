@@ -30,6 +30,9 @@ ROUNDS = {
     (2015, 2): date(2015, 5, 24),
     (2010, 1): date(2010, 6, 20),
     (2010, 2): date(2010, 7, 4),
+    (2005, 1): date(2005, 10, 9),
+    (2005, 2): date(2005, 10, 23),
+    (2000, 1): date(2000, 10, 8),
 }
 FILES = {
     (2025, 1): {
@@ -52,7 +55,12 @@ FILES = {
     (2015, 2): {"units": "2015/prezydent/2/wyniki_tura2.zip"},
     (2010, 1): {"units": "2010/prezydent/1/pzt2010-wyn-obw.zip"},
     (2010, 2): {"units": "2010/prezydent/2/pzt2010-wyn-obw.zip"},
+    (2005, 1): {"units": "2005/prezydent/1/1456148660_37030.xls"},
+    (2005, 2): {"units": "2005/prezydent/2/1456148721_37553.xls"},
+    (2000, 1): {"units": "2000/prezydent/prez2000obw.xls"},
 }
+SHEETS = {(2005, 1): "obw1tura"}
+ALIASES = {"KORWIN-MIKKE Janusz": "KORWIN-MIKKE Janusz Ryszard", "LEPPER Andrzej": "LEPPER Andrzej Zbigniew"}
 NOTICES = {
     (2025, 1): (
         "2025/652",
@@ -176,6 +184,61 @@ NOTICES = {
         {"KACZYŃSKI Jarosław Aleksander": 7919134, "KOMOROWSKI Bronisław Maria": 8933887},
     ),
 }
+NOTICES |= {
+    (2005, 1): (
+        "2005/1647",
+        (
+            "Obwieszczenie Państwowej Komisji Wyborczej z dnia 10 października 2005 r. o wynikach głosowania i "
+            "wyniku wyborów Prezydenta Rzeczypospolitej Polskiej, zarządzonych na dzień 9 października 2005 r."
+        ),
+        {"electors": 30260027, "cast": 14946689 + 99661, "valid": 14946689},
+        {
+            "BOCHNIARZ Henryka Teodora": 188598,
+            "BOROWSKI Marek Stefan": 1544642,
+            "BUBEL Leszek Henryk": 18828,
+            "ILASZ Liwiusz Marian": 31691,
+            "KACZYŃSKI Lech Aleksander": 4947927,
+            "KALINOWSKI Jarosław": 269316,
+            "KORWIN-MIKKE Janusz Ryszard": 214116,
+            "LEPPER Andrzej Zbigniew": 2259094,
+            "PYSZKO Jan": 10371,
+            "SŁOMKA Adam Andrzej": 8895,
+            "TUSK Donald Franciszek": 5429666,
+            "TYMIŃSKI Stanisław": 23545,
+        },
+    ),
+    (2005, 2): (
+        "2005/1739",
+        (
+            "Obwieszczenie Państwowej Komisji Wyborczej z dnia 24 października 2005 r. o wynikach ponownego "
+            "głosowania i wyniku wyborów Prezydenta Rzeczypospolitej Polskiej"
+        ),
+        {"electors": 30279209, "cast": 15279787 + 155233, "valid": 15279787},
+        {"KACZYŃSKI Lech Aleksander": 8257468, "TUSK Donald Franciszek": 7022319},
+    ),
+    (2000, 1): (
+        "2000/952",
+        (
+            "Obwieszczenie Państwowej Komisji Wyborczej z dnia 9 października 2000 r. o wynikach głosowania i "
+            "wyniku wyborów Prezydenta Rzeczypospolitej Polskiej, zarządzonych na dzień 8 października 2000 r."
+        ),
+        {"electors": 29122304, "cast": 17789231, "valid": 17598919},
+        {
+            "GRABOWSKI Dariusz Maciej": 89002,
+            "IKONOWICZ Piotr": 38672,
+            "KALINOWSKI Jarosław": 1047949,
+            "KORWIN-MIKKE Janusz": 252499,
+            "KRZAKLEWSKI Marian": 2739621,
+            "KWAŚNIEWSKI Aleksander": 9485224,
+            "LEPPER Andrzej": 537570,
+            "ŁOPUSZAŃSKI Jan": 139682,
+            "OLECHOWSKI Andrzej Marian": 3044141,
+            "PAWŁOWSKI Bogdan": 17164,
+            "WAŁĘSA Lech": 178590,
+            "WILECKI Tadeusz Adam": 28805,
+        },
+    ),
+}
 AMENDMENTS = {
     (2015, 1): (
         "2015/705",
@@ -185,7 +248,7 @@ AMENDMENTS = {
         ),
     )
 }
-INCUMBENTS = {2015: "KOMOROWSKI Bronisław Maria", 2020: "DUDA Andrzej Sebastian"}
+INCUMBENTS = {2000: "KWAŚNIEWSKI Aleksander", 2015: "KOMOROWSKI Bronisław Maria", 2020: "DUDA Andrzej Sebastian"}
 METHOD = (
     "National totals and the declared result as the Państwowa Komisja Wyborcza published them in its notice in the "
     "Dziennik Ustaw: voters entitled to vote, ballots cast (ballots taken from the urn), and valid votes for all "
@@ -233,7 +296,7 @@ def fetch() -> None:
 
 def read(year: int, round_: int, kind: str) -> pl.DataFrame:
     path = raw.cached(SOURCE, url(year, round_, kind)).path
-    if path.suffix == ".csv":
+    if path.suffix in (".csv", ".xls"):
         data, member = path.read_bytes(), path.name
     else:
         archive = zipfile.ZipFile(path)
@@ -243,7 +306,7 @@ def read(year: int, round_: int, kind: str) -> pl.DataFrame:
         member = min(members, key=lambda name: not name.endswith(".csv"))
         data = archive.read(member)
     if member.endswith(".xls"):
-        frame = pl.read_excel(io.BytesIO(data), infer_schema_length=0)
+        frame = pl.read_excel(io.BytesIO(data), sheet_name=SHEETS.get((year, round_)), infer_schema_length=0)
     else:
         encoding = "utf8" if "utf8" in member else "cp1250"
         frame = pl.read_csv(
@@ -253,7 +316,7 @@ def read(year: int, round_: int, kind: str) -> pl.DataFrame:
             encoding=encoding,
             quote_char='"' if year > 2010 else None,
         )
-    frame = frame.rename({column: column.lstrip("﻿").replace("\xa0", " ").strip() for column in frame.columns})
+    frame = frame.rename({column: " ".join(column.lstrip("﻿").split()) for column in frame.columns})
     return frame.with_columns(pl.col(pl.String).str.strip_chars())
 
 
@@ -331,7 +394,7 @@ def frames(year: int, round_: int) -> tuple[pl.DataFrame, list[str]]:
             "Liczba kart ważnych",
             "Liczba głosów ważnych",
         )
-    else:
+    elif year == 2010:
         first = "Głosy ważne"
         unit = [
             gmina("Kod gm.", "Gmina"),
@@ -339,7 +402,22 @@ def frames(year: int, round_: int) -> tuple[pl.DataFrame, list[str]]:
             pl.col("Adres obwodu").alias("seat"),
         ]
         electors, cast, valid = "Uprawnieni do głosowania", "Głosy oddane", first
-    candidates = data.columns[data.columns.index(first) + 1 :]
+    elif year == 2005:
+        data = data.filter(pl.col("TERYT").str.contains(r"^\d{6}$"))
+        first = "Głosy nieważne" if round_ == 1 else "Głosy ważne"
+        unit = [
+            gmina("TERYT", "TERYT"),
+            pl.col("Numer obwodu").alias("commission"),
+            pl.col("Adres obwodu" if round_ == 1 else "Adres").alias("seat"),
+        ]
+        electors = "Uprawnieni do głosowania"
+        cast = "Głosy oddane" if round_ == 1 else "Karty wyjęte (głosy oddane)"
+        valid = "Głosy ważne"
+    else:
+        first = "Głosy ważne"
+        unit = [gmina("Kod gminy", "Gmina"), pl.col("Nr obw.").alias("commission"), pl.col("Adres").alias("seat")]
+        electors, cast, valid = "Uprawnieni", "Głosy oddane", first
+    candidates = [column for column in data.columns[data.columns.index(first) + 1 :] if "UNNAMED" not in column]
     if candidates and candidates[0] == "RAZEM":
         candidates = candidates[1:]
     units = data.select(
@@ -428,7 +506,7 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary=(
-                "Presidential elections of 2010, 2015, 2020, and 2025, both rounds, nationally from the Państwowa "
+                "Presidential elections of 2000 to 2025, every round, nationally from the Państwowa "
                 "Komisja Wyborcza's notices and by gmina and polling district from the Krajowe Biuro Wyborcze's files"
             ),
             polity="PL",
@@ -611,19 +689,20 @@ def emit() -> Path:
                     ballot_position=position,
                     ballot_label=display(ballot, "pl"),
                 )
-                if candidate not in people:
-                    person = people[candidate] = cs.key(f"{SOURCE}.person", slug(candidate))
+                identity = ALIASES.get(candidate, candidate)
+                if identity not in people:
+                    person = people[identity] = cs.key(f"{SOURCE}.person", slug(identity))
                     cs.add(
                         "person",
                         id=person,
                         gender={"Kobieta": "female", "Mężczyzna": "male"}.get(row.get("sex") or ""),
                     )
-                    name(person, display(ballot, "pl"))
+                    name(person, display(given_first(identity), "pl"))
                 candidacy = cs.key(f"{SOURCE}.candidacy", f"{key}:{slug(candidate)}")
                 cs.add(
                     "candidacy",
                     id=candidacy,
-                    person_id=people[candidate],
+                    person_id=people[identity],
                     option_id=option,
                     role="head",
                     ballot_name=candidate,
