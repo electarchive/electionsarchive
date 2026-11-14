@@ -98,6 +98,12 @@
    "url": "https://computos2021.ine.mx/",
    "kind": "official_body"
   },
+  "ine_cdmx_2016": {
+   "title": "Informe del Consejero Presidente al Consejo General sobre la elección de la Asamblea Constituyente de la Ciudad de México (15 de junio de 2016)",
+   "publisher": "Instituto Nacional Electoral (INE)",
+   "url": "https://repositoriodocumental.ine.mx/xmlui/handle/123456789/110788",
+   "kind": "official_body"
+  },
   "ine_computos2024": {
    "title": "Cómputos Distritales 2024",
    "publisher": "Instituto Nacional Electoral (INE)",
@@ -1537,6 +1543,15 @@
    },
    "note": "60 of its 100 members elected on 5 June 2016 from lists in a single Mexico City constituency by proportional representation; the other 40 were appointed. It wrote the Constitution of Mexico City.",
    "source": "cpeum",
+   "dates": [
+    {
+     "date": "2016-06-05",
+     "contests": 1,
+     "seats": 60,
+     "note": "One Mexico City constituency, 60 seats by proportional representation.",
+     "source": "ine_cdmx_2016"
+    }
+   ],
    "est_votes": 2000000,
    "effort": 2,
    "match": [

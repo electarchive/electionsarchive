@@ -1531,7 +1531,15 @@
       ],
       "est_votes": 300000,
       "effort": 4,
-      "dates": []
+      "dates": [
+        {
+          "date": "1925-09-17",
+          "contests": 1,
+          "seats": 19,
+          "note": "Nineteen seats by STV in one national constituency. The 1928, 1931, and 1934 renewals were votes of Oireachtas members, not yet dated from the Acts.",
+          "source": "const-1922"
+        }
+      ]
     },
     {
       "key": "local",

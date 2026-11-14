@@ -2190,7 +2190,125 @@
       ],
       "est_votes": 7000000,
       "effort": 4,
-      "dates": []
+      "dates": [
+        {
+          "date": "1861-01-27",
+          "contests": 443,
+          "source": "istat_compendio_1848_1934"
+        },
+        {
+          "date": "1865-10-22",
+          "contests": 443,
+          "source": "istat_compendio_1848_1934",
+          "note": "The collegi total of 443 is the 1861 figure; Veneto was annexed in 1866."
+        },
+        {
+          "date": "1867-03-10",
+          "contests": 493,
+          "source": "istat_compendio_1848_1934",
+          "note": "443 collegi plus 50 for the Veneto."
+        },
+        {
+          "date": "1870-11-20",
+          "contests": 508,
+          "source": "istat_compendio_1848_1934"
+        },
+        {
+          "date": "1874-11-08",
+          "contests": 508,
+          "source": "istat_compendio_1848_1934"
+        },
+        {
+          "date": "1876-11-05",
+          "contests": 508,
+          "source": "istat_compendio_1848_1934"
+        },
+        {
+          "date": "1880-05-16",
+          "contests": 508,
+          "source": "istat_compendio_1848_1934"
+        },
+        {
+          "date": "1882-10-29",
+          "contests": 135,
+          "source": "istat_compendio_1848_1934",
+          "note": "Counted as 135 plurinominal collegi."
+        },
+        {
+          "date": "1886-05-23",
+          "contests": 135,
+          "source": "istat_compendio_1848_1934",
+          "note": "Counted as 135 plurinominal collegi."
+        },
+        {
+          "date": "1890-11-23",
+          "contests": 135,
+          "source": "istat_compendio_1848_1934",
+          "note": "Counted as 135 plurinominal collegi."
+        },
+        {
+          "date": "1892-11-06",
+          "contests": 508,
+          "source": "istat_compendio_1848_1934"
+        },
+        {
+          "date": "1895-05-26",
+          "contests": 508,
+          "source": "istat_compendio_1848_1934"
+        },
+        {
+          "date": "1897-03-21",
+          "contests": 508,
+          "source": "istat_compendio_1848_1934"
+        },
+        {
+          "date": "1900-06-03",
+          "contests": 508,
+          "source": "istat_compendio_1848_1934"
+        },
+        {
+          "date": "1904-11-06",
+          "contests": 508,
+          "source": "istat_compendio_1848_1934"
+        },
+        {
+          "date": "1909-03-07",
+          "contests": 508,
+          "source": "istat_compendio_1848_1934"
+        },
+        {
+          "date": "1913-10-26",
+          "contests": 508,
+          "source": "istat_compendio_1848_1934"
+        },
+        {
+          "date": "1919-11-16",
+          "contests": 54,
+          "source": "istat_compendio_1848_1934"
+        },
+        {
+          "date": "1921-05-15",
+          "contests": 34,
+          "source": "istat_compendio_1848_1934"
+        },
+        {
+          "date": "1924-04-06",
+          "source": "istat_compendio_1848_1934",
+          "note": "National single college for the majority list plus plurinominal colleges for the minority lists."
+        },
+        {
+          "date": "1929-03-24",
+          "contests": 1,
+          "source": "istat_compendio_1848_1934",
+          "note": "Single national college; plebiscitary single list."
+        },
+        {
+          "date": "1934-03-25",
+          "contests": 1,
+          "source": "istat_compendio_1848_1934",
+          "note": "Single national college; plebiscitary single list."
+        }
+      ]
     },
     {
       "key": "comites",
