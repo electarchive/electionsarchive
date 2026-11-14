@@ -1634,23 +1634,39 @@ async function labeled(rows: Promise<Surveyed>, key: string, date: string) {
   return remember(`children:${key}`, async () => label(await rows, date));
 }
 
-async function seat(
-  contest: string,
-  place: { id: string; k: number },
+async function seats(
+  asked: Array<{ contest: string; place: { id: string; k: number } }>,
   area: { id: string; k: number },
   date: string,
 ) {
-  const ks = await setsOf(contest);
-  if (ks.length === 0) {
-    return null;
+  const sets = await Promise.all(
+    asked.map(async ({ contest }) => setsOf(contest)),
+  );
+  const held = asked.flatMap((entry, index) => {
+    const ks = sets[index] ?? [];
+    return ks.length === 0 ? [] : [{ ...entry, index, ks }];
+  });
+  if (held.length === 0) {
+    return new Map<string, string | null | undefined>(
+      asked.map(({ contest }) => [contest, null]),
+    );
   }
-  const { pool, valued } = countingFor(ks);
+  const pooled = held.flatMap(({ index, ks }) => ks.map((k) => [index, k]));
+  const pool = sql`x.pool`;
   const counts = (k: SQL, id: SQL) => sql`(
     exists (
       select from result_rollup_sum r
       where r.area_k = ${k} and r.result_set_k = any(${pool}) and r.measure = any(${COUNTED})
     )
-    or ${valued(k)}
+    or exists (
+      select from result_rollup_unit u
+      cross join lateral (
+        select from result_value v
+        where v.result_set_k = u.result_set_k and v.unit_k = u.unit_k and v.measure = any(${COUNTED})
+        limit 1
+      ) v
+      where u.area_k = ${k} and u.result_set_k = any(${pool})
+    )
     or ${id} in (select c.district_area_id from result_set s join contest c on c.id = s.contest_id where s.k = any(${pool}))
   )`;
   const shape = (id: SQL) => sql`
@@ -1659,99 +1675,130 @@ async function seat(
   `;
   const [found, labels] = await Promise.all([
     db.execute<{
+      i: number;
       yes: boolean;
       no: boolean;
       texts: Array<string | null> | null;
     }>(sql`
-      with kin as materialized (
-        select a.id, a.k from area_parent p join area a on a.id = p.area_id
-        where p.parent_id = ${place.id}::uuid and p.valid @> ${date}::date
-        limit 5001
+      with pooled as materialized (
+        select * from unnest(
+          ${sql.param(pooled.map(([index]) => index))}::int[],
+          ${sql.param(pooled.map(([, k]) => k))}::int[]
+        ) as t(i, k)
       ),
-      rolled as materialized (
-        select coalesce(bool_or(r.value <> 0), false) as voted
-        from unnest(${pool}) as s(k) cross join lateral (
-          select x.value from result_rollup x
-          where x.result_set_k = s.k and x.area_k = ${area.k} and x.measure = any(${COUNTED}) offset 0
-        ) r
-        having count(*) > 0
+      asked as materialized (
+        select t.i, t.place, array(select p.k from pooled p where p.i = t.i) as pool
+        from unnest(
+          ${sql.param(held.map(({ index }) => index))}::int[],
+          ${sql.param(held.map(({ place }) => place.id))}::uuid[]
+        ) as t(i, place)
       ),
-      me as materialized (${shape(sql`${place.id}::uuid`)}),
       it as materialized (${shape(sql`${area.id}::uuid`)}),
-      flags as materialized (
+      fixed as materialized (
         select
-          (select count(*) from kin) <= 5000 as small,
-          exists (select from kin where kin.k = ${area.k} and ${counts(sql`kin.k`, sql`kin.id`)}) as inside,
-          (select count(*) from (select from kin where kin.k <> ${area.k} and ${counts(sql`kin.k`, sql`kin.id`)} limit 2) z) as others,
-          exists (
-            select from rolled
-            where not exists (
-              with recursive anc(id) as (
-                select ${place.id}::uuid
-                union
-                select p.parent_id from area_parent p join anc on p.area_id = anc.id
-              )
-              select from anc where anc.id = ${area.id}::uuid
-            )
-            and (
-              rolled.voted
-              or not exists (select from me)
-              or coalesce((
-                select case
-                  when not g.geom && me.geom then ST_Area(g.geom) = 0
-                  when ST_Covers(me.geom, g.geom) then true
-                  when not ST_Intersects(me.geom, g.geom) then ST_Area(g.geom) = 0
-                  else ST_Area(ST_Intersection(g.geom, me.geom)) >= 0.01 * ST_Area(g.geom)
-                end
-                from me cross join it g
-              ), true)
-            )
-          ) as rooted,
-          exists (
-            select from result_rollup_unit u
-            join reporting_unit ru on ru.k = u.unit_k
-            join reporting_unit_area m on m.unit_id = ru.id and m.area_id = ${place.id}::uuid and m.valid @> ${date}::date
-            where u.result_set_k = any(${pool}) and u.area_k = ${area.k}
-          ) as linked,
           exists (select from area_parent p where p.area_id = ${area.id}::uuid and p.valid @> ${date}::date) as parented,
-          exists (
-            select from area_parent p join kin on kin.id = p.parent_id
-            where p.area_id = ${area.id}::uuid and p.valid @> ${date}::date
-          ) as nested,
           exists (select from area a where a.k = ${area.k} and a.scheme_code = 'world.country') as abroad
       )
-      select
-        small and (inside and others > 0 or not inside and others = 0 and rooted) as yes,
-        small and not linked and not abroad and parented and not inside
-          and (others = 2 and not nested or others = 0 and not rooted) as no,
-        array(
-          select n.text from (
-            select kin.id from kin where kin.k < ${area.k}
-            union
-            select a.id from (
-              select r.area_k as k from result_rollup_sum r
-              where r.result_set_k = any(${pool}) and r.measure = any(${COUNTED}) and r.area_k < ${area.k}
+      select x.i, f.yes, f.no, f.texts
+      from asked x cross join fixed cross join lateral (
+        with kin as materialized (
+          select a.id, a.k from area_parent p join area a on a.id = p.area_id
+          where p.parent_id = x.place and p.valid @> ${date}::date
+          limit 5001
+        ),
+        rolled as materialized (
+          select coalesce(bool_or(r.value <> 0), false) as voted
+          from unnest(${pool}) as s(k) cross join lateral (
+            select y.value from result_rollup y
+            where y.result_set_k = s.k and y.area_k = ${area.k} and y.measure = any(${COUNTED}) offset 0
+          ) r
+          having count(*) > 0
+        ),
+        me as materialized (${shape(sql`x.place`)}),
+        flags as materialized (
+          select
+            (select count(*) from kin) <= 5000 as small,
+            exists (select from kin where kin.k = ${area.k} and ${counts(sql`kin.k`, sql`kin.id`)}) as inside,
+            (select count(*) from (select from kin where kin.k <> ${area.k} and ${counts(sql`kin.k`, sql`kin.id`)} limit 2) z) as others,
+            exists (
+              select from rolled
+              where not exists (
+                with recursive anc(id) as (
+                  select x.place
+                  union
+                  select p.parent_id from area_parent p join anc on p.area_id = anc.id
+                )
+                select from anc where anc.id = ${area.id}::uuid
+              )
+              and (
+                rolled.voted
+                or not exists (select from me)
+                or coalesce((
+                  select case
+                    when not g.geom && me.geom then ST_Area(g.geom) = 0
+                    when ST_Covers(me.geom, g.geom) then true
+                    when not ST_Intersects(me.geom, g.geom) then ST_Area(g.geom) = 0
+                    else ST_Area(ST_Intersection(g.geom, me.geom)) >= 0.01 * ST_Area(g.geom)
+                  end
+                  from me cross join it g
+                ), true)
+              )
+            ) as rooted,
+            exists (
+              select from result_rollup_unit u
+              join reporting_unit ru on ru.k = u.unit_k
+              join reporting_unit_area m on m.unit_id = ru.id and m.area_id = x.place and m.valid @> ${date}::date
+              where u.result_set_k = any(${pool}) and u.area_k = ${area.k}
+            ) as linked,
+            exists (
+              select from area_parent p join kin on kin.id = p.parent_id
+              where p.area_id = ${area.id}::uuid and p.valid @> ${date}::date
+            ) as nested
+        )
+        select
+          small and (inside and others > 0 or not inside and others = 0 and rooted) as yes,
+          small and not linked and not fixed.abroad and fixed.parented and not inside
+            and (others = 2 and not nested or others = 0 and not rooted) as no,
+          array(
+            select n.text from (
+              select kin.id from kin where kin.k < ${area.k}
               union
-              select u.area_k from result_rollup_unit u where u.result_set_k = any(${pool}) and u.area_k < ${area.k}
-            ) r
-            join area a on a.k = r.k
-          ) x
-          left join name n on n.entity_id = x.id and n.kind in ('official', 'english')
-        ) as texts
-      from flags
+              select a.id from (
+                select r.area_k as k from result_rollup_sum r
+                where r.result_set_k = any(${pool}) and r.measure = any(${COUNTED}) and r.area_k < ${area.k}
+                union
+                select u.area_k from result_rollup_unit u where u.result_set_k = any(${pool}) and u.area_k < ${area.k}
+              ) r
+              join area a on a.k = r.k
+            ) z
+            left join name n on n.entity_id = z.id and n.kind in ('official', 'english')
+          ) as texts
+        from flags
+      ) f
     `),
     names([area.id], date),
   ]);
-  const row = found.rows[0];
-  if (row?.no === true) {
-    return null;
-  }
   const base = segment(labels.full.get(area.id) ?? "");
-  return row?.yes === true &&
-    base !== "unnamed" &&
-    (row.texts ?? []).every((text) => segment(text ?? "") !== base)
-    ? base
-    : undefined;
+  const rows = new Map(found.rows.map((row) => [row.i, row]));
+  return new Map(
+    asked.map(({ contest }, index): [string, string | null | undefined] => {
+      if ((sets[index] ?? []).length === 0) {
+        return [contest, null];
+      }
+      const row = rows.get(index);
+      if (row?.no === true) {
+        return [contest, null];
+      }
+      return [
+        contest,
+        row?.yes === true &&
+        base !== "unnamed" &&
+        (row.texts ?? []).every((text) => segment(text ?? "") !== base)
+          ? base
+          : undefined,
+      ];
+    }),
+  );
 }
 
 function countingFor(ks: Array<number>) {
@@ -13232,11 +13279,14 @@ export const contests = {
                 `),
               ).map((row) => row.id),
             );
-      const locate = async ({ row, place }: (typeof placed)[number]) => {
+      const locate = async (
+        { row, place }: (typeof placed)[number],
+        quicks: Map<string, string | null | undefined>,
+      ) => {
         if (!row.voted && !(await reaches(place.id, area.id, day))) {
           return null;
         }
-        const quick = await seat(row.id, place, area, day);
+        const quick = quicks.get(row.id);
         if (quick !== undefined) {
           return quick;
         }
@@ -13256,8 +13306,13 @@ export const contests = {
         Promise.all(
           lanes.map(async (lane) => {
             const done: Array<[string, string | null]> = [];
+            const quicks = await seats(
+              lane.map(({ row, place }) => ({ contest: row.id, place })),
+              area,
+              day,
+            );
             for (const entry of lane) {
-              done.push([entry.row.id, await locate(entry)]);
+              done.push([entry.row.id, await locate(entry, quicks)]);
             }
             return done;
           }),
