@@ -1,5 +1,7 @@
+import functools
 import html
 import re
+import struct
 import subprocess
 import sys
 import time
@@ -13,7 +15,7 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset
-from ea.sources.gb.cc_elections import proper, surname_first
+from ea.sources.gb.cc_elections import display, proper, surname_first
 from ea.sources.gb.parish import fold, slug
 from ea.store import DATA, connect
 
@@ -21,6 +23,8 @@ SOURCE = "gb.welsh_communities"
 VERSION = "1"
 WARDS = "gb.parish_ward"
 PARSED = DATA / "parsed" / SOURCE
+PAGES = DATA / "pages" / SOURCE
+DIGITIZED = 8
 DAY = date(2022, 5, 5)
 BROWSER = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36"
 VOTES, REGISTERED, INVALID = 1, 2, 5
@@ -49,7 +53,25 @@ COUNCILS = {
         "https://democracy.monmouthshire.gov.uk/mgElectionElectionAreaResults.aspx?EID=11",
         "moderngov",
     ),
+    "W06000002": (
+        "Gwynedd Council",
+        "Canlyniad Etholiad Diwrthwynebiad / Result of Uncontested Election, community and town councillors, 5 May 2022",
+        "https://www.gwynedd.gov.uk/cy/Cyngor/Dogfennau-Cyngor/Pleidleisio-ac-etholiadau/Etholiad-Tref-Cymuned-2022/Uncontested-Cymuned.pdf",
+        "gwynedd",
+    ),
 }
+GWYNEDD_POLLS = (
+    "https://www.gwynedd.llyw.cymru/cy/Cyngor/Dogfennau-Cyngor/Pleidleisio-ac-etholiadau/Etholiad-Tref-Cymuned-2022/"
+    "Canlyniadau-Etholiad-2022.pdf"
+)
+SCANS = {
+    GWYNEDD_POLLS: (
+        "Gwynedd Council",
+        "Datganiad Canlyniad y Pleidleisio / Declaration of Result of Poll, community and town councillors, 5 May 2022",
+    ),
+}
+POLLS = Path(__file__).with_name("gwynedd_2022_polls.tsv")
+VOTE_COLUMN = (0.685, 0.955)
 ALIASES = {
     ("W06000010", "Cwarter Bach"): "Quarter Bach",
     ("W06000010", "Dyffryn Cennen"): "Cyngor Bro Dyffryn Cennen",
@@ -58,6 +80,10 @@ ALIASES = {
     ("W06000003", "Bay of Colwyn"): "Colwyn Bay",
     ("W06000003", "Towyn and Kinmel Bay"): "Kinmel Bay and Towyn",
     ("W06000021", "Llanfoist"): "Llanfoist Fawr",
+    ("W06000002", "LLANAELHAEARN"): "Trefor a Llanaelhaearn",
+    ("W06000002", "LLANYMSTUMDWY"): "Llanystumdwy",
+    ("W06000002", "Abermaw"): "Barmouth",
+    ("W06000002", "Llangelynin"): "Llangelynnin",
 }
 UNREGISTERED = {("W06000010", "Trelech a'r Betws"), ("W06000003", "Betws-y-Coed"), ("W06000021", "Llangybi Fawr")}
 WARD_NAMES = {
@@ -88,6 +114,13 @@ PARTIES: dict[str, str | None] = {
     "Liberal Democrats": "Q9624",
     "Welsh Liberal Democrats": "Q9624",
     "Welsh Labour/Llafur Cymr": "Q9630",
+    "Annibynnol/Independent": "independent",
+    "Annibynnol/ Independent": "independent",
+    "Annibynnol - Independent": "independent",
+    "Plaid Cymru-The Party of Wales": "Q10691",
+    "Plaid Cymru- The Party of Wales": "Q10691",
+    "Welsh Liberal Democrats- Democratiaid Rhyddfrydol Cymru": "Q9624",
+    "Welsh Conservative Party Candidate/ Ymgeisydd Plaid Geidwadol Cymru": "Q9626",
 }
 BY_CONTEXT = (
     "A by-election to fill a casual vacancy on a Welsh community or town council, held between the five-yearly "
@@ -103,6 +136,20 @@ CAVEATS = {
         "Monmouthshire County Council's page lists Bryony Nicholson three times: twice with 432 votes and no "
         "description, and once as Welsh Labour with no votes. She is stored once, with 432 votes. The page's total of "
         "2,827 votes counts her 432 twice; the six candidates' votes sum to 2,395."
+    ),
+}
+GWYNEDD_CAVEATS = {
+    ("Abermaw", "Abermaw"): (
+        "Gwynedd Council's declaration gives Philip Hill's votes in a handwritten figure that reads as either 279 or "
+        "379, so no count is stored for him; he is recorded as elected, as the declaration marks him."
+    ),
+    ("Llangelynin", "Llangelynin"): (
+        "Gwynedd Council's declaration gives Hannah Elizabeth Johns's votes in an overwritten handwritten figure that "
+        "cannot be read with certainty, so no count is stored for her."
+    ),
+    ("Mawddwy", "Llanymawddwy"): (
+        'Gwynedd Council\'s declaration writes the total of rejected ballot papers as "25 (DP)" and does not explain '
+        "the annotation."
     ),
 }
 CONTEXT = (
@@ -123,6 +170,8 @@ def areas(url: str) -> list[str]:
 
 
 def fetch() -> None:
+    for url in SCANS:
+        store(url)
     for _, _, url, reader in COUNCILS.values():
         store(url)
         if reader == "moderngov":
@@ -399,10 +448,130 @@ def moderngov(url: str) -> list[dict]:
     return reads
 
 
+def communities(lad: str) -> dict[str, str]:
+    with connect() as conn:
+        rows = conn.execute(
+            """select en.text, n.text from external_id be join body b on b.id = be.entity_id
+               join polity_parent pp on pp.polity_id = b.polity_id
+               join external_id lp on lp.entity_id = pp.parent_id and lp.scheme = 'gb.polity'
+               join name en on en.entity_id = b.polity_id and en.is_preferred and en.lang = 'en'
+               join name n on n.entity_id = b.polity_id and n.lang in ('en', 'cy')
+               where be.scheme = 'gb.body' and lp.value = %s and b.kind = 'council'""",
+            [lad],
+        ).fetchall()
+    names = {fold(other): english for english, other in rows}
+    for (alias_lad, printed), english in ALIASES.items():
+        if alias_lad == lad:
+            names[fold(printed)] = english
+    return names
+
+
+def welsh_title(text: str) -> str:
+    words = re.split(r"([ /()-])", re.sub(r"(\S)\(", r"\1 (", " ".join(text.split())).lower())
+    out: list[str] = []
+    for word in words:
+        if word.strip(" /()-"):
+            out.append(word if out and word in ("y", "a", "ap") else word[:1].upper() + word[1:])
+        else:
+            out.append(word)
+    return "".join(out)
+
+
+def gwynedd(url: str) -> list[dict]:
+    names = communities("W06000002")
+    reads: list[dict] = []
+    for notice in text_of(url).split("ETHOL CYNGHORYDD/CYNGHORWYR")[1:]:
+        heading = " ".join(found(r"FOR THE\s*\n(.*?)\n\s*\d\d/\d\d/\d{4}", notice, re.DOTALL).group(1).split())
+        words = found(r"CYMUNED/TREF [GC]YNGOR (?:CYMUNED|TREF|DINAS) (.+)", heading.replace("COMMUNITY/TOWN", ""))
+        words = words.group(1).split()
+        cut = next((cut for cut in range(len(words), 0, -1) if fold(" ".join(words[:cut])) in names), 0)
+        if not cut:
+            raise ValueError(f"Gwynedd: no council in {heading}")
+        block = found(r"Home Address\s*\n(.*?)RHODDWYD", notice, re.DOTALL).group(1)
+        printed = [re.split(r"\s{3,}", line.strip())[0] for line in block.splitlines() if re.match(r" {0,4}\S", line)]
+        if not printed:
+            continue
+        reads.append(
+            {
+                "council": names[fold(" ".join(words[:cut]))],
+                "ward": welsh_title(" ".join(words[cut:])) or None,
+                "places": None,
+                "turnout": None,
+                "candidates": [
+                    {
+                        "printed": line,
+                        "name": " ".join([*line.split()[:-1], line.split()[-1][:1].upper() + line.split()[-1][1:]]),
+                        "description": "",
+                        "votes": None,
+                        "elected": True,
+                    }
+                    for line in printed
+                ],
+            }
+        )
+    return reads
+
+
+def gwynedd_polls() -> list[dict]:
+    names = communities("W06000002")
+    frame = pl.read_csv(POLLS, separator="\t", infer_schema_length=0)
+    reads: list[dict] = []
+    for (council, ward), lines in frame.group_by("council", "ward", maintain_order=True):
+        assert isinstance(council, str) and isinstance(ward, str)
+        rejected = lines.filter(pl.col("printed").is_null()).rows(named=True)
+        candidates = [
+            {
+                "printed": line["printed"],
+                "name": line["name"] or display(line["printed"]),
+                "description": line["description"] or "",
+                "votes": int(line["votes"]) if line["votes"] else None,
+                "elected": line["elected"] == "1",
+                "box_page": int(line["page"]),
+                "box": [VOTE_COLUMN[0], float(line["top"]), VOTE_COLUMN[1], float(line["bottom"])],
+            }
+            for line in lines.filter(pl.col("printed").is_not_null()).iter_rows(named=True)
+        ]
+        if any(candidate["votes"] is None for candidate in candidates) and (council, ward) not in GWYNEDD_CAVEATS:
+            raise ValueError(f"Gwynedd {council} {ward}: a count is missing without a caveat")
+        box = (
+            [VOTE_COLUMN[0], float(rejected[0]["top"]), VOTE_COLUMN[1], float(rejected[0]["bottom"])]
+            if rejected
+            else None
+        )
+        reads.append(
+            {
+                "council": names[fold(council)],
+                "ward": ward,
+                "places": sum(1 for candidate in candidates if candidate["elected"]),
+                "turnout": None,
+                "source": GWYNEDD_POLLS,
+                "url": GWYNEDD_POLLS,
+                "rejected": int(rejected[0]["votes"]) if rejected else None,
+                "rejected_page": int(rejected[0]["page"]) if rejected else None,
+                "rejected_box": box,
+                "caveat": GWYNEDD_CAVEATS.get((council, ward)),
+                "candidates": candidates,
+            }
+        )
+    return reads
+
+
+def unwarded(reads: list[dict], lad: str) -> list[dict]:
+    names = communities(lad)
+    counts: dict[str, int] = {}
+    for read in reads:
+        counts[read["council"]] = counts.get(read["council"], 0) + 1
+    for read in reads:
+        if read["ward"] and names.get(fold(read["ward"])) == read["council"] and counts[read["council"]] == 1:
+            read["ward"] = None
+    return reads
+
+
 READERS = {
     "torfaen": lambda url: torfaen(text_of(url)) + torfaen_by_elections(text_of(url)),
     "carmarthenshire": lambda url: carmarthenshire(text_of(url)),
     "moderngov": moderngov,
+    "gwynedd": lambda url: unwarded(gwynedd(url) + gwynedd_polls(), "W06000002"),
 }
 
 
@@ -437,7 +606,7 @@ def parse() -> None:
                 rows.append(
                     {
                         "lad": lad,
-                        "url": url,
+                        "url": read.get("source", url),
                         "council": read["council"],
                         "key": key,
                         "scheme": scheme,
@@ -452,6 +621,8 @@ def parse() -> None:
                         "issued": read.get("issued"),
                         "rejected": read.get("rejected"),
                         "page": read.get("url", url),
+                        "rejected_page": read.get("rejected_page"),
+                        "rejected_box": read.get("rejected_box"),
                         "caveat": read.get("caveat"),
                         "number": number,
                         **candidate,
@@ -463,7 +634,7 @@ def parse() -> None:
     if clash := frame.group_by("key", "ward", "day").agg(pl.col("url").n_unique()).filter(pl.col("url") > 1).rows():
         raise ValueError(f"two sources for one ward: {clash}")
     contests = frame.select("key", "ward", "day").unique().height
-    uncontested = frame.filter(pl.col("votes").is_null()).select("key", "ward", "day").unique().height
+    uncontested = frame.group_by("key", "ward", "day").agg(pl.col("votes").is_null().all())["votes"].sum()
     print(
         f"{frame['key'].n_unique()} councils, {contests} contests ({uncontested} uncontested), "
         f"{frame.height} candidates",
@@ -497,13 +668,57 @@ def emit() -> Path:
                 "scheme", code=WARDS, polity_id=gb, kind="electoral_district", rank=5, noun="parish or community ward"
             )
         sources: dict[str, UUID] = {}
-        for publisher, title, url, _ in COUNCILS.values():
+        artifacts: dict[str, UUID] = {}
+        listed = [(publisher, title, url) for publisher, title, url, _ in COUNCILS.values()]
+        for publisher, title, url in listed + [(publisher, title, url) for url, (publisher, title) in SCANS.items()]:
             if url not in set(frame["url"]):
                 continue
             sources[url] = cs.source(publisher, title)
             cs.add("source", id=sources[url], kind="official_body", publisher=publisher, title=title, url=url)
             for page in frame.filter(pl.col("url") == url)["page"].unique().sort():
-                cs.artifact(raw.cached(SOURCE, page), sources[url])
+                artifacts[page] = cs.artifact(raw.cached(SOURCE, page), sources[url])
+
+        @functools.cache
+        def page_of(url: str, number: int) -> UUID:
+            artifact = raw.cached(SOURCE, url)
+            image = PAGES / f"{artifact.sha256}-{number}.png"
+            if not image.exists():
+                PAGES.mkdir(parents=True, exist_ok=True)
+                subprocess.run(
+                    ["pdftoppm", "-r", "150", "-gray", "-png", "-f", str(number), "-l", str(number), "-singlefile"]
+                    + [str(artifact.path), str(image.with_suffix(""))],
+                    check=True,
+                )
+            width, height = struct.unpack(">II", image.read_bytes()[16:24])
+            found = cs.page(artifacts[url], number)
+            cs.add(
+                "source_page",
+                id=found,
+                artifact_id=artifacts[url],
+                page_number=number,
+                image_key=f"pages/{SOURCE}/{image.name}",
+                width=width,
+                height=height,
+            )
+            return found
+
+        def locate(result_set: UUID, unit: UUID, option: UUID | None, measure: int, url: str, number: int, box: list):
+            cs.add(
+                "value_locator",
+                result_set_id=result_set,
+                unit_id=unit,
+                option_id=option,
+                channel=0,
+                measure=measure,
+                count_round=0,
+                page_id=page_of(url, number),
+                source_id=None,
+                x0=box[0],
+                y0=box[1],
+                x1=box[2],
+                y1=box[3],
+            )
+
         keys = sorted(set(frame["key"]))
         paths = dict(
             conn.execute(
@@ -539,7 +754,7 @@ def emit() -> Path:
             first = lines.row(0, named=True)
             by = first["by"]
             places = first["places"]
-            tacit = first["votes"] is None
+            tacit = lines["votes"].is_null().all()
             polity = cs.key("gb.polity", key)
             council_area = cs.area(first["scheme"], first["code"])
             election_key = f"{day}:wcc:{key}"
@@ -667,9 +882,13 @@ def emit() -> Path:
                             channel=0,
                             measure=measure,
                             count_round=0,
-                            flags=0,
+                            flags=DIGITIZED if field == "rejected" and first["rejected_box"] is not None else 0,
                             value=first[field],
                         )
+                if first["rejected_box"] is not None:
+                    locate(
+                        result_set, unit, None, INVALID, first["page"], first["rejected_page"], first["rejected_box"]
+                    )
             for line in lines.iter_rows(named=True):
                 option_key = f"{contest_key}:{line['number']}"
                 person_key = f"{key}:{slug(line['name'])}"
@@ -706,9 +925,11 @@ def emit() -> Path:
                         channel=0,
                         measure=VOTES,
                         count_round=0,
-                        flags=0,
+                        flags=DIGITIZED if line["box"] is not None else 0,
                         value=line["votes"],
                     )
+                    if line["box"] is not None:
+                        locate(result_set, unit, option, VOTES, line["page"], line["box_page"], line["box"])
                 if line["elected"]:
                     cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected")
         return cs.write()
