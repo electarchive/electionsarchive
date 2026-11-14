@@ -345,9 +345,10 @@ class Changeset:
             id
             for (id,) in self.conn.execute(
                 """select rs.id from result_set rs join changeset c on c.id = rs.changeset_id
-                   where c.pipeline = %s and rs.status = 'active' and rs.kind = 'counted'
-                     and exists (select from result_value v where v.result_set_k = rs.k)
-                     and not exists (select from result_value v where v.result_set_k = rs.k and v.value <> 0)""",
+                   cross join lateral (
+                     select bool_or(v.value <> 0) nonzero from result_value v where v.result_set_k = rs.k
+                   ) x
+                   where c.pipeline = %s and rs.status = 'active' and rs.kind = 'counted' and not x.nonzero""",
                 [self.manifest["pipeline"]],
             )
         }
