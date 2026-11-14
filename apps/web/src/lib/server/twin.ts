@@ -124,6 +124,7 @@ const KINDS: Record<string, () => string> = {
 };
 
 const PLACE_KINDS: Record<string, () => string> = {
+  federal_unit: m.polity_subdivisions,
   county: m.polity_kind_county,
   municipality: m.polity_kind_municipality,
   school_district: m.polity_kind_school_district,

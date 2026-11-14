@@ -151,6 +151,7 @@
   });
   const KINDS: Record<string, () => string> = {
     all: m.polity_filter_all,
+    federal_unit: m.polity_subdivisions,
     county: m.polity_kind_county,
     municipality: m.polity_kind_municipality,
     school_district: m.polity_kind_school_district,
@@ -166,8 +167,9 @@
   const kind = $derived(
     picked != null && kinds.includes(picked)
       ? picked
-      : (["county", "municipality"].find((key) => kinds.includes(key)) ??
-          "all"),
+      : (["county", "municipality", "federal_unit"].find((key) =>
+          kinds.includes(key),
+        ) ?? "all"),
   );
   const kindOptions = $derived(
     kinds.map((key) => ({ value: key, label: KINDS[key]?.() ?? key })),
