@@ -227,6 +227,29 @@ COUNCILS["E07000086"] = {
     "order": "comma",
     "reader": "declarations",
 }
+CORNWALL_2025 = (
+    "https://www.cornwall.gov.uk/the-council-and-democracy/elections/elections-and-referendums/"
+    "2025-cornwall-council-and-parish-and-town-council-elections-1-may-2025/"
+)
+COUNCILS["E06000052"] = {
+    "day": date(2025, 5, 1),
+    "publisher": "Cornwall Council",
+    "title": "Results of 2025 Parish and Town Council elections",
+    "url": f"{CORNWALL_2025}results-of-2025-parish-and-town-council-elections/",
+    "pages": [
+        f"{CORNWALL_2025}results-of-2025-parish-and-town-council-elections/",
+        f"{CORNWALL_2025}notices-of-uncontested-election-parish-and-town-council-elections-1-may-2025/",
+    ],
+    "linked": {
+        "files": r"href=['\"](?:https://www\.cornwall\.gov\.uk)?(/media/[^'\"]+/notice-of-uncontested-election-[^'\"]+\.pdf)",
+        "polls": r"href=['\"](?:https://www\.cornwall\.gov\.uk)?(/media/[^'\"]+/declaration-of-results?-[^'\"]+\.pdf)",
+        "summary": r"href=['\"](?:https://www\.cornwall\.gov\.uk)?(/media/[^'\"]+/summary-of-results-parish-[^'\"]+\.pdf)",
+    },
+    "columns": (215, 384),
+    "order": "upper-first",
+    "anchored": True,
+    "reader": "notices+declarations",
+}
 POST_NOMINALS = re.compile(r"^(?:[A-Z]{2,5}\.\s+)+")
 BROWSER = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36"
 PARTIES: dict[str, str | None] = {
@@ -244,11 +267,15 @@ PARTIES: dict[str, str | None] = {
     "The Green Party candidate": "Q3499324",
     "Conservative": "Q9626",
     "Green Party": "Q3499324",
+    "Mebyon Kernow - The Party for Cornwall": "Q161957",
 }
 ALIASES = {
     ("E07000011", "Kimbolton & Stonely"): "Kimbolton",
     ("E07000011", "Leighton Bromswold"): "Leighton",
     ("E07000181", "Asthal"): "Asthall",
+    ("E06000052", "Lanteglos-by-Fowey"): "Lanteglos",
+    ("E06000052", "St Dominic"): "St. Dominick",
+    ("E06000052", "St Michael Penkivel"): "St. Michael Penkevil",
 }
 GROUPED = {
     ("E07000071", "Abberton and Langenhoe"),
@@ -265,27 +292,47 @@ UNSTATED = (
 )
 
 
+def link(council: dict) -> None:
+    for key, pattern in council.get("linked", {}).items():
+        origin = re.match(r"https://[^/]+", council["url"])
+        assert origin is not None
+        council[key] = sorted(
+            {
+                f"{origin.group(0)}{path}"
+                for page in council["pages"]
+                for path in re.findall(pattern, Path(raw.cached(SOURCE, page).path).read_text(encoding="utf-8"))
+            }
+        )
+
+
+def store(council: dict, url: str) -> None:
+    try:
+        raw.cached(SOURCE, url)
+        return
+    except LookupError:
+        pass
+    response = httpx.get(url, headers={"User-Agent": BROWSER}, timeout=120, follow_redirects=True)
+    response.raise_for_status()
+    pdf = url not in council.get("pages", [])
+    if pdf != response.content.startswith(b"%PDF"):
+        raise ValueError(f"{url} is not the expected {'PDF' if pdf else 'page'}")
+    raw.store(
+        SOURCE,
+        url,
+        response.content,
+        suffix=".pdf" if pdf else ".html",
+        retrieved_at=datetime.now(UTC),
+        media_type="application/pdf" if pdf else "text/html",
+    )
+
+
 def fetch() -> None:
     for council in COUNCILS.values():
-        for url in council.get("files", []) + council.get("polls", []) + council.get("pages", []):
-            try:
-                raw.cached(SOURCE, url)
-                continue
-            except LookupError:
-                pass
-            response = httpx.get(url, headers={"User-Agent": BROWSER}, timeout=120, follow_redirects=True)
-            response.raise_for_status()
-            pdf = url not in council.get("pages", [])
-            if pdf != response.content.startswith(b"%PDF"):
-                raise ValueError(f"{url} is not the expected {'PDF' if pdf else 'page'}")
-            raw.store(
-                SOURCE,
-                url,
-                response.content,
-                suffix=".pdf" if pdf else ".html",
-                retrieved_at=datetime.now(UTC),
-                media_type="application/pdf" if pdf else "text/html",
-            )
+        for url in council.get("pages", []):
+            store(council, url)
+        link(council)
+        for url in council.get("files", []) + council.get("polls", []) + council.get("summary", []):
+            store(council, url)
         if "inbox" not in council:
             continue
         for file in sorted((INBOX / council["inbox"]).glob("*.html")):
@@ -406,7 +453,7 @@ def surname_first(printed: str) -> str:
 
 def area_of(page: str) -> tuple[str, str, str | None] | None:
     heading = re.search(
-        r"Election of (?:a )?(?:(Parish|Town) )?Councillors? for(?: the)?\s*\n\s*(.+?)(?:\s*\n\s*|\s+)on(?=\s*\n|\s+(?:\d|Thursday))",
+        r"Election of (?:a )?(?:(Parish|Town|City) )?Councillors? for(?: the)?\s*\n\s*((?:.+\n\s*){0,2}?.+?)(?:\s*\n\s*|\s+)on(?=\s*\n|\s+(?:\d|Thursday))",
         page,
     )
     if heading is None:
@@ -421,6 +468,8 @@ def area_of(page: str) -> tuple[str, str, str | None] | None:
     area = re.sub(r"(?<=[A-Z]) (?:Parish|Town)$", "", area)
     if area.isupper():
         area = area.title()
+    if council := re.fullmatch(r"(.+?) (?:Parish|Town|City|Community) Council(?: - (.+) Ward)?", area):
+        return heading.group(1) or "Parish", council.group(1), council.group(2)
     ward = re.fullmatch(r"(.+?) \((.+)\)", area)
     return heading.group(1) or "Parish", *((ward.group(1), ward.group(2)) if ward else (area, None))
 
@@ -429,7 +478,7 @@ def notices(lad: str, council: dict) -> list[dict]:
     reads: list[dict] = []
     for url in council["files"]:
         for number, (page, words) in enumerate(pdf_pages(url), start=1):
-            if not page.strip():
+            if not page.strip() or "no candidates were nominated" in page:
                 continue
             heading = area_of(page)
             if heading is not None and "(surname first)" in page:
@@ -695,11 +744,35 @@ def person(printed: str, order: str) -> str:
     return f"{found.group(1)} {display(found.group(2).strip())}"
 
 
+def anchored(words: list[tuple[float, float, str]]) -> list[dict]:
+    top = next(y for x, y, word in words if word == "Votes*")
+    bottom = min(y for x, y, word in words if word == "*" and y > top)
+    inside = [(x, y, word) for x, y, word in words if top + 4 < y < bottom - 2]
+    anchors = sorted(y for x, y, word in inside if 440 <= x < 510 and re.fullmatch(r"[\d,]+", word))
+    cells: list[dict[str, list[tuple[float, float, str]]]] = [{"name": [], "description": []} for _ in anchors]
+    elected = [False for _ in anchors]
+    for x, y, word in inside:
+        nearest = min(range(len(anchors)), key=lambda i: abs(anchors[i] - y))
+        if x >= 510 and word == "Elected":
+            elected[nearest] = True
+        elif x < 440:
+            cells[nearest]["name" if x < 250 else "description"].append((y, x, word))
+    return [
+        {
+            "printed": " ".join(word for _, _, word in sorted(cell["name"])).replace("`", "'"),
+            "description": " ".join(word for _, _, word in sorted(cell["description"])),
+            "votes": count(next(word for x, y, word in inside if y == anchor and 440 <= x < 510)),
+            "elected": chosen,
+        }
+        for cell, anchor, chosen in zip(cells, anchors, elected, strict=True)
+    ]
+
+
 def declarations(lad: str, council: dict) -> list[dict]:
     order = council["order"]
     reads: list[dict] = []
     for url in council["polls"] if "polls" in council else council["files"]:
-        for number, (page, _) in enumerate(pdf_pages(url), start=1):
+        for number, (page, words) in enumerate(pdf_pages(url), start=1):
             lines = page.split("\n")
             if not any("DECLARATION OF RESULT OF POLL" in line for line in lines):
                 continue
@@ -714,8 +787,11 @@ def declarations(lad: str, council: dict) -> list[dict]:
                 if line.strip() != "for":
                     heading.append(line.strip())
             area = " ".join(heading)
+            suffixed = re.fullmatch(r"(.+?) (?:Parish|Town|City|Community) Council(?: - (.+) Ward)?", area)
             if area in council.get("areas", {}):
                 parish, ward = council["areas"][area]
+            elif suffixed:
+                parish, ward = suffixed.groups()
             else:
                 body = re.fullmatch(r"(.+) (?:Town|Parish) Council", owner)
                 if body is None:
@@ -724,15 +800,19 @@ def declarations(lad: str, council: dict) -> list[dict]:
             parish, ward = parish.replace("\u2019", "'"), ward and ward.replace("\u2019", "'")
             top = next(i for i, line in enumerate(lines) if "Votes*" in line)
             end = next(i for i, line in enumerate(lines) if line.startswith("* If elected"))
-            candidates: list[dict] = []
-            for line in lines[top + 1 : end]:
+            candidates: list[dict] = anchored(words) if council.get("anchored") else []
+            for line in [] if council.get("anchored") else lines[top + 1 : end]:
                 if not line.strip():
                     continue
                 cells = re.split(r"\s{2,}", line.strip())
                 column_zero = not line[0].isspace()
                 rest = "  ".join(cells[1:] if column_zero else cells)
                 if column_zero:
-                    if candidates and (cells[0][0].islower() or cells[0].lower().startswith("commonly known as")):
+                    if candidates and (
+                        cells[0][0].islower()
+                        or cells[0].lower().startswith("commonly known as")
+                        or candidates[-1]["printed"].endswith(" commonly known as")
+                    ):
                         candidates[-1]["printed"] += f" {cells[0]}"
                     else:
                         printed = cells[0].replace("`", "'")
@@ -942,6 +1022,47 @@ def colchester_poll(lad: str, council: dict) -> list[dict]:
     ]
 
 
+def summarized(url: str) -> dict[tuple[str, str | None], dict]:
+    sections: dict[tuple[str, str | None], dict] = {}
+    lines = "\n".join(page for page, _ in pdf_pages(url)).split("\n")
+    for start, line in enumerate(lines):
+        if "Name of Candidate" not in line:
+            continue
+        title = re.fullmatch(r"(.+?) (?:Parish|Town|City|Community) Council(?: - (.+) Ward)?", lines[start - 1].strip())
+        if title is None:
+            raise ValueError(f"{url}: no council in {lines[start - 1]!r}")
+        end = next(i for i in range(start, len(lines)) if "Vacant Seats:" in lines[i])
+        figures = re.search(
+            r"Vacant Seats:\s*(\d+)\s+Electorate:\s*([\d,]+)(?:\s+Ballot Papers Issued:\s*([\d,]+))?", lines[end]
+        )
+        assert figures is not None
+        votes = [re.search(r"\s{2,}([\d,]+)(?:\s+Elected)?$", line) for line in lines[start + 1 : end]]
+        sections[title.group(1), title.group(2)] = {
+            "places": int(figures.group(1)),
+            "electorate": count(figures.group(2)),
+            "ballots": count(figures.group(3)) if figures.group(3) else None,
+            "votes": sorted(count(vote.group(1)) for vote in votes if vote and vote.start(1) > 95),
+        }
+    return sections
+
+
+def reconcile(lad: str, council: dict, reads: list[dict]) -> None:
+    sections = {key: value for url in council.get("summary", []) for key, value in summarized(url).items()}
+    if not sections:
+        return
+    if len(sections) != len(reads):
+        raise ValueError(f"{lad}: {len(sections)} summary sections, {len(reads)} reads")
+    for read in reads:
+        section = sections[read["parish"], read["ward"]]
+        votes = sorted(candidate["votes"] for candidate in read["candidates"] if candidate["votes"] is not None)
+        if votes != section["votes"]:
+            raise ValueError(f"{read['url']}: votes differ from the summary")
+        for field in ("places", "electorate", "ballots"):
+            if read[field] is not None and read[field] != section[field]:
+                raise ValueError(f"{read['url']}: {field} {read[field]} but the summary has {section[field]}")
+            read[field] = section[field]
+
+
 READERS = {
     "moderngov": moderngov,
     "notices": notices,
@@ -955,24 +1076,32 @@ READERS = {
 
 
 def parse() -> None:
+    for council in COUNCILS.values():
+        link(council)
     with connect() as conn:
-        parishes = conn.execute(
-            """select pc.code, n.text, pe.value, a.scheme_code, c.code
+        parishes = [
+            row
+            for day in sorted({council["day"] for council in COUNCILS.values()})
+            for row in conn.execute(
+                """select pc.code, n.text, pe.value, a.scheme_code, c.code
                from area a join area_code c on c.area_id = a.id
                join area_parent p on p.area_id = a.id join area_code pc on pc.area_id = p.parent_id
                join name n on n.entity_id = a.id and n.lang = 'en'
                join polity_territory pt on pt.area_id = a.id and pt.valid @> %s::date
                join external_id pe on pe.entity_id = pt.polity_id and pe.scheme = 'gb.polity'
                where a.scheme_code in ('gb.parish', 'gb.parish_group') and pc.code = any(%s)""",
-            [date(2026, 5, 7), sorted(COUNCILS)],
-        ).fetchall()
+                [day, sorted(lad for lad, council in COUNCILS.items() if council["day"] == day)],
+            ).fetchall()
+        ]
     known: dict[tuple[str, str], set[tuple[str, str, str]]] = {}
     for lad, name, key, scheme, code in parishes:
         known.setdefault((lad, fold(name)), set()).add((key, scheme, code))
     rows = []
     misses: list[str] = []
     for lad, council in COUNCILS.items():
-        for read in (read for reader in council["reader"].split("+") for read in READERS[reader](lad, council)):
+        reads = [read for reader in council["reader"].split("+") for read in READERS[reader](lad, council)]
+        reconcile(lad, council, reads)
+        for read in reads:
             if (lad, read["parish"]) in GROUPED:
                 continue
             found = known.get((lad, fold(ALIASES.get((lad, read["parish"]), read["parish"]))), set())
@@ -1031,6 +1160,7 @@ def emit() -> Path:
             )
         sources: dict[str, UUID] = {}
         for lad, council in COUNCILS.items():
+            link(council)
             if lad not in set(frame["lad"]):
                 continue
             sources[lad] = cs.source(council["publisher"], council["title"])
@@ -1043,7 +1173,7 @@ def emit() -> Path:
                 url=council["url"],
                 license=COUNCIL,
             )
-            for url in sorted(set(frame.filter(pl.col("lad") == lad)["url"])):
+            for url in sorted(set(frame.filter(pl.col("lad") == lad)["url"]) | set(council.get("summary", []))):
                 cs.artifact(raw.cached(SOURCE, url), sources[lad])
         keys = sorted(set(frame["key"]))
         paths = dict(
@@ -1160,7 +1290,7 @@ def emit() -> Path:
                 cs.add(
                     "note", entity_id=result_set, kind="context", body_md=f"The declaration reads: “{first['remark']}”"
                 )
-            if tacit:
+            if tacit and places is None:
                 cs.add("note", entity_id=result_set, kind="caveat", body_md=UNSTATED.format(publisher=publisher))
             for field, measure in MEASURES.items():
                 if first[field] is not None:
