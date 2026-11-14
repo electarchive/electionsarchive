@@ -48,18 +48,21 @@ def rules(dark: np.ndarray, top: int, bottom: int, count: int) -> tuple[list[int
         return None
     pitch = float(np.median(gaps))
 
-    def walk(start: float) -> list[float]:
+    def walk(start: float, low: float) -> list[float]:
         edges = [start]
         while len(edges) < count:
-            near = [peak for peak in peaks if abs(peak - edges[-1] - pitch) <= 0.15 * pitch]
+            near = [peak for peak in peaks if -low * pitch <= peak - edges[-1] - pitch <= 0.15 * pitch]
             edges.append(min(near, key=lambda peak: abs(peak - edges[-1] - pitch)) if near else edges[-1] + pitch)
         return edges
 
     def strength(edges: list[float]) -> float:
         return sum(float(share[max(0, round(x) - 8) : round(x) + 9].max(initial=0)) for x in edges)
 
-    best = max((walk(start) for peak in peaks for start in (peak, peak - pitch) if start >= 0), key=strength)
-    if strength(best) < 0.8 * count:
+    for low in (0.15, 0.25):
+        best = max((walk(start, low) for peak in peaks for start in (peak, peak - pitch) if start >= 0), key=strength)
+        if strength(best) >= 0.8 * count:
+            break
+    else:
         return None
     return [round(x) for x in (*best, best[-1] + pitch)], strength(best)
 
@@ -166,7 +169,13 @@ def step(name: str) -> str:
             for index, column in enumerate(columns):
                 if column["contest"] is None:
                     continue
-                x0, x1 = (edges[index] + 4) / width, (edges[index + 1] - 4) / width
+                left, right = edges[index] + 4, edges[index + 1] - 4
+                top, bottom = round(y0 * height), round(y1 * height)
+                while left < right and dark[top:bottom, left].mean() > 0.7:
+                    left += 1
+                while right > left and dark[top:bottom, right - 1].mean() > 0.7:
+                    right -= 1
+                x0, x1 = left / width, right / width
                 crop = image.crop((round(x0 * width), round(y0 * height), round(x1 * width), round(y1 * height)))
                 ocr = tesseract(crop)
                 text = re.sub(
