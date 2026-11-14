@@ -331,7 +331,7 @@ def parse() -> None:
                     "measure": "votes",
                     "candidate": number,
                     "value": votes,
-                    "page": FIRST_PAGE + int(page.stem.split("-")[1]) - 1,
+                    "page": int(page.stem.split("-")[1]),
                     "box": located.get(index),
                 }
             )
@@ -342,7 +342,7 @@ def parse() -> None:
                 "measure": "valid",
                 "candidate": None,
                 "value": summed,
-                "page": FIRST_PAGE + int(last.stem.split("-")[1]) - 1,
+                "page": int(last.stem.split("-")[1]),
                 "box": located.get(len(rows)),
             }
         )
