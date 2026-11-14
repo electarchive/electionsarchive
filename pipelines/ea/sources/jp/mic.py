@@ -68,6 +68,7 @@ class Listing:
     seats: str
     winners: str
     elected: str
+    turnout: list[tuple[str, str]]
 
 
 def listing(number: int) -> Listing:
@@ -90,7 +91,12 @@ def listing(number: int) -> Listing:
     seats = next(url for url, label in links if SEATS_LABEL in label)
     winners = next(url for url, label in links if WINNERS_LABEL in label)
     elected = next(url for url, label in links if ELECTED_LABEL in label)
-    return Listing(index, towns, [url for url, _ in subpages], smd, pr, seats, winners, elected)
+    turnout = [
+        (label, url)
+        for url, label in links
+        if "/main_content/" in url and re.search(r"有権者数、投票者数|投票総数、有効投票数、無効投票数", label)
+    ]
+    return Listing(index, towns, [url for url, _ in subpages], smd, pr, seats, winners, elected, turnout)
 
 
 def fetch() -> None:
@@ -101,11 +107,11 @@ def fetch() -> None:
             if re.search(r"shikuchouson_\d+\.html$", url):
                 raw.fetch(SOURCE, url, suffix=".html")
         found = listing(number)
-        for url in [*(url for _, url in found.smd + found.pr), found.seats, found.winners, found.elected]:
+        for url in [*(url for _, url in found.smd + found.pr + found.turnout), found.seats, found.winners, found.elected]:
             raw.fetch(SOURCE, url, suffix=suffix(url))
 
 
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 INDEPENDENT = {"", "無所属"}
 STATE_TOTAL = re.compile(r"^(?:[道都府県]計|.+[道都府県] 合計)$")
@@ -267,6 +273,35 @@ def pr_sheet(rows: list[list[str]], held: str, prefecture: str) -> list[dict]:
     ]
 
 
+def turnout_tables(number: int) -> dict[tuple[str, str], tuple[Decimal, Decimal, Decimal]]:
+    names = {native for native, _ in PREFECTURES}
+    found: dict[tuple[str, str], dict[str, tuple[Decimal, ...]]] = {}
+    for label, url in listing(number).turnout:
+        match = re.search(r"（(小選挙区|比例代表)）", label)
+        if match is None:
+            continue
+        kind = "smd" if match[1] == "小選挙区" else "pr"
+        field = "voters" if "有権者数" in label else "invalid"
+        path = raw.cached(SOURCE, url).path
+        for row in grid(path, sheets(path)[0]):
+            cells = [re.sub(r"\s+", "", cell) for cell in row]
+            at = max((i for i, cell in enumerate(cells) if cell in names), default=None)
+            if at is None or not re.fullmatch(r"[\d.]+", cells[at + 1] if at + 1 < len(cells) else ""):
+                continue
+            numbers = [amount(cell) for cell in cells[at + 1 :] if cell]
+            found.setdefault((kind, cells[at]), {})[field] = tuple(numbers)
+    result = {}
+    for key, fields in found.items():
+        registered, voters = fields["voters"][2], fields["voters"][5]
+        total, valid, invalid = fields["invalid"][:3]
+        if valid + invalid != total or abs(total - voters) > voters / 1000:
+            raise ValueError(f"{number} {key}: voters {voters}, ballots {total}, valid {valid}, invalid {invalid}")
+        result[key] = (registered, voters, invalid)
+    if len(result) != 94:
+        raise ValueError(f"{number}: {len(result)} turnout rows")
+    return result
+
+
 def prefecture_of(label: str) -> str:
     match = re.match(r"(.+?[都道府県])", label)
     return match[1] if match else label
@@ -278,7 +313,19 @@ def parse() -> None:
     pr_votes: list[dict] = []
     seats: list[dict] = []
     lists: list[dict] = []
+    turnout: list[dict] = []
     for number, held in ELECTIONS.items():
+        for (kind, prefecture), (registered, voters, invalid) in turnout_tables(number).items():
+            turnout.append(
+                {
+                    "held": held,
+                    "kind": kind,
+                    "prefecture": prefecture,
+                    "registered": str(registered),
+                    "voters": str(voters),
+                    "invalid": str(invalid),
+                }
+            )
         found = listing(number)
         text = book_text(found.winners)
         for prefecture, url in found.smd:
@@ -363,6 +410,7 @@ def parse() -> None:
     pl.DataFrame(pr_votes).write_parquet(PARSED / f"pr-v{VERSION}.parquet")
     pl.DataFrame(seats).write_parquet(PARSED / f"seats-v{VERSION}.parquet")
     pl.DataFrame(lists).write_parquet(PARSED / f"lists-v{VERSION}.parquet")
+    pl.DataFrame(turnout).write_parquet(PARSED / f"turnout-v{VERSION}.parquet")
 
 
 def book_text(url: str) -> str:
@@ -780,6 +828,7 @@ def emit() -> Path:
     pr = pl.read_parquet(PARSED / f"pr-v{VERSION}.parquet")
     seats = pl.read_parquet(PARSED / f"seats-v{VERSION}.parquet")
     lists = pl.read_parquet(PARSED / f"lists-v{VERSION}.parquet")
+    turnout = pl.read_parquet(PARSED / f"turnout-v{VERSION}.parquet")
     codes = {native: f"{number:02d}" for number, (native, _) in enumerate(PREFECTURES, 1)}
     english = {native: name for native, name in PREFECTURES}
     blocks = {native: (f"{number:02d}", name) for number, (native, name, _) in enumerate(BLOCKS, 1)}
@@ -863,12 +912,14 @@ def emit() -> Path:
             return unit("jp.prefecture", code, None, cs.area("jp.prefecture", code), "equals", cs.polity(f"JP-{code}"))
 
         values: list[tuple[UUID, UUID, UUID, Decimal]] = []
+        accounting: list[tuple[UUID, UUID, int, Decimal]] = []
+        measures = (("registered", 2), ("voters", 14), ("invalid", 5))
         for number, held in ELECTIONS.items():
             day = date.fromisoformat(held)
             found = listing(number)
             for url in [found.index, found.towns, *found.subpages, found.seats, found.winners, found.elected]:
                 cs.artifact(raw.cached(SOURCE, url), source)
-            for _, url in found.smd + found.pr:
+            for _, url in found.smd + found.pr + found.turnout:
                 cs.artifact(raw.cached(SOURCE, url), source)
             places = Places(conn, day)
 
@@ -974,6 +1025,35 @@ def emit() -> Path:
                     place, previous = place_unit(row["prefecture"], row["place"], previous)
                     values.append((result_set, place, options[row["order"]], Decimal(row["votes"])))
 
+            day_turnout = turnout.filter(pl.col("held") == held)
+            for kind, label in (("smd", "district"), ("pr", "proportional")):
+                key = f"{held}:turnout:{kind}"
+                result_set = cs.key(f"{SOURCE}.result_set", key)
+                cs.add(
+                    "result_set",
+                    id=result_set,
+                    election_id=election,
+                    contest_id=None,
+                    stage="official",
+                    kind="counted",
+                    source_id=source,
+                    status="active",
+                    is_default=kind == "smd",
+                    completeness=1,
+                )
+                cs.add(
+                    "note",
+                    entity_id=result_set,
+                    kind="methodology",
+                    body_md=f"Registered voters on election day, voters, and invalid votes by prefecture for the "
+                    f"{label} ballot, from the ministry's prefecture tables. Registered voters and voters include "
+                    "overseas electors; invalid votes are the ballot total less valid votes.",
+                )
+                for row in day_turnout.filter(pl.col("kind") == kind).iter_rows(named=True):
+                    where = prefecture_unit(codes[row["prefecture"]])
+                    for field, measure in measures:
+                        accounting.append((result_set, where, measure, Decimal(row[field])))
+
             for block, (block_code, block_english) in blocks.items():
                 key = f"{held}:pr:{block_code}"
                 contest = cs.key(f"{SOURCE}.contest", key)
@@ -1037,6 +1117,14 @@ def emit() -> Path:
                         f"leaves its quotients blank. Declared, then D'Hondt alone: {moved}.",
                     )
                 block_unit = unit("jp.hor_block", block_code, None, area, "equals", japan)
+                in_block = day_turnout.filter(
+                    (pl.col("kind") == "pr")
+                    & pl.col("prefecture").is_in([n for n, b in BLOCK_OF.items() if b == block])
+                )
+                for field, measure in measures:
+                    accounting.append(
+                        (block_set, block_unit, measure, sum((Decimal(v) for v in in_block[field]), Decimal(0)))
+                    )
                 options = {}
                 for position, row in enumerate(allocated.iter_rows(named=True), 1):
                     option = options[row["party"]] = cs.key(f"{SOURCE}.option", f"{key}:{row['party']}")
@@ -1096,6 +1184,18 @@ def emit() -> Path:
                 option_id=option,
                 channel=0,
                 measure=VOTES,
+                count_round=0,
+                flags=0,
+                value=amount_,
+            )
+        for result_set, place, measure, amount_ in accounting:
+            cs.add(
+                "result_value",
+                result_set_id=result_set,
+                unit_id=place,
+                option_id=None,
+                channel=0,
+                measure=measure,
                 count_round=0,
                 flags=0,
                 value=amount_,
