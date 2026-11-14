@@ -187,6 +187,7 @@ COUNCILS = {
     ),
 }
 ALIASES = {
+    ("S12000006", "Auldgirth"): "Auldgirth and District",
     ("S12000006", "Buittle"): "Buittle Parish",
     ("S12000006", "Templand and District"): "Templand",
     ("S12000006", "Port William and District"): "Port William",
@@ -881,8 +882,9 @@ def dumgal_name(entry: str, address: bool) -> dict:
             kept.append(part)
         parts = kept
     forenames = " ".join(parts)
+    given = " ".join(display(word) if re.fullmatch(r"[A-Z]{2,}", word) else word for word in forenames.split())
     plain = re.sub(r"\s*\(.*?\)", "", surname)
-    return {"printed": f"{surname}, {forenames}", "name": f"{forenames} {display(plain).replace(' Of ', ' of ')}"}
+    return {"printed": f"{surname}, {forenames}", "name": f"{given} {display(plain).replace(' Of ', ' of ')}"}
 
 
 def dumgal_title(text: str) -> str:
@@ -983,8 +985,10 @@ def dumgal_declaration(text: str) -> dict:
 
 
 def dumgal_casual(text: str) -> dict:
-    head = re.search(r"COUNCILLORS FOR\s+(.+?) COMMUNITY COUNCIL\s+DATE OF ELECTION \w+ (\d+ \w+ \d{4})", text)
-    names = re.search(r"Names of Candidates? remaining validly nominated\n(.*?)\nRO", text, re.DOTALL)
+    head = re.search(
+        r"COUNCILLORS FOR\s+(.+?) COMMUNITY COUNCIL\s+DATE OF ELECTION :? ?\w+ (\d+)(?:ST|ND|RD|TH)? (\w+ \d{4})", text
+    )
+    names = re.search(r"Names of Candidate(?:s|\(s\))? remaining validly nominated\n(.*?)\nRO", text, re.DOTALL)
     if not (head and names):
         raise ValueError("unreadable casual vacancy notice")
     members = [
@@ -994,7 +998,7 @@ def dumgal_casual(text: str) -> dict:
     ]
     return {
         "council": dumgal_title(head.group(1)),
-        "day": when(head.group(2)),
+        "day": when(f"{head.group(2)} {head.group(3)}"),
         "places": None,
         "members": members,
         "by": True,
@@ -1292,8 +1296,8 @@ def emit() -> Path:
             "unopposed in Perth and Kinross, Stirling, Shetland, Argyll and Bute, Clackmannanshire, East Lothian, "
             "Moray, Angus, and South Lanarkshire from the councils' notices and lists, as tacit sets, with South "
             "Lanarkshire's 2026 polls from the council's results pages; Dumfries and Galloway's October 2024 round "
-            "(76 councils formed unopposed and 4 polls) and the Dalry casual vacancy of 2025, Aberdeenshire's September "
-            "2024 round (62 formed unopposed and the Ballater and Crathie and Kemnay ballots), and Scottish Borders' "
+            "(76 councils formed unopposed and 4 polls) and its uncontested casual vacancy elections in Dalry (2025) "
+            "and Auldgirth, Moffat, and Lochans (2026), Aberdeenshire's September 2024 round (62 formed unopposed and the Ballater and Crathie and Kemnay ballots), and Scottish Borders' "
             "Coldingham ballot of 2023",
             polity="GB",
         )
