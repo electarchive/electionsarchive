@@ -2289,6 +2289,7 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
       isLate &&
       !isTail &&
       spent > 0 &&
+      (cureAt == null || Date.parse(stamp) < cureAt) &&
       TAILS[race.state] != null &&
       latest - onNight < tail * onNight
     ) {
