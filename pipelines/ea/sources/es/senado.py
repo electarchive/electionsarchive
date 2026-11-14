@@ -88,6 +88,14 @@ FLAGS_DIFFER = (
     " The ministry's candidate file marks other candidates as elected than the seat flags in its results file, such "
     "as a substitute who took the seat later; the winners in the results file are stored."
 )
+SINGLE_DIFFERS = (
+    " The candidate votes add up to {votes:,}, against {valid:,} ballots with votes to candidates in the file's own "
+    "totals; one mark per ballot would make them equal, and both are stored as printed."
+)
+MARKS_EXCEEDED = (
+    " The candidate votes add up to {votes:,}, more than {marks} for each of the {valid:,} ballots with votes to "
+    "candidates in the file's own totals; both are stored as printed."
+)
 OVER = " In {count} units the ballots cast exceed the registered voters, as the file prints them."
 TABLES = (
     "lists",
@@ -606,6 +614,11 @@ def emit() -> Path:
                 if top != elected:
                     note += TOP_DIFFERS
                     mismatched.append(key)
+                if seats == 1 and official != total["list_votes"]:
+                    note += SINGLE_DIFFERS.format(votes=official, valid=total["list_votes"])
+                marks = 3 if seats == 4 else 2
+                if seats > 1 and official > marks * total["list_votes"]:
+                    note += MARKS_EXCEEDED.format(votes=official, marks=marks, valid=total["list_votes"])
                 if flagged and flagged != elected:
                     note += FLAGS_DIFFER
                     relabeled.append(key)
