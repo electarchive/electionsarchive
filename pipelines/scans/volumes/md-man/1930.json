@@ -1,0 +1,23 @@
+{
+  "year": 1930,
+  "day": "1930-11-04",
+  "polity": "US-MD",
+  "publisher": "Maryland Secretary of State",
+  "title": "Maryland Manual 1930, general election returns (general election 1930-11-04)",
+  "license": "Public record",
+  "file": {
+    "url": "https://msa.maryland.gov/megafile/msa/speccol/sc2900/sc2908/000001/000147/pdf/am147--{page}.pdf",
+    "item": "https://msa.maryland.gov/megafile/msa/speccol/sc2900/sc2908/000001/000147/html/index.html"
+  },
+  "raw_source": "us.scans",
+  "create": true,
+  "offices": {
+    "governor": "Governor of Maryland; only the 1930 general election",
+    "house": "U.S. Representative in Congress, one table per congressional district; district is the congressional district number; only the 1930 general election, not a primary"
+  },
+  "leaves": [
+    240,
+    250,
+    251
+  ]
+}

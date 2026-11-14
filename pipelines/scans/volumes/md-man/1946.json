@@ -1,0 +1,25 @@
+{
+  "year": 1946,
+  "day": "1946-11-05",
+  "polity": "US-MD",
+  "publisher": "Maryland Secretary of State",
+  "title": "Maryland Manual 1948-49, general election returns (general election 1946-11-05)",
+  "license": "Public record",
+  "file": {
+    "url": "https://msa.maryland.gov/megafile/msa/speccol/sc2900/sc2908/000001/000162/pdf/am162--{page}.pdf",
+    "item": "https://msa.maryland.gov/megafile/msa/speccol/sc2900/sc2908/000001/000162/html/index.html"
+  },
+  "raw_source": "us.scans",
+  "create": true,
+  "offices": {
+    "governor": "Governor of Maryland; only the 1946 general election",
+    "senate": "U.S. Senator (United States Senator), not a state senator; only the 1946 general election",
+    "house": "U.S. Representative in Congress, one table per congressional district; district is the congressional district number; only the 1946 general election, not a primary"
+  },
+  "leaves": [
+    227,
+    228,
+    231,
+    232
+  ]
+}

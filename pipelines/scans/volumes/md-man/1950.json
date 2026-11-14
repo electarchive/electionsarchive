@@ -1,0 +1,24 @@
+{
+  "year": 1950,
+  "day": "1950-11-07",
+  "polity": "US-MD",
+  "publisher": "Maryland Secretary of State",
+  "title": "Maryland Manual 1951-52, general election returns (general election 1950-11-07)",
+  "license": "Public record",
+  "file": {
+    "url": "https://msa.maryland.gov/megafile/msa/speccol/sc2900/sc2908/000001/000164/pdf/am164--{page}.pdf",
+    "item": "https://msa.maryland.gov/megafile/msa/speccol/sc2900/sc2908/000001/000164/html/index.html"
+  },
+  "raw_source": "us.scans",
+  "create": true,
+  "offices": {
+    "governor": "Governor of Maryland; only the 1950 general election",
+    "senate": "U.S. Senator (United States Senator), not a state senator; only the 1950 general election",
+    "house": "U.S. Representative in Congress, one table per congressional district; district is the congressional district number; only the 1950 general election, not a primary"
+  },
+  "leaves": [
+    261,
+    263,
+    264
+  ]
+}

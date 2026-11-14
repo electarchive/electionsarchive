@@ -1,0 +1,26 @@
+{
+  "year": 1934,
+  "day": "1934-11-06",
+  "polity": "US-MD",
+  "publisher": "Maryland Secretary of State",
+  "title": "Maryland Manual 1934, general election returns (general election 1934-11-06)",
+  "license": "Public record",
+  "file": {
+    "url": "https://msa.maryland.gov/megafile/msa/speccol/sc2900/sc2908/000001/000151/pdf/am151--{page}.pdf",
+    "item": "https://msa.maryland.gov/megafile/msa/speccol/sc2900/sc2908/000001/000151/html/index.html"
+  },
+  "raw_source": "us.scans",
+  "create": true,
+  "offices": {
+    "governor": "Governor of Maryland; only the 1934 general election",
+    "senate": "U.S. Senator (United States Senator), not a state senator; only the 1934 general election",
+    "house": "U.S. Representative in Congress, one table per congressional district; district is the congressional district number; only the 1934 general election, not a primary"
+  },
+  "leaves": [
+    261,
+    262,
+    266,
+    267,
+    268
+  ]
+}

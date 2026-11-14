@@ -1,0 +1,28 @@
+{
+  "year": 1936,
+  "day": "1936-11-03",
+  "polity": "US-MD",
+  "publisher": "Maryland Secretary of State",
+  "title": "Maryland Manual 1937, general election returns (general election 1936-11-03)",
+  "license": "Public record",
+  "file": {
+    "url": "https://msa.maryland.gov/megafile/msa/speccol/sc2900/sc2908/000001/000156/pdf/am156--{page}.pdf",
+    "item": "https://msa.maryland.gov/megafile/msa/speccol/sc2900/sc2908/000001/000156/html/index.html"
+  },
+  "raw_source": "us.scans",
+  "create": true,
+  "offices": {
+    "president": "President (votes for presidential electors by county; when the page prints one column per elector, the column of each party's first elector, the elector at large listed first); only the 1936 general election",
+    "house": "U.S. Representative in Congress, one table per congressional district; district is the congressional district number; only the 1936 general election, not a primary"
+  },
+  "leaves": [
+    305,
+    306,
+    307,
+    308,
+    309,
+    310,
+    311,
+    312
+  ]
+}
