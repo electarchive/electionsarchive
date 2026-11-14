@@ -194,7 +194,7 @@ const MODEL = {
     drift: 0.04,
     base: 0.002,
     window: 2,
-    carry: 1,
+    carry: 0.5,
     half: 1,
     amount: 1.2,
     small: 0.03,
