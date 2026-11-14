@@ -377,6 +377,16 @@ const TAILS: Record<string, number> = {
   wa: 0.5,
 };
 
+const MAILED: Record<string, string> = { nv: "2020-06-09" };
+
+function tailOf(race: LiveRace) {
+  const since = MAILED[race.state];
+  const day = /\d{4}-\d{2}-\d{2}/.exec(race.slug)?.[0];
+  return since != null && day != null && day < since
+    ? MODEL.tail.share
+    : (TAILS[race.state] ?? MODEL.tail.share);
+}
+
 const TAUS = 41;
 const PIS = [0.05, 0.2, 0.4, 0.6, 0.8, 0.95];
 const SCALES = [0.4, 0.55, 0.75, 1, 1.35];
@@ -532,7 +542,7 @@ function units(
   sizes: Map<string, number>,
   adjacent: Map<string, Set<string>>,
 ) {
-  const tail = TAILS[race.state] ?? MODEL.tail.share;
+  const tail = tailOf(race);
   const byUnit = series(race, at);
   const latest = new Map<string, Array<number>>();
   const nights = new Map<string, Array<number>>();
@@ -1524,7 +1534,7 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
     sizes,
     adjacent,
   );
-  const tail = TAILS[race.state] ?? MODEL.tail.share;
+  const tail = tailOf(race);
   const counted = sum(found.map((unit) => unit.total));
   const empty: LiveEstimate = {
     status: "waiting",
