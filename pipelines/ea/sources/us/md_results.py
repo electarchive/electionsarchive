@@ -410,10 +410,9 @@ def emit() -> Path:
                 "completeness",
                 "supersedes_id",
             )
-            for row in conn.execute(
+            previous = conn.execute(
                 f"select {', '.join(columns)} from result_set where contest_id = %s and is_default", [contest]
-            ).fetchall():
-                cs.add("result_set", **dict(zip(columns, row, strict=True)), is_default=False)
+            ).fetchall()
             outcomes = conn.execute(
                 """select o.option_id, o.kind, o.seats from outcome o
                    join result_set rs on rs.id = o.result_set_id and rs.is_default where rs.contest_id = %s""",
@@ -505,6 +504,12 @@ def emit() -> Path:
                     print(f"{key}: {candidate} has {votes}, {on_file[option]} on file")
                 totals[option] = votes
                 picked[candidate] = option
+            complete = len(totals) >= sum(1 for count in on_file.values() if count)
+            if complete:
+                for row in previous:
+                    cs.add("result_set", **dict(zip(columns, row, strict=True)), is_default=False)
+            else:
+                print(f"{key}: county pages lack options on file; the statewide set stays the default")
             cs.add(
                 "result_set",
                 id=result_set,
@@ -514,7 +519,7 @@ def emit() -> Path:
                 kind="counted",
                 status="active",
                 source_id=source,
-                is_default=True,
+                is_default=complete or not previous,
                 completeness=1,
             )
             for county, candidate, votes in lines.select("county", "candidate", "votes").iter_rows():
