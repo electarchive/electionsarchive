@@ -122,6 +122,17 @@ A re-emit runs the same pipeline again and writes a new changeset. Re-emits must
 
 **Reverting is the fallback.** `ea revert` undoes a changeset. It deletes the result sets the changeset created, restores the rows it changed from their history, and removes the entities it minted. It refuses when a later changeset changed a row it wrote, references an entity it created, or holds facts on its units. It also refuses when the changeset replaced facts in a set it did not create. Those corrections are fixed forward with another re-emit. Use `revert` when a re-emit cannot express the fix, such as an entity that should not exist. Revert newer changesets first, and move the reverted folders to `data/retired`.
 
+## Withdrawal at a source's request
+
+When a source asks the archive to remove or limit its data, the pipeline that owns the source carries it out in four steps.
+
+1. **Mark the source.** The pipeline stages a new license text on the source, starting with `Withdrawn: <body> asked on <date> …` for a full withdrawal or `Limited: …` for a partial one. Because the mark is part of the license, it goes through a changeset like any other change.
+2. **Hide what cites it.** `licensed()` hides every result set that cites a withdrawn source, so the site, the API, the MCP server, and embeds stop serving it at once. The restricted cache class keeps the source's raw files out of bulk releases.
+3. **Drop the sets.** The owning pipeline then drops the result sets with `result_set_drop` and retires the entities that existed only for them. A retired entity's public ID returns HTTP 410 and the reason.
+4. **Carry out limits in the emit step.** The pipeline changes what it emits, so a limit shows up in the staged rows.
+
+`_history` keeps the deleted rows for the audit trail and is never served.
+
 ## Entity resolution
 
 Matching people, parties, and places across elections and sources runs in three stages. Deterministic rules come first: official IDs, and exact normalized names within a polity and period. Wikidata lookups come second. AI-assisted matching comes last, and it outputs a confidence score with the evidence behind it. High-confidence matches are applied automatically as `match` changesets. Everything else goes to review. A wrong match is undone by reverting its changeset.
