@@ -1662,6 +1662,7 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
         ) / latest
       : 0;
   const tailWeight = Math.min(1, tail / MODEL.tail.share);
+  const isMailTail = tail > MODEL.tail.share;
   const held =
     isLate && onNight > 0 && latest > 0
       ? Math.max(
@@ -2521,13 +2522,15 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
       const pullExpect =
         pull == null ? null : MODEL.late.canvass * (pull.mean + pullOwn.shift);
       const local = pull == null ? MODEL.tail.local * jitter : 0;
+      const isRecent = isMailTail && recent != null && remaining > 0;
       const tail = (value: number, tilt: number) =>
         final > 0
           ? extra *
             clamp(
-              (countedLead + value) / final +
-                (isPacedLean ? MODEL.late.rest : 1) * tilt +
-                local,
+              (isRecent
+                ? value / remaining
+                : (countedLead + value) / final +
+                  (isPacedLean ? MODEL.late.rest : 1) * tilt) + local,
               -ceiling,
               ceiling,
             )
