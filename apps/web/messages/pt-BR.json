@@ -5073,7 +5073,7 @@
   "method_margin_uniform": "Uma oscilação uniforme em favor de um partido em todo o estado.",
   "method_margin_stronghold": "Um efeito de reduto, para quando a oscilação é maior nos lugares que um partido já domina.",
   "method_margin_size": "Um efeito de tamanho do condado, para quando condados grandes e pequenos se movem de forma diferente.",
-  "method_margin_traits": "Um efeito demográfico, para quando condados com mais pessoas com ensino superior, ou com mais moradores brancos, negros ou hispânicos, se movem de forma diferente dos demais. Os dados dos condados vêm do Departamento do Censo dos EUA.",
+  "method_margin_traits": "Um efeito demográfico: condados com mais pessoas com diploma universitário, ou com mais moradores brancos, negros ou hispânicos, se movem de forma diferente dos demais. Condados em que a parcela de moradores brancos, negros ou hispânicos cresceu ou diminuiu desde 2016 também se movem de forma diferente dos condados que mudaram menos. Os dados dos condados vêm do Census Bureau.",
   "method_margin_order": "Um efeito da ordem de apuração, para quando os votos apurados mais tarde em um condado tendem para um lado diferente dos votos apurados primeiro. O modelo mede isso pela variação da margem de cada condado entre as primeiras e as últimas apurações.",
   "method_margin_body_more": "A margem projetada de cada condado combina a apuração do próprio condado com essa previsão ajustada. Quanto maior a parte dos votos do condado já apurada, maior o peso da apuração própria. Cada efeito começa perto de zero e só cresce na medida em que os votos apurados o sustentam.",
   "method_order_title": "Votos apurados mais tarde",

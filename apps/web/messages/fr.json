@@ -5075,7 +5075,7 @@
   "method_margin_uniform": "Une variation uniforme en faveur d'un parti dans tout l'État.",
   "method_margin_stronghold": "Un effet de bastion, lorsque la variation est plus forte là où un parti domine déjà.",
   "method_margin_size": "Un effet de taille, lorsque les grands et les petits comtés évoluent différemment.",
-  "method_margin_traits": "Un effet démographique, lorsque les comtés comptant plus de diplômés de l'université, ou plus d'habitants blancs, noirs ou hispaniques, évoluent différemment des autres. Les chiffres par comté proviennent du Bureau du recensement des États-Unis (Census Bureau).",
+  "method_margin_traits": "Un effet démographique : les comtés qui comptent plus de diplômés du supérieur, ou plus d'habitants blancs, noirs ou hispaniques, évoluent autrement que les autres. De même, les comtés où la part des habitants blancs, noirs ou hispaniques a augmenté ou diminué depuis 2016 évoluent autrement que ceux où elle a moins changé. Les chiffres par comté proviennent du Census Bureau.",
   "method_margin_order": "Un effet d'ordre de dépouillement, lorsque les votes dépouillés plus tard dans un comté penchent autrement que ceux dépouillés en premier. Le modèle le mesure d'après l'évolution de l'écart de voix de chaque comté entre ses premiers et ses derniers décomptes.",
   "method_margin_body_more": "L'écart projeté de chaque comté combine son propre décompte et cette prédiction ajustée, et plus la part du vote d'un comté déjà comptée est grande, plus son propre décompte pèse. Chaque effet part d'une valeur proche de zéro et ne grandit que si les votes comptés le confirment.",
   "method_order_title": "Votes dépouillés en dernier",
