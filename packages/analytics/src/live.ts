@@ -345,7 +345,9 @@ function split(race: LiveRace, at: string | null) {
 
 const HOLDS: Record<string, number> = { ga: 0.002 };
 
-const CANVASS: Record<string, number> = { pa: 0.005 };
+const CANVASS: Record<string, { base: number; late: number }> = {
+  pa: { base: 0.0035, late: 0.05 },
+};
 
 const NIGHTS: Record<string, number> = { ga: 0.0075 };
 
@@ -1499,10 +1501,15 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
             (latest - onNight),
         ) / latest
       : 0;
-  const canvass = isLate
-    ? (CANVASS[race.state] ?? 0) *
-      Math.exp(-Math.max(0, days - MODEL.late.baseGrace) / MODEL.late.baseLife)
-    : 0;
+  const daily = dayOne == null ? 0 : sum(dayOne.totals);
+  const owed = CANVASS[race.state];
+  const canvass =
+    isLate && owed != null && daily > 0
+      ? (owed.base + (owed.late * Math.max(0, latest - daily)) / daily) *
+        Math.exp(
+          -Math.max(0, days - MODEL.late.baseGrace) / MODEL.late.baseLife,
+        )
+      : 0;
   const slowing =
     isLate && onNight > 0 && latest > onNight
       ? Math.min(
