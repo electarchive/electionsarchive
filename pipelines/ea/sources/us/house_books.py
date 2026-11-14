@@ -931,10 +931,20 @@ def emit(source: ModuleType) -> Path:
                 if source.REVISION > 1
                 else None
             )
-            fresh = result_set in cs.minted or key in getattr(source, "REREAD", ())
-            if not fresh and conn.execute(
-                "select coalesce(bool_or(is_default), true) from result_set where id = %s", [result_set]
-            ).fetchone() == (True,):
+            fresh = (
+                result_set in cs.minted
+                or key in getattr(source, "REREAD", ())
+                or district > 0
+                and re.sub(r":house:\d+$", ":house:0", key) in contests
+                and conn.execute(
+                    """select 1 from result_set r join result_value v on v.result_set_k = r.k
+                       join reporting_unit u on u.k = v.unit_k and u.scheme_code in ('us.county', 'us.place')
+                       where r.id = %s limit 1""",
+                    [result_set],
+                ).fetchone()
+                is not None
+            )
+            if not fresh:
                 continue
             if len(picked) < lines["column"].n_unique():
                 rest = int(lines.filter(~pl.col("column").is_in(list(picked)))["votes"].sum())
@@ -1002,8 +1012,6 @@ def emit(source: ModuleType) -> Path:
                         "select option_id, kind, seats from outcome where result_set_id = %s", [row[0]]
                     ).fetchall():
                         cs.add("outcome", result_set_id=result_set, option_id=option, kind=outcome_kind, seats=seats)
-            if not fresh and not ties:
-                continue
             if (
                 previous is not None
                 and not conn.execute("select 1 from result_set where id = %s", [previous]).fetchone()
@@ -1039,7 +1047,9 @@ def emit(source: ModuleType) -> Path:
             units: dict[str, UUID] = {}
             for county in lines["county"].unique(maintain_order=True):
                 code, parent, area = counties.get((county, county)) or counties[(fips[where], _plain(county))]
-                if district > 0 and (int(year), where, county) in split:
+                if district > 0 and (
+                    (int(year), where, county) in split or re.sub(r":house:\d+$", ":house:0", key) in contests
+                ):
                     part = (
                         f"{year}:{code}:{source.CHAMBER}:{key.split(':', 3)[3]}"
                         if hasattr(source, "CHAMBER")
