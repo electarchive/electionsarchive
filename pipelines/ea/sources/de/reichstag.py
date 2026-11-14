@@ -25,6 +25,17 @@ VOTES, REGISTERED, CAST, VALID = 1, 2, 3, 4
 DIGITIZED = 8
 WIDTH = 1400
 TOTALS = {"registered": REGISTERED, "cast": CAST, "valid": VALID}
+WAHLKREISE = list(range(1, 36))
+BODIES = {
+    "reichstag": ("lower_house", "Reichstag", "Reichstag", "Reichstag", "reichstag"),
+    "nationalversammlung": (
+        "constituent_assembly",
+        "Weimar National Assembly",
+        "Verfassunggebende Deutsche Nationalversammlung",
+        "National Assembly",
+        "national-assembly",
+    ),
+}
 
 PARTIES = {
     "spd": ("Q49768", "Sozialdemokratische Partei Deutschlands", "SPD"),
@@ -95,6 +106,9 @@ PARTIES = {
     "mittelpartei": ("Q15787248", "Bayerische Mittelpartei", "BMP"),
     "hessische_volkspartei": (None, "Hessische Volkspartei", "HVP"),
     "vlbt": (None, "Vereinigte Landwirtschaftliche Berufsvereinigungen Thüringens", "VLBT"),
+    "sh_bauerndemokratie": (None, "Schleswig-Holsteinische Bauern- und Landarbeiterdemokratie", "SHBLD"),
+    "braunschweig": (None, "Braunschweigischer Landeswahlverband", "BLWV"),
+    "cvp_baden": (None, "Christliche Volkspartei in Baden", "CVP"),
 }
 BLOCS = {"kampffront"}
 JOINT = {
@@ -186,10 +200,160 @@ JOINT = {
         ("mittelpartei", "dvp"),
     ),
     "bvp_cvp": ("Bayerische Volkspartei und Christliche Volkspartei", ("bvp", "christliche_volkspartei")),
+    "dnvp_dvp": ("Deutschnationale Volkspartei und Deutsche Volkspartei", ("dnvp", "dvp")),
+    "dnvp_dvp_essen": (
+        "Deutschnationale Volkspartei, Deutsche Volkspartei und Nationaler Verein Essen",
+        ("dnvp", "dvp"),
+    ),
+    "ddp_dvp": ("Deutsche Demokratische Partei und Deutsche Volkspartei", ("ddp", "dvp")),
+    "zentrum_dhp": ("Christliche Volkspartei und Deutsch-Hannoversche Partei", ("zentrum", "dhp")),
+    "mittelpartei_nlb": (
+        "Bayerische Mittelpartei und Nationalliberale Landespartei in Bayern",
+        ("mittelpartei", "nlb"),
+    ),
+    "buergerpartei_bauernbund": (
+        "Württembergische Bürgerpartei und Württembergischer Bauern- und Weingärtnerbund",
+        ("wuerttemberg_buergerpartei", "wuerttemberg_landbund"),
+    ),
 }
 OTHERS = "Andere Parteien"
 
 ELECTIONS: dict[date, dict[str, Any]] = {
+    date(1919, 1, 19): {
+        "english": "1919 German federal election",
+        "german": "Wahl zur Nationalversammlung 1919",
+        "year": 1919,
+        "volume": 40,
+        "printed": "236 and 237",
+        "seats": 421,
+        "body": "nationalversammlung",
+        "scheme": "de.nv_wahlkreis",
+        "order": [*range(1, 32), *range(33, 38)],
+        "codes": {31: "31/32"},
+        "units": {
+            1: "Ostpreußen",
+            2: "Westpreußen",
+            3: "Berlin",
+            4: "Potsdam (Reichstagswahlkreise 1–9)",
+            5: "Potsdam (Reichstagswahlkreis 10)",
+            6: "Frankfurt a. d. O.",
+            7: "Pommern",
+            8: "Posen",
+            9: "Breslau",
+            10: "Oppeln",
+            11: "Liegnitz",
+            12: "Magdeburg und Anhalt",
+            13: "Merseburg",
+            14: "Schleswig-Holstein und Fürstentum Lübeck",
+            15: "Aurich, Osnabrück und Oldenburg",
+            16: "Hannover, Hildesheim, Lüneburg und Braunschweig",
+            17: "Münster, Minden, Schaumburg und Lippe",
+            18: "Arnsberg",
+            19: "Hessen-Nassau und Waldeck",
+            20: "Köln und Aachen",
+            21: "Koblenz, Trier und Birkenfeld",
+            22: "Düsseldorf (Reichstagswahlkreise 1–5)",
+            23: "Düsseldorf (Reichstagswahlkreise 6–12)",
+            24: "Oberbayern und Schwaben",
+            25: "Niederbayern und Oberpfalz",
+            26: "Franken",
+            27: "Pfalz",
+            28: "Sachsen (Reichstagswahlkreise 1–9)",
+            29: "Sachsen (Reichstagswahlkreise 10–14)",
+            30: "Sachsen (Reichstagswahlkreise 15–23)",
+            31: "Württemberg und Hohenzollern",
+            33: "Baden",
+            34: "Hessen",
+            35: "Mecklenburg und Lübeck",
+            36: "Thüringen",
+            37: "Hamburg, Bremen und Stade",
+        },
+        "pages": {
+            275: {
+                "top": 0.25,
+                "cast": (0.283, 0.360),
+                "registered": (0.194, 0.273),
+                "valid": (0.471, 0.547),
+                "dnvp": (0.561, 0.628),
+                "dnvp_dvp": (0.561, 0.750),
+                "dvp": (0.691, 0.750),
+                "zentrum": (0.815, 0.873),
+            },
+            276: {
+                "top": 0.25,
+                "ddp": (0.108, 0.174),
+                "spd": (0.226, 0.292),
+                "uspd": (0.340, 0.407),
+                "others": (0.458, 0.514),
+                "bayerischer_bauernbund": (0.458, 0.514),
+            },
+        },
+        "lists": {
+            14: {"others": "sh_bauerndemokratie"},
+            15: {"others": "dhp"},
+            16: {"zentrum": "zentrum_dhp", "others": "braunschweig"},
+            21: {"ddp": "ddp_dvp"},
+            22: {"dnvp_dvp": "dnvp_dvp_essen"},
+            24: {"dnvp": "mittelpartei_nlb", "zentrum": "bvp"},
+            25: {"zentrum": "bvp"},
+            26: {"dnvp": "mittelpartei_nlb", "zentrum": "bvp"},
+            27: {"zentrum": "bvp"},
+            31: {"dnvp": "buergerpartei_bauernbund"},
+            33: {"dnvp": "cvp_baden"},
+            34: {"dnvp": "hessische_volkspartei"},
+            37: {"others": "dhp"},
+        },
+        "won": {
+            "dnvp": 33,
+            "dnvp_dvp": 5,
+            "dnvp_dvp_essen": 2,
+            "mittelpartei_nlb": 1,
+            "buergerpartei_bauernbund": 2,
+            "cvp_baden": 1,
+            "dvp": 19,
+            "zentrum": 69,
+            "bvp": 18,
+            "zentrum_dhp": 4,
+            "ddp": 73,
+            "ddp_dvp": 2,
+            "spd": 163,
+            "uspd": 22,
+            "sh_bauerndemokratie": 1,
+            "braunschweig": 1,
+            "bayerischer_bauernbund": 4,
+            "dhp": 1,
+        },
+        "system": (
+            "Proportional representation in 37 Wahlkreise under the Verordnung über die Wahlen zur verfassunggebenden "
+            "deutschen Nationalversammlung of 30 November 1918 (Reichsgesetzblatt 1918, p. 1345), whose annex fixed "
+            "each Wahlkreis's number of members from the 1910 census, 433 in all. Seats in each Wahlkreis went to the "
+            "lists by the d'Hondt method. Elsaß-Lothringen (Wahlkreis 38, 12 members) did not vote, so 421 were elected."
+        ),
+        "caveat": (
+            "The Christliche Volkspartei is the name the Zentrum stood under in 1919; its column also holds its "
+            "regional lists (the Christlich-demokratische Partei in Wahlkreis 1, the Katholische Volkspartei in Oppeln, "
+            "and the Zentrum parties of Württemberg and Hohenzollern, Baden, and Hessen) and, in Wahlkreis 7, the lists "
+            "Pionteck (4,380) and Kiesak (456). In Wahlkreise 24 to 27 that column holds the Bayerische Volkspartei, "
+            "counted here as its own list, and in Wahlkreis 16 the joint list of the Christliche Volkspartei and the "
+            "Deutsch-Hannoversche Partei. The Deutsche Demokratische Partei's column holds the Deutsche Volkspartei in "
+            "Bayern, the Demokratische Partei in Hessen, and in Wahlkreis 37 the lists Petersen (156,056) and Böhmert "
+            "(95,757); in Wahlkreis 21 it holds a joint list with the Deutsche Volkspartei. The Deutschnationale "
+            "Volkspartei's column holds the lists Buchmann, Schöttler, and Mahlstaedt in Wahlkreis 37 (33,708 in all) "
+            "and its regional affiliates, which are counted here as their own lists. The Deutschnationale Volkspartei "
+            "and the Deutsche Volkspartei stood jointly in Wahlkreise 18, 22 (with the Nationaler Verein Essen), and 36. "
+            "The national totals the Jahrbuch prints leave out the joint lists: 502,755 votes for the three of the "
+            "Deutschnationale Volkspartei and the Deutsche Volkspartei, 142,103 in Wahlkreis 21, and 270,771 in "
+            "Wahlkreis 16. Other parties include the Soziale Reformpartei, the Demokratische Mittelstandspartei, the "
+            "Christlich-soziale Partei, the Deutsche Friedenspartei, the Mecklenburgischer Dorfbund, a Mittelstandspartei "
+            "(640 votes in Wahlkreis 24), and 56 votes that election officers recorded as valid though cast for no "
+            "admitted list. The Jahrbuch prints no electorate for Wahlkreise 8 (Posen), 14, and 36. Wahlkreise 31 "
+            "and 32 voted as one, Württemberg and Hohenzollern, and the table prints them together. Seats are the members "
+            "elected on each list as the Jahrbuch reports them (its table 2b); they differ from the parliamentary groups "
+            "the members joined, which the Jahrbuch gives as Deutschnationale Volkspartei 42, Deutsche Volkspartei 22, "
+            "Zentrum 89, Deutsche Demokratische Partei 74, Social Democrats 163, Independent Social Democrats 22, and no "
+            "group 9."
+        ),
+    },
     date(1920, 6, 6): {
         "english": "1920 German federal election",
         "german": "Reichstagswahl 1920",
@@ -853,8 +1017,12 @@ def fetch() -> None:
             raw.fetch(SOURCE, url(day, leaf), suffix=".pdf" if "pdf" in spec else ".jpg")
 
 
+def order(spec: dict[str, Any]) -> list[int]:
+    return spec.get("order", WAHLKREISE)
+
+
 def bands(
-    gray: np.ndarray, top: float, columns: dict[str, tuple[float, float]], ink: int = 120
+    gray: np.ndarray, top: float, columns: dict[str, tuple[float, float]], rows: int, ink: int = 120
 ) -> list[tuple[float, float]]:
     height, width = gray.shape
     left, right = next(iter(columns.values()))
@@ -870,9 +1038,9 @@ def bands(
         else:
             lines.append((y, y))
     lines = [(top, bottom) for top, bottom in lines if bottom - top >= 8]
-    if len(lines) < 36:
-        raise ValueError(f"{len(lines)} text lines in the first column, expected at least 36")
-    return [((top - 3) / height, (bottom + 3) / height) for top, bottom in lines[:35]]
+    if len(lines) <= rows:
+        raise ValueError(f"{len(lines)} text lines in the first column, expected at least {rows + 1}")
+    return [((top - 3) / height, (bottom + 3) / height) for top, bottom in lines[:rows]]
 
 
 def parse() -> None:
@@ -899,7 +1067,7 @@ def parse() -> None:
                     "image": f"pages/{SOURCE}/{image.name}",
                     "width": width,
                     "height": height,
-                    "rows": [list(row) for row in bands(gray, top, columns, spec.get("ink", 120))],
+                    "rows": [list(row) for row in bands(gray, top, columns, len(order(spec)), spec.get("ink", 120))],
                 }
             )
     folder = raw.parsed(SOURCE)
@@ -911,15 +1079,17 @@ def returns() -> pl.DataFrame:
     frame = pl.read_csv(TSV, separator="\t", try_parse_dates=True, schema_overrides={"votes": pl.Int64})
     for (day,), group in frame.group_by("date"):
         spec = ELECTIONS[day]
-        if sorted(group["wahlkreis"].unique()) != list(range(1, 36)):
-            raise ValueError(f"{day}: expected Wahlkreise 1 to 35")
+        if sorted(group["wahlkreis"].unique()) != sorted(order(spec)):
+            raise ValueError(f"{day}: expected Wahlkreise {order(spec)}")
         printed = {column for layout in spec["pages"].values() for column in layout if column != "top"}
         if set(group["column"]) - printed:
             raise ValueError(f"{day}: columns not on the pages: {set(group['column']) - printed}")
         for (wahlkreis,), rows in group.group_by("wahlkreis"):
             counts = dict(rows.select("column", "votes").iter_rows())
             lists = sum(votes for column, votes in counts.items() if column not in TOTALS)
-            if lists != counts["valid"] or not counts["valid"] <= counts["cast"] <= counts["registered"]:
+            if lists != counts["valid"] or not counts["valid"] <= counts["cast"] <= counts.get(
+                "registered", counts["cast"]
+            ):
                 raise ValueError(f"{day} Wahlkreis {wahlkreis}: {lists} list votes against {counts['valid']} valid")
         if sum(spec["won"].values()) != spec["seats"]:
             raise ValueError(f"{day}: seats add up to {sum(spec['won'].values())}, not {spec['seats']}")
@@ -942,11 +1112,14 @@ def emit() -> Path:
             cs.add("name", entity_id=entity, text=text, lang=lang, kind=kind, is_preferred=kind == "official")
 
         germany = cs.polity("DE")
-        reichstag = cs.key("de.body", "reichstag")
-        if reichstag in cs.minted:
-            cs.add("body", id=reichstag, polity_id=germany, kind="lower_house")
-            name(reichstag, "Reichstag")
-            name(reichstag, "Reichstag", "de", "native")
+        bodies: dict[str, UUID] = {}
+        for key in {spec.get("body", "reichstag") for spec in ELECTIONS.values()}:
+            kind, english, german, _, _ = BODIES[key]
+            bodies[key] = cs.key("de.body", key)
+            if bodies[key] in cs.minted:
+                cs.add("body", id=bodies[key], polity_id=germany, kind=kind)
+                name(bodies[key], english)
+                name(bodies[key], german, "de", "native")
         parties: dict[str, UUID] = {}
         for key, (item, label, short) in PARTIES.items():
             if item is None:
@@ -959,7 +1132,7 @@ def emit() -> Path:
                 cs.add("party", id=parties[key], kind="bloc" if key in BLOCS else "party", polity_id=germany)
                 name(parties[key], label, "de")
                 name(parties[key], short, "de", "abbreviation")
-        units = {number: cs.unit("de.reich_wahlkreis", str(number)) for number in range(1, 36)}
+        units_of = {"de.reich_wahlkreis": {number: cs.unit("de.reich_wahlkreis", str(number)) for number in WAHLKREISE}}
 
         values: list[tuple[str, str, str | None, int, int, int]] = []
         locators: list[tuple[str, str, str | None, int, str, float, float, float, float]] = []
@@ -1001,6 +1174,29 @@ def emit() -> Path:
                     height=page["height"],
                 )
 
+            scheme = spec.get("scheme", "de.reich_wahlkreis")
+            if scheme not in units_of:
+                cs.add("scheme", code=scheme, polity_id=germany, kind="electoral_district", rank=1, noun="constituency")
+                units_of[scheme] = {}
+                for number, label in spec["units"].items():
+                    code = spec.get("codes", {}).get(number, str(number))
+                    unit = cs.unit(scheme, code)
+                    if unit in cs.minted:
+                        cs.add(
+                            "reporting_unit",
+                            id=unit,
+                            polity_id=germany,
+                            scheme_code=scheme,
+                            code=code,
+                            area_relation="unlocated",
+                            kind="standard",
+                        )
+                        name(unit, label, "de")
+                    units_of[scheme][number] = unit
+            units = units_of[scheme]
+            body = spec.get("body", "reichstag")
+            _, _, _, label, segment = BODIES[body]
+
             election = cs.key("de.election", f"{day}:general")
             cs.add(
                 "election", id=election, polity_id=germany, kind="general", date_from=day, date_to=day, status="held"
@@ -1009,19 +1205,19 @@ def emit() -> Path:
             name(election, spec["german"], "de", "native")
             path = f"de/{day}-general"
             cs.add("slug", path=path, entity_id=election)
-            contest = cs.key("de.contest", f"{day}:reichstag")
+            contest = cs.key("de.contest", f"{day}:{body}")
             cs.add(
                 "contest",
                 id=contest,
                 election_id=election,
                 kind="list_allocation",
-                body_id=reichstag,
+                body_id=bodies[body],
                 magnitude=spec["seats"],
                 default_result_kind="counted",
             )
-            name(contest, "Reichstag")
-            cs.add("slug", path=f"{path}/reichstag", entity_id=contest)
-            cs.add("note", entity_id=contest, kind="methodology", body_md=f"{SYSTEM}\n\n{NOTE}")
+            name(contest, label)
+            cs.add("slug", path=f"{path}/{segment}", entity_id=contest)
+            cs.add("note", entity_id=contest, kind="methodology", body_md=f"{spec.get('system', SYSTEM)}\n\n{NOTE}")
             cs.add("note", entity_id=contest, kind="caveat", body_md=spec["caveat"])
             result_set = cs.key(f"{SOURCE}.result_set", str(day))
             cs.add(
@@ -1044,7 +1240,7 @@ def emit() -> Path:
             }
             options: dict[str, UUID] = {}
             for key in sorted((stood - set(TOTALS)) | set(spec["won"])):
-                option = cs.key("de.option", f"{day}:reichstag:{key}")
+                option = cs.key("de.option", f"{day}:{body}:{key}")
                 if key == "others":
                     cs.add("contest_option", id=option, contest_id=contest, kind="others", ballot_label=OTHERS)
                 elif key in JOINT:
@@ -1086,7 +1282,7 @@ def emit() -> Path:
                         .sort("wahlkreis")
                         .iter_rows()
                     ):
-                        top, bottom = bands_of[leaf][spec.get("order", list(range(1, 36))).index(wahlkreis)]
+                        top, bottom = bands_of[leaf][order(spec).index(wahlkreis)]
                         key = spec["lists"].get(wahlkreis, {}).get(column, column)
                         option = None if column in TOTALS else str(options[key])
                         measure = TOTALS.get(column, VOTES)
