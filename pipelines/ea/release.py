@@ -1,3 +1,4 @@
+import csv
 import gzip
 import hashlib
 import json
@@ -16,6 +17,22 @@ from ea.changeset import Changeset
 from ea.store import DATA, connect
 
 RELEASES = DATA / "releases"
+GAPS = Path(__file__).parent / "coverage_inputs" / "coverage-gaps.tsv"
+GAP_COLUMNS = [
+    "polity",
+    "state",
+    "level",
+    "stage",
+    "years",
+    "grain",
+    "label",
+    "ids",
+    "category",
+    "reason",
+    "sources",
+    "checked",
+]
+SHARED = ("ATTRIBUTION.md", "manifest.json", "electionsarchive.sql", "gaps.csv")
 BUNDLES = {
     "cc-by": (
         "CC BY 4.0",
@@ -716,8 +733,8 @@ def build(calver: str | None = None) -> str:
             sql.SQL("select * from changeset where status = 'published'"),
         )
         _geometry(conn, writer)
-    if len(writer.files) + 4 > MAX_FILES:
-        raise RuntimeError(f"{len(writer.files) + 4} files, over the {MAX_FILES}-file release limit")
+    if len(writer.files) + len(SHARED) + 1 > MAX_FILES:
+        raise RuntimeError(f"{len(writer.files) + len(SHARED) + 1} files, over the {MAX_FILES}-file release limit")
 
     lines = [
         f"# Attribution\n\nelectionsarchive.com release {calver}. Each bundle carries the license below; credit these sources when you use it.\n"
@@ -747,6 +764,7 @@ def build(calver: str | None = None) -> str:
             "shapes from sources that state no license (IBGE census tracts and neighborhoods, TKGM neighborhoods)",
             "rows written by changesets not yet published",
         ],
+        "gaps": gaps(folder),
         "summary": summary(folder, writer.files),
         "files": writer.files,
     }
@@ -762,13 +780,38 @@ def build(calver: str | None = None) -> str:
             + "], union_by_name = true);\n"
             for table, names in sorted(tables.items())
         )
+        + "create or replace view gaps as select * from read_csv('gaps.csv', all_varchar = true);\n"
     )
     sums = [f"{entry['sha256']}  {entry['file']}" for entry in writer.files]
-    for name in ("ATTRIBUTION.md", "manifest.json", "electionsarchive.sql"):
+    for name in SHARED:
         sums.append(f"{hashlib.sha256((folder / name).read_bytes()).hexdigest()}  {name}")
     (folder / "SHA256SUMS").write_text("\n".join(sums) + "\n")
     size = sum(int(str(entry["bytes"])) for entry in writer.files)
-    return f"{folder}: {len(writer.files) + 4} files, {size / (1 << 30):.2f} GiB"
+    return f"{folder}: {len(writer.files) + len(SHARED) + 1} files, {size / (1 << 30):.2f} GiB"
+
+
+def gaps(folder: Path) -> dict[str, object]:
+    with GAPS.open(newline="") as handle:
+        rows = [
+            row
+            for row in csv.DictReader((line for line in handle if not line.startswith("#")), delimiter="\t")
+            if row.get("polity")
+        ]
+    with (folder / "gaps.csv").open("w", newline="") as handle:
+        out = csv.DictWriter(handle, fieldnames=GAP_COLUMNS, extrasaction="ignore", lineterminator="\n")
+        out.writeheader()
+        out.writerows(rows)
+    categories: dict[str, int] = defaultdict(int)
+    polities: dict[str, int] = defaultdict(int)
+    for row in rows:
+        categories[row["category"]] += 1
+        polities[row["polity"].upper()] += 1
+    return {
+        "file": "gaps.csv",
+        "rows": len(rows),
+        "categories": dict(sorted(categories.items(), key=lambda item: -item[1])),
+        "polities": dict(sorted(polities.items(), key=lambda item: -item[1])),
+    }
 
 
 def record(calver: str | None = None) -> str:
