@@ -217,6 +217,7 @@ const MODEL = {
     memory: 2,
     patience: 0.5,
     canvass: 0.3,
+    growth: { share: 0.08, power: 2, max: 2.5 },
     lull: 0.5,
     stir: 0.01,
     spill: 0.3,
@@ -2177,6 +2178,23 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
     isLate && !isTail && learned == null
       ? lean(found, a, b, coming, base)
       : null;
+  const grownShare =
+    sum(
+      found.map((unit) =>
+        unit.night == null ? 0 : Math.max(0, unit.total - sum(unit.night)),
+      ),
+    ) / Math.max(1, sum(found.map((unit) => unit.total)));
+  const leanFactor =
+    CANVASS[race.state] == null
+      ? 1
+      : Math.min(
+          MODEL.late.growth.max,
+          Math.max(
+            1,
+            (MODEL.late.growth.share / Math.max(1e-6, grownShare)) **
+              MODEL.late.growth.power,
+          ),
+        );
   const ahead = sum(found.map((unit) => unit.margin * unit.total));
   const finalMargins: Array<number> = [];
   const finalTotals: Array<number> = [];
@@ -2595,7 +2613,9 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
             : share + spills[county]! * portion[index]!
           : Math.max(0, open - remaining);
       const canvass =
-        owed > share ? MODEL.late.frozen.canvass : MODEL.late.canvass;
+        owed > share
+          ? MODEL.late.frozen.canvass
+          : MODEL.late.canvass * leanFactor;
       const ceiling = 1 - unit.others;
       const jitter = final > 0 && learned == null ? gaussian(random) : 0;
       const pullOwn = pull?.own.get(index) ?? {
