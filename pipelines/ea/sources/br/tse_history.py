@@ -304,7 +304,7 @@ def describe(frame: pl.LazyFrame, year: int, roster: pl.DataFrame) -> pl.DataFra
     )
 
 
-def parse() -> None:
+def municipal() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
     frames: dict[str, list[pl.DataFrame]] = {"candidates": [], "votes": [], "legends": [], "detail": [], "places": []}
     for year in YEARS:
@@ -564,14 +564,19 @@ def parse() -> None:
         PARSED / "abroad_places.parquet"
     )
     excess.write_parquet(PARSED / "excess.parquet")
-    del frames, candidates, votes, legends, detail, places
+
+
+def parse() -> None:
     context = multiprocessing.get_context("spawn")
-    for year in SECTION_YEARS:
-        child = context.Process(target=sections, args=(year,))
+    for step, args in (
+        (municipal, ()),
+        *((sections, (year,)) for year in SECTION_YEARS),
+    ):
+        child = context.Process(target=step, args=args)
         child.start()
         child.join()
         if child.exitcode:
-            raise RuntimeError(f"the {year} section load failed with exit code {child.exitcode}")
+            raise RuntimeError(f"{step.__name__}{args} failed with exit code {child.exitcode}")
 
 
 def unpack(url: str, suffix: str = ".csv") -> list[Path]:
