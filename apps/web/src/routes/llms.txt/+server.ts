@@ -28,6 +28,7 @@ Pages follow the place, then the election, then the contest, then the reporting 
 ## About
 
 - [License](${origin}/license.md): the data is CC BY 4.0 unless a source's own license differs (each result set records it), the code is AGPL-3.0, and how to cite.
+- [Downloads](${origin}/downloads): every release of the whole archive as Parquet and CSV files, with what each release holds, its changes, checksums, and a DuckDB quickstart; also as [Markdown](${origin}/downloads.md) and [JSON](${origin}/downloads.json). ${origin}/downloads/latest/<file> always points to that file in the newest release.
 - [Architecture](${origin}/architecture.md): how data gets into the archive and how it comes out.
 - [Contribute](${origin}/contribute.md): how to report errors today and how proposals will work.
 - [About](${origin}/about.md), [Privacy](${origin}/privacy.md), and [Terms of use](${origin}/terms.md).
