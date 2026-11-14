@@ -231,6 +231,7 @@ const MODEL = {
     order: 0.4,
     sigma: 1.5,
     unlisted: 0.02,
+    gate: { full: 0.6, off: 0.8 },
   },
   floor: { slack: 0.98, met: 0.99, closed: 0 },
   remaining: { spread: 0.2, stale: 3 },
@@ -1062,7 +1063,8 @@ function turnout(
   };
   let slope = 0;
   let logs = score(slope);
-  const gate = Math.max(0, 1 - share) ** 2;
+  const { full, off } = MODEL.channel.gate;
+  const gate = clamp((off - share) / (off - full), 0, 1);
   if (lean > 0 && gate > 0 && reported.length > 2) {
     const { tau, scale, pi } = cellOf(logs.indexOf(Math.max(...logs)));
     const rows = reported.map((unit) => {
