@@ -23036,7 +23036,11 @@ export const elections = {
             const polity = owner.get(part) ?? "";
             const top = found.rows
               .filter((row) => row.part === part && row.tier === "top")
-              .toSorted((a, b) => b.seats - a.seats)[0];
+              .toSorted(
+                (a, b) =>
+                  b.seats - a.seats ||
+                  (a.party ?? "").localeCompare(b.party ?? ""),
+              )[0];
             return {
               id: part,
               code: slugs.get(polity)?.split("/").at(-1) ?? "",
@@ -23045,12 +23049,19 @@ export const elections = {
               top: top?.party ?? null,
             };
           })
-          .toSorted((a, b) => a.place.localeCompare(b.place)),
+          .toSorted(
+            (a, b) =>
+              a.place.localeCompare(b.place) ||
+              (a.path ?? "").localeCompare(b.path ?? "") ||
+              a.id.localeCompare(b.id),
+          ),
         tiers: (["governor", "lower", "upper", "measure"] as const)
           .map((kind) => ({
             kind,
             rows: Map.groupBy(
-              found.rows.filter((row) => row.tier === kind),
+              found.rows
+                .filter((row) => row.tier === kind)
+                .toSorted((a, b) => a.part.localeCompare(b.part)),
               (row) => row.part,
             )
               .entries()
@@ -23076,7 +23087,12 @@ export const elections = {
                       isNonpartisan: row.nonpartisan,
                       seats: row.seats,
                     }))
-                    .toSorted((a, b) => b.seats - a.seats),
+                    .toSorted(
+                      (a, b) =>
+                        b.seats - a.seats ||
+                        (a.party ?? "").localeCompare(b.party ?? "") ||
+                        Number(a.isIndependent) - Number(b.isIndependent),
+                    ),
                 };
               })
               .toArray(),
