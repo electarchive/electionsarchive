@@ -87,6 +87,14 @@ PARTIES = {
         "NMD",
     ),
     "schleswigsche_heimat": (None, "Schleswigsche Heimat", "SH"),
+    "uspd": ("Q310296", "Unabhängige Sozialdemokratische Partei Deutschlands", "USPD"),
+    "christliche_volkspartei": (None, "Christliche Volkspartei", "CVP"),
+    "wirtschaftsbund": (None, "Deutscher Wirtschaftsbund für Stadt und Land", "DWB"),
+    "bayerischer_bauernbund": ("Q812330", "Bayerischer Bauernbund", "BBB"),
+    "wuerttemberg_buergerpartei": ("Q2596816", "Württembergische Bürgerpartei", "WBP"),
+    "mittelpartei": ("Q15787248", "Bayerische Mittelpartei", "BMP"),
+    "hessische_volkspartei": (None, "Hessische Volkspartei", "HVP"),
+    "vlbt": (None, "Vereinigte Landwirtschaftliche Berufsvereinigungen Thüringens", "VLBT"),
 }
 BLOCS = {"kampffront"}
 JOINT = {
@@ -168,10 +176,98 @@ JOINT = {
         "Reichspartei für Volksrecht und Aufwertung und Beamtengruppe Kratofiel",
         ("volksrecht", "kratofiel"),
     ),
+    "vspd": ("Vereinigte Sozialdemokratische Partei Deutschlands", ("spd", "uspd")),
+    "hvp_hbb": (
+        "Einigungsliste der Hessischen Volkspartei und des Hessischen Bauernbundes",
+        ("hessische_volkspartei", "hessischer_bauernbund"),
+    ),
+    "mittelpartei_dvp": (
+        "Gemeinsamer Wahlvorschlag der Bayerischen Mittelpartei und der Deutschen Volkspartei",
+        ("mittelpartei", "dvp"),
+    ),
+    "bvp_cvp": ("Bayerische Volkspartei und Christliche Volkspartei", ("bvp", "christliche_volkspartei")),
 }
 OTHERS = "Andere Parteien"
 
 ELECTIONS: dict[date, dict[str, Any]] = {
+    date(1920, 6, 6): {
+        "english": "1920 German federal election",
+        "german": "Reichstagswahl 1920",
+        "year": 1923,
+        "volume": 43,
+        "printed": "348 and 349",
+        "seats": 459,
+        "order": [1, 2, 3, 4, 5, 6, 35, 7, 8, 9, 10, 11, 12, 13, 34, 14, 15, 16, 17, 18, 19, 33, *range(20, 33)],
+        "pages": {
+            359: {
+                "top": 0.228,
+                "registered": (0.332, 0.398),
+                "cast": (0.408, 0.471),
+                "valid": (0.517, 0.581),
+                "dnvp": (0.599, 0.654),
+                "vlbt": (0.599, 0.654),
+                "wuerttemberg_landbund": (0.599, 0.654),
+                "dvp": (0.708, 0.763),
+                "zentrum": (0.816, 0.871),
+            },
+            360: {
+                "top": 0.228,
+                "ddp": (0.136, 0.193),
+                "spd": (0.239, 0.292),
+                "uspd": (0.338, 0.393),
+                "kpd": (0.437, 0.485),
+                "bvp": (0.557, 0.604),
+                "bayerischer_bauernbund": (0.664, 0.713),
+                "others": (0.765, 0.821),
+            },
+        },
+        "lists": {
+            **{wk: {"bvp": "dhp"} for wk in (2, 3, 14, 15, 16, 34)},
+            **{wk: {"bvp": "christliche_volkspartei"} for wk in (18, 20, 21, 22, 23)},
+            **{wk: {"bayerischer_bauernbund": "wirtschaftsbund"} for wk in (2, 3, 4, 6, 35)},
+            9: {"uspd": "vspd"},
+            31: {"dnvp": "wuerttemberg_buergerpartei"},
+            33: {"dnvp": "hvp_hbb"},
+            25: {"dvp": "mittelpartei_dvp"},
+            26: {"dnvp": "mittelpartei"},
+        },
+        "won": {
+            "dnvp": 71,
+            "dvp": 65,
+            "zentrum": 64,
+            "ddp": 39,
+            "spd": 102,
+            "uspd": 84,
+            "kpd": 4,
+            "bvp_cvp": 21,
+            "dhp": 5,
+            "bayerischer_bauernbund": 4,
+        },
+        "caveat": (
+            "Oppeln (Wahlkreis 9) voted on 19 November 1922, after the Upper Silesian plebiscite, and Ostpreußen "
+            "(Wahlkreis 1) and Schleswig-Holstein (Wahlkreis 13) on 20 February 1921, after the plebiscites there; the "
+            "Jahrbuch's table holds all three with the rest, and the figures follow the rulings of the electoral review "
+            "court. The table numbers the Wahlkreise in the order of the law of 1920 (Mecklenburg 7, Hamburg 15, "
+            "Hessen-Darmstadt 22), mapped here to the numbers used from 1924. Several columns hold more than one list. "
+            "In Thüringen (Wahlkreis 12) the Deutschnationale Volkspartei's column holds the Vereinigte "
+            "Landwirtschaftliche Berufsvereinigungen Thüringens (176,546) and the Deutschnationale Volkspartei (91,127), "
+            "and in Württemberg (Wahlkreis 31) the Württembergischer Bauern- und Weingärtnerbund (195,777) and the "
+            "Württembergische Bürgerpartei (100,528), as the footnotes split them. In Hessen-Darmstadt it holds the joint "
+            "list of the Hessische Volkspartei and the Hessischer Bauernbund, and in Franken the Bayerische Mittelpartei, "
+            "the Deutschnationale Volkspartei in Bavaria. In Niederbayern the Deutsche Volkspartei's column holds the "
+            "joint list of the Bayerische Mittelpartei and the Deutsche Volkspartei. The column of national lists 15 and "
+            "13 holds the Bayerische Volkspartei in Bavaria, the Christliche Volkspartei in Westfalen Süd and the "
+            "Rhineland, and the Deutsch-Hannoversche Partei elsewhere; the column of national lists 12 and 14 holds the "
+            "Bayerischer Bauernbund in Bavaria and the Deutscher Wirtschaftsbund für Stadt und Land elsewhere. In Oppeln "
+            "the column of the Unabhängige Sozialdemokratische Partei holds the Vereinigte Sozialdemokratische Partei "
+            "Deutschlands, formed by the merger of the two Social Democratic parties in September 1922. Other parties "
+            "include the Polish lists, the Deutsche Mittelstandspartei, the Schleswig-Holsteinische Landespartei, and "
+            "the Polnisch-katholische Partei Oberschlesiens (51,437). Seats are by national list as the Jahrbuch prints "
+            "them: the 21 won by national list 15 belong to the Bayerische Volkspartei and the Christliche Volkspartei "
+            "together, and the 4 of national lists 12 and 14 to the Bayerischer Bauernbund. Before Oppeln voted, its 15 "
+            "members of the National Assembly sat in the Reichstag."
+        ),
+    },
     date(1924, 5, 4): {
         "english": "May 1924 German federal election",
         "german": "Reichstagswahl Mai 1924",
@@ -990,7 +1086,7 @@ def emit() -> Path:
                         .sort("wahlkreis")
                         .iter_rows()
                     ):
-                        top, bottom = bands_of[leaf][wahlkreis - 1]
+                        top, bottom = bands_of[leaf][spec.get("order", list(range(1, 36))).index(wahlkreis)]
                         key = spec["lists"].get(wahlkreis, {}).get(column, column)
                         option = None if column in TOTALS else str(options[key])
                         measure = TOTALS.get(column, VOTES)
