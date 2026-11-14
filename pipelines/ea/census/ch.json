@@ -419,6 +419,12 @@
       "url": "https://gesetze.nw.ch/app/de/texts_of_law/171.1",
       "kind": "official_body"
     },
+    "fr-lco-1894": {
+      "title": "Loi du 19 mai 1894 sur les communes et paroisses, and Décret du 19 mai 1894 prorogeant les pouvoirs des syndics et des conseils communaux, in the Bulletin officiel des lois, décrets, arrêtés et autres actes publics du gouvernement du canton de Fribourg, 53e volume",
+      "publisher": "État de Fribourg, Bulletin officiel des lois (bdlf.fr.ch, file 5735.fr)",
+      "url": "https://bdlf.fr.ch",
+      "kind": "official_body"
+    },
     "fr-lco": {
       "title": "Loi du 25 septembre 1980 sur les communes (LCo, RSF 140.1)",
       "publisher": "État de Fribourg, Recueil systématique de la législation fribourgeoise",
@@ -9851,6 +9857,14 @@
         {
           "within": "CH-FR",
           "term_years": 4,
+          "source": "fr-lco-1894",
+          "locator": "Loi du 19 mai 1894 art. 90 (the members of the conseil général are named for four years; renewal is complete); art. 87 (the communal assembly elects them by proportional representation); Décret du 19 mai 1894 art. 1 (the first renewal under the law falls in spring 1895)",
+          "valid_from": "1895-01-01",
+          "valid_to": "1982-01-01"
+        },
+        {
+          "within": "CH-FR",
+          "term_years": 4,
           "valid_from": "1982-01-01",
           "valid_to": "1986-01-01",
           "source": "fr-lco",
@@ -10113,6 +10127,15 @@
           "locator": "Cst. JU art. 65 (communal authorities are elected for five years); art. 74 (the voters elect the conseillers communaux); all communes elected together on 23 Oct 2022 (LDP art. 22 al. 2)",
           "valid_from": "2010-07-01",
           "phase": 2
+        },
+        {
+          "within": "CH-FR",
+          "period_years": 4,
+          "term_years": 4,
+          "source": "fr-lco-1894",
+          "locator": "Loi du 19 mai 1894 art. 100 (the conseillers communaux are named for four years; renewal is complete and falls at the same time in every commune); Décret du 19 mai 1894 art. 1 (the first renewal under the law falls in spring 1895)",
+          "valid_from": "1895-01-01",
+          "valid_to": "1982-01-01"
         },
         {
           "within": "CH-FR",
