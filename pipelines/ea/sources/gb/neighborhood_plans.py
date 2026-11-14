@@ -394,10 +394,14 @@ def emit() -> Path:
                 "note",
                 entity_id=area,
                 kind="methodology",
-                body_md=f"The neighborhood area designated on {date.fromisoformat(row['designated']):%-d %B %Y}: the "
-                f"{'parish' if len(labels) == 1 else 'parishes'} of {listed} as they stood then. The shape is the "
-                f"union of the ONS shapes of {'that parish' if len(labels) == 1 else 'those parishes'} in "
-                f"{row['title']}.",
+                body_md=f"The neighborhood area designated on {date.fromisoformat(row['designated']):%-d %B %Y}: "
+                + (
+                    f"the parish of {listed} as it stood then. The shape is the ONS shape of that parish in "
+                    if len(labels) == 1
+                    else f"the parishes of {listed} as they stood then. The shape is the union of the ONS shapes of "
+                    "those parishes in "
+                )
+                + f"{row['title']}.",
             )
             designation = cs.source(row["publisher"], row["document"])
             if designation not in added:
@@ -539,9 +543,9 @@ def emit() -> Path:
                 context = CONTEXT[str(row["kind"])].format(council=council_name, **single)
                 if district is None:
                     context = f"{context} {WITHIN.format(council=council_name)}"
-                elif unit_code in drawn:
+                else:
                     stale = f"{context} {WITHIN.format(council=council_name)}"
-                    if len(spans[unit_code]) > 1:
+                    if len(spans.get(unit_code, [])) > 1:
                         names = [council(lad)[0] for lad in spans[unit_code]]
                         context = CONTEXT[str(row["kind"])].format(
                             council=f"{', '.join(names[:-1])} and {names[-1]}",
