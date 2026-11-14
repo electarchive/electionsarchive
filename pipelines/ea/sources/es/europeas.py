@@ -1,20 +1,23 @@
+import json
 import re
 import unicodedata
 import zipfile
 from collections import defaultdict
 from datetime import date
 from pathlib import Path
+from urllib.parse import quote
 from uuid import UUID
 
 import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset
+from ea.names import display
 from ea.sources.es.infoelectoral import APLIEXTR, PAGE, archive, processes, records
 from ea.store import DATA, connect
 
 SOURCE = "es.europeas"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 PUBLISHER = "Ministerio del Interior"
 TITLE = "Resultados electorales: elecciones al Parlamento Europeo (ficheros de datos)"
@@ -54,6 +57,41 @@ SEATS_NOTE = (
 )
 
 
+SPARQL = "https://query.wikidata.org/sparql?format=json&query="
+MEMBERS = quote(
+    "SELECT ?item ?term ?start ?end ?district ?label ?alt ?ep ?gender ?birth WHERE {\n"
+    "?item p:P39 ?s . ?s ps:P39 wd:Q27169 .\n"
+    "OPTIONAL { ?s pq:P2937 ?term } OPTIONAL { ?s pq:P580 ?start } OPTIONAL { ?s pq:P582 ?end } "
+    "OPTIONAL { ?s pq:P768 ?district }\n"
+    "{ ?s pq:P768 wd:Q29 } UNION { ?item wdt:P27 wd:Q29 }\n"
+    "OPTIONAL { ?item rdfs:label ?label FILTER(lang(?label) = 'es') }\n"
+    "OPTIONAL { ?item skos:altLabel ?alt FILTER(lang(?alt) = 'es') }\n"
+    "OPTIONAL { ?item wdt:P1186 ?ep } OPTIONAL { ?item wdt:P21 ?gender } OPTIONAL { ?item wdt:P569 ?birth } }"
+)
+EVERY_MEMBER = quote(
+    "SELECT ?item ?start ?term ?label WHERE {\n"
+    "?item p:P39 ?s . ?s ps:P39 wd:Q27169 .\n"
+    "OPTIONAL { ?s pq:P580 ?start } OPTIONAL { ?s pq:P2937 ?term }\n"
+    "?item rdfs:label|skos:altLabel ?label FILTER(lang(?label) IN ('es', 'ca', 'en', 'gl', 'eu')) }"
+)
+NAME_STOP = {"de", "del", "la", "las", "los", "y", "i", "e", "el"}
+GENDERS = {"M": "male", "F": "female", "Q6581097": "male", "Q6581072": "female"}
+CANDIDATE = (
+    ("list", 16, 21),
+    ("position", 22, 24),
+    ("kind", 25, 25),
+    ("name", 26, 100),
+    ("sex", 101, 101),
+    ("elected", 120, 120),
+)
+
+UNLISTED = (
+    " The candidate file lists {candidates} candidates on lists that have no votes in the results files ({lists}); "
+    "they are not stored."
+)
+BLANK_NAMES = " The candidate file holds {count} list positions with no name, which are not stored."
+
+
 def normalize(text: str) -> str:
     text = "".join(c for c in unicodedata.normalize("NFKD", text) if not unicodedata.combining(c))
     return re.sub(r"[\W_]+", " ", text.casefold()).strip()
@@ -65,12 +103,65 @@ def section_of(field: str) -> str:
     return f"{int(found[1]):03d}{found[2]}"
 
 
+def tokens(text: str) -> set[str]:
+    return set(normalize(text).split()) - NAME_STOP
+
+
+def members() -> dict[str, dict]:
+    found: dict[str, dict] = defaultdict(lambda: {"names": set(), "years": set(), "gender": None})
+    for query in (MEMBERS, EVERY_MEMBER):
+        for row in json.loads(raw.cached(SOURCE, SPARQL + query).path.read_text())["results"]["bindings"]:
+            item = found[row["item"]["value"].rsplit("/", 1)[1]]
+            for field in ("label", "alt"):
+                if field in row:
+                    item["names"].add(row[field]["value"])
+            if "start" in row and re.match(r"\d{4}", row["start"]["value"]):
+                item["years"].add(int(row["start"]["value"][:4]))
+            if "gender" in row:
+                item["gender"] = GENDERS.get(row["gender"]["value"].rsplit("/", 1)[1])
+    return found
+
+
+def resolve(found: dict[str, dict], year: int, printed: str) -> str | None:
+    words = tokens(printed)
+    hits = [item for item, entry in found.items() if any(words >= tokens(text) > set() for text in entry["names"])]
+    near = [item for item in hits if any(year - 1 <= start <= year + 5 for start in found[item]["years"])]
+    ranked = sorted(
+        (
+            (max(len(tokens(text)) for text in found[item]["names"] if words >= tokens(text)), item)
+            for item in near or hits
+        ),
+        reverse=True,
+    )
+    if ranked and (len(ranked) == 1 or ranked[1][0] < ranked[0][0]):
+        return ranked[0][1]
+    if hits:
+        return None
+    scores = sorted(
+        (
+            (max((len(words & tokens(text)) for text in entry["names"]), default=0), item)
+            for item, entry in found.items()
+            if any(year - 1 <= start <= year + 5 for start in entry["years"])
+        ),
+        reverse=True,
+    )
+    if scores and scores[0][0] >= 2 and (len(scores) == 1 or scores[1][0] < scores[0][0]):
+        return scores[0][1]
+    return None
+
+
 def fetch() -> None:
-    pass
+    for query in (MEMBERS, EVERY_MEMBER):
+        try:
+            raw.cached(SOURCE, SPARQL + query)
+        except LookupError:
+            raw.fetch(SOURCE, SPARQL + query, suffix=".json")
 
 
 def parse() -> None:
     lists, totals, unit_votes, elected, mesas, mesa_votes, days = [], [], [], [], [], [], {}
+    candidates = []
+    found = members()
     for process in processes("07"):
         year = int(process[:4])
         with zipfile.ZipFile(archive("07", process, "TOTA")) as bundle:
@@ -102,9 +193,23 @@ def parse() -> None:
                     (year, "ES" if row["province"] == "99" else row["province"], row["list"], row["votes"])
                 )
         seats: dict[int, int] = defaultdict(int)
-        for row in records("07", process, "TOTA", "04"):
+        for row in records("07", process, "TOTA", "04", CANDIDATE):
+            printed = " ".join(str(row["name"]).split())
+            item = resolve(found, year, printed) if row["elected"] == "S" else None
             if row["elected"] == "S":
                 seats[int(row["list"])] += 1
+            candidates.append(
+                (
+                    year,
+                    row["list"],
+                    row["kind"],
+                    row["position"],
+                    printed,
+                    GENDERS.get(str(row["sex"])) or (found[item]["gender"] if item else None),
+                    row["elected"] == "S",
+                    item,
+                )
+            )
         elected += [(year, number, count) for number, count in seats.items()]
         for row in records("07", process, "MESA", "09"):
             if row["province"] == "99":
@@ -146,6 +251,11 @@ def parse() -> None:
         ("unit_votes", unit_votes, ["year", "unit", "list", "votes"]),
         ("elected", elected, ["year", "list", "seats"]),
         (
+            "candidates",
+            candidates,
+            ["year", "list", "kind", "position", "name", "gender", "elected", "wikidata"],
+        ),
+        (
             "mesas",
             mesas,
             [*key, "registered", "blank", "invalid", "list_votes", "official"],
@@ -166,6 +276,7 @@ def emit() -> Path:
     totals = pl.read_parquet(PARSED / "totals.parquet")
     unit_votes = pl.read_parquet(PARSED / "unit_votes.parquet")
     elected = pl.read_parquet(PARSED / "elected.parquet")
+    candidates = pl.read_parquet(PARSED / "candidates.parquet")
     mesas = pl.read_parquet(PARSED / "mesas.parquet")
     mesa_votes = pl.read_parquet(PARSED / "mesa_votes.parquet")
     days = dict(pl.read_parquet(PARSED / "days.parquet").iter_rows())
@@ -176,7 +287,7 @@ def emit() -> Path:
             version=VERSION,
             summary=(
                 "Spain's European Parliament elections of 1987 to 2024 by province and polling station (mesa) with "
-                "every list and the candidates declared elected, from the Ministry of the Interior's data files"
+                "every list, its candidates, and those declared elected, from the Ministry of the Interior's data files"
             ),
             polity="ES",
         )
@@ -220,6 +331,21 @@ def emit() -> Path:
         if {parliament, member_state} & cs.minted:
             raise ValueError("publish eu.members and the European Parliament body before es.europeas")
 
+        known = dict(
+            conn.execute(
+                """select x.value, x.entity_id from external_id x join person p on p.id = x.entity_id
+                   where x.scheme = 'wikidata' and x.value = any(%s)""",
+                [[item for item in candidates["wikidata"].unique() if item]],
+            ).fetchall()
+        )
+        persons: dict[str, UUID] = {}
+        latest = dict(
+            candidates.filter(pl.col("wikidata").is_not_null())
+            .sort("year")
+            .group_by("wikidata")
+            .agg(pl.col("name").last())
+            .iter_rows()
+        )
         unit_rows: dict[UUID, dict[str, str | None]] = {}
         parties: dict[str, UUID] = {}
         value_frames: list[pl.DataFrame] = []
@@ -327,6 +453,37 @@ def emit() -> Path:
                 option = options[number] = cs.key("es.europeas.option", f"{day}:{number}")
                 cs.add("contest_option", id=option, contest_id=contest, kind="list", party_id=party, ballot_label=label)
 
+            year_candidates = candidates.filter(pl.col("year") == year).sort("list", "kind", "position")
+            blank_names = year_candidates.filter(pl.col("name") == "").height
+            year_candidates = year_candidates.filter(pl.col("name") != "")
+            unlisted = year_candidates.filter(~pl.col("list").is_in(list(options)))
+            year_candidates = year_candidates.filter(pl.col("list").is_in(list(options)))
+            elected_candidacies: list[tuple[int, UUID]] = []
+            for entry in year_candidates.iter_rows(named=True):
+                tag = f"{day}:{entry['list']}:{entry['kind']}{entry['position']}"
+                item = entry["wikidata"] or (f"elected:{normalize(entry['name'])}" if entry["elected"] else None)
+                if item in known:
+                    person = known[item]
+                elif (person := persons.get(item or tag)) is None:
+                    person = persons[item or tag] = cs.key(f"{SOURCE}.person", item or tag)
+                    cs.add("person", id=person, gender=entry["gender"])
+                    name(person, display(latest.get(item, entry["name"]), "es"), "es")
+                    if entry["wikidata"]:
+                        cs.add("external_id", entity_id=person, scheme="wikidata", value=item)
+                candidacy = cs.key(f"{SOURCE}.candidacy", tag)
+                cs.add(
+                    "candidacy",
+                    id=candidacy,
+                    person_id=person,
+                    option_id=options[entry["list"]],
+                    role="list_member" if entry["kind"] == "T" else "substitute",
+                    list_position=entry["position"],
+                    ballot_name=entry["name"],
+                    is_independent=False,
+                )
+                if entry["elected"]:
+                    elected_candidacies.append((entry["list"], candidacy))
+
             def make_set(label: str, default: bool, stage: str, completeness: float, notes: list[str]) -> UUID:
                 result_set = cs.key(f"{SOURCE}.result_set", f"{day}:{label}")
                 cs.add(
@@ -365,7 +522,27 @@ def emit() -> Path:
             note = PROVINCE_METHOD
             if magnitude != national["seats"]:
                 note += SEATS_NOTE.format(flagged=national["seats"], magnitude=magnitude)
+            if unlisted.height:
+                note += UNLISTED.format(
+                    candidates=unlisted.height,
+                    lists="; ".join(
+                        " ".join(label.split())
+                        for label in year_lists.filter(pl.col("list").is_in(unlisted["list"].unique().to_list()))[
+                            "name"
+                        ]
+                    ),
+                )
+            if blank_names:
+                note += BLANK_NAMES.format(count=blank_names)
             province_set = make_set("province", True, "official", 1, [note])
+            for number, candidacy in elected_candidacies:
+                cs.add(
+                    "outcome",
+                    result_set_id=province_set,
+                    option_id=options[number],
+                    candidacy_id=candidacy,
+                    kind="elected",
+                )
             option_ids = pl.DataFrame(
                 {"list": list(options), "option_id": [str(option) for option in options.values()]}
             )
@@ -496,8 +673,9 @@ def emit() -> Path:
                     )
                 )
             print(
-                f"{year}: {len(options)} lists, {sum(1 for n in options if earlier.get(n))} on parties of the earlier "
-                f"set, seats {sum(seats.values())} (magnitude {magnitude}), mesa votes {mesa_total} of "
+                f"{year}: {len(options)} lists, {year_candidates.height} candidates, {len(elected_candidacies)} elected "
+                f"({year_candidates.filter(pl.col('elected'))['wikidata'].drop_nulls().len()} on Wikidata), "
+                f"{sum(1 for n in options if earlier.get(n))} on parties of the earlier set, seats {sum(seats.values())} (magnitude {magnitude}), mesa votes {mesa_total} of "
                 f"{national['list_votes']}",
                 flush=True,
             )
