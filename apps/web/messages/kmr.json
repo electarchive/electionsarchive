@@ -2605,6 +2605,7 @@
   "versus_verdict_parties": "Ji {total} pêşbaziyên ku her du partî tê de beşdar bûn, {a} di {one} pêşbaziyan de ji {b} pêştir qediya.",
   "polity_kind_special_district": "Herêmên taybet",
   "polity_kind_judicial_district": "Herêmên dadwerî",
+  "polity_kind_tribal_nation": "Neteweyên eşîrî",
   "coverage_upcoming": "Yên tên, amade",
   "coverage_upcoming_def": "Dengdan hê nehatiye kirin, û di arşîvê de ji bilî encaman her tişt jixwe heye: wezîfe an kursî, herêm, pergala dengdanê û her berendam bi partiya xwe re, an jî ji bo pirsa dengdanê bersiv û nivîsa wê ya fermî. Heta roja hilbijartinê ev wekî vegirtî tên hesibandin. Ji roja piştî wê ve encam divê hebin.",
   "coverage_upcoming_of": "{count} tên û amade ne",

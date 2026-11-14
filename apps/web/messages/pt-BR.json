@@ -2653,6 +2653,7 @@
   "versus_verdict_parties": "{a} terminou à frente de {b} em {one} das {total} disputas em que ambos concorreram.",
   "polity_kind_special_district": "Distritos especiais",
   "polity_kind_judicial_district": "Distritos judiciais",
+  "polity_kind_tribal_nation": "Nações indígenas",
   "coverage_upcoming": "Próximas, prontas",
   "coverage_upcoming_def": "A votação ainda vai acontecer, e o arquivo já tem tudo, exceto os resultados: o cargo ou a cadeira, o distrito, o sistema de votação e cada candidato com seu partido ou, no caso de uma consulta popular, as respostas e o texto oficial. Esses casos contam como cobertos até o dia da eleição. A partir do dia seguinte, precisam de resultados.",
   "coverage_upcoming_of": "Próximas e prontas: {count}",
