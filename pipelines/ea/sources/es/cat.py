@@ -5,8 +5,9 @@ import subprocess
 import unicodedata
 import zipfile
 from collections import Counter, defaultdict
-from datetime import UTC, date, datetime
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
+from urllib.parse import quote
 from uuid import UUID
 
 import polars as pl
@@ -16,7 +17,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "es.cat"
-VERSION = "5"
+VERSION = "6"
 API = "https://resultats.dadeselectorals.gencat.cat/webelec/api"
 PUBLISHER = "Generalitat de Catalunya"
 TITLE = "Resultats electorals: eleccions al Parlament de Catalunya (Departament de la Presidència)"
@@ -37,6 +38,12 @@ WIKIDATA = {
     "PACMA": "Q82558",
     "ERC": "Q150068",
 }
+MEMBERS = "https://query.wikidata.org/sparql?format=json&query=" + quote(
+    "SELECT ?item ?start ?term ?label WHERE { ?item p:P39 ?s . ?s ps:P39 wd:Q18714088 .\n"
+    "OPTIONAL { ?s pq:P580 ?start } OPTIONAL { ?s pq:P2937 ?t . ?t wdt:P580 ?term }\n"
+    "?item rdfs:label|skos:altLabel ?label FILTER(lang(?label) IN ('ca', 'es')) }"
+)
+NAME_STOP = {"de", "del", "la", "las", "los", "y", "i", "e", "el", "da", "dels", "d", "l"}
 DOGC = "https://portaldogc.gencat.cat/utilsEADOP/AppJava/PdfProviderServlet?documentId={}&type=01&language=ca_ES"
 DOGC_TITLE = "Diari Oficial de la Generalitat de Catalunya: proclamations of members elected to the Parlament"
 PROCLAIMED: dict[tuple[str, str], tuple[tuple[int, ...], dict[str, list[str]]]] = {
@@ -486,6 +493,7 @@ def fetch() -> None:
     for documents, _ in PROCLAIMED.values():
         for document in documents:
             raw.fetch(SOURCE, DOGC.format(document), suffix=".pdf")
+    raw.fetch(SOURCE, MEMBERS, suffix=".json")
 
 
 def cached() -> list[tuple[str, date]]:
@@ -631,6 +639,64 @@ def proclaimed(code: str, members: pl.DataFrame) -> pl.DataFrame:
     return pl.concat([members, pl.DataFrame(rows, schema=members.schema)]) if rows else members
 
 
+def tokens(text: str) -> tuple[str, ...]:
+    folded = unicodedata.normalize("NFKD", text.casefold().replace("mª", "maria"))
+    folded = "".join(c for c in folded if not unicodedata.combining(c))
+    return tuple(word for word in re.sub(r"[\W_]+", " ", folded).split() if word not in NAME_STOP)
+
+
+def close(a: str, b: str) -> bool:
+    if a == b or (min(len(a), len(b)) == 1 and a[0] == b[0]):
+        return True
+    if min(len(a), len(b)) < 5 or abs(len(a) - len(b)) > 1:
+        return False
+    if len(a) == len(b):
+        return sum(x != y for x, y in zip(a, b)) <= 1
+    short, long = sorted((a, b), key=len)
+    return any(long[:i] + long[i + 1 :] == short for i in range(len(long)))
+
+
+def covered(small: tuple[str, ...], big: tuple[str, ...]) -> bool:
+    used: set[int] = set()
+    for word in small:
+        if (hit := next((i for i, other in enumerate(big) if i not in used and close(word, other)), None)) is None:
+            return False
+        used.add(hit)
+    return True
+
+
+def fits(printed: tuple[str, ...], label: tuple[str, ...]) -> int:
+    if min(sum(len(word) > 1 for word in words) for words in (printed, label)) < 2:
+        return 0
+    return min(len(printed), len(label)) if covered(label, printed) or covered(printed, label) else 0
+
+
+def wikidata(members: pl.DataFrame) -> pl.Series:
+    found: dict[str, tuple[set[tuple[str, ...]], set[date]]] = defaultdict(lambda: (set(), set()))
+    for row in json.loads(raw.cached(SOURCE, MEMBERS).path.read_text())["results"]["bindings"]:
+        labels, starts = found[row["item"]["value"].rsplit("/", 1)[1]]
+        labels.add(tokens(row["label"]["value"]))
+        for field in ("start", "term"):
+            if field in row and re.match(r"\d{4}-\d\d-\d\d", row[field]["value"]):
+                starts.add(date.fromisoformat(row[field]["value"][:10]))
+
+    def resolve(name: str, day: date) -> str | None:
+        printed = tokens(name)
+        sitting = {item for item, (_, starts) in found.items() if any(day <= s <= day + timedelta(150) for s in starts)}
+        for pool in (sitting, set(found)):
+            scores = sorted(
+                ((max(fits(printed, label) for label in found[item][0]), item) for item in pool), reverse=True
+            )
+            scores = [score for score in scores if score[0] >= 3 or score[0] == len(printed) == 2]
+            if scores:
+                return scores[0][1] if len(scores) == 1 or scores[1][0] < scores[0][0] else None
+        return None
+
+    items = pl.Series("wikidata", [resolve(row["name"], row["day"]) for row in members.iter_rows(named=True)])
+    twice = pl.col("wikidata").is_not_null() & pl.struct("year", "wikidata").is_duplicated()
+    return members.select("year").with_columns(items).select(pl.when(~twice).then("wikidata")).to_series()
+
+
 def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
     tables: dict[str, list[pl.DataFrame]] = defaultdict(list)
@@ -767,6 +833,7 @@ def emit() -> Path:
     mesas = pl.read_parquet(PARSED / "mesas.parquet")
     mesa_votes = pl.read_parquet(PARSED / "mesa_votes.parquet")
     members = pl.read_parquet(PARSED / "elected.parquet")
+    members = members.with_columns(wikidata=wikidata(members))
     with connect() as conn:
         cs = Changeset(
             conn,
@@ -825,6 +892,14 @@ def emit() -> Path:
                 "select e.value, e.entity_id from external_id e join party p on p.id = e.entity_id "
                 "where e.scheme = 'wikidata' and e.value = any(%s)",
                 (list(WIKIDATA.values()),),
+            ).fetchall()
+        )
+        people: dict[str, UUID] = dict(
+            conn.execute(
+                """select x.value, x.entity_id from external_id x join person p on p.id = x.entity_id
+                   where x.scheme = 'wikidata' and x.value = any(%s)
+                     and not exists (select from entity_merge m where m.entity_id = p.id)""",
+                [members["wikidata"].drop_nulls().unique().to_list()],
             ).fetchall()
         )
         parties: dict[str, UUID] = {}
@@ -1001,6 +1076,12 @@ def emit() -> Path:
                     if person in cs.minted:
                         cs.add("person", id=person)
                         name(person, member["name"], "ca")
+                    if (item := member["wikidata"]) is not None:
+                        if item not in people:
+                            people[item] = person
+                            cs.add("external_id", entity_id=person, scheme="wikidata", value=item)
+                        cs.merge(person, people[item])
+                        person = people[item]
                     option = cs.key(f"{SOURCE}.option", person_key)
                     cs.add(
                         "contest_option",
