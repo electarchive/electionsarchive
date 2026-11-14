@@ -198,7 +198,7 @@ order by d.date
 """
 
 CADENCE_SQL = """
-select c.class_id::text, w.iso_code, c.period_years, c.phase, c.valid_from, c.valid_to
+select c.class_id::text, w.iso_code, c.period_years, c.phase, c.valid_from, c.valid_to, c.name_pattern is not null
 from election_cadence c
 join census_class k on k.id = c.class_id
 join polity w on w.id = c.polity_id
@@ -321,7 +321,7 @@ def counted(cc: str, iso: str, k: dict, cadence: list[tuple], counts: list[tuple
     per = k["per"] or 1
     years: dict[int, dict[str, int]] = defaultdict(dict)
     spread: set[int] = set()
-    for within, period, phase, lo, hi in cadence:
+    for within, period, phase, lo, hi, named in cadence:
         if phase is None and not k["cycle"]:
             continue
         start = max(d.year for d in (lo, k["from"], date(1800, 1, 1)) if d is not None)
@@ -331,7 +331,11 @@ def counted(cc: str, iso: str, k: dict, cadence: list[tuple], counts: list[tuple
         share = 0.0
         step = period if phase is not None else 1
         for year in range(start + (0 if phase is None else (phase - start) % period), end + 1, step):
-            found = [value for tier, w, day, value in counts if tier == k["tier"] and w == scope and day.year <= year]
+            found = (
+                [1]
+                if named
+                else [value for tier, w, day, value in counts if tier == k["tier"] and w == scope and day.year <= year]
+            )
             if not found:
                 continue
             if phase is None:
@@ -340,7 +344,7 @@ def counted(cc: str, iso: str, k: dict, cadence: list[tuple], counts: list[tuple
                 share -= n
                 spread.add(year)
             else:
-                years[year][reg] = found[-1] * per
+                years[year][reg] = found[-1] * per + (years[year].get(reg, 0) if named else 0)
     return [
         {
             "year": year,
