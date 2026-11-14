@@ -253,6 +253,37 @@ def emit() -> str:
         classes[LOCAL[kind]]["cadence"].append({"id": id, **shape, **fields, "source": tag, "locator": row["locator"]})
         counts["rules"] += 1
 
+    all_levels = ("us_house", "us_senate", "governor", "statewide_exec", "state_upper", "state_lower")
+    for group in spec.pop("runoffs"):
+        for st in group["states"].split():
+            for level in group.get("levels", all_levels):
+                classes[level]["cadence"].append(
+                    {
+                        "id": uuid5(
+                            NAMESPACE, f"election_cadence\x1frunoff:{st}:{group['stage']}:{level}:{group['first']}"
+                        ),
+                        "within": f"US-{st}",
+                        "name_pattern": f"^{group['stage']}$",
+                        "runoff": "majority" if group["share"] == 0.5 else "threshold",
+                        "runoff_threshold": group["share"],
+                        "runoff_rule": f"{group['stage']}: {group['authority'][st]}",
+                        "valid_from": f"{group['first']}-01-01",
+                        "valid_to": f"{group['end'] + 1}-01-01" if group["end"] else None,
+                        "source": "state-codes",
+                        "locator": group["authority"][st],
+                    }
+                )
+                counts["runoffs"] += 1
+    for cycle in spec.pop("cycles"):
+        classes[cycle["class"]]["cadence"].append(
+            {
+                "id": uuid5(NAMESPACE, f"election_cadence\x1fcycle:{cycle['class']}"),
+                "period_years": cycle["period_years"],
+                "source": cycle["source"],
+                "locator": cycle["locator"],
+            }
+        )
+
     cog = pl.read_parquet(DATA / "parsed" / "us.cog" / "governments.parquet")
     for tier in spec["tiers"]:
         if kind := tier.pop("cog", None):

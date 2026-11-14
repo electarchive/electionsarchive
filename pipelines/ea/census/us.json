@@ -33,6 +33,12 @@
       "url": "https://bookofthestates.org/tables/2022-4-1",
       "kind": "compendium"
     },
+    "state-codes": {
+      "publisher": "National Conference of State Legislatures",
+      "title": "Primary Runoffs (the state statutes each row's locator cites)",
+      "url": "https://www.ncsl.org/elections-and-campaigns/primary-runoffs",
+      "kind": "compendium"
+    },
     "bots-executives": {
       "publisher": "The Council of State Governments",
       "title": "The Book of the States 2022, Table 6.1: State Executive Branch Officials to be Elected, 2022-2026",
@@ -122,6 +128,49 @@
     {"key": "school_district", "name": "Independent school districts", "parent": "state", "polity_kind": "school_district", "source": "cog", "cog": "school"},
     {"key": "special_district", "name": "Special district governments", "parent": "state", "polity_kind": "special_district", "source": "cog", "cog": "special"},
     {"key": "tribal_nation", "name": "Federally recognized Tribal nations", "parent": "national", "polity_kind": "tribal_nation", "source": "bia-fr", "counts": [{"date": "2026-01-30", "value": 575, "source": "bia-fr", "locator": "91 FR 4102, FR Doc. 2026-01899: \"This notice publishes the current list of 575 Tribal entities\""}]}
+  ],
+  "runoffs": [
+    {"states": "AL AR GA MS OK SC TX", "stage": "primary", "first": 1900, "end": null, "share": 0.5, "authority": {
+      "AL": "Ala. Code § 17-13-18: a primary candidate without a majority goes to a runoff",
+      "AR": "Ark. Code § 7-7-202: a runoff primary when no candidate receives a majority",
+      "GA": "O.C.G.A. § 21-2-501: a primary candidate without a majority goes to a runoff",
+      "MS": "Miss. Code § 23-15-1031: a second primary when no candidate receives a majority",
+      "OK": "Okla. Stat. tit. 26, § 1-102: a runoff primary when no candidate receives a majority",
+      "SC": "S.C. Code § 7-13-15: a runoff primary when no candidate receives a majority",
+      "TX": "Tex. Elec. Code § 172.003: a runoff primary when no candidate receives a majority"
+    }},
+    {"states": "FL", "stage": "primary", "first": 1900, "end": 2000, "share": 0.5, "authority": {
+      "FL": "Fla. Stat. § 100.091 (second primary, repealed in 2001): a second primary when no candidate receives a majority"
+    }},
+    {"states": "SD", "stage": "primary", "levels": ["us_house", "us_senate", "governor"], "first": 1900, "end": null, "share": 0.35, "authority": {
+      "SD": "S.D. Codified Laws § 12-6-51.1: a secondary election for U.S. Senate, U.S. House, and governor when no candidate receives 35 percent"
+    }},
+    {"states": "GA", "stage": "general", "first": 1964, "end": null, "share": 0.5, "authority": {
+      "GA": "O.C.G.A. § 21-2-501: a general election candidate without a majority goes to a runoff"
+    }},
+    {"states": "LA", "stage": "general", "levels": ["governor", "statewide_exec", "state_upper", "state_lower"], "first": 1975, "end": null, "share": 0.5, "authority": {
+      "LA": "La. R.S. 18:511: a majority election, with a second election between the two leading candidates"
+    }},
+    {"states": "LA", "stage": "general", "levels": ["us_house", "us_senate"], "first": 1978, "end": 2006, "share": 0.5, "authority": {
+      "LA": "La. R.S. 18:511: the open primary of 1978 to 2006 for Congress, with a second election between the two leading candidates"
+    }},
+    {"states": "LA", "stage": "general", "levels": ["us_house", "us_senate"], "first": 2012, "end": null, "share": 0.5, "authority": {
+      "LA": "La. R.S. 18:511: the majority election for Congress restored in 2012, with a second election between the two leading candidates"
+    }},
+    {"states": "GA LA MS TX", "stage": "special", "first": 1980, "end": null, "share": 0.5, "authority": {
+      "GA": "O.C.G.A. § 21-2-501: a special election candidate without a majority goes to a runoff",
+      "LA": "La. R.S. 18:511: a special election decided by majority, with a second election between the two leading candidates",
+      "MS": "Miss. Code § 23-15-849: a nonpartisan special election, with a runoff when no candidate receives a majority",
+      "TX": "Tex. Elec. Code § 203.004: a special election to fill a vacancy, with a runoff when no candidate receives a majority"
+    }}
+  ],
+  "cycles": [
+    {"class": "president", "period_years": 4, "source": "constitution", "locator": "U.S. Const. art. II, § 1, cl. 1: the President holds office for a four-year term"},
+    {"class": "us_senate", "period_years": 6, "source": "constitution", "locator": "U.S. Const. art. I, § 3, cl. 1: a senator's term is six years"},
+    {"class": "governor", "period_years": 4, "source": "bots-governors", "locator": "Table 4.1: a four-year term in 48 states"},
+    {"class": "statewide_exec", "period_years": 4, "source": "bots-executives", "locator": "Table 6.1: most statewide executive officials serve four-year terms"},
+    {"class": "state_upper", "period_years": 4, "source": "bots-legislators", "locator": "Table 6.2: a four-year senate term in most states"},
+    {"class": "state_lower", "period_years": 2, "source": "bots-legislators", "locator": "Table 6.2: a two-year house term in most states"}
   ],
   "classes": [
     {

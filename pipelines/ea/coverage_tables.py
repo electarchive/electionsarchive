@@ -42,7 +42,6 @@ BALANCES = {
     "2148003": "2148006",
     "2028410": "2028412",
 }
-OFFSETS = {"us_house": 2, "state_lower": 2, "us_senate": 6}
 KNOWN = {("GA", 2025, "statewide_exec", "general"): 2}
 DECIDED_EARLIER = {
     "FL": (
@@ -894,6 +893,7 @@ def build(full: bool = False) -> str:
                     held[polity][int(year)] = values
         polities = {str(pid): (kind, code, name, st) for pid, kind, code, name, st in conn.execute(POLITIES_SQL)}
         rules = cadence_rules(conn)
+        cycle_years = coverage.cycle_years(conn)
         judges = {st: rule for (key, st), rule in coverage.cycles(conn).items() if key == "judicial"}
         census_classes = dict(conn.execute(CLASSES_SQL).fetchall())
         access: dict[str, str] = {}
@@ -914,7 +914,7 @@ def build(full: bool = False) -> str:
                 cell_stage != stage
                 or level not in STATE_LEVELS
                 or level == "statewide_measure"
-                or year != today.year - OFFSETS.get(level, 4)
+                or year != today.year - cycle_years.get(level, 4)
             ):
                 continue
             key = (st, today.year, level, stage)
