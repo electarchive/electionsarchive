@@ -48,10 +48,12 @@ FULL = {
     (2016, "Republican", "CO"): (
         {"Ted Cruz": 30},
         7,
-        "The article's table lists only the 21 delegates the district conventions chose. The state convention "
-        "chose 13 more at large, all pledged to Ted Cruz, and the 3 automatic delegates were unpledged; the Colorado "
-        "Republican Party's 2016 results, as the article and the Denver Post's report of the state convention give "
-        "them, make 30 pledged to Cruz and 7 unpledged of the 37.",
+        (
+            "The article's table lists only the 21 delegates the district conventions chose. The state convention "
+            "chose 13 more at large, all pledged to Ted Cruz, and the 3 automatic delegates were unpledged; the Colorado "
+            "Republican Party's 2016 results, as the article and the Denver Post's report of the state convention give "
+            "them, make 30 pledged to Cruz and 7 unpledged of the 37."
+        ),
     ),
 }
 VOTES = {(2004, "Democratic", "NM"), (2016, "Democratic", "KS"), (2008, "Democratic", "ND"), (2008, "Republican", "ME")}
