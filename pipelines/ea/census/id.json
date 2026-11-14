@@ -869,6 +869,8 @@
       "source": "uu10-2016",
       "first_held": "2005-06-01",
       "note": "Direct since June 2005; 508 regents and mayors in the 2024 wave. Each regency or city KPU declares its own result.",
+      "disposition": "blocked",
+      "disposition_reason": "The Commission's open data portal holds only each winner with votes and the contest total for 2006-2018 (datasets 12-17), not every candidate's votes; the 2020 and 2024 results sat on pilkada2020.kpu.go.id and pilkada2024.kpu.go.id, which time out or are offline, and the declaration decrees for about 500 regencies and cities per wave sit with each regency or city commission, with no national file.",
       "match": [
         {
           "office_kinds": [
