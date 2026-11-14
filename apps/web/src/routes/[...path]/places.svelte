@@ -1069,6 +1069,10 @@
                   <span class="text-[0.8125rem] text-muted-foreground"
                     >{m.places_no_votes()}</span
                   >
+                {:else}
+                  <span class="text-[0.8125rem] text-muted-foreground"
+                    >{m.places_unsplit()}</span
+                  >
                 {/if}
               </td>
               <td

@@ -1861,6 +1861,17 @@
   const moved = $derived(
     focus == null || !isCompared ? null : (changes.get(focus) ?? null),
   );
+  const unsplit = $derived(
+    view === "winner" || view === "split"
+      ? places.rows.filter(
+          (row) =>
+            row.leader == null &&
+            row.runoff == null &&
+            row.declared == null &&
+            row.valid > 0,
+        )
+      : [],
+  );
   const runoffs = $derived(
     !isFinal && (view === "winner" || view === "flips")
       ? places.rows.filter((row) => row.runoff != null)
@@ -2095,6 +2106,9 @@
     const empty = read(
       "color-mix(in oklab, var(--muted-foreground) 6%, var(--card))",
     );
+    const unbroken = read(
+      "color-mix(in oklab, var(--muted-foreground) 32%, var(--card))",
+    );
     for (const entry of [...missing, ...pending]) {
       result.push([entry.k, empty]);
     }
@@ -2127,6 +2141,10 @@
       }
       if (row.leader == null) {
         const lead = rolled(row);
+        if (unsplit.includes(row)) {
+          result.push([row.k, unbroken]);
+          continue;
+        }
         if (
           (view === "winner" || view === "split") &&
           only == null &&
@@ -4169,6 +4187,13 @@
             ...new Set(runoffs.map((row) => row.name)),
           ])}
         {/if}
+        {#if unsplit.length > 0}
+          {@render gap(
+            "unsplit",
+            m.map_unsplit_key(),
+            unsplit.map((row) => row.name),
+          )}
+        {/if}
         {#if missing.length > 0}
           {@render gap(
             "absent",
@@ -4670,7 +4695,7 @@
 {/snippet}
 
 {#snippet gap(
-  shape: "absent" | "norun" | "runoff",
+  shape: "absent" | "norun" | "runoff" | "unsplit",
   label: string,
   names: Array<string>,
 )}
@@ -4681,6 +4706,10 @@
   >
     {#if shape === "runoff"}
       {@render striped()}
+    {:else if shape === "unsplit"}
+      <span
+        class="shrink-0 rounded-xs bg-[color-mix(in_oklab,var(--muted-foreground)_32%,var(--card))] block-2.5 inline-2.5"
+      ></span>
     {:else}
       <svg
         viewBox="0 0 10 10"
@@ -5194,6 +5223,11 @@
     {/if}
     {#if current.runoff != null}
       {@render second(current.runoff)}
+    {/if}
+    {#if unsplit.some((row) => row.k === current.k)}
+      <span class="text-xs text-pretty text-muted-foreground"
+        >{m.map_unsplit_line({ votes: count(current.valid) })}</span
+      >
     {/if}
     {#if isCompared && places.estimated === true && current.earlier != null && span != null}
       <span class="text-xs text-muted-foreground"
