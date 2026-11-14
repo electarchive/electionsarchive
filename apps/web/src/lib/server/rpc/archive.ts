@@ -2081,8 +2081,12 @@ async function shallow(
     return;
   }
   const { pool, valued, counted } = countingFor(ks);
-  const lazy = (within: SQL) => sql`
-    with sums as materialized (
+  const lazy = (within: SQL, parents: Array<string>) => sql`
+    with under as materialized (
+      select p.area_id from area_parent p
+      where p.parent_id = any(${sql.param(parents)}::uuid[]) and p.valid @> ${date}::date
+    ),
+    sums as materialized (
       select r.area_k as k from result_rollup_sum r
       where r.result_set_k = any(${pool}) and r.measure = any(${COUNTED})
     ),
@@ -2098,9 +2102,7 @@ async function shallow(
       select a.id, a.k, a.scheme_code as scheme
       from (select k from sums union select k from units union select k from names offset 0) h
       join area a on a.k = h.k
-      cross join lateral (
-        select from area_parent p where p.area_id = a.id and p.valid @> ${date}::date and ${within} offset 0
-      ) p
+      where a.id in (select area_id from under) and ${within}
     )
     select distinct kids.* from kids
     where kids.k in (select k from sums)
@@ -2113,7 +2115,8 @@ async function shallow(
     where p.valid @> ${date}::date and ${within}
   `;
   const kidsOf = async (parents: Array<string>, except: Array<string>) => {
-    const within = sql`
+    const within = sql`a.scheme_code <> all(${sql.param(except)}::text[])`;
+    const under = sql`
       p.parent_id = any(${sql.param(parents)}::uuid[])
         and a.scheme_code <> all(${sql.param(except)}::text[])
     `;
@@ -2126,7 +2129,7 @@ async function shallow(
     }
     if (total >= OFFSPRING) {
       return db.execute<{ id: string; k: number; scheme: string }>(
-        ks.length < 100 ? lazy(within) : counted(wide(within)),
+        ks.length < 100 ? lazy(within, parents) : counted(wide(under)),
       );
     }
     const rows = lists
