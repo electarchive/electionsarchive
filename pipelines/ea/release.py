@@ -280,8 +280,10 @@ class Writer:
         _mem(stem)
 
 
-def _key(polities: dict[str, tuple[str, str | None]], parents: dict[str, str], polity: str) -> str:
-    country = state = None
+def _walk(
+    polities: dict[str, tuple[str, str | None]], parents: dict[str, str], polity: str
+) -> tuple[str | None, str | None]:
+    state = None
     seen = set()
     current: str | None = polity
     while current is not None and current not in seen:
@@ -290,12 +292,246 @@ def _key(polities: dict[str, tuple[str, str | None]], parents: dict[str, str], p
         if state is None and iso and iso.startswith("US-"):
             state = iso
         if kind in {"sovereign_state", "supranational"}:
-            country = iso
-            break
+            return iso, state
         current = parents.get(current)
+    return None, state
+
+
+def _key(polities: dict[str, tuple[str, str | None]], parents: dict[str, str], polity: str) -> str:
+    country, state = _walk(polities, parents, polity)
     if country == "US" and state:
         return state.lower()
     return (country or "world").lower()
+
+
+def summary(folder: Path, files: list[dict[str, object]]) -> dict[str, object]:
+    paths: dict[str, list[str]] = defaultdict(list)
+    tables: dict[str, dict[str, int]] = defaultdict(lambda: {"rows": 0, "bytes": 0, "files": 0})
+    for entry in files:
+        table, name = str(entry["table"]), str(entry["file"])
+        tables[table]["bytes"] += int(str(entry["bytes"]))
+        tables[table]["files"] += 1
+        if name.endswith(".parquet"):
+            paths[table].append(str(folder / name))
+            tables[table]["rows"] += int(str(entry["rows"]))
+
+    def scan(table: str, *columns: str) -> pl.LazyFrame:
+        return pl.scan_parquet(paths[table], missing_columns="insert").select(columns)
+
+    def year(column: str) -> pl.Expr:
+        return pl.col(column).dt.year()
+
+    def span(column: str = "year") -> list[pl.Expr]:
+        return [pl.col(column).min().alias("first"), pl.col(column).max().alias("last")]
+
+    def nested(frame: pl.DataFrame, sort: list[str], descending: list[bool]) -> dict[str, list[dict[str, object]]]:
+        grouped: dict[str, list[dict[str, object]]] = defaultdict(list)
+        for row in frame.sort(sort, descending=descending, nulls_last=True).to_dicts():
+            grouped[str(row.pop("country"))].append(row)
+        return grouped
+
+    polity = scan("polity", "id", "kind", "iso_code").collect()
+    polities = {row[0]: (row[1], row[2]) for row in polity.iter_rows()}
+    parents: dict[str, str] = {}
+    for child, parent in (
+        scan("polity_parent", "polity_id", "parent_id", "valid_from")
+        .sort("valid_from", nulls_last=False)
+        .select("polity_id", "parent_id")
+        .collect()
+        .iter_rows()
+    ):
+        parents[child] = parent
+    countries = {identifier: _walk(polities, parents, identifier)[0] or "world" for identifier in polities}
+    places = pl.DataFrame(
+        {
+            "polity_id": list(countries),
+            "country": list(countries.values()),
+            "level": [polities[identifier][0] for identifier in countries],
+        }
+    ).lazy()
+    roots = {identifier for identifier, (kind, iso) in polities.items() if iso in set(countries.values())}
+    labels: dict[str, str] = {}
+    for entity, text, lang in (
+        scan("name", "entity_id", "text", "lang", "kind", "is_preferred")
+        .filter(pl.col("entity_id").is_in(list(roots)) & (pl.col("kind") == "official"))
+        .sort(pl.col("lang") != "en", pl.col("is_preferred").not_())
+        .select("entity_id", "text", "lang")
+        .collect()
+        .iter_rows()
+    ):
+        iso = polities[entity][1]
+        if iso is not None and iso not in labels:
+            labels[iso] = text
+
+    election = (
+        scan("election", "id", "polity_id", "kind", "date_from")
+        .join(places, on="polity_id", how="left")
+        .with_columns(year("date_from").alias("year"))
+        .collect()
+    )
+    result_set = (
+        scan("result_set", "k", "election_id", "contest_id", "stage")
+        .join(
+            election.lazy().select(pl.col("id").alias("election_id"), "country", "year"), on="election_id", how="left"
+        )
+        .collect()
+    )
+    formulas = {
+        identifier: json.loads(rules).get("formula") if rules else None
+        for identifier, rules in scan("electoral_system", "id", "rules").collect().iter_rows()
+    }
+    contest = (
+        scan("contest", "id", "election_id", "kind", "electoral_system_id")
+        .join(
+            election.lazy().select(pl.col("id").alias("election_id"), "country", "level", "year"),
+            on="election_id",
+            how="left",
+        )
+        .with_columns(
+            pl.col("electoral_system_id")
+            .replace_strict(formulas, default=None, return_dtype=pl.String)
+            .alias("formula")
+        )
+        .collect()
+    )
+    schemes = scan("scheme", "code", "noun", "rank", "polity_id").collect()
+    rows = (
+        scan("results", "result_set_k", "unit_k", "measure", "channel")
+        .join(
+            scan("reporting_unit", "k", "scheme_code").rename({"k": "unit_k"}),
+            on="unit_k",
+            how="left",
+        )
+        .group_by("result_set_k", "scheme_code", "measure", "channel")
+        .agg(pl.len().alias("rows"))
+        .collect(engine="streaming")
+    )
+    per_set = (
+        rows.group_by("result_set_k", "scheme_code")
+        .agg(pl.col("rows").sum())
+        .join(result_set.select(pl.col("k").alias("result_set_k"), "country", "year"), on="result_set_k", how="left")
+    )
+    question = (
+        scan("ballot_question", "contest_id", "type")
+        .join(contest.lazy().select(pl.col("id").alias("contest_id"), "country", "year"), on="contest_id", how="left")
+        .collect()
+    )
+    shapes = (
+        scan("geometry", "scheme_code", "area_id", "valid_from", "valid_to")
+        .group_by("scheme_code")
+        .agg(
+            pl.len().alias("shapes"),
+            pl.col("area_id").n_unique().alias("areas"),
+            year("valid_from").min().alias("first"),
+            year("valid_to").max().alias("last"),
+        )
+        .join(schemes.lazy().rename({"code": "scheme_code"}), on="scheme_code", how="left")
+        .join(places.select("polity_id", "country"), on="polity_id", how="left")
+        .select(pl.col("scheme_code").alias("scheme"), "noun", "country", "shapes", "areas", "first", "last")
+        .sort("scheme")
+        .collect()
+    )
+
+    held = election.join(result_set.select(pl.col("election_id").alias("id")).unique(), on="id", how="semi")
+    election_kinds = election.group_by("country", "kind").agg(pl.len().alias("count"), *span())
+    ballot_questions = question.group_by("country", "type").agg(
+        pl.len().alias("count"), pl.col("year").min().alias("first")
+    )
+    contest_formulas = contest.drop_nulls("formula").group_by("country", "formula").agg(pl.len().alias("contests"))
+    by_country = {
+        "levels": nested(
+            contest.group_by("country", "level").agg(pl.len().alias("contests"), *span()), ["contests"], [True]
+        ),
+        "units": nested(
+            per_set.group_by("country", "scheme_code")
+            .agg(
+                pl.col("rows").sum().alias("results"),
+                pl.col("result_set_k").n_unique().alias("result_sets"),
+                *span(),
+            )
+            .join(schemes.select(pl.col("code").alias("scheme_code"), "noun", "rank"), on="scheme_code", how="left")
+            .rename({"scheme_code": "scheme"}),
+            ["rank", "results"],
+            [False, True],
+        ),
+        "election_kinds": nested(election_kinds, ["count"], [True]),
+        "ballot_questions": nested(ballot_questions, ["count"], [True]),
+        "formulas": nested(contest_formulas, ["contests"], [True]),
+    }
+    for units in by_country["units"].values():
+        for unit in units:
+            unit.pop("rank")
+    totals = (
+        election.group_by("country")
+        .agg(pl.len().alias("elections"))
+        .join(held.group_by("country").agg(*span()), on="country", how="left")
+        .join(contest.group_by("country").agg(pl.len().alias("contests")), on="country", how="left")
+        .join(
+            per_set.group_by("country").agg(
+                pl.col("result_set_k").n_unique().alias("result_sets"), pl.col("rows").sum().alias("results")
+            ),
+            on="country",
+            how="left",
+        )
+        .with_columns(pl.col("contests", "result_sets", "results").fill_null(0))
+        .sort("results", "contests", descending=True)
+    )
+
+    def count(frame: pl.DataFrame, column: str, *extra: pl.Expr) -> list[dict[str, object]]:
+        return frame.group_by(column).agg(pl.len().alias("count"), *extra).sort("count", descending=True).to_dicts()
+
+    def coded(table: str, column: str) -> list[dict[str, object]]:
+        codes = dict(scan(table, "id", "code").collect().iter_rows())
+        return [
+            {"code": codes.get(row[column], str(row[column])), "rows": row["rows"]}
+            for row in rows.group_by(column).agg(pl.col("rows").sum()).sort("rows", descending=True).to_dicts()
+        ]
+
+    first, last = held.select(pl.col("date_from").min().alias("first"), pl.col("date_from").max().alias("last")).row(0)
+    return {
+        "totals": {
+            label: tables[table]["rows"] if table in tables else 0
+            for label, table in {
+                "results": "results",
+                "result_sets": "result_set",
+                "contests": "contest",
+                "elections": "election",
+                "polities": "polity",
+                "reporting_units": "reporting_unit",
+                "candidacies": "candidacy",
+                "people": "person",
+                "parties": "party",
+                "tenures": "tenure",
+                "shapes": "geometry",
+                "sources": "source",
+                "changesets": "changeset",
+            }.items()
+        },
+        "span": {"first": first.isoformat() if first else None, "last": last.isoformat() if last else None},
+        "countries": [
+            {
+                "code": row["country"],
+                "name": labels.get(row["country"], row["country"]),
+                **{key: value for key, value in row.items() if key != "country"},
+                **{key: groups.get(row["country"], []) for key, groups in by_country.items()},
+            }
+            for row in totals.to_dicts()
+        ],
+        "election_kinds": count(election, "kind", *span()),
+        "contest_kinds": count(contest, "kind"),
+        "ballot_questions": count(question, "type", pl.col("year").min().alias("first")),
+        "formulas": [
+            {"formula": row["formula"], "contests": row["count"]}
+            for row in count(contest.drop_nulls("formula"), "formula")
+        ],
+        "measures": coded("measure", "measure"),
+        "channels": coded("channel", "channel"),
+        "stages": [{"stage": row["stage"], "count": row["count"]} for row in count(result_set, "stage")],
+        "shapes": shapes.to_dicts(),
+        "tables": [
+            {"table": table, **sizes} for table, sizes in sorted(tables.items(), key=lambda item: -item[1]["rows"])
+        ],
+    }
 
 
 def _chunks(decades: dict[int, int]) -> list[tuple[str, list[int]]]:
@@ -511,6 +747,7 @@ def build(calver: str | None = None) -> str:
             "shapes from sources that state no license (IBGE census tracts and neighborhoods, TKGM neighborhoods)",
             "rows written by changesets not yet published",
         ],
+        "summary": summary(folder, writer.files),
         "files": writer.files,
     }
     (folder / "manifest.json").write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n")
