@@ -221,7 +221,8 @@ const MODEL = {
     stir: 0.01,
     spill: 0.3,
     cap: 1.5,
-    lid: { share: 0.05, reach: 1 },
+    lid: { share: 0.05, reach: 0.75 },
+    frozen: { share: 0.2, canvass: 1 },
     scatter: 1.2,
     brisk: 0.25,
     hush: 0.02,
@@ -2044,6 +2045,14 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
       ? unit.total ** MODEL.late.heft * hefted
       : 1,
   );
+  const frozen = whole.map(
+    (unit) =>
+      isLate &&
+      CANVASS[race.state] != null &&
+      unit.night != null &&
+      unit.total > 0 &&
+      unit.total <= sum(unit.night),
+  );
   const random = seeded(`${race.id}@${stamp}`);
   const typical = found.map((unit) => {
     if (!unit.hasBaseline) {
@@ -2572,17 +2581,21 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
       );
       const steady = clamp(aimed + leaning * expect, -room, room);
       const open = opens[index];
+      const county = wholeOf.get(unit.county)!;
+      const share = final * later * heft[county]!;
+      const owed =
+        frozen[county]! && open == null && !reports.has(unit.county)
+          ? (MODEL.late.frozen.share * final * whole[county]!.total) / everyone
+          : 0;
       const extra = reports.has(unit.county)
         ? (pending.get(unit.county) ?? 0) * portion[index]!
         : open == null
           ? CANVASS[race.state] != null
-            ? Math.max(
-                final * later * heft[wholeOf.get(unit.county)!]!,
-                spills[wholeOf.get(unit.county)!]! * portion[index]!,
-              )
-            : final * later * heft[wholeOf.get(unit.county)!]! +
-              spills[wholeOf.get(unit.county)!]! * portion[index]!
+            ? Math.max(share, owed, spills[county]! * portion[index]!)
+            : share + spills[county]! * portion[index]!
           : Math.max(0, open - remaining);
+      const canvass =
+        owed > share ? MODEL.late.frozen.canvass : MODEL.late.canvass;
       const ceiling = 1 - unit.others;
       const jitter = final > 0 && learned == null ? gaussian(random) : 0;
       const pullOwn = pull?.own.get(index) ?? {
@@ -2592,10 +2605,10 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
       const pullDrift =
         pull == null
           ? null
-          : MODEL.late.canvass *
+          : canvass *
             (pullTilt + pullOwn.shift + Math.sqrt(pullOwn.variance) * jitter);
       const pullExpect =
-        pull == null ? null : MODEL.late.canvass * (pull.mean + pullOwn.shift);
+        pull == null ? null : canvass * (pull.mean + pullOwn.shift);
       const local = pull == null ? MODEL.tail.local * jitter : 0;
       const isRecent = isMailTail && recent != null && remaining > 0;
       const tail = (value: number, tilt: number) =>
