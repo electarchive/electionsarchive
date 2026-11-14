@@ -567,6 +567,19 @@ TABLES += [
         "short": True,
     }
 ]
+STAR_1932_JULY_1 = "batch_dlc_1bernal_ver01:data:sn83045462:00280601093:1932070101:0343"
+TABLES += [
+    {
+        "table": f"1932:democratic:b{ballot}",
+        "image": f"https://tile.loc.gov/image-services/iiif/service:ndnp:dlc:{STAR_1932_JULY_1}/full/pct:50/0/default.jpg",
+        "release": "https://www.loc.gov/resource/sn83045462/1932-07-01/ed-1/?sp=3",
+        "leaves": (1,),
+        "ballot": ballot,
+        "transcribed": "conventions_chicago_1932.tsv",
+        "short": True,
+    }
+    for ballot in (1, 2, 3)
+]
 EVENING_STAR_1960 = "https://www.loc.gov/resource/sn83045462/1960-07-14/ed-1/?sp=8"
 TABLES += [
     {
@@ -688,9 +701,20 @@ EVENING_STAR_1932_CAVEAT = (
     "The archive has not located a free copy of the official proceedings' roll call, so this ballot is the "
     "state-by-state table the Washington Evening Star printed on July 2, 1932 (page A-4). It is a default to be "
     "superseded by the official proceedings. The table prints the fourth ballot only; the first three ballots by "
-    "state are not loaded. Pennsylvania's 76 votes include 5½ not recorded for a candidate. The printed totals are "
+    "state are stored from the July 1 issue. Pennsylvania's 76 votes include 5½ not recorded for a candidate. The printed totals are "
     "945 for Franklin D. Roosevelt, 190½ for Alfred E. Smith, 5½ for Newton D. Baker, 3½ for Albert C. Ritchie, 3 for "
     "George White, and 1 for James M. Cox, 1,148½ votes cast of 1,154; two-thirds, 770, were needed."
+)
+EVENING_STAR_1932_JULY_1_CAVEAT = (
+    "The archive has not located a free copy of the official proceedings' roll call, so these ballots are the "
+    "state-by-state tables the Washington Evening Star printed on July 1, 1932 (page A-3). They are defaults to be "
+    "superseded by the official proceedings. The fourth ballot is stored from the July 2 issue. Totals are the "
+    "printed ones: on the first ballot Franklin D. Roosevelt had 666¼, Alfred E. Smith 201¾, John Nance Garner 90¼, "
+    "and George White 52; on the second, Roosevelt had 677¾; and on the third, 682.79. The third-ballot table "
+    "prints Missouri's Roosevelt vote as 30½, which a 36-vote delegation with 15½ for James A. Reed cannot hold; "
+    "20½ is stored because the printed Roosevelt total of 682.79 requires it. "
+    "Delegations that do not add up to their votes (second ballot: Ohio 51 of 52 and Pennsylvania 71½ of 76; "
+    "third ballot: Indiana 28 of 30 and Pennsylvania 73½ of 76) show the difference as not recorded."
 )
 STAR_RNC_DEFAULT = (
     "The archive has not located a free copy of the official proceedings' roll call, so this ballot is the "
@@ -880,6 +904,7 @@ VICE_1876 = "Ohio cast 8 of its 44 votes blank; the blank votes are not stored. 
 PROCEEDINGS += [
     {"party": "democratic", "tables": {n: f"1848:democratic:b{n}" for n in range(1, 5)}, "title": "The Proceedings of the Democratic National Convention, Held at Baltimore, May 22, 1848", "publisher": "Democratic National Convention", "city": "Baltimore", "days": (date(1848, 5, 22), date(1848, 5, 25)), "ballots": dict.fromkeys(range(1, 5), date(1848, 5, 25)), "deciding": 4, "required": {1: 168, 2: 168, 3: 170, 4: 170}, "caveat": {1: BALTIMORE_1848, 2: BALTIMORE_1848, 3: BALTIMORE_1848, 4: BALTIMORE_1848 + FOURTH_1848}, "vice": {"tables": {1: "1848:democratic:vp-b1", 2: "1848:democratic:vp-b2"}, "ballots": dict.fromkeys((1, 2), date(1848, 5, 25)), "deciding": 2, "shifted": True, "required": {1: 168, 2: 158}, "method": PROCEEDINGS_VICE, "caveat": VICE_1848}},
     {"party": "democratic", "tables": {1: "1908:democratic"}, "title": "Official Report of the Proceedings of the Democratic National Convention, Held in Denver, Colorado, July 7, 8, 9 and 10, 1908", "publisher": "Western Newspaper Union", "city": "Denver", "days": (date(1908, 7, 7), date(1908, 7, 10)), "ballots": {1: date(1908, 7, 10)}, "deciding": 1, "caveat": DENVER_1908},
+    {"party": "democratic", "tables": {1: "1932:democratic:b1", 2: "1932:democratic:b2", 3: "1932:democratic:b3"}, "title": "The Evening Star (Washington, D.C.), July 1, 1932: First, Second, and Third Ballots", "publisher": "The Evening Star", "kind": "news_agency", "city": "Chicago", "days": (date(1932, 6, 27), date(1932, 7, 2)), "ballots": {1: date(1932, 7, 1), 2: date(1932, 7, 1), 3: date(1932, 7, 1)}, "deciding": None, "required": 770, "method": PRESS.format("the Washington Evening Star"), "caveat": EVENING_STAR_1932_JULY_1_CAVEAT},
     {"party": "democratic", "tables": {4: "1932:democratic:b4"}, "title": "The Evening Star (Washington, D.C.), July 2, 1932: Fourth Ballot", "publisher": "The Evening Star", "kind": "news_agency", "city": "Chicago", "days": (date(1932, 6, 27), date(1932, 7, 2)), "ballots": {4: date(1932, 7, 2)}, "deciding": 4, "required": 770, "method": PRESS.format("the Washington Evening Star"), "caveat": EVENING_STAR_1932_CAVEAT},
     {"party": "democratic", "tables": {1: "1835:democratic"}, "title": "Niles' Weekly Register, May 30, 1835: Presidential Convention", "publisher": "Niles' Weekly Register", "kind": "news_agency", "city": "Baltimore", "days": (date(1835, 5, 20), date(1835, 5, 22)), "ballots": {1: date(1835, 5, 22)}, "deciding": 1, "method": PRESS.format("Niles' Weekly Register's reprint of the official statement"), "caveat": NILES_1835, "vice": {"tables": {1: "1835:democratic:vp"}, "ballots": {1: date(1835, 5, 22)}, "deciding": 1, "required": 177, "method": VICE_METHOD.format("Niles' Weekly Register's reprint of the official statement"), "caveat": NILES_1835_VICE}},
     {"party": "democratic", "tables": {}, "vice": {"tables": {1: "1832:democratic:vp"}, "ballots": {1: date(1832, 5, 22)}, "deciding": 1, "required": 189, "method": VICE_METHOD.format("the convention's summary of its proceedings"), "caveat": BALTIMORE_1832}, "title": "Summary of the Proceedings of a Convention of Republican Delegates, from the Several States in the Union, for the Purpose of Nominating a Candidate for the Office of Vice-President of the United States; Held at Baltimore, in the State of Maryland, May, 1832", "publisher": "Packard and Van Benthuysen", "city": "Baltimore", "days": (date(1832, 5, 21), date(1832, 5, 23))},
@@ -1332,6 +1357,10 @@ CANDIDATES = {
     "1932:democratic:Baker": ("Newton D. Baker", None),
     "1932:democratic:White": ("George White", None),
     "1932:democratic:Cox": ("James M. Cox", "Q440117"),
+    "1932:democratic:Reed": ("James A. Reed", None),
+    "1932:democratic:Traylor": ("Melvin A. Traylor", None),
+    "1932:democratic:Murray": ("William H. Murray", None),
+    "1932:democratic:Rogers": ("Will Rogers", None),
     "democratic:Roosevelt": ("Franklin D. Roosevelt", "Q8007"),
     "democratic:Farley": ("James A. Farley", "Q954859"),
     "democratic:Tydings": ("Millard Tydings", "Q354099"),
@@ -2134,6 +2163,10 @@ TOTALS = {
     "1864:democratic": {"Thomas H. Seymour": 23.5},
 }
 MISPRINTS = {
+    "1932:democratic:b3": (
+        "The printed total for Albert C. Ritchie is 23\u00bd, against 21\u00bd in the state rows. The table gives Indiana 2 for Ritchie; the rows are stored as printed.",
+        {"column Ritchie": (23.5, 21.5, "the state figures add to 21\u00bd")},
+    ),
     "1896:republican:vp": (
         "The printed total for Henry Clay Evans is 280\u00bd, against 277\u00bd in the state rows. The rows are stored as printed.",
         {"column Evans": (280.5, 277.5, "the state figures add to 277\u00bd")},
