@@ -14,7 +14,7 @@ from ea.changeset import Changeset, slug
 from ea.store import Connection, connect
 
 SOURCE = "gb.advisory_polls"
-VERSION = "2"
+VERSION = "3"
 VOTES, REGISTERED, BALLOTS = 1, 2, 3
 SHARE_ONLY = 4
 IPSOS = (
@@ -26,6 +26,10 @@ HANSARD = "https://api.parliament.uk/historic-hansard/commons/1994/mar/22/engage
 WIKIPEDIA = "https://en.wikipedia.org/wiki/1994_Strathclyde_water_referendum"
 EVALUATION = "https://www.gov.scot/publications/health-board-elections-alternative-pilots-final-report-statutory-evaluation/pages/"
 SUNDAY = "https://api.parliament.uk/historic-hansard/written_answers/1978/mar/01/licensed-premises-polls-wales"
+CHRISTCHURCH = (
+    "https://bcpcouncil.gov.uk/documents/councillors-committees-and-elections/"
+    "declaration-of-result-of-local-poll-christchurch-borough-council.pdf"
+)
 DISTRICTS = "https://borders.ukdataservice.ac.uk/ukborders/easy_download/prebuilt/shape/Wales_dt_1991.zip"
 SOURCES = {
     "ipsos": (
@@ -76,6 +80,13 @@ SOURCES = {
         "official_body",
         "UK Parliament",
         "Licensed Premises Polls (Wales), HC Deb 1 March 1978 vol 945 cc232-3W",
+    ),
+    "christchurch": (
+        CHRISTCHURCH,
+        ".pdf",
+        "official_body",
+        "BCP Council",
+        "Declaration of Result of Local Poll, Christchurch Borough Council local advisory poll (14 December 2017)",
     ),
     "districts": (
         DISTRICTS,
@@ -230,6 +241,30 @@ POLLS: list[dict[str, Any]] = [
             "1994; no official declaration was found."
         ),
     },
+    {
+        "key": "christchurch-2017",
+        "from": date(2017, 12, 1),
+        "to": date(2017, 12, 14),
+        "polity": ("gb.polity", "E07000048"),
+        "area": ("gb.lad", "E07000048"),
+        "name": "2017 Christchurch local government reorganization poll",
+        "title": "Single council for Christchurch, Bournemouth, and Poole",
+        "path": None,
+        "units": [("gb.lad", "E07000048", None, 3321, 17676, 21022, 39183)],
+        "primary": "christchurch",
+        "cited": ["christchurch"],
+        "context": (
+            "Christchurch Borough Council polled its electors by post from 1 to 14 December 2017 on the Future "
+            "Dorset proposal to merge Christchurch with Bournemouth and Poole in a single unitary council. The "
+            "question was: Do you support the current proposal for a single Council covering Christchurch, "
+            "Bournemouth and Poole? The poll was advisory; the Secretary of State approved the merger in 2018, and "
+            "Bournemouth, Christchurch and Poole Council took over on 1 April 2019."
+        ),
+        "caveat": (
+            "Ballots are the 21,022 ballot papers issued as printed on the declaration, which equal the Yes and No "
+            "votes plus 25 rejected papers (1 for voting both ways, 6 for identifying marks, and 18 unmarked or void)."
+        ),
+    },
 ]
 
 
@@ -260,7 +295,8 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary="Council-run advisory polls: the Strathclyde water referendum of 1994, the Edinburgh congestion "
-            "charging referendum of 2005, the Greater Manchester congestion charge referendum of 2008, and the Welsh "
+            "charging referendum of 2005, the Greater Manchester congestion charge referendum of 2008, the Christchurch "
+            "reorganization poll of 2017, and the Welsh "
             "Sunday opening polls of 1975 in 18 districts, with the 37 Welsh districts of 1974 to 1996 and their 1991 "
             "census boundaries; and the ballots returned in the 2010 NHS Fife and NHS Dumfries and Galloway board "
             "elections",
