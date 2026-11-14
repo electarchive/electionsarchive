@@ -13161,7 +13161,7 @@ export const contests = {
         ),
         here as materialized (
           select r.result_set_k as k from result_rollup_sum r
-          where r.area_k = ${area.k} and r.measure = any(${COUNTED}) and not (select inside from scoped)
+          where r.area_k = ${area.k} and r.measure + 0 = any(${COUNTED}) and not (select inside from scoped)
           union
           select u.result_set_k from result_rollup_unit u where u.area_k = ${area.k} and not (select inside from scoped)
         ),
