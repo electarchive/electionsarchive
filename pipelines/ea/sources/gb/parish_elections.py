@@ -1302,6 +1302,7 @@ def emit() -> Path:
 
         people: dict[str, UUID] = {}
         elections: set[str] = set()
+        units: set[UUID] = set()
         for (key, _, ward), lines in frame.group_by("key", "day", "ward", maintain_order=True):
             assert isinstance(key, str)
             first = lines.row(0, named=True)
@@ -1326,13 +1327,15 @@ def emit() -> Path:
             else:
                 scheme, code = WARDS, f"{key}:{slug(ward)}"
                 area = cs.area(WARDS, code)
-                if area in cs.minted:
+                if area in cs.minted and area not in units:
+                    units.add(area)
                     cs.add("area", id=area, scheme_code=WARDS)
                     cs.add("area_code", area_id=area, code=code, valid_from=None, valid_to=None)
                     cs.add("area_parent", area_id=area, parent_id=parish_area, valid_from=None, valid_to=None)
                 name(area, ward)
             unit = cs.unit(scheme, code)
-            if unit in cs.minted:
+            if unit in cs.minted and unit not in units:
+                units.add(unit)
                 cs.add(
                     "reporting_unit",
                     id=unit,
