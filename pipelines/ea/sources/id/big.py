@@ -440,7 +440,7 @@ def emit() -> Path:
             name(polity, text)
             if code in items:
                 cs.add("external_id", entity_id=polity, scheme="wikidata", value=items[code])
-        for scheme in ("id.provinsi", "id.kabkota"):
+        for scheme in ("id.nation", "id.provinsi", "id.kabkota"):
             for vintage, as_of, valid_from, valid_to in (
                 ("2019", date(2019, 4, 17), None, date(2022, 7, 25)),
                 ("2026", EDITION, date(2022, 12, 8), None),
