@@ -603,6 +603,7 @@ def emit() -> Path:
         cs.add("note", entity_id=system, kind="methodology", body_md=SYSTEM_NOTE)
 
         parties: dict[tuple[str, str], UUID] = {}
+        minted_parties: set[UUID] = set()
 
         def party(text: str, day: str) -> UUID:
             if (text, day) not in parties:
@@ -614,7 +615,8 @@ def emit() -> Path:
                 ]
                 key = ("wikidata", found[0]) if len(set(found)) == 1 else (f"{SOURCE}.party", f"{text}:{day}")
                 entity = parties[text, day] = cs.key(*key)
-                if entity in cs.minted:
+                if entity in cs.minted and entity not in minted_parties:
+                    minted_parties.add(entity)
                     cs.add("party", id=entity, kind="party", polity_id=korea)
                     name(entity, text)
                     english = next((e for item, e, _, _ in party_items.get(text, []) if key[1] == item and e), None)
