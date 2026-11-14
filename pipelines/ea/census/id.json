@@ -681,6 +681,8 @@
       "source": "uu7-2017",
       "first_held": "1957-06-01",
       "note": "Open-list PR in about 2,325 dapil in 508 regencies and cities (Jakarta's administrative cities have no council), held with the DPR; each regency or city KPU declares its own result.",
+      "disposition": "blocked",
+      "disposition_reason": "The Commission publishes only 2019 seats per party per dapil (open data portal dataset 33); candidate and party votes for the roughly 2,325 electoral districts sit in each of about 514 regency and city commissions' own decrees and sites, one format apiece, with no national file.",
       "match": [
         {
           "body_kinds": [
