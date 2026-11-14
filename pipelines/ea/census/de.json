@@ -292,6 +292,48 @@
       "url": "https://digi.bib.uni-mannheim.de/fileadmin/statjahrb/514401303_1934/pdf/514401303_0598.pdf",
       "kind": "official_body",
       "note": "Digitized by the Universitätsbibliothek Mannheim, one PDF per page. Printed page 550 (scan 0598): the Reichstag election and the Volksabstimmung of 12 November 1933 by Wahlkreis; printed page 551 (scan 0599): the Volksabstimmung on the head of state of 19 August 1934 by Stimmkreis."
+    },
+    "sl-ksvg": {
+      "title": "Kommunalselbstverwaltungsgesetz Saarland (KSVG), § 31 Abs. 2",
+      "publisher": "Haufe, reproducing the Saarland KSVG (haufe.de)",
+      "url": "https://www.haufe.de/id/norm/kommunalselbstverwaltungsgesetz-saarland-31-amtszeit-HI2737229_p31.html",
+      "kind": "official_body",
+      "note": "Für die Dauer von zehn Jahren werden Bürgermeisterinnen und Bürgermeister vorbehaltlich der Regelung des § 56 Abs. 3 sowie hauptamtliche Beigeordnete berufen. The page shows no consolidation date; the Landrat's ten-year term rests on the Saarland district portal and a trade-press overview, because the Landkreisordnung text was not readable."
+    },
+    "rp-lko": {
+      "title": "Landkreisordnung Rheinland-Pfalz (LKO), § 45",
+      "publisher": "Haufe, reproducing the Rheinland-Pfalz LKO (haufe.de)",
+      "url": "https://www.haufe.de/id/norm/landkreisordnung-rheinland-pfalz-45-amtszeit-des-landrats-und-der-kreisbeigeordneten-HI1523351_p45.html",
+      "kind": "official_body",
+      "note": "Die Amtszeit des Landrats und der hauptamtlichen Kreisbeigeordneten beträgt acht Jahre. The page shows no consolidation date."
+    },
+    "st-go": {
+      "title": "Kommunalverfassungsgesetz Sachsen-Anhalt, § 61 and § 63 (Hauptverwaltungsbeamte, including the Landrat)",
+      "publisher": "Land Sachsen-Anhalt",
+      "url": "https://www.landesrecht.sachsen-anhalt.de/",
+      "kind": "official_body",
+      "note": "§ 61 Abs. 1: Die Amtszeit beträgt sieben Jahre. § 63 Abs. 1: Die Wahl des Hauptverwaltungsbeamten hat frühestens sechs Monate und spätestens einen Monat vor Ablauf der Amtszeit zu erfolgen. Read from a text excerpt found by search, not from the Land portal, which refuses automated reads."
+    },
+    "sh-kro": {
+      "title": "Kreisordnung für Schleswig-Holstein (KrO), § 43",
+      "publisher": "Haufe, reproducing the Schleswig-Holstein KrO (haufe.de)",
+      "url": "https://www.haufe.de/id/norm/kreisordnung-schleswig-holstein-43-wahlgrundsaetze-amtszeit-HI2363383_p43.html",
+      "kind": "official_body",
+      "note": "Die Landrätin oder der Landrat wird vom Kreistag gewählt. Die Amtszeit beträgt nach näherer Regelung in der Hauptsatzung mindestens sechs und höchstens acht Jahre. The page shows no consolidation date."
+    },
+    "th-kwg": {
+      "title": "Thüringer Kommunalwahlgesetz (ThürKWG), §§ 24, 25, and 28",
+      "publisher": "juralernen.de, reproducing the ThürKWG",
+      "url": "https://juralernen.de/landesrecht/th/komwgth",
+      "kind": "official_body",
+      "note": "§ 25 Abs. 1: Der Bürgermeister wird auf die Dauer von sechs Jahren gewählt. Den Wahltermin, der innerhalb der letzten drei Monate der Amtszeit des vorhergehenden Bürgermeisters liegen soll, bestimmt die Rechtsaufsichtsbehörde. § 28 Abs. 1: Der Landrat wird unmittelbar auf die Dauer von sechs Jahren gewählt; § 24 Abs. 8: gewählt ist, wer die meisten Stimmen erhalten hat (the mirror shows the first-ballot plurality rule of an older text; the current text's runoff was not checked). Date rule: no fixed day, set per election by the Rechtsaufsichtsbehörde."
+    },
+    "sn-smi": {
+      "title": "Kommunalwahlen: Wahl der (Ober-)Bürgermeister und Landräte",
+      "publisher": "Sächsisches Staatsministerium des Innern",
+      "url": "https://www.smi.sachsen.de/kommunalwahlen-5261.html",
+      "kind": "official_body",
+      "note": "Erhält im ersten Wahlgang keine Bewerberin oder kein Bewerber die absolute Mehrheit, findet frühestens zwei und spätestens vier Wochen später ein zweiter Wahlgang statt (§ 44a KomWG); gewählt ist, wer die höchste Stimmenzahl erhält. Der zweite Wahlgang ist keine Stichwahl unter den beiden Erstplatzierten."
     }
   },
   "tiers": [
@@ -4147,22 +4189,23 @@
           "within": "DE-RP"
         },
         {
+          "term_years": 10,
           "runoff": "majority",
-          "source": "sl-kw",
+          "source": "sl-ksvg",
           "within": "DE-SL"
         },
         {
           "term_years": 7,
           "runoff": "majority",
-          "runoff_rule": "A second ballot (zweiter Wahlgang) open to new candidates, decided by plurality.",
-          "source": "sn-gemo",
+          "runoff_rule": "A second ballot (zweiter Wahlgang) two to four weeks later, decided by plurality among the first-ballot candidates (KomWG § 44a).",
+          "source": "sn-smi",
           "locator": "https://www.revosax.sachsen.de/vorschrift/2754.1#p51",
           "within": "DE-SN"
         },
         {
           "term_years": 7,
           "runoff": "majority",
-          "source": "st-kw",
+          "source": "st-go",
           "within": "DE-ST"
         },
         {
@@ -4174,7 +4217,7 @@
           "term_years": 6,
           "runoff": "majority",
           "runoff_rule": "Stichwahl two weeks after the first ballot.",
-          "source": "th-kw",
+          "source": "th-kwg",
           "within": "DE-TH"
         }
       ],
@@ -4240,25 +4283,26 @@
         {
           "term_years": 8,
           "runoff": "majority",
-          "source": "rp-kw",
+          "source": "rp-lko",
           "within": "DE-RP"
         },
         {
+          "term_years": 10,
           "runoff": "majority",
-          "source": "sl-kw",
+          "source": "sl-ksvg",
           "within": "DE-SL"
         },
         {
           "term_years": 7,
           "runoff": "majority",
-          "source": "st-kw",
+          "source": "st-go",
           "within": "DE-ST"
         },
         {
           "term_years": 6,
           "runoff": "majority",
           "runoff_rule": "Stichwahl two weeks after the first ballot.",
-          "source": "th-kw",
+          "source": "th-kwg",
           "within": "DE-TH"
         },
         {
@@ -4271,7 +4315,8 @@
         {
           "term_years": 7,
           "runoff": "majority",
-          "source": "sn-gemo",
+          "runoff_rule": "A second ballot (zweiter Wahlgang) two to four weeks later, decided by plurality among the first-ballot candidates (KomWG § 44a).",
+          "source": "sn-smi",
           "within": "DE-SN"
         }
       ],
