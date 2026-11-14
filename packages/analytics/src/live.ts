@@ -354,6 +354,7 @@ type Unit = {
   night: Array<number> | null;
   paced: number | null;
   before: number | null;
+  earlier: number | null;
   reported: { share: number; total: number } | null;
   county: string;
   channel: number;
@@ -570,6 +571,7 @@ function units(
       MODEL.still.share * sum(framed.at(-1)!.totals);
   const paces = new Map<string, number>();
   const befores = new Map<string, number>();
+  const earliers = new Map<string, number>();
   if (cutoff != null && start > cutoff) {
     const seen = race.frames
       .map((frame) => Date.parse(frame.at))
@@ -599,6 +601,7 @@ function units(
       };
       paces.set(id, point(start));
       befores.set(id, point(start - MODEL.late.span * 86_400_000));
+      earliers.set(id, point(start - 2 * MODEL.late.span * 86_400_000));
     }
   }
   const [a, b] = pair(race, latest);
@@ -673,6 +676,7 @@ function units(
       night: nights.get(id) ?? null,
       paced: paces.get(id) ?? null,
       before: befores.get(id) ?? null,
+      earlier: earliers.get(id) ?? null,
       reported: reported.get(id) ?? null,
       floor: 0,
     });
@@ -1453,6 +1457,9 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
         before: members.some((unit) => unit.before == null)
           ? null
           : sum(members.map((unit) => unit.before ?? 0)),
+        earlier: members.some((unit) => unit.earlier == null)
+          ? null
+          : sum(members.map((unit) => unit.earlier ?? 0)),
         sigma:
           MODEL.spread *
           clamp((MODEL.sizeRef / expected) ** MODEL.sizeExp, MODEL.sizeLow, 1),
@@ -1463,19 +1470,21 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
     floor: (floors.get(unit.id) ?? 0) / (1 + tail),
   }));
   const wholeOf = new Map(whole.map((unit, index) => [unit.id, index]));
+  const priorPace = (unit: (typeof whole)[number]) =>
+    Math.max(
+      0,
+      Math.min(
+        (unit.paced ?? 0) - (unit.before ?? 0),
+        (unit.before ?? 0) - (unit.earlier ?? 0),
+      ),
+    );
   const pacing = whole.filter((unit) => unit.paced != null && unit.total > 0);
   const surged = sum(pacing.map((unit) => unit.total - (unit.paced ?? 0)));
   const sustained =
     isTail && surged > 0
       ? Math.min(
           1,
-          sum(
-            pacing.map((unit) =>
-              Math.max(0, (unit.paced ?? 0) - (unit.before ?? 0)),
-            ),
-          ) /
-            surged /
-            MODEL.late.lull,
+          sum(pacing.map((unit) => priorPace(unit))) / surged / MODEL.late.lull,
         )
       : 1;
   const floored = whole.filter((unit) => unit.floor > 0);
@@ -1687,10 +1696,7 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
         if (isLate && unit.paced != null && unit.total > 0) {
           const free = finals[index];
           const growth = unit.total - unit.paced;
-          const steady = Math.min(
-            growth,
-            Math.max(0, unit.paced - (unit.before ?? 0)),
-          );
+          const steady = Math.min(growth, priorPace(unit));
           finals[index] = Math.min(
             finals[index],
             Math.max(
