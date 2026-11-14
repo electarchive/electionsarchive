@@ -283,6 +283,12 @@
       "url": "https://le.utah.gov/xcode/ArticleVIII/Article_VIII,_Section_9.html",
       "kind": "official_body"
     },
+    "const-in": {
+      "publisher": "Indiana Judicial Branch",
+      "title": "Indiana's Judicial Retention System (Ind. Const. art. 7, § 11)",
+      "url": "https://www.in.gov/courts/about/retention/",
+      "kind": "official_body"
+    },
     "const-tn": {
       "publisher": "Tennessee Secretary of State",
       "title": "Constitution of the State of Tennessee, article VI (Tennessee Blue Book, founding documents)",
@@ -753,6 +759,7 @@
         "MI": {"source": "const-mi", "locator": "Mich. Const. art. VI, § 2: seven justices are elected at nonpartisan elections to eight-year terms"},
         "WV": {"source": "const-wv", "locator": "W. Va. Const. art. VIII, § 2: justices are elected by the voters of the state for twelve-year terms"},
         "TN": {"source": "const-tn", "locator": "Tenn. Const. art. VI, § 3: appellate judges are appointed by the governor, confirmed by the Legislature, and then face retention elections for eight-year terms"},
+        "IN": {"source": "const-in", "locator": "Ind. Const. art. 7, § 11, as described by the Indiana Judicial Branch: the governor appoints from Judicial Nominating Commission nominees, and justices face retention votes at the first general election after two full years, then every 10 years"},
         "AL": {"source": "const-al", "locator": "Ala. Const. art. VI, §§ 152 and 154: judges are elected by the voters of their courts' territories and serve six-year terms"},
         "UT": {"source": "const-ut", "locator": "Utah Const. art. VIII, §§ 8 and 9: justices are appointed from nominating commission lists and face unopposed retention votes at the first general election more than three years after appointment, then every tenth year"},
         "AK": {"source": "const-ak", "locator": "Alaska Const. art. IV, §§ 5 and 6: justices are appointed from judicial council nominations and face approval votes after three years, then every tenth year"},
