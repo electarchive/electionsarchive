@@ -1,3 +1,4 @@
+import base64
 import io
 import re
 import subprocess
@@ -6,9 +7,11 @@ from pathlib import Path
 from uuid import UUID
 
 import polars as pl
+from anthropic.types import ImageBlockParam, TextBlockParam
+from anthropic.types.message_create_params import MessageCreateParamsNonStreaming
 from PIL import Image
 
-from ea import raw
+from ea import batch, raw
 from ea.changeset import Changeset, slug
 from ea.sources.us import house_books
 from ea.store import DATA, Connection, connect
@@ -32,6 +35,96 @@ SCANS = {
     date(2007, 11, 6): "https://web.archive.org/web/20080306045210id_/http://www.sos.state.ms.us/elections/2007/"
     "Electoral%20Results/Electoral%20Vote%20Report.pdf",
 }
+COUNTY_SCANS = {
+    date(2007, 11, 6): [
+        "Adams",
+        "Alcorn",
+        "Amite",
+        "Attala",
+        "Benton",
+        "Bolivar",
+        "Calhoun",
+        "Carroll",
+        "Chickasaw",
+        "Choctaw",
+        "Claiborne",
+        "Clarke",
+        "Clay",
+        "Coahoma",
+        "Copiah",
+        "Covington",
+        "Desoto",
+        "Forrest",
+        "Franklin",
+        "George",
+        "Greene",
+        "Grenada",
+        "Hancock",
+        "Harrison",
+        "Hinds",
+        "Holmes",
+        "Humphreys",
+        "Issaquena",
+        "Itawamba",
+        "Jackson",
+        "Jasper",
+        "Jefferson Davis",
+        "Jefferson",
+        "Jones",
+        "Kemper",
+        "Lafayette",
+        "Lamar",
+        "Lauderdale",
+        "Lawrence",
+        "Leake",
+        "Lee",
+        "Leflore",
+        "Lincoln",
+        "Lowndes",
+        "Madison",
+        "Marion",
+        "Marshall",
+        "Monroe",
+        "Montgomery",
+        "Neshoba",
+        "Newton",
+        "Noxubee",
+        "Oktibbeha",
+        "Panola",
+        "Pearl River",
+        "Perry",
+        "Pike",
+        "Pontotoc",
+        "Prentiss",
+        "Quitman",
+        "Rankin",
+        "Scott",
+        "Sharkey",
+        "Simpson",
+        "Smith",
+        "Stone",
+        "Sunflower",
+        "Tallahatchie",
+        "Tate",
+        "Tippah",
+        "Tishomingo",
+        "Tunica",
+        "Union",
+        "Walthall",
+        "Warren",
+        "Washington",
+        "Wayne",
+        "Webster",
+        "Wilkinson",
+        "Winston",
+        "Yalobusha",
+        "Yazoo",
+    ],
+}
+COUNTY_SCAN = (
+    "https://web.archive.org/web/20080306044000id_/http://www.sos.state.ms.us/elections/{year}/General%20Election/General/"
+    "{county}.pdf"
+)
 PAGES = DATA / "pages" / SOURCE
 REPORT_TITLE = "Electoral Vote Assignment"
 DISTRICTS = "us.ms_house_district"
@@ -70,6 +163,53 @@ BALLOT = {
     "Commissioner of Insurance": [("Gary Anderson", "Democrat"), ("Mike Chaney", "Republican")],
 }
 
+MODEL = "claude-haiku-5-5"
+PROMPT = "1"
+LONGEST = 1568
+READ_SYSTEM = (
+    "You read one scanned page of a Mississippi county's official returns of the general election of November 6, "
+    "2007, as filed with the Secretary of State. Layouts vary by county: offices may be column groups with precincts "
+    "as rows, or rows with precincts as columns, and one office's precincts may run over several pages. The statewide "
+    "offices are Governor, Lieutenant Governor, Secretary of State, Attorney General, State Auditor, State Treasurer, "
+    "Commissioner of Agriculture and Commerce, and Commissioner of Insurance. For each of these offices whose "
+    "county-wide grand total is printed on this page, copy that total for each named candidate exactly as printed. "
+    "The county-wide grand total covers every precinct in the county: the last Total line (or Total column) after "
+    "the final precinct, sometimes labeled 'Total', 'Grand Total', 'County Total', or 'Jurisdiction Wide'. Do not "
+    "report a subtotal of one precinct, of a group of precincts (such as 'Separated Precincts' or 'Non-Separated "
+    "Precincts'), or of one voting method (polling, absentee, affidavit). Leave out write-ins, total votes, "
+    "over and under votes, and turnout. Give the candidate as printed (for example 'Barbour, Haley (Rep)'). Copy the "
+    "label of the total line or column. If no statewide office's county-wide grand total is on this page, return an "
+    "empty list."
+)
+READ_SCHEMA: dict[str, object] = {
+    "type": "object",
+    "properties": {
+        "totals": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "office": {"type": "string", "enum": list(BALLOT)},
+                    "label": {"type": "string"},
+                    "candidates": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {"candidate": {"type": "string"}, "votes": {"type": "integer"}},
+                            "required": ["candidate", "votes"],
+                            "additionalProperties": False,
+                        },
+                    },
+                },
+                "required": ["office", "label", "candidates"],
+                "additionalProperties": False,
+            },
+        },
+    },
+    "required": ["totals"],
+    "additionalProperties": False,
+}
+
 
 CORRECTED = {
     (date(2007, 11, 6), "Lieutenant Governor", 75, "franks"): 2226,
@@ -86,9 +226,95 @@ SURNAMES = {office: {surname(name): name for name, _ in names} for office, names
 CANDIDATE = re.compile(r"^(\S.*?)\s{2,}([A-Z][a-z]+)\s+(\d[\d\s]*)$")
 
 
+def county_scans() -> dict[tuple[date, str], str]:
+    return {
+        (day, county): COUNTY_SCAN.format(year=day.year, county=county.replace(" ", "%20"))
+        for day, counties in COUNTY_SCANS.items()
+        for county in counties
+    }
+
+
+def county_page(link: str, number: int) -> Path:
+    scan = raw.cached(SOURCE, link)
+    image = PAGES / f"{scan.sha256}-{number}.png"
+    if not image.exists():
+        PAGES.mkdir(parents=True, exist_ok=True)
+        subprocess.run(
+            ["pdftoppm", "-r", "150", "-gray", "-png", "-f", str(number), "-l", str(number), "-singlefile"]
+            + [str(scan.path), str(image.with_suffix(""))],
+            check=True,
+        )
+        with Image.open(image) as rendered:
+            turns = {angle: rendered.rotate(angle, expand=True) for angle in (0, 90, 270)}
+        words = {angle: len(re.findall(r"[A-Za-z]{4,}", words_on(turned))) for angle, turned in turns.items()}
+        best = max(words, key=words.__getitem__)
+        if best and words[best] > 2 * words[0]:
+            turns[best].save(image)
+    return image
+
+
+def words_on(image: Image.Image) -> str:
+    buffer = io.BytesIO()
+    image.save(buffer, "PNG")
+    return subprocess.run(
+        ["tesseract", "stdin", "stdout", "--psm", "6"], input=buffer.getvalue(), capture_output=True, check=True
+    ).stdout.decode(errors="replace")
+
+
+def page_count(link: str) -> int:
+    info = subprocess.run(
+        ["pdfinfo", str(raw.cached(SOURCE, link).path)], capture_output=True, text=True, check=True
+    ).stdout
+    return int(re.findall(r"^Pages:\s+(\d+)", info, re.MULTILINE)[0])
+
+
+def read_key(day: date, county: str, number: int) -> str:
+    return f"anthropic-batch:{MODEL}/{PROMPT}/{day}/{county}/{number}"
+
+
+def read_counties() -> None:
+    price_in, price_out = batch.PRICES[MODEL]
+    wanted: dict[str, batch.Want] = {}
+    for (day, county), link in county_scans().items():
+        for number in range(1, page_count(link) + 1):
+            with Image.open(county_page(link, number)) as rendered:
+                tile = rendered.copy()
+            tile.thumbnail((LONGEST, LONGEST))
+            buffer = io.BytesIO()
+            tile.save(buffer, "PNG", optimize=True)
+            params = MessageCreateParamsNonStreaming(
+                model=MODEL,
+                max_tokens=3000,
+                system=READ_SYSTEM,
+                messages=[
+                    {
+                        "role": "user",
+                        "content": [
+                            ImageBlockParam(
+                                type="image",
+                                source={
+                                    "type": "base64",
+                                    "media_type": "image/png",
+                                    "data": base64.b64encode(buffer.getvalue()).decode(),
+                                },
+                            ),
+                            TextBlockParam(type="text", text=f"{county} County. Read the county-wide totals."),
+                        ],
+                    }
+                ],
+                output_config={"effort": "low", "format": {"type": "json_schema", "schema": READ_SCHEMA}},
+            )
+            wanted[read_key(day, county, number)] = (
+                params,
+                (tile.width * tile.height / 750 * price_in + 1000 * price_out) / 1e6,
+            )
+    print(batch.ensure(SOURCE, "county-totals-2007", wanted)[1])
+
+
 def fetch() -> None:
-    for link in [*FILES.values(), *REPORTS.values(), *SCANS.values(), SAMPLE_BALLOT]:
+    for link in [*FILES.values(), *REPORTS.values(), *SCANS.values(), SAMPLE_BALLOT, *county_scans().values()]:
         raw.fetch(SOURCE, link, suffix=".pdf")
+    read_counties()
 
 
 def pdf_text(link: str) -> str:
