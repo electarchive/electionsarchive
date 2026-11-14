@@ -25,7 +25,7 @@ import { pollsClose } from "#lib/live/closes.js";
 import { Rule, rule } from "#lib/measure.js";
 import { m } from "#lib/paraglide/messages.js";
 import { era, independent, side as sideOf, UNAFFILIATED } from "#lib/party.js";
-import { dataVersion, os, remember } from "#lib/server/cache.js";
+import { dataVersion, os, remember, versionOf } from "#lib/server/cache.js";
 import { counting } from "#lib/server/counting.js";
 import { db } from "#lib/server/db/index.js";
 import { logos, withLogos } from "#lib/server/logos.js";
@@ -20721,8 +20721,8 @@ export const elections = {
             );
             return chunks.flat();
           },
-          true,
-          undefined,
+          false,
+          versionOf("elections.winners"),
           true,
         );
         const segments = new Map(
