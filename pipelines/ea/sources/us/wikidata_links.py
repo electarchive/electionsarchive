@@ -165,6 +165,7 @@ STATEMENTS = (
 with recursive t(id) as (
     select id from polity where iso_code = 'US'
     union select pp.polity_id from polity_parent pp join t on pp.parent_id = t.id
+    join polity ch on ch.id = pp.polity_id where ch.kind::text <> 'tribal_nation'
 )
 select distinct id from t""",
     """create temp table pstate as
