@@ -1215,8 +1215,14 @@ def national(description: str | None) -> str | None:
     return next((label for pattern, label in DESCRIPTIONS if re.search(pattern, text)), None)
 
 
+TEXT_REPAIRS = {"ártainn MAC A' BHÀILLIDH": "Mártainn MAC A' BHÀILLIDH"}
+
+
 def pdf_text(path: Path) -> str:
-    return subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True).stdout
+    text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True).stdout
+    for broken, whole in TEXT_REPAIRS.items():
+        text = re.sub(rf"(?<!\S){re.escape(broken)}", whole, text)
+    return text
 
 
 def declares(text: str, label: str, votes: Decimal) -> bool:
