@@ -69,7 +69,7 @@ const ORDER =
 const STAGES = sql.raw(ORDER);
 
 const licensed = (set: string) =>
-  `(${set}.source_id = any(array(select icpsr.id from source icpsr where icpsr.license ilike '%ICPSR%'))) is not true`;
+  `(${set}.source_id = any(array(select icpsr.id from source icpsr where icpsr.license ilike '%ICPSR%' or icpsr.license ilike 'Withdrawn:%'))) is not true`;
 
 export const served = (set: string) => sql.raw(licensed(set));
 

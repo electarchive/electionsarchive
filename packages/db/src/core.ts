@@ -3364,6 +3364,7 @@ export const source = pgTable("source", {
 	}).onDelete("cascade"),
 	index("source_changeset_id_idx").using("btree", table.changesetId.asc().nullsLast()),
 	index("source_icpsr_idx").using("btree", table.id.asc().nullsLast()).where(sql`(license ~~* '%ICPSR%'::text)`),
+	index("source_withheld_idx").using("btree", table.id.asc().nullsLast()).where(sql`((license ~~* '%ICPSR%'::text) OR (license ~~* 'Withdrawn:%'::text))`),
 ]);
 
 export const sourceArtifact = pgTable("source_artifact", {
