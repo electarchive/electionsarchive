@@ -217,6 +217,7 @@ const MODEL = {
     lull: 0.5,
     stir: 0.01,
     spill: 0.3,
+    cap: 2,
     scatter: 1.2,
     brisk: 0.25,
     hush: 0.02,
@@ -2291,7 +2292,10 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
       TAILS[race.state] != null &&
       latest - onNight < tail * onNight
     ) {
-      const scale = Math.min(1, (carrying * Math.max(1, latest)) / spent);
+      const scale = Math.min(
+        1,
+        (MODEL.late.cap * carrying * Math.max(1, latest)) / spent,
+      );
       for (const [index, unit] of whole.entries()) {
         if (!unit.hasBaseline || reports.has(unit.id)) {
           continue;
