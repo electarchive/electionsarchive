@@ -24,28 +24,28 @@
       "id": "11-0",
       "columns": [
         {
-          "label": "Ed C. Johnson\u2014D",
+          "label": "Ed C. Johnson—D",
           "contest": "governor",
           "candidate": "Edwin C. Johnson"
         },
         {
-          "label": "Nate C. Warren\u2014R",
+          "label": "Nate C. Warren—R",
           "contest": "governor",
           "candidate": "Nate C. Warren"
         },
         {
-          "label": "P. C. Frost\u2014Com",
+          "label": "P. C. Frost—Com",
           "contest": "governor",
           "candidate": "P. C. Frost",
           "party": "Com"
         },
         {
-          "label": "Paul W. Hipp\u2014Pro",
+          "label": "Paul W. Hipp—Pro",
           "contest": "governor",
           "candidate": "Paul W. Hipp"
         },
         {
-          "label": "Paul S. McCormick\u2014Soc",
+          "label": "Paul S. McCormick—Soc",
           "contest": "governor",
           "candidate": "Paul S. McCormick"
         }
@@ -64,9 +64,10 @@
         0.223
       ],
       "stub": [
-        0.017,
-        0.052
-      ]
+        0.024,
+        0.066
+      ],
+      "dpi": 450
     }
   ],
   "empty": true

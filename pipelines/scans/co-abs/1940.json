@@ -48,28 +48,28 @@
       "id": "20-0",
       "columns": [
         {
-          "label": "Lawrence Lewis \u2014D",
+          "label": "Lawrence Lewis —D",
           "contest": "house1",
           "candidate": "Lawrence Lewis"
         },
         {
-          "label": "James D. Parriott \u2014R",
+          "label": "James D. Parriott —R",
           "contest": "house1",
           "candidate": "James D. Parriott"
         },
         {
-          "label": "George T. Evans \u2014R",
+          "label": "George T. Evans —R",
           "contest": "house1",
           "candidate": "George T. Evans",
           "party": "R"
         },
         {
-          "label": "James Allander \u2014Com.",
+          "label": "James Allander —Com.",
           "contest": "house1",
           "candidate": "James Allander"
         },
         {
-          "label": "Ward Rogers \u2014Soc.",
+          "label": "Ward Rogers —Soc.",
           "contest": "house1",
           "candidate": "Ward Rogers"
         }
@@ -88,28 +88,28 @@
       "id": "20-1",
       "columns": [
         {
-          "label": "Fred Cummings \u2014D",
+          "label": "Fred Cummings —D",
           "contest": "house2",
           "candidate": "Fred Cummings"
         },
         {
-          "label": "William S. Hill \u2014R",
+          "label": "William S. Hill —R",
           "contest": "house2",
           "candidate": "William S. Hill"
         },
         {
-          "label": "William R. Kelly \u2014R",
+          "label": "William R. Kelly —R",
           "contest": "house2",
           "candidate": "William R. Kelly",
           "party": "R"
         },
         {
-          "label": "Robert F. Billings \u2014Peace",
+          "label": "Robert F. Billings —Peace",
           "contest": "house2",
           "candidate": "Robert F. Billings"
         },
         {
-          "label": "Henry Neumann \u2014Soc.",
+          "label": "Henry Neumann —Soc.",
           "contest": "house2",
           "candidate": "Henry Neumann"
         }
@@ -128,12 +128,12 @@
       "id": "20-2",
       "columns": [
         {
-          "label": "J. Edgar Chenoweth \u2014R",
+          "label": "J. Edgar Chenoweth —R",
           "contest": "house3",
           "candidate": "J. Edgar Chenoweth"
         },
         {
-          "label": "Byron G. Rogers \u2014D",
+          "label": "Byron G. Rogers —D",
           "contest": "house3",
           "candidate": "Byron G. Rogers"
         }
@@ -152,12 +152,22 @@
       "id": "21-1",
       "columns": [
         {
-          "label": "Paul W. Crawford \u2014R",
+          "label": "Paul W. Crawford —R P.E.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Paul W. Crawford —R G.E.",
           "contest": "house4",
           "candidate": "Paul W. Crawford"
         },
         {
-          "label": "Edward T. Taylor \u2014D",
+          "label": "Edward T. Taylor —D P.E.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Edward T. Taylor —D G.E.",
           "contest": "house4",
           "candidate": "Edward T. Taylor"
         }

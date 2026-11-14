@@ -64,22 +64,22 @@
       "id": "13-0",
       "columns": [
         {
-          "label": "Alva B. Adams\u2014Dem.",
+          "label": "Alva B. Adams—Dem.",
           "contest": "senate",
           "candidate": "Alva B. Adams"
         },
         {
-          "label": "Archibald A. Lee\u2014Rep.",
+          "label": "Archibald A. Lee—Rep.",
           "contest": "senate",
           "candidate": "Archibald A. Lee"
         },
         {
-          "label": "James Allander\u2014Ind. Prog.",
+          "label": "James Allander—Ind. Prog.",
           "contest": "senate",
           "candidate": "James Allander"
         },
         {
-          "label": "Carle Whitehead\u2014Soc.",
+          "label": "Carle Whitehead—Soc.",
           "contest": "senate",
           "candidate": "Carle Whitehead"
         }
@@ -96,29 +96,30 @@
       "header": [
         0.0,
         0.2797
-      ]
+      ],
+      "dpi": 450
     },
     {
       "page": 13,
       "id": "13-1",
       "columns": [
         {
-          "label": "Peter Ammons\u2014Dem.",
+          "label": "Peter Ammons—Dem.",
           "contest": "governor",
           "candidate": "Teller Ammons"
         },
         {
-          "label": "Ralph L. Carr\u2014Rep.",
+          "label": "Ralph L. Carr—Rep.",
           "contest": "governor",
           "candidate": "Ralph L. Carr"
         },
         {
-          "label": "Harvey I. Mayfield\u2014Royal Way",
+          "label": "Harvey I. Mayfield—Royal Way",
           "contest": "governor",
           "candidate": "Harvey L. Mayfield"
         },
         {
-          "label": "Jack R. White\u2014Nat'l Union",
+          "label": "Jack R. White—Nat'l Union",
           "contest": "governor",
           "candidate": "Jack R. White"
         }
@@ -135,6 +136,10 @@
       "header": [
         0.0,
         0.2797
+      ],
+      "stub": [
+        0.01,
+        0.055
       ]
     },
     {
@@ -142,22 +147,22 @@
       "id": "16-0",
       "columns": [
         {
-          "label": "Lawrence Lewis \u2014D",
+          "label": "Lawrence Lewis —D",
           "contest": "house1",
           "candidate": "Lawrence Lewis"
         },
         {
-          "label": "William I. Reilly \u2014R",
+          "label": "William I. Reilly —R",
           "contest": "house1",
           "candidate": "William I. Reilly"
         },
         {
-          "label": "Oliver L. Barnes \u2014Pro.",
+          "label": "Oliver L. Barnes —Pro.",
           "contest": "house1",
           "candidate": "Oliver L. Barnes"
         },
         {
-          "label": "Edgar P. Sherman \u2014Soc.",
+          "label": "Edgar P. Sherman —Soc.",
           "contest": "house1",
           "candidate": "Edgar P. Sherman"
         }
@@ -176,23 +181,23 @@
       "id": "16-1",
       "columns": [
         {
-          "label": "Fred Cummings \u2014D",
+          "label": "Fred Cummings —D",
           "contest": "house2",
           "candidate": "Fred Cummings"
         },
         {
-          "label": "William S. Hill \u2014R",
+          "label": "William S. Hill —R",
           "contest": "house2",
           "candidate": "William S. Hill"
         },
         {
-          "label": "George H. Bradfield \u2014R",
+          "label": "George H. Bradfield —R",
           "contest": "house2",
           "candidate": "George H. Bradfield",
           "party": "R"
         },
         {
-          "label": "Charles R. Axelson \u2014Soc.",
+          "label": "Charles R. Axelson —Soc.",
           "contest": "house2",
           "candidate": "Charles R. Axelson"
         }
@@ -211,12 +216,22 @@
       "id": "16-2",
       "columns": [
         {
-          "label": "Henry Leonard \u2014R",
+          "label": "Henry Leonard —R P.E.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Henry Leonard —R G.E.",
           "contest": "house3",
           "candidate": "Henry Leonard"
         },
         {
-          "label": "John A. Martin \u2014D",
+          "label": "John A. Martin —D P.E.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John A. Martin —D G.E.",
           "contest": "house3",
           "candidate": "John A. Martin"
         }
@@ -235,12 +250,12 @@
       "id": "17-0",
       "columns": [
         {
-          "label": "Edward T. Taylor \u2014D",
+          "label": "Edward T. Taylor —D",
           "contest": "house4",
           "candidate": "Edward T. Taylor"
         },
         {
-          "label": "John S. Woody \u2014R",
+          "label": "John S. Woody —R",
           "contest": "house4",
           "candidate": "John S. Woody"
         }
