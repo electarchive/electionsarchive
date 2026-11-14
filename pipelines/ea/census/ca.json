@@ -662,6 +662,21 @@
       ]
     },
     {
+      "key": "montreal_borough",
+      "name": "Montréal boroughs",
+      "parent": "submunicipal",
+      "polity_kind": "submunicipal",
+      "source": "mtl-results",
+      "counts": [
+        {
+          "date": "2006-01-01",
+          "value": 19,
+          "source": "mtl-charter",
+          "within": "CA-QC"
+        }
+      ]
+    },
+    {
       "key": "rural_district",
       "name": "Rural districts",
       "parent": "province",
@@ -6222,7 +6237,7 @@
     },
     {
       "key": "qc_borough",
-      "tier": "submunicipal",
+      "tier": "montreal_borough",
       "name": "Quebec borough mayors and borough councils",
       "category": "council",
       "goal": "local",
@@ -6230,7 +6245,7 @@
         "unit": "polity"
       },
       "contests_per_unit": 2,
-      "note": "Montréal's 19 boroughs elect borough mayors and borough councillors on the municipal ballot. The other seven boroughed municipalities (Québec, Sherbrooke, Lévis, Longueuil, Saguenay, Grenville-sur-la-Rouge, and Métis-sur-Mer) seat city councillors on their borough councils, so those 22 boroughs hold no separate borough election; only Montréal's class is confirmed to be held.",
+      "note": "Montréal's 19 boroughs elect borough mayors and borough councillors on the municipal ballot. The other seven boroughed municipalities (Québec, Sherbrooke, Lévis, Longueuil, Saguenay, Grenville-sur-la-Rouge, and Métis-sur-Mer) seat city councillors on their borough councils, so those 22 boroughs hold no separate borough election; only Montréal's class is confirmed to be held. The unit count is Montréal's 19 boroughs (tier montreal_borough), while the matches and the cadence stay within CA-QC because Montréal is not yet a separate polity from the four Montréal polities the archive holds; merging them belongs with the first borough contest load.",
       "source": "mtl-results",
       "match": [
         {
