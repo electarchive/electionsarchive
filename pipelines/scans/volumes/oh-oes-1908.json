@@ -1,0 +1,28 @@
+{
+  "year": 1908,
+  "day": "1908-11-03",
+  "polity": "US-OH",
+  "publisher": "Ohio Secretary of State",
+  "title": "Ohio Election Statistics for 1908, general election 1908-11-03",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/ohioelectionsta01statgoog/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/ohioelectionsta01statgoog"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "president": "Presidential electors by county with pluralities, printed sideways, the table continues over several leaves",
+    "governor": "Governor by county with pluralities, printed sideways, following the president table"
+  },
+  "leaves": [
+    418,
+    419,
+    420,
+    421,
+    422,
+    423,
+    424,
+    425
+  ],
+  "autorotate": true
+}
