@@ -2,10 +2,12 @@ import base64
 import csv
 import html
 import io
+import json
 import re
 import struct
 import subprocess
 from pathlib import Path
+from typing import Any
 from uuid import UUID
 
 import httpx
@@ -432,46 +434,118 @@ def _sumut_correction(rows: list[dict[str, object]]) -> None:
             raise ValueError(f"North Sumatra candidate {number}: decree 1315 differs from the workbook")
 
 
+def _read_page(key: str) -> dict[str, Any]:
+    message = json.loads(raw.cached(SOURCE, key).path.read_text())
+    return json.loads(next(block["text"] for block in message["content"] if block["type"] == "text"))
+
+
+def _figure(text: str) -> int | None:
+    text = text.replace(".", "").replace(" ", "")
+    return int(text) if text.isdigit() else None
+
+
+def _scanned(province: str) -> tuple[str, list[dict[str, object]], dict[int, str]]:
+    pages = sorted(key for key in raw.keys(SOURCE) if key.startswith(f"{province}/p-"))
+    values: dict[tuple[str, str, int | None], int] = {}
+    names: dict[int, str] = {}
+    section = ""
+    errors: list[str] = []
+    for key in pages:
+        page = _read_page(key)
+        columns = [str(column) for column in page["columns"]]
+        label = ""
+        for row in page["rows"]:
+            label = str(row["label"]).strip() or label
+            cells = row["cells"]
+            if not any(str(cell).strip() for cell in cells):
+                if "DATA PEMILIH" in label:
+                    section = "registered"
+                elif "PENGGUNA HAK PILIH" in label:
+                    section = "voters"
+                continue
+            if len(cells) != len(columns):
+                errors.append(f"{key} row {row['number']}: {len(cells)} cells for {len(columns)} columns")
+                continue
+            number = _number(str(row["number"]).rstrip("."))
+            text = re.sub(r"^[abc]\.\s*", "", label.lower())
+            sex = str(row["sex"]).strip()
+            if number is not None and not text.startswith("jumlah") and sex == "":
+                names[number] = re.sub(r"\s+", " ", str(row["label"])).strip()
+                measure: tuple[str, int | None] | None = ("votes", number)
+            elif text.startswith("jumlah pemilih (a.1+a.2+a.3)") and sex == "JML":
+                measure = (section, None)
+            elif text.startswith("jumlah seluruh suara sah dan"):
+                measure = ("ballots", None)
+            elif text.startswith("jumlah seluruh suara sah"):
+                measure = ("valid", None)
+            elif text.startswith("jumlah suara tidak sah"):
+                measure = ("invalid", None)
+            else:
+                continue
+            for column, cell in zip(columns, cells, strict=True):
+                if column == "JUMLAH PINDAHAN":
+                    continue
+                value = _figure(cell)
+                if value is None:
+                    errors.append(f"{key} {measure} {column}: {cell!r}")
+                    continue
+                if (column, *measure) in values:
+                    errors.append(f"{key} {measure} {column}: read twice")
+                values[(column, *measure)] = value
+    if errors:
+        raise ValueError(f"{province}: " + "; ".join(errors[:12]))
+    return province, _checked(province, values, names), names
+
+
 def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
     regencies = _regencies()
     elected = _elected_2019()
     results: list[dict[str, object]] = []
     candidates: list[dict[str, object]] = []
+    certificates = []
     for dataset in CERTIFICATES:
         for _, url in files(dataset):
             province, rows, names = _certificate(raw.cached(SOURCE, url).path)
             if province == "SUMATERA UTARA":
                 _sumut_correction(rows)
-            code = PROVINCES[province]
-            totals = {
-                int(str(row["candidate"])): int(str(row["value"]))
-                for row in rows
-                if row["unit"] == FINAL and row["measure"] == "votes"
+            certificates.append((url, province, rows, names))
+    for province, url in SCANS.items():
+        certificates.append((url, *_scanned(province)))
+    created_later = {"PAPUA BARAT DAYA", "PAPUA PEGUNUNGAN", "PAPUA SELATAN", "PAPUA TENGAH"}
+    missing = set(PROVINCES) - created_later - {province for _, province, _, _ in certificates}
+    if missing:
+        raise ValueError(f"2019: no certificate for {sorted(missing)}")
+    for url, province, rows, names in certificates:
+        code = PROVINCES[province]
+        totals = {
+            int(str(row["candidate"])): int(str(row["value"]))
+            for row in rows
+            if row["unit"] == FINAL and row["measure"] == "votes"
+        }
+        top = sorted(totals, key=lambda number: -totals[number])
+        if [totals[number] for number in top[:4]] != elected[province] or totals[top[3]] == totals[top[4]]:
+            raise ValueError(f"2019 {province}: decree 1319 names {elected[province]}, the certificate {top[:5]}")
+        for row in rows:
+            if row["unit"] == FINAL:
+                continue
+            label = str(row["unit"])
+            key = ("KOTA" + _squash(label[5:])) if label.startswith("KOTA ") else _squash(label)
+            regency = ALIASES.get(label) or regencies.get((code, key))
+            if regency is None or regency[:2] != code:
+                raise ValueError(f"2019 {province}: no regency for {label}")
+            results.append({**row, "unit": regency, "url": url, "page": None, "box": None})
+        candidates += [
+            {
+                "year": 2019,
+                "province": province,
+                "number": number,
+                "name": name,
+                "votes": totals[number],
+                "elected": number in top[:4],
             }
-            top = sorted(totals, key=lambda number: -totals[number])
-            if [totals[number] for number in top[:4]] != elected[province] or totals[top[3]] == totals[top[4]]:
-                raise ValueError(f"2019 {province}: decree 1319 names {elected[province]}, the certificate {top[:5]}")
-            for row in rows:
-                if row["unit"] == FINAL:
-                    continue
-                label = str(row["unit"])
-                key = ("KOTA" + _squash(label[5:])) if label.startswith("KOTA ") else _squash(label)
-                regency = ALIASES.get(label) or regencies.get((code, key))
-                if regency is None or regency[:2] != code:
-                    raise ValueError(f"2019 {province}: no regency for {label}")
-                results.append({**row, "unit": regency, "url": url, "page": None, "box": None})
-            candidates += [
-                {
-                    "year": 2019,
-                    "province": province,
-                    "number": number,
-                    "name": name,
-                    "votes": totals[number],
-                    "elected": number in top[:4],
-                }
-                for number, name in sorted(names.items())
-            ]
+            for number, name in sorted(names.items())
+        ]
     url = DECREES["1207"][0]
     for province, found in _ranked(url).items():
         listed = found["candidates"]
@@ -547,7 +621,8 @@ NOTES = {
         "regency's candidate votes sum to its valid votes, its valid and invalid votes sum to its ballots, and every "
         "row sums to the certificate's provincial total. The four candidates with the most votes match the elected "
         "members and their votes in KPU decree 1319/2019. North Sumatra's workbook equals the corrected certificate in "
-        "lampiran III.2 of KPU decree 1315/2019 in every regency."
+        "lampiran III.2 of KPU decree 1315/2019 in every regency. Yogyakarta and East Java have no workbook; their scanned "
+        "certificates (lampiran III of KPU decree 987/2019) were read by a vision model and pass the same sums."
     ),
     2024: (
         "Candidate votes and valid votes by province, from the ranking of candidates in KPU decree 1207/2024, which "
