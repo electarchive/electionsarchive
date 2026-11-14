@@ -105,6 +105,12 @@ COUNCILS = {
         "https://www.caerffili.gov.uk/CaerphillyDocs/Elections/voting-2022/notice-of-uncontested-elections-communities-only.aspx",
         "caerphilly",
     ),
+    "W06000009": (
+        "Pembrokeshire County Council",
+        "Declaration of result of poll: Election of Community Councillors, 5 May 2022",
+        "https://cms.pembrokeshire.gov.uk/objview.asp?object_id=10926&language=",
+        "pembrokeshire",
+    ),
 }
 VALE = (
     "https://www.valeofglamorgan.gov.uk/Documents/Our%20Council/Council/Elections/Election%20Documents/Nominees/"
@@ -1229,7 +1235,83 @@ def bridgend(url: str) -> list[dict]:
     return reads
 
 
+def pembrokeshire(url: str) -> list[dict]:
+    reads = []
+    for chunk in re.split(r"(?m)^(?=\f?\s*ELECTION OF \d+ COMMUNITY COUNCILLORS)", text_of(url))[1:]:
+        lines = chunk.replace("\f", "").splitlines()
+        places = int(found(r"ELECTION OF (\d+) COMMUNITY", lines[0]).group(1))
+        title = " ".join(lines[2].split())
+        council, _, ward = title.partition(" - ")
+        ward = re.sub(r" WARD$", "", ward) if ward else None
+        head = next(i for i, line in enumerate(lines) if "Number of votes recorded" in line)
+        column = lines[head].index("Number of votes recorded") - 2
+        start = next(i for i, line in enumerate(lines) if "Nifer y Pleidleisiau a Fwriwyd" in line) + 1
+        end = next(i for i, line in enumerate(lines) if "The number of ballot papers rejected" in line)
+        names: list[tuple[int, str]] = []
+        votes: list[int] = []
+        marks: list[int] = []
+        details: dict[int, list[str]] = {}
+        for number in range(start, end):
+            left, right = lines[number][:column].strip(), lines[number][column:].strip()
+            if re.fullmatch(r"\d+", right):
+                votes.append(number)
+            if "ELECTED" in right.split():
+                marks.append(number)
+            if re.match(r"Comm\w+ know", left):
+                continue
+            if re.match(r"^[^\W\d_][\w'’ -]*, \S", left):
+                names.append((number, left))
+                details[number] = []
+            elif names and re.search(
+                r"Independ|Annibynn|Party|Labour|Llafur|Conserv|Plaid|Democrat|Reform|Gwlad|Green", left
+            ):
+                details[names[-1][0]].append(left)
+        if len(names) != len(votes):
+            raise ValueError(f"Pembrokeshire {title}: {len(names)} names, {len(votes)} vote counts")
+        elected = [False] * len(votes)
+        for mark in marks:
+            elected[max(k for k, line in enumerate(votes) if line <= mark)] = True
+        after = "\n".join(lines[end:])
+        roll = after.split("are duly elected")[0].split("And I do hereby")[1].split("\n")
+        roll = [" ".join(line.split()) for line in roll[1:] if line.strip()]
+        for k, (_, printed) in enumerate(names):
+            if printed in roll:
+                elected[k] = True
+        counts = [int(lines[number][column:].strip()) for number in votes]
+        candidates = [
+            {
+                "printed": printed,
+                "name": forenames_first(printed),
+                "description": canonical(" ".join(details[number])),
+                "votes": count,
+                "elected": mark,
+            }
+            for (number, printed), count, mark in zip(names, counts, elected, strict=True)
+        ]
+        if len(roll) != sum(elected) or sum(elected) > places:
+            raise ValueError(f"Pembrokeshire {title}: {sum(elected)} marked, {len(roll)} declared, {places} seats")
+        rejected = int(found(r"(\d+)\s*\n\s*TOTAL", after).group(1))
+        electorate = int(found(r"(\d+) Electorate", after).group(1))
+        turnout = re.search(r"Electorate / Etholaeth\s+([\d.]+)\s+% Turnout", after)
+        reads.append(
+            {
+                "council": caps(council),
+                "ward": caps(ward) if ward else None,
+                "places": places,
+                "turnout": None,
+                "electorate": electorate,
+                "rejected": rejected,
+                "context": f"Pembrokeshire County Council prints a turnout of {turnout.group(1)}%."
+                if turnout
+                else None,
+                "candidates": candidates,
+            }
+        )
+    return unwarded(reads, "W06000009")
+
+
 READERS = {
+    "pembrokeshire": pembrokeshire,
     "torfaen": lambda url: torfaen(text_of(url)) + torfaen_by_elections(text_of(url)),
     "carmarthenshire": lambda url: carmarthenshire(text_of(url)),
     "moderngov": moderngov,
