@@ -177,7 +177,18 @@ def due(today: date | None = None) -> list[dict]:
     today = today or date.today()
     with connect() as conn:
         found = conn.execute(
-            """select e.id, p.iso_code, e.polity_id, e.kind, e.date_from
+            """select e.id,
+                      coalesce(p.iso_code, (
+                        with recursive up as (
+                          select e.polity_id id, 0 depth
+                          union all
+                          select pp.parent_id, up.depth + 1 from up
+                            join polity_parent pp on pp.polity_id = up.id and pp.valid_to is null
+                          where up.depth < 8
+                        )
+                        select a.iso_code from up join polity a on a.id = up.id
+                        where a.iso_code is not null order by up.depth limit 1)),
+                      e.polity_id, e.kind, e.date_from
                from election e join polity p on p.id = e.polity_id
                join entity en on en.id = e.id and en.retired_by is null
                where e.status = 'scheduled' and e.date_from >= %s
