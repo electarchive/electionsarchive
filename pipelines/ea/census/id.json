@@ -587,6 +587,8 @@
       "source": "uu7-2017",
       "first_held": "1957-06-01",
       "note": "Open-list PR in provincial dapil (301 in 2024 across 38 provinces), held with the DPR since 1971; the first regional councils were elected in 1957-1958. Papua's appointed seats are not elected.",
+      "disposition": "blocked",
+      "disposition_reason": "No national canvass with candidate votes exists. KPU's open data portal holds only 2019 seats per party per provincial constituency; votes by candidate and party sit in the result decrees of the 38 provincial KPUs (about 301 constituencies in 2024), one site and format apiece, and none is gathered.",
       "match": [
         {
           "body_kinds": [
