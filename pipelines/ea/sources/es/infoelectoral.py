@@ -71,6 +71,7 @@ LAYOUTS: dict[str, tuple[tuple[str, int, int], ...]] = {
         ("blank", 190, 197),
         ("invalid", 198, 205),
         ("list_votes", 206, 213),
+        ("seats", 214, 216),
         ("official", 233, 233),
     ),
     "06": (
@@ -133,6 +134,36 @@ LAYOUTS: dict[str, tuple[tuple[str, int, int], ...]] = {
         ("list", 24, 29),
         ("votes", 30, 36),
     ),
+    "11": (
+        ("tier", 1, 2),
+        ("round", 9, 9),
+        ("community", 10, 11),
+        ("province", 12, 13),
+        ("municipality", 14, 16),
+        ("name", 17, 116),
+        ("population", 126, 128),
+        ("census", 134, 136),
+        ("blank", 149, 151),
+        ("invalid", 152, 154),
+        ("list_votes", 155, 157),
+        ("seats", 158, 159),
+        ("official", 160, 160),
+    ),
+    "12": (
+        ("tier", 1, 2),
+        ("round", 9, 9),
+        ("province", 10, 11),
+        ("municipality", 12, 14),
+        ("list", 15, 20),
+        ("list_votes", 21, 23),
+        ("seats", 24, 25),
+        ("given", 26, 50),
+        ("surname", 51, 75),
+        ("second_surname", 76, 100),
+        ("sex", 101, 101),
+        ("votes", 120, 122),
+        ("elected", 123, 123),
+    ),
 }
 COUNTS = {
     "seats",
@@ -159,7 +190,9 @@ def processes(kind: str) -> list[str]:
     return sorted({key.rsplit("/", 1)[1][2:8] for key in raw.keys(SOURCE) if key.startswith(f"{APLIEXTR}{kind}")})
 
 
-def records(kind: str, process: str, extent: str, number: str) -> list[dict[str, str | int]]:
+def records(
+    kind: str, process: str, extent: str, number: str, layout: tuple[tuple[str, int, int], ...] | None = None
+) -> list[dict[str, str | int]]:
     with zipfile.ZipFile(archive(kind, process, extent)) as bundle:
         name = f"{number}{kind}{process[2:]}.DAT"
         if name not in bundle.namelist():
@@ -171,7 +204,7 @@ def records(kind: str, process: str, extent: str, number: str) -> list[dict[str,
         if not line.strip():
             continue
         row: dict[str, str | int] = {}
-        for field, start, end in LAYOUTS[number]:
+        for field, start, end in layout or LAYOUTS[number]:
             value = line[start - 1 : end].strip()
             row[field] = int(value or 0) if field in COUNTS else value
         rows.append(row)
