@@ -540,6 +540,18 @@
       "url": "https://so.ch/verwaltung/volkswirtschaftsdepartement/amt-fuer-gemeinden/gemeindeorganisation/gemeindeorganisation-einfuehrung/",
       "kind": "official_body"
     },
+    "ju-com-guide-2023": {
+      "title": "Les bases de l'activité communale: guide pratique à l'intention des élues et des élus des communes jurassiennes (June 2023)",
+      "publisher": "République et Canton du Jura, Délégué aux affaires communales",
+      "url": "https://www.jura.ch/Htdocs/Files/v/80ed4f762dcf2759df1104cd3705587acd199eb46d189b5ef2a29fedb8657cd0.pdf/Departements/DFI/COM/Doc/Guide-pratique-elu-e-s-communes_Juin-2023.pdf?download=1",
+      "kind": "official_body"
+    },
+    "moutier-motion-1910": {
+      "title": "Motion du Centre relative à la réforme des institutions communales suite au transfert de Moutier dans le canton du Jura (N° 1910 - MO 779, 23 February 2026)",
+      "publisher": "Ville de Moutier, Conseil de Ville",
+      "url": "https://moutier.ch/app/uploads/cv/int/1910.pdf",
+      "kind": "official_body"
+    },
     "ar-gpk-2025": {
       "title": "Leitfaden für Geschäftsprüfungskommissionen der Gemeinden (Mai 2025)",
       "publisher": "Kanton Appenzell Ausserrhoden, Departement Inneres und Sicherheit",
@@ -2709,6 +2721,20 @@
           "value": 1,
           "source": "bs-riehen-go",
           "locator": "RiE 111.100 § 11 Abs. 1 lit. a (the voters elect the Einwohnerrat); the canton runs the city of Basel (KV BS § 57 Abs. 2) and Bettingen decides in a Gemeindeversammlung, so Riehen is the only commune with a parliament"
+        },
+        {
+          "within": "CH-JU",
+          "date": "2023-06-01",
+          "value": 5,
+          "source": "ju-com-guide-2023",
+          "locator": "6.1 Le conseil général: \"A ce jour, cinq communes jurassiennes ont institué un conseil général : Haute-Sorne, Val Terbi, Les Bois, Delémont et Porrentruy\" (the last two call it the conseil de ville)"
+        },
+        {
+          "within": "CH-JU",
+          "date": "2026-01-01",
+          "value": 6,
+          "source": "moutier-motion-1910",
+          "locator": "Moutier joined the canton of Jura on 1 January 2026 and keeps its Conseil de Ville: the motion of 23 February 2026 asks the Conseil municipal to report to the Conseil de Ville on reforming the communal institutions after the transfer, so the six are the five of the 2023 guide plus Moutier"
         },
         {
           "within": "CH-FR",
@@ -10003,7 +10029,7 @@
         ],
         "cycle": true
       },
-      "note": "Only some communes have an elected parliament (all communes in Geneva and Neuchâtel, communes above a size threshold in Vaud and Ticino, the cities elsewhere); the rest decide in a communal assembly. No federal register lists which communes have one. Terms follow the canton (KV ZH Art. 87: a commune may replace its assembly with a parliament). The archive counts the communes with a parliament in each canton from the cantonal lists, and expects their elections where the canton fixes one cycle for all of them: Lucerne, Fribourg, Solothurn, Appenzell Ausserrhoden, Vaud, Neuchâtel, and Geneva, and Riehen in Basel-Stadt. Ticino and Jura have no official list yet. The Federal Statistical Office publishes party seats in the parliaments of the statistical cities from 1983.",
+      "note": "Only some communes have an elected parliament (all communes in Geneva and Neuchâtel, communes above a size threshold in Vaud and Ticino, the cities elsewhere); the rest decide in a communal assembly. No federal register lists which communes have one. Terms follow the canton (KV ZH Art. 87: a commune may replace its assembly with a parliament). The archive counts the communes with a parliament in each canton from the cantonal lists, and expects their elections where the canton fixes one cycle for all of them: Lucerne, Fribourg, Solothurn, Appenzell Ausserrhoden, Jura, Vaud, Neuchâtel, and Geneva, and Riehen in Basel-Stadt. Jura has five (Haute-Sorne, Val Terbi, Les Bois, Delémont, and Porrentruy; Moutier from 2026). Ticino has no official list yet. The Federal Statistical Office publishes party seats in the parliaments of the statistical cities from 1983.",
       "source": "kv-zh",
       "match": [
         {
