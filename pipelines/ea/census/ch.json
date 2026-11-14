@@ -503,6 +503,85 @@
       "publisher": "Ville de Fribourg, Archives de la Ville",
       "url": "https://archives.ville-fribourg.ch/ville-de-fribourg-conseil-communal",
       "kind": "official_body"
+    },
+    "zh-gemeinden": {
+      "title": "Gemeinden: Arten von Gemeinden, Parlamentsgemeinden (the 13 cities with a Gemeindeparlament)",
+      "publisher": "Kanton Zürich, Gemeindeamt",
+      "url": "https://www.zh.ch/de/politik-staat/gemeinden.html",
+      "kind": "official_body"
+    },
+    "be-agr-gemeindedaten": {
+      "title": "Statistische Daten der Gemeinden (Stand Januar 2026): Gemeinden mit Parlament",
+      "publisher": "Kanton Bern, Amt für Gemeinden und Raumordnung",
+      "url": "https://www.gemeinden.dij.be.ch/de/start/daten/statistische-daten-der-gemeinden.html",
+      "kind": "official_body"
+    },
+    "lu-wahlanordnung-2020": {
+      "title": "Anordnung der Neuwahlen des Grossen Stadtrates von Luzern sowie der Einwohnerräte von Emmen, Horw und Kriens für die Amtsdauer 2020 - 2024",
+      "publisher": "Kanton Luzern, Justiz- und Sicherheitsdepartement",
+      "url": "https://wahlen.lu.ch/kommunalwahlen",
+      "kind": "official_body"
+    },
+    "ag-handbuch-2020": {
+      "title": "Handbuch Gemeinderecht (Stand 1. Juli 2020), Kapitel 2.1: Gemeinden mit Einwohnerrat",
+      "publisher": "Kanton Aargau, Departement Volkswirtschaft und Inneres, Gemeindeabteilung",
+      "url": "https://www.ag.ch/media/kanton-aargau/dvi/dokumente/ga/rechtsaufsicht/veroeffentlichungen/1handbuch-gemeinderecht-2020-20200701.pdf",
+      "kind": "official_body"
+    },
+    "gr-afg-2024": {
+      "title": "Frauenvertretung in Gemeindebehörden, Januar 2024 (Gemeindeparlamente)",
+      "publisher": "Kanton Graubünden, Amt für Gemeinden",
+      "url": "https://www.gr.ch/DE/institutionen/verwaltung/dfg/afg/Dokumentenliste/Frauenvertretung%20in%20Gemeindebeh%c3%b6rden_Januar%202024.pdf",
+      "kind": "official_body"
+    },
+    "so-agem-organisation": {
+      "title": "Gemeindeorganisation - Einführung",
+      "publisher": "Kanton Solothurn, Amt für Gemeinden",
+      "url": "https://so.ch/verwaltung/volkswirtschaftsdepartement/amt-fuer-gemeinden/gemeindeorganisation/gemeindeorganisation-einfuehrung/",
+      "kind": "official_body"
+    },
+    "ar-gpk-2025": {
+      "title": "Leitfaden für Geschäftsprüfungskommissionen der Gemeinden (Mai 2025)",
+      "publisher": "Kanton Appenzell Ausserrhoden, Departement Inneres und Sicherheit",
+      "url": "https://ar.ch/fileadmin/user_upload/Departement_Inneres_Sicherheit/DepSekretariat/Gemeinden/GPK_Leitfaden_Mai_2025.pdf",
+      "kind": "official_body"
+    },
+    "sg-gemeindeorganisation": {
+      "title": "Gemeindeorganisation: Bürgerversammlung oder Parlament",
+      "publisher": "Kanton St.Gallen, Amt für Gemeinden",
+      "url": "https://www.sg.ch/politik-verwaltung/gemeinden/gemeindeorganisation.html",
+      "kind": "official_body"
+    },
+    "fr-scom-cg": {
+      "title": "Communes dotées d'un conseil général / Gemeinden mit Generalrat: Historique / Übersicht (état au 1er avril 2026)",
+      "publisher": "État de Fribourg, Service des communes",
+      "url": "https://www.fr.ch/document/535086",
+      "kind": "official_body"
+    },
+    "vd-votelec-2026": {
+      "title": "Élections communales générales du 8 mars 2026: conseils communaux, élections à la proportionnelle (CORP) et au système majoritaire (COMA), scrutin.json",
+      "publisher": "État de Vaud, Votelec",
+      "url": "https://www.elections.vd.ch/votelec/app23/data/CORP20260308/scrutin.json",
+      "kind": "official_body",
+      "note": "CORP lists 64 communes and COMA 95 (https://www.elections.vd.ch/votelec/app23/data/COMA20260308/scrutin.json), keyed by OFS number."
+    },
+    "bs-riehen-go": {
+      "title": "Gemeindeordnung der Einwohnergemeinde Riehen vom 27. Februar 2002 (RiE 111.100, Stand 1. Januar 2023)",
+      "publisher": "Kanton Basel-Stadt, Gesetzessammlung der Gemeinden",
+      "url": "https://bs.lexwork.naz.ch/de/dta/RiE%20111.100.pdf",
+      "kind": "official_body"
+    },
+    "bs-bettingen-go": {
+      "title": "Gemeindeordnung der Einwohnergemeinde Bettingen vom 26. April 2016 (BeE 111.100, Stand 1. April 2023)",
+      "publisher": "Kanton Basel-Stadt, Gesetzessammlung der Gemeinden",
+      "url": "https://bs.lexwork.naz.ch/de/dta/BeE%20111.100.pdf",
+      "kind": "official_body"
+    },
+    "ne-convocation-2024": {
+      "title": "Arrêté convoquant les électrices et les électeurs pour les élections communales du 21 avril 2024 (20 décembre 2023)",
+      "publisher": "République et Canton de Neuchâtel, Chancellerie d'État",
+      "url": "https://www.ne.ch/legislation-jurisprudence/pubfo/ArrRegCE/Documents/2023/FO51_05_2023_12_20_CHAN_602_ACE_ConvocationElectionsCommunales_21avril2024.pdf",
+      "kind": "official_body"
     }
   },
   "tiers": [
@@ -2551,6 +2630,203 @@
           "date": "2026-01-01",
           "value": 160,
           "source": "bfs-agv-2026"
+        }
+      ]
+    },
+    {
+      "key": "commune_parliament",
+      "name": "Gemeinden mit Gemeindeparlament, communes avec un conseil général ou communal élu, comuni con un consiglio comunale",
+      "name_en": "Communes with an elected parliament",
+      "parent": "canton",
+      "polity_kind": "municipality",
+      "source": "kv-zh",
+      "counts": [
+        {
+          "within": "CH-ZH",
+          "date": "2026-01-01",
+          "value": 13,
+          "source": "zh-gemeinden",
+          "locator": "Parlamentsgemeinden: \"Die folgenden 13 Städte haben ein Gemeindeparlament\": Adliswil, Bülach, Dietikon, Dübendorf, Illnau-Effretikon, Kloten, Opfikon, Schlieren, Uster, Wädenswil, Wetzikon, Winterthur, Zürich (page read 14 Nov 2026)"
+        },
+        {
+          "within": "CH-BE",
+          "date": "2026-01-01",
+          "value": 22,
+          "source": "be-agr-gemeindedaten",
+          "locator": "Table \"Gemeinden mit Parlament\" (Stand Januar 2026) names 22: Bern, Biel/Bienne, Burgdorf, Interlaken, Köniz, La Neuveville, Langenthal, Langnau i.E., Lyss, Münchenbuchsee, Münsingen, Muri bei Bern, Nidau, Ostermundigen, Saint-Imier, Spiez, Steffisburg, Thun, Tramelan, Valbirse, Worb, Zollikofen; the summary table on the same page says 24 (19 German-speaking, 5 French-speaking) without naming them, so the named list is used"
+        },
+        {
+          "within": "CH-LU",
+          "date": "2020-03-29",
+          "value": 4,
+          "source": "lu-wahlanordnung-2020",
+          "locator": "Ziff. 1: on 29 March 2020 the voters elect the Grosser Stadtrat of Luzern and the Einwohnerräte of Emmen (40), Horw (30), and Kriens (30) for 2020-2024"
+        },
+        {
+          "within": "CH-AG",
+          "date": "2020-07-01",
+          "value": 10,
+          "source": "ag-handbuch-2020",
+          "locator": "Kapitel 2.1: Aarau, Baden, Brugg, Buchs, Lenzburg, Obersiggenthal, Wettingen, Windisch, Wohlen, Zofingen have an Einwohnerrat"
+        },
+        {
+          "within": "CH-GR",
+          "date": "2024-01-01",
+          "value": 16,
+          "source": "gr-afg-2024",
+          "locator": "Gemeindeparlamente: 16 communes listed"
+        },
+        {
+          "within": "CH-SO",
+          "date": "2026-11-14",
+          "value": 1,
+          "source": "so-agem-organisation",
+          "locator": "Gemeindeparlament: \"Im Kanton Solothurn hat sich als einzige Gemeinde die Stadt Olten so organisiert\" (page read 14 Nov 2026)"
+        },
+        {
+          "within": "CH-AR",
+          "date": "2025-05-01",
+          "value": 1,
+          "source": "ar-gpk-2025",
+          "locator": "Herisau is the only commune with an Einwohnerrat"
+        },
+        {
+          "within": "CH-SG",
+          "date": "2025-12-10",
+          "value": 4,
+          "source": "sg-gemeindeorganisation",
+          "locator": "Parlament: \"Im Kanton St.Gallen gibt es vier Gemeinden, die sich als Gemeinde mit Parlament organisiert haben\""
+        },
+        {
+          "within": "CH-BS",
+          "date": "2002-02-27",
+          "value": 1,
+          "source": "bs-riehen-go",
+          "locator": "RiE 111.100 § 11 Abs. 1 lit. a (the voters elect the Einwohnerrat); the canton runs the city of Basel (KV BS § 57 Abs. 2) and Bettingen decides in a Gemeindeversammlung, so Riehen is the only commune with a parliament"
+        },
+        {
+          "within": "CH-FR",
+          "date": "2001-01-01",
+          "precision": "year",
+          "value": 12,
+          "source": "fr-scom-cg",
+          "locator": "Total line \"Conseils généraux (CG) / Generalräte (GR)\", column 2001"
+        },
+        {
+          "within": "CH-FR",
+          "date": "2011-01-01",
+          "precision": "year",
+          "value": 15,
+          "source": "fr-scom-cg",
+          "locator": "Total line \"Conseils généraux (CG) / Generalräte (GR)\", column 2011"
+        },
+        {
+          "within": "CH-FR",
+          "date": "2016-01-01",
+          "precision": "year",
+          "value": 21,
+          "source": "fr-scom-cg",
+          "locator": "Total line \"Conseils généraux (CG) / Generalräte (GR)\", column 2016"
+        },
+        {
+          "within": "CH-FR",
+          "date": "2021-01-01",
+          "precision": "year",
+          "value": 27,
+          "source": "fr-scom-cg",
+          "locator": "Total line \"Conseils généraux (CG) / Generalräte (GR)\", column 2021"
+        },
+        {
+          "within": "CH-FR",
+          "date": "2025-01-01",
+          "precision": "year",
+          "value": 28,
+          "source": "fr-scom-cg",
+          "locator": "Total line \"Conseils généraux (CG) / Generalräte (GR)\", column 2025"
+        },
+        {
+          "within": "CH-FR",
+          "date": "2026-04-01",
+          "value": 31,
+          "source": "fr-scom-cg",
+          "locator": "Total line \"Conseils généraux (CG) / Generalräte (GR)\", column 2026 (état au 1er avril 2026)"
+        },
+        {
+          "within": "CH-VD",
+          "date": "2026-03-08",
+          "value": 159,
+          "source": "vd-votelec-2026",
+          "locator": "elections keyed by OFS number: 64 communes in CORP20260308 and 95 in COMA20260308, each electing its conseil communal at the ballot box on 8 March 2026"
+        },
+        {
+          "within": "CH-GE",
+          "date": "1960-01-01",
+          "value": 45,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1960 (every commune in the canton has an elected parliament)"
+        },
+        {
+          "within": "CH-GE",
+          "date": "2026-01-01",
+          "value": 45,
+          "source": "bfs-agv-2026",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2026 (every commune in the canton has an elected parliament)"
+        },
+        {
+          "within": "CH-NE",
+          "date": "1960-01-01",
+          "value": 62,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-1960 (every commune in the canton has an elected parliament)"
+        },
+        {
+          "within": "CH-NE",
+          "date": "2009-01-01",
+          "value": 53,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2009 (every commune in the canton has an elected parliament)"
+        },
+        {
+          "within": "CH-NE",
+          "date": "2013-01-01",
+          "value": 37,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2013 (every commune in the canton has an elected parliament)"
+        },
+        {
+          "within": "CH-NE",
+          "date": "2016-01-01",
+          "value": 36,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2016 (every commune in the canton has an elected parliament)"
+        },
+        {
+          "within": "CH-NE",
+          "date": "2018-01-01",
+          "value": 31,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2018 (every commune in the canton has an elected parliament)"
+        },
+        {
+          "within": "CH-NE",
+          "date": "2021-01-01",
+          "value": 27,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2021 (every commune in the canton has an elected parliament)"
+        },
+        {
+          "within": "CH-NE",
+          "date": "2025-01-01",
+          "value": 24,
+          "source": "bfs-agv-hist",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2025 (every commune in the canton has an elected parliament)"
+        },
+        {
+          "within": "CH-NE",
+          "date": "2026-01-01",
+          "value": 24,
+          "source": "bfs-agv-2026",
+          "locator": "https://www.agvchapp.bfs.admin.ch/api/communes/snapshot?date=01-01-2026 (every commune in the canton has an elected parliament)"
         }
       ]
     },
@@ -9702,7 +9978,7 @@
     },
     {
       "key": "communal_parliament",
-      "tier": "commune",
+      "tier": "commune_parliament",
       "name": "Wahlen der Gemeindeparlamente (Gemeinderat, Grosser Gemeinderat, Einwohnerrat, Stadtrat, Conseil communal, Conseil général, Consiglio comunale)",
       "name_en": "Communal parliament elections",
       "category": "council",
@@ -9714,7 +9990,7 @@
         ],
         "cycle": true
       },
-      "note": "Only some communes have an elected parliament (all communes in Geneva and Neuchâtel, communes above a size threshold in Vaud and Ticino, the cities elsewhere); the rest decide in a communal assembly. No federal register lists which communes have one. Terms follow the canton (KV ZH Art. 87: a commune may replace its assembly with a parliament). The archive expects a yearly count only for Geneva and Neuchâtel, where every commune elects one. The Federal Statistical Office publishes party seats in the parliaments of the statistical cities from 1983.",
+      "note": "Only some communes have an elected parliament (all communes in Geneva and Neuchâtel, communes above a size threshold in Vaud and Ticino, the cities elsewhere); the rest decide in a communal assembly. No federal register lists which communes have one. Terms follow the canton (KV ZH Art. 87: a commune may replace its assembly with a parliament). The archive counts the communes with a parliament in each canton from the cantonal lists, and expects their elections where the canton fixes one cycle for all of them: Lucerne, Fribourg, Solothurn, Appenzell Ausserrhoden, Vaud, Neuchâtel, and Geneva, and Riehen in Basel-Stadt. Ticino and Jura have no official list yet. The Federal Statistical Office publishes party seats in the parliaments of the statistical cities from 1983.",
       "source": "kv-zh",
       "match": [
         {
@@ -9749,7 +10025,9 @@
           "within": "CH-LU",
           "term_years": 4,
           "source": "lu-gg",
-          "locator": "GG LU § 12 Abs. 2: a Gemeindeparlament is elected by proportional representation every four years, in the same year as the Gemeinderat"
+          "locator": "GG LU § 12 Abs. 2: a Gemeindeparlament is elected by proportional representation every four years, in the same year as the Gemeinderat; all four parliaments were elected together on 29 March 2020 for 2020-2024",
+          "period_years": 4,
+          "phase": 0
         },
         {
           "within": "CH-GL",
@@ -9767,8 +10045,10 @@
           "within": "CH-FR",
           "term_years": 5,
           "source": "fr-lco",
-          "locator": "LCo FR art. 29 al. 1 and 2 (the conseil général is elected at the ballot box for five years); art. 25 names the eight communes that must have one, and art. 26 lets communes above 600 inhabitants adopt one",
-          "valid_from": "1986-01-01"
+          "locator": "LCo FR art. 29 al. 1 and 2 (the conseil général is elected at the ballot box for five years); art. 25 names the eight communes that must have one, and art. 26 lets communes above 600 inhabitants adopt one; every conseil général is renewed with the conseils communaux for the same legislature (the Service des communes lists them by legislature, 2016-2021 and 2021-2026)",
+          "valid_from": "1986-01-01",
+          "period_years": 5,
+          "phase": 1
         },
         {
           "within": "CH-SO",
@@ -9825,14 +10105,18 @@
           "within": "CH-TI",
           "term_years": 4,
           "source": "kv-ti",
-          "locator": "Cost. TI art. 18 (the consiglio comunale is elected by proportional representation for four years); art. 35 (by the people)"
+          "locator": "Cost. TI art. 18 (the consiglio comunale is elected by proportional representation for four years); art. 35 (by the people); all communes elected their Municipi and Consigli comunali together on 14 April 2024 for 2024-2028, except those merging",
+          "period_years": 4,
+          "phase": 0
         },
         {
           "within": "CH-VD",
           "term_years": 5,
           "source": "kv-vd",
-          "locator": "Cst-VD art. 144: the voters elect the conseil communal for five years, as a rule by proportional representation",
-          "valid_from": "2006-07-01"
+          "locator": "Cst-VD art. 144: the voters elect the conseil communal for five years, as a rule by proportional representation; all communes elected together in 2026, and art. 178 al. 1 renewed every communal authority in spring 2006",
+          "valid_from": "2006-07-01",
+          "period_years": 5,
+          "phase": 1
         },
         {
           "within": "CH-NE",
@@ -9897,6 +10181,27 @@
           "valid_to": "2010-07-01",
           "source": "kv-ju",
           "locator": "Before the change, four years: Cst. JU art. 65 al. 1 as amended by the vote of 7 March 2010, in force 1 July 2010 (five years instead of four), with Disposition transitoire art. 14 al. 2: communal authorities elected before then serve to the end of their four-year term"
+        },
+        {
+          "within": "CH-BS",
+          "name_pattern": "^Riehen$",
+          "period_years": 4,
+          "term_years": 4,
+          "phase": 2,
+          "source": "bs-riehen-go",
+          "locator": "RiE 111.100 § 16 Abs. 1 (four years) and § 11 Abs. 1 (the voters elect the Einwohnerrat); the term before the 2021 amendment began on 1 May, last in 2022 (§ 43)",
+          "valid_from": "2003-01-01",
+          "valid_to": "2023-01-01"
+        },
+        {
+          "within": "CH-BS",
+          "name_pattern": "^Riehen$",
+          "period_years": 4,
+          "term_years": 4,
+          "phase": 1,
+          "source": "bs-riehen-go",
+          "locator": "RiE 111.100 § 16 (four years, from 1 February; amended 28 April 2021, in force 1 January 2022) and § 43 (first applied to the term from 1 February 2026, which shortened the term from 1 May 2022 by three months); § 11 Abs. 1 (the voters elect the Einwohnerrat); elected on 19 October 2025",
+          "valid_from": "2023-01-01"
         }
       ],
       "access": [
@@ -9930,7 +10235,7 @@
         ],
         "cycle": true
       },
-      "note": "The voters of each commune elect its executive, at the ballot box or in the communal assembly, mostly by majority vote with a second round; Ticino's municipi and the executives in some other cantons by proportional representation (KV TI Art. 18). Two cantons differ: in Neuchâtel each commune decides whether its voters or its Conseil général elect the executive, and in Basel-Stadt the canton runs the city of Basel, so only Riehen and Bettingen elect one. The term is four years in most cantons and five in Fribourg, Vaud, Geneva, and Jura. Schwyz renews half of each council every two years, and the districts of Appenzell Innerrhoden elect theirs every year. Bern, Uri, Graubünden, and Basel-Stadt leave the term to each commune. The archive expects a yearly count only where cantonal law fixes the cycle for every commune. Foreigners vote in communal elections in Neuchâtel, Jura, Vaud, Fribourg, and Geneva, and in some communes of Appenzell Ausserrhoden, Graubünden, and Basel-Stadt.",
+      "note": "The voters of each commune elect its executive, at the ballot box or in the communal assembly, mostly by majority vote with a second round; Ticino's municipi and the executives in some other cantons by proportional representation (KV TI Art. 18). Two cantons differ: in Neuchâtel each commune decides whether its voters or its Conseil général elect the executive, and in Basel-Stadt the canton runs the city of Basel, so only Riehen and Bettingen elect one. The term is four years in most cantons and five in Fribourg, Vaud, Geneva, and Jura. Schwyz renews half of each council every two years, and the districts of Appenzell Innerrhoden elect theirs every year. Bern, Uri, Graubünden, and Basel-Stadt leave the term to each commune. The archive expects a yearly count only where cantonal law fixes the cycle for every commune, and one election each for Riehen, Bettingen, and the four Neuchâtel communes whose voters elected their executive in 2024 (Cressier, La Chaux-de-Fonds, Le Locle, and Neuchâtel). Foreigners vote in communal elections in Neuchâtel, Jura, Vaud, Fribourg, and Geneva, and in some communes of Appenzell Ausserrhoden, Graubünden, and Basel-Stadt.",
       "source": "kv-ti",
       "est_votes": 2500000,
       "effort": 5,
@@ -10114,8 +10419,7 @@
           "within": "CH-NE",
           "term_years": 4,
           "source": "kv-ne",
-          "locator": "Cst. NE art. 95: the conseil communal serves four years, and each commune decides whether its voters or its conseil général elect it, so no cantonwide popular election applies",
-          "period_years": 4
+          "locator": "Cst. NE art. 95: the conseil communal serves four years, and each commune decides whether its voters or its conseil général elect it, so no cantonwide popular election applies"
         },
         {
           "within": "CH-GE",
@@ -10176,6 +10480,77 @@
           "valid_to": "2010-07-01",
           "source": "kv-ju",
           "locator": "Before the change, four years: Cst. JU art. 65 al. 1 as amended by the vote of 7 March 2010, in force 1 July 2010 (five years instead of four), with Disposition transitoire art. 14 al. 2: communal authorities elected before then serve to the end of their four-year term"
+        },
+        {
+          "within": "CH-BS",
+          "name_pattern": "^Riehen$",
+          "period_years": 4,
+          "term_years": 4,
+          "phase": 2,
+          "source": "bs-riehen-go",
+          "locator": "RiE 111.100 § 16 Abs. 1 (four years) and § 11 Abs. 1 (the voters elect the Gemeindepräsident and the other members of the Gemeinderat); the term before the 2021 amendment began on 1 May, last in 2022 (§ 43)",
+          "valid_from": "2003-01-01",
+          "valid_to": "2023-01-01"
+        },
+        {
+          "within": "CH-BS",
+          "name_pattern": "^Riehen$",
+          "period_years": 4,
+          "term_years": 4,
+          "phase": 1,
+          "source": "bs-riehen-go",
+          "locator": "RiE 111.100 § 16 (four years, from 1 February; amended 28 April 2021, in force 1 January 2022) and § 43 (first applied to the term from 1 February 2026, which shortened the term from 1 May 2022 by three months); § 11 Abs. 1 (the voters elect the Gemeindepräsident and the other members of the Gemeinderat); elected on 19 October 2025",
+          "valid_from": "2023-01-01"
+        },
+        {
+          "within": "CH-BS",
+          "name_pattern": "^Bettingen$",
+          "period_years": 4,
+          "term_years": 4,
+          "phase": 3,
+          "source": "bs-bettingen-go",
+          "locator": "BeE 111.100 § 22 Abs. 1 (four years) and § 29 Abs. 3 (the Gemeindepräsident and the members of the Gemeinderat are elected at the ballot box); elected on 12 February 2023 for 2023-2027",
+          "valid_from": "2017-01-01"
+        },
+        {
+          "within": "CH-NE",
+          "name_pattern": "^Cressier$",
+          "period_years": 4,
+          "term_years": 4,
+          "phase": 0,
+          "source": "ne-convocation-2024",
+          "locator": "Art. 1 and 2: on 21 April 2024 the voters elect every conseil général and, in Cressier, La Chaux-de-Fonds, Le Locle, and Neuchâtel, the conseil communal (Cst. NE art. 95, four years); earlier popular elections in these communes are not established here",
+          "valid_from": "2024-01-01"
+        },
+        {
+          "within": "CH-NE",
+          "name_pattern": "^La Chaux-de-Fonds$",
+          "period_years": 4,
+          "term_years": 4,
+          "phase": 0,
+          "source": "ne-convocation-2024",
+          "locator": "Art. 1 and 2: on 21 April 2024 the voters elect every conseil général and, in Cressier, La Chaux-de-Fonds, Le Locle, and Neuchâtel, the conseil communal (Cst. NE art. 95, four years); earlier popular elections in these communes are not established here",
+          "valid_from": "2024-01-01"
+        },
+        {
+          "within": "CH-NE",
+          "name_pattern": "^Le Locle$",
+          "period_years": 4,
+          "term_years": 4,
+          "phase": 0,
+          "source": "ne-convocation-2024",
+          "locator": "Art. 1 and 2: on 21 April 2024 the voters elect every conseil général and, in Cressier, La Chaux-de-Fonds, Le Locle, and Neuchâtel, the conseil communal (Cst. NE art. 95, four years); earlier popular elections in these communes are not established here",
+          "valid_from": "2024-01-01"
+        },
+        {
+          "within": "CH-NE",
+          "name_pattern": "^Neuchâtel$",
+          "period_years": 4,
+          "term_years": 4,
+          "phase": 0,
+          "source": "ne-convocation-2024",
+          "locator": "Art. 1 and 2: on 21 April 2024 the voters elect every conseil général and, in Cressier, La Chaux-de-Fonds, Le Locle, and Neuchâtel, the conseil communal (Cst. NE art. 95, four years); earlier popular elections in these communes are not established here",
+          "valid_from": "2024-01-01"
         }
       ]
     },
@@ -10193,7 +10568,7 @@
         ],
         "cycle": true
       },
-      "note": "The voters elect the president of the communal executive in Zurich, Schwyz, Glarus, Zug, Solothurn, Basel-Landschaft, Schaffhausen, Appenzell Ausserrhoden, St. Gallen, Aargau, Thurgau, Ticino, Vaud, Valais, and Jura, for the executive's term (two years in Schwyz), and the district assemblies of Appenzell Innerrhoden elect their Hauptleute every year. In Fribourg, Neuchâtel, and Geneva the executive chooses its own president or mayor. Obwalden, Nidwalden, and Uri set a default term of one or two years that a commune may lengthen, and Bern, Lucerne, Graubünden, and Basel-Stadt leave the election or its term to each commune. The archive expects a yearly count only where cantonal law fixes the cycle for every commune.",
+      "note": "The voters elect the president of the communal executive in Zurich, Schwyz, Glarus, Zug, Solothurn, Basel-Landschaft, Schaffhausen, Appenzell Ausserrhoden, St. Gallen, Aargau, Thurgau, Ticino, Vaud, Valais, and Jura, for the executive's term (two years in Schwyz), and the district assemblies of Appenzell Innerrhoden elect their Hauptleute every year. In Fribourg, Neuchâtel, and Geneva the executive chooses its own president or mayor. Obwalden, Nidwalden, and Uri set a default term of one or two years that a commune may lengthen, and Bern, Lucerne, Graubünden, and Basel-Stadt leave the election or its term to each commune. The archive expects a yearly count only where cantonal law fixes the cycle for every commune, and one election each for Riehen and Bettingen.",
       "source": "sg-gg",
       "match": [
         {
@@ -10385,6 +10760,37 @@
           "valid_to": "2010-07-01",
           "source": "kv-ju",
           "locator": "Before the change, four years: Cst. JU art. 65 al. 1 as amended by the vote of 7 March 2010, in force 1 July 2010 (five years instead of four), with Disposition transitoire art. 14 al. 2: communal authorities elected before then serve to the end of their four-year term"
+        },
+        {
+          "within": "CH-BS",
+          "name_pattern": "^Riehen$",
+          "period_years": 4,
+          "term_years": 4,
+          "phase": 2,
+          "source": "bs-riehen-go",
+          "locator": "RiE 111.100 § 16 Abs. 1 (four years) and § 11 Abs. 1 (the voters elect the Gemeindepräsident); the term before the 2021 amendment began on 1 May, last in 2022 (§ 43)",
+          "valid_from": "2003-01-01",
+          "valid_to": "2023-01-01"
+        },
+        {
+          "within": "CH-BS",
+          "name_pattern": "^Riehen$",
+          "period_years": 4,
+          "term_years": 4,
+          "phase": 1,
+          "source": "bs-riehen-go",
+          "locator": "RiE 111.100 § 16 (four years, from 1 February; amended 28 April 2021, in force 1 January 2022) and § 43 (first applied to the term from 1 February 2026, which shortened the term from 1 May 2022 by three months); § 11 Abs. 1 (the voters elect the Gemeindepräsident); elected on 19 October 2025",
+          "valid_from": "2023-01-01"
+        },
+        {
+          "within": "CH-BS",
+          "name_pattern": "^Bettingen$",
+          "period_years": 4,
+          "term_years": 4,
+          "phase": 3,
+          "source": "bs-bettingen-go",
+          "locator": "BeE 111.100 § 22 Abs. 1 (four years) and § 29 Abs. 3 (the Gemeindepräsident and the members of the Gemeinderat are elected at the ballot box); elected on 12 February 2023 for 2023-2027",
+          "valid_from": "2017-01-01"
         }
       ],
       "est_votes": 1800000,
