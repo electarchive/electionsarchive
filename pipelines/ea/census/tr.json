@@ -297,6 +297,55 @@
       "url": "https://sonuc.ysk.gov.tr/api/getSecimList?secimSayi=100&araSecim=0&yenilemeSecimi=0",
       "note": "Lists 17 elections, from the general election of 22 July 2007 to the reruns of 2 June 2024; each has ballot-box results through the same API.",
       "kind": "official_body"
+    },
+    "tbmm-tutanak-1993": {
+      "title": "TBMM Tutanak Dergisi, dönem 19, cilt 35, 101. Birleşim (8 May 1993)",
+      "publisher": "Türkiye Büyük Millet Meclisi",
+      "url": "https://www5.tbmm.gov.tr/tutanaklar/TUTANAK/TBMM/d19/c035/tbmm19035101.pdf",
+      "note": "Records the first round on 8 May 1993 (422 voting) and sets the second for 12 May 1993.",
+      "kind": "official_body"
+    },
+    "wiki-tr-1973": {
+      "title": "1973 Türkiye cumhurbaşkanlığı seçimi",
+      "publisher": "Vikipedi (Turkish Wikipedia), round table citing the TBMM minutes",
+      "url": "https://tr.wikipedia.org/wiki/1973_T%C3%BCrkiye_cumhurba%C5%9Fkanl%C4%B1%C4%9F%C4%B1_se%C3%A7imi",
+      "note": "Round table with the date of each of the 15 rounds; the AA history of presidential elections agrees on 13 March to 6 April 1973.",
+      "kind": "compendium"
+    },
+    "wiki-tr-1989": {
+      "title": "1989 Türkiye cumhurbaşkanlığı seçimi",
+      "publisher": "Vikipedi (Turkish Wikipedia), round table citing the TBMM minutes",
+      "url": "https://tr.wikipedia.org/wiki/1989_T%C3%BCrkiye_cumhurba%C5%9Fkanl%C4%B1%C4%9F%C4%B1_se%C3%A7imi",
+      "note": "Round table: 20, 24, and 31 October 1989.",
+      "kind": "compendium"
+    },
+    "wiki-tr-1993": {
+      "title": "1993 Türkiye cumhurbaşkanlığı seçimi",
+      "publisher": "Vikipedi (Turkish Wikipedia), round table citing the TBMM minutes",
+      "url": "https://tr.wikipedia.org/wiki/1993_T%C3%BCrkiye_cumhurba%C5%9Fkanl%C4%B1%C4%9F%C4%B1_se%C3%A7imi",
+      "note": "Round table: 8, 12, and 16 May 1993.",
+      "kind": "compendium"
+    },
+    "wiki-tr-2000": {
+      "title": "2000 Türkiye cumhurbaşkanlığı seçimi",
+      "publisher": "Vikipedi (Turkish Wikipedia), round table citing the TBMM minutes",
+      "url": "https://tr.wikipedia.org/wiki/2000_T%C3%BCrkiye_cumhurba%C5%9Fkanl%C4%B1%C4%9F%C4%B1_se%C3%A7imi",
+      "note": "Round table: 27 April, 1 May, and 5 May 2000.",
+      "kind": "compendium"
+    },
+    "wiki-tr-2007": {
+      "title": "2007 Türkiye cumhurbaşkanlığı seçimi",
+      "publisher": "Vikipedi (Turkish Wikipedia), round table citing the TBMM minutes",
+      "url": "https://tr.wikipedia.org/wiki/2007_T%C3%BCrkiye_cumhurba%C5%9Fkanl%C4%B1%C4%9F%C4%B1_se%C3%A7imi",
+      "note": "Rounds on 20, 24, and 28 August 2007. The April 2007 round, annulled by the Constitutional Court, is not counted.",
+      "kind": "compendium"
+    },
+    "tbmm-mbk-158": {
+      "title": "Temsilciler Meclisi Seçimi Kanunu (Law 158, 13 December 1960), Millî Birlik Komitesi minutes",
+      "publisher": "Türkiye Büyük Millet Meclisi",
+      "url": "https://www5.tbmm.gov.tr/tutanaklar/TUTANAK/MBK_/d00/c004/mbk_00004052.pdf",
+      "note": "Article 4 sets the district delegate boards within 10 days of publication and the provincial boards, which choose the representatives, within 15 days.",
+      "kind": "official_body"
     }
   },
   "tiers": [
@@ -875,7 +924,7 @@
       "measure": {
         "unit": "contest"
       },
-      "note": "The Assembly elected the President for its own term under the 1924 Constitution (art. 31), for seven years by two-thirds majority in the first two rounds under 1961 art. 95 and 1982 art. 102, until the 2007 amendment moved the office to a popular vote. Counted per round of voting.",
+      "note": "The Assembly elected the President for its own term under the 1924 Constitution (art. 31), for seven years by two-thirds majority in the first two rounds under 1961 art. 95 and 1982 art. 102, until the 2007 amendment moved the office to a popular vote. Counted per round of voting. Dates cover the rounds of 1973, 1989, 1993, 2000, and August 2007; rounds of other elections are not yet dated.",
       "source": "anayasa_1924",
       "match": [
         {
@@ -931,7 +980,125 @@
           "evidence": "Round-by-round votes in the Assembly's minutes"
         }
       ],
-      "dates": []
+      "dates": [
+        {
+          "date": "1973-03-13",
+          "contests": 4,
+          "source": "wiki-tr-1973"
+        },
+        {
+          "date": "1973-03-16",
+          "contests": 2,
+          "source": "wiki-tr-1973"
+        },
+        {
+          "date": "1973-03-21",
+          "contests": 1,
+          "source": "wiki-tr-1973"
+        },
+        {
+          "date": "1973-03-24",
+          "contests": 1,
+          "source": "wiki-tr-1973"
+        },
+        {
+          "date": "1973-03-26",
+          "contests": 1,
+          "source": "wiki-tr-1973"
+        },
+        {
+          "date": "1973-03-27",
+          "contests": 1,
+          "source": "wiki-tr-1973"
+        },
+        {
+          "date": "1973-03-28",
+          "contests": 1,
+          "source": "wiki-tr-1973"
+        },
+        {
+          "date": "1973-03-30",
+          "contests": 1,
+          "source": "wiki-tr-1973"
+        },
+        {
+          "date": "1973-04-02",
+          "contests": 1,
+          "source": "wiki-tr-1973"
+        },
+        {
+          "date": "1973-04-04",
+          "contests": 1,
+          "source": "wiki-tr-1973"
+        },
+        {
+          "date": "1973-04-06",
+          "contests": 1,
+          "source": "wiki-tr-1973"
+        },
+        {
+          "date": "1989-10-20",
+          "contests": 1,
+          "source": "wiki-tr-1989"
+        },
+        {
+          "date": "1989-10-24",
+          "contests": 1,
+          "source": "wiki-tr-1989"
+        },
+        {
+          "date": "1989-10-31",
+          "contests": 1,
+          "source": "wiki-tr-1989"
+        },
+        {
+          "date": "1993-05-08",
+          "contests": 1,
+          "source": "tbmm-tutanak-1993",
+          "quote": "Cumhurbaşkanı seçimi için yapılan birinci tur oylamaya 422 üye katılmış"
+        },
+        {
+          "date": "1993-05-12",
+          "contests": 1,
+          "source": "tbmm-tutanak-1993",
+          "quote": "ikinci oylama, 12 Mayıs 1993 Çarşamba günkü birleşimde yapılacaktır"
+        },
+        {
+          "date": "1993-05-16",
+          "contests": 1,
+          "source": "wiki-tr-1993"
+        },
+        {
+          "date": "2000-04-27",
+          "contests": 1,
+          "source": "wiki-tr-2000"
+        },
+        {
+          "date": "2000-05-01",
+          "contests": 1,
+          "source": "wiki-tr-2000"
+        },
+        {
+          "date": "2000-05-05",
+          "contests": 1,
+          "source": "wiki-tr-2000"
+        },
+        {
+          "date": "2007-08-20",
+          "contests": 1,
+          "source": "wiki-tr-2007"
+        },
+        {
+          "date": "2007-08-24",
+          "contests": 1,
+          "source": "wiki-tr-2007"
+        },
+        {
+          "date": "2007-08-28",
+          "contests": 1,
+          "source": "wiki-tr-2007"
+        }
+      ]
     },
     {
       "key": "senate",
@@ -1168,7 +1335,15 @@
       ],
       "est_votes": 10000,
       "effort": 4,
-      "dates": []
+      "dates": [
+        {
+          "date": "1960-12-13",
+          "through": "1961-01-05",
+          "source": "tbmm-mbk-158",
+          "quote": "il temsilci seçme kurulları ... bu kanunun yayımı tarihinden başlıyarak en geç 15 gün içinde o ili temsil edecek temsilci veya temsilcileri seçerler",
+          "note": "Law 158 was dated 13 December 1960; district delegates and provincial representatives were chosen board by board before the first sitting on 6 January 1961, and no official table of the per-province days is held."
+        }
+      ]
     },
     {
       "key": "danisma_meclisi",
