@@ -24,8 +24,37 @@ from ea.store import DATA, connect
 SOURCE = "jp.mic_chiji"
 INDEX = "https://www.soumu.go.jp/senkyo/senkyo_s/data/chiji/index.html"
 ROOT = "https://www.soumu.go.jp"
+ARCHIVE = (
+    "https://web.archive.org/web/20100620022653id_/http://www.soumu.go.jp:80/senkyo/senkyo_s/data/chiji/index.html"
+)
+EARLY = {
+    "060409kyoto": "20110323112407",
+    "060702shiga": "20110323112402",
+    "060806nagano": "20110323112401",
+    "060827kagawa": "20110323112400",
+    "061112fukushima": "20110323112359",
+    "061119okinawa": "20110323112358",
+    "061217wakayama": "20110323112350",
+    "070121ehime": "20110323112342",
+    "070121miyazaki": "20110323112340",
+    "070121yamanashi": "20110323112344",
+    "070603aomori": None,
+    "070722gunma": None,
+    "070826saitama": None,
+    "071125kochi": None,
+    "080127osaka": None,
+    "080323kumamoto": None,
+    "080713kagoshima": None,
+    "080803yamaguchi": None,
+    "081019nigata": None,
+    "081019toyama": None,
+    "081026okayama": None,
+    "081116tochiji": None,
+    "090125gifu": None,
+}
 MODEL = "claude-haiku-5-5"
 PROMPT = "1"
+WAYBACK = "https://web.archive.org/web/{stamp}id_/{url}"
 LONGEST = 1568
 READ_SYSTEM = (
     "You read one page of a Japanese Ministry of Internal Affairs and Communications summary of a prefectural governor "
@@ -60,19 +89,28 @@ READ_SCHEMA: dict[str, object] = {
 }
 ERAS = {"令和": 2018, "平成": 1988}
 LINK = re.compile(r'href="(/main_content/\d+\.pdf)"[^>]*>([^<]*)')
+OLD_LINK = re.compile(r'href="pdf/(\w+)\.pdf"[^>]*>(.*?)</a>')
 LABEL = re.compile(r"(令和|平成)(元|\d+)年(\d+)月(\d+)日(?:執行)?([（(]無投票[）)])?(\S+?[都道府県])知事選挙")
 
 
 def listing() -> list[tuple[str, str, str, bool]]:
     html = raw.cached(SOURCE, INDEX).path.read_bytes().decode("cp932")
+    archived = raw.cached(SOURCE, ARCHIVE).path.read_bytes().decode("cp932")
+    links = [(ROOT + href, text) for href, text in LINK.findall(html)]
+    for name, text in OLD_LINK.findall(archived):
+        if name in EARLY:
+            url = f"{ROOT}/senkyo/senkyo_s/data/chiji/pdf/{name}.pdf"
+            if (stamp := EARLY[name]) is not None:
+                url = WAYBACK.format(stamp=stamp, url=url.replace("https", "http"))
+            links.append((url, re.sub(r"<[^>]+>", "", text)))
     rows = []
-    for href, text in LINK.findall(html):
+    for url, text in links:
         label = re.sub(r"\s+", "", unicodedata.normalize("NFKC", text.replace("&nbsp;", " ")))
         if not (match := LABEL.search(label)):
             raise ValueError(f"unread label {label!r}")
         era, year, month, day, unopposed, prefecture = match.groups()
         held = f"{ERAS[era] + (1 if year == '元' else int(year)):04d}-{int(month):02d}-{int(day):02d}"
-        rows.append((ROOT + href, held, prefecture, unopposed is not None))
+        rows.append((url, held, prefecture, unopposed is not None))
     return rows
 
 
@@ -95,6 +133,7 @@ def page_count(path: Path) -> int:
 
 def fetch() -> None:
     raw.fetch(SOURCE, INDEX, suffix=".html")
+    raw.fetch(SOURCE, ARCHIVE, suffix=".html")
     price_in, price_out = batch.PRICES[MODEL]
     wanted: dict[str, batch.Want] = {}
     for url, *_ in listing():
@@ -150,7 +189,7 @@ def fetch() -> None:
     print(batch.ensure(SOURCE, "chiji", wanted)[1])
 
 
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 WORD = re.compile(r'<word xMin="([\d.]+)" yMin="([\d.]+)" xMax="([\d.]+)" yMax="([\d.]+)">([^<]*)</word>')
 PAGE = re.compile(r"<page [^>]*>(.*?)</page>", re.DOTALL)
@@ -335,8 +374,30 @@ FIXES = {
     "\ue020渡 啓祐": "樋渡 啓祐",
     "野口 俊\ue000": "野口 俊邦",
     "小\ue002 隆史": "小鑓 隆史",
+    "横内 正 明": "横内 正明",
+    "泉 敏 孝": "泉 敏孝",
 }
 SCANNED = {
+    "2008-03-23:熊本県": [
+        ("岩下 栄一", None),
+        ("北里 敏明", None),
+        ("かまくら 孝幸", "鎌倉 孝幸"),
+        ("かばしま 郁夫", "蒲島 郁夫"),
+        ("矢上 雅義", None),
+    ],
+    "2008-01-27:大阪府": [
+        ("梅田 章二", None),
+        ("橋下 とおる", "橋下 徹"),
+        ("熊谷 さだとし", "熊谷 貞俊"),
+        ("杉浦 清一", None),
+        ("高橋 正明", None),
+    ],
+    "2007-11-25:高知県": [
+        ("近森 正久", None),
+        ("せきや 徳", "関谷 徳"),
+        ("国松 勝", None),
+        ("おざき 正直", "尾崎 正直"),
+    ],
     "2011-07-31:埼玉県": [("原冨 さとる", "原冨 悟"), ("上田 きよし", "上田 清司"), ("たけだ のぶひろ", "武田 信弘")],
     "2011-07-03:群馬県": [
         ("えびね 篤", "海老根 篤"),
@@ -367,6 +428,7 @@ SCANNED = {
     "2010-11-28:愛媛県": [("田中 かつひこ", "田中 克彦"), ("中村 時広", None), ("小松 正幸", None)],
     "2010-11-28:沖縄県": [("なかいま 弘多", "仲井真 弘多"), ("イハ 洋一", "伊波 洋一"), ("金城 タツロー", "金城 竜郎")],
 }
+MISREAD = {"2007-11-25:高知県": {"voters": "297205"}}
 PAGES = DATA / "pages" / SOURCE
 
 
@@ -506,6 +568,7 @@ def parse() -> None:
             read_ = read(artifact.sha256, 1)
             figures_ = {k: digits(read_[k]) if read_[k] else None for k in FIGURES}
             figures_["cast"] = str(int(figures_["valid"] or 0) + int(figures_["invalid"] or 0))
+            figures_ |= MISREAD.get(key, {})
             rows = []
             for order, ((name, legal), seen) in enumerate(zip(SCANNED[key], read_["candidates"], strict=True), 1):
                 votes = digits(seen["votes"])
@@ -567,8 +630,15 @@ WIKIDATA = {
     "幸福実現党": "Q1571486",
     "みんなの党": "Q1355093",
     "大阪維新の会": "Q385785",
+    "自由民主党": "Q232595",
+    "琉球独立党": "Q859008",
 }
 NEW_PARTIES = {
+    "Q859008": (
+        ("琉球独立党", "official", None),
+        ("かりゆしクラブ", "historical", None),
+        ("Kariyushi Club", "english", None),
+    ),
     "Q385785": (("大阪維新の会", "official", None), ("Osaka Restoration Association", "english", None)),
     "Q39142381": (
         ("みんなでつくる党", "official", None),
@@ -612,7 +682,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Japan's prefectural governor elections 2010-2026 from the Ministry of Internal Affairs and "
+            summary="Japan's prefectural governor elections 2006-2026 from the Ministry of Internal Affairs and "
             "Communications' election summaries, by prefecture",
             polity="JP",
         )
@@ -639,10 +709,12 @@ def emit() -> Path:
             license=LICENSE,
             license_url=LICENSE_URL,
             attribution=ATTRIBUTION,
-            notes="Counts are as the ministry's summaries print them, read from each PDF's text layer; the nine "
-            "summaries of 2010 and 2011 are scans, read from the page images and checked by hand.",
+            notes="Counts are as the ministry's summaries print them, read from each PDF's text layer; the twelve "
+            "summaries of 2007 to 2011 that are scans were read from the page images and checked by hand. Summaries "
+            "of 2006 and early 2007 no longer on the ministry's site are copies from the Internet Archive.",
         )
         cs.artifact(raw.cached(SOURCE, INDEX), source)
+        cs.artifact(raw.cached(SOURCE, ARCHIVE), source)
         system = cs.key(f"{SOURCE}.electoral_system", "governor")
         cs.add("electoral_system", id=system, polity_id=japan, rules=RULES, rules_version=1)
         name(system, "First past the post with a legal minimum of a quarter of the valid votes", "en")
