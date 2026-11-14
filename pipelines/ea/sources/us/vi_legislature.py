@@ -63,6 +63,27 @@ REPORTS = {
         "Totals include absentee and provisional ballots, which the archive's 2024 general rows leave out.",
     ),
 }
+SCANS = {
+    "stx10": (
+        SOURCE,
+        "https://vivote.gov/wp-content/uploads/2023/12/STX-2010-Gen-Certification.pdf",
+        "2010 General Election Certification, District of St. Croix",
+        "Hand-keyed from the scanned certification: at-polls, absentee, and provisional columns added to the total column. The archive's 2010 general rows hold at-polls votes only. The report covers only the delegate, governor, and senator-at-large contests; the St. Croix district senator and Board of Elections contests are not in it. The territory-wide senator-at-large totals also add the St. Thomas-St. John certification, https://vivote.gov/wp-content/uploads/2023/12/2010-STTJ-General-Election.pdf.",
+    ),
+    "sttj10": (
+        SOURCE,
+        "https://vivote.gov/wp-content/uploads/2023/12/2010-STTJ-General-Election.pdf",
+        "2010 General Election Certification, St. Thomas-St. John District",
+        "Hand-keyed from the scanned certification: at-polls, absentee, and provisional columns added to the total column. The archive's 2010 general rows hold at-polls votes only.",
+    ),
+    "stx12": (
+        SOURCE,
+        "https://vivote.gov/wp-content/uploads/2024/06/CERTIFICATION-GENERAL-ELECTION-2012-ST.-CROIX-DISTRICT.pdf",
+        "2012 General Election Certification, District of St. Croix",
+        "Hand-keyed from the scanned certification: machine, paper, walk-in, mail, and provisional columns added to the total column. The archive's 2012 general rows hold machine votes only.",
+    ),
+}
+SCAN_ROWS = Path(__file__).with_name("vi_legislature_scans.tsv")
 CODES = {"DEM": "Democratic", "REP": "Republican", "ICM": "Independent Citizens Movement", "IND": "Independent"}
 ROW = re.compile(r"^(?:([A-Z]{3}) )?(\S.*?\S)\s{2,}([\d,]+)(?:\s|$)")
 DOTTED = re.compile(r"^(.*?\S)(?:\s*\(([A-Z]{3})\))?[\s.]*\s([\d,]+) +\.?\d")
@@ -84,6 +105,8 @@ def url() -> str:
 def fetch() -> None:
     raw.fetch(SOURCE, url(), suffix=".csv")
     raw.fetch(SOURCE, REPORTS[date(2024, 11, 5)][1], suffix=".pdf")
+    for _, link, _, _ in SCANS.values():
+        raw.fetch(SOURCE, link, suffix=".pdf")
 
 
 def district(body: str, name: str) -> str:
@@ -182,6 +205,46 @@ def parse() -> None:
     token = pl.col("candidate_name").map_elements(slug, return_dtype=pl.String).alias("token")
     keys = ["election_date", "body", "district_name", "token"]
     flags = archive.filter(reported & pl.col("is_winner")).select(*keys[:3], token).unique()
+    contest = ["election_date", "body", "district_name"]
+    scans = pl.read_csv(
+        SCAN_ROWS, separator="\t", schema_overrides={"election_date": pl.Date, "votes": pl.Int64}
+    ).with_columns(pl.col("report").replace_strict({key: value[1] for key, value in SCANS.items()}))
+    assert (scans["polls"] + scans["absentee"] + scans["provisional"] == scans["votes"]).all()
+    scanned = scans.select(contest).unique()
+    meta = (
+        archive.join(scanned, on=contest)
+        .group_by(contest)
+        .agg(pl.col("contest_id", "election_type", "primary_party", "number_seats").first())
+    )
+    named = archive.unique(subset=[*contest, "candidate_name"]).select(
+        *contest, "candidate_name", "candidate_party_name"
+    )
+    first = scans.group_by(contest).agg(pl.col("report").first())
+    writeins = (
+        archive.filter(pl.col("candidate_name") == "Write-In Votes")
+        .join(scanned, on=contest)
+        .group_by(contest)
+        .agg(pl.col("votes").sum())
+        .with_columns(pl.lit("Write-In Votes").alias("candidate_name"))
+    )
+    entered = (
+        pl.concat(
+            [
+                scans.select(*contest, "candidate_name", "votes")
+                .join(meta, on=contest)
+                .with_columns(
+                    (
+                        pl.col("votes").rank("ordinal", descending=True).over("contest_id") <= pl.col("number_seats")
+                    ).alias("is_winner")
+                ),
+                writeins.join(meta, on=contest).with_columns(pl.lit(False).alias("is_winner")),
+            ],
+            how="diagonal",
+        )
+        .join(first, on=contest)
+        .join(named, on=[*contest, "candidate_name"], how="left")
+        .select(archive.columns)
+    )
     reports = (
         pl.concat([report(day) for day in REPORTS])
         .with_columns(token)
@@ -190,7 +253,7 @@ def parse() -> None:
         .drop("token", "flagged")
     )
     (
-        pl.concat([archive.filter(~reported), reports])
+        pl.concat([archive.filter(~reported).join(scanned, on=contest, how="anti"), reports, entered])
         .group_by(
             "contest_id",
             "election_date",
@@ -217,7 +280,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Virgin Islands Legislature, Board of Education, and Board of Elections generals, Democratic primaries, and the 2017 special 2010–2024 from the Elections System's archive and its official 2016, 2020, and 2024 general reports",
+            summary="Virgin Islands Legislature, Board of Education, and Board of Elections generals, Democratic primaries, and the 2017 special 2010–2024 from the Elections System's archive and its official certifications and reports for the 2010, 2012, 2016, 2020, and 2024 generals",
             polity="US",
         )
 
@@ -236,7 +299,7 @@ def emit() -> Path:
         )
         cs.artifact(raw.cached(SOURCE, url()), source)
         reports: dict[str, UUID] = {}
-        for cache, link, title, notes in REPORTS.values():
+        for cache, link, title, notes in [*REPORTS.values(), *SCANS.values()]:
             reports[link] = cs.source(PUBLISHER, title)
             cs.add(
                 "source",
