@@ -1,5 +1,6 @@
 import io
 import json
+import os
 import re
 import zipfile
 from datetime import date, timedelta
@@ -54,6 +55,7 @@ DAYS = {
     "P26": date(2026, 6, 2),
 }
 ELECTIONS = list(DAYS)[:-1]
+EMITTED = os.environ.get("EA_SWDB_ELECTIONS", ",".join(ELECTIONS)).split(",")
 KINDS = ("srprec", "mprec")
 BROKEN = {("P14", "mprec")}
 TOLERANCE = 0.00002
@@ -368,6 +370,8 @@ def emit() -> Path:
                 )
         restricted: dict[tuple[str, str, str], str] = {}
         for (election, kind), urls in files().items():
+            if election not in EMITTED:
+                continue
             year = 2000 + int(election[1:])
             stage = "primary" if election[0] == "P" else "general"
             title = f"{kind.upper()} precinct shapes, {year} {stage} election"
