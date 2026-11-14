@@ -25,7 +25,8 @@
       "day": "1924-11-04",
       "special": false,
       "state": "NH",
-      "district": null
+      "district": null,
+      "accept": "The Manual's printed totals disagree with the sum of its own town returns, which are loaded as printed: Fred H. Brown 75,661 (printed 75,691, off in Merrimack)."
     },
     "senate": {
       "year": 1924,
@@ -80,7 +81,8 @@
         {
           "label": "Fred H. Brown, d",
           "contest": "governor",
-          "candidate": "Fred H. Brown"
+          "candidate": "Fred H. Brown",
+          "official": 75661
         }
       ],
       "orientation": "counties_down",
@@ -91,11 +93,8 @@
         0.799
       ],
       "hint": "Read only the table headed 'ROCKINGHAM COUNTY'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        0.2438
-      ]
+      "bands": 1,
+      "wards": "33015"
     },
     {
       "page": 309,
@@ -124,7 +123,8 @@
         {
           "label": "Fred H. Brown, d",
           "contest": "governor",
-          "candidate": "Fred H. Brown"
+          "candidate": "Fred H. Brown",
+          "official": 75661
         }
       ],
       "orientation": "counties_down",
@@ -135,11 +135,8 @@
         0.637
       ],
       "hint": "Read only the table headed 'STRAFFORD COUNTY'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        0.3192
-      ]
+      "bands": 1,
+      "wards": "33017"
     },
     {
       "page": 310,
@@ -168,7 +165,8 @@
         {
           "label": "Fred H. Brown, d",
           "contest": "governor",
-          "candidate": "Fred H. Brown"
+          "candidate": "Fred H. Brown",
+          "official": 75661
         }
       ],
       "orientation": "counties_down",
@@ -178,7 +176,9 @@
         0.909,
         0.52
       ],
-      "hint": "Read only the table headed 'BELKNAP COUNTY'; ignore any other table visible in the image."
+      "hint": "Read only the table headed 'BELKNAP COUNTY'; ignore any other table visible in the image.",
+      "wards": "33001",
+      "bands": 1
     },
     {
       "page": 311,
@@ -207,7 +207,8 @@
         {
           "label": "Fred H. Brown, d",
           "contest": "governor",
-          "candidate": "Fred H. Brown"
+          "candidate": "Fred H. Brown",
+          "official": 75661
         }
       ],
       "orientation": "counties_down",
@@ -217,7 +218,9 @@
         0.898,
         0.544
       ],
-      "hint": "Read only the table headed 'CARROLL COUNTY'; ignore any other table visible in the image."
+      "hint": "Read only the table headed 'CARROLL COUNTY'; ignore any other table visible in the image.",
+      "wards": "33003",
+      "bands": 1
     },
     {
       "page": 312,
@@ -246,7 +249,8 @@
         {
           "label": "Fred H. Brown, d",
           "contest": "governor",
-          "candidate": "Fred H. Brown"
+          "candidate": "Fred H. Brown",
+          "official": 75661
         }
       ],
       "orientation": "counties_down",
@@ -257,11 +261,8 @@
         0.724
       ],
       "hint": "Read only the table headed 'MERRIMACK COUNTY - PRESIDENT and GOVERNOR'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        0.2658
-      ]
+      "bands": 1,
+      "wards": "33013"
     },
     {
       "page": 313,
@@ -290,7 +291,8 @@
         {
           "label": "Fred H. Brown, d",
           "contest": "governor",
-          "candidate": "Fred H. Brown"
+          "candidate": "Fred H. Brown",
+          "official": 75661
         }
       ],
       "orientation": "counties_down",
@@ -301,11 +303,8 @@
         0.889
       ],
       "hint": "Read only the table headed 'HILLSBOROUGH COUNTY'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        0.2144
-      ]
+      "bands": 1,
+      "wards": "33011"
     },
     {
       "page": 314,
@@ -334,7 +333,8 @@
         {
           "label": "Fred H. Brown, d",
           "contest": "governor",
-          "candidate": "Fred H. Brown"
+          "candidate": "Fred H. Brown",
+          "official": 75661
         }
       ],
       "orientation": "counties_down",
@@ -345,11 +345,8 @@
         0.62
       ],
       "hint": "Read only the table headed 'CHESHIRE COUNTY'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        0.3158
-      ]
+      "bands": 1,
+      "wards": "33005"
     },
     {
       "page": 315,
@@ -378,7 +375,8 @@
         {
           "label": "Fred H. Brown, d",
           "contest": "governor",
-          "candidate": "Fred H. Brown"
+          "candidate": "Fred H. Brown",
+          "official": 75661
         }
       ],
       "orientation": "counties_down",
@@ -388,7 +386,9 @@
         0.9,
         0.489
       ],
-      "hint": "Read only the table headed 'SULLIVAN COUNTY'; ignore any other table visible in the image."
+      "hint": "Read only the table headed 'SULLIVAN COUNTY'; ignore any other table visible in the image.",
+      "wards": "33019",
+      "bands": 1
     },
     {
       "page": 316,
@@ -417,7 +417,8 @@
         {
           "label": "Fred H. Brown, d",
           "contest": "governor",
-          "candidate": "Fred H. Brown"
+          "candidate": "Fred H. Brown",
+          "official": 75661
         }
       ],
       "orientation": "counties_down",
@@ -428,11 +429,8 @@
         0.749
       ],
       "hint": "Read only the table headed 'GRAFTON COUNTY'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        0.2549
-      ]
+      "bands": 1,
+      "wards": "33009"
     },
     {
       "page": 317,
@@ -461,7 +459,8 @@
         {
           "label": "Fred H. Brown, d",
           "contest": "governor",
-          "candidate": "Fred H. Brown"
+          "candidate": "Fred H. Brown",
+          "official": 75661
         }
       ],
       "orientation": "counties_down",
@@ -472,11 +471,8 @@
         0.581
       ],
       "hint": "Read only the table headed 'COOS COUNTY'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        0.3517
-      ]
+      "bands": 1,
+      "wards": "33007"
     },
     {
       "page": 318,
@@ -491,26 +487,7 @@
           "label": "Farrand, d",
           "contest": "senate",
           "candidate": "George E. Farrand"
-        }
-      ],
-      "orientation": "counties_down",
-      "crop": [
-        0.07,
-        0.102,
-        0.635,
-        0.794
-      ],
-      "hint": "Read only the table headed 'U. S. SENATOR, Rockingham County'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        0.2355
-      ]
-    },
-    {
-      "page": 318,
-      "id": "318-1",
-      "columns": [
+        },
         {
           "label": "Hale, r",
           "contest": "house1",
@@ -524,17 +501,14 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.628,
-        0.113,
+        0.05,
+        0.102,
         0.879,
         0.794
       ],
-      "hint": "Read only the table headed 'CONGRESSMEN, 1st Dist., Rockingham County'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        0.2232
-      ]
+      "hint": "Read the whole table: the town names at the left, then the U. S. Senator columns, then the Congressmen columns (one or both districts).",
+      "bands": 1,
+      "wards": "33015"
     },
     {
       "page": 319,
@@ -549,26 +523,7 @@
           "label": "Farrand, d",
           "contest": "senate",
           "candidate": "George E. Farrand"
-        }
-      ],
-      "orientation": "counties_down",
-      "crop": [
-        0.366,
-        0.105,
-        0.676,
-        0.606
-      ],
-      "hint": "Read only the table headed 'STRAFFORD COUNTY - U. S. SENATOR'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        0.3293
-      ]
-    },
-    {
-      "page": 319,
-      "id": "319-1",
-      "columns": [
+        },
         {
           "label": "Hale, r",
           "contest": "house1",
@@ -582,17 +537,14 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.66,
+        0.05,
         0.105,
         0.916,
         0.606
       ],
-      "hint": "Read only the table headed 'CONGRESSMEN 1st Dist. - STRAFFORD COUNTY'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        0.3293
-      ]
+      "hint": "Read the whole table: the town names at the left, then the U. S. Senator columns, then the Congressmen columns (one or both districts).",
+      "bands": 1,
+      "wards": "33017"
     },
     {
       "page": 320,
@@ -621,12 +573,14 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.083,
+        0.05,
         0.092,
         0.893,
         0.499
       ],
-      "hint": "Read only the table headed 'BELKNAP COUNTY'; ignore any other table visible in the image."
+      "hint": "Read the whole table: the town names at the left, then the U. S. Senator columns, then the Congressmen columns (one or both districts).",
+      "wards": "33001",
+      "bands": 1
     },
     {
       "page": 321,
@@ -655,12 +609,14 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.108,
+        0.05,
         0.107,
         0.918,
         0.514
       ],
-      "hint": "Read only the table headed 'CARROLL COUNTY'; ignore any other table visible in the image."
+      "hint": "Read the whole table: the town names at the left, then the U. S. Senator columns, then the Congressmen columns (one or both districts).",
+      "wards": "33003",
+      "bands": 1
     },
     {
       "page": 322,
@@ -675,26 +631,7 @@
           "label": "Farrand, d",
           "contest": "senate",
           "candidate": "George E. Farrand"
-        }
-      ],
-      "orientation": "counties_down",
-      "crop": [
-        0.333,
-        0.106,
-        0.57,
-        0.756
-      ],
-      "hint": "Read only the table headed 'U. S. SENATOR'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        0.2477
-      ]
-    },
-    {
-      "page": 322,
-      "id": "322-1",
-      "columns": [
+        },
         {
           "label": "Hale, r",
           "contest": "house1",
@@ -704,26 +641,7 @@
           "label": "Rogers, d",
           "contest": "house1",
           "candidate": "William N. Rogers"
-        }
-      ],
-      "orientation": "counties_down",
-      "crop": [
-        0.554,
-        0.106,
-        0.731,
-        0.756
-      ],
-      "hint": "Read only the table headed 'CONGRESSMEN 1st Dist.'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        0.2477
-      ]
-    },
-    {
-      "page": 322,
-      "id": "322-2",
-      "columns": [
+        },
         {
           "label": "Wason, r",
           "contest": "house2",
@@ -737,17 +655,14 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.715,
+        0.05,
         0.106,
         0.886,
         0.756
       ],
-      "hint": "Read only the table headed 'CONGRESSMEN 2d Dist.'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        0.2477
-      ]
+      "hint": "Read the whole table: the town names at the left, then the U. S. Senator columns, then the Congressmen columns (one or both districts).",
+      "bands": 1,
+      "wards": "33013"
     },
     {
       "page": 323,
@@ -786,17 +701,14 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.114,
+        0.05,
         0.108,
         0.927,
         0.909
       ],
-      "hint": "Read only the table headed 'HILLSBOROUGH COUNTY: U. S. SENATOR AND CONGRESSMEN, 1924 GENERAL ELECTION'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        0.2097
-      ]
+      "hint": "Read the whole table: the town names at the left, then the U. S. Senator columns, then the Congressmen columns (one or both districts).",
+      "bands": 1,
+      "wards": "33011"
     },
     {
       "page": 324,
@@ -811,26 +723,7 @@
           "label": "Farrand, d",
           "contest": "senate",
           "candidate": "George E. Farrand"
-        }
-      ],
-      "orientation": "counties_down",
-      "crop": [
-        0.104,
-        0.106,
-        0.682,
-        0.64
-      ],
-      "hint": "Read only the table headed 'CHESHIRE COUNTY - U. S. SENATOR'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        0.309
-      ]
-    },
-    {
-      "page": 324,
-      "id": "324-1",
-      "columns": [
+        },
         {
           "label": "Wason, r",
           "contest": "house2",
@@ -844,17 +737,14 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.666,
+        0.05,
         0.106,
         0.919,
         0.64
       ],
-      "hint": "Read only the table headed 'CONGRESSMEN 2nd Dist. - CHESHIRE COUNTY'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        0.309
-      ]
+      "hint": "Read the whole table: the town names at the left, then the U. S. Senator columns, then the Congressmen columns (one or both districts).",
+      "bands": 1,
+      "wards": "33005"
     },
     {
       "page": 325,
@@ -869,21 +759,7 @@
           "label": "Farrand, d",
           "contest": "senate",
           "candidate": "George E. Farrand"
-        }
-      ],
-      "orientation": "counties_down",
-      "crop": [
-        0.084,
-        0.107,
-        0.65,
-        0.496
-      ],
-      "hint": "Read only the table headed 'U. S. SENATOR - SULLIVAN COUNTY'; ignore any other table visible in the image."
-    },
-    {
-      "page": 325,
-      "id": "325-1",
-      "columns": [
+        },
         {
           "label": "Wason, r",
           "contest": "house2",
@@ -897,12 +773,14 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.636,
+        0.05,
         0.107,
         0.891,
         0.496
       ],
-      "hint": "Read only the table headed 'CONGRESSMEN 2nd Dist. - SULLIVAN COUNTY'; ignore any other table visible in the image."
+      "hint": "Read the whole table: the town names at the left, then the U. S. Senator columns, then the Congressmen columns (one or both districts).",
+      "wards": "33019",
+      "bands": 1
     },
     {
       "page": 326,
@@ -917,26 +795,7 @@
           "label": "Farrand, d",
           "contest": "senate",
           "candidate": "George E. Farrand"
-        }
-      ],
-      "orientation": "counties_down",
-      "crop": [
-        0.098,
-        0.106,
-        0.665,
-        0.767
-      ],
-      "hint": "Read only the table headed 'U. S. SENATOR'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        0.2466
-      ]
-    },
-    {
-      "page": 326,
-      "id": "326-1",
-      "columns": [
+        },
         {
           "label": "Wason, r",
           "contest": "house2",
@@ -950,17 +809,14 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.649,
+        0.05,
         0.106,
         0.906,
         0.767
       ],
-      "hint": "Read only the table headed 'CONGRESSMEN 2nd Dist.'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        0.2466
-      ]
+      "hint": "Read the whole table: the town names at the left, then the U. S. Senator columns, then the Congressmen columns (one or both districts).",
+      "bands": 1,
+      "wards": "33009"
     },
     {
       "page": 327,
@@ -989,17 +845,17 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.091,
+        0.05,
         0.106,
         0.9,
         0.619
       ],
-      "hint": "Read only the table headed 'COOS COUNTY'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        0.3411
-      ]
+      "hint": "Read the whole table: the town names at the left, then the U. S. Senator columns, then the Congressmen columns (one or both districts).",
+      "bands": 1,
+      "wards": "33007"
     }
-  ]
+  ],
+  "unit_codes": {
+    "Wentworth's Loc'n": "33007"
+  }
 }

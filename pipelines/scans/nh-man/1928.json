@@ -17,7 +17,8 @@
       "day": "1928-11-06",
       "special": false,
       "state": "NH",
-      "district": null
+      "district": null,
+      "accept": "The Manual's printed totals disagree with the sum of its own town returns, which are loaded as printed: Norman Thomas (Socialist) 460 (printed 455, off in Sullivan)."
     },
     "governor": {
       "year": 1928,
@@ -25,7 +26,8 @@
       "day": "1928-11-06",
       "special": false,
       "state": "NH",
-      "district": null
+      "district": null,
+      "accept": "The Manual's printed totals disagree with the sum of its own town returns, which are loaded as printed: Charles W. Tobey 108,401 (printed 108,431, off in Merrimack)."
     },
     "house1": {
       "year": 1928,
@@ -33,7 +35,8 @@
       "day": "1928-11-06",
       "special": false,
       "state": "NH",
-      "district": 1
+      "district": 1,
+      "accept": "The Manual's printed totals disagree with the sum of its own town returns, which are loaded as printed: Francis C. Keefe 39,568 (printed 39,570, off in the state summary)."
     },
     "house2": {
       "year": 1928,
@@ -67,12 +70,14 @@
         {
           "label": "Thomas & Maurer, s",
           "contest": "president",
-          "candidate": "Norman Thomas (Socialist)"
+          "candidate": "Norman Thomas (Socialist)",
+          "official": 460
         },
         {
           "label": "Charles W. Tobey, r",
           "contest": "governor",
-          "candidate": "Charles W. Tobey"
+          "candidate": "Charles W. Tobey",
+          "official": 108401
         },
         {
           "label": "Eaton D. Sargent, d",
@@ -103,11 +108,8 @@
         0.811
       ],
       "hint": "Read only the table headed 'ROCKINGHAM COUNTY'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        0.2354
-      ]
+      "bands": 1,
+      "wards": "33015"
     },
     {
       "page": 405,
@@ -131,12 +133,14 @@
         {
           "label": "Thomas & Maurer, s",
           "contest": "president",
-          "candidate": "Norman Thomas (Socialist)"
+          "candidate": "Norman Thomas (Socialist)",
+          "official": 460
         },
         {
           "label": "Charles W. Tobey, r",
           "contest": "governor",
-          "candidate": "Charles W. Tobey"
+          "candidate": "Charles W. Tobey",
+          "official": 108401
         },
         {
           "label": "Eaton D. Sargent, d",
@@ -167,11 +171,8 @@
         0.626
       ],
       "hint": "Read only the table headed 'STRAFFORD COUNTY'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        0.3259
-      ]
+      "bands": 1,
+      "wards": "33017"
     },
     {
       "page": 406,
@@ -195,12 +196,14 @@
         {
           "label": "Thomas & Maurer, s",
           "contest": "president",
-          "candidate": "Norman Thomas (Socialist)"
+          "candidate": "Norman Thomas (Socialist)",
+          "official": 460
         },
         {
           "label": "Charles W. Tobey, r",
           "contest": "governor",
-          "candidate": "Charles W. Tobey"
+          "candidate": "Charles W. Tobey",
+          "official": 108401
         },
         {
           "label": "Eaton D. Sargent, d",
@@ -230,7 +233,9 @@
         0.872,
         0.525
       ],
-      "hint": "Read only the table headed 'BELKNAP COUNTY'; ignore any other table visible in the image."
+      "hint": "Read only the table headed 'BELKNAP COUNTY'; ignore any other table visible in the image.",
+      "wards": "33001",
+      "bands": 1
     },
     {
       "page": 407,
@@ -254,12 +259,14 @@
         {
           "label": "Thomas & Maurer, s",
           "contest": "president",
-          "candidate": "Norman Thomas (Socialist)"
+          "candidate": "Norman Thomas (Socialist)",
+          "official": 460
         },
         {
           "label": "Charles W. Tobey, r",
           "contest": "governor",
-          "candidate": "Charles W. Tobey"
+          "candidate": "Charles W. Tobey",
+          "official": 108401
         },
         {
           "label": "Eaton D. Sargent, d",
@@ -290,11 +297,8 @@
         0.54
       ],
       "hint": "Read only the table headed 'CARROLL COUNTY'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        0.389
-      ]
+      "bands": 1,
+      "wards": "33003"
     },
     {
       "page": 408,
@@ -318,12 +322,14 @@
         {
           "label": "Thomas & Maurer, s",
           "contest": "president",
-          "candidate": "Norman Thomas (Socialist)"
+          "candidate": "Norman Thomas (Socialist)",
+          "official": 460
         },
         {
           "label": "Charles W. Tobey, r",
           "contest": "governor",
-          "candidate": "Charles W. Tobey"
+          "candidate": "Charles W. Tobey",
+          "official": 108401
         },
         {
           "label": "Eaton D. Sargent, d",
@@ -354,11 +360,8 @@
         0.774
       ],
       "hint": "Read only the table headed 'Merrimack County: President and Governor (general election 1928)'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        0.2607
-      ]
+      "bands": 1,
+      "wards": "33013"
     },
     {
       "page": 409,
@@ -382,12 +385,14 @@
         {
           "label": "Thomas & Maurer, s",
           "contest": "president",
-          "candidate": "Norman Thomas (Socialist)"
+          "candidate": "Norman Thomas (Socialist)",
+          "official": 460
         },
         {
           "label": "Charles W. Tobey, r",
           "contest": "governor",
-          "candidate": "Charles W. Tobey"
+          "candidate": "Charles W. Tobey",
+          "official": 108401
         },
         {
           "label": "Eaton D. Sargent, d",
@@ -418,11 +423,8 @@
         0.944
       ],
       "hint": "Read only the table headed 'HILLSBOROUGH COUNTY'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        0.2065
-      ]
+      "bands": 1,
+      "wards": "33011"
     },
     {
       "page": 410,
@@ -446,12 +448,14 @@
         {
           "label": "Thomas & Maurer, s",
           "contest": "president",
-          "candidate": "Norman Thomas (Socialist)"
+          "candidate": "Norman Thomas (Socialist)",
+          "official": 460
         },
         {
           "label": "Charles W. Tobey, r",
           "contest": "governor",
-          "candidate": "Charles W. Tobey"
+          "candidate": "Charles W. Tobey",
+          "official": 108401
         },
         {
           "label": "Eaton D. Sargent, d",
@@ -482,11 +486,8 @@
         0.644
       ],
       "hint": "Read only the table headed 'CHESHIRE COUNTY'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        0.3229
-      ]
+      "bands": 1,
+      "wards": "33005"
     },
     {
       "page": 411,
@@ -510,12 +511,14 @@
         {
           "label": "Thomas & Maurer, s",
           "contest": "president",
-          "candidate": "Norman Thomas (Socialist)"
+          "candidate": "Norman Thomas (Socialist)",
+          "official": 460
         },
         {
           "label": "Charles W. Tobey, r",
           "contest": "governor",
-          "candidate": "Charles W. Tobey"
+          "candidate": "Charles W. Tobey",
+          "official": 108401
         },
         {
           "label": "Eaton D. Sargent, d",
@@ -545,7 +548,9 @@
         0.911,
         0.504
       ],
-      "hint": "Read only the table headed 'SULLIVAN COUNTY'; ignore any other table visible in the image."
+      "hint": "Read only the table headed 'SULLIVAN COUNTY'; ignore any other table visible in the image.",
+      "wards": "33019",
+      "bands": 1
     },
     {
       "page": 412,
@@ -569,12 +574,14 @@
         {
           "label": "Thomas & Maurer, s",
           "contest": "president",
-          "candidate": "Norman Thomas (Socialist)"
+          "candidate": "Norman Thomas (Socialist)",
+          "official": 460
         },
         {
           "label": "Charles W. Tobey, r",
           "contest": "governor",
-          "candidate": "Charles W. Tobey"
+          "candidate": "Charles W. Tobey",
+          "official": 108401
         },
         {
           "label": "Eaton D. Sargent, d",
@@ -605,11 +612,8 @@
         0.805
       ],
       "hint": "Read only the table headed 'GRAFTON COUNTY'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        0.2497
-      ]
+      "bands": 1,
+      "wards": "33009"
     },
     {
       "page": 413,
@@ -633,12 +637,14 @@
         {
           "label": "Thomas & Maurer, s",
           "contest": "president",
-          "candidate": "Norman Thomas (Socialist)"
+          "candidate": "Norman Thomas (Socialist)",
+          "official": 460
         },
         {
           "label": "Charles W. Tobey, r",
           "contest": "governor",
-          "candidate": "Charles W. Tobey"
+          "candidate": "Charles W. Tobey",
+          "official": 108401
         },
         {
           "label": "Eaton D. Sargent, d",
@@ -669,11 +675,8 @@
         0.596
       ],
       "hint": "Read only the table headed 'COOS COUNTY'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        0.3398
-      ]
+      "bands": 1,
+      "wards": "33007"
     },
     {
       "page": 414,
@@ -687,7 +690,8 @@
         {
           "label": "Keefe, d",
           "contest": "house1",
-          "candidate": "Francis C. Keefe"
+          "candidate": "Francis C. Keefe",
+          "official": 39568
         },
         {
           "label": "Greene, s",
@@ -702,12 +706,8 @@
         0.887,
         1.0
       ],
-      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image.",
-      "bands": 3,
-      "header": [
-        0.0,
-        0.1869
-      ]
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image. Ward rows sit under their city's name; label each one with the city, for example 'Manchester Ward 9', even when the city's name is printed above the part of the table you are reading.",
+      "bands": 1
     },
     {
       "page": 415,
@@ -721,7 +721,8 @@
         {
           "label": "Keefe, d",
           "contest": "house1",
-          "candidate": "Francis C. Keefe"
+          "candidate": "Francis C. Keefe",
+          "official": 39568
         },
         {
           "label": "Greene, s",
@@ -736,12 +737,8 @@
         0.909,
         1.0
       ],
-      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT\u2014Continued'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        -0.0182
-      ]
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT—Continued'; ignore any other table visible in the image. Ward rows sit under their city's name; label each one with the city, for example 'Manchester Ward 9', even when the city's name is printed above the part of the table you are reading.",
+      "bands": 1
     },
     {
       "page": 416,
@@ -755,7 +752,8 @@
         {
           "label": "Keefe, d",
           "contest": "house1",
-          "candidate": "Francis C. Keefe"
+          "candidate": "Francis C. Keefe",
+          "official": 39568
         },
         {
           "label": "Greene, s",
@@ -770,12 +768,8 @@
         0.893,
         0.755
       ],
-      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT\u2014Concluded'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        -0.0341
-      ]
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT—Concluded'; ignore any other table visible in the image. Ward rows sit under their city's name; label each one with the city, for example 'Manchester Ward 9', even when the city's name is printed above the part of the table you are reading.",
+      "bands": 1
     },
     {
       "page": 417,
@@ -804,12 +798,8 @@
         0.89,
         1.0
       ],
-      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image.",
-      "bands": 3,
-      "header": [
-        0.0,
-        0.1931
-      ]
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image. Ward rows sit under their city's name; label each one with the city, for example 'Manchester Ward 9', even when the city's name is printed above the part of the table you are reading.",
+      "bands": 1
     },
     {
       "page": 418,
@@ -838,7 +828,8 @@
         0.894,
         1.0
       ],
-      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT\u2014Continued'; ignore any other table visible in the image."
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT—Continued'; ignore any other table visible in the image. Ward rows sit under their city's name; label each one with the city, for example 'Manchester Ward 9', even when the city's name is printed above the part of the table you are reading.",
+      "bands": 1
     },
     {
       "page": 419,
@@ -867,12 +858,8 @@
         0.89,
         1.0
       ],
-      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT \u2014Continued'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        -0.0199
-      ]
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT —Continued'; ignore any other table visible in the image. Ward rows sit under their city's name; label each one with the city, for example 'Manchester Ward 9', even when the city's name is printed above the part of the table you are reading.",
+      "bands": 1
     },
     {
       "page": 420,
@@ -901,7 +888,11 @@
         0.872,
         0.598
       ],
-      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT\u2014Concluded'; ignore any other table visible in the image."
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT—Concluded'; ignore any other table visible in the image. Ward rows sit under their city's name; label each one with the city, for example 'Manchester Ward 9', even when the city's name is printed above the part of the table you are reading.",
+      "bands": 1
     }
-  ]
+  ],
+  "unit_codes": {
+    "Wentworth's Loc'n": "33007"
+  }
 }
