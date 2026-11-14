@@ -617,6 +617,19 @@ TABLES += [
     }
     for ballot in range(93, 104)
 ]
+EVENING_STAR_1924_JULY_1 = "batch_dlc_carmichael_ver01:data:sn83045462:00280657566:1924070101:0273"
+TABLES += [
+    {
+        "table": f"1924:democratic:b{ballot}",
+        "image": f"https://tile.loc.gov/image-services/iiif/service:ndnp:dlc:{EVENING_STAR_1924_JULY_1}/full/pct:50/0/default.jpg",
+        "release": "https://www.loc.gov/resource/sn83045462/1924-07-01/ed-1/?sp=3",
+        "leaves": (1,),
+        "ballot": ballot,
+        "transcribed": "conventions_new_york_1924.tsv",
+        "short": True,
+    }
+    for ballot in range(15, 19)
+]
 EVENING_STAR_1924_JULY_2 = "batch_dlc_carmichael_ver01:data:sn83045462:00280657566:1924070201:0322"
 TABLES += [
     {
@@ -864,6 +877,20 @@ EVENING_STAR_1924_CAVEAT = (
     "Davis was nominated by acclamation after the roll call, so that table has no printed totals. Delegations whose "
     "named votes fall short of their size are shown as not recorded. Totals are the printed ones. Where a printed "
     "total differs from the state rows, the rows are stored as printed and the ballot's own note says so."
+)
+EVENING_STAR_1924_JULY_1_CAVEAT = (
+    "The archive has not located a free copy of the official proceedings' roll call of these ballots, so they are the "
+    "state-by-state tables the Washington Evening Star printed on July 1, 1924 (page 3), for the 15th through the "
+    "18th ballot. They are defaults to be superseded by the official proceedings. Each table gives, for every "
+    "delegation, its votes for six to eleven named candidates, and the 15th table's scattering column and a note "
+    "under each of the others split the scattering votes by candidate and state; those entries are stored too. "
+    "The Star does not date each ballot; the 15th is stored under June 30, 1924, the day the Star's "
+    "summary of yesterday's ballots gives it, and the 16th through the 18th under July 1, 1924. Delegations whose "
+    "named votes fall short of their size are shown as not recorded. Totals are the printed ones. Where a printed "
+    "total differs from the state rows, the rows are stored as printed and the ballot's own note says so. The "
+    "'J. Davis' of the Star's Illinois and Pennsylvania entries is not identified. The Star's 15th table headed a "
+    "column Harrison, which holds Mississippi's 20 votes and one half vote from Massachusetts; the archive stores it "
+    "as Pat Harrison. The Star's notes name Brown, Walsh, Baker, Copeland, and Hull without further identification."
 )
 EVENING_STAR_1924_JULY_2_CAVEAT = (
     "The archive has not located a free copy of the official proceedings' roll call of these ballots, so they are the "
@@ -1116,6 +1143,7 @@ PROCEEDINGS += [
     {"party": "democratic", "tables": {1: "2008:democratic"}, "title": "Roll Call Vote for President of the United States, 2008 Democratic National Convention: Final Vote Tally, as compiled by the Office of the Secretary", "publisher": "Democratic National Committee, Office of the Secretary", "city": "Denver", "days": (date(2008, 8, 25), date(2008, 8, 28)), "ballots": {1: date(2008, 8, 27)}, "deciding": 1, "method": SHEET_METHOD, "caveat": SHEET_CAVEAT},
     {"party": "democratic", "tables": {1: "2024:democratic"}, "title": "2024 Electronic Roll Call: State by State Breakdown", "publisher": "Democratic National Committee", "city": "Chicago", "days": (date(2024, 8, 19), date(2024, 8, 22)), "ballots": {1: date(2024, 8, 5)}, "umbrella": "2024-01-23:president:democratic", "deciding": 1, "required": None, "method": DNC_2024_METHOD, "caveat": DNC_2024_CAVEAT},
     {"party": "democratic", "tables": {1: "1960:democratic"}, "title": "The Evening Star (Washington, D.C.), July 14, 1960: Roll Call of States", "publisher": "The Evening Star", "kind": "news_agency", "city": "Los Angeles", "days": (date(1960, 7, 11), date(1960, 7, 15)), "ballots": {1: date(1960, 7, 13)}, "deciding": 1, "required": 761, "method": PRESS.format("the Washington Evening Star"), "caveat": EVENING_STAR_1960_CAVEAT},
+    {"party": "democratic", "tables": {n: f"1924:democratic:b{n}" for n in range(15, 19)}, "title": "The Evening Star (Washington, D.C.), July 1, 1924: Tabulation of Results of Democratic Convention Vote on Latest Ballots", "publisher": "The Evening Star", "kind": "news_agency", "city": "New York", "days": (date(1924, 6, 24), date(1924, 7, 9)), "ballots": {15: date(1924, 6, 30), 16: date(1924, 7, 1), 17: date(1924, 7, 1), 18: date(1924, 7, 1)}, "deciding": None, "required": 732, "method": PRESS.format("the Washington Evening Star"), "caveat": EVENING_STAR_1924_JULY_1_CAVEAT},
     {"party": "democratic", "tables": {n: f"1924:democratic:b{n}" for n in range(19, 31)}, "title": "The Evening Star (Washington, D.C.), July 2, 1924: Details of Balloting in Democratic Convention Since 2 P.M. Yesterday", "publisher": "The Evening Star", "kind": "news_agency", "city": "New York", "days": (date(1924, 6, 24), date(1924, 7, 9)), "ballots": dict.fromkeys(range(19, 31), date(1924, 7, 1)), "deciding": None, "required": 732, "method": PRESS.format("the Washington Evening Star"), "caveat": EVENING_STAR_1924_JULY_2_CAVEAT},
     {"party": "democratic", "tables": {n: f"1924:democratic:b{n}" for n in range(31, 51)}, "title": "The Evening Star (Washington, D.C.), July 3, 1924: Details of Balloting in Democratic Convention Wednesday and Today", "publisher": "The Evening Star", "kind": "news_agency", "city": "New York", "days": (date(1924, 6, 24), date(1924, 7, 9)), "ballots": dict.fromkeys(range(31, 51), date(1924, 7, 2)), "deciding": None, "required": 732, "method": PRESS.format("the Washington Evening Star"), "caveat": EVENING_STAR_1924_JULY_3_CAVEAT},
     {"party": "democratic", "tables": {n: f"1924:democratic:b{n}" for n in range(51, 64)}, "title": "The Evening Star (Washington, D.C.), July 4, 1924: Details of Balloting in Democratic Convention Showing Late Trends", "publisher": "The Evening Star", "kind": "news_agency", "city": "New York", "days": (date(1924, 6, 24), date(1924, 7, 9)), "ballots": dict.fromkeys(range(51, 64), date(1924, 7, 3)), "deciding": None, "required": 732, "method": PRESS.format("the Washington Evening Star"), "caveat": EVENING_STAR_1924_JULY_4_CAVEAT},
@@ -2837,6 +2865,18 @@ MISPRINTS = {
             "been found to settle it."
         ),
         {"VA": (24, 25, "2½, 18½, 2½, and 1½ against a delegation of 24")},
+    ),
+    "1924:democratic:b15": (
+        "The Star's table for this ballot disagrees with itself: the PA row adds to 77, against a delegation of 76; Cox's printed total is 60, against 61 in the state rows. The rows are stored as printed.",
+        {"PA": (76, 77, "the printed figure differs from the state figures"), "column Cox": (60, 61, "the printed figure differs from the state figures")},
+    ),
+    "1924:democratic:b17": (
+        "The Star's table for this ballot has no column for Robinson, and its scattering list omits him, so 28 of the 1,098 votes are not attributed to anyone: Arkansas 18, Wyoming 6, Illinois 2, Minnesota 1, and Pennsylvania 1 (each delegation's size less the votes the table names). Those cells are blank in the Star and are stored as not recorded.",
+        {},
+    ),
+    "1924:democratic:b18": (
+        "The Star's table for this ballot disagrees with itself: the MN row adds to 27, against a delegation of 24; Smith's printed total is 312.5, against 315.5 in the state rows; the printed scattering total of 129.5 is 10 more than the candidates named in the scattering list add to (119.5). The rows are stored as printed.",
+        {"MN": (24, 27, "the printed figure differs from the state figures"), "column Smith": (312.5, 315.5, "the printed figure differs from the state figures")},
     ),
     "1924:democratic:b19": (
         "The Star's table for this ballot disagrees with itself: Smith's printed total is 310.5, against 311.5 in the state rows. The rows are stored as printed.",
