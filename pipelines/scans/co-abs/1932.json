@@ -24,36 +24,36 @@
       "id": "13-0",
       "columns": [
         {
-          "label": "Alva B. Adams\u2014D",
+          "label": "Alva B. Adams—D",
           "contest": "senate",
           "candidate": "Alva B. Adams"
         },
         {
-          "label": "Karl C. Schuyler\u2014R",
+          "label": "Karl C. Schuyler—R",
           "contest": "senate",
           "candidate": "Karl C. Schuyler"
         },
         {
-          "label": "H. H. Marsh\u2014P.L.",
+          "label": "H. H. Marsh—P.L.",
           "contest": "senate",
           "candidate": "H. H. Marsh",
           "party": "P.L."
         },
         {
-          "label": "Raymond D. D. Richardson\u2014C",
+          "label": "Raymond D. D. Richardson—C",
           "contest": "senate",
           "candidate": "Raymond D. D. Richardson",
           "party": "C"
         },
         {
-          "label": "Carle Whitehead\u2014S",
+          "label": "Carle Whitehead—S",
           "contest": "senate",
           "candidate": "Carle Whitehead"
         }
       ],
       "orientation": "counties_down",
       "crop": [
-        0.012,
+        0.005,
         0.12,
         0.136,
         0.975
@@ -63,7 +63,8 @@
       "header": [
         0.0,
         0.21
-      ]
+      ],
+      "dpi": 450
     }
   ],
   "empty": true

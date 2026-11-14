@@ -24,22 +24,22 @@
       "id": "13-0",
       "columns": [
         {
-          "label": "Ralph L. Carr\u2014Rep.",
+          "label": "Ralph L. Carr—Rep.",
           "contest": "senate",
           "candidate": "Ralph L. Carr"
         },
         {
-          "label": "Edwin C. Johnson\u2014Dem.",
+          "label": "Edwin C. Johnson—Dem.",
           "contest": "senate",
           "candidate": "Edwin C. Johnson"
         },
         {
-          "label": "James A. Allender\u2014Ind.",
+          "label": "James A. Allender—Ind.",
           "contest": "senate",
           "candidate": "James Allander"
         },
         {
-          "label": "Carle Whitehead\u2014Soc.",
+          "label": "Carle Whitehead—Soc.",
           "contest": "senate",
           "candidate": "Carle Whitehead"
         }
@@ -52,11 +52,12 @@
         0.96
       ],
       "hint": "Read only the table headed 'U. S. SENATOR 6-YEAR TERM'; ignore any other table visible in the image.",
-      "bands": 2,
+      "bands": 3,
       "header": [
         0.0,
         0.2617
-      ]
+      ],
+      "dpi": 450
     }
   ],
   "empty": true
