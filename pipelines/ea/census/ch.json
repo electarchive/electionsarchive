@@ -9829,15 +9829,17 @@
           "period_years": 4,
           "term_years": 4,
           "source": "kv-ne",
-          "locator": "Cst. NE art. 95: every commune has a conseil général, elected by its voters for four years, as a rule by proportional representation"
+          "locator": "Cst. NE art. 95: every commune has a conseil général, elected by its voters for four years, as a rule by proportional representation; all communes elected together in 2024",
+          "phase": 0
         },
         {
           "within": "CH-GE",
           "period_years": 5,
           "term_years": 5,
           "source": "kv-ge",
-          "locator": "Cst-GE art. 140: each commune's conseil municipal is elected every five years by proportional representation",
-          "valid_from": "2015-06-01"
+          "locator": "Cst-GE art. 140: each commune's conseil municipal is elected every five years by proportional representation; all communes elected together in 2025 (LEDP A 5 05 art. 21)",
+          "valid_from": "2015-06-01",
+          "phase": 0
         },
         {
           "within": "CH-JU",
@@ -9931,7 +9933,8 @@
           "period_years": 4,
           "term_years": 4,
           "source": "lu-gg",
-          "locator": "GG LU § 16 Abs. 1: the voters elect the Gemeinderat every four years, and it takes office on 1 September"
+          "locator": "GG LU § 16 Abs. 1: the voters elect the Gemeinderat every four years, and it takes office on 1 September; all communes elected together in 2024",
+          "phase": 0
         },
         {
           "within": "CH-UR",
@@ -9945,50 +9948,57 @@
           "term_years": 4,
           "classes": 2,
           "source": "sz-gog",
-          "locator": "GOG SZ § 37 Abs. 2 and 3: half of each Gemeinderat is renewed every two years, and members serve four years; § 15 Abs. 1 lit. a (elected by the voters)"
+          "locator": "GOG SZ § 37 Abs. 2 and 3: half of each Gemeinderat is renewed every two years, and members serve four years; § 15 Abs. 1 lit. a (elected by the voters); all communes elected together under the 2026 decree, half renewed every two years",
+          "phase": 0
         },
         {
           "within": "CH-OW",
           "period_years": 4,
           "term_years": 4,
           "source": "kv-ow",
-          "locator": "KV OW Art. 93 Ziff. 2 lit. a: the Gemeinderäte are elected for four years"
+          "locator": "KV OW Art. 93 Ziff. 2 lit. a: the Gemeinderäte are elected for four years; all communes elected together in 2024",
+          "phase": 0
         },
         {
           "within": "CH-NW",
           "period_years": 4,
           "term_years": 4,
           "source": "kv-nw",
-          "locator": "KV NW Art. 45 (authorities serve four years); Art. 76 Ziff. 2 lets a commune elect half of its council every two years instead; GemG Art. 75 Abs. 1 (ballot box unless the Gemeindeordnung says otherwise)"
+          "locator": "KV NW Art. 45 (authorities serve four years); Art. 76 Ziff. 2 lets a commune elect half of its council every two years instead; GemG Art. 75 Abs. 1 (ballot box unless the Gemeindeordnung says otherwise); all communes elected together in 2026",
+          "phase": 2
         },
         {
           "within": "CH-GL",
           "period_years": 4,
           "term_years": 4,
           "source": "kv-gl",
-          "locator": "KV GL Art. 78 Abs. 1 (four years for cantonal and communal authorities, from 1 July); Art. 130 (the Vorsteherschaft is elected at the ballot box by majority vote)"
+          "locator": "KV GL Art. 78 Abs. 1 (four years for cantonal and communal authorities, from 1 July); Art. 130 (the Vorsteherschaft is elected at the ballot box by majority vote); all communes elected together in 2026",
+          "phase": 2
         },
         {
           "within": "CH-ZG",
           "period_years": 4,
           "term_years": 4,
           "source": "kv-zg",
-          "locator": "KV ZG § 77 Abs. 1 (four years for communal authorities elected by the people); § 78 (the Gemeinderat is elected at the ballot box)"
+          "locator": "KV ZG § 77 Abs. 1 (four years for communal authorities elected by the people); § 78 (the Gemeinderat is elected at the ballot box); all communes elected together on 4 Oct 2026",
+          "phase": 2
         },
         {
           "within": "CH-FR",
           "period_years": 5,
           "term_years": 5,
           "source": "fr-lco",
-          "locator": "LCo FR art. 56 al. 1 and 2: the conseil communal is elected at the ballot box for five years",
-          "valid_from": "1986-01-01"
+          "locator": "LCo FR art. 56 al. 1 and 2: the conseil communal is elected at the ballot box for five years; all communes elected together in 2026",
+          "valid_from": "1986-01-01",
+          "phase": 1
         },
         {
           "within": "CH-SO",
           "period_years": 4,
           "term_years": 4,
           "source": "kv-so",
-          "locator": "KV SO Art. 61 Abs. 1 (four years for all cantonal and communal authorities); GG SO § 54 Abs. 1 lit. a (ballot box)"
+          "locator": "KV SO Art. 61 Abs. 1 (four years for all cantonal and communal authorities); GG SO § 54 Abs. 1 lit. a (ballot box); all communes elected together for the term starting 2025",
+          "phase": 1
         },
         {
           "within": "CH-BS",
@@ -10015,7 +10025,8 @@
           "period_years": 4,
           "term_years": 4,
           "source": "ar-gg",
-          "locator": "GG AR Art. 7 Abs. 1 (the term of the cantonal authorities, four years under KV AR Art. 65); Art. 5 Abs. 1 (the same day in every commune); Art. 15 Abs. 1 lit. b (elected by the voters)"
+          "locator": "GG AR Art. 7 Abs. 1 (the term of the cantonal authorities, four years under KV AR Art. 65); Art. 5 Abs. 1 (the same day in every commune); Art. 15 Abs. 1 lit. b (elected by the voters); all communes elect together for the cantonal term from 1 June, last in 2023",
+          "phase": 3
         },
         {
           "within": "CH-AI",
@@ -10030,7 +10041,8 @@
           "period_years": 4,
           "term_years": 4,
           "source": "kv-sg",
-          "locator": "KV SG Art. 59 lit. a (four years for cantonal and communal authorities); GG SG Art. 22 Abs. 1 and Art. 64 Abs. 1 lit. b (elected by the voters)"
+          "locator": "KV SG Art. 59 lit. a (four years for cantonal and communal authorities); GG SG Art. 22 Abs. 1 and Art. 64 Abs. 1 lit. b (elected by the voters); all communes elected together on 22 Sep 2024",
+          "phase": 0
         },
         {
           "within": "CH-GR",
@@ -10042,36 +10054,41 @@
           "period_years": 4,
           "term_years": 4,
           "source": "kv-ag",
-          "locator": "KV AG § 70 Abs. 1 (authorities serve four years); GG AG § 21 Abs. 1 lit. a (elected in the assembly or at the ballot box)"
+          "locator": "KV AG § 70 Abs. 1 (authorities serve four years); GG AG § 21 Abs. 1 lit. a (elected in the assembly or at the ballot box); all communes elected together in 2025",
+          "phase": 1
         },
         {
           "within": "CH-TG",
           "period_years": 4,
           "term_years": 4,
           "source": "kv-tg",
-          "locator": "KV TG § 32 (four years for everyone elected by the people); GemG TG § 3 Abs. 1 Ziff. 3 and 4 (elected by the voters)"
+          "locator": "KV TG § 32 (four years for everyone elected by the people); GemG TG § 3 Abs. 1 Ziff. 3 and 4 (elected by the voters); all communes elected together for the term from 1 June 2023",
+          "phase": 3
         },
         {
           "within": "CH-TI",
           "period_years": 4,
           "term_years": 4,
           "source": "kv-ti",
-          "locator": "Cost. TI art. 18 (the municipio is elected by proportional representation for four years); art. 35 (by the people)"
+          "locator": "Cost. TI art. 18 (the municipio is elected by proportional representation for four years); art. 35 (by the people); all communes elected together in 2024",
+          "phase": 0
         },
         {
           "within": "CH-VD",
           "period_years": 5,
           "term_years": 5,
           "source": "kv-vd",
-          "locator": "Cst-VD art. 148 (five years) and art. 149 (the voters elect the municipalité directly by majority vote in two rounds)",
-          "valid_from": "2006-07-01"
+          "locator": "Cst-VD art. 148 (five years) and art. 149 (the voters elect the municipalité directly by majority vote in two rounds); all communes elected together in 2026",
+          "valid_from": "2006-07-01",
+          "phase": 1
         },
         {
           "within": "CH-VS",
           "period_years": 4,
           "term_years": 4,
           "source": "kv-vs",
-          "locator": "Cst. VS art. 85 (communal councils are elected for four years); art. 78 (by the primary assembly)"
+          "locator": "Cst. VS art. 85 (communal councils are elected for four years); art. 78 (by the primary assembly); all communes elected together on 13 Oct 2024",
+          "phase": 0
         },
         {
           "within": "CH-NE",
@@ -10084,16 +10101,18 @@
           "period_years": 5,
           "term_years": 5,
           "source": "kv-ge",
-          "locator": "Cst-GE art. 141: the communal executive is elected every five years by majority vote, the first round with the conseil municipal",
-          "valid_from": "2015-06-01"
+          "locator": "Cst-GE art. 141: the communal executive is elected every five years by majority vote, the first round with the conseil municipal; all communes elected together in 2025 (LEDP A 5 05 art. 21)",
+          "valid_from": "2015-06-01",
+          "phase": 0
         },
         {
           "within": "CH-JU",
           "period_years": 5,
           "term_years": 5,
           "source": "kv-ju",
-          "locator": "Cst. JU art. 65 (communal authorities are elected for five years); art. 74 (the voters elect the conseillers communaux)",
-          "valid_from": "2010-07-01"
+          "locator": "Cst. JU art. 65 (communal authorities are elected for five years); art. 74 (the voters elect the conseillers communaux); all communes elected together on 23 Oct 2022 (LDP art. 22 al. 2)",
+          "valid_from": "2010-07-01",
+          "phase": 2
         },
         {
           "within": "CH-FR",
@@ -10192,7 +10211,8 @@
           "period_years": 2,
           "term_years": 2,
           "source": "sz-gog",
-          "locator": "GOG SZ § 15 Abs. 1 lit. a (the voters elect the Gemeindepräsident); § 37 Abs. 3 (for two years)"
+          "locator": "GOG SZ § 15 Abs. 1 lit. a (the voters elect the Gemeindepräsident); § 37 Abs. 3 (for two years); all communes elected together under the 2026 decree, half renewed every two years",
+          "phase": 0
         },
         {
           "within": "CH-OW",
@@ -10211,21 +10231,24 @@
           "period_years": 4,
           "term_years": 4,
           "source": "kv-gl",
-          "locator": "KV GL Art. 78 Abs. 1 (four years); Art. 130 (the president is elected at the ballot box by majority vote)"
+          "locator": "KV GL Art. 78 Abs. 1 (four years); Art. 130 (the president is elected at the ballot box by majority vote); all communes elected together in 2026",
+          "phase": 2
         },
         {
           "within": "CH-ZG",
           "period_years": 4,
           "term_years": 4,
           "source": "kv-zg",
-          "locator": "KV ZG § 77 Abs. 1 (four years); § 78 (the president of the Gemeinderat is elected at the ballot box)"
+          "locator": "KV ZG § 77 Abs. 1 (four years); § 78 (the president of the Gemeinderat is elected at the ballot box); all communes elected together on 4 Oct 2026",
+          "phase": 2
         },
         {
           "within": "CH-SO",
           "period_years": 4,
           "term_years": 4,
           "source": "so-gg",
-          "locator": "GG SO § 54 Abs. 1 lit. c (the Gemeindepräsident is elected at the ballot box); KV SO Art. 61 Abs. 1 (four years)"
+          "locator": "GG SO § 54 Abs. 1 lit. c (the Gemeindepräsident is elected at the ballot box); KV SO Art. 61 Abs. 1 (four years); all communes elected together for the term starting 2025",
+          "phase": 1
         },
         {
           "within": "CH-BS",
@@ -10252,7 +10275,8 @@
           "period_years": 4,
           "term_years": 4,
           "source": "ar-gg",
-          "locator": "GG AR Art. 15 Abs. 1 lit. b (the voters elect the Gemeindepräsident); Art. 7 Abs. 1 (the cantonal term, four years)"
+          "locator": "GG AR Art. 15 Abs. 1 lit. b (the voters elect the Gemeindepräsident); Art. 7 Abs. 1 (the cantonal term, four years); all communes elect together for the cantonal term from 1 June, last in 2023",
+          "phase": 3
         },
         {
           "within": "CH-AI",
@@ -10267,7 +10291,8 @@
           "period_years": 4,
           "term_years": 4,
           "source": "sg-gg",
-          "locator": "GG SG Art. 22 Abs. 1 and Art. 64 Abs. 1 lit. b (the voters elect the chair of the council); Abs. 2bis lets a commune with more than one full-time council member have the council choose its chair; KV SG Art. 59 lit. a (four years)"
+          "locator": "GG SG Art. 22 Abs. 1 and Art. 64 Abs. 1 lit. b (the voters elect the chair of the council); Abs. 2bis lets a commune with more than one full-time council member have the council choose its chair; KV SG Art. 59 lit. a (four years); all communes elected together on 22 Sep 2024",
+          "phase": 0
         },
         {
           "within": "CH-GR",
@@ -10279,43 +10304,49 @@
           "period_years": 4,
           "term_years": 4,
           "source": "ag-gg",
-          "locator": "GG AG § 21 Abs. 1 lit. a (the Gemeindeammann is elected in the assembly or at the ballot box); KV AG § 70 Abs. 1 (four years)"
+          "locator": "GG AG § 21 Abs. 1 lit. a (the Gemeindeammann is elected in the assembly or at the ballot box); KV AG § 70 Abs. 1 (four years); all communes elected together in 2025",
+          "phase": 1
         },
         {
           "within": "CH-TG",
           "period_years": 4,
           "term_years": 4,
           "source": "tg-gemg",
-          "locator": "GemG TG § 3 Abs. 1 Ziff. 3 (the voters elect the chair of the communal authority); KV TG § 32 (four years)"
+          "locator": "GemG TG § 3 Abs. 1 Ziff. 3 (the voters elect the chair of the communal authority); KV TG § 32 (four years); all communes elected together for the term from 1 June 2023",
+          "phase": 3
         },
         {
           "within": "CH-TI",
           "period_years": 4,
           "term_years": 4,
           "source": "kv-ti",
-          "locator": "Cost. TI art. 35 (the people elect the sindaco); art. 18 (four years)"
+          "locator": "Cost. TI art. 35 (the people elect the sindaco); art. 18 (four years); all communes elected together in 2024",
+          "phase": 0
         },
         {
           "within": "CH-VD",
           "period_years": 5,
           "term_years": 5,
           "source": "kv-vd",
-          "locator": "Cst-VD art. 149 (the voters elect the syndic from the members of the municipalité, within a month of its election); art. 148 (five years)"
+          "locator": "Cst-VD art. 149 (the voters elect the syndic from the members of the municipalité, within a month of its election); art. 148 (five years); all communes elected together in 2026",
+          "phase": 1
         },
         {
           "within": "CH-VS",
           "period_years": 4,
           "term_years": 4,
           "source": "kv-vs",
-          "locator": "Cst. VS art. 78 (the primary assembly elects the president and the vice president); art. 85 (four years)"
+          "locator": "Cst. VS art. 78 (the primary assembly elects the president and the vice president); art. 85 (four years); all communes elected together on 13 Oct 2024",
+          "phase": 0
         },
         {
           "within": "CH-JU",
           "period_years": 5,
           "term_years": 5,
           "source": "kv-ju",
-          "locator": "Cst. JU art. 74 (the voters elect the maire by majority vote); art. 65 (five years)",
-          "valid_from": "2010-07-01"
+          "locator": "Cst. JU art. 74 (the voters elect the maire by majority vote); art. 65 (five years); all communes elected together on 23 Oct 2022 (LDP art. 22 al. 2)",
+          "valid_from": "2010-07-01",
+          "phase": 2
         },
         {
           "within": "CH-JU",
