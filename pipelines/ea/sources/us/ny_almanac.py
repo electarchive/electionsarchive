@@ -478,6 +478,7 @@ def emit() -> Path:
             if (int(year), int(district)) in WITHHELD:
                 continue
             contest = contests[key]
+            atlarge = int(district) > 0 and key.replace(f":house:{district}", ":house:0") in contests
             election, district_area, first, official = conn.execute(
                 """select c.election_id, c.district_area_id, coalesce(min(v.count_round), 0),
                           coalesce(sum(v.value) filter (where v.measure = 4 and v.option_k = 0),
@@ -508,7 +509,13 @@ def emit() -> Path:
                 if len(match) == 1:
                     picked[label] = match[0]
             result_set = cs.key(f"{SOURCE}.result_set", f"{key}:county")
-            if result_set not in cs.minted:
+            held = conn.execute(
+                """select r.is_default from result_set r join result_value v on v.result_set_k = r.k
+                   join reporting_unit u on u.k = v.unit_k and u.scheme_code in ('us.county', 'us.place')
+                   where r.id = %s limit 1""",
+                [result_set],
+            ).fetchone()
+            if result_set not in cs.minted and not (atlarge and held is not None):
                 continue
             if len(picked) < lines["label"].n_unique():
                 pool = cs.key("us.option", f"{key}:others:ny_almanac")
@@ -531,7 +538,7 @@ def emit() -> Path:
                 kind="counted",
                 status="active",
                 source_id=sources[int(year)],
-                is_default=False,
+                is_default=held is not None and held[0],
                 completeness=round(min(counted / official, 1), 4) if official else None,
             )
             for label, summed, printed in (
@@ -556,7 +563,7 @@ def emit() -> Path:
                 plain = _plain(county)
                 if plain in joint:
                     units[county] = joint[plain]
-                elif plain.startswith("partof"):
+                elif plain.startswith("partof") or atlarge:
                     code, parent, area = counties[plain.removeprefix("partof")]
                     part = f"{year}:{code}:{district}"
                     units[county] = cs.unit("us.county_part", part)

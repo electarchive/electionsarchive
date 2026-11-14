@@ -548,6 +548,28 @@ def emit() -> Path:
             ).fetchall()
         }
         counties: dict[tuple[str, str], tuple[UUID, UUID]] = {}
+        county_codes: dict[UUID, str] = {}
+        at_large = {
+            value
+            for (value,) in conn.execute(
+                "select value from external_id where scheme = 'us.contest' and value like '%%:house:0'"
+            ).fetchall()
+        }
+        on_counties = {
+            re.sub(r":(units|declared)(:declared)?$", "", value)
+            for (value,) in conn.execute(
+                """select x.value from result_set r join external_id x on x.entity_id = r.id and x.scheme = %s
+                   where r.status = 'active' and exists (
+                     select from result_value v join reporting_unit u on u.k = v.unit_k
+                      and u.scheme_code in ('us.county', 'us.place') where v.result_set_k = r.k)""",
+                [f"{SOURCE}.result_set"],
+            ).fetchall()
+        }
+        on_counties = {
+            value
+            for value in on_counties
+            if re.search(r":house:[1-9]", value) and re.sub(r":house:\d+.*$", ":house:0", value) in at_large
+        }
         for code, text, unit, area in conn.execute(
             """select u.code, n.text, u.id, u.area_id from reporting_unit u
                join name n on n.entity_id = u.area_id and n.kind = 'short'
@@ -555,6 +577,7 @@ def emit() -> Path:
         ).fetchall():
             postal = next(state for state, entry in states.items() if entry[3] == code[:2])
             counties[(postal, plain(text) + ("city" if int(code[2:]) >= 500 else ""))] = (unit, area)
+            county_codes[unit] = code
         for code, unit, area in conn.execute(
             "select code, id, area_id from reporting_unit where scheme_code = 'us.former_county'"
         ).fetchall():
@@ -635,6 +658,31 @@ def emit() -> Path:
                 parent = made[prefix][0]
             return parent
 
+        def parted(spot: UUID, key: str, day: date) -> UUID:
+            if (
+                spot not in county_codes
+                or re.search(r":house:0(:|$)", key)
+                or re.sub(r":house:\d+.*$", ":house:0", key) not in at_large
+            ):
+                return spot
+            part = cs.unit("us.county_part", f"{key}:{county_codes[spot]}")
+            if part in cs.minted:
+                county = next(entry for entry in counties.values() if entry[0] == spot)
+                cs.add(
+                    "reporting_unit",
+                    id=part,
+                    polity_id=cs.polity(f"US-{key.split(':')[1]}"),
+                    scheme_code="us.county_part",
+                    code=f"{key}:{county_codes[spot]}",
+                    parent_id=spot,
+                    area_relation="within",
+                    area_id=county[1],
+                    kind="standard",
+                    valid_from=day,
+                    valid_to=day + timedelta(days=1),
+                )
+            return part
+
         held: dict[str, dict] = {}
         for (
             key,
@@ -650,6 +698,7 @@ def emit() -> Path:
             votes,
             won,
             person,
+            held_day,
         ) in conn.execute(
             """select x.value, c.id, c.election_id, c.magnitude, r.id, r.kind, o.id, o.kind, o.ballot_label,
                           exists (select from contest_option ch where ch.parent_option_id = o.id),
@@ -657,7 +706,8 @@ def emit() -> Path:
                            where v.result_set_k = r.k and v.option_k = o.k and v.measure = 1),
                           exists (select from outcome oc where oc.result_set_id = r.id and oc.option_id = o.id
                                   and oc.kind = 'elected'),
-                          (select cd.person_id from candidacy cd where cd.option_id = o.id and cd.role = 'head' limit 1)
+                          (select cd.person_id from candidacy cd where cd.option_id = o.id and cd.role = 'head' limit 1),
+                          (select ee.date_from from election ee where ee.id = c.election_id)
                    from external_id x join contest c on c.id = x.entity_id
                    join result_set r on r.contest_id = c.id and r.is_default
                    left join contest_option o on o.contest_id = c.id and o.parent_option_id is null
@@ -667,7 +717,14 @@ def emit() -> Path:
         ).fetchall():
             entry = held.setdefault(
                 key,
-                {"contest": contest, "election": election, "magnitude": magnitude, "kind": kind, "options": []},
+                {
+                    "contest": contest,
+                    "election": election,
+                    "magnitude": magnitude,
+                    "kind": kind,
+                    "day": held_day,
+                    "options": [],
+                },
             )
             if option is not None:
                 entry["options"].append(
@@ -821,7 +878,7 @@ def emit() -> Path:
                     )
                     + ". THEA's figures stay the default.",
                 )
-            if result_set not in cs.minted:
+            if result_set not in cs.minted and key not in on_counties:
                 continue
             pool = None
             if any(candidate not in picked for candidate in sums):
@@ -855,7 +912,7 @@ def emit() -> Path:
                     + ". THEA's figures stay the default.",
                 )
             for place, cell in local.items():
-                spot = unit(postal, place)
+                spot = parted(unit(postal, place), key, entry["day"])
                 merged: dict[tuple[UUID | None, int], float] = {}
                 for candidate, vote in cell.items():
                     option = picked.get(candidate, pool) if candidate in picked else pool
@@ -1350,7 +1407,8 @@ def emit() -> Path:
                     "default_result_kind": "counted",
                     **fields,
                 }
-                if existing and not revise and not reopen:
+                restage = existing and not revise and not reopen and key in on_counties
+                if existing and not revise and not reopen and not restage:
                     if magnitude is not None and contest in magnitudes and magnitudes[contest] is None:
                         cs.add("contest", **contest_row)
                         tally["NNV trials on file with an open magnitude, given their declared winners' count"] += 1
@@ -1366,18 +1424,19 @@ def emit() -> Path:
                     previous = contest
                     continue
                 filled += len([line for line in lines.get(record, []) if line["elected"]])
-                cs.add("contest", **contest_row)
-                named(
-                    contest,
-                    f"{day.year} {title}"
-                    + (f", {TRIALS[round_number - 1]} trial" if round_number > 1 or anchor is not None else ""),
-                )
-                cs.add(
-                    "slug",
-                    path=f"us/{postal.lower()}/{stamp}-{part}/{part_path}"
-                    + (f"-trial-{round_number}" if round_number > 1 or anchor is not None else ""),
-                    entity_id=contest,
-                )
+                if not restage:
+                    cs.add("contest", **contest_row)
+                    named(
+                        contest,
+                        f"{day.year} {title}"
+                        + (f", {TRIALS[round_number - 1]} trial" if round_number > 1 or anchor is not None else ""),
+                    )
+                    cs.add(
+                        "slug",
+                        path=f"us/{postal.lower()}/{stamp}-{part}/{part_path}"
+                        + (f"-trial-{round_number}" if round_number > 1 or anchor is not None else ""),
+                        entity_id=contest,
+                    )
                 previous = contest
                 if reopen:
                     tally["NNV races with no winner marked, magnitude left open"] += 1
@@ -1492,28 +1551,42 @@ def emit() -> Path:
                         source_id=source,
                         is_default=is_default,
                         supersedes_id=old_sets[key]["id"] if revise and is_default and key in old_sets else None,
-                        completeness=round(min(counted / known, 1), 4) if known else None if counted else 0,
+                        completeness=(
+                            (
+                                conn.execute(
+                                    "select completeness from result_set where id = %s", [result_set]
+                                ).fetchone()
+                                or (None,)
+                            )[0]
+                            if restage
+                            else round(min(counted / known, 1), 4)
+                            if known
+                            else None
+                            if counted
+                            else 0
+                        ),
                     )
-                    if not is_default and units_note:
-                        cs.add("note", entity_id=result_set, kind="caveat", body_md=units_note)
-                    cs.add(
-                        "citation",
-                        entity_id=result_set,
-                        source_id=source,
-                        locator={"file": row["file"], "election_id": record, "handle": row["handle"]},
-                    )
-                    if is_default:
-                        for option in winners:
-                            cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected", seats=1)
-                        if precision != "day":
-                            cs.add(
-                                "note",
-                                entity_id=result_set,
-                                kind="caveat",
-                                body_md=MONTH_NOTE if precision == "month" else YEAR_NOTE,
-                            )
+                    if not restage:
+                        if not is_default and units_note:
+                            cs.add("note", entity_id=result_set, kind="caveat", body_md=units_note)
+                        cs.add(
+                            "citation",
+                            entity_id=result_set,
+                            source_id=source,
+                            locator={"file": row["file"], "election_id": record, "handle": row["handle"]},
+                        )
+                        if is_default:
+                            for option in winners:
+                                cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected", seats=1)
+                            if precision != "day":
+                                cs.add(
+                                    "note",
+                                    entity_id=result_set,
+                                    kind="caveat",
+                                    body_md=MONTH_NOTE if precision == "month" else YEAR_NOTE,
+                                )
                     for place_key, cell in places.items():
-                        spot = unit(postal, place_key) if place_key else district_unit
+                        spot = parted(unit(postal, place_key), key, day) if place_key else district_unit
                         merged: dict[tuple[UUID | None, int], float] = {}
                         for candidate, vote in cell.items():
                             if candidate not in options:
