@@ -4998,7 +4998,17 @@
     <span class="text-xs text-pretty text-muted-foreground"
       >{runoff.bar == null
         ? m.map_runoff_dated({ date: when })
-        : m.map_runoff_line({ bar: percent(runoff.bar, 0), date: when })}</span
+        : runoff.spread == null
+          ? m.map_runoff_line({ bar: percent(runoff.bar, 0), date: when })
+          : (runoff.spread.isStrict
+              ? m.map_runoff_spread_line
+              : m.map_runoff_spread_line_inclusive)({
+              bar: percent(runoff.bar, 0),
+              share: percent(runoff.spread.share, 0),
+              reach: percent(runoff.spread.reach, 0),
+              units: plural(runoff.spread.noun),
+              date: when,
+            })}</span
     >
     {#if finalists.length > 0}
       {const first = $derived(finalists[0])}
