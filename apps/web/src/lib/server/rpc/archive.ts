@@ -14710,11 +14710,19 @@ async function anchors(ks: Array<number>, day: string) {
       rowsOf(
         await db.execute<{ k: number; x: number; y: number }>(sql`
           select k, ST_X(p) as x, ST_Y(p) as y from (
-            select distinct on (a.k) a.k,
-              ${spot("coalesce(g.label_point, ST_PointOnSurface(g.geom))", "a.scheme_code")} as p
-            from area a join area_geometry g on g.area_id = a.id
-            where a.k = any(${sql.param(ks)}::int[]) and g.valid @> ${day}::date
-            order by a.k
+            select k,
+              ${spot("pt", "scheme_code")} as p
+            from (
+              select a.k, a.scheme_code,
+                coalesce(g.label_point, (
+                  select ST_PointOnSurface(f.geom) from area_geometry f
+                  where f.area_id = a.id and f.valid @> ${day}::date
+                )) as pt
+              from area a join area_geometry g on g.area_id = a.id
+              where a.k = any(${sql.param(ks)}::int[])
+                and (lower_inf(g.valid) or lower(g.valid) <= ${day}::date)
+                and (upper_inf(g.valid) or upper(g.valid) > ${day}::date)
+            ) y where pt is not null
           ) x where p is not null
         `),
       ),
