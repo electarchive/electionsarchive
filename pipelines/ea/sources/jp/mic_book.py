@@ -1,5 +1,9 @@
+import base64
+import io
+import json
 import re
 import subprocess
+import tempfile
 import unicodedata
 from dataclasses import dataclass
 from datetime import date
@@ -9,8 +13,11 @@ from typing import Any
 from uuid import UUID
 
 import polars as pl
+from anthropic.types import ImageBlockParam, TextBlockParam
+from anthropic.types.message_create_params import MessageCreateParamsNonStreaming
+from PIL import Image
 
-from ea import raw
+from ea import batch, raw
 from ea.changeset import Changeset, slug
 from ea.sources.jp import mic
 from ea.sources.jp.mic import BLOCK_OF
@@ -35,6 +42,135 @@ BOOKS = {
         "2005-09-11",
         ("20071230111711", "http://www.soumu.go.jp:80/senkyo/senkyo_s/data/shugiin44/index.html"),
         ("20110520101329", "http://www.soumu.go.jp/senkyo/senkyo_s/data/shugiin44/pdf/h17sousenkyo_050911_all.pdf"),
+    ),
+}
+ESTAT = "https://www.e-stat.go.jp/stat-search/file-download?statInfId={}&fileKind=2"
+
+
+@dataclass(frozen=True)
+class Scanned:
+    held: str
+    file: str
+    sections: dict[str, tuple[int, int]]
+
+
+SCANNED = {
+    43: Scanned("2003-11-09", "000008255748", {"forfeit": (339, 342), "smd": (373, 408), "pr": (420, 452)}),
+}
+MODEL = "claude-haiku-5-5"
+PROMPT = "1"
+READS = 2
+LONGEST = 1568
+DPI = 200
+TILES = {
+    "smd": {"top": (0.06, 0.05, 0.94, 0.52), "bottom": (0.06, 0.46, 0.94, 0.95)},
+    "pr": {"left": (0.06, 0.05, 0.51, 0.95), "right": (0.49, 0.05, 0.94, 0.95)},
+    "forfeit": {"left": (0.06, 0.05, 0.51, 0.95), "right": (0.49, 0.05, 0.94, 0.95)},
+}
+PREAMBLE = (
+    "You read a crop of one page of 衆議院議員総選挙・最高裁判所裁判官国民審査結果調, the official 2003 Japanese House "
+    "of Representatives election book. The table is printed horizontally in Arabic numerals with commas as thousands "
+    "separators. Transcribe exactly as printed, row by row from the top, and keep every digit, comma, and decimal "
+    "point of a figure. Keep names as printed, with one space between surname and given name where the print shows "
+    "a gap. Skip rows the crop cuts in half. "
+)
+SYSTEMS = {
+    "smd": PREAMBLE
+    + "This is table 72, 候補者別得票数, votes by candidate in the single-member districts. Its columns are 都道府県, "
+    "小選挙区 (第N区), 当落の別 (○ marks the winner), 候補者氏名 (the ballot name, with the legal name below it in "
+    "parentheses when it differs), 得票数 (may carry three decimals, as in 12,345.678), 男女別, 年令, 届出政党 (所属団体), "
+    "新前元別, 職業, 重複立候補 (重 when the candidate also stood on a list), and 惜敗率 (%). The prefecture and the "
+    "district are printed only on the first candidate of each group: give them on that row and null on the rows "
+    "below. Give the votes as the printed figure, and the 惜敗率 as printed or null when blank.",
+    "pr": PREAMBLE
+    + "This is table 74, 比例代表党派別当選者に関する調, one panel per party list in a proportional block. A panel "
+    "starts with the block (北海道選挙区, printed above the first panel of a block only), then 政党等名, 得票数 (a figure "
+    "followed by 票), 当選人数 (followed by 人), and the men and women elected, then one row per list member with "
+    "名簿 (list position), 氏名, 順位 (election order, blank for members not elected), 小選挙区 (当 or 落 for members who "
+    "also stood in a district, blank otherwise), and 惜敗率 (a ratio, ×, or blank). Give every panel in the crop, "
+    "left to right, and every member row, including those not elected.",
+    "forfeit": PREAMBLE
+    + "This is table 70, 法定得票数, 供託物没収点及び選挙運動法定費用額に関する調. It has two side-by-side column groups, "
+    "each with 都道府県/小選挙区別 (a prefecture name on its own row, then district numbers), 法定得票数, 供託物没収点, "
+    "and 選挙運動法定費用額 (円). Give one row per district with its prefecture; repeat the prefecture on every row.",
+}
+TEXT = {"type": "string"}
+MAYBE_TEXT = {"type": ["string", "null"]}
+MAYBE_INT = {"type": ["integer", "null"]}
+
+
+def strict(properties: dict[str, object]) -> dict[str, object]:
+    return {"type": "object", "properties": properties, "required": list(properties), "additionalProperties": False}
+
+
+SCHEMAS: dict[str, dict[str, object]] = {
+    "smd": strict(
+        {
+            "rows": {
+                "type": "array",
+                "items": strict(
+                    {
+                        "prefecture": MAYBE_TEXT,
+                        "district": MAYBE_INT,
+                        "winner": {"type": "boolean"},
+                        "name": TEXT,
+                        "legal": MAYBE_TEXT,
+                        "votes": TEXT,
+                        "gender": TEXT,
+                        "age": MAYBE_INT,
+                        "party": TEXT,
+                        "status": TEXT,
+                        "dual": {"type": "boolean"},
+                        "ratio": MAYBE_TEXT,
+                    }
+                ),
+            }
+        }
+    ),
+    "pr": strict(
+        {
+            "panels": {
+                "type": "array",
+                "items": strict(
+                    {
+                        "block": MAYBE_TEXT,
+                        "party": TEXT,
+                        "votes": TEXT,
+                        "seats": MAYBE_INT,
+                        "men": MAYBE_INT,
+                        "women": MAYBE_INT,
+                        "members": {
+                            "type": "array",
+                            "items": strict(
+                                {
+                                    "position": {"type": "integer"},
+                                    "name": TEXT,
+                                    "order": MAYBE_INT,
+                                    "district": MAYBE_TEXT,
+                                    "ratio": MAYBE_TEXT,
+                                }
+                            ),
+                        },
+                    }
+                ),
+            }
+        }
+    ),
+    "forfeit": strict(
+        {
+            "rows": {
+                "type": "array",
+                "items": strict(
+                    {
+                        "prefecture": TEXT,
+                        "district": {"type": "integer"},
+                        "legal": TEXT,
+                        "forfeit": TEXT,
+                        "expense": TEXT,
+                    }
+                ),
+            }
+        }
     ),
 }
 WORD = re.compile(r'<word xMin="([\d.]+)" yMin="([\d.]+)" xMax="([\d.]+)" yMax="([\d.]+)">(.*?)</word>')
@@ -65,6 +201,83 @@ def fetch() -> None:
     for book in BOOKS.values():
         raw.fetch(SOURCE, archived(*book.index), suffix=".html")
         raw.fetch(SOURCE, archived(*book.book), suffix=".pdf")
+    for scanned in SCANNED.values():
+        raw.fetch(SOURCE, ESTAT.format(scanned.file), suffix=".pdf")
+
+
+def section(scanned: Scanned, page: int) -> str:
+    return next(name for name, (first, last) in scanned.sections.items() if first <= page <= last)
+
+
+def tiles(scanned: Scanned, page: int) -> dict[str, tuple[tuple[int, int, int, int], Image.Image]]:
+    with tempfile.TemporaryDirectory() as folder:
+        stem = Path(folder) / "page"
+        path = raw.cached(SOURCE, ESTAT.format(scanned.file)).path
+        subprocess.run(
+            ["pdftoppm", "-f", str(page), "-l", str(page), "-r", str(DPI), "-gray", "-png", "-singlefile", path, stem],
+            check=True,
+        )
+        image = Image.open(stem.with_suffix(".png"))
+        image.load()
+    out = {}
+    for tile, (left, top, right, bottom) in TILES[section(scanned, page)].items():
+        box = (int(image.width * left), int(image.height * top), int(image.width * right), int(image.height * bottom))
+        crop = image.crop(box)
+        crop.thumbnail((LONGEST, LONGEST))
+        out[tile] = (box, crop)
+    return out
+
+
+def read_key(scanned: Scanned, page: int, tile: str, read: int) -> str:
+    return f"anthropic-batch:{MODEL}/{PROMPT}/{scanned.file}/{page}/{tile}/{read}"
+
+
+def read(scanned: Scanned, page: int, tile: str, read: int) -> dict[str, Any]:
+    message = json.loads(raw.cached(SOURCE, read_key(scanned, page, tile, read)).path.read_text())
+    return json.loads(next(block["text"] for block in message["content"] if block["type"] == "text"))
+
+
+def request(kind: str, crop: Image.Image, read: int) -> batch.Want:
+    buffer = io.BytesIO()
+    crop.save(buffer, "PNG", optimize=True)
+    price_in, price_out = batch.PRICES[MODEL]
+    params = MessageCreateParamsNonStreaming(
+        model=MODEL,
+        max_tokens=16000,
+        system=SYSTEMS[kind],
+        messages=[
+            {
+                "role": "user",
+                "content": [
+                    ImageBlockParam(
+                        type="image",
+                        source={
+                            "type": "base64",
+                            "media_type": "image/png",
+                            "data": base64.b64encode(buffer.getvalue()).decode(),
+                        },
+                    ),
+                    TextBlockParam(
+                        type="text",
+                        text="Transcribe this table crop." if read == 1 else "Transcribe this table crop, row by row.",
+                    ),
+                ],
+            }
+        ],
+        output_config={"effort": "low", "format": {"type": "json_schema", "schema": SCHEMAS[kind]}},
+    )
+    return params, (crop.width * crop.height / 750 * price_in + 5000 * price_out) / 1e6
+
+
+def ocr(election: int) -> None:
+    scanned = SCANNED[election]
+    wanted: dict[str, batch.Want] = {}
+    for kind, (first, last) in scanned.sections.items():
+        for page in range(first, last + 1):
+            for tile, (_, crop) in tiles(scanned, page).items():
+                for number in range(1, READS + 1):
+                    wanted[read_key(scanned, page, tile, number)] = request(kind, crop, number)
+    print(batch.ensure(SOURCE, f"hor{election}", wanted)[1])
 
 
 @dataclass(frozen=True)
