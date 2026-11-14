@@ -1009,4 +1009,5 @@ def emit() -> Path:
                 valid_from=day,
                 valid_to=day + timedelta(days=1),
             )
+        cs.manifest["scope"] = {"polity": "US-NC", "sweeps": ["note"]}
         return cs.write()
