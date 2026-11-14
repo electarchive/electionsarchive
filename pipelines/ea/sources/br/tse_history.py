@@ -40,9 +40,12 @@ POLLING_PLACES = {
     year: f"{TSE}eleitorado_locais_votacao/eleitorado_local_votacao_{year}.zip"
     for year in (2010, 2014, 2018, 2022, 2026)
 }
-SECTION_YEARS = (2002, 2006, 2010, 2014, 2018, 2026)
+SECTION_YEARS = (1998, 2002, 2006, 2010, 2014, 2018, 2026)
 SECTIONS = {
-    year: {key: f"{TSE}votacao_secao/votacao_secao_{year}_{key}.zip" for key in ("BR", *UFS)} for year in SECTION_YEARS
+    year: {
+        key: f"{TSE}votacao_secao/votacao_secao_{year}_{key}.zip" for key in (*(() if year == 1998 else ("BR",)), *UFS)
+    }
+    for year in SECTION_YEARS
 }
 SECTION_DETAIL = {year: f"{TSE}detalhe_votacao_secao/detalhe_votacao_secao_{year}.zip" for year in SECTION_YEARS}
 SECTION_NAMES = {
@@ -54,6 +57,7 @@ SECTION_NAMES = {
     "8": "district deputies",
 }
 SECTION_OFFICES = {
+    1998: ("3", "5"),
     2002: ("1", "3", "5"),
     2006: ("1", "3", "5"),
     2010: ("1", "3", "5"),
@@ -178,6 +182,12 @@ REMAINDERS = (
 ANNULLED_VOTES = (
     "The electoral court did not count this candidate's votes as valid. Its section files list them, but its "
     "municipal and state totals leave them out, so they count here as annulled votes."
+)
+DISAGREE = {1998: 150}
+DISAGREEMENT = (
+    "In {municipalities} of this contest's municipalities, the electoral court's polling-section files and its "
+    "municipal totals differ by a few votes, mostly between candidates and blank or null votes. Both are shown as the "
+    "court published them."
 )
 EXCESS = (
     "The electoral court's candidate totals here exceed its count of valid nominal votes by {excess} votes. The "
@@ -605,7 +615,8 @@ def numbered(year: int, voted: pl.DataFrame) -> pl.DataFrame:
             ),
             choice="NR_CANDIDATO",
             sequence="SQ_CANDIDATO",
-            replaced=pl.col("DS_SIT_TOT_TURNO") == "SUBSTITUÍDO",
+            replaced=(pl.col("DS_SIT_TOT_TURNO") == "SUBSTITUÍDO")
+            | (pl.lit(year == 1998) & (pl.col("DS_SITUACAO_CANDIDATURA") == "INDEFERIDO")),
         )
         .unique()
         .collect()
@@ -912,7 +923,17 @@ def sections(year: int) -> None:
         .join(rolled.select("contest", "candidate").unique(), on=["contest", "candidate"], how="anti")
     )
     differ = differ.join(shared, on=["contest", "candidate"], how="anti")
-    if differ.height or apart.height:
+    disagreement = pl.concat(
+        [
+            differ.select("contest", "municipality"),
+            apart.select("contest", "municipality"),
+        ]
+    ).unique()
+    if year in DISAGREE and disagreement.height <= DISAGREE[year]:
+        disagreement.group_by("contest").agg(municipalities=pl.len()).write_parquet(
+            PARSED / f"disagreement_{year}.parquet"
+        )
+    elif differ.height or apart.height:
         raise ValueError(
             f"section sums differ from the municipal totals: {differ.head(10)} {apart.select('contest', 'municipality', *(pl.col(field) - pl.col(f'{field}_sections') for field in measures)).head(10)}"
         )
@@ -1042,6 +1063,11 @@ def emit() -> Path:
     places = pl.read_parquet(PARSED / "places.parquet")
     excess = dict(pl.read_parquet(PARSED / "excess.parquet").iter_rows())
     section_year = int(os.environ.get("BR_SECTION_YEAR", SECTION_YEARS[-1]))
+    disagreement = (
+        dict(pl.read_parquet(PARSED / f"disagreement_{section_year}.parquet").iter_rows())
+        if (PARSED / f"disagreement_{section_year}.parquet").exists()
+        else {}
+    )
     section_units = pl.read_parquet(PARSED / f"sections_{section_year}.parquet")
     offices = os.environ.get("BR_SECTION_OFFICES", ",".join(SECTION_OFFICES[section_year])).split(",")
     section_values = pl.scan_parquet(PARSED / f"section_values_{section_year}.parquet")
@@ -1572,6 +1598,13 @@ def emit() -> Path:
                 cs.add("note", entity_id=contest, kind="caveat", body_md=EXCESS.format(excess=f"{excess[code]:,}"))
             if code in DROPPED:
                 cs.add("note", entity_id=contest, kind="caveat", body_md=DROPPED[code])
+            if code in disagreement:
+                cs.add(
+                    "note",
+                    entity_id=contest,
+                    kind="caveat",
+                    body_md=DISAGREEMENT.format(municipalities=disagreement[code]),
+                )
             result_set = cs.key(f"{SOURCE}.result_set", key) if code in tallied else None
             if result_set is not None:
                 cs.add(
