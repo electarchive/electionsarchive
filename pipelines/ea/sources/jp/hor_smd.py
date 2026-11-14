@@ -49,8 +49,10 @@ class Table:
 
 
 TABLES = {
+    "2017": Table("20170716_428AC1000000049", date(2017, 7, 16), "2017", 2015, "11.0b"),
     "2022": Table("20221228_504AC0000000089", date(2022, 12, 28), "2022", 2020, "16.0b"),
 }
+ISLANDS = {"1336": "大島支庁", "1338": "三宅支庁", "1340": "八丈支庁", "1342": "小笠原支庁"}
 NUMERALS = {"一": 1, "二": 2, "三": 3, "四": 4, "五": 5, "六": 6, "七": 7, "八": 8, "九": 9}
 
 
@@ -92,15 +94,17 @@ def annex(table: str) -> list[tuple[str, int, tuple[str, ...]]]:
     )
     prefectures = {native: f"{number:02d}" for number, (native, _) in enumerate(PREFECTURES, 1)}
     entries: list[tuple[str, int, tuple[str, ...]]] = []
-    prefecture = ""
+    native = prefecture = ""
     district = 0
     path: list[str] = []
     for depth, text in sentences(appendix):
         if text in prefectures:
-            prefecture, district, path = prefectures[text], 0, []
+            native, prefecture, district, path = text, prefectures[text], 0, []
         elif found := re.fullmatch(r"第([一二三四五六七八九十]+)区", text):
             district, path = kanji(found[1]), []
         elif text:
+            if depth == 0 and path and text.endswith("管内") and not text.startswith(native):
+                depth = 1
             path = [*path[:depth], text]
             entries.append((prefecture, district, tuple(path)))
     return entries
@@ -124,7 +128,7 @@ def estat_url(year: int, prefecture: str) -> str:
 
 def norm(text: str) -> str:
     text = unicodedata.normalize("NFKC", text)
-    for old, new in (("ヶ", "ケ"), ("ヵ", "カ"), ("之", "ノ"), ("桧", "檜"), ("舘", "館"), ("冨", "富")):
+    for old, new in (("ヶ", "ケ"), ("ヵ", "カ"), ("之", "ノ"), ("桧", "檜"), ("舘", "館"), ("冨", "富"), ("與", "与")):
         text = text.replace(old, new)
     return re.sub(r"^(大字|字)", "", text.strip())
 
@@ -173,6 +177,7 @@ def municipalities(vintage: str) -> dict[str, Municipality]:
     found: dict[str, Municipality] = {}
     for layer, code, parent, name in frame.filter(pl.col("layer").is_in(["municipality", "ward"])).iter_rows():
         subprefecture, county = attributes.get(code, ("", ""))
+        county = county or ISLANDS.get(code[:4], "")
         found[code] = Municipality(code, parent, name, subprefecture, county, layer == "ward" or name[-1] in "市区")
     return found
 
@@ -286,21 +291,29 @@ def plan(
         elif root.endswith("郡"):
             members = [town for town in local if norm(town.county) == norm(root)]
             if len(path) > 2:
-                raise ValueError(f"{table} {prefecture} {district} {path}: split town")
-            codes = (
-                [one([town for town in members if norm(town.name) == norm(path[1])], path[1]).code]
-                if len(path) > 1
-                else [town.code for town in members]
-            )
+                town = one([town for town in members if norm(town.name) == norm(path[1])], path[1])
+                splits.setdefault(town.code, []).append((district, path[-1]))
+            else:
+                codes = (
+                    [one([town for town in members if norm(town.name) == norm(path[1])], path[1]).code]
+                    if len(path) > 1
+                    else [town.code for town in members]
+                )
         else:
-            town = one([town for town in local if norm(town.name) == norm(root) and town.parent == prefecture])
-            if town.code in DESIGNATED:
+            name, _, excluded = root.partition("（")
+            town = one([town for town in local if norm(town.name) == norm(name) and town.parent == prefecture])
+            if excluded:
+                splits.setdefault(town.code, []).append((district, root))
+            elif town.code in DESIGNATED:
                 wards = [ward for ward in local if ward.parent == town.code]
                 if len(path) == 1:
                     codes = [ward.code for ward in wards]
                 else:
-                    ward = one([ward for ward in wards if norm(ward.name) == norm(path[1])], path[1])
-                    if len(path) == 2:
+                    name, _, excluded = path[1].partition("（")
+                    ward = one([ward for ward in wards if norm(ward.name) == norm(name)], path[1])
+                    if excluded:
+                        splits.setdefault(ward.code, []).append((district, path[1]))
+                    elif len(path) == 2:
                         codes = [ward.code]
                     else:
                         splits.setdefault(ward.code, []).append((district, path[-1]))
@@ -368,11 +381,11 @@ def assign(
         key = norm(name)
         inside = polygon.representative_point()
         prefix = [other for other in listed if key.startswith(other) and not SUFFIX.match(key[len(other) :])]
-        if district := next((district for shape, district in shapes_ if shape.contains(inside)), None):
-            chosen.append(district)
-        elif key in listed:
+        if key in listed:
             chosen.append(listed[key])
             found.add(key)
+        elif district := next((district for shape, district in shapes_ if shape.contains(inside)), None):
+            chosen.append(district)
         elif prefix:
             chosen.append(listed[max(prefix, key=len)])
             found.add(max(prefix, key=len))
@@ -501,7 +514,7 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary="House of Representatives single-member districts of Japan from the Public Offices Election Act "
-            "annex 1 (2022 table), drawn from N03 administrative areas and census small areas",
+            f"annex 1 ({' and '.join(TABLES)} tables), drawn from N03 administrative areas and census small areas",
             polity="JP",
         )
         law = cs.source(mlit.LAW_PUBLISHER, LAW_TITLE)
@@ -522,14 +535,17 @@ def emit() -> Path:
         districts = pl.concat([pl.read_parquet(PARSED / f"districts_{table}.parquet") for table in order])
         used = sorted(set(districts.filter(pl.col("members").str.contains("(part)", literal=True))["prefecture"]))
         for publisher, title, url, license_, license_url, attribution, links in (
-            (
-                "Statistics Bureau of Japan",
-                "Census small-area boundaries (町丁・字等), 2020",
-                "https://www.e-stat.go.jp/gis/statmap-search?page=1&type=2&aggregateUnitForBoundary=A",
-                "Government of Japan Standard Terms of Use 2.0 (compatible with CC BY 4.0)",
-                "https://www.e-stat.go.jp/terms-of-use",
-                "出典：政府統計の総合窓口(e-Stat)「国勢調査 小地域（町丁・字等）境界データ」を加工して作成",
-                [estat_url(TABLES[table].census, prefecture) for table in TABLES for prefecture in used],
+            *(
+                (
+                    "Statistics Bureau of Japan",
+                    f"Census small-area boundaries (町丁・字等), {year}",
+                    "https://www.e-stat.go.jp/gis/statmap-search?page=1&type=2&aggregateUnitForBoundary=A",
+                    "Government of Japan Standard Terms of Use 2.0 (compatible with CC BY 4.0)",
+                    "https://www.e-stat.go.jp/terms-of-use",
+                    "出典：政府統計の総合窓口(e-Stat)「国勢調査 小地域（町丁・字等）境界データ」を加工して作成",
+                    [estat_url(year, prefecture) for prefecture in used],
+                )
+                for year in sorted({spec.census for spec in TABLES.values()})
             ),
             (
                 mlit.PUBLISHER,
