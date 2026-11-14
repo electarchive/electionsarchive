@@ -1,8 +1,10 @@
 import re
+import subprocess
 import unicodedata
 from dataclasses import dataclass
 from datetime import date
 from decimal import Decimal
+from itertools import pairwise
 from pathlib import Path
 from urllib.parse import urljoin
 from uuid import UUID
@@ -34,7 +36,7 @@ BOOK = "候補者別得票数（選挙区）"
 SEATS = "党派別議席配分表（比例代表）"
 LISTS = "党派別名簿登載者別得票数、当選人数（比例代表）"
 PARTY_TOTALS = "党派別得票数（比例代表）"
-PARSED_ELECTIONS = [23, 24, 25, 26, 27]
+PARSED_ELECTIONS = [22, 23, 24, 25, 26, 27]
 PREFECTURE_NAMES = [native for native, _ in PREFECTURES]
 TOTAL_ROW = re.compile(r"(合計|[都道府県]計|県計)$")
 SUBTOTAL_ROW = re.compile(r"計$")
@@ -56,6 +58,8 @@ ALIASES = {
     "日本のこころを": "日本のこころを大切にする党",
     "生活の党と": "生活の党と山本太郎となかまたち",
     "労働の解放をめざす": "労働の解放をめざす労働者党",
+    "たちあがれ": "たちあがれ日本",
+    "たちあがれ日": "たちあがれ日本",
 }
 MERGED = ("鳥取県・島根県", "徳島県・高知県")
 SIZE = re.compile(r"[（(]定数(\d+)(?:[（(](\d+)[）)])?名[）)]")
@@ -452,6 +456,546 @@ def prefecture_of_page(page: str) -> str:
     return PREFECTURE_NAMES[int(match[1]) - 1]
 
 
+BOOK_PARTIES = [
+    "民主党",
+    "自由民主党",
+    "日本共産党",
+    "みんなの党",
+    "無所属",
+    "幸福実現党",
+    "社会民主党",
+    "新党改革",
+    "たちあがれ日本",
+    "公明党",
+    "日本創新党",
+    "国民新党",
+    "あきつ新党",
+    "スマイル党",
+    "新党フリーウェイクラブ",
+    "平和党核兵器廃絶平和運動",
+    "平和党核兵器廃絶平和",
+    "世界経済共同体党",
+    "新党本質",
+    "女性党",
+    "維新政党・新風",
+]
+ENTRY = re.compile(
+    r"(当|落)([^\d男女()（）当落]{1,14}?)(?:男|女)\d{2,3}("
+    + "|".join(sorted(map(re.escape, BOOK_PARTIES), key=len, reverse=True))
+    + r")(?:新|現|元).*?(\d{1,3}(?:,\d{3})+(?:\.\d+)?)"
+)
+NOT_LABEL = re.compile(r"^(確定?|残票|開票率|.*順位|.*番号|[*＊]|\d.*|.*率|.+名)$")
+CJK = re.compile(r"[぀-ヿ一-鿿]")
+
+
+def book_entries(text: str) -> list[dict]:
+    party = {"平和党核兵器廃絶平和": "平和党核兵器廃絶平和運動"}
+    return [
+        {"result": mark, "name": name, "party": party.get(member, member), "votes": amount(votes)}
+        for mark, name, member, votes in ENTRY.findall(text)
+    ]
+
+
+def number_of(cell: str) -> Decimal | None:
+    text = cell.replace(",", "").replace(" ", "")
+    if not re.fullmatch(r"-?\d+(?:\.\d+)?", text):
+        return None
+    return Decimal(text)
+
+
+def label_of(row: list[str], before: int) -> str:
+    for cell in reversed(row[:before]):
+        text = re.sub(r"[\s☆★※◎○●*]+", "", cell).replace("ケ", "ヶ")
+        if text and CJK.search(text) and not NOT_LABEL.match(text):
+            return text
+    return ""
+
+
+def pdf_rows(path: Path) -> list[list[str]]:
+    tsv = subprocess.run(["pdftotext", "-tsv", str(path), "-"], check=True, capture_output=True, text=True).stdout
+    pages: dict[str, list[tuple[float, float, float, str]]] = {}
+    for line in tsv.splitlines()[1:]:
+        cells = line.split("\t")
+        if cells[0] == "5" and cells[11].strip():
+            left, width = float(cells[6]), float(cells[8])
+            pages.setdefault(cells[1], []).append((float(cells[7]), left, left + width, norm(cells[11]).strip()))
+    rows: list[list[str]] = []
+    for words in pages.values():
+        lines: list[list[tuple[float, float, str]]] = []
+        last = -10.0
+        for y, left, right, word in sorted(words):
+            if y - last > 3:
+                lines.append([])
+                last = y
+            lines[-1].append((left, right, word))
+        joined: list[list[tuple[float, float, str]]] = []
+        for line in lines:
+            line.sort()
+            out: list[tuple[float, float, str]] = []
+            for left, right, word in line:
+                if out and re.fullmatch(r"\.\d+", word) and number_of(out[-1][2]) is not None:
+                    out[-1] = (out[-1][0], out[-1][1], out[-1][2] + word)
+                else:
+                    out.append((left, right, word))
+            joined.append(out)
+
+        def numeric(word: str) -> bool:
+            return number_of(word) is not None and not re.fullmatch(r"0\d+", word)
+
+        edges = sorted(
+            (left, right)
+            for line in joined
+            if line
+            and not numeric(line[0][2])
+            and (count := sum(1 for *_, word in line if numeric(word))) >= 3
+            and count >= 2 * (len(line) - count)
+            for left, right, word in line
+            if numeric(word)
+        )
+        clusters: list[list[tuple[float, float]]] = []
+        for left, right in sorted(edges, key=lambda edge: edge[1]):
+            if clusters and right - clusters[-1][-1][1] <= 6:
+                clusters[-1].append((left, right))
+            else:
+                clusters.append([(left, right)])
+        spans = [(min(left for left, _ in cluster), max(right for _, right in cluster)) for cluster in clusters]
+        if not spans:
+            continue
+        for line in joined:
+            row = [""] * (len(spans) + 1)
+            for left, right, word in line:
+                if numeric(word):
+                    k = min(range(len(spans)), key=lambda k: abs(spans[k][1] - right))
+                elif right <= spans[0][0] + 2:
+                    row[0] += word
+                    continue
+                else:
+                    middle = (left + right) / 2
+                    k = min(range(len(spans)), key=lambda k: abs((spans[k][0] + spans[k][1]) / 2 - middle))
+                row[k + 1] += word
+            rows.append(row)
+    return rows
+
+
+def workbook_rows(path: Path) -> list[list[str]]:
+    if path.suffix == ".pdf":
+        return wards(pdf_rows(path))
+    rows: list[list[str]] = []
+    for sheet in sheets(path):
+        rows += grid(path, sheet)
+    return wards(rows)
+
+
+def wards(rows: list[list[str]]) -> list[list[str]]:
+    city = None
+    for row in rows:
+        label, at = labeled(row)
+        if not label:
+            continue
+        if label.endswith("市"):
+            city = label
+        elif label.endswith("区") and city and "市" not in label:
+            row[at] = city + label
+        elif any(re.fullmatch(r"\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+\.\d+", cell) for cell in row[at + 1 :]):
+            city = None
+    return rows
+
+
+def table_rows(rows: list[list[str]], columns: list[int]) -> list[tuple[str, list[Decimal]]]:
+    found = []
+    for row in rows:
+        if max(columns) >= len(row):
+            continue
+        cells = [number_of(row[j]) if row[j] not in {"-", "－", "―"} else Decimal(0) for j in columns]
+        if all(cell is None for cell in cells) or any(cell is None and row[j] for cell, j in zip(cells, columns)):
+            continue
+        label = label_of(row, min(columns))
+        steps = [cell or Decimal(0) for cell in cells]
+        if len(steps) >= 3 and all(b - a == 1 for a, b in pairwise(steps)):
+            continue
+        if label:
+            found.append((label, [cell or Decimal(0) for cell in cells]))
+    return found
+
+
+def smd_2010(
+    path: Path, entries: list[dict], held: str, district: str
+) -> tuple[list[dict], list[dict], dict[str, str]] | None:
+    rows = workbook_rows(path)
+    totals = {entry["votes"]: index for index, entry in enumerate(entries)}
+    best: dict[int, int] = {}
+    at = 0
+    for index, row in enumerate(rows):
+        hits: dict[int, int] = {}
+        for j, cell in enumerate(row):
+            value = number_of(cell)
+            if value is not None and value in totals and totals[value] not in hits.values():
+                hits[j] = totals[value]
+        if len(hits) > len(best):
+            best, at = hits, index
+    columns = sorted(best)
+    wanted = [entries[best[j]]["votes"] for j in columns]
+    if not best:
+        return None
+    for part in (rows[:at], rows[at + 1 :], rows):
+        found = [row for row in table_rows(part, columns) if not TOTAL_ROW.search(row[0])]
+        leaves = leaves_of(found)
+        sums = [sum((values[k] for _, values in leaves), Decimal(0)) for k in range(len(columns))]
+        if sums == wanted:
+            break
+    else:
+        print(f"MISMATCH {held} {district}: leaves {sums} against the book {wanted}")
+        return None
+    aliases = {
+        label: found[index - 1][0]
+        for index, (label, values) in enumerate(found)
+        if label.endswith("郡") and index and found[index - 1][1] == values and (label, values) in leaves
+    }
+    leaves = [(aliases.get(label, label), values) for label, values in leaves]
+    candidates = []
+    for position, j in enumerate(columns):
+        entry = entries[best[j]]
+        header = next((row[j] for row in rows if j < len(row) and plain(row[j]) == plain(entry["name"])), "")
+        candidates.append(
+            {
+                "held": held,
+                "district": district,
+                "order": position + 1,
+                "name": person_name(header) if header else entry["name"],
+                "party": party_name(entry["party"]),
+                "votes": str(entry["votes"]),
+                "result": entry["result"],
+            }
+        )
+    votes = [
+        {"held": held, "district": district, "place": name, "order": k + 1, "votes": str(v)}
+        for name, values in leaves
+        for k, v in enumerate(values)
+    ]
+    return candidates, votes, aliases
+
+
+def bands(rows: list[list[str]], match) -> list[tuple[dict[int, object], list[list[str]]]]:
+    out: list[tuple[dict[int, object], list[list[str]]]] = []
+    for row in rows:
+        hits = {j: key for j, cell in enumerate(row) if cell and (key := match(cell)) is not None}
+        if hits:
+            out.append((hits, []))
+        elif out:
+            out[-1][1].append(row)
+    return out
+
+
+FRACTION = re.compile(r"0?\.\d{1,3}|0")
+
+
+def labeled(row: list[str]) -> tuple[str, int]:
+    found = "", -1
+    for j, cell in enumerate(row):
+        if number_of(cell) is not None and found[1] >= 0:
+            break
+        text = re.sub(r"[\s☆★※◎○●*]+", "", cell).replace("ケ", "ヶ")
+        if text and CJK.search(text) and not NOT_LABEL.match(text):
+            found = text, j
+    return found
+
+
+def fused(
+    rows: list[list[str]], keep: set[str], aliases: dict[str, str] | None = None
+) -> list[tuple[str, dict[int, Decimal]]]:
+    present = {labeled(row)[0] for row in rows}
+    names = {county: town for county, town in (aliases or {}).items() if town not in present}
+    rows = [
+        row for row in rows if names.get(labeled(row)[0], labeled(row)[0]) in keep or TOTAL_ROW.search(labeled(row)[0])
+    ]
+    width = max((len(row) for row in rows), default=0)
+    fraction = set()
+    for j in range(1, width):
+        cells = [row[j] for row in rows if j < len(row) and row[j]]
+        before = [row[j - 1] for row in rows if j < len(row) and row[j - 1]]
+        if (
+            cells
+            and all(FRACTION.fullmatch(cell) for cell in cells)
+            and all(re.fullmatch(r"[\d,]+", cell) for cell in before)
+        ):
+            fraction.add(j)
+    out = []
+    for row in rows:
+        label, at = labeled(row)
+        label = names.get(label, label)
+        if label not in keep and not TOTAL_ROW.search(label):
+            continue
+        values: dict[int, Decimal] = {}
+        last = None
+        for j in range(at + 1, len(row)):
+            if j in fraction and last is not None:
+                if row[j]:
+                    values[last] += Decimal(row[j])
+                continue
+            value = number_of(row[j])
+            if value is not None:
+                values[j] = value
+                last = j
+        out.append((label, values))
+    return out
+
+
+def split(group: list[int], found: list[tuple[str, dict[int, Decimal]]]) -> tuple[int, int | None, int | None] | None:
+    if len(group) == 1:
+        return group[0], None, None
+    for total in group:
+        for a in group:
+            for b in group:
+                if len({total, a, b}) < 3 or a > b:
+                    continue
+                if all(
+                    abs(values.get(total, Decimal(0)) - values.get(a, Decimal(0)) - values.get(b, Decimal(0)))
+                    < Decimal("0.002")
+                    for _, values in found
+                ) and any(values.get(a) for _, values in found):
+                    return total, a, b
+    return None
+
+
+def pr_party_2010(
+    path: Path, held: str, prefecture: str, known: set[str], keep: list[str], aliases: dict[str, str]
+) -> list[dict]:
+    def match(cell: str) -> str | None:
+        name = party_name(re.sub(r"^\d+[:：]?", "", norm(cell)))
+        return name if name in known else None
+
+    first: dict[tuple[str, str], tuple[Decimal, Decimal | None, Decimal | None]] = {}
+    for hits, rows in bands(workbook_rows(path), match):
+        found = fused(rows, set(keep), aliases)
+        if not found:
+            continue
+        counts: dict[int, int] = {}
+        for _, values in found:
+            for j in values:
+                counts[j] = counts.get(j, 0) + 1
+        columns = sorted(j for j, count in counts.items() if count * 2 >= len(found))
+        heads = sorted({str(party): j for j, party in sorted(hits.items(), reverse=True)}.values())
+        groups: list[tuple[int, int | None, int | None]] = []
+        index = 0
+        while index < len(columns):
+            for size in (3, 4):
+                picked = split(columns[index : index + size], found) if index + size <= len(columns) else None
+                if picked is not None and columns[index] in picked:
+                    groups.append(picked)
+                    index += size
+                    break
+            else:
+                index += 1
+        if not groups:
+            groups = [(j, None, None) for j in heads if j in columns]
+        if len(groups) == len(heads) + 1:
+            for extra in (groups[0], groups[-1]):
+                rest = [group for group in groups if group != extra]
+                if all(
+                    values.get(extra[0], Decimal(0))
+                    == sum((values.get(group[0], Decimal(0)) for group in rest), Decimal(0))
+                    for _, values in found
+                ):
+                    groups = rest
+                    break
+        parties = [str(hits[j]) for j in heads]
+        if len(groups) == len(heads):
+            for party, (total, a, b) in zip(parties, groups, strict=True):
+                for label, values in found:
+                    first.setdefault(
+                        (party, label),
+                        (
+                            values.get(total, Decimal(0)),
+                            None if a is None else values.get(a, Decimal(0)),
+                            None if b is None else values.get(b, Decimal(0)),
+                        ),
+                    )
+            continue
+        for label, values in found:
+            tokens = list(values.values())
+            triples = [tokens[k : k + 3] for k in range(0, len(tokens), 3)]
+            if len(tokens) != 3 * len(parties) or any(abs(t - a - b) >= Decimal("0.002") for t, a, b in triples):
+                print(f"COLUMNS {held} {prefecture} {label}: {len(tokens)} values for {len(parties)} parties")
+                continue
+            for party, (total, a, b) in zip(parties, triples, strict=True):
+                first.setdefault((party, label), (total, a, b))
+    out = []
+    for party in dict.fromkeys(party for party, _ in first):
+        missing = [label for label in keep if (party, label) not in first]
+        if missing:
+            print(f"MISSING {held} {prefecture} {party}: {missing[:5]}")
+        totals = [first[party, label] for p, label in first if p == party and TOTAL_ROW.search(label)]
+        whole = sum((first[party, label][0] for label in keep if (party, label) in first), Decimal(0))
+        if totals and all(abs(total[0] - whole) > Decimal("0.01") for total in totals):
+            print(f"MISMATCH {held} {prefecture} {party}: {whole} against {[str(total[0]) for total in totals]}")
+        for label in keep:
+            if (party, label) not in first:
+                continue
+            total, a, b = first[party, label]
+            out.append(
+                {
+                    "held": held,
+                    "prefecture": prefecture,
+                    "place": label,
+                    "party": party,
+                    "total": str(total),
+                    "party_votes": None if a is None else str(a),
+                    "candidate_votes": None if b is None else str(b),
+                }
+            )
+    return out
+
+
+def rising(values: list[int]) -> bool:
+    return bool(values) and values[0] == 1 and all(a < b for a, b in pairwise(values))
+
+
+def pr_candidates_2010(
+    path: Path, held: str, prefecture: str, keep: list[str], known: set[str], aliases: dict[str, str]
+) -> list[dict]:
+    rows = workbook_rows(path)
+    labels = set(keep)
+    out: list[dict] = []
+    parties: list[str] = []
+    for row in rows:
+        found = [name for cell in row if (name := party_name(re.sub(r"^\d+[:：\s]?", "", norm(cell)))) in known]
+        parties.append(found[0] if found else parties[-1] if parties else "")
+    index = 0
+    while index < len(rows):
+        row = rows[index]
+        party = parties[index]
+        if labeled(row)[0] in labels:
+            index += 1
+            continue
+        numbers = {j: int(cell) for j, cell in enumerate(row) if j > 0 and re.fullmatch(r"\d{1,3}", cell)}
+        if not rising(list(numbers.values())):
+            index += 1
+            continue
+        stop = index + 1
+        while stop < len(rows):
+            later = rows[stop]
+            values = [int(cell) for j, cell in enumerate(later) if j > 0 and re.fullmatch(r"\d{1,3}", cell)]
+            if labeled(later)[0] not in labels and rising(values):
+                break
+            stop += 1
+        names = {
+            j: next(
+                (
+                    later[j]
+                    for later in rows[index + 1 : stop]
+                    if j < len(later) and later[j] and number_of(later[j]) is None
+                ),
+                "",
+            )
+            for j in numbers
+        }
+        for label, values in fused(rows[index + 1 : stop], labels, aliases):
+            if label not in labels:
+                continue
+            for j, number in numbers.items():
+                out.append(
+                    {
+                        "held": held,
+                        "prefecture": prefecture,
+                        "place": label,
+                        "party": party,
+                        "number": number,
+                        "name": plain(names[j]),
+                        "votes": str(values.get(j, Decimal(0))),
+                    }
+                )
+        index = stop
+    return out
+
+
+def ranked_numbers(rows: list[dict], people: list[dict]) -> dict[tuple[str, int], dict]:
+    named = {(row["party"], plain(norm(row["name"]))): row for row in people}
+    votes: dict[tuple[str, int], dict[tuple[str, int], int]] = {}
+    for row in rows:
+        key = (row["party"], plain(norm(row["name"])))
+        person = named.get(key)
+        if person is None:
+            longer = [
+                found
+                for (party, name), found in named.items()
+                if party == row["party"] and len(key[1]) >= 4 and name.startswith(key[1])
+            ]
+            person = longer[0] if len(longer) == 1 else None
+        if person is not None:
+            tally = votes.setdefault((row["party"], row["number"]), {})
+            tally[person["party"], person["number"]] = tally.get((person["party"], person["number"]), 0) + 1
+    by = {(row["party"], row["number"]): row for row in people}
+    return {key: by[max(tally, key=lambda k: tally[k])] for key, tally in votes.items()}
+
+
+def parse_2010(
+    found: Listing, text: str, held: str, size: dict[str, tuple[int, int]], listed: list[dict], ranked: list[dict]
+) -> tuple[list[dict], list[dict], list[dict], list[dict]]:
+    entries = book_entries(text)
+    known = {row["party"] for row in listed if row["party"] != "合計"}
+    people = [row for row in ranked if row["party"] != "合計"]
+    candidates: list[dict] = []
+    smd_votes: list[dict] = []
+    places: list[dict] = []
+    loose: list[dict] = []
+    for page, files in found.pages:
+        prefecture = prefecture_of_page(page)
+        parsed = smd_2010(raw.cached(RAW, files[0]).path, entries, held, prefecture)
+        if parsed is None or not parsed[0]:
+            print(f"SKIPPED {held} {prefecture}: no readable municipal table")
+            UNCONFIRMED.append({"held": held, "district": prefecture})
+            continue
+        won = sum(1 for row in parsed[0] if row["result"] == "当")
+        if won != sum(size[prefecture]):
+            raise ValueError(f"{held} {prefecture}: {won} winners against {size[prefecture]} seats")
+        candidates += parsed[0]
+        smd_votes += parsed[1]
+        keep = list(dict.fromkeys(row["place"] for row in parsed[1]))
+        party_file = files[2] if files[1].endswith(".pdf") else files[1]
+        places += pr_party_2010(raw.cached(RAW, party_file).path, held, prefecture, known, keep, parsed[2])
+        loose += pr_candidates_2010(raw.cached(RAW, files[2]).path, held, prefecture, keep, known, parsed[2])
+    print(f"{held}: {len(candidates)} district candidates")
+    mapping = ranked_numbers(loose, people)
+    split_votes = {
+        (row["prefecture"], row["place"], row["party"]): row["candidate_votes"]
+        for row in places
+        if row["candidate_votes"] is not None
+    }
+    counts = {row["party"]: row["listed"] for row in listed}
+    by_prefecture: dict[str, list[dict]] = {}
+    for row in loose:
+        by_prefecture.setdefault(row["prefecture"], []).append(row)
+    pr_candidates: list[dict] = []
+    for prefecture, rows in by_prefecture.items():
+        sums: dict[tuple[str, str], Decimal] = {}
+        mapped: list[dict] = []
+        persons: dict[str, set[int]] = {}
+        for row in rows:
+            person = mapping.get((row["party"], row["number"]))
+            if person is None:
+                continue
+            persons.setdefault(row["party"], set()).add(person["number"])
+            sums[row["place"], row["party"]] = sums.get((row["place"], row["party"]), Decimal(0)) + Decimal(
+                row["votes"]
+            )
+            mapped.append({**row, "number": person["number"], "name": person["name"]})
+        short = sorted(party for party in known if len(persons.get(party, ())) != counts[party])
+        off = sorted(
+            {
+                party
+                for (place, party), total in sums.items()
+                if (prefecture, place, party) in split_votes
+                and abs(Decimal(split_votes[prefecture, place, party]) - total) > Decimal("0.01")
+            }
+        )
+        if short or off:
+            print(f"DROPPED {held} {prefecture} candidates: unmapped {short}, sums off {off}")
+            DROPPED.append({"held": held, "prefecture": prefecture, "party": ", ".join(short + off)})
+            continue
+        pr_candidates += mapped
+    return candidates, smd_votes, places, pr_candidates
+
+
 def parse(numbers: list[int] | None = None) -> None:
     candidates: list[dict] = []
     smd_votes: list[dict] = []
@@ -467,7 +1011,14 @@ def parse(numbers: list[int] | None = None) -> None:
         size = sizes(text, held)
         done: set[str] = set()
         parts: dict[str, tuple[list[dict], list[dict]]] = {}
-        for page, files in found.pages:
+        listed, ranked = national_lists(raw.cached(RAW, found.lists).path, held)
+        if number == 22:
+            more = parse_2010(found, text, held, size, listed, ranked)
+            candidates += more[0]
+            smd_votes += more[1]
+            pr_places += more[2]
+            pr_candidates += more[3]
+        for page, files in found.pages if number != 22 else []:
             prefecture = prefecture_of_page(page)
             path = raw.cached(RAW, files[0]).path
             if files[0] not in done:
@@ -489,7 +1040,8 @@ def parse(numbers: list[int] | None = None) -> None:
             pr_places += places
             keep = {row["place"] for row in places}
             pr_candidates += pr_candidate_sheets(raw.cached(RAW, files[2]).path, held, prefecture, keep)
-        for district, (more, votes) in parts.items():
+        for district, (more_, votes) in parts.items():
+            more = more_
             won = sum(size[district])
             top = sorted(more, key=lambda c: Decimal(c["votes"]), reverse=True)
             if won < len(top) and Decimal(top[won - 1]["votes"]) == Decimal(top[won]["votes"]):
@@ -502,7 +1054,6 @@ def parse(numbers: list[int] | None = None) -> None:
             else:
                 print(f"UNCONFIRMED {held} {district}: the municipal file disagrees with the book")
                 UNCONFIRMED.append({"held": held, "district": district})
-        listed, ranked = national_lists(raw.cached(RAW, found.lists).path, held)
         allocation = seat_table(raw.cached(RAW, found.seats).path)
         for record in listed:
             if record["party"] == "合計":
@@ -530,7 +1081,12 @@ def parse(numbers: list[int] | None = None) -> None:
 
 
 TITLE = "参議院議員通常選挙結果調"
-TYPOS = {"泰野市": "秦野市"}
+TYPOS = {
+    "泰野市": "秦野市",
+    "川口1": "川口市第1",
+    "川口2": "川口市第2",
+    **{f"揖斐川町{part}": f"揖斐川町({part})" for part in ("揖斐川", "谷汲", "春日", "久瀬", "藤橋", "坂内")},
+}
 SMD_RULES = {"formula": "sntv"}
 PR_RULES = {"formula": "dhondt", "lists": {"order": "open", "vacancy": "next_by_votes"}}
 SMD_SYSTEM = (
@@ -589,7 +1145,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Japan's House of Councillors regular elections 2013-2025 from the Ministry of Internal Affairs "
+            summary="Japan's House of Councillors regular elections 2010-2025 from the Ministry of Internal Affairs "
             "and Communications: prefectural district candidates and national list votes by counting district, with "
             "declared winners and seats",
             polity="JP",
@@ -925,7 +1481,8 @@ def emit() -> Path:
                 code = codes_of(row["prefecture"])
                 place, _ = place_unit(code, row["place"], None)
                 values.append((place_set, place, options_by[row["party"], -1], Decimal(row["total"])))
-                values.append((place_set, place, options_by[row["party"], None], Decimal(row["party_votes"])))
+                if row["party_votes"] is not None:
+                    values.append((place_set, place, options_by[row["party"], None], Decimal(row["party_votes"])))
             for row in pr_people.filter((pl.col("held") == held) & (pl.col("votes").cast(pl.Float64) > 0)).iter_rows(
                 named=True
             ):
