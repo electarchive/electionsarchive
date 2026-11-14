@@ -37,6 +37,9 @@ READ = {
     "S12000020",
     "S12000041",
     "S12000029",
+    "S12000006",
+    "S12000034",
+    "S12000026",
 }
 TRANSCRIBED = Path(__file__).parent / "cc_elections_transcribed.tsv"
 INBOX = DATA / "inbox/manual/MF-668"
@@ -146,6 +149,30 @@ COUNCILS = {
             "the scheme text. The list gives members only, not the places to be filled."
         ),
     ),
+    "S12000006": (
+        "Dumfries and Galloway Council",
+        "Amended Scheme for the Establishment of Community Councils in Dumfries and Galloway",
+        "https://www.dumgal.gov.uk/media/20726/Scheme-for-the-Establishment-of-Community-Councils/pdf/Sceheme_for_the_Establishment_of_Community_Councils_October_2020.pdf",
+        (
+            "Community councils in Dumfries and Galloway are formed under the council's Scheme for the Establishment of Community Councils, made under the Local Government (Scotland) Act 1973, and the council's returning officer runs the elections. Where the candidates validly nominated reach the minimum but do not exceed the maximum membership in Schedule 1 of the scheme, they are declared elected without a ballot; where they exceed it, a poll is held at a polling place and each voter may vote for candidates up to the number of vacancies, no more than once for each; below the minimum, no community council is established."
+        ),
+    ),
+    "S12000034": (
+        "Aberdeenshire Council",
+        "Aberdeenshire Council community council elections",
+        "https://www.aberdeenshire.gov.uk/communities-and-events/community-councils/cc-election",
+        (
+            "Community councils in Aberdeenshire are formed under the council's scheme for the establishment of community councils, made under the Local Government (Scotland) Act 1973. In 2024 all of them sought members at the same time for the first time, with the next election due in three years. Where nominations exceed the places, a ballot is held; where they fall short of a council's minimum, no community council is formed. This record is built from the council's area pages, not from the scheme text."
+        ),
+    ),
+    "S12000026": (
+        "Scottish Borders Council",
+        "Ballot rescheduled for Coldingham Community Council election",
+        "https://www.scotborders.gov.uk/news/article/4526/ballot-rescheduled-for-coldingham-community-council-election",
+        (
+            "Community councils in the Scottish Borders are formed under the council's scheme for community councils, made under the Local Government (Scotland) Act 1973, and the council runs their elections. At the Coldingham ballot, each voter was entitled to 10 votes and the 10 seats were filled by the 10 candidates with the most votes. This record is built from the council's news releases, not from the scheme text."
+        ),
+    ),
     "S12000027": (
         "Shetland Islands Council",
         "Shetland Islands Council community council elections 2025",
@@ -160,6 +187,21 @@ COUNCILS = {
     ),
 }
 ALIASES = {
+    ("S12000006", "Buittle"): "Buittle Parish",
+    ("S12000006", "Templand and District"): "Templand",
+    ("S12000006", "Port William and District"): "Port William",
+    ("S12000006", "Royal Burgh of Wigtown"): "Royal Burgh of Wigtown and District",
+    ("S12000006", "The Royal Burgh of Lochmaben and District"): "Royal Burgh of Lochmaben and District",
+    ("S12000006", "The Royal Burgh of Kirkcudbright and District"): "Royal Burgh of Kirkcudbright and District",
+    ("S12000006", "The Royal Burgh of New Galloway and Kells"): "The Royal Burgh of New Galloway and Kells Parish",
+    ("S12000006", "The Royal Burgh of Sanquhar and District"): "Royal Burgh of Sanquhar and District",
+    ("S12000006", "St Johns Town of Dalry"): "Dalry",
+    ("S12000006", "Stranraer Ochtrelure and Belmont"): "Stranraer, Ochtrelure and Belmont",
+    ("S12000034", "Boddam"): "Boddam and District",
+    ("S12000034", "Fraserburgh and District"): "Fraserburgh",
+    ("S12000034", "Fordyce, Sandend and Rural District"): "Fordyce, Sandend and District",
+    ("S12000034", "Fyvie, Rothienorman and Monquhitter"): "Fyvie Rothienorman Monquhitter",
+    ("S12000034", "St. Cyrus"): "St Cyrus",
     ("S12000030", "Kings Park"): "King's Park",
     ("S12000027", "Sandsting and Aithsting"): "Aithsting and Sandsting",
     ("S12000027", "Tingwall, Whiteness and Weisdale"): "Whiteness, Weisdale and Tingwall",
@@ -178,10 +220,18 @@ ALIASES = {
     ("S12000029", "Sandford and Upper Avondale"): "Sandford/Upper Avondale",
     ("S12000029", "Rigside and Douglas Water"): "Douglas Water and Rigside",
 }
+UNREGISTERED = {("S12000006", "Stranraer, Ochtrelure and Belmont")}
+SKIPPED = ("scheme", "candidates")
 ODT = "application/vnd.oasis.opendocument.text"
+DOCX = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
 TITLES = ("Mr", "Mrs", "Ms", "Miss", "Dr", "Rev")
 UNSTATED = "The notice does not state how many places the community council had, so the seat count is not recorded."
 UNVOTED = "The council's results notice names the candidates elected and not elected but gives no vote counts."
+DUMGAL_PLACES = (
+    "The notice does not state the places; the seat count is the maximum membership in Schedule 1 of the council's "
+    "scheme, which the notice's candidates did not exceed. Candidates' full forenames are printed run together with "
+    "their addresses, so the names here keep the first forename and any initials that follow it."
+)
 SHORT = "{publisher}'s notice lists {elected} members elected unopposed to {places} places, leaving {left} vacant."
 
 
@@ -216,6 +266,8 @@ def fetch() -> None:
             suffix, media = ".pdf", "application/pdf"
         elif response.content.startswith(b"PK") and ODT.encode() in response.content[:100]:
             suffix, media = ".odt", ODT
+        elif response.content.startswith(b"PK") and b"word/" in response.content:
+            suffix, media = ".docx", DOCX
         elif response.headers.get("content-type", "").startswith("text/html"):
             suffix, media = ".html", "text/html"
         else:
@@ -239,6 +291,14 @@ def text_of(url: str, mode: str = "-layout") -> str:
     if path.suffix == ".html":
         page = re.sub(r"<(script|style)\b.*?</\1>", " ", path.read_text(), flags=re.DOTALL)
         return " ".join(html.unescape(re.sub(r"<[^>]+>", " ", page)).split())
+    if path.suffix == ".docx":
+        word = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
+        with zipfile.ZipFile(path) as document:
+            body = ElementTree.fromstring(document.read("word/document.xml"))
+        return "\n".join(
+            " ".join("".join(node.text or "" for node in paragraph.iter(word + "t")).split())
+            for paragraph in body.iter(word + "p")
+        )
     if path.suffix == ".odt":
         office = "{urn:oasis:names:tc:opendocument:xmlns:%s:1.0}"
         text_ns, table_ns = office % "text", office % "table"
@@ -805,6 +865,247 @@ def lanarkshire_list(text: str) -> list[dict]:
     return reads
 
 
+DUMGAL_SURNAME = r"((?:Ma?c)?[A-Z][A-Z'’-]+(?: (?:[A-Z][A-Z'’-]+|\([A-Z ]+\)))*)"
+
+
+def dumgal_name(entry: str, address: bool) -> dict:
+    found = re.fullmatch(DUMGAL_SURNAME + r"(?:,\s*|\s+(?=[A-Z][a-z]))(.+)", entry.strip().lstrip("*"))
+    if found is None:
+        raise ValueError(f"unreadable name {entry!r}")
+    surname, parts = found.group(1), [part.strip() for part in re.split(r",\s*", found.group(2)) if part.strip()]
+    if address:
+        kept = [re.split(r"\s+(?=\S*\d)", parts[0])[0]]
+        for part in parts[1:]:
+            if not re.fullmatch(r"(?:[A-Z]\.?\s?)+", part):
+                break
+            kept.append(part)
+        parts = kept
+    forenames = " ".join(parts)
+    plain = re.sub(r"\s*\(.*?\)", "", surname)
+    return {"printed": f"{surname}, {forenames}", "name": f"{forenames} {display(plain).replace(' Of ', ' of ')}"}
+
+
+def dumgal_title(text: str) -> str:
+    words = text.split()
+    return " ".join(
+        word.lower() if index and word.lower() in ("and", "of", "the") else display(word) if word.isupper() else word
+        for index, word in enumerate(words)
+    )
+
+
+def dumgal_notice(text: str) -> list[dict]:
+    day = re.search(r"(?:ORDINARY ELECTIONS\s*[–-]|DATE OF ELECTION:)\s*\w+,?\s+(\d+ \w+ \d{4})", text)
+    if day is None:
+        raise ValueError("unreadable notice")
+    reads: list[dict] = []
+    started, label, previous = False, [], ""
+    lines = text.splitlines()
+    for number, line in enumerate(lines):
+        if "Returning Officer" in line:
+            while reads and not reads[-1]["members"]:
+                reads.pop()
+            break
+        if "Validly Nominated Candidates" in line:
+            started = True
+            continue
+        cells = re.split(r"\s{2,}", line.strip())
+        if not started or not line.strip() or cells[0] in ("PUBLIC", "OFFICIAL") or cells[0].lower() == "electors":
+            continue
+        if re.match(r"\S", line) or len(line) - len(line.lstrip()) < 6:
+            left, right = cells[0], " ".join(cells[1:])
+            if joined := re.search(r"(?<=[a-z]) (?=" + DUMGAL_SURNAME + ",)", left):
+                left, right = left[: joined.start()], f"{left[joined.end() :]} {right}".strip()
+        else:
+            left, right = "", " ".join(cells)
+        if left:
+            if not previous:
+                label = []
+                reads.append({"council": "", "day": when(day.group(1)), "places": None, "members": []})
+            label.append(left)
+            reads[-1]["council"] = dumgal_title(" ".join(label))
+        previous = left
+        if right and re.match(DUMGAL_SURNAME + r"(?:,|\s+[A-Z][a-z])", right):
+            if not reads:
+                raise ValueError(f"unreadable line {line!r}")
+            reads[-1]["members"].append(dumgal_name(right, address=True))
+    if empty := [read["council"] for read in reads if not read["members"]]:
+        raise ValueError(f"no members for {empty}")
+    return reads
+
+
+def dumgal_declaration(text: str) -> dict:
+    head = re.search(r"NOTICE OF COMMUNITY COUNCILLORS ELECTED\s+AS RESULT OF POLL\s+HELD ON (\d+ \w+ \d{4})", text)
+    council = re.search(
+        r"Election of (\d+) Community Councillors to serve on\s+(.+?)\s+Community Council,", text, re.DOTALL
+    )
+    body = re.search(r"NAME\s+VOTES\s*\n(.*?)\n\s*Number of Ballot Papers Received", text, re.DOTALL)
+    chosen = re.search(r"are\s+as\s+follows:(.*?)Ballot Papers rejected:", text, re.DOTALL)
+    if not (head and council and body and chosen):
+        raise ValueError("unreadable declaration")
+    candidates = []
+    for line in body.group(1).splitlines():
+        row = re.fullmatch(r"\s*(.+?)\s{2,}(\d+)\s*", line)
+        if row:
+            candidates.append({**dumgal_name(row.group(1), address=False), "votes": int(row.group(2))})
+        elif line.strip() and not re.fullmatch(r"\s*(OFFICIAL|.*COMMUNITY COUNCIL|THURSDAY .*)\s*", line):
+            raise ValueError(f"unreadable candidate line {line!r}")
+    elected = {
+        dumgal_name(line.strip(), address=False)["printed"].rstrip(".")
+        for line in re.findall(r"^\s*(?:\d+\s+)?(\*?" + DUMGAL_SURNAME[1:-1] + r",.*)$", chosen.group(1), re.MULTILINE)
+    }
+    for candidate in candidates:
+        candidate["elected"] = str(candidate["printed"]).rstrip(".") in elected
+    if len(elected) != sum(candidate["elected"] for candidate in candidates):
+        raise ValueError("elected members not among the candidates")
+
+    def figure(label: str) -> int:
+        found = re.search(rf"{label}\s+(\d+)", text) or re.search(rf"(\d+)\s*\n\s*{label}", text)
+        if found is None:
+            raise ValueError(f"no {label}")
+        return int(found.group(1))
+
+    tied = []
+    if "equality of votes" in text:
+        lowest = min(candidate["votes"] for candidate in candidates if candidate["elected"])
+        tied = [candidate["printed"] for candidate in candidates if candidate["votes"] == lowest]
+    return {
+        "council": council.group(2),
+        "day": when(head.group(1)),
+        "places": int(council.group(1)),
+        "candidates": candidates,
+        "electorate": figure(r"Electorate(?: \(from total in Register\))?"),
+        "ballots": figure("Number of Ballot Papers Received"),
+        "rejected": figure("Number of Ballot Papers rejected"),
+        "valid": figure("Total number of valid Ballot Papers"),
+        "tied": tied,
+        "settled": "the declaration records that the tie was settled by drawing lots",
+    }
+
+
+def dumgal_casual(text: str) -> dict:
+    head = re.search(r"COUNCILLORS FOR\s+(.+?) COMMUNITY COUNCIL\s+DATE OF ELECTION \w+ (\d+ \w+ \d{4})", text)
+    names = re.search(r"Names of Candidates? remaining validly nominated\n(.*?)\nRO", text, re.DOTALL)
+    if not (head and names):
+        raise ValueError("unreadable casual vacancy notice")
+    members = [
+        dumgal_name(line, address=False)
+        for line in names.group(1).splitlines()
+        if re.match(DUMGAL_SURNAME + ",", line) and not line.startswith("Address")
+    ]
+    return {
+        "council": dumgal_title(head.group(1)),
+        "day": when(head.group(2)),
+        "places": None,
+        "members": members,
+        "by": True,
+    }
+
+
+def dumgal_schedule(text: str) -> dict[str, tuple[int, int]]:
+    rows = re.findall(r"^\s*\d+ (\S.*?)\s{2,}([\d,]+)\s+(\d+)\s+\d+\s*$", text, re.MULTILINE)
+    return {
+        slug(council_name("S12000006", name)): (int(voters.replace(",", "")), int(places))
+        for name, voters, places in rows
+    }
+
+
+def page_html(url: str) -> str:
+    return re.sub(r"<(script|style)\b.*?</\1>", " ", raw.cached(SOURCE, url).path.read_text(), flags=re.DOTALL)
+
+
+def flat(fragment: str) -> str:
+    return " ".join(html.unescape(re.sub(r"<[^>]+>", " ", fragment)).split())
+
+
+def aberdeenshire_page(page: str) -> list[dict]:
+    reads: list[dict] = []
+    balloted = set()
+    for ballot in re.finditer(
+        r"<p>A ballot for (.+?) Community Council took place on (.+?), due to.*?</table>(.*?)<h", page, re.DOTALL
+    ):
+        candidates, elected, note = [], True, None
+        for row in re.findall(r"<tr>(.*?)</tr>", ballot.group(0), re.DOTALL):
+            cells = [flat(cell) for cell in re.findall(r"<t[dh][^>]*>(.*?)</t[dh]>", row, re.DOTALL)]
+            if cells in (["Not elected"], ["Not selected"]):
+                elected = False
+            elif cells == ["Candidate", "Total votes"]:
+                continue
+            elif len(cells) == 2 and cells[1].isdigit():
+                candidates.append({**dumgal_name(cells[0], address=False), "votes": int(cells[1]), "elected": elected})
+            elif len(cells) == 2 and (unopposed := re.fullmatch(r"N/A \(elected unopposed for (\w+) area\)", cells[1])):
+                person = dumgal_name(cells[0], address=False)["name"]
+                note = (
+                    f"The ballot was held in the Ballater area only; {person} was elected unopposed for the "
+                    f"{unopposed.group(1)} area and is not counted among this contest's candidates."
+                )
+            else:
+                raise ValueError(f"unreadable ballot row {cells}")
+        tied = []
+        if "determined by lot" in ballot.group(3):
+            lowest = min(candidate["votes"] for candidate in candidates if candidate["elected"])
+            tied = [candidate["printed"] for candidate in candidates if candidate["votes"] == lowest]
+        council = " ".join(ballot.group(1).split())
+        balloted.add(council)
+        reads.append(
+            {
+                "council": council,
+                "day": when(re.sub(r"(\d+)(?:st|nd|rd|th)", r"\1", flat(ballot.group(2)))),
+                "places": sum(candidate["elected"] for candidate in candidates),
+                "candidates": candidates,
+                "tied": tied,
+                "settled": "the council's area page records that the last place was decided by lot",
+                "caveat": note,
+            }
+        )
+    for council, listed in re.findall(
+        r"<h3[^>]*>((?:(?!</h3>).)*)</h3>\s*<p[^>]*>((?:(?!</p>).)*)</p>", page, re.DOTALL
+    ):
+        council = re.sub(r"\s+Community Council$", "", flat(council))
+        listed = flat(listed)
+        if not listed.startswith("2024 election:"):
+            continue
+        listed = listed.removeprefix("2024 election:").strip()
+        if listed.startswith("not formed") or council in balloted:
+            continue
+        reads.append(
+            {
+                "council": council,
+                "day": date(2024, 9, 20),
+                "places": None,
+                "members": [name.strip() for name in re.split(r",\s*|\s+and\s+", listed.rstrip(". ")) if name.strip()],
+                "caveat": "The council's area page lists the members elected in 2024 without a date; the council's "
+                "news release of 13 September 2024 says nominees would be formally elected on 20 September 2024.",
+            }
+        )
+    return reads
+
+
+def borders_news(page: str, candidates_page: str) -> dict:
+    head = re.search(r"election that took place on \w+ (\d+ \w+ \d{4})\.", page)
+    counts = re.search(
+        r"(\d+) candidates contested for the (\d+) available places on the (.+?) Community Council", page
+    )
+    elected = [
+        flat(item)
+        for item in re.findall(r"<li>(.*?)</li>", page.split("declared to be elected", 1)[-1].split("</ul>")[0])
+    ]
+    standing = re.search(r"are as follows:(.*?)Any enquiries", flat(candidates_page))
+    if not (head and counts and standing and elected):
+        raise ValueError("unreadable news item")
+    names = re.findall(r"[A-Z][a-z]+ [A-Z][a-z]+", standing.group(1))
+    if len(names) != int(counts.group(1)) or not set(elected) <= set(names):
+        raise ValueError("candidate list does not match")
+    return {
+        "council": counts.group(3),
+        "day": when(head.group(1)),
+        "places": int(counts.group(2)),
+        "candidates": [{"printed": name, "votes": None, "elected": name in elected} for name in names],
+        "unvoted": True,
+        "unvoted_note": "The council's results release names the 10 candidates elected, and its earlier ballot "
+        "notice names all 20 who stood, but neither gives vote counts.",
+    }
+
+
 def counted(url: str, read: dict) -> list[tuple[dict, list[dict]]]:
     elected = sum(candidate["elected"] for candidate in read["candidates"])
     if elected != min(read["places"], len(read["candidates"])):
@@ -846,10 +1147,48 @@ def transcribed(url: str) -> list[dict]:
     ]
 
 
+def companion(lad: str, kind: str) -> str:
+    frame = pl.read_csv(SOURCES, separator="\t").filter((pl.col("lad") == lad) & (pl.col("kind") == kind))
+    return frame["url"].item()
+
+
+def dumgal_reads(url: str, kind: str, text: str) -> list[tuple[dict, list[dict]]]:
+    if kind == "casual":
+        return tacit([dumgal_casual(text)])
+    schedule = dumgal_schedule(text_of(companion("S12000006", "scheme")))
+    if kind == "declaration":
+        read = dumgal_declaration(text)
+        voters, places = schedule[slug(council_name("S12000006", read["council"]))]
+        if places != read["places"]:
+            raise ValueError(f"{read['council']}: {read['places']} places, the scheme gives {places}")
+        if read["electorate"] == voters:
+            read["caveat"] = (
+                "The electorate in the declaration equals the scheme's count of registered voters at 1 September 2017."
+            )
+        return counted(url, read)
+    reads = dumgal_notice(text)
+    for read in reads:
+        council = council_name("S12000006", read["council"])
+        if ("S12000006", council) in UNREGISTERED:
+            continue
+        read["places"] = schedule[slug(council)][1]
+        if len(read["members"]) > read["places"]:
+            raise ValueError(f"{council}: {len(read['members'])} members, {read['places']} places")
+        read["caveat"] = DUMGAL_PLACES
+    return tacit(reads)
+
+
 def reads_of(url: str, lad: str, kind: str) -> list[tuple[dict, list[dict]]]:
     if kind == "transcribed":
         return tacit(transcribed(url))
+    if lad == "S12000034":
+        reads = aberdeenshire_page(page_html(url))
+        return [pair for read in reads for pair in (counted(url, read) if "candidates" in read else tacit([read]))]
+    if lad == "S12000026":
+        return counted(url, borders_news(page_html(url), page_html(companion(lad, "candidates"))))
     text = text_of(url)
+    if lad == "S12000006":
+        return dumgal_reads(url, kind, text)
     if lad == "S12000035":
         if kind == "page":
             return counted(url, argyll_declaration(text))
@@ -879,7 +1218,7 @@ def reads_of(url: str, lad: str, kind: str) -> list[tuple[dict, list[dict]]]:
 def parse() -> None:
     rows = []
     for url, lad, kind in pl.read_csv(SOURCES, separator="\t").rows():
-        if lad not in READ:
+        if lad not in READ or kind in SKIPPED:
             continue
         if not _cached(url):
             print(f"not fetched: {url}", file=sys.stderr)
@@ -893,6 +1232,8 @@ def parse() -> None:
             continue
         for read, candidates in reads:
             council = council_name(lad, read["council"])
+            if (lad, council) in UNREGISTERED:
+                continue
             for candidate in candidates:
                 rows.append(
                     {
@@ -913,6 +1254,10 @@ def parse() -> None:
                         "valid": read.get("valid"),
                         "unvoted": read.get("unvoted", False),
                         "tied": candidate["printed"] in read.get("tied", ()),
+                        "settled": read.get(
+                            "settled", "the declaration records that the tie was settled by cutting a pack of cards"
+                        ),
+                        "unvoted_note": read.get("unvoted_note", UNVOTED),
                         "caveat": read.get("caveat"),
                     }
                 )
@@ -946,7 +1291,10 @@ def emit() -> Path:
             "Kilcreggan and Clackmannanshire's Dollar polls, East Lothian's Dunbar result, and councils formed "
             "unopposed in Perth and Kinross, Stirling, Shetland, Argyll and Bute, Clackmannanshire, East Lothian, "
             "Moray, Angus, and South Lanarkshire from the councils' notices and lists, as tacit sets, with South "
-            "Lanarkshire's 2026 polls from the council's results pages",
+            "Lanarkshire's 2026 polls from the council's results pages; Dumfries and Galloway's October 2024 round "
+            "(76 councils formed unopposed and 4 polls) and the Dalry casual vacancy of 2025, Aberdeenshire's September "
+            "2024 round (62 formed unopposed and the Ballater and Crathie and Kemnay ballots), and Scottish Borders' "
+            "Coldingham ballot of 2023",
             polity="GB",
         )
 
@@ -1063,13 +1411,13 @@ def emit() -> Path:
                 completeness=0 if first["unvoted"] else 1,
             )
             if first["unvoted"]:
-                cs.add("note", entity_id=result_set, kind="caveat", body_md=UNVOTED)
+                cs.add("note", entity_id=result_set, kind="caveat", body_md=first["unvoted_note"])
             if tied := lines.filter(pl.col("tied"))["name"].to_list():
                 cs.add(
                     "note",
                     entity_id=result_set,
                     kind="context",
-                    body_md=f"{' and '.join(tied)} tied on {lines.filter(pl.col('tied'))['votes'][0]} votes; the declaration records that the tie was settled by cutting a pack of cards.",
+                    body_md=f"{' and '.join(tied)} tied on {lines.filter(pl.col('tied'))['votes'][0]} votes; {first['settled']}.",
                 )
             if first["caveat"]:
                 cs.add("note", entity_id=result_set, kind="caveat", body_md=first["caveat"])
