@@ -76,6 +76,19 @@ const JURISDICTIONS: Record<
   federal_unit: "state",
 };
 const WHOLE = ["us.place", "us.state", "us.county"];
+const LATE_LEANS: Record<
+  string,
+  { gap: number; sd: number; years: Array<number>; source: string }
+> = {
+  nv: {
+    gap: 0.1,
+    sd: 0.04,
+    years: [2018, 2022, 2024],
+    source:
+      "https://www.nvsos.gov/sos/elections/election-information/election-results",
+  },
+};
+const LEANS: Record<string, number> = { Q29552: 1, Q29468: -1 };
 const ZONES: Record<string, string> = {
   ct: "America/New_York",
   de: "America/New_York",
@@ -1499,7 +1512,7 @@ async function night(
       ),
     ),
   ];
-  const [titles, partyNames] = await Promise.all([
+  const [titles, partyNames, wikidata] = await Promise.all([
     names(
       [
         found.id,
@@ -1511,6 +1524,11 @@ async function night(
       found.date,
     ).then(localized),
     names(parties, found.date),
+    db
+      .execute<{ id: string; value: string }>(
+        sql`select entity_id as id, value from external_id where scheme = 'wikidata' and entity_id = any(${sql.param(parties)}::uuid[])`,
+      )
+      .then(({ rows }) => new Map(rows.map((row) => [row.id, row.value]))),
   ]);
   const sitting = new Set(incumbents.map((row) => row.option));
   const unitOf = new Map(
@@ -1996,6 +2014,15 @@ async function night(
       }),
     );
     const where = placed.get(row.id);
+    const late = LATE_LEANS[parts[1] ?? ""];
+    const shifts = own.map((choice) => {
+      const party = choice.key.startsWith("party:")
+        ? wikidata.get(choice.key.slice(6))
+        : undefined;
+      return late == null || party == null
+        ? 0
+        : ((LEANS[party] ?? 0) * late.gap) / 2;
+    });
     const kind =
       where == null
         ? undefined
@@ -2089,6 +2116,10 @@ async function night(
       counts,
       baseline,
       ...(remaining.length > 0 && { remaining }),
+      ...(late != null &&
+        shifts.some((shift) => shift !== 0) && {
+          lateLean: { shifts, sd: late.sd },
+        }),
       certified:
         final.length === 0
           ? null

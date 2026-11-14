@@ -92,6 +92,7 @@ export type LiveRace = {
   rule?: LiveRule | null;
   unopposed?: LiveUnopposed | null;
   remaining?: Array<LiveRemaining>;
+  lateLean?: { shifts: Array<number>; sd: number } | null;
 };
 
 export type LiveUnopposed = { options: Array<string>; isTacit: boolean };
@@ -216,6 +217,7 @@ const MODEL = {
     trickle: 0.01,
     follow: 0.5,
     fresh: 0.005,
+    settle: 6,
   },
   reported: { common: 0.9, own: 0.3, capped: 0.99 },
   channel: {
@@ -1272,7 +1274,13 @@ function fit(
   return solve(matrix, vector, random);
 }
 
-function lean(found: Array<Unit>, a: number, b: number, coming: number) {
+function lean(
+  found: Array<Unit>,
+  a: number,
+  b: number,
+  coming: number,
+  base: { mean: number; sd: number } | null,
+) {
   const rows: Array<{ index: number; gap: number; noise: number }> = [];
   let seen = 0;
   for (const [index, unit] of found.entries()) {
@@ -1295,7 +1303,8 @@ function lean(found: Array<Unit>, a: number, b: number, coming: number) {
       noise: MODEL.late.grain / added,
     });
   }
-  const prior = MODEL.late.prior ** 2;
+  const prior = (base?.sd ?? MODEL.late.prior) ** 2;
+  const start = base?.mean ?? 0;
   let spread = MODEL.late.floor ** 2;
   let pooled = 0;
   let error = Infinity;
@@ -1327,8 +1336,8 @@ function lean(found: Array<Unit>, a: number, b: number, coming: number) {
   }
   const trust = seen > 0 ? seen / (seen + MODEL.late.weigh * coming) : 0;
   const mean = Number.isFinite(error)
-    ? (trust * pooled * prior) / (prior + error)
-    : 0;
+    ? start + (trust * (pooled - start) * prior) / (prior + error)
+    : start;
   const variance = Number.isFinite(error)
     ? (prior * error) / (prior + error)
     : prior;
@@ -1910,7 +1919,22 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
           : outstanding[index].open - left * unit.total,
       ),
     );
-  const learned = isTail ? lean(found, a, b, coming) : null;
+  const gap =
+    race.lateLean == null
+      ? 0
+      : (race.lateLean.shifts[a] ?? 0) - (race.lateLean.shifts[b] ?? 0);
+  const base =
+    race.lateLean == null || gap === 0
+      ? null
+      : { mean: gap, sd: race.lateLean.sd };
+  const isSettled =
+    opened != null &&
+    Date.parse(stamp) - Date.parse(opened) >= MODEL.late.settle * 3_600_000;
+  const learned = isTail
+    ? lean(found, a, b, coming, null)
+    : base != null && isSettled
+      ? lean([], a, b, coming, base)
+      : null;
   const ahead = sum(found.map((unit) => unit.margin * unit.total));
   const finalMargins: Array<number> = [];
   const finalTotals: Array<number> = [];
