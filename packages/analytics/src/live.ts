@@ -1450,16 +1450,25 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
     ? (CANVASS[race.state] ?? 0) *
       Math.exp(-Math.max(0, days - MODEL.late.baseGrace) / MODEL.late.baseLife)
     : 0;
+  const slowing =
+    isLate && onNight > 0 && latest > onNight
+      ? Math.min(
+          1,
+          (recent * latest * (Date.parse(stamp) - (cutoff ?? 0))) /
+            ((latest - onNight) * (Date.parse(stamp) - lookback)),
+        )
+      : 1;
   const planned = Math.max(
-    Math.min(
-      tail *
-        Math.exp(
-          -Math.max(0, days - MODEL.tail.grace) / (MODEL.tail.pace * tail),
-        ),
-      onNight <= 0 || latest <= 0
-        ? Infinity
-        : Math.max(0, tail * onNight - (latest - onNight)) / latest,
-    ),
+    slowing *
+      Math.min(
+        tail *
+          Math.exp(
+            -Math.max(0, days - MODEL.tail.grace) / (MODEL.tail.pace * tail),
+          ),
+        onNight <= 0 || latest <= 0
+          ? Infinity
+          : Math.max(0, tail * onNight - (latest - onNight)) / latest,
+      ),
     held + canvass,
   );
   const complete =
@@ -1933,21 +1942,25 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
         }
       }
     }
-    let unpaced = 0;
+    let spent = 0;
     for (const [index, unit] of whole.entries()) {
-      if (
-        drained > 0 &&
-        unit.hasBaseline &&
-        unit.paced == null &&
-        unit.total > 0 &&
-        !reports.has(unit.id)
-      ) {
-        unpaced += finals[index]! - unit.total;
+      if (!unit.hasBaseline || reports.has(unit.id)) {
+        continue;
+      }
+      if (!isTail) {
+        spent += isLate ? finals[index]! - unit.total + spills[index]! : 0;
+      } else if (unit.paced == null && unit.total > 0) {
+        spent += drained * (finals[index]! - unit.total);
       }
     }
     const later =
       holding +
-      Math.max(0, carrying - (drained * unpaced) / Math.max(1, latest));
+      Math.max(
+        isTail || left <= 0
+          ? 0
+          : carrying * Math.min(1, (held + canvass) / left),
+        carrying - spent / Math.max(1, latest),
+      );
     for (const [index, unit] of found.entries()) {
       if (unit.hasBaseline) {
         if (unit.channel === 0) {
