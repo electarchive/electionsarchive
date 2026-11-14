@@ -1519,6 +1519,7 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
           sum(pacing.map((unit) => priorPace(unit))) / surged / MODEL.late.lull,
         )
       : 1;
+  const lasting = recent * sustained;
   const floored = whole.filter((unit) => unit.floor > 0);
   const flooredVotes = sum(floored.map((unit) => unit.total));
   const met =
@@ -1533,7 +1534,7 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
   const left = isTail
     ? Math.max(
         planned,
-        (MODEL.late.carry * recent * closed +
+        (MODEL.late.carry * lasting * closed +
           MODEL.late.base *
             Math.exp(
               -Math.max(0, days - MODEL.late.baseGrace) / MODEL.late.baseLife,
@@ -1787,7 +1788,7 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
             spill *
             closed *
             settles *
-            Math.min(1, recent / (MODEL.late.hush * tail)) *
+            Math.min(1, lasting / (MODEL.late.hush * tail)) *
             (1 - drained * fade) *
             Math.exp(scatter * gaussian(random) - scatter ** 2 / 2);
         }
