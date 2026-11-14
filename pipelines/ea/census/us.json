@@ -98,6 +98,19 @@
       "title": "State Primary Election Types",
       "url": "https://www.ncsl.org/elections-and-campaigns/state-primary-election-types",
       "kind": "compendium"
+    },
+    "bia-fr": {
+      "publisher": "Bureau of Indian Affairs",
+      "title": "Indian Entities Recognized by and Eligible To Receive Services From the United States Bureau of Indian Affairs, 91 FR 4102 (FR Doc. 2026-01899)",
+      "url": "https://www.federalregister.gov/documents/2026/01/30/2026-01899/indian-entities-recognized-by-and-eligible-to-receive-services-from-the-united-states-bureau-of-indian",
+      "kind": "official_body",
+      "note": "Notice of January 30, 2026 publishing the current list of 575 Tribal entities"
+    },
+    "25cfr81": {
+      "publisher": "Electronic Code of Federal Regulations",
+      "title": "25 CFR Part 81: Tribal Reorganization Under a Federal Statute",
+      "url": "https://www.ecfr.gov/current/title-25/chapter-I/subchapter-D/part-81",
+      "kind": "official_body"
     }
   },
   "tiers": [
@@ -107,7 +120,8 @@
     {"key": "municipality", "name": "Municipal governments", "parent": "county", "polity_kind": "municipality", "source": "cog", "cog": "municipality"},
     {"key": "township", "name": "Town and township governments", "parent": "county", "polity_kind": "municipality", "source": "cog", "cog": "township"},
     {"key": "school_district", "name": "Independent school districts", "parent": "state", "polity_kind": "school_district", "source": "cog", "cog": "school"},
-    {"key": "special_district", "name": "Special district governments", "parent": "state", "polity_kind": "special_district", "source": "cog", "cog": "special"}
+    {"key": "special_district", "name": "Special district governments", "parent": "state", "polity_kind": "special_district", "source": "cog", "cog": "special"},
+    {"key": "tribal_nation", "name": "Federally recognized Tribal nations", "parent": "national", "polity_kind": "tribal_nation", "source": "bia-fr", "counts": [{"date": "2026-01-30", "value": 575, "source": "bia-fr", "locator": "91 FR 4102, FR Doc. 2026-01899: \"This notice publishes the current list of 575 Tribal entities\""}]}
   ],
   "classes": [
     {
@@ -329,6 +343,69 @@
       "goal": "referendums",
       "source": "cog",
       "match": [{"within": null, "contest_kinds": ["ballot_question"], "precedence": 3}]
+    },
+    {
+      "key": "tribal_executive",
+      "tier": "tribal_nation",
+      "name": "Tribal executives",
+      "category": "non_territorial",
+      "goal": "subnational",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "bia-fr",
+      "note": "Chair, president, principal chief, or governor, with the deputy where elected. Rules: (1) load a nation's results only from what its own election body publishes openly; (2) cite that body as the source; (3) never use news tallies, tribal newspapers included, or BIA files in their place, and a nation whose body publishes nothing openly gets a gap row; (4) honor any nation's request to withdraw or limit its data. Each nation's constitution or election code sets its own calendar, recorded with that nation's load."
+    },
+    {
+      "key": "tribal_council",
+      "tier": "tribal_nation",
+      "name": "Tribal councils and legislatures",
+      "category": "non_territorial",
+      "goal": "subnational",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "bia-fr",
+      "note": "Council or legislature. Rules: (1) load a nation's results only from what its own election body publishes openly; (2) cite that body as the source; (3) never use news tallies, tribal newspapers included, or BIA files in their place, and a nation whose body publishes nothing openly gets a gap row; (4) honor any nation's request to withdraw or limit its data. Each nation's constitution or election code sets its own calendar, recorded with that nation's load."
+    },
+    {
+      "key": "tribal_subunit",
+      "tier": "tribal_nation",
+      "name": "Tribal sub-units and boards",
+      "category": "non_territorial",
+      "goal": "subnational",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "bia-fr",
+      "note": "Navajo chapters, school boards, and the Board of Election Supervisors; Cherokee Nation districts; Eastern Band townships and school board. Rules: (1) load a nation's results only from what its own election body publishes openly; (2) cite that body as the source; (3) never use news tallies, tribal newspapers included, or BIA files in their place, and a nation whose body publishes nothing openly gets a gap row; (4) honor any nation's request to withdraw or limit its data. Each nation's constitution or election code sets its own calendar, recorded with that nation's load."
+    },
+    {
+      "key": "tribal_referendum",
+      "tier": "tribal_nation",
+      "name": "Tribal constitutional and referendum votes",
+      "category": "non_territorial",
+      "goal": "subnational",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "bia-fr",
+      "note": "Constitutional and referendum votes the nation itself runs. Rules: (1) load a nation's results only from what its own election body publishes openly; (2) cite that body as the source; (3) never use news tallies, tribal newspapers included, or BIA files in their place, and a nation whose body publishes nothing openly gets a gap row; (4) honor any nation's request to withdraw or limit its data. Each nation's constitution or election code sets its own calendar, recorded with that nation's load."
+    },
+    {
+      "key": "bia_secretarial",
+      "tier": "tribal_nation",
+      "name": "BIA Secretarial elections",
+      "category": "non_territorial",
+      "goal": "subnational",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "25cfr81",
+      "note": "Secretarial elections under 25 CFR Part 81 on constitutions and amendments (IRA and OIWA). Rules: (1) load a nation's results only from what its own election body publishes openly; (2) cite that body as the source; (3) never use news tallies, tribal newspapers included, or BIA files in their place, and a nation whose body publishes nothing openly gets a gap row; (4) honor any nation's request to withdraw or limit its data. Each nation's constitution or election code sets its own calendar, recorded with that nation's load.",
+      "locator": "25 CFR 81.41-81.42",
+      "disposition": "blocked",
+      "disposition_reason": "No register of past Secretarial elections: each Election Board posts its Certificate of Results locally (25 CFR 81.42) and the BIA publishes no central list."
     }
   ]
 }
