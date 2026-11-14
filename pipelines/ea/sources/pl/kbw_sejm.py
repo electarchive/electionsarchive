@@ -1,4 +1,6 @@
 import io
+import os
+import re
 import zipfile
 from collections import Counter
 from datetime import date
@@ -37,8 +39,17 @@ OBWOD_METHOD = (
 )
 BASE = "https://danewyborcze.kbw.gov.pl/dane"
 PARSED = raw.parsed(SOURCE)
-ELECTIONS = {2023: date(2023, 10, 15)}
+ELECTIONS = {2019: date(2019, 10, 13), 2023: date(2023, 10, 15)}
 FILES = {
+    2019: {
+        "districts": "sejmsenat/okregi_sejm_csv.zip",
+        "lists": "sejmsenat/wykaz_list_sejm_csv.zip",
+        "candidates": "sejmsenat/kandydaci_sejm_csv.zip",
+        "units": "sejmsenat/obwody_glosowania_csv.zip",
+        "unit_lists": "sejmsenat/wyniki_gl_na_listy_po_obwodach_sejm_csv.zip",
+        "unit_candidates": "sejmsenat/wyniki_gl_na_kand_po_obwodach_sejm_csv.zip",
+        "district_lists": "sejmsenat/wyniki_gl_na_listy_po_okregach_sejm_csv.zip",
+    },
     2023: {
         "districts": "sejmsenat/okregi_sejm_csv.zip",
         "lists": "sejmsenat/wykaz_list_sejm_csv.zip",
@@ -47,7 +58,7 @@ FILES = {
         "unit_lists": "sejmsenat/wyniki_gl_na_listy_po_obwodach_sejm_csv.zip",
         "unit_candidates": "sejmsenat/wyniki_gl_na_kandydatow_po_obwodach_sejm_csv.zip",
         "district_lists": "sejmsenat/wyniki_gl_na_listy_po_okregach_sejm_csv.zip",
-    }
+    },
 }
 ACCOUNTING = {
     "Liczba wyborców uprawnionych do głosowania": "electors",
@@ -58,6 +69,7 @@ ACCOUNTING = {
     "Liczba głosów nieważnych": "invalid",
     "Liczba głosów ważnych oddanych łącznie na wszystkie listy kandydatów": "valid",
 }
+VALID_COLUMN = "Liczba głosów ważnych oddanych łącznie na wszystkie listy kandydatów"
 
 
 def url(year: int, kind: str) -> str:
@@ -78,7 +90,7 @@ def tables(year: int, kind: str) -> dict[str, pl.DataFrame]:
             continue
         frame = pl.read_csv(io.BytesIO(archive.read(member)), separator=";", infer_schema_length=0)
         frame = frame.rename({column: column.lstrip("﻿") for column in frame.columns})
-        frames[member] = frame.with_columns(pl.col(pl.String).str.strip_chars())
+        frames[member] = frame.with_columns(pl.col(pl.String).str.strip_chars().replace("", None))
     return frames
 
 
@@ -88,7 +100,18 @@ def table(year: int, kind: str) -> pl.DataFrame:
 
 
 def count(column: str) -> pl.Expr:
-    return pl.col(column).cast(pl.Int64)
+    return pl.col(column).replace("-", None).cast(pl.Int64)
+
+
+PERSON = (
+    pl.col("Płeć").alias("sex"),
+    pl.col("Zawód").alias("occupation"),
+    pl.col("Miejsce zamieszkania").alias("residence"),
+    pl.col("Przynależność do partii").alias("membership"),
+    pl.col("Poparcie").alias("support"),
+    count("Liczba głosów").alias("votes"),
+    (pl.col("Czy przyznano mandat") == "Tak").alias("elected"),
+)
 
 
 def gmina(column: str) -> pl.Expr:
@@ -102,23 +125,18 @@ def dhondt(votes: dict[int, int], seats: int) -> Counter[int]:
     return Counter(number for _, number in quotients[:seats])
 
 
-def parse_2023() -> dict[str, pl.DataFrame]:
+def load_2023() -> dict[str, pl.DataFrame]:
     year = 2023
     unit = [gmina("TERYT Gminy"), count("Nr komisji").alias("commission")]
     results = table(year, "unit_lists")
-    committees = results.columns[
-        results.columns.index("Liczba głosów ważnych oddanych łącznie na wszystkie listy kandydatów") + 1 :
-    ]
-    units = results.select(
+    committees = results.columns[results.columns.index(VALID_COLUMN) + 1 :]
+    results = results.select(
         *unit,
         count("Nr okręgu").alias("district"),
         pl.col("Siedziba").alias("seat"),
         *(count(column).alias(name) for column, name in ACCOUNTING.items()),
+        *(count(committee) for committee in committees),
     )
-    if units.select("gmina", "commission").is_duplicated().any():
-        raise ValueError("two polling districts share a gmina and number")
-    if (units["valid"] + units["invalid"] != units["valid_ballots"]).any():
-        raise ValueError("valid and invalid votes do not add up to the valid ballots")
     lists = table(year, "lists").select(
         count("Numer okręgu").alias("district"),
         count("Nr listy").alias("list"),
@@ -127,10 +145,157 @@ def parse_2023() -> dict[str, pl.DataFrame]:
         (pl.col("Udział w podziale mandatów") == "Tak").alias("qualified"),
         count("Liczba mandatów").alias("seats"),
     )
+    districts = table(year, "districts").select(
+        count("Numer okręgu").alias("district"),
+        count("Liczba mandatów").alias("magnitude"),
+        pl.col("Siedziba OKW").alias("seat"),
+        pl.col("Opis granic").alias("boundary"),
+    )
+    candidates = table(year, "candidates").select(
+        count("Nr okręgu").alias("district"),
+        count("Nr listy").alias("list"),
+        count("Pozycja na liście").alias("position"),
+        pl.col("Nazwisko i imiona").alias("name"),
+        *PERSON,
+    )
+    pieces = []
+    for member, frame in tables(year, "unit_candidates").items():
+        district = int(member.rsplit("okreg_", 1)[1].split("_", 1)[0])
+        ballot = candidates.filter(pl.col("district") == district).sort("list", "position")
+        names = frame.columns[frame.columns.index("Liczba uwzględnionych komisji") + 1 :]
+        if len(names) != ballot.height:
+            raise ValueError(f"district {district}: {len(names)} candidate columns for {ballot.height} candidates")
+        for header, row in zip(names, ballot.iter_rows(named=True)):
+            surname, given = header.split(" - ", 1)[0].split(" ", 1)[0], row["name"].split(" ")[0]
+            if surname.split("-")[0] not in row["name"] or given not in header:
+                raise ValueError(f"district {district}: column {header!r} is not {row['name']!r}")
+        piece = frame.select(*unit, *(count(header).alias(str(i)) for i, header in enumerate(names)))
+        piece = piece.unpivot(index=["gmina", "commission"], variable_name="i", value_name="votes")
+        keys = ballot.select("list", "position").with_row_index("i").with_columns(pl.col("i").cast(pl.String))
+        pieces.append(piece.join(keys, on="i").drop("i").with_columns(district=pl.lit(district, pl.Int64)))
+    registry = table(year, "units").select(
+        gmina("TERYT gminy"),
+        count("Numer").alias("commission"),
+        pl.col("Typ obwodu").alias("kind"),
+        pl.col("Typ obszaru").alias("area"),
+        pl.col("Opis granic").alias("boundary"),
+    )
+    return {
+        "results": results,
+        "lists": lists,
+        "districts": districts,
+        "candidates": candidates,
+        "candidate_votes": pl.concat(pieces),
+        "registry": registry,
+    }
+
+
+def teryt(column: str) -> pl.Expr:
+    code = pl.col(column)
+    return (
+        pl.when(code.is_null() | (code == "149901"))
+        .then(pl.lit("zagranica"))
+        .otherwise(code.str.zfill(6))
+        .alias("gmina")
+    )
+
+
+def load_2019() -> dict[str, pl.DataFrame]:
+    year = 2019
+    unit = [teryt("Kod TERYT"), count("Numer").alias("commission")]
+    results = table(year, "unit_lists")
+    columns = results.columns[results.columns.index(VALID_COLUMN) + 1 :]
+    accounting = {**ACCOUNTING, "Liczba wyborców, którym wydano karty do głosowania": "issued"}
+    results = results.select(
+        *unit,
+        count("Okręg").alias("district"),
+        pl.col("Siedziba").alias("seat"),
+        *(count(column).alias(name) for column, name in accounting.items() if column in results.columns),
+        *(count(column).alias(re.sub(r" - ZPOW-\d+-\d+/\d+$", "", column)) for column in columns),
+    )
+    lists = table(year, "lists").select(
+        count("Numer okręgu").alias("district"),
+        count("Numer listy").alias("list"),
+        pl.col("Nazwa").alias("committee"),
+        count("Liczba głosów").alias("votes"),
+        (pl.col("Udział w podziale mandatów") == "Tak").alias("qualified"),
+        count("Liczba mandatów").alias("seats"),
+    )
+    districts = table(year, "districts").select(
+        count("Numer okręgu").alias("district"),
+        count("Liczba mandatów").alias("magnitude"),
+        pl.col("Siedziba OKW").alias("seat"),
+        pl.col("Opis granic").alias("boundary"),
+    )
+    candidates = table(year, "candidates").select(
+        count("Nr okręgu").alias("district"),
+        count("Nr listy (po nadaniu)").alias("list"),
+        count("Pozycja na liście").alias("position"),
+        pl.concat_str(pl.col("Imiona"), pl.col("Nazwisko"), separator=" ").alias("name"),
+        *PERSON,
+    )
+    pieces, struck = [], []
+    for member, frame in tables(year, "unit_candidates").items():
+        district = int(member.rsplit("okr_", 1)[1].split(".", 1)[0])
+        names = frame.columns[frame.columns.index(VALID_COLUMN) + 1 :]
+        keys, current = [], None
+        for header in names:
+            if found := re.match(r"Lista nr (\d+) - ", header):
+                current = int(found[1])
+            elif found := re.search(r" - nr na liście (\d+)$", header):
+                keys.append((header, current, int(found[1])))
+            else:
+                raise ValueError(f"district {district}: unknown column {header!r}")
+        ballot = candidates.filter(pl.col("district") == district)
+        lookup = {(row["list"], row["position"]): row["name"] for row in ballot.iter_rows(named=True)}
+        for header, list_, position in keys:
+            if (list_, position) not in lookup:
+                print(f"{year} district {district}: column {header!r} is a candidate struck from list {list_}")
+            elif lookup[(list_, position)] != header.rsplit(" - nr na liście", 1)[0]:
+                raise ValueError(f"district {district}: column {header!r} is not {lookup[(list_, position)]!r}")
+        struck.extend((district, list_) for _, list_, position in keys if (list_, position) not in lookup)
+        keys = [key for key in keys if key[1:] in lookup]
+        if len(keys) != ballot.height:
+            raise ValueError(f"district {district}: {len(keys)} candidate columns for {ballot.height} candidates")
+        piece = frame.select(*unit, *(count(header).alias(str(i)) for i, (header, _, _) in enumerate(keys)))
+        piece = piece.unpivot(index=["gmina", "commission"], variable_name="i", value_name="votes")
+        index = pl.DataFrame(
+            [(str(i), list_, position) for i, (_, list_, position) in enumerate(keys)],
+            schema={"i": pl.String, "list": pl.Int64, "position": pl.Int64},
+            orient="row",
+        )
+        pieces.append(piece.join(index, on="i").drop("i").with_columns(district=pl.lit(district, pl.Int64)))
+    registry = table(year, "units").select(
+        teryt("TERYT gminy"),
+        count("Numer").alias("commission"),
+        pl.col("Typ obwodu").alias("kind"),
+        pl.col("Typ obszaru").alias("area"),
+        pl.col("Opis granic").alias("boundary"),
+    )
+    return {
+        "results": results,
+        "lists": lists,
+        "districts": districts,
+        "candidates": candidates,
+        "candidate_votes": pl.concat(pieces),
+        "registry": registry,
+        "struck": pl.DataFrame(struck, schema={"district": pl.Int64, "list": pl.Int64}, orient="row"),
+    }
+
+
+def check(year: int, loaded: dict[str, pl.DataFrame]) -> dict[str, pl.DataFrame]:
+    results, lists, districts, candidates = (loaded[k] for k in ("results", "lists", "districts", "candidates"))
+    names = [name for name in ACCOUNTING.values() if name in results.columns]
+    committees = [c for c in results.columns if c not in {"gmina", "commission", "district", "seat", *names}]
+    units = results.select("gmina", "commission", "district", "seat", *names)
+    if units.select("gmina", "commission").is_duplicated().any():
+        raise ValueError("two polling districts share a gmina and number")
+    if (units["valid"] + units["invalid"] != units["valid_ballots"]).any():
+        raise ValueError("valid and invalid votes do not add up to the valid ballots")
     if lists.select("district", "committee").is_duplicated().any():
         raise ValueError("a committee holds two lists in one district")
     unit_votes = (
-        results.select(*unit, *(count(committee) for committee in committees))
+        results.select("gmina", "commission", *committees)
         .unpivot(index=["gmina", "commission"], variable_name="committee", value_name="votes")
         .filter(pl.col("votes").is_not_null())
         .join(units.select("gmina", "commission", "district"), on=["gmina", "commission"])
@@ -163,12 +328,6 @@ def parse_2023() -> dict[str, pl.DataFrame]:
         raise ValueError(f"{gap.height} district lists differ from the polling-district sums:\n{gap}")
     if off.height:
         print(f"{year}: the blank polling districts hold {(off['votes'] - off['got']).sum()} list votes")
-    districts = table(year, "districts").select(
-        count("Numer okręgu").alias("district"),
-        count("Liczba mandatów").alias("magnitude"),
-        pl.col("Siedziba OKW").alias("seat"),
-        pl.col("Opis granic").alias("boundary"),
-    )
     if districts["magnitude"].sum() != 460 or lists["seats"].sum() != 460:
         raise ValueError("seats do not sum to 460")
     for row in districts.iter_rows(named=True):
@@ -176,19 +335,6 @@ def parse_2023() -> dict[str, pl.DataFrame]:
         won = dhondt(dict(zip(part["list"], part["votes"])), row["magnitude"])
         if any(won[list_] != seats for list_, seats in zip(part["list"], part["seats"])):
             print(f"{year} district {row['district']}: D'Hondt does not give the declared seats")
-    candidates = table(year, "candidates").select(
-        count("Nr okręgu").alias("district"),
-        count("Nr listy").alias("list"),
-        count("Pozycja na liście").alias("position"),
-        pl.col("Nazwisko i imiona").alias("name"),
-        pl.col("Płeć").alias("sex"),
-        pl.col("Zawód").alias("occupation"),
-        pl.col("Miejsce zamieszkania").alias("residence"),
-        pl.col("Przynależność do partii").alias("membership"),
-        pl.col("Poparcie").alias("support"),
-        count("Liczba głosów").alias("votes"),
-        (pl.col("Czy przyznano mandat") == "Tak").alias("elected"),
-    )
     seated = candidates.group_by("district", "list").agg(pl.col("elected").sum().alias("won"))
     off = lists.filter(pl.col("seats") > 0).join(seated, on=["district", "list"], how="left")
     off = off.filter(pl.col("won").fill_null(0) != pl.col("seats"))
@@ -198,27 +344,17 @@ def parse_2023() -> dict[str, pl.DataFrame]:
         pl.col("votes").sum(), struck=pl.col("position").max() - pl.len()
     )
     off = lists.join(listed, on=["district", "list"], how="left").filter(pl.col("votes") != pl.col("votes_right"))
+    if "struck" in loaded:
+        marked = loaded["struck"].with_columns(marked=pl.lit(1))
+        off = off.join(marked, on=["district", "list"], how="left").with_columns(
+            struck=pl.col("struck") + pl.col("marked").fill_null(0)
+        )
     if off.filter((pl.col("votes") < pl.col("votes_right")) | (pl.col("struck") == 0)).height:
         raise ValueError(f"candidate votes differ from list votes:\n{off}")
     for row in off.iter_rows(named=True):
         residual = row["votes"] - row["votes_right"]
         print(f"{year} district {row['district']} list {row['list']}: {residual} votes for struck candidates")
-    pieces = []
-    for member, frame in tables(year, "unit_candidates").items():
-        district = int(member.rsplit("okreg_", 1)[1].split("_", 1)[0])
-        ballot = candidates.filter(pl.col("district") == district).sort("list", "position")
-        names = frame.columns[frame.columns.index("Liczba uwzględnionych komisji") + 1 :]
-        if len(names) != ballot.height:
-            raise ValueError(f"district {district}: {len(names)} candidate columns for {ballot.height} candidates")
-        for header, row in zip(names, ballot.iter_rows(named=True)):
-            surname, given = header.split(" - ", 1)[0].split(" ", 1)[0], row["name"].split(" ")[0]
-            if surname.split("-")[0] not in row["name"] or given not in header:
-                raise ValueError(f"district {district}: column {header!r} is not {row['name']!r}")
-        piece = frame.select(*unit, *(count(header).alias(str(i)) for i, header in enumerate(names)))
-        piece = piece.unpivot(index=["gmina", "commission"], variable_name="i", value_name="votes")
-        keys = ballot.select("list", "position").with_row_index("i").with_columns(pl.col("i").cast(pl.String))
-        pieces.append(piece.join(keys, on="i").drop("i").with_columns(district=pl.lit(district, pl.Int64)))
-    candidate_votes = pl.concat(pieces).filter(pl.col("votes").is_not_null())
+    candidate_votes = loaded["candidate_votes"].filter(pl.col("votes").is_not_null())
     got = candidate_votes.group_by("district", "list", "position").agg(got=pl.col("votes").sum())
     off = candidates.join(got, on=["district", "list", "position"], how="left").filter(
         pl.col("votes") != pl.col("got").fill_null(0)
@@ -231,14 +367,7 @@ def parse_2023() -> dict[str, pl.DataFrame]:
     )
     if off.height:
         print(f"{year}: {off.height} polling-district lists whose candidate votes differ from the list votes")
-    registry = table(year, "units").select(
-        gmina("TERYT gminy"),
-        count("Numer").alias("commission"),
-        pl.col("Typ obwodu").alias("kind"),
-        pl.col("Typ obszaru").alias("area"),
-        pl.col("Opis granic").alias("boundary"),
-    )
-    units = units.join(registry, on=["gmina", "commission"], how="left")
+    units = units.join(loaded["registry"], on=["gmina", "commission"], how="left")
     return {
         "districts": districts,
         "lists": lists,
@@ -249,24 +378,21 @@ def parse_2023() -> dict[str, pl.DataFrame]:
     }
 
 
-PARSERS = {2023: parse_2023}
+LOADERS = {2019: load_2019, 2023: load_2023}
 
 
 def parse() -> None:
-    PARSED.mkdir(parents=True, exist_ok=True)
-    out: dict[str, list[pl.DataFrame]] = {}
     for year, day in ELECTIONS.items():
-        for name, frame in PARSERS[year]().items():
-            out.setdefault(name, []).append(frame.with_columns(year=pl.lit(year, pl.Int32), day=pl.lit(day)))
-    for name, frames in out.items():
-        frame = pl.concat(frames, how="diagonal")
-        frame.write_parquet(PARSED / f"{name}.parquet")
-        print(f"{name}: {frame.height} rows")
+        folder = PARSED / str(year)
+        folder.mkdir(parents=True, exist_ok=True)
+        for name, frame in check(year, LOADERS[year]()).items():
+            frame.with_columns(year=pl.lit(year, pl.Int32), day=pl.lit(day)).write_parquet(folder / f"{name}.parquet")
+            print(f"{year} {name}: {frame.height} rows")
 
 
 def emit() -> Path:
     frames = {
-        name: pl.read_parquet(PARSED / f"{name}.parquet")
+        name: pl.read_parquet(PARSED / os.environ["SEJM_YEAR"] / f"{name}.parquet")
         for name in ("districts", "lists", "candidates", "units", "unit_votes")
     }
     districts, lists, candidates, units, unit_votes = (
