@@ -1,0 +1,75 @@
+{
+  "polity": "US-NH",
+  "publisher": "New Hampshire Secretary of State",
+  "title": "Manual for the General Court of New Hampshire 1941, general election returns, summary by counties (general election 1940-11-05)",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/manualforgeneral27newh/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/manualforgeneral27newh"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1940,
+      "chamber": "president",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "NH",
+      "district": null
+    },
+    "governor": {
+      "year": 1940,
+      "chamber": "governor",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "NH",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 421,
+      "id": "421-0",
+      "columns": [
+        {
+          "label": "Electors of President and Vice President Willkie and McNary, r",
+          "contest": "president",
+          "candidate": "Wendell Willkie (Republican)"
+        },
+        {
+          "label": "Roosevelt and Wallace, d",
+          "contest": "president",
+          "candidate": "Franklin D. Roosevelt (Democratic)"
+        },
+        {
+          "label": "Blood, r",
+          "contest": "governor",
+          "candidate": "Robert O. Blood"
+        },
+        {
+          "label": "Keefe, d",
+          "contest": "governor",
+          "candidate": "F. Clyde Keefe"
+        },
+        {
+          "label": "Names on Checklist",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Ballots Cast",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.134,
+        0.128,
+        0.886,
+        0.526
+      ],
+      "hint": "Read only the table headed 'SUMMARY'; ignore any other table visible in the image."
+    }
+  ]
+}

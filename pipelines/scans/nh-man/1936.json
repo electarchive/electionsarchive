@@ -1,0 +1,137 @@
+{
+  "polity": "US-NH",
+  "publisher": "New Hampshire Secretary of State",
+  "title": "Manual for the General Court of New Hampshire 1937, general election returns, summary by counties (general election 1936-11-03)",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/manualforgeneral25newh/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/manualforgeneral25newh"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1936,
+      "chamber": "president",
+      "day": "1936-11-03",
+      "special": false,
+      "state": "NH",
+      "district": null
+    },
+    "senate": {
+      "year": 1936,
+      "chamber": "senate",
+      "day": "1936-11-03",
+      "special": false,
+      "state": "NH",
+      "district": null
+    },
+    "governor": {
+      "year": 1936,
+      "chamber": "governor",
+      "day": "1936-11-03",
+      "special": false,
+      "state": "NH",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 301,
+      "id": "301-0",
+      "columns": [
+        {
+          "label": "Landon and Knox, r",
+          "contest": "president",
+          "candidate": "Alfred Landon (Republican)"
+        },
+        {
+          "label": "Roosevelt and Garner, d",
+          "contest": "president",
+          "candidate": "Franklin D. Roosevelt (Democratic)"
+        },
+        {
+          "label": "Browder and Ford, com.",
+          "contest": "president",
+          "candidate": "Communist"
+        },
+        {
+          "label": "Lemke and O'Brien, u",
+          "contest": "president",
+          "candidate": "William Lemke (Union)"
+        },
+        {
+          "label": "Bridges, r",
+          "contest": "senate",
+          "candidate": "H. Styles Bridges"
+        },
+        {
+          "label": "Rogers, d",
+          "contest": "senate",
+          "candidate": "William N. Rogers"
+        },
+        {
+          "label": "Morse, f-l",
+          "contest": "senate",
+          "candidate": "Stearnes Morse"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.12,
+        0.117,
+        0.902,
+        0.536
+      ],
+      "hint": "Read only the table headed 'SUMMARY'; ignore any other table visible in the image."
+    },
+    {
+      "page": 312,
+      "id": "312-0",
+      "columns": [
+        {
+          "label": "Murphy, r",
+          "contest": "governor",
+          "candidate": "Francis P. Murphy"
+        },
+        {
+          "label": "Blandin, d",
+          "contest": "governor",
+          "candidate": "Amos Blandin"
+        },
+        {
+          "label": "Bergeron, f-l",
+          "contest": "governor",
+          "candidate": "Arthur J. Bergeron"
+        },
+        {
+          "label": "State Stores Yes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "State Stores No",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Beverages Yes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Beverages No",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.094,
+        0.416,
+        0.877,
+        0.804
+      ],
+      "hint": "Read only the table headed 'SUMMARY'; ignore any other table visible in the image."
+    }
+  ]
+}

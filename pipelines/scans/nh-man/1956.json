@@ -1,0 +1,116 @@
+{
+  "polity": "US-NH",
+  "publisher": "New Hampshire Secretary of State",
+  "title": "Manual for the General Court of New Hampshire 1957, general election returns, summary by counties (general election 1956-11-06)",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/manualforgeneral35newh/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/manualforgeneral35newh"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1956,
+      "chamber": "president",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "NH",
+      "district": null
+    },
+    "governor": {
+      "year": 1956,
+      "chamber": "governor",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "NH",
+      "district": null
+    },
+    "senate": {
+      "year": 1956,
+      "chamber": "senate",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "NH",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 638,
+      "id": "638-0",
+      "columns": [
+        {
+          "label": "Eisenhower and Nixon, r",
+          "contest": "president",
+          "candidate": "Dwight D. Eisenhower (Republican)"
+        },
+        {
+          "label": "Stevenson and Kefauver, d",
+          "contest": "president",
+          "candidate": "Adlai Stevenson (Democratic)"
+        },
+        {
+          "label": "Andrews",
+          "contest": "president",
+          "candidate": "T. Coleman Andrews (Unpledged Electors / States' Rights)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.043,
+        0.152,
+        0.84,
+        0.482
+      ],
+      "hint": "Read only the table headed 'Summary by Counties, November 6, 1956: For Electors of President and Vice-President'; ignore any other table visible in the image."
+    },
+    {
+      "page": 639,
+      "id": "639-0",
+      "columns": [
+        {
+          "label": "Dwinell, r",
+          "contest": "governor",
+          "candidate": "Lane Dwinell"
+        },
+        {
+          "label": "Shaw, d",
+          "contest": "governor",
+          "candidate": "John Shaw"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.148,
+        0.13,
+        0.678,
+        0.427
+      ],
+      "hint": "Read only the table headed 'SUMMARY BY COUNTIES November 6, 1956'; ignore any other table visible in the image."
+    },
+    {
+      "page": 639,
+      "id": "639-1",
+      "columns": [
+        {
+          "label": "Cotton, r",
+          "contest": "senate",
+          "candidate": "Norris Cotton"
+        },
+        {
+          "label": "Pickett, d",
+          "contest": "senate",
+          "candidate": "Laurence M. Pickett"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.665,
+        0.13,
+        0.942,
+        0.427
+      ],
+      "hint": "Read only the table headed 'SUMMARY BY COUNTIES November 6, 1956'; ignore any other table visible in the image."
+    }
+  ]
+}
