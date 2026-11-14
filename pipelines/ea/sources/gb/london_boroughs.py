@@ -532,6 +532,66 @@ NAMES = {
     "Graber,lngeborg": "Graber, Ingeborg",
     "Khan,lmran": "Khan, Imran",
     "cummins. Mark": "Cummins, Mark",
+    "unk David E.": "Burch, David E.",
+    "Mclsaac, Anthony J.": "McIsaac, Anthony J.",
+    "Mclaughlin, Reginald": "McLaughlin, Reginald",
+    "Alexander, Alastair J.Mcl.": "Alexander, Alastair J.McL.",
+    "Azad, HarnamS.": "Azad, Harnam S.",
+    "Guthrie. Eileen W.": "Guthrie, Eileen W.",
+    "Pindoria, Ravji, D.": "Pindoria, Ravji D.",
+    "Eldridge, Alexandra, C.": "Eldridge, Alexandra C.",
+    "Stephens, Rupert Su.": "Stephens, Rupert StJ.",
+    "Bewley, Henry.J.": "Bewley, Henry J.",
+    "Tremlett,PeterJ.": "Tremlett, Peter J.",
+    "Sclous Hodges, Donald M.": "Selous Hodges, Donald M.",
+    "Joel, Margaret, J.": "Joel, Margaret J.",
+    "Haley, Mark DJ": "Haley, Mark D.I.",
+    "Hill, Edward U": "Hill, Edward J.F.",
+    "Head, Emily H.": "Head, Emily J.E.",
+    "Snell, Peter JJ": "Snell, Peter J.I.",
+    "Clarke, Angela FJ": "Clarke, Angela F.I.",
+    "Hayhow, David U": "Hayhow, David J.J.",
+    "Deva, Roocoomany U": "Deva, Roocoomany L.I.",
+    "Muggeridge, Raymond U": "Muggeridge, Raymond L.J.",
+    "Raven, Hugh H.": "Raven, Hugh J.E.",
+    "Crooks, Colin E": "Crooks, Colin F.",
+    "Marder, Barnaby H.": "Marder, Barnaby J.L.",
+    "Mcinerney, Dermot I.A.": "McInerney, Dermot T.A.",
+    "Hinton, Daniel IN": "Hinton, Daniel J.N.",
+    "Cope, Pierre F. L.": "Cope, Pierre E.L.",
+    "Gray, John EI.": "Gray, John F.I.",
+    "Knight, Patricia EL.": "Knight, Patricia F.L.",
+    "Steel, Michael C J.": "Steel, Michael C.F.",
+    "Shannon, Robert W.E": "Shannon, Robert W.F.",
+    "Stanley, Simon H.E": "Stanley, Simon H.F.",
+    "Compton, Gareth El.": "Compton, Gareth F.T.",
+    "Ruffell, Lisa G J": "Ruffell, Lisa G.I.",
+    "Ayonrinde, Bernadina LT.": "Ayonrinde, Bernadina I.T.",
+    "Hawkins, William ED.": "Hawkins, William F.D.",
+    "Blois, Elizabeth EM.": "Blois, Elizabeth F.M.",
+    "Porter, Richard A.a.": "Porter, Richard A.O.",
+    "Quieros, Gerald EX": "Quieros, Gerald E.R.",
+    "Hoof, Timothy EX": "Hoof, Timothy E.R.",
+    "Bagha, lej R.": "Bagha, Tej R.",
+    "Gillis, lona K.": "Gillis, Iona K.",
+    "lIoghalu, Miriam A.": "Iloghalu, Miriam A.",
+    "Lister, Edward lU.": "Lister, Edward J.U.",
+    "Mackenzie-Smith, Alexander we.": "Mackenzie-Smith, Alexander W.C.",
+    "Siotover, Timothy JH.": "Slotover, Timothy J.H.",
+    "Ladipo, Jelill.": "Ladipo, Jelil I.",
+    "Clamp, Jonathan CWdaS.": "Clamp, Jonathan C.W. da S.",
+    "Dowell, Vanessa CD.de la C": "Dowell, Vanessa C.D. de la C.",
+    "Brisby, Tania AlB.": "Brisby, Tania A.T.B.",
+    "Fitzgerald, Adrian lA.D.": "Fitzgerald, Adrian J.A.D.",
+    "Gannon, Paul lB.": "Gannon, Paul T.B.",
+    "Keighley, Dennis lE.": "Keighley, Dennis J.E.",
+    "Con new, John A.": "Connew, John A.",
+    "Caval la, Peter": "Cavalla, Peter",
+    "Watki ns, Peter D.": "Watkins, Peter D.",
+    "Ki ng, Peter J.": "King, Peter J.",
+    "Northover, Li ndsay PG": "Northover, Lindsay P.G.",
+    "Everest, Lesl ie M.": "Everest, Leslie M.",
+    "Alden, Lesl ie H.": "Alden, Leslie H.",
 }
 SUMMARY = {1994: (5838, 1917, 4872088, 2246209, 2240669)}
 SEATS = {("Bexley", "Falconwood"): 1}
@@ -1827,6 +1887,16 @@ READ_FIXES = {
     r" 1\.$": " J.",
     r"§S\.": "S.",
     r"A:S\.": "A.S.",
+    r"(?<=[A-Z])_(?=[A-Z])": ".",
+    r"\bMeN\.": "McN.",
+    r"(?<=[A-Z]),\.?$": ".",
+    r"(?<=[a-z.]),$": "",
+    r"(?<=\.)\(": " (",
+    r" \.$": ".",
+    r"(?<= )0$": "O.",
+    r"(?<![a-z])((?:Mc|St)[A-Z])$": r"\1.",
+    r"-AI$": "-Al",
+    r"-UI$": "-Ul",
 }
 
 
@@ -1836,12 +1906,16 @@ def dotted(name: str) -> str:
     surname, comma, rest = name.partition(",")
     words = []
     for word in rest.split():
-        if re.fullmatch(r"[A-Z](?:[A-Z.]*[A-Z])\.?,?", word) and not word.startswith("Mc"):
+        if re.fullmatch(r"[A-Z](?:[A-Z.]*[A-Z])?\.?,?", word):
             word = ".".join(re.findall(r"[A-Z]", word)) + "."
+            if words and re.fullmatch(r"(?:[A-Z]\.)+", words[-1]):
+                word = words.pop() + word
         elif re.fullmatch(r"[A-Z]-[A-Z]{2,}", word):
             word = word[:2] + ".".join(word[2:]) + "."
-        elif re.fullmatch(r"[A-Z],", word):
-            word = word[0] + "."
+        elif re.fullmatch(r"[A-Z]-[A-Z]", word):
+            word += "."
+        elif re.fullmatch(r"(?:Mc|St)[A-Z]\.?", word) and words and re.fullmatch(r"(?:[A-Z]\.)+", words[-1]):
+            word = words.pop() + word
         words.append(word)
     return surname + comma + " " + " ".join(words) if words else name
 
@@ -2195,9 +2269,7 @@ def parse() -> None:
                 found = fixed(found)
         found = found.with_columns(name_printed=pl.col("name")).with_columns(
             pl.col("name").map_elements(
-                lambda n: NAMES.get(
-                    n, dotted(person(n)) if year in SCANNED else (tidy(n) if year == 1994 else person(n))
-                ),
+                lambda n: NAMES.get(n, dotted(person(n)) if year in SCANNED else tidy(n)),
                 return_dtype=pl.String,
             )
         )
