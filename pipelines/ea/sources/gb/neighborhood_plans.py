@@ -151,6 +151,7 @@ KINDS = {
     "right_to_build": "Community Right to Build Order referendum",
     "parish_poll": "parish poll",
 }
+DECISIONS = ("decision", "delegated", "for%20making", "for_making")
 WITHIN = (
     "The neighborhood area is not a single parish, so it is shown within {council}'s area rather than drawn on its own."
 )
@@ -467,7 +468,7 @@ def emit() -> Path:
                 key = f"{day}:neighborhood:{code}:{slug(plan)}:{row['kind']}"
                 title = (
                     f"Decision statement: {plan} {KINDS[row['kind']]}, {day}"
-                    if pdf and "decision" in row["url"].lower()
+                    if pdf and any(part in row["url"].lower() for part in DECISIONS)
                     else f"Declaration of result of poll: {plan} {KINDS[row['kind']]}, {day}"
                     if pdf
                     else "Neighbourhood plan referendum results"
