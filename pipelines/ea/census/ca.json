@@ -7571,18 +7571,20 @@
           "valid_from": "2000-01-01",
           "valid_to": "2024-01-01",
           "called": false,
-          "locator": "Municipal Act, RSY 2002, c. 154, s. 52 before the 2023 amendment: a general election every third year on the third Thursday of October, starting in 2000 (read in the official consolidation; the file refuses scripted downloads, so the section number is unconfirmed)"
+          "locator": "Municipal Act, RSY 2002, c. 154, s. 52 before the 2023 amendment: a general election every third year on the third Thursday of October, starting in 2000 (S.Y. 1998, c. 19, s. 52; read in the laws.yukon.ca consolidation preceding the amendment)"
         },
         {
           "within": "CA-YT",
           "government_kind": "municipality",
-          "source": "yt-term",
+          "source": "yt-municipal-act",
           "period_years": 4,
           "phase": 0,
           "month": 10,
           "term_years": 4,
+          "day_rule": "oct_third_thursday",
           "valid_from": "2024-01-01",
-          "called": false
+          "called": false,
+          "locator": "Municipal Act, RSY 2002, c. 154, s. 52 as amended by S.Y. 2023, c. 5: each municipality holds a general election on October 17, 2024, and on the third Thursday of October of every fourth year after 2024 (read in the December 2024 unofficial consolidation)"
         }
       ],
       "est_votes": 12000,
