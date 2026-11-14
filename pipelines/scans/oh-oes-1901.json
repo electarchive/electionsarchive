@@ -1,0 +1,159 @@
+{
+  "polity": "US-OH",
+  "publisher": "Ohio Secretary of State",
+  "title": "Ohio Election Statistics for 1901, general election 1901-11-05",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/ohioelectionsta04statgoog/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/ohioelectionsta04statgoog"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "governor": {
+      "year": 1901,
+      "chamber": "governor",
+      "day": "1901-11-05",
+      "special": false,
+      "state": "OH",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 16,
+      "id": "16-0",
+      "columns": [
+        {
+          "label": "Geo. K. Nash, Rep.",
+          "contest": "governor",
+          "candidate": "Geo. K. Nash",
+          "party": "Rep."
+        },
+        {
+          "label": "Jas. Kilbourne, Dem.",
+          "contest": "governor",
+          "candidate": "Jas. Kilbourne",
+          "party": "Dem."
+        },
+        {
+          "label": "E. Jay Pinney, Pro.",
+          "contest": "governor",
+          "candidate": "E. Jay Pinney",
+          "party": "Pro."
+        },
+        {
+          "label": "John Richardson, U. R.",
+          "contest": "governor",
+          "candidate": "John Richardson",
+          "party": "U. R."
+        },
+        {
+          "label": "John H. T. Juergens, S. L.",
+          "contest": "governor",
+          "candidate": "John H. T. Juergens",
+          "party": "S. L."
+        },
+        {
+          "label": "Harry C. Thompson, Soc.",
+          "contest": "governor",
+          "candidate": "Harry C. Thompson",
+          "party": "Soc."
+        },
+        {
+          "label": "Total Vote for Governor",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Pluralities Rep. (Geo. K. Nash)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Pluralities Dem. (Jas. Kilbourne)",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.123,
+        0.121,
+        0.891,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTE FOR GOVERNOR.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.248
+      ]
+    },
+    {
+      "page": 17,
+      "id": "17-0",
+      "columns": [
+        {
+          "label": "Geo. K. Nash",
+          "contest": "governor",
+          "candidate": "Geo. K. Nash",
+          "party": "Rep."
+        },
+        {
+          "label": "Jas. Kilbourne",
+          "contest": "governor",
+          "candidate": "Jas. Kilbourne",
+          "party": "Dem."
+        },
+        {
+          "label": "E. Jay Pinney",
+          "contest": "governor",
+          "candidate": "E. Jay Pinney",
+          "party": "Pro."
+        },
+        {
+          "label": "John Richardson",
+          "contest": "governor",
+          "candidate": "John Richardson",
+          "party": "U. R."
+        },
+        {
+          "label": "John H. T. Juergens",
+          "contest": "governor",
+          "candidate": "John H. T. Juergens",
+          "party": "S. L."
+        },
+        {
+          "label": "Harry C. Thompson",
+          "contest": "governor",
+          "candidate": "Harry C. Thompson",
+          "party": "Soc."
+        },
+        {
+          "label": "Total Vote for Governor",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Pluralities Rep. Geo. K. Nash",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Pluralities Dem. Jas. Kilbourne",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.07,
+        0.365,
+        0.845,
+        0.646
+      ],
+      "hint": "Read only the table headed 'VOTE FOR GOVERNOR \u2014 Concluded.'; ignore any other table visible in the image."
+    }
+  ]
+}

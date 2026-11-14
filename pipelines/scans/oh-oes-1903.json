@@ -1,0 +1,162 @@
+{
+  "polity": "US-OH",
+  "publisher": "Ohio Secretary of State",
+  "title": "Ohio Election Statistics for 1903, general election 1903-11-03",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/ohioelectionsta01statgoog/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/ohioelectionsta01statgoog"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "governor": {
+      "year": 1903,
+      "chamber": "governor",
+      "day": "1903-11-03",
+      "special": false,
+      "state": "OH",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 1697,
+      "id": "1697-0",
+      "columns": [
+        {
+          "label": "Rep. Myron T. Herrick.",
+          "contest": "governor",
+          "candidate": "Myron T. Herrick",
+          "party": "Rep."
+        },
+        {
+          "label": "Dem. Tom L. Johnson.",
+          "contest": "governor",
+          "candidate": "Tom L. Johnson",
+          "party": "Dem."
+        },
+        {
+          "label": "Soc. Isaac Cowen.",
+          "contest": "governor",
+          "candidate": "Isaac Cowen",
+          "party": "Soc."
+        },
+        {
+          "label": "Pro. Nelson D. Creamer.",
+          "contest": "governor",
+          "candidate": "Nelson D. Creamer",
+          "party": "Pro."
+        },
+        {
+          "label": "Soc. Lab. John D. Goerke.",
+          "contest": "governor",
+          "candidate": "John D. Goerke",
+          "party": "Soc. Lab."
+        },
+        {
+          "label": "Total Vote Cast for Governor.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Pluralities Rep. Myron T. Herrick.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Pluralities Dem. Tom L. Johnson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Vote Cast in State.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.08,
+        0.086,
+        0.82,
+        1.0
+      ],
+      "hint": "Read only the table headed 'NO. 1 \u2014 VOTE CAST FOR CANDIDATES FOR GOVERNOR OF OHIO, AND TOTAL VOTE CAST IN STATE, AT THE ELECTION HELD NOVEMBER 3, 1903, BY COUNTIES, WITH PLURALITIES OF CANDIDATES.'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.267
+      ]
+    },
+    {
+      "page": 1698,
+      "id": "1698-0",
+      "columns": [
+        {
+          "label": "Myron T. Herrick",
+          "contest": "governor",
+          "candidate": "Myron T. Herrick",
+          "party": "Rep."
+        },
+        {
+          "label": "Tom L. Johnson",
+          "contest": "governor",
+          "candidate": "Tom L. Johnson",
+          "party": "Dem."
+        },
+        {
+          "label": "Isaac Cowen",
+          "contest": "governor",
+          "candidate": "Isaac Cowen",
+          "party": "Soc."
+        },
+        {
+          "label": "Nelson D. Creamer",
+          "contest": "governor",
+          "candidate": "Nelson D. Creamer",
+          "party": "Pro."
+        },
+        {
+          "label": "John D. Goerke",
+          "contest": "governor",
+          "candidate": "John D. Goerke",
+          "party": "Soc. Lab."
+        },
+        {
+          "label": "Total Vote Cast for Governor",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Myron T. Herrick (plurality)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Tom L. Johnson (plurality)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Vote Cast in State",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.105,
+        0.114,
+        0.771,
+        0.85
+      ],
+      "hint": "Read only the table headed 'TABLE NO. 1 \u2014 VOTE CAST FOR CANDIDATES FOR GOVERNOR OF OHIO, AND TOTAL VOTE CAST IN STATE, AT THE ELECTION HELD NOVEMBER 3, 1903, BY COUNTIES, WITH PLURALITIES OF CANDIDATES \u2014 Concluded.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3003
+      ]
+    }
+  ]
+}

@@ -1,0 +1,96 @@
+{
+  "polity": "US-OH",
+  "publisher": "Ohio Secretary of State",
+  "title": "Ohio Election Statistics for 1895, general election 1895-11-05",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/ohioelectionsta00statgoog/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/ohioelectionsta00statgoog"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "governor": {
+      "year": 1895,
+      "chamber": "governor",
+      "day": "1895-11-05",
+      "special": false,
+      "state": "OH",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 26,
+      "id": "26-0",
+      "columns": [
+        {
+          "label": "Asa S. Bushnell, Republican",
+          "contest": "governor",
+          "candidate": "Asa S. Bushnell",
+          "party": "Republican"
+        },
+        {
+          "label": "James E. Campbell, Democratic",
+          "contest": "governor",
+          "candidate": "James E. Campbell",
+          "party": "Democratic"
+        },
+        {
+          "label": "Total vote",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.189,
+        0.126,
+        0.604,
+        1.0
+      ],
+      "hint": "Read only the table headed 'TABLE GIVING VOTE FOR GOVERNOR, 1895, AND SECRETARY OF STATE, 1894, WITH TOTAL VOTE BY COUNTIES.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2311
+      ]
+    },
+    {
+      "page": 27,
+      "id": "27-0",
+      "columns": [
+        {
+          "label": "Asa S. Bushnell. (Republican)",
+          "contest": "governor",
+          "candidate": "Asa S. Bushnell",
+          "party": "Republican"
+        },
+        {
+          "label": "James E. Campbell. (Democratic)",
+          "contest": "governor",
+          "candidate": "James E. Campbell",
+          "party": "Democratic"
+        },
+        {
+          "label": "Total vote.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.205,
+        0.343,
+        0.817,
+        0.832
+      ],
+      "hint": "Read only the table headed 'Table Giving Vote for Governor, 1895, and Secretary of State, 1894, With Total Vote by Counties\u2014Concluded.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        -0.0348
+      ]
+    }
+  ]
+}

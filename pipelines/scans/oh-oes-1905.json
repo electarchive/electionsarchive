@@ -1,0 +1,162 @@
+{
+  "polity": "US-OH",
+  "publisher": "Ohio Secretary of State",
+  "title": "Ohio Election Statistics for 1905, general election 1905-11-07",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/ohioelectionsta01statgoog/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/ohioelectionsta01statgoog"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "governor": {
+      "year": 1905,
+      "chamber": "governor",
+      "day": "1905-11-07",
+      "special": false,
+      "state": "OH",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 11,
+      "id": "11-0",
+      "columns": [
+        {
+          "label": "Rep. Myron T. Herrick",
+          "contest": "governor",
+          "candidate": "Myron T. Herrick",
+          "party": "Rep."
+        },
+        {
+          "label": "Dem. John M. Pattison",
+          "contest": "governor",
+          "candidate": "John M. Pattison",
+          "party": "Dem."
+        },
+        {
+          "label": "Soc. Isaac Cowen",
+          "contest": "governor",
+          "candidate": "Isaac Cowen",
+          "party": "Soc."
+        },
+        {
+          "label": "Pro. Aaron S. Watkins",
+          "contest": "governor",
+          "candidate": "Aaron S. Watkins",
+          "party": "Pro."
+        },
+        {
+          "label": "Soc. Lab. John E. Steiger",
+          "contest": "governor",
+          "candidate": "John E. Steiger",
+          "party": "Soc. Lab."
+        },
+        {
+          "label": "Total Vote Cast for Governor",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality Rep. Myron T. Herrick",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality Dem. John M. Pattison",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Vote Cast in Each County",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.196,
+        0.136,
+        0.86,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTE CAST FOR CANDIDATES FOR GOVERNOR OF THE STATE OF OHIO, AND TOTAL VOTE CAST IN STATE AT THE ELECTION HELD NOVEMBER 7, 1905, BY COUNTIES, WITH PLURALITIES OF CANDIDATES.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2593
+      ]
+    },
+    {
+      "page": 12,
+      "id": "12-0",
+      "columns": [
+        {
+          "label": "Rep. Myron T. Herrick.",
+          "contest": "governor",
+          "candidate": "Myron T. Herrick",
+          "party": "Rep."
+        },
+        {
+          "label": "Dem. John M. Pattison.",
+          "contest": "governor",
+          "candidate": "John M. Pattison",
+          "party": "Dem."
+        },
+        {
+          "label": "Soc. Isaac Cowen.",
+          "contest": "governor",
+          "candidate": "Isaac Cowen",
+          "party": "Soc."
+        },
+        {
+          "label": "Pro. Aaron S. Watkins.",
+          "contest": "governor",
+          "candidate": "Aaron S. Watkins",
+          "party": "Pro."
+        },
+        {
+          "label": "Soc. Lab. John E. Steiger.",
+          "contest": "governor",
+          "candidate": "John E. Steiger",
+          "party": "Soc. Lab."
+        },
+        {
+          "label": "Total Vote Cast for Governor.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality Rep. Myron T. Herrick.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality Dem. John M. Pattison.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Vote Cast in Each County.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.164,
+        0.198,
+        0.824,
+        0.888
+      ],
+      "hint": "Read only the table headed 'VOTE CAST FOR CANDIDATES FOR GOVERNOR OF THE STATE OF OHIO, AND TOTAL VOTE CAST IN STATE AT THE ELECTION HELD NOVEMBER 7, 1905, BY COUNTIES, WITH PLURALITIES OF CANDIDATES.\u2014Concluded.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2435
+      ]
+    }
+  ]
+}

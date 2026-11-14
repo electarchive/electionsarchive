@@ -1,0 +1,183 @@
+{
+  "polity": "US-OH",
+  "publisher": "Ohio Secretary of State",
+  "title": "Ohio Election Statistics for 1897, general election 1897-11-02",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/ohioelectionsta00statgoog/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/ohioelectionsta00statgoog"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "governor": {
+      "year": 1897,
+      "chamber": "governor",
+      "day": "1897-11-02",
+      "special": false,
+      "state": "OH",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 497,
+      "id": "497-0",
+      "columns": [
+        {
+          "label": "Asa S. Bushnell (Rep.)",
+          "contest": "governor",
+          "candidate": "Asa S. Bushnell",
+          "party": "Rep."
+        },
+        {
+          "label": "Horace L. Chapman (Dem)",
+          "contest": "governor",
+          "candidate": "Horace L. Chapman",
+          "party": "Dem"
+        },
+        {
+          "label": "John C. Holliday (Proh.)",
+          "contest": "governor",
+          "candidate": "John C. Holliday",
+          "party": "Proh."
+        },
+        {
+          "label": "Jacob Sechler Coxey (Peo.)",
+          "contest": "governor",
+          "candidate": "Jacob Sechler Coxey",
+          "party": "Peo."
+        },
+        {
+          "label": "Julius Dexter (Natl. Dem.)",
+          "contest": "governor",
+          "candidate": "Julius Dexter",
+          "party": "Natl. Dem."
+        },
+        {
+          "label": "William Watkins (Soc. Lab.)",
+          "contest": "governor",
+          "candidate": "William Watkins",
+          "party": "Soc. Lab."
+        },
+        {
+          "label": "Samuel J. Lewis (Neg. Pro.)",
+          "contest": "governor",
+          "candidate": "Samuel J. Lewis",
+          "party": "Neg. Pro."
+        },
+        {
+          "label": "John Richardson (Lib-erty.)",
+          "contest": "governor",
+          "candidate": "John Richardson",
+          "party": "Lib-erty."
+        },
+        {
+          "label": "Bushnell",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Chapman",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total vote",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.207,
+        0.126,
+        0.825,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTE FOR GOVERNOR.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1808
+      ]
+    },
+    {
+      "page": 498,
+      "id": "498-0",
+      "columns": [
+        {
+          "label": "Asa S. Bushnell",
+          "contest": "governor",
+          "candidate": "Asa S. Bushnell",
+          "party": "Rep."
+        },
+        {
+          "label": "Horace L. Chapman",
+          "contest": "governor",
+          "candidate": "Horace L. Chapman",
+          "party": "Dem."
+        },
+        {
+          "label": "John C. Holliday",
+          "contest": "governor",
+          "candidate": "John C. Holliday",
+          "party": "Proh."
+        },
+        {
+          "label": "Jacob Sechler Coxey",
+          "contest": "governor",
+          "candidate": "Jacob Sechler Coxey",
+          "party": "Peo."
+        },
+        {
+          "label": "Julius Dexter",
+          "contest": "governor",
+          "candidate": "Julius Dexter",
+          "party": "Natl. Dem."
+        },
+        {
+          "label": "William Watkins",
+          "contest": "governor",
+          "candidate": "William Watkins",
+          "party": "Soc. Lab."
+        },
+        {
+          "label": "Samuel J. Lewis",
+          "contest": "governor",
+          "candidate": "Samuel J. Lewis",
+          "party": "Neg. Pro."
+        },
+        {
+          "label": "John Richardson",
+          "contest": "governor",
+          "candidate": "John Richardson",
+          "party": "Lib."
+        },
+        {
+          "label": "Pluralities Rep. Bushnell",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Pluralities Dem. Chapman",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total vote.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.193,
+        0.281,
+        0.809,
+        0.48
+      ],
+      "hint": "Read only the table headed 'Vote for Governor\u2014Concluded.'; ignore any other table visible in the image."
+    }
+  ]
+}

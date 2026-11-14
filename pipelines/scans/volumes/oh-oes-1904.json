@@ -17,5 +17,6 @@
     937,
     938
   ],
-  "autorotate": true
+  "autorotate": true,
+  "create": true
 }
