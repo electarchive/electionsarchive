@@ -221,6 +221,7 @@ const MODEL = {
     lean: 0.3,
     blend: 0.3,
     prior: 0.08,
+    order: 0.4,
     sigma: 1.5,
     unlisted: 0.02,
   },
@@ -862,7 +863,24 @@ function units(
       }
     }
   }
-  return { found, a, b, widths };
+  const progress = new Map<string, [number, number]>();
+  for (const unit of sized) {
+    const held = progress.get(unit.county) ?? [0, 0];
+    progress.set(unit.county, [held[0] + unit.total, held[1] + unit.expected]);
+  }
+  const done =
+    weight > 0
+      ? sum(
+          [...progress.values()].map(([total, expected]) =>
+            Math.min(total, expected),
+          ),
+        ) / weight
+      : 0;
+  const lanes = streamed.map((channel) => ({
+    channel,
+    width: MODEL.channel.order * Math.max(0, 1 - done),
+  }));
+  return { found, a, b, widths, lanes };
 }
 
 function merged(found: Array<Unit>, a: number, b: number) {
@@ -1152,6 +1170,16 @@ function predict(coefficients: Float64Array, unit: Unit, center: number) {
   return value;
 }
 
+type Lane = { channel: number; width: number };
+
+function ordered(coefficients: Float64Array, unit: Unit, lanes: Array<Lane>) {
+  const at = lanes.findIndex((lane) => lane.channel === unit.channel);
+  return (
+    coefficients.at(-1)! +
+    (at === -1 ? 0 : coefficients[coefficients.length - 1 - lanes.length + at]!)
+  );
+}
+
 function fit(
   found: Array<Unit>,
   totals: Array<number>,
@@ -1159,9 +1187,16 @@ function fit(
   residual: Array<number>,
   random: (() => number) | null,
   widths: Array<number>,
+  lanes: Array<Lane>,
 ) {
   const { swing, slope, order } = MODEL.priors;
-  const priors = [swing, slope, ...widths, order];
+  const priors = [
+    swing,
+    slope,
+    ...widths,
+    ...lanes.map((lane) => lane.width),
+    order,
+  ];
   const width = priors.length;
   const matrix = Array.from({ length: width * width }, (_, index) =>
     index % (width + 1) === 0 ? 1 / priors[index / (width + 1)]! ** 2 : 0,
@@ -1184,7 +1219,13 @@ function fit(
     }
     const fraction = Math.min(1, unit.total / totals[index]!);
     add(
-      [1, unit.prior - center, ...features(unit), 1 - fraction],
+      [
+        1,
+        unit.prior - center,
+        ...features(unit),
+        ...lanes.map(() => 0),
+        1 - fraction,
+      ],
       unit.margin - unit.prior - unit.pool,
       residual[index]! ** 2 + partial(fraction),
     );
@@ -1195,7 +1236,13 @@ function fit(
         (unit.margin * unit.total - unit.early.margin * unit.early.total) /
         (unit.total - unit.early.total);
       add(
-        [...priors.slice(1).map(() => 0), fraction],
+        [
+          ...priors.slice(1 + lanes.length).map(() => 0),
+          ...lanes.map((lane) =>
+            lane.channel === unit.channel ? fraction : 0,
+          ),
+          fraction,
+        ],
         unit.early.margin - increment,
         MODEL.partial ** 2 * (1 / Math.max(first, 0.05) + 1 / step),
       );
@@ -1356,7 +1403,13 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
       ),
     ]),
   );
-  const { found, a, b, widths } = units(race, at, cutoff, sizes, adjacent);
+  const { found, a, b, widths, lanes } = units(
+    race,
+    at,
+    cutoff,
+    sizes,
+    adjacent,
+  );
   const tail = TAILS[race.state] ?? MODEL.tail.share;
   const counted = sum(found.map((unit) => unit.total));
   const empty: LiveEstimate = {
@@ -1739,6 +1792,7 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
     scale.map((value) => MODEL.residual * value),
     null,
     widths,
+    lanes,
   );
   let squares = 5 * MODEL.residual ** 2;
   let weights = 5;
@@ -1749,7 +1803,7 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
     }
     const predicted =
       predict(first, unit, center) +
-      first.at(-1)! * (1 - Math.min(1, fraction));
+      ordered(first, unit, lanes) * (1 - Math.min(1, fraction));
     squares +=
       Math.max(
         0,
@@ -2049,13 +2103,13 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
       residuals,
       random,
       widths,
+      lanes,
     );
     const fitted = found.map((unit, index) =>
       unit.channel === 0
         ? totals[index]!
         : Math.max(totals[index]!, typical[index]!),
     );
-    const order = coefficients.at(-1)!;
     let votes = 0;
     let still = 0;
     let all = 0;
@@ -2073,6 +2127,7 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
       let margin: number;
       if (unit.total > 0) {
         const noise = partial(fraction);
+        const order = ordered(coefficients, unit, lanes);
         const observed = unit.margin - order * (1 - fraction);
         const precision = 1 / priorVariance + (noise > 0 ? 1 / noise : 1e12);
         const weight = noise > 0 ? 1 / noise / precision : 1;
