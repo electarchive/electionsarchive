@@ -476,6 +476,60 @@
       "publisher": "Indigenous Services Canada",
       "url": "https://www.sac-isc.gc.ca/eng/1323195944486",
       "kind": "official_body"
+    },
+    "nb-municipalities-act-2004": {
+      "title": "An Act to Amend the Municipalities Act, SNB 2004, c. 2",
+      "publisher": "Government of New Brunswick",
+      "url": "https://www2.gnb.ca/content/dam/gnb/Departments/ag-pg/PDF/ActsLois/2004/Chap-2.pdf",
+      "kind": "official_body"
+    },
+    "nb-elections-2021": {
+      "title": "May 10, 2021 Local Elections: Report of the Municipal Electoral Officer",
+      "publisher": "Elections New Brunswick",
+      "url": "https://www.legnb.ca/content/house_business/60/1/tabled_documents/9/general_elections_2021-elections_generales_2021.pdf",
+      "kind": "official_body"
+    },
+    "yt-municipal-act": {
+      "title": "Municipal Act, RSY 2002, c. 154",
+      "publisher": "Government of Yukon",
+      "url": "https://laws.yukon.ca/cms/images/LEGISLATION/acts/municipal.pdf",
+      "kind": "official_body"
+    },
+    "nt-laea": {
+      "title": "Local Authorities Elections Act, RSNWT 1988, c. L-10",
+      "publisher": "Government of the Northwest Territories",
+      "url": "https://gnwt.ca/resources/local-authorities-elections-act",
+      "kind": "official_body"
+    },
+    "qc-bill-185": {
+      "title": "Loi reportant la prochaine élection scolaire générale (2018, chapitre 15)",
+      "publisher": "Publications du Québec",
+      "url": "https://www.publicationsduquebec.gouv.qc.ca/fileadmin/gazette/pdf_encrypte/lois_reglements/2018F/68843.pdf",
+      "kind": "official_body"
+    },
+    "qc-loi-40": {
+      "title": "Loi modifiant principalement la Loi sur l'instruction publique relativement à l'organisation et à la gouvernance scolaires (2020, chapitre 1)",
+      "publisher": "Publications du Québec",
+      "url": "https://www.publicationsduquebec.gouv.qc.ca/fileadmin/Fichiers_client/lois_et_reglements/LoisAnnuelles/fr/2020/2020C1F.PDF",
+      "kind": "official_body"
+    },
+    "ns-bill-72": {
+      "title": "Bill 72, Education Reform (2018) Act",
+      "publisher": "Nova Scotia Legislature",
+      "url": "https://nslegislature.ca/legc/bills/63rd_1st/1st_read/b072.htm",
+      "kind": "official_body"
+    },
+    "ns-2015-release": {
+      "title": "Amendments to Municipal Elections Act Will Make Voting Easier",
+      "publisher": "Province of Nova Scotia",
+      "url": "https://news.novascotia.ca/en/2015/11/27/amendments-municipal-elections-act-will-make-voting-easier",
+      "kind": "official_body"
+    },
+    "pe-assembly-history": {
+      "title": "Our History and Timeline",
+      "publisher": "Legislative Assembly of Prince Edward Island",
+      "url": "https://www.assembly.pe.ca/about/our-history-and-timeline",
+      "kind": "official_body"
     }
   },
   "tiers": [
@@ -6245,6 +6299,54 @@
       "first_held": "2005-11-06"
     },
     {
+      "key": "qc_school_fr",
+      "tier": "school",
+      "name": "Quebec French-language school board elections (commissioners)",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "The French-language school boards elected commissioners on the first Sunday of November every four years; the last election held was 2 November 2014. The 2018 election was postponed to 1 November 2020 (SQ 2018, c. 15), and Loi 40 (SQ 2020, c. 1, sanctioned 8 February 2020) turned the boards into appointed school service centres and ended the 2020 election for them. The English-language boards kept elections (class qc_school).",
+      "source": "qc-loi-40",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "school_district"
+          ],
+          "within": "CA-QC",
+          "valid_to": "2020-02-08"
+        }
+      ],
+      "dates": [],
+      "cadence": [
+        {
+          "within": "CA-QC",
+          "government_kind": "school",
+          "source": "qc-school",
+          "period_years": 4,
+          "phase": 2,
+          "month": 11,
+          "term_years": 4,
+          "day_rule": "nov_first_sunday",
+          "valid_from": "2014-01-01",
+          "valid_to": "2018-01-01",
+          "called": false,
+          "locator": "First Sunday of November every four years (2 November 2014); the 4 November 2018 election was postponed to 1 November 2020 by SQ 2018, c. 15, and cancelled for the French-language boards by SQ 2020, c. 1, so the row ends before 2018"
+        }
+      ],
+      "est_votes": 600000,
+      "effort": 2,
+      "valid_to": "2020-02-08"
+    },
+    {
       "key": "qc_school",
       "tier": "school",
       "name": "Quebec school board elections",
@@ -6267,7 +6369,8 @@
           "polity_kinds": [
             "school_district"
           ],
-          "within": "CA-QC"
+          "within": "CA-QC",
+          "valid_from": "2020-02-08"
         }
       ],
       "dates": [],
@@ -6336,13 +6439,28 @@
           "within": "CA-ON",
           "government_kind": "municipality",
           "source": "on-mea",
+          "period_years": 3,
+          "phase": 2,
+          "month": 11,
+          "term_years": 3,
+          "day_rule": "nov_second_monday",
+          "valid_from": "1997-01-01",
+          "valid_to": "2007-01-01",
+          "called": false,
+          "locator": "Municipal Elections Act, 1996, S.O. 1996, c. 32, Sched., as enacted (e-Laws version 1): s. 4 (1) a regular election is held in 1997 and in every third year thereafter; s. 5 voting day is the second Monday in November; s. 6 (1) a three-year term begins on December 1. Section 4 (1) was replaced by 2006, c. 9, Sched. H, s. 1 (2006 and every fourth year thereafter), so 2006 is the last triennial-cycle election"
+        },
+        {
+          "within": "CA-ON",
+          "government_kind": "municipality",
+          "source": "on-mea",
           "period_years": 4,
           "phase": 2,
           "month": 10,
           "term_years": 4,
           "day_rule": "oct_fourth_monday",
           "valid_from": "2010-01-01",
-          "called": false
+          "called": false,
+          "locator": "Municipal Elections Act, 1996, as consolidated from 1 January 2023 (e-Laws): s. 4 (1) a regular election is held in 2006 and in every fourth year thereafter (2006, c. 9, Sched. H, s. 1); s. 5 voting day is the fourth Monday in October (2009, c. 33, Sched. 21, s. 8 (4)), first applied in 2010"
         }
       ],
       "est_votes": 3600000,
@@ -6406,13 +6524,28 @@
           "within": "CA-ON",
           "government_kind": "school",
           "source": "on-mea",
+          "period_years": 3,
+          "phase": 2,
+          "month": 11,
+          "term_years": 3,
+          "day_rule": "nov_second_monday",
+          "valid_from": "1997-01-01",
+          "valid_to": "2007-01-01",
+          "called": false,
+          "locator": "Municipal Elections Act, 1996, S.O. 1996, c. 32, Sched., as enacted (e-Laws version 1): s. 4 (1) a regular election is held in 1997 and in every third year thereafter; s. 5 voting day is the second Monday in November; s. 6 (1) a three-year term begins on December 1. Section 4 (1) was replaced by 2006, c. 9, Sched. H, s. 1 (2006 and every fourth year thereafter), so 2006 is the last triennial-cycle election"
+        },
+        {
+          "within": "CA-ON",
+          "government_kind": "school",
+          "source": "on-mea",
           "period_years": 4,
           "phase": 2,
           "month": 10,
           "term_years": 4,
           "day_rule": "oct_fourth_monday",
           "valid_from": "2010-01-01",
-          "called": false
+          "called": false,
+          "locator": "Municipal Elections Act, 1996, as consolidated from 1 January 2023 (e-Laws): s. 4 (1) a regular election is held in 2006 and in every fourth year thereafter (2006, c. 9, Sched. H, s. 1); s. 5 voting day is the fourth Monday in October (2009, c. 33, Sched. 21, s. 8 (4)), first applied in 2010"
         }
       ],
       "est_votes": 3000000,
@@ -6966,6 +7099,20 @@
         {
           "within": "CA-NB",
           "government_kind": "municipality",
+          "source": "nb-municipalities-act-2004",
+          "period_years": 4,
+          "phase": 0,
+          "month": 5,
+          "term_years": 4,
+          "day_rule": "may_second_monday",
+          "valid_from": "2004-01-01",
+          "valid_to": "2020-01-01",
+          "called": false,
+          "locator": "Municipalities Act, RSNB 1973, c. M-22, s. 38 (1) as replaced by SNB 2004, c. 2, s. 10: quadrennial elections on the second Monday in May for the year 2004 and every fourth year thereafter. The 2020 round (11 May) was postponed by An Act Respecting Elections in 2020, SNB 2020, c. 11, and held on 10 May 2021 (Elections New Brunswick report), so the row stops before 2020"
+        },
+        {
+          "within": "CA-NB",
+          "government_kind": "municipality",
           "source": "nb-manual",
           "period_years": 4,
           "phase": 2,
@@ -7094,6 +7241,55 @@
       "effort": 4
     },
     {
+      "key": "ns_school",
+      "tier": "school",
+      "name": "Nova Scotia regional school board elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "The seven English-language regional school boards were elected for four years on the municipal voting day (15 October 2016 was the last) and were replaced by regional centres for education on 1 April 2018 (Education Reform Act, Bill 72). The Conseil scolaire acadien provincial kept its elections (class ns_csap).",
+      "source": "ns-bill-72",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "school_district"
+          ],
+          "within": "CA-NS",
+          "valid_to": "2018-04-01",
+          "precedence": -1
+        }
+      ],
+      "dates": [],
+      "cadence": [
+        {
+          "within": "CA-NS",
+          "government_kind": "school",
+          "source": "ns-2015-release",
+          "period_years": 4,
+          "phase": 0,
+          "month": 10,
+          "term_years": 4,
+          "day_rule": "oct_third_saturday",
+          "valid_from": "2016-01-01",
+          "valid_to": "2018-04-01",
+          "called": false,
+          "locator": "Provincial release of 27 November 2015: the next municipal and school board elections take place on 15 October 2016; Bill 72 (2018) took effect on 1 April 2018 and replaced the school boards other than the CSAP. The row starts at 2016 because earlier cycles were not read"
+        }
+      ],
+      "est_votes": 300000,
+      "effort": 4,
+      "valid_to": "2018-04-01"
+    },
+    {
       "key": "ns_csap",
       "tier": "school",
       "name": "Conseil scolaire acadien provincial member elections",
@@ -7136,6 +7332,35 @@
       ],
       "est_votes": 10000,
       "effort": 4
+    },
+    {
+      "key": "pe_legislative_council",
+      "tier": "province",
+      "name": "Prince Edward Island Legislative Council elections",
+      "category": "council",
+      "goal": "subnational",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "The upper house was elected, instead of appointed, from 1862 and merged with the House of Assembly in 1893 into the single Legislative Assembly, where each of the 15 districts elects one Assemblyman and one Councillor (those Councillor seats are part of the provincial general election, not this class). Candidates and voters needed property. No statute with a fixed election calendar has been read.",
+      "source": "pe-assembly-history",
+      "valid_from": "1862-01-01",
+      "valid_to": "1893-01-01",
+      "est_votes": 10000,
+      "effort": 4,
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "by_election"
+          ],
+          "body_kinds": [
+            "upper_house"
+          ],
+          "within": "CA-PE"
+        }
+      ],
+      "dates": []
     },
     {
       "key": "pe_municipal",
@@ -7294,6 +7519,20 @@
         {
           "within": "CA-YT",
           "government_kind": "municipality",
+          "source": "yt-municipal-act",
+          "period_years": 3,
+          "phase": 2,
+          "month": 10,
+          "term_years": 3,
+          "day_rule": "oct_third_thursday",
+          "valid_from": "2000-01-01",
+          "valid_to": "2024-01-01",
+          "called": false,
+          "locator": "Municipal Act, RSY 2002, c. 154, s. 52 before the 2023 amendment: a general election every third year on the third Thursday of October, starting in 2000 (read in the official consolidation; the file refuses scripted downloads, so the section number is unconfirmed)"
+        },
+        {
+          "within": "CA-YT",
+          "government_kind": "municipality",
           "source": "yt-term",
           "period_years": 4,
           "phase": 0,
@@ -7360,6 +7599,48 @@
       ],
       "est_votes": 15000,
       "effort": 4
+    },
+    {
+      "key": "nt_hamlet",
+      "tier": "municipal",
+      "name": "Northwest Territories hamlet elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "note": "Hamlets vote on the second Monday in December under the Local Authorities Elections Act, while towns, villages, and cities vote on the third Monday in October (class nt_community). Terms are staggered and differ by office: in the round of 8 December 2025, mayors and half the councillors were elected for two years and the other half for three.",
+      "source": "nt-laea",
+      "est_votes": 3000,
+      "effort": 4,
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "within": "CA-NT",
+          "name_pattern": "hamlet"
+        }
+      ],
+      "dates": [],
+      "cadence": [
+        {
+          "within": "CA-NT",
+          "government_kind": "municipality",
+          "source": "nt-laea",
+          "month": 12,
+          "day_rule": "dec_second_monday",
+          "called": false,
+          "locator": "Local Authorities Elections Act, RSNWT 1988, c. L-10, s. 10 (1) (b): the general election day for a hamlet is the second Monday in December (towns, villages, and cities vote on the third Monday in October, s. 10 (1) (a)). Hamlet terms are staggered and differ by office, so no period or phase is set; the 2025 round was held on 8 December 2025 (mayors and half the councillors for two years, the other half for three, Municipal and Community Affairs)"
+        }
+      ]
     },
     {
       "key": "nu_municipal",
