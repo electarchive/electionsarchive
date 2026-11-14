@@ -86,6 +86,18 @@ COUNCILS = {
         "https://www.bridgend.gov.uk/council/elections/election-results",
         "bridgend",
     ),
+    "W06000004": (
+        "Denbighshire County Council",
+        "Election results by community area, City, Town and Community Council Elections, 5 May 2022",
+        "https://moderngov.denbighshire.gov.uk/mgElectionElectionAreaResults.aspx?Page=all&EID=93",
+        "moderngov",
+    ),
+    "W06000018": (
+        "Caerphilly County Borough Council",
+        "Notice of Uncontested Elections, community councils, 5 May 2022",
+        "https://www.caerffili.gov.uk/CaerphillyDocs/Elections/voting-2022/notice-of-uncontested-elections-communities-only.aspx",
+        "caerphilly",
+    ),
 }
 VALE = (
     "https://www.valeofglamorgan.gov.uk/Documents/Our%20Council/Council/Elections/Election%20Documents/Nominees/"
@@ -162,6 +174,9 @@ SCANS |= {
 POLLS = Path(__file__).with_name("gwynedd_2022_polls.tsv")
 VOTE_COLUMN = (0.685, 0.955)
 ALIASES = {
+    ("W06000018", "Llanbradach"): "Llanbradach and Pwllypant",
+    ("W06000018", "Draethen, Waterloo and Rudry"): "Rudry",
+    ("W06000018", "Risca Town"): "Risca West",
     ("W06000010", "Cwarter Bach"): "Quarter Bach",
     ("W06000010", "Dyffryn Cennen"): "Cyngor Bro Dyffryn Cennen",
     ("W06000010", "Llanddowror and Llanmiloe"): "Llanddowror",
@@ -193,6 +208,10 @@ WARD_NAMES = {
     "Grifithstown West": "Griffithstown West",
 }
 PARTIES: dict[str, str | None] = {
+    "Labour": "Q9630",
+    "Conservative": "Q9626",
+    "Welsh Conservatives": "Q9626",
+    "Heritage Party": "Q105972889",
     "": None,
     "Independent": "independent",
     "Welsh Labour": "Q9630",
@@ -549,6 +568,9 @@ def moderngov(url: str) -> list[dict]:
         council = english[-1].group(1) if english else found(r"^(.+?)(?: \(| - results$)", caption).group(1)
         ward = re.search(r"\(([^()]+?)\)\s*- results$", caption[english[-1].end() if english else 0 :])
         ward = re.sub(r"\s+[Ww]ard$", "", ward.group(1).strip()) if ward else None
+        bracketed = re.match(r"^(.+?) \[(.+?)\] - results$", caption)
+        if bracketed:
+            council, ward = bracketed.groups()
         table = page[page.index('class="mgStatsTable') :].split("</table>")[0]
         candidates: list[dict] = []
         rows = [
@@ -895,6 +917,53 @@ def vale(url: str) -> list[dict]:
     return unwarded(reads, "W06000014")
 
 
+def caerphilly(url: str) -> list[dict]:
+    names = communities("W06000018")
+    reads: list[dict] = []
+    parts = text_of(url).split("NOTICE OF UNCONTESTED ELECTION")
+    for before, notice in zip(parts, parts[1:], strict=False):
+        heading = [line.strip() for line in before.splitlines() if line.strip()][-1]
+        council = None
+        for piece in reversed([part.strip() for part in heading.split("/")]):
+            if fold(piece.replace("&", "and")) in names:
+                council = names[fold(piece.replace("&", "and"))]
+                break
+        if council is None:
+            raise ValueError(f"Caerphilly: no council in {heading}")
+        ward = " ".join(found(r"Name of Community Ward:\s*(.*?)\s*Enw", notice, re.DOTALL).group(1).split())
+        ward = ward.split(" / ")[-1].strip()
+        places = int(found(r"election of (\d+) Community Councillors", notice).group(1))
+        block = found(r"cartref.\n(.*?)\n.If a Candidate", notice, re.DOTALL).group(1)
+        lines = [line[:60].rstrip() for line in block.splitlines() if line[:60].strip()]
+        candidates = []
+        for line in lines:
+            if re.match(r"^ ?[^\s]", line) and re.match(r"^\s*[A-Z][A-Z' .-]+, ", line):
+                candidates.append({"printed": line.strip(), "description": ""})
+            elif candidates and not candidates[-1]["description"]:
+                candidates[-1]["description"] = line.strip().split(" / ")[0]
+        if not candidates or len(candidates) > places:
+            raise ValueError(f"Caerphilly {council} {ward}: {len(candidates)} candidates for {places} places")
+        reads.append(
+            {
+                "council": council,
+                "ward": ward,
+                "places": places,
+                "turnout": None,
+                "candidates": [
+                    {
+                        "printed": c["printed"],
+                        "name": surname_first(c["printed"]),
+                        "description": c["description"],
+                        "votes": None,
+                        "elected": True,
+                    }
+                    for c in candidates
+                ],
+            }
+        )
+    return unwarded(reads, "W06000018")
+
+
 def unwarded(reads: list[dict], lad: str) -> list[dict]:
     names = communities(lad)
     counts: dict[str, int] = {}
@@ -1156,6 +1225,7 @@ READERS = {
     "gwynedd": lambda url: unwarded(gwynedd_seats(gwynedd(url) + gwynedd_polls()), "W06000002"),
     "ceredigion": ceredigion,
     "bridgend": bridgend,
+    "caerphilly": caerphilly,
 }
 
 
