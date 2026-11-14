@@ -43,6 +43,12 @@ COUNCILS = {
         "https://modgovpub-eng.secure.conwy.gov.uk/mgElectionElectionAreaResults.aspx?Page=all&EID=104&RPID=20212970",
         "moderngov",
     ),
+    "W06000021": (
+        "Monmouthshire County Council",
+        "Election results by community area, Community Council Elections, 5 May 2022",
+        "https://democracy.monmouthshire.gov.uk/mgElectionElectionAreaResults.aspx?EID=11",
+        "moderngov",
+    ),
 }
 ALIASES = {
     ("W06000010", "Cwarter Bach"): "Quarter Bach",
@@ -51,8 +57,9 @@ ALIASES = {
     ("W06000010", "Llansteffan & Llanybri"): "Llansteffan",
     ("W06000003", "Bay of Colwyn"): "Colwyn Bay",
     ("W06000003", "Towyn and Kinmel Bay"): "Kinmel Bay and Towyn",
+    ("W06000021", "Llanfoist"): "Llanfoist Fawr",
 }
-UNREGISTERED = {("W06000010", "Trelech a'r Betws"), ("W06000003", "Betws-y-Coed")}
+UNREGISTERED = {("W06000010", "Trelech a'r Betws"), ("W06000003", "Betws-y-Coed"), ("W06000021", "Llangybi Fawr")}
 WARD_NAMES = {"Grifithstown East": "Griffithstown East", "Grifithstown West": "Griffithstown West"}
 PARTIES: dict[str, str | None] = {
     "": None,
@@ -73,6 +80,15 @@ PARTIES: dict[str, str | None] = {
     "Welsh Conservative Party Candidate / Ymgeisydd Plaid Geidwadol Cymru": "Q9626",
     "Labour and Co-operative Party / Llafur a'r Blaid Gydweithredol": "Q9630",
     "Wales Green Party/Plaid Werdd Cymru": "Q3499324",
+    "Welsh Conservative Party": "Q9626",
+    "Liberal Democrats": "Q9624",
+}
+CAVEATS = {
+    "Abergavenny (Cantref) - results": (
+        "Monmouthshire County Council's page lists Bryony Nicholson three times: twice with 432 votes and no "
+        "description, and once as Welsh Labour with no votes. She is stored once, with 432 votes. The page's total of "
+        "2,827 votes counts her 432 twice; the six candidates' votes sum to 2,395."
+    ),
 }
 CONTEXT = (
     "Wales's community and town councils are elected every five years on the day of the principal council "
@@ -249,24 +265,33 @@ def moderngov(url: str) -> list[dict]:
     reads = []
     for page_url in areas(url):
         page = re.sub(r"<script\b.*?</script>", " ", text_of(page_url), flags=re.DOTALL)
+        if "No election candidates have been specified for this area" in page:
+            continue
         caption = flat(found(r'<caption\s+class="mgSectionTitle"\s*>(.*?)</caption>', page, re.DOTALL).group(1))
-        english = list(re.finditer(r"/\s*([^/(]+?) (?:Town|Community|City) Counci?l?\b", caption))[-1]
-        council = english.group(1)
-        ward = re.search(r"\(([^()]+?)\)\s*- results$", caption[english.end() :])
+        english = list(re.finditer(r"/\s*([^/(]+?) (?:Town|Community|City) Counci?l?\b", caption))
+        council = english[-1].group(1) if english else found(r"^(.+?)(?: \(| - results$)", caption).group(1)
+        ward = re.search(r"\(([^()]+?)\)\s*- results$", caption[english[-1].end() if english else 0 :])
         ward = re.sub(r"\s+[Ww]ard$", "", ward.group(1).strip()) if ward else None
         table = page[page.index('class="mgStatsTable') :].split("</table>")[0]
         candidates: list[dict] = []
-        for row in re.findall(r"<tr\s+class=\"mgTable(?:Odd|Even)Row\"\s*>(.*?)</tr>", table, re.DOTALL):
-            printed, description, count, _, outcome = (
-                flat(cell) for cell in re.findall(r"<td[^>]*>(.*?)</td>", row, re.DOTALL)
-            )
+        rows = [
+            [flat(cell) for cell in re.findall(r"<td[^>]*>(.*?)</td>", row, re.DOTALL)]
+            for row in re.findall(r"<tr\s+class=\"mgTable(?:Odd|Even)Row\"\s*>(.*?)</tr>", table, re.DOTALL)
+        ]
+        voted = any(row[2] not in ("No contest", "") for row in rows)
+        described = {row[0]: row[1] for row in rows if row[1]}
+        seen = set()
+        for printed, _, count, _, outcome in rows:
+            if printed in seen or (voted and count == ""):
+                continue
+            seen.add(printed)
             candidates.append(
                 {
                     "printed": printed,
                     "name": printed,
-                    "description": description,
-                    "votes": None if count == "No contest" else int(count.replace(",", "")),
-                    "elected": outcome == "Elected",
+                    "description": described.get(printed, ""),
+                    "votes": None if count in ("No contest", "") else int(count.replace(",", "")),
+                    "elected": outcome == "Elected" or (count == "" and outcome == ""),
                 }
             )
         summary = flat(page[page.index("Voting Summary") :].split("</table>")[0]) if "Voting Summary" in page else ""
@@ -277,7 +302,7 @@ def moderngov(url: str) -> list[dict]:
 
         places = figure("Seats")
         if candidates[0]["votes"] is not None:
-            if figure("Total votes") != sum(int(candidate["votes"]) for candidate in candidates):
+            if caption not in CAVEATS and figure("Total votes") != sum(int(c["votes"]) for c in candidates):
                 raise ValueError(f"{caption}: total votes do not agree")
             if places != sum(1 for candidate in candidates if candidate["elected"]):
                 raise ValueError(f"{caption}: seats and elected do not agree")
@@ -290,8 +315,10 @@ def moderngov(url: str) -> list[dict]:
                 "turnout": turnout.group(1) if turnout else None,
                 "electorate": figure("Electorate"),
                 "counted": figure("Number of ballot papers included in the count"),
+                "issued": figure("Number of ballot papers issued"),
                 "rejected": figure("Number of ballot papers rejected"),
                 "url": page_url,
+                "caveat": CAVEATS.get(caption),
                 "candidates": candidates,
             }
         )
@@ -346,8 +373,10 @@ def parse() -> None:
                         "turnout": read["turnout"],
                         "electorate": read.get("electorate"),
                         "counted": read.get("counted"),
+                        "issued": read.get("issued"),
                         "rejected": read.get("rejected"),
                         "page": read.get("url", url),
+                        "caveat": read.get("caveat"),
                         "number": number,
                         **candidate,
                     }
@@ -513,6 +542,8 @@ def emit() -> Path:
                         publisher=publisher, elected=lines.height, places=places, left=places - lines.height
                     ),
                 )
+            if first["caveat"]:
+                cs.add("note", entity_id=result_set, kind="caveat", body_md=first["caveat"])
             if first["counted"] is not None:
                 cs.add(
                     "note",
@@ -520,6 +551,13 @@ def emit() -> Path:
                     kind="context",
                     body_md=f"{publisher} prints {first['counted']:,} ballot papers included in the count and a "
                     f"turnout of {first['turnout']}%.",
+                )
+            elif first["issued"] is not None:
+                cs.add(
+                    "note",
+                    entity_id=result_set,
+                    kind="context",
+                    body_md=f"{publisher} prints {first['issued']:,} ballot papers issued.",
                 )
             elif first["turnout"] is not None:
                 cs.add(
