@@ -37,7 +37,7 @@ import {
   spot,
 } from "#lib/server/plane.js";
 import { proseColumns, proseEntries, proseJoin } from "#lib/server/prose.js";
-import { reading } from "#lib/server/reads.js";
+import { depend, reading } from "#lib/server/reads.js";
 import { Path, Polity } from "#lib/server/territory.js";
 import { together } from "#lib/server/together.js";
 
@@ -20838,23 +20838,58 @@ export const elections = {
         const found = await remember(
           `crown:${election}`,
           async () => {
-            const children = await db.execute<{ id: string }>(sql`
-              select k.id from election k where k.parent_id = ${election}::uuid
+            depend(`crown:${election}`);
+            const stored = await db.execute<{
+              election: string;
+              path: string;
+              date: string;
+              person: string | null;
+              party: string | null;
+              label: string | null;
+              color: string | null;
+              area: string | null;
+              led: boolean | null;
+              votes: Array<[string | null, string | null, number]> | null;
+              office: string | null;
+              group: string | null;
+              shaped: string | null;
+              held: boolean;
+            }>(sql`
+              select k.id as election, s.path, k.date_from::text as date, w.person_id as person,
+                w.party_id as party, w.label,
+                ${paint(sql`w.party_id`, sql`select ${election}::uuid`, sql`k.date_from`)} as color,
+                w.area_id as area, w.is_led as led, w.votes, w.office, w.group_id as "group",
+                w.shaped_id as shaped, w.election_id is not null as held
+              from election k
+              join slug s on s.entity_id = k.id and s.is_current
+              left join election_crown w on w.election_id = k.id and w.parent_id = k.parent_id
+              where k.parent_id = ${election}::uuid
             `);
-            const ids = children.rows.map((row) => row.id);
+            const missing = stored.rows
+              .filter((row) => !row.held)
+              .map((row) => row.election);
             const size = Math.ceil(
-              ids.length / Math.min(3, Math.ceil(ids.length / 300)),
+              missing.length / Math.min(3, Math.ceil(missing.length / 300)),
             );
             const chunks = await Promise.all(
-              Map.groupBy(ids, (_id, index) => Math.floor(index / size))
+              Map.groupBy(missing, (_id, index) => Math.floor(index / size))
                 .values()
-                .map(async (chunk) =>
-                  (await crownChunk(election, chunk)).map(
-                    ({ election: _child, chain: _chain, ...row }) => row,
-                  ),
-                ),
+                .map(async (chunk) => crownChunk(election, chunk)),
             );
-            return chunks.flat();
+            const rows = new Map([
+              ...stored.rows
+                .filter((row) => row.held)
+                .map(({ held: _held, ...row }) => [row.election, row] as const),
+              ...chunks
+                .flat()
+                .map(
+                  ({ chain: _chain, ...row }) => [row.election, row] as const,
+                ),
+            ]);
+            return [...rows.keys()].toSorted().flatMap((id) => {
+              const { election: _child, ...row } = rows.get(id) ?? {};
+              return "path" in row ? [row] : [];
+            });
           },
           false,
           versionOf("elections.winners"),

@@ -632,6 +632,37 @@ async function bump(
   }
 }
 
+export async function bumpKeys(keys: Array<string>) {
+  const pool = await shelf();
+  if (pool == null || keys.length === 0) {
+    return;
+  }
+  const connection = await pool.connect();
+  try {
+    await connection.query("begin");
+    await connection.query("set local statement_timeout = 120000");
+    await connection.query(
+      "select pg_advisory_xact_lock(hashtext('cache bump'))",
+    );
+    await connection.query(
+      `insert into bump (key, epoch) select distinct unnest($1::text[]), nextval('epoch')
+        on conflict (key) do update set epoch = excluded.epoch`,
+      [keys],
+    );
+    await connection.query("commit");
+  } catch (error) {
+    await connection.query("rollback").catch(() => null);
+    throw error;
+  } finally {
+    connection.release();
+  }
+}
+
+export async function closeShelf() {
+  const pool = await shelved?.catch(() => null);
+  await pool?.end();
+}
+
 async function sync(observed: Array<[string, string]>, stamp: string) {
   const tokens = [...shadow.pending, ...observed];
   shadow.pending = [];

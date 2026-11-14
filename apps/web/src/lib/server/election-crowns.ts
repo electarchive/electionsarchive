@@ -1,4 +1,5 @@
 import { sql } from "drizzle-orm";
+import { bumpKeys } from "#lib/server/cache.js";
 import { db } from "#lib/server/db/index.js";
 import { crownChunk } from "#lib/server/rpc/archive.js";
 
@@ -155,6 +156,7 @@ export async function rebuild(target?: string) {
     .toArray()
     .toReversed();
   const total = queue.length;
+  const touched = new Set<string>();
   let built = 0;
   let failed = 0;
   let done = 0;
@@ -164,6 +166,7 @@ export async function rebuild(target?: string) {
         try {
           const stored = await store(job.parent, job.ids);
           built += stored;
+          touched.add(job.parent);
         } catch (error) {
           failed += job.ids.length;
           console.error(job.parent, error);
@@ -176,6 +179,11 @@ export async function rebuild(target?: string) {
         }
       }
     }),
+  );
+  await bumpKeys([...touched].map((parent) => `crown:${parent}`)).catch(
+    (error: unknown) => {
+      console.error("The crown keys could not be bumped:", error);
+    },
   );
   if (target == null && failed === 0) {
     await db.execute(sql`
