@@ -150,12 +150,13 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.025,
-        0.866,
-        0.226,
-        0.955
+        0.024,
+        0.757,
+        0.221,
+        0.988
       ],
-      "hint": "Read only the table headed 'First Congressional District of Maryland'; ignore any other table visible in the image."
+      "hint": "Read only the table for the First Congressional District of Maryland (Goldsborough and Towers), at the foot of the page; ignore the constitutional amendment table above it.",
+      "wards": "24510"
     },
     {
       "page": 257,
@@ -184,7 +185,8 @@
         0.218,
         0.841
       ],
-      "hint": "Read only the table headed 'Second Congressional District of Maryland.'; ignore any other table visible in the image."
+      "hint": "Read only the table headed 'Second Congressional District of Maryland.'; ignore any other table visible in the image.",
+      "wards": "24510"
     },
     {
       "page": 257,
@@ -213,7 +215,8 @@
         0.22,
         0.89
       ],
-      "hint": "Read only the table headed 'Third Congressional District of Maryland'; ignore any other table visible in the image."
+      "hint": "Read only the table headed 'Third Congressional District of Maryland'; ignore any other table visible in the image.",
+      "wards": "24510"
     },
     {
       "page": 257,
@@ -242,7 +245,8 @@
         0.208,
         0.944
       ],
-      "hint": "Read only the table headed 'Fourth Congressional District of Maryland.'; ignore any other table visible in the image."
+      "hint": "Read only the table headed 'Fourth Congressional District of Maryland.'; ignore any other table visible in the image.",
+      "wards": "24510"
     },
     {
       "page": 257,
@@ -266,7 +270,8 @@
         0.21,
         0.992
       ],
-      "hint": "Read only the table headed 'Fifth Congressional District of Maryland.'; ignore any other table visible in the image."
+      "hint": "Read only the table headed 'Fifth Congressional District of Maryland.'; ignore any other table visible in the image.",
+      "wards": "24510"
     },
     {
       "page": 258,
@@ -290,12 +295,37 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.031,
-        0.774,
-        0.233,
-        0.841
+        0.034,
+        0.763,
+        0.226,
+        0.991
       ],
-      "hint": "Read only the table headed 'Sixth Congressional District of Maryland.'; ignore any other table visible in the image."
+      "hint": "Read only the table headed 'Sixth Congressional District of Maryland.'; ignore any other table visible in the image.",
+      "wards": "24510"
     }
-  ]
+  ],
+  "unit_codes": {
+    "Pr. George's": "24033",
+    "Balto. City": "24510",
+    "Balto. Co.": "24005",
+    "Bal. C.": "24510",
+    "Ba. C'y": "24510"
+  },
+  "unit_labels": {
+    "Subtotal counties": "Subtotal",
+    "": "Subtotal",
+    "Tot's": "Totals",
+    "First District": "Baltimore City wards, First District",
+    "Second District": "Baltimore City wards, Second District",
+    "Third District": "Baltimore City wards, Third District",
+    "Fourth District": "Baltimore City wards, Fourth District",
+    "Fifth District": "Baltimore City wards, Fifth District",
+    "Sixth District": "Baltimore City wards, Sixth District",
+    "1st District": "Baltimore City wards, 1st District",
+    "2nd District": "Baltimore City wards, 2nd District",
+    "3rd District": "Baltimore City wards, 3rd District",
+    "4th District": "Baltimore City wards, 4th District",
+    "5th District": "Baltimore City wards, 5th District",
+    "6th District": "Baltimore City wards, 6th District"
+  }
 }

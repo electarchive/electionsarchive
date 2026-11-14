@@ -124,10 +124,10 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.039,
-        0.852,
-        0.22,
-        0.955
+        0.02,
+        0.782,
+        0.218,
+        0.96
       ],
       "hint": "Read only the table headed 'UNITED STATES SENATOR'; ignore any other table visible in the image."
     },
@@ -153,7 +153,8 @@
         0.112,
         0.894
       ],
-      "hint": "Read only the table headed 'First Congressional District'; ignore any other table visible in the image."
+      "hint": "Read only the table headed 'First Congressional District'; ignore any other table visible in the image.",
+      "wards": "24510"
     },
     {
       "page": 327,
@@ -177,7 +178,8 @@
         0.202,
         0.897
       ],
-      "hint": "Read only the table headed 'Third Congressional District'; ignore any other table visible in the image."
+      "hint": "Read only the table headed 'Third Congressional District'; ignore any other table visible in the image.",
+      "wards": "24510"
     },
     {
       "page": 327,
@@ -201,7 +203,8 @@
         0.112,
         0.956
       ],
-      "hint": "Read only the table headed 'Second Congressional District'; ignore any other table visible in the image."
+      "hint": "Read only the table headed 'Second Congressional District'; ignore any other table visible in the image.",
+      "wards": "24510"
     },
     {
       "page": 327,
@@ -225,7 +228,8 @@
         0.202,
         0.975
       ],
-      "hint": "Read only the table headed 'Fourth Congressional District'; ignore any other table visible in the image."
+      "hint": "Read only the table headed 'Fourth Congressional District'; ignore any other table visible in the image.",
+      "wards": "24510"
     },
     {
       "page": 328,
@@ -249,7 +253,8 @@
         0.127,
         0.888
       ],
-      "hint": "Read only the table headed 'Fifth Congressional District'; ignore any other table visible in the image."
+      "hint": "Read only the table headed 'Fifth Congressional District'; ignore any other table visible in the image.",
+      "wards": "24510"
     },
     {
       "page": 328,
@@ -273,7 +278,8 @@
         0.216,
         0.879
       ],
-      "hint": "Read only the table headed 'Sixth Congressional District'; ignore any other table visible in the image."
+      "hint": "Read only the table headed 'Sixth Congressional District'; ignore any other table visible in the image.",
+      "wards": "24510"
     },
     {
       "page": 328,
@@ -297,7 +303,32 @@
         0.172,
         0.963
       ],
-      "hint": "Read only the table headed 'Seventh Congressional District'; ignore any other table visible in the image."
+      "hint": "Read only the table headed 'Seventh Congressional District'; ignore any other table visible in the image.",
+      "wards": "24510"
     }
-  ]
+  ],
+  "unit_codes": {
+    "Pr. George's": "24033",
+    "Balto. City": "24510",
+    "Balto. Co.": "24005",
+    "Bal. C.": "24510",
+    "Ba. C'y": "24510"
+  },
+  "unit_labels": {
+    "Subtotal counties": "Subtotal",
+    "": "Subtotal",
+    "Tot's": "Totals",
+    "First District": "Baltimore City wards, First District",
+    "Second District": "Baltimore City wards, Second District",
+    "Third District": "Baltimore City wards, Third District",
+    "Fourth District": "Baltimore City wards, Fourth District",
+    "Fifth District": "Baltimore City wards, Fifth District",
+    "Sixth District": "Baltimore City wards, Sixth District",
+    "1st District": "Baltimore City wards, 1st District",
+    "2nd District": "Baltimore City wards, 2nd District",
+    "3rd District": "Baltimore City wards, 3rd District",
+    "4th District": "Baltimore City wards, 4th District",
+    "5th District": "Baltimore City wards, 5th District",
+    "6th District": "Baltimore City wards, 6th District"
+  }
 }

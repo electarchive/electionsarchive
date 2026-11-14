@@ -122,12 +122,12 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.079,
-        0.857,
-        0.896,
-        0.995
+        0.016,
+        0.774,
+        0.226,
+        0.967
       ],
-      "hint": "Read only the table headed 'REPUBLICAN PARTY. Candidates for President, Herbert Hoover; Vice-President, Charles Curtis; Presidential Electors'; ignore any other table visible in the image."
+      "hint": "Read only the Republican presidential electors table. It has eight number columns headed Towers, Allen, Butler, Wade, Stephan, Gatch, Littlepage, and Foltz; the Towers heading sits on the same line as the stub label 'Balto. City', and the stub column is 'Counties and Balto. City'."
     },
     {
       "page": 232,
@@ -284,10 +284,10 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.013,
-        0.834,
-        0.229,
-        0.928
+        0.018,
+        0.776,
+        0.226,
+        0.965
       ],
       "hint": "Read only the table headed \"WORKERS' PARTY\"; ignore any other table visible in the image."
     },
@@ -366,7 +366,8 @@
         0.215,
         0.853
       ],
-      "hint": "Read only the table headed 'First Congressional District'; ignore any other table visible in the image."
+      "hint": "Read only the table headed 'First Congressional District'; ignore any other table visible in the image.",
+      "wards": "24510"
     },
     {
       "page": 237,
@@ -395,7 +396,8 @@
         0.214,
         0.921
       ],
-      "hint": "Read only the table headed 'Second Congressional District'; ignore any other table visible in the image."
+      "hint": "Read only the table headed 'Second Congressional District'; ignore any other table visible in the image.",
+      "wards": "24510"
     },
     {
       "page": 237,
@@ -424,7 +426,8 @@
         0.215,
         0.965
       ],
-      "hint": "Read only the table headed 'Third Congressional District'; ignore any other table visible in the image."
+      "hint": "Read only the table headed 'Third Congressional District'; ignore any other table visible in the image.",
+      "wards": "24510"
     },
     {
       "page": 238,
@@ -453,7 +456,8 @@
         0.207,
         0.846
       ],
-      "hint": "Read only the table headed 'Fourth Congressional District'; ignore any other table visible in the image."
+      "hint": "Read only the table headed 'Fourth Congressional District'; ignore any other table visible in the image.",
+      "wards": "24510"
     },
     {
       "page": 238,
@@ -482,7 +486,8 @@
         0.207,
         0.916
       ],
-      "hint": "Read only the table headed 'Fifth Congressional District'; ignore any other table visible in the image."
+      "hint": "Read only the table headed 'Fifth Congressional District'; ignore any other table visible in the image.",
+      "wards": "24510"
     },
     {
       "page": 238,
@@ -506,7 +511,32 @@
         0.207,
         0.967
       ],
-      "hint": "Read only the table headed 'Sixth Congressional District'; ignore any other table visible in the image."
+      "hint": "Read only the table headed 'Sixth Congressional District'; ignore any other table visible in the image.",
+      "wards": "24510"
     }
-  ]
+  ],
+  "unit_codes": {
+    "Pr. George's": "24033",
+    "Balto. City": "24510",
+    "Balto. Co.": "24005",
+    "Bal. C.": "24510",
+    "Ba. C'y": "24510"
+  },
+  "unit_labels": {
+    "Subtotal counties": "Subtotal",
+    "": "Subtotal",
+    "Tot's": "Totals",
+    "First District": "Baltimore City wards, First District",
+    "Second District": "Baltimore City wards, Second District",
+    "Third District": "Baltimore City wards, Third District",
+    "Fourth District": "Baltimore City wards, Fourth District",
+    "Fifth District": "Baltimore City wards, Fifth District",
+    "Sixth District": "Baltimore City wards, Sixth District",
+    "1st District": "Baltimore City wards, 1st District",
+    "2nd District": "Baltimore City wards, 2nd District",
+    "3rd District": "Baltimore City wards, 3rd District",
+    "4th District": "Baltimore City wards, 4th District",
+    "5th District": "Baltimore City wards, 5th District",
+    "6th District": "Baltimore City wards, 6th District"
+  }
 }
