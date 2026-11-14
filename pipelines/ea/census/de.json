@@ -432,6 +432,13 @@
       "url": "https://www.gvoon.de/art/dokumente/1968/gesetzblatt-gbl-ddr-teil-1-1968/pdf/gesetzblatt-gbl-ddr-teil-1-1968-seite_192.pdf",
       "kind": "official_body",
       "note": "Gesetzblatt page on the gvoon.de document archive: par. 1 sets the Volksentscheid on the Verfassung for 6 April 1968. One question."
+    },
+    "gonschior-weimar": {
+      "title": "Wahlen in der Weimarer Republik, per-state Landtagswahlen pages (Andreas Gonschior)",
+      "publisher": "Andreas Gonschior (gonschior.de)",
+      "url": "https://www.gonschior.de/weimar/",
+      "kind": "academic",
+      "note": "One page per Landtag, Bürgerschaft, Landesversammlung, or Volkskammer election, each headed by its election day (for example https://www.gonschior.de/weimar/Bayern/LT1.html), reached from each state's Uebersicht_LTW.html. Used for the elections before each state's latest as of 1932; the first constituent assemblies of 1919 are counted with the Landtage."
     }
   },
   "tiers": [
@@ -3763,82 +3770,454 @@
     {
       "dates": [
         {
+          "date": "1919-01-12",
+          "contests": 3,
+          "note": "Landtag election: Bayern, Württemberg, Baden.",
+          "source": "gonschior-weimar"
+        },
+        {
+          "date": "1919-01-26",
+          "contests": 4,
+          "note": "Landtag election: Preußen, Hessen, Mecklenburg-Schwerin, Lippe.",
+          "source": "gonschior-weimar"
+        },
+        {
+          "date": "1919-02-02",
+          "contests": 1,
+          "note": "Landtag election: Sachsen.",
+          "source": "gonschior-weimar"
+        },
+        {
+          "date": "1919-02-09",
+          "contests": 1,
+          "note": "Landtag election: Lübeck.",
+          "source": "gonschior-weimar"
+        },
+        {
+          "date": "1919-02-16",
+          "contests": 1,
+          "note": "Landtag election: Schaumburg-Lippe.",
+          "source": "gonschior-weimar"
+        },
+        {
+          "date": "1919-02-23",
+          "contests": 1,
+          "note": "Landtag election: Oldenburg.",
+          "source": "gonschior-weimar"
+        },
+        {
+          "date": "1919-03-09",
+          "contests": 2,
+          "note": "Landtag election: Bremen, Waldeck.",
+          "source": "gonschior-weimar"
+        },
+        {
+          "date": "1919-03-16",
+          "contests": 1,
+          "note": "Landtag election: Hamburg.",
+          "source": "gonschior-weimar"
+        },
+        {
+          "date": "1919-03-30",
+          "contests": 1,
+          "note": "Landtag election: Mecklenburg-Strelitz.",
+          "source": "gonschior-weimar"
+        },
+        {
+          "date": "1920-05-16",
+          "contests": 1,
+          "note": "Landtag election: Mecklenburg-Strelitz.",
+          "source": "gonschior-weimar"
+        },
+        {
+          "date": "1920-06-06",
+          "contests": 5,
+          "note": "Landtag election: Bayern, Württemberg, Oldenburg, Anhalt, Bremen.",
+          "source": "gonschior-weimar"
+        },
+        {
+          "date": "1920-06-13",
+          "contests": 1,
+          "note": "Landtag election: Mecklenburg-Schwerin.",
+          "source": "gonschior-weimar"
+        },
+        {
+          "date": "1920-06-16",
+          "contests": 1,
+          "note": "Landtag election: Braunschweig.",
+          "source": "gonschior-weimar"
+        },
+        {
+          "date": "1920-06-20",
+          "contests": 1,
+          "note": "Landtag election: Thüringen.",
+          "source": "gonschior-weimar"
+        },
+        {
+          "date": "1920-11-14",
+          "contests": 1,
+          "note": "Landtag election: Sachsen.",
+          "source": "gonschior-weimar"
+        },
+        {
+          "date": "1921-01-23",
+          "contests": 1,
+          "note": "Landtag election: Lippe.",
+          "source": "gonschior-weimar"
+        },
+        {
+          "date": "1921-02-20",
+          "contests": 3,
+          "note": "Landtag election: Preußen, Hamburg, Bremen.",
+          "source": "gonschior-weimar"
+        },
+        {
+          "date": "1921-03-13",
+          "contests": 1,
+          "note": "Landtag election: Mecklenburg-Schwerin.",
+          "source": "gonschior-weimar"
+        },
+        {
+          "date": "1921-09-11",
+          "contests": 1,
+          "note": "Landtag election: Thüringen.",
+          "source": "gonschior-weimar"
+        },
+        {
+          "date": "1921-10-30",
+          "contests": 1,
+          "note": "Landtag election: Baden.",
+          "source": "gonschior-weimar"
+        },
+        {
+          "date": "1921-11-13",
+          "contests": 1,
+          "note": "Landtag election: Lübeck.",
+          "source": "gonschior-weimar"
+        },
+        {
+          "date": "1921-11-27",
+          "contests": 1,
+          "note": "Landtag election: Hessen.",
+          "source": "gonschior-weimar"
+        },
+        {
+          "date": "1922-01-22",
+          "contests": 1,
+          "note": "Landtag election: Braunschweig.",
+          "source": "gonschior-weimar"
+        },
+        {
+          "date": "1922-04-23",
+          "contests": 1,
+          "note": "Landtag election: Schaumburg-Lippe.",
+          "source": "gonschior-weimar"
+        },
+        {
+          "date": "1922-05-21",
+          "contests": 1,
+          "note": "Landtag election: Waldeck.",
+          "source": "gonschior-weimar"
+        },
+        {
+          "date": "1922-11-05",
+          "contests": 1,
+          "note": "Landtag election: Sachsen.",
+          "source": "gonschior-weimar"
+        },
+        {
+          "date": "1923-06-10",
+          "contests": 1,
+          "note": "Landtag election: Oldenburg.",
+          "source": "gonschior-weimar"
+        },
+        {
+          "date": "1923-07-08",
+          "contests": 1,
+          "note": "Landtag election: Mecklenburg-Strelitz.",
+          "source": "gonschior-weimar"
+        },
+        {
+          "date": "1923-11-18",
+          "contests": 1,
+          "note": "Landtag election: Bremen.",
+          "source": "gonschior-weimar"
+        },
+        {
+          "date": "1924-02-10",
+          "contests": 2,
+          "note": "Landtag election: Thüringen, Lübeck.",
+          "source": "gonschior-weimar"
+        },
+        {
+          "date": "1924-02-17",
+          "contests": 1,
+          "note": "Landtag election: Mecklenburg-Schwerin.",
+          "source": "gonschior-weimar"
+        },
+        {
+          "date": "1924-04-06",
+          "contests": 1,
+          "note": "Landtag election: Bayern.",
+          "source": "gonschior-weimar"
+        },
+        {
+          "date": "1924-05-04",
+          "contests": 1,
+          "note": "Landtag election: Württemberg.",
+          "source": "gonschior-weimar"
+        },
+        {
+          "date": "1924-06-22",
+          "contests": 1,
+          "note": "Landtag election: Anhalt.",
+          "source": "gonschior-weimar"
+        },
+        {
+          "date": "1924-10-26",
+          "contests": 1,
+          "note": "Landtag election: Hamburg.",
+          "source": "gonschior-weimar"
+        },
+        {
+          "date": "1924-11-09",
+          "contests": 1,
+          "note": "Landtag election: Anhalt.",
+          "source": "gonschior-weimar"
+        },
+        {
+          "date": "1924-12-07",
+          "contests": 4,
+          "note": "Landtag election: Preußen, Hessen, Braunschweig, Bremen.",
+          "source": "gonschior-weimar"
+        },
+        {
+          "date": "1925-01-18",
+          "contests": 1,
+          "note": "Landtag election: Lippe.",
+          "source": "gonschior-weimar"
+        },
+        {
+          "date": "1925-05-03",
+          "contests": 1,
+          "note": "Landtag election: Schaumburg-Lippe.",
+          "source": "gonschior-weimar"
+        },
+        {
+          "date": "1925-05-17",
+          "contests": 1,
+          "note": "Landtag election: Waldeck.",
+          "source": "gonschior-weimar"
+        },
+        {
+          "date": "1925-05-24",
+          "contests": 1,
+          "note": "Landtag election: Oldenburg.",
+          "source": "gonschior-weimar"
+        },
+        {
+          "date": "1925-10-25",
+          "contests": 1,
+          "note": "Landtag election: Baden.",
+          "source": "gonschior-weimar"
+        },
+        {
+          "date": "1926-06-06",
+          "contests": 1,
+          "note": "Landtag election: Mecklenburg-Schwerin.",
+          "source": "gonschior-weimar"
+        },
+        {
+          "date": "1926-10-31",
+          "contests": 1,
+          "note": "Landtag election: Sachsen.",
+          "source": "gonschior-weimar"
+        },
+        {
+          "date": "1926-11-14",
+          "contests": 1,
+          "note": "Landtag election: Lübeck.",
+          "source": "gonschior-weimar"
+        },
+        {
+          "date": "1927-01-30",
+          "contests": 1,
+          "note": "Landtag election: Thüringen.",
+          "source": "gonschior-weimar"
+        },
+        {
+          "date": "1927-05-22",
+          "contests": 1,
+          "note": "Landtag election: Mecklenburg-Schwerin.",
+          "source": "gonschior-weimar"
+        },
+        {
+          "date": "1927-07-03",
+          "contests": 1,
+          "note": "Landtag election: Mecklenburg-Strelitz.",
+          "source": "gonschior-weimar"
+        },
+        {
+          "date": "1927-10-09",
+          "contests": 1,
+          "note": "Landtag election: Hamburg.",
+          "source": "gonschior-weimar"
+        },
+        {
+          "date": "1927-11-13",
+          "contests": 2,
+          "note": "Landtag election: Hessen, Bremen.",
+          "source": "gonschior-weimar"
+        },
+        {
+          "date": "1927-11-27",
+          "contests": 1,
+          "note": "Landtag election: Braunschweig.",
+          "source": "gonschior-weimar"
+        },
+        {
+          "date": "1928-01-29",
+          "contests": 1,
+          "note": "Landtag election: Mecklenburg-Strelitz.",
+          "source": "gonschior-weimar"
+        },
+        {
+          "date": "1928-02-19",
+          "contests": 1,
+          "note": "Landtag election: Hamburg.",
+          "source": "gonschior-weimar"
+        },
+        {
+          "date": "1928-04-29",
+          "contests": 1,
+          "note": "Landtag election: Schaumburg-Lippe.",
+          "source": "gonschior-weimar"
+        },
+        {
+          "date": "1928-05-20",
+          "contests": 5,
+          "note": "Landtag election: Preußen, Bayern, Württemberg, Oldenburg, Anhalt.",
+          "source": "gonschior-weimar"
+        },
+        {
           "date": "1929-01-06",
           "contests": 1,
-          "note": "Landtag election: Lippe. Each state's latest election as of 1932; earlier ones are not yet dated.",
+          "note": "Landtag election: Lippe. Latest election of the state as of 1932.",
           "source": "sj-reich-1932"
+        },
+        {
+          "date": "1929-05-12",
+          "contests": 1,
+          "note": "Landtag election: Sachsen.",
+          "source": "gonschior-weimar"
+        },
+        {
+          "date": "1929-06-23",
+          "contests": 1,
+          "note": "Landtag election: Mecklenburg-Schwerin.",
+          "source": "gonschior-weimar"
         },
         {
           "date": "1929-10-27",
           "contests": 1,
-          "note": "Landtag election: Baden. Each state's latest election as of 1932; earlier ones are not yet dated.",
+          "note": "Landtag election: Baden. Latest election of the state as of 1932.",
           "source": "sj-reich-1932"
         },
         {
           "date": "1929-11-10",
           "contests": 1,
-          "note": "Landtag election: Lübeck. Each state's latest election as of 1932; earlier ones are not yet dated.",
+          "note": "Landtag election: Lübeck. Latest election of the state as of 1932.",
           "source": "sj-reich-1932"
+        },
+        {
+          "date": "1929-12-08",
+          "contests": 1,
+          "note": "Landtag election: Thüringen.",
+          "source": "gonschior-weimar"
         },
         {
           "date": "1930-06-22",
           "contests": 1,
-          "note": "Landtag election: Sachsen. Each state's latest election as of 1932; earlier ones are not yet dated.",
+          "note": "Landtag election: Sachsen. Latest election of the state as of 1932.",
           "source": "sj-reich-1932"
         },
         {
           "date": "1930-09-14",
           "contests": 1,
-          "note": "Landtag election: Braunschweig. Each state's latest election as of 1932; earlier ones are not yet dated.",
+          "note": "Landtag election: Braunschweig. Latest election of the state as of 1932.",
           "source": "sj-reich-1932"
         },
         {
           "date": "1930-11-30",
           "contests": 1,
-          "note": "Landtag election: Bremen. Each state's latest election as of 1932; earlier ones are not yet dated.",
+          "note": "Landtag election: Bremen. Latest election of the state as of 1932.",
           "source": "sj-reich-1932"
         },
         {
           "date": "1931-05-03",
           "contests": 1,
-          "note": "Landtag election: Schaumburg-Lippe. Each state's latest election as of 1932; earlier ones are not yet dated.",
+          "note": "Landtag election: Schaumburg-Lippe. Latest election of the state as of 1932.",
           "source": "sj-reich-1932"
+        },
+        {
+          "date": "1931-05-17",
+          "contests": 1,
+          "note": "Landtag election: Oldenburg.",
+          "source": "gonschior-weimar"
+        },
+        {
+          "date": "1931-09-27",
+          "contests": 1,
+          "note": "Landtag election: Hamburg.",
+          "source": "gonschior-weimar"
+        },
+        {
+          "date": "1931-11-15",
+          "contests": 1,
+          "note": "Landtag election: Hessen.",
+          "source": "gonschior-weimar"
         },
         {
           "date": "1932-03-13",
           "contests": 1,
-          "note": "Landtag election: Mecklenburg-Strelitz. Each state's latest election as of 1932; earlier ones are not yet dated.",
+          "note": "Landtag election: Mecklenburg-Strelitz. Latest election of the state as of 1932.",
           "source": "sj-reich-1932"
         },
         {
           "date": "1932-04-24",
           "contests": 5,
-          "note": "Landtag election: Preußen, Bayern, Württemberg, Hamburg, Anhalt. Each state's latest election as of 1932; earlier ones are not yet dated.",
+          "note": "Landtag election: Preußen, Bayern, Württemberg, Hamburg, Anhalt. Latest election of the state as of 1932.",
           "source": "sj-reich-1932"
         },
         {
           "date": "1932-05-29",
           "contests": 1,
-          "note": "Landtag election: Oldenburg. Each state's latest election as of 1932; earlier ones are not yet dated.",
+          "note": "Landtag election: Oldenburg. Latest election of the state as of 1932.",
           "source": "sj-reich-1932"
         },
         {
           "date": "1932-06-05",
           "contests": 1,
-          "note": "Landtag election: Mecklenburg-Schwerin. Each state's latest election as of 1932; earlier ones are not yet dated.",
+          "note": "Landtag election: Mecklenburg-Schwerin. Latest election of the state as of 1932.",
           "source": "sj-reich-1932"
         },
         {
           "date": "1932-06-19",
           "contests": 1,
-          "note": "Landtag election: Hessen. Each state's latest election as of 1932; earlier ones are not yet dated.",
+          "note": "Landtag election: Hessen. Latest election of the state as of 1932.",
           "source": "sj-reich-1932"
         },
         {
           "date": "1932-07-31",
           "contests": 1,
-          "note": "Landtag election: Thüringen. Each state's latest election as of 1932; earlier ones are not yet dated.",
+          "note": "Landtag election: Thüringen. Latest election of the state as of 1932.",
           "source": "sj-reich-1932"
+        },
+        {
+          "date": "1932-11-13",
+          "contests": 1,
+          "note": "Landtag election: Lübeck.",
+          "source": "gonschior-weimar"
         }
       ],
       "key": "reich_landtage",
