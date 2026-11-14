@@ -14500,17 +14500,22 @@ async function turnout(contest: string | null, ks: Array<number>) {
           where ${latest("rs")}
         ),
         facts as materialized (
-          select s.k as set, s.election_id as election, ua.area_id as area, v.measure, sum(v.value)::float8 as value
+          select s.k as set, s.election_id as election, f.area, f.measure, sum(f.value)::float8 as value
           from sets s
-          join result_value v on v.result_set_k = s.k and v.option_k = 0 and v.measure in (2, 3, 14) and v.count_round = 0
-          join reporting_unit ru on ru.k = v.unit_k
           cross join lateral (
-            select coalesce(ru.area_id, (
-              select x.area_id from reporting_unit_area x where x.unit_id = ru.id
-              order by x.valid @> (select date_from from day) desc limit 1
-            )) as area_id
-          ) ua
-          where ua.area_id is not null
+            select ua.area_id as area, v.measure, v.value
+            from result_value v
+            join reporting_unit ru on ru.k = v.unit_k
+            cross join lateral (
+              select coalesce(ru.area_id, (
+                select x.area_id from reporting_unit_area x where x.unit_id = ru.id
+                order by x.valid @> (select date_from from day) desc limit 1
+              )) as area_id
+            ) ua
+            where v.result_set_k = s.k and v.option_k = 0 and v.measure in (2, 3, 14) and v.count_round = 0
+              and ua.area_id is not null
+            offset 0
+          ) f
           group by 1, 2, 3, 4
         ),
         expected as materialized (
