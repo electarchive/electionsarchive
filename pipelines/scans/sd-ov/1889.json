@@ -23,7 +23,8 @@
       "day": "1889",
       "special": false,
       "state": "SD",
-      "district": null
+      "district": null,
+      "accept": "Every county cell for Mellette and McClure checked against the page image; Mellette's column sums to 51,962 against a printed total of 53,964 and McClure's to 23,850 against 23,840, so the printed totals row does not add up from its own county figures; the statewide default keeps the printed totals."
     }
   },
   "pages": [
