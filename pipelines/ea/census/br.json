@@ -287,6 +287,12 @@
       "url": "https://sintse.tse.jus.br/documentos/2011/Ago/24/diario-da-justica-eletronico-tse/resolucao-no-23-355-de-18-de-agosto-de-2011-dispoe",
       "kind": "official_body"
     },
+    "tre-ac-referendo-2010": {
+      "title": "Plebiscitos e referendos: Referendo 2010, fuso horário no Acre",
+      "publisher": "Tribunal Regional Eleitoral do Acre",
+      "url": "http://www.tre-ac.jus.br/eleicoes/plebiscitos-e-referendos",
+      "kind": "official_body"
+    },
     "tse-noronha-2026": {
       "title": "Eleitores de Fernando de Noronha elegem 7 conselheiros distritais",
       "publisher": "Tribunal Regional Eleitoral de Pernambuco",
@@ -2634,10 +2640,10 @@
       "measure": {
         "unit": "contest"
       },
-      "note": "Plebiscites on dividing a state are called by Congress (Constitution art. 18, § 3, and Law 9.709 of 1998) and run by the Electoral Justice for the state's voters: Pará voted on 11 December 2011 on creating Carajás and Tapajós, two questions. Other state consultations follow the state constitution.",
+      "note": "Plebiscites on dividing a state are called by Congress (Constitution art. 18, § 3, and Law 9.709 of 1998) and run by the Electoral Justice for the state's voters: Pará voted on 11 December 2011 on creating Carajás and Tapajós, two questions. Acre voted on 31 October 2010, with the presidential runoff, on keeping the time zone set by Law 11.662 of 2008; the TSE's list of consultations leaves it out. Other state consultations follow the state constitution.",
       "source": "tse-plebiscitos",
       "valid_from": "1988-10-05",
-      "first_held": "2011-12-11",
+      "first_held": "2010-10-31",
       "match": [
         {
           "election_kinds": [
@@ -2655,10 +2661,16 @@
       "effort": 3,
       "dates": [
         {
+          "date": "2010-10-31",
+          "source": "tre-ac-referendo-2010",
+          "quote": "Em 31 de outubro de 2010, 470.975 eleitores acreanos foram às urnas escolher o novo Presidente da República e ainda decidir sobre a mudança ou manutenção do fuso horário local.",
+          "contests": 1
+        },
+        {
           "date": "2011-12-11",
           "source": "tse-res-23355",
           "quote": "consultas plebiscitárias sobre a divisão do Estado do Pará para a criação do Estado do Carajás e/ou do Estado do Tapajós, convocadas por meio dos Decretos Legislativos nº 136/2011 e nº 137/2011",
-          "note": "The resolution names the two questions; the date is the polling day the TSE announced, to be confirmed against the results when loaded.",
+          "note": "Polling day confirmed by the TRE-PA result reports.",
           "contests": 2
         }
       ]
