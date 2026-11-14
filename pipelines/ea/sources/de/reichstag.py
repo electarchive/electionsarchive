@@ -100,17 +100,18 @@ PARTIES = {
     "schleswigsche_heimat": (None, "Schleswigsche Heimat", "SH"),
     "uspd": ("Q310296", "Unabhängige Sozialdemokratische Partei Deutschlands", "USPD"),
     "christliche_volkspartei": (None, "Christliche Volkspartei", "CVP"),
-    "wirtschaftsbund": (None, "Deutscher Wirtschaftsbund für Stadt und Land", "DWB"),
+    "wirtschaftsbund": ("Q541230", "Deutscher Wirtschaftsbund für Stadt und Land", "DWB"),
     "bayerischer_bauernbund": ("Q812330", "Bayerischer Bauernbund", "BBB"),
     "wuerttemberg_buergerpartei": ("Q2596816", "Württembergische Bürgerpartei", "WBP"),
     "mittelpartei": ("Q15787248", "Bayerische Mittelpartei", "BMP"),
     "hessische_volkspartei": (None, "Hessische Volkspartei", "HVP"),
     "vlbt": (None, "Vereinigte Landwirtschaftliche Berufsvereinigungen Thüringens", "VLBT"),
-    "sh_bauerndemokratie": (None, "Schleswig-Holsteinische Bauern- und Landarbeiterdemokratie", "SHBLD"),
-    "braunschweig": (None, "Braunschweigischer Landeswahlverband", "BLWV"),
+    "sh_bauerndemokratie": ("Q895651", "Schleswig-Holsteinische Bauern- und Landarbeiterdemokratie", "SHBLD"),
+    "braunschweig": ("Q15789722", "Braunschweigischer Landeswahlverband", "BLWV"),
     "cvp_baden": (None, "Christliche Volkspartei in Baden", "CVP"),
 }
 BLOCS = {"kampffront"}
+KEYED = {"wirtschaftsbund", "sh_bauerndemokratie", "braunschweig"}
 JOINT = {
     "zentrum_bvp": ("Zentrum und Bayerische Volkspartei", ("zentrum", "bvp")),
     "kvp_dhp": ("Konservative Volkspartei und Deutsch-Hannoversche Partei", ("kvp", "dhp")),
@@ -1128,6 +1129,8 @@ def emit() -> Path:
                 parties[key] = cs.key(*item.split(":", 1))
             else:
                 parties[key] = cs.key("wikidata", item)
+                if key in KEYED:
+                    cs.merge(cs.key(f"{SOURCE}.party", key), parties[key])
             if parties[key] in cs.minted:
                 cs.add("party", id=parties[key], kind="bloc" if key in BLOCS else "party", polity_id=germany)
                 name(parties[key], label, "de")
