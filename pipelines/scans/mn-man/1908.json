@@ -15,7 +15,9 @@
       "day": "1908-11-03",
       "special": false,
       "state": "MN",
-      "district": null
+      "district": null,
+      "accept": "The Manual's county figures on pages 135 and 137, checked against the scan, do not add up to its own totals row (Johnson 175,036 against 175,136, Jacobson 147,034 against 146,997, Haggard 6,570 against 7,024, Moore 6,319 against 6,516, and Allen 591 against 593); the statewide default keeps the held totals.",
+      "keep_default": true
     },
     "president": {
       "year": 1908,
