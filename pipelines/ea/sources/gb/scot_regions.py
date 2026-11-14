@@ -705,7 +705,11 @@ def fixed(division: dict, lines: list[dict], fix: dict) -> list[dict]:
         line[field] = int(value) if field == "votes" else float(value) if field == "percent" else value
     elif field == "drop":
         lines = [line for line in lines if line["surname"] != value]
-    elif field == "note":
+    elif field == "add":
+        title, initials, surname, party, votes, percent = value.split("|")
+        lines = [*lines, {"title": title or None, "initials": initials or None, "surname": surname, "party": party}]
+        lines[-1] |= {"votes": figure(votes), "percent": share(percent)}
+    elif field in ("note", "number"):
         division[field] = value
     elif field != "checked":
         division[field] = float(value) if field == "turnout" else int(value) if value else None
@@ -785,6 +789,7 @@ def parse() -> None:
     candidates: list[dict] = []
     problems: list[str] = []
     doubts: list[dict] = []
+    held: list[dict] = []
     for volume in ROUNDS:
         bodies = {key: (label, region) for key, label, region in councils(volume)}
         columns = assigned(volume, ("L", "R"))
@@ -829,16 +834,11 @@ def parse() -> None:
             ):
                 mine = ["read once, with no majority or shares to check it"]
             for fix in fixes.pop((volume, item["page"], division["number"]), []):
-                if fix["surname"]:
-                    line = next(line for line in lines if line["surname"] == fix["surname"])
-                    line[fix["field"]] = int(fix["value"]) if fix["field"] == "votes" else fix["value"]
-                elif fix["field"] == "drop":
-                    lines = [line for line in lines if line["surname"] != fix["value"]]
-                elif fix["field"] != "checked":
-                    division[fix["field"]] = int(fix["value"]) if fix["value"] else None
+                lines = fixed(division, lines, fix)
                 mine = [] if fix["field"] == "checked" else issues(division, lines)
             if mine:
                 problems += [f"{volume}\t{item['page']}\t{division['number']}\t{label}\t{issue}" for issue in mine]
+                held.append({**division, "council": key, "side": item["side"], "issues": mine, "candidates": lines})
                 if third is None:
                     doubts.append(
                         {
@@ -875,6 +875,7 @@ def parse() -> None:
         PARSED / "doubts.tsv", separator="\t"
     )
     (PARSED / "problems.tsv").write_text("".join(f"{problem}\n" for problem in problems))
+    (PARSED / "held.json").write_text(json.dumps(held, indent=1, default=str))
     print(
         f"{keep.height} divisions kept, {lines.height} candidates, {len(problems)} problems, {len(doubts)} to read again"
     )
@@ -901,11 +902,10 @@ def party_of(label: str, year: int) -> tuple[str, str] | None:
 
 
 def emit() -> Path:
-    clean = [
-        folder
-        for folder in (PARSED, PARSED / "b1974")
-        if (folder / "problems.tsv").exists() and not (folder / "problems.tsv").read_text()
-    ]
+    clean = [PARSED, *[folder for folder in [PARSED / "b1974"] if not (folder / "problems.tsv").read_text()]]
+    left_out: dict[tuple[str, str], list[str]] = {}
+    for item in json.loads((PARSED / "held.json").read_text()):
+        left_out.setdefault((item["volume"], item["council"]), []).append(item["number"])
     divisions = pl.concat([pl.read_parquet(folder / "divisions.parquet") for folder in clean], how="diagonal_relaxed")
     lines = pl.concat([pl.read_parquet(folder / "candidates.parquet") for folder in clean], how="diagonal_relaxed")
     volumes = {volume: VOLUMES[volume] for volume in divisions["volume"].unique(maintain_order=True)}
@@ -1190,6 +1190,15 @@ def emit() -> Path:
                             flags=0,
                             value=row[field],
                         )
+                if (volume, key) in left_out:
+                    numbers = sorted(left_out[volume, key], key=lambda text: (len(text), text))
+                    cs.add(
+                        "note",
+                        entity_id=election,
+                        kind="caveat",
+                        body_md=f"The printed figures for {noun}{'s' * (len(numbers) > 1)} {', '.join(numbers)} do not add up and could not be "
+                        "settled against the page, so those seats are left out.",
+                    )
                 if empty:
                     cs.add(
                         "note",
