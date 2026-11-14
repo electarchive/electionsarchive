@@ -562,6 +562,18 @@
       "publisher": "Legislative Assembly of Prince Edward Island",
       "url": "https://www.assembly.pe.ca/about/our-history-and-timeline",
       "kind": "official_body"
+    },
+    "pe-acts-1862": {
+      "title": "The Acts of the General Assembly of Prince Edward Island, 25 Vic. c. 18 (1862), 'An Act to change the constitution of the Legislative Council, by rendering the same elective', Revised Statutes pp. 552-558",
+      "publisher": "Government of Prince Edward Island (digitized by the Internet Archive)",
+      "url": "https://archive.org/details/actsgeneralasse05islagoog",
+      "kind": "official_body"
+    },
+    "pe-acts-1870": {
+      "title": "33 Vic. c. 8 (1870), 'An Act to alter the time for holding the Elections of Members for the Legislative Council'",
+      "publisher": "Government of Prince Edward Island (digitized by the Internet Archive)",
+      "url": "https://archive.org/details/actsgeneralasse10islagoog",
+      "kind": "official_body"
     }
   },
   "tiers": [
@@ -7426,8 +7438,8 @@
       "measure": {
         "unit": "polity"
       },
-      "note": "The upper house was elected, instead of appointed, from 1862 and merged with the House of Assembly in 1893 into the single Legislative Assembly, where each of the 15 districts elects one Assemblyman and one Councillor (those Councillor seats are part of the provincial general election, not this class). Candidates and voters needed property. The 1862 Act (introduced by Thomas Heath Haviland, royal assent reported to the Assembly on 2 December 1862) made the Council 13 members, four from each county and one from Charlottetown; its text was not found. Secondary sources say the first elected Council sat from 1863, that six members went out by lot at the end of four years under the Act, and that councillors served eight years (the Canadian Parliamentary Companion, 1885, records seats won in 1866, 1874, Nov. 1876, Nov. 1878, Nov. 1882, and Nov. 1886, and a June 1882 by-election, and does not say the elections were held on one fixed day). No primary statute or Elections PEI table was reachable, so no cadence or dates are recorded.",
-      "source": "pe-assembly-history",
+      "note": "The upper house was elected, instead of appointed, from 1862 and merged with the House of Assembly in 1893 into the single Legislative Assembly, where each of the 15 districts elects one Assemblyman and one Councillor (those Councillor seats are part of the provincial general election, not this class). Candidates and voters needed property. The 1862 Act (25 Vic. c. 18, introduced by Thomas Heath Haviland, royal assent reported to the Assembly on 2 December 1862) made the Council 13 members: two from each of six two-member districts (two per county) and one from Charlottetown. Section 17 set the periodical elections: one member per two-member district every fourth year and the Charlottetown member every eighth year, dated from the first election of the Council, each made within twenty days of the anniversary of the day the Act came into operation (by proclamation); under section 18 one member per district was fixed by lot as elected for four years, the rest for eight. The Act of 1870 (33 Vic. c. 8) kept the four- and eight-year periods and moved the window to within sixty days before that anniversary. The proclamation date and first election day were not found, so no phase or election days are recorded; the Canadian Parliamentary Companion (1885) records seats won in 1866, 1874, Nov. 1876, Nov. 1878, Nov. 1882, and Nov. 1886, and a June 1882 by-election, which do not sit on one grid.",
+      "source": "pe-acts-1862",
       "valid_from": "1862-01-01",
       "valid_to": "1893-01-01",
       "est_votes": 10000,
