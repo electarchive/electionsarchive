@@ -23,7 +23,8 @@
       "day": "1940-11-05",
       "special": false,
       "state": "MN",
-      "district": null
+      "district": null,
+      "accept": "The Manual's county table has no column for Carl Winter, credited with 256 votes statewide in the Clerk of the House's statistics, so his votes are not in these county figures."
     },
     "governor": {
       "year": 1940,
@@ -31,7 +32,9 @@
       "day": "1940-11-05",
       "special": false,
       "state": "MN",
-      "district": null
+      "district": null,
+      "accept": "The Manual's county table has no column for Martin Mackie, credited with 360 votes statewide, so his votes are not in these county figures; the statewide default keeps them.",
+      "keep_default": true
     }
   },
   "pages": [

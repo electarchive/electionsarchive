@@ -55,7 +55,8 @@
       "day": "1964-11-03",
       "special": false,
       "state": "MN",
-      "district": 4
+      "district": 4,
+      "accept": "The Manual prints 52,221 votes for John M. Drexler, in its county rows and its district total; the Clerk of the House's statistics print 54,221, and the district default keeps that figure."
     },
     "house5": {
       "year": 1964,

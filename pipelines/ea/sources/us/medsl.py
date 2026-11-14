@@ -972,7 +972,7 @@ def attach(
                 held_back |= medsl < fec * 0.9
                 overcounted |= medsl > fec
                 undercounted |= medsl < fec
-        if overcounted and authoritative is None:
+        if overcounted and authoritative is None and key not in accepted:
             print(f"{key}: a candidate's county sum exceeds the FEC total, skipped")
             continue
         uniform = (

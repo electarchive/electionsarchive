@@ -559,5 +559,6 @@
       ],
       "hint": "Read only the table headed 'NINTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
     }
-  ]
+  ],
+  "empty": true
 }

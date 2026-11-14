@@ -15,7 +15,7 @@ from dataclasses import dataclass, field
 from functools import cache
 from pathlib import Path
 from typing import Literal, NamedTuple, NotRequired, TypedDict
-from uuid import UUID
+from uuid import UUID, uuid5
 
 import numpy as np
 import polars as pl
@@ -76,6 +76,8 @@ class Contest(TypedDict):
     district: int | None
     create: NotRequired[bool]
     suffix: NotRequired[str]
+    accept: NotRequired[str]
+    keep_default: NotRequired[bool]
 
 
 class Manifest(TypedDict):
@@ -1501,6 +1503,10 @@ def passed(name: str, ids: dict[str, UUID]) -> tuple[Manifest, pl.DataFrame, dic
         key_of(contests[contest]): note
         for contest, note in frame.filter(pl.col("note").is_not_null()).select("contest", "note").unique().iter_rows()
     }
+    for contest in contests.values():
+        if "accept" in contest:
+            found = key_of(contest)
+            caveats[found] = " ".join(part for part in (caveats.get(found), contest["accept"]) if part)
     if "half" in frame.columns:
         for contest, text in (
             pl.read_parquet(WORK / name / "tables.parquet")
@@ -1616,6 +1622,12 @@ def emit(name: str) -> Path:
             extend=bool(lead.get("extend")),
             empty=bool(lead.get("empty")),
             restage=bool(lead.get("restage")) or "EA_SCANS_RESTAGE" in os.environ,
+            accepted=frozenset(
+                key_of(contest)
+                for _, manifest, _, _ in volumes
+                for contest in manifest["contests"].values()
+                if "accept" in contest
+            ),
         )
         for one, manifest, _, caveats in volumes:
             contests = manifest["contests"]
@@ -1638,7 +1650,8 @@ def emit(name: str) -> Path:
                 targets.setdefault(held, contest)
             for held, contest in targets.items():
                 found = conn.execute(
-                    "select value from external_id where scheme = 'us.contest' and entity_id = %s", [contest]
+                    "select value from external_id where scheme = 'us.contest' and entity_id = %s order by value = any(%s) desc",
+                    [contest, [key_of(item) for item in contests.values()]],
                 ).fetchone()
                 text = (
                     (
@@ -1679,4 +1692,16 @@ def emit(name: str) -> Path:
                         )
                 if not current:
                     cs.add("note", entity_id=held, kind="caveat", body_md=text)
+                if found is not None and any(
+                    contest.get("keep_default") and key_of(contest) == found[0] for contest in contests.values()
+                ):
+                    cs.add(
+                        "flag",
+                        id=uuid5(UUID(str(held)), "reconcile.official"),
+                        result_set_id=held,
+                        check_code="reconcile.official",
+                        severity="warning",
+                        status="accepted",
+                        details={"reason": "The county table differs from the held statewide totals by design."},
+                    )
         return cs.write()
