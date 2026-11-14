@@ -1,4 +1,5 @@
 import io
+import json
 import os
 import shutil
 import unicodedata
@@ -43,6 +44,8 @@ SECTIONS = {
     )
     for uf in ufs
 }
+RESULTS_URL = "https://resultados.tse.jus.br/oficial/"
+RESULTS = {2024: {"1": "619", "2": "620"}}
 SECTION_DETAIL = {2004: f"{TSE}detalhe_votacao_secao/detalhe_votacao_secao_2004.zip"}
 MAYOR, COUNCIL = "11", "13"
 RUNOFF_ELECTORATE = 200_000
@@ -89,7 +92,8 @@ SHORT = (
 )
 SECTIONED = (
     "The electoral court's municipal results files leave this contest out, so its votes are summed from the court's "
-    "results by polling section. Candidates' final standings are as the court's candidate file records them."
+    "results by polling section, with votes for candidates whose registration the court denied or revoked counted as "
+    "void. Candidates' final standings are as the court's candidate file records them."
 )
 REPLACED = ["CASSAÇÃO DO REGISTRO", "HOMOLOGAÇÃO DE RENÚNCIA", "SUBSTITUÍDO"]
 
@@ -114,7 +118,7 @@ def scan(year: int, kind: str) -> pl.LazyFrame:
     present = frame.collect_schema().names()
     return frame.with_columns(
         pl.lit(None, pl.String).alias(column)
-        for column in ("NR_FEDERACAO", "NM_FEDERACAO", "NM_SOCIAL_CANDIDATO")
+        for column in ("NR_FEDERACAO", "NM_FEDERACAO", "NM_SOCIAL_CANDIDATO", "DS_DETALHE_SITUACAO_CAND")
         if column not in present
     )
 
@@ -131,6 +135,34 @@ def sections(year: int, contest: pl.Expr, ordinary: pl.Expr, known: pl.DataFrame
         .collect(engine="streaming")
         .join(known, on="contest", how="anti")
     )
+
+
+def bulletin(code: str, uf: str) -> str:
+    year, round, cargo, municipality = code.split(":")
+    election = RESULTS[int(year)][round]
+    return f"{RESULTS_URL}ele{year}/{election}/dados/{uf}/{uf}{municipality}-c{cargo:0>4}-e{election:0>6}-u.json"
+
+
+def verdicts(year: int, contests: list[str], roster: pl.LazyFrame) -> pl.Series:
+    states = dict(
+        roster.select(municipality=pl.col("SG_UE").str.zfill(5), uf=pl.col("SG_UF").str.to_lowercase())
+        .unique()
+        .collect()
+        .iter_rows()
+    )
+    valid: list[str] = []
+    for code in contests:
+        url = bulletin(code, states[code[-5:]])
+        stack: list[object] = [json.loads(raw.fetch(SOURCE, url, suffix=".json").path.read_bytes())]
+        while stack:
+            item = stack.pop()
+            if isinstance(item, dict):
+                if "sqcand" in item and str(item.get("dvt", "")).startswith("Válido"):
+                    valid.append(str(item["sqcand"]))
+                stack.extend(item.values())
+            elif isinstance(item, list):
+                stack.extend(item)
+    return pl.Series(valid, dtype=pl.String)
 
 
 def coalition(year: int) -> pl.Expr:
@@ -160,9 +192,24 @@ def parse() -> None:
         valid = "QT_VOTOS_NOMINAIS_VALIDOS" if "QT_VOTOS_NOMINAIS_VALIDOS" in columns else "QT_VOTOS_NOMINAIS"
         cast = sections(year, contest, ordinary, candidates.select(contest=contest).unique().collect())
         if cast.height:
-            annulled = pl.col("DS_SIT_TOT_TURNO").str.contains("INDEFERIDO") | (
-                pl.col("DS_SITUACAO_CANDIDATURA") == "INAPTO"
+            annulled = (
+                (pl.col("DS_SITUACAO_CANDIDATURA") == "INAPTO")
+                | pl.col("DS_DETALHE_SITUACAO_CAND").str.contains("INDEFERIDO|CASSADO")
+                | pl.col("DS_SIT_TOT_TURNO").str.contains("INDEFERIDO|CASSADO")
+            ).fill_null(False)
+            zero = (
+                scan(year, "detail")
+                .filter(ordinary)
+                .group_by(contest=contest)
+                .agg(pl.col("QT_VOTOS_NOMINAIS_VALIDOS").cast(pl.Int64).sum())
+                .filter(pl.col("QT_VOTOS_NOMINAIS_VALIDOS") == 0)
+                .collect()["contest"]
             )
+            annulled = annulled | contest.is_in(zero.implode())
+            secondary = pl.col("SQ_CANDIDATO").is_null()
+            if year in RESULTS:
+                verdict = verdicts(year, cast["contest"].unique().to_list(), scan(year, "roster"))
+                annulled = secondary = ~pl.col("SQ_CANDIDATO").is_in(verdict.implode())
             supplement = (
                 scan(year, "roster")
                 .filter(ordinary)
@@ -171,6 +218,13 @@ def parse() -> None:
                 .unique(["NR_TURNO", "CD_CARGO", "CD_MUNICIPIO", "SQ_CANDIDATO"])
                 .collect()
                 .with_columns(contest=contest)
+                .sort(
+                    secondary,
+                    pl.col("DS_SITUACAO_CANDIDATURA") != "APTO",
+                    pl.col("DS_DETALHE_SITUACAO_CAND").is_in([*WITHDRAWN, *REPLACED]).fill_null(False),
+                    "SQ_CANDIDATO",
+                )
+                .unique(["contest", "NR_CANDIDATO"], keep="first", maintain_order=True)
                 .join(cast, left_on=["contest", "NR_CANDIDATO"], right_on=["contest", "number"], how="left")
                 .with_columns(pl.col("votes").fill_null(0))
                 .with_columns(
@@ -178,6 +232,12 @@ def parse() -> None:
                     SECAO_VALIDOS=pl.when(annulled).then(0).otherwise(pl.col("votes")),
                 )
                 .drop("contest", "votes")
+            )
+            barred = (
+                supplement.group_by(contest=contest, party_number=pl.col("NR_PARTIDO"))
+                .agg(barred=annulled.all())
+                .filter("barred")
+                .drop("barred")
             )
             candidates = pl.concat([candidates, supplement.lazy()], how="diagonal_relaxed")
             unmatched = cast.filter(
@@ -392,7 +452,29 @@ def parse() -> None:
                     coalition="coalition",
                 )
             )
-            legends = pl.concat([legends, matched, orphans])
+            found = pl.concat([matched, orphans]).join(
+                barred.with_columns(barred=pl.lit(True)), on=["contest", "party_number"], how="left"
+            )
+            voided = (
+                found.group_by("contest")
+                .agg(
+                    every=pl.col("votes").sum(),
+                    kept=pl.col("votes").filter(pl.col("barred").is_null()).sum(),
+                )
+                .join(tallies.select("contest", "legend"), on="contest")
+                .filter((pl.col("every") != pl.col("legend")) & (pl.col("kept") == pl.col("legend")))["contest"]
+            )
+            legends = pl.concat(
+                [
+                    legends.with_columns(void=pl.lit(0, pl.Int64)),
+                    found.with_columns(pl.col("barred") & pl.col("contest").is_in(voided.implode()))
+                    .with_columns(
+                        void=pl.when(pl.col("barred")).then("votes").otherwise(0),
+                        votes=pl.when(pl.col("barred")).then(0).otherwise("votes"),
+                    )
+                    .drop("barred"),
+                ]
+            )
             residue = (
                 cast.join(legends.select("contest", number="party_number"), on=["contest", "number"], how="anti")
                 .filter(
@@ -415,7 +497,10 @@ def parse() -> None:
                 .with_columns(pl.col("legend", "valid", "void").fill_null(0))
                 .filter(
                     (pl.col("blank") != pl.col("blank_detail"))
-                    | (pl.col("null") + pl.col("void") != pl.col("null_detail"))
+                    | (
+                        (pl.col("null_detail") != pl.col("null"))
+                        & (pl.col("null_detail") != pl.col("null") + pl.col("void"))
+                    )
                     | (pl.col("valid") != pl.col("nominal"))
                     | (pl.col("legend") != pl.col("legend_detail"))
                     | pl.col("registered").is_null()
@@ -477,6 +562,8 @@ def emit() -> Path:
     candidates = pl.read_parquet(folder / "candidates.parquet")
     votes = pl.read_parquet(folder / "votes.parquet")
     legends = pl.read_parquet(folder / "legends.parquet")
+    if "void" not in legends.columns:
+        legends = legends.with_columns(void=pl.lit(0, pl.Int64))
     detail = pl.read_parquet(folder / "detail.parquet")
     places = pl.read_parquet(folder / "places.parquet").filter(
         pl.col("municipality").is_in(candidates["municipality"].unique().implode())
@@ -532,6 +619,10 @@ def emit() -> Path:
             if (folder / "sections.parquet").exists()
             else set()
         )
+        if year in RESULTS:
+            states = dict(places.select("municipality", "uf").iter_rows())
+            for code in sorted(sectioned):
+                cs.artifact(raw.cached(SOURCE, bulletin(code, states[code[-5:]].lower())), results)
 
         brazil = cs.polity("BR")
         systems: dict[str, UUID] = {}
@@ -928,11 +1019,14 @@ def emit() -> Path:
                         measure=pl.col("variable").replace_strict({"valid": 1, "void": 5}, return_dtype=pl.Int16),
                         value="value",
                     ),
-                    legends.filter(live & (pl.col("votes") > 0)).select(
+                    legends.filter(live)
+                    .unpivot(on=["votes", "void"], index=["contest", "party_number"])
+                    .filter(pl.col("value") > 0)
+                    .select(
                         "contest",
                         option=pl.col("contest") + ":legend:" + pl.col("party_number"),
-                        measure=pl.lit(1, pl.Int16),
-                        value="votes",
+                        measure=pl.col("variable").replace_strict({"votes": 1, "void": 5}, return_dtype=pl.Int16),
+                        value="value",
                     ),
                     detail.filter(live)
                     .unpivot(on=["registered", "voters", "blank", "null"], index=["contest"])
