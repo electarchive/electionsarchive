@@ -157,8 +157,10 @@ NOMINATED = (
 SCANS = {
     GWYNEDD_NOMINATED: (
         "Gwynedd Council",
-        "Datganiad am y Personau a Enwebwyd / Statement of Persons Nominated, community and town councillors, "
-        "5 May 2022",
+        (
+            "Datganiad am y Personau a Enwebwyd / Statement of Persons Nominated, community and town councillors, "
+            "5 May 2022"
+        ),
     ),
     GWYNEDD_POLLS: (
         "Gwynedd Council",
