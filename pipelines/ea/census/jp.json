@@ -103,6 +103,42 @@
       "publisher": "総務省 (e-Stat 政府統計の総合窓口)",
       "url": "https://www.e-stat.go.jp/stat-search/files?toukei=00200233",
       "kind": "official_body"
+    },
+    "mic-ninki-2020": {
+      "title": "地方公共団体の議会の議員及び長の任期満了に関する調（都道府県別） 令和2年",
+      "publisher": "総務省",
+      "url": "https://www.soumu.go.jp/senkyo/senkyo_s/data/ninki/ninki_r02.html",
+      "kind": "official_body"
+    },
+    "mic-ninki-2021": {
+      "title": "地方公共団体の議会の議員及び長の任期満了に関する調（都道府県別） 令和3年",
+      "publisher": "総務省",
+      "url": "https://www.soumu.go.jp/senkyo/senkyo_s/data/ninki/ninki_r03.html",
+      "kind": "official_body"
+    },
+    "mic-ninki-2022": {
+      "title": "地方公共団体の議会の議員及び長の任期満了に関する調（都道府県別） 令和4年",
+      "publisher": "総務省",
+      "url": "https://www.soumu.go.jp/senkyo/senkyo_s/data/ninki/ninki_r04.html",
+      "kind": "official_body"
+    },
+    "mic-ninki-2023": {
+      "title": "地方公共団体の議会の議員及び長の任期満了に関する調（都道府県別） 令和5年",
+      "publisher": "総務省",
+      "url": "https://www.soumu.go.jp/senkyo/senkyo_s/data/ninki/ninki_r05.html",
+      "kind": "official_body"
+    },
+    "mic-ninki-2024": {
+      "title": "地方公共団体の議会の議員及び長の任期満了に関する調（都道府県別） 令和6年",
+      "publisher": "総務省",
+      "url": "https://www.soumu.go.jp/senkyo/senkyo_s/data/ninki/ninki_r06.html",
+      "kind": "official_body"
+    },
+    "mic-ninki-2026": {
+      "title": "地方公共団体の議会の議員及び長の任期満了に関する調（都道府県別） 令和8年",
+      "publisher": "総務省",
+      "url": "https://www.soumu.go.jp/senkyo/senkyo_s/data/ninki/ninki_r08.html",
+      "kind": "official_body"
     }
   },
   "tiers": [
@@ -278,7 +314,7 @@
       "first_held": "1947-04-25",
       "earliest_record": "1947-04-25",
       "finest_note": "Ballots from every polling place in a counting district are mixed before counting (公職選挙法 art. 66), so no polling-place results exist; the counting district (municipality, ward, or a numbered piece of a split one) is the finest unit.",
-      "note": "Counted per constituency: 1947-1993 SNTV in multi-member districts; from 1996 the single-member districts plus the 11 PR blocks (300 + 11 to 2012, 295 + 11 in 2014, 289 + 11 since 2017). Pre-1996 district counts are quoted from Wikipedia only for 1947 (117) and 1993 (129), with seat totals where its district list states them; the MIC 結果調 books were not reachable.",
+      "note": "Counted per constituency: 1947-1993 SNTV in multi-member districts; from 1996 the single-member districts plus the 11 PR blocks (300 + 11 to 2012, 295 + 11 in 2014, 289 + 11 since 2017). Pre-1996 district counts and seats are read from the 選挙制度 box of each Wikipedia election article (第23回 to 第40回; the 1人区 Amami district counts from 1955); the MIC 結果調 books were not reachable.",
       "match": [
         {
           "election_kinds": [
@@ -329,82 +365,113 @@
           "date": "1949-01-23",
           "seats": 466,
           "source": "wiki-hor-districts",
-          "quote": "選挙区一覧 概説: 再び中選挙区制となり、定数は466 (第23回 - 第24回)"
+          "quote": "第24回 article, 選挙制度: 3人区 40, 4人区 39, 5人区 38; 計 117 選挙区, 定数 466",
+          "contests": 117
         },
         {
-          "date": "1952-10-01"
+          "date": "1952-10-01",
+          "contests": 117,
+          "seats": 466,
+          "source": "wiki-hor-districts",
+          "quote": "第25回 article, 選挙制度: 3人区 40, 4人区 39, 5人区 38; 計 117 選挙区, 定数 466"
         },
         {
-          "date": "1953-04-19"
+          "date": "1953-04-19",
+          "contests": 117,
+          "seats": 466,
+          "source": "wiki-hor-districts",
+          "quote": "第26回 article, 選挙制度: 3人区 40, 4人区 39, 5人区 38; 計 117 選挙区, 定数 466"
         },
         {
           "date": "1955-02-27",
           "seats": 467,
           "source": "wiki-hor-districts",
-          "quote": "選挙区一覧 概説: 1953年の奄美群島返還に伴い、定数は1増の467 (第27回 - 第30回)"
+          "quote": "第27回 article, 選挙制度: 3人区 40, 4人区 39, 5人区 38, 1人区 1; 計 118 選挙区, 定数 467",
+          "contests": 118
         },
         {
-          "date": "1958-05-22"
+          "date": "1958-05-22",
+          "contests": 118,
+          "seats": 467,
+          "source": "wiki-hor-districts",
+          "quote": "第28回 article, 選挙制度: 3人区 40, 4人区 39, 5人区 38, 1人区 1; 計 118 選挙区, 定数 467"
         },
         {
-          "date": "1960-11-20"
+          "date": "1960-11-20",
+          "contests": 118,
+          "seats": 467,
+          "source": "wiki-hor-districts",
+          "quote": "第29回 article, 選挙制度: 3人区 40, 4人区 39, 5人区 38, 1人区 1; 計 118 選挙区, 定数 467"
         },
         {
-          "date": "1963-11-21"
+          "date": "1963-11-21",
+          "contests": 118,
+          "seats": 467,
+          "source": "wiki-hor-districts",
+          "quote": "第30回 article, 選挙制度: 3人区 40, 4人区 39, 5人区 38, 1人区 1; 計 118 選挙区, 定数 467"
         },
         {
           "date": "1967-01-29",
           "seats": 486,
           "source": "wiki-hor-districts",
-          "quote": "選挙区一覧 概説: 定数が19増の486に (第31回 - 第32回)"
+          "quote": "第31回 article, 選挙制度: 3人区 43, 4人区 39, 5人区 40, 1人区 1; 計 123 選挙区, 定数 486",
+          "contests": 123
         },
         {
           "date": "1969-12-27",
           "seats": 486,
           "source": "wiki-hor-districts",
-          "quote": "選挙区一覧 概説: 定数が19増の486に (第31回 - 第32回)"
+          "quote": "第32回 article, 選挙制度: 3人区 43, 4人区 39, 5人区 40, 1人区 1; 計 123 選挙区, 定数 486",
+          "contests": 123
         },
         {
           "date": "1972-12-10",
           "seats": 491,
           "source": "wiki-hor-districts",
-          "quote": "選挙区一覧 概説: 沖縄返還に伴い定数は5増の491に (第33回)"
+          "quote": "第33回 article, 選挙制度: 3人区 43, 4人区 39, 5人区 41, 1人区 1; 計 124 選挙区, 定数 491",
+          "contests": 124
         },
         {
           "date": "1976-12-05",
           "seats": 511,
           "source": "wiki-hor-districts",
-          "quote": "選挙区一覧 概説: 定数が20増の511に (第34回 - 第37回)"
+          "quote": "第34回 article, 選挙制度: 3人区 47, 4人区 41, 5人区 41, 1人区 1; 計 130 選挙区, 定数 511",
+          "contests": 130
         },
         {
           "date": "1979-10-07",
           "seats": 511,
           "source": "wiki-hor-districts",
-          "quote": "選挙区一覧 概説: 定数が20増の511に (第34回 - 第37回)"
+          "quote": "第35回 article, 選挙制度: 3人区 47, 4人区 41, 5人区 41, 1人区 1; 計 130 選挙区, 定数 511",
+          "contests": 130
         },
         {
           "date": "1980-06-22",
           "seats": 511,
           "source": "wiki-hor-districts",
-          "quote": "選挙区一覧 概説: 定数が20増の511に (第34回 - 第37回)"
+          "quote": "第36回 article, 選挙制度: 3人区 47, 4人区 41, 5人区 41, 1人区 1; 計 130 選挙区, 定数 511",
+          "contests": 130
         },
         {
           "date": "1983-12-18",
           "seats": 511,
           "source": "wiki-hor-districts",
-          "quote": "選挙区一覧 概説: 定数が20増の511に (第34回 - 第37回)"
+          "quote": "第37回 article, 選挙制度: 3人区 47, 4人区 41, 5人区 41, 1人区 1; 計 130 選挙区, 定数 511",
+          "contests": 130
         },
         {
           "date": "1986-07-06",
           "seats": 512,
           "source": "wiki-hor-districts",
-          "quote": "選挙区一覧 概説: 8増7減で合計定数512 (第38回 - 第39回)"
+          "quote": "第38回 article, 選挙制度: 2人区 4, 3人区 42, 4人区 39, 5人区 43, 6人区 1, 1人区 1; 計 130 選挙区, 定数 512",
+          "contests": 130
         },
         {
           "date": "1990-02-18",
           "seats": 512,
           "source": "wiki-hor-districts",
-          "quote": "選挙区一覧 概説: 定数512 (第38回 - 第39回)"
+          "quote": "第39回 article, 選挙制度: 2人区 4, 3人区 42, 4人区 39, 5人区 43, 6人区 1, 1人区 1; 計 130 選挙区, 定数 512",
+          "contests": 130
         },
         {
           "date": "1993-07-18",
@@ -1246,53 +1313,418 @@
           "quote": "平成３１年中における任期満了団体数(平成３０年１１月１日現在): 知事 20"
         },
         {
-          "date": "2020-01-01",
-          "precision": "year",
-          "contests": 6,
-          "source": "mic-ninki",
-          "quote": "令和２年中における任期満了団体数(令和元年１１月１日現在): 知事 6"
+          "date": "2020-04-15",
+          "contests": 1,
+          "source": "mic-ninki-2020",
+          "quote": "令和2年中における任期満了団体（都道府県別）, 知事 任期満了月日 4.15: 熊本"
         },
         {
-          "date": "2021-01-01",
-          "precision": "year",
-          "contests": 9,
-          "source": "mic-ninki",
-          "quote": "令和３年中における任期満了団体数(令和２年１１月１日現在): 知事 9"
+          "date": "2020-07-27",
+          "contests": 1,
+          "source": "mic-ninki-2020",
+          "quote": "令和2年中における任期満了団体（都道府県別）, 知事 任期満了月日 7.27: 鹿児島"
         },
         {
-          "date": "2022-01-01",
-          "precision": "year",
-          "contests": 12,
-          "source": "mic-ninki",
-          "quote": "令和４年中における任期満了団体数(令和３年１１月１日現在): 知事 12"
+          "date": "2020-07-30",
+          "contests": 1,
+          "source": "mic-ninki-2020",
+          "quote": "令和2年中における任期満了団体（都道府県別）, 知事 任期満了月日 7.3（7月30日: 東京都の任期は2016年7月31日起算の4年。数値セルでは7.30が7.3と表示される）: 東京"
         },
         {
-          "date": "2023-01-01",
-          "precision": "year",
-          "contests": 18,
-          "source": "mic-ninki",
-          "quote": "令和５年中における任期満了団体数(令和４年１１月１日現在): 知事 18"
+          "date": "2020-11-08",
+          "contests": 1,
+          "source": "mic-ninki-2020",
+          "quote": "令和2年中における任期満了団体（都道府県別）, 知事 任期満了月日 11.8: 富山"
         },
         {
-          "date": "2024-01-01",
-          "precision": "year",
-          "contests": 6,
-          "source": "mic-ninki",
-          "quote": "令和６年中における任期満了団体数(令和５年１１月１日現在): 知事 6"
+          "date": "2020-11-11",
+          "contests": 1,
+          "source": "mic-ninki-2020",
+          "quote": "令和2年中における任期満了団体（都道府県別）, 知事 任期満了月日 11.11: 岡山"
         },
         {
-          "date": "2025-01-01",
-          "precision": "year",
-          "contests": 9,
-          "source": "mic-ninki",
-          "quote": "令和７年中における任期満了団体数(令和６年１１月１日現在): 知事 9"
+          "date": "2020-12-08",
+          "contests": 1,
+          "source": "mic-ninki-2020",
+          "quote": "令和2年中における任期満了団体（都道府県別）, 知事 任期満了月日 12.8: 栃木"
         },
         {
-          "date": "2026-01-01",
-          "precision": "year",
-          "contests": 11,
+          "date": "2021-02-05",
+          "contests": 1,
+          "source": "mic-ninki-2021",
+          "quote": "令和3年中における任期満了団体（都道府県別）, 知事 任期満了月日 2.5: 岐阜"
+        },
+        {
+          "date": "2021-02-13",
+          "contests": 1,
+          "source": "mic-ninki-2021",
+          "quote": "令和3年中における任期満了団体（都道府県別）, 知事 任期満了月日 2.13: 山形"
+        },
+        {
+          "date": "2021-04-04",
+          "contests": 1,
+          "source": "mic-ninki-2021",
+          "quote": "令和3年中における任期満了団体（都道府県別）, 知事 任期満了月日 4.4: 千葉"
+        },
+        {
+          "date": "2021-04-19",
+          "contests": 1,
+          "source": "mic-ninki-2021",
+          "quote": "令和3年中における任期満了団体（都道府県別）, 知事 任期満了月日 4.19: 秋田"
+        },
+        {
+          "date": "2021-07-04",
+          "contests": 1,
+          "source": "mic-ninki-2021",
+          "quote": "令和3年中における任期満了団体（都道府県別）, 知事 任期満了月日 7.4: 静岡"
+        },
+        {
+          "date": "2021-07-31",
+          "contests": 1,
+          "source": "mic-ninki-2021",
+          "quote": "令和3年中における任期満了団体（都道府県別）, 知事 任期満了月日 7.31: 兵庫"
+        },
+        {
+          "date": "2021-09-25",
+          "contests": 1,
+          "source": "mic-ninki-2021",
+          "quote": "令和3年中における任期満了団体（都道府県別）, 知事 任期満了月日 9.25: 茨城"
+        },
+        {
+          "date": "2021-11-20",
+          "contests": 1,
+          "source": "mic-ninki-2021",
+          "quote": "令和3年中における任期満了団体（都道府県別）, 知事 任期満了月日 11.20: 宮城"
+        },
+        {
+          "date": "2021-11-28",
+          "contests": 1,
+          "source": "mic-ninki-2021",
+          "quote": "令和3年中における任期満了団体（都道府県別）, 知事 任期満了月日 11.28: 広島"
+        },
+        {
+          "date": "2022-02-22",
+          "contests": 1,
+          "source": "mic-ninki-2022",
+          "quote": "令和4年中における任期満了団体（都道府県別）, 知事 任期満了月日 2.22: 山口"
+        },
+        {
+          "date": "2022-03-01",
+          "contests": 1,
+          "source": "mic-ninki-2022",
+          "quote": "令和4年中における任期満了団体（都道府県別）, 知事 任期満了月日 3.1: 長崎"
+        },
+        {
+          "date": "2022-03-26",
+          "contests": 1,
+          "source": "mic-ninki-2022",
+          "quote": "令和4年中における任期満了団体（都道府県別）, 知事 任期満了月日 3.26: 石川"
+        },
+        {
+          "date": "2022-04-15",
+          "contests": 1,
+          "source": "mic-ninki-2022",
+          "quote": "令和4年中における任期満了団体（都道府県別）, 知事 任期満了月日 4.15: 京都"
+        },
+        {
+          "date": "2022-06-09",
+          "contests": 1,
+          "source": "mic-ninki-2022",
+          "quote": "令和4年中における任期満了団体（都道府県別）, 知事 任期満了月日 6.9: 新潟"
+        },
+        {
+          "date": "2022-07-19",
+          "contests": 1,
+          "source": "mic-ninki-2022",
+          "quote": "令和4年中における任期満了団体（都道府県別）, 知事 任期満了月日 7.19: 滋賀"
+        },
+        {
+          "date": "2022-08-31",
+          "contests": 1,
+          "source": "mic-ninki-2022",
+          "quote": "令和4年中における任期満了団体（都道府県別）, 知事 任期満了月日 8.31: 長野"
+        },
+        {
+          "date": "2022-09-04",
+          "contests": 1,
+          "source": "mic-ninki-2022",
+          "quote": "令和4年中における任期満了団体（都道府県別）, 知事 任期満了月日 9.4: 香川"
+        },
+        {
+          "date": "2022-09-29",
+          "contests": 1,
+          "source": "mic-ninki-2022",
+          "quote": "令和4年中における任期満了団体（都道府県別）, 知事 任期満了月日 9.29: 沖縄"
+        },
+        {
+          "date": "2022-11-11",
+          "contests": 1,
+          "source": "mic-ninki-2022",
+          "quote": "令和4年中における任期満了団体（都道府県別）, 知事 任期満了月日 11.11: 福島"
+        },
+        {
+          "date": "2022-11-30",
+          "contests": 1,
+          "source": "mic-ninki-2022",
+          "quote": "令和4年中における任期満了団体（都道府県別）, 知事 任期満了月日 11.30: 愛媛"
+        },
+        {
+          "date": "2022-12-16",
+          "contests": 1,
+          "source": "mic-ninki-2022",
+          "quote": "令和4年中における任期満了団体（都道府県別）, 知事 任期満了月日 12.16: 和歌山"
+        },
+        {
+          "date": "2023-01-10",
+          "contests": 1,
+          "source": "mic-ninki-2023",
+          "quote": "令和5年中における任期満了団体（都道府県別）, 知事 任期満了月日 1.10: 佐賀"
+        },
+        {
+          "date": "2023-01-20",
+          "contests": 1,
+          "source": "mic-ninki-2023",
+          "quote": "令和5年中における任期満了団体（都道府県別）, 知事 任期満了月日 1.20: 宮崎"
+        },
+        {
+          "date": "2023-02-14",
+          "contests": 1,
+          "source": "mic-ninki-2023",
+          "quote": "令和5年中における任期満了団体（都道府県別）, 知事 任期満了月日 2.14: 愛知"
+        },
+        {
+          "date": "2023-02-16",
+          "contests": 1,
+          "source": "mic-ninki-2023",
+          "quote": "令和5年中における任期満了団体（都道府県別）, 知事 任期満了月日 2.16: 山梨"
+        },
+        {
+          "date": "2023-04-06",
+          "contests": 1,
+          "source": "mic-ninki-2023",
+          "quote": "令和5年中における任期満了団体（都道府県別）, 知事 任期満了月日 4.6: 大阪"
+        },
+        {
+          "date": "2023-04-12",
+          "contests": 1,
+          "source": "mic-ninki-2023",
+          "quote": "令和5年中における任期満了団体（都道府県別）, 知事 任期満了月日 4.12: 鳥取"
+        },
+        {
+          "date": "2023-04-22",
+          "contests": 3,
+          "source": "mic-ninki-2023",
+          "quote": "令和5年中における任期満了団体（都道府県別）, 知事 任期満了月日 4.22: 北海道、神奈川、福井"
+        },
+        {
+          "date": "2023-04-27",
+          "contests": 1,
+          "source": "mic-ninki-2023",
+          "quote": "令和5年中における任期満了団体（都道府県別）, 知事 任期満了月日 4.27: 大分"
+        },
+        {
+          "date": "2023-04-29",
+          "contests": 1,
+          "source": "mic-ninki-2023",
+          "quote": "令和5年中における任期満了団体（都道府県別）, 知事 任期満了月日 4.29: 島根"
+        },
+        {
+          "date": "2023-05-02",
+          "contests": 1,
+          "source": "mic-ninki-2023",
+          "quote": "令和5年中における任期満了団体（都道府県別）, 知事 任期満了月日 5.2: 奈良"
+        },
+        {
+          "date": "2023-05-17",
+          "contests": 1,
+          "source": "mic-ninki-2023",
+          "quote": "令和5年中における任期満了団体（都道府県別）, 知事 任期満了月日 5.17: 徳島"
+        },
+        {
+          "date": "2023-06-28",
+          "contests": 1,
+          "source": "mic-ninki-2023",
+          "quote": "令和5年中における任期満了団体（都道府県別）, 知事 任期満了月日 6.28: 青森"
+        },
+        {
+          "date": "2023-07-27",
+          "contests": 1,
+          "source": "mic-ninki-2023",
+          "quote": "令和5年中における任期満了団体（都道府県別）, 知事 任期満了月日 7.27: 群馬"
+        },
+        {
+          "date": "2023-08-30",
+          "contests": 1,
+          "source": "mic-ninki-2023",
+          "quote": "令和5年中における任期満了団体（都道府県別）, 知事 任期満了月日 8.30: 埼玉"
+        },
+        {
+          "date": "2023-09-10",
+          "contests": 1,
+          "source": "mic-ninki-2023",
+          "quote": "令和5年中における任期満了団体（都道府県別）, 知事 任期満了月日 9.10: 岩手"
+        },
+        {
+          "date": "2023-12-06",
+          "contests": 1,
+          "source": "mic-ninki-2023",
+          "quote": "令和5年中における任期満了団体（都道府県別）, 知事 任期満了月日 12.6: 高知"
+        },
+        {
+          "date": "2024-04-15",
+          "contests": 1,
+          "source": "mic-ninki-2024",
+          "quote": "令和6年中における任期満了団体（都道府県別）, 知事 任期満了月日 4.15: 熊本"
+        },
+        {
+          "date": "2024-07-27",
+          "contests": 1,
+          "source": "mic-ninki-2024",
+          "quote": "令和6年中における任期満了団体（都道府県別）, 知事 任期満了月日 7.27: 鹿児島"
+        },
+        {
+          "date": "2024-07-30",
+          "contests": 1,
+          "source": "mic-ninki-2024",
+          "quote": "令和6年中における任期満了団体（都道府県別）, 知事 任期満了月日 7.3（7月30日: 東京都の任期は2016年7月31日起算の4年。数値セルでは7.30が7.3と表示される）: 東京"
+        },
+        {
+          "date": "2024-11-08",
+          "contests": 1,
+          "source": "mic-ninki-2024",
+          "quote": "令和6年中における任期満了団体（都道府県別）, 知事 任期満了月日 11.8: 富山"
+        },
+        {
+          "date": "2024-11-11",
+          "contests": 1,
+          "source": "mic-ninki-2024",
+          "quote": "令和6年中における任期満了団体（都道府県別）, 知事 任期満了月日 11.11: 岡山"
+        },
+        {
+          "date": "2024-12-08",
+          "contests": 1,
+          "source": "mic-ninki-2024",
+          "quote": "令和6年中における任期満了団体（都道府県別）, 知事 任期満了月日 12.8: 栃木"
+        },
+        {
+          "date": "2025-02-05",
+          "contests": 1,
           "source": "mic-ninki",
-          "quote": "令和８年中における任期満了団体数(令和７年１１月１日現在): 知事 11"
+          "quote": "令和7年中における任期満了団体（都道府県別）, 知事 任期満了月日 2.5: 岐阜県"
+        },
+        {
+          "date": "2025-02-13",
+          "contests": 1,
+          "source": "mic-ninki",
+          "quote": "令和7年中における任期満了団体（都道府県別）, 知事 任期満了月日 2.13: 山形県"
+        },
+        {
+          "date": "2025-04-04",
+          "contests": 1,
+          "source": "mic-ninki",
+          "quote": "令和7年中における任期満了団体（都道府県別）, 知事 任期満了月日 4.4: 千葉県"
+        },
+        {
+          "date": "2025-04-10",
+          "contests": 1,
+          "source": "mic-ninki",
+          "quote": "令和7年中における任期満了団体（都道府県別）, 知事 任期満了月日 4.10: 福岡県"
+        },
+        {
+          "date": "2025-04-19",
+          "contests": 1,
+          "source": "mic-ninki",
+          "quote": "令和7年中における任期満了団体（都道府県別）, 知事 任期満了月日 4.19: 秋田県"
+        },
+        {
+          "date": "2025-09-12",
+          "contests": 1,
+          "source": "mic-ninki",
+          "quote": "令和7年中における任期満了団体（都道府県別）, 知事 任期満了月日 9.12: 三重県"
+        },
+        {
+          "date": "2025-09-25",
+          "contests": 1,
+          "source": "mic-ninki",
+          "quote": "令和7年中における任期満了団体（都道府県別）, 知事 任期満了月日 9.25: 茨城県"
+        },
+        {
+          "date": "2025-11-20",
+          "contests": 1,
+          "source": "mic-ninki",
+          "quote": "令和7年中における任期満了団体（都道府県別）, 知事 任期満了月日 11.20: 宮城県"
+        },
+        {
+          "date": "2025-11-28",
+          "contests": 1,
+          "source": "mic-ninki",
+          "quote": "令和7年中における任期満了団体（都道府県別）, 知事 任期満了月日 11.28: 広島県"
+        },
+        {
+          "date": "2026-02-22",
+          "contests": 1,
+          "source": "mic-ninki-2026",
+          "quote": "令和8年中における任期満了団体（都道府県別）, 知事 任期満了月日 2.22: 山口県"
+        },
+        {
+          "date": "2026-03-01",
+          "contests": 1,
+          "source": "mic-ninki-2026",
+          "quote": "令和8年中における任期満了団体（都道府県別）, 知事 任期満了月日 3.1: 長崎県"
+        },
+        {
+          "date": "2026-03-26",
+          "contests": 1,
+          "source": "mic-ninki-2026",
+          "quote": "令和8年中における任期満了団体（都道府県別）, 知事 任期満了月日 3.26: 石川県"
+        },
+        {
+          "date": "2026-04-15",
+          "contests": 1,
+          "source": "mic-ninki-2026",
+          "quote": "令和8年中における任期満了団体（都道府県別）, 知事 任期満了月日 4.15: 京都府"
+        },
+        {
+          "date": "2026-06-09",
+          "contests": 1,
+          "source": "mic-ninki-2026",
+          "quote": "令和8年中における任期満了団体（都道府県別）, 知事 任期満了月日 6.9: 新潟県"
+        },
+        {
+          "date": "2026-07-19",
+          "contests": 1,
+          "source": "mic-ninki-2026",
+          "quote": "令和8年中における任期満了団体（都道府県別）, 知事 任期満了月日 7.19: 滋賀県"
+        },
+        {
+          "date": "2026-08-31",
+          "contests": 1,
+          "source": "mic-ninki-2026",
+          "quote": "令和8年中における任期満了団体（都道府県別）, 知事 任期満了月日 8.31: 長野県"
+        },
+        {
+          "date": "2026-09-04",
+          "contests": 1,
+          "source": "mic-ninki-2026",
+          "quote": "令和8年中における任期満了団体（都道府県別）, 知事 任期満了月日 9.4: 香川県"
+        },
+        {
+          "date": "2026-09-29",
+          "contests": 1,
+          "source": "mic-ninki-2026",
+          "quote": "令和8年中における任期満了団体（都道府県別）, 知事 任期満了月日 9.29: 沖縄県"
+        },
+        {
+          "date": "2026-11-11",
+          "contests": 1,
+          "source": "mic-ninki-2026",
+          "quote": "令和8年中における任期満了団体（都道府県別）, 知事 任期満了月日 11.11: 福島県"
+        },
+        {
+          "date": "2026-11-30",
+          "contests": 1,
+          "source": "mic-ninki-2026",
+          "quote": "令和8年中における任期満了団体（都道府県別）, 知事 任期満了月日 11.30: 愛媛県"
         }
       ],
       "cadence": [
