@@ -350,7 +350,10 @@ def _outranked(stage: Stage) -> sql.Composed:
                           case when c.pipeline = 'identity' then 2 when p.kind = 'official' then 1 else 0 end as tier
                    from public.name p join changeset c on c.id = p.changeset_id
                    where p.is_preferred and p.valid_from is null and p.valid_to is null
-                     and p.entity_id in (select entity_id from {staged})) p
+                     and p.entity_id in (select entity_id from {staged} union
+                                         select n.entity_id from public.name n join changeset k on k.id = n.changeset_id
+                                         and k.pipeline = {pipeline} where n.is_preferred and n.valid_from is null
+                                         and n.valid_to is null)) p
              window w as (partition by entity_id, lang, script order by tier desc, pipeline = {pipeline}, recorded_from, id)
            ) ranked
            where rank > 1 and (pipeline = {pipeline} or tier < top)"""
