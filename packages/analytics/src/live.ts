@@ -193,6 +193,8 @@ const MODEL = {
     grain: 2,
     drift: 0.04,
     base: 0.002,
+    baseGrace: 7,
+    baseLife: 6,
     window: 2,
     carry: 0.5,
     half: 1,
@@ -1510,7 +1512,12 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
   const left = isTail
     ? Math.max(
         planned,
-        (MODEL.late.carry * recent * closed + MODEL.late.base) * settles,
+        (MODEL.late.carry * recent * closed +
+          MODEL.late.base *
+            Math.exp(
+              -Math.max(0, days - MODEL.late.baseGrace) / MODEL.late.baseLife,
+            )) *
+          settles,
       )
     : isLate
       ? planned
