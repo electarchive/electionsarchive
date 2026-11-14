@@ -225,6 +225,8 @@ const MODEL = {
 
 const STREAM = "~";
 
+const POOLED: Record<number, number> = { 2: 3, 5: 1 };
+
 function split(race: LiveRace, at: string | null) {
   if (race.counts.every((count) => (count.channel ?? 0) === 0)) {
     return { race, sizes: new Map<string, number>() };
@@ -248,7 +250,7 @@ function split(race: LiveRace, at: string | null) {
       (bases.get(count.unitId)?.channels?.length ?? 0) > 0
     ) {
       const set = reported.get(count.unitId) ?? new Set<number>();
-      set.add(channel);
+      set.add(POOLED[channel] ?? channel);
       reported.set(count.unitId, set);
     }
   }
@@ -265,18 +267,21 @@ function split(race: LiveRace, at: string | null) {
       }
       continue;
     }
-    if (reported.has(count.unitId)) {
-      counts.push({
-        ...count,
-        unitId: `${count.unitId}${STREAM}${channel}`,
-        eevp: null,
-      });
-      continue;
-    }
-    const key = `${count.unitId}@${count.at}`;
+    const stream = reported.has(count.unitId)
+      ? (POOLED[channel] ?? channel)
+      : 0;
+    const unitId =
+      stream === 0 ? count.unitId : `${count.unitId}${STREAM}${stream}`;
+    const key = `${unitId}@${count.at}`;
     const held = summed.get(key);
     if (held == null) {
-      const copy = { ...count, votes: [...count.votes], channel: 0 };
+      const copy = {
+        ...count,
+        unitId,
+        votes: [...count.votes],
+        channel: stream,
+        ...(stream !== 0 && { eevp: null }),
+      };
       summed.set(key, copy);
       counts.push(copy);
     } else {
@@ -289,14 +294,29 @@ function split(race: LiveRace, at: string | null) {
   const sizes = new Map<string, number>();
   for (const row of race.baseline) {
     sizes.set(row.unitId, row.expected ?? row.turnout);
+    const listed = new Map<number, LiveChannel>();
+    for (const item of row.channels ?? []) {
+      const stream = POOLED[item.channel] ?? item.channel;
+      const held = listed.get(stream);
+      const share = (held?.share ?? 0) + item.share;
+      listed.set(stream, {
+        channel: stream,
+        share,
+        shift: item.shift.map((value, index) =>
+          held == null || share <= 0
+            ? value
+            : ((held.shift[index] ?? 0) * held.share + value * item.share) /
+              share,
+        ),
+      });
+    }
     const channels = reported.get(row.unitId);
     if (channels == null) {
-      baseline.push(row);
+      baseline.push(
+        row.channels == null ? row : { ...row, channels: [...listed.values()] },
+      );
       continue;
     }
-    const listed = new Map(
-      (row.channels ?? []).map((item) => [item.channel, item]),
-    );
     for (const channel of new Set([...listed.keys(), ...channels])) {
       const item = listed.get(channel);
       const share = item?.share ?? MODEL.channel.unlisted;
