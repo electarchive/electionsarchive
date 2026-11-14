@@ -1,0 +1,61 @@
+{
+  "polity": "US-CT",
+  "publisher": "Connecticut Secretary of the State",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "extend": true,
+  "unit_scheme": "town",
+  "title": "Register and Manual of the State of Connecticut 1951, vote for Representative in Congress, Fifth District, by town (general election 1950-11-07)",
+  "file": {
+    "url": "https://archive.org/download/registe51conn/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/registe51conn"
+  },
+  "contests": {
+    "house5": {
+      "year": 1950,
+      "chamber": "house",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "CT",
+      "district": 5
+    }
+  },
+  "pages": [
+    {
+      "page": 375,
+      "id": "375-0",
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.15,
+        1.0,
+        0.85
+      ],
+      "hint": "Read the table 'VOTE FOR REPRESENTATIVE IN CONGRESS, NOVEMBER 7, 1950, FIFTH DISTRICT': the towns of Litchfield County, then the towns of New Haven County, then the Totals row. County headings are not rows.",
+      "columns": [
+        {
+          "label": "Lynch Democrat",
+          "contest": "house5",
+          "candidate": "J. Gregory Lynch"
+        },
+        {
+          "label": "Patterson Republican",
+          "contest": "house5",
+          "candidate": "James T. Patterson"
+        },
+        {
+          "label": "Ring Socialist",
+          "contest": "house5",
+          "candidate": "Ring",
+          "party": "Socialist"
+        },
+        {
+          "label": "Staneslow Peoples",
+          "contest": "house5",
+          "candidate": "Staneslow",
+          "party": "Peoples"
+        }
+      ]
+    }
+  ]
+}
