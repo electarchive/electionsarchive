@@ -397,14 +397,20 @@ def census_spec(conn, cc: str) -> dict:
                 e["date"] = day.isoformat()
             slots[str(e.get("year") or e.get("date"))].append(e)
         elections = [merged(entries) for entries in slots.values()]
-        if not rows:
-            elections = counted(
-                cc,
-                iso,
-                {"per": per, "from": lo, "to": hi, "tier": tier, "cycle": bool((measure_ or {}).get("cycle"))},
-                cadence.get(class_id, []),
-                counts,
-            )
+        cycle = bool((measure_ or {}).get("cycle"))
+        if not rows or (cycle and by_year):
+            first = min((e["year"] for e in elections), default=None)
+            elections = [
+                e
+                for e in counted(
+                    cc,
+                    iso,
+                    {"per": per, "from": lo, "to": hi, "tier": tier, "cycle": cycle},
+                    cadence.get(class_id, []),
+                    counts,
+                )
+                if first is None or e["year"] < first
+            ] + elections
         levels.append(
             {
                 "class_id": class_id,
