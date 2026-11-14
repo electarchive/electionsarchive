@@ -1,4 +1,5 @@
 import struct
+import tempfile
 from datetime import date
 from pathlib import Path
 from typing import Any
@@ -10,6 +11,7 @@ from PIL import Image
 
 from ea import raw
 from ea.changeset import Changeset
+from ea.scan import rendered
 from ea.sources.licenses import UNLICENSED
 from ea.store import DATA, connect
 
@@ -66,6 +68,25 @@ PARTIES = {
     "pfarrer_greber": (None, "Pfarrer-Greber-Partei", "PGP"),
     "csr": (None, "Christlich-Soziale Reichspartei", "CSRP"),
     "kratofiel": (None, "Beamtengruppe Kratofiel", "Kratofiel"),
+    "thueringer_landbund": ("Q2430807", "Thüringer Landbund", "ThLB"),
+    "radikaler_mittelstand": ("de.party:PR:Radikaler Mittelstand", "Radikaler Mittelstand", "RM"),
+    "kleinrentner": (
+        "de.party:PR:Interessengemeinschaft der Kleinrentner u. Inflationsgeschädigten",
+        "Interessengemeinschaft der Kleinrentner und Inflationsgeschädigten",
+        "IKI",
+    ),
+    "erwerbslosenfront": (
+        None,
+        "Schicksalsgemeinschaft deutscher Erwerbslosen, Kleinhandel und Gewerbe (Erwerbslosenfront)",
+        "Erwerbslosenfront",
+    ),
+    "sapd": ("Q689018", "Sozialistische Arbeiterpartei Deutschlands", "SAPD"),
+    "minderheiten": (
+        "de.party:PR:Nationale Minderheiten in Deutschland",
+        "Nationale Minderheiten in Deutschland",
+        "NMD",
+    ),
+    "schleswigsche_heimat": (None, "Schleswigsche Heimat", "SH"),
 }
 BLOCS = {"kampffront"}
 JOINT = {
@@ -551,6 +572,100 @@ ELECTIONS: dict[date, dict[str, Any]] = {
             "only a few constituencies, and their votes there are counted under other parties."
         ),
     },
+    date(1932, 11, 6): {
+        "english": "November 1932 German federal election",
+        "german": "Reichstagswahl November 1932",
+        "pdf": (
+            "https://www.statistischebibliothek.de/mir/servlets/MCRFileNodeServlet/HHAusgabe_derivate_00000744/"
+            "1221-10-30.pdf"
+        ),
+        "publisher": "Statistisches Landesamt Hamburg",
+        "title": (
+            "Statistische Mitteilungen über den hamburgischen Staat Nr. 30: Die Reichstagswahl am 6. November 1932 "
+            "im Wahlkreis Nr. 34 (Hamburg)"
+        ),
+        "license": "CC BY-SA 4.0 (digitization by the Staats- und Universitätsbibliothek Hamburg)",
+        "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+        "attribution": "Staats- und Universitätsbibliothek Hamburg, https://resolver.sub.uni-hamburg.de/kitodo/PPN728604477",
+        "notes": (
+            "Appendix Endgültige Ergebnisse der Wahlen zum Reichstag am 6. November 1932 im Deutschen Reich, table 1 "
+            "(votes by Wahlkreis), printed pages 56 and 57, from the Statistische Bibliothek copy of the Hamburg "
+            "university library scan. Seats by party follow the Statistisches Jahrbuch für das Deutsche Reich 1933, "
+            "page 539."
+        ),
+        "seats": 584,
+        "ink": 180,
+        "pages": {
+            59: {
+                "top": 0.322,
+                "registered": (0.385, 0.446),
+                "cast": (0.457, 0.519),
+                "valid": (0.617, 0.680),
+                "nsdap": (0.686, 0.757),
+                "spd": (0.762, 0.826),
+                "kpd": (0.830, 0.894),
+                "zentrum": (0.900, 0.962),
+            },
+            60: {
+                "top": 0.318,
+                "dvp": (0.214, 0.262),
+                "dnvp": (0.025, 0.084),
+                "thueringer_landbund": (0.025, 0.084),
+                "radikaler_mittelstand": (0.092, 0.136),
+                "bvp": (0.150, 0.213),
+                "staatspartei": (0.274, 0.324),
+                "csvd": (0.335, 0.386),
+                "dhp": (0.394, 0.450),
+                "erwerbslosenfront": (0.394, 0.450),
+                "wirtschaftspartei": (0.454, 0.505),
+                "bauernpartei": (0.509, 0.561),
+                "wuerttemberg_landbund": (0.562, 0.614),
+                "landvolk": (0.617, 0.662),
+                "volksrecht": (0.663, 0.709),
+                "sapd": (0.712, 0.757),
+                "minderheiten": (0.768, 0.814),
+                "others": (0.815, 0.861),
+            },
+        },
+        "lists": {
+            2: {"bvp": "kleinrentner"},
+            13: {"minderheiten": "schleswigsche_heimat"},
+            19: {"bvp": "kleinrentner"},
+            27: {"zentrum": "zentrum_bvp"},
+        },
+        "won": {
+            "nsdap": 196,
+            "spd": 121,
+            "kpd": 100,
+            "zentrum": 70,
+            "bvp": 20,
+            "dnvp": 52,
+            "dvp": 11,
+            "staatspartei": 2,
+            "wirtschaftspartei": 1,
+            "csvd": 5,
+            "dhp": 1,
+            "bauernpartei": 3,
+            "wuerttemberg_landbund": 2,
+        },
+        "caveat": (
+            "The table counts each list where it stood. The national totals printed beneath it also move the votes cast "
+            "for minor lists, which are counted here under other parties, to the national lists they were joined to. Several columns hold two lists. In Wahlkreis 12 (Thüringen) the Thüringer Landbund (60,062) stood "
+            "beside the Deutschnationale Volkspartei and is printed in its column; the member elected on its list is "
+            "counted by the Statistisches Reichsamt with the Deutschnationale Volkspartei. The column of the Bayerische "
+            "Volkspartei holds the Interessengemeinschaft der Kleinrentner und Inflationsgeschädigten in Wahlkreise 2 "
+            "and 19. One column holds the Deutsch-Hannoversche Partei and the Erwerbslosenfront, both joined to "
+            "national list 9 of the Christlich-Sozialer Volksdienst. The minorities' column holds the Polish list and, in "
+            "Wahlkreis 13, the Schleswigsche Heimat. The joint list of the Zentrum and the Bayerische Volkspartei in "
+            "Wahlkreis 27 (Pfalz) is counted with the Zentrum. Several parties shared a national list, and the Hamburg "
+            "seat table counts seats by national list, so seats by party follow the Statistisches Jahrbuch für das "
+            "Deutsche Reich 1933. The seat table gives the Deutschnationale Volkspartei and the Deutsche Volkspartei 63 "
+            "(Jahrbuch: 52 and 11), the Zentrum 71 including the 2 won by the Pfalz joint list, the Bayerische "
+            "Volkspartei and the Wirtschaftspartei 20 (Jahrbuch: Zentrum 70, Bayerische Volkspartei 20, "
+            "Wirtschaftspartei 1), the Christlich-Sozialer Volksdienst and the Deutsch-Hannoversche Partei 6 (5 and 1), "
+            "and the Deutsche Bauernpartei and the Landvolk 3 (3 and none)."
+        ),
+    },
     date(1933, 3, 5): {
         "english": "March 1933 German federal election",
         "german": "Reichstagswahl März 1933",
@@ -626,25 +741,29 @@ NOTE = (
 
 def url(day: date, leaf: int) -> str:
     spec = ELECTIONS[day]
+    if "pdf" in spec:
+        return spec["pdf"]
     return ARCHIVE.format(item=spec.get("item", "fr-das-deutsc"), year=spec["year"], volume=spec["volume"], leaf=leaf)
 
 
 def title(day: date) -> str:
     spec = ELECTIONS[day]
-    return f"Statistisches Jahrbuch für das Deutsche Reich {spec.get('edition', spec['year'])}"
+    return spec.get("title", f"Statistisches Jahrbuch für das Deutsche Reich {spec.get('edition', spec.get('year'))}")
 
 
 def fetch() -> None:
     for day, spec in ELECTIONS.items():
         for leaf in spec["pages"]:
-            raw.fetch(SOURCE, url(day, leaf), suffix=".jpg")
+            raw.fetch(SOURCE, url(day, leaf), suffix=".pdf" if "pdf" in spec else ".jpg")
 
 
-def bands(gray: np.ndarray, top: float, columns: dict[str, tuple[float, float]]) -> list[tuple[float, float]]:
+def bands(
+    gray: np.ndarray, top: float, columns: dict[str, tuple[float, float]], ink: int = 120
+) -> list[tuple[float, float]]:
     height, width = gray.shape
     left, right = next(iter(columns.values()))
     margin = (right - left) / 5
-    strip = gray[:, int((left + margin) * width) : int((right - margin) * width)] < 120
+    strip = gray[:, int((left + margin) * width) : int((right - margin) * width)] < ink
     inked = strip.sum(axis=1) > 3
     lines: list[tuple[int, int]] = []
     for y in range(int(top * height), int(0.8 * height)):
@@ -667,10 +786,13 @@ def parse() -> None:
         for leaf, layout in spec["pages"].items():
             top, columns = layout["top"], {k: v for k, v in layout.items() if k != "top"}
             artifact = raw.cached(SOURCE, url(day, leaf))
-            image = PAGES / f"{artifact.sha256}-1.png"
+            page_number = leaf if "pdf" in spec else 1
+            image = PAGES / f"{artifact.sha256}-{page_number}.png"
             if not image.exists():
-                with Image.open(artifact.path) as scan:
-                    scan.convert("L").resize((WIDTH, round(scan.height * WIDTH / scan.width))).save(image)
+                with tempfile.TemporaryDirectory() as folder:
+                    scan_path = rendered(artifact.path, leaf, Path(folder)) if "pdf" in spec else artifact.path
+                    with Image.open(scan_path) as scan:
+                        scan.convert("L").resize((WIDTH, round(scan.height * WIDTH / scan.width))).save(image)
             width, height = struct.unpack(">II", image.read_bytes()[16:24])
             with Image.open(image) as page:
                 gray = np.asarray(page.convert("L"))
@@ -681,7 +803,7 @@ def parse() -> None:
                     "image": f"pages/{SOURCE}/{image.name}",
                     "width": width,
                     "height": height,
-                    "rows": [list(row) for row in bands(gray, top, columns)],
+                    "rows": [list(row) for row in bands(gray, top, columns, spec.get("ink", 120))],
                 }
             )
     folder = raw.parsed(SOURCE)
@@ -746,33 +868,38 @@ def emit() -> Path:
         values: list[tuple[str, str, str | None, int, int, int]] = []
         locators: list[tuple[str, str, str | None, int, str, float, float, float, float]] = []
         for day, spec in ELECTIONS.items():
-            source = cs.source(PUBLISHER, title(day))
+            publisher = spec.get("publisher", PUBLISHER)
+            source = cs.source(publisher, title(day))
             first = next(iter(spec["pages"]))
             if source in cs.minted:
                 cs.add(
                     "source",
                     id=source,
                     kind="official_body",
-                    publisher=PUBLISHER,
+                    publisher=publisher,
                     title=title(day),
                     url=url(day, first),
-                    license=UNLICENSED,
-                    notes=(
+                    license=spec.get("license", UNLICENSED),
+                    license_url=spec.get("license_url"),
+                    attribution=spec.get("attribution"),
+                    notes=spec.get(
+                        "notes",
                         f"Chapter Wahlen und Abstimmungen, table Gesamtergebnis der Wahlen zum Reichstag, printed "
-                        f"pages {spec['printed']}, from the Internet Archive scan of volume {spec['volume']}."
+                        f"pages {spec.get('printed')}, from the Internet Archive scan of volume {spec.get('volume')}.",
                     ),
                 )
             page_ids: dict[int, UUID] = {}
             bands_of: dict[int, list[list[float]]] = {}
             for page in pages.filter(pl.col("date") == day).iter_rows(named=True):
                 artifact = cs.artifact(raw.cached(SOURCE, url(day, page["leaf"])), source)
-                page_ids[page["leaf"]] = cs.page(artifact, 1)
+                page_number = page["leaf"] if "pdf" in spec else 1
+                page_ids[page["leaf"]] = cs.page(artifact, page_number)
                 bands_of[page["leaf"]] = page["rows"]
                 cs.add(
                     "source_page",
                     id=page_ids[page["leaf"]],
                     artifact_id=artifact,
-                    page_number=1,
+                    page_number=page_number,
                     image_key=page["image"],
                     width=page["width"],
                     height=page["height"],
