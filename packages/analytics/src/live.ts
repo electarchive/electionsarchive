@@ -216,7 +216,14 @@ const MODEL = {
     trickle: 0.01,
   },
   reported: { common: 0.9, own: 0.3, capped: 0.99 },
-  channel: { turnout: 0.35, prior: 0.08, sigma: 1.5, unlisted: 0.02 },
+  channel: {
+    turnout: 0.35,
+    lean: 0.3,
+    blend: 0.3,
+    prior: 0.08,
+    sigma: 1.5,
+    unlisted: 0.02,
+  },
   floor: { slack: 0.98, met: 0.99, closed: 0 },
   remaining: { spread: 0.2, stale: 3 },
   outlier: 0.01,
@@ -932,36 +939,85 @@ function truncated(mu: number, sigma: number, random: () => number) {
   }
 }
 
-function turnout(found: Array<Unit>, center: number, spread: number) {
+function turnout(
+  found: Array<Unit>,
+  center: number,
+  spread: number,
+  lean = 0,
+  share = 0,
+) {
   const step = (8 * spread) / (TAUS - 1);
   const taus = Array.from(
     { length: TAUS },
     (_, index) => center - 4 * spread + index * step,
   );
-  const reported = found.filter((unit) => unit.hasBaseline && unit.total > 0);
-  const logs: Array<number> = [];
-  for (const tau of taus) {
-    for (const scale of SCALES) {
-      for (const pi of PIS) {
-        let log = (-0.5 * (tau - center) ** 2) / (spread * spread);
-        for (const unit of reported) {
-          const { done, open } = components(unit, tau, pi, scale);
-          const top = Math.max(done, open);
-          const kept =
-            Math.log(1 - MODEL.outlier) +
-            top +
-            Math.log(Math.exp(done - top) + Math.exp(open - top));
-          const raw = Math.log(unit.total / unit.expected);
-          const stray =
-            Math.log(MODEL.outlier) -
-            (raw * raw) / 2 -
-            Math.log(Math.sqrt(2 * Math.PI));
-          const high = Math.max(kept, stray);
-          log +=
-            high + Math.log(Math.exp(kept - high) + Math.exp(stray - high));
+  const cellOf = (cell: number) => ({
+    tau: taus[Math.floor(cell / (PIS.length * SCALES.length))]!,
+    scale: SCALES[Math.floor(cell / PIS.length) % SCALES.length]!,
+    pi: PIS[cell % PIS.length]!,
+  });
+  const based = found.filter((unit) => unit.hasBaseline);
+  const mass = sum(based.map((unit) => unit.expected));
+  const mid =
+    mass > 0 ? sum(based.map((unit) => unit.expected * unit.prior)) / mass : 0;
+  const tilted = (unit: Unit, slope: number) =>
+    slope === 0
+      ? unit
+      : {
+          ...unit,
+          expected: unit.expected * Math.exp(slope * (unit.prior - mid)),
+        };
+  const reported = based.filter((unit) => unit.total > 0);
+  const score = (slope: number) => {
+    const units = reported.map((unit) => tilted(unit, slope));
+    const logs: Array<number> = [];
+    for (const tau of taus) {
+      for (const scale of SCALES) {
+        for (const pi of PIS) {
+          let log = (-0.5 * (tau - center) ** 2) / (spread * spread);
+          for (const unit of units) {
+            const { done, open } = components(unit, tau, pi, scale);
+            const top = Math.max(done, open);
+            const kept =
+              Math.log(1 - MODEL.outlier) +
+              top +
+              Math.log(Math.exp(done - top) + Math.exp(open - top));
+            const raw = Math.log(unit.total / unit.expected);
+            const stray =
+              Math.log(MODEL.outlier) -
+              (raw * raw) / 2 -
+              Math.log(Math.sqrt(2 * Math.PI));
+            const high = Math.max(kept, stray);
+            log +=
+              high + Math.log(Math.exp(kept - high) + Math.exp(stray - high));
+          }
+          logs.push(log);
         }
-        logs.push(log);
       }
+    }
+    return logs;
+  };
+  let slope = 0;
+  let logs = score(slope);
+  const gate = Math.max(0, 1 - share) ** 2;
+  if (lean > 0 && gate > 0 && reported.length > 2) {
+    const { tau, scale, pi } = cellOf(logs.indexOf(Math.max(...logs)));
+    const rows = reported.map((unit) => {
+      const { done, open } = components(unit, tau, pi, scale);
+      return {
+        x: unit.prior - mid,
+        y: Math.log(unit.total / unit.expected),
+        w: 1 / (1 + Math.exp(open - done)) / (unit.sigma * scale) ** 2,
+      };
+    });
+    const weights = sum(rows.map((row) => row.w));
+    if (weights > 0) {
+      const x = sum(rows.map((row) => row.w * row.x)) / weights;
+      const y = sum(rows.map((row) => row.w * row.y)) / weights;
+      slope =
+        (gate * sum(rows.map((row) => row.w * (row.x - x) * (row.y - y)))) /
+        (sum(rows.map((row) => row.w * (row.x - x) ** 2)) + lean ** -2);
+      logs = score(slope);
     }
   }
   const top = Math.max(...logs);
@@ -974,6 +1030,7 @@ function turnout(found: Array<Unit>, center: number, spread: number) {
     cumulative.push(running);
   }
   return {
+    peak: cellOf(logs.indexOf(top)).tau,
     draw(random: () => number) {
       const u = random();
       let cell = cumulative.findIndex((value) => value >= u);
@@ -992,6 +1049,7 @@ function turnout(found: Array<Unit>, center: number, spread: number) {
       surge: number,
       random: () => number,
     ) {
+      unit = tilted(unit, slope);
       const scale = SCALES[Math.floor(cell / PIS.length) % SCALES.length]!;
       if (unit.total <= 0) {
         return Math.max(
@@ -1624,6 +1682,13 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
   const model = isExpected
     ? turnout(fitted, 0, MODEL.turnout)
     : turnout(fitted, MODEL.same.center, MODEL.same.spread);
+  const fittedBase = fitted.filter((unit) => unit.hasBaseline);
+  const progress =
+    sum(fittedBase.map((unit) => unit.total)) /
+    Math.max(
+      1,
+      sum(fittedBase.map((unit) => unit.expected)) * Math.exp(model.peak),
+    );
   const models = new Map(
     [...new Set(found.map((unit) => unit.channel))]
       .filter((channel) => channel !== 0)
@@ -1635,6 +1700,8 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
             members,
             isExpected ? 0 : MODEL.same.center,
             MODEL.channel.turnout,
+            MODEL.channel.lean,
+            progress,
           ),
         ] as const;
       }),
@@ -1900,7 +1967,7 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
     for (const [county, indexes] of streamsOf) {
       const final = finals[wholeOf.get(county)!]!;
       const members = indexes.map((index) => found[index]!);
-      const open = Math.max(0, final - sum(members.map((unit) => unit.total)));
+      const left = Math.max(0, final - sum(members.map((unit) => unit.total)));
       const predicted = sum(indexes.map((index) => totals[index]!));
       const wants = indexes.map((index) =>
         Math.max(0, totals[index]! - found[index]!.total),
@@ -1915,6 +1982,10 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
       );
       const wanted = sum(wants);
       const shared = sum(shares);
+      const open =
+        isLate || reports.has(county) || left <= 0 || wanted <= 0
+          ? left
+          : left ** (1 - MODEL.channel.blend) * wanted ** MODEL.channel.blend;
       const expected = sum(members.map((unit) => unit.expected));
       for (const [slot, index] of indexes.entries()) {
         const even = found[index]!.expected / Math.max(expected, 1);
