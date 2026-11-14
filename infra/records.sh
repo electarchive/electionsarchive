@@ -4,6 +4,9 @@ stale=$(psql electionsarchive -tAc "select count(*) from changeset where status 
 if [ "$stale" != 0 ] || [ "$(psql electionsarchive -tAc 'select not exists (select 1 from contest_cover)')" = t ]; then
   ../data/logs/gate.sh uv run ea covers || echo "covers failed"
 fi
+if [ "$(psql electionsarchive -tAc 'select exists (select 1 from election_crown_mark)')" = t ]; then
+  ../data/logs/gate.sh uv run ea crowns || echo "crowns failed"
+fi
 late=$(psql electionsarchive -tAc "select count(*) from changeset where status = 'published' and published_at > (select coalesce(min(built_at), '-infinity') from polity_record)")
 [ "$late" = 0 ] && { echo "polity records are newer than every publish"; exit 0; }
 ../data/logs/gate.sh uv run ea records || exit $?

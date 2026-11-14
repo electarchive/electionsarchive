@@ -115,6 +115,11 @@ def main() -> None:
     commands.add_parser("mosaics", help="rebuild the precomputed national map mosaics the app serves")
     commands.add_parser("records", help="rebuild the precomputed election records of the largest polities")
     commands.add_parser("covers", help="fill the precomputed contest covers that contest pages read")
+    crowning = commands.add_parser(
+        "crowns", help="refresh the precomputed winner rows of the children of elections with 40 or more children"
+    )
+    crowning.add_argument("target", nargs="?", help="rebuild every child of one election, or of a polity's elections")
+    crowning.add_argument("--all", action="store_true", help="rebuild every child of every such election")
     rolling = commands.add_parser("rollup", help="recompute the area rollups of result sets")
     rolling.add_argument("sets", nargs="*", type=int, help="result_set k values")
     rolling.add_argument("--affected", action="store_true", help="add every set with no rollup at its district")
@@ -373,6 +378,16 @@ def main() -> None:
         case "records":
             subprocess.run(
                 ["node", "scripts/polity-records.js"],
+                cwd=Path(__file__).resolve().parents[2] / "apps" / "web",
+                check=True,
+            )
+        case "crowns":
+            subprocess.run(
+                [
+                    "node",
+                    "scripts/election-crowns.js",
+                    *(["--all"] if args.all else [args.target] if args.target else []),
+                ],
                 cwd=Path(__file__).resolve().parents[2] / "apps" / "web",
                 check=True,
             )
