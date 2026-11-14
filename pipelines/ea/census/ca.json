@@ -7694,7 +7694,7 @@
           "term_years": 3,
           "day_rule": "oct_third_monday",
           "called": false,
-          "locator": "Local Authorities Elections Act, RSNWT 1988, c. L-10, s. 10(1)(a), consolidated text on gnwt.ca (PDF issued 21 September 2026): the general election day for a city, town, village, or municipal taxing authority is the third Monday in October. Section 10(1)(a) fixes the day and not the three-year period; the period and phase (2021-10-18, 2024-10-21) come from Municipal and Community Affairs' election dates (nt-dates)"
+          "locator": "Local Authorities Elections Act, RSNWT 1988, c. L-10, s. 10(1)(a), consolidated text on gnwt.ca (PDF issued 21 September 2026): the general election day for a city, town, village, or municipal taxing authority is the third Monday in October. The term is Cities, Towns and Villages Act, SNWT 2003, c. 22, s. 17(1), consolidated text on gnwt.ca: 'Subject to this Act, the mayor and councillors hold office for three years, unless council, (a) by bylaw, decreases the term of office to two years; or (b) by a bylaw that receives the approval of the voters in accordance with this Act, increases the term to four years.' Three years is the default, not a floor: a council can bylaw two or four years (Yellowknife went to four after its 2018 referendum), and s. 18 lets council stagger councillor terms. The phase (2021-10-18, 2024-10-21) comes from Municipal and Community Affairs' election dates (nt-dates)"
         }
       ],
       "est_votes": 15000,
