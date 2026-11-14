@@ -94,6 +94,37 @@ COUNCILS: dict[str, dict] = {
         "reader": "notices",
     },
 }
+COUNCILS["E06000030"] = {
+    "day": date(2026, 5, 7),
+    "publisher": "Swindon Borough Council",
+    "title": "Parish election results 2026",
+    "url": "https://www.swindon.gov.uk/info/20073/elections_and_voting/769/election_results/3",
+    "pages": ["https://www.swindon.gov.uk/info/20073/elections_and_voting/769/election_results/3"],
+    "reader": "swindon",
+}
+COUNCILS["E07000220"] = {
+    "day": date(2026, 5, 7),
+    "publisher": "Rugby Borough Council",
+    "title": "2026 elections - parish councils",
+    "url": "https://rugby.gov.uk/w/2026-elections-parish-councils",
+    "pages": ["https://rugby.gov.uk/w/2026-elections-parish-councils"],
+    "files": [
+        "https://www.rugby.gov.uk/documents/20124/63178158/Notice+of+uncontested+election+-+Easenhall.pdf/18782199-459c-7524-31df-171a6bd35d3e?t=1775749323133",
+        "https://www.rugby.gov.uk/documents/20124/63178158/Notice+of+uncontested+election+-+Shilton+%26+Barnacle.pdf/71863cda-8bb5-15b9-109e-c011889bbad4?t=1775749336972",
+        "https://www.rugby.gov.uk/documents/20124/63178158/Notice+of+uncontested+election+-+Wolston.pdf/990b1c59-a4ea-f6f2-7699-c53642e77a47?t=1775749346984",
+        "https://www.rugby.gov.uk/documents/20124/63178158/Notice+of+uncontested+election+-+Wolvey.pdf/ec0ffaa0-9947-758b-6e42-e35b34f77995?t=1775749363889",
+    ],
+    "columns": (290, 290),
+    "reader": "notices+rugby",
+}
+COUNCILS["E07000181"] = {
+    "day": date(2026, 5, 7),
+    "publisher": "West Oxfordshire District Council",
+    "title": "Notice of uncontested election, parish and town councils, 7 May 2026",
+    "url": "https://www.westoxon.gov.uk/media/kykluq1i/2026-notice-of-uncontested-election-parish.pdf",
+    "files": ["https://www.westoxon.gov.uk/media/kykluq1i/2026-notice-of-uncontested-election-parish.pdf"],
+    "reader": "notices",
+}
 BROWSER = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36"
 PARTIES: dict[str, str | None] = {
     "": None,
@@ -114,6 +145,7 @@ PARTIES: dict[str, str | None] = {
 ALIASES = {
     ("E07000011", "Kimbolton & Stonely"): "Kimbolton",
     ("E07000011", "Leighton Bromswold"): "Leighton",
+    ("E07000181", "Asthal"): "Asthall",
 }
 GROUPED = {("E07000011", "Great and Little Gidding")}
 CONTEXT = (
@@ -129,7 +161,7 @@ UNSTATED = (
 
 def fetch() -> None:
     for council in COUNCILS.values():
-        for url in council.get("files", []):
+        for url in council.get("files", []) + council.get("pages", []):
             try:
                 raw.cached(SOURCE, url)
                 continue
@@ -137,15 +169,16 @@ def fetch() -> None:
                 pass
             response = httpx.get(url, headers={"User-Agent": BROWSER}, timeout=120, follow_redirects=True)
             response.raise_for_status()
-            if not response.content.startswith(b"%PDF"):
-                raise ValueError(f"{url} is not a PDF")
+            pdf = url in council.get("files", [])
+            if pdf != response.content.startswith(b"%PDF"):
+                raise ValueError(f"{url} is not the expected {'PDF' if pdf else 'page'}")
             raw.store(
                 SOURCE,
                 url,
                 response.content,
-                suffix=".pdf",
+                suffix=".pdf" if pdf else ".html",
                 retrieved_at=datetime.now(UTC),
-                media_type="application/pdf",
+                media_type="application/pdf" if pdf else "text/html",
             )
         if "inbox" not in council:
             continue
@@ -266,7 +299,10 @@ def surname_first(printed: str) -> str:
 
 
 def area_of(page: str) -> tuple[str, str, str | None] | None:
-    heading = re.search(r"Election of (?:a )?(Parish|Town) Councillors? for\s*\n\s*(.+?)\s*\n\s*on\b", page)
+    heading = re.search(
+        r"Election of (?:a )?(Parish|Town) Councillors? for(?: the)?\s*\n\s*(.+?)(?:\s*\n\s*|\s+)on(?=\s*\n|\s+(?:\d|Thursday))",
+        page,
+    )
     if heading is None:
         inline = re.search(
             r"Election of (Parish) Councillors for\s+(.+?)\s+Parish\s+Council\s+on Thursday", page, re.DOTALL
@@ -275,6 +311,10 @@ def area_of(page: str) -> tuple[str, str, str | None] | None:
             return inline.group(1), " ".join(inline.group(2).split()), None
         return None
     area = " ".join(heading.group(2).split())
+    area = re.sub(r"^(?:Parish|Town) of ", "", area)
+    area = re.sub(r"(?<=[A-Z]) (?:Parish|Town)$", "", area)
+    if area.isupper():
+        area = area.title()
     ward = re.fullmatch(r"(.+?) \((.+)\)", area)
     return heading.group(1), *((ward.group(1), ward.group(2)) if ward else (area, None))
 
@@ -322,13 +362,16 @@ def notices(lad: str, council: dict) -> list[dict]:
                 )
                 continue
             if heading is None:
+                if not reads and "UNCONTESTED ELECTIONS" in page:
+                    continue
                 if not reads or reads[-1]["url"] != url or not reads[-1]["uncontested"]:
                     raise ValueError(f"{url} page {number}: no heading")
                 read = reads[-1]
                 header = 0.0
             else:
                 style, parish, ward = heading
-                header = max(y for x, y, word in words if word == "Candidate" and x < 200 and y < 300)
+                header = max(y for x, y, word in words if word == "Candidate" and x < 260 and y < 300)
+                name_limit, description_x = council.get("columns", (215, 375))
                 read: dict = {
                     "lad": lad,
                     "url": url,
@@ -348,13 +391,18 @@ def notices(lad: str, council: dict) -> list[dict]:
                 reads.append(read)
             candidates: list[dict] = read["candidates"]
             if read["uncontested"]:
-                bottom = min((y for x, y, word in words if word in ("Dated", "Printed")), default=9999.0)
+                bottom = min((y for x, y, word in words if word.startswith(("Dated", "Printed"))), default=9999.0)
                 for line in rows_of(words, header + 6, bottom):
-                    name = joined(line, 0, 215)
-                    description = joined(line, 375, 999)
-                    if name and name == name.upper() and re.search(r"[A-Z]", name):
+                    name = joined(line, 0, name_limit)
+                    description = joined(line, description_x, 999)
+                    if re.match(r"[A-Z][A-Z'’ -]*, \S", name):
+                        surname, forenames = name.split(",", 1)
+                        candidates.append({"surname": surname, "forenames": forenames.strip(), "description": ""})
+                    elif name and name == name.upper() and re.search(r"[A-Z]", name):
                         candidates.append({"surname": name, "forenames": "", "description": ""})
                     elif name:
+                        if not candidates:
+                            raise ValueError(f"{url} page {number}: no surname before {name!r}")
                         candidates[-1]["forenames"] = f"{candidates[-1]['forenames']} {name}".strip()
                     if description:
                         candidates[-1]["description"] = f"{candidates[-1]['description']} {description}".strip()
@@ -414,7 +462,118 @@ def notices(lad: str, council: dict) -> list[dict]:
     return reads
 
 
-READERS = {"moderngov": moderngov, "notices": notices}
+def count(value: str) -> int:
+    return int(value.replace(",", ""))
+
+
+def swindon(lad: str, council: dict) -> list[dict]:
+    url = council["pages"][0]
+    page = Path(raw.cached(SOURCE, url).path).read_text(encoding="utf-8")
+    reads = []
+    for heading, body in re.findall(r"<h2 id=\"[^\"]+\">(.*?)</h2>(.*?)<hr />", page + "<hr />", re.DOTALL):
+        if "<table" not in body:
+            continue
+        area = text(heading)
+        parish, _, ward = area.partition(" Parish \u2013 ")
+        candidates = []
+        for row in re.findall(r"<tr>\s*<td>(.*?)</tr>", body, re.DOTALL):
+            printed, description, votes = (
+                text(cell) for cell in re.findall(r"(.*?)</td>\s*(?:<td>|$)", row, re.DOTALL)
+            )
+            surname = re.match(r"((?:[A-Z][A-Z'\u2019-]*\s+)*[A-Z][A-Z'\u2019-]*)\s+(.+)", printed)
+            if surname is None:
+                raise ValueError(f"{url}: no surname in {printed}")
+            figure = re.fullmatch(r"([\d,]+)( Elected)?", votes)
+            if figure is None:
+                raise ValueError(f"{url}: no votes in {votes}")
+            candidates.append(
+                {
+                    "printed": printed,
+                    "name": f"{surname.group(2)} {display(surname.group(1))}",
+                    "description": description,
+                    "votes": count(figure.group(1)),
+                    "elected": figure.group(2) is not None,
+                }
+            )
+        figures = {
+            label: count(value)
+            for label, value in re.findall(
+                r"<li>(Number of ballot papers rejected|Ballot papers issued|Electorate): ([\d,]+)</li>", body
+            )
+        }
+        reads.append(
+            {
+                "lad": lad,
+                "url": url,
+                "page": None,
+                "style": None,
+                "parish": parish,
+                "ward": ward.removesuffix(" ward") or None,
+                "places": sum(1 for candidate in candidates if candidate["elected"]),
+                "electorate": figures["Electorate"],
+                "ballots": figures["Ballot papers issued"],
+                "rejected": figures["Number of ballot papers rejected"],
+                "total": None,
+                "remark": None,
+                "candidates": candidates,
+            }
+        )
+    return reads
+
+
+def rugby(lad: str, council: dict) -> list[dict]:
+    url = council["pages"][0]
+    page = Path(raw.cached(SOURCE, url).path).read_text(encoding="utf-8")
+    reads = []
+    for heading, body in re.findall(
+        r'<h2 class="section_title">(.*?) Parish Council</h2>\s*<div class="section_content">(.*?)</article>',
+        page,
+        re.DOTALL,
+    ):
+        if "<table" not in body:
+            continue
+        candidates = []
+        for row in re.findall(r"<tr>\s*<td>(.*?)</tr>", body, re.DOTALL):
+            printed, description, votes = (
+                text(cell) for cell in re.findall(r"(.*?)</td>\s*(?:<td>|$)", row, re.DOTALL)
+            )
+            figure = re.fullmatch(r"([\d,]+)( elected)?", votes)
+            if figure is None:
+                raise ValueError(f"{url}: no votes in {votes}")
+            candidates.append(
+                {
+                    "printed": printed,
+                    "name": surname_first(printed),
+                    "description": description,
+                    "votes": count(figure.group(1)),
+                    "elected": figure.group(2) is not None,
+                }
+            )
+        figures = {
+            label: count(value)
+            for label, value in re.findall(r"(Vacant seats|Electorate|Ballot papers issued): ([\d,]+)", text(body))
+        }
+        reads.append(
+            {
+                "lad": lad,
+                "url": url,
+                "page": None,
+                "style": "Parish",
+                "parish": text(heading),
+                "ward": None,
+                "places": figures["Vacant seats"],
+                "electorate": figures["Electorate"],
+                "ballots": figures["Ballot papers issued"],
+                "rejected": None,
+                "total": None,
+                "remark": None,
+                "candidates": candidates,
+            }
+        )
+    return reads
+
+
+READERS = {"moderngov": moderngov, "notices": notices, "swindon": swindon, "rugby": rugby}
 
 
 def parse() -> None:
@@ -435,7 +594,7 @@ def parse() -> None:
     rows = []
     misses: list[str] = []
     for lad, council in COUNCILS.items():
-        for read in READERS[council["reader"]](lad, council):
+        for read in (read for reader in council["reader"].split("+") for read in READERS[reader](lad, council)):
             if (lad, read["parish"]) in GROUPED:
                 continue
             found = known.get((lad, fold(ALIASES.get((lad, read["parish"]), read["parish"]))), set())
