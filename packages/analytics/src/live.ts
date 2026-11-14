@@ -200,6 +200,7 @@ const MODEL = {
     baseGrace: 7,
     baseLife: 6,
     cure: { floor: 0.35, life: 0.25 },
+    wane: { after: 4, life: 2 },
     minor: 0.1,
     window: 1.5,
     carry: 1.1,
@@ -2201,6 +2202,13 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
         spills[index] = 0;
         if (isLate && unit.paced != null && unit.total > 0) {
           const free = finals[index];
+          const waning =
+            isTail || tail <= MODEL.tail.share
+              ? 1
+              : Math.exp(
+                  -Math.max(0, days - MODEL.late.wane.after) /
+                    MODEL.late.wane.life,
+                );
           const growth = unit.rate ?? 0;
           const steady = Math.min(growth, priorPace(unit));
           const capped = Math.min(
@@ -2210,6 +2218,7 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
               unit.floor,
               unit.total +
                 MODEL.late.reach *
+                  waning *
                   closed *
                   fade *
                   (steady + (1 - drained) * sustained * (growth - steady)),
@@ -2220,6 +2229,7 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
           spills[index] =
             Math.max(0, free - capped) *
             spill *
+            waning *
             closed *
             settles *
             Math.min(1, lasting / (MODEL.late.hush * tail)) *
