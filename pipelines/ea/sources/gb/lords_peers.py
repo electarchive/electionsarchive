@@ -1,4 +1,5 @@
 import base64
+import csv
 import io
 import json
 import re
@@ -966,6 +967,66 @@ MISTITLED = (
     "The notice is headed Conservative hereditary peers' by-election, but every member of the House was eligible "
     "to vote, so it was a whole-House by-election."
 )
+BLOCK = (
+    "The block vote used for the elections of October and November 1999 under Standing Order 9. Each voter could "
+    "vote for up to as many candidates as there were seats, ranking them in order of preference. The candidates "
+    "with the most votes were elected, and the preferences decided ties."
+)
+WINNERS_1999 = (
+    "The Clerk of the Parliaments announced only the successful candidates and their votes to the House. The paper "
+    "giving every candidate's votes was laid in the Printed Paper Office and the Library and has not been found "
+    "online, so the unsuccessful candidates are not stored and the votes cover the elected only."
+)
+TIE_1999 = " The Clerk added that the tie between Lord Strabolgi and Lord Elton was resolved by voters' preferences, which put Lord Strabolgi ahead."
+HANSARD = "https://api.parliament.uk/historic-hansard/lords"
+ELECTIONS_1999: dict[str, tuple[str, str, int, int, str, str, str]] = {
+    "house": (
+        "1999-10-27",
+        "1999-10-28",
+        15,
+        631,
+        f"{HANSARD}/1999/oct/29/hereditary-peers-elections",
+        "15 office-holder",
+        TIE_1999,
+    ),
+    "labour": (
+        "1999-11-03",
+        "1999-11-04",
+        2,
+        17,
+        f"{HANSARD}/1999/nov/05/hereditary-peers-elections",
+        "75 party and group",
+        "",
+    ),
+    "liberal_democrat": (
+        "1999-11-03",
+        "1999-11-04",
+        3,
+        20,
+        f"{HANSARD}/1999/nov/05/hereditary-peers-elections",
+        "75 party and group",
+        "",
+    ),
+    "crossbench": (
+        "1999-11-03",
+        "1999-11-04",
+        28,
+        105,
+        f"{HANSARD}/1999/nov/05/hereditary-peers-elections",
+        "75 party and group",
+        "",
+    ),
+    "conservative": (
+        "1999-11-03",
+        "1999-11-04",
+        42,
+        204,
+        f"{HANSARD}/1999/nov/05/hereditary-peers-elections",
+        "75 party and group",
+        "",
+    ),
+}
+NUMBERS_1999 = {631: "Six hundred and thirty-one"}
 CAVEATS = {("2017-03-21", "house"): SHORT, ("2023-09-19", "crossbench"): BLANK}
 
 
@@ -989,7 +1050,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="House of Lords hereditary peers' by-elections 2004-2023, from the Clerk of the Parliaments' result notices",
+            summary="House of Lords hereditary peers' elections of 1999 and by-elections 2004-2023, from the Clerk of the Parliaments",
             polity="GB",
         )
 
@@ -1011,6 +1072,12 @@ def emit() -> Path:
         for code, label, note, rules in (
             ("av", "Alternative vote (House of Lords by-elections)", AV, {"formula": "irv"}),
             ("stv", "Single transferable vote (House of Lords by-elections)", STV, {"formula": "stv"}),
+            (
+                "1999",
+                "Block vote with ranked tie-breaks (House of Lords elections of 1999)",
+                BLOCK,
+                {"formula": "block"},
+            ),
         ):
             systems[code] = cs.key("gb.electoral_system", f"lords-{code}")
             cs.add("electoral_system", id=systems[code], polity_id=gb, rules=rules, rules_version=1)
@@ -1196,6 +1263,112 @@ def emit() -> Path:
                     for number, figure in enumerate(count.summary.get(kind, []), 1):
                         if figure is not None and (kind != "exhausted" or stv):
                             values.append((result_set, units[group], None, measure, number, figure))
+        rows = list(csv.DictReader((Path(__file__).parent / "lords_peers_1999.tsv").open(), delimiter="\t"))
+        cited: set[UUID] = set()
+        for group, (day, until, seats, valid, url, intro, caveat) in ELECTIONS_1999.items():
+            picked = [row for row in rows if row["electorate"] == group]
+            if len(picked) != seats or {
+                (row["date_from"], row["date_to"], int(row["seats"]), int(row["valid_ballots"]), row["url"])
+                for row in picked
+            } != {(day, until, seats, valid, url)}:
+                raise ValueError(f"1999 {group}: rows disagree")
+            artifact = raw.cached(SOURCE, url)
+            text = " ".join(re.sub(r"<[^>]+>", " ", artifact.path.read_text()).split())
+            title = re.search(r"HL Deb \d+ \w+ 1999 vol \d+ cc?[\d-]+", text)
+            if title is None:
+                raise ValueError(f"1999 {group}: no column reference")
+            source = cs.source(PUBLISHER, f"Hereditary Peers' Elections, {title[0]}")
+            if source not in cited:
+                cited.add(source)
+                cs.add(
+                    "source",
+                    id=source,
+                    kind="official_body",
+                    publisher=PUBLISHER,
+                    title=f"Hereditary Peers' Elections, {title[0]}",
+                    url=url,
+                    license=LICENSE,
+                )
+                cs.artifact(artifact, source)
+            held, closed = date.fromisoformat(day), date.fromisoformat(until)
+            noun, electorate = GROUPS[group]
+            key = f"{day}:lords:{group}"
+            election = cs.key("gb.election", key)
+            cs.add("election", id=election, polity_id=gb, kind="general", date_from=held, date_to=closed, status="held")
+            name(election, f"{noun} hereditary peers' election, {held:%-d}-{closed:%-d %B %Y}")
+            path = f"gb/{day}-lords-{group.replace('_', '-')}-election"
+            cs.add("slug", path=path, entity_id=election)
+            cs.add(
+                "note",
+                entity_id=election,
+                kind="context",
+                body_md=f"An election by {electorate} to {seats} of the {intro} seats in the House of Lords kept for "
+                "hereditary peers under section 2 of the House of Lords Act 1999, held before the Act removed the "
+                "other hereditary peers at the end of the 1998-99 session.",
+            )
+            contest = cs.key("gb.contest", key)
+            cs.add(
+                "contest",
+                id=contest,
+                election_id=election,
+                kind="body_seats",
+                body_id=lords,
+                magnitude=seats,
+                electoral_system_id=systems["1999"],
+                round_number=1,
+                default_result_kind="counted",
+            )
+            name(contest, f"{noun} hereditary peers ({seats} seats)")
+            cs.add("slug", path=f"{path}/count", entity_id=contest)
+            result_set = cs.key(f"{SOURCE}.result_set", key)
+            cs.add(
+                "result_set",
+                id=result_set,
+                election_id=election,
+                contest_id=contest,
+                stage="official",
+                kind="counted",
+                status="active",
+                source_id=source,
+                is_default=True,
+                completeness=0,
+            )
+            cs.add("citation", entity_id=result_set, source_id=source)
+            cs.add("note", entity_id=result_set, kind="caveat", body_md=WINNERS_1999 + caveat)
+            if str(valid) not in text and NUMBERS_1999.get(valid, "") not in text:
+                raise ValueError(f"1999 {group}: {valid} valid ballots not printed")
+            for row in picked:
+                label, votes = row["ballot_label"], int(row["votes"])
+                if not re.search(r"\.\s*".join(map(re.escape, label.split(". "))) + r"\s+" + str(votes) + r"\b", text):
+                    raise ValueError(f"1999 {group}: {label} {votes} not printed")
+                option_key = f"{key}:{label}"
+                option = cs.key(f"{SOURCE}.option", option_key)
+                member = party(label, group)
+                cs.add(
+                    "contest_option",
+                    id=option,
+                    contest_id=contest,
+                    kind="candidate",
+                    ballot_position=int(row["rank"]),
+                    party_id=parties.get(member or ""),
+                    ballot_label=label,
+                )
+                person = cs.key(f"{SOURCE}.person", f"{key}:{label}")
+                if person in cs.minted:
+                    cs.add("person", id=person)
+                    name(person, re.sub(r"^(\w+\.)(?=\S)", r"\1 ", label))
+                cs.add(
+                    "candidacy",
+                    id=cs.key(f"{SOURCE}.candidacy", option_key),
+                    person_id=person,
+                    option_id=option,
+                    role="head",
+                    ballot_name=label,
+                    member_of_party_id=parties.get(member or ""),
+                )
+                cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected")
+                values.append((result_set, units[group], option, VOTES, 1, votes))
+            values.append((result_set, units[group], None, VALID, 1, valid))
         for result_set, unit, option, measure, number, value in values:
             cs.add(
                 "result_value",
