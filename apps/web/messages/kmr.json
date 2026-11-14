@@ -1976,6 +1976,8 @@
   "map_unopposed": "Bê hevrik",
   "map_runoff": "Dora duyem",
   "map_runoff_line": "Ji ber ku kesî {bar} bi dest nexist, di {date} de çû dora duyem",
+  "map_runoff_spread_line": "Ji ber ku kesî li seranserê welêt {bar} û li zêdetirî {reach} ji {units} {share} bi dest nexist, di {date} de çû dora duyem",
+  "map_runoff_spread_line_inclusive": "Ji ber ku kesî li seranserê welêt {bar} û li herî kêm {reach} ji {units} {share} bi dest nexist, di {date} de çû dora duyem",
   "map_runoff_dated": "Di {date} de çû dora duyem",
   "map_runoff_pending": "Hê encamên dora duyem tune ne",
   "scatter_lede": "Her gilover cihek e û mezinahiya wê li gorî dengan e. Eksena asoyî cudahiya dengan a navbera {a} û {b} di {from} de nîşan dide. Eksena stûnî nîşan dide ku ew cudahî heta {to} çiqas guheriye. Gilover ên bi xelekê ketine destê alîyê din.",

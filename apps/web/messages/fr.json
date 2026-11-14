@@ -2018,6 +2018,8 @@
   "map_unopposed": "Élu sans opposition",
   "map_runoff": "Second tour",
   "map_runoff_line": "Personne n’a atteint {bar}, d’où un second tour le {date}",
+  "map_runoff_spread_line": "Personne n’a atteint à la fois {bar} au niveau national et {share} dans plus de {reach} de {units}, d’où un second tour le {date}",
+  "map_runoff_spread_line_inclusive": "Personne n’a atteint à la fois {bar} au niveau national et {share} dans au moins {reach} de {units}, d’où un second tour le {date}",
   "map_runoff_dated": "Second tour le {date}",
   "map_runoff_pending": "Résultats du second tour à venir",
   "scatter_lede": "Chaque cercle représente un lieu, dont la taille reflète le nombre de voix. L'axe horizontal indique l'écart de voix entre {a} et {b} en {from} ; l'axe vertical indique de combien cet écart a varié en {to}. Les cercles entourés d'un anneau ont changé de camp.",
