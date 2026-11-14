@@ -201,6 +201,7 @@ const MODEL = {
     weigh: 1,
     span: 1,
     reach: 5,
+    lull: 0.25,
     spill: 0.3,
     scatter: 1.2,
     brisk: 0.25,
@@ -1462,6 +1463,21 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
     floor: (floors.get(unit.id) ?? 0) / (1 + tail),
   }));
   const wholeOf = new Map(whole.map((unit, index) => [unit.id, index]));
+  const pacing = whole.filter((unit) => unit.paced != null && unit.total > 0);
+  const surged = sum(pacing.map((unit) => unit.total - (unit.paced ?? 0)));
+  const sustained =
+    isTail && surged > 0
+      ? Math.min(
+          1,
+          sum(
+            pacing.map((unit) =>
+              Math.max(0, (unit.paced ?? 0) - (unit.before ?? 0)),
+            ),
+          ) /
+            surged /
+            MODEL.late.lull,
+        )
+      : 1;
   const floored = whole.filter((unit) => unit.floor > 0);
   const flooredVotes = sum(floored.map((unit) => unit.total));
   const met =
@@ -1675,7 +1691,7 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
                 MODEL.late.reach *
                   closed *
                   fade *
-                  (growth - drained * (growth - steady)),
+                  (steady + (1 - drained) * sustained * (growth - steady)),
             ),
           );
           const { spill, scatter } = MODEL.late;
