@@ -1763,10 +1763,13 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
         const noise = partial(fraction);
         const observed = unit.margin - order * (1 - fraction);
         const precision = 1 / priorVariance + (noise > 0 ? 1 / noise : 1e12);
+        const weight = noise > 0 ? 1 / noise / precision : 1;
         const mean =
-          (prior / priorVariance +
-            (noise > 0 ? observed / noise : observed * 1e12)) /
-          precision;
+          unit.channel === 0
+            ? weight * observed + (1 - weight) * prior
+            : fraction * unit.margin +
+              (1 - fraction) *
+                (prior - fraction * order + weight * (observed - prior));
         margin = mean + gaussian(random) / Math.sqrt(precision);
       } else {
         margin = prior + Math.sqrt(priorVariance) * gaussian(random);
