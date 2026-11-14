@@ -2,6 +2,7 @@ import csv
 import html
 import re
 import subprocess
+import tempfile
 import unicodedata
 from datetime import UTC, date, datetime
 from pathlib import Path
@@ -34,6 +35,20 @@ DAYS = {
 }
 URL24 = "https://electionspuertorico.org/datos/2024/escrutinio/municipal.csv"
 CANDIDATES24 = "https://electionspuertorico.org/referencia/candidatos/2024/"
+URL88 = (
+    "https://ww2.ceepur.org/sites/ComisionEE/es-pr/Informe%20Estadstico/ESTADISTICAS%20DE%20LAS%20ELECCIONES%201988.pdf"
+)
+TITLE88 = "Statistics of the 1988 General Elections (Estadísticas de las Elecciones Generales de 1988), votes for mayors by precinct"
+PAGES88 = (110, 116)
+FIXES88 = {
+    "JOSE £. TRAVERSO CACERES": "José E. Traverso Cáceres",
+    "ANGEL 0. BERRIOS": "Ángel O. Berríos",
+    "ANGEL S$ CRUZ RIVERA": "Ángel S. Cruz Rivera",
+    "VICTOR A PEREZ VALENTIN ;": "Víctor A. Pérez Valentín",
+    "RAMON E£. RIVERA (BOYE)": "Ramón E. Rivera (Boye)",
+    "ANGEL _L. BULERIN RAMOS": "Ángel L. Bulerín Ramos",
+}
+WRITE_INS88 = {"toa alta": (("Papin Ortiz", 1601), ("Peter Albino", 1222))}
 TITLE24 = "2024 General Election official count (escrutinio) by voting center, municipal ballot"
 COLUMNS24 = ("PNP", "PPD", "MVC", "PIP", "PD", "IND")
 PARTIES = {
@@ -86,6 +101,10 @@ def fetch() -> None:
     for link, suffix, media_type in ((URL24, ".csv", "text/csv"), (CANDIDATES24, ".html", "text/html")):
         if not raw_has(link):
             raw.store(SOURCE, link, curl(link), suffix=suffix, retrieved_at=datetime.now(UTC), media_type=media_type)
+    if not raw_has(URL88):
+        raw.store(
+            SOURCE, URL88, curl(URL88), suffix=".pdf", retrieved_at=datetime.now(UTC), media_type="application/pdf"
+        )
     for code in municipios():
         if not raw_has(url(code)):
             raw.store(
@@ -152,6 +171,62 @@ def read(code: str, place: str) -> dict[int, list[tuple[str, str | None, int]]]:
     return tables
 
 
+def ocr88() -> list[list[tuple[str, str, int]]]:
+    party = r"PNP|PPD|PIP|IND"
+    line_pattern = re.compile(rf"^(.+?)\s+({party})\s+([\d,\s.:;“\"'|]+)$")
+    total_pattern = re.compile(rf"^({party})\s+([\d,\s]+)$")
+    blocks: list[list[list]] = []
+    current: list[list] | None = None
+    with tempfile.TemporaryDirectory() as folder:
+        subprocess.run(
+            ["pdftoppm", "-r", "200", "-f", str(PAGES88[0]), "-l", str(PAGES88[1]), "-gray", "-png"]
+            + [str(raw.cached(SOURCE, URL88).path), f"{folder}/p"],
+            check=True,
+        )
+        for image in sorted(Path(folder).glob("p-*.png")):
+            text = subprocess.run(
+                ["tesseract", str(image), "-", "--psm", "6"], capture_output=True, check=True, text=True
+            ).stdout
+            for line in text.splitlines():
+                line = line.strip()
+                if match := line_pattern.match(line):
+                    numbers = [int(n.replace(",", "")) for n in re.findall(r"\d[\d,]*", match[3])]
+                    if current is None:
+                        current = []
+                        blocks.append(current)
+                    current.append([match[1], match[2], numbers])
+                elif (match := total_pattern.match(line)) and current:
+                    for row in current:
+                        if row[1] == match[1]:
+                            row[2] += [int(n.replace(",", "")) for n in re.findall(r"\d[\d,]*", match[2])]
+                elif not line.startswith("SAN JUAN 5"):
+                    current = None
+    for block in blocks:
+        for label, _, numbers in block:
+            if len(numbers) < 2 or sum(numbers[:-1]) != numbers[-1]:
+                raise ValueError(f"1988 mayor line {label}: precinct votes {numbers} do not sum to the total")
+    return [[(label, party_code, numbers[-1]) for label, party_code, numbers in block] for block in blocks]
+
+
+def read88(places: dict[str, str]) -> dict[str, list[tuple[str, str | None, int]]]:
+    blocks = ocr88()
+    names = sorted(places.values(), key=fold)
+    if len(blocks) != len(names):
+        raise ValueError(f"{len(blocks)} 1988 mayor blocks for {len(names)} municipios")
+    found: dict[str, list[tuple[str, str | None, int]]] = {}
+    for place, block in zip(names, blocks, strict=True):
+        lines: list[tuple[str, str | None, int]] = []
+        for index, (label, party, votes) in enumerate(block):
+            if index == 1:
+                label = label[len(place) :].lstrip(" =—-")
+            label = FIXES88.get(label) or label.title()
+            lines.append((label, "Ind." if party == "IND" else party, votes))
+        for label, votes in WRITE_INS88.get(fold(place), ()):
+            lines.append((label, "Write-in", votes))
+        found[place] = lines
+    return found
+
+
 def candidates24() -> dict[str, dict[str, str]]:
     text = raw.cached(SOURCE, CANDIDATES24).path.read_text(encoding="latin-1")
     found: dict[str, dict[str, str]] = {}
@@ -193,6 +268,17 @@ def emit() -> Path:
             license="Public record",
         )
         cs.artifact(raw.cached(SOURCE, SITE), source)
+        source88 = cs.source(PUBLISHER, TITLE88)
+        cs.add(
+            "source",
+            id=source88,
+            kind="official_body",
+            publisher=PUBLISHER,
+            title=TITLE88,
+            url=URL88,
+            license="Public record",
+        )
+        cs.artifact(raw.cached(SOURCE, URL88), source88)
         source24 = cs.source(PUBLISHER, TITLE24)
         cs.add(
             "source",
@@ -231,6 +317,7 @@ def emit() -> Path:
                    where u.scheme_code = 'us.precinct' and u.code like '2024:PR:%%'"""
             ).fetchall()
         }
+        lines88 = read88(places)
         names24 = candidates24()
         if names24.keys() != held.keys():
             raise ValueError("the 2024 candidate list does not match the held municipios")
@@ -255,6 +342,9 @@ def emit() -> Path:
                 year: [(label, party, [(unit, votes)]) for label, party, votes in lines]
                 for year, lines in read(code, place).items()
             }
+            if 1988 in tables:
+                raise ValueError(f"{place}: the archive pages now print 1988")
+            tables[1988] = [(label, party, [(unit, votes)]) for label, party, votes in lines88[place]]
             tables[2024] = [
                 (names24[fold(place)][party], "Ind." if party == "IND" else party, votes24[fold(place)][party])
                 for party in COLUMNS24
@@ -305,7 +395,7 @@ def emit() -> Path:
                     stage="certified",
                     kind="counted",
                     status="active",
-                    source_id=source24 if year == 2024 else source,
+                    source_id={1988: source88, 2024: source24}.get(year, source),
                     is_default=True,
                     completeness=1,
                 )
