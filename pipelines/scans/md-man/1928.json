@@ -122,10 +122,10 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.016,
-        0.774,
-        0.226,
-        0.967
+        0.06655,
+        0.058493,
+        0.941623,
+        0.862392
       ],
       "hint": "Read only the Republican presidential electors table. It has eight number columns headed Towers, Allen, Butler, Wade, Stephan, Gatch, Littlepage, and Foltz; the Towers heading sits on the same line as the stub label 'Balto. City', and the stub column is 'Counties and Balto. City'."
     },
@@ -176,10 +176,10 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.013,
-        0.864,
-        0.228,
-        0.966
+        0.054418,
+        0.433446,
+        0.950263,
+        0.858268
       ],
       "hint": "Read only the table headed 'DEMOCRATIC PARTY - Candidates for Presidential Electors'; ignore any other table visible in the image."
     },
@@ -230,10 +230,10 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.012,
-        0.865,
-        0.222,
-        0.96
+        0.049855,
+        0.437852,
+        0.925217,
+        0.833271
       ],
       "hint": "Read only the table headed 'SOCIALIST PARTY - FOR PRESIDENTIAL ELECTORS'; ignore any other table visible in the image."
     },
@@ -284,10 +284,10 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.018,
-        0.776,
-        0.226,
-        0.965
+        0.074898,
+        0.066942,
+        0.942071,
+        0.85408
       ],
       "hint": "Read only the table headed \"WORKERS' PARTY\"; ignore any other table visible in the image."
     },
@@ -303,10 +303,10 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.013,
-        0.862,
-        0.227,
-        0.958
+        0.054291,
+        0.425197,
+        0.946293,
+        0.824897
       ],
       "hint": "Read only the table headed 'LABOR PARTY'; ignore any other table visible in the image."
     },
@@ -337,10 +337,10 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.03,
-        0.794,
-        0.213,
-        0.951
+        0.124636,
+        0.141132,
+        0.88643,
+        0.795849
       ],
       "hint": "Read only the table headed 'FOR UNITED STATES SENATOR FROM MARYLAND'; ignore any other table visible in the image."
     },
@@ -361,10 +361,10 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.037,
-        0.784,
-        0.215,
-        0.853
+        0.153757,
+        0.099662,
+        0.894584,
+        0.387364
       ],
       "hint": "Read only the table headed 'First Congressional District'; ignore any other table visible in the image.",
       "wards": "24510"
@@ -391,10 +391,10 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.036,
-        0.845,
-        0.214,
-        0.921
+        0.14968,
+        0.353892,
+        0.890507,
+        0.670553
       ],
       "hint": "Read only the table headed 'Second Congressional District'; ignore any other table visible in the image.",
       "wards": "24510"
@@ -421,10 +421,10 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.035,
-        0.913,
-        0.215,
-        0.965
+        0.145603,
+        0.637458,
+        0.894584,
+        0.85408
       ],
       "hint": "Read only the table headed 'Third Congressional District'; ignore any other table visible in the image.",
       "wards": "24510"
@@ -451,10 +451,10 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.028,
-        0.786,
-        0.207,
-        0.846
+        0.116482,
+        0.1089,
+        0.861969,
+        0.358618
       ],
       "hint": "Read only the table headed 'Fourth Congressional District'; ignore any other table visible in the image.",
       "wards": "24510"
@@ -481,10 +481,10 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.028,
-        0.838,
-        0.207,
-        0.916
+        0.116482,
+        0.325573,
+        0.861969,
+        0.650394
       ],
       "hint": "Read only the table headed 'Fifth Congressional District'; ignore any other table visible in the image.",
       "wards": "24510"
@@ -506,10 +506,10 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.028,
-        0.908,
-        0.207,
-        0.967
+        0.116482,
+        0.616973,
+        0.861969,
+        0.862561
       ],
       "hint": "Read only the table headed 'Sixth Congressional District'; ignore any other table visible in the image.",
       "wards": "24510"

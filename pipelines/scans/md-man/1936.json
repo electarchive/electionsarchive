@@ -80,9 +80,9 @@
       "orientation": "counties_down",
       "crop": [
         0.0,
-        0.849,
-        0.243,
-        0.996
+        0.371795,
+        1.0,
+        0.983516
       ],
       "hint": "Read only the table headed 'GENERAL ELECTION RETURNS'; ignore any other table visible in the image."
     },
@@ -133,10 +133,10 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.004,
-        0.76,
-        0.237,
-        0.999
+        0.016498,
+        0.0,
+        0.988001,
+        0.995716
       ],
       "hint": "Read only the table headed 'FOR PRESIDENTIAL ELECTORS'; ignore any other table visible in the image."
     },
@@ -187,10 +187,10 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.003,
-        0.763,
-        0.236,
-        0.999
+        0.012355,
+        0.012628,
+        0.983901,
+        0.995791
       ],
       "hint": "Read only the table headed 'LABOR PARTY OF MARYLAND (Socialist Labor Party) FOR PRESIDENTIAL ELECTORS'; ignore any other table visible in the image."
     },
@@ -241,10 +241,10 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.006,
-        0.818,
-        0.234,
-        0.999
+        0.025047,
+        0.241738,
+        0.974953,
+        0.995716
       ],
       "hint": "Read only the table headed 'FOR PRESIDENTIAL ELECTORS'; ignore any other table visible in the image."
     },
@@ -295,10 +295,10 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.002,
-        0.819,
-        0.236,
-        0.999
+        0.008172,
+        0.246642,
+        0.983284,
+        0.995726
       ],
       "hint": "Read only the table headed 'Communist Party Candidates, For Presidential Electors'; ignore any other table visible in the image."
     },
@@ -319,10 +319,10 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.047,
-        0.835,
-        0.193,
-        0.903
+        0.195838,
+        0.312054,
+        0.80355,
+        0.595569
       ],
       "hint": "Read only the table headed 'First Congressional District'; ignore any other table visible in the image.",
       "wards": "24510"
@@ -349,10 +349,10 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.047,
-        0.895,
-        0.193,
-        0.964
+        0.195838,
+        0.562148,
+        0.80355,
+        0.849793
       ],
       "hint": "Read only the table headed 'Second Congressional District'; ignore any other table visible in the image.",
       "wards": "24510"
@@ -379,10 +379,10 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.072,
-        0.808,
-        0.19,
-        0.876
+        0.30049,
+        0.19985,
+        0.791922,
+        0.48294
       ],
       "hint": "Read only the table headed 'Third Congressional District'; ignore any other table visible in the image.",
       "wards": "24510"
@@ -414,10 +414,10 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.072,
-        0.868,
-        0.19,
-        0.929
+        0.30049,
+        0.449944,
+        0.791922,
+        0.704162
       ],
       "hint": "Read only the table headed 'Fourth Congressional District'; ignore any other table visible in the image.",
       "wards": "24510"
@@ -444,10 +444,10 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.05,
-        0.781,
-        0.2,
-        0.877
+        0.20869,
+        0.08712,
+        0.834149,
+        0.48742
       ],
       "hint": "Read only the table headed 'Fifth Congressional District Candidates'; ignore any other table visible in the image.",
       "wards": "24510"
@@ -474,10 +474,10 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.05,
-        0.869,
-        0.2,
-        0.935
+        0.20869,
+        0.453999,
+        0.834149,
+        0.728877
       ],
       "hint": "Read only the table headed 'Sixth Congressional District Candidates'; ignore any other table visible in the image.",
       "wards": "24510"
