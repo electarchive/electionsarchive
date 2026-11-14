@@ -355,6 +355,76 @@ COUNCILS["E08000018/2024"] = {
     ],
     "reader": "rotherham",
 }
+STRATFORD = "https://www.stratford.gov.uk/doc"
+COUNCILS["E07000221/2023"] = {
+    "day": date(2023, 5, 4),
+    "publisher": "Stratford-on-Avon District Council",
+    "title": "Notices of uncontested election and declarations of result of poll, town and parish councils, 4 May 2023",
+    "url": "https://www.stratford.gov.uk/news/press.cfm/item/137971",
+    "files": [f"{STRATFORD}/211878/name/Uncontested%20Parish%20Elections%20May%202023.pdf"],
+    "polls": [f"{STRATFORD}/211958/name/Declaration%20of%20Results%20Parish.pdf"],
+    "anchored": True,
+    "order": "comma",
+    "bracketed": True,
+    "reader": "notices+declarations",
+}
+STALBANS = "https://www.stalbans.gov.uk/sites/default/files/attachments"
+COUNCILS["E07000240/2023"] = {
+    "day": date(2023, 5, 4),
+    "publisher": "St Albans City and District Council",
+    "title": "Notice of uncontested election and results, parish and town councils, 4 May 2023",
+    "url": "https://www.stalbans.gov.uk/node/11309",
+    "files": [
+        f"{STALBANS}/Parish%20and%20Town%20Council_Notice%20of%20Uncontested%20Election_4%20May%202023_St%20Albans%20City%20and%20District.pdf"
+    ],
+    "polls": [
+        f"{STALBANS}/Results_Parish%20and%20Town%20Council_St%20Albans%20City%20and%20District_4%20May%202023.pdf"
+    ],
+    "order": "comma",
+    "bracketed": True,
+    "anchored": True,
+    "reader": "notices+declarations",
+}
+CANTERBURY = "https://www.canterbury.gov.uk/sites/default/files"
+COUNCILS["E07000106/2023"] = {
+    "day": date(2023, 5, 4),
+    "publisher": "Canterbury City Council",
+    "title": "Uncontested parish election results 2023, and the Kingston Parish Council declaration of result",
+    "url": f"{CANTERBURY}/2023-06/Uncontested%20parish%20election%20results%202023.pdf",
+    "files": [f"{CANTERBURY}/2023-06/Uncontested%20parish%20election%20results%202023.pdf"],
+    "polls": [f"{CANTERBURY}/2024-04/Kingston%20Parish%20Council%20declaration%20of%20results.pdf"],
+    "areas": {"Thanington(North)": ("Thanington", "North")},
+    "order": "comma",
+    "bracketed": True,
+    "reader": "notices+declarations",
+}
+COUNCILS["E07000220/2023"] = {
+    "day": date(2023, 5, 4),
+    "publisher": "Rugby Borough Council",
+    "title": "Parish council elections 2023",
+    "url": "https://rugby.gov.uk/w/parish-council-elections-2023",
+    "pages": ["https://rugby.gov.uk/w/parish-council-elections-2023"],
+    "files": [
+        f"https://www.rugby.gov.uk/documents/d/guest/notice_of_uncontested_election___{name}_parish_council-pdf?download=true"
+        for name in (
+            "binley_woods",
+            "birdingbury",
+            "bourton_and_draycote",
+            "brandon_and_bretford",
+            "cawston",
+            "frankton",
+            "grandborough",
+            "leamington_hastings",
+            "marton",
+            "princethorpe",
+            "ryton_on_dunsmore",
+            "stretton_on_dunsmore",
+            "thurlaston",
+            "willoughby",
+        )
+    ],
+    "reader": "notices+rugby",
+}
 DOCX = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
 POST_NOMINALS = re.compile(r"^(?:[A-Z]{2,5}\.\s+)+")
 BROWSER = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36"
@@ -374,6 +444,11 @@ PARTIES: dict[str, str | None] = {
     "Conservative": "Q9626",
     "Green Party": "Q3499324",
     "Mebyon Kernow - The Party for Cornwall": "Q161957",
+    "Local Conservatives": "Q9626",
+    "Conservatives": "Q9626",
+    "The Labour Party Candidate": "Q9630",
+    "Labour and Co-operative Party": "Q9630",
+    "Labour and Co-operative Party Candidate": "Q9630",
 }
 ALIASES = {
     ("E07000011", "Kimbolton & Stonely"): "Kimbolton",
@@ -385,6 +460,9 @@ ALIASES = {
     ("E06000059", "Iwerne Courtney"): "Iwerne Courtney or Shroton",
     ("E08000018", "Anston"): "North and South Anston",
     ("E06000059", "Winfrith Newburgh and East Knighton"): "Winfrith Newburgh",
+    ("E07000221", "Newbold Pacey and Ashorne"): "Newbold Pacey",
+    ("E07000221", "Whichford and Ascott"): "Whichford",
+    ("E07000221", "Warmington and Arlescote"): "Warmington",
 }
 GROUPED = {
     ("E07000071", "Abberton and Langenhoe"),
@@ -734,8 +812,9 @@ def notices(lad: str, council: dict) -> list[dict]:
                     "votes": None,
                     "elected": True,
                 }
-            printed = candidate["printed"]
-            shown = candidate["known_as"] or printed
+            candidate["description"] = candidate["description"].replace("`", "'")
+            printed = candidate["printed"].replace("`", "'")
+            shown = (candidate["known_as"] or printed).replace("`", "'")
             candidate["name"] = surname_first(shown) if "," in shown else shown
             if candidate["known_as"]:
                 candidate["printed"] = f"{printed} commonly known as {candidate['known_as']}"
@@ -808,17 +887,19 @@ def rugby(lad: str, council: dict) -> list[dict]:
     page = Path(raw.cached(SOURCE, url).path).read_text(encoding="utf-8")
     reads = []
     for heading, body in re.findall(
-        r'<h2 class="section_title">(.*?) Parish Council</h2>\s*<div class="section_content">(.*?)</article>',
+        r'<h2 class="section_title">([^<]*?) Parish Council</h2>\s*<div class="section_content">(.*?)</article>',
         page,
         re.DOTALL,
     ):
-        if "<table" not in body:
+        rows = [
+            [text(cell) for cell in re.findall(r"(.*?)</td>\s*(?:<td>|$)", row, re.DOTALL)]
+            for row in re.findall(r"<tr>\s*<td>(.*?)</tr>", body, re.DOTALL)
+        ]
+        if not rows or len(rows[0]) == 1:
             continue
         candidates = []
-        for row in re.findall(r"<tr>\s*<td>(.*?)</tr>", body, re.DOTALL):
-            printed, description, votes = (
-                text(cell) for cell in re.findall(r"(.*?)</td>\s*(?:<td>|$)", row, re.DOTALL)
-            )
+        for cells in rows:
+            printed, description, votes = cells if len(cells) == 3 else (cells[0], "", cells[1])
             figure = re.fullmatch(r"([\d,]+)( elected)?", votes)
             if figure is None:
                 raise ValueError(f"{url}: no votes in {votes}")
@@ -843,9 +924,9 @@ def rugby(lad: str, council: dict) -> list[dict]:
                 "style": "Parish",
                 "parish": text(heading),
                 "ward": None,
-                "places": figures["Vacant seats"],
-                "electorate": figures["Electorate"],
-                "ballots": figures["Ballot papers issued"],
+                "places": figures.get("Vacant seats", sum(bool(candidate["elected"]) for candidate in candidates)),
+                "electorate": figures.get("Electorate"),
+                "ballots": figures.get("Ballot papers issued"),
                 "rejected": None,
                 "total": None,
                 "remark": None,
@@ -1094,7 +1175,7 @@ def anchored(words: list[tuple[float, float, str]]) -> list[dict]:
     elected = [False for _ in anchors]
     for x, y, word in inside:
         nearest = min(range(len(anchors)), key=lambda i: abs(anchors[i] - y))
-        if x >= 510 and word == "Elected":
+        if x >= 510 and word in ("E", "Elected"):
             elected[nearest] = True
         elif x < 440:
             cells[nearest]["name" if x < 250 else "description"].append((y, x, word))
@@ -1133,6 +1214,9 @@ def declarations(lad: str, council: dict) -> list[dict]:
                 parish, ward = council["areas"][area]
             elif suffixed:
                 parish, ward = suffixed.groups()
+            elif council.get("bracketed"):
+                bracketed = re.fullmatch(r"(.+?) ?\((.+)\)", area)
+                parish, ward = bracketed.groups() if bracketed else (area, None)
             else:
                 body = re.fullmatch(r"(.+) (?:Town|Parish) Council", owner)
                 if body is None:
@@ -1159,13 +1243,13 @@ def declarations(lad: str, council: dict) -> list[dict]:
                         printed = cells[0].replace("`", "'")
                         candidates.append({"printed": printed, "description": "", "votes": None, "elected": False})
                 if rest:
-                    figure = re.fullmatch(r"(?:(.*?)\s{2,})?([\d,]+)(?:\s+(E|Elected))?", rest)
+                    figure = re.fullmatch(r"(?:(.*?)\s{2,})?(Elected\s+)?([\d,]+)(?:\s+(E|Elected))?", rest)
                     if figure is None or not candidates:
                         raise ValueError(f"{url} page {number}: cannot read {line.strip()!r}")
                     candidates[-1] |= {
                         "description": figure.group(1) or "",
-                        "votes": count(figure.group(2)),
-                        "elected": figure.group(3) is not None,
+                        "votes": count(figure.group(3)),
+                        "elected": figure.group(2) is not None or figure.group(4) is not None,
                     }
             declared = re.search(r"declare that(.*?)(?:is|are) duly elected", page, re.DOTALL)
             marked = any(c["elected"] for c in candidates)
@@ -1181,6 +1265,9 @@ def declarations(lad: str, council: dict) -> list[dict]:
                 r"Vacant Seats:\s*(\d+)\s+Electorate:\s*([\d,]+)\s+Ballot Papers Issued:\s*([\d,]+)", page
             )
             rejected = re.search(r"\n\s+Total\s+(\d+)\s*\n", page)
+            reasons = [int(n) for n in re.findall(r"\n\s*[A-E]\s{2,}\D+?\s{2,}(\d+)\s*(?=\n)", page)]
+            if rejected and len(reasons) == 5 and sum(reasons) != int(rejected.group(1)):
+                rejected = None
             places = int(figures.group(1)) if figures else sum(c["elected"] for c in candidates)
             if places != sum(c["elected"] for c in candidates):
                 raise ValueError(f"{url} page {number}: {places} seats, other elected count")
