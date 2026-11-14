@@ -93,6 +93,12 @@ COUNCILS = {
         "https://moderngov.denbighshire.gov.uk/mgElectionElectionAreaResults.aspx?Page=all&EID=93",
         "moderngov",
     ),
+    "W06000006": (
+        "Wrexham County Borough Council",
+        "Election results by community area, Community Council Elections, 5 May 2022",
+        "https://moderngov.wrexham.gov.uk/mgElectionElectionAreaResults.aspx?Page=all&EID=1000000009&RPID=1105211469&LLL=0",
+        "moderngov",
+    ),
     "W06000018": (
         "Caerphilly County Borough Council",
         "Notice of Uncontested Elections, community councils, 5 May 2022",
@@ -177,6 +183,7 @@ SCANS |= {
 POLLS = Path(__file__).with_name("gwynedd_2022_polls.tsv")
 VOTE_COLUMN = (0.685, 0.955)
 ALIASES = {
+    ("W06000006", "Rhosllannerchrugog"): "Rhosllanerchrugog",
     ("W06000018", "Llanbradach"): "Llanbradach and Pwllypant",
     ("W06000018", "Draethen, Waterloo and Rudry"): "Rudry",
     ("W06000018", "Risca Town"): "Risca West",
@@ -281,6 +288,7 @@ CAVEATS = {
         "2,827 votes counts her 432 twice; the six candidates' votes sum to 2,395."
     ),
 }
+INCOMPLETE = {"Acton (Little Acton ) - results", "Rossett (Burton) - results"}
 GWYNEDD_CAVEATS = {
     ("Abermaw", "Abermaw"): (
         "Gwynedd Council's declaration gives Philip Hill's votes in a handwritten figure that reads as either 279 or "
@@ -567,6 +575,8 @@ def moderngov(url: str) -> list[dict]:
         if "No election candidates have been specified for this area" in page:
             continue
         caption = flat(found(r'<caption\s+class="mgSectionTitle"\s*>(.*?)</caption>', page, re.DOTALL).group(1))
+        if caption in INCOMPLETE:
+            continue
         english = list(re.finditer(r"/\s*([^/(]+?) (?:Town|Community|City) Counci?l?\b", caption))
         council = english[-1].group(1) if english else found(r"^(.+?)(?: \(| - results$)", caption).group(1)
         ward = re.search(r"\(([^()]+?)\)\s*- results$", caption[english[-1].end() if english else 0 :])
