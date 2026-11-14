@@ -10,7 +10,7 @@ from PIL import Image
 
 from ea import raw
 from ea.sources.id.kpu_dpr import _sainte_lague, _slug
-from ea.sources.id.kpu_pilpres import DAYS, PROVINCES
+from ea.sources.id.kpu_pilpres import DAYS
 from ea.store import DATA
 
 SOURCE = "id.kpu_dpr_2024"
@@ -610,22 +610,21 @@ def emit() -> Path:
         if set(results["party"]) - set(parties):
             raise ValueError(f"parties {sorted(set(results['party']) - set(parties))} are not published")
 
-        cs.add(
-            "scheme",
-            code="id.dapil_dpr",
-            polity_id=indonesia,
-            kind="electoral_district",
-            rank=2,
-            noun="electoral district",
-            kinds=None,
-            code_system=None,
-        )
+        shapes = {
+            _slug(text): area
+            for text, area in conn.execute(
+                """select n.text, a.id from area a
+                   join area_code c on c.area_id = a.id and c.valid @> %s::date
+                   join name n on n.entity_id = a.id and n.kind = 'official'
+                   where a.scheme_code = 'id.dapil_dpr'""",
+                [DAYS[2024]],
+            ).fetchall()
+        }
         districts = results.select("dapil", "province").unique()
-        whole = {province for province, count in districts.group_by("province").len().rows() if count == 1}
         for dapil, province in sorted(districts.rows()):
             key = f"{DAY}:dpr:{_slug(dapil)}"
             title = _title(dapil)
-            area = cs.area("id.provinsi", PROVINCES[province])
+            area = shapes[_slug(dapil)]
             code = f"2024:{_slug(dapil)}"
             unit = cs.unit("id.dapil_dpr", code)
             cs.add(
@@ -634,7 +633,7 @@ def emit() -> Path:
                 polity_id=indonesia,
                 scheme_code="id.dapil_dpr",
                 code=code,
-                area_relation="equals" if province in whole else "within",
+                area_relation="equals",
                 area_id=area,
                 kind="standard",
                 valid_from=None,
@@ -649,7 +648,7 @@ def emit() -> Path:
                 election_id=election,
                 kind="list_allocation",
                 body_id=body,
-                district_area_id=area if province in whole else None,
+                district_area_id=area,
                 term="full",
                 magnitude=magnitude,
                 round_number=1,
