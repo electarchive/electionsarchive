@@ -7662,10 +7662,12 @@
           "government_kind": "municipality",
           "source": "nt-dates",
           "period_years": 3,
-          "phase": 0,
+          "phase": 2,
           "month": 10,
           "term_years": 3,
-          "called": false
+          "day_rule": "oct_third_monday",
+          "called": false,
+          "locator": "Local Authorities Elections Act, RSNWT 1988, c. L-10, s. 10(1)(a): towns, villages, and cities elect on the third Monday in October every third year (2021-10-18, 2024-10-21)"
         }
       ],
       "est_votes": 15000,
