@@ -2343,7 +2343,7 @@
   "error_code": "Erreur {code}",
   "footer_data_as_of": "Données à {time}",
   "footer_release": "Publication {version}",
-  "footer_release_download": "Télécharger la publication {version} depuis Zenodo",
+  "footer_release_download": "Télécharger la publication {version}",
   "footer_version": "Version {version}",
   "footer_version_label": "Version {version} : voir les modifications",
   "footer_commit": "Commit {sha} sur GitHub",

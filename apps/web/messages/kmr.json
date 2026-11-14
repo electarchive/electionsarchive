@@ -2298,7 +2298,7 @@
   "error_code": "Çewtiya {code}",
   "footer_data_as_of": "Daneyên heta {time}",
   "footer_release": "Weşana {version}",
-  "footer_release_download": "Weşana {version} ji Zenodo dakêşe",
+  "footer_release_download": "Weşana {version} daxîne",
   "footer_version": "Guhertoya {version}",
   "footer_version_label": "Guhertoya {version}: guhertinan bibîne",
   "footer_commit": "Commita {sha} li GitHub",

@@ -2298,7 +2298,7 @@
   "error_code": "Hata {code}",
   "footer_data_as_of": "Veriler {time} itibarıyla",
   "footer_release": "Yayın {version}",
-  "footer_release_download": "Zenodo'dan {version} yayınını indir",
+  "footer_release_download": "{version} yayınını indir",
   "footer_version": "Sürüm {version}",
   "footer_version_label": "Sürüm {version}: değişenleri göster",
   "footer_commit": "GitHub'da {sha} commit'ini aç",

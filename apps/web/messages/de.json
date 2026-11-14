@@ -2298,7 +2298,7 @@
   "error_code": "Fehler {code}",
   "footer_data_as_of": "Datenstand {time}",
   "footer_release": "Release {version}",
-  "footer_release_download": "Release {version} von Zenodo herunterladen",
+  "footer_release_download": "Release {version} herunterladen",
   "footer_version": "Version {version}",
   "footer_version_label": "Version {version}: Änderungen ansehen",
   "footer_commit": "Commit {sha} auf GitHub",
