@@ -822,7 +822,8 @@ def emit() -> Path:
                 slate = lists_by.get((day, code))
                 if slate is not None:
                     seats = slate["seats"].fill_null(0).sum()
-                    seated = 0 < seats <= LARGEST_COUNCIL and slate["seats"].null_count() == 0
+                    most_voted_seats = slate.sort("list_votes", descending=True)["seats"][0]
+                    seated = 0 < seats <= LARGEST_COUNCIL and slate["seats"].null_count() == 0 and most_voted_seats > 0
                     contest = cs.key(f"{SOURCE}.contest", f"{day}:{code}:council")
                     cs.add(
                         "contest",
