@@ -6,6 +6,7 @@ import subprocess
 import tempfile
 from collections import Counter
 from datetime import date
+from itertools import pairwise
 from pathlib import Path
 from uuid import UUID
 
@@ -64,11 +65,13 @@ LEEDS_FILES = {
 LEEDS_MODEL = "claude-haiku-5-5"
 LEEDS_LONGEST = 1568
 LEEDS_SPECKS = 40
-LEEDS_TABLES = {1988}
+LEEDS_COLUMNS = {1988: 1, 1990: 4, 1999: 5}
 LEEDS_READS = {
     "a": "",
     "b": " Read each handwritten vote figure digit by digit before you write it, and count its digits; where a figure "
     "was altered, give the one that stands.",
+    "c": " Some figures are smudged or written over the dotted leader: look at each one closely before you write it, "
+    "and never carry a figure over from another candidate.",
 }
 LEEDS_SYSTEM = (
     "You read part of a scanned sheet from Leeds City Council giving the result of the poll at a city council "
@@ -346,13 +349,13 @@ def fetch() -> None:
     for year in LEEDS_FILES:
         path = str(raw.fetch(SOURCE, leeds_url(year), suffix=".pdf").path)
         for page in range(1, pages(path) + 1):
-            for index, (_, piece) in enumerate(leeds_pieces(leeds_page(path, page), year not in LEEDS_TABLES)):
+            for index, (_, piece) in enumerate(leeds_pieces(leeds_page(path, page), LEEDS_COLUMNS.get(year, 2))):
                 buffer = io.BytesIO()
                 piece.save(buffer, "PNG")
                 for read, extra in LEEDS_READS.items():
                     params = MessageCreateParamsNonStreaming(
                         model=LEEDS_MODEL,
-                        max_tokens=8000,
+                        max_tokens=16000,
                         system=LEEDS_SYSTEM + extra,
                         messages=[
                             {
@@ -385,7 +388,9 @@ def leeds_url(year: int) -> str:
 
 
 def leeds_key(read: str, year: int, page: int, index: int) -> str:
-    return f"anthropic-batch:{LEEDS_MODEL}/leeds-{read}/{year}/{page}/{index}"
+    columns = LEEDS_COLUMNS.get(year, 2)
+    piece = f"{index}of{columns}" if columns > 2 else str(index)
+    return f"anthropic-batch:{LEEDS_MODEL}/leeds-{read}/{year}/{page}/{piece}"
 
 
 def leeds_page(path: str, page: int) -> Image.Image:
@@ -398,20 +403,24 @@ def leeds_page(path: str, page: int) -> Image.Image:
         return Image.open(f"{stem}.png").convert("L").rotate(90, expand=True)
 
 
-def leeds_pieces(image: Image.Image, split: bool) -> list[tuple[tuple[int, int, int, int], Image.Image]]:
+def leeds_pieces(image: Image.Image, columns: int) -> list[tuple[tuple[int, int, int, int], Image.Image]]:
     width, height = image.size
     ink = image.crop((0, int(height * 0.08), width, int(height * 0.97))).point(lambda v: 1 if v < 128 else 0)
     data = ink.tobytes()
-    columns = [sum(data[x : len(data) : width * 2]) for x in range(width)]
+    sums = [sum(data[x : len(data) : width * 2]) for x in range(width)]
     span = 12
-    window = range(int(width * 0.3), int(width * 0.7) - span)
-    cut = min(window, key=lambda x: (sum(columns[x : x + span]), abs(x - width // 2)))
-    if not split or sum(columns[cut : cut + span]) > LEEDS_SPECKS:
-        boxes = [(0, 0, width, height)]
-    else:
-        boxes = [(0, 0, cut + span // 2, height), (cut + span // 2, 0, width, height)]
+    edges = [0]
+    for part in range(1, columns):
+        middle = width * part // columns
+        window = range(middle - int(width * 0.35 / columns), middle + int(width * 0.35 / columns) - span)
+        cut = min(window, key=lambda x: (sum(sums[x : x + span]), abs(x - middle)))
+        if columns == 2 and sum(sums[cut : cut + span]) > LEEDS_SPECKS:
+            break
+        edges.append(cut + span // 2)
+    edges.append(width)
     pieces = []
-    for box in boxes:
+    for left, right in pairwise(edges):
+        box = (left, 0, right, height)
         piece = image.crop(box)
         piece.thumbnail((LEEDS_LONGEST, LEEDS_LONGEST))
         pieces.append((box, piece))
