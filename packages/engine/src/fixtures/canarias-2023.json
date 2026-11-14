@@ -1,0 +1,258 @@
+{
+  "districts": [
+    {
+      "name": "El Hierro",
+      "seats": 3,
+      "valid": 6323,
+      "entries": [
+        {
+          "id": "PARTIDO SOCIALISTA OBRERO ESPAÑOL",
+          "votes": 1677,
+          "declared": 1
+        },
+        {
+          "id": "AGRUPACION HERREÑA INDEPENDIENTE",
+          "votes": 1660,
+          "declared": 1
+        },
+        { "id": "PARTIDO POPULAR", "votes": 1279, "declared": 1 },
+        { "id": "ASAMBLEA HERREÑA", "votes": 1089, "declared": 0 },
+        { "id": "REUNIR CANARIAS SOSTENIBLE", "votes": 182, "declared": 0 },
+        { "id": "UNIDAS SÍ PODEMOS", "votes": 158, "declared": 0 },
+        { "id": "VOX", "votes": 102, "declared": 0 },
+        { "id": "TERCERA EDAD EN ACCIÓN", "votes": 69, "declared": 0 }
+      ]
+    },
+    {
+      "name": "Fuerteventura",
+      "seats": 8,
+      "valid": 37977,
+      "entries": [
+        { "id": "COALICION CANARIA", "votes": 9771, "declared": 3 },
+        {
+          "id": "PARTIDO SOCIALISTA OBRERO ESPAÑOL",
+          "votes": 8129,
+          "declared": 2
+        },
+        { "id": "PARTIDO POPULAR", "votes": 7297, "declared": 2 },
+        {
+          "id": "NUEVA CANARIAS - BLOQUE CANARISTA",
+          "votes": 4115,
+          "declared": 1
+        },
+        {
+          "id": "ASAMBLEAS MUNICIPALES DE FUERTEVENTURA",
+          "votes": 2840,
+          "declared": 0
+        },
+        { "id": "VOX", "votes": 2287, "declared": 0 },
+        { "id": "DRAGO VERDES CANARIAS", "votes": 1612, "declared": 0 },
+        { "id": "UNIDAS SÍ PODEMOS", "votes": 834, "declared": 0 },
+        { "id": "CONTIGO SOMOS DEMOCRACIA", "votes": 278, "declared": 0 }
+      ]
+    },
+    {
+      "name": "Gran Canaria",
+      "seats": 15,
+      "valid": 367743,
+      "entries": [
+        {
+          "id": "PARTIDO SOCIALISTA OBRERO ESPAÑOL",
+          "votes": 103153,
+          "declared": 5
+        },
+        { "id": "PARTIDO POPULAR", "votes": 78462, "declared": 4 },
+        {
+          "id": "NUEVA CANARIAS - BLOQUE CANARISTA",
+          "votes": 53140,
+          "declared": 3
+        },
+        { "id": "VOX", "votes": 36528, "declared": 2 },
+        { "id": "COALICION CANARIA", "votes": 34990, "declared": 1 },
+        { "id": "UNIDOS POR GRAN CANARIA", "votes": 17153, "declared": 0 },
+        { "id": "UNIDAS SÍ PODEMOS", "votes": 15334, "declared": 0 },
+        { "id": "DRAGO VERDES CANARIAS", "votes": 7589, "declared": 0 },
+        {
+          "id": "PARTIDO ANIMALISTA CON EL MEDIO AMBIENTE",
+          "votes": 4102,
+          "declared": 0
+        },
+        { "id": "HABLEMOS AHORA", "votes": 4030, "declared": 0 },
+        {
+          "id": "CIUDADANOS-PARTIDO DE LA CIUDADANIA",
+          "votes": 1364,
+          "declared": 0
+        },
+        {
+          "id": "AHORA CANARIAS-PARTIDO COMUNISTA DEL PUEBLO CANARIO",
+          "votes": 1250,
+          "declared": 0
+        },
+        { "id": "PARTIDO NACIONALISTA CANARIO", "votes": 1154, "declared": 0 },
+        { "id": "REUNIR CANARIAS SOSTENIBLE", "votes": 1136, "declared": 0 },
+        { "id": "TERCERA EDAD EN ACCIÓN", "votes": 1026, "declared": 0 },
+        { "id": "CONTIGO SOMOS DEMOCRACIA", "votes": 454, "declared": 0 }
+      ]
+    },
+    {
+      "name": "La Gomera",
+      "seats": 4,
+      "valid": 12372,
+      "entries": [
+        { "id": "AGRUPACION SOCIALISTA GOMERA", "votes": 6765, "declared": 3 },
+        {
+          "id": "PARTIDO SOCIALISTA OBRERO ESPAÑOL",
+          "votes": 2213,
+          "declared": 1
+        },
+        { "id": "INICIATIVA POR LA GOMERA", "votes": 1312, "declared": 0 },
+        { "id": "COALICION CANARIA", "votes": 1147, "declared": 0 },
+        { "id": "PARTIDO POPULAR", "votes": 553, "declared": 0 },
+        { "id": "VOX", "votes": 247, "declared": 0 }
+      ]
+    },
+    {
+      "name": "Lanzarote",
+      "seats": 8,
+      "valid": 49475,
+      "entries": [
+        {
+          "id": "PARTIDO SOCIALISTA OBRERO ESPAÑOL",
+          "votes": 14347,
+          "declared": 3
+        },
+        { "id": "COALICION CANARIA", "votes": 13497, "declared": 3 },
+        { "id": "PARTIDO POPULAR", "votes": 8508, "declared": 1 },
+        {
+          "id": "NUEVA CANARIAS - BLOQUE CANARISTA",
+          "votes": 4330,
+          "declared": 1
+        },
+        { "id": "VOX", "votes": 3402, "declared": 0 },
+        { "id": "UNIDAS SÍ PODEMOS", "votes": 2136, "declared": 0 },
+        { "id": "DRAGO VERDES CANARIAS", "votes": 1237, "declared": 0 },
+        { "id": "PARTIDO NACIONALISTA CANARIO", "votes": 269, "declared": 0 },
+        { "id": "MÁS CANARIAS", "votes": 264, "declared": 0 },
+        { "id": "REUNIR CANARIAS SOSTENIBLE", "votes": 233, "declared": 0 }
+      ]
+    },
+    {
+      "name": "La Palma",
+      "seats": 8,
+      "valid": 44211,
+      "entries": [
+        { "id": "COALICION CANARIA", "votes": 18756, "declared": 4 },
+        {
+          "id": "PARTIDO SOCIALISTA OBRERO ESPAÑOL",
+          "votes": 10551,
+          "declared": 2
+        },
+        { "id": "PARTIDO POPULAR", "votes": 8827, "declared": 2 },
+        { "id": "VOX", "votes": 1340, "declared": 0 },
+        {
+          "id": "NUEVA CANARIAS - BLOQUE CANARISTA",
+          "votes": 1327,
+          "declared": 0
+        },
+        { "id": "DRAGO VERDES CANARIAS", "votes": 1036, "declared": 0 },
+        { "id": "UNIDAS SÍ PODEMOS", "votes": 874, "declared": 0 },
+        {
+          "id": "MOVIMIENTO ALTERNATIVO ELECTORAL",
+          "votes": 778,
+          "declared": 0
+        },
+        { "id": "MÁS CANARIAS", "votes": 130, "declared": 0 }
+      ]
+    },
+    {
+      "name": "Tenerife",
+      "seats": 15,
+      "valid": 394116,
+      "entries": [
+        { "id": "COALICION CANARIA", "votes": 123240, "declared": 6 },
+        {
+          "id": "PARTIDO SOCIALISTA OBRERO ESPAÑOL",
+          "votes": 107741,
+          "declared": 5
+        },
+        { "id": "PARTIDO POPULAR", "votes": 71382, "declared": 3 },
+        { "id": "VOX", "votes": 27832, "declared": 1 },
+        { "id": "DRAGO VERDES CANARIAS", "votes": 17425, "declared": 0 },
+        { "id": "UNIDAS SÍ PODEMOS", "votes": 16441, "declared": 0 },
+        {
+          "id": "NUEVA CANARIAS - BLOQUE CANARISTA",
+          "votes": 9460,
+          "declared": 0
+        },
+        {
+          "id": "PARTIDO ANIMALISTA CON EL MEDIO AMBIENTE",
+          "votes": 7088,
+          "declared": 0
+        },
+        {
+          "id": "CIUDADANOS-PARTIDO DE LA CIUDADANIA",
+          "votes": 2146,
+          "declared": 0
+        },
+        { "id": "MÁS CANARIAS", "votes": 1082, "declared": 0 },
+        { "id": "PARTIDO NACIONALISTA CANARIO", "votes": 972, "declared": 0 },
+        {
+          "id": "AHORA CANARIAS-PARTIDO COMUNISTA DEL PUEBLO CANARIO",
+          "votes": 856,
+          "declared": 0
+        },
+        { "id": "TERCERA EDAD EN ACCIÓN", "votes": 803, "declared": 0 },
+        { "id": "REUNIR CANARIAS SOSTENIBLE", "votes": 761, "declared": 0 },
+        { "id": "UNION DEMOCRATICA DE CANARIAS", "votes": 718, "declared": 0 }
+      ]
+    },
+    {
+      "name": "Autonómica",
+      "seats": 9,
+      "valid": 912645,
+      "entries": [
+        {
+          "id": "PARTIDO SOCIALISTA OBRERO ESPAÑOL",
+          "votes": 295969,
+          "declared": 4
+        },
+        { "id": "PARTIDO POPULAR", "votes": 183761, "declared": 2 },
+        { "id": "COALICION CANARIA", "votes": 175198, "declared": 2 },
+        { "id": "VOX", "votes": 71887, "declared": 1 },
+        {
+          "id": "NUEVA CANARIAS - BLOQUE CANARISTA",
+          "votes": 65028,
+          "declared": 0
+        },
+        { "id": "DRAGO VERDES CANARIAS", "votes": 30392, "declared": 0 },
+        { "id": "UNIDAS SÍ PODEMOS", "votes": 29556, "declared": 0 },
+        { "id": "UNIDOS POR GRAN CANARIA", "votes": 13760, "declared": 0 },
+        {
+          "id": "PARTIDO ANIMALISTA CON EL MEDIO AMBIENTE",
+          "votes": 11803,
+          "declared": 0
+        },
+        { "id": "AHORA TÚ", "votes": 3846, "declared": 0 },
+        {
+          "id": "CIUDADANOS-PARTIDO DE LA CIUDADANIA",
+          "votes": 3548,
+          "declared": 0
+        },
+        {
+          "id": "ASAMBLEAS MUNICIPALES DE FUERTEVENTURA",
+          "votes": 3108,
+          "declared": 0
+        },
+        { "id": "PARTIDO NACIONALISTA CANARIO", "votes": 2417, "declared": 0 },
+        { "id": "MÁS CANARIAS", "votes": 2354, "declared": 0 },
+        {
+          "id": "AHORA CANARIAS-PARTIDO COMUNISTA DEL PUEBLO CANARIO",
+          "votes": 2156,
+          "declared": 0
+        },
+        { "id": "REUNIR CANARIAS SOSTENIBLE", "votes": 1998, "declared": 0 },
+        { "id": "PAIS CON GESTORES", "votes": 1210, "declared": 0 }
+      ]
+    }
+  ]
+}
