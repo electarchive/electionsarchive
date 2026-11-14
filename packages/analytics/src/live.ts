@@ -213,6 +213,7 @@ const MODEL = {
     ramp: 3,
     memory: 2,
     patience: 0.5,
+    canvass: 0.3,
     lull: 0.5,
     stir: 0.01,
     spill: 0.3,
@@ -2115,6 +2116,10 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
     : base != null && isSettled
       ? lean([], a, b, coming, base)
       : null;
+  const pull =
+    isLate && !isTail && learned == null
+      ? lean(found, a, b, coming, base)
+      : null;
   const ahead = sum(found.map((unit) => unit.margin * unit.total));
   const finalMargins: Array<number> = [];
   const finalTotals: Array<number> = [];
@@ -2154,9 +2159,10 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
     const holding = kept * Math.exp(firm * deviate - firm ** 2 / 2);
     const carrying =
       (left - kept) * Math.exp(amount * deviate - amount ** 2 / 2);
+    const tilted = gaussian(random);
     const tilt =
-      (learned?.mean ?? 0) +
-      (learned?.sd ?? MODEL.tail.lean) * gaussian(random);
+      (learned?.mean ?? 0) + (learned?.sd ?? MODEL.tail.lean) * tilted;
+    const pullTilt = pull == null ? 0 : pull.mean + pull.sd * tilted;
     const { common, own: alone } = MODEL.reported;
     const reportedDraw =
       told > 0
@@ -2418,7 +2424,8 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
       } else {
         margin = prior + Math.sqrt(priorVariance) * gaussian(random);
       }
-      const reach = Math.sqrt(1 - fraction);
+      const unread = final > 0 ? Math.max(0, 1 - unit.total / final) : 0;
+      const reach = Math.sqrt(unread);
       const remaining = final - unit.total;
       const room = remaining * (1 - unit.others);
       const countedLead = unit.margin * unit.total;
@@ -2434,7 +2441,11 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
       const isPacedLean = learned != null && unit.paced != null && !isTail;
       const leaning =
         learned != null && (unit.paced == null || isPacedLean) ? remaining : 0;
-      const modeled = margin * final - countedLead;
+      const span = fitted[index]!;
+      const modeled =
+        isLate && !isTail && span > final && span > unit.total
+          ? (remaining * (margin * span - countedLead)) / (span - unit.total)
+          : margin * final - countedLead;
       const anchor =
         unit.pacedLead != null
           ? { total: unit.paced ?? unit.total, lead: unit.pacedLead }
@@ -2467,9 +2478,7 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
             ? toward
             : modeled + MODEL.late.follow * (toward - modeled);
       const lead = clamp(
-        aimed +
-          (shift * reach + mode * (1 - fraction)) * final +
-          leaning * drift,
+        aimed + (shift * reach + mode * unread) * final + leaning * drift,
         -room,
         room,
       );
@@ -2481,8 +2490,19 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
           ? final * later + spills[wholeOf.get(unit.county)!]! * portion[index]!
           : Math.max(0, open - remaining);
       const ceiling = 1 - unit.others;
-      const local =
-        final > 0 && learned == null ? MODEL.tail.local * gaussian(random) : 0;
+      const jitter = final > 0 && learned == null ? gaussian(random) : 0;
+      const pullOwn = pull?.own.get(index) ?? {
+        shift: 0,
+        variance: pull?.spread ?? 0,
+      };
+      const pullDrift =
+        pull == null
+          ? null
+          : MODEL.late.canvass *
+            (pullTilt + pullOwn.shift + Math.sqrt(pullOwn.variance) * jitter);
+      const pullExpect =
+        pull == null ? null : MODEL.late.canvass * (pull.mean + pullOwn.shift);
+      const local = pull == null ? MODEL.tail.local * jitter : 0;
       const tail = (value: number, tilt: number) =>
         final > 0
           ? extra *
@@ -2494,14 +2514,14 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
               ceiling,
             )
           : 0;
-      const unitVotes = countedLead + lead + tail(lead, drift);
+      const unitVotes = countedLead + lead + tail(lead, pullDrift ?? drift);
       const unitTotal = final + extra;
       votes += unitVotes;
-      still += countedLead + steady + tail(steady, expect);
+      still += countedLead + steady + tail(steady, pullExpect ?? expect);
       all += unitTotal;
       if (Math.abs(margin * final - countedLead) < room) {
         shifted += unitTotal * reach;
-        moded += unitTotal * (1 - fraction);
+        moded += unitTotal * unread;
       }
       leaned += extra;
       scattered += extra ** 2 * own.variance;
