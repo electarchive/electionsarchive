@@ -783,6 +783,8 @@
       "source": "uu10-2016",
       "first_held": "2005-06-01",
       "note": "Direct since June 2005 (the DPRD chose governors before), in staggered contests to 2014 and in national waves since 2015; 37 governors in 2024 (Yogyakarta's governor is the Sultan). Plurality since 2015, with an empty-box option against a single ticket; Jakarta needs over 50% else a runoff.",
+      "disposition": "blocked",
+      "disposition_reason": "No national canvass of all tickets exists. KPU's open data portal (ds/12-17) lists only the winning ticket with its votes and the contest total for 2006-2008, 2010, 2017, and 2018; runner-up tickets and the 2015, 2020, and 2024 waves sit in each of the 38 provincial KPU decrees, which are not gathered.",
       "match": [
         {
           "office_kinds": [
