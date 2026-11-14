@@ -2,11 +2,13 @@ import base64
 import csv
 import html
 import io
+import json
 import re
 import subprocess
 import tempfile
 from collections import Counter
 from datetime import date
+from difflib import SequenceMatcher, get_close_matches
 from itertools import pairwise
 from pathlib import Path
 from uuid import UUID
@@ -70,6 +72,118 @@ LEEDS_MODEL = "claude-haiku-5-5"
 LEEDS_LONGEST = 1568
 LEEDS_SPECKS = 40
 LEEDS_COLUMNS = {1988: 1, 1990: 4, 1999: 5}
+LEEDS_PAGE_COLUMNS = {(1995, 1): 4, (1996, 1): 3}
+LEEDS_UPSIDE = {(1995, 1)}
+LEEDS_ALL_OUT = {1973, 1980}
+LEEDS_MARKED = {1973, 1980, 1982, 1983, 1984, 2000}
+LEEDS_UNSURE = "?"
+LEEDS_WARDS = (
+    "AIREBOROUGH",
+    "ARMLEY",
+    "BARWICK & KIPPAX",
+    "BEESTON",
+    "BRAMLEY",
+    "BURMANTOFTS",
+    "CHAPEL ALLERTON",
+    "CITY & HOLBECK",
+    "COOKRIDGE",
+    "GARFORTH & SWILLINGTON",
+    "HALTON",
+    "HAREHILLS",
+    "HEADINGLEY",
+    "HORSFORTH",
+    "HUNSLET",
+    "KIRKSTALL",
+    "MIDDLETON",
+    "MOORTOWN",
+    "MORLEY NORTH",
+    "MORLEY SOUTH",
+    "NORTH",
+    "OTLEY & WHARFEDALE",
+    "PUDSEY NORTH",
+    "PUDSEY SOUTH",
+    "RICHMOND HILL",
+    "ROTHWELL",
+    "ROUNDHAY",
+    "SEACROFT",
+    "UNIVERSITY",
+    "WEETWOOD",
+    "WETHERBY",
+    "WHINMOOR",
+    "WORTLEY",
+)
+LEEDS_NUMBERED = (
+    "Armley and Castleton",
+    "Beeston and Holbeck",
+    "Burmantofts and Richmond Hill",
+    "Chapel Allerton and Scott Hall",
+    "City and Woodhouse",
+    "Cookridge and Weetwood",
+    "East and West Hunslet",
+    "Gipton and Whinmoor",
+    "Harehills and Roundhay",
+    "Bramley",
+    "Halton",
+    "Headingley",
+    "Kirkstall",
+    "Burley",
+    "Middleton",
+    "Moortown",
+    "Osmondthorpe",
+    "Seacroft",
+    "Stanningley",
+    "Talbot",
+    "Wortley",
+    "Morley Part 1",
+    "Morley Part 2",
+    "Pudsey Part 1",
+    "Pudsey Part 2",
+    "Aireborough",
+    "Garforth Part 1",
+    "Garforth Part 2",
+    "Horsforth",
+    "Otley",
+    "Rothwell",
+    "Wetherby",
+)
+LEEDS_TAIL = r"\s*\(.*$|\s+[A-Z]+/[A-Z/]+\)?$|\s+(LAB|CON|LIB|LIB DEM|COMM?|NF|ECOL|SDP|GRN|IND)\.?$"
+LEEDS_LABELS = {
+    **dict.fromkeys(("LAB", "LABOUR", "LAB/CO OP", "LAB/ CO OP"), "Labour Party"),
+    **dict.fromkeys(("CON", "CONSERVATIVE", "OFF CON", "OFFICIAL CONSERVATIVE"), "Conservative Party"),
+    **dict.fromkeys(
+        (
+            "LIB DEM",
+            "L/DEM",
+            "LIB/DEM",
+            "LIBERAL DEMOCRAT",
+            "YOUR LIBERAL DEMOCRAT TEAM",
+            "SOCIAL AND LIBERAL DEMOCRAT",
+            "SOCIAL AND LIBERAL DEMOCRATS",
+            "SOCIAL & LIBERAL DEMOCRAT",
+            "SOCIAL & LIBERAL DEMOCRATS",
+            "SOCIAL AND LIBERAL DEMOCRATIC",
+            "SOCIAL LIBERAL DEMOCRAT",
+            "SLD",
+            "LIBERAL SLD",
+        ),
+        "Liberal Democrats",
+    ),
+    "LIB": "Liberal",
+    **dict.fromkeys(("SDP/LIB", "LIB/SDP", "SDP/ALNCE", "LIB/ALNCE", "SDP/LIB/ALNCE", "LIB/SDP/ALNCE"), "SDP/Lib All"),
+    **dict.fromkeys(("SDP", "S D P", "SOCIAL DEMOCRATIC"), "Social Democratic Party"),
+    **dict.fromkeys(("GRN", "GREEN", "GRN IST", "GRN ND", "GRN ST"), "Green Party"),
+    **dict.fromkeys(("ECOL", "ECOLOGY"), "Ecology Party"),
+    **dict.fromkeys(("COM", "COMM", "COMMUNIST"), "Communist"),
+    **dict.fromkeys(("RV COMM", "RV  COMM"), "Revolutionary Communist"),
+    **dict.fromkeys(("NAT FRONT", "NATFRONT", "NF"), "National Front"),
+    "BNP": "BNP",
+    **dict.fromkeys(("IND", "INDEP", "INDEPENDENT"), "Independent"),
+    **dict.fromkeys(("IND LAB", "IND/LAB"), "Independent Labour"),
+    "UK IND": "UK Independence Party",
+    "LEFT AL": "Left Alliance",
+    "MIL LAB": "Militant Labour",
+}
+LEEDS_HAND = Path(__file__).with_name("council_archives_leeds.tsv")
 LEEDS_READS = {
     "a": "",
     "b": " Read each handwritten vote figure digit by digit before you write it, and count its digits; where a figure "
@@ -267,6 +381,12 @@ CALDERDALE_ELECTIONS = {
     4: (date(1999, 10, 29), "Elland by-election, 29 October 1999"),
     5: (date(2000, 5, 4), "Election of Local Councillors 2000"),
 }
+LEEDS_NATIONAL = {date(1973, 5, 10): "1973 metropolitan district elections in England"}
+LEEDS_NOTES = (
+    "Scanned typed and handwritten result sheets for each Leeds City Council election, published by the council as "
+    "open data, with each ward's candidates, parties, and votes; some years mark the elected candidates. Figures "
+    "were read three times from the page images and disagreements settled by eye against the scan."
+)
 CALDERDALE_NOTES = (
     "Calderdale Council's election results pages, one per ward, with each candidate's surname and forenames, party, "
     "votes, and the elected candidate, and the ward's eligible voters, total turnout, and rejected papers."
@@ -380,6 +500,14 @@ PARTIES = {
     "BNP": ("gb.party", "british-national-party"),
     "Communist": ("wikidata", "Q592068"),
     "Liberal": ("wikidata", "Q622441"),
+    "Liberal Party": ("gb.party", "liberal-party"),
+    "Liberal Party (1989)": ("gb.party", "liberal-party-1989"),
+    "SDP": ("gb.party", "social-democratic-party-1981"),
+    "SDP (1990)": ("gb.party", "social-democratic-party-1990"),
+    "Ecology Party": ("gb.party", "ecology-party"),
+    "National Front": ("gb.party", "national-front"),
+    "Independent Labour": ("gb.party", "independent-labour"),
+    "Militant Labour": ("gb.party", "militant-labour"),
 }
 INDEPENDENT = {"Independent", "Ind"}
 
@@ -395,7 +523,7 @@ def fetch() -> None:
     for year in LEEDS_FILES:
         path = str(raw.fetch(SOURCE, leeds_url(year), suffix=".pdf").path)
         for page in range(1, pages(path) + 1):
-            for index, (_, piece) in enumerate(leeds_pieces(leeds_page(path, page), LEEDS_COLUMNS.get(year, 2))):
+            for index, (_, piece) in enumerate(leeds_pieces(leeds_page(path, year, page), leeds_columns(year, page))):
                 buffer = io.BytesIO()
                 piece.save(buffer, "PNG")
                 for read, extra in LEEDS_READS.items():
@@ -433,20 +561,36 @@ def leeds_url(year: int) -> str:
     return f"{LEEDS_SITE}/{LEEDS_FILES[year][0]}"
 
 
+def leeds_columns(year: int, page: int) -> int:
+    return LEEDS_PAGE_COLUMNS.get((year, page), LEEDS_COLUMNS.get(year, 2))
+
+
+def leeds_piece(year: int, page: int, index: int | str) -> str:
+    columns = leeds_columns(year, page)
+    return f"{index}{f'of{columns}' if columns > 2 else ''}{'u' if (year, page) in LEEDS_UPSIDE else ''}"
+
+
 def leeds_key(read: str, year: int, page: int, index: int) -> str:
-    columns = LEEDS_COLUMNS.get(year, 2)
-    piece = f"{index}of{columns}" if columns > 2 else str(index)
-    return f"anthropic-batch:{LEEDS_MODEL}/leeds-{read}/{year}/{page}/{piece}"
+    return f"anthropic-batch:{LEEDS_MODEL}/leeds-{read}/{year}/{page}/{leeds_piece(year, page, index)}"
 
 
-def leeds_page(path: str, page: int) -> Image.Image:
+def leeds_page(path: str, year: int, page: int) -> Image.Image:
     with tempfile.TemporaryDirectory() as folder:
         stem = f"{folder}/page"
         subprocess.run(
             ["pdftoppm", "-r", "200", "-gray", "-png", "-f", str(page), "-l", str(page), "-singlefile", path, stem],
             check=True,
         )
-        return Image.open(f"{stem}.png").convert("L").rotate(90, expand=True)
+        return Image.open(f"{stem}.png").convert("L").rotate(270 if (year, page) in LEEDS_UPSIDE else 90, expand=True)
+
+
+def leeds_box(year: int, page: int, box: list[int] | None) -> list[int] | None:
+    if box is None or len(box) != 4:
+        return None
+    left, top, right, bottom = (min(max(value, 0), 1000) for value in box)
+    if (year, page) in LEEDS_UPSIDE:
+        return [min(top, bottom), 1000 - max(left, right), max(top, bottom), 1000 - min(left, right)]
+    return [1000 - max(top, bottom), min(left, right), 1000 - min(top, bottom), max(left, right)]
 
 
 def leeds_pieces(image: Image.Image, columns: int) -> list[tuple[tuple[int, int, int, int], Image.Image]]:
@@ -471,6 +615,198 @@ def leeds_pieces(image: Image.Image, columns: int) -> list[tuple[tuple[int, int,
         piece.thumbnail((LEEDS_LONGEST, LEEDS_LONGEST))
         pieces.append((box, piece))
     return pieces
+
+
+def leeds_reads(year: int) -> dict[str, list[dict]]:
+    path = str(raw.cached(SOURCE, leeds_url(year)).path)
+    keys = raw.keys(SOURCE)
+    reads: dict[str, list[dict]] = {}
+    for read in LEEDS_READS:
+        found_lines = reads.setdefault(read, [])
+        for page in range(1, pages(path) + 1):
+            prefix = f"anthropic-batch:{LEEDS_MODEL}/leeds-{read}/{year}/{page}/"
+            pieces = sorted(
+                (int(key.removeprefix(prefix).split("of")[0].rstrip("u")), key)
+                for key in keys
+                if key.startswith(prefix) and re.fullmatch(leeds_piece(year, page, r"\d+"), key.removeprefix(prefix))
+            )
+            if not pieces:
+                continue
+            image = leeds_page(path, year, page)
+            boxes = [box for box, _ in leeds_pieces(image, leeds_columns(year, page))]
+            for index, key in pieces:
+                left, _, right, _ = boxes[index]
+                message = json.loads(raw.cached(SOURCE, key).path.read_bytes())
+                if message.get("stop_reason") != "end_turn":
+                    continue
+                text = next(block["text"] for block in message["content"] if block["type"] == "text")
+                for ward in json.loads(text)["wards"]:
+                    if not leeds_ward(ward["heading"]):
+                        continue
+                    for entry in ward["candidates"]:
+                        found_lines.append(
+                            {
+                                **entry,
+                                "heading": leeds_ward(ward["heading"]),
+                                "seats_note": ward["seats_note"],
+                                "page": page,
+                                "piece": index,
+                                "box": [
+                                    round((left + ward["box"][0] * (right - left) / 1000) * 1000 / image.width),
+                                    ward["box"][1],
+                                    round((left + ward["box"][2] * (right - left) / 1000) * 1000 / image.width),
+                                    ward["box"][3],
+                                ]
+                                if len(ward["box"]) == 4
+                                else None,
+                                "key": re.sub(r"[^A-Z]", "", re.sub(LEEDS_TAIL, "", entry["name"].upper().strip())),
+                            }
+                        )
+    return reads
+
+
+def leeds_ward(heading: str) -> str:
+    text = heading.upper()
+    if "ELECTORAL DIVISION" in text or "W.Y.C.C" in text:
+        return ""
+    number = re.match(r"WARD NO\.? ?(\d+)", text)
+    if number:
+        return LEEDS_NUMBERED[int(number[1]) - 1]
+    inner = re.search(r"\(([^)]*)\)?", text)
+    if "WARD NO" in text and inner:
+        text = inner[1]
+    text = re.sub(r"\bWARD\b|\(.*|NO\.? ?\d+|CONT.*|[^A-Z& ]", " ", text)
+    text = " ".join(text.replace(" AND ", " & ").replace("&", " & ").split())
+    return next(iter(get_close_matches(text, LEEDS_WARDS, 1, 0.6)), text)
+
+
+def leeds_votes(value: str | None) -> int | None:
+    digits = re.sub(r"[,.\s]", "", value or "")
+    return int(digits) if digits.isdigit() else None
+
+
+def majority(values: list) -> object:
+    value, count = Counter(values).most_common(1)[0]
+    return value if count >= 2 or len(values) == 1 else LEEDS_UNSURE
+
+
+def leeds_party(year: int, party: str) -> str:
+    text = re.sub(r"[^A-Z/& ]", "", party.upper().replace("-", " ")).strip()
+    text = re.sub(r"^THE | CANDIDATE$| PARTY$| PARTY CANDIDATE$", "", text).strip()
+    label = LEEDS_LABELS.get(" ".join(text.split()), party)
+    if label == "Liberal":
+        return "Liberal Party" if year < 1989 else "Liberal Party (1989)"
+    if label == "Social Democratic Party":
+        return "SDP" if year <= 1990 else "SDP (1990)"
+    return label
+
+
+def leeds() -> tuple[list[dict], list[dict]]:
+    rows: list[dict] = []
+    wards: list[dict] = []
+    hand = {
+        (int(line["year"]), line["candidate"]): int(line["votes"]) if line["votes"] else None
+        for line in csv.DictReader(LEEDS_HAND.open(), delimiter="\t")
+    }
+    for year, (_, day) in LEEDS_FILES.items():
+        reads = leeds_reads(year)
+        clusters: list[dict[str, dict]] = []
+        for read, entries in reads.items():
+            taken: set[int] = set()
+            for entry in entries:
+                scores = [
+                    (
+                        SequenceMatcher(None, entry["key"], first["key"]).ratio()
+                        + 0.1 * (entry["heading"] == first["heading"]),
+                        index,
+                    )
+                    for index, cluster in enumerate(clusters)
+                    if read not in cluster and index not in taken
+                    for first in [next(iter(cluster.values()))]
+                ]
+                score, index = max(scores, default=(0.0, -1))
+                if score >= 0.85:
+                    clusters[index][read] = entry
+                    taken.add(index)
+                else:
+                    clusters.append({read: entry})
+                    taken.add(len(clusters) - 1)
+        entry = {"code": LEEDS, "file": leeds_url(year), "day": day}
+        by_ward: dict[str, list[dict]] = {}
+        unsure = 0
+        for cluster in clusters:
+            seen = list(cluster.values())
+            name = majority([line["key"] for line in seen])
+            if name == LEEDS_UNSURE:
+                name = max(seen, key=lambda line: len(line["key"]))["key"]
+            pick = {
+                "ward": majority([line["heading"] for line in seen]),
+                "votes": hand.get((year, str(name)), majority([leeds_votes(line["votes"]) for line in seen])),
+                "party": majority([line["party"] for line in seen]),
+                "mark": majority([bool(line["mark"]) for line in seen]) is True,
+                "hand": (year, str(name)) in hand,
+            }
+            label = next(line["name"] for line in seen if line["key"] == name)
+            if len(seen) < 2 and len(reads) > 1:
+                continue
+            if LEEDS_UNSURE in pick.values():
+                unsure += 1
+                print(
+                    f"leeds {year}: unsure {[(read, line['heading'], line['name'], line['party'], line['votes'], line['mark'], line['page'], line['piece']) for read, line in cluster.items()]}"
+                )
+                continue
+            by_ward.setdefault(str(pick["ward"]), []).append(
+                {
+                    **pick,
+                    "name": label,
+                    "page": seen[0]["page"],
+                    "box": seen[0]["box"],
+                    "seats": {line["seats_note"] for line in seen},
+                }
+            )
+        if unsure:
+            continue
+        for ward_name, found_lines in by_ward.items():
+            if any(line["votes"] is None for line in found_lines):
+                print(f"leeds {year}: {ward_name} has a figure cut off the scan")
+                continue
+            notes = set().union(*(line["seats"] for line in found_lines)) - {None}
+            seats = 3 if year in LEEDS_ALL_OUT else 2 if any("TWO" in str(note) for note in notes) else 1
+            marked = [line for line in found_lines if line["mark"]]
+            elected = year in LEEDS_MARKED and len(marked) == seats
+            ward = {
+                "name": ward_name
+                if ward_name in LEEDS_NUMBERED
+                else " ".join(word if word == "&" else word.capitalize() for word in ward_name.split()).replace(
+                    "&", "and"
+                ),
+                "code": LEEDS,
+                "day": day,
+                "seats": seats,
+                "box": leeds_box(year, found_lines[0]["page"], found_lines[0]["box"]),
+            }
+            wards.append(ward)
+            for line in found_lines:
+                printed = re.sub(LEEDS_TAIL, "", str(line["name"]).strip())
+                parts = printed.replace(".", ". ").split()
+                letters = ""
+                while len(parts) > 1 and len(parts[-1].rstrip(".")) == 1:
+                    letters = f"{parts.pop().rstrip('.')}. {letters}"
+                surname = " ".join(parts)
+                label = display(printed) if re.search(r"[a-z]{2}", printed) else f"{letters}{display(surname)}"
+                rows.append(
+                    candidate(
+                        entry,
+                        ward,
+                        line["page"],
+                        label,
+                        leeds_party(year, str(line["party"] or "")),
+                        int(str(line["votes"])),
+                        elected and bool(line["mark"]),
+                    )
+                )
+        print(f"leeds {year}: {len(by_ward)} wards")
+    return rows, wards
 
 
 def found(pattern: str, content: str, flags: int = 0) -> re.Match[str]:
@@ -1005,6 +1341,7 @@ def parse() -> None:
         wards += found_wards
     for found_rows, found_wards in (
         calderdale(),
+        leeds(),
         *(shepway(entry) for entry in FILES if entry["parser"] == "shepway"),
     ):
         rows += found_rows
@@ -1012,7 +1349,13 @@ def parse() -> None:
     for row in rows:
         ward = row.pop("at")
         row["name"] = FIXES.get(row["name"], re.sub(r"(\w)- (\w)", r"\1-\2", row["name"]))
-        row.update(day=ward["day"], precision=ward.get("precision", "day"), by=ward.get("by", False), ward=ward["name"])
+        row.update(
+            day=ward["day"],
+            precision=ward.get("precision", "day"),
+            by=ward.get("by", False),
+            ward=ward["name"],
+            box=ward.get("box"),
+        )
     frame = pl.DataFrame(rows, infer_schema_length=None).with_row_index("number")
     figures = {(w["code"], w["day"], w["name"]): w for w in wards}
     extra = []
@@ -1026,7 +1369,7 @@ def parse() -> None:
             raise ValueError(f"{code} {day} {ward}: votes for some candidates only")
         if tacit and (group.height != seats or elected != seats):
             raise ValueError(f"{code} {day} {ward}: {group.height} unopposed candidates for {seats} seats")
-        if elected == 0 and code == CALDERDALE:
+        if elected == 0 and code in (CALDERDALE, LEEDS):
             print(f"{code} {day} {ward}: no candidate marked elected")
         elif elected != seats:
             raise ValueError(f"{code} {day} {ward}: {elected} elected for {seats} seats")
@@ -1101,7 +1444,7 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary="English council elections from 1965 to 2001 by ward, from council-published results in Dover, "
-            "Kent, Epsom and Ewell, Surrey, Bedford, Calderdale, and Shepway",
+            "Kent, Epsom and Ewell, Surrey, Bedford, Calderdale, Shepway, and Leeds",
             polity="GB",
         )
         outranked = foreign_preferred(conn, cs, SOURCE)
@@ -1215,6 +1558,22 @@ def emit() -> Path:
         for url in candidates.filter(pl.col("code") == CALDERDALE)["file"].unique().sort():
             sources[url] = calderdale_source
             cs.artifact(raw.cached(SOURCE, url), calderdale_source)
+        leeds_source = cs.source("Leeds City Council", "Leeds City Council election results, 1973 to 2000")
+        cs.add(
+            "source",
+            id=leeds_source,
+            kind="official_body",
+            publisher="Leeds City Council",
+            title="Leeds City Council election results, 1973 to 2000",
+            url=LEEDS_SITE,
+            license="Open Government Licence v3.0",
+            license_url=OGL,
+            attribution="Contains public sector information licensed under the Open Government Licence v3.0.",
+            notes=LEEDS_NOTES,
+        )
+        for url in candidates.filter(pl.col("code") == LEEDS)["file"].unique().sort():
+            sources[url] = leeds_source
+            cs.artifact(raw.cached(SOURCE, url), leeds_source)
 
         councils: dict[str, tuple[UUID, UUID, UUID, str, str]] = {}
         for code in candidates["code"].unique(maintain_order=True):
@@ -1252,7 +1611,8 @@ def emit() -> Path:
                         status="held",
                     )
                     wales = day.year in (1976, 1979, 1983, 1985, 1987, 1989, 1991, 1993, 1995)
-                    name(national, f"{day.year} local elections in England{' and Wales' if wales else ''}")
+                    label = f"{day.year} local elections in England{' and Wales' if wales else ''}"
+                    name(national, LEEDS_NATIONAL.get(day, label))
                     cs.add("slug", path=f"gb/{day}-local", entity_id=national)
             election = cs.key("gb.election", f"{stamp}:local:{code}")
             if election in cs.minted:
@@ -1348,6 +1708,8 @@ def emit() -> Path:
                 locator: dict[str, object] = {"ward": ward}
                 if first["page"]:
                     locator["page"] = first["page"]
+                    if first["box"] is not None:
+                        locator["bbox"] = [value / 1000 for value in first["box"]]
                 else:
                     locator["url"] = first["file"]
                 cs.add("citation", entity_id=result_set, source_id=source, locator=locator)
