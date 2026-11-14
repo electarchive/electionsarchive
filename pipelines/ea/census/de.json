@@ -3420,11 +3420,12 @@
           "quote": "Table 17, Ergebnisse der Wahlen zum Reichstag am 10. Januar 1877: Gesamtzahl der Abgeordneten 397"
         },
         {
-          "date": "1878-06-30",
+          "date": "1878-07-30",
           "contests": 397,
           "seats": 397,
           "source": "bwl-ergebnisse",
-          "quote": "Table 17, Ergebnisse der Wahlen zum Reichstag am 30. Juni 1878: Gesamtzahl der Abgeordneten 397"
+          "quote": "Table 17, Ergebnisse der Wahlen zum Reichstag am 30. Juni 1878: Gesamtzahl der Abgeordneten 397",
+          "note": "Table 17 misprints the month. The election was held on 30 July 1878, matching the archive's de.reichstag_empire election (changeset 01a1d7ec)."
         },
         {
           "date": "1881-10-27",
