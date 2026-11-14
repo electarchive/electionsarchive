@@ -482,6 +482,55 @@ def read_script(text: str, declared: str) -> Stages:
     return facts, rows, exhausted, dropped, [], affiliations
 
 
+def read_wide(text: str) -> Stages:
+    facts = {
+        key: Decimal(found.group(1).replace(",", ""))
+        for key, pattern in (
+            ("valid", r"Total Number of Valid Votes\s+(" + NUMBER + ")"),
+            ("seats", r"Number of Vacancies\s+(" + NUMBER + ")"),
+            ("quota", r"Quota\s+(" + NUMBER + ")"),
+        )
+        if (found := re.search(pattern, text)) is not None
+    }
+    cells: dict[str, list[Decimal]] = {}
+    elected: set[str] = set()
+    affiliations: dict[str, str] = {}
+    odd = []
+    label = ""
+    for line in text.splitlines():
+        if not line.strip() or re.match(r"(Name of|Total|Number of|Quota|LIVE|Election)", line):
+            continue
+        if line[0].isspace():
+            if label and re.fullmatch(r"\s+(?:-?[\d,]+(?:\.\d+)?\s*)+", line):
+                cells[label].extend(Decimal(token.replace(",", "")) for token in line.split())
+            continue
+        if line.rstrip().endswith(" Ward"):
+            continue
+        status = re.search(r"\s(Elected)\s*$", line)
+        fields = re.split(r"\s{2,}", (line[: status.start()] if status else line).strip())
+        label = fields[0]
+        body = fields[1:]
+        if not label.startswith("Non-transferable") and body and not re.match(r"-?\d", body[0]):
+            affiliations.setdefault(label, body.pop(0))
+        tokens = re.findall(r"-?\d[\d,]*(?:\.\d+)?", " ".join(body))
+        cells.setdefault(label, []).extend(Decimal(token.replace(",", "")) for token in tokens)
+        if status:
+            elected.add(label)
+    rows: list[tuple[int, str, Decimal, str | None]] = []
+    exhausted: dict[int, Decimal] = {}
+    dropped: set[str] = set()
+    for label, values in cells.items():
+        totals = values[:1] + values[2::2]
+        if label.startswith("Non-transferable"):
+            exhausted = {stage: total for stage, total in enumerate(totals, 1)}
+            continue
+        for stage, total in enumerate(totals, 1):
+            rows.append((stage, label, total, "Elected" if label in elected and stage == len(totals) else None))
+        if label not in elected and totals and totals[-1] == 0:
+            dropped.add(name_key(label))
+    return facts, rows, exhausted, dropped, odd, affiliations
+
+
 def read_other(text: str, declared: str) -> Stages:
     if "Stage 1 - First Preference" in text:
         return read_matrix(text)
@@ -1712,8 +1761,11 @@ def parse_hist() -> None:
             units.append({"council": council, "ward": row["ward"], "locator": locator, "status": "not fetched"})
             continue
         text = pdf_text(path)
-        facts, rows, exhausted, dropped, odd, _ = read_stages(text)
-        ballots = re.search(r"Ballot Papers Received\s+(" + NUMBER + ")", text)
+        if "Total Number of Valid Votes" in text and "Number of Vacancies" in text:
+            facts, rows, exhausted, dropped, odd, _ = read_wide(text)
+        else:
+            facts, rows, exhausted, dropped, odd, _ = read_stages(text)
+        ballots = re.search(r"(?:Ballot Papers|Total Number of Ballots) Received\s+(" + NUMBER + ")", text)
         first = [(label, votes, outcome) for number, label, votes, outcome in rows if number == 1]
         found = contests.get((council, tuple(sorted(int(votes) for _, votes, _ in first))), [])
         if not found:
