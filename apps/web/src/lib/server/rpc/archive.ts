@@ -1406,7 +1406,7 @@ async function find(id: string) {
   return contest;
 }
 
-export type Top = {
+type Top = {
   root: string;
   person: string | null;
   party: string | null;
@@ -10533,7 +10533,9 @@ export const contests = {
                       ),
                     ),
                 )
-              ).flatMap((part) => part.rows),
+              ).flatMap((part) =>
+                part.rows.map(({ inferred: _inferred, ...row }) => row),
+              ),
             ];
             const painted = await db.execute<{
               root: string;
@@ -10559,7 +10561,7 @@ export const contests = {
             const colors = new Map(
               painted.rows.map((row) => [`${row.root}:${row.party}`, row]),
             );
-            return found.map(({ inferred: _inferred, ...row }) => {
+            return found.map((row) => {
               const color = colors.get(`${row.root}:${row.party ?? ""}`);
               return {
                 ...row,
