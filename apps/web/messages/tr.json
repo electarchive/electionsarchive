@@ -74,6 +74,8 @@
   "about_maker_body": "Elections Archive projesini [Firat Ciftci](https://www.firatciftci.com) yapıyor. Kaynak kodu [GitHub](https://github.com/electarchive/electionsarchive) üzerinde.",
   "about_contact_title": "İletişim",
   "about_contact_body": "[hello@electionsarchive.com](mailto:hello@electionsarchive.com) adresine yazabilirsiniz. Yanlış bir rakamı bildirmek için GitHub'daki [veri hatası formunu](https://github.com/electarchive/electionsarchive/issues/new?template=data-error.yml) kullanın.",
+  "about_tribal_title": "Yerli kabileler",
+  "about_tribal_body": "Bir yerli kabilenin sonuçları yalnızca o kabilenin kendi seçim kurulunun herkese açık olarak yayımladığı verilerden alınır ve kaynak olarak bu kurul gösterilir. Haber kuruluşlarının derlediği sonuçlar ve ABD Kızılderili İşleri Bürosu dosyaları bu verilerin yerine hiçbir zaman kullanılmaz. Bir kabile, istediği zaman verilerinin kaldırılmasını ya da sınırlandırılmasını isteyebilir. Bu istek yerine getirilir. [hello@electionsarchive.com](mailto:hello@electionsarchive.com) adresine yazabilirsiniz.",
   "license_title": "Lisans",
   "license_lede": "Veriler CC BY 4.0 lisansıyla serbestçe yeniden kullanılabilir, kod ise AGPL altında özgür yazılımdır. Arşivi ve kaynaklarını belirtirseniz verileri her amaçla kullanabilirsiniz.",
   "license_data_title": "Veriler",

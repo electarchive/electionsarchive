@@ -74,6 +74,8 @@
   "about_maker_body": "Elections Archive stammt von [Firat Ciftci](https://www.firatciftci.com). Der Quellcode steht auf [GitHub](https://github.com/electarchive/electionsarchive).",
   "about_contact_title": "Kontakt",
   "about_contact_body": "Schreiben Sie an [hello@electionsarchive.com](mailto:hello@electionsarchive.com). Eine falsche Zahl melden Sie über das [Formular für Datenfehler](https://github.com/electarchive/electionsarchive/issues/new?template=data-error.yml) auf GitHub.",
+  "about_tribal_title": "Indigene Nationen",
+  "about_tribal_body": "Die Ergebnisse einer indigenen Nation stammen ausschließlich aus dem, was ihre eigene Wahlbehörde öffentlich zugänglich macht. Sie werden dieser Behörde als Quelle zugeschrieben. Zählungen aus Medienberichten und Akten des Bureau of Indian Affairs dienen nie als Ersatz. Eine Nation kann jederzeit verlangen, dass ihre Daten entfernt oder nur eingeschränkt gezeigt werden. Diesem Wunsch wird entsprochen. Schreiben Sie dazu an [hello@electionsarchive.com](mailto:hello@electionsarchive.com).",
   "license_title": "Lizenz",
   "license_lede": "Die Daten dürfen unter CC BY 4.0 frei weiterverwendet werden, und der Code ist freie Software unter der AGPL. Nennen Sie das Archiv und seine Quellen, dann können Sie die Daten für jeden Zweck nutzen.",
   "license_data_title": "Daten",

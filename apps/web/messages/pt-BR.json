@@ -74,6 +74,8 @@
   "about_maker_body": "O Elections Archive é feito por [Firat Ciftci](https://www.firatciftci.com). O código-fonte está no [GitHub](https://github.com/electarchive/electionsarchive).",
   "about_contact_title": "Contato",
   "about_contact_body": "Escreva para [hello@electionsarchive.com](mailto:hello@electionsarchive.com). Para informar um número errado, use o [formulário de erro de dados](https://github.com/electarchive/electionsarchive/issues/new?template=data-error.yml) no GitHub.",
+  "about_tribal_title": "Nações indígenas",
+  "about_tribal_body": "Os resultados de uma nação indígena vêm apenas do que o órgão eleitoral da própria nação publica abertamente. O crédito vai para esse órgão. Contagens da imprensa e arquivos do Bureau of Indian Affairs nunca substituem esses dados. Uma nação pode pedir a qualquer momento que seus dados sejam retirados ou limitados. O pedido será atendido. Escreva para [hello@electionsarchive.com](mailto:hello@electionsarchive.com).",
   "license_title": "Licença",
   "license_lede": "Os dados podem ser reutilizados livremente sob a CC BY 4.0, e o código é software livre sob a AGPL. Dê crédito ao arquivo e às suas fontes, e você pode usar os dados para qualquer finalidade.",
   "license_data_title": "Dados",
