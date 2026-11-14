@@ -2785,6 +2785,8 @@ export const polityRecord = pgTable("polity_record", {
 	polityId: uuid("polity_id").primaryKey(),
 	record: jsonb().notNull(),
 	builtAt: timestamp("built_at", { withTimezone: true }).default(sql`now()`).notNull(),
+	mark: bigint({ mode: 'number' }),
+	deps: text().array(),
 });
 
 export const polityRelation = pgTable("polity_relation", {
