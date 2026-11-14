@@ -66,6 +66,13 @@ PARTIES = {
     "Write-in": None,
 }
 SKIP = ("Total", "Válidos", "Mal Votado", "No Votado", "Blanco", "Nulo")
+ESCRUTINIO = {
+    2016: "https://elecciones2016.ceepur.org/Escrutinio_General_77/",
+    2020: "https://elecciones2020.ceepur.org/Escrutinio_General_93/",
+    2024: "https://elecciones2024.ceepur.org/Escrutinio_General_121/",
+}
+LEGISLATURE_INDEX = "data/LEGISLADORES_MUNICIPALES_Municipios.xml"
+SEATS = {4: 5, 9: 12, 11: 14, 13: 16, 14: 17}
 
 
 def url(code: str) -> str:
@@ -105,6 +112,7 @@ def fetch() -> None:
         raw.store(
             SOURCE, URL88, curl(URL88), suffix=".pdf", retrieved_at=datetime.now(UTC), media_type="application/pdf"
         )
+    fetch_legislatures()
     for code in municipios():
         if not raw_has(url(code)):
             raw.store(
@@ -115,6 +123,59 @@ def fetch() -> None:
                 retrieved_at=datetime.now(UTC),
                 media_type="text/html",
             )
+
+
+def fetch_legislatures() -> None:
+    for year in ESCRUTINIO:
+        fetch_legislature(year, LEGISLATURE_INDEX)
+        for page in legislature_pages(year):
+            fetch_legislature(year, page)
+
+
+def fetch_legislature(year: int, page: str) -> None:
+    link = ESCRUTINIO[year] + page
+    if raw_has(link):
+        return
+    if year == 2024:
+        raise LookupError(f"{link}: the 2024 site refuses scripts; store it from a headless browser")
+    body = subprocess.run(
+        ["curl", "-sfLk", "--compressed", "-A", raw.USER_AGENT, link], capture_output=True, check=True
+    ).stdout
+    raw.store(SOURCE, link, body, suffix=".xml", retrieved_at=datetime.now(UTC), media_type="text/xml")
+
+
+def legislature_pages(year: int) -> list[str]:
+    link = ESCRUTINIO[year] + LEGISLATURE_INDEX
+    if not raw_has(link):
+        return []
+    text = raw.cached(SOURCE, link).path.read_text(encoding="latin-1")
+    pages = sorted(set(re.findall(r"<link><es>(LEGISLADORES_MUNICIPALES_[^<]+\.xml)</es>", text)))
+    if len(pages) != 78:
+        raise ValueError(f"{year}: {len(pages)} municipal legislature pages")
+    return [f"data/{page}" for page in pages]
+
+
+def read_legislature(year: int, page: str) -> tuple[str, list[tuple[str, str, int]], int]:
+    text = raw.cached(SOURCE, ESCRUTINIO[year] + page).path.read_text(encoding="latin-1")
+    place = re.search(r"<demarcation><es>(.*?)</es>", text)
+    report = re.search(r"<report>.*?<qty>(\d+)</qty><total>(\d+)</total>", text, re.DOTALL)
+    write_ins = re.search(r"<desc><es>NOMINACI.N DIRECTA</es>.*?<qty>(\d+)</qty>", text, re.DOTALL)
+    if place is None or report is None or write_ins is None:
+        raise ValueError(f"{year} {page}: unexpected layout")
+    if report[1] != report[2]:
+        raise ValueError(f"{year} {page}: {report[1]} of {report[2]} polling places reported")
+    lines = []
+    for option in re.findall(r"<option>(.*?)</option>", text, re.DOTALL):
+        label = re.search(r"<name><es>(.*?)</es>", option)
+        party = re.search(r"<peini><es>(.*?)</es>", option)
+        votes = re.search(r"<votes>(\d+)</votes>", option)
+        if label is None or party is None or votes is None:
+            raise ValueError(f"{year} {page}: unexpected option {option[:80]}")
+        code = "Ind." if party[1] == "INDPT" else party[1]
+        if code not in PARTIES:
+            raise ValueError(f"{year} {page}: party {party[1]}")
+        lines.append((re.sub(r"\s+", " ", html.unescape(label[1])).strip(), code, int(votes[1])))
+    return html.unescape(place[1]).strip(), lines, int(write_ins[1])
 
 
 def raw_has(link: str) -> bool:
@@ -249,7 +310,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Puerto Rico mayoral elections 1976-2024 in all 78 municipios, 2024 by voting center",
+            summary="Puerto Rico mayoral elections 1976-2024 in all 78 municipios, 2024 by voting center, and municipal legislatures 2016-2024 by municipio",
             polity="US-PR",
         )
 
@@ -457,5 +518,132 @@ def emit() -> Path:
                             value=votes,
                         )
                         counts["values"] += 1
+        limited = cs.key("us.electoral_system", "PR:municipal-legislature")
+        if limited in cs.minted:
+            ((territory,),) = conn.execute(
+                "select polity_id from election where id = %s", [cs.key("us.election", f"{DAYS[2024]}:PR")]
+            ).fetchall()
+            cs.add("electoral_system", id=limited, polity_id=territory, rules={"formula": "limited"}, rules_version=1)
+            name(limited, "Puerto Rico municipal legislature limited vote")
+        bodies: set[UUID] = set()
+        for year, base in ESCRUTINIO.items():
+            day = DAYS[year]
+            title = f"{year} General Election official count (escrutinio), municipal legislators by municipio"
+            source_leg = cs.source(PUBLISHER, title)
+            cs.add(
+                "source",
+                id=source_leg,
+                kind="official_body",
+                publisher=PUBLISHER,
+                title=title,
+                url=base + "index.html",
+                license="Public record",
+            )
+            cs.artifact(raw.cached(SOURCE, base + LEGISLATURE_INDEX), source_leg)
+            seen: set[str] = set()
+            for page in legislature_pages(year):
+                cs.artifact(raw.cached(SOURCE, base + page), source_leg)
+                place, lines, write_ins = read_legislature(year, page)
+                key = fold(place)
+                if key not in held or key in seen:
+                    raise ValueError(f"{year}: municipio {place}")
+                seen.add(key)
+                fips, polity, area, unit, path = held[key]
+                cap = max(sum(1 for line in lines if line[1] == party) for party in {line[1] for line in lines})
+                body = cs.key("us.body", f"PR:{fips}:legislature")
+                if body in cs.minted and body not in bodies:
+                    bodies.add(body)
+                    cs.add("body", id=body, polity_id=polity, kind="council")
+                    name(body, f"Municipal Legislature of {place}")
+                contest_key = f"{day}:PR:{fips}:legislature"
+                contest = cs.key("us.contest", contest_key)
+                cs.add(
+                    "contest",
+                    id=contest,
+                    election_id=cs.key("us.election", f"{day}:PR:{fips}"),
+                    kind="body_seats",
+                    office_id=None,
+                    body_id=body,
+                    district_area_id=area,
+                    magnitude=SEATS[cap],
+                    term="full",
+                    round_number=1,
+                    previous_round_id=None,
+                    electoral_system_id=limited,
+                    default_result_kind="counted",
+                )
+                name(contest, f"{year} {place} municipal legislature election")
+                if contest in cs.minted:
+                    cs.add("slug", path=f"{path}/{day}-general/municipal-legislature", entity_id=contest)
+                result_set = cs.key(f"{SOURCE}.result_set", contest_key)
+                cs.add(
+                    "result_set",
+                    id=result_set,
+                    election_id=cs.key("us.election", f"{day}:PR:{fips}"),
+                    contest_id=contest,
+                    stage="certified",
+                    kind="counted",
+                    status="active",
+                    source_id=source_leg,
+                    is_default=True,
+                    completeness=1,
+                )
+                cs.add(
+                    "note",
+                    entity_id=result_set,
+                    kind="methodology",
+                    body_md=f"Votes by municipio from the State Elections Commission's official count. Each party may nominate and elect at most {cap} of the {SEATS[cap]} members; the remaining seats go to minority parties. The count does not mark which candidates were elected, so no outcomes are recorded.",
+                )
+                counts["contests"] += 1
+                for label, party, votes in [("", "Write-in", write_ins), *lines]:
+                    if party == "Write-in":
+                        option = cs.key("us.option", f"{contest_key}:scattering")
+                        cs.add(
+                            "contest_option",
+                            id=option,
+                            contest_id=contest,
+                            kind="write_in",
+                            party_id=None,
+                            ballot_label="Scattered write-ins",
+                        )
+                    else:
+                        token = slug(fold(label))
+                        option = cs.key("us.option", f"{contest_key}:{token}")
+                        party_key = PARTIES[party]
+                        cs.add(
+                            "contest_option",
+                            id=option,
+                            contest_id=contest,
+                            kind="candidate",
+                            party_id=cs.key("us.party", party_key) if party_key else None,
+                            ballot_label=label,
+                        )
+                        person = cs.key(f"{SOURCE}.person", f"{contest_key}:{token}")
+                        if person in cs.minted:
+                            cs.add("person", id=person)
+                            name(person, label)
+                        cs.add(
+                            "candidacy",
+                            id=cs.key("us.candidacy", f"{contest_key}:{token}:head"),
+                            person_id=person,
+                            option_id=option,
+                            role="head",
+                            ballot_name=label,
+                            is_independent=party == "Ind.",
+                        )
+                    cs.add(
+                        "result_value",
+                        result_set_id=result_set,
+                        unit_id=unit,
+                        option_id=option,
+                        channel=0,
+                        measure=1,
+                        count_round=0,
+                        flags=0,
+                        value=votes,
+                    )
+                    counts["values"] += 1
+            if len(seen) != 78:
+                raise ValueError(f"{year}: {len(seen)} municipal legislatures")
         print(counts)
         return cs.write()
