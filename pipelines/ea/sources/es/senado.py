@@ -10,6 +10,7 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
+from ea.names import display
 from ea.sources.es.infoelectoral import APLIEXTR, COUNTS, LAYOUTS, PAGE, archive
 from ea.sources.es.infoelectoral import SOURCE as INFOELECTORAL
 from ea.store import DATA, connect
@@ -54,8 +55,10 @@ BLOCK = (
 SINGLE = (
     "Each of the smaller islands or island groups (Menorca, Ibiza-Formentera, Lanzarote, Fuerteventura, La Palma, La "
     "Gomera, and El Hierro) elects one senator, and the candidate with the most votes wins (Ley Orgánica 5/1985 del "
-    "Régimen Electoral General, articles 165 and 166; in 1977 and 1979, Real Decreto-ley 20/1977)."
+    "Régimen Electoral General, articles 165 and 166; in 1977 and 1979, Real Decreto-ley 20/1977). In 1977 La Gomera "
+    "and El Hierro elected one senator together (Real Decreto-ley 20/1977, article 19)."
 )
+JOINT = {("197706", "386"): ("386-387", "La Gomera-El Hierro", ("386", "387"))}
 DISTRICT_METHOD = (
     "Candidate votes, registered voters, blank ballots, and null ballots by constituency from the Ministry of the "
     "Interior's data files, including the votes of residents abroad (CERA). Each voter may mark several candidates, "
@@ -96,7 +99,12 @@ MARKS_EXCEEDED = (
     " The candidate votes add up to {votes:,}, more than {marks} for each of the {valid:,} ballots with votes to "
     "candidates in the file's own totals; both are stored as printed."
 )
+NO_BALLOTS = " The file gives no count of ballots for this constituency; only the figures it prints are stored."
 OVER = " In {count} units the ballots cast exceed the registered voters, as the file prints them."
+NO_CENSUS = " The file prints a census of zero for {count} units; their registered voters are left out."
+SPLIT_NAME = "The name was split where the file's name field wraps, or was stored in capitals."
+REWRITTEN = "The methodology note was rewritten."
+WHOLE = {"04": (("whole", 26, 100),)}
 TABLES = (
     "lists",
     "congreso_lists",
@@ -148,7 +156,7 @@ def read(kind: str, stamp: str, number: str) -> pl.DataFrame:
                 )
                 .fill_null(0 if field in COUNTS else "")
                 .alias(field)
-                for field, start, end in LAYOUTS[number]
+                for field, start, end in (*LAYOUTS[number], *WHOLE.get(number, ()))
             )
     return pl.DataFrame()
 
@@ -174,19 +182,22 @@ def parse() -> None:
     for stamp in DAYS:
         keep("lists", stamp, read("03", stamp, "03").select("list", "abbrev", "name"))
         keep("congreso_lists", stamp, read("02", stamp, "03").select("list", "abbrev", "name"))
+        frame = read("03", stamp, "04")
+        wraps = (frame["surname"] == "").any()
         keep(
             "candidates",
             stamp,
-            read("03", stamp, "04").select(
+            frame.select(
                 "province",
                 "district",
                 pl.col("municipality").cast(pl.Int64).alias("order"),
                 "list",
                 "position",
                 "kind",
-                "given",
-                "surname",
-                "second_surname",
+                (pl.col("whole") if wraps else pl.concat_str("given", "surname", "second_surname", separator=" "))
+                .str.replace_all(r"\s+", " ")
+                .str.strip_chars()
+                .alias("name"),
                 "sex",
                 "elected",
             ),
@@ -277,6 +288,12 @@ def emit() -> Path:
         def name(entity: UUID, text: str, lang: str = "en", kind: str = "official") -> None:
             cs.add("name", entity_id=entity, text=text, lang=lang, kind=kind, is_preferred=kind == "official")
 
+        methods: dict[UUID, str] = {}
+
+        def method(entity: UUID, body: str) -> None:
+            methods[entity] = body
+            cs.add("note", entity_id=entity, kind="methodology", body_md=body)
+
         spain = cs.polity("ES")
         for scheme in ("es.provincia", "es.municipio", "es.seccion", "es.mesa"):
             if conn.execute("select 1 from scheme where code = %s", (scheme,)).fetchone() is None:
@@ -309,7 +326,7 @@ def emit() -> Path:
             systems[key] = cs.key("es.electoral_system", key)
             cs.add("electoral_system", id=systems[key], polity_id=spain, rules=rules, rules_version=1)
             name(systems[key], english)
-            cs.add("note", entity_id=systems[key], kind="methodology", body_md=body)
+            method(systems[key], body)
 
         municipalities = frames["municipalities"]
         municipality_areas = dict(
@@ -344,7 +361,11 @@ def emit() -> Path:
                 valid_to=None,
                 as_of=date(2025, 1, 1),
             )
-        for code, label in sorted(island_names.items()):
+        islands: dict[str, tuple[str, tuple[str, ...]]] = {
+            code: (label, (code,)) for code, label in island_names.items()
+        }
+        islands |= {code: (label, parts) for code, label, parts in JOINT.values()}
+        for code, (label, parts) in sorted(islands.items()):
             area = cs.area("es.isla", code)
             if area not in cs.minted:
                 continue
@@ -352,7 +373,7 @@ def emit() -> Path:
             cs.add("area_code", area_id=area, code=code, valid_from=None)
             cs.add("area_parent", area_id=area, parent_id=cs.area("es.provincia", code[:2]), valid_from=None)
             name(area, label, "es")
-            members = sorted(town for town, island in island_of.items() if island == code)
+            members = sorted(town for town, island in island_of.items() if island in parts)
             shape = conn.execute(
                 """select encode(st_asewkb(st_multi(st_union(g.geom))), 'hex'),
                           encode(st_asewkb(st_pointonsurface(st_union(g.geom))), 'hex'), min(g.source_id::text)
@@ -450,22 +471,29 @@ def emit() -> Path:
 
         values: list[tuple[str, str, str | None, int, int, int]] = []
 
-        def accounting(result_set: UUID, unit: UUID, row: dict[str, int], channel: int = 0) -> None:
+        def accounting(
+            result_set: UUID, unit: UUID, row: dict[str, int], channel: int = 0, printed: bool = True
+        ) -> None:
             figures = {
                 REGISTERED: row["census"],
-                BALLOTS: row["list_votes"] + row["blank"] + row["invalid"],
+                BALLOTS: row["list_votes"] + row["blank"] + row["invalid"] if printed else 0,
                 VALID: row["list_votes"],
                 INVALID: row["invalid"],
                 BLANK: row["blank"],
             }
             for measure, value in figures.items():
-                values.append((str(result_set), str(unit), None, measure, value, channel))
+                if value or (printed and measure != REGISTERED):
+                    values.append((str(result_set), str(unit), None, measure, value, channel))
 
         def over(frame: pl.DataFrame) -> str:
-            count = frame.filter(pl.col("list_votes") + pl.col("blank") + pl.col("invalid") > pl.col("census")).height
-            return OVER.format(count=count) if count else ""
+            count = frame.filter(
+                (pl.col("census") > 0) & (pl.col("list_votes") + pl.col("blank") + pl.col("invalid") > pl.col("census"))
+            ).height
+            missing = frame.filter(pl.col("census") == 0).height
+            return (OVER.format(count=count) if count else "") + (NO_CENSUS.format(count=missing) if missing else "")
 
         mismatched, relabeled, contests, elected_total = [], [], 0, 0
+        shown: dict[UUID, str] = {}
         for stamp in stamps:
             day = DAYS[stamp]
             lists = {row["list"]: row for row in frames["lists"].filter(pl.col("stamp") == stamp).iter_rows(named=True)}
@@ -525,7 +553,8 @@ def emit() -> Path:
                 elected = {code for code, won in zip(rows["list"], rows["seats"]) if won}
                 seats = len(elected)
                 contest = cs.key(f"{SOURCE}.contest", key)
-                area = cs.area("es.isla", circ) if island else cs.area("es.provincia", province)
+                seat, label, _ = JOINT.get((stamp, circ), (circ, " ".join(total["name"].split()), ()))
+                area = cs.area("es.isla", seat) if island else cs.area("es.provincia", province)
                 system = (
                     "senado-single" if seats == 1 else "senado-block" if province in {"51", "52"} else "senado-limited"
                 )
@@ -540,13 +569,12 @@ def emit() -> Path:
                     electoral_system_id=systems[system],
                     default_result_kind="counted",
                 )
-                label = " ".join(total["name"].split())
                 name(contest, label)
                 cs.add("slug", path=f"{path}/senate/{slug(label)}", entity_id=contest)
                 contests += 1
                 if island:
-                    unit = cs.unit("es.isla", circ)
-                    unit_rows[unit] = (unit, "es.isla", circ, province_unit(province), "equals", area, "standard")
+                    unit = cs.unit("es.isla", seat)
+                    unit_rows[unit] = (unit, "es.isla", seat, province_unit(province), "equals", area, "standard")
                 else:
                     unit = province_unit(province)
 
@@ -555,7 +583,8 @@ def emit() -> Path:
                 flagged: set[int] = set()
                 for person_row in people.sort("order", "kind", descending=[False, True]).iter_rows(named=True):
                     code = int(f"{province}{total['district']}{person_row['order']:03d}")
-                    if code not in options:
+                    substitute = code in options
+                    if not substitute:
                         option = options[code] = cs.key(f"{SOURCE}.option", f"{key}:{person_row['order']}")
                         cs.add(
                             "contest_option",
@@ -566,22 +595,19 @@ def emit() -> Path:
                             ballot_position=person_row["order"],
                             ballot_label=" ".join(lists[person_row["list"]]["name"].split()),
                         )
-                    full = " ".join(
-                        part
-                        for part in (person_row["given"], person_row["surname"], person_row["second_surname"])
-                        if part
-                    )
+                    full = person_row["name"]
                     tag = f"{key}:{person_row['order']}:{person_row['kind']}{person_row['position']}"
                     person = cs.key(f"{SOURCE}.person", tag)
                     cs.add("person", id=person, gender={"M": "male", "F": "female"}.get(person_row["sex"]))
-                    name(person, full)
+                    name(person, display(full, "es"))
+                    shown[person] = display(full, "es")
                     candidacy = cs.key(f"{SOURCE}.candidacy", tag)
                     cs.add(
                         "candidacy",
                         id=candidacy,
                         person_id=person,
                         option_id=options[code],
-                        role="substitute" if person_row["kind"] == "S" else "head",
+                        role="substitute" if substitute else "head",
                         ballot_name=full,
                         is_independent=False,
                     )
@@ -606,7 +632,7 @@ def emit() -> Path:
                         is_default=default,
                         completeness=completeness,
                     )
-                    cs.add("note", entity_id=result_set, kind="methodology", body_md=note)
+                    method(result_set, note)
                     return result_set
 
                 note = DISTRICT_METHOD + ("" if total["official"] == "S" else NOT_OFFICIAL)
@@ -614,16 +640,19 @@ def emit() -> Path:
                 if top != elected:
                     note += TOP_DIFFERS
                     mismatched.append(key)
-                if seats == 1 and official != total["list_votes"]:
+                printed = total["list_votes"] > 0
+                if not printed:
+                    note += NO_BALLOTS
+                if seats == 1 and printed and official != total["list_votes"]:
                     note += SINGLE_DIFFERS.format(votes=official, valid=total["list_votes"])
                 marks = 3 if seats == 4 else 2
-                if seats > 1 and official > marks * total["list_votes"]:
+                if seats > 1 and printed and official > marks * total["list_votes"]:
                     note += MARKS_EXCEEDED.format(votes=official, marks=marks, valid=total["list_votes"])
                 if flagged and flagged != elected:
                     note += FLAGS_DIFFER
                     relabeled.append(key)
                 district_set = make_set("district", True, True, 1, note)
-                accounting(district_set, unit, total)
+                accounting(district_set, unit, total, printed=printed)
                 for entry in rows.iter_rows(named=True):
                     values.append((str(district_set), str(unit), str(options[entry["list"]]), VOTES, entry["votes"], 0))
                 for code in sorted(elected):
@@ -695,6 +724,20 @@ def emit() -> Path:
                         raise ValueError(f"{key}: mesa {row['code']} has votes for {row['list']}")
                     values.append((str(mesa_set), str(mesa), str(options[row["list"]]), VOTES, row["votes"], channel))
 
+        for name_id, person, text in conn.execute(
+            """select n.id, n.entity_id, n.text from name n join changeset c on c.id = n.changeset_id
+               where c.pipeline = %s and n.entity_id = any(%s)""",
+            (SOURCE, list(shown)),
+        ).fetchall():
+            if text != shown[person]:
+                cs.add("name_drop", name_id=name_id, entity_id=person, text=text, reason=SPLIT_NAME)
+        for note_id, entity, body in conn.execute(
+            """select n.id, n.entity_id, n.body_md from note n join changeset c on c.id = n.changeset_id
+               where c.pipeline = %s and n.kind = 'methodology' and n.entity_id = any(%s)""",
+            (SOURCE, list(methods)),
+        ).fetchall():
+            if body != methods[entity]:
+                cs.add("note_drop", note_id=note_id, entity_id=entity, body_md=body, reason=REWRITTEN)
         print(f"{contests} contests, {elected_total} senators elected")
         print(f"the candidate file's elected flags differ in {len(relabeled)} contests: {relabeled}")
         print(f"the most-voted candidates are not the elected ones in {len(mismatched)} contests: {mismatched}")
