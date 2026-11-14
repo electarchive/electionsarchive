@@ -15,7 +15,8 @@
       "day": "1900-11-06",
       "special": false,
       "state": "SD",
-      "district": null
+      "district": null,
+      "accept": "The county columns miss the printed totals by a few votes (McKinley 54,574 against 54,530, Bryan 39,568 against 39,544, Debs 176 against 169), and the cells are stored as printed."
     },
     "house": {
       "year": 1900,
@@ -302,7 +303,7 @@
         0.906,
         0.874
       ],
-      "hint": "Read only the table headed 'OFFICIAL VOTE\u2014Continued November Election, 1900'; ignore any other table visible in the image.",
+      "hint": "Read only the table headed 'OFFICIAL VOTE—Continued November Election, 1900'; ignore any other table visible in the image.",
       "bands": 2,
       "header": [
         0.0,

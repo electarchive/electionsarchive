@@ -24,7 +24,7 @@
       "special": false,
       "state": "SD",
       "district": null,
-      "accept": "Every county cell for Mellette and McClure checked against the page image; Mellette's column sums to 51,962 against a printed total of 53,964 and McClure's to 23,850 against 23,840, so the printed totals row does not add up from its own county figures; the statewide default keeps the printed totals."
+      "accept": "Every county cell for Mellette and McClure checked against the page image; the printed Brown County row (1,208 for Mellette) sits far below Gifford's 3,180 and Fletcher's 3,103 in the same county, so Mellette's county sum of 51,962 falls 2,002 short of the printed total of 53,964, and McClure's 23,850 against a printed 23,840; the county figures are stored as printed and the statewide default keeps the printed totals."
     }
   },
   "pages": [
