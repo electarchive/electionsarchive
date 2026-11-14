@@ -1,4 +1,5 @@
 party	polity	name	item	inception	precision	earliest	evidence
+05616f96-f761-5f53-bc1e-ca595148651b	BE	Confederate Ecologists for the Organisation of Original Struggles	Q655611	1980-01-01	year	1979-06-07	option
 047942f1-3645-53eb-b2af-e248d22ff95c	BR	Democratas	Q1185830	2007-03-28	day	1986-11-15	option
 6ec07fd5-7ae4-5f0c-85ef-15a4f169e6db	BR	Humanist Party of Solidarity	Q2453205	1997-03-20	day	1996-10-03	option
 e5739d74-35aa-513d-b11c-6e0c4f95aa7e	BR	Partido Geral dos Trabalhadores	Q3056426	1995-01-01	year	1994-10-03	option
@@ -35,6 +36,11 @@ ee08bd4e-780b-528e-aeb1-b90ac15e12a3	DE	The Greens	Q18761823	1980-01-13	day	1979
 49fc1249-64ee-5d3c-8d0c-d439b71ffa60	DE	UNABHÄNGIGE für bürgernahe Demokratie	Q2492228	2002-01-01	year	1986-10-12	option
 530008a3-a83d-58b7-b24f-f78867473c1d	DE-BE	Sozialistische Einheitspartei Westberlins	Q76867	1962-01-01	year	1954-12-05	option
 bd73b6ee-fd9e-5648-a9c8-e96cf6bd5bcd	DE-SN	FREIE SACHSEN	Q108916704	2021-02-26	day	2009-08-30	option
+3f2707c0-ef1c-5316-a0fb-718ae5214320	ES	Coalition for Europe	Q17176393	2014-01-01	year	2009-06-04	option
+a2040423-3cfd-579d-9a7f-0c2b91c2a471	ES	FRENTE NACIONAL	Q5502807	2006-01-01	year	1987-06-10	option
+69c81482-b1c7-59bd-8174-41836ae1db00	ES	FRONT NACIONAL DE CATALUNYA	Q64768632	2013-10-04	day	1979-03-01	option
+51211633-c5b6-5859-9320-788be0c7db71	ES	JUNTS PER CATALUNYA	Q97155800	2020-07-25	day	2019-05-26	option
+480d8c14-9165-5c02-b14e-930ffbdd7038	ES	Ruiz-Mateos Group	Q4893367	1989-08-30	day	1989-06-15	option
 01a13bdd-fee2-723d-9a74-75bc20b30366	EU	Confederal Group of the European United Left/Nordic Green Left	Q753711	1995-01-06	day	1994-01-01	name
 20efc1d5-9476-5b44-a8fc-f54529f5cbae	EU	European Conservatives and Reformists Group	Q1345559	2009-06-22	day	2009-01-01	name
 bceae0bf-7552-5397-a17b-d381462bff85	EU	Group for the European United Left	Q5413380	1989-07-25	day	1989-01-01	name
@@ -57,7 +63,7 @@ ce2006d2-f0ae-5fc6-9279-3a6e924bd4a0	FR	Union pour un mouvement populaire	Q17315
 a7447d90-4940-5489-865d-21229b1705fa	GB	Alderley Edge First	Q124381811	2023-02-13	day	2019-05-02	option
 57212c27-4f13-50c4-919a-26e3411f3801	GB	Aspire	Q52701679	2018-01-26	day	2014-05-22	option
 a21a58eb-4e72-5256-aea0-ceaf96f247c5	GB	Black Country Party	Q134937030	2025-05-30	day	2019-05-02	option
-68a98081-9348-56dd-b360-0f45de7fb2d2	GB	British Democratic Party	Q4969878	2013-02-09	day	1997-05-01	option
+68a98081-9348-56dd-b360-0f45de7fb2d2	GB	British Democratic Party	Q4969878	2013-02-09	day	1981-05-07	option
 e333484a-1961-5f86-bc99-28f4a8038b75	GB	Consensus	Q126434084	2023-06-08	day	2015-05-07	option
 01a13b8d-570d-753a-9432-089e633eb55b	GB	Conservative Party	Q9626	1834-12-18	day	1832-12-08	option
 ed7903e6-b11f-5524-b8c0-d47911615402	GB	Constitutionalist	Q17986644	1923-01-01	year	1922-11-15	option
@@ -88,15 +94,18 @@ afcd99ba-df24-5349-8059-a8204ef63e23	GB	Scottish Socialist Party	Q891900	1998-09
 56b96f83-491c-588c-8a26-f589b117e9a8	GB	The Justice & Anti-Corruption Party	Q20648840	2015-01-01	year	2010-05-06	option
 f531cf55-0cff-5e42-b0b4-5f366ff4b5b6	GB	The Yorkshire Party	Q17059489	2014-04-01	month	1991-11-07	option
 f52e3b6f-c4b2-55c1-896a-2ef9b20fe81a	GB	Your Party	Q135454755	2025-07-01	month	2005-05-05	option
+6a0510d3-8c0c-5608-8116-4c8ed209379e	HU	Our Homeland Movement	Q55443054	2018-06-23	day	2014-05-22	option
+33660a26-d195-50a2-a505-f90a9daecb58	IT	Communist Refoundation Party	Q780997	1991-12-12	day	1991-05-12	option
 89dbd20e-b8d8-5f27-a683-b9925885f09d	IT	Democratic Party of the Left	Q541679	1998-02-13	day	1994-06-09	option
 a3660c4e-5465-5e3b-b3c7-a51ac05bccfe	IT	Democrazia Nazionale	Q3705337	1977-01-01	year	1976-12-21	tenure_affiliation
 530d39c9-2732-50dd-b806-fcbf34e9b54f	IT	Democrazia è Libertà – La Margherita	Q1141788	2002-03-24	day	2001-05-13	option
 e6b68b22-e54c-5858-a050-ed6df271ebea	IT	Left, Ecology and Freedom	Q286140	2009-12-20	day	2009-06-04	option
-e598bbed-f242-5883-a4d1-be5965f4a898	IT	National Alliance	Q662849	1995-01-27	day	1994-03-27	option
+01a13bf7-300c-7784-acd9-f60cef597cca	IT	Lega per Salvini Premier	Q85776185	2017-12-14	day	1990-05-06	option
+e598bbed-f242-5883-a4d1-be5965f4a898	IT	National Alliance	Q662849	1995-01-27	day	1993-11-21	option
 0cb036ee-e21a-5e13-8ebe-d15bd72a11cd	IT	Partito Socialista Italiano di Unità Proletaria	Q2755002	1964-01-12	day	1946-06-02	option
 18067f0f-dad9-5adc-a90c-b65720b62952	IT	Party of Italian Communists	Q1428001	1998-10-11	day	1996-05-15	tenure_affiliation
 8c7c443a-62cd-5054-b46b-791ab39669be	IT	The People of Freedom	Q47720	2009-03-29	day	2008-04-13	option
-55ca99d8-7f43-579c-aaaa-3fc2b03d8f0a	IT	Union of the Centre	Q47781	2002-12-06	day	1995-04-23	option
+55ca99d8-7f43-579c-aaaa-3fc2b03d8f0a	IT	Union of the Centre	Q47781	2002-12-06	day	1993-11-21	option
 c7ca5ee1-ba76-555b-908a-1b9fecef87b4	PL	URP Real politics union	Q1584987	2011-03-25	day	2009-06-04	option
 01a13c0c-c7c5-74b3-a52f-540d0f6e2f76	TR	Adalet Partisi	Q97210769	2023-10-09	day	2023-05-14	option
 01a13dfc-a279-73f2-957b-1a15a210f39b	TR	Demokrat Parti	Q2067217	2007-05-27	day	1984-03-25	option
