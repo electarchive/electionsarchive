@@ -203,7 +203,7 @@ const MODEL = {
     small: 0.03,
     weigh: 1,
     span: 1,
-    reach: 1.5,
+    reach: 1.75,
     memory: 2,
     patience: 0.5,
     lull: 0.5,
@@ -214,6 +214,8 @@ const MODEL = {
     hush: 0.02,
     idle: 0.75,
     trickle: 0.01,
+    follow: 0.5,
+    fresh: 0.005,
   },
   reported: { common: 0.9, own: 0.3, capped: 0.99 },
   channel: {
@@ -394,6 +396,7 @@ type Unit = {
   hasBaseline: boolean;
   night: Array<number> | null;
   paced: number | null;
+  pacedLead: number | null;
   before: number | null;
   earlier: number | null;
   rate: number | null;
@@ -621,13 +624,19 @@ function units(
   const befores = new Map<string, number>();
   const earliers = new Map<string, number>();
   const rates = new Map<string, number>();
+  const leads = new Map<string, number>();
+  const [a, b] = pair(race, latest);
   if (cutoff != null && start > cutoff) {
     const seen = race.frames
       .map((frame) => Date.parse(frame.at))
       .filter((time) => time <= clock)
       .toSorted((x, y) => x - y);
     const day = MODEL.late.span * 86_400_000;
-    const value = (lists: Array<Array<LiveUnitCount>>, time: number) =>
+    const value = (
+      lists: Array<Array<LiveUnitCount>>,
+      time: number,
+      read: (votes: Array<number>) => number = sum,
+    ) =>
       sum(
         lists.map((list) => {
           let then: LiveUnitCount | null = null;
@@ -639,17 +648,23 @@ function units(
               then = count;
             }
           }
-          return then == null ? 0 : sum(then.votes);
+          return then == null ? 0 : read(then.votes);
         }),
       );
-    const point = (lists: Array<Array<LiveUnitCount>>, time: number) => {
+    const point = (
+      lists: Array<Array<LiveUnitCount>>,
+      time: number,
+      read: (votes: Array<number>) => number = sum,
+    ) => {
       const low = seen.findLast((frame) => frame <= time);
       const high = seen.find((frame) => frame > time) ?? clock;
       if (low == null || high <= low) {
-        return value(lists, time);
+        return value(lists, time, read);
       }
-      const from = value(lists, low);
-      return from + ((value(lists, high) - from) * (time - low)) / (high - low);
+      const from = value(lists, low, read);
+      return (
+        from + ((value(lists, high, read) - from) * (time - low)) / (high - low)
+      );
     };
     const memory = MODEL.late.memory * day;
     const weight = (from: number, to: number) =>
@@ -657,6 +672,10 @@ function units(
       (Math.exp(-(clock - to) / memory) - Math.exp(-(clock - from) / memory));
     for (const [id, list] of byUnit) {
       paces.set(id, point([list], start));
+      leads.set(
+        id,
+        point([list], start, (votes) => (votes[a] ?? 0) - (votes[b] ?? 0)),
+      );
       befores.set(id, point([list], start - day));
       earliers.set(id, point([list], start - 2 * day));
       let then: { time: number; value: number } | null = null;
@@ -690,7 +709,6 @@ function units(
       );
     }
   }
-  const [a, b] = pair(race, latest);
   const pooled =
     byUnit.has(race.id) && race.baseline.every((row) => row.unitId !== race.id);
   const rows: Array<LiveBaseline> = pooled
@@ -763,6 +781,7 @@ function units(
       hasBaseline: base != null && base.turnout > 0,
       night: nights.get(id) ?? null,
       paced: paces.get(id) ?? null,
+      pacedLead: leads.get(id) ?? null,
       before: befores.get(id) ?? null,
       earlier: earliers.get(id) ?? null,
       rate: rates.get(id) ?? null,
@@ -1682,6 +1701,9 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
         paced: members.some((unit) => unit.paced == null)
           ? null
           : sum(members.map((unit) => unit.paced ?? 0)),
+        pacedLead: members.some((unit) => unit.pacedLead == null)
+          ? null
+          : sum(members.map((unit) => unit.pacedLead ?? 0)),
         before: members.some((unit) => unit.before == null)
           ? null
           : sum(members.map((unit) => unit.before ?? 0)),
@@ -2162,18 +2184,30 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
           : tilt + own.shift + Math.sqrt(own.variance) * gaussian(random);
       const expect = (learned?.mean ?? 0) + own.shift;
       const leaning = learned != null && unit.paced == null ? remaining : 0;
+      const fresh = unit.total - (unit.paced ?? unit.total);
+      const recent =
+        isLate &&
+        unit.channel === 0 &&
+        unit.pacedLead != null &&
+        fresh > MODEL.late.fresh * unit.total
+          ? (countedLead - unit.pacedLead) / fresh
+          : null;
+      const modeled = margin * final - countedLead;
+      const toward = remaining * (recent ?? 0);
+      const aimed =
+        recent == null
+          ? modeled
+          : (recent - unit.margin) * (modeled - toward) > 0
+            ? toward
+            : modeled + MODEL.late.follow * (toward - modeled);
       const lead = clamp(
-        (margin + shift * reach + mode * (1 - fraction)) * final -
-          countedLead +
+        aimed +
+          (shift * reach + mode * (1 - fraction)) * final +
           leaning * drift,
         -room,
         room,
       );
-      const steady = clamp(
-        margin * final - countedLead + leaning * expect,
-        -room,
-        room,
-      );
+      const steady = clamp(aimed + leaning * expect, -room, room);
       const open = opens[index];
       const extra = reports.has(unit.county)
         ? (pending.get(unit.county) ?? 0) * portion[index]!
