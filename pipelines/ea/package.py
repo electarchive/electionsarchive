@@ -812,20 +812,23 @@ def load(conn: Connection, path: Path, meter: Meter, accepted: dict[str, object]
                    from pkg_value_locator v join result_set r on r.id = v.result_set_id
                    join reporting_unit u on u.id = v.unit_id left join contest_option o on o.id = v.option_id"""
             )
-        facts_step = meter.step("facts")
+        steps = [meter.step("facts")]
         rolled = sorted(set(sets_after) | (set(sets_before) - set(dropped_sets)))
         _rollup(conn, None, moved, [], rolled)
+        steps.append(meter.step("rollups"))
         covers.uncover(conn, changeset_id, moved, [], sets=rolled)
         touched.recorded(conn, changeset_id)
+        steps.append(meter.step("covers"))
         search.scope(conn, [changeset_id])
         search.refresh(conn)
+        steps.append(meter.step("search"))
     copy = folder(key) / f"v{version}"
     if copy.exists():
         shutil.rmtree(copy)
     shutil.copytree(path, copy)
     changed = ", ".join(f"{t} +{a:,}/-{d:,}" for t, (a, d) in counts.items() if a or d)
     print(
-        f"{key} v{version} as {changeset_id}: {changed}; {facts_step}, {meter.step('rollups and search')}",
+        f"{key} v{version} as {changeset_id}: {changed}; {', '.join(steps)}",
         flush=True,
     )
     return changeset_id
