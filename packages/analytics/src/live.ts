@@ -1674,6 +1674,15 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
           unit.total > 0 && complete
             ? unit.total
             : model.unit(unit, cell, tau, surge, random);
+        if (
+          isLate &&
+          unit.paced == null &&
+          unit.settled === 1 &&
+          unit.total > 0
+        ) {
+          finals[index] =
+            unit.total + (finals[index] - unit.total) * tailWeight;
+        }
         spills[index] = 0;
         if (isLate && unit.paced != null && unit.total > 0) {
           const free = finals[index];
