@@ -13,7 +13,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "us.dc_boe"
-VERSION = "3"
+VERSION = "4"
 PARSED = DATA / "parsed" / SOURCE
 HOST = "https://electionresults.dcboe.org"
 INFO = HOST + "/electionResults/getElectionInfo/{year}-General-Election"
@@ -35,6 +35,7 @@ CONTESTS = [
     ),
     (r"UNITED STATES SENATOR.*", "Shadow United States Senator"),
     (r"UNITED STATES REPRESENTATIVE.*", "Shadow United States Representative"),
+    (r"(?:ADVISORY NEIGHBORHOOD COMMISSIONER|ANC ?-) ?(\d(?:/\d)?[A-G]\d\d)\b.*", "anc"),
 ]
 CODES = r"^(DEM|REP|LIB|STG|IND|SWP|NPN) "
 PARTIES = {
@@ -114,11 +115,12 @@ def parse() -> None:
                 .agg(pl.col("votes").cast(pl.Int64).sum())
                 .iter_rows()
             )
-            if {name: votes for name, votes in sums.items() if not re.search("OVER|UNDER", name)} != {
-                name: votes for name, votes in published[contest].items() if not re.search("OVER|UNDER", name)
-            }:
+            if office != "anc" and {
+                name: votes for name, votes in sums.items() if not re.search("OVER|UNDER", name)
+            } != {name: votes for name, votes in published[contest].items() if not re.search("OVER|UNDER", name)}:
                 raise ValueError(f"{year} {contest}: precinct sums differ from the citywide totals")
             ward = next((group for group in found.groups() if group), None)
+            smd = ward if office == "anc" else None
             for precinct, candidate, party, votes in (
                 lines.filter(pl.col("precinct").str.contains(r"^\d+$"), ~pl.col("candidate").str.contains("OVER|UNDER"))
                 .select("precinct", "candidate", "party", "votes")
@@ -133,7 +135,8 @@ def parse() -> None:
                     (
                         year,
                         office,
-                        WARDS.get(ward or "") if ward else None,
+                        WARDS.get(ward or "") if ward and not smd else None,
+                        smd,
                         name,
                         code[1] if code else party,
                         candidate.upper() == "WRITE-IN",
@@ -148,6 +151,7 @@ def parse() -> None:
                     "year": pl.Int32,
                     "office": pl.String,
                     "seat": pl.Int32,
+                    "smd": pl.String,
                     "candidate": pl.String,
                     "party": pl.String,
                     "writein": pl.Boolean,
@@ -161,8 +165,14 @@ def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.write_parquet(PARSED / "lines.parquet")
     print(
-        frame.group_by("year", "office", "seat", maintain_order=True)
-        .agg(pl.col("candidate").n_unique(), pl.col("precinct").n_unique(), pl.col("votes").sum())
+        frame.group_by("year", "office", maintain_order=True)
+        .agg(
+            pl.col("seat").n_unique(),
+            pl.col("smd").n_unique(),
+            pl.col("candidate").n_unique(),
+            pl.col("precinct").n_unique(),
+            pl.col("votes").sum(),
+        )
         .rows()
     )
 
@@ -174,7 +184,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="The District of Columbia's mayor, council, attorney general, shadow delegation, and State Board of "
+            summary="The District of Columbia's mayor, council, advisory neighborhood commission, attorney general, shadow delegation, and State Board of "
             "Education 2012–2024 by precinct from the Board of Elections' certified results",
             polity="US",
         )
@@ -212,6 +222,21 @@ def emit() -> Path:
         def name(entity: UUID, text: str) -> None:
             cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
 
+        def local_district(district: str, area: UUID) -> None:
+            cs.add("area", id=area, scheme_code="us.local_district")
+            cs.add("area_code", area_id=area, code=district, valid_from=None)
+            cs.add("area_parent", area_id=area, parent_id=city, valid_from=None)
+            cs.add(
+                "reporting_unit",
+                id=cs.unit("us.local_district", district),
+                polity_id=polity,
+                scheme_code="us.local_district",
+                code=district,
+                area_relation="equals",
+                area_id=area,
+                kind="standard",
+            )
+
         values: dict[tuple[str, str, str], int] = defaultdict(int)
         minted: dict[str, date] = {}
         memberships: set[tuple[UUID, UUID, date]] = set()
@@ -247,7 +272,7 @@ def emit() -> Path:
                                      where k.entity_id = c.id and k.scheme = 'us.contest' and s.pipeline = %s)""",
                 [f"{when}:DC:{PLACE}", SOURCE],
             ).fetchall()
-            for (office, seat), cells in rows.group_by("office", "seat", maintain_order=True):
+            for (office, seat, smd), cells in rows.group_by("office", "seat", "smd", maintain_order=True):
                 municipal = office in ("mayor", "chair", "at-large", "ward")
                 magnitude = 2 if office == "at-large" else 1
                 if municipal:
@@ -264,6 +289,11 @@ def emit() -> Path:
                     contest_key = f"{when}:DC:{PLACE}:" + ("mayor" if office == "mayor" else f"council:{slug(shown)}")
                     if found:
                         contest, contest_key = found[0]
+                elif office == "anc":
+                    shown = smd.upper()
+                    contest_key = f"{when}:DC:11:anc:{slug(smd)}"
+                    contest = cs.key("us.contest", contest_key)
+                    found = [(contest, contest_key)] if contest_key in keys else []
                 else:
                     shown = f"Seat {seat}" if seat else ""
                     contest_key = f"{when}:DC:{slug(office)}" + (f":{slug(shown)}" if shown else "")
@@ -347,7 +377,17 @@ def emit() -> Path:
                         raise ValueError(f"{contest_key} is taken")
                     contest = cs.key("us.contest", contest_key)
                     area = state_area
-                    if office == "ward" or (not municipal and seat):
+                    if office == "anc":
+                        plan = "" if year >= 2022 else f"{2012 if year >= 2012 else 2002}:"
+                        district = f"DC:{PLACE}:anc:{plan}{slug(smd)}"
+                        area = cs.area("us.local_district", district)
+                        if district not in districts:
+                            districts.add(district)
+                            name(area, f"Advisory Neighborhood Commission {shown}, District of Columbia")
+                        if area in cs.minted and district not in minted_districts:
+                            minted_districts.add(district)
+                            local_district(district, area)
+                    elif office == "ward" or (not municipal and seat):
                         ward = f"Ward {seat}"
                         district = f"DC:{PLACE}:council:{slug(ward)}"
                         area = cs.area("us.local_district", district)
@@ -356,28 +396,17 @@ def emit() -> Path:
                             name(area, f"{ward}, District of Columbia")
                         if area in cs.minted and district not in minted_districts:
                             minted_districts.add(district)
-                            cs.add("area", id=area, scheme_code="us.local_district")
-                            cs.add("area_code", area_id=area, code=district, valid_from=None)
-                            cs.add("area_parent", area_id=area, parent_id=city, valid_from=None)
-                            cs.add(
-                                "reporting_unit",
-                                id=cs.unit("us.local_district", district),
-                                polity_id=polity,
-                                scheme_code="us.local_district",
-                                code=district,
-                                area_relation="equals",
-                                area_id=area,
-                                kind="standard",
-                            )
+                            local_district(district, area)
                         for number in cells["precinct"].unique():
                             memberships.add((cs.unit("us.precinct", units[number]), area, when))
                     elif municipal:
                         area = city
-                    office_key = f"{slug(office)}:DC"
+                    title = "Advisory Neighborhood Commissioner" if office == "anc" else office
+                    office_key = f"{slug(title)}:DC"
                     if not municipal and office_key not in offices:
                         offices.add(office_key)
                         cs.add("office", id=cs.key("us.office", office_key), polity_id=cs.polity("US-DC"), kind="other")
-                        name(cs.key("us.office", office_key), f"{office} of the District of Columbia")
+                        name(cs.key("us.office", office_key), f"{title} of the District of Columbia")
                     cs.add(
                         "contest",
                         id=contest,
@@ -399,6 +428,9 @@ def emit() -> Path:
                     if municipal:
                         name(contest, f"{year} Council of the District of Columbia election, {shown}")
                         path = f"us/dc/{when}-general/council-{slug(shown)}"
+                    elif office == "anc":
+                        name(contest, f"{year} Advisory Neighborhood Commission {shown} election")
+                        path = f"us/dc/{when}-general/anc-{slug(smd)}"
                     else:
                         name(
                             contest,
@@ -442,9 +474,12 @@ def emit() -> Path:
                             ballot_label="Write-ins" if writein else candidate,
                         )
                         if not writein:
-                            person = cs.key(f"{SOURCE}.person", f"DC:{slug(candidate)}")
-                            if person in cs.minted and slug(candidate) not in persons:
-                                persons.add(slug(candidate))
+                            person_key = (
+                                f"DC:anc:{slug(smd)}:{slug(candidate)}" if office == "anc" else f"DC:{slug(candidate)}"
+                            )
+                            person = cs.key(f"{SOURCE}.person", person_key)
+                            if person in cs.minted and person_key not in persons:
+                                persons.add(person_key)
                                 cs.add("person", id=person)
                                 name(person, candidate)
                             cs.add(
@@ -474,6 +509,9 @@ def emit() -> Path:
                 print(contest_key, "on file" if found else "new", total, totals[: magnitude + 1])
                 if len(totals) > magnitude and totals[magnitude - 1][0] - totals[magnitude][0] <= total * 0.005:
                     cs.add("note", entity_id=result_set, kind="caveat", body_md=CLOSE)
+                    continue
+                writes = int(cells.filter(pl.col("writein"))["votes"].sum())
+                if office == "anc" and (not totals or writes > totals[0][0]):
                     continue
                 for _, option in totals[:magnitude]:
                     cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected", seats=1)
