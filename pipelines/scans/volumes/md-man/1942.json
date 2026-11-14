@@ -1,0 +1,23 @@
+{
+  "year": 1942,
+  "day": "1942-11-03",
+  "polity": "US-MD",
+  "publisher": "Maryland Secretary of State",
+  "title": "Maryland Manual 1943-44, general election returns (general election 1942-11-03)",
+  "license": "Public record",
+  "file": {
+    "url": "https://msa.maryland.gov/megafile/msa/speccol/sc2900/sc2908/000001/000160/pdf/am160--{page}.pdf",
+    "item": "https://msa.maryland.gov/megafile/msa/speccol/sc2900/sc2908/000001/000160/html/index.html"
+  },
+  "raw_source": "us.scans",
+  "create": true,
+  "offices": {
+    "governor": "Governor of Maryland; only the 1942 general election",
+    "house": "U.S. Representative in Congress, one table per congressional district; district is the congressional district number; only the 1942 general election, not a primary"
+  },
+  "leaves": [
+    198,
+    201,
+    202
+  ]
+}

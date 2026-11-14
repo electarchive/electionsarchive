@@ -1,0 +1,26 @@
+{
+  "year": 1926,
+  "day": "1926-11-02",
+  "polity": "US-MD",
+  "publisher": "Maryland Secretary of State",
+  "title": "Maryland Manual 1926, general election returns (general election 1926-11-02)",
+  "license": "Public record",
+  "file": {
+    "url": "https://msa.maryland.gov/megafile/msa/speccol/sc2900/sc2908/000001/000137/pdf/am137--{page}.pdf",
+    "item": "https://msa.maryland.gov/megafile/msa/speccol/sc2900/sc2908/000001/000137/html/index.html"
+  },
+  "raw_source": "us.scans",
+  "create": true,
+  "offices": {
+    "governor": "Governor of Maryland; only the 1926 general election",
+    "senate": "U.S. Senator (United States Senator), not a state senator; only the 1926 general election",
+    "house": "U.S. Representative in Congress, one table per congressional district; district is the congressional district number; only the 1926 general election, not a primary"
+  },
+  "leaves": [
+    251,
+    252,
+    256,
+    257,
+    258
+  ]
+}
