@@ -1,10 +1,14 @@
+import difflib
 import re
 import struct
 import subprocess
+import tempfile
 from datetime import UTC, date, datetime
 from pathlib import Path
 
+import numpy as np
 import polars as pl
+from PIL import Image, ImageOps
 
 from ea import raw
 from ea.changeset import Changeset
@@ -13,10 +17,10 @@ from ea.sources.us.or_pri_abstract import NUMBER, lines_of
 from ea.store import DATA, connect
 
 SOURCE = "us.or_abstract_gaps"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
-INBOX = DATA / "inbox" / "manual" / "MF-032"
+INBOX = DATA / "inbox" / "manual"
 PUBLISHER = "Oregon Secretary of State"
 FILES = {
     2002: ("2002 Primary Election Official Results.PDF", 6873551, date(2002, 5, 21), False, "Primary Election", None),
@@ -39,7 +43,44 @@ FILES = {
         {5},
     ),
 }
+SCANNED = {
+    1978: ("1978 General.PDF", 8411046, date(1978, 11, 7), False, "General Election", {8, 9, 10}),
+}
+NAMES = {
+    ("senate", None): ["COOK, VERN", "HATFIELD, MARK O."],
+    ("house", 1): ["AUCOIN, LES", "BUNICK, NICK"],
+    ("house", 2): ["HICKS, TERRY L.", "ULLMAN, AL"],
+    ("house", 3): ["DUNCAN, ROBERT B.", "SIMON, MARTIN"],
+    ("house", 4): ["LAUSMANN, JERRY S.", "WEAVER, JIM"],
+    ("governor", None): ["ATIYEH, VICTOR", "STRAUB, BOB"],
+}
+FIXED = {
+    (("senate", None), 0, "harney"): "1,439",
+    (("senate", None), 1, "hoodriver"): "3,463",
+    (("senate", None), 2, "umatilla"): "11",
+    (("house", 1), 1, "columbia"): "3,728",
+    (("house", 2), 0, "grant"): "778",
+    (("house", 2), 0, "union"): "2,553",
+    (("house", 2), 1, "jefferson"): "2,235",
+    (("house", 2), 1, "sherman"): "734",
+    (("house", 3), 0, "multnomah"): "132,265",
+    (("house", 4), 0, "linn"): "5,466",
+    (("house", 4), 1, "benton"): "488",
+    (("governor", None), 0, "josephine"): "13,515",
+    (("governor", None), 0, "malheur"): "5,546",
+    (("governor", None), 2, "union"): "11",
+}
+LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz "
+REGIONS = [
+    (8, ("senate", None), (60, 170), [(540, 655), (685, 790), (830, 890)], (263, 875)),
+    (8, ("house", 1), (1030, 1135), [(1520, 1610), (1665, 1750), (1805, 1865)], (318, 530)),
+    (8, ("house", 2), (1035, 1130), [(1530, 1610), (1660, 1745), (1810, 1865)], (680, 1080)),
+    (9, ("house", 3), (30, 125), [(525, 595), (665, 730), (795, 855)], (228, 290)),
+    (9, ("house", 4), (30, 125), [(525, 595), (665, 730), (795, 855)], (428, 590)),
+    (10, ("governor", None), (70, 170), [(565, 645), (685, 785), (825, 890)], (300, 1025)),
+]
 ONLY = {2008: 1, 2024: 5}
+ALL = {**FILES, **SCANNED}
 TITLE = re.compile(
     r"(UNITED STATES SENATOR|REPRESENTATIVE IN CONGRESS, (\d+)(?:ST|ND|RD|TH) DISTRICT)(?: (DEMOCRAT|REPUBLICAN))?"
 )
@@ -48,22 +89,142 @@ TAG = re.compile(r"\s*\([A-Z]+\)$")
 
 
 def url(year: int) -> str:
-    return f"https://records.sos.state.or.us/ORSOSWebDrawer/Record/{FILES[year][1]}/File/document"
+    return f"https://records.sos.state.or.us/ORSOSWebDrawer/Record/{ALL[year][1]}/File/document"
 
 
 def fetch() -> None:
-    for year, (name, *_) in FILES.items():
+    for year, (name, *_) in ALL.items():
         try:
             raw.cached(SOURCE, url(year))
         except LookupError:
             raw.store(
                 SOURCE,
                 url(year),
-                (INBOX / name).read_bytes(),
+                (INBOX / ("MF-667" if year in SCANNED else "MF-032") / name).read_bytes(),
                 suffix=".pdf",
                 retrieved_at=datetime.now(UTC),
                 media_type="application/pdf",
             )
+
+
+def ocr(image: Image.Image, whitelist: str, votes: int = 1) -> str:
+    seen: list[str] = []
+    for factor, mode in [(3, "7"), (4, "7"), (3, "8"), (4, "8"), (5, "7"), (2, "7")][:votes]:
+        big = ImageOps.expand(
+            image.resize((image.width * factor, image.height * factor), Image.LANCZOS), border=20, fill=255
+        )
+        with tempfile.NamedTemporaryFile(suffix=".png") as handle:
+            big.save(handle.name)
+            text = subprocess.run(
+                ["tesseract", handle.name, "-", "--psm", mode, "-c", f"tessedit_char_whitelist={whitelist}"],
+                capture_output=True,
+                text=True,
+                check=True,
+            ).stdout.strip()
+        seen.append(text.strip(","))
+    return max(seen, key=lambda t: (seen.count(t), bool(re.fullmatch(r"\d{1,3}(,\d{3})*", t))))
+
+
+def bands(gray: np.ndarray, x0: int, x1: int, y0: int, y1: int) -> list[tuple[int, int, int, int]]:
+    ink = gray[y0:y1, x0:x1] < 150
+    rows = ink.sum(axis=1) > 0
+    found: list[tuple[int, int, int, int]] = []
+    start = None
+    for y, on in enumerate([*rows, False]):
+        if on and start is None:
+            start = y
+        elif not on and start is not None:
+            columns = np.nonzero(ink[start:y].sum(axis=0))[0]
+            box = (x0 + int(columns[0]), y0 + start, x0 + int(columns[-1]) + 1, y0 + y)
+            if y - start <= 4 and columns[-1] - columns[0] >= 21:
+                start = None
+                continue
+            if found and box[1] - found[-1][3] <= 1 and min(y - start, found[-1][3] - found[-1][1]) < 5:
+                last = found.pop()
+                box = (min(box[0], last[0]), last[1], max(box[2], last[2]), box[3])
+            found.append(box)
+            start = None
+    return found
+
+
+def read_scanned(year: int, codes: dict[str, str]) -> list[dict[str, object]]:
+    _, _, day, special, _, _ = SCANNED[year]
+    pdf = raw.cached(SOURCE, url(year)).path
+    counties = {name: code for name, code in codes.items()}
+    out: list[dict[str, object]] = []
+    with tempfile.TemporaryDirectory() as tmp:
+        for number, key, label, columns, (top, bottom) in REGIONS:
+            image = Path(tmp) / f"p{number}"
+            if not image.with_suffix(".png").exists():
+                subprocess.run(
+                    ["pdftoppm", "-r", "200", "-gray", "-png", "-f", str(number), "-l", str(number), "-singlefile"]
+                    + [str(pdf), str(image)],
+                    check=True,
+                )
+            picture = Image.open(image.with_suffix(".png")).convert("L")
+            gray = np.asarray(picture)
+            width, height = picture.size
+            scale = width / 2000
+            top, bottom = round(top * scale), round(bottom * scale)
+            names = []
+            for box in bands(gray, round(label[0] * scale), round(label[1] * scale), top - round(12 * scale), bottom):
+                if box[2] - box[0] < 30:
+                    continue
+                strokes = (gray[box[1] : box[3], box[0] : box[2]] < 150).sum(axis=0) >= 4
+                end = box[0] + int(np.nonzero(strokes)[0][-1]) + 3
+                text = ocr(picture.crop((box[0] - 2, box[1] - 2, end, box[3] + 2)), LETTERS)
+                names.append(difflib.get_close_matches(re.sub(r"[^a-z]", "", text.lower()), list(counties), 1, 0.6))
+            cells = [bands(gray, round(a * scale), round(b * scale), top, bottom) for a, b in columns]
+            total = [column.pop() for column in cells]
+            printed = [int(ocr(picture.crop(box), "0123456789,").replace(",", "") or 0) for box in total]
+            names = [n[0] if n else None for n in names[:-1]]
+            while names and names[0] is None:
+                names.pop(0)
+            if None in names:
+                raise ValueError(f"{key}: unread county among {names}")
+            if any(len(column) != len(names) for column in cells):
+                raise ValueError(f"{key}: {len(names)} counties against {[len(c) for c in cells]} rows")
+            candidates = NAMES[key]
+            read = [
+                [ocr(picture.crop((b[0] - 2, b[1] - 2, b[2] + 2, b[3] + 2)), "0123456789,", 6) for b in column]
+                for column in cells
+            ]
+            read = [
+                [FIXED.get((key, index, county), text) for county, text in zip(names, column, strict=True)]
+                for index, column in enumerate(read)
+            ]
+            for index, want in enumerate(printed):
+                got = sum(int(v.replace(",", "") or 0) for v in read[index])
+                if got != want:
+                    raise ValueError(f"{key} column {index}: {got} against {want}")
+            for index, column in enumerate(cells):
+                for county, box, text in zip(names, column, read[index], strict=True):
+                    if not text:
+                        continue
+                    out.append(
+                        {
+                            "year": year,
+                            "chamber": key[0],
+                            "day": day,
+                            "special": special,
+                            "state": "OR",
+                            "district": key[1],
+                            "code": counties[county],
+                            "candidate": "WRITE-INS" if index == len(candidates) else candidates[index],
+                            "measure": 1,
+                            "writein": index == len(candidates),
+                            "votes": int(text.replace(",", "")),
+                            "kind": "county",
+                            "source": "OR",
+                            "file": 0,
+                            "page": number,
+                            "x0": box[0] / width,
+                            "y0": box[1] / height,
+                            "x1": box[2] / width,
+                            "y1": box[3] / height,
+                        }
+                    )
+    return out
 
 
 def parse() -> None:
@@ -76,6 +237,8 @@ def parse() -> None:
             ).fetchall()
         }
     out: list[dict[str, object]] = []
+    for year in SCANNED:
+        out.extend(read_scanned(year, codes))
     for year, (_, _, day, special, stage, pages) in FILES.items():
         primary = stage == "Primary Election"
         office = district = party = None
@@ -214,12 +377,12 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Oregon's 2002 and 2010 U.S. Senate and House primaries, 2008 and 2024 general House seats, and the 2012 special, by county from the Secretary of State's official results",
+            summary="Oregon's 2002 and 2010 U.S. Senate and House primaries, 1978 general governor, U.S. Senate, and House, 2008 and 2024 general House seats, and the 2012 special, by county from the Secretary of State's official results",
             polity="US-OR",
         )
         sources: dict[str, object] = {}
         pages: dict[tuple[int, int], str] = {}
-        for year, (_, _, day, _, stage, _) in FILES.items():
+        for year, (_, _, day, _, stage, _) in ALL.items():
             title = f"{day:%B %-d, %Y} {stage} Official Results"
             source = cs.source(PUBLISHER, title)
             sources[f"OR{year}"] = source
