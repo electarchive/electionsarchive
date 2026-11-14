@@ -67,7 +67,7 @@
       "publisher": "Statistisches Reichsamt",
       "url": "https://digi.bib.uni-mannheim.de/fileadmin/statjahrb/514401303_1932/pdf/514401303_0585.pdf",
       "kind": "official_body",
-      "note": "Digitized by the Universitätsbibliothek Mannheim, one PDF per page. Printed pages 541 to 546: Reichstag elections 1919 to 1932 and by Wahlkreis (scan pages 0585 to 0587), Landtag elections in the German states (0588 and 0589), and the 1932 Reich President election by Wahlkreis (0590)."
+      "note": "Digitized by the Universitätsbibliothek Mannheim, one PDF per page. Printed pages 541 to 546: Reichstag elections 1919 to 1932 and by Wahlkreis (scan pages 0585 to 0587), Landtag elections in the German states (0588 and 0589), and the 1932 Reich President election by Wahlkreis (0590). Table 3 on printed pages 544 and 545 gives each state's latest Landtag (Bürgerschaft for Hamburg, Bremen, and Lübeck) election as of 1932, with its date, electorate, and votes; earlier Landtag elections are not listed."
     },
     "sj-reich-1930": {
       "title": "Statistisches Jahrbuch für das Deutsche Reich 1930, Wahlen und Abstimmungen",
@@ -355,6 +355,20 @@
       "url": "https://www.bpb.de/themen/zeit-kulturgeschichte/deutschland-chronik/132377/5-mai-1996/",
       "kind": "official_body",
       "note": "Berlin–Brandenburg merger vote of 5 May 1996 failed in Brandenburg."
+    },
+    "sj-reich-1939": {
+      "title": "Statistisches Jahrbuch für das Deutsche Reich 1939/40, XXI. Wahlen und Abstimmungen",
+      "publisher": "Statistisches Reichsamt",
+      "url": "https://archive.org/details/per_statistisches-jahrbuch-fur-das-deutsche-reich_statistisches-jahrbuch-fr-das-d_1939-1940_58",
+      "kind": "official_body",
+      "note": "Scan on the Internet Archive. Printed page 634: Volksabstimmung and Reichstag vote of 10 April 1938 by Wahlkreis; the plebiscite is one question, and the total over the old Reich and the former Austria is 49,359,956 valid votes."
+    },
+    "bundestag-ddr-1989": {
+      "title": "Die Kommunalwahlen in der DDR vom 7. Mai 1989",
+      "publisher": "Deutscher Bundestag, Wissenschaftliche Dienste",
+      "url": "https://www.bundestag.de/blob/276668/39aa97d8f3abe4e472ca39123e9cc0d6/die_kommunalwahlen_in_der_ddr_vom_7__mai_1989-data.pdf",
+      "kind": "official_body",
+      "note": "Gives 7 May 1989 as the date of the last Einheitswahl of the GDR's local assemblies."
     }
   },
   "tiers": [
@@ -3650,8 +3664,9 @@
         },
         {
           "date": "1938-04-10",
-          "through": "1938-04-10",
-          "note": "Plebiscite and single-list Reichstag vote on the Anschluss of Austria. Not yet counted: the Statistisches Jahrbuch für das Deutsche Reich 1939/40 page was not reachable."
+          "contests": 1,
+          "note": "Plebiscite on the Anschluss of Austria, held with the single-list Reichstag vote. One question; 49,359,956 valid votes over the old Reich and the former Austria.",
+          "source": "sj-reich-1939"
         }
       ],
       "key": "reich_volksentscheid",
@@ -3682,7 +3697,86 @@
       "effort": 3
     },
     {
-      "dates": [],
+      "dates": [
+        {
+          "date": "1929-01-06",
+          "contests": 1,
+          "note": "Landtag election: Lippe. Each state's latest election as of 1932; earlier ones are not yet dated.",
+          "source": "sj-reich-1932"
+        },
+        {
+          "date": "1929-10-27",
+          "contests": 1,
+          "note": "Landtag election: Baden. Each state's latest election as of 1932; earlier ones are not yet dated.",
+          "source": "sj-reich-1932"
+        },
+        {
+          "date": "1929-11-10",
+          "contests": 1,
+          "note": "Landtag election: Lübeck. Each state's latest election as of 1932; earlier ones are not yet dated.",
+          "source": "sj-reich-1932"
+        },
+        {
+          "date": "1930-06-22",
+          "contests": 1,
+          "note": "Landtag election: Sachsen. Each state's latest election as of 1932; earlier ones are not yet dated.",
+          "source": "sj-reich-1932"
+        },
+        {
+          "date": "1930-09-14",
+          "contests": 1,
+          "note": "Landtag election: Braunschweig. Each state's latest election as of 1932; earlier ones are not yet dated.",
+          "source": "sj-reich-1932"
+        },
+        {
+          "date": "1930-11-30",
+          "contests": 1,
+          "note": "Landtag election: Bremen. Each state's latest election as of 1932; earlier ones are not yet dated.",
+          "source": "sj-reich-1932"
+        },
+        {
+          "date": "1931-05-03",
+          "contests": 1,
+          "note": "Landtag election: Schaumburg-Lippe. Each state's latest election as of 1932; earlier ones are not yet dated.",
+          "source": "sj-reich-1932"
+        },
+        {
+          "date": "1932-03-13",
+          "contests": 1,
+          "note": "Landtag election: Mecklenburg-Strelitz. Each state's latest election as of 1932; earlier ones are not yet dated.",
+          "source": "sj-reich-1932"
+        },
+        {
+          "date": "1932-04-24",
+          "contests": 5,
+          "note": "Landtag election: Preußen, Bayern, Württemberg, Hamburg, Anhalt. Each state's latest election as of 1932; earlier ones are not yet dated.",
+          "source": "sj-reich-1932"
+        },
+        {
+          "date": "1932-05-29",
+          "contests": 1,
+          "note": "Landtag election: Oldenburg. Each state's latest election as of 1932; earlier ones are not yet dated.",
+          "source": "sj-reich-1932"
+        },
+        {
+          "date": "1932-06-05",
+          "contests": 1,
+          "note": "Landtag election: Mecklenburg-Schwerin. Each state's latest election as of 1932; earlier ones are not yet dated.",
+          "source": "sj-reich-1932"
+        },
+        {
+          "date": "1932-06-19",
+          "contests": 1,
+          "note": "Landtag election: Hessen. Each state's latest election as of 1932; earlier ones are not yet dated.",
+          "source": "sj-reich-1932"
+        },
+        {
+          "date": "1932-07-31",
+          "contests": 1,
+          "note": "Landtag election: Thüringen. Each state's latest election as of 1932; earlier ones are not yet dated.",
+          "source": "sj-reich-1932"
+        }
+      ],
       "key": "reich_landtage",
       "tier": "reich",
       "name": "Landtagswahlen der Länder des Deutschen Reiches",
@@ -3772,6 +3866,12 @@
     },
     {
       "dates": [
+        {
+          "date": "1989-05-07",
+          "contests": 1,
+          "note": "Last Einheitswahl of the Bezirkstage, Kreistage, and Gemeindevertretungen.",
+          "source": "bundestag-ddr-1989"
+        },
         {
           "date": "1990-05-06",
           "through": "1990-05-06",
