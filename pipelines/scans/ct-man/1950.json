@@ -1,0 +1,113 @@
+{
+  "polity": "US-CT",
+  "publisher": "Connecticut Secretary of the State",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "extend": true,
+  "title": "Register and Manual of the State of Connecticut 1951, vote for United States Senators and Representative at Large by counties (general election 1950-11-07)",
+  "file": {
+    "url": "https://archive.org/download/registe51conn/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/registe51conn"
+  },
+  "contests": {
+    "senate": {
+      "year": 1950,
+      "chamber": "senate",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "CT",
+      "district": null
+    },
+    "senate-special": {
+      "year": 1950,
+      "chamber": "senate",
+      "day": "1950-11-07",
+      "special": true,
+      "state": "CT",
+      "district": null
+    },
+    "house0": {
+      "year": 1950,
+      "chamber": "house",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "CT",
+      "district": 0
+    }
+  },
+  "pages": [
+    {
+      "page": 370,
+      "id": "370-0",
+      "turn": -90,
+      "orientation": "counties_down",
+      "hint": "The page is printed sideways; read the table 'VOTE FOR UNITED STATES SENATORS AND REPRESENTATIVE AT LARGE, NOVEMBER 7, 1950': eight county rows and the Totals row. The Peoples Party's two 'No Nomination' columns are blank.",
+      "columns": [
+        {
+          "label": "Benton for U. S. Senator Unexpired Term (Democratic)",
+          "contest": "senate-special",
+          "candidate": "William Benton"
+        },
+        {
+          "label": "McMahon for U. S. Senator Full Term (Democratic)",
+          "contest": "senate",
+          "candidate": "Brien McMahon"
+        },
+        {
+          "label": "Bogdanski for Rep.-at-Large (Democratic)",
+          "contest": "house0",
+          "candidate": "Joseph W. Bogdanski"
+        },
+        {
+          "label": "Bush for U. S. Senator Unexpired Term (Republican)",
+          "contest": "senate-special",
+          "candidate": "Prescott S. Bush"
+        },
+        {
+          "label": "Talbot for U. S. Senator Full Term (Republican)",
+          "contest": "senate",
+          "candidate": "Joseph E. Talbot"
+        },
+        {
+          "label": "Sadlak for Rep.-at-Large (Republican)",
+          "contest": "house0",
+          "candidate": "Antoni N. Sadlak"
+        },
+        {
+          "label": "Gillespie for U. S. Senator Unexpired Term (Socialist)",
+          "contest": "senate-special",
+          "candidate": "Gillespie",
+          "party": "Socialist"
+        },
+        {
+          "label": "Martino for U. S. Senator Full Term (Socialist)",
+          "contest": "senate",
+          "candidate": "Martino",
+          "party": "Socialist"
+        },
+        {
+          "label": "Mayhew for Rep.-at-Large (Socialist)",
+          "contest": "house0",
+          "candidate": "Mayhew",
+          "party": "Socialist"
+        },
+        {
+          "label": "No Nomination for U. S. Senator Unexpired Term (Peoples)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No Nomination for U. S. Senator Full Term (Peoples)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Robeson for Rep.-at-Large (Peoples)",
+          "contest": "house0",
+          "candidate": "Robeson",
+          "party": "Peoples"
+        }
+      ]
+    }
+  ]
+}

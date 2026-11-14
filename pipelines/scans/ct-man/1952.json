@@ -1,0 +1,91 @@
+{
+  "polity": "US-CT",
+  "publisher": "Connecticut Secretary of the State",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "extend": true,
+  "title": "Register and Manual of the State of Connecticut 1953, summary of vote for United States Senators and Representative at Large by counties (general election 1952-11-04)",
+  "file": {
+    "url": "https://prdext2.cga.ct.gov/hco/books/CT_State_Register_Manual_1953.pdf",
+    "item": "https://prdext2.cga.ct.gov/hco/books/CT_State_Register_Manual_1953.pdf"
+  },
+  "contests": {
+    "senate": {
+      "year": 1952,
+      "chamber": "senate",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "CT",
+      "district": null
+    },
+    "senate-special": {
+      "year": 1952,
+      "chamber": "senate",
+      "day": "1952-11-04",
+      "special": true,
+      "state": "CT",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 551,
+      "id": "551-0",
+      "turn": -90,
+      "orientation": "counties_down",
+      "hint": "The page is printed sideways; read the table 'SUMMARY OF VOTE FOR UNITED STATES SENATORS AND REPRESENTATIVE AT LARGE, NOVEMBER 4, 1952': eight county rows and the Totals row.",
+      "columns": [
+        {
+          "label": "Bush for U. S. Senator Unexpired Term (Republican)",
+          "contest": "senate-special",
+          "candidate": "Prescott Bush"
+        },
+        {
+          "label": "Purtell for U. S. Senator Full Term (Republican)",
+          "contest": "senate",
+          "candidate": "William A. Purtell"
+        },
+        {
+          "label": "Sadlak for Rep.-at-Large (Republican)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Ribicoff for U. S. Senator Unexpired Term (Democratic)",
+          "contest": "senate-special",
+          "candidate": "Abraham A. Ribicoff"
+        },
+        {
+          "label": "Benton for U. S. Senator Full Term (Democratic)",
+          "contest": "senate",
+          "candidate": "William Benton"
+        },
+        {
+          "label": "Rep.-at-Large (Democratic)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Taft for U. S. Senator Unexpired Term (Socialist)",
+          "contest": "senate-special",
+          "candidate": "William H. Taft"
+        },
+        {
+          "label": "McLevy for U. S. Senator Full Term (Socialist)",
+          "contest": "senate",
+          "candidate": "Jasper McLevy"
+        },
+        {
+          "label": "Waterman for Rep.-at-Large (Socialist)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Kellems for U. S. Senator Full Term (Ind. Republican)",
+          "contest": "senate",
+          "candidate": "Vivien Kellems"
+        }
+      ]
+    }
+  ]
+}

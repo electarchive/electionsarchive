@@ -1,0 +1,91 @@
+{
+  "polity": "US-CT",
+  "publisher": "Connecticut Secretary of the State",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "extend": true,
+  "title": "Register and Manual of the State of Connecticut 1947, summary vote for United States Senator by counties (general election 1946-11-05)",
+  "file": {
+    "url": "https://archive.org/download/register47conn/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/register47conn"
+  },
+  "contests": {
+    "senate": {
+      "year": 1946,
+      "chamber": "senate",
+      "day": "1946-11-05",
+      "special": false,
+      "state": "CT",
+      "district": null
+    },
+    "senate-special": {
+      "year": 1946,
+      "chamber": "senate",
+      "day": "1946-11-05",
+      "special": true,
+      "state": "CT",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 493,
+      "id": "493-0",
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.1,
+        1.0,
+        0.55
+      ],
+      "hint": "Read only the table headed 'SUMMARY - VOTE FOR UNITED STATES SENATOR': eight county rows and the Totals row. The first three columns are 1944, the other six 1946.",
+      "columns": [
+        {
+          "label": "Danaher Republican 1944",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "McMahon Democrat 1944",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Anderson Socialist 1944",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Baldwin Republican (Unexpired Term)",
+          "contest": "senate-special",
+          "candidate": "Raymond E. Baldwin"
+        },
+        {
+          "label": "Baldwin Republican (Full Term)",
+          "contest": "senate",
+          "candidate": "Raymond E. Baldwin"
+        },
+        {
+          "label": "Cross Democrat (Unexpired Term)",
+          "contest": "senate-special",
+          "candidate": "Wilbur L. Cross"
+        },
+        {
+          "label": "Tone Democrat (Full Term)",
+          "contest": "senate",
+          "candidate": "Joseph M. Tone"
+        },
+        {
+          "label": "Smedley Socialist (Unexpired Term)",
+          "contest": "senate-special",
+          "candidate": "Frederic C. Smedley"
+        },
+        {
+          "label": "Smedley Socialist (Full Term)",
+          "contest": "senate",
+          "candidate": "Frederic C. Smedley"
+        }
+      ]
+    }
+  ]
+}
