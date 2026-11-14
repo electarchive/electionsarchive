@@ -197,7 +197,12 @@
         }
       ],
       "orientation": "counties_down",
-      "crop": [0.162, 0.396, 0.873, 0.777],
+      "crop": [
+        0.162,
+        0.396,
+        0.873,
+        0.777
+      ],
       "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
     },
     {
@@ -226,7 +231,12 @@
         }
       ],
       "orientation": "counties_down",
-      "crop": [0.162, 0.54, 0.873, 0.78],
+      "crop": [
+        0.162,
+        0.54,
+        0.873,
+        0.78
+      ],
       "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
     },
     {
@@ -260,7 +270,12 @@
         }
       ],
       "orientation": "counties_down",
-      "crop": [0.17, 0.199, 0.874, 0.636],
+      "crop": [
+        0.17,
+        0.199,
+        0.874,
+        0.636
+      ],
       "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
     },
     {
@@ -289,7 +304,12 @@
         }
       ],
       "orientation": "counties_down",
-      "crop": [0.17, 0.628, 0.87, 1.0],
+      "crop": [
+        0.17,
+        0.628,
+        0.87,
+        1.0
+      ],
       "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
     },
     {
@@ -318,10 +338,18 @@
         }
       ],
       "orientation": "counties_down",
-      "crop": [0.164, 0.199, 0.87, 0.698],
+      "crop": [
+        0.164,
+        0.199,
+        0.87,
+        0.698
+      ],
       "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image.",
       "bands": 2,
-      "header": [0.0, 0.483]
+      "header": [
+        0.0,
+        0.483
+      ]
     },
     {
       "page": 965,
@@ -349,7 +377,12 @@
         }
       ],
       "orientation": "counties_down",
-      "crop": [0.164, 0.69, 0.87, 1.0],
+      "crop": [
+        0.164,
+        0.69,
+        0.87,
+        1.0
+      ],
       "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
     },
     {
@@ -373,10 +406,18 @@
         }
       ],
       "orientation": "counties_down",
-      "crop": [0.175, 0.199, 0.87, 0.691],
+      "crop": [
+        0.175,
+        0.199,
+        0.87,
+        0.691
+      ],
       "hint": "Read only the table headed 'SEVENTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image.",
       "bands": 2,
-      "header": [0.0, 0.4898]
+      "header": [
+        0.0,
+        0.4898
+      ]
     },
     {
       "page": 966,
@@ -404,7 +445,12 @@
         }
       ],
       "orientation": "counties_down",
-      "crop": [0.175, 0.683, 0.87, 1.0],
+      "crop": [
+        0.175,
+        0.683,
+        0.87,
+        1.0
+      ],
       "hint": "Read only the table headed 'EIGHTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
     },
     {
@@ -433,10 +479,18 @@
         }
       ],
       "orientation": "counties_down",
-      "crop": [0.18, 0.186, 0.886, 0.663],
+      "crop": [
+        0.18,
+        0.186,
+        0.886,
+        0.663
+      ],
       "hint": "Read only the table headed 'NINTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image.",
       "bands": 2,
-      "header": [0.0, 0.5115]
+      "header": [
+        0.0,
+        0.5115
+      ]
     },
     {
       "page": 967,
@@ -464,7 +518,12 @@
         }
       ],
       "orientation": "counties_down",
-      "crop": [0.178, 0.655, 0.882, 1.0],
+      "crop": [
+        0.178,
+        0.655,
+        0.882,
+        1.0
+      ],
       "hint": "Read only the table headed 'TENTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
     },
     {
@@ -488,10 +547,18 @@
         }
       ],
       "orientation": "counties_down",
-      "crop": [0.175, 0.199, 0.87, 0.729],
+      "crop": [
+        0.175,
+        0.199,
+        0.87,
+        0.729
+      ],
       "hint": "Read only the table headed 'ELEVENTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image.",
       "bands": 2,
-      "header": [0.0, 0.4491]
+      "header": [
+        0.0,
+        0.4491
+      ]
     },
     {
       "page": 968,
@@ -519,7 +586,12 @@
         }
       ],
       "orientation": "counties_down",
-      "crop": [0.175, 0.721, 0.87, 1.0],
+      "crop": [
+        0.175,
+        0.721,
+        0.87,
+        1.0
+      ],
       "hint": "Read only the table headed 'TWELFTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
     },
     {
@@ -548,10 +620,18 @@
         }
       ],
       "orientation": "counties_down",
-      "crop": [0.17, 0.196, 0.874, 0.697],
+      "crop": [
+        0.17,
+        0.196,
+        0.874,
+        0.697
+      ],
       "hint": "Read only the table headed 'THIRTEENTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image.",
       "bands": 2,
-      "header": [0.0, 0.481]
+      "header": [
+        0.0,
+        0.481
+      ]
     },
     {
       "page": 970,
@@ -579,8 +659,13 @@
         }
       ],
       "orientation": "counties_down",
-      "crop": [0.17, 0.199, 0.821, 0.475],
-      "hint": "Read only the table headed 'FOURTEENTH CONGRESSIONAL DISTRICT\u2014(Full Term.)'; ignore any other table visible in the image."
+      "crop": [
+        0.17,
+        0.199,
+        0.821,
+        0.475
+      ],
+      "hint": "Read only the table headed 'FOURTEENTH CONGRESSIONAL DISTRICT—(Full Term.)'; ignore any other table visible in the image."
     },
     {
       "page": 970,
@@ -608,7 +693,12 @@
         }
       ],
       "orientation": "counties_down",
-      "crop": [0.165, 0.467, 0.823, 0.794],
+      "crop": [
+        0.165,
+        0.467,
+        0.823,
+        0.794
+      ],
       "hint": "Read only the table headed 'FIFTEENTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
     },
     {
@@ -637,10 +727,18 @@
         }
       ],
       "orientation": "counties_down",
-      "crop": [0.247, 0.201, 0.946, 0.704],
+      "crop": [
+        0.247,
+        0.201,
+        0.946,
+        0.704
+      ],
       "hint": "Read only the table headed 'SIXTEENTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image.",
       "bands": 2,
-      "header": [0.0, 0.4891]
+      "header": [
+        0.0,
+        0.4891
+      ]
     },
     {
       "page": 971,
@@ -668,7 +766,12 @@
         }
       ],
       "orientation": "counties_down",
-      "crop": [0.247, 0.696, 0.946, 1.0],
+      "crop": [
+        0.247,
+        0.696,
+        0.946,
+        1.0
+      ],
       "hint": "Read only the table headed 'SEVENTEENTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
     },
     {
@@ -697,10 +800,18 @@
         }
       ],
       "orientation": "counties_down",
-      "crop": [0.175, 0.204, 0.87, 0.668],
+      "crop": [
+        0.175,
+        0.204,
+        0.87,
+        0.668
+      ],
       "hint": "Read only the table headed 'EIGHTEENTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image.",
       "bands": 2,
-      "header": [0.0, 0.5259]
+      "header": [
+        0.0,
+        0.5259
+      ]
     },
     {
       "page": 973,
@@ -728,7 +839,12 @@
         }
       ],
       "orientation": "counties_down",
-      "crop": [0.187, 0.681, 0.9, 1.0],
+      "crop": [
+        0.187,
+        0.681,
+        0.9,
+        1.0
+      ],
       "hint": "Read only the table headed 'TWENTIETH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
     },
     {
@@ -762,44 +878,18 @@
         }
       ],
       "orientation": "counties_down",
-      "crop": [0.164, 0.2, 0.87, 1.0],
+      "crop": [
+        0.164,
+        0.2,
+        0.87,
+        1.0
+      ],
       "hint": "Read only the table headed 'TWENTY-FIRST CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image.",
       "bands": 2,
-      "header": [0.0, 0.2962]
-    },
-    {
-      "page": 975,
-      "id": "975-0",
-      "columns": [
-        {
-          "label": "Rep. Theodore E. Burton.",
-          "contest": "house21",
-          "candidate": "Theodore Elijah Burton"
-        },
-        {
-          "label": "Dem. L. A. Russell.",
-          "contest": "house21",
-          "candidate": "L A Russell"
-        },
-        {
-          "label": "Pro. John McDonaugh",
-          "contest": "house21",
-          "candidate": "John McDonaugh"
-        },
-        {
-          "label": "Soc. Max S. Hayes.",
-          "contest": "house21",
-          "candidate": "Max S Hayes"
-        },
-        {
-          "label": "Soc. Lab. James Rugg.",
-          "contest": "house21",
-          "candidate": "James Rugg"
-        }
-      ],
-      "orientation": "counties_down",
-      "crop": [0.164, 0.0, 0.87, 1.0],
-      "hint": "This page continues the table of the previous page and prints no headings."
+      "header": [
+        0.0,
+        0.2962
+      ]
     }
   ]
 }
