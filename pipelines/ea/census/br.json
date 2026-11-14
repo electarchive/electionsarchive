@@ -2162,7 +2162,7 @@
           "date": "1844-01-01",
           "precision": "year",
           "source": "wp-eleicoes-br",
-          "note": "General election year for the Chamber of Deputies; contests and seats not yet counted."
+          "note": "General election year for the Chamber of Deputies, held after the Decreto of 24 May 1844 dissolved the Chamber and convoked the next for 1 January 1845. No decree fixes one polling day: the Anais do Imperio 1844 and 1845 print none, and a study of the Rio de Janeiro province's fourth district dates the second-stage deputy election in Campos dos Goytacazes to 10 November 1844, so days varied by province as in 1842. Contests and seats not yet counted."
         },
         {
           "date": "1847-11-07",
