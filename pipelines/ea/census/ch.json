@@ -382,6 +382,102 @@
       "publisher": "Kanton Glarus",
       "url": "https://www.gl.ch/public/upload/assets/64330/Resultate%20Gesamterneuerungswaheln%20Regierungsrat%20vom%208.%20M%C3%A4rz%202026.pdf?fp=1",
       "kind": "official_body"
+    },
+    "zh-gpr": {
+      "title": "Gesetz über die politischen Rechte vom 1. September 2003 (GPR, LS 161; text as of 1 July 2021, supplement 113)",
+      "publisher": "Kanton Zürich, Zürcher Gesetzessammlung",
+      "url": "https://www.zh.ch/de/politik-staat/gesetze-beschluesse/gesetzessammlung/zhlex-ls/erlass-161-2003_09_01-2005_01_01-113.html",
+      "kind": "official_body"
+    },
+    "be-gg": {
+      "title": "Gemeindegesetz vom 16. März 1998 (GG, BSG 170.11)",
+      "publisher": "Kanton Bern, Bernische Systematische Gesetzessammlung",
+      "url": "https://www.belex.sites.be.ch/app/de/texts_of_law/170.11",
+      "kind": "official_body"
+    },
+    "lu-gg": {
+      "title": "Gemeindegesetz vom 4. Mai 2004 (GG, SRL Nr. 150)",
+      "publisher": "Kanton Luzern, Systematische Rechtssammlung",
+      "url": "https://srl.lu.ch/app/de/texts_of_law/150",
+      "kind": "official_body"
+    },
+    "lu-strg": {
+      "title": "Stimmrechtsgesetz vom 25. Oktober 1988 (StRG, SRL Nr. 10)",
+      "publisher": "Kanton Luzern, Systematische Rechtssammlung",
+      "url": "https://srl.lu.ch/app/de/texts_of_law/10",
+      "kind": "official_body"
+    },
+    "sz-gog": {
+      "title": "Gesetz über die Organisation der Gemeinden und Bezirke vom 25. Oktober 2017 (Gemeindeorganisationsgesetz, GOG, SRSZ 152.100)",
+      "publisher": "Kanton Schwyz, Systematische Gesetzsammlung",
+      "url": "https://www.sz.ch/public/upload/assets/7311/152_100.pdf",
+      "kind": "official_body"
+    },
+    "nw-gemg": {
+      "title": "Gesetz über Organisation und Verwaltung der Gemeinden vom 28. April 1974 (Gemeindegesetz, GemG, NG 171.1)",
+      "publisher": "Kanton Nidwalden, Erlass-Sammlung",
+      "url": "https://gesetze.nw.ch/app/de/texts_of_law/171.1",
+      "kind": "official_body"
+    },
+    "fr-lco": {
+      "title": "Loi du 25 septembre 1980 sur les communes (LCo, RSF 140.1)",
+      "publisher": "État de Fribourg, Recueil systématique de la législation fribourgeoise",
+      "url": "https://bdlf.fr.ch/app/fr/texts_of_law/140.1",
+      "kind": "official_body"
+    },
+    "so-gg": {
+      "title": "Gemeindegesetz vom 16. Februar 1992 (GG, BGS 131.1)",
+      "publisher": "Kanton Solothurn, Bereinigte Gesetzessammlung",
+      "url": "https://bgs.so.ch/app/de/texts_of_law/131.1",
+      "kind": "official_body"
+    },
+    "bs-gg": {
+      "title": "Gemeindegesetz vom 17. Oktober 1984 (SG 170.100)",
+      "publisher": "Kanton Basel-Stadt, Systematische Gesetzessammlung",
+      "url": "https://www.gesetzessammlung.bs.ch/app/de/texts_of_law/170.100",
+      "kind": "official_body"
+    },
+    "bl-gemg": {
+      "title": "Gesetz über die Organisation und die Verwaltung der Gemeinden vom 28. Mai 1970 (Gemeindegesetz, GemG, SGS 180)",
+      "publisher": "Kanton Basel-Landschaft, Systematische Gesetzessammlung",
+      "url": "https://bl.clex.ch/app/de/texts_of_law/180",
+      "kind": "official_body"
+    },
+    "sh-gg": {
+      "title": "Gemeindegesetz vom 17. August 1998 (SHR 120.100)",
+      "publisher": "Kanton Schaffhausen, Schaffhauser Rechtsbuch",
+      "url": "https://rechtsbuch.sh.ch/app/de/texts_of_law/120.100",
+      "kind": "official_body"
+    },
+    "ar-gg": {
+      "title": "Gemeindegesetz vom 7. Juni 1998 (bGS 151.11)",
+      "publisher": "Kanton Appenzell Ausserrhoden, Bereinigte Gesetzessammlung",
+      "url": "https://bgs.ar.ch/app/de/texts_of_law/151.11",
+      "kind": "official_body"
+    },
+    "sg-gg": {
+      "title": "Gemeindegesetz vom 21. April 2009 (GG, sGS 151.2)",
+      "publisher": "Kanton St. Gallen, Gesetzessammlung",
+      "url": "https://www.gesetzessammlung.sg.ch/app/de/texts_of_law/151.2",
+      "kind": "official_body"
+    },
+    "gr-gg": {
+      "title": "Gemeindegesetz des Kantons Graubünden vom 17. Oktober 2017 (GG, BR 175.050)",
+      "publisher": "Kanton Graubünden, Bündner Rechtsbuch",
+      "url": "https://www.gr-lex.gr.ch/app/de/texts_of_law/175.050",
+      "kind": "official_body"
+    },
+    "ag-gg": {
+      "title": "Gesetz über die Einwohnergemeinden vom 19. Dezember 1978 (Gemeindegesetz, GG, SAR 171.100)",
+      "publisher": "Kanton Aargau, Systematische Sammlung des Aargauischen Rechts",
+      "url": "https://gesetzessammlungen.ag.ch/app/de/texts_of_law/171.100",
+      "kind": "official_body"
+    },
+    "tg-gemg": {
+      "title": "Gesetz über die Gemeinden vom 5. Mai 1999 (GemG, RB 131.1)",
+      "publisher": "Kanton Thurgau, Thurgauer Rechtsbuch",
+      "url": "https://www.rechtsbuch.tg.ch/app/de/texts_of_law/131.1",
+      "kind": "official_body"
     }
   },
   "tiers": [
@@ -7847,9 +7943,10 @@
         "unit": "municipality",
         "schemes": [
           "ch.commune"
-        ]
+        ],
+        "cycle": true
       },
-      "note": "Only some communes have an elected parliament (all communes in Geneva and Neuchâtel, communes above a size threshold in Vaud and Ticino, the cities elsewhere); the rest decide in a communal assembly. No federal register lists which communes have one. Terms follow the canton (KV ZH Art. 87: a commune may replace its assembly with a parliament). The Federal Statistical Office publishes party seats in the parliaments of the statistical cities from 1983.",
+      "note": "Only some communes have an elected parliament (all communes in Geneva and Neuchâtel, communes above a size threshold in Vaud and Ticino, the cities elsewhere); the rest decide in a communal assembly. No federal register lists which communes have one. Terms follow the canton (KV ZH Art. 87: a commune may replace its assembly with a parliament). The archive expects a yearly count only for Geneva and Neuchâtel, where every commune elects one. The Federal Statistical Office publishes party seats in the parliaments of the statistical cities from 1983.",
       "source": "kv-zh",
       "match": [
         {
@@ -7866,6 +7963,122 @@
             "municipality"
           ],
           "within": "CH"
+        }
+      ],
+      "cadence": [
+        {
+          "within": "CH-ZH",
+          "term_years": 4,
+          "source": "zh-gpr",
+          "locator": "GPR ZH § 32 Abs. 1 (four years); § 40 lit. a Ziff. 1 (a Gemeindeparlament, where there is one, is elected at the ballot box)"
+        },
+        {
+          "within": "CH-BE",
+          "source": "be-gg",
+          "locator": "GG BE Art. 34: each commune sets the term of its organs, six years at most, so no cantonwide cycle applies"
+        },
+        {
+          "within": "CH-LU",
+          "term_years": 4,
+          "source": "lu-gg",
+          "locator": "GG LU § 12 Abs. 2: a Gemeindeparlament is elected by proportional representation every four years, in the same year as the Gemeinderat"
+        },
+        {
+          "within": "CH-GL",
+          "term_years": 4,
+          "source": "kv-gl",
+          "locator": "KV GL Art. 78 Abs. 1 (four years); Art. 130 (a Gemeindeparlament is elected at the ballot box by proportional representation)"
+        },
+        {
+          "within": "CH-ZG",
+          "term_years": 4,
+          "source": "kv-zg",
+          "locator": "KV ZG § 77 Abs. 1 (four years); § 78 (a Grosser Gemeinderat is elected at the ballot box)"
+        },
+        {
+          "within": "CH-FR",
+          "term_years": 5,
+          "source": "fr-lco",
+          "locator": "LCo FR art. 29 al. 1 and 2 (the conseil général is elected at the ballot box for five years); art. 25 names the eight communes that must have one, and art. 26 lets communes above 600 inhabitants adopt one"
+        },
+        {
+          "within": "CH-SO",
+          "term_years": 4,
+          "source": "so-gg",
+          "locator": "GG SO § 89 Abs. 1 lit. a (a Gemeindeparlament is elected at the ballot box); KV SO Art. 61 Abs. 1 (four years)"
+        },
+        {
+          "within": "CH-BL",
+          "term_years": 4,
+          "source": "bl-gemg",
+          "locator": "GemG BL § 131 Abs. 1 (the voters elect the Einwohnerrat, always by proportional representation); § 12 Abs. 1 (four years)"
+        },
+        {
+          "within": "CH-SH",
+          "term_years": 4,
+          "source": "sh-gg",
+          "locator": "GG SH Art. 6 Abs. 2 lit. c (an Einwohnerrat is elected at the ballot box); KV SH Art. 41 Abs. 1 (four years)"
+        },
+        {
+          "within": "CH-AR",
+          "term_years": 4,
+          "source": "ar-gg",
+          "locator": "GG AR Art. 7 Abs. 1: members elected by the voters serve the cantonal term, four years"
+        },
+        {
+          "within": "CH-SG",
+          "term_years": 4,
+          "source": "sg-gg",
+          "locator": "GG SG Art. 64 Abs. 1 lit. a (the voters elect the members of the parliament); KV SG Art. 40 (by proportional representation) and Art. 59 lit. a (four years)"
+        },
+        {
+          "within": "CH-GR",
+          "source": "gr-gg",
+          "locator": "GG GR Art. 23 Abs. 1: each commune's constitution sets the size and powers of its parliament, and the act sets no term, so no cantonwide cycle applies"
+        },
+        {
+          "within": "CH-AG",
+          "term_years": 4,
+          "source": "kv-ag",
+          "locator": "KV AG § 70 Abs. 1: authorities serve four years"
+        },
+        {
+          "within": "CH-TG",
+          "term_years": 4,
+          "source": "tg-gemg",
+          "locator": "GemG TG § 3 Abs. 1 Ziff. 5 (the voters elect a Gemeindeparlament where the Gemeindeordnung provides one); KV TG § 32 (four years)"
+        },
+        {
+          "within": "CH-TI",
+          "term_years": 4,
+          "source": "kv-ti",
+          "locator": "Cost. TI art. 18 (the consiglio comunale is elected by proportional representation for four years); art. 35 (by the people)"
+        },
+        {
+          "within": "CH-VD",
+          "term_years": 5,
+          "source": "kv-vd",
+          "locator": "Cst-VD art. 144: the voters elect the conseil communal for five years, as a rule by proportional representation"
+        },
+        {
+          "within": "CH-NE",
+          "period_years": 4,
+          "term_years": 4,
+          "source": "kv-ne",
+          "locator": "Cst. NE art. 95: every commune has a conseil général, elected by its voters for four years, as a rule by proportional representation"
+        },
+        {
+          "within": "CH-GE",
+          "period_years": 5,
+          "term_years": 5,
+          "source": "kv-ge",
+          "locator": "Cst-GE art. 140: each commune's conseil municipal is elected every five years by proportional representation"
+        },
+        {
+          "within": "CH-JU",
+          "term_years": 5,
+          "source": "kv-ju",
+          "locator": "Cst. JU art. 65 (five years); art. 74 (the voters elect the conseillers généraux by proportional representation)"
         }
       ],
       "access": [
@@ -7896,13 +8109,193 @@
         "unit": "municipality",
         "schemes": [
           "ch.commune"
-        ]
+        ],
+        "cycle": true
       },
-      "note": "Every commune's executive is elected by its voters, at the ballot box or in the communal assembly, mostly by majority vote with a second round; Ticino's municipi and the executives in some other cantons by proportional representation (KV TI). Foreigners vote in communal elections in Neuchâtel, Jura, Vaud, Fribourg, and Geneva, and in some communes of Appenzell Ausserrhoden, Graubünden, and Basel-Stadt.",
+      "note": "The voters of each commune elect its executive, at the ballot box or in the communal assembly, mostly by majority vote with a second round; Ticino's municipi and the executives in some other cantons by proportional representation (KV TI Art. 18). Two cantons differ: in Neuchâtel each commune decides whether its voters or its Conseil général elect the executive, and in Basel-Stadt the canton runs the city of Basel, so only Riehen and Bettingen elect one. The term is four years in most cantons and five in Fribourg, Vaud, Geneva, and Jura. Schwyz renews half of each council every two years, and the districts of Appenzell Innerrhoden elect theirs every year. Bern, Uri, Graubünden, and Basel-Stadt leave the term to each commune. The archive expects a yearly count only where cantonal law fixes the cycle for every commune. Foreigners vote in communal elections in Neuchâtel, Jura, Vaud, Fribourg, and Geneva, and in some communes of Appenzell Ausserrhoden, Graubünden, and Basel-Stadt.",
       "source": "kv-ti",
       "est_votes": 2500000,
       "effort": 5,
-      "dates": []
+      "dates": [],
+      "cadence": [
+        {
+          "within": "CH-ZH",
+          "period_years": 4,
+          "term_years": 4,
+          "source": "kv-zh",
+          "locator": "KV ZH Art. 41 Abs. 1 (members of authorities serve four years); GPR § 40 lit. a Ziff. 2 (the Gemeindevorstand is elected at the ballot box)"
+        },
+        {
+          "within": "CH-BE",
+          "source": "be-gg",
+          "locator": "GG BE Art. 34: each commune sets the term of its organs, six years at most, so no cantonwide cycle applies"
+        },
+        {
+          "within": "CH-LU",
+          "period_years": 4,
+          "term_years": 4,
+          "source": "lu-gg",
+          "locator": "GG LU § 16 Abs. 1: the voters elect the Gemeinderat every four years, and it takes office on 1 September"
+        },
+        {
+          "within": "CH-UR",
+          "term_years": 2,
+          "source": "kv-ur",
+          "locator": "KV UR Art. 83 Abs. 2: two years for communal authorities unless the commune's Gemeindeordnung sets another term, so no cantonwide cycle applies"
+        },
+        {
+          "within": "CH-SZ",
+          "period_years": 2,
+          "term_years": 4,
+          "classes": 2,
+          "source": "sz-gog",
+          "locator": "GOG SZ § 37 Abs. 2 and 3: half of each Gemeinderat is renewed every two years, and members serve four years; § 15 Abs. 1 lit. a (elected by the voters)"
+        },
+        {
+          "within": "CH-OW",
+          "period_years": 4,
+          "term_years": 4,
+          "source": "kv-ow",
+          "locator": "KV OW Art. 93 Ziff. 2 lit. a: the Gemeinderäte are elected for four years"
+        },
+        {
+          "within": "CH-NW",
+          "period_years": 4,
+          "term_years": 4,
+          "source": "kv-nw",
+          "locator": "KV NW Art. 45 (authorities serve four years); Art. 76 Ziff. 2 lets a commune elect half of its council every two years instead; GemG Art. 75 Abs. 1 (ballot box unless the Gemeindeordnung says otherwise)"
+        },
+        {
+          "within": "CH-GL",
+          "period_years": 4,
+          "term_years": 4,
+          "source": "kv-gl",
+          "locator": "KV GL Art. 78 Abs. 1 (four years for cantonal and communal authorities, from 1 July); Art. 130 (the Vorsteherschaft is elected at the ballot box by majority vote)"
+        },
+        {
+          "within": "CH-ZG",
+          "period_years": 4,
+          "term_years": 4,
+          "source": "kv-zg",
+          "locator": "KV ZG § 77 Abs. 1 (four years for communal authorities elected by the people); § 78 (the Gemeinderat is elected at the ballot box)"
+        },
+        {
+          "within": "CH-FR",
+          "period_years": 5,
+          "term_years": 5,
+          "source": "fr-lco",
+          "locator": "LCo FR art. 56 al. 1 and 2: the conseil communal is elected at the ballot box for five years"
+        },
+        {
+          "within": "CH-SO",
+          "period_years": 4,
+          "term_years": 4,
+          "source": "kv-so",
+          "locator": "KV SO Art. 61 Abs. 1 (four years for all cantonal and communal authorities); GG SO § 54 Abs. 1 lit. a (ballot box)"
+        },
+        {
+          "within": "CH-BS",
+          "source": "bs-gg",
+          "locator": "GG BS § 10 Abs. 1: each commune's Gemeindeordnung sets the term of its authorities; the canton runs the city of Basel (KV BS § 57 Abs. 2), so only Riehen and Bettingen elect an executive, and no cantonwide cycle applies"
+        },
+        {
+          "within": "CH-BL",
+          "period_years": 4,
+          "term_years": 4,
+          "phase": 0,
+          "source": "bl-gemg",
+          "locator": "GemG BL § 12 Abs. 1 (four years) and § 12a Abs. 1 lit. a (terms begin on 1 July 2004, 2008, and so on); KV BL § 26 Abs. 1 lit. b (ballot box)"
+        },
+        {
+          "within": "CH-SH",
+          "period_years": 4,
+          "term_years": 4,
+          "source": "kv-sh",
+          "locator": "KV SH Art. 41 Abs. 1 (communal authorities are elected for four years); GG SH Art. 6 Abs. 2 lit. a (ballot box)"
+        },
+        {
+          "within": "CH-AR",
+          "period_years": 4,
+          "term_years": 4,
+          "source": "ar-gg",
+          "locator": "GG AR Art. 7 Abs. 1 (the term of the cantonal authorities, four years under KV AR Art. 65); Art. 5 Abs. 1 (the same day in every commune); Art. 15 Abs. 1 lit. b (elected by the voters)"
+        },
+        {
+          "within": "CH-AI",
+          "period_years": 1,
+          "term_years": 1,
+          "selection": "town_meeting",
+          "source": "kv-ai",
+          "locator": "KV AI Art. 33 Abs. 2 and 3: each district's Bezirksgemeinde meets every year, a week after the Landsgemeinde, and elects the Hauptleute and the other members of the Bezirksrat"
+        },
+        {
+          "within": "CH-SG",
+          "period_years": 4,
+          "term_years": 4,
+          "source": "kv-sg",
+          "locator": "KV SG Art. 59 lit. a (four years for cantonal and communal authorities); GG SG Art. 22 Abs. 1 and Art. 64 Abs. 1 lit. b (elected by the voters)"
+        },
+        {
+          "within": "CH-GR",
+          "source": "gr-gg",
+          "locator": "GG GR sets no term for the Gemeindevorstand and leaves it to each commune's constitution, so no cantonwide cycle applies"
+        },
+        {
+          "within": "CH-AG",
+          "period_years": 4,
+          "term_years": 4,
+          "source": "kv-ag",
+          "locator": "KV AG § 70 Abs. 1 (authorities serve four years); GG AG § 21 Abs. 1 lit. a (elected in the assembly or at the ballot box)"
+        },
+        {
+          "within": "CH-TG",
+          "period_years": 4,
+          "term_years": 4,
+          "source": "kv-tg",
+          "locator": "KV TG § 32 (four years for everyone elected by the people); GemG TG § 3 Abs. 1 Ziff. 3 and 4 (elected by the voters)"
+        },
+        {
+          "within": "CH-TI",
+          "period_years": 4,
+          "term_years": 4,
+          "source": "kv-ti",
+          "locator": "Cost. TI art. 18 (the municipio is elected by proportional representation for four years); art. 35 (by the people)"
+        },
+        {
+          "within": "CH-VD",
+          "period_years": 5,
+          "term_years": 5,
+          "source": "kv-vd",
+          "locator": "Cst-VD art. 148 (five years) and art. 149 (the voters elect the municipalité directly by majority vote in two rounds)"
+        },
+        {
+          "within": "CH-VS",
+          "period_years": 4,
+          "term_years": 4,
+          "source": "kv-vs",
+          "locator": "Cst. VS art. 85 (communal councils are elected for four years); art. 78 (by the primary assembly)"
+        },
+        {
+          "within": "CH-NE",
+          "term_years": 4,
+          "source": "kv-ne",
+          "locator": "Cst. NE art. 95: the conseil communal serves four years, and each commune decides whether its voters or its conseil général elect it, so no cantonwide popular election applies"
+        },
+        {
+          "within": "CH-GE",
+          "period_years": 5,
+          "term_years": 5,
+          "source": "kv-ge",
+          "locator": "Cst-GE art. 141: the communal executive is elected every five years by majority vote, the first round with the conseil municipal"
+        },
+        {
+          "within": "CH-JU",
+          "period_years": 5,
+          "term_years": 5,
+          "source": "kv-ju",
+          "locator": "Cst. JU art. 65 (communal authorities are elected for five years); art. 74 (the voters elect the conseillers communaux)"
+        }
+      ]
     },
     {
       "key": "communal_president",
@@ -7915,10 +8308,11 @@
         "unit": "municipality",
         "schemes": [
           "ch.commune"
-        ]
+        ],
+        "cycle": true
       },
-      "note": "In most German-speaking cantons the voters elect the president of the communal executive in a separate contest (KV SG Art. 40); in Vaud, Neuchâtel, Geneva, and Ticino the president or mayor is chosen from or by the elected executive in many communes.",
-      "source": "kv-sg",
+      "note": "The voters elect the president of the communal executive in Zurich, Schwyz, Glarus, Zug, Solothurn, Basel-Landschaft, Schaffhausen, Appenzell Ausserrhoden, St. Gallen, Aargau, Thurgau, Ticino, Vaud, Valais, and Jura, for the executive's term (two years in Schwyz), and the district assemblies of Appenzell Innerrhoden elect their Hauptleute every year. In Fribourg, Neuchâtel, and Geneva the executive chooses its own president or mayor. Obwalden, Nidwalden, and Uri set a default term of one or two years that a commune may lengthen, and Bern, Lucerne, Graubünden, and Basel-Stadt leave the election or its term to each commune. The archive expects a yearly count only where cantonal law fixes the cycle for every commune.",
+      "source": "sg-gg",
       "match": [
         {
           "election_kinds": [
@@ -7933,6 +8327,161 @@
             "municipality"
           ],
           "within": "CH"
+        }
+      ],
+      "cadence": [
+        {
+          "within": "CH-ZH",
+          "period_years": 4,
+          "term_years": 4,
+          "source": "zh-gpr",
+          "locator": "GPR ZH § 32 Abs. 1 (four years); § 40 lit. a Ziff. 2 (the president of the Gemeindevorstand is elected at the ballot box)"
+        },
+        {
+          "within": "CH-BE",
+          "source": "be-gg",
+          "locator": "GG BE Art. 34: each commune sets the term of its organs, six years at most, so no cantonwide cycle applies"
+        },
+        {
+          "within": "CH-LU",
+          "term_years": 4,
+          "source": "lu-strg",
+          "locator": "StRG LU § 24 Abs. 3: where the voters allocate the offices, the presidium is elected on the same day as the Gemeinderat; the acts read do not say that every commune's voters do"
+        },
+        {
+          "within": "CH-UR",
+          "term_years": 2,
+          "source": "kv-ur",
+          "locator": "KV UR Art. 83 Abs. 2: two years for communal authorities unless the commune's Gemeindeordnung sets another term, so no cantonwide cycle applies"
+        },
+        {
+          "within": "CH-SZ",
+          "period_years": 2,
+          "term_years": 2,
+          "source": "sz-gog",
+          "locator": "GOG SZ § 15 Abs. 1 lit. a (the voters elect the Gemeindepräsident); § 37 Abs. 3 (for two years)"
+        },
+        {
+          "within": "CH-OW",
+          "term_years": 1,
+          "source": "kv-ow",
+          "locator": "KV OW Art. 93 Ziff. 3: the president of the council is elected for one year unless the Gemeindeordnung sets a longer term, so no cantonwide cycle applies"
+        },
+        {
+          "within": "CH-NW",
+          "term_years": 2,
+          "source": "nw-gemg",
+          "locator": "GemG NW Art. 75 Abs. 1 and 1a: the presidium is elected at the ballot box for two years unless the Gemeindeordnung provides otherwise or sets four years, so no cantonwide cycle applies"
+        },
+        {
+          "within": "CH-GL",
+          "period_years": 4,
+          "term_years": 4,
+          "source": "kv-gl",
+          "locator": "KV GL Art. 78 Abs. 1 (four years); Art. 130 (the president is elected at the ballot box by majority vote)"
+        },
+        {
+          "within": "CH-ZG",
+          "period_years": 4,
+          "term_years": 4,
+          "source": "kv-zg",
+          "locator": "KV ZG § 77 Abs. 1 (four years); § 78 (the president of the Gemeinderat is elected at the ballot box)"
+        },
+        {
+          "within": "CH-SO",
+          "period_years": 4,
+          "term_years": 4,
+          "source": "so-gg",
+          "locator": "GG SO § 54 Abs. 1 lit. c (the Gemeindepräsident is elected at the ballot box); KV SO Art. 61 Abs. 1 (four years)"
+        },
+        {
+          "within": "CH-BS",
+          "source": "bs-gg",
+          "locator": "GG BS § 10 Abs. 1: each commune's Gemeindeordnung sets its authorities and their term; only Riehen and Bettingen have a president (KV BS § 57 Abs. 2), and no cantonwide cycle applies"
+        },
+        {
+          "within": "CH-BL",
+          "period_years": 4,
+          "term_years": 4,
+          "phase": 0,
+          "source": "bl-gemg",
+          "locator": "GemG BL § 131 Abs. 1 (the voters elect the Gemeindepräsident); § 12 Abs. 1 (four years) and § 12a Abs. 1 lit. a (terms begin on 1 July 2004, 2008, and so on)"
+        },
+        {
+          "within": "CH-SH",
+          "period_years": 4,
+          "term_years": 4,
+          "source": "sh-gg",
+          "locator": "GG SH Art. 6 Abs. 2 lit. a (the Gemeindepräsident is elected at the ballot box); KV SH Art. 41 Abs. 1 (four years)"
+        },
+        {
+          "within": "CH-AR",
+          "period_years": 4,
+          "term_years": 4,
+          "source": "ar-gg",
+          "locator": "GG AR Art. 15 Abs. 1 lit. b (the voters elect the Gemeindepräsident); Art. 7 Abs. 1 (the cantonal term, four years)"
+        },
+        {
+          "within": "CH-AI",
+          "period_years": 1,
+          "term_years": 1,
+          "selection": "town_meeting",
+          "source": "kv-ai",
+          "locator": "KV AI Art. 33 Abs. 2 and 3: each district's Bezirksgemeinde meets every year and elects the governing and the standing Hauptmann"
+        },
+        {
+          "within": "CH-SG",
+          "period_years": 4,
+          "term_years": 4,
+          "source": "sg-gg",
+          "locator": "GG SG Art. 22 Abs. 1 and Art. 64 Abs. 1 lit. b (the voters elect the chair of the council); Abs. 2bis lets a commune with more than one full-time council member have the council choose its chair; KV SG Art. 59 lit. a (four years)"
+        },
+        {
+          "within": "CH-GR",
+          "source": "gr-gg",
+          "locator": "GG GR sets no term for communal authorities and leaves it to each commune's constitution, so no cantonwide cycle applies"
+        },
+        {
+          "within": "CH-AG",
+          "period_years": 4,
+          "term_years": 4,
+          "source": "ag-gg",
+          "locator": "GG AG § 21 Abs. 1 lit. a (the Gemeindeammann is elected in the assembly or at the ballot box); KV AG § 70 Abs. 1 (four years)"
+        },
+        {
+          "within": "CH-TG",
+          "period_years": 4,
+          "term_years": 4,
+          "source": "tg-gemg",
+          "locator": "GemG TG § 3 Abs. 1 Ziff. 3 (the voters elect the chair of the communal authority); KV TG § 32 (four years)"
+        },
+        {
+          "within": "CH-TI",
+          "period_years": 4,
+          "term_years": 4,
+          "source": "kv-ti",
+          "locator": "Cost. TI art. 35 (the people elect the sindaco); art. 18 (four years)"
+        },
+        {
+          "within": "CH-VD",
+          "period_years": 5,
+          "term_years": 5,
+          "source": "kv-vd",
+          "locator": "Cst-VD art. 149 (the voters elect the syndic from the members of the municipalité, within a month of its election); art. 148 (five years)"
+        },
+        {
+          "within": "CH-VS",
+          "period_years": 4,
+          "term_years": 4,
+          "source": "kv-vs",
+          "locator": "Cst. VS art. 78 (the primary assembly elects the president and the vice president); art. 85 (four years)"
+        },
+        {
+          "within": "CH-JU",
+          "period_years": 5,
+          "term_years": 5,
+          "source": "kv-ju",
+          "locator": "Cst. JU art. 74 (the voters elect the maire by majority vote); art. 65 (five years)"
         }
       ],
       "est_votes": 1800000,
@@ -7987,7 +8536,21 @@
       "source": "kv-zh",
       "est_votes": 600000,
       "effort": 5,
-      "dates": []
+      "dates": [],
+      "cadence": [
+        {
+          "within": "CH-ZH",
+          "term_years": 4,
+          "source": "zh-gpr",
+          "locator": "GPR ZH § 40 lit. a Ziff. 3 (the Schulpflege is elected at the ballot box); § 32 Abs. 1 (four years)"
+        },
+        {
+          "within": "CH-SH",
+          "term_years": 4,
+          "source": "sh-gg",
+          "locator": "GG SH Art. 6 Abs. 2 lit. d (the president and members of the Schulbehörde are elected at the ballot box); KV SH Art. 41 Abs. 1 (four years)"
+        }
+      ]
     },
     {
       "key": "burgher_community",
@@ -8003,7 +8566,28 @@
       "source": "kv-vs",
       "est_votes": 100000,
       "effort": 5,
-      "dates": []
+      "dates": [],
+      "cadence": [
+        {
+          "within": "CH-OW",
+          "term_years": 4,
+          "selection": "town_meeting",
+          "source": "kv-ow",
+          "locator": "KV OW Art. 98 Abs. 1 Ziff. 1: the Bürgergemeindeversammlung elects a Bürgergemeinderat of five to nine members for four years"
+        },
+        {
+          "within": "CH-BL",
+          "term_years": 4,
+          "source": "bl-gemg",
+          "locator": "GemG BL § 142 Abs. 1 and 2 (the president, the Bürgerrat, and the Bürgerkommission are elected at the ballot box by majority vote); § 12 Abs. 1 (four years)"
+        },
+        {
+          "within": "CH-VS",
+          "term_years": 4,
+          "source": "kv-vs",
+          "locator": "Cst. VS art. 85: the Burgerräte are elected for four years, like the communal councils"
+        }
+      ]
     },
     {
       "key": "church_parishes",
