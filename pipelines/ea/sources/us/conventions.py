@@ -2868,7 +2868,10 @@ MISPRINTS = {
     ),
     "1924:democratic:b15": (
         "The Star's table for this ballot disagrees with itself: the PA row adds to 77, against a delegation of 76; Cox's printed total is 60, against 61 in the state rows. The rows are stored as printed.",
-        {"PA": (76, 77, "the printed figure differs from the state figures"), "column Cox": (60, 61, "the printed figure differs from the state figures")},
+        {
+            "PA": (76, 77, "the printed figure differs from the state figures"),
+            "column Cox": (60, 61, "the printed figure differs from the state figures"),
+        },
     ),
     "1924:democratic:b17": (
         "The Star's table for this ballot has no column for Robinson, and its scattering list omits him, so 28 of the 1,098 votes are not attributed to anyone: Arkansas 18, Wyoming 6, Illinois 2, Minnesota 1, and Pennsylvania 1 (each delegation's size less the votes the table names). Those cells are blank in the Star and are stored as not recorded.",
@@ -2876,7 +2879,10 @@ MISPRINTS = {
     ),
     "1924:democratic:b18": (
         "The Star's table for this ballot disagrees with itself: the MN row adds to 27, against a delegation of 24; Smith's printed total is 312.5, against 315.5 in the state rows; the printed scattering total of 129.5 is 10 more than the candidates named in the scattering list add to (119.5). The rows are stored as printed.",
-        {"MN": (24, 27, "the printed figure differs from the state figures"), "column Smith": (312.5, 315.5, "the printed figure differs from the state figures")},
+        {
+            "MN": (24, 27, "the printed figure differs from the state figures"),
+            "column Smith": (312.5, 315.5, "the printed figure differs from the state figures"),
+        },
     ),
     "1924:democratic:b19": (
         "The Star's table for this ballot disagrees with itself: Smith's printed total is 310.5, against 311.5 in the state rows. The rows are stored as printed.",
