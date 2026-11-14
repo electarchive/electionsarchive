@@ -198,6 +198,9 @@ const MODEL = {
     drift: 0.04,
     base: 0.002,
     baseGrace: 7,
+    read: 0.85,
+    night: 0.4,
+    readTail: 0.2,
     baseLife: 6,
     cure: { floor: 0.35, life: 0.25 },
     wane: { after: 4, life: 2 },
@@ -682,6 +685,22 @@ function units(
     for (const [id, list] of byUnit) {
       const then = list.findLast((count) => Date.parse(count.at) <= start);
       sinces.set(id, then?.votes ?? []);
+    }
+  }
+  const opener = race.frames.find((frame) => sum(frame.totals) > 0)?.at;
+  if (
+    cutoff != null &&
+    opener != null &&
+    clock <= cutoff &&
+    tail >= MODEL.late.readTail &&
+    clock > Date.parse(opener) + MODEL.late.read * 86_400_000
+  ) {
+    const from = Date.parse(opener) + MODEL.late.night * 86_400_000;
+    for (const [id, list] of byUnit) {
+      const then = list.findLast((count) => Date.parse(count.at) <= from);
+      if (then != null && sum(then.votes) > 0) {
+        sinces.set(id, then.votes);
+      }
     }
   }
   if (cutoff != null && start > cutoff) {
@@ -2531,14 +2550,14 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
         ) ?? null;
       const fresh = origin == null ? 0 : unit.total - origin.total;
       const recent =
-        isLate && unit.channel === 0 && origin != null
+        unit.channel === 0 && origin != null
           ? (countedLead - origin.lead) / fresh
           : null;
       const toward = remaining * (recent ?? 0);
       const aimed =
         recent == null
           ? modeled
-          : (recent - unit.margin) * (modeled - toward) > 0
+          : !isLate || (recent - unit.margin) * (modeled - toward) > 0
             ? toward
             : modeled + MODEL.late.follow * (toward - modeled);
       const lead = clamp(
