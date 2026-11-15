@@ -161,7 +161,7 @@ type Built = {
   tops: unknown;
   inferred: Array<string>;
   units: unknown;
-  built_at?: Date;
+  built_at?: string;
 };
 
 async function auditTops() {
@@ -194,7 +194,7 @@ async function auditTops() {
     if (kept !== current) {
       stale.push(row.root);
       console.error(
-        `stale contest top ${row.root}: built ${row.built_at?.toISOString()}, stored ${kept}, live ${current}`,
+        `stale contest top ${row.root}: built ${row.built_at}, stored ${kept}, live ${current}`,
       );
     }
   }
@@ -211,6 +211,16 @@ async function refillTops() {
   const orphans = await db.execute<{ id: string }>(sql`
     delete from contest_top t
     where not exists (select from contest c where c.id = t.contest_id and c.allocation_parent_id is null)
+    returning t.contest_id as id
+  `);
+  const outlived = await db.execute<{ id: string }>(sql`
+    delete from contest_top t
+    using (
+      select contest_id, max(at) as at from cover_stale
+      where contest_id is not null and at > (select min(built_at) from contest_top)
+      group by contest_id
+    ) s
+    where s.contest_id = t.contest_id and t.built_at < s.at
     returning t.contest_id as id
   `);
   const listed = await db.execute<{ id: string }>(sql`
@@ -250,7 +260,7 @@ async function refillTops() {
   }
   await db.execute(sql`analyze contest_top`);
   const { checked, stale } = await auditTops();
-  return `${built} race tops built, ${counted} unit counts filled, ${orphans.rows.length} orphans removed, ${stale} of ${checked} sampled rows stale and removed, in ${Math.round((Date.now() - started) / 1000)}s`;
+  return `${built} race tops built, ${counted} unit counts filled, ${orphans.rows.length} orphans removed, ${outlived.rows.length} built before a later stale mark removed, ${stale} of ${checked} sampled rows stale and removed, in ${Math.round((Date.now() - started) / 1000)}s`;
 }
 
 async function refillCovers() {
