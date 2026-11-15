@@ -1083,7 +1083,11 @@ def match(labels: list[str], held: list[tuple[str, str, int | None]], contest: s
             found_options = [
                 name
                 for name, options_ in surnames
-                if any(difflib.get_close_matches(word, options_, n=1, cutoff=0.85) for word in words)
+                if any(
+                    difflib.get_close_matches(word, options_, n=1, cutoff=0.85)
+                    or any(len(word) > 4 and word[0] == o[0] and sorted(word) == sorted(o) for o in options_)
+                    for word in words
+                )
             ]
         found_options = list(dict.fromkeys(found_options))
         if len(found_options) == 1 and given_conflict(label, found_options[0], held):
