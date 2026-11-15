@@ -305,6 +305,48 @@
    "publisher": "Instituto Nacional Electoral (INE)",
    "url": "https://portalanterior.ine.mx/archivos2/portal/Elecciones/PElocales/Extraordinarias/2015-2016/EleccionGobernador/Colima/",
    "kind": "official_body"
+  },
+  "voices_2004": {
+   "title": "Mexico's 2004 Local Elections: What to Expect (Voices of Mexico 67), table 1, 2004 Local Electoral Calendar",
+   "publisher": "Universidad Nacional Autónoma de México, CISAN",
+   "url": "http://www.revistascisan.unam.mx/Voices/pdfs/6702.pdf",
+   "kind": "academic",
+   "note": "Read 2026-11-14. Written before the 2004 elections; its dates for Yucatán, Baja California, Veracruz, Chiapas, Tamaulipas, and Oaxaca's ayuntamientos differ from the dates held, which the per-state articles in wiki_es_estatales give."
+  },
+  "wiki_es_estatales": {
+   "title": "Elecciones estatales de <estado> de 2003, 2004, and 2005 (per-state articles) and Anexo:Elecciones locales de México",
+   "publisher": "Wikipedia (Spanish)",
+   "url": "https://es.wikipedia.org/wiki/Anexo:Elecciones_locales_de_M%C3%A9xico",
+   "kind": "community",
+   "note": "Read 2026-11-14. Each per-state article gives the day held, the offices at stake, and the number of ayuntamientos and deputies."
+  },
+  "cpm_360": {
+   "title": "Elecciones 2005: Gubernaturas en disputa (I), Carta de Política Mexicana 360, 28 January 2005",
+   "publisher": "Grupo Consultor Interdisciplinario",
+   "url": "https://consultoriapolitica.com/paginas/revistaCPM/paginasCPM/muestrasCPM/CPM360do.pdf",
+   "kind": "news_agency",
+   "note": "Read 2026-11-14. Gives the 2005 calendar by office and the 231 municipal presidencies at stake (Baja California Sur 5, Quintana Roo 8, Guerrero 76, Hidalgo 84, Nayarit 20, Coahuila 38)."
+  },
+  "pdba_2005": {
+   "title": "Electoral Calendar 2005",
+   "publisher": "Georgetown University, Political Database of the Americas",
+   "url": "https://pdba.georgetown.edu/Elecdata/calen05.html",
+   "kind": "academic",
+   "note": "Read 2026-11-14."
+  },
+  "ieem_2003": {
+   "title": "Sistema de Consulta de la Memoria Electoral 1993-2024: 2003 Elección de Diputados y Ayuntamientos, 124 Ayuntamientos",
+   "publisher": "Instituto Electoral del Estado de México",
+   "url": "https://www.ieem.org.mx/organizacion/sicome/2003.html",
+   "kind": "official_body",
+   "note": "Read 2026-11-14."
+  },
+  "iecm_2003": {
+   "title": "Comparativo de las elecciones locales de 2000 y 2003 en el Distrito Federal",
+   "publisher": "Instituto Electoral de la Ciudad de México (formerly IEDF)",
+   "url": "https://www.iecm.mx/www/sites/biblioteca_electronica/estadisticas_y_estudios_electorales/estudios_electorales/comparativo_de_las_elecciones_locales_de_2000_y_2003_en_el_df.pdf",
+   "kind": "official_body",
+   "note": "Read 2026-11-14. States that the 2000 and 2003 processes each elected the 16 jefaturas delegacionales and the 66 deputies, and that the jornada of 2003 was 6 July."
   }
  },
  "tiers": [
@@ -1371,8 +1413,121 @@
    "dates": [
     {
      "date": "1917-01-01",
-     "through": "2005-12-31",
-     "note": "Per-state governor elections before 2006 are not yet enumerated."
+     "through": "2002-12-31",
+     "note": "Per-state governor elections before 2003 are not yet enumerated."
+    },
+    {
+     "date": "2003-07-06",
+     "contests": 6,
+     "source": "wiki_es_estatales",
+     "regions": {
+      "CAM": 1,
+      "COL": 1,
+      "NLE": 1,
+      "QUE": 1,
+      "SLP": 1,
+      "SON": 1
+     },
+     "quote": "Per-state articles: Campeche, Colima, Nuevo León, Querétaro, San Luis Potosí, and Sonora, 6 de julio de 2003, Gobernador. Colima's was annulled."
+    },
+    {
+     "date": "2003-12-07",
+     "contests": 1,
+     "source": "wiki_es_estatales",
+     "regions": {
+      "COL": 1
+     },
+     "quote": "Elecciones estatales extraordinarias de Colima de 2003, 7 de diciembre (rerun of the annulled governor election)."
+    },
+    {
+     "date": "2004-07-04",
+     "contests": 3,
+     "source": "wiki_es_estatales",
+     "regions": {
+      "CHH": 1,
+      "DUR": 1,
+      "ZAC": 1
+     },
+     "quote": "Per-state articles: Chihuahua, Durango, and Zacatecas, 4 de julio de 2004, Gobernador; Voices of Mexico table 1 agrees."
+    },
+    {
+     "date": "2004-08-01",
+     "contests": 2,
+     "source": "wiki_es_estatales",
+     "regions": {
+      "AGU": 1,
+      "OAX": 1
+     },
+     "quote": "Per-state articles: Aguascalientes and Oaxaca, 1 de agosto de 2004, Gobernador; Voices of Mexico table 1 agrees."
+    },
+    {
+     "date": "2004-09-05",
+     "contests": 1,
+     "source": "wiki_es_estatales",
+     "regions": {
+      "VER": 1
+     },
+     "quote": "Elecciones estatales de Veracruz de 2004, 5 de septiembre de 2004, Gobernador (Voices of Mexico table 1 projected 15 September)."
+    },
+    {
+     "date": "2004-11-14",
+     "contests": 4,
+     "source": "wiki_es_estatales",
+     "regions": {
+      "PUE": 1,
+      "SIN": 1,
+      "TAM": 1,
+      "TLA": 1
+     },
+     "quote": "Per-state articles: Puebla, Sinaloa, Tamaulipas, and Tlaxcala, 14 de noviembre de 2004, Gobernador (Voices of Mexico table 1 projected 3 October for Tamaulipas)."
+    },
+    {
+     "date": "2005-02-06",
+     "contests": 3,
+     "source": "cpm_360",
+     "regions": {
+      "BCS": 1,
+      "ROO": 1,
+      "GRO": 1
+     },
+     "quote": "El 6 de febrero: gubernatura, congreso y ayuntamientos en Baja California Sur y Quintana Roo; en Guerrero, en la misma fecha, solamente la gubernatura."
+    },
+    {
+     "date": "2005-02-20",
+     "contests": 1,
+     "source": "cpm_360",
+     "regions": {
+      "HID": 1
+     },
+     "quote": "El 20 de febrero se realizarán los comicios para la gubernatura y el congreso (Hidalgo)."
+    },
+    {
+     "date": "2005-04-10",
+     "contests": 1,
+     "source": "wiki_es_estatales",
+     "regions": {
+      "COL": 1
+     },
+     "quote": "Elecciones estatales extraordinarias de Colima de 2005, 10 de abril (Anexo:Elecciones locales de México)."
+    },
+    {
+     "date": "2005-07-03",
+     "contests": 2,
+     "source": "cpm_360",
+     "regions": {
+      "MEX": 1,
+      "NAY": 1
+     },
+     "quote": "El 3 de julio: Nayarit renueva gubernatura, congreso y municipios; el Estado de México solamente el Ejecutivo. PDBA: July 3 State of Mexico and State of Nayarit, Governor."
+    },
+    {
+     "date": "2005-09-25",
+     "contests": 1,
+     "source": "cpm_360",
+     "regions": {
+      "COA": 1
+     },
+     "quote": "El 25 de septiembre en Coahuila todos los puestos de elección popular. PDBA: September 25 Estado de Coahuila: Governor, Congress and Municipal."
     },
     {
      "date": "2006-07-02",
@@ -1764,8 +1919,152 @@
    "dates": [
     {
      "date": "1917-01-01",
-     "through": "2005-12-31",
-     "note": "Per-state legislative elections before 2006 are not yet enumerated."
+     "through": "2002-12-31",
+     "note": "Per-state legislative elections before 2003 are not yet enumerated."
+    },
+    {
+     "date": "2003-03-09",
+     "contests": 1,
+     "source": "wiki_es_estatales",
+     "regions": {
+      "MEX": 1
+     },
+     "quote": "Elecciones estatales del Estado de México de 2003, 9 de marzo, 75 diputados."
+    },
+    {
+     "date": "2003-07-06",
+     "contests": 10,
+     "source": "wiki_es_estatales",
+     "regions": {
+      "CAM": 1,
+      "COL": 1,
+      "CMX": 1,
+      "GUA": 1,
+      "JAL": 1,
+      "MOR": 1,
+      "NLE": 1,
+      "QUE": 1,
+      "SLP": 1,
+      "SON": 1
+     },
+     "quote": "Per-state articles, 6 de julio de 2003: Campeche, Colima, Distrito Federal (66 diputados), Guanajuato, Jalisco, Morelos, Nuevo León, Querétaro, San Luis Potosí, and Sonora; IECM confirms the Distrito Federal's 6 July 2003 jornada."
+    },
+    {
+     "date": "2003-10-19",
+     "contests": 1,
+     "source": "wiki_es_estatales",
+     "regions": {
+      "TAB": 1
+     },
+     "quote": "Elecciones estatales de Tabasco de 2003, 19 de octubre."
+    },
+    {
+     "date": "2004-05-16",
+     "contests": 1,
+     "source": "wiki_es_estatales",
+     "regions": {
+      "YUC": 1
+     },
+     "quote": "Elecciones estatales de Yucatán de 2004, 16 de mayo, 25 diputados."
+    },
+    {
+     "date": "2004-07-04",
+     "contests": 3,
+     "source": "wiki_es_estatales",
+     "regions": {
+      "CHH": 1,
+      "DUR": 1,
+      "ZAC": 1
+     },
+     "quote": "Per-state articles, 4 de julio de 2004; Voices of Mexico table 1 agrees."
+    },
+    {
+     "date": "2004-08-01",
+     "contests": 3,
+     "source": "wiki_es_estatales",
+     "regions": {
+      "AGU": 1,
+      "BCN": 1,
+      "OAX": 1
+     },
+     "quote": "Per-state articles, 1 de agosto de 2004; Voices of Mexico table 1 lists Baja California on 4 July."
+    },
+    {
+     "date": "2004-09-05",
+     "contests": 1,
+     "source": "wiki_es_estatales",
+     "regions": {
+      "VER": 1
+     },
+     "quote": "Elecciones estatales de Veracruz de 2004, 5 de septiembre."
+    },
+    {
+     "date": "2004-10-03",
+     "contests": 1,
+     "source": "wiki_es_estatales",
+     "regions": {
+      "CHP": 1
+     },
+     "quote": "Elecciones estatales de Chiapas de 2004, 3 de octubre, 40 diputados."
+    },
+    {
+     "date": "2004-11-14",
+     "contests": 5,
+     "source": "wiki_es_estatales",
+     "regions": {
+      "MIC": 1,
+      "PUE": 1,
+      "SIN": 1,
+      "TAM": 1,
+      "TLA": 1
+     },
+     "quote": "Per-state articles, 14 de noviembre de 2004."
+    },
+    {
+     "date": "2005-02-06",
+     "contests": 2,
+     "source": "cpm_360",
+     "regions": {
+      "BCS": 1,
+      "ROO": 1
+     },
+     "quote": "Gubernatura, congreso y ayuntamientos en Baja California Sur y Quintana Roo, 6 de febrero."
+    },
+    {
+     "date": "2005-02-20",
+     "contests": 1,
+     "source": "cpm_360",
+     "regions": {
+      "HID": 1
+     },
+     "quote": "El 20 de febrero se realizarán los comicios para la gubernatura y el congreso (Hidalgo)."
+    },
+    {
+     "date": "2005-07-03",
+     "contests": 1,
+     "source": "cpm_360",
+     "regions": {
+      "NAY": 1
+     },
+     "quote": "Nayarit renueva gubernatura, congreso y municipios el 3 de julio."
+    },
+    {
+     "date": "2005-09-25",
+     "contests": 1,
+     "source": "cpm_360",
+     "regions": {
+      "COA": 1
+     },
+     "quote": "El 25 de septiembre en Coahuila todos los puestos de elección popular."
+    },
+    {
+     "date": "2005-10-02",
+     "contests": 1,
+     "source": "cpm_360",
+     "regions": {
+      "GRO": 1
+     },
+     "quote": "Guerrero vota por municipios y congreso hasta el 2 de octubre."
     },
     {
      "date": "2006-03-12",
@@ -2437,8 +2736,151 @@
    "dates": [
     {
      "date": "1917-01-01",
-     "through": "2005-12-31",
-     "note": "Per-state municipal elections before 2006 are not yet enumerated."
+     "through": "2002-12-31",
+     "note": "Per-state municipal elections before 2003 are not yet enumerated."
+    },
+    {
+     "date": "2003-03-09",
+     "contests": 124,
+     "source": "ieem_2003",
+     "regions": {
+      "MEX": 124
+     },
+     "quote": "2003 Elección de Diputados y Ayuntamientos, 124 Ayuntamientos (9 de marzo per the Estado de México article, which counts 123)."
+    },
+    {
+     "date": "2003-07-06",
+     "contests": 423,
+     "source": "wiki_es_estatales",
+     "regions": {
+      "CAM": 11,
+      "COL": 10,
+      "GUA": 46,
+      "JAL": 124,
+      "MOR": 33,
+      "NLE": 51,
+      "QUE": 18,
+      "SLP": 58,
+      "SON": 72
+     },
+     "quote": "Per-state articles, 6 de julio de 2003: Campeche 11, Colima 10, Guanajuato 46, Jalisco 124, Morelos 33, Nuevo León 51, Querétaro 18, San Luis Potosí 58, Sonora 72."
+    },
+    {
+     "date": "2003-10-19",
+     "contests": 17,
+     "source": "wiki_es_estatales",
+     "regions": {
+      "TAB": 17
+     },
+     "quote": "Elecciones estatales de Tabasco de 2003, 19 de octubre, 17 ayuntamientos."
+    },
+    {
+     "date": "2004-05-16",
+     "contests": 106,
+     "source": "wiki_es_estatales",
+     "regions": {
+      "YUC": 106
+     },
+     "quote": "Elecciones estatales de Yucatán de 2004, 16 de mayo, 106 ayuntamientos."
+    },
+    {
+     "date": "2004-07-04",
+     "contests": 163,
+     "source": "wiki_es_estatales",
+     "regions": {
+      "CHH": 67,
+      "DUR": 39,
+      "ZAC": 57
+     },
+     "quote": "Per-state articles, 4 de julio de 2004: Chihuahua 67, Durango 39, Zacatecas 57; Voices of Mexico table 1 agrees."
+    },
+    {
+     "date": "2004-08-01",
+     "contests": 16,
+     "source": "wiki_es_estatales",
+     "regions": {
+      "AGU": 11,
+      "BCN": 5
+     },
+     "quote": "Per-state articles, 1 de agosto de 2004: Aguascalientes 11, Baja California 5; Voices of Mexico table 1 agrees on the counts."
+    },
+    {
+     "date": "2004-09-05",
+     "contests": 211,
+     "source": "wiki_es_estatales",
+     "regions": {
+      "VER": 211
+     },
+     "quote": "Elecciones estatales de Veracruz de 2004, 5 de septiembre, 211 ayuntamientos (Voices of Mexico table 1 lists 210)."
+    },
+    {
+     "date": "2004-10-03",
+     "contests": 270,
+     "source": "wiki_es_estatales",
+     "regions": {
+      "CHP": 118,
+      "OAX": 152
+     },
+     "quote": "Chiapas 118 ayuntamientos (3 de octubre de 2004); Oaxaca 152 by parties of 570 (Anexo:Elecciones locales de México lists Oaxaca on 3 October; Voices of Mexico table 1 says 17 October)."
+    },
+    {
+     "date": "2004-11-14",
+     "contests": 451,
+     "source": "wiki_es_estatales",
+     "regions": {
+      "MIC": 113,
+      "PUE": 217,
+      "SIN": 18,
+      "TAM": 43,
+      "TLA": 60
+     },
+     "quote": "Per-state articles, 14 de noviembre de 2004: Michoacán 113, Puebla 217, Sinaloa 18, Tamaulipas 43, Tlaxcala 60."
+    },
+    {
+     "date": "2005-02-06",
+     "contests": 13,
+     "source": "cpm_360",
+     "regions": {
+      "BCS": 5,
+      "ROO": 8
+     },
+     "quote": "Baja California Sur y Quintana Roo renuevan los ayuntamientos el 6 de febrero (5 and 8 municipios)."
+    },
+    {
+     "date": "2005-07-03",
+     "contests": 20,
+     "source": "cpm_360",
+     "regions": {
+      "NAY": 20
+     },
+     "quote": "Nayarit renueva municipios el 3 de julio (20 municipios; 231 presidencias in all in 2005)."
+    },
+    {
+     "date": "2005-09-25",
+     "contests": 38,
+     "source": "cpm_360",
+     "regions": {
+      "COA": 38
+     },
+     "quote": "Coahuila 25 de septiembre, todos los puestos (38 municipios)."
+    },
+    {
+     "date": "2005-10-02",
+     "contests": 76,
+     "source": "cpm_360",
+     "regions": {
+      "GRO": 76
+     },
+     "quote": "Guerrero tiene 76 municipios, votados el 2 de octubre."
+    },
+    {
+     "date": "2005-11-13",
+     "contests": 84,
+     "source": "cpm_360",
+     "regions": {
+      "HID": 84
+     },
+     "quote": "Hidalgo, 84 municipios, presidencias municipales el 13 de noviembre."
     },
     {
      "date": "2006-03-12",
@@ -3273,8 +3715,21 @@
    "dates": [
     {
      "date": "2000-07-02",
-     "through": "2003-07-06",
-     "note": "The 2000 and 2003 elections of all 16 delegaciones are not yet enumerated."
+     "contests": 16,
+     "source": "wiki_es_estatales",
+     "regions": {
+      "CMX": 16
+     },
+     "quote": "Elecciones locales del Distrito Federal de México de 2000, 2 de julio de 2000; IECM: the 2000 process renewed the 16 jefaturas delegacionales."
+    },
+    {
+     "date": "2003-07-06",
+     "contests": 16,
+     "source": "iecm_2003",
+     "regions": {
+      "CMX": 16
+     },
+     "quote": "Posterior a la jornada electoral del 6 de julio de 2003; both processes renewed the 16 jefaturas delegacionales."
     },
     {
      "date": "2006-07-02",
