@@ -91,6 +91,22 @@
       "special": false,
       "state": "KS",
       "district": 6
+    },
+    "house7": {
+      "year": 1920,
+      "chamber": "house",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "KS",
+      "district": 7
+    },
+    "house8": {
+      "year": 1920,
+      "chamber": "house",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "KS",
+      "district": 8
     }
   },
   "pages": [
@@ -161,7 +177,7 @@
         0.926,
         1.0
       ],
-      "hint": "Read only the table headed 'PRESIDENT, VICE PRESIDENT, AND PRESIDENTIAL ELECTORS—DEMOCRAT.'; ignore any other table visible in the image.",
+      "hint": "Read only the table headed 'PRESIDENT, VICE PRESIDENT, AND PRESIDENTIAL ELECTORS\u2014DEMOCRAT.'; ignore any other table visible in the image.",
       "bands": 2,
       "header": [
         0.0,
@@ -189,6 +205,41 @@
         },
         {
           "label": "Mary Fitzwilliam Carney.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Lucy R. Clemans.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Geo. S. Currier.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Maude Dillard.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "H. C. Lemon.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John M. Rodgers.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "D. M. Rothweiler.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C. E. Scudder.",
           "contest": null,
           "candidate": ""
         }
@@ -269,7 +320,7 @@
         0.918,
         0.951
       ],
-      "hint": "Read only the table headed 'PRESIDENT, VICE PRESIDENT, AND PRESIDENTIAL ELECTORS—DEMOCRAT.—CONCLUDED.'; ignore any other table visible in the image.",
+      "hint": "Read only the table headed 'PRESIDENT, VICE PRESIDENT, AND PRESIDENTIAL ELECTORS\u2014DEMOCRAT.\u2014CONCLUDED.'; ignore any other table visible in the image.",
       "bands": 2,
       "header": [
         0.0,
@@ -338,7 +389,7 @@
         0.912,
         1.0
       ],
-      "hint": "Read only the table headed 'PRESIDENT, VICE PRESIDENT, AND PRESIDENTIAL ELECTORS—SOCIALIST.'; ignore any other table visible in the image.",
+      "hint": "Read only the table headed 'PRESIDENT, VICE PRESIDENT, AND PRESIDENTIAL ELECTORS\u2014SOCIALIST.'; ignore any other table visible in the image.",
       "bands": 3,
       "header": [
         0.0,
@@ -407,46 +458,12 @@
         0.913,
         0.964
       ],
-      "hint": "Read only the table headed 'PRESIDENT, VICE PRESIDENT, AND PRESIDENTIAL ELECTORS—SOCIALIST—Concluded'; ignore any other table visible in the image.",
+      "hint": "Read only the table headed 'PRESIDENT, VICE PRESIDENT, AND PRESIDENTIAL ELECTORS\u2014SOCIALIST\u2014Concluded'; ignore any other table visible in the image.",
       "bands": 3,
       "header": [
         0.0,
         0.242
       ]
-    },
-    {
-      "page": 8,
-      "id": "8-0",
-      "columns": [
-        {
-          "label": "Socialist. For President and Vice President, Debs and Stedman.",
-          "contest": "president",
-          "candidate": "Eugene Debs (Socialist)"
-        },
-        {
-          "label": "Charles Clawson.",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "S. O. Coble.",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "John M. Dennis.",
-          "contest": null,
-          "candidate": ""
-        }
-      ],
-      "orientation": "counties_down",
-      "crop": [
-        0.079,
-        0.0,
-        0.926,
-        1.0
-      ],
-      "hint": "This page continues the table of the previous page and prints no headings."
     },
     {
       "page": 10,
@@ -515,7 +532,7 @@
         0.904,
         1.0
       ],
-      "hint": "Read only the table headed 'General Election, November 2, 1920. PRESIDENT, VICE PRESIDENT, AND PRESIDENTIAL ELECTORS—REPUBLICAN.'; ignore any other table visible in the image.",
+      "hint": "Read only the table headed 'General Election, November 2, 1920. PRESIDENT, VICE PRESIDENT, AND PRESIDENTIAL ELECTORS\u2014REPUBLICAN.'; ignore any other table visible in the image.",
       "bands": 2,
       "header": [
         0.0,
@@ -543,6 +560,41 @@
         },
         {
           "label": "Dorsey Green.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "F. R. Hammond.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Ella F. Hobble.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C. C. Houston.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Matie Toothaker Kimball.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. Percy Roberson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C. W. Ryan.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Laura Kyner.",
           "contest": null,
           "candidate": ""
         }
@@ -623,7 +675,7 @@
         0.911,
         0.947
       ],
-      "hint": "Read only the table headed 'PRESIDENT, VICE PRESIDENT, AND PRESIDENTIAL ELECTORS—REPUBLICAN—CONCLUDED.'; ignore any other table visible in the image.",
+      "hint": "Read only the table headed 'PRESIDENT, VICE PRESIDENT, AND PRESIDENTIAL ELECTORS\u2014REPUBLICAN\u2014CONCLUDED.'; ignore any other table visible in the image.",
       "bands": 2,
       "header": [
         0.0,
@@ -690,8 +742,8 @@
         },
         {
           "label": "Gen. H. Hodges Democratic.",
-          "contest": "senate",
-          "candidate": "George H. Hodges"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "Dan Beedy Socialist.",
@@ -721,7 +773,7 @@
         0.94,
         0.922
       ],
-      "hint": "Read only the table headed 'UNITED STATES SENATOR, AND JUSTICE OF SUPREME COURT FOR POSITION No. 5—CONCLUDED.'; ignore any other table visible in the image.",
+      "hint": "Read only the table headed 'UNITED STATES SENATOR, AND JUSTICE OF SUPREME COURT FOR POSITION No. 5\u2014CONCLUDED.'; ignore any other table visible in the image.",
       "bands": 2,
       "header": [
         0.0,
@@ -1006,6 +1058,69 @@
       "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
     },
     {
+      "page": 33,
+      "id": "33-0",
+      "columns": [
+        {
+          "label": "J. N. Tincher, Rep.",
+          "contest": "house7",
+          "candidate": "J. N. Tincher"
+        },
+        {
+          "label": "J. R. Beeching, Dem.",
+          "contest": "house7",
+          "candidate": "J. R. Beeching"
+        },
+        {
+          "label": "Edw. E. Colglazier, Soc.",
+          "contest": "house7",
+          "candidate": "Edw. E. Colglazier"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.113,
+        0.112,
+        0.947,
+        0.576
+      ],
+      "hint": "Read only the table headed 'SEVENTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1487
+      ]
+    },
+    {
+      "page": 33,
+      "id": "33-1",
+      "columns": [
+        {
+          "label": "Richard E. Bird, Rep.",
+          "contest": "house8",
+          "candidate": "Richard E. Bird"
+        },
+        {
+          "label": "W. A. Ayres, Dem.",
+          "contest": "house8",
+          "candidate": "W. A. Ayers"
+        },
+        {
+          "label": "Reed Crandall, Soc.",
+          "contest": "house8",
+          "candidate": "Reed Crandall"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.11,
+        0.568,
+        0.938,
+        0.762
+      ],
+      "hint": "Read only the table headed 'EIGHTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
       "page": 55,
       "id": "55-0",
       "columns": [
@@ -1072,7 +1187,7 @@
         0.926,
         0.891
       ],
-      "hint": "Read only the table headed 'Federal Service Vote—General Election, November 2, 1920. PRESIDENT, VICE PRESIDENT, AND PRESIDENTIAL ELECTORS—REPUBLICAN.'; ignore any other table visible in the image.",
+      "hint": "Read only the table headed 'Federal Service Vote\u2014General Election, November 2, 1920. PRESIDENT, VICE PRESIDENT, AND PRESIDENTIAL ELECTORS\u2014REPUBLICAN.'; ignore any other table visible in the image.",
       "bands": 2,
       "header": [
         0.0,
@@ -1111,7 +1226,7 @@
         0.897,
         0.637
       ],
-      "hint": "Read only the table headed 'Federal Service Vote—General Election, November 2, 1920. UNITED STATES SENATOR, AND JUSTICE OF SUPREME COURT FOR POSITION No. 5.'; ignore any other table visible in the image.",
+      "hint": "Read only the table headed 'Federal Service Vote\u2014General Election, November 2, 1920. UNITED STATES SENATOR, AND JUSTICE OF SUPREME COURT FOR POSITION No. 5.'; ignore any other table visible in the image.",
       "bands": 2,
       "header": [
         0.0,
@@ -1124,13 +1239,13 @@
       "columns": [
         {
           "label": "Henry J. Allen, Rep.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "Henry J. Allen"
         },
         {
           "label": "Jonathan M. Davis, Dem.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "Jonathan M. Davis"
         },
         {
           "label": "Chas. S. Huffman, Rep.",
@@ -1150,7 +1265,7 @@
         0.936,
         0.618
       ],
-      "hint": "Read only the table headed 'Federal Service Vote—General Election, November 2, 1920. GOVERNOR AND LIEUTENANT GOVERNOR.'; ignore any other table visible in the image.",
+      "hint": "Read only the table headed 'Federal Service Vote\u2014General Election, November 2, 1920. GOVERNOR AND LIEUTENANT GOVERNOR.'; ignore any other table visible in the image.",
       "bands": 2,
       "header": [
         0.0,
