@@ -1,0 +1,1122 @@
+{
+  "polity": "US-WI",
+  "publisher": "Wisconsin Legislative Reference Bureau",
+  "license": "Public record",
+  "title": "The Wisconsin Blue Book, presidential preference vote by county, 1952-1988",
+  "file": {
+    "url": "https://search.library.wisc.edu/digital/A5BZZBS2FDP3LV8O",
+    "item": "https://search.library.wisc.edu/digital/A5BZZBS2FDP3LV8O"
+  },
+  "raw_source": "us.county_volumes",
+  "contests": {
+    "dem1952": {
+      "year": 1952,
+      "chamber": "president-democratic",
+      "day": "1952-04-01",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "rep1952": {
+      "year": 1952,
+      "chamber": "president-republican",
+      "day": "1952-04-01",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "dem1956": {
+      "year": 1956,
+      "chamber": "president-democratic",
+      "day": "1956-04-03",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "rep1956": {
+      "year": 1956,
+      "chamber": "president-republican",
+      "day": "1956-04-03",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "dem1960": {
+      "year": 1960,
+      "chamber": "president-democratic",
+      "day": "1960-04-05",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "rep1960": {
+      "year": 1960,
+      "chamber": "president-republican",
+      "day": "1960-04-05",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "dem1964": {
+      "year": 1964,
+      "chamber": "president-democratic",
+      "day": "1964-04-07",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "rep1964": {
+      "year": 1964,
+      "chamber": "president-republican",
+      "day": "1964-04-07",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "dem1968": {
+      "year": 1968,
+      "chamber": "president-democratic",
+      "day": "1968-04-02",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "rep1968": {
+      "year": 1968,
+      "chamber": "president-republican",
+      "day": "1968-04-02",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "dem1972": {
+      "year": 1972,
+      "chamber": "president-democratic",
+      "day": "1972-04-04",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "rep1972": {
+      "year": 1972,
+      "chamber": "president-republican",
+      "day": "1972-04-04",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "dem1976": {
+      "year": 1976,
+      "chamber": "president-democratic",
+      "day": "1976-04-06",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "rep1976": {
+      "year": 1976,
+      "chamber": "president-republican",
+      "day": "1976-04-06",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "dem1980": {
+      "year": 1980,
+      "chamber": "president-democratic",
+      "day": "1980-04-01",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "rep1980": {
+      "year": 1980,
+      "chamber": "president-republican",
+      "day": "1980-04-01",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "dem1984": {
+      "year": 1984,
+      "chamber": "president-democratic",
+      "day": "1984-04-03",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "rep1984": {
+      "year": 1984,
+      "chamber": "president-republican",
+      "day": "1984-04-03",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "dem1988": {
+      "year": 1988,
+      "chamber": "president-democratic",
+      "day": "1988-04-05",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "rep1988": {
+      "year": 1988,
+      "chamber": "president-republican",
+      "day": "1988-04-05",
+      "special": false,
+      "state": "WI",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 645,
+      "id": "1952-645",
+      "orientation": "counties_down",
+      "bands": 2,
+      "columns": [
+        {
+          "label": "Charles E. Broughton",
+          "contest": "dem1952",
+          "candidate": "Charles E. Broughton"
+        },
+        {
+          "label": "Jerome F. Fox",
+          "contest": "dem1952",
+          "candidate": "Jerome F. Fox"
+        },
+        {
+          "label": "Estes Kefauver",
+          "contest": "dem1952",
+          "candidate": "Estes Kefauver"
+        },
+        {
+          "label": "Grant A. Ritter",
+          "contest": "rep1952",
+          "candidate": "Grant A. Ritter"
+        },
+        {
+          "label": "Harold E. Stassen",
+          "contest": "rep1952",
+          "candidate": "Harold E. Stassen"
+        },
+        {
+          "label": "Perry J. Stearns",
+          "contest": "rep1952",
+          "candidate": "Perry J. Stearns"
+        },
+        {
+          "label": "Robert A. Taft",
+          "contest": "rep1952",
+          "candidate": "Robert A. Taft"
+        },
+        {
+          "label": "Earl Warren",
+          "contest": "rep1952",
+          "candidate": "Earl Warren"
+        }
+      ],
+      "hint": "Read only the presidential preference vote by county table for April 1, 1952; skip the Total column and any column not listed. Rows are Wisconsin counties, plus the TOTAL row where one is printed.",
+      "url": "https://search.library.wisc.edu/digital/AN6Q3X3SXGLMTH8Z"
+    },
+    {
+      "page": 646,
+      "id": "1952-646",
+      "orientation": "counties_down",
+      "bands": 2,
+      "columns": [
+        {
+          "label": "Charles E. Broughton",
+          "contest": "dem1952",
+          "candidate": "Charles E. Broughton"
+        },
+        {
+          "label": "Jerome F. Fox",
+          "contest": "dem1952",
+          "candidate": "Jerome F. Fox"
+        },
+        {
+          "label": "Estes Kefauver",
+          "contest": "dem1952",
+          "candidate": "Estes Kefauver"
+        },
+        {
+          "label": "Grant A. Ritter",
+          "contest": "rep1952",
+          "candidate": "Grant A. Ritter"
+        },
+        {
+          "label": "Harold E. Stassen",
+          "contest": "rep1952",
+          "candidate": "Harold E. Stassen"
+        },
+        {
+          "label": "Perry J. Stearns",
+          "contest": "rep1952",
+          "candidate": "Perry J. Stearns"
+        },
+        {
+          "label": "Robert A. Taft",
+          "contest": "rep1952",
+          "candidate": "Robert A. Taft"
+        },
+        {
+          "label": "Earl Warren",
+          "contest": "rep1952",
+          "candidate": "Earl Warren"
+        }
+      ],
+      "hint": "Read only the presidential preference vote by county table for April 1, 1952; skip the Total column and any column not listed. Rows are Wisconsin counties, plus the TOTAL row where one is printed.",
+      "url": "https://search.library.wisc.edu/digital/AN6Q3X3SXGLMTH8Z"
+    },
+    {
+      "page": 653,
+      "id": "1956-653",
+      "orientation": "counties_down",
+      "bands": 2,
+      "columns": [
+        {
+          "label": "Estes Kefauver",
+          "contest": "dem1956",
+          "candidate": "Estes Kefauver"
+        },
+        {
+          "label": "John Chapple",
+          "contest": "rep1956",
+          "candidate": "John Chapple"
+        },
+        {
+          "label": "Dwight D. Eisenhower",
+          "contest": "rep1956",
+          "candidate": "Dwight D. Eisenhower"
+        }
+      ],
+      "hint": "Read only the presidential preference vote by county table for April 3, 1956; skip the Total column and any column not listed. Rows are Wisconsin counties, plus the TOTAL row where one is printed.",
+      "url": "https://search.library.wisc.edu/digital/A2BH4FP76N6HMK8V"
+    },
+    {
+      "page": 775,
+      "id": "1960-775",
+      "orientation": "counties_down",
+      "bands": 2,
+      "columns": [
+        {
+          "label": "Hubert H. Humphrey",
+          "contest": "dem1960",
+          "candidate": "Hubert H. Humphrey"
+        },
+        {
+          "label": "John F. Kennedy",
+          "contest": "dem1960",
+          "candidate": "John F. Kennedy"
+        },
+        {
+          "label": "Richard M. Nixon",
+          "contest": "rep1960",
+          "candidate": "Richard M. Nixon"
+        }
+      ],
+      "hint": "Read only the presidential preference vote by county table for April 5, 1960; skip the Total column and any column not listed. Rows are Wisconsin counties, plus the TOTAL row where one is printed.",
+      "url": "https://search.library.wisc.edu/digital/A5BZZBS2FDP3LV8O"
+    },
+    {
+      "page": 742,
+      "id": "1964-742",
+      "orientation": "counties_down",
+      "bands": 2,
+      "columns": [
+        {
+          "label": "John W. Reynolds",
+          "contest": "dem1964",
+          "candidate": "John W. Reynolds"
+        },
+        {
+          "label": "George C. Wallace",
+          "contest": "dem1964",
+          "candidate": "George C. Wallace"
+        },
+        {
+          "label": "John W. Byrnes",
+          "contest": "rep1964",
+          "candidate": "John W. Byrnes"
+        }
+      ],
+      "hint": "Read only the presidential preference vote by county table for April 7, 1964; skip the Total column and any column not listed. Rows are Wisconsin counties, plus the TOTAL row where one is printed.",
+      "url": "https://search.library.wisc.edu/digital/ANICGVB65P4ZNO8M"
+    },
+    {
+      "page": 838,
+      "id": "1968-838",
+      "orientation": "counties_down",
+      "bands": 2,
+      "columns": [
+        {
+          "label": "Lyndon B. Johnson",
+          "contest": "dem1968",
+          "candidate": "Lyndon B. Johnson"
+        },
+        {
+          "label": "Eugene J. McCarthy",
+          "contest": "dem1968",
+          "candidate": "Eugene J. McCarthy"
+        },
+        {
+          "label": "None of Names Shown",
+          "contest": "dem1968",
+          "candidate": "None of the names shown"
+        },
+        {
+          "label": "Hubert Humphrey (write-in)",
+          "contest": "dem1968",
+          "candidate": "Hubert H. Humphrey"
+        },
+        {
+          "label": "Robert F. Kennedy (write-in)",
+          "contest": "dem1968",
+          "candidate": "Robert F. Kennedy"
+        },
+        {
+          "label": "George C. Wallace (write-in)",
+          "contest": "dem1968",
+          "candidate": "George C. Wallace"
+        },
+        {
+          "label": "Scattering",
+          "contest": "dem1968",
+          "candidate": "Scattering"
+        }
+      ],
+      "hint": "Read only the presidential preference vote by county table for April 2, 1968; skip the Total column and any column not listed. Rows are Wisconsin counties, plus the TOTAL row where one is printed.",
+      "url": "https://search.library.wisc.edu/digital/A63MVAJVDHMHFW9E"
+    },
+    {
+      "page": 839,
+      "id": "1968-839",
+      "orientation": "counties_down",
+      "bands": 2,
+      "columns": [
+        {
+          "label": "Lyndon B. Johnson",
+          "contest": "dem1968",
+          "candidate": "Lyndon B. Johnson"
+        },
+        {
+          "label": "Eugene J. McCarthy",
+          "contest": "dem1968",
+          "candidate": "Eugene J. McCarthy"
+        },
+        {
+          "label": "None of Names Shown",
+          "contest": "dem1968",
+          "candidate": "None of the names shown"
+        },
+        {
+          "label": "Hubert Humphrey (write-in)",
+          "contest": "dem1968",
+          "candidate": "Hubert H. Humphrey"
+        },
+        {
+          "label": "Robert F. Kennedy (write-in)",
+          "contest": "dem1968",
+          "candidate": "Robert F. Kennedy"
+        },
+        {
+          "label": "George C. Wallace (write-in)",
+          "contest": "dem1968",
+          "candidate": "George C. Wallace"
+        },
+        {
+          "label": "Scattering",
+          "contest": "dem1968",
+          "candidate": "Scattering"
+        }
+      ],
+      "hint": "Read only the presidential preference vote by county table for April 2, 1968; skip the Total column and any column not listed. Rows are Wisconsin counties, plus the TOTAL row where one is printed.",
+      "url": "https://search.library.wisc.edu/digital/A63MVAJVDHMHFW9E"
+    },
+    {
+      "page": 843,
+      "id": "1968-843",
+      "orientation": "counties_down",
+      "bands": 2,
+      "columns": [
+        {
+          "label": "Richard M. Nixon",
+          "contest": "rep1968",
+          "candidate": "Richard M. Nixon"
+        },
+        {
+          "label": "Ronald W. Reagan",
+          "contest": "rep1968",
+          "candidate": "Ronald Reagan"
+        },
+        {
+          "label": "Harold E. Stassen",
+          "contest": "rep1968",
+          "candidate": "Harold E. Stassen"
+        },
+        {
+          "label": "None of Names Shown",
+          "contest": "rep1968",
+          "candidate": "None of the names shown"
+        },
+        {
+          "label": "Robert F. Kennedy (write-in)",
+          "contest": "rep1968",
+          "candidate": "Robert F. Kennedy"
+        },
+        {
+          "label": "Nelson A. Rockefeller (write-in)",
+          "contest": "rep1968",
+          "candidate": "Nelson A. Rockefeller"
+        },
+        {
+          "label": "George W. Romney (write-in)",
+          "contest": "rep1968",
+          "candidate": "George W. Romney"
+        },
+        {
+          "label": "George C. Wallace (write-in)",
+          "contest": "rep1968",
+          "candidate": "George C. Wallace"
+        },
+        {
+          "label": "Scattering",
+          "contest": "rep1968",
+          "candidate": "Scattering"
+        }
+      ],
+      "hint": "Read only the presidential preference vote by county table for April 2, 1968; skip the Total column and any column not listed. Rows are Wisconsin counties, plus the TOTAL row where one is printed.",
+      "url": "https://search.library.wisc.edu/digital/A63MVAJVDHMHFW9E"
+    },
+    {
+      "page": 844,
+      "id": "1968-844",
+      "orientation": "counties_down",
+      "bands": 2,
+      "columns": [
+        {
+          "label": "Richard M. Nixon",
+          "contest": "rep1968",
+          "candidate": "Richard M. Nixon"
+        },
+        {
+          "label": "Ronald W. Reagan",
+          "contest": "rep1968",
+          "candidate": "Ronald Reagan"
+        },
+        {
+          "label": "Harold E. Stassen",
+          "contest": "rep1968",
+          "candidate": "Harold E. Stassen"
+        },
+        {
+          "label": "None of Names Shown",
+          "contest": "rep1968",
+          "candidate": "None of the names shown"
+        },
+        {
+          "label": "Robert F. Kennedy (write-in)",
+          "contest": "rep1968",
+          "candidate": "Robert F. Kennedy"
+        },
+        {
+          "label": "Nelson A. Rockefeller (write-in)",
+          "contest": "rep1968",
+          "candidate": "Nelson A. Rockefeller"
+        },
+        {
+          "label": "George W. Romney (write-in)",
+          "contest": "rep1968",
+          "candidate": "George W. Romney"
+        },
+        {
+          "label": "George C. Wallace (write-in)",
+          "contest": "rep1968",
+          "candidate": "George C. Wallace"
+        },
+        {
+          "label": "Scattering",
+          "contest": "rep1968",
+          "candidate": "Scattering"
+        }
+      ],
+      "hint": "Read only the presidential preference vote by county table for April 2, 1968; skip the Total column and any column not listed. Rows are Wisconsin counties, plus the TOTAL row where one is printed.",
+      "url": "https://search.library.wisc.edu/digital/A63MVAJVDHMHFW9E"
+    },
+    {
+      "page": 803,
+      "id": "1972-803",
+      "orientation": "counties_down",
+      "bands": 2,
+      "columns": [
+        {
+          "label": "Shirley Chisholm",
+          "contest": "dem1972",
+          "candidate": "Shirley Chisholm"
+        },
+        {
+          "label": "Vance Hartke",
+          "contest": "dem1972",
+          "candidate": "Vance Hartke"
+        },
+        {
+          "label": "Hubert H. Humphrey",
+          "contest": "dem1972",
+          "candidate": "Hubert H. Humphrey"
+        },
+        {
+          "label": "Henry M. Jackson",
+          "contest": "dem1972",
+          "candidate": "Henry M. Jackson"
+        },
+        {
+          "label": "John V. Lindsay",
+          "contest": "dem1972",
+          "candidate": "John V. Lindsay"
+        },
+        {
+          "label": "Eugene J. McCarthy",
+          "contest": "dem1972",
+          "candidate": "Eugene J. McCarthy"
+        },
+        {
+          "label": "George S. McGovern",
+          "contest": "dem1972",
+          "candidate": "George S. McGovern"
+        }
+      ],
+      "hint": "Read only the presidential preference vote by county table for April 4, 1972; skip the Total column and any column not listed. Rows are Wisconsin counties, plus the TOTAL row where one is printed.",
+      "url": "https://search.library.wisc.edu/digital/AZKQZSCWLXXUFN8R"
+    },
+    {
+      "page": 804,
+      "id": "1972-804",
+      "orientation": "counties_down",
+      "bands": 2,
+      "columns": [
+        {
+          "label": "Wilbur D. Mills",
+          "contest": "dem1972",
+          "candidate": "Wilbur D. Mills"
+        },
+        {
+          "label": "Patsy T. Mink",
+          "contest": "dem1972",
+          "candidate": "Patsy T. Mink"
+        },
+        {
+          "label": "Edmund S. Muskie",
+          "contest": "dem1972",
+          "candidate": "Edmund S. Muskie"
+        },
+        {
+          "label": "George Wallace",
+          "contest": "dem1972",
+          "candidate": "George C. Wallace"
+        },
+        {
+          "label": "Samuel Yorty",
+          "contest": "dem1972",
+          "candidate": "Samuel W. Yorty"
+        },
+        {
+          "label": "None of Names Shown",
+          "contest": "dem1972",
+          "candidate": "None of the names shown"
+        },
+        {
+          "label": "Edward Kennedy (write-in)",
+          "contest": "dem1972",
+          "candidate": "Edward M. Kennedy"
+        }
+      ],
+      "hint": "Read only the presidential preference vote by county table for April 4, 1972; skip the Total column and any column not listed. Rows are Wisconsin counties, plus the TOTAL row where one is printed. County names are printed at the right edge of this page.",
+      "url": "https://search.library.wisc.edu/digital/AZKQZSCWLXXUFN8R"
+    },
+    {
+      "page": 809,
+      "id": "1972-809",
+      "orientation": "counties_down",
+      "bands": 2,
+      "columns": [
+        {
+          "label": "John Ashbrook",
+          "contest": "rep1972",
+          "candidate": "John M. Ashbrook"
+        },
+        {
+          "label": "Paul McCloskey",
+          "contest": "rep1972",
+          "candidate": "Paul N. McCloskey Jr."
+        },
+        {
+          "label": "Richard M. Nixon",
+          "contest": "rep1972",
+          "candidate": "Richard M. Nixon"
+        },
+        {
+          "label": "None of Names Shown",
+          "contest": "rep1972",
+          "candidate": "None of the names shown"
+        },
+        {
+          "label": "George Wallace (write-in)",
+          "contest": "rep1972",
+          "candidate": "George C. Wallace"
+        }
+      ],
+      "hint": "Read only the presidential preference vote by county table for April 4, 1972; skip the Total column and any column not listed. Rows are Wisconsin counties, plus the TOTAL row where one is printed.",
+      "url": "https://search.library.wisc.edu/digital/AZKQZSCWLXXUFN8R"
+    },
+    {
+      "page": 889,
+      "id": "1976-889",
+      "orientation": "counties_down",
+      "bands": 2,
+      "columns": [
+        {
+          "label": "Birch Bayh",
+          "contest": "dem1976",
+          "candidate": "Birch Bayh"
+        },
+        {
+          "label": "Lloyd Bentsen",
+          "contest": "dem1976",
+          "candidate": "Lloyd Bentsen"
+        },
+        {
+          "label": "Jimmy Carter",
+          "contest": "dem1976",
+          "candidate": "Jimmy Carter"
+        },
+        {
+          "label": "Fred Harris",
+          "contest": "dem1976",
+          "candidate": "Fred R. Harris"
+        },
+        {
+          "label": "Henry M. Jackson",
+          "contest": "dem1976",
+          "candidate": "Henry M. Jackson"
+        },
+        {
+          "label": "Ellen McCormack",
+          "contest": "dem1976",
+          "candidate": "Ellen McCormack"
+        }
+      ],
+      "hint": "Read only the presidential preference vote by county table for April 6, 1976; skip the Total column and any column not listed. Rows are Wisconsin counties, plus the TOTAL row where one is printed.",
+      "url": "https://search.library.wisc.edu/digital/AXFTVPSYH4JPMZ8D"
+    },
+    {
+      "page": 890,
+      "id": "1976-890",
+      "orientation": "counties_down",
+      "bands": 2,
+      "columns": [
+        {
+          "label": "Milton Shapp",
+          "contest": "dem1976",
+          "candidate": "Milton J. Shapp"
+        },
+        {
+          "label": "Sargent Shriver",
+          "contest": "dem1976",
+          "candidate": "Sargent Shriver"
+        },
+        {
+          "label": "Morris Udall",
+          "contest": "dem1976",
+          "candidate": "Morris K. Udall"
+        },
+        {
+          "label": "George Wallace",
+          "contest": "dem1976",
+          "candidate": "George C. Wallace"
+        },
+        {
+          "label": "None of the Names Shown",
+          "contest": "dem1976",
+          "candidate": "None of the names shown"
+        },
+        {
+          "label": "Write-in Candidates",
+          "contest": "dem1976",
+          "candidate": "Write-in"
+        }
+      ],
+      "hint": "Read only the presidential preference vote by county table for April 6, 1976; skip the Total column and any column not listed. Rows are Wisconsin counties, plus the TOTAL row where one is printed. County names are printed at the right edge of this page.",
+      "url": "https://search.library.wisc.edu/digital/AXFTVPSYH4JPMZ8D"
+    },
+    {
+      "page": 896,
+      "id": "1976-896",
+      "orientation": "counties_down",
+      "bands": 2,
+      "columns": [
+        {
+          "label": "Gerald R. Ford",
+          "contest": "rep1976",
+          "candidate": "Gerald R. Ford"
+        },
+        {
+          "label": "Ronald Reagan",
+          "contest": "rep1976",
+          "candidate": "Ronald Reagan"
+        },
+        {
+          "label": "None of Names Shown",
+          "contest": "rep1976",
+          "candidate": "None of the names shown"
+        },
+        {
+          "label": "Write-in Candidates",
+          "contest": "rep1976",
+          "candidate": "Write-in"
+        }
+      ],
+      "hint": "Read only the presidential preference vote by county table for April 6, 1976; skip the Total column and any column not listed. Rows are Wisconsin counties, plus the TOTAL row where one is printed.",
+      "url": "https://search.library.wisc.edu/digital/AXFTVPSYH4JPMZ8D"
+    },
+    {
+      "page": 884,
+      "id": "1980-884",
+      "orientation": "counties_down",
+      "bands": 2,
+      "columns": [
+        {
+          "label": "Edmund G. Brown, Jr.",
+          "contest": "dem1980",
+          "candidate": "Edmund G. Brown Jr."
+        },
+        {
+          "label": "Jimmy Carter",
+          "contest": "dem1980",
+          "candidate": "Jimmy Carter"
+        },
+        {
+          "label": "Charles E. Finch",
+          "contest": "dem1980",
+          "candidate": "Charles E. Finch"
+        },
+        {
+          "label": "Edward Kennedy",
+          "contest": "dem1980",
+          "candidate": "Edward M. Kennedy"
+        },
+        {
+          "label": "Lyndon LaRouche",
+          "contest": "dem1980",
+          "candidate": "Lyndon H. LaRouche Jr."
+        },
+        {
+          "label": "None of Names Shown",
+          "contest": "dem1980",
+          "candidate": "None of the names shown"
+        }
+      ],
+      "url": "https://archive.org/download/micro_IA40706910_0093/page/n{page}.jpg",
+      "hint": "Read only the presidential preference vote by county table for April 1, 1980; skip the Total column and any column not listed. Rows are Wisconsin counties, plus the TOTAL row where one is printed."
+    },
+    {
+      "page": 887,
+      "id": "1980-887",
+      "orientation": "counties_down",
+      "bands": 2,
+      "columns": [
+        {
+          "label": "John B. Anderson",
+          "contest": "rep1980",
+          "candidate": "John B. Anderson"
+        },
+        {
+          "label": "Howard H. Baker, Jr.",
+          "contest": "rep1980",
+          "candidate": "Howard H. Baker Jr."
+        },
+        {
+          "label": "George Bush",
+          "contest": "rep1980",
+          "candidate": "George Bush"
+        },
+        {
+          "label": "John B. Connally",
+          "contest": "rep1980",
+          "candidate": "John B. Connally"
+        }
+      ],
+      "url": "https://archive.org/download/micro_IA40706910_0093/page/n{page}.jpg",
+      "hint": "Read only the presidential preference vote by county table for April 1, 1980; skip the Total column and any column not listed. Rows are Wisconsin counties, plus the TOTAL row where one is printed."
+    },
+    {
+      "page": 888,
+      "id": "1980-888",
+      "orientation": "counties_down",
+      "bands": 2,
+      "columns": [
+        {
+          "label": "Philip M. Crane",
+          "contest": "rep1980",
+          "candidate": "Philip M. Crane"
+        },
+        {
+          "label": "Benjamin Fernandez",
+          "contest": "rep1980",
+          "candidate": "Benjamin Fernandez"
+        },
+        {
+          "label": "Ronald Reagan",
+          "contest": "rep1980",
+          "candidate": "Ronald Reagan"
+        },
+        {
+          "label": "Harold E. Stassen",
+          "contest": "rep1980",
+          "candidate": "Harold E. Stassen"
+        },
+        {
+          "label": "None of Names Shown",
+          "contest": "rep1980",
+          "candidate": "None of the names shown"
+        }
+      ],
+      "url": "https://archive.org/download/micro_IA40706910_0093/page/n{page}.jpg",
+      "hint": "Read only the presidential preference vote by county table for April 1, 1980; skip the Total column and any column not listed. Rows are Wisconsin counties, plus the TOTAL row where one is printed. County names are printed at the right edge of this page."
+    },
+    {
+      "page": 893,
+      "id": "1984-893",
+      "orientation": "counties_down",
+      "bands": 2,
+      "columns": [
+        {
+          "label": "Reubin Askew",
+          "contest": "dem1984",
+          "candidate": "Reubin Askew"
+        },
+        {
+          "label": "Alan Cranston",
+          "contest": "dem1984",
+          "candidate": "Alan Cranston"
+        },
+        {
+          "label": "John Glenn",
+          "contest": "dem1984",
+          "candidate": "John Glenn"
+        },
+        {
+          "label": "Gary Hart",
+          "contest": "dem1984",
+          "candidate": "Gary Hart"
+        }
+      ],
+      "url": "https://archive.org/download/micro_IA40706923_0147/page/n{page}.jpg",
+      "hint": "Read only the presidential preference vote by county table for April 3, 1984; skip the Total column and any column not listed. Rows are Wisconsin counties, plus the TOTAL row where one is printed."
+    },
+    {
+      "page": 894,
+      "id": "1984-894",
+      "orientation": "counties_down",
+      "bands": 2,
+      "columns": [
+        {
+          "label": "Ernest F. Hollings",
+          "contest": "dem1984",
+          "candidate": "Ernest F. Hollings"
+        },
+        {
+          "label": "Jesse Jackson",
+          "contest": "dem1984",
+          "candidate": "Jesse Jackson"
+        },
+        {
+          "label": "George S. McGovern",
+          "contest": "dem1984",
+          "candidate": "George S. McGovern"
+        },
+        {
+          "label": "Walter F. Mondale",
+          "contest": "dem1984",
+          "candidate": "Walter F. Mondale"
+        },
+        {
+          "label": "None of the Names Shown",
+          "contest": "dem1984",
+          "candidate": "None of the names shown"
+        }
+      ],
+      "url": "https://archive.org/download/micro_IA40706923_0147/page/n{page}.jpg",
+      "hint": "Read only the presidential preference vote by county table for April 3, 1984; skip the Total column and any column not listed. Rows are Wisconsin counties, plus the TOTAL row where one is printed. County names are printed at the right edge of this page."
+    },
+    {
+      "page": 899,
+      "id": "1984-899-l",
+      "orientation": "counties_down",
+      "bands": 1,
+      "columns": [
+        {
+          "label": "Ronald Reagan Yes",
+          "contest": "rep1984",
+          "candidate": "Ronald Reagan"
+        },
+        {
+          "label": "Ronald Reagan No",
+          "contest": "rep1984",
+          "candidate": "No"
+        }
+      ],
+      "crop": [
+        0,
+        0,
+        0.52,
+        1
+      ],
+      "url": "https://archive.org/download/micro_IA40706923_0147/page/n{page}.jpg",
+      "hint": "Read only the presidential preference vote by county table for April 3, 1984; skip the Total column and any column not listed. Rows are Wisconsin counties, plus the TOTAL row where one is printed. The page prints two side-by-side panels of counties; read only the panel in the image."
+    },
+    {
+      "page": 899,
+      "id": "1984-899-r",
+      "orientation": "counties_down",
+      "bands": 1,
+      "columns": [
+        {
+          "label": "Ronald Reagan Yes",
+          "contest": "rep1984",
+          "candidate": "Ronald Reagan"
+        },
+        {
+          "label": "Ronald Reagan No",
+          "contest": "rep1984",
+          "candidate": "No"
+        }
+      ],
+      "crop": [
+        0.48,
+        0,
+        1,
+        1
+      ],
+      "url": "https://archive.org/download/micro_IA40706923_0147/page/n{page}.jpg",
+      "hint": "Read only the presidential preference vote by county table for April 3, 1984; skip the Total column and any column not listed. Rows are Wisconsin counties, plus the TOTAL row where one is printed. The page prints two side-by-side panels of counties; read only the panel in the image."
+    },
+    {
+      "page": 903,
+      "id": "1988-903",
+      "orientation": "counties_down",
+      "bands": 2,
+      "columns": [
+        {
+          "label": "Bruce Babbitt",
+          "contest": "dem1988",
+          "candidate": "Bruce Babbitt"
+        },
+        {
+          "label": "Michael S. Dukakis",
+          "contest": "dem1988",
+          "candidate": "Michael S. Dukakis"
+        },
+        {
+          "label": "Richard A. Gephardt",
+          "contest": "dem1988",
+          "candidate": "Richard A. Gephardt"
+        },
+        {
+          "label": "Al Gore",
+          "contest": "dem1988",
+          "candidate": "Al Gore"
+        }
+      ],
+      "url": "https://archive.org/download/micro_IA40706936_0250/page/n{page}.jpg",
+      "hint": "Read only the presidential preference vote by county table for April 5, 1988; skip the Total column and any column not listed. Rows are Wisconsin counties, plus the TOTAL row where one is printed."
+    },
+    {
+      "page": 904,
+      "id": "1988-904",
+      "orientation": "counties_down",
+      "bands": 2,
+      "columns": [
+        {
+          "label": "Gary Hart",
+          "contest": "dem1988",
+          "candidate": "Gary Hart"
+        },
+        {
+          "label": "Jesse L. Jackson",
+          "contest": "dem1988",
+          "candidate": "Jesse Jackson"
+        },
+        {
+          "label": "Paul Simon",
+          "contest": "dem1988",
+          "candidate": "Paul Simon"
+        },
+        {
+          "label": "Uninstructed Delegation",
+          "contest": "dem1988",
+          "candidate": "Uninstructed delegation"
+        }
+      ],
+      "url": "https://archive.org/download/micro_IA40706936_0250/page/n{page}.jpg",
+      "hint": "Read only the presidential preference vote by county table for April 5, 1988; skip the Total column and any column not listed. Rows are Wisconsin counties, plus the TOTAL row where one is printed. County names are printed at the right edge of this page."
+    },
+    {
+      "page": 909,
+      "id": "1988-909",
+      "orientation": "counties_down",
+      "bands": 2,
+      "columns": [
+        {
+          "label": "George Bush",
+          "contest": "rep1988",
+          "candidate": "George Bush"
+        },
+        {
+          "label": "Robert Dole",
+          "contest": "rep1988",
+          "candidate": "Robert Dole"
+        },
+        {
+          "label": "Pierre S. du Pont IV",
+          "contest": "rep1988",
+          "candidate": "Pierre S. du Pont IV"
+        }
+      ],
+      "url": "https://archive.org/download/micro_IA40706936_0250/page/n{page}.jpg",
+      "hint": "Read only the presidential preference vote by county table for April 5, 1988; skip the Total column and any column not listed. Rows are Wisconsin counties, plus the TOTAL row where one is printed."
+    },
+    {
+      "page": 910,
+      "id": "1988-910",
+      "orientation": "counties_down",
+      "bands": 2,
+      "columns": [
+        {
+          "label": "Alexander Haig, Jr.",
+          "contest": "rep1988",
+          "candidate": "Alexander M. Haig Jr."
+        },
+        {
+          "label": "Jack F. Kemp",
+          "contest": "rep1988",
+          "candidate": "Jack F. Kemp"
+        },
+        {
+          "label": "Pat Robertson",
+          "contest": "rep1988",
+          "candidate": "Pat Robertson"
+        },
+        {
+          "label": "Uninstructed Delegation",
+          "contest": "rep1988",
+          "candidate": "Uninstructed delegation"
+        }
+      ],
+      "url": "https://archive.org/download/micro_IA40706936_0250/page/n{page}.jpg",
+      "hint": "Read only the presidential preference vote by county table for April 5, 1988; skip the Total column and any column not listed. Rows are Wisconsin counties, plus the TOTAL row where one is printed. County names are printed at the right edge of this page."
+    }
+  ]
+}
