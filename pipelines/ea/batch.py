@@ -212,7 +212,7 @@ def answer(params: MessageCreateParamsNonStreaming) -> dict[str, object] | str:
         try:
             done = subprocess.run(
                 [
-                    shutil.which("claude") or str(Path.home() / ".local/bin/claude"),
+                    shutil.which(os.environ.get("EA_CLAUDE", "claude")) or str(Path.home() / ".local/bin/claude"),
                     "-p",
                     "--model",
                     params["model"],
