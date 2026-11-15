@@ -1,8 +1,11 @@
 import base64
+import difflib
 import io
+import json
 import re
 import subprocess
 from datetime import date, timedelta
+from functools import cache
 from pathlib import Path
 from uuid import UUID
 
@@ -127,6 +130,7 @@ COUNTY_SCAN = (
 )
 PAGES = DATA / "pages" / SOURCE
 REPORT_TITLE = "Electoral Vote Assignment"
+COUNTY_TITLE = "Official county returns"
 DISTRICTS = "us.ms_house_district"
 OFFICES = {
     "Governor": "Governor",
@@ -216,6 +220,121 @@ CORRECTED = {
     (date(2007, 11, 6), "Auditor", 7, "sumrall"): 767,
 }
 
+COUNTY_CORRECTED = {
+    (date(2007, 11, 6), "Alcorn", 3): {
+        "eaves": 3695,
+        "sumrall": 4306,
+        "bryant": 4913,
+        "franks": 3981,
+        "barbour": 5363,
+        "smith": 3947,
+        "pickering": 4183,
+        "ohara": 3788,
+        "reeves": 4617,
+        "cole": 3979,
+        "spell": 4048,
+        "hood": 4841,
+        "hosemann": 4659,
+        "hopkins": 3901,
+    },
+    (date(2007, 11, 6), "Alcorn", 5): {"riley": 598},
+    (date(2007, 11, 6), "Benton", 3): {"hopkins": 848, "smith": 1348, "hood": 1384, "hosemann": 813},
+    (date(2007, 11, 6), "Calhoun", 3): {"riley": 352},
+    (date(2007, 11, 6), "Claiborne", 4): {"chaney": 705},
+    (date(2007, 11, 6), "Desoto", 9): {"riley": 1928},
+    (date(2007, 11, 6), "Greene", 5): {"riley": 191},
+    (date(2007, 11, 6), "Harrison", 8): {"sumrall": 11329},
+    (date(2007, 11, 6), "Harrison", 15): {"pickering": 21404},
+    (date(2007, 11, 6), "Hinds", 23): {"riley": 3525},
+    (date(2007, 11, 6), "Humphreys", 5): {"riley": 302},
+    (date(2007, 11, 6), "Issaquena", 2): {"barbour": 364, "franks": 408, "bryant": 347, "eaves": 432},
+    (date(2007, 11, 6), "Jasper", 3): {
+        "hosemann": 2164,
+        "cole": 3160,
+        "eaves": 3225,
+        "barbour": 2164,
+        "franks": 2971,
+        "bryant": 2417,
+        "smith": 3188,
+        "hood": 3970,
+        "spell": 2048,
+        "hopkins": 1405,
+        "sumrall": 3131,
+        "pickering": 2232,
+        "ohara": 2961,
+        "reeves": 2341,
+    },
+    (date(2007, 11, 6), "Jasper", 5): {"anderson": 3115, "riley": 167, "chaney": 2259},
+    (date(2007, 11, 6), "Jefferson Davis", 7): {"riley": 245},
+    (date(2007, 11, 6), "Jones", 11): {"riley": 846, "anderson": 6976, "chaney": 12657},
+    (date(2007, 11, 6), "Lauderdale", 7): {"smith": 5891, "hosemann": 11976, "hopkins": 7794, "hood": 10240},
+    (date(2007, 11, 6), "Lee", 5): {
+        "bryant": 10830,
+        "eaves": 8389,
+        "barbour": 12191,
+        "franks": 9880,
+        "smith": 6840,
+        "hosemann": 13371,
+        "sumrall": 7375,
+        "pickering": 12595,
+        "ohara": 6446,
+        "reeves": 13286,
+        "hood": 11991,
+        "hopkins": 8442,
+        "anderson": 7455,
+        "chaney": 12731,
+    },
+    (date(2007, 11, 6), "Lee", 9): {"spell": 11054, "riley": 1563, "cole": 7192},
+    (date(2007, 11, 6), "Lincoln", 7): {"pickering": 5634},
+    (date(2007, 11, 6), "Madison", 3): {"eaves": 8254, "barbour": 18207, "bryant": 18201, "franks": 8197},
+    (date(2007, 11, 6), "Madison", 5): {"hosemann": 18224, "smith": 8082, "hood": 13190, "hopkins": 13145},
+    (date(2007, 11, 6), "Madison", 7): {"reeves": 18607, "pickering": 16983, "sumrall": 9147, "ohara": 7508},
+    (date(2007, 11, 6), "Monroe", 7): {"riley": 988},
+    (date(2007, 11, 6), "Montgomery", 7): {"chaney": 2275, "anderson": 2050, "riley": 284},
+    (date(2007, 11, 6), "Oktibbeha", 5): {"hosemann": 5821, "smith": 4668, "hood": 6037, "hopkins": 4484},
+    (date(2007, 11, 6), "Pearl River", 9): {"riley": 760},
+    (date(2007, 11, 6), "Pike", 3): {"eaves": 5380, "barbour": 5594, "bryant": 5809, "franks": 5093},
+    (date(2007, 11, 6), "Pike", 5): {"hosemann": 5735, "smith": 5117, "hood": 7118, "hopkins": 3766},
+    (date(2007, 11, 6), "Pike", 7): {"sumrall": 5367, "pickering": 5459, "reeves": 6033, "ohara": 4743},
+    (date(2007, 11, 6), "Quitman", 5): {"riley": 184},
+    (date(2007, 11, 6), "Rankin", 15): {"spell": 21502},
+    (date(2007, 11, 6), "Tallahatchie", 4): {"pickering": 1486},
+    (date(2007, 11, 6), "Tallahatchie", 7): {"sumrall": 3037},
+    (date(2007, 11, 6), "Tate", 5): {"chaney": 3891, "anderson": 2531, "riley": 491},
+    (date(2007, 11, 6), "Tunica", 5): {"riley": 184},
+    (date(2007, 11, 6), "Union", 3): {
+        "sumrall": 3036,
+        "hood": 4353,
+        "reeves": 4656,
+        "ohara": 2209,
+        "pickering": 3900,
+        "hopkins": 2727,
+    },
+    (date(2007, 11, 6), "Union", 4): {"riley": 485, "anderson": 2581, "chaney": 4414, "cole": 2366, "spell": 4105},
+    (date(2007, 11, 6), "Washington", 3): {
+        "sumrall": 5209,
+        "hosemann": 3844,
+        "smith": 5196,
+        "bryant": 4015,
+        "franks": 5150,
+        "barbour": 4020,
+        "eaves": 5289,
+        "chaney": 3738,
+        "anderson": 5428,
+        "riley": 447,
+        "spell": 3291,
+        "cole": 5256,
+        "hopkins": 2590,
+        "hood": 6594,
+    },
+    (date(2007, 11, 6), "Washington", 5): {"reeves": 3920, "ohara": 5074, "pickering": 3795},
+    (date(2007, 11, 6), "Winston", 5): {"riley": 358},
+}
+COUNTY_DIFFERENCES = {
+    (date(2007, 11, 6), "Commissioner of Insurance", "Gary Anderson"): 2,
+    (date(2007, 11, 6), "Commissioner of Insurance", "Mike Chaney"): -2,
+}
+
 
 def surname(name: str) -> str:
     words = [re.sub(r"[^a-z]", "", word.lower()) for word in name.replace(",", " ").split()]
@@ -240,12 +359,12 @@ def county_page(link: str, number: int) -> Path:
     if not image.exists():
         PAGES.mkdir(parents=True, exist_ok=True)
         subprocess.run(
-            ["pdftoppm", "-r", "150", "-gray", "-png", "-f", str(number), "-l", str(number), "-singlefile"]
+            ["pdftoppm", "-scale-to", "1650", "-gray", "-png", "-f", str(number), "-l", str(number), "-singlefile"]
             + [str(scan.path), str(image.with_suffix(""))],
             check=True,
         )
         with Image.open(image) as rendered:
-            turns = {angle: rendered.rotate(angle, expand=True) for angle in (0, 90, 270)}
+            turns = {angle: rendered.rotate(angle, expand=True) for angle in (0, 90, 180, 270)}
         words = {angle: len(re.findall(r"[A-Za-z]{4,}", words_on(turned))) for angle, turned in turns.items()}
         best = max(words, key=words.__getitem__)
         if best and words[best] > 2 * words[0]:
@@ -309,6 +428,110 @@ def read_counties() -> None:
                 (tile.width * tile.height / 750 * price_in + 1000 * price_out) / 1e6,
             )
     print(batch.ensure(SOURCE, "county-totals-2007", wanted)[1])
+
+
+PARTY_TAGS = {
+    "dem": "Democrat",
+    "democrat": "Democrat",
+    "rep": "Republican",
+    "republican": "Republican",
+    "cns": "Constitution",
+    "constitution": "Constitution",
+}
+
+
+def county_candidate(office: str, text: str) -> str | None:
+    words = {re.sub(r"[^a-z]", "", word) for word in re.sub(r"[,()]", " ", text.lower()).split()}
+    named = [name for names in SURNAMES.values() for name in names if name in words]
+    if len(named) == 1:
+        return named[0]
+    close = {name for word in words for name in difflib.get_close_matches(word, list(SURNAMES[office]), 1, 0.6)}
+    if len(close) == 1:
+        return close.pop()
+    parties = {PARTY_TAGS[word] for word in words if word in PARTY_TAGS}
+    matched = [surname(name) for name, party in BALLOT[office] if party in parties]
+    return matched[0] if len(parties) == 1 and len(matched) == 1 else None
+
+
+@cache
+def page_words(image: Path) -> tuple[int, int, pl.DataFrame]:
+    with Image.open(image) as rendered:
+        width, height = rendered.size
+    words = pl.read_csv(
+        io.StringIO(
+            subprocess.run(
+                ["tesseract", str(image), "stdout", "--psm", "6", "tsv"], capture_output=True, text=True, check=True
+            ).stdout
+        ),
+        separator="\t",
+        quote_char=None,
+        schema_overrides={"text": pl.String},
+    ).with_columns(digits=pl.col("text").str.replace_all(r"[^0-9]", ""))
+    return width, height, words
+
+
+def locate(image: Path, votes: int) -> tuple[float, float, float, float]:
+    width, height, words = page_words(image)
+    found = words.filter(pl.col("digits") == str(votes))
+    if not found.height:
+        return (0.0, 0.0, 1.0, 1.0)
+    left, top, wide, high = found.sort(pl.col("left") + pl.col("top")).select("left", "top", "width", "height").row(-1)
+    return (left / width, top / height, (left + wide) / width, (top + high) / height)
+
+
+def parse_counties() -> None:
+    owner = {name: office for office, names in SURNAMES.items() for name in names}
+    rows: list[dict[str, object]] = []
+    for (day, county), link in county_scans().items():
+        picked: dict[str, tuple[int, int]] = {}
+        for number in range(1, page_count(link) + 1):
+            message = json.loads(raw.cached(SOURCE, read_key(day, county, number)).path.read_text())
+            texts = [block["text"] for block in message["content"] if block["type"] == "text"]
+            try:
+                totals = json.loads(texts[0])["totals"] if texts else []
+            except json.JSONDecodeError:
+                totals = []
+            for total in totals:
+                for cell in total["candidates"]:
+                    if name := county_candidate(total["office"], cell["candidate"]):
+                        picked[name] = (number, cell["votes"])
+        for (when, place, number), cells in COUNTY_CORRECTED.items():
+            if (when, place) == (day, county):
+                picked |= {name: (number, votes) for name, votes in cells.items()}
+        if missing := set(owner) - set(picked):
+            raise ValueError(f"{day} {county}: no county total for {sorted(missing)}")
+        for name, (number, votes) in picked.items():
+            image = county_page(link, number)
+            x0, y0, x1, y1 = locate(image, votes)
+            rows.append(
+                {
+                    "day": day,
+                    "office": owner[name],
+                    "county": county,
+                    "candidate": SURNAMES[owner[name]][name],
+                    "votes": votes,
+                    "page": number,
+                    "x0": x0,
+                    "y0": y0,
+                    "x1": x1,
+                    "y1": y1,
+                }
+            )
+    frame = pl.DataFrame(rows)
+    districts = pl.read_parquet(PARSED / "districts.parquet").filter(pl.col("day").is_in(list(COUNTY_SCANS)))
+    summed = frame.group_by("day", "office", "candidate").agg(pl.col("votes").sum())
+    printed = districts.group_by("day", "office", "candidate").agg(total=pl.col("votes").sum())
+    checked = summed.join(printed, on=["day", "office", "candidate"], how="full", coalesce=True).with_columns(
+        allowed=pl.struct("day", "office", "candidate").map_elements(
+            lambda key: COUNTY_DIFFERENCES.get((key["day"], key["office"], key["candidate"]), 0),
+            return_dtype=pl.Int64,
+        )
+    )
+    if (
+        wrong := checked.filter(pl.col("votes").is_null() | (pl.col("votes") - pl.col("total") != pl.col("allowed")))
+    ).height:
+        raise ValueError(f"county totals don't sum to the Electoral Vote Assignment totals: {wrong}")
+    frame.write_parquet(PARSED / "counties.parquet")
 
 
 def fetch() -> None:
@@ -506,6 +729,7 @@ def parse_scans() -> pl.DataFrame:
 
 def parse() -> None:
     parse_reports()
+    parse_counties()
     rows: list[dict[str, object]] = []
     for day, link in FILES.items():
         text = pdf_text(link)
@@ -599,7 +823,7 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary="Mississippi's statewide general elections of 2023 by county, the 2015 and 2019 governor elections"
-            " by House district, and the 2007 statewide elections by House district",
+            " by House district, and the 2007 statewide elections by House district and county",
             polity="US",
         )
 
@@ -812,6 +1036,58 @@ def attach_reports(cs: Changeset, conn: Connection) -> None:
         rank=3,
         noun="house district",
     )
+    counties = pl.read_parquet(PARSED / "counties.parquet")
+    returns = cs.source(PUBLISHER, COUNTY_TITLE)
+    cs.add(
+        "source",
+        id=returns,
+        kind="official_body",
+        publisher=PUBLISHER,
+        title=COUNTY_TITLE,
+        url="https://www.sos.ms.gov/elections-voting/election-results",
+        license="Public record",
+    )
+    county_pages: dict[tuple[date, str, int], UUID] = {}
+    for (day, county), link in county_scans().items():
+        artifact = cs.artifact(raw.cached(SOURCE, link), returns)
+        for (number,) in (
+            counties.filter(pl.col("day") == day, pl.col("county") == county).select("page").unique().iter_rows()
+        ):
+            image = county_page(link, number)
+            with Image.open(image) as rendered:
+                width, height = rendered.size
+            county_pages[(day, county, number)] = cs.page(artifact, number)
+            cs.add(
+                "source_page",
+                id=county_pages[(day, county, number)],
+                artifact_id=artifact,
+                page_number=number,
+                image_key=f"pages/{SOURCE}/{image.name}",
+                width=width,
+                height=height,
+            )
+    county_units: dict[str, UUID] = {
+        re.sub(r"[^a-z]", "", text.lower()): unit
+        for text, unit in conn.execute(
+            """select n.text, u.id from reporting_unit u join name n on n.entity_id = u.area_id and n.kind = 'short'
+               where u.scheme_code = 'us.county' and u.code like '28%'"""
+        ).fetchall()
+    }
+    official = {
+        contest
+        for (contest,) in conn.execute(
+            """select rs.contest_id from result_set rs
+               join source s on s.id = rs.source_id and s.kind = 'official_body'
+               join contest c on c.id = rs.contest_id
+               join office o on o.id = c.office_id
+               join polity p on p.id = o.polity_id and p.iso_code = 'US-MS'
+               where rs.status = 'active' and rs.changeset_id <> all(
+                   select id from changeset where pipeline = %s)
+                 and exists (select 1 from result_value v join reporting_unit u on u.k = v.unit_k
+                             where v.result_set_k = rs.k and u.scheme_code = 'us.county')""",
+            [SOURCE],
+        ).fetchall()
+    }
     placed: set[date] = set()
     for (day, office), lines in frame.group_by("day", "office", maintain_order=True):
         office_slug = slug(office)
@@ -896,9 +1172,46 @@ def attach_reports(cs: Changeset, conn: Connection) -> None:
             kind="counted",
             status="active",
             source_id=source,
-            is_default=office != "Governor",
+            is_default=contest not in official and day not in COUNTY_SCANS,
             completeness=1,
         )
+        if day in COUNTY_SCANS:
+            county_set = cs.key(f"{SOURCE}.result_set", f"{contest_key}:us.county")
+            cs.add(
+                "result_set",
+                id=county_set,
+                election_id=election,
+                contest_id=contest,
+                stage="certified",
+                kind="counted",
+                status="active",
+                source_id=returns,
+                is_default=True,
+                completeness=1,
+            )
+            cells = counties.filter(pl.col("day") == day, pl.col("office") == office)
+            for county, candidate, votes, number, x0, y0, x1, y1 in cells.select(
+                "county", "candidate", "votes", "page", "x0", "y0", "x1", "y1"
+            ).iter_rows():
+                fact = {
+                    "result_set_id": county_set,
+                    "unit_id": county_units[re.sub(r"[^a-z]", "", county.lower())],
+                    "option_id": options[surname(candidate)],
+                    "channel": 0,
+                    "measure": 1,
+                    "count_round": 0,
+                }
+                cs.add("result_value", **fact, flags=house_books.DIGITIZED, value=votes)
+                cs.add(
+                    "value_locator",
+                    **fact,
+                    page_id=county_pages[(day, county, number)],
+                    source_id=None,
+                    x0=x0,
+                    y0=y0,
+                    x1=x1,
+                    y1=y1,
+                )
         if office != "Governor":
             summed = lines.group_by("candidate").agg(pl.col("votes").sum()).sort("votes", descending=True)
             cs.add(
