@@ -1,0 +1,1271 @@
+image	segment	code	desa	row	name	tps	value
+1_9.jpg	0	19.04.03.2003	Keretak	1	Sukandi	1	33
+1_9.jpg	0	19.04.03.2003	Keretak	1	Sukandi	2	20
+1_9.jpg	0	19.04.03.2003	Keretak	1	Sukandi	3	32
+1_9.jpg	0	19.04.03.2003	Keretak	1	Sukandi	4	30
+1_9.jpg	0	19.04.03.2003	Keretak	1	Sukandi	5	31
+1_9.jpg	0	19.04.03.2003	Keretak	1	Sukandi	6	29
+1_9.jpg	0	19.04.03.2003	Keretak	1	Sukandi	7	81
+1_9.jpg	0	19.04.03.2003	Keretak	1	Sukandi	0	256
+1_9.jpg	0	19.04.03.2003	Keretak	2	Ahmad Nurihsan	1	117
+1_9.jpg	0	19.04.03.2003	Keretak	2	Ahmad Nurihsan	2	154
+1_9.jpg	0	19.04.03.2003	Keretak	2	Ahmad Nurihsan	3	177
+1_9.jpg	0	19.04.03.2003	Keretak	2	Ahmad Nurihsan	4	200
+1_9.jpg	0	19.04.03.2003	Keretak	2	Ahmad Nurihsan	5	175
+1_9.jpg	0	19.04.03.2003	Keretak	2	Ahmad Nurihsan	6	173
+1_9.jpg	0	19.04.03.2003	Keretak	2	Ahmad Nurihsan	7	184
+1_9.jpg	0	19.04.03.2003	Keretak	2	Ahmad Nurihsan	0	1180
+1_9.jpg	0	19.04.03.2003	Keretak	valid		1	150
+1_9.jpg	0	19.04.03.2003	Keretak	valid		2	174
+1_9.jpg	0	19.04.03.2003	Keretak	valid		3	209
+1_9.jpg	0	19.04.03.2003	Keretak	valid		4	230
+1_9.jpg	0	19.04.03.2003	Keretak	valid		5	206
+1_9.jpg	0	19.04.03.2003	Keretak	valid		6	202
+1_9.jpg	0	19.04.03.2003	Keretak	valid		7	265
+1_9.jpg	0	19.04.03.2003	Keretak	valid		0	1436
+1_9.jpg	0	19.04.03.2003	Keretak	invalid		1	12
+1_9.jpg	0	19.04.03.2003	Keretak	invalid		2	1
+1_9.jpg	0	19.04.03.2003	Keretak	invalid		3	6
+1_9.jpg	0	19.04.03.2003	Keretak	invalid		4	4
+1_9.jpg	0	19.04.03.2003	Keretak	invalid		5	9
+1_9.jpg	0	19.04.03.2003	Keretak	invalid		6	15
+1_9.jpg	0	19.04.03.2003	Keretak	invalid		7	19
+1_9.jpg	0	19.04.03.2003	Keretak	invalid		0	66
+1_9.jpg	0	19.04.03.2003	Keretak	ballots		1	162
+1_9.jpg	0	19.04.03.2003	Keretak	ballots		2	175
+1_9.jpg	0	19.04.03.2003	Keretak	ballots		3	215
+1_9.jpg	0	19.04.03.2003	Keretak	ballots		4	234
+1_9.jpg	0	19.04.03.2003	Keretak	ballots		5	215
+1_9.jpg	0	19.04.03.2003	Keretak	ballots		6	217
+1_9.jpg	0	19.04.03.2003	Keretak	ballots		7	284
+1_9.jpg	0	19.04.03.2003	Keretak	ballots		0	1502
+1_9.jpg	0	19.04.03.2003	Keretak	registered		1	240
+1_9.jpg	0	19.04.03.2003	Keretak	registered		2	233
+1_9.jpg	0	19.04.03.2003	Keretak	registered		3	260
+1_9.jpg	0	19.04.03.2003	Keretak	registered		4	355
+1_9.jpg	0	19.04.03.2003	Keretak	registered		5	241
+1_9.jpg	0	19.04.03.2003	Keretak	registered		6	283
+1_9.jpg	0	19.04.03.2003	Keretak	registered		7	344
+1_9.jpg	0	19.04.03.2003	Keretak	registered		0	1956
+1_9.jpg	1	19.04.03.2010	Romadhon	1	Robuan	1	21
+1_9.jpg	1	19.04.03.2010	Romadhon	1	Robuan	2	15
+1_9.jpg	1	19.04.03.2010	Romadhon	1	Robuan	3	2
+1_9.jpg	1	19.04.03.2010	Romadhon	1	Robuan	4	1
+1_9.jpg	1	19.04.03.2010	Romadhon	1	Robuan	0	39
+1_9.jpg	1	19.04.03.2010	Romadhon	2	Hamdani	1	11
+1_9.jpg	1	19.04.03.2010	Romadhon	2	Hamdani	2	12
+1_9.jpg	1	19.04.03.2010	Romadhon	2	Hamdani	3	2
+1_9.jpg	1	19.04.03.2010	Romadhon	2	Hamdani	4	238
+1_9.jpg	1	19.04.03.2010	Romadhon	2	Hamdani	0	263
+1_9.jpg	1	19.04.03.2010	Romadhon	3	Domi	1	153
+1_9.jpg	1	19.04.03.2010	Romadhon	3	Domi	2	144
+1_9.jpg	1	19.04.03.2010	Romadhon	3	Domi	3	96
+1_9.jpg	1	19.04.03.2010	Romadhon	3	Domi	4	42
+1_9.jpg	1	19.04.03.2010	Romadhon	3	Domi	0	435
+1_9.jpg	1	19.04.03.2010	Romadhon	4	Ruslan	1	66
+1_9.jpg	1	19.04.03.2010	Romadhon	4	Ruslan	2	109
+1_9.jpg	1	19.04.03.2010	Romadhon	4	Ruslan	3	48
+1_9.jpg	1	19.04.03.2010	Romadhon	4	Ruslan	4	38
+1_9.jpg	1	19.04.03.2010	Romadhon	4	Ruslan	0	261
+1_9.jpg	1	19.04.03.2010	Romadhon	5	Muhammad Pandi	1	105
+1_9.jpg	1	19.04.03.2010	Romadhon	5	Muhammad Pandi	2	23
+1_9.jpg	1	19.04.03.2010	Romadhon	5	Muhammad Pandi	3	18
+1_9.jpg	1	19.04.03.2010	Romadhon	5	Muhammad Pandi	4	15
+1_9.jpg	1	19.04.03.2010	Romadhon	5	Muhammad Pandi	0	161
+1_9.jpg	1	19.04.03.2010	Romadhon	valid		1	356
+1_9.jpg	1	19.04.03.2010	Romadhon	valid		2	303
+1_9.jpg	1	19.04.03.2010	Romadhon	valid		3	166
+1_9.jpg	1	19.04.03.2010	Romadhon	valid		4	334
+1_9.jpg	1	19.04.03.2010	Romadhon	valid		0	1159
+1_9.jpg	1	19.04.03.2010	Romadhon	invalid		1	8
+1_9.jpg	1	19.04.03.2010	Romadhon	invalid		2	17
+1_9.jpg	1	19.04.03.2010	Romadhon	invalid		3	0
+1_9.jpg	1	19.04.03.2010	Romadhon	invalid		4	6
+1_9.jpg	1	19.04.03.2010	Romadhon	invalid		0	31
+1_9.jpg	1	19.04.03.2010	Romadhon	ballots		1	364
+1_9.jpg	1	19.04.03.2010	Romadhon	ballots		2	320
+1_9.jpg	1	19.04.03.2010	Romadhon	ballots		3	166
+1_9.jpg	1	19.04.03.2010	Romadhon	ballots		4	340
+1_9.jpg	1	19.04.03.2010	Romadhon	ballots		0	1190
+1_9.jpg	1	19.04.03.2010	Romadhon	registered		1	417
+1_9.jpg	1	19.04.03.2010	Romadhon	registered		2	367
+1_9.jpg	1	19.04.03.2010	Romadhon	registered		3	179
+1_9.jpg	1	19.04.03.2010	Romadhon	registered		4	441
+1_9.jpg	1	19.04.03.2010	Romadhon	registered		0	1404
+2_9.jpg	0	19.04.03.2005	Sarang Mandi	1	Supriyadi, A.Md	1	47
+2_9.jpg	0	19.04.03.2005	Sarang Mandi	1	Supriyadi, A.Md	2	85
+2_9.jpg	0	19.04.03.2005	Sarang Mandi	1	Supriyadi, A.Md	3	259
+2_9.jpg	0	19.04.03.2005	Sarang Mandi	1	Supriyadi, A.Md	4	186
+2_9.jpg	0	19.04.03.2005	Sarang Mandi	1	Supriyadi, A.Md	0	577
+2_9.jpg	0	19.04.03.2005	Sarang Mandi	2	Dalpia	1	14
+2_9.jpg	0	19.04.03.2005	Sarang Mandi	2	Dalpia	2	4
+2_9.jpg	0	19.04.03.2005	Sarang Mandi	2	Dalpia	3	10
+2_9.jpg	0	19.04.03.2005	Sarang Mandi	2	Dalpia	4	5
+2_9.jpg	0	19.04.03.2005	Sarang Mandi	2	Dalpia	0	33
+2_9.jpg	0	19.04.03.2005	Sarang Mandi	3	Heldi Yansah	1	116
+2_9.jpg	0	19.04.03.2005	Sarang Mandi	3	Heldi Yansah	2	69
+2_9.jpg	0	19.04.03.2005	Sarang Mandi	3	Heldi Yansah	3	70
+2_9.jpg	0	19.04.03.2005	Sarang Mandi	3	Heldi Yansah	4	85
+2_9.jpg	0	19.04.03.2005	Sarang Mandi	3	Heldi Yansah	0	340
+2_9.jpg	0	19.04.03.2005	Sarang Mandi	4	H. Samsumin	1	62
+2_9.jpg	0	19.04.03.2005	Sarang Mandi	4	H. Samsumin	2	31
+2_9.jpg	0	19.04.03.2005	Sarang Mandi	4	H. Samsumin	3	67
+2_9.jpg	0	19.04.03.2005	Sarang Mandi	4	H. Samsumin	4	94
+2_9.jpg	0	19.04.03.2005	Sarang Mandi	4	H. Samsumin	0	254
+2_9.jpg	0	19.04.03.2005	Sarang Mandi	5	Jhoni Iskandar	1	76
+2_9.jpg	0	19.04.03.2005	Sarang Mandi	5	Jhoni Iskandar	2	103
+2_9.jpg	0	19.04.03.2005	Sarang Mandi	5	Jhoni Iskandar	3	84
+2_9.jpg	0	19.04.03.2005	Sarang Mandi	5	Jhoni Iskandar	4	134
+2_9.jpg	0	19.04.03.2005	Sarang Mandi	5	Jhoni Iskandar	0	397
+2_9.jpg	0	19.04.03.2005	Sarang Mandi	valid		1	315
+2_9.jpg	0	19.04.03.2005	Sarang Mandi	valid		2	292
+2_9.jpg	0	19.04.03.2005	Sarang Mandi	valid		3	490
+2_9.jpg	0	19.04.03.2005	Sarang Mandi	valid		4	504
+2_9.jpg	0	19.04.03.2005	Sarang Mandi	valid		0	1601
+2_9.jpg	0	19.04.03.2005	Sarang Mandi	invalid		1	8
+2_9.jpg	0	19.04.03.2005	Sarang Mandi	invalid		2	7
+2_9.jpg	0	19.04.03.2005	Sarang Mandi	invalid		3	8
+2_9.jpg	0	19.04.03.2005	Sarang Mandi	invalid		4	12
+2_9.jpg	0	19.04.03.2005	Sarang Mandi	invalid		0	35
+2_9.jpg	0	19.04.03.2005	Sarang Mandi	ballots		1	323
+2_9.jpg	0	19.04.03.2005	Sarang Mandi	ballots		2	299
+2_9.jpg	0	19.04.03.2005	Sarang Mandi	ballots		3	498
+2_9.jpg	0	19.04.03.2005	Sarang Mandi	ballots		4	516
+2_9.jpg	0	19.04.03.2005	Sarang Mandi	ballots		0	1636
+2_9.jpg	0	19.04.03.2005	Sarang Mandi	registered		1	349
+2_9.jpg	0	19.04.03.2005	Sarang Mandi	registered		2	322
+2_9.jpg	0	19.04.03.2005	Sarang Mandi	registered		3	534
+2_9.jpg	0	19.04.03.2005	Sarang Mandi	registered		4	545
+2_9.jpg	0	19.04.03.2005	Sarang Mandi	registered		0	1750
+2_9.jpg	1	19.04.03.2008	Sungaiselan Atas	1	Rusman	1	103
+2_9.jpg	1	19.04.03.2008	Sungaiselan Atas	1	Rusman	2	208
+2_9.jpg	1	19.04.03.2008	Sungaiselan Atas	1	Rusman	3	167
+2_9.jpg	1	19.04.03.2008	Sungaiselan Atas	1	Rusman	4	187
+2_9.jpg	1	19.04.03.2008	Sungaiselan Atas	1	Rusman	5	160
+2_9.jpg	1	19.04.03.2008	Sungaiselan Atas	1	Rusman	0	825
+2_9.jpg	1	19.04.03.2008	Sungaiselan Atas	2	Aswadi	1	3
+2_9.jpg	1	19.04.03.2008	Sungaiselan Atas	2	Aswadi	2	10
+2_9.jpg	1	19.04.03.2008	Sungaiselan Atas	2	Aswadi	3	22
+2_9.jpg	1	19.04.03.2008	Sungaiselan Atas	2	Aswadi	4	13
+2_9.jpg	1	19.04.03.2008	Sungaiselan Atas	2	Aswadi	5	14
+2_9.jpg	1	19.04.03.2008	Sungaiselan Atas	2	Aswadi	0	62
+2_9.jpg	1	19.04.03.2008	Sungaiselan Atas	3	Selamet Riyadi	1	154
+2_9.jpg	1	19.04.03.2008	Sungaiselan Atas	3	Selamet Riyadi	2	119
+2_9.jpg	1	19.04.03.2008	Sungaiselan Atas	3	Selamet Riyadi	3	223
+2_9.jpg	1	19.04.03.2008	Sungaiselan Atas	3	Selamet Riyadi	4	162
+2_9.jpg	1	19.04.03.2008	Sungaiselan Atas	3	Selamet Riyadi	5	150
+2_9.jpg	1	19.04.03.2008	Sungaiselan Atas	3	Selamet Riyadi	0	808
+2_9.jpg	1	19.04.03.2008	Sungaiselan Atas	4	Supendi Saputra	1	41
+2_9.jpg	1	19.04.03.2008	Sungaiselan Atas	4	Supendi Saputra	2	17
+2_9.jpg	1	19.04.03.2008	Sungaiselan Atas	4	Supendi Saputra	3	6
+2_9.jpg	1	19.04.03.2008	Sungaiselan Atas	4	Supendi Saputra	4	7
+2_9.jpg	1	19.04.03.2008	Sungaiselan Atas	4	Supendi Saputra	5	0
+2_9.jpg	1	19.04.03.2008	Sungaiselan Atas	4	Supendi Saputra	0	71
+2_9.jpg	1	19.04.03.2008	Sungaiselan Atas	valid		1	301
+2_9.jpg	1	19.04.03.2008	Sungaiselan Atas	valid		2	354
+2_9.jpg	1	19.04.03.2008	Sungaiselan Atas	valid		3	418
+2_9.jpg	1	19.04.03.2008	Sungaiselan Atas	valid		4	369
+2_9.jpg	1	19.04.03.2008	Sungaiselan Atas	valid		5	324
+2_9.jpg	1	19.04.03.2008	Sungaiselan Atas	valid		0	1766
+2_9.jpg	1	19.04.03.2008	Sungaiselan Atas	invalid		1	4
+2_9.jpg	1	19.04.03.2008	Sungaiselan Atas	invalid		2	7
+2_9.jpg	1	19.04.03.2008	Sungaiselan Atas	invalid		3	4
+2_9.jpg	1	19.04.03.2008	Sungaiselan Atas	invalid		4	3
+2_9.jpg	1	19.04.03.2008	Sungaiselan Atas	invalid		5	2
+2_9.jpg	1	19.04.03.2008	Sungaiselan Atas	invalid		0	20
+2_9.jpg	1	19.04.03.2008	Sungaiselan Atas	ballots		1	305
+2_9.jpg	1	19.04.03.2008	Sungaiselan Atas	ballots		2	361
+2_9.jpg	1	19.04.03.2008	Sungaiselan Atas	ballots		3	422
+2_9.jpg	1	19.04.03.2008	Sungaiselan Atas	ballots		4	372
+2_9.jpg	1	19.04.03.2008	Sungaiselan Atas	ballots		5	326
+2_9.jpg	1	19.04.03.2008	Sungaiselan Atas	ballots		0	1786
+2_9.jpg	1	19.04.03.2008	Sungaiselan Atas	registered		1	390
+2_9.jpg	1	19.04.03.2008	Sungaiselan Atas	registered		2	449
+2_9.jpg	1	19.04.03.2008	Sungaiselan Atas	registered		3	555
+2_9.jpg	1	19.04.03.2008	Sungaiselan Atas	registered		4	473
+2_9.jpg	1	19.04.03.2008	Sungaiselan Atas	registered		5	430
+2_9.jpg	1	19.04.03.2008	Sungaiselan Atas	registered		0	2297
+2_9.jpg	2	19.04.03.2006	Munggu	1	Tamrin Aziz	1	222
+2_9.jpg	2	19.04.03.2006	Munggu	1	Tamrin Aziz	2	269
+2_9.jpg	2	19.04.03.2006	Munggu	1	Tamrin Aziz	3	276
+2_9.jpg	2	19.04.03.2006	Munggu	1	Tamrin Aziz	4	178
+2_9.jpg	2	19.04.03.2006	Munggu	1	Tamrin Aziz	0	945
+2_9.jpg	2	19.04.03.2006	Munggu	2	Sunardi, SE	1	169
+2_9.jpg	2	19.04.03.2006	Munggu	2	Sunardi, SE	2	168
+2_9.jpg	2	19.04.03.2006	Munggu	2	Sunardi, SE	3	136
+2_9.jpg	2	19.04.03.2006	Munggu	2	Sunardi, SE	4	43
+2_9.jpg	2	19.04.03.2006	Munggu	2	Sunardi, SE	0	516
+2_9.jpg	2	19.04.03.2006	Munggu	valid		1	391
+2_9.jpg	2	19.04.03.2006	Munggu	valid		2	437
+2_9.jpg	2	19.04.03.2006	Munggu	valid		3	412
+2_9.jpg	2	19.04.03.2006	Munggu	valid		4	221
+2_9.jpg	2	19.04.03.2006	Munggu	valid		0	1461
+2_9.jpg	2	19.04.03.2006	Munggu	invalid		1	8
+2_9.jpg	2	19.04.03.2006	Munggu	invalid		2	2
+2_9.jpg	2	19.04.03.2006	Munggu	invalid		3	4
+2_9.jpg	2	19.04.03.2006	Munggu	invalid		4	3
+2_9.jpg	2	19.04.03.2006	Munggu	invalid		0	17
+2_9.jpg	2	19.04.03.2006	Munggu	ballots		1	399
+2_9.jpg	2	19.04.03.2006	Munggu	ballots		2	439
+2_9.jpg	2	19.04.03.2006	Munggu	ballots		3	416
+2_9.jpg	2	19.04.03.2006	Munggu	ballots		4	224
+2_9.jpg	2	19.04.03.2006	Munggu	ballots		0	1478
+2_9.jpg	2	19.04.03.2006	Munggu	registered		1	554
+2_9.jpg	2	19.04.03.2006	Munggu	registered		2	554
+2_9.jpg	2	19.04.03.2006	Munggu	registered		3	566
+2_9.jpg	2	19.04.03.2006	Munggu	registered		4	298
+2_9.jpg	2	19.04.03.2006	Munggu	registered		0	1972
+3_8.jpg	0	19.04.03.2002	Kerantai	1	Jefri Andrian, S.Pd	1	91
+3_8.jpg	0	19.04.03.2002	Kerantai	1	Jefri Andrian, S.Pd	2	189
+3_8.jpg	0	19.04.03.2002	Kerantai	1	Jefri Andrian, S.Pd	0	280
+3_8.jpg	0	19.04.03.2002	Kerantai	2	Ma'sud	1	72
+3_8.jpg	0	19.04.03.2002	Kerantai	2	Ma'sud	2	73
+3_8.jpg	0	19.04.03.2002	Kerantai	2	Ma'sud	0	145
+3_8.jpg	0	19.04.03.2002	Kerantai	3	Sahroni, SE	1	26
+3_8.jpg	0	19.04.03.2002	Kerantai	3	Sahroni, SE	2	27
+3_8.jpg	0	19.04.03.2002	Kerantai	3	Sahroni, SE	0	53
+3_8.jpg	0	19.04.03.2002	Kerantai	4	Fadliyadi	1	106
+3_8.jpg	0	19.04.03.2002	Kerantai	4	Fadliyadi	2	37
+3_8.jpg	0	19.04.03.2002	Kerantai	4	Fadliyadi	0	143
+3_8.jpg	0	19.04.03.2002	Kerantai	valid		1	295
+3_8.jpg	0	19.04.03.2002	Kerantai	valid		2	326
+3_8.jpg	0	19.04.03.2002	Kerantai	valid		0	621
+3_8.jpg	0	19.04.03.2002	Kerantai	invalid		1	3
+3_8.jpg	0	19.04.03.2002	Kerantai	invalid		2	6
+3_8.jpg	0	19.04.03.2002	Kerantai	invalid		0	9
+3_8.jpg	0	19.04.03.2002	Kerantai	ballots		1	298
+3_8.jpg	0	19.04.03.2002	Kerantai	ballots		2	332
+3_8.jpg	0	19.04.03.2002	Kerantai	ballots		0	630
+3_8.jpg	0	19.04.03.2002	Kerantai	registered		1	333
+3_8.jpg	0	19.04.03.2002	Kerantai	registered		2	362
+3_8.jpg	0	19.04.03.2002	Kerantai	registered		0	695
+3_8.jpg	1	19.04.03.2011	Kerakas	1	Rio Iskandar	1	116
+3_8.jpg	1	19.04.03.2011	Kerakas	1	Rio Iskandar	2	105
+3_8.jpg	1	19.04.03.2011	Kerakas	1	Rio Iskandar	3	79
+3_8.jpg	1	19.04.03.2011	Kerakas	1	Rio Iskandar	0	300
+3_8.jpg	1	19.04.03.2011	Kerakas	2	Junaidi	1	96
+3_8.jpg	1	19.04.03.2011	Kerakas	2	Junaidi	2	166
+3_8.jpg	1	19.04.03.2011	Kerakas	2	Junaidi	3	177
+3_8.jpg	1	19.04.03.2011	Kerakas	2	Junaidi	0	439
+3_8.jpg	1	19.04.03.2011	Kerakas	3	Ekawani	1	36
+3_8.jpg	1	19.04.03.2011	Kerakas	3	Ekawani	2	16
+3_8.jpg	1	19.04.03.2011	Kerakas	3	Ekawani	3	15
+3_8.jpg	1	19.04.03.2011	Kerakas	3	Ekawani	0	67
+3_8.jpg	1	19.04.03.2011	Kerakas	valid		1	248
+3_8.jpg	1	19.04.03.2011	Kerakas	valid		2	287
+3_8.jpg	1	19.04.03.2011	Kerakas	valid		3	271
+3_8.jpg	1	19.04.03.2011	Kerakas	valid		0	806
+3_8.jpg	1	19.04.03.2011	Kerakas	invalid		1	38
+3_8.jpg	1	19.04.03.2011	Kerakas	invalid		2	71
+3_8.jpg	1	19.04.03.2011	Kerakas	invalid		3	2
+3_8.jpg	1	19.04.03.2011	Kerakas	invalid		0	111
+3_8.jpg	1	19.04.03.2011	Kerakas	ballots		1	286
+3_8.jpg	1	19.04.03.2011	Kerakas	ballots		2	358
+3_8.jpg	1	19.04.03.2011	Kerakas	ballots		3	273
+3_8.jpg	1	19.04.03.2011	Kerakas	ballots		0	917
+3_8.jpg	1	19.04.03.2011	Kerakas	registered		1	325
+3_8.jpg	1	19.04.03.2011	Kerakas	registered		2	403
+3_8.jpg	1	19.04.03.2011	Kerakas	registered		3	345
+3_8.jpg	1	19.04.03.2011	Kerakas	registered		0	1073
+3_8.jpg	2	19.04.03.2007	Kemingking	1	Arwandi	1	263
+3_8.jpg	2	19.04.03.2007	Kemingking	1	Arwandi	2	237
+3_8.jpg	2	19.04.03.2007	Kemingking	1	Arwandi	3	156
+3_8.jpg	2	19.04.03.2007	Kemingking	1	Arwandi	4	165
+3_8.jpg	2	19.04.03.2007	Kemingking	1	Arwandi	0	821
+3_8.jpg	2	19.04.03.2007	Kemingking	2	Rohim	1	35
+3_8.jpg	2	19.04.03.2007	Kemingking	2	Rohim	2	12
+3_8.jpg	2	19.04.03.2007	Kemingking	2	Rohim	3	3
+3_8.jpg	2	19.04.03.2007	Kemingking	2	Rohim	4	9
+3_8.jpg	2	19.04.03.2007	Kemingking	2	Rohim	0	59
+3_8.jpg	2	19.04.03.2007	Kemingking	3	Supriyono	1	106
+3_8.jpg	2	19.04.03.2007	Kemingking	3	Supriyono	2	106
+3_8.jpg	2	19.04.03.2007	Kemingking	3	Supriyono	3	154
+3_8.jpg	2	19.04.03.2007	Kemingking	3	Supriyono	4	112
+3_8.jpg	2	19.04.03.2007	Kemingking	3	Supriyono	0	478
+3_8.jpg	2	19.04.03.2007	Kemingking	valid		1	404
+3_8.jpg	2	19.04.03.2007	Kemingking	valid		2	355
+3_8.jpg	2	19.04.03.2007	Kemingking	valid		3	313
+3_8.jpg	2	19.04.03.2007	Kemingking	valid		4	286
+3_8.jpg	2	19.04.03.2007	Kemingking	valid		0	1358
+3_8.jpg	2	19.04.03.2007	Kemingking	invalid		1	2
+3_8.jpg	2	19.04.03.2007	Kemingking	invalid		2	2
+3_8.jpg	2	19.04.03.2007	Kemingking	invalid		3	7
+3_8.jpg	2	19.04.03.2007	Kemingking	invalid		4	4
+3_8.jpg	2	19.04.03.2007	Kemingking	invalid		0	15
+3_8.jpg	2	19.04.03.2007	Kemingking	ballots		1	406
+3_8.jpg	2	19.04.03.2007	Kemingking	ballots		2	357
+3_8.jpg	2	19.04.03.2007	Kemingking	ballots		3	320
+3_8.jpg	2	19.04.03.2007	Kemingking	ballots		4	290
+3_8.jpg	2	19.04.03.2007	Kemingking	ballots		0	1373
+3_8.jpg	2	19.04.03.2007	Kemingking	registered		1	430
+3_8.jpg	2	19.04.03.2007	Kemingking	registered		2	380
+3_8.jpg	2	19.04.03.2007	Kemingking	registered		3	366
+3_8.jpg	2	19.04.03.2007	Kemingking	registered		4	335
+3_8.jpg	2	19.04.03.2007	Kemingking	registered		0	1511
+4_2.jpg	0	19.04.05.2008	Bukit Kijang	1	Nazarudin	1	103
+4_2.jpg	0	19.04.05.2008	Bukit Kijang	1	Nazarudin	2	149
+4_2.jpg	0	19.04.05.2008	Bukit Kijang	1	Nazarudin	3	117
+4_2.jpg	0	19.04.05.2008	Bukit Kijang	1	Nazarudin	0	369
+4_2.jpg	0	19.04.05.2008	Bukit Kijang	2	Idryansyah	1	62
+4_2.jpg	0	19.04.05.2008	Bukit Kijang	2	Idryansyah	2	44
+4_2.jpg	0	19.04.05.2008	Bukit Kijang	2	Idryansyah	3	32
+4_2.jpg	0	19.04.05.2008	Bukit Kijang	2	Idryansyah	0	138
+4_2.jpg	0	19.04.05.2008	Bukit Kijang	3	Wawan	1	29
+4_2.jpg	0	19.04.05.2008	Bukit Kijang	3	Wawan	2	12
+4_2.jpg	0	19.04.05.2008	Bukit Kijang	3	Wawan	3	37
+4_2.jpg	0	19.04.05.2008	Bukit Kijang	3	Wawan	0	78
+4_2.jpg	0	19.04.05.2008	Bukit Kijang	4	Hendra	1	67
+4_2.jpg	0	19.04.05.2008	Bukit Kijang	4	Hendra	2	17
+4_2.jpg	0	19.04.05.2008	Bukit Kijang	4	Hendra	3	55
+4_2.jpg	0	19.04.05.2008	Bukit Kijang	4	Hendra	0	139
+4_2.jpg	0	19.04.05.2008	Bukit Kijang	valid		1	261
+4_2.jpg	0	19.04.05.2008	Bukit Kijang	valid		2	222
+4_2.jpg	0	19.04.05.2008	Bukit Kijang	valid		3	241
+4_2.jpg	0	19.04.05.2008	Bukit Kijang	valid		0	724
+4_2.jpg	0	19.04.05.2008	Bukit Kijang	invalid		0	15
+4_2.jpg	0	19.04.05.2008	Bukit Kijang	ballots		0	739
+4_2.jpg	0	19.04.05.2008	Bukit Kijang	registered		1	291
+4_2.jpg	0	19.04.05.2008	Bukit Kijang	registered		2	244
+4_2.jpg	0	19.04.05.2008	Bukit Kijang	registered		3	291
+4_2.jpg	0	19.04.05.2008	Bukit Kijang	registered		0	826
+4_2.jpg	1	19.04.05.2006	Baskara Bakti	1	Saut Ritonga	1	60
+4_2.jpg	1	19.04.05.2006	Baskara Bakti	1	Saut Ritonga	2	60
+4_2.jpg	1	19.04.05.2006	Baskara Bakti	1	Saut Ritonga	3	37
+4_2.jpg	1	19.04.05.2006	Baskara Bakti	1	Saut Ritonga	0	157
+4_2.jpg	1	19.04.05.2006	Baskara Bakti	2	Budi Wibowo	1	120
+4_2.jpg	1	19.04.05.2006	Baskara Bakti	2	Budi Wibowo	2	69
+4_2.jpg	1	19.04.05.2006	Baskara Bakti	2	Budi Wibowo	3	4
+4_2.jpg	1	19.04.05.2006	Baskara Bakti	2	Budi Wibowo	0	193
+4_2.jpg	1	19.04.05.2006	Baskara Bakti	3	Bahtiar Effendi	1	71
+4_2.jpg	1	19.04.05.2006	Baskara Bakti	3	Bahtiar Effendi	2	86
+4_2.jpg	1	19.04.05.2006	Baskara Bakti	3	Bahtiar Effendi	3	374
+4_2.jpg	1	19.04.05.2006	Baskara Bakti	3	Bahtiar Effendi	0	531
+4_2.jpg	1	19.04.05.2006	Baskara Bakti	4	Sawaludin	1	88
+4_2.jpg	1	19.04.05.2006	Baskara Bakti	4	Sawaludin	2	62
+4_2.jpg	1	19.04.05.2006	Baskara Bakti	4	Sawaludin	3	40
+4_2.jpg	1	19.04.05.2006	Baskara Bakti	4	Sawaludin	0	190
+4_2.jpg	1	19.04.05.2006	Baskara Bakti	5	Abidin Samoele	1	99
+4_2.jpg	1	19.04.05.2006	Baskara Bakti	5	Abidin Samoele	2	172
+4_2.jpg	1	19.04.05.2006	Baskara Bakti	5	Abidin Samoele	3	16
+4_2.jpg	1	19.04.05.2006	Baskara Bakti	5	Abidin Samoele	0	287
+4_2.jpg	1	19.04.05.2006	Baskara Bakti	valid		1	438
+4_2.jpg	1	19.04.05.2006	Baskara Bakti	valid		2	449
+4_2.jpg	1	19.04.05.2006	Baskara Bakti	valid		3	471
+4_2.jpg	1	19.04.05.2006	Baskara Bakti	valid		0	1358
+4_2.jpg	1	19.04.05.2006	Baskara Bakti	invalid		1	13
+4_2.jpg	1	19.04.05.2006	Baskara Bakti	invalid		2	4
+4_2.jpg	1	19.04.05.2006	Baskara Bakti	invalid		3	6
+4_2.jpg	1	19.04.05.2006	Baskara Bakti	invalid		0	23
+4_2.jpg	1	19.04.05.2006	Baskara Bakti	ballots		1	451
+4_2.jpg	1	19.04.05.2006	Baskara Bakti	ballots		2	453
+4_2.jpg	1	19.04.05.2006	Baskara Bakti	ballots		3	477
+4_2.jpg	1	19.04.05.2006	Baskara Bakti	ballots		0	1381
+4_2.jpg	1	19.04.05.2006	Baskara Bakti	registered		1	560
+4_2.jpg	1	19.04.05.2006	Baskara Bakti	registered		2	560
+4_2.jpg	1	19.04.05.2006	Baskara Bakti	registered		3	563
+4_2.jpg	1	19.04.05.2006	Baskara Bakti	registered		0	1683
+4_2.jpg	2	19.04.05.2001	Namang	1	Zaiwan	1	223
+4_2.jpg	2	19.04.05.2001	Namang	1	Zaiwan	2	173
+4_2.jpg	2	19.04.05.2001	Namang	1	Zaiwan	3	194
+4_2.jpg	2	19.04.05.2001	Namang	1	Zaiwan	4	176
+4_2.jpg	2	19.04.05.2001	Namang	1	Zaiwan	0	766
+4_2.jpg	2	19.04.05.2001	Namang	2	Pirwan	1	9
+4_2.jpg	2	19.04.05.2001	Namang	2	Pirwan	2	23
+4_2.jpg	2	19.04.05.2001	Namang	2	Pirwan	3	29
+4_2.jpg	2	19.04.05.2001	Namang	2	Pirwan	4	9
+4_2.jpg	2	19.04.05.2001	Namang	2	Pirwan	0	70
+4_2.jpg	2	19.04.05.2001	Namang	3	Juanda	1	15
+4_2.jpg	2	19.04.05.2001	Namang	3	Juanda	2	43
+4_2.jpg	2	19.04.05.2001	Namang	3	Juanda	3	18
+4_2.jpg	2	19.04.05.2001	Namang	3	Juanda	4	15
+4_2.jpg	2	19.04.05.2001	Namang	3	Juanda	0	91
+4_2.jpg	2	19.04.05.2001	Namang	4	Wahid	1	125
+4_2.jpg	2	19.04.05.2001	Namang	4	Wahid	2	160
+4_2.jpg	2	19.04.05.2001	Namang	4	Wahid	3	149
+4_2.jpg	2	19.04.05.2001	Namang	4	Wahid	4	183
+4_2.jpg	2	19.04.05.2001	Namang	4	Wahid	0	617
+4_2.jpg	2	19.04.05.2001	Namang	valid		1	372
+4_2.jpg	2	19.04.05.2001	Namang	valid		2	399
+4_2.jpg	2	19.04.05.2001	Namang	valid		3	390
+4_2.jpg	2	19.04.05.2001	Namang	valid		4	383
+4_2.jpg	2	19.04.05.2001	Namang	valid		0	1544
+4_2.jpg	2	19.04.05.2001	Namang	invalid		1	22
+4_2.jpg	2	19.04.05.2001	Namang	invalid		2	16
+4_2.jpg	2	19.04.05.2001	Namang	invalid		3	21
+4_2.jpg	2	19.04.05.2001	Namang	invalid		4	21
+4_2.jpg	2	19.04.05.2001	Namang	invalid		0	80
+5_3.jpg	0	19.04.05.2005	Belilik	1	Sudarwan	1	342
+5_3.jpg	0	19.04.05.2005	Belilik	1	Sudarwan	2	298
+5_3.jpg	0	19.04.05.2005	Belilik	1	Sudarwan	3	326
+5_3.jpg	0	19.04.05.2005	Belilik	1	Sudarwan	4	294
+5_3.jpg	0	19.04.05.2005	Belilik	1	Sudarwan	0	1260
+5_3.jpg	0	19.04.05.2005	Belilik	2	Muldari	1	27
+5_3.jpg	0	19.04.05.2005	Belilik	2	Muldari	2	54
+5_3.jpg	0	19.04.05.2005	Belilik	2	Muldari	3	29
+5_3.jpg	0	19.04.05.2005	Belilik	2	Muldari	4	19
+5_3.jpg	0	19.04.05.2005	Belilik	2	Muldari	0	129
+5_3.jpg	0	19.04.05.2005	Belilik	valid		1	369
+5_3.jpg	0	19.04.05.2005	Belilik	valid		2	352
+5_3.jpg	0	19.04.05.2005	Belilik	valid		3	355
+5_3.jpg	0	19.04.05.2005	Belilik	valid		4	313
+5_3.jpg	0	19.04.05.2005	Belilik	valid		0	1389
+5_3.jpg	0	19.04.05.2005	Belilik	invalid		1	8
+5_3.jpg	0	19.04.05.2005	Belilik	invalid		2	5
+5_3.jpg	0	19.04.05.2005	Belilik	invalid		3	4
+5_3.jpg	0	19.04.05.2005	Belilik	invalid		4	6
+5_3.jpg	0	19.04.05.2005	Belilik	invalid		0	23
+5_3.jpg	0	19.04.05.2005	Belilik	ballots		1	377
+5_3.jpg	0	19.04.05.2005	Belilik	ballots		2	357
+5_3.jpg	0	19.04.05.2005	Belilik	ballots		3	359
+5_3.jpg	0	19.04.05.2005	Belilik	ballots		4	319
+5_3.jpg	0	19.04.05.2005	Belilik	ballots		0	1412
+5_3.jpg	0	19.04.05.2005	Belilik	registered		1	452
+5_3.jpg	0	19.04.05.2005	Belilik	registered		2	424
+5_3.jpg	0	19.04.05.2005	Belilik	registered		3	422
+5_3.jpg	0	19.04.05.2005	Belilik	registered		4	416
+5_3.jpg	0	19.04.05.2005	Belilik	registered		0	1714
+5_3.jpg	1	19.04.02.2018	Batu Belubang	1	Juadi	1	35
+5_3.jpg	1	19.04.02.2018	Batu Belubang	1	Juadi	2	57
+5_3.jpg	1	19.04.02.2018	Batu Belubang	1	Juadi	3	101
+5_3.jpg	1	19.04.02.2018	Batu Belubang	1	Juadi	4	64
+5_3.jpg	1	19.04.02.2018	Batu Belubang	1	Juadi	5	111
+5_3.jpg	1	19.04.02.2018	Batu Belubang	1	Juadi	6	99
+5_3.jpg	1	19.04.02.2018	Batu Belubang	1	Juadi	0	467
+5_3.jpg	1	19.04.02.2018	Batu Belubang	2	Samsiar	1	2
+5_3.jpg	1	19.04.02.2018	Batu Belubang	2	Samsiar	2	7
+5_3.jpg	1	19.04.02.2018	Batu Belubang	2	Samsiar	3	9
+5_3.jpg	1	19.04.02.2018	Batu Belubang	2	Samsiar	4	7
+5_3.jpg	1	19.04.02.2018	Batu Belubang	2	Samsiar	5	2
+5_3.jpg	1	19.04.02.2018	Batu Belubang	2	Samsiar	6	3
+5_3.jpg	1	19.04.02.2018	Batu Belubang	2	Samsiar	0	30
+5_3.jpg	1	19.04.02.2018	Batu Belubang	3	Dasih Tri Wulandari	1	13
+5_3.jpg	1	19.04.02.2018	Batu Belubang	3	Dasih Tri Wulandari	2	103
+5_3.jpg	1	19.04.02.2018	Batu Belubang	3	Dasih Tri Wulandari	3	63
+5_3.jpg	1	19.04.02.2018	Batu Belubang	3	Dasih Tri Wulandari	4	34
+5_3.jpg	1	19.04.02.2018	Batu Belubang	3	Dasih Tri Wulandari	5	8
+5_3.jpg	1	19.04.02.2018	Batu Belubang	3	Dasih Tri Wulandari	6	4
+5_3.jpg	1	19.04.02.2018	Batu Belubang	3	Dasih Tri Wulandari	0	225
+5_3.jpg	1	19.04.02.2018	Batu Belubang	4	Ahirman B	1	220
+5_3.jpg	1	19.04.02.2018	Batu Belubang	4	Ahirman B	2	56
+5_3.jpg	1	19.04.02.2018	Batu Belubang	4	Ahirman B	3	154
+5_3.jpg	1	19.04.02.2018	Batu Belubang	4	Ahirman B	4	109
+5_3.jpg	1	19.04.02.2018	Batu Belubang	4	Ahirman B	5	173
+5_3.jpg	1	19.04.02.2018	Batu Belubang	4	Ahirman B	6	158
+5_3.jpg	1	19.04.02.2018	Batu Belubang	4	Ahirman B	0	870
+5_3.jpg	1	19.04.02.2018	Batu Belubang	5	Sarjono	1	64
+5_3.jpg	1	19.04.02.2018	Batu Belubang	5	Sarjono	2	64
+5_3.jpg	1	19.04.02.2018	Batu Belubang	5	Sarjono	3	46
+5_3.jpg	1	19.04.02.2018	Batu Belubang	5	Sarjono	4	20
+5_3.jpg	1	19.04.02.2018	Batu Belubang	5	Sarjono	5	43
+5_3.jpg	1	19.04.02.2018	Batu Belubang	5	Sarjono	6	45
+5_3.jpg	1	19.04.02.2018	Batu Belubang	5	Sarjono	0	282
+5_3.jpg	1	19.04.02.2018	Batu Belubang	valid		1	334
+5_3.jpg	1	19.04.02.2018	Batu Belubang	valid		2	287
+5_3.jpg	1	19.04.02.2018	Batu Belubang	valid		3	373
+5_3.jpg	1	19.04.02.2018	Batu Belubang	valid		4	234
+5_3.jpg	1	19.04.02.2018	Batu Belubang	valid		5	337
+5_3.jpg	1	19.04.02.2018	Batu Belubang	valid		6	309
+5_3.jpg	1	19.04.02.2018	Batu Belubang	valid		0	1874
+5_3.jpg	1	19.04.02.2018	Batu Belubang	invalid		1	2
+5_3.jpg	1	19.04.02.2018	Batu Belubang	invalid		2	5
+5_3.jpg	1	19.04.02.2018	Batu Belubang	invalid		3	7
+5_3.jpg	1	19.04.02.2018	Batu Belubang	invalid		4	4
+5_3.jpg	1	19.04.02.2018	Batu Belubang	invalid		5	0
+5_3.jpg	1	19.04.02.2018	Batu Belubang	invalid		6	3
+5_3.jpg	1	19.04.02.2018	Batu Belubang	invalid		0	21
+5_3.jpg	1	19.04.02.2018	Batu Belubang	ballots		1	336
+5_3.jpg	1	19.04.02.2018	Batu Belubang	ballots		2	292
+5_3.jpg	1	19.04.02.2018	Batu Belubang	ballots		3	380
+5_3.jpg	1	19.04.02.2018	Batu Belubang	ballots		4	238
+5_3.jpg	1	19.04.02.2018	Batu Belubang	ballots		5	337
+5_3.jpg	1	19.04.02.2018	Batu Belubang	ballots		6	312
+5_3.jpg	1	19.04.02.2018	Batu Belubang	ballots		0	1895
+5_3.jpg	1	19.04.02.2018	Batu Belubang	registered		1	456
+5_3.jpg	1	19.04.02.2018	Batu Belubang	registered		2	441
+5_3.jpg	1	19.04.02.2018	Batu Belubang	registered		3	495
+5_3.jpg	1	19.04.02.2018	Batu Belubang	registered		4	382
+5_3.jpg	1	19.04.02.2018	Batu Belubang	registered		5	438
+5_3.jpg	1	19.04.02.2018	Batu Belubang	registered		6	466
+5_3.jpg	1	19.04.02.2018	Batu Belubang	registered		0	2678
+5_3.jpg	2	19.04.02.2010	Benteng	1	Boei Nyoen	1	146
+5_3.jpg	2	19.04.02.2010	Benteng	1	Boei Nyoen	2	59
+5_3.jpg	2	19.04.02.2010	Benteng	1	Boei Nyoen	3	182
+5_3.jpg	2	19.04.02.2010	Benteng	1	Boei Nyoen	4	97
+5_3.jpg	2	19.04.02.2010	Benteng	1	Boei Nyoen	5	90
+5_3.jpg	2	19.04.02.2010	Benteng	1	Boei Nyoen	0	574
+5_3.jpg	2	19.04.02.2010	Benteng	2	Jani	1	65
+5_3.jpg	2	19.04.02.2010	Benteng	2	Jani	2	103
+5_3.jpg	2	19.04.02.2010	Benteng	2	Jani	3	62
+5_3.jpg	2	19.04.02.2010	Benteng	2	Jani	4	146
+5_3.jpg	2	19.04.02.2010	Benteng	2	Jani	5	141
+5_3.jpg	2	19.04.02.2010	Benteng	2	Jani	0	517
+5_3.jpg	2	19.04.02.2010	Benteng	3	Usmanto	1	80
+5_3.jpg	2	19.04.02.2010	Benteng	3	Usmanto	2	55
+5_3.jpg	2	19.04.02.2010	Benteng	3	Usmanto	3	55
+5_3.jpg	2	19.04.02.2010	Benteng	3	Usmanto	4	84
+5_3.jpg	2	19.04.02.2010	Benteng	3	Usmanto	5	78
+5_3.jpg	2	19.04.02.2010	Benteng	3	Usmanto	0	352
+5_3.jpg	2	19.04.02.2010	Benteng	valid		1	291
+5_3.jpg	2	19.04.02.2010	Benteng	valid		2	217
+5_3.jpg	2	19.04.02.2010	Benteng	valid		3	299
+5_3.jpg	2	19.04.02.2010	Benteng	valid		4	327
+5_3.jpg	2	19.04.02.2010	Benteng	valid		5	309
+5_3.jpg	2	19.04.02.2010	Benteng	valid		0	1443
+5_3.jpg	2	19.04.02.2010	Benteng	invalid		1	4
+5_3.jpg	2	19.04.02.2010	Benteng	invalid		2	12
+5_3.jpg	2	19.04.02.2010	Benteng	invalid		3	1
+5_3.jpg	2	19.04.02.2010	Benteng	invalid		4	2
+5_3.jpg	2	19.04.02.2010	Benteng	invalid		5	3
+5_3.jpg	2	19.04.02.2010	Benteng	invalid		0	22
+5_3.jpg	2	19.04.02.2010	Benteng	ballots		1	295
+5_3.jpg	2	19.04.02.2010	Benteng	ballots		2	229
+5_3.jpg	2	19.04.02.2010	Benteng	ballots		3	300
+5_3.jpg	2	19.04.02.2010	Benteng	ballots		4	329
+5_3.jpg	2	19.04.02.2010	Benteng	ballots		5	312
+5_3.jpg	2	19.04.02.2010	Benteng	ballots		0	1465
+5_3.jpg	2	19.04.02.2010	Benteng	registered		1	414
+5_3.jpg	2	19.04.02.2010	Benteng	registered		2	305
+5_3.jpg	2	19.04.02.2010	Benteng	registered		3	396
+5_3.jpg	2	19.04.02.2010	Benteng	registered		4	443
+5_3.jpg	2	19.04.02.2010	Benteng	registered		5	416
+5_3.jpg	2	19.04.02.2010	Benteng	registered		0	1974
+6_0.jpg	0	19.04.02.2013	Jeruk	1	Aini	1	117
+6_0.jpg	0	19.04.02.2013	Jeruk	1	Aini	2	119
+6_0.jpg	0	19.04.02.2013	Jeruk	1	Aini	3	77
+6_0.jpg	0	19.04.02.2013	Jeruk	1	Aini	4	116
+6_0.jpg	0	19.04.02.2013	Jeruk	1	Aini	0	429
+6_0.jpg	0	19.04.02.2013	Jeruk	2	Jhon Hendri, S.E., M.M	1	146
+6_0.jpg	0	19.04.02.2013	Jeruk	2	Jhon Hendri, S.E., M.M	2	83
+6_0.jpg	0	19.04.02.2013	Jeruk	2	Jhon Hendri, S.E., M.M	3	108
+6_0.jpg	0	19.04.02.2013	Jeruk	2	Jhon Hendri, S.E., M.M	4	168
+6_0.jpg	0	19.04.02.2013	Jeruk	2	Jhon Hendri, S.E., M.M	0	505
+6_0.jpg	0	19.04.02.2013	Jeruk	3	Darmawan	1	90
+6_0.jpg	0	19.04.02.2013	Jeruk	3	Darmawan	2	108
+6_0.jpg	0	19.04.02.2013	Jeruk	3	Darmawan	3	95
+6_0.jpg	0	19.04.02.2013	Jeruk	3	Darmawan	4	44
+6_0.jpg	0	19.04.02.2013	Jeruk	3	Darmawan	0	337
+6_0.jpg	0	19.04.02.2013	Jeruk	valid		1	353
+6_0.jpg	0	19.04.02.2013	Jeruk	valid		2	310
+6_0.jpg	0	19.04.02.2013	Jeruk	valid		3	280
+6_0.jpg	0	19.04.02.2013	Jeruk	valid		4	328
+6_0.jpg	0	19.04.02.2013	Jeruk	valid		0	1271
+6_0.jpg	0	19.04.02.2013	Jeruk	invalid		1	3
+6_0.jpg	0	19.04.02.2013	Jeruk	invalid		2	5
+6_0.jpg	0	19.04.02.2013	Jeruk	invalid		3	1
+6_0.jpg	0	19.04.02.2013	Jeruk	invalid		4	15
+6_0.jpg	0	19.04.02.2013	Jeruk	invalid		0	24
+6_0.jpg	0	19.04.02.2013	Jeruk	ballots		1	356
+6_0.jpg	0	19.04.02.2013	Jeruk	ballots		2	315
+6_0.jpg	0	19.04.02.2013	Jeruk	ballots		3	281
+6_0.jpg	0	19.04.02.2013	Jeruk	ballots		4	343
+6_0.jpg	0	19.04.02.2013	Jeruk	ballots		0	1295
+6_0.jpg	0	19.04.02.2013	Jeruk	registered		1	500
+6_0.jpg	0	19.04.02.2013	Jeruk	registered		2	491
+6_0.jpg	0	19.04.02.2013	Jeruk	registered		3	438
+6_0.jpg	0	19.04.02.2013	Jeruk	registered		4	461
+6_0.jpg	0	19.04.02.2013	Jeruk	registered		0	1890
+6_0.jpg	1	19.04.02.2004	Air Mesu	1	Heri Sutiono	1	30
+6_0.jpg	1	19.04.02.2004	Air Mesu	1	Heri Sutiono	2	56
+6_0.jpg	1	19.04.02.2004	Air Mesu	1	Heri Sutiono	3	24
+6_0.jpg	1	19.04.02.2004	Air Mesu	1	Heri Sutiono	4	38
+6_0.jpg	1	19.04.02.2004	Air Mesu	1	Heri Sutiono	5	36
+6_0.jpg	1	19.04.02.2004	Air Mesu	1	Heri Sutiono	0	184
+6_0.jpg	1	19.04.02.2004	Air Mesu	2	Pajri	1	88
+6_0.jpg	1	19.04.02.2004	Air Mesu	2	Pajri	2	116
+6_0.jpg	1	19.04.02.2004	Air Mesu	2	Pajri	3	151
+6_0.jpg	1	19.04.02.2004	Air Mesu	2	Pajri	4	158
+6_0.jpg	1	19.04.02.2004	Air Mesu	2	Pajri	5	149
+6_0.jpg	1	19.04.02.2004	Air Mesu	2	Pajri	0	662
+6_0.jpg	1	19.04.02.2004	Air Mesu	3	Angga Wijaya	1	128
+6_0.jpg	1	19.04.02.2004	Air Mesu	3	Angga Wijaya	2	88
+6_0.jpg	1	19.04.02.2004	Air Mesu	3	Angga Wijaya	3	104
+6_0.jpg	1	19.04.02.2004	Air Mesu	3	Angga Wijaya	4	79
+6_0.jpg	1	19.04.02.2004	Air Mesu	3	Angga Wijaya	5	51
+6_0.jpg	1	19.04.02.2004	Air Mesu	3	Angga Wijaya	0	450
+6_0.jpg	1	19.04.02.2004	Air Mesu	4	Firnado	1	16
+6_0.jpg	1	19.04.02.2004	Air Mesu	4	Firnado	2	17
+6_0.jpg	1	19.04.02.2004	Air Mesu	4	Firnado	3	8
+6_0.jpg	1	19.04.02.2004	Air Mesu	4	Firnado	4	31
+6_0.jpg	1	19.04.02.2004	Air Mesu	4	Firnado	5	41
+6_0.jpg	1	19.04.02.2004	Air Mesu	4	Firnado	0	113
+6_0.jpg	1	19.04.02.2004	Air Mesu	5	Sukardi	1	104
+6_0.jpg	1	19.04.02.2004	Air Mesu	5	Sukardi	2	72
+6_0.jpg	1	19.04.02.2004	Air Mesu	5	Sukardi	3	64
+6_0.jpg	1	19.04.02.2004	Air Mesu	5	Sukardi	4	97
+6_0.jpg	1	19.04.02.2004	Air Mesu	5	Sukardi	5	122
+6_0.jpg	1	19.04.02.2004	Air Mesu	5	Sukardi	0	459
+6_0.jpg	1	19.04.02.2004	Air Mesu	valid		1	366
+6_0.jpg	1	19.04.02.2004	Air Mesu	valid		2	349
+6_0.jpg	1	19.04.02.2004	Air Mesu	valid		3	351
+6_0.jpg	1	19.04.02.2004	Air Mesu	valid		4	403
+6_0.jpg	1	19.04.02.2004	Air Mesu	valid		5	399
+6_0.jpg	1	19.04.02.2004	Air Mesu	valid		0	1868
+6_0.jpg	1	19.04.02.2004	Air Mesu	invalid		1	6
+6_0.jpg	1	19.04.02.2004	Air Mesu	invalid		2	8
+6_0.jpg	1	19.04.02.2004	Air Mesu	invalid		3	9
+6_0.jpg	1	19.04.02.2004	Air Mesu	invalid		4	4
+6_0.jpg	1	19.04.02.2004	Air Mesu	invalid		5	4
+6_0.jpg	1	19.04.02.2004	Air Mesu	invalid		0	31
+6_0.jpg	1	19.04.02.2004	Air Mesu	ballots		1	372
+6_0.jpg	1	19.04.02.2004	Air Mesu	ballots		2	357
+6_0.jpg	1	19.04.02.2004	Air Mesu	ballots		3	360
+6_0.jpg	1	19.04.02.2004	Air Mesu	ballots		4	407
+6_0.jpg	1	19.04.02.2004	Air Mesu	ballots		5	403
+6_0.jpg	1	19.04.02.2004	Air Mesu	ballots		0	1899
+6_0.jpg	1	19.04.02.2004	Air Mesu	registered		1	437
+6_0.jpg	1	19.04.02.2004	Air Mesu	registered		2	420
+6_0.jpg	1	19.04.02.2004	Air Mesu	registered		3	420
+6_0.jpg	1	19.04.02.2004	Air Mesu	registered		4	466
+6_0.jpg	1	19.04.02.2004	Air Mesu	registered		5	488
+6_0.jpg	1	19.04.02.2004	Air Mesu	registered		0	2231
+6_0.jpg	2	19.04.02.2012	Padang Baru	1	Rustam	1	89
+6_0.jpg	2	19.04.02.2012	Padang Baru	1	Rustam	2	106
+6_0.jpg	2	19.04.02.2012	Padang Baru	1	Rustam	3	65
+6_0.jpg	2	19.04.02.2012	Padang Baru	1	Rustam	4	31
+6_0.jpg	2	19.04.02.2012	Padang Baru	1	Rustam	0	291
+6_0.jpg	2	19.04.02.2012	Padang Baru	2	Amnah, S.Pd	1	86
+6_0.jpg	2	19.04.02.2012	Padang Baru	2	Amnah, S.Pd	2	175
+6_0.jpg	2	19.04.02.2012	Padang Baru	2	Amnah, S.Pd	3	113
+6_0.jpg	2	19.04.02.2012	Padang Baru	2	Amnah, S.Pd	4	106
+6_0.jpg	2	19.04.02.2012	Padang Baru	2	Amnah, S.Pd	0	480
+6_0.jpg	2	19.04.02.2012	Padang Baru	3	Hendri Madinah	1	128
+6_0.jpg	2	19.04.02.2012	Padang Baru	3	Hendri Madinah	2	47
+6_0.jpg	2	19.04.02.2012	Padang Baru	3	Hendri Madinah	3	14
+6_0.jpg	2	19.04.02.2012	Padang Baru	3	Hendri Madinah	4	2
+6_0.jpg	2	19.04.02.2012	Padang Baru	3	Hendri Madinah	0	191
+6_0.jpg	2	19.04.02.2012	Padang Baru	4	Kai-Kai	1	12
+6_0.jpg	2	19.04.02.2012	Padang Baru	4	Kai-Kai	2	3
+6_0.jpg	2	19.04.02.2012	Padang Baru	4	Kai-Kai	3	62
+6_0.jpg	2	19.04.02.2012	Padang Baru	4	Kai-Kai	4	193
+6_0.jpg	2	19.04.02.2012	Padang Baru	4	Kai-Kai	0	270
+6_0.jpg	2	19.04.02.2012	Padang Baru	5	Mulyadi, SE	1	40
+6_0.jpg	2	19.04.02.2012	Padang Baru	5	Mulyadi, SE	2	23
+6_0.jpg	2	19.04.02.2012	Padang Baru	5	Mulyadi, SE	3	11
+6_0.jpg	2	19.04.02.2012	Padang Baru	5	Mulyadi, SE	4	0
+6_0.jpg	2	19.04.02.2012	Padang Baru	5	Mulyadi, SE	0	74
+6_0.jpg	2	19.04.02.2012	Padang Baru	valid		1	355
+6_0.jpg	2	19.04.02.2012	Padang Baru	valid		2	354
+6_0.jpg	2	19.04.02.2012	Padang Baru	valid		3	265
+6_0.jpg	2	19.04.02.2012	Padang Baru	valid		4	332
+6_0.jpg	2	19.04.02.2012	Padang Baru	valid		0	1306
+6_0.jpg	2	19.04.02.2012	Padang Baru	invalid		1	4
+6_0.jpg	2	19.04.02.2012	Padang Baru	invalid		2	7
+6_0.jpg	2	19.04.02.2012	Padang Baru	invalid		3	10
+6_0.jpg	2	19.04.02.2012	Padang Baru	invalid		4	6
+6_0.jpg	2	19.04.02.2012	Padang Baru	invalid		0	27
+6_0.jpg	2	19.04.02.2012	Padang Baru	ballots		1	359
+6_0.jpg	2	19.04.02.2012	Padang Baru	ballots		2	361
+6_0.jpg	2	19.04.02.2012	Padang Baru	ballots		3	275
+6_0.jpg	2	19.04.02.2012	Padang Baru	ballots		4	338
+6_0.jpg	2	19.04.02.2012	Padang Baru	ballots		0	1333
+6_0.jpg	2	19.04.02.2012	Padang Baru	registered		1	473
+6_0.jpg	2	19.04.02.2012	Padang Baru	registered		2	436
+6_0.jpg	2	19.04.02.2012	Padang Baru	registered		3	434
+6_0.jpg	2	19.04.02.2012	Padang Baru	registered		4	502
+6_0.jpg	2	19.04.02.2012	Padang Baru	registered		0	1845
+7.jpg	1	19.04.01.2008	Terentang III	1	Sudirman, S.IP	1	91
+7.jpg	1	19.04.01.2008	Terentang III	1	Sudirman, S.IP	2	156
+7.jpg	1	19.04.01.2008	Terentang III	1	Sudirman, S.IP	3	117
+7.jpg	1	19.04.01.2008	Terentang III	1	Sudirman, S.IP	0	364
+7.jpg	1	19.04.01.2008	Terentang III	2	Romadoni	1	6
+7.jpg	1	19.04.01.2008	Terentang III	2	Romadoni	2	20
+7.jpg	1	19.04.01.2008	Terentang III	2	Romadoni	3	14
+7.jpg	1	19.04.01.2008	Terentang III	2	Romadoni	0	40
+7.jpg	1	19.04.01.2008	Terentang III	3	Supendi	1	104
+7.jpg	1	19.04.01.2008	Terentang III	3	Supendi	2	59
+7.jpg	1	19.04.01.2008	Terentang III	3	Supendi	3	179
+7.jpg	1	19.04.01.2008	Terentang III	3	Supendi	0	342
+7.jpg	1	19.04.01.2008	Terentang III	4	Basrin Sugiharto	1	48
+7.jpg	1	19.04.01.2008	Terentang III	4	Basrin Sugiharto	2	28
+7.jpg	1	19.04.01.2008	Terentang III	4	Basrin Sugiharto	3	53
+7.jpg	1	19.04.01.2008	Terentang III	4	Basrin Sugiharto	0	129
+7.jpg	1	19.04.01.2008	Terentang III	5	Heri	1	11
+7.jpg	1	19.04.01.2008	Terentang III	5	Heri	2	27
+7.jpg	1	19.04.01.2008	Terentang III	5	Heri	3	39
+7.jpg	1	19.04.01.2008	Terentang III	5	Heri	0	77
+7.jpg	1	19.04.01.2008	Terentang III	valid		1	260
+7.jpg	1	19.04.01.2008	Terentang III	valid		2	290
+7.jpg	1	19.04.01.2008	Terentang III	valid		3	402
+7.jpg	1	19.04.01.2008	Terentang III	valid		0	952
+7.jpg	1	19.04.01.2008	Terentang III	invalid		1	4
+7.jpg	1	19.04.01.2008	Terentang III	invalid		2	5
+7.jpg	1	19.04.01.2008	Terentang III	invalid		3	7
+7.jpg	1	19.04.01.2008	Terentang III	invalid		0	16
+7.jpg	1	19.04.01.2008	Terentang III	ballots		1	264
+7.jpg	1	19.04.01.2008	Terentang III	ballots		2	295
+7.jpg	1	19.04.01.2008	Terentang III	ballots		3	409
+7.jpg	1	19.04.01.2008	Terentang III	ballots		0	968
+7.jpg	1	19.04.01.2008	Terentang III	registered		1	309
+7.jpg	1	19.04.01.2008	Terentang III	registered		2	326
+7.jpg	1	19.04.01.2008	Terentang III	registered		3	447
+7.jpg	1	19.04.01.2008	Terentang III	registered		0	1082
+7.jpg	2	19.04.01.2003	Nibung	1	Roni Fahrizal	1	132
+7.jpg	2	19.04.01.2003	Nibung	1	Roni Fahrizal	2	160
+7.jpg	2	19.04.01.2003	Nibung	1	Roni Fahrizal	3	204
+7.jpg	2	19.04.01.2003	Nibung	1	Roni Fahrizal	4	203
+7.jpg	2	19.04.01.2003	Nibung	1	Roni Fahrizal	5	198
+7.jpg	2	19.04.01.2003	Nibung	1	Roni Fahrizal	6	163
+7.jpg	2	19.04.01.2003	Nibung	1	Roni Fahrizal	7	208
+7.jpg	2	19.04.01.2003	Nibung	1	Roni Fahrizal	8	178
+7.jpg	2	19.04.01.2003	Nibung	1	Roni Fahrizal	0	1446
+7.jpg	2	19.04.01.2003	Nibung	2	Suharli	1	13
+7.jpg	2	19.04.01.2003	Nibung	2	Suharli	2	13
+7.jpg	2	19.04.01.2003	Nibung	2	Suharli	3	9
+7.jpg	2	19.04.01.2003	Nibung	2	Suharli	4	13
+7.jpg	2	19.04.01.2003	Nibung	2	Suharli	5	16
+7.jpg	2	19.04.01.2003	Nibung	2	Suharli	6	10
+7.jpg	2	19.04.01.2003	Nibung	2	Suharli	7	5
+7.jpg	2	19.04.01.2003	Nibung	2	Suharli	8	0
+7.jpg	2	19.04.01.2003	Nibung	2	Suharli	0	79
+7.jpg	2	19.04.01.2003	Nibung	3	Suwandi Fendoyo	1	79
+7.jpg	2	19.04.01.2003	Nibung	3	Suwandi Fendoyo	2	57
+7.jpg	2	19.04.01.2003	Nibung	3	Suwandi Fendoyo	3	74
+7.jpg	2	19.04.01.2003	Nibung	3	Suwandi Fendoyo	4	113
+7.jpg	2	19.04.01.2003	Nibung	3	Suwandi Fendoyo	5	118
+7.jpg	2	19.04.01.2003	Nibung	3	Suwandi Fendoyo	6	165
+7.jpg	2	19.04.01.2003	Nibung	3	Suwandi Fendoyo	7	115
+7.jpg	2	19.04.01.2003	Nibung	3	Suwandi Fendoyo	8	29
+7.jpg	2	19.04.01.2003	Nibung	3	Suwandi Fendoyo	0	750
+7.jpg	2	19.04.01.2003	Nibung	4	Astiar	1	61
+7.jpg	2	19.04.01.2003	Nibung	4	Astiar	2	184
+7.jpg	2	19.04.01.2003	Nibung	4	Astiar	3	158
+7.jpg	2	19.04.01.2003	Nibung	4	Astiar	4	90
+7.jpg	2	19.04.01.2003	Nibung	4	Astiar	5	47
+7.jpg	2	19.04.01.2003	Nibung	4	Astiar	6	71
+7.jpg	2	19.04.01.2003	Nibung	4	Astiar	7	66
+7.jpg	2	19.04.01.2003	Nibung	4	Astiar	8	2
+7.jpg	2	19.04.01.2003	Nibung	4	Astiar	0	679
+7.jpg	2	19.04.01.2003	Nibung	valid		1	285
+7.jpg	2	19.04.01.2003	Nibung	valid		2	414
+7.jpg	2	19.04.01.2003	Nibung	valid		3	445
+7.jpg	2	19.04.01.2003	Nibung	valid		4	419
+7.jpg	2	19.04.01.2003	Nibung	valid		5	379
+7.jpg	2	19.04.01.2003	Nibung	valid		6	409
+7.jpg	2	19.04.01.2003	Nibung	valid		7	394
+7.jpg	2	19.04.01.2003	Nibung	valid		8	209
+7.jpg	2	19.04.01.2003	Nibung	valid		0	2954
+7.jpg	2	19.04.01.2003	Nibung	invalid		1	6
+7.jpg	2	19.04.01.2003	Nibung	invalid		2	4
+7.jpg	2	19.04.01.2003	Nibung	invalid		3	5
+7.jpg	2	19.04.01.2003	Nibung	invalid		4	4
+7.jpg	2	19.04.01.2003	Nibung	invalid		5	5
+7.jpg	2	19.04.01.2003	Nibung	invalid		6	1
+7.jpg	2	19.04.01.2003	Nibung	invalid		7	4
+7.jpg	2	19.04.01.2003	Nibung	invalid		8	1
+7.jpg	2	19.04.01.2003	Nibung	invalid		0	30
+7.jpg	2	19.04.01.2003	Nibung	ballots		1	291
+7.jpg	2	19.04.01.2003	Nibung	ballots		2	418
+7.jpg	2	19.04.01.2003	Nibung	ballots		3	450
+7.jpg	2	19.04.01.2003	Nibung	ballots		4	423
+7.jpg	2	19.04.01.2003	Nibung	ballots		5	384
+7.jpg	2	19.04.01.2003	Nibung	ballots		6	410
+7.jpg	2	19.04.01.2003	Nibung	ballots		7	398
+7.jpg	2	19.04.01.2003	Nibung	ballots		8	210
+7.jpg	2	19.04.01.2003	Nibung	ballots		0	2984
+7.jpg	2	19.04.01.2003	Nibung	registered		1	506
+7.jpg	2	19.04.01.2003	Nibung	registered		2	528
+7.jpg	2	19.04.01.2003	Nibung	registered		3	528
+7.jpg	2	19.04.01.2003	Nibung	registered		4	498
+7.jpg	2	19.04.01.2003	Nibung	registered		5	511
+7.jpg	2	19.04.01.2003	Nibung	registered		6	491
+7.jpg	2	19.04.01.2003	Nibung	registered		7	490
+7.jpg	2	19.04.01.2003	Nibung	registered		8	268
+7.jpg	2	19.04.01.2003	Nibung	registered		0	3820
+8_1.jpg	0	19.04.04.2008	Pasir Garam	1	Matrozik	1	70
+8_1.jpg	0	19.04.04.2008	Pasir Garam	1	Matrozik	2	72
+8_1.jpg	0	19.04.04.2008	Pasir Garam	1	Matrozik	3	48
+8_1.jpg	0	19.04.04.2008	Pasir Garam	1	Matrozik	4	54
+8_1.jpg	0	19.04.04.2008	Pasir Garam	1	Matrozik	5	73
+8_1.jpg	0	19.04.04.2008	Pasir Garam	1	Matrozik	0	317
+8_1.jpg	0	19.04.04.2008	Pasir Garam	2	Kurnia, S	1	47
+8_1.jpg	0	19.04.04.2008	Pasir Garam	2	Kurnia, S	2	66
+8_1.jpg	0	19.04.04.2008	Pasir Garam	2	Kurnia, S	3	32
+8_1.jpg	0	19.04.04.2008	Pasir Garam	2	Kurnia, S	4	9
+8_1.jpg	0	19.04.04.2008	Pasir Garam	2	Kurnia, S	5	18
+8_1.jpg	0	19.04.04.2008	Pasir Garam	2	Kurnia, S	0	172
+8_1.jpg	0	19.04.04.2008	Pasir Garam	3	Suharto, S.Pd	1	55
+8_1.jpg	0	19.04.04.2008	Pasir Garam	3	Suharto, S.Pd	2	54
+8_1.jpg	0	19.04.04.2008	Pasir Garam	3	Suharto, S.Pd	3	22
+8_1.jpg	0	19.04.04.2008	Pasir Garam	3	Suharto, S.Pd	4	6
+8_1.jpg	0	19.04.04.2008	Pasir Garam	3	Suharto, S.Pd	5	14
+8_1.jpg	0	19.04.04.2008	Pasir Garam	3	Suharto, S.Pd	0	151
+8_1.jpg	0	19.04.04.2008	Pasir Garam	4	Munzilin	1	95
+8_1.jpg	0	19.04.04.2008	Pasir Garam	4	Munzilin	2	133
+8_1.jpg	0	19.04.04.2008	Pasir Garam	4	Munzilin	3	95
+8_1.jpg	0	19.04.04.2008	Pasir Garam	4	Munzilin	4	90
+8_1.jpg	0	19.04.04.2008	Pasir Garam	4	Munzilin	5	135
+8_1.jpg	0	19.04.04.2008	Pasir Garam	4	Munzilin	0	548
+8_1.jpg	0	19.04.04.2008	Pasir Garam	5	Elpa Iswan	1	0
+8_1.jpg	0	19.04.04.2008	Pasir Garam	5	Elpa Iswan	2	2
+8_1.jpg	0	19.04.04.2008	Pasir Garam	5	Elpa Iswan	3	9
+8_1.jpg	0	19.04.04.2008	Pasir Garam	5	Elpa Iswan	4	39
+8_1.jpg	0	19.04.04.2008	Pasir Garam	5	Elpa Iswan	5	37
+8_1.jpg	0	19.04.04.2008	Pasir Garam	5	Elpa Iswan	0	87
+8_1.jpg	0	19.04.04.2008	Pasir Garam	valid		1	267
+8_1.jpg	0	19.04.04.2008	Pasir Garam	valid		2	327
+8_1.jpg	0	19.04.04.2008	Pasir Garam	valid		3	206
+8_1.jpg	0	19.04.04.2008	Pasir Garam	valid		4	198
+8_1.jpg	0	19.04.04.2008	Pasir Garam	valid		5	277
+8_1.jpg	0	19.04.04.2008	Pasir Garam	valid		0	1275
+8_1.jpg	0	19.04.04.2008	Pasir Garam	invalid		1	15
+8_1.jpg	0	19.04.04.2008	Pasir Garam	invalid		2	15
+8_1.jpg	0	19.04.04.2008	Pasir Garam	invalid		3	6
+8_1.jpg	0	19.04.04.2008	Pasir Garam	invalid		4	6
+8_1.jpg	0	19.04.04.2008	Pasir Garam	invalid		5	10
+8_1.jpg	0	19.04.04.2008	Pasir Garam	invalid		0	52
+8_1.jpg	0	19.04.04.2008	Pasir Garam	ballots		1	282
+8_1.jpg	0	19.04.04.2008	Pasir Garam	ballots		2	342
+8_1.jpg	0	19.04.04.2008	Pasir Garam	ballots		3	212
+8_1.jpg	0	19.04.04.2008	Pasir Garam	ballots		4	204
+8_1.jpg	0	19.04.04.2008	Pasir Garam	ballots		5	287
+8_1.jpg	0	19.04.04.2008	Pasir Garam	ballots		0	1327
+8_1.jpg	0	19.04.04.2008	Pasir Garam	registered		1	375
+8_1.jpg	0	19.04.04.2008	Pasir Garam	registered		2	485
+8_1.jpg	0	19.04.04.2008	Pasir Garam	registered		3	321
+8_1.jpg	0	19.04.04.2008	Pasir Garam	registered		4	277
+8_1.jpg	0	19.04.04.2008	Pasir Garam	registered		5	337
+8_1.jpg	0	19.04.04.2008	Pasir Garam	registered		0	1795
+8_1.jpg	1	19.04.04.2006	Teru	1	Suharli	1	54
+8_1.jpg	1	19.04.04.2006	Teru	1	Suharli	2	62
+8_1.jpg	1	19.04.04.2006	Teru	1	Suharli	3	118
+8_1.jpg	1	19.04.04.2006	Teru	1	Suharli	4	78
+8_1.jpg	1	19.04.04.2006	Teru	1	Suharli	5	110
+8_1.jpg	1	19.04.04.2006	Teru	1	Suharli	6	100
+8_1.jpg	1	19.04.04.2006	Teru	1	Suharli	0	522
+8_1.jpg	1	19.04.04.2006	Teru	2	Abdurrani	1	2
+8_1.jpg	1	19.04.04.2006	Teru	2	Abdurrani	2	1
+8_1.jpg	1	19.04.04.2006	Teru	2	Abdurrani	3	4
+8_1.jpg	1	19.04.04.2006	Teru	2	Abdurrani	4	8
+8_1.jpg	1	19.04.04.2006	Teru	2	Abdurrani	5	9
+8_1.jpg	1	19.04.04.2006	Teru	2	Abdurrani	6	1
+8_1.jpg	1	19.04.04.2006	Teru	2	Abdurrani	0	25
+8_1.jpg	1	19.04.04.2006	Teru	3	Solihin	1	75
+8_1.jpg	1	19.04.04.2006	Teru	3	Solihin	2	160
+8_1.jpg	1	19.04.04.2006	Teru	3	Solihin	3	100
+8_1.jpg	1	19.04.04.2006	Teru	3	Solihin	4	86
+8_1.jpg	1	19.04.04.2006	Teru	3	Solihin	5	71
+8_1.jpg	1	19.04.04.2006	Teru	3	Solihin	6	59
+8_1.jpg	1	19.04.04.2006	Teru	3	Solihin	0	551
+8_1.jpg	1	19.04.04.2006	Teru	4	Markowi Munandar	1	103
+8_1.jpg	1	19.04.04.2006	Teru	4	Markowi Munandar	2	54
+8_1.jpg	1	19.04.04.2006	Teru	4	Markowi Munandar	3	93
+8_1.jpg	1	19.04.04.2006	Teru	4	Markowi Munandar	4	65
+8_1.jpg	1	19.04.04.2006	Teru	4	Markowi Munandar	5	36
+8_1.jpg	1	19.04.04.2006	Teru	4	Markowi Munandar	6	46
+8_1.jpg	1	19.04.04.2006	Teru	4	Markowi Munandar	0	397
+8_1.jpg	1	19.04.04.2006	Teru	valid		1	234
+8_1.jpg	1	19.04.04.2006	Teru	valid		2	277
+8_1.jpg	1	19.04.04.2006	Teru	valid		3	315
+8_1.jpg	1	19.04.04.2006	Teru	valid		4	237
+8_1.jpg	1	19.04.04.2006	Teru	valid		5	226
+8_1.jpg	1	19.04.04.2006	Teru	valid		6	206
+8_1.jpg	1	19.04.04.2006	Teru	valid		0	1495
+8_1.jpg	1	19.04.04.2006	Teru	invalid		1	12
+8_1.jpg	1	19.04.04.2006	Teru	invalid		2	11
+8_1.jpg	1	19.04.04.2006	Teru	invalid		3	6
+8_1.jpg	1	19.04.04.2006	Teru	invalid		4	5
+8_1.jpg	1	19.04.04.2006	Teru	invalid		5	7
+8_1.jpg	1	19.04.04.2006	Teru	invalid		6	5
+8_1.jpg	1	19.04.04.2006	Teru	invalid		0	46
+8_1.jpg	1	19.04.04.2006	Teru	ballots		1	246
+8_1.jpg	1	19.04.04.2006	Teru	ballots		2	288
+8_1.jpg	1	19.04.04.2006	Teru	ballots		3	321
+8_1.jpg	1	19.04.04.2006	Teru	ballots		4	242
+8_1.jpg	1	19.04.04.2006	Teru	ballots		5	233
+8_1.jpg	1	19.04.04.2006	Teru	ballots		6	211
+8_1.jpg	1	19.04.04.2006	Teru	ballots		0	1541
+8_1.jpg	1	19.04.04.2006	Teru	registered		1	308
+8_1.jpg	1	19.04.04.2006	Teru	registered		2	366
+8_1.jpg	1	19.04.04.2006	Teru	registered		3	412
+8_1.jpg	1	19.04.04.2006	Teru	registered		4	294
+8_1.jpg	1	19.04.04.2006	Teru	registered		5	352
+8_1.jpg	1	19.04.04.2006	Teru	registered		6	281
+8_1.jpg	1	19.04.04.2006	Teru	registered		0	2013
+8_1.jpg	2	19.04.04.2001	Simpang Katis	1	Budi	1	38
+8_1.jpg	2	19.04.04.2001	Simpang Katis	1	Budi	2	38
+8_1.jpg	2	19.04.04.2001	Simpang Katis	1	Budi	3	33
+8_1.jpg	2	19.04.04.2001	Simpang Katis	1	Budi	4	66
+8_1.jpg	2	19.04.04.2001	Simpang Katis	1	Budi	5	32
+8_1.jpg	2	19.04.04.2001	Simpang Katis	1	Budi	0	207
+8_1.jpg	2	19.04.04.2001	Simpang Katis	2	Hendra Gunawan	1	195
+8_1.jpg	2	19.04.04.2001	Simpang Katis	2	Hendra Gunawan	2	216
+8_1.jpg	2	19.04.04.2001	Simpang Katis	2	Hendra Gunawan	3	174
+8_1.jpg	2	19.04.04.2001	Simpang Katis	2	Hendra Gunawan	4	116
+8_1.jpg	2	19.04.04.2001	Simpang Katis	2	Hendra Gunawan	5	127
+8_1.jpg	2	19.04.04.2001	Simpang Katis	2	Hendra Gunawan	0	828
+8_1.jpg	2	19.04.04.2001	Simpang Katis	3	Syainur	1	104
+8_1.jpg	2	19.04.04.2001	Simpang Katis	3	Syainur	2	46
+8_1.jpg	2	19.04.04.2001	Simpang Katis	3	Syainur	3	58
+8_1.jpg	2	19.04.04.2001	Simpang Katis	3	Syainur	4	133
+8_1.jpg	2	19.04.04.2001	Simpang Katis	3	Syainur	5	199
+8_1.jpg	2	19.04.04.2001	Simpang Katis	3	Syainur	0	540
+8_1.jpg	2	19.04.04.2001	Simpang Katis	valid		1	337
+8_1.jpg	2	19.04.04.2001	Simpang Katis	valid		2	300
+8_1.jpg	2	19.04.04.2001	Simpang Katis	valid		3	265
+8_1.jpg	2	19.04.04.2001	Simpang Katis	valid		4	315
+8_1.jpg	2	19.04.04.2001	Simpang Katis	valid		5	358
+8_1.jpg	2	19.04.04.2001	Simpang Katis	valid		0	1575
+8_1.jpg	2	19.04.04.2001	Simpang Katis	invalid		1	2
+8_1.jpg	2	19.04.04.2001	Simpang Katis	invalid		2	2
+8_1.jpg	2	19.04.04.2001	Simpang Katis	invalid		3	2
+8_1.jpg	2	19.04.04.2001	Simpang Katis	invalid		4	10
+8_1.jpg	2	19.04.04.2001	Simpang Katis	invalid		5	8
+8_1.jpg	2	19.04.04.2001	Simpang Katis	invalid		0	24
+8_1.jpg	2	19.04.04.2001	Simpang Katis	ballots		1	339
+8_1.jpg	2	19.04.04.2001	Simpang Katis	ballots		2	302
+8_1.jpg	2	19.04.04.2001	Simpang Katis	ballots		3	267
+8_1.jpg	2	19.04.04.2001	Simpang Katis	ballots		4	325
+8_1.jpg	2	19.04.04.2001	Simpang Katis	ballots		5	366
+8_1.jpg	2	19.04.04.2001	Simpang Katis	ballots		0	1599
+8_1.jpg	2	19.04.04.2001	Simpang Katis	registered		1	425
+8_1.jpg	2	19.04.04.2001	Simpang Katis	registered		2	378
+8_1.jpg	2	19.04.04.2001	Simpang Katis	registered		3	360
+8_1.jpg	2	19.04.04.2001	Simpang Katis	registered		4	415
+8_1.jpg	2	19.04.04.2001	Simpang Katis	registered		5	450
+8_1.jpg	2	19.04.04.2001	Simpang Katis	registered		0	2028
+9_0.jpg	0	19.04.04.2009	Katis	1	Rachman, SE	1	9
+9_0.jpg	0	19.04.04.2009	Katis	1	Rachman, SE	2	14
+9_0.jpg	0	19.04.04.2009	Katis	1	Rachman, SE	0	23
+9_0.jpg	0	19.04.04.2009	Katis	2	Ishak	1	187
+9_0.jpg	0	19.04.04.2009	Katis	2	Ishak	2	207
+9_0.jpg	0	19.04.04.2009	Katis	2	Ishak	0	394
+9_0.jpg	0	19.04.04.2009	Katis	3	Suharyadi	1	30
+9_0.jpg	0	19.04.04.2009	Katis	3	Suharyadi	2	126
+9_0.jpg	0	19.04.04.2009	Katis	3	Suharyadi	0	156
+9_0.jpg	0	19.04.04.2009	Katis	4	Suratman	1	167
+9_0.jpg	0	19.04.04.2009	Katis	4	Suratman	2	97
+9_0.jpg	0	19.04.04.2009	Katis	4	Suratman	0	264
+9_0.jpg	0	19.04.04.2009	Katis	5	Sudarno	1	36
+9_0.jpg	0	19.04.04.2009	Katis	5	Sudarno	2	20
+9_0.jpg	0	19.04.04.2009	Katis	5	Sudarno	0	56
+9_0.jpg	0	19.04.04.2009	Katis	valid		1	429
+9_0.jpg	0	19.04.04.2009	Katis	valid		2	464
+9_0.jpg	0	19.04.04.2009	Katis	valid		0	893
+9_0.jpg	0	19.04.04.2009	Katis	invalid		1	10
+9_0.jpg	0	19.04.04.2009	Katis	invalid		2	15
+9_0.jpg	0	19.04.04.2009	Katis	invalid		0	25
+9_0.jpg	0	19.04.04.2009	Katis	ballots		1	439
+9_0.jpg	0	19.04.04.2009	Katis	ballots		2	479
+9_0.jpg	0	19.04.04.2009	Katis	ballots		0	918
+9_0.jpg	0	19.04.04.2009	Katis	registered		1	473
+9_0.jpg	0	19.04.04.2009	Katis	registered		2	525
+9_0.jpg	0	19.04.04.2009	Katis	registered		0	998
+9_0.jpg	1	19.04.04.2010	Pinang Sebatang	1	Ahmad Nakar	1	247
+9_0.jpg	1	19.04.04.2010	Pinang Sebatang	1	Ahmad Nakar	2	211
+9_0.jpg	1	19.04.04.2010	Pinang Sebatang	1	Ahmad Nakar	0	458
+9_0.jpg	1	19.04.04.2010	Pinang Sebatang	2	Azwar	1	75
+9_0.jpg	1	19.04.04.2010	Pinang Sebatang	2	Azwar	2	65
+9_0.jpg	1	19.04.04.2010	Pinang Sebatang	2	Azwar	0	140
+9_0.jpg	1	19.04.04.2010	Pinang Sebatang	3	Suparman	1	147
+9_0.jpg	1	19.04.04.2010	Pinang Sebatang	3	Suparman	2	165
+9_0.jpg	1	19.04.04.2010	Pinang Sebatang	3	Suparman	0	312
+9_0.jpg	1	19.04.04.2010	Pinang Sebatang	valid		1	469
+9_0.jpg	1	19.04.04.2010	Pinang Sebatang	valid		2	441
+9_0.jpg	1	19.04.04.2010	Pinang Sebatang	valid		0	910
+9_0.jpg	1	19.04.04.2010	Pinang Sebatang	invalid		1	13
+9_0.jpg	1	19.04.04.2010	Pinang Sebatang	invalid		2	6
+9_0.jpg	1	19.04.04.2010	Pinang Sebatang	invalid		0	19
+9_0.jpg	1	19.04.04.2010	Pinang Sebatang	ballots		1	482
+9_0.jpg	1	19.04.04.2010	Pinang Sebatang	ballots		2	447
+9_0.jpg	1	19.04.04.2010	Pinang Sebatang	ballots		0	929
+9_0.jpg	1	19.04.04.2010	Pinang Sebatang	registered		1	525
+9_0.jpg	1	19.04.04.2010	Pinang Sebatang	registered		2	484
+9_0.jpg	1	19.04.04.2010	Pinang Sebatang	registered		0	1009
+9_0.jpg	2	19.04.06.2005	Lubuk Lingkuk	1	Lamana Ridianto	1	170
+9_0.jpg	2	19.04.06.2005	Lubuk Lingkuk	1	Lamana Ridianto	2	241
+9_0.jpg	2	19.04.06.2005	Lubuk Lingkuk	1	Lamana Ridianto	3	167
+9_0.jpg	2	19.04.06.2005	Lubuk Lingkuk	1	Lamana Ridianto	4	20
+9_0.jpg	2	19.04.06.2005	Lubuk Lingkuk	1	Lamana Ridianto	0	598
+9_0.jpg	2	19.04.06.2005	Lubuk Lingkuk	2	Mustopa Kamal Al Ayubi Lubis, SE, MM	1	126
+9_0.jpg	2	19.04.06.2005	Lubuk Lingkuk	2	Mustopa Kamal Al Ayubi Lubis, SE, MM	2	75
+9_0.jpg	2	19.04.06.2005	Lubuk Lingkuk	2	Mustopa Kamal Al Ayubi Lubis, SE, MM	3	97
+9_0.jpg	2	19.04.06.2005	Lubuk Lingkuk	2	Mustopa Kamal Al Ayubi Lubis, SE, MM	4	60
+9_0.jpg	2	19.04.06.2005	Lubuk Lingkuk	2	Mustopa Kamal Al Ayubi Lubis, SE, MM	0	358
+9_0.jpg	2	19.04.06.2005	Lubuk Lingkuk	3	Maruzik	1	25
+9_0.jpg	2	19.04.06.2005	Lubuk Lingkuk	3	Maruzik	2	37
+9_0.jpg	2	19.04.06.2005	Lubuk Lingkuk	3	Maruzik	3	25
+9_0.jpg	2	19.04.06.2005	Lubuk Lingkuk	3	Maruzik	4	2
+9_0.jpg	2	19.04.06.2005	Lubuk Lingkuk	3	Maruzik	0	89
+9_0.jpg	2	19.04.06.2005	Lubuk Lingkuk	4	Khozi	1	55
+9_0.jpg	2	19.04.06.2005	Lubuk Lingkuk	4	Khozi	2	33
+9_0.jpg	2	19.04.06.2005	Lubuk Lingkuk	4	Khozi	3	84
+9_0.jpg	2	19.04.06.2005	Lubuk Lingkuk	4	Khozi	4	97
+9_0.jpg	2	19.04.06.2005	Lubuk Lingkuk	4	Khozi	0	269
+9_0.jpg	2	19.04.06.2005	Lubuk Lingkuk	valid		1	376
+9_0.jpg	2	19.04.06.2005	Lubuk Lingkuk	valid		2	386
+9_0.jpg	2	19.04.06.2005	Lubuk Lingkuk	valid		3	373
+9_0.jpg	2	19.04.06.2005	Lubuk Lingkuk	valid		4	179
+9_0.jpg	2	19.04.06.2005	Lubuk Lingkuk	valid		0	1314
+9_0.jpg	2	19.04.06.2005	Lubuk Lingkuk	invalid		1	2
+9_0.jpg	2	19.04.06.2005	Lubuk Lingkuk	invalid		2	4
+9_0.jpg	2	19.04.06.2005	Lubuk Lingkuk	invalid		3	4
+9_0.jpg	2	19.04.06.2005	Lubuk Lingkuk	invalid		4	5
+9_0.jpg	2	19.04.06.2005	Lubuk Lingkuk	invalid		0	15
+9_0.jpg	2	19.04.06.2005	Lubuk Lingkuk	ballots		1	378
+9_0.jpg	2	19.04.06.2005	Lubuk Lingkuk	ballots		2	390
+9_0.jpg	2	19.04.06.2005	Lubuk Lingkuk	ballots		3	377
+9_0.jpg	2	19.04.06.2005	Lubuk Lingkuk	ballots		4	184
+9_0.jpg	2	19.04.06.2005	Lubuk Lingkuk	ballots		0	1329
+9_0.jpg	2	19.04.06.2005	Lubuk Lingkuk	registered		1	466
+9_0.jpg	2	19.04.06.2005	Lubuk Lingkuk	registered		2	499
+9_0.jpg	2	19.04.06.2005	Lubuk Lingkuk	registered		3	501
+9_0.jpg	2	19.04.06.2005	Lubuk Lingkuk	registered		4	240
+9_0.jpg	2	19.04.06.2005	Lubuk Lingkuk	registered		0	1706
+10_0.jpg	1	19.04.06.2001	Perlang	1	Aris Misnandar	1	47
+10_0.jpg	1	19.04.06.2001	Perlang	1	Aris Misnandar	2	48
+10_0.jpg	1	19.04.06.2001	Perlang	1	Aris Misnandar	3	64
+10_0.jpg	1	19.04.06.2001	Perlang	1	Aris Misnandar	4	66
+10_0.jpg	1	19.04.06.2001	Perlang	1	Aris Misnandar	5	118
+10_0.jpg	1	19.04.06.2001	Perlang	1	Aris Misnandar	6	44
+10_0.jpg	1	19.04.06.2001	Perlang	1	Aris Misnandar	7	39
+10_0.jpg	1	19.04.06.2001	Perlang	1	Aris Misnandar	8	16
+10_0.jpg	1	19.04.06.2001	Perlang	1	Aris Misnandar	9	13
+10_0.jpg	1	19.04.06.2001	Perlang	1	Aris Misnandar	10	77
+10_0.jpg	1	19.04.06.2001	Perlang	1	Aris Misnandar	11	41
+10_0.jpg	1	19.04.06.2001	Perlang	1	Aris Misnandar	0	573
+10_0.jpg	1	19.04.06.2001	Perlang	2	Yani Basaroni	1	243
+10_0.jpg	1	19.04.06.2001	Perlang	2	Yani Basaroni	2	205
+10_0.jpg	1	19.04.06.2001	Perlang	2	Yani Basaroni	3	187
+10_0.jpg	1	19.04.06.2001	Perlang	2	Yani Basaroni	4	115
+10_0.jpg	1	19.04.06.2001	Perlang	2	Yani Basaroni	5	118
+10_0.jpg	1	19.04.06.2001	Perlang	2	Yani Basaroni	6	73
+10_0.jpg	1	19.04.06.2001	Perlang	2	Yani Basaroni	7	134
+10_0.jpg	1	19.04.06.2001	Perlang	2	Yani Basaroni	8	184
+10_0.jpg	1	19.04.06.2001	Perlang	2	Yani Basaroni	9	165
+10_0.jpg	1	19.04.06.2001	Perlang	2	Yani Basaroni	10	100
+10_0.jpg	1	19.04.06.2001	Perlang	2	Yani Basaroni	11	167
+10_0.jpg	1	19.04.06.2001	Perlang	2	Yani Basaroni	0	1691
+10_0.jpg	1	19.04.06.2001	Perlang	3	Maulana Fajri	1	27
+10_0.jpg	1	19.04.06.2001	Perlang	3	Maulana Fajri	2	41
+10_0.jpg	1	19.04.06.2001	Perlang	3	Maulana Fajri	3	38
+10_0.jpg	1	19.04.06.2001	Perlang	3	Maulana Fajri	4	84
+10_0.jpg	1	19.04.06.2001	Perlang	3	Maulana Fajri	5	83
+10_0.jpg	1	19.04.06.2001	Perlang	3	Maulana Fajri	6	118
+10_0.jpg	1	19.04.06.2001	Perlang	3	Maulana Fajri	7	46
+10_0.jpg	1	19.04.06.2001	Perlang	3	Maulana Fajri	8	33
+10_0.jpg	1	19.04.06.2001	Perlang	3	Maulana Fajri	9	21
+10_0.jpg	1	19.04.06.2001	Perlang	3	Maulana Fajri	10	30
+10_0.jpg	1	19.04.06.2001	Perlang	3	Maulana Fajri	11	23
+10_0.jpg	1	19.04.06.2001	Perlang	3	Maulana Fajri	0	544
+10_0.jpg	1	19.04.06.2001	Perlang	4	Ardani	1	53
+10_0.jpg	1	19.04.06.2001	Perlang	4	Ardani	2	55
+10_0.jpg	1	19.04.06.2001	Perlang	4	Ardani	3	30
+10_0.jpg	1	19.04.06.2001	Perlang	4	Ardani	4	42
+10_0.jpg	1	19.04.06.2001	Perlang	4	Ardani	5	36
+10_0.jpg	1	19.04.06.2001	Perlang	4	Ardani	6	71
+10_0.jpg	1	19.04.06.2001	Perlang	4	Ardani	7	99
+10_0.jpg	1	19.04.06.2001	Perlang	4	Ardani	8	18
+10_0.jpg	1	19.04.06.2001	Perlang	4	Ardani	9	20
+10_0.jpg	1	19.04.06.2001	Perlang	4	Ardani	10	3
+10_0.jpg	1	19.04.06.2001	Perlang	4	Ardani	11	16
+10_0.jpg	1	19.04.06.2001	Perlang	4	Ardani	0	443
+10_0.jpg	1	19.04.06.2001	Perlang	5	Marjoni	1	12
+10_0.jpg	1	19.04.06.2001	Perlang	5	Marjoni	2	20
+10_0.jpg	1	19.04.06.2001	Perlang	5	Marjoni	3	36
+10_0.jpg	1	19.04.06.2001	Perlang	5	Marjoni	4	17
+10_0.jpg	1	19.04.06.2001	Perlang	5	Marjoni	5	25
+10_0.jpg	1	19.04.06.2001	Perlang	5	Marjoni	6	39
+10_0.jpg	1	19.04.06.2001	Perlang	5	Marjoni	7	31
+10_0.jpg	1	19.04.06.2001	Perlang	5	Marjoni	8	21
+10_0.jpg	1	19.04.06.2001	Perlang	5	Marjoni	9	21
+10_0.jpg	1	19.04.06.2001	Perlang	5	Marjoni	10	25
+10_0.jpg	1	19.04.06.2001	Perlang	5	Marjoni	11	33
+10_0.jpg	1	19.04.06.2001	Perlang	5	Marjoni	0	280
+10_0.jpg	1	19.04.06.2001	Perlang	valid		1	382
+10_0.jpg	1	19.04.06.2001	Perlang	valid		2	369
+10_0.jpg	1	19.04.06.2001	Perlang	valid		3	355
+10_0.jpg	1	19.04.06.2001	Perlang	valid		4	324
+10_0.jpg	1	19.04.06.2001	Perlang	valid		5	380
+10_0.jpg	1	19.04.06.2001	Perlang	valid		6	345
+10_0.jpg	1	19.04.06.2001	Perlang	valid		7	349
+10_0.jpg	1	19.04.06.2001	Perlang	valid		8	272
+10_0.jpg	1	19.04.06.2001	Perlang	valid		9	240
+10_0.jpg	1	19.04.06.2001	Perlang	valid		10	235
+10_0.jpg	1	19.04.06.2001	Perlang	valid		11	280
+10_0.jpg	1	19.04.06.2001	Perlang	valid		0	3531
+10_0.jpg	1	19.04.06.2001	Perlang	invalid		1	11
+10_0.jpg	1	19.04.06.2001	Perlang	invalid		2	2
+10_0.jpg	1	19.04.06.2001	Perlang	invalid		3	2
+10_0.jpg	1	19.04.06.2001	Perlang	invalid		4	4
+10_0.jpg	1	19.04.06.2001	Perlang	invalid		5	2
+10_0.jpg	1	19.04.06.2001	Perlang	invalid		6	6
+10_0.jpg	1	19.04.06.2001	Perlang	invalid		7	4
+10_0.jpg	1	19.04.06.2001	Perlang	invalid		8	4
+10_0.jpg	1	19.04.06.2001	Perlang	invalid		9	3
+10_0.jpg	1	19.04.06.2001	Perlang	invalid		10	1
+10_0.jpg	1	19.04.06.2001	Perlang	invalid		11	1
+10_0.jpg	1	19.04.06.2001	Perlang	invalid		0	40
+10_0.jpg	1	19.04.06.2001	Perlang	ballots		1	393
+10_0.jpg	1	19.04.06.2001	Perlang	ballots		2	371
+10_0.jpg	1	19.04.06.2001	Perlang	ballots		3	357
+10_0.jpg	1	19.04.06.2001	Perlang	ballots		4	328
+10_0.jpg	1	19.04.06.2001	Perlang	ballots		5	382
+10_0.jpg	1	19.04.06.2001	Perlang	ballots		6	351
+10_0.jpg	1	19.04.06.2001	Perlang	ballots		7	353
+10_0.jpg	1	19.04.06.2001	Perlang	ballots		8	276
+10_0.jpg	1	19.04.06.2001	Perlang	ballots		9	243
+10_0.jpg	1	19.04.06.2001	Perlang	ballots		10	236
+10_0.jpg	1	19.04.06.2001	Perlang	ballots		11	281
+10_0.jpg	1	19.04.06.2001	Perlang	ballots		0	3571
+10_0.jpg	1	19.04.06.2001	Perlang	registered		1	514
+10_0.jpg	1	19.04.06.2001	Perlang	registered		2	509
+10_0.jpg	1	19.04.06.2001	Perlang	registered		3	508
+10_0.jpg	1	19.04.06.2001	Perlang	registered		4	458
+10_0.jpg	1	19.04.06.2001	Perlang	registered		5	481
+10_0.jpg	1	19.04.06.2001	Perlang	registered		6	447
+10_0.jpg	1	19.04.06.2001	Perlang	registered		7	469
+10_0.jpg	1	19.04.06.2001	Perlang	registered		8	397
+10_0.jpg	1	19.04.06.2001	Perlang	registered		9	352
+10_0.jpg	1	19.04.06.2001	Perlang	registered		10	365
+10_0.jpg	1	19.04.06.2001	Perlang	registered		11	390
+10_0.jpg	1	19.04.06.2001	Perlang	registered		0	4890
+10_0.jpg	2	19.04.06.2007	Trubus	1	Edy Gunawan	1	91
+10_0.jpg	2	19.04.06.2007	Trubus	1	Edy Gunawan	2	71
+10_0.jpg	2	19.04.06.2007	Trubus	1	Edy Gunawan	3	82
+10_0.jpg	2	19.04.06.2007	Trubus	1	Edy Gunawan	0	244
+10_0.jpg	2	19.04.06.2007	Trubus	2	Ngiat Hiung	1	140
+10_0.jpg	2	19.04.06.2007	Trubus	2	Ngiat Hiung	2	165
+10_0.jpg	2	19.04.06.2007	Trubus	2	Ngiat Hiung	3	167
+10_0.jpg	2	19.04.06.2007	Trubus	2	Ngiat Hiung	0	472
+10_0.jpg	2	19.04.06.2007	Trubus	3	Tjen Suitjhin	1	82
+10_0.jpg	2	19.04.06.2007	Trubus	3	Tjen Suitjhin	2	44
+10_0.jpg	2	19.04.06.2007	Trubus	3	Tjen Suitjhin	3	86
+10_0.jpg	2	19.04.06.2007	Trubus	3	Tjen Suitjhin	0	212
+10_0.jpg	2	19.04.06.2007	Trubus	valid		1	313
+10_0.jpg	2	19.04.06.2007	Trubus	valid		2	280
+10_0.jpg	2	19.04.06.2007	Trubus	valid		3	335
+10_0.jpg	2	19.04.06.2007	Trubus	valid		0	928
+10_0.jpg	2	19.04.06.2007	Trubus	invalid		1	3
+10_0.jpg	2	19.04.06.2007	Trubus	invalid		2	0
+10_0.jpg	2	19.04.06.2007	Trubus	invalid		3	3
+10_0.jpg	2	19.04.06.2007	Trubus	invalid		0	6
+10_0.jpg	2	19.04.06.2007	Trubus	ballots		1	316
+10_0.jpg	2	19.04.06.2007	Trubus	ballots		2	280
+10_0.jpg	2	19.04.06.2007	Trubus	ballots		3	338
+10_0.jpg	2	19.04.06.2007	Trubus	ballots		0	934
+10_0.jpg	2	19.04.06.2007	Trubus	registered		1	440
+10_0.jpg	2	19.04.06.2007	Trubus	registered		2	362
+10_0.jpg	2	19.04.06.2007	Trubus	registered		3	474
+10_0.jpg	2	19.04.06.2007	Trubus	registered		0	1276
+11.jpg	0	19.04.06.2003	Lubuk Besar	1	Syamsuri	1	104
+11.jpg	0	19.04.06.2003	Lubuk Besar	1	Syamsuri	2	82
+11.jpg	0	19.04.06.2003	Lubuk Besar	1	Syamsuri	3	56
+11.jpg	0	19.04.06.2003	Lubuk Besar	1	Syamsuri	4	140
+11.jpg	0	19.04.06.2003	Lubuk Besar	1	Syamsuri	5	69
+11.jpg	0	19.04.06.2003	Lubuk Besar	1	Syamsuri	6	37
+11.jpg	0	19.04.06.2003	Lubuk Besar	1	Syamsuri	7	74
+11.jpg	0	19.04.06.2003	Lubuk Besar	1	Syamsuri	8	27
+11.jpg	0	19.04.06.2003	Lubuk Besar	1	Syamsuri	9	67
+11.jpg	0	19.04.06.2003	Lubuk Besar	1	Syamsuri	0	656
+11.jpg	0	19.04.06.2003	Lubuk Besar	2	Superi Jahuda, S.E	1	123
+11.jpg	0	19.04.06.2003	Lubuk Besar	2	Superi Jahuda, S.E	2	173
+11.jpg	0	19.04.06.2003	Lubuk Besar	2	Superi Jahuda, S.E	3	177
+11.jpg	0	19.04.06.2003	Lubuk Besar	2	Superi Jahuda, S.E	4	181
+11.jpg	0	19.04.06.2003	Lubuk Besar	2	Superi Jahuda, S.E	5	60
+11.jpg	0	19.04.06.2003	Lubuk Besar	2	Superi Jahuda, S.E	6	19
+11.jpg	0	19.04.06.2003	Lubuk Besar	2	Superi Jahuda, S.E	7	42
+11.jpg	0	19.04.06.2003	Lubuk Besar	2	Superi Jahuda, S.E	8	28
+11.jpg	0	19.04.06.2003	Lubuk Besar	2	Superi Jahuda, S.E	9	64
+11.jpg	0	19.04.06.2003	Lubuk Besar	2	Superi Jahuda, S.E	0	867
+11.jpg	0	19.04.06.2003	Lubuk Besar	3	Juharno, S.T	1	8
+11.jpg	0	19.04.06.2003	Lubuk Besar	3	Juharno, S.T	2	5
+11.jpg	0	19.04.06.2003	Lubuk Besar	3	Juharno, S.T	3	6
+11.jpg	0	19.04.06.2003	Lubuk Besar	3	Juharno, S.T	4	7
+11.jpg	0	19.04.06.2003	Lubuk Besar	3	Juharno, S.T	5	6
+11.jpg	0	19.04.06.2003	Lubuk Besar	3	Juharno, S.T	6	4
+11.jpg	0	19.04.06.2003	Lubuk Besar	3	Juharno, S.T	7	155
+11.jpg	0	19.04.06.2003	Lubuk Besar	3	Juharno, S.T	8	266
+11.jpg	0	19.04.06.2003	Lubuk Besar	3	Juharno, S.T	9	2
+11.jpg	0	19.04.06.2003	Lubuk Besar	3	Juharno, S.T	0	459
+11.jpg	0	19.04.06.2003	Lubuk Besar	4	Suryadi	1	24
+11.jpg	0	19.04.06.2003	Lubuk Besar	4	Suryadi	2	6
+11.jpg	0	19.04.06.2003	Lubuk Besar	4	Suryadi	3	55
+11.jpg	0	19.04.06.2003	Lubuk Besar	4	Suryadi	4	7
+11.jpg	0	19.04.06.2003	Lubuk Besar	4	Suryadi	5	102
+11.jpg	0	19.04.06.2003	Lubuk Besar	4	Suryadi	6	250
+11.jpg	0	19.04.06.2003	Lubuk Besar	4	Suryadi	7	29
+11.jpg	0	19.04.06.2003	Lubuk Besar	4	Suryadi	8	27
+11.jpg	0	19.04.06.2003	Lubuk Besar	4	Suryadi	9	12
+11.jpg	0	19.04.06.2003	Lubuk Besar	4	Suryadi	0	512
+11.jpg	0	19.04.06.2003	Lubuk Besar	5	Mardianto	1	38
+11.jpg	0	19.04.06.2003	Lubuk Besar	5	Mardianto	2	18
+11.jpg	0	19.04.06.2003	Lubuk Besar	5	Mardianto	3	20
+11.jpg	0	19.04.06.2003	Lubuk Besar	5	Mardianto	4	16
+11.jpg	0	19.04.06.2003	Lubuk Besar	5	Mardianto	5	103
+11.jpg	0	19.04.06.2003	Lubuk Besar	5	Mardianto	6	56
+11.jpg	0	19.04.06.2003	Lubuk Besar	5	Mardianto	7	25
+11.jpg	0	19.04.06.2003	Lubuk Besar	5	Mardianto	8	20
+11.jpg	0	19.04.06.2003	Lubuk Besar	5	Mardianto	9	35
+11.jpg	0	19.04.06.2003	Lubuk Besar	5	Mardianto	0	331
+11.jpg	0	19.04.06.2003	Lubuk Besar	valid		1	297
+11.jpg	0	19.04.06.2003	Lubuk Besar	valid		2	284
+11.jpg	0	19.04.06.2003	Lubuk Besar	valid		3	314
+11.jpg	0	19.04.06.2003	Lubuk Besar	valid		4	351
+11.jpg	0	19.04.06.2003	Lubuk Besar	valid		5	340
+11.jpg	0	19.04.06.2003	Lubuk Besar	valid		6	366
+11.jpg	0	19.04.06.2003	Lubuk Besar	valid		7	325
+11.jpg	0	19.04.06.2003	Lubuk Besar	valid		8	368
+11.jpg	0	19.04.06.2003	Lubuk Besar	valid		9	180
+11.jpg	0	19.04.06.2003	Lubuk Besar	valid		0	2825
+11.jpg	0	19.04.06.2003	Lubuk Besar	invalid		1	2
+11.jpg	0	19.04.06.2003	Lubuk Besar	invalid		2	2
+11.jpg	0	19.04.06.2003	Lubuk Besar	invalid		3	5
+11.jpg	0	19.04.06.2003	Lubuk Besar	invalid		4	5
+11.jpg	0	19.04.06.2003	Lubuk Besar	invalid		5	3
+11.jpg	0	19.04.06.2003	Lubuk Besar	invalid		6	5
+11.jpg	0	19.04.06.2003	Lubuk Besar	invalid		7	4
+11.jpg	0	19.04.06.2003	Lubuk Besar	invalid		8	6
+11.jpg	0	19.04.06.2003	Lubuk Besar	invalid		9	2
+11.jpg	0	19.04.06.2003	Lubuk Besar	invalid		0	34
+11.jpg	0	19.04.06.2003	Lubuk Besar	ballots		1	299
+11.jpg	0	19.04.06.2003	Lubuk Besar	ballots		2	286
+11.jpg	0	19.04.06.2003	Lubuk Besar	ballots		3	319
+11.jpg	0	19.04.06.2003	Lubuk Besar	ballots		4	356
+11.jpg	0	19.04.06.2003	Lubuk Besar	ballots		5	343
+11.jpg	0	19.04.06.2003	Lubuk Besar	ballots		6	371
+11.jpg	0	19.04.06.2003	Lubuk Besar	ballots		7	329
+11.jpg	0	19.04.06.2003	Lubuk Besar	ballots		8	374
+11.jpg	0	19.04.06.2003	Lubuk Besar	ballots		9	182
+11.jpg	0	19.04.06.2003	Lubuk Besar	ballots		0	2859
+11.jpg	0	19.04.06.2003	Lubuk Besar	registered		1	499
+11.jpg	0	19.04.06.2003	Lubuk Besar	registered		2	420
+11.jpg	0	19.04.06.2003	Lubuk Besar	registered		3	506
+11.jpg	0	19.04.06.2003	Lubuk Besar	registered		4	499
+11.jpg	0	19.04.06.2003	Lubuk Besar	registered		5	484
+11.jpg	0	19.04.06.2003	Lubuk Besar	registered		6	461
+11.jpg	0	19.04.06.2003	Lubuk Besar	registered		7	513
+11.jpg	0	19.04.06.2003	Lubuk Besar	registered		8	516
+11.jpg	0	19.04.06.2003	Lubuk Besar	registered		9	260
+11.jpg	0	19.04.06.2003	Lubuk Besar	registered		0	4158
+11.jpg	1	19.04.06.2008	Kulur Ilir	1	Muhamad Azmi	1	69
+11.jpg	1	19.04.06.2008	Kulur Ilir	1	Muhamad Azmi	2	30
+11.jpg	1	19.04.06.2008	Kulur Ilir	1	Muhamad Azmi	3	13
+11.jpg	1	19.04.06.2008	Kulur Ilir	1	Muhamad Azmi	0	112
+11.jpg	1	19.04.06.2008	Kulur Ilir	2	Darwin	1	21
+11.jpg	1	19.04.06.2008	Kulur Ilir	2	Darwin	2	51
+11.jpg	1	19.04.06.2008	Kulur Ilir	2	Darwin	3	78
+11.jpg	1	19.04.06.2008	Kulur Ilir	2	Darwin	0	150
+11.jpg	1	19.04.06.2008	Kulur Ilir	3	Abdurrahman	1	72
+11.jpg	1	19.04.06.2008	Kulur Ilir	3	Abdurrahman	2	115
+11.jpg	1	19.04.06.2008	Kulur Ilir	3	Abdurrahman	3	102
+11.jpg	1	19.04.06.2008	Kulur Ilir	3	Abdurrahman	0	289
+11.jpg	1	19.04.06.2008	Kulur Ilir	4	Asbullah	1	203
+11.jpg	1	19.04.06.2008	Kulur Ilir	4	Asbullah	2	170
+11.jpg	1	19.04.06.2008	Kulur Ilir	4	Asbullah	3	239
+11.jpg	1	19.04.06.2008	Kulur Ilir	4	Asbullah	0	612
+11.jpg	1	19.04.06.2008	Kulur Ilir	valid		1	365
+11.jpg	1	19.04.06.2008	Kulur Ilir	valid		2	366
+11.jpg	1	19.04.06.2008	Kulur Ilir	valid		3	432
+11.jpg	1	19.04.06.2008	Kulur Ilir	valid		0	1163
+11.jpg	1	19.04.06.2008	Kulur Ilir	invalid		1	5
+11.jpg	1	19.04.06.2008	Kulur Ilir	invalid		2	6
+11.jpg	1	19.04.06.2008	Kulur Ilir	invalid		3	11
+11.jpg	1	19.04.06.2008	Kulur Ilir	invalid		0	22
+11.jpg	1	19.04.06.2008	Kulur Ilir	ballots		1	370
+11.jpg	1	19.04.06.2008	Kulur Ilir	ballots		2	372
+11.jpg	1	19.04.06.2008	Kulur Ilir	ballots		3	443
+11.jpg	1	19.04.06.2008	Kulur Ilir	ballots		0	1185
+11.jpg	1	19.04.06.2008	Kulur Ilir	registered		1	425
+11.jpg	1	19.04.06.2008	Kulur Ilir	registered		2	421
+11.jpg	1	19.04.06.2008	Kulur Ilir	registered		3	547
+11.jpg	1	19.04.06.2008	Kulur Ilir	registered		0	1393
