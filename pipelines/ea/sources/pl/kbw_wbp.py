@@ -887,9 +887,11 @@ def emit() -> Path:
         minted = [
             {"id": str(unit), "polity_id": str(poland), **row} for unit, row in unit_rows.items() if unit in cs.minted
         ]
-        cs.frame(
-            "reporting_unit", pl.DataFrame(minted, schema_overrides={"parent_id": pl.String, "area_id": pl.String})
-        )
+        if minted:
+            cs.frame(
+                "reporting_unit",
+                pl.DataFrame(minted, schema_overrides={"parent_id": pl.String, "area_id": pl.String}),
+            )
         cs.frame(
             "result_value",
             pl.DataFrame(
