@@ -42,6 +42,13 @@ def sweep_scratch(scratch_root: Path, max_age: float = 86_400) -> None:
 def build(prefix: str | None) -> str:
     started = time.monotonic()
     with connect() as conn:
+        stamped = conn.execute(
+            """select g.area_id::text, a.scheme_code from area_geometry g join area a on a.id = g.area_id
+               where g.changeset_id in (select id from changeset where scope->>'package' = %s)""",
+            [prefix],
+        ).fetchall()
+        areas = [area for area, _ in stamped] if stamped else None
+        schemes = sorted({scheme for _, scheme in stamped}) if stamped else None
         sets = conn.execute(
             """select bs.scheme_code, bs.vintage, bs.as_of,
                       (select count(*) from area a join area_geometry g on g.area_id = a.id
@@ -51,14 +58,16 @@ def build(prefix: str | None) -> str:
                        cross join lateral (values (s.publisher), (nullif(s.attribution, ''))) c(credit)
                        where a.scheme_code = bs.scheme_code and g.valid @> bs.as_of and c.credit is not null)
                from boundary_set bs
-               where starts_with(bs.scheme_code, %s) or bs.scheme_code || '/' || bs.vintage = %s
+               where case when %(schemes)s::text[] is null
+                          then starts_with(bs.scheme_code, %(prefix)s) or bs.scheme_code || '/' || bs.vintage = %(prefix)s
+                          else bs.scheme_code = any(%(schemes)s::text[]) end
                order by bs.scheme_code, bs.vintage""",
-            [prefix or "", prefix],
+            {"prefix": prefix or "", "schemes": schemes},
         ).fetchall()
     with connect() as conn:
         mask = display.ensure(conn)
-        display.coarsen(conn)
-        display.straddle(conn)
+        display.coarsen(conn, areas)
+        display.straddle(conn, schemes)
     summaries: list[str] = []
     (DATA / "tmp").mkdir(exist_ok=True)
     sweep_scratch(DATA / "tmp")

@@ -172,7 +172,7 @@ def refresh(conn: Connection, scheme_code: str, as_of: date, mask: str) -> int:
     return len(todo)
 
 
-def coarsen(conn: Connection) -> int:
+def coarsen(conn: Connection, areas: list[str] | None = None) -> int:
     conn.execute("create schema if not exists display")
     conn.execute(
         """create table if not exists display.coarse (
@@ -184,16 +184,18 @@ def coarsen(conn: Connection) -> int:
            )"""
     )
     conn.execute(
-        """delete from display.coarse k where not exists (
-               select from area_geometry g
-               where g.area_id = k.area_id and g.valid = k.valid and md5(ST_AsBinary(g.geom)) = k.geom_hash
-           )"""
+        """delete from display.coarse k
+           where (%(areas)s::uuid[] is null or k.area_id = any(%(areas)s::uuid[])) and not exists (
+               select from (select g.valid, g.geom from area_geometry g where g.area_id = k.area_id offset 0) g
+               where g.valid = k.valid and md5(ST_AsBinary(g.geom)) = k.geom_hash
+           )""",
+        {"areas": areas},
     )
     todo = conn.execute(
         """select g.area_id, g.valid from area_geometry g
-           where ST_NPoints(g.geom) > %s
+           where (%(areas)s::uuid[] is null or g.area_id = any(%(areas)s::uuid[])) and ST_NPoints(g.geom) > %(points)s
              and not exists (select from display.coarse k where k.area_id = g.area_id and k.valid = g.valid)""",
-        [COARSE],
+        {"areas": areas, "points": COARSE},
     ).fetchall()
     for area_id, valid in todo:
         conn.execute(
@@ -221,7 +223,7 @@ GEOMETRY_MARK = """select greatest(
 )"""
 
 
-def straddle(conn: Connection) -> int:
+def straddle(conn: Connection, scope: list[str] | None = None) -> int:
     conn.execute("create schema if not exists display")
     conn.execute(
         """create table if not exists display.straddle (
@@ -236,19 +238,28 @@ def straddle(conn: Connection) -> int:
     row = conn.execute(GEOMETRY_MARK).fetchone()
     mark = row[0] if row else None
     held = conn.execute("select mark from display.straddle_mark").fetchone()
+    touched: set[str] = set()
     if held is None:
         conn.execute("truncate display.straddle")
+        scope = None
     elif held[0] != mark:
-        conn.execute(
-            """with changed as (
-                   select area_id from area_geometry where changeset_id > %(held)s
-                   union
-                   select area_id from area_geometry_history where superseded_by > %(held)s
-               )
-               delete from display.straddle s
-               where s.area_id in (select area_id from changed) or s.kid_id in (select area_id from changed)""",
-            {"held": held[0]},
-        )
+        touched = {
+            code
+            for (code,) in conn.execute(
+                """with changed as (
+                       select area_id from area_geometry where changeset_id > %(held)s
+                       union
+                       select area_id from area_geometry_history where superseded_by > %(held)s
+                   ),
+                   gone as (
+                       delete from display.straddle s
+                       where s.area_id in (select area_id from changed) or s.kid_id in (select area_id from changed)
+                       returning s.area_id
+                   )
+                   select distinct a.scheme_code from area a where a.id in (select area_id from gone)""",
+                {"held": held[0]},
+            ).fetchall()
+        }
     conn.execute("delete from display.straddle_mark")
     if mark is not None:
         conn.execute("insert into display.straddle_mark values (%s)", [mark])
@@ -256,7 +267,9 @@ def straddle(conn: Connection) -> int:
     schemes = [
         code
         for (code,) in conn.execute(
-            "select code from scheme where kind = 'electoral_district' order by code"
+            """select code from scheme where kind = 'electoral_district'
+                 and (%(scope)s::text[] is null or code = any(%(scope)s::text[])) order by code""",
+            {"scope": None if scope is None else sorted({*scope, *touched})},
         ).fetchall()
     ]
     done = 0

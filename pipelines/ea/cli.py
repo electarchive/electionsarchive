@@ -61,7 +61,8 @@ def main() -> None:
     commands.add_parser("tiles", help="build one PMTiles archive per boundary set").add_argument(
         "scheme",
         nargs="?",
-        help="scheme_code prefix, such as tr or tr.il, or one set as scheme/vintage; omit to build every set",
+        help="scheme_code prefix, such as tr or tr.il, one set as scheme/vintage, or a loaded package key such as "
+        "cz.volby/geo for the sets of the areas whose geometry it loaded; omit to build every set",
     )
     commands.add_parser(
         "rasters", help="build one area-ID raster PMTiles archive per boundary set of 1,000 or more areas"
