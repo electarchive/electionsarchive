@@ -85,6 +85,7 @@ TABLES: dict[str, tuple[tuple[str, ...] | None, dict[str, pl.DataType]]] = {
         {"id": U, "polity_id": U, "valid_from": D, "valid_to": D, "rules": U, "rules_version": I32},
     ),
     "party": (("id",), {"id": U, "kind": U, "polity_id": U}),
+    "party_color": (None, {"party_id": U, "color": U, "valid_from": D, "valid_to": D, "source_id": U}),
     "person": (("id",), {"id": U, "birth_date": D, "birth_precision": U, "gender": U}),
     "election": (
         ("id",),
@@ -399,6 +400,8 @@ REFERENCES = [
     ("contest_option", "contest_id", "contest"),
     ("contest_option", "parent_option_id", "contest_option"),
     ("contest_option", "party_id", "party"),
+    ("party_color", "party_id", "party"),
+    ("party_color", "source_id", "source"),
     ("candidacy", "person_id", "person"),
     ("candidacy", "option_id", "contest_option"),
     ("candidacy", "member_of_party_id", "party"),

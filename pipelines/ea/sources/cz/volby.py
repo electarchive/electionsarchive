@@ -350,6 +350,17 @@ def registry() -> Package:
         license_url="https://volby.gov.cz/opendata/opendata.htm",
         attribution="Český statistický úřad, volby.cz",
     )
+    p.add(
+        "source",
+        id=COLORS_SOURCE,
+        kind="community",
+        publisher="electionsarchive.com",
+        title="Brand colors of Czech parties, taken from their logos and websites",
+        url="https://electionsarchive.com",
+        license="CC0 1.0",
+        license_url="https://creativecommons.org/publicdomain/zero/1.0/",
+        attribution="electionsarchive.com",
+    )
     for folder, *names in [*CHAMBER.values(), *PRESIDENT.values()]:
         for name in names:
             p.artifact(raw.cached(SOURCE, url(folder, name)), VOLBY_SOURCE)
@@ -424,11 +435,46 @@ def registry() -> Package:
             p.name(id, clean(row["ZKRATKAV30"]), "cs", "short", False)
         if row.get("ZKRATKAV8"):
             p.name(id, clean(row["ZKRATKAV8"]), "cs", "abbreviation", False)
+        if code in COLORS:
+            p.add(
+                "party_color", party_id=id, color=COLORS[code], valid_from=None, valid_to=None, source_id=COLORS_SOURCE
+            )
     return p
 
 
 def party(code: str) -> str:
     return key("party", code)
+
+
+COLORS_SOURCE = key("source", "cz.volby.party_colors")
+COLORS = {
+    "1": "#ffd500",
+    "5": "#4cae3a",
+    "7": "#ec5b00",
+    "11": "#29348e",
+    "13": "#2e86c1",
+    "47": "#e2001a",
+    "53": "#1e50a2",
+    "81": "#f5a623",
+    "102": "#f5a623",
+    "137": "#2a9d8f",
+    "144": "#1b9bd7",
+    "166": "#00a651",
+    "177": "#4cae3a",
+    "270": "#f5c400",
+    "720": "#000000",
+    "721": "#6b2c91",
+    "724": "#a6192e",
+    "759": "#ec5b00",
+    "768": "#252262",
+    "792": "#6c8ebf",
+    "1114": "#1f4e9c",
+    "1178": "#0057b8",
+    "1245": "#b5121b",
+    "1298": "#c8102e",
+    "1327": "#1b4f9c",
+    "1350": "#1fa99a",
+}
 
 
 def clean(text: str | None) -> str:
