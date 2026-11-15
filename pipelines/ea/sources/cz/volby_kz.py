@@ -161,7 +161,7 @@ def _declared(year: int) -> dict[str, ElementTree.Element]:
 
 def _genitive(title: str) -> str:
     if title.startswith("Kraj "):
-        return f"Zastupitelstvo {title}"
+        return f"Zastupitelstvo Kraje {title.removeprefix('Kraj ')}"
     return "Zastupitelstvo " + re.sub(r"ý kraj$", "ého kraje", title)
 
 
