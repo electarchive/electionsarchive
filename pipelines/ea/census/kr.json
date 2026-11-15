@@ -1160,7 +1160,7 @@
      "kr.sido"
     ]
    },
-   "note": "The Second Republic's upper house: 58 councillors from 10 province-wide districts, elected with the House of Representatives on 29 July 1960 for six years; dissolved by the coup of 16 May 1961.",
+   "note": "The Second Republic's upper house: 58 councillors from 10 province-wide districts, elected with the House of Representatives on 29 July 1960 for six years; dissolved by the coup of 16 May 1961. Loaded from the NEC's 대한민국선거사 제1집 (winners' votes and each province's electors and ballots); the statistics system holds no 참의원 results, and votes of losing candidates are not printed.",
    "source": "nec_history",
    "est_votes": 9000000,
    "effort": 3,
@@ -1177,14 +1177,14 @@
    ],
    "access": [
     {
-     "platform": "NEC 선거통계시스템 (info.nec.go.kr), 국회의원선거 (제5대 참의원)",
-     "url": "http://info.nec.go.kr/main/showDocument.xhtml?electionId=0000000000&topMenuId=VC&secondMenuId=VCCP08",
-     "format": "html, xls",
+     "platform": "NEC 대한민국선거사 제1집 e-book (library.nec.go.kr), pp. 1185-1190",
+     "url": "https://library.nec.go.kr/neweps/epdata/EP24/EBM2024/01/EBM0120240243/index.html",
+     "format": "page images",
      "access": "open",
      "checked_at": "2026-11-13",
      "first_date": "1960-07-29",
      "source": "nec_results",
-     "evidence": "역대선거 lists the 참의원 election beside the 민의원"
+     "evidence": "The statistics system lists the 참의원 election beside the 민의원 but holds no results; the book prints the winners and province totals"
     }
    ],
    "dates": [
