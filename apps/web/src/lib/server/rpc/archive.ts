@@ -20953,10 +20953,12 @@ export const elections = {
                   ({ chain: _chain, ...row }) => [row.election, row] as const,
                 ),
             ]);
-            return [...rows.keys()].toSorted().flatMap((id) => {
-              const { election: _child, ...row } = rows.get(id) ?? {};
-              return "path" in row ? [row] : [];
-            });
+            return [...rows.keys()]
+              .toSorted((a, b) => Number(a > b) - Number(a < b))
+              .flatMap((id) => {
+                const { election: _child, ...row } = rows.get(id) ?? {};
+                return "path" in row ? [row] : [];
+              });
           },
           false,
           versionOf("elections.winners"),
