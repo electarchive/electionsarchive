@@ -537,16 +537,7 @@ class Changeset:
                     for option in options:
                         self.merge(option, twins[0])
 
-    def write(self) -> Path:
-        pipeline = self.manifest["pipeline"]
-        if self.manifest["kind"] == "import" and self.conn.execute(
-            "select exists (select from changeset where pipeline = %s and created_at < %s)",
-            (pipeline, PACKAGES_ONLY_FROM),
-        ).fetchone() == (False,):
-            raise SystemExit(
-                f"{pipeline} has no changeset from before {PACKAGES_ONLY_FROM:%Y-%m-%d %H:%M} UTC, so it is a new family:"
-                " build packages with ea.package and load them with `ea package load` (.agents/spec/file-first.md)"
-            )
+    def _tables(self) -> dict[str, pl.DataFrame]:
         self._answers()
         tables: dict[str, pl.DataFrame] = {}
         for table, rows in self.rows.items():
@@ -664,6 +655,27 @@ class Changeset:
                         for part in text.split("/")
                     ):
                         raise ValueError(f"party {text!r} joins known parties; record each party's line or nomination")
+        return tables
+
+    def write(self) -> Path:
+        pipeline = self.manifest["pipeline"]
+        if self.manifest["kind"] == "import" and self.conn.execute(
+            "select exists (select from changeset where pipeline = %s and created_at < %s)",
+            (pipeline, PACKAGES_ONLY_FROM),
+        ).fetchone() == (False,):
+            raise SystemExit(
+                f"{pipeline} has no changeset from before {PACKAGES_ONLY_FROM:%Y-%m-%d %H:%M} UTC, so it is a new family:"
+                " build packages with ea.package and load them with `ea package load` (.agents/spec/file-first.md)"
+            )
+        if self.conn.execute(
+            "select exists (select from changeset where pipeline = %s and scope->>'package' = %s and status = 'published')",
+            (pipeline, f"{pipeline}/all"),
+        ).fetchone() == (True,):
+            raise SystemExit(
+                f"{pipeline} is on packages: {pipeline}/all is loaded, so the changeset path is closed for it;"
+                " emit with the package path (ea.package.Draft) and load with `ea package load`"
+            )
+        tables = self._tables()
         folder = DATA / "changesets" / str(self.id)
         folder.mkdir(parents=True)
         for table, frame in tables.items():
