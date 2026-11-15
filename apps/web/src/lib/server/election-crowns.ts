@@ -4,6 +4,7 @@ import { db } from "#lib/server/db/index.js";
 import { crownChunk } from "#lib/server/rpc/archive.js";
 
 const CHUNK = 300;
+const SAMPLE = 12;
 
 const parents = sql`
   select k.parent_id as id from election k
@@ -113,6 +114,70 @@ async function store(parent: string, ids: Array<string>) {
   return rows.length;
 }
 
+type Crown = {
+  election: string;
+  office: string | null;
+  party: string | null;
+  person: string | null;
+  label: string | null;
+  area: string | null;
+  group: string | null;
+  shaped: string | null;
+  led: boolean | null;
+  votes: unknown;
+  chain: Array<string> | null;
+};
+
+function shape(rows: Array<unknown>) {
+  return rows
+    .map((row) => {
+      const r = structuredClone(row) as Crown;
+      return JSON.stringify([
+        r.election,
+        r.office,
+        r.party,
+        r.person,
+        r.label,
+        r.area,
+        r.group,
+        r.shaped,
+        r.led,
+        r.votes,
+        r.chain,
+      ]);
+    })
+    .toSorted((a, b) => a.localeCompare(b));
+}
+
+async function drifted() {
+  const sampled = await db.execute<{ parent: string; ids: Array<string> }>(sql`
+    select parent_id as parent, array_agg(election_id) as ids from (
+      select w.parent_id, w.election_id from (select distinct election_id, parent_id from election_crown) w
+      join (${parents}) p on p.id = w.parent_id
+      order by random()
+    ) s group by parent_id
+  `);
+  const differing = new Set<string>();
+  for (const { parent, ids } of sampled.rows) {
+    const chosen = ids.slice(0, SAMPLE);
+    const stored = await db.execute<Crown>(sql`
+      select w.election_id as election, w.office, w.party_id as party, w.person_id as person, w.label,
+        w.area_id as area, w.group_id as "group", w.shaped_id as shaped, w.is_led as led, w.votes, w.chain
+      from election_crown w where w.election_id = any(${sql.param(chosen)}::uuid[])
+    `);
+    const live: Array<unknown> = await crownChunk(parent, chosen);
+    const want = shape(live);
+    const have = shape(stored.rows);
+    if (
+      want.length !== have.length ||
+      want.some((row, index) => row !== have[index])
+    ) {
+      differing.add(parent);
+    }
+  }
+  return differing;
+}
+
 export async function rebuild(target?: string) {
   const started = Date.now();
   const latest = await db.execute<{ upto: string | null }>(sql`
@@ -137,9 +202,20 @@ export async function rebuild(target?: string) {
     )
     returning w.election_id as id
   `);
+  const differing = target == null ? await drifted() : new Set<string>();
+  if (differing.size > 0) {
+    console.warn(
+      `${differing.size} parents differ from the live query: ${[...differing].join(" ")}`,
+    );
+  }
   const listed = await db.execute<{ parent: string; id: string }>(
     target == null
-      ? await dirty(since, upto)
+      ? sql`
+        select d.parent, d.id from (${await dirty(since, upto)}) d
+        union select k.parent_id, k.id from election k
+        where k.parent_id = any(${sql.param([...differing])}::uuid[])
+          and exists (select from slug s where s.entity_id = k.id and s.is_current)
+      `
       : sql`
         select k.parent_id as parent, k.id from election k
         where k.parent_id in (${await scope(target)})
@@ -192,5 +268,5 @@ export async function rebuild(target?: string) {
     `);
   }
   await db.execute(sql`analyze election_crown`);
-  return `${built} election crowns from ${listed.rows.length} children, ${failed} failed, ${removed.rows.length} removed, in ${Math.round((Date.now() - started) / 1000)}s`;
+  return `${built} election crowns from ${listed.rows.length} children, ${failed} failed, ${removed.rows.length} removed, ${differing.size} parents drifted, in ${Math.round((Date.now() - started) / 1000)}s`;
 }
