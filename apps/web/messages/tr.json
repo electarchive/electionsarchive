@@ -2596,6 +2596,7 @@
   "polity_kind_special_district": "Özel amaçlı bölgeler",
   "polity_kind_judicial_district": "Yargı bölgeleri",
   "polity_kind_tribal_nation": "Yerli kabileler",
+  "polity_kind_region": "Bölgeler",
   "coverage_upcoming": "Yaklaşan, hazır",
   "coverage_upcoming_def": "Oylama henüz yapılmadı. Arşivde sonuçlar dışında her şey var: makam veya sandalye, seçim bölgesi, oylama sistemi ve her adayın partisi. Halkoylaması önerilerinde ise seçenekler ve resmî metin. Bunlar seçim gününe kadar kapsanmış sayılır. Ertesi gün sonuçların da arşive girmesi gerekir.",
   "coverage_upcoming_of": "{count} yaklaşan, hazır",

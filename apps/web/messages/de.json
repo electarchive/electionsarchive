@@ -2596,6 +2596,7 @@
   "polity_kind_special_district": "Sonderdistrikte",
   "polity_kind_judicial_district": "Gerichtsdistrikte",
   "polity_kind_tribal_nation": "Stammesnationen",
+  "polity_kind_region": "Territorien",
   "coverage_upcoming": "Anstehend, bereit",
   "coverage_upcoming_def": "Die Wahl steht noch aus, und das Archiv enthält schon alles außer den Ergebnissen: Amt oder Sitz, Distrikt, Wahlsystem und alle Kandidaten mit ihrer Partei, bei einer Abstimmungsvorlage deren Antworten und den amtlichen Wortlaut. Bis zum Wahltag gelten diese Wahlen als abgedeckt. Ab dem nächsten Tag brauchen sie Ergebnisse.",
   "coverage_upcoming_of": "{count} anstehend und bereit",
