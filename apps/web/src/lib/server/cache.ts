@@ -84,6 +84,7 @@ const REMEMBERED = 100_000;
 const REPORT = 600_000;
 const FLUSH = 60_000;
 const SAMPLE = 0.02;
+const SYNC_WAIT = 250;
 const VERSIONED = 2_000_000;
 const TRACING = CACHE_SHADOW || CACHE_KEYS;
 const MODE = CACHE_KEYS ? "keys" : "shadow";
@@ -789,6 +790,7 @@ async function isKept(
   deps: Array<string> | null,
   day: string,
   isDated: boolean,
+  isBounded = false,
 ) {
   if (
     !CACHE_KEYS ||
@@ -798,7 +800,21 @@ async function isKept(
   ) {
     return false;
   }
-  await shadow.loading;
+  if (isBounded) {
+    let timer: NodeJS.Timeout | undefined;
+    const isSynced = await Promise.race([
+      shadow.loading.then(() => true),
+      new Promise<boolean>((resolve) => {
+        timer = setTimeout(resolve, SYNC_WAIT, false);
+      }),
+    ]);
+    clearTimeout(timer);
+    if (!isSynced) {
+      return false;
+    }
+  } else {
+    await shadow.loading;
+  }
   return shadow.seen != null && holds(deps, mark);
 }
 
@@ -982,7 +998,13 @@ function store(
       entry.version = found.version;
       return true;
     }
-    const isHeld = await isKept(found.mark, found.deps, found.day, isDated);
+    const isHeld = await isKept(
+      found.mark,
+      found.deps,
+      found.day,
+      isDated,
+      true,
+    );
     tally.restamped += Number(isHeld);
     return isHeld;
   };
@@ -1273,7 +1295,7 @@ export async function remember<T>(
       if (
         CACHE_KEYS &&
         hit.isSettled &&
-        (await isKept(hit.mark, await hit.deps, hit.day, isDated))
+        (await isKept(hit.mark, await hit.deps, hit.day, isDated, true))
       ) {
         hit.version = version;
         tally.restamped++;
