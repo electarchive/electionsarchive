@@ -9,6 +9,7 @@ from ea.changeset import Changeset, slug
 from ea.store import connect
 
 SUFFIXES = {"jr", "sr", "ii", "iii", "iv", "junior", "senior"}
+ELSEWHERE = "Withdrawn: these precinct returns are another county's contest, which an earlier match took because the totals were close."
 TWIN = "Withdrawn: the same precinct returns are this contest's default set, which a merge of two copies of the contest left beside it."
 
 
@@ -38,6 +39,20 @@ def emit(
         if county is None:
             raise ValueError(f"{place} has no unit")
         state = cs.polity(f"US-{state_code}")
+        elsewhere = {
+            contest
+            for (contest,) in conn.execute(
+                """select k.id from contest k join election e on e.id = k.election_id join area d on d.id = k.district_area_id
+                   where e.date_from = any(%s) and (
+                     (d.scheme_code = 'us.county'
+                      and not exists (select from area_code c where c.area_id = d.id and c.code = %s))
+                     or (exists (select from area_parent p join area a on a.id = p.parent_id and a.scheme_code = 'us.county'
+                                 where p.area_id = d.id)
+                         and not exists (select from area_parent p join area_code c on c.area_id = p.parent_id
+                                         where p.area_id = d.id and c.code = %s)))""",
+                [days, fips, fips],
+            ).fetchall()
+        }
         contests = conn.execute(
             """select distinct on (k.id) k.id, k.election_id, e.date_from, rs.stage, rs.kind,
                       (select min(v.count_round) from result_value v where v.result_set_k = rs.k and v.measure = 1)
@@ -48,8 +63,9 @@ def emit(
                  and not exists (
                    select 1 from result_set r2 join result_value v on v.result_set_k = r2.k
                    join reporting_unit u on u.k = v.unit_k
-                   where r2.contest_id = k.id and u.scheme_code = 'us.precinct')""",
-            [days, f"us/{state_code.lower()}", f"us/{state_code.lower()}/%%"],
+                   where r2.contest_id = k.id and u.scheme_code = 'us.precinct')
+                 and k.id <> all(%s)""",
+            [days, f"us/{state_code.lower()}", f"us/{state_code.lower()}/%%", list(elsewhere)],
         ).fetchall()
         ids = [contest for contest, *_ in contests]
         notes = dict(
@@ -277,6 +293,28 @@ def emit(
                 completeness=completeness,
             )
             cs.add("note", entity_id=twin, kind="caveat", body_md=TWIN)
+        for stray, election, contest, stage, kind, set_source, completeness in conn.execute(
+            """select r.id, r.election_id, r.contest_id, r.stage, r.kind, r.source_id, r.completeness from result_set r
+               join changeset g on g.id = r.changeset_id
+               where g.pipeline = %s and r.status = 'active' and r.contest_id = any(%s)""",
+            [pipeline, list(elsewhere)],
+        ).fetchall():
+            report["withdrawn from another county's contest"] = (
+                report.get("withdrawn from another county's contest", 0) + 1
+            )
+            cs.add(
+                "result_set",
+                id=stray,
+                election_id=election,
+                contest_id=contest,
+                stage=stage,
+                kind=kind,
+                status="withdrawn",
+                source_id=set_source,
+                is_default=False,
+                completeness=completeness,
+            )
+            cs.add("note", entity_id=stray, kind="caveat", body_md=ELSEWHERE)
         print(report)
         if values:
             cs.frame("result_value", pl.concat(values))
