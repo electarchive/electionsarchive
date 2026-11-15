@@ -214,6 +214,91 @@
    "url": "https://ine.mx/wp-content/uploads/2025/05/Regimen-Electoral-Mexicano-2025_VF.pdf",
    "kind": "official_body",
    "note": "Read 2026-11-14. Pages 28-29 list the 19 entities whose local judicial election (PELPJ) was concurrent with the federal one on 1 June 2025 and used the casilla seccional única: Aguascalientes, Baja California, Coahuila, Colima, Chihuahua, Ciudad de México, Durango, Estado de México, Michoacán, Nayarit, Quintana Roo, San Luis Potosí, Sonora, Tabasco, Tamaulipas, Tlaxcala, Veracruz, Yucatán, and Zacatecas; the other 13 held only the federal election."
+  },
+  "ine_2017": {
+   "title": "Elecciones 2017",
+   "publisher": "Instituto Nacional Electoral (INE)",
+   "url": "https://www.ine.mx/voto-y-elecciones/elecciones-2017/",
+   "kind": "official_body"
+  },
+  "ine_2018": {
+   "title": "Elecciones 2018 (one page per state, such as /elecciones-2018/aguascalientes/ and /elecciones-2018/nuevoleon/)",
+   "publisher": "Instituto Nacional Electoral (INE)",
+   "url": "https://www.ine.mx/voto-y-elecciones/elecciones-2018/",
+   "kind": "official_body"
+  },
+  "ine_2019": {
+   "title": "Elecciones 2019",
+   "publisher": "Instituto Nacional Electoral (INE)",
+   "url": "https://www.ine.mx/voto-y-elecciones/elecciones-2019/",
+   "kind": "official_body"
+  },
+  "ine_2020": {
+   "title": "Elecciones 2020",
+   "publisher": "Instituto Nacional Electoral (INE)",
+   "url": "https://www.ine.mx/voto-y-elecciones/elecciones-2020/",
+   "kind": "official_body"
+  },
+  "ine_calendario": {
+   "title": "Calendario Electoral (Calendarios Electorales 2016 and 2017, and the IFE calendars of 2009 to 2015)",
+   "publisher": "Instituto Nacional Electoral (INE)",
+   "url": "https://sitios.ine.mx/archivos3/portal/historico/contenido/Calendario_Electoral/",
+   "kind": "official_body"
+  },
+  "ife_cal_2015": {
+   "title": "Calendario Electoral 2015 (actualización: 6 de enero de 2015)",
+   "publisher": "Instituto Federal Electoral (IFE)",
+   "url": "https://sitios.ine.mx/archivos3/portal/historico/recursos/IFE-v2/DECEYEC/DECEYEC-ProcesosElectorales/Calendario-Docs/ISU_Cal_Elect-2015.pdf",
+   "kind": "official_body"
+  },
+  "ife_cal_2014": {
+   "title": "Calendario Electoral 2014 (actualización: 16 de abril de 2014)",
+   "publisher": "Instituto Federal Electoral (IFE)",
+   "url": "https://sitios.ine.mx/archivos3/portal/historico/recursos/IFE-v2/DECEYEC/DECEYEC-ProcesosElectorales/Calendario-Docs/CalendarioElectoral-2014.pdf",
+   "kind": "official_body"
+  },
+  "ife_cal_2013": {
+   "title": "Calendario Electoral 2013 (fecha de actualización: 12 de noviembre de 2013)",
+   "publisher": "Instituto Federal Electoral (IFE)",
+   "url": "https://sitios.ine.mx/archivos3/portal/historico/recursos/IFE-v2/DECEYEC/DECEYEC-ProcesosElectorales/Calendario-Docs/ISU_Calendario_Electoral_2013.pdf",
+   "kind": "official_body"
+  },
+  "ife_cal_2012": {
+   "title": "Calendario Electoral 2012 (fecha de actualización: 30 de marzo de 2012)",
+   "publisher": "Instituto Federal Electoral (IFE)",
+   "url": "https://sitios.ine.mx/archivos3/portal/historico/recursos/IFE-v2/DECEYEC/DECEYEC-ProcesosElectorales/Calendario-Docs/CalendarioElectoral-2012.pdf",
+   "kind": "official_body"
+  },
+  "ife_cal_2011": {
+   "title": "Calendario Electoral 2011 (fecha de actualización: 28 de abril de 2011)",
+   "publisher": "Instituto Federal Electoral (IFE)",
+   "url": "https://sitios.ine.mx/archivos3/portal/historico/recursos/IFE-v2/DECEYEC/DECEYEC-ProcesosElectorales/Calendario-Docs/Calendario_2011_final.pdf",
+   "kind": "official_body"
+  },
+  "ife_cal_2010": {
+   "title": "Calendario Electoral 2010",
+   "publisher": "Instituto Federal Electoral (IFE)",
+   "url": "https://sitios.ine.mx/archivos3/portal/historico/recursos/IFE-v2/DECEYEC/DECEYEC-ProcesosElectorales/Calendario-Docs/CalendarioElectoral-2010.pdf",
+   "kind": "official_body"
+  },
+  "ife_cal_2009": {
+   "title": "Calendario Electoral 2009",
+   "publisher": "Instituto Federal Electoral (IFE)",
+   "url": "https://sitios.ine.mx/archivos3/portal/historico/recursos/IFE-v2/DECEYEC/DECEYEC-ProcesosElectorales/ISU_CalendarioElectoral2009.pdf",
+   "kind": "official_body"
+  },
+  "sedia_2007": {
+   "title": "La homologación de los calendarios electorales en las Entidades Federativas de México en los términos de la reforma al artículo 116 constitucional (SE-ISS-28-07, noviembre de 2007), cuadros 2, 3, and 4",
+   "publisher": "Cámara de Diputados, Centro de Documentación, Información y Análisis, Servicios de Investigación y Análisis",
+   "url": "https://www.diputados.gob.mx/sedia/sia/se/SE-ISS-28-07.pdf",
+   "kind": "official_body",
+   "note": "Read 2026-11-14. Cuadros 2 and 3 list the local elections held in 2006 and 2007 by state and day, compiled from the state electoral institutes; cuadro 4 lists those scheduled for 2008. Its 28 September 2008 day for Coahuila is not the day held (19 October 2008)."
+  },
+  "jornada_2008_coa": {
+   "title": "PRI y abstención arrasan en elecciones de Coahuila (La Jornada, 20 de octubre de 2008)",
+   "publisher": "La Jornada",
+   "url": "https://web.jornada.com.mx/2008/10/20/index.php?article=039n1est&section=estados",
+   "kind": "news_agency"
   }
  },
  "tiers": [
@@ -1436,8 +1521,457 @@
    "dates": [
     {
      "date": "1917-01-01",
-     "through": "2021-12-31",
-     "note": "Per-state legislative elections before 2022 are not yet enumerated."
+     "through": "2005-12-31",
+     "note": "Per-state legislative elections before 2006 are not yet enumerated."
+    },
+    {
+     "date": "2006-03-12",
+     "contests": 1,
+     "source": "sedia_2007",
+     "regions": {
+      "MEX": 1
+     },
+     "quote": "Cuadro No. 2: Estado de México | Diputados Locales y Ayuntamientos. | 12 de marzo"
+    },
+    {
+     "date": "2006-07-02",
+     "contests": 10,
+     "source": "sedia_2007",
+     "regions": {
+      "CMX": 1,
+      "GUA": 1,
+      "JAL": 1,
+      "MOR": 1,
+      "CAM": 1,
+      "COL": 1,
+      "NLE": 1,
+      "QUE": 1,
+      "SLP": 1,
+      "SON": 1
+     },
+     "quote": "Cuadro No. 2, elecciones concurrentes, 2 de julio: Distrito Federal, Guanajuato, Jalisco, Morelos, Campeche, Colima, Nuevo León, Querétaro, San Luis Potosí, and Sonora elect Diputados Locales."
+    },
+    {
+     "date": "2006-10-15",
+     "contests": 1,
+     "source": "sedia_2007",
+     "regions": {
+      "TAB": 1
+     },
+     "quote": "Cuadro No. 2: Tabasco | Gobernador, Diputados Locales y Ayuntamientos. | 15 de octubre"
+    },
+    {
+     "date": "2007-05-20",
+     "contests": 1,
+     "source": "sedia_2007",
+     "regions": {
+      "YUC": 1
+     },
+     "quote": "Cuadro No. 3: Yucatán | Gobernador, Diputados Locales y Ayuntamientos. | 20 de mayo"
+    },
+    {
+     "date": "2007-07-01",
+     "contests": 3,
+     "source": "sedia_2007",
+     "regions": {
+      "CHH": 1,
+      "DUR": 1,
+      "ZAC": 1
+     },
+     "quote": "Cuadro No. 3: Chihuahua, Durango, and Zacatecas | Diputados Locales | 1 de julio"
+    },
+    {
+     "date": "2007-08-05",
+     "contests": 3,
+     "source": "sedia_2007",
+     "regions": {
+      "AGU": 1,
+      "BCN": 1,
+      "OAX": 1
+     },
+     "quote": "Cuadro No. 3: Baja California, Aguascalientes, and Oaxaca | Diputados Locales | 5 de agosto"
+    },
+    {
+     "date": "2007-09-02",
+     "contests": 1,
+     "source": "sedia_2007",
+     "regions": {
+      "VER": 1
+     },
+     "quote": "Cuadro No. 3: Veracruz | Diputados Locales y Ayuntamientos | 2 de septiembre"
+    },
+    {
+     "date": "2007-10-07",
+     "contests": 1,
+     "source": "sedia_2007",
+     "regions": {
+      "CHP": 1
+     },
+     "quote": "Cuadro No. 3: Chiapas | Diputados Locales y Ayuntamientos | 7 de octubre"
+    },
+    {
+     "date": "2007-10-14",
+     "contests": 1,
+     "source": "sedia_2007",
+     "regions": {
+      "SIN": 1
+     },
+     "quote": "Cuadro No. 3: Sinaloa | Diputados Locales y Ayuntamientos | 14 de octubre"
+    },
+    {
+     "date": "2007-11-11",
+     "contests": 4,
+     "source": "sedia_2007",
+     "regions": {
+      "MIC": 1,
+      "PUE": 1,
+      "TAM": 1,
+      "TLA": 1
+     },
+     "quote": "Cuadro No. 3: Michoacán, Puebla, Tamaulipas, and Tlaxcala | Diputados Locales | 11 de noviembre"
+    },
+    {
+     "date": "2008-02-03",
+     "contests": 2,
+     "source": "sedia_2007",
+     "regions": {
+      "BCS": 1,
+      "ROO": 1
+     },
+     "quote": "Cuadro No. 4: Baja California Sur | Diputados Locales y Ayuntamientos. | 3 de febrero; Quintana Roo | Diputados Locales y Ayuntamientos. | 3 de febrero"
+    },
+    {
+     "date": "2008-02-17",
+     "contests": 1,
+     "source": "sedia_2007",
+     "regions": {
+      "HID": 1
+     },
+     "quote": "Cuadro No. 4: Hidalgo | Diputados Locales | 17 de febrero"
+    },
+    {
+     "date": "2008-07-06",
+     "contests": 1,
+     "source": "sedia_2007",
+     "regions": {
+      "NAY": 1
+     },
+     "quote": "Cuadro No. 4: Nayarit | Diputados Locales y Ayuntamientos. | 6 de julio"
+    },
+    {
+     "date": "2008-10-05",
+     "contests": 1,
+     "source": "sedia_2007",
+     "regions": {
+      "GRO": 1
+     },
+     "quote": "Cuadro No. 4: Guerrero | Diputados Locales y Ayuntamientos. | 5 de octubre"
+    },
+    {
+     "date": "2008-10-19",
+     "contests": 1,
+     "source": "jornada_2008_coa",
+     "regions": {
+      "COA": 1
+     },
+     "quote": "La escasa afluencia de votantes fue la constante en las más de 3 mil urnas que se instalaron ayer para la elección de diputados."
+    },
+    {
+     "date": "2009-07-05",
+     "contests": 11,
+     "source": "ife_cal_2009",
+     "regions": {
+      "CAM": 1,
+      "COL": 1,
+      "CMX": 1,
+      "MEX": 1,
+      "GUA": 1,
+      "JAL": 1,
+      "MOR": 1,
+      "NLE": 1,
+      "QUE": 1,
+      "SLP": 1,
+      "SON": 1
+     },
+     "quote": "Elecciones coincidentes, domingo 5 de julio: Campeche 21 DMR, Colima 16, Distrito Federal 40, Estado de México 45, Guanajuato 22, Jalisco 20, Morelos 18, Nuevo León 26, Querétaro 15, San Luis Potosí 15, Sonora 21."
+    },
+    {
+     "date": "2009-10-18",
+     "contests": 1,
+     "source": "ife_cal_2009",
+     "regions": {
+      "TAB": 1
+     },
+     "quote": "Tabasco | Local (extraord.) | 18 de octubre | 21 DMR | 14 DRP | 17 Ay."
+    },
+    {
+     "date": "2010-05-16",
+     "contests": 1,
+     "source": "ife_cal_2010",
+     "regions": {
+      "YUC": 1
+     },
+     "quote": "Yucatán | 16 de mayo | 15 | 10 | 106"
+    },
+    {
+     "date": "2010-07-04",
+     "contests": 14,
+     "source": "ife_cal_2010",
+     "regions": {
+      "AGU": 1,
+      "BCN": 1,
+      "CHH": 1,
+      "DUR": 1,
+      "HID": 1,
+      "OAX": 1,
+      "PUE": 1,
+      "ROO": 1,
+      "SIN": 1,
+      "TAM": 1,
+      "TLA": 1,
+      "VER": 1,
+      "ZAC": 1,
+      "CHP": 1
+     },
+     "quote": "Local, 4 de julio: DMR Aguascalientes 18, Baja California 16, Chihuahua 22, Durango 17, Hidalgo 18, Oaxaca 25, Puebla 26, Quintana Roo 15, Sinaloa 24, Tamaulipas 22, Tlaxcala 19, Veracruz 30, Zacatecas 18, Chiapas 24."
+    },
+    {
+     "date": "2011-02-06",
+     "contests": 1,
+     "source": "ife_cal_2011",
+     "regions": {
+      "BCS": 1
+     },
+     "quote": "Baja California Sur | 6 de febrero | G | 16 | 5 | 5"
+    },
+    {
+     "date": "2011-07-03",
+     "contests": 2,
+     "source": "ife_cal_2011",
+     "regions": {
+      "COA": 1,
+      "NAY": 1
+     },
+     "quote": "Coahuila | 3 de julio | G | 16 | 9; Nayarit | G | 18 | 12 | 20"
+    },
+    {
+     "date": "2011-11-13",
+     "contests": 1,
+     "source": "ife_cal_2011",
+     "regions": {
+      "MIC": 1
+     },
+     "quote": "Michoacán | 13 de noviembre | G | 24 | 16 | 113"
+    },
+    {
+     "date": "2012-07-01",
+     "contests": 15,
+     "source": "ife_cal_2012",
+     "regions": {
+      "CAM": 1,
+      "COL": 1,
+      "CHP": 1,
+      "CMX": 1,
+      "GUA": 1,
+      "GRO": 1,
+      "JAL": 1,
+      "MEX": 1,
+      "MOR": 1,
+      "NLE": 1,
+      "QUE": 1,
+      "SLP": 1,
+      "SON": 1,
+      "YUC": 1,
+      "TAB": 1
+     },
+     "quote": "Elecciones coincidentes con la federal, LOCAL, 1 DE JULIO: DMR Campeche 21, Colima 16, Chiapas 24, Distrito Federal 40, Guanajuato 22, Guerrero 28, Jalisco 20, Estado de México 45, Morelos 18, Nuevo León 26, Querétaro 15, San Luis Potosí 15, Sonora 21, Yucatán 15, Tabasco 21."
+    },
+    {
+     "date": "2013-07-07",
+     "contests": 13,
+     "source": "ife_cal_2013",
+     "regions": {
+      "AGU": 1,
+      "BCN": 1,
+      "CHH": 1,
+      "DUR": 1,
+      "HID": 1,
+      "OAX": 1,
+      "PUE": 1,
+      "ROO": 1,
+      "SIN": 1,
+      "TAM": 1,
+      "TLA": 1,
+      "VER": 1,
+      "ZAC": 1
+     },
+     "quote": "LOCAL, 7 de Julio: DMR Aguascalientes 18, Baja California 17, Chihuahua 22, Durango 17, Hidalgo 18, Oaxaca 25, Puebla 26, Quintana Roo 15, Sinaloa 24, Tamaulipas 22, Tlaxcala 19, Veracruz 30, Zacatecas 18 (Coahuila elects only ayuntamientos)."
+    },
+    {
+     "date": "2014-07-06",
+     "contests": 2,
+     "source": "ife_cal_2014",
+     "regions": {
+      "COA": 1,
+      "NAY": 1
+     },
+     "quote": "Coahuila 16 DMR 9 DRP; Nayarit 18 DMR 12 DRP; Local Ordinaria 6 de julio"
+    },
+    {
+     "date": "2015-06-07",
+     "contests": 16,
+     "source": "ife_cal_2015",
+     "regions": {
+      "BCS": 1,
+      "CAM": 1,
+      "COL": 1,
+      "CMX": 1,
+      "GUA": 1,
+      "GRO": 1,
+      "JAL": 1,
+      "MEX": 1,
+      "MIC": 1,
+      "MOR": 1,
+      "NLE": 1,
+      "QUE": 1,
+      "SLP": 1,
+      "SON": 1,
+      "TAB": 1,
+      "YUC": 1
+     },
+     "quote": "Ordinaria, 7 de junio: Baja California Sur 16 DMR, Campeche 21, Colima 16, Distrito Federal 40, Guanajuato 22, Guerrero 28, Jalisco 20, México 45, Michoacán 24, Morelos 18, Nuevo León 26, Querétaro 15, San Luis Potosí 15, Sonora 21, Tabasco 21, Yucatán 15."
+    },
+    {
+     "date": "2015-07-19",
+     "contests": 1,
+     "source": "ife_cal_2015",
+     "regions": {
+      "CHP": 1
+     },
+     "quote": "Chiapas | 19 de julio | 24 DMR | 17 DRP"
+    },
+    {
+     "date": "2016-06-05",
+     "contests": 12,
+     "source": "ine_calendario",
+     "regions": {
+      "AGU": 1,
+      "BCN": 1,
+      "CHH": 1,
+      "DUR": 1,
+      "HID": 1,
+      "OAX": 1,
+      "ROO": 1,
+      "SIN": 1,
+      "TAM": 1,
+      "TLA": 1,
+      "VER": 1,
+      "ZAC": 1
+     },
+     "quote": "Calendario Electoral 2016, Jornada 5 de junio: Diputaciones MR in Aguascalientes 18, Baja California 17, Chihuahua 22, Durango 15, Hidalgo 18, Oaxaca 25, Quintana Roo 15, Sinaloa 24, Tamaulipas 22, Tlaxcala 15, Veracruz 30, Zacatecas 18 (Ciudad de México's 60 RP seats are the constituent assembly)."
+    },
+    {
+     "date": "2017-06-04",
+     "contests": 2,
+     "source": "ine_2017",
+     "regions": {
+      "COA": 1,
+      "NAY": 1
+     },
+     "quote": "Coahuila elige: 1 GOBERNADOR 16 DIPUTACIONES DE MAYORÍA RELATIVA ...; Nayarit elige: 1 GOBERNADOR 18 DIPUTACIONES DE MAYORÍA RELATIVA ... DÍA DE LA ELECCIÓN: 4 de junio de 2017"
+    },
+    {
+     "date": "2018-07-01",
+     "contests": 27,
+     "source": "ine_2018",
+     "regions": {
+      "AGU": 1,
+      "BCS": 1,
+      "CAM": 1,
+      "CHP": 1,
+      "CHH": 1,
+      "CMX": 1,
+      "COL": 1,
+      "DUR": 1,
+      "MEX": 1,
+      "GUA": 1,
+      "GRO": 1,
+      "HID": 1,
+      "JAL": 1,
+      "MIC": 1,
+      "MOR": 1,
+      "NLE": 1,
+      "OAX": 1,
+      "PUE": 1,
+      "QUE": 1,
+      "SLP": 1,
+      "SIN": 1,
+      "SON": 1,
+      "TAB": 1,
+      "TLA": 1,
+      "VER": 1,
+      "YUC": 1,
+      "ZAC": 1
+     },
+     "quote": "Per-state pages: each of the 27 lists 'DIPUTACIONES LOCALES DE MAYORÍA RELATIVA' and 'DÍA DE LA ELECCIÓN: 1 de julio de 2018'; Coahuila, Quintana Roo, and Tamaulipas elect only ayuntamientos, and Baja California and Nayarit have no 2018 page."
+    },
+    {
+     "date": "2019-06-02",
+     "contests": 3,
+     "source": "ine_2019",
+     "regions": {
+      "BCN": 1,
+      "ROO": 1,
+      "TAM": 1
+     },
+     "quote": "Baja California elige: 1 GUBERNATURA 17 DIPUTACIONES ...; Quintana Roo elige: 15 DIPUTACIONES DE MAYORÍA RELATIVA ...; Tamaulipas elige: 22 DIPUTACIONES DE MAYORÍA RELATIVA ... DÍA DE LA ELECCIÓN: 2 de junio"
+    },
+    {
+     "date": "2020-10-18",
+     "contests": 1,
+     "source": "ine_2020",
+     "regions": {
+      "COA": 1
+     },
+     "quote": "Coahuila elige: 16 9 DIPUTACIONES REPRESENTACIÓN PROPORCIONAL DIPUTACIONES MAYORIA RELATIVA DÍA DE LA ELECCIÓN: 18 de octubre"
+    },
+    {
+     "date": "2021-06-06",
+     "contests": 30,
+     "source": "ine_2021",
+     "regions": {
+      "AGU": 1,
+      "BCN": 1,
+      "BCS": 1,
+      "CAM": 1,
+      "CHP": 1,
+      "CHH": 1,
+      "CMX": 1,
+      "COL": 1,
+      "DUR": 1,
+      "GUA": 1,
+      "GRO": 1,
+      "HID": 1,
+      "JAL": 1,
+      "MEX": 1,
+      "MIC": 1,
+      "MOR": 1,
+      "NAY": 1,
+      "NLE": 1,
+      "OAX": 1,
+      "PUE": 1,
+      "QUE": 1,
+      "SLP": 1,
+      "SIN": 1,
+      "SON": 1,
+      "TAB": 1,
+      "TAM": 1,
+      "TLA": 1,
+      "VER": 1,
+      "YUC": 1,
+      "ZAC": 1
+     },
+     "quote": "Per-state pages /elecciones-2021/<estado>/: each of the 30 lists 'Diputaciones de Mayoría Relativa' and 'Jornada Electoral 6 de junio de 2021'; Coahuila and Quintana Roo elect only ayuntamientos."
     },
     {
      "date": "2022-06-05",
