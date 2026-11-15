@@ -1424,10 +1424,22 @@ def _rollup(
     conn.execute("delete from result_rollup_unit where result_set_k = any(%s)", [stale])
     conn.execute("delete from rollup_coverage where result_set_k = any(%s)", [stale])
     conn.execute("delete from area_day_set where result_set_k = any(%s)", [stale])
-    facts = (
-        sql.SQL("select distinct result_set_id from {}").format(stage.staged("result_value"))
-        if stage is not None and "result_value" in stage.tables
-        else sql.SQL("select null::uuid")
+    keys = sorted(
+        {
+            *stale,
+            *(
+                [
+                    key
+                    for (key,) in conn.execute(
+                        sql.SQL("select k from result_set where id in (select result_set_id from {})").format(
+                            stage.staged("result_value")
+                        )
+                    ).fetchall()
+                ]
+                if stage is not None and "result_value" in stage.tables
+                else []
+            ),
+        }
     )
     conn.execute(
         sql.SQL(
@@ -1440,7 +1452,7 @@ def _rollup(
                      bs.valid_from as plan_from, c.id as contest_id, c.district_area_id, c.allocation_parent_id
               from result_set r join election e on e.id = r.election_id join contest c on c.id = r.contest_id
               left join boundary_set bs on bs.id = c.boundary_set_id
-              where r.id in ({facts}) or r.k = any({stale})
+              where r.k = any({keys}::int4[])
             ),
             above as (
               select rs.k as result_set_k, p.parent_id as area_id, rs.on_date
@@ -1570,14 +1582,9 @@ def _rollup(
             join counted c on c.result_set_k = a.result_set_k and c.area_id = a.area_id and c.summed
             join area on area.id = a.area_id
             group by v.result_set_k, area.k, area.id, v.option_k, v.channel, v.measure, v.count_round"""
-        ).format(facts=facts, stale=sql.Literal(stale))
+        ).format(keys=sql.Literal(keys))
     )
-    _days(
-        conn,
-        sql.SQL("r.result_set_k in (select k from result_set where id in ({facts}) or k = any({stale}))").format(
-            facts=facts, stale=sql.Literal(stale)
-        ),
-    )
+    _days(conn, sql.SQL("r.result_set_k = any({}::int4[])").format(sql.Literal(keys)))
 
 
 def _days(conn: Connection, where: sql.Composable) -> None:
