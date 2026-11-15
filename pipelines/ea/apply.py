@@ -1441,149 +1441,129 @@ def _rollup(
             ),
         }
     )
-    conn.execute(
-        sql.SQL(
-            """with recursive
-            rs as (
-              select r.k,
-                     case when c.notional then greatest(e.date_from, (select min(lower(p.valid)) from area_parent p
-                                                                      where p.area_id = c.district_area_id))
-                          else e.date_from end as on_date,
-                     bs.valid_from as plan_from, c.id as contest_id, c.district_area_id, c.allocation_parent_id
-              from result_set r join election e on e.id = r.election_id join contest c on c.id = r.contest_id
-              left join boundary_set bs on bs.id = c.boundary_set_id
-              where r.k = any({keys}::int4[])
-            ),
-            above as (
-              select rs.k as result_set_k, p.parent_id as area_id, rs.on_date
-              from rs join area_parent p on p.area_id = rs.district_area_id and p.valid @> rs.on_date
-              where rs.allocation_parent_id is not null
-              union
-              select b.result_set_k, p.parent_id, b.on_date
-              from above b join area_parent p on p.area_id = b.area_id and p.valid @> b.on_date
-            ),
-            ceiling as (
-              select b.result_set_k, b.area_id from above b join rs on rs.k = b.result_set_k
-              where exists (
-                select from contest s join above t on t.result_set_k = b.result_set_k and t.area_id = s.district_area_id
-                where s.allocation_parent_id = rs.allocation_parent_id and s.id <> rs.contest_id
-              )
-            ),
-            vals as materialized (
-              select v.result_set_k, v.unit_k, v.option_k, v.channel, v.measure, v.count_round, v.value
-              from (select distinct k from rs) s cross join lateral (
-                select * from result_value v where v.result_set_k = s.k offset 0) v
-            ),
-            units as (
-              select rs.k as result_set_k, ru.k as unit_k, ru.id as unit_id,
-                     coalesce(ru.area_id, pt.area_id) as area_id, rs.on_date
-              from rs
-              join (select distinct result_set_k, unit_k from vals) v
-                on v.result_set_k = rs.k
-              join reporting_unit ru on ru.k = v.unit_k
-              left join polity_territory pt on pt.polity_id = ru.polity_id and pt.valid @> rs.on_date
-            ),
-            grain as (
-              select distinct unit_k, unit_id, area_id, on_date from units
-            ),
-            links as materialized (
-              select g.unit_k, g.area_id as own_id, g.on_date, ua.area_id, ua.partial,
-                     not ua.partial and dated.scheme_code = own.scheme_code and dated.id <> own.id as rival
-              from grain g join reporting_unit_area ua on ua.unit_id = g.unit_id and ua.valid @> g.on_date and not ua.approximate
-              join area dated on dated.id = ua.area_id left join area own on own.id = g.area_id
-            ),
-            ancestors as (
-              select unit_k, area_id, on_date, true as complete, area_id as origin_id from grain
-              where not exists (
-                select from links l where l.unit_k = grain.unit_k and l.on_date = grain.on_date
-                  and l.own_id = grain.area_id and l.rival
-              )
-              union
-              select unit_k, area_id, on_date, not partial, area_id from links
-              union
-              select a.unit_k, p.parent_id, a.on_date, a.complete, a.origin_id
-              from ancestors a join area_parent p on p.area_id = a.area_id and p.valid @> a.on_date
-            ),
-            climbed as (
-              select u.result_set_k, u.unit_k, a.area_id, bool_or(a.complete) as complete
-              from (select distinct result_set_k, unit_k, coalesce(on_date, 'infinity') as day from units) u
-              join rs on rs.k = u.result_set_k
-              left join area district on district.id = rs.district_area_id
-              join ancestors a on a.unit_k = u.unit_k and coalesce(a.on_date, 'infinity') = u.day
-              left join area origin on origin.id = a.origin_id
-              left join area reached on reached.id = a.area_id
-              where (district.id is null
-                 or (origin.id = district.id or origin.scheme_code is distinct from district.scheme_code)
-                and (reached.id = district.id or reached.scheme_code is distinct from district.scheme_code))
-                and not exists (
-                  select from grain g join ancestors o on o.unit_k = g.unit_k and o.on_date is not distinct from g.on_date
-                    and o.origin_id = g.area_id
-                  join area held on held.id = o.area_id
-                  where g.unit_k = a.unit_k and g.on_date is not distinct from a.on_date
-                    and a.origin_id is distinct from g.area_id and a.area_id <> a.origin_id
-                    and held.scheme_code = reached.scheme_code and held.id <> reached.id
-                )
-              group by u.result_set_k, u.unit_k, a.area_id
-            ),
-            spans as (
-              select rs.k as result_set_k, dc.county_area_id
-              from rs join district_county dc on dc.district_area_id = rs.district_area_id
-                and dc.district_valid @> coalesce(rs.plan_from, rs.on_date) and dc.county_valid @> rs.on_date and dc.share >= 0.005
-            ),
-            reached as (
-              select * from climbed
-              union all
-              select u.result_set_k, u.unit_k, rs.district_area_id,
-                     exists (select from spans s where s.result_set_k = rs.k) and not exists (
-                       select from spans s where s.result_set_k = rs.k and not exists (
-                         select from climbed r where r.result_set_k = s.result_set_k and r.area_id = s.county_area_id))
-              from units u join rs on rs.k = u.result_set_k
-              where rs.district_area_id is not null and rs.allocation_parent_id is null
-                and not exists (select from climbed r where r.result_set_k = rs.k and r.unit_k = u.unit_k and r.area_id = rs.district_area_id)
-            ),
-            coverage as (
-              select m.result_set_k, m.area_id, au.expected, greatest(m.shaped, m.shapeless) as reporting
-              from (
-                select r.result_set_k, r.area_id, rs.on_date,
-                       count(distinct own.id) filter (where own.scheme_code = ru.scheme_code)::int as shaped,
-                       count(distinct r.unit_k) filter (where own.scheme_code is distinct from ru.scheme_code)::int as shapeless
-                from reached r join rs on rs.k = r.result_set_k
-                join reporting_unit ru on ru.k = r.unit_k and ru.scheme_code = 'us.precinct'
-                left join area own on own.id = ru.area_id
-                where exists (select from area_universe u where u.area_id = r.area_id and u.valid @> rs.on_date)
-                group by r.result_set_k, r.area_id, rs.on_date
-              ) m
-              join area_universe au on au.area_id = m.area_id and au.valid @> m.on_date and au.shaped = (m.shaped >= m.shapeless)
-            ),
-            covered as (
-              insert into rollup_coverage (result_set_k, area_k, reporting, expected)
-              select c.result_set_k, area.k, c.reporting, c.expected from coverage c join area on area.id = c.area_id
-            ),
-            counted as (
-              select r.result_set_k, r.area_id, min(r.unit_k) as unit_k,
-                     count(*) > 1 or not bool_and(r.complete) or exists (
-                       select from coverage c where c.result_set_k = r.result_set_k and c.area_id = r.area_id
-                         and c.reporting <> c.expected) as summed
-              from reached r
-              where not exists (select from ceiling x where x.result_set_k = r.result_set_k and x.area_id = r.area_id)
-              group by r.result_set_k, r.area_id
-            ),
-            single as (
-              insert into result_rollup_unit (result_set_k, area_k, unit_k)
-              select c.result_set_k, area.k, c.unit_k from counted c join area on area.id = c.area_id where not c.summed
-            )
-            insert into result_rollup_sum (result_set_k, area_k, option_k, channel, measure, count_round, complete, value)
-            select v.result_set_k, area.k, v.option_k, v.channel, v.measure, v.count_round,
-                   bool_and(a.complete) and not exists (
-                     select from coverage s where s.result_set_k = v.result_set_k and s.area_id = area.id
-                       and s.reporting <> s.expected), sum(v.value)
-            from vals v
-            join reached a on a.result_set_k = v.result_set_k and a.unit_k = v.unit_k
-            join counted c on c.result_set_k = a.result_set_k and c.area_id = a.area_id and c.summed
-            join area on area.id = a.area_id
-            group by v.result_set_k, area.k, area.id, v.option_k, v.channel, v.measure, v.count_round"""
-        ).format(keys=sql.Literal(keys))
-    )
+    steps: dict[str, LiteralString] = {
+        "rs": """select r.k,
+               case when c.notional then greatest(e.date_from, (select min(lower(p.valid)) from area_parent p
+                                                                where p.area_id = c.district_area_id))
+                    else e.date_from end as on_date,
+               bs.valid_from as plan_from, c.id as contest_id, c.district_area_id, c.allocation_parent_id
+        from result_set r join election e on e.id = r.election_id join contest c on c.id = r.contest_id
+        left join boundary_set bs on bs.id = c.boundary_set_id
+        where r.k = any({keys}::int4[])""",
+        "above": """with recursive above as (
+          select rs.k as result_set_k, p.parent_id as area_id, rs.on_date
+          from rs join area_parent p on p.area_id = rs.district_area_id and p.valid @> rs.on_date
+          where rs.allocation_parent_id is not null
+          union
+          select b.result_set_k, p.parent_id, b.on_date
+          from above b join area_parent p on p.area_id = b.area_id and p.valid @> b.on_date
+        )
+        select * from above""",
+        "ceiling": """select b.result_set_k, b.area_id from above b join rs on rs.k = b.result_set_k
+        where exists (
+          select from contest s join above t on t.result_set_k = b.result_set_k and t.area_id = s.district_area_id
+          where s.allocation_parent_id = rs.allocation_parent_id and s.id <> rs.contest_id
+        )""",
+        "vals": """select v.result_set_k, v.unit_k, v.option_k, v.channel, v.measure, v.count_round, v.value
+        from (select distinct k from rs) s cross join lateral (
+          select * from result_value v where v.result_set_k = s.k offset 0) v""",
+        "units": """select rs.k as result_set_k, ru.k as unit_k, ru.id as unit_id,
+               coalesce(ru.area_id, pt.area_id) as area_id, rs.on_date
+        from rs
+        join (select distinct result_set_k, unit_k from vals) v
+          on v.result_set_k = rs.k
+        join reporting_unit ru on ru.k = v.unit_k
+        left join polity_territory pt on pt.polity_id = ru.polity_id and pt.valid @> rs.on_date""",
+        "grain": """select distinct unit_k, unit_id, area_id, on_date from units""",
+        "links": """select g.unit_k, g.area_id as own_id, g.on_date, ua.area_id, ua.partial,
+               not ua.partial and dated.scheme_code = own.scheme_code and dated.id <> own.id as rival
+        from grain g join reporting_unit_area ua on ua.unit_id = g.unit_id and ua.valid @> g.on_date and not ua.approximate
+        join area dated on dated.id = ua.area_id left join area own on own.id = g.area_id""",
+        "ancestors": """with recursive ancestors as (
+          select unit_k, area_id, on_date, true as complete, area_id as origin_id from grain
+          where not exists (
+            select from links l where l.unit_k = grain.unit_k and l.on_date = grain.on_date
+              and l.own_id = grain.area_id and l.rival
+          )
+          union
+          select unit_k, area_id, on_date, not partial, area_id from links
+          union
+          select a.unit_k, p.parent_id, a.on_date, a.complete, a.origin_id
+          from ancestors a join area_parent p on p.area_id = a.area_id and p.valid @> a.on_date
+        )
+        select * from ancestors""",
+        "climbed": """select u.result_set_k, u.unit_k, a.area_id, bool_or(a.complete) as complete
+        from (select distinct result_set_k, unit_k, coalesce(on_date, 'infinity') as day from units) u
+        join rs on rs.k = u.result_set_k
+        left join area district on district.id = rs.district_area_id
+        join ancestors a on a.unit_k = u.unit_k and coalesce(a.on_date, 'infinity') = u.day
+        left join area origin on origin.id = a.origin_id
+        left join area reached on reached.id = a.area_id
+        where (district.id is null
+           or (origin.id = district.id or origin.scheme_code is distinct from district.scheme_code)
+          and (reached.id = district.id or reached.scheme_code is distinct from district.scheme_code))
+          and not exists (
+            select from grain g join ancestors o on o.unit_k = g.unit_k and o.on_date is not distinct from g.on_date
+              and o.origin_id = g.area_id
+            join area held on held.id = o.area_id
+            where g.unit_k = a.unit_k and g.on_date is not distinct from a.on_date
+              and a.origin_id is distinct from g.area_id and a.area_id <> a.origin_id
+              and held.scheme_code = reached.scheme_code and held.id <> reached.id
+          )
+        group by u.result_set_k, u.unit_k, a.area_id""",
+        "spans": """select rs.k as result_set_k, dc.county_area_id
+        from rs join district_county dc on dc.district_area_id = rs.district_area_id
+          and dc.district_valid @> coalesce(rs.plan_from, rs.on_date) and dc.county_valid @> rs.on_date and dc.share >= 0.005""",
+        "reached": """select * from climbed
+        union all
+        select u.result_set_k, u.unit_k, rs.district_area_id,
+               exists (select from spans s where s.result_set_k = rs.k) and not exists (
+                 select from spans s where s.result_set_k = rs.k and not exists (
+                   select from climbed r where r.result_set_k = s.result_set_k and r.area_id = s.county_area_id))
+        from units u join rs on rs.k = u.result_set_k
+        where rs.district_area_id is not null and rs.allocation_parent_id is null
+          and not exists (select from climbed r where r.result_set_k = rs.k and r.unit_k = u.unit_k and r.area_id = rs.district_area_id)""",
+        "coverage": """select m.result_set_k, m.area_id, au.expected, greatest(m.shaped, m.shapeless) as reporting
+        from (
+          select r.result_set_k, r.area_id, rs.on_date,
+                 count(distinct own.id) filter (where own.scheme_code = ru.scheme_code)::int as shaped,
+                 count(distinct r.unit_k) filter (where own.scheme_code is distinct from ru.scheme_code)::int as shapeless
+          from reached r join rs on rs.k = r.result_set_k
+          join reporting_unit ru on ru.k = r.unit_k and ru.scheme_code = 'us.precinct'
+          left join area own on own.id = ru.area_id
+          where exists (select from area_universe u where u.area_id = r.area_id and u.valid @> rs.on_date)
+          group by r.result_set_k, r.area_id, rs.on_date
+        ) m
+        join area_universe au on au.area_id = m.area_id and au.valid @> m.on_date and au.shaped = (m.shaped >= m.shapeless)""",
+        "counted": """select r.result_set_k, r.area_id, min(r.unit_k) as unit_k,
+               count(*) > 1 or not bool_and(r.complete) or exists (
+                 select from coverage c where c.result_set_k = r.result_set_k and c.area_id = r.area_id
+                   and c.reporting <> c.expected) as summed
+        from reached r
+        where not exists (select from ceiling x where x.result_set_k = r.result_set_k and x.area_id = r.area_id)
+        group by r.result_set_k, r.area_id""",
+    }
+    for name, query in steps.items():
+        conn.execute(
+            sql.SQL("create temp table {} as ").format(sql.Identifier(name))
+            + sql.SQL(query).format(keys=sql.Literal(keys))
+        )
+        conn.execute(sql.SQL("analyze {}").format(sql.Identifier(name)))
+    conn.execute("""insert into rollup_coverage (result_set_k, area_k, reporting, expected)
+    select c.result_set_k, area.k, c.reporting, c.expected from coverage c join area on area.id = c.area_id""")
+    conn.execute("""insert into result_rollup_unit (result_set_k, area_k, unit_k)
+    select c.result_set_k, area.k, c.unit_k from counted c join area on area.id = c.area_id where not c.summed""")
+    conn.execute("""insert into result_rollup_sum (result_set_k, area_k, option_k, channel, measure, count_round, complete, value)
+    select v.result_set_k, area.k, v.option_k, v.channel, v.measure, v.count_round,
+           bool_and(a.complete) and not exists (
+             select from coverage s where s.result_set_k = v.result_set_k and s.area_id = area.id
+               and s.reporting <> s.expected), sum(v.value)
+    from vals v
+    join reached a on a.result_set_k = v.result_set_k and a.unit_k = v.unit_k
+    join counted c on c.result_set_k = a.result_set_k and c.area_id = a.area_id and c.summed
+    join area on area.id = a.area_id
+    group by v.result_set_k, area.k, area.id, v.option_k, v.channel, v.measure, v.count_round""")
+    conn.execute(sql.SQL("drop table {}").format(sql.SQL(", ").join(map(sql.Identifier, steps))))
     _days(conn, sql.SQL("r.result_set_k = any({}::int4[])").format(sql.Literal(keys)))
 
 
