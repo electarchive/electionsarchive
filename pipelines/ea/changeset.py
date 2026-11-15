@@ -4,7 +4,7 @@ import unicodedata
 from array import array
 from collections import defaultdict
 from collections.abc import Iterable, Sequence
-from datetime import date, datetime
+from datetime import UTC, date, datetime
 from pathlib import Path
 from typing import LiteralString, cast
 from uuid import NAMESPACE_URL, UUID, uuid5, uuid7
@@ -18,6 +18,7 @@ from ea.raw import Artifact
 from ea.store import DATA, Connection, checkout
 
 NAMESPACE = uuid5(NAMESPACE_URL, "https://electionsarchive.com/")
+PACKAGES_ONLY_FROM = datetime(2026, 11, 15, 7, tzinfo=UTC)
 CHUNK = 200_000
 LATE = ("name", "slug", "external_id", "note", "label", "citation", "entity_merge", "entity_retirement")
 UUID_TEXT = re.compile(r"[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}")
@@ -537,6 +538,15 @@ class Changeset:
                         self.merge(option, twins[0])
 
     def write(self) -> Path:
+        pipeline = self.manifest["pipeline"]
+        if self.manifest["kind"] == "import" and self.conn.execute(
+            "select exists (select from changeset where pipeline = %s and created_at < %s)",
+            (pipeline, PACKAGES_ONLY_FROM),
+        ).fetchone() == (False,):
+            raise SystemExit(
+                f"{pipeline} has no changeset from before {PACKAGES_ONLY_FROM:%Y-%m-%d %H:%M} UTC, so it is a new family:"
+                " build packages with ea.package and load them with `ea package load` (.agents/spec/file-first.md)"
+            )
         self._answers()
         tables: dict[str, pl.DataFrame] = {}
         for table, rows in self.rows.items():
