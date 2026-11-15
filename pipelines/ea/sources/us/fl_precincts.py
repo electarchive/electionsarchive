@@ -1,7 +1,6 @@
 import io
 import os
 import re
-import subprocess
 import tempfile
 import unicodedata
 import zipfile
@@ -272,7 +271,7 @@ def president_2008(schema: pl.Schema, counties: dict[str, str], labels: dict[str
 def returns_2008() -> dict[str, dict[tuple[str, str], int]]:
     counties: dict[str, dict[tuple[str, str], int]] = {}
     with zipfile.ZipFile(raw.cached(SOURCE, RETURNS_URL).path) as archive:
-        for member in sorted(archive.namelist(), key=lambda member: member.lower().endswith((".xls", ".pdf"))):
+        for member in sorted(archive.namelist(), key=lambda member: member.lower().endswith(".xls")):
             parts = member.split("/")
             if len(parts) != 4 or parts[1] != "General" or not parts[3] or parts[2] in counties:
                 continue
@@ -282,16 +281,12 @@ def returns_2008() -> dict[str, dict[tuple[str, str], int]]:
                     name, data = inner.namelist()[0].lower(), inner.read(inner.namelist()[0])
             if name.endswith((".asc", ".001")):
                 counted = ess(data)
-            elif data.startswith(b"precinct_id\t"):
-                counted = canvass(data)
             elif name.endswith(".txt") and data.startswith(b'"'):
                 counted = gems(data)
             elif name.endswith(".xls"):
                 counted = sheet(data)
             elif name.endswith(".mdb"):
                 counted = access(data)
-            elif name.startswith("canvass report"):
-                counted = report(data)
             else:
                 continue
             if counted:
@@ -299,7 +294,7 @@ def returns_2008() -> dict[str, dict[tuple[str, str], int]]:
     return counties
 
 
-INCOMPLETE_2008 = {"Alachua", "Indian River", "Palm Beach"}
+INCOMPLETE_2008 = {"Alachua"}
 TOKEN = re.compile(rb'"([^"]*)"|([^\s,"\']+)')
 STATISTICS = {
     "TIMES BLANK VOTED": "UNDERVOTES",
@@ -387,35 +382,6 @@ def access(data: bytes) -> dict[tuple[str, str], int]:
             candidate = ticket(candidate)
         key = (str(int(precinct)), candidate)
         counted[key] = counted.get(key, 0) + int(votes)
-    return counted
-
-
-def report(data: bytes) -> dict[tuple[str, str], int]:
-    text = subprocess.run(["pdftotext", "-layout", "-", "-"], input=data, capture_output=True, check=True).stdout
-    lines = [line.rstrip() for line in text.decode("utf-8").splitlines()]
-    counted: dict[tuple[str, str], int] = {}
-    for index, line in enumerate(lines):
-        if line.strip() != "President":
-            continue
-        unit = next(text.strip() for text in reversed(lines[:index]) if text.strip())
-        for row in lines[index + 2 :]:
-            match = re.fullmatch(r"(\S.*?)\s{2,}[\d,\s]*?([\d,]+)", row)
-            if match is None:
-                break
-            counted[(unit, ticket(match[1]))] = int(match[2].replace(",", ""))
-    return counted
-
-
-def canvass(data: bytes) -> dict[tuple[str, str], int]:
-    frame = pl.read_csv(data, separator="\t", infer_schema=False, quote_char=None, encoding="utf8-lossy")
-    counted: dict[tuple[str, str], int] = {}
-    for precinct, contest, candidate, total in frame.select(
-        "precinct_id", "contest_name", "candidate_name", "grand_total"
-    ).iter_rows():
-        if not contest.upper().startswith("PRES") or not total:
-            continue
-        key = (precinct, ticket(candidate))
-        counted[key] = counted.get(key, 0) + int(total)
     return counted
 
 
