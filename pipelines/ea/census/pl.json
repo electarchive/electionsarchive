@@ -1318,8 +1318,9 @@
       "dates": [
         {
           "date": "1947-01-19",
+          "contests": 52,
           "source": "isap",
-          "quote": "DU/1946/322: order of the elections to the Legislative Sejm"
+          "quote": "MP/1947/19: results notice, 52 constituencies"
         },
         {
           "date": "1952-10-26",
@@ -1333,38 +1334,45 @@
         },
         {
           "date": "1961-04-16",
+          "contests": 80,
           "source": "isap",
-          "quote": "MP/1961/145: results notice of the Sejm elections"
+          "quote": "MP/1961/145: results notice, 80 constituencies"
         },
         {
           "date": "1965-05-30",
+          "contests": 80,
           "source": "isap",
-          "quote": "MP/1965/157: results notice of the Sejm elections"
+          "quote": "MP/1965/157: results notice, 80 constituencies"
         },
         {
           "date": "1969-06-01",
+          "contests": 80,
           "source": "isap",
-          "quote": "MP/1969/177: results notice of the Sejm elections"
+          "quote": "MP/1969/177: results notice, 80 constituencies"
         },
         {
           "date": "1972-03-19",
+          "contests": 80,
           "source": "isap",
-          "quote": "MP/1972/110: results notice of the Sejm elections"
+          "quote": "MP/1972/110: results notice, 80 constituencies"
         },
         {
           "date": "1976-03-21",
+          "contests": 71,
           "source": "isap",
-          "quote": "MP/1976/52: results notice of the Sejm elections"
+          "quote": "MP/1976/52: results notice, 71 constituencies"
         },
         {
           "date": "1980-03-23",
+          "contests": 72,
           "source": "isap",
-          "quote": "MP/1980/37: results notice of the Sejm elections"
+          "quote": "MP/1980/37: results notice, 72 constituencies"
         },
         {
           "date": "1985-10-13",
+          "contests": 75,
           "source": "isap",
-          "quote": "MP/1985/198: results notice of the Sejm elections"
+          "quote": "MP/1985/198: results notice, 74 constituencies and the national list"
         }
       ]
     },
