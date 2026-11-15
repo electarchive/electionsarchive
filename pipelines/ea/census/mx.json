@@ -347,6 +347,62 @@
    "url": "https://www.iecm.mx/www/sites/biblioteca_electronica/estadisticas_y_estudios_electorales/estudios_electorales/comparativo_de_las_elecciones_locales_de_2000_y_2003_en_el_df.pdf",
    "kind": "official_body",
    "note": "Read 2026-11-14. States that the 2000 and 2003 processes each elected the 16 jefaturas delegacionales and the 66 deputies, and that the jornada of 2003 was 6 July."
+  },
+  "wiki_es_2000_2002": {
+   "title": "Elecciones estatales de <estado> de 2000, 2001, and 2002 (per-state articles) and Anexo:Elecciones locales de México",
+   "publisher": "Wikipedia (Spanish)",
+   "url": "https://es.wikipedia.org/wiki/Anexo:Elecciones_locales_de_M%C3%A9xico",
+   "kind": "community",
+   "note": "Read 2026-11-14. Each per-state article gives the day held and the offices at stake. The Anexo lists San Luis Potosí on 13 August 2000, Baja California on 24 June 2001, Veracruz's extraordinary election on 5 August 2001, Guerrero's 6 October 2002 election with an article dated 3 February, and an Estado de México election on 7 July 2002 that has no article; the per-state articles, the institute pages, and La Jornada reports used here contradict those entries."
+  },
+  "ieeh_2002": {
+   "title": "Procesos Electorales Locales Ordinarios 2002",
+   "publisher": "Instituto Estatal Electoral de Hidalgo",
+   "url": "https://www.ieehidalgo.org.mx/procesos-electorales/resultados-historicos/pel-2002/",
+   "kind": "official_body",
+   "note": "Read 2026-11-14. Ayuntamientos celebrated 10 November 2002; diputaciones celebrated 17 February 2002."
+  },
+  "ite_2001": {
+   "title": "Memoria del proceso electoral ordinario 2001",
+   "publisher": "Instituto Tlaxcalteca de Elecciones",
+   "url": "https://itetlax.org.mx/assets/pdf/memElect/3.pdf",
+   "kind": "official_body",
+   "note": "Read 2026-11-14. The proceso electoral ordinario of 11 November 2001 renewed the Congreso, 60 ayuntamientos, and 300 presidencias de comunidad."
+  },
+  "ieepuebla_2001": {
+   "title": "Memoria del Proceso Electoral Ordinario del Estado de Puebla 2001 y del Proceso Electoral Extraordinario en el Municipio de Molcaxac 2002",
+   "publisher": "Instituto Electoral del Estado de Puebla",
+   "url": "https://www.ieepuebla.org.mx/prevfiles/arc_Memoria%20Definitiva.pdf",
+   "kind": "official_body",
+   "note": "Read 2026-11-14 (table of contents and chapter titles). Chapter 7 reports the results of the election of 11 November 2001 for diputados and ayuntamientos."
+  },
+  "jornada_oax_2001": {
+   "title": "Oaxaca: comicios de 5 de agosto y 7 de octubre de 2001, La Jornada 2001-08-06, 2001-09-06, and 2001-10-07",
+   "publisher": "La Jornada",
+   "url": "https://edit00.jornada.com.mx/2001/10/07/035n1est.html",
+   "kind": "news_agency",
+   "note": "Read 2026-11-14. 25 majority and 17 proportional diputados on 5 August 2001; 152 ayuntamientos elected by party system on 7 October 2001, the other 418 by usos y costumbres on various dates."
+  },
+  "tepjf_oax_2001": {
+   "title": "Sentencia SUP-JRC-205-2001, Tribunal Electoral del Poder Judicial de la Federación, 31 October 2001",
+   "publisher": "Tribunal Electoral del Poder Judicial de la Federación",
+   "url": "https://vlex.com.mx/vid/43534646",
+   "kind": "official_body",
+   "note": "Read 2026-11-14. Records that the diputados election in Oaxaca was held on 5 August 2001."
+  },
+  "jornada_gro_2002": {
+   "title": "Guerrero: comicios del 6 de octubre de 2002, La Jornada 2002-11-12 and 2002-11-29",
+   "publisher": "La Jornada",
+   "url": "https://www.jornada.com.mx/2002/11/12/033n2est.php?origen=estados.html",
+   "kind": "news_agency",
+   "note": "Read 2026-11-14. The 6 October 2002 elections renewed 76 ayuntamientos and the Congress (46 diputaciones); the Boletín Mexicano de Derecho Comparado 109 gives the same day."
+  },
+  "jornada_roo_2002": {
+   "title": "Quintana Roo: comicios del 17 de febrero de 2002, La Jornada 2002-02-18",
+   "publisher": "La Jornada",
+   "url": "https://www.jornada.com.mx/2002/02/18/029n2est.php?printver=1",
+   "kind": "news_agency",
+   "note": "Read 2026-11-14. Comicios of 17 February renewed the eight presidencias municipales and the state Congress."
   }
  },
  "tiers": [
@@ -1413,8 +1469,72 @@
    "dates": [
     {
      "date": "1917-01-01",
-     "through": "2002-12-31",
-     "note": "Per-state governor elections before 2003 are not yet enumerated."
+     "through": "1999-12-31",
+     "note": "Per-state governor elections before 2000 are not yet enumerated."
+    },
+    {
+     "date": "2000-07-02",
+     "contests": 2,
+     "source": "wiki_es_2000_2002",
+     "regions": {
+      "GUA": 1,
+      "MOR": 1
+     },
+     "quote": "Elecciones estatales de Guanajuato de 2000 and Morelos de 2000, 2 de julio de 2000, Gobernador."
+    },
+    {
+     "date": "2000-08-20",
+     "contests": 1,
+     "source": "wiki_es_2000_2002",
+     "regions": {
+      "CHP": 1
+     },
+     "quote": "Elecciones estatales de Chiapas de 2000, domingo 20 de agosto de 2000, Gobernador (Pablo Salazar Mendiguchía)."
+    },
+    {
+     "date": "2000-10-15",
+     "contests": 1,
+     "source": "wiki_es_2000_2002",
+     "regions": {
+      "TAB": 1
+     },
+     "quote": "Elecciones estatales de Tabasco de 2000, 15 de octubre de 2000, Gobernador; annulled."
+    },
+    {
+     "date": "2000-11-12",
+     "contests": 1,
+     "source": "wiki_es_2000_2002",
+     "regions": {
+      "JAL": 1
+     },
+     "quote": "Elecciones estatales de Jalisco de 2000, 12 de noviembre de 2000, Gobernador."
+    },
+    {
+     "date": "2001-05-27",
+     "contests": 1,
+     "source": "wiki_es_2000_2002",
+     "regions": {
+      "YUC": 1
+     },
+     "quote": "Elecciones estatales de Yucatán de 2001, 27 de mayo de 2001, Gobernador."
+    },
+    {
+     "date": "2001-08-05",
+     "contests": 1,
+     "source": "wiki_es_2000_2002",
+     "regions": {
+      "TAB": 1
+     },
+     "quote": "Elecciones estatales extraordinarias de Tabasco de 2001, domingo 5 de agosto de 2001, rerun of the annulled governor election of 15 October 2000."
+    },
+    {
+     "date": "2001-11-11",
+     "contests": 1,
+     "source": "wiki_es_2000_2002",
+     "regions": {
+      "MIC": 1
+     },
+     "quote": "Elecciones estatales de Michoacán de 2001, domingo 11 de noviembre de 2001, Gobernador."
     },
     {
      "date": "2003-07-06",
@@ -1919,8 +2039,168 @@
    "dates": [
     {
      "date": "1917-01-01",
-     "through": "2002-12-31",
-     "note": "Per-state legislative elections before 2003 are not yet enumerated."
+     "through": "1999-12-31",
+     "note": "Per-state legislative elections before 2000 are not yet enumerated."
+    },
+    {
+     "date": "2000-03-05",
+     "contests": 1,
+     "source": "wiki_es_2000_2002",
+     "regions": {
+      "MEX": 1
+     },
+     "quote": "Elecciones estatales del Estado de México de 2000, domingo 5 de marzo de 2000, diputados."
+    },
+    {
+     "date": "2000-07-02",
+     "contests": 9,
+     "source": "wiki_es_2000_2002",
+     "regions": {
+      "CAM": 1,
+      "COL": 1,
+      "CMX": 1,
+      "GUA": 1,
+      "MOR": 1,
+      "NLE": 1,
+      "QUE": 1,
+      "SLP": 1,
+      "SON": 1
+     },
+     "quote": "Per-state articles, 2 de julio de 2000: Campeche (35 diputados), Colima (25), Distrito Federal (66), Guanajuato (36), Morelos (30), Nuevo León (42), Querétaro, San Luis Potosí, and Sonora (33). The Anexo lists San Luis Potosí on 13 August; its article says 2 July."
+    },
+    {
+     "date": "2000-09-03",
+     "contests": 1,
+     "source": "wiki_es_2000_2002",
+     "regions": {
+      "VER": 1
+     },
+     "quote": "Elecciones estatales de Veracruz de 2000, domingo 3 de septiembre de 2000."
+    },
+    {
+     "date": "2000-10-15",
+     "contests": 1,
+     "source": "wiki_es_2000_2002",
+     "regions": {
+      "TAB": 1
+     },
+     "quote": "Elecciones estatales de Tabasco de 2000, 15 de octubre de 2000, 31 diputados."
+    },
+    {
+     "date": "2000-11-12",
+     "contests": 1,
+     "source": "wiki_es_2000_2002",
+     "regions": {
+      "JAL": 1
+     },
+     "quote": "Elecciones estatales de Jalisco de 2000, 12 de noviembre de 2000, 40 diputados."
+    },
+    {
+     "date": "2001-05-27",
+     "contests": 1,
+     "source": "wiki_es_2000_2002",
+     "regions": {
+      "YUC": 1
+     },
+     "quote": "Elecciones estatales de Yucatán de 2001, 27 de mayo de 2001, 25 diputados."
+    },
+    {
+     "date": "2001-07-01",
+     "contests": 3,
+     "source": "wiki_es_2000_2002",
+     "regions": {
+      "CHH": 1,
+      "DUR": 1,
+      "ZAC": 1
+     },
+     "quote": "Per-state articles, domingo 1 de julio de 2001: Chihuahua (33 diputados), Durango, and Zacatecas."
+    },
+    {
+     "date": "2001-07-08",
+     "contests": 1,
+     "source": "wiki_es_2000_2002",
+     "regions": {
+      "BCN": 1
+     },
+     "quote": "Elecciones estatales de Baja California de 2001, domingo 8 de julio de 2001, 25 diputados (the Anexo lists 24 June)."
+    },
+    {
+     "date": "2001-08-05",
+     "contests": 2,
+     "source": "tepjf_oax_2001",
+     "regions": {
+      "AGU": 1,
+      "OAX": 1
+     },
+     "quote": "Oaxaca: SUP-JRC-205-2001, 'El cinco de agosto del año en curso, en el Estado de Oaxaca, se celebraron los comicios para elegir ... Diputados'; Aguascalientes: Elecciones estatales de Aguascalientes de 2001, 5 de agosto de 2001, 25 diputados."
+    },
+    {
+     "date": "2001-10-07",
+     "contests": 2,
+     "source": "wiki_es_2000_2002",
+     "regions": {
+      "CHP": 1,
+      "TAM": 1
+     },
+     "quote": "Elecciones estatales de Chiapas de 2001 (40 diputados) and Tamaulipas de 2001 (32 diputados), domingo 7 de octubre de 2001."
+    },
+    {
+     "date": "2001-11-11",
+     "contests": 4,
+     "source": "ite_2001",
+     "regions": {
+      "MIC": 1,
+      "PUE": 1,
+      "SIN": 1,
+      "TLA": 1
+     },
+     "quote": "Tlaxcala: 'proceso electoral ordinario del 11 de noviembre del 2001 en el que se renovó el Congreso del Estado'. Puebla: Memoria 2001, 'los resultados de la elección del 11 de noviembre de 2001'. Michoacán and Sinaloa: per-state articles, 11 de noviembre de 2001."
+    },
+    {
+     "date": "2002-02-03",
+     "contests": 1,
+     "source": "wiki_es_2000_2002",
+     "regions": {
+      "BCS": 1
+     },
+     "quote": "Elecciones estatales de Baja California Sur de 2002, 3 de febrero de 2002, 21 diputados."
+    },
+    {
+     "date": "2002-02-17",
+     "contests": 2,
+     "source": "ieeh_2002",
+     "regions": {
+      "HID": 1,
+      "ROO": 1
+     },
+     "quote": "Hidalgo: 'Diputaciones Celebrada el día 17 de Febrero de 2002'. Quintana Roo: La Jornada 2002-02-18, comicios of 17 February for the state Congress."
+    },
+    {
+     "date": "2002-07-07",
+     "contests": 1,
+     "source": "wiki_es_2000_2002",
+     "regions": {
+      "NAY": 1
+     },
+     "quote": "Elecciones estatales de Nayarit de 2002, domingo 7 de julio de 2002, 30 diputados."
+    },
+    {
+     "date": "2002-09-22",
+     "contests": 1,
+     "source": "wiki_es_2000_2002",
+     "regions": {
+      "COA": 1
+     },
+     "quote": "Elecciones estatales de Coahuila de 2002, domingo 22 de septiembre de 2002."
+    },
+    {
+     "date": "2002-10-06",
+     "contests": 1,
+     "source": "jornada_gro_2002",
+     "regions": {
+      "GRO": 1
+     },
+     "quote": "Las elecciones en Guerrero se realizaron el pasado 6 de octubre para renovar 76 ayuntamientos y las 46 diputaciones que integran el Congreso local."
     },
     {
      "date": "2003-03-09",
@@ -2736,8 +3016,202 @@
    "dates": [
     {
      "date": "1917-01-01",
-     "through": "2002-12-31",
-     "note": "Per-state municipal elections before 2003 are not yet enumerated."
+     "through": "1999-12-31",
+     "note": "Per-state municipal elections before 2000 are not yet enumerated."
+    },
+    {
+     "date": "2000-03-05",
+     "contests": 122,
+     "source": "wiki_es_2000_2002",
+     "regions": {
+      "MEX": 122
+     },
+     "quote": "Elecciones estatales del Estado de México de 2000, domingo 5 de marzo de 2000, 122 ayuntamientos."
+    },
+    {
+     "date": "2000-07-02",
+     "contests": 299,
+     "source": "wiki_es_2000_2002",
+     "regions": {
+      "CAM": 11,
+      "COL": 10,
+      "GUA": 46,
+      "MOR": 33,
+      "NLE": 51,
+      "QUE": 18,
+      "SLP": 58,
+      "SON": 72
+     },
+     "quote": "Per-state articles, 2 de julio de 2000: Campeche 11, Colima 10, Guanajuato 46, Morelos 33, Nuevo León 51, Querétaro 18, San Luis Potosí 58, Sonora 72."
+    },
+    {
+     "date": "2000-09-03",
+     "contests": 212,
+     "source": "wiki_es_2000_2002",
+     "regions": {
+      "VER": 212
+     },
+     "quote": "Elecciones estatales de Veracruz de 2000, 3 de septiembre de 2000, 212 ayuntamientos (its infobox says 217)."
+    },
+    {
+     "date": "2000-10-15",
+     "contests": 17,
+     "source": "wiki_es_2000_2002",
+     "regions": {
+      "TAB": 17
+     },
+     "quote": "Elecciones estatales de Tabasco de 2000, 15 de octubre de 2000, 17 ayuntamientos."
+    },
+    {
+     "date": "2000-11-12",
+     "contests": 124,
+     "source": "wiki_es_2000_2002",
+     "regions": {
+      "JAL": 124
+     },
+     "quote": "Elecciones estatales de Jalisco de 2000, 12 de noviembre de 2000, 124 ayuntamientos."
+    },
+    {
+     "date": "2001-01-28",
+     "contests": 1,
+     "source": "wiki_es_2000_2002",
+     "regions": {
+      "MOR": 1
+     },
+     "quote": "Elecciones estatales extraordinarias de Morelos de 2001, 28 de enero de 2001, ayuntamiento of Ocuituco after the annulment of the July 2000 election."
+    },
+    {
+     "date": "2001-05-27",
+     "contests": 106,
+     "source": "wiki_es_2000_2002",
+     "regions": {
+      "YUC": 106
+     },
+     "quote": "Elecciones estatales de Yucatán de 2001, 27 de mayo de 2001, 106 ayuntamientos."
+    },
+    {
+     "date": "2001-07-01",
+     "contests": 163,
+     "source": "wiki_es_2000_2002",
+     "regions": {
+      "CHH": 67,
+      "DUR": 39,
+      "ZAC": 57
+     },
+     "quote": "Per-state articles, domingo 1 de julio de 2001: Chihuahua 67, Durango 39, Zacatecas 57."
+    },
+    {
+     "date": "2001-07-08",
+     "contests": 5,
+     "source": "wiki_es_2000_2002",
+     "regions": {
+      "BCN": 5
+     },
+     "quote": "Elecciones estatales de Baja California de 2001, domingo 8 de julio de 2001, 5 ayuntamientos."
+    },
+    {
+     "date": "2001-07-15",
+     "contests": 3,
+     "source": "wiki_es_2000_2002",
+     "regions": {
+      "VER": 3
+     },
+     "quote": "Elecciones estatales extraordinarias de Veracruz de 2001, domingo 15 de julio de 2001, 3 ayuntamientos (the Anexo lists 5 August; the article's 33 diputados is not carried here)."
+    },
+    {
+     "date": "2001-08-05",
+     "contests": 11,
+     "source": "wiki_es_2000_2002",
+     "regions": {
+      "AGU": 11
+     },
+     "quote": "Elecciones estatales de Aguascalientes de 2001, domingo 5 de agosto de 2001, 11 ayuntamientos."
+    },
+    {
+     "date": "2001-10-07",
+     "contests": 313,
+     "source": "jornada_oax_2001",
+     "regions": {
+      "CHP": 118,
+      "OAX": 152,
+      "TAM": 43
+     },
+     "quote": "Oaxaca: 'el próximo 7 de octubre contenderán en comicios municipales' 152 municipios by the party system (418 others by usos y costumbres on varied dates). Chiapas 118 and Tamaulipas 43: per-state articles, 7 de octubre de 2001."
+    },
+    {
+     "date": "2001-11-11",
+     "contests": 408,
+     "source": "ite_2001",
+     "regions": {
+      "MIC": 113,
+      "PUE": 217,
+      "SIN": 18,
+      "TLA": 60
+     },
+     "quote": "Tlaxcala: 'sesenta ayuntamientos y trescientas presidencias de comunidad', 11 November 2001. Michoacán 113, Puebla 217, and Sinaloa 18: per-state articles and the Puebla memoria, 11 de noviembre de 2001."
+    },
+    {
+     "date": "2002-02-03",
+     "contests": 5,
+     "source": "wiki_es_2000_2002",
+     "regions": {
+      "BCS": 5
+     },
+     "quote": "Elecciones estatales de Baja California Sur de 2002, 3 de febrero de 2002, 5 ayuntamientos."
+    },
+    {
+     "date": "2002-02-17",
+     "contests": 8,
+     "source": "jornada_roo_2002",
+     "regions": {
+      "ROO": 8
+     },
+     "quote": "Comicios para renovar las ocho presidencias municipales y el Congreso del estado, 17 de febrero."
+    },
+    {
+     "date": "2002-05-12",
+     "contests": 1,
+     "source": "wiki_es_2000_2002",
+     "regions": {
+      "CHH": 1
+     },
+     "quote": "Elecciones estatales extraordinarias de Chihuahua de 2002, domingo 12 de mayo de 2002, ayuntamiento of Juárez."
+    },
+    {
+     "date": "2002-07-07",
+     "contests": 20,
+     "source": "wiki_es_2000_2002",
+     "regions": {
+      "NAY": 20
+     },
+     "quote": "Elecciones estatales de Nayarit de 2002, domingo 7 de julio de 2002, 20 ayuntamientos."
+    },
+    {
+     "date": "2002-09-22",
+     "contests": 38,
+     "source": "wiki_es_2000_2002",
+     "regions": {
+      "COA": 38
+     },
+     "quote": "Elecciones estatales de Coahuila de 2002, domingo 22 de septiembre de 2002, 38 ayuntamientos."
+    },
+    {
+     "date": "2002-10-06",
+     "contests": 76,
+     "source": "jornada_gro_2002",
+     "regions": {
+      "GRO": 76
+     },
+     "quote": "Las elecciones en Guerrero se realizaron el pasado 6 de octubre para renovar 76 ayuntamientos."
+    },
+    {
+     "date": "2002-11-10",
+     "contests": 84,
+     "source": "ieeh_2002",
+     "regions": {
+      "HID": 84
+     },
+     "quote": "Ayuntamientos celebrada el día 10 de Noviembre de 2002 (84 municipios)."
     },
     {
      "date": "2003-03-09",
