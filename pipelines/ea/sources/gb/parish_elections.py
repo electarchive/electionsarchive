@@ -448,6 +448,72 @@ COUNCILS["E07000082/2024"] = {
     "bracketed": True,
     "reader": "notices+declarations",
 }
+COUNCILS["E07000181/2024"] = {
+    "day": date(2024, 5, 2),
+    "publisher": "West Oxfordshire District Council",
+    "title": "Notices of results of uncontested town and parish council elections, 2 May 2024",
+    "url": "https://www.westoxon.gov.uk/media/ekrbq5lf/notice-of-uncontested-elections-town-and-parish-councils-2-may-2024.pdf",
+    "files": [
+        "https://www.westoxon.gov.uk/media/ekrbq5lf/notice-of-uncontested-elections-town-and-parish-councils-2-may-2024.pdf"
+    ],
+    "reader": "notices",
+}
+COUNCILS["E06000031/2024"] = {
+    "day": date(2024, 5, 2),
+    "publisher": "Peterborough City Council",
+    "title": "Notice of uncontested elections, parish councillors, 2 May 2024",
+    "url": "https://www.peterborough.gov.uk/asset-library/notice-of-uncontested-elections-parish-councillors-20241.pdf",
+    "files": [
+        "https://www.peterborough.gov.uk/asset-library/notice-of-uncontested-elections-parish-councillors-20241.pdf"
+    ],
+    "areas": {
+        "Hampton Hargate": ("Hampton Hargate and Vale", "Hampton Hargate"),
+        "Hampton Vale": ("Hampton Hargate and Vale", "Hampton Vale"),
+    },
+    "reader": "notices",
+}
+COUNCILS["E07000089/2024"] = {
+    "day": date(2024, 5, 2),
+    "publisher": "Hart District Council",
+    "title": "Notices of uncontested elections, parish and town councils, 2 May 2024",
+    "url": f"{HART}/sites/default/files/2026-02/May-2024-uncontested-elections-parish.pdf",
+    "files": [f"{HART}/sites/default/files/2026-02/May-2024-uncontested-elections-parish.pdf"],
+    "areas": {
+        f"Crookham Village - {ward} Ward": ("Crookham Village", ward)
+        for ward in ("Crookham Village", "Netherhouse", "Zebon")
+    },
+    "reader": "notices",
+}
+COUNCILS["E07000081/2024"] = {
+    "day": date(2024, 5, 2),
+    "publisher": "Gloucester City Council",
+    "title": "Notices of uncontested election, Quedgeley Town Council, 2 May 2024",
+    "url": "https://www.gloucester.gov.uk/media/gyhfltdm/qtc-notices-of-uncontested-elections-combined.pdf",
+    "files": ["https://www.gloucester.gov.uk/media/gyhfltdm/qtc-notices-of-uncontested-elections-combined.pdf"],
+    "ends": ("candidates",),
+    "reader": "notices",
+}
+COUNCILS["E07000068/2024"] = {
+    "day": date(2024, 5, 2),
+    "publisher": "Brentwood Borough Council",
+    "title": "Notices of uncontested election, parish councils, 2 May 2024",
+    "url": "https://www.brentwood.gov.uk/media/674",
+    "files": [f"https://www.brentwood.gov.uk/media/{number}" for number in (674, 675, 676)],
+    "header": 400,
+    "reader": "notices",
+}
+COUNCILS["E07000223/2024"] = {
+    "day": date(2024, 5, 2),
+    "publisher": "Adur District Council",
+    "title": "Notice of uncontested election, Sompting Parish Council, 2 May 2024",
+    "url": "https://www.adur-worthing.gov.uk/media/Media,171323,smxx.pdf",
+    "files": ["https://www.adur-worthing.gov.uk/media/Media,171323,smxx.pdf"],
+    "areas": {
+        f"Sompting - {ward} Ward": ("Sompting", ward)
+        for ward in ("Cokeham North", "Cokeham South", "Peverel North", "Peverel South")
+    },
+    "reader": "notices",
+}
 STRATFORD = "https://www.stratford.gov.uk/doc"
 COUNCILS["E07000221/2023"] = {
     "day": date(2023, 5, 4),
@@ -549,6 +615,7 @@ PARTIES: dict[str, str | None] = {
     "Homeland Party": "Q119285871",
 }
 ALIASES = {
+    ("E06000031", "Bainton & Ashton"): "Bainton",
     ("E07000082", "Bisley"): "Bisley-with-Lypiatt",
     ("E07000082", "Randwick"): "Randwick and Westrip",
     ("E07000011", "Kimbolton & Stonely"): "Kimbolton",
@@ -831,7 +898,7 @@ def notices(lad: str, council: dict) -> list[dict]:
                 )
                 continue
             if heading is None:
-                if not reads and "UNCONTESTED ELECTIONS" in page:
+                if not reads and "UNCONTESTED ELECTIONS" in page.upper():
                     continue
                 if not reads or reads[-1]["url"] != url or not reads[-1]["uncontested"]:
                     raise ValueError(f"{url} page {number}: no heading")
@@ -844,6 +911,7 @@ def notices(lad: str, council: dict) -> list[dict]:
                 header = max(
                     y for x, y, word in words if word == "Candidate" and x < 260 and y < council.get("header", 300)
                 )
+                header = max([header, *(y for x, y, word in words if word == "any)" and header < y < header + 20)])
                 name_limit, description_x = council.get("columns", (215, 375))
                 read: dict = {
                     "lad": lad,
