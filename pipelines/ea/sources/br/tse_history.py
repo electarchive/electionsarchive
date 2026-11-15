@@ -1769,7 +1769,10 @@ def emit() -> Path:
                 .cast(pl.Categorical),
                 measure="measure",
                 value="value",
-                **common,
-            ).collect(),
+            )
+            .group_by("result_set_id", "unit_id", "option_id", "measure")
+            .agg(pl.col("value").sum())
+            .with_columns(**common)
+            .collect(),
         )
         return cs.write()
