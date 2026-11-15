@@ -217,7 +217,7 @@ const MODEL = {
     memory: 2,
     patience: 0.5,
     canvass: 0.3,
-    growth: { share: 0.08, power: 2, max: 2.5 },
+    growth: { share: 0.045, power: 2, max: 2.5 },
     lull: 0.5,
     stir: 0.01,
     spill: 0.3,
