@@ -54,6 +54,10 @@ TABLES: dict[str, tuple[tuple[str, ...] | None, dict[str, pl.DataType]]] = {
             "bytes": I64,
         },
     ),
+    "source_page": (
+        ("id",),
+        {"id": U, "artifact_id": U, "page_number": I32, "image_key": U, "width": I32, "height": I32},
+    ),
     "scheme": (
         ("code",),
         {"code": U, "polity_id": U, "kind": U, "rank": I16, "noun": U, "kinds": U, "code_system": U},
