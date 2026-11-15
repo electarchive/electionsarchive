@@ -467,6 +467,7 @@ def emit() -> Path:
             .iter_rows(named=True)
         }
         days = sorted({start for start, _ in sizes})
+        methods: dict[UUID, str] = {}
         unit_rows: dict[UUID, dict[str, str | None]] = {}
         values: list[tuple[str, str, str | None, int, int]] = []
         gminas = Counter[str]()
@@ -684,6 +685,7 @@ def emit() -> Path:
                             )
                         )
                 cs.add("note", entity_id=result_set, kind="methodology", body_md=note)
+                methods[result_set] = note
                 elected = Counter()
                 for row in lists.iter_rows(named=True):
                     values.append((str(result_set), str(unit), str(options[row["list"]]), VOTES, row["votes"]))
@@ -723,6 +725,20 @@ def emit() -> Path:
                 if sum(elected.values()) != seats:
                     raise ValueError(f"{key}: elected count mismatch")
 
+        for note, entity, body in conn.execute(
+            """select n.id, n.entity_id, n.body_md from note n
+               join changeset w on w.id = n.changeset_id and w.pipeline = %s
+               where n.kind = 'methodology' and n.entity_id = any(%s)""",
+            [SOURCE, list(methods)],
+        ).fetchall():
+            if body != methods[entity]:
+                cs.add(
+                    "note_drop",
+                    note_id=note,
+                    entity_id=entity,
+                    body_md=body,
+                    reason="the result set's votes are now summed from the polling district protocols",
+                )
         minted = [
             {"id": str(unit), "polity_id": str(poland), **row}
             for unit, row in unit_rows.items()
