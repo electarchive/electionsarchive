@@ -1,9 +1,13 @@
 import hashlib
 import json
+import os
+import shlex
 import shutil
+import subprocess
 import threading
 import time
 from collections.abc import Iterable, Iterator
+from contextlib import suppress
 from datetime import UTC, datetime
 from io import BytesIO
 from pathlib import Path
@@ -520,14 +524,32 @@ class Meter:
             threading.Thread(target=self._sample, daemon=True).start()
 
     def _sample(self) -> None:
-        while not self.done.wait(0.2):
-            self.server = max(self.server, _rss(str(self.backend), "RssAnon"))
-            if self.server > SERVER_LIMIT and not self.tripped and self.conn is not None:
-                self.tripped = self.server
-                self.conn.cancel_safe()
+        shell = os.environ.get("EA_DB_SHELL")
+        if shell is None:
+            while not self.done.wait(0.2):
+                self._seen(_rss(str(self.backend), "RssAnon"))
+            return
+        script = f"while kill -0 {self.backend} 2>/dev/null; do awk '/^RssAnon:/ {{print $2}}' /proc/{self.backend}/status; sleep 0.2; done"
+        with subprocess.Popen(
+            [*shlex.split(shell), f"sh -c {shlex.quote(script)}"], stdout=subprocess.PIPE, text=True
+        ) as remote:
+            assert remote.stdout is not None
+            for line in remote.stdout:
+                if self.done.is_set():
+                    remote.terminate()
+                    break
+                if line.strip().isdigit():
+                    self._seen(int(line) >> 10)
+
+    def _seen(self, mb: int) -> None:
+        self.server = max(self.server, mb)
+        if self.server > SERVER_LIMIT and not self.tripped and self.conn is not None:
+            self.tripped = self.server
+            self.conn.cancel_safe()
 
     def reset(self) -> None:
-        Path("/proc/self/clear_refs").write_text("5")
+        with suppress(OSError):
+            Path("/proc/self/clear_refs").write_text("5")
         self.server = 0
         self.began = time.monotonic()
 
