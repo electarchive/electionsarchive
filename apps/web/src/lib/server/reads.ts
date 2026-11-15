@@ -3,6 +3,7 @@ import { AsyncLocalStorage } from "node:async_hooks";
 
 export type Reads = {
   ids: Set<string>;
+  asked: Set<string>;
   keys: Set<string>;
   pending: Array<Promise<Array<string> | null>>;
   isWide: boolean;
@@ -26,16 +27,40 @@ export function depend(key: string) {
 }
 
 export function fresh(): Reads {
-  return { ids: new Set(), keys: new Set(), pending: [], isWide: false };
+  return {
+    ids: new Set(),
+    asked: new Set(),
+    keys: new Set(),
+    pending: [],
+    isWide: false,
+  };
 }
 
-function add(reads: Reads, id: string) {
-  reads.ids.add(id.toLowerCase());
+export async function shown<T>(compute: () => Promise<T>) {
+  const reads = reading.getStore();
+  if (reads == null) {
+    return compute();
+  }
+  const inner = { ...reads, asked: new Set<string>() };
+  try {
+    return await reading.run(inner, compute);
+  } finally {
+    reads.isWide ||= inner.isWide;
+  }
+}
+
+function add(reads: Reads, id: string, isAsked: boolean) {
+  const lower = id.toLowerCase();
+  reads.ids.add(lower);
+  if (isAsked) {
+    reads.asked.add(lower);
+  }
   if (reads.ids.size <= WIDEST) {
     return;
   }
   reads.isWide = true;
   reads.ids.clear();
+  reads.asked.clear();
 }
 
 function scan(reads: Reads, value: unknown, isText: boolean) {
@@ -45,11 +70,11 @@ function scan(reads: Reads, value: unknown, isText: boolean) {
   if (typeof value === "string") {
     if (value.length === 36) {
       if (UUID.test(value)) {
-        add(reads, value);
+        add(reads, value, isText);
       }
     } else if (isText && value.length > 36) {
       for (const [found] of value.matchAll(UUIDS)) {
-        add(reads, found);
+        add(reads, found, true);
       }
     }
   } else if (Array.isArray(value)) {

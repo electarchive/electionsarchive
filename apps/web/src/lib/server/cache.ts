@@ -88,6 +88,16 @@ const SYNC_WAIT = 250;
 const VERSIONED = 2_000_000;
 const TRACING = CACHE_SHADOW || CACHE_KEYS;
 const MODE = CACHE_KEYS ? "keys" : "shadow";
+const HELD = sql`(
+  v.k = l.polity_id or v.k <> all(array(
+    with recursive up(k) as (
+      select l.polity_id
+      union
+      select p.parent_id from polity_parent p join up on p.polity_id = up.k
+    )
+    select k from up
+  ))
+)`;
 const ANCHOR = sql`
   left join lateral (
     select u.k from (
@@ -99,20 +109,20 @@ const ANCHOR = sql`
       union all select v.k from contest x join election l on l.id = x.election_id
         left join body b on b.id = x.body_id left join office f on f.id = x.office_id
         cross join lateral (values (l.polity_id), (b.polity_id), (f.polity_id)) v(k)
-        where e.type = 'contest' and x.id = e.id
+        where e.type = 'contest' and x.id = e.id and ${HELD}
       union all select v.k from result_set r join contest x on x.id = r.contest_id join election l on l.id = x.election_id
         left join body b on b.id = x.body_id left join office f on f.id = x.office_id
         cross join lateral (values (l.polity_id), (b.polity_id), (f.polity_id)) v(k)
-        where e.type = 'result_set' and r.id = e.id
+        where e.type = 'result_set' and r.id = e.id and ${HELD}
       union all select v.k from contest_option o join contest x on x.id = o.contest_id join election l on l.id = x.election_id
         left join body b on b.id = x.body_id left join office f on f.id = x.office_id
         cross join lateral (values (l.polity_id), (b.polity_id), (f.polity_id), (o.party_id)) v(k)
-        where e.type = 'contest_option' and o.id = e.id
+        where e.type = 'contest_option' and o.id = e.id and ${HELD}
       union all select v.k from candidacy d join contest_option o on o.id = d.option_id join contest x on x.id = o.contest_id
         join election l on l.id = x.election_id
         left join body b on b.id = x.body_id left join office f on f.id = x.office_id
         cross join lateral (values (l.polity_id), (b.polity_id), (f.polity_id), (d.person_id), (d.member_of_party_id)) v(k)
-        where e.type = 'candidacy' and d.id = e.id
+        where e.type = 'candidacy' and d.id = e.id and ${HELD}
       union all select v.k from tenure t left join body b on b.id = t.body_id left join office f on f.id = t.office_id
         cross join lateral (values (coalesce(b.polity_id, f.polity_id)), (t.person_id)) v(k)
         where e.type = 'tenure' and t.id = e.id
@@ -471,11 +481,16 @@ async function anchor(ids: Array<string>) {
     }
   }
   for (const batch of batches) {
-    const result = await db.execute<{ id: string; keys: Array<string> }>(sql`
-      select e.id::text as id, array_agg(distinct coalesce(a.k, e.id)::text) as keys
+    const result = await db.execute<{
+      id: string;
+      keys: Array<string>;
+      isRow: boolean;
+    }>(sql`
+      select e.id::text as id, array_agg(distinct coalesce(a.k, e.id)::text) as keys,
+        e.type in ('body', 'office') as "isRow"
       from entity e ${ANCHOR}
       where e.id = any(${sql.param(batch)}::uuid[])
-      group by e.id
+      group by e.id, e.type
     `);
     if (shadow.anchors.size > REMEMBERED) {
       shadow.anchors.clear();
@@ -485,10 +500,8 @@ async function anchor(ids: Array<string>) {
       anchors.set(id, []);
     }
     for (const row of result.rows) {
-      anchors.set(
-        row.id,
-        row.keys.map((key) => intern(key)),
-      );
+      const keys = row.keys.map((key) => intern(key));
+      anchors.set(row.id, row.isRow ? [`row:${row.id}`, ...keys] : keys);
     }
     for (const id of batch) {
       shadow.anchors.set(id, anchors.get(id) ?? []);
@@ -510,7 +523,12 @@ async function settle(reads: Reads) {
       }
     }
     const anchors = await reading.exit(async () => anchor([...reads.ids]));
-    for (const found of anchors.values()) {
+    for (const [id, found] of anchors) {
+      const [first] = found;
+      if (first?.startsWith("row:") === true && !reads.asked.has(id)) {
+        keys.add(first);
+        continue;
+      }
       for (const key of found) {
         keys.add(key);
       }
@@ -593,7 +611,7 @@ async function touch(ids: Array<string>) {
     select key::text as key from up
     union all
     select distinct 'row:' || e.id from changeset_entity ce join entity e on e.id = ce.entity_id
-    where ce.changeset_id = any(${sql.param(ids)}::uuid[]) and e.type in ('party', 'person')
+    where ce.changeset_id = any(${sql.param(ids)}::uuid[]) and e.type in ('party', 'person', 'polity', 'body', 'office')
     union all
     select 'translation' where exists (
       select from translation where changeset_id = any(${sql.param(ids)}::uuid[])
@@ -660,7 +678,9 @@ async function bump(
           reasons.push("touch");
           return ["*"];
         });
-      keys.push(...touched);
+      for (const key of touched) {
+        keys.push(key);
+      }
     }
     const isFloor = keys.includes("*");
     if (keys.length > 0) {

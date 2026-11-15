@@ -45,7 +45,7 @@ import {
 } from "#lib/server/plane.js";
 import { isCurrent } from "#lib/server/polity-touched.js";
 import { proseColumns, proseEntries, proseJoin } from "#lib/server/prose.js";
-import { depend, reading } from "#lib/server/reads.js";
+import { depend, reading, shown } from "#lib/server/reads.js";
 import { Path, Polity } from "#lib/server/territory.js";
 import { together } from "#lib/server/together.js";
 
@@ -1051,10 +1051,12 @@ export async function names(
   common: Array<string> = [],
   historical = false,
 ) {
-  const found = await dated(
-    ids.map((id) => ({ id, on })),
-    common,
-    historical,
+  const found = await shown(async () =>
+    dated(
+      ids.map((id) => ({ id, on })),
+      common,
+      historical,
+    ),
   );
   const full = new Map<string, string>();
   const short = new Map<string, string>();
@@ -1319,9 +1321,11 @@ export async function eras(
 }
 
 export async function paths(ids: Array<string>) {
-  const result = await db.execute<{ entity_id: string; path: string }>(sql`
-    select entity_id, path from slug where is_current and entity_id = any(${sql.param(ids)}::uuid[])
-  `);
+  const result = await shown(async () =>
+    db.execute<{ entity_id: string; path: string }>(sql`
+      select entity_id, path from slug where is_current and entity_id = any(${sql.param(ids)}::uuid[])
+    `),
+  );
   return new Map(result.rows.map((row) => [row.entity_id, row.path]));
 }
 
@@ -1331,45 +1335,52 @@ const crumbIds = async (polity: string, keep: string | null) =>
   remember(
     `crumbs:${polity}:${keep ?? ""}`,
     async () => {
-      const result = await db.execute<{ id: string }>(sql`
-        with recursive chain(id, depth) as (
-          select ${polity}::uuid, 0
-          union all
-          select p.parent_id, chain.depth + 1 from polity_parent p join chain on p.polity_id = chain.id where chain.depth < 8
-        ),
-        county as (
+      const result = await reading.exit(async () =>
+        db.execute<{ id: string }>(sql`
+          with recursive chain(id, depth) as (
+            select ${polity}::uuid, 0
+            union all
+            select p.parent_id, chain.depth + 1 from polity_parent p join chain on p.polity_id = chain.id where chain.depth < 8
+          ),
+          county as (
+            select id from (
+              select c.id, st_contains(cg.geom, coalesce(g.label_point, st_pointonsurface(g.geom))) as holds,
+                count(*) filter (where st_contains(g.geom, coalesce(cg.label_point, st_pointonsurface(cg.geom)))) over () as inside
+              from polity y
+              join polity_parent pp on pp.polity_id = y.id
+              join polity s on s.id = pp.parent_id and s.kind = 'federal_unit'
+              join polity_territory t on t.polity_id = y.id and upper_inf(t.valid)
+              join area_geometry g on g.area_id = t.area_id and upper_inf(g.valid)
+              join polity_parent cp on cp.parent_id = pp.parent_id
+              join polity c on c.id = cp.polity_id and c.kind = 'county'
+              join polity_territory ct on ct.polity_id = c.id and upper_inf(ct.valid)
+              join area_geometry cg on cg.area_id = ct.area_id and upper_inf(cg.valid)
+              where y.id = ${polity}::uuid and y.kind in ('municipality', 'school_district', 'special_district')
+                and cg.geom && g.geom
+            ) x
+            where holds and inside < 2
+            limit 1
+          )
           select id from (
-            select c.id, st_contains(cg.geom, coalesce(g.label_point, st_pointonsurface(g.geom))) as holds,
-              count(*) filter (where st_contains(g.geom, coalesce(cg.label_point, st_pointonsurface(cg.geom)))) over () as inside
-            from polity y
-            join polity_parent pp on pp.polity_id = y.id
-            join polity s on s.id = pp.parent_id and s.kind = 'federal_unit'
-            join polity_territory t on t.polity_id = y.id and upper_inf(t.valid)
-            join area_geometry g on g.area_id = t.area_id and upper_inf(g.valid)
-            join polity_parent cp on cp.parent_id = pp.parent_id
-            join polity c on c.id = cp.polity_id and c.kind = 'county'
-            join polity_territory ct on ct.polity_id = c.id and upper_inf(ct.valid)
-            join area_geometry cg on cg.area_id = ct.area_id and upper_inf(cg.valid)
-            where y.id = ${polity}::uuid and y.kind in ('municipality', 'school_district', 'special_district')
-              and cg.geom && g.geom
+            select chain.id, chain.depth::numeric as depth from chain join polity y on y.id = chain.id
+            where chain.id = ${polity}::uuid or y.kind <> 'supranational'
+              or ${keep}::text = 'all'
+              or exists (
+                select from election e join election up on up.id = e.parent_id
+                where e.id::text = ${keep}::text and up.polity_id = chain.id
+              )
+            union all
+            select id, 0.5 from county
           ) x
-          where holds and inside < 2
-          limit 1
-        )
-        select id from (
-          select chain.id, chain.depth::numeric as depth from chain join polity y on y.id = chain.id
-          where chain.id = ${polity}::uuid or y.kind <> 'supranational'
-            or ${keep}::text = 'all'
-            or exists (
-              select from election e join election up on up.id = e.parent_id
-              where e.id::text = ${keep}::text and up.polity_id = chain.id
-            )
-          union all
-          select id, 0.5 from county
-        ) x
-        group by id order by max(depth) desc
-      `);
-      return result.rows.map((row) => row.id);
+          group by id order by max(depth) desc
+        `),
+      );
+      depend(polity);
+      const ids = result.rows.map((row) => row.id);
+      for (const id of ids) {
+        depend(`row:${id}`);
+      }
+      return ids;
     },
     true,
     undefined,
@@ -1378,7 +1389,12 @@ const crumbIds = async (polity: string, keep: string | null) =>
 
 async function breadcrumbs(polity: string, keep: string | null = null) {
   const ids = await crumbIds(polity, keep);
-  const [labels, slugs] = await Promise.all([names(ids), paths(ids)]);
+  const [labels, slugs] = await reading.exit(async () =>
+    Promise.all([names(ids), paths(ids)]),
+  );
+  for (const id of ids) {
+    depend(`row:${id}`);
+  }
   return ids.map((id) => ({
     name: labels.full.get(id) ?? "",
     path: slugs.get(id) ?? null,
@@ -24367,19 +24383,29 @@ export const polities = {
         mapped,
         holdings,
       ] = await Promise.all([
-        db.execute<{
-          kind: string;
-          parent: string | null;
-          isTerritorial: boolean;
-        }>(
-          sql`
-            select p.kind::text, (
-              select pp.parent_id from polity_parent pp where pp.polity_id = p.id
-              order by upper_inf(pp.valid) desc, upper(pp.valid) desc limit 1
-            ) as parent, (p.kind = 'region' or (p.kind = 'federal_unit' and exists (select from polity_parent pp join slug ps on ps.entity_id = pp.parent_id and ps.is_current and ps.path = 'ca' where pp.polity_id = p.id))) as "isTerritorial"
-            from polity p where p.id = ${input.id}::uuid
-          `,
-        ),
+        reading
+          .exit(async () =>
+            db.execute<{
+              kind: string;
+              parent: string | null;
+              isTerritorial: boolean;
+            }>(
+              sql`
+                select p.kind::text, (
+                  select pp.parent_id from polity_parent pp where pp.polity_id = p.id
+                  order by upper_inf(pp.valid) desc, upper(pp.valid) desc limit 1
+                ) as parent, (p.kind = 'region' or (p.kind = 'federal_unit' and exists (select from polity_parent pp join slug ps on ps.entity_id = pp.parent_id and ps.is_current and ps.path = 'ca' where pp.polity_id = p.id))) as "isTerritorial"
+                from polity p where p.id = ${input.id}::uuid
+              `,
+            ),
+          )
+          .then((result) => {
+            depend(input.id);
+            for (const row of result.rows) {
+              depend(`row:${row.parent ?? input.id}`);
+            }
+            return result;
+          }),
         db.execute<{
           id: string;
           kind: string;
