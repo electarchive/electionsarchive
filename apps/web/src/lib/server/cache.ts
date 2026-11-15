@@ -230,6 +230,10 @@ async function open() {
       changeset_id uuid primary key,
       epoch bigint not null
     );
+    create table if not exists synced (
+      id boolean primary key default true check (id),
+      total bigint not null
+    );
     insert into bump (key, epoch) values ('*', nextval('epoch')) on conflict do nothing;
   `);
   return pool;
@@ -602,7 +606,7 @@ async function bump(
   pool: pg.Pool,
   ids: Array<string>,
   tokens: Array<[string, string]>,
-  stamp: string,
+  total: number,
   isStart: boolean,
 ) {
   const connection = await pool.connect();
@@ -621,23 +625,31 @@ async function bump(
         on conflict do nothing returning changeset_id::text as id`,
       [ids, epoch],
     );
-    const marked = await connection.query<{ key: string }>(
+    const marked = await connection.query<{ token: string; key: string }>(
       `with t(token, key) as (select * from unnest($1::text[], $2::text[])),
         won as (
           insert into bumped (changeset_id, epoch) select md5(token)::uuid, $3::bigint from t
           on conflict do nothing returning changeset_id
         )
-        select t.key from t join won on won.changeset_id = md5(t.token)::uuid`,
+        select t.token, t.key from t join won on won.changeset_id = md5(t.token)::uuid`,
       [tokens.map(([token]) => token), tokens.map(([, key]) => key), epoch],
     );
-    const stamped = await connection.query(
-      `insert into bumped (changeset_id, epoch) values (md5($1)::uuid, $2::bigint)
-        on conflict do nothing returning 1`,
-      [stamp, epoch],
+    const before = await connection.query<{ total: string }>(
+      "select total::text as total from synced",
+    );
+    await connection.query(
+      `insert into synced (total) values ($1::bigint)
+        on conflict (id) do update set total = excluded.total`,
+      [total],
     );
     const keys = marked.rows.map((row) => row.key);
-    if (isStart && stamped.rows.length > 0) {
+    const reasons = marked.rows
+      .filter((row) => row.key === "*")
+      .map((row) => row.token);
+    const last = before.rows[0]?.total;
+    if (isStart && (last == null || Number(last) + won.rows.length !== total)) {
       keys.push("*");
+      reasons.push(`start:${last ?? "none"}+${won.rows.length}:${total}`);
     }
     if (won.rows.length > 0 && !keys.includes("*")) {
       keys.push("changesets");
@@ -645,6 +657,7 @@ async function bump(
         .exit(async () => touch(won.rows.map((row) => row.id)))
         .catch((error: unknown) => {
           console.error("The cache could not map changesets to keys:", error);
+          reasons.push("touch");
           return ["*"];
         });
       keys.push(...touched);
@@ -663,6 +676,9 @@ async function bump(
       ]);
     }
     await connection.query("commit");
+    if (isFloor) {
+      console.info(`cache floor ${epoch}: ${reasons.join(" ")}`);
+    }
   } catch (error) {
     await connection.query("rollback").catch(() => null);
     throw error;
@@ -702,7 +718,7 @@ export async function closeShelf() {
   await pool?.end();
 }
 
-async function sync(observed: Array<[string, string]>, stamp: string) {
+async function sync(observed: Array<[string, string]>) {
   const tokens = [...shadow.pending, ...observed];
   shadow.pending = [];
   try {
@@ -720,7 +736,13 @@ async function sync(observed: Array<[string, string]>, stamp: string) {
     if (shadow.epochs.size > VERSIONED) {
       tokens.push([`prune:${shadow.epochs.get("*")}`, "*"]);
     }
-    await bump(pool, ids, tokens, stamp, shadow.total == null && !following);
+    await bump(
+      pool,
+      ids,
+      tokens,
+      found.total,
+      shadow.total == null && !following,
+    );
     shadow.mapped = new Set(found.ids);
     shadow.total = found.total;
     const result = await pool.query<{ key: string; epoch: string }>(
@@ -752,25 +774,22 @@ async function sync(observed: Array<[string, string]>, stamp: string) {
 function observe(row: Totals) {
   const last = shadow.last;
   shadow.last = row;
-  const tokens: Array<[string, string]> = [];
-  if (last != null && row.rejected !== last.rejected) {
-    tokens.push([`rejected:${row.rejected}`, "changesets"]);
-  }
-  if (last != null && row.built !== last.built) {
-    tokens.push([`coverage:${row.built}`, "coverage"]);
-  }
-  if (last != null && row.named !== last.named) {
-    tokens.push([`named:${row.named}`, "*"]);
-  }
-  const isPublished =
+  const isMoved =
     last == null ||
     row.published !== last.published ||
-    row.latest !== last.latest;
-  if (!isPublished && tokens.length === 0 && shadow.seen != null) {
+    row.latest !== last.latest ||
+    row.rejected !== last.rejected ||
+    row.built !== last.built ||
+    row.named !== last.named;
+  if (!isMoved && shadow.seen != null) {
     return;
   }
-  const stamp = `version:${state.version}`;
-  shadow.loading = shadow.loading.then(async () => sync(tokens, stamp));
+  const tokens: Array<[string, string]> = [
+    [`rejected:${row.rejected}`, "changesets"],
+    [`coverage:${row.built}`, "coverage"],
+    [`named:${row.named}`, "*"],
+  ];
+  shadow.loading = shadow.loading.then(async () => sync(tokens));
 }
 
 function holds(deps: Array<string>, mark: number) {
