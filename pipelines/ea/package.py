@@ -7,7 +7,7 @@ from collections.abc import Iterable, Iterator
 from datetime import UTC, datetime
 from io import BytesIO
 from pathlib import Path
-from typing import LiteralString, TypedDict, cast
+from typing import LiteralString, NamedTuple, NotRequired, TypedDict, cast
 from uuid import NAMESPACE_URL, uuid5
 
 import duckdb
@@ -25,6 +25,8 @@ ROOT = DATA / "packages"
 CHECK_MEMORY = "1GB"
 CHUNK_BYTES = 2 << 20
 SERVER_LIMIT = 3072
+ROLLUP_VALUES = 500_000
+ROLLED = {"election", "contest", "reporting_unit", "result_set"}
 
 U = pl.String()
 D = pl.Date()
@@ -194,6 +196,12 @@ FACTS: dict[str, dict[str, pl.DataType]] = {
     },
     "declared": {"result_set_id": U, "option_id": U, "measure": I16, "value": I64},
 }
+FACT_LIKE: dict[str, LiteralString] = {
+    "result_value": "result_set_id uuid, unit_id uuid, option_id uuid, channel smallint, measure smallint,"
+    " count_round smallint, flags smallint, value numeric",
+    "value_locator": "result_set_id uuid, unit_id uuid, option_id uuid, channel smallint, measure smallint,"
+    " count_round smallint, page_id uuid, source_id uuid, x0 real, y0 real, x1 real, y1 real",
+}
 JSON_COLUMNS = {"kinds", "rules", "locator"}
 
 
@@ -257,7 +265,6 @@ class Package:
             shutil.rmtree(out)
         out.mkdir(parents=True)
         counts: dict[str, int] = {}
-        digest = hashlib.sha256()
         for table, rows in sorted(self.rows.items()):
             schema = TABLES[table][1] if table in TABLES else FACTS[table]
             unknown = {column for row in rows for column in row} - set(schema)
@@ -278,8 +285,6 @@ class Package:
             )
             frame.write_parquet(out / f"{table}.parquet", statistics=False)
             counts[table] = frame.height
-            digest.update(table.encode())
-            digest.update(frame.hash_rows().sort().to_numpy().tobytes())
         commit = store.checkout()
         manifest = {
             "key": self.key,
@@ -292,7 +297,7 @@ class Package:
             "sources": self.sources,
             "accepted": self.accepted,
             "tables": counts,
-            "digest": digest.hexdigest(),
+            "digest": _digest(out, counts),
         }
         (out / "package.json").write_text(json.dumps(manifest, indent=1) + "\n")
         print(f"{self.key}: " + ", ".join(f"{table} {n:,}" for table, n in counts.items()), flush=True)
@@ -311,6 +316,7 @@ class Manifest(TypedDict):
     accepted: dict[str, str]
     tables: dict[str, int]
     digest: str
+    adopts: NotRequired[list[str]]
 
 
 def _manifest(path: Path) -> Manifest:
@@ -351,6 +357,22 @@ def _duck(kind: pl.DataType) -> str:
     if text.startswith("Datetime"):
         return "timestamptz"
     return {"String": "varchar", "Date": "date", "Boolean": "boolean", "Float64": "double"}.get(text, "bigint")
+
+
+def _digest(out: Path, tables: Iterable[str], con: duckdb.DuckDBPyConnection | None = None) -> str:
+    own = con is None
+    con = con or duckdb.connect(config={"memory_limit": CHECK_MEMORY, "threads": 4})
+    digest = hashlib.sha256()
+    for table in sorted(tables):
+        schema = TABLES[table][1] if table in TABLES else FACTS[table]
+        columns = ", ".join(f'"{c}"::{_duck(kind)} as "{c}"' for c, kind in schema.items())
+        found = con.execute(
+            f"select sum(hash(t))::varchar from (select {columns} from read_parquet('{out / table}.parquet')) t"
+        ).fetchone()
+        digest.update(f"{table}\x1f{None if found is None else found[0]}\n".encode())
+    if own:
+        con.close()
+    return digest.hexdigest()
 
 
 REFERENCES = [
@@ -591,12 +613,24 @@ def _hash(alias: str, columns: list[str]) -> sql.Composable:
     )
 
 
-def load(conn: Connection, path: Path, meter: Meter, accepted: dict[str, object] | None = None) -> str | None:
+class Loaded(NamedTuple):
+    key: str
+    version: int
+    changeset_id: str
+    path: Path
+    moved: list[str]
+    repointed: list[str]
+    sets: dict[int, int]
+    counts: dict[str, list[int]]
+
+
+def _facts(conn: Connection, path: Path, accepted: dict[str, object]) -> Loaded | None:
     manifest = _manifest(path)
     key = str(manifest["key"])
     missing = conn.execute(
-        """select x from unnest(%s::uuid[]) x
-           where not exists (select from entity e where e.id = x) and not exists (select from polity p where p.id = x)""",
+        """select x from unnest(%s::text[]) x
+           where not exists (select from entity e where e.id::text = x) and not exists (select from polity p where p.id::text = x)
+             and not exists (select from scheme s where s.code = x)""",
         [manifest["external"]],
     ).fetchall()
     if missing:
@@ -605,237 +639,305 @@ def load(conn: Connection, path: Path, meter: Meter, accepted: dict[str, object]
         if conn.execute("select 1 from changeset where scope->>'package' = %s", [depend]).fetchone() is None:
             raise ValueError(f"{key} depends on {depend}, which is not loaded")
     prior = conn.execute(
-        """select id, scope->>'digest', (scope->>'version')::int from changeset
+        """select id, scope->>'digest', (scope->>'version')::int, scope->'adopts' from changeset
            where scope->>'package' = %s order by created_at""",
         [key],
     ).fetchall()
     if prior and prior[-1][1] == manifest["digest"]:
         print(f"{key}: version {prior[-1][2]} already loaded, unchanged", flush=True)
         return None
-    owned = [str(row[0]) for row in prior]
+    adopts = sorted({str(id) for row in prior for id in row[3] or []} | set(manifest.get("adopts", [])))
+    owned = [str(row[0]) for row in prior] + adopts
     version = len(prior) + 1
     files = {table: path / f"{table}.parquet" for table in [*TABLES, *FACTS] if (path / f"{table}.parquet").exists()}
-    with conn.transaction():
-        conn.execute("select pg_advisory_xact_lock_shared(hashtext('ea.search'))")
-        conn.execute("select pg_advisory_xact_lock_shared(%s)", [MERGE_LOCK])
-        conn.execute("select pg_advisory_xact_lock(hashtext(%s))", [f"package:{key}"])
-        inserted = conn.execute(
-            """insert into changeset (author_kind, pipeline, pipeline_version, kind, status, summary, scope,
-                                      payload_kind, artifact_keys, checks, published_at)
-               values ('pipeline', %s, %s, 'import', 'published', %s, %s, 'artifacts', %s, %s, now()) returning id::text""",
-            [
-                manifest["pipeline"],
-                manifest["parser_commit"],
-                f"{manifest['summary']} (package {key} v{version})",
-                json.dumps(
-                    {
-                        "package": key,
-                        "version": version,
-                        "digest": manifest["digest"],
-                        "depends": manifest["depends"],
-                        "polity": key.split(".")[0].upper(),
-                    }
-                ),
-                [str(source["storage_key"]) for source in manifest["sources"]],
-                json.dumps({"package": "passed", "accepted": accepted or {}}),
-            ],
-        ).fetchone()
-        if inserted is None:
-            raise RuntimeError(f"{key}: no changeset row")
-        changeset_id = str(inserted[0])
-        conn.execute("select set_config('ea.changeset_id', %s, true)", [changeset_id])
-        sets_before = [
-            k
-            for (k,) in conn.execute(
-                "select k from result_set where changeset_id = any(%s::uuid[])", [owned]
-            ).fetchall()
-        ]
-        staged: dict[str, tuple[str, list[str]]] = {}
-        for table, file in files.items():
-            if table in TABLES:
-                columns = list(TABLES[table][1])
-                _stage(conn, table, columns, file)
-                staged[table] = (f"pkg_{table}", columns)
-        moved: list[str] = []
-        if "area_parent" in staged or "area" in staged:
-            moved = [
-                str(id)
-                for (id,) in conn.execute(
-                    sql.SQL(
-                        """select p.area_id from area_parent p where p.changeset_id = any(%s::uuid[])
-                           and {h} not in (select {s} from pkg_area_parent s)"""
-                    ).format(
-                        h=_hash("p", staged["area_parent"][1]) if "area_parent" in staged else sql.SQL("null"),
-                        s=_hash("s", staged["area_parent"][1]) if "area_parent" in staged else sql.SQL("null"),
-                    )
-                    if "area_parent" in staged
-                    else sql.SQL("select null::uuid where false"),
-                    [owned],
-                ).fetchall()
-            ]
-        if sets_before:
-            for table in ("result_value", "value_locator"):
-                conn.execute(
-                    sql.SQL("delete from {} where result_set_k = any(%s)").format(sql.Identifier(table)), [sets_before]
+    conn.execute("select pg_advisory_xact_lock(hashtext(%s))", [f"package:{key}"])
+    inserted = conn.execute(
+        """insert into changeset (author_kind, pipeline, pipeline_version, kind, status, summary, scope,
+                                  payload_kind, artifact_keys, checks, published_at)
+           values ('pipeline', %s, %s, 'import', 'published', %s, %s, 'artifacts', %s, %s, now()) returning id::text""",
+        [
+            manifest["pipeline"],
+            manifest["parser_commit"],
+            f"{manifest['summary']} (package {key} v{version})",
+            json.dumps(
+                {
+                    "package": key,
+                    "version": version,
+                    "digest": manifest["digest"],
+                    "adopts": adopts,
+                    "depends": manifest["depends"],
+                    "polity": key.split(".")[0].upper(),
+                }
+            ),
+            [str(source["storage_key"]) for source in manifest["sources"]],
+            json.dumps({"package": "passed", "accepted": accepted or {}}),
+        ],
+    ).fetchone()
+    if inserted is None:
+        raise RuntimeError(f"{key}: no changeset row")
+    changeset_id = str(inserted[0])
+    conn.execute("select set_config('ea.changeset_id', %s, true)", [changeset_id])
+    sets_before = [
+        k for (k,) in conn.execute("select k from result_set where changeset_id = any(%s::uuid[])", [owned]).fetchall()
+    ]
+    staged: dict[str, tuple[str, list[str]]] = {}
+    for table, file in files.items():
+        if table in TABLES:
+            columns = list(TABLES[table][1])
+            _stage(conn, table, columns, file)
+            staged[table] = (f"pkg_{table}", columns)
+    moved: list[str] = []
+    if "area_parent" in staged or "area" in staged:
+        moved = [
+            str(id)
+            for (id,) in conn.execute(
+                sql.SQL(
+                    """select p.area_id from area_parent p where p.changeset_id = any(%s::uuid[])
+                       and {h} not in (select {s} from pkg_area_parent s)"""
+                ).format(
+                    h=_hash("p", staged["area_parent"][1]) if "area_parent" in staged else sql.SQL("null"),
+                    s=_hash("s", staged["area_parent"][1]) if "area_parent" in staged else sql.SQL("null"),
                 )
-        dropped_sets = [
-            k
-            for (k,) in conn.execute(
-                "select k from result_set where changeset_id = any(%s::uuid[]) and id not in (select id from pkg_result_set)"
-                if "result_set" in staged
-                else "select k from result_set where changeset_id = any(%s::uuid[])",
+                if "area_parent" in staged
+                else sql.SQL("select null::uuid where false"),
                 [owned],
             ).fetchall()
         ]
-        if dropped_sets:
-            for table in ("result_rollup_sum", "result_rollup_unit", "rollup_coverage", "area_day_set"):
-                conn.execute(
-                    sql.SQL("delete from {} where result_set_k = any(%s)").format(sql.Identifier(table)), [dropped_sets]
-                )
+    dropped_sets = [
+        k
+        for (k,) in conn.execute(
+            "select k from result_set where changeset_id = any(%s::uuid[]) and id not in (select id from pkg_result_set)"
+            if "result_set" in staged
+            else "select k from result_set where changeset_id = any(%s::uuid[])",
+            [owned],
+        ).fetchall()
+    ]
+    if dropped_sets:
+        for table in ("result_rollup_sum", "result_rollup_unit", "rollup_coverage", "area_day_set"):
             conn.execute(
-                "delete from flag where result_set_id in (select id from result_set where k = any(%s))", [dropped_sets]
+                sql.SQL("delete from {} where result_set_k = any(%s)").format(sql.Identifier(table)), [dropped_sets]
             )
-        counts: dict[str, list[int]] = {}
-        for table in reversed(TABLES):
-            key_columns = TABLES[table][0]
-            if table not in staged:
-                gone = conn.execute(
-                    sql.SQL("delete from {} where changeset_id = any(%s::uuid[])").format(sql.Identifier(table)),
-                    [owned],
-                ).rowcount
-            elif key_columns is not None:
-                gone = conn.execute(
-                    sql.SQL(
-                        "delete from {t} t where t.changeset_id = any(%s::uuid[]) and ({k}) not in (select {k} from {s})"
-                    ).format(
-                        t=sql.Identifier(table),
-                        k=sql.SQL(", ").join(map(sql.Identifier, key_columns)),
-                        s=sql.Identifier(staged[table][0]),
-                    ),
-                    [owned],
-                ).rowcount
-            else:
-                columns = staged[table][1]
-                gone = conn.execute(
-                    sql.SQL(
-                        "delete from {t} t where t.changeset_id = any(%s::uuid[]) and {h} not in (select {sh} from {s} s)"
-                    ).format(
-                        t=sql.Identifier(table),
-                        h=_hash("t", columns),
-                        sh=_hash("s", columns),
-                        s=sql.Identifier(staged[table][0]),
-                    ),
-                    [owned],
-                ).rowcount
-            counts.setdefault(table, [0, 0])[1] = gone
-        for table in TABLES:
-            if table not in staged:
-                continue
-            name, columns = staged[table]
-            key_columns = TABLES[table][0]
-            listed = sql.SQL(", ").join(map(sql.Identifier, columns))
-            if key_columns is not None:
-                rest = [c for c in columns if c not in key_columns]
-                written = conn.execute(
-                    sql.SQL(
-                        """insert into {t} as t ({c}) select {c} from {s}
-                           on conflict ({k}) do {action}"""
-                    ).format(
-                        t=sql.Identifier(table),
-                        c=listed,
-                        s=sql.Identifier(name),
-                        k=sql.SQL(", ").join(map(sql.Identifier, key_columns)),
-                        action=sql.SQL("update set ({r}) = row({x}) where ({tr}) is distinct from ({x})").format(
-                            r=sql.SQL(", ").join(map(sql.Identifier, rest)),
-                            x=sql.SQL(", ").join(sql.SQL("excluded.{}").format(sql.Identifier(c)) for c in rest),
-                            tr=sql.SQL(", ").join(sql.SQL("t.{}").format(sql.Identifier(c)) for c in rest),
-                        )
-                        if rest
-                        else sql.SQL("nothing"),
-                    )
-                ).rowcount
-            else:
-                lead = columns[0]
-                written = conn.execute(
-                    sql.SQL(
-                        """insert into {t} ({c}) select {c} from {s} s
-                           where {sh} not in (select {h} from {t} t where t.{lead} in (select {lead} from {s}))"""
-                    ).format(
-                        t=sql.Identifier(table),
-                        c=listed,
-                        s=sql.Identifier(name),
-                        sh=_hash("s", columns),
-                        h=_hash("t", columns),
-                        lead=sql.Identifier(lead),
-                    )
-                ).rowcount
-            counts.setdefault(table, [0, 0])[0] = written
-        sets_after: list[int] = []
-        if "result_value" in files:
-            rows = _stage(
-                conn,
-                "result_value",
-                list(FACTS["result_value"]),
-                files["result_value"],
-                like="result_set_id uuid, unit_id uuid, option_id uuid, channel smallint, measure smallint,"
-                " count_round smallint, flags smallint, value numeric",
-            )
-            facts = conn.execute(
-                """insert into result_value (result_set_k, unit_k, option_k, channel, measure, count_round, flags, value)
-                   select r.k, u.k, coalesce(o.k, 0), v.channel, v.measure, v.count_round, v.flags, v.value
-                   from pkg_result_value v join result_set r on r.id = v.result_set_id
-                   join reporting_unit u on u.id = v.unit_id left join contest_option o on o.id = v.option_id"""
+        conn.execute(
+            "delete from flag where result_set_id in (select id from result_set where k = any(%s))", [dropped_sets]
+        )
+    counts: dict[str, list[int]] = {}
+    touched_ids: dict[str, list[str]] = {}
+    for table in reversed(TABLES):
+        key_columns = TABLES[table][0]
+        if table not in staged:
+            gone = conn.execute(
+                sql.SQL("delete from {} where changeset_id = any(%s::uuid[])").format(sql.Identifier(table)),
+                [owned],
             ).rowcount
-            if facts != rows:
-                raise ValueError(f"{key}: {rows} facts staged, {facts} written")
-            counts["result_value"] = [facts, 0]
-            sets_after = [
-                k
-                for (k,) in conn.execute(
-                    "select distinct r.k from pkg_result_value v join result_set r on r.id = v.result_set_id"
+        elif key_columns is not None:
+            gone = conn.execute(
+                sql.SQL(
+                    "delete from {t} t where t.changeset_id = any(%s::uuid[]) and ({k}) not in (select {k} from {s})"
+                ).format(
+                    t=sql.Identifier(table),
+                    k=sql.SQL(", ").join(map(sql.Identifier, key_columns)),
+                    s=sql.Identifier(staged[table][0]),
+                ),
+                [owned],
+            ).rowcount
+        else:
+            columns = staged[table][1]
+            gone = conn.execute(
+                sql.SQL(
+                    "delete from {t} t where t.changeset_id = any(%s::uuid[]) and {h} not in (select {sh} from {s} s)"
+                ).format(
+                    t=sql.Identifier(table),
+                    h=_hash("t", columns),
+                    sh=_hash("s", columns),
+                    s=sql.Identifier(staged[table][0]),
+                ),
+                [owned],
+            ).rowcount
+        counts.setdefault(table, [0, 0])[1] = gone
+    for table in TABLES:
+        if table not in staged:
+            continue
+        name, columns = staged[table]
+        key_columns = TABLES[table][0]
+        listed = sql.SQL(", ").join(map(sql.Identifier, columns))
+        if key_columns is not None:
+            rest = [c for c in columns if c not in key_columns]
+            query = sql.SQL(
+                """insert into {t} as t ({c}) select {c} from {s}
+                   on conflict ({k}) do {action}"""
+            ).format(
+                t=sql.Identifier(table),
+                c=listed,
+                s=sql.Identifier(name),
+                k=sql.SQL(", ").join(map(sql.Identifier, key_columns)),
+                action=sql.SQL("update set ({r}) = row({x}) where ({tr}) is distinct from ({x})").format(
+                    r=sql.SQL(", ").join(map(sql.Identifier, rest)),
+                    x=sql.SQL(", ").join(sql.SQL("excluded.{}").format(sql.Identifier(c)) for c in rest),
+                    tr=sql.SQL(", ").join(sql.SQL("t.{}").format(sql.Identifier(c)) for c in rest),
                 )
-            ]
-        if "value_locator" in files:
-            _stage(
-                conn,
-                "value_locator",
-                list(FACTS["value_locator"]),
-                files["value_locator"],
-                like="result_set_id uuid, unit_id uuid, option_id uuid, channel smallint, measure smallint,"
-                " count_round smallint, page_id uuid, source_id uuid, x0 real, y0 real, x1 real, y1 real",
+                if rest
+                else sql.SQL("nothing"),
             )
-            conn.execute(
-                """insert into value_locator (result_set_k, unit_k, option_k, channel, measure, count_round,
-                                              page_id, source_id, x0, y0, x1, y1)
-                   select r.k, u.k, coalesce(o.k, 0), v.channel, v.measure, v.count_round, v.page_id, v.source_id,
-                          v.x0, v.y0, v.x1, v.y1
-                   from pkg_value_locator v join result_set r on r.id = v.result_set_id
+            if table in ROLLED:
+                returned = conn.execute(
+                    sql.SQL("with w as ({} returning t.id, xmax = 0 as fresh) select id, fresh from w").format(query)
+                ).fetchall()
+                touched_ids[table] = [str(id) for id, fresh in returned if table != "reporting_unit" or not fresh]
+                written = len(returned)
+            else:
+                written = conn.execute(query).rowcount
+        else:
+            lead = columns[0]
+            written = conn.execute(
+                sql.SQL(
+                    """insert into {t} ({c}) select {c} from {s} s
+                       where {sh} not in (select {h} from {t} t where t.{lead} in (select {lead} from {s}))"""
+                ).format(
+                    t=sql.Identifier(table),
+                    c=listed,
+                    s=sql.Identifier(name),
+                    sh=_hash("s", columns),
+                    h=_hash("t", columns),
+                    lead=sql.Identifier(lead),
+                )
+            ).rowcount
+        counts.setdefault(table, [0, 0])[0] = written
+    sizes, changed = _merge(conn, "result_value", files.get("result_value"), sets_before, counts)
+    _merge(conn, "value_locator", files.get("value_locator"), sets_before, counts)
+    current = conn.execute(
+        """select k from result_set where id = any(%(sets)s::uuid[]) or contest_id = any(%(contests)s::uuid[])
+           or election_id = any(%(elections)s::uuid[])""",
+        {
+            "sets": touched_ids.get("result_set", []),
+            "contests": touched_ids.get("contest", []),
+            "elections": touched_ids.get("election", []),
+        },
+    ).fetchall()
+    changed |= {k for (k,) in current}
+    changed -= set(dropped_sets)
+    rolled = {k: sizes.get(k, 0) for k in changed}
+    return Loaded(key, version, changeset_id, path, moved, touched_ids.get("reporting_unit", []), rolled, counts)
+
+
+def _merge(
+    conn: Connection, table: str, file: Path | None, before: list[int], counts: dict[str, list[int]]
+) -> tuple[dict[int, int], set[int]]:
+    schema = FACTS[table]
+    rest = [c for c in schema if c not in FACT]
+    keys = ["result_set_k", "unit_k", "option_k", *FACT[3:]]
+    resolved = sql.Identifier(f"pkg_{table}_k")
+    conn.execute(sql.SQL("drop table if exists {}").format(resolved))
+    if file is None:
+        conn.execute(
+            sql.SQL("create temp table {} on commit drop as select {} from public.{} limit 0").format(
+                resolved, sql.SQL(", ").join(map(sql.Identifier, [*keys, *rest])), sql.Identifier(table)
+            )
+        )
+    else:
+        rows = _stage(conn, table, list(schema), file, like=FACT_LIKE[table])
+        made = conn.execute(
+            sql.SQL(
+                """create temp table {k} on commit drop as
+                   select r.k as result_set_k, u.k as unit_k, coalesce(o.k, 0) as option_k, {fact}, {rest}
+                   from {s} v join result_set r on r.id = v.result_set_id
                    join reporting_unit u on u.id = v.unit_id left join contest_option o on o.id = v.option_id"""
+            ).format(
+                k=resolved,
+                fact=sql.SQL(", ").join(sql.SQL("v.{}").format(sql.Identifier(c)) for c in FACT[3:]),
+                rest=sql.SQL(", ").join(sql.SQL("v.{}").format(sql.Identifier(c)) for c in rest),
+                s=sql.Identifier(f"pkg_{table}"),
             )
-        steps = [meter.step("facts")]
-        rolled = sorted(set(sets_after) | (set(sets_before) - set(dropped_sets)))
-        _rollup(conn, None, moved, [], rolled)
-        steps.append(meter.step("rollups"))
-        covers.uncover(conn, changeset_id, moved, [], sets=rolled)
-        touched.recorded(conn, changeset_id)
-        steps.append(meter.step("covers"))
-        search.scope(conn, [changeset_id])
-        search.refresh(conn)
-        steps.append(meter.step("search"))
-    copy = folder(key) / f"v{version}"
-    if copy.exists():
-        shutil.rmtree(copy)
-    shutil.copytree(path, copy)
-    changed = ", ".join(f"{t} +{a:,}/-{d:,}" for t, (a, d) in counts.items() if a or d)
-    print(
-        f"{key} v{version} as {changeset_id}: {changed}; {', '.join(steps)}",
-        flush=True,
+        ).rowcount
+        if made != rows:
+            raise ValueError(f"{table}: {rows:,} staged, {made:,} resolved")
+        conn.execute(sql.SQL("analyze {}").format(resolved))
+    listed = sql.SQL(", ").join(map(sql.Identifier, [*keys, *rest]))
+    gone = dict(
+        conn.execute(
+            sql.SQL(
+                """with d as (
+                     delete from {t} t where t.result_set_k = any(%s) and not exists (
+                       select from {k} f where {same} and ({fr}) is not distinct from ({tr}))
+                     returning t.result_set_k)
+                   select result_set_k, count(*) from d group by 1"""
+            ).format(
+                t=sql.Identifier(table),
+                k=resolved,
+                same=sql.SQL(" and ").join(sql.SQL("f.{c} = t.{c}").format(c=sql.Identifier(c)) for c in keys),
+                fr=sql.SQL(", ").join(sql.SQL("f.{}").format(sql.Identifier(c)) for c in rest),
+                tr=sql.SQL(", ").join(sql.SQL("t.{}").format(sql.Identifier(c)) for c in rest),
+            ),
+            [before],
+        ).fetchall()
     )
-    return changeset_id
+    put = dict(
+        conn.execute(
+            sql.SQL(
+                """with w as (insert into {t} ({c}) select {c} from {k} on conflict do nothing returning result_set_k)
+                   select result_set_k, count(*) from w group by 1"""
+            ).format(t=sql.Identifier(table), c=listed, k=resolved)
+        ).fetchall()
+    )
+    if gone or put:
+        counts[table] = [sum(put.values()), sum(gone.values())]
+    sizes = dict(conn.execute(sql.SQL("select result_set_k, count(*) from {} group by 1").format(resolved)).fetchall())
+    return sizes, set(gone) | set(put)
+
+
+def _derive(conn: Connection, loaded: list[Loaded], meter: Meter) -> list[str]:
+    sizes: dict[int, int] = {}
+    for item in loaded:
+        sizes.update(item.sets)
+    moved = sorted({area for item in loaded for area in item.moved})
+    repointed = sorted({unit for item in loaded for unit in item.repointed})
+    batches: list[list[int]] = [[]]
+    total = 0
+    for k, n in sorted(sizes.items()):
+        if batches[-1] and total + n > ROLLUP_VALUES:
+            batches.append([])
+            total = 0
+        batches[-1].append(k)
+        total += n
+    for index, batch in enumerate(batches):
+        _rollup(conn, None, moved if index == 0 else [], repointed if index == 0 else [], batch)
+    steps = [meter.step(f"rollups ({len(batches)} passes)")]
+    for item in loaded:
+        covers.uncover(conn, item.changeset_id, item.moved, item.repointed, sets=sorted(item.sets))
+        touched.recorded(conn, item.changeset_id)
+    steps.append(meter.step("covers"))
+    search.scope(conn, [item.changeset_id for item in loaded])
+    search.refresh(conn)
+    steps.append(meter.step("search"))
+    return steps
+
+
+def load(conn: Connection, items: list[tuple[Path, dict[str, object]]], meter: Meter) -> list[str]:
+    with conn.transaction():
+        conn.execute("select pg_advisory_xact_lock_shared(hashtext('ea.search'))")
+        conn.execute("select pg_advisory_xact_lock_shared(%s)", [MERGE_LOCK])
+        loaded = [item for path, accepted in items if (item := _facts(conn, path, accepted)) is not None]
+        steps = [meter.step("facts")]
+        if loaded:
+            steps += _derive(conn, loaded, meter)
+    for item in loaded:
+        copy = folder(item.key) / f"v{item.version}"
+        if copy.exists():
+            shutil.rmtree(copy)
+        shutil.copytree(item.path, copy)
+        changed = ", ".join(f"{t} +{a:,}/-{d:,}" for t, (a, d) in item.counts.items() if a or d)
+        print(f"{item.key} v{item.version} as {item.changeset_id}: {changed}", flush=True)
+    if loaded:
+        print(f"{len(loaded)} packages: {', '.join(steps)}", flush=True)
+    return [item.changeset_id for item in loaded]
 
 
 def run(command: str, keys: list[str]) -> None:
+    if command == "export":
+        for pipeline in keys:
+            export(pipeline)
+        return
     failed = False
+    ready: list[tuple[Path, dict[str, object]]] = []
     for key in keys:
         path = _resolve(key)
         reasons = _manifest(path).get("accepted", {})
@@ -855,19 +957,195 @@ def run(command: str, keys: list[str]) -> None:
             failed = True
             continue
         print(f"{key}: checks passed, {checked}", flush=True)
-        if command == "load":
-            with store.connect() as conn:
-                meter = Meter(conn)
-                try:
-                    load(conn, path, meter, accepted)
-                except Exception:
-                    if meter.tripped:
-                        raise MemoryError(
-                            f"{key}: the database backend reached {meter.tripped:,} MB, over {SERVER_LIMIT:,} MB, "
-                            "so the load was canceled and rolled back"
-                        ) from None
-                    raise
-                finally:
-                    meter.close()
+        ready.append((path, accepted))
+    if command == "load" and ready:
+        with store.connect() as conn:
+            meter = Meter(conn)
+            try:
+                load(conn, ready, meter)
+            except Exception:
+                if meter.tripped:
+                    raise MemoryError(
+                        f"the database backend reached {meter.tripped:,} MB, over {SERVER_LIMIT:,} MB, "
+                        "so the load was canceled and rolled back"
+                    ) from None
+                raise
+            finally:
+                meter.close()
     if failed:
         raise SystemExit(1)
+
+
+EXPORT_REASON = "published through the changeset path before this export"
+KEPT = {"changeset_id", "recorded_from"}
+
+
+def _select(schema: dict[str, pl.DataType]) -> sql.Composable:
+    return sql.SQL(", ").join(
+        sql.SQL("t.{}::text").format(sql.Identifier(c)) if kind == U else sql.SQL("t.{}").format(sql.Identifier(c))
+        for c, kind in schema.items()
+    )
+
+
+def _dump(
+    conn: Connection, con: duckdb.DuckDBPyConnection, query: sql.Composable, schema: dict[str, pl.DataType], out: Path
+) -> int:
+    staging = out.with_suffix(".csv")
+    with (
+        staging.open("wb") as sink,
+        conn.cursor() as cursor,
+        cursor.copy(sql.SQL("copy ({}) to stdout (format csv)").format(query)) as copy,
+    ):
+        for block in copy:
+            sink.write(block)
+    if staging.stat().st_size == 0:
+        staging.unlink()
+        return 0
+    columns = ", ".join(f"'{c}': '{_duck(kind)}'" for c, kind in schema.items())
+    con.execute(
+        f"copy (select * from read_csv('{staging}', header = false, delim = ',', quote = '\"', escape = '\"',"
+        f" allow_quoted_nulls = false, columns = {{{columns}}})) to '{out}' (format parquet)"
+    )
+    staging.unlink()
+    found = con.execute(f"select count(*) from read_parquet('{out}')").fetchone()
+    rows = 0 if found is None else int(found[0])
+    if rows == 0:
+        out.unlink()
+    return rows
+
+
+def export(pipeline: str) -> Path:
+    key = f"{pipeline}/all"
+    out = folder(key) / "build"
+    if out.exists():
+        shutil.rmtree(out)
+    out.mkdir(parents=True)
+    spill = ROOT / ".duckdb"
+    spill.mkdir(parents=True, exist_ok=True)
+    con = duckdb.connect(config={"memory_limit": CHECK_MEMORY, "threads": 4, "temp_directory": str(spill)})
+    meter = Meter()
+    with store.connect() as conn:
+        conn.execute("set transaction isolation level repeatable read, read only")
+        adopted = conn.execute(
+            """select coalesce(array_agg(distinct c.id::text), '{}'),
+                      coalesce(array_agg(distinct k) filter (where k is not null), '{}')
+               from changeset c left join lateral unnest(c.artifact_keys) k on true
+               where c.pipeline = %s and c.status = 'published' and not c.scope ? 'package'""",
+            [pipeline],
+        ).fetchone()
+        if adopted is None or not adopted[0]:
+            raise LookupError(f"{pipeline} has no published changesets outside packages")
+        owned, artifacts = sorted(adopted[0]), sorted(adopted[1])
+        mine = sql.SQL("t.changeset_id = any({}::uuid[])").format(sql.Literal(owned))
+        counts: dict[str, int] = {}
+        for table, (_, schema) in TABLES.items():
+            query = sql.SQL("select {} from {} t where {}").format(_select(schema), sql.Identifier(table), mine)
+            counts[table] = _dump(conn, con, query, schema, out / f"{table}.parquet")
+        sets = sql.SQL("r.changeset_id = any({}::uuid[])").format(sql.Literal(owned))
+        fractional = conn.execute(
+            sql.SQL(
+                """select count(*) from result_set r
+                   cross join lateral (select v.value from result_value v where v.result_set_k = r.k offset 0) v
+                   where {} and v.value <> trunc(v.value)"""
+            ).format(sets)
+        ).fetchone()
+        if fractional is not None and fractional[0]:
+            raise ValueError(f"{pipeline}: {fractional[0]:,} fractional values do not fit the package format")
+        for table, rest in (
+            ("result_value", "v.flags, v.value::int8"),
+            ("value_locator", "v.page_id::text, v.source_id::text, v.x0, v.y0, v.x1, v.y1"),
+        ):
+            query = sql.SQL(
+                """select r.id::text, (select u.id::text from reporting_unit u where u.k = v.unit_k),
+                          (select o.id::text from contest_option o where o.k = v.option_k and v.option_k <> 0),
+                          v.channel, v.measure, v.count_round, {rest}
+                   from result_set r cross join lateral (select * from {t} v where v.result_set_k = r.k offset 0) v
+                   where {sets}"""
+            ).format(rest=sql.SQL(rest), t=sql.Identifier(table), sets=sets)
+            counts[table] = _dump(conn, con, query, FACTS[table], out / f"{table}.parquet")
+        outside = conn.execute(
+            """select c.relname from pg_attribute a join pg_class c on c.oid = a.attrelid
+               where c.relnamespace = 'public'::regnamespace and a.attname = 'changeset_id' and not a.attisdropped
+                 and c.relkind in ('r', 'p') and not c.relispartition and c.relname not like '%%\\_history'
+                 and c.relname <> all(%s) order by 1""",
+            [[*TABLES, "entity", "changeset"]],
+        ).fetchall()
+        left: list[str] = []
+        for (table,) in outside:
+            found = conn.execute(
+                sql.SQL("select count(*) from {} t where {}").format(sql.Identifier(table), mine)
+            ).fetchone()
+            if found is not None and found[0]:
+                left.append(f"{table} {found[0]:,}")
+        dropped: list[str] = []
+        for table, (_, schema) in TABLES.items():
+            if not counts[table]:
+                continue
+            extra = conn.execute(
+                """select a.attname, pg_get_expr(d.adbin, d.adrelid) from pg_attribute a
+                   left join pg_attrdef d on d.adrelid = a.attrelid and d.adnum = a.attnum
+                   where a.attrelid = %s::regclass and a.attnum > 0 and not a.attisdropped and a.attgenerated = ''
+                     and a.attidentity = '' and a.attname <> all(%s) order by a.attnum""",
+                [table, [*schema, *KEPT]],
+            ).fetchall()
+            for column, default in extra:
+                differs = (
+                    sql.SQL("t.{} is not null").format(sql.Identifier(column))
+                    if default is None or "(" in default
+                    else sql.SQL("t.{} is distinct from {}").format(sql.Identifier(column), sql.SQL(default))
+                )
+                found = conn.execute(
+                    sql.SQL("select count(*) from {} t where {} and {}").format(sql.Identifier(table), mine, differs)
+                ).fetchone()
+                if found is not None and found[0]:
+                    dropped.append(f"{table}.{column} {found[0]:,}")
+    exported = meter.step("export")
+    counts = {table: rows for table, rows in counts.items() if rows}
+    for table, (_, schema) in [*TABLES.items(), *((t, (None, s)) for t, s in FACTS.items())]:
+        file = out / f"{table}.parquet"
+        columns = ", ".join(f'"{c}"' for c in schema)
+        types = ", ".join(f'null::{_duck(kind)} as "{c}"' for c, kind in schema.items())
+        body = f"select {columns} from read_parquet('{file}')" if file.exists() else f"select {types} where false"
+        con.execute(f'create or replace view "{table}" as {body}')
+    external: set[str] = set()
+    for table, column, target in REFERENCES:
+        if table not in counts:
+            continue
+        known = (
+            ""
+            if target == "polity"
+            else f' and "{column}" not in (select "{TARGET_KEY.get(target, "id")}" from "{target}")'
+        )
+        rows = con.execute(
+            f'select distinct "{column}"::varchar from "{table}" where "{column}" is not null{known}'
+        ).fetchall()
+        external |= {str(row[0]) for row in rows}
+    digest = _digest(out, counts, con)
+    con.close()
+    manifest: Manifest = {
+        "key": key,
+        "pipeline": pipeline,
+        "summary": f"{pipeline}, exported from the changeset path",
+        "depends": [],
+        "external": sorted(external),
+        "parser_commit": store.checkout()["sha"],
+        "built_at": datetime.now(UTC).isoformat(),
+        "sources": [{"storage_key": artifact} for artifact in artifacts],
+        "accepted": {},
+        "tables": counts,
+        "digest": digest,
+        "adopts": owned,
+    }
+    (out / "package.json").write_text(json.dumps(manifest, indent=1) + "\n")
+    for code, n, _ in check(out):
+        if code.startswith(("unique.", "reference.")):
+            raise ValueError(f"{key}: the export fails {code} ({n:,})")
+        manifest["accepted"][code] = EXPORT_REASON
+    (out / "package.json").write_text(json.dumps(manifest, indent=1) + "\n")
+    print(f"{key}: {', '.join(f'{t} {n:,}' for t, n in counts.items())}; {len(owned):,} changesets adopted", flush=True)
+    print(f"{key}: {exported}, then {meter.step('external and checks')}", flush=True)
+    if left:
+        print(f"{key}: rows left on the changeset path: {', '.join(left)}", flush=True)
+    if dropped:
+        print(f"{key}: columns outside the package format, kept in place: {', '.join(dropped)}", flush=True)
+    return out
