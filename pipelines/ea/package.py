@@ -20,6 +20,7 @@ from psycopg import Connection, sql
 
 from ea import covers, search, store, touched
 from ea.apply import MERGE_LOCK, _rollup
+from ea.changeset import Changeset
 from ea.checks import RULES
 from ea.raw import Artifact
 from ea.store import DATA
@@ -43,7 +44,17 @@ F = pl.Float64()
 TABLES: dict[str, tuple[tuple[str, ...] | None, dict[str, pl.DataType]]] = {
     "source": (
         ("id",),
-        {"id": U, "kind": U, "publisher": U, "title": U, "url": U, "license": U, "license_url": U, "attribution": U},
+        {
+            "id": U,
+            "kind": U,
+            "publisher": U,
+            "title": U,
+            "url": U,
+            "license": U,
+            "license_url": U,
+            "attribution": U,
+            "notes": U,
+        },
     ),
     "source_artifact": (
         ("id",),
@@ -94,10 +105,32 @@ TABLES: dict[str, tuple[tuple[str, ...] | None, dict[str, pl.DataType]]] = {
     ),
     "party": (("id",), {"id": U, "kind": U, "polity_id": U}),
     "party_color": (None, {"party_id": U, "color": U, "valid_from": D, "valid_to": D, "source_id": U}),
-    "person": (("id",), {"id": U, "birth_date": D, "birth_precision": U, "gender": U}),
+    "person": (
+        ("id",),
+        {
+            "id": U,
+            "birth_date": D,
+            "birth_precision": U,
+            "death_date": D,
+            "death_precision": U,
+            "gender": U,
+        },
+    ),
     "election": (
         ("id",),
-        {"id": U, "polity_id": U, "parent_id": U, "kind": U, "date_from": D, "date_to": D, "status": U},
+        {
+            "id": U,
+            "polity_id": U,
+            "parent_id": U,
+            "kind": U,
+            "date_from": D,
+            "date_to": D,
+            "date_precision": U,
+            "original_calendar": U,
+            "original_text": U,
+            "status": U,
+            "rerun_of_id": U,
+        },
     ),
     "contest": (
         ("id",),
@@ -138,6 +171,8 @@ TABLES: dict[str, tuple[tuple[str, ...] | None, dict[str, pl.DataType]]] = {
             "ballot_name": U,
             "member_of_party_id": U,
             "is_independent": B,
+            "is_incumbent": B,
+            "ballot_lines": I16,
         },
     ),
     "reporting_unit": (
@@ -151,6 +186,11 @@ TABLES: dict[str, tuple[tuple[str, ...] | None, dict[str, pl.DataType]]] = {
             "area_relation": U,
             "area_id": U,
             "kind": U,
+            "counted_with_id": U,
+            "valid_from": D,
+            "valid_from_precision": U,
+            "valid_to": D,
+            "valid_to_precision": U,
         },
     ),
     "result_set": (
@@ -165,17 +205,60 @@ TABLES: dict[str, tuple[tuple[str, ...] | None, dict[str, pl.DataType]]] = {
             "status": U,
             "is_default": B,
             "completeness": F,
+            "as_of": pl.Datetime("us", "UTC"),
+            "supersedes_id": U,
         },
     ),
     "outcome": (None, {"result_set_id": U, "option_id": U, "candidacy_id": U, "kind": U, "seats": I32}),
     "name": (
         ("id",),
-        {"id": U, "entity_id": U, "text": U, "lang": U, "kind": U, "is_preferred": B, "source_id": U},
+        {
+            "id": U,
+            "entity_id": U,
+            "text": U,
+            "lang": U,
+            "script": U,
+            "kind": U,
+            "valid_from": D,
+            "valid_from_precision": U,
+            "valid_to": D,
+            "valid_to_precision": U,
+            "is_preferred": B,
+            "source_id": U,
+        },
     ),
     "note": (("id",), {"id": U, "entity_id": U, "kind": U, "body_md": U, "lang": U}),
     "slug": (("path",), {"path": U, "entity_id": U, "is_current": B}),
     "external_id": (None, {"entity_id": U, "scheme": U, "value": U}),
     "citation": (("id",), {"id": U, "entity_id": U, "source_id": U, "locator": U}),
+    "reporting_unit_area": (
+        None,
+        {
+            "unit_id": U,
+            "area_id": U,
+            "valid_from": D,
+            "valid_from_precision": U,
+            "valid_to": D,
+            "valid_to_precision": U,
+            "approximate": B,
+            "partial": B,
+            "method": U,
+        },
+    ),
+    "party_affiliation": (
+        None,
+        {
+            "party_id": U,
+            "parent_party_id": U,
+            "kind": U,
+            "valid_from": D,
+            "valid_from_precision": U,
+            "valid_to": D,
+            "valid_to_precision": U,
+        },
+    ),
+    "ballot_question": (None, {"contest_id": U, "type": U}),
+    "entity_retirement": (None, {"entity_id": U, "reason": U}),
 }
 FACT = ("result_set_id", "unit_id", "option_id", "channel", "measure", "count_round")
 FACTS: dict[str, dict[str, pl.DataType]] = {
@@ -216,6 +299,11 @@ JSON_COLUMNS = {"kinds", "rules", "locator"}
 
 def folder(key: str) -> Path:
     return ROOT / key
+
+
+def canonical(value: object) -> str:
+    parsed = json.loads(value) if isinstance(value, str) else value
+    return json.dumps(parsed, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
 
 
 class Package:
@@ -282,7 +370,7 @@ class Package:
             frame = pl.DataFrame(
                 [
                     {
-                        column: json.dumps(row[column])
+                        column: canonical(row[column])
                         if column in JSON_COLUMNS and row.get(column) is not None
                         else row.get(column)
                         for column in schema
@@ -428,6 +516,13 @@ REFERENCES = [
     ("result_value", "option_id", "contest_option"),
     ("declared", "result_set_id", "result_set"),
     ("declared", "option_id", "contest_option"),
+    ("reporting_unit", "counted_with_id", "reporting_unit"),
+    ("result_set", "supersedes_id", "result_set"),
+    ("reporting_unit_area", "unit_id", "reporting_unit"),
+    ("reporting_unit_area", "area_id", "area"),
+    ("party_affiliation", "party_id", "party"),
+    ("party_affiliation", "parent_party_id", "party"),
+    ("ballot_question", "contest_id", "contest"),
 ]
 TARGET_KEY = {"scheme": "code", "polity": "id"}
 
@@ -1006,7 +1101,7 @@ def run(command: str, keys: list[str]) -> None:
 
 
 EXPORT_REASON = "published through the changeset path before this export"
-KEPT = {"changeset_id", "recorded_from"}
+KEPT = {"changeset_id", "recorded_from", "valid"}
 
 
 def _select(schema: dict[str, pl.DataType]) -> sql.Composable:
@@ -1043,28 +1138,102 @@ def _dump(
     return rows
 
 
+def _connect() -> duckdb.DuckDBPyConnection:
+    spill = ROOT / ".duckdb"
+    spill.mkdir(parents=True, exist_ok=True)
+    return duckdb.connect(config={"memory_limit": CHECK_MEMORY, "threads": 4, "temp_directory": str(spill)})
+
+
+def _adopted(conn: Connection, pipeline: str) -> tuple[list[str], list[str]]:
+    row = conn.execute(
+        """select coalesce(array_agg(distinct c.id::text), '{}'),
+                  coalesce(array_agg(distinct k) filter (where k is not null), '{}')
+           from changeset c left join lateral unnest(c.artifact_keys) k on true
+           where c.pipeline = %s and c.status = 'published' and not c.scope ? 'package'""",
+        [pipeline],
+    ).fetchone()
+    if row is None:
+        return [], []
+    return sorted(row[0]), sorted(row[1])
+
+
+def _canonicalize(file: Path, columns: list[str]) -> None:
+    pl.read_parquet(file).with_columns(
+        pl.col(column).map_elements(canonical, return_dtype=pl.String) for column in columns
+    ).write_parquet(file, statistics=False)
+
+
+def _seal(
+    key: str,
+    pipeline: str,
+    summary: str,
+    out: Path,
+    counts: dict[str, int],
+    adopts: list[str],
+    sources: list[dict[str, str]],
+    reason: str | None,
+) -> Manifest:
+    con = _connect()
+    for table, (_, schema) in [*TABLES.items(), *((t, (None, s)) for t, s in FACTS.items())]:
+        file = out / f"{table}.parquet"
+        columns = ", ".join(f'"{c}"' for c in schema)
+        types = ", ".join(f'null::{_duck(kind)} as "{c}"' for c, kind in schema.items())
+        body = f"select {columns} from read_parquet('{file}')" if file.exists() else f"select {types} where false"
+        con.execute(f'create or replace view "{table}" as {body}')
+    external: set[str] = set()
+    for table, column, target in REFERENCES:
+        if table not in counts:
+            continue
+        known = (
+            ""
+            if target == "polity"
+            else f' and "{column}" not in (select "{TARGET_KEY.get(target, "id")}" from "{target}")'
+        )
+        rows = con.execute(
+            f'select distinct "{column}"::varchar from "{table}" where "{column}" is not null{known}'
+        ).fetchall()
+        external |= {str(row[0]) for row in rows}
+    digest = _digest(out, counts, con)
+    con.close()
+    manifest: Manifest = {
+        "key": key,
+        "pipeline": pipeline,
+        "summary": summary,
+        "depends": [],
+        "external": sorted(external),
+        "parser_commit": store.checkout()["sha"],
+        "built_at": datetime.now(UTC).isoformat(),
+        "sources": sources,
+        "accepted": {},
+        "tables": counts,
+        "digest": digest,
+        "adopts": adopts,
+    }
+    (out / "package.json").write_text(json.dumps(manifest, indent=1) + "\n")
+    for code, n, _ in check(out):
+        if code.startswith(("unique.", "reference.")):
+            raise ValueError(f"{key}: the build fails {code} ({n:,})")
+        if reason is None:
+            print(f"{key}: {code} {n:,} is not accepted", flush=True)
+        else:
+            manifest["accepted"][code] = reason
+    (out / "package.json").write_text(json.dumps(manifest, indent=1) + "\n")
+    return manifest
+
+
 def export(pipeline: str) -> Path:
     key = f"{pipeline}/all"
     out = folder(key) / "build"
     if out.exists():
         shutil.rmtree(out)
     out.mkdir(parents=True)
-    spill = ROOT / ".duckdb"
-    spill.mkdir(parents=True, exist_ok=True)
-    con = duckdb.connect(config={"memory_limit": CHECK_MEMORY, "threads": 4, "temp_directory": str(spill)})
+    con = _connect()
     meter = Meter()
     with store.connect() as conn:
         conn.execute("set transaction isolation level repeatable read, read only")
-        adopted = conn.execute(
-            """select coalesce(array_agg(distinct c.id::text), '{}'),
-                      coalesce(array_agg(distinct k) filter (where k is not null), '{}')
-               from changeset c left join lateral unnest(c.artifact_keys) k on true
-               where c.pipeline = %s and c.status = 'published' and not c.scope ? 'package'""",
-            [pipeline],
-        ).fetchone()
-        if adopted is None or not adopted[0]:
+        owned, artifacts = _adopted(conn, pipeline)
+        if not owned:
             raise LookupError(f"{pipeline} has no published changesets outside packages")
-        owned, artifacts = sorted(adopted[0]), sorted(adopted[1])
         mine = sql.SQL("t.changeset_id = any({}::uuid[])").format(sql.Literal(owned))
         counts: dict[str, int] = {}
         for table, (_, schema) in TABLES.items():
@@ -1130,47 +1299,21 @@ def export(pipeline: str) -> Path:
                     dropped.append(f"{table}.{column} {found[0]:,}")
     exported = meter.step("export")
     counts = {table: rows for table, rows in counts.items() if rows}
-    for table, (_, schema) in [*TABLES.items(), *((t, (None, s)) for t, s in FACTS.items())]:
-        file = out / f"{table}.parquet"
-        columns = ", ".join(f'"{c}"' for c in schema)
-        types = ", ".join(f'null::{_duck(kind)} as "{c}"' for c, kind in schema.items())
-        body = f"select {columns} from read_parquet('{file}')" if file.exists() else f"select {types} where false"
-        con.execute(f'create or replace view "{table}" as {body}')
-    external: set[str] = set()
-    for table, column, target in REFERENCES:
-        if table not in counts:
-            continue
-        known = (
-            ""
-            if target == "polity"
-            else f' and "{column}" not in (select "{TARGET_KEY.get(target, "id")}" from "{target}")'
-        )
-        rows = con.execute(
-            f'select distinct "{column}"::varchar from "{table}" where "{column}" is not null{known}'
-        ).fetchall()
-        external |= {str(row[0]) for row in rows}
-    digest = _digest(out, counts, con)
     con.close()
-    manifest: Manifest = {
-        "key": key,
-        "pipeline": pipeline,
-        "summary": f"{pipeline}, exported from the changeset path",
-        "depends": [],
-        "external": sorted(external),
-        "parser_commit": store.checkout()["sha"],
-        "built_at": datetime.now(UTC).isoformat(),
-        "sources": [{"storage_key": artifact} for artifact in artifacts],
-        "accepted": {},
-        "tables": counts,
-        "digest": digest,
-        "adopts": owned,
-    }
-    (out / "package.json").write_text(json.dumps(manifest, indent=1) + "\n")
-    for code, n, _ in check(out):
-        if code.startswith(("unique.", "reference.")):
-            raise ValueError(f"{key}: the export fails {code} ({n:,})")
-        manifest["accepted"][code] = EXPORT_REASON
-    (out / "package.json").write_text(json.dumps(manifest, indent=1) + "\n")
+    for table in counts:
+        columns = [column for column in TABLES[table][1] if column in JSON_COLUMNS] if table in TABLES else []
+        if columns:
+            _canonicalize(out / f"{table}.parquet", columns)
+    _seal(
+        key,
+        pipeline,
+        f"{pipeline}, exported from the changeset path",
+        out,
+        counts,
+        owned,
+        [{"storage_key": artifact} for artifact in artifacts],
+        EXPORT_REASON,
+    )
     print(f"{key}: {', '.join(f'{t} {n:,}' for t, n in counts.items())}; {len(owned):,} changesets adopted", flush=True)
     print(f"{key}: {exported}, then {meter.step('external and checks')}", flush=True)
     if left:
@@ -1178,3 +1321,62 @@ def export(pipeline: str) -> Path:
     if dropped:
         print(f"{key}: columns outside the package format, kept in place: {', '.join(dropped)}", flush=True)
     return out
+
+
+def _column(frame: pl.DataFrame, column: str, kind: pl.DataType) -> pl.Expr:
+    if column not in frame.columns:
+        return pl.lit(None, dtype=kind).alias(column)
+    values = pl.col(column)
+    dtype = frame.schema[column]
+    if isinstance(kind, pl.Datetime):
+        if dtype == pl.String:
+            values = values.str.to_datetime(time_unit="us", time_zone="UTC")
+        elif isinstance(dtype, pl.Datetime) and dtype.time_zone is None:
+            values = values.dt.replace_time_zone("UTC")
+    return values.cast(kind).alias(column)
+
+
+class Draft(Changeset):
+    def write(self) -> Path:
+        pipeline = str(self.manifest["pipeline"])
+        key = f"{pipeline}/all"
+        tables = self._tables()
+        out = folder(key) / "build"
+        if out.exists():
+            shutil.rmtree(out)
+        out.mkdir(parents=True)
+        counts: dict[str, int] = {}
+        for table, frame in tables.items():
+            schema = TABLES[table][1] if table in TABLES else FACTS.get(table)
+            if schema is None:
+                raise ValueError(f"{pipeline} writes {table}, which is outside the package format in ea/package.py")
+            unknown = sorted(set(frame.columns) - set(schema))
+            if unknown:
+                raise ValueError(f"{pipeline} writes {table} columns outside the package format: {unknown}")
+            if frame.height == 0:
+                continue
+            if "value" in frame.columns and (frame["value"].cast(pl.Float64) % 1 != 0).any():
+                raise ValueError(f"{pipeline}: {table} has fractional values, which do not fit the package format")
+            frame.select(_column(frame, column, kind) for column, kind in schema.items()).with_columns(
+                pl.col(column).map_elements(canonical, return_dtype=pl.String)
+                for column in schema
+                if column in JSON_COLUMNS
+            ).write_parquet(out / f"{table}.parquet", statistics=False)
+            counts[table] = frame.height
+        owned, artifacts = _adopted(self.conn, pipeline)
+        new = tables["source_artifact"]["storage_key"].to_list() if "source_artifact" in tables else []
+        _seal(
+            key,
+            pipeline,
+            str(self.manifest["summary"]),
+            out,
+            counts,
+            owned,
+            [{"storage_key": storage} for storage in sorted({*artifacts, *new})],
+            None,
+        )
+        print(
+            f"{key}: {', '.join(f'{t} {n:,}' for t, n in counts.items())}; {len(owned):,} changesets adopted",
+            flush=True,
+        )
+        return out
