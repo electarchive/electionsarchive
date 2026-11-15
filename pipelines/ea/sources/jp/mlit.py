@@ -173,12 +173,14 @@ def kind(code: str, name: str) -> str:
     return {"市": "city", "町": "town", "村": "village"}[name[-1]]
 
 
-def read(vintage: str) -> list[tuple[str, str, str, shapely.Geometry]]:
+def read(
+    vintage: str, links: list[str] | None = None, source: str = SOURCE
+) -> list[tuple[str, str, str, shapely.Geometry]]:
     prefectures = {name: f"{number:02d}" for number, (name, _) in enumerate(PREFECTURES, 1)}
     cities = {(code[:2], name): code for code, name in DESIGNATED.items()}
     features: dict[str, tuple[str, str, list[shapely.Geometry]]] = {}
-    for url in urls(vintage):
-        with zipfile.ZipFile(raw.cached(SOURCE, url).path) as archive:
+    for url in links or urls(vintage):
+        with zipfile.ZipFile(raw.cached(source, url).path) as archive:
             names = archive.namelist()
             stem = next(
                 name.removesuffix(".shp")
@@ -200,7 +202,7 @@ def read(vintage: str) -> list[tuple[str, str, str, shapely.Geometry]]:
                 code = row["N03_007"]
                 if not code or code.endswith("000") or code in TERRITORIES or shape.shapeType == shapefile.NULL:
                     continue
-                if prefectures[row["N03_001"]] != code[:2]:
+                if prefectures[row["N03_001"].replace("繩", "縄")] != code[:2]:
                     raise ValueError(f"{vintage} {code}: prefecture {row['N03_001']}")
                 parts = [row.get(f"N03_00{n}", "") for n in (3, 4, 5)]
                 if ward(code):
@@ -245,8 +247,8 @@ def merge(members: list[shapely.Geometry]) -> shapely.Geometry:
     return merged
 
 
-def layers(vintage: str) -> pl.DataFrame:
-    features = read(vintage)
+def layers(vintage: str, links: list[str] | None = None, source: str = SOURCE) -> pl.DataFrame:
+    features = read(vintage, links, source)
     simplified = shapely.coverage_simplify([geometry for *_, geometry in features], TOLERANCE)
     rows: list[tuple[str, str, str, str, str | None, shapely.Geometry]] = []
     pieces: dict[str, list[shapely.Geometry]] = {}
