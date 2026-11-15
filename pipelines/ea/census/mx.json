@@ -403,6 +403,13 @@
    "url": "https://www.jornada.com.mx/2002/02/18/029n2est.php?printver=1",
    "kind": "news_agency",
    "note": "Read 2026-11-14. Comicios of 17 February renewed the eight presidencias municipales and the state Congress."
+  },
+  "wiki_es_1990s": {
+   "title": "Elecciones estatales de <estado> de 1990 to 1999 (per-state articles) and Anexo:Elecciones locales de México, Década de 1990",
+   "publisher": "Wikipedia (Spanish)",
+   "url": "https://es.wikipedia.org/wiki/Anexo:Elecciones_locales_de_M%C3%A9xico",
+   "kind": "community",
+   "note": "Read 2026-11-14. A day is taken only where the Anexo and the state article give the same one; each article names the offices at stake and the number of ayuntamientos. Where they disagree (Baja California 1992 and 1998, Baja California Sur 1996, Campeche 1994, Chiapas 1991, Coahuila 1990 and 1996, Guerrero 1993 and 1999 first rounds, Quintana Roo 1990, Querétaro 1994) the state-year is left to the placeholder."
   }
  },
  "tiers": [
@@ -1469,8 +1476,302 @@
    "dates": [
     {
      "date": "1917-01-01",
+     "through": "1989-12-31",
+     "note": "Per-state elections before 1990 are not yet enumerated; no source has been found that reaches them."
+    },
+    {
+     "date": "1990-01-01",
      "through": "1999-12-31",
-     "note": "Per-state governor elections before 2000 are not yet enumerated."
+     "note": "Not enumerated for 1990-1999: Estado de México 1991, 1994, and 1996; Tabasco, Tlaxcala, and Veracruz 1991; Sonora, Tlaxcala, and Distrito Federal 1994; Durango, Zacatecas, Puebla, Tlaxcala, and Oaxaca 1995 (state articles missing); Guerrero 1996 and 1999 and Jalisco 1998 extraordinary; and the state-years where the Anexo and the state article give different days (Baja California 1992 and 1998, Baja California Sur 1996, Campeche 1994, Chiapas 1991, Coahuila 1990 and 1996, Guerrero 1993 and 1999 first rounds, Quintana Roo 1990, Querétaro 1994). Before 1990 no source has been found."
+    },
+    {
+     "date": "1991-07-07",
+     "contests": 3,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "CAM": 1,
+      "COL": 1,
+      "NLE": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1991-07-07, Gobernador: Campeche, Colima, Nuevo León."
+    },
+    {
+     "date": "1991-08-18",
+     "contests": 4,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "GUA": 1,
+      "QUE": 1,
+      "SLP": 1,
+      "SON": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1991-08-18, Gobernador: Guanajuato, Querétaro, San Luis Potosí, Sonora."
+    },
+    {
+     "date": "1992-07-05",
+     "contests": 1,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "MIC": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1992-07-05, Gobernador: Michoacán."
+    },
+    {
+     "date": "1992-07-12",
+     "contests": 1,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "CHH": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1992-07-12, Gobernador: Chihuahua."
+    },
+    {
+     "date": "1992-08-02",
+     "contests": 5,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "AGU": 1,
+      "DUR": 1,
+      "OAX": 1,
+      "VER": 1,
+      "ZAC": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1992-08-02, Gobernador: Aguascalientes, Durango, Oaxaca, Veracruz, Zacatecas."
+    },
+    {
+     "date": "1992-11-08",
+     "contests": 3,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "PUE": 1,
+      "SIN": 1,
+      "TAM": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1992-11-08, Gobernador: Puebla, Sinaloa, Tamaulipas."
+    },
+    {
+     "date": "1992-11-15",
+     "contests": 1,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "TLA": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1992-11-15, Gobernador: Tlaxcala."
+    },
+    {
+     "date": "1993-02-07",
+     "contests": 1,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "BCS": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1993-02-07, Gobernador: Baja California Sur."
+    },
+    {
+     "date": "1993-02-21",
+     "contests": 2,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "HID": 1,
+      "ROO": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1993-02-21, Gobernador: Hidalgo, Quintana Roo."
+    },
+    {
+     "date": "1993-04-18",
+     "contests": 1,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "SLP": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1993-04-18, Gobernador: San Luis Potosí."
+    },
+    {
+     "date": "1993-07-04",
+     "contests": 2,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "MEX": 1,
+      "NAY": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1993-07-04, Gobernador: Estado de México, Nayarit."
+    },
+    {
+     "date": "1993-09-26",
+     "contests": 1,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "COA": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1993-09-26, Gobernador: Coahuila."
+    },
+    {
+     "date": "1993-11-28",
+     "contests": 1,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "YUC": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1993-11-28, Gobernador: Yucatán."
+    },
+    {
+     "date": "1994-03-20",
+     "contests": 1,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "MOR": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1994-03-20, Gobernador: Morelos."
+    },
+    {
+     "date": "1994-08-21",
+     "contests": 1,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "CHP": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1994-08-21, Gobernador: Chiapas."
+    },
+    {
+     "date": "1994-11-20",
+     "contests": 1,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "TAB": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1994-11-20, Gobernador: Tabasco."
+    },
+    {
+     "date": "1995-02-12",
+     "contests": 1,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "JAL": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1995-02-12, Gobernador: Jalisco."
+    },
+    {
+     "date": "1995-05-28",
+     "contests": 2,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "GUA": 1,
+      "YUC": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1995-05-28, Gobernador: Guanajuato, Yucatán."
+    },
+    {
+     "date": "1995-08-06",
+     "contests": 1,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "BCN": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1995-08-06, Gobernador: Baja California."
+    },
+    {
+     "date": "1995-11-12",
+     "contests": 1,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "MIC": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1995-11-12, Gobernador: Michoacán."
+    },
+    {
+     "date": "1997-07-06",
+     "contests": 7,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "CAM": 1,
+      "CMX": 1,
+      "COL": 1,
+      "NLE": 1,
+      "QUE": 1,
+      "SLP": 1,
+      "SON": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1997-07-06, Gobernador: Campeche, Distrito Federal, Colima, Nuevo León, Querétaro, San Luis Potosí, Sonora."
+    },
+    {
+     "date": "1998-07-05",
+     "contests": 3,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "CHH": 1,
+      "DUR": 1,
+      "ZAC": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1998-07-05, Gobernador: Chihuahua, Durango, Zacatecas."
+    },
+    {
+     "date": "1998-08-02",
+     "contests": 3,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "AGU": 1,
+      "OAX": 1,
+      "VER": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1998-08-02, Gobernador: Aguascalientes, Oaxaca, Veracruz."
+    },
+    {
+     "date": "1998-10-25",
+     "contests": 1,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "TAM": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1998-10-25, Gobernador: Tamaulipas."
+    },
+    {
+     "date": "1998-11-08",
+     "contests": 3,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "PUE": 1,
+      "SIN": 1,
+      "TLA": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1998-11-08, Gobernador: Puebla, Sinaloa, Tlaxcala."
+    },
+    {
+     "date": "1999-02-07",
+     "contests": 1,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "BCS": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1999-02-07, Gobernador: Baja California Sur."
+    },
+    {
+     "date": "1999-02-21",
+     "contests": 2,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "HID": 1,
+      "ROO": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1999-02-21, Gobernador: Hidalgo, Quintana Roo."
+    },
+    {
+     "date": "1999-07-04",
+     "contests": 2,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "MEX": 1,
+      "NAY": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1999-07-04, Gobernador: Estado de México, Nayarit."
+    },
+    {
+     "date": "1999-09-26",
+     "contests": 1,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "COA": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1999-09-26, Gobernador: Coahuila."
     },
     {
      "date": "2000-07-02",
@@ -2039,8 +2340,445 @@
    "dates": [
     {
      "date": "1917-01-01",
+     "through": "1989-12-31",
+     "note": "Per-state elections before 1990 are not yet enumerated; no source has been found that reaches them."
+    },
+    {
+     "date": "1990-01-01",
      "through": "1999-12-31",
-     "note": "Per-state legislative elections before 2000 are not yet enumerated."
+     "note": "Not enumerated for 1990-1999: Estado de México 1991, 1994, and 1996; Tabasco, Tlaxcala, and Veracruz 1991; Sonora, Tlaxcala, and Distrito Federal 1994; Durango, Zacatecas, Puebla, Tlaxcala, and Oaxaca 1995 (state articles missing); Guerrero 1996 and 1999 and Jalisco 1998 extraordinary; and the state-years where the Anexo and the state article give different days (Baja California 1992 and 1998, Baja California Sur 1996, Campeche 1994, Chiapas 1991, Coahuila 1990 and 1996, Guerrero 1993 and 1999 first rounds, Quintana Roo 1990, Querétaro 1994). Before 1990 no source has been found."
+    },
+    {
+     "date": "1990-01-21",
+     "contests": 1,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "HID": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1990-01-21, Diputados al Congreso del Estado: Hidalgo."
+    },
+    {
+     "date": "1990-02-04",
+     "contests": 1,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "BCS": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1990-02-04, Diputados al Congreso del Estado: Baja California Sur."
+    },
+    {
+     "date": "1990-06-10",
+     "contests": 1,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "NAY": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1990-06-10, Diputados al Congreso del Estado: Nayarit."
+    },
+    {
+     "date": "1990-08-05",
+     "contests": 1,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "SLP": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1990-08-05, Diputados al Congreso del Estado: San Luis Potosí."
+    },
+    {
+     "date": "1990-11-11",
+     "contests": 1,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "MEX": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1990-11-11, Diputados al Congreso del Estado: Estado de México."
+    },
+    {
+     "date": "1990-11-25",
+     "contests": 1,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "YUC": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1990-11-25, Diputados al Congreso del Estado: Yucatán."
+    },
+    {
+     "date": "1991-03-17",
+     "contests": 1,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "MOR": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1991-03-17, Diputados al Congreso del Estado: Morelos."
+    },
+    {
+     "date": "1991-07-07",
+     "contests": 2,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "COL": 1,
+      "NLE": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1991-07-07, Diputados al Congreso del Estado: Colima, Nuevo León."
+    },
+    {
+     "date": "1991-08-18",
+     "contests": 3,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "GUA": 1,
+      "QUE": 1,
+      "SON": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1991-08-18, Diputados al Congreso del Estado: Guanajuato, Querétaro, Sonora."
+    },
+    {
+     "date": "1992-02-09",
+     "contests": 1,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "JAL": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1992-02-09, Diputados al Congreso del Estado: Jalisco."
+    },
+    {
+     "date": "1992-07-05",
+     "contests": 1,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "MIC": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1992-07-05, Diputados al Congreso del Estado: Michoacán."
+    },
+    {
+     "date": "1992-07-12",
+     "contests": 1,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "CHH": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1992-07-12, Diputados al Congreso del Estado: Chihuahua."
+    },
+    {
+     "date": "1992-08-02",
+     "contests": 4,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "AGU": 1,
+      "DUR": 1,
+      "OAX": 1,
+      "ZAC": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1992-08-02, Diputados al Congreso del Estado: Aguascalientes, Durango, Oaxaca, Zacatecas."
+    },
+    {
+     "date": "1992-11-08",
+     "contests": 3,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "PUE": 1,
+      "SIN": 1,
+      "TAM": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1992-11-08, Diputados al Congreso del Estado: Puebla, Sinaloa, Tamaulipas."
+    },
+    {
+     "date": "1992-11-15",
+     "contests": 1,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "TLA": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1992-11-15, Diputados al Congreso del Estado: Tlaxcala."
+    },
+    {
+     "date": "1993-02-07",
+     "contests": 1,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "BCS": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1993-02-07, Diputados al Congreso del Estado: Baja California Sur."
+    },
+    {
+     "date": "1993-02-21",
+     "contests": 2,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "HID": 1,
+      "ROO": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1993-02-21, Diputados al Congreso del Estado: Hidalgo, Quintana Roo."
+    },
+    {
+     "date": "1993-04-18",
+     "contests": 1,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "SLP": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1993-04-18, Diputados al Congreso del Estado: San Luis Potosí."
+    },
+    {
+     "date": "1993-07-04",
+     "contests": 2,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "MEX": 1,
+      "NAY": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1993-07-04, Diputados al Congreso del Estado: Estado de México, Nayarit."
+    },
+    {
+     "date": "1993-10-24",
+     "contests": 1,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "YUC": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1993-10-24, Diputados al Congreso del Estado: Yucatán."
+    },
+    {
+     "date": "1994-03-20",
+     "contests": 1,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "MOR": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1994-03-20, Diputados al Congreso del Estado: Morelos."
+    },
+    {
+     "date": "1994-08-21",
+     "contests": 5,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "COL": 1,
+      "GUA": 1,
+      "NLE": 1,
+      "SLP": 1,
+      "VER": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1994-08-21, Diputados al Congreso del Estado: Colima, Guanajuato, Nuevo León, San Luis Potosí, Veracruz."
+    },
+    {
+     "date": "1994-11-20",
+     "contests": 1,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "TAB": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1994-11-20, Diputados al Congreso del Estado: Tabasco."
+    },
+    {
+     "date": "1995-02-12",
+     "contests": 1,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "JAL": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1995-02-12, Diputados al Congreso del Estado: Jalisco."
+    },
+    {
+     "date": "1995-05-28",
+     "contests": 1,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "YUC": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1995-05-28, Diputados al Congreso del Estado: Yucatán."
+    },
+    {
+     "date": "1995-07-02",
+     "contests": 1,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "CHH": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1995-07-02, Diputados al Congreso del Estado: Chihuahua."
+    },
+    {
+     "date": "1995-08-06",
+     "contests": 3,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "AGU": 1,
+      "BCN": 1,
+      "OAX": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1995-08-06, Diputados al Congreso del Estado: Aguascalientes, Baja California, Oaxaca."
+    },
+    {
+     "date": "1995-10-15",
+     "contests": 1,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "CHP": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1995-10-15, Diputados al Congreso del Estado: Chiapas."
+    },
+    {
+     "date": "1995-11-12",
+     "contests": 3,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "MIC": 1,
+      "SIN": 1,
+      "TAM": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1995-11-12, Diputados al Congreso del Estado: Michoacán, Sinaloa, Tamaulipas."
+    },
+    {
+     "date": "1996-02-18",
+     "contests": 2,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "HID": 1,
+      "ROO": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1996-02-18, Diputados al Congreso del Estado: Hidalgo, Quintana Roo."
+    },
+    {
+     "date": "1996-07-07",
+     "contests": 1,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "NAY": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1996-07-07, Diputados al Congreso del Estado: Nayarit."
+    },
+    {
+     "date": "1997-03-16",
+     "contests": 1,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "MOR": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1997-03-16, Diputados al Congreso del Estado: Morelos."
+    },
+    {
+     "date": "1997-07-06",
+     "contests": 8,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "CAM": 1,
+      "CMX": 1,
+      "COL": 1,
+      "GUA": 1,
+      "NLE": 1,
+      "QUE": 1,
+      "SLP": 1,
+      "SON": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1997-07-06, Diputados al Congreso del Estado: Campeche, Distrito Federal, Colima, Guanajuato, Nuevo León, Querétaro, San Luis Potosí, Sonora."
+    },
+    {
+     "date": "1997-11-09",
+     "contests": 3,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "JAL": 1,
+      "TAB": 1,
+      "VER": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1997-11-09, Diputados al Congreso del Estado: Jalisco, Tabasco, Veracruz."
+    },
+    {
+     "date": "1998-05-24",
+     "contests": 1,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "YUC": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1998-05-24, Diputados al Congreso del Estado: Yucatán."
+    },
+    {
+     "date": "1998-07-05",
+     "contests": 3,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "CHH": 1,
+      "DUR": 1,
+      "ZAC": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1998-07-05, Diputados al Congreso del Estado: Chihuahua, Durango, Zacatecas."
+    },
+    {
+     "date": "1998-08-02",
+     "contests": 3,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "AGU": 1,
+      "OAX": 1,
+      "VER": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1998-08-02, Diputados al Congreso del Estado: Aguascalientes, Oaxaca, Veracruz."
+    },
+    {
+     "date": "1998-10-25",
+     "contests": 1,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "TAM": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1998-10-25, Diputados al Congreso del Estado: Tamaulipas."
+    },
+    {
+     "date": "1998-11-08",
+     "contests": 4,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "MIC": 1,
+      "PUE": 1,
+      "SIN": 1,
+      "TLA": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1998-11-08, Diputados al Congreso del Estado: Michoacán, Puebla, Sinaloa, Tlaxcala."
+    },
+    {
+     "date": "1998-12-06",
+     "contests": 1,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "CHP": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1998-12-06, Diputados al Congreso del Estado: Chiapas."
+    },
+    {
+     "date": "1999-02-07",
+     "contests": 1,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "BCS": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1999-02-07, Diputados al Congreso del Estado: Baja California Sur."
+    },
+    {
+     "date": "1999-02-21",
+     "contests": 2,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "HID": 1,
+      "ROO": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1999-02-21, Diputados al Congreso del Estado: Hidalgo, Quintana Roo."
+    },
+    {
+     "date": "1999-07-04",
+     "contests": 1,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "NAY": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1999-07-04, Diputados al Congreso del Estado: Nayarit."
+    },
+    {
+     "date": "1999-09-26",
+     "contests": 1,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "COA": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1999-09-26, Diputados al Congreso del Estado: Coahuila."
     },
     {
      "date": "2000-03-05",
@@ -3016,8 +3754,500 @@
    "dates": [
     {
      "date": "1917-01-01",
+     "through": "1989-12-31",
+     "note": "Per-state elections before 1990 are not yet enumerated; no source has been found that reaches them."
+    },
+    {
+     "date": "1990-01-01",
      "through": "1999-12-31",
-     "note": "Per-state municipal elections before 2000 are not yet enumerated."
+     "note": "Not enumerated for 1990-1999: Estado de México 1991, 1994, and 1996; Tabasco, Tlaxcala, and Veracruz 1991; Sonora, Tlaxcala, and Distrito Federal 1994; Durango, Zacatecas, Puebla, Tlaxcala, and Oaxaca 1995 (state articles missing); Guerrero 1996 and 1999 and Jalisco 1998 extraordinary; and the state-years where the Anexo and the state article give different days (Baja California 1992 and 1998, Baja California Sur 1996, Campeche 1994, Chiapas 1991, Coahuila 1990 and 1996, Guerrero 1993 and 1999 first rounds, Quintana Roo 1990, Querétaro 1994). Before 1990 no source has been found."
+    },
+    {
+     "date": "1990-02-04",
+     "contests": 4,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "BCS": 4
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1990-02-04, Ayuntamientos: Baja California Sur 4."
+    },
+    {
+     "date": "1990-06-10",
+     "contests": 19,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "NAY": 19
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1990-06-10, Ayuntamientos: Nayarit 19."
+    },
+    {
+     "date": "1990-11-11",
+     "contests": 203,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "HID": 82,
+      "MEX": 121
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1990-11-11, Ayuntamientos: Hidalgo 82, Estado de México 121."
+    },
+    {
+     "date": "1990-11-25",
+     "contests": 105,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "YUC": 105
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1990-11-25, Ayuntamientos: Yucatán 105."
+    },
+    {
+     "date": "1991-03-17",
+     "contests": 33,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "MOR": 33
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1991-03-17, Ayuntamientos: Morelos 33."
+    },
+    {
+     "date": "1991-07-07",
+     "contests": 19,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "CAM": 9,
+      "COL": 10
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1991-07-07, Ayuntamientos: Campeche 9, Colima 10."
+    },
+    {
+     "date": "1991-08-18",
+     "contests": 133,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "GUA": 46,
+      "QUE": 18,
+      "SON": 69
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1991-08-18, Ayuntamientos: Guanajuato 46, Querétaro 18, Sonora 69."
+    },
+    {
+     "date": "1991-11-10",
+     "contests": 51,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "NLE": 51
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1991-11-10, Ayuntamientos: Nuevo León 51."
+    },
+    {
+     "date": "1991-12-01",
+     "contests": 56,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "SLP": 56
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1991-12-01, Ayuntamientos: San Luis Potosí 56."
+    },
+    {
+     "date": "1992-02-09",
+     "contests": 124,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "JAL": 124
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1992-02-09, Ayuntamientos: Jalisco 124."
+    },
+    {
+     "date": "1992-07-05",
+     "contests": 113,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "MIC": 113
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1992-07-05, Ayuntamientos: Michoacán 113."
+    },
+    {
+     "date": "1992-07-12",
+     "contests": 67,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "CHH": 67
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1992-07-12, Ayuntamientos: Chihuahua 67."
+    },
+    {
+     "date": "1992-08-02",
+     "contests": 676,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "AGU": 11,
+      "DUR": 39,
+      "OAX": 570,
+      "ZAC": 56
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1992-08-02, Ayuntamientos: Aguascalientes 11, Durango 39, Oaxaca 570, Zacatecas 56."
+    },
+    {
+     "date": "1992-11-08",
+     "contests": 278,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "PUE": 217,
+      "SIN": 18,
+      "TAM": 43
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1992-11-08, Ayuntamientos: Puebla 217, Sinaloa 18, Tamaulipas 43."
+    },
+    {
+     "date": "1992-11-15",
+     "contests": 44,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "TLA": 44
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1992-11-15, Ayuntamientos: Tlaxcala 44."
+    },
+    {
+     "date": "1993-02-07",
+     "contests": 5,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "BCS": 5
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1993-02-07, Ayuntamientos: Baja California Sur 5."
+    },
+    {
+     "date": "1993-02-21",
+     "contests": 7,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "ROO": 7
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1993-02-21, Ayuntamientos: Quintana Roo 7."
+    },
+    {
+     "date": "1993-07-04",
+     "contests": 20,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "NAY": 20
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1993-07-04, Ayuntamientos: Nayarit 20."
+    },
+    {
+     "date": "1993-09-26",
+     "contests": 38,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "COA": 38
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1993-09-26, Ayuntamientos: Coahuila 38."
+    },
+    {
+     "date": "1993-10-03",
+     "contests": 76,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "GRO": 76
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1993-10-03, Ayuntamientos: Guerrero 76."
+    },
+    {
+     "date": "1993-10-24",
+     "contests": 106,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "YUC": 106
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1993-10-24, Ayuntamientos: Yucatán 106."
+    },
+    {
+     "date": "1993-11-14",
+     "contests": 121,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "MEX": 121
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1993-11-14, Ayuntamientos: Estado de México 121."
+    },
+    {
+     "date": "1994-03-20",
+     "contests": 33,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "MOR": 33
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1994-03-20, Ayuntamientos: Morelos 33."
+    },
+    {
+     "date": "1994-08-21",
+     "contests": 317,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "COL": 10,
+      "GUA": 46,
+      "NLE": 51,
+      "VER": 210
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1994-08-21, Ayuntamientos: Colima 10, Guanajuato 46, Nuevo León 51, Veracruz 210."
+    },
+    {
+     "date": "1994-11-20",
+     "contests": 17,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "TAB": 17
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1994-11-20, Ayuntamientos: Tabasco 17."
+    },
+    {
+     "date": "1994-12-04",
+     "contests": 55,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "SLP": 55
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1994-12-04, Ayuntamientos: San Luis Potosí 55."
+    },
+    {
+     "date": "1995-02-12",
+     "contests": 124,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "JAL": 124
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1995-02-12, Ayuntamientos: Jalisco 124."
+    },
+    {
+     "date": "1995-03-05",
+     "contests": 1,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "SLP": 1
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1995-03-05, Ayuntamientos: San Luis Potosí 1."
+    },
+    {
+     "date": "1995-05-28",
+     "contests": 106,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "YUC": 106
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1995-05-28, Ayuntamientos: Yucatán 106."
+    },
+    {
+     "date": "1995-07-02",
+     "contests": 67,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "CHH": 67
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1995-07-02, Ayuntamientos: Chihuahua 67."
+    },
+    {
+     "date": "1995-08-06",
+     "contests": 16,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "AGU": 11,
+      "BCN": 5
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1995-08-06, Ayuntamientos: Aguascalientes 11, Baja California 5."
+    },
+    {
+     "date": "1995-10-15",
+     "contests": 111,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "CHP": 111
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1995-10-15, Ayuntamientos: Chiapas 111."
+    },
+    {
+     "date": "1995-11-12",
+     "contests": 174,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "MIC": 113,
+      "SIN": 18,
+      "TAM": 43
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1995-11-12, Ayuntamientos: Michoacán 113, Sinaloa 18, Tamaulipas 43."
+    },
+    {
+     "date": "1996-02-18",
+     "contests": 8,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "ROO": 8
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1996-02-18, Ayuntamientos: Quintana Roo 8."
+    },
+    {
+     "date": "1996-07-07",
+     "contests": 20,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "NAY": 20
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1996-07-07, Ayuntamientos: Nayarit 20."
+    },
+    {
+     "date": "1996-11-10",
+     "contests": 84,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "HID": 84
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1996-11-10, Ayuntamientos: Hidalgo 84."
+    },
+    {
+     "date": "1997-03-16",
+     "contests": 33,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "MOR": 33
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1997-03-16, Ayuntamientos: Morelos 33."
+    },
+    {
+     "date": "1997-07-06",
+     "contests": 203,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "CAM": 10,
+      "COL": 10,
+      "GUA": 46,
+      "NLE": 51,
+      "QUE": 18,
+      "SON": 68
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1997-07-06, Ayuntamientos: Campeche 10, Colima 10, Guanajuato 46, Nuevo León 51, Querétaro 18, Sonora 68."
+    },
+    {
+     "date": "1997-08-17",
+     "contests": 58,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "SLP": 58
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1997-08-17, Ayuntamientos: San Luis Potosí 58."
+    },
+    {
+     "date": "1997-11-09",
+     "contests": 353,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "JAL": 124,
+      "TAB": 17,
+      "VER": 212
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1997-11-09, Ayuntamientos: Jalisco 124, Tabasco 17, Veracruz 212."
+    },
+    {
+     "date": "1998-05-24",
+     "contests": 106,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "YUC": 106
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1998-05-24, Ayuntamientos: Yucatán 106."
+    },
+    {
+     "date": "1998-07-05",
+     "contests": 162,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "CHH": 67,
+      "DUR": 39,
+      "ZAC": 56
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1998-07-05, Ayuntamientos: Chihuahua 67, Durango 39, Zacatecas 56."
+    },
+    {
+     "date": "1998-08-02",
+     "contests": 162,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "AGU": 11,
+      "OAX": 151
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1998-08-02, Ayuntamientos: Aguascalientes 11, Oaxaca 151."
+    },
+    {
+     "date": "1998-10-25",
+     "contests": 43,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "TAM": 43
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1998-10-25, Ayuntamientos: Tamaulipas 43."
+    },
+    {
+     "date": "1998-11-08",
+     "contests": 408,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "MIC": 113,
+      "PUE": 217,
+      "SIN": 18,
+      "TLA": 60
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1998-11-08, Ayuntamientos: Michoacán 113, Puebla 217, Sinaloa 18, Tlaxcala 60."
+    },
+    {
+     "date": "1998-12-06",
+     "contests": 111,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "CHP": 111
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1998-12-06, Ayuntamientos: Chiapas 111."
+    },
+    {
+     "date": "1999-02-07",
+     "contests": 5,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "BCS": 5
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1999-02-07, Ayuntamientos: Baja California Sur 5."
+    },
+    {
+     "date": "1999-02-21",
+     "contests": 8,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "ROO": 8
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1999-02-21, Ayuntamientos: Quintana Roo 8."
+    },
+    {
+     "date": "1999-07-04",
+     "contests": 20,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "NAY": 20
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1999-07-04, Ayuntamientos: Nayarit 20."
+    },
+    {
+     "date": "1999-09-26",
+     "contests": 38,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "COA": 38
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1999-09-26, Ayuntamientos: Coahuila 38."
+    },
+    {
+     "date": "1999-11-14",
+     "contests": 84,
+     "source": "wiki_es_1990s",
+     "regions": {
+      "HID": 84
+     },
+     "quote": "Anexo:Elecciones locales de México and the per-state articles, 1999-11-14, Ayuntamientos: Hidalgo 84."
     },
     {
      "date": "2000-03-05",
