@@ -514,6 +514,39 @@ COUNCILS["E07000223/2024"] = {
     },
     "reader": "notices",
 }
+CHERWELL_2024 = "https://www.cherwell.gov.uk/directory-record"
+COUNCILS["E07000177/2024"] = {
+    "day": date(2024, 5, 2),
+    "publisher": "Cherwell District Council",
+    "title": "Elections 2024: parish and town councils",
+    "url": "https://www.cherwell.gov.uk/directory/150/elections-2024/category/448",
+    "pages": [
+        "https://www.cherwell.gov.uk/directory/150/elections-2024/category/448",
+        f"{CHERWELL_2024}/103052/adderbury-parish-council",
+        f"{CHERWELL_2024}/103053/ardley-with-fewcott-parish-council",
+        f"{CHERWELL_2024}/103054/arncott-parish-council",
+        f"{CHERWELL_2024}/103055/banbury-town-council---calthorpe-north",
+        f"{CHERWELL_2024}/103056/banbury-town-council---calthorpe-south",
+        f"{CHERWELL_2024}/103057/banbury-town-council---easington-north",
+        f"{CHERWELL_2024}/103058/banbury-town-council---easington-south",
+        f"{CHERWELL_2024}/103059/banbury-town-council---grimsbury",
+        f"{CHERWELL_2024}/103060/banbury-town-council---hardwick-east",
+        f"{CHERWELL_2024}/103061/banbury-town-council---hardwick-west",
+        f"{CHERWELL_2024}/103062/banbury-town-council---neithrop-north",
+        f"{CHERWELL_2024}/103063/banbury-town-council---neithrop-south",
+        f"{CHERWELL_2024}/103064/banbury-town-council---park-road",
+        f"{CHERWELL_2024}/103065/banbury-town-council---ruscote",
+        f"{CHERWELL_2024}/103066/bodicote-parish-council",
+        f"{CHERWELL_2024}/103067/banbury-town-council---town-centre",
+        f"{CHERWELL_2024}/103068/drayton-parish-council",
+        f"{CHERWELL_2024}/103069/hanwell-parish-council",
+        f"{CHERWELL_2024}/103070/horley-parish-council",
+        f"{CHERWELL_2024}/103071/piddington-parish-council",
+        f"{CHERWELL_2024}/103072/stoke-lyne-parish-council",
+        f"{CHERWELL_2024}/103073/wroxton-parish-council",
+    ],
+    "reader": "cherwell",
+}
 STRATFORD = "https://www.stratford.gov.uk/doc"
 COUNCILS["E07000221/2023"] = {
     "day": date(2023, 5, 4),
@@ -615,6 +648,7 @@ PARTIES: dict[str, str | None] = {
     "Homeland Party": "Q119285871",
 }
 ALIASES = {
+    ("E07000177", "Ardley with Fewcott"): "Ardley",
     ("E06000031", "Bainton & Ashton"): "Bainton",
     ("E07000082", "Bisley"): "Bisley-with-Lypiatt",
     ("E07000082", "Randwick"): "Randwick and Westrip",
@@ -1059,6 +1093,58 @@ def swindon(lad: str, council: dict) -> list[dict]:
                 "electorate": figures["Electorate"],
                 "ballots": figures["Ballot papers issued"],
                 "rejected": figures["Number of ballot papers rejected"],
+                "total": None,
+                "remark": None,
+                "candidates": candidates,
+            }
+        )
+    return reads
+
+
+def cherwell(lad: str, council: dict) -> list[dict]:
+    reads = []
+    for url in council["pages"][1:]:
+        page = Path(raw.cached(SOURCE, url).path).read_text(encoding="utf-8")
+        heading = re.search(r"<h1[^>]*>Elections 2024 - (.+?) (Parish|Town) Council(?: - (.+?))?\s*</h1>", page)
+        table = re.search(r"<tbody>(.*?)</tbody>", page, re.DOTALL)
+        if heading is None or table is None:
+            raise ValueError(f"{url}: no heading or table")
+        parish, style, ward = heading.groups()
+        table = table.group(1)
+        rows = [
+            [text(cell.replace("<br />", "|")) for cell in re.findall(r"<td[^>]*>(.*?)</td>", row, re.DOTALL)]
+            for row in re.findall(r"<tr>(.*?)</tr>", table, re.DOTALL)
+        ]
+        uncontested = "Notice of Uncontested Election" in page
+        candidates = []
+        for cells in rows:
+            surname, forenames = (part.strip() for part in cells[0].split("|", 1))
+            candidates.append(
+                {
+                    "printed": f"{surname}, {forenames}",
+                    "name": f"{forenames} {surname}",
+                    "description": cells[2 if uncontested else 1].replace("|", " ").strip(),
+                    "votes": None if uncontested else count(cells[2]),
+                    "elected": uncontested or cells[3] == "Elected",
+                }
+            )
+        figures = {
+            label: count(value)
+            for label, value in re.findall(r"<dt[^>]*>(Electorate)</dt>\s*<dd[^>]*>\s*([\d,]+)", page)
+        }
+        rejected = re.search(r"Total</strong></td>\s*<td><strong>([\d,]+)<", page)
+        reads.append(
+            {
+                "lad": lad,
+                "url": url,
+                "page": None,
+                "style": style,
+                "parish": parish,
+                "ward": ward,
+                "places": None if uncontested else sum(1 for candidate in candidates if candidate["elected"]),
+                "electorate": figures.get("Electorate"),
+                "ballots": None,
+                "rejected": count(rejected.group(1)) if rejected else None,
                 "total": None,
                 "remark": None,
                 "candidates": candidates,
@@ -1830,6 +1916,7 @@ READERS = {
     "dorset": dorset,
     "warrington": warrington,
     "rotherham": rotherham,
+    "cherwell": cherwell,
 }
 
 
