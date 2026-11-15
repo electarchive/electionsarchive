@@ -1323,9 +1323,9 @@ def export(pipeline: str) -> Path:
     return out
 
 
-def _column(frame: pl.DataFrame, column: str, kind: pl.DataType) -> pl.Expr:
+def _column(frame: pl.DataFrame, column: str, kind: pl.DataType, default: object | None) -> pl.Expr:
     if column not in frame.columns:
-        return pl.lit(None, dtype=kind).alias(column)
+        return pl.lit(default, dtype=kind).alias(column)
     values = pl.col(column)
     dtype = frame.schema[column]
     if isinstance(kind, pl.Datetime):
@@ -1357,7 +1357,10 @@ class Draft(Changeset):
                 continue
             if "value" in frame.columns and (frame["value"].cast(pl.Float64) % 1 != 0).any():
                 raise ValueError(f"{pipeline}: {table} has fractional values, which do not fit the package format")
-            frame.select(_column(frame, column, kind) for column, kind in schema.items()).with_columns(
+            defaults = self.defaults.get(table, {})
+            frame.select(
+                _column(frame, column, kind, defaults.get(column)) for column, kind in schema.items()
+            ).with_columns(
                 pl.col(column).map_elements(canonical, return_dtype=pl.String)
                 for column in schema
                 if column in JSON_COLUMNS

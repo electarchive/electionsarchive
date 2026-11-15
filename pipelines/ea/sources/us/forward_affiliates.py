@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from ea import raw
-from ea.changeset import Changeset
+from ea.package import Draft
 from ea.store import connect
 
 SOURCE = "us.forward_affiliates"
@@ -20,7 +20,7 @@ def fetch() -> None:
 def emit() -> Path:
     artifact = raw.cached(SOURCE, PAGE)
     with connect() as conn:
-        cs = Changeset(
+        cs = Draft(
             conn,
             pipeline=SOURCE,
             version=VERSION,
