@@ -367,9 +367,10 @@ function split(race: LiveRace, at: string | null) {
 
 const HOLDS: Record<string, number> = { ga: 0.002 };
 
-const CANVASS: Record<string, { base: number; late: number; reach: number }> = {
-  pa: { base: 0.006, late: 0.05, reach: 0.85 },
-};
+const CANVASS: Record<
+  string,
+  { base: number; late: number; reach: number; tail: number }
+> = { pa: { base: 0.006, late: 0.05, reach: 0.85, tail: 2 } };
 
 const NIGHTS: Record<string, number> = { ga: 0.0075 };
 
@@ -1959,7 +1960,7 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
       sum(fittedBase.map((unit) => unit.expected)) * Math.exp(model.peak),
     );
   const left = Math.max(
-    held + canvass,
+    held + canvass * (isTail ? (owed?.tail ?? 1) : 1),
     pool * Math.max(0, 1 - Math.max(0, progress - 1 - MODEL.tail.over) / tail),
   );
   const models = new Map(
@@ -2230,7 +2231,7 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
     const mode = modeScale * gaussian(random);
     const amount = isTail ? MODEL.late.amount : MODEL.tail.spread;
     const firm = amount - (amount - MODEL.tail.firm) * tailWeight ** 2;
-    const kept = isTail ? Math.min(left, held) : 0;
+    const kept = isTail ? Math.min(left, held + canvass) : 0;
     const deviate = gaussian(random);
     const holding = kept * Math.exp(firm * deviate - firm ** 2 / 2);
     const carrying =
