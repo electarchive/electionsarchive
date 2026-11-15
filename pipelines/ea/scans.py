@@ -178,7 +178,7 @@ SUBTOTAL = re.compile(
     r"^(down ?state|downstate|percent(age)?s?|sub ?totals?)$|^(.*\s)?(pluralit(y|ies)|majorit(y|ies))$"
     r"|^\S+ dist(rict)? totals?$"
 )
-TOTAL = re.compile(r"^(state ?wide |state (grand )?|grand |county |district )?totals?\b|^state ?wide$|^all counties$")
+TOTAL = re.compile(r"^(state ?wide |state (grand )?|grand |county |district )?totals?\b|^state ?wide$|^(the )?state$|^all counties$")
 SUFFIX_WORDS = {"jr", "sr", "ii", "iii", "iv"}
 ABBREVIATION = re.compile(r"^(mt|w|e|n|s|no|so)\.? ", re.IGNORECASE)
 EXPANDED = {"mt": "mount", "w": "west", "e": "east", "n": "north", "s": "south", "no": "north", "so": "south"}
