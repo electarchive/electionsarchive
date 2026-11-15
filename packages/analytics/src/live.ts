@@ -218,7 +218,7 @@ const MODEL = {
     patience: 0.5,
     canvass: 0.3,
     own: 0.5,
-    growth: { share: 0.045, power: 2, max: 2.5 },
+    growth: { share: 0.08, power: 2, max: 2.5 },
     lull: 0.5,
     stir: 0.01,
     spill: 0.3,
@@ -367,8 +367,8 @@ function split(race: LiveRace, at: string | null) {
 
 const HOLDS: Record<string, number> = { ga: 0.002 };
 
-const CANVASS: Record<string, { base: number; late: number }> = {
-  pa: { base: 0.006, late: 0.05 },
+const CANVASS: Record<string, { base: number; late: number; reach: number }> = {
+  pa: { base: 0.006, late: 0.05, reach: 0.85 },
 };
 
 const NIGHTS: Record<string, number> = { ga: 0.0075 };
@@ -2323,6 +2323,7 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
               unit.floor,
               unit.total +
                 MODEL.late.reach *
+                  (CANVASS[race.state]?.reach ?? 1) *
                   waning *
                   closed *
                   fade *
