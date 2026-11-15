@@ -299,6 +299,12 @@
    "publisher": "La Jornada",
    "url": "https://web.jornada.com.mx/2008/10/20/index.php?article=039n1est&section=estados",
    "kind": "news_agency"
+  },
+  "ine_colima_2016": {
+   "title": "Proceso Electoral Local Elección Extraordinaria para Gobernador del Estado de Colima (Jornada Electoral: 17 de enero de 2016)",
+   "publisher": "Instituto Nacional Electoral (INE)",
+   "url": "https://portalanterior.ine.mx/archivos2/portal/Elecciones/PElocales/Extraordinarias/2015-2016/EleccionGobernador/Colima/",
+   "kind": "official_body"
   }
  },
  "tiers": [
@@ -1317,7 +1323,7 @@
      "mx.casilla"
     ]
    },
-   "note": "Each state elects its governor by plurality for six years with no re-election (CPEUM art. 116 I); Mexico City elects its Head of Government since 1997 (art. 122). Each state's constitution sets the year; terms were shortened or lengthened between 2015 and 2022 so that every state votes with a federal election (Aguascalientes and Quintana Roo, elected in 2022, vote again in 2027). Extraordinary elections (Colima 2016, Puebla 2019) belong here.",
+   "note": "Each state elects its governor by plurality for six years with no re-election (CPEUM art. 116 I); Mexico City elects its Head of Government since 1997 (art. 122). Each state's constitution sets the year; terms were shortened or lengthened between 2015 and 2022 so that every state votes with a federal election (Aguascalientes and Quintana Roo, elected in 2022, vote again in 2027). Extraordinary elections (Colima 2016, Puebla 2019) belong here. The Chamber of Deputies' 2007 study lists Durango's 2007-07-01 election as including a governor, which the IFE's 2010 and INE's 2016 calendars contradict (Durango elected its governor on 2010-07-04 and 2016-06-05); it is not counted. The same study's Estado de México 2006-03-12 governor line is likewise left out because its table lists deputies and ayuntamientos only.",
    "source": "cpeum",
    "locator": "https://www.diputados.gob.mx/LeyesBiblio/pdf/CPEUM.pdf (arts. 116 I and 122)",
    "est_votes": 18000000,
@@ -1365,8 +1371,245 @@
    "dates": [
     {
      "date": "1917-01-01",
-     "through": "2020-12-31",
-     "note": "Per-state governor elections before 2021 are not yet enumerated; each OPLE and state congress holds them."
+     "through": "2005-12-31",
+     "note": "Per-state governor elections before 2006 are not yet enumerated."
+    },
+    {
+     "date": "2006-07-02",
+     "contests": 4,
+     "source": "sedia_2007",
+     "regions": {
+      "CMX": 1,
+      "GUA": 1,
+      "JAL": 1,
+      "MOR": 1
+     },
+     "quote": "Cuadro No. 2: Distrito Federal (Jefe de Gobierno), Guanajuato, Jalisco, and Morelos | Gobernador, Diputados Locales y Ayuntamientos | 2 de julio"
+    },
+    {
+     "date": "2006-08-20",
+     "contests": 1,
+     "source": "sedia_2007",
+     "regions": {
+      "CHP": 1
+     },
+     "quote": "Cuadro No. 2: Chiapas | Gobernador | 20 de agosto"
+    },
+    {
+     "date": "2006-10-15",
+     "contests": 1,
+     "source": "sedia_2007",
+     "regions": {
+      "TAB": 1
+     },
+     "quote": "Cuadro No. 2: Tabasco | Gobernador, Diputados Locales y Ayuntamientos | 15 de octubre"
+    },
+    {
+     "date": "2007-05-20",
+     "contests": 1,
+     "source": "sedia_2007",
+     "regions": {
+      "YUC": 1
+     },
+     "quote": "Cuadro No. 3: Yucatán | Gobernador, Diputados Locales y Ayuntamientos | 20 de mayo"
+    },
+    {
+     "date": "2007-08-05",
+     "contests": 1,
+     "source": "sedia_2007",
+     "regions": {
+      "BCN": 1
+     },
+     "quote": "Cuadro No. 3: Baja California | Gobernador, Diputados Locales y Ayuntamientos | 5 de agosto"
+    },
+    {
+     "date": "2007-11-11",
+     "contests": 1,
+     "source": "sedia_2007",
+     "regions": {
+      "MIC": 1
+     },
+     "quote": "Cuadro No. 3: Michoacán | Gobernador, Diputados Locales y Ayuntamientos | 11 de noviembre"
+    },
+    {
+     "date": "2009-07-05",
+     "contests": 6,
+     "source": "ife_cal_2009",
+     "regions": {
+      "CAM": 1,
+      "COL": 1,
+      "NLE": 1,
+      "QUE": 1,
+      "SLP": 1,
+      "SON": 1
+     },
+     "quote": "Elecciones coincidentes, domingo 5 de julio, Gobernador (G): Campeche, Colima, Nuevo León, Querétaro, San Luis Potosí, Sonora."
+    },
+    {
+     "date": "2010-07-04",
+     "contests": 12,
+     "source": "ife_cal_2010",
+     "regions": {
+      "AGU": 1,
+      "CHH": 1,
+      "DUR": 1,
+      "HID": 1,
+      "OAX": 1,
+      "PUE": 1,
+      "ROO": 1,
+      "SIN": 1,
+      "TAM": 1,
+      "TLA": 1,
+      "VER": 1,
+      "ZAC": 1
+     },
+     "quote": "Local, 4 de julio, Gobernador (G): Aguascalientes, Chihuahua, Durango, Hidalgo, Oaxaca, Puebla, Quintana Roo, Sinaloa, Tamaulipas, Tlaxcala, Veracruz, Zacatecas."
+    },
+    {
+     "date": "2011-01-30",
+     "contests": 1,
+     "source": "ife_cal_2011",
+     "regions": {
+      "GRO": 1
+     },
+     "quote": "Guerrero | 30 de enero | G; por única ocasión, la Jornada Electoral para elegir al Gobernador del Estado tendrá verificativo el día treinta de enero de dos mil once"
+    },
+    {
+     "date": "2011-02-06",
+     "contests": 1,
+     "source": "ife_cal_2011",
+     "regions": {
+      "BCS": 1
+     },
+     "quote": "Baja California Sur | 6 de febrero | G | 16 | 5 | 5"
+    },
+    {
+     "date": "2011-07-03",
+     "contests": 3,
+     "source": "ife_cal_2011",
+     "regions": {
+      "COA": 1,
+      "MEX": 1,
+      "NAY": 1
+     },
+     "quote": "Coahuila G; México G; Nayarit G (3 de julio)"
+    },
+    {
+     "date": "2011-11-13",
+     "contests": 1,
+     "source": "ife_cal_2011",
+     "regions": {
+      "MIC": 1
+     },
+     "quote": "Michoacán | 13 de noviembre | G | 24 | 16 | 113"
+    },
+    {
+     "date": "2012-07-01",
+     "contests": 7,
+     "source": "ife_cal_2012",
+     "regions": {
+      "CHP": 1,
+      "CMX": 1,
+      "GUA": 1,
+      "JAL": 1,
+      "MOR": 1,
+      "YUC": 1,
+      "TAB": 1
+     },
+     "quote": "Cargo: GOBERNADOR in Chiapas, Guanajuato, Jalisco, Morelos, Yucatán, and Tabasco; JEFE DE GOBIERNO in Distrito Federal."
+    },
+    {
+     "date": "2013-07-07",
+     "contests": 1,
+     "source": "ife_cal_2013",
+     "regions": {
+      "BCN": 1
+     },
+     "quote": "Baja California | G | 17 DMR | Hasta 8 DRP | 5 Ay."
+    },
+    {
+     "date": "2015-06-07",
+     "contests": 9,
+     "source": "ife_cal_2015",
+     "regions": {
+      "BCS": 1,
+      "CAM": 1,
+      "COL": 1,
+      "GRO": 1,
+      "MIC": 1,
+      "NLE": 1,
+      "QUE": 1,
+      "SLP": 1,
+      "SON": 1
+     },
+     "quote": "Ordinaria 7 de junio, Gobernador Si: Baja California Sur, Campeche, Colima, Guerrero, Michoacán, Nuevo León, Querétaro, San Luis Potosí, Sonora."
+    },
+    {
+     "date": "2016-01-17",
+     "contests": 1,
+     "source": "ine_colima_2016",
+     "regions": {
+      "COL": 1
+     },
+     "quote": "Elección Extraordinaria para Gobernador del Estado de Colima. Jornada Electoral: 17 de enero de 2016"
+    },
+    {
+     "date": "2016-06-05",
+     "contests": 12,
+     "source": "ine_calendario",
+     "regions": {
+      "AGU": 1,
+      "CHH": 1,
+      "DUR": 1,
+      "HID": 1,
+      "OAX": 1,
+      "PUE": 1,
+      "ROO": 1,
+      "SIN": 1,
+      "TAM": 1,
+      "TLA": 1,
+      "VER": 1,
+      "ZAC": 1
+     },
+     "quote": "Calendario Electoral 2016, Jornada 5 de junio, Elección Gobernador 1: Aguascalientes, Chihuahua, Durango, Hidalgo, Oaxaca, Puebla, Quintana Roo, Sinaloa, Tamaulipas, Tlaxcala, Veracruz, Zacatecas (the table also lists Colima, whose governor was elected in the extraordinary election of 17 January 2016)."
+    },
+    {
+     "date": "2017-06-04",
+     "contests": 3,
+     "source": "ine_2017",
+     "regions": {
+      "COA": 1,
+      "MEX": 1,
+      "NAY": 1
+     },
+     "quote": "Coahuila elige: 1 GOBERNADOR ...; Estado de México elige: 1 GOBERNADOR; Nayarit elige: 1 GOBERNADOR ... DÍA DE LA ELECCIÓN: 4 de junio de 2017"
+    },
+    {
+     "date": "2018-07-01",
+     "contests": 9,
+     "source": "ine_2018",
+     "regions": {
+      "CHP": 1,
+      "CMX": 1,
+      "GUA": 1,
+      "JAL": 1,
+      "MOR": 1,
+      "PUE": 1,
+      "TAB": 1,
+      "VER": 1,
+      "YUC": 1
+     },
+     "quote": "Per-state pages list '1 GUBERNATURA' (Chiapas, Guanajuato, Jalisco, Morelos, Puebla, Tabasco, Veracruz, Yucatán) or '1 JEFATURA DE GOBIERNO' (Ciudad de México) and 'DÍA DE LA ELECCIÓN: 1 de julio de 2018'."
+    },
+    {
+     "date": "2019-06-02",
+     "contests": 2,
+     "source": "ine_2019",
+     "regions": {
+      "BCN": 1,
+      "PUE": 1
+     },
+     "quote": "Baja California elige: 1 GUBERNATURA ... DÍA DE LA ELECCIÓN: 2 de junio; Elecciones extraordinarias Puebla elige: 1 GUBERNATURA 5 AYUNTAMIENTOS DÍA DE LA ELECCIÓN: 2 de junio"
     },
     {
      "date": "2021-06-06",
@@ -2194,8 +2437,555 @@
    "dates": [
     {
      "date": "1917-01-01",
-     "through": "2021-12-31",
-     "note": "Per-state municipal elections before 2022 are not yet enumerated."
+     "through": "2005-12-31",
+     "note": "Per-state municipal elections before 2006 are not yet enumerated."
+    },
+    {
+     "date": "2006-03-12",
+     "contests": 125,
+     "source": "sedia_2007",
+     "regions": {
+      "MEX": 125
+     },
+     "quote": "Cuadro No. 2: Estado de México | Diputados Locales y Ayuntamientos | 12 de marzo"
+    },
+    {
+     "date": "2006-07-02",
+     "contests": 425,
+     "source": "sedia_2007",
+     "regions": {
+      "CAM": 11,
+      "COL": 10,
+      "GUA": 46,
+      "JAL": 126,
+      "MOR": 33,
+      "NLE": 51,
+      "QUE": 18,
+      "SLP": 58,
+      "SON": 72
+     },
+     "quote": "Cuadro No. 2, 2 de julio: Guanajuato, Jalisco, Morelos, Campeche, Colima, Nuevo León, Querétaro, San Luis Potosí, and Sonora | Ayuntamientos (Distrito Federal's delegaciones are jefaturas delegacionales)"
+    },
+    {
+     "date": "2006-10-15",
+     "contests": 17,
+     "source": "sedia_2007",
+     "regions": {
+      "TAB": 17
+     },
+     "quote": "Cuadro No. 2: Tabasco | Gobernador, Diputados Locales y Ayuntamientos | 15 de octubre"
+    },
+    {
+     "date": "2007-05-20",
+     "contests": 106,
+     "source": "sedia_2007",
+     "regions": {
+      "YUC": 106
+     },
+     "quote": "Cuadro No. 3: Yucatán | Gobernador, Diputados Locales y Ayuntamientos | 20 de mayo"
+    },
+    {
+     "date": "2007-07-01",
+     "contests": 164,
+     "source": "sedia_2007",
+     "regions": {
+      "CHH": 67,
+      "DUR": 39,
+      "ZAC": 58
+     },
+     "quote": "Cuadro No. 3: Chihuahua, Durango, and Zacatecas | Ayuntamientos | 1 de julio"
+    },
+    {
+     "date": "2007-08-05",
+     "contests": 16,
+     "source": "sedia_2007",
+     "regions": {
+      "AGU": 11,
+      "BCN": 5
+     },
+     "quote": "Cuadro No. 3: Baja California and Aguascalientes | Ayuntamientos | 5 de agosto"
+    },
+    {
+     "date": "2007-09-02",
+     "contests": 212,
+     "source": "sedia_2007",
+     "regions": {
+      "VER": 212
+     },
+     "quote": "Cuadro No. 3: Veracruz | Diputados Locales y Ayuntamientos | 2 de septiembre"
+    },
+    {
+     "date": "2007-10-07",
+     "contests": 118,
+     "source": "sedia_2007",
+     "regions": {
+      "CHP": 118
+     },
+     "quote": "Cuadro No. 3: Chiapas | Diputados Locales y Ayuntamientos | 7 de octubre (Oaxaca's ayuntamientos, 570 municipios mostly by normative systems, are not counted)"
+    },
+    {
+     "date": "2007-10-14",
+     "contests": 18,
+     "source": "sedia_2007",
+     "regions": {
+      "SIN": 18
+     },
+     "quote": "Cuadro No. 3: Sinaloa | Diputados Locales y Ayuntamientos | 14 de octubre"
+    },
+    {
+     "date": "2007-11-11",
+     "contests": 435,
+     "source": "sedia_2007",
+     "regions": {
+      "MIC": 115,
+      "PUE": 217,
+      "TAM": 43,
+      "TLA": 60
+     },
+     "quote": "Cuadro No. 3: Michoacán, Puebla, Tamaulipas, and Tlaxcala | Ayuntamientos | 11 de noviembre; cuadro 1 municipios"
+    },
+    {
+     "date": "2008-02-03",
+     "contests": 13,
+     "source": "sedia_2007",
+     "regions": {
+      "BCS": 5,
+      "ROO": 8
+     },
+     "quote": "Cuadro No. 4: Baja California Sur and Quintana Roo | Diputados Locales y Ayuntamientos | 3 de febrero; cuadro 1: 5 and 8 municipios"
+    },
+    {
+     "date": "2008-07-06",
+     "contests": 20,
+     "source": "sedia_2007",
+     "regions": {
+      "NAY": 20
+     },
+     "quote": "Cuadro No. 4: Nayarit | Diputados Locales y Ayuntamientos | 6 de julio; cuadro 1: 20 municipios"
+    },
+    {
+     "date": "2008-10-05",
+     "contests": 81,
+     "source": "sedia_2007",
+     "regions": {
+      "GRO": 81
+     },
+     "quote": "Cuadro No. 4: Guerrero | Diputados Locales y Ayuntamientos | 5 de octubre; cuadro 1: 81 municipios"
+    },
+    {
+     "date": "2008-11-09",
+     "contests": 84,
+     "source": "sedia_2007",
+     "regions": {
+      "HID": 84
+     },
+     "quote": "Cuadro No. 4: Hidalgo | Ayuntamientos | 9 de noviembre; cuadro 1: 84 municipios"
+    },
+    {
+     "date": "2009-02-01",
+     "contests": 1,
+     "source": "ife_cal_2009",
+     "regions": {
+      "ROO": 1
+     },
+     "quote": "Quintana Roo | Local (extraord.) | 1° de febrero | 1 Ay."
+    },
+    {
+     "date": "2009-04-19",
+     "contests": 1,
+     "source": "ife_cal_2009",
+     "regions": {
+      "GRO": 1
+     },
+     "quote": "Guerrero | Local (extraord.) | 19 de abril | 1 Ay."
+    },
+    {
+     "date": "2009-07-05",
+     "contests": 552,
+     "source": "ife_cal_2009",
+     "regions": {
+      "CAM": 11,
+      "COL": 10,
+      "MEX": 125,
+      "GUA": 46,
+      "JAL": 125,
+      "MOR": 33,
+      "NLE": 51,
+      "QUE": 18,
+      "SLP": 58,
+      "SON": 72,
+      "HID": 3
+     },
+     "quote": "Elecciones coincidentes, domingo 5 de julio: Campeche 11 Ay., Colima 10, Estado de México 125, Guanajuato 46, Jalisco 125, Morelos 33, Nuevo León 51, Querétaro 18, San Luis Potosí 58, Sonora 72; Hidalgo (extraordinaria) 3 Ay. (Distrito Federal's 16 are delegaciones)."
+    },
+    {
+     "date": "2009-10-18",
+     "contests": 55,
+     "source": "ife_cal_2009",
+     "regions": {
+      "COA": 38,
+      "TAB": 17
+     },
+     "quote": "Coahuila | Local | 18 de octubre | 38 Ay.; Tabasco | Local (extraord.) | 18 de octubre | 21 DMR | 14 DRP | 17 Ay."
+    },
+    {
+     "date": "2010-05-16",
+     "contests": 106,
+     "source": "ife_cal_2010",
+     "regions": {
+      "YUC": 106
+     },
+     "quote": "Yucatán | 16 de mayo | 15 | 10 | 106"
+    },
+    {
+     "date": "2010-07-04",
+     "contests": 1011,
+     "source": "ife_cal_2010",
+     "regions": {
+      "AGU": 11,
+      "BCN": 5,
+      "CHH": 67,
+      "DUR": 39,
+      "OAX": 152,
+      "PUE": 217,
+      "ROO": 9,
+      "SIN": 18,
+      "TAM": 43,
+      "TLA": 60,
+      "VER": 212,
+      "ZAC": 58,
+      "CHP": 118,
+      "COA": 2
+     },
+     "quote": "Local, 4 de julio, Número de Ayuntamientos: Aguascalientes 11, Baja California 5, Chihuahua 67, Durango 39, Oaxaca 570 (152 Sistema de Partidos), Puebla 217, Quintana Roo 9, Sinaloa 18, Tamaulipas 43, Tlaxcala 60, Veracruz 212, Zacatecas 58, Chiapas 118; Coahuila (extraordinaria) Juárez and Lamadrid 2."
+    },
+    {
+     "date": "2011-01-30",
+     "contests": 2,
+     "source": "ife_cal_2011",
+     "regions": {
+      "VER": 2
+     },
+     "quote": "Veracruz 30 de enero: Ayuntamientos de los Municipios de Coxquihui y José Azueta"
+    },
+    {
+     "date": "2011-02-06",
+     "contests": 5,
+     "source": "ife_cal_2011",
+     "regions": {
+      "BCS": 5
+     },
+     "quote": "Baja California Sur | 6 de febrero | G | 16 | 5 | 5"
+    },
+    {
+     "date": "2011-03-27",
+     "contests": 1,
+     "source": "ife_cal_2011",
+     "regions": {
+      "OAX": 1
+     },
+     "quote": "Oaxaca 27 de marzo: Ayuntamiento del Municipio Pinotepa de Don Luis"
+    },
+    {
+     "date": "2011-07-03",
+     "contests": 107,
+     "source": "ife_cal_2011",
+     "regions": {
+      "HID": 84,
+      "NAY": 20,
+      "PUE": 3
+     },
+     "quote": "Hidalgo | 3 de julio | 84; Nayarit | G | 18 | 12 | 20; Puebla (extraordinaria) San Jerónimo Tecuanipan, Ixcamilpa de Guerrero y Tlaola 3"
+    },
+    {
+     "date": "2011-11-13",
+     "contests": 113,
+     "source": "ife_cal_2011",
+     "regions": {
+      "MIC": 113
+     },
+     "quote": "Michoacán | 13 de noviembre | G | 24 | 16 | 113"
+    },
+    {
+     "date": "2012-03-18",
+     "contests": 2,
+     "source": "ife_cal_2012",
+     "regions": {
+      "HID": 2
+     },
+     "quote": "Hidalgo 18 DE MARZO: Elección de Ayuntamiento en Santiago Tulantepec and Xochicoatlán"
+    },
+    {
+     "date": "2012-07-01",
+     "contests": 876,
+     "source": "ife_cal_2012",
+     "regions": {
+      "CAM": 11,
+      "COL": 10,
+      "CHP": 122,
+      "GUA": 46,
+      "GRO": 81,
+      "JAL": 125,
+      "MEX": 125,
+      "MOR": 33,
+      "NLE": 51,
+      "QUE": 18,
+      "SLP": 58,
+      "SON": 72,
+      "YUC": 106,
+      "TAB": 17,
+      "MIC": 1
+     },
+     "quote": "LOCAL, 1 DE JULIO, Número de Ayuntamientos: Campeche 11, Colima 10, Chiapas 122, Guanajuato 46, Guerrero 81, Jalisco 125, México 125, Morelos 33, Nuevo León 51, Querétaro 18, San Luis Potosí 58, Sonora 72, Yucatán 106, Tabasco 17 (Distrito Federal's 16 are jefes delegacionales); Michoacán (extraordinaria) Morelia 1."
+    },
+    {
+     "date": "2013-07-07",
+     "contests": 931,
+     "source": "ife_cal_2013",
+     "regions": {
+      "AGU": 11,
+      "BCN": 5,
+      "COA": 38,
+      "CHH": 67,
+      "DUR": 39,
+      "OAX": 153,
+      "PUE": 217,
+      "ROO": 10,
+      "SIN": 18,
+      "TAM": 43,
+      "TLA": 60,
+      "VER": 212,
+      "ZAC": 58
+     },
+     "quote": "LOCAL, 7 de Julio, Número de Ayuntamientos: Aguascalientes 11, Baja California 5, Coahuila 38, Chihuahua 67, Durango 39, Oaxaca 570 (153 Sistema de Partidos), Puebla 217, Quintana Roo 10, Sinaloa 18, Tamaulipas 43, Tlaxcala 60, Veracruz 212, Zacatecas 58."
+    },
+    {
+     "date": "2013-11-24",
+     "contests": 1,
+     "source": "ife_cal_2013",
+     "regions": {
+      "CHH": 1
+     },
+     "quote": "Chihuahua | 24 de noviembre | 1 Coyame del Sotol"
+    },
+    {
+     "date": "2013-12-08",
+     "contests": 1,
+     "source": "ife_cal_2013",
+     "regions": {
+      "TLA": 1
+     },
+     "quote": "Tlaxcala | 8 de diciembre | 1 Apetatitlán de Antonio Carvajal"
+    },
+    {
+     "date": "2014-02-23",
+     "contests": 1,
+     "source": "ife_cal_2014",
+     "regions": {
+      "TLA": 1
+     },
+     "quote": "Tlaxcala 23 de febrero 1"
+    },
+    {
+     "date": "2014-05-04",
+     "contests": 1,
+     "source": "ife_cal_2014",
+     "regions": {
+      "OAX": 1
+     },
+     "quote": "Oaxaca Local Extraordinaria 4 de mayo 1"
+    },
+    {
+     "date": "2014-06-01",
+     "contests": 3,
+     "source": "ife_cal_2014",
+     "regions": {
+      "VER": 3
+     },
+     "quote": "Veracruz 1 de junio 3"
+    },
+    {
+     "date": "2014-07-06",
+     "contests": 22,
+     "source": "ife_cal_2014",
+     "regions": {
+      "NAY": 20,
+      "PUE": 2
+     },
+     "quote": "Nayarit 18 12 20; Puebla Local Extraordinaria 6 de julio 2"
+    },
+    {
+     "date": "2015-06-07",
+     "contests": 871,
+     "source": "ife_cal_2015",
+     "regions": {
+      "BCS": 5,
+      "CAM": 11,
+      "COL": 10,
+      "GUA": 46,
+      "GRO": 81,
+      "JAL": 125,
+      "MEX": 125,
+      "MIC": 113,
+      "MOR": 33,
+      "NLE": 51,
+      "QUE": 18,
+      "SLP": 58,
+      "SON": 72,
+      "TAB": 17,
+      "YUC": 106
+     },
+     "quote": "Ordinaria 7 de junio, Ayuntamiento(s): Baja California Sur 5, Campeche 11, Colima 10, Guanajuato 46, Guerrero 81, Jalisco 125, México 125, Michoacán 113, Morelos 33, Nuevo León 51, Querétaro 18, San Luis Potosí 58, Sonora 72, Tabasco 17, Yucatán 106 (Distrito Federal's 16 are jefes delegacionales)."
+    },
+    {
+     "date": "2015-07-19",
+     "contests": 122,
+     "source": "ife_cal_2015",
+     "regions": {
+      "CHP": 122
+     },
+     "quote": "Chiapas | 19 de julio | - | 24 | 17 | 122"
+    },
+    {
+     "date": "2016-03-13",
+     "contests": 1,
+     "source": "ine_calendario",
+     "regions": {
+      "TAB": 1
+     },
+     "quote": "Elecciones Extraordinarias: Tabasco 1 Ayuntamiento 13 marzo 2016"
+    },
+    {
+     "date": "2016-06-05",
+     "contests": 549,
+     "source": "ine_calendario",
+     "regions": {
+      "AGU": 11,
+      "BCN": 5,
+      "CHH": 67,
+      "DUR": 39,
+      "HID": 84,
+      "OAX": 153,
+      "ROO": 11,
+      "SIN": 18,
+      "TAM": 43,
+      "TLA": 60,
+      "ZAC": 58
+     },
+     "quote": "Calendario Electoral 2016, Jornada 5 de junio: Aguascalientes 11, Baja California 5, Chihuahua 67, Durango 39, Hidalgo 84, Oaxaca 570 (153 by parties, 417 by sistemas normativos internos), Quintana Roo 11, Sinaloa 18, Tamaulipas 43, Tlaxcala 60, Zacatecas 58."
+    },
+    {
+     "date": "2016-12-04",
+     "contests": 3,
+     "source": "ine_calendario",
+     "regions": {
+      "MEX": 1,
+      "HID": 1,
+      "ZAC": 1
+     },
+     "quote": "Elecciones Extraordinarias: Edo. México 1 Ayuntamiento, Hidalgo 1 Presidente Mpal., Zacatecas 1 Ayuntamiento, 4 diciembre 2016"
+    },
+    {
+     "date": "2017-06-04",
+     "contests": 271,
+     "source": "ine_2017",
+     "regions": {
+      "COA": 38,
+      "NAY": 20,
+      "VER": 212,
+      "OAX": 1
+     },
+     "quote": "Coahuila 38 ELECCIONES EN AYUNTAMIENTOS; Nayarit 20; Veracruz 212; Santa María Xadani, Oaxaca (extraordinaria) 1 CONCEJALES AL AYUNTAMIENTO; DÍA DE LA ELECCIÓN: 4 de junio de 2017"
+    },
+    {
+     "date": "2018-07-01",
+     "contests": 1597,
+     "source": "ine_2018",
+     "regions": {
+      "BCS": 5,
+      "CAM": 11,
+      "CHP": 123,
+      "CHH": 67,
+      "COA": 38,
+      "COL": 10,
+      "MEX": 125,
+      "GUA": 46,
+      "GRO": 80,
+      "JAL": 125,
+      "MIC": 112,
+      "MOR": 33,
+      "NLE": 51,
+      "OAX": 153,
+      "PUE": 217,
+      "QUE": 18,
+      "ROO": 11,
+      "SLP": 58,
+      "SIN": 18,
+      "SON": 72,
+      "TAB": 17,
+      "TAM": 43,
+      "YUC": 106,
+      "ZAC": 58
+     },
+     "quote": "Per-state pages list the AYUNTAMIENTOS and 'DÍA DE LA ELECCIÓN: 1 de julio de 2018'; Oaxaca's 153 are those elected by parties; Ciudad de México's 16 alcaldías are the class alcaldia."
+    },
+    {
+     "date": "2019-06-02",
+     "contests": 60,
+     "source": "ine_2019",
+     "regions": {
+      "AGU": 11,
+      "BCN": 5,
+      "DUR": 39,
+      "PUE": 5
+     },
+     "quote": "Aguascalientes elige: 11 AYUNTAMIENTOS; Baja California 5; Durango 39; Puebla (extraordinaria) 5; DÍA DE LA ELECCIÓN: 2 de junio"
+    },
+    {
+     "date": "2020-10-18",
+     "contests": 84,
+     "source": "ine_2020",
+     "regions": {
+      "HID": 84
+     },
+     "quote": "Hidalgo elige: 84 AYUNTAMIENTOS DÍA DE LA ELECCIÓN: 18 de octubre"
+    },
+    {
+     "date": "2021-06-06",
+     "contests": 1907,
+     "source": "ine_2021",
+     "regions": {
+      "AGU": 11,
+      "BCN": 5,
+      "BCS": 5,
+      "CAM": 13,
+      "CHP": 123,
+      "CHH": 67,
+      "COA": 38,
+      "COL": 10,
+      "MEX": 125,
+      "GUA": 46,
+      "GRO": 80,
+      "JAL": 125,
+      "MIC": 112,
+      "MOR": 33,
+      "NAY": 20,
+      "NLE": 51,
+      "OAX": 153,
+      "PUE": 217,
+      "QUE": 18,
+      "ROO": 11,
+      "SLP": 58,
+      "SIN": 18,
+      "SON": 72,
+      "TAB": 17,
+      "TAM": 43,
+      "TLA": 60,
+      "VER": 212,
+      "YUC": 106,
+      "ZAC": 58
+     },
+     "quote": "Per-state pages 'Presidencias Municipales' (Oaxaca's 153 are those elected by parties); Durango and Hidalgo elect none; Ciudad de México's 16 alcaldías are the class alcaldia."
     },
     {
      "date": "2022-06-05",
@@ -2416,8 +3206,21 @@
    "dates": [
     {
      "date": "2018-07-01",
-     "through": "2021-06-06",
-     "note": "The 2018 and 2021 alcaldía elections are not yet enumerated from IECM."
+     "contests": 16,
+     "source": "ine_2018",
+     "regions": {
+      "CMX": 16
+     },
+     "quote": "Ciudad de México elige: ... 160 CONCEJALES 16 ALCALDÍAS DÍA DE LA ELECCIÓN: 1 de julio de 2018"
+    },
+    {
+     "date": "2021-06-06",
+     "contests": 16,
+     "source": "ine_2021",
+     "regions": {
+      "CMX": 16
+     },
+     "quote": "Ciudad de México: Presidencias Municipales 16, Juntas Municipales 204"
     },
     {
      "date": "2024-06-02",
@@ -2470,8 +3273,44 @@
    "dates": [
     {
      "date": "2000-07-02",
-     "through": "2015-06-07",
-     "note": "Six elections of all 16 delegaciones (2000 to 2015), not yet enumerated from the Federal District electoral institute's records."
+     "through": "2003-07-06",
+     "note": "The 2000 and 2003 elections of all 16 delegaciones are not yet enumerated."
+    },
+    {
+     "date": "2006-07-02",
+     "contests": 16,
+     "source": "sedia_2007",
+     "regions": {
+      "CMX": 16
+     },
+     "quote": "Cuadro No. 2: Distrito Federal | Jefe de Gobierno, Diputados Locales Delegaciones | 2 de julio; cuadro 1: 16"
+    },
+    {
+     "date": "2009-07-05",
+     "contests": 16,
+     "source": "ife_cal_2009",
+     "regions": {
+      "CMX": 16
+     },
+     "quote": "Distrito Federal | Local | 40 DMR | 26 DRP | 16 Del."
+    },
+    {
+     "date": "2012-07-01",
+     "contests": 16,
+     "source": "ife_cal_2012",
+     "regions": {
+      "CMX": 16
+     },
+     "quote": "Distrito Federal | JEFE DE GOBIERNO | 40 | 26 | 16"
+    },
+    {
+     "date": "2015-06-07",
+     "contests": 16,
+     "source": "ife_cal_2015",
+     "regions": {
+      "CMX": 16
+     },
+     "quote": "Distrito Federal | Ordinaria 7 de junio | 40 | 26 | 16 (Jefes Delegacionales)"
     }
    ]
   },
