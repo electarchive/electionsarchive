@@ -2541,10 +2541,9 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
       const remaining = final - unit.total;
       const room = remaining * (1 - unit.others);
       const countedLead = unit.margin * unit.total;
-      const own = learned?.own.get(index) ?? {
-        shift: 0,
-        variance: learned?.spread ?? 0,
-      };
+      const own = (CANVASS[race.state] == null
+        ? learned?.own.get(index)
+        : undefined) ?? { shift: 0, variance: learned?.spread ?? 0 };
       const drift =
         learned == null
           ? tilt
