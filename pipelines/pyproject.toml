@@ -3,6 +3,7 @@ name = "ea-pipelines"
 version = "0.1.0"
 requires-python = ">=3.14"
 dependencies = [
+  "access-parser==0.0.6",
   "anthropic>=1.17.0",
   "duckdb>=1.4",
   "fastexcel>=0.21.0",
