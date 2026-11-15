@@ -46,6 +46,7 @@ class Vote:
     totals: str | None
     method: str
     system: str
+    city: tuple[str, str] | None = None
 
 
 OSAKA_CITY = "大阪市"
@@ -144,14 +145,217 @@ VOTES = {
         OKINAWA_RULES,
     ),
 }
+NDL = "https://dl.ndl.go.jp/view/download/digidepo_999583_po_070503.pdf?contentNo=1"
+NDL_COMMISSION = Commission(
+    "国立国会図書館調査及び立法考査局",
+    "小林公夫「地方自治特別法の制定手続について」『レファレンス』705号（2009年10月）別表2 地方自治特別法一覧",
+    "https://dl.ndl.go.jp/pid/999583",
+    "国立国会図書館 刊行物の転載 (reuse with attribution; numeric data outside copyright)",
+    "https://www.ndl.go.jp/jp/copyright/index.html",
+    "出典：国立国会図書館『レファレンス』705号",
+)
+ART95_RULES = (
+    "Held under article 95 of the Constitution of Japan and articles 261 and 262 of the Local Autonomy Act "
+    "(地方自治法): a law that applies to one local government only is enacted only if a majority of the valid votes "
+    "cast by its residents are for it. There is no turnout threshold. Voters wrote 賛成 (for) or 反対 (against) on "
+    "the ballot."
+)
+ART95_METHOD = (
+    "Electors, ballots cast, valid votes, and votes for and against for the whole municipality from table 2 of the "
+    "National Diet Library's study of the procedure for local special laws, which takes them from the Prime "
+    "Minister's notices to the Speaker of the House of Representatives that the result was final, printed in the "
+    "House's bulletin (衆議院公報), and fills gaps from the municipalities' own yearbooks and bulletins. Votes for and "
+    "against sum to the valid votes. No breakdown below the municipality is published. The unit is today's "
+    "municipality, whose territory has grown by later mergers."
+)
+ART95 = (
+    (
+        "hiroshima-1949",
+        date(1949, 7, 7),
+        "広島市",
+        "Hiroshima",
+        "34100",
+        "広島平和記念都市建設法",
+        "Hiroshima Peace Memorial City Construction Act",
+    ),
+    (
+        "nagasaki-1949",
+        date(1949, 7, 7),
+        "長崎市",
+        "Nagasaki",
+        "42201",
+        "長崎国際文化都市建設法",
+        "Nagasaki International Cultural City Construction Act",
+    ),
+    (
+        "beppu-1950",
+        date(1950, 6, 15),
+        "別府市",
+        "Beppu",
+        "44202",
+        "別府国際観光温泉文化都市建設法",
+        "Beppu International Tourist and Hot Spring Culture City Construction Act",
+    ),
+    (
+        "atami-1950",
+        date(1950, 6, 28),
+        "熱海市",
+        "Atami",
+        "22205",
+        "熱海国際観光温泉文化都市建設法",
+        "Atami International Tourist and Hot Spring Culture City Construction Act",
+    ),
+    (
+        "ito-1950",
+        date(1950, 6, 15),
+        "伊東市",
+        "Ito",
+        "22208",
+        "伊東国際観光温泉文化都市建設法",
+        "Ito International Tourist and Hot Spring Culture City Construction Act",
+    ),
+    ("tokyo-1950", date(1950, 6, 4), "東京都", "Tokyo", "13", "首都建設法", "Capital Construction Act"),
+    (
+        "yokosuka-1950",
+        date(1950, 6, 4),
+        "横須賀市",
+        "Yokosuka",
+        "14201",
+        "旧軍港市転換法",
+        "Former Naval Port Cities Conversion Act",
+    ),
+    (
+        "sasebo-1950",
+        date(1950, 6, 4),
+        "佐世保市",
+        "Sasebo",
+        "42202",
+        "旧軍港市転換法",
+        "Former Naval Port Cities Conversion Act",
+    ),
+    (
+        "kure-1950",
+        date(1950, 6, 4),
+        "呉市",
+        "Kure",
+        "34202",
+        "旧軍港市転換法",
+        "Former Naval Port Cities Conversion Act",
+    ),
+    (
+        "maizuru-1950",
+        date(1950, 6, 4),
+        "舞鶴市",
+        "Maizuru",
+        "26202",
+        "旧軍港市転換法",
+        "Former Naval Port Cities Conversion Act",
+    ),
+    (
+        "kyoto-1950",
+        date(1950, 9, 20),
+        "京都市",
+        "Kyoto",
+        "26100",
+        "京都国際文化観光都市建設法",
+        "Kyoto International Cultural Tourist City Construction Act",
+    ),
+    (
+        "nara-1950",
+        date(1950, 9, 20),
+        "奈良市",
+        "Nara",
+        "29201",
+        "奈良国際文化観光都市建設法",
+        "Nara International Cultural Tourist City Construction Act",
+    ),
+    (
+        "yokohama-1950",
+        date(1950, 9, 20),
+        "横浜市",
+        "Yokohama",
+        "14100",
+        "横浜国際港都建設法",
+        "Yokohama International Port City Construction Act",
+    ),
+    (
+        "kobe-1950",
+        date(1950, 9, 20),
+        "神戸市",
+        "Kobe",
+        "28100",
+        "神戸国際港都建設法",
+        "Kobe International Port City Construction Act",
+    ),
+    (
+        "matsue-1951",
+        date(1951, 2, 10),
+        "松江市",
+        "Matsue",
+        "32201",
+        "松江国際文化観光都市建設法",
+        "Matsue International Cultural Tourist City Construction Act",
+    ),
+    (
+        "ashiya-1951",
+        date(1951, 2, 11),
+        "芦屋市",
+        "Ashiya",
+        "28206",
+        "芦屋国際文化住宅都市建設法",
+        "Ashiya International Cultural Residential City Construction Act",
+    ),
+    (
+        "matsuyama-1951",
+        date(1951, 2, 11),
+        "松山市",
+        "Matsuyama",
+        "38201",
+        "松山国際観光温泉文化都市建設法",
+        "Matsuyama International Tourist and Hot Spring Culture City Construction Act",
+    ),
+    (
+        "karuizawa-1951",
+        date(1951, 7, 18),
+        "軽井沢町",
+        "Karuizawa",
+        "20321",
+        "軽井沢国際親善文化観光都市建設法",
+        "Karuizawa International Goodwill Cultural Tourist City Construction Act",
+    ),
+    (
+        "ito-1952",
+        date(1952, 8, 20),
+        "伊東市",
+        "Ito",
+        "22208",
+        "伊東国際観光温泉文化都市建設法の一部を改正する法律",
+        "Act Amending the Ito International Tourist and Hot Spring Culture City Construction Act",
+    ),
+)
+for key, held, city, english, code, law, act in ART95:
+    VOTES[key] = Vote(
+        held,
+        NDL_COMMISSION,
+        code,
+        "jp.prefecture" if len(code) == 2 else "jp.municipality",
+        f"日本国憲法第九十五条の規定に基く{law}",
+        f"{english} {act} referendum" if "Conversion" in act else f"{act} referendum",
+        "mandatory_referendum",
+        (("yes", "賛成"), ("no", "反対")),
+        NDL,
+        NDL,
+        None,
+        ART95_METHOD,
+        ART95_RULES,
+        (city, english),
+    )
 LABELS = {"yes": "For", "no": "Against", "neither": "Neither"}
 
 
 def fetch() -> None:
-    for vote in VOTES.values():
-        for url in (vote.votes, vote.registered, vote.totals):
-            if url is not None:
-                raw.fetch(SOURCE, url, suffix=".pdf")
+    for url in {url for vote in VOTES.values() for url in (vote.votes, vote.registered, vote.totals) if url}:
+        raw.fetch(SOURCE, url, suffix=".pdf")
 
 
 def lines(path: Path) -> list[str]:
@@ -251,11 +455,38 @@ def okinawa(vote: Vote) -> list[dict[str, object]]:
     return [{"place": place, **figures, "registered": registered[place]} for place, figures in rows.items()]
 
 
+def art95(vote: Vote) -> list[dict[str, object]]:
+    assert vote.city is not None
+    pattern = re.compile(
+        rf"{vote.city[0]}.*?{vote.held.year - 1925}\.\s*{vote.held.month}\.\s*{vote.held.day}\s+([\d,]+)\s+([\d,]+)"
+        r"\s+[\d.]+%\s+([\d,]+)\s+([\d,]+)\s+[\d.]+%\s+([\d,]+)\s+[\d.]+%"
+    )
+    found = [match for line in lines(raw.cached(SOURCE, vote.votes).path) if (match := pattern.search(line))]
+    if len(found) != 1:
+        raise ValueError(f"{vote.city[0]} {vote.held}: {len(found)} rows in the table")
+    registered, cast, valid, yes, no = (count(value) for value in found[0].groups())
+    if yes + no != valid or valid > cast or cast > registered:
+        raise ValueError(f"{vote.city[0]} {vote.held} does not add up")
+    return [
+        {
+            "place": vote.city[0],
+            "yes": yes,
+            "no": no,
+            "valid": valid,
+            "invalid": None,
+            "cast": cast,
+            "voters": None,
+            "registered": registered,
+            "neither": None,
+        }
+    ]
+
+
 def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
     rows: list[dict[str, object]] = []
     for key, vote in VOTES.items():
-        found = osaka(vote) if vote.scheme == "jp.ward" else okinawa(vote)
+        found = osaka(vote) if vote.scheme == "jp.ward" else art95(vote) if vote.city else okinawa(vote)
         for row in found:
             rows.append({"vote": key, **row})
         print(
@@ -273,9 +504,10 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Japan's local referendums: the Osaka Metropolis plan votes of 2015 and 2020 by ward and the "
-            "Okinawa Henoko landfill vote of 2019 by municipality, from the Osaka City election commission and "
-            "Okinawa Prefecture",
+            summary="Japan's local referendums: the Osaka Metropolis plan votes of 2015 and 2020 by ward, the "
+            "Okinawa Henoko landfill vote of 2019 by municipality, and the 19 votes of 1949 to 1952 on local special "
+            "laws under article 95 of the constitution, from the Osaka City election commission, Okinawa Prefecture, "
+            "and the National Diet Library",
             polity="JP",
         )
 
@@ -313,16 +545,38 @@ def emit() -> Path:
                     attribution=commission.attribution,
                 )
         values: list[tuple[UUID, UUID, UUID | None, int, int]] = []
+        added: set[UUID] = set()
+        prefectures = {
+            iso: path
+            for iso, path in conn.execute(
+                "select p.iso_code, s.path from polity p join slug s on s.entity_id = p.id where p.iso_code like 'JP-__'"
+            )
+        }
         for key, vote in VOTES.items():
             rows = frame.filter(pl.col("vote") == key)
             source = sources[vote.commission.url]
-            for url in (vote.votes, vote.registered, vote.totals):
-                if url is not None:
-                    cs.artifact(raw.cached(SOURCE, url), source)
+            for url in {vote.votes, vote.registered, vote.totals} - {None}:
+                assert url is not None
+                cs.artifact(raw.cached(SOURCE, url), source)
             osaka_city = vote.scheme == "jp.ward"
-            polity = city if osaka_city else cs.polity(f"JP-{vote.polity}")
-            district = cs.area("jp.municipality", vote.polity) if osaka_city else cs.area("jp.prefecture", vote.polity)
-            prefix = "jp/osaka/osaka-city" if osaka_city else "jp/okinawa"
+            if vote.city and vote.scheme == "jp.municipality":
+                native, english = vote.city
+                polity = cs.key("jp.polity", native)
+                district = cs.area("jp.municipality", vote.polity)
+                prefix = f"{prefectures[f'JP-{vote.polity[:2]}']}/{english.lower()}-{'town' if native.endswith('町') else 'city'}"
+                if polity in cs.minted and polity not in added:
+                    added.add(polity)
+                    cs.add("polity", id=polity, kind="municipality", iso_code=None)
+                    name(polity, english)
+                    name(polity, native, "ja", "native", False)
+                    cs.add("polity_parent", polity_id=polity, parent_id=cs.polity(f"JP-{vote.polity[:2]}"))
+                    cs.add("polity_territory", polity_id=polity, area_id=district)
+                    cs.add("slug", path=prefix, entity_id=polity)
+            elif osaka_city:
+                polity, district, prefix = city, cs.area("jp.municipality", vote.polity), "jp/osaka/osaka-city"
+            else:
+                polity, district = cs.polity(f"JP-{vote.polity}"), cs.area("jp.prefecture", vote.polity)
+                prefix = prefectures[f"JP-{vote.polity}"]
             election = cs.key(f"{SOURCE}.election", key)
             cs.add(
                 "election",
@@ -395,15 +649,19 @@ def emit() -> Path:
                     option_id=options[answer],
                     kind="won" if totals[answer] == max(totals.values()) else "lost",
                 )
-            codes = {
-                text: code
-                for code, text in conn.execute(
-                    """select c.code, n.text from area a join area_code c on c.area_id = a.id
+            codes = (
+                {vote.city[0]: vote.polity}
+                if vote.city
+                else {
+                    text: code
+                    for code, text in conn.execute(
+                        """select c.code, n.text from area a join area_code c on c.area_id = a.id
                        join name n on n.entity_id = a.id and n.lang = 'ja' and n.kind = 'official'
                        where a.scheme_code = %s and c.code like %s and n.valid @> %s::date""",
-                    [vote.scheme, f"{vote.polity[:3] if osaka_city else vote.polity}%", vote.held],
-                )
-            }
+                        [vote.scheme, f"{vote.polity[:3] if osaka_city else vote.polity}%", vote.held],
+                    )
+                }
+            )
             parent = cs.unit("jp.prefecture", vote.polity[:2])
             for row in rows.iter_rows(named=True):
                 if row["place"] not in codes:
@@ -426,7 +684,8 @@ def emit() -> Path:
                 for answer, option in options.items():
                     values.append((result, unit, option, 1, row[answer]))
                 for field, measure in MEASURES.items():
-                    values.append((result, unit, None, measure, row[field]))
+                    if row[field] is not None:
+                        values.append((result, unit, None, measure, row[field]))
         cs.frame(
             "result_value",
             pl.DataFrame(
