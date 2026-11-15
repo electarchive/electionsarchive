@@ -1,3 +1,4 @@
+import functools
 import io
 import re
 import zipfile
@@ -91,6 +92,7 @@ SENATE = {
     "se2026": ("SE2026data20261017_csv.zip", "SE2026reg20261017_csv.zip", "SE2026ciselniky20261017_csv.zip"),
 }
 SENATE_STAMPS = {"se2026": "20261009"}
+SENATE_MAP_FROM = "20140101"
 SENATE_METHOD = (
     "Counted by the Czech Statistical Office per polling district (okrsek), as published in the volby.cz open data. "
     "Registered voters are the electoral roll, voters are the official envelopes issued, ballots cast are the "
@@ -196,7 +198,8 @@ def geo() -> Package:
     p = Package(
         "cz.volby/geo",
         SOURCE,
-        "Czechia's 14 regions, 77 districts, and 6,258 municipalities from ČÚZK's RÚIAN statistical boundaries",
+        "Czechia's 14 regions, 77 districts, 6,258 municipalities, and current polling districts from ČÚZK's RÚIAN "
+        "statistical boundaries",
     )
     p.external |= {CZECHIA, TERRITORY}
     artifact = raw.cached("cz.cuzk", RUIAN)
@@ -219,22 +222,14 @@ def geo() -> Package:
         ("cz.okrsek", 4, "precinct", "polling district", None),
     ):
         p.add("scheme", code=code, polity_id=CZECHIA, kind=kind, rank=rank, noun=noun, code_system=system)
-        if kind == "administrative":
-            p.add(
-                "boundary_set",
-                id=key("boundary_set", code, artifact.retrieved_at.year),
-                scheme_code=code,
-                vintage=str(artifact.retrieved_at.year),
-                as_of=artifact.retrieved_at.date(),
-            )
-    towns, outlines = _shapes("OBCE_P")
-    simple = shapely.make_valid(shapely.coverage_simplify(numpy.array(outlines), TOLERANCE))
-    project = pyproj.Transformer.from_crs(5514, 4326, always_xy=True)
-
-    def wgs(shape: shapely.Geometry) -> shapely.Geometry:
-        moved = shapely.transform(shape, lambda xy: numpy.column_stack(project.transform(xy[:, 0], xy[:, 1])))
-        parts = [part for part in shapely.get_parts(shapely.make_valid(moved)) if shapely.get_type_id(part) in (3, 6)]
-        return shapely.set_srid(shapely.MultiPolygon(list(shapely.get_parts(parts))), 4326)
+        p.add(
+            "boundary_set",
+            id=key("boundary_set", code, artifact.retrieved_at.year),
+            scheme_code=code,
+            vintage=str(artifact.retrieved_at.year),
+            as_of=artifact.retrieved_at.date(),
+        )
+    towns, simple = _obce()
 
     def place(scheme: str, code: str, text: str, parent: str, shape: shapely.Geometry) -> None:
         id = area(scheme, code)
@@ -242,17 +237,7 @@ def geo() -> Package:
         p.add("area_code", area_id=id, code=code)
         p.add("area_parent", area_id=id, parent_id=parent)
         p.name(id, text, "cs", "official")
-        shape = wgs(shape)
-        p.add(
-            "area_geometry",
-            area_id=id,
-            geom=shapely.to_wkb(shape, hex=True, include_srid=True),
-            label_point=shapely.to_wkb(
-                shapely.set_srid(shapely.point_on_surface(shape), 4326), hex=True, include_srid=True
-            ),
-            quality="official",
-            source_id=RUIAN_SOURCE,
-        )
+        _outline(p, id, shape)
 
     regions, _ = _shapes("VUSC_P")
     districts, _ = _shapes("OKRESY_P")
@@ -272,7 +257,78 @@ def geo() -> Package:
         )
     for town, shape in zip(towns, simple, strict=True):
         place("cz.obec", str(town["KOD"]), str(town["NAZEV"]), area("cz.okres", lau[str(town["OKRES_KOD"])]), shape)
+    names = {str(town["KOD"]): str(town["NAZEV"]) for town in towns}
+    for row, shape in zip(*_okrsky(), strict=True):
+        place(
+            "cz.okrsek",
+            f"{row['OBEC_KOD']}:{row['CISLO']}",
+            f"{names[str(row['OBEC_KOD'])]}, okrsek {row['CISLO']}",
+            area("cz.obec", str(row["OBEC_KOD"])),
+            shape,
+        )
     return p
+
+
+def _wgs(shape: shapely.Geometry) -> shapely.Geometry:
+    project = pyproj.Transformer.from_crs(5514, 4326, always_xy=True)
+    moved = shapely.transform(shape, lambda xy: numpy.column_stack(project.transform(xy[:, 0], xy[:, 1])))
+    parts = [part for part in shapely.get_parts(shapely.make_valid(moved)) if shapely.get_type_id(part) in (3, 6)]
+    return shapely.set_srid(shapely.MultiPolygon(list(shapely.get_parts(parts))), 4326)
+
+
+def _outline(p: Package, id: str, shape: shapely.Geometry) -> None:
+    shape = _wgs(shape)
+    p.add(
+        "area_geometry",
+        area_id=id,
+        geom=shapely.to_wkb(shape, hex=True, include_srid=True),
+        label_point=shapely.to_wkb(
+            shapely.set_srid(shapely.point_on_surface(shape), 4326), hex=True, include_srid=True
+        ),
+        quality="official",
+        source_id=RUIAN_SOURCE,
+    )
+
+
+@functools.cache
+def _obce() -> tuple[list[dict[str, object]], list[shapely.Geometry]]:
+    rows, outlines = _shapes("OBCE_P")
+    return rows, list(shapely.make_valid(shapely.coverage_simplify(numpy.array(outlines), TOLERANCE)))
+
+
+@functools.cache
+def _okrsky() -> tuple[list[dict[str, object]], list[shapely.Geometry]]:
+    rows, outlines = _shapes("VO_P")
+    return rows, list(shapely.make_valid(shapely.coverage_simplify(numpy.array(outlines), TOLERANCE)))
+
+
+def _senate_districts() -> dict[str, list[shapely.Geometry]]:
+    ranges: dict[str, list[tuple[str, str, list[tuple[int, int]]]]] = {}
+    coco = _senate_table("cis", "secoco")
+    for row in coco.filter(pl.col("DATUMVOLEB") >= SENATE_MAP_FROM).iter_rows(named=True):
+        spans = [(row[f"MINOKRSEK{i}"], row[f"MAXOKRSEK{i}"]) for i in range(1, 10)]
+        spans.append((row["MINOKRSE10"], row["MAXOKRSE10"]))
+        held = [(int(low), int(high)) for low, high in spans if low and low != "0"]
+        ranges.setdefault(row["OBEC"], []).append((row["DATUMVOLEB"], row["OBVOD"], held))
+    members: dict[str, list[shapely.Geometry]] = {}
+    for row, shape in zip(*_okrsky(), strict=True):
+        options = ranges.get(str(row["MOMC_KOD"]) or str(row["OBEC_KOD"])) or ranges[str(row["OBEC_KOD"])]
+        number = int(str(row["CISLO"]))
+        held = [(day, obvod) for day, obvod, spans in options if not spans or any(a <= number <= b for a, b in spans)]
+        if not held:
+            newest = max(day for day, _, _ in options)
+            (obvod,) = {obvod for day, obvod, _ in options if day == newest}
+            held = [(newest, obvod)]
+        members.setdefault(max(held)[1], []).append(shape)
+    covered = {str(row["OBEC_KOD"]) for row in _okrsky()[0]}
+    latest = {row["OBEC"]: row["OBVOD"] for row in coco.sort("DATUMVOLEB").iter_rows(named=True)}
+    for row, shape in zip(*_obce(), strict=True):
+        if str(row["KOD"]) not in covered:
+            print(
+                f"cz.senat: {row['KOD']} {row['NAZEV']} has no polling district, placed whole in {latest[str(row['KOD'])]}"
+            )
+            members.setdefault(latest[str(row["KOD"])], []).append(shape)
+    return members
 
 
 def registry() -> Package:
@@ -325,6 +381,16 @@ def registry() -> Package:
         p.add("area_code", area_id=id, code=row["OBVOD"])
         p.add("area_parent", area_id=id, parent_id=TERRITORY)
         p.name(id, clean(row["NAZEV_OBV"]), "cs", "official")
+    artifact = raw.cached("cz.cuzk", RUIAN)
+    p.add(
+        "boundary_set",
+        id=key("boundary_set", "cz.senat", artifact.retrieved_at.year),
+        scheme_code="cz.senat",
+        vintage=str(artifact.retrieved_at.year),
+        as_of=artifact.retrieved_at.date(),
+    )
+    for obvod, shapes in sorted(_senate_districts().items(), key=lambda item: int(item[0])):
+        _outline(p, area("cz.senat", obvod), shapely.union_all(shapes, grid_size=0.01))
     p.add("office", id=PRESIDENCY, polity_id=CZECHIA, kind="head_of_state")
     p.name(PRESIDENCY, "President of the Czech Republic", "en", "official")
     p.name(PRESIDENCY, "Prezident republiky", "cs", "native", False)
