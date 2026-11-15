@@ -43,14 +43,9 @@ def emit(
             contest
             for (contest,) in conn.execute(
                 """select k.id from contest k join election e on e.id = k.election_id join area d on d.id = k.district_area_id
-                   where e.date_from = any(%s) and (
-                     (d.scheme_code = 'us.county'
-                      and not exists (select from area_code c where c.area_id = d.id and c.code = %s))
-                     or (exists (select from area_parent p join area a on a.id = p.parent_id and a.scheme_code = 'us.county'
-                                 where p.area_id = d.id)
-                         and not exists (select from area_parent p join area_code c on c.area_id = p.parent_id
-                                         where p.area_id = d.id and c.code = %s)))""",
-                [days, fips, fips],
+                   where e.date_from = any(%s) and d.scheme_code = 'us.county'
+                     and not exists (select from area_code c where c.area_id = d.id and c.code = %s)""",
+                [days, fips],
             ).fetchall()
         }
         contests = conn.execute(
