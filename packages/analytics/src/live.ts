@@ -217,6 +217,7 @@ const MODEL = {
     memory: 2,
     patience: 0.5,
     canvass: 0.3,
+    own: 0.5,
     growth: { share: 0.045, power: 2, max: 2.5 },
     lull: 0.5,
     stir: 0.01,
@@ -2622,13 +2623,16 @@ export function estimate({ race: given, at }: EstimateInput): LiveEstimate {
         shift: 0,
         variance: pull?.spread ?? 0,
       };
+      const ownShift =
+        CANVASS[race.state] == null
+          ? pullOwn.shift
+          : MODEL.late.own * pullOwn.shift;
       const pullDrift =
         pull == null
           ? null
           : canvass *
-            (pullTilt + pullOwn.shift + Math.sqrt(pullOwn.variance) * jitter);
-      const pullExpect =
-        pull == null ? null : canvass * (pull.mean + pullOwn.shift);
+            (pullTilt + ownShift + Math.sqrt(pullOwn.variance) * jitter);
+      const pullExpect = pull == null ? null : canvass * (pull.mean + ownShift);
       const local = pull == null ? MODEL.tail.local * jitter : 0;
       const isRecent = isMailTail && recent != null && remaining > 0;
       const tail = (value: number, tilt: number) =>
