@@ -344,7 +344,7 @@ def packages() -> list[str]:
     return [
         "lv.cvk/geo",
         "lv.cvk/registry",
-        *(f"lv.cvk/{day}" for day in sorted([*DAYS, *REFERENDUMS, *MUNICIPAL, *DATI])),
+        *(f"lv.cvk/{day}" for day in sorted([*DAYS, *REFERENDUMS, *MUNICIPAL, *DATI, "2021-06-05"])),
     ]
 
 
@@ -357,6 +357,10 @@ def fetch() -> None:
         for url in (*dati_pages(code)[1:][0], *dati_pages(code)[2]):
             raw.fetch(SOURCE, url, suffix=".html")
         raw.fetch(SOURCE, f"{HOST}/{code}/ieveletie-deputati/", suffix=".html")
+    raw.fetch(SOURCE, PV2021, suffix=".html")
+    raw.fetch(SOURCE, PV2021_ELECTED, suffix=".html")
+    for url in pv2021_pages():
+        raw.fetch(SOURCE, url, suffix=".html")
 
 
 def parse() -> None:
@@ -370,6 +374,7 @@ def parse() -> None:
         municipal(day).write()
     for day in DATI:
         build_dati(day).write()
+    build_pv2021().write()
 
 
 def emit() -> None:
@@ -421,6 +426,8 @@ def registry() -> Package:
     )
     for name in URLS:
         p.artifact(path(name), CVK_SOURCE)
+    for url in (PV2021, PV2021_ELECTED, *pv2021_pages()):
+        p.artifact(raw.cached(SOURCE, url), CVK_SOURCE)
     for code in DATI.values():
         for url in (
             *dati_pages(code)[0],
@@ -444,6 +451,9 @@ def registry() -> Package:
         for place in (*data.regions.values(), *data.towns.values()):
             for stand in place.stands.values():
                 labels.setdefault(party(stand.name), stand.name)
+    for page in read_pv2021()[0]:
+        for stand in page.stands.values():
+            labels.setdefault(party(stand.name), stand.name)
     for prefix in MUNICIPAL.values():
         for council in _municipal(prefix)[0].values():
             for label, _, _ in council.lists.values():
@@ -1086,8 +1096,8 @@ class Tables(HTMLParser):
             self._anchor = (found["href"] or "", [])
             if self._cell is not None and self._href is None:
                 self._href = found["href"]
-        elif tag == "table" and found.get("id"):
-            self._table = self.tables.setdefault(found["id"] or "", [])
+        elif tag == "table":
+            self._table = self.tables.setdefault(found.get("id") or f"t{len(self.tables)}", [])
         elif tag == "tr" and self._table is not None:
             self._row = []
         elif tag in ("td", "th") and self._row is not None:
@@ -1385,4 +1395,180 @@ def build_dati(day: str) -> Package:
             ballot_name=who,
         )
         p.add("outcome", result_set_id=sets[ident], option_id=option, candidacy_id=candidacy, kind="elected")
+    return p
+
+
+ARCHIVE = "https://arhivs.cvk.lv/lv"
+PV2021 = f"{ARCHIVE}/pv-2021-velesanu-rezultati/"
+PV2021_ELECTED = f"{ARCHIVE}/pv-2021-ieveletie-deputati/"
+
+
+def pv2021_pages() -> list[str]:
+    summary = tables(PV2021)
+    seen = dict.fromkeys(
+        f"{ARCHIVE}/{link.rsplit('/lv/', 1)[-1]}"
+        for link in summary.links
+        if re.search(r"/lv/pv-2021-velesanu-iecirkni-[^/]+/?$", link)
+    )
+    return list(seen)
+
+
+@dataclass
+class Page:
+    slug: str
+    name: str
+    stands: dict[int, Stand]
+    stations: list[tuple[int, str, str, int, int, dict[int, int]]]
+    row: tuple[int, int, int, int]
+
+
+def _station(text: str) -> tuple[int, str]:
+    number, _, name = text.partition(". ")
+    return int(number), clean(name)
+
+
+def read_pv2021() -> tuple[list[Page], list[tuple[str, str, str]]]:
+    summary = {
+        row[0].text: (_n(row[1]), _n(row[2]), _n(row[4]), _n(row[6]))
+        for row in tables(PV2021).tables["t0"][1:]
+        if row[0].text != "Kopā"
+    }
+    pages: list[Page] = []
+    for url in pv2021_pages():
+        slug = url.rstrip("/").rsplit("/", 1)[-1].removeprefix("pv-2021-velesanu-iecirkni-")
+        page = tables(url)
+        name = next(
+            text
+            for link, text in tables(PV2021).anchors
+            if link.rstrip("/").endswith(url.rstrip("/").rsplit("/", 1)[-1])
+        )
+        addresses = {_station(r[0].text)[0]: clean(r[1].text) for r in page.tables["t0"][1:] if r[0].text != "Kopā"}
+        stands = {
+            int(r[0].text): Stand(clean(r[1].text), _n(r[2]), 0) for r in page.tables["t2"][1:] if r[0].text.isdigit()
+        }
+        matrix: dict[int, dict[int, int]] = {}
+        for r in page.tables["t3"][1:]:
+            matrix.setdefault(_station(r[0].text)[0], {})[int(r[1].text)] = _n(r[3])
+        stations = []
+        for r in page.tables["t1"][1:]:
+            if r[0].text == "Kopā":
+                continue
+            number, label = _station(r[0].text)
+            stations.append((number, label, addresses.get(number, ""), _n(r[1]), _n(r[3]), matrix.get(number, {})))
+        pages.append(Page(slug, name, stands, stations, summary[name]))
+    elected = [
+        (clean(r[0].text), clean(r[1].text), clean(r[2].text))
+        for r in tables(PV2021_ELECTED).tables["t0"][1:]
+        if len(r) >= 3
+    ]
+    return pages, elected
+
+
+def build_pv2021() -> Package:
+    day = "2021-06-05"
+    first = date.fromisoformat(day)
+    english, native = "2021 Latvian municipal elections", "2021. gada pašvaldību vēlēšanas"
+    p = Package(
+        f"lv.cvk/{day}",
+        SOURCE,
+        f"The {english} by polling station from the Central Election Commission",
+        depends=["lv.cvk/geo", "lv.cvk/registry"],
+    )
+    p.external |= {LATVIA, COUNTRY}
+    for url in (PV2021, PV2021_ELECTED, *pv2021_pages()):
+        p.uses(raw.cached(SOURCE, url))
+    pages, elected = read_pv2021()
+    election = key("election", day)
+    where = f"lv/{day}-local"
+    p.add("election", id=election, polity_id=LATVIA, kind="local", date_from=first, date_to=first, status="held")
+    p.name(election, english, "en", "official")
+    p.name(election, native, "lv", "native", False)
+    p.add("slug", path=where, entity_id=election, is_current=True)
+    p.add(
+        "note",
+        id=key("note", election, "scope"),
+        entity_id=election,
+        kind="context",
+        body_md="Riga, Rēzekne, and Varakļāni held their own elections in 2020; they are not part of this vote.",
+        lang="en",
+    )
+    seats = Counter((c, lst) for c, lst, _ in elected)
+    options: dict[tuple[str, int], str] = {}
+    sets: dict[str, str] = {}
+    for page in sorted(pages, key=lambda q: q.name):
+        contest = key("contest", day, page.slug)
+        total = sum(n for (c, _), n in seats.items() if c == page.name)
+        p.add(
+            "contest",
+            id=contest,
+            election_id=election,
+            kind="list_allocation",
+            magnitude=total or None,
+            round_number=1,
+            electoral_system_id=SYSTEM_MUNICIPAL,
+            default_result_kind="counted",
+        )
+        p.name(contest, f"{first.year} {page.name} council election", "en", "official")
+        p.name(contest, f"{page.name} domes vēlēšanas {first.year}", "lv", "native", False)
+        p.add("slug", path=f"{where}/{page.slug}", entity_id=contest, is_current=True)
+        result_set = sets[page.name] = key("result_set", day, page.slug)
+        p.add(
+            "result_set",
+            id=result_set,
+            election_id=election,
+            contest_id=contest,
+            stage="official",
+            kind="counted",
+            source_id=CVK_SOURCE,
+            status="active",
+            is_default=True,
+            completeness=1.0,
+        )
+        p.add(
+            "note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=DATI_METHOD, lang="en"
+        )
+        for number, stand in sorted(page.stands.items()):
+            option = options[(page.name, number)] = key("option", day, page.slug, number)
+            p.add(
+                "contest_option",
+                id=option,
+                contest_id=contest,
+                kind="list",
+                party_id=party(stand.name),
+                ballot_position=number,
+                ballot_label=stand.name,
+            )
+            p.add("declared", result_set_id=result_set, option_id=option, measure=VOTES, value=stand.votes)
+            won = seats[(page.name, stand.name)]
+            if won:
+                p.add("outcome", result_set_id=result_set, option_id=option, kind="won", seats=won)
+        p.add("declared", result_set_id=result_set, option_id=None, measure=CAST, value=page.row[1])
+        p.add("declared", result_set_id=result_set, option_id=None, measure=VALID, value=page.row[3])
+        for number, label, address, cast, valid, votes in page.stations:
+            code = f"{day}:{page.slug}:{number}"
+            unit = key("unit", code)
+            p.add(
+                "reporting_unit",
+                id=unit,
+                polity_id=LATVIA,
+                scheme_code="lv.iecirknis",
+                code=code,
+                area_relation="unlocated",
+                area_id=None,
+                kind="standard",
+            )
+            p.name(unit, ", ".join(part for part in (label, address) if part), "lv", "official")
+            _put(p, result_set, unit, None, CAST, cast)
+            _put(p, result_set, unit, None, VALID, valid)
+            for list_number in page.stands:
+                _put(p, result_set, unit, options[(page.name, list_number)], VOTES, votes.get(list_number, 0))
+    by_label = {(page.name, stand.name): n for page in pages for n, stand in page.stands.items()}
+    for index, (council, list_name, who) in enumerate(elected):
+        option = options[(council, by_label[(council, list_name)])]
+        person = key("person", day, council, who, index)
+        p.add("person", id=person)
+        p.name(person, who, "lv", "official")
+        candidacy = key("candidacy", day, council, who, index)
+        p.add("candidacy", id=candidacy, person_id=person, option_id=option, role="list_member", ballot_name=who)
+        p.add("outcome", result_set_id=sets[council], option_id=option, candidacy_id=candidacy, kind="elected")
     return p
