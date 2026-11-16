@@ -1,0 +1,1263 @@
+{
+  "polity": "GL",
+  "name": "Greenland",
+  "sources": {
+    "l14-2020": {
+      "title": "Inatsisartutlov nr. 14 af 24. november 2020 om valg til Inatsisartut",
+      "publisher": "Naalakkersuisut (Nalunaarutit.gl)",
+      "url": "https://nalunaarutit.gl/Groenlandsk-lovgivning/2020/L-14-2020",
+      "kind": "official_body"
+    },
+    "lbk15-2023": {
+      "title": "Selvstyrets lovbekendtgørelse nr. 15 af 4. april 2023 af Inatsisartutlov om Inatsisartut og Naalakkersuisut",
+      "publisher": "Naalakkersuisut (Nalunaarutit.gl)",
+      "url": "https://nalunaarutit.gl/Groenlandsk-lovgivning/2023/Selvstyrets-lovbekendtgoerelse-nr-15-af-04_04_2023",
+      "kind": "official_body"
+    },
+    "l15-2025": {
+      "title": "Inatsisartutlov nr. 15 af 4. februar 2025 om nyvalg til Inatsisartut",
+      "publisher": "Naalakkersuisut (Nalunaarutit.gl)",
+      "url": "https://nalunaarutit.gl/Groenlandsk-lovgivning/2025/Inatsisartutlov-nr-15-af-04_02_2025",
+      "kind": "official_body"
+    },
+    "lov473-2009": {
+      "title": "Lov nr. 473 af 12. juni 2009 om Grønlands Selvstyre",
+      "publisher": "Civilstyrelsen (Retsinformation)",
+      "url": "https://www.retsinformation.dk/eli/lta/2009/473",
+      "kind": "official_body"
+    },
+    "lov577-1978": {
+      "title": "Lov nr. 577 af 29. november 1978 om Grønlands hjemmestyre",
+      "publisher": "Civilstyrelsen (Retsinformation)",
+      "url": "https://www.retsinformation.dk/eli/lta/1978/577",
+      "kind": "official_body"
+    },
+    "lov56-1979": {
+      "title": "Lov nr. 56 af 21. februar 1979 om valg til Grønlands landsting",
+      "publisher": "Naalakkersuisut (Nalunaarutit.gl)",
+      "url": "https://nalunaarutit.gl/Rigslovgivning/1979/Lov-nr-56-af-21_02_1979",
+      "kind": "official_body"
+    },
+    "l27-2016": {
+      "title": "Inatsisartutlov nr. 27 af 28. november 2016 om valg til kommunalbestyrelser, bygdebestyrelser og menighedsrepræsentationer",
+      "publisher": "Naalakkersuisut (Nalunaarutit.gl)",
+      "url": "https://nalunaarutit.gl/Groenlandsk-lovgivning/2016/L-27-2016",
+      "kind": "official_body"
+    },
+    "l29-2017": {
+      "title": "Inatsisartutlov nr. 29 af 17. november 2017 om den kommunale styrelse",
+      "publisher": "Naalakkersuisut (Nalunaarutit.gl)",
+      "url": "https://nalunaarutit.gl/Groenlandsk-lovgivning/2017/L-29-2017",
+      "kind": "official_body"
+    },
+    "l34-2017": {
+      "title": "Inatsisartutlov nr. 34 af 23. november 2017 om Grønlands inddeling i landsdele og kommuner",
+      "publisher": "Naalakkersuisut (Nalunaarutit.gl)",
+      "url": "https://nalunaarutit.gl/Groenlandsk-lovgivning/2017/L-34-2017",
+      "kind": "official_body"
+    },
+    "ltl14-2007": {
+      "title": "Landstingslov nr. 14 af 19. november 2007 om strukturreform af den kommunale sektor",
+      "publisher": "Naalakkersuisut (Nalunaarutit.gl)",
+      "url": "https://nalunaarutit.gl/Groenlandsk-lovgivning/2007/ltl-14-2007",
+      "kind": "official_body"
+    },
+    "l30-2016": {
+      "title": "Inatsisartutlov nr. 30 af 28. november 2016 om deling af Qaasuitsup Kommunia",
+      "publisher": "Naalakkersuisut (Nalunaarutit.gl)",
+      "url": "https://nalunaarutit.gl/Groenlandsk-lovgivning/2016/L-30-2016",
+      "kind": "official_body"
+    },
+    "bkg4-2009": {
+      "title": "Hjemmestyrets bekendtgørelse nr. 4 af 22. januar 2009 om valg til fælles bygdebestyrelser i april 2009",
+      "publisher": "Naalakkersuisut (Nalunaarutit.gl)",
+      "url": "https://nalunaarutit.gl/Groenlandsk-lovgivning/2009/bkg-04-2009",
+      "kind": "official_body"
+    },
+    "bkg18-2025": {
+      "title": "Selvstyrets bekendtgørelse nr. 18 af 5. februar 2025 om valg til menighedsrepræsentationer, bilag 1",
+      "publisher": "Naalakkersuisut (Nalunaarutit.gl)",
+      "url": "https://nalunaarutit.gl/-/media/lovfiler/2025/bilag/bilag---selvstyrets-bekendtgoerelse-nr-18-af-05_02_2025_da.pdf",
+      "kind": "official_body"
+    },
+    "l10-2021": {
+      "title": "Inatsisartutlov nr. 10 af 19. november 2021 om borgerbestyrelser i områder uden for den kommunale inddeling",
+      "publisher": "Naalakkersuisut (Nalunaarutit.gl)",
+      "url": "https://nalunaarutit.gl/Groenlandsk-lovgivning/2021/L-10-2021",
+      "kind": "official_body"
+    },
+    "lbk1167-2023": {
+      "title": "Lovbekendtgørelse nr. 1167 af 8. september 2023 af lov om folketingsvalg i Grønland",
+      "publisher": "Civilstyrelsen (Retsinformation)",
+      "url": "https://www.retsinformation.dk/eli/lta/2023/1167",
+      "kind": "official_body"
+    },
+    "lbk805-2026": {
+      "title": "Lovbekendtgørelse nr. 805 af 11. september 2026 af lov om valg til Folketinget",
+      "publisher": "Civilstyrelsen (Retsinformation)",
+      "url": "https://www.retsinformation.dk/eli/lta/2026/805",
+      "kind": "official_body"
+    },
+    "lbk1007-2025": {
+      "title": "Lovbekendtgørelse nr. 1007 af 27. juni 2025 af lov om rettens pleje i Grønland",
+      "publisher": "Civilstyrelsen (Retsinformation)",
+      "url": "https://www.retsinformation.dk/eli/lta/2025/1007",
+      "kind": "official_body"
+    },
+    "statbank": {
+      "title": "Statbank Greenland, archived tables SAXLANST, SAXFOLK and SAXKOMST (Politics and administration)",
+      "publisher": "Statistics Greenland",
+      "url": "https://bank.stat.gl/pxweb/en/Greenland/Greenland__SA__SA99__SA30/",
+      "kind": "official_body",
+      "note": "Party votes, blank and invalid ballots, ballots counted and electorate by election and by municipality (the 18 municipalities before 2009 and the 4 and 5 after); Inatsisartut 1979-2021 also by the three electoral districts of 1979-1995."
+    },
+    "sa2010": {
+      "title": "Grønlands statistiske årbog 2010, kapitel Valg",
+      "publisher": "Statistics Greenland",
+      "url": "http://stat.gl/publ/da/SA/201001/oversigt/Valg.htm",
+      "kind": "official_body"
+    },
+    "sa2016-kommune": {
+      "title": "Grønlands statistiske årbog 2016, Kommunalbestyrelser",
+      "publisher": "Statistics Greenland",
+      "url": "http://stat.gl/publ/da/SA/201601/oversigt/Kommunalbestyrelser.htm",
+      "kind": "official_body"
+    },
+    "sa2016-bygd": {
+      "title": "Grønlands statistiske årbog 2016, Valg til bygdebestyrelser",
+      "publisher": "Statistics Greenland",
+      "url": "http://stat.gl/publ/da/SA/201601/oversigt/Valg%20til%20bygdebestyrelser.htm",
+      "kind": "official_body"
+    },
+    "git2026": {
+      "title": "Grønland i tal 2026",
+      "publisher": "Statistics Greenland",
+      "url": "https://stat.gl/publ/da/GF/2026/pdf/Gr%C3%B8nland%20i%20tal%202026.pdf",
+      "kind": "official_body"
+    },
+    "dst1953": {
+      "title": "Folketingsvalgene 1953 (Statistiske Meddelelser)",
+      "publisher": "Statistics Denmark",
+      "url": "https://www.dst.dk/Site/Dst/Udgivelser/GetPubFile.aspx?id=20213&sid=valg1953",
+      "kind": "official_body"
+    },
+    "dst1975": {
+      "title": "Folketingsvalget den 9. januar 1975",
+      "publisher": "Statistics Denmark",
+      "url": "https://www.dst.dk/Site/Dst/Udgivelser/GetPubFile.aspx?id=20205&sid=valg1975",
+      "kind": "official_body"
+    },
+    "landsraad": {
+      "title": "Etableringen af Landsrådene for 100 år siden",
+      "publisher": "Inatsisartut",
+      "url": "https://inatsisartut.gl/media/elklpgit/d-inatsisartut-website-inatsisartutgl-media-10680-201109-brochure-etablering-af-landsraadet-for-100-aar-siden-a4-dk.pdf",
+      "kind": "official_body"
+    },
+    "valg-gl": {
+      "title": "Om Valg.gl",
+      "publisher": "Naalakkersuisut (valg.gl)",
+      "url": "https://valg.gl/om-valg",
+      "kind": "official_body"
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "Kalaallit Nunaat",
+      "name_en": "Greenland",
+      "parent": null,
+      "polity_kind": "sovereign_state",
+      "source": "lov473-2009"
+    },
+    {
+      "key": "kommune",
+      "name": "Kommuneqarfiit",
+      "name_en": "Municipalities",
+      "parent": "national",
+      "polity_kind": "municipality",
+      "scheme": "gl.kommune",
+      "source": "l34-2017",
+      "counts": [
+        {
+          "date": "2005-04-05",
+          "value": 18,
+          "source": "sa2010",
+          "locator": "Note 1: \"Ved valget i 2005 var Grønland opdelt i 18 kommuner med 168 mandater i kommunalbestyrelserne\""
+        },
+        {
+          "date": "2009-01-01",
+          "value": 4,
+          "source": "ltl14-2007",
+          "locator": "§ 1: \"Fra 1. januar 2009 inddeles Grønland i 4 kommuner\""
+        },
+        {
+          "date": "2018-01-01",
+          "value": 5,
+          "source": "l34-2017",
+          "locator": "§ 2: \"Grønland inddeles i kommunerne Kommune Kujalleq, Kommuneqarfik Sermersooq, Qeqqata Kommunia, Kommune Qeqertalik og Avannaata Kommunia\""
+        }
+      ]
+    },
+    {
+      "key": "bygd",
+      "name": "Fælles bygdebestyrelser",
+      "name_en": "Settlement council constituencies (joint settlement councils)",
+      "parent": "kommune",
+      "polity_kind": "submunicipal",
+      "source": "l27-2016",
+      "counts": [
+        {
+          "date": "2009-01-22",
+          "value": 26,
+          "source": "bkg4-2009",
+          "locator": "§ 1 lists the valgkredse for joint settlement councils: Kommune Kujalleq 4, Kommuneqarfik Sermersooq 4, Qeqqata Kommunia 4, Qaasuitsup Kommunia 14"
+        }
+      ]
+    },
+    {
+      "key": "by",
+      "name": "Lokaludvalg",
+      "name_en": "Town local committees",
+      "parent": "kommune",
+      "polity_kind": "submunicipal",
+      "source": "l29-2017"
+    },
+    {
+      "key": "menighed",
+      "name": "Menighedsrepræsentationer",
+      "name_en": "Parish council constituencies (Church of Greenland)",
+      "parent": "kommune",
+      "source": "l27-2016",
+      "counts": [
+        {
+          "date": "2025-02-05",
+          "value": 66,
+          "source": "bkg18-2025",
+          "locator": "Bilag 1, \"Valgkredse, hvor der skal vælges menighedsrepræsentationer i Grønland til valget den 1. april 2025\": 66 valgkredse electing 259 members"
+        }
+      ]
+    },
+    {
+      "key": "udenfor",
+      "name": "Områder uden for den kommunale inddeling",
+      "name_en": "Areas outside the municipalities (Pituffik and the National Park)",
+      "parent": "national",
+      "source": "l10-2021"
+    }
+  ],
+  "classes": [
+    {
+      "key": "inatsisartut",
+      "tier": "national",
+      "name": "Inatsisartutigassanik qinersineq / Valg til Inatsisartut",
+      "name_en": "Inatsisartut (Landsting until 2009)",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "fine": [
+          "gl.kommune",
+          "gl.afstemningssted"
+        ]
+      },
+      "finest_note": "valg.gl prints party and candidate votes by polling place from 2005; Statbank prints party votes by the 18 former municipalities and by the three districts of 1979-1995.",
+      "source": "l14-2020",
+      "locator": "https://nalunaarutit.gl/Groenlandsk-lovgivning/2020/L-14-2020 (§ 5: 31 members, Greenland one constituency; § 6: four-year term)",
+      "valid_from": "1979-01-01",
+      "first_held": "1979-04-04",
+      "earliest_record": "1979-04-04",
+      "note": "Open-list d'Hondt PR: 21 seats in 1979, 26 in 1983, 25 in 1984, 27 in 1987 and 1991, 31 since 1995. The 1979 law elected 18 constituency members plus up to 3 supplementary seats; Statbank prints three districts (Syd, Midt, Disko) and the outlying municipalities for 1979-1995 and one constituency from 1999. Each early election was called by its own act (most recently Inatsisartutlov nr. 15 af 4. februar 2025).",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "name_pattern": "^Parliament of Greenland$|Inatsisartut|Landsting",
+          "iso_pattern": "GL"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "called": true,
+          "administered_by": "Valgnævnet (Naalakkersuisut), with municipal valgbestyrelser",
+          "source": "l14-2020",
+          "locator": "https://nalunaarutit.gl/Groenlandsk-lovgivning/2020/L-14-2020 (§ 6: \"Medlemmer af Inatsisartut vælges for 4 år\")",
+          "valid_from": "1979-05-01"
+        }
+      ],
+      "access": [
+        {
+          "platform": "valg.gl",
+          "url": "https://www.valg.gl/resultater",
+          "format": "html",
+          "access": "browser",
+          "checked_at": "2026-11-16",
+          "finest": "gl.afstemningssted",
+          "source": "valg-gl",
+          "first_date": "2005-11-15",
+          "last_date": "2025-03-11",
+          "evidence": "Landstingsvalg 2005-2018 and Inatsisartutvalg 2021 and 2025 in the election dropdown; tables render only in a browser session"
+        },
+        {
+          "platform": "Statbank Greenland",
+          "url": "https://bank.stat.gl/pxweb/en/Greenland/Greenland__SA__SA99__SA30/SAXLANST.px/",
+          "format": "px",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "1979-04-04",
+          "last_date": "2021-04-06",
+          "finest": "gl.kommune",
+          "source": "statbank",
+          "evidence": "Party votes, blank, invalid, counted and electorate for 14 elections by municipality"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1979-04-04",
+          "seats": 21,
+          "source": "sa2010",
+          "quote": "Oversigt 2, Fordeling af mandater ved valg til Inatsisartut/Landstinget, 1979: Mandater i alt 21",
+          "note": "The first Landsting: 18 members in constituencies and up to 3 supplementary seats (lov nr. 56 af 21. februar 1979, § 5)."
+        },
+        {
+          "date": "1983-04-12",
+          "seats": 26,
+          "source": "sa2010",
+          "quote": "Oversigt 2, Fordeling af mandater ved valg til Inatsisartut/Landstinget, 1983: Mandater i alt 26"
+        },
+        {
+          "date": "1984-06-06",
+          "seats": 25,
+          "source": "sa2010",
+          "quote": "Oversigt 2, Fordeling af mandater ved valg til Inatsisartut/Landstinget, 1984: Mandater i alt 25"
+        },
+        {
+          "date": "1987-05-26",
+          "seats": 27,
+          "source": "sa2010",
+          "quote": "Oversigt 2, Fordeling af mandater ved valg til Inatsisartut/Landstinget, 1987: Mandater i alt 27"
+        },
+        {
+          "date": "1991-03-05",
+          "seats": 27,
+          "source": "sa2010",
+          "quote": "Oversigt 2, Fordeling af mandater ved valg til Inatsisartut/Landstinget, 1991: Mandater i alt 27"
+        },
+        {
+          "date": "1995-03-04",
+          "seats": 31,
+          "source": "sa2010",
+          "quote": "Oversigt 2, Fordeling af mandater ved valg til Inatsisartut/Landstinget, 1995: Mandater i alt 31"
+        },
+        {
+          "date": "1999-02-16",
+          "seats": 31,
+          "source": "sa2010",
+          "quote": "Oversigt 2, Fordeling af mandater ved valg til Inatsisartut/Landstinget, 1999: Mandater i alt 31"
+        },
+        {
+          "date": "2002-12-03",
+          "seats": 31,
+          "source": "sa2010",
+          "quote": "Oversigt 2, Fordeling af mandater ved valg til Inatsisartut/Landstinget, 2002: Mandater i alt 31"
+        },
+        {
+          "date": "2005-11-15",
+          "seats": 31,
+          "source": "sa2010",
+          "quote": "Oversigt 2, Fordeling af mandater ved valg til Inatsisartut/Landstinget, 2005: Mandater i alt 31",
+          "note": "Statbank (SAXLANST) dates this election 15 November 2005."
+        },
+        {
+          "date": "2009-06-02",
+          "seats": 31,
+          "source": "sa2010",
+          "quote": "Oversigt 2, Fordeling af mandater ved valg til Inatsisartut/Landstinget, 2009: Mandater i alt 31"
+        },
+        {
+          "date": "2013-03-12",
+          "source": "statbank",
+          "quote": "SAXLANST, time: 2013-03-12"
+        },
+        {
+          "date": "2014-11-28",
+          "source": "statbank",
+          "quote": "SAXLANST, time: 2014-11-28"
+        },
+        {
+          "date": "2018-04-24",
+          "source": "statbank",
+          "quote": "SAXLANST, time: 2018-04-24"
+        },
+        {
+          "date": "2021-04-06",
+          "source": "l14-2020",
+          "quote": "§ 5: \"Inatsisartut består af 31 medlemmer. Stk. 2. Grønland udgør 1 valgkreds.\"",
+          "contests": 1,
+          "seats": 31
+        },
+        {
+          "date": "2025-03-11",
+          "contests": 1,
+          "seats": 31,
+          "source": "l15-2025",
+          "quote": "§ 1: \"Der afholdes valg til Inatsisartut den 11. marts 2025.\"",
+          "note": "Seats and the single constituency from Inatsisartutlov nr. 14 af 24. november 2020, § 5."
+        }
+      ],
+      "est_votes": 400000,
+      "effort": 2
+    },
+    {
+      "key": "folketing",
+      "tier": "national",
+      "name": "Folketingsvalg i Grønland",
+      "name_en": "Greenland's two seats in the Danish Folketing",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "fine": [
+          "gl.kommune",
+          "gl.afstemningssted"
+        ]
+      },
+      "finest_note": "valg.gl prints votes by polling place from 2007; Statbank prints party votes by municipality from 1984; Statistics Denmark's publications print Greenland's votes by district for 1953-1981.",
+      "source": "lbk1167-2023",
+      "locator": "https://www.retsinformation.dk/eli/lta/2023/1167 (§ 1: two members; § 7: Greenland one area)",
+      "valid_from": "1953-06-05",
+      "first_held": "1953-08-25",
+      "earliest_record": "1953-08-25",
+      "note": "West Greenland elected one member in each of two districts from 1953 (North and East Greenland outside the system at first); one two-member area from 1975, allocated by dividing each list's votes by 1 and 2. A district with no more candidates than seats held no vote.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "name_pattern": "Folketing",
+          "iso_pattern": "GL"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "called": true,
+          "administered_by": "Rigsombudsmanden i Grønland",
+          "source": "lbk1167-2023",
+          "locator": "https://www.retsinformation.dk/eli/lta/2023/1167 (§ 1 stk. 2: four-year term; the election is led by the Rigsombudsmand)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "valg.gl",
+          "url": "https://www.valg.gl/resultater",
+          "format": "html",
+          "access": "browser",
+          "checked_at": "2026-11-16",
+          "finest": "gl.afstemningssted",
+          "source": "valg-gl",
+          "first_date": "2007-11-13",
+          "last_date": "2026-03-24",
+          "evidence": "Folketingsvalg 2007-2026 in the election dropdown"
+        },
+        {
+          "platform": "Statbank Greenland",
+          "url": "https://bank.stat.gl/pxweb/en/Greenland/Greenland__SA__SA99__SA30/SAXFOLK.px/",
+          "format": "px",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "1984-01-10",
+          "last_date": "2022-11-01",
+          "finest": "gl.kommune",
+          "source": "statbank",
+          "evidence": "Party votes, blank, counted and electorate for 13 elections by municipality"
+        },
+        {
+          "platform": "Statistics Denmark publications",
+          "url": "https://www.dst.dk/Site/Dst/Udgivelser/GetPubFile.aspx?id=20205&sid=valg1975",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "1953-08-25",
+          "last_date": "1975-01-09",
+          "source": "dst1975",
+          "evidence": "Table 43 lists Greenland's districts with electorate and votes; one scanned volume per election"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1953-08-25",
+          "contests": 2,
+          "seats": 2,
+          "source": "dst1953",
+          "quote": "\"Folketingsvalget i Grønland den 25. august 1953 ... Nord- og Østgrønland foreløbig holdes uden for valgordningen, medens Vestgrønland er inddelt i 2 valgkredse, som hver vælger 1 folketingsmedlem\""
+        },
+        {
+          "date": "1957-05-14",
+          "source": "dst1975",
+          "quote": "Table 43, election of 1957-05-14; the date also applies to the 1st and 2nd nomination districts in Greenland",
+          "note": "Greenland's first district voted on 2 July 1957 (Table 43)."
+        },
+        {
+          "date": "1960-11-15",
+          "source": "dst1975",
+          "quote": "Table 43, election of 1960-11-15; the date also applies to the 1st and 2nd nomination districts in Greenland"
+        },
+        {
+          "date": "1964-09-22",
+          "source": "dst1975",
+          "quote": "Table 43, election of 1964-09-22; the date also applies to the 1st and 2nd nomination districts in Greenland"
+        },
+        {
+          "date": "1966-11-22",
+          "source": "dst1975",
+          "quote": "Table 43, election of 1966-11-22; the date also applies to the 1st and 2nd nomination districts in Greenland",
+          "note": "Greenland's second district voted on 6 December 1966 (Table 43)."
+        },
+        {
+          "date": "1968-01-23",
+          "source": "dst1975",
+          "quote": "Table 43, election of 1968-01-23; the date also applies to the 1st and 2nd nomination districts in Greenland",
+          "note": "Greenland's first district voted on 29 February 1968 (Table 43)."
+        },
+        {
+          "date": "1971-09-21",
+          "source": "dst1975",
+          "quote": "Table 43, election of 1971-09-21; the date also applies to the 1st and 2nd nomination districts in Greenland"
+        },
+        {
+          "date": "1973-12-04",
+          "source": "dst1975",
+          "quote": "Table 43, election of 1973-12-04; the date also applies to the 1st and 2nd nomination districts in Greenland"
+        },
+        {
+          "date": "1975-01-09",
+          "contests": 1,
+          "seats": 2,
+          "source": "dst1975",
+          "quote": "\"Efter § 4 udgør Grønland nu ét opstillingsområde, der udpeger 2 folketingsmedlemmer, mens Grønland tidligere var opdelt i 2 opstillingskredse, der hver valgte 1\""
+        },
+        {
+          "date": "1977-02-15",
+          "source": "sa2010",
+          "quote": "Table 8.2, folketingsvalg 1977-02-15"
+        },
+        {
+          "date": "1979-10-23",
+          "source": "sa2010",
+          "quote": "Table 8.2, folketingsvalg 1979-10-23"
+        },
+        {
+          "date": "1981-12-08",
+          "source": "sa2010",
+          "quote": "Table 8.2, folketingsvalg 1981-12-08"
+        },
+        {
+          "date": "1984-01-10",
+          "source": "statbank",
+          "quote": "SAXFOLK, time: 1984-01-10"
+        },
+        {
+          "date": "1987-09-08",
+          "source": "statbank",
+          "quote": "SAXFOLK, time: 1987-09-08"
+        },
+        {
+          "date": "1988-05-10",
+          "source": "statbank",
+          "quote": "SAXFOLK, time: 1988-05-10"
+        },
+        {
+          "date": "1990-12-12",
+          "source": "statbank",
+          "quote": "SAXFOLK, time: 1990-12-12"
+        },
+        {
+          "date": "1994-09-21",
+          "source": "statbank",
+          "quote": "SAXFOLK, time: 1994-09-21"
+        },
+        {
+          "date": "1998-03-11",
+          "source": "statbank",
+          "quote": "SAXFOLK, time: 1998-03-11"
+        },
+        {
+          "date": "2001-11-20",
+          "source": "statbank",
+          "quote": "SAXFOLK, time: 2001-11-20"
+        },
+        {
+          "date": "2005-02-08",
+          "source": "statbank",
+          "quote": "SAXFOLK, time: 2005-02-08"
+        },
+        {
+          "date": "2007-11-13",
+          "source": "statbank",
+          "quote": "SAXFOLK, time: 2007-11-13"
+        },
+        {
+          "date": "2011-09-15",
+          "source": "statbank",
+          "quote": "SAXFOLK, time: 2011-09-15"
+        },
+        {
+          "date": "2015-06-18",
+          "source": "statbank",
+          "quote": "SAXFOLK, time: 2015-06-18"
+        },
+        {
+          "date": "2019-06-05",
+          "source": "statbank",
+          "quote": "SAXFOLK, time: 03-jun-19",
+          "note": "Statbank prints 3 June 2019; the Folketing election day was 5 June 2019, the date the valg.gl pipeline records."
+        },
+        {
+          "date": "2022-11-01",
+          "source": "lbk1167-2023",
+          "quote": "§ 1: \"I Grønland vælges to medlemmer til Folketinget\"; § 7: \"Grønland udgør ét valgområde\"",
+          "contests": 1,
+          "seats": 2
+        },
+        {
+          "date": "2026-03-24",
+          "note": "Listed on valg.gl as Folketingsvalg 2026; the day is the one the valg.gl pipeline records and is not quoted from a fetched official page."
+        }
+      ],
+      "est_votes": 450000,
+      "effort": 2
+    },
+    {
+      "key": "folkeafstemning",
+      "tier": "national",
+      "name": "Folkeafstemning",
+      "name_en": "Referendums held in Greenland",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "question"
+      },
+      "source": "git2026",
+      "locator": "https://stat.gl/publ/da/GF/2026/pdf/Gr%C3%B8nland%20i%20tal%202026.pdf (\"I 1979 stemte Grønland om hjemmestyre, og i 2008 om selvstyre. I 1982 stemte Grønland for at forlade EU.\")",
+      "first_held": "1979-01-01",
+      "note": "Greenland-wide votes on home rule (1979), leaving the European Community (1982) and self-government (2008). An independence agreement must be approved by a referendum in Greenland (Self-Government Act § 21), and the alcohol act allows local or national alcohol referendums. No Greenlandic referendum act exists. Danish realm referendums were held in Greenland in some years (the Folketing act for Greenland was amended for referendums in 1993) but not in 1992 (Maastricht, by a special act) or 2022 (defence opt-out, § 3 of lov nr. 578).",
+      "disposition": "blocked",
+      "disposition_reason": "No official result for the 1979, 1982 or 2008 votes is online: valg.gl lists no referendum, Statbank has no referendum table, and the Statistical Yearbooks give only the years. The results sit in the Landsting/Inatsisartut records and the Danish government's announcements of each vote, which are not published as files.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "iso_pattern": "GL"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1979-01-01",
+          "precision": "year",
+          "note": "Home rule"
+        },
+        {
+          "date": "1982-01-01",
+          "precision": "year",
+          "note": "Membership of the European Community"
+        },
+        {
+          "date": "2008-01-01",
+          "precision": "year",
+          "note": "Self-government"
+        }
+      ],
+      "est_votes": 70000,
+      "effort": 3
+    },
+    {
+      "key": "ep",
+      "tier": "national",
+      "name": "Valg til Europa-Parlamentet i Grønland",
+      "name_en": "European Parliament, Greenland constituency",
+      "category": "legislature",
+      "goal": "ep",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "git2026",
+      "locator": "https://stat.gl/publ/da/GF/2026/pdf/Gr%C3%B8nland%20i%20tal%202026.pdf (\"Danmark medlem af EU i 1973. Efter en folkeafstemning i 1982 ...\")",
+      "valid_from": "1979-01-01",
+      "valid_to": "1985-02-01",
+      "note": "Greenland formed its own one-seat constituency within Denmark at the direct elections of 1979 and 1984 and left the Community on 1 February 1985.",
+      "disposition": "blocked",
+      "disposition_reason": "No official source online gives Greenland's European Parliament votes: Statistics Denmark's results tables start after 1985 and its scanned 1979 and 1984 volumes were not found; neither valg.gl nor Statbank covers them.",
+      "match": [
+        {
+          "name_pattern": "European Parliament",
+          "iso_pattern": "GL"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1979-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1984-01-01",
+          "precision": "year"
+        }
+      ],
+      "est_votes": 25000,
+      "effort": 4
+    },
+    {
+      "key": "landsraad",
+      "tier": "national",
+      "name": "Grønlands Landsråd",
+      "name_en": "Greenland Provincial Council (Landsråd), 1951-1979",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "constituency"
+      },
+      "source": "landsraad",
+      "locator": "https://inatsisartut.gl/media/elklpgit/d-inatsisartut-website-inatsisartutgl-media-10680-201109-brochure-etablering-af-landsraadet-for-100-aar-siden-a4-dk.pdf (\"befolkningen den 29. juni 1951 for første gang fik mulighed for at stemme\")",
+      "valid_from": "1950-01-01",
+      "valid_to": "1979-05-01",
+      "first_held": "1951-06-29",
+      "note": "One Landsråd for all Greenland, elected by men and women over 23 for four-year terms (1951-55 to 1975-79) in single-member constituencies; replaced by the Landsting under home rule on 1 May 1979.",
+      "disposition": "blocked",
+      "disposition_reason": "No official results publication of the Landsråd elections is online; the votes would have to be taken from scanned Danish government reports or the Landsråd's printed proceedings, neither of which is published as a file.",
+      "match": [
+        {
+          "name_pattern": "Landsr[aå]d",
+          "iso_pattern": "GL",
+          "valid_from": "1950-01-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1951-06-29",
+          "source": "landsraad",
+          "quote": "\"den 29. juni 1951 for første gang fik mulighed for at stemme\""
+        },
+        {
+          "date": "1955-01-01",
+          "precision": "year",
+          "source": "landsraad",
+          "quote": "Term list: 1955-1959"
+        },
+        {
+          "date": "1959-01-01",
+          "precision": "year",
+          "source": "landsraad",
+          "quote": "Term list: 1959-1963"
+        },
+        {
+          "date": "1963-01-01",
+          "precision": "year",
+          "source": "landsraad",
+          "quote": "Term list: 1963-1967"
+        },
+        {
+          "date": "1967-01-01",
+          "precision": "year",
+          "source": "landsraad",
+          "quote": "Term list: 1967-1971"
+        },
+        {
+          "date": "1971-01-01",
+          "precision": "year",
+          "source": "landsraad",
+          "quote": "Term list: 1971-1975"
+        },
+        {
+          "date": "1975-01-01",
+          "precision": "year",
+          "source": "landsraad",
+          "quote": "Term list: 1975-1979"
+        }
+      ],
+      "est_votes": 80000,
+      "effort": 4
+    },
+    {
+      "key": "landsraad_provins",
+      "tier": "national",
+      "name": "Landsrådene for Nord- og Sydgrønland",
+      "name_en": "Provincial councils of North and South Greenland, 1911-1950",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "constituency"
+      },
+      "source": "landsraad",
+      "locator": "https://inatsisartut.gl/media/elklpgit/d-inatsisartut-website-inatsisartutgl-media-10680-201109-brochure-etablering-af-landsraadet-for-100-aar-siden-a4-dk.pdf (members elected for six years by the members of the municipal councils; \"Antallet af medlemmer måtte ikke overstige tolv\")",
+      "valid_from": "1911-01-01",
+      "valid_to": "1950-01-01",
+      "first_held": "1911-01-01",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Members were chosen by the members of the Greenlandic municipal councils, not by voters.",
+      "match": [
+        {
+          "name_pattern": "Landsr[aå]d",
+          "iso_pattern": "GL",
+          "valid_to": "1950-01-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1911-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1917-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1923-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1927-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1933-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1939-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1945-01-01",
+          "precision": "year"
+        }
+      ]
+    },
+    {
+      "key": "naalakkersuisut_siulittaasuat",
+      "tier": "national",
+      "name": "Naalakkersuisut siulittaasuat",
+      "name_en": "Premier and Naalakkersuisut, chosen by Inatsisartut",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "lbk15-2023",
+      "locator": "https://nalunaarutit.gl/Groenlandsk-lovgivning/2023/Selvstyrets-lovbekendtgoerelse-nr-15-af-04_04_2023 (§ 22: Naalakkersuisut is elected by Inatsisartut)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Inatsisartut elects the premier and the government; no popular vote.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "head_of_government"
+          ],
+          "iso_pattern": "GL"
+        }
+      ]
+    },
+    {
+      "key": "kandidatopstilling",
+      "tier": "national",
+      "name": "Kandidatopstilling",
+      "name_en": "Party candidate selection",
+      "category": "nominating",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "l14-2020",
+      "locator": "https://nalunaarutit.gl/Groenlandsk-lovgivning/2020/L-14-2020 (candidate lists are filed by parties and by independent candidates with supporters' signatures)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Parties pick their candidates internally; the state runs no primaries.",
+      "match": [
+        {
+          "election_kinds": [
+            "primary",
+            "caucus"
+          ],
+          "iso_pattern": "GL"
+        }
+      ]
+    },
+    {
+      "key": "kommunalbestyrelse",
+      "tier": "kommune",
+      "name": "Kommunalbestyrelsesvalg",
+      "name_en": "Municipal councils",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity",
+        "schemes": [
+          "gl.kommune"
+        ],
+        "fine": [
+          "gl.afstemningssted"
+        ]
+      },
+      "finest_note": "valg.gl prints party and candidate votes by polling place from 2005; Statbank prints party votes by municipality for 1979-2021.",
+      "source": "l27-2016",
+      "locator": "https://nalunaarutit.gl/Groenlandsk-lovgivning/2016/L-27-2016 (each municipality one constituency, four-year term, election on the first Tuesday of April, d'Hondt)",
+      "first_held": "1979-04-04",
+      "earliest_record": "1979-04-04",
+      "note": "Open-list d'Hondt PR in each municipality: 18 councils with 168 seats in 2005, 4 with 72 in 2008 and 70 in 2013, 5 since 2018 (15 members in Kujalleq, Qeqqata and Qeqertalik, 17 in Avannaata and 19 in Sermersooq under § 3 of the 2017 act, each able to reduce to an odd number). Statbank's series starts in 1979; municipal councils were elected before home rule, and those elections are not listed here.",
+      "match": [
+        {
+          "election_kinds": [
+            "local"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "iso_pattern": "GL"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 1,
+          "month": 4,
+          "day_rule": "apr_first_tuesday",
+          "term_years": 4,
+          "called": false,
+          "administered_by": "Municipal valgbestyrelser",
+          "source": "l27-2016",
+          "locator": "https://nalunaarutit.gl/Groenlandsk-lovgivning/2016/L-27-2016 (\"Kommunalbestyrelsens medlemmer vælges for 4 år ... Valget afholdes den 1. tirsdag i april måned\")",
+          "valid_from": "2013-01-01"
+        }
+      ],
+      "access": [
+        {
+          "platform": "valg.gl",
+          "url": "https://www.valg.gl/resultater",
+          "format": "html",
+          "access": "browser",
+          "checked_at": "2026-11-16",
+          "finest": "gl.afstemningssted",
+          "source": "valg-gl",
+          "first_date": "2005-04-05",
+          "last_date": "2025-04-01",
+          "evidence": "Kommunevalg 2005, 2008, 2013, 2017, 2021 and 2025 in the election dropdown"
+        },
+        {
+          "platform": "Statbank Greenland",
+          "url": "https://bank.stat.gl/pxweb/en/Greenland/Greenland__SA__SA99__SA30/SAXKOMST.px/",
+          "format": "px",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "1979-04-04",
+          "last_date": "2021-04-06",
+          "finest": "gl.kommune",
+          "source": "statbank",
+          "evidence": "Party votes, blank, counted and electorate for 11 elections by municipality"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1979-04-04",
+          "source": "statbank",
+          "quote": "SAXKOMST, time: 1979-04-04"
+        },
+        {
+          "date": "1983-04-12",
+          "source": "statbank",
+          "quote": "SAXKOMST, time: 1983-04-12"
+        },
+        {
+          "date": "1989-04-04",
+          "source": "statbank",
+          "quote": "SAXKOMST, time: 1989-04-04"
+        },
+        {
+          "date": "1993-04-06",
+          "source": "statbank",
+          "quote": "SAXKOMST, time: 1993-04-06"
+        },
+        {
+          "date": "1997-04-08",
+          "source": "statbank",
+          "quote": "SAXKOMST, time: 1997-04-08"
+        },
+        {
+          "date": "2001-04-03",
+          "source": "statbank",
+          "quote": "SAXKOMST, time: 2001-04-03"
+        },
+        {
+          "date": "2005-04-05",
+          "contests": 18,
+          "seats": 168,
+          "source": "sa2010",
+          "quote": "\"Ved valget i 2005 var Grønland opdelt i 18 kommuner med 168 mandater i kommunalbestyrelserne\""
+        },
+        {
+          "date": "2008-04-08",
+          "contests": 4,
+          "seats": 72,
+          "source": "sa2010",
+          "quote": "\"Ved valget i 2008 havde Grønland fået 4 storkommuner med 72 mandater i kommunalbestyrelserne\"",
+          "note": "Elected the councils of the four municipalities that took over on 1 January 2009 (Landstingslov nr. 14 af 19. november 2007)."
+        },
+        {
+          "date": "2013-04-02",
+          "contests": 4,
+          "seats": 70,
+          "source": "sa2016-kommune",
+          "quote": "\"Ved valget i 2013 skulle der fordeles 70 mandater i de 4 kommunalbestyrelser\""
+        },
+        {
+          "date": "2017-04-04",
+          "source": "statbank",
+          "quote": "SAXKOMST, time: 04-apr-17",
+          "note": "Elected the four councils and the transition committees of Avannaata and Qeqertalik, which replaced Qaasuitsup Kommunia on 1 January 2018 (Inatsisartutlov nr. 30 af 28. november 2016)."
+        },
+        {
+          "date": "2021-04-06",
+          "contests": 5,
+          "source": "statbank",
+          "quote": "SAXKOMST, time: 06-apr-21; rows for the five municipalities Avannaata, Qeqertalik, Qeqqata, Sermersooq and Kujalleq"
+        },
+        {
+          "date": "2025-04-01",
+          "contests": 5,
+          "source": "valg-gl",
+          "quote": "\"5 valgkredse ved kommunevalg\""
+        }
+      ],
+      "est_votes": 280000,
+      "effort": 2
+    },
+    {
+      "key": "borgmester",
+      "tier": "kommune",
+      "name": "Borgmestervalg",
+      "name_en": "Mayors, chosen by the councils",
+      "category": "indirect",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "l29-2017",
+      "locator": "https://nalunaarutit.gl/Groenlandsk-lovgivning/2017/L-29-2017 (\"På det konstituerende møde vælger kommunalbestyrelsen indledningsvis borgmesteren blandt sine medlemmer\")",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Each council elects its mayor from among its members; no popular vote.",
+      "match": [
+        {
+          "office_kinds": [
+            "mayor"
+          ],
+          "iso_pattern": "GL"
+        }
+      ]
+    },
+    {
+      "key": "domsmaend",
+      "tier": "kommune",
+      "name": "Domsmænd",
+      "name_en": "Lay judges, chosen by councils",
+      "category": "judicial",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "lbk1007-2025",
+      "locator": "https://www.retsinformation.dk/eli/lta/2025/1007 (§ 35: district-court lay judges are chosen by the municipal council, those of the Court of Greenland and the High Court by the Landsting; judges are appointed)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Lay judges are chosen by the municipal councils and by Inatsisartut and judges are appointed; voters elect no judicial office."
+    },
+    {
+      "key": "bygdebestyrelse",
+      "tier": "bygd",
+      "name": "Bygdebestyrelsesvalg",
+      "name_en": "Settlement councils (joint settlement councils)",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "constituency"
+      },
+      "source": "l27-2016",
+      "locator": "https://nalunaarutit.gl/Groenlandsk-lovgivning/2016/L-27-2016 (\"Der vælges fælles bygdebestyrelser. En fælles bygdebestyrelse skal omfatte mindst 2 bygder inden for samme kommune\"; four-year term)",
+      "first_held": "2009-04-01",
+      "note": "Joint councils of 3 or 5 members for groups of settlements, elected in April of the municipal election year; each council decides the grouping and the number of members. 26 constituencies in 2009. Settlement councils existed before the 2009 reform, when several were merged.",
+      "disposition": "blocked",
+      "disposition_reason": "No published results: valg.gl's election list has no settlement-council election, Statbank has no table, and the Statistical Yearbook gives only the date of the 2013 vote. Results are declared by each municipality's valgbestyrelse and not published centrally.",
+      "match": [
+        {
+          "body_kinds": [
+            "council"
+          ],
+          "name_pattern": "bygd|settlement",
+          "iso_pattern": "GL"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 1,
+          "month": 4,
+          "day_rule": "apr_first_tuesday",
+          "term_years": 4,
+          "called": false,
+          "administered_by": "Municipal valgbestyrelser",
+          "source": "l27-2016",
+          "locator": "https://nalunaarutit.gl/Groenlandsk-lovgivning/2016/L-27-2016 (\"Bygdebestyrelsen vælges for 4 år\")",
+          "valid_from": "2013-01-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2009-04-01",
+          "precision": "month",
+          "contests": 26,
+          "source": "bkg4-2009",
+          "quote": "\"Hjemmestyrets bekendtgørelse om valg til fælles bygdebestyrelser i april 2009\"; § 1 lists 26 valgkredse"
+        },
+        {
+          "date": "2013-04-02",
+          "source": "sa2016-bygd",
+          "quote": "\"Der var valg til bygdebestyrelserne den 2. april 2013\""
+        },
+        {
+          "date": "2017-04-04"
+        },
+        {
+          "date": "2021-04-06"
+        },
+        {
+          "date": "2025-04-01"
+        }
+      ],
+      "est_votes": 20000,
+      "effort": 5
+    },
+    {
+      "key": "lokaludvalg",
+      "tier": "by",
+      "name": "Lokaludvalg",
+      "name_en": "Town local committees",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "l29-2017",
+      "locator": "https://nalunaarutit.gl/Groenlandsk-lovgivning/2017/L-29-2017 (\"Kommunalbestyrelsen nedsætter et lokaludvalg i hver by\"; \"Kommunalbestyrelsen fastsætter regler for valg til lokaludvalgene\")",
+      "disposition": "blocked",
+      "disposition_reason": "Each municipality sets its own rules for electing the committees, which may be left unelected when no one stands; no results are published centrally or by the election authority.",
+      "match": [
+        {
+          "body_kinds": [
+            "council"
+          ],
+          "name_pattern": "lokaludvalg|local committee",
+          "iso_pattern": "GL"
+        }
+      ],
+      "est_votes": 10000,
+      "effort": 5
+    },
+    {
+      "key": "menighedsrepraesentation",
+      "tier": "menighed",
+      "name": "Valg til menighedsrepræsentationer",
+      "name_en": "Parish councils of the Church of Greenland",
+      "category": "special_purpose",
+      "goal": "local",
+      "measure": {
+        "unit": "constituency"
+      },
+      "source": "l27-2016",
+      "locator": "https://nalunaarutit.gl/Groenlandsk-lovgivning/2016/L-27-2016 (\"Valg til menighedsrepræsentationen finder sted samtidig med valg til kommunalbestyrelsen\"; \"Menighedsrepræsentanterne vælges for 4 år\")",
+      "note": "Members of the Church of Greenland vote, on the municipal election day; uncontested councils are elected without a vote. 66 constituencies with 259 members in 2025.",
+      "disposition": "blocked",
+      "disposition_reason": "No published results: neither valg.gl nor Statbank covers parish council elections, and each valgbestyrelse declares its own.",
+      "match": [
+        {
+          "body_kinds": [
+            "council"
+          ],
+          "name_pattern": "menighed|parish",
+          "iso_pattern": "GL"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 1,
+          "month": 4,
+          "day_rule": "apr_first_tuesday",
+          "term_years": 4,
+          "called": false,
+          "administered_by": "Municipal valgbestyrelser",
+          "source": "l27-2016",
+          "locator": "https://nalunaarutit.gl/Groenlandsk-lovgivning/2016/L-27-2016"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2025-04-01",
+          "contests": 66,
+          "seats": 259,
+          "source": "bkg18-2025",
+          "quote": "Bilag 1: \"Valgkredse, hvor der skal vælges menighedsrepræsentationer i Grønland til valget den 1. april 2025\" (66 valgkredse, 259 members)"
+        }
+      ],
+      "est_votes": 15000,
+      "effort": 5
+    },
+    {
+      "key": "borgerbestyrelse",
+      "tier": "udenfor",
+      "name": "Valg til borgerbestyrelser",
+      "name_en": "Citizen boards outside the municipalities",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "l10-2021",
+      "locator": "https://nalunaarutit.gl/Groenlandsk-lovgivning/2021/L-10-2021 (\"Der vælges til en borgerbestyrelse 3 eller 5 medlemmer ... vælges for 4 år ... Valget afholdes den 1. tirsdag i maj måned. Næste valg finder sted i 2025.\")",
+      "note": "Boards of 3 or 5 members for areas outside the municipal division, such as Pituffik.",
+      "disposition": "blocked",
+      "disposition_reason": "No published results; valg.gl and Statbank do not cover these boards.",
+      "match": [
+        {
+          "body_kinds": [
+            "council"
+          ],
+          "name_pattern": "borgerbestyrelse|citizen",
+          "iso_pattern": "GL"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 1,
+          "month": 5,
+          "day_rule": "may_first_tuesday",
+          "term_years": 4,
+          "called": false,
+          "administered_by": "Naalakkersuisut",
+          "source": "l10-2021",
+          "locator": "https://nalunaarutit.gl/Groenlandsk-lovgivning/2021/L-10-2021"
+        }
+      ],
+      "est_votes": 300,
+      "effort": 5
+    }
+  ]
+}
