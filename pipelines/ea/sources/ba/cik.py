@@ -48,7 +48,7 @@ class Results:
 
 RESULTS = [
     Results(13, date(2016, 10, 2), "2016-10-02", "local", "2016 Bosnian local elections"),
-    Results(14, date(2017, 1, 22), "2017-01-22", "by_election", "2017 Stolac repeat local election"),
+    Results(14, date(2017, 2, 19), "2017-02-19", "by_election", "2017 Stolac repeat local election"),
     Results(15, date(2017, 9, 24), "2017-09-24", "by_election", "2017 Trnovo mayoral by-election"),
     Results(17, date(2017, 12, 17), "2017-12-17", "by_election", "2017 Glamoč mayoral by-election"),
     Results(25, date(2018, 10, 7), "2018-10-07", "general", "2018 Bosnian general election"),
@@ -59,13 +59,15 @@ RESULTS = [
     Results(30, date(2021, 4, 11), "2021-04-11", "by_election", "2021 Travnik and Foča mayoral by-elections"),
     Results(31, date(2021, 12, 12), "2021-12-12", "by_election", "2021 Prijedor mayoral by-election"),
     Results(32, date(2022, 10, 2), "2022-10-02", "general", "2022 Bosnian general election"),
-    Results(33, date(2023, 2, 26), "2023-02-26", "by_election", "2023 mayoral by-elections"),
-    Results(34, date(2023, 6, 4), "2023-06-04", "by_election", "2023 Živinice mayoral by-election"),
+    Results(33, date(2023, 2, 5), "2023-02-05", "by_election", "2023 mayoral by-elections"),
+    Results(34, date(2023, 5, 28), "2023-05-28", "by_election", "2023 Živinice mayoral by-election"),
     Results(35, date(2023, 11, 5), "2023-11-05", "by_election", "2023 Stari Grad Sarajevo mayoral by-election"),
     Results(36, date(2024, 10, 6), "2024-10-06", "local", "2024 Bosnian local elections"),
     Results(39, date(2025, 11, 23), "2025-11-23", "by_election", "2025 Republika Srpska presidential election"),
     Results(41, date(2026, 2, 15), "2026-02-15", "by_election", "2026 Vareš mayoral by-election"),
 ]
+MOSTAR = "199"
+MOSTAR_UNITS = {code: MOSTAR for code in ("151", "152", "153", "154", "155", "156")}  # the city's electoral areas
 CANDIDATE_RACES = {"1", "5", "8"}  # races whose ballots name candidates; the others are party lists
 SLASHED = {"2", "8", "9"}  # races whose basic-info endpoints the application calls with a trailing slash
 
@@ -325,7 +327,9 @@ def _options(rows: Any, *, candidates: bool) -> list[Option]:
     for row in _list(rows):
         channels = {code: int(row[field]) for field, code, _ in CHANNELS if row.get(field)}
         seats = row.get("regularMandates")
-        if seats is None:
+        if seats is not None:
+            seats += row.get("compensationMandates") or 0
+        else:
             seats = row.get("mandates") if row.get("mandates") is not None else row.get("totalMandates")
         out.append(
             Option(
@@ -342,13 +346,19 @@ def _options(rows: Any, *, candidates: bool) -> list[Option]:
 
 def _stations(t: Tree, units: list[dict[str, Any]]) -> list[tuple[int, str, str]]:
     return [
-        (s["pollingStationId"], str(s["code"]).strip(), str(u["code"]).strip())
+        (
+            s["pollingStationId"],
+            str(s["code"]).strip(),
+            MOSTAR_UNITS.get(str(u["code"]).strip(), str(u["code"]).strip()),
+        )
         for u in units
         for s in t.stations.get(u["electoralUnitId"], [])
     ]
 
 
 def _munis(units: list[dict[str, Any]]) -> list[tuple[str, str]]:
+    if any(str(u["code"]).strip() in MOSTAR_UNITS or str(u["code"]).strip() == MOSTAR for u in units):
+        return [(MOSTAR, "MOSTAR")]
     return [(str(u["code"]).strip(), label(u)) for u in units]
 
 
@@ -391,7 +401,7 @@ def contests(r: Results) -> list[Contest]:
                     maybe(race_info_url(db, race)) or {},
                     _stations(t, units),
                     _munis(units),
-                    magnitude=1,
+                    magnitude=max(1, sum(o.elected for o in options)),
                 )
             )
         elif race in {"8", "9"}:
@@ -403,7 +413,9 @@ def contests(r: Results) -> list[Contest]:
                         race,
                         f"{race}:{i}",
                         label(u),
-                        ("ba.municipality", str(u["code"]).strip()),
+                        ("ba.constituency", f"9:{u['code']}".strip())
+                        if str(u["code"]).strip() in MOSTAR_UNITS
+                        else ("ba.municipality", str(u["code"]).strip()),
                         options,
                         maybe(unit_info_url(db, race, i)) or {},
                         _stations(t, [u]),
@@ -435,7 +447,6 @@ def contests(r: Results) -> list[Contest]:
 def compensation(db: str, race: str, t: Tree) -> list[Contest]:
     """The compensation seats a race allocates over a whole entity, as contests counted at the entity level."""
     if race == "2":
-        rows = _options(maybe(race_extra_urls(db, race)[0]), candidates=False)
         files = {e["entityId"]: maybe(entity_votes_url(db, race, e["entityId"])) for e in t.entities}
         out = []
         for entity, file in files.items():
@@ -456,7 +467,6 @@ def compensation(db: str, race: str, t: Tree) -> list[Contest]:
                         compensation=True,
                     )
                 )
-        del rows
         return out
     return []
 
@@ -573,7 +583,8 @@ def geo() -> Package:
     for r in RESULTS:
         for c in everything()[r.id]:
             for code, text in c.municipalities:
-                names[code] = text
+                if c.race in {"1", "2"} or code not in names:
+                    names[code] = text
             if c.district and c.district[0] == "ba.constituency":
                 districts[c.district[1]] = (c.name, c.race)
     for code, text in sorted(names.items()):
@@ -587,8 +598,12 @@ def geo() -> Package:
         id = area("ba.constituency", code)
         p.add("area", id=id, scheme_code="ba.constituency")
         p.add("area_code", area_id=id, code=code)
-        entity = {"4": 1, "6": 2, "7": 1}.get(race) or (1 if text.endswith("A") else 2)
-        p.add("area_parent", area_id=id, parent_id=area("ba.entity", str(entity)))
+        if race == "9":
+            parent = area("ba.municipality", MOSTAR)
+        else:
+            entity = {"4": 1, "6": 2, "7": 1}.get(race) or (1 if text.endswith("A") else 2)
+            parent = area("ba.entity", str(entity))
+        p.add("area_parent", area_id=id, parent_id=parent)
         p.name(id, f"{title(text)} ({RACES[race][0]})", "en", "official")
         p.name(id, title(text), "bs", "native", False)
     return p
@@ -600,8 +615,15 @@ def body(race: str, district: str | None) -> str | None:
     if race == "7":
         return key("body", race, district)
     if race == "9":
-        return key("body", race, district)
+        return key("body", race, council(district))
     return None
+
+
+def council(district: str | None) -> str | None:
+    """The municipality whose council a race 9 district elects; Mostar's city areas elect part of its council."""
+    if district and district.startswith("9:"):
+        return MOSTAR
+    return district
 
 
 def office(race: str, district: str | None) -> str | None:
@@ -640,8 +662,9 @@ def registry() -> Package:
     cantons: dict[str, str] = {}
     for r in RESULTS:
         for c in everything()[r.id]:
-            if c.race in {"8", "9"} and c.district:
-                municipalities[c.district[1]] = c.name
+            if c.race in {"8", "9"}:
+                for code, text in c.municipalities:
+                    municipalities[code] = text
             if c.race == "7" and c.district:
                 cantons[c.district[1]] = c.name
     for race, kind in (("2", "lower_house"), ("4", "lower_house"), ("6", "unicameral")):
@@ -738,6 +761,8 @@ def contest_name(r: Results, c: Contest) -> tuple[str, str]:
         return f"{en}, compensation seats in the {ENTITY_NAMES[int(c.key[3:])]}", f"{bs}, kompenzacijski mandati"
     if c.race == "8":
         return f"Mayor of {place}", f"{bs} {place}"
+    if c.race == "9" and c.district and council(c.district[1]) == MOSTAR:
+        return f"Mostar City Council, {place}", f"Gradsko vijeće Grada Mostara, {place}"
     if c.race == "9":
         return f"Municipal council of {place}", f"{bs} {place}"
     if c.race == "7":
@@ -829,7 +854,7 @@ def election(r: Results, report: Report) -> Package:
                 raise ValueError(f"{r.slug} {c.key}: {o.label} is listed twice")
             options[o.label] = option
             if c.race in CANDIDATE_RACES:
-                name, party_name = candidate(o.label)
+                name, _ = candidate(o.label)
                 p.add(
                     "contest_option",
                     id=option,
@@ -854,7 +879,6 @@ def election(r: Results, report: Report) -> Package:
                 )
                 if o.elected:
                     p.add("outcome", result_set_id=result_set, option_id=option, kind="elected")
-                del party_name
             else:
                 p.add(
                     "contest_option",
