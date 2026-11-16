@@ -1,0 +1,1201 @@
+{
+  "polity": "CD",
+  "name": "Congo - Kinshasa",
+  "create": {
+    "kind": "sovereign_state",
+    "names": [
+      {
+        "text": "Congo - Kinshasa",
+        "lang": "en",
+        "kind": "official"
+      },
+      {
+        "text": "République démocratique du Congo",
+        "lang": "fr",
+        "kind": "native"
+      }
+    ],
+    "slug": "cd",
+    "wikidata": "Q974",
+    "source": "constitution"
+  },
+  "sources": {
+    "constitution": {
+      "title": "Constitution de la République Démocratique du Congo du 18 février 2006 (Journal officiel, numéro spécial)",
+      "publisher": "Présidence de la République",
+      "url": "https://presidence.cd/uploads/files/Constitution%20de%20la%203me%20Republique.%2018%20Fev%202006.pdf",
+      "kind": "official_body"
+    },
+    "constitution-1964": {
+      "title": "Constitution de la République Démocratique du Congo du 1er août 1964 (Moniteur congolais, numéro spécial)",
+      "publisher": "Présidence de la République",
+      "url": "https://www.presidence.cd/uploads/files/Constitution%201er%20Aout%201964.pdf",
+      "kind": "official_body"
+    },
+    "constitution-1967": {
+      "title": "Constitution et lois constitutionnelles de la Deuxième République, 24 juin 1967 (Moniteur congolais n°14 du 15 juillet 1967)",
+      "publisher": "Présidence de la République",
+      "url": "https://presidence.cd/uploads/files/Constitution%20et%20lois%20constitutionnelles%20de%20la%202me%20Republique%2024%20Juin%201967.pdf.pdf",
+      "kind": "official_body"
+    },
+    "loi-2017": {
+      "title": "Loi n°06/006 du 9 mars 2006 portant organisation des élections présidentielle, législatives, provinciales, urbaines, municipales et locales, textes coordonnés au 24 décembre 2017 (Journal officiel, numéro spécial du 30 décembre 2017)",
+      "publisher": "Commission électorale nationale indépendante",
+      "url": "https://www.ceni.cd/sites/default/files/2023-06/Loi%20%C3%A9lectorale%20textes%20coordonn%C3%A9s%202017.pdf",
+      "kind": "official_body"
+    },
+    "loi-2022": {
+      "title": "Loi n°22/029 du 29 juin 2022 modifiant et complétant la loi n°06/006 du 9 mars 2006 portant organisation des élections",
+      "publisher": "Commission électorale nationale indépendante",
+      "url": "https://www.ceni.cd/sites/default/files/2023-06/LOI%20ELECTORALE%20N%C2%B022-029%20DU%2029%20JUIN%202022%20%281%29.PDF",
+      "kind": "official_body"
+    },
+    "loi-23-025": {
+      "title": "Loi n°23/025 du 15 juin 2023 portant répartition des sièges par circonscription électorale pour les élections législatives, provinciales, municipales et locales (Journal officiel, numéro spécial du 24 juin 2023)",
+      "publisher": "Commission électorale nationale indépendante",
+      "url": "https://www.ceni.cd/sites/default/files/2023-10/J.O.%20n%C2%B0%20sp%C3%A9cial%20du%2024%20juin%202023_REPARTITION%20DES%20SIEGES.pdf",
+      "kind": "official_body"
+    },
+    "bosolo-2023": {
+      "title": "CENI, Résultats des élections combinées du 20 décembre 2023 (Bosolo results portal)",
+      "publisher": "Commission électorale nationale indépendante",
+      "url": "https://bosolo.ceni.cd/e20231220/bosolo/",
+      "kind": "official_body"
+    },
+    "bosolo-2024": {
+      "title": "CENI, Résultats des élections combinées du 15 décembre 2024 pour les circonscriptions de Masi-Manimba et de Yakoma",
+      "publisher": "Commission électorale nationale indépendante",
+      "url": "https://bosolo.ceni.cd/e20241215/bosolo/",
+      "kind": "official_body"
+    },
+    "ceni-masi-2024": {
+      "title": "CENI, La CENI rend publics les résultats provisoires des élections législatives à Masi-Manimba et Yakoma (21 décembre 2024)",
+      "publisher": "Commission électorale nationale indépendante",
+      "url": "https://www.ceni.cd/depeches/2024/12/21/la-ceni-rend-publics-les-resultats-provisoires-des-elections-legislatives-masi",
+      "kind": "official_body"
+    },
+    "ceni-calendrier": {
+      "title": "CENI, Calendrier électoral 2022-2027",
+      "publisher": "Commission électorale nationale indépendante",
+      "url": "https://www.ceni.cd/calendrier-electoral",
+      "kind": "official_body"
+    },
+    "ceni-cp-027-2024": {
+      "title": "CENI, Communiqué de presse n°027/CENI/2024 (élection des gouverneurs et vice-gouverneurs du 29 avril 2024)",
+      "publisher": "Commission électorale nationale indépendante",
+      "url": "https://www.ceni.cd/sites/default/files/2024-04/COMMUNIQUE%20DE%20PRESSE%20n%C2%B0%20027.pdf",
+      "kind": "official_body"
+    },
+    "ceni-cp-026-2024": {
+      "title": "CENI, Communiqué de presse n°026/CENI/2024 relatif au report des élections des sénateurs, gouverneurs et vice-gouverneurs dans la province de l'Équateur",
+      "publisher": "Commission électorale nationale indépendante",
+      "url": "https://www.ceni.cd/sites/default/files/2024-04/COMMUNIQUE%20DE%20PRESSE%20n%C2%B0%20026.pdf",
+      "kind": "official_body"
+    },
+    "ceni-cp-039-2024": {
+      "title": "CENI, Communiqué de presse n°039/CENI/2024 portant publication des résultats provisoires de l'élection des sénateurs du Maï-Ndombe et du Nord-Kivu (26 mai 2024)",
+      "publisher": "Commission électorale nationale indépendante",
+      "url": "https://www.ceni.cd/communique-de-presse/2024/05/27/communique-de-presse-ndeg-039ceni2024-portant-publication-des",
+      "kind": "official_body"
+    },
+    "ceni-cp-043-2024": {
+      "title": "CENI, Communiqué de presse n°043/CENI/2024 relatif à l'annulation de la reprise de l'élection des gouverneur et vice-gouverneur du Kongo-Central",
+      "publisher": "Commission électorale nationale indépendante",
+      "url": "https://www.ceni.cd/communique-de-presse/2024/06/02/communique-de-presse-ndeg-o43ceni2024-relatif-lannulation-de-la",
+      "kind": "official_body"
+    },
+    "ceni-cp-025-2024": {
+      "title": "CENI, Communiqué de presse n°025/CENI/2024 relatif à l'ouverture des bureaux de réception des candidatures aux élections des conseillers urbains, bourgmestres et bourgmestres adjoints",
+      "publisher": "Commission électorale nationale indépendante",
+      "url": "https://www.ceni.cd/communique-de-presse/2024/04/25/communique-de-presse-ndeg-025ceni2024-relatif-louverture-des",
+      "kind": "official_body"
+    },
+    "ceni-cp-004-2025": {
+      "title": "CENI, Communiqué de presse n°004/CENI/2025, calendrier des élections des sénateurs, gouverneurs et vice-gouverneurs du Kwilu et du Nord-Ubangi",
+      "publisher": "Commission électorale nationale indépendante",
+      "url": "https://www.ceni.cd/sites/default/files/2025-03/COMMUNIQUE%20DE%20PRESSE%20n%C2%B0%20004.pdf",
+      "kind": "official_body"
+    },
+    "ceni-cp-009-2026": {
+      "title": "CENI, Communiqué de presse n°009/CENI/2026 portant publication des résultats provisoires de l'élection du gouverneur et du vice-gouverneur du Sankuru",
+      "publisher": "Commission électorale nationale indépendante",
+      "url": "https://www.ceni.cd/communique-de-presse/2026/04/16/communique-de-presse-ndeg-009ceni2026-portant-publication-des",
+      "kind": "official_body"
+    },
+    "ceni-fecc-2025": {
+      "title": "CENI, Les femmes élues conseillères communales exhortent le gouvernement à financer la CENI pour organiser les élections des bourgmestres et leurs adjoints (3 juin 2025)",
+      "publisher": "Commission électorale nationale indépendante",
+      "url": "https://www.ceni.cd/depeches/2025/06/03/les-femmes-elues-conseilleres-communales-exhortent-le-gouvernement-financer-la",
+      "kind": "official_body"
+    },
+    "ceni-cc-2023": {
+      "title": "CENI, Décision n°120/CENI/AP/2023 du 16 novembre 2023 portant publication des listes définitives des candidatures à l'élection des conseillers communaux (annexe III, Kwango)",
+      "publisher": "Commission électorale nationale indépendante",
+      "url": "https://www.ceni.cd/sites/default/files/2023-11/CENI%20RDC%20-%20Listes%20Definitives%20Candidatures%20Conseillers%20Communaux%202023%20-%20KWANGO.pdf",
+      "kind": "official_body"
+    },
+    "kas-2013": {
+      "title": "Les élections dans l'histoire politique de la RDC (1957-2011)",
+      "publisher": "Konrad-Adenauer-Stiftung, Kinshasa",
+      "url": "https://www.kas.de/documents/275840/5293160/KAS_Les+%C3%A9lections+dans+l%27histoire+politique+de+la+RDC+1957-2011.pdf",
+      "kind": "academic",
+      "note": "Index for the pre-2006 calendar, citing Verhaegen (CRISP), Mutamba Makombo, and Mobutu's speeches; not a source of counts."
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "République démocratique du Congo",
+      "name_en": "Democratic Republic of the Congo",
+      "parent": null,
+      "polity_kind": "sovereign_state",
+      "scheme": "cd.nation",
+      "source": "constitution"
+    },
+    {
+      "key": "province",
+      "name": "Provinces et ville de Kinshasa",
+      "name_en": "Provinces and the city of Kinshasa",
+      "parent": "national",
+      "polity_kind": "region",
+      "scheme": "cd.province",
+      "source": "constitution",
+      "counts": [
+        {
+          "date": "2006-02-18",
+          "value": 26,
+          "source": "constitution",
+          "locator": "Article 2: la ville de Kinshasa et 25 provinces (installed on 30 June 2015 under the programming law of 2015; 11 provinces before)"
+        },
+        {
+          "date": "2023-06-15",
+          "value": 26,
+          "source": "loi-23-025",
+          "locator": "Annexe I, I.2: the 182 national-deputy circonscriptions listed under 26 provinces, Bas-Uélé to Tshuapa"
+        }
+      ]
+    },
+    {
+      "key": "territoire",
+      "name": "Territoires",
+      "name_en": "Territories (deconcentrated, not elected)",
+      "parent": "province",
+      "polity_kind": "county",
+      "elects": false,
+      "source": "loi-23-025",
+      "counts": [
+        {
+          "date": "2023-06-15",
+          "value": 145,
+          "source": "loi-23-025",
+          "locator": "Annexe I, I.2: 182 circonscriptions less the 33 'Ville de' circonscriptions and the 4 Kinshasa groupings"
+        }
+      ]
+    },
+    {
+      "key": "ville",
+      "name": "Villes",
+      "name_en": "Cities",
+      "parent": "province",
+      "polity_kind": "municipality",
+      "scheme": "cd.ville",
+      "source": "constitution",
+      "counts": [
+        {
+          "date": "2023-06-15",
+          "value": 33,
+          "source": "loi-23-025",
+          "locator": "Annexe I, I.2: 33 'Ville de' circonscriptions across the 25 provinces outside Kinshasa (Kinshasa is a city-province)"
+        }
+      ]
+    },
+    {
+      "key": "commune",
+      "name": "Communes",
+      "name_en": "Communes (urban communes in cities, rural communes in territories)",
+      "parent": "ville",
+      "polity_kind": "submunicipal",
+      "scheme": "cd.commune",
+      "source": "constitution"
+    },
+    {
+      "key": "secteur_chefferie",
+      "name": "Secteurs et chefferies",
+      "name_en": "Sectors and chiefdoms",
+      "parent": "territoire",
+      "polity_kind": "submunicipal",
+      "scheme": "cd.secteur_chefferie",
+      "source": "constitution"
+    }
+  ],
+  "classes": [
+    {
+      "key": "president",
+      "tier": "national",
+      "name": "Élection présidentielle",
+      "name_en": "President, direct",
+      "category": "executive",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "cd.nation"
+        ],
+        "fine": [
+          "cd.province",
+          "cd.circonscription",
+          "cd.bureau"
+        ]
+      },
+      "source": "loi-2017",
+      "locator": "https://www.ceni.cd/sites/default/files/2023-06/Loi%20%C3%A9lectorale%20textes%20coordonn%C3%A9s%202017.pdf (Articles 100, 101 and 114: territoire national, suffrage universel direct, majorité simple, mandat de cinq ans renouvelable une seule fois)",
+      "valid_from": "1970-01-01",
+      "first_held": "1970-10-31",
+      "earliest_record": "2006-07-30",
+      "note": "Two-round majority in 2006 (runoff 29 October 2006); single-round plurality since the constitutional revision of 20 January 2011 (Loi 11/002, Article 71) and Loi 11/003. The Mobutu-era elections of 1970, 1977, and 1984 were single-candidate yes/no plebiscites. In 2023 voting ran 20 December with extensions to 21 December and beyond in some areas, and diaspora voting in five pilot countries.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "CD",
+          "valid_from": "1970-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "Commission électorale nationale indépendante",
+          "source": "constitution",
+          "locator": "https://presidence.cd/uploads/files/Constitution%20de%20la%203me%20Republique.%2018%20Fev%202006.pdf (Article 70: élu au suffrage universel direct pour un mandat de cinq ans renouvelable une seule fois)",
+          "runoff": "none",
+          "valid_from": "2011-01-20"
+        },
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "Commission électorale nationale indépendante",
+          "source": "constitution",
+          "locator": "https://presidence.cd/uploads/files/Constitution%20de%20la%203me%20Republique.%2018%20Fev%202006.pdf (Article 71 (2006 text): majorité absolue, else a second round within fifteen days)",
+          "runoff": "majority",
+          "valid_from": "2006-02-18",
+          "valid_to": "2011-01-20"
+        }
+      ],
+      "access": [
+        {
+          "platform": "CENI Bosolo",
+          "url": "https://bosolo.ceni.cd/e20231220/bosolo/mapapi.php",
+          "format": "json",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "2023-12-20",
+          "last_date": "2023-12-20",
+          "finest": "cd.bureau",
+          "source": "bosolo-2023",
+          "evidence": "JSON endpoint behind the results map: national totals per candidate (mapapi.php?p=0), circonscriptions per province (?c=<province_id>), and votes by polling site and polling station (?sv=, ?value=&type=&circ=)"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1970-10-31",
+          "note": "Single candidate (Mobutu), yes/no; dated 31 October-1 November"
+        },
+        {
+          "date": "1977-12-02",
+          "note": "Single candidate, yes/no"
+        },
+        {
+          "date": "1984-07-29",
+          "note": "Single candidate, yes/no; dated 28-29 July in some accounts"
+        },
+        {
+          "date": "2006-07-30"
+        },
+        {
+          "date": "2006-10-29",
+          "election_kind": "runoff"
+        },
+        {
+          "date": "2011-11-28"
+        },
+        {
+          "date": "2018-12-30"
+        },
+        {
+          "date": "2023-12-20",
+          "contests": 1,
+          "source": "bosolo-2023",
+          "quote": "Résultats des élections combinées du 20 décembre 2023: Présidentielle"
+        }
+      ],
+      "est_votes": 90000000,
+      "effort": 2
+    },
+    {
+      "key": "president_parlement",
+      "tier": "national",
+      "name": "Élection du chef de l'État par les Chambres réunies",
+      "name_en": "Head of state chosen by Parliament",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "kas-2013",
+      "valid_from": "1960-06-01",
+      "valid_to": "1967-06-24",
+      "first_held": "1960-06-24",
+      "note": "The Chamber of Representatives and the Senate in joint session elected Joseph Kasa-Vubu head of state on 24 June 1960 under the Loi fondamentale of 19 May 1960. The 1964 constitution provided for election by an electoral college, which never sat before the 1965 coup; the 1967 constitution made the office directly elected.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "CD"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1960-06-24"
+        }
+      ],
+      "est_votes": 220,
+      "effort": 3,
+      "disposition": "blocked",
+      "disposition_reason": "The joint session's minutes of 24 June 1960 are not online; secondary accounts disagree on the count (159-44 or 150-43), so no official figure can be cited."
+    },
+    {
+      "key": "assemblee_nationale",
+      "tier": "national",
+      "name": "Élection des députés nationaux",
+      "name_en": "National Assembly",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "constituency",
+        "schemes": [
+          "cd.circonscription"
+        ],
+        "fine": [
+          "cd.bureau"
+        ]
+      },
+      "source": "loi-2017",
+      "locator": "https://www.ceni.cd/sites/default/files/2023-06/Loi%20%C3%A9lectorale%20textes%20coordonn%C3%A9s%202017.pdf (Articles 115-121: territoire, ville, or groupement de communes in Kinshasa; plurality in single-seat circonscriptions, open-list PR with one preferential vote and largest remainders in the rest; five-year term)",
+      "valid_from": "2006-02-18",
+      "first_held": "2006-07-30",
+      "earliest_record": "2023-12-20",
+      "note": "500 seats. 169 circonscriptions in 2006 and 2011 (Kinshasa in four); 181 in 2018; 182 in 2023 under Loi 23/025, with Masisi, Rutshuru, and Kwamouth not voting and their 16 seats reserved. In 2018 Beni, Butembo, and Yumbi voted on 31 March 2019. In 2023 the CENI annulled Masi-Manimba and Yakoma, which voted again on 15 December 2024. A national legal threshold applies to lists since the 2017 amendment.",
+      "match": [
+        {
+          "body_kinds": [
+            "lower_house",
+            "unicameral"
+          ],
+          "iso_pattern": "CD",
+          "valid_from": "2006-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "Commission électorale nationale indépendante",
+          "source": "constitution",
+          "locator": "https://presidence.cd/uploads/files/Constitution%20de%20la%203me%20Republique.%2018%20Fev%202006.pdf (Article 101: élus au suffrage universel direct et secret pour un mandat de cinq ans renouvelable)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "CENI Bosolo",
+          "url": "https://bosolo.ceni.cd/e20241215/bosolo/mapapi.php",
+          "format": "json",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "2024-12-15",
+          "last_date": "2024-12-15",
+          "finest": "cd.bureau",
+          "source": "bosolo-2024",
+          "evidence": "The 15 December 2024 re-run in Masi-Manimba and Yakoma by polling station; the 2023 national-deputy results by circonscription are not on the current CENI site"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2006-07-30",
+          "seats": 500
+        },
+        {
+          "date": "2011-11-28",
+          "seats": 500
+        },
+        {
+          "date": "2018-12-30"
+        },
+        {
+          "date": "2019-03-31",
+          "election_kind": "by_election",
+          "note": "Beni, Butembo (Ebola), and Yumbi (violence), postponed from 30 December 2018"
+        },
+        {
+          "date": "2023-12-20",
+          "contests": 179,
+          "seats": 484,
+          "source": "loi-23-025",
+          "quote": "subdivisé en 182 circonscriptions électorales ... les circonscriptions en proie à l'insécurité (16 dont 1 pour Kwamouth, 8 pour Masisi et 7 pour Rutshuru), le nombre de sièges à repartir est de 484",
+          "note": "182 circonscriptions less Masisi, Rutshuru, and Kwamouth, which did not vote"
+        },
+        {
+          "date": "2024-12-15",
+          "election_kind": "by_election",
+          "contests": 2,
+          "source": "ceni-masi-2024",
+          "quote": "élections législatives nationales et provinciales reprises dimanche 15 décembre 2024, dans les circonscriptions électorales de Masi-Manimba, dans le Kwilu, et de Yakoma dans le Nord-Ubangi"
+        }
+      ],
+      "est_votes": 75000000,
+      "effort": 4
+    },
+    {
+      "key": "chambre_1960",
+      "tier": "national",
+      "name": "Élection de la Chambre des représentants",
+      "name_en": "Chamber of Representatives (First Republic)",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "constituency"
+      },
+      "source": "constitution-1964",
+      "valid_from": "1960-05-01",
+      "valid_to": "1967-06-24",
+      "first_held": "1960-05-11",
+      "note": "137 seats in May 1960 (list PR by district with an optional preference vote, men aged 21 and over, under the electoral law of 23 March 1960); 167 seats in March-April 1965 under the 1964 constitution, polled province by province from 18 March (Léopoldville) to 30 April 1965. The chamber was suspended after the November 1965 coup and replaced by the 1967 constitution.",
+      "match": [
+        {
+          "body_kinds": [
+            "lower_house"
+          ],
+          "iso_pattern": "CD",
+          "valid_from": "1960-01-01",
+          "valid_to": "1967-06-24"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1960-05-11",
+          "through": "1960-05-25",
+          "seats": 137
+        },
+        {
+          "date": "1965-03-18",
+          "through": "1965-04-30",
+          "seats": 167
+        }
+      ],
+      "est_votes": 5000000,
+      "effort": 5,
+      "disposition": "blocked",
+      "disposition_reason": "No official returns are reachable: the 1960 and 1965 results by district were proclaimed in the Moniteur congolais, which is not online at journalofficiel.cd, and the archive of the Chamber is not published."
+    },
+    {
+      "key": "assemblee_mpr",
+      "tier": "national",
+      "name": "Élection des membres de l'Assemblée nationale / du Conseil législatif (MPR)",
+      "name_en": "One-party legislature (1970-1987)",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "constituency"
+      },
+      "source": "constitution-1967",
+      "valid_from": "1967-06-24",
+      "valid_to": "1990-04-24",
+      "first_held": "1970-11-14",
+      "note": "Unicameral legislature under the 1967 constitution (the Conseil législatif from 1974). 1970: a single MPR list approved by referendum-style vote; 1975: members acclaimed at popular rallies; 1977, 1982, and 1987: competitive choice among MPR-approved candidates by constituency (274, 310, and 210 seats). Ended with the return to multipartism on 24 April 1990.",
+      "match": [
+        {
+          "body_kinds": [
+            "unicameral",
+            "lower_house"
+          ],
+          "iso_pattern": "CD",
+          "valid_from": "1967-06-24",
+          "valid_to": "1990-04-24"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1970-11-14"
+        },
+        {
+          "date": "1975-11-02",
+          "note": "Acclamation at popular rallies"
+        },
+        {
+          "date": "1977-10-15"
+        },
+        {
+          "date": "1982-09-18"
+        },
+        {
+          "date": "1987-09-06"
+        }
+      ],
+      "est_votes": 50000000,
+      "effort": 5,
+      "disposition": "blocked",
+      "disposition_reason": "No official returns are reachable: the 1970-1987 results were published in the Journal officiel du Zaïre and the party press, none of which is online at journalofficiel.cd."
+    },
+    {
+      "key": "senat",
+      "tier": "national",
+      "name": "Élection des sénateurs",
+      "name_en": "Senate, elected by provincial assemblies",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "constituency",
+        "schemes": [
+          "cd.province"
+        ]
+      },
+      "source": "loi-2017",
+      "locator": "https://www.ceni.cd/sites/default/files/2023-06/Loi%20%C3%A9lectorale%20textes%20coordonn%C3%A9s%202017.pdf (Articles 128-140: the province and the city of Kinshasa; elected by the provincial deputies by open-list PR, in one round, within four days of the provincial assembly's installation)",
+      "first_held": "1960-06-15",
+      "earliest_record": "2024-05-26",
+      "note": "108 elected senators since 2007 (plus former presidents for life), chosen by each provincial assembly in staggered sittings; provinces whose assemblies were not installed vote later (Maï-Ndombe and Nord-Kivu 26 May 2024; Kwilu and Nord-Ubangi 2 April 2025). First Republic senates of 84 seats (1960, 14 per province including co-opted members) and of the 1965 provincial assemblies; no senate from 1967 to 2006.",
+      "match": [
+        {
+          "body_kinds": [
+            "upper_house"
+          ],
+          "iso_pattern": "CD"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "Commission électorale nationale indépendante",
+          "source": "constitution",
+          "locator": "https://presidence.cd/uploads/files/Constitution%20de%20la%203me%20Republique.%2018%20Fev%202006.pdf (Article 104: élus au second degré par les assemblées provinciales pour un mandat de cinq ans renouvelable)",
+          "valid_from": "2006-02-18"
+        }
+      ],
+      "access": [
+        {
+          "platform": "CENI communiqués",
+          "url": "https://www.ceni.cd/communique-de-presse",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "2024-04-29",
+          "last_date": "2025-04-02",
+          "finest": "cd.province",
+          "source": "ceni-cp-039-2024",
+          "evidence": "Scanned press releases list each elected senator with their votes by province (no text layer)"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1960-06-15",
+          "precision": "month",
+          "seats": 84,
+          "note": "Elected by the six provincial assemblies after the Belgian law of 7 June 1960 eased the quorum; Parliament was installed on 17 June 1960"
+        },
+        {
+          "date": "1965-06-01",
+          "precision": "month",
+          "note": "Elected by the 21 provincial assemblies after the 1965 elections"
+        },
+        {
+          "date": "2007-01-19",
+          "seats": 108
+        },
+        {
+          "date": "2019-03-15",
+          "seats": 108
+        },
+        {
+          "date": "2024-04-29",
+          "source": "ceni-cp-026-2024",
+          "quote": "report des élections des Sénateurs, Gouverneurs et Vice-Gouverneurs dans la province de l'Équateur"
+        },
+        {
+          "date": "2024-05-26",
+          "contests": 2,
+          "source": "ceni-cp-039-2024",
+          "quote": "les opérations de vote pour l'élection des Sénateurs se sont bien déroulées ce dimanche 26 mai 2024 à Inongo dans la province du Maï-Ndombe et à Goma dans celle du Nord Kivu"
+        },
+        {
+          "date": "2025-04-02",
+          "contests": 2,
+          "source": "ceni-cp-004-2025",
+          "quote": "Le 02 avril 2025: Jour de vote des Sénateurs, Gouverneurs et Vice-Gouverneurs des provinces du Kwilu et du Nord-Ubangi"
+        }
+      ],
+      "est_votes": 4000,
+      "effort": 3
+    },
+    {
+      "key": "referendum",
+      "tier": "national",
+      "name": "Référendum constitutionnel",
+      "name_en": "Constitutional referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "question",
+        "fine": [
+          "cd.province"
+        ]
+      },
+      "source": "constitution",
+      "locator": "https://presidence.cd/uploads/files/Constitution%20de%20la%203me%20Republique.%2018%20Fev%202006.pdf (Articles 5 and 218: sovereignty exercised by referendum; a revision is final when approved by referendum unless Parliament adopts it by three-fifths)",
+      "first_held": "1964-06-25",
+      "note": "Three constitutional referendums: the Luluabourg constitution (25 June-10 July 1964), the Second Republic constitution (4-24 June 1967, the first vote for women), and the Third Republic constitution (18-19 December 2005, organized by the Commission électorale indépendante; final results by the Supreme Court on 3 February 2006). Local boundary referendums ordered in 1963 are not counted.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "iso_pattern": "CD"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1964-06-25",
+          "contests": 1,
+          "note": "Voting ran 25 June to 10 July 1964",
+          "source": "constitution-1964",
+          "quote": "le référendum organisé du 25 juin au 10 juillet 1964"
+        },
+        {
+          "date": "1967-06-04",
+          "contests": 1,
+          "note": "Voting ran 4 to 24 June 1967",
+          "source": "constitution-1967",
+          "quote": "le référendum organisé du 4 au 24 juin 1967"
+        },
+        {
+          "date": "2005-12-18",
+          "note": "Voting ran 18-19 December 2005; final results by the Supreme Court on 3 February 2006"
+        }
+      ],
+      "est_votes": 27000000,
+      "effort": 4
+    },
+    {
+      "key": "assemblee_provinciale",
+      "tier": "province",
+      "name": "Élection des députés provinciaux",
+      "name_en": "Provincial assemblies",
+      "category": "legislature",
+      "goal": "subnational",
+      "measure": {
+        "unit": "constituency",
+        "fine": [
+          "cd.bureau"
+        ]
+      },
+      "source": "loi-2017",
+      "locator": "https://www.ceni.cd/sites/default/files/2023-06/Loi%20%C3%A9lectorale%20textes%20coordonn%C3%A9s%202017.pdf (Articles 143-146: ville and territoire in the provinces, commune in Kinshasa; 780 seats, 18 to 48 per assembly; same mode of scrutiny as national deputies)",
+      "first_held": "1960-05-11",
+      "earliest_record": "2024-12-15",
+      "note": "Elected with the national deputies: 2006 (11 provinces), 2018 and 2023 (26 provinces); not held in 2011. 780 seats including co-opted customary chiefs (at most a tenth, class cooptation_chefs); 202 circonscriptions in 2023, Kinshasa's 24 communes among them. First Republic assemblies were elected in May 1960 (6 provinces) and March-April 1965 (21 provinces). Regional assemblies of the Mobutu era (1982, 1987) were one-party bodies and are not counted here.",
+      "match": [
+        {
+          "body_kinds": [
+            "council",
+            "unicameral"
+          ],
+          "polity_kinds": [
+            "region"
+          ],
+          "iso_pattern": "CD-*"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "Commission électorale nationale indépendante",
+          "source": "constitution",
+          "locator": "https://presidence.cd/uploads/files/Constitution%20de%20la%203me%20Republique.%2018%20Fev%202006.pdf (Article 197: députés provinciaux élus au suffrage universel direct et secret ou cooptés pour un mandat de cinq ans renouvelable)",
+          "valid_from": "2006-02-18"
+        }
+      ],
+      "access": [
+        {
+          "platform": "CENI Bosolo",
+          "url": "https://bosolo.ceni.cd/e20241215/bosolo/mapapi.php",
+          "format": "json",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "2024-12-15",
+          "last_date": "2024-12-15",
+          "finest": "cd.bureau",
+          "source": "bosolo-2024",
+          "evidence": "Masi-Manimba and Yakoma re-run only; 2023 provincial results by circonscription are not on the current CENI site"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1960-05-11",
+          "through": "1960-05-25"
+        },
+        {
+          "date": "1965-03-18",
+          "through": "1965-04-30"
+        },
+        {
+          "date": "2006-10-29"
+        },
+        {
+          "date": "2018-12-30"
+        },
+        {
+          "date": "2023-12-20",
+          "contests": 199,
+          "source": "loi-23-025",
+          "quote": "La République Démocratique du Congo est subdivisée en 202 circonscriptions",
+          "note": "202 circonscriptions less Masisi, Rutshuru, and Kwamouth"
+        },
+        {
+          "date": "2024-12-15",
+          "election_kind": "by_election",
+          "contests": 2,
+          "source": "ceni-masi-2024",
+          "quote": "élections législatives nationales et provinciales reprises dimanche 15 décembre 2024"
+        }
+      ],
+      "est_votes": 70000000,
+      "effort": 4
+    },
+    {
+      "key": "cooptation_chefs",
+      "tier": "province",
+      "name": "Cooptation des chefs coutumiers aux assemblées provinciales",
+      "name_en": "Customary chiefs co-opted to provincial assemblies",
+      "category": "non_territorial",
+      "goal": "subnational",
+      "measure": {
+        "unit": "constituency"
+      },
+      "source": "loi-2017",
+      "locator": "https://www.ceni.cd/sites/default/files/2023-06/Loi%20%C3%A9lectorale%20textes%20coordonn%C3%A9s%202017.pdf (Articles 152-155: the customary chiefs of each territory designate candidates, whom the elected provincial deputies co-opt at the installation session)",
+      "valid_from": "2006-02-18",
+      "first_held": "2007-01-15",
+      "note": "At most a tenth of each provincial assembly. Co-opted after each provincial election (2007, 2019, 2024).",
+      "disposition": "blocked",
+      "disposition_reason": "The CENI publishes only the names of the co-opted chiefs; neither the chiefs' designation meetings nor the assemblies' co-optation votes have published counts.",
+      "dates": [
+        {
+          "date": "2007-01-15",
+          "precision": "month"
+        },
+        {
+          "date": "2019-03-01",
+          "precision": "month"
+        },
+        {
+          "date": "2024-03-01",
+          "precision": "month"
+        }
+      ],
+      "est_votes": 3000,
+      "effort": 5
+    },
+    {
+      "key": "gouverneur",
+      "tier": "province",
+      "name": "Élection des gouverneurs et vice-gouverneurs de province",
+      "name_en": "Provincial governors and vice-governors",
+      "category": "indirect",
+      "goal": "subnational",
+      "measure": {
+        "unit": "polity",
+        "schemes": [
+          "cd.province"
+        ]
+      },
+      "source": "loi-2017",
+      "locator": "https://www.ceni.cd/sites/default/files/2023-06/Loi%20%C3%A9lectorale%20textes%20coordonn%C3%A9s%202017.pdf (Articles 158-173: one ticket, elected by the provincial deputies by secret two-round majority; five-year term renewable once)",
+      "valid_from": "2006-02-18",
+      "first_held": "2007-01-27",
+      "earliest_record": "2024-04-29",
+      "note": "Elected by each provincial assembly: 11 in January-February 2007, the 21 new provinces on 26 March 2016, and 24 provinces on 10 April 2019; in 2024, 21 provinces on 29 April (Équateur postponed; Kongo Central re-run ordered by the Conseil d'État and annulled by the Constitutional Court), Kwilu and Nord-Ubangi on 2 April 2025, and Sankuru on 15 April 2026. Ituri and Nord-Kivu have been under military governors since the 2021 state of siege. The 1960-1966 provincial presidents and governors chosen by First Republic assemblies are noted here but not dated.",
+      "match": [
+        {
+          "office_kinds": [
+            "governor"
+          ],
+          "polity_kinds": [
+            "region"
+          ],
+          "iso_pattern": "CD-*"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "Commission électorale nationale indépendante",
+          "source": "constitution",
+          "locator": "https://presidence.cd/uploads/files/Constitution%20de%20la%203me%20Republique.%2018%20Fev%202006.pdf (Article 198: le Gouverneur et le Vice-gouverneur sont élus pour un mandat de cinq ans renouvelable une seule fois par les députés provinciaux)",
+          "runoff": "majority",
+          "valid_from": "2006-02-18"
+        }
+      ],
+      "access": [
+        {
+          "platform": "CENI communiqués",
+          "url": "https://www.ceni.cd/communique-de-presse",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "2024-04-29",
+          "last_date": "2026-04-15",
+          "finest": "cd.province",
+          "source": "ceni-cp-009-2026",
+          "evidence": "Scanned press releases with each province's electors, voters, blank ballots, and votes per ticket"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2007-01-27"
+        },
+        {
+          "date": "2016-03-26"
+        },
+        {
+          "date": "2019-04-10"
+        },
+        {
+          "date": "2024-04-29",
+          "contests": 21,
+          "source": "ceni-cp-027-2024",
+          "quote": "la tenue le 29 avril 2024 de l'élection des Gouverneurs et Vice-Gouverneurs de provinces du Bas-Uele, du Haut Katanga, du Haut-Lomami, du Haut Uele, du Kasaï, du Kasaï Central, du Kasaï Oriental, de Kinshasa, du Kongo Central, du Kwango, de la Lomami, du Lualaba, du Maniema, de la Mongala, du Nord Ubangi, du Sankuru, du Sud Kivu, du Sud Ubangi, du Tanganyika, de la Tshuapa et de la Tshopo"
+        },
+        {
+          "date": "2025-04-02",
+          "contests": 2,
+          "source": "ceni-cp-004-2025",
+          "quote": "Jour de vote des Sénateurs, Gouverneurs et Vice-Gouverneurs des provinces du Kwilu et du Nord-Ubangi"
+        },
+        {
+          "date": "2026-04-15",
+          "contests": 1,
+          "source": "ceni-cp-009-2026",
+          "quote": "les opérations de vote pour l'élection du Gouverneur et du Vice-Gouverneur de la Province du Sankuru tenue ce mercredi 15 avril 2026 à Lusambo"
+        }
+      ],
+      "est_votes": 4000,
+      "effort": 3
+    },
+    {
+      "key": "conseil_urbain",
+      "tier": "ville",
+      "name": "Élection des conseillers urbains",
+      "name_en": "City councils, elected by commune councils",
+      "category": "indirect",
+      "goal": "local",
+      "measure": {
+        "unit": "constituency"
+      },
+      "source": "loi-2017",
+      "locator": "https://www.ceni.cd/sites/default/files/2023-06/Loi%20%C3%A9lectorale%20textes%20coordonn%C3%A9s%202017.pdf (Articles 174-175: four councillors per commune, elected by the commune councillors by open-list PR)",
+      "valid_from": "2006-02-18",
+      "note": "Candidacies were received from 25 April to 9 May 2024 in the provinces' chief towns (none in Kinshasa, whose provincial assembly serves as its council).",
+      "disposition": "blocked",
+      "disposition_reason": "No city council election has been held: the CENI opened candidacies in April 2024 but the indirect local elections were not organized, and in June 2025 it was still seeking funding for them.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "within": null,
+          "iso_pattern": "CD*"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "Commission électorale nationale indépendante",
+          "source": "loi-2017",
+          "locator": "https://www.ceni.cd/sites/default/files/2023-06/Loi%20%C3%A9lectorale%20textes%20coordonn%C3%A9s%202017.pdf (Article 175: mandat de cinq ans renouvelable)"
+        }
+      ],
+      "dates": [],
+      "est_votes": 2000,
+      "effort": 4
+    },
+    {
+      "key": "maire",
+      "tier": "ville",
+      "name": "Élection du maire et du maire adjoint",
+      "name_en": "City mayors, elected by city councils",
+      "category": "indirect",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "loi-2017",
+      "locator": "https://www.ceni.cd/sites/default/files/2023-06/Loi%20%C3%A9lectorale%20textes%20coordonn%C3%A9s%202017.pdf (Article 183: one ticket, elected by the city councillors by two-round majority for five years)",
+      "valid_from": "2006-02-18",
+      "note": "Mayors have been appointed by the President since 2006 pending these elections.",
+      "disposition": "blocked",
+      "disposition_reason": "Never held: mayors are elected by city councils, which have not been elected, and the CENI reported in June 2025 that the mayoral and bourgmestre elections await funding.",
+      "match": [
+        {
+          "office_kinds": [
+            "mayor",
+            "deputy_mayor"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "within": null,
+          "iso_pattern": "CD*"
+        }
+      ],
+      "dates": [],
+      "est_votes": 300,
+      "effort": 4
+    },
+    {
+      "key": "conseil_communal",
+      "tier": "commune",
+      "name": "Élection des conseillers communaux (municipaux)",
+      "name_en": "Commune councils",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "constituency",
+        "fine": [
+          "cd.bureau"
+        ]
+      },
+      "source": "loi-2017",
+      "locator": "https://www.ceni.cd/sites/default/files/2023-06/Loi%20%C3%A9lectorale%20textes%20coordonn%C3%A9s%202017.pdf (Articles 190-192: the commune; open-list PR with one preferential vote and largest remainders; 7 to 13 or more seats by enrolled electors)",
+      "first_held": "1957-12-08",
+      "earliest_record": "2023-12-20",
+      "note": "Colonial communal councils were elected in Léopoldville (8 December 1957, 11 communes), Élisabethville and Jadotville (22 December 1957), other towns in 1958, and nationwide in December 1959 (boycotted in Bas-Congo). On 20 December 2023 the CENI held the first commune council elections of the Third Republic, in the communes of the provinces' chief towns (candidate lists under Décision 120/CENI/AP/2023); results were announced by commune.",
+      "match": [
+        {
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "submunicipal"
+          ],
+          "within": null,
+          "iso_pattern": "CD*",
+          "name_pattern": "commun"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "Commission électorale nationale indépendante",
+          "source": "loi-2017",
+          "locator": "https://www.ceni.cd/sites/default/files/2023-06/Loi%20%C3%A9lectorale%20textes%20coordonn%C3%A9s%202017.pdf (Article 191: mandat de cinq ans renouvelable)"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1957-12-08",
+          "note": "Léopoldville, 11 communes, 170 councillors"
+        },
+        {
+          "date": "1957-12-22",
+          "note": "Élisabethville (5 communes) and Jadotville (2 communes)"
+        },
+        {
+          "date": "1958-01-01",
+          "precision": "year",
+          "note": "Coquilhatville, Stanleyville, Bukavu, Luluabourg, and new Léopoldville communes"
+        },
+        {
+          "date": "1959-12-01",
+          "precision": "month",
+          "note": "Communal and territorial councils nationwide; Léopoldville voted 20 December"
+        },
+        {
+          "date": "2023-12-20",
+          "source": "ceni-cc-2023",
+          "quote": "Décision No. 120/CENI/AP/2023 du 16 novembre 2023 portant publication des listes définitives des candidatures à l'élection des Conseillers Communaux"
+        }
+      ],
+      "est_votes": 8000000,
+      "effort": 5
+    },
+    {
+      "key": "bourgmestre",
+      "tier": "commune",
+      "name": "Élection du bourgmestre et du bourgmestre adjoint",
+      "name_en": "Commune bourgmestres, elected by commune councils",
+      "category": "indirect",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "loi-2017",
+      "locator": "https://www.ceni.cd/sites/default/files/2023-06/Loi%20%C3%A9lectorale%20textes%20coordonn%C3%A9s%202017.pdf (Articles 199-204: one ticket, elected by the commune councillors by two-round majority within fourteen days of the council's installation)",
+      "valid_from": "2006-02-18",
+      "note": "In 1957-1959 the elected councils chose the bourgmestres of Léopoldville's African communes. Since 2006 bourgmestres have been appointed.",
+      "disposition": "blocked",
+      "disposition_reason": "Not yet held: the councils elected in December 2023 have not chosen their bourgmestres; the CENI opened candidacies on 25 April 2024 and reported in June 2025 that the elections await government funding.",
+      "match": [
+        {
+          "office_kinds": [
+            "mayor",
+            "deputy_mayor"
+          ],
+          "polity_kinds": [
+            "submunicipal"
+          ],
+          "within": null,
+          "iso_pattern": "CD*"
+        }
+      ],
+      "dates": [],
+      "est_votes": 3000,
+      "effort": 4
+    },
+    {
+      "key": "conseil_secteur_chefferie",
+      "tier": "secteur_chefferie",
+      "name": "Élection des conseillers de secteur ou de chefferie",
+      "name_en": "Sector and chiefdom councils",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "constituency"
+      },
+      "source": "loi-2017",
+      "locator": "https://www.ceni.cd/sites/default/files/2023-06/Loi%20%C3%A9lectorale%20textes%20coordonn%C3%A9s%202017.pdf (Articles 207-209 quater: the sector or chiefdom, with seats allotted by groupement; direct universal suffrage, five-year term)",
+      "valid_from": "2006-02-18",
+      "note": "Listed in the 2023 combined vote's calendar but not held: the December 2023 local vote covered only the communes of the provinces' chief towns. Chiefdom heads are customary and not elected.",
+      "disposition": "blocked",
+      "disposition_reason": "Never held since the 2006 constitution created the councils; local elections were dropped from the 2011 and 2018 cycles and limited to chief-town communes in 2023.",
+      "match": [
+        {
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "submunicipal"
+          ],
+          "within": null,
+          "iso_pattern": "CD*",
+          "name_pattern": "secteur|chefferie"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "Commission électorale nationale indépendante",
+          "source": "loi-2017",
+          "locator": "https://www.ceni.cd/sites/default/files/2023-06/Loi%20%C3%A9lectorale%20textes%20coordonn%C3%A9s%202017.pdf (Article 209 bis: suffrage universel direct, mandat de cinq ans renouvelable)"
+        }
+      ],
+      "dates": [],
+      "est_votes": 20000000,
+      "effort": 5
+    },
+    {
+      "key": "chef_secteur",
+      "tier": "secteur_chefferie",
+      "name": "Élection du chef de secteur et du chef de secteur adjoint",
+      "name_en": "Sector heads, elected by sector councils",
+      "category": "indirect",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "loi-2017",
+      "locator": "https://www.ceni.cd/sites/default/files/2023-06/Loi%20%C3%A9lectorale%20textes%20coordonn%C3%A9s%202017.pdf (Article 215: one ticket, elected by the sector councillors by two-round majority for five years)",
+      "valid_from": "2006-02-18",
+      "disposition": "blocked",
+      "disposition_reason": "Never held, because no sector council has been elected.",
+      "match": [
+        {
+          "office_kinds": [
+            "mayor",
+            "other"
+          ],
+          "polity_kinds": [
+            "submunicipal"
+          ],
+          "within": null,
+          "iso_pattern": "CD*",
+          "name_pattern": "secteur"
+        }
+      ],
+      "dates": [],
+      "est_votes": 5000,
+      "effort": 4
+    },
+    {
+      "key": "conseils_mpr_locaux",
+      "tier": "ville",
+      "name": "Élections des conseils urbains, de zone et de collectivité (MPR)",
+      "name_en": "One-party local councils (1977-1987)",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "constituency"
+      },
+      "source": "kas-2013",
+      "valid_from": "1977-01-01",
+      "valid_to": "1990-04-24",
+      "first_held": "1977-10-15",
+      "note": "Councils of the urban zones (1977, with the legislative vote) and, under the ordinances of 1982 and 1987, regional assemblies and city, zone, and collectivité councils among MPR-approved candidates.",
+      "disposition": "blocked",
+      "disposition_reason": "No official returns are reachable: the Mobutu-era results were proclaimed in the Journal officiel and press of the time, none of which is online at journalofficiel.cd.",
+      "dates": [
+        {
+          "date": "1977-10-15"
+        },
+        {
+          "date": "1982-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1987-01-01",
+          "precision": "year"
+        }
+      ],
+      "est_votes": 30000000,
+      "effort": 5
+    }
+  ]
+}
