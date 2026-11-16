@@ -1,0 +1,1344 @@
+{
+  "polity": "BT",
+  "name": "Bhutan",
+  "sources": {
+    "const-2008": {
+      "title": "The Constitution of the Kingdom of Bhutan (2008)",
+      "publisher": "Office of the Attorney General",
+      "url": "https://oag.gov.bt/wp-content/uploads/2026/08/Constitution_of_Bhutan.pdf",
+      "kind": "official_body"
+    },
+    "ea-2008": {
+      "title": "Election Act of the Kingdom of Bhutan 2008",
+      "publisher": "Office of the Attorney General",
+      "url": "https://oag.gov.bt/wp-content/uploads/2026/08/Election-Act-of-Bhutan-2008both-Dzongkha-English.pdf",
+      "kind": "official_body"
+    },
+    "nra-2008": {
+      "title": "National Referendum Act of the Kingdom of Bhutan 2008",
+      "publisher": "Office of the Attorney General",
+      "url": "https://oag.gov.bt/wp-content/uploads/2026/08/National-Referendum-Act-of-the-Kingdom-of-Bhutan-2008-both-Dzongkha-English.pdf",
+      "kind": "official_body"
+    },
+    "lga-2009": {
+      "title": "Local Government Act of Bhutan 2009",
+      "publisher": "Office of the Attorney General",
+      "url": "https://oag.gov.bt/wp-content/uploads/2026/08/Local-Government-Act-of-Bhutan-2009-.pdf",
+      "kind": "official_body"
+    },
+    "lga-2014": {
+      "title": "Local Government (Amendment) Act of Bhutan 2014",
+      "publisher": "Office of the Attorney General",
+      "url": "https://oag.gov.bt/wp-content/uploads/2026/08/Local-Government-Amendment-Act-of-Bhutan-2014.pdf",
+      "kind": "official_body"
+    },
+    "syb-2025": {
+      "title": "Statistical Yearbook of Bhutan 2025",
+      "publisher": "National Statistics Bureau",
+      "url": "https://nsb.gov.bt/wp-content/uploads/2026/09/Statistical-Yearbook-2025.pdf",
+      "kind": "official_body"
+    },
+    "ecb-lg": {
+      "title": "Local Government Elections (Thromde Tshogde and Gewog Tshogde election years)",
+      "publisher": "Election Commission of Bhutan",
+      "url": "https://ecb.bt/local-government-elections/",
+      "kind": "official_body"
+    },
+    "ecb-lg2011": {
+      "title": "Local Government Elections 2011: results by dzongkhag, contested and uncontested",
+      "publisher": "Election Commission of Bhutan",
+      "url": "https://ecb.bt/local-government-elections-2011-results/",
+      "kind": "official_body"
+    },
+    "ecb-thromde2026": {
+      "title": "Declaration of Results: Dzongkhag Thromde Tshogde Elections, 2026",
+      "publisher": "Election Commission of Bhutan",
+      "url": "https://ecb.bt/4ththromdeelections2026/",
+      "kind": "official_body"
+    },
+    "ecb-lg2027": {
+      "title": "Public Notification on Social and Religious Events during the 4th Local Government Elections 2027",
+      "publisher": "Election Commission of Bhutan",
+      "url": "https://ecb.bt/public-notification-on-social-and-religious-events-during-the-4th-local-government-elections-2027/",
+      "kind": "official_body"
+    },
+    "ecb-na": {
+      "title": "National Assembly Election results",
+      "publisher": "Election Commission of Bhutan",
+      "url": "https://ecb.bt/national-assembly-election/",
+      "kind": "official_body"
+    },
+    "ecb-primary": {
+      "title": "National Assembly primary round results",
+      "publisher": "Election Commission of Bhutan",
+      "url": "https://ecb.bt/primary-round/",
+      "kind": "official_body"
+    },
+    "ecb-nc": {
+      "title": "National Council Elections results",
+      "publisher": "Election Commission of Bhutan",
+      "url": "https://ecb.bt/national-council-elections/",
+      "kind": "official_body"
+    },
+    "ecb-bye": {
+      "title": "Bye-Elections",
+      "publisher": "Election Commission of Bhutan",
+      "url": "https://ecb.bt/bye-elections/",
+      "kind": "official_body"
+    },
+    "ecb-lgbye": {
+      "title": "Local Government Bye-Elections",
+      "publisher": "Election Commission of Bhutan",
+      "url": "https://ecb.bt/local-government-bye-elections/",
+      "kind": "official_body"
+    },
+    "ecb-na2008": {
+      "title": "National Assembly Election 2008: final results by constituency",
+      "publisher": "Election Commission of Bhutan",
+      "url": "https://ecb.bt/wp-content/uploads/2026/06/NA-ResultsFinal-2008.pdf",
+      "kind": "official_body"
+    },
+    "ecb-na2018": {
+      "title": "Declaration of the Results of the Third Parliamentary Elections 2018: General Election to the National Assembly",
+      "publisher": "Election Commission of Bhutan",
+      "url": "https://ecb.bt/declaration-of-the-results-of-the-third-parliamentary-elections-2018-general-election-to-the-national-assembly/",
+      "kind": "official_body"
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "Druk Gyal Khab",
+      "name_en": "Kingdom of Bhutan",
+      "parent": null,
+      "polity_kind": "sovereign_state",
+      "source": "const-2008"
+    },
+    {
+      "key": "dzongkhag",
+      "name": "Dzongkhag",
+      "name_en": "Dzongkhags (districts): each elects one National Council member and has a Dzongkhag Tshogdu",
+      "parent": "national",
+      "polity_kind": "region",
+      "scheme": "bt.dzongkhag",
+      "source": "const-2008",
+      "counts": [
+        {
+          "date": "2008-07-18",
+          "value": 20,
+          "source": "const-2008",
+          "locator": "https://oag.gov.bt/wp-content/uploads/2026/08/Constitution_of_Bhutan.pdf (Art. 11.1(a) and Art. 22.2: \"each of the twenty Dzongkhags\")"
+        },
+        {
+          "date": "2024-07-01",
+          "precision": "month",
+          "value": 20,
+          "source": "syb-2025",
+          "locator": "Table 14.14, Thirteenth Five-Year Plan Annual Grant Allocation for Gewogs, 2024-2029: 20 dzongkhag subtotals"
+        }
+      ]
+    },
+    {
+      "key": "dungkhag",
+      "name": "Dungkhag",
+      "name_en": "Dungkhags (sub-districts, administrative only)",
+      "parent": "dzongkhag",
+      "elects": false,
+      "source": "syb-2025"
+    },
+    {
+      "key": "demkhong",
+      "name": "Demkhong",
+      "name_en": "National Assembly constituencies (demkhongs)",
+      "parent": "dzongkhag",
+      "scheme": "bt.demkhong",
+      "source": "ea-2008",
+      "counts": [
+        {
+          "date": "2025-01-01",
+          "precision": "year",
+          "value": 47,
+          "source": "syb-2025",
+          "locator": "Introduction, p. xix: \"The National Assembly (Gyelyong Tshogdu) consists of 47 members who are elected representatives from the 47 Constituencies\""
+        }
+      ]
+    },
+    {
+      "key": "gewog",
+      "name": "Gewog",
+      "name_en": "Gewogs (rural blocks): each elects a Gup and a Mangmi",
+      "parent": "dzongkhag",
+      "polity_kind": "municipality",
+      "source": "lga-2009",
+      "counts": [
+        {
+          "date": "2024-07-01",
+          "precision": "month",
+          "value": 205,
+          "source": "syb-2025",
+          "locator": "Table 14.14, Thirteenth Five-Year Plan Annual Grant Allocation for Gewogs, 2024-2029: 205 gewog rows (Bumthang 4, Chhukha 11, Dagana 14, Gasa 4, Haa 6, Lhuentse 8, Monggar 17, Paro 10, Pema Gatshel 11, Punakha 11, Samdrup Jongkhar 11, Samtse 15, Sarpang 12, Thimphu 8, Trashigang 15, Trashi Yangtse 8, Trongsa 5, Tsirang 12, Wangdue Phodrang 15, Zhemgang 8)"
+        }
+      ]
+    },
+    {
+      "key": "chiwog",
+      "name": "Chiwog",
+      "name_en": "Chiwogs: each elects one Tshogpa to its Gewog Tshogde (the finest unit that elects anyone)",
+      "parent": "gewog",
+      "polity_kind": "submunicipal",
+      "source": "ea-2008"
+    },
+    {
+      "key": "thromde",
+      "name": "Dzongkhag Thromde",
+      "name_en": "Dzongkhag Thromdes with a Thromde Tshogde: each elects a Thrompon and its Tshogde members by constituency",
+      "parent": "dzongkhag",
+      "polity_kind": "municipality",
+      "source": "lga-2009",
+      "counts": [
+        {
+          "date": "2017-05-30",
+          "value": 4,
+          "source": "syb-2025",
+          "locator": "Table 1.2, Population by Sex and Dzongkhag/Thromde, 2017: Thimphu, Phuentsholing, Gelephu, and Samdrup Jongkhar Thromdes"
+        }
+      ]
+    },
+    {
+      "key": "yenlag_thromde",
+      "name": "Dzongkhag Yenlag Thromde",
+      "name_en": "Dzongkhag Yenlag Thromdes (satellite towns): together elect one Thuemi to the Dzongkhag Tshogdu",
+      "parent": "dzongkhag",
+      "polity_kind": "submunicipal",
+      "source": "lga-2014"
+    }
+  ],
+  "classes": [
+    {
+      "key": "na",
+      "tier": "national",
+      "name": "Gyelyong Tshogdu general election",
+      "name_en": "National Assembly general elections",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "bt.demkhong"
+        ]
+      },
+      "source": "const-2008",
+      "locator": "https://oag.gov.bt/wp-content/uploads/2026/08/Constitution_of_Bhutan.pdf (Art. 12.1: a maximum of fifty-five members, each constituency directly electing one member; Art. 15.5-15.8: only the two parties placed first and second in the primary round contest the general election)",
+      "first_held": "2008-03-24",
+      "earliest_record": "2008-03-24",
+      "note": "First past the post in 47 single-member constituencies (demkhongs), at most 55 under Art. 12.1, with 2 to 7 per dzongkhag (Election Act 2008 s.5). Only the two parties placed first and second in the primary round stand; in 2008 only two parties registered, so no primary round was held. Results give EVM and postal votes by constituency. The party winning most seats forms the government and its leader is made Prime Minister (Art. 17.1).",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "contest_kinds": [
+            "body_seats"
+          ],
+          "body_kinds": [
+            "lower_house"
+          ],
+          "iso_pattern": "BT"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 3,
+          "term_years": 5,
+          "called": true,
+          "partisan": true,
+          "administered_by": "Election Commission of Bhutan",
+          "source": "const-2008",
+          "locator": "https://oag.gov.bt/wp-content/uploads/2026/08/Constitution_of_Bhutan.pdf (Art. 10.24: the National Assembly continues for five years from its first sitting unless dissolved early; Art. 15.6: a primary round on the expiry of the term or on dissolution)",
+          "vacancy_rule": "A vacancy is filled by a bye-election within ninety days, unless less than 180 days of the term remain (Constitution Art. 15.9; Election Act 2008 s.579)."
+        }
+      ],
+      "access": [
+        {
+          "platform": "Election Commission of Bhutan (ecb.bt)",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "No license stated; published by the Election Commission of Bhutan",
+          "url": "https://ecb.bt/wp-content/uploads/2026/06/NA-ResultsFinal-2008.pdf",
+          "first_date": "2008-03-24",
+          "last_date": "2018-10-18",
+          "evidence": "Result tables by constituency for 2008, 2013, and 2018 with EVM and postal votes (NA-ResultsFinal-2008.pdf, result.pdf, Annexure-2.pdf); the 2024 general election has a page (national-assembly-election-2023-2024) whose files were not read from here",
+          "source": "ecb-na",
+          "finest": "bt.demkhong"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2008-03-24",
+          "note": "First elections to the National Assembly; two parties, no primary round."
+        },
+        {
+          "date": "2013-07-13"
+        },
+        {
+          "date": "2018-10-18"
+        },
+        {
+          "date": "2024-01-09",
+          "note": "Fourth National Assembly; the primary round was on 30 November 2023."
+        }
+      ],
+      "est_votes": 1200000,
+      "effort": 2
+    },
+    {
+      "key": "na_primary",
+      "tier": "national",
+      "name": "Gyelyong Tshogdu primary round",
+      "name_en": "National Assembly primary round",
+      "category": "nominating",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "bt.demkhong"
+        ]
+      },
+      "source": "const-2008",
+      "locator": "https://oag.gov.bt/wp-content/uploads/2026/08/Constitution_of_Bhutan.pdf (Art. 15.5-15.7: a primary round in which all registered parties may take part selects the two parties for the general election)",
+      "first_held": "2013-05-31",
+      "earliest_record": "2013-05-31",
+      "note": "A state-run party vote held by the Commission on the full electorate: every registered party is on the ballot in every constituency, and the two with the most votes nationally go on to the general election. The archive holds it as one national list contest with constituency units.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "primary"
+          ],
+          "contest_kinds": [
+            "list_allocation"
+          ],
+          "body_kinds": [
+            "lower_house"
+          ],
+          "iso_pattern": "BT"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 3,
+          "term_years": 5,
+          "called": true,
+          "partisan": true,
+          "administered_by": "Election Commission of Bhutan",
+          "source": "const-2008",
+          "locator": "https://oag.gov.bt/wp-content/uploads/2026/08/Constitution_of_Bhutan.pdf (Art. 15.6)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Election Commission of Bhutan (ecb.bt)",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "No license stated; published by the Election Commission of Bhutan",
+          "url": "https://ecb.bt/primary-round/",
+          "first_date": "2013-05-31",
+          "last_date": "2023-11-30",
+          "evidence": "Party votes by constituency for 2013, 2018, and 2023 (result.pdf, demkhongwise.pdf, and the 2023-24 demkhong-wise result)",
+          "source": "ecb-primary",
+          "finest": "bt.demkhong"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2013-05-31"
+        },
+        {
+          "date": "2018-09-15"
+        },
+        {
+          "date": "2023-11-30"
+        }
+      ],
+      "est_votes": 900000,
+      "effort": 2
+    },
+    {
+      "key": "na_by",
+      "tier": "national",
+      "name": "Gyelyong Tshogdu bye-election",
+      "name_en": "National Assembly bye-elections",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "bt.demkhong"
+        ]
+      },
+      "source": "ea-2008",
+      "locator": "https://oag.gov.bt/wp-content/uploads/2026/08/Election-Act-of-Bhutan-2008both-Dzongkha-English.pdf (s.577-580, Bye-Election)",
+      "note": "Called for a single constituency when a seat falls vacant; the Commission posts each notification and declaration under Bye-Elections (for example Monggar and Nganglam demkhongs).",
+      "match": [
+        {
+          "election_kinds": [
+            "by_election"
+          ],
+          "body_kinds": [
+            "lower_house"
+          ],
+          "iso_pattern": "BT"
+        }
+      ],
+      "cadence": [
+        {
+          "called": true,
+          "partisan": true,
+          "administered_by": "Election Commission of Bhutan",
+          "source": "ea-2008",
+          "locator": "https://oag.gov.bt/wp-content/uploads/2026/08/Election-Act-of-Bhutan-2008both-Dzongkha-English.pdf (s.579)",
+          "vacancy_rule": "Within ninety days of the vacancy, unless less than 180 days of the term remain or the Commission certifies it is difficult (s.579)."
+        }
+      ],
+      "access": [
+        {
+          "platform": "Election Commission of Bhutan (ecb.bt)",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "No license stated; published by the Election Commission of Bhutan",
+          "url": "https://ecb.bt/bye-elections/",
+          "first_date": "2008-03-24",
+          "evidence": "Notifications and declarations of results for each bye-election, as web posts",
+          "source": "ecb-bye"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2008-01-01",
+          "precision": "year",
+          "through": "2026-12-31",
+          "note": "No official list of National Assembly bye-elections has been compiled yet."
+        }
+      ],
+      "est_votes": 30000,
+      "effort": 3
+    },
+    {
+      "key": "nc",
+      "tier": "dzongkhag",
+      "name": "Gyelyong Tshogde election",
+      "name_en": "National Council elections",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "bt.dzongkhag"
+        ]
+      },
+      "source": "const-2008",
+      "locator": "https://oag.gov.bt/wp-content/uploads/2026/08/Constitution_of_Bhutan.pdf (Art. 11.1: one member elected by the voters in each of the twenty Dzongkhags and five eminent persons nominated by the Druk Gyalpo)",
+      "first_held": "2007-12-31",
+      "earliest_record": "2007-12-31",
+      "note": "First past the post, one member per dzongkhag; candidates may not belong to a party (Art. 11.3). Each gewog and dzongkhag thromde first picks one candidate at a zomdu (class nc_zomdu). The five eminent members are nominated by the Druk Gyalpo, not elected. In 2007-08 fifteen dzongkhags voted on 31 December 2007 and the other five in January 2008.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "upper_house"
+          ],
+          "iso_pattern": "BT"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 3,
+          "month": 4,
+          "term_years": 5,
+          "called": false,
+          "partisan": false,
+          "administered_by": "Election Commission of Bhutan",
+          "source": "const-2008",
+          "locator": "https://oag.gov.bt/wp-content/uploads/2026/08/Constitution_of_Bhutan.pdf (Art. 10.24: \"the National Council shall complete its five-year term\")",
+          "vacancy_rule": "A vacancy is filled by a bye-election within ninety days, unless less than 180 days of the term remain (Election Act 2008 s.579)."
+        }
+      ],
+      "access": [
+        {
+          "platform": "Election Commission of Bhutan (ecb.bt)",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "No license stated; published by the Election Commission of Bhutan",
+          "url": "https://ecb.bt/national-council-elections/",
+          "first_date": "2007-12-31",
+          "last_date": "2023-04-20",
+          "evidence": "Final results by dzongkhag with EVM and postal votes for 2007-08, 2013, and 2023 (NC-FinalResults-2007.pdf, NCFinalResult2013.pdf, FinalResult_NC2023.pdf); a 2018 file was not located",
+          "source": "ecb-nc",
+          "finest": "bt.dzongkhag"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2007-12-31",
+          "note": "Five dzongkhags without two candidates voted in January 2008."
+        },
+        {
+          "date": "2013-04-23"
+        },
+        {
+          "date": "2018-04-20"
+        },
+        {
+          "date": "2023-04-01",
+          "precision": "month"
+        }
+      ],
+      "est_votes": 900000,
+      "effort": 2
+    },
+    {
+      "key": "nc_by",
+      "tier": "dzongkhag",
+      "name": "Gyelyong Tshogde bye-election",
+      "name_en": "National Council bye-elections",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "bt.dzongkhag"
+        ]
+      },
+      "source": "ea-2008",
+      "locator": "https://oag.gov.bt/wp-content/uploads/2026/08/Election-Act-of-Bhutan-2008both-Dzongkha-English.pdf (s.577-580)",
+      "match": [
+        {
+          "election_kinds": [
+            "by_election"
+          ],
+          "body_kinds": [
+            "upper_house"
+          ],
+          "iso_pattern": "BT"
+        }
+      ],
+      "cadence": [
+        {
+          "called": true,
+          "partisan": false,
+          "administered_by": "Election Commission of Bhutan",
+          "source": "ea-2008",
+          "locator": "https://oag.gov.bt/wp-content/uploads/2026/08/Election-Act-of-Bhutan-2008both-Dzongkha-English.pdf (s.579)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Election Commission of Bhutan (ecb.bt)",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "No license stated; published by the Election Commission of Bhutan",
+          "url": "https://ecb.bt/bye-elections/",
+          "first_date": "2008-01-01",
+          "evidence": "The Commission files National Council bye-elections under their own category",
+          "source": "ecb-bye"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2008-01-01",
+          "precision": "year",
+          "through": "2026-12-31",
+          "note": "No official list of National Council bye-elections has been compiled yet."
+        }
+      ],
+      "est_votes": 20000,
+      "effort": 3
+    },
+    {
+      "key": "nc_zomdu",
+      "tier": "gewog",
+      "name": "Zomdu for National Council candidates",
+      "name_en": "National Council candidate zomdus",
+      "category": "nominating",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "ea-2008",
+      "locator": "https://oag.gov.bt/wp-content/uploads/2026/08/Election-Act-of-Bhutan-2008both-Dzongkha-English.pdf (s.11: every gewog and dzongkhag thromde nominates one National Council candidate at a zomdu by majority vote of the registered voters present, with a polling station set up by the Dzongkhag Electoral Officer)",
+      "disposition": "blocked",
+      "disposition_reason": "The zomdu is a state-run nominating vote in each gewog and thromde, but the Commission publishes only the resulting candidate lists, not the zomdu tallies.",
+      "match": [],
+      "dates": [],
+      "est_votes": 200000,
+      "effort": 5
+    },
+    {
+      "key": "referendums",
+      "tier": "national",
+      "name": "National Referendum",
+      "name_en": "National Referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "bt.dzongkhag"
+        ]
+      },
+      "source": "const-2008",
+      "locator": "https://oag.gov.bt/wp-content/uploads/2026/08/Constitution_of_Bhutan.pdf (Art. 34: the Druk Gyalpo may command a National Referendum on a bill not passed in a joint sitting or on the appeal of half the members of all Dzongkhag Tshogdus; Art. 2.24-2.26 (abdication); Art. 35.3)",
+      "note": "Decided by a simple majority of votes cast (Art. 34.1), under the National Referendum Act 2008. None has been held.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "iso_pattern": "BT"
+        }
+      ],
+      "cadence": [
+        {
+          "called": true,
+          "administered_by": "Election Commission of Bhutan",
+          "source": "nra-2008",
+          "locator": "https://oag.gov.bt/wp-content/uploads/2026/08/National-Referendum-Act-of-the-Kingdom-of-Bhutan-2008-both-Dzongkha-English.pdf"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "prime_minister",
+      "tier": "national",
+      "name": "Lyonchhen",
+      "name_en": "Prime Minister",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "const-2008",
+      "locator": "https://oag.gov.bt/wp-content/uploads/2026/08/Constitution_of_Bhutan.pdf (Art. 17.1: the Druk Gyalpo confers Dakyen on the leader or nominee of the party that wins the majority of seats in the National Assembly)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "No vote is held: the Druk Gyalpo appoints the leader or nominee of the majority party (Art. 17.1). The Druk Gyalpo is a hereditary monarch (Art. 2), so the head of state is never elected either.",
+      "match": [],
+      "dates": []
+    },
+    {
+      "key": "judiciary",
+      "tier": "national",
+      "name": "Drangpon",
+      "name_en": "Judges (Drangpons)",
+      "category": "judicial",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "const-2008",
+      "locator": "https://oag.gov.bt/wp-content/uploads/2026/08/Constitution_of_Bhutan.pdf (Art. 21.4-21.5: the Chief Justice and Drangpons are appointed by the Druk Gyalpo in consultation with the National Judicial Commission)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Every judge is appointed by the Druk Gyalpo; no judicial office is elected.",
+      "match": [],
+      "dates": []
+    },
+    {
+      "key": "party_selections",
+      "tier": "national",
+      "name": "Party candidate selection",
+      "name_en": "Party candidate selections",
+      "category": "nominating",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "ea-2008",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Parties pick their National Assembly candidates under their own rules; the state neither runs nor publishes the selections. The state-run step, the primary round, is class na_primary.",
+      "match": [],
+      "dates": []
+    },
+    {
+      "key": "dt_chair",
+      "tier": "dzongkhag",
+      "name": "Dzongkhag Tshogdu Chairperson",
+      "name_en": "Dzongkhag Tshogdu chairperson",
+      "category": "indirect",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "const-2008",
+      "locator": "https://oag.gov.bt/wp-content/uploads/2026/08/Constitution_of_Bhutan.pdf (Art. 22.11: the Dzongkhag Tshogdu elects a Chairperson from among its members)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Each Dzongkhag Tshogdu elects its chairperson from among its own members at its sitting; the Commission does not run or publish the vote.",
+      "match": [],
+      "dates": []
+    },
+    {
+      "key": "dt_thuemi",
+      "tier": "yenlag_thromde",
+      "name": "Dzongkhag Tshogdu Thromde Thuemi",
+      "name_en": "Thromde Thuemi to the Dzongkhag Tshogdu",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "lga-2009",
+      "locator": "https://oag.gov.bt/wp-content/uploads/2026/08/Local-Government-Act-of-Bhutan-2009-.pdf (s.8 and s.90: a Class B or Yenlag Thromde directly elects a Thuemi to the Dzongkhag Tshogdu; the Thrompon of a Class A Thromde sits ex officio)",
+      "first_held": "2011-01-01",
+      "earliest_record": "2011-01-01",
+      "finest_note": "yenlag thromde",
+      "note": "Elected at the Local Government Elections; the 2011 results have a separate Thromde Thuemi file. The Dzongkhag Tshogdu is otherwise made up of the Gups and Mangmis.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "general"
+          ],
+          "name_pattern": "Dzongkhag Tshogdu|Thuemi",
+          "valid_from": "2011-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 1,
+          "term_years": 5,
+          "called": false,
+          "partisan": false,
+          "administered_by": "Election Commission of Bhutan",
+          "vacancy_rule": "A vacancy is filled by a bye-election within thirty days, unless less than 180 days of the term remain (Election Act 2008 s.579); the member serves the rest of the predecessor's term (s.580).",
+          "source": "lga-2009",
+          "locator": "https://oag.gov.bt/wp-content/uploads/2026/08/Local-Government-Act-of-Bhutan-2009-.pdf (s.20: Local Governments \"shall continue for five years from the date of the first sitting\"; Constitution Art. 22.21)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Election Commission of Bhutan (ecb.bt)",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "No license stated; published by the Election Commission of Bhutan",
+          "url": "https://ecb.bt/local-government-elections-2011-results/",
+          "first_date": "2011-01-01",
+          "last_date": "2011-12-31",
+          "evidence": "One contested and one uncontested PDF for each of the 20 dzongkhags (elected and non-elected candidates with votes), plus Thromde Thuemi and Thromde Tshogpa files; the 2016 and 2021 entries on the Local Government Elections page have no file linked",
+          "source": "ecb-lg2011"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2011-01-01",
+          "precision": "year",
+          "note": "First Local Government Elections under the Local Government Act 2009; results by dzongkhag, contested and uncontested.",
+          "source": "ecb-lg",
+          "quote": "Thromde Tshogde(Thromde Elections) 2026 ... 2021 2016 2011 Gewog Tshogde ( LG Elections) 2021 2016 2011"
+        },
+        {
+          "date": "2016-01-01",
+          "precision": "year",
+          "note": "Second Local Government Elections (gewog poll); the Commission lists the year without a results file.",
+          "source": "ecb-lg",
+          "quote": "Thromde Tshogde(Thromde Elections) 2026 ... 2021 2016 2011 Gewog Tshogde ( LG Elections) 2021 2016 2011"
+        },
+        {
+          "date": "2021-01-01",
+          "precision": "year",
+          "note": "Third Local Government Elections (gewog poll); the Commission lists the year without a results file.",
+          "source": "ecb-lg",
+          "quote": "Thromde Tshogde(Thromde Elections) 2026 ... 2021 2016 2011 Gewog Tshogde ( LG Elections) 2021 2016 2011"
+        },
+        {
+          "date": "2027-01-01",
+          "precision": "year",
+          "note": "Fourth Local Government Elections, announced by the Commission.",
+          "source": "ecb-lg2027",
+          "quote": "Public Notification on Social and Religious Events during the 4th Local Government Elections 2027"
+        }
+      ],
+      "est_votes": 60000,
+      "effort": 3
+    },
+    {
+      "key": "gup",
+      "tier": "gewog",
+      "name": "Gup",
+      "name_en": "Gup (gewog head)",
+      "category": "executive",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "const-2008",
+      "locator": "https://oag.gov.bt/wp-content/uploads/2026/08/Constitution_of_Bhutan.pdf (Art. 22.7: the Gup and Mangmi are elected by the people of the Gewog; the Gup chairs the Gewog Tshogde)",
+      "first_held": "2011-01-01",
+      "earliest_record": "2011-01-01",
+      "finest_note": "gewog",
+      "note": "One Gup per gewog (205), first past the post and non-partisan; an uncontested candidate faces a yes-or-no vote. The Gup also sits in the Dzongkhag Tshogdu. Gups chosen before the Local Government Act 2009 are class gup_pre2011.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "general"
+          ],
+          "name_pattern": "\\mGup\\M",
+          "valid_from": "2011-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 1,
+          "term_years": 5,
+          "called": false,
+          "partisan": false,
+          "administered_by": "Election Commission of Bhutan",
+          "vacancy_rule": "A vacancy is filled by a bye-election within thirty days, unless less than 180 days of the term remain (Election Act 2008 s.579); the member serves the rest of the predecessor's term (s.580).",
+          "source": "lga-2009",
+          "locator": "https://oag.gov.bt/wp-content/uploads/2026/08/Local-Government-Act-of-Bhutan-2009-.pdf (s.20: Local Governments \"shall continue for five years from the date of the first sitting\"; Constitution Art. 22.21)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Election Commission of Bhutan (ecb.bt)",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "No license stated; published by the Election Commission of Bhutan",
+          "url": "https://ecb.bt/local-government-elections-2011-results/",
+          "first_date": "2011-01-01",
+          "last_date": "2011-12-31",
+          "evidence": "One contested and one uncontested PDF for each of the 20 dzongkhags (elected and non-elected candidates with votes), plus Thromde Thuemi and Thromde Tshogpa files; the 2016 and 2021 entries on the Local Government Elections page have no file linked",
+          "source": "ecb-lg2011"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2011-01-01",
+          "precision": "year",
+          "note": "First Local Government Elections under the Local Government Act 2009; results by dzongkhag, contested and uncontested.",
+          "source": "ecb-lg",
+          "quote": "Thromde Tshogde(Thromde Elections) 2026 ... 2021 2016 2011 Gewog Tshogde ( LG Elections) 2021 2016 2011"
+        },
+        {
+          "date": "2016-01-01",
+          "precision": "year",
+          "note": "Second Local Government Elections (gewog poll); the Commission lists the year without a results file.",
+          "source": "ecb-lg",
+          "quote": "Thromde Tshogde(Thromde Elections) 2026 ... 2021 2016 2011 Gewog Tshogde ( LG Elections) 2021 2016 2011"
+        },
+        {
+          "date": "2021-01-01",
+          "precision": "year",
+          "note": "Third Local Government Elections (gewog poll); the Commission lists the year without a results file.",
+          "source": "ecb-lg",
+          "quote": "Thromde Tshogde(Thromde Elections) 2026 ... 2021 2016 2011 Gewog Tshogde ( LG Elections) 2021 2016 2011"
+        },
+        {
+          "date": "2027-01-01",
+          "precision": "year",
+          "note": "Fourth Local Government Elections, announced by the Commission.",
+          "source": "ecb-lg2027",
+          "quote": "Public Notification on Social and Religious Events during the 4th Local Government Elections 2027"
+        }
+      ],
+      "est_votes": 900000,
+      "effort": 3
+    },
+    {
+      "key": "mangmi",
+      "tier": "gewog",
+      "name": "Mangmi",
+      "name_en": "Mangmi (deputy gewog head)",
+      "category": "executive",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "const-2008",
+      "locator": "https://oag.gov.bt/wp-content/uploads/2026/08/Constitution_of_Bhutan.pdf (Art. 22.7)",
+      "first_held": "2011-01-01",
+      "earliest_record": "2011-01-01",
+      "finest_note": "gewog",
+      "note": "One Mangmi per gewog, elected with the Gup (Election Act 2008 s.15).",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "general"
+          ],
+          "name_pattern": "Mangmi",
+          "valid_from": "2011-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 1,
+          "term_years": 5,
+          "called": false,
+          "partisan": false,
+          "administered_by": "Election Commission of Bhutan",
+          "vacancy_rule": "A vacancy is filled by a bye-election within thirty days, unless less than 180 days of the term remain (Election Act 2008 s.579); the member serves the rest of the predecessor's term (s.580).",
+          "source": "lga-2009",
+          "locator": "https://oag.gov.bt/wp-content/uploads/2026/08/Local-Government-Act-of-Bhutan-2009-.pdf (s.20: Local Governments \"shall continue for five years from the date of the first sitting\"; Constitution Art. 22.21)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Election Commission of Bhutan (ecb.bt)",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "No license stated; published by the Election Commission of Bhutan",
+          "url": "https://ecb.bt/local-government-elections-2011-results/",
+          "first_date": "2011-01-01",
+          "last_date": "2011-12-31",
+          "evidence": "One contested and one uncontested PDF for each of the 20 dzongkhags (elected and non-elected candidates with votes), plus Thromde Thuemi and Thromde Tshogpa files; the 2016 and 2021 entries on the Local Government Elections page have no file linked",
+          "source": "ecb-lg2011"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2011-01-01",
+          "precision": "year",
+          "note": "First Local Government Elections under the Local Government Act 2009; results by dzongkhag, contested and uncontested.",
+          "source": "ecb-lg",
+          "quote": "Thromde Tshogde(Thromde Elections) 2026 ... 2021 2016 2011 Gewog Tshogde ( LG Elections) 2021 2016 2011"
+        },
+        {
+          "date": "2016-01-01",
+          "precision": "year",
+          "note": "Second Local Government Elections (gewog poll); the Commission lists the year without a results file.",
+          "source": "ecb-lg",
+          "quote": "Thromde Tshogde(Thromde Elections) 2026 ... 2021 2016 2011 Gewog Tshogde ( LG Elections) 2021 2016 2011"
+        },
+        {
+          "date": "2021-01-01",
+          "precision": "year",
+          "note": "Third Local Government Elections (gewog poll); the Commission lists the year without a results file.",
+          "source": "ecb-lg",
+          "quote": "Thromde Tshogde(Thromde Elections) 2026 ... 2021 2016 2011 Gewog Tshogde ( LG Elections) 2021 2016 2011"
+        },
+        {
+          "date": "2027-01-01",
+          "precision": "year",
+          "note": "Fourth Local Government Elections, announced by the Commission.",
+          "source": "ecb-lg2027",
+          "quote": "Public Notification on Social and Religious Events during the 4th Local Government Elections 2027"
+        }
+      ],
+      "est_votes": 800000,
+      "effort": 3
+    },
+    {
+      "key": "gewog_tshogpa",
+      "tier": "chiwog",
+      "name": "Gewog Tshogde Tshogpa",
+      "name_en": "Gewog Tshogde Tshogpas",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "ea-2008",
+      "locator": "https://oag.gov.bt/wp-content/uploads/2026/08/Election-Act-of-Bhutan-2008both-Dzongkha-English.pdf (s.14-16: each gewog is divided into chiwogs equal to its Gewog Tshogde seats and each chiwog elects one Tshogpa; the Tshogde has seven to ten members with the Gup and Mangmi)",
+      "first_held": "2011-01-01",
+      "earliest_record": "2011-01-01",
+      "finest_note": "chiwog",
+      "note": "Five to eight Tshogpas per gewog (Local Government Act 2009 s.10), one per chiwog. Many chiwog seats are uncontested or go unfilled.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "general"
+          ],
+          "name_pattern": "Gewog Tshogde",
+          "valid_from": "2011-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 1,
+          "term_years": 5,
+          "called": false,
+          "partisan": false,
+          "administered_by": "Election Commission of Bhutan",
+          "vacancy_rule": "A vacancy is filled by a bye-election within thirty days, unless less than 180 days of the term remain (Election Act 2008 s.579); the member serves the rest of the predecessor's term (s.580).",
+          "source": "lga-2009",
+          "locator": "https://oag.gov.bt/wp-content/uploads/2026/08/Local-Government-Act-of-Bhutan-2009-.pdf (s.20: Local Governments \"shall continue for five years from the date of the first sitting\"; Constitution Art. 22.21)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Election Commission of Bhutan (ecb.bt)",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "No license stated; published by the Election Commission of Bhutan",
+          "url": "https://ecb.bt/local-government-elections-2011-results/",
+          "first_date": "2011-01-01",
+          "last_date": "2011-12-31",
+          "evidence": "One contested and one uncontested PDF for each of the 20 dzongkhags (elected and non-elected candidates with votes), plus Thromde Thuemi and Thromde Tshogpa files; the 2016 and 2021 entries on the Local Government Elections page have no file linked",
+          "source": "ecb-lg2011"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2011-01-01",
+          "precision": "year",
+          "note": "First Local Government Elections under the Local Government Act 2009; results by dzongkhag, contested and uncontested.",
+          "source": "ecb-lg",
+          "quote": "Thromde Tshogde(Thromde Elections) 2026 ... 2021 2016 2011 Gewog Tshogde ( LG Elections) 2021 2016 2011"
+        },
+        {
+          "date": "2016-01-01",
+          "precision": "year",
+          "note": "Second Local Government Elections (gewog poll); the Commission lists the year without a results file.",
+          "source": "ecb-lg",
+          "quote": "Thromde Tshogde(Thromde Elections) 2026 ... 2021 2016 2011 Gewog Tshogde ( LG Elections) 2021 2016 2011"
+        },
+        {
+          "date": "2021-01-01",
+          "precision": "year",
+          "note": "Third Local Government Elections (gewog poll); the Commission lists the year without a results file.",
+          "source": "ecb-lg",
+          "quote": "Thromde Tshogde(Thromde Elections) 2026 ... 2021 2016 2011 Gewog Tshogde ( LG Elections) 2021 2016 2011"
+        },
+        {
+          "date": "2027-01-01",
+          "precision": "year",
+          "note": "Fourth Local Government Elections, announced by the Commission.",
+          "source": "ecb-lg2027",
+          "quote": "Public Notification on Social and Religious Events during the 4th Local Government Elections 2027"
+        }
+      ],
+      "est_votes": 800000,
+      "effort": 4
+    },
+    {
+      "key": "thrompon",
+      "tier": "thromde",
+      "name": "Thrompon",
+      "name_en": "Thrompon (mayor of a Dzongkhag Thromde)",
+      "category": "executive",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "const-2008",
+      "locator": "https://oag.gov.bt/wp-content/uploads/2026/08/Constitution_of_Bhutan.pdf (Art. 22.8: the Thrompon is directly elected by the voters of the Dzongkhag Thromde)",
+      "first_held": "2011-01-01",
+      "earliest_record": "2011-01-01",
+      "finest_note": "thromde",
+      "note": "Chief executive and chair of the Thromde Tshogde (Election Act 2008 s.19). The Commission lists thromde elections in 2011, 2016, 2021, and 2026; the 2026 results cover Thimphu and Phuentsholing.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "general"
+          ],
+          "name_pattern": "Thrompon",
+          "valid_from": "2011-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 1,
+          "term_years": 5,
+          "called": false,
+          "partisan": false,
+          "administered_by": "Election Commission of Bhutan",
+          "vacancy_rule": "A vacancy is filled by a bye-election within thirty days, unless less than 180 days of the term remain (Election Act 2008 s.579); the member serves the rest of the predecessor's term (s.580).",
+          "source": "lga-2009",
+          "locator": "https://oag.gov.bt/wp-content/uploads/2026/08/Local-Government-Act-of-Bhutan-2009-.pdf (s.20: Local Governments \"shall continue for five years from the date of the first sitting\"; Constitution Art. 22.21)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Election Commission of Bhutan (ecb.bt)",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "No license stated; published by the Election Commission of Bhutan",
+          "url": "https://ecb.bt/4ththromdeelections2026/",
+          "first_date": "2026-01-01",
+          "last_date": "2026-12-31",
+          "evidence": "Annexure I (contested) and II (uncontested) results for Phuentsholing and Thimphu, dated 16 July 2026",
+          "source": "ecb-thromde2026"
+        },
+        {
+          "platform": "Election Commission of Bhutan (ecb.bt)",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "No license stated; published by the Election Commission of Bhutan",
+          "url": "https://ecb.bt/local-government-elections-2011-results/",
+          "first_date": "2011-01-01",
+          "last_date": "2011-12-31",
+          "evidence": "One contested and one uncontested PDF for each of the 20 dzongkhags (elected and non-elected candidates with votes), plus Thromde Thuemi and Thromde Tshogpa files; the 2016 and 2021 entries on the Local Government Elections page have no file linked",
+          "source": "ecb-lg2011"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2011-01-01",
+          "precision": "year",
+          "source": "ecb-lg",
+          "quote": "Thromde Tshogde(Thromde Elections) 2026 ... 2021 2016 2011 Gewog Tshogde ( LG Elections) 2021 2016 2011"
+        },
+        {
+          "date": "2016-01-01",
+          "precision": "year",
+          "source": "ecb-lg",
+          "quote": "Thromde Tshogde(Thromde Elections) 2026 ... 2021 2016 2011 Gewog Tshogde ( LG Elections) 2021 2016 2011"
+        },
+        {
+          "date": "2021-01-01",
+          "precision": "year",
+          "source": "ecb-lg",
+          "quote": "Thromde Tshogde(Thromde Elections) 2026 ... 2021 2016 2011 Gewog Tshogde ( LG Elections) 2021 2016 2011"
+        },
+        {
+          "date": "2026-01-01",
+          "precision": "year",
+          "source": "ecb-thromde2026",
+          "quote": "Dzongkhag Thromde Tshogde Elections, 2026"
+        }
+      ],
+      "est_votes": 60000,
+      "effort": 2
+    },
+    {
+      "key": "thromde_tshogpa",
+      "tier": "thromde",
+      "name": "Thromde Tshogde",
+      "name_en": "Thromde Tshogde members",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "ea-2008",
+      "locator": "https://oag.gov.bt/wp-content/uploads/2026/08/Election-Act-of-Bhutan-2008both-Dzongkha-English.pdf (s.17-18: a Dzongkhag Thromde is divided into constituencies equal to its Thromde Tshogde seats, seven to ten including the Thrompon)",
+      "first_held": "2011-01-01",
+      "earliest_record": "2011-01-01",
+      "finest_note": "thromde constituency",
+      "note": "One member per thromde constituency, non-partisan.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "general"
+          ],
+          "name_pattern": "Thromde Tshogde",
+          "valid_from": "2011-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 1,
+          "term_years": 5,
+          "called": false,
+          "partisan": false,
+          "administered_by": "Election Commission of Bhutan",
+          "vacancy_rule": "A vacancy is filled by a bye-election within thirty days, unless less than 180 days of the term remain (Election Act 2008 s.579); the member serves the rest of the predecessor's term (s.580).",
+          "source": "lga-2009",
+          "locator": "https://oag.gov.bt/wp-content/uploads/2026/08/Local-Government-Act-of-Bhutan-2009-.pdf (s.20: Local Governments \"shall continue for five years from the date of the first sitting\"; Constitution Art. 22.21)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Election Commission of Bhutan (ecb.bt)",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "No license stated; published by the Election Commission of Bhutan",
+          "url": "https://ecb.bt/4ththromdeelections2026/",
+          "first_date": "2026-01-01",
+          "last_date": "2026-12-31",
+          "evidence": "Annexure I (contested) and II (uncontested) results for Phuentsholing and Thimphu, dated 16 July 2026",
+          "source": "ecb-thromde2026"
+        },
+        {
+          "platform": "Election Commission of Bhutan (ecb.bt)",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "No license stated; published by the Election Commission of Bhutan",
+          "url": "https://ecb.bt/local-government-elections-2011-results/",
+          "first_date": "2011-01-01",
+          "last_date": "2011-12-31",
+          "evidence": "One contested and one uncontested PDF for each of the 20 dzongkhags (elected and non-elected candidates with votes), plus Thromde Thuemi and Thromde Tshogpa files; the 2016 and 2021 entries on the Local Government Elections page have no file linked",
+          "source": "ecb-lg2011"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2011-01-01",
+          "precision": "year",
+          "source": "ecb-lg",
+          "quote": "Thromde Tshogde(Thromde Elections) 2026 ... 2021 2016 2011 Gewog Tshogde ( LG Elections) 2021 2016 2011"
+        },
+        {
+          "date": "2016-01-01",
+          "precision": "year",
+          "source": "ecb-lg",
+          "quote": "Thromde Tshogde(Thromde Elections) 2026 ... 2021 2016 2011 Gewog Tshogde ( LG Elections) 2021 2016 2011"
+        },
+        {
+          "date": "2021-01-01",
+          "precision": "year",
+          "source": "ecb-lg",
+          "quote": "Thromde Tshogde(Thromde Elections) 2026 ... 2021 2016 2011 Gewog Tshogde ( LG Elections) 2021 2016 2011"
+        },
+        {
+          "date": "2026-01-01",
+          "precision": "year",
+          "source": "ecb-thromde2026",
+          "quote": "Dzongkhag Thromde Tshogde Elections, 2026"
+        }
+      ],
+      "est_votes": 100000,
+      "effort": 3
+    },
+    {
+      "key": "lg_by",
+      "tier": "gewog",
+      "name": "Local Government bye-election",
+      "name_en": "Local Government bye-elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "ea-2008",
+      "locator": "https://oag.gov.bt/wp-content/uploads/2026/08/Election-Act-of-Bhutan-2008both-Dzongkha-English.pdf (s.577-580)",
+      "note": "Bye-elections for any Gup, Mangmi, Tshogpa, Thrompon, or Thuemi seat, within thirty days of the vacancy. The Commission posts each declaration (for example Garzhikha_Omchheygang and Zamding chiwogs in Wangdue Phodrang, and Dhangkhar_Trong chiwog in Zhemgang).",
+      "match": [
+        {
+          "election_kinds": [
+            "by_election"
+          ],
+          "name_pattern": "\\mGup\\M|Mangmi|Thrompon|Gewog Tshogde|Thromde Tshogde|Dzongkhag Tshogdu|Thuemi"
+        }
+      ],
+      "cadence": [
+        {
+          "called": true,
+          "partisan": false,
+          "administered_by": "Election Commission of Bhutan",
+          "source": "ea-2008",
+          "locator": "https://oag.gov.bt/wp-content/uploads/2026/08/Election-Act-of-Bhutan-2008both-Dzongkha-English.pdf (s.579: Local Government bye-elections within thirty days of the vacancy)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Election Commission of Bhutan (ecb.bt)",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "No license stated; published by the Election Commission of Bhutan",
+          "url": "https://ecb.bt/local-government-bye-elections/",
+          "first_date": "2011-01-01",
+          "evidence": "Declarations of results for each Local Government bye-election, as web posts",
+          "source": "ecb-lgbye"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2011-01-01",
+          "precision": "year",
+          "through": "2026-12-31",
+          "note": "No official list of Local Government bye-elections has been compiled yet."
+        }
+      ],
+      "est_votes": 50000,
+      "effort": 4
+    },
+    {
+      "key": "tshogdu_1953",
+      "tier": "national",
+      "name": "Tshogdu",
+      "name_en": "Tshogdu (National Assembly) chimis, 1953-2007",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "syb-2025",
+      "locator": "Introduction, p. xix (the National Assembly (Gyelyong Tshogdu))",
+      "valid_from": "1953-01-01",
+      "valid_to": "2008-05-08",
+      "first_held": "1953-01-01",
+      "note": "Before the Constitution the Tshogdu held chimis chosen by the people of each gewog (one vote per household), alongside representatives of the monastic body and government nominees. It ended when the elected National Assembly first sat in 2008.",
+      "disposition": "blocked",
+      "disposition_reason": "No official source publishes the chimi selections; the National Assembly's own site (nab.gov.bt) does not answer from here and the Commission's records begin in 2007.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "indirect",
+            "local"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "BT",
+          "valid_to": "2008-05-08"
+        }
+      ],
+      "dates": [],
+      "est_votes": 300000,
+      "effort": 5
+    },
+    {
+      "key": "gup_pre2011",
+      "tier": "gewog",
+      "name": "Gup, Mangmi, and Tshogpa before 2011",
+      "name_en": "Gups and gewog bodies before the Local Government Act 2009",
+      "category": "executive",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "syb-2025",
+      "locator": "Introduction, p. xix: \"Dzongkhag Tshogdu was established in 1981 ... the Gewog Tshogde was established in 1991\"",
+      "valid_from": "1991-01-01",
+      "valid_to": "2011-01-01",
+      "note": "Gups, Mangmis, and Tshogpas of the Dzongkhag Yargay Tshogdu and Gewog Yargay Tshogchhung chosen under royal decrees and chathrims before the Local Government Act 2009.",
+      "disposition": "blocked",
+      "disposition_reason": "No official record of these selections is published online; the Department of Local Governance site (dlg.gov.bt) does not answer from here.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "general"
+          ],
+          "name_pattern": "\\mGup\\M|Mangmi|Gewog Tshogde|Gewog Yargay|Tshogpa",
+          "valid_to": "2011-01-01"
+        }
+      ],
+      "dates": [],
+      "est_votes": 500000,
+      "effort": 5
+    }
+  ]
+}
