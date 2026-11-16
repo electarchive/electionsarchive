@@ -850,6 +850,10 @@ def ce_read(path: str, member: str) -> pl.DataFrame:
         else column("circunscripcionelectoral")
     )
     elected = next((c for c in columns if c.startswith("electo")), None)
+    lista = column("lista")
+    if "nominadoa" in columns:
+        # A primaries workbook leaves the list blank on its blank and null rows; each district held one list's primary.
+        lista = lista.fill_null(lista.drop_nulls().first().over(column("distrito")))
     return frame.select(
         region=column("idregion"),
         comuna=column("comuna"),
@@ -861,7 +865,7 @@ def ce_read(path: str, member: str) -> pl.DataFrame:
         circ_prov=pl.lit(None, pl.String),
         electores=pl.lit(None, pl.String),
         voto=pl.lit(None, pl.String),
-        lista=column("lista"),
+        lista=lista,
         pacto=pl.lit(None, pl.String),
         subpacto=pl.lit(None, pl.String),
         partido=column("partido"),
