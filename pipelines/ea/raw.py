@@ -6,7 +6,7 @@ import os
 import shlex
 import subprocess
 import sys
-from collections.abc import Generator
+from collections.abc import Callable, Generator
 from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import UTC, datetime
@@ -207,7 +207,14 @@ def store(source: str, url: str, content: bytes, *, suffix: str, retrieved_at: d
     return _artifact(source, url, entry)
 
 
-def fetch(source: str, url: str, *, suffix: str, body: dict[str, object] | None = None) -> Artifact:
+def fetch(
+    source: str,
+    url: str,
+    *,
+    suffix: str,
+    body: dict[str, object] | None = None,
+    check: Callable[[Path], object] | None = None,
+) -> Artifact:
     index = _read(source)
     key = _key(url, body)
     if key in index:
@@ -235,6 +242,8 @@ def fetch(source: str, url: str, *, suffix: str, body: dict[str, object] | None 
                 digest.update(chunk)
                 size += len(chunk)
                 file.write(chunk)
+        if check is not None:
+            check(partial)
     except BaseException:
         partial.unlink(missing_ok=True)
         raise

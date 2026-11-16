@@ -609,10 +609,13 @@ def _placed(countries: dict[str, tuple[str | None, str]]) -> list[str]:
     return [_url(POSITIONS, _scope(item), languages) for item, languages in countries.values()] + [_extra(POSITIONS)]
 
 
+def _bindings(path: Path) -> list[dict[str, dict[str, str]]]:
+    return json.loads(path.read_text(encoding="utf-8"))["results"]["bindings"]
+
+
 def _rows(url: str) -> list[dict[str, str]]:
     return [
-        {key: value["value"] for key, value in binding.items()}
-        for binding in json.loads(raw.cached(SOURCE, url).path.read_text(encoding="utf-8"))["results"]["bindings"]
+        {key: value["value"] for key, value in binding.items()} for binding in _bindings(raw.cached(SOURCE, url).path)
     ]
 
 
@@ -648,9 +651,9 @@ def fetch() -> None:
     for url in dict.fromkeys(_urls(countries) + _placed(countries)):
         for attempt in range(3):
             try:
-                raw.fetch(SOURCE, url, suffix=".json")
+                raw.fetch(SOURCE, url, suffix=".json", check=_bindings)
                 break
-            except httpx.HTTPStatusError, httpx.TransportError:
+            except httpx.HTTPStatusError, httpx.TransportError, ValueError, KeyError:
                 time.sleep(30 * (attempt + 1))
         else:
             failed.append(url)
