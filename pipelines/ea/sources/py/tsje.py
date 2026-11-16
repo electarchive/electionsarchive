@@ -2,12 +2,14 @@ import functools
 import json
 import re
 import unicodedata
+import zipfile
 from collections import Counter
 from datetime import date
 from uuid import uuid5
 
 import fastexcel
 import polars as pl
+import shapely
 
 from ea import changeset, package, raw
 from ea.package import Package
@@ -28,6 +30,15 @@ ELECTED_SUMMARY = f"{FILES}/resumen-electos-por-organizacion-y-genero-2026.xlsx"
 # The results page of the 2026 portal reads its district totals from these two modules.
 SUMMARY = f"{SITE}/assets/resumen-DviwI-nn.js"
 COUNCIL_SUMMARY = f"{SITE}/assets/juntas-o1DzBmUK.js"
+# Paraguay's district boundaries (admin level 2: 263 distritos) from the DGEEC/INE cartography, as redistributed in the
+# humanitarian community's common operational dataset of July 2026.
+BOUNDARIES = (
+    "https://data.humdata.org/dataset/212cd82f-bcb8-445f-8b32-aa194387f6c3/resource/"
+    "9d74ce1f-40d9-488b-8e7c-b710c1997f01/download/pry_admin_boundaries.geojson.zip"
+)
+BOUNDARIES_PAGE = "https://data.humdata.org/dataset/cod-ab-pry"
+BOUNDARY_FILE = "pry_admin2.geojson"
+BOUNDARY_DAY = date(2026, 7, 29)
 WORKBOOKS = (MAYORS, COUNCILS, MAYORS_ELECTED, COUNCILS_ELECTED, ELECTED_SUMMARY)
 MODULES = (SUMMARY, COUNCIL_SUMMARY)
 
@@ -54,6 +65,7 @@ COUNCIL_METHOD = (
 
 
 def fetch() -> None:
+    raw.fetch(SOURCE, BOUNDARIES, suffix=".zip")
     for url in (*WORKBOOKS, *MODULES):
         artifact = raw.fetch(SOURCE, url, suffix="." + url.rsplit(".", 1)[1])
         # The portal answers every unknown path with its HTML shell, so a missing file arrives as a page.
@@ -98,6 +110,7 @@ def body(dep: int, dis: int) -> str:
 
 SOURCE_ID = key("source", SOURCE)
 SUMMARY_ID = key("source", SOURCE, "summary")
+BOUNDARY_ID = key("source", SOURCE, "boundaries")
 MAYOR_SYSTEM = key("electoral_system", "mayor", 1991)
 COUNCIL_SYSTEM = key("electoral_system", "council", 2021)
 SYSTEMS = (
@@ -304,6 +317,95 @@ def compare() -> dict[str, dict[str, int]]:
     return national
 
 
+# The cartography numbers the departments of Boquerón and Alto Paraguay the other way round from the Tribunal.
+CARTOGRAPHY_DEPARTMENT = {16: 17, 17: 16}
+# Districts whose Tribunal name is abbreviated or differs from the cartography's, by (department, district).
+RENAMED = {
+    (1, 4): "Sargento José Félix López",
+    (2, 5): "Capiibary",
+    (2, 9): "General Elizardo Aquino",
+    (2, 11): "General Francisco Isidoro Resquín",
+    (3, 1): "Primero de Marzo",
+    (4, 3): "Capitán Mauricio José Troche",
+    (4, 7): "Doctor Bottrell",
+    (4, 11): "Gral. Eugenio A. Garay",
+    (4, 19): "José Fassardi",
+    (4, 21): "Mbocayaty",
+    (4, 31): "Yataity",
+    (5, 9): "Dr. J. Eulogio Estigarribia",
+    (5, 11): "Dr. Juan Manuel Frutos",
+    (5, 17): "Mariscal Francisco Solano López",
+    (6, 5): "Dr. Moisés S. Bertoni",
+    (6, 7): "Yegros",
+    (6, 9): "Gral. Higinio Morinigo",
+    (7, 35): "Mayor Julio Dionisio Otaño",
+    (8, 0): "San Juan Bautista de las Misiones",
+    (8, 17): "Yabebyry",
+    (9, 9): "Caballero",
+    (9, 21): "Roque Gonzalez de Santa Cruz",
+    (10, 1): "Dr. Juan León Mallorquín",
+    (11, 19): "Mariano Roque Alonso",
+    (12, 7): "Gral. José Eduvigis Díaz",
+    (12, 17): "Mayor José Dejesús Martínez",
+    (12, 21): "San Juan Bautista de Ñeembucú",
+    (13, 0): "Pedro Juan Caballero",
+    (14, 9): "La Paloma del Espíritu Santo",
+    (14, 13): "Villa Curuguaty",
+    (14, 14): "Puerto Adela",
+    (14, 18): "Ybyrarobaná",
+    (15, 3): "José Falcón",
+    (15, 4): "General José María Bruguez",
+    (15, 9): "Tte. 1° Manuel Irala Fernández",
+    (15, 11): "Teniente Esteban Martínez",
+    (17, 3): "Mariscal José Félix Estigarribia",
+}
+
+
+def _fold(text: str) -> str:
+    plain = "".join(c for c in unicodedata.normalize("NFD", text.lower()) if unicodedata.category(c) != "Mn")
+    return re.sub(r"[^a-z0-9]", "", plain)
+
+
+def boundaries() -> dict[tuple[int, int], shapely.Geometry]:
+    """The cartography's district shapes keyed by the Tribunal's (department, district) codes."""
+    with zipfile.ZipFile(raw.cached(SOURCE, BOUNDARIES).path) as archive:
+        collection = json.loads(archive.read(BOUNDARY_FILE))
+    shapes: dict[tuple[int, str], shapely.Geometry] = {}
+    for feature in collection["features"]:
+        props = feature["properties"]
+        dep = int(props["adm1_pcode"][2:])
+        name = _fold(props["adm2_name"])
+        if (dep, name) in shapes:
+            raise ValueError(f"the cartography has two districts called {props['adm2_name']} in department {dep}")
+        shapes[dep, name] = shapely.from_geojson(json.dumps(feature["geometry"]))
+    units = districts()
+    found: dict[tuple[int, int], shapely.Geometry] = {}
+    for dep, dis, name in units.select("dep", "dis", "dis_name").iter_rows():
+        cartography = CARTOGRAPHY_DEPARTMENT.get(dep, dep)
+        label = RENAMED.get((dep, dis), name)
+        if (cartography, _fold(label)) not in shapes:
+            raise ValueError(f"no cartography shape for district {dep}:{dis} {name}")
+        found[dep, dis] = shapes.pop((cartography, _fold(label)))
+    if shapes:
+        raise ValueError(f"cartography districts without a Tribunal district: {sorted(shapes)}")
+    return found
+
+
+def _wkb(geometry: shapely.Geometry) -> str:
+    valid = shapely.make_valid(geometry)
+    parts = [g for g in getattr(valid, "geoms", [valid]) if g.geom_type in {"Polygon", "MultiPolygon"}]
+    polygons = shapely.union_all(parts) if len(parts) > 1 else parts[0]
+    if polygons.geom_type == "Polygon":
+        polygons = shapely.MultiPolygon([polygons])
+    return shapely.to_wkb(shapely.set_srid(polygons, 4326), hex=True, include_srid=True)
+
+
+def _point(geometry: shapely.Geometry) -> str:
+    return shapely.to_wkb(
+        shapely.set_srid(shapely.point_on_surface(shapely.make_valid(geometry)), 4326), hex=True, include_srid=True
+    )
+
+
 def geo() -> Package:
     frame = districts()
     p = Package(
@@ -318,6 +420,18 @@ def geo() -> Package:
         p.artifact(raw.cached(SOURCE, url), SOURCE_ID)
     for url in MODULES:
         p.artifact(raw.cached(SOURCE, url), SUMMARY_ID)
+    p.add(
+        "source",
+        id=BOUNDARY_ID,
+        kind="official_body",
+        publisher="Dirección General de Estadística, Encuestas y Censos (DGEEC), Instituto Nacional de Estadística",
+        title="Paraguay: límites administrativos, cartografía de distritos (as distributed in the OCHA COD-AB, v01)",
+        url=BOUNDARIES_PAGE,
+        license="CC BY-IGO 3.0",
+        license_url="https://creativecommons.org/licenses/by/3.0/igo/",
+        attribution="Dirección General de Estadística, Encuestas y Censos (DGEEC), INE Paraguay; OCHA Field Information Services",
+    )
+    p.artifact(raw.cached(SOURCE, BOUNDARIES), BOUNDARY_ID)
     for code, rank, kind, noun in (
         ("py.departamento", 1, "administrative", "department"),
         ("py.distrito", 2, "administrative", "municipality"),
@@ -336,6 +450,27 @@ def geo() -> Package:
         p.add("area_code", area_id=id, code=f"{dep}:{dis}")
         p.add("area_parent", area_id=id, parent_id=area("py.departamento", str(dep)))
         p.name(id, title(name), "es", "official")
+    shapes = boundaries()
+    for (dep, dis), shape in sorted(shapes.items()):
+        p.add(
+            "area_geometry",
+            area_id=area("py.distrito", f"{dep}:{dis}"),
+            valid_from=None,
+            valid_to=None,
+            geom=_wkb(shape),
+            label_point=_point(shape),
+            quality="official",
+            source_id=BOUNDARY_ID,
+        )
+    p.add(
+        "boundary_set",
+        id=p.id("boundary_set", "py.distrito", "2026"),
+        scheme_code="py.distrito",
+        vintage="2026",
+        valid_from=None,
+        valid_to=None,
+        as_of=DAY,
+    )
     return p
 
 
