@@ -1,0 +1,889 @@
+{
+  "polity": "XK",
+  "name": "Kosovo",
+  "sources": {
+    "kushtetuta": {
+      "title": "Kushtetuta e Republikës së Kosovës",
+      "publisher": "Gazeta Zyrtare e Republikës së Kosovës",
+      "url": "https://gzk.rks-gov.net/ActDetail.aspx?ActID=3702",
+      "kind": "official_body",
+      "note": "Adopted 9 April 2008, in force 15 June 2008 (art. 162). Arts. 64-66 (Assembly), 65(3) (referendum), 82 (dissolution), 86-87 (President), 123-124 (local self-government), 139 (Central Election Commission)."
+    },
+    "l03-073": {
+      "title": "Ligji Nr. 03/L-073 për zgjedhjet e përgjithshme në Republikën e Kosovës",
+      "publisher": "Gazeta Zyrtare e Republikës së Kosovës",
+      "url": "https://gzk.rks-gov.net/ActDetail.aspx?ActID=2544",
+      "kind": "official_body",
+      "note": "Official Gazette 31/2008, published 15 June 2008; amended by Law 03/L-256 (2010) and repealed by Law 08/L-228 (2023)."
+    },
+    "l08-228": {
+      "title": "Ligji Nr. 08/L-228 për zgjedhjet e përgjithshme në Republikën e Kosovës",
+      "publisher": "Gazeta Zyrtare e Republikës së Kosovës",
+      "url": "https://gzk.rks-gov.net/ActDetail.aspx?ActID=77074",
+      "kind": "official_body",
+      "note": "Official Gazette 14/2023, published 3 July 2023; repeals Law 03/L-073."
+    },
+    "l03-072": {
+      "title": "Ligji Nr. 03/L-072 për zgjedhjet lokale në Republikën e Kosovës",
+      "publisher": "Gazeta Zyrtare e Republikës së Kosovës",
+      "url": "https://gzk.rks-gov.net/ActDetail.aspx?ActID=2549",
+      "kind": "official_body",
+      "note": "Official Gazette 32/2008, published 15 June 2008. Arts. 4-5 (four-year cycle on a Sunday), 7-8 (municipal assemblies, one district per municipality, divisors 1, 3, 5, 7), 9 (mayors), 11 (extraordinary mayoral elections)."
+    },
+    "l03-040": {
+      "title": "Ligji Nr. 03/L-040 për vetëqeverisjen lokale",
+      "publisher": "Gazeta Zyrtare e Republikës së Kosovës",
+      "url": "https://gzk.rks-gov.net/ActDetail.aspx?ActID=2530",
+      "kind": "official_body",
+      "note": "Official Gazette 28/2008, published 4 June 2008. Art. 34 (villages, settlements, and urban quarters), 36 (assembly size by population), 71 (municipal referendum on a regulation), 72 (removal of the mayor)."
+    },
+    "l03-041": {
+      "title": "Ligji Nr. 03/L-041 për kufijtë administrativ të komunave",
+      "publisher": "Gazeta Zyrtare e Republikës së Kosovës",
+      "url": "https://gzk.rks-gov.net/ActDetail.aspx?ActID=2518",
+      "kind": "official_body",
+      "note": "Official Gazette 26/2008, published 2 June 2008. Art. 5 lists the 38 municipalities: 28 continued from UNMIK Regulation 2000/43, Novobërdë enlarged, Mitrovica split in two, and 7 new ones."
+    },
+    "v22-2025": {
+      "title": "Vendim Nr. 22/2025 (PRS-22/2025-V), shpallen zgjedhjet lokale në Republikën e Kosovës",
+      "publisher": "Gazeta Zyrtare e Republikës së Kosovës",
+      "url": "https://gzk.rks-gov.net/ActDetail.aspx?ActID=106486",
+      "kind": "official_body",
+      "note": "Decision of the President of the Republic, published 9 June 2025, setting the 2025 local elections under Law 03/L-072."
+    },
+    "dekret-210-2025": {
+      "title": "Dekret për caktimin dhe shpalljen e zgjedhjeve të parakohshme për Kuvendin e Republikës së Kosovës (PRS-210/2025-DKR)",
+      "publisher": "Gazeta Zyrtare e Republikës së Kosovës",
+      "url": "https://gzk.rks-gov.net/ActDetail.aspx?ActID=112742",
+      "kind": "official_body",
+      "note": "Decree of the President of the Republic, published 20 November 2025, calling the early Assembly election."
+    },
+    "kqz-local-2025": {
+      "title": "Results of the 2025 local elections by polling station",
+      "publisher": "Komisioni Qendror i Zgjedhjeve",
+      "url": "https://resultslocal2025.kqz-ks.org/",
+      "kind": "official_body",
+      "license": "Official election results of the Republic of Kosovo, published for public use",
+      "note": "The results platform's JSON files on storage.kqz-ks.org: assembly-total-latest.json and mayor-total-latest.json (38 municipalities, 2,812 stations), mayor-total-latest-part-2.json (18 runoffs)."
+    },
+    "kqz": {
+      "title": "Rezultatet e zgjedhjeve",
+      "publisher": "Komisioni Qendror i Zgjedhjeve",
+      "url": "https://kqz-ks.org/rezultatet/",
+      "kind": "official_body",
+      "note": "The Commission's results archive for assembly and local elections since 2000. On 16 November 2026 the site answered automated clients with a browser challenge (HTTP 403)."
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "Republika e Kosovës",
+      "name_en": "Kosovo",
+      "parent": null,
+      "polity_kind": "sovereign_state",
+      "source": "kushtetuta"
+    },
+    {
+      "key": "komuna",
+      "name": "Komuna",
+      "name_en": "Municipalities",
+      "parent": "national",
+      "polity_kind": "municipality",
+      "scheme": "xk.komuna",
+      "source": "l03-041",
+      "counts": [
+        {
+          "date": "2008-06-02",
+          "value": 38,
+          "source": "l03-041",
+          "locator": "https://gzk.rks-gov.net/ActDetail.aspx?ActID=2518 (art. 5, paragraphs 2-5: municipalities 1-38)"
+        },
+        {
+          "date": "2025-10-12",
+          "value": 38,
+          "source": "kqz-local-2025",
+          "locator": "https://storage.kqz-ks.org/metadata-round2.json (38 municipalities)"
+        }
+      ]
+    },
+    {
+      "key": "fshat",
+      "name": "Fshatrat, vendbanimet dhe lagjet urbane",
+      "name_en": "Villages, settlements, and urban quarters",
+      "parent": "komuna",
+      "polity_kind": "submunicipal",
+      "source": "l03-040"
+    }
+  ],
+  "classes": [
+    {
+      "key": "kuvendi",
+      "tier": "national",
+      "name": "Zgjedhjet për Kuvendin e Republikës së Kosovës",
+      "name_en": "Assembly of the Republic of Kosovo",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "2008-06-15",
+      "first_held": "2010-12-12",
+      "measure": {
+        "unit": "contest",
+        "fine": [
+          "xk.komuna",
+          "xk.vendvotimi"
+        ]
+      },
+      "source": "kushtetuta",
+      "locator": "https://gzk.rks-gov.net/ActDetail.aspx?ActID=3702 (arts. 64 and 66)",
+      "note": "120 deputies elected for four years from open lists in a single nationwide district, in proportion to valid votes; 20 seats are guaranteed to non-majority communities (10 Serb, 10 for the Roma, Ashkali, Egyptian, Bosniak, Turkish, and Gorani communities), filled from the same ballot (Constitution art. 64). Elections are held at the latest 30 days before the term ends, or within 45 days of a dissolution (art. 66). The 2010 election had revotes in several municipalities in January 2011. Before the Constitution the Assembly was elected under the UNMIK Constitutional Framework (class kuvendi_kk).",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "special"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "XK",
+          "valid_from": "2008-06-15"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "called": true,
+          "administered_by": "Komisioni Qendror i Zgjedhjeve",
+          "source": "kushtetuta",
+          "locator": "https://gzk.rks-gov.net/ActDetail.aspx?ActID=3702 (art. 66: four-year term; art. 82: dissolution)",
+          "valid_from": "2008-06-15",
+          "valid_to": "2023-07-03"
+        },
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "called": true,
+          "administered_by": "Komisioni Qendror i Zgjedhjeve",
+          "source": "l08-228",
+          "locator": "https://gzk.rks-gov.net/ActDetail.aspx?ActID=77074 (Law 08/L-228 on General Elections)",
+          "valid_from": "2023-07-03"
+        }
+      ],
+      "access": [
+        {
+          "platform": "KQZ, Rezultatet e zgjedhjeve",
+          "url": "https://kqz-ks.org/rezultatet/",
+          "format": "xlsx, pdf",
+          "access": "browser",
+          "checked_at": "2026-11-16",
+          "license": "none stated",
+          "first_date": "2010-12-12",
+          "last_date": "2025-12-28",
+          "finest": "xk.vendvotimi",
+          "source": "kqz",
+          "evidence": "Results by municipality and polling station; a browser challenge (HTTP 403) refuses automated clients"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2010-12-12",
+          "note": "Early election after the dissolution of 2 November 2010; revotes in several municipalities in January 2011."
+        },
+        {
+          "date": "2014-06-08",
+          "note": "Early election after the Assembly dissolved itself on 7 May 2014."
+        },
+        {
+          "date": "2017-06-11",
+          "note": "Early election after a vote of no confidence on 10 May 2017."
+        },
+        {
+          "date": "2019-10-06",
+          "note": "Early election after the Assembly dissolved itself on 22 August 2019."
+        },
+        {
+          "date": "2021-02-14",
+          "note": "Early election after the Constitutional Court annulled the government's election."
+        },
+        {
+          "date": "2025-02-09"
+        },
+        {
+          "date": "2025-12-28",
+          "note": "Early election after the Assembly elected in February 2025 failed to elect a government.",
+          "source": "dekret-210-2025",
+          "quote": "Dekret për caktimin dhe shpalljen e zgjedhjeve të parakohshme për Kuvendin e Republikës së Kosovës, PRS-210/2025-DKR"
+        }
+      ],
+      "est_votes": 6000000,
+      "effort": 4
+    },
+    {
+      "key": "kuvendi_kk",
+      "tier": "national",
+      "name": "Zgjedhjet për Kuvendin e Kosovës sipas Kornizës Kushtetuese",
+      "name_en": "Assembly of Kosovo under the UNMIK Constitutional Framework (2001-2008)",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "2001-05-15",
+      "valid_to": "2008-06-15",
+      "first_held": "2001-11-17",
+      "measure": {
+        "unit": "contest",
+        "fine": [
+          "xk.komuna",
+          "xk.vendvotimi"
+        ]
+      },
+      "source": "kushtetuta",
+      "locator": "https://gzk.rks-gov.net/ActDetail.aspx?ActID=3702 (art. 162: the Constitution replaces the Constitutional Framework on 15 June 2008)",
+      "note": "Under UNMIK Regulation 2001/9 (Constitutional Framework for Provisional Self-Government), 120 members were elected for three years in a single nationwide district: 100 by proportional representation and 20 reserved for non-majority communities (10 Serb, 10 others). Lists were closed in 2001 and 2004 and open in 2007. The OSCE Mission ran the 2001 and 2004 elections through the Central Election Commission; the Commission ran the 2007 election jointly with the local elections.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "special"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "XK",
+          "valid_to": "2008-06-15"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 3,
+          "term_years": 3,
+          "called": false,
+          "administered_by": "OSCE Mission in Kosovo and the Central Election Commission",
+          "source": "kushtetuta",
+          "locator": "https://gzk.rks-gov.net/ActDetail.aspx?ActID=3702 (art. 162: the Constitutional Framework, UNMIK Regulation 2001/9, applied until 15 June 2008)",
+          "valid_from": "2001-05-15",
+          "valid_to": "2008-06-15"
+        }
+      ],
+      "access": [
+        {
+          "platform": "KQZ, Rezultatet e zgjedhjeve",
+          "url": "https://kqz-ks.org/rezultatet/",
+          "format": "xlsx, pdf",
+          "access": "browser",
+          "checked_at": "2026-11-16",
+          "license": "none stated",
+          "first_date": "2001-11-17",
+          "last_date": "2007-11-17",
+          "finest": "xk.vendvotimi",
+          "source": "kqz",
+          "evidence": "Results by municipality and polling station; a browser challenge (HTTP 403) refuses automated clients"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2001-11-17"
+        },
+        {
+          "date": "2004-10-23"
+        },
+        {
+          "date": "2007-11-17",
+          "note": "Held jointly with the municipal assembly and mayoral elections."
+        }
+      ],
+      "est_votes": 2300000,
+      "effort": 4
+    },
+    {
+      "key": "president",
+      "tier": "national",
+      "name": "Zgjedhja e Presidentit të Republikës së Kosovës nga Kuvendi",
+      "name_en": "President of the Republic, elected by the Assembly",
+      "category": "indirect",
+      "goal": "national",
+      "valid_from": "2008-06-15",
+      "first_held": "2011-02-22",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "kushtetuta",
+      "locator": "https://gzk.rks-gov.net/ActDetail.aspx?ActID=3702 (arts. 86-87)",
+      "note": "The Assembly elects the President by secret ballot for five years, renewable once: two-thirds of all deputies in the first two rounds, otherwise a third round between the two leaders by a majority of all deputies; failure within 60 days dissolves the Assembly (arts. 82, 86, 87). The election of 22 February 2011 was annulled by the Constitutional Court on 28 March 2011.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "XK",
+          "valid_from": "2008-06-15"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": true,
+          "administered_by": "Kuvendi i Republikës së Kosovës",
+          "source": "kushtetuta",
+          "locator": "https://gzk.rks-gov.net/ActDetail.aspx?ActID=3702 (art. 86(2): at the latest 30 days before the term ends; art. 87(2): five-year term)",
+          "valid_from": "2008-06-15"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Kuvendi i Republikës së Kosovës, procesverbalet e seancave plenare",
+          "url": "https://www.kuvendikosoves.org/",
+          "format": "pdf",
+          "access": "blocked",
+          "checked_at": "2026-11-16",
+          "license": "none stated",
+          "first_date": "2011-02-22",
+          "last_date": "2021-04-04",
+          "evidence": "Round-by-round votes are in the Assembly's plenary minutes; the site refused an automated client with HTTP 403"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2011-02-22",
+          "note": "Annulled by the Constitutional Court (case KO 29/11)."
+        },
+        {
+          "date": "2011-04-07"
+        },
+        {
+          "date": "2016-02-26"
+        },
+        {
+          "date": "2021-04-04"
+        }
+      ],
+      "est_votes": 1000,
+      "effort": 3
+    },
+    {
+      "key": "president_kk",
+      "tier": "national",
+      "name": "Zgjedhja e Presidentit të Kosovës sipas Kornizës Kushtetuese",
+      "name_en": "President of Kosovo under the Constitutional Framework, elected by the Assembly (2002-2008)",
+      "category": "indirect",
+      "goal": "national",
+      "valid_from": "2001-05-15",
+      "valid_to": "2008-06-15",
+      "first_held": "2002-03-04",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "kushtetuta",
+      "locator": "https://gzk.rks-gov.net/ActDetail.aspx?ActID=3702 (art. 162)",
+      "note": "Under Regulation 2001/9 the Assembly elected the President for three years, by two-thirds in the first two rounds and a simple majority in the third. Rugova was elected on 4 March 2002 after failed rounds from December 2001, and again after the 2004 election; Sejdiu succeeded him on his death and was re-elected after the 2007 election.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "XK",
+          "valid_to": "2008-06-15"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2002-03-04"
+        },
+        {
+          "date": "2004-12-01",
+          "precision": "month",
+          "note": "Rugova re-elected after the 2004 Assembly election; the day is not confirmed from an official record."
+        },
+        {
+          "date": "2006-02-10"
+        },
+        {
+          "date": "2008-01-09"
+        }
+      ],
+      "est_votes": 800,
+      "effort": 3
+    },
+    {
+      "key": "referendum",
+      "tier": "national",
+      "name": "Referendumi",
+      "name_en": "National referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "valid_from": "2008-06-15",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "kushtetuta",
+      "locator": "https://gzk.rks-gov.net/ActDetail.aspx?ActID=3702 (art. 2(1), art. 65(3), art. 81(2), art. 139(1))",
+      "note": "The Assembly announces a referendum in accordance with the law (art. 65(3)) and the Central Election Commission conducts it and declares its result (art. 139(1)); laws of vital interest cannot be put to a referendum (art. 81(2)). None has been held under the Constitution.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "iso_pattern": "XK"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "kuvendi_komunal",
+      "tier": "komuna",
+      "name": "Zgjedhjet për Kuvendet e Komunave",
+      "name_en": "Municipal assemblies",
+      "category": "council",
+      "goal": "local",
+      "first_held": "2000-10-28",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "xk.komuna"
+        ],
+        "fine": [
+          "xk.vendvotimi"
+        ]
+      },
+      "source": "l03-072",
+      "locator": "https://gzk.rks-gov.net/ActDetail.aspx?ActID=2549 (arts. 4, 7, and 8)",
+      "boundary_source": "l03-041",
+      "note": "Each municipality is one district; seats go to entities by the divisors 1, 3, 5, 7 (Sainte-Laguë) and to candidates by preference votes with a 30% gender quota (Law 03/L-072 arts. 7-8). Assembly size runs from 15 to 51 by population (Law 03/L-040 art. 36). Under UNMIK the 30 municipalities of Regulation 2000/43 elected closed-list assemblies in 2000 and 2002; the 2007 elections were the last under UNMIK, and the 38 municipalities of Law 03/L-041 first voted in 2009 (North Mitrovica in 2013).",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "special",
+            "by_election"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "iso_pattern": "XK"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 1,
+          "term_years": 4,
+          "called": false,
+          "administered_by": "Komisioni Qendror i Zgjedhjeve",
+          "source": "l03-072",
+          "locator": "https://gzk.rks-gov.net/ActDetail.aspx?ActID=2549 (art. 4.2: on a Sunday every four years; art. 5.1)",
+          "valid_from": "2008-06-15"
+        }
+      ],
+      "access": [
+        {
+          "platform": "KQZ, Rezultatet e zgjedhjeve",
+          "url": "https://kqz-ks.org/rezultatet/",
+          "format": "xlsx, pdf",
+          "access": "browser",
+          "checked_at": "2026-11-16",
+          "license": "none stated",
+          "first_date": "2000-10-28",
+          "last_date": "2021-10-17",
+          "finest": "xk.vendvotimi",
+          "source": "kqz",
+          "evidence": "Results by municipality and polling station; a browser challenge (HTTP 403) refuses automated clients"
+        },
+        {
+          "platform": "KQZ results platform, local elections 2025",
+          "url": "https://storage.kqz-ks.org/",
+          "format": "json",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Official election results of the Republic of Kosovo, published for public use",
+          "first_date": "2025-10-12",
+          "last_date": "2025-11-09",
+          "finest": "xk.vendvotimi",
+          "source": "kqz-local-2025",
+          "evidence": "assembly-total-latest.json: votes by entity and candidate for every station of the 38 municipalities"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2000-10-28",
+          "note": "30 municipalities under UNMIK Regulation 2000/43, run by the OSCE Mission."
+        },
+        {
+          "date": "2002-10-26"
+        },
+        {
+          "date": "2007-11-17",
+          "note": "Held jointly with the Assembly election."
+        },
+        {
+          "date": "2009-11-15",
+          "note": "The first under Laws 03/L-072 and 03/L-041; most Serb voters in the north stayed away until 2013."
+        },
+        {
+          "date": "2013-11-03",
+          "note": "North Mitrovica voted again on 17 November 2013 after its stations were closed on 3 November."
+        },
+        {
+          "date": "2017-10-22"
+        },
+        {
+          "date": "2021-10-17"
+        },
+        {
+          "date": "2025-10-12",
+          "contests": 38,
+          "source": "kqz-local-2025",
+          "quote": "assembly-total-latest.json: 38 municipalities, 2,812 of 2,812 polling stations processed"
+        }
+      ],
+      "est_votes": 5500000,
+      "effort": 4
+    },
+    {
+      "key": "kryetari",
+      "tier": "komuna",
+      "name": "Zgjedhjet për Kryetarë të Komunave",
+      "name_en": "Mayors, direct",
+      "category": "executive",
+      "goal": "local",
+      "valid_from": "2007-11-17",
+      "first_held": "2007-11-17",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "xk.komuna"
+        ],
+        "fine": [
+          "xk.vendvotimi"
+        ]
+      },
+      "source": "l03-072",
+      "locator": "https://gzk.rks-gov.net/ActDetail.aspx?ActID=2549 (arts. 4, 9, and 11)",
+      "boundary_source": "l03-041",
+      "note": "Each municipality elects its mayor directly for four years; a candidate with more than half of the valid votes wins, otherwise the two leaders meet in a runoff (Law 03/L-072 art. 9). A mayor whose term ends early is replaced by an extraordinary election for the rest of the term (art. 11); the four northern municipalities held them in 2019 and 2023. Mayors were first elected directly in 2007; before that the municipal assembly chose its president.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "runoff",
+            "special",
+            "by_election"
+          ],
+          "office_kinds": [
+            "mayor"
+          ],
+          "iso_pattern": "XK"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 1,
+          "term_years": 4,
+          "called": false,
+          "runoff": "majority",
+          "administered_by": "Komisioni Qendror i Zgjedhjeve",
+          "source": "l03-072",
+          "locator": "https://gzk.rks-gov.net/ActDetail.aspx?ActID=2549 (arts. 4.2 and 9; art. 11.2 for extraordinary elections)",
+          "valid_from": "2008-06-15"
+        }
+      ],
+      "access": [
+        {
+          "platform": "KQZ, Rezultatet e zgjedhjeve",
+          "url": "https://kqz-ks.org/rezultatet/",
+          "format": "xlsx, pdf",
+          "access": "browser",
+          "checked_at": "2026-11-16",
+          "license": "none stated",
+          "first_date": "2007-11-17",
+          "last_date": "2023-04-23",
+          "finest": "xk.vendvotimi",
+          "source": "kqz",
+          "evidence": "Results by municipality and polling station; a browser challenge (HTTP 403) refuses automated clients"
+        },
+        {
+          "platform": "KQZ results platform, local elections 2025",
+          "url": "https://storage.kqz-ks.org/",
+          "format": "json",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Official election results of the Republic of Kosovo, published for public use",
+          "first_date": "2025-10-12",
+          "last_date": "2025-11-09",
+          "finest": "xk.vendvotimi",
+          "source": "kqz-local-2025",
+          "evidence": "mayor-total-latest.json and mayor-total-latest-part-2.json: votes by candidate for every station, both rounds"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2007-11-17"
+        },
+        {
+          "date": "2007-12-08",
+          "election_kind": "runoff"
+        },
+        {
+          "date": "2009-11-15"
+        },
+        {
+          "date": "2009-12-13",
+          "election_kind": "runoff"
+        },
+        {
+          "date": "2013-11-03"
+        },
+        {
+          "date": "2013-11-17",
+          "election_kind": "special",
+          "note": "North Mitrovica's repeated first round."
+        },
+        {
+          "date": "2013-12-01",
+          "election_kind": "runoff"
+        },
+        {
+          "date": "2017-10-22"
+        },
+        {
+          "date": "2017-11-19",
+          "election_kind": "runoff"
+        },
+        {
+          "date": "2019-05-19",
+          "election_kind": "special",
+          "note": "Extraordinary elections in North Mitrovica, Leposaviq, Zubin Potok, and Zveçan."
+        },
+        {
+          "date": "2021-10-17"
+        },
+        {
+          "date": "2021-11-14",
+          "election_kind": "runoff"
+        },
+        {
+          "date": "2023-04-23",
+          "election_kind": "special",
+          "note": "Extraordinary elections in North Mitrovica, Leposaviq, Zubin Potok, and Zveçan."
+        },
+        {
+          "date": "2025-10-12",
+          "contests": 38,
+          "source": "kqz-local-2025",
+          "quote": "mayor-total-latest.json: 38 municipalities, every polling station processed"
+        },
+        {
+          "date": "2025-11-09",
+          "election_kind": "runoff",
+          "contests": 18,
+          "source": "kqz-local-2025",
+          "quote": "mayor-total-latest-part-2.json: 18 municipalities, 1,699 of 1,699 polling stations processed"
+        }
+      ],
+      "est_votes": 6000000,
+      "effort": 4
+    },
+    {
+      "key": "largimi_kryetarit",
+      "tier": "komuna",
+      "name": "Votimi për largimin e kryetarit të komunës",
+      "name_en": "Votes to remove a mayor",
+      "category": "direct_democracy",
+      "goal": "local",
+      "valid_from": "2008-06-15",
+      "first_held": "2024-04-21",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "xk.komuna"
+        ],
+        "fine": [
+          "xk.vendvotimi"
+        ]
+      },
+      "source": "l03-040",
+      "locator": "https://gzk.rks-gov.net/ActDetail.aspx?ActID=2530 (art. 72)",
+      "note": "A petition signed by 20% of registered voters puts the mayor's removal to a vote, which succeeds only if a majority of all registered voters vote for it; a new mayoral election follows (Law 03/L-040 art. 72). The Commission ran the only such votes on 21 April 2024 in North Mitrovica, Leposaviq, Zubin Potok, and Zveçan; turnout was far below the threshold and all four mayors stayed.",
+      "match": [
+        {
+          "election_kinds": [
+            "recall"
+          ],
+          "iso_pattern": "XK"
+        }
+      ],
+      "cadence": [
+        {
+          "called": true,
+          "administered_by": "Komisioni Qendror i Zgjedhjeve",
+          "source": "l03-040",
+          "locator": "https://gzk.rks-gov.net/ActDetail.aspx?ActID=2530 (art. 72.2: petition of 20% of registered voters)",
+          "valid_from": "2008-06-15"
+        }
+      ],
+      "access": [
+        {
+          "platform": "KQZ, Rezultatet e zgjedhjeve",
+          "url": "https://kqz-ks.org/rezultatet/",
+          "format": "xlsx, pdf",
+          "access": "browser",
+          "checked_at": "2026-11-16",
+          "license": "none stated",
+          "first_date": "2024-04-21",
+          "last_date": "2024-04-21",
+          "finest": "xk.vendvotimi",
+          "source": "kqz",
+          "evidence": "Results by municipality and polling station; a browser challenge (HTTP 403) refuses automated clients"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2024-04-21",
+          "note": "Four municipalities: North Mitrovica, Leposaviq, Zubin Potok, and Zveçan."
+        }
+      ],
+      "est_votes": 300,
+      "effort": 2
+    },
+    {
+      "key": "referendum_komunal",
+      "tier": "komuna",
+      "name": "Referendumi komunal",
+      "name_en": "Municipal referendums on a regulation",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "valid_from": "2008-06-15",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "xk.komuna"
+        ]
+      },
+      "source": "l03-040",
+      "locator": "https://gzk.rks-gov.net/ActDetail.aspx?ActID=2530 (art. 71)",
+      "note": "Ten percent of registered voters may, within 30 days, ask that a regulation the municipal assembly adopted be put to a referendum (Law 03/L-040 art. 71). No such referendum is known to have been held.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "iso_pattern": "XK",
+          "schemes": [
+            "xk.komuna"
+          ]
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "keshilli_fshatit",
+      "tier": "fshat",
+      "name": "Këshillat e fshatrave dhe të lagjeve",
+      "name_en": "Village and urban-quarter councils",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "l03-040",
+      "locator": "https://gzk.rks-gov.net/ActDetail.aspx?ActID=2530 (art. 34)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Set up by each municipality's statute under Law 03/L-040 art. 34 and chosen at residents' meetings; the Central Election Commission does not run them and no results are published.",
+      "match": [],
+      "dates": []
+    },
+    {
+      "key": "zgjedhjet_partiake",
+      "tier": "national",
+      "name": "Zgjedhjet e brendshme të partive",
+      "name_en": "Party leadership and candidate selection",
+      "category": "nominating",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "l08-228",
+      "locator": "https://gzk.rks-gov.net/ActDetail.aspx?ActID=77074",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Parties choose their leaders and candidates under their own statutes; the state neither runs nor publishes these votes, and no law provides for state-run primaries.",
+      "match": [],
+      "dates": []
+    },
+    {
+      "key": "keshillat_gjyqesore",
+      "tier": "national",
+      "name": "Zgjedhja e anëtarëve të Këshillit Gjyqësor dhe të Këshillit Prokurorial",
+      "name_en": "Members of the Judicial and Prosecutorial Councils",
+      "category": "judicial",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "kushtetuta",
+      "locator": "https://gzk.rks-gov.net/ActDetail.aspx?ActID=3702 (arts. 108 and 110)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Judges and prosecutors elect some council members among themselves and the Assembly elects others; these are internal or indirect votes, not public elections. Judges are appointed, never elected.",
+      "match": [],
+      "dates": []
+    },
+    {
+      "key": "kuvendi_ksak",
+      "tier": "national",
+      "name": "Kuvendi i Krahinës Socialiste Autonome të Kosovës",
+      "name_en": "Assembly of the Socialist Autonomous Province of Kosovo (1945-1990)",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "kushtetuta",
+      "locator": "https://gzk.rks-gov.net/ActDetail.aspx?ActID=3702",
+      "disposition": "out_of_scope",
+      "disposition_reason": "A provincial assembly of Serbia within Yugoslavia, chosen through the Yugoslav delegate system until 1990; it belongs under a Yugoslav or Serbian polity if the archive adds one, and no official vote counts survive.",
+      "match": [],
+      "dates": [],
+      "valid_to": "1990-07-05"
+    },
+    {
+      "key": "institucionet_paralele",
+      "tier": "national",
+      "name": "Referendumi dhe zgjedhjet e institucioneve paralele të Republikës së Kosovës",
+      "name_en": "Referendum and elections of the parallel Republic of Kosova (1991-1998)",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "kushtetuta",
+      "locator": "https://gzk.rks-gov.net/ActDetail.aspx?ActID=3702",
+      "disposition": "out_of_scope",
+      "disposition_reason": "The 1991 independence referendum and the 1992 and 1998 parliamentary and presidential votes were run by unrecognized parallel institutions outside any state election administration; the Central Election Commission holds no results for them.",
+      "match": [],
+      "dates": [],
+      "valid_from": "1991-09-26",
+      "valid_to": "1999-06-10"
+    },
+    {
+      "key": "zgjedhjet_serbe",
+      "tier": "komuna",
+      "name": "Zgjedhjet e organizuara nga Serbia në Kosovë",
+      "name_en": "Elections Serbia organizes in Kosovo",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "kushtetuta",
+      "locator": "https://gzk.rks-gov.net/ActDetail.aspx?ActID=3702 (art. 139: the Central Election Commission conducts all elections)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Serbia's parliamentary, presidential, and (until 2013) local elections held among Kosovo Serbs belong to Serbia's census; Kosovo's authorities do not recognize them and publish no results.",
+      "match": [],
+      "dates": []
+    }
+  ]
+}
