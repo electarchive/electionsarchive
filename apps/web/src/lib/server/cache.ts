@@ -23,6 +23,10 @@ const LIMIT = 20_000;
 const BUDGET = 1024 ** 3;
 const LARGEST = 64 * 1024 ** 2;
 const LIFETIME = 30 * 86_400;
+const SHELF_AGE = 7 * 86_400;
+const SHELF_BUDGET = 100 * 1024 ** 3;
+const SHELF_BATCH = 5000;
+const PRUNE = 3_600_000;
 const CHECK = 5000;
 const LOCK = 75_000;
 const PATIENCE = 70_000;
@@ -230,6 +234,7 @@ async function open() {
       stored_at timestamptz not null default now()
     );
     alter table entry alter column body set storage external;
+    create index if not exists entry_stored_at_idx on entry (stored_at);
     create sequence if not exists epoch start ${Date.now()};
     create table if not exists bump (
       key text primary key,
@@ -246,7 +251,55 @@ async function open() {
     );
     insert into bump (key, epoch) values ('*', nextval('epoch')) on conflict do nothing;
   `);
+  setInterval(() => {
+    prune(pool).catch((error: unknown) => {
+      console.error("Pruning the persistent cache failed:", error);
+    });
+  }, PRUNE).unref();
   return pool;
+}
+
+async function prune(pool: pg.Pool) {
+  const connection = await pool.connect();
+  try {
+    const locked = await connection.query<{ isLocked: boolean }>(
+      `select pg_try_advisory_lock(hashtext('cache prune')) as "isLocked"`,
+    );
+    if (locked.rows[0]?.isLocked !== true) {
+      return;
+    }
+    try {
+      const found = await connection.query<{ cutoff: Date }>(
+        `with sampled as (
+          select stored_at, sum(pg_column_size(body)::float8 * 1000) over (order by stored_at desc) as total
+          from entry tablesample system (0.1)
+        )
+        select greatest(
+          now() - make_interval(secs => $1),
+          (select min(stored_at) from sampled where total <= $2)
+        ) as cutoff`,
+        [SHELF_AGE, SHELF_BUDGET],
+      );
+      const cutoff = found.rows[0]?.cutoff;
+      if (cutoff == null) {
+        return;
+      }
+      let deleted = SHELF_BATCH;
+      while (deleted === SHELF_BATCH) {
+        const result = await connection.query(
+          "delete from entry where ctid = any(array(select ctid from entry where stored_at < $1 limit $2))",
+          [cutoff, SHELF_BATCH],
+        );
+        deleted = result.rowCount ?? 0;
+      }
+    } finally {
+      await connection.query(
+        "select pg_advisory_unlock(hashtext('cache prune'))",
+      );
+    }
+  } finally {
+    connection.release();
+  }
 }
 
 async function shelf() {
