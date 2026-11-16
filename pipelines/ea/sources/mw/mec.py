@@ -607,8 +607,8 @@ def general(year: int) -> Package:
     p.add("election", id=election, polity_id=MALAWI, kind="general", date_from=day, date_to=day, status="held")
     p.add("slug", path=path_, entity_id=election, is_current=True)
     p.name(election, f"{year} Malawi general election", "en", "official")
-    constituency = f"mw.constituency.{year}"
-    district = f"mw.district.{year}"
+    constituency = f"mw.constituency_{year}"
+    district = f"mw.district_{year}"
     for code, rank, kind, noun in (
         (district, 2, "administrative", "district"),
         (constituency, 3, "electoral_district", "constituency"),
