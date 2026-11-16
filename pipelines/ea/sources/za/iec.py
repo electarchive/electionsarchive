@@ -400,7 +400,11 @@ def geo() -> Package:
         "South Africa's provinces, and the districts, municipalities, and wards of each municipal demarcation from "
         "2011, as the IEC's results name them",
     )
-    p.external.add(SOUTH_AFRICA)
+    p.add("polity", id=SOUTH_AFRICA, kind="sovereign_state", iso_code="ZA")
+    p.name(SOUTH_AFRICA, "South Africa", "en", "official")
+    p.name(SOUTH_AFRICA, "Republic of South Africa", "en", "official", False)
+    p.add("slug", path="za", entity_id=SOUTH_AFRICA, is_current=True)
+    p.add("external_id", entity_id=SOUTH_AFRICA, scheme="wikidata", value="Q258")
     for code, rank, kind, noun in (
         ("za.province", 1, "administrative", "province"),
         ("za.district", 2, "administrative", "district municipality"),
@@ -495,7 +499,6 @@ def registry() -> Package:
         "results from 2011",
         depends=["za.iec/geo"],
     )
-    p.external.add(SOUTH_AFRICA)
     p.add(
         "source",
         id=SOURCE_ID,
@@ -710,7 +713,6 @@ def national(year: str) -> Package:
         f"South Africa's {year} National Assembly and provincial legislature elections by voting district from the IEC",
         depends=["za.iec/geo", "za.iec/registry"],
     )
-    p.external.add(SOUTH_AFRICA)
     election = key("election", day)
     path = f"za/{day}-general"
     _election(p, election, "general", day, path, f"{year} South African general election")
@@ -876,7 +878,6 @@ def municipal(year: str) -> Package:
         "district from the IEC",
         depends=["za.iec/geo", "za.iec/registry"],
     )
-    p.external.add(SOUTH_AFRICA)
     for province in FILES:
         _uses(p, municipal_url(item.event, province))
     _uses(p, municipal_totals_url(item.event))
