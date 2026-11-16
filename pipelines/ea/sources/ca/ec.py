@@ -20,7 +20,8 @@ from ea.package import Package
 
 SOURCE = "ca.ec"
 HOST = "https://www.elections.ca"
-CANADA = str(uuid5(package.NAMESPACE, "polity\x1fCA"))
+# Canada predates the uuid5 country ids: its record came from an earlier changeset, so it is referenced by that id.
+CANADA = "01a13fb6-ea9b-72f8-8170-25b12e45cb98"
 LICENSE = "Open Government Licence – Canada"
 LICENSE_URL = "https://open.canada.ca/en/open-government-licence-canada"
 ACCOUNTING_FLAG = 32
