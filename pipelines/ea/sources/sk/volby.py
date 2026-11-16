@@ -32,6 +32,9 @@ VOTES, REGISTERED, CAST, VALID, INVALID, VOTERS = 1, 2, 3, 4, 5, 14
 ABROAD = "599999"
 """The office's code for the postal vote from abroad, counted in its own polling districts."""
 KRAJ, OKRES, OBEC, OKRSOK, VUC_OBVOD = "sk.kraj", "sk.okres", "sk.obec", "sk.okrsok", "sk.vuc_obvod"
+TOWN_DISTRICT = "sk.volebny_obvod"
+"""A city council's electoral district in Bratislava and Košice, the finest unit the office prints for the city
+contests: its polling-district tables number districts within boroughs that one council district can join."""
 
 
 def key(kind: str, *parts: object) -> str:
@@ -56,7 +59,7 @@ def number(text: object) -> int | None:
     if s.lower() in ("", "nan", "-", "x"):
         return None
     s = s.replace(",", ".")
-    return int(round(float(s)))
+    return round(float(s))
 
 
 def url(path: str) -> str:
@@ -102,10 +105,28 @@ def table(path: str) -> pl.DataFrame:
         seen[name] += 1
         names.append(name if seen[name] == 1 else f"{name}_{seen[name]}")
     width = len(names)
+    rows = _rejoin(rows, width)
     body = [
-        [clean(cell) or None for cell in (row + [""] * width)[:width]] for row in rows[1:] if any(c.strip() for c in row)
+        [clean(cell) or None for cell in (row + [""] * width)[:width]]
+        for row in rows[1:]
+        if any(c.strip() for c in row)
     ]
     return pl.DataFrame(body, schema={name: pl.String for name in names}, orient="row")
+
+
+def _rejoin(rows: list[list[str]], width: int) -> list[list[str]]:
+    """Rows that a line break inside an unquoted cell split in two (the 2022 regional candidate lists)."""
+    out = [rows[0]]
+    index = 1
+    while index < len(rows):
+        row = rows[index]
+        while len(row) < width and index + 1 < len(rows) and len(row) + len(rows[index + 1]) - 1 <= width:
+            following = rows[index + 1]
+            row = [*row[:-1], f"{row[-1]} {following[0]}", *following[1:]] if row else following
+            index += 1
+        out.append(row)
+        index += 1
+    return out
 
 
 def col(frame: pl.DataFrame, *words: str, exclude: Iterable[str] = ()) -> str:
@@ -206,13 +227,23 @@ class Day:
     contests: list[Contest] = field(default_factory=list)
     units: list[pl.DataFrame] = field(default_factory=list)
     method: str = ""
+    accepts: dict[str, str] = field(default_factory=dict)
 
 
-FACT_SCHEMA = {"unit": pl.String, "option": pl.String, "measure": pl.Int16, "value": pl.Int64}
-UNIT_SCHEMA = {"unit": pl.String, "scheme": pl.String, "obec": pl.String, "okres": pl.String, "kraj": pl.String}
+FACT_SCHEMA = pl.Schema(
+    {
+        "unit": pl.String(),
+        "option": pl.String(),
+        "measure": pl.Int16(),
+        "value": pl.Int64(),
+    }
+)
+UNIT_SCHEMA = pl.Schema({name: pl.String() for name in ("unit", "scheme", "obec", "okres", "kraj")})
 
 
-def units_of(frame: pl.DataFrame, day: date, *, okrsok: str | None, obec: str, okres: str | None = None) -> pl.DataFrame:
+def units_of(
+    frame: pl.DataFrame, day: date, *, okrsok: str | None, obec: str, okres: str | None = None
+) -> pl.DataFrame:
     """Reporting units from a frame with a municipality code column and, at the finest level, a district column."""
     exprs = {
         "obec": pl.col(obec),
@@ -374,7 +405,11 @@ def list_options(
 
 def nrsr_modern(year: int) -> Day:
     start, _ = NRSR_DAYS[year]
-    t = (lambda n: f"nrsr/{year}/NRSR2023_SK_{n}.csv") if year == 2023 else (lambda n: f"nrsr/{year}/NRSR_{year}_{n}.csv")
+    t = (
+        (lambda n: f"nrsr/{year}/NRSR2023_SK_{n}.csv")
+        if year == 2023
+        else (lambda n: f"nrsr/{year}/NRSR_{year}_{n}.csv")
+    )
     d = Day(str(start), f"The {year} National Council election by polling district", [])
     d.elections.append(nrsr_election(year))
     c = nrsr_contest()
@@ -409,7 +444,8 @@ def nrsr_modern(year: int) -> Day:
     short = col(parties, "skratka")
     national = table(national_file)
     seats = {
-        row[col(national, "cislo")]: number_or_zero(row[col(national, "mandat")]) for row in national.iter_rows(named=True)
+        row[col(national, "cislo")]: number_or_zero(row[col(national, "mandat")])
+        for row in national.iter_rows(named=True)
     }
     list_options(c, parties.select(number, name, short).iter_rows(), seats)
     for row in national.iter_rows(named=True):
@@ -473,7 +509,10 @@ def ep_modern(year: int) -> Day:
     )
     parties = table(paths["tab0a"])
     allotted = table(paths["tab04"])
-    seats = {row[col(allotted, "cislo")]: number_or_zero(row[col(allotted, "spolu")]) for row in allotted.iter_rows(named=True)}
+    seats = {
+        row[col(allotted, "cislo")]: number_or_zero(row[col(allotted, "spolu")])
+        for row in allotted.iter_rows(named=True)
+    }
     list_options(
         c, parties.select(col(parties, "cislo"), col(parties, "nazov"), col(parties, "skratka")).iter_rows(), seats
     )
@@ -534,7 +573,9 @@ def presidential_outcomes(contest: Contest) -> None:
     round two: the leader is elected."""
     totals: Counter[str] = Counter()
     for frame in contest.facts:
-        for option, value in frame.filter(pl.col("measure") == VOTES).group_by("option").agg(pl.col("value").sum()).iter_rows():
+        for option, value in (
+            frame.filter(pl.col("measure") == VOTES).group_by("option").agg(pl.col("value").sum()).iter_rows()
+        ):
             totals[option] += value
     ranked = [option for option, _ in totals.most_common()]
     for o in contest.options:
@@ -553,9 +594,9 @@ def prez_modern(year: int) -> Day:
     d.elections += prez_elections(year)
     for round_number, day in enumerate(PREZ_DAYS[year], start=1):
         if year == 2024:
-            t = lambda n, r=round_number: f"pre/{year}/{r}.kolo/PREZ2024_kolo{r}_SK_{n}.csv"  # noqa: E731
+            t = lambda n, r=round_number: f"pre/{year}/{r}.kolo/PREZ2024_kolo{r}_SK_{n}.csv"
         else:
-            t = lambda n, r=round_number: f"pre/{year}/{r}.kolo/PRE_{year}_KOLO{r}_{n}.csv"  # noqa: E731
+            t = lambda n, r=round_number: f"pre/{year}/{r}.kolo/PRE_{year}_KOLO{r}_{n}.csv"
         c = prez_contest(year, round_number)
         paths = {n: t(n) for n in ("tab01", "tab02e", "tab03f", "tab0a")}
         d.paths += list(paths.values())
@@ -569,7 +610,9 @@ def prez_modern(year: int) -> Day:
                 u,
                 {
                     REGISTERED: [col(units, "zapisan")],
-                    VOTERS: [col(units, "vydanych obalok")] if has(units, "vydanych obalok") else [col(units, "zucastn")],
+                    VOTERS: [col(units, "vydanych obalok")]
+                    if has(units, "vydanych obalok")
+                    else [col(units, "zucastn")],
                     CAST: [col(units, "odovzdanych obalok", exclude=["podiel"])],
                     VALID: [col(units, "platnych hlasov", exclude=["podiel"])],
                 },
@@ -628,9 +671,7 @@ def referendum_outcomes(contest: Contest, registered: int) -> None:
     totals: Counter[str] = Counter()
     voters = 0
     for frame in contest.facts:
-        for option, measure, value in (
-            frame.group_by("option", "measure").agg(pl.col("value").sum()).iter_rows()
-        ):
+        for option, measure, value in frame.group_by("option", "measure").agg(pl.col("value").sum()).iter_rows():
             if measure == VOTES:
                 totals[option] += value
             elif measure == VOTERS and option is None:
@@ -644,7 +685,7 @@ def ref_modern(year: int) -> Day:
     start, _ = REF_DAYS[year]
     d = Day(str(start), f"The {year} referendum by polling district", [])
     d.elections.append(ref_election(year))
-    t = lambda n: f"ref/{year}/REF{year}_SK_{n}.csv"  # noqa: E731
+    t = lambda n: f"ref/{year}/REF{year}_SK_{n}.csv"
     paths = {n: t(n) for n in ("tab01", "tab02e", "tab03f", "tab0a")}
     d.paths += list(paths.values())
     units = table(paths["tab02e"])
@@ -659,7 +700,9 @@ def ref_modern(year: int) -> Day:
             CAST: [col(units, "odovzdanych obalok", exclude=["podiel"])],
         }
     u = unit_expr(start, obec, okrsok)
-    d.units.append(units_of(units, start, okrsok=okrsok, obec=obec, okres=None if year == 2023 else col(units, "kod okresu")))
+    d.units.append(
+        units_of(units, start, okrsok=okrsok, obec=obec, okres=None if year == 2023 else col(units, "kod okresu"))
+    )
     shared = accounting(units, u, {m: c for m, c in columns.items() if m != VALID})
     questions = table(paths["tab0a"])
     texts = {row[col(questions, "cislo")]: row[col(questions, "znenie")] for row in questions.iter_rows(named=True)}
@@ -709,6 +752,8 @@ TERRITORY = [
     "nrsr/1994/NRSR_1994_tab05.csv",
 ]
 """Tables that print municipality codes with names, newest first: a municipality takes its newest name and district."""
+DISTRICT_TABLES = ("osk/2017/OSK_2017_tab0db.csv", "osk/2022/OSK2022_SK_tab0db.csv", "osk/2026/OSK2026_SK_tab0db.csv")
+"""The regional electoral districts and their seats, cited by the geo package."""
 CITIES = {"582000": ("Bratislava", "1"), "599981": ("Košice", "8")}
 """Bratislava and Košice elect a city mayor and council over their boroughs (mestské časti), which the office codes as
 municipalities."""
@@ -778,6 +823,8 @@ def geo() -> Package:
         (OKRES, 2, "administrative", "district", "lau1"),
         (OBEC, 3, "administrative", "municipality", "lau2"),
         (OKRSOK, 4, "precinct", "polling district", None),
+        (VUC_OBVOD, 2, "electoral_district", "regional electoral district", None),
+        (TOWN_DISTRICT, 4, "electoral_district", "municipal electoral district", None),
     ):
         p.add("scheme", code=code, polity_id=SLOVAKIA, kind=kind, rank=rank, noun=noun, code_system=system_)
 
@@ -798,6 +845,15 @@ def geo() -> Package:
     for code, (text, kraj) in CITIES.items():
         if code not in known.obce:
             place(OBEC, code, text, area(KRAJ, kraj))
+    for path in DISTRICT_TABLES:
+        p.artifact(raw.cached(SOURCE, url(path)), VOLBY_SOURCE)
+    for code, (text, kraj) in sorted(vuc_obvody().items()):
+        place(
+            VUC_OBVOD,
+            code,
+            f"{known.kraje[kraj]}, {text.lower() if text.startswith('Volebný') else text}",
+            area(KRAJ, kraj),
+        )
     return p
 
 
@@ -851,11 +907,13 @@ SYSTEMS: dict[str, tuple[date, dict[str, object], str]] = {
             "formula": "hagenbach_bischoff",
             "threshold": {"level": "list", "scope": "national", "percent": 5},
         },
-        "The National Council's 150 seats are allocated by the Hagenbach-Bischoff quota (the republic electoral number, "
-        "valid votes for qualifying lists divided by 151) and the largest remainders, among the lists that pass the "
-        "threshold: 5% for a party, 7% for a coalition of two or three parties, and 10% for four or more (the 1994 "
-        "election had four constituencies with a national threshold). Preference votes move a candidate up the list "
-        "once they reach 3% of the list's votes (10% before 2006).",
+        (
+            "The National Council's 150 seats are allocated by the Hagenbach-Bischoff quota (the republic electoral number, "
+            "valid votes for qualifying lists divided by 151) and the largest remainders, among the lists that pass the "
+            "threshold: 5% for a party, 7% for a coalition of two or three parties, and 10% for four or more (the 1994 "
+            "election had four constituencies with a national threshold). Preference votes move a candidate up the list "
+            "once they reach 3% of the list's votes (10% before 2006)."
+        ),
     ),
     "ep": (
         date(2004, 1, 1),
@@ -863,27 +921,35 @@ SYSTEMS: dict[str, tuple[date, dict[str, object], str]] = {
             "formula": "hagenbach_bischoff",
             "threshold": {"level": "list", "scope": "contest", "percent": 5},
         },
-        "Slovakia elects its members of the European Parliament in one national constituency by the Hagenbach-Bischoff "
-        "quota and the largest remainders, among the lists with at least 5% of the valid votes.",
+        (
+            "Slovakia elects its members of the European Parliament in one national constituency by the Hagenbach-Bischoff "
+            "quota and the largest remainders, among the lists with at least 5% of the valid votes."
+        ),
     ),
     "president": (
         date(1999, 1, 1),
         {"formula": "two_round", "majority": 0.5, "advance": 2},
-        "Direct election since 1999: a candidate who wins the votes of more than half of all registered voters in the "
-        "first round is elected; otherwise the two leading candidates meet in a second round two weeks later, which the "
-        "candidate with more valid votes wins.",
+        (
+            "Direct election since 1999: a candidate who wins the votes of more than half of all registered voters in the "
+            "first round is elected; otherwise the two leading candidates meet in a second round two weeks later, which the "
+            "candidate with more valid votes wins."
+        ),
     ),
     "referendum": (
         date(1993, 1, 1),
         {"formula": "referendum"},
-        "A national referendum is valid when more than half of the registered voters take part, and a proposal carries "
-        "when more than half of the voters who took part vote yes.",
+        (
+            "A national referendum is valid when more than half of the registered voters take part, and a proposal carries "
+            "when more than half of the voters who took part vote yes."
+        ),
     ),
     "vuc-chair-2001": (
         date(2001, 1, 1),
         {"formula": "two_round", "majority": 0.5, "advance": 2},
-        "The chair of a self-governing region was elected in two rounds until 2013: a candidate with a majority of the "
-        "valid votes was elected in the first round, otherwise the two leading candidates met two weeks later.",
+        (
+            "The chair of a self-governing region was elected in two rounds until 2013: a candidate with a majority of the "
+            "valid votes was elected in the first round, otherwise the two leading candidates met two weeks later."
+        ),
     ),
     "vuc-chair-2017": (
         date(2017, 1, 1),
@@ -893,8 +959,10 @@ SYSTEMS: dict[str, tuple[date, dict[str, object], str]] = {
     "vuc-council": (
         date(2001, 1, 1),
         {"formula": "block"},
-        "Regional councillors are elected in multi-member electoral districts: each voter may vote for as many "
-        "candidates as the district elects, and the candidates with the most votes win.",
+        (
+            "Regional councillors are elected in multi-member electoral districts: each voter may vote for as many "
+            "candidates as the district elects, and the candidates with the most votes win."
+        ),
     ),
     "mayor": (
         date(1990, 1, 1),
@@ -904,8 +972,10 @@ SYSTEMS: dict[str, tuple[date, dict[str, object], str]] = {
     "town-council": (
         date(1990, 1, 1),
         {"formula": "block"},
-        "Municipal councillors are elected in one or more multi-member electoral districts: each voter may vote for as "
-        "many candidates as the district elects, and the candidates with the most votes win.",
+        (
+            "Municipal councillors are elected in one or more multi-member electoral districts: each voter may vote for as "
+            "many candidates as the district elects, and the candidates with the most votes win."
+        ),
     ),
 }
 
@@ -927,7 +997,9 @@ def registry() -> Package:
     p.name(PRESIDENCY, "Prezident Slovenskej republiky", "sk", "native", False)
     for name, (since, rules, method) in SYSTEMS.items():
         id = system(name)
-        p.add("electoral_system", id=id, polity_id=SLOVAKIA, valid_from=since, valid_to=None, rules=rules, rules_version=1)
+        p.add(
+            "electoral_system", id=id, polity_id=SLOVAKIA, valid_from=since, valid_to=None, rules=rules, rules_version=1
+        )
         p.add("note", id=key("note", id), entity_id=id, kind="methodology", body_md=method, lang="en")
     known = places()
     bodies: set[str] = set()
@@ -987,7 +1059,7 @@ def build(d: Day) -> Package:
     p = Package(f"{SOURCE}/{d.key}", SOURCE, d.summary, depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"])
     p.external |= {SLOVAKIA, COUNTRY}
     for path in dict.fromkeys(d.paths):
-        if path in TERRITORY:
+        if path in TERRITORY or path in DISTRICT_TABLES:
             p.uses(raw.cached(SOURCE, url(path)))
         else:
             p.artifact(raw.cached(SOURCE, url(path)), VOLBY_SOURCE)
@@ -1187,16 +1259,22 @@ def _declared(d: Day, c: Contest, facts: pl.DataFrame, caveats: Counter[str]) ->
         roll = facts.filter(pl.col("unit").str.contains(f":{ABROAD}") & (pl.col("measure") == REGISTERED)).height
         abroad = facts.filter(pl.col("unit").str.contains(f":{ABROAD}")).height
         if measure == REGISTERED and option is None and abroad and not roll and got is not None and value > got:
-            caveats[f"declared:the national roll includes {value - got:,} voters on the list for the postal vote from "
-                    f"abroad, whose polling districts (code {ABROAD}) print no roll"] += 1
+            caveats[
+                f"declared:the national roll includes {value - got:,} voters on the list for the postal vote from "
+                f"abroad, whose polling districts (code {ABROAD}) print no roll"
+            ] += 1
             continue
         reason = EXPLAINED.get((d.key, c.key, measure))
         if reason is None:
-            raise ValueError(f"{d.key} {c.key}: declared {option} measure {measure} is {value:,}, the units sum to {got}")
+            raise ValueError(
+                f"{d.key} {c.key}: declared {option} measure {measure} is {value:,}, the units sum to {got}"
+            )
         caveats[f"declared:{reason}"] += 1
 
 
 def _accept(p: Package, d: Day, caveats: Counter[str]) -> None:
+    for code, reason in d.accepts.items():
+        p.accept(code, reason)
     reasons = sorted({k.removeprefix("declared:") for k in caveats if k.startswith("declared:")})
     if reasons:
         p.accept("accounting.declared", "; ".join(reasons))
@@ -1246,7 +1324,12 @@ def _register() -> None:
         reader(functools.partial(ref_municipal, year), f"ref-{year}")
     for year in (2010, 2015):
         reader(functools.partial(ref_precinct, year), f"ref-{year}")
-
+    for year in (2017, 2022, 2026):
+        reader(functools.partial(osk_modern, year), f"osk-{year}")
+    for year in (2022, 2026):
+        reader(functools.partial(oso_modern, year), f"oso-{year}")
+    for year in (2014, 2018):
+        reader(functools.partial(oso_mayors, year), f"oso-{year}")
 
 
 @functools.cache
@@ -1331,6 +1414,9 @@ def directory() -> dict[str, list[tuple[str, frozenset[str]]]]:
                 continue
             names.setdefault(code, set()).add(fold(row[obec_name]))
             groups.setdefault(code, set()).update(group_key(row[label]) for label in labels if row[label])
+    for code, (text, _) in CITIES.items():
+        names.setdefault(code, set()).update({fold(text), fold(f"{text} hl m sr"), fold(f"{text} mesto")})
+        groups.setdefault(code, set()).update({fold(f"{text} mesto"), fold(f"{text} - mesto")})
     out: dict[str, list[tuple[str, frozenset[str]]]] = {}
     for code, folded in names.items():
         for name in folded:
@@ -1516,7 +1602,9 @@ def nrsr_municipal(year: int) -> Day:
         }
         for r in listed.iter_rows(named=True):
             n = r[col(listed, "cislo")]
-            national.append((n, r[col(listed, "nazov")], number_or_zero(r[col(listed, "pocet platnych")]), seats.get(n, 0)))
+            national.append(
+                (n, r[col(listed, "nazov")], number_or_zero(r[col(listed, "pocet platnych")]), seats.get(n, 0))
+            )
     else:
         file = {2006: "tab05", 2010: "tab09", 2012: "tab09"}[year]
         listed = table(f"nrsr/{year}/NRSR_{year}_{file}.csv")
@@ -1524,13 +1612,26 @@ def nrsr_municipal(year: int) -> Day:
         for position, r in enumerate(listed.iter_rows(named=True), start=1):
             label = r[col(listed, "nazov")]
             national.append(
-                (str(position), label, number_or_zero(r[col(listed, "pocet platnych")]), number(r[col(listed, "mandat")]))
+                (
+                    str(position),
+                    label,
+                    number_or_zero(r[col(listed, "pocet platnych")]),
+                    number(r[col(listed, "mandat")]),
+                )
             )
     options = wide_options(rows, "platn[ée] hlasy po[čc]et")
     pairs = by_totals(column_sums(rows, options), {k: v for k, _, v, _ in national}, f"nrsr {year}")
     for k, label, total, seats in national:
         c.options.append(
-            Option(k, clean(label), "list", position=int(k), party=clean(label), outcome="won" if seats else "lost", seats=seats or None)
+            Option(
+                k,
+                clean(label),
+                "list",
+                position=int(k),
+                party=clean(label),
+                outcome="won" if seats else "lost",
+                seats=seats or None,
+            )
         )
         c.declared[(k, VOTES)] = total
     c.declared[(None, VALID)] = sum(total for _, _, total, _ in national)
@@ -1571,7 +1672,9 @@ def nrsr_1994() -> Day:
     party = col(data, "politicky subjekt")
     abbreviations = data.group_by(party).agg(ints(data, col(data, "pocet platnych hlasov")).sum().alias("v"))
     regions = table("nrsr/1994/NRSR_1994_tab03.csv")
-    full = regions.group_by(col(regions, "nazov")).agg(ints(regions, col(regions, "pocet platnych hlasov", exclude=["spolu"])).sum().alias("v"))
+    full = regions.group_by(col(regions, "nazov")).agg(
+        ints(regions, col(regions, "pocet platnych hlasov", exclude=["spolu"])).sum().alias("v")
+    )
     national = {clean(k): int(v) for k, v in full.iter_rows()}
     pairs = by_totals({clean(k): int(v) for k, v in abbreviations.iter_rows()}, national, "nrsr 1994")
     for position, (label, total) in enumerate(sorted(national.items(), key=lambda item: -item[1]), start=1):
@@ -1581,8 +1684,15 @@ def nrsr_1994() -> Day:
     option = pl.col(party).map_elements(lambda s: fold(pairs[clean(s)]), pl.String)
     c.facts.append(votes(data, u, option, col(data, "pocet platnych hlasov")))
     turnout = table("nrsr/1994/NRSR_1994_tab02.csv")
-    for measure, word in ((REGISTERED, "zoznamu"), (VOTERS, "vydane"), (CAST, "odovzdanych"), (VALID, "platnych hlasov spolu")):
-        c.declared[(None, measure)] = int(turnout.select(ints(turnout, col(turnout, word, exclude=["podiel"]))).sum().item())
+    for measure, word in (
+        (REGISTERED, "zoznamu"),
+        (VOTERS, "vydane"),
+        (CAST, "odovzdanych"),
+        (VALID, "platnych hlasov spolu"),
+    ):
+        c.declared[(None, measure)] = int(
+            turnout.select(ints(turnout, col(turnout, word, exclude=["podiel"]))).sum().item()
+        )
     d.contests.append(c)
     return d
 
@@ -1604,7 +1714,17 @@ def nrsr_1998() -> Day:
     for position, r in enumerate(national.iter_rows(named=True), start=1):
         label = clean(r[col(national, "nazov")])
         seats = number(r[col(national, "mandat")])
-        c.options.append(Option(fold(label), label, "list", position=position, party=label, outcome="won" if seats else "lost", seats=seats or None))
+        c.options.append(
+            Option(
+                fold(label),
+                label,
+                "list",
+                position=position,
+                party=label,
+                outcome="won" if seats else "lost",
+                seats=seats or None,
+            )
+        )
         c.declared[(fold(label), VOTES)] = number_or_zero(r[col(national, "pocet platnych")])
     c.declared[(None, VALID)] = sum(v for (k, m), v in c.declared.items() if m == VOTES)
     option = pl.col(col(data, "nazov politickeho")).map_elements(fold, pl.String)
@@ -1620,7 +1740,11 @@ def ep_municipal(year: int) -> Day:
     c = ep_contest(year)
     d.method = " The office's open data gives this election's results by municipality, without the seats won."
     if year == 2004:
-        path, parties_path, total_path = "eup/2004/EP_2004_Politicke_strany_obce.csv", "eup/2004/koal04.csv", "eup/2004/EUP_2004_tab01.csv"
+        path, parties_path, total_path = (
+            "eup/2004/EP_2004_Politicke_strany_obce.csv",
+            "eup/2004/koal04.csv",
+            "eup/2004/EUP_2004_tab01.csv",
+        )
         d.paths += [path, parties_path, total_path]
         rows = table(path).with_columns(_obec=pl.col("Kód obce"))
         turnout = rows
@@ -1630,10 +1754,24 @@ def ep_municipal(year: int) -> Day:
         pairs = {name: abbreviation[name][col(parties, "cislo")] for name in rows.columns[start:] if name != "_obec"}
         for r in parties.iter_rows(named=True):
             number_ = r[col(parties, "cislo")]
-            c.options.append(Option(number_, clean(r[col(parties, "nazov")]), "list", position=int(number_), party=clean(r[col(parties, "nazov")]), english=r[col(parties, "skratka")]))
+            c.options.append(
+                Option(
+                    number_,
+                    clean(r[col(parties, "nazov")]),
+                    "list",
+                    position=int(number_),
+                    party=clean(r[col(parties, "nazov")]),
+                    english=r[col(parties, "skratka")],
+                )
+            )
         totals = table(total_path)
         total = total_row(totals, "Obvod")
-        for measure, word in ((REGISTERED, "zapisanych"), (VOTERS, "vydane"), (CAST, "odovzdanych"), (VALID, "platnych hlasov spolu")):
+        for measure, word in (
+            (REGISTERED, "zapisanych"),
+            (VOTERS, "vydane"),
+            (CAST, "odovzdanych"),
+            (VALID, "platnych hlasov spolu"),
+        ):
             c.declared[(None, measure)] = number_or_zero(total[col(totals, word, exclude=["podiel"])])
     else:
         path, turnout_path = {
@@ -1648,7 +1786,12 @@ def ep_municipal(year: int) -> Day:
             totals = table("eup/2009/EUP_2009_tab02.csv")
             d.paths.append("eup/2009/EUP_2009_tab02.csv")
             total = total_row(totals, "Obvod")
-            for measure, word in ((REGISTERED, "zapisanych"), (VOTERS, "vydane"), (CAST, "odovzdanych"), (VALID, "platnych hlasov spolu")):
+            for measure, word in (
+                (REGISTERED, "zapisanych"),
+                (VOTERS, "vydane"),
+                (CAST, "odovzdanych"),
+                (VALID, "platnych hlasov spolu"),
+            ):
                 c.declared[(None, measure)] = number_or_zero(total[col(totals, word, exclude=["podiel"])])
             for position, (column, label) in enumerate(options.items(), start=1):
                 c.options.append(Option(label, label, "list", position=position, party=label))
@@ -1657,7 +1800,13 @@ def ep_municipal(year: int) -> Day:
             options = wide_options(rows, "po[čc]et platn[ýy]ch hlasov")
             national = table("eup/2014/EUP_2014_tab08.csv")
             d.paths.append("eup/2014/EUP_2014_tab08.csv")
-            totals = {fold(r[col(national, "politicky")]): (r[col(national, "politicky")], number_or_zero(r[col(national, "pocet")])) for r in national.iter_rows(named=True)}
+            totals = {
+                fold(r[col(national, "politicky")]): (
+                    r[col(national, "politicky")],
+                    number_or_zero(r[col(national, "pocet")]),
+                )
+                for r in national.iter_rows(named=True)
+            }
             pairs = {}
             for position, (column, label) in enumerate(options.items(), start=1):
                 full = totals[fold(label)][0] if fold(label) in totals else label
@@ -1667,8 +1816,15 @@ def ep_municipal(year: int) -> Day:
                     c.declared[(fold(full), VOTES)] = totals[fold(label)][1]
             total = total_row(turnout, "Obvod") if False else None
             summary = total_row(table(turnout_path), "Obvod")
-            for measure, word in ((REGISTERED, "zapisanych"), (VOTERS, "vyda"), (CAST, "odovzdanych"), (VALID, "platnych hlasov")):
-                c.declared[(None, measure)] = number_or_zero(summary[col(table(turnout_path), word, exclude=["podiel"])])
+            for measure, word in (
+                (REGISTERED, "zapisanych"),
+                (VOTERS, "vyda"),
+                (CAST, "odovzdanych"),
+                (VALID, "platnych hlasov"),
+            ):
+                c.declared[(None, measure)] = number_or_zero(
+                    summary[col(table(turnout_path), word, exclude=["podiel"])]
+                )
     units, u = obec_units(turnout, day)
     d.units.append(units)
     c.facts.append(
@@ -1677,7 +1833,11 @@ def ep_municipal(year: int) -> Day:
             u,
             {
                 REGISTERED: [col(turnout, "zapisanych")],
-                VOTERS: [col(turnout, "vydan", exclude=["podiel"]) if has(turnout, "vydan", exclude=["podiel"]) else col(turnout, "vyda")],
+                VOTERS: [
+                    col(turnout, "vydan", exclude=["podiel"])
+                    if has(turnout, "vydan", exclude=["podiel"])
+                    else col(turnout, "vyda")
+                ],
                 CAST: [col(turnout, "odovzdanych", exclude=["podiel"])],
                 VALID: [col(turnout, "platnych hlasov", exclude=["podiel"])],
             },
@@ -1695,16 +1855,36 @@ def ep_municipal(year: int) -> Day:
 PREZ_OLD: dict[int, tuple[tuple[str, str | None, str, str], ...]] = {
     # (results by unit, its turnout table or None when the same table holds both, national candidates, unit level)
     2004: (
-        ("pre/2004/1.kolo/PRE_2004_1kolo_tab04.csv", "pre/2004/1.kolo/PRE_2004_1kolo_tab02.csv", "pre/2004/1.kolo/PRE_2004_1kolo_tab07.csv", "okres"),
+        (
+            "pre/2004/1.kolo/PRE_2004_1kolo_tab04.csv",
+            "pre/2004/1.kolo/PRE_2004_1kolo_tab02.csv",
+            "pre/2004/1.kolo/PRE_2004_1kolo_tab07.csv",
+            "okres",
+        ),
         ("pre/2004/2.kolo/PRE_2004_2kolo_tab13.csv", None, "pre/2004/2.kolo/PRE_2004_2kolo_tab14.csv", "obec"),
     ),
     2009: (
-        ("pre/2009/1.kolo/PRE_2009_1kolo_tab07.csv", "pre/2009/1.kolo/PRE_2009_1kolo_tab03.csv", "pre/2009/1.kolo/PRE_2009_1kolo_tab08.csv", "obec"),
+        (
+            "pre/2009/1.kolo/PRE_2009_1kolo_tab07.csv",
+            "pre/2009/1.kolo/PRE_2009_1kolo_tab03.csv",
+            "pre/2009/1.kolo/PRE_2009_1kolo_tab08.csv",
+            "obec",
+        ),
         ("pre/2009/2.kolo/PRE_2009_2kolo_tab12.csv", None, "pre/2009/2.kolo/PRE_2009_2kolo_tab13.csv", "obec"),
     ),
     2014: (
-        ("pre/2014/1.kolo/PRE_2014_1kolo_tab06.csv", "pre/2014/1.kolo/PRE_2014_1kolo_tab03.csv", "pre/2014/1.kolo/PRE_2014_1kolo_tab04.csv", "obec"),
-        ("pre/2014/2.kolo/PRE_2014_2kolo_tab14.csv", "pre/2014/2.kolo/PRE_2014_2kolo_tab11.csv", "pre/2014/2.kolo/PRE_2014_2kolo_tab12.csv", "obec"),
+        (
+            "pre/2014/1.kolo/PRE_2014_1kolo_tab06.csv",
+            "pre/2014/1.kolo/PRE_2014_1kolo_tab03.csv",
+            "pre/2014/1.kolo/PRE_2014_1kolo_tab04.csv",
+            "obec",
+        ),
+        (
+            "pre/2014/2.kolo/PRE_2014_2kolo_tab14.csv",
+            "pre/2014/2.kolo/PRE_2014_2kolo_tab11.csv",
+            "pre/2014/2.kolo/PRE_2014_2kolo_tab12.csv",
+            "obec",
+        ),
     ),
 }
 CANDIDATE_VOTES = r"(platn[ée] hlasy po[čc]et|po[čc]et platn[ýy]ch hlasov|po[čc]et hlasov$|po[čc]et$)"
@@ -1722,7 +1902,9 @@ def prez_municipal(year: int) -> Day:
     d = Day(str(PREZ_DAYS[year][0]), f"The {year} presidential election, both rounds, by municipality", [])
     d.elections += prez_elections(year)
     if year == 2004:
-        d.method = " The office's open data gives the first round of 2004 by district (okres) and the second by municipality."
+        d.method = (
+            " The office's open data gives the first round of 2004 by district (okres) and the second by municipality."
+        )
     else:
         d.method = " The office's open data gives this election by municipality, naming each without its code; the code is resolved from the name within its district."
     for round_number, (path, turnout_path, national_path, level) in enumerate(PREZ_OLD[year], start=1):
@@ -1744,10 +1926,17 @@ def prez_municipal(year: int) -> Day:
                 u,
                 {
                     REGISTERED: [col(turnout, "zapisanych")],
-                    VOTERS: [col(turnout, "vydan", exclude=["podiel"]) if has(turnout, "vydan", exclude=["podiel"]) else col(turnout, "vyda")],
+                    VOTERS: [
+                        col(turnout, "vydan", exclude=["podiel"])
+                        if has(turnout, "vydan", exclude=["podiel"])
+                        else col(turnout, "vyda")
+                    ],
                     CAST: [col(turnout, "odovzdanych obalok", exclude=["podiel"])],
-                    VALID: [col(turnout, "platnych hlasov", exclude=["podiel", "-"])
-                            if has(turnout, "platnych hlasov", exclude=["podiel", "-"]) else col(turnout, "pocet hlasov pre vsetkych")],
+                    VALID: [
+                        col(turnout, "platnych hlasov", exclude=["podiel", "-"])
+                        if has(turnout, "platnych hlasov", exclude=["podiel", "-"])
+                        else col(turnout, "pocet hlasov pre vsetkych")
+                    ],
                 },
             )
         )
@@ -1806,6 +1995,33 @@ def ref_municipal(year: int) -> Day:
     c.facts.append(votes(rows, u, pl.lit("yes"), col(rows, "pocet hlasov ano")))
     c.facts.append(votes(rows, u, pl.lit("no"), col(rows, "pocet hlasov nie")))
     registered = int(rows.select(ints(rows, col(rows, "opravnenych"))).sum().item())
+    if year == 2003:
+        totals = table("ref/2003/REF_2003_tab02.csv")
+        d.paths.append("ref/2003/REF_2003_tab02.csv")
+        sums = {
+            k: int(totals.select(ints(totals, col(totals, w))).sum().item())
+            for k, w in (
+                ("r", "opravnenych"),
+                ("v", "vydanych"),
+                ("yes", "pocet hlasov ano"),
+                ("no", "pocet hlasov nie"),
+            )
+        }
+    else:
+        totals = table("ref/2004/REF_2004_tab03.csv")
+        d.paths.append("ref/2004/REF_2004_tab03.csv")
+        row = total_row(totals, "Okres")
+        sums = {
+            k: number_or_zero(row[col(totals, w)])
+            for k, w in (
+                ("r", "opravnenych"),
+                ("v", "vydanych"),
+                ("yes", "pocet hlasov ano"),
+                ("no", "pocet hlasov nie"),
+            )
+        }
+    c.declared[(None, REGISTERED)], c.declared[(None, VOTERS)] = sums["r"], sums["v"]
+    c.declared[("yes", VOTES)], c.declared[("no", VOTES)] = sums["yes"], sums["no"]
     referendum_outcomes(c, registered)
     d.contests.append(c)
     return d
@@ -1838,9 +2054,27 @@ def ref_precinct(year: int) -> Day:
             INVALID: [col(rows, "neplatne")],
         },
     )
-    registered = int(rows.select(ints(rows, col(rows, "zapisani") if has(rows, "zapisani") else col(rows, "opravnenych"))).sum().item())
+    registered = int(
+        rows.select(ints(rows, col(rows, "zapisani") if has(rows, "zapisani") else col(rows, "opravnenych")))
+        .sum()
+        .item()
+    )
+    if year == 2010:
+        summary = table("ref/2010/REF_2010_tab03.csv")
+        total = total_row(summary, "Samosprávny kraj")
+    else:
+        summary = table("ref/2015/REF_2015_tab01.csv")
+        total = total_row(summary, "Obvod")
+    d.paths.append("ref/2010/REF_2010_tab03.csv" if year == 2010 else "ref/2015/REF_2015_tab01.csv")
+    declared = {
+        REGISTERED: number_or_zero(total[col(summary, "opravnenych", exclude=["percento", "ucast"])]),
+        VOTERS: number_or_zero(total[col(summary, "vydanych")]),
+        VALID: number_or_zero(total[col(summary, "platnych", exclude=["neplatnych"])]),
+        INVALID: number_or_zero(total[col(summary, "neplatnych")]),
+    }
     for question in range(1, count + 1):
         c = ref_contest(question, None)
+        c.declared |= {(None, m): v for m, v in declared.items()}
         c.facts.append(shared)
         yes = next(n for n in rows.columns if re.fullmatch(rf"Otázka (č\. )?{question} ÁNO", n))
         no = next(n for n in rows.columns if re.fullmatch(rf"Otázka (č\. )?{question} NIE", n))
@@ -1848,6 +2082,692 @@ def ref_precinct(year: int) -> Day:
         c.facts.append(votes(rows, u, pl.lit("no"), no))
         referendum_outcomes(c, registered)
         d.contests.append(c)
+    return d
+
+
+# Regional (samosprávne kraje) and municipal elections by polling district: the chair and the council of each region
+# since 2017, and the mayor and council of each municipality since 2022.
+
+OSK_DAYS = {
+    2001: (date(2001, 12, 1), date(2001, 12, 15)),
+    2005: (date(2005, 11, 26), date(2005, 12, 10)),
+    2009: (date(2009, 11, 14), date(2009, 11, 28)),
+    2013: (date(2013, 11, 9), date(2013, 11, 23)),
+    2017: (date(2017, 11, 4), None),
+    2022: (date(2022, 10, 29), None),
+    2026: (date(2026, 10, 24), None),
+}
+OSO_DAYS = {
+    2002: date(2002, 12, 6),
+    2006: date(2006, 12, 2),
+    2010: date(2010, 11, 27),
+    2014: date(2014, 11, 15),
+    2018: date(2018, 11, 10),
+    2022: date(2022, 10, 29),
+    2026: date(2026, 10, 24),
+}
+INDEPENDENT = {"neka", "nk neka", "nezavisly kandidat", "nezavisla kandidatka", "nk", "001"}
+
+
+@dataclass
+class Local:
+    """One family of local contests on one day, in long form.
+
+    candidates: contest, number, name, party, status (elected, withdrew, or null)
+    votes: contest, obec, okrsok, number, value
+    units: obec, okrsok, and the accounting columns registered, voters, cast, and valid_<kind> (kind is the contest
+    key's first part), each nullable."""
+
+    candidates: pl.DataFrame
+    votes: pl.DataFrame
+    units: pl.DataFrame | None
+    meta: dict[str, Contest]
+
+
+def vuc_obvody() -> dict[str, tuple[str, str]]:
+    """Regional electoral districts: code → (name, region)."""
+    out: dict[str, tuple[str, str]] = {}
+    for path in ("osk/2017/OSK_2017_tab0db.csv", "osk/2026/OSK2026_SK_tab0db.csv"):
+        frame = table(path)
+        for row in frame.iter_rows(named=True):
+            out[row[col(frame, "kod volebneho obvodu")]] = (
+                clean(row[col(frame, "volebneho obvodu", exclude=["kod", "pocet"])]),
+                row[col(frame, "kod kraja")],
+            )
+    frame = table("osk/2022/OSK2022_SK_tab0db.csv")
+    for row in frame.iter_rows(named=True):
+        out.setdefault(
+            row[col(frame, "kod volebneho obvodu")],
+            (clean(row[col(frame, "nazov volebneho obvodu")]), row[col(frame, "kod kraja")]),
+        )
+    return out
+
+
+def town_name(code: str) -> str:
+    known = places().obce
+    return known[code][0] if code in known else CITIES[code][0]
+
+
+def status_of(text: object) -> str | None:
+    folded = fold(text)
+    if folded in ("x",):
+        return "withdrew"
+    if folded in ("1", "2", "zvoleny", "zvolena"):
+        return "elected"
+    return None
+
+
+def local_party(label: object) -> tuple[str | None, bool]:
+    text = clean(label)
+    if not text or fold(text) in INDEPENDENT:
+        return None, True
+    return text, False
+
+
+def mayor_contest(obec: str) -> Contest:
+    name = town_name(obec)
+    return Contest(
+        f"mayor:{obec}",
+        "oso",
+        "office",
+        f"{'Primátor' if obec in CITIES else 'Starosta'}, {name}",
+        f"{changeset.slug(name)}-{obec}-mayor",
+        system("mayor"),
+        district=area(OBEC, obec),
+        magnitude=1,
+        office=mayor(obec),
+    )
+
+
+def council_contest(obec: str, vo: str, seats: int | None) -> Contest:
+    name = town_name(obec)
+    return Contest(
+        f"council:{obec}:{vo}",
+        "oso",
+        "body_seats",
+        f"Zastupiteľstvo, {name}, volebný obvod č. {vo}",
+        f"{changeset.slug(name)}-{obec}-council-{vo}",
+        system("town-council"),
+        district=area(OBEC, obec),
+        magnitude=seats,
+        body=town_council(obec),
+    )
+
+
+def chair_contest(kraj: str, year: int, round_number: int = 1) -> Contest:
+    text = places().kraje[kraj]
+    return Contest(
+        f"chair:{kraj}:{round_number}",
+        f"osk:{round_number}",
+        "office",
+        f"Predseda, {text}",
+        f"{changeset.slug(text)}-chair",
+        system("vuc-chair-2017" if year >= 2017 else "vuc-chair-2001"),
+        district=area(KRAJ, kraj),
+        magnitude=1,
+        round=round_number,
+        previous=f"chair:{kraj}:1" if round_number == 2 else None,
+        office=regional_chair(kraj),
+    )
+
+
+def vuc_contest(obvod: str, seats: int | None) -> Contest:
+    name, kraj = vuc_obvody()[obvod]
+    text = places().kraje[kraj]
+    return Contest(
+        f"vuc:{obvod}",
+        "osk:1",
+        "body_seats",
+        f"Zastupiteľstvo, {text}, {name.lower() if name.startswith('Volebný') else name}",
+        f"{changeset.slug(text)}-council-{obvod}",
+        system("vuc-council"),
+        district=area(VUC_OBVOD, obvod),
+        magnitude=seats,
+        body=regional_council(kraj),
+    )
+
+
+def osk_election(year: int, round_number: int = 1) -> Election:
+    first, _ = OSK_DAYS[year]
+    day = first if round_number == 1 else OSK_DAYS[year][1] or first
+    suffix = "" if round_number == 1 else ", second round"
+    return Election(
+        f"osk:{round_number}",
+        "local" if round_number == 1 else "runoff",
+        day,
+        day,
+        f"{year} Slovak regional elections{suffix}",
+        f"Voľby do orgánov samosprávnych krajov {year}" + ("" if round_number == 1 else ", 2. kolo"),
+        f"sk/{day}-regional" + ("" if round_number == 1 else "-runoff"),
+    )
+
+
+def oso_election(year: int) -> Election:
+    day = OSO_DAYS[year]
+    return Election(
+        "oso",
+        "local",
+        day,
+        day,
+        f"{year} Slovak municipal elections",
+        f"Voľby do orgánov samosprávy obcí {year}",
+        f"sk/{day}-municipal",
+    )
+
+
+def local_unit(day: date) -> pl.Expr:
+    """A polling district, a city council district (okrsok "vo<n>"), or a whole municipality (no okrsok)."""
+    return (
+        pl.when(pl.col("okrsok").is_null())
+        .then(pl.concat_str(pl.lit(f"{day}:"), "obec"))
+        .otherwise(pl.concat_str(pl.lit(f"{day}:"), "obec", pl.lit(":"), "okrsok"))
+    )
+
+
+def add_local(d: Day, day: date, local: Local) -> None:
+    """Contests, options, outcomes, and facts from a family's long tables."""
+    votes_ = local.votes.with_columns(unit=local_unit(day))
+    d.units.append(
+        votes_.select(
+            "unit",
+            scheme=pl.when(pl.col("okrsok").is_null())
+            .then(pl.lit(OBEC))
+            .when(pl.col("okrsok").str.starts_with("vo"))
+            .then(pl.lit(TOWN_DISTRICT))
+            .otherwise(pl.lit(OKRSOK)),
+            obec="obec",
+            okres=pl.lit(None, pl.String),
+            kraj=pl.lit(None, pl.String),
+        ).unique("unit")
+    )
+    by_contest = votes_.partition_by("contest", as_dict=True)
+    accounting_parts: dict[str, pl.DataFrame] = {}
+    if local.units is not None:
+        units = local.units.with_columns(unit=local_unit(day))
+        pairs = votes_.select("contest", "unit").unique()
+        kinds = pairs.with_columns(kind=pl.col("contest").str.split(":").list.first())
+        long_parts = []
+        for measure, name in ((REGISTERED, "registered"), (VOTERS, "voters"), (CAST, "cast")):
+            if name in units.columns:
+                long_parts.append(
+                    units.select(
+                        "unit",
+                        kind=pl.lit(None, pl.String),
+                        measure=pl.lit(measure, pl.Int16),
+                        value=pl.col(name).cast(pl.Int64),
+                    )
+                )
+        for name in units.columns:
+            if name.startswith("valid_"):
+                long_parts.append(
+                    units.select(
+                        "unit",
+                        kind=pl.lit(name.removeprefix("valid_")),
+                        measure=pl.lit(VALID, pl.Int16),
+                        value=pl.col(name).cast(pl.Int64),
+                    )
+                )
+        long = pl.concat(long_parts).filter(pl.col("value").is_not_null())
+        shared = kinds.join(long.filter(pl.col("kind").is_null()).drop("kind"), on="unit")
+        own = kinds.join(long.filter(pl.col("kind").is_not_null()), on=["unit", "kind"])
+        joined = pl.concat(
+            [shared.select("contest", "unit", "measure", "value"), own.select("contest", "unit", "measure", "value")]
+        )
+        accounting_parts = {k[0]: v for k, v in joined.partition_by("contest", as_dict=True).items()}
+    candidates = local.candidates.partition_by("contest", as_dict=True)
+    for (contest_key,), frame in sorted(by_contest.items()):
+        c = local.meta[contest_key]
+        for row in candidates[(contest_key,)].sort(pl.col("number").cast(pl.Int32)).iter_rows(named=True):
+            label, independent = local_party(row["party"])
+            name = clean(row["name"])
+            c.options.append(
+                Option(
+                    row["number"],
+                    name,
+                    "candidate",
+                    position=int(row["number"]),
+                    party=label,
+                    person=name,
+                    independent=independent,
+                    outcome=row["status"],
+                )
+            )
+        c.facts.append(frame.select("unit", option="number", measure=pl.lit(VOTES, pl.Int16), value="value"))
+        if contest_key in accounting_parts:
+            c.facts.append(
+                accounting_parts[contest_key].select(
+                    "unit", option=pl.lit(None, pl.String), measure="measure", value="value"
+                )
+            )
+        if c.magnitude is None:
+            c.magnitude = sum(1 for o in c.options if o.outcome == "elected") or None
+        winners = [o for o in c.options if o.outcome == "elected"]
+        if c.magnitude and len(winners) > c.magnitude:
+            # Namesakes on one ballot both match the office's list of the elected: the one with more votes won.
+            totals = dict(frame.group_by("number").agg(pl.col("value").sum()).iter_rows())
+            for o in sorted(winners, key=lambda o: -totals.get(o.key, 0))[c.magnitude :]:
+                o.outcome = None
+        for o in c.options:
+            if o.outcome is None:
+                o.outcome = "lost"
+        d.contests.append(c)
+
+
+def _names(frame: pl.DataFrame) -> pl.Expr:
+    if has(frame, "meno a priezvisko"):
+        return pl.col(col(frame, "meno a priezvisko"))
+    first = col(frame, "meno", exclude=["priezvisko"]) if "MENO" not in frame.columns else "MENO"
+    last = col(frame, "priezvisko") if "PRIEZVISKO" not in frame.columns else "PRIEZVISKO"
+    return pl.concat_str(pl.col(first), pl.lit(" "), pl.col(last))
+
+
+def oso_modern(year: int) -> Day:
+    day = OSO_DAYS[year]
+    d = Day(str(day), f"The {year} municipal elections (mayors and councils) by polling district", [])
+    d.method = (
+        " In municipal elections each voter casts one ballot for the mayor and one for the council of the electoral "
+        "district (volebný obvod) the polling district belongs to, with as many votes as the district elects; valid "
+        "ballots are counted per ballot. Bratislava and Košice also elect a city mayor and council over their "
+        "boroughs; those city contests are stored by city council district, because the office's polling-district "
+        "tables for them repeat district numbers across boroughs."
+    )
+    d.elections.append(oso_election(year))
+    t = lambda n: f"oso/{year}/OSO{year}_SK_{n}.csv"
+    files = {
+        "units": t("tab02bf") if year == 2022 else t("tab02f"),
+        "units_x": t("tab02bex") if year == 2022 else t("tab02ex"),
+        "mayor": t("tab05f"),
+        "mayor_x": t("tab05ex"),
+        "council": t("tab08f"),
+        "council_x": t("tab08ex"),
+        "mayors": t("tab0ad"),
+        "mayors_x": t("tab0ax"),
+        "councillors": t("tab0bd"),
+        "councillors_x": t("tab0bx"),
+        "elected": t("tab06d"),
+        "elected_x": t("tab06x"),
+        "elected_mayors": t("tab04d"),
+    }
+    d.paths += list(files.values())
+    unit_frames = []
+    for name, city in (("units", False), ("units_x", True)):
+        f = table(files[name])
+        if not city:
+            f = f.filter(~pl.col(col(f, "kod obce")).is_in(list(CITIES)))
+        obec = col(f, "kod mesta") if city else col(f, "kod obce")
+        okrsok = pl.concat_str(pl.lit("vo"), pl.col(col(f, "volebny obvod"))) if city else pl.col(col(f, "okrsok"))
+        unit_frames.append(
+            f.select(
+                obec=pl.col(obec),
+                okrsok=okrsok,
+                registered=ints(f, col(f, "zapisanych")),
+                voters=ints(f, col(f, "zucastnenych")),
+                cast=ints(f, col(f, "odovzdanych obalok", exclude=["podiel"])),
+                valid_mayor=ints(f, col(f, "starost") if has(f, "starost") else col(f, "primator")),
+                valid_council=ints(f, col(f, "zastupitel")),
+            )
+        )
+    units = pl.concat(unit_frames)
+    vote_frames, cand_frames = [], []
+    meta: dict[str, Contest] = {}
+    elected = _elected_councillors(files["elected"], files["elected_x"])
+    elected_mayors = _elected_mayors(files["elected_mayors"], files["mayors_x"], files["mayor_x"])
+    for kind in ("mayor", "council"):
+        for city in (False, True):
+            f = table(files[f"{kind}_x" if city else kind])
+            if not city:
+                f = f.filter(~pl.col("OBEC" if "OBEC" in f.columns else col(f, "kod obce")).is_in(list(CITIES)))
+            people = table(files[(f"{kind}s" if kind == "mayor" else "councillors") + ("_x" if city else "")])
+            if "OBEC" in f.columns:
+                obec, vo, okrsok, number, value = "OBEC", "VOOBEC", "OKRSOK", "PC_HL", "P_HL"
+            else:
+                obec = col(f, "kod mesta") if city else col(f, "kod obce")
+                vo, number, value = col(f, "volebny obvod"), col(f, "poradie"), col(f, "pocet platnych hlasov")
+                okrsok = vo if city else col(f, "okrsok")
+            contest = (
+                pl.concat_str(pl.lit("mayor:"), pl.col(obec))
+                if kind == "mayor"
+                else pl.concat_str(pl.lit("council:"), pl.col(obec), pl.lit(":"), pl.col(vo))
+            )
+            okrsok_expr = pl.concat_str(pl.lit("vo"), pl.col(vo)) if city else pl.col(okrsok)
+            vote_frames.append(
+                f.select(
+                    contest=contest,
+                    obec=pl.col(obec),
+                    okrsok=okrsok_expr,
+                    number=pl.col(number).cast(pl.Int32).cast(pl.String),
+                    value=ints(f, value),
+                ).filter(pl.col("value").is_not_null())
+            )
+            pobec = col(people, "kod mesta") if city else col(people, "kod obce")
+            pcontest = (
+                pl.concat_str(pl.lit("mayor:"), pl.col(pobec))
+                if kind == "mayor"
+                else pl.concat_str(pl.lit("council:"), pl.col(pobec), pl.lit(":"), pl.col(col(people, "volebny obvod")))
+            )
+            note = col(people, "poznamka") if has(people, "poznamka") else None
+            cand_frames.append(
+                people.select(
+                    contest=pcontest,
+                    number=pl.col(col(people, "poradie")).cast(pl.Int32).cast(pl.String),
+                    name=_names(people),
+                    party=pl.col(col(people, "politicky subjekt")),
+                    status=pl.col(note).map_elements(lambda s: "withdrew" if fold(s) == "x" else None, pl.String)
+                    if note
+                    else pl.lit(None, pl.String),
+                )
+            )
+    votes_ = pl.concat(vote_frames)
+    candidates = pl.concat(cand_frames).with_columns(
+        status=pl.when(pl.col("status").is_not_null())
+        .then("status")
+        .when(
+            pl.struct("contest", "name").map_elements(
+                lambda r: (
+                    (r["contest"], fold(r["name"])) in elected or (r["contest"], fold(r["name"])) in elected_mayors
+                ),
+                pl.Boolean,
+            )
+        )
+        .then(pl.lit("elected"))
+        .otherwise(pl.lit(None, pl.String))
+    )
+    seats = Counter(contest for contest, _ in elected)
+    for contest_key in candidates["contest"].unique().to_list():
+        parts = contest_key.split(":")
+        meta[contest_key] = (
+            mayor_contest(parts[1])
+            if parts[0] == "mayor"
+            else council_contest(parts[1], parts[2], seats.get(contest_key))
+        )
+    unknown = set(votes_["contest"].unique()) - set(meta)
+    if unknown:
+        raise ValueError(f"oso {year}: votes for contests without candidates: {sorted(unknown)[:5]}")
+    add_local(d, day, Local(candidates, votes_, units, meta))
+    return d
+
+
+def _elected_councillors(path: str, city_path: str) -> set[tuple[str, str]]:
+    out = set()
+    for p_, city in ((path, False), (city_path, True)):
+        f = table(p_)
+        obec = col(f, "kod mesta") if city else col(f, "kod obce")
+        for row in f.select(obec=pl.col(obec), vo=pl.col(col(f, "volebny obvod")), name=_names(f)).iter_rows(
+            named=True
+        ):
+            out.add((f"council:{row['obec']}:{row['vo']}", fold(row["name"])))
+    return out
+
+
+def _elected_mayors(path: str, city_people: str, city_votes: str) -> set[tuple[str, str]]:
+    out = set()
+    f = table(path)
+    for row in f.select(obec=pl.col(col(f, "kod obce")), name=_names(f)).iter_rows(named=True):
+        out.add((f"mayor:{row['obec']}", fold(row["name"])))
+    votes_ = table(city_votes)
+    city = col(votes_, "kod mesta")
+    totals = votes_.group_by(city, col(votes_, "meno"), col(votes_, "priezvisko")).agg(
+        ints(votes_, col(votes_, "pocet platnych hlasov")).sum().alias("v")
+    )
+    for code in totals[city].unique().to_list():
+        top = totals.filter(pl.col(city) == code).sort("v", descending=True).row(0)
+        out.add((f"mayor:{code}", fold(f"{top[1]} {top[2]}")))
+    return out
+
+
+def osk_modern(year: int) -> Day:
+    day, _ = OSK_DAYS[year]
+    d = Day(str(day), f"The {year} regional elections (chairs and councils) by polling district", [])
+    d.method = (
+        " In regional elections each voter casts one ballot for the region's chair and one for the council of the "
+        "regional electoral district, with as many votes as the district elects; valid ballots are counted per ballot."
+    )
+    d.elections.append(osk_election(year))
+    meta: dict[str, Contest] = {}
+    if year == 2017:
+        paths = {
+            "units": "osk/2017/OSK_2017_tab02d.csv",
+            "chair": "osk/2017/OSK_2017_tab06e.csv",
+            "council": "osk/2017/OSK_2017_tab09e.csv",
+            "seats": "osk/2017/OSK_2017_tab0db.csv",
+        }
+    elif year == 2022:
+        paths = {
+            "units": "osk/2022/OSK2022_SK_tab02bd.csv",
+            "chair": "osk/2022/OSK2022_SK_tab06d.csv",
+            "council": "osk/2022/OSK2022_SK_tab09d.csv",
+            "seats": "osk/2022/OSK2022_SK_tab0db.csv",
+            "chairs": "osk/2022/OSK2022_SK_tab0a.csv",
+            "members": "osk/2022/OSK2022_SK_tab0b.csv",
+            "parties": "osk/2022/OSK2022_SK_tab0c.csv",
+            "map": "osk/2022/OSK2022_SK_tab0dc.csv",
+        }
+    else:
+        paths = {
+            "chair": "osk/2026/OSK2026_SK_tab06d.csv",
+            "council": "osk/2026/OSK2026_SK_tab09d.csv",
+            "seats": "osk/2026/OSK2026_SK_tab0db.csv",
+        }
+    d.paths += list(paths.values())
+    seats_frame = table(paths["seats"])
+    seats = {
+        r[col(seats_frame, "kod volebneho obvodu")]: number(r[col(seats_frame, "volenych poslancov")])
+        for r in seats_frame.iter_rows(named=True)
+    }
+    units = None
+    if year == 2022:
+        mapping = table(paths["map"])
+        kraj_of = {r["OBEC"]: r["KRAJ"] for r in mapping.iter_rows(named=True)}
+        obvod_of = {r["OBEC"]: r["VOBVOD"] for r in mapping.iter_rows(named=True)}
+        parties = {r["PS"]: r["NPS"] for r in table(paths["parties"]).iter_rows(named=True)}
+
+        def label(codes: str | None) -> str | None:
+            listed = [c.strip() for c in (codes or "").split(",") if c.strip()]
+            if not listed or listed == ["001"]:
+                return None
+            return ", ".join(parties.get(c, c) for c in listed)
+
+        u = table(paths["units"])
+        units = u.select(
+            obec="OBEC",
+            okrsok="OKRSOK",
+            registered=ints(u, "P_ZAP"),
+            voters=ints(u, "P_ZUC"),
+            cast=ints(u, "P_OO"),
+            valid_chair=ints(u, "P_HL_PRE"),
+            valid_vuc=ints(u, "P_HL_POS"),
+        )
+        ch, co = table(paths["chair"]), table(paths["council"])
+        votes_ = pl.concat(
+            [
+                ch.select(
+                    contest=pl.concat_str(pl.lit("chair:"), pl.col("OBEC").replace_strict(kraj_of), pl.lit(":1")),
+                    obec="OBEC",
+                    okrsok="OKRSOK",
+                    number="PC_HL",
+                    value=ints(ch, "P_HL"),
+                    flag="KANDIDAT",
+                ),
+                co.select(
+                    contest=pl.concat_str(pl.lit("vuc:"), pl.col("OBEC").replace_strict(obvod_of)),
+                    obec="OBEC",
+                    okrsok="OKRSOK",
+                    number="PC_HL",
+                    value=ints(co, "P_HL"),
+                    flag="KANDIDAT",
+                ),
+            ]
+        )
+        cands = []
+        for path, key_ in ((paths["chairs"], "chair"), (paths["members"], "vuc")):
+            f = table(path)
+            contest = (
+                pl.concat_str(pl.lit("chair:"), "KRAJ", pl.lit(":1"))
+                if key_ == "chair"
+                else pl.concat_str(pl.lit("vuc:"), "VOBVOD")
+            )
+            cands.append(
+                f.select(
+                    contest=contest,
+                    number="PC_HL",
+                    name=pl.concat_str("MENO", pl.lit(" "), "PRIEZVISKO"),
+                    party=pl.col("PS").map_elements(label, pl.String),
+                    note="POZNAMKA",
+                )
+            )
+        people = pl.concat(cands)
+    else:
+        ch, co = table(paths["chair"]), table(paths["council"])
+        frames = []
+        cand_frames = []
+        for f, key_ in ((ch, "chair"), (co, "vuc")):
+            okrsok = pl.col(col(f, "okrsok")).map_elements(precinct, pl.String)
+            contest = (
+                pl.concat_str(pl.lit("chair:"), pl.col(col(f, "kod", "kraja")), pl.lit(":1"))
+                if key_ == "chair"
+                else pl.concat_str(pl.lit("vuc:"), pl.col(col(f, "kod volebneho obvodu")))
+            )
+            flag = col(f, "poznamka") if has(f, "poznamka") else col(f, "kandidat", exclude=["meno"])
+            number_ = col(f, "poradie")
+            frames.append(
+                f.select(
+                    contest=contest,
+                    obec=pl.col(col(f, "kod obce")),
+                    okrsok=okrsok,
+                    number=pl.col(number_),
+                    value=ints(f, col(f, "pocet platnych hlasov")),
+                    flag=pl.col(flag),
+                )
+            )
+            cand_frames.append(
+                f.select(
+                    contest=contest,
+                    number=pl.col(number_),
+                    name=_names(f),
+                    party=pl.col(col(f, "politicky subjekt")),
+                    note=pl.col(flag),
+                ).unique(["contest", "number"])
+            )
+        votes_ = pl.concat(frames)
+        people = pl.concat(cand_frames)
+        if year == 2017:
+            u = table(paths["units"])
+            units = u.select(
+                obec=pl.col(col(u, "kod obce")),
+                okrsok=pl.col(col(u, "okrsok")).map_elements(precinct, pl.String),
+                registered=ints(u, col(u, "zapisanych")),
+                voters=ints(u, col(u, "zucastnili")),
+                cast=ints(u, col(u, "odovzdanych obalok", exclude=["podiel"])),
+                valid_chair=ints(u, col(u, "predsedu")),
+                valid_vuc=ints(u, col(u, "zastupitel")),
+            )
+    flags = votes_.group_by("contest", "number").agg(pl.col("flag").drop_nulls().first())
+
+    def status(note: object, flag: object) -> str | None:
+        if fold(note) == "x" or fold(flag) == "x" or (year == 2017 and fold(flag) == "0"):
+            return "withdrew"
+        if (year == 2017 and fold(flag) == "2") or (year != 2017 and status_of(flag) == "elected"):
+            return "elected"
+        return None
+
+    candidates = (
+        people.unique(["contest", "number"])
+        .join(flags, on=["contest", "number"], how="left")
+        .select(
+            "contest",
+            "number",
+            "name",
+            party=pl.col("party"),
+            status=pl.struct("note", "flag").map_elements(lambda r: status(r["note"], r["flag"]), pl.String),
+        )
+    )
+    for contest_key in candidates["contest"].unique().to_list():
+        kind, code = contest_key.split(":")[:2]
+        meta[contest_key] = chair_contest(code, year) if kind == "chair" else vuc_contest(code, seats.get(code))
+    if units is not None:
+        units = units.with_columns(okrsok=pl.col("okrsok").map_elements(precinct, pl.String))
+    add_local(
+        d,
+        day,
+        Local(
+            candidates,
+            votes_.drop("flag").with_columns(okrsok=pl.col("okrsok").map_elements(precinct, pl.String)),
+            units,
+            meta,
+        ),
+    )
+    return d
+
+
+def oso_mayors(year: int) -> Day:
+    """2014 and 2018: mayors' votes and the municipal roll and turnout by municipality; councillors' votes are
+    published only for the elected (2014, 2018) or for some cities (2014), so the councils are left out."""
+    day = OSO_DAYS[year]
+    d = Day(str(day), f"The {year} municipal elections, mayors by municipality", [])
+    d.method = " The office's open data gives the mayors' votes in this election by municipality."
+    d.elections.append(oso_election(year))
+    if year == 2018:
+        paths = ["oso/2018/OSO_2018_tab05.csv", "oso/2018/OSO_2018_tab02bd.csv"]
+        f, u = table(paths[0]), table(paths[1])
+        f = f.with_columns(_obec=pl.col("Kód obce"))
+        u = u.with_columns(_obec=pl.col("Kód obce"))
+        elected = {
+            (r["Kód obce"], fold(f"{r['Meno']} {r['Priezvisko']}"))
+            for r in table("oso/2018/OSO_2018_tab04.csv").iter_rows(named=True)
+        }
+        paths.append("oso/2018/OSO_2018_tab04.csv")
+        names = pl.concat_str(pl.col("Meno"), pl.lit(" "), pl.col("Priezvisko"))
+        number = pl.col("Poradie na hlasovacom lístku")
+        status = pl.struct("_obec", "_name").map_elements(
+            lambda r: "elected" if (r["_obec"], fold(r["_name"])) in elected else None, pl.String
+        )
+        party = pl.col("Politický subjekt")
+    else:
+        paths = ["oso/2014/OSO_2014_tab11.csv", "oso/2014/OSO_2014_tab07.csv"]
+        f = municipal_rows(table(paths[0]), "Obec, mesto, mestská časť", "Obvod")
+        u = municipal_rows(table(paths[1]), "Obec, mesto, mestská časť", "Obvod")
+        names = pl.col("Meno a priezvisko")
+        number = pl.int_range(1, pl.len() + 1).over("_obec").cast(pl.String)
+        status = (
+            pl.when(pl.col("Zvolený starosta/primátor") == "1")
+            .then(pl.lit("elected"))
+            .otherwise(pl.lit(None, pl.String))
+        )
+        party = pl.col("Skratka politického subjektu")
+    d.paths += paths
+    f = f.with_columns(_name=names, _number=number)
+    contest = pl.concat_str(pl.lit("mayor:"), pl.col("_obec"))
+    votes_ = f.select(
+        contest=contest,
+        obec="_obec",
+        okrsok=pl.lit(None, pl.String),
+        number=pl.col("_number").cast(pl.Int32).cast(pl.String),
+        value=ints(f, col(f, "pocet", "hlas")),
+    )
+    candidates = f.select(
+        contest=contest,
+        number=pl.col("_number").cast(pl.Int32).cast(pl.String),
+        name="_name",
+        party=party,
+        status=status,
+    )
+    units = u.select(
+        obec="_obec",
+        okrsok=pl.lit(None, pl.String),
+        registered=ints(u, col(u, "zapisanych")),
+        voters=ints(u, col(u, "vydan", exclude=["podiel"])),
+        cast=ints(u, col(u, "odovzdanych obalok", exclude=["podiel"])),
+        valid_mayor=ints(u, col(u, "platnych", "starost", exclude=["podiel"])),
+    )
+    meta = {k: mayor_contest(k.split(":")[1]) for k in candidates["contest"].unique().to_list()}
+    summed = votes_.group_by("obec").agg(pl.col("value").sum()).join(units.select("obec", "valid_mayor"), on="obec")
+    short = summed.filter(pl.col("value") != pl.col("valid_mayor")).height
+    if short:
+        d.accepts["accounting.votes_valid"] = (
+            f"in {short} municipalities the office's votes for the mayoral candidates add up to a different number "
+            "than the valid mayoral ballots it prints for the municipality; both are stored as printed"
+        )
+    add_local(d, day, Local(candidates, votes_, units, meta))
     return d
 
 
