@@ -725,6 +725,16 @@ def _chunks(file: Path, columns: list[str]) -> Iterator[bytes]:
         yield buffer.getvalue()
 
 
+def _defaults(conn: Connection, table: str, columns: list[str]) -> list[tuple[str, LiteralString]]:
+    rows = conn.execute(
+        """select a.attname, pg_get_expr(d.adbin, d.adrelid) from pg_attribute a
+           join pg_attrdef d on d.adrelid = a.attrelid and d.adnum = a.attnum
+           where a.attrelid = %s::regclass and a.attnotnull and a.attname = any(%s)""",
+        [f"public.{table}", columns],
+    ).fetchall()
+    return [(str(column), cast(LiteralString, str(default))) for column, default in rows if "(" not in str(default)]
+
+
 def _stage(conn: Connection, table: str, columns: list[str], file: Path, like: LiteralString | None = None) -> int:
     name = f"pkg_{table}"
     conn.execute(sql.SQL("drop table if exists {}").format(sql.Identifier(name)))
@@ -746,6 +756,12 @@ def _stage(conn: Connection, table: str, columns: list[str], file: Path, like: L
     ):
         for chunk in _chunks(file, columns):
             copy.write(chunk)
+    for column, default in _defaults(conn, table, columns):
+        conn.execute(
+            sql.SQL("update {t} set {c} = {d} where {c} is null").format(
+                t=sql.Identifier(name), c=sql.Identifier(column), d=sql.SQL(default)
+            )
+        )
     conn.execute(sql.SQL("analyze {}").format(sql.Identifier(name)))
     found = conn.execute(sql.SQL("select count(*) from {}").format(sql.Identifier(name))).fetchone()
     return 0 if found is None else int(found[0])
@@ -1129,10 +1145,84 @@ def load(conn: Connection, items: list[tuple[Path, dict[str, object]]], meter: M
     return [item.changeset_id for item in loaded]
 
 
+READY_COLUMNS = """select a.attname, a.attnotnull,
+       coalesce(pg_get_expr(d.adbin, d.adrelid) not like '%%(%%', false),
+       array(select e.enumlabel::text from pg_enum e where e.enumtypid = a.atttypid)
+   from pg_attribute a left join pg_attrdef d on d.adrelid = a.attrelid and d.adnum = a.attnum
+   where a.attrelid = %s::regclass and a.attnum > 0 and not a.attisdropped"""
+
+
+def _ready(conn: Connection, key: str, batch: set[str]) -> list[str]:
+    path = _resolve(key)
+    manifest = _manifest(path)
+    found: list[str] = []
+    missing = [
+        str(x)
+        for (x,) in conn.execute(
+            """select x from unnest(%s::text[]) x
+               where not exists (select from entity e where e.id::text = x)
+                 and not exists (select from polity p where p.id::text = x)
+                 and not exists (select from scheme s where s.code = x)""",
+            [manifest["external"]],
+        ).fetchall()
+    ]
+    if missing:
+        found.append(f"ready.external: {len(missing)} referenced ids are missing from the database: {missing[:5]}")
+    for depend in manifest["depends"]:
+        if (
+            depend not in batch
+            and conn.execute("select 1 from changeset where scope->>'package' = %s", [depend]).fetchone() is None
+        ):
+            found.append(
+                f"ready.depends: {depend} is neither loaded nor in this batch; build it and list it in run.json"
+            )
+    for table, (_, schema) in TABLES.items():
+        file = path / f"{table}.parquet"
+        if not file.exists():
+            continue
+        present = set(pl.read_parquet_schema(file))
+        frame = pl.scan_parquet(file)
+        rows = frame.select(pl.len()).collect().item()
+        known = {
+            str(name): (bool(required), bool(fixed), list(labels))
+            for name, required, fixed, labels in conn.execute(READY_COLUMNS, [f"public.{table}"]).fetchall()
+        }
+        for column in schema:
+            if column not in known:
+                found.append(f"ready.column: {table}.{column} does not exist in the database")
+                continue
+            required, fixed, labels = known[column]
+            nulls = rows if column not in present else frame.select(pl.col(column).null_count()).collect().item()
+            if required and not fixed and nulls:
+                found.append(f"ready.null: {table}.{column} is required and {nulls:,} rows leave it empty")
+            if labels and column in present:
+                bad = [
+                    str(value)
+                    for value in frame.select(pl.col(column).cast(pl.Utf8).unique()).collect().to_series().to_list()
+                    if value is not None and value not in labels
+                ]
+                if bad:
+                    found.append(f"ready.enum: {table}.{column} has values the database does not allow: {bad[:5]}")
+    return found
+
+
+def readiness(keys: list[str]) -> None:
+    with store.connect() as conn:
+        found = [f"{key}: {problem}" for key in keys for problem in _ready(conn, key, set(keys))]
+    for line in found:
+        print(line, flush=True)
+    if found:
+        raise SystemExit(1)
+    print(f"{len(keys)} packages ready to load", flush=True)
+
+
 def run(command: str, keys: list[str]) -> None:
     if command == "export":
         for pipeline in keys:
             export(pipeline)
+        return
+    if command == "ready":
+        readiness(keys)
         return
     failed = False
     ready: list[tuple[Path, dict[str, object]]] = []

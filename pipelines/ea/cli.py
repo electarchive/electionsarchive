@@ -112,7 +112,7 @@ def main() -> None:
     crowning.add_argument("target", nargs="?", help="rebuild every child of one election, or of a polity's elections")
     crowning.add_argument("--all", action="store_true", help="rebuild every child of every such election")
     packaging = commands.add_parser("package", help="check or bulk-load file-first Parquet packages")
-    packaging.add_argument("action", choices=["check", "load", "export"])
+    packaging.add_argument("action", choices=["check", "ready", "load", "export"])
     packaging.add_argument(
         "keys",
         nargs="+",
