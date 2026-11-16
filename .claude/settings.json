@@ -5,5 +5,10 @@
     "pr": "",
     "sessionUrl": false
   },
-  "includeCoAuthoredBy": false
+  "includeCoAuthoredBy": false,
+  "permissions": {
+    "allow": [
+      "mcp__claude-code-remote__add_repo"
+    ]
+  }
 }
