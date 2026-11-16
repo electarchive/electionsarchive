@@ -1035,6 +1035,58 @@ def _derive(conn: Connection, loaded: list[Loaded], meter: Meter) -> list[str]:
     return steps
 
 
+def _verify(conn: Connection, loaded: list[Loaded]) -> None:
+    problems: list[str] = []
+    for item in loaded:
+        for table, (key_columns, _) in TABLES.items():
+            file = item.path / f"{table}.parquet"
+            if key_columns != ("id",) or not file.exists():
+                continue
+            ids = pl.read_parquet(file, columns=["id"])["id"].unique().to_list()
+            found = conn.execute(
+                sql.SQL("select count(*) from {} where id = any(%s::uuid[])").format(sql.Identifier(table)), [ids]
+            ).fetchone()
+            present = 0 if found is None else int(found[0])
+            if present != len(ids):
+                problems.append(f"{item.key}: {table} holds {present:,} of the package's {len(ids):,} rows")
+        sets_file = item.path / "result_set.parquet"
+        sets = set(pl.read_parquet(sets_file, columns=["id"])["id"].to_list()) if sets_file.exists() else set()
+        for table, measure, query in (
+            (
+                "result_value",
+                "value",
+                """select r.id::text, count(*), coalesce(sum(v.value), 0) from result_set r
+                   join result_value v on v.result_set_k = r.k where r.id = any(%s::uuid[]) group by r.id""",
+            ),
+            (
+                "outcome",
+                "seats",
+                """select result_set_id::text, count(*), coalesce(sum(seats), 0) from outcome
+                   where result_set_id = any(%s::uuid[]) group by result_set_id""",
+            ),
+        ):
+            file = item.path / f"{table}.parquet"
+            expected: dict[str, tuple[int, int]] = {}
+            if file.exists():
+                grouped = (
+                    pl.scan_parquet(file)
+                    .group_by("result_set_id")
+                    .agg(pl.len(), pl.col(measure).fill_null(0).sum())
+                    .collect()
+                )
+                expected = {str(rs): (int(n), int(total)) for rs, n, total in grouped.iter_rows()}
+            ids = sorted(sets | set(expected))
+            actual = {str(rs): (int(n), int(total)) for rs, n, total in conn.execute(query, [ids]).fetchall()}
+            for rs in ids:
+                if actual.get(rs, (0, 0)) != expected.get(rs, (0, 0)):
+                    problems.append(
+                        f"{item.key}: {table} for result set {rs} holds (rows, {measure}) {actual.get(rs, (0, 0))},"
+                        f" the package {expected.get(rs, (0, 0))}"
+                    )
+    if problems:
+        raise ValueError(f"load verification failed, rolled back ({len(problems):,}): " + "; ".join(problems[:10]))
+
+
 def load(conn: Connection, items: list[tuple[Path, dict[str, object]]], meter: Meter) -> list[str]:
     with conn.transaction():
         conn.execute("select pg_advisory_xact_lock_shared(hashtext('ea.search'))")
@@ -1043,6 +1095,8 @@ def load(conn: Connection, items: list[tuple[Path, dict[str, object]]], meter: M
         steps = [meter.step("facts")]
         if loaded:
             steps += _derive(conn, loaded, meter)
+            _verify(conn, loaded)
+            steps.append(meter.step("verify"))
     for item in loaded:
         copy = folder(item.key) / f"v{item.version}"
         if copy.exists():
