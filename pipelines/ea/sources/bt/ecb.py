@@ -579,7 +579,7 @@ def primary(p: Package, election: Election, eid: str, path_: str) -> None:
         seats, totals = tables.na_round(path("na2018p"), kind="primary18")
     else:
         seats = tables.na2023(path("na2023p"))
-        grand = re.search(r"GRAND TOTAL.*?Total\s+(\d+)\s+(\d+)", _text(path("na2023turnout")), re.S)
+        grand = re.search(r"GRAND TOTAL.*?Total\s+(\d+)\s+(\d+)", _text(path("na2023turnout")), re.DOTALL)
         if grand is None:
             raise ValueError("2023 turnout table has no grand total")
         totals = {"registered": int(grand[1])}
