@@ -1,0 +1,1590 @@
+{
+ "polity": "LV",
+ "name": "Latvia",
+ "sources": {
+  "satversme": {
+   "title": "Latvijas Republikas Satversme (1922, restored 1993)",
+   "publisher": "Saeima (likumi.lv)",
+   "url": "https://likumi.lv/ta/id/57980",
+   "kind": "official_body"
+  },
+  "svl1995": {
+   "title": "Saeimas vēlēšanu likums (1995)",
+   "publisher": "Saeima (likumi.lv)",
+   "url": "https://likumi.lv/ta/id/35261",
+   "kind": "official_body"
+  },
+  "pdvl1994": {
+   "title": "Pašvaldības domes vēlēšanu likums (1994; first titled Pilsētas domes, rajona padomes un pagasta padomes vēlēšanu likums)",
+   "publisher": "Saeima (likumi.lv)",
+   "url": "https://likumi.lv/ta/id/57839",
+   "kind": "official_body"
+  },
+  "epvl2003": {
+   "title": "Eiropas Parlamenta vēlēšanu likums (2003)",
+   "publisher": "Saeima (likumi.lv)",
+   "url": "https://likumi.lv/ta/id/84185",
+   "kind": "official_body"
+  },
+  "tnl1994": {
+   "title": "Par tautas nobalsošanu, likumu ierosināšanu un Eiropas pilsoņu iniciatīvu (1994)",
+   "publisher": "Saeima (likumi.lv)",
+   "url": "https://likumi.lv/ta/id/58065",
+   "kind": "official_body"
+  },
+  "vprl2022": {
+   "title": "Vietējo pašvaldību referendumu likums (2022)",
+   "publisher": "Saeima (likumi.lv)",
+   "url": "https://likumi.lv/ta/id/331194",
+   "kind": "official_body"
+  },
+  "pl2022": {
+   "title": "Pašvaldību likums (2022)",
+   "publisher": "Saeima (likumi.lv)",
+   "url": "https://likumi.lv/ta/id/336956",
+   "kind": "official_body"
+  },
+  "par_pasv1994": {
+   "title": "Par pašvaldībām (1994, repealed 2023)",
+   "publisher": "Saeima (likumi.lv)",
+   "url": "https://likumi.lv/ta/id/57255",
+   "kind": "official_body"
+  },
+  "atavl2020": {
+   "title": "Administratīvo teritoriju un apdzīvoto vietu likums (2020), pielikums: administratīvās teritorijas un teritoriālā iedalījuma vienības",
+   "publisher": "Saeima (likumi.lv)",
+   "url": "https://likumi.lv/ta/id/315654",
+   "kind": "official_body"
+  },
+  "cvk_saeima": {
+   "title": "Vēsturiskā kartotēka: Saeimas vēlēšanas",
+   "publisher": "Centrālā vēlēšanu komisija",
+   "url": "https://arhivs.cvk.lv/lv/saeimas-velesanas/",
+   "kind": "official_body"
+  },
+  "cvk_pasv": {
+   "title": "Vēsturiskā kartotēka: Pašvaldību vēlēšanas",
+   "publisher": "Centrālā vēlēšanu komisija",
+   "url": "https://arhivs.cvk.lv/lv/pasvaldibu-velesanas/",
+   "kind": "official_body"
+  },
+  "cvk_ep": {
+   "title": "Vēsturiskā kartotēka: Eiropas Parlamenta vēlēšanas",
+   "publisher": "Centrālā vēlēšanu komisija",
+   "url": "https://arhivs.cvk.lv/lv/eiropas-parlamenta-velesanas/",
+   "kind": "official_body"
+  },
+  "cvk_tn": {
+   "title": "Vēsturiskā kartotēka: Notikušās tautas nobalsošanas",
+   "publisher": "Centrālā vēlēšanu komisija",
+   "url": "https://arhivs.cvk.lv/lv/notikusas-tautas-nobalsosanas/",
+   "kind": "official_body"
+  },
+  "cvk_pv": {
+   "title": "Vēsturiskā kartotēka: Parakstu vākšana ierosināšanai",
+   "publisher": "Centrālā vēlēšanu komisija",
+   "url": "https://arhivs.cvk.lv/lv/parakstu-vaksana-ierosinasanai/",
+   "kind": "official_body"
+  },
+  "cvk_1994": {
+   "title": "Vēsturiskā kartotēka: 1994. gada 29. maija pašvaldību vēlēšanas",
+   "publisher": "Centrālā vēlēšanu komisija",
+   "url": "https://arhivs.cvk.lv/lv/1994-gada-29-maija-velesanas/",
+   "kind": "official_body"
+  },
+  "cvk_2009": {
+   "title": "Vēsturiskā kartotēka: 2009. gada 6. jūnija pašvaldību vēlēšanas",
+   "publisher": "Centrālā vēlēšanu komisija",
+   "url": "https://arhivs.cvk.lv/lv/2009gada-6junija-velesanas/",
+   "kind": "official_body"
+  },
+  "cvk_2013": {
+   "title": "Vēsturiskā kartotēka: 2013. gada 1. jūnija pašvaldību vēlēšanas",
+   "publisher": "Centrālā vēlēšanu komisija",
+   "url": "https://arhivs.cvk.lv/lv/2013gada-1junija-velesanas/",
+   "kind": "official_body"
+  },
+  "cvk_2017": {
+   "title": "Vēsturiskā kartotēka: 2017. gada 3. jūnija pašvaldību vēlēšanas",
+   "publisher": "Centrālā vēlēšanu komisija",
+   "url": "https://arhivs.cvk.lv/lv/2017gada-3junija-velesanas/",
+   "kind": "official_body"
+  },
+  "cvk_2021": {
+   "title": "Vēsturiskā kartotēka: 2021. gada 5. jūnija pašvaldību vēlēšanas",
+   "publisher": "Centrālā vēlēšanu komisija",
+   "url": "https://arhivs.cvk.lv/lv/2021-gada-5-junija-velesanas/",
+   "kind": "official_body"
+  },
+  "cvk_2021b": {
+   "title": "Vēsturiskā kartotēka: Varakļānu novada domes un Rēzeknes novada domes vēlēšanas (2021)",
+   "publisher": "Centrālā vēlēšanu komisija",
+   "url": "https://arhivs.cvk.lv/lv/varaklanu-novada-domes-un-rezeknes-novada-domes-velesanas-0/",
+   "kind": "official_body"
+  },
+  "cvk_2025": {
+   "title": "Vēsturiskā kartotēka: 2025. gada pašvaldību vēlēšanas",
+   "publisher": "Centrālā vēlēšanu komisija",
+   "url": "https://arhivs.cvk.lv/lv/2025-gada-velesanas/",
+   "kind": "official_body"
+  },
+  "cvk_riga2020": {
+   "title": "Vēsturiskā kartotēka: Rīgas domes ārkārtas vēlēšanas (2020)",
+   "publisher": "Centrālā vēlēšanu komisija",
+   "url": "https://arhivs.cvk.lv/lv/rigas-domes-arkartas-velesanas/",
+   "kind": "official_body"
+  },
+  "cvk_2010": {
+   "title": "Vēsturiskā kartotēka: 2010. gada 18. decembra Rojas novada domes un Mērsraga novada domes vēlēšanas",
+   "publisher": "Centrālā vēlēšanu komisija",
+   "url": "https://arhivs.cvk.lv/lv/2010gada-18decembra-rojas-novada-domes-un-mersraga-novada-domes-velesanas/",
+   "kind": "official_body"
+  },
+  "cvk_2003": {
+   "title": "Vēsturiskā kartotēka: 2003. gada 20. septembra vēlēšanas Rendas pagastā",
+   "publisher": "Centrālā vēlēšanu komisija",
+   "url": "https://arhivs.cvk.lv/lv/2003-gada-20-septembra-velesanas-rendas-pagasta/",
+   "kind": "official_body"
+  },
+  "cvk_2005r": {
+   "title": "Vēsturiskā kartotēka: 2005. gada 20. augusta atkārtotās vēlēšanas Rēzeknē",
+   "publisher": "Centrālā vēlēšanu komisija",
+   "url": "https://arhivs.cvk.lv/lv/2005gada-20augusta-atkartotas-velesanas-rezekne/",
+   "kind": "official_body"
+  },
+  "cvk_aptauja": {
+   "title": "Vēsturiskā kartotēka: Iedzīvotāju aptauja par Latvijas Republikas neatkarību (1991)",
+   "publisher": "Centrālā vēlēšanu komisija",
+   "url": "https://arhivs.cvk.lv/lv/iedzivotaju-aptauja-par-latvijas-republikas-neatkaribu/",
+   "kind": "official_body"
+  },
+  "cvk_dati": {
+   "title": "Vēlēšanu rezultāti (dati.cvk.lv)",
+   "publisher": "Centrālā vēlēšanu komisija",
+   "url": "https://dati.cvk.lv/",
+   "kind": "official_body"
+  },
+  "cvk_open": {
+   "title": "Centrālā vēlēšanu komisija: atvērtie dati (data.gov.lv)",
+   "publisher": "Centrālā vēlēšanu komisija",
+   "url": "https://data.gov.lv/dati/lv/organization/cvk",
+   "kind": "official_body"
+  },
+  "saeima_hist": {
+   "title": "Likumdevēju vēsture",
+   "publisher": "Latvijas Republikas Saeima",
+   "url": "https://www.saeima.lv/lv/par-saeimu/likumdeveju-vesture",
+   "kind": "official_body"
+  },
+  "saeima_ap": {
+   "title": "Latvijas Republikas Augstākā Padome 1990: deputāti 1. sesijā",
+   "publisher": "Latvijas Republikas Saeima",
+   "url": "https://www.saeima.lv/steno/AP_steno/ap_dep.htm",
+   "kind": "official_body"
+  },
+  "lv_vp2015": {
+   "title": "Valsts prezidenta vēlēšanas (Saeimas paziņojums, Latvijas Vēstnesis 109, 05.06.2015)",
+   "publisher": "Saeima (likumi.lv)",
+   "url": "https://likumi.lv/ta/id/274504",
+   "kind": "official_body"
+  },
+  "lv_vp2023": {
+   "title": "Par Valsts prezidenta ievēlēšanu (Saeimas paziņojums, Latvijas Vēstnesis 104A, 2023)",
+   "publisher": "Saeima (Latvijas Vēstnesis)",
+   "url": "https://www.vestnesis.lv/op/2023/104A.1",
+   "kind": "official_body"
+  }
+ },
+ "tiers": [
+  {
+   "key": "national",
+   "name": "Latvijas Republika",
+   "name_en": "Republic of Latvia",
+   "parent": null,
+   "polity_kind": "sovereign_state",
+   "scheme": "lv.valsts",
+   "source": "satversme"
+  },
+  {
+   "key": "pasvaldiba",
+   "name": "Pašvaldības (valstspilsētas un novadi)",
+   "name_en": "Municipalities (state cities and counties)",
+   "parent": "national",
+   "polity_kind": "municipality",
+   "scheme": "lv.pasvaldiba",
+   "valid_from": "2009-07-01",
+   "source": "atavl2020",
+   "counts": [
+    {
+     "date": "2026-08-22",
+     "value": 42,
+     "source": "atavl2020",
+     "locator": "https://likumi.lv/ta/id/315654 (pielikums: 7 valstspilsētu pašvaldības and 35 novadi, version in force from 22.08.2026)"
+    },
+    {
+     "date": "2021-07-01",
+     "value": 43,
+     "source": "cvk_2021",
+     "locator": "https://arhivs.cvk.lv/lv/2021-gada-5-junija-velesanas/ (Latvijā būs 43 pašvaldības līdzšinējo 119 vietā)"
+    },
+    {
+     "date": "2013-06-01",
+     "value": 119,
+     "source": "cvk_2013",
+     "locator": "https://arhivs.cvk.lv/lv/2013gada-1junija-velesanas/ (119 Latvijas pašvaldībās)"
+    },
+    {
+     "date": "2009-06-06",
+     "value": 118,
+     "source": "cvk_2009",
+     "locator": "https://arhivs.cvk.lv/lv/2009gada-6junija-velesanas/ (109 novadu un 9 republikas pilsētu robežām)"
+    }
+   ]
+  },
+  {
+   "key": "teritoriala_vieniba",
+   "name": "Novadu teritoriālā iedalījuma vienības (pagasti un pilsētas)",
+   "name_en": "Territorial units of counties (parishes and towns)",
+   "parent": "pasvaldiba",
+   "polity_kind": "submunicipal",
+   "valid_from": "2009-07-01",
+   "elects": false,
+   "source": "atavl2020",
+   "counts": [
+    {
+     "date": "2026-08-22",
+     "value": 586,
+     "source": "atavl2020",
+     "locator": "https://likumi.lv/ta/id/315654 (pielikums: 511 pagasti, 72 novadu pilsētas, and 3 valstspilsētas within counties)"
+    }
+   ]
+  },
+  {
+   "key": "rajons",
+   "name": "Rajoni",
+   "name_en": "Districts (rajoni)",
+   "parent": "national",
+   "polity_kind": "county",
+   "valid_from": "1990-05-04",
+   "valid_to": "2009-07-01",
+   "source": "cvk_1994",
+   "counts": [
+    {
+     "date": "1994-05-29",
+     "value": 26,
+     "source": "cvk_1994",
+     "locator": "https://arhivs.cvk.lv/lv/1994-gada-29-maija-velesanas/ (26 rajonu ... padomēs)"
+    }
+   ]
+  },
+  {
+   "key": "vieteja_pasvaldiba",
+   "name": "Vietējās pašvaldības (pilsētas, pagasti un novadi)",
+   "name_en": "Local governments before 2009 (cities, towns, parishes, and counties)",
+   "parent": "rajons",
+   "polity_kind": "municipality",
+   "valid_from": "1990-05-04",
+   "valid_to": "2009-07-01",
+   "source": "cvk_1994",
+   "counts": [
+    {
+     "date": "1994-05-29",
+     "value": 568,
+     "source": "cvk_1994",
+     "locator": "https://arhivs.cvk.lv/lv/1994-gada-29-maija-velesanas/ (7 lielpilsētu un 69 rajonu pilsētu domēs ... 492 pagastu padomēs)"
+    }
+   ]
+  },
+  {
+   "key": "lpsr",
+   "name": "Latvijas PSR",
+   "name_en": "Latvian SSR (Soviet occupation, 1940-1990)",
+   "parent": null,
+   "polity_kind": "historical_state",
+   "valid_from": "1940-07-21",
+   "valid_to": "1990-05-04",
+   "source": "saeima_hist"
+  }
+ ],
+ "classes": [
+  {
+   "key": "saeima",
+   "tier": "national",
+   "name": "Saeimas vēlēšanas",
+   "name_en": "Saeima elections",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "schemes": [
+     "lv.apgabals"
+    ],
+    "fine": [
+     "lv.pasvaldiba",
+     "lv.iecirknis"
+    ]
+   },
+   "finest_note": "Counted by polling station (vēlēšanu iecirknis); stations abroad count with the Riga constituency. Station boundaries are address lists, not mapped.",
+   "note": "100 seats in five list-PR constituencies (Rīga, Vidzeme, Latgale, Kurzeme, Zemgale), Sainte-Laguë with a 5% national threshold (Saeimas vēlēšanu likums arts. 7, 38); voters may mark candidates up or down.",
+   "source": "satversme",
+   "valid_from": "1993-06-05",
+   "first_held": "1993-06-05",
+   "earliest_record": "1993-06-05",
+   "contests_per_unit": 5,
+   "est_votes": 9500000,
+   "effort": 1,
+   "cadence": [
+    {
+     "period_years": 3,
+     "phase": 2,
+     "term_years": 3,
+     "called": true,
+     "valid_from": "1993-01-01",
+     "valid_to": "1998-11-03",
+     "administered_by": "Centrālā vēlēšanu komisija",
+     "source": "satversme",
+     "locator": "https://likumi.lv/ta/id/57980 (art. 10 before the 1997 amendment; the 5th Saeima of 1993 sat two years)"
+    },
+    {
+     "period_years": 4,
+     "phase": 2,
+     "month": 10,
+     "term_years": 4,
+     "called": true,
+     "valid_from": "1998-11-03",
+     "administered_by": "Centrālā vēlēšanu komisija",
+     "source": "satversme",
+     "locator": "https://likumi.lv/ta/id/57980 (arts. 10-11: four-year term, elections on the first Saturday of October; arts. 14 and 48 allow dissolution)",
+     "vacancy_rule": "Vacant seats pass to the next candidate on the same list (Saeimas vēlēšanu likums)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Vēlēšanu rezultāti (dati.cvk.lv)",
+     "url": "https://dati.cvk.lv/",
+     "format": "html",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "2026-10-03",
+     "finest": "lv.iecirknis",
+     "evidence": "Results site for the 2026 Saeima and 2025 municipal elections, by polling station.",
+     "source": "cvk_dati"
+    },
+    {
+     "platform": "Vēsturiskā kartotēka (arhivs.cvk.lv)",
+     "url": "https://arhivs.cvk.lv/lv/saeimas-velesanas/",
+     "format": "html",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "1993-06-05",
+     "finest": "lv.iecirknis",
+     "evidence": "Result pages for every Saeima since 1993; polling-station tables for most.",
+     "source": "cvk_saeima"
+    },
+    {
+     "platform": "Latvijas Atvērto datu portāls (CVK)",
+     "url": "https://data.gov.lv/dati/lv/organization/cvk",
+     "format": "json, xml, and csv",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "2011-07-23",
+     "finest": "lv.iecirknis",
+     "evidence": "Polling-station files for the 2011 and 2012 referendums, the 2014, 2018, and 2022 Saeima, the 2017 and 2021 municipal, and the 2019 and 2024 European Parliament elections.",
+     "license": "CC0 1.0",
+     "source": "cvk_open"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "by_election"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "LV",
+     "valid_from": "1993-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1993-06-05",
+     "contests": 5,
+     "seats": 100,
+     "source": "cvk_saeima",
+     "quote": "5. Saeimas vēlēšanas (1993)",
+     "note": "Voting ran over 5 and 6 June 1993."
+    },
+    {
+     "date": "1995-09-30",
+     "contests": 5,
+     "seats": 100,
+     "source": "cvk_saeima",
+     "quote": "6. Saeimas vēlēšanas (1995)",
+     "note": "Voting ran over 30 September and 1 October 1995."
+    },
+    {
+     "date": "1998-10-03",
+     "contests": 5,
+     "seats": 100,
+     "source": "cvk_saeima",
+     "quote": "7. Saeimas vēlēšanas (1998)"
+    },
+    {
+     "date": "2002-10-05",
+     "contests": 5,
+     "seats": 100,
+     "source": "cvk_saeima",
+     "quote": "8. Saeimas vēlēšanas (2002)"
+    },
+    {
+     "date": "2006-10-07",
+     "contests": 5,
+     "seats": 100,
+     "source": "cvk_saeima",
+     "quote": "9. Saeimas vēlēšanas (2006)"
+    },
+    {
+     "date": "2010-10-02",
+     "contests": 5,
+     "seats": 100,
+     "source": "cvk_saeima",
+     "quote": "10. Saeimas vēlēšanas (2010)"
+    },
+    {
+     "date": "2011-09-17",
+     "contests": 5,
+     "seats": 100,
+     "source": "cvk_saeima",
+     "quote": "11. Saeimas vēlēšanas (2011)",
+     "note": "Extraordinary election after the 2011 referendum dissolved the 10th Saeima."
+    },
+    {
+     "date": "2014-10-04",
+     "contests": 5,
+     "seats": 100,
+     "source": "cvk_saeima",
+     "quote": "12. Saeimas vēlēšanas (2014)"
+    },
+    {
+     "date": "2018-10-06",
+     "contests": 5,
+     "seats": 100,
+     "source": "cvk_saeima",
+     "quote": "13. Saeimas vēlēšanas (2018)"
+    },
+    {
+     "date": "2022-10-01",
+     "contests": 5,
+     "seats": 100,
+     "source": "cvk_saeima",
+     "quote": "14. Saeimas vēlēšanas (2022)"
+    },
+    {
+     "date": "2026-10-03",
+     "contests": 5,
+     "seats": 100,
+     "source": "cvk_saeima",
+     "quote": "15. Saeimas vēlēšanas (2026)"
+    }
+   ]
+  },
+  {
+   "key": "saeima_1922",
+   "tier": "national",
+   "name": "1.–4. Saeimas vēlēšanas",
+   "name_en": "Saeima elections of the first republic (1922-1931)",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "100 seats by list PR in five constituencies; the Saeima was suspended by the coup of 15 May 1934. Results by parish and town were printed by the State Statistical Bureau (Valsts statistiskā pārvalde).",
+   "source": "cvk_saeima",
+   "valid_from": "1922-10-07",
+   "valid_to": "1934-05-15",
+   "first_held": "1922-10-07",
+   "est_votes": 3500000,
+   "effort": 4,
+   "access": [
+    {
+     "platform": "Vēsturiskā kartotēka (arhivs.cvk.lv)",
+     "url": "https://arhivs.cvk.lv/lv/saeimas-velesanas/",
+     "format": "html",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "1922-10-07",
+     "last_date": "1931-10-03",
+     "evidence": "National turnout and list counts only; no list or constituency results.",
+     "source": "cvk_saeima"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "LV",
+     "valid_to": "1934-05-15"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1922-10-07",
+     "election_kind": "general",
+     "source": "cvk_saeima",
+     "quote": "1922.gada 7. un 8.oktobrī Latvijā notika 1.Saeimas vēlēšanas",
+     "note": "Two-day vote; constituency count not yet read from an official text."
+    },
+    {
+     "date": "1925-10-03",
+     "election_kind": "general",
+     "source": "cvk_saeima",
+     "quote": "2.Saeimas vēlēšanas notika 1925.gada 3. un 4.oktobrī",
+     "note": "Two-day vote; constituency count not yet read from an official text."
+    },
+    {
+     "date": "1928-10-06",
+     "election_kind": "general",
+     "source": "cvk_saeima",
+     "quote": "3.Saeimas vēlēšanas Latvijas Republikā notika 1928.gada 6. un 7.oktobrī",
+     "note": "Two-day vote; constituency count not yet read from an official text."
+    },
+    {
+     "date": "1931-10-03",
+     "election_kind": "general",
+     "source": "cvk_saeima",
+     "quote": "4.Saeimas vēlēšanas Latvijas Republikā notika 1931.gada 3. un 4.oktobrī",
+     "note": "Two-day vote; constituency count not yet read from an official text."
+    }
+   ]
+  },
+  {
+   "key": "satversmes_sapulce",
+   "tier": "national",
+   "name": "Satversmes sapulces vēlēšanas",
+   "name_en": "Constituent Assembly election (1920)",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "150-seat assembly that adopted the Satversme of 1922; voting on 17-18 April 1920.",
+   "source": "saeima_hist",
+   "valid_from": "1920-04-17",
+   "valid_to": "1922-11-07",
+   "first_held": "1920-04-17",
+   "est_votes": 700000,
+   "effort": 4,
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "constituent_assembly"
+     ],
+     "iso_pattern": "LV"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1920-04-17",
+     "election_kind": "general",
+     "source": "saeima_hist",
+     "quote": "Satversmes sapulce (1920-1922)",
+     "note": "Constituency count not yet read from an official text."
+    }
+   ]
+  },
+  {
+   "key": "valsts_prezidents",
+   "tier": "national",
+   "name": "Valsts prezidenta vēlēšanas Saeimā",
+   "name_en": "Election of the President by the Saeima",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "The Saeima elects the President by at least 51 votes, in rounds until a candidate has them (Satversme arts. 35-36); secret ballot until 2019, open since.",
+   "source": "satversme",
+   "first_held": "1922-11-14",
+   "earliest_record": "1993-07-07",
+   "contests_per_unit": 1,
+   "est_votes": 2400,
+   "effort": 3,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 3,
+     "term_years": 4,
+     "called": true,
+     "valid_from": "1999-01-01",
+     "administered_by": "Saeima",
+     "source": "satversme",
+     "locator": "https://likumi.lv/ta/id/57980 (arts. 35-39)",
+     "vacancy_rule": "Satversme art. 52: the Speaker acts; the Saeima elects a new President"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "indirect"
+     ],
+     "office_kinds": [
+      "head_of_state"
+     ],
+     "iso_pattern": "LV"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1922-11-14",
+     "through": "1933-12-31",
+     "election_kind": "indirect",
+     "note": "Five elections of the first republic (1922, 1925, 1927, 1930, 1933); not yet counted from the Saeima's records."
+    },
+    {
+     "date": "1993-07-07",
+     "through": "2011-12-31",
+     "election_kind": "indirect",
+     "note": "Six elections (1993, 1996, 1999, 2003, 2007, 2011); not yet counted from the Saeima's statements."
+    },
+    {
+     "date": "2015-06-03",
+     "election_kind": "indirect",
+     "contests": 1,
+     "source": "lv_vp2015",
+     "quote": "Valsts prezidenta vēlēšanas: Saeima 2015. gada 3. jūnijā ievēlēja Raimondu Vējoni"
+    },
+    {
+     "date": "2019-05-29",
+     "election_kind": "indirect",
+     "note": "Egils Levits; not yet counted from the Saeima's statement."
+    },
+    {
+     "date": "2023-05-31",
+     "election_kind": "indirect",
+     "contests": 1,
+     "source": "lv_vp2023",
+     "quote": "Par Valsts prezidenta ievēlēšanu: Saeima ... ievēlēja Edgaru Rinkēviču"
+    }
+   ]
+  },
+  {
+   "key": "ep",
+   "tier": "national",
+   "name": "Eiropas Parlamenta vēlēšanas Latvijā",
+   "name_en": "European Parliament elections in Latvia",
+   "category": "legislature",
+   "goal": "ep",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "lv.pasvaldiba",
+     "lv.iecirknis"
+    ]
+   },
+   "note": "Latvia is one constituency; seats go to lists by Sainte-Laguë with a 5% threshold (Eiropas Parlamenta vēlēšanu likums).",
+   "source": "epvl2003",
+   "valid_from": "2004-06-12",
+   "first_held": "2004-06-12",
+   "earliest_record": "2004-06-12",
+   "est_votes": 2600000,
+   "effort": 1,
+   "cadence": [
+    {
+     "period_years": 5,
+     "phase": 4,
+     "term_years": 5,
+     "administered_by": "Centrālā vēlēšanu komisija",
+     "source": "epvl2003",
+     "locator": "https://likumi.lv/ta/id/84185"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Vēsturiskā kartotēka (arhivs.cvk.lv)",
+     "url": "https://arhivs.cvk.lv/lv/eiropas-parlamenta-velesanas/",
+     "format": "html",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "2004-06-12",
+     "finest": "lv.iecirknis",
+     "evidence": "Results pages for every European Parliament election since 2004.",
+     "source": "cvk_ep"
+    },
+    {
+     "platform": "Latvijas Atvērto datu portāls (CVK)",
+     "url": "https://data.gov.lv/dati/lv/organization/cvk",
+     "format": "json, xml, and csv",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "2011-07-23",
+     "finest": "lv.iecirknis",
+     "evidence": "Polling-station files for the 2011 and 2012 referendums, the 2014, 2018, and 2022 Saeima, the 2017 and 2021 municipal, and the 2019 and 2024 European Parliament elections.",
+     "license": "CC0 1.0",
+     "source": "cvk_open"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "contest_kinds": [
+      "list_allocation"
+     ],
+     "schemes": [
+      "world.country"
+     ],
+     "iso_pattern": "LV",
+     "valid_from": "2004-01-01"
+    },
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "EU",
+     "within": null,
+     "valid_from": "2004-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2004-06-12",
+     "contests": 1,
+     "seats": 9,
+     "source": "cvk_ep",
+     "quote": "2004. gada vēlēšanas"
+    },
+    {
+     "date": "2009-06-06",
+     "contests": 1,
+     "seats": 8,
+     "source": "cvk_ep",
+     "quote": "2009. gada vēlēšanas"
+    },
+    {
+     "date": "2014-05-24",
+     "contests": 1,
+     "seats": 8,
+     "source": "cvk_ep",
+     "quote": "2014. gada vēlēšanas"
+    },
+    {
+     "date": "2019-05-25",
+     "contests": 1,
+     "seats": 8,
+     "source": "cvk_ep",
+     "quote": "2019. gada vēlēšanas"
+    },
+    {
+     "date": "2024-06-08",
+     "contests": 1,
+     "seats": 9,
+     "source": "cvk_ep",
+     "quote": "2024. gada vēlēšanas: Latvija ir viens vēlēšanu apgabals, no kura Eiropas Parlamentā jāievēlē deviņi deputāti"
+    }
+   ]
+  },
+  {
+   "key": "tautas_nobalsosana",
+   "tier": "national",
+   "name": "Tautas nobalsošana",
+   "name_en": "National referendums",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "lv.iecirknis"
+    ]
+   },
+   "note": "Referendums on suspended laws, citizen-initiated bills and constitutional amendments, dissolution of the Saeima, and EU membership (Satversme arts. 14, 48, 68, 72-80); quorum rules tie validity to turnout at the last Saeima election.",
+   "source": "tnl1994",
+   "first_held": "1923-09-01",
+   "earliest_record": "1998-10-03",
+   "est_votes": 7000000,
+   "effort": 1,
+   "access": [
+    {
+     "platform": "Vēsturiskā kartotēka (arhivs.cvk.lv)",
+     "url": "https://arhivs.cvk.lv/lv/notikusas-tautas-nobalsosanas/",
+     "format": "html",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "1998-10-03",
+     "finest": "lv.iecirknis",
+     "evidence": "Results and turnout for every referendum since 1998.",
+     "source": "cvk_tn"
+    },
+    {
+     "platform": "Latvijas Atvērto datu portāls (CVK)",
+     "url": "https://data.gov.lv/dati/lv/organization/cvk",
+     "format": "json, xml, and csv",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "2011-07-23",
+     "finest": "lv.iecirknis",
+     "evidence": "Polling-station files for the 2011 and 2012 referendums, the 2014, 2018, and 2022 Saeima, the 2017 and 2021 municipal, and the 2019 and 2024 European Parliament elections.",
+     "license": "CC0 1.0",
+     "source": "cvk_open"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "iso_pattern": "LV"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1923-09-01",
+     "through": "1934-12-31",
+     "election_kind": "referendum",
+     "note": "Interwar referendums under Satversme arts. 72-80 (on church property, citizenship, Riga Cathedral, and the insurance law); not yet counted from the State Statistical Bureau's official returns."
+    },
+    {
+     "date": "1998-10-03",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "cvk_tn",
+     "quote": "Pirmā tautas nobalsošana atjaunotajā Latvijas Republikā notika 1998.gada 3.oktobrī vienlaikus ar 7.Saeimas vēlēšanām"
+    },
+    {
+     "date": "1999-11-13",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "cvk_tn",
+     "quote": "Tautas nobalsošana par likuma “Grozījumi likumā “Par valsts pensijām”” atcelšanu notika 1999.gada 13.novembrī"
+    },
+    {
+     "date": "2003-09-20",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "cvk_tn",
+     "quote": "Par Latvijas dalību Eiropas Savienībā (2003)"
+    },
+    {
+     "date": "2007-07-07",
+     "election_kind": "referendum",
+     "contests": 2,
+     "source": "cvk_tn",
+     "quote": "2007.gada 7.jūlijā Latvijā notika tautas nobalsošana par ... likumu \"Grozījumi Nacionālās drošības likumā\" un \"Grozījumi Valsts drošības iestāžu likumā\" atcelšanu"
+    },
+    {
+     "date": "2008-08-02",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "cvk_tn",
+     "quote": "2008.gada 2.augustā notika tautas nobalsošana par likuma „Grozījumi Latvijas Republikas Satversmē” ierosināšanu"
+    },
+    {
+     "date": "2008-08-23",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "cvk_tn",
+     "quote": "2008.gada 23.augustā notika tautas nobalsošana par likumprojektu „Grozījums likumā „Par valsts pensijām””"
+    },
+    {
+     "date": "2011-07-23",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "cvk_tn",
+     "quote": "Par 10.Saeimas atlaišanu (2011)"
+    },
+    {
+     "date": "2012-02-18",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "cvk_tn",
+     "quote": "Sestdien, 2012.gada 18.februārī, Latvijā notika tautas nobalsošana par likumprojekta „Grozījumi Latvijas Republikas Satversmē” pieņemšanu"
+    }
+   ]
+  },
+  {
+   "key": "aptauja_1991",
+   "tier": "national",
+   "name": "Iedzīvotāju aptauja par Latvijas Republikas neatkarību",
+   "name_en": "Independence poll of 3 March 1991",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Advisory poll called by the Supreme Council; all permanent residents aged 18 could vote.",
+   "source": "cvk_aptauja",
+   "valid_from": "1991-03-03",
+   "valid_to": "1991-03-04",
+   "first_held": "1991-03-03",
+   "est_votes": 1666128,
+   "effort": 2,
+   "access": [
+    {
+     "platform": "Vēsturiskā kartotēka (arhivs.cvk.lv)",
+     "url": "https://arhivs.cvk.lv/lv/iedzivotaju-aptauja-par-latvijas-republikas-neatkaribu/",
+     "format": "html",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "1991-03-03",
+     "last_date": "1991-03-03",
+     "evidence": "National totals only.",
+     "source": "cvk_aptauja"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "iso_pattern": "LV",
+     "valid_from": "1991-03-01",
+     "valid_to": "1991-03-31",
+     "precedence": 1
+    }
+   ],
+   "dates": [
+    {
+     "date": "1991-03-03",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "cvk_aptauja",
+     "quote": "1991.gada 3.martā notika iedzīvotāju aptauja par Latvijas Republikas neatkarību"
+    }
+   ]
+  },
+  {
+   "key": "parakstu_vaksana",
+   "tier": "national",
+   "name": "Parakstu vākšana tautas nobalsošanas un likumu ierosināšanai",
+   "name_en": "Signature collections to initiate referendums and bills",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {},
+   "source": "cvk_pv",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Voters sign in support; there is no ballot and no choice between options, so a signature count is not an election result. The archive keeps the referendums that a successful collection triggers."
+  },
+  {
+   "key": "tiesnesi",
+   "tier": "national",
+   "name": "Tiesnešu apstiprināšana",
+   "name_en": "Judges",
+   "category": "judicial",
+   "goal": "national",
+   "measure": {},
+   "source": "satversme",
+   "disposition": "out_of_scope",
+   "disposition_reason": "No judge or prosecutor is elected by voters: the Saeima confirms judges (Satversme art. 84) and Constitutional Court justices (art. 85)."
+  },
+  {
+   "key": "netiesas_velesanas",
+   "tier": "national",
+   "name": "Pastarpinātas vēlēšanas",
+   "name_en": "Indirect elections by elected bodies",
+   "category": "indirect",
+   "goal": "local",
+   "measure": {},
+   "source": "par_pasv1994",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Officers and bodies chosen by elected bodies, not voters: council chairs and deputies by each council, district councils of 1997-2009 formed from local council chairs, planning region development councils, the Speaker, and the Cabinet's confidence vote in the Saeima.",
+   "match": [
+    {
+     "election_kinds": [
+      "indirect"
+     ],
+     "office_kinds": [
+      "head_of_government",
+      "mayor",
+      "speaker",
+      "other"
+     ],
+     "iso_pattern": "LV",
+     "within": null
+    }
+   ]
+  },
+  {
+   "key": "pasvaldibas_dome",
+   "tier": "pasvaldiba",
+   "name": "Pašvaldības domes vēlēšanas",
+   "name_en": "Municipal council elections",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "schemes": [
+     "lv.pasvaldiba"
+    ],
+    "fine": [
+     "lv.iecirknis"
+    ]
+   },
+   "finest_note": "Each council is one list-PR constituency; counted by polling station.",
+   "note": "Councils of the state cities and counties (republic cities and counties 2009-2021); list PR, Sainte-Laguë, 5% threshold, preference marks (Pašvaldības domes vēlēšanu likums).",
+   "source": "pdvl1994",
+   "valid_from": "2009-06-06",
+   "first_held": "2009-06-06",
+   "earliest_record": "2009-06-06",
+   "est_votes": 6000000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 1,
+     "month": 6,
+     "term_years": 4,
+     "called": false,
+     "administered_by": "Centrālā vēlēšanu komisija and the municipal election commissions",
+     "source": "pdvl1994",
+     "locator": "https://likumi.lv/ta/id/57839 (art. 1: four-year term, regular elections on the first Saturday of June)",
+     "vacancy_rule": "Extraordinary elections after the Saeima dissolves a council (e.g. Riga 2020)"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Vēlēšanu rezultāti (dati.cvk.lv)",
+     "url": "https://dati.cvk.lv/",
+     "format": "html",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "2025-06-07",
+     "finest": "lv.iecirknis",
+     "evidence": "2025 results by council and polling station.",
+     "source": "cvk_dati"
+    },
+    {
+     "platform": "Vēsturiskā kartotēka (arhivs.cvk.lv)",
+     "url": "https://arhivs.cvk.lv/lv/pasvaldibu-velesanas/",
+     "format": "html",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "2009-06-06",
+     "finest": "lv.iecirknis",
+     "evidence": "Results for 2009, 2013, 2017, 2021, the 2010 Roja and Mērsrags, 2020 Riga, and 2021 Varakļāni and Rēzekne elections.",
+     "source": "cvk_pasv"
+    },
+    {
+     "platform": "Latvijas Atvērto datu portāls (CVK)",
+     "url": "https://data.gov.lv/dati/lv/organization/cvk",
+     "format": "json, xml, and csv",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "2011-07-23",
+     "finest": "lv.iecirknis",
+     "evidence": "Polling-station files for the 2011 and 2012 referendums, the 2014, 2018, and 2022 Saeima, the 2017 and 2021 municipal, and the 2019 and 2024 European Parliament elections.",
+     "license": "CC0 1.0",
+     "source": "cvk_open"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "by_election"
+     ],
+     "valid_from": "2009-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2009-06-06",
+     "election_kind": "local",
+     "contests": 118,
+     "source": "cvk_2009",
+     "quote": "Pašvaldību vēlēšanas notika 118 vēlēšanu apgabalos, kuru robežas atbilst 109 novadu un 9 republikas pilsētu robežām"
+    },
+    {
+     "date": "2010-12-18",
+     "election_kind": "local",
+     "contests": 2,
+     "source": "cvk_2010",
+     "quote": "2010. gada 18. decembra Rojas novada domes un Mērsraga novada domes vēlēšanas",
+     "note": "First councils of the two counties split from Rojas novads."
+    },
+    {
+     "date": "2013-06-01",
+     "election_kind": "local",
+     "contests": 119,
+     "source": "cvk_2013",
+     "quote": "119 Latvijas pašvaldībās notika republikas pilsētas domes un novada domes vēlēšanas, kurās bija jāievēl 1614 republikas pilsētu un novadu domju deputāti",
+     "seats": 1614
+    },
+    {
+     "date": "2017-06-03",
+     "election_kind": "local",
+     "contests": 119,
+     "source": "cvk_2017",
+     "quote": "deviņās republikas pilsētās un 110 novados notika pašvaldību vēlēšanas",
+     "seats": 1618
+    },
+    {
+     "date": "2020-08-29",
+     "election_kind": "local",
+     "contests": 1,
+     "source": "cvk_riga2020",
+     "quote": "Rīgas domes ārkārtas vēlēšanas",
+     "note": "Extraordinary election after the Saeima dissolved the Riga city council (Rīgas domes atlaišanas likums, 2020)."
+    },
+    {
+     "date": "2021-06-05",
+     "election_kind": "local",
+     "contests": 40,
+     "source": "cvk_2021",
+     "quote": "318 kandidātu saraksti, kuros uz iekļūšanu 40 pašvaldību domēs kopumā pretendē 5448 kandidāti",
+     "note": "Riga was not elected (its council came from the 2020 extraordinary vote); Rēzeknes and Varakļānu novads were postponed to 11 September 2021."
+    },
+    {
+     "date": "2021-09-11",
+     "election_kind": "local",
+     "contests": 2,
+     "source": "cvk_2021b",
+     "quote": "Varakļānu novada domes un Rēzeknes novada domes vēlēšanas ... 11. septembrī"
+    },
+    {
+     "date": "2025-06-07",
+     "election_kind": "local",
+     "contests": 42,
+     "source": "cvk_2025",
+     "quote": "Vēlēšanas notika 42 apgabalos – Latvijas valstspilsētās un novados."
+    }
+   ]
+  },
+  {
+   "key": "pasvaldibu_referendums",
+   "tier": "pasvaldiba",
+   "name": "Pašvaldības referendums",
+   "name_en": "Municipal referendums",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Binding municipal referendums, including on dismissing a council, after a 30-day signature collection run by the CVK (Vietējo pašvaldību referendumu likums; Pašvaldību likums art. 63). Three collections to dismiss the Jelgava county council have not reached the threshold.",
+   "source": "vprl2022",
+   "valid_from": "2022-07-01",
+   "est_votes": 0,
+   "effort": 2,
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ],
+     "valid_from": "2022-07-01",
+     "precedence": 1
+    }
+   ]
+  },
+  {
+   "key": "iedzivotaju_padome",
+   "tier": "teritoriala_vieniba",
+   "name": "Iedzīvotāju padomes",
+   "name_en": "Residents' councils",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "polity"
+   },
+   "source": "pl2022",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Consultative councils set up by each municipality under Pašvaldību likums art. 58 and chosen by residents' meetings under the municipality's own rules; no electoral authority runs them or compiles returns.",
+   "match": [
+    {
+     "election_kinds": [
+      "local"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "polity_kinds": [
+      "submunicipal"
+     ],
+     "precedence": 1
+    }
+   ]
+  },
+  {
+   "key": "vietejas_padomes",
+   "tier": "vieteja_pasvaldiba",
+   "name": "Pilsētu domju, novadu domju un pagastu padomju vēlēšanas",
+   "name_en": "City, town, county, and parish council elections (1994-2005)",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Councils of the 7 large cities, towns, parishes, and early counties before the 2009 reform; list PR.",
+   "source": "pdvl1994",
+   "valid_from": "1994-05-29",
+   "valid_to": "2009-06-06",
+   "first_held": "1994-05-29",
+   "earliest_record": "1994-05-29",
+   "est_votes": 3800000,
+   "effort": 3,
+   "cadence": [
+    {
+     "period_years": 4,
+     "phase": 1,
+     "month": 3,
+     "term_years": 4,
+     "called": false,
+     "valid_from": "1997-01-01",
+     "valid_to": "2009-06-06",
+     "administered_by": "Centrālā vēlēšanu komisija and the local election commissions",
+     "source": "pdvl1994",
+     "locator": "https://likumi.lv/ta/id/57839"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Vēsturiskā kartotēka (arhivs.cvk.lv)",
+     "url": "https://arhivs.cvk.lv/lv/pasvaldibu-velesanas/",
+     "format": "html",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "first_date": "1994-05-29",
+     "last_date": "2005-08-20",
+     "finest": "lv.pasvaldiba",
+     "evidence": "1994 summary; result tables by council for 1997, 2001, and 2005; the 2003 Renda and 2005 Rēzekne repeat elections.",
+     "source": "cvk_pasv"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "by_election"
+     ],
+     "valid_from": "1994-01-01",
+     "valid_to": "2009-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1994-05-29",
+     "election_kind": "local",
+     "contests": 568,
+     "source": "cvk_1994",
+     "quote": "Latvijā ievēlēja 4771 deputātu 594 pašvaldībās: 7 lielpilsētu un 69 rajonu pilsētu domēs, 26 rajonu un 492 pagastu padomēs.",
+     "deferred": [
+      "1994-08-28",
+      "1994-09-04"
+     ],
+     "note": "568 city, town, and parish councils (the 26 district councils are their own class). Bārta parish and Durbe town voted on 28 August 1994; Zasa parish re-voted on 4 September 1994 after a court annulled its result."
+    },
+    {
+     "date": "1997-03-09",
+     "election_kind": "local",
+     "source": "cvk_pasv",
+     "quote": "1997. gada vēlēšanas",
+     "note": "Council count not printed on the archive page."
+    },
+    {
+     "date": "2001-03-11",
+     "election_kind": "local",
+     "source": "cvk_pasv",
+     "quote": "2001. gada vēlēšanas",
+     "note": "Council count not printed on the archive page."
+    },
+    {
+     "date": "2003-09-20",
+     "election_kind": "local",
+     "contests": 1,
+     "source": "cvk_2003",
+     "quote": "2003.gada 20.septembra Rendas pagasta padomes vēlēšanu rezultāti"
+    },
+    {
+     "date": "2005-03-12",
+     "election_kind": "local",
+     "source": "cvk_pasv",
+     "quote": "2005. gada vēlēšanas",
+     "note": "Council count not printed on the archive page."
+    },
+    {
+     "date": "2005-08-20",
+     "election_kind": "local",
+     "contests": 1,
+     "source": "cvk_2005r",
+     "quote": "2005. gada 20. augusta atkārtotās vēlēšanas Rēzeknē",
+     "note": "Repeat election of the Rēzekne city council."
+    }
+   ]
+  },
+  {
+   "key": "rajona_padome",
+   "tier": "rajons",
+   "name": "Rajonu padomju vēlēšanas",
+   "name_en": "District council elections (1994)",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "District councils were directly elected only in 1994; from 1997 they were formed from the chairs of their local councils (Par pašvaldībām), until the districts were abolished in 2009.",
+   "source": "cvk_1994",
+   "valid_from": "1994-05-29",
+   "valid_to": "1997-03-09",
+   "first_held": "1994-05-29",
+   "earliest_record": "1994-05-29",
+   "est_votes": 900000,
+   "effort": 3,
+   "match": [
+    {
+     "election_kinds": [
+      "local"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "polity_kinds": [
+      "county"
+     ],
+     "valid_to": "1997-01-01",
+     "precedence": 1
+    }
+   ],
+   "dates": [
+    {
+     "date": "1994-05-29",
+     "election_kind": "local",
+     "contests": 26,
+     "source": "cvk_1994",
+     "quote": "Latvijā ievēlēja 4771 deputātu 594 pašvaldībās: 7 lielpilsētu un 69 rajonu pilsētu domēs, 26 rajonu un 492 pagastu padomēs."
+    }
+   ]
+  },
+  {
+   "key": "pasvaldibas_1919",
+   "tier": "national",
+   "name": "Pilsētu domju un pagastu padomju vēlēšanas (1919-1934)",
+   "name_en": "Municipal elections of the first republic (1919-1934)",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "City councils, parish councils, and county (apriņķis) councils elected by list PR until the 1934 coup; returns were printed in the State Statistical Bureau's bulletins.",
+   "source": "saeima_hist",
+   "valid_from": "1919-01-01",
+   "valid_to": "1934-05-15",
+   "est_votes": 2500000,
+   "effort": 5,
+   "match": [
+    {
+     "election_kinds": [
+      "local"
+     ],
+     "valid_to": "1934-05-15"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1919-01-01",
+     "through": "1934-05-14",
+     "election_kind": "local",
+     "precision": "year",
+     "note": "Interwar municipal elections; dates and council counts not yet listed from an official register."
+    }
+   ]
+  },
+  {
+   "key": "tautas_saeima_1940",
+   "tier": "lpsr",
+   "name": "Tautas Saeimas vēlēšanas",
+   "name_en": "People's Saeima election (1940)",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Single-list vote of 14-15 July 1940 held under Soviet occupation; the assembly requested admission to the USSR.",
+   "source": "saeima_hist",
+   "valid_from": "1940-07-14",
+   "valid_to": "1940-08-26",
+   "first_held": "1940-07-14",
+   "est_votes": 1200000,
+   "effort": 4,
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "LV",
+     "valid_from": "1940-01-01",
+     "valid_to": "1941-01-01",
+     "precedence": 1
+    }
+   ],
+   "dates": [
+    {
+     "date": "1940-07-14",
+     "election_kind": "general",
+     "source": "saeima_hist",
+     "quote": "Tautas Saeima (1940)",
+     "note": "Constituency count not yet read from an official text."
+    }
+   ]
+  },
+  {
+   "key": "augstaka_padome_lpsr",
+   "tier": "lpsr",
+   "name": "Latvijas PSR Augstākās padomes vēlēšanas",
+   "name_en": "Supreme Soviet of the Latvian SSR elections (1947-1985)",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Single-candidate elections in single-member districts under Soviet occupation; district results appeared in the official press.",
+   "source": "saeima_hist",
+   "valid_from": "1947-02-09",
+   "valid_to": "1990-03-18",
+   "first_held": "1947-02-09",
+   "est_votes": 15000000,
+   "effort": 5,
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "LV",
+     "valid_from": "1941-01-01",
+     "valid_to": "1990-01-01",
+     "precedence": 1
+    }
+   ],
+   "dates": [
+    {
+     "date": "1947-02-09",
+     "through": "1985-12-31",
+     "election_kind": "general",
+     "note": "Ten convocations (1947-1985); dates and district counts not yet listed from an official text."
+    }
+   ]
+  },
+  {
+   "key": "augstaka_padome_1990",
+   "tier": "lpsr",
+   "name": "Latvijas PSR Augstākās padomes vēlēšanas 1990",
+   "name_en": "Supreme Council election (1990)",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "First competitive election under Soviet rule: 201 single-member districts with majority runoffs; the Council declared the restoration of independence on 4 May 1990.",
+   "source": "saeima_ap",
+   "valid_from": "1990-03-18",
+   "valid_to": "1990-05-04",
+   "first_held": "1990-03-18",
+   "est_votes": 2600000,
+   "effort": 4,
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "runoff"
+     ],
+     "iso_pattern": "LV",
+     "valid_from": "1990-01-01",
+     "valid_to": "1990-12-31",
+     "precedence": 1
+    }
+   ],
+   "dates": [
+    {
+     "date": "1990-03-18",
+     "election_kind": "general",
+     "contests": 201,
+     "seats": 201,
+     "source": "saeima_ap",
+     "quote": "Latvijas Republikas Augstākās padomes deputāti 1.sesijā ... no 77.Daugavpils vēl. apg.",
+     "note": "Districts numbered 1-201 in the Saeima's list of deputies; runoff rounds followed in late March and April 1990."
+    }
+   ]
+  },
+  {
+   "key": "vietejas_padomes_lpsr",
+   "tier": "lpsr",
+   "name": "Latvijas PSR vietējo padomju vēlēšanas",
+   "name_en": "Local soviet elections of the Latvian SSR (1947-1989)",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "Single-candidate elections to district, city, town, and rural soviets, then the first competitive local vote of 10 December 1989.",
+   "source": "saeima_hist",
+   "valid_from": "1947-01-01",
+   "valid_to": "1990-05-04",
+   "est_votes": 30000000,
+   "effort": 5,
+   "match": [
+    {
+     "election_kinds": [
+      "local"
+     ],
+     "valid_from": "1941-01-01",
+     "valid_to": "1990-05-04"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1947-01-01",
+     "through": "1989-12-31",
+     "election_kind": "local",
+     "precision": "year",
+     "note": "Local soviet elections every two to two-and-a-half years, last on 10 December 1989; not yet listed from an official text."
+    }
+   ]
+  },
+  {
+   "key": "psrs_velesanas",
+   "tier": "lpsr",
+   "name": "PSRS vēlēšanas Latvijā",
+   "name_en": "Elections to all-Union bodies of the USSR held in Latvia",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {},
+   "source": "saeima_hist",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Elections to the USSR Supreme Soviet (1941-1984) and Congress of People's Deputies (1989) chose members of the occupying state's bodies, not of a Latvian tier; they belong with the USSR, not this census.",
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "iso_pattern": "SU",
+     "within": null
+    }
+   ]
+  }
+ ]
+}
