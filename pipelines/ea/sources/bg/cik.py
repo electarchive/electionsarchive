@@ -745,7 +745,13 @@ def build(e: Election) -> Package:
         )
         p.name(contest, en, "en", "official")
         p.name(contest, bg, "bg", "native", False)
-        slug = "president" if e.kind == "pres" else "national" if e.kind == "ep" else f"{m:02d}-{changeset.slug(en)}"
+        slug = (
+            "president"
+            if e.kind == "pres"
+            else "national"
+            if e.kind == "ep"
+            else f"{m:02d}-{changeset.slug(MIR.get(m, ABROAD)[0])}"
+        )
         p.add("slug", path=f"{path}/{slug}", entity_id=contest, is_current=True)
         result_set = sets[m] = key("result_set", e.id, ckey)
         p.add(
@@ -862,6 +868,26 @@ def build(e: Election) -> Package:
         p.frame("person", pl.DataFrame(people))
         p.frame("name", pl.DataFrame(named))
         p.frame("candidacy", pl.DataFrame(runs))
+    if e.layout == "ns2013":
+        seats = defaultdict(int)
+        for r in rows(e, "result"):
+            number = r[1].strip()
+            for m, n in zip(r[3::2], r[4::2], strict=False):
+                if m.strip().isdigit() and (int(m), number) in options:
+                    seats[(int(m), number)] += int(n)
+                    p.add(
+                        "outcome",
+                        result_set_id=sets[int(m)],
+                        option_id=options[(int(m), number)],
+                        kind="won",
+                        seats=int(n),
+                    )
+        for m, rs in sets.items():
+            total = sum(n for (mir, _), n in seats.items() if mir == m)
+            if total:
+                p.rows["contest"][[c["id"] for c in p.rows["contest"]].index(key("contest", e.id, f"{m:02d}"))][
+                    "magnitude"
+                ] = total
     if e.kind == "pres" and e.round == 2 and any(c.elected for c in cands):
         for c in cands:
             kind = "elected" if c.elected else "lost"
