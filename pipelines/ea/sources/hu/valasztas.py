@@ -2318,7 +2318,18 @@ LOCAL_MAYOR = key("electoral_system", "local-mayor", 1990)
 LOCAL_BLOCK = key("electoral_system", "local-block", 1990)
 LOCAL_SMD = key("electoral_system", "local-smd", 1990)
 LOCAL_LIST = key("electoral_system", "local-list", 1990)
+LOCAL_COMP = key("electoral_system", "local-compensation", 1990)
 SYSTEMS += [
+    (
+        LOCAL_COMP,
+        date(1990, 1, 1),
+        None,
+        {"formula": "dhondt"},
+        (
+            "The compensation seats of a council elected partly in single-member wards go to lists built from the votes "
+            "that won no ward, the fragment votes, allocated by D'Hondt."
+        ),
+    ),
     (
         LOCAL_MAYOR,
         date(1990, 1, 1),
@@ -2445,6 +2456,10 @@ class Local:
         elif kind == "county-list":
             title, english = f"{COUNTIES[maz]} vármegyei közgyűlés", f"{COUNTIES[maz]} County Assembly"
             office, body, area, system = None, county_assembly(maz), county(maz), LOCAL_LIST
+            contest_kind = "list_allocation"
+        elif kind == "compensation":
+            title, english = f"{name} kompenzációs lista", f"{name} compensation list"
+            office, body, area, system = None, council(area_code), settlement(area_code), LOCAL_COMP
             contest_kind = "list_allocation"
         else:
             title, english = "Fővárosi közgyűlés", "Budapest Assembly"
@@ -2640,9 +2655,58 @@ def local_workbook(
                 d.value(tag, unit, option, 1, votes)
 
 
+def compensation(
+    d: Day,
+    local: Local,
+    area: str,
+    lists: dict[int, str],
+    fragments: dict[int, int | None],
+    seats: dict[int, int | None],
+) -> None:
+    """One settlement's compensation lists: the fragment votes each list held and the seats it won."""
+    total = sum(seat or 0 for seat in seats.values())
+    tag = local.contest("compensation", area, magnitude=total or None)
+    unit = d.settlement_unit(area)
+    for position, label in lists.items():
+        option = d.option(tag, label, "list", nominator=label, position=position, ident=str(position))
+        d.value(tag, unit, option, 1, fragments.get(position))
+        if seats.get(position):
+            d.outcome(tag, option, "won", seats[position])
+
+
+def compensation_2019(d: Day, local: Local) -> None:
+    found = places()
+    for path in sorted(bundle("2019_onkormanyzati")):
+        match = re.search(r"kompenzációs listák/(.+)_komp_listák\.xlsx$", path)
+        if not match:
+            continue
+        maz = county_key(match[1].replace("_", "-"))
+        book = sheets("2019_onkormanyzati", path)
+        names: dict[str, dict[int, str]] = defaultdict(dict)
+        table = next(rows for name, rows in book.items() if name.startswith("Param"))
+        start = next(i for i, row in enumerate(table) if row[:1] == ["Főváros/település neve"])
+        for row in table[start + 1 :]:
+            if row[0] and number(row[1]) is not None:
+                names[row[0]][cast(int, number(row[1]))] = row[2]
+        rows = next(rows for name, rows in book.items() if not name.startswith("Param"))
+        head = next(i for i, row in enumerate(rows) if row[:1] == ["Főváros/település neve"])
+        for row in rows[head + 2 :]:
+            if not row[0].strip():
+                continue
+            # The workbooks put list n's fragment votes in column 2 + n - 1 and its seats in column 10 + n - 1.
+            fragments = {i - 1: number(row[i]) for i in range(2, 10) if i < len(row) and row[i]}
+            seats = {i - 9: number(row[i]) for i in range(10, len(row)) if row[i]}
+            area = found.resolve(maz, None, row[0].strip(), trust_code=False)
+            lists = names[row[0].strip()]
+            if not lists or not set(fragments) | set(seats) <= set(lists):
+                raise ValueError(f"2019 {row[0]}: figures for lists without names: {fragments} {seats} {lists}")
+            compensation(d, local, area, lists, fragments, seats)
+
+
 def local_2019(d: Day) -> None:
     d.cite(ARCHIVE)
     local = Local(d, 2019)
+    compensation_2019(d, local)
     for path in sorted(bundle("2019_onkormanyzati")):
         found = re.search(r"szavazóköri_eredmények_(\d\d)_", path)
         if found:
@@ -2746,9 +2810,35 @@ FILES_2014 = {
 }
 
 
+def compensation_2014(d: Day, local: Local) -> None:
+    found = places()
+    area = ""
+    lists: dict[int, str] = {}
+    fragments: dict[int, int | None] = {}
+    seats: dict[int, int | None] = {}
+    for path in bundle("2014_onkormanyzati"):
+        if path.endswith("kompenzációs_listás_választás.csv"):
+            rows = delimited("2014_onkormanyzati", path)
+    for row in [*rows, {"JVK_AZONOSÍTÓ": "00000F"}]:
+        if row["JVK_AZONOSÍTÓ"].endswith("F"):
+            if lists:
+                compensation(d, local, area, lists, fragments, seats)
+            lists, fragments, seats = {}, {}, {}
+            if row.get("MEGYEKÓD"):
+                area = found.resolve(
+                    row["MEGYEKÓD"], row["TELEPÜLÉS_SORSZÁM"], row["FŐVÁROS_TELEPÜLÉS"], trust_code=True
+                )
+        else:
+            position = cast(int, number(row["LISTA_SORSZÁM"]))
+            lists[position] = row["LISTA_NEVE"]
+            fragments[position] = number(row["TÖREDÉK_SZAVAZAT"])
+            seats[position] = number(row["MANDÁTUM"])
+
+
 def local_2014(d: Day) -> None:
     d.cite(ARCHIVE)
     local = Local(d, 2014)
+    compensation_2014(d, local)
     found = places()
     for path in sorted(bundle("2014_onkormanyzati")):
         role = FILES_2014.get(path.split("/")[-1])
