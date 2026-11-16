@@ -4,7 +4,7 @@ import json
 import os
 import re
 import unicodedata
-from collections import Counter, defaultdict
+from collections import Counter
 from collections.abc import Iterator
 from dataclasses import dataclass
 from datetime import date
@@ -50,7 +50,6 @@ TABLES = {
     # overview
     "KOS01900": "kosningayfirlit",
     "KOS02000": "kosningayfirlit",
-    "KOS02001": "kosningayfirlit",
     "KOS02001": "kosningayfirlit",
     "KOS02002": "kosningayfirlit",
     "KOS02003": "kosningayfirlit",
@@ -113,7 +112,9 @@ class Grid:
 
     def __init__(self, document: dict[str, object]) -> None:
         self.title = str(document.get("label", ""))
-        self.dims: list[str] = [str(d) for d in document["id"]]  # type: ignore[attr-defined]
+        ids = document["id"]
+        assert isinstance(ids, list)
+        self.dims: list[str] = [str(d) for d in ids]
         dimension = document["dimension"]
         assert isinstance(dimension, dict)
         self.labels: dict[str, list[str]] = {}
@@ -126,10 +127,8 @@ class Grid:
         values = document["value"]
         assert isinstance(values, list) and len(values) == _product(sizes)
         self.cells: dict[tuple[str, ...], float | None] = {}
-        position = 0
-        for combo in _combos([self.labels[d] for d in self.dims]):
+        for position, combo in enumerate(_combos([self.labels[d] for d in self.dims])):
             self.cells[combo] = values[position]
-            position += 1
 
     def get(self, **where: str) -> int | None:
         """The one integer cell that matches the labels given for every dimension."""
@@ -181,7 +180,21 @@ def clean(text: str) -> str:
 MONTHS = {
     name: number
     for number, name in enumerate(
-        "january february march april may june july august september october november december".split(), 1
+        [
+            "january",
+            "february",
+            "march",
+            "april",
+            "may",
+            "june",
+            "july",
+            "august",
+            "september",
+            "october",
+            "november",
+            "december",
+        ],
+        1,
     )
 }
 
@@ -337,11 +350,8 @@ def is_region(label: str) -> bool:
     text = clean(label)
     return (
         text in REGIONS
-        or text.endswith(" total")
-        or text.endswith(" constituency")
-        or text.startswith("Constituency of ")
-        or text.startswith("Reykjavík south")
-        or text.startswith("Reykjavík north")
+        or text.endswith((" total", " constituency"))
+        or text.startswith(("Constituency of ", "Reykjavík south", "Reykjavík north"))
     )
 
 
@@ -456,7 +466,7 @@ def hierarchy(table: str) -> list[tuple[str | None, str, str]]:
         text = clean(label)
         if text in REGIONS and not text.endswith(" total"):
             continue
-        if text.endswith(" constituency") or text.endswith(" total") or text.startswith("Constituency of "):
+        if text.endswith((" constituency", " total")) or text.startswith("Constituency of "):
             current = constituency(text, "new")
             continue
         if text in ("Reykjavík south", "Reykjavík north"):
@@ -481,9 +491,7 @@ def geo() -> Package:
     )
     p.external |= {ICELAND, TERRITORY}
     p.add("scheme", code="is.landid", polity_id=ICELAND, kind="administrative", rank=0, noun="country")
-    p.add(
-        "scheme", code="is.kjordaemi", polity_id=ICELAND, kind="electoral_district", rank=1, noun="constituency"
-    )
+    p.add("scheme", code="is.kjordaemi", polity_id=ICELAND, kind="electoral_district", rank=1, noun="constituency")
     p.add("scheme", code="is.sveitarfelag", polity_id=ICELAND, kind="administrative", rank=2, noun="municipality")
     for code, (english, native) in CONSTITUENCIES.items():
         id = area("is.kjordaemi", code)
@@ -523,18 +531,22 @@ SYSTEMS = [
         date(1959, 1, 1),
         date(2003, 1, 1),
         {"formula": "dhondt"},
-        "Constituency seats are allocated to lists by the D'Hondt method, and a fixed number of adjustment seats are "
-        "allocated to lists nationwide to even out the disproportion between the parties' votes and seats.",
+        (
+            "Constituency seats are allocated to lists by the D'Hondt method, and a fixed number of adjustment seats "
+            "are allocated to lists nationwide to even out the disproportion between the parties' votes and seats."
+        ),
     ),
     (
         SYSTEM_2003,
         date(2003, 1, 1),
         None,
         {"formula": "dhondt"},
-        "Constituency seats are allocated to lists by the D'Hondt method, and nine adjustment seats are allocated to "
-        "the parties that win at least five percent of the valid votes nationwide, so that each party's seats follow "
-        "its votes. The adjustment seats are assigned to constituencies, and Statistics Iceland counts a member "
-        "under the constituency that seat was assigned to.",
+        (
+            "Constituency seats are allocated to lists by the D'Hondt method, and nine adjustment seats are allocated "
+            "to the parties that win at least five percent of the valid votes nationwide, so that each party's seats "
+            "follow its votes. The adjustment seats are assigned to constituencies, and Statistics Iceland counts a "
+            "member under the constituency that seat was assigned to."
+        ),
     ),
     (SYSTEM_LOCAL, date(1900, 1, 1), None, {"formula": "dhondt"}, LOCAL_NOTE),
     (
@@ -542,8 +554,10 @@ SYSTEMS = [
         date(1944, 1, 1),
         None,
         {"formula": "fptp"},
-        "The president is elected directly for four years. The candidate with the most votes is elected, and an "
-        "election with a single candidate is not held.",
+        (
+            "The president is elected directly for four years. The candidate with the most votes is elected, and an "
+            "election with a single candidate is not held."
+        ),
     ),
     (SYSTEM_REFERENDUM, date(1900, 1, 1), None, {"formula": "referendum"}, "A referendum is decided by a majority."),
 ]
@@ -739,9 +753,7 @@ class Build:
         self.p.name(id, title[0], "en", "official")
         if title[1]:
             self.p.name(id, title[1], "is", "native", False)
-        self.p.add(
-            "slug", path=f"{self.event.path}/{changeset.slug(title[0])}", entity_id=id, is_current=True
-        )
+        self.p.add("slug", path=f"{self.event.path}/{changeset.slug(title[0])}", entity_id=id, is_current=True)
         return id
 
     def result_set(self, suffix: str, contest: str | None, note: str) -> str:
@@ -858,9 +870,7 @@ def mismatch(b: Build, what: str, ours: int | None, theirs: int | None) -> None:
     raise ValueError(f"{what}: parsed {ours}, the source prints {theirs}")
 
 
-SOURCE_NOTE = (
-    "Counted by the election authorities and published by Statistics Iceland in its PxWeb tables. "
-)
+SOURCE_NOTE = "Counted by the election authorities and published by Statistics Iceland in its PxWeb tables. "
 
 
 # ---------------------------------------------------------------- events
@@ -918,7 +928,7 @@ def blank_void(event: Event, kind: str) -> tuple[int | None, int | None]:
         and ("referendum" in label.lower()) == (kind == "referendum")
     ]
     if len(found) > 1:
-        found = [label for label in found if ENGLISH_MONTHS[month].lower() in label.lower()]
+        found = [label for label in found if str(ENGLISH_MONTHS[month]).lower() in label.lower()]
     if len(found) != 1:
         return None, None
     label = found[0]
@@ -935,7 +945,7 @@ TURNOUT = {
     "KOS02003": ("Votes and voters", "Voters on the electoral roll", "Votes cast"),
     "KOS02004": ("Votes and voters", "Voters on the electoral roll", "Votes cast"),
     "KOS02005": ("Votes and voters", "Voters on the electoral roll", "Votes cast"),
-    "KOS02006": ("Votes", "Voters on the electoral roll", "Votes cast"),
+    "KOS02006": ("Votes and voters", "Voters on the electoral roll", "Votes cast"),
 }
 
 
@@ -1092,7 +1102,10 @@ def althing_national(
     names = [n for n in g.labels["Political party"] if n != "Valid votes"]
     for position, name in enumerate(names, 1):
         totals = [g.get(Year=label, **{"Political party": name}, Constituency=c) for c in consts]
-        if all(v is None for v in totals) and g.get(Year=label, **{"Political party": name}, Constituency="Whole Country") is None:
+        if (
+            all(v is None for v in totals)
+            and g.get(Year=label, **{"Political party": name}, Constituency="Whole Country") is None
+        ):
             continue
         pid = party_id_of(name)
         text = clean(name)
@@ -1133,6 +1146,21 @@ def althing_national(
     for measure, value in ((2, registered), (3, cast), (6, blank), (5, void)):
         b.value(result_set, national_unit, None, measure, value)
         b.declare(result_set, None, measure, value)
+    if year >= 1963:
+        aggregate = national_seats(year, "others and outside parties")
+        if aggregate:
+            b.p.accept(
+                "outcomes.seats_magnitude",
+                f"Statistics Iceland counts {aggregate} seat in this election only under 'others and outside parties', "
+                "so the seats it gives to the named lists add up to one fewer than the Althing's members",
+            )
+            b.note(
+                result_set,
+                "caveat",
+                f"Statistics Iceland gives {aggregate} of the seats only in an aggregate for others and outside "
+                "parties, so no list is credited with it.",
+                "aggregate",
+            )
     if None not in (cast, blank, void):
         mismatch(b, f"{year} ballots", whole, (cast or 0) - (blank or 0) - (void or 0))
     dated(b, event)
@@ -1213,8 +1241,12 @@ def althing_constituencies(b: Build, event: Event, registered: int | None, cast:
         b.declare(result_set, None, 4, valid)
         void = ballots.get(Year=str(year), Unit="Votes total", Constituency=row, **{"Votes/ballots": "Void ballots"})
         blank = ballots.get(Year=str(year), Unit="Votes total", Constituency=row, **{"Votes/ballots": "Blank ballots"})
-        const_cast = ballots.get(Year=str(year), Unit="Votes total", Constituency=row, **{"Votes/ballots": "Votes cast"})
-        const_valid = ballots.get(Year=str(year), Unit="Votes total", Constituency=row, **{"Votes/ballots": "Valid votes"})
+        const_cast = ballots.get(
+            Year=str(year), Unit="Votes total", Constituency=row, **{"Votes/ballots": "Votes cast"}
+        )
+        const_valid = ballots.get(
+            Year=str(year), Unit="Votes total", Constituency=row, **{"Votes/ballots": "Valid votes"}
+        )
         mismatch(b, f"{year} {english} valid votes", const_valid, valid)
         mismatch(b, f"{year} {english} ballots", const_cast, (valid or 0) + (blank or 0) + (void or 0))
         for measure, value in ((5, void), (6, blank)):
@@ -1242,9 +1274,7 @@ def althing_constituencies(b: Build, event: Event, registered: int | None, cast:
             b.value(result_set, mu, None, 3, c)
             registered_here += r or 0
             cast_here += c or 0
-        constituency_label = next(
-            lab for lab in munis.labels["Municipality"] if constituency(lab, "new") == code
-        )
+        constituency_label = next(lab for lab in munis.labels["Municipality"] if constituency(lab, "new") == code)
         published_registered = munis.get(
             Municipality=constituency_label, Year=str(year), Category="Voters on the electroral roll", Sex="Total"
         )
@@ -1288,23 +1318,19 @@ def president(event: Event) -> Package:
     old = year < 2004
     b = Build(event, f"The {year} Icelandic presidential election by constituency from Statistics Iceland")
     registered, cast = turnout("KOS02004", event.label)
-    blank_n, void_n = blank_void(event, "presidential")
     totals = grid("KOS07100")
     cons = grid("KOS07104" if old else "KOS07102")
     cands = grid("KOS07112" if old else "KOS07110")
     b.cite("KOS02004", "KOS02000", "KOS07100", "KOS07104" if old else "KOS07102", "KOS07112" if old else "KOS07110")
     cand_dim = cands.dims[0]
-    unit_dim = "Unit" if old else "Valid votes"
     number = "Number valid votes" if old else "Number"
     whole = "Whole Country" if old else "Whole country"
-    cons_whole = "Whole Country" if old else "Whole Country"
     labels = cands.labels[cand_dim]
     names = []
     for label in labels:
         name, total = candidate_name(label, year)
         if label.rstrip().endswith(str(year)) and not total:
             names.append((name, label))
-    total_label = next(label for label in labels if label.rstrip().endswith(str(year)) and candidate_name(label, year)[1])
     contest = b.contest(
         "president",
         (f"{year} Icelandic presidential election", f"Forsetakosningar {year}"),
@@ -1352,7 +1378,14 @@ def president(event: Event) -> Package:
         person = people[name] = key("person", name)
         if (key_ := ("person", person)) not in PERSONS:
             PERSONS.add(key_)
-        b.p.add("candidacy", id=key("candidacy", b.ekey, name), person_id=person, option_id=options[name], role="head", ballot_name=name)
+        b.p.add(
+            "candidacy",
+            id=key("candidacy", b.ekey, name),
+            person_id=person,
+            option_id=options[name],
+            role="head",
+            ballot_name=name,
+        )
         b.p.add("person", id=person, birth_precision=None)
         b.p.name(person, name, "is", "official")
     leader = max(votes_by_name, key=lambda n: votes_by_name[n] or 0)
@@ -1363,7 +1396,9 @@ def president(event: Event) -> Package:
     for label, code in constituency_codes.items():
         assert code is not None, label
         unit = b.constituency(code)
-        v_total = cons.get(Year=ys, Constituency=label, Unit="Number", Votes="Votes total" if old else "Votes cast total")
+        v_total = cons.get(
+            Year=ys, Constituency=label, Unit="Number", Votes="Votes total" if old else "Votes cast total"
+        )
         v_valid = cons.get(Year=ys, Constituency=label, Unit="Number", Votes="Valid votes")
         v_blank = cons.get(Year=ys, Constituency=label, Unit="Number", Votes="Blank ballots")
         v_void = cons.get(Year=ys, Constituency=label, Unit="Number", Votes="Void ballots")
@@ -1394,7 +1429,9 @@ def president(event: Event) -> Package:
         g = grid("KOS07002")
         reg_sum = mcast_sum = 0
         for code, name, label in hierarchy("KOS07002"):
-            r = g.get(**{"Constituency/Municipality": label}, Year=ys, Category="Voters on the electoral roll", Sex="Total")
+            r = g.get(
+                **{"Constituency/Municipality": label}, Year=ys, Category="Voters on the electoral roll", Sex="Total"
+            )
             c = g.get(**{"Constituency/Municipality": label}, Year=ys, Category="Votes cast", Sex="Total")
             if r is None and c is None:
                 continue
@@ -1484,10 +1521,12 @@ def referendum(event: Event) -> Package:
         )
         yes = b.option(contest, "yes", "Yes", 1, "answer")
         no = b.option(contest, "no", "No", 2, "answer")
-        row = lambda name: g.get(Referenda=label, Results=name)  # noqa: E731
+        row = lambda name: g.get(Referenda=label, Results=name)
         y, n = row("Votes cast, yes"), row("Votes cast, no")
-        registered, cast, combined = row("Voters on the electoral roll"), row("Votes cast"), row(
-            "Votes cast, blank and void ballots"
+        registered, cast, combined = (
+            row("Voters on the electoral roll"),
+            row("Votes cast"),
+            row("Votes cast, blank and void ballots"),
         )
         for option, v in ((yes, y), (no, n)):
             b.value(result_set, unit, option, 1, v)
@@ -1495,7 +1534,7 @@ def referendum(event: Event) -> Package:
         for measure, value in ((2, registered), (3, cast)):
             b.value(result_set, unit, None, measure, value)
             b.declare(result_set, None, measure, value)
-        split_key = year_key = str(year) if len(questions) == 1 else f"{year}:{key_}"
+        split_key = str(year) if len(questions) == 1 else f"{year}:{key_}"
         label_k = BLANK_VOID_LABELS.get(split_key)
         if label_k is not None:
             gk = grid("KOS02000")
@@ -1520,7 +1559,7 @@ def referendum(event: Event) -> Package:
             b.note(
                 result_set,
                 "caveat",
-                f"Statistics Iceland prints {cast - (y or 0) - (n or 0):,} votes cast beyond the yes and no votes and "
+                f"Statistics Iceland prints {(cast or 0) - (y or 0) - (n or 0):,} votes cast beyond the yes and no votes and "
                 "does not say how many of them were blank or void.",
             )
         b.outcome(result_set, yes, None, "won" if (y or 0) > (n or 0) else "lost")
@@ -1557,7 +1596,11 @@ def referendum_constituencies(b: Build, event: Event, questions: list[tuple[str,
     answer_sets: list[tuple[str, str, str, str, str]] = []
     for key_, label in questions:
         text = clean(label[4:]) if year < 2012 else clean(label)
-        title = f"{year} Icelandic referendum: {text}" if year < 2012 else f"{year} Icelandic referendum, question {key_[1:]}"
+        title = (
+            f"{year} Icelandic referendum: {text}"
+            if year < 2012
+            else f"{year} Icelandic referendum, question {key_[1:]}"
+        )
         contest = b.contest(
             f"referendum:{key_}",
             (title, None),
@@ -1598,7 +1641,12 @@ def referendum_constituencies(b: Build, event: Event, questions: list[tuple[str,
                 g = grid("KOS04102")
                 y = g.get(Year=ys, Category="Valid votes - Yes", Constituency=c_label)
                 n = g.get(Year=ys, Category="Valid votes - No", Constituency=c_label)
-                mismatch(b, f"{year} {c_label} answers", (y or 0) + (n or 0), g.get(Year=ys, Category="Valid votes", Constituency=c_label))
+                mismatch(
+                    b,
+                    f"{year} {c_label} answers",
+                    (y or 0) + (n or 0),
+                    g.get(Year=ys, Category="Valid votes", Constituency=c_label),
+                )
             b.value(result_set, unit, yes, 1, y)
             b.value(result_set, unit, no, 1, n)
             sums[key_]["yes"] += y or 0
@@ -1606,12 +1654,14 @@ def referendum_constituencies(b: Build, event: Event, questions: list[tuple[str,
     # municipal counts of voters and votes cast
     reg_sum = cast_sum = 0
     for code, name, label in hierarchy("KOS04105"):
-        r = munis.get(**{"Constituency/Municipality": label}, Year=ys, Category="Voters on the electoral roll", Sex="Total")
+        r = munis.get(
+            **{"Constituency/Municipality": label}, Year=ys, Category="Voters on the electoral roll", Sex="Total"
+        )
         c = munis.get(**{"Constituency/Municipality": label}, Year=ys, Category="Votes cast", Sex="Total")
         if r is None and c is None:
             continue
         mu = b.municipality(name)
-        for result_set in ([ballot_set] if year == 2012 else [rs for _, _, _, rs, _ in answer_sets]):
+        for result_set in [ballot_set] if year == 2012 else [rs for _, _, _, rs, _ in answer_sets]:
             assert result_set is not None
             b.value(result_set, mu, None, 2, r)
             b.value(result_set, mu, None, 3, c)
@@ -1665,6 +1715,10 @@ LOCAL_TABLES = {
 LETTER = re.compile(r"^([A-ZÞÆÖÐÁÉÍÓÚÝ]{1,2})(?=[\s\-–:.]|$)")
 TACIT = re.compile(r"^(?P<m>.+?)[,\s]+(?:sjálfkjörið|one list)(?P<rest>.*)$", re.IGNORECASE)
 MARKER = re.compile(r"^[\s,]*(?:elected|without voting|no voting|not voting|,)\s*", re.IGNORECASE)
+
+
+def count(value: float | None) -> int | None:
+    return None if value is None else int(value)
 
 
 @dataclass
@@ -1754,14 +1808,10 @@ def local(event: Event) -> Package:
     t = grid(turnout_table)
     results = grid(results_table)
     seats = grid(seats_table)
-    result_rows = {
-        label: [results.cells[(label, unit)] for unit in results.labels[results.dims[1]]]
-        for label in results.labels[results.dims[0]]
-    }
+    first_unit = results.labels[results.dims[1]][0]
+    result_rows = {label: [count(results.cells[(label, first_unit)])] for label in results.labels[results.dims[0]]}
     seat_unit = seats.labels["Unit"][-1]
-    seat_rows = {
-        label: [seats.cells[(label, seat_unit, "Total")]] for label in seats.labels[seats.dims[0]]
-    }
+    seat_rows = {label: [count(seats.cells[(label, seat_unit, "Total")])] for label in seats.labels[seats.dims[0]]}
     r_blocks = {x.name: x for x in blocks(results, result_rows)}
     s_blocks = {x.name: x for x in blocks(seats, seat_rows)}
     v = grid(votes_table) if votes_table else None
@@ -1822,9 +1872,8 @@ def local(event: Event) -> Package:
             if share is not None and share.head[0] is not None:
                 b.p.rows["contest"][-1]["magnitude"] = share.head[0]
             for position, (text, _) in enumerate(block.lists, 1):
-                option = b.option(
-                    contest, letter(text), text, position, "list", party(local_party(text)) if local_party(text) else None
-                )
+                pid = local_party(text)
+                option = b.option(contest, letter(text), text, position, "list", party(pid) if pid else None)
                 if seated[position - 1]:
                     b.outcome(tacit_set, option, seated[position - 1], "elected")
             continue
@@ -1886,6 +1935,7 @@ def local(event: Event) -> Package:
         cast_sum += cast or 0
     mismatch(b, f"{year} registered voters (municipalities, national total)", reg_sum, registered_all)
     mismatch(b, f"{year} votes cast", cast_sum, cast_all)
+    national_set(b, registered_all, cast_all)
     if gaps:
         b.p.accept(
             "accounting.ballots_sum",
@@ -1905,7 +1955,13 @@ def local(event: Event) -> Package:
 
 
 def gap(
-    b: Build, result_set: str, gaps: list[str], name: str, cast: int | None, valid: int | None, blank: int | None,
+    b: Build,
+    result_set: str,
+    gaps: list[str],
+    name: str,
+    cast: int | None,
+    valid: int | None,
+    blank: int | None,
     void: int | None,
 ) -> None:
     if cast is None or valid is None or valid + (blank or 0) + (void or 0) == cast:
@@ -1921,8 +1977,82 @@ def gap(
     )
 
 
+def national_set(b: Build, registered: int | None, cast: int | None) -> None:
+    result_set = b.result_set(
+        "national",
+        None,
+        SOURCE_NOTE + "Statistics Iceland's nationwide count of voters on the electoral roll and of votes cast in "
+        "the elections of all municipalities that year, stored at a national unit.",
+    )
+    unit = b.national()
+    for measure, value in ((2, registered), (3, cast)):
+        b.value(result_set, unit, None, measure, value)
+        b.declare(result_set, None, measure, value)
+
+
 def local_reykjavik(event: Event) -> Package:
-    raise NotImplementedError(event.ekey)
+    """A local election year before 2002, where only Reykjavík's results and the national turnout are published."""
+    year = event.day.first.year
+    label = event.label if event.kind == "reykjavik" else str(year)
+    b = Build(
+        event,
+        f"The {event.stamp} Reykjavík City Council election"
+        + (" and national turnout in the local government elections" if event.kind == "local" else "")
+        + " from Statistics Iceland",
+    )
+    b.cite("KOS02006", "KOS03107")
+    registered, cast = turnout("KOS02006", label)
+    if event.kind == "local":
+        b.cite("KOS02005")
+        national = turnout("KOS02005", event.label)
+        national_set(b, *national)
+    results = grid("KOS03107")
+    ys = str(year)
+    total = None
+    if ys in results.labels["Year"] and event.kind in ("reykjavik", "local"):
+        total = results.get(Item="Valid votes", **{"Political party": "Total"}, Year=ys)
+    seats = results.get(Item="Representatives", **{"Political party": "Total"}, Year=ys) if total is not None else None
+    area_id = area("is.sveitarfelag", "Reykjavík")
+    contest = b.contest(
+        "reykjavik",
+        (f"{year} Reykjavík City Council election", f"Borgarstjórnarkosningar í Reykjavík {year}"),
+        kind="list_allocation" if total is not None else "body_seats",
+        where=area_id,
+        system=SYSTEM_LOCAL,
+        body_id=COUNCIL_BODY,
+        magnitude=seats,
+    )
+    result_set = b.result_set(
+        "reykjavik",
+        contest,
+        SOURCE_NOTE + "Voters on the electoral roll and votes cast are Reykjavík's, and each list's votes are its "
+        "valid votes."
+        + (
+            ""
+            if total is not None
+            else " Statistics Iceland publishes only the turnout of this election, not its results by list."
+        ),
+    )
+    unit = b.municipality("Reykjavík")
+    for measure, value in ((2, registered), (3, cast), (4, total)):
+        b.value(result_set, unit, None, measure, value)
+        b.declare(result_set, None, measure, value)
+    if total is not None:
+        listed = 0
+        for position, name in enumerate((n for n in results.labels["Political party"] if n != "Total"), 1):
+            votes = results.get(Item="Valid votes", **{"Political party": name}, Year=ys)
+            if votes is None:
+                continue
+            pid = local_party(name)
+            option = b.option(contest, name, clean(name), position, "list", party(pid) if pid else None)
+            b.value(result_set, unit, option, 1, votes)
+            b.declare(result_set, option, 1, votes)
+            listed += votes
+            won = results.get(Item="Representatives", **{"Political party": name}, Year=ys)
+            if won:
+                b.outcome(result_set, option, won)
+        mismatch(b, f"{year} Reykjavík list votes", listed, total)
+    return b.finish()
 
 
 # ---------------------------------------------------------------- run
@@ -1935,7 +2065,7 @@ def build(event: Event) -> Package:
         return president(event)
     if event.kind == "referendum":
         return referendum(event)
-    if event.kind == "local":
+    if event.kind in ("local", "reykjavik"):
         return local(event)
     raise NotImplementedError(event.ekey)
 
