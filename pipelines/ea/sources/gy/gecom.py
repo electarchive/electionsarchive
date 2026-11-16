@@ -4,7 +4,7 @@ import json
 import re
 import statistics
 import subprocess
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from datetime import date
 from functools import cache
 from pathlib import Path
@@ -902,29 +902,32 @@ def contests_2011() -> list[Contest]:
     return out
 
 
-LOADERS = {
-    "2011-11-28": (contests_2011, ["GAZETTED_RESULTS_OF_THE_2011_GENERAL_&_REGIONAL_ELECTIONS.pdf"]),
-    "2015-05-11": (
-        contests_2015,
-        [f"{k}_{n}.pdf" for k in ("GE", "RE") for n in ("Summary", *(f"District_{i}" for i in range(1, 11)))],
-    ),
-    "2020-03-02": (contests_2020, ["Tabulation-General-2020.pdf", "Tabulation-Regional-2020.pdf"]),
-    "2025-09-01": (
-        contests_2025,
-        [
-            "GE-Results-Comparative-Recount.pdf",
-            "GE-Seat-Allocations-Geographical-Constituencies.pdf",
-            "GE-Seat-Allocations-National-Assembly.pdf",
-            "RE-Seat-Allocations-Regional-Democratic-Councils.pdf",
-            "GE_2025_Region06.pdf",
-            *(n for k in ("GE", "RE") for r in range(1, 11) for n in files_2025(k, r)),
-        ],
-    ),
-}
+@cache
+def loaders() -> dict[str, tuple[Callable[[], list[Contest]], list[str]]]:
+    """The contest loader and the files each election reads, by election day."""
+    return {
+        "2011-11-28": (contests_2011, ["GAZETTED_RESULTS_OF_THE_2011_GENERAL_&_REGIONAL_ELECTIONS.pdf"]),
+        "2015-05-11": (
+            contests_2015,
+            [f"{k}_{n}.pdf" for k in ("GE", "RE") for n in ("Summary", *(f"District_{i}" for i in range(1, 11)))],
+        ),
+        "2020-03-02": (contests_2020, ["Tabulation-General-2020.pdf", "Tabulation-Regional-2020.pdf"]),
+        "2025-09-01": (
+            contests_2025,
+            [
+                "GE-Results-Comparative-Recount.pdf",
+                "GE-Seat-Allocations-Geographical-Constituencies.pdf",
+                "GE-Seat-Allocations-National-Assembly.pdf",
+                "RE-Seat-Allocations-Regional-Democratic-Councils.pdf",
+                "GE_2025_Region06.pdf",
+                *(n for k in ("GE", "RE") for r in range(1, 11) for n in files_2025(k, r)),
+            ],
+        ),
+    }
 
 
 def abbreviations() -> list[str]:
-    return sorted({p for loader, _ in LOADERS.values() for c in loader() for p in c.parties})
+    return sorted({p for loader, _ in loaders().values() for c in loader() for p in c.parties})
 
 
 def registry() -> Package:
@@ -1048,7 +1051,7 @@ def differences(c: Contest) -> list[str]:
 
 
 def build(day: str) -> Package:
-    loader, files = LOADERS[day]
+    loader, files = loaders()[day]
     first = DAYS[day]
     p = Package(
         f"{SOURCE}/{day}",
