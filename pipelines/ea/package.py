@@ -1135,7 +1135,23 @@ def _verify(conn: Connection, loaded: list[Loaded]) -> None:
         raise ValueError(f"load verification failed, rolled back ({len(problems):,}): " + "; ".join(problems[:10]))
 
 
+def _ordered(items: list[tuple[Path, dict[str, object]]]) -> list[tuple[Path, dict[str, object]]]:
+    keyed = {str(_manifest(path)["key"]): (path, accepted) for path, accepted in items}
+    placed: list[str] = []
+    while len(placed) < len(keyed):
+        ready = [
+            key
+            for key, (path, _) in keyed.items()
+            if key not in placed and all(d in placed or d not in keyed for d in _manifest(path)["depends"])
+        ]
+        if not ready:
+            raise ValueError(f"packages depend on each other in a cycle: {sorted(set(keyed) - set(placed))}")
+        placed += ready
+    return [keyed[key] for key in placed]
+
+
 def load(conn: Connection, items: list[tuple[Path, dict[str, object]]], meter: Meter) -> list[str]:
+    items = _ordered(items)
     with conn.transaction():
         conn.execute("select pg_advisory_xact_lock_shared(hashtext('ea.search'))")
         conn.execute("select pg_advisory_xact_lock_shared(%s)", [MERGE_LOCK])
