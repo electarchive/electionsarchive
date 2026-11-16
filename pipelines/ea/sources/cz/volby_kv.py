@@ -1,4 +1,4 @@
-"""Czech municipal council elections (volby do zastupitelstev obcí) 2006-2026 by polling district from volby.cz.
+"""Czech municipal council elections (volby do zastupitelstev obcí) 2002-2026 by polling district from volby.cz.
 
 `cz.volby/kv-registry` holds what every date shares: the electoral system, one council body per council, and the
 parties the main registry lacks. Each election date is one package, `cz.volby/kv-<date>`, built on `cz.volby/geo`,
@@ -42,6 +42,7 @@ from ea.sources.cz.volby import (
 )
 
 MUNICIPAL = {
+    2002: ("kv2002", "KV2002_data_20230224_csv.zip", "KV2002_reg_20230224_csv.zip", "KV2002_cisel_20230224_csv.zip"),
     2006: ("kv2006", "KV2006_data_20230224_csv.zip", "KV2006_reg_20230224_csv.zip", "KV2006_cisel_20230224_csv.zip"),
     2010: ("kv2010", "KV2010_data_20230224_csv.zip", "KV2010_reg_20230224_csv.zip", "KV2010_cisel_20230224_csv.zip"),
     2014: ("kv2014", "KV2014_data_20230224_csv.zip", "KV2014_reg_20230224_csv.zip", "KV2014_cisel_20230224_csv.zip"),
@@ -49,7 +50,15 @@ MUNICIPAL = {
     2022: ("kv2022", "KV2022_data_20260328_csv.zip", "KV2022reg20260328_csv.zip", "KV2022ciselniky20260328_csv.zip"),
     2026: ("kv2026", "KV2026_data_20261011_csv.zip", "KV2026reg20261011_csv.zip", "KV2026ciselniky20261011_csv.zip"),
 }
-REGULAR = {2006: "20061020", 2010: "20101015", 2014: "20141010", 2018: "20181005", 2022: "20220923", 2026: "20261009"}
+REGULAR = {
+    2002: "20021101",
+    2006: "20061020",
+    2010: "20101015",
+    2014: "20141010",
+    2018: "20181005",
+    2022: "20220923",
+    2026: "20261009",
+}
 VOTES, PREFERENCE = 1, 7
 FIRST = min(MUNICIPAL)
 REGISTRY = "cz.volby/kv-registry"
@@ -169,8 +178,19 @@ def _load(year: int) -> dict[str, pl.DataFrame]:
     return tables
 
 
+@functools.cache
+def _independent() -> frozenset[str]:
+    """The codes any year's code list marks as independent candidates; the 2002 list leaves the kind blank."""
+    return frozenset(
+        row["VSTRANA"]
+        for folder, _, _, cis in MUNICIPAL.values()
+        for row in table(folder, cis, "cvs").iter_rows(named=True)
+        if row.get("TYPVS") == "N"
+    )
+
+
 def _named(codes: set[str], cvs: dict[str, dict[str, str | None]]) -> dict[str, dict[str, str | None]]:
-    return {c: cvs[c] for c in codes - {None, "", *NO_PARTY} if c in cvs and cvs[c].get("TYPVS") != "N"}
+    return {c: cvs[c] for c in codes - {None, "", *NO_PARTY} - _independent() if c in cvs}
 
 
 def registry() -> Package:
