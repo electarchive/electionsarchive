@@ -327,8 +327,30 @@ def parse_code(code: str) -> None:
     print(f"{code}: {len(elections)} elections, {len(counts):,} counts, {len(candidates):,} candidates", flush=True)
 
 
+def _pad(column: str) -> pl.Expr:
+    """Municipal codes are four digits; some files drop the leading zeros (363 for Amsterdam's 0363), so pad every
+    municipal code, alone or as the municipal part of a unit id."""
+    return (
+        pl.col(column)
+        .str.replace(r"^(\d{1,3})$", "000$1")
+        .str.replace(r"^(\d{1,3})::", "000$1::")
+        .str.replace(r"::(\d{1,3})$", "::000$1")
+        .str.replace(r"^0*(\d{4})(::|$)", "$1$2")
+        .str.replace(r"::0*(\d{4})$", "::$1")
+    )
+
+
 def parsed(code: str, table: str) -> pl.DataFrame:
-    return pl.read_parquet(PARSED / f"{code}.{table}.parquet")
+    frame = pl.read_parquet(PARSED / f"{code}.{table}.parquet")
+    if table == "counts":
+        return frame.with_columns(_pad("authority"), _pad("unit"))
+    if table == "names":
+        return frame.with_columns(_pad("unit"))
+    if table == "regions":
+        return frame.with_columns(
+            number=pl.when(pl.col("category") == "GEMEENTE").then(_pad("number")).otherwise(pl.col("number"))
+        )
+    return frame
 
 
 NETHERLANDS = str(uuid5(package.NAMESPACE, "polity\x1fNL"))
@@ -812,9 +834,12 @@ def _contest(
     slugs.add(path)
     seats = row["seats"]
     results = parsed(code, "candidates").filter(pl.col("eml") == eml)
-    elected = results.filter(pl.col("elected"))
+    # Two people on one list can share a candidate number when the list differs between electoral districts.
+    elected = results.filter(pl.col("elected")).unique(["aff", "candidate", "name"], keep="first", maintain_order=True)
     won = Counter(elected["aff"].to_list())
-    magnitude = None if answers else int(str(seats)) if seats is not None else sum(won.values()) or None
+    # The seats filled by election, as the result file records them: water boards also hold appointed seats, and
+    # some definition files misstate the council size (the Kiesraad notes Duiven and Heemstede in 2022).
+    magnitude = None if answers else sum(won.values()) or (int(str(seats)) if seats is not None else None)
     p.add(
         "contest",
         id=contest,
@@ -827,6 +852,21 @@ def _contest(
         default_result_kind="counted",
     )
     p.name(contest, title, "nl", "official")
+    if not answers and seats is not None and magnitude != int(str(seats)):
+        reason = (
+            "the board's other seats are appointed for agriculture, nature, and business interests"
+            if category == "AB"
+            else "the Kiesraad notes that the definition file states the council size wrongly"
+        )
+        p.add(
+            "note",
+            id=key("note", contest, "seats"),
+            entity_id=contest,
+            kind="caveat",
+            body_md=f"The definition file gives {seats} seats; {magnitude} were filled by this election, as the "
+            f"result file records, because {reason}.",
+            lang="en",
+        )
     p.add("slug", path=path, entity_id=contest, is_current=True)
     if answers:
         p.add("ballot_question", contest_id=contest, type="optional_referendum")
@@ -995,14 +1035,14 @@ def _contest(
         + f"; stations hold {station_valid:,} valid"
     )
     if not answers:
-        persons = results.filter(pl.col("elected")).unique(["aff", "candidate"], keep="first")
+        persons = elected
         for aff, n in sorted(won.items()):
             if aff in options:
                 p.add("outcome", result_set_id=official_set, option_id=options[aff], kind="won", seats=n)
         for entry in persons.iter_rows(named=True):
             if entry["aff"] not in options:
                 continue
-            tag = f"{eml}:{entry['aff']}:{entry['candidate']}"
+            tag = f"{eml}:{entry['aff']}:{entry['candidate']}:{fold(str(entry['name']))}"
             person = key("person", tag)
             p.add("person", id=person, gender={"male": "male", "female": "female"}.get(str(entry["gender"])))
             p.name(person, str(entry["name"]), "nl", "official")
