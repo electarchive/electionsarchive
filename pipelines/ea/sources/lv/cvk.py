@@ -4,6 +4,7 @@ import xml.etree.ElementTree as ET
 from collections import Counter
 from dataclasses import dataclass, field
 from datetime import date
+from html.parser import HTMLParser
 from uuid import uuid5
 
 from ea import changeset, package, raw
@@ -340,12 +341,22 @@ def read(day: str) -> Reading:
 
 
 def packages() -> list[str]:
-    return ["lv.cvk/geo", "lv.cvk/registry", *(f"lv.cvk/{day}" for day in sorted([*DAYS, *REFERENDUMS, *MUNICIPAL]))]
+    return [
+        "lv.cvk/geo",
+        "lv.cvk/registry",
+        *(f"lv.cvk/{day}" for day in sorted([*DAYS, *REFERENDUMS, *MUNICIPAL, *DATI])),
+    ]
 
 
 def fetch() -> None:
     for name, url in URLS.items():
         raw.fetch(SOURCE, url, suffix=".xml" if name.endswith("xml") else ".json")
+    for code in DATI.values():
+        root = dati_url(code)
+        raw.fetch(SOURCE, root, suffix=".html")
+        for url in (*dati_pages(code)[1:][0], *dati_pages(code)[2]):
+            raw.fetch(SOURCE, url, suffix=".html")
+        raw.fetch(SOURCE, f"{HOST}/{code}/ieveletie-deputati/", suffix=".html")
 
 
 def parse() -> None:
@@ -357,6 +368,8 @@ def parse() -> None:
         referendum(day).write()
     for day in MUNICIPAL:
         municipal(day).write()
+    for day in DATI:
+        build_dati(day).write()
 
 
 def emit() -> None:
@@ -408,6 +421,14 @@ def registry() -> Package:
     )
     for name in URLS:
         p.artifact(path(name), CVK_SOURCE)
+    for code in DATI.values():
+        for url in (
+            *dati_pages(code)[0],
+            *dati_pages(code)[1],
+            *dati_pages(code)[2],
+            f"{HOST}/{code}/ieveletie-deputati/",
+        ):
+            p.artifact(raw.cached(SOURCE, url), CVK_SOURCE)
     p.add("body", id=SAEIMA, polity_id=LATVIA, kind="unicameral")
     p.name(SAEIMA, "Saeima", "en", "official")
     p.name(SAEIMA, "Latvijas Republikas Saeima", "lv", "native", False)
@@ -418,6 +439,11 @@ def registry() -> Package:
     for day in DAYS:
         for label in read(day).names.values():
             labels.setdefault(party(label), label)
+    for code in DATI.values():
+        data = read_dati(code)
+        for place in (*data.regions.values(), *data.towns.values()):
+            for stand in place.stands.values():
+                labels.setdefault(party(stand.name), stand.name)
     for prefix in MUNICIPAL.values():
         for council in _municipal(prefix)[0].values():
             for label, _, _ in council.lists.values():
@@ -1024,4 +1050,339 @@ def municipal(day: str) -> Package:
             "accounting.turnout",
             f"{over} polling stations print more voters than the voters attached to them; stored as printed",
         )
+    return p
+
+
+DATI = {"2026-10-03": "SV2026", "2025-06-07": "PV2025"}
+HOST = "https://dati.cvk.lv"
+
+
+class Cell:
+    def __init__(self, text: str, order: str | None, href: str | None) -> None:
+        self.text = text
+        self.order = order
+        self.href = href
+
+
+class Tables(HTMLParser):
+    """The results tables of a dati.cvk.lv page, by table id, as rows of cells."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.tables: dict[str, list[list[Cell]]] = {}
+        self.links: list[str] = []
+        self.anchors: list[tuple[str, str]] = []
+        self._anchor: tuple[str, list[str]] | None = None
+        self._table: list[list[Cell]] | None = None
+        self._row: list[Cell] | None = None
+        self._cell: list[str] | None = None
+        self._order: str | None = None
+        self._href: str | None = None
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        found = dict(attrs)
+        if tag == "a" and found.get("href"):
+            self.links.append(found["href"] or "")
+            self._anchor = (found["href"] or "", [])
+            if self._cell is not None and self._href is None:
+                self._href = found["href"]
+        elif tag == "table" and found.get("id"):
+            self._table = self.tables.setdefault(found["id"] or "", [])
+        elif tag == "tr" and self._table is not None:
+            self._row = []
+        elif tag in ("td", "th") and self._row is not None:
+            self._cell, self._order, self._href = [], found.get("data-order"), None
+
+    def handle_endtag(self, tag: str) -> None:
+        if tag == "a" and self._anchor is not None:
+            self.anchors.append((self._anchor[0], clean("".join(self._anchor[1]))))
+            self._anchor = None
+        if tag in ("td", "th") and self._row is not None and self._cell is not None:
+            self._row.append(Cell(clean("".join(self._cell)), self._order, self._href))
+            self._cell = None
+        elif tag == "tr" and self._table is not None and self._row is not None:
+            self._table.append(self._row)
+            self._row = None
+        elif tag == "table":
+            self._table = None
+
+    def handle_data(self, data: str) -> None:
+        if self._anchor is not None:
+            self._anchor[1].append(data)
+        if self._cell is not None:
+            self._cell.append(data)
+
+
+def tables(url: str) -> Tables:
+    parser = Tables()
+    parser.feed(raw.cached(SOURCE, url).path.read_text(encoding="utf-8"))
+    return parser
+
+
+def dati_url(code: str, *parts: str) -> str:
+    return f"{HOST}/{code}/velesanu-rezultati/" + "".join(f"{part}/" for part in parts)
+
+
+def dati_pages(code: str) -> tuple[list[str], list[str], list[tuple[str, str]]]:
+    """The commission's results pages for an election: the root, the region pages, and the municipality pages."""
+    root = tables(dati_url(code))
+    seen: dict[tuple[str, ...], None] = {}
+    for link in root.links:
+        found = re.fullmatch(r"(?:\.\./)+velesanu-rezultati/([^/]+)(?:/([^/]+))?/?", link)
+        if found and found.group(1) != "kandidatu-saraksti":
+            seen[tuple(part for part in found.groups() if part)] = None
+    regions = [parts[0] for parts in seen if len(parts) == 1]
+    towns = [(parts[0], parts[1]) for parts in seen if len(parts) == 2]
+    return [dati_url(code)], [dati_url(code, region) for region in regions], [dati_url(code, *t) for t in towns]
+
+
+def _n(cell: Cell) -> int:
+    return int(cell.order if cell.order and re.fullmatch(r"-?\d+", cell.order) else re.sub(r"\D", "", cell.text) or 0)
+
+
+@dataclass
+class Stand:
+    """A list's printed total in one contest: its name, valid marks, and seats."""
+
+    name: str
+    votes: int
+    seats: int
+
+
+@dataclass
+class Place:
+    slug: str
+    name: str
+    stations: list[tuple[int, str, int, int, dict[int, int]]] = field(default_factory=list)
+    stands: dict[int, Stand] = field(default_factory=dict)
+    row: tuple[int, int, int, int] | None = None
+
+
+@dataclass
+class Dati:
+    regions: dict[str, Place]
+    towns: dict[tuple[str, str], Place]
+    elected: list[tuple[str, str, str, int | None]]
+
+
+def _stands(page: Tables) -> dict[int, Stand]:
+    found: dict[int, Stand] = {}
+    for row in page.tables.get("result-candidate-table", [])[1:]:
+        if len(row) >= 3 and row[0].order and row[0].order.isdigit():
+            found[int(row[0].order)] = Stand(
+                clean(row[1].order or row[1].text), _n(row[2]), _n(row[4]) if len(row) > 4 and row[4].text else 0
+            )
+    return found
+
+
+def _rows(page: Tables) -> dict[str, tuple[str, tuple[int, int, int, int]]]:
+    """The rows of a place's statistics table, by link slug: name and registered, voted, envelopes, marks."""
+    found: dict[str, tuple[str, tuple[int, int, int, int]]] = {}
+    for row in page.tables.get("result-stat-table", [])[1:]:
+        if len(row) == 5 and row[0].href:
+            slug = row[0].href.rstrip("/").rsplit("/", 1)[-1]
+            found[slug] = (row[0].text, (_n(row[1]), _n(row[2]), _n(row[3]), _n(row[4])))
+    return found
+
+
+def read_dati(code: str) -> Dati:
+    _, region_urls, town_urls = dati_pages(code)
+    regions: dict[str, Place] = {}
+    towns: dict[tuple[str, str], Place] = {}
+    names = {link.rstrip("/").rsplit("/", 1)[-1]: text for link, text in tables(dati_url(code)).anchors if text}
+    summary = _rows(tables(dati_url(code)))
+    for url in region_urls:
+        slug = url.rstrip("/").rsplit("/", 1)[-1]
+        page = tables(url)
+        place = regions[slug] = Place(slug, names[slug], stands=_stands(page), row=summary.get(slug, (slug, None))[1])
+        for town, (_, row) in _rows(page).items():
+            towns[(slug, town)] = Place(town, names.get(town, town), row=row)
+    for url in town_urls:
+        region, slug = url.rstrip("/").rsplit("/", 2)[-2:]
+        page = tables(url)
+        place = towns[(region, slug)]
+        place.stands = _stands(page)
+        stats = [row for row in page.tables["result-stat-table"][1:] if row[0].order and row[0].order.isdigit()]
+        header = [cell.text for cell in page.tables["result-candidates-list-table"][0]]
+        matrix = {
+            row[0].order: row
+            for row in page.tables["result-candidates-list-table"][1:]
+            if row[0].order and row[0].order.isdigit()
+        }
+        for row in stats:
+            votes = {
+                int(number): _n(cell)
+                for number, cell in zip(header[2:], matrix[row[0].order][2:], strict=False)
+                if number.isdigit()
+            }
+            place.stations.append((int(row[0].order), row[1].text, _n(row[2]), _n(row[4]), votes))
+    elected = []
+    for row in tables(f"{HOST}/{code}/ieveletie-deputati/").tables["elected-total-table"][1:]:
+        elected.append(
+            (
+                row[0].text,
+                clean(row[1].order or row[1].text),
+                row[2].text,
+                int(row[3].text) if len(row) > 3 and row[3].text.isdigit() else None,
+            )
+        )
+    return Dati(regions, towns, elected)
+
+
+DATI_METHOD = (
+    "Counted per polling station and published by the Central Election Commission of Latvia on its results site. "
+    "Ballots cast are the voters who took part, and valid votes are the valid marks for lists. The site prints the "
+    "number of registered voters only for municipalities and constituencies, so no registered voters are stored per "
+    "polling station. The valid-envelope counts and each candidate's plus and minus marks are not stored here yet."
+)
+
+
+def build_dati(day: str) -> Package:
+    code = DATI[day]
+    first = date.fromisoformat(day)
+    year = first.year
+    saeima = code.startswith("SV")
+    english = f"{year} Latvian parliamentary election" if saeima else f"{year} Latvian municipal elections"
+    native = f"{year}. gada Saeimas vēlēšanas" if saeima else f"{year}. gada pašvaldību vēlēšanas"
+    if saeima:
+        native = "15. Saeimas vēlēšanas"
+    p = Package(
+        f"lv.cvk/{day}",
+        SOURCE,
+        f"The {english} by polling station from the Central Election Commission",
+        depends=["lv.cvk/geo", "lv.cvk/registry"],
+    )
+    p.external |= {LATVIA, COUNTRY}
+    data = read_dati(code)
+    for url in (dati_url(code), f"{HOST}/{code}/ieveletie-deputati/"):
+        p.uses(raw.cached(SOURCE, url))
+    _, region_urls, town_urls = dati_pages(code)
+    for url in (*region_urls, *town_urls):
+        p.uses(raw.cached(SOURCE, url))
+    election = key("election", day)
+    where = f"lv/{day}-" + ("general" if saeima else "local")
+    p.add(
+        "election",
+        id=election,
+        polity_id=LATVIA,
+        kind="general" if saeima else "local",
+        date_from=first,
+        date_to=first,
+        status="held",
+    )
+    p.name(election, english, "en", "official")
+    p.name(election, native, "lv", "native", False)
+    p.add("slug", path=where, entity_id=election, is_current=True)
+    # a contest is a constituency (Saeima) or a council (municipal); each holds the stations that count toward it
+    contests: list[tuple[str, str, str, Place, list[tuple[str, Place]]]] = []
+    if saeima:
+        for slug, region in data.regions.items():
+            members = [(f"{r}/{t}", town) for (r, t), town in data.towns.items() if r == slug]
+            contests.append((slug, slug, region.name, region, members))
+    else:
+        for (r, t), town in data.towns.items():
+            contests.append((f"{r}/{t}", t, town.name, town, [(f"{r}/{t}", town)]))
+    options: dict[tuple[str, int], str] = {}
+    sets: dict[str, str] = {}
+    abroad = {"arvalstis"}
+    for ident, slug, name, place, members in sorted(contests, key=lambda c: c[2]):
+        contest = key("contest", day, ident)
+        seats = sum(stand.seats for stand in place.stands.values())
+        if saeima:
+            local = REGION_NAMES[str(next(i for i, s_ in enumerate(REGION_SLUGS.values(), 1) if s_ == slug))]
+            title, nativetitle = f"{english}, {local[2]}", f"{native}, {local[1]}"
+            district = area("lv.apgabals", str(next(i for i, s_ in enumerate(REGION_SLUGS.values(), 1) if s_ == slug)))
+        else:
+            title, nativetitle, district = f"{year} {name} council election", f"{name} domes vēlēšanas {year}", None
+        p.add(
+            "contest",
+            id=contest,
+            election_id=election,
+            kind="list_allocation",
+            body_id=SAEIMA if saeima else None,
+            district_area_id=district,
+            magnitude=seats or None,
+            round_number=1,
+            electoral_system_id=SYSTEM_SAEIMA if saeima else SYSTEM_MUNICIPAL,
+            default_result_kind="counted",
+        )
+        p.name(contest, title, "en", "official")
+        p.name(contest, nativetitle, "lv", "native", False)
+        p.add("slug", path=f"{where}/{slug}", entity_id=contest, is_current=True)
+        result_set = sets[ident] = key("result_set", day, ident)
+        p.add(
+            "result_set",
+            id=result_set,
+            election_id=election,
+            contest_id=contest,
+            stage="official",
+            kind="counted",
+            source_id=CVK_SOURCE,
+            status="active",
+            is_default=True,
+            completeness=1.0,
+        )
+        p.add(
+            "note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=DATI_METHOD, lang="en"
+        )
+        for number, stand in sorted(place.stands.items()):
+            option = options[(ident, number)] = key("option", day, ident, number)
+            p.add(
+                "contest_option",
+                id=option,
+                contest_id=contest,
+                kind="list",
+                party_id=party(stand.name),
+                ballot_position=number,
+                ballot_label=stand.name,
+            )
+            p.add("declared", result_set_id=result_set, option_id=option, measure=VOTES, value=stand.votes)
+            if stand.seats:
+                p.add("outcome", result_set_id=result_set, option_id=option, kind="won", seats=stand.seats)
+        if place.row is not None:
+            p.add("declared", result_set_id=result_set, option_id=None, measure=CAST, value=place.row[1])
+            p.add("declared", result_set_id=result_set, option_id=None, measure=VALID, value=place.row[3])
+        for town_slug, town in members:
+            for number, label, cast, valid, votes in town.stations:
+                unit_code = f"{day}:{town_slug}:{number}"
+                unit = key("unit", unit_code)
+                p.add(
+                    "reporting_unit",
+                    id=unit,
+                    polity_id=LATVIA,
+                    scheme_code="lv.iecirknis",
+                    code=unit_code,
+                    area_relation="unlocated",
+                    area_id=None,
+                    kind="abroad_mission" if town.slug in abroad else "standard",
+                )
+                p.name(unit, label, "lv", "official")
+                _put(p, result_set, unit, None, CAST, cast)
+                _put(p, result_set, unit, None, VALID, valid)
+                for number_, option in ((n, o) for (i, n), o in options.items() if i == ident):
+                    _put(p, result_set, unit, option, VOTES, votes.get(number_, 0))
+    lookup = {
+        (ident, stand.name): number
+        for ident, slug, name, place, members in contests
+        for number, stand in place.stands.items()
+    }
+    by_name = {name: ident for ident, slug, name, place, members in contests}
+    for index, (who, list_name, where_name, position) in enumerate(data.elected):
+        ident = by_name[where_name]
+        number = lookup[(ident, list_name)]
+        option = options[(ident, number)]
+        person = key("person", day, ident, who, index)
+        p.add("person", id=person)
+        p.name(person, who, "lv", "official")
+        candidacy = key("candidacy", day, ident, who, index)
+        p.add(
+            "candidacy",
+            id=candidacy,
+            person_id=person,
+            option_id=option,
+            role="list_member",
+            list_position=position,
+            ballot_name=who,
+        )
+        p.add("outcome", result_set_id=sets[ident], option_id=option, candidacy_id=candidacy, kind="elected")
     return p
