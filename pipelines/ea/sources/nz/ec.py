@@ -18,12 +18,26 @@ NEW_ZEALAND = str(uuid5(package.NAMESPACE, "polity\x1fNZ"))
 VOTES, REGISTERED, CAST, VALID, INVALID = 1, 2, 3, 4, 5
 EARLY, ELECTION_DAY = 2, 1
 UNIT_SCHEME = "nz.voting_place"
+ELECTORATE_SCHEME = "nz.electorate"
+NATION_SCHEME = "nz.nation"
 
-# General elections with voting-place pages. The authority publishes a page per electorate and vote; an election
-# is built once its overall summary is in the raw cache.
-GENERAL = {"2017-09-23": 2017, "2020-10-17": 2020}
+# The general elections the authority's results site publishes. From 2017 it publishes a page per electorate and vote
+# with the count at each voting place; for 2002 to 2014 the cached statistics give each electorate's party votes.
+# An election is built at the finest level its cached files reach.
+GENERAL = {
+    "2002-07-27": 2002,
+    "2005-09-17": 2005,
+    "2008-11-08": 2008,
+    "2011-11-26": 2011,
+    "2014-09-20": 2014,
+    "2017-09-23": 2017,
+    "2020-10-17": 2020,
+    "2023-10-14": 2023,
+}
 REFERENDUM_DAY = "2011-11-26"
 FETCH_YEARS = (2017, 2020, 2023)
+E9_YEARS = (2002, 2005, 2008, 2011, 2014)
+E9_PARTS = ("e9_part1.csv", "e9_part4.csv", "e9_part6.csv", "e9_part9_1.csv", "e9_part9_2.csv")
 SUMMARIES = (
     "overall-results-summary.csv",
     "winning-electorate-candidates.csv",
@@ -89,7 +103,19 @@ def index_url(year: int) -> str:
     return f"{SITE}/electionresults_{year}/statistics/votes-by-voting-place-electorate-index.html"
 
 
+def e9_url(year: int, name: str) -> str:
+    return f"{SITE}/electionresults_{year}/e9/csv/{name}"
+
+
+def home_url(year: int) -> str:
+    return f"{SITE}/electionresults_{year}/index.html"
+
+
 def fetch() -> None:
+    for year in E9_YEARS:
+        _try(home_url(year), ".html")
+        for name in E9_PARTS:
+            _try(e9_url(year, name), ".csv")
     for year in FETCH_YEARS:
         for url in (
             f"{SITE}/electionresults_{year}/index.html",
@@ -115,14 +141,21 @@ def _try(url: str, suffix: str) -> None:
 
 
 class Cells(HTMLParser):
+    """The rows of every table on a page. A table inside a cell, such as the bar charts the pages draw, keeps its
+    own rows, so the outer cell holds only its own text."""
+
     def __init__(self) -> None:
         super().__init__()
         self.rows: list[list[str]] = []
         self.row: list[str] | None = None
         self.cell: str | None = None
+        self.outer: list[tuple[list[str] | None, str | None]] = []
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
-        if tag == "tr":
+        if tag == "table":
+            self.outer.append((self.row, self.cell))
+            self.row = self.cell = None
+        elif tag == "tr":
             self.row = []
         elif tag in ("td", "th"):
             self.cell = ""
@@ -134,6 +167,8 @@ class Cells(HTMLParser):
         elif tag == "tr" and self.row is not None:
             self.rows.append(self.row)
             self.row = None
+        elif tag == "table" and self.outer:
+            self.row, self.cell = self.outer.pop()
 
     def handle_data(self, data: str) -> None:
         if self.cell is not None:
@@ -159,6 +194,7 @@ class Page:
     rows: list[Row] = field(default_factory=list)
     total: list[int] = field(default_factory=list)
     parties: dict[str, str] = field(default_factory=dict)
+    winner: str | None = None
 
 
 def read_page(url: str) -> Page:
@@ -174,6 +210,9 @@ def read_page(url: str) -> Page:
     after = False
     for row in rows[1:]:
         if after:
+            won = re.fullmatch(r"(.+) - majority \d+", row[-1]) if row else None
+            if won and won.group(1) in page.labels:
+                page.winner = won.group(1)
             if len(row) >= 4 and row[0] in page.labels and row[2].replace(",", "").isdigit():
                 page.parties[row[0]] = row[1]
             continue
@@ -202,39 +241,107 @@ def electorates(year: int) -> dict[int, str]:
     return {int(link): row[0] for row, link in zip(rows, links, strict=True)}
 
 
+def text(url: str) -> str:
+    """A cached file's text; the older statistics files are in Windows-1252, the newer ones in UTF-8."""
+    data = art(url).path.read_bytes()
+    try:
+        return data.decode("utf-8-sig")
+    except UnicodeDecodeError:
+        # The 2005 files write the macron of Māori with the byte that Windows-1252 reads as â.
+        return data.decode("cp1252").replace("Mâori", "Māori").replace("MÂORI", "MĀORI")
+
+
+def rows_of(url: str) -> list[list[str]]:
+    return [[cell.strip() for cell in row] for row in csv.reader(io.StringIO(text(url)))]
+
+
 def table(year: int, name: str) -> list[list[str]]:
-    return list(csv.reader(io.StringIO(art(csv_url(year, name)).path.read_text("utf-8-sig"))))
+    return rows_of(csv_url(year, name))
 
 
 @dataclass
 class Summary:
+    url: str
     seats: dict[str, int]
     votes: dict[str, int]
     valid: int
-    informal: int
+    informal: int | None
+    magnitude: int
+
+
+GROUPS = ("Registered Parties with List", "Registered Parties, no List", "Unregistered Parties")
+
+
+def summary_url(year: int) -> str | None:
+    for url in (csv_url(year, "overall-results-summary.csv"), e9_url(year, "e9_part1.csv"), home_url(year)):
+        if has(url):
+            return url
+    return None
 
 
 def summary(year: int) -> Summary:
-    rows = table(year, "overall-results-summary.csv")
+    """The national party votes and each party's seats (list and electorate together), as the authority prints them:
+    from its summary of overall results, or else from the results home page."""
+    url = summary_url(year)
+    if url is None:
+        raise LookupError(f"{year}: no summary of overall results is cached")
+    if url.endswith(".html"):
+        return _home_summary(year, url)
     seats: dict[str, int] = {}
     votes: dict[str, int] = {}
+    state: dict[str, int] = {}
+    totals: list[int] = []
     group = ""
-    totals: list[list[str]] = []
-    for row in rows:
-        if not row or row[0] == "State of the Parties":
-            if row and row[0] == "State of the Parties":
-                break
+    magnitude = 0
+    in_state = False
+    for row in rows_of(url):
+        if not any(row):
             continue
-        if row[0] in ("Registered Parties with List", "Unregistered Parties"):
+        if row[0] == "State of the Parties":
+            in_state = True
+        elif in_state and len(row) >= 5 and not row[0] and row[1] == "Seats":
+            magnitude = int(row[4])
+            break
+        elif in_state and row[0] and len(row) >= 5:
+            state[row[0]] = int(row[4])
+        elif row[0] in GROUPS:
             group = row[0]
-            continue
-        if row[0] and group and len(row) >= 9 and row[1].isdigit():
-            seats[row[0]] = int(row[1])
-            votes[row[0]] = int(row[2])
-        elif group and not row[0] and all(cell.isdigit() for cell in row if cell):
-            totals.append(row)
-    valid, informal = (int(next(cell for cell in totals[i] if cell)) for i in (1, 2))
-    return Summary(seats, votes, valid, informal)
+        elif group and row[0] and len(row) >= 7 and row[1].isdigit():
+            votes[row[0]] = int(row[2] or 0)
+            won = int(row[1]) + int(row[5] or 0)
+            if won:
+                seats[row[0]] = won
+        elif group and not row[0]:
+            totals.append(int(next(cell for cell in row if cell)))
+    if seats != state or sum(seats.values()) != magnitude:
+        raise ValueError(f"{url}: the seats {seats} disagree with the state of the parties {state} ({magnitude})")
+    if sum(votes.values()) != totals[1]:
+        raise ValueError(f"{url}: the party votes sum to {sum(votes.values())}, but the total is {totals[1]}")
+    return Summary(url, seats, votes, totals[1], totals[2], magnitude)
+
+
+def _home_summary(year: int, url: str) -> Summary:
+    cells = Cells()
+    cells.feed(text(url))
+    seats: dict[str, int] = {}
+    votes: dict[str, int] = {}
+    inside = False
+    for row in cells.rows:
+        if len(row) == 6 and row[1] == "Party Votes" and row[5].lower() == "total seats":
+            inside = True
+        elif inside and len(row) == 6 and row[0] == "Total":
+            valid, magnitude = number(row[1]), number(row[5])
+            break
+        elif inside and len(row) == 6 and row[1] != "-":
+            # A party that stood its component parties' candidates prints them below it with no votes of their own.
+            votes[row[0]] = number(row[1])
+            if row[5] != "-":
+                seats[row[0]] = number(row[5])
+    else:
+        raise ValueError(f"{url}: no party table with a total row")
+    if sum(votes.values()) != valid or sum(seats.values()) != magnitude:
+        raise ValueError(f"{url}: the party rows do not sum to the printed total")
+    return Summary(url, seats, votes, valid, None, magnitude)
 
 
 def winners(year: int) -> dict[str, str]:
@@ -271,6 +378,7 @@ def party_id(name: str) -> str:
     return key("party", name.casefold())
 
 
+@functools.cache
 def pages(year: int, vote: str) -> dict[int, Page]:
     found: dict[int, Page] = {}
     for n in range(1, 80):
@@ -280,12 +388,27 @@ def pages(year: int, vote: str) -> dict[int, Page]:
     return found
 
 
+def level(year: int) -> str | None:
+    """The finest level the cache reaches for a general election: voting places, electorates, or the nation."""
+    if summary_url(year) is None:
+        return None
+    if has(index_url(year)) and pages(year, "candidate") and len(pages(year, "candidate")) == len(electorates(year)):
+        return "voting_place"
+    if all(has(e9_url(year, name)) for name in ("e9_part1.csv", "e9_part4.csv")):
+        return "electorate"
+    return "nation"
+
+
 def days() -> list[str]:
-    return [day for day, year in GENERAL.items() if has(csv_url(year, "overall-results-summary.csv"))]
+    return [day for day, year in GENERAL.items() if level(year)]
+
+
+def package_key(day: str) -> str:
+    return f"nz.ec/{day}-general" if day == REFERENDUM_DAY else f"nz.ec/{day}"
 
 
 def packages() -> list[str]:
-    return ["nz.ec/registry", f"nz.ec/{REFERENDUM_DAY}", *(f"nz.ec/{day}" for day in days())]
+    return ["nz.ec/registry", f"nz.ec/{REFERENDUM_DAY}", *(package_key(day) for day in days())]
 
 
 def parse() -> None:
@@ -297,6 +420,41 @@ def parse() -> None:
 
 def emit() -> None:
     package.run("load", packages())
+
+
+@functools.cache
+def party_columns(year: int) -> tuple[list[str], dict[str, list[int]], list[int]]:
+    """The party columns of the electorate table, named as the summary names them, each electorate's row (party
+    votes, then valid and informal), and the combined totals row."""
+    rows = rows_of(e9_url(year, "e9_part4.csv"))
+    names = list(summary(year).votes)
+    columns = []
+    for header in rows[1][1:-2]:
+        found = [name for name in names if name.casefold().startswith(header.casefold())]
+        exact = [name for name in found if name.casefold() == header.casefold()]
+        if len(exact or found) != 1:
+            raise ValueError(f"{year}: the party column {header!r} matches {found} in the summary")
+        columns.append((exact or found)[0])
+    if rows[1][-2:] != ["Total Valid Party Votes", "Informal Party Votes"]:
+        raise ValueError(f"{year}: unexpected last columns {rows[1][-2:]}")
+    width = len(rows[1])
+    electorate_rows: dict[str, list[int]] = {}
+    combined: list[int] = []
+    for row in rows[2:]:
+        if len(row) < width or not row[0] or not row[1].isdigit():
+            continue
+        values = [int(cell) for cell in row[1:width]]
+        if row[0] == "Combined Totals":
+            combined = values
+        elif not row[0].endswith("Totals"):
+            electorate_rows[row[0]] = values
+    for values in electorate_rows.values():
+        if sum(values[:-2]) != values[-2]:
+            raise ValueError(f"{year}: an electorate's party votes do not sum to its valid total")
+    sums = [sum(values[i] for values in electorate_rows.values()) for i in range(width - 1)]
+    if sums != combined:
+        raise ValueError(f"{year}: the electorates sum to {sums}, but the combined totals are {combined}")
+    return columns, electorate_rows, combined
 
 
 def registry() -> Package:
@@ -355,14 +513,30 @@ def registry() -> Package:
     for id, rules, text in systems:
         p.add("electoral_system", id=id, polity_id=NEW_ZEALAND, rules=rules, rules_version=1)
         p.add("note", id=key("note", id), entity_id=id, kind="methodology", body_md=text, lang="en")
+    p.add(
+        "scheme",
+        code=ELECTORATE_SCHEME,
+        polity_id=NEW_ZEALAND,
+        kind="electoral_district",
+        rank=1,
+        noun="electorate",
+    )
+    p.add("scheme", code=NATION_SCHEME, polity_id=NEW_ZEALAND, kind="synthetic", rank=0, noun="nation")
     names: set[str] = set()
     for day in days():
         year = GENERAL[day]
-        for vote in ("candidate", "party"):
-            for page in pages(year, vote).values():
-                names |= {*page.parties.values(), *(label for label in page.labels if vote == "party")}
+        names |= {name for name, votes in summary(year).votes.items() if votes or name in summary(year).seats}
+        if level(year) == "voting_place":
+            for vote in ("candidate", "party"):
+                for page in pages(year, vote).values():
+                    names |= {*page.parties.values(), *(label for label in page.labels if vote == "party")}
+        elif level(year) == "electorate":
+            names |= set(party_columns(year)[0])
+    # A party printed under two spellings (MANA and Mana) is one party, under the spelling that sorts first.
+    latest: dict[str, str] = {}
     for name in sorted(names - {"Independent"}):
-        id = party_id(name)
+        latest.setdefault(party_id(name), name)
+    for id, name in sorted(latest.items(), key=lambda item: item[1]):
         p.add("party", id=id, kind="party", polity_id=NEW_ZEALAND)
         p.name(id, name, "en", "official")
     return p
@@ -463,43 +637,30 @@ def _cite(p: Package, urls: list[str]) -> None:
         p.uses(art(url))
 
 
+DESCRIPTION = {
+    "voting_place": "by voting place, from the Electoral Commission's results pages",
+    "electorate": "by electorate, from the Electoral Commission's statistics",
+    "nation": "national totals, from the Electoral Commission's results page",
+}
+
+
 def general(day: str) -> Package:
     year = GENERAL[day]
+    how = level(year)
+    if how is None:
+        raise LookupError(f"{year}: nothing is cached")
     first = date.fromisoformat(day)
     p = Package(
-        f"nz.ec/{day}",
+        package_key(day),
         SOURCE,
-        f"The {year} New Zealand general election by voting place, from the Electoral Commission's results pages",
+        f"The {year} New Zealand general election {DESCRIPTION[how]}",
         depends=["nz.ec/registry"],
     )
     p.external.add(NEW_ZEALAND)
-    candidate_pages = pages(year, "candidate")
-    party_pages = pages(year, "party")
-    names = electorates(year)
-    _cite(
-        p,
-        [
-            *(page_url(year, "candidate", n) for n in candidate_pages),
-            *(page_url(year, "party", n) for n in party_pages),
-            index_url(year),
-            csv_url(year, "overall-results-summary.csv"),
-            csv_url(year, "winning-electorate-candidates.csv"),
-            *(
-                [csv_url(year, "votes-for-registered-parties-by-electorate.csv")]
-                if set(names) - set(party_pages)
-                else []
-            ),
-        ],
-    )
+    summ = summary(year)
     election = _election(
         p, f"general-{day}", first, "general", f"{year} New Zealand general election", f"nz/{day}-general"
     )
-    units = Units(p, str(year))
-    summ = summary(year)
-    won = winners(year)
-
-    # The party vote.
-    seats = sum(summ.seats.values())
     party_contest = _contest(
         p,
         f"party-{day}",
@@ -508,13 +669,18 @@ def general(day: str) -> Package:
         f"{year} New Zealand general election, party vote",
         f"nz/{day}-general/party-vote",
         body_id=PARLIAMENT,
-        magnitude=seats,
+        magnitude=summ.magnitude,
         electoral_system_id=SYSTEM_PARTY,
     )
     party_set = _result_set(p, election, party_contest, f"party-{day}")
-    first_page = next(iter(party_pages.values()))
+    if how == "voting_place":
+        labels = next(iter(pages(year, "party").values())).labels
+    elif how == "electorate":
+        labels = party_columns(year)[0]
+    else:
+        labels = list(summ.votes)
     options: dict[str, str] = {}
-    for position, label in enumerate(first_page.labels, 1):
+    for position, label in enumerate(labels, 1):
         option = options[label] = key("option", f"party-{day}", label)
         p.add(
             "contest_option",
@@ -527,14 +693,105 @@ def general(day: str) -> Package:
         )
     stray = {label for label, value in summ.votes.items() if label not in options and value}
     if stray:
-        raise ValueError(f"{year}: the summary prints party votes for {sorted(stray)}, which no page lists")
+        raise ValueError(f"{year}: the summary prints party votes for {sorted(stray)}, which no table lists")
     for label, allocated in summ.seats.items():
-        if allocated:
-            p.add("outcome", result_set_id=party_set, option_id=options[label], kind="won", seats=allocated)
+        p.add("outcome", result_set_id=party_set, option_id=options[label], kind="won", seats=allocated)
+    for label, value in summ.votes.items():
+        if label in options:
+            p.add("declared", result_set_id=party_set, option_id=options[label], measure=VOTES, value=value)
+    p.add("declared", result_set_id=party_set, option_id=None, measure=VALID, value=summ.valid)
+    if summ.informal is not None:
+        p.add("declared", result_set_id=party_set, option_id=None, measure=INVALID, value=summ.informal)
+    p.uses(art(summ.url))
+    if how == "voting_place":
+        _voting_places(p, day, election, party_set, options)
+    elif how == "electorate":
+        p.uses(art(e9_url(year, "e9_part4.csv")))
+        _, electorate_rows, _ = party_columns(year)
+        for number, (name, values) in enumerate(electorate_rows.items(), 1):
+            code = f"{year}:{name}"
+            unit = key("unit", "electorate", code)
+            p.add(
+                "reporting_unit",
+                id=unit,
+                polity_id=NEW_ZEALAND,
+                scheme_code=ELECTORATE_SCHEME,
+                code=code,
+                area_relation="unlocated",
+                area_id=None,
+                kind="standard",
+            )
+            p.name(unit, name, "en", "official")
+            for label, value in zip(labels, values, strict=False):
+                _put(p, party_set, unit, 0, options[label], VOTES, value)
+            _put(p, party_set, unit, 0, None, VALID, values[-2])
+            _put(p, party_set, unit, 0, None, INVALID, values[-1])
+        p.add(
+            "note",
+            id=key("note", party_set, "electorates"),
+            entity_id=party_set,
+            kind="caveat",
+            body_md="The party vote is given by electorate, including each electorate's special votes, from the "
+            "Electoral Commission's statistics. The electorate candidate votes and the counts at each polling "
+            "place are not yet held.",
+            lang="en",
+        )
+    else:
+        code = f"{year}:nation"
+        unit = key("unit", "nation", code)
+        p.add(
+            "reporting_unit",
+            id=unit,
+            polity_id=NEW_ZEALAND,
+            scheme_code=NATION_SCHEME,
+            code=code,
+            area_relation="unlocated",
+            area_id=None,
+            kind="aggregate",
+        )
+        p.name(unit, "New Zealand", "en", "official")
+        for label, value in summ.votes.items():
+            _put(p, party_set, unit, 0, options[label], VOTES, value)
+        _put(p, party_set, unit, 0, None, VALID, summ.valid)
+        p.add(
+            "note",
+            id=key("note", party_set, "nation"),
+            entity_id=party_set,
+            kind="caveat",
+            body_md="Only the national party vote and seats, as the Electoral Commission's results page prints "
+            "them, are held so far. The votes by electorate and by voting place, and the electorate contests, are "
+            "not yet held.",
+            lang="en",
+        )
+    return p
+
+
+def _voting_places(p: Package, day: str, election: str, party_set: str, options: dict[str, str]) -> None:
+    year = GENERAL[day]
+    candidate_pages = pages(year, "candidate")
+    party_pages = pages(year, "party")
+    names = electorates(year)
+    won = winners(year) if has(csv_url(year, "winning-electorate-candidates.csv")) else {}
+    _cite(
+        p,
+        [
+            *(page_url(year, "candidate", n) for n in candidate_pages),
+            *(page_url(year, "party", n) for n in party_pages),
+            index_url(year),
+            *([csv_url(year, "winning-electorate-candidates.csv")] if won else []),
+            *(
+                [csv_url(year, "votes-for-registered-parties-by-electorate.csv")]
+                if set(names) - set(party_pages)
+                else []
+            ),
+        ],
+    )
+    units = Units(p, str(year))
+    labels = list(options)
     missing = sorted(set(names) - set(party_pages))
     fallback = party_totals(year) if missing else {}
     for number, page in party_pages.items():
-        if page.labels != first_page.labels:
+        if page.labels != labels:
             raise ValueError(f"{year} electorate {number}: party columns differ from the first page")
         for row in page.rows:
             channel, aggregate = _channel(row)
@@ -547,7 +804,7 @@ def general(day: str) -> Package:
         electorate = names[number]
         values = fallback[electorate]
         unit = units.get(number, electorate, f"{electorate} total", True)
-        for label, value in zip(first_page.labels, values, strict=False):
+        for label, value in zip(labels, values, strict=False):
             _put(p, party_set, unit, 0, options[label], VOTES, value)
         _put(p, party_set, unit, 0, None, VALID, values[-2])
         _put(p, party_set, unit, 0, None, INVALID, values[-1])
@@ -562,15 +819,14 @@ def general(day: str) -> Package:
             "unit each with the electorate's printed party-vote totals.",
             lang="en",
         )
-    for label, value in summ.votes.items():
-        if label in options:
-            p.add("declared", result_set_id=party_set, option_id=options[label], measure=VOTES, value=value)
-    p.add("declared", result_set_id=party_set, option_id=None, measure=VALID, value=summ.valid)
-    p.add("declared", result_set_id=party_set, option_id=None, measure=INVALID, value=summ.informal)
 
     # The electorate votes.
     for number, page in sorted(candidate_pages.items()):
         name = page.electorate
+        if won and won.get(name) != page.winner:
+            raise ValueError(f"{year} {name}: the page names {page.winner} the winner, the table {won.get(name)}")
+        if page.winner is None or set(page.parties) != set(page.labels):
+            raise ValueError(f"{year} {name}: the page lists no winner or misses a candidate's party")
         contest = _contest(
             p,
             f"electorate-{day}-{number}",
@@ -587,8 +843,8 @@ def general(day: str) -> Package:
         for position, label in enumerate(page.labels, 1):
             option = choice[label] = key("option", f"electorate-{day}-{number}", label)
             person = key("person", f"{day}:{number}", label)
-            party = page.parties.get(label)
-            independent = party in (None, "Independent")
+            party = page.parties[label]
+            independent = party == "Independent"
             p.add("person", id=person)
             p.name(person, person_name(label), "en", "official")
             p.add(
@@ -596,7 +852,7 @@ def general(day: str) -> Package:
                 id=option,
                 contest_id=contest,
                 kind="candidate",
-                party_id=None if independent else party_id(party or ""),
+                party_id=None if independent else party_id(party),
                 ballot_position=position,
                 ballot_label=label,
             )
@@ -607,10 +863,10 @@ def general(day: str) -> Package:
                 option_id=option,
                 role="head",
                 ballot_name=label,
-                member_of_party_id=None if independent else party_id(party or ""),
+                member_of_party_id=None if independent else party_id(party),
                 is_independent=independent,
             )
-            if won.get(name) == label:
+            if page.winner == label:
                 p.add("outcome", result_set_id=result_set, option_id=option, kind="elected", seats=1)
         for row in page.rows:
             channel, aggregate = _channel(row)
@@ -623,7 +879,6 @@ def general(day: str) -> Package:
             p.add("declared", result_set_id=result_set, option_id=choice[label], measure=VOTES, value=value)
         p.add("declared", result_set_id=result_set, option_id=None, measure=VALID, value=page.total[-2])
         p.add("declared", result_set_id=result_set, option_id=None, measure=INVALID, value=page.total[-1])
-    return p
 
 
 def referendum() -> Package:
