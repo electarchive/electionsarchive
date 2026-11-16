@@ -443,21 +443,21 @@ def cited() -> set[str]:
 CAVEATS = {
     "accounting.votes_valid": (
         (
-            "In {n} polling station{s} the votes for the options do not add up to the valid ballots in the office's file. "
+            "In {n} reporting unit{s} the votes for the options do not add up to the valid ballots in the office's file. "
             "The figures are stored as printed."
         ),
         "the office's polling-station lines do not add up to the valid ballots it prints; stored as printed",
     ),
     "accounting.ballots_sum": (
         (
-            "In {n} polling station{s} the valid and invalid ballots do not add up to the ballots in the box in the "
+            "In {n} reporting unit{s} the valid and invalid ballots do not add up to the ballots in the box in the "
             "office's file. The figures are stored as printed."
         ),
         "the valid and invalid ballots the office prints do not add up to the ballots in the box; stored as printed",
     ),
     "accounting.turnout": (
         (
-            "In {n} polling station{s} more ballots were in the box than voters were on the roll at its close, because "
+            "In {n} reporting unit{s} more ballots were in the box than voters were on the roll at its close, because "
             "voters with a certificate or a transfer voted there. The figures are stored as printed."
         ),
         "more ballots than voters on the station's roll, from voters who voted there with a certificate or transfer",
@@ -784,10 +784,10 @@ class Day:
                 self.p.accept(
                     code,
                     f"{total} declared totals in {len(counts)} contests differ from the sum of the office's own "
-                    f"polling-station lines (largest gap {largest:,} votes); both are stored as published",
+                    f"reporting-unit lines (largest gap {largest:,} votes); both are stored as published",
                 )
             else:
-                self.p.accept(code, f"{total} polling stations in {len(counts)} contests: {reason}")
+                self.p.accept(code, f"{total} reporting units in {len(counts)} contests: {reason}")
             for result_set, n in counts.items():
                 self.p.add(
                     "note",
@@ -800,6 +800,10 @@ class Day:
 
     def write(self) -> None:
         self.reconcile()
+        counted = {result_set for result_set, _, _, _ in self.values}
+        for row in self.p.rows.get("result_set", []):
+            if row["id"] not in counted:
+                row["completeness"] = 0.0
         if self.values:
             self.p.frame(
                 "result_value",
@@ -2316,34 +2320,43 @@ class Local:
         tag = f"onk:{self.year}:{kind}:{area_code}" + (f":{ward}" if ward else "")
         if tag in self.d.sets:
             return tag
-        name = self.place_name(area_code) if kind not in ("county-list", "lord-mayor", "budapest-list") else ""
+        name = (
+            self.place_name(area_code)
+            if kind not in ("county-list", "county-list-large", "lord-mayor", "budapest-list")
+            else ""
+        )
         maz = area_code[:2]
         if kind == "mayor":
             title, english = f"{name} polgármester", f"Mayor of {name}"
-            fields = {"office": mayoralty(area_code), "district_area": settlement(area_code), "system": LOCAL_MAYOR}
+            office, body, area, system = mayoralty(area_code), None, settlement(area_code), LOCAL_MAYOR
             contest_kind = "office"
         elif kind == "lord-mayor":
             title, english = "Budapest főpolgármester", "Lord Mayor of Budapest"
-            fields = {"office": mayoralty("01"), "district_area": county("01"), "system": LOCAL_MAYOR}
+            office, body, area, system = mayoralty("01"), None, county("01"), LOCAL_MAYOR
             contest_kind = "office"
         elif kind == "council":
             title, english = f"{name} képviselő-testület", f"{name} council"
-            fields = {"body": council(area_code), "district_area": settlement(area_code), "system": LOCAL_BLOCK}
+            office, body, area, system = None, council(area_code), settlement(area_code), LOCAL_BLOCK
             contest_kind = "body_seats"
         elif kind == "ward":
             title, english = (
                 f"{name} {int(cast(str, ward))}. egyéni választókerület",
                 f"{name} ward {int(cast(str, ward))}",
             )
-            fields = {"body": council(area_code), "district_area": settlement(area_code), "system": LOCAL_SMD}
+            office, body, area, system = None, council(area_code), settlement(area_code), LOCAL_SMD
             contest_kind = "body_seats"
+        elif kind == "county-list-large":
+            title = f"{COUNTIES[maz]} megyei közgyűlés, 10 ezer fő feletti települések"
+            english = f"{COUNTIES[maz]} County Assembly, towns over 10,000"
+            office, body, area, system = None, county_assembly(maz), county(maz), LOCAL_LIST
+            contest_kind = "list_allocation"
         elif kind == "county-list":
             title, english = f"{COUNTIES[maz]} vármegyei közgyűlés", f"{COUNTIES[maz]} County Assembly"
-            fields = {"body": county_assembly(maz), "district_area": county(maz), "system": LOCAL_LIST}
+            office, body, area, system = None, county_assembly(maz), county(maz), LOCAL_LIST
             contest_kind = "list_allocation"
         else:
             title, english = "Fővárosi közgyűlés", "Budapest Assembly"
-            fields = {"body": county_assembly("01"), "district_area": county("01"), "system": LOCAL_LIST}
+            office, body, area, system = None, county_assembly("01"), county("01"), LOCAL_LIST
             contest_kind = "list_allocation"
         self.d.contest(
             tag,
@@ -2354,7 +2367,10 @@ class Local:
             magnitude=magnitude,
             method=method(),
             english=english,
-            **fields,  # type: ignore[arg-type]
+            office=office,
+            body=body,
+            district_area=area,
+            system=system,
         )
         return tag
 
@@ -2551,9 +2567,11 @@ SYSTEMS.append(
         date(1994, 1, 1),
         None,
         {"formula": "block"},
-        ("Voters on the nationality roll elect the settlement nationality self-government on one ballot from "
-        "individual candidates, voting for as many as there are seats; from 2014 the territorial and national "
-        "nationality self-governments are elected from lists on the same day."),
+        (
+            "Voters on the nationality roll elect the settlement nationality self-government on one ballot from "
+            "individual candidates, voting for as many as there are seats; from 2014 the territorial and national "
+            "nationality self-governments are elected from lists on the same day."
+        ),
     )
 )
 
@@ -2767,3 +2785,295 @@ def nationality_2024(d: Day) -> None:
 
 OTHER.append((date(2019, 10, 13), "2019 nationality elections", nationality_2019))
 OTHER.append((date(2024, 6, 9), "2024 nationality elections", nationality_2024))
+
+
+def seat_key(position: str, label: str) -> str:
+    """A local candidate's key: the ballot position and the name, since a withdrawn candidate keeps a position."""
+    return f"{number(position)}:{same_name(label)}"
+
+
+MID_LOCAL = {
+    2002: ("2002_onkormanyzati", date(2002, 10, 20)),
+    2006: ("2006_onkormanyzati", date(2006, 10, 1)),
+    2010: ("2010_onkormanyzati", date(2010, 10, 3)),
+}
+LIST_KINDS = {"1": "county-list", "2": "county-list-large", "3": "budapest-list"}
+
+
+def _txt(name: str, stem: str) -> list[list[str]]:
+    found = [path for path in bundle(name) if path.split("/")[-1] == f"{stem}.txt"]
+    return piped(name, found[0]) if found else []
+
+
+def mid_local(d: Day) -> None:
+    year = d.day.year
+    name, _ = MID_LOCAL[year]
+    d.cite(ARCHIVE)
+    local = Local(d, year)
+    found = places()
+    registered_at = -6 if year == 2010 else -7
+    nominators: dict[tuple[str, ...], list[str]] = defaultdict(list)
+    for stem, width in (("polgsz", 3), ("ejelersz", 4), ("kislersz", 3), ("fopolgsz", 1)):
+        for row in _txt(name, stem):
+            nominators[(stem[:-2], *row[:width])].append(row[width + 2] if stem != "fopolgsz" else row[3])
+    areas: dict[tuple[str, str], str] = {}
+
+    def area_of(maz: str, taz: str, town: str) -> str:
+        index = (maz, taz)
+        if index not in areas:
+            areas[index] = found.resolve(maz, taz, town, trust_code=True)
+        return areas[index]
+
+    def accounting(tag: str, unit: str, nums: list[int]) -> None:
+        d.accounting(tag, unit, nums[registered_at], nums[-5], nums[-4], nums[-2], nums[-1])
+
+    def candidate(
+        tag: str, unit: str | None, position: str, title: str, printed: str, votes: str, nominator: str
+    ) -> str:
+        label = f"{title} {printed}".strip()
+        ident = seat_key(position, label)
+        option = d.option(tag, label, "candidate", nominator=nominator or None, position=number(position), ident=ident)
+        if d.first(tag, ident):
+            d.candidate(tag, option, f"{tag}:{ident}", label, nominator=nominator or None)
+        if unit is not None:
+            d.value(tag, unit, option, 1, number(votes))
+        return option
+
+    # Mayors
+    for row in _txt(name, "polgsf"):
+        area = area_of(row[0], row[2], row[3])
+        nums, _ = _numbers(row[5:])
+        accounting(local.contest("mayor", area), d.unit(area, row[4]), nums)
+    for row in _txt(name, "polgsj"):
+        area = areas[(row[0], row[1])]
+        nominator = ",".join(nominators.get(("polg", row[0], row[1], row[3]), []))
+        candidate(local.contest("mayor", area), d.unit(area, row[2]), row[3], row[4], row[5], row[6], nominator)
+    for row in _txt(name, "polgoj"):
+        if (row[0], row[1]) not in areas:
+            continue
+        tag = local.contest("mayor", areas[(row[0], row[1])])
+        option = d.options.get((tag, seat_key(row[2], f"{row[3]} {row[4]}")))
+        if option and number(row[6]):
+            d.outcome(tag, option, "elected")
+    # Lord Mayor of Budapest
+    for row in _txt(name, "fopolgsf"):
+        area = area_of("01", row[0], row[2])
+        nums, _ = _numbers(row[3:])
+        accounting(local.contest("lord-mayor", "01"), d.unit(area, row[1]), nums)
+    for row in _txt(name, "fopolgsj"):
+        area = areas[("01", row[0])]
+        nominator = ",".join(nominators.get(("fopolg", row[2]), []))
+        candidate(local.contest("lord-mayor", "01"), d.unit(area, row[1]), row[2], row[3], row[4], row[5], nominator)
+    for row in _txt(name, "fopolgoj"):
+        tag = local.contest("lord-mayor", "01")
+        option = d.options.get((tag, seat_key(row[0], f"{row[1]} {row[2]}")))
+        if option and number(row[4]):
+            d.outcome(tag, option, "elected")
+    # Single-member wards
+    for row in _txt(name, "ejelersf"):
+        area = area_of(row[0], row[2], row[3])
+        nums, _ = _numbers(row[6:])
+        accounting(local.contest("ward", area, row[4]), d.unit(area, row[5]), nums)
+    for row in _txt(name, "ejelersj"):
+        area = areas[(row[0], row[1])]
+        nominator = ",".join(nominators.get(("ejeler", row[0], row[1], row[2], row[4]), []))
+        tag = local.contest("ward", area, row[2])
+        candidate(tag, d.unit(area, row[3]), row[4], row[5], row[6], row[7], nominator)
+    for row in _txt(name, "ejelerej"):
+        if (row[0], row[1]) not in areas:
+            continue
+        tag = local.contest("ward", areas[(row[0], row[1])], row[2])
+        option = d.options.get((tag, seat_key(row[3], f"{row[4]} {row[5]}")))
+        if option and number(row[7]):
+            d.outcome(tag, option, "elected")
+    # Councils of settlements up to 10,000 inhabitants (block vote)
+    for row in _txt(name, "kislersf"):
+        area = area_of(row[0], row[2], row[3])
+        nums, _ = _numbers(row[5:])
+        accounting(local.contest("council", area, magnitude=None), d.unit(area, row[4]), nums[:-1])
+    for row in _txt(name, "kislersj"):
+        area = areas[(row[0], row[1])]
+        nominator = ",".join(nominators.get(("kisler", row[0], row[1], row[3]), []))
+        candidate(
+            local.contest("council", area, magnitude=None),
+            d.unit(area, row[2]),
+            row[3],
+            row[4],
+            row[5],
+            row[6],
+            nominator,
+        )
+    for row in _txt(name, "kislerej"):
+        if (row[0], row[1]) not in areas:
+            continue
+        tag = local.contest("council", areas[(row[0], row[1])], magnitude=None)
+        option = d.options.get((tag, seat_key(row[2], f"{row[3]} {row[4]}")))
+        if option and number(row[6]):
+            d.outcome(tag, option, "elected")
+    # County and Budapest assembly lists
+    for row in _txt(name, "kozgysf"):
+        area = area_of(row[0], row[2], row[3])
+        nums, _ = _numbers(row[7:])
+        role = LIST_KINDS[row[5]]
+        tag = local.contest(role, row[0], magnitude=None)
+        accounting(tag, d.unit(area, row[4]), nums)
+    for row in _txt(name, "kozgysl"):
+        area = areas[(row[0], row[1])]
+        tag = local.contest(LIST_KINDS[row[3]], row[0], magnitude=None)
+        ident = str(number(row[4]))
+        option = d.option(tag, row[5], "list", nominator=row[5], position=number(row[4]), ident=ident)
+        d.value(tag, d.unit(area, row[2]), option, 1, number(row[6]))
+    for row in _txt(name, "kozgyol"):
+        tag = local.contest(LIST_KINDS[row[1]], row[0], magnitude=None)
+        option = d.options.get((tag, str(number(row[2]))))
+        if option is not None:
+            d.declare(tag, option, 1, number(row[4]))
+            if number(row[5]):
+                d.outcome(tag, option, "won", number(row[5]))
+    # Minority self-governments: candidate votes per polling station; seats from the settlement protocols
+    nations: dict[str, str] = {}
+    for row in _txt(name, "kisersf"):
+        code, nation = (row[4], row[6]) if year == 2002 else (row[5], row[6])
+        nations[code] = nation.strip().capitalize()
+        area_of(row[0], row[2], row[3])
+    for row in _txt(name, "kisersj"):
+        if year == 2002:
+            maz, taz, code, _, sorsz, position, title, printed, votes = row[:9]
+        else:
+            maz, taz, sorsz, code, position, title, printed, votes = row[:8]
+        area = areas.get((maz, taz)) or area_of(maz, taz, "")
+        tag = nationality_contest(local, "settlement", area, nations.get(code, code))
+        candidate(tag, d.unit(area, sorsz), position, title, printed, votes, "")
+    for row in _txt(name, "kiserej"):
+        area = areas.get((row[0], row[1]))
+        if area is None:
+            continue
+        tag = nationality_contest(local, "settlement", area, nations.get(row[2], row[2]))
+        option = d.options.get((tag, seat_key(row[3], f"{row[4]} {row[5]}")))
+        if option and number(row[7]):
+            d.outcome(tag, option, "elected")
+
+
+for _year, (_, _day) in MID_LOCAL.items():
+    OTHER.append((_day, f"{_year} local and minority elections", mid_local))
+
+
+OLD_LOCAL = {1994: ("1994_onkormanyzati", date(1994, 12, 11)), 1998: ("1998_onkormanyzati", date(1998, 10, 18))}
+# Column positions of the settlement-level candidate files: position, name cells, votes, won flag, nominator.
+OLD_LOCAL_ITEMS = {
+    1994: {
+        "polgmjel": (4, (6,), 7, 8, 11),
+        "ejeleret": (5, (7,), 8, 9, 12),
+        "kisljel": (4, (6,), 7, 8, 11),
+        "fopolgt": (0, (2,), 3, 4, 7),
+        "kiseretj": (7, (8,), 13, 11, 10),
+    },
+    1998: {
+        "polgmjel": (4, (6, 7), 8, 9, 12),
+        "ejeleret": (5, (7, 8), 9, 10, 13),
+        "kisljel": (4, (6, 7), 8, 9, 12),
+        "fopolgt": (0, (2, 3), 4, 5, 8),
+        "kiseretj": (7, (8, 9), 14, 12, 11),
+    },
+}
+OLD_LIST_KINDS = {"A": "county-list", "B": "budapest-list", "C": "county-list-large"}
+
+
+def old_local(d: Day) -> None:
+    year = d.day.year
+    name, _ = OLD_LOCAL[year]
+    d.cite(ARCHIVE)
+    local = Local(d, year)
+    found = places()
+    spec = OLD_LOCAL_ITEMS[year]
+
+    def stem(text_: str) -> list[list[str]]:
+        rows = [row for path in bundle(name) if path.split("/")[-1] == f"{text_}.txt" for row in piped(name, path)]
+        return rows
+
+    def accounting(tag: str, unit: str, cells: list[str], extra: int = 0) -> None:
+        nums, _ = _numbers(cells)
+        nums = nums[: len(nums) - extra] if extra else nums
+        d.accounting(tag, unit, nums[-6] if len(nums) == 9 else nums[-7], nums[-5], nums[-4], nums[-2], nums[-1])
+
+    def items(file: str, tag_of: Callable[[list[str]], tuple[str, str] | None]) -> None:
+        position_at, name_at, votes_at, won_at, nominator_at = spec[file]
+        for row in stem(file):
+            target = tag_of(row)
+            if target is None:
+                continue
+            tag, unit = target
+            label = " ".join(row[i] for i in name_at if row[i]).strip()
+            nominator = row[nominator_at].replace(";", ",") if nominator_at < len(row) else ""
+            ident = seat_key(row[position_at], label)
+            option = d.option(
+                tag, label, "candidate", nominator=nominator or None, position=number(row[position_at]), ident=ident
+            )
+            if d.first(tag, ident):
+                d.candidate(tag, option, f"{tag}:{ident}", label, nominator=nominator or None)
+            d.value(tag, unit, option, 1, number(row[votes_at]))
+            if row[won_at] == "1":
+                d.outcome(tag, option, "elected")
+
+    areas: dict[tuple[str, str], str] = {}
+
+    def area_of(row: list[str]) -> str:
+        index = (row[0], row[2])
+        if index not in areas:
+            areas[index] = found.resolve(county_key(row[1]), None, row[3], trust_code=False)
+        return areas[index]
+
+    for row in stem("polgmfej"):
+        area = area_of(row)
+        accounting(local.contest("mayor", area), d.settlement_unit(area), row[6:])
+    items("polgmjel", lambda row: (local.contest("mayor", area_of(row)), d.settlement_unit(area_of(row))))
+    for row in stem("ejelere"):
+        area = area_of(row)
+        accounting(local.contest("ward", area, row[4]), d.settlement_unit(area), row[7:])
+    items("ejeleret", lambda row: (local.contest("ward", area_of(row), row[4]), d.settlement_unit(area_of(row))))
+    for row in stem("kislfej"):
+        area = area_of(row)
+        accounting(
+            local.contest("council", area, magnitude=None), d.settlement_unit(area), row[6:], 1 if year == 1994 else 3
+        )
+    items(
+        "kisljel",
+        lambda row: (local.contest("council", area_of(row), magnitude=None), d.settlement_unit(area_of(row))),
+    )
+    budapest = county_unit(d, "01")
+    for row in stem("fopolgf"):
+        accounting(local.contest("lord-mayor", "01"), budapest, row[2:])
+    items("fopolgt", lambda row: (local.contest("lord-mayor", "01"), budapest))
+    for row in stem("tlisere"):
+        maz = county_key(row[1])
+        role = OLD_LIST_KINDS.get(
+            row[2], {"1": "county-list", "2": "county-list-large", "3": "budapest-list"}.get(row[2])
+        )
+        if role is None:
+            continue
+        tag = local.contest(role, maz, magnitude=None)
+        accounting(tag, county_unit(d, maz, f":{row[2]}"), row[6:], 1 if year == 1994 else 3)
+    for row in stem("tliseret"):
+        maz = county_key(row[1])
+        role = OLD_LIST_KINDS.get(
+            row[2], {"1": "county-list", "2": "county-list-large", "3": "budapest-list"}.get(row[2])
+        )
+        if role is None:
+            continue
+        tag = local.contest(role, maz, magnitude=None)
+        label, votes, seats = (row[6], row[7], row[8]) if year == 1994 else (row[6], row[9], row[10])
+        option = d.option(tag, label, "list", nominator=label, position=number(row[4]), ident=str(number(row[4])))
+        d.value(tag, county_unit(d, maz, f":{row[2]}"), option, 1, number(votes))
+        if number(seats):
+            d.outcome(tag, option, "won", number(seats))
+    items(
+        "kiseretj",
+        lambda row: (
+            nationality_contest(local, "settlement", area_of(row), row[5].capitalize()),
+            d.settlement_unit(area_of(row)),
+        ),
+    )
+
+
+for _year, (_, _day) in OLD_LOCAL.items():
+    OTHER.append((_day, f"{_year} local and minority elections", old_local))
