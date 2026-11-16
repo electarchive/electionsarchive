@@ -79,7 +79,10 @@ export async function rebuild(targets: Array<string> = []) {
           const found = await traced(async () => record({ id }));
           const rows = await db.execute<{ id: string }>(sql`
             select id::text as id from entity
-            where id = any(${sql.param(found.deps ?? [])}::uuid[]) and type in ('party', 'person')
+            where id = any(array(
+              select k::uuid from unnest(${sql.param(found.deps ?? [])}::text[]) k
+              where k ~* '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
+            )) and type in ('party', 'person')
           `);
           const named = new Set(rows.rows.map((row) => row.id));
           const deps =
