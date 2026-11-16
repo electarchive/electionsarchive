@@ -17,7 +17,7 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "wikidata"
-VERSION = "20"
+VERSION = "21"
 TITLE = "Political parties and their colors"
 HAND_COLORS = Path(__file__).with_name("tr_party_colors.tsv")
 HAND_POSITIONS = Path(__file__).with_name("tr_party_positions.tsv")
@@ -587,8 +587,11 @@ def _countries() -> dict[str, tuple[str | None, str]]:
                where po.kind = 'sovereign_state' and po.iso_code ~ '^[A-Z]{2}$'
                group by po.iso_code, x.value"""
         ).fetchall():
-            languages = ", ".join(f'"{lang}"' for lang in dict.fromkeys(["en", "mul", *sorted(native)]))
-            found.setdefault(str(iso), (str(item), languages))
+            known, languages = found.get(str(iso), (str(item), '"en", "mul"'))
+            found[str(iso)] = (
+                known,
+                ", ".join(dict.fromkeys([*languages.split(", "), *(f'"{lang}"' for lang in sorted(native))])),
+            )
     return found
 
 
@@ -621,7 +624,7 @@ def _rows(url: str) -> list[dict[str, str]]:
 
 def _norm(text: str) -> str:
     folded = unicodedata.normalize("NFKD", text.replace("ı", "i").replace("İ", "i").lower().replace("&", " and "))
-    return " ".join(re.findall(r"[a-z0-9]+", "".join(c for c in folded if not unicodedata.combining(c))))
+    return " ".join(re.findall(r"[^\W_]+", unicodedata.normalize("NFKC", re.sub("[\u0300-\u036f]", "", folded))))
 
 
 def _year(value: str | None) -> int | None:

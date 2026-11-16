@@ -4,7 +4,6 @@ import re
 import unicodedata
 from collections import Counter, defaultdict
 from datetime import date, datetime, timedelta
-from itertools import pairwise
 from pathlib import Path
 from uuid import UUID
 
@@ -12,28 +11,12 @@ from ea import names, raw
 from ea.changeset import Changeset
 from ea.sources.gb import members as commons
 from ea.sources.gb import mnis, wikidata_links
-from ea.sources.us.wikidata_links import NICKNAMES
 from ea.store import connect
 
 SOURCE = "identity"
 VERSION = "3"
 NEAR = 12 * 366
-LONG_GAP = 24 * 365
-LONG_SPAN = 50 * 365
-MATCHED = ("tr.", "br.")
 SUFFIXES = {"jr", "sr", "ii", "iii", "iv"}
-IDENTITIES = (
-    "bioguide",
-    "wikidata",
-    "mnis",
-    "ep.mep",
-    "lop.person",
-    "fec.candidate",
-    "us.klarner.person",
-    "us.alged.person",
-    "us.elstats_local.person",
-)
-STRONG = ("bioguide", "wikidata", "mnis", "ep.mep", "lop.person", "fec.candidate")
 PARTIES = {
     "Colorado's Commonwealth Party, 1930": (
         "6a73b7d9-da80-5785-ac0b-c40a34ad2fc2",
@@ -1950,34 +1933,6 @@ def emit() -> Path:
                 "select distinct pipeline from changeset where status in ('draft', 'pending_review')"
             ).fetchall()
         }
-        rows: list[tuple[UUID, str | None, UUID, UUID | None, UUID | None, date, str]] = conn.execute(
-            """select cy.person_id, coalesce(cy.ballot_name, n.text), k.district_area_id, k.office_id, k.body_id,
-                      e.date_from, c.pipeline
-               from candidacy cy
-               join contest_option o on o.id = cy.option_id
-               join contest k on k.id = o.contest_id
-               join election e on e.id = k.election_id
-               join changeset c on c.id = cy.changeset_id
-               left join lateral (select text from name where entity_id = cy.person_id and is_preferred limit 1) n
-                 on true
-               where not exists (select from entity_merge m where m.entity_id = cy.person_id)"""
-        ).fetchall()
-        sole: set[UUID] = {
-            office
-            for (office,) in conn.execute(
-                """select k.office_id from contest k join office f on f.id = k.office_id
-                   join entity e on e.id = k.id and e.retired_by is null
-                   where k.district_area_id is null and f.kind <> 'head_of_state'
-                   group by k.office_id having count(*) = count(distinct (k.election_id, k.party_scope_id))"""
-            ).fetchall()
-        }
-        held: dict[UUID, dict[str, set[str]]] = defaultdict(dict)
-        for person, scheme, value in conn.execute(
-            """select entity_id, scheme, value from external_id
-               where scheme = any(%s) or scheme = 'us.nnv.person' and value ~ '^[A-Z]{2}[0-9]{4}' and value !~ '^AA0000'""",
-            [list(IDENTITIES)],
-        ).fetchall():
-            held[person].setdefault(scheme, set()).add(value)
         created: dict[UUID, datetime] = dict(
             conn.execute("select id, created_at from entity where type = 'person'").fetchall()
         )
@@ -1992,151 +1947,12 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary=(
-                "People recorded once per source or per race joined into one person where the same printed name "
-                "(ignoring case, accents, middle initials, and a common nickname such as Bill for William, or a first "
-                "name printed as its initial when one person on the race line fits it) ran for the same office or body in the same "
-                "district (or, for an office elected without one, the same office) within 12 years, and nothing tells them apart (no race for another seat within 60 days, and no "
-                "first name on either record that the other's names cannot be), and party labels of one state or country "
-                "that sources spelled apart joined by hand"
+                "Members of the House of Commons joined across seats and by-elections, people and party labels of one "
+                "state or country that sources spelled apart joined by hand, and preferred names tidied"
             ),
             polity=None,
             kind="match",
         )
-
-        dates: dict[UUID, list[date]] = defaultdict(list)
-        seats: dict[UUID, set[tuple[date, object, object, object]]] = defaultdict(set)
-        given: dict[UUID, set[str]] = defaultdict(set)
-        pipelines: dict[UUID, set[str]] = defaultdict(set)
-        lines: dict[tuple[object, ...], dict[UUID, list[date]]] = defaultdict(lambda: defaultdict(list))
-        initials: dict[tuple[tuple[object, ...], UUID], set[frozenset[str]]] = defaultdict(set)
-        canon = {"rudy": "rudolph", "rudi": "rudolph"} | {
-            form: first
-            for first, forms in NICKNAMES.items()
-            for form in forms.split()
-            if form not in {"kathleen", "jon", "bert"}
-        }
-        for person, text, area, office, body, day, pipeline in rows:
-            dates[person].append(day)
-            pipelines[person].add(pipeline)
-            if area is None and office in sole:
-                area = office
-            if text is None or area is None or (office is None and body is None) or pipeline.startswith(MATCHED):
-                continue
-            named = words(text)
-            if named is None:
-                continue
-            first, rest = named[0].split(" ", 1)
-            seats[person].add((day, area, office, body))
-            given[person].add(first)
-            line = (area, office, body, f"{canon.get(first, first)} {rest}")
-            lines[line][person].append(day)
-            if named[1]:
-                initials[line, person].add(named[1])
-        spelled: dict[tuple[object, ...], list[tuple[object, ...]]] = defaultdict(list)
-        for line in lines:
-            first, rest = line[3].split(" ", 1)
-            if len(first) > 1:
-                spelled[*line[:3], rest, first[0]].append(line)
-        for line in [line for line in lines if len(line[3].split(" ", 1)[0]) == 1]:
-            first, rest = line[3].split(" ", 1)
-            fits = spelled.get((*line[:3], rest, first), [])
-            if len(fits) != 1 or len(lines[fits[0]]) != 1:
-                continue
-            for person, days in lines.pop(line).items():
-                lines[fits[0]][person].extend(days)
-                if (line, person) in initials:
-                    initials[fits[0], person] |= initials.pop((line, person))
-
-        def suspect(person: UUID) -> bool:
-            days = sorted(dates[person])
-            gaps = [(later - earlier).days for earlier, later in pairwise(days)]
-            return (
-                bool(pipelines[person] & busy)
-                or (days[-1] - days[0]).days > LONG_SPAN
-                or max(gaps, default=0) > LONG_GAP
-            )
-
-        parent: dict[UUID, UUID] = {}
-
-        def root(node: UUID) -> UUID:
-            parent.setdefault(node, node)
-            while parent[node] != node:
-                parent[node] = parent[parent[node]]
-                node = parent[node]
-            return node
-
-        considered: set[UUID] = set()
-        blocked: list[tuple[UUID, UUID]] = []
-        for line, people in lines.items():
-            if len(people) < 2:
-                continue
-            members = [person for person in people if not suspect(person)]
-            for index, person in enumerate(members):
-                for other in members[index + 1 :]:
-                    signed = initials[line, person] | initials[line, other]
-                    births = {born[one] for one in (person, other) if one in born}
-                    posthumous = any(
-                        one in died and (max(dates[two], default=died[one]) - died[one]).days > 365
-                        for one, two in ((person, other), (other, person))
-                    )
-                    rival = any(
-                        abs((one[0] - two[0]).days) <= 60 and one[1:] != two[1:]
-                        for one in seats[person]
-                        for two in seats[other]
-                    )
-                    strangers = any(
-                        not (
-                            one == two
-                            or canon.get(one, one) == canon.get(two, two)
-                            or (len(one) == 1 or len(two) == 1)
-                            and one[0] == two[0]
-                            or one.startswith(two)
-                            or two.startswith(one)
-                        )
-                        for one in given[person]
-                        for two in given[other]
-                    )
-                    if (
-                        set(dates[person]) & set(dates[other])
-                        or rival
-                        or strangers
-                        or len(signed) > 1
-                        or len(births) > 1
-                        or posthumous
-                    ):
-                        blocked.append((person, other))
-                        continue
-                    if min(abs((a - b).days) for a in people[person] for b in people[other]) <= NEAR:
-                        considered.update((person, other))
-                        parent[root(person)] = root(other)
-
-        groups: dict[UUID, list[UUID]] = defaultdict(list)
-        for person in considered:
-            groups[root(person)].append(person)
-        refused = {root(a) for a, b in blocked if a in parent and b in parent and root(a) == root(b)}
-        merged = skipped = 0
-        for key, people in groups.items():
-            schemes = defaultdict(set)
-            for person in people:
-                for scheme, values in held[person].items():
-                    schemes[scheme] |= values
-            if key in refused or any(len(values) > 1 for values in schemes.values()):
-                skipped += 1
-                continue
-            survivor = max(
-                people,
-                key=lambda person: (
-                    any(scheme in held[person] for scheme in STRONG),
-                    len(dates[person]),
-                    -created[person].timestamp(),
-                    -person.int,
-                ),
-            )
-            for person in people:
-                if person != survivor:
-                    cs.merge(person, survivor)
-                    merged += 1
-        print(f"{len(groups)} groups, {merged} merged, {skipped} skipped, deferred pipelines: {sorted(busy)}")
 
         if not {"gb.byelections", "gb.umit"} <= busy:
             lineage: dict[UUID, UUID] = {}

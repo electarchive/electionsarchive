@@ -3,7 +3,7 @@ import json
 import time
 from collections import defaultdict
 from pathlib import Path
-from urllib.parse import quote, unquote, urlparse
+from urllib.parse import quote, unquote, urlencode, urlparse
 from uuid import UUID
 
 from ea import raw
@@ -11,7 +11,7 @@ from ea.changeset import Changeset
 from ea.store import DATA, connect
 
 SOURCE = "partyfacts"
-VERSION = "1"
+VERSION = "2"
 PUBLISHER = "Party Facts (Döring and Regel)"
 TITLE = "Party Facts: core and external parties, 2025 release"
 LANDING = "https://partyfacts.herokuapp.com/"
@@ -22,42 +22,9 @@ WIKIDATA = "Wikidata"
 WIKIDATA_TITLE = "Wikidata items of the Wikipedia pages that Party Facts cites"
 BATCH = 50
 ATTRIBUTION = "Döring, Holger, and Sven Regel. 2019. Party Facts: A database of political parties worldwide. Party Politics 25(2): 97-109."
-COUNTRIES = {
-    "AT": "AUT",
-    "BE": "BEL",
-    "BG": "BGR",
-    "BR": "BRA",
-    "CA": "CAN",
-    "CH": "CHE",
-    "CY": "CYP",
-    "CZ": "CZE",
-    "DE": "DEU",
-    "DK": "DNK",
-    "EE": "EST",
-    "ES": "ESP",
-    "FI": "FIN",
-    "FR": "FRA",
-    "GB": "GBR",
-    "GR": "GRC",
-    "HR": "HRV",
-    "HU": "HUN",
-    "IE": "IRL",
-    "IT": "ITA",
-    "LT": "LTU",
-    "LU": "LUX",
-    "LV": "LVA",
-    "MT": "MLT",
-    "NL": "NLD",
-    "PL": "POL",
-    "PT": "PRT",
-    "RO": "ROU",
-    "SE": "SWE",
-    "SI": "SVN",
-    "SK": "SVK",
-    "TR": "TUR",
-    "US": "USA",
-}
-ISO2 = {iso3: iso2 for iso2, iso3 in COUNTRIES.items()}
+CODES = "https://query.wikidata.org/sparql?" + urlencode(
+    {"query": "SELECT ?iso2 ?iso3 WHERE { ?country wdt:P297 ?iso2 ; wdt:P298 ?iso3 . }", "format": "json"}
+)
 NATIONAL = DATA / "tmp"
 
 
@@ -74,10 +41,20 @@ def _page(link: str) -> tuple[str, str] | None:
     return host[0] + "wiki", unquote(parsed.path[len("/wiki/") :]).replace("_", " ")
 
 
+def _iso2() -> dict[str, str]:
+    rows = json.loads(raw.cached(SOURCE, CODES).path.read_text())["results"]["bindings"]
+    return {row["iso3"]["value"]: row["iso2"]["value"] for row in rows}
+
+
+def _core() -> list[dict[str, str]]:
+    iso2 = _iso2()
+    return [row for row in _rows(raw.cached(SOURCE, CORE)) if row["country"] in iso2]
+
+
 def _pages(core: list[dict[str, str]]) -> dict[str, list[str]]:
     pages: dict[str, set[str]] = defaultdict(set)
     for row in core:
-        if row["country"] in ISO2 and (page := _page(row["wikipedia"])):
+        if page := _page(row["wikipedia"]):
             pages[page[0]].add(page[1])
     return {site: sorted(titles) for site, titles in pages.items()}
 
@@ -99,10 +76,11 @@ def _urls(core: list[dict[str, str]]) -> list[tuple[str, list[str], str]]:
 
 
 def fetch() -> None:
-    core = _rows(raw.fetch(SOURCE, CORE, suffix=".csv"))
+    raw.fetch(SOURCE, CORE, suffix=".csv")
     raw.fetch(SOURCE, EXTERNAL, suffix=".csv")
+    raw.fetch(SOURCE, CODES, suffix=".json")
     held = raw.keys(SOURCE)
-    for _, _, url in _urls(core):
+    for _, _, url in _urls(_core()):
         if url not in held:
             raw.fetch(SOURCE, url, suffix=".json")
             time.sleep(1)
@@ -128,12 +106,13 @@ def _qids(core: list[dict[str, str]]) -> dict[str, str]:
 
 
 def emit() -> Path:
-    core = [row for row in _rows(raw.cached(SOURCE, CORE)) if row["country"] in ISO2]
+    iso2 = _iso2()
+    core = _core()
     external = _rows(raw.cached(SOURCE, EXTERNAL))
     qids = _qids(core)
     parlgov: dict[str, set[str]] = defaultdict(set)
     for row in external:
-        if row["dataset_key"] == "parlgov" and row["country"] in ISO2:
+        if row["dataset_key"] == "parlgov" and row["country"] in iso2:
             parlgov[row["dataset_party_id"]].add(row["partyfacts_id"])
     routes: dict[str, list[tuple[str, str, str]]] = defaultdict(list)
     for row in core:
@@ -162,7 +141,7 @@ def emit() -> Path:
         for pf, found in routes.items():
             for route, item, country in found:
                 hit = by_item.get(item)
-                if hit and hit[1].upper() in ("", ISO2[country]):
+                if hit and hit[1].upper() in ("", iso2[country]):
                     candidates[pf][hit[0]].add((route, item))
         for value, ids in parlgov.items():
             hit = by_parlgov.get(value)
