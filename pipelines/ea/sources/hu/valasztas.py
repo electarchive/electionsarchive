@@ -2778,9 +2778,108 @@ def nationality_2019(d: Day) -> None:
     nationality_settlements(d, Local(d, 2019))
 
 
+NATIONALITY_LISTS_2024 = "2024_nemzetisegi"
+NATIONALITY_LISTS_FILE = "2024.xls"
+
+
+def nationality_lists(d: Day, local: Local) -> None:
+    """National and territorial nationality lists, by settlement within each county.
+
+    One sheet per nationality holds two blocks. The national block gives the nationwide total, the county totals, and
+    the settlement lines of the national lists; the territorial block gives, for each county, the county total and its
+    settlement lines. Each line also has a counting-committee line ("TVB számlálás jegyzőkönyve") for the ballots the
+    committee counted itself. The office prints the lists by number only.
+    """
+    name = NATIONALITY_LISTS_2024
+    found = places()
+    book = sheets(name, NATIONALITY_LISTS_FILE)
+    roll = {str(row["nemznev"]): row for row in _items(vtr_json("onk2024", "ver", "NemzVal.json")["list"])}
+    for nation in NATIONS:
+        rows = book.get(nation)
+        if rows is None:
+            raise LookupError(f"{nation}: no sheet in the national and territorial workbook")
+        level = ""
+        header: list[str] = []
+        seats: Counter[str] = Counter()
+        for row in rows:
+            row = row + [""] * (len(header) - len(row))
+            heading = row[2].strip() if len(row) > 2 else ""
+            if heading.startswith("Országos nemzetiségi"):
+                level = "national"
+                continue
+            if heading.startswith("Területi nemzetiségi"):
+                level = "territorial"
+                continue
+            if row[0] == "Vármegye":
+                header = row
+                continue
+            if not level or not header or number(row[4]) is None:
+                continue
+            county_name, place = row[0].strip(), row[1].strip()
+            lists = [
+                (index, int(header[index])) for index in range(12, len(header), 2) if header[index].strip().isdigit()
+            ]
+            if level == "national" and not county_name:
+                maz, tag = None, nationality_contest(local, "national", "HU", nation)
+            else:
+                maz = county_key(county_name)
+                if level == "national" and place == "---":
+                    continue  # a county total of the national lists; the settlement lines carry the same votes
+                tag = nationality_contest(local, level, "HU" if level == "national" else maz, nation)
+            if place == "---":
+                total = tag
+                d.declare(total, None, 4, number(row[11]))
+                for index, position in lists:
+                    option = d.option(tag, f"{position}. lista", "list", position=position, ident=str(position))
+                    d.declare(total, option, 1, number(row[index]))
+                    won = number(row[index + 1])
+                    if won:
+                        d.outcome(total, option, "won", won)
+                        seats[tag] += won
+                continue
+            assert maz is not None
+            if place.startswith("TVB "):
+                unit = d.special_unit(f"nemz-tvb:{maz}", "standard")
+            else:
+                area = found.resolve(maz, None, place, trust_code=False)
+                unit = d.settlement_unit(area)
+            d.accounting(
+                tag,
+                unit,
+                number(row[4]),
+                number(row[5]),
+                number(row[8]),
+                number(row[10]),
+                number(row[11]),
+            )
+            for index, position in lists:
+                option = d.option(tag, f"{position}. lista", "list", position=position, ident=str(position))
+                d.value(tag, unit, option, 1, number(row[index]))
+        expected = roll[nation]
+        national = seats[f"nemz:2024:national:HU:{changeset.slug(nation)}"]
+        if national != expected.get("mandatum"):
+            print(
+                f"nationality lists {nation}: national seats {national}, NemzVal.json says {expected.get('mandatum')}"
+            )
+    for tag, result_set in d.sets.items():
+        if tag.startswith(("nemz:2024:national:", "nemz:2024:territorial:")):
+            d.p.add(
+                "note",
+                id=key("note", result_set, "unnamed"),
+                entity_id=result_set,
+                kind="caveat",
+                body_md="The office publishes these results by settlement and by list number, without the lists' "
+                "names; the options are named by that number. Lines headed as the counting committee's protocol "
+                "hold the ballots that committee counted itself, and are kept as separate units.",
+                lang="en",
+            )
+
+
 def nationality_2024(d: Day) -> None:
     d.cite(ARCHIVE)
-    nationality_settlements(d, Local(d, 2024))
+    local = Local(d, 2024)
+    nationality_settlements(d, local)
+    nationality_lists(d, local)
 
 
 OTHER.append((date(2019, 10, 13), "2019 nationality elections", nationality_2019))
