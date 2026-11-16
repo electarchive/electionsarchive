@@ -552,9 +552,10 @@ CHECKS = {
                       group by all having count(*) > 1""",
     "fact.negative": "select * from result_value where value < 0",
     "fact.option_contest": """select v.result_set_id, v.option_id from result_value v
-                              join all_result_set r on r.id = v.result_set_id
                               join all_contest_option o on o.id = v.option_id
-                              where o.contest_id <> r.contest_id""",
+                              where exists (select 1 from all_result_set r where r.id = v.result_set_id)
+                                and not exists (select 1 from all_result_set r
+                                                where r.id = v.result_set_id and r.contest_id = o.contest_id)""",
     "fact.party_color": "select party_id, color from party_color where not regexp_full_match(color, '#[0-9a-f]{6}')",
     "fact.note_kind": """select id, kind from note
                          where kind not in ('context', 'caveat', 'methodology', 'editorial', 'retired')""",
