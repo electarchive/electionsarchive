@@ -1,0 +1,2148 @@
+"""Hungary's national elections from the National Election Office (Nemzeti Választási Iroda, valasztas.hu).
+
+Elections from 1990 to 2024 come from the office's archive of processable results, one bundle per election in the
+format the office used that year (pipe-separated text, CSV, or spreadsheets). Elections the archive does not hold yet,
+and the 2022 and 2026 parliamentary elections, come from the office's results service (vtr.valasztas.hu), whose
+per-settlement polling-station files are crawled once and kept unchanged in one zip per election.
+"""
+
+import functools
+import html
+import io
+import json
+import re
+import unicodedata
+import zipfile
+from collections import Counter, defaultdict
+from collections.abc import Callable, Iterable, Iterator
+from concurrent.futures import ThreadPoolExecutor
+from dataclasses import dataclass, field
+from datetime import UTC, date, datetime
+from typing import cast
+from uuid import uuid5
+
+import fastexcel
+import httpx
+import polars as pl
+
+from ea import changeset, package, raw
+from ea.package import Package
+
+SOURCE = "hu.valasztas"
+ARCHIVE = "https://static.valasztas.hu/dyn/letoltesek/valasztasi_eredmenyek_1990-2024.zip"
+ARCHIVE_PAGE = "https://www.valasztas.hu/korabbi-valasztasok-feldolgozhato-adatai"
+VTR = "https://vtr.valasztas.hu"
+HUNGARY = "e62e9390-07d2-5939-8163-733a6ca2b373"
+TERRITORY = "59a0ba57-5c5c-5af8-9987-c96feb05b10a"
+ABROAD = "99"
+
+
+def key(kind: str, *parts: object) -> str:
+    return str(uuid5(package.NAMESPACE, "\x1f".join([SOURCE, kind, *(str(part) for part in parts)])))
+
+
+NVI = key("source", SOURCE)
+PARLIAMENT = key("body", "parliament")
+EP_BODY = key("body", "european-parliament")
+
+
+# ---------------------------------------------------------------------------------------------------------------
+# Raw files
+
+
+def _archive() -> zipfile.ZipFile:
+    return zipfile.ZipFile(raw.cached(SOURCE, ARCHIVE).path)
+
+
+def _decoded(info: zipfile.ZipInfo) -> str:
+    if info.flag_bits & 0x800:
+        return info.filename
+    try:
+        return info.filename.encode("cp437").decode("cp852")
+    except UnicodeError:
+        return info.filename
+
+
+@functools.cache
+def bundle(name: str) -> dict[str, bytes]:
+    """Every file of one election's bundle in the archive, keyed by its lowercased path inside the bundle."""
+    outer = _archive()
+    (inner,) = [i for i in outer.infolist() if _decoded(i).split("/")[-1].removesuffix(".zip") == name]
+    files: dict[str, bytes] = {}
+    with zipfile.ZipFile(io.BytesIO(outer.read(inner))) as archive:
+        for info in archive.infolist():
+            path = _decoded(info)
+            if info.is_dir() or "__MACOSX" in path:
+                continue
+            files[path.lower()] = archive.read(info)
+    return files
+
+
+def member(name: str, suffix: str) -> bytes:
+    found = [path for path in bundle(name) if path.endswith(suffix.lower())]
+    if len(found) != 1:
+        raise LookupError(f"{name}: {suffix} matches {found}")
+    return bundle(name)[found[0]]
+
+
+def text(data: bytes) -> str:
+    data = data.removeprefix(b"\xef\xbb\xbf")
+    try:
+        return data.decode("utf-8")
+    except UnicodeDecodeError:
+        return data.decode("cp1250")
+
+
+def piped(name: str, suffix: str) -> list[list[str]]:
+    return [
+        [cell.strip() for cell in line.split("|")] for line in text(member(name, suffix)).splitlines() if line.strip()
+    ]
+
+
+def delimited(name: str, suffix: str) -> list[dict[str, str]]:
+    body = text(member(name, suffix))
+    first = body.split("\n", 1)[0]
+    frame = pl.read_csv(
+        io.StringIO(body), separator=";" if first.count(";") > first.count(",") else ",", infer_schema_length=0
+    )
+    frame = frame.rename({column: column.strip().strip("'").strip() for column in frame.columns})
+    return [{k: (v or "").strip() for k, v in row.items()} for row in frame.iter_rows(named=True)]
+
+
+def sheets(name: str, suffix: str) -> dict[str, list[list[str]]]:
+    reader = fastexcel.read_excel(member(name, suffix))
+    out: dict[str, list[list[str]]] = {}
+    for sheet in reader.sheet_names:
+        frame = reader.load_sheet_by_name(sheet, header_row=None, dtypes="string").to_polars()
+        out[sheet] = [[_cell(value) for value in row] for row in frame.iter_rows()]
+    return out
+
+
+def _cell(value: object) -> str:
+    if value is None:
+        return ""
+    cell = str(value).strip()
+    return cell[:-2] if re.fullmatch(r"-?\d+\.0", cell) else cell
+
+
+def number(cell: str | None) -> int | None:
+    if cell is None:
+        return None
+    cell = cell.strip().replace(" ", "").replace("\xa0", "")
+    if not re.fullmatch(r"[+-]?\d+(\.0+)?", cell):
+        return None
+    return int(float(cell))
+
+
+# Results service (vtr.valasztas.hu): catalogs are fetched one by one; the per-settlement polling-station files are
+# crawled once per election and stored unchanged in one zip, keyed by the folder they came from.
+VTR_ELECTIONS = {
+    "ogy2022": ("04022333", "04161400"),
+    "ogy2026": ("04112100", "05071600"),
+    "ep2024": ("06091753", "06201531"),
+    "onk2024": ("06091753", "08021106"),
+}
+
+
+def vtr_url(election: str, part: str, name: str) -> str:
+    ver, final = VTR_ELECTIONS[election]
+    return f"{VTR}/{election}/data/{ver if part == 'ver' else final}/{part}/{name}"
+
+
+def vtr_json(election: str, part: str, name: str) -> dict[str, object]:
+    return cast(dict[str, object], json.loads(raw.cached(SOURCE, vtr_url(election, part, name)).path.read_bytes()))
+
+
+def _crawl_key(election: str) -> str:
+    return vtr_url(election, "szavossz", "") + "#SzavkorJkv"
+
+
+def vtr_settlements(election: str) -> list[dict[str, object]]:
+    rows = cast(list[dict[str, object]], vtr_json(election, "ver", "Telepulesek.json")["list"])
+    return [cast(dict[str, object], row.get("leiro", row)) for row in rows]
+
+
+@functools.cache
+def vtr_precincts(election: str) -> dict[str, dict[str, object]]:
+    """The crawled polling-station files of one election, keyed by MAZ and TAZ."""
+    out: dict[str, dict[str, object]] = {}
+    with zipfile.ZipFile(raw.cached(SOURCE, _crawl_key(election)).path) as archive:
+        for name in archive.namelist():
+            found = re.search(r"SzavkorJkv-(\d\d)-(\d\d\d)\.json$", name)
+            if found:
+                out[found[1] + found[2]] = json.loads(archive.read(name))
+    return out
+
+
+VTR_CATALOGS = {
+    "ogy2022": (
+        ["Telepulesek.json", "EgyeniJeloltek.json", "ListakEsJeloltek.json", "Szervezetek.json", "OevkAdatok.json"],
+        ["OevkJkv.json", "ListasJkv.json", "LevelJkv.json"],
+    ),
+    "ogy2026": (
+        ["Telepulesek.json", "EgyeniJeloltek.json", "ListakEsJeloltek.json", "Szervezetek.json", "OevkAdatok.json"],
+        ["OevkJkv.json", "ListasJkv.json", "LevelJkv.json"],
+    ),
+}
+
+
+def _crawl(election: str) -> None:
+    if _crawl_key(election) in raw.keys(SOURCE):
+        return
+    settlements = vtr_settlements(election)
+    _ver, final = VTR_ELECTIONS[election]
+
+    def get(entry: dict[str, object]) -> tuple[str, bytes | None]:
+        maz, taz = str(entry["maz"]), str(entry["taz"])
+        url = f"{VTR}/{election}/data/{final}/szavossz/{maz}/SzavkorJkv-{maz}-{taz}.json"
+        for _ in range(5):
+            try:
+                response = httpx.get(url, headers={"User-Agent": raw.USER_AGENT}, timeout=120)
+            except httpx.TransportError:
+                continue
+            if response.status_code == 404:
+                return url, None
+            response.raise_for_status()
+            return url, response.content
+        raise RuntimeError(f"{url} failed five times")
+
+    with ThreadPoolExecutor(8) as pool:
+        fetched = list(pool.map(get, settlements))
+    buffer = io.BytesIO()
+    with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as archive:
+        for url, content in sorted(fetched, key=lambda item: item[0]):
+            if content is None:
+                continue
+            info = zipfile.ZipInfo(url.removeprefix(f"{VTR}/"), date_time=(1980, 1, 1, 0, 0, 0))
+            info.compress_type = zipfile.ZIP_DEFLATED
+            archive.writestr(info, content)
+    missing = sum(content is None for _, content in fetched)
+    print(f"{election}: {len(fetched) - missing:,} polling-station files, {missing} settlements without one")
+    raw.store(
+        SOURCE,
+        _crawl_key(election),
+        buffer.getvalue(),
+        suffix=".zip",
+        retrieved_at=datetime.now(UTC),
+        media_type="application/zip",
+    )
+
+
+PV14 = "https://static.valasztas.hu/dyn/pv14/szavossz/hu/"
+PV14_PAGES = ("orszlist.html", "oevker.html")
+EP14 = "https://static.valasztas.hu/dyn/ep14/szavossz/hu/eredm.html"
+
+
+def table_rows(url: str, encoding: str = "iso-8859-2") -> list[list[str]]:
+    """The cells of every table row of a cached results page."""
+    page = raw.cached(SOURCE, url).path.read_bytes().decode(encoding)
+    rows = []
+    for row in re.findall(r"<tr[^>]*>(.*?)</tr>", page, flags=re.DOTALL | re.IGNORECASE):
+        cells = [
+            re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", cell))).strip()
+            for cell in re.findall(r"<t[dh][^>]*>(.*?)</t[dh]>", row, flags=re.DOTALL | re.IGNORECASE)
+        ]
+        if cells:
+            rows.append(cells)
+    return rows
+
+
+def fetch() -> None:
+    raw.fetch(SOURCE, ARCHIVE, suffix=".zip")
+    for page in PV14_PAGES:
+        raw.fetch(SOURCE, PV14 + page, suffix=".html")
+    raw.fetch(SOURCE, EP14, suffix=".html")
+    for election, (catalogs, results) in VTR_CATALOGS.items():
+        raw.fetch(SOURCE, f"{VTR}/{election}/data/config.json", suffix=".json")
+        for name in catalogs:
+            raw.fetch(SOURCE, vtr_url(election, "ver", name), suffix=".json")
+        for name in results:
+            raw.fetch(SOURCE, vtr_url(election, "szavossz", name), suffix=".json")
+        _crawl(election)
+
+
+# ---------------------------------------------------------------------------------------------------------------
+# Places
+
+COUNTIES = {
+    "01": "Budapest",
+    "02": "Baranya",
+    "03": "Bács-Kiskun",
+    "04": "Békés",
+    "05": "Borsod-Abaúj-Zemplén",
+    "06": "Csongrád-Csanád",
+    "07": "Fejér",
+    "08": "Győr-Moson-Sopron",
+    "09": "Hajdú-Bihar",
+    "10": "Heves",
+    "11": "Jász-Nagykun-Szolnok",
+    "12": "Komárom-Esztergom",
+    "13": "Nógrád",
+    "14": "Pest",
+    "15": "Somogy",
+    "16": "Szabolcs-Szatmár-Bereg",
+    "17": "Tolna",
+    "18": "Vas",
+    "19": "Veszprém",
+    "20": "Zala",
+}
+ROMAN = {"i": 1, "v": 5, "x": 10, "l": 50}
+
+
+def _roman(text: str) -> int:
+    total = 0
+    for index, char in enumerate(text):
+        value = ROMAN[char]
+        total += -value if index + 1 < len(text) and ROMAN[text[index + 1]] > value else value
+    return total
+
+
+def fold(name: str) -> str:
+    """A settlement name reduced for matching across spellings, cases, and accents."""
+    plain = unicodedata.normalize("NFC", name.lower()).replace("õ", "ő").replace("û", "ű").replace("ô", "ő")
+    found = re.match(r"\s*budapest\W*([ivxl]+|\d+)\b", plain)
+    if found:
+        part = found[1]
+        return f"budapest{int(part) if part.isdigit() else _roman(part)}"
+    plain = plain.translate(str.maketrans("íóőúű", "ioöuü"))
+    return re.sub(r"[^a-z0-9áéöü]", "", plain)
+
+
+def county_key(name: str) -> str:
+    folded = fold(name)
+    if folded.startswith("szolnok"):
+        return "11"
+    for code, county in COUNTIES.items():
+        own = fold(county)
+        if own.startswith(folded) or folded[:5] == own[:5]:
+            return code
+    raise LookupError(f"no county is named {name}")
+
+
+@dataclass
+class Places:
+    """Settlements: the current list from the results service, and every name the elections use."""
+
+    names: dict[str, str] = field(default_factory=dict)
+    by_name: dict[tuple[str, str], str] = field(default_factory=dict)
+    national: dict[str, set[str]] = field(default_factory=lambda: defaultdict(set))
+    used: dict[str, tuple[str, str]] = field(default_factory=dict)
+    historic: dict[str, tuple[str, str]] = field(default_factory=dict)
+
+    def add(self, code: str, name: str) -> None:
+        self.names.setdefault(code, name)
+        self.by_name.setdefault((code[:2], fold(name)), code)
+        self.national[fold(name)].add(code)
+
+    def resolve(self, maz: str, taz: str | None, name: str, trust_code: bool) -> str:
+        """The settlement area code for a settlement as one election names it."""
+        maz = maz.zfill(2)
+        code = None if taz is None else maz + taz.zfill(3)
+        folded = fold(name)
+        if code is not None and code in self.names and fold(self.names[code]) == folded:
+            found = code
+        elif (maz, folded) in self.by_name:
+            found = self.by_name[(maz, folded)]
+        elif len(self.national.get(folded, ())) == 1:
+            (found,) = self.national[folded]
+        elif trust_code and code is not None and code in self.names:
+            found = code
+        else:
+            found = f"{maz}-{changeset.slug(name)}"
+            self.historic[found] = (maz, name)
+        self.used[found] = (maz, name)
+        return found
+
+
+@functools.cache
+def places() -> Places:
+    found = Places()
+    for election in ("ogy2026", "ogy2022"):
+        for entry in vtr_settlements(election):
+            if str(entry["maz"]) != ABROAD:
+                found.add(f"{entry['maz']}{entry['taz']}", str(entry["megnev"]))
+    return found
+
+
+def settlement(code: str) -> str:
+    return key("area", "hu.telepules", code)
+
+
+def county(code: str) -> str:
+    return key("area", "hu.megye", code)
+
+
+def district(period: int, maz: str, oevk: str) -> str:
+    return key("area", "hu.oevk", period, maz, oevk)
+
+
+OEVK_NAMES: dict[tuple[int, str, str], str] = {}
+
+
+def oevk(period: int, maz: str, number: str, name: str | None = None) -> str:
+    maz, number = maz.zfill(2), number.zfill(2)
+    OEVK_NAMES.setdefault(
+        (period, maz, number), name or f"{COUNTIES[maz]} {'főváros' if maz == '01' else 'megye'} {number}. OEVK"
+    )
+    return district(period, maz, number)
+
+
+def oevk_period(day: date) -> int:
+    return 1990 if day.year < 2014 else 2014 if day.year < 2026 else 2026
+
+
+# ---------------------------------------------------------------------------------------------------------------
+# Parties
+
+PARTIES: dict[str, str] = {}
+INDEPENDENT = re.compile(r"^(FÜGG(ETLEN)?\.?( JELÖLT)?|FÜGGETLEN JELÖLT|független( jelölt)?|)$", re.IGNORECASE)
+
+
+def party_label(label: str) -> str:
+    return re.sub(r"\s+", " ", label.replace("|", ",")).strip(" ,")
+
+
+def party(label: str | None) -> str | None:
+    if label is None:
+        return None
+    label = party_label(label)
+    if INDEPENDENT.match(label):
+        return None
+    folded = label.upper()
+    PARTIES.setdefault(folded, label)
+    return key("party", folded)
+
+
+# ---------------------------------------------------------------------------------------------------------------
+# Building one election day
+
+
+def person_text(name: str) -> str:
+    name = re.sub(r"\s+", " ", name).strip()
+    if name.isupper():
+        name = " ".join(part.capitalize() if not re.fullmatch(r"[A-Z]+\.", part) else part for part in name.split())
+        name = re.sub(r"-(\w)", lambda m: "-" + m[1].upper(), name)
+    return name
+
+
+TITLES = re.compile(r"^((DR|IFJ|ID|ÖZV|PROF|ID\.)\.?\s+)+", re.IGNORECASE)
+
+
+def same_name(name: str) -> str:
+    return re.sub(r"[^A-ZÁÉÍÓÖŐÚÜŰ]", "", TITLES.sub("", re.sub(r"\s+", " ", name).strip()).upper())
+
+
+CAVEATS = {
+    "accounting.votes_valid": (
+        ("In {n} polling station{s} the votes for the options do not add up to the valid ballots in the office's file. "
+        "The figures are stored as printed."),
+        "the office's polling-station lines do not add up to the valid ballots it prints; stored as printed",
+    ),
+    "accounting.ballots_sum": (
+        ("In {n} polling station{s} the valid and invalid ballots do not add up to the ballots in the box in the "
+        "office's file. The figures are stored as printed."),
+        "the valid and invalid ballots the office prints do not add up to the ballots in the box; stored as printed",
+    ),
+    "accounting.turnout": (
+        ("In {n} polling station{s} more ballots were in the box than voters were on the roll at its close, because "
+        "voters with a certificate or a transfer voted there. The figures are stored as printed."),
+        "more ballots than voters on the station's roll, from voters who voted there with a certificate or transfer",
+    ),
+    "accounting.declared": (
+        ("{n} of the office's declared totals for this contest differ from the sum of its own polling-station lines. "
+        "Both are stored as published."),
+        "",
+    ),
+}
+
+
+class Day:
+    """One package: every election the office held on one date."""
+
+    def __init__(self, day: date, summary: str, depends: Iterable[str] = ()) -> None:
+        self.day = day
+        self.p = Package(
+            f"{SOURCE}/{day}",
+            SOURCE,
+            summary,
+            depends=[f"{SOURCE}/geo", f"{SOURCE}/registry", *depends],
+        )
+        self.p.external |= {HUNGARY, TERRITORY}
+        self.values: dict[tuple[str, str, str | None, int], int] = {}
+        self.units: dict[str, str] = {}
+        self.options: dict[tuple[str, str], str] = {}
+        self.sets: dict[str, str] = {}
+        self.declared: dict[tuple[str, str | None, int], int] = {}
+        self.outcomes: set[tuple[str, str, str | None]] = set()
+        self.people: dict[str, str] = {}
+        self.seen: set[tuple[str, str]] = set()
+        self.inherited: set[str] = set()
+        self.reasons: dict[str, str] = {}
+        for depend in depends:
+            built = package.folder(depend) / "build" / "person.parquet"
+            if built.exists():
+                self.inherited |= set(pl.read_parquet(built, columns=["id"])["id"])
+
+    def first(self, tag: str, label: str) -> bool:
+        """Whether this is the first time the label is seen in the contest."""
+        if (tag, label) in self.seen:
+            return False
+        self.seen.add((tag, label))
+        return True
+
+    def cite(self, name: str) -> None:
+        self.p.uses(raw.cached(SOURCE, name))
+
+    def election(
+        self,
+        tag: str,
+        kind: str,
+        english: str,
+        native: str,
+        path: str,
+        day: date | None = None,
+        parent: str | None = None,
+    ) -> str:
+        id = key("election", tag)
+        on = day or self.day
+        self.p.add(
+            "election", id=id, polity_id=HUNGARY, parent_id=parent, kind=kind, date_from=on, date_to=on, status="held"
+        )
+        self.p.name(id, english, "en", "official")
+        self.p.name(id, native, "hu", "native", False)
+        self.p.add("slug", path=path, entity_id=id, is_current=True)
+        return id
+
+    def contest(
+        self,
+        tag: str,
+        election: str,
+        kind: str,
+        name: str,
+        path: str,
+        *,
+        district_area: str = TERRITORY,
+        magnitude: int | None = 1,
+        round_number: int = 1,
+        previous: str | None = None,
+        system: str | None = None,
+        body: str | None = None,
+        office: str | None = None,
+        method: str,
+        english: str | None = None,
+    ) -> str:
+        """Stage a contest and its official result set; returns the result set id."""
+        contest = key("contest", tag)
+        self.p.add(
+            "contest",
+            id=contest,
+            election_id=election,
+            kind=kind,
+            office_id=office,
+            body_id=body,
+            district_area_id=district_area,
+            magnitude=magnitude,
+            round_number=round_number,
+            previous_round_id=None if previous is None else key("contest", previous),
+            electoral_system_id=system,
+            default_result_kind="counted",
+        )
+        self.p.name(contest, name, "hu", "official")
+        if english:
+            self.p.name(contest, english, "en", "english", False)
+        self.p.add("slug", path=path, entity_id=contest, is_current=True)
+        result_set = key("result_set", tag)
+        self.p.add(
+            "result_set",
+            id=result_set,
+            election_id=election,
+            contest_id=contest,
+            stage="official",
+            kind="counted",
+            source_id=NVI,
+            status="active",
+            is_default=True,
+            completeness=1.0,
+        )
+        self.p.add(
+            "note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=method, lang="en"
+        )
+        self.sets[tag] = result_set
+        return result_set
+
+    def option(
+        self,
+        tag: str,
+        label: str,
+        kind: str,
+        *,
+        nominator: str | None = None,
+        position: int | None = None,
+        ident: str | None = None,
+    ) -> str:
+        """Stage an option of the contest `tag`; the option's own key follows the label, or `ident` when given."""
+        index = (tag, ident or same_name(label) or label)
+        found = self.options.get(index)
+        if found is not None:
+            return found
+        id = key("option", tag, index[1])
+        self.p.add(
+            "contest_option",
+            id=id,
+            contest_id=key("contest", tag),
+            kind=kind,
+            party_id=party(nominator) if kind != "answer" else None,
+            ballot_position=position,
+            ballot_label=re.sub(r"\s+", " ", label).strip(),
+        )
+        self.options[index] = id
+        return id
+
+    def candidate(
+        self,
+        tag: str,
+        option: str,
+        person: str,
+        name: str,
+        *,
+        role: str = "head",
+        position: int | None = None,
+        nominator: str | None = None,
+    ) -> str:
+        """Stage a person (once per person key) and their candidacy on an option."""
+        person_id = self.people.get(person)
+        if person_id is None:
+            person_id = self.people[person] = key("person", person)
+            if person_id not in self.inherited:
+                self.p.add("person", id=person_id)
+                self.p.name(person_id, person_text(TITLES.sub("", name.strip())), "hu", "official")
+        candidacy = key("candidacy", tag, option, person)
+        self.p.add(
+            "candidacy",
+            id=candidacy,
+            person_id=person_id,
+            option_id=option,
+            role=role,
+            list_position=position,
+            ballot_name=re.sub(r"\s+", " ", name).strip(),
+            member_of_party_id=None,
+            is_independent=nominator is not None and party(nominator) is None,
+        )
+        return candidacy
+
+    def unit(self, area_code: str, number: str | int, kind: str = "standard", relation: str = "within") -> str:
+        code = (
+            f"{self.day}:{area_code}:{int(number):03d}" if str(number).isdigit() else f"{self.day}:{area_code}:{number}"
+        )
+        found = self.units.get(code)
+        if found is None:
+            found = self.units[code] = key("unit", code)
+            self.p.add(
+                "reporting_unit",
+                id=found,
+                polity_id=HUNGARY,
+                scheme_code="hu.szavazokor",
+                code=code,
+                area_relation=relation,
+                area_id=None if relation == "unlocated" else settlement(area_code),
+                kind=kind,
+            )
+        return found
+
+    def settlement_unit(self, area_code: str) -> str:
+        code = f"{self.day}:{area_code}"
+        found = self.units.get(code)
+        if found is None:
+            found = self.units[code] = key("unit", code)
+            self.p.add(
+                "reporting_unit",
+                id=found,
+                polity_id=HUNGARY,
+                scheme_code="hu.telepules",
+                code=code,
+                area_relation="equals",
+                area_id=settlement(area_code),
+                kind="standard",
+            )
+        return found
+
+    def special_unit(self, name: str, kind: str) -> str:
+        code = f"{self.day}:{name}"
+        found = self.units.get(code)
+        if found is None:
+            found = self.units[code] = key("unit", code)
+            self.p.add(
+                "reporting_unit",
+                id=found,
+                polity_id=HUNGARY,
+                scheme_code="hu.szavazokor",
+                code=code,
+                area_relation="unlocated",
+                area_id=None,
+                kind=kind,
+            )
+        return found
+
+    def value(self, tag: str, unit: str, option: str | None, measure: int, amount: int | None) -> None:
+        if amount is None:
+            return
+        index = (self.sets[tag], unit, option, measure)
+        if index in self.values:
+            raise ValueError(f"{self.day} {tag}: a second value for {index}")
+        self.values[index] = amount
+
+    def accounting(
+        self,
+        tag: str,
+        unit: str,
+        registered: int | None,
+        voters: int | None,
+        cast: int | None,
+        invalid: int | None,
+        valid: int | None,
+    ) -> None:
+        for measure, amount in ((2, registered), (14, voters), (3, cast), (5, invalid), (4, valid)):
+            self.value(tag, unit, None, measure, amount)
+
+    def declare(self, tag: str, option: str | None, measure: int, amount: int | None) -> None:
+        if amount is not None:
+            self.declared[(self.sets[tag], option, measure)] = amount
+
+    def outcome(self, tag: str, option: str, kind: str, seats: int | None = None, candidacy: str | None = None) -> None:
+        index = (self.sets[tag], option, candidacy)
+        if index in self.outcomes:
+            return
+        self.outcomes.add(index)
+        self.p.add(
+            "outcome", result_set_id=self.sets[tag], option_id=option, candidacy_id=candidacy, kind=kind, seats=seats
+        )
+
+    def reconcile(self) -> None:
+        """Count where the office's figures disagree with each other, note it on each result set, and accept it."""
+        kinds = {row["id"]: row for row in self.p.rows.get("contest", [])}
+        checked = {
+            self.sets[tag]
+            for tag in self.sets
+            if (row := kinds[key("contest", tag)])["magnitude"] == 1 or row["kind"] == "list_allocation"
+        }
+        units: dict[tuple[str, str], dict[int, int]] = defaultdict(dict)
+        votes: Counter[tuple[str, str]] = Counter()
+        for (result_set, unit, option, measure), amount in self.values.items():
+            if option is None:
+                units[(result_set, unit)][measure] = amount
+            elif measure == 1:
+                votes[(result_set, unit)] += amount
+        found: dict[str, Counter[str]] = {code: Counter() for code in CAVEATS}
+        for (result_set, unit), figures in units.items():
+            valid, invalid, cast_, registered = figures.get(4), figures.get(5), figures.get(3), figures.get(2)
+            if result_set in checked and valid is not None and votes[(result_set, unit)] != valid:
+                found["accounting.votes_valid"][result_set] += 1
+            if valid is not None and cast_ is not None and valid + (invalid or 0) != cast_:
+                found["accounting.ballots_sum"][result_set] += 1
+            if cast_ is not None and registered is not None and cast_ > registered:
+                found["accounting.turnout"][result_set] += 1
+        sums: Counter[tuple[str, str | None, int]] = Counter()
+        for (result_set, _, option, measure), amount in self.values.items():
+            sums[(result_set, option, measure)] += amount
+        gaps = {index: amount - sums[index] for index, amount in self.declared.items() if sums[index] != amount}
+        for (result_set, _, _) in gaps:
+            found["accounting.declared"][result_set] += 1
+        for code, counts in found.items():
+            if not counts:
+                continue
+            what, reason = CAVEATS[code]
+            reason = self.reasons.get(code, reason)
+            total = counts.total()
+            if code == "accounting.declared" and code in self.reasons:
+                self.p.accept(code, f"{total} declared totals in {len(counts)} contests: {reason}")
+            elif code == "accounting.declared":
+                largest = max(abs(gap) for gap in gaps.values())
+                self.p.accept(
+                    code,
+                    f"{total} declared totals in {len(counts)} contests differ from the sum of the office's own "
+                    f"polling-station lines (largest gap {largest:,} votes); both are stored as published",
+                )
+            else:
+                self.p.accept(code, f"{total} polling stations in {len(counts)} contests: {reason}")
+            for result_set, n in counts.items():
+                self.p.add(
+                    "note",
+                    id=key("note", result_set, code),
+                    entity_id=result_set,
+                    kind="caveat",
+                    body_md=what.format(n=n, s="s" if n > 1 else ""),
+                    lang="en",
+                )
+
+    def write(self) -> None:
+        self.reconcile()
+        if self.values:
+            self.p.frame(
+                "result_value",
+                pl.DataFrame(
+                    {
+                        "result_set_id": [k[0] for k in self.values],
+                        "unit_id": [k[1] for k in self.values],
+                        "option_id": [k[2] for k in self.values],
+                        "channel": [0] * len(self.values),
+                        "measure": [k[3] for k in self.values],
+                        "count_round": [0] * len(self.values),
+                        "flags": [0] * len(self.values),
+                        "value": list(self.values.values()),
+                    },
+                    schema_overrides={"option_id": pl.String},
+                ),
+            )
+        for (result_set, option, measure), amount in self.declared.items():
+            self.p.add("declared", result_set_id=result_set, option_id=option, measure=measure, value=amount)
+        self.p.write()
+
+    def summed(self, tag: str, measure: int = 1) -> Counter[str | None]:
+        totals: Counter[str | None] = Counter()
+        result_set = self.sets[tag]
+        for (rs, _, option, m), amount in self.values.items():
+            if rs == result_set and m == measure:
+                totals[option] += amount
+        return totals
+
+
+# ---------------------------------------------------------------------------------------------------------------
+# Electoral systems and methods
+
+SMD_TWO_ROUND = key("electoral_system", "smd", 1990)
+LIST_1990 = key("electoral_system", "regional-list", 1990)
+LIST_1994 = key("electoral_system", "regional-list", 1994)
+SMD_FPTP = key("electoral_system", "smd", 2014)
+LIST_2014 = key("electoral_system", "national-list", 2014)
+EP_SYSTEM = key("electoral_system", "ep", 2004)
+SYSTEMS: list[tuple[str, date, date | None, dict[str, object], str]] = [
+    (
+        SMD_TWO_ROUND,
+        date(1989, 10, 23),
+        date(2011, 12, 30),
+        {"formula": "two_round", "majority": 0.5, "advance": 3},
+        ("176 single-member districts. In the first round a candidate needed more than half of the valid votes, with "
+        "a turnout above half of the electorate. Otherwise every candidate with at least 15% of the votes, and at "
+        "least the top three, could run in the second round, where the most votes won if a quarter of the electorate "
+        "turned out."),
+    ),
+    (
+        LIST_1990,
+        date(1989, 10, 23),
+        date(1994, 1, 1),
+        {
+            "formula": "hagenbach_bischoff_quota",
+            "threshold": {"level": "list", "scope": "national", "percent": 4},
+        },
+        ("152 seats on the regional lists of the 19 counties and Budapest, allocated by the Hagenbach-Bischoff quota "
+        "among the lists that won 4% of the regional list votes nationwide; the remaining seats went to national "
+        "compensation lists from the votes that won no seat."),
+    ),
+    (
+        LIST_1994,
+        date(1994, 1, 1),
+        date(2011, 12, 30),
+        {
+            "formula": "hagenbach_bischoff_quota",
+            "threshold": {"level": "list", "scope": "national", "percent": 5},
+        },
+        ("152 seats on the regional lists of the 19 counties and Budapest, allocated by the Hagenbach-Bischoff quota "
+        "among the lists that won 5% of the regional list votes nationwide (10% for a joint list of two parties, 15% "
+        "for three or more); the remaining seats went to national compensation lists."),
+    ),
+    (
+        SMD_FPTP,
+        date(2011, 12, 30),
+        None,
+        {"formula": "fptp"},
+        "106 single-member districts, each won by the candidate with the most votes in a single round.",
+    ),
+    (
+        LIST_2014,
+        date(2011, 12, 30),
+        None,
+        {"formula": "dhondt", "threshold": {"level": "list", "scope": "national", "percent": 5}},
+        ("93 seats from national lists, allocated by D'Hondt among the lists that won 5% of the list votes (10% for a "
+        "joint list of two parties, 15% for three or more), counting the votes that won no district seat and the "
+        "winners' surplus votes. National minority lists win a seat at a reduced quota."),
+    ),
+    (
+        EP_SYSTEM,
+        date(2004, 1, 1),
+        None,
+        {"formula": "dhondt", "threshold": {"level": "list", "scope": "national", "percent": 5}},
+        ("Hungary's members of the European Parliament, elected from closed national lists by D'Hondt among the lists "
+        "that won 5% of the valid votes."),
+    ),
+]
+PRECINCT_METHOD = (
+    "Counted by the polling-station commissions and published by the National Election Office (Nemzeti Választási "
+    "Iroda) per polling station (szavazókör). Registered voters are the electoral roll at the close of voting, voters "
+    "are those who signed the roll, ballots cast are the stamped ballots in the box, and valid and invalid are the "
+    "valid and invalid ballots.{extra}"
+)
+
+
+def method(extra: str = "") -> str:
+    return PRECINCT_METHOD.format(extra=f" {extra}" if extra else "")
+
+
+# ---------------------------------------------------------------------------------------------------------------
+# Parliament
+
+
+def ordinal(n: int) -> str:
+    return {1: "first", 2: "second"}[n]
+
+
+def _parliament_elections(d: Day, year: int, round_number: int) -> tuple[str, str]:
+    path = f"hu/{d.day}-parliamentary" + ("-runoff" if round_number == 2 else "")
+    suffix = "" if round_number == 1 else ", second round"
+    election = d.election(
+        f"ogy:{year}:{round_number}",
+        "general" if round_number == 1 else "runoff",
+        f"{year} Hungarian parliamentary election{suffix}",
+        f"{year}. évi országgyűlési választás" + ("" if round_number == 1 else ", második forduló"),
+        path,
+    )
+    return election, path
+
+
+def smd_tag(year: int, round_number: int, maz: str, number: str) -> str:
+    return f"ogy:{year}:egyeni:{round_number}:{maz.zfill(2)}-{number.zfill(2)}"
+
+
+def smd_contest(d: Day, year: int, round_number: int, election: str, path: str, maz: str, number: str) -> str:
+    tag = smd_tag(year, round_number, maz, number)
+    if tag in d.sets:
+        return tag
+    period = oevk_period(d.day)
+    area = oevk(period, maz, number)
+    name = OEVK_NAMES[(period, maz.zfill(2), number.zfill(2))]
+    d.contest(
+        tag,
+        election,
+        "body_seats",
+        name,
+        f"{path}/{changeset.slug(name)}",
+        district_area=area,
+        magnitude=1,
+        round_number=round_number,
+        previous=smd_tag(year, 1, maz, number) if round_number == 2 else None,
+        system=SMD_TWO_ROUND if year < 2014 else SMD_FPTP,
+        body=PARLIAMENT,
+        method=method(),
+    )
+    return tag
+
+
+def regional_tag(year: int, round_number: int, maz: str) -> str:
+    return f"ogy:{year}:lista:{round_number}:{maz.zfill(2)}"
+
+
+def regional_contest(d: Day, year: int, round_number: int, election: str, path: str, maz: str) -> str:
+    tag = regional_tag(year, round_number, maz)
+    if tag in d.sets:
+        return tag
+    maz = maz.zfill(2)
+    name = f"{COUNTIES[maz]} {'fővárosi' if maz == '01' else 'megyei'} területi lista"
+    d.contest(
+        tag,
+        election,
+        "list_allocation",
+        name,
+        f"{path}/lista-{changeset.slug(COUNTIES[maz])}",
+        district_area=county(maz),
+        magnitude=None,
+        round_number=round_number,
+        previous=regional_tag(year, 1, maz) if round_number == 2 else None,
+        system=LIST_1990 if year == 1990 else LIST_1994,
+        body=PARLIAMENT,
+        method=method(),
+        english=f"{COUNTIES[maz]} regional list",
+    )
+    return tag
+
+
+def national_list_contest(d: Day, year: int, election: str, path: str) -> str:
+    tag = f"ogy:{year}:lista"
+    d.contest(
+        tag,
+        election,
+        "list_allocation",
+        "Országos lista",
+        f"{path}/orszagos-lista",
+        magnitude=93,
+        system=LIST_2014,
+        body=PARLIAMENT,
+        method=method(
+            "Postal votes from voters without a Hungarian address are counted nationally and stored on one unit "
+            "without a place. National minority lists are options of the same contest."
+        ),
+        english="National list",
+    )
+    return tag
+
+
+OLD_PARLIAMENT = {
+    1990: ("1990_parlamenti", date(1990, 3, 25), date(1990, 4, 8), "evktet.txt", "tertet.txt"),
+    1994: ("1994_parlamenti", date(1994, 5, 8), date(1994, 5, 29), "oevk_jkv_tetel.txt", "megye_jkv_tetel.txt"),
+    1998: ("1998_parlamenti", date(1998, 5, 10), date(1998, 5, 24), "evktet.txt", "tertet.txt"),
+}
+
+
+def _declare_candidates(d: Day, tag: str, rows: Iterable[tuple[str, int]]) -> list[str]:
+    missing = []
+    for name, votes in rows:
+        option = d.options.get((tag, same_name(name)))
+        if option is None:
+            missing.append(f"{tag} {name}")
+            continue
+        d.declare(tag, option, 1, votes)
+    return missing
+
+
+def _unrepeat(
+    rows: list[list[str]],
+    label: Callable[[list[str]], str],
+    votes: Callable[[list[str]], int],
+    valid: dict[tuple[str, str, str], int],
+) -> tuple[list[list[str]], Counter[tuple[str, str, str]]]:
+    """Drop the repeated line of a polling station that names one option twice: keep the occurrence that brings the
+    station closest to its valid ballots, the later one on a tie."""
+    blocks: dict[tuple[str, str, str], list[list[str]]] = defaultdict(list)
+    for row in rows:
+        blocks[(row[1], row[2], row[3])].append(row)
+    kept: list[list[str]] = []
+    repeated: Counter[tuple[str, str, str]] = Counter()
+    for place, block in blocks.items():
+        labels = [label(row) for row in block]
+        if len(set(labels)) == len(labels):
+            kept += block
+            continue
+        first: dict[str, list[str]] = {}
+        last: dict[str, list[str]] = {}
+        for row, text_ in zip(block, labels, strict=True):
+            first.setdefault(text_, row)
+            last[text_] = row
+        target = valid.get(place)
+        options = (list(last.values()), list(first.values()))
+        choice = min(options, key=lambda rows_: abs(sum(map(votes, rows_)) - (target or 0)))
+        repeated[place] += len(block) - len(choice)
+        kept += choice
+    return kept, repeated
+
+
+def old_parliament(d: Day, year: int, round_number: int) -> None:
+    name, _, _, smd_file, list_file = OLD_PARLIAMENT[year]
+    d.cite(ARCHIVE)
+    election, path = _parliament_elections(d, year, round_number)
+    found = places()
+    where: dict[tuple[str, str, str, str], tuple[str, str]] = {}
+    valid: dict[tuple[str, str, str], int] = {}
+    valid_lists: dict[tuple[str, str, str], int] = {}
+    for row in piped(name, "szkf.txt"):
+        kind, ford, code, taz, sorsz, county_name, telep, district_number = row[:8]
+        if int(ford) != round_number:
+            continue
+        maz = county_key(county_name)
+        nums, _ = _numbers(row[8:])
+        area = found.resolve(maz, None, telep, trust_code=False)
+        unit = d.unit(area, sorsz)
+        if kind.lower().startswith("egy"):
+            tag = smd_contest(d, year, round_number, election, path, maz, district_number)
+            where[("egy", code, taz, sorsz)] = (unit, tag)
+            valid[(code, taz, sorsz)] = nums[8]
+        else:
+            tag = regional_contest(d, year, round_number, election, path, maz)
+            where[("lis", code, taz, sorsz)] = (unit, tag)
+            valid_lists[(code, taz, sorsz)] = nums[8]
+        d.accounting(tag, unit, nums[3], nums[4], nums[5], nums[7], nums[8])
+    positioned = year > 1990
+    smd_agg: dict[tuple[str, str], tuple[str, int, str]] = {}
+    for row in piped(name, smd_file):
+        if int(row[0]) == round_number:
+            tag = smd_tag(year, round_number, county_key(row[2]), row[3])
+            label = " ".join(cell for cell in row[4:-2] if not cell.isdigit())
+            smd_agg[(tag, str(number(row[4])) if positioned else same_name(label))] = (
+                label,
+                number(row[-2]) or 0,
+                row[-1],
+            )
+    list_agg: dict[tuple[str, str], tuple[str, int]] = {}
+    for row in piped(name, list_file):
+        if int(row[0]) == round_number:
+            tag = regional_tag(year, round_number, county_key(row[2]))
+            list_agg[(tag, str(number(row[3])) if positioned else same_name(row[-2]))] = (row[-2], number(row[-1]) or 0)
+    smd_rows, repeated = _unrepeat(
+        [row for row in piped(name, "egy_szkt.txt") if int(row[0]) == round_number],
+        lambda row: str(number(row[4])) if positioned else same_name(" ".join(row[4:6])),
+        lambda row: number(row[-2]) or 0,
+        valid,
+    )
+    list_rows, repeated_lists = _unrepeat(
+        [row for row in piped(name, "lis_szkt.txt") if int(row[0]) == round_number],
+        lambda row: str(number(row[4])) if positioned else same_name(row[-2]),
+        lambda row: number(row[-1]) or 0,
+        valid_lists,
+    )
+    for kind, counts in (("egy", repeated), ("lis", repeated_lists)):
+        by_tag: Counter[str] = Counter()
+        for (maz, taz, sorsz), n in counts.items():
+            by_tag[where[(kind, maz, taz, sorsz)][1]] += n
+        for tag, n in by_tag.items():
+            d.p.add(
+                "note",
+                id=key("note", d.sets[tag], "repeated"),
+                entity_id=d.sets[tag],
+                kind="caveat",
+                body_md=f"In {n} polling station{'s' if n > 1 else ''} the office's file prints one "
+                f"{'candidate' if kind == 'egy' else 'list'} twice, once in place of another line. The line that brings "
+                "the polling station closest to its valid ballots is kept and the other is left out.",
+                lang="en",
+            )
+    for row in smd_rows:
+        _, maz, taz, sorsz = row[:4]
+        if positioned:
+            position, title, person, votes, nominator = row[4], row[5], row[6], row[7], row[8]
+        else:
+            position, title, person, votes, nominator = "", row[4], row[5], row[6], row[7]
+        unit, tag = where[("egy", maz, taz, sorsz)]
+        label = f"{title} {person}".strip()
+        ident = str(number(position)) if positioned else same_name(label)
+        if (tag, ident) in smd_agg:
+            label, _, nominator = smd_agg[(tag, ident)]
+        option = d.option(tag, label, "candidate", nominator=nominator, position=number(position), ident=ident)
+        if d.first(tag, ident):
+            d.candidate(tag, option, f"ogy:{year}:{tag.split(':')[-1]}:{same_name(label)}", label, nominator=nominator)
+        d.value(tag, unit, option, 1, number(votes))
+    for row in list_rows:
+        _, maz, taz, sorsz = row[:4]
+        position, label, votes = (row[4], row[5], row[6]) if positioned else ("", row[4], row[5])
+        unit, tag = where[("lis", maz, taz, sorsz)]
+        ident = str(number(position)) if positioned else same_name(label)
+        if (tag, ident) in list_agg:
+            label = list_agg[(tag, ident)][0]
+        option = d.option(tag, label, "list", nominator=label, position=number(position), ident=ident)
+        d.value(tag, unit, option, 1, number(votes))
+    missing = []
+    for (tag, ident), (label, votes, _) in smd_agg.items():
+        option = d.options.get((tag, ident))
+        if option is None:
+            missing.append(f"{tag} {label}")
+        else:
+            d.declare(tag, option, 1, votes)
+    for (tag, ident), (label, votes) in list_agg.items():
+        option = d.options.get((tag, ident))
+        if option is None:
+            missing.append(f"{tag} {label}")
+        else:
+            d.declare(tag, option, 1, votes)
+    if missing:
+        print(f"{d.day}: {len(missing)} declared rows match no option: {missing[:5]}")
+
+
+MID_PARLIAMENT = {
+    2002: ("2002_parlamenti", date(2002, 4, 7), date(2002, 4, 21), ("1_ford/", "2_ford/"), 3),
+    2006: ("2006_parlamenti", date(2006, 4, 9), date(2006, 4, 23), ("txt_1ford/", "txt_2ford/"), 4),
+    2010: ("2010_parlamenti", date(2010, 4, 11), date(2010, 4, 25), ("txt_1ford/", "txt_2ford/"), 4),
+}
+
+
+def _numbers(cells: list[str]) -> tuple[list[int], list[str]]:
+    values: list[int] = []
+    for index, cell in enumerate(cells):
+        found = number(cell)
+        if found is None:
+            return values, cells[index:]
+        values.append(found)
+    return values, []
+
+
+def _candidate_cells(year: int, cells: list[str]) -> tuple[str, str, int | None, str]:
+    """Position, printed name, votes, and nominating parties from the cells after the location."""
+    if year == 2002:
+        position, title, person, votes, rest = cells[0], cells[1], cells[2], cells[3], cells[5:]
+    else:
+        position, title, person, votes, rest = cells[0], cells[1], f"{cells[2]} {cells[3]}", cells[4], cells[6:]
+    return position, f"{title} {person}".strip(), number(votes), ",".join(cell for cell in rest if cell)
+
+
+def mid_parliament(d: Day, year: int, round_number: int) -> None:
+    name, _, _, folders, registered = MID_PARLIAMENT[year]
+    folder = folders[round_number - 1]
+    d.cite(ARCHIVE)
+    election, path = _parliament_elections(d, year, round_number)
+    found = places()
+    kinds = ["egy", "lis"] if round_number == 1 else ["egy"]
+    where: dict[tuple[str, str, str, str], tuple[str, str]] = {}
+    for kind in kinds:
+        for row in piped(name, f"{folder}{kind}_szkf.txt"):
+            maz, taz, sorsz, _, telep, district_number = row[:6]
+            nums, rest = _numbers(row[6:])
+            area = found.resolve(maz, taz, telep, trust_code=True)
+            abroad = bool(rest) and rest[0].lower().startswith("kül")
+            unit = d.unit(area, sorsz, "abroad_mission" if abroad else "standard")
+            if kind == "egy":
+                tag = smd_contest(d, year, round_number, election, path, maz, district_number)
+            else:
+                tag = regional_contest(d, year, round_number, election, path, maz)
+            where[(kind, maz, taz, sorsz)] = (unit, tag)
+            d.accounting(tag, unit, nums[registered], nums[-5], nums[-4], nums[-2], nums[-1])
+        for row in piped(name, f"{folder}{kind}_szkt.txt"):
+            maz, taz, sorsz = row[:3]
+            unit, tag = where[(kind, maz, taz, sorsz)]
+            if kind == "egy":
+                position, label, votes, nominator = _candidate_cells(year, row[3:])
+                option = d.option(tag, label, "candidate", nominator=nominator, position=number(position))
+                if d.first(tag, label):
+                    person = f"ogy:{year}:{tag.split(':')[-1]}:{same_name(label)}"
+                    d.candidate(tag, option, person, label, nominator=nominator)
+            else:
+                position, label, votes = row[3], row[4], number(row[5])
+                nominator = row[7] if len(row) > 7 and row[7] else label
+                option = d.option(tag, label, "list", nominator=nominator, position=number(position))
+            d.value(tag, unit, option, 1, votes)
+    missing: list[str] = []
+    positions = {}
+    for row in piped(name, f"{folder}egy_ert.txt"):
+        tag = smd_tag(year, round_number, row[0], row[1])
+        position, label, votes, _ = _candidate_cells(year, row[2:])
+        missing += _declare_candidates(d, tag, [(label, votes or 0)])
+        positions[(tag, number(position))] = d.options.get((tag, same_name(label)))
+    for row in piped(name, f"{folder}egy_erf.txt"):
+        tag = smd_tag(year, round_number, row[0], row[1])
+        nums, rest = _numbers(row[4:])
+        verdict = rest[0].lower() if rest else ""
+        winner = number(rest[2]) if len(rest) > 2 else None
+        option = d.options.get((tag, same_name(" ".join(rest[3:])))) or positions.get((tag, winner))
+        if "eredményes" in verdict and "eredménytelen" not in verdict and winner and option:
+            d.outcome(tag, option, "elected")
+    if round_number == 1:
+        for row in piped(name, f"{folder}lis_ert.txt"):
+            tag = regional_tag(year, 1, row[0])
+            option = d.options.get((tag, same_name(row[2]) or row[2]))
+            if option is None:
+                missing.append(f"{tag} {row[2]}")
+                continue
+            d.declare(tag, option, 1, number(row[3]))
+    if missing:
+        print(f"{d.day}: {len(missing)} declared rows match no option: {missing[:5]}")
+
+
+NEW_PARLIAMENT = {
+    2014: ("2014_parlamenti", date(2014, 4, 6), "egyéni-szavazás-jkv.csv", "listás-szavazás-jkv.csv"),
+    2018: ("2018_parlamenti", date(2018, 4, 8), "egyéni_szavazás_szkjkv.csv", "listás_szavazás_szkjkv_teljes_nemz.csv"),
+}
+
+
+def _protocols(rows: list[dict[str, str]], id_column: str) -> Iterator[tuple[dict[str, str], list[dict[str, str]]]]:
+    """Group a protocol file's head rows (F, or a row naming the protocol type) with the item rows that follow."""
+    head: dict[str, str] | None = None
+    items: list[dict[str, str]] = []
+    kinds = [
+        column for column in (rows[0] if rows else {}) if column.upper() in ("LEVÉLBEN", "JKV_TÍPUS", "JKV_MEGNEV")
+    ]
+    for row in rows:
+        tag = row[id_column]
+        if tag.endswith("F") or row.get("TIPUS") == "F" or any(row[column] for column in kinds):
+            if head is not None:
+                yield head, items
+            head, items = row, []
+        else:
+            items.append(row)
+    if head is not None:
+        yield head, items
+
+
+def namesake(label: str, nominator: str) -> str:
+    """A candidate's key within a contest where namesakes ran: the name and the nominating organization."""
+    return f"{same_name(label)}|{party_label(nominator).upper()}"
+
+
+def new_parliament(d: Day, year: int) -> None:
+    name, _, smd_file, list_file = NEW_PARLIAMENT[year]
+    d.cite(ARCHIVE)
+    election, path = _parliament_elections(d, year, 1)
+    found = places()
+    list_tag = national_list_contest(d, year, election, path)
+    for file, kind in ((smd_file, "egy"), (list_file, "lis")):
+        for head, items in _protocols(delimited(name, file), "SZAVAZÓKÖR_AZON"):
+            maz, taz, telep = head["MEGYEKÓD"], head["TELEPÜLÉS_SORSZÁM"], head["TELEPÜLÉS"]
+            area = found.resolve(maz, taz, telep, trust_code=True)
+            unit = d.unit(area, head["SZAVAZÓKÖR"])
+            tag = smd_contest(d, year, 1, election, path, maz, head["OEVK"]) if kind == "egy" else list_tag
+            d.accounting(
+                tag,
+                unit,
+                number(head["VÁLASZTÓPOLGÁR"]),
+                number(head["MEGJELENTEK"]),
+                number(head["URNÁBAN_LEVŐ"]),
+                number(head["ÉRVÉNYTELEN"]),
+                number(head["ÉRVÉNYES"]),
+            )
+            for item in items:
+                if kind == "egy":
+                    label, nominator = item["JELÖLT"], item["SZERVEZET"]
+                    ident = namesake(label, nominator)
+                    option = d.option(tag, label, "candidate", nominator=nominator, ident=ident)
+                    if d.first(tag, ident):
+                        person = f"ogy:{year}:{tag.split(':')[-1]}:{ident}"
+                        d.candidate(tag, option, person, label, nominator=nominator)
+                else:
+                    label = item["LISTA"]
+                    option = d.option(tag, label, "list", nominator=label)
+                d.value(tag, unit, option, 1, number(item["SZAVAZAT"]))
+    postal = [file for file in bundle(name) if "levélben" in file and file.endswith(".csv")]
+    for head, items in _protocols(delimited(name, postal[0].split("/")[-1]), "JKV_AZONOSÍTÓ"):
+        unit = d.special_unit("levelben", "postal_district")
+        d.accounting(
+            list_tag,
+            unit,
+            number(head["VÁLASZTÓPOLGÁR"]),
+            number(head["ÉRVÉNYES_SZAVAZÁSI_IRATOK"]),
+            number(head["IRATOKBAN_LEVŐ_SZAVAZÓLAP"]),
+            number(head["ÉRVÉNYTELEN"]),
+            number(head["ÉRVÉNYES"]),
+        )
+        for item in items:
+            option = d.option(list_tag, item["LISTA"], "list", nominator=item["LISTA"])
+            d.value(list_tag, unit, option, 1, number(item["SZAVAZAT"]))
+    if year == 2014:
+        for page in PV14_PAGES:
+            d.cite(PV14 + page)
+        labels = {same_name(label): option for (tag, label), option in d.options.items() if tag == list_tag}
+        for cells in table_rows(PV14 + "orszlist.html"):
+            if len(cells) >= 7 and number(cells[5].replace(" ", "")) is not None:
+                option = labels.get(same_name(cells[0]))
+                if option is not None:
+                    d.declare(list_tag, option, 1, number(cells[5].replace(" ", "")))
+        chunks = [row[i : i + 6] for row in table_rows(PV14 + "oevker.html") for i in range(0, len(row), 6)]
+        for cells in chunks:
+            if len(cells) >= 5 and re.fullmatch(r"\d\d", cells[1]):
+                tag = smd_tag(year, 1, county_key(cells[0]), cells[1])
+                option = d.options.get((tag, namesake(cells[3], cells[4])))
+                if option is None:
+                    print(f"{d.day}: {tag} first-placed {cells[3]} ({cells[4]}) matches no candidate")
+                    continue
+                d.outcome(tag, option, "elected")
+        d.reasons["accounting.votes_valid"] = (
+            "the office's polling-station file for the national list leaves out the 19,543 votes for national minority "
+            "lists, which its valid ballots include (the 13 lists' national totals on its 2014 results site sum to "
+            "exactly 19,543)"
+        )
+        d.p.add(
+            "note",
+            id=key("note", d.sets[list_tag], "minorities"),
+            entity_id=d.sets[list_tag],
+            kind="caveat",
+            body_md="The office's polling-station file for the national list leaves out the 19,543 votes cast for "
+            "the 13 national minority lists, which the valid ballots include. Those lists' national totals are on "
+            "the office's 2014 results site.",
+            lang="en",
+        )
+    if year == 2018:
+        for head, items in _protocols(delimited(name, "egyéni_szavazás_erjkv.csv"), "TIPUS"):
+            tag = smd_tag(year, 1, head["MEGYEKÓD"], head["OEVK"])
+            for item in items:
+                option = d.options.get((tag, namesake(item["JELÖLT"], item["SZERVEZET"])))
+                if option is None:
+                    print(f"{d.day}: {tag} {item['JELÖLT']} is in the district protocol only")
+                    continue
+                d.declare(tag, option, 1, number(item["SZAVAZAT"]))
+                if item.get("NYERTES", "").lower().startswith("nyertes"):
+                    d.outcome(tag, option, "elected")
+        rows = delimited(name, "orsz_listás_erjkv1.csv")
+        for row in rows:
+            label = row.get("PÁRT_LISTA") or row.get("NEMZ_LISTA")
+            if not label:
+                continue
+            option = d.options.get((list_tag, same_name(label) or label))
+            if option is None:
+                print(f"{d.day}: national list {label} is in the national protocol only")
+                continue
+            votes = number(row.get("PÁRT_LISTA_SZAVAZAT") or row.get("NEMZ_LISTA_SZAVAZAT"))
+            d.declare(list_tag, option, 1, votes)
+            seats = number(row.get("NYERT_MANDÁTUM") or row.get("KEDV_MANDÁTUM"))
+            if seats:
+                d.outcome(list_tag, option, "won", seats)
+
+
+VTR_PARLIAMENT = {2022: ("ogy2022", date(2022, 4, 3)), 2026: ("ogy2026", date(2026, 4, 12))}
+
+
+def _items(value: object) -> list[dict[str, object]]:
+    return cast(list[dict[str, object]], value or [])
+
+
+def _int(value: object) -> int | None:
+    return None if value is None else int(cast(int, value))
+
+
+def vtr_parliament(d: Day, year: int) -> None:
+    election_name, _ = VTR_PARLIAMENT[year]
+    for name in VTR_CATALOGS[election_name][0]:
+        d.cite(vtr_url(election_name, "ver", name))
+    for name in VTR_CATALOGS[election_name][1]:
+        d.cite(vtr_url(election_name, "szavossz", name))
+    d.cite(_crawl_key(election_name))
+    election, path = _parliament_elections(d, year, 1)
+    found = places()
+    period = oevk_period(d.day)
+    for row in _items(vtr_json(election_name, "ver", "OevkAdatok.json")["list"]):
+        oevk(period, str(row["maz"]), str(row["evk"]), str(row["evk_nev"]))
+    organizations = {
+        int(cast(int, row["szkod"])): str(row["nev"])
+        for row in _items(vtr_json(election_name, "ver", "Szervezetek.json")["list"])
+    }
+    candidates = {
+        int(cast(int, row["ej_id"])): row
+        for row in _items(vtr_json(election_name, "ver", "EgyeniJeloltek.json")["list"])
+    }
+    lists = {
+        int(cast(int, row["tl_id"])): row
+        for row in _items(vtr_json(election_name, "ver", "ListakEsJeloltek.json")["list"])
+    }
+    list_tag = national_list_contest(d, year, election, path)
+
+    def nominator(row: dict[str, object]) -> str:
+        codes = cast(list[int], row.get("jelolo_szervezetek") or [])
+        if codes == [0] or not codes:
+            return "Független jelölt"
+        return str(row.get("jlcs_nev") or ", ".join(organizations.get(code, str(code)) for code in codes))
+
+    def candidate_option(ej_id: int) -> tuple[str, str]:
+        row = candidates[ej_id]
+        tag = smd_contest(d, year, 1, election, path, str(row["maz"]), str(row["evk"]))
+        label = str(row["neve"]) if not row.get("dr_jelzo") else f"{row['dr_jelzo']} {row['neve']}"
+        party_name = nominator(row)
+        option = d.option(
+            tag, label, "candidate", nominator=party_name, position=_int(row.get("szavlap_sorsz")), ident=f"ej{ej_id}"
+        )
+        if d.first(tag, f"ej{ej_id}"):
+            d.candidate(tag, option, f"ogy:{year}:kpn:{row.get('kpn_id') or ej_id}", label, nominator=party_name)
+        return tag, option
+
+    def list_option(tl_id: int) -> str:
+        row = lists[tl_id]
+        label = str(row["jlcs_nev"])
+        option = d.option(
+            list_tag, label, "list", nominator=label, position=_int(row.get("szavlap_sorsz")), ident=f"tl{tl_id}"
+        )
+        if d.first(list_tag, f"tl{tl_id}"):
+            for member_row in _items(row.get("jeloltek")):
+                printed = str(member_row["neve"])
+                if member_row.get("dr_jelzo"):
+                    printed = f"{member_row['dr_jelzo']} {printed}"
+                d.candidate(
+                    list_tag,
+                    option,
+                    f"ogy:{year}:kpn:{member_row.get('kpn_id') or member_row['tj_id']}",
+                    printed,
+                    role="list_member",
+                    position=_int(member_row.get("sorsz")),
+                )
+        return option
+
+    for code, payload in sorted(vtr_precincts(election_name).items()):
+        for row in _items(payload.get("list")):
+            maz, taz = str(row["maz"]), str(row["taz"])
+            if maz == ABROAD:
+                area, kind = None, "abroad_mission"
+            else:
+                area, kind = found.resolve(maz, taz, found.names.get(maz + taz, ""), trust_code=True), "standard"
+            unit = (
+                d.unit(area, str(row["sorsz"]), kind)
+                if area
+                else d.special_unit(f"kulkepviselet:{taz}:{row['sorsz']}", kind)
+            )
+            smd = cast(dict[str, object] | None, row.get("egyeni_jkv"))
+            if smd and _items(smd.get("tetelek")):
+                tags = set()
+                for item in _items(smd["tetelek"]):
+                    tag, option = candidate_option(int(cast(int, item["ej_id"])))
+                    tags.add(tag)
+                    d.value(tag, unit, option, 1, _int(item.get("szavazat")))
+                (tag,) = tags
+                d.accounting(
+                    tag,
+                    unit,
+                    _int(smd.get("vp_osszes")),
+                    _int(smd.get("szavazott_osszesen")),
+                    _int(smd.get("szl_belyegzett_urna")),
+                    _int(smd.get("szl_ervenytelen")),
+                    _int(smd.get("szl_ervenyes")),
+                )
+            listed = cast(dict[str, object] | None, row.get("listas_jkv"))
+            if listed and _items(listed.get("tetelek")):
+                for item in _items(listed["tetelek"]):
+                    d.value(list_tag, unit, list_option(int(cast(int, item["tl_id"]))), 1, _int(item.get("szavazat")))
+                d.accounting(
+                    list_tag,
+                    unit,
+                    _int(listed.get("vp_osszes")),
+                    _int(listed.get("szavazott_osszesen")),
+                    _int(listed.get("szl_belyegzett_urna")),
+                    _int(listed.get("szl_ervenytelen")),
+                    _int(listed.get("szl_ervenyes")),
+                )
+    for row in _items(vtr_json(election_name, "szavossz", "LevelJkv.json")["list"]):
+        unit = d.special_unit("levelben", "postal_district")
+        for item in _items(row.get("tetelek")):
+            d.value(list_tag, unit, list_option(int(cast(int, item["tl_id"]))), 1, _int(item.get("szavazat")))
+        d.accounting(
+            list_tag,
+            unit,
+            _int(row.get("vp_level")),
+            _int(row.get("beerkezett_ervenyes_irat")),
+            _int(row.get("szl_belyegzett_urna")),
+            _int(row.get("szl_ervenytelen")),
+            _int(row.get("szl_ervenyes")),
+        )
+    for row in _items(vtr_json(election_name, "szavossz", "OevkJkv.json")["list"]):
+        protocol = cast(dict[str, object], row["egyeni_jkv"])
+        for item in _items(protocol.get("tetelek")):
+            tag, option = candidate_option(int(cast(int, item["ej_id"])))
+            d.declare(tag, option, 1, _int(item.get("szavazat")))
+            if item.get("mandatum") == 1:
+                d.outcome(tag, option, "elected")
+        d.declare(tag, None, 4, _int(protocol.get("szl_ervenyes")))
+    for row in _items(vtr_json(election_name, "szavossz", "ListasJkv.json")["list"]):
+        if str(row.get("oszint")) != "5":
+            continue
+        for item in _items(row.get("tetelek")):
+            option = list_option(int(cast(int, item["tl_id"])))
+            d.declare(list_tag, option, 1, _int(item.get("osszes_szavazat")))
+            seats = _int(item.get("mandatum"))
+            if seats:
+                d.outcome(list_tag, option, "won", seats)
+
+
+# ---------------------------------------------------------------------------------------------------------------
+# Registry and geography
+
+
+def registry() -> Package:
+    p = Package(
+        f"{SOURCE}/registry",
+        SOURCE,
+        "Hungary's National Assembly, its electoral systems, and the parties and lists of the National Election "
+        "Office's results",
+        depends=[f"{SOURCE}/geo"],
+    )
+    p.external |= {HUNGARY}
+    p.add(
+        "source",
+        id=NVI,
+        kind="official_body",
+        publisher="Nemzeti Választási Iroda",
+        title="Választási eredmények (valasztas.hu)",
+        url=ARCHIVE_PAGE,
+        license="Public information under Act CXII of 2011; reuse with the source acknowledged",
+        license_url="https://www.valasztas.hu/impresszum",
+        attribution="Nemzeti Választási Iroda, valasztas.hu",
+    )
+    p.artifact(raw.cached(SOURCE, ARCHIVE), NVI)
+    for election, (catalogs, results) in VTR_CATALOGS.items():
+        for name in catalogs:
+            p.artifact(raw.cached(SOURCE, vtr_url(election, "ver", name)), NVI)
+        for name in results:
+            p.artifact(raw.cached(SOURCE, vtr_url(election, "szavossz", name)), NVI)
+        p.artifact(raw.cached(SOURCE, _crawl_key(election)), NVI)
+    p.add("body", id=PARLIAMENT, polity_id=HUNGARY, kind="unicameral")
+    p.name(PARLIAMENT, "National Assembly", "en", "official")
+    p.name(PARLIAMENT, "Országgyűlés", "hu", "native", False)
+    for id, since, until, rules, text in SYSTEMS:
+        p.add(
+            "electoral_system", id=id, polity_id=HUNGARY, valid_from=since, valid_to=until, rules=rules, rules_version=1
+        )
+        p.add("note", id=key("note", id), entity_id=id, kind="methodology", body_md=text, lang="en")
+    for folded, label in sorted(PARTIES.items()):
+        id = key("party", folded)
+        p.add("party", id=id, kind="bloc" if re.search(r",|-KDNP|\bÉS\b", label) else "party", polity_id=HUNGARY)
+        p.add("external_id", entity_id=id, scheme="hu.valasztas.party", value=folded)
+        p.name(id, label, "hu", "official")
+    return p
+
+
+def geo() -> Package:
+    p = Package(
+        f"{SOURCE}/geo",
+        SOURCE,
+        "Hungary's counties, settlements, and parliamentary districts as the National Election Office names them",
+    )
+    p.external |= {HUNGARY, TERRITORY}
+    for code, rank, kind, noun in (
+        ("hu.megye", 1, "administrative", "county"),
+        ("hu.oevk", 2, "electoral_district", "parliamentary constituency"),
+        ("hu.telepules", 3, "administrative", "settlement"),
+        ("hu.szavazokor", 4, "precinct", "polling station"),
+    ):
+        p.add("scheme", code=code, polity_id=HUNGARY, kind=kind, rank=rank, noun=noun, code_system=None)
+    for code, name in COUNTIES.items():
+        id = county(code)
+        p.add("area", id=id, scheme_code="hu.megye")
+        p.add("area_code", area_id=id, code=code)
+        p.add("area_parent", area_id=id, parent_id=TERRITORY)
+        p.name(id, "Budapest" if code == "01" else f"{name} vármegye", "hu", "official")
+    found = places()
+    for code, name in sorted({**found.names, **{c: n for c, (_, n) in found.historic.items()}}.items()):
+        id = settlement(code)
+        p.add("area", id=id, scheme_code="hu.telepules")
+        p.add("area_code", area_id=id, code=code)
+        p.add("area_parent", area_id=id, parent_id=county(code[:2]))
+        p.name(id, person_text(name) if name.isupper() else name, "hu", "official")
+    for (period, maz, number_), name in sorted(OEVK_NAMES.items()):
+        id = district(period, maz, number_)
+        p.add("area", id=id, scheme_code="hu.oevk")
+        p.add("area_code", area_id=id, code=f"{period}:{maz}-{number_}")
+        p.add("area_parent", area_id=id, parent_id=county(maz))
+        p.name(id, name, "hu", "official")
+    return p
+
+
+Builder = Callable[[Day], None]
+DAYS: dict[date, list[tuple[str, Builder]]] = defaultdict(list)
+DEPENDS: dict[date, list[str]] = {}
+OTHER: list[tuple[date, str, Builder]] = []
+
+
+def _register() -> None:
+    if DAYS:
+        return
+    for year, (_, first, second, _, _) in OLD_PARLIAMENT.items():
+        for round_number, day in ((1, first), (2, second)):
+            text = f"{year} parliamentary election, {ordinal(round_number)} round"
+            DAYS[day].append((text, functools.partial(old_parliament, year=year, round_number=round_number)))
+        DEPENDS[second] = [f"{SOURCE}/{first}"]
+    for year, (_, first, second, _, _) in MID_PARLIAMENT.items():
+        for round_number, day in ((1, first), (2, second)):
+            text = f"{year} parliamentary election, {ordinal(round_number)} round"
+            DAYS[day].append((text, functools.partial(mid_parliament, year=year, round_number=round_number)))
+        DEPENDS[second] = [f"{SOURCE}/{first}"]
+    for year, (_, day, _, _) in NEW_PARLIAMENT.items():
+        DAYS[day].append((f"{year} parliamentary election", functools.partial(new_parliament, year=year)))
+    for year, (_, day) in VTR_PARLIAMENT.items():
+        DAYS[day].append((f"{year} parliamentary election", functools.partial(vtr_parliament, year=year)))
+    for day, text, builder in OTHER:
+        DAYS[day].append((text, builder))
+
+
+def build(day: date) -> Day:
+    texts = [text for text, _ in DAYS[day]]
+    d = Day(
+        day,
+        f"Hungary's {' and '.join(texts)} by polling station, from the National Election Office",
+        depends=DEPENDS.get(day, []),
+    )
+    for _, builder in DAYS[day]:
+        builder(d)
+    return d
+
+
+def packages() -> list[str]:
+    _register()
+    return [f"{SOURCE}/geo", f"{SOURCE}/registry", *(f"{SOURCE}/{day}" for day in sorted(DAYS))]
+
+
+def parse(only: str | None = None) -> None:
+    _register()
+    for day in sorted(DAYS):
+        if only and only not in str(day):
+            continue
+        build(day).write()
+        bundle.cache_clear()
+    geo().write()
+    registry().write()
+
+
+def emit() -> None:
+    package.run("load", packages())
+
+
+# ---------------------------------------------------------------------------------------------------------------
+# National referendums
+
+REFERENDUMS: dict[date, tuple[str, str]] = {
+    date(1997, 11, 16): ("1997_nepszavazas", "optional_referendum"),
+    date(2003, 4, 12): ("2003_nepszavazas", "optional_referendum"),
+    date(2004, 12, 5): ("2004_nepszavazas", "initiative"),
+    date(2008, 3, 9): ("2008_nepszavazas", "initiative"),
+    date(2016, 10, 2): ("2016_nepszavazas", "optional_referendum"),
+    date(2022, 4, 3): ("2022_nepszavazas", "optional_referendum"),
+}
+REFERENDUM_METHOD = (
+    "Counted per polling station (szavazókör) and published by the National Election Office. Registered voters are "
+    "the electoral roll, voters are those who signed the roll, ballots cast are the stamped ballots in the box, and "
+    "valid and invalid are the ballots valid or invalid on this question.{extra}"
+)
+
+
+class Referendum:
+    def __init__(self, d: Day, kind: str) -> None:
+        self.d = d
+        self.kind = kind
+        path = f"hu/{d.day}-referendum"
+        self.path = path
+        self.election = d.election(
+            f"nep:{d.day}",
+            "referendum",
+            f"{d.day.year} Hungarian referendum",
+            f"{d.day.year}. évi országos népszavazás",
+            path,
+        )
+        self.tags: dict[int, str] = {}
+
+    def question(self, number_: int, text_: str, extra: str = "") -> str:
+        tag = self.tags.get(number_)
+        if tag is not None:
+            return tag
+        tag = self.tags[number_] = f"nep:{self.d.day}:{number_}"
+        self.d.contest(
+            tag,
+            self.election,
+            "ballot_question",
+            re.sub(r"\s+", " ", text_).strip().strip('"„”'),
+            f"{self.path}/{number_}",
+            magnitude=None,
+            method=REFERENDUM_METHOD.format(extra=f" {extra}" if extra else ""),
+            english=f"Question {number_}",
+        )
+        self.d.p.add("ballot_question", contest_id=key("contest", tag), type=self.kind)
+        self.d.option(tag, "Igen", "answer", position=1)
+        self.d.option(tag, "Nem", "answer", position=2)
+        return tag
+
+    def answers(self, tag: str, unit: str, yes: int | None, no: int | None) -> None:
+        self.d.value(tag, unit, self.d.options[(tag, same_name("Igen"))], 1, yes)
+        self.d.value(tag, unit, self.d.options[(tag, same_name("Nem"))], 1, no)
+
+    def declare(self, tag: str, yes: int | None, no: int | None) -> None:
+        self.d.declare(tag, self.d.options[(tag, same_name("Igen"))], 1, yes)
+        self.d.declare(tag, self.d.options[(tag, same_name("Nem"))], 1, no)
+
+
+def referendum(d: Day) -> None:
+    name, kind = REFERENDUMS[d.day]
+    if d.day.year != 2022:
+        d.cite(ARCHIVE)
+    r = Referendum(d, kind)
+    found = places()
+    year = d.day.year
+    if year == 1997:
+        heads = {}
+        for row in piped(name, "szkf.txt"):
+            maz = county_key(row[3])
+            nums, _ = _numbers(row[5:])
+            heads[tuple(row[:3])] = (d.unit(found.resolve(maz, None, row[4], trust_code=False), row[2]), nums)
+        for row in piped(name, "szkt.txt"):
+            unit, nums = heads[tuple(row[:3])]
+            tag = r.question(int(row[3]), row[4])
+            invalid, valid, yes, no = (number(cell) for cell in row[5:9])
+            d.accounting(tag, unit, nums[3], nums[4], nums[5], invalid, valid)
+            r.answers(tag, unit, yes, no)
+        for row in piped(name, "orszt.txt"):
+            tag = r.question(int(row[1]), row[2])
+            r.declare(tag, number(row[5]), number(row[6]))
+    elif year == 2003:
+        (national,) = piped(name, "orszageredm.txt")
+        tag = r.question(1, national[12])
+        for row in piped(name, "szaveredm.txt"):
+            nums, _ = _numbers(row[7:])
+            unit = d.unit(found.resolve(row[0], row[4], row[5], trust_code=True), row[6])
+            d.accounting(tag, unit, nums[3], nums[5], nums[6], nums[8], nums[9])
+            r.answers(tag, unit, nums[10], nums[11])
+        r.declare(tag, number(national[10]), number(national[11]))
+    elif year == 2004:
+        questions = {int(row[0]): row[1] for row in piped(name, "orszkerd.txt")}
+        heads = {}
+        for row in piped(name, "szaveredm.txt"):
+            nums, _ = _numbers(row[7:])
+            heads[(row[0], row[4], row[6])] = (
+                d.unit(found.resolve(row[0], row[4], row[5], trust_code=True), row[6]),
+                nums,
+            )
+        for row in piped(name, "szavkerd.txt"):
+            unit, nums = heads[(row[0], row[1], row[2])]
+            tag = r.question(int(row[3]), questions[int(row[3])])
+            invalid, valid, yes, no = (number(cell) for cell in row[5:9])
+            d.accounting(tag, unit, nums[3], nums[5], nums[6], invalid, valid)
+            r.answers(tag, unit, yes, no)
+        (abroad,) = piped(name, "kuleredm.txt")
+        nums, _ = _numbers(abroad)
+        unit = d.special_unit("kulkepviselet", "abroad_mission")
+        for row in piped(name, "kulkerd.txt"):
+            tag = r.question(int(row[0]), questions[int(row[0])])
+            invalid, valid, yes, no = (number(cell) for cell in row[2:6])
+            d.accounting(tag, unit, nums[0], nums[2], nums[3], invalid, valid)
+            r.answers(tag, unit, yes, no)
+        for row in piped(name, "orszkerd.txt"):
+            tag = r.question(int(row[0]), row[1])
+            r.declare(tag, number(row[4]), number(row[5]))
+    elif year == 2008:
+        book = sheets(name, ".xls")
+        totals: Counter[tuple[int, str]] = Counter()
+        for sheet, rows in book.items():
+            if sheet.startswith("Param"):
+                continue
+            abroad = sheet.upper().startswith("KÜLK")
+            maz = None if abroad else county_key(sheet)
+            texts = {}
+            for row in rows[:4]:
+                for index, cell in enumerate(row):
+                    found_q = re.match(r"(\d)\. kérdés: (.*)", cell)
+                    if found_q:
+                        texts[index] = (int(found_q[1]), found_q[2])
+            starts = sorted(texts)
+            for row in rows[3:]:
+                place_name = row[0]
+                if place_name.lower().startswith("megye összesen"):
+                    for start in starts:
+                        totals[(texts[start][0], "Igen")] += number(row[start + 11]) or 0
+                        totals[(texts[start][0], "Nem")] += number(row[start + 12]) or 0
+                    continue
+                if not place_name or number(row[1]) is None or place_name.lower().startswith(("összes", "megye")):
+                    continue
+                if abroad:
+                    unit = d.special_unit(f"kulkepviselet:{changeset.slug(place_name)}", "abroad_mission")
+                else:
+                    unit = d.settlement_unit(found.resolve(cast(str, maz), None, place_name, trust_code=False))
+                for start in starts:
+                    question, text_ = texts[start]
+                    tag = r.question(question, text_, "This referendum is published per settlement only.")
+                    cells = [number(cell) for cell in row[start + 2 : start + 13]]
+                    d.accounting(tag, unit, cells[2], cells[4], cells[5], cells[7], cells[8])
+                    r.answers(tag, unit, cells[9], cells[10])
+        for question, tag in r.tags.items():
+            r.declare(tag, totals[(question, "Igen")], totals[(question, "Nem")])
+    elif year == 2016:
+        book = sheets(name, ".xls")
+        domestic = book["Belf. szavkörök jkv."]
+        header = domestic[0]
+        text_ = book["Kontrol adatok"][1][1]
+        tag = r.question(1, text_)
+        for row in domestic[1:]:
+            cells = dict(zip(header, row, strict=False))
+            if not cells.get("Megye kód"):
+                continue
+            unit = d.unit(found.resolve(row[0], row[2], row[3], trust_code=True), row[4])
+            d.accounting(
+                tag,
+                unit,
+                number(cells["Névjegyzéki létszám (A)"]),
+                number(cells["Megjelent vál.polg. (E)"]),
+                number(cells["Szavazólap bélyegzett (J)"]),
+                number(cells["Érvénytelen szavazólap (K)"]),
+                number(cells["Érvényes szavazólap (L)"]),
+            )
+            r.answers(tag, unit, number(cells["Igen szavazat (I)"]), number(cells["Nem szavazat (N)"]))
+        for sheet, kind, unit_name in (
+            ("Külképviseleti jkv.", "abroad_mission", "kulkepviselet"),
+            ("Levélben szavazás jkv.", "postal_district", "levelben"),
+        ):
+            rows = book[sheet]
+            header = rows[0]
+            for index, row in enumerate(rows[1:]):
+                cells = dict(zip(header, row, strict=False))
+                if not any(cells.values()) or number(cells.get("Igen szavazat (I)")) is None:
+                    continue
+                label = next((value for column, value in cells.items() if "megnev" in column.lower()), str(index))
+                unit = d.special_unit(f"{unit_name}:{changeset.slug(label) or index}", kind)
+                figures = {column.split("(")[-1].rstrip(")"): number(value) for column, value in cells.items()}
+                registered = next((number(v) for c, v in cells.items() if "létszám" in c.lower()), None)
+                voters = next((number(v) for c, v in cells.items() if "megjelent" in c.lower()), None)
+                d.accounting(
+                    tag,
+                    unit,
+                    registered,
+                    voters,
+                    figures.get("J"),
+                    figures.get("K"),
+                    figures.get("L"),
+                )
+                r.answers(tag, unit, figures.get("I"), figures.get("N"))
+        d.reasons["accounting.declared"] = (
+            "the national totals include the ballots cast at foreign missions, for which the office's file prints the "
+            "envelopes but no votes"
+        )
+        national = dict(zip(book["Országos eredmény"][0], book["Országos eredmény"][1], strict=False))
+        r.declare(tag, number(national["Igen szavazat (I)"]), number(national["Nem szavazat (N)"]))
+    elif year == 2022:
+        archive = "2022_nepszavazas"
+        d.cite(ARCHIVE)
+        rows = [
+            dict(zip(raw_rows[0], row, strict=False))
+            for raw_rows in [next(iter(sheets(archive, "szavazóköri_jkv_20220502.xlsx").values()))]
+            for row in raw_rows[1:]
+        ]
+        for head, items in _protocols(rows, "SZAVAZÓKÖR_AZON"):
+            unit = d.unit(
+                found.resolve(head["MEGYEKÓD"], head["TELEPÜLÉS_SORSZÁM"], head["TELEPÜLÉS"], True), head["SZAVAZÓKÖR"]
+            )
+            for item in items:
+                tag = r.question(int(cast(int, number(item["KÉRDÉS_SORSZÁM"]))), item["KÉRDÉS_SZÖVEGE"])
+                invalid = number(next(v for c, v in item.items() if c.startswith("ÉRVÉNYES_SZAVAZATOT_NEM")))
+                d.accounting(
+                    tag,
+                    unit,
+                    number(head["VÁLASZTÓPOLGÁR"]),
+                    number(head["MEGJELENTEK"]),
+                    number(head["URNÁBAN_LEVŐ"]),
+                    invalid,
+                    number(item["ÉRVÉNYES_SZAVAZATOK"]),
+                )
+                r.answers(tag, unit, number(item["IGEN_SZAVAZAT"]), number(item["NEM_SZAVAZAT"]))
+        for suffix, kind, unit_name in (
+            ("levélben_leadott_szavazatok_számlálási_jkv_20220502.xlsx", "postal_district", "levelben"),
+        ):
+            sheet_rows = next(iter(sheets(archive, suffix).values()))
+            table = [dict(zip(sheet_rows[0], row, strict=False)) for row in sheet_rows[1:]]
+            unit = d.special_unit(unit_name, kind)
+            head = table[0]
+            for item in table:
+                question = number(item.get("KÉRDÉS_SORSZÁM"))
+                if question is None:
+                    head = item
+                    continue
+                tag = r.question(question, item.get("KÉRDÉS_SZÖVEGE", ""))
+                invalid = number(next((v for c, v in item.items() if c.startswith("ÉRVÉNYES_SZAVAZATOT_NEM")), None))
+                d.accounting(
+                    tag,
+                    unit,
+                    number(next((v for c, v in head.items() if c.startswith("VÁLASZTÓPOLGÁR")), None)),
+                    number(next((v for c, v in head.items() if "IRAT" in c and "ÉRVÉNYES" in c), None)),
+                    number(next((v for c, v in head.items() if "SZAVAZÓLAP" in c and "LEVŐ" in c), None)),
+                    invalid,
+                    number(item.get("ÉRVÉNYES_SZAVAZATOK")),
+                )
+                r.answers(tag, unit, number(item.get("IGEN_SZAVAZAT")), number(item.get("NEM_SZAVAZAT")))
+        sheet_rows = next(iter(sheets(archive, "eredmény_jkv_20220502.xlsx").values()))
+        for row in sheet_rows[1:]:
+            item = dict(zip(sheet_rows[0], row, strict=False))
+            question = number(item.get("KÉRDÉS_SORSZÁM"))
+            if question is not None and question in r.tags:
+                r.declare(r.tags[question], number(item.get("IGEN_SZAVAZAT")), number(item.get("NEM_SZAVAZAT")))
+
+
+for _day in REFERENDUMS:
+    OTHER.append((_day, f"{_day.year} referendum", referendum))
+
+
+# ---------------------------------------------------------------------------------------------------------------
+# European Parliament
+
+EP_DAYS = {
+    date(2004, 6, 13): "2004_EP",
+    date(2009, 6, 7): "2009_EP",
+    date(2014, 5, 25): "2014_EP",
+    date(2019, 5, 26): "2019_EP",
+    date(2024, 6, 9): "ep2024",
+}
+EP_SEATS = {2004: 24, 2009: 22, 2014: 21, 2019: 21, 2024: 21}
+
+
+def ep_contest(d: Day) -> str:
+    path = f"hu/{d.day}-european-parliament-polling-stations"
+    election = d.election(
+        f"ep:{d.day.year}",
+        "general",
+        f"{d.day.year} European Parliament election in Hungary, by polling station",
+        f"{d.day.year}. évi európai parlamenti választás",
+        path,
+    )
+    tag = f"ep:{d.day.year}"
+    d.contest(
+        tag,
+        election,
+        "list_allocation",
+        "Európai parlamenti képviselők választása",
+        f"{path}/lista",
+        magnitude=EP_SEATS[d.day.year],
+        system=EP_SYSTEM,
+        method=method(
+            "The national result of this election is also held from the European Parliament's own figures; this "
+            "contest holds the National Election Office's polling-station returns."
+        ),
+        english="Members of the European Parliament",
+    )
+    return tag
+
+
+def european(d: Day) -> None:
+    year = d.day.year
+    name = EP_DAYS[d.day]
+    tag = ep_contest(d)
+    found = places()
+    if year in (2004, 2009):
+        d.cite(ARCHIVE)
+        heads: dict[tuple[str, str, str], str] = {}
+        for row in piped(name, "cdszavf.txt"):
+            nums, _ = _numbers(row[5:])
+            if row[0] == ABROAD:
+                unit = d.special_unit(f"kulkepviselet:{int(row[4]):03d}", "abroad_mission")
+            else:
+                unit = d.unit(found.resolve(row[0], row[2], row[3], trust_code=True), row[4])
+            heads[(row[0], row[2], row[4])] = unit
+            d.accounting(tag, unit, nums[-7], nums[-5], nums[-4], nums[-2], nums[-1])
+        for row in piped(name, "cdszavt.txt"):
+            option = d.option(tag, row[6], "list", nominator=row[6], position=number(row[5]), ident=str(number(row[5])))
+            d.value(tag, heads[(row[0], row[2], row[4])], option, 1, number(row[7]))
+        for row in piped(name, "cdorszt.txt"):
+            option = d.option(tag, row[1], "list", nominator=row[1], position=number(row[0]), ident=str(number(row[0])))
+            d.declare(tag, option, 1, number(row[2]))
+            if number(row[4]):
+                d.outcome(tag, option, "won", number(row[4]))
+        for row in piped(name, "cdorszj.txt"):
+            option = d.options[(tag, str(number(row[0])))]
+            candidacy = d.candidate(
+                tag,
+                option,
+                f"ep:{year}:{number(row[0])}:{same_name(row[3])}",
+                row[3],
+                role="list_member",
+                position=number(row[2]),
+            )
+            if row[4] == "1":
+                d.outcome(tag, option, "elected", candidacy=candidacy)
+    elif year == 2014:
+        d.cite(ARCHIVE)
+        for head, items in _protocols(delimited(name, ".csv"), "SZAVAZÓKÖR_AZON"):
+            if head["JKV_TÍPUS"].lower().startswith("külk"):
+                unit = d.special_unit(f"kulkepviselet:{head['SZAVAZÓKÖR_AZON']}", "abroad_mission")
+            else:
+                area = found.resolve(head["MEGYEKÓD"], head["TELEPÜLÉS_SORSZÁM"], head["TELEPÜLÉS"], trust_code=True)
+                unit = d.unit(area, head["SZAVAZÓKÖR"])
+            d.accounting(
+                tag,
+                unit,
+                number(head["VÁLASZTÓPOLGÁR"]),
+                number(head["MEGJELENTEK"]),
+                number(head["URNÁBAN_LEBÉLYEGZETT"]),
+                number(head["ÉRVÉNYTELEN"]),
+                number(head["ÉRVÉNYES"]),
+            )
+            for item in items:
+                option = d.option(tag, item["LISTA"], "list", nominator=item["LISTA"])
+                d.value(tag, unit, option, 1, number(item["SZAVAZAT"]))
+        d.cite(EP14)
+        for cells in table_rows(EP14):
+            option = d.options.get((tag, same_name(cells[0]))) if len(cells) >= 4 else None
+            if option is None:
+                continue
+            d.declare(tag, option, 1, number(cells[1].replace(" ", "")))
+            if number(cells[3]):
+                d.outcome(tag, option, "won", number(cells[3]))
+    elif year == 2019:
+        d.cite(ARCHIVE)
+        for sheet, rows in sheets(name, "szavazóköri_eredmény.xlsx").items():
+            header = rows[0]
+            labels = {index: re.sub(r"^\d+\.\s*", "", cell).strip() for index, cell in enumerate(header) if index >= 11}
+            for row in rows[1:]:
+                if not row[2] or number(row[4]) is None:
+                    continue
+                unit = d.unit(found.resolve(county_key(row[1] or sheet), None, row[2], trust_code=False), row[3])
+                d.accounting(tag, unit, number(row[4]), number(row[5]), number(row[7]), number(row[9]), number(row[10]))
+                for index, label in labels.items():
+                    position = number(header[index].split(".")[0])
+                    option = d.option(tag, label, "list", nominator=label, position=position, ident=str(position))
+                    d.value(tag, unit, option, 1, number(row[index]))
+        d.p.add(
+            "note",
+            id=key("note", d.sets[tag], "domestic"),
+            entity_id=d.sets[tag],
+            kind="caveat",
+            body_md="The office's 2019 polling-station file holds the polling stations in Hungary only; votes cast at "
+            "foreign missions and by post are not in it.",
+            lang="en",
+        )
+    else:
+        vtr_european(d, tag)
+
+
+def _single(value: object) -> list[dict[str, object]]:
+    if isinstance(value, dict):
+        return [cast(dict[str, object], value)]
+    return _items(value)
+
+
+def _payload(document: dict[str, object]) -> object:
+    return document.get("list", document.get("data"))
+
+
+def vtr_european(d: Day, tag: str) -> None:
+    election_name = "ep2024"
+    for name in VTR_CATALOGS[election_name][0]:
+        d.cite(vtr_url(election_name, "ver", name))
+    for name in VTR_CATALOGS[election_name][1]:
+        d.cite(vtr_url(election_name, "szavossz", name))
+    d.cite(_crawl_key(election_name))
+    found = places()
+    lists = {
+        int(cast(int, row["szavlap_sorsz"])): row
+        for row in _items(vtr_json(election_name, "ver", "euListakEsJeloltek.json")["list"])
+        if row.get("szavlap_sorsz") is not None
+    }
+    winners = {
+        int(cast(int, row["kpn_id"])) for row in _items(vtr_json(election_name, "szavossz", "epGyoztesek.json")["list"])
+    }
+    options: dict[int, str] = {}
+    for position, row in sorted(lists.items()):
+        label = str(row["jlcs_nev"])
+        option = options[position] = d.option(
+            tag, label, "list", nominator=label, position=position, ident=str(position)
+        )
+        for member in _items(row.get("jeloltek")):
+            printed = str(member["neve"]) if not member.get("dr_jelzo") else f"{member['dr_jelzo']} {member['neve']}"
+            candidacy = d.candidate(
+                tag,
+                option,
+                f"ep:2024:kpn:{member['kpn_id']}",
+                printed,
+                role="list_member",
+                position=_int(member.get("sorsz")),
+            )
+            if int(cast(int, member["kpn_id"])) in winners:
+                d.outcome(tag, option, "elected", candidacy=candidacy)
+
+    def votes(unit: str, protocol: dict[str, object], registered: object, voters: object) -> None:
+        for item in _items(protocol.get("tetelek")):
+            d.value(tag, unit, options[int(cast(int, item["szavlap_sorsz"]))], 1, _int(item.get("szavazat")))
+        d.accounting(
+            tag,
+            unit,
+            _int(registered),
+            _int(voters),
+            _int(protocol.get("szl_belyegzett_urna")),
+            _int(protocol.get("szl_ervenytelen")),
+            _int(protocol.get("szl_ervenyes")),
+        )
+
+    for code, payload in sorted(vtr_precincts(election_name).items()):
+        data = cast(dict[str, object], payload.get("data") or {})
+        area = found.resolve(code[:2], code[2:], found.names.get(code, ""), trust_code=True)
+        for protocol in _items(data.get("jegyzokonyvek")):
+            unit = d.unit(area, str(protocol["sorsz"]))
+            votes(unit, protocol, protocol.get("vp_osszes"), protocol.get("szk_megjelent"))
+    for row in _single(_payload(vtr_json(election_name, "szavossz", "KuviJkv.json"))):
+        votes(d.special_unit("kulkepviselet", "abroad_mission"), row, row.get("vp_kulkepv"), row.get("kuvi_megjelent"))
+    for row in _single(_payload(vtr_json(election_name, "szavossz", "LevelJkv.json"))):
+        votes(
+            d.special_unit("levelben", "postal_district"), row, row.get("vp_level"), row.get("beerkezett_ervenyes_irat")
+        )
+    for row in _items(vtr_json(election_name, "szavossz", "ListasJkv.json")["list"]):
+        if str(row.get("oszint")) != "5":
+            continue
+        for item in _items(row.get("tetelek")):
+            option = options[int(cast(int, item["szavlap_sorsz"]))]
+            d.declare(tag, option, 1, _int(item.get("szavazat")))
+            seats = _int(item.get("mandatum"))
+            if seats:
+                d.outcome(tag, option, "won", seats)
+
+
+VTR_CATALOGS["ep2024"] = (
+    ["Telepulesek.json", "euListakEsJeloltek.json", "euSzervezetek.json"],
+    ["ListasJkv.json", "LevelJkv.json", "KuviJkv.json", "epGyoztesek.json"],
+)
+for _day in EP_DAYS:
+    OTHER.append((_day, f"{_day.year} European Parliament election", european))
