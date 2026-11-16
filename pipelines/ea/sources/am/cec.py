@@ -725,6 +725,8 @@ def election(e: Election) -> Package:
         kind="aggregate",
     )
     declared = totals(e, data, found, columns)
+    if not any("total" in values for values in data.columns.values()):
+        p.artifact(page(e), SOURCE_ID)
     for name, measure in accounting.items():
         if name in found:
             values.add(result_set, evote, None, measure, data.columns[found[name]].get("evote"))
