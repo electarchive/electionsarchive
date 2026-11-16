@@ -71,7 +71,9 @@ def parse() -> None:
     for year, (election, since, until) in ELECTIONS.items():
         polygons = raw.cached(SOURCE, hu.vtr_url(election, "ver", "OevkPoligonok.json"))
         p.artifact(polygons, hu.NVI)
-        p.artifact(raw.cached(SOURCE, hu.vtr_url(election, "ver", "OevkAdatok.json")), hu.NVI)
+        # The election packages already register the constituency list as a source artifact; cite it without
+        # repeating the row.
+        p.uses(raw.cached(SOURCE, hu.vtr_url(election, "ver", "OevkAdatok.json")))
         rows = cast(list[dict[str, str]], json.loads(polygons.path.read_bytes())["list"])
         expected = {
             (str(row["maz"]).zfill(2), str(row["evk"]).zfill(2))
