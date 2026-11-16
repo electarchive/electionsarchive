@@ -25,7 +25,7 @@ import polars as pl
 from ea import changeset, package, raw
 from ea.package import Package
 from ea.sources.pt import legacy
-from ea.sources.pt.crawl import HOST, Site, bundle_url, store
+from ea.sources.pt.crawl import CANDIDATE_SITES, HOST, Site, bundle_url, store
 from ea.sources.pt.legacy import Old
 
 SOURCE = "pt.mai"
@@ -844,6 +844,91 @@ def person(name: str) -> str:
     return key("person", fold(name))
 
 
+@dataclass
+class Slate:
+    """One list's candidates in one territory: the head candidates of a council, or the effective and alternate
+    candidates of a list, in ballot order."""
+
+    effective: list[str]
+    alternates: list[str]
+    mandates: int
+    elected: list[str] | None  # the names a site's elected-only pages print, when they filter
+    heads: int  # presidents elected, for a municipal council
+
+
+PROTO_CANDIDATES = re.compile(r"PARTIES-CANDIDATES-([A-Z]+)-.*PAGE-\d+-ELECTED-(TRUE|FALSE)\.json$")
+NG_CANDIDATES = re.compile(r"parties-candidates-([A-Z]+)(?:-.+)?-\d+-(true|false)\.json$")
+
+
+def _names(value: object) -> list[str]:
+    return [clean(name) for name in value if clean(name)] if isinstance(value, list) else []
+
+
+@functools.cache
+def slates(site: Site) -> dict[tuple[str, str], dict[str, Slate]]:
+    """The candidate lists of a site, by organ and territory key, then by party label."""
+    if site.name not in CANDIDATE_SITES:
+        return {}
+    archive = zipfile.ZipFile(raw.cached(SOURCE, bundle_url(site)).path)
+    if site.family == "ps":
+        return _ps_slates(site, archive)
+    out: dict[tuple[str, str], dict[str, Slate]] = {}
+    elected: dict[tuple[str, str, str], list[str]] = {}
+    pattern = PROTO_CANDIDATES if site.family == "proto" else NG_CANDIDATES
+    for name in sorted(archive.namelist()):
+        found = pattern.search(name)
+        if found is None:
+            continue
+        site_organ, flag = found.group(1), found.group(2).lower() == "true"
+        organ = ORGANS[site_organ]
+        body = _decode(archive.read(name))
+        for entry in _list(body.get("electionCandidates") if isinstance(body, dict) else None):
+            territory = str(entry["territoryKey"])
+            for item in _list(entry.get("candidates")):
+                label = clean(item["party"])
+                if flag:
+                    elected[(organ, territory, label)] = _names(item.get("effectiveCandidates"))
+                    continue
+                out.setdefault((organ, territory), {})[label] = Slate(
+                    _names(item.get("effectiveCandidates")),
+                    _names(item.get("alternateCandidates")),
+                    _int(item.get("mandates")) or 0,
+                    None,
+                    _int(item.get("presidents")) or 0,
+                )
+    for (organ, territory, label), names in elected.items():
+        slate = out.get((organ, territory), {}).get(label)
+        if slate is not None and len(names) == slate.mandates and names != slate.effective:
+            slate.elected = names
+    return out
+
+
+def _ps_slates(site: Site, archive: zipfile.ZipFile) -> dict[tuple[str, str], dict[str, Slate]]:
+    """The 2025 local sites list each voting option across every municipality; only the council head is published."""
+    out: dict[tuple[str, str], dict[str, Slate]] = {}
+    for name in sorted(archive.namelist()):
+        if "/candidate/candidates-" not in name or "candidatesElected=false" not in name:
+            continue
+        body = json.loads(archive.read(name)).get("data") or {}
+        for region in _list(body.get("territories")):
+            for town in _list(region.get("territories")):
+                for option in _list(town.get("votingOptions")):
+                    voting = option.get("votingOption")
+                    people = [c for c in _list(option.get("candidates")) if c.get("type") == "Efetivo"]
+                    if not isinstance(voting, dict) or not people:
+                        continue
+                    label = clean(voting.get("name"))
+                    president = any(c.get("state") == "President" for c in people)
+                    out.setdefault(("CM", str(town["id"])), {})[label] = Slate(
+                        [clean(c["name"]) for c in sorted(people, key=lambda c: int(str(c["position"])))],
+                        [],
+                        0,
+                        None,
+                        1 if president else 0,
+                    )
+    return out
+
+
 # ---------------------------------------------------------------------------------------------------------------------
 # Elections
 
@@ -1029,6 +1114,12 @@ def election(site: Site) -> Package:
             _contest(p, t, site, organ, node, leaves, election_id, path, slugs, built, towns, known, people, first)
     _values(p, built)
     _turnout(p, site, built)
+    if family == "autarquicas" and slates(site):
+        p.accept(
+            "outcomes.list_members",
+            "the results site names only the head of each municipal council list, so one elected candidate stands "
+            "against the several council seats the list won",
+        )
     return p
 
 
@@ -1320,6 +1411,43 @@ def _contest(
         p.add("note", id=key("note", result_set, "gap"), entity_id=result_set, kind="caveat", body_md=gap, lang="en")
     if declared is not None:
         _outcomes(p, organ, result_set, declared, options)
+    _slates(p, site, organ, node, result_set, options)
+
+
+def _slates(
+    p: Package, site: Site, organ: str, node: str, result_set: str, options: dict[tuple[str, int], str]
+) -> None:
+    """Add the people on each list and, from the lists' mandates, who was elected."""
+    here = slates(site).get((organ, node))
+    if not here:
+        return
+    for (label, n), option in options.items():
+        slate = here.get(label)
+        if n != 0 or slate is None:
+            continue
+        council = organ == "CM"
+        elected = set(slate.elected if slate.elected is not None else slate.effective[: slate.mandates])
+        if council:
+            elected = set(slate.effective[: slate.heads])
+        positions = [(name, "head" if council else "list_member", i) for i, name in enumerate(slate.effective, 1)]
+        positions += [(name, "substitute", i) for i, name in enumerate(slate.alternates, len(slate.effective) + 1)]
+        for name, role, position in positions:
+            tag = (site.name, organ, node, label, position)
+            who = key("person", *tag)
+            p.add("person", id=who)
+            p.name(who, name, "pt", "official")
+            candidacy = key("candidacy", *tag)
+            p.add(
+                "candidacy",
+                id=candidacy,
+                person_id=who,
+                option_id=option,
+                role=role,
+                list_position=position,
+                ballot_name=name,
+            )
+            if role != "substitute" and name in elected:
+                p.add("outcome", result_set_id=result_set, option_id=option, candidacy_id=candidacy, kind="elected")
 
 
 def _outcomes(p: Package, organ: str, result_set: str, declared: Count, options: dict[tuple[str, int], str]) -> None:
