@@ -2,12 +2,15 @@ import csv
 import json
 import math
 import re
+import time
 import unicodedata
 from collections import Counter, defaultdict
 from datetime import date
 from pathlib import Path
 from urllib.parse import urlencode
 from uuid import UUID
+
+import httpx
 
 from ea import raw
 from ea.changeset import Changeset
@@ -630,10 +633,29 @@ def _day(value: str | None, precision: str | None) -> tuple[date | None, str]:
     return day.replace(day=1) if kind == "month" else day.replace(month=1, day=1) if kind == "year" else day, kind
 
 
+def _complete(countries: dict[str, tuple[str | None, str]]) -> dict[str, tuple[str | None, str]]:
+    held = raw.keys(SOURCE)
+    return {
+        iso: entry
+        for iso, entry in countries.items()
+        if all(url in held for url in _urls({iso: entry})[:-2] + _placed({iso: entry})[:-1])
+    }
+
+
 def fetch() -> None:
     countries = _countries()
-    for url in _urls(countries) + _placed(countries):
-        raw.fetch(SOURCE, url, suffix=".json")
+    failed: list[str] = []
+    for url in dict.fromkeys(_urls(countries) + _placed(countries)):
+        for attempt in range(3):
+            try:
+                raw.fetch(SOURCE, url, suffix=".json")
+                break
+            except httpx.HTTPStatusError, httpx.TransportError:
+                time.sleep(30 * (attempt + 1))
+        else:
+            failed.append(url)
+    if failed:
+        print(f"{len(failed)} queries failed; their countries wait for a later run")
 
 
 def emit() -> Path:
@@ -642,7 +664,7 @@ def emit() -> Path:
     inceptions: defaultdict[str, set[tuple[date, str]]] = defaultdict(set)
     statements: dict[str, list[dict[str, str]]] = defaultdict(list)
     stances: dict[str, list[dict[str, str]]] = defaultdict(list)
-    countries = _countries()
+    countries = _complete(_countries())
     for scope, (country, languages) in countries.items():
         for row in _rows(_url(NAMES, _scope(country), languages)):
             item = row["item"].rsplit("/", 1)[1]
