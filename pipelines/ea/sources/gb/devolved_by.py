@@ -15,7 +15,7 @@ from ea.sources.gb import umit
 from ea.store import DATA, connect
 
 SOURCE = "gb.devolved_by"
-VERSION = "6"
+VERSION = "7"
 PARSED = DATA / "parsed" / SOURCE
 VOTES, REGISTERED, INVALID = 1, 2, 5
 PAGE = "https://en.wikipedia.org/w/index.php?title={}&action=raw"
@@ -169,6 +169,15 @@ WINNERS = {
     "rhun-ap-iorwerth": ("wikidata", "Q14420732"),
     "jack-sargeant": ("wikidata", "Q47995095"),
     "lindsay-whittle": ("wikidata", "Q6552839"),
+}
+# By-election candidates who also sat in another body, matched by name and party
+# against persons other pipelines already hold. A join applies only when the
+# target person exists and the candidate's party matches; no namesake is inferred.
+JOINS = {
+    "jim-mather": ("gb.scottish_parliament.person", "jim-mather", "scottish-national-party"),
+    "shirley-anne-somerville": ("gb.scottish_parliament.person", "shirley-anne-somerville", "scottish-national-party"),
+    "rosie-kane": ("gb.scottish_parliament.person", "rosie-kane", "scottish-socialist-party"),
+    "ross-thomson": ("gb.scottish_parliament.person", "ross-thomson", "conservative"),
 }
 PARTIES = {
     "Scottish Conservatives": "conservative",
@@ -565,9 +574,18 @@ def emit() -> Path:
 
         persons: dict[str, UUID] = {}
 
-        def person_of(day: date, place: str, text: str) -> UUID:
+        def person_of(day: date, place: str, text: str, label: str = "") -> UUID:
             identity = slug(text) if slug(text) in WINNERS else f"{day}:{slug(place)}:{slug(text)}"
             if identity not in persons:
+                join = JOINS.get(slug(text))
+                if identity not in WINNERS and join and PARTIES.get(label) == join[2]:
+                    target = cs.key(join[0], join[1])
+                    if target not in cs.minted:
+                        previous = cs.key(f"{SOURCE}.person", identity)
+                        if previous not in cs.minted:
+                            cs.merge(previous, target)
+                        persons[identity] = target
+                        return target
                 persons[identity] = (
                     cs.key(*WINNERS[identity]) if identity in WINNERS else cs.key(f"{SOURCE}.person", identity)
                 )
@@ -705,7 +723,7 @@ def emit() -> Path:
                     cs.add(
                         "candidacy",
                         id=cs.key("gb.candidacy", option_key),
-                        person_id=person_of(day, constituency, line["candidate"]),
+                        person_id=person_of(day, constituency, line["candidate"], line["party"]),
                         option_id=option,
                         role="head",
                         ballot_name=line["candidate"],
