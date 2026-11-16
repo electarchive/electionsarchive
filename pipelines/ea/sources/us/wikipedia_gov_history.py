@@ -116,6 +116,9 @@ def pages() -> dict[str, dict[str, str | int]]:
 
 
 SUFFIXES = {"jr", "sr", "ii", "iii", "iv", "v"}
+# Father and son share a first name and surname once the generational suffix is dropped, so the
+# 1978 candidate "Edmund G. Brown Jr." is pinned to Jerry Brown rather than to Pat Brown.
+PINNED = {("CA", 1978, "brown"): UUID("6c11a949-17a3-55b6-827d-35e8b82d2fc3")}
 
 
 def words(text: str) -> list[str]:
@@ -748,6 +751,9 @@ def emit() -> Path:
                         for person, seen in people[state].get(probe, [])
                         if abs(seen - year) <= 16 and deaths.get(person, on) >= on
                     }
+                    pin = PINNED.get((state, year, surname(candidate)))
+                    if pin is not None:
+                        found = {pin}
                     person = (
                         next(iter(found))
                         if len(found) == 1
