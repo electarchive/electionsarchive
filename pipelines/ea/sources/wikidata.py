@@ -21,7 +21,6 @@ VERSION = "21"
 TITLE = "Political parties and their colors"
 HAND_COLORS = Path(__file__).with_name("tr_party_colors.tsv")
 HAND_POSITIONS = Path(__file__).with_name("tr_party_positions.tsv")
-LATE_FOUNDINGS = Path(__file__).with_name("wikidata_late_foundings.tsv")
 REGISTERED = Path(__file__).parent / "tr" / "lineage_register_foundings.tsv"
 POSITIONED = "Political positions of parties"
 COUNTRIES = {
@@ -1094,15 +1093,6 @@ def emit() -> Path:
             cs.add(
                 "name_drop", name_id=name_id, entity_id=party, text=text, reason="Named after an unlinked Wikidata item"
             )
-        with LATE_FOUNDINGS.open("w", encoding="utf-8", newline="") as handle:
-            writer = csv.DictWriter(
-                handle,
-                fieldnames=["party", "polity", "name", "item", "inception", "precision", "earliest", "evidence"],
-                delimiter="\t",
-                lineterminator="\n",
-            )
-            writer.writeheader()
-            writer.writerows(sorted(late, key=lambda row: (str(row["polity"]), str(row["name"]))))
         print(f"{len(late)} Wikidata inceptions fall after the party's earliest option, affiliation, or dated name")
         for scope in sorted({scope for scope, _ in report}):
             print(
@@ -1165,4 +1155,14 @@ def emit() -> Path:
                         print(f"close: {iso} {day} {labels.get(one)} {color} ~ {labels.get(other)} {shade} ({gap:.3f})")
             if bare := [labels.get(party, str(party)) for party, color in winners if color is None]:
                 print(f"no color: {iso} {day} seat winners {', '.join(bare)}")
-        return cs.write()
+        folder = cs.write()
+        with (folder / "late_foundings.tsv").open("w", encoding="utf-8", newline="") as handle:
+            writer = csv.DictWriter(
+                handle,
+                fieldnames=["party", "polity", "name", "item", "inception", "precision", "earliest", "evidence"],
+                delimiter="\t",
+                lineterminator="\n",
+            )
+            writer.writeheader()
+            writer.writerows(sorted(late, key=lambda row: (str(row["polity"]), str(row["name"]))))
+        return folder
