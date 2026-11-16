@@ -1,0 +1,966 @@
+{
+  "polity": "LR",
+  "name": "Liberia",
+  "sources": {
+    "const-1986": {
+      "title": "Constitution of the Republic of Liberia (January 6, 1986)",
+      "publisher": "Republic of Liberia",
+      "url": "https://www.wipo.int/wipolex/en/legislation/details/8556",
+      "note": "Official English text as filed with WIPO Lex (lr003en.pdf). Arts. 37 (by-elections), 45-48 (Senate and House), 50 (President), 54(d) (appointed county and subdivision officials), 56(b) (chiefs), 80(d)-(e) (constituencies), 83 (election day and majority), 91-92 (amendment by referendum).",
+      "kind": "official_body"
+    },
+    "elections-law": {
+      "title": "Title 11, Elections Law (New Elections Law, approved September 29, 1986, with amendments through the Elections Act of 2004 and the 2004 Electoral Reform Law)",
+      "publisher": "Ministry of Foreign Affairs, Republic of Liberia (Liberian Codes Revised, Vol. II)",
+      "url": "https://liblaw.org/wp-content/uploads/2022/10/NEW-ELECTIONS-LAW.pdf",
+      "note": "Published by Authority, Bureau of Printing, Ministry of Foreign Affairs. Pages 238-336 of Liberian Codes Revised Vol. II; the 2004 Electoral Reform Law of the National Transitional Legislative Assembly is reproduced from page 316.",
+      "kind": "official_body"
+    },
+    "sc-mayors-2008": {
+      "title": "CDC et al. v. Executive Branch et al., Opinion of the Supreme Court, October Term 2007 (decided January 11, 2008)",
+      "publisher": "Supreme Court of Liberia",
+      "url": "https://liblaw.org/wp-content/uploads/2025/04/CDC-et-al.-v.-Executive-Branch-et-al.-2008.pdf",
+      "note": "Holds the 1979 Act Regulating the Time of Election of City Mayors unconstitutional under Article 54(d) and repealed by implication from January 6, 1986.",
+      "kind": "official_body"
+    },
+    "sc-threshold-2010": {
+      "title": "In re Petition for Declaratory Judgment on the Constitutionality of a Joint Resolution on the Setting of an Electoral Threshold, Opinion of the Supreme Court (decided October 11, 2010)",
+      "publisher": "Supreme Court of Liberia",
+      "url": "https://liblaw.org/wp-content/uploads/2022/11/IN-RE-The-Petition-for-Declaratory-Judgment-on-the-Constitutionality-of-a-Joint-Resolution-on-the-setting-of-an-Electoral-Threshold-LRSC-43-2010.pdf",
+      "note": "Joint Resolution LEG-002 (2010), approved July 29, 2010, kept the 64 House seats and added nine constituencies in six of the fifteen counties; the Court quashed the writ as a political question, so the 73 constituencies stood for 2011.",
+      "kind": "official_body"
+    },
+    "nec-results": {
+      "title": "Election results (national tally)",
+      "publisher": "National Elections Commission of Liberia",
+      "url": "https://necliberia.org/results",
+      "note": "Answers automated clients with a Cloudflare challenge (HTTP 403, cf-mitigated: challenge) as of 2026-11-16.",
+      "kind": "official_body"
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "Republic of Liberia",
+      "name_en": "Liberia",
+      "parent": null,
+      "polity_kind": "sovereign_state",
+      "scheme": "lr.nation",
+      "source": "const-1986"
+    },
+    {
+      "key": "county",
+      "name": "County",
+      "name_en": "Counties",
+      "parent": "national",
+      "polity_kind": "region",
+      "scheme": "lr.county",
+      "source": "const-1986",
+      "counts": [
+        {
+          "date": "2004-12-23",
+          "value": 15,
+          "source": "elections-law",
+          "locator": "Page 247, § 1.2(l) as reworded by the Elections Act of 2004: \"each of the fifteen counties in the country when referring to the elections for the Senate\""
+        },
+        {
+          "date": "2010-10-11",
+          "value": 15,
+          "source": "sc-threshold-2010",
+          "locator": "Issue: \"nine (9) new Legislative constituencies to six (6) out of fifteen (15) counties\""
+        }
+      ]
+    },
+    {
+      "key": "house_district",
+      "name": "Electoral district (legislative constituency)",
+      "name_en": "House electoral districts",
+      "parent": "county",
+      "scheme": "lr.house_district",
+      "source": "const-1986",
+      "counts": [
+        {
+          "date": "2004-12-23",
+          "value": 64,
+          "source": "elections-law",
+          "locator": "Page 318, 2004 Electoral Reform Law § 4.2: \"For the 2005 elections, the number of members of the House of Representatives shall be fixed at sixty-four (64)\""
+        },
+        {
+          "date": "2010-10-11",
+          "value": 73,
+          "source": "sc-threshold-2010",
+          "locator": "Issue: the Legislature \"maintained the current 64 Legislative seats and at the same time allotted nine (9) new Legislative constituencies\" (Montserrado 3, Nimba 2, Grand Bassa, Lofa, Margibi, and Bong 1 each)"
+        }
+      ]
+    },
+    {
+      "key": "district",
+      "name": "Administrative district",
+      "name_en": "Administrative districts",
+      "parent": "county",
+      "polity_kind": "county",
+      "elects": false,
+      "source": "const-1986"
+    },
+    {
+      "key": "city",
+      "name": "City",
+      "name_en": "Cities",
+      "parent": "county",
+      "polity_kind": "municipality",
+      "elects": false,
+      "source": "sc-mayors-2008"
+    },
+    {
+      "key": "chiefdom",
+      "name": "Paramount chiefdom",
+      "name_en": "Chiefdoms",
+      "parent": "district",
+      "polity_kind": "submunicipal",
+      "source": "const-1986"
+    },
+    {
+      "key": "clan",
+      "name": "Clan",
+      "name_en": "Clans",
+      "parent": "chiefdom",
+      "polity_kind": "submunicipal",
+      "source": "const-1986"
+    },
+    {
+      "key": "town",
+      "name": "Town",
+      "name_en": "Towns",
+      "parent": "clan",
+      "polity_kind": "submunicipal",
+      "source": "const-1986"
+    }
+  ],
+  "classes": [
+    {
+      "key": "president",
+      "tier": "national",
+      "name": "Election of the President and Vice President",
+      "name_en": "President and vice president",
+      "category": "executive",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "lr.nation"
+        ],
+        "fine": [
+          "lr.county",
+          "lr.house_district",
+          "lr.precinct",
+          "lr.polling_place"
+        ]
+      },
+      "source": "const-1986",
+      "locator": "https://www.wipo.int/wipolex/en/legislation/details/8556 (Art. 50: six-year term, at most two terms; Art. 83(b): absolute majority, else a runoff)",
+      "valid_from": "1984-07-03",
+      "first_held": "1985-10-15",
+      "note": "Joint ticket elected nationwide by two-round absolute majority (Art. 83(b); Elections Law § 4.15(a)). Tallied by polling place and precinct, then by electoral district and county.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff",
+            "special"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "LR",
+          "valid_from": "1985-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 6,
+          "phase": 1,
+          "month": 10,
+          "day_rule": "oct_second_tuesday",
+          "term_years": 6,
+          "called": false,
+          "runoff": "majority",
+          "runoff_threshold": 0.5,
+          "runoff_rule": "Absolute majority of valid votes, else a runoff between the top two on the second Tuesday after the first-round results are announced",
+          "administered_by": "National Elections Commission",
+          "certify_days": 15,
+          "source": "const-1986",
+          "locator": "https://www.wipo.int/wipolex/en/legislation/details/8556 (Art. 83(a): \"second Tuesday in October of each election year\"; Art. 83(c): returns declared within fifteen days)",
+          "valid_from": "1986-01-06"
+        }
+      ],
+      "access": [
+        {
+          "platform": "National Elections Commission results",
+          "url": "https://necliberia.org/results",
+          "format": "html",
+          "access": "browser",
+          "checked_at": "2026-11-16",
+          "source": "nec-results",
+          "evidence": "Cloudflare challenge (HTTP 403) to scripts; the national tally page lists county results for 2023"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1985-10-15",
+          "note": "First election under the 1986 Constitution, held by the Special Elections Commission under the People's Redemption Council before the Constitution took effect on January 6, 1986."
+        },
+        {
+          "date": "1997-07-19",
+          "election_kind": "special",
+          "note": "Special election under the Abuja peace accords, one national constituency."
+        },
+        {
+          "date": "2005-10-11"
+        },
+        {
+          "date": "2005-11-08",
+          "election_kind": "runoff"
+        },
+        {
+          "date": "2011-10-11"
+        },
+        {
+          "date": "2011-11-08",
+          "election_kind": "runoff"
+        },
+        {
+          "date": "2017-10-10"
+        },
+        {
+          "date": "2017-12-26",
+          "election_kind": "runoff",
+          "note": "Runoff delayed from November 7 by the Supreme Court's hearing of the first-round complaint."
+        },
+        {
+          "date": "2023-10-10"
+        },
+        {
+          "date": "2023-11-14",
+          "election_kind": "runoff"
+        },
+        {
+          "date": "2029-10-09",
+          "note": "Next regular election: the second Tuesday in October of the election year (Art. 83(a))."
+        }
+      ],
+      "est_votes": 11000000,
+      "effort": 3
+    },
+    {
+      "key": "president_1847",
+      "tier": "national",
+      "name": "Election of the President under the 1847 Constitution",
+      "name_en": "President (First Republic, 1847-1980)",
+      "category": "executive",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "const-1986",
+      "locator": "https://www.wipo.int/wipolex/en/legislation/details/8556 (Art. 94-95: transitional provisions replacing the suspended 1847 Constitution)",
+      "valid_from": "1847-07-26",
+      "valid_to": "1980-04-12",
+      "note": "Presidents were elected under the 1847 Constitution from 1847 (two-year terms, later four and eight) until the April 12, 1980 coup suspended it. Returns were canvassed by the Legislature and printed, when at all, in legislative journals and handbills.",
+      "disposition": "blocked",
+      "disposition_reason": "No official body publishes the 1847-1975 presidential returns; the canvasses sit in legislative journals and handbills that are not online, and the National Elections Commission's site holds only post-1985 results and refuses automated clients.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "LR",
+          "valid_to": "1985-01-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1847-01-01",
+          "precision": "year",
+          "note": "First presidential election under the 1847 Constitution."
+        },
+        {
+          "date": "1975-01-01",
+          "precision": "year",
+          "note": "Last presidential election before the 1980 coup."
+        }
+      ],
+      "est_votes": 3000000,
+      "effort": 5
+    },
+    {
+      "key": "house",
+      "tier": "house_district",
+      "name": "Election of the House of Representatives",
+      "name_en": "House of Representatives",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "lr.house_district"
+        ],
+        "fine": [
+          "lr.precinct",
+          "lr.polling_place"
+        ]
+      },
+      "source": "const-1986",
+      "locator": "https://www.wipo.int/wipolex/en/legislation/details/8556 (Art. 48: six-year term, elected in the legislative constituencies of the counties; Art. 80(d): at most one hundred constituencies)",
+      "valid_from": "1984-07-03",
+      "first_held": "1985-10-15",
+      "note": "Single-member districts by plurality since 2005 (2004 Electoral Reform Law § 1.4; Elections Law § 4.15(c)); 64 districts in 2005 and 73 since 2011. The 1997 House was chosen by national-list proportional representation.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "special"
+          ],
+          "body_kinds": [
+            "lower_house"
+          ],
+          "iso_pattern": "LR",
+          "valid_from": "1985-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 6,
+          "phase": 1,
+          "month": 10,
+          "day_rule": "oct_second_tuesday",
+          "term_years": 6,
+          "called": false,
+          "runoff": "none",
+          "administered_by": "National Elections Commission",
+          "certify_days": 15,
+          "source": "const-1986",
+          "locator": "https://www.wipo.int/wipolex/en/legislation/details/8556 (Arts. 48 and 83(a))",
+          "valid_from": "1986-01-06"
+        }
+      ],
+      "access": [
+        {
+          "platform": "National Elections Commission results",
+          "url": "https://necliberia.org/results",
+          "format": "html",
+          "access": "browser",
+          "checked_at": "2026-11-16",
+          "source": "nec-results",
+          "evidence": "Cloudflare challenge (HTTP 403) to scripts"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1985-10-15",
+          "seats": 64
+        },
+        {
+          "date": "1997-07-19",
+          "election_kind": "special",
+          "seats": 64,
+          "note": "Seats filled by proportional representation from one national constituency under the 1997 special elections arrangements."
+        },
+        {
+          "date": "2005-10-11",
+          "contests": 64,
+          "seats": 64,
+          "source": "elections-law",
+          "quote": "§ 4.2: \"For the 2005 elections, the number of members of the House of Representatives shall be fixed at sixty-four (64).\" § 1.4: single member electoral districts"
+        },
+        {
+          "date": "2011-10-11",
+          "contests": 73,
+          "seats": 73,
+          "source": "sc-threshold-2010",
+          "quote": "\"maintained the current 64 Legislative seats and at the same time allotted nine (9) new Legislative constituencies\" (Joint Resolution LEG-002 (2010), for the 2011 elections)"
+        },
+        {
+          "date": "2017-10-10",
+          "seats": 73
+        },
+        {
+          "date": "2023-10-10",
+          "seats": 73
+        },
+        {
+          "date": "2029-10-09",
+          "note": "Next regular election (Arts. 48 and 83(a))."
+        }
+      ],
+      "est_votes": 7500000,
+      "effort": 3
+    },
+    {
+      "key": "house_by",
+      "tier": "house_district",
+      "name": "By-election to the House of Representatives",
+      "name_en": "House by-elections",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "lr.house_district"
+        ]
+      },
+      "source": "const-1986",
+      "locator": "https://www.wipo.int/wipolex/en/legislation/details/8556 (Art. 37: by-election within 90 days of the Commission's notice of a vacancy)",
+      "valid_from": "1986-01-06",
+      "note": "Called by the National Elections Commission within 90 days of a vacancy, unless the vacancy falls within 90 days of a general election (Art. 37; Elections Law § 1.2(h)).",
+      "match": [
+        {
+          "election_kinds": [
+            "by_election"
+          ],
+          "body_kinds": [
+            "lower_house"
+          ],
+          "iso_pattern": "LR"
+        }
+      ],
+      "cadence": [
+        {
+          "called": true,
+          "runoff": "none",
+          "administered_by": "National Elections Commission",
+          "source": "const-1986",
+          "locator": "https://www.wipo.int/wipolex/en/legislation/details/8556 (Art. 37)",
+          "vacancy_rule": "The presiding officer notifies the Commission within 30 days; the Commission holds the by-election within 90 days, unless the vacancy arises within 90 days of a general election"
+        }
+      ],
+      "access": [
+        {
+          "platform": "National Elections Commission results",
+          "url": "https://necliberia.org/results",
+          "format": "html",
+          "access": "browser",
+          "checked_at": "2026-11-16",
+          "source": "nec-results",
+          "evidence": "Cloudflare challenge (HTTP 403) to scripts"
+        }
+      ],
+      "dates": [],
+      "est_votes": 150000,
+      "effort": 4
+    },
+    {
+      "key": "senate",
+      "tier": "county",
+      "name": "Election of the Senate",
+      "name_en": "Senate",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "lr.county"
+        ],
+        "fine": [
+          "lr.house_district",
+          "lr.precinct",
+          "lr.polling_place"
+        ]
+      },
+      "source": "const-1986",
+      "locator": "https://www.wipo.int/wipolex/en/legislation/details/8556 (Art. 45: two senators per county, nine-year terms; Art. 46: staggered categories)",
+      "valid_from": "1984-07-03",
+      "first_held": "1985-10-15",
+      "note": "Each county elects two senators. In 1985 and 2005 both seats were filled at once and the runner-up's seat ran a six-year first term (Art. 46; 2004 Electoral Reform Law § 1.3), so since 2011 half the counties' seats (one per county) fall due in alternating three- and six-year gaps: 2011, 2014, 2020, 2023, 2029, 2032. Plurality per seat since 2011.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "special"
+          ],
+          "body_kinds": [
+            "upper_house"
+          ],
+          "iso_pattern": "LR",
+          "valid_from": "1985-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 9,
+          "phase": 7,
+          "month": 10,
+          "day_rule": "oct_second_tuesday",
+          "term_years": 9,
+          "called": false,
+          "runoff": "none",
+          "administered_by": "National Elections Commission",
+          "certify_days": 15,
+          "source": "const-1986",
+          "locator": "https://www.wipo.int/wipolex/en/legislation/details/8556 (Arts. 45-46 and 83(a); seats filled in 2014 and 2023, with the general election since 2023)",
+          "valid_from": "2006-01-01",
+          "function": "senate_general_cycle"
+        },
+        {
+          "period_years": 9,
+          "phase": 4,
+          "term_years": 9,
+          "called": false,
+          "runoff": "none",
+          "administered_by": "National Elections Commission",
+          "certify_days": 15,
+          "source": "const-1986",
+          "locator": "https://www.wipo.int/wipolex/en/legislation/details/8556 (Arts. 45-46; seats filled in 2011 and 2020, the midterm cycle (December 8 in 2020))",
+          "valid_from": "2006-01-01",
+          "function": "senate_midterm_cycle"
+        }
+      ],
+      "access": [
+        {
+          "platform": "National Elections Commission results",
+          "url": "https://necliberia.org/results",
+          "format": "html",
+          "access": "browser",
+          "checked_at": "2026-11-16",
+          "source": "nec-results",
+          "evidence": "Cloudflare challenge (HTTP 403) to scripts"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1985-10-15",
+          "seats": 26,
+          "note": "Two senators for each of the 13 counties then existing."
+        },
+        {
+          "date": "1997-07-19",
+          "election_kind": "special",
+          "seats": 26,
+          "note": "Seats filled by proportional representation from one national constituency under the 1997 special elections arrangements."
+        },
+        {
+          "date": "2005-10-11",
+          "contests": 15,
+          "seats": 30,
+          "source": "elections-law",
+          "quote": "§ 1.3: \"The two candidates who obtain the highest and second highest numbers of valid votes cast in the county shall be elected\"; § 1.2(l): \"each of the fifteen counties\""
+        },
+        {
+          "date": "2011-10-11",
+          "seats": 15,
+          "note": "Second-category seats after their first six-year term (Art. 46)."
+        },
+        {
+          "date": "2014-12-20",
+          "seats": 15,
+          "note": "First-category seats after nine years; postponed from October 14, 2014 during the Ebola epidemic."
+        },
+        {
+          "date": "2020-12-08",
+          "seats": 15,
+          "note": "Midterm senatorial election, held with the 2020 constitutional referendum."
+        },
+        {
+          "date": "2023-10-10",
+          "seats": 15
+        },
+        {
+          "date": "2029-01-01",
+          "precision": "year",
+          "note": "Next midterm senatorial election: the seats filled in December 2020 expire after nine years (Art. 45)."
+        }
+      ],
+      "est_votes": 8000000,
+      "effort": 3
+    },
+    {
+      "key": "senate_by",
+      "tier": "county",
+      "name": "By-election to the Senate",
+      "name_en": "Senate by-elections",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "lr.county"
+        ]
+      },
+      "source": "const-1986",
+      "locator": "https://www.wipo.int/wipolex/en/legislation/details/8556 (Arts. 37 and 45: a by-elected senator serves the remainder of the term)",
+      "valid_from": "1986-01-06",
+      "note": "Called within 90 days of a vacancy (Art. 37) for the remainder of the term (Art. 45).",
+      "match": [
+        {
+          "election_kinds": [
+            "by_election"
+          ],
+          "body_kinds": [
+            "upper_house"
+          ],
+          "iso_pattern": "LR"
+        }
+      ],
+      "cadence": [
+        {
+          "called": true,
+          "runoff": "none",
+          "administered_by": "National Elections Commission",
+          "source": "const-1986",
+          "locator": "https://www.wipo.int/wipolex/en/legislation/details/8556 (Art. 37)",
+          "vacancy_rule": "The presiding officer notifies the Commission within 30 days; the Commission holds the by-election within 90 days, unless the vacancy arises within 90 days of a general election"
+        }
+      ],
+      "access": [
+        {
+          "platform": "National Elections Commission results",
+          "url": "https://necliberia.org/results",
+          "format": "html",
+          "access": "browser",
+          "checked_at": "2026-11-16",
+          "source": "nec-results",
+          "evidence": "Cloudflare challenge (HTTP 403) to scripts"
+        }
+      ],
+      "dates": [],
+      "est_votes": 150000,
+      "effort": 4
+    },
+    {
+      "key": "legislature_1847",
+      "tier": "national",
+      "name": "Election of the Legislature under the 1847 Constitution",
+      "name_en": "Legislature (First Republic, 1847-1980)",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "const-1986",
+      "locator": "https://www.wipo.int/wipolex/en/legislation/details/8556 (Arts. 94-95: transitional provisions replacing the suspended 1847 Constitution)",
+      "valid_from": "1847-07-26",
+      "valid_to": "1980-04-12",
+      "note": "Senate and House of Representatives of the First Republic, elected by county until the April 12, 1980 coup.",
+      "disposition": "blocked",
+      "disposition_reason": "No official body publishes the First Republic's legislative returns; they survive only in printed legislative journals and handbills that are not online.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "by_election"
+          ],
+          "body_kinds": [
+            "lower_house",
+            "upper_house"
+          ],
+          "iso_pattern": "LR",
+          "valid_to": "1985-01-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1847-01-01",
+          "precision": "year"
+        }
+      ],
+      "est_votes": 3000000,
+      "effort": 5
+    },
+    {
+      "key": "referendum",
+      "tier": "national",
+      "name": "Constitutional referendum",
+      "name_en": "Constitutional referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "question",
+        "schemes": [
+          "lr.nation"
+        ],
+        "fine": [
+          "lr.county"
+        ]
+      },
+      "source": "const-1986",
+      "locator": "https://www.wipo.int/wipolex/en/legislation/details/8556 (Art. 91: ratified by two-thirds of the registered voters voting in a referendum; Art. 92: each proposal voted on separately)",
+      "first_held": "1984-07-03",
+      "note": "The 1984 referendum adopted the Constitution. The August 23, 2011 referendum put four propositions; the Supreme Court read the two-thirds rule against valid votes and held Proposition 4 (plurality for elections other than the presidency) adopted. All eight propositions of December 8, 2020 fell short of two-thirds.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "iso_pattern": "LR",
+          "valid_from": "1984-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "called": true,
+          "runoff": "none",
+          "administered_by": "National Elections Commission",
+          "source": "const-1986",
+          "locator": "https://www.wipo.int/wipolex/en/legislation/details/8556 (Art. 91: not sooner than one year after the Legislature's action)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "National Elections Commission results",
+          "url": "https://necliberia.org/results",
+          "format": "html",
+          "access": "browser",
+          "checked_at": "2026-11-16",
+          "source": "nec-results",
+          "evidence": "Cloudflare challenge (HTTP 403) to scripts"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1984-07-03",
+          "note": "Adoption of the 1986 Constitution."
+        },
+        {
+          "date": "2011-08-23",
+          "note": "Four propositions."
+        },
+        {
+          "date": "2020-12-08",
+          "note": "Eight propositions."
+        }
+      ],
+      "est_votes": 8000000,
+      "effort": 3
+    },
+    {
+      "key": "referendum_1847",
+      "tier": "national",
+      "name": "Referendum under the 1847 Constitution",
+      "name_en": "Referendums (First Republic, 1847-1980)",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "question"
+      },
+      "source": "const-1986",
+      "locator": "https://www.wipo.int/wipolex/en/legislation/details/8556 (Arts. 94-95)",
+      "valid_from": "1847-01-01",
+      "valid_to": "1980-04-12",
+      "note": "Ratification of the 1847 Constitution and its later amendments by popular vote.",
+      "disposition": "blocked",
+      "disposition_reason": "No official body publishes the 1847-1980 referendum returns; they survive only in printed legislative records that are not online.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "iso_pattern": "LR",
+          "valid_to": "1984-01-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1847-01-01",
+          "precision": "year",
+          "note": "Ratification of the 1847 Constitution."
+        }
+      ],
+      "est_votes": 1000000,
+      "effort": 5
+    },
+    {
+      "key": "paramount_chief",
+      "tier": "chiefdom",
+      "name": "Election of Paramount Chiefs",
+      "name_en": "Paramount chiefs",
+      "category": "executive",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "const-1986",
+      "locator": "https://www.wipo.int/wipolex/en/legislation/details/8556 (Art. 56(b): \"There shall be elections of Paramount, Clan and Town Chiefs by the registered voters in their respective localities, to serve for a term of six years\")",
+      "valid_from": "1986-01-06",
+      "note": "Six-year terms (Art. 56(b); Elections Law § 1.7), candidates at least 30 (§ 1.8). The Commission conducts chieftaincy elections and is the judge of their contests (§ 2.9(q), (t)); since the civil war chiefs have mostly been appointed or chosen locally pending elections.",
+      "disposition": "blocked",
+      "disposition_reason": "The National Elections Commission has published no chieftaincy returns: none appear on its results pages, and no official register lists the chiefdoms, clans, and towns or the dates their chiefs were last elected.",
+      "match": [
+        {
+          "name_pattern": "(?i)Paramount chief",
+          "polity_kinds": [
+            "submunicipal"
+          ],
+          "within": null
+        }
+      ],
+      "cadence": [
+        {
+          "term_years": 6,
+          "called": false,
+          "administered_by": "National Elections Commission",
+          "source": "elections-law",
+          "locator": "https://liblaw.org/wp-content/uploads/2022/10/NEW-ELECTIONS-LAW.pdf (page 250, § 1.7: \"Election of chiefs shall be held every six (6) years by registered voters of the chiefdom, clan, and town\")"
+        }
+      ],
+      "dates": [],
+      "est_votes": 2000000,
+      "effort": 5
+    },
+    {
+      "key": "clan_chief",
+      "tier": "clan",
+      "name": "Election of Clan Chiefs",
+      "name_en": "Clan chiefs",
+      "category": "executive",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "const-1986",
+      "locator": "https://www.wipo.int/wipolex/en/legislation/details/8556 (Art. 56(b): \"There shall be elections of Paramount, Clan and Town Chiefs by the registered voters in their respective localities, to serve for a term of six years\")",
+      "valid_from": "1986-01-06",
+      "note": "Six-year terms (Art. 56(b); Elections Law § 1.7), candidates at least 25 (§ 1.8). The Commission conducts chieftaincy elections and is the judge of their contests (§ 2.9(q), (t)); since the civil war chiefs have mostly been appointed or chosen locally pending elections.",
+      "disposition": "blocked",
+      "disposition_reason": "The National Elections Commission has published no chieftaincy returns: none appear on its results pages, and no official register lists the chiefdoms, clans, and towns or the dates their chiefs were last elected.",
+      "match": [
+        {
+          "name_pattern": "(?i)Clan chief",
+          "polity_kinds": [
+            "submunicipal"
+          ],
+          "within": null
+        }
+      ],
+      "cadence": [
+        {
+          "term_years": 6,
+          "called": false,
+          "administered_by": "National Elections Commission",
+          "source": "elections-law",
+          "locator": "https://liblaw.org/wp-content/uploads/2022/10/NEW-ELECTIONS-LAW.pdf (page 250, § 1.7: \"Election of chiefs shall be held every six (6) years by registered voters of the chiefdom, clan, and town\")"
+        }
+      ],
+      "dates": [],
+      "est_votes": 2000000,
+      "effort": 5
+    },
+    {
+      "key": "town_chief",
+      "tier": "town",
+      "name": "Election of Town Chiefs",
+      "name_en": "Town chiefs",
+      "category": "executive",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "const-1986",
+      "locator": "https://www.wipo.int/wipolex/en/legislation/details/8556 (Art. 56(b): \"There shall be elections of Paramount, Clan and Town Chiefs by the registered voters in their respective localities, to serve for a term of six years\")",
+      "valid_from": "1986-01-06",
+      "note": "Six-year terms (Art. 56(b); Elections Law § 1.7), candidates at least 25 (§ 1.8). The Commission conducts chieftaincy elections and is the judge of their contests (§ 2.9(q), (t)); since the civil war chiefs have mostly been appointed or chosen locally pending elections.",
+      "disposition": "blocked",
+      "disposition_reason": "The National Elections Commission has published no chieftaincy returns: none appear on its results pages, and no official register lists the chiefdoms, clans, and towns or the dates their chiefs were last elected.",
+      "match": [
+        {
+          "name_pattern": "(?i)Town chief",
+          "polity_kinds": [
+            "submunicipal"
+          ],
+          "within": null
+        }
+      ],
+      "cadence": [
+        {
+          "term_years": 6,
+          "called": false,
+          "administered_by": "National Elections Commission",
+          "source": "elections-law",
+          "locator": "https://liblaw.org/wp-content/uploads/2022/10/NEW-ELECTIONS-LAW.pdf (page 250, § 1.7: \"Election of chiefs shall be held every six (6) years by registered voters of the chiefdom, clan, and town\")"
+        }
+      ],
+      "dates": [],
+      "est_votes": 2000000,
+      "effort": 5
+    },
+    {
+      "key": "city_mayor",
+      "tier": "city",
+      "name": "Election of City Mayors and Common Councils",
+      "name_en": "City mayors and councils",
+      "category": "executive",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "sc-mayors-2008",
+      "locator": "https://liblaw.org/wp-content/uploads/2025/04/CDC-et-al.-v.-Executive-Branch-et-al.-2008.pdf (pages 5-6: the 1979 Act \"is opposed to the plain terms of Article 54(d)\" and city-charter provisions for elected mayors were \"repealed by implication\" on January 6, 1986)",
+      "valid_from": "1979-08-20",
+      "valid_to": "1986-01-06",
+      "first_held": "1979-11-13",
+      "note": "The 1979 Act Regulating the Time of Election of City Mayors set quadrennial elections on the second Tuesday in November, starting November 1979; earlier charters elected mayors on their own dates. Since January 6, 1986 the President appoints mayors with the Senate's consent (Art. 54(d)), so no class remains open.",
+      "disposition": "blocked",
+      "disposition_reason": "Abolished in 1986. No official body publishes the returns of the city elections held under city charters and the 1979 Act; they survive only in handbills and local records.",
+      "match": [
+        {
+          "office_kinds": [
+            "mayor"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "within": null
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "month": 11,
+          "called": false,
+          "source": "sc-mayors-2008",
+          "locator": "https://liblaw.org/wp-content/uploads/2025/04/CDC-et-al.-v.-Executive-Branch-et-al.-2008.pdf (page 4, Act of August 9, 1979, § 1: \"elected quadrennially on the second Tuesday in November\")",
+          "valid_from": "1979-08-20",
+          "valid_to": "1986-01-06"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1979-11-13",
+          "note": "Second Tuesday in November 1979, the date the 1979 Act fixed for all city mayors."
+        }
+      ],
+      "est_votes": 300000,
+      "effort": 5
+    },
+    {
+      "key": "party_primary",
+      "tier": "national",
+      "name": "Party primaries",
+      "name_en": "Party nominating contests",
+      "category": "nominating",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "elections-law",
+      "locator": "https://liblaw.org/wp-content/uploads/2022/10/NEW-ELECTIONS-LAW.pdf (§ 2.9: the Commission's powers cover public elections and referenda, not party nominations)",
+      "note": "Parties and coalitions choose their candidates under their own constitutions; the Commission only accepts their nominations.",
+      "disposition": "out_of_scope",
+      "disposition_reason": "No state-run nominating contest exists: the National Elections Commission administers no primaries, and parties publish no official returns.",
+      "match": [
+        {
+          "election_kinds": [
+            "primary"
+          ],
+          "iso_pattern": "LR*"
+        }
+      ],
+      "dates": []
+    }
+  ]
+}
