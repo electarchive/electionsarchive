@@ -344,7 +344,7 @@ def packages() -> list[str]:
     return [
         "lv.cvk/geo",
         "lv.cvk/registry",
-        *(f"lv.cvk/{day}" for day in sorted([*DAYS, *REFERENDUMS, *MUNICIPAL, *DATI, "2021-06-05"])),
+        *(f"lv.cvk/{day}" for day in sorted([*DAYS, *REFERENDUMS, *MUNICIPAL, *DATI, "2021-06-05", *LEGACY])),
     ]
 
 
@@ -357,6 +357,8 @@ def fetch() -> None:
         for url in (*dati_pages(code)[1:][0], *dati_pages(code)[2]):
             raw.fetch(SOURCE, url, suffix=".html")
         raw.fetch(SOURCE, f"{HOST}/{code}/ieveletie-deputati/", suffix=".html")
+    for day in LEGACY:
+        raw.fetch(SOURCE, legacy_url(day), suffix=".html")
     raw.fetch(SOURCE, PV2021, suffix=".html")
     raw.fetch(SOURCE, PV2021_ELECTED, suffix=".html")
     for url in pv2021_pages():
@@ -375,6 +377,8 @@ def parse() -> None:
     for day in DATI:
         build_dati(day).write()
     build_pv2021().write()
+    for day in LEGACY:
+        build_legacy(day).write()
 
 
 def emit() -> None:
@@ -393,8 +397,10 @@ def geo() -> Package:
         "Election Commission",
     )
     p.external |= {LATVIA, COUNTRY}
+    p.add("scheme", code="lv.valsts", polity_id=LATVIA, kind="administrative", rank=0, noun="country")
     p.add("scheme", code="lv.apgabals", polity_id=LATVIA, kind="electoral_district", rank=1, noun="constituency")
-    p.add("scheme", code="lv.iecirknis", polity_id=LATVIA, kind="precinct", rank=2, noun="polling station")
+    p.add("scheme", code="lv.pasvaldiba", polity_id=LATVIA, kind="administrative", rank=2, noun="municipality")
+    p.add("scheme", code="lv.iecirknis", polity_id=LATVIA, kind="precinct", rank=3, noun="polling station")
     for code, (short, native, english) in REGION_NAMES.items():
         id = area("lv.apgabals", code)
         p.add("area", id=id, scheme_code="lv.apgabals")
@@ -426,6 +432,8 @@ def registry() -> Package:
     )
     for name in URLS:
         p.artifact(path(name), CVK_SOURCE)
+    for day in LEGACY:
+        p.artifact(raw.cached(SOURCE, legacy_url(day)), CVK_SOURCE)
     for url in (PV2021, PV2021_ELECTED, *pv2021_pages()):
         p.artifact(raw.cached(SOURCE, url), CVK_SOURCE)
     for code in DATI.values():
@@ -451,6 +459,9 @@ def registry() -> Package:
         for place in (*data.regions.values(), *data.towns.values()):
             for stand in place.stands.values():
                 labels.setdefault(party(stand.name), stand.name)
+    for day in LEGACY:
+        for label in read_legacy(day).lists.values():
+            labels.setdefault(party(label), label)
     for page in read_pv2021()[0]:
         for stand in page.stands.values():
             labels.setdefault(party(stand.name), stand.name)
@@ -1571,4 +1582,312 @@ def build_pv2021() -> Package:
         candidacy = key("candidacy", day, council, who, index)
         p.add("candidacy", id=candidacy, person_id=person, option_id=option, role="list_member", ballot_name=who)
         p.add("outcome", result_set_id=sets[council], option_id=option, candidacy_id=candidacy, kind="elected")
+    return p
+
+
+# Elections whose results the commission prints only for constituencies, municipalities, or the whole country.
+LEGACY = {
+    "1993-06-05": ("saeima", "5-saeimas-velesanas", 5),
+    "1995-09-30": ("saeima", "6-saeimas-velesanas", 6),
+    "1998-10-03": ("saeima", "7-saeimas-velesanu-rezultati", 7),
+    "2002-10-05": ("saeima", "8-saeimas-velesanu-rezultati", 8),
+    "2006-10-07": ("saeima", "9-saeimas-velesanu-rezultati", 9),
+    "2010-10-02": ("saeima", "10-saeimas-velesanu-rezultati", 10),
+    "2011-09-17": ("saeima", "11-saeimas-velesanu-rezultati", 11),
+    "2004-06-12": ("ep", "ep-2004-rezultati", 0),
+    "2009-06-06": ("ep", "ep-2009-rezultati", 0),
+    "2014-05-24": ("ep", "ep-2014-aktivitate-un-rezultati", 0),
+}
+SEATS_EP = {"2004-06-12": 9, "2009-06-06": 8, "2014-05-24": 8}
+LEGACY_REGIONS = ("1", "2", "3", "4", "5")
+
+
+def legacy_url(day: str) -> str:
+    return f"{ARCHIVE}/{LEGACY[day][1]}/"
+
+
+@dataclass
+class Unit:
+    code: str
+    name: str
+    registered: int | None
+    cast: int | None
+    valid: int | None
+    votes: dict[int, int]
+
+
+@dataclass
+class Scope:
+    ident: str
+    name: str
+    region: str | None
+    units: list[Unit]
+    seats: dict[int, int] = field(default_factory=dict)
+
+
+@dataclass
+class Legacy:
+    lists: dict[int, str]
+    scopes: list[Scope]
+    national: dict[int, tuple[int, int]]  # list number -> votes, seats
+    level: str  # the unit scheme: lv.apgabals, lv.pasvaldiba, or lv.valsts
+
+
+def _cols(row: list[Cell]) -> dict[str, int]:
+    return {cell.text.rstrip("."): i for i, cell in enumerate(row)}
+
+
+def _list_table(rows: list[list[Cell]]) -> tuple[dict[int, str], dict[int, int], dict[int, int]]:
+    head = _cols(rows[0])
+    number = head["Nr"]
+    names: dict[int, str] = {}
+    votes: dict[int, int] = {}
+    seats: dict[int, int] = {}
+    for row in rows[1:]:
+        if len(row) > number and row[number].text.isdigit():
+            n = int(row[number].text)
+            names[n] = clean(row[head["Saraksts"]].text)
+            votes[n] = _n(row[head["Balsis"]])
+            seats[n] = _n(row[head["Vietas"]]) if head["Vietas"] < len(row) else 0
+    return names, votes, seats
+
+
+def read_legacy(day: str) -> Legacy:
+    number = LEGACY[day][2]
+    page = tables(legacy_url(day))
+    tabs = page.tables
+    if day == "1993-06-05":
+        rows = [r for r in tabs["t0"][1:] if r[0].text.rstrip(".").isdigit()]
+        names = {int(r[0].text.rstrip(".")): clean(r[1].text.strip('"')) for r in rows}
+        votes = {int(r[0].text.rstrip(".")): _n(r[3]) for r in rows}
+        seats = {int(r[0].text.rstrip(".")): _n(r[5]) for r in rows}
+        unit = Unit(f"{day}:valsts", "Latvija", None, None, None, votes)
+        return Legacy(
+            names,
+            [Scope("national", "Latvija", None, [unit], seats)],
+            {n: (votes[n], seats[n]) for n in names},
+            "lv.valsts",
+        )
+    if day == "1995-09-30":
+        rows = [r for r in tabs["t0"] if len(r) == 9 and r[0].text.rstrip(".").isdigit()]
+        names = {int(r[0].text.rstrip(".")): clean(r[1].text) for r in rows}
+        scopes = []
+        for index, code in enumerate(LEGACY_REGIONS):
+            unit = Unit(
+                f"{day}:{code}",
+                REGION_NAMES[code][0],
+                None,
+                None,
+                None,
+                {int(r[0].text.rstrip(".")): _n(r[2 + index]) for r in rows},
+            )
+            scopes.append(Scope(code, REGION_NAMES[code][0], code, [unit]))
+        return Legacy(names, scopes, {int(r[0].text.rstrip(".")): (_n(r[7]), 0) for r in rows}, "lv.apgabals")
+    if number in (7, 8, 9):
+        names, votes, seats = _list_table(tabs["t0"])
+        scopes = []
+        for index, code in enumerate(LEGACY_REGIONS):
+            _, v, s = _list_table(tabs[f"t{index + 1}"])
+            unit = Unit(f"{day}:{code}", REGION_NAMES[code][0], None, None, None, v)
+            scopes.append(Scope(code, REGION_NAMES[code][0], code, [unit], s))
+        return Legacy(names, scopes, {n: (votes[n], seats[n]) for n in names}, "lv.apgabals")
+    if number in (10, 11):
+        names = {}
+        for r in tabs["t0"][1:]:
+            for start in (0, 2):
+                if len(r) > start + 1 and r[start].text.rstrip(".").isdigit():
+                    names[int(r[start].text.rstrip("."))] = clean(r[start + 1].text)
+        head = [c.text.rstrip(".") for c in tabs["t1"][0]]
+        scopes = []
+        total: dict[int, int] = {}
+        for r in tabs["t1"][1:]:
+            if r[1].text == "":
+                continue
+            code = r[0].text
+            votes = {int(h): _n(c) for h, c in zip(head, r, strict=True) if h.isdigit()}
+            cast = _n(r[head.index("Balsotāju skaits")]) if "Balsotāju skaits" in head else None
+            valid = _n(r[head.index("Derīgo zīmju skaits")]) if "Derīgo zīmju skaits" in head else None
+            unit = Unit(f"{day}:{code}", REGION_NAMES[code][0], None, cast, valid, votes)
+            scopes.append(Scope(code, REGION_NAMES[code][0], code, [unit]))
+            for n, v in votes.items():
+                total[n] = total.get(n, 0) + v
+        return Legacy(names, scopes, {n: (total[n], 0) for n in names}, "lv.apgabals")
+    if day == "2014-05-24":
+        rows = [r for r in tabs["t1"][1:] if r[0].text.rstrip(".").isdigit()]
+        names = {int(r[0].text.rstrip(".")): clean(r[1].text) for r in rows}
+        votes = {int(r[0].text.rstrip(".")): _n(r[2]) for r in rows}
+        seats = {int(r[0].text.rstrip(".")): _n(r[3]) for r in rows}
+        stats = {r[0].text.rstrip(":"): _n(r[1]) for r in tabs["t0"] if len(r) == 2 and r[1].text.isdigit()}
+        unit = Unit(f"{day}:valsts", "Latvija", None, stats["Nobalsojušie"], sum(votes.values()), votes)
+        return Legacy(
+            names,
+            [Scope("national", "Latvija", None, [unit], seats)],
+            {n: (votes[n], seats[n]) for n in names},
+            "lv.valsts",
+        )
+    names, votes, seats = _list_table(
+        [[Cell(c.text.replace("Sar.nr.", "Nr").replace("Sar.Nr.", "Nr"), None, None) for c in r] for r in tabs["t0"]]
+    )
+    units: list[Unit] = []
+    if day == "2004-06-12":
+        head = [c.text for c in tabs["t1"][0]]
+        for r in tabs["t1"][1:]:
+            if r[0].text.startswith("Kopā"):
+                continue
+            units.append(
+                Unit(
+                    f"{day}:{len(units) + 1}",
+                    clean(r[0].text),
+                    _n(r[1]) or None,
+                    None,
+                    _n(r[-1]),
+                    {int(h): _n(c) for h, c in zip(head, r, strict=True) if h.isdigit()},
+                )
+            )
+    else:
+        for region, key_ in zip(LEGACY_REGIONS, ("t1", "t2", "t3", "t4", "t5"), strict=True):
+            head = [c.text for c in tabs[key_][0]]
+            for r in tabs[key_][1:]:
+                if r[0].text == "Kopā":
+                    continue
+                units.append(
+                    Unit(
+                        f"{day}:{region}:{len(units) + 1}",
+                        clean(r[0].text),
+                        _n(r[1]),
+                        None,
+                        _n(r[-1]),
+                        {int(h): _n(c) for h, c in zip(head, r, strict=True) if h.isdigit()},
+                    )
+                )
+    return Legacy(
+        names,
+        [Scope("national", "Latvija", None, units, seats)],
+        {n: (votes[n], seats[n]) for n in names},
+        "lv.pasvaldiba",
+    )
+
+
+LEGACY_METHOD = (
+    "Published by the Central Election Commission of Latvia on its archive site as tables of votes for each list. "
+    "The finest unit the commission prints for this election is the {unit}; no polling-station figures are "
+    "published. Each list's votes are its valid marks."
+)
+LEGACY_DAYS = {"1993-06-05": "1993-06-06", "1995-09-30": "1995-10-01"}
+
+
+def build_legacy(day: str) -> Package:
+    kind, _, number = LEGACY[day]
+    first = date.fromisoformat(day)
+    last = date.fromisoformat(LEGACY_DAYS.get(day, day))
+    year = first.year
+    if kind == "saeima":
+        english, native = f"{year} Latvian parliamentary election", f"{number}. Saeimas vēlēšanas"
+    else:
+        english, native = f"{year} European Parliament election in Latvia", f"{year}. gada Eiropas Parlamenta vēlēšanas"
+    p = Package(
+        f"lv.cvk/{day}",
+        SOURCE,
+        f"The {english} by the finest unit the Central Election Commission publishes",
+        depends=["lv.cvk/geo", "lv.cvk/registry"],
+    )
+    p.external |= {LATVIA, COUNTRY}
+    p.uses(raw.cached(SOURCE, legacy_url(day)))
+    data = read_legacy(day)
+    unit_noun = {"lv.apgabals": "constituency", "lv.pasvaldiba": "municipality", "lv.valsts": "whole country"}[
+        data.level
+    ]
+    method = LEGACY_METHOD.format(unit=unit_noun)
+    election = key("election", day)
+    where = f"lv/{day}-general"
+    p.add("election", id=election, polity_id=LATVIA, kind="general", date_from=first, date_to=last, status="held")
+    p.name(election, english, "en", "official")
+    p.name(election, native, "lv", "native", False)
+    p.add("slug", path=where, entity_id=election, is_current=True)
+    for scope in data.scopes:
+        ident = scope.ident
+        contest = key("contest", day, ident)
+        region = scope.region
+        total = sum(scope.seats.values()) or SEATS_EP.get(day)
+        if region:
+            title, nativetitle = f"{english}, {REGION_NAMES[region][2]}", f"{native}, {REGION_NAMES[region][1]}"
+            slug, district = REGION_SLUGS[region], area("lv.apgabals", region)
+        else:
+            title, nativetitle, slug, district = english, native, "national", COUNTRY
+        p.add(
+            "contest",
+            id=contest,
+            election_id=election,
+            kind="list_allocation",
+            body_id=SAEIMA if kind == "saeima" else None,
+            district_area_id=district,
+            magnitude=total or (100 if day == "1993-06-05" else None),
+            round_number=1,
+            electoral_system_id=SYSTEM_SAEIMA if kind == "saeima" else SYSTEM_EP,
+            default_result_kind="counted",
+        )
+        p.name(contest, title, "en", "official")
+        p.name(contest, nativetitle, "lv", "native", False)
+        p.add("slug", path=f"{where}/{slug}", entity_id=contest, is_current=True)
+        result_set = key("result_set", day, ident)
+        p.add(
+            "result_set",
+            id=result_set,
+            election_id=election,
+            contest_id=contest,
+            stage="official",
+            kind="counted",
+            source_id=CVK_SOURCE,
+            status="active",
+            is_default=True,
+            completeness=1.0,
+        )
+        p.add("note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=method, lang="en")
+        options: dict[int, str] = {}
+        for n in sorted(data.lists):
+            if not any(n in u.votes for u in scope.units):
+                continue
+            option = options[n] = key("option", day, ident, n)
+            p.add(
+                "contest_option",
+                id=option,
+                contest_id=contest,
+                kind="list",
+                party_id=party(data.lists[n]),
+                ballot_position=n,
+                ballot_label=data.lists[n],
+            )
+            p.add(
+                "declared",
+                result_set_id=result_set,
+                option_id=option,
+                measure=VOTES,
+                value=sum(u.votes.get(n, 0) for u in scope.units),
+            )
+            if scope.seats.get(n):
+                p.add("outcome", result_set_id=result_set, option_id=option, kind="won", seats=scope.seats[n])
+        for u in scope.units:
+            unit = key("unit", u.code)
+            p.add(
+                "reporting_unit",
+                id=unit,
+                polity_id=LATVIA,
+                scheme_code=data.level,
+                code=u.code,
+                area_relation="equals" if data.level != "lv.pasvaldiba" else "unlocated",
+                area_id=(area("lv.apgabals", region) if data.level == "lv.apgabals" and region else COUNTRY)
+                if data.level != "lv.pasvaldiba"
+                else None,
+                kind="aggregate" if data.level != "lv.pasvaldiba" else "standard",
+            )
+            p.name(unit, u.name, "lv", "official")
+            _put(p, result_set, unit, None, REGISTERED, u.registered)
+            _put(p, result_set, unit, None, CAST, u.cast)
+            _put(p, result_set, unit, None, VALID, u.valid)
+            for n, option in options.items():
+                _put(p, result_set, unit, option, VOTES, u.votes.get(n, 0))
+        for measure, getter in ((CAST, "cast"), (VALID, "valid")):
+            values = [getattr(u, getter) for u in scope.units]
+            if all(v is not None for v in values) and values:
+                p.add("declared", result_set_id=result_set, option_id=None, measure=measure, value=sum(values))
     return p
