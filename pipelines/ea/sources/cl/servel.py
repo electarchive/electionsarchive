@@ -618,10 +618,16 @@ ELECTIONS = (
     _election(
         date(2013, 6, 30),
         "primary",
-        "presidential-primaries",
-        "2013 Chilean presidential primaries",
-        "Primarias presidenciales 2013",
+        "primaries",
+        "2013 Chilean presidential and parliamentary primaries",
+        "Primarias presidenciales y parlamentarias 2013",
         Group("president_primary", r"2022/12/\d\d_Resultados_Mesa_Presidente_Tricel1(-\d)?\.xlsx"),
+        # Servel publishes the deputies primaries of 2013 only by circunscripcion electoral.
+        Group(
+            "deputies_primary",
+            r"2022/12/resultados_elecciones_primarias_diputados_ce_2013_2017-1\.xlsx",
+            "2013-06-30:1",
+        ),
     ),
     _election(
         date(2013, 11, 17),
@@ -844,6 +850,10 @@ def ce_read(path: str, member: str) -> pl.DataFrame:
         else column("circunscripcionelectoral")
     )
     elected = next((c for c in columns if c.startswith("electo")), None)
+    lista = column("lista")
+    if "nominadoa" in columns:
+        # A primaries workbook leaves the list blank on its blank and null rows; each district held one list's primary.
+        lista = lista.fill_null(lista.drop_nulls().first().over(column("distrito")))
     return frame.select(
         region=column("idregion"),
         comuna=column("comuna"),
@@ -855,7 +865,7 @@ def ce_read(path: str, member: str) -> pl.DataFrame:
         circ_prov=pl.lit(None, pl.String),
         electores=pl.lit(None, pl.String),
         voto=pl.lit(None, pl.String),
-        lista=column("lista"),
+        lista=lista,
         pacto=pl.lit(None, pl.String),
         subpacto=pl.lit(None, pl.String),
         partido=column("partido"),
