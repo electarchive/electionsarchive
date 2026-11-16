@@ -1,0 +1,2053 @@
+{
+ "polity": "AT",
+ "name": "Austria",
+ "sources": {
+  "bvg": {
+   "title": "Bundes-Verfassungsgesetz (B-VG), BGBl. Nr. 1/1930 in der geltenden Fassung",
+   "publisher": "Bundeskanzleramt, Rechtsinformationssystem des Bundes (RIS)",
+   "url": "https://www.ris.bka.gv.at/GeltendeFassung.wxe?Abfrage=Bundesnormen&Gesetzesnummer=10000138",
+   "kind": "official_body"
+  },
+  "nrwo": {
+   "title": "Nationalrats-Wahlordnung 1992 (NRWO), BGBl. Nr. 471/1992 in der geltenden Fassung",
+   "publisher": "Bundeskanzleramt, Rechtsinformationssystem des Bundes (RIS)",
+   "url": "https://www.ris.bka.gv.at/GeltendeFassung.wxe?Abfrage=Bundesnormen&Gesetzesnummer=10001199",
+   "kind": "official_body"
+  },
+  "bmi-wahlen": {
+   "title": "Wahlen",
+   "publisher": "Bundesministerium für Inneres",
+   "url": "https://www.bmi.gv.at/412/",
+   "kind": "official_body"
+  },
+  "bmi-nr": {
+   "title": "Nationalratswahlen: Historischer Rückblick",
+   "publisher": "Bundesministerium für Inneres",
+   "url": "https://www.bmi.gv.at/412/nationalratswahlen/historischer_rueckblick.html",
+   "kind": "official_body"
+  },
+  "bmi-nr-2024": {
+   "title": "Nationalratswahl 2024",
+   "publisher": "Bundesministerium für Inneres",
+   "url": "https://www.bmi.gv.at/412/nationalratswahlen/nationalratswahl_2024/start.html",
+   "kind": "official_body"
+  },
+  "bmi-bp": {
+   "title": "Bundespräsidentenwahlen: Historischer Rückblick",
+   "publisher": "Bundesministerium für Inneres",
+   "url": "https://www.bmi.gv.at/412/bundespraesidentenwahlen/historischer_rueckblick.html",
+   "kind": "official_body"
+  },
+  "bmi-eu": {
+   "title": "Europawahlen: Historischer Rückblick",
+   "publisher": "Bundesministerium für Inneres",
+   "url": "https://www.bmi.gv.at/412/europawahlen/historischer_rueckblick.html",
+   "kind": "official_body"
+  },
+  "bmi-eu-start": {
+   "title": "Europawahlen: Überblick",
+   "publisher": "Bundesministerium für Inneres",
+   "url": "https://www.bmi.gv.at/412/europawahlen/start.html",
+   "kind": "official_body"
+  },
+  "bmi-va": {
+   "title": "Volksabstimmungen: Überblick",
+   "publisher": "Bundesministerium für Inneres",
+   "url": "https://www.bmi.gv.at/410/start.html",
+   "kind": "official_body"
+  },
+  "bmi-vbf": {
+   "title": "Volksbefragung: Überblick",
+   "publisher": "Bundesministerium für Inneres",
+   "url": "https://www.bmi.gv.at/416/start.html",
+   "kind": "official_body"
+  },
+  "bmi-vbg": {
+   "title": "Alle Volksbegehren der zweiten Republik",
+   "publisher": "Bundesministerium für Inneres",
+   "url": "https://www.bmi.gv.at/411/alle_volksbegehren_der_zweiten_republik.html",
+   "kind": "official_body"
+  },
+  "bmi-vbg-start": {
+   "title": "Volksbegehren: Überblick",
+   "publisher": "Bundesministerium für Inneres",
+   "url": "https://www.bmi.gv.at/411/start.html",
+   "kind": "official_body"
+  },
+  "parl-nr": {
+   "title": "Zusammensetzung des Nationalrates seit 1919",
+   "publisher": "Parlamentsdirektion (Republik Österreich)",
+   "url": "https://www.parlament.gv.at/recherchieren/statistiken/personen-statistiken/zusammensetzung-nr/index.html",
+   "kind": "official_body"
+  },
+  "parl-100": {
+   "title": "100 Jahre Nationalrat und Bundesrat",
+   "publisher": "Parlamentsdirektion (Republik Österreich)",
+   "url": "https://www.parlament.gv.at/fachinfos/rlw/100-Jahre-Nationalrat-und-Bundesrat",
+   "kind": "official_body"
+  },
+  "parl-br": {
+   "title": "Bundesrat",
+   "publisher": "Parlamentsdirektion (Republik Österreich)",
+   "url": "https://www.parlament.gv.at/verstehen/bundesrat/index.html",
+   "kind": "official_body"
+  },
+  "parl-bv": {
+   "title": "Bundesversammlung",
+   "publisher": "Parlamentsdirektion (Republik Österreich)",
+   "url": "https://www.parlament.gv.at/verstehen/das-hohe-haus/bundesversammlung/index.html",
+   "kind": "official_body"
+  },
+  "parl-wahlrecht": {
+   "title": "Geschichte des Wahlrechts",
+   "publisher": "Parlamentsdirektion (Republik Österreich)",
+   "url": "https://www.parlament.gv.at/verstehen/historisches/wahlen/geschichte-des-wahlrechts/index.html",
+   "kind": "official_body"
+  },
+  "parl-1848": {
+   "title": "1848 bis 1918",
+   "publisher": "Parlamentsdirektion (Republik Österreich)",
+   "url": "https://www.parlament.gv.at/verstehen/historisches/1848-1918/",
+   "kind": "official_body"
+  },
+  "stat-gl": {
+   "title": "Regionale Gliederungen",
+   "publisher": "Statistik Austria",
+   "url": "https://www.statistik.at/services/tools/regionale-internationale-daten/regionale-daten-und-gliederungen/regionale-gliederungen",
+   "kind": "official_body",
+   "note": "Landing page with the current unit counts: 'Anzahl der Gemeinden 2 092', 'Anzahl der Bezirke 94'."
+  },
+  "stat-ueb": {
+   "title": "Überblick Regionale Gliederungen, Datenstand 01.01.2026 (RegGliederungUebersicht.ods)",
+   "publisher": "Statistik Austria",
+   "url": "https://www.statistik.at/fileadmin/pages/453/RegGliederungUebersicht.ods",
+   "kind": "official_body"
+  },
+  "stat-gemvz2022": {
+   "title": "Gemeindeverzeichnis 2022, Gebietsstand 01.01.2022 (RegGemVz2022.ods)",
+   "publisher": "Statistik Austria",
+   "url": "https://www.statistik.at/fileadmin/pages/453/RegGemVz2022.ods",
+   "kind": "official_body"
+  },
+  "stat-gemvz2026": {
+   "title": "Gemeindeverzeichnis 2026, Gebietsstand 01.01.2026 (RegGemVz2026.ods)",
+   "publisher": "Statistik Austria",
+   "url": "https://www.statistik.at/fileadmin/pages/453/RegGemVz2026.ods",
+   "kind": "official_body"
+  },
+  "wien-wahlen": {
+   "title": "Wahlergebnisse",
+   "publisher": "Stadt Wien",
+   "url": "https://www.wien.gv.at/politik/wahlergebnisse",
+   "kind": "official_body",
+   "license": "CC BY 4.0"
+  },
+  "wien-gr-bv": {
+   "title": "Gemeinderats- und Bezirksvertretungswahlen",
+   "publisher": "Stadt Wien",
+   "url": "https://www.wien.gv.at/politik/gemeinderats-und-bezirksvertretungswahlen",
+   "kind": "official_body"
+  },
+  "graz": {
+   "title": "Wahlen des Gemeinderates, der Bezirksräte und des Migrantinnen- und Migrantenbeirates Graz am 28. Juni 2026",
+   "publisher": "Stadt Graz",
+   "url": "https://www.graz.at/wahlen",
+   "kind": "official_body"
+  },
+  "tirol": {
+   "title": "Wahlen in Tirol",
+   "publisher": "Amt der Tiroler Landesregierung",
+   "url": "https://wahlen.tirol.gv.at/",
+   "kind": "official_body"
+  },
+  "bgld": {
+   "title": "Gemeinderatswahlen",
+   "publisher": "Amt der Burgenländischen Landesregierung",
+   "url": "https://www.burgenland.at/politik/wahlen-im-burgenland/gemeinderatswahlen/",
+   "kind": "official_body"
+  },
+  "sbg": {
+   "title": "Wahlen in den Gemeinden",
+   "publisher": "Amt der Salzburger Landesregierung",
+   "url": "https://www.salzburg.gv.at/pol/wahl/wahl-gemeinden",
+   "kind": "official_body"
+  },
+  "ooe": {
+   "title": "Wahlen",
+   "publisher": "Amt der Oö. Landesregierung",
+   "url": "https://www.land-oberoesterreich.gv.at/wahlen.htm",
+   "kind": "official_body"
+  },
+  "vbg": {
+   "title": "Wahlergebnisse: Landtag, Gemeindewahl, Nationalrat, EU-Wahl",
+   "publisher": "Amt der Vorarlberger Landesregierung",
+   "url": "https://apps.vorarlberg.at/wahlen/",
+   "kind": "official_body"
+  }
+ },
+ "tiers": [
+  {
+   "key": "national",
+   "name": "Republik Österreich",
+   "name_en": "Republic of Austria",
+   "parent": null,
+   "polity_kind": "sovereign_state",
+   "valid_from": "1918-10-30",
+   "source": "bvg"
+  },
+  {
+   "key": "land",
+   "name": "Bundesländer",
+   "name_en": "Federal states (Bundesländer)",
+   "parent": "national",
+   "polity_kind": "federal_unit",
+   "scheme": "at.land",
+   "source": "bvg",
+   "counts": [
+    {
+     "date": "2026-01-01",
+     "value": 9,
+     "source": "stat-ueb",
+     "locator": "https://www.statistik.at/fileadmin/pages/453/RegGliederungUebersicht.ods (sheet BDL)"
+    }
+   ]
+  },
+  {
+   "key": "bezirk",
+   "name": "Politische Bezirke und Statutarstädte",
+   "name_en": "Political districts, including the 15 statutory cities (administrative only; not elected)",
+   "parent": "land",
+   "elects": false,
+   "polity_kind": "county",
+   "scheme": "at.bezirk",
+   "source": "stat-gl",
+   "counts": [
+    {
+     "date": "2026-01-01",
+     "value": 94,
+     "source": "stat-gl",
+     "locator": "https://www.statistik.at/services/tools/regionale-internationale-daten/regionale-daten-und-gliederungen/regionale-gliederungen ('Anzahl der Bezirke 94')"
+    }
+   ]
+  },
+  {
+   "key": "gemeinde",
+   "name": "Gemeinden",
+   "name_en": "Municipalities (Gemeinden), including the 15 statutory cities and Vienna",
+   "parent": "bezirk",
+   "polity_kind": "municipality",
+   "scheme": "at.gemeinde",
+   "source": "stat-gl",
+   "counts": [
+    {
+     "date": "2026-01-01",
+     "value": 2092,
+     "source": "stat-gl",
+     "locator": "https://www.statistik.at/services/tools/regionale-internationale-daten/regionale-daten-und-gliederungen/regionale-gliederungen ('Anzahl der Gemeinden 2 092'; RegGemVz2026.ods lists 2,092 distinct Gemeindekennziffern: Burgenland 171, Kärnten 132, Niederösterreich 573, Oberösterreich 438, Salzburg 119, Steiermark 285, Tirol 277, Vorarlberg 96, Wien 1)"
+    },
+    {
+     "date": "2022-01-01",
+     "value": 2093,
+     "source": "stat-gemvz2022",
+     "locator": "https://www.statistik.at/fileadmin/pages/453/RegGemVz2022.ods (sheet Gemeinden, 2,093 distinct Gemeindekennziffern)"
+    }
+   ]
+  },
+  {
+   "key": "wien_bezirk",
+   "name": "Wiener Gemeindebezirke",
+   "name_en": "Vienna's 23 municipal districts",
+   "parent": "gemeinde",
+   "polity_kind": "submunicipal",
+   "source": "wien-gr-bv",
+   "counts": [
+    {
+     "date": "2026-01-01",
+     "value": 23,
+     "source": "stat-ueb",
+     "locator": "https://www.statistik.at/fileadmin/pages/453/RegGliederungUebersicht.ods (sheet POLBEZ, codes 901-923)"
+    }
+   ]
+  },
+  {
+   "key": "graz_bezirk",
+   "name": "Stadtbezirke der Landeshauptstadt Graz",
+   "name_en": "Graz city districts with elected district councils (Bezirksräte)",
+   "parent": "gemeinde",
+   "polity_kind": "submunicipal",
+   "source": "graz"
+  },
+  {
+   "key": "functional",
+   "name": "Gesetzliche Interessenvertretungen und Hochschülerschaft",
+   "name_en": "Statutory chambers and the students' union (non-territorial)",
+   "parent": "national",
+   "source": "bvg"
+  },
+  {
+   "key": "cisleithanien",
+   "name": "Im Reichsrat vertretene Königreiche und Länder",
+   "name_en": "Cisleithania, the Austrian half of Austria-Hungary (1867-1918)",
+   "parent": null,
+   "polity_kind": "historical_state",
+   "valid_from": "1867-12-21",
+   "valid_to": "1918-11-12",
+   "source": "parl-1848"
+  }
+ ],
+ "classes": [
+  {
+   "key": "nationalrat",
+   "tier": "national",
+   "name": "Nationalratswahl",
+   "name_en": "National Council elections",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "election",
+    "fine": [
+     "at.gemeinde"
+    ]
+   },
+   "finest_note": "The BMI publishes results by municipality (Gemeinde) and, for Vienna, by district; polling-district (Wahlsprengel) results are published only by some Länder and cities.",
+   "note": "Counted per election, as the archive loads one national list-allocation contest per election: seats are allocated in three steps (39 regional constituencies, 9 Land constituencies, and the federal level) under the NRWO 1992. 165 seats from 1923 to 1970 and 183 in 1920 and since 1971. The term is five years since 2007 (four before), and the Council can dissolve itself early. No elections were held from 1934 to 1945.",
+   "source": "nrwo",
+   "valid_from": "1920-10-01",
+   "first_held": "1920-10-17",
+   "earliest_record": "1920-10-17",
+   "est_votes": 4900000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 4,
+     "term_years": 4,
+     "called": true,
+     "administered_by": "Bundeswahlbehörde (Bundesministerium für Inneres)",
+     "valid_to": "2007-07-01",
+     "source": "bvg"
+    },
+    {
+     "period_years": 5,
+     "phase": 4,
+     "term_years": 5,
+     "called": true,
+     "administered_by": "Bundeswahlbehörde (Bundesministerium für Inneres)",
+     "valid_from": "2007-07-01",
+     "source": "bvg"
+    }
+   ],
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Bundesministerium für Inneres (Bundeswahlbehörde)",
+     "format": "XLSX, XLS, and PDF",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "finest": "at.gemeinde",
+     "first_date": "1945-11-25",
+     "url": "https://www.bmi.gv.at/412/nationalratswahlen/",
+     "evidence": "Results by municipality as XLSX/XLS from 1995 (2024: endgueltiges_ergebnis_beschluss_bundeswahlbehoerde_16102024.xlsx 'mit Gemeindeergebnissen'); earlier elections as scanned PDFs back to 1930 on the historical page.",
+     "source": "bmi-nr-2024"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "lower_house"
+     ],
+     "iso_pattern": "AT",
+     "valid_from": "1920-10-01",
+     "precedence": 1
+    }
+   ],
+   "dates": [
+    {
+     "date": "1920-10-17",
+     "contests": 1,
+     "source": "parl-nr",
+     "quote": "Election day and seats: 17.10.1920: 183",
+     "seats": 183,
+     "note": "Only 174 of the 183 seats were filled in 1920; the Carinthian and Burgenland seats followed the 1920 plebiscite and the 1921 transfer of Burgenland."
+    },
+    {
+     "date": "1923-10-21",
+     "contests": 1,
+     "source": "parl-nr",
+     "quote": "Election day and seats: 21.10.1923: 165",
+     "seats": 165
+    },
+    {
+     "date": "1927-04-24",
+     "contests": 1,
+     "source": "parl-nr",
+     "quote": "Election day and seats: 24.04.1927: 165",
+     "seats": 165
+    },
+    {
+     "date": "1930-11-09",
+     "contests": 1,
+     "source": "parl-nr",
+     "quote": "Election day and seats: 09.11.1930: 165",
+     "seats": 165
+    },
+    {
+     "date": "1945-11-25",
+     "contests": 1,
+     "source": "bmi-nr",
+     "quote": "In der zweiten Republik fanden bislang 24 Nationalratswahlen statt",
+     "seats": 165
+    },
+    {
+     "date": "1949-10-09",
+     "contests": 1,
+     "source": "bmi-nr",
+     "quote": "In der zweiten Republik fanden bislang 24 Nationalratswahlen statt",
+     "seats": 165
+    },
+    {
+     "date": "1953-02-22",
+     "contests": 1,
+     "source": "bmi-nr",
+     "quote": "In der zweiten Republik fanden bislang 24 Nationalratswahlen statt",
+     "seats": 165
+    },
+    {
+     "date": "1956-05-13",
+     "contests": 1,
+     "source": "bmi-nr",
+     "quote": "In der zweiten Republik fanden bislang 24 Nationalratswahlen statt",
+     "seats": 165
+    },
+    {
+     "date": "1959-05-10",
+     "contests": 1,
+     "source": "bmi-nr",
+     "quote": "In der zweiten Republik fanden bislang 24 Nationalratswahlen statt",
+     "seats": 165
+    },
+    {
+     "date": "1962-11-18",
+     "contests": 1,
+     "source": "bmi-nr",
+     "quote": "In der zweiten Republik fanden bislang 24 Nationalratswahlen statt",
+     "seats": 165
+    },
+    {
+     "date": "1966-03-06",
+     "contests": 1,
+     "source": "bmi-nr",
+     "quote": "In der zweiten Republik fanden bislang 24 Nationalratswahlen statt",
+     "seats": 165
+    },
+    {
+     "date": "1970-03-01",
+     "contests": 1,
+     "source": "bmi-nr",
+     "quote": "In der zweiten Republik fanden bislang 24 Nationalratswahlen statt",
+     "seats": 165,
+     "note": "Repeated on 4 October 1970 in three constituencies (nine Viennese districts); the BMI's figures include the repeat."
+    },
+    {
+     "date": "1971-10-10",
+     "contests": 1,
+     "source": "bmi-nr",
+     "quote": "In der zweiten Republik fanden bislang 24 Nationalratswahlen statt",
+     "seats": 183
+    },
+    {
+     "date": "1975-10-05",
+     "contests": 1,
+     "source": "bmi-nr",
+     "quote": "In der zweiten Republik fanden bislang 24 Nationalratswahlen statt",
+     "seats": 183
+    },
+    {
+     "date": "1979-05-06",
+     "contests": 1,
+     "source": "bmi-nr",
+     "quote": "In der zweiten Republik fanden bislang 24 Nationalratswahlen statt",
+     "seats": 183
+    },
+    {
+     "date": "1983-04-24",
+     "contests": 1,
+     "source": "bmi-nr",
+     "quote": "In der zweiten Republik fanden bislang 24 Nationalratswahlen statt",
+     "seats": 183
+    },
+    {
+     "date": "1986-11-23",
+     "contests": 1,
+     "source": "bmi-nr",
+     "quote": "In der zweiten Republik fanden bislang 24 Nationalratswahlen statt",
+     "seats": 183
+    },
+    {
+     "date": "1990-10-07",
+     "contests": 1,
+     "source": "bmi-nr",
+     "quote": "In der zweiten Republik fanden bislang 24 Nationalratswahlen statt",
+     "seats": 183
+    },
+    {
+     "date": "1994-10-09",
+     "contests": 1,
+     "source": "bmi-nr",
+     "quote": "In der zweiten Republik fanden bislang 24 Nationalratswahlen statt",
+     "seats": 183
+    },
+    {
+     "date": "1995-12-17",
+     "contests": 1,
+     "source": "bmi-nr",
+     "quote": "In der zweiten Republik fanden bislang 24 Nationalratswahlen statt",
+     "seats": 183,
+     "note": "Repeated on 13 October 1996 in Donnerskirchen and in polling district 2 of Reutte; the BMI's figures include the repeat."
+    },
+    {
+     "date": "1999-10-03",
+     "contests": 1,
+     "source": "bmi-nr",
+     "quote": "In der zweiten Republik fanden bislang 24 Nationalratswahlen statt",
+     "seats": 183
+    },
+    {
+     "date": "2002-11-24",
+     "contests": 1,
+     "source": "bmi-nr",
+     "quote": "In der zweiten Republik fanden bislang 24 Nationalratswahlen statt",
+     "seats": 183
+    },
+    {
+     "date": "2006-10-01",
+     "contests": 1,
+     "source": "bmi-nr",
+     "quote": "In der zweiten Republik fanden bislang 24 Nationalratswahlen statt",
+     "seats": 183
+    },
+    {
+     "date": "2008-09-28",
+     "contests": 1,
+     "source": "bmi-nr",
+     "quote": "In der zweiten Republik fanden bislang 24 Nationalratswahlen statt",
+     "seats": 183
+    },
+    {
+     "date": "2013-09-29",
+     "contests": 1,
+     "source": "bmi-nr",
+     "quote": "In der zweiten Republik fanden bislang 24 Nationalratswahlen statt",
+     "seats": 183
+    },
+    {
+     "date": "2017-10-15",
+     "contests": 1,
+     "source": "bmi-nr",
+     "quote": "In der zweiten Republik fanden bislang 24 Nationalratswahlen statt",
+     "seats": 183
+    },
+    {
+     "date": "2019-09-29",
+     "contests": 1,
+     "source": "bmi-nr",
+     "quote": "In der zweiten Republik fanden bislang 24 Nationalratswahlen statt",
+     "seats": 183
+    },
+    {
+     "date": "2024-09-29",
+     "contests": 1,
+     "source": "bmi-nr",
+     "quote": "In der zweiten Republik fanden bislang 24 Nationalratswahlen statt",
+     "seats": 183
+    }
+   ]
+  },
+  {
+   "key": "konstituierende_nationalversammlung",
+   "tier": "national",
+   "name": "Wahl zur Konstituierenden Nationalversammlung",
+   "name_en": "Constituent National Assembly election of 1919",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "election"
+   },
+   "note": "The Provisional National Assembly of 1918 was formed from the German-speaking members of the 1911 Reichsrat, not elected. On 16 February 1919, 159 members were elected and 11 more were summoned on 4 April 1919.",
+   "source": "parl-nr",
+   "valid_from": "1919-02-16",
+   "valid_to": "1920-11-10",
+   "first_held": "1919-02-16",
+   "earliest_record": "1919-02-16",
+   "est_votes": 2900000,
+   "effort": 3,
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "constituent_assembly"
+     ],
+     "iso_pattern": "AT"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1919-02-16",
+     "contests": 1,
+     "source": "parl-nr",
+     "quote": "159 Abgeordnete wurden gewählt und mit Beschluss vom 4. April 1919 weitere 11 Abgeordnete einberufen",
+     "seats": 159
+    }
+   ]
+  },
+  {
+   "key": "bundespraesident",
+   "tier": "national",
+   "name": "Bundespräsidentenwahl",
+   "name_en": "Federal presidential elections",
+   "category": "executive",
+   "goal": "national",
+   "measure": {
+    "unit": "round",
+    "fine": [
+     "at.gemeinde"
+    ]
+   },
+   "finest_note": "Results by municipality from the BMI.",
+   "note": "Counted per round: a second round (Stichwahl) four weeks later when no candidate wins an absolute majority (1951, 1986, 1992, 2016). Popular election was introduced by the 1929 amendment but first held in 1951. The 2016 second round was annulled and repeated.",
+   "source": "bvg",
+   "valid_from": "1951-01-01",
+   "first_held": "1951-05-06",
+   "earliest_record": "1951-05-06",
+   "est_votes": 4600000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 6,
+     "phase": 4,
+     "term_years": 6,
+     "called": false,
+     "runoff": "majority",
+     "runoff_rule": "Absolute majority of valid votes; otherwise a runoff between the two leading candidates (Art. 60 Abs. 2 B-VG).",
+     "administered_by": "Bundeswahlbehörde (Bundesministerium für Inneres)",
+     "source": "bvg"
+    }
+   ],
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Bundesministerium für Inneres (Bundeswahlbehörde)",
+     "format": "XLSX, XLS, and PDF",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "finest": "at.gemeinde",
+     "first_date": "1951-05-06",
+     "url": "https://www.bmi.gv.at/412/bundespraesidentenwahlen/",
+     "evidence": "Municipal results as XLS/XLSX from 1998; earlier rounds on the historical page.",
+     "source": "bmi-bp"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "runoff"
+     ],
+     "office_kinds": [
+      "head_of_state"
+     ],
+     "iso_pattern": "AT"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1951-05-06",
+     "contests": 1,
+     "source": "bmi-bp",
+     "quote": "Bundespräsidentenwahl 1951, Erster Wahlgang: 6. Mai 1951",
+     "election_kind": "general",
+     "seats": 1
+    },
+    {
+     "date": "1951-05-27",
+     "contests": 1,
+     "source": "bmi-bp",
+     "quote": "Bundespräsidentenwahl 1951, Zweiter Wahlgang: 27. Mai 1951",
+     "election_kind": "runoff",
+     "seats": 1
+    },
+    {
+     "date": "1957-05-05",
+     "contests": 1,
+     "source": "bmi-bp",
+     "quote": "Bundespräsidentenwahl 1957, Nur ein Wahlgang: 5. Mai 1957",
+     "election_kind": "general",
+     "seats": 1
+    },
+    {
+     "date": "1963-04-28",
+     "contests": 1,
+     "source": "bmi-bp",
+     "quote": "Bundespräsidentenwahl 1963, Nur ein Wahlgang: 28. April 1963",
+     "election_kind": "general",
+     "seats": 1
+    },
+    {
+     "date": "1965-05-23",
+     "contests": 1,
+     "source": "bmi-bp",
+     "quote": "Bundespräsidentenwahl 1965, Nur ein Wahlgang: 23. Mai 1965",
+     "election_kind": "general",
+     "seats": 1
+    },
+    {
+     "date": "1971-04-25",
+     "contests": 1,
+     "source": "bmi-bp",
+     "quote": "Bundespräsidentenwahl 1971, Nur ein Wahlgang: 25. April 1971",
+     "election_kind": "general",
+     "seats": 1
+    },
+    {
+     "date": "1974-06-23",
+     "contests": 1,
+     "source": "bmi-bp",
+     "quote": "Bundespräsidentenwahl 1974, Nur ein Wahlgang: 23. Juni 1974",
+     "election_kind": "general",
+     "seats": 1
+    },
+    {
+     "date": "1980-05-18",
+     "contests": 1,
+     "source": "bmi-bp",
+     "quote": "Bundespräsidentenwahl 1980, Nur ein Wahlgang: 18. Mai 1980",
+     "election_kind": "general",
+     "seats": 1
+    },
+    {
+     "date": "1986-05-04",
+     "contests": 1,
+     "source": "bmi-bp",
+     "quote": "Bundespräsidentenwahl 1986, Erster Wahlgang: 4. Mai 1986",
+     "election_kind": "general",
+     "seats": 1
+    },
+    {
+     "date": "1986-06-08",
+     "contests": 1,
+     "source": "bmi-bp",
+     "quote": "Bundespräsidentenwahl 1986, Zweiter Wahlgang: 8. Juni 1986",
+     "election_kind": "runoff",
+     "seats": 1
+    },
+    {
+     "date": "1992-04-26",
+     "contests": 1,
+     "source": "bmi-bp",
+     "quote": "Bundespräsidentenwahl 1992, Erster Wahlgang: 26. April 1992",
+     "election_kind": "general",
+     "seats": 1
+    },
+    {
+     "date": "1992-05-24",
+     "contests": 1,
+     "source": "bmi-bp",
+     "quote": "Bundespräsidentenwahl 1992, Zweiter Wahlgang: 24. Mai 1992",
+     "election_kind": "runoff",
+     "seats": 1
+    },
+    {
+     "date": "1998-04-19",
+     "contests": 1,
+     "source": "bmi-bp",
+     "quote": "Bundespräsidentenwahl 1998, Nur ein Wahlgang: 19. April 1998",
+     "election_kind": "general",
+     "seats": 1
+    },
+    {
+     "date": "2004-04-25",
+     "contests": 1,
+     "source": "bmi-bp",
+     "quote": "Bundespräsidentenwahl 2004, Nur ein Wahlgang: 25. April 2004",
+     "election_kind": "general",
+     "seats": 1
+    },
+    {
+     "date": "2010-04-25",
+     "contests": 1,
+     "source": "bmi-bp",
+     "quote": "Bundespräsidentenwahl 2010, Nur ein Wahlgang: 25. April 2010",
+     "election_kind": "general",
+     "seats": 1
+    },
+    {
+     "date": "2016-04-24",
+     "contests": 1,
+     "source": "bmi-bp",
+     "quote": "Bundespräsidentenwahl 2016, Erster Wahlgang: 24. April 2016",
+     "election_kind": "general",
+     "seats": 1
+    },
+    {
+     "date": "2016-05-22",
+     "contests": 1,
+     "source": "bmi-bp",
+     "quote": "Bundespräsidentenwahl 2016, Zweiter Wahlgang: 22. Mai 2016",
+     "election_kind": "runoff",
+     "seats": 1,
+     "note": "Annulled by the Constitutional Court on 1 July 2016 (W I 6/2016)."
+    },
+    {
+     "date": "2016-12-04",
+     "contests": 1,
+     "source": "bmi-bp",
+     "quote": "Bundespräsidentenwahl 2016, Wiederholung zweiter Wahlgang: 4. Dezember 2016",
+     "election_kind": "runoff",
+     "seats": 1,
+     "note": "Repeat of the annulled second round (Wiederholung zweiter Wahlgang)."
+    },
+    {
+     "date": "2022-10-09",
+     "contests": 1,
+     "source": "bmi-bp",
+     "quote": "Bundespräsidentenwahl 2022, Nur ein Wahlgang: 9. Oktober 2022",
+     "election_kind": "general",
+     "seats": 1
+    }
+   ]
+  },
+  {
+   "key": "bundesversammlung",
+   "tier": "national",
+   "name": "Wahl des Bundespräsidenten durch die Bundesversammlung",
+   "name_en": "Election of the Federal President by the Federal Assembly (1920-1945)",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {
+    "unit": "ballot"
+   },
+   "note": "The Federal Assembly (National Council and Federal Council in joint session) elected the president in 1920, 1924, 1928, 1931, and 1945. The 1931 popular election provided for by the 1929 amendment was cancelled. The Parliament's pages give the 1945 date; the 1920-1931 ballots are listed as a span until a cited date list is found.",
+   "source": "parl-bv",
+   "valid_from": "1920-10-01",
+   "valid_to": "1951-01-01",
+   "est_votes": 250,
+   "effort": 2,
+   "match": [
+    {
+     "election_kinds": [
+      "indirect"
+     ],
+     "office_kinds": [
+      "head_of_state"
+     ],
+     "iso_pattern": "AT",
+     "valid_to": "1951-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1920-12-01",
+     "through": "1931-12-31",
+     "source": "parl-bv",
+     "quote": "Die Volkswahl wurde mit der B-VG-Novelle 1929 eingeführt, gelangte aber erst 1951 erstmals tatsächlich zur Anwendung."
+    },
+    {
+     "date": "1945-12-20",
+     "contests": 1,
+     "source": "parl-100",
+     "quote": "Am 20. Dezember wählte die Bundesversammlung Karl Renner zum Bundespräsidenten.",
+     "election_kind": "indirect"
+    }
+   ]
+  },
+  {
+   "key": "ep",
+   "tier": "national",
+   "name": "Europawahl in Österreich",
+   "name_en": "European Parliament elections in Austria",
+   "category": "legislature",
+   "goal": "ep",
+   "measure": {
+    "unit": "election",
+    "fine": [
+     "at.gemeinde"
+    ]
+   },
+   "finest_note": "Results by municipality from the BMI.",
+   "note": "Counted per election: Austria elects its members as one national constituency by list PR with preference votes. The 1996 by-election followed accession on 1 January 1995; until then members were delegated by the National Council.",
+   "source": "bmi-eu",
+   "valid_from": "1996-01-01",
+   "first_held": "1996-10-13",
+   "earliest_record": "1996-10-13",
+   "est_votes": 3500000,
+   "effort": 2,
+   "cadence": [
+    {
+     "period_years": 5,
+     "phase": 4,
+     "term_years": 5,
+     "administered_by": "Bundeswahlbehörde (Bundesministerium für Inneres)",
+     "source": "bmi-eu-start"
+    }
+   ],
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Bundesministerium für Inneres (Bundeswahlbehörde)",
+     "format": "XLSX, XLS, and PDF",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "finest": "at.gemeinde",
+     "first_date": "1996-10-13",
+     "url": "https://www.bmi.gv.at/412/europawahlen/",
+     "source": "bmi-eu"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "contest_kinds": [
+      "list_allocation"
+     ],
+     "iso_pattern": "AT",
+     "valid_from": "1996-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1996-10-13",
+     "contests": 1,
+     "source": "bmi-eu",
+     "quote": "in Österreich fanden diese am 13. Oktober 1996 statt"
+    },
+    {
+     "date": "1999-06-13",
+     "contests": 1,
+     "source": "bmi-eu",
+     "quote": "ergab sich automatisch, dass in Österreich Sonntag, der 13. Juni 1999"
+    },
+    {
+     "date": "2004-06-13",
+     "contests": 1,
+     "source": "bmi-eu",
+     "quote": "Österreich konnte 2004 aber aufgrund einer Übergangsbestimmung zum Vertrag von Nizza ... für die Periode bis 2009 noch 18 Mitglieder in das Europäische Parlament wählen.",
+     "seats": 18
+    },
+    {
+     "date": "2009-06-07",
+     "contests": 1,
+     "source": "bmi-eu",
+     "quote": "Der Wahltag in Österreich war der 7. Juni 2009 . Bei dieser Wahl konnten ... nur mehr 17 österreichische Mitglieder des Europäischen Parlaments gewählt werden.",
+     "seats": 17
+    },
+    {
+     "date": "2014-05-25",
+     "contests": 1,
+     "source": "bmi-eu",
+     "quote": "Der Wahltag in Österreich war der 25. Mai 2014 . Für Österreich konnten bei der Europawahl 2014 18 EP-Mitglieder gewählt werden.",
+     "seats": 18
+    },
+    {
+     "date": "2019-05-26",
+     "contests": 1,
+     "source": "bmi-eu",
+     "quote": "konnten für die Wahlperiode 2019-2024 für Österreich 19 EP-Mitglieder gewählt werden ... In Österreich fand die Europawahl am Sonntag, dem 26. Mai 2019, statt.",
+     "seats": 19,
+     "note": "The 19th seat was taken up only after the United Kingdom left on 31 January 2020."
+    },
+    {
+     "date": "2024-06-09",
+     "contests": 1,
+     "source": "bmi-eu-start",
+     "quote": "Für die Wahlperiode 2024-2029 werden 20 österreichische Mitglieder gewählt.",
+     "seats": 20
+    }
+   ]
+  },
+  {
+   "key": "volksabstimmung",
+   "tier": "national",
+   "name": "Volksabstimmung",
+   "name_en": "Federal referendums (binding)",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "question",
+    "fine": [
+     "at.gemeinde"
+    ]
+   },
+   "note": "Binding referendum on a law passed by the National Council (Art. 43 B-VG, on request of its majority) or mandatory on a total revision of the constitution (Art. 44 Abs. 3 B-VG). Held twice: Zwentendorf nuclear plant (1978) and EU accession (1994).",
+   "source": "bvg",
+   "valid_from": "1920-10-01",
+   "first_held": "1978-11-05",
+   "earliest_record": "1978-11-05",
+   "est_votes": 4000000,
+   "effort": 2,
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Bundesministerium für Inneres (Bundeswahlbehörde)",
+     "format": "PDF",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "finest": "at.gemeinde",
+     "first_date": "1978-11-05",
+     "url": "https://www.bmi.gv.at/410/start.html",
+     "source": "bmi-va"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "iso_pattern": "AT",
+     "valid_from": "1945-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1978-11-05",
+     "contests": 1,
+     "source": "bmi-va",
+     "quote": "die am 5. November 1978 durchgeführte Volksabstimmung über ein Bundesgesetz zur friedlichen Nutzung der Kernenergie"
+    },
+    {
+     "date": "1994-06-12",
+     "contests": 1,
+     "source": "bmi-va",
+     "quote": "die am 12. Juni 1994 abgehaltene Volksabstimmung betreffend den Beitritt Österreichs zur Europäischen Union"
+    }
+   ]
+  },
+  {
+   "key": "volksbefragung",
+   "tier": "national",
+   "name": "Volksbefragung",
+   "name_en": "Federal consultative referendums",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "question",
+    "fine": [
+     "at.gemeinde"
+    ]
+   },
+   "note": "Non-binding consultation on a matter of national importance, decided by the National Council (Art. 49b B-VG, since 1989). Held once, on conscription versus a professional army (2013). Its selector is limited to 2013 so later consultations need a new date range here.",
+   "source": "bvg",
+   "valid_from": "1989-01-01",
+   "first_held": "2013-01-20",
+   "earliest_record": "2013-01-20",
+   "est_votes": 2400000,
+   "effort": 1,
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Bundesministerium für Inneres (Bundeswahlbehörde)",
+     "format": "XLSX, XLS, and PDF",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "finest": "at.gemeinde",
+     "first_date": "2013-01-20",
+     "url": "https://www.bmi.gv.at/416/start.html",
+     "source": "bmi-vbf"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "iso_pattern": "AT",
+     "valid_from": "2013-01-01",
+     "valid_to": "2014-01-01",
+     "precedence": 1
+    }
+   ],
+   "dates": [
+    {
+     "date": "2013-01-20",
+     "contests": 1,
+     "source": "bmi-va",
+     "quote": "Bisher haben in Österreich zwei Volksabstimmungen und eine Volksbefragung stattgefunden"
+    }
+   ]
+  },
+  {
+   "key": "volksbegehren",
+   "tier": "national",
+   "name": "Volksbegehren",
+   "name_en": "Citizens' initiatives (signatures collected over an eight-day period)",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "initiative",
+    "fine": [
+     "at.gemeinde"
+    ]
+   },
+   "finest_note": "The BMI publishes the signatures per municipality and Land for each initiative.",
+   "note": "An initiative signed by 100,000 voters (or a sixth of the voters in each of three Länder) must be dealt with by the National Council (Art. 41 Abs. 2 B-VG). Each one counts once; registrations still collecting supporting declarations without a set signing period are not counted. Not yet loaded: a loader must add a body, office, or name selector here so that its contests do not fall to volksabstimmung.",
+   "source": "bmi-vbg",
+   "valid_from": "1963-01-01",
+   "first_held": "1964-10-05",
+   "earliest_record": "1964-10-05",
+   "est_votes": 300000,
+   "effort": 2,
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Bundesministerium für Inneres (Bundeswahlbehörde)",
+     "format": "HTML and PDF",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "finest": "at.land",
+     "first_date": "1964-10-05",
+     "url": "https://www.bmi.gv.at/411/alle_volksbegehren_der_zweiten_republik.html",
+     "source": "bmi-vbg-start",
+     "evidence": "114 initiatives with a signing period, 1964 to June 2026, with valid signatures and turnout."
+    }
+   ],
+   "dates": [
+    {
+     "date": "1964-10-05",
+     "contests": 1,
+     "source": "bmi-vbg",
+     "quote": "Eintragungszeitraum 5.10. - 12.10.1964: 1 Volksbegehren",
+     "note": "Count of initiatives whose eight-day signing period (Eintragungszeitraum) opened on this day."
+    },
+    {
+     "date": "1969-05-04",
+     "contests": 1,
+     "source": "bmi-vbg",
+     "quote": "Eintragungszeitraum 4.5. - 11.5.1969: 1 Volksbegehren",
+     "note": "Count of initiatives whose eight-day signing period (Eintragungszeitraum) opened on this day."
+    },
+    {
+     "date": "1969-05-12",
+     "contests": 1,
+     "source": "bmi-vbg",
+     "quote": "Eintragungszeitraum 12.5. - 19.5.1969: 1 Volksbegehren",
+     "note": "Count of initiatives whose eight-day signing period (Eintragungszeitraum) opened on this day."
+    },
+    {
+     "date": "1975-11-24",
+     "contests": 1,
+     "source": "bmi-vbg",
+     "quote": "Eintragungszeitraum 24.11. - 1.12.1975: 1 Volksbegehren",
+     "note": "Count of initiatives whose eight-day signing period (Eintragungszeitraum) opened on this day."
+    },
+    {
+     "date": "1980-11-03",
+     "contests": 2,
+     "source": "bmi-vbg",
+     "quote": "Eintragungszeitraum 3.11. - 10.11.1980: 2 Volksbegehren",
+     "note": "Count of initiatives whose eight-day signing period (Eintragungszeitraum) opened on this day."
+    },
+    {
+     "date": "1982-05-10",
+     "contests": 1,
+     "source": "bmi-vbg",
+     "quote": "Eintragungszeitraum 10.5. - 17.5.1982: 1 Volksbegehren",
+     "note": "Count of initiatives whose eight-day signing period (Eintragungszeitraum) opened on this day."
+    },
+    {
+     "date": "1985-03-04",
+     "contests": 1,
+     "source": "bmi-vbg",
+     "quote": "Eintragungszeitraum 4.3. - 11.3.1985: 1 Volksbegehren",
+     "note": "Count of initiatives whose eight-day signing period (Eintragungszeitraum) opened on this day."
+    },
+    {
+     "date": "1985-04-22",
+     "contests": 1,
+     "source": "bmi-vbg",
+     "quote": "Eintragungszeitraum 22.4. - 29.4.1985: 1 Volksbegehren",
+     "note": "Count of initiatives whose eight-day signing period (Eintragungszeitraum) opened on this day."
+    },
+    {
+     "date": "1985-11-04",
+     "contests": 1,
+     "source": "bmi-vbg",
+     "quote": "Eintragungszeitraum 4.11. -11.11.1985: 1 Volksbegehren",
+     "note": "Count of initiatives whose eight-day signing period (Eintragungszeitraum) opened on this day."
+    },
+    {
+     "date": "1986-03-03",
+     "contests": 1,
+     "source": "bmi-vbg",
+     "quote": "Eintragungszeitraum 3.3. - 10.3.1986: 1 Volksbegehren",
+     "note": "Count of initiatives whose eight-day signing period (Eintragungszeitraum) opened on this day."
+    },
+    {
+     "date": "1987-06-22",
+     "contests": 1,
+     "source": "bmi-vbg",
+     "quote": "Eintragungszeitraum 22.6. - 29.6.1987: 1 Volksbegehren",
+     "note": "Count of initiatives whose eight-day signing period (Eintragungszeitraum) opened on this day."
+    },
+    {
+     "date": "1989-05-29",
+     "contests": 1,
+     "source": "bmi-vbg",
+     "quote": "Eintragungszeitraum 29.5. - 5.6.1989: 1 Volksbegehren",
+     "note": "Count of initiatives whose eight-day signing period (Eintragungszeitraum) opened on this day."
+    },
+    {
+     "date": "1989-11-27",
+     "contests": 1,
+     "source": "bmi-vbg",
+     "quote": "Eintragungszeitraum 27.11. - 4.12.1989: 1 Volksbegehren",
+     "note": "Count of initiatives whose eight-day signing period (Eintragungszeitraum) opened on this day."
+    },
+    {
+     "date": "1991-11-11",
+     "contests": 1,
+     "source": "bmi-vbg",
+     "quote": "Eintragungszeitraum 11.11. - 18.11.1991: 1 Volksbegehren",
+     "note": "Count of initiatives whose eight-day signing period (Eintragungszeitraum) opened on this day."
+    },
+    {
+     "date": "1993-01-25",
+     "contests": 1,
+     "source": "bmi-vbg",
+     "quote": "Eintragungszeitraum 25.1. - 1.2.1993: 1 Volksbegehren",
+     "note": "Count of initiatives whose eight-day signing period (Eintragungszeitraum) opened on this day."
+    },
+    {
+     "date": "1995-06-12",
+     "contests": 1,
+     "source": "bmi-vbg",
+     "quote": "Eintragungszeitraum 12.6. - 19.6.1995: 1 Volksbegehren",
+     "note": "Count of initiatives whose eight-day signing period (Eintragungszeitraum) opened on this day."
+    },
+    {
+     "date": "1996-03-18",
+     "contests": 2,
+     "source": "bmi-vbg",
+     "quote": "Eintragungszeitraum 18.3. - 25.3.1996: 2 Volksbegehren",
+     "note": "Count of initiatives whose eight-day signing period (Eintragungszeitraum) opened on this day."
+    },
+    {
+     "date": "1997-04-07",
+     "contests": 2,
+     "source": "bmi-vbg",
+     "quote": "Eintragungszeitraum 7.4. - 14.4.1997: 2 Volksbegehren",
+     "note": "Count of initiatives whose eight-day signing period (Eintragungszeitraum) opened on this day."
+    },
+    {
+     "date": "1997-11-24",
+     "contests": 2,
+     "source": "bmi-vbg",
+     "quote": "Eintragungszeitraum 24.11. - 1.12.1997: 2 Volksbegehren",
+     "note": "Count of initiatives whose eight-day signing period (Eintragungszeitraum) opened on this day."
+    },
+    {
+     "date": "1999-09-09",
+     "contests": 1,
+     "source": "bmi-vbg",
+     "quote": "Eintragungszeitraum 9.9. - 16.9.1999: 1 Volksbegehren",
+     "note": "Count of initiatives whose eight-day signing period (Eintragungszeitraum) opened on this day."
+    },
+    {
+     "date": "2000-11-29",
+     "contests": 1,
+     "source": "bmi-vbg",
+     "quote": "Eintragungszeitraum 29.11- 6.12.2000: 1 Volksbegehren",
+     "note": "Count of initiatives whose eight-day signing period (Eintragungszeitraum) opened on this day."
+    },
+    {
+     "date": "2001-11-06",
+     "contests": 1,
+     "source": "bmi-vbg",
+     "quote": "Eintragungszeitraum 6.11.- 13.11.2001: 1 Volksbegehren",
+     "note": "Count of initiatives whose eight-day signing period (Eintragungszeitraum) opened on this day."
+    },
+    {
+     "date": "2002-01-14",
+     "contests": 1,
+     "source": "bmi-vbg",
+     "quote": "Eintragungszeitraum 14.1.- 21.1.2002: 1 Volksbegehren",
+     "note": "Count of initiatives whose eight-day signing period (Eintragungszeitraum) opened on this day."
+    },
+    {
+     "date": "2002-04-03",
+     "contests": 1,
+     "source": "bmi-vbg",
+     "quote": "Eintragungszeitraum 3.4. - 10.4.2002: 1 Volksbegehren",
+     "note": "Count of initiatives whose eight-day signing period (Eintragungszeitraum) opened on this day."
+    },
+    {
+     "date": "2002-07-29",
+     "contests": 1,
+     "source": "bmi-vbg",
+     "quote": "Eintragungszeitraum 29.7. - 5.8.2002: 1 Volksbegehren",
+     "note": "Count of initiatives whose eight-day signing period (Eintragungszeitraum) opened on this day."
+    },
+    {
+     "date": "2003-06-10",
+     "contests": 1,
+     "source": "bmi-vbg",
+     "quote": "Eintragungszeitraum 10.6. - 17.6.2003: 1 Volksbegehren",
+     "note": "Count of initiatives whose eight-day signing period (Eintragungszeitraum) opened on this day."
+    },
+    {
+     "date": "2004-03-22",
+     "contests": 1,
+     "source": "bmi-vbg",
+     "quote": "Eintragungszeitraum 22.3. - 29.3.2004: 1 Volksbegehren",
+     "note": "Count of initiatives whose eight-day signing period (Eintragungszeitraum) opened on this day."
+    },
+    {
+     "date": "2006-03-06",
+     "contests": 1,
+     "source": "bmi-vbg",
+     "quote": "Eintragungszeitraum 6.3. - 13.3.2006: 1 Volksbegehren",
+     "note": "Count of initiatives whose eight-day signing period (Eintragungszeitraum) opened on this day."
+    },
+    {
+     "date": "2009-07-27",
+     "contests": 1,
+     "source": "bmi-vbg",
+     "quote": "Eintragungszeitraum 27.7. - 3.8. 2009: 1 Volksbegehren",
+     "note": "Count of initiatives whose eight-day signing period (Eintragungszeitraum) opened on this day."
+    },
+    {
+     "date": "2011-02-28",
+     "contests": 1,
+     "source": "bmi-vbg",
+     "quote": "Eintragungszeitraum 28.2. - 7.3.2011: 1 Volksbegehren",
+     "note": "Count of initiatives whose eight-day signing period (Eintragungszeitraum) opened on this day."
+    },
+    {
+     "date": "2011-11-03",
+     "contests": 1,
+     "source": "bmi-vbg",
+     "quote": "Eintragungszeitraum 3.11. - 10.11.2011: 1 Volksbegehren",
+     "note": "Count of initiatives whose eight-day signing period (Eintragungszeitraum) opened on this day."
+    },
+    {
+     "date": "2013-04-15",
+     "contests": 2,
+     "source": "bmi-vbg",
+     "quote": "Eintragungszeitraum 15.4. - 22.4.2013: 2 Volksbegehren",
+     "note": "Count of initiatives whose eight-day signing period (Eintragungszeitraum) opened on this day."
+    },
+    {
+     "date": "2015-06-24",
+     "contests": 1,
+     "source": "bmi-vbg",
+     "quote": "Eintragungszeitraum 24.6. - 1.7.2015: 1 Volksbegehren",
+     "note": "Count of initiatives whose eight-day signing period (Eintragungszeitraum) opened on this day."
+    },
+    {
+     "date": "2017-01-23",
+     "contests": 1,
+     "source": "bmi-vbg",
+     "quote": "Eintragungszeitraum 23.1. - 30.1.2017: 1 Volksbegehren",
+     "note": "Count of initiatives whose eight-day signing period (Eintragungszeitraum) opened on this day."
+    },
+    {
+     "date": "2018-10-01",
+     "contests": 3,
+     "source": "bmi-vbg",
+     "quote": "Eintragungszeitraum 1.10. - 8.10.2018: 3 Volksbegehren",
+     "note": "Count of initiatives whose eight-day signing period (Eintragungszeitraum) opened on this day."
+    },
+    {
+     "date": "2019-03-25",
+     "contests": 2,
+     "source": "bmi-vbg",
+     "quote": "Eintragungszeitraum 25.3. - 1.4.2019: 2 Volksbegehren",
+     "note": "Count of initiatives whose eight-day signing period (Eintragungszeitraum) opened on this day."
+    },
+    {
+     "date": "2019-11-18",
+     "contests": 1,
+     "source": "bmi-vbg",
+     "quote": "Eintragungszeitraum 18.11. - 25.11.2019: 1 Volksbegehren",
+     "note": "Count of initiatives whose eight-day signing period (Eintragungszeitraum) opened on this day."
+    },
+    {
+     "date": "2020-06-22",
+     "contests": 5,
+     "source": "bmi-vbg",
+     "quote": "Eintragungszeitraum 22.6. - 29.6.2020: 5 Volksbegehren",
+     "note": "Count of initiatives whose eight-day signing period (Eintragungszeitraum) opened on this day."
+    },
+    {
+     "date": "2021-01-18",
+     "contests": 3,
+     "source": "bmi-vbg",
+     "quote": "Eintragungszeitraum 18.1. - 25.1.2021: 3 Volksbegehren",
+     "note": "Count of initiatives whose eight-day signing period (Eintragungszeitraum) opened on this day."
+    },
+    {
+     "date": "2021-09-20",
+     "contests": 4,
+     "source": "bmi-vbg",
+     "quote": "Eintragungszeitraum 20.9. - 27.9.2021: 4 Volksbegehren",
+     "note": "Count of initiatives whose eight-day signing period (Eintragungszeitraum) opened on this day."
+    },
+    {
+     "date": "2022-05-02",
+     "contests": 7,
+     "source": "bmi-vbg",
+     "quote": "Eintragungszeitraum 2.5. - 9.5.2022: 7 Volksbegehren",
+     "note": "Count of initiatives whose eight-day signing period (Eintragungszeitraum) opened on this day."
+    },
+    {
+     "date": "2022-06-20",
+     "contests": 2,
+     "source": "bmi-vbg",
+     "quote": "Eintragungszeitraum 20.6. - 27.6.2022: 2 Volksbegehren",
+     "note": "Count of initiatives whose eight-day signing period (Eintragungszeitraum) opened on this day."
+    },
+    {
+     "date": "2022-09-19",
+     "contests": 7,
+     "source": "bmi-vbg",
+     "quote": "Eintragungszeitraum 19.9. - 26.9.2022: 7 Volksbegehren",
+     "note": "Count of initiatives whose eight-day signing period (Eintragungszeitraum) opened on this day."
+    },
+    {
+     "date": "2023-04-17",
+     "contests": 7,
+     "source": "bmi-vbg",
+     "quote": "Eintragungszeitraum 17.4. - 24.4.2023: 7 Volksbegehren",
+     "note": "Count of initiatives whose eight-day signing period (Eintragungszeitraum) opened on this day."
+    },
+    {
+     "date": "2023-06-19",
+     "contests": 9,
+     "source": "bmi-vbg",
+     "quote": "Eintragungszeitraum 19.6. - 26.6.2023: 9 Volksbegehren",
+     "note": "Count of initiatives whose eight-day signing period (Eintragungszeitraum) opened on this day."
+    },
+    {
+     "date": "2023-11-06",
+     "contests": 3,
+     "source": "bmi-vbg",
+     "quote": "Eintragungszeitraum 6.11.- 13.11.2023: 3 Volksbegehren",
+     "note": "Count of initiatives whose eight-day signing period (Eintragungszeitraum) opened on this day."
+    },
+    {
+     "date": "2024-03-11",
+     "contests": 14,
+     "source": "bmi-vbg",
+     "quote": "Eintragungszeitraum 11.3.- 18.3.2024: 14 Volksbegehren",
+     "note": "Count of initiatives whose eight-day signing period (Eintragungszeitraum) opened on this day."
+    },
+    {
+     "date": "2025-03-31",
+     "contests": 3,
+     "source": "bmi-vbg",
+     "quote": "Eintragungszeitraum 31.3.- 7.4.2025: 3 Volksbegehren",
+     "note": "Count of initiatives whose eight-day signing period (Eintragungszeitraum) opened on this day."
+    },
+    {
+     "date": "2026-06-15",
+     "contests": 5,
+     "source": "bmi-vbg",
+     "quote": "Eintragungszeitraum 15.6.- 22.6.2026: 5 Volksbegehren",
+     "note": "Count of initiatives whose eight-day signing period (Eintragungszeitraum) opened on this day."
+    }
+   ]
+  },
+  {
+   "key": "landtage",
+   "tier": "land",
+   "name": "Landtagswahlen",
+   "name_en": "State parliament (Landtag) elections",
+   "category": "legislature",
+   "goal": "subnational",
+   "measure": {
+    "unit": "polity",
+    "fine": [
+     "at.gemeinde"
+    ]
+   },
+   "finest_note": "The Länder publish results by municipality; Vienna and some Länder also by polling district.",
+   "note": "Each of the nine Länder elects its Landtag by list PR (Art. 95 B-VG), for five years (six in Upper Austria). Vienna's Landtag is its Gemeinderat, elected once for both roles. Elections began in 1919 (Burgenland from 1922, Vienna as a Land from 1922) and resumed in 1945. Counted per election; the days are not yet listed from each Land's records.",
+   "source": "bvg",
+   "valid_from": "1919-01-01",
+   "est_votes": 4400000,
+   "effort": 3,
+   "cadence": [
+    {
+     "period_years": 5,
+     "term_years": 5,
+     "called": true,
+     "source": "bvg"
+    },
+    {
+     "name_pattern": "Oberösterreich",
+     "period_years": 6,
+     "term_years": 6,
+     "called": true,
+     "source": "ooe"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Amt der Oö. Landesregierung",
+     "url": "https://www.land-oberoesterreich.gv.at/wahlen.htm",
+     "format": "TXT and XLS",
+     "access": "open",
+     "first_date": "1995-01-01",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "finest": "at.gemeinde",
+     "evidence": "'Wahlergebnisse sind seit 1995 als .txt und .xls verfügbar'",
+     "source": "ooe"
+    },
+    {
+     "platform": "Amt der Tiroler Landesregierung",
+     "url": "https://wahlen.tirol.gv.at/",
+     "format": "HTML",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "finest": "at.gemeinde",
+     "source": "tirol"
+    },
+    {
+     "platform": "Amt der Vorarlberger Landesregierung",
+     "url": "https://apps.vorarlberg.at/wahlen/",
+     "format": "HTML",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "finest": "at.gemeinde",
+     "source": "vbg"
+    },
+    {
+     "platform": "Stadt Wien",
+     "url": "https://www.wien.gv.at/politik/wahlergebnisse",
+     "format": "HTML and JSON",
+     "access": "blocked",
+     "first_date": "1996-10-13",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "license": "CC BY 4.0",
+     "evidence": "The index page answers; the result pages under /wahlergebnis/ answered 403 to a cloud session on 2026-11-16.",
+     "source": "wien-wahlen"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "local"
+     ],
+     "body_kinds": [
+      "unicameral",
+      "lower_house"
+     ],
+     "iso_pattern": "AT-*"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1919-02-16",
+     "through": "2026-11-16",
+     "source": "bvg"
+    }
+   ]
+  },
+  {
+   "key": "landesregierung",
+   "tier": "land",
+   "name": "Wahl der Landesregierung und des Landeshauptmannes durch den Landtag",
+   "name_en": "Election of the state governor and government by the Landtag",
+   "category": "indirect",
+   "goal": "subnational",
+   "measure": {
+    "unit": "ballot"
+   },
+   "note": "Each Landtag elects the Landeshauptmann and the members of the Land government (Art. 101 B-VG); some Länder fill government seats by party strength (Proporz). The Landtag's records give each ballot.",
+   "source": "bvg",
+   "valid_from": "1920-10-01",
+   "est_votes": 500,
+   "effort": 4,
+   "match": [
+    {
+     "election_kinds": [
+      "indirect"
+     ],
+     "office_kinds": [
+      "governor",
+      "head_of_government"
+     ],
+     "iso_pattern": "AT-*"
+    }
+   ]
+  },
+  {
+   "key": "gemeinderat",
+   "tier": "gemeinde",
+   "name": "Gemeinderatswahlen (Gemeindevertretungswahlen)",
+   "name_en": "Municipal council elections",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "municipality",
+    "schemes": [
+     "at.gemeinde"
+    ]
+   },
+   "contests_per_unit": 1,
+   "note": "Every municipality elects its council by list PR (Art. 117 Abs. 2 B-VG); EU citizens vote. Each Land fixes a common election day for its municipalities by Land law, and the statutory cities (Statutarstädte) have their own statutes and days (Graz voted on 28 June 2026). Vienna's Gemeinderat is its Landtag and is counted under landtage, so the expected count is the municipalities outside Vienna.",
+   "source": "bvg",
+   "est_votes": 3300000,
+   "effort": 4,
+   "access": [
+    {
+     "platform": "Amt der Oö. Landesregierung",
+     "url": "https://www.land-oberoesterreich.gv.at/wahlen.htm",
+     "format": "TXT, XLS, and PDF",
+     "access": "open",
+     "first_date": "1995-01-01",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "finest": "at.gemeinde",
+     "source": "ooe"
+    },
+    {
+     "platform": "Amt der Tiroler Landesregierung",
+     "url": "https://wahlen.tirol.gv.at/",
+     "format": "HTML",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "finest": "at.gemeinde",
+     "evidence": "Lists '27.02.2022 | Gemeinderats- und Bürgermeisterwahlen 2022'.",
+     "source": "tirol"
+    },
+    {
+     "platform": "Amt der Burgenländischen Landesregierung",
+     "url": "https://www.burgenland.at/politik/wahlen-im-burgenland/gemeinderatswahlen/",
+     "format": "HTML",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "source": "bgld"
+    },
+    {
+     "platform": "Amt der Salzburger Landesregierung",
+     "url": "https://www.salzburg.gv.at/pol/wahl/wahl-gemeinden",
+     "format": "HTML",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "source": "sbg"
+    },
+    {
+     "platform": "Amt der Vorarlberger Landesregierung",
+     "url": "https://apps.vorarlberg.at/wahlen/",
+     "format": "HTML",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "source": "vbg"
+    },
+    {
+     "platform": "Stadt Graz",
+     "url": "http://wahlergebnis.graz.at/",
+     "format": "HTML",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "source": "graz"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "general",
+      "runoff"
+     ],
+     "body_kinds": [
+      "council",
+      "unicameral"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ]
+    }
+   ],
+   "dates": [
+    {
+     "date": "1945-01-01",
+     "through": "2026-11-16",
+     "precision": "year",
+     "source": "bvg"
+    }
+   ]
+  },
+  {
+   "key": "buergermeister",
+   "tier": "gemeinde",
+   "name": "Bürgermeister-Direktwahl",
+   "name_en": "Direct mayoral elections",
+   "category": "executive",
+   "goal": "local",
+   "measure": {
+    "unit": "municipality",
+    "schemes": [
+     "at.gemeinde"
+    ]
+   },
+   "note": "Land law may provide for the people to elect the mayor (Art. 117 Abs. 6 B-VG). Burgenland, Carinthia, Upper Austria, Salzburg, Tyrol, and Vorarlberg do, on separate ballots on the council election day, with a runoff (Stichwahl, 'engere Wahl') two weeks later when no candidate wins an absolute majority (Tyrol: 13 March 2022 after 27 February 2022). Lower Austria, Styria, and Vienna have their councils elect the mayor. Those six Länder held 1,233 municipalities on 1 January 2026 (171 + 132 + 438 + 119 + 277 + 96), so the class is listed as a span rather than counted from the 2,092 municipalities.",
+   "source": "bvg",
+   "est_votes": 1900000,
+   "effort": 4,
+   "access": [
+    {
+     "platform": "Amt der Tiroler Landesregierung",
+     "url": "https://wahlen.tirol.gv.at/",
+     "format": "HTML",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "finest": "at.gemeinde",
+     "source": "tirol"
+    },
+    {
+     "platform": "Amt der Burgenländischen Landesregierung",
+     "url": "https://www.burgenland.at/politik/wahlen-im-burgenland/gemeinderatswahlen/",
+     "format": "HTML",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "source": "bgld"
+    },
+    {
+     "platform": "Amt der Oö. Landesregierung",
+     "url": "https://www.land-oberoesterreich.gv.at/wahlen.htm",
+     "format": "TXT, XLS, and PDF",
+     "access": "open",
+     "first_date": "1997-01-01",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "finest": "at.gemeinde",
+     "source": "ooe"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "general",
+      "runoff"
+     ],
+     "office_kinds": [
+      "mayor"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ]
+    }
+   ],
+   "dates": [
+    {
+     "date": "1991-01-01",
+     "through": "2026-11-16",
+     "precision": "year",
+     "source": "bvg"
+    }
+   ]
+  },
+  {
+   "key": "buergermeister_indirekt",
+   "tier": "gemeinde",
+   "name": "Wahl des Bürgermeisters und Gemeindevorstandes durch den Gemeinderat",
+   "name_en": "Election of mayors and executive boards by municipal councils",
+   "category": "indirect",
+   "goal": "local",
+   "measure": {},
+   "disposition": "out_of_scope",
+   "disposition_reason": "Council-internal votes (Art. 117 Abs. 6 B-VG) in Lower Austria, Styria, Vienna, and some statutory cities; minutes are kept by each municipality and no authority publishes them as election results.",
+   "source": "bvg",
+   "match": [
+    {
+     "election_kinds": [
+      "indirect"
+     ],
+     "office_kinds": [
+      "mayor",
+      "deputy_mayor"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ]
+    }
+   ]
+  },
+  {
+   "key": "bezirksvertretung_wien",
+   "tier": "wien_bezirk",
+   "name": "Bezirksvertretungswahlen in Wien",
+   "name_en": "Vienna district council (Bezirksvertretung) elections",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "district"
+   },
+   "contests_per_unit": 1,
+   "note": "Each of Vienna's 23 districts elects its Bezirksvertretung by list PR on the day of the Gemeinderat election; EU citizens vote here but not for the Gemeinderat. The City publishes results from 1996 to 2025.",
+   "source": "wien-gr-bv",
+   "earliest_record": "1996-10-13",
+   "est_votes": 750000,
+   "effort": 2,
+   "access": [
+    {
+     "platform": "Stadt Wien",
+     "url": "https://www.wien.gv.at/politik/wahlergebnisse",
+     "format": "HTML and JSON",
+     "access": "blocked",
+     "first_date": "1996-10-13",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "license": "CC BY 4.0",
+     "evidence": "Index lists Bezirksvertretungswahlen 2025, 2020, 2015, 2010, 2005, 2001, 1996; result pages under /wahlergebnis/ (BV251, BV201) answered 403 to a cloud session.",
+     "source": "wien-wahlen"
+    }
+   ],
+   "match": [
+    {
+     "body_kinds": [
+      "council"
+     ],
+     "polity_kinds": [
+      "submunicipal"
+     ],
+     "name_pattern": "Bezirksvertretung"
+    }
+   ]
+  },
+  {
+   "key": "bezirksrat_graz",
+   "tier": "graz_bezirk",
+   "name": "Bezirksratswahlen in Graz",
+   "name_en": "Graz district council (Bezirksrat) elections",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "district"
+   },
+   "note": "Graz's city districts elect their Bezirksräte on the day of the Gemeinderat election (most recently 28 June 2026), with one sample ballot per district on the City's page (17).",
+   "source": "graz",
+   "est_votes": 110000,
+   "effort": 2,
+   "access": [
+    {
+     "platform": "Stadt Graz",
+     "url": "http://wahlergebnis.graz.at/",
+     "format": "HTML",
+     "access": "open",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "source": "graz"
+    }
+   ],
+   "match": [
+    {
+     "body_kinds": [
+      "council"
+     ],
+     "polity_kinds": [
+      "submunicipal"
+     ],
+     "name_pattern": "Bezirksrat"
+    }
+   ]
+  },
+  {
+   "key": "land_direktdemokratie",
+   "tier": "land",
+   "name": "Landesvolksabstimmungen, Landesvolksbefragungen und Landesvolksbegehren",
+   "name_en": "State referendums, consultations, and initiatives",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "question"
+   },
+   "note": "Each Land constitution provides for referendums, consultations, or initiatives (for example Vienna's consultations of 2010 and 2013, 'Wien will's wissen', which the City lists with its results).",
+   "source": "bvg",
+   "est_votes": 300000,
+   "effort": 4,
+   "access": [
+    {
+     "platform": "Stadt Wien",
+     "url": "https://www.wien.gv.at/politik/wahlergebnisse",
+     "format": "HTML",
+     "access": "blocked",
+     "checked_at": "2026-11-16T00:00:00Z",
+     "license": "CC BY 4.0",
+     "source": "wien-wahlen"
+    }
+   ],
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "iso_pattern": "AT-*"
+    }
+   ]
+  },
+  {
+   "key": "gemeinde_direktdemokratie",
+   "tier": "gemeinde",
+   "name": "Gemeindevolksabstimmungen und -befragungen",
+   "name_en": "Municipal referendums and consultations",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "question"
+   },
+   "disposition": "blocked",
+   "disposition_reason": "No register or central publisher: each municipality calls and announces its own votes under Land law, and the Länder do not compile them.",
+   "source": "bvg",
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "polity_kinds": [
+      "municipality",
+      "submunicipal"
+     ]
+    }
+   ]
+  },
+  {
+   "key": "bundesrat",
+   "tier": "land",
+   "name": "Entsendung in den Bundesrat",
+   "name_en": "Federal Council members chosen by the Landtage",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {},
+   "disposition": "out_of_scope",
+   "disposition_reason": "Each Landtag fills its Federal Council seats by its parties' strength after its own election (Art. 35 B-VG); there is no contested vote to record.",
+   "source": "parl-br",
+   "match": [
+    {
+     "body_kinds": [
+      "upper_house"
+     ],
+     "iso_pattern": "AT"
+    }
+   ]
+  },
+  {
+   "key": "kammerwahlen",
+   "tier": "functional",
+   "name": "Arbeiterkammer-, Wirtschaftskammer-, Landwirtschaftskammer-, Berufskammer- und ÖH-Wahlen",
+   "name_en": "Chamber and students' union elections",
+   "category": "non_territorial",
+   "goal": "local",
+   "measure": {},
+   "disposition": "out_of_scope",
+   "disposition_reason": "Statutory self-governing bodies (chambers of labour, commerce, agriculture, and the professions, and the Austrian Students' Union) run these elections for their own members, not the electoral authorities for a territorial electorate.",
+   "source": "bvg"
+  },
+  {
+   "key": "volksabstimmung_1938",
+   "tier": "national",
+   "name": "Volksabstimmung vom 10. April 1938",
+   "name_en": "Plebiscite on the Anschluss (10 April 1938)",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {},
+   "disposition": "out_of_scope",
+   "disposition_reason": "Held by the German Reich after the annexation, together with the single-list Reichstag vote; the archive counts it in the German census (census.de, reich_volksentscheid).",
+   "source": "parl-100",
+   "valid_from": "1938-03-13",
+   "valid_to": "1945-04-27",
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "iso_pattern": "AT",
+     "valid_from": "1938-01-01",
+     "valid_to": "1939-01-01",
+     "precedence": 1
+    }
+   ]
+  },
+  {
+   "key": "reichsrat",
+   "tier": "cisleithanien",
+   "name": "Wahlen zum Abgeordnetenhaus des Reichsrates",
+   "name_en": "Elections to the House of Deputies of the Imperial Council (Reichsrat)",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "election"
+   },
+   "note": "From 1861 to 1873 the Landtage delegated the deputies; direct election by curiae began in 1873, a fifth general curia was added in 1897, and equal male suffrage applied in 1907 and 1911. The House covered all of Cisleithania, including today's Czechia, Slovenia, and southern Poland. The 1848 Constituent Reichstag is noted here and not counted.",
+   "source": "parl-wahlrecht",
+   "valid_from": "1861-02-26",
+   "valid_to": "1918-11-12",
+   "est_votes": 4500000,
+   "effort": 5,
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "lower_house"
+     ],
+     "iso_pattern": "AT",
+     "valid_to": "1918-11-12"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1873-01-01",
+     "through": "1911-12-31",
+     "precision": "year",
+     "source": "parl-wahlrecht",
+     "quote": "Erst 1873 wurde weitgehend die direkte Wahl der Abgeordneten, also ohne Umweg über die Landtage, eingeführt."
+    }
+   ]
+  },
+  {
+   "key": "kronland_landtage",
+   "tier": "cisleithanien",
+   "name": "Landtagswahlen in den Kronländern",
+   "name_en": "Crown-land diet elections (1861-1918)",
+   "category": "legislature",
+   "goal": "subnational",
+   "measure": {},
+   "disposition": "blocked",
+   "disposition_reason": "No official compilation: the diets of the seventeen crown lands were elected by curiae under their own Landesordnungen, and their returns survive only in each diet's records, most of them outside today's Austria.",
+   "source": "parl-1848",
+   "valid_from": "1861-02-26",
+   "valid_to": "1918-11-12",
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "AT-*",
+     "valid_to": "1918-11-12",
+     "precedence": 1
+    }
+   ]
+  }
+ ]
+}
