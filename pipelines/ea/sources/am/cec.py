@@ -180,7 +180,7 @@ def fetch() -> None:
     for e in ELECTIONS:
         raw.fetch(SOURCE, export_url(e), suffix=".xlsx")
         raw.fetch(SOURCE, stations_url(e), suffix=".xlsx")
-        raw.fetch(SOURCE, info_url(e), suffix=e.info.rsplit(".", 1)[1])
+        raw.fetch(SOURCE, info_url(e), suffix="." + e.info.rsplit(".", 1)[1])
     for e in ELECTIONS:
         page(e)
 
