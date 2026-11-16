@@ -147,6 +147,7 @@ class Legacy:
         self.title = clean((main.find("h1") or Node("h1", {})).text())
         self.summary: list[list[str]] = []
         self.details: dict[str, str] = {}
+        self.plain: list[tuple[str, int | None, bool]] = []
         self.lists: list[tuple[str, str, list[tuple[str, int | None, bool]], dict[str, int | None]]] = []
         for table in main.all("table"):
             rows = table.rows()
@@ -154,7 +155,13 @@ class Legacy:
                 continue
             head = rows[0].cells()
             first = head[0].text() if head else ""
-            if first == "Nom du parti":
+            if first == "Nom du candidat":
+                for row in rows[1:]:
+                    cells = row.cells()
+                    if len(cells) == 2:
+                        shaded = bool({"elu", "highlight"} & (row.classes() | cells[0].classes()))
+                        self.plain.append((cells[0].text(), figure(cells[1].text()), shaded))
+            elif first == "Nom du parti":
                 self.summary = [[c.text() for c in row.cells()] for row in rows[1:]]
             elif len(head) == 2 and head[0].tag == "th" and head[1].text().replace(" ", " ").endswith("%"):
                 name = head[0].text()

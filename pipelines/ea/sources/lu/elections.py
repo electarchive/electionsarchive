@@ -573,21 +573,17 @@ def _sum(places: list[Place]) -> Stats:
 
 def _communal_race(place: Place, view: pages.Legacy) -> Race:
     seats = pages.figure(view.details.get("Conseillers", ""))
-    mode = (
-        "PROPORTIONNEL" if "proportionnelle" in view.details.get("Système électoral", "").casefold() else "MAJORITAIRE"
-    )
-    candidates: list[Candidate] = []
-    if mode != "PROPORTIONNEL":
-        candidates = [c for entry in place.entries for c in entry.candidates]
-        place.candidates = candidates
+    proportional = "proportionnelle" in view.details.get("Système électoral", "").casefold()
+    if not proportional:
+        place.candidates = [Candidate(i, who, votes, won) for i, (who, votes, won) in enumerate(view.plain, 1)]
         place.entries = []
     return Race(
         place.name,
         seats,
-        mode,
+        "PROPORTIONNEL" if proportional else "MAJORITAIRE",
         place.stats,
         place.entries,
-        candidates if mode != "PROPORTIONNEL" else [],
+        [] if proportional else place.candidates,
         [place],
         printed=False,
     )
