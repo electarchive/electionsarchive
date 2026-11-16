@@ -16,7 +16,8 @@ from ea.package import Package
 SOURCE = "it.eligendo"
 OPENDATA = "https://dait.interno.gov.it/documenti/opendata/europee/europee-{day:%Y%m%d}.zip"
 PAGE = "https://elezionistorico.interno.gov.it/eligendo/opendata.php"
-ITALY = str(uuid5(package.NAMESPACE, "polity\x1fIT"))
+# Italy's polity id in the archive, minted before country ids followed the package namespace.
+ITALY = "01a13bf7-2f71-7303-964e-fdd9421ca0b6"
 DAYS = [
     date(1979, 6, 10),
     date(1984, 6, 17),
