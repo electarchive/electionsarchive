@@ -8,6 +8,7 @@ names the URL pattern of each. The crawl keeps every page byte for byte in one z
 import html
 import io
 import re
+import time
 import zipfile
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
@@ -92,10 +93,12 @@ def crawl(site: Old) -> dict[str, bytes]:
                 try:
                     response = client.get(base + path)
                 except httpx.TransportError:
+                    time.sleep(2 + attempt * 3)
                     continue
                 if response.status_code == 404:
                     return path, None
-                if response.status_code >= 500 and attempt < 5:
+                if (response.status_code >= 500 or response.status_code in (403, 429)) and attempt < 5:
+                    time.sleep(2 + attempt * 3)  # the site throttles bursts with a 403
                     continue
                 response.raise_for_status()
                 return path, response.content
