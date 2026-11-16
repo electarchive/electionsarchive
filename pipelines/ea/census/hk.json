@@ -1,0 +1,1653 @@
+{
+  "polity": "HK",
+  "name": "Hong Kong SAR China",
+  "sources": {
+    "basic-law": {
+      "title": "The Basic Law of the Hong Kong Special Administrative Region of the People's Republic of China",
+      "publisher": "Constitutional and Mainland Affairs Bureau, Hong Kong",
+      "url": "https://www.basiclaw.gov.hk/en/basiclaw/index.html",
+      "kind": "official_body"
+    },
+    "basic-law-ch4": {
+      "title": "The Basic Law, Chapter IV: Political Structure (Articles 43-104)",
+      "publisher": "Constitutional and Mainland Affairs Bureau, Hong Kong",
+      "url": "https://www.basiclaw.gov.hk/en/basiclaw/chapter4.html",
+      "kind": "official_body"
+    },
+    "basic-law-annex1": {
+      "title": "The Basic Law, Annex I: Method for the Selection of the Chief Executive of the Hong Kong Special Administrative Region (amended 30 March 2021)",
+      "publisher": "Constitutional and Mainland Affairs Bureau, Hong Kong",
+      "url": "https://www.basiclaw.gov.hk/en/basiclaw/annex1.html",
+      "kind": "official_body"
+    },
+    "basic-law-annex2": {
+      "title": "The Basic Law, Annex II: Method for the Formation of the Legislative Council of the Hong Kong Special Administrative Region and Its Voting Procedures (amended 30 March 2021)",
+      "publisher": "Constitutional and Mainland Affairs Bureau, Hong Kong",
+      "url": "https://www.basiclaw.gov.hk/en/basiclaw/annex2.html",
+      "kind": "official_body"
+    },
+    "cap542": {
+      "title": "Legislative Council Ordinance (Cap. 542)",
+      "publisher": "Department of Justice, Hong Kong (Hong Kong e-Legislation)",
+      "url": "https://www.elegislation.gov.hk/hk/cap542",
+      "kind": "official_body"
+    },
+    "cap547": {
+      "title": "District Councils Ordinance (Cap. 547)",
+      "publisher": "Department of Justice, Hong Kong (Hong Kong e-Legislation)",
+      "url": "https://www.elegislation.gov.hk/hk/cap547",
+      "kind": "official_body"
+    },
+    "cap569": {
+      "title": "Chief Executive Election Ordinance (Cap. 569)",
+      "publisher": "Department of Justice, Hong Kong (Hong Kong e-Legislation)",
+      "url": "https://www.elegislation.gov.hk/hk/cap569",
+      "kind": "official_body"
+    },
+    "cap576": {
+      "title": "Rural Representative Election Ordinance (Cap. 576)",
+      "publisher": "Department of Justice, Hong Kong (Hong Kong e-Legislation)",
+      "url": "https://www.elegislation.gov.hk/hk/cap576",
+      "kind": "official_body"
+    },
+    "cap552": {
+      "title": "Provision of Municipal Services (Reorganization) Ordinance (Cap. 552)",
+      "publisher": "Department of Justice, Hong Kong (Hong Kong e-Legislation)",
+      "url": "https://www.elegislation.gov.hk/hk/cap552",
+      "kind": "official_body"
+    },
+    "eac-legco": {
+      "title": "Electoral Affairs Commission: Legislative Council Elections (index of election reports, 1998-2025)",
+      "publisher": "Electoral Affairs Commission, Hong Kong",
+      "url": "https://www.eac.hk/en/elections/legco.html",
+      "kind": "official_body"
+    },
+    "eac-distco": {
+      "title": "Electoral Affairs Commission: District Council Elections (index of election reports, 1999-2023)",
+      "publisher": "Electoral Affairs Commission, Hong Kong",
+      "url": "https://www.eac.hk/en/elections/distco.html",
+      "kind": "official_body"
+    },
+    "eac-chief": {
+      "title": "Electoral Affairs Commission: Chief Executive Elections (index of election reports, 2002-2022)",
+      "publisher": "Electoral Affairs Commission, Hong Kong",
+      "url": "https://www.eac.hk/en/elections/chief.html",
+      "kind": "official_body"
+    },
+    "eac-ecse": {
+      "title": "Electoral Affairs Commission: Election Committee Subsector Elections (index of election reports, 1998-2026)",
+      "publisher": "Electoral Affairs Commission, Hong Kong",
+      "url": "https://www.eac.hk/en/elections/ecse.html",
+      "kind": "official_body"
+    },
+    "eac-rural": {
+      "title": "Electoral Affairs Commission: Rural Representative Elections (index of election reports, 2003-2027)",
+      "publisher": "Electoral Affairs Commission, Hong Kong",
+      "url": "https://www.eac.hk/en/elections/rural.html",
+      "kind": "official_body"
+    },
+    "eac-lc2025": {
+      "title": "Report on the 2025 Legislative Council General Election",
+      "publisher": "Electoral Affairs Commission, Hong Kong",
+      "url": "https://www.eac.hk/pdf/legco/2025LC_Report/en/full_report.pdf",
+      "kind": "official_body"
+    },
+    "eac-lc2021": {
+      "title": "Report on the 2021 Legislative Council General Election",
+      "publisher": "Electoral Affairs Commission, Hong Kong",
+      "url": "https://www.eac.hk/pdf/legco/2021LCE_Report/en/2021lce_full_report.pdf",
+      "kind": "official_body"
+    },
+    "eac-lc2020": {
+      "title": "Report on the 2020 Legislative Council General Election (postponed)",
+      "publisher": "Electoral Affairs Commission, Hong Kong",
+      "url": "https://www.eac.hk/pdf/legco/2020lcge_Report/en/2020lcge_full_report.pdf",
+      "kind": "official_body"
+    },
+    "eac-lc2016": {
+      "title": "Report on the 2016 Legislative Council General Election",
+      "publisher": "Electoral Affairs Commission, Hong Kong",
+      "url": "https://www.eac.hk/pdf/legco/2016LCE_Report/en/2016lce_full_report.pdf",
+      "kind": "official_body"
+    },
+    "eac-lc2016-results": {
+      "title": "2016 Legislative Council General Election, Appendix: Results of Election, Geographical Constituencies",
+      "publisher": "Electoral Affairs Commission, Hong Kong",
+      "url": "https://www.eac.hk/pdf/legco/2016LCE_Report/en/2016lce_appendix8.pdf",
+      "kind": "official_body"
+    },
+    "eac-lc2012": {
+      "title": "Report on the 2012 Legislative Council Election",
+      "publisher": "Electoral Affairs Commission, Hong Kong",
+      "url": "https://www.eac.hk/pdf/legco/2012LCE_Report/en/2012lce_fullreport.pdf",
+      "kind": "official_body"
+    },
+    "eac-lc2008": {
+      "title": "Report on the 2008 Legislative Council Election",
+      "publisher": "Electoral Affairs Commission, Hong Kong",
+      "url": "https://www.eac.hk/pdf/legco/2008/en/report/2008lce_full_lc_report_e.pdf",
+      "kind": "official_body"
+    },
+    "eac-lc2004": {
+      "title": "Report on the 2004 Legislative Council Election",
+      "publisher": "Electoral Affairs Commission, Hong Kong",
+      "url": "https://www.eac.hk/pdf/legco/2004/en/report/lc2004full_lc_report_e.pdf",
+      "kind": "official_body"
+    },
+    "eac-lc1998": {
+      "title": "Report on the 1998 Legislative Council Elections",
+      "publisher": "Electoral Affairs Commission, Hong Kong",
+      "url": "https://www.info.gov.hk/info/98eac-e.htm",
+      "kind": "official_body"
+    },
+    "eac-lcbe2007": {
+      "title": "Report on the 2007 Legislative Council Hong Kong Island Geographical Constituency By-election",
+      "publisher": "Electoral Affairs Commission, Hong Kong",
+      "url": "https://www.eac.hk/pdf/legco/en/2007/2007lcbe_hki_detailreport_e.pdf",
+      "kind": "official_body"
+    },
+    "eac-lcbe2010": {
+      "title": "Report on the 2010 Legislative Council By-election",
+      "publisher": "Electoral Affairs Commission, Hong Kong",
+      "url": "https://www.eac.hk/pdf/legco/en/2010/2010lcbe_detailreport_e.pdf",
+      "kind": "official_body"
+    },
+    "eac-lcbe2016": {
+      "title": "Report on the 2016 Legislative Council New Territories East Geographical Constituency By-election",
+      "publisher": "Electoral Affairs Commission, Hong Kong",
+      "url": "https://www.eac.hk/pdf/legco/2016lcbe_nte_report/en/2016lcbe_nte_full_report.pdf",
+      "kind": "official_body"
+    },
+    "eac-lcbe2018": {
+      "title": "Report on the 2018 Legislative Council By-election",
+      "publisher": "Electoral Affairs Commission, Hong Kong",
+      "url": "https://www.eac.hk/pdf/legco/2018lcbe_report/en/2018lcbe_full_report(Eng).pdf",
+      "kind": "official_body"
+    },
+    "eac-lcbe2018kw": {
+      "title": "Report on the 2018 Legislative Council Kowloon West Geographical Constituency By-election",
+      "publisher": "Electoral Affairs Commission, Hong Kong",
+      "url": "https://www.eac.hk/pdf/legco/2018lcbe_kw_report/en/2018lcbe_kw_full_report(Eng).pdf",
+      "kind": "official_body"
+    },
+    "eac-lcbe2022": {
+      "title": "Report on the 2022 Legislative Council Election Committee Constituency By-election",
+      "publisher": "Electoral Affairs Commission, Hong Kong",
+      "url": "https://www.eac.hk/pdf/legco/2022LCBE_Report/en/2022lcbe_full_report.pdf",
+      "kind": "official_body"
+    },
+    "eac-dc2023": {
+      "title": "Report on the 2023 District Council Ordinary Election",
+      "publisher": "Electoral Affairs Commission, Hong Kong",
+      "url": "https://www.eac.hk/pdf/distco/en/2023dc_report/2023dcereport_full_report.pdf",
+      "kind": "official_body"
+    },
+    "eac-dc2019": {
+      "title": "Report on the 2019 District Council Ordinary Election",
+      "publisher": "Electoral Affairs Commission, Hong Kong",
+      "url": "https://www.eac.hk/pdf/distco/en/2019dc_report/2019dcereport_full_report.pdf",
+      "kind": "official_body"
+    },
+    "eac-dc2015": {
+      "title": "Report on the 2015 District Council Ordinary Election",
+      "publisher": "Electoral Affairs Commission, Hong Kong",
+      "url": "https://www.eac.hk/pdf/distco/en/2015dc_report/2015dcereport_full_report.pdf",
+      "kind": "official_body"
+    },
+    "eac-dc2011": {
+      "title": "Report on the 2011 District Council Election",
+      "publisher": "Electoral Affairs Commission, Hong Kong",
+      "url": "https://www.eac.hk/pdf/distco/en/2011dc_report/2011dcereport_detailreport.pdf",
+      "kind": "official_body"
+    },
+    "eac-dc2007": {
+      "title": "Report on the 2007 District Council Election",
+      "publisher": "Electoral Affairs Commission, Hong Kong",
+      "url": "https://www.eac.hk/pdf/distco/en/2007dc_report/2007dcereport_detailreport_e.pdf",
+      "kind": "official_body"
+    },
+    "eac-dc2003": {
+      "title": "Report on the 2003 District Council Election",
+      "publisher": "Electoral Affairs Commission, Hong Kong",
+      "url": "https://www.eac.hk/pdf/distco/en/2003dc_report/full_dc_report_e.pdf",
+      "kind": "official_body"
+    },
+    "eac-dc1999-results": {
+      "title": "Report on the 1999 District Councils Election, Appendix IV: Results of the 1999 DC Election",
+      "publisher": "Electoral Affairs Commission, Hong Kong",
+      "url": "https://www.eac.hk/pdf/distco/en/1999dc_report/appendix iv_english.pdf",
+      "kind": "official_body"
+    },
+    "eac-dcbe2000": {
+      "title": "Report on the 2000 North District Council Fung Tsui Constituency By-election",
+      "publisher": "Electoral Affairs Commission, Hong Kong",
+      "url": "https://www.eac.hk/pdf/e_report.pdf",
+      "kind": "official_body"
+    },
+    "eac-dcbe2002": {
+      "title": "Report on the 2002 Kowloon City District Council Kai Tak Constituency By-election",
+      "publisher": "Electoral Affairs Commission, Hong Kong",
+      "url": "https://www.eac.hk/pdf/distco/en/2002dc_report/2002kckt_reporttext_e.pdf",
+      "kind": "official_body"
+    },
+    "eac-dcbe2003hs": {
+      "title": "Report on the 2003 Kowloon City District Council Hoi Sham Constituency By-election",
+      "publisher": "Electoral Affairs Commission, Hong Kong",
+      "url": "https://www.eac.hk/pdf/distco/en/2003dc_report/2003kchs_reporttext_e.pdf",
+      "kind": "official_body"
+    },
+    "eac-ce2022": {
+      "title": "Report on the 2022 Chief Executive Election (including the 2021 Election Committee Subsector Ordinary Elections)",
+      "publisher": "Electoral Affairs Commission, Hong Kong",
+      "url": "https://www.eac.hk/pdf/chief/en/2022_CE_Report/2022ce_full_report.pdf",
+      "kind": "official_body"
+    },
+    "eac-ce2017": {
+      "title": "Report on the 2017 Chief Executive Election (including the 2016 Election Committee Subsector Ordinary Elections)",
+      "publisher": "Electoral Affairs Commission, Hong Kong",
+      "url": "https://www.eac.hk/pdf/chief/en/2017_CE_Report/2017ce_full_report.pdf",
+      "kind": "official_body"
+    },
+    "eac-ce2005": {
+      "title": "Report on the 2005 Chief Executive Election",
+      "publisher": "Electoral Affairs Commission, Hong Kong",
+      "url": "https://www.eac.hk/pdf/chief/en/2005_CE_Report/Fulltext.pdf",
+      "kind": "official_body"
+    },
+    "eac-ecse2025by": {
+      "title": "Report on the 2025 Election Committee Subsector By-elections",
+      "publisher": "Electoral Affairs Commission, Hong Kong",
+      "url": "https://www.eac.hk/pdf/ecse/en/2025ecseby_report/full_report.pdf",
+      "kind": "official_body"
+    },
+    "reo-ecss2026": {
+      "title": "2026 Election Committee Subsector Ordinary Elections: Election Brief",
+      "publisher": "Registration and Electoral Office, Hong Kong",
+      "url": "https://www.elections.gov.hk/ecss2026/eng/brief.html",
+      "kind": "official_body"
+    },
+    "eac-rural2023": {
+      "title": "Report on the 2023 Rural Ordinary Election",
+      "publisher": "Electoral Affairs Commission, Hong Kong",
+      "url": "https://www.eac.hk/pdf/village/2023/en/2023roe_full_report.pdf",
+      "kind": "official_body"
+    },
+    "eac-rural2023-areas": {
+      "title": "2023 Rural Ordinary Election, Appendix III: Breakdown of Number of Rural Areas and Rural Representatives by Administrative District",
+      "publisher": "Electoral Affairs Commission, Hong Kong",
+      "url": "https://www.eac.hk/pdf/village/2023/en/2023roe_appendix3.pdf",
+      "kind": "official_body"
+    },
+    "eac-rural2019": {
+      "title": "Report on the 2019 Rural Ordinary Election",
+      "publisher": "Electoral Affairs Commission, Hong Kong",
+      "url": "https://www.eac.hk/pdf/village/2019/en/2019roe_all-in-one.pdf",
+      "kind": "official_body"
+    },
+    "eac-rural2015by": {
+      "title": "Report on the Rural By-election held on 14 June 2015",
+      "publisher": "Electoral Affairs Commission, Hong Kong",
+      "url": "https://www.eac.hk/pdf/village/2015/en/2015rrbe1_all-in-one.pdf",
+      "kind": "official_body"
+    },
+    "eac-rural2011by": {
+      "title": "Report on the Village Representative By-election held on 12 June 2011",
+      "publisher": "Electoral Affairs Commission, Hong Kong",
+      "url": "https://www.eac.hk/pdf/village/2011/en/2011vrbe1_full_report.pdf",
+      "kind": "official_body"
+    },
+    "eac-rural2007": {
+      "title": "Report on the 2007 Village Representative Election",
+      "publisher": "Electoral Affairs Commission, Hong Kong",
+      "url": "https://www.eac.hk/pdf/village/2007/en/2007vre_full_report.pdf",
+      "kind": "official_body"
+    },
+    "eac-rural2003": {
+      "title": "Report on the 2003 Village Representative Election",
+      "publisher": "Electoral Affairs Commission, Hong Kong",
+      "url": "https://www.eac.hk/pdf/village/2003/en/2003vre_full_report.pdf",
+      "kind": "official_body"
+    },
+    "isd-rural2027": {
+      "title": "Press release: Polling dates of 2027 Rural Ordinary Election gazetted (13 November 2026)",
+      "publisher": "Information Services Department, Hong Kong",
+      "url": "https://www.info.gov.hk/gia/general/202611/13/P2026111300173.htm",
+      "kind": "official_body"
+    },
+    "reo-results": {
+      "title": "Election results published by the Registration and Electoral Office",
+      "publisher": "Registration and Electoral Office, Hong Kong",
+      "url": "https://www.elections.gov.hk/index.html",
+      "kind": "official_body"
+    }
+  },
+  "tiers": [
+    {
+      "key": "territory",
+      "name": "香港特別行政區",
+      "name_en": "Hong Kong Special Administrative Region",
+      "parent": null,
+      "polity_kind": "sovereign_state",
+      "source": "basic-law"
+    },
+    {
+      "key": "district",
+      "name": "區",
+      "name_en": "Districts",
+      "parent": "territory",
+      "polity_kind": "municipality",
+      "source": "cap547",
+      "counts": [
+        {
+          "date": "2023-12-10",
+          "value": 18,
+          "source": "eac-dc2023",
+          "locator": "Chapter 1: \"There would be a total of 44 DCGCs established in the 18 Districts in Hong Kong\""
+        }
+      ]
+    },
+    {
+      "key": "municipal_council",
+      "name": "市政局及區域市政局",
+      "name_en": "Municipal council areas (Urban Council and Regional Council)",
+      "parent": "territory",
+      "polity_kind": "region",
+      "elects": true,
+      "valid_to": "2000-01-01",
+      "source": "cap552",
+      "counts": [
+        {
+          "date": "1999-12-31",
+          "value": 2,
+          "source": "cap552",
+          "locator": "Provision of Municipal Services (Reorganization) Ordinance (Cap. 552): dissolves the two municipal councils, the Provisional Urban Council and the Provisional Regional Council, on 31 December 1999"
+        }
+      ]
+    },
+    {
+      "key": "rural_committee",
+      "name": "鄉事委員會",
+      "name_en": "Rural committees",
+      "parent": "district",
+      "polity_kind": "submunicipal",
+      "elects": false,
+      "source": "cap576",
+      "counts": [
+        {
+          "date": "2023-12-10",
+          "value": 27,
+          "source": "eac-dc2023",
+          "locator": "Chapter 1: the 470 District Council members include \"27 ex officio members\", the chairmen of the 27 Rural Committees in the New Territories districts"
+        }
+      ]
+    },
+    {
+      "key": "village",
+      "name": "鄉村及墟鎮",
+      "name_en": "Villages and market towns",
+      "parent": "rural_committee",
+      "polity_kind": "submunicipal",
+      "valid_from": "2003-01-01",
+      "source": "cap576",
+      "counts": [
+        {
+          "date": "2023-01-08",
+          "value": 1298,
+          "source": "eac-rural2023-areas",
+          "locator": "Appendix III, Total row: 695 existing villages and 603 indigenous and composite indigenous villages (plus 2 market towns), which overlap on the ground"
+        },
+        {
+          "date": "2026-11-13",
+          "value": 709,
+          "source": "isd-rural2027",
+          "locator": "\"At present, there are 709 villages with a total of 1 484 Village Representative seats ... In addition, there are 39 and 17 Kaifong Representative seats for the Market Towns of Cheung Chau and Peng Chau\""
+        }
+      ]
+    }
+  ],
+  "classes": [
+    {
+      "key": "legco",
+      "tier": "territory",
+      "name": "立法會選舉",
+      "name_en": "Legislative Council",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "constituency",
+        "schemes": [
+          "hk.constituency"
+        ],
+        "fine": [
+          "hk.constituency",
+          "hk.counting_station"
+        ],
+        "components": [
+          "geographical constituencies",
+          "functional constituencies",
+          "Election Committee constituency"
+        ]
+      },
+      "source": "basic-law-annex2",
+      "locator": "https://www.basiclaw.gov.hk/en/basiclaw/annex2.html (90 members: 40 returned by the Election Committee, 30 by functional constituencies, 20 by geographical constituencies through direct elections)",
+      "first_held": "1985-09-26",
+      "earliest_record": "1998-05-24",
+      "note": "One class for the whole council, because the geographical (directly elected), functional (sectoral electorates of individuals and corporate bodies), and Election Committee constituencies elect members of the same body on the same day and a selector cannot tell their contests apart. Seats: 60 in 1998-2008 (20, 24, 30 and 30 geographical; 10 and 6 Election Committee seats in 1998 and 2000), 70 in 2012-2016 (35 geographical, 35 functional including 5 District Council (second) seats elected territory-wide), and 90 from 2021 (20 geographical in 10 two-seat constituencies, 30 functional in 28 constituencies, 40 Election Committee). The colonial council held its first indirect elections in 1985 and 1988 (functional constituencies and an electoral college of District Board and municipal council members), its first direct elections in 1991, and its last in 1995. The election due 6 September 2020 was postponed by the Chief Executive in Council and never held. By-elections fill casual vacancies.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "by_election",
+            "indirect"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "HK"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 0,
+          "month": 9,
+          "term_years": 4,
+          "called": false,
+          "administered_by": "Electoral Affairs Commission; Registration and Electoral Office",
+          "source": "basic-law-ch4",
+          "locator": "https://www.basiclaw.gov.hk/en/basiclaw/chapter4.html (Article 69: the term of office of the Legislative Council shall be four years, except the first term which shall be two years)",
+          "valid_from": "2000-01-01",
+          "valid_to": "2020-01-01"
+        },
+        {
+          "period_years": 4,
+          "phase": 1,
+          "month": 12,
+          "term_years": 4,
+          "called": false,
+          "administered_by": "Electoral Affairs Commission; Registration and Electoral Office",
+          "source": "basic-law-ch4",
+          "locator": "https://www.basiclaw.gov.hk/en/basiclaw/chapter4.html (Article 69: four-year term); the 2020 election was postponed to 19 December 2021",
+          "valid_from": "2021-01-01"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Registration and Electoral Office election websites",
+          "url": "https://www.elections.gov.hk/legco2025/eng/index.html",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Official publication; reuse terms are not stated",
+          "first_date": "2021-12-19",
+          "last_date": "2025-12-07",
+          "finest": "hk.counting_station",
+          "source": "reo-results",
+          "evidence": "legco2021 and legco2025 sites: geographical constituency votes by counting station, functional and Election Committee constituency totals"
+        },
+        {
+          "platform": "Electoral Affairs Commission election reports",
+          "url": "https://www.eac.hk/en/elections/legco.html",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Official publication; reuse terms are not stated",
+          "first_date": "1998-05-24",
+          "last_date": "2025-12-07",
+          "finest": "hk.constituency",
+          "source": "eac-legco",
+          "evidence": "Each general election and by-election report carries a results appendix by constituency (for example 2016lce_appendix8.pdf); the 1998 report is an HTML page on info.gov.hk"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1985-01-01",
+          "precision": "year",
+          "election_kind": "indirect",
+          "note": "First elections to the colonial council: 12 functional constituency seats and 12 seats chosen by an electoral college of District Board and municipal council members."
+        },
+        {
+          "date": "1988-01-01",
+          "precision": "year",
+          "election_kind": "indirect",
+          "note": "Functional constituencies and the electoral college again; no direct election."
+        },
+        {
+          "date": "1991-01-01",
+          "precision": "year",
+          "note": "First direct elections: 18 seats in 9 two-seat geographical constituencies plus 21 functional seats."
+        },
+        {
+          "date": "1995-01-01",
+          "precision": "year",
+          "note": "Last colonial election: 20 single-seat geographical constituencies, 30 functional constituencies (9 new ones with broad electorates), and 10 seats elected by the District Board members."
+        },
+        {
+          "date": "1998-05-24",
+          "seats": 60,
+          "note": "First Legislative Council of the HKSAR: 20 geographical, 30 functional, and 10 Election Committee seats, for a two-year term."
+        },
+        {
+          "date": "2000-09-10",
+          "source": "eac-lc2004",
+          "quote": "not more than 36 months after the preceding general election held on 10 September 2000"
+        },
+        {
+          "date": "2000-12-10",
+          "election_kind": "by_election",
+          "note": "Hong Kong Island geographical constituency by-election."
+        },
+        {
+          "date": "2001-09-16",
+          "election_kind": "by_election",
+          "source": "eac-dcbe2002",
+          "note": "Election Committee constituency by-election.",
+          "quote": "the 2001 Legislative Council (\"LegCo\") by-election and the 2002 Election Committee Subsector (\"ECSS\") by-elections held on 16 September 2001 and 6 January 2002 respectively"
+        },
+        {
+          "date": "2004-09-12",
+          "source": "eac-lc2004",
+          "quote": "A general election was held on 12 September 2004 to return 60 Members of the Legislative Council",
+          "seats": 60
+        },
+        {
+          "date": "2007-12-02",
+          "election_kind": "by_election",
+          "source": "eac-lcbe2007",
+          "quote": "a by-election notice in the Gazette, appointing 2 December 2007 as the polling day"
+        },
+        {
+          "date": "2008-09-07",
+          "source": "eac-lc2008",
+          "quote": "A general election was held on 7 September 2008 to return 60 Members of the Legislative Council",
+          "seats": 60
+        },
+        {
+          "date": "2010-05-16",
+          "election_kind": "by_election",
+          "source": "eac-lcbe2010",
+          "quote": "the Chief Electoral Officer (\"CEO\") published a notice in the Gazette, appointing 16 May 2010 as the polling day for the 2010 LegCo By-election"
+        },
+        {
+          "date": "2012-09-09",
+          "source": "eac-lc2012",
+          "quote": "A general election was held on 9 September 2012 to return 70 Members of the Legislative Council",
+          "seats": 70
+        },
+        {
+          "date": "2016-02-28",
+          "election_kind": "by_election",
+          "source": "eac-lcbe2016",
+          "quote": "the EAC decided to appoint 28 February 2016 as the date of the By-election"
+        },
+        {
+          "date": "2016-09-04",
+          "source": "eac-lc2016",
+          "quote": "the 2016 Legislative Council General Election held on 4 September 2016"
+        },
+        {
+          "date": "2018-03-11",
+          "election_kind": "by_election",
+          "source": "eac-lcbe2018",
+          "quote": "the EAC decided to hold this By-election on 11 March 2018"
+        },
+        {
+          "date": "2018-11-25",
+          "election_kind": "by_election",
+          "source": "eac-lcbe2018kw",
+          "quote": "the EAC decided to hold this By-election on 25 November 2018"
+        },
+        {
+          "date": "2021-12-19",
+          "source": "eac-lc2021",
+          "quote": "to change the date of the general election of the seventh term of the LegCo to 19 December 2021"
+        },
+        {
+          "date": "2022-12-18",
+          "election_kind": "by_election",
+          "source": "eac-lcbe2022",
+          "quote": "the EAC eventually decided to conduct this by-election on 18 December 2022"
+        },
+        {
+          "date": "2025-12-07",
+          "contests": 39,
+          "seats": 90,
+          "source": "eac-lc2025",
+          "quote": "the 10 GCs are Hong Kong Island East (LC1), Hong Kong Island West (LC2), Kowloon East (LC3); Sections 20 and 25 of the LCO stipulate the qualifications for registration as electors for the 28 FCs; The 2025 LCGE was conducted smoothly on 7 December 2025",
+          "note": "39 contests: 10 geographical constituencies, 28 functional constituencies, and the Election Committee constituency."
+        }
+      ],
+      "est_votes": 16000000,
+      "effort": 3
+    },
+    {
+      "key": "chief_executive",
+      "tier": "territory",
+      "name": "行政長官選舉",
+      "name_en": "Chief Executive, elected by the Election Committee",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "basic-law-annex1",
+      "locator": "https://www.basiclaw.gov.hk/en/basiclaw/annex1.html (the Chief Executive is elected by a broadly representative Election Committee of 1,500 members; term of office five years)",
+      "first_held": "1996-12-11",
+      "earliest_record": "1996-12-11",
+      "note": "Elected by secret ballot of the Election Committee (800 members in 2002-2007, 1,200 in 2012-2017, 1,500 from 2021; the 400-member Selection Committee chose the first Chief Executive on 11 December 1996). In 2002 and 2005 the sole validly nominated candidate was declared elected and no poll was held. A vacancy is filled by an election within six months (Basic Law Article 53), as in 2005.",
+      "match": [
+        {
+          "office_kinds": [
+            "head_of_government"
+          ],
+          "iso_pattern": "HK"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 2,
+          "month": 3,
+          "term_years": 5,
+          "called": false,
+          "vacancy_rule": "election within six months of the vacancy (Basic Law Article 53)",
+          "administered_by": "Electoral Affairs Commission; Registration and Electoral Office",
+          "source": "basic-law-ch4",
+          "locator": "https://www.basiclaw.gov.hk/en/basiclaw/chapter4.html (Article 46: the term of office of the Chief Executive shall be five years)",
+          "runoff": "majority",
+          "runoff_rule": "A candidate needs more than 750 valid votes of the Election Committee (more than half before 2021); otherwise the poll is repeated among the leading candidates"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Registration and Electoral Office election websites",
+          "url": "https://www.elections.gov.hk/ce2022/eng/results.html",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Official publication; reuse terms are not stated",
+          "first_date": "2017-03-26",
+          "last_date": "2022-05-08",
+          "source": "reo-results",
+          "evidence": "ce2017 and ce2022 results pages: votes for each candidate"
+        },
+        {
+          "platform": "Electoral Affairs Commission election reports",
+          "url": "https://www.eac.hk/en/elections/chief.html",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Official publication; reuse terms are not stated",
+          "first_date": "2002-02-28",
+          "last_date": "2022-05-08",
+          "source": "eac-chief",
+          "evidence": "Reports on each Chief Executive election from 2002, with the count"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1996-12-11",
+          "election_kind": "indirect",
+          "note": "The 400-member Selection Committee convened by the Preparatory Committee chose the first Chief Executive."
+        },
+        {
+          "date": "2002-02-28",
+          "note": "Sole validly nominated candidate declared elected at the close of nominations; no poll."
+        },
+        {
+          "date": "2005-06-01",
+          "precision": "month",
+          "source": "eac-ce2005",
+          "quote": "The polling date for electing the new CE was fixed ... to be on Sunday, 10 July 2005",
+          "note": "Election to fill the vacancy left by the first Chief Executive's resignation; the sole validly nominated candidate was declared elected in June 2005 and the poll set for 10 July 2005 was not held."
+        },
+        {
+          "date": "2007-03-25"
+        },
+        {
+          "date": "2012-03-25"
+        },
+        {
+          "date": "2017-03-26",
+          "contests": 1,
+          "source": "eac-ce2017",
+          "quote": "The CE Election was held on Sunday, 26 March 2017"
+        },
+        {
+          "date": "2022-05-08",
+          "contests": 1,
+          "source": "eac-ce2022",
+          "quote": "the polling day of the sixth-term CE Election, originally scheduled for 27 March 2022, to 8 May 2022"
+        }
+      ],
+      "est_votes": 8000,
+      "effort": 1
+    },
+    {
+      "key": "ec_subsector",
+      "tier": "territory",
+      "name": "選舉委員會界別分組選舉",
+      "name_en": "Election Committee subsector elections",
+      "category": "non_territorial",
+      "goal": "national",
+      "measure": {
+        "unit": "subsector"
+      },
+      "source": "basic-law-annex1",
+      "locator": "https://www.basiclaw.gov.hk/en/basiclaw/annex1.html (1,500 members from five sectors; term of office five years)",
+      "first_held": "1998-04-02",
+      "earliest_record": "1998-04-02",
+      "note": "Registered individual and corporate voters of each subsector elect the subsector's share of the Election Committee, which then elects the Chief Executive and (1998, 2000, and from 2021) members of the Legislative Council. From 2021, 40 subsectors return 1,500 members, of whom some are ex officio and some nominated by designated bodies; only the elected seats go to a poll, and many are returned uncontested. Ordinary elections in 1998, 2000, 2006, 2011, 2016, 2021, and 2026, plus by-elections.",
+      "match": [
+        {
+          "body_kinds": [
+            "electoral_college"
+          ],
+          "iso_pattern": "HK"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 1,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "Electoral Affairs Commission; Registration and Electoral Office",
+          "source": "basic-law-annex1",
+          "locator": "https://www.basiclaw.gov.hk/en/basiclaw/annex1.html (the term of office of the Election Committee shall be five years)",
+          "valid_from": "2006-01-01"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Registration and Electoral Office election websites",
+          "url": "https://www.elections.gov.hk/ecss2021/eng/index.html",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Official publication; reuse terms are not stated",
+          "first_date": "2016-12-11",
+          "last_date": "2025-09-07",
+          "source": "reo-results",
+          "evidence": "ecss2016, ecss2021, and ecss2025by sites: votes for each candidate by subsector"
+        },
+        {
+          "platform": "Electoral Affairs Commission election reports",
+          "url": "https://www.eac.hk/en/elections/ecse.html",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Official publication; reuse terms are not stated",
+          "first_date": "1998-04-02",
+          "last_date": "2025-09-07",
+          "source": "eac-ecse",
+          "evidence": "Subsector results appear in the Chief Executive and Legislative Council reports' chapters on the subsector elections"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1998-04-02"
+        },
+        {
+          "date": "2000-07-09"
+        },
+        {
+          "date": "2002-01-06",
+          "election_kind": "by_election",
+          "source": "eac-dcbe2002",
+          "quote": "the 2002 Election Committee Subsector (\"ECSS\") by-elections held on 16 September 2001 and 6 January 2002 respectively"
+        },
+        {
+          "date": "2005-05-01",
+          "election_kind": "by_election",
+          "source": "eac-ce2005",
+          "quote": "ECSS By-elections held on 1 May 2005"
+        },
+        {
+          "date": "2006-12-10"
+        },
+        {
+          "date": "2011-12-11"
+        },
+        {
+          "date": "2016-12-11",
+          "source": "eac-ce2017",
+          "quote": "The ECSS Ordinary Elections were held on 11 December 2016"
+        },
+        {
+          "date": "2021-09-19",
+          "source": "eac-ce2022",
+          "quote": "The ECSS Ordinary Elections were held on 19 September 2021"
+        },
+        {
+          "date": "2025-09-07",
+          "election_kind": "by_election",
+          "source": "eac-ecse2025by",
+          "quote": "From 4 July to the polling day on 7 September 2025"
+        },
+        {
+          "date": "2026-11-22",
+          "source": "reo-ecss2026",
+          "quote": "Polling day: 22 November 2026 (Sunday)"
+        }
+      ],
+      "est_votes": 400000,
+      "effort": 3
+    },
+    {
+      "key": "district_council",
+      "tier": "district",
+      "name": "區議會選舉",
+      "name_en": "District Councils",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "constituency",
+        "schemes": [
+          "hk.constituency"
+        ],
+        "fine": [
+          "hk.constituency",
+          "hk.counting_station"
+        ]
+      },
+      "source": "cap547",
+      "first_held": "1999-11-28",
+      "earliest_record": "1999-11-28",
+      "note": "18 councils. 1999-2019: single-member constituencies by first past the post (390 in 1999, 400 in 2003, 405 in 2007, 412 in 2011, 431 in 2015, 452 in 2019), plus appointed members until 2015 and the 27 rural committee chairmen ex officio. From 2023: 44 two-seat District Council geographical constituencies (88 seats), 18 District Committees constituencies (176 seats, elected by the members of each district's Area Committees, District Fight Crime Committee, and District Fire Safety Committee), 179 appointed members, and the 27 ex officio chairmen: 470 in all. Succeeded the District Boards (class district_board). By-elections fill vacancies.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "name_pattern": "District Council",
+          "iso_pattern": "HK"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 3,
+          "month": 11,
+          "term_years": 4,
+          "called": false,
+          "administered_by": "Electoral Affairs Commission; Registration and Electoral Office",
+          "source": "cap547",
+          "locator": "https://www.elegislation.gov.hk/hk/cap547 (four-year term from 1 January after the election)",
+          "valid_to": "2023-01-01"
+        },
+        {
+          "period_years": 4,
+          "phase": 3,
+          "month": 12,
+          "term_years": 4,
+          "called": false,
+          "administered_by": "Electoral Affairs Commission; Registration and Electoral Office",
+          "source": "eac-dc2023",
+          "valid_from": "2023-01-01"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Registration and Electoral Office election websites",
+          "url": "https://www.elections.gov.hk/dc2023/eng/results.html",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Official publication; reuse terms are not stated",
+          "first_date": "2019-11-24",
+          "last_date": "2023-12-10",
+          "finest": "hk.counting_station",
+          "source": "reo-results",
+          "evidence": "dc2019 (counting results by station as xls) and dc2023 (geographical constituencies by counting station, District Committees constituency totals)"
+        },
+        {
+          "platform": "Electoral Affairs Commission election reports",
+          "url": "https://www.eac.hk/en/elections/distco.html",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Official publication; reuse terms are not stated",
+          "first_date": "1999-11-28",
+          "last_date": "2023-12-10",
+          "finest": "hk.constituency",
+          "source": "eac-distco",
+          "evidence": "Each ordinary election report has a results appendix by constituency (1999: appendix iv_english.pdf); each by-election report carries its count"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1999-11-28",
+          "source": "eac-dc2003",
+          "quote": "As the last ordinary election was held on 28 November 1999"
+        },
+        {
+          "date": "2000-07-23",
+          "election_kind": "by_election",
+          "source": "eac-dcbe2000",
+          "quote": "REPORT ON THE DISTRICT COUNCILS BY-ELECTION HELD ON 23 JULY 2000",
+          "note": "North District Council Fung Tsui constituency by-election."
+        },
+        {
+          "date": "2002-11-03",
+          "election_kind": "by_election",
+          "note": "Kowloon City District Council Kai Tak constituency by-election.",
+          "source": "eac-dcbe2003hs",
+          "quote": "Kai Tak Constituency By-election held on 3 November 2002"
+        },
+        {
+          "date": "2003-02-09",
+          "election_kind": "by_election",
+          "note": "Kowloon City District Council Hoi Sham constituency by-election; the EAC report gives the following Sunday as 16 February 2003."
+        },
+        {
+          "date": "2003-04-06",
+          "election_kind": "by_election",
+          "note": "Sham Shui Po District Council Mei Foo constituency by-election."
+        },
+        {
+          "date": "2003-08-03",
+          "election_kind": "by_election",
+          "note": "Sham Shui Po District Council Lai Kok constituency by-election; the EAC report gives the following Sunday as 10 August 2003."
+        },
+        {
+          "date": "2003-11-23",
+          "source": "eac-dc2003",
+          "quote": "An ordinary election was held on 23 November 2003 to return 400 members",
+          "contests": 400,
+          "seats": 400
+        },
+        {
+          "date": "2004-11-21",
+          "election_kind": "by_election",
+          "note": "Southern District Council Tin Wan constituency by-election; the EAC report gives the preceding day as 20 November 2004."
+        },
+        {
+          "date": "2005-03-06",
+          "election_kind": "by_election",
+          "note": "Eastern District Council Fort Street and Sham Shui Po District Council Nam Cheong Central constituency by-elections."
+        },
+        {
+          "date": "2005-03-20",
+          "election_kind": "by_election",
+          "note": "Southern District Council Ap Lei Chau North constituency by-election."
+        },
+        {
+          "date": "2005-10-23",
+          "election_kind": "by_election",
+          "note": "Kwun Tong District Council King Tin constituency by-election."
+        },
+        {
+          "date": "2006-06-11",
+          "election_kind": "by_election",
+          "note": "Central and Western District Council Centre Street constituency by-election."
+        },
+        {
+          "date": "2006-09-10",
+          "election_kind": "by_election",
+          "note": "Eastern District Council Tsui Wan constituency by-election."
+        },
+        {
+          "date": "2007-03-11",
+          "election_kind": "by_election",
+          "note": "Sha Tin District Council Kam Ying constituency by-election."
+        },
+        {
+          "date": "2007-05-20",
+          "election_kind": "by_election",
+          "note": "Kwun Tong District Council Kai Yip constituency by-election."
+        },
+        {
+          "date": "2007-06-10",
+          "election_kind": "by_election",
+          "note": "Tai Po District Council Hong Lok Yuen constituency by-election."
+        },
+        {
+          "date": "2007-07-29",
+          "election_kind": "by_election",
+          "note": "Kowloon City District Council Hung Hom Bay constituency by-election."
+        },
+        {
+          "date": "2007-11-18",
+          "source": "eac-dc2007",
+          "quote": "An ordinary election was held on 18 November 2007 to return 405 members",
+          "contests": 405,
+          "seats": 405
+        },
+        {
+          "date": "2008-10-12",
+          "election_kind": "by_election",
+          "note": "Yau Tsim Mong District Council Jordan East constituency by-election."
+        },
+        {
+          "date": "2008-12-07",
+          "election_kind": "by_election",
+          "note": "Wong Tai Sin District Council Tsz Wan West constituency by-election."
+        },
+        {
+          "date": "2009-03-29",
+          "election_kind": "by_election",
+          "note": "Sha Tin District Council Tai Wai constituency by-election (its election expense period ended 45 days after polling, on 13 May 2009)."
+        },
+        {
+          "date": "2009-06-28",
+          "election_kind": "by_election",
+          "note": "Wan Chai District Council Canal Road constituency by-election."
+        },
+        {
+          "date": "2009-09-13",
+          "election_kind": "by_election",
+          "note": "Kwai Tsing District Council Kwai Shing East Estate constituency by-election."
+        },
+        {
+          "date": "2010-09-05",
+          "election_kind": "by_election",
+          "note": "Southern District Council Pokfulam constituency by-election (expense period ended 45 days after polling, on 20 October 2010)."
+        },
+        {
+          "date": "2011-06-26",
+          "election_kind": "by_election",
+          "note": "Yuen Long District Council Shap Pat Heung North constituency by-election (expense period ended 10 August 2011)."
+        },
+        {
+          "date": "2011-07-24",
+          "election_kind": "by_election",
+          "note": "Tsuen Wan District Council Fuk Loi constituency by-election (expense period ended 7 September 2011)."
+        },
+        {
+          "date": "2011-11-06",
+          "source": "eac-dc2011",
+          "quote": "An ordinary election was held on 6 November 2011 to return 412 members",
+          "contests": 412,
+          "seats": 412
+        },
+        {
+          "date": "2012-11-04",
+          "election_kind": "by_election",
+          "note": "Sha Tin District Council On Tai constituency by-election (expense period ended 19 December 2012)."
+        },
+        {
+          "date": "2013-03-10",
+          "election_kind": "by_election",
+          "note": "Sha Tin District Council Tin Sum constituency by-election (expense period ended 24 April 2013)."
+        },
+        {
+          "date": "2013-05-26",
+          "election_kind": "by_election",
+          "note": "Kwun Tong District Council Ping Shek constituency by-election (expense period ended 10 July 2013)."
+        },
+        {
+          "date": "2013-10-27",
+          "election_kind": "by_election",
+          "note": "Yau Tsim Mong District Council King's Park constituency by-election (expense period ended 11 December 2013)."
+        },
+        {
+          "date": "2014-03-23",
+          "election_kind": "by_election",
+          "note": "Southern District Council South Horizons West constituency by-election (expense period ended 7 May 2014)."
+        },
+        {
+          "date": "2014-04-27",
+          "election_kind": "by_election",
+          "note": "Islands District Council Tung Chung North constituency by-election (expense period ended 11 June 2014)."
+        },
+        {
+          "date": "2014-05-18",
+          "election_kind": "by_election",
+          "note": "Eastern District Council Nam Fung constituency by-election (expense period ended 2 July 2014)."
+        },
+        {
+          "date": "2014-09-07",
+          "election_kind": "by_election",
+          "note": "Islands District Council Peng Chau and Hei Ling Chau constituency by-election (expense period ended 22 October 2014)."
+        },
+        {
+          "date": "2015-07-19",
+          "election_kind": "by_election",
+          "note": "Tai Po District Council San Fu constituency by-election."
+        },
+        {
+          "date": "2015-11-22",
+          "source": "eac-dc2015",
+          "quote": "An ordinary election was held on 22 November 2015 to return 431 elected members",
+          "contests": 431,
+          "seats": 431
+        },
+        {
+          "date": "2017-11-01",
+          "precision": "month",
+          "election_kind": "by_election",
+          "note": "Central and Western District Council by-election; results gazetted 1 December 2017."
+        },
+        {
+          "date": "2018-06-01",
+          "precision": "month",
+          "election_kind": "by_election",
+          "note": "Eastern District Council Kai Hiu constituency by-election; results gazetted 15 June 2018."
+        },
+        {
+          "date": "2019-03-01",
+          "precision": "month",
+          "election_kind": "by_election",
+          "note": "Yau Tsim Mong District Council Tai Nan constituency by-election; results gazetted 29 March 2019."
+        },
+        {
+          "date": "2019-07-14",
+          "election_kind": "by_election",
+          "note": "Yuen Long District Council by-election."
+        },
+        {
+          "date": "2019-11-24",
+          "contests": 452,
+          "seats": 452,
+          "source": "eac-dc2019",
+          "quote": "An ordinary election was held on 24 November 2019 to return 452 elected members for the sixth term of four years from 1 January 2020 to 31 December 2023"
+        },
+        {
+          "date": "2023-12-10",
+          "contests": 62,
+          "seats": 264,
+          "source": "eac-dc2023",
+          "quote": "The DCGCs and the newly established DCCs take up 88 and 176 seats respectively with members to be returned by elections; the ROs for the 18 DCCs and 44 DCGCs; the 2023 DC Ordinary Election held on 10 December 2023"
+        }
+      ],
+      "est_votes": 10000000,
+      "effort": 3
+    },
+    {
+      "key": "rural_representative",
+      "tier": "village",
+      "name": "鄉郊代表選舉",
+      "name_en": "Rural Representatives (village and kaifong representatives)",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "rural area"
+      },
+      "source": "cap576",
+      "valid_from": "2003-01-01",
+      "first_held": "2003-07-01",
+      "earliest_record": "2003-07-01",
+      "note": "Under the Rural Representative Election Ordinance (Cap. 576) every existing village returns one Resident Representative, every indigenous or composite indigenous village one to five Indigenous Inhabitant Representatives, and the market towns of Cheung Chau and Peng Chau 39 and 17 Kaifong Representatives by block vote. 1,540 seats in 2023, of which 1,100 were returned uncontested and 115 failed for want of a candidate. The Home Affairs Department runs the elections on several January Sundays every four years; the EAC reports each one and publishes results by village. Before 2003 villages chose representatives under rural committee rules, not public law (left out). Rural by-elections are held about twice a year.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "name_pattern": "(Resident|Indigenous Inhabitant|Kaifong|Village) Representative",
+          "iso_pattern": "HK"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 3,
+          "month": 1,
+          "term_years": 4,
+          "called": false,
+          "administered_by": "Home Affairs Department (supervised by the Electoral Affairs Commission)",
+          "source": "eac-rural2023",
+          "locator": "Chapter 1, para 1.1: \"The term of office of Rural Representative is 4 years\"",
+          "valid_from": "2007-01-01"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Electoral Affairs Commission election reports",
+          "url": "https://www.eac.hk/en/elections/rural.html",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Official publication; reuse terms are not stated",
+          "first_date": "2003-07-01",
+          "last_date": "2026-05-17",
+          "source": "eac-rural",
+          "evidence": "Each ordinary and by-election report lists results by village and market town (2023: appendices 11a resident, 11b indigenous inhabitant, 11c kaifong representatives; 6a-6c uncontested; 7a-7b failed)"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2003-07-01",
+          "precision": "month",
+          "through": "2003-08-17",
+          "note": "First Village Representative Election under Cap. 576, on several polling days ending 17 August 2003.",
+          "source": "eac-rural2003",
+          "quote": "On the last polling day on 17 August 2003"
+        },
+        {
+          "date": "2004-03-28",
+          "election_kind": "by_election"
+        },
+        {
+          "date": "2004-11-28",
+          "election_kind": "by_election"
+        },
+        {
+          "date": "2005-05-08",
+          "election_kind": "by_election"
+        },
+        {
+          "date": "2006-01-08",
+          "election_kind": "by_election"
+        },
+        {
+          "date": "2006-05-21",
+          "election_kind": "by_election"
+        },
+        {
+          "date": "2006-10-15",
+          "election_kind": "by_election"
+        },
+        {
+          "date": "2006-12-01",
+          "precision": "month",
+          "through": "2007-02-04",
+          "note": "2007 Village Representative Election on 10 polling days ending 4 February 2007.",
+          "source": "eac-rural2007",
+          "quote": "45 days after the last polling day, 4 February 2007"
+        },
+        {
+          "date": "2007-05-27",
+          "election_kind": "by_election"
+        },
+        {
+          "date": "2008-01-06",
+          "election_kind": "by_election"
+        },
+        {
+          "date": "2008-05-25",
+          "election_kind": "by_election"
+        },
+        {
+          "date": "2008-11-23",
+          "election_kind": "by_election"
+        },
+        {
+          "date": "2009-05-31",
+          "election_kind": "by_election"
+        },
+        {
+          "date": "2010-01-17",
+          "election_kind": "by_election"
+        },
+        {
+          "date": "2010-06-06",
+          "election_kind": "by_election"
+        },
+        {
+          "date": "2010-10-03",
+          "election_kind": "by_election"
+        },
+        {
+          "date": "2011-01-02",
+          "through": "2011-01-23",
+          "note": "2011 Village Representative Election, on the Sundays from 2 to 23 January 2011.",
+          "source": "eac-rural2011by",
+          "quote": "was held on the Sundays in four consecutive weeks during the period from 2 January to 23 January 2011"
+        },
+        {
+          "date": "2011-06-12",
+          "election_kind": "by_election"
+        },
+        {
+          "date": "2011-11-27",
+          "election_kind": "by_election"
+        },
+        {
+          "date": "2012-04-22",
+          "election_kind": "by_election"
+        },
+        {
+          "date": "2012-12-02",
+          "election_kind": "by_election"
+        },
+        {
+          "date": "2013-05-26",
+          "election_kind": "by_election"
+        },
+        {
+          "date": "2013-12-15",
+          "election_kind": "by_election"
+        },
+        {
+          "date": "2014-05-25",
+          "election_kind": "by_election"
+        },
+        {
+          "date": "2014-10-05",
+          "election_kind": "by_election"
+        },
+        {
+          "date": "2015-01-04",
+          "through": "2015-01-25",
+          "note": "2015 Rural Ordinary Election, the first to include Kaifong Representatives, on the Sundays from 4 to 25 January 2015.",
+          "source": "eac-rural2015by",
+          "quote": "was held on the Sundays in four consecutive weeks during the period from 4 to 25 January 2015"
+        },
+        {
+          "date": "2015-06-14",
+          "election_kind": "by_election"
+        },
+        {
+          "date": "2015-12-06",
+          "election_kind": "by_election"
+        },
+        {
+          "date": "2016-05-29",
+          "election_kind": "by_election"
+        },
+        {
+          "date": "2016-11-27",
+          "election_kind": "by_election"
+        },
+        {
+          "date": "2017-04-30",
+          "election_kind": "by_election"
+        },
+        {
+          "date": "2017-12-10",
+          "election_kind": "by_election"
+        },
+        {
+          "date": "2018-05-20",
+          "election_kind": "by_election"
+        },
+        {
+          "date": "2018-10-07",
+          "election_kind": "by_election"
+        },
+        {
+          "date": "2019-01-06",
+          "through": "2019-01-20",
+          "note": "2019 Rural Ordinary Election: village representatives on 6 and 13 January 2019, kaifong representatives the following Sunday.",
+          "source": "eac-rural2019",
+          "quote": "The polls were arranged to take place on the two consecutive Sundays of 6 and 13 January 2019"
+        },
+        {
+          "date": "2019-06-16",
+          "election_kind": "by_election"
+        },
+        {
+          "date": "2019-12-08",
+          "election_kind": "by_election"
+        },
+        {
+          "date": "2023-01-08",
+          "through": "2023-01-15",
+          "note": "2023 Rural Ordinary Election: 1,540 seats; village representatives on 8 January, kaifong representatives on 15 January 2023.",
+          "source": "eac-rural2023",
+          "quote": "Regarding the VR Elections conducted on 8 January 2023 ... The KFR Election was scheduled for 15 January 2023"
+        },
+        {
+          "date": "2024-12-01",
+          "election_kind": "by_election"
+        },
+        {
+          "date": "2025-04-27",
+          "election_kind": "by_election"
+        },
+        {
+          "date": "2026-05-17",
+          "election_kind": "by_election"
+        },
+        {
+          "date": "2027-01-17",
+          "through": "2027-01-24",
+          "note": "2027 Rural Ordinary Election, scheduled.",
+          "source": "isd-rural2027",
+          "quote": "The Village Representative ... Election will be conducted on January 17, 2027 (Sunday), while the Kaifong Representative Election for Market Towns will be held on January 24, 2027 (Sunday)."
+        }
+      ],
+      "est_votes": 500000,
+      "effort": 3
+    },
+    {
+      "key": "district_board",
+      "tier": "district",
+      "name": "區議會（區議局）選舉",
+      "name_en": "District Boards (abolished)",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "constituency"
+      },
+      "source": "cap547",
+      "valid_from": "1982-01-01",
+      "valid_to": "2000-01-01",
+      "first_held": "1982-01-01",
+      "note": "The colonial District Boards (18 or 19 boards) were first elected in 1982 (New Territories in March, urban areas in September), then in 1985, 1988, 1991, and 1994, by first past the post in single- and two-member constituencies alongside appointed members until 1994. Appointed Provisional District Boards served from 1997 and the District Councils replaced them on 1 January 2000.",
+      "disposition": "blocked",
+      "disposition_reason": "No official online canvass found: the results were published as Government Gazette notices and in the Boundary and Election Commission's reports, neither of which the Hong Kong government serves online for 1982-1994; the class waits on a scan of the Gazette or the commission's reports.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "name_pattern": "District Board",
+          "iso_pattern": "HK"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1982-01-01",
+          "precision": "year",
+          "through": "1994-12-31",
+          "note": "Ordinary elections in 1982, 1985, 1988, 1991, and 1994."
+        }
+      ],
+      "est_votes": 2500000,
+      "effort": 5
+    },
+    {
+      "key": "urban_council",
+      "tier": "municipal_council",
+      "name": "市政局選舉",
+      "name_en": "Urban Council (abolished)",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "constituency"
+      },
+      "source": "cap552",
+      "valid_to": "2000-01-01",
+      "first_held": "1952-01-01",
+      "note": "The Urban Council (1936-1999) had elected members from 1952 on a restricted franchise, widened to universal suffrage in 1983; its last election was in 1995. A provisional council appointed in 1997 served until both municipal councils were dissolved on 31 December 1999 by the Provision of Municipal Services (Reorganization) Ordinance (Cap. 552). Its predecessor, the Sanitary Board, had elected members from 1888 to 1935 (class sanitary_board).",
+      "disposition": "blocked",
+      "disposition_reason": "No official online canvass found: results 1952-1995 were published as Government Gazette notices and in Urban Council and Boundary and Election Commission reports, none of which an official Hong Kong host serves online; the class waits on a scan.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "name_pattern": "Urban Council",
+          "iso_pattern": "HK"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1952-01-01",
+          "precision": "year",
+          "through": "1995-12-31",
+          "note": "Elections roughly every two years from 1952 to 1983, then 1986, 1989, 1991, and 1995."
+        }
+      ],
+      "est_votes": 2000000,
+      "effort": 5,
+      "valid_from": "1936-01-01"
+    },
+    {
+      "key": "regional_council",
+      "tier": "municipal_council",
+      "name": "區域市政局選舉",
+      "name_en": "Regional Council (abolished)",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "constituency"
+      },
+      "source": "cap552",
+      "valid_from": "1986-01-01",
+      "valid_to": "2000-01-01",
+      "first_held": "1986-01-01",
+      "note": "The Regional Council served the New Territories from 1986, with directly elected members chosen in 1986, 1989, 1991, and 1995, and was dissolved with the Urban Council on 31 December 1999.",
+      "disposition": "blocked",
+      "disposition_reason": "No official online canvass found for 1986-1995; the results were Government Gazette notices and Boundary and Election Commission reports that no official Hong Kong host serves online.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "name_pattern": "Regional Council",
+          "iso_pattern": "HK"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1986-01-01",
+          "precision": "year",
+          "through": "1995-12-31",
+          "note": "Elections in 1986, 1989, 1991, and 1995."
+        }
+      ],
+      "est_votes": 1000000,
+      "effort": 5
+    },
+    {
+      "key": "sanitary_board",
+      "tier": "municipal_council",
+      "name": "潔淨局選舉",
+      "name_en": "Sanitary Board (abolished)",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "cap552",
+      "valid_from": "1888-01-01",
+      "valid_to": "1936-01-01",
+      "first_held": "1888-01-01",
+      "note": "The Sanitary Board, the Urban Council's predecessor, had two (later four) members elected from 1888 by ratepayers on the jury list, the colony's first public elections; it became the Urban Council in 1936.",
+      "disposition": "blocked",
+      "disposition_reason": "The only official record is the Hong Kong Government Gazette of 1888-1935, which no official Hong Kong host serves online; the electorate was a few hundred jurors.",
+      "dates": [
+        {
+          "date": "1888-01-01",
+          "precision": "year",
+          "through": "1935-12-31",
+          "note": "Elections to the Sanitary Board's elected seats."
+        }
+      ],
+      "est_votes": 5000,
+      "effort": 5
+    },
+    {
+      "key": "provisional_legco",
+      "tier": "territory",
+      "name": "臨時立法會選舉",
+      "name_en": "Provisional Legislative Council (abolished)",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "basic-law",
+      "valid_from": "1996-12-01",
+      "valid_to": "1998-07-01",
+      "first_held": "1996-12-21",
+      "note": "The 400-member Selection Committee chose the 60 members of the Provisional Legislative Council on 21 December 1996; the council sat from 1997 until the first Legislative Council took office on 1 July 1998.",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Held in Shenzhen by the Selection Committee convened by the National People's Congress's Preparatory Committee, outside Hong Kong electoral law; no Hong Kong electoral authority conducted it or published its count.",
+      "dates": [
+        {
+          "date": "1996-12-21"
+        }
+      ],
+      "est_votes": 24000,
+      "effort": 4
+    },
+    {
+      "key": "npc_deputies",
+      "tier": "territory",
+      "name": "香港特別行政區選舉全國人民代表大會代表",
+      "name_en": "HKSAR deputies to the National People's Congress",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "basic-law",
+      "first_held": "1997-12-08",
+      "note": "36 deputies elected every five years by an electoral conference of Hong Kong members (from 2017 the Election Committee members and others).",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Conducted by a presidium under the National People's Congress Standing Committee's rules, not by the Hong Kong electoral authorities; an indirect vote of a conference of a few thousand members. It belongs to China's census if anywhere.",
+      "est_votes": 15000,
+      "effort": 4
+    },
+    {
+      "key": "heung_yee_kuk",
+      "tier": "rural_committee",
+      "name": "鄉事委員會及鄉議局選舉",
+      "name_en": "Rural committee and Heung Yee Kuk elections",
+      "category": "indirect",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "cap576",
+      "note": "Village and kaifong representatives elect each of the 27 rural committees' chairmen and executive committees, and the committee chairmen and others form the Heung Yee Kuk's council.",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Internal elections of statutory advisory bodies held under their own constitutions and the Heung Yee Kuk Ordinance (Cap. 1097), not by the Electoral Affairs Commission or the Home Affairs Department, and with no published count.",
+      "est_votes": 5000,
+      "effort": 5
+    },
+    {
+      "key": "referendum",
+      "tier": "territory",
+      "name": "公投",
+      "name_en": "Referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "question"
+      },
+      "source": "basic-law",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Neither the Basic Law nor any Hong Kong ordinance provides for a referendum, and none has been held. The 2014 civil referendum was a private poll, and the 2010 Legislative Council by-elections that the resigning members called a referendum were ordinary by-elections (class legco).",
+      "est_votes": 0,
+      "effort": 1
+    },
+    {
+      "key": "party_primary",
+      "tier": "territory",
+      "name": "初選",
+      "name_en": "Party primaries",
+      "category": "nominating",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "cap542",
+      "disposition": "out_of_scope",
+      "disposition_reason": "No law provides for a state-run nominating contest; candidates are nominated by subscribers (and from 2021 by Election Committee members), and the 2020 opposition primary was a private poll.",
+      "est_votes": 0,
+      "effort": 1
+    }
+  ]
+}
