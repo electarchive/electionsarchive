@@ -1,0 +1,1711 @@
+{
+  "polity": "IS",
+  "name": "Iceland",
+  "sources": {
+    "const": {
+      "title": "Constitution of the Republic of Iceland (No. 33, 17 June 1944, as amended), English translation",
+      "publisher": "Government of Iceland (Prime Minister's Office)",
+      "url": "https://www.government.is/library/01-Ministries/Prime-Ministrers-Office/constitution_of_iceland.pdf",
+      "kind": "official_body",
+      "note": "Arts. 3-7 (president), 26 (referendum on a refused bill), 31 (63 members, six or seven constituencies), 78 (municipalities), 79 (amendment)."
+    },
+    "ea2021": {
+      "title": "Elections Act No. 112, 25 June 2021 (English translation)",
+      "publisher": "Government of Iceland (Stjórnarráð Íslands)",
+      "url": "https://www.stjornarradid.is/library/03-Verkefni/Kosningar/Kosningalog_enska.pdf",
+      "kind": "official_body",
+      "note": "Translation as amended to Act No. 18/2022; in force since 1 January 2022. The Icelandic text on althingi.is was not reachable from this session."
+    },
+    "lk-althingi": {
+      "title": "Alþingiskosningar",
+      "publisher": "Landskjörstjórn (National Electoral Commission)",
+      "url": "https://island.is/s/landskjorstjorn/althingiskosningar",
+      "kind": "official_body"
+    },
+    "lk-forseti": {
+      "title": "Forsetakjör",
+      "publisher": "Landskjörstjórn (National Electoral Commission)",
+      "url": "https://island.is/s/landskjorstjorn/forsetakjor",
+      "kind": "official_body"
+    },
+    "lk-sveit": {
+      "title": "Sveitarstjórnarkosningar",
+      "publisher": "Landskjörstjórn (National Electoral Commission)",
+      "url": "https://island.is/s/landskjorstjorn/sveitarstjornarkosningar",
+      "kind": "official_body"
+    },
+    "lk-thjod": {
+      "title": "Þjóðaratkvæðagreiðslur",
+      "publisher": "Landskjörstjórn (National Electoral Commission)",
+      "url": "https://island.is/s/landskjorstjorn/thjodaratkvaedagreidslur",
+      "kind": "official_body"
+    },
+    "lk-ref2026": {
+      "title": "Landskjörstjórn tilkynnir niðurstöðu þjóðaratkvæðagreiðslu (22 September 2026)",
+      "publisher": "Landskjörstjórn (National Electoral Commission)",
+      "url": "https://island.is/s/landskjorstjorn/frett/landskjorstjorn-tilkynnir-nidurstodu-thjodaratkvaedagreidslu",
+      "kind": "official_body"
+    },
+    "lk-local2026": {
+      "title": "Sveitarstjórnarkosningar 2026 (3 March 2026)",
+      "publisher": "Landskjörstjórn (National Electoral Commission)",
+      "url": "https://island.is/s/landskjorstjorn/frett/sveitarstjornarkosningar-2026",
+      "kind": "official_body"
+    },
+    "lk-reports2026": {
+      "title": "Kosningaskýrslur sveitarfélaga aðgengilegar á vef landskjörstjórnar (20 May 2026)",
+      "publisher": "Landskjörstjórn (National Electoral Commission)",
+      "url": "https://island.is/s/landskjorstjorn/frett/kosningaskyrslur-sveitarfelaga-adgengilegar-a-vef-landskjoerstjornar",
+      "kind": "official_body"
+    },
+    "stj-reports2022": {
+      "title": "Kosningaskýrslur yfirkjörstjórna, sveitarstjórnarkosningar 14. maí 2022 (Múlaþing, 7400)",
+      "publisher": "Government of Iceland (Stjórnarráð Íslands)",
+      "url": "https://www.stjornarradid.is/library/03-Verkefni/Kosningar/Sveitarstjkosn2022/Kosningaskyrslur/7400%20M%c3%bala%c3%being.pdf",
+      "kind": "official_body",
+      "note": "One report per municipality under Articles 116 and 117 of the Elections Act: list votes, seats, and each candidate's ranked votes."
+    },
+    "stj-2010": {
+      "title": "Stjórnlagaþing 2010: kynning á frambjóðendum",
+      "publisher": "Government of Iceland (Stjórnarráð Íslands)",
+      "url": "https://www.stjornarradid.is/media/kosning.media/media/stjornlagathing-2010/stjornlagathing-frambjodendur-kynningarrit-2010.pdf",
+      "kind": "official_body"
+    },
+    "mul-samthykkt": {
+      "title": "Samþykkt um stjórn Múlaþings (July 2026)",
+      "publisher": "Múlaþing",
+      "url": "https://www.mulathing.is/static/files/samthykkt/um-stjorn-mulathings-juli2026.pdf",
+      "kind": "official_body"
+    },
+    "statice-mulathing": {
+      "title": "Equal turnout for men and women in the first local government elections in Múlaþing (9 August 2021)",
+      "publisher": "Hagstofa Íslands (Statistics Iceland)",
+      "url": "https://statice.is/publications/news-archive/elections/local-government-elections-in-mulathing/",
+      "kind": "official_body"
+    },
+    "statice-local2022": {
+      "title": "Local government elections on 14 May 2022 (4 October 2023)",
+      "publisher": "Hagstofa Íslands (Statistics Iceland)",
+      "url": "https://statice.is/publications/news-archive/elections/local-government-elections-2022-14329/",
+      "kind": "official_body"
+    },
+    "statice-pop2025": {
+      "title": "The population on 1 January 2025 (12 March 2025)",
+      "publisher": "Hagstofa Íslands (Statistics Iceland)",
+      "url": "https://old.statice.is/publications/news-archive/inhabitants/the-population-on-1-january-2025/",
+      "kind": "official_body"
+    },
+    "statice-pop2026": {
+      "title": "Population 1 January 2026 (12 March 2026)",
+      "publisher": "Hagstofa Íslands (Statistics Iceland)",
+      "url": "https://old.statice.is/publications/news-archive/inhabitants/population-1-january-2026/",
+      "kind": "official_body"
+    },
+    "statice-elections": {
+      "title": "Elections (statistics and publications)",
+      "publisher": "Hagstofa Íslands (Statistics Iceland)",
+      "url": "https://statice.is/statistics/population/elections/",
+      "kind": "official_body"
+    },
+    "hs-px": {
+      "title": "Elections: PxWeb statistical database",
+      "publisher": "Hagstofa Íslands (Statistics Iceland)",
+      "url": "https://px.hagstofa.is/pxen/pxweb/en/Ibuar/Ibuar__kosningar/",
+      "kind": "official_body",
+      "license": "Statistics Iceland terms of use: reuse with Statistics Iceland acknowledged as the source"
+    },
+    "kos01900": {
+      "title": "KOS01900: Elections to the Althingi, presidential elections and referenda 1874-2024",
+      "publisher": "Hagstofa Íslands (Statistics Iceland)",
+      "url": "https://px.hagstofa.is/pxen/pxweb/en/Ibuar/Ibuar__kosningar__kosningayfirlit/KOS01900.px/",
+      "kind": "official_body",
+      "license": "Statistics Iceland terms of use: reuse with Statistics Iceland acknowledged as the source"
+    },
+    "kos02001": {
+      "title": "KOS02001: Participation in general elections to the Althingi 1874-2024",
+      "publisher": "Hagstofa Íslands (Statistics Iceland)",
+      "url": "https://px.hagstofa.is/pxen/pxweb/en/Ibuar/Ibuar__kosningar__kosningayfirlit/KOS02001.px/",
+      "kind": "official_body",
+      "license": "Statistics Iceland terms of use: reuse with Statistics Iceland acknowledged as the source"
+    },
+    "kos02002": {
+      "title": "KOS02002: Participation in elections to the Althingi of nationally elected members 1916-1930",
+      "publisher": "Hagstofa Íslands (Statistics Iceland)",
+      "url": "https://px.hagstofa.is/pxen/pxweb/en/Ibuar/Ibuar__kosningar__kosningayfirlit/KOS02002.px/",
+      "kind": "official_body",
+      "license": "Statistics Iceland terms of use: reuse with Statistics Iceland acknowledged as the source"
+    },
+    "kos02003": {
+      "title": "KOS02003: Participation in referenda 1918-2012",
+      "publisher": "Hagstofa Íslands (Statistics Iceland)",
+      "url": "https://px.hagstofa.is/pxen/pxweb/en/Ibuar/Ibuar__kosningar__kosningayfirlit/KOS02003.px/",
+      "kind": "official_body",
+      "license": "Statistics Iceland terms of use: reuse with Statistics Iceland acknowledged as the source"
+    },
+    "kos02004": {
+      "title": "KOS02004: Participation in presidential elections 1952-2024",
+      "publisher": "Hagstofa Íslands (Statistics Iceland)",
+      "url": "https://px.hagstofa.is/pxen/pxweb/en/Ibuar/Ibuar__kosningar__kosningayfirlit/KOS02004.px/",
+      "kind": "official_body",
+      "license": "Statistics Iceland terms of use: reuse with Statistics Iceland acknowledged as the source"
+    },
+    "kos02005": {
+      "title": "KOS02005: Participation in local government elections 1938-2022",
+      "publisher": "Hagstofa Íslands (Statistics Iceland)",
+      "url": "https://px.hagstofa.is/pxen/pxweb/en/Ibuar/Ibuar__kosningar__kosningayfirlit/KOS02005.px/",
+      "kind": "official_body",
+      "license": "Statistics Iceland terms of use: reuse with Statistics Iceland acknowledged as the source"
+    },
+    "kos02006": {
+      "title": "KOS02006: Participation in elections to the Reykjavík City Council 1908-2022",
+      "publisher": "Hagstofa Íslands (Statistics Iceland)",
+      "url": "https://px.hagstofa.is/pxen/pxweb/en/Ibuar/Ibuar__kosningar__kosningayfirlit/KOS02006.px/",
+      "kind": "official_body",
+      "license": "Statistics Iceland terms of use: reuse with Statistics Iceland acknowledged as the source"
+    },
+    "kos02124": {
+      "title": "KOS02124: Results of general elections to the Althingi by constituency 1959-1999",
+      "publisher": "Hagstofa Íslands (Statistics Iceland)",
+      "url": "https://px.hagstofa.is/pxen/pxweb/en/Ibuar/Ibuar__kosningar__althingi__althurslit/KOS02124.px/",
+      "kind": "official_body",
+      "license": "Statistics Iceland terms of use: reuse with Statistics Iceland acknowledged as the source"
+    },
+    "kos02122": {
+      "title": "KOS02122: Results of general elections to the Althingi by constituency 2003-2009",
+      "publisher": "Hagstofa Íslands (Statistics Iceland)",
+      "url": "https://px.hagstofa.is/pxen/pxweb/en/Ibuar/Ibuar__kosningar__althingi__althurslit/KOS02122.px/",
+      "kind": "official_body",
+      "license": "Statistics Iceland terms of use: reuse with Statistics Iceland acknowledged as the source"
+    },
+    "kos02018": {
+      "title": "KOS02018: Results of general elections to the Althingi by constituency 2024",
+      "publisher": "Hagstofa Íslands (Statistics Iceland)",
+      "url": "https://px.hagstofa.is/pxen/pxweb/en/Ibuar/Ibuar__kosningar__althingi__althurslit/KOS02018.px/",
+      "kind": "official_body",
+      "license": "Statistics Iceland terms of use: reuse with Statistics Iceland acknowledged as the source"
+    },
+    "kos03101": {
+      "title": "KOS03101: Local government elections 1962-2022",
+      "publisher": "Hagstofa Íslands (Statistics Iceland)",
+      "url": "https://px.hagstofa.is/pxen/pxweb/en/Ibuar/Ibuar__kosningar__sveitastjorn__svf_yfirlit/KOS03101.px/",
+      "kind": "official_body",
+      "license": "Statistics Iceland terms of use: reuse with Statistics Iceland acknowledged as the source"
+    },
+    "kos03107": {
+      "title": "KOS03107: Results in municipal elections in Reykjavík 1930-2022",
+      "publisher": "Hagstofa Íslands (Statistics Iceland)",
+      "url": "https://px.hagstofa.is/pxen/pxweb/en/Ibuar/Ibuar__kosningar__sveitastjorn__svf_yfirlit/KOS03107.px/",
+      "kind": "official_body",
+      "license": "Statistics Iceland terms of use: reuse with Statistics Iceland acknowledged as the source"
+    },
+    "kos03214a": {
+      "title": "KOS03214a: Results in proportional voting by municipality 2022",
+      "publisher": "Hagstofa Íslands (Statistics Iceland)",
+      "url": "https://px.hagstofa.is/pxen/pxweb/en/Ibuar/Ibuar__kosningar__sveitastjorn__svf_urslit/KOS03214a.px/",
+      "kind": "official_body",
+      "license": "Statistics Iceland terms of use: reuse with Statistics Iceland acknowledged as the source"
+    },
+    "kos04101": {
+      "title": "KOS04101: Results for referenda 1908-2011",
+      "publisher": "Hagstofa Íslands (Statistics Iceland)",
+      "url": "https://px.hagstofa.is/pxen/pxweb/en/Ibuar/Ibuar__kosningar__thjodaratkv/KOS04101.px/",
+      "kind": "official_body",
+      "license": "Statistics Iceland terms of use: reuse with Statistics Iceland acknowledged as the source"
+    },
+    "kos04102": {
+      "title": "KOS04102: Results for referenda by constituency 2010 and 2011",
+      "publisher": "Hagstofa Íslands (Statistics Iceland)",
+      "url": "https://px.hagstofa.is/pxen/pxweb/en/Ibuar/Ibuar__kosningar__thjodaratkv/KOS04102.px/",
+      "kind": "official_body",
+      "license": "Statistics Iceland terms of use: reuse with Statistics Iceland acknowledged as the source"
+    },
+    "kos04108": {
+      "title": "KOS04108: Results for referenda 20 October 2012",
+      "publisher": "Hagstofa Íslands (Statistics Iceland)",
+      "url": "https://px.hagstofa.is/pxen/pxweb/en/Ibuar/Ibuar__kosningar__thjodaratkv/KOS04108.px/",
+      "kind": "official_body",
+      "license": "Statistics Iceland terms of use: reuse with Statistics Iceland acknowledged as the source"
+    },
+    "kos07104": {
+      "title": "KOS07104: Results of presidential elections by constituency 1952-1996",
+      "publisher": "Hagstofa Íslands (Statistics Iceland)",
+      "url": "https://px.hagstofa.is/pxen/pxweb/en/Ibuar/Ibuar__kosningar__forsetakosningar/KOS07104.px/",
+      "kind": "official_body",
+      "license": "Statistics Iceland terms of use: reuse with Statistics Iceland acknowledged as the source"
+    },
+    "kos07110": {
+      "title": "KOS07110: Results of presidential elections by candidate and constituency 2004-2024",
+      "publisher": "Hagstofa Íslands (Statistics Iceland)",
+      "url": "https://px.hagstofa.is/pxen/pxweb/en/Ibuar/Ibuar__kosningar__forsetakosningar/KOS07110.px/",
+      "kind": "official_body",
+      "license": "Statistics Iceland terms of use: reuse with Statistics Iceland acknowledged as the source"
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "Ísland",
+      "name_en": "Iceland",
+      "parent": null,
+      "polity_kind": "sovereign_state",
+      "scheme": "is.landid",
+      "source": "const"
+    },
+    {
+      "key": "kjordaemi",
+      "name": "Kjördæmi",
+      "name_en": "Althing constituencies",
+      "parent": "national",
+      "elects": false,
+      "scheme": "is.kjordaemi",
+      "source": "ea2021",
+      "counts": [
+        {
+          "date": "1959-10-25",
+          "value": 8,
+          "source": "kos02124",
+          "locator": "Constituency values: Reykjavík, Reykjanes, West, Westfjords, North West, North East, East, South"
+        },
+        {
+          "date": "2022-01-01",
+          "value": 6,
+          "source": "ea2021",
+          "locator": "Art. 7: North-Western, North-Eastern, Southern, South-Western, Reykjavík South and Reykjavík North"
+        }
+      ]
+    },
+    {
+      "key": "sysla",
+      "name": "Sýslur",
+      "name_en": "Counties",
+      "parent": "national",
+      "polity_kind": "county",
+      "valid_to": "1989-01-01",
+      "source": "kos02005"
+    },
+    {
+      "key": "sveitarfelag",
+      "name": "Sveitarfélög",
+      "name_en": "Municipalities",
+      "parent": "national",
+      "polity_kind": "municipality",
+      "scheme": "is.sveitarfelag",
+      "source": "const",
+      "counts": [
+        {
+          "date": "2022-05-14",
+          "value": 64,
+          "source": "statice-local2022",
+          "locator": "\"included all 64 municipalities in the country\""
+        },
+        {
+          "date": "2025-01-01",
+          "value": 62,
+          "source": "statice-pop2025",
+          "locator": "\"There were a total of 62 municipalities in Iceland on January 1, 2025, two less than the previous year\""
+        },
+        {
+          "date": "2026-01-01",
+          "value": 62,
+          "source": "statice-pop2026",
+          "locator": "\"There were a total of 62 municipalities in Iceland on January 1, 2026\""
+        }
+      ]
+    },
+    {
+      "key": "heimastjorn",
+      "name": "Heimastjórnir",
+      "name_en": "Local boards (Múlaþing)",
+      "parent": "sveitarfelag",
+      "polity_kind": "submunicipal",
+      "valid_from": "2020-09-19",
+      "source": "mul-samthykkt",
+      "counts": [
+        {
+          "date": "2026-07-01",
+          "precision": "month",
+          "value": 4,
+          "source": "mul-samthykkt",
+          "locator": "Art. 36: Heimastjórn Borgarfjarðar, Djúpavogs, Fljótsdalshéraðs, Seyðisfjarðar"
+        }
+      ]
+    }
+  ],
+  "classes": [
+    {
+      "key": "althingi",
+      "tier": "national",
+      "name": "Alþingiskosningar",
+      "name_en": "Althing general elections",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "constituency",
+        "schemes": [
+          "is.kjordaemi"
+        ]
+      },
+      "finest_note": "Statistics Iceland publishes list votes by constituency (8 constituencies 1959-1999, 6 since 2003) and only national totals before October 1959; votes by polling ward and by municipality are not published for Althing elections.",
+      "source": "const",
+      "locator": "https://www.government.is/library/01-Ministries/Prime-Ministrers-Office/constitution_of_iceland.pdf (Art. 31: 63 members elected by proportional representation for four years, in no fewer than six and no more than seven constituencies)",
+      "first_held": "1874-01-01",
+      "earliest_record": "1874-01-01",
+      "note": "The Althing gained legislative power under the constitution of 1874; Statistics Iceland's series starts with the 1874 election. Single- and two-member constituencies until 1959 (with proportional representation in Reykjavík from 1920 and supplementary seats from 1934); eight multi-member constituencies with national adjustment seats from October 1959 (60 seats, 63 from 1987); six constituencies with 9 adjustment seats since 2003 (D'Hondt in each constituency, Arts. 109-110 of the Elections Act). The 1916-1930 elections of nationally elected members are the landskjor class.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "unicameral",
+            "lower_house"
+          ],
+          "iso_pattern": "IS",
+          "valid_from": "1874-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 0,
+          "term_years": 4,
+          "called": true,
+          "partisan": true,
+          "administered_by": "Landskjörstjórn (National Electoral Commission)",
+          "source": "ea2021",
+          "locator": "https://www.stjornarradid.is/library/03-Verkefni/Kosningar/Kosningalog_enska.pdf (Art. 23: the electoral term shall be four years; if the Althingi is dissolved, elections are held on the date the dissolution takes effect)",
+          "valid_from": "2022-01-01"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Statistics Iceland PxWeb (elections)",
+          "url": "https://px.hagstofa.is/pxen/api/v1/en/Ibuar/kosningar/althingi/althurslit/",
+          "format": "json-stat2, csv, px",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Statistics Iceland terms of use: reuse with Statistics Iceland acknowledged as the source",
+          "first_date": "1874-01-01",
+          "last_date": "2024-11-30",
+          "finest": "is.kjordaemi",
+          "source": "hs-px",
+          "evidence": "KOS02124 (by constituency 1959-1999), KOS02122 (2003-2009), KOS02118c/b/a (2013-2017), KOS02019 (2021), KOS02018 (2024); KOS01900 and KOS02001 national turnout from 1874. The API answered 429 (rate limit) to this session; the table pages answered."
+        },
+        {
+          "role": "administers",
+          "platform": "Landskjörstjórn (island.is)",
+          "url": "https://island.is/s/landskjorstjorn/althingiskosningar",
+          "format": "html, pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "finest": "is.kjordaemi",
+          "source": "lk-althingi",
+          "evidence": "Commission since 2022 (Elections Act Art. 14(e): publish the results of elections); notices and allocation reports"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1874-01-01",
+          "precision": "year",
+          "note": "Statistics Iceland gives only the season or month of this election.",
+          "source": "kos02001",
+          "quote": "1874, autumn"
+        },
+        {
+          "date": "1880-09-01",
+          "precision": "month",
+          "note": "Statistics Iceland gives only the season or month of this election.",
+          "source": "kos02001",
+          "quote": "1880, September"
+        },
+        {
+          "date": "1886-06-01",
+          "precision": "month",
+          "note": "Statistics Iceland gives only the season or month of this election.",
+          "source": "kos02001",
+          "quote": "1886, June"
+        },
+        {
+          "date": "1892-09-01",
+          "precision": "month",
+          "note": "Statistics Iceland gives only the season or month of this election.",
+          "source": "kos02001",
+          "quote": "1892, September"
+        },
+        {
+          "date": "1894-06-01",
+          "precision": "month",
+          "note": "Statistics Iceland gives only the season or month of this election.",
+          "source": "kos02001",
+          "quote": "1894, June"
+        },
+        {
+          "date": "1900-09-01",
+          "precision": "month",
+          "note": "Statistics Iceland gives only the season or month of this election.",
+          "source": "kos02001",
+          "quote": "1900, September"
+        },
+        {
+          "date": "1902-06-01",
+          "precision": "month",
+          "note": "Statistics Iceland gives only the season or month of this election.",
+          "source": "kos02001",
+          "quote": "1902, June"
+        },
+        {
+          "date": "1903-06-01",
+          "precision": "month",
+          "note": "Statistics Iceland gives only the season or month of this election.",
+          "source": "kos02001",
+          "quote": "1903, June"
+        },
+        {
+          "date": "1908-09-10",
+          "note": "Dated as in the overview table (KOS01900); the participation table (KOS02001) prints 11 April 1908, which swaps the 1908 and 1914 days.",
+          "source": "kos02001",
+          "quote": "1908, 10 September"
+        },
+        {
+          "date": "1911-10-28",
+          "source": "kos02001",
+          "quote": "1911, 28 October"
+        },
+        {
+          "date": "1914-04-11",
+          "note": "Dated as in the overview table (KOS01900); the participation table (KOS02001) prints 10 September 1914, which swaps the 1908 and 1914 days.",
+          "source": "kos02001",
+          "quote": "1914, 11 April"
+        },
+        {
+          "date": "1916-10-21",
+          "source": "kos02001",
+          "quote": "1916, 21 October"
+        },
+        {
+          "date": "1919-11-15",
+          "source": "kos02001",
+          "quote": "1919, 15 November"
+        },
+        {
+          "date": "1923-10-27",
+          "source": "kos02001",
+          "quote": "1923, 27 October"
+        },
+        {
+          "date": "1927-07-09",
+          "source": "kos02001",
+          "quote": "1927, 9 July"
+        },
+        {
+          "date": "1931-06-12",
+          "source": "kos02001",
+          "quote": "1931, 12 June"
+        },
+        {
+          "date": "1933-07-16",
+          "source": "kos02001",
+          "quote": "1933, 16 July"
+        },
+        {
+          "date": "1934-06-24",
+          "source": "kos02001",
+          "quote": "1934, 24 June"
+        },
+        {
+          "date": "1937-06-29",
+          "source": "kos02001",
+          "quote": "1937, 29 June"
+        },
+        {
+          "date": "1942-07-05",
+          "source": "kos02001",
+          "quote": "1942, 5 July"
+        },
+        {
+          "date": "1942-10-18",
+          "note": "Polling over 18-19 October.",
+          "source": "kos02001",
+          "quote": "1942, 18-19 October"
+        },
+        {
+          "date": "1946-06-30",
+          "source": "kos02001",
+          "quote": "1946, 30 June"
+        },
+        {
+          "date": "1949-10-23",
+          "note": "Polling over 23-24 October.",
+          "source": "kos02001",
+          "quote": "1949, 23-24 October"
+        },
+        {
+          "date": "1953-06-28",
+          "source": "kos02001",
+          "quote": "1953, 28 June"
+        },
+        {
+          "date": "1956-06-24",
+          "source": "kos02001",
+          "quote": "1956, 24 June"
+        },
+        {
+          "date": "1959-06-28",
+          "source": "kos02001",
+          "quote": "1959, 28 June"
+        },
+        {
+          "date": "1959-10-25",
+          "contests": 8,
+          "source": "kos02124",
+          "quote": "Constituency values: Reykjavík | Reykjanes | West | Westfjords | North West | North East | East | South (time value '25-26 October 1959')",
+          "note": "Polling over 25-26 October."
+        },
+        {
+          "date": "1963-06-09",
+          "contests": 8,
+          "source": "kos02124",
+          "quote": "Constituency values: Reykjavík | Reykjanes | West | Westfjords | North West | North East | East | South (time value '9 June 1963')"
+        },
+        {
+          "date": "1967-06-11",
+          "contests": 8,
+          "source": "kos02124",
+          "quote": "Constituency values: Reykjavík | Reykjanes | West | Westfjords | North West | North East | East | South (time value '11 June 1967')"
+        },
+        {
+          "date": "1971-06-13",
+          "contests": 8,
+          "source": "kos02124",
+          "quote": "Constituency values: Reykjavík | Reykjanes | West | Westfjords | North West | North East | East | South (time value '13 June 1971')"
+        },
+        {
+          "date": "1974-06-30",
+          "contests": 8,
+          "source": "kos02124",
+          "quote": "Constituency values: Reykjavík | Reykjanes | West | Westfjords | North West | North East | East | South (time value '30 June 1974')"
+        },
+        {
+          "date": "1978-06-25",
+          "contests": 8,
+          "source": "kos02124",
+          "quote": "Constituency values: Reykjavík | Reykjanes | West | Westfjords | North West | North East | East | South (time value '25 June 1978')"
+        },
+        {
+          "date": "1979-12-02",
+          "contests": 8,
+          "source": "kos02124",
+          "quote": "Constituency values: Reykjavík | Reykjanes | West | Westfjords | North West | North East | East | South (time value '2-3 December 1979')",
+          "note": "Polling over 2-3 December."
+        },
+        {
+          "date": "1983-04-23",
+          "contests": 8,
+          "source": "kos02124",
+          "quote": "Constituency values: Reykjavík | Reykjanes | West | Westfjords | North West | North East | East | South (time value '23 April 1983')"
+        },
+        {
+          "date": "1987-04-25",
+          "contests": 8,
+          "source": "kos02124",
+          "quote": "Constituency values: Reykjavík | Reykjanes | West | Westfjords | North West | North East | East | South (time value '25 April 1987')"
+        },
+        {
+          "date": "1991-04-20",
+          "contests": 8,
+          "source": "kos02124",
+          "quote": "Constituency values: Reykjavík | Reykjanes | West | Westfjords | North West | North East | East | South (time value '20 April 1991')"
+        },
+        {
+          "date": "1995-04-08",
+          "contests": 8,
+          "source": "kos02124",
+          "quote": "Constituency values: Reykjavík | Reykjanes | West | Westfjords | North West | North East | East | South (time value '8 April 1995')"
+        },
+        {
+          "date": "1999-05-08",
+          "contests": 8,
+          "source": "kos02124",
+          "quote": "Constituency values: Reykjavík | Reykjanes | West | Westfjords | North West | North East | East | South (time value '8 May 1999')"
+        },
+        {
+          "date": "2003-05-10",
+          "contests": 6,
+          "seats": 63,
+          "source": "kos02122",
+          "quote": "Northwest | Northeast | South | Southwest | Reykjavík south | Reykjavík north (2003 | 2007 | 2009)"
+        },
+        {
+          "date": "2007-05-12",
+          "contests": 6,
+          "seats": 63,
+          "source": "kos02122",
+          "quote": "Northwest | Northeast | South | Southwest | Reykjavík south | Reykjavík north (2003 | 2007 | 2009)"
+        },
+        {
+          "date": "2009-04-25",
+          "contests": 6,
+          "seats": 63,
+          "source": "kos02122",
+          "quote": "Northwest | Northeast | South | Southwest | Reykjavík south | Reykjavík north (2003 | 2007 | 2009)"
+        },
+        {
+          "date": "2013-04-27",
+          "source": "kos02001",
+          "quote": "2013, 27 April"
+        },
+        {
+          "date": "2016-10-29",
+          "source": "kos02001",
+          "quote": "2016, 29 October"
+        },
+        {
+          "date": "2017-10-28",
+          "source": "kos02001",
+          "quote": "2017, 28 October"
+        },
+        {
+          "date": "2021-09-25",
+          "source": "kos02001",
+          "quote": "2021, 25 September"
+        },
+        {
+          "date": "2024-11-30",
+          "contests": 6,
+          "seats": 63,
+          "source": "kos02018",
+          "quote": "Northwest | Northeast | South | Southwest | Reykjavík south | Reykjavík north (2024)"
+        }
+      ],
+      "est_votes": 4500000,
+      "effort": 2
+    },
+    {
+      "key": "landskjor",
+      "tier": "national",
+      "name": "Landskjör til Alþingis",
+      "name_en": "Althing elections of nationally elected members",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "is.landid"
+        ]
+      },
+      "source": "kos02002",
+      "valid_from": "1916-01-01",
+      "valid_to": "1934-01-01",
+      "first_held": "1916-08-05",
+      "earliest_record": "1916-08-05",
+      "note": "Separate nationwide list elections of the Althing's nationally elected members (landskjörnir þingmenn), in which only voters aged 35 and over took part; abolished by the constitutional amendment that took effect for the 1934 election. The 23 October 1926 poll filled a single vacant seat.",
+      "match": [
+        {
+          "election_kinds": [
+            "special"
+          ],
+          "body_kinds": [
+            "unicameral",
+            "upper_house"
+          ],
+          "iso_pattern": "IS"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Statistics Iceland PxWeb (elections)",
+          "url": "https://px.hagstofa.is/pxen/pxweb/en/Ibuar/Ibuar__kosningar__kosningayfirlit/KOS02002.px/",
+          "format": "json-stat2, csv, px",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Statistics Iceland terms of use: reuse with Statistics Iceland acknowledged as the source",
+          "first_date": "1916-08-05",
+          "last_date": "1930-06-15",
+          "finest": "is.landid",
+          "source": "kos02002",
+          "evidence": "National turnout; list votes in KOS01900"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1916-08-05",
+          "source": "kos02002",
+          "quote": "1916, 5 August"
+        },
+        {
+          "date": "1922-07-08",
+          "source": "kos02002",
+          "quote": "1922, 8 July"
+        },
+        {
+          "date": "1926-07-01",
+          "source": "kos02002",
+          "quote": "1926, 1 July"
+        },
+        {
+          "date": "1926-10-23",
+          "source": "kos02002",
+          "quote": "1926, 23 October"
+        },
+        {
+          "date": "1930-06-15",
+          "source": "kos02002",
+          "quote": "1930, 15 June"
+        }
+      ],
+      "est_votes": 70000,
+      "effort": 2
+    },
+    {
+      "key": "althingi_by",
+      "tier": "national",
+      "name": "Aukakosningar til Alþingis",
+      "name_en": "Althing by-elections",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "kos01900",
+      "valid_to": "1959-10-25",
+      "note": "Vacancies in the single- and two-member constituencies were filled by by-elections; from October 1959 a vacancy passes to the next substitute on the list (Elections Act Art. 111) and no by-election is held.",
+      "disposition": "blocked",
+      "disposition_reason": "Statistics Iceland's election tables list general elections only (KOS01900 has no by-election rows), and no official list of the by-elections or their results was found; their returns sit in the Althing's own records (Alþingistíðindi) on althingi.is, which refused this session.",
+      "match": [
+        {
+          "election_kinds": [
+            "by_election"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "IS"
+        }
+      ],
+      "dates": [],
+      "est_votes": 20000,
+      "effort": 5
+    },
+    {
+      "key": "forseti",
+      "tier": "national",
+      "name": "Forsetakjör",
+      "name_en": "Presidential elections",
+      "category": "executive",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "is.landid"
+        ],
+        "fine": [
+          "is.kjordaemi",
+          "is.sveitarfelag"
+        ]
+      },
+      "finest_note": "Candidate votes by constituency (KOS07112 for 1952-1996, KOS07110 since 2004); turnout but not candidate votes by municipality from 2012 (KOS07002).",
+      "source": "const",
+      "locator": "https://www.government.is/library/01-Ministries/Prime-Ministrers-Office/constitution_of_iceland.pdf (Arts. 3-7: elected by direct secret ballot; the candidate with the most votes is elected; a sole candidate is elected without a vote)",
+      "first_held": "1952-06-29",
+      "earliest_record": "1952-06-29",
+      "note": "Plurality, one round. Only contested elections are polled: a sole candidate is declared elected without a vote (Constitution Art. 5; Elections Act Art. 122), so the years with one candidate have no poll and no contest. The first president was chosen by the Althing in 1944 (class forseti_althingi).",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "special"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "IS"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 0,
+          "month": 6,
+          "day_rule": "first Saturday of June not falling on the Saturday before Whitsun (then one week later)",
+          "term_years": 4,
+          "called": false,
+          "partisan": false,
+          "administered_by": "Landskjörstjórn (National Electoral Commission)",
+          "source": "ea2021",
+          "locator": "https://www.stjornarradid.is/library/03-Verkefni/Kosningar/Kosningalog_enska.pdf (Art. 25: presidential elections every four years on the first Saturday of June not falling on the Saturday immediately preceding Whitsun)",
+          "vacancy_rule": "On death or resignation a new president is elected within one year, on a day the National Electoral Commission sets (Elections Act Art. 25(2)).",
+          "valid_from": "2022-01-01"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Statistics Iceland PxWeb (elections)",
+          "url": "https://px.hagstofa.is/pxen/pxweb/en/Ibuar/Ibuar__kosningar__forsetakosningar/",
+          "format": "json-stat2, csv, px",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Statistics Iceland terms of use: reuse with Statistics Iceland acknowledged as the source",
+          "first_date": "1952-06-29",
+          "last_date": "2024-06-01",
+          "finest": "is.kjordaemi",
+          "source": "kos07110",
+          "evidence": "KOS07112 (by candidate and constituency 1952-1996), KOS07110 (2004-2024), KOS07002 (turnout by municipality 2012-2024)"
+        },
+        {
+          "role": "administers",
+          "platform": "Landskjörstjórn (island.is)",
+          "url": "https://island.is/s/landskjorstjorn/forsetakjor",
+          "format": "html, pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "source": "lk-forseti",
+          "evidence": "Next election 10 June 2028"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1952-06-29",
+          "source": "kos02004",
+          "quote": "1952, 29 June",
+          "note": "The overview table KOS01900 prints 29 July 1952."
+        },
+        {
+          "date": "1968-06-30",
+          "source": "kos02004",
+          "quote": "1968, 30 June"
+        },
+        {
+          "date": "1980-06-29",
+          "source": "kos02004",
+          "quote": "1980, 29 June"
+        },
+        {
+          "date": "1988-06-25",
+          "source": "kos02004",
+          "quote": "1988, 25 June"
+        },
+        {
+          "date": "1996-06-29",
+          "source": "kos02004",
+          "quote": "1996, 29 June"
+        },
+        {
+          "date": "2004-06-26",
+          "source": "kos02004",
+          "quote": "2004, 26 June",
+          "note": "The overview table KOS01900 prints 26 May 2004."
+        },
+        {
+          "date": "2012-06-30",
+          "source": "kos02004",
+          "quote": "2012, 30 June"
+        },
+        {
+          "date": "2016-06-25",
+          "source": "kos02004",
+          "quote": "2016, 25 June"
+        },
+        {
+          "date": "2020-06-27",
+          "source": "kos02004",
+          "quote": "2020, 27 June"
+        },
+        {
+          "date": "2024-06-01",
+          "source": "kos02004",
+          "quote": "2024, 1 June"
+        }
+      ],
+      "est_votes": 1500000,
+      "effort": 2
+    },
+    {
+      "key": "forseti_althingi",
+      "tier": "national",
+      "name": "Kjör ríkisstjóra og forseta á Alþingi",
+      "name_en": "Regent and first president chosen by the Althing",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "const",
+      "valid_to": "1944-06-18",
+      "first_held": "1941-01-01",
+      "note": "The Althing elected a regent (ríkisstjóri) to exercise the king's powers in 1941, 1942, and 1943, and on 17 June 1944, the day the republic's constitution took effect, elected the first President of Iceland for one year; every later president was elected by the people (Constitution Art. 3) or declared elected as the sole candidate.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "IS"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1944-06-17",
+          "note": "First president elected by the Althing at Þingvellir.",
+          "source": "const",
+          "quote": "Constitution of the Republic of Iceland (No. 33, 17 June 1944 ...)"
+        }
+      ],
+      "est_votes": 250,
+      "effort": 2
+    },
+    {
+      "key": "thjodaratkvaedi",
+      "tier": "national",
+      "name": "Þjóðaratkvæðagreiðslur",
+      "name_en": "National referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "is.landid"
+        ],
+        "fine": [
+          "is.kjordaemi",
+          "is.sveitarfelag"
+        ]
+      },
+      "finest_note": "Yes and no votes by constituency for 2010, 2011, and 2012 (KOS04102, KOS04109) and in the Commission's 2026 report; national totals only for 1908-1944; turnout by municipality for 2010-2012 (KOS04105).",
+      "source": "ea2021",
+      "locator": "https://www.stjornarradid.is/library/03-Verkefni/Kosningar/Kosningalog_enska.pdf (Art. 2: referendums the Althing decides on, and those under Arts. 11(3), 26, and 79(2) of the Constitution; Art. 26: timing)",
+      "first_held": "1908-01-01",
+      "earliest_record": "1908-01-01",
+      "note": "Advisory referendums called by the Althing (1908 alcohol import ban, 1916 civic duty, 1933 repeal of the ban, 2012 constitutional proposals, 2026 resuming EU accession talks), the binding 1918 vote on the Act of Union and 1944 votes on the republic, and the two votes on bills the President refused to sign (Icesave, 2010 and 2011, under Constitution Art. 26). Each question is one contest.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "iso_pattern": "IS"
+        }
+      ],
+      "cadence": [
+        {
+          "selection": "elected",
+          "called": true,
+          "administered_by": "Landskjörstjórn (National Electoral Commission)",
+          "source": "ea2021",
+          "locator": "https://www.stjornarradid.is/library/03-Verkefni/Kosningar/Kosningalog_enska.pdf (Art. 26: held three months to one year after the Althing's resolution, or within two months of a refusal under Constitution Art. 26)",
+          "valid_from": "2022-01-01"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Statistics Iceland PxWeb (elections)",
+          "url": "https://px.hagstofa.is/pxen/pxweb/en/Ibuar/Ibuar__kosningar__thjodaratkv/",
+          "format": "json-stat2, csv, px",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Statistics Iceland terms of use: reuse with Statistics Iceland acknowledged as the source",
+          "first_date": "1908-01-01",
+          "last_date": "2012-10-20",
+          "finest": "is.kjordaemi",
+          "source": "kos04101",
+          "evidence": "KOS04101 (national results 1908-2011), KOS04102 and KOS04109 (by constituency 2010-2012), KOS04108 (the six 2012 questions)"
+        },
+        {
+          "platform": "Landskjörstjórn (island.is)",
+          "url": "https://island.is/s/landskjorstjorn/frett/landskjorstjorn-tilkynnir-nidurstodu-thjodaratkvaedagreidslu",
+          "format": "html, pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "2026-08-29",
+          "last_date": "2026-08-29",
+          "finest": "is.kjordaemi",
+          "source": "lk-ref2026",
+          "evidence": "Notice of result (Yes 105,338, No 118,047, blank and void 1,646) and the Commission's election report PDF"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1908-01-01",
+          "precision": "year",
+          "contests": 1,
+          "note": "Held with the Althing election of 10 September 1908.",
+          "source": "kos04101",
+          "quote": "1908 Import ban on alcohol"
+        },
+        {
+          "date": "1916-01-01",
+          "precision": "year",
+          "contests": 1,
+          "note": "Held with the Althing election of 21 October 1916.",
+          "source": "kos04101",
+          "quote": "1916 Civic duty"
+        },
+        {
+          "date": "1918-10-19",
+          "contests": 1,
+          "source": "kos02003",
+          "quote": "1918, 19 October (KOS04101: 1918 The Danish-Icelandic Union Act)"
+        },
+        {
+          "date": "1933-10-21",
+          "contests": 1,
+          "source": "kos02003",
+          "quote": "1933, 21 October (KOS04101: 1933 Abolition of import ban on alcohol)"
+        },
+        {
+          "date": "1944-05-20",
+          "contests": 2,
+          "note": "Polling over 20-23 May.",
+          "source": "kos04101",
+          "quote": "1944 Abrogation of the Danish-Icelandic Union Act of 1918 | 1944 Constitution of the Republic of Iceland (KOS02003: 1944, 20-23 May)"
+        },
+        {
+          "date": "2010-03-06",
+          "contests": 1,
+          "source": "kos04101",
+          "quote": "2010 State guarantee of the Icesave loan agreement (KOS02003: 2010, 6 March)"
+        },
+        {
+          "date": "2011-04-09",
+          "contests": 1,
+          "source": "kos04101",
+          "quote": "2011 State guarantee of the Icesave loan agreement (KOS02003: 2011, 9 April)"
+        },
+        {
+          "date": "2012-10-20",
+          "contests": 6,
+          "source": "kos04108",
+          "quote": "Questions 1. ... to 6. ... (Results for referenda 20 October 2012)"
+        },
+        {
+          "date": "2026-08-29",
+          "contests": 1,
+          "source": "lk-ref2026",
+          "quote": "þjóðaratkvæðagreiðslu þeirrar sem haldin var 29. ágúst síðastliðinn ... um hvort Ísland ætti að hefja á ný aðildarviðræður við Evrópusambandið"
+        }
+      ],
+      "est_votes": 1700000,
+      "effort": 2
+    },
+    {
+      "key": "stjornlagathing",
+      "tier": "national",
+      "name": "Kosning til stjórnlagaþings",
+      "name_en": "Constitutional Assembly election",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "is.landid"
+        ]
+      },
+      "source": "stj-2010",
+      "valid_from": "2010-01-01",
+      "valid_to": "2011-01-25",
+      "first_held": "2010-11-27",
+      "earliest_record": "2010-11-27",
+      "note": "A single nationwide constituency electing 25 members by single transferable vote from 522 candidates; the Supreme Court annulled the election on 25 January 2011 and the Althing then appointed the 25 to a Constitutional Council instead, so the assembly never sat.",
+      "match": [
+        {
+          "body_kinds": [
+            "constituent_assembly"
+          ],
+          "iso_pattern": "IS"
+        }
+      ],
+      "access": [
+        {
+          "role": "administers",
+          "platform": "Landskjörstjórn (then under the Ministry of the Interior)",
+          "url": "https://www.stjornarradid.is/media/kosning.media/media/stjornlagathing-2010/stjornlagathing-frambjodendur-kynningarrit-2010.pdf",
+          "format": "pdf",
+          "access": "manual",
+          "checked_at": "2026-11-16",
+          "source": "stj-2010",
+          "evidence": "Candidate booklet with the ballot rules (25 preferences); the count report of the 2010 commission is not on the current Landskjörstjórn site"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2010-11-27",
+          "contests": 1,
+          "seats": 25,
+          "source": "stj-2010",
+          "quote": "Stjórnlagaþing skal skipað minnst 25 og mest 31 þjóðkjörnum fulltrúa. Þingfulltrúar verða valdir í persónukjöri 27. nóvember"
+        }
+      ],
+      "est_votes": 85000,
+      "effort": 3
+    },
+    {
+      "key": "radgjafarthing",
+      "tier": "national",
+      "name": "Kosningar til ráðgjafarþings",
+      "name_en": "Elections to the consultative Althing",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "constituency"
+      },
+      "source": "kos02001",
+      "valid_to": "1874-01-01",
+      "note": "The restored Althing met from 1845 as a consultative assembly with members elected in the counties (sýslur) and Reykjavík until the constitution of 1874 gave it legislative power.",
+      "disposition": "blocked",
+      "disposition_reason": "Statistics Iceland's series begins with the 1874 election (KOS02001: 'Participation in general elections to the Althingi 1874-2024'); no official publication of the 1844-1869 returns was found.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "IS",
+          "valid_to": "1874-01-01"
+        }
+      ],
+      "dates": [],
+      "est_votes": 15000,
+      "effort": 5
+    },
+    {
+      "key": "profkjor",
+      "tier": "national",
+      "name": "Prófkjör",
+      "name_en": "Party primaries",
+      "category": "nominating",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "ea2021",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Parties choose and rank their list candidates in primaries (prófkjör) or by their own councils, run under party rules; the Elections Act regulates only the lists submitted, and no public authority runs or publishes the primaries.",
+      "match": [
+        {
+          "election_kinds": [
+            "primary"
+          ],
+          "iso_pattern": "IS"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "sveitarstjorn",
+      "tier": "sveitarfelag",
+      "name": "Sveitarstjórnarkosningar",
+      "name_en": "Municipal council elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "is.sveitarfelag"
+        ]
+      },
+      "finest_note": "Each municipality elects its council at large; Statistics Iceland publishes list votes and seats by municipality from 2002 (KOS03210-KOS03214a) and Reykjavík's results from 1930 (KOS03107). Polling wards are not published.",
+      "source": "ea2021",
+      "locator": "https://www.stjornarradid.is/library/03-Verkefni/Kosningar/Kosningalog_enska.pdf (Art. 24: general municipal elections; four-year term)",
+      "first_held": "1908-01-01",
+      "earliest_record": "1908-01-01",
+      "note": "Restricted proportional (list) elections by D'Hondt where two or more lists stand, unrestricted personal elections where none does, and an uncontested (sjálfkjörið) list where only one does (Elections Act Arts. 116-118). A single national election day since 1962 (KOS03101); merged municipalities may elect a council off the cycle, as Múlaþing did on 19 September 2020.",
+      "match": [
+        {
+          "election_kinds": [
+            "local"
+          ],
+          "body_kinds": [
+            "council"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "phase": 2,
+          "month": 5,
+          "day_rule": "third Saturday of May not falling on the Saturday before Whitsun (then one week earlier); the second Saturday until the 2026 election",
+          "term_years": 4,
+          "called": false,
+          "partisan": true,
+          "administered_by": "Senior electoral commission of each municipality (yfirkjörstjórn)",
+          "source": "lk-sveit",
+          "locator": "https://island.is/s/landskjorstjorn/sveitarstjornarkosningar (Sveitarstjórnarkosningar verða næst þann 18. maí 2030 ... fara fram þriðja laugardag í maímánuði sem ekki ber upp á laugardag fyrir hvítasunnu)",
+          "valid_from": "2022-01-01"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Statistics Iceland PxWeb (elections)",
+          "url": "https://px.hagstofa.is/pxen/pxweb/en/Ibuar/Ibuar__kosningar__sveitastjorn__svf_urslit/",
+          "format": "json-stat2, csv, px",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "Statistics Iceland terms of use: reuse with Statistics Iceland acknowledged as the source",
+          "first_date": "1938-01-01",
+          "last_date": "2022-05-14",
+          "finest": "is.sveitarfelag",
+          "source": "kos03214a",
+          "evidence": "List votes and seats by municipality 2002-2022 (KOS03210-KOS03214a), turnout by municipality 2002-2022 (KOS03201-KOS03204b), national turnout from 1938 (KOS02005), Reykjavík results from 1930 (KOS03107); 2026 not yet published"
+        },
+        {
+          "role": "administers",
+          "platform": "Landskjörstjórn (island.is), reports of the municipal senior electoral commissions",
+          "url": "https://island.is/s/landskjorstjorn/frett/kosningaskyrslur-sveitarfelaga-adgengilegar-a-vef-landskjoerstjornar",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "2026-05-16",
+          "last_date": "2026-05-16",
+          "finest": "is.sveitarfelag",
+          "source": "lk-reports2026",
+          "evidence": "One report per municipality for 16 May 2026: list votes, seats, and candidate rankings"
+        },
+        {
+          "platform": "Stjórnarráð Íslands (reports of the municipal senior electoral commissions)",
+          "url": "https://www.stjornarradid.is/library/03-Verkefni/Kosningar/Sveitarstjkosn2022/Kosningaskyrslur/",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "2022-05-14",
+          "last_date": "2022-05-14",
+          "finest": "is.sveitarfelag",
+          "source": "stj-reports2022",
+          "evidence": "Per-municipality PDF (e.g. 7400 Múlaþing): list votes, seats, and each candidate's ranked votes under Arts. 116-117"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1908-01-01",
+          "precision": "year",
+          "note": "Reykjavík City Council only: Statistics Iceland's series for the other towns and rural municipalities starts in 1938.",
+          "source": "kos02006",
+          "quote": "1908"
+        },
+        {
+          "date": "1910-01-01",
+          "precision": "year",
+          "note": "Reykjavík City Council only: Statistics Iceland's series for the other towns and rural municipalities starts in 1938.",
+          "source": "kos02006",
+          "quote": "1910"
+        },
+        {
+          "date": "1912-01-01",
+          "precision": "year",
+          "note": "Reykjavík City Council only: Statistics Iceland's series for the other towns and rural municipalities starts in 1938.",
+          "source": "kos02006",
+          "quote": "1912"
+        },
+        {
+          "date": "1914-01-01",
+          "precision": "month",
+          "note": "Reykjavík City Council only.",
+          "source": "kos02006",
+          "quote": "1914, jan."
+        },
+        {
+          "date": "1914-12-01",
+          "precision": "month",
+          "note": "Reykjavík City Council only.",
+          "source": "kos02006",
+          "quote": "1914, des."
+        },
+        {
+          "date": "1916-01-01",
+          "precision": "year",
+          "note": "Reykjavík City Council only.",
+          "source": "kos02006",
+          "quote": "1916"
+        },
+        {
+          "date": "1918-01-01",
+          "precision": "year",
+          "note": "Reykjavík City Council only.",
+          "source": "kos02006",
+          "quote": "1918"
+        },
+        {
+          "date": "1920-01-01",
+          "precision": "month",
+          "note": "Reykjavík City Council only.",
+          "source": "kos02006",
+          "quote": "1920, jan."
+        },
+        {
+          "date": "1920-11-01",
+          "precision": "month",
+          "note": "Reykjavík City Council only.",
+          "source": "kos02006",
+          "quote": "1920, nóv."
+        },
+        {
+          "date": "1922-01-01",
+          "precision": "year",
+          "note": "Reykjavík City Council only.",
+          "source": "kos02006",
+          "quote": "1922"
+        },
+        {
+          "date": "1924-01-01",
+          "precision": "year",
+          "note": "Reykjavík City Council only.",
+          "source": "kos02006",
+          "quote": "1924"
+        },
+        {
+          "date": "1926-01-01",
+          "precision": "year",
+          "note": "Reykjavík City Council only.",
+          "source": "kos02006",
+          "quote": "1926"
+        },
+        {
+          "date": "1928-01-01",
+          "precision": "year",
+          "note": "Reykjavík City Council only.",
+          "source": "kos02006",
+          "quote": "1928"
+        },
+        {
+          "date": "1930-01-01",
+          "precision": "year",
+          "note": "Reykjavík City Council only.",
+          "source": "kos02006",
+          "quote": "1930"
+        },
+        {
+          "date": "1934-01-01",
+          "precision": "year",
+          "note": "Reykjavík City Council only.",
+          "source": "kos02006",
+          "quote": "1934"
+        },
+        {
+          "date": "1938-01-01",
+          "precision": "year",
+          "source": "kos02005",
+          "quote": "1938",
+          "note": "Nationwide turnout only; results by municipality are published from 2002, and before 1962 the towns and the rural municipalities voted on different days."
+        },
+        {
+          "date": "1942-01-01",
+          "precision": "year",
+          "source": "kos02005",
+          "quote": "1942",
+          "note": "Nationwide turnout only; results by municipality are published from 2002, and before 1962 the towns and the rural municipalities voted on different days."
+        },
+        {
+          "date": "1946-01-01",
+          "precision": "year",
+          "source": "kos02005",
+          "quote": "1946",
+          "note": "Nationwide turnout only; results by municipality are published from 2002, and before 1962 the towns and the rural municipalities voted on different days."
+        },
+        {
+          "date": "1950-01-01",
+          "precision": "year",
+          "source": "kos02005",
+          "quote": "1950",
+          "note": "Nationwide turnout only; results by municipality are published from 2002, and before 1962 the towns and the rural municipalities voted on different days."
+        },
+        {
+          "date": "1954-01-01",
+          "precision": "year",
+          "source": "kos02005",
+          "quote": "1954",
+          "note": "Nationwide turnout only; results by municipality are published from 2002, and before 1962 the towns and the rural municipalities voted on different days."
+        },
+        {
+          "date": "1958-01-01",
+          "precision": "year",
+          "source": "kos02005",
+          "quote": "1958",
+          "note": "Nationwide turnout only; results by municipality are published from 2002, and before 1962 the towns and the rural municipalities voted on different days."
+        },
+        {
+          "date": "1962-01-01",
+          "precision": "year",
+          "source": "kos02005",
+          "quote": "1962",
+          "note": "Nationwide turnout only; results by municipality are published from 2002, and before 1962 the towns and the rural municipalities voted on different days."
+        },
+        {
+          "date": "1966-01-01",
+          "precision": "year",
+          "source": "kos02005",
+          "quote": "1966",
+          "note": "Nationwide turnout only; results by municipality are published from 2002, and before 1962 the towns and the rural municipalities voted on different days."
+        },
+        {
+          "date": "1970-01-01",
+          "precision": "year",
+          "source": "kos02005",
+          "quote": "1970",
+          "note": "Nationwide turnout only; results by municipality are published from 2002, and before 1962 the towns and the rural municipalities voted on different days."
+        },
+        {
+          "date": "1974-01-01",
+          "precision": "year",
+          "source": "kos02005",
+          "quote": "1974",
+          "note": "Nationwide turnout only; results by municipality are published from 2002, and before 1962 the towns and the rural municipalities voted on different days."
+        },
+        {
+          "date": "1978-01-01",
+          "precision": "year",
+          "source": "kos02005",
+          "quote": "1978",
+          "note": "Nationwide turnout only; results by municipality are published from 2002, and before 1962 the towns and the rural municipalities voted on different days."
+        },
+        {
+          "date": "1982-01-01",
+          "precision": "year",
+          "source": "kos02005",
+          "quote": "1982",
+          "note": "Nationwide turnout only; results by municipality are published from 2002, and before 1962 the towns and the rural municipalities voted on different days."
+        },
+        {
+          "date": "1986-01-01",
+          "precision": "year",
+          "source": "kos02005",
+          "quote": "1986",
+          "note": "Nationwide turnout only; results by municipality are published from 2002, and before 1962 the towns and the rural municipalities voted on different days."
+        },
+        {
+          "date": "1990-01-01",
+          "precision": "year",
+          "source": "kos02005",
+          "quote": "1990",
+          "note": "Nationwide turnout only; results by municipality are published from 2002, and before 1962 the towns and the rural municipalities voted on different days."
+        },
+        {
+          "date": "1994-01-01",
+          "precision": "year",
+          "source": "kos02005",
+          "quote": "1994",
+          "note": "Nationwide turnout only; results by municipality are published from 2002, and before 1962 the towns and the rural municipalities voted on different days."
+        },
+        {
+          "date": "1998-01-01",
+          "precision": "year",
+          "source": "kos02005",
+          "quote": "1998",
+          "note": "Nationwide turnout only; results by municipality are published from 2002, and before 1962 the towns and the rural municipalities voted on different days."
+        },
+        {
+          "date": "2002-05-25",
+          "source": "kos02005",
+          "quote": "2002"
+        },
+        {
+          "date": "2006-05-27",
+          "source": "kos02005",
+          "quote": "2006"
+        },
+        {
+          "date": "2010-05-29",
+          "source": "kos02005",
+          "quote": "2010"
+        },
+        {
+          "date": "2014-05-31",
+          "source": "kos02005",
+          "quote": "2014"
+        },
+        {
+          "date": "2018-05-26",
+          "source": "kos02005",
+          "quote": "2018"
+        },
+        {
+          "date": "2020-09-19",
+          "contests": 1,
+          "seats": 11,
+          "note": "First election of the merged municipality of Múlaþing, outside the general cycle.",
+          "source": "statice-mulathing",
+          "quote": "The first elections to the local government in the municipality of Múlaþing took place on 19 September 2020. It was a restricted proportional voting."
+        },
+        {
+          "date": "2022-05-14",
+          "contests": 64,
+          "source": "statice-local2022",
+          "quote": "Local government elections took place on May 14 2022 and included all 64 municipalities in the country."
+        },
+        {
+          "date": "2026-05-16",
+          "source": "lk-local2026",
+          "quote": "Á grundvelli 1. mgr. 24. gr. kosningalaga, nr. 112/2021, fara almennar sveitarstjórnarkosningar fram 16. maí 2026."
+        }
+      ],
+      "est_votes": 2900000,
+      "effort": 3
+    },
+    {
+      "key": "ibuakosning",
+      "tier": "sveitarfelag",
+      "name": "Íbúakosningar sveitarfélaga",
+      "name_en": "Municipal referendums, including merger votes",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "is.sveitarfelag"
+        ]
+      },
+      "source": "mul-samthykkt",
+      "locator": "https://www.mulathing.is/static/files/samthykkt/um-stjorn-mulathings-juli2026.pdf (Art. 35: votes under the Regulation on municipal referendums No. 922/2023)",
+      "note": "Votes on mergers of municipalities and other local questions, held by each municipality under the Local Government Act and Regulation No. 922/2023; the National Electoral Commission does not run them.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ]
+        }
+      ],
+      "access": [
+        {
+          "role": "administers",
+          "platform": "Each municipality's website",
+          "url": "https://www.mulathing.is/",
+          "format": "html, pdf",
+          "access": "manual",
+          "checked_at": "2026-11-16",
+          "source": "mul-samthykkt",
+          "evidence": "No national register or results series; each municipality posts its own result"
+        }
+      ],
+      "dates": [],
+      "est_votes": 300000,
+      "effort": 5
+    },
+    {
+      "key": "heimastjorn",
+      "tier": "heimastjorn",
+      "name": "Kosningar til heimastjórna",
+      "name_en": "Local board elections in Múlaþing",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "mul-samthykkt",
+      "locator": "https://www.mulathing.is/static/files/samthykkt/um-stjorn-mulathings-juli2026.pdf (Art. 36: four local boards of three members, two members and two alternates elected directly)",
+      "valid_from": "2020-09-19",
+      "first_held": "2020-09-19",
+      "note": "Múlaþing's four local boards (Borgarfjörður, Djúpivogur, Fljótsdalshérað, Seyðisfjörður), each with two members elected by direct personal vote alongside the municipal election and one councillor named by the council.",
+      "match": [
+        {
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "submunicipal"
+          ],
+          "name_pattern": "[Hh]eimastj"
+        }
+      ],
+      "access": [
+        {
+          "role": "administers",
+          "platform": "Múlaþing",
+          "url": "https://www.mulathing.is/",
+          "format": "html, pdf",
+          "access": "manual",
+          "checked_at": "2026-11-16",
+          "source": "mul-samthykkt",
+          "evidence": "Results posted by the municipality; not in Statistics Iceland's tables"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2020-09-19",
+          "contests": 4,
+          "seats": 8,
+          "source": "mul-samthykkt",
+          "quote": "Kjósa skal til fjögurra heimastjórna ... Tveir fulltrúar og tveir til vara skulu kosnir beinni kosningu.",
+          "note": "With Múlaþing's first council election (Statistics Iceland, 9 August 2021)."
+        },
+        {
+          "date": "2022-05-14",
+          "contests": 4,
+          "seats": 8,
+          "source": "mul-samthykkt",
+          "quote": "Kjósa skal til fjögurra heimastjórna ... Tveir fulltrúar og tveir til vara skulu kosnir beinni kosningu."
+        },
+        {
+          "date": "2026-05-16",
+          "contests": 4,
+          "seats": 8,
+          "source": "mul-samthykkt",
+          "quote": "Kjósa skal til fjögurra heimastjórna ... Tveir fulltrúar og tveir til vara skulu kosnir beinni kosningu."
+        }
+      ],
+      "est_votes": 6000,
+      "effort": 3
+    },
+    {
+      "key": "syslunefnd",
+      "tier": "sysla",
+      "name": "Kosningar til sýslunefnda",
+      "name_en": "County council (sýslunefnd) elections",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "kos02005",
+      "valid_to": "1989-01-01",
+      "note": "Each rural municipality (hreppur) elected one member of its county council; the county councils were abolished at the end of 1988 and replaced by district committees named by the municipalities.",
+      "disposition": "blocked",
+      "disposition_reason": "No official series of county council returns exists: Statistics Iceland's local tables (KOS02005, KOS03101) cover municipal councils only, and the returns were kept in each county's minutes.",
+      "match": [
+        {
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "county"
+          ],
+          "iso_pattern": "IS*"
+        }
+      ],
+      "dates": [],
+      "est_votes": 100000,
+      "effort": 5
+    },
+    {
+      "key": "kirkja",
+      "tier": "national",
+      "name": "Kosningar innan þjóðkirkjunnar",
+      "name_en": "Church of Iceland elections (bishops, parish priests, church assembly)",
+      "category": "special_purpose",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "const",
+      "locator": "https://www.government.is/library/01-Ministries/Prime-Ministrers-Office/constitution_of_iceland.pdf (Art. 79(2): a change to the status of the Church is put to a referendum; that referendum is in thjodaratkvaedi)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Elections of bishops, parish priests, and the church assembly are run by the Church of Iceland under its own rules for its members; they fill no public office and no public election authority runs or publishes them.",
+      "match": [
+        {
+          "name_pattern": "[Bb]isk|[Kk]irkju",
+          "iso_pattern": "IS"
+        }
+      ],
+      "dates": []
+    }
+  ]
+}
