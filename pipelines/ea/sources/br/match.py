@@ -126,10 +126,11 @@ def cross_state(
     """Join persons who share a full name across states when the name is unique nationwide among plausible ages.
 
     Each career is (person, name slug, first year, last year, candidacies, parties at the first race, parties at the
-    last race). A name's persons merge only when, ordered by first year, each career ends before the next begins and
-    within CONSECUTIVE years, every neighbouring pair shares a Wikidata item or a party between the earlier person's
-    last race and the later person's first, and no two persons hold different items or different birth years. A name
-    with any other plausible namesake, or any pair that fails, is left apart.
+    last race). A name's persons merge only when, ordered by first year, each career ends before the next begins, every
+    neighboring pair shares a Wikidata item or, within CONSECUTIVE years, a party between the earlier person's last
+    race and the later person's first, and no two persons hold different items or different birth years. A shared
+    item bridges any gap, such as an exile under the military regime. A name with any other plausible namesake, or
+    any pair that fails, is left apart.
     """
     by_name: dict[str, list[tuple[str, str, int, int, int, set[str], set[str]]]] = defaultdict(list)
     for career in careers:
@@ -144,7 +145,7 @@ def cross_state(
             continue
         group.sort(key=lambda career: (career[2], career[3]))
         people = [career[0] for career in group]
-        if any(before[3] >= after[2] or after[2] - before[3] > CONSECUTIVE for before, after in pairwise(group)):
+        if any(before[3] >= after[2] for before, after in pairwise(group)):
             continue
         held = [items.get(person, set()) for person in people]
         if any(a and b and not a & b for i, a in enumerate(held) for b in held[i + 1 :]):
@@ -152,7 +153,10 @@ def cross_state(
         known = [births[person] for person in people if births.get(person)]
         if any(not a & b for i, a in enumerate(known) for b in known[i + 1 :]):
             continue
-        if not all(held[i] & held[i + 1] or before[6] & after[5] for i, (before, after) in enumerate(pairwise(group))):
+        if not all(
+            held[i] & held[i + 1] or (before[6] & after[5] and after[2] - before[3] <= CONSECUTIVE)
+            for i, (before, after) in enumerate(pairwise(group))
+        ):
             continue
         survivor = min(group, key=lambda career: (not items.get(career[0]), -career[4], career[0]))[0]
         for person in people:
