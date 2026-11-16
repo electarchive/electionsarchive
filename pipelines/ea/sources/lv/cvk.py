@@ -1,5 +1,6 @@
 import json
 import re
+import xml.etree.ElementTree as ET
 from collections import Counter
 from dataclasses import dataclass, field
 from datetime import date
@@ -39,12 +40,14 @@ URLS = {
 }
 
 DAYS = {
+    "2014-10-04": ("sv", "sv2014"),
     "2018-10-06": ("sv", "sv2018"),
     "2022-10-01": ("sv", "sv2022"),
     "2019-05-25": ("ep", "ep2019"),
     "2024-06-08": ("ep", "epv2024"),
 }
 SEATS = {"2019-05-25": 8, "2024-06-08": 9}
+REFERENDUMS = {"2011-07-23": "tn2011", "2012-02-18": "tn2012"}
 REGION_NAMES = {
     "1": ("Rīga", "Rīgas apgabals", "Riga constituency"),
     "2": ("Vidzeme", "Vidzemes apgabals", "Vidzeme constituency"),
@@ -55,10 +58,11 @@ REGION_NAMES = {
 REGION_SLUGS = {"1": "riga", "2": "vidzeme", "3": "latgale", "4": "kurzeme", "5": "zemgale"}
 METHOD = (
     "Counted per polling station (vēlēšanu iecirknis) and published by the Central Election Commission of Latvia "
-    "(Centrālā vēlēšanu komisija) as open data. Ballots cast are the voters who took part, and valid votes are the "
-    "valid marks for lists. Polling stations abroad are counted with the Riga constituency in Saeima elections. "
-    "Registered voters are published only where the file prints them. The commission's files also hold each "
-    "candidate's plus marks, minus marks, and valid-envelope counts; they are not stored here yet."
+    "(Centrālā vēlēšanu komisija) as open data. Each list's votes are its valid marks. Ballots cast are the voters "
+    "who took part, and valid votes are the valid marks for lists. Ballots cast, valid votes, and registered voters "
+    "are stored only where the commission's file prints them for the polling station. Polling stations abroad are "
+    "counted with the Riga constituency in Saeima elections. The commission's files also hold each candidate's plus "
+    "marks, minus marks, and valid-envelope counts; they are not stored here yet."
 )
 
 
@@ -118,6 +122,7 @@ class Reading:
     names: dict[int, str]
     running: set[tuple[str | None, int]] | None
     elected: list[Elected]
+    national: dict[int, int] = field(default_factory=dict)
 
     def region(self, node: Node) -> Node | None:
         while node.type > 1 and node.parent is not None:
@@ -267,14 +272,75 @@ def _tree() -> tuple[dict[str, Node], dict[int, str]]:
     return nodes, names
 
 
+def _xml2014() -> Reading:
+    root = ET.parse(path("sv2014/rezultsxml").path).getroot()
+    base = root.find("PamatTabulas")
+    nodes: dict[str, Node] = {}
+    names: dict[int, str] = {}
+    ballot: dict[str, int] = {}
+    for entry in base.find("Saraksti"):
+        ballot[entry.get("SarID")] = int(entry.get("Loze"))
+        names[int(entry.get("Loze"))] = clean(entry.get("Nosaukums"))
+    total = root.find("Valsts")
+    nodes["0"] = Node(
+        "0",
+        None,
+        0,
+        "0",
+        "Latvija",
+        "",
+        int(total.get("Balsstiesigie")),
+        int(total.get("Nobalsojusie")),
+        int(total.get("DerVelZimes")),
+        lists={ballot[e.get("SarID")]: int(e.get("Zimes")) for e in total},
+    )
+    national = {ballot[e.get("SarID")]: int(e.get("Vietas")) for e in total}
+    for e in base.find("Regioni"):
+        code = str(int(e.get("RegID")) - 1)
+        nodes[f"r{e.get('RegID')}"] = Node(
+            f"r{e.get('RegID')}", "0", 1, code, clean(e.get("Nosaukums")), "", None, None, None
+        )
+    for e in base.find("PilsetasUnNovadi"):
+        nodes[f"c{e.get('PilsNovID')}"] = Node(
+            f"c{e.get('PilsNovID')}",
+            f"r{e.get('RegID')}",
+            2,
+            e.get("PilsNovID"),
+            clean(e.get("Nosaukums")),
+            "",
+            None,
+            None,
+            None,
+        )
+    for e in base.find("Iecirkni"):
+        nodes[f"s{e.get('IecID')}"] = Node(
+            f"s{e.get('IecID')}",
+            f"c{e.get('PilsNovID')}",
+            3,
+            e.get("IecID"),
+            clean(e.get("Nosaukums")),
+            clean(e.get("Adrese")),
+            None,
+            None,
+            None,
+        )
+    for e in root.find("PartijasRegionos"):
+        nodes[f"r{e.get('RegID')}"].lists[ballot[e.get("SarID")]] = int(e.get("DerVelZimes"))
+    for e in root.find("PartijasIecirknos"):
+        nodes[f"s{e.get('IecID')}"].lists[ballot[e.get("SarID")]] = int(e.get("DerVelZimes"))
+    return Reading(nodes, names, None, [], national)
+
+
 def read(day: str) -> Reading:
     prefix = DAYS[day][1]
+    if prefix == "sv2014":
+        return _xml2014()
     nodes, names = _tree() if prefix == "epv2024" else _results(prefix)
     return Reading(nodes, names, _running(prefix), _elected(prefix))
 
 
 def packages() -> list[str]:
-    return ["lv.cvk/geo", "lv.cvk/registry", *(f"lv.cvk/{day}" for day in DAYS)]
+    return ["lv.cvk/geo", "lv.cvk/registry", *(f"lv.cvk/{day}" for day in sorted([*DAYS, *REFERENDUMS]))]
 
 
 def fetch() -> None:
@@ -287,6 +353,8 @@ def parse() -> None:
     registry().write()
     for day in DAYS:
         build(day).write()
+    for day in REFERENDUMS:
+        referendum(day).write()
 
 
 def emit() -> None:
@@ -409,7 +477,7 @@ def _title(day: str) -> tuple[str, str]:
     year = int(day[:4])
     if kind == "ep":
         return f"{year} European Parliament election in Latvia", f"{year}. gada Eiropas Parlamenta vēlēšanas"
-    number = {"2018-10-06": 13, "2022-10-01": 14}[day]
+    number = {"2014-10-04": 12, "2018-10-06": 13, "2022-10-01": 14}[day]
     return f"{year} Latvian parliamentary election", f"{number}. Saeimas vēlēšanas"
 
 
@@ -433,6 +501,19 @@ def build(day: str) -> Package:
     p.name(election, english, "en", "official")
     p.name(election, native, "lv", "native", False)
     p.add("slug", path=where, entity_id=election, is_current=True)
+    if r.national:
+        seats_text = "; ".join(f"{r.names[n]}: {v}" for n, v in sorted(r.national.items()) if v)
+        p.add(
+            "note",
+            id=key("note", election, "seats"),
+            entity_id=election,
+            kind="caveat",
+            body_md=(
+                "The commission's results file prints seats only for the whole country, not for each "
+                f"constituency, so no seats or elected candidates are stored per constituency. Seats by list: {seats_text}."
+            ),
+            lang="en",
+        )
     stations = {n.id: n for n in r.nodes.values() if n.type == 3}
     regions = [n for n in r.nodes.values() if n.type == 1]
     root = next(n for n in r.nodes.values() if n.type == 0)
@@ -564,3 +645,150 @@ def build(day: str) -> Package:
 def _rs_of(p: Package, option: str) -> str:
     contest = next(o["contest_id"] for o in p.rows["contest_option"] if o["id"] == option)
     return next(r["id"] for r in p.rows["result_set"] if r["contest_id"] == contest)
+
+
+REFERENDUM_TITLES = {
+    "2011-07-23": (
+        "2011 Latvian referendum on the dissolution of the Saeima",
+        "2011. gada tautas nobalsošana par 10. Saeimas atlaišanu",
+        "referendum",
+    ),
+    "2012-02-18": (
+        "2012 Latvian referendum on Russian as a second official language",
+        "2012. gada tautas nobalsošana par grozījumiem Satversmē (valodas referendums)",
+        "initiative",
+    ),
+}
+REFERENDUM_METHOD = (
+    "Counted per polling station and published by the Central Election Commission of Latvia as open data. "
+    "Registered voters are the voters attached to the polling station in the commission's file. Voters are those who "
+    "took part, ballots cast are the ballot papers counted, and invalid ballots are those declared invalid. The "
+    "file also prints envelope counts and the numbers of voters who did not take part; they are not stored here."
+)
+
+
+def _referendum(day: str) -> tuple[list[dict[str, str]], list[dict[str, int]], dict[str, int]]:
+    root = ET.parse(
+        path(f"{REFERENDUMS[day]}/" + ("results.xml" if day == "2011-07-23" else "results_tn2012.xml")).path
+    ).getroot()
+
+    def values(e: ET.Element) -> dict[str, int]:
+        return {v.get("id"): int(v.text) for v in e.findall("value")}
+
+    stations = [dict(e.attrib) for e in root.findall("district")]
+    figures = [values(e) for e in root.findall("district")]
+    if day == "2011-07-23":
+        names = [values(e) for e in root.findall("area")]
+        total = {k: sum(a[k] for a in names) for k in names[0]}
+    else:
+        total = values(root.find("area"))
+    return stations, figures, total
+
+
+def referendum(day: str) -> Package:
+    first = date.fromisoformat(day)
+    english, native, kind = REFERENDUM_TITLES[day]
+    p = Package(
+        f"lv.cvk/{day}",
+        SOURCE,
+        f"The {english} by polling station from the Central Election Commission",
+        depends=["lv.cvk/geo", "lv.cvk/registry"],
+    )
+    p.external |= {LATVIA, COUNTRY}
+    for name in files(REFERENDUMS[day]):
+        p.uses(path(name))
+    election = key("election", day)
+    where = f"lv/{day}-referendum"
+    p.add("election", id=election, polity_id=LATVIA, kind="referendum", date_from=first, date_to=first, status="held")
+    p.name(election, english, "en", "official")
+    p.name(election, native, "lv", "native", False)
+    p.add("slug", path=where, entity_id=election, is_current=True)
+    contest = key("contest", day, "question")
+    p.add(
+        "contest",
+        id=contest,
+        election_id=election,
+        kind="ballot_question",
+        district_area_id=COUNTRY,
+        round_number=1,
+        electoral_system_id=SYSTEM_REFERENDUM,
+        default_result_kind="counted",
+    )
+    p.name(contest, english, "en", "official")
+    p.name(contest, native, "lv", "native", False)
+    p.add("slug", path=f"{where}/question", entity_id=contest, is_current=True)
+    p.add("ballot_question", contest_id=contest, type=kind)
+    result_set = key("result_set", day, "question")
+    p.add(
+        "result_set",
+        id=result_set,
+        election_id=election,
+        contest_id=contest,
+        stage="official",
+        kind="counted",
+        source_id=CVK_SOURCE,
+        status="active",
+        is_default=True,
+        completeness=1.0,
+    )
+    p.add(
+        "note",
+        id=key("note", result_set),
+        entity_id=result_set,
+        kind="methodology",
+        body_md=REFERENDUM_METHOD,
+        lang="en",
+    )
+    answers = {}
+    for position, (column, label, english_label) in enumerate((("f2", "Par", "For"), ("f3", "Pret", "Against")), 1):
+        option = answers[column] = key("option", day, position)
+        p.add(
+            "contest_option",
+            id=option,
+            contest_id=contest,
+            kind="answer",
+            ballot_position=position,
+            ballot_label=f"{label} ({english_label})",
+        )
+    stations, figures, total = _referendum(day)
+    over = 0
+    for station, row in zip(stations, figures, strict=True):
+        code = f"{day}:{station['id']}"
+        unit = key("unit", code)
+        p.add(
+            "reporting_unit",
+            id=unit,
+            polity_id=LATVIA,
+            scheme_code="lv.iecirknis",
+            code=code,
+            area_relation="unlocated",
+            area_id=None,
+            kind="standard",
+        )
+        text = ", ".join(part for part in (clean(station.get("name")), clean(station.get("address"))) if part)
+        if text:
+            p.name(unit, text, "lv", "official")
+        for measure, column in ((REGISTERED, "c"), (14, "c3"), (CAST, "e"), (5, "f1")):
+            _put(p, result_set, unit, None, measure, row[column])
+        for column, option in answers.items():
+            _put(p, result_set, unit, option, VOTES, row[column])
+        over += row["c3"] > row["c"]
+    for measure, column in ((REGISTERED, "c"), (14, "c3"), (CAST, "e"), (5, "f1")):
+        p.add("declared", result_set_id=result_set, option_id=None, measure=measure, value=total[column])
+    for column, option in answers.items():
+        p.add("declared", result_set_id=result_set, option_id=option, measure=VOTES, value=total[column])
+    if over:
+        p.accept(
+            "accounting.turnout",
+            f"{over} polling stations print more voters than the voters attached to them; stored as printed",
+        )
+        p.add(
+            "note",
+            id=key("note", result_set, "turnout"),
+            entity_id=result_set,
+            kind="caveat",
+            body_md=f"At {over} polling stations, more voters took part than the voters attached to the station in "
+            "the commission's file. The figures are stored as printed.",
+            lang="en",
+        )
+    return p
