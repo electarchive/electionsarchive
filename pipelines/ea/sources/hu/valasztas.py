@@ -230,6 +230,24 @@ def _crawl(election: str) -> None:
 
 PV14 = "https://static.valasztas.hu/dyn/pv14/szavossz/hu/"
 PV14_PAGES = ("orszlist.html", "oevker.html")
+PV14_STATIONS = PV14 + "#szkjkv"
+# The nationality names on a polling-station page, and the label each national minority list carries on the national
+# result page.
+PV14_MINORITIES = {
+    "Bolgár": "BOLGÁR ORSZÁGOS ÖNKORMÁNYZAT",
+    "Görög": "MAGYARORSZÁGI GÖRÖGÖK",
+    "Horvát": "ORSZÁGOS HORVÁT ÖNKORMÁNYZAT",
+    "Lengyel": "ORSZÁGOS LENGYEL ÖNKORMÁNYZAT",
+    "Német": "MNOÖ",
+    "Örmény": "ÖRMÉNY ÖNKORMÁNYZAT",
+    "Roma": "ORSZÁGOS ROMA ÖNKORMÁNYZAT",
+    "Román": "MROÖ",
+    "Ruszin": "ORÖ",
+    "Szerb": "SZOÖ",
+    "Szlovák": "SZLOVÁK LISTA",
+    "Szlovén": "ORSZÁGOS SZLOVÉN ÖNKORMÁNYZAT",
+    "Ukrán": "UKRÁN ORSZÁGOS ÖNKORMÁNYZAT",
+}
 EP14 = "https://static.valasztas.hu/dyn/ep14/szavossz/hu/eredm.html"
 
 
@@ -247,10 +265,82 @@ def table_rows(url: str, encoding: str = "iso-8859-2") -> list[list[str]]:
     return rows
 
 
+def _crawl14() -> None:
+    """Fetch every polling-station page of the 2014 results site into one stored archive."""
+    if PV14_STATIONS in raw.keys(SOURCE):
+        return
+
+    def get(path: str) -> tuple[str, bytes]:
+        for _ in range(5):
+            try:
+                response = httpx.get(PV14 + path, headers={"User-Agent": raw.USER_AGENT}, timeout=60)
+            except httpx.TransportError:
+                continue
+            response.raise_for_status()
+            return path, response.content
+        raise RuntimeError(f"{path} failed five times")
+
+    districts = sorted(
+        set(
+            re.findall(
+                r'href="(M\d\d/E\d\d/evkjkv\.html)"',
+                raw.cached(SOURCE, PV14 + "oevker.html").path.read_text("iso-8859-2"),
+            )
+        )
+    )
+    with ThreadPoolExecutor(8) as pool:
+        pages = list(pool.map(get, districts))
+        links = sorted(
+            {
+                district.rsplit("/", 2)[0] + "/" + link.removeprefix("../")
+                for district, page in pages
+                for link in re.findall(r'href="(\.\./T\d+/szkjkv_\d+\.html)"', page.decode("iso-8859-2"))
+            }
+        )
+        fetched = list(pool.map(get, links))
+    buffer = io.BytesIO()
+    with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as archive:
+        for path, content in sorted(fetched):
+            info = zipfile.ZipInfo(path, date_time=(1980, 1, 1, 0, 0, 0))
+            info.compress_type = zipfile.ZIP_DEFLATED
+            archive.writestr(info, content)
+    print(f"2014: {len(fetched):,} polling-station pages")
+    raw.store(
+        SOURCE,
+        PV14_STATIONS,
+        buffer.getvalue(),
+        suffix=".zip",
+        retrieved_at=datetime.now(UTC),
+        media_type="application/zip",
+    )
+
+
+def minority_votes() -> dict[tuple[str, str, int], dict[str, int]]:
+    """The 2014 national minority list votes of each polling station, keyed by county, settlement and station."""
+    out: dict[tuple[str, str, int], dict[str, int]] = {}
+    with zipfile.ZipFile(raw.cached(SOURCE, PV14_STATIONS).path) as archive:
+        for name in archive.namelist():
+            found = re.fullmatch(r"M(\d\d)/T(\d+)/szkjkv_(\d+)\.html", name)
+            if not found:
+                continue
+            page = archive.read(name).decode("iso-8859-2")
+            votes: dict[str, int] = {}
+            for row in re.findall(r"<tr[^>]*>(.*?)</tr>", page, flags=re.DOTALL | re.IGNORECASE):
+                cells = [
+                    re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", cell))).strip().replace(" ", "")
+                    for cell in re.findall(r"<td[^>]*>(.*?)</td>", row, flags=re.DOTALL | re.IGNORECASE)
+                ]
+                if len(cells) == 7 and cells[0] in PV14_MINORITIES:
+                    votes[cells[0]] = number(cells[6]) or 0
+            out[(found[1], found[2], int(found[3]))] = votes
+    return out
+
+
 def fetch() -> None:
     raw.fetch(SOURCE, ARCHIVE, suffix=".zip")
     for page in PV14_PAGES:
         raw.fetch(SOURCE, PV14 + page, suffix=".html")
+    _crawl14()
     raw.fetch(SOURCE, EP14, suffix=".html")
     for election, (catalogs, results) in VTR_CATALOGS.items():
         raw.fetch(SOURCE, f"{VTR}/{election}/data/config.json", suffix=".json")
@@ -1304,11 +1394,14 @@ def new_parliament(d: Day, year: int) -> None:
     election, path = _parliament_elections(d, year, 1)
     found = places()
     list_tag = national_list_contest(d, year, election, path)
+    stations: dict[tuple[str, str, int], str] = {}
     for file, kind in ((smd_file, "egy"), (list_file, "lis")):
         for head, items in _protocols(delimited(name, file), "SZAVAZÓKÖR_AZON"):
             maz, taz, telep = head["MEGYEKÓD"], head["TELEPÜLÉS_SORSZÁM"], head["TELEPÜLÉS"]
             area = found.resolve(maz, taz, telep, trust_code=True)
             unit = d.unit(area, head["SZAVAZÓKÖR"])
+            if kind == "lis" and head["SZAVAZÓKÖR"].isdigit():
+                stations[(maz.zfill(2), taz.zfill(3), int(head["SZAVAZÓKÖR"]))] = unit
             tag = smd_contest(d, year, 1, election, path, maz, head["OEVK"]) if kind == "egy" else list_tag
             d.accounting(
                 tag,
@@ -1349,6 +1442,8 @@ def new_parliament(d: Day, year: int) -> None:
     if year == 2014:
         for page in PV14_PAGES:
             d.cite(PV14 + page)
+        for label in PV14_MINORITIES.values():
+            d.option(list_tag, label, "list", nominator=label)
         labels = {same_name(label): option for (tag, label), option in d.options.items() if tag == list_tag}
         for cells in table_rows(PV14 + "orszlist.html"):
             if len(cells) >= 7 and number(cells[5].replace(" ", "")) is not None:
@@ -1364,21 +1459,18 @@ def new_parliament(d: Day, year: int) -> None:
                     print(f"{d.day}: {tag} first-placed {cells[3]} ({cells[4]}) matches no candidate")
                     continue
                 d.outcome(tag, option, "elected")
-        d.reasons["accounting.votes_valid"] = (
-            "the office's polling-station file for the national list leaves out the 19,543 votes for national minority "
-            "lists, which its valid ballots include (the 13 lists' national totals on its 2014 results site sum to "
-            "exactly 19,543)"
-        )
-        d.p.add(
-            "note",
-            id=key("note", d.sets[list_tag], "minorities"),
-            entity_id=d.sets[list_tag],
-            kind="caveat",
-            body_md="The office's polling-station file for the national list leaves out the 19,543 votes cast for "
-            "the 13 national minority lists, which the valid ballots include. Those lists' national totals are on "
-            "the office's 2014 results site.",
-            lang="en",
-        )
+        d.cite(PV14_STATIONS)
+        unmatched = 0
+        for station, votes in minority_votes().items():
+            unit = stations.get(station)
+            if unit is None:
+                unmatched += 1
+                continue
+            for nationality, label in PV14_MINORITIES.items():
+                if nationality in votes:
+                    d.value(list_tag, unit, d.options[(list_tag, same_name(label) or label)], 1, votes[nationality])
+        if unmatched:
+            print(f"{d.day}: {unmatched} polling-station pages match no unit of the list file")
     if year == 2018:
         for head, items in _protocols(delimited(name, "egyéni_szavazás_erjkv.csv"), "TIPUS"):
             tag = smd_tag(year, 1, head["MEGYEKÓD"], head["OEVK"])
