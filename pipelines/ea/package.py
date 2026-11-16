@@ -1,3 +1,4 @@
+import gzip
 import hashlib
 import json
 import os
@@ -1180,18 +1181,76 @@ READY_COLUMNS = """select a.attname, a.attnotnull,
    where a.attrelid = %s::regclass and a.attnum > 0 and not a.attisdropped"""
 
 
-def _ready(conn: Connection, key: str, batch: set[str]) -> list[str]:
+Columns = dict[str, tuple[bool, bool, list[str]]]
+SNAPSHOT_IDS = """select id from polity
+union select area_id from polity_territory
+union select id from area where scheme_code like 'world.%' or scheme_code like 'eu.%'"""
+
+
+class Reference(NamedTuple):
+    ids: frozenset[str]
+    packages: frozenset[str]
+    columns: dict[str, Columns]
+
+
+def _columns(conn: Connection, table: str) -> Columns:
+    return {
+        str(name): (bool(required), bool(fixed), [str(label) for label in labels])
+        for name, required, fixed, labels in conn.execute(READY_COLUMNS, [f"public.{table}"]).fetchall()
+    }
+
+
+def snapshot(target: Path) -> None:
+    with store.connect() as conn:
+        ids = [str(value) for (value,) in conn.execute(SNAPSHOT_IDS).fetchall()]
+        ids += [str(code) for (code,) in conn.execute("select code from scheme").fetchall()]
+        packages = [
+            str(key)
+            for (key,) in conn.execute(
+                "select distinct scope->>'package' from changeset where scope ? 'package'"
+            ).fetchall()
+        ]
+        columns = {table: _columns(conn, table) for table in TABLES}
+    body = {
+        "created": datetime.now(UTC).isoformat(),
+        "ids": sorted(ids),
+        "packages": sorted(packages),
+        "columns": columns,
+    }
+    partial = target.with_name(f".{target.name}.part")
+    partial.write_bytes(gzip.compress(json.dumps(body).encode()))
+    partial.replace(target)
+    print(f"{target}: {len(ids):,} ids, {len(packages):,} packages", flush=True)
+
+
+def _reference(path: Path) -> Reference:
+    body = json.loads(gzip.decompress(path.read_bytes()))
+    columns = {
+        table: {name: (bool(rule[0]), bool(rule[1]), [str(label) for label in rule[2]]) for name, rule in found.items()}
+        for table, found in body["columns"].items()
+    }
+    return Reference(frozenset(body["ids"]), frozenset(body["packages"]), columns)
+
+
+def _ready(source: Connection | Reference, key: str, batch: set[str]) -> list[str]:
     path = _resolve(key)
     manifest = _manifest(path)
     found: list[str] = []
-    missing = _missing(conn, manifest["external"])
+    if isinstance(source, Reference):
+        missing = [str(value) for value in manifest["external"] if str(value) not in source.ids]
+        where = "the reference snapshot (polities, schemes, and country areas)"
+    else:
+        missing = _missing(source, manifest["external"])
+        where = "the database"
     if missing:
-        found.append(f"ready.external: {len(missing)} referenced ids are missing from the database: {missing[:5]}")
+        found.append(f"ready.external: {len(missing)} referenced ids are missing from {where}: {missing[:5]}")
     for depend in manifest["depends"]:
-        if (
-            depend not in batch
-            and conn.execute("select 1 from changeset where scope->>'package' = %s", [depend]).fetchone() is None
-        ):
+        loaded = (
+            depend in source.packages
+            if isinstance(source, Reference)
+            else source.execute("select 1 from changeset where scope->>'package' = %s", [depend]).fetchone() is not None
+        )
+        if depend not in batch and not loaded:
             found.append(
                 f"ready.depends: {depend} is neither loaded nor in this batch; build it and list it in run.json"
             )
@@ -1202,10 +1261,7 @@ def _ready(conn: Connection, key: str, batch: set[str]) -> list[str]:
         present = set(pl.read_parquet_schema(file))
         frame = pl.scan_parquet(file)
         rows = frame.select(pl.len()).collect().item()
-        known = {
-            str(name): (bool(required), bool(fixed), list(labels))
-            for name, required, fixed, labels in conn.execute(READY_COLUMNS, [f"public.{table}"]).fetchall()
-        }
+        known = source.columns.get(table, {}) if isinstance(source, Reference) else _columns(source, table)
         for column in schema:
             if column not in known:
                 found.append(f"ready.column: {table}.{column} does not exist in the database")
@@ -1225,9 +1281,13 @@ def _ready(conn: Connection, key: str, batch: set[str]) -> list[str]:
     return found
 
 
-def readiness(keys: list[str]) -> None:
-    with store.connect() as conn:
-        found = [f"{key}: {problem}" for key in keys for problem in _ready(conn, key, set(keys))]
+def readiness(keys: list[str], reference: Path | None = None) -> None:
+    if reference is not None:
+        source = _reference(reference)
+        found = [f"{key}: {problem}" for key in keys for problem in _ready(source, key, set(keys))]
+    else:
+        with store.connect() as conn:
+            found = [f"{key}: {problem}" for key in keys for problem in _ready(conn, key, set(keys))]
     for line in found:
         print(line, flush=True)
     if found:
@@ -1235,13 +1295,16 @@ def readiness(keys: list[str]) -> None:
     print(f"{len(keys)} packages ready to load", flush=True)
 
 
-def run(command: str, keys: list[str]) -> None:
+def run(command: str, keys: list[str], reference: Path | None = None) -> None:
+    if command == "snapshot":
+        snapshot(Path(keys[0]))
+        return
     if command == "export":
         for pipeline in keys:
             export(pipeline)
         return
     if command == "ready":
-        readiness(keys)
+        readiness(keys, reference)
         return
     failed = False
     ready: list[tuple[Path, dict[str, object]]] = []
