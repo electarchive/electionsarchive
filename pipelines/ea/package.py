@@ -32,9 +32,6 @@ CHUNK_BYTES = 2 << 20
 SERVER_LIMIT = 3072
 ROLLUP_VALUES = 500_000
 ROLLED = {"election", "contest", "reporting_unit", "result_set"}
-# A package may add or update a polity but never deletes one: polities from the changeset path are not in older
-# exports, and other pipelines hang their rows on a country's polity.
-UPSERT_ONLY = {"polity"}
 
 U = pl.String()
 D = pl.Date()
@@ -45,7 +42,6 @@ I64 = pl.Int64()
 F = pl.Float64()
 
 TABLES: dict[str, tuple[tuple[str, ...] | None, dict[str, pl.DataType]]] = {
-    "polity": (("id",), {"id": U, "kind": U, "iso_code": U}),
     "source": (
         ("id",),
         {
@@ -699,7 +695,11 @@ def check(path: Path) -> list[tuple[str, int, list[tuple[object, ...]]]]:
             findings.append((f"unique.{table}", len(rows), rows[:5]))
     for table, column, target in REFERENCES:
         target_key = TARGET_KEY.get(target, "id")
-        known = f'select "{target_key}" from "all_{target}" union all select id from external'
+        known = (
+            "select id from external"
+            if target == "polity"
+            else f'select "{target_key}" from "all_{target}" union all select id from external'
+        )
         rows = con.execute(
             f'select distinct "{column}" from "{table}" where "{column}" is not null and "{column}" not in ({known})'
         ).fetchall()
@@ -868,8 +868,6 @@ def _facts(conn: Connection, path: Path, accepted: dict[str, object]) -> Loaded 
     touched_ids: dict[str, list[str]] = {}
     for table in reversed(TABLES):
         key_columns = TABLES[table][0]
-        if table in UPSERT_ONLY:
-            continue
         if table not in staged:
             gone = conn.execute(
                 sql.SQL("delete from {} where changeset_id = any(%s::uuid[])").format(sql.Identifier(table)),
@@ -1260,7 +1258,11 @@ def _seal(
     for table, column, target in REFERENCES:
         if table not in counts:
             continue
-        known = f' and "{column}" not in (select "{TARGET_KEY.get(target, "id")}" from "{target}")'
+        known = (
+            ""
+            if target == "polity"
+            else f' and "{column}" not in (select "{TARGET_KEY.get(target, "id")}" from "{target}")'
+        )
         rows = con.execute(
             f'select distinct "{column}"::varchar from "{table}" where "{column}" is not null{known}'
         ).fetchall()
