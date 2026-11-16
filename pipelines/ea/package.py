@@ -1136,15 +1136,29 @@ def _verify(conn: Connection, loaded: list[Loaded]) -> None:
         raise ValueError(f"load verification failed, rolled back ({len(problems):,}): " + "; ".join(problems[:10]))
 
 
+def _minted(paths: Iterable[Path]) -> set[str]:
+    minted: set[str] = set()
+    for path in paths:
+        for table, (key, _) in TABLES.items():
+            file = path / f"{table}.parquet"
+            if key in (("id",), ("code",)) and file.exists():
+                minted |= {str(value) for value in pl.read_parquet(file, columns=list(key)).to_series().drop_nulls()}
+    return minted
+
+
 def _ordered(items: list[tuple[Path, dict[str, object]]]) -> list[tuple[Path, dict[str, object]]]:
     keyed = {str(_manifest(path)["key"]): (path, accepted) for path, accepted in items}
+    mints = {key: _minted([path]) for key, (path, _) in keyed.items()}
+    needs: dict[str, set[str]] = {}
+    for key, (path, _) in keyed.items():
+        manifest = _manifest(path)
+        external = {str(value) for value in manifest["external"]}
+        needs[key] = {str(d) for d in manifest["depends"] if d in keyed} | {
+            other for other, ids in mints.items() if other != key and not ids.isdisjoint(external)
+        }
     placed: list[str] = []
     while len(placed) < len(keyed):
-        ready = [
-            key
-            for key, (path, _) in keyed.items()
-            if key not in placed and all(d in placed or d not in keyed for d in _manifest(path)["depends"])
-        ]
+        ready = [key for key in keyed if key not in placed and needs[key] <= set(placed)]
         if not ready:
             raise ValueError(f"packages depend on each other in a cycle: {sorted(set(keyed) - set(placed))}")
         placed += ready
@@ -1232,16 +1246,17 @@ def _reference(path: Path) -> Reference:
     return Reference(frozenset(body["ids"]), frozenset(body["packages"]), columns)
 
 
-def _ready(source: Connection | Reference, key: str, batch: set[str]) -> list[str]:
+def _ready(source: Connection | Reference, key: str, batch: set[str], minted: set[str]) -> list[str]:
     path = _resolve(key)
     manifest = _manifest(path)
     found: list[str] = []
+    external = [str(value) for value in manifest["external"] if str(value) not in minted]
     if isinstance(source, Reference):
-        missing = [str(value) for value in manifest["external"] if str(value) not in source.ids]
-        where = "the reference snapshot (polities, schemes, and country areas)"
+        missing = [value for value in external if value not in source.ids]
+        where = "the reference snapshot (polities, schemes, and country areas) or this batch"
     else:
-        missing = _missing(source, manifest["external"])
-        where = "the database"
+        missing = _missing(source, external)
+        where = "the database and this batch"
     if missing:
         found.append(f"ready.external: {len(missing)} referenced ids are missing from {where}: {missing[:5]}")
     for depend in manifest["depends"]:
@@ -1282,12 +1297,13 @@ def _ready(source: Connection | Reference, key: str, batch: set[str]) -> list[st
 
 
 def readiness(keys: list[str], reference: Path | None = None) -> None:
+    minted = _minted(_resolve(key) for key in keys)
     if reference is not None:
         source = _reference(reference)
-        found = [f"{key}: {problem}" for key in keys for problem in _ready(source, key, set(keys))]
+        found = [f"{key}: {problem}" for key in keys for problem in _ready(source, key, set(keys), minted)]
     else:
         with store.connect() as conn:
-            found = [f"{key}: {problem}" for key in keys for problem in _ready(conn, key, set(keys))]
+            found = [f"{key}: {problem}" for key in keys for problem in _ready(conn, key, set(keys), minted)]
     for line in found:
         print(line, flush=True)
     if found:
