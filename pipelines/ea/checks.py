@@ -32,6 +32,7 @@ SWEEPABLE = {
     "census_class": "id",
     "census_match": "id",
     "census_date": "id",
+    "census_world": "iso_code",
     "body_composition": "id",
     "body_composition_party": "id",
     "note": "entity_id",

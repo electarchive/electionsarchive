@@ -155,6 +155,15 @@ where u.polity_id in (select id from t) and (%(iso)s <> 'EU' or u.scheme_code = 
 group by 1, 2, s.rank having count(*) >= 100 order by s.rank desc, count(*) desc limit 1
 """
 
+WORLD_ROWS_SQL = """
+select lower(iso_code), status::text, name_en, changeset_id::text from census_world order by 1
+"""
+
+UNSURVEYED = (
+    "The election census of {name} has not started, so the archive does not yet know which elections it should hold;"
+    " it is listed as not yet surveyed."
+)
+
 COUNTRIES_SQL = """
 select distinct lower(p.iso_code) from census_class k join polity p on p.id = k.polity_id
 where p.iso_code <> 'US' order by 1
@@ -288,15 +297,59 @@ def region(cc: str, scheme: str | None, code: str | None, parent: str | None, el
     return ""
 
 
+def world_rows(conn) -> list[tuple[str, str, str, str]]:
+    if conn.execute("select to_regclass('public.census_world')").fetchone() == (None,):
+        return []
+    return conn.execute(WORLD_ROWS_SQL).fetchall()
+
+
+def surveyed(conn) -> list[str]:
+    return [cc for (cc,) in conn.execute(COUNTRIES_SQL)]
+
+
+def unsurveyed(conn) -> dict[str, str]:
+    held = {"us", *surveyed(conn)}
+    return {cc: name for cc, status, name, _ in world_rows(conn) if status == "own" and cc not in held}
+
+
 def countries(conn=None) -> list[str]:
     if conn is None:
         with connect() as own:
             return countries(own)
-    return [cc for (cc,) in conn.execute(COUNTRIES_SQL)]
+    return sorted([*surveyed(conn), *unsurveyed(conn)])
 
 
 def stamps(conn) -> dict[str, str]:
-    return dict(conn.execute(STAMP_SQL).fetchall())
+    found = dict(conn.execute(STAMP_SQL).fetchall())
+    return found | {
+        cc: f"world:{stamp}"
+        for cc, status, _, stamp in world_rows(conn)
+        if status == "own" and cc not in found and cc != "us"
+    }
+
+
+def not_surveyed(conn, cc: str, name: str) -> tuple:
+    return (
+        cc,
+        *summary(conn, cc),
+        "{}",
+        "[]",
+        json.dumps(
+            [
+                {
+                    "goal": "census",
+                    "level": "census",
+                    "from": None,
+                    "to": None,
+                    "note": UNSURVEYED.format(name=name),
+                    "census": "none",
+                    "name": name,
+                }
+            ],
+            ensure_ascii=False,
+        ),
+        "{}",
+    )
 
 
 def merged(entries: list[dict]) -> dict:
@@ -863,6 +916,8 @@ def part(conn, cc: str) -> tuple[list[tuple], tuple]:
             json.dumps(canvass + ready, ensure_ascii=False),
             json.dumps(cited, ensure_ascii=False),
         )
+    if cc not in surveyed(conn):
+        return [], not_surveyed(conn, cc, unsurveyed(conn).get(cc, cc.upper()))
     data = measure(conn, cc)
     goals, _, notes = tally(cc, data)
     spec = data["spec"]
@@ -1081,7 +1136,8 @@ def world() -> str:
     with connect() as conn:
         record(conn)
         rows = list(conn.execute(WORLD_SQL))
-        specs = {cc: census_spec(conn, cc) for cc in countries(conn)}
+        specs = {cc: census_spec(conn, cc) for cc in surveyed(conn)}
+        waiting = unsurveyed(conn)
     spans: dict[tuple, dict] = {}
     for cc, level, year, total, complete, absent, bare, known in rows:
         found = next(
@@ -1174,6 +1230,22 @@ def world() -> str:
             f"| {specs[span['cc']]['name']} | {labels.get((span['cc'], span['level']), span['level'])}"
             f" | {', '.join(str(y) for y in sorted(span['years']))} | {span['missing']:,} |"
         )
+    lines += [
+        "",
+        "## Not yet surveyed",
+        "",
+        (
+            f"{len(waiting)} countries hold elections of their own under the census's world tier (`census_world`) but"
+            " have no census yet, so none of their gaps can be counted. Each is listed until its census publishes."
+        ),
+        "",
+        "| Country | Code |",
+        "| --- | --- |",
+        *(f"| {name} | {cc.upper()} |" for cc, name in sorted(waiting.items(), key=lambda item: item[1])),
+    ]
     coverage.REPORTS.mkdir(parents=True, exist_ok=True)
     (coverage.REPORTS / "world-gaps.md").write_text("\n".join(lines) + "\n")
-    return f"world-gaps.md: {len(sourced)} sourced spans, {len(unsourced)} unsourced years"
+    return (
+        f"world-gaps.md: {len(sourced)} sourced spans, {len(unsourced)} unsourced years,"
+        f" {len(waiting)} countries not yet surveyed"
+    )

@@ -216,7 +216,7 @@ def database(conn) -> list[str]:
         polity: [n for n in found if n["from"] is None and n["note"].startswith(OVER)]
         for polity, found in conn.execute("select polity, notes from coverage_polity")
     }
-    for cc in coverage_countries.countries(conn):
+    for cc in coverage_countries.surveyed(conn):
         spec = coverage_countries.census_spec(conn, cc)
         for level in spec["levels"]:
             cited: dict[int, int] = defaultdict(int)
@@ -255,6 +255,8 @@ def pages(conn) -> list[str]:
                 if shown not in landing:
                     problems.append(f"/coverage {cc} {tier['key']}: {shown} not shown")
     for cc, summary in overview.items():
+        if not summary.get("surveyed", True):
+            continue
         page = visible(f"/coverage/{cc}")
         rest = json.loads(fetch(f"/api/v1/coverage/{cc}"))
         twin = json.loads(fetch(f"/coverage/{cc}.json"))

@@ -585,6 +585,21 @@ def _publish_table(conn: Connection, stage: Stage, table: str, deferred: list[st
                 raise ValueError(f"row_drop {id}: no {relation} row matches {json.dumps(key, default=str)} any more")
             if dropped > 1:
                 raise ValueError(f"row_drop {id}: {relation} key matches {dropped} rows")
+    if table == "census_world":
+        compared = [column for column in columns if column != "iso_code"]
+        conn.execute(
+            sql.SQL(
+                """insert into public.census_world ({0}) select {0} from {1}
+                   on conflict (iso_code) do update set {2} where ({3}) is distinct from ({4})"""
+            ).format(
+                listed,
+                staged,
+                sql.SQL(", ").join(sql.SQL("{0} = excluded.{0}").format(sql.Identifier(c)) for c in compared),
+                sql.SQL(", ").join(sql.SQL("census_world.{}").format(sql.Identifier(c)) for c in compared),
+                sql.SQL(", ").join(sql.SQL("excluded.{}").format(sql.Identifier(c)) for c in compared),
+            )
+        )
+        return
     if "id" in columns:
         compared = [column for column in columns if column != "id"]
         conflict = (

@@ -1,0 +1,2041 @@
+{
+  "name": "World",
+  "names": {
+    "title": "Unicode CLDR 46: English territory display names (cldr-localenames-full, main/en/territories.json)",
+    "publisher": "Unicode Consortium",
+    "url": "https://cdn.jsdelivr.net/npm/cldr-localenames-full@46.0.0/main/en/territories.json"
+  },
+  "sources": {
+    "ipu-parline": {
+      "title": "Parline: global data on national parliaments",
+      "publisher": "Inter-Parliamentary Union",
+      "url": "https://data.ipu.org/",
+      "kind": "compendium",
+      "note": "One entry per country, compiled from data each national parliament submits; the locator is the country's entry, which names its chambers and how their members are chosen."
+    },
+    "ai-gov": {
+      "title": "Government of Anguilla: House of Assembly and general elections",
+      "publisher": "Government of Anguilla",
+      "url": "https://www.gov.ai/",
+      "kind": "official_body"
+    },
+    "aw-staten": {
+      "title": "Parlamento di Aruba (Staten van Aruba)",
+      "publisher": "Staten van Aruba",
+      "url": "https://www.parlamento.aw/",
+      "kind": "official_body"
+    },
+    "ax-autonomy": {
+      "title": "Ahvenanmaan itsehallintolaki / Act on the Autonomy of Åland (1144/1991)",
+      "publisher": "Finlex (Ministry of Justice, Finland)",
+      "url": "https://www.finlex.fi/fi/laki/ajantasa/1991/19911144",
+      "kind": "official_body"
+    },
+    "bm-parliament": {
+      "title": "Parliament of Bermuda: House of Assembly",
+      "publisher": "Parliament of Bermuda",
+      "url": "https://www.parliament.bm/",
+      "kind": "official_body"
+    },
+    "ck-constitution": {
+      "title": "Cook Islands Constitution Act 1964 (1964 No 69)",
+      "publisher": "New Zealand Legislation (Parliamentary Counsel Office)",
+      "url": "https://www.legislation.govt.nz/act/public/1964/0069/latest/whole.html",
+      "kind": "official_body"
+    },
+    "cw-staten": {
+      "title": "Staten van Curaçao (Parliament of Curaçao)",
+      "publisher": "Staten van Curaçao",
+      "url": "https://www.staten.cw/",
+      "kind": "official_body"
+    },
+    "fk-constitution": {
+      "title": "The Falkland Islands Constitution Order 2008 (SI 2008/2846)",
+      "publisher": "UK Statutory Instruments (legislation.gov.uk)",
+      "url": "https://www.legislation.gov.uk/uksi/2008/2846/contents",
+      "kind": "official_body"
+    },
+    "fo-logting": {
+      "title": "Løgtingið (Parliament of the Faroe Islands)",
+      "publisher": "Løgtingið",
+      "url": "https://www.logting.fo/",
+      "kind": "official_body"
+    },
+    "gg-elections": {
+      "title": "States of Guernsey: elections to the States of Deliberation",
+      "publisher": "States of Guernsey",
+      "url": "https://www.gov.gg/elections",
+      "kind": "official_body"
+    },
+    "gi-parliament": {
+      "title": "Gibraltar Parliament",
+      "publisher": "Gibraltar Parliament",
+      "url": "https://www.parliament.gi/",
+      "kind": "official_body"
+    },
+    "gl-inatsisartut": {
+      "title": "Inatsisartut (Parliament of Greenland)",
+      "publisher": "Inatsisartut",
+      "url": "https://inatsisartut.gl/",
+      "kind": "official_body"
+    },
+    "hk-basic-law": {
+      "title": "The Basic Law of the Hong Kong Special Administrative Region, Article 68 (Legislative Council)",
+      "publisher": "Government of the Hong Kong SAR",
+      "url": "https://www.basiclaw.gov.hk/",
+      "kind": "official_body"
+    },
+    "im-tynwald": {
+      "title": "Tynwald (Parliament of the Isle of Man): House of Keys elections",
+      "publisher": "Tynwald",
+      "url": "https://www.tynwald.org.im/",
+      "kind": "official_body"
+    },
+    "je-vote": {
+      "title": "vote.je: elections to the States Assembly of Jersey",
+      "publisher": "States of Jersey",
+      "url": "https://www.vote.je/",
+      "kind": "official_body"
+    },
+    "ky-constitution": {
+      "title": "The Cayman Islands Constitution Order 2009 (SI 2009/1379)",
+      "publisher": "UK Statutory Instruments (legislation.gov.uk)",
+      "url": "https://www.legislation.gov.uk/uksi/2009/1379/contents",
+      "kind": "official_body"
+    },
+    "mo-al": {
+      "title": "Legislative Assembly of the Macao Special Administrative Region",
+      "publisher": "Assembleia Legislativa da RAEM",
+      "url": "https://www.al.gov.mo/",
+      "kind": "official_body"
+    },
+    "ms-constitution": {
+      "title": "The Montserrat Constitution Order 2010 (SI 2010/2474)",
+      "publisher": "UK Statutory Instruments (legislation.gov.uk)",
+      "url": "https://www.legislation.gov.uk/uksi/2010/2474/contents",
+      "kind": "official_body"
+    },
+    "nu-constitution": {
+      "title": "Niue Constitution Act 1974 (1974 No 42)",
+      "publisher": "New Zealand Legislation (Parliamentary Counsel Office)",
+      "url": "https://www.legislation.govt.nz/act/public/1974/0042/latest/whole.html",
+      "kind": "official_body"
+    },
+    "pn-constitution": {
+      "title": "The Pitcairn Constitution Order 2010 (SI 2010/244)",
+      "publisher": "UK Statutory Instruments (legislation.gov.uk)",
+      "url": "https://www.legislation.gov.uk/uksi/2010/244/contents",
+      "kind": "official_body"
+    },
+    "ps-cec": {
+      "title": "Central Elections Commission – Palestine",
+      "publisher": "Central Elections Commission – Palestine",
+      "url": "https://www.elections.ps/",
+      "kind": "official_body"
+    },
+    "sh-constitution": {
+      "title": "The St Helena, Ascension and Tristan da Cunha Constitution Order 2009 (SI 2009/1751)",
+      "publisher": "UK Statutory Instruments (legislation.gov.uk)",
+      "url": "https://www.legislation.gov.uk/uksi/2009/1751/contents",
+      "kind": "official_body"
+    },
+    "sx-parliament": {
+      "title": "Parliament of Sint Maarten",
+      "publisher": "Parliament of Sint Maarten",
+      "url": "https://www.sxmparliament.org/",
+      "kind": "official_body"
+    },
+    "tc-constitution": {
+      "title": "The Turks and Caicos Islands Constitution Order 2011 (SI 2011/1681)",
+      "publisher": "UK Statutory Instruments (legislation.gov.uk)",
+      "url": "https://www.legislation.gov.uk/uksi/2011/1681/contents",
+      "kind": "official_body"
+    },
+    "tk-gov": {
+      "title": "Government of Tokelau: the General Fono and village elections",
+      "publisher": "Government of Tokelau",
+      "url": "https://www.tokelau.org.nz/",
+      "kind": "official_body"
+    },
+    "tw-cec": {
+      "title": "Central Election Commission",
+      "publisher": "Central Election Commission (Taiwan)",
+      "url": "https://www.cec.gov.tw/",
+      "kind": "official_body"
+    },
+    "vg-constitution": {
+      "title": "The Virgin Islands Constitution Order 2007 (SI 2007/1678)",
+      "publisher": "UK Statutory Instruments (legislation.gov.uk)",
+      "url": "https://www.legislation.gov.uk/uksi/2007/1678/contents",
+      "kind": "official_body"
+    },
+    "xk-kqz": {
+      "title": "Central Election Commission of Kosovo",
+      "publisher": "Komisioni Qendror i Zgjedhjeve",
+      "url": "https://kqz-ks.org/",
+      "kind": "official_body"
+    },
+    "us-48-gu": {
+      "title": "48 U.S.C. § 1423a: Legislature of Guam",
+      "publisher": "U.S. Government Publishing Office",
+      "url": "https://www.govinfo.gov/link/uscode/48/1423a",
+      "kind": "official_body"
+    },
+    "us-48-vi": {
+      "title": "48 U.S.C. § 1591: Governor and Lieutenant Governor of the Virgin Islands",
+      "publisher": "U.S. Government Publishing Office",
+      "url": "https://www.govinfo.gov/link/uscode/48/1591",
+      "kind": "official_body"
+    },
+    "us-pr-const": {
+      "title": "Constitución del Estado Libre Asociado de Puerto Rico",
+      "publisher": "Government of Puerto Rico",
+      "url": "https://docs.pr.gov/files/JRT/LeyesReglamentos/Leyes/CONSTITUCIONES%20DE%20ESTADOS%20UNIDOS%20DE%20AMERICA%20Y%20DE%20PUERTO%20RICO.pdf",
+      "kind": "official_body"
+    },
+    "us-as-code": {
+      "title": "American Samoa Code Annotated § 4.0105, Term of office",
+      "publisher": "American Samoa Bar Association",
+      "url": "https://asbar.org/code-annotated/4-0105-term-of-office/",
+      "kind": "official_body"
+    },
+    "us-mp-const": {
+      "title": "Constitution of the Commonwealth of the Northern Mariana Islands",
+      "publisher": "Commonwealth of the Northern Mariana Islands",
+      "url": "https://cnmilaw.org/pdf/supreme/1NMI-101.pdf",
+      "kind": "official_body"
+    },
+    "fr-code-electoral": {
+      "title": "Code électoral",
+      "publisher": "Légifrance (Secrétariat général du Gouvernement)",
+      "url": "https://www.legifrance.gouv.fr/codes/texte_lc/LEGITEXT000006070239",
+      "kind": "official_body"
+    },
+    "fr-lo-2004-192": {
+      "title": "Loi organique n° 2004-192 du 27 février 2004 portant statut d'autonomie de la Polynésie française",
+      "publisher": "Journal officiel de la République française",
+      "url": "https://www.legifrance.gouv.fr/loda/id/JORFTEXT000000435515",
+      "kind": "official_body"
+    },
+    "fr-lo-99-209": {
+      "title": "Loi organique n° 99-209 du 19 mars 1999 relative à la Nouvelle-Calédonie",
+      "publisher": "Journal officiel de la République française",
+      "url": "https://www.legifrance.gouv.fr/loda/id/JORFTEXT000000393606",
+      "kind": "official_body"
+    },
+    "nl-wolbes": {
+      "title": "Wet openbare lichamen Bonaire, Sint Eustatius en Saba",
+      "publisher": "Overheid.nl (Wettenbank)",
+      "url": "https://wetten.overheid.nl/BWBR0028063/",
+      "kind": "official_body"
+    },
+    "no-svalbard": {
+      "title": "Lov om Svalbard (svalbardloven), LOV-1925-07-17-11",
+      "publisher": "Lovdata",
+      "url": "https://lovdata.no/dokument/NL/lov/1925-07-17-11",
+      "kind": "official_body"
+    },
+    "no-bilandsloven": {
+      "title": "Lov om Bouvet-øya, Peter I's øy og Dronning Maud Land m.m. (bilandsloven), LOV-1930-02-27-3",
+      "publisher": "Lovdata",
+      "url": "https://lovdata.no/dokument/NL/lov/1930-02-27-3",
+      "kind": "official_body"
+    },
+    "au-electoral-act": {
+      "title": "Commonwealth Electoral Act 1918",
+      "publisher": "Federal Register of Legislation (Australia)",
+      "url": "https://www.legislation.gov.au/C1918A00027/latest/text",
+      "kind": "official_body"
+    },
+    "au-heard": {
+      "title": "Heard Island and McDonald Islands",
+      "publisher": "Australian Antarctic Division",
+      "url": "https://www.antarctica.gov.au/about-antarctica/people-in-antarctica/heard-island-and-mcdonald-islands/",
+      "kind": "official_body"
+    },
+    "aq-treaty": {
+      "title": "The Antarctic Treaty (1959)",
+      "publisher": "Secretariat of the Antarctic Treaty",
+      "url": "https://www.ats.aq/e/antarctictreaty.html",
+      "kind": "official_body"
+    },
+    "gs-gov": {
+      "title": "Government of South Georgia and the South Sandwich Islands",
+      "publisher": "Government of South Georgia and the South Sandwich Islands",
+      "url": "https://www.gov.gs/",
+      "kind": "official_body"
+    },
+    "io-gov": {
+      "title": "British Indian Ocean Territory",
+      "publisher": "British Indian Ocean Territory Administration",
+      "url": "https://biot.gov.io/",
+      "kind": "official_body"
+    },
+    "tf-taaf": {
+      "title": "Terres australes et antarctiques françaises (TAAF)",
+      "publisher": "Terres australes et antarctiques françaises",
+      "url": "https://taaf.fr/",
+      "kind": "official_body"
+    },
+    "um-doi": {
+      "title": "Office of Insular Affairs: the U.S. territories and the minor outlying islands",
+      "publisher": "U.S. Department of the Interior, Office of Insular Affairs",
+      "url": "https://www.doi.gov/oia",
+      "kind": "official_body"
+    },
+    "va-state": {
+      "title": "Legge fondamentale dello Stato della Città del Vaticano (2023)",
+      "publisher": "Governatorato dello Stato della Città del Vaticano",
+      "url": "https://www.vaticanstate.va/it/stato-governo/norme-fondamentali/legge-fondamentale-dello-stato-della-citta-del-vaticano.html",
+      "kind": "official_body"
+    }
+  },
+  "countries": [
+    {
+      "iso": "AD",
+      "name_en": "Andorra",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/AD/"
+    },
+    {
+      "iso": "AE",
+      "name_en": "United Arab Emirates",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/AE/"
+    },
+    {
+      "iso": "AF",
+      "name_en": "Afghanistan",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/AF/"
+    },
+    {
+      "iso": "AG",
+      "name_en": "Antigua & Barbuda",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/AG/"
+    },
+    {
+      "iso": "AI",
+      "name_en": "Anguilla",
+      "status": "own",
+      "source": "ai-gov"
+    },
+    {
+      "iso": "AL",
+      "name_en": "Albania",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/AL/"
+    },
+    {
+      "iso": "AM",
+      "name_en": "Armenia",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/AM/"
+    },
+    {
+      "iso": "AO",
+      "name_en": "Angola",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/AO/"
+    },
+    {
+      "iso": "AQ",
+      "name_en": "Antarctica",
+      "status": "none",
+      "reason": "Governed under the Antarctic Treaty system, with no permanent population and no elections.",
+      "source": "aq-treaty"
+    },
+    {
+      "iso": "AR",
+      "name_en": "Argentina",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/AR/"
+    },
+    {
+      "iso": "AS",
+      "name_en": "American Samoa",
+      "status": "within",
+      "within": "US",
+      "reason": "Its elections sit in the United States census: the territory's legislature, governor, and delegate are elected under the statute or constitution cited, within the U.S. archive.",
+      "source": "us-as-code"
+    },
+    {
+      "iso": "AT",
+      "name_en": "Austria",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/AT/"
+    },
+    {
+      "iso": "AU",
+      "name_en": "Australia",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/AU/"
+    },
+    {
+      "iso": "AW",
+      "name_en": "Aruba",
+      "status": "own",
+      "source": "aw-staten"
+    },
+    {
+      "iso": "AX",
+      "name_en": "Åland Islands",
+      "status": "own",
+      "source": "ax-autonomy"
+    },
+    {
+      "iso": "AZ",
+      "name_en": "Azerbaijan",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/AZ/"
+    },
+    {
+      "iso": "BA",
+      "name_en": "Bosnia & Herzegovina",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/BA/"
+    },
+    {
+      "iso": "BB",
+      "name_en": "Barbados",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/BB/"
+    },
+    {
+      "iso": "BD",
+      "name_en": "Bangladesh",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/BD/"
+    },
+    {
+      "iso": "BE",
+      "name_en": "Belgium",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/BE/"
+    },
+    {
+      "iso": "BF",
+      "name_en": "Burkina Faso",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/BF/"
+    },
+    {
+      "iso": "BG",
+      "name_en": "Bulgaria",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/BG/"
+    },
+    {
+      "iso": "BH",
+      "name_en": "Bahrain",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/BH/"
+    },
+    {
+      "iso": "BI",
+      "name_en": "Burundi",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/BI/"
+    },
+    {
+      "iso": "BJ",
+      "name_en": "Benin",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/BJ/"
+    },
+    {
+      "iso": "BL",
+      "name_en": "St. Barthélemy",
+      "status": "within",
+      "within": "FR",
+      "reason": "An overseas collectivity of France; its Territorial Council is elected under Book VI of the French Code électoral and sits in the French census.",
+      "source": "fr-code-electoral"
+    },
+    {
+      "iso": "BM",
+      "name_en": "Bermuda",
+      "status": "own",
+      "source": "bm-parliament"
+    },
+    {
+      "iso": "BN",
+      "name_en": "Brunei",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/BN/"
+    },
+    {
+      "iso": "BO",
+      "name_en": "Bolivia",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/BO/"
+    },
+    {
+      "iso": "BQ",
+      "name_en": "Caribbean Netherlands",
+      "status": "within",
+      "within": "NL",
+      "reason": "Bonaire, Sint Eustatius, and Saba are public bodies (openbare lichamen) of the Netherlands; their island councils are elected under the Dutch Kieswet as set by this act.",
+      "source": "nl-wolbes"
+    },
+    {
+      "iso": "BR",
+      "name_en": "Brazil",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/BR/"
+    },
+    {
+      "iso": "BS",
+      "name_en": "Bahamas",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/BS/"
+    },
+    {
+      "iso": "BT",
+      "name_en": "Bhutan",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/BT/"
+    },
+    {
+      "iso": "BV",
+      "name_en": "Bouvet Island",
+      "status": "none",
+      "reason": "An uninhabited Norwegian dependency with no elected body.",
+      "source": "no-bilandsloven"
+    },
+    {
+      "iso": "BW",
+      "name_en": "Botswana",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/BW/"
+    },
+    {
+      "iso": "BY",
+      "name_en": "Belarus",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/BY/"
+    },
+    {
+      "iso": "BZ",
+      "name_en": "Belize",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/BZ/"
+    },
+    {
+      "iso": "CA",
+      "name_en": "Canada",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/CA/"
+    },
+    {
+      "iso": "CC",
+      "name_en": "Cocos (Keeling) Islands",
+      "status": "within",
+      "within": "AU",
+      "reason": "An external territory of Australia; its residents vote in Australian federal elections in a Northern Territory division under this act, and its shire council is elected under Australian territory law.",
+      "source": "au-electoral-act"
+    },
+    {
+      "iso": "CD",
+      "name_en": "Congo - Kinshasa",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/CD/"
+    },
+    {
+      "iso": "CF",
+      "name_en": "Central African Republic",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/CF/"
+    },
+    {
+      "iso": "CG",
+      "name_en": "Congo - Brazzaville",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/CG/"
+    },
+    {
+      "iso": "CH",
+      "name_en": "Switzerland",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/CH/"
+    },
+    {
+      "iso": "CI",
+      "name_en": "Côte d’Ivoire",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/CI/"
+    },
+    {
+      "iso": "CK",
+      "name_en": "Cook Islands",
+      "status": "own",
+      "source": "ck-constitution"
+    },
+    {
+      "iso": "CL",
+      "name_en": "Chile",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/CL/"
+    },
+    {
+      "iso": "CM",
+      "name_en": "Cameroon",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/CM/"
+    },
+    {
+      "iso": "CN",
+      "name_en": "China",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/CN/"
+    },
+    {
+      "iso": "CO",
+      "name_en": "Colombia",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/CO/"
+    },
+    {
+      "iso": "CR",
+      "name_en": "Costa Rica",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/CR/"
+    },
+    {
+      "iso": "CU",
+      "name_en": "Cuba",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/CU/"
+    },
+    {
+      "iso": "CV",
+      "name_en": "Cape Verde",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/CV/"
+    },
+    {
+      "iso": "CW",
+      "name_en": "Curaçao",
+      "status": "own",
+      "source": "cw-staten"
+    },
+    {
+      "iso": "CX",
+      "name_en": "Christmas Island",
+      "status": "within",
+      "within": "AU",
+      "reason": "An external territory of Australia; its residents vote in Australian federal elections in a Northern Territory division under this act, and its shire council is elected under Australian territory law.",
+      "source": "au-electoral-act"
+    },
+    {
+      "iso": "CY",
+      "name_en": "Cyprus",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/CY/"
+    },
+    {
+      "iso": "CZ",
+      "name_en": "Czechia",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/CZ/"
+    },
+    {
+      "iso": "DE",
+      "name_en": "Germany",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/DE/"
+    },
+    {
+      "iso": "DJ",
+      "name_en": "Djibouti",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/DJ/"
+    },
+    {
+      "iso": "DK",
+      "name_en": "Denmark",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/DK/"
+    },
+    {
+      "iso": "DM",
+      "name_en": "Dominica",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/DM/"
+    },
+    {
+      "iso": "DO",
+      "name_en": "Dominican Republic",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/DO/"
+    },
+    {
+      "iso": "DZ",
+      "name_en": "Algeria",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/DZ/"
+    },
+    {
+      "iso": "EC",
+      "name_en": "Ecuador",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/EC/"
+    },
+    {
+      "iso": "EE",
+      "name_en": "Estonia",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/EE/"
+    },
+    {
+      "iso": "EG",
+      "name_en": "Egypt",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/EG/"
+    },
+    {
+      "iso": "EH",
+      "name_en": "Western Sahara",
+      "status": "within",
+      "within": "MA",
+      "reason": "A non-self-governing territory on the United Nations list whose status is disputed; the elections held in the part Morocco administers are Moroccan elections, held under Morocco's organic laws for its House of Representatives and regional councils.",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/MA/"
+    },
+    {
+      "iso": "ER",
+      "name_en": "Eritrea",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/ER/"
+    },
+    {
+      "iso": "ES",
+      "name_en": "Spain",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/ES/"
+    },
+    {
+      "iso": "ET",
+      "name_en": "Ethiopia",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/ET/"
+    },
+    {
+      "iso": "FI",
+      "name_en": "Finland",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/FI/"
+    },
+    {
+      "iso": "FJ",
+      "name_en": "Fiji",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/FJ/"
+    },
+    {
+      "iso": "FK",
+      "name_en": "Falkland Islands",
+      "status": "own",
+      "source": "fk-constitution"
+    },
+    {
+      "iso": "FM",
+      "name_en": "Micronesia",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/FM/"
+    },
+    {
+      "iso": "FO",
+      "name_en": "Faroe Islands",
+      "status": "own",
+      "source": "fo-logting"
+    },
+    {
+      "iso": "FR",
+      "name_en": "France",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/FR/"
+    },
+    {
+      "iso": "GA",
+      "name_en": "Gabon",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/GA/"
+    },
+    {
+      "iso": "GB",
+      "name_en": "United Kingdom",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/GB/"
+    },
+    {
+      "iso": "GD",
+      "name_en": "Grenada",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/GD/"
+    },
+    {
+      "iso": "GE",
+      "name_en": "Georgia",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/GE/"
+    },
+    {
+      "iso": "GF",
+      "name_en": "French Guiana",
+      "status": "within",
+      "within": "FR",
+      "reason": "An overseas collectivity of France (Collectivité territoriale de Guyane) whose assembly, municipal, and national elections are held under the French Code électoral and sit in the French census.",
+      "source": "fr-code-electoral"
+    },
+    {
+      "iso": "GG",
+      "name_en": "Guernsey",
+      "status": "own",
+      "source": "gg-elections"
+    },
+    {
+      "iso": "GH",
+      "name_en": "Ghana",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/GH/"
+    },
+    {
+      "iso": "GI",
+      "name_en": "Gibraltar",
+      "status": "own",
+      "source": "gi-parliament"
+    },
+    {
+      "iso": "GL",
+      "name_en": "Greenland",
+      "status": "own",
+      "source": "gl-inatsisartut"
+    },
+    {
+      "iso": "GM",
+      "name_en": "Gambia",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/GM/"
+    },
+    {
+      "iso": "GN",
+      "name_en": "Guinea",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/GN/"
+    },
+    {
+      "iso": "GP",
+      "name_en": "Guadeloupe",
+      "status": "within",
+      "within": "FR",
+      "reason": "An overseas department and region of France; its elections are held under the French Code électoral and sit in the French census.",
+      "source": "fr-code-electoral"
+    },
+    {
+      "iso": "GQ",
+      "name_en": "Equatorial Guinea",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/GQ/"
+    },
+    {
+      "iso": "GR",
+      "name_en": "Greece",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/GR/"
+    },
+    {
+      "iso": "GS",
+      "name_en": "South Georgia & South Sandwich Islands",
+      "status": "none",
+      "reason": "A British overseas territory with no permanent population, run by a commissioner; no elections are held.",
+      "source": "gs-gov"
+    },
+    {
+      "iso": "GT",
+      "name_en": "Guatemala",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/GT/"
+    },
+    {
+      "iso": "GU",
+      "name_en": "Guam",
+      "status": "within",
+      "within": "US",
+      "reason": "Its elections sit in the United States census: the territory's legislature, governor, and delegate are elected under the statute or constitution cited, within the U.S. archive.",
+      "source": "us-48-gu"
+    },
+    {
+      "iso": "GW",
+      "name_en": "Guinea-Bissau",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/GW/"
+    },
+    {
+      "iso": "GY",
+      "name_en": "Guyana",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/GY/"
+    },
+    {
+      "iso": "HK",
+      "name_en": "Hong Kong SAR China",
+      "status": "own",
+      "source": "hk-basic-law"
+    },
+    {
+      "iso": "HM",
+      "name_en": "Heard & McDonald Islands",
+      "status": "none",
+      "reason": "An uninhabited Australian external territory; no elections are held.",
+      "source": "au-heard"
+    },
+    {
+      "iso": "HN",
+      "name_en": "Honduras",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/HN/"
+    },
+    {
+      "iso": "HR",
+      "name_en": "Croatia",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/HR/"
+    },
+    {
+      "iso": "HT",
+      "name_en": "Haiti",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/HT/"
+    },
+    {
+      "iso": "HU",
+      "name_en": "Hungary",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/HU/"
+    },
+    {
+      "iso": "ID",
+      "name_en": "Indonesia",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/ID/"
+    },
+    {
+      "iso": "IE",
+      "name_en": "Ireland",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/IE/"
+    },
+    {
+      "iso": "IL",
+      "name_en": "Israel",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/IL/"
+    },
+    {
+      "iso": "IM",
+      "name_en": "Isle of Man",
+      "status": "own",
+      "source": "im-tynwald"
+    },
+    {
+      "iso": "IN",
+      "name_en": "India",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/IN/"
+    },
+    {
+      "iso": "IO",
+      "name_en": "British Indian Ocean Territory",
+      "status": "none",
+      "reason": "A British overseas territory with no permanent population, run by a commissioner; no elections are held.",
+      "source": "io-gov"
+    },
+    {
+      "iso": "IQ",
+      "name_en": "Iraq",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/IQ/"
+    },
+    {
+      "iso": "IR",
+      "name_en": "Iran",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/IR/"
+    },
+    {
+      "iso": "IS",
+      "name_en": "Iceland",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/IS/"
+    },
+    {
+      "iso": "IT",
+      "name_en": "Italy",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/IT/"
+    },
+    {
+      "iso": "JE",
+      "name_en": "Jersey",
+      "status": "own",
+      "source": "je-vote"
+    },
+    {
+      "iso": "JM",
+      "name_en": "Jamaica",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/JM/"
+    },
+    {
+      "iso": "JO",
+      "name_en": "Jordan",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/JO/"
+    },
+    {
+      "iso": "JP",
+      "name_en": "Japan",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/JP/"
+    },
+    {
+      "iso": "KE",
+      "name_en": "Kenya",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/KE/"
+    },
+    {
+      "iso": "KG",
+      "name_en": "Kyrgyzstan",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/KG/"
+    },
+    {
+      "iso": "KH",
+      "name_en": "Cambodia",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/KH/"
+    },
+    {
+      "iso": "KI",
+      "name_en": "Kiribati",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/KI/"
+    },
+    {
+      "iso": "KM",
+      "name_en": "Comoros",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/KM/"
+    },
+    {
+      "iso": "KN",
+      "name_en": "St. Kitts & Nevis",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/KN/"
+    },
+    {
+      "iso": "KP",
+      "name_en": "North Korea",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/KP/"
+    },
+    {
+      "iso": "KR",
+      "name_en": "South Korea",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/KR/"
+    },
+    {
+      "iso": "KW",
+      "name_en": "Kuwait",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/KW/"
+    },
+    {
+      "iso": "KY",
+      "name_en": "Cayman Islands",
+      "status": "own",
+      "source": "ky-constitution"
+    },
+    {
+      "iso": "KZ",
+      "name_en": "Kazakhstan",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/KZ/"
+    },
+    {
+      "iso": "LA",
+      "name_en": "Laos",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/LA/"
+    },
+    {
+      "iso": "LB",
+      "name_en": "Lebanon",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/LB/"
+    },
+    {
+      "iso": "LC",
+      "name_en": "St. Lucia",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/LC/"
+    },
+    {
+      "iso": "LI",
+      "name_en": "Liechtenstein",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/LI/"
+    },
+    {
+      "iso": "LK",
+      "name_en": "Sri Lanka",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/LK/"
+    },
+    {
+      "iso": "LR",
+      "name_en": "Liberia",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/LR/"
+    },
+    {
+      "iso": "LS",
+      "name_en": "Lesotho",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/LS/"
+    },
+    {
+      "iso": "LT",
+      "name_en": "Lithuania",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/LT/"
+    },
+    {
+      "iso": "LU",
+      "name_en": "Luxembourg",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/LU/"
+    },
+    {
+      "iso": "LV",
+      "name_en": "Latvia",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/LV/"
+    },
+    {
+      "iso": "LY",
+      "name_en": "Libya",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/LY/"
+    },
+    {
+      "iso": "MA",
+      "name_en": "Morocco",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/MA/"
+    },
+    {
+      "iso": "MC",
+      "name_en": "Monaco",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/MC/"
+    },
+    {
+      "iso": "MD",
+      "name_en": "Moldova",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/MD/"
+    },
+    {
+      "iso": "ME",
+      "name_en": "Montenegro",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/ME/"
+    },
+    {
+      "iso": "MF",
+      "name_en": "St. Martin",
+      "status": "within",
+      "within": "FR",
+      "reason": "An overseas collectivity of France; its Territorial Council is elected under Book VI of the French Code électoral and sits in the French census.",
+      "source": "fr-code-electoral"
+    },
+    {
+      "iso": "MG",
+      "name_en": "Madagascar",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/MG/"
+    },
+    {
+      "iso": "MH",
+      "name_en": "Marshall Islands",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/MH/"
+    },
+    {
+      "iso": "MK",
+      "name_en": "North Macedonia",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/MK/"
+    },
+    {
+      "iso": "ML",
+      "name_en": "Mali",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/ML/"
+    },
+    {
+      "iso": "MM",
+      "name_en": "Myanmar (Burma)",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/MM/"
+    },
+    {
+      "iso": "MN",
+      "name_en": "Mongolia",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/MN/"
+    },
+    {
+      "iso": "MO",
+      "name_en": "Macao SAR China",
+      "status": "own",
+      "source": "mo-al"
+    },
+    {
+      "iso": "MP",
+      "name_en": "Northern Mariana Islands",
+      "status": "within",
+      "within": "US",
+      "reason": "Its elections sit in the United States census: the territory's legislature, governor, and delegate are elected under the statute or constitution cited, within the U.S. archive.",
+      "source": "us-mp-const"
+    },
+    {
+      "iso": "MQ",
+      "name_en": "Martinique",
+      "status": "within",
+      "within": "FR",
+      "reason": "An overseas collectivity of France (Collectivité territoriale de Martinique); its elections are held under the French Code électoral and sit in the French census.",
+      "source": "fr-code-electoral"
+    },
+    {
+      "iso": "MR",
+      "name_en": "Mauritania",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/MR/"
+    },
+    {
+      "iso": "MS",
+      "name_en": "Montserrat",
+      "status": "own",
+      "source": "ms-constitution"
+    },
+    {
+      "iso": "MT",
+      "name_en": "Malta",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/MT/"
+    },
+    {
+      "iso": "MU",
+      "name_en": "Mauritius",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/MU/"
+    },
+    {
+      "iso": "MV",
+      "name_en": "Maldives",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/MV/"
+    },
+    {
+      "iso": "MW",
+      "name_en": "Malawi",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/MW/"
+    },
+    {
+      "iso": "MX",
+      "name_en": "Mexico",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/MX/"
+    },
+    {
+      "iso": "MY",
+      "name_en": "Malaysia",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/MY/"
+    },
+    {
+      "iso": "MZ",
+      "name_en": "Mozambique",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/MZ/"
+    },
+    {
+      "iso": "NA",
+      "name_en": "Namibia",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/NA/"
+    },
+    {
+      "iso": "NC",
+      "name_en": "New Caledonia",
+      "status": "within",
+      "within": "FR",
+      "reason": "A French collectivity sui generis whose provincial assemblies and Congress are elected under French organic law no. 99-209; its elections and self-determination referendums sit in the French census.",
+      "source": "fr-lo-99-209"
+    },
+    {
+      "iso": "NE",
+      "name_en": "Niger",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/NE/"
+    },
+    {
+      "iso": "NF",
+      "name_en": "Norfolk Island",
+      "status": "within",
+      "within": "AU",
+      "reason": "An external territory of Australia; since 2016 its residents vote in Australian federal elections in an Australian Capital Territory division under this act.",
+      "source": "au-electoral-act"
+    },
+    {
+      "iso": "NG",
+      "name_en": "Nigeria",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/NG/"
+    },
+    {
+      "iso": "NI",
+      "name_en": "Nicaragua",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/NI/"
+    },
+    {
+      "iso": "NL",
+      "name_en": "Netherlands",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/NL/"
+    },
+    {
+      "iso": "NO",
+      "name_en": "Norway",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/NO/"
+    },
+    {
+      "iso": "NP",
+      "name_en": "Nepal",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/NP/"
+    },
+    {
+      "iso": "NR",
+      "name_en": "Nauru",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/NR/"
+    },
+    {
+      "iso": "NU",
+      "name_en": "Niue",
+      "status": "own",
+      "source": "nu-constitution"
+    },
+    {
+      "iso": "NZ",
+      "name_en": "New Zealand",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/NZ/"
+    },
+    {
+      "iso": "OM",
+      "name_en": "Oman",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/OM/"
+    },
+    {
+      "iso": "PA",
+      "name_en": "Panama",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/PA/"
+    },
+    {
+      "iso": "PE",
+      "name_en": "Peru",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/PE/"
+    },
+    {
+      "iso": "PF",
+      "name_en": "French Polynesia",
+      "status": "within",
+      "within": "FR",
+      "reason": "An overseas country of France whose Assembly is elected under French organic law no. 2004-192; its elections sit in the French census.",
+      "source": "fr-lo-2004-192"
+    },
+    {
+      "iso": "PG",
+      "name_en": "Papua New Guinea",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/PG/"
+    },
+    {
+      "iso": "PH",
+      "name_en": "Philippines",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/PH/"
+    },
+    {
+      "iso": "PK",
+      "name_en": "Pakistan",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/PK/"
+    },
+    {
+      "iso": "PL",
+      "name_en": "Poland",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/PL/"
+    },
+    {
+      "iso": "PM",
+      "name_en": "St. Pierre & Miquelon",
+      "status": "within",
+      "within": "FR",
+      "reason": "An overseas collectivity of France; its Territorial Council is elected under Book VI of the French Code électoral and sits in the French census.",
+      "source": "fr-code-electoral"
+    },
+    {
+      "iso": "PN",
+      "name_en": "Pitcairn Islands",
+      "status": "own",
+      "source": "pn-constitution"
+    },
+    {
+      "iso": "PR",
+      "name_en": "Puerto Rico",
+      "status": "within",
+      "within": "US",
+      "reason": "Its elections sit in the United States census: the territory's legislature, governor, and delegate are elected under the statute or constitution cited, within the U.S. archive.",
+      "source": "us-pr-const"
+    },
+    {
+      "iso": "PS",
+      "name_en": "Palestinian Territories",
+      "status": "own",
+      "source": "ps-cec"
+    },
+    {
+      "iso": "PT",
+      "name_en": "Portugal",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/PT/"
+    },
+    {
+      "iso": "PW",
+      "name_en": "Palau",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/PW/"
+    },
+    {
+      "iso": "PY",
+      "name_en": "Paraguay",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/PY/"
+    },
+    {
+      "iso": "QA",
+      "name_en": "Qatar",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/QA/"
+    },
+    {
+      "iso": "RE",
+      "name_en": "Réunion",
+      "status": "within",
+      "within": "FR",
+      "reason": "An overseas department and region of France; its elections are held under the French Code électoral and sit in the French census.",
+      "source": "fr-code-electoral"
+    },
+    {
+      "iso": "RO",
+      "name_en": "Romania",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/RO/"
+    },
+    {
+      "iso": "RS",
+      "name_en": "Serbia",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/RS/"
+    },
+    {
+      "iso": "RU",
+      "name_en": "Russia",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/RU/"
+    },
+    {
+      "iso": "RW",
+      "name_en": "Rwanda",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/RW/"
+    },
+    {
+      "iso": "SA",
+      "name_en": "Saudi Arabia",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/SA/"
+    },
+    {
+      "iso": "SB",
+      "name_en": "Solomon Islands",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/SB/"
+    },
+    {
+      "iso": "SC",
+      "name_en": "Seychelles",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/SC/"
+    },
+    {
+      "iso": "SD",
+      "name_en": "Sudan",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/SD/"
+    },
+    {
+      "iso": "SE",
+      "name_en": "Sweden",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/SE/"
+    },
+    {
+      "iso": "SG",
+      "name_en": "Singapore",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/SG/"
+    },
+    {
+      "iso": "SH",
+      "name_en": "St. Helena",
+      "status": "own",
+      "source": "sh-constitution"
+    },
+    {
+      "iso": "SI",
+      "name_en": "Slovenia",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/SI/"
+    },
+    {
+      "iso": "SJ",
+      "name_en": "Svalbard & Jan Mayen",
+      "status": "within",
+      "within": "NO",
+      "reason": "Svalbard and Jan Mayen are part of the Kingdom of Norway; Longyearbyen's local council is elected under Norwegian law as set by the Svalbard Act.",
+      "source": "no-svalbard"
+    },
+    {
+      "iso": "SK",
+      "name_en": "Slovakia",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/SK/"
+    },
+    {
+      "iso": "SL",
+      "name_en": "Sierra Leone",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/SL/"
+    },
+    {
+      "iso": "SM",
+      "name_en": "San Marino",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/SM/"
+    },
+    {
+      "iso": "SN",
+      "name_en": "Senegal",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/SN/"
+    },
+    {
+      "iso": "SO",
+      "name_en": "Somalia",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/SO/"
+    },
+    {
+      "iso": "SR",
+      "name_en": "Suriname",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/SR/"
+    },
+    {
+      "iso": "SS",
+      "name_en": "South Sudan",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/SS/"
+    },
+    {
+      "iso": "ST",
+      "name_en": "São Tomé & Príncipe",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/ST/"
+    },
+    {
+      "iso": "SV",
+      "name_en": "El Salvador",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/SV/"
+    },
+    {
+      "iso": "SX",
+      "name_en": "Sint Maarten",
+      "status": "own",
+      "source": "sx-parliament"
+    },
+    {
+      "iso": "SY",
+      "name_en": "Syria",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/SY/"
+    },
+    {
+      "iso": "SZ",
+      "name_en": "Eswatini",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/SZ/"
+    },
+    {
+      "iso": "TC",
+      "name_en": "Turks & Caicos Islands",
+      "status": "own",
+      "source": "tc-constitution"
+    },
+    {
+      "iso": "TD",
+      "name_en": "Chad",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/TD/"
+    },
+    {
+      "iso": "TF",
+      "name_en": "French Southern Territories",
+      "status": "none",
+      "reason": "French Southern and Antarctic Lands, with no permanent population, run by a prefect; no elections are held.",
+      "source": "tf-taaf"
+    },
+    {
+      "iso": "TG",
+      "name_en": "Togo",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/TG/"
+    },
+    {
+      "iso": "TH",
+      "name_en": "Thailand",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/TH/"
+    },
+    {
+      "iso": "TJ",
+      "name_en": "Tajikistan",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/TJ/"
+    },
+    {
+      "iso": "TK",
+      "name_en": "Tokelau",
+      "status": "own",
+      "source": "tk-gov"
+    },
+    {
+      "iso": "TL",
+      "name_en": "Timor-Leste",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/TL/"
+    },
+    {
+      "iso": "TM",
+      "name_en": "Turkmenistan",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/TM/"
+    },
+    {
+      "iso": "TN",
+      "name_en": "Tunisia",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/TN/"
+    },
+    {
+      "iso": "TO",
+      "name_en": "Tonga",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/TO/"
+    },
+    {
+      "iso": "TR",
+      "name_en": "Türkiye",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/TR/"
+    },
+    {
+      "iso": "TT",
+      "name_en": "Trinidad & Tobago",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/TT/"
+    },
+    {
+      "iso": "TV",
+      "name_en": "Tuvalu",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/TV/"
+    },
+    {
+      "iso": "TW",
+      "name_en": "Taiwan",
+      "status": "own",
+      "source": "tw-cec"
+    },
+    {
+      "iso": "TZ",
+      "name_en": "Tanzania",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/TZ/"
+    },
+    {
+      "iso": "UA",
+      "name_en": "Ukraine",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/UA/"
+    },
+    {
+      "iso": "UG",
+      "name_en": "Uganda",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/UG/"
+    },
+    {
+      "iso": "UM",
+      "name_en": "U.S. Outlying Islands",
+      "status": "none",
+      "reason": "United States minor outlying islands with no permanent population and no elected government.",
+      "source": "um-doi"
+    },
+    {
+      "iso": "US",
+      "name_en": "United States",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/US/"
+    },
+    {
+      "iso": "UY",
+      "name_en": "Uruguay",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/UY/"
+    },
+    {
+      "iso": "UZ",
+      "name_en": "Uzbekistan",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/UZ/"
+    },
+    {
+      "iso": "VA",
+      "name_en": "Vatican City",
+      "status": "none",
+      "reason": "Vatican City State is governed under its Fundamental Law by the Pope and bodies he appoints; it holds no public elections.",
+      "source": "va-state"
+    },
+    {
+      "iso": "VC",
+      "name_en": "St. Vincent & Grenadines",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/VC/"
+    },
+    {
+      "iso": "VE",
+      "name_en": "Venezuela",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/VE/"
+    },
+    {
+      "iso": "VG",
+      "name_en": "British Virgin Islands",
+      "status": "own",
+      "source": "vg-constitution"
+    },
+    {
+      "iso": "VI",
+      "name_en": "U.S. Virgin Islands",
+      "status": "within",
+      "within": "US",
+      "reason": "Its elections sit in the United States census: the territory's legislature, governor, and delegate are elected under the statute or constitution cited, within the U.S. archive.",
+      "source": "us-48-vi"
+    },
+    {
+      "iso": "VN",
+      "name_en": "Vietnam",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/VN/"
+    },
+    {
+      "iso": "VU",
+      "name_en": "Vanuatu",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/VU/"
+    },
+    {
+      "iso": "WF",
+      "name_en": "Wallis & Futuna",
+      "status": "within",
+      "within": "FR",
+      "reason": "An overseas collectivity of France; its Territorial Assembly is elected under French law and sits in the French census.",
+      "source": "fr-code-electoral"
+    },
+    {
+      "iso": "WS",
+      "name_en": "Samoa",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/WS/"
+    },
+    {
+      "iso": "XK",
+      "name_en": "Kosovo",
+      "status": "own",
+      "source": "xk-kqz"
+    },
+    {
+      "iso": "YE",
+      "name_en": "Yemen",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/YE/"
+    },
+    {
+      "iso": "YT",
+      "name_en": "Mayotte",
+      "status": "within",
+      "within": "FR",
+      "reason": "An overseas department of France (Département de Mayotte); its elections are held under the French Code électoral and sit in the French census.",
+      "source": "fr-code-electoral"
+    },
+    {
+      "iso": "ZA",
+      "name_en": "South Africa",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/ZA/"
+    },
+    {
+      "iso": "ZM",
+      "name_en": "Zambia",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/ZM/"
+    },
+    {
+      "iso": "ZW",
+      "name_en": "Zimbabwe",
+      "status": "own",
+      "source": "ipu-parline",
+      "locator": "https://data.ipu.org/parliament/ZW/"
+    }
+  ]
+}
