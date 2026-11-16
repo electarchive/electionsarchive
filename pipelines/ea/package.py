@@ -17,7 +17,7 @@ from uuid import NAMESPACE_URL, uuid5
 
 import duckdb
 import polars as pl
-from psycopg import Connection, sql
+from psycopg import Connection, errors, sql
 
 from ea import covers, search, store, touched
 from ea.apply import MERGE_LOCK, _rollup
@@ -803,6 +803,38 @@ def _missing(conn: Connection, external: object) -> list[str]:
     ]
 
 
+def _drop(conn: Connection, table: str, staged: dict[str, tuple[str, list[str]]], owned: list[str]) -> int:
+    key_columns = TABLES[table][0]
+    if table not in staged:
+        return conn.execute(
+            sql.SQL("delete from {} where changeset_id = any(%s::uuid[])").format(sql.Identifier(table)),
+            [owned],
+        ).rowcount
+    if key_columns is not None:
+        return conn.execute(
+            sql.SQL(
+                "delete from {t} t where t.changeset_id = any(%s::uuid[]) and ({k}) not in (select {k} from {s})"
+            ).format(
+                t=sql.Identifier(table),
+                k=sql.SQL(", ").join(map(sql.Identifier, key_columns)),
+                s=sql.Identifier(staged[table][0]),
+            ),
+            [owned],
+        ).rowcount
+    columns = staged[table][1]
+    return conn.execute(
+        sql.SQL(
+            "delete from {t} t where t.changeset_id = any(%s::uuid[]) and {h} not in (select {sh} from {s} s)"
+        ).format(
+            t=sql.Identifier(table),
+            h=_hash("t", columns),
+            sh=_hash("s", columns),
+            s=sql.Identifier(staged[table][0]),
+        ),
+        [owned],
+    ).rowcount
+
+
 def _facts(conn: Connection, path: Path, accepted: dict[str, object]) -> Loaded | None:
     manifest = _manifest(path)
     key = str(manifest["key"])
@@ -860,23 +892,19 @@ def _facts(conn: Connection, path: Path, accepted: dict[str, object]) -> Loaded 
             columns = list(TABLES[table][1])
             _stage(conn, table, columns, file)
             staged[table] = (f"pkg_{table}", columns)
-    moved: list[str] = []
-    if "area_parent" in staged or "area" in staged:
-        moved = [
-            str(id)
-            for (id,) in conn.execute(
-                sql.SQL(
-                    """select p.area_id from area_parent p where p.changeset_id = any(%s::uuid[])
-                       and {h} not in (select {s} from pkg_area_parent s)"""
-                ).format(
-                    h=_hash("p", staged["area_parent"][1]) if "area_parent" in staged else sql.SQL("null"),
-                    s=_hash("s", staged["area_parent"][1]) if "area_parent" in staged else sql.SQL("null"),
+    moved = [
+        str(id)
+        for (id,) in conn.execute(
+            sql.SQL("select p.area_id from area_parent p where p.changeset_id = any(%s::uuid[]){kept}").format(
+                kept=sql.SQL(" and {h} not in (select {s} from pkg_area_parent s)").format(
+                    h=_hash("p", staged["area_parent"][1]), s=_hash("s", staged["area_parent"][1])
                 )
                 if "area_parent" in staged
-                else sql.SQL("select null::uuid where false"),
-                [owned],
-            ).fetchall()
-        ]
+                else sql.SQL("")
+            ),
+            [owned],
+        ).fetchall()
+    ]
     dropped_sets = [
         k
         for (k,) in conn.execute(
@@ -897,37 +925,14 @@ def _facts(conn: Connection, path: Path, accepted: dict[str, object]) -> Loaded 
     counts: dict[str, list[int]] = {}
     touched_ids: dict[str, list[str]] = {}
     for table in reversed(TABLES):
-        key_columns = TABLES[table][0]
-        if table not in staged:
-            gone = conn.execute(
-                sql.SQL("delete from {} where changeset_id = any(%s::uuid[])").format(sql.Identifier(table)),
-                [owned],
-            ).rowcount
-        elif key_columns is not None:
-            gone = conn.execute(
-                sql.SQL(
-                    "delete from {t} t where t.changeset_id = any(%s::uuid[]) and ({k}) not in (select {k} from {s})"
-                ).format(
-                    t=sql.Identifier(table),
-                    k=sql.SQL(", ").join(map(sql.Identifier, key_columns)),
-                    s=sql.Identifier(staged[table][0]),
-                ),
-                [owned],
-            ).rowcount
-        else:
-            columns = staged[table][1]
-            gone = conn.execute(
-                sql.SQL(
-                    "delete from {t} t where t.changeset_id = any(%s::uuid[]) and {h} not in (select {sh} from {s} s)"
-                ).format(
-                    t=sql.Identifier(table),
-                    h=_hash("t", columns),
-                    sh=_hash("s", columns),
-                    s=sql.Identifier(staged[table][0]),
-                ),
-                [owned],
-            ).rowcount
-        counts.setdefault(table, [0, 0])[1] = gone
+        try:
+            counts.setdefault(table, [0, 0])[1] = _drop(conn, table, staged, owned)
+        except errors.ForeignKeyViolation as error:
+            raise ValueError(
+                f"{key} v{version} would delete {table} rows that other packages still use "
+                f"({error.diag.message_detail}); a package must keep every row other packages reference, "
+                "so build it from a full parse of its pipeline"
+            ) from None
     for table in TABLES:
         if table not in staged:
             continue
