@@ -240,3 +240,13 @@ for _name, _rule in {
     "nov_last_sunday": last_weekday(11, 6),
 }.items():
     DAY_RULES.setdefault(_name, _rule)
+
+for _month_number, _month in enumerate(
+    ("jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"), 1
+):
+    for _weekday_number, _weekday in enumerate(
+        ("monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday")
+    ):
+        DAY_RULES.setdefault(f"{_month}_last_{_weekday}", last_weekday(_month_number, _weekday_number))
+        for _nth, _ordinal in enumerate(("first", "second", "third", "fourth", "fifth"), 1):
+            DAY_RULES.setdefault(f"{_month}_{_ordinal}_{_weekday}", nth_weekday(_month_number, _weekday_number, _nth))
