@@ -152,10 +152,11 @@ def documents(code: str) -> Iterator[Doc]:
             if found["kind"] is None or found["eml"] is None:
                 continue
             fields = {name: "" if match is None else match.group(1).decode() for name, match in found.items()}
-            slot = (fields["kind"], fields["eml"], fields["authority"], fields["contest"])
+            folder = member.rsplit("/", 1)[0] if "/" in member else ""
+            slot = (fields["kind"], fields["eml"], fields["authority"], fields["contest"], folder)
             if slot not in chosen or chosen[slot][2] < fields["created"]:
                 chosen[slot] = (path, member, fields["created"])
-    for (kind, eml, authority, _), (path, member, created) in chosen.items():
+    for (kind, eml, authority, *_), (path, member, created) in chosen.items():
         archive = zipfile.ZipFile(raw.cached(SOURCE, url(path)).path)
         yield Doc(member, kind, eml, authority, created, ElementTree.fromstring(archive.read(member)))
 
@@ -451,9 +452,7 @@ def elections() -> pl.DataFrame:
     )
     # Bonaire's 2023 count file carries the day before; every election in an archive shares one day.
     first = frame.group_by("code").agg(pl.col("day").mode().first().alias("mode"))
-    frame = frame.join(first, on="code").with_columns(
-        day=pl.when(pl.col("category").is_in(["GR"])).then("day").otherwise("mode")
-    )
+    frame = frame.join(first, on="code").with_columns(day=pl.col("mode"))
     return frame.drop("mode").filter(pl.col("category").is_in(list(CATEGORIES))).sort("day", "eml")
 
 
@@ -591,6 +590,7 @@ def registry() -> Package:
         ("nl.waterschap", 1, "administrative", "water board", None),
         ("nl.gemeente", 2, "administrative", "municipality", "cbs"),
         ("nl.stembureau", 3, "precinct", "polling station", None),
+        ("nl.kieskring", 2, "electoral_district", "electoral district", None),
     ):
         p.add("scheme", code=code, polity_id=NETHERLANDS, kind=kind, rank=rank, noun=noun, code_system=system)
 
@@ -664,28 +664,42 @@ def registry() -> Package:
 
 def _official(frame: pl.DataFrame) -> tuple[pl.DataFrame, str]:
     """The municipal figures of one EML election: the district count files when there are any, else the total
-    count file's municipal rows, else each municipality's own total."""
+    count file's municipal rows, else each municipality's own total. An electoral district whose count file lists
+    no municipalities takes its municipalities' own totals when they add up to the district total, and is otherwise
+    kept whole as an aggregate unit named HSB and its number."""
     district = frame.filter(pl.col("kind") == "510c", pl.col("unit").is_not_null())
-    if district.height:
-        grain, chosen = "district", district.with_columns(municipality=pl.col("unit").str.split("::").list.last())
-        local = frame.filter(pl.col("kind") == "510b", pl.col("unit").is_null()).with_columns(
-            municipality=pl.col("authority")
-        )
-        missing = local.filter(~pl.col("municipality").is_in(chosen["municipality"].unique().implode()))
-        chosen = pl.concat([chosen, missing])
+    local = frame.filter(pl.col("kind") == "510b", pl.col("unit").is_null()).with_columns(
+        municipality=pl.col("authority")
+    )
+    totals = frame.filter(pl.col("kind") == "510d", pl.col("unit").str.contains(r"^HSB\d+$"))
+    if district.height or totals.height:
+        grain = "district"
+        chosen = district.with_columns(municipality=pl.col("unit").str.split("::").list.last())
+        covered = set(district["unit"].str.split("::").list.first().str.strip_prefix("HSB").unique().to_list())
+        pieces = [chosen]
+        for number in sorted(set(totals["unit"].str.strip_prefix("HSB").unique().to_list()) - covered):
+            whole = totals.filter(pl.col("unit") == f"HSB{number}")
+            towns = local.filter(pl.col("contest") == number)
+            want = whole.filter(pl.col("measure") == VALID)["value"].sum()
+            if towns.height and towns.filter(pl.col("measure") == VALID)["value"].sum() == want:
+                pieces.append(towns)
+            else:
+                grain = "district with aggregates"
+                pieces.append(whole.with_columns(municipality=pl.lit(f"HSB{number}")))
+        if not totals.height:
+            seen = set(pl.concat(pieces)["municipality"].unique().to_list())
+            pieces.append(local.filter(~pl.col("municipality").is_in(list(seen))))
+        chosen = pl.concat(pieces)
     else:
         total = frame.filter(pl.col("kind") == "510d", pl.col("unit").str.contains(r"^\d{4}$"))
         if total.height:
             grain, chosen = "total", total.with_columns(municipality=pl.col("unit"))
         else:
-            grain = "municipal"
-            chosen = frame.filter(pl.col("kind") == "510b", pl.col("unit").is_null()).with_columns(
-                municipality=pl.col("authority")
-            )
-    chosen = chosen.filter(pl.col("municipality").str.contains(r"^\d{4}$"))
+            grain, chosen = "municipal", local
+    chosen = chosen.filter(pl.col("municipality").str.contains(r"^(\d{4}|HSB\d+)$"))
     # A zero electorate is a blank in the source (the Kiesraad lists the true figures in its notes), never a count.
     chosen = chosen.filter(~((pl.col("measure") == REGISTERED) & (pl.col("value") == 0)))
-    return chosen.group_by("municipality", "measure", "aff").agg(pl.col("value").sum()), grain
+    return chosen.group_by("municipality", "measure", "aff").agg(pl.col("value").first()), grain
 
 
 def _stations(frame: pl.DataFrame) -> pl.DataFrame:
@@ -860,13 +874,38 @@ def _contest(
         body_md=OFFICIAL_METHOD,
         lang="en",
     )
+    for aggregate in sorted(c for c in official["municipality"].unique().to_list() if c.startswith("HSB")):
+        p.add(
+            "reporting_unit",
+            id=unit("nl.kieskring", f"{day}:{eml}:{aggregate}"),
+            polity_id=NETHERLANDS,
+            scheme_code="nl.kieskring",
+            code=f"{day}:{eml}:{aggregate}",
+            area_relation="unlocated",
+            kind="aggregate",
+            valid_from=day,
+            valid_from_precision="day",
+        )
+        p.add(
+            "note",
+            id=key("note", official_set, aggregate),
+            entity_id=official_set,
+            kind="caveat",
+            body_md=f"Electoral district {aggregate.removeprefix('HSB')} has no municipal breakdown in the Kiesraad's "
+            "district count file, and its municipalities' own files do not add up to its total, so its votes are "
+            "kept whole in one aggregate unit.",
+            lang="en",
+        )
     valid = int(official.filter(pl.col("measure") == VALID)["value"].sum())
     station_valid = int(stations.filter(pl.col("measure") == VALID)["value"].sum())
     out: list[pl.DataFrame] = []
     out.append(
         official.select(
             result_set_id=pl.lit(official_set),
-            unit_id=pl.col("municipality").map_elements(lambda c: unit("nl.gemeente", c), return_dtype=pl.String),
+            unit_id=pl.col("municipality").map_elements(
+                lambda c: unit("nl.kieskring", f"{day}:{eml}:{c}") if c.startswith("HSB") else unit("nl.gemeente", c),
+                return_dtype=pl.String,
+            ),
             option_id=pl.col("aff").replace_strict(options, default=None, return_dtype=pl.String),
             measure=pl.col("measure"),
             value=pl.col("value"),
