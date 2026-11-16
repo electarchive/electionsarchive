@@ -34,6 +34,7 @@ IDENTITIES = (
 )
 STRONG = ("bioguide", "wikidata", "mnis", "ep.mep", "lop.person", "fec.candidate")
 SAME = Path(__file__).with_name("crosswalk_same.tsv")
+APART = Path(__file__).with_name("crosswalk_apart.tsv")
 CANON = {"rudy": "rudolph", "rudi": "rudolph"} | {
     form: first
     for first, forms in NICKNAMES.items()
@@ -212,6 +213,12 @@ def emit() -> Path:
             [list(IDENTITIES)],
         ).fetchall():
             ids[person_of[str(person)]][scheme].add(value)
+        with APART.open(newline="", encoding="utf-8") as handle:
+            different = {
+                frozenset((person_of[entry["one"]], person_of[entry["two"]]))
+                for entry in csv.DictReader(handle, delimiter="\t")
+                if entry["one"] in person_of and entry["two"] in person_of
+            }
 
         def suspect(person: int) -> bool:
             days = sorted(dates[person])
@@ -232,6 +239,8 @@ def emit() -> Path:
             )
 
         def apart(one: int, two: int) -> str | None:
+            if frozenset((one, two)) in different:
+                return "listed as different people"
             if suspect(one) or suspect(two):
                 return "busy or long career"
             if dates[one] & dates[two]:
