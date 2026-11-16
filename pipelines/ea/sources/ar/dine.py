@@ -702,7 +702,7 @@ def geo() -> Package:
 
 def _colors() -> dict[str, str]:
     colors: dict[str, str] = {}
-    for held in available():
+    for held in [held for held in available() if held.url in raw.keys(SOURCE)]:
         archive = zipfile.ZipFile(raw.cached(SOURCE, held.url).path)
         for member in archive.namelist():
             if not re.search(r"colores[^/]*\.csv$", member, re.IGNORECASE):
@@ -725,7 +725,7 @@ def registry() -> Package:
         depends=[f"{SOURCE}/geo"],
     )
     p.external |= {ARGENTINA}
-    for held in available():
+    for held in [held for held in available() if held.url in raw.keys(SOURCE)]:
         p.artifact(raw.cached(SOURCE, held.url), DINE_SOURCE)
     for year in sorted({held.day.year for held in HELD}):
         p.artifact(raw.cached(SOURCE, menu_url(year)), API_SOURCE)
@@ -1678,6 +1678,8 @@ def parse() -> None:
             stage_sections(held.key)
     geo().write()
     registry().write()
+    for day in history()[0]:
+        past(day).write()
     for held in sorted(available(), key=lambda held: held.key in FIRST_ROUND):
         _build(held.key)
 
