@@ -563,6 +563,18 @@ SYSTEMS = [
 ]
 
 
+def candidate_names() -> list[str]:
+    """Every presidential candidate that Statistics Iceland names, by the name as printed."""
+    names: set[str] = set()
+    for table in ("KOS07112", "KOS07110"):
+        g = grid(table)
+        for label in g.labels[g.dims[0]]:
+            text = re.sub(r"\s*\d{4}\s*$", "", clean(label))
+            if text not in ("Total", "Alls"):
+                names.add(text)
+    return sorted(names)
+
+
 def registry() -> Package:
     p = Package(
         "is.hagstofa/registry",
@@ -579,9 +591,9 @@ def registry() -> Package:
         publisher="Hagstofa Íslands (Statistics Iceland)",
         title="Elections: PxWeb statistical database",
         url="https://px.hagstofa.is/pxen/pxweb/en/Ibuar/Ibuar__kosningar/",
-        license="CC BY 4.0",
-        license_url="https://creativecommons.org/licenses/by/4.0/",
-        attribution="Statistics Iceland, hagstofa.is",
+        license="Statistics Iceland terms of use: reuse with Statistics Iceland acknowledged as the source",
+        license_url="https://hagstofa.is/en/about-us/terms-of-use",
+        attribution="Source: Statistics Iceland, hagstofa.is",
     )
     for table in TABLES:
         p.artifact(raw.cached(SOURCE, url(table)), STATS)
@@ -600,6 +612,10 @@ def registry() -> Package:
             "electoral_system", id=id, polity_id=ICELAND, valid_from=since, valid_to=until, rules=rules, rules_version=1
         )
         p.add("note", id=key("note", id), entity_id=id, kind="methodology", body_md=method, lang="en")
+    for name in candidate_names():
+        person = key("person", name)
+        p.add("person", id=person, birth_precision=None)
+        p.name(person, name, "is", "official")
     for pid, text in sorted(parties().items()):
         id = party(pid)
         p.add("party", id=id, kind="party", polity_id=ICELAND)
@@ -1376,8 +1392,6 @@ def president(event: Event) -> Package:
         votes_by_name[name] = total
         options[name] = b.option(contest, name, name, position, "candidate")
         person = people[name] = key("person", name)
-        if (key_ := ("person", person)) not in PERSONS:
-            PERSONS.add(key_)
         b.p.add(
             "candidacy",
             id=key("candidacy", b.ekey, name),
@@ -1386,8 +1400,6 @@ def president(event: Event) -> Package:
             role="head",
             ballot_name=name,
         )
-        b.p.add("person", id=person, birth_precision=None)
-        b.p.name(person, name, "is", "official")
     leader = max(votes_by_name, key=lambda n: votes_by_name[n] or 0)
     for name, option in options.items():
         b.outcome(result_set, option, None, "elected" if name == leader else "lost")
@@ -1463,9 +1475,6 @@ def president(event: Event) -> Package:
     b.declare(result_set, None, 5, totals.get(Year=ys, Votes="Void ballots", Unit="Number"))
     dated(b, event)
     return b.finish()
-
-
-PERSONS: set[tuple[str, str]] = set()
 
 
 # ---------------------------------------------------------------- referenda
