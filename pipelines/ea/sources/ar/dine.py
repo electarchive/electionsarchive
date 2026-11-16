@@ -677,8 +677,14 @@ def geo() -> Package:
         f"Argentina's {len(districts)} electoral districts and {len(sections):,} sections (departments, partidos, and "
         "comunas) as the Dirección Nacional Electoral codes them",
     )
-    p.external |= {ARGENTINA, COUNTRY}
+    p.external.add(COUNTRY)
     _source_rows(p)
+    p.add("polity", id=ARGENTINA, kind="sovereign_state", iso_code="AR")
+    p.name(ARGENTINA, "Argentina", "en", "official")
+    p.name(ARGENTINA, "Argentina", "es", "native", preferred=False)
+    p.add("slug", path="ar", entity_id=ARGENTINA, is_current=True)
+    p.add("external_id", entity_id=ARGENTINA, scheme="wikidata", value="Q414")
+    p.add("polity_territory", polity_id=ARGENTINA, area_id=COUNTRY)
     for code, rank, kind, noun in (
         ("ar.distrito", 1, "administrative", "province"),
         ("ar.seccion", 2, "administrative", "department"),

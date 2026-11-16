@@ -73,6 +73,7 @@ TABLES: dict[str, tuple[tuple[str, ...] | None, dict[str, pl.DataType]]] = {
         ("id",),
         {"id": U, "artifact_id": U, "page_number": I32, "image_key": U, "width": I32, "height": I32},
     ),
+    "polity": (("id",), {"id": U, "kind": U, "iso_code": U}),
     "scheme": (
         ("code",),
         {"code": U, "polity_id": U, "kind": U, "rank": I16, "noun": U, "kinds": U, "code_system": U},
@@ -93,6 +94,7 @@ TABLES: dict[str, tuple[tuple[str, ...] | None, dict[str, pl.DataType]]] = {
             "source_id": U,
         },
     ),
+    "polity_territory": (None, {"polity_id": U, "area_id": U, "valid_from": D, "valid_to": D}),
     "boundary_set": (
         ("id",),
         {"id": U, "scheme_code": U, "vintage": U, "valid_from": D, "valid_to": D, "as_of": D},
@@ -295,6 +297,9 @@ FACT_LIKE: dict[str, LiteralString] = {
     " count_round smallint, page_id uuid, source_id uuid, x0 real, y0 real, x1 real, y1 real",
 }
 JSON_COLUMNS = {"kinds", "rules", "locator"}
+# Tables that joined the format after packages were first exported: a package removes its own rows in them only when
+# it carries the table, so a package exported earlier never drops the polities its adopted changesets wrote.
+STAGED_ONLY = {"polity", "polity_territory"}
 
 
 def folder(key: str) -> Path:
@@ -494,6 +499,8 @@ def _digest(out: Path, tables: Iterable[str], con: duckdb.DuckDBPyConnection | N
 
 REFERENCES = [
     ("source_artifact", "source_id", "source"),
+    ("polity_territory", "polity_id", "polity"),
+    ("polity_territory", "area_id", "area"),
     ("scheme", "polity_id", "polity"),
     ("area", "scheme_code", "scheme"),
     ("area_code", "area_id", "area"),
@@ -695,11 +702,7 @@ def check(path: Path) -> list[tuple[str, int, list[tuple[object, ...]]]]:
             findings.append((f"unique.{table}", len(rows), rows[:5]))
     for table, column, target in REFERENCES:
         target_key = TARGET_KEY.get(target, "id")
-        known = (
-            "select id from external"
-            if target == "polity"
-            else f'select "{target_key}" from "all_{target}" union all select id from external'
-        )
+        known = f'select "{target_key}" from "all_{target}" union all select id from external'
         rows = con.execute(
             f'select distinct "{column}" from "{table}" where "{column}" is not null and "{column}" not in ({known})'
         ).fetchall()
@@ -868,7 +871,9 @@ def _facts(conn: Connection, path: Path, accepted: dict[str, object]) -> Loaded 
     touched_ids: dict[str, list[str]] = {}
     for table in reversed(TABLES):
         key_columns = TABLES[table][0]
-        if table not in staged:
+        if table not in staged and table in STAGED_ONLY:
+            gone = 0
+        elif table not in staged:
             gone = conn.execute(
                 sql.SQL("delete from {} where changeset_id = any(%s::uuid[])").format(sql.Identifier(table)),
                 [owned],
@@ -1258,11 +1263,7 @@ def _seal(
     for table, column, target in REFERENCES:
         if table not in counts:
             continue
-        known = (
-            ""
-            if target == "polity"
-            else f' and "{column}" not in (select "{TARGET_KEY.get(target, "id")}" from "{target}")'
-        )
+        known = f' and "{column}" not in (select "{TARGET_KEY.get(target, "id")}" from "{target}")'
         rows = con.execute(
             f'select distinct "{column}"::varchar from "{table}" where "{column}" is not null{known}'
         ).fetchall()
