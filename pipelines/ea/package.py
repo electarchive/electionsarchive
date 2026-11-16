@@ -784,15 +784,27 @@ class Loaded(NamedTuple):
     counts: dict[str, list[int]]
 
 
+def _missing(conn: Connection, external: object) -> list[str]:
+    return [
+        str(value)
+        for (value,) in conn.execute(
+            """with x as (
+                 select v, case when v ~ '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$' then v::uuid end as id
+                 from unnest(%s::text[]) v
+               )
+               select v from x
+               where not exists (select from entity e where e.id = x.id)
+                 and not exists (select from polity p where p.id = x.id)
+                 and not exists (select from scheme s where s.code = x.v)""",
+            [external],
+        ).fetchall()
+    ]
+
+
 def _facts(conn: Connection, path: Path, accepted: dict[str, object]) -> Loaded | None:
     manifest = _manifest(path)
     key = str(manifest["key"])
-    missing = conn.execute(
-        """select x from unnest(%s::text[]) x
-           where not exists (select from entity e where e.id::text = x) and not exists (select from polity p where p.id::text = x)
-             and not exists (select from scheme s where s.code = x)""",
-        [manifest["external"]],
-    ).fetchall()
+    missing = _missing(conn, manifest["external"])
     if missing:
         raise ValueError(f"{key} references ids missing from the database: {missing[:5]}")
     for depend in manifest["depends"]:
@@ -1156,16 +1168,7 @@ def _ready(conn: Connection, key: str, batch: set[str]) -> list[str]:
     path = _resolve(key)
     manifest = _manifest(path)
     found: list[str] = []
-    missing = [
-        str(x)
-        for (x,) in conn.execute(
-            """select x from unnest(%s::text[]) x
-               where not exists (select from entity e where e.id::text = x)
-                 and not exists (select from polity p where p.id::text = x)
-                 and not exists (select from scheme s where s.code = x)""",
-            [manifest["external"]],
-        ).fetchall()
-    ]
+    missing = _missing(conn, manifest["external"])
     if missing:
         found.append(f"ready.external: {len(missing)} referenced ids are missing from the database: {missing[:5]}")
     for depend in manifest["depends"]:
