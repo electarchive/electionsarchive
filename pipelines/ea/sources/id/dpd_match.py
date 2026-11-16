@@ -51,10 +51,12 @@ TITLES = {
     "tgh",
 }
 DPD = "Q21328635"
+DCT_2024 = "Q123724130"
 QUERY = """SELECT ?name ?item ?description ?pos WHERE {{ VALUES ?name {{ {names} }}
 ?item rdfs:label|skos:altLabel ?name ; wdt:P31 wd:Q5 ; wdt:P27 wd:Q252 .
 OPTIONAL {{ ?item schema:description ?description FILTER(LANG(?description) IN ("id", "en")) }}
-OPTIONAL {{ ?item wdt:P39 ?pos }} }}"""
+OPTIONAL {{ ?item wdt:P39 ?pos }}
+OPTIONAL {{ ?item ?claim ?statement . ?statement prov:wasDerivedFrom/pr:P248 wd:{dct} . BIND(wd:{dct} AS ?dct) }} }}"""
 MEMBER = re.compile(r"dewan perwakilan daerah|\bdpd\b|regional representative council|senator", re.IGNORECASE)
 UNMATCHED = DATA / "tmp" / "id-dev" / "dpd_unmatched.tsv"
 
@@ -108,11 +110,12 @@ def urls(conn: Connection) -> list[str]:
         + urlencode(
             {
                 "query": QUERY.format(
+                    dct=DCT_2024,
                     names=" ".join(
                         json.dumps(name, ensure_ascii=False) + "@" + lang
                         for name in names[start : start + 60]
                         for lang in ("id", "en")
-                    )
+                    ),
                 ),
                 "format": "json",
             }
@@ -271,6 +274,8 @@ def offers() -> tuple[
             evidence = labeled[plain(core(binding["name"]["value"]))][item]
             if binding.get("pos", {}).get("value", "").endswith(f"/{DPD}"):
                 evidence.add("held")
+            if binding.get("dct", {}).get("value", "").endswith(f"/{DCT_2024}"):
+                evidence.add("candidate-2024")
             if MEMBER.search(binding.get("description", {}).get("value", "")):
                 evidence.add("described")
     listed = listing()
@@ -305,7 +310,9 @@ def emit() -> Path:
         for run in winners:
             key = plain(run.core)
             items = set(listed[run.day.year].get(key, set())) | {
-                item for item, evidence in labeled.get(key, {}).items() if evidence
+                item
+                for item, evidence in labeled.get(key, {}).items()
+                if evidence - ({"candidate-2024"} if run.day.year != 2024 else set())
             }
             if not items:
                 items = {
