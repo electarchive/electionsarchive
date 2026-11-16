@@ -44,6 +44,8 @@ class Results:
     slug: str
     kind: str  # general, local, by_election
     title: str
+    keep: frozenset[str] | None = None  # the only municipalities this package takes from the database
+    extra: tuple[tuple[int, frozenset[str]], ...] = ()  # municipalities taken from other databases
 
 
 RESULTS = [
@@ -53,11 +55,17 @@ RESULTS = [
     Results(17, date(2017, 12, 17), "2017-12-17", "by_election", "2017 Glamoč mayoral by-election"),
     Results(25, date(2018, 10, 7), "2018-10-07", "general", "2018 Bosnian general election"),
     Results(26, date(2019, 2, 17), "2019-02-17", "by_election", "2019 mayoral by-elections"),
-    Results(27, date(2020, 11, 15), "2020-11-15", "local", "2020 Bosnian local elections"),
+    Results(
+        27,
+        date(2020, 11, 15),
+        "2020-11-15",
+        "local",
+        "2020 Bosnian local elections",
+        extra=((29, frozenset({"105"})),),  # Srebrenica, certified separately
+    ),
     Results(28, date(2020, 12, 20), "2020-12-20", "local", "2020 Mostar city council election"),
-    Results(29, date(2021, 2, 21), "2021-02-21", "local", "2020 local elections in Srebrenica and Doboj (repeat)"),
+    Results(29, date(2021, 2, 21), "2021-02-21", "local", "2021 Doboj repeat local election", keep=frozenset({"038"})),
     Results(30, date(2021, 4, 11), "2021-04-11", "by_election", "2021 Travnik and Foča mayoral by-elections"),
-    Results(31, date(2021, 12, 12), "2021-12-12", "by_election", "2021 Prijedor mayoral by-election"),
     Results(32, date(2022, 10, 2), "2022-10-02", "general", "2022 Bosnian general election"),
     Results(33, date(2023, 2, 5), "2023-02-05", "by_election", "2023 mayoral by-elections"),
     Results(34, date(2023, 5, 28), "2023-05-28", "by_election", "2023 Živinice mayoral by-election"),
@@ -795,7 +803,6 @@ def contest_name(r: Results, c: Contest) -> tuple[str, str]:
 
 
 def election(r: Results, report: Report) -> Package:
-    db = database(r)
     p = Package(
         package_key(r),
         SOURCE,
@@ -831,7 +838,10 @@ def election(r: Results, report: Report) -> Package:
 
     seen_slugs: set[str] = set()
     over: list[str] = []
-    for c in everything()[r.id]:
+    central_over: list[str] = []
+    ambiguous: Counter[str] = Counter()
+    people: set[str] = set()
+    for db, c in package_contests(r):
         contest = key("contest", r.slug, c.key)
         result_set = key("result_set", r.slug, c.key)
         en, bs = contest_name(r, c)
@@ -890,8 +900,10 @@ def election(r: Results, report: Report) -> Package:
                     ballot_label=o.label,
                 )
                 person = key("person", c.race, district if c.race in {"8", "9"} else "", name)
-                p.add("person", id=person)
-                p.name(person, title(name), "bs", "official")
+                if person not in people:
+                    people.add(person)
+                    p.add("person", id=person)
+                    p.name(person, title(name), "bs", "official")
                 p.add(
                     "candidacy",
                     id=key("candidacy", r.slug, c.key, o.label),
@@ -935,6 +947,23 @@ def election(r: Results, report: Report) -> Package:
                     values.add(result_set, id, None, measure, c.info.get(field_name))
             continue
         named = {words(o.label): o.label for o in c.options if o.minority}
+        lists = Counter(candidate(o.label)[1] for o in c.options if o.minority)
+        minority_lists = {
+            candidate(o.label)[1]: o.label for o in c.options if o.minority if lists[candidate(o.label)[1]] == 1
+        }
+        minority_codes = Counter(o.code for o in c.options if o.minority)
+        minority_by_code = {o.code: o.label for o in c.options if o.minority and minority_codes[o.code] == 1}
+
+        def minority(row: dict[str, Any]) -> str | None:
+            """The minority candidate a station row counts: by name, else by the list printed, else by code."""
+            text = label(row)
+            return (
+                named.get(words(text))
+                or minority_lists.get(text)
+                or minority_lists.get(candidate(text)[1])
+                or minority_by_code.get(str(row.get("code") or "").strip())
+            )
+
         codes = Counter(o.code for o in c.options if o.code)
         by_code = {o.code: o.label for o in c.options if o.code and codes[o.code] == 1 and not o.minority}
         summed: Counter[str] = Counter()
@@ -953,21 +982,27 @@ def election(r: Results, report: Report) -> Package:
                 if info.get(field_name) is not None:
                     values.add(result_set, id, None, measure, info[field_name])
                     accounting[measure] += int(info[field_name])
-            if c.race == "9":
-                minorities_url = station_minorities_url(db, station)
-                files.add(minorities_url)
-                rows = [
-                    *_list(rows),
-                    *(dict(row, name=named.get(words(label(row)), label(row))) for row in _list(maybe(minorities_url))),
-                ]
+            found: list[tuple[str | None, dict[str, Any]]] = []
             for row in _list(rows):
                 text = label(row)
                 if text not in options and row.get("code") and str(row["code"]).strip() in by_code:
                     text = by_code[str(row["code"]).strip()]
-                if text not in options and not row.get("totalVotes"):
+                found.append((text if text in options else None, row))
+            if c.race == "9":
+                minorities_url = station_minorities_url(db, station)
+                files.add(minorities_url)
+                found += [(minority(row), row) for row in _list(maybe(minorities_url))]
+            for text, row in found:
+                if text is None and not row.get("totalVotes"):
                     continue
-                if text not in options:
-                    report.problems.append(f"{r.slug} {c.key}: station {code} names {text}, not on the district list")
+                if text is None and lists[label(row)] > 1:
+                    shared = sorted(o.label for o in c.options if o.minority and candidate(o.label)[1] == label(row))
+                    ambiguous[f"{en} ({' and '.join(shared)})"] += int(row["totalVotes"])
+                    continue
+                if text is None:
+                    report.problems.append(
+                        f"{r.slug} {c.key}: station {code} names {label(row)}, not on the district list"
+                    )
                     continue
                 values.add(result_set, id, options[text], VOTES, row.get("totalVotes") or 0)
                 summed[text] += int(row.get("totalVotes") or 0)
@@ -995,6 +1030,8 @@ def election(r: Results, report: Report) -> Package:
                 for row in p.rows["declared"]
                 if not (row["result_set_id"] == result_set and row["option_id"] is None and row["measure"] == measure)
             ]
+        if rest.get(BALLOTS, 0) > rest.get(REGISTERED, rest.get(BALLOTS, 0)):
+            central_over.append(f"{en} ({rest[BALLOTS]} ballots, {rest[REGISTERED]} registered)")
         if any(rest.values()):
             id = unit(f"central:{c.key}", "aggregate", place)
             for measure, n in rest.items():
@@ -1004,7 +1041,7 @@ def election(r: Results, report: Report) -> Package:
             if here != o.votes:
                 report.problems.append(f"{r.slug} {c.key}: {o.label} has {here} votes in the units, {o.votes} printed")
     cited: set[str] = set()
-    for url in sorted(files | aggregate_files(r)):
+    for url in sorted(files | aggregate_files(r) | {u for i, _ in r.extra for u in aggregate_files(by_id(i))}):
         try:
             artifact = raw.cached(SOURCE, url)
         except LookupError:
@@ -1014,21 +1051,54 @@ def election(r: Results, report: Report) -> Package:
         else:
             cited.add(artifact.storage_key)
             p.artifact(artifact, SOURCE_ID)
+    reasons = []
     if over:
-        p.accept(
-            "accounting.turnout",
+        reasons.append(
             "The Commission's own polling station results print more ballots cast than registered voters at "
-            + "; ".join(over),
+            + "; ".join(over)
         )
+    if central_over:
+        reasons.append(
+            "Each district's centrally counted unit holds the registered voters the Commission prints for the "
+            "district beyond its stations' rolls, while its ballots are the postal, absentee, mobile, and tendered "
+            "ballots of voters on those rolls, so its ballots exceed its registered voters in "
+            + "; ".join(central_over)
+        )
+    if reasons:
+        p.accept("accounting.turnout", ". ".join(reasons))
+    if ambiguous:
+        why = (
+            "The Commission's polling station files for national-minority council seats print only the list's name "
+            "for two minority candidates of the same list, so their station votes cannot be told apart and are not "
+            "stored: " + "; ".join(f"{k}, {n} votes" for k, n in sorted(ambiguous.items()))
+        )
+        p.accept("accounting.votes_valid", why)
+        p.accept("accounting.declared", why)
     frame = values.frame()
     report.values += frame.height
     p.frame("result_value", frame)
     return p
 
 
+def by_id(id: int) -> Results:
+    return next(r for r in RESULTS if r.id == id)
+
+
+def _within(c: Contest, codes: frozenset[str] | None) -> bool:
+    return codes is None or (c.district is not None and c.district[1] in codes)
+
+
+def package_contests(r: Results) -> list[tuple[str, Contest]]:
+    """The contests one package holds, with the database each comes from."""
+    out = [(database(r), c) for c in everything()[r.id] if _within(c, r.keep)]
+    for id, codes in r.extra:
+        out += [(database(by_id(id)), c) for c in everything()[id] if _within(c, codes)]
+    return out
+
+
 def aggregate_files(r: Results) -> set[str]:
     db = database(r)
-    out: set[str] = set()
+    out: set[str] = {database_url(r), races_url(r)}
     for race in races(r):
         t = tree(db, race, fetching=False)
         out |= {entities_url(db, race), units_url(db, race, None)}
@@ -1050,7 +1120,7 @@ def totals(r: Results) -> list[str]:
     lines = []
     for race in races(r):
         printed = maybe(race_info_url(db, race))
-        parts = [c for c in everything()[r.id] if c.race == race and not c.compensation]
+        parts = [c for _, c in package_contests(r) if c.race == race and not c.compensation]
         if not isinstance(printed, dict) or not parts or race in {"8", "9"}:
             continue
         for field_name in ("numberOfVoters", "totalVotes", "validVotes"):
