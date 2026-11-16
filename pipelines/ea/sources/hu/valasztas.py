@@ -3067,6 +3067,8 @@ def nationality_lists_2019(d: Day, local: Local) -> None:
                 if level == "territorial" and not row[2].startswith("Nincs rögzítve"):
                     d.declare(tag, None, 4, number(row[11]))
                     for index, position in lists:
+                        if position not in names and not number(row[index]):
+                            continue  # the sheet prints zeros for list numbers this county did not register
                         d.declare(tag, option(position), 1, number(row[index]))
                         won = number(row[index + 1])
                         if won:
