@@ -313,6 +313,7 @@ class Package:
         self.summary = summary
         self.depends = list(depends)
         self.rows: dict[str, list[dict[str, object]]] = {}
+        self.frames: dict[str, list[pl.DataFrame]] = {}
         self.sources: list[dict[str, object]] = []
         self.external: set[str] = set()
         self.accepted: dict[str, str] = {}
@@ -322,6 +323,10 @@ class Package:
 
     def add(self, table: str, **row: object) -> None:
         self.rows.setdefault(table, []).append(row)
+
+    def frame(self, table: str, frame: pl.DataFrame) -> None:
+        """Stage many rows at once; the frame's columns must be in the table's schema, and missing ones are null."""
+        self.frames.setdefault(table, []).append(frame)
 
     def name(self, entity: str, text: str, lang: str, kind: str, preferred: bool = True) -> None:
         self.add(
@@ -362,11 +367,13 @@ class Package:
             shutil.rmtree(out)
         out.mkdir(parents=True)
         counts: dict[str, int] = {}
-        for table, rows in sorted(self.rows.items()):
+        for table in sorted({*self.rows, *self.frames}):
+            rows = self.rows.get(table, [])
             schema = TABLES[table][1] if table in TABLES else FACTS[table]
-            unknown = {column for row in rows for column in row} - set(schema)
-            if unknown:
-                raise ValueError(f"{table} has columns outside the package format: {sorted(unknown)}")
+            staged = self.frames.get(table, [])
+            unknown = {column for row in rows for column in row} | {c for f in staged for c in f.columns}
+            if unknown - set(schema):
+                raise ValueError(f"{table} has columns outside the package format: {sorted(unknown - set(schema))}")
             frame = pl.DataFrame(
                 [
                     {
@@ -380,6 +387,19 @@ class Package:
                 schema=schema,
                 orient="row",
             )
+            if staged:
+                frame = pl.concat(
+                    [
+                        frame,
+                        *(
+                            f.select(
+                                pl.col(c).cast(kind) if c in f.columns else pl.lit(None, kind).alias(c)
+                                for c, kind in schema.items()
+                            )
+                            for f in staged
+                        ),
+                    ]
+                )
             frame.write_parquet(out / f"{table}.parquet", statistics=False)
             counts[table] = frame.height
         commit = store.checkout()
