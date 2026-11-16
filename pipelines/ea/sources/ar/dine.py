@@ -471,6 +471,22 @@ def _category(name: str) -> str | None:
     return None
 
 
+CHUNK = 2_000_000
+
+
+def _chunk(kept: dict[str, list[str]]) -> pl.DataFrame:
+    """One slice of staged rows, typed, so a multi-gigabyte file never sits in memory as Python strings."""
+    return (
+        pl.DataFrame(kept)
+        .with_columns(pl.col(column).str.strip_chars() for column in COLUMNS)
+        .with_columns(
+            pl.col("distrito_id", "seccion_id").str.strip_chars_start("0").replace("", "0"),
+            pl.col("agrupacion_id", "lista_numero").str.strip_chars_start("0"),
+            pl.col("mesa_electores", "votos_cantidad").replace("", None).cast(pl.Int64),
+        )
+    )
+
+
 def stage(name: str) -> Path:
     held = BY_KEY[name]
     lines = _lines(held)
@@ -480,6 +496,7 @@ def stage(name: str) -> Path:
     if missing:
         raise ValueError(f"{held.key} lacks columns {sorted(missing)}: {header}")
     kept: dict[str, list[str]] = {column: [] for column in (*COLUMNS, "category")}
+    parts: list[pl.DataFrame] = []
     seen: Counter[tuple[str, str, str | None]] = Counter()
     for number, line in enumerate(lines, 2):
         line = line.rstrip("\r\n")
@@ -498,17 +515,13 @@ def stage(name: str) -> Path:
         for column in COLUMNS:
             kept[column].append(row[index[column]] if column in index else "")
         kept["category"].append(category)
+        if len(kept["category"]) >= CHUNK:
+            parts.append(_chunk(kept))
+            kept = {column: [] for column in kept}
+    parts.append(_chunk(kept))
     for (cargo, cargo_name, category), n in sorted(seen.items()):
         print(f"{held.key}: cargo {cargo} {cargo_name}: {n:,} rows, {category or 'left out'}", flush=True)
-    frame = (
-        pl.DataFrame(kept)
-        .with_columns(pl.col(column).str.strip_chars() for column in COLUMNS)
-        .with_columns(
-            pl.col("distrito_id", "seccion_id").str.strip_chars_start("0").replace("", "0"),
-            pl.col("agrupacion_id", "lista_numero").str.strip_chars_start("0"),
-            pl.col("mesa_electores", "votos_cantidad").replace("", None).cast(pl.Int64),
-        )
-    )
+    frame = pl.concat(parts)
     PARSED.mkdir(parents=True, exist_ok=True)
     out = PARSED / f"{held.key}.parquet"
     frame.write_parquet(out)
@@ -989,6 +1002,9 @@ def election(name: str) -> Package:
             _add_declared(p, held, result_set, contest_key, declared, option_rows)
 
     options = pl.DataFrame(option_rows, schema=["contest", "agrupacion_id", "lista_numero", "option_id"], orient="row")
+    frame = frame.select(
+        *table, "contest", "mesa_electores", "agrupacion_id", "lista_numero", "votos_tipo", "votos_cantidad"
+    )
     rows = frame.join(pl.DataFrame({"contest": list(sets), "result_set_id": list(sets.values())}), on="contest").join(
         unit_ids, on=table
     )
