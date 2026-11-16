@@ -66,6 +66,7 @@ DAY_RULES = {
     "nov_tuesday_after_first_monday": tuesday_after_first_monday(11),
     "mar_second_tuesday": nth_weekday(3, 1, 2),
     "may_third_tuesday": nth_weekday(5, 1, 3),
+    "nov_third_tuesday": nth_weekday(11, 1, 3),
     "aug_fourth_tuesday": nth_weekday(8, 1, 4),
     "may_second_monday": nth_weekday(5, 0, 2),
     "sep_last_tuesday": last_weekday(9, 1),
