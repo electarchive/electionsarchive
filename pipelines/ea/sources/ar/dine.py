@@ -590,39 +590,11 @@ def available() -> list[Held]:
 
 
 class Frames(Package):
-    """A package whose largest tables arrive as polars frames instead of row dicts."""
-
-    def __init__(self, key: str, pipeline: str, summary: str, depends: list[str]) -> None:
-        super().__init__(key, pipeline, summary, depends)
-        self.frames: dict[str, list[pl.DataFrame]] = {}
+    """A package whose largest tables arrive as polars frames, keeping only the columns of the package format."""
 
     def frame(self, table: str, frame: pl.DataFrame) -> None:
-        self.frames.setdefault(table, []).append(frame)
-
-    def write(self) -> Path:
-        out = super().write()
-        manifest = json.loads((out / "package.json").read_text())
-        counts: dict[str, int] = manifest["tables"]
-        for table, parts in self.frames.items():
-            if table in self.rows:
-                raise ValueError(f"{self.key}: {table} has both rows and frames")
-            schema = TABLES[table][1] if table in TABLES else FACTS[table]
-            frame = pl.concat(
-                [
-                    part.select(
-                        (pl.col(column) if column in part.columns else pl.lit(None)).cast(kind).alias(column)
-                        for column, kind in schema.items()
-                    )
-                    for part in parts
-                ]
-            )
-            frame.write_parquet(out / f"{table}.parquet", statistics=False)
-            counts[table] = frame.height
-            print(f"{self.key}: {table} {frame.height:,}", flush=True)
-        manifest["tables"] = dict(sorted(counts.items()))
-        manifest["digest"] = package._digest(out, counts)
-        (out / "package.json").write_text(json.dumps(manifest, indent=1) + "\n")
-        return out
+        schema = TABLES[table][1] if table in TABLES else FACTS[table]
+        super().frame(table, frame.select(column for column in frame.columns if column in schema))
 
 
 def _source_rows(p: Package) -> None:
