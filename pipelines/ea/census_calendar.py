@@ -100,6 +100,7 @@ DAY_RULES = {
     "apr_first_wednesday": nth_weekday(4, 2, 1),
     "apr_first_tuesday": nth_weekday(4, 1, 1),
     "may_first_tuesday": nth_weekday(5, 1, 1),
+    "jan_fourth_wednesday": nth_weekday(1, 2, 4),
     "jun_first_sunday": nth_weekday(6, 6, 1),
     "jul_first_sunday": nth_weekday(7, 6, 1),
     "aug_first_sunday": nth_weekday(8, 6, 1),
