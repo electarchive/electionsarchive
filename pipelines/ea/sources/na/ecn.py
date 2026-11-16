@@ -24,6 +24,7 @@ PAGES = f"{SITE}/previous-election-results/"
 BY_ELECTIONS_PAGE = f"{SITE}/by-elections/"
 NAMIBIA = str(uuid5(package.NAMESPACE, "polity\x1fNA"))
 VOTES, REGISTERED, CAST, VALID, INVALID = 1, 2, 3, 4, 5
+DIGITIZED = 8
 
 URLS = {
     "rc2010": f"{UPLOADS}/2021/06/Regional-Councils-2010.pdf",
@@ -33,12 +34,16 @@ URLS = {
     "la2020": f"{UPLOADS}/2021/06/7497-Gov-N65-Results-LA-2020.pdf",
     "pna2024": f"{UPLOADS}/2025/03/Results-publication-2024PNA.pdf",
     "rcby2025": f"{UPLOADS}/2025/10/Govt-Gazette-five-by-elections-result.pdf",
+    "byopuwo2021": f"{UPLOADS}/2021/07/Opuwo-Rural-Final-Results-Media-Release-03-July-2021.pdf",
+    "byswakopmund2022": f"{UPLOADS}/2022/08/OFFICIAL-RESULTS-FOR-THE-REGIONAL-COUNCIL-ELECTION-FOR-THE-SWAKOPMUND-CONSTITUENCY.pdf",
 }
 DAYS = {
     "2010-11-27": date(2010, 11, 27),
     "2014-11-28": date(2014, 11, 28),
     "2015-11-27": date(2015, 11, 27),
     "2020-11-25": date(2020, 11, 25),
+    "2021-07-02": date(2021, 7, 2),
+    "2022-08-12": date(2022, 8, 12),
     "2024-11-27": date(2024, 11, 27),
     "2025-06-17": date(2025, 6, 17),
 }
@@ -686,6 +691,52 @@ def regional(name: str) -> tuple[Contest, ...]:
     return tuple(read_regional(name, (8, 28, 48) if name == "rcby2025" else None))
 
 
+# Two media releases are scanned images with no text layer. Their figures were read from the page images and checked
+# against each release's own printed totals: the candidates' votes sum to the votes counted in both.
+MEDIA_RELEASES = {
+    "2021-07-02": (
+        "byopuwo2021",
+        "2021 Opuwo Rural constituency by-election",
+        Contest(
+            "Kunene",
+            "Opuwo Rural",
+            registered=8194,
+            counted=3451,
+            declared="Muharukua Western Uakaisiua Melchizedek",
+            candidates=[
+                Candidate("Maundu Heinz Hariki", "NUDO", 414),
+                Candidate("Muharukua Western Uakaisiua Melchizedek", "DTA", 2330, True),
+                Candidate("Rikambura Kaiho", "RDP", 141),
+                Candidate("Tjambiru Kazepanda", "SWAPO", 486),
+                Candidate("Tjituri Howards Kaihepere", "IPC", 80),
+            ],
+        ),
+    ),
+    "2022-08-12": (
+        "byswakopmund2022",
+        "2022 Swakopmund constituency by-election",
+        Contest(
+            "Erongo",
+            "Swakopmund",
+            registered=37406,
+            counted=9918,
+            rejected=56,
+            declared="Kativa Louisa Ndaninga",
+            candidates=[
+                Candidate("Dantu Zerolda Venansia", "UDF", 465),
+                Candidate("Dausab Rodger", "NEFF", 307),
+                Candidate("Kativa Louisa Ndaninga", "IPC", 3625, True),
+                Candidate("Musheko Tangeni Hilaria", "LPM", 1362),
+                Candidate("Narib Williward", None, 56),
+                Candidate("Pascheka Lelanie", "DTA", 672),
+                Candidate("Salomon Nehemiah Ndara", "SWAPO", 3122),
+                Candidate("Von Seydlitz-Kurzbach Bernhard Karl Siegfried", "UPM", 309),
+            ],
+        ),
+    ),
+}
+
+
 @cache
 def local() -> tuple[Area, ...]:
     return tuple(read_local())
@@ -793,7 +844,9 @@ def registry() -> Package:
     return p
 
 
-def _put(p: Package, result_set: str, unit: str, option: str | None, measure: int, value: int | None) -> None:
+def _put(
+    p: Package, result_set: str, unit: str, option: str | None, measure: int, value: int | None, flags: int = 0
+) -> None:
     if value is None:
         return
     p.add(
@@ -804,7 +857,7 @@ def _put(p: Package, result_set: str, unit: str, option: str | None, measure: in
         channel=0,
         measure=measure,
         count_round=0,
-        flags=0,
+        flags=flags,
         value=value,
     )
 
@@ -905,6 +958,7 @@ def _constituencies(
     contests: tuple[Contest, ...],
     total: int,
     valid_printed: bool = False,
+    flags: int = 0,
 ) -> None:
     """One election of single-member constituency contests, each counted as one unit."""
     election = _election(p, tag, election_kind, first, last, english, path)
@@ -929,14 +983,14 @@ def _constituencies(
         values = contest.registered is not None or not contest.tacit
         result_set = _result_set(p, ctag, election, node, tacit=contest.tacit, empty=not values)
         if contest.tacit:
-            _put(p, result_set, unit, None, REGISTERED, contest.registered)
+            _put(p, result_set, unit, None, REGISTERED, contest.registered, flags)
         else:
-            _put(p, result_set, unit, None, REGISTERED, contest.registered)
-            _put(p, result_set, unit, None, VALID if valid_printed else CAST, contest.counted)
-            _put(p, result_set, unit, None, INVALID, contest.rejected)
+            _put(p, result_set, unit, None, REGISTERED, contest.registered, flags)
+            _put(p, result_set, unit, None, VALID if valid_printed else CAST, contest.counted, flags)
+            _put(p, result_set, unit, None, INVALID, contest.rejected, flags)
         for position, candidate in enumerate(contest.candidates, 1):
             option = _candidate(p, ctag, node, position, candidate.name, candidate.party)
-            _put(p, result_set, unit, option, VOTES, candidate.votes)
+            _put(p, result_set, unit, option, VOTES, candidate.votes, flags)
             if contest.declared or contest.tacit or candidate.elected:
                 p.add(
                     "outcome",
@@ -1033,6 +1087,23 @@ def build(day: str) -> Package:
             121,
         )
         _local_2020(p, day, first)
+    elif day in MEDIA_RELEASES:
+        name, english, contest = MEDIA_RELEASES[day]
+        p.uses(raw.cached(SOURCE, URLS[name]))
+        _constituencies(
+            p,
+            day,
+            name,
+            "by_election",
+            english,
+            f"na/{day}-by-election",
+            first,
+            first,
+            (contest,),
+            1,
+            valid_printed=True,
+            flags=DIGITIZED,
+        )
     elif day == "2024-11-27":
         _national_2024(p, day, first)
     elif day == "2025-06-17":
