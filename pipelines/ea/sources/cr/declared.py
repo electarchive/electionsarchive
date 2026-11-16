@@ -93,7 +93,7 @@ def available() -> list[Resolution]:
     for resolution in RESOLUTIONS:
         try:
             raw.cached(SOURCE, url(resolution))
-        except KeyError:
+        except LookupError:
             continue
         found.append(resolution)
     return found
