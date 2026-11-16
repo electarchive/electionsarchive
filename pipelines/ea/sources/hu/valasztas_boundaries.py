@@ -7,6 +7,10 @@ package, `hu.valasztas/boundaries`, carries both on the constituency areas that 
 
 The office's `Korzethatar-<maz>-<taz>.json` files are not shapes: each lists the streets and house-number ranges that
 belong to each polling station of a settlement, so the archive holds no polygon for a polling station or settlement.
+
+The constituency areas belong to `hu.valasztas/geo`, but that package lists only the constituencies of the elections a
+build parsed, so a partial rebuild leaves them out. The package therefore names the areas it draws as external ids,
+which the loader finds in the database where the election packages put them.
 """
 
 import json
@@ -81,9 +85,11 @@ def parse() -> None:
         for row in rows:
             geometry, fixed = repaired(ring(row["poligon"]))
             fixed_rings += fixed
+            area = hu.district(period, row["maz"].zfill(2), row["evk"].zfill(2))
+            p.external.add(area)
             p.add(
                 "area_geometry",
-                area_id=hu.district(period, row["maz"].zfill(2), row["evk"].zfill(2)),
+                area_id=area,
                 valid_from=since,
                 valid_to=until,
                 geom=shapely.to_wkb(shapely.set_srid(geometry, 4326), hex=True, include_srid=True),
