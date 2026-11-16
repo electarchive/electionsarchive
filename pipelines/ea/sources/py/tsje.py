@@ -46,8 +46,10 @@ METHOD = (
 COUNCIL_METHOD = (
     METHOD + " Each list's votes are the sum of its candidates' preference votes, which the source prints per "
     "candidate and table; the preference votes are stored on each candidate under the list. The Tribunal also "
-    "proclaims as many substitute councillors (suplentes) as members, from the same lists; they are listed in its "
-    "file of elected candidates and are not marked here."
+    "proclaims as many substitute councillors (suplentes) as members, from the same lists. They are not on the "
+    "per-table candidate files; its file of elected candidates lists them, and each is recorded as a candidacy with "
+    "the substitute role on the list that elected them, with no votes and no outcome of their own. The source "
+    "numbers them in the same seat order as the members and does not say which member each one replaces."
 )
 
 
@@ -514,6 +516,13 @@ def election() -> Package:
         for row in workbook(MAYORS_ELECTED).iter_rows(named=True)
     }
     councillors = workbook(COUNCILS_ELECTED).filter(pl.col("DESC_TITSUP") == "TITULARES")
+    substitutes = (
+        workbook(COUNCILS_ELECTED)
+        .filter(pl.col("DESC_TITSUP") == "SUPLENTES")
+        .with_columns(dep=pl.col("DEP_JUN").cast(pl.Int64), dis=pl.col("DIS_JUN").cast(pl.Int64))
+    )
+    if substitutes.height != councillors.height:
+        raise ValueError("the elected-candidates file lists a different number of substitutes and members")
     seats = Counter((int(row["DEP_JUN"]), int(row["DIS_JUN"])) for row in councillors.iter_rows(named=True))
     winners = {
         (int(row["DEP_JUN"]), int(row["DIS_JUN"]), int(row["LISTA_JUN"]), row["CEDULA_JUN"]): int(row["TOT_VOTOS"])
@@ -656,8 +665,12 @@ def election() -> Package:
         lists = here.select("lista", "sigla", "nombre").unique().sort("lista")
         won = Counter(lista for (d1, d2, lista, _) in winners if (d1, d2) == (dep, dis))
         by_sigla = {}
+        by_lista: dict[int, str] = {}
+        named: dict[int, str] = {}
         for lista, sigla, nombre in lists.iter_rows():
             option = key("option", DAY, "council", dep, dis, lista)
+            by_lista[int(lista)] = option
+            named[int(lista)] = nombre
             if sigla in by_sigla:
                 raise ValueError(f"{dep}:{dis}: two council lists use {sigla}")
             by_sigla[sigla] = option
@@ -716,6 +729,24 @@ def election() -> Package:
                     kind="elected",
                 )
                 p.add("declared", result_set_id=result_set, option_id=option, measure=PREFERENCE, value=total)
+        for row in substitutes.filter(pl.col("dep") == dep, pl.col("dis") == dis).iter_rows(named=True):
+            lista = int(row["LISTA_JUN"])
+            if lista not in by_lista:
+                raise ValueError(f"{dep}:{dis}: substitute {row['ORDEN_JUN']} is on unknown list {lista}")
+            tag = (DAY, "council", "substitute", dep, dis, int(row["ORDEN_JUN"]))
+            person = key("person", *tag)
+            p.add("person", id=person)
+            p.name(person, title(row["APENOM_JUN"]), "es", "official")
+            p.add(
+                "candidacy",
+                id=key("candidacy", *tag),
+                person_id=person,
+                option_id=by_lista[lista],
+                role="substitute",
+                ballot_name=row["APENOM_JUN"],
+                member_of_party_id=party(named[lista]),
+                is_independent=False,
+            )
         _declared(p, result_set, printed["junta"], by_sigla)
         tables_here = council_tables.filter(pl.col("dep") == dep, pl.col("dis") == dis)
         values.append(_accounting(tables_here, result_set))
