@@ -13,6 +13,7 @@ import subprocess
 import unicodedata
 from dataclasses import dataclass, field
 from datetime import date
+from difflib import SequenceMatcher
 from functools import cache
 from uuid import uuid5
 
@@ -41,6 +42,9 @@ URLS = {
     "la1998": f"{UPLOADS}/2021/06/Local-Authourities-Elections-1998.xls",
     "rc2004": f"{UPLOADS}/2021/06/Regional-Councils-Election-2004.xls",
     "la2004": f"{UPLOADS}/2021/06/local-Authourity-Election-2004.xls",
+    "gazette2025": "https://www.lac.org.na/laws/2025/8818.pdf",
+    "rccandidates2025": f"{UPLOADS}/2025/11/8790-Gov-N310.-RC-Candidates.pdf",
+    "lacandidates2025": f"{UPLOADS}/2025/11/8791-Gov-N311-Candidates-LA.pdf",
 }
 DAYS = {
     "1998-02-16": date(1998, 2, 16),
@@ -52,6 +56,7 @@ DAYS = {
     "2020-11-25": date(2020, 11, 25),
     "2024-11-27": date(2024, 11, 27),
     "2025-06-17": date(2025, 6, 17),
+    "2025-11-26": date(2025, 11, 26),
 }
 
 
@@ -88,7 +93,9 @@ PARTIES = {
     "NDP": "National Democratic Party of Namibia",
     "NEFC": "National Empowerment Fighting Corruption",
     "NEFF": "Namibia Economic Freedom Fighters",
+    "NPP": "Namibia Progressive Party",
     "NUDO": "National Unity Democratic Organisation",
+    "PUC": "People Unite for Change",
     "RDP": "Rally for Democracy and Progress",
     "RP": "Republican Party of Namibia",
     "SWANU": "SWANU of Namibia",
@@ -165,6 +172,13 @@ ALIASES = {
     "national empowerment fighting corruption": "NEFC",
     "cod of namibia": "COD",
     "swapo party": "SWAPO",
+    "namibia progressive party": "NPP",
+    "npp": "NPP",
+    "national democratic party": "NDP",
+    "people unite for change": "PUC",
+    "puc": "PUC",
+    "united namibian’s party": "UNP",
+    "united namibian's party": "UNP",
     "app of namibia": "APP",
     "swapo-party": "SWAPO",
     "dcn": "DCN",
@@ -220,8 +234,15 @@ def party_id(code: str) -> str:
     return key("party", code)
 
 
+GAZETTE_2025 = ("rc2025", "la2025")  # the two notices of Government Gazette 8818, one file
+
+
 def text(name: str) -> list[str]:
     """The pages of a cached file as layout text, one string per page."""
+    if name in GAZETTE_2025:
+        pages = text("gazette2025")
+        start = next(i for i, page in enumerate(pages) if "FOR REGIONAL COUNCILS: ELECTORAL ACT" in page)
+        return pages[start:] if name == "rc2025" else pages[:start]
     path = raw.cached(SOURCE, URLS[name]).path
     done = subprocess.run(["pdftotext", "-layout", str(path), "-"], check=True, capture_output=True, text=True)
     return done.stdout.split("\f")
@@ -352,6 +373,9 @@ def read_regional(name: str, columns: tuple[int, int, int] | None = None) -> lis
     for page in text(name):
         rows = [segments(line) for line in page.splitlines() if line.strip()]
         rows = [row for row in rows if not (len(row) == 1 and row[0][1].startswith("Government Gazette"))]
+        if name in GAZETTE_2025:  # the gazette number printed in each page's margin
+            rows = [[(p, t) for p, t in row if not (t == "8818" and p > 100)] for row in rows]
+            rows = [row for row in rows if row]
         both = [
             [p for p, t in row if t.isdigit()]
             for row in rows
@@ -409,7 +433,18 @@ def read_regional(name: str, columns: tuple[int, int, int] | None = None) -> lis
                 current = Contest(region_name(region), label, counted=int(totals[0]))
                 contests.append(current)
             elif label and current is not None:
-                current.name = clean(f"{current.name} {label}")
+                unopposed = (
+                    name in GAZETTE_2025
+                    and not amounts
+                    and any(cand_at - 1 <= p < party_at - 1 and not t.isdigit() for p, t in row)
+                    and any(p >= party_at - 1 for p, t in row)
+                )
+                if unopposed:  # a constituency with one candidate prints no votes
+                    current = Contest(region_name(region), label, tacit=True)
+                    contests.append(current)
+                    current.candidates.append(Candidate("", None, None))
+                else:
+                    current.name = clean(f"{current.name} {label}")
             if current is None:
                 continue
             if amounts:
@@ -424,6 +459,8 @@ def read_regional(name: str, columns: tuple[int, int, int] | None = None) -> lis
             last.name = clean(f"{last.name} {cand}")
             last.label = clean(f"{last.label} {party}")
             current.declared = clean(f"{current.declared} {elected}")
+    if name == "rc2025":
+        contests = _split_2025(contests)
     for contest in contests:
         for candidate in contest.candidates:
             label = candidate.label
@@ -435,6 +472,9 @@ def read_regional(name: str, columns: tuple[int, int, int] | None = None) -> lis
                 if match:
                     label = candidate.name[len(candidate.name) - len(match) :]
                     candidate.name = candidate.name[: len(candidate.name) - len(match)].strip()
+            if candidate.name and candidate.name in label:  # the party's name and the winner's run together
+                label = clean(label.replace(candidate.name, "", 1))
+                contest.declared = clean(f"{contest.declared} {candidate.name}")
             try:
                 candidate.party = party_of(label)
             except ValueError:
@@ -455,9 +495,35 @@ def read_regional(name: str, columns: tuple[int, int, int] | None = None) -> lis
     return contests
 
 
+def _split_2025(contests: list[Contest]) -> list[Contest]:
+    """Tell apart the constituencies whose names the 2025 gazette prints in a block that runs on from the one above.
+
+    The Ondobe and Ongenga blocks each print one name beside the other's candidates, and Ondangwa Urban and
+    Ongwediva share one total cell; the votes add up to the printed totals only with the candidates split here.
+    """
+    out: list[Contest] = []
+    for contest in contests:
+        if (contest.region, contest.name) == ("Ohangwena", "Ondobe Ongenga"):
+            contest.name = "Ondobe"
+        elif (contest.region, contest.name) == ("Ohangwena", ""):
+            contest.name = "Ongenga"
+        elif (contest.region, contest.name) == ("Oshana", "Ondangwa Urban Ongwediva"):
+            urban, rest = contest.candidates[:4], contest.candidates[4:]
+            contest.name, contest.candidates = "Ondangwa Urban", urban
+            second = Contest(contest.region, "Ongwediva", candidates=rest)  # the gazette prints no total for it
+            printed = re.sub(r"\W", "", contest.declared.casefold())
+            for part in (contest, second):
+                top = max(part.candidates, key=lambda c: c.votes or 0)
+                part.declared = top.name if re.sub(r"\W", "", top.name.casefold()) in printed else ""
+            out.extend([contest, second])
+            continue
+        out.append(contest)
+    return out
+
+
 def _same(a: str, b: str) -> bool:
     x, y = re.sub(r"\W", "", a.casefold()), re.sub(r"\W", "", b.casefold())
-    return x == y or x.startswith(y) or y.startswith(x)
+    return x == y or x.startswith(y) or y.startswith(x) or SequenceMatcher(None, x, y).ratio() >= 0.9  # typos
 
 
 # --- 2014 National Assembly by constituency ---------------------------------------------------------------------------
@@ -560,11 +626,13 @@ class Area:
     rejected: int | None = None
 
 
-def read_local() -> list[Area]:
+def read_local(name: str = "la2020") -> list[Area]:
+    if name == "la2025":
+        return read_local_2025()
     areas: list[Area] = []
     region = ""
     current: Area | None = None
-    for page in text("la2020"):
+    for page in text(name):
         header = True
         for line in page.splitlines():
             row = [(p, t) for p, t in segments(line) if not t.startswith("Government Ga")]
@@ -608,6 +676,68 @@ def read_local() -> list[Area]:
                     number(after[1][1]),
                     [after[2][1]] if len(after) > 2 else [],
                 )
+            )
+    return areas
+
+
+def read_local_2025() -> list[Area]:
+    """Local authority tables of the 2025 gazette, whose columns shift a few characters from page to page."""
+    areas: list[Area] = []
+    region = ""
+    current: Area | None = None
+    for page in text("la2025"):
+        for line in page.splitlines():
+            row = [(p, t) for p, t in segments(line) if not t.startswith("Government Gazette")]
+            row = [
+                (p, t)
+                for p, t in row
+                if not (t.startswith("____") or t in ("8818", "Column 1") or (len(row) == 1 and t.isdigit()))
+            ]
+            if not row or row[0][1].startswith(("Column", "LOCAL", "AUTHORITY", "AREA", "CAST", "votes cast")):
+                continue
+            if len(row) == 1 and re.fullmatch(r"[/!A-Z -]+ REGION", row[0][1]):
+                region = row[0][1]
+                continue
+            party = next(
+                (
+                    i
+                    for i, (_, t) in enumerate(row)
+                    if i >= 1
+                    and t.isdigit()
+                    and i + 1 < len(row)
+                    and row[i + 1][1].isdigit()
+                    and row[i - 1][0] >= 20
+                    and not row[i - 1][1].isdigit()
+                ),
+                None,
+            )
+            if party is None:
+                if current is None or not current.lists:
+                    continue
+                for p, t in row:
+                    if p >= 60 and re.search(r"[A-Za-z]", t):
+                        if "," not in t and current.lists[-1].names:  # a name that wraps onto the next line
+                            current.lists[-1].names[-1] = clean(f"{current.lists[-1].names[-1]} {t}")
+                        else:
+                            current.lists[-1].names.append(t)
+                    elif p >= 20 and not t.isdigit():
+                        current.lists[-1].label = clean(f"{current.lists[-1].label} {t}")
+                    elif re.search(r"[a-z]", t):
+                        current.name = clean(f"{current.name} {t}")
+                continue
+            before, label, after = row[: party - 1], row[party - 1], row[party:]
+            # the segments before the label are the area, its votes cast, and its quota
+            if len(before) >= 3:
+                current = Area(region_name(region), before[0][1], number(before[1][1]), before[2][1])
+                areas.append(current)
+            elif len(before) == 2 and region_name(region) == "Oshikoto":
+                # the gazette leaves this area's name cell empty; the candidates gazette puts these lists in Oniipa
+                current = Area(region_name(region), "Oniipa", number(before[0][1]), before[1][1])
+                areas.append(current)
+            elif current is None:
+                raise ValueError(f"local authority row without an area: {line!r}")
+            current.lists.append(
+                Entry(label[1], number(after[0][1]), number(after[1][1]), [after[2][1]] if len(after) > 2 else [])
             )
     return areas
 
@@ -991,8 +1121,8 @@ def regional(name: str) -> tuple[Contest, ...]:
 
 
 @cache
-def local() -> tuple[Area, ...]:
-    return tuple(read_local())
+def local(name: str = "la2020") -> tuple[Area, ...]:
+    return tuple(read_local(name))
 
 
 @cache
@@ -1012,9 +1142,10 @@ def assembly_2014() -> tuple[list[Row], Row, int]:
 
 def everything() -> None:
     """Read every file once, so the registry sees every party any package uses."""
-    for name in ("rc2010", "rc2015", "rc2020", "rcby2025", "rc1998", "rc2004"):
+    for name in ("rc2010", "rc2015", "rc2020", "rcby2025", "rc2025", "rc1998", "rc2004"):
         regional(name)
     local()
+    local("la2025")
     for name in ("la1998", "la2004"):
         old_local(name)
     assembly_2014()
@@ -1022,7 +1153,7 @@ def everything() -> None:
         party_of(label)
     for label, *_ in national().lists:
         party_of(label)
-    for area in local():
+    for area in (*local(), *local("la2025")):
         for entry in area.lists:
             party_of(entry.label)
 
@@ -1275,6 +1406,19 @@ def _constituencies(
         summed = sum(c.votes or 0 for c in contest.candidates)
         if not contest.tacit and valid_printed and contest.counted != summed:
             unequal.append(f"{contest.name} (printed {contest.counted:,}, candidates {summed:,})")
+        if tag == "rc2025" and contest.counted and summed < contest.counted * 0.9:
+            _caveat(
+                p,
+                result_set,
+                "total",
+                "The printed total of votes counted is more than a tenth above the sum of the candidates' printed votes"
+                + (
+                    ", and the gazette prints only some of the candidates and declares no winner. The candidates"
+                    " nominated for this constituency who are missing from the printed table are not stored."
+                    if not contest.declared
+                    else ". Both are stored as printed."
+                ),
+            )
         if (
             contest.declared
             and not contest.tacit
@@ -1358,7 +1502,7 @@ def build(day: str) -> Package:
             regional("rc2020"),
             121,
         )
-        _local_2020(p, day, first)
+        _local(p, day, first, date(2021, 2, 26), 2020, local())
     elif day == "1998-02-16":
         p.uses(raw.cached(SOURCE, URLS["la1998"]))
         _local_old(p, "la1998", day, first, first, "1998 Namibian local authority council elections", 0)
@@ -1435,6 +1579,22 @@ def build(day: str) -> Package:
             regional("rcby2025"),
             5,
         )
+    elif day == "2025-11-26":
+        for name in ("gazette2025", "rccandidates2025", "lacandidates2025"):
+            p.uses(raw.cached(SOURCE, URLS[name]))
+        _constituencies(
+            p,
+            day,
+            "rc2025",
+            "local",
+            "2025 Namibian regional council elections",
+            f"na/{day}-regional-councils",
+            first,
+            first,
+            regional("rc2025"),
+            120,
+        )
+        _local(p, day, first, first, 2025, local("la2025"))
     return p
 
 
@@ -1578,13 +1738,11 @@ def _local_old(p: Package, tag: str, day: str, first: date, last: date, english:
         )
 
 
-def _local_2020(p: Package, day: str, first: date) -> None:
-    tag, path = "la2020", f"na/{day}-local-authorities"
-    election = _election(
-        p, tag, "local", first, date(2021, 2, 26), "2020 Namibian local authority council elections", path
-    )
+def _local(p: Package, day: str, first: date, last: date, year: int, areas: tuple[Area, ...]) -> None:
+    tag, path = f"la{year}", f"na/{day}-local-authorities"
+    election = _election(p, tag, "local", first, last, f"{year} Namibian local authority council elections", path)
     unequal: list[str] = []
-    for area in local():
+    for area in areas:
         code = f"{slug(area.region)}-{slug(area.name)}"
         seats = sum(entry.seats for entry in area.lists)
         ctag = f"{tag}:{code}"
@@ -1593,7 +1751,7 @@ def _local_2020(p: Package, day: str, first: date) -> None:
             ctag,
             election,
             "list_allocation",
-            f"2020 Namibian local authority council election, {area.name} ({area.region} region)",
+            f"{year} Namibian local authority council election, {area.name} ({area.region} region)",
             f"{path}/{slug(area.region)}/{slug(area.name)}",
             body_id=LOCAL,
             magnitude=seats,
@@ -1610,6 +1768,14 @@ def _local_2020(p: Package, day: str, first: date) -> None:
             lang="en",
         )
         _put(p, result_set, unit, None, CAST, area.cast)
+        if year == 2025 and area.name == "Oniipa":
+            _caveat(
+                p,
+                result_set,
+                "name",
+                "The gazette leaves the name cell of this area empty. The candidates gazette lists these parties and "
+                "candidates under Oniipa.",
+            )
         for position, entry in enumerate(area.lists, 1):
             label, votes, won, names = entry.label, entry.votes, entry.seats, entry.names
             party = party_of(str(label))
@@ -1667,7 +1833,7 @@ def _local_2020(p: Package, day: str, first: date) -> None:
         body_md="The Commission's printed total of votes cast in a local authority area equals the sum of its "
         "lists' votes in most areas. In "
         + str(len(unequal))
-        + " areas the two differ by a few votes: "
+        + " areas the two differ: "
         + "; ".join(unequal)
         + ". Both are stored as printed.",
         lang="en",
