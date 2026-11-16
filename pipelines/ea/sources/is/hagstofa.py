@@ -1402,6 +1402,227 @@ def president(event: Event) -> Package:
 PERSONS: set[tuple[str, str]] = set()
 
 
+# ---------------------------------------------------------------- referenda
+
+BLANK_VOID_LABELS = {
+    "1918": "1918, referendum",
+    "1944:Abrogation": "1944,  referendum. Derog. Union Act of 1918",
+    "1944:Constitution": "1944,  referendum, Constitution",
+    "2010": "2010, referendum",
+    "2011": "2011, referendum",
+    "2012": "2012, referendum",
+}
+REFERENDUM_METHOD = SOURCE_NOTE + "Each answer's votes are the valid votes for it."
+
+
+def referendum_titles(year: int) -> list[tuple[str, str]]:
+    """The referendum questions of one polling day as (key, source label)."""
+    if year == 2012:
+        return [(f"q{n}", label) for n, label in enumerate(grid("KOS04108").labels["Questions"], 1)]
+    found = [label for label in grid("KOS04101").labels["Referenda"] if label.startswith(str(year))]
+    return [(clean(label[4:]).split(" ")[0].strip(".") if len(found) > 1 else "q", label) for label in found]
+
+
+def referendum(event: Event) -> Package:
+    year = event.day.first.year
+    b = Build(event, f"The {year} Icelandic referendum from Statistics Iceland")
+    b.cite("KOS04101", "KOS02000")
+    questions = referendum_titles(year)
+    detailed = year >= 2010
+    if detailed:
+        b.cite("KOS04102", "KOS04103", "KOS04105")
+    if year == 2012:
+        b.cite("KOS04108", "KOS04109")
+    if year >= 2010:
+        return referendum_constituencies(b, event, questions)
+    g = grid("KOS04101")
+    unit = b.national()
+    for key_, label in questions:
+        text = clean(label[4:])
+        contest = b.contest(
+            f"referendum:{key_}",
+            (f"{year} Icelandic referendum: {text}", None),
+            kind="ballot_question",
+            where=TERRITORY,
+            system=SYSTEM_REFERENDUM,
+        )
+        b.p.add("ballot_question", contest_id=contest, type="referendum")
+        result_set = b.result_set(
+            f"referendum:{key_}",
+            contest,
+            SOURCE_NOTE + "Statistics Iceland publishes this referendum only for the whole country. Voters on the "
+            "electoral roll, votes cast, and each answer's votes are stored at a national unit.",
+        )
+        yes = b.option(contest, "yes", "Yes", 1, "answer")
+        no = b.option(contest, "no", "No", 2, "answer")
+        row = lambda name: g.get(Referenda=label, Results=name)  # noqa: E731
+        y, n = row("Votes cast, yes"), row("Votes cast, no")
+        registered, cast, combined = row("Voters on the electoral roll"), row("Votes cast"), row(
+            "Votes cast, blank and void ballots"
+        )
+        for option, v in ((yes, y), (no, n)):
+            b.value(result_set, unit, option, 1, v)
+            b.declare(result_set, option, 1, v)
+        for measure, value in ((2, registered), (3, cast)):
+            b.value(result_set, unit, None, measure, value)
+            b.declare(result_set, None, measure, value)
+        split_key = year_key = str(year) if len(questions) == 1 else f"{year}:{key_}"
+        label_k = BLANK_VOID_LABELS.get(split_key)
+        if label_k is not None:
+            gk = grid("KOS02000")
+            blank = gk.get(Year=label_k, Unit="Number", Ballots="Blank ballots")
+            void = gk.get(Year=label_k, Unit="Number", Ballots="Void ballots")
+            mismatch(b, f"{year} blank and void ballots", (blank or 0) + (void or 0), combined)
+            for measure, value in ((6, blank), (5, void)):
+                b.value(result_set, unit, None, measure, value)
+                b.declare(result_set, None, measure, value)
+        elif combined is not None:
+            b.value(result_set, unit, None, 5, combined)
+            b.declare(result_set, None, 5, combined)
+            b.note(
+                result_set,
+                "caveat",
+                "Statistics Iceland counts blank and void ballots together for this referendum. The figure is stored "
+                "as invalid ballots.",
+            )
+        if combined is not None:
+            mismatch(b, f"{year} ballots cast", (y or 0) + (n or 0) + combined, cast)
+        else:
+            b.note(
+                result_set,
+                "caveat",
+                f"Statistics Iceland prints {cast - (y or 0) - (n or 0):,} votes cast beyond the yes and no votes and "
+                "does not say how many of them were blank or void.",
+            )
+        b.outcome(result_set, yes, None, "won" if (y or 0) > (n or 0) else "lost")
+        b.outcome(result_set, no, None, "won" if (n or 0) > (y or 0) else "lost")
+        if year == 1944 and not any(q for q in [None]):
+            pass
+    return b.p
+
+
+def referendum_constituencies(b: Build, event: Event, questions: list[tuple[str, str]]) -> Package:
+    year = event.day.first.year
+    ys = str(year)
+    voters = grid("KOS04103")
+    munis = grid("KOS04105")
+    const_labels = {c: constituency(c, "new") for c in voters.labels["Constituency"] if c != "Whole country"}
+
+    def ballots(category: str, c: str) -> int | None:
+        return voters.get(Year=ys, Category=category, Sex="Total", Constituency=c)
+
+    registered = ballots("Voters on the electoral roll", "Whole country")
+    cast = ballots("Votes cast", "Whole country")
+    blank_total, void_total = ballots("Blank ballots", "Whole country"), ballots("Void ballots", "Whole country")
+    valid_total = ballots("Valid votes", "Whole country")
+    mismatch(b, f"{year} ballots", cast, (valid_total or 0) + (blank_total or 0) + (void_total or 0))
+    # the sets the ballot paper's answers are stored in
+    ballot_set = None
+    if year == 2012:
+        ballot_set = b.result_set(
+            "ballot",
+            None,
+            SOURCE_NOTE + "One ballot paper carried all six questions. Voters on the electoral roll and votes cast are "
+            "counted in each municipality, and valid, blank, and void ballots in each constituency.",
+        )
+    answer_sets: list[tuple[str, str, str, str, str]] = []
+    for key_, label in questions:
+        text = clean(label[4:]) if year < 2012 else clean(label)
+        title = f"{year} Icelandic referendum: {text}" if year < 2012 else f"{year} Icelandic referendum, question {key_[1:]}"
+        contest = b.contest(
+            f"referendum:{key_}",
+            (title, None),
+            kind="ballot_question",
+            where=TERRITORY,
+            system=SYSTEM_REFERENDUM,
+        )
+        b.p.add("ballot_question", contest_id=contest, type="referendum")
+        result_set = b.result_set(f"referendum:{key_}", contest, REFERENDUM_METHOD)
+        if year == 2012:
+            b.note(contest, "context", f"The question on the ballot: {text}", key_)
+        yes = b.option(contest, "yes", "Yes", 1, "answer")
+        no = b.option(contest, "no", "No", 2, "answer")
+        answer_sets.append((key_, label, contest, result_set, yes + "|" + no))
+    unit_cache: dict[str, str] = {}
+    sums: dict[str, Counter[str]] = {k: Counter() for k, *_ in answer_sets}
+    for c_label, code in const_labels.items():
+        assert code is not None
+        unit = unit_cache[code] = b.constituency(code)
+        valid = ballots("Valid votes", c_label)
+        blank, void = ballots("Blank ballots", c_label), ballots("Void ballots", c_label)
+        target_sets = [ballot_set] if year == 2012 else [rs for _, _, _, rs, _ in answer_sets]
+        for result_set in target_sets:
+            assert result_set is not None
+            for measure, value in ((4, valid), (6, blank), (5, void)):
+                b.value(result_set, unit, None, measure, value)
+        for key_, label, contest, result_set, options in answer_sets:
+            yes, no = options.split("|")
+            if year == 2012:
+                g = grid("KOS04109")
+                where = {"Constituency": c_label, "Questions": label, "Unit": "Number of valid votes"}
+                y, n = g.get(**where, Category="Yes"), g.get(**where, Category="No")
+                other = g.get(**where, Category="Unanswered/void")
+                mismatch(b, f"{year} {key_} {c_label} answers", (y or 0) + (n or 0) + (other or 0), valid)
+                b.value(result_set, unit, None, 5, other)
+                sums[key_]["other"] += other or 0
+            else:
+                g = grid("KOS04102")
+                y = g.get(Year=ys, Category="Valid votes - Yes", Constituency=c_label)
+                n = g.get(Year=ys, Category="Valid votes - No", Constituency=c_label)
+                mismatch(b, f"{year} {c_label} answers", (y or 0) + (n or 0), g.get(Year=ys, Category="Valid votes", Constituency=c_label))
+            b.value(result_set, unit, yes, 1, y)
+            b.value(result_set, unit, no, 1, n)
+            sums[key_]["yes"] += y or 0
+            sums[key_]["no"] += n or 0
+    # municipal counts of voters and votes cast
+    reg_sum = cast_sum = 0
+    for code, name, label in hierarchy("KOS04105"):
+        r = munis.get(**{"Constituency/Municipality": label}, Year=ys, Category="Voters on the electoral roll", Sex="Total")
+        c = munis.get(**{"Constituency/Municipality": label}, Year=ys, Category="Votes cast", Sex="Total")
+        if r is None and c is None:
+            continue
+        mu = b.municipality(name)
+        for result_set in ([ballot_set] if year == 2012 else [rs for _, _, _, rs, _ in answer_sets]):
+            assert result_set is not None
+            b.value(result_set, mu, None, 2, r)
+            b.value(result_set, mu, None, 3, c)
+        reg_sum += r or 0
+        cast_sum += c or 0
+    mismatch(b, f"{year} registered voters by municipality", reg_sum, registered)
+    mismatch(b, f"{year} votes cast by municipality", cast_sum, cast)
+    for key_, label, contest, result_set, options in answer_sets:
+        yes, no = options.split("|")
+        if year == 2012:
+            g8 = grid("KOS04108")
+            ny = g8.get(Questions=label, Unit="Number of valid votes", Category="Yes")
+            nn = g8.get(Questions=label, Unit="Number of valid votes", Category="No")
+            no_answer = g8.get(Questions=label, Unit="Number of valid votes", Category="Unanswered/void")
+            b.declare(result_set, None, 5, no_answer)
+            mismatch(b, f"{year} {key_} unanswered nationwide", sums[key_]["other"], no_answer)
+            b.note(
+                result_set,
+                "caveat",
+                "Statistics Iceland counts unanswered and void answers to this question together. They are stored "
+                "as invalid ballots.",
+            )
+        else:
+            g = grid("KOS04102")
+            ny = g.get(Year=ys, Category="Valid votes - Yes", Constituency="Whole country")
+            nn = g.get(Year=ys, Category="Valid votes - No", Constituency="Whole country")
+            for measure, value in ((4, valid_total), (2, registered), (3, cast), (6, blank_total), (5, void_total)):
+                b.declare(result_set, None, measure, value)
+        b.declare(result_set, yes, 1, ny)
+        b.declare(result_set, no, 1, nn)
+        mismatch(b, f"{year} {key_} yes votes", sums[key_]["yes"], ny)
+        mismatch(b, f"{year} {key_} no votes", sums[key_]["no"], nn)
+        b.outcome(result_set, yes, None, "won" if (ny or 0) > (nn or 0) else "lost")
+        b.outcome(result_set, no, None, "won" if (nn or 0) > (ny or 0) else "lost")
+    if ballot_set is not None:
+        for measure, value in ((2, registered), (3, cast), (4, valid_total), (6, blank_total), (5, void_total)):
+            b.declare(ballot_set, None, measure, value)
+    return b.p
+
+
 # ---------------------------------------------------------------- run
 
 
@@ -1410,6 +1631,8 @@ def build(event: Event) -> Package:
         return althing(event)
     if event.kind == "presidential":
         return president(event)
+    if event.kind == "referendum":
+        return referendum(event)
     raise NotImplementedError(event.ekey)
 
 
