@@ -2970,8 +2970,141 @@ def nationality_settlements(d: Day, local: Local) -> None:
             )
 
 
+NATIONALITY_LISTS_2019 = "2019_Nemzetisegi orsz és teruleti eredmenyek"
+
+
+def list_names_2019(book: dict[str, list[list[str]]], nation: str) -> dict[tuple[str, str | None], dict[int, str]]:
+    """The names of the registered lists, by level and county, from a nationality's list sheets."""
+    names: dict[tuple[str, str | None], dict[int, str]] = {}
+    for sheet, rows in book.items():
+        if sheet == "Országos listák":
+            level, maz = "national", None
+        elif "területi list" in sheet:
+            level = "territorial"
+            label = next(row[1] for row in rows if row[:1] == ["Megye:"])
+            maz = county_key(re.sub(r"(?i)\s*megye$", "", label))
+        else:
+            continue
+        head = next(i for i, row in enumerate(rows) if row[:1] in (["Nemzetiség"], ["Megye"]))
+        columns = {cell: index for index, cell in enumerate(rows[head])}
+        order = next((index for cell, index in columns.items() if cell.startswith("Lista sorszám")), None)
+        found: dict[int, str] = {}
+        unnumbered: list[str] = []
+        for row in rows[head + 1 :]:
+            if len(row) <= columns["Lista neve"] or not row[columns["Lista neve"]]:
+                continue
+            position = number(row[order]) if order is not None and order < len(row) else None
+            name = row[columns["Lista neve"]]
+            if position is None:
+                if name not in unnumbered:
+                    unnumbered.append(name)
+            else:
+                found[position] = name
+        if unnumbered:
+            # Where the sheet prints no list number, the lists are numbered in the order the sheet gives them.
+            if found:
+                raise ValueError(f"{nation} {sheet}: unnumbered lists {unnumbered} beside {found}")
+            found = {position: name for position, name in enumerate(unnumbered, 1)}
+        elif list(found) != sorted(found):
+            print(f"{nation} {sheet}: lists out of order {found}")
+        names[(level, maz)] = found
+    return names
+
+
+def nationality_lists_2019(d: Day, local: Local) -> None:
+    """National and territorial nationality lists, by settlement within each county.
+
+    One results sheet per nationality holds two blocks: the national lists' votes by county and settlement, and the
+    territorial lists' votes by settlement with each county's total and seats. The national block's nationwide row is
+    printed empty, so it declares no national totals and no seats.
+    """
+    name = NATIONALITY_LISTS_2019
+    found = places()
+    for path in sorted(bundle(name)):
+        book = sheets(name, path)
+        nation = next(
+            row[1]
+            for sheet, rows in book.items()
+            if sheet == "Országos listák"
+            for row in rows
+            if row[:1] == ["Nemzetiség:"]
+        )
+        titles = list_names_2019(book, nation)
+        rows = next(rows for rows in book.values() if any(row[:2] == ["Megye", "Település"] for row in rows))
+        level = ""
+        header: list[str] = []
+        for row in rows:
+            row = row + [""] * (len(header) - len(row))
+            heading = next(
+                (cell.strip() for cell in row[:5] if cell.startswith(("Országos nemz", "Területi nemz"))), ""
+            )
+            if heading:
+                level = "national" if heading.startswith("Országos") else "territorial"
+                continue
+            if row[:2] == ["Megye", "Település"]:
+                header = row
+                continue
+            if not level or not header or number(row[4]) is None or row[0] == "Országos":
+                continue
+            county_name, place = row[0].strip(), row[1].strip()
+            maz = county_key(county_name)
+            lists = [(i, int(header[i])) for i in range(12, len(header), 2) if header[i].strip().isdigit()]
+            tag = nationality_contest(local, level, "HU" if level == "national" else maz, nation)
+            names = titles.get((level, None if level == "national" else maz), {})
+
+            def option(position: int) -> str:
+                label = names.get(position)
+                return d.option(
+                    tag,
+                    label or f"{position}. lista",
+                    "list",
+                    nominator=label,
+                    position=position,
+                    ident=str(position),
+                )
+
+            if not place:
+                if level == "territorial" and not row[2].startswith("Nincs rögzítve"):
+                    d.declare(tag, None, 4, number(row[11]))
+                    for index, position in lists:
+                        if position not in names and not number(row[index]):
+                            continue  # the sheet prints zeros for list numbers this county did not register
+                        d.declare(tag, option(position), 1, number(row[index]))
+                        won = number(row[index + 1])
+                        if won:
+                            d.outcome(tag, option(position), "won", won)
+                continue  # a county total of the national lists; the settlement lines carry the same votes
+            if place.startswith("TVB "):
+                unit = d.special_unit(f"nemz-tvb:{maz}", "standard")
+            else:
+                unit = d.settlement_unit(found.resolve(maz, None, place, trust_code=False))
+            d.accounting(tag, unit, number(row[4]), number(row[5]), number(row[8]), number(row[10]), number(row[11]))
+            for index, position in lists:
+                d.value(tag, unit, option(position), 1, number(row[index]))
+    for tag, result_set in d.sets.items():
+        if tag.startswith(("nemz:2019:national:", "nemz:2019:territorial:")):
+            body = (
+                "The office published these results as not yet final. Lines headed as the counting committee's "
+                "protocol hold the ballots that committee counted itself, and are kept as separate units. Where the "
+                "workbook marks a county's total as not recorded, only the settlement lines are stored."
+            )
+            if ":national:" in tag:
+                body += " The workbooks leave the nationwide row and every seat of the national lists empty."
+            d.p.add(
+                "note",
+                id=key("note", result_set, "lists"),
+                entity_id=result_set,
+                kind="caveat",
+                body_md=body,
+                lang="en",
+            )
+
+
 def nationality_2019(d: Day) -> None:
-    nationality_settlements(d, Local(d, 2019))
+    d.cite(ARCHIVE)
+    local = Local(d, 2019)
+    nationality_settlements(d, local)
+    nationality_lists_2019(d, local)
 
 
 NATIONALITY_LISTS_2024 = "2024_nemzetisegi"
