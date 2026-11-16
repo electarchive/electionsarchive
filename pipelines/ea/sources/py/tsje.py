@@ -254,11 +254,12 @@ def parse() -> None:
     compare2018()
     compare2021()
     compare2015()
+    compare2008()
     geo().write()
     registry().write()
     election().write()
     history().write()
-    for build in (municipal_2015, general_2018, municipal_2021):
+    for build in (general_2008, municipal_2015, general_2018, municipal_2021):
         build().write()
 
 
@@ -974,17 +975,20 @@ MUNICIPAL_2015_FILES = {
     "resultados": f"{ARCHIVE}/20160626224654id_/http://tsje.gov.py:80/static/ups/docs/archivos/2015/noviembre/RESULTADO_PAIS_COMPLETO_2015.pdf",
     "candidatos": f"{ARCHIVE}/20151119114116id_/http://tsje.gov.py:80/static/ups/docs/archivos/2015/boletines/candidatos-distrito-09-11-2015.xlsx",
 }
+MEMORIA_2008 = f"{ARCHIVE}/20160808124710id_/http://tsje.gov.py/static/ups/libros/pdf/2008_resultados.pdf"
 HISTORY_FILES = {
     **{url: ".xlsx" if "RESULTADOS_POR_MESA" in url else ".xls" for url in GENERAL_2018_FILES.values()},
     **{url: ".xlsx" for url in MUNICIPAL_2021_FILES.values()},
     ROLL: ".csv",
     MUNICIPAL_2015_FILES["resultados"]: ".pdf",
     MUNICIPAL_2015_FILES["candidatos"]: ".xlsx",
+    MEMORIA_2008: ".pdf",
 }
+GENERAL_2008 = date(2008, 4, 20)
 GENERAL_2018 = date(2018, 4, 22)
 MUNICIPAL_2021 = date(2021, 10, 10)
 MUNICIPAL_2015 = date(2015, 11, 15)
-HISTORY_DAYS = (MUNICIPAL_2015, GENERAL_2018, MUNICIPAL_2021)
+HISTORY_DAYS = (GENERAL_2008, MUNICIPAL_2015, GENERAL_2018, MUNICIPAL_2021)
 ABROAD = 18
 UNIT_KEY = ("dep", "dis", "zona", "local", "mesa")
 OPEN_DATA = "Public official records of the Republic of Paraguay; reuse with the source acknowledged"
@@ -1133,6 +1137,7 @@ class Tally(NamedTuple):
     preferences: pl.DataFrame | None = None  # unit_id, lista, orden, votes
     declared_preferences: tuple[tuple[int, int, int], ...] = ()  # (list, position, votes) the Tribunal prints
     candidates: tuple[tuple[int, int, str], ...] = ()  # (list, position, name) of registered candidates, no outcome
+    positions: dict[int, int | None] | None = None  # list -> number on the ballot, when it differs from the list key
 
 
 def _add_contest(
@@ -1178,7 +1183,7 @@ def _add_contest(
             contest_id=contest,
             kind=spec.option,
             party_id=party_id,
-            ballot_position=lista,
+            ballot_position=lista if tally.positions is None else tally.positions.get(lista),
             ballot_label=label,
         )
         if spec.kind == "office":
@@ -2437,6 +2442,8 @@ def party_names() -> dict[str, str]:
         add(name)
     for name in candidates2015()["party"]:
         add(name)
+    for name in PARTIES_2008.values():
+        add(name)
     return {n: c.most_common(1)[0][0] for n, c in sorted(found.items()) if n not in registry_parties()}
 
 
@@ -2496,3 +2503,517 @@ def history() -> Package:
 
 def history_packages() -> list[str]:
     return [f"{SOURCE}/history", *(f"{SOURCE}/{day}" for day in HISTORY_DAYS)]
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# The general election of 20 April 2008, from the Tribunal's memoir of that election.
+
+# The parties the memoir spells out, by the acronym its tables use. A party the 2018 table also numbers keeps the
+# name that table gives it, so both elections tie to the same record.
+PARTIES_2008 = {
+    "ANR": NATIONAL_PARTIES[(1, "ANR")],
+    "PLRA": NATIONAL_PARTIES[(2, "PLRA")],
+    "PPS": "PARTIDO PAIS SOLIDARIO",
+    "PHP": "PARTIDO HUMANISTA PARAGUAYO",
+    "UNACE": NATIONAL_PARTIES[(7, "UNACE")],
+    "PPQ": NATIONAL_PARTIES[(8, "PPQ")],
+    "PEN": NATIONAL_PARTIES[(9, "PEN")],
+    "P_MAS": NATIONAL_PARTIES[(11, "PMAS")],
+    "P-MAS": NATIONAL_PARTIES[(11, "PMAS")],
+    "PFA": NATIONAL_PARTIES[(12, "PFA")],
+    "PUP": "PARTIDO DE LA UNIDAD POPULAR",
+    "MRCN": "MOVIMIENTO RESISTENCIA CIUDADANA NACIONAL",
+    "MTP": "MOVIMIENTO TETA PYAHU",
+    "MPT": "MOVIMIENTO POPULAR TEKOJOJA",
+    "PDP": "PARTIDO DEMOCRATICO PROGRESISTA",
+    "PT": "PARTIDO DE LOS TRABAJADORES",
+    "ADT": "ALIANZA DEMOCRATICA TRICOLOR",
+    "APC": "ALIANZA PATRIOTICA PARA EL CAMBIO",
+    "PRF": NATIONAL_PARTIES[(3, "PRF")],
+}
+CONTESTS_2008 = {
+    "Presidente y Vicepresidente": "president",
+    "Senadores": "senate",
+    "Parlamento Mercosur": "parlasur",
+    "Diputados": "deputies",
+    "Gobernador": "governor",
+    "Gobernadores": "governor",
+}
+ORDER_2008 = ("president", "senate", "parlasur", "deputies", "governor")
+HEADING_2008 = re.compile(
+    r"Resultados para (Presidente y Vicepresidente|Senadores|Parlamento Mercosur|Diputados|Gobernador(?:es)?|"
+    r"Junta Departamental)\b(.*)$"
+)
+HEADER_2008 = re.compile(r"L\s?\d+\s?\(\*\)|\S+(?:\s\(\*\))?")
+FIGURE_2008 = re.compile(r"(?<![\d,.])(?:\d+(?:\.\d{3})*|-)(?![\d,])")
+ROW_2008 = re.compile(r"^\s*(\d+)\s+([A-ZÑÁÉÍÓÚ0-9][A-ZÑÁÉÍÓÚ0-9 .\-/'()]*?)\s{2,}([\d-].*)$")
+TOTALS_2008 = re.compile(r"^\s*TOTALES\s{2,}([\d-].*)$")
+NOTE_2008 = re.compile(
+    r"^\s*(?:(L\s?\d+\s?\(\*\))\s+)?(\S+(?:\s?-\s?\S+)?)\s{2,}(\S.*?),?\s+EN DPTOS?\.\s*([\d, ]+)\.?\s*$"
+)
+META_2008 = ("ELECTORES", "MESAS", "BLANCOS", "NULOS", "TOTAL", "PARTICIPACION")
+
+
+class Parsed2008(NamedTuple):
+    districts: dict[tuple[str, int, int], dict[str, int]]  # (contest, dep, dis) -> column -> figure
+    names: dict[tuple[int, int], str]  # (dep, dis) -> the memoir's spelling
+    departments: dict[tuple[str, int], dict[str, int]]  # (contest, dep) -> the department row of a national table
+    national: dict[str, dict[str, int]]  # contest -> the printed national totals
+    notes: dict[tuple[str, str], list[tuple[str, str, frozenset[int]]]]  # (contest, column) -> (acronym, name, deps)
+
+
+def _column(text: str) -> str:
+    """A header's name without its spaces; an asterisk after an acronym only points at the footnote."""
+    name = re.sub(r"\s", "", text)
+    return name if re.fullmatch(r"L\d+\(\*\)", name) else name.replace("(*)", "")
+
+
+def _assign(ends: list[int], columns: list[int]) -> list[int] | None:
+    """Place each figure under the header whose right edge is nearest, keeping their order."""
+    k, n, inf = len(ends), len(columns), 10**9
+    cost = [[inf] * (n + 1) for _ in range(k + 1)]
+    take = [[False] * (n + 1) for _ in range(k + 1)]
+    cost[0] = [0] * (n + 1)
+    for i in range(1, k + 1):
+        for j in range(1, n + 1):
+            use = cost[i - 1][j - 1] + abs(ends[i - 1] - columns[j - 1])
+            if use <= cost[i][j - 1]:
+                cost[i][j], take[i][j] = use, True
+            else:
+                cost[i][j] = cost[i][j - 1]
+    if cost[k][n] >= inf:
+        return None
+    out: list[int] = []
+    i, j = k, n
+    while i > 0:
+        if take[i][j]:
+            out.append(j - 1)
+            i, j = i - 1, j - 1
+        else:
+            j -= 1
+    return out[::-1]
+
+
+def _figures(text: str, offset: int, columns: list[tuple[str, int]], line: str) -> dict[str, int]:
+    found = [
+        (0 if m.group(0) == "-" else int(m.group(0).replace(".", "")), m.end() + offset)
+        for m in FIGURE_2008.finditer(text)
+    ]
+    placed = _assign([end for _, end in found], [end for _, end in columns])
+    if placed is None:
+        raise ValueError(
+            f"2008 memoir: {len(found)} figures do not fit {len(columns)} headers in {line.strip()[:80]!r}"
+        )
+    return {columns[j][0]: value for (value, _), j in zip(found, placed, strict=True)}
+
+
+@functools.cache
+def memoir2008() -> Parsed2008:
+    """The district tables of the memoir's results chapter, placed under their column headers by position."""
+    deps = {**_dep_codes(), "PRESIDENTE HAYES": 15}
+    districts: dict[tuple[str, int, int], dict[str, int]] = {}
+    names: dict[tuple[int, int], str] = {}
+    departments: dict[tuple[str, int], dict[str, int]] = {}
+    national: dict[str, dict[str, int]] = {}
+    notes: dict[tuple[str, str], list[tuple[str, str, frozenset[int]]]] = {}
+    contest: str | None = None
+    section: str | None = None
+    columns: list[tuple[str, int]] | None = None
+    rank, late, last = 0, False, ""
+    for line in pdf_text(MEMORIA_2008).splitlines():
+        found = HEADING_2008.search(line)
+        if found:
+            contest, section, columns = CONTESTS_2008.get(found.group(1)), None, None
+            late = late or found.group(1) == "Junta Departamental"
+            if contest is not None:
+                # The memoir prints its departmental boards under the headings of the other contests too.
+                if ORDER_2008.index(contest) < rank or late:
+                    contest = None
+                rank = max(rank, ORDER_2008.index(contest)) if contest else rank
+            if "Zonas" in found.group(2):
+                contest = None
+            continue
+        if contest is None:
+            continue
+        if re.match(r"\s*COD\.", line):
+            heads = [(_column(m.group(0)), m.end()) for m in HEADER_2008.finditer(line)]
+            columns = None if "ZONAS" in line else [(n, e) for n, e in heads if n not in ("COD.", "DISTRITO")]
+            continue
+        if columns is not None and re.match(r"\s*PORCENTAJE", line):
+            columns = None
+            continue
+        text = line.strip()
+        if columns is None:
+            note = NOTE_2008.match(line)
+            if note and section is not None and section.startswith("Resumen"):
+                if note.group(1):
+                    last = re.sub(r"\s", "", note.group(1))
+                place = frozenset(int(n) for n in re.findall(r"\d+", note.group(4)))
+                entry = (clean(note.group(2)).replace("- ", "-"), clean(note.group(3)), place)
+                if entry not in notes.setdefault((contest, last), []):
+                    notes[(contest, last)].append(entry)
+            elif text and section is None:
+                section = re.sub(r"\s*\(\d\)$", "", text)
+            continue
+        row = ROW_2008.match(line)
+        if row:
+            assert section is not None
+            code = int(row.group(1))
+            values = _figures(row.group(3), row.start(3), columns, line)
+            if section.startswith("Resumen"):
+                departments.setdefault((contest, code), {}).update(values)
+                continue
+            dep = deps[normal(section)]
+            districts.setdefault((contest, dep, code), {}).update(values)
+            names[(dep, code)] = clean(row.group(2))
+            continue
+        total = TOTALS_2008.match(line)
+        if total and section is not None and section.startswith("Resumen"):
+            national.setdefault(contest, {}).update(_figures(total.group(1), total.start(1), columns, line))
+    # The footnotes to column L 66 disagree with the department rows. For the deputies, the department rows put the
+    # Caazapeña alliance in Caazapá (6) and the alliance for change in 10, 12, and 16; for the governors, the
+    # footnote omits Alto Paraná (10), where the column holds the alliance for change.
+    caazapena, change = "ALIANZA PATRIOTICA CAAZAPEÑA", "ALIANZA PATRIOTICA PARA EL CAMBIO"
+    notes[("deputies", "L66(*)")] = [entry for entry in notes.get(("deputies", "L66(*)"), []) if entry[0] != "APC"] + [
+        ("APC", caazapena, frozenset({6})),
+        ("APC", change, frozenset({10, 12, 16})),
+    ]
+    notes[("governor", "L66(*)")] = [
+        entry for entry in notes.get(("governor", "L66(*)"), []) if entry[1] == caazapena
+    ] + [("APC", change, frozenset({10, 12, 16}))]
+    for (contest, dep, dis), values in districts.items():
+        parties = sum(v for k, v in values.items() if k not in META_2008)
+        if parties + values.get("BLANCOS", 0) + values.get("NULOS", 0) != values.get("TOTAL"):
+            raise ValueError(f"2008 memoir: {contest} {dep}:{dis} does not add up to its printed total")
+    return Parsed2008(districts, names, departments, national, notes)
+
+
+@functools.cache
+def governors2008() -> dict[int, tuple[str, str]]:
+    """The governors the memoir declares elected, by department: the name and the acronym of the winning list."""
+    deps = {**_dep_codes(), "PRESIDENTE HAYES": 15}
+    out: dict[int, tuple[str, str]] = {}
+    started, dep = False, None
+    for line in pdf_text(MEMORIA_2008).splitlines():
+        if "Gobernadores Electos por Departamento" in line:
+            started = True
+        elif started and "Junta" in line:
+            break
+        elif started:
+            text = clean(line)
+            if normal(text) in deps:
+                dep = deps[normal(text)]
+                continue
+            found = re.match(r"^(?:8\.16\s+)?(\D+?)\s+(\d+)\s+(\S+)\s+\S.*$", text)
+            if found and dep is not None and dep not in out and "Nombre" not in text:
+                out[dep] = (clean(found.group(1)), found.group(3))
+    return out
+
+
+def acronym2008(contest: str, column: str, dep: int) -> str:
+    """The acronym behind a numbered column of the memoir's tables, in the department where it ran."""
+    mine = [a for a, _, deps in memoir2008().notes.get((contest, column), []) if dep in deps]
+    return mine[0] if len(mine) == 1 else column
+
+
+def compare2008() -> dict[str, int]:
+    """Check the district tables against the department rows and the national totals the memoir prints."""
+    memoir = memoir2008()
+    known = set(districts().select("dep", "dis").iter_rows())
+    unknown = {(dep, dis) for _, dep, dis in memoir.districts} - known
+    if unknown:
+        raise ValueError(f"2008 memoir: districts without a place in the geography: {sorted(unknown)[:5]}")
+    sums: dict[tuple[str, int], Counter[str]] = {}
+    for (contest, dep, _), values in memoir.districts.items():
+        sums.setdefault((contest, dep), Counter()).update(
+            {acronym2008(contest, k, dep): v for k, v in values.items() if k != "PARTICIPACION"}
+        )
+    out = {"districts": len({(dep, dis) for _, dep, dis in memoir.districts})}
+    for contest in ORDER_2008:
+        total: Counter[str] = Counter()
+        for (c, dep), counts in sums.items():
+            if c != contest:
+                continue
+            total.update(counts)
+            printed = memoir.departments.get((contest, dep))
+            if printed is not None:
+                wrong = {
+                    k: (v, counts.get(acronym2008(contest, k, dep), 0))
+                    for k, v in printed.items()
+                    if k != "PARTICIPACION" and counts.get(acronym2008(contest, k, dep), 0) != v
+                }
+                if wrong:
+                    raise ValueError(f"2008 memoir: {contest} department {dep} differs from its districts: {wrong}")
+        printed_total = memoir.national.get(contest)
+        if printed_total is not None:
+            wrong = {
+                k: (v, total.get(k, 0))
+                for k, v in printed_total.items()
+                if k != "PARTICIPACION"
+                and not k.startswith("L")
+                and not (k == "APC" and contest in ("deputies", "governor"))  # three different alliances share it
+                and total.get(k, 0) != v
+            }
+            if wrong:
+                raise ValueError(f"2008 memoir: {contest} national totals differ from its districts: {wrong}")
+        out[f"{contest} votes"] = total["TOTAL"]
+    print(f"2008: {out}", flush=True)
+    return out
+
+
+GENERAL_2008_NOTE = (
+    "Counted by the Tribunal Superior de Justicia Electoral and printed, by municipality (distrito), in the results "
+    "chapter of its memoir of the general and departmental elections of 20 April 2008. Valid votes are the votes for "
+    "lists; blank and null ballots are the district's own counts, and ballots cast are the district total the memoir "
+    "prints. Registered voters are the district's roll as printed. The sums of the districts agree with the "
+    "department rows and with the national totals the memoir prints, for every list. The memoir also breaks the "
+    "Capital's results down by zone; the zones are not stored. A numbered column of the memoir's tables is read as "
+    "the list its footnote names in that department."
+)
+
+
+def _ticket2008() -> tuple[str, str]:
+    """The names of the president and vice president the memoir declares elected."""
+    lines = [clean(line) for line in pdf_text(MEMORIA_2008).splitlines()]
+    at = next(i for i, line in enumerate(lines) if line.startswith("PRESIDENTE DE LA REPUBLICA"))
+    names = [
+        re.sub(r"\s+[\d.]+\s+[\d,]+%$", "", line) for line in lines[at + 1 : at + 12] if line and "FOTO" not in line
+    ]
+    return names[0], names[1]
+
+
+def _labels2008(contest: str, dep: int, order: list[str]) -> dict[int, tuple[str, str | None]]:
+    """Ballot label and party of each column of a contest, in the department where it is read."""
+    memoir = memoir2008()
+    named = {a: n for (c, _), entries in memoir.notes.items() if c == contest for a, n, deps in entries if dep in deps}
+    known = {normal(name) for name in PARTIES_2008.values()}
+    out: dict[int, tuple[str, str | None]] = {}
+    for lista, column in enumerate(order, 1):
+        acronym = acronym2008(contest, column, dep)
+        name = named.get(acronym) or PARTIES_2008.get(acronym) or acronym
+        out[lista] = (name, party(name) if normal(name) in known else None)
+    return out
+
+
+def general_2008() -> Package:
+    day = GENERAL_2008
+    p = Package(
+        f"{SOURCE}/{day}",
+        SOURCE,
+        "Paraguay's general elections of 20 April 2008 (President, Senate, Mercosur Parliament, Chamber of Deputies, "
+        "and governors), by municipality, from the Tribunal Superior de Justicia Electoral",
+        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry", f"{SOURCE}/history"],
+    )
+    p.external |= {PARAGUAY, COUNTRY}
+    source_id = key("source", SOURCE, "general-2008")
+    _source(
+        p,
+        source_id,
+        "Memoria y Estadísticas Electorales: resultados de las elecciones generales y departamentales de 2008",
+        original(MEMORIA_2008),
+        [MEMORIA_2008],
+    )
+    election_id = key("election", day)
+    path = f"py/{day}-general"
+    p.add(
+        "election",
+        id=election_id,
+        polity_id=PARAGUAY,
+        kind="general",
+        date_from=day,
+        date_to=day,
+        date_precision="day",
+        status="held",
+    )
+    p.add("slug", path=path, entity_id=election_id, is_current=True)
+    p.name(election_id, "2008 Paraguayan general election", "en", "official")
+    p.name(election_id, "Elecciones generales 2008", "es", "native", False)
+
+    memoir = memoir2008()
+    places = sorted({(dep, dis) for _, dep, dis in memoir.districts})
+    frame = pl.DataFrame(places, schema=["dep", "dis"], orient="row").with_columns(
+        code=pl.concat_str(pl.lit(str(day)), "dep", "dis", separator=":")
+    )
+    frame = frame.with_columns(unit_id=pl.col("code").map_elements(lambda c: key("unit", c), return_dtype=pl.String))
+    p.frame(
+        "reporting_unit",
+        frame.select(
+            id="unit_id",
+            polity_id=pl.lit(PARAGUAY),
+            scheme_code=pl.lit("py.distrito"),
+            code="code",
+            area_relation=pl.lit("equals"),
+            area_id=pl.struct("dep", "dis").map_elements(
+                lambda row: area("py.distrito", f"{row['dep']}:{row['dis']}"), return_dtype=pl.String
+            ),
+            kind=pl.lit("aggregate"),
+        ),
+    )
+    unit_of = {(dep, dis): unit for dep, dis, unit in frame.select("dep", "dis", "unit_id").iter_rows()}
+    names = _dep_names()
+    slugs = {dep: changeset.slug(name) for dep, name in names.items()}
+    values: list[pl.DataFrame] = []
+    elected = governors2008()
+
+    def contest(code: str, dep: int | None, spec: Spec) -> None:
+        mine = {
+            (d, dis): row for (c, d, dis), row in memoir.districts.items() if c == code and (dep is None or d == dep)
+        }
+        order: list[str] = []
+        for _, row in sorted(mine.items()):
+            order += [column for column in row if column not in META_2008 and column not in order]
+        # A national contest prints one acronym per list, whatever the department.
+        labels = _labels2008(code, 0 if dep is None else dep, order)
+        slot = {column: lista for lista, column in enumerate(order, 1)}
+        rows = [
+            (unit_of[place], slot[column], value)
+            for place, row in mine.items()
+            for column, value in row.items()
+            if column not in META_2008
+        ]
+        accounting = [
+            (
+                unit_of[place],
+                row.get("ELECTORES") or None,
+                row["TOTAL"],
+                row.get("BLANCOS"),
+                row.get("NULOS"),
+            )
+            for place, row in mine.items()
+        ]
+        printed = memoir.national.get(code) if dep is None else memoir.departments.get((code, dep))
+        declared: list[tuple[int | None, int, int]] = []
+        for column, value in (printed or {}).items():
+            if column in slot:
+                declared.append((slot[column], 1, value))
+        if printed:
+            for column, measure in (("BLANCOS", BLANK), ("NULOS", INVALID)):
+                if column in printed:
+                    declared.append((None, measure, printed[column]))
+            if all(row.get("ELECTORES") for row in mine.values()) and "ELECTORES" in printed:
+                declared.append((None, REGISTERED, printed["ELECTORES"]))
+        winner: int | None = None
+        members: tuple[tuple[int, int, str], ...] = ()
+        if code == "president":
+            winner = slot["APC"]
+            members = tuple((winner, rank, name) for rank, name in enumerate(_ticket2008(), 1))
+        elif code == "governor" and dep is not None and dep in elected:
+            name, sigla = elected[dep]
+            matched = [slot[c] for c in order if acronym2008(code, c, dep) == sigla]
+            if len(matched) == 1:
+                winner, members = matched[0], ((matched[0], 1, name),)
+        tally = Tally(
+            rows=pl.DataFrame(rows, schema=["unit_id", "lista", "votes"], orient="row"),
+            totals=pl.DataFrame(
+                accounting,
+                schema={
+                    "unit_id": pl.String,
+                    "registered": pl.Int64,
+                    "total": pl.Int64,
+                    "blank": pl.Int64,
+                    "invalid": pl.Int64,
+                },
+                orient="row",
+            ),
+            labels=labels,
+            winner=winner,
+            members=members,
+            declared=tuple(declared),
+            positions=dict.fromkeys(labels),
+        )
+        values.append(_add_contest(p, election_id, day, path, spec, tally, source_id, GENERAL_2008_NOTE))
+
+    contest(
+        "president",
+        None,
+        Spec(
+            "president",
+            "office",
+            "2008 Paraguayan presidential election",
+            "Elección presidencial 2008",
+            "president",
+            COUNTRY,
+            PRESIDENCY,
+            None,
+            PRESIDENT_SYSTEM,
+            1,
+            "ticket",
+        ),
+    )
+    contest(
+        "senate",
+        None,
+        Spec(
+            "senate",
+            "list_allocation",
+            "2008 Paraguayan Senate election",
+            "Elección de senadores 2008",
+            "senate",
+            COUNTRY,
+            None,
+            SENATE,
+            SENATE_SYSTEM,
+            45,
+            "list",
+        ),
+    )
+    contest(
+        "parlasur",
+        None,
+        Spec(
+            "parlasur",
+            "list_allocation",
+            "2008 election of Paraguay's members of the Mercosur Parliament",
+            "Elección de parlamentarios del Mercosur 2008",
+            "mercosur-parliament",
+            COUNTRY,
+            None,
+            PARLASUR,
+            PARLASUR_SYSTEM,
+            18,
+            "list",
+        ),
+    )
+    for dep in sorted({d for c, d, _ in memoir.districts if c == "deputies"}):
+        contest(
+            "deputies",
+            dep,
+            Spec(
+                f"deputies:{dep}",
+                "list_allocation",
+                f"2008 Chamber of Deputies election, {names[dep]}",
+                f"Elección de diputados 2008, {names[dep]}",
+                f"deputies-{slugs[dep]}",
+                area("py.departamento", str(dep)),
+                None,
+                CHAMBER,
+                CHAMBER_SYSTEM,
+                None,
+                "list",
+            ),
+        )
+    for dep in sorted({d for c, d, _ in memoir.districts if c == "governor"}):
+        contest(
+            "governor",
+            dep,
+            Spec(
+                f"governor:{dep}",
+                "office",
+                f"2008 governor election, {names[dep]}",
+                f"Elección de gobernador 2008, {names[dep]}",
+                f"governor-{slugs[dep]}",
+                area("py.departamento", str(dep)),
+                key("office", "governor", dep),
+                None,
+                GOVERNOR_SYSTEM,
+                1,
+                "candidate",
+            ),
+        )
+    p.frame(
+        "result_value",
+        pl.concat(values).with_columns(
+            channel=pl.lit(0, pl.Int16), count_round=pl.lit(0, pl.Int16), flags=pl.lit(0, pl.Int16)
+        ),
+    )
+    return p
