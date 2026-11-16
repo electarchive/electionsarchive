@@ -1,6 +1,7 @@
 """Costa Rica's Tribunal Supremo de Elecciones: the "cómputo de votos" workbooks of every national election."""
 
 import functools
+import json
 import re
 import unicodedata
 import zipfile
@@ -14,6 +15,7 @@ import polars as pl
 
 from ea import changeset, package, raw
 from ea.package import Package
+from ea.sources.cr import declared
 
 SOURCE = "cr.tse"
 BASE = "https://www.tse.go.cr"
@@ -62,6 +64,7 @@ def fetch() -> None:
     raw.fetch(SOURCE, LIST_URL, suffix=".html")
     for name in (*ARCHIVES, *MUNICIPAL_ARCHIVES):
         raw.fetch(SOURCE, zip_url(name), suffix=".zip")
+    declared.fetch()
 
 
 CENTROS, NESTED_LEVEL = "centro", "nested"
@@ -504,6 +507,7 @@ def party(name: str) -> str:
 
 
 TSE_SOURCE = key("source", "tse")
+DECLARATORIAS = key("source", "declaratorias")
 ASSEMBLY = key("body", "assembly")
 PRESIDENCY = key("office", "president")
 PRESIDENT_SYSTEM = key("electoral_system", "president")
@@ -642,6 +646,20 @@ def registry() -> Package:
     for name in ARCHIVES:
         p.artifact(raw.cached(SOURCE, zip_url(name)), TSE_SOURCE)
     p.artifact(raw.cached(SOURCE, LIST_URL), TSE_SOURCE)
+    p.add(
+        "source",
+        id=DECLARATORIAS,
+        kind="official_body",
+        publisher="Tribunal Supremo de Elecciones",
+        title="Resoluciones declaratorias de elección",
+        url=declared.INDEX_URL,
+        license="CC BY-SA 4.0",
+        license_url="http://creativecommons.org/licenses/by-sa/4.0/",
+        attribution=SOURCE_NOTE,
+    )
+    p.artifact(raw.cached(SOURCE, declared.INDEX_URL), DECLARATORIAS)
+    for resolution in declared.available():
+        p.artifact(raw.cached(SOURCE, declared.url(resolution)), DECLARATORIAS)
     p.add("body", id=ASSEMBLY, polity_id=COSTA_RICA, kind="unicameral")
     p.name(ASSEMBLY, "Legislative Assembly of Costa Rica", "en", "official")
     p.name(ASSEMBLY, "Asamblea Legislativa", "es", "native", False)
@@ -693,7 +711,7 @@ def chosen(held: Held) -> Chosen:
         if chapter not in held.chapters or not low <= number <= high:
             continue
         if number == low:
-            out.declared[chapter] = declared(frame)
+            out.declared[chapter] = printed_totals(frame)
             continue
         table = read(name, frame)
         if table is None:
@@ -724,7 +742,7 @@ def chosen(held: Held) -> Chosen:
     return out
 
 
-def declared(frame: pl.DataFrame) -> dict[str, dict[str, float]]:
+def printed_totals(frame: pl.DataFrame) -> dict[str, dict[str, float]]:
     """The printed totals of a chapter's first table: for each column (Costa Rica, a province, abroad), its rows."""
     top = next(r for r in range(2, 8) if fold(cell(frame, r, 1)).startswith("COSTA RICA"))
     columns: dict[int, str] = {}
@@ -803,6 +821,157 @@ def over(p: Package, values: pl.DataFrame) -> None:
         )
 
 
+@functools.lru_cache(maxsize=8)
+def seat_table(day: date) -> declared.Seats | None:
+    """The workbook's table of the deputies elected by province and party, for the days it is read."""
+    sheet = declared.SEAT_SHEETS.get(day)
+    if sheet is None:
+        return None
+    wb = next(held for held in HELD if held.day == day).books[0]
+    return declared.seats(book(wb.zip, wb.member)[sheet])
+
+
+def magnitude(day: date, province: int) -> int:
+    table = seat_table(day)
+    return table.magnitude[province] if table else SEATS[province]
+
+
+def resolution_for(day: date, kind: str, round_number: int = 1) -> declared.Resolution | None:
+    return next(
+        (r for r in declared.available() if (r.day, r.kind, r.round) == (day, kind, round_number)),
+        None,
+    )
+
+
+@functools.lru_cache(maxsize=8)
+def elected_deputies(day: date) -> dict[int, list[declared.Elected]]:
+    resolution = resolution_for(day, "assembly")
+    if resolution is None:
+        return {}
+    found = (declared.deputies_pdf if resolution.path.endswith(".pdf") else declared.deputies_html)(resolution)
+    grouped: dict[int, list[declared.Elected]] = {}
+    for elected in found:
+        grouped.setdefault(elected.place, []).append(elected)
+    return grouped
+
+
+def cite(p: Package, resolution: declared.Resolution, result_set: str) -> None:
+    p.add(
+        "citation",
+        id=key("citation", result_set, resolution.number),
+        entity_id=result_set,
+        source_id=DECLARATORIAS,
+        locator=json.dumps({"resolution": resolution.number}),
+    )
+
+
+def person_of(p: Package, elected: declared.Elected, *tag: object) -> str:
+    person = key("person", *tag, fold(elected.name))
+    p.add("person", id=person)
+    p.name(person, title(elected.name), "es", "official")
+    return person
+
+
+def declare_assembly(p: Package, day: date, province: int, result_set: str, options: dict[str, str]) -> None:
+    """Store the seats each party won in a province as the workbook declares them, and the deputies named elected."""
+    table = seat_table(day)
+    if table is None:
+        return
+    for name, seats in sorted(table.won[province].items()):
+        if name not in options:
+            raise KeyError(f"{day} {PROVINCE_NAMES[province - 1]}: no list for {name}")
+        p.add("outcome", result_set_id=result_set, option_id=options[name], kind="won", seats=seats)
+    note = (
+        "The seats won by each party are those the Tribunal declares in its table of deputies elected by province "
+        "and party."
+    )
+    resolution = resolution_for(day, "assembly")
+    elected = elected_deputies(day).get(province, [])
+    if resolution is not None:
+        names = Counter(e.party for e in elected)
+        if names != Counter(table.won[province]):
+            raise ValueError(f"{day} {PROVINCE_NAMES[province - 1]}: {names} against {table.won[province]}")
+        for deputy in elected:
+            assert deputy.party is not None
+            tag = (day, "assembly", province, deputy.party)
+            person = person_of(p, deputy, *tag)
+            candidacy = key("candidacy", *tag, fold(deputy.name))
+            p.add(
+                "candidacy",
+                id=candidacy,
+                person_id=person,
+                option_id=options[deputy.party],
+                role="list_member",
+                member_of_party_id=party(deputy.party),
+            )
+            p.add(
+                "outcome",
+                result_set_id=result_set,
+                option_id=options[deputy.party],
+                candidacy_id=candidacy,
+                kind="elected",
+            )
+        cite(p, resolution, result_set)
+        note += f" The deputies named are those the Tribunal declares elected in resolution n.º {resolution.number}."
+    p.add(
+        "note",
+        id=key("note", result_set, "declared"),
+        entity_id=result_set,
+        kind="methodology",
+        body_md=note,
+        lang="en",
+    )
+
+
+def declare_president(p: Package, day: date, round_number: int, result_set: str, options: dict[str, str]) -> None:
+    """Store which tickets the Tribunal declares elected or sends to a second round, and the elected ticket's names."""
+    resolution = resolution_for(day, "president", round_number)
+    if resolution is None:
+        return
+    names, winner = declared.ticket(resolution)
+    if names:
+        if winner not in options:
+            raise KeyError(f"{day}: no ticket for {winner}")
+        for column, option in options.items():
+            kind = "elected" if column == winner else "lost"
+            p.add("outcome", result_set_id=result_set, option_id=option, kind=kind)
+        for member in names:
+            tag = (day, "president", round_number, winner)
+            person = person_of(p, member, *tag)
+            p.add(
+                "candidacy",
+                id=key("candidacy", *tag, fold(member.name)),
+                person_id=person,
+                option_id=options[winner],
+                role=member.role,
+                list_position=member.place or None,
+                member_of_party_id=party(winner),
+            )
+        what = f"The president and vice presidents named are those the Tribunal declares elected in resolution n.º {resolution.number}."
+    else:
+        runoff = declared.advancing(resolution)
+        missing = [name for name in runoff if name not in options]
+        if missing:
+            raise KeyError(f"{day}: no ticket for {missing}")
+        for column, option in options.items():
+            p.add(
+                "outcome",
+                result_set_id=result_set,
+                option_id=option,
+                kind="advanced" if column in runoff else "eliminated",
+            )
+        what = f"The tickets sent to a second round are those the Tribunal names in resolution n.º {resolution.number}."
+    cite(p, resolution, result_set)
+    p.add(
+        "note",
+        id=key("note", result_set, "declared"),
+        entity_id=result_set,
+        kind="methodology",
+        body_md=what,
+        lang="en",
+    )
+
+
 def election(day: date) -> Package:
     helds = [held for held in HELD if held.day == day]
     held = helds[0]
@@ -820,6 +989,10 @@ def election(day: date) -> Package:
     )
     p.external |= {COSTA_RICA, COUNTRY}
     sources(p)
+    for resolution in declared.available():
+        if resolution.day.year == day.year:
+            p.uses(raw.cached(SOURCE, declared.url(resolution)))
+    p.uses(raw.cached(SOURCE, declared.INDEX_URL))
     chosen_tables = chosen(held)
     method = METHOD + (CENTER_METHOD if held.level == CENTROS else DISTRICT_METHOD)
     election_id = key("election", day)
@@ -891,7 +1064,7 @@ def election(day: date) -> Package:
                     kind="list_allocation",
                     body_id=ASSEMBLY,
                     district_area_id=area("cr.provincia", str(province)),
-                    magnitude=SEATS[province],
+                    magnitude=magnitude(day, province),
                     round_number=1,
                     electoral_system_id=ASSEMBLY_SYSTEM,
                     default_result_kind="counted",
@@ -994,6 +1167,10 @@ def election(day: date) -> Package:
                     mine = sums[(option_id, measure)]
                     if mine != count:
                         gaps[column] = (mine, count)
+            if family == "president":
+                declare_president(p, day, round_number, result_set, options)
+            else:
+                declare_assembly(p, day, province, result_set, options)
             comparison[rows] = {
                 "gaps": gaps,
                 "units": len({v["unit_id"] for v in values if v["result_set_id"] == result_set}),
