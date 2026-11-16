@@ -314,6 +314,7 @@ class Package:
         self.depends = list(depends)
         self.rows: dict[str, list[dict[str, object]]] = {}
         self.frames: dict[str, list[pl.DataFrame]] = {}
+        self.parts: dict[str, list[Path]] = {}
         self.sources: list[dict[str, object]] = []
         self.external: set[str] = set()
         self.accepted: dict[str, str] = {}
@@ -327,6 +328,10 @@ class Package:
     def frame(self, table: str, frame: pl.DataFrame) -> None:
         """Stage many rows at once; the frame's columns must be in the table's schema, and missing ones are null."""
         self.frames.setdefault(table, []).append(frame)
+
+    def part(self, table: str, path: Path) -> None:
+        """Stage a Parquet file of rows for a table too large to hold in memory; the file is streamed in on write."""
+        self.parts.setdefault(table, []).append(path)
 
     def name(self, entity: str, text: str, lang: str, kind: str, preferred: bool = True) -> None:
         self.add(
@@ -367,9 +372,25 @@ class Package:
             shutil.rmtree(out)
         out.mkdir(parents=True)
         counts: dict[str, int] = {}
-        for table in sorted({*self.rows, *self.frames}):
+        for table in sorted({*self.rows, *self.frames, *self.parts}):
             rows = self.rows.get(table, [])
             schema = TABLES[table][1] if table in TABLES else FACTS[table]
+            if table in self.parts:
+                if rows or table in self.frames:
+                    raise ValueError(f"{table} cannot mix staged files with rows")
+                pl.concat(
+                    [
+                        pl.scan_parquet(path).select(
+                            pl.col(c).cast(kind)
+                            if c in pl.scan_parquet(path).collect_schema()
+                            else pl.lit(None, kind).alias(c)
+                            for c, kind in schema.items()
+                        )
+                        for path in self.parts[table]
+                    ]
+                ).sink_parquet(out / f"{table}.parquet", statistics=False)
+                counts[table] = int(pl.scan_parquet(out / f"{table}.parquet").select(pl.len()).collect().item())
+                continue
             staged = self.frames.get(table, [])
             unknown = {column for row in rows for column in row} | {c for f in staged for c in f.columns}
             if unknown - set(schema):
@@ -547,13 +568,19 @@ REFERENCES = [
 TARGET_KEY = {"scheme": "code", "polity": "id"}
 
 CHECKS = {
-    "unique.fact": """select result_set_id, unit_id, option_id, measure, count(*) as n from result_value
+    # Group on a 64-bit hash first, so a package of tens of millions of values never holds every key in memory.
+    "unique.fact": """with repeated as (
+                        select hash(result_set_id, unit_id, option_id, measure) as h from result_value
+                        group by h having count(*) > 1)
+                      select result_set_id, unit_id, option_id, measure, count(*) as n from result_value
+                      where hash(result_set_id, unit_id, option_id, measure) in (select h from repeated)
                       group by all having count(*) > 1""",
     "fact.negative": "select * from result_value where value < 0",
-    "fact.option_contest": """select v.result_set_id, v.option_id from result_value v
-                              join all_result_set r on r.id = v.result_set_id
-                              join all_contest_option o on o.id = v.option_id
-                              where o.contest_id <> r.contest_id""",
+    "fact.option_contest": """with pairs as (select distinct result_set_id, option_id from result_value)
+                              select p.result_set_id, p.option_id from pairs p
+                              join all_contest_option o on o.id = p.option_id
+                              where not exists (select 1 from all_result_set r
+                                                where r.id = p.result_set_id and r.contest_id = o.contest_id)""",
     "accounting.votes_valid": """with v as (
                                    select v.result_set_id, v.unit_id,
                                           sum(value) filter (where measure = 1 and option_id is not null) as votes,
@@ -696,12 +723,13 @@ def check(path: Path) -> list[tuple[str, int, list[tuple[object, ...]]]]:
     for table, column, target in REFERENCES:
         target_key = TARGET_KEY.get(target, "id")
         known = (
-            "select id from external"
+            "select id as v from external"
             if target == "polity"
-            else f'select "{target_key}" from "all_{target}" union all select id from external'
+            else f'select "{target_key}" as v from "all_{target}" union all select id as v from external'
         )
         rows = con.execute(
-            f'select distinct "{column}" from "{table}" where "{column}" is not null and "{column}" not in ({known})'
+            f'select distinct "{column}" from "{table}" where "{column}" is not null '
+            f'and not exists (select 1 from ({known}) k where k.v = "{table}"."{column}")'
         ).fetchall()
         if rows:
             findings.append((f"reference.{table}.{column}", len(rows), rows[:5]))
