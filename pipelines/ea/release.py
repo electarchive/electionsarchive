@@ -98,6 +98,7 @@ ENTITIES = [
     "census_class",
     "census_match",
     "census_date",
+    "census_world",
 ]
 BY_RESULT_SET = {"result_set": "k", "outcome": "result_set_id", "value_locator": "result_set_k"}
 SOURCE_COLUMNS = ["id", "kind", "publisher", "title", "url", "license", "license_url", "attribution"]
