@@ -1,0 +1,1095 @@
+import functools
+import re
+import time
+from concurrent.futures import ThreadPoolExecutor
+from dataclasses import dataclass
+from datetime import date
+from html.parser import HTMLParser
+from uuid import uuid5
+
+import httpx
+
+from ea import package, raw
+from ea.package import Package
+
+SOURCE = "ua.cvk"
+BASE = "https://www.cvk.gov.ua/pls"
+DELAY = 0.4
+WORKERS = 4
+ABROAD = 226  # the abroad district's number in the site's pages; it votes only in the national list
+DISTRICTS = range(1, ABROAD + 1)
+
+
+@dataclass(frozen=True)
+class Parliament:
+    site: str  # the results site's folder
+    id: int  # the authority's election number within the site
+    day: date
+    kind: str  # general, by_election
+
+
+@dataclass(frozen=True)
+class President:
+    site: str
+    id: int
+    day: date
+    round: int
+
+
+PARLIAMENT = [
+    Parliament("vnd2012", 900, date(2012, 10, 28), "general"),
+    Parliament("vnd2012", 902, date(2013, 7, 7), "by_election"),
+    Parliament("vnd2012", 903, date(2013, 12, 15), "by_election"),
+    Parliament("vnd2012", 904, date(2014, 5, 25), "by_election"),
+    Parliament("vnd2014", 910, date(2014, 10, 26), "general"),
+    Parliament("vnd2014", 913, date(2015, 7, 26), "by_election"),
+    Parliament("vnd2014", 914, date(2016, 7, 17), "by_election"),
+    Parliament("vnd2019", 919, date(2019, 7, 21), "general"),
+    Parliament("vnd2019", 920, date(2020, 3, 15), "by_election"),
+    Parliament("vnd2019", 921, date(2020, 10, 25), "by_election"),
+    Parliament("vnd2019", 922, date(2021, 3, 28), "by_election"),
+    Parliament("vnd2019", 923, date(2021, 10, 31), "by_election"),
+    Parliament("vnd2019", 924, date(2022, 3, 27), "by_election"),
+]
+PRESIDENT = [
+    President("vp2014", 702, date(2014, 5, 25), 1),
+    President("vp2019", 719, date(2019, 3, 31), 1),
+    President("vp2019", 720, date(2019, 4, 21), 2),
+]
+
+
+def page(site: str, name: str, id: int, extra: str = "") -> str:
+    return f"{BASE}/{site}/{name}pt001f01={id}{extra}.html"
+
+
+def get(url: str) -> raw.Artifact | None:
+    """Fetch one page into the raw cache; a page the site does not serve is None."""
+    try:
+        return raw.cached(SOURCE, url)
+    except LookupError:
+        pass
+    time.sleep(DELAY)
+    try:
+        return raw.fetch(SOURCE, url, suffix=".html")
+    except httpx.HTTPStatusError as failure:
+        if failure.response.status_code == 404:
+            return None
+        raise
+
+
+def text(artifact: raw.Artifact) -> str:
+    return artifact.path.read_bytes().decode("windows-1251", errors="replace")
+
+
+class _Tables(HTMLParser):
+    """Collect every table of a page as rows of cell texts; the site's markup leaves cells and rows unclosed."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.done: list[list[list[str]]] = []
+        self.open: list[list[list[str]]] = []
+        self.inside = False
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        if tag == "table":
+            self.open.append([])
+            self.inside = False
+        elif tag == "tr" and self.open:
+            self.open[-1].append([])
+            self.inside = False
+        elif tag in ("td", "th") and self.open:
+            if not self.open[-1]:
+                self.open[-1].append([])
+            self.open[-1][-1].append("")
+            self.inside = True
+
+    def handle_endtag(self, tag: str) -> None:
+        if tag == "table" and self.open:
+            self.done.append(self.open.pop())
+            self.inside = False
+        elif tag in ("td", "th"):
+            self.inside = False
+
+    def handle_data(self, data: str) -> None:
+        if self.inside and self.open and self.open[-1] and self.open[-1][-1]:
+            self.open[-1][-1][-1] += data
+
+
+def tables(artifact: raw.Artifact) -> list[list[list[str]]]:
+    parser = _Tables()
+    parser.feed(text(artifact))
+    return [[[" ".join(cell.split()) for cell in row] for row in table if row] for table in parser.done]
+
+
+def districts(election: Parliament) -> list[int]:
+    """The single-member districts that voted: the whole range on a general election, else those the results page names."""
+    if election.kind == "general":
+        return list(DISTRICTS)
+    found: set[int] = set()
+    for name in ("wp039", "wp030", "wp306_n"):
+        artifact = get(page(election.site, name, election.id))
+        if artifact is None:
+            continue
+        body = text(artifact)
+        found |= {int(n) for n in re.findall(r"pf7331=(\d+)", body)}
+        found |= {int(n) for n in re.findall(r"ОВО\s*№\s*(\d+)", body)}
+    return sorted(found)
+
+
+def cached(url: str) -> raw.Artifact | None:
+    try:
+        return raw.cached(SOURCE, url)
+    except LookupError:
+        return None
+
+
+def _all(urls: list[str]) -> None:
+    with ThreadPoolExecutor(WORKERS) as pool:
+        list(pool.map(get, urls))
+
+
+def letters(e: Parliament) -> list[int]:
+    """The letter pages of the commission's alphabetical list of elected deputies."""
+    artifact = cached(page(e.site, "wp610", e.id))
+    return [] if artifact is None else sorted({int(n) for n in re.findall(r"lit=(\d+)", text(artifact))})
+
+
+def fetch() -> None:
+    for election in PARLIAMENT:
+        _all(
+            [
+                page(election.site, name, election.id)
+                for name in ("wp300", "wp312", "wp039", "wp306_n", "wp611", "wp610")
+            ]
+        )
+        _all([page(election.site, "wp610", election.id, f"lit={lit}current_row=1") for lit in letters(election)])
+        numbers = districts(election)
+        _all([page(election.site, name, election.id, f"pf7331={n}") for n in numbers for name in ("wp336", "wp338")])
+        _all([page(election.site, "wp033", election.id, f"pf7331={n}") for n in numbers if n != ABROAD])
+        _all([page(election.site, "wp040", election.id, f"pf7331={n}") for n in numbers if n != ABROAD])
+        print(f"{SOURCE}: {election.day} fetched", flush=True)
+    for president in PRESIDENT:
+        _all([page(president.site, name, president.id) for name in ("wp300", "wp301", "wp312", "wp335")])
+        index = cached(page(president.site, "wp335", president.id))
+        if index is None:
+            raise LookupError(f"{president.site} {president.id} has no precinct index")
+        numbers = sorted({int(m) for m in re.findall(r"pt005f01=(\d+)", text(index))})
+        _all([page(president.site, "wp336", president.id, f"pt005f01={n}") for n in numbers])
+        print(f"{SOURCE}: {president.day} fetched", flush=True)
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Parsing
+
+
+def key(kind: str, *parts: object) -> str:
+    return str(uuid5(package.NAMESPACE, "\x1f".join([SOURCE, kind, *(str(part) for part in parts)])))
+
+
+UKRAINE = str(uuid5(package.NAMESPACE, "polity\x1fUA"))
+SOURCE_ID = key("source", SOURCE)
+RADA = key("body", "rada")
+PRESIDENCY = key("office", "president")
+LIST_SYSTEM = key("electoral_system", "rada-list")
+DISTRICT_SYSTEM = key("electoral_system", "rada-district")
+PRESIDENT_SYSTEM = key("electoral_system", "president")
+SELF_NOMINATED = "самовисування"
+LIST_SEATS = 225
+FOREVER = date(1991, 8, 24)
+
+# Where each table kind keeps its fixed columns: the first option column and the column of each measure.
+LAYOUTS: dict[str, tuple[int, dict[int, int]]] = {
+    "full": (15, {2: 3, 14: 7, 3: 12, 5: 13, 4: 14}),
+    "short": (3, {2: 1, 4: 2}),
+    "president": (11, {2: 2, 3: 9, 5: 10}),
+}
+MEASURES = {2: "registered", 14: "received a ballot", 3: "voted", 5: "invalid", 4: "valid"}
+
+LIST_METHOD = (
+    "Counted by the Central Election Commission from the polling station protocols and published per polling "
+    "station on its results site. Registered voters are the voters on the roll, voters are those who received a "
+    "ballot, ballots cast are the voters who took part, and valid votes are the votes for the party lists. The "
+    "protocols also count ballots received, unused, and not counted; they are not stored here. Polling stations "
+    "abroad vote only in the national list."
+)
+DISTRICT_METHOD = (
+    "Counted by the Central Election Commission from the polling station protocols and published per polling "
+    "station on its results site. Registered voters are the voters on the roll, voters are those who received a "
+    "ballot, ballots cast are the voters who took part, and valid votes are the votes for the candidates."
+)
+PRESIDENT_METHOD = (
+    "Counted by the Central Election Commission from the polling station protocols and published per polling "
+    "station on its results site. Registered voters are the voters on the roll, ballots cast are the voters who "
+    "took part, and invalid ballots are those declared invalid. The valid votes are the votes for the candidates."
+)
+
+
+def clean(value: str) -> str:
+    return " ".join(value.replace("\xa0", " ").split())
+
+
+def norm(value: str) -> str:
+    """The key of a party across elections: its name without case, spacing, or quote style."""
+    for old, new in (("’", "'"), ("ʼ", "'"), ("`", "'"), ("“", '"'), ("”", '"'), ("«", '"'), ("»", '"'), ("„", '"')):
+        value = value.replace(old, new)
+    return " ".join(value.casefold().split())
+
+
+def squash(value: str) -> str:
+    return re.sub(r"\W", "", value).casefold()
+
+
+def split_name(value: str) -> str:
+    """The site prints a candidate column header as surname, name, and patronymic run together."""
+    return re.sub(r"(?<=[а-яіїєґ'’])(?=[А-ЯІЇЄҐ])", " ", value)
+
+
+def number(value: str) -> int | None:
+    digits = re.sub(r"[\s\xa0]", "", value)
+    return int(digits) if digits.isdigit() else None
+
+
+@dataclass(frozen=True)
+class Sheet:
+    district: int
+    region: str
+    kind: str
+    header: list[str]
+    rows: list[list[str]]
+
+    @property
+    def options(self) -> list[tuple[int, str]]:
+        first = LAYOUTS[self.kind][0]
+        stop = len(self.header) - (1 if self.header[-1].startswith("Дата") else 0)
+        return [(column, clean(self.header[column])) for column in range(first, stop)]
+
+
+@functools.cache
+def sheet(site: str, name: str, id: int, extra: str, district: int) -> Sheet | None:
+    artifact = cached(page(site, name, id, extra))
+    if artifact is None:
+        return None
+    found = tables(artifact)
+    grid = next((t for t in found if t and t[0] and t[0][0] == "№ ВД"), None)
+    if grid is None:
+        raise ValueError(f"{page(site, name, id, extra)} holds no precinct table")
+    header = grid[0]
+    kind = "short" if header[1].startswith("1) п.3") else "full" if header[1].startswith("1)") else "president"
+    title = next((" ".join(cell for cell in t[0]) for t in found if t and "№" in " ".join(t[0]) and len(t) == 1), "")
+    region = re.search(r"№\s*\d+,\s*(.+)$", title)
+    return Sheet(
+        district=district,
+        region=clean(region.group(1)) if region else "",
+        kind=kind,
+        header=header,
+        rows=[row for row in grid[1:] if re.fullmatch(r"\d{6}", row[0]) and len(row) == len(header)],
+    )
+
+
+def list_sheet(e: Parliament, n: int) -> Sheet | None:
+    return sheet(e.site, "wp336", e.id, f"pf7331={n}", n)
+
+
+def district_sheet(e: Parliament, n: int) -> Sheet | None:
+    return sheet(e.site, "wp338", e.id, f"pf7331={n}", n)
+
+
+def held(e: Parliament) -> list[int]:
+    """The districts, abroad included, whose pages the cache holds."""
+    return [
+        n
+        for n in DISTRICTS
+        if any(found is not None and found.rows for found in (list_sheet(e, n), district_sheet(e, n)))
+    ]
+
+
+MONTHS = {
+    "січня": 1,
+    "лютого": 2,
+    "березня": 3,
+    "квітня": 4,
+    "травня": 5,
+    "червня": 6,
+    "липня": 7,
+    "серпня": 8,
+    "вересня": 9,
+    "жовтня": 10,
+    "листопада": 11,
+    "грудня": 12,
+}
+
+
+@dataclass(frozen=True)
+class Candidate:
+    name: str
+    nominator: str
+    born: date | None
+    gender: str | None
+
+
+def roster(e: Parliament, n: int) -> dict[str, Candidate]:
+    """Each registered candidate of a district as the commission prints them, keyed by the squashed name."""
+    artifact = cached(page(e.site, "wp033", e.id, f"pf7331={n}"))
+    found: dict[str, Candidate] = {}
+    if artifact is None:
+        return found
+    for t in tables(artifact):
+        if not t or not t[0][0].startswith("Прізвище"):
+            continue
+        nominated = next(i for i, cell in enumerate(t[0]) if cell.startswith("Висування"))
+        for row in t[1:]:
+            if len(row) <= nominated:
+                continue
+            born = re.search(r"народи(вся|лася)\s+(\d+)\s+(\w+)\s+(\d{4})\s+року", row[1])
+            month = MONTHS.get(born.group(3)) if born else None
+            found[squash(row[0])] = Candidate(
+                name=split_name(clean(row[0])),
+                nominator=clean(row[nominated]),
+                born=date(int(born.group(4)), month, int(born.group(2))) if born and month else None,
+                gender=None if born is None else ("female" if born.group(1) == "лася" else "male"),
+            )
+    return found
+
+
+def region_key(name: str) -> str:
+    return norm(re.sub(r"\s*-\s*\d+$", "", name))
+
+
+def regions() -> dict[str, str]:
+    """Every region the pages name, by its key."""
+    found: dict[str, str] = {}
+    for e in PARLIAMENT:
+        for n in held(e):
+            for found_sheet in (list_sheet(e, n), district_sheet(e, n)):
+                if found_sheet is not None and found_sheet.region:
+                    found.setdefault(region_key(found_sheet.region), re.sub(r"\s*-\s*\d+$", "", found_sheet.region))
+    for r in PRESIDENT:
+        for name in grouped(r).values():
+            found.setdefault(region_key(name), name)
+    return found
+
+
+@functools.cache
+def grouped(r: President) -> dict[int, str]:
+    """The region of each territorial district of a presidential election, from the precinct index."""
+    index = cached(page(r.site, "wp335", r.id))
+    found: dict[int, str] = {}
+    if index is None:
+        return found
+    region = ""
+    for t in tables(index):
+        for row in t:
+            if len(row) == 1 and re.search(r"\s-\s*\d+$", row[0]):
+                region = re.sub(r"\s*-\s*\d+$", "", row[0])
+            elif len(row) >= 4 and row[0].isdigit():
+                found[int(row[0])] = region
+            elif row[:1] == ["ЗВО"]:
+                found[ABROAD] = ""
+    return found
+
+
+def area(scheme: str, code: object) -> str:
+    return key("area", scheme, code)
+
+
+def geo() -> Package:
+    p = Package(
+        f"{SOURCE}/geo",
+        SOURCE,
+        "Ukraine's regions, single-member districts, and polling stations as the Central Election Commission names them",
+    )
+    p.external.add(UKRAINE)
+    for code, rank, kind, noun in (
+        ("ua.region", 1, "administrative", "region"),
+        ("ua.ovo", 2, "electoral_district", "single-member district"),
+        ("ua.dilnytsia", 3, "precinct", "polling station"),
+    ):
+        p.add("scheme", code=code, polity_id=UKRAINE, kind=kind, rank=rank, noun=noun, code_system=None)
+    names = regions()
+    for code, text in sorted(names.items()):
+        id = area("ua.region", code)
+        p.add("area", id=id, scheme_code="ua.region")
+        p.add("area_code", area_id=id, code=code)
+        p.name(id, text, "uk", "official")
+    where: dict[int, str] = {}
+    for e in PARLIAMENT:
+        for n in held(e):
+            for found_sheet in (list_sheet(e, n), district_sheet(e, n)):
+                if found_sheet is not None and found_sheet.region and n != ABROAD:
+                    where.setdefault(n, region_key(found_sheet.region))
+    for r in PRESIDENT:
+        for n, name in grouped(r).items():
+            if name and n != ABROAD:
+                where.setdefault(n, region_key(name))
+    for n in sorted(where):
+        id = area("ua.ovo", n)
+        p.add("area", id=id, scheme_code="ua.ovo")
+        p.add("area_code", area_id=id, code=str(n))
+        p.add("area_parent", area_id=id, parent_id=area("ua.region", where[n]))
+        p.name(id, f"Одномандатний виборчий округ № {n}", "uk", "official")
+        p.name(id, f"Single-member district {n}", "en", "official", False)
+    return p
+
+
+def nominators(e: Parliament) -> set[str]:
+    return {
+        c.nominator
+        for n in held(e)
+        for c in roster(e, n).values()
+        if c.nominator and norm(c.nominator) != SELF_NOMINATED
+    }
+
+
+def list_parties(e: Parliament) -> set[str]:
+    found: set[str] = set()
+    for n in held(e):
+        found_sheet = list_sheet(e, n)
+        if found_sheet is not None:
+            found |= {name for _, name in found_sheet.options}
+    return found
+
+
+def party_names() -> dict[str, str]:
+    """Every party name the pages print, by key; the latest spelling wins."""
+    found: dict[str, str] = {}
+    for e in PARLIAMENT:
+        for name in sorted(list_parties(e) | nominators(e)):
+            found[norm(name)] = clean(name)
+    return found
+
+
+def party(name: str) -> str:
+    return key("party", norm(name))
+
+
+def registry() -> Package:
+    p = Package(
+        f"{SOURCE}/registry",
+        SOURCE,
+        "Ukrainian parties, the Verkhovna Rada, the presidency, and their electoral systems from the Central "
+        "Election Commission",
+        depends=[f"{SOURCE}/geo"],
+    )
+    p.external.add(UKRAINE)
+    p.add(
+        "source",
+        id=SOURCE_ID,
+        kind="official_body",
+        publisher="Центральна виборча комісія",
+        title="Results of elections, Central Election Commission of Ukraine",
+        url="https://www.cvk.gov.ua/",
+        license="Free reuse with the source cited, as the commission's results sites state",
+        license_url="https://www.cvk.gov.ua/",
+        attribution="Центральна виборча комісія",
+    )
+    p.add("body", id=RADA, polity_id=UKRAINE, kind="unicameral")
+    p.name(RADA, "Verkhovna Rada", "en", "official")
+    p.name(RADA, "Верховна Рада України", "uk", "native", False)
+    p.add("office", id=PRESIDENCY, polity_id=UKRAINE, kind="head_of_state")
+    p.name(PRESIDENCY, "President of Ukraine", "en", "official")
+    p.name(PRESIDENCY, "Президент України", "uk", "native", False)
+    for id, rules, method in (
+        (
+            LIST_SYSTEM,
+            {
+                "formula": "hare",
+                "threshold": {"level": "list", "scope": "national", "percent": 5},
+                "lists": {"order": "closed", "vacancy": "next_on_list"},
+            },
+            (
+                "225 seats are allocated by largest remainder with the Hare quota among the national closed lists "
+                "that reach 5% of the valid votes."
+            ),
+        ),
+        (
+            DISTRICT_SYSTEM,
+            {"formula": "fptp"},
+            "225 deputies are elected in single-member districts, each by a plurality of the votes.",
+        ),
+        (
+            PRESIDENT_SYSTEM,
+            {"formula": "two_round", "majority": 0.5, "advance": 2},
+            (
+                "A candidate with more than half of the votes of the voters who took part is elected; otherwise the "
+                "two leading candidates go to a second round."
+            ),
+        ),
+    ):
+        p.add(
+            "electoral_system",
+            id=id,
+            polity_id=UKRAINE,
+            valid_from=date(2012, 1, 1),
+            valid_to=None,
+            rules=rules,
+            rules_version=1,
+        )
+        p.add("note", id=key("note", id), entity_id=id, kind="methodology", body_md=method, lang="en")
+    for code, text in sorted(party_names().items()):
+        id = party(code)
+        p.add("party", id=id, kind="party", polity_id=UKRAINE)
+        p.add("external_id", entity_id=id, scheme="ua.cvk.party", value=code)
+        p.name(id, text, "uk", "official")
+    return p
+
+
+def declared_list(e: Parliament, name: str = "wp300") -> dict[str, int]:
+    """The list votes of each party as a results page prints them: nationwide (wp300) or abroad (wp312)."""
+    artifact = cached(page(e.site, name, e.id))
+    found: dict[str, int] = {}
+    if artifact is not None:
+        for t in tables(artifact):
+            if t and t[0][:2] == ["№", "Партія"]:
+                for row in t[1:]:
+                    votes = number(row[-1])
+                    if votes is not None:
+                        found[norm(row[1])] = votes
+    return found
+
+
+def seats(e: Parliament) -> dict[str, int]:
+    """The mandates each list won, as the page of elected deputies prints them."""
+    artifact = cached(page(e.site, "wp611", e.id))
+    found: dict[str, int] = {}
+    if artifact is not None:
+        for t in tables(artifact):
+            if t and t[0][:1] == ["Партія"]:
+                for row in t[1:]:
+                    won = number(row[1]) if len(row) > 1 else None
+                    if won is not None:
+                        found[norm(row[0])] = won
+    return found
+
+
+def declared_district(e: Parliament, n: int) -> dict[str, int]:
+    """Each candidate's votes in a district as its summary page prints them, by squashed name."""
+    artifact = cached(page(e.site, "wp040", e.id, f"pf7331={n}"))
+    found: dict[str, int] = {}
+    if artifact is not None:
+        for t in tables(artifact):
+            if t and t[0][:1] == ["Кандидат"]:
+                for row in t[1:]:
+                    votes = number(row[-1])
+                    if votes is not None:
+                        found[squash(row[0].split(",", 1)[0])] = votes
+    return found
+
+
+def winners(e: Parliament) -> dict[int, tuple[str, int | None, bool]]:
+    """For each district, the leading candidate's squashed name, printed votes, and whether the page declares them elected."""
+    found: dict[int, tuple[str, int | None, bool]] = {}
+    for lit in [None, *letters(e)]:
+        artifact = cached(
+            page(e.site, "wp610", e.id) if lit is None else page(e.site, "wp610", e.id, f"lit={lit}current_row=1")
+        )
+        if artifact is None:
+            continue
+        for t in tables(artifact):
+            for row in t:
+                where = re.search(r"ОВО\s*№\s*(\d+)", row[3]) if len(row) == 4 else None
+                if where:
+                    found[int(where.group(1))] = (squash(row[0]), None, True)
+    for name in ("wp039", "wp306_n"):
+        artifact = cached(page(e.site, name, e.id))
+        if artifact is None:
+            continue
+        for t in tables(artifact):
+            for row in t:
+                if len(row) == 6 and row[0].startswith("ОВО"):
+                    n = number(re.sub(r"\D", "", row[0]))
+                    leader = squash(row[1].rpartition(" , ")[0] or row[1])
+                    if n is not None:
+                        found[n] = (leader, number(row[3]), "Обран" in row[5])
+                elif len(row) == 7 and row[0].isdigit() and int(row[0]) not in found:
+                    found[int(row[0])] = (squash(row[4]), None, "Обран" in row[6])
+    return found
+
+
+def unit_for(p: Package, e_day: date, precinct: str, district: int, units: dict[str, str]) -> str:
+    # Stations numbered below 100 are local to their district and repeat across districts.
+    code = f"{e_day}:{district}:{precinct}" if precinct.startswith("0000") else f"{e_day}:{precinct}"
+    if code not in units:
+        id = units[code] = key("unit", code)
+        abroad = district == ABROAD
+        p.add(
+            "reporting_unit",
+            id=id,
+            polity_id=UKRAINE,
+            scheme_code="ua.dilnytsia",
+            code=code,
+            area_relation="unlocated" if abroad else "within",
+            area_id=None if abroad else area("ua.ovo", district),
+            kind="abroad_mission" if abroad else "standard",
+        )
+    return units[code]
+
+
+def values(
+    p: Package,
+    result_set: str,
+    units: dict[str, str],
+    day: date,
+    found: Sheet,
+    options: dict[str, str],
+) -> list[tuple[int | None, ...]]:
+    """Stage one sheet's accounting and option values; return each precinct's printed measures for the overcount check."""
+    layout = LAYOUTS[found.kind][1]
+    kept: list[tuple[int | None, ...]] = []
+    for row in found.rows:
+        unit = unit_for(p, day, row[0], found.district, units)
+        measures = {measure: number(row[column]) for measure, column in layout.items()}
+        for measure, value in measures.items():
+            if value is not None:
+                p.add(
+                    "result_value",
+                    result_set_id=result_set,
+                    unit_id=unit,
+                    option_id=None,
+                    channel=0,
+                    measure=measure,
+                    count_round=0,
+                    flags=0,
+                    value=value,
+                )
+        for column, name in found.options:
+            value = number(row[column])
+            if value is not None:
+                p.add(
+                    "result_value",
+                    result_set_id=result_set,
+                    unit_id=unit,
+                    option_id=options[name],
+                    channel=0,
+                    measure=1,
+                    count_round=0,
+                    flags=0,
+                    value=value,
+                )
+        kept.append((measures.get(3), measures.get(4), measures.get(5), measures.get(2)))
+    return kept
+
+
+def parliament(e: Parliament) -> Package:
+    word = "general" if e.kind == "general" else "by-election"
+    p = Package(
+        f"{SOURCE}/rada-{e.day}",
+        SOURCE,
+        f"The {e.day} Ukrainian parliamentary {'election' if e.kind == 'general' else 'by-election'} by polling "
+        "station from the Central Election Commission",
+        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"],
+    )
+    p.external.add(UKRAINE)
+    election = key("election", "rada", e.day)
+    p.add(
+        "election",
+        id=election,
+        polity_id=UKRAINE,
+        kind=e.kind,
+        date_from=e.day,
+        date_to=e.day,
+        status="held",
+    )
+    path = f"ua/{e.day}-{word}"
+    if e.kind == "general":
+        p.name(election, f"{e.day.year} Ukrainian parliamentary election", "en", "official")
+        p.name(election, f"Вибори народних депутатів України {e.day.year}", "uk", "native", False)
+    else:
+        p.name(election, f"{e.day} Ukrainian parliamentary by-election", "en", "official")
+        p.name(election, f"Проміжні вибори народних депутатів України {e.day:%d.%m.%Y}", "uk", "native", False)
+    p.add("slug", path=path, entity_id=election, is_current=True)
+    units: dict[str, str] = {}
+    pages = [page(e.site, name, e.id) for name in ("wp300", "wp611", "wp039", "wp306_n")]
+    for n in held(e):
+        pages += [page(e.site, name, e.id, f"pf7331={n}") for name in ("wp336", "wp338")]
+        pages.append(page(e.site, "wp033", e.id, f"pf7331={n}"))
+    for url in pages:
+        artifact = cached(url)
+        if artifact is not None:
+            p.artifact(artifact, SOURCE_ID)
+    numbers = held(e)
+    over: list[tuple[int | None, ...]] = []
+    declared = declared_list(e)
+    parties = party_names()
+    sheets = [s for n in numbers if (s := list_sheet(e, n)) is not None and s.rows]
+    if sheets:
+        contest = key("contest", "rada", e.day, "list")
+        p.add(
+            "contest",
+            id=contest,
+            election_id=election,
+            kind="list_allocation",
+            body_id=RADA,
+            magnitude=LIST_SEATS,
+            round_number=1,
+            electoral_system_id=LIST_SYSTEM,
+            default_result_kind="counted",
+        )
+        p.name(contest, f"{e.day.year} Verkhovna Rada national list", "en", "official")
+        p.name(contest, "Загальнодержавний багатомандатний виборчий округ", "uk", "native", False)
+        p.add("slug", path=f"{path}/national-list", entity_id=contest, is_current=True)
+        result_set = key("result_set", "rada", e.day, "list")
+        p.add(
+            "result_set",
+            id=result_set,
+            election_id=election,
+            contest_id=contest,
+            stage="official",
+            kind="counted",
+            source_id=SOURCE_ID,
+            status="active",
+            is_default=True,
+            completeness=1.0,
+        )
+        p.add(
+            "note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=LIST_METHOD, lang="en"
+        )
+        options: dict[str, str] = {}
+        for name in sorted({name for s in sheets for _, name in s.options}, key=norm):
+            option = options[name] = key("option", "rada", e.day, "list", norm(name))
+            p.add(
+                "contest_option",
+                id=option,
+                contest_id=contest,
+                kind="list",
+                party_id=party(name) if norm(name) in parties else None,
+                ballot_label=name,
+            )
+        won = seats(e)
+        for name, option in options.items():
+            if norm(name) in won:
+                p.add("outcome", result_set_id=result_set, option_id=option, kind="won", seats=won[norm(name)])
+            if norm(name) in declared:
+                p.add("declared", result_set_id=result_set, option_id=option, measure=1, value=declared[norm(name)])
+        for found_sheet in sheets:
+            over += values(p, result_set, units, e.day, found_sheet, options)
+        if ABROAD not in numbers:
+            abroad_votes(p, e, result_set, options)
+    leaders = winners(e)
+    for n in numbers:
+        found_sheet = district_sheet(e, n)
+        if found_sheet is None or not found_sheet.rows:
+            continue
+        contest = key("contest", "rada", e.day, "district", n)
+        p.add(
+            "contest",
+            id=contest,
+            election_id=election,
+            kind="body_seats",
+            body_id=RADA,
+            district_area_id=area("ua.ovo", n),
+            magnitude=1,
+            round_number=1,
+            electoral_system_id=DISTRICT_SYSTEM,
+            default_result_kind="counted",
+        )
+        p.name(contest, f"Single-member district {n}", "en", "official")
+        p.name(contest, f"Одномандатний виборчий округ № {n}", "uk", "native", False)
+        p.add("slug", path=f"{path}/district-{n}", entity_id=contest, is_current=True)
+        result_set = key("result_set", "rada", e.day, "district", n)
+        p.add(
+            "result_set",
+            id=result_set,
+            election_id=election,
+            contest_id=contest,
+            stage="official",
+            kind="counted",
+            source_id=SOURCE_ID,
+            status="active",
+            is_default=True,
+            completeness=1.0,
+        )
+        p.add(
+            "note",
+            id=key("note", result_set),
+            entity_id=result_set,
+            kind="methodology",
+            body_md=DISTRICT_METHOD,
+            lang="en",
+        )
+        listed = roster(e, n)
+        options = {}
+        by_name: dict[str, str] = {}
+        for _, header in found_sheet.options:
+            known = listed.get(squash(header))
+            printed = known.name if known else split_name(header)
+            nominator = known.nominator if known else ""
+            option = options[header] = key("option", "rada", e.day, "district", n, squash(header))
+            by_name[squash(header)] = option
+            p.add("contest_option", id=option, contest_id=contest, kind="candidate", ballot_label=printed)
+            person = key("person", "rada", e.day, n, squash(header))
+            p.add(
+                "person",
+                id=person,
+                birth_date=known.born if known else None,
+                birth_precision="day" if known and known.born else None,
+                gender=known.gender if known else None,
+            )
+            p.name(person, printed, "uk", "official")
+            independent = norm(nominator) == SELF_NOMINATED
+            candidacy = key("candidacy", "rada", e.day, n, squash(header))
+            p.add(
+                "candidacy",
+                id=candidacy,
+                person_id=person,
+                option_id=option,
+                role="head",
+                ballot_name=printed,
+                member_of_party_id=party(nominator)
+                if nominator and not independent and norm(nominator) in parties
+                else None,
+                is_independent=independent if nominator else None,
+            )
+        leader = leaders.get(n)
+        if leader is not None and leader[2] and leader[0] in by_name:
+            option = by_name[leader[0]]
+            p.add(
+                "outcome",
+                result_set_id=result_set,
+                option_id=option,
+                kind="elected",
+            )
+        for squashed, total in declared_district(e, n).items():
+            if squashed in by_name:
+                p.add("declared", result_set_id=result_set, option_id=by_name[squashed], measure=1, value=total)
+        over += values(p, result_set, units, e.day, found_sheet, options)
+    note_overcount(p, over)
+    return p
+
+
+def abroad_votes(p: Package, e: Parliament, result_set: str, options: dict[str, str]) -> None:
+    """Where the site prints no station pages for the abroad district, store its printed list totals as one aggregate unit."""
+    abroad = declared_list(e, "wp312")
+    if not abroad:
+        return
+    unit = key("unit", f"{e.day}:abroad")
+    p.add(
+        "reporting_unit",
+        id=unit,
+        polity_id=UKRAINE,
+        scheme_code="ua.dilnytsia",
+        code=f"{e.day}:abroad",
+        area_relation="unlocated",
+        area_id=None,
+        kind="aggregate",
+    )
+    artifact = cached(page(e.site, "wp312", e.id))
+    if artifact is not None:
+        p.artifact(artifact, SOURCE_ID)
+    for name, option in options.items():
+        if norm(name) in abroad:
+            p.add(
+                "result_value",
+                result_set_id=result_set,
+                unit_id=unit,
+                option_id=option,
+                channel=0,
+                measure=1,
+                count_round=0,
+                flags=0,
+                value=abroad[norm(name)],
+            )
+    p.add(
+        "note",
+        id=key("note", result_set, "abroad"),
+        entity_id=result_set,
+        kind="caveat",
+        body_md="The results site prints no polling station pages for the polling stations abroad at this election, "
+        "so the votes cast abroad are stored as one aggregate unit, from the page it prints for the abroad district.",
+        lang="en",
+    )
+
+
+def note_overcount(p: Package, rows: list[tuple[int | None, ...]]) -> None:
+    """Accept the accounting findings the protocols themselves cause, and say how many precincts they touch."""
+    cast = sum(
+        1
+        for voted, valid, invalid, _ in rows
+        if voted is not None and valid is not None and valid + (invalid or 0) != voted
+    )
+    turnout = sum(
+        1 for voted, _, _, registered in rows if voted is not None and registered is not None and voted > registered
+    )
+    if cast:
+        p.accept(
+            "accounting.ballots_sum",
+            f"{cast} polling station protocols print valid and invalid ballots that do not add to the voters who took "
+            "part; stored as printed",
+        )
+    if turnout:
+        p.accept(
+            "accounting.turnout",
+            f"{turnout} polling station protocols print more voters who took part than the roll holds, which the "
+            "authority allows for voters added on election day; stored as printed",
+        )
+
+
+def declared_president(r: President) -> tuple[dict[str, tuple[str, int]], int | None]:
+    """Each candidate's printed name and national votes, by squashed name, and the voters who took part."""
+    artifact = cached(page(r.site, "wp300", r.id))
+    found: dict[str, tuple[str, int]] = {}
+    voters: int | None = None
+    if artifact is not None:
+        for t in tables(artifact):
+            for row in t:
+                if row[:1] == ["Кандидат"]:
+                    continue
+                if len(row) == 4 and number(row[3]) is not None and not row[0].isdigit():
+                    found[squash(row[0])] = (row[0], number(row[3]) or 0)
+                elif len(row) == 2 and row[0].startswith("Кількість виборців, які взяли участь"):
+                    voters = number(row[1])
+    return found, voters
+
+
+def president(r: President) -> Package:
+    first = r.round == 1
+    p = Package(
+        f"{SOURCE}/president-{r.day}",
+        SOURCE,
+        f"The {r.day} Ukrainian presidential {'election' if first else 'runoff'} by polling station from the Central "
+        "Election Commission",
+        depends=[
+            f"{SOURCE}/geo",
+            f"{SOURCE}/registry",
+            *(f"{SOURCE}/president-{x.day}" for x in PRESIDENT if x.site == r.site and x.round == r.round - 1),
+        ],
+    )
+    p.external.add(UKRAINE)
+    election = key("election", "president", r.day)
+    p.add(
+        "election",
+        id=election,
+        polity_id=UKRAINE,
+        kind="general" if first else "runoff",
+        date_from=r.day,
+        date_to=r.day,
+        status="held",
+    )
+    path = f"ua/{r.day}-presidential" + ("" if first else "-runoff")
+    suffix = "" if first else ", second round"
+    p.name(election, f"{r.day.year} Ukrainian presidential election{suffix}", "en", "official")
+    p.name(election, f"Вибори Президента України {r.day.year}, {r.round}-й тур", "uk", "native", False)
+    p.add("slug", path=path, entity_id=election, is_current=True)
+    contest = key("contest", "president", r.day)
+    previous = None
+    if not first:
+        before = next(x for x in PRESIDENT if x.site == r.site and x.round == r.round - 1)
+        previous = key("contest", "president", before.day)
+    p.add(
+        "contest",
+        id=contest,
+        election_id=election,
+        kind="office",
+        office_id=PRESIDENCY,
+        magnitude=1,
+        round_number=r.round,
+        previous_round_id=previous,
+        electoral_system_id=PRESIDENT_SYSTEM,
+        default_result_kind="counted",
+    )
+    p.name(contest, f"{r.day.year} Ukrainian presidential election, round {r.round}", "en", "official")
+    p.add("slug", path=f"{path}/president", entity_id=contest, is_current=True)
+    result_set = key("result_set", "president", r.day)
+    p.add(
+        "result_set",
+        id=result_set,
+        election_id=election,
+        contest_id=contest,
+        stage="official",
+        kind="counted",
+        source_id=SOURCE_ID,
+        status="active",
+        is_default=True,
+        completeness=1.0,
+    )
+    p.add(
+        "note",
+        id=key("note", result_set),
+        entity_id=result_set,
+        kind="methodology",
+        body_md=PRESIDENT_METHOD,
+        lang="en",
+    )
+    numbers = sorted(grouped(r))
+    sheets = [s for n in numbers if (s := sheet(r.site, "wp336", r.id, f"pt005f01={n}", n)) is not None]
+    for url in [
+        *(page(r.site, name, r.id) for name in ("wp300", "wp301", "wp312", "wp335")),
+        *(page(r.site, "wp336", r.id, f"pt005f01={n}") for n in numbers),
+    ]:
+        artifact = cached(url)
+        if artifact is not None:
+            p.artifact(artifact, SOURCE_ID)
+    declared, voters = declared_president(r)
+    options: dict[str, str] = {}
+
+    def printed_for(header: str) -> tuple[str, int | None]:
+        """The candidate's printed name and national votes: the sheet may print the surname alone."""
+        key_ = squash(header)
+        hits = [d for d in declared if d == key_] or [d for d in declared if d.startswith(key_)]
+        if len(hits) == 1:
+            return declared[hits[0]][0], declared[hits[0]][1]
+        return split_name(header), None
+
+    votes: dict[str, int] = {}
+    for header in sorted({name for s in sheets for _, name in s.options}):
+        printed, total = printed_for(header)
+        printed = split_name(printed) if " " not in printed else printed
+        option = options[header] = key("option", "president", r.day, squash(header))
+        person = key("person", "president", r.day, squash(header))
+        p.add("contest_option", id=option, contest_id=contest, kind="candidate", ballot_label=printed)
+        p.add("person", id=person)
+        p.name(person, printed, "uk", "official")
+        p.add(
+            "candidacy",
+            id=key("candidacy", "president", r.day, squash(header)),
+            person_id=person,
+            option_id=option,
+            role="head",
+            ballot_name=printed,
+        )
+        if total is not None:
+            votes[header] = total
+            p.add("declared", result_set_id=result_set, option_id=option, measure=1, value=total)
+    if voters is not None:
+        p.add("declared", result_set_id=result_set, option_id=None, measure=3, value=voters)
+    final = not any(x.site == r.site and x.round == r.round + 1 for x in PRESIDENT)
+    for place, header in enumerate(sorted(options, key=lambda h: -votes.get(h, 0))):
+        if not votes:
+            break
+        if final:
+            kind = "elected" if place == 0 else "lost"
+        else:
+            kind = "advanced" if place < 2 else "eliminated"
+        p.add("outcome", result_set_id=result_set, option_id=options[header], kind=kind)
+    units: dict[str, str] = {}
+    over: list[tuple[int | None, ...]] = []
+    for found_sheet in sheets:
+        over += values(p, result_set, units, r.day, found_sheet, options)
+    note_overcount(p, over)
+    return p
+
+
+def counted() -> list[Parliament]:
+    """The parliamentary elections the commission published polling station results for."""
+    return [e for e in PARLIAMENT if held(e)]
+
+
+def packages() -> list[str]:
+    return [
+        f"{SOURCE}/geo",
+        f"{SOURCE}/registry",
+        *(f"{SOURCE}/rada-{e.day}" for e in counted()),
+        *(f"{SOURCE}/president-{r.day}" for r in PRESIDENT),
+    ]
+
+
+def parse() -> None:
+    geo().write()
+    registry().write()
+    for e in counted():
+        parliament(e).write()
+    for r in PRESIDENT:
+        president(r).write()
+
+
+def emit() -> None:
+    package.run("load", packages())
