@@ -96,7 +96,14 @@ def runs(conn: Connection) -> list[Run]:
     return [
         Run(person, day, area, printed, core(printed), won)
         for person, day, area, printed, won in conn.execute(
-            """select cy.person_id, e.date_from, k.district_area_id, cy.ballot_name,
+            """select cy.person_id, e.date_from,
+                      coalesce(k.district_area_id,
+                               (select ac.area_id from external_id x
+                                join area_code ac on ac.code = split_part(x.value, ':', 3)
+                                join area a on a.id = ac.area_id and a.scheme_code = 'id.provinsi'
+                                where x.entity_id = k.id and x.scheme = 'id.contest' and x.value like '%%:dpd:%%'
+                                order by ac.area_id limit 1)),
+                      cy.ballot_name,
                       exists (select from outcome w join result_set r on r.id = w.result_set_id
                               where w.option_id = o.id and r.is_default and w.kind = 'elected')
                from candidacy cy
