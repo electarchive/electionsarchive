@@ -1,0 +1,1163 @@
+{
+ "polity": "IR",
+ "name": "Iran",
+ "create": {
+  "kind": "sovereign_state",
+  "names": [
+   {
+    "text": "Iran",
+    "lang": "en",
+    "kind": "official"
+   },
+   {
+    "text": "ایران",
+    "lang": "fa",
+    "kind": "native"
+   }
+  ],
+  "slug": "ir",
+  "wikidata": "Q794",
+  "source": "constitution"
+ },
+ "sources": {
+  "constitution": {
+   "title": "Constitution of the Islamic Republic of Iran (1979, as amended in 1989)",
+   "publisher": "World Intellectual Property Organization (WIPO Lex)",
+   "url": "https://www.wipo.int/wipolex/en/legislation/details/7697",
+   "kind": "official_body",
+   "note": "The official text as filed in WIPO Lex, in Persian (ir001fa.pdf) and English (ir001en.pdf), with the 1979 wording of each amended article in footnotes. Art. 6: the country's affairs are run through elections of the President, the Majlis, the councils and such institutions, or by referendum. Art. 59: referendum on a two-thirds vote of the Majlis. Arts. 62-64: Majlis elected directly for four years; 270 seats plus at most 20 every ten years after 1368; five seats for the Zoroastrians, Jews, Assyrian and Chaldean Christians, and the Armenians of the North and South. Art. 99: the Guardian Council supervises the elections of the Assembly of Experts, the President, the Majlis, and referendums. Art. 100: village, district, city, county, and province councils elected by the people of each locality. Art. 101: Supreme Council of the Provinces formed from the provincial councils. Art. 107: the Leader is designated by the Experts elected by the people. Art. 114: President elected for four years by direct vote, once re-electable consecutively. Art. 117: absolute majority, else a second round between the top two on the Friday of the following week. Art. 177: constitutional revision by referendum."
+  },
+  "majlis_law": {
+   "title": "قانون انتخابات مجلس شورای اسلامی (مصوب ۱۳۷۸/۰۹/۰۷، با اصلاحات بعدی)",
+   "publisher": "مرکز پژوهش‌های مجلس شورای اسلامی (Islamic Parliament Research Center)",
+   "url": "https://rc.majlis.ir/fa/law",
+   "kind": "official_body",
+   "note": "Islamic Consultative Assembly Election Law of 28 November 1999, as amended. Art. 2: 290 members. Art. 3: supervision by the Guardian Council. Its annex lists the constituencies and their seats. The Research Center's law database did not answer from the session that wrote this census (connection reset on 2026-11-16); the law is cited by title and article, to be quoted from rc.majlis.ir when the host answers."
+  },
+  "president_law": {
+   "title": "قانون انتخابات ریاست جمهوری اسلامی ایران (مصوب ۱۳۶۴/۰۴/۰۵، با اصلاحات بعدی)",
+   "publisher": "مرکز پژوهش‌های مجلس شورای اسلامی (Islamic Parliament Research Center)",
+   "url": "https://rc.majlis.ir/fa/law",
+   "kind": "official_body",
+   "note": "Presidential Election Law of 26 June 1985, as amended. Art. 1: four-year term from the Leader's endorsement. Art. 8: supervision by the Guardian Council. The Research Center's law database did not answer from the session that wrote this census (connection reset on 2026-11-16); the law is cited by title and article, to be quoted from rc.majlis.ir when the host answers."
+  },
+  "councils_law": {
+   "title": "قانون تشکیلات، وظایف و انتخابات شوراهای اسلامی کشور و انتخاب شهرداران و دهیاران (مصوب ۱۳۷۵/۰۳/۰۱، با اصلاحات بعدی)",
+   "publisher": "مرکز پژوهش‌های مجلس شورای اسلامی (Islamic Parliament Research Center)",
+   "url": "https://rc.majlis.ir/fa/law",
+   "kind": "official_body",
+   "note": "Law on the organization, duties, and elections of the Islamic councils and the election of mayors (and, since the 1403 amendment, village administrators), of 22 May 1996, as amended. Village and city councils are elected directly; district, county, and province councils and the Supreme Council of the Provinces are formed from members of the councils below them; city councils choose the mayor. The 1396 amendment set a four-year term. The Research Center's law database did not answer from the session that wrote this census (connection reset on 2026-11-16); the law is cited by title and article, to be quoted from rc.majlis.ir when the host answers."
+  },
+  "referendum_law": {
+   "title": "قانون همه‌پرسی در جمهوری اسلامی ایران (مصوب ۱۳۶۸/۰۴/۰۴)",
+   "publisher": "مرکز پژوهش‌های مجلس شورای اسلامی (Islamic Parliament Research Center)",
+   "url": "https://rc.majlis.ir/fa/law",
+   "kind": "official_body",
+   "note": "Referendum Law of 25 June 1989, implementing arts. 59 and 177 of the Constitution. The Research Center's law database did not answer from the session that wrote this census (connection reset on 2026-11-16); the law is cited by title and article, to be quoted from rc.majlis.ir when the host answers."
+  },
+  "experts_law": {
+   "title": "قانون انتخابات و آیین‌نامه داخلی مجلس خبرگان رهبری (با اصلاحات بعدی)",
+   "publisher": "دبیرخانه مجلس خبرگان رهبری (Secretariat of the Assembly of Experts)",
+   "url": "https://www.majlesekhobregan.ir/",
+   "kind": "official_body",
+   "note": "Law on the number and qualifications of the Experts and the manner of their election, adopted by the jurists of the first Guardian Council under art. 108 of the Constitution and amended since by the Assembly itself. Each province is one constituency, with seats in proportion to its population; the term is eight years. The Secretariat's site did not answer from the session that wrote this census (connection reset on 2026-11-16)."
+  },
+  "moi": {
+   "title": "ستاد انتخابات کشور، وزارت کشور (Election Headquarters of the Ministry of Interior)",
+   "publisher": "وزارت کشور جمهوری اسلامی ایران (Ministry of Interior)",
+   "url": "https://www.moi.ir/",
+   "kind": "official_body",
+   "note": "The Ministry's Election Headquarters runs every public election and announces the results: national totals, and votes by candidate per constituency and per county. The host reset every connection from the session that wrote this census on 2026-11-16; elect.moi.ir answered the proxy with 502."
+  },
+  "sci2016": {
+   "title": "سرشماری عمومی نفوس و مسکن ۱۳۹۵: نتایج تفصیلی کل کشور (2016 National Population and Housing Census, detailed results)",
+   "publisher": "مرکز آمار ایران (Statistical Centre of Iran)",
+   "url": "https://www.amar.org.ir/",
+   "kind": "official_body",
+   "note": "The census's country-division table counts 31 provinces, 429 counties (shahrestan), 1,057 districts (bakhsh), 1,245 cities (shahr), and 2,589 rural districts (dehestan) on the census date. The Centre's host reset every connection from the session that wrote this census on 2026-11-16, so the counts were cross-checked against secondary indexes that cite this table; quote them from the table when the host answers. The Ministry of Interior's country-division register (تقسیمات کشوری) gives later counts."
+  },
+  "ical": {
+   "title": "کتابخانه، موزه و مرکز اسناد مجلس شورای اسلامی: ادوار مجلس شورای ملی و مجلس سنا (Library, Museum and Document Center of the Islamic Consultative Assembly)",
+   "publisher": "کتابخانه، موزه و مرکز اسناد مجلس شورای اسلامی",
+   "url": "https://www.ical.ir/",
+   "kind": "official_body",
+   "note": "The parliament's library keeps the records of the 24 terms of the National Consultative Assembly (1906-1979), the seven terms of the Senate (1949-1979), and the constituent assemblies. Its host reset every connection from the session that wrote this census on 2026-11-16."
+  }
+ },
+ "tiers": [
+  {
+   "key": "national",
+   "name": "جمهوری اسلامی ایران",
+   "name_en": "Islamic Republic of Iran",
+   "parent": null,
+   "polity_kind": "sovereign_state",
+   "scheme": "ir.nation",
+   "source": "constitution"
+  },
+  {
+   "key": "ostan",
+   "name": "استان‌ها",
+   "name_en": "Provinces, each with an indirectly formed provincial council",
+   "parent": "national",
+   "polity_kind": "region",
+   "scheme": "ir.ostan",
+   "source": "constitution",
+   "counts": [
+    {
+     "date": "2016-09-24",
+     "precision": "year",
+     "value": 31,
+     "source": "sci2016",
+     "locator": "Country divisions table, 1395 census: 31 ostan"
+    }
+   ]
+  },
+  {
+   "key": "shahrestan",
+   "name": "شهرستان‌ها",
+   "name_en": "Counties, each with an indirectly formed county council",
+   "parent": "ostan",
+   "polity_kind": "county",
+   "scheme": "ir.shahrestan",
+   "source": "councils_law",
+   "counts": [
+    {
+     "date": "2016-09-24",
+     "precision": "year",
+     "value": 429,
+     "source": "sci2016",
+     "locator": "Country divisions table, 1395 census: 429 shahrestan"
+    }
+   ]
+  },
+  {
+   "key": "bakhsh",
+   "name": "بخش‌ها",
+   "name_en": "Districts, each with an indirectly formed district council",
+   "parent": "shahrestan",
+   "scheme": "ir.bakhsh",
+   "source": "councils_law",
+   "counts": [
+    {
+     "date": "2016-09-24",
+     "precision": "year",
+     "value": 1057,
+     "source": "sci2016",
+     "locator": "Country divisions table, 1395 census: 1,057 bakhsh"
+    }
+   ]
+  },
+  {
+   "key": "shahr",
+   "name": "شهرها",
+   "name_en": "Cities, each electing an Islamic city council",
+   "parent": "bakhsh",
+   "polity_kind": "municipality",
+   "scheme": "ir.shahr",
+   "source": "councils_law",
+   "counts": [
+    {
+     "date": "2016-09-24",
+     "precision": "year",
+     "value": 1245,
+     "source": "sci2016",
+     "locator": "Country divisions table, 1395 census: 1,245 shahr"
+    }
+   ]
+  },
+  {
+   "key": "dehestan",
+   "name": "دهستان‌ها",
+   "name_en": "Rural districts",
+   "parent": "bakhsh",
+   "elects": false,
+   "scheme": "ir.dehestan",
+   "source": "councils_law",
+   "counts": [
+    {
+     "date": "2016-09-24",
+     "precision": "year",
+     "value": 2589,
+     "source": "sci2016",
+     "locator": "Country divisions table, 1395 census: 2,589 dehestan"
+    }
+   ]
+  },
+  {
+   "key": "rusta",
+   "name": "روستاها",
+   "name_en": "Villages, each inhabited village electing an Islamic village council",
+   "parent": "dehestan",
+   "polity_kind": "submunicipal",
+   "scheme": "ir.abadi",
+   "source": "councils_law"
+  }
+ ],
+ "classes": [
+  {
+   "key": "majlis",
+   "tier": "national",
+   "name": "انتخابات مجلس شورای اسلامی",
+   "name_en": "Islamic Consultative Assembly (Majlis), general elections",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "constituency",
+    "schemes": [
+     "ir.majlis_district"
+    ],
+    "fine": [
+     "ir.shahrestan"
+    ]
+   },
+   "finest_note": "Votes per candidate per constituency and, in the Ministry's detailed tables, per county",
+   "source": "constitution",
+   "locator": "https://www.wipo.int/wipolex/en/legislation/details/7697 (arts. 62-64)",
+   "valid_from": "1979-12-03",
+   "first_held": "1980-03-14",
+   "earliest_record": "1980-03-14",
+   "note": "Multi-member and single-member territorial constituencies built from counties, with a two-round plurality vote; 270 seats until 1996, 290 since 2000 (Constitution art. 64; Majlis Election Law art. 2). The five religious-minority seats are their own class, majlis_minorities. The second round of each election is listed as a deferred polling day; the 2020 second round was postponed to September by the epidemic.",
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "runoff"
+     ],
+     "body_kinds": [
+      "unicameral",
+      "lower_house"
+     ],
+     "iso_pattern": "IR",
+     "valid_from": "1979-12-03"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1980-03-14",
+     "deferred": [
+      "1980-05-09"
+     ],
+     "note": "270 seats in all, the religious-minority seats included (Constitution art. 64; Majlis Election Law art. 2)."
+    },
+    {
+     "date": "1984-04-15",
+     "deferred": [
+      "1984-05-17"
+     ],
+     "note": "270 seats in all, the religious-minority seats included (Constitution art. 64; Majlis Election Law art. 2)."
+    },
+    {
+     "date": "1988-04-08",
+     "deferred": [
+      "1988-05-13"
+     ],
+     "note": "270 seats in all, the religious-minority seats included (Constitution art. 64; Majlis Election Law art. 2)."
+    },
+    {
+     "date": "1992-04-10",
+     "deferred": [
+      "1992-05-08"
+     ],
+     "note": "270 seats in all, the religious-minority seats included (Constitution art. 64; Majlis Election Law art. 2)."
+    },
+    {
+     "date": "1996-03-08",
+     "deferred": [
+      "1996-04-19"
+     ],
+     "note": "270 seats in all, the religious-minority seats included (Constitution art. 64; Majlis Election Law art. 2)."
+    },
+    {
+     "date": "2000-02-18",
+     "deferred": [
+      "2000-05-05"
+     ],
+     "note": "290 seats in all, the religious-minority seats included (Constitution art. 64; Majlis Election Law art. 2)."
+    },
+    {
+     "date": "2004-02-20",
+     "deferred": [
+      "2004-05-07"
+     ],
+     "note": "290 seats in all, the religious-minority seats included (Constitution art. 64; Majlis Election Law art. 2)."
+    },
+    {
+     "date": "2008-03-14",
+     "deferred": [
+      "2008-04-25"
+     ],
+     "note": "290 seats in all, the religious-minority seats included (Constitution art. 64; Majlis Election Law art. 2)."
+    },
+    {
+     "date": "2012-03-02",
+     "deferred": [
+      "2012-05-04"
+     ],
+     "note": "290 seats in all, the religious-minority seats included (Constitution art. 64; Majlis Election Law art. 2)."
+    },
+    {
+     "date": "2016-02-26",
+     "deferred": [
+      "2016-04-29"
+     ],
+     "note": "290 seats in all, the religious-minority seats included (Constitution art. 64; Majlis Election Law art. 2)."
+    },
+    {
+     "date": "2020-02-21",
+     "deferred": [
+      "2020-09-11"
+     ],
+     "note": "290 seats in all, the religious-minority seats included (Constitution art. 64; Majlis Election Law art. 2)."
+    },
+    {
+     "date": "2024-03-01",
+     "deferred": [
+      "2024-05-10"
+     ],
+     "note": "290 seats in all, the religious-minority seats included (Constitution art. 64; Majlis Election Law art. 2)."
+    }
+   ],
+   "cadence": [
+    {
+     "source": "constitution",
+     "locator": "https://www.wipo.int/wipolex/en/legislation/details/7697 (art. 63: four-year term, elections before the term ends; art. 68: postponement only in war)",
+     "period_years": 4,
+     "phase": 0,
+     "term_years": 4,
+     "called": false,
+     "runoff": "threshold",
+     "runoff_rule": "A candidate who wins at least the share of valid votes the law sets for the first round is elected; seats left over go to a second round among the leading remaining candidates, twice as many as the seats left, won by plurality.",
+     "administered_by": "Ministry of Interior, under the supervision of the Guardian Council",
+     "vacancy_rule": "Vacant seats are filled at mid-term (میان‌دوره‌ای) elections, held with the next nationwide election where possible (class majlis_by)."
+    }
+   ],
+   "access": [
+    {
+     "platform": "Ministry of Interior, Election Headquarters (moi.ir)",
+     "url": "https://www.moi.ir/",
+     "format": "html, pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "role": "administers",
+     "source": "moi",
+     "evidence": "Every request from the census session was reset (moi.ir, www.moi.ir) or refused with 502 (elect.moi.ir); every other .ir government host tried (shora-gc.ir, amar.org.ir, rc.majlis.ir, president.ir, parliran.ir) reset too. The Ministry announces votes per candidate per constituency after each round.",
+     "first_date": "1980-03-14",
+     "last_date": "2024-05-10",
+     "finest": "ir.shahrestan"
+    }
+   ],
+   "est_votes": 260000000,
+   "effort": 4
+  },
+  {
+   "key": "majlis_minorities",
+   "tier": "national",
+   "name": "نمایندگان اقلیت‌های دینی در مجلس شورای اسلامی",
+   "name_en": "Majlis seats of the recognized religious minorities",
+   "category": "non_territorial",
+   "goal": "national",
+   "measure": {
+    "unit": "constituency"
+   },
+   "finest_note": "Votes per candidate nationwide, sometimes per province",
+   "source": "constitution",
+   "locator": "https://www.wipo.int/wipolex/en/legislation/details/7697 (art. 64: one seat each for the Zoroastrians and the Jews, one for the Assyrian and Chaldean Christians together, and one each for the Armenians of the North and the South)",
+   "valid_from": "1979-12-03",
+   "first_held": "1980-03-14",
+   "note": "Five nationwide non-territorial constituencies on the Majlis polling days; only members of each community vote in it. The Assyrian and Chaldean seat was added by the 1989 revision; before it the 1979 text gave four minority seats.",
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "runoff"
+     ],
+     "body_kinds": [
+      "unicameral",
+      "lower_house"
+     ],
+     "iso_pattern": "IR",
+     "name_pattern": "(Zoroastrian|Jew|Assyrian|Chaldean|Armenian|زرتشت|کلیمی|یهود|آشوری|کلدانی|ارامنه|ارمنی)",
+     "valid_from": "1979-12-03"
+    }
+   ],
+   "est_votes": 600000,
+   "effort": 2
+  },
+  {
+   "key": "majlis_by",
+   "tier": "national",
+   "name": "انتخابات میان‌دوره‌ای مجلس شورای اسلامی",
+   "name_en": "Majlis mid-term (by-)elections",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "majlis_law",
+   "locator": "https://rc.majlis.ir/fa/law (Majlis Election Law, chapter on mid-term elections)",
+   "valid_from": "1979-12-03",
+   "note": "Seats left vacant by death, resignation, or annulment are filled at mid-term elections, which since the 2000s have been held on the polling day of the next nationwide election. Not yet dated or counted.",
+   "match": [
+    {
+     "election_kinds": [
+      "by_election"
+     ],
+     "body_kinds": [
+      "unicameral",
+      "lower_house"
+     ],
+     "iso_pattern": "IR"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Ministry of Interior, Election Headquarters (moi.ir)",
+     "url": "https://www.moi.ir/",
+     "format": "html, pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "role": "administers",
+     "source": "moi",
+     "evidence": "Every request from the census session was reset (moi.ir, www.moi.ir) or refused with 502 (elect.moi.ir); every other .ir government host tried (shora-gc.ir, amar.org.ir, rc.majlis.ir, president.ir, parliran.ir) reset too. Mid-term results are announced like general ones.",
+     "first_date": null,
+     "last_date": null,
+     "finest": "ir.shahrestan"
+    }
+   ],
+   "est_votes": 8000000,
+   "effort": 4
+  },
+  {
+   "key": "president",
+   "tier": "national",
+   "name": "انتخابات ریاست جمهوری",
+   "name_en": "President of the Islamic Republic",
+   "category": "executive",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "ir.ostan"
+    ],
+    "fine": [
+     "ir.shahrestan"
+    ]
+   },
+   "finest_note": "Votes per candidate per province and per county",
+   "source": "constitution",
+   "locator": "https://www.wipo.int/wipolex/en/legislation/details/7697 (arts. 114-118)",
+   "valid_from": "1979-12-03",
+   "first_held": "1980-01-25",
+   "earliest_record": "1980-01-25",
+   "note": "Direct election for four years, once re-electable consecutively (art. 114), by an absolute majority of voters, else a second round between the top two on the Friday of the following week (art. 117). The 1981 elections followed President Rajai's assassination, and the 2024 one President Raisi's death (arts. 130-131: a new President within 50 days). Only 2005 and 2024 went to a second round.",
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "runoff",
+      "special"
+     ],
+     "office_kinds": [
+      "head_of_state",
+      "head_of_government"
+     ],
+     "iso_pattern": "IR"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1980-01-25"
+    },
+    {
+     "date": "1981-07-24"
+    },
+    {
+     "date": "1981-10-02"
+    },
+    {
+     "date": "1985-08-16"
+    },
+    {
+     "date": "1989-07-28"
+    },
+    {
+     "date": "1993-06-11"
+    },
+    {
+     "date": "1997-05-23"
+    },
+    {
+     "date": "2001-06-08"
+    },
+    {
+     "date": "2005-06-17"
+    },
+    {
+     "date": "2009-06-12"
+    },
+    {
+     "date": "2013-06-14"
+    },
+    {
+     "date": "2017-05-19"
+    },
+    {
+     "date": "2021-06-18"
+    },
+    {
+     "date": "2024-06-28"
+    },
+    {
+     "date": "2005-06-24",
+     "election_kind": "runoff"
+    },
+    {
+     "date": "2024-07-05",
+     "election_kind": "runoff"
+    }
+   ],
+   "cadence": [
+    {
+     "source": "constitution",
+     "locator": "https://www.wipo.int/wipolex/en/legislation/details/7697 (art. 114: four years; art. 117: absolute majority, second round between the top two)",
+     "period_years": 4,
+     "phase": 1,
+     "term_years": 4,
+     "called": true,
+     "runoff": "majority",
+     "runoff_threshold": 0.5,
+     "runoff_rule": "Absolute majority of the votes cast, else a second round between the two leading candidates on the Friday of the following week (Constitution art. 117).",
+     "administered_by": "Ministry of Interior, under the supervision of the Guardian Council",
+     "vacancy_rule": "On the President's death, dismissal, or resignation, a new President is elected within 50 days (Constitution arts. 130-131)."
+    }
+   ],
+   "access": [
+    {
+     "platform": "Ministry of Interior, Election Headquarters (moi.ir)",
+     "url": "https://www.moi.ir/",
+     "format": "html, pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "role": "administers",
+     "source": "moi",
+     "evidence": "Every request from the census session was reset (moi.ir, www.moi.ir) or refused with 502 (elect.moi.ir); every other .ir government host tried (shora-gc.ir, amar.org.ir, rc.majlis.ir, president.ir, parliran.ir) reset too. The Ministry announces votes per candidate nationally and per province and county.",
+     "first_date": "1980-01-25",
+     "last_date": "2024-07-05",
+     "finest": "ir.shahrestan"
+    }
+   ],
+   "est_votes": 410000000,
+   "effort": 2
+  },
+  {
+   "key": "khobregan",
+   "tier": "national",
+   "name": "انتخابات مجلس خبرگان رهبری",
+   "name_en": "Assembly of Experts for the Leadership",
+   "category": "special_purpose",
+   "goal": "national",
+   "measure": {
+    "unit": "constituency",
+    "schemes": [
+     "ir.ostan"
+    ],
+    "fine": [
+     "ir.shahrestan"
+    ]
+   },
+   "finest_note": "Votes per candidate per province, the constituency",
+   "source": "constitution",
+   "locator": "https://www.wipo.int/wipolex/en/legislation/details/7697 (arts. 107-108: the Experts who designate the Leader are elected by the people; art. 99: Guardian Council supervision)",
+   "valid_from": "1979-12-03",
+   "first_held": "1982-12-10",
+   "earliest_record": "1982-12-10",
+   "note": "Jurists elected by province, each province one multi-member constituency with seats by population (82 seats in 1982, 83 in 1990-1998, 86 in 2006-2016, 88 in 2024), by plurality, for eight-year terms. The fifth term was lengthened so that its 2016 election fell on the Majlis polling day. The Experts elect the Leader (class rahbari).",
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "by_election"
+     ],
+     "name_pattern": "(Assembly of Experts|خبرگان)",
+     "iso_pattern": "IR",
+     "valid_from": "1980-01-01"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1982-12-10"
+    },
+    {
+     "date": "1990-10-08"
+    },
+    {
+     "date": "1998-10-23"
+    },
+    {
+     "date": "2006-12-15"
+    },
+    {
+     "date": "2016-02-26"
+    },
+    {
+     "date": "2024-03-01"
+    }
+   ],
+   "cadence": [
+    {
+     "source": "experts_law",
+     "locator": "https://www.majlesekhobregan.ir/ (Experts election law: eight-year term)",
+     "period_years": 8,
+     "phase": 0,
+     "term_years": 8,
+     "called": false,
+     "administered_by": "Ministry of Interior, under the supervision of the Guardian Council",
+     "vacancy_rule": "Vacant seats are filled at mid-term elections held with the next nationwide election."
+    }
+   ],
+   "access": [
+    {
+     "platform": "Ministry of Interior, Election Headquarters (moi.ir)",
+     "url": "https://www.moi.ir/",
+     "format": "html, pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "role": "administers",
+     "source": "moi",
+     "evidence": "Every request from the census session was reset (moi.ir, www.moi.ir) or refused with 502 (elect.moi.ir); every other .ir government host tried (shora-gc.ir, amar.org.ir, rc.majlis.ir, president.ir, parliran.ir) reset too. Votes per candidate per province.",
+     "first_date": "1982-12-10",
+     "last_date": "2024-03-01",
+     "finest": "ir.ostan"
+    }
+   ],
+   "est_votes": 135000000,
+   "effort": 2
+  },
+  {
+   "key": "rahbari",
+   "tier": "national",
+   "name": "تعیین رهبر توسط مجلس خبرگان",
+   "name_en": "Leader, designated by the Assembly of Experts",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "constitution",
+   "locator": "https://www.wipo.int/wipolex/en/legislation/details/7697 (art. 107; art. 111 on the Leader's incapacity or death)",
+   "valid_from": "1979-12-03",
+   "first_held": "1989-06-04",
+   "note": "The Assembly of Experts designates the Leader in session. Ayatollah Khomeini was acknowledged as Leader by the constitution itself (art. 107) and not elected; Ayatollah Khamenei was designated on 4 June 1989. Later designations are not yet dated here.",
+   "match": [
+    {
+     "election_kinds": [
+      "indirect"
+     ],
+     "office_kinds": [
+      "head_of_state"
+     ],
+     "iso_pattern": "IR"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1989-06-04"
+    }
+   ],
+   "est_votes": 0,
+   "effort": 2
+  },
+  {
+   "key": "referendum",
+   "tier": "national",
+   "name": "همه‌پرسی",
+   "name_en": "National referendums",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "question",
+    "grain": [
+     "ir.ostan"
+    ]
+   },
+   "finest_note": "Yes and no votes per province",
+   "source": "constitution",
+   "locator": "https://www.wipo.int/wipolex/en/legislation/details/7697 (art. 59: on two-thirds of the Majlis; art. 177: constitutional revision)",
+   "first_held": "1953-08-03",
+   "note": "Five national votes: the 1953 referendum on dissolving the 17th Majlis (Tehran on 3 August, the provinces on 10 August); the 1963 referendum on the Shah's six-point reform program; the March 1979 referendum on the Islamic Republic (30-31 March); the December 1979 referendum on the Constitution (2-3 December); and the 1989 revision of the Constitution, held with the presidential election. Under the Referendum Law of 1989 a referendum needs two-thirds of the Majlis (art. 59) or, for a revision, the Leader's order (art. 177).",
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "iso_pattern": "IR"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1953-08-03",
+     "deferred": [
+      "1953-08-10"
+     ]
+    },
+    {
+     "date": "1963-01-26"
+    },
+    {
+     "date": "1979-03-30",
+     "deferred": [
+      "1979-03-31"
+     ]
+    },
+    {
+     "date": "1979-12-02",
+     "deferred": [
+      "1979-12-03"
+     ]
+    },
+    {
+     "date": "1989-07-28"
+    }
+   ],
+   "cadence": [
+    {
+     "source": "referendum_law",
+     "locator": "https://rc.majlis.ir/fa/law (Referendum Law of 1368)",
+     "called": true,
+     "administered_by": "Ministry of Interior, under the supervision of the Guardian Council"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Ministry of Interior, Election Headquarters (moi.ir)",
+     "url": "https://www.moi.ir/",
+     "format": "html, pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "role": "administers",
+     "source": "moi",
+     "evidence": "Every request from the census session was reset (moi.ir, www.moi.ir) or refused with 502 (elect.moi.ir); every other .ir government host tried (shora-gc.ir, amar.org.ir, rc.majlis.ir, president.ir, parliran.ir) reset too. Results per province for the 1979 and 1989 referendums.",
+     "first_date": "1979-03-30",
+     "last_date": "1989-07-28",
+     "finest": "ir.ostan"
+    }
+   ],
+   "est_votes": 61000000,
+   "effort": 2
+  },
+  {
+   "key": "khobregan_qanun_asasi",
+   "tier": "national",
+   "name": "مجلس بررسی نهایی قانون اساسی (خبرگان قانون اساسی)",
+   "name_en": "Assembly of Experts for the Constitution (1979)",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "constituency",
+    "schemes": [
+     "ir.ostan"
+    ]
+   },
+   "source": "moi",
+   "valid_from": "1979-06-01",
+   "valid_to": "1979-11-16",
+   "first_held": "1979-08-03",
+   "note": "A 73-member constituent assembly elected by province on 3 August 1979 (plurality in multi-member provincial constituencies, with seats for the religious minorities); it drafted the Constitution put to referendum in December 1979.",
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "constituent_assembly"
+     ],
+     "iso_pattern": "IR",
+     "valid_from": "1979-06-01",
+     "valid_to": "1979-11-16"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1979-08-03"
+    }
+   ],
+   "est_votes": 10000000,
+   "effort": 3
+  },
+  {
+   "key": "majles_melli",
+   "tier": "national",
+   "name": "انتخابات مجلس شورای ملی",
+   "name_en": "National Consultative Assembly (1906-1979)",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "constituency"
+   },
+   "source": "ical",
+   "valid_from": "1906-08-05",
+   "valid_to": "1979-02-11",
+   "first_held": "1906-09-01",
+   "note": "Twenty-four terms under the Constitution of 1906 and its 1907 Supplementary Law: the first elected by estates in 1906, the second indirectly in two stages (1909), and direct plurality voting by constituency from the 1911 election law on, with seats for the Armenian, Assyrian, Jewish, and Zoroastrian communities. The 24th Majlis, elected in 1975, was the last. Individual polling periods, often spread over weeks, are not yet dated here.",
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "by_election"
+     ],
+     "body_kinds": [
+      "unicameral",
+      "lower_house"
+     ],
+     "iso_pattern": "IR",
+     "valid_to": "1979-02-11"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1906-01-01",
+     "precision": "year",
+     "through": "1975-12-31"
+    }
+   ],
+   "est_votes": 40000000,
+   "effort": 5
+  },
+  {
+   "key": "sena",
+   "tier": "national",
+   "name": "انتخابات مجلس سنا",
+   "name_en": "Senate, elected half (1949-1979)",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "constituency"
+   },
+   "source": "ical",
+   "valid_from": "1949-05-08",
+   "valid_to": "1979-02-11",
+   "first_held": "1949-01-01",
+   "note": "Provided by the 1906 Constitution and first convened in 1950 after the 1949 constituent assembly; half of its 60 members were elected (15 from Tehran, 15 from the provinces) and half appointed by the Shah. Seven terms; the elections are not yet dated here.",
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "by_election"
+     ],
+     "body_kinds": [
+      "upper_house"
+     ],
+     "iso_pattern": "IR",
+     "valid_to": "1979-02-11"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1949-01-01",
+     "precision": "year",
+     "through": "1975-12-31"
+    }
+   ],
+   "est_votes": 8000000,
+   "effort": 5
+  },
+  {
+   "key": "moassesan",
+   "tier": "national",
+   "name": "مجلس مؤسسان",
+   "name_en": "Constituent assemblies of 1925, 1949, and 1967",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "constituency"
+   },
+   "source": "ical",
+   "valid_from": "1925-01-01",
+   "valid_to": "1967-12-31",
+   "first_held": "1925-01-01",
+   "note": "Elected constituent assemblies that amended the 1906 Constitution: in 1925, transferring the throne to the Pahlavis; in 1949, creating the power to dissolve parliament and convening the Senate; and in 1967, on the regency.",
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "constituent_assembly"
+     ],
+     "iso_pattern": "IR",
+     "valid_to": "1979-02-11"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1925-01-01",
+     "precision": "year"
+    },
+    {
+     "date": "1949-01-01",
+     "precision": "year"
+    },
+    {
+     "date": "1967-01-01",
+     "precision": "year"
+    }
+   ],
+   "est_votes": 5000000,
+   "effort": 5
+  },
+  {
+   "key": "shora_shahr",
+   "tier": "shahr",
+   "name": "انتخابات شوراهای اسلامی شهر",
+   "name_en": "Islamic city councils",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "polity",
+    "schemes": [
+     "ir.shahr"
+    ]
+   },
+   "finest_note": "Votes per candidate per city",
+   "source": "councils_law",
+   "locator": "https://rc.majlis.ir/fa/law (Councils Law: city councils elected directly; seats by city population)",
+   "valid_from": "1996-05-22",
+   "first_held": "1999-02-26",
+   "earliest_record": "1999-02-26",
+   "contests_per_unit": 1,
+   "note": "Every city elects a council of 5 to 21 members (Tehran 21) by plurality block vote, on the same day nationwide. Six rounds so far; the fourth was postponed from 2010 to 2013 to coincide with the presidential vote, and terms have been four years since. City councils then elect the mayor (class shahrdar).",
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "general",
+      "by_election"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ],
+     "within": null
+    }
+   ],
+   "dates": [
+    {
+     "date": "1999-02-26"
+    },
+    {
+     "date": "2003-02-28"
+    },
+    {
+     "date": "2006-12-15"
+    },
+    {
+     "date": "2013-06-14"
+    },
+    {
+     "date": "2017-05-19"
+    },
+    {
+     "date": "2021-06-18"
+    }
+   ],
+   "cadence": [
+    {
+     "source": "councils_law",
+     "locator": "https://rc.majlis.ir/fa/law (Councils Law, as amended in 1396: four-year term)",
+     "period_years": 4,
+     "phase": 1,
+     "term_years": 4,
+     "called": false,
+     "administered_by": "Ministry of Interior, under the supervision of the Majlis's central supervisory board for council elections",
+     "vacancy_rule": "Alternates (اعضای علی‌البدل), the next-placed candidates, fill vacant seats."
+    }
+   ],
+   "access": [
+    {
+     "platform": "Ministry of Interior, Election Headquarters (moi.ir)",
+     "url": "https://www.moi.ir/",
+     "format": "html, pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "role": "administers",
+     "source": "moi",
+     "evidence": "Every request from the census session was reset (moi.ir, www.moi.ir) or refused with 502 (elect.moi.ir); every other .ir government host tried (shora-gc.ir, amar.org.ir, rc.majlis.ir, president.ir, parliran.ir) reset too. Elected members and their votes per city; full candidate tallies mostly in provincial announcements.",
+     "first_date": "1999-02-26",
+     "last_date": "2021-06-18",
+     "finest": "ir.shahr"
+    }
+   ],
+   "est_votes": 130000000,
+   "effort": 5
+  },
+  {
+   "key": "shora_rusta",
+   "tier": "rusta",
+   "name": "انتخابات شوراهای اسلامی روستا",
+   "name_en": "Islamic village councils",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "polity"
+   },
+   "finest_note": "Elected members per village; candidate votes only in county announcements",
+   "source": "councils_law",
+   "locator": "https://rc.majlis.ir/fa/law (Councils Law: village councils of 3 or 5 members by population)",
+   "valid_from": "1996-05-22",
+   "first_held": "1999-02-26",
+   "note": "Each inhabited village above the law's population floor elects a council of three or five members (the 1403 amendment set three members and two alternates for villages of up to 1,500 people) on the city-council polling day. The village councils choose the village administrator (dehyar). Village counts are not in the 2016 country-divisions table quoted here.",
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "general",
+      "by_election"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "polity_kinds": [
+      "submunicipal"
+     ],
+     "within": null
+    }
+   ],
+   "dates": [
+    {
+     "date": "1999-02-26"
+    },
+    {
+     "date": "2003-02-28"
+    },
+    {
+     "date": "2006-12-15"
+    },
+    {
+     "date": "2013-06-14"
+    },
+    {
+     "date": "2017-05-19"
+    },
+    {
+     "date": "2021-06-18"
+    }
+   ],
+   "cadence": [
+    {
+     "source": "councils_law",
+     "locator": "https://rc.majlis.ir/fa/law (Councils Law, as amended in 1396)",
+     "period_years": 4,
+     "phase": 1,
+     "term_years": 4,
+     "called": false,
+     "administered_by": "Ministry of Interior through the county governorates"
+    }
+   ],
+   "access": [
+    {
+     "platform": "Ministry of Interior, Election Headquarters (moi.ir)",
+     "url": "https://www.moi.ir/",
+     "format": "html, pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "role": "administers",
+     "source": "moi",
+     "evidence": "Every request from the census session was reset (moi.ir, www.moi.ir) or refused with 502 (elect.moi.ir); every other .ir government host tried (shora-gc.ir, amar.org.ir, rc.majlis.ir, president.ir, parliran.ir) reset too. Village winners are announced by each county governorate.",
+     "first_date": "1999-02-26",
+     "last_date": "2021-06-18",
+     "finest": "ir.abadi"
+    }
+   ],
+   "est_votes": 50000000,
+   "effort": 5
+  },
+  {
+   "key": "shoraha_gheyr_mostaghim",
+   "tier": "ostan",
+   "name": "شوراهای بخش، شهرستان و استان و شورای عالی استان‌ها",
+   "name_en": "District, county, and provincial councils and the Supreme Council of the Provinces",
+   "category": "indirect",
+   "goal": "local",
+   "measure": {
+    "unit": "polity"
+   },
+   "source": "constitution",
+   "locator": "https://www.wipo.int/wipolex/en/legislation/details/7697 (arts. 100-101)",
+   "valid_from": "1996-05-22",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Formed indirectly: under the Councils Law each tier's members are chosen by and from the members of the councils below it, not by the voters, so there is no public vote to hold.",
+   "match": [],
+   "note": "District councils are drawn from the village councils, county councils from the city and district councils, provincial councils from the county councils, and the Supreme Council of the Provinces from the provincial councils."
+  },
+  {
+   "key": "shahrdar",
+   "tier": "shahr",
+   "name": "انتخاب شهردار",
+   "name_en": "Mayors, elected by the city council",
+   "category": "indirect",
+   "goal": "local",
+   "measure": {
+    "unit": "polity"
+   },
+   "source": "councils_law",
+   "locator": "https://rc.majlis.ir/fa/law (Councils Law: the city council elects the mayor, confirmed by the Ministry of Interior or the provincial governor)",
+   "valid_from": "1996-05-22",
+   "disposition": "out_of_scope",
+   "disposition_reason": "The city council chooses the mayor by a vote of its members, confirmed by the Interior Ministry or the provincial governor; there is no public vote.",
+   "match": []
+  },
+  {
+   "key": "anjoman_shahr",
+   "tier": "shahr",
+   "name": "انجمن شهر",
+   "name_en": "City councils (anjoman-e shahr) before 1979",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "polity"
+   },
+   "source": "ical",
+   "valid_from": "1907-01-01",
+   "valid_to": "1979-02-11",
+   "note": "The 1907 Supplementary Law and the Municipalities Law (1907, replaced in 1955) provided elected city and provincial associations (anjoman-e baladi, anjoman-e ayalati va velayati); city councils were elected under the 1955 Municipalities Law until 1979. Their elections are not yet dated or counted here.",
+   "match": [
+    {
+     "election_kinds": [
+      "local"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ],
+     "within": null,
+     "valid_to": "1979-02-11"
+    }
+   ],
+   "est_votes": 5000000,
+   "effort": 5
+  },
+  {
+   "key": "senfi",
+   "tier": "national",
+   "name": "انتخابات نظام‌های صنفی و حرفه‌ای",
+   "name_en": "Professional and guild bodies (medical, engineering, bar, chambers)",
+   "category": "non_territorial",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "constitution",
+   "locator": "https://www.wipo.int/wipolex/en/legislation/details/7697 (art. 104: councils in production, educational, administrative, and service units)",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Each body's members elect its boards under its own law (the Medical Council, the Engineering Organization, the bar associations, the chambers of commerce, the workplace Islamic labor councils); these are elections of members only, not of the public.",
+   "match": []
+  }
+ ]
+}
