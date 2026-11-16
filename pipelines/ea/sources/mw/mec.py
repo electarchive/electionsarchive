@@ -1,3 +1,4 @@
+import functools
 import re
 from datetime import date
 from pathlib import Path
@@ -7,12 +8,13 @@ import polars as pl
 
 from ea import changeset, package, raw
 from ea.package import Package
-from ea.sources.mw import pdf
+from ea.sources.mw import legacy, pdf
 
 SOURCE = "mw.mec"
 MALAWI = str(uuid5(package.NAMESPACE, "polity\x1fMW"))
 COUNTRY = str(uuid5(package.NAMESPACE, "area:world.country@None\x1fMWI"))
 PAGE = "https://mec.org.mw/election-results/"
+DAYS = {1994: date(1994, 5, 17), 1999: date(1999, 6, 15), 2004: date(2004, 5, 20), 2009: date(2009, 5, 19)}
 DAY_2019 = date(2019, 5, 21)
 DAY_2020 = date(2020, 6, 23)
 BASE = "https://mec.org.mw/wp-content/uploads"
@@ -129,20 +131,52 @@ def parties() -> list[str]:
     found: set[str] = set(FRESH_PARTIES)
     for name in PARTY_FILES:
         found |= set(centres(name)["party"])
-    return sorted(found - INDEPENDENT)
+    for year in DAYS:
+        for result in [*books(year)[0], *books(year)[1]]:
+            found |= {code for _, code, _ in result.candidates}
+    return sorted({norm(code) for code in found if not independent(code)})
+
+
+def independent(code: str) -> bool:
+    return code.upper().split(" ")[0] in INDEPENDENT
+
+
+def norm(code: str) -> str:
+    """A party's printed abbreviation, upper-cased because the source varies its case, such as UDF and UDf."""
+    return "IND" if independent(code) else code.strip().upper()
+
+
+@functools.cache
+def books(year: int) -> tuple[list[legacy.Result], list[legacy.Result]]:
+    """The year's constituency results for the National Assembly and its district results for President."""
+    if year == 1994 or year == 1999:
+        results = legacy.ppe(legacy.text(path(str(year))))
+        return [r for r in results if r.kind == "parliament"], [r for r in results if r.kind == "president"]
+    if year == 2004:
+        return legacy.parliament_2004(path("2004-parliament")), []
+    parliament = [r for r in legacy.parliament_2009(legacy.text(path("2009-parliament"))) if r.candidates]
+    return parliament, legacy.president_2009(legacy.text(path("2009-president")))
 
 
 def party(code: str) -> str:
-    return key("party", code)
+    return key("party", norm(code))
 
 
 def packages() -> list[str]:
-    return [f"{SOURCE}/geo", f"{SOURCE}/registry", f"{SOURCE}/{DAY_2019}", f"{SOURCE}/{DAY_2020}"]
+    return [
+        f"{SOURCE}/geo",
+        f"{SOURCE}/registry",
+        *(f"{SOURCE}/{day}" for day in DAYS.values()),
+        f"{SOURCE}/{DAY_2019}",
+        f"{SOURCE}/{DAY_2020}",
+    ]
 
 
 def parse() -> None:
     geo().write()
     registry().write()
+    for year in DAYS:
+        general(year).write()
     tripartite().write()
     fresh().write()
 
@@ -315,7 +349,7 @@ def _contest(
     options: dict[str, str] = {}
     for candidate, code in frame.select("candidate", "party").unique().sort("candidate").iter_rows():
         option = options[candidate] = key("option", tag, candidate)
-        independent = code in INDEPENDENT
+        solo = independent(code)
         person = key("person", tag, candidate)
         p.add("person", id=person)
         p.name(person, candidate, "en", "official")
@@ -324,7 +358,7 @@ def _contest(
             id=option,
             contest_id=contest,
             kind="candidate",
-            party_id=None if independent else party(code),
+            party_id=None if solo else party(code),
             ballot_label=candidate,
         )
         p.add(
@@ -334,8 +368,8 @@ def _contest(
             option_id=option,
             role="head",
             ballot_name=candidate,
-            member_of_party_id=None if independent else party(code),
-            is_independent=independent,
+            member_of_party_id=None if solo else party(code),
+            is_independent=solo,
         )
     rows = frame.with_columns(
         pl.col("candidate").replace_strict(options, return_dtype=pl.String).alias("option"),
@@ -544,3 +578,265 @@ def fresh() -> Package:
             value=value,
         )
     return p
+
+
+LEGACY_FILES = {
+    1994: ("1994",),
+    1999: ("1999",),
+    2004: ("2004-parliament",),
+    2009: ("2009-president", "2009-parliament"),
+}
+
+
+def general(year: int) -> Package:
+    """A general election from the printed constituency and district tables, one unit for each."""
+    day = DAYS[year]
+    parliament, president = books(year)
+    p = Package(
+        f"{SOURCE}/{day}",
+        SOURCE,
+        f"The {day:%-d %B %Y} general election: National Assembly by constituency"
+        + (" and President by district" if president else ""),
+        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"],
+    )
+    p.external |= {MALAWI, COUNTRY}
+    for name in LEGACY_FILES[year]:
+        p.uses(raw.cached(SOURCE, url(name)))
+    election = key("election", day)
+    path_ = f"mw/{day}"
+    p.add("election", id=election, polity_id=MALAWI, kind="general", date_from=day, date_to=day, status="held")
+    p.add("slug", path=path_, entity_id=election, is_current=True)
+    p.name(election, f"{year} Malawi general election", "en", "official")
+    constituency = f"mw.constituency.{year}"
+    district = f"mw.district.{year}"
+    for code, rank, kind, noun in (
+        (district, 2, "administrative", "district"),
+        (constituency, 3, "electoral_district", "constituency"),
+    ):
+        p.add("scheme", code=code, polity_id=MALAWI, kind=kind, rank=rank, noun=noun, code_system=None)
+    if year == 2004:
+        printed = legacy.national_2004(path("2004-parliament"))
+        summed = (
+            sum(r.registered or 0 for r in parliament),
+            sum(r.valid or 0 for r in parliament),
+            sum(r.null or 0 for r in parliament),
+            sum(r.cast or 0 for r in parliament),
+        )
+        if printed != summed:
+            raise ValueError(f"2004 constituency rows sum to {summed}, the printed national summary gives {printed}")
+    mismatched: list[str] = []
+    unbalanced: list[str] = []
+    over: list[str] = []
+    for scheme, results, office in ((constituency, parliament, False), (district, president, True)):
+        if not results:
+            continue
+        tag = f"{day}:{'president' if office else 'parliament'}"
+        units: dict[str, str] = {}
+        for result in results:
+            code = changeset.slug(result.name) if office and not result.code else result.code
+            place = area(scheme, code)
+            p.add("area", id=place, scheme_code=scheme)
+            p.add("area_code", area_id=place, code=code)
+            p.add("area_parent", area_id=place, parent_id=COUNTRY)
+            p.name(place, result.name, "en", "official")
+            unit = units[code] = key("unit", f"{day}:{scheme}:{code}")
+            p.add(
+                "reporting_unit",
+                id=unit,
+                polity_id=MALAWI,
+                scheme_code=scheme,
+                code=f"{day}:{code}",
+                area_relation="equals",
+                area_id=place,
+                kind="standard",
+            )
+        groups = [("", results)] if office else [(r.code, [r]) for r in results]
+        for code, group in groups:
+            first = group[0]
+            contest_tag = tag if office else f"{tag}:{code}"
+            frame = pl.DataFrame(
+                [
+                    {
+                        "unit": units[changeset.slug(r.name) if office and not r.code else r.code],
+                        "candidate": name,
+                        "party": norm(party_code),
+                        "votes": votes,
+                    }
+                    for r in group
+                    for name, party_code, votes in r.candidates
+                ]
+            )
+            _legacy_contest(
+                p,
+                election,
+                contest_tag,
+                frame,
+                group,
+                office=office,
+                year=year,
+                name=first.name,
+                path_=path_,
+                code=code,
+                scheme=scheme,
+                units=units,
+                mismatched=mismatched,
+            )
+    for result in [*parliament, *president]:
+        if (
+            result.valid is not None
+            and result.null is not None
+            and result.cast is not None
+            and result.valid + result.null != result.cast
+        ):
+            unbalanced.append(
+                f"{result.name} (printed valid {result.valid:,} + null and void {result.null:,}, votes cast {result.cast:,})"
+            )
+        if result.registered is not None and result.cast is not None and result.cast > result.registered:
+            over.append(f"{result.name} (votes cast {result.cast:,}, registered {result.registered:,})")
+    if unbalanced:
+        p.accept(
+            "accounting.ballots_sum",
+            "The printed valid and null and void votes do not add up to the votes cast for "
+            + "; ".join(unbalanced)
+            + ". Each is stored as printed.",
+        )
+    if over:
+        p.accept(
+            "accounting.turnout",
+            "The printed votes cast exceed the printed registered voters for "
+            + "; ".join(over)
+            + ". Each is stored as printed.",
+        )
+    if mismatched:
+        p.accept(
+            "accounting.votes_valid",
+            "The printed table's total valid votes differ from the sum of its candidates' votes for "
+            + "; ".join(mismatched)
+            + ". Each is stored as printed.",
+        )
+    return p
+
+
+def _legacy_contest(
+    p: Package,
+    election: str,
+    tag: str,
+    frame: pl.DataFrame,
+    group: list[legacy.Result],
+    *,
+    office: bool,
+    year: int,
+    name: str,
+    path_: str,
+    code: str,
+    scheme: str,
+    units: dict[str, str],
+    mismatched: list[str],
+) -> None:
+    contest = key("contest", tag)
+    title = f"{year} Malawi presidential election" if office else f"{year} National Assembly election, {name}"
+    p.add(
+        "contest",
+        id=contest,
+        election_id=election,
+        kind="office" if office else "body_seats",
+        office_id=PRESIDENCY if office else None,
+        body_id=None if office else ASSEMBLY,
+        district_area_id=COUNTRY if office else area(scheme, code),
+        magnitude=1,
+        round_number=1,
+        electoral_system_id=SYSTEM_PRESIDENT_PLURALITY if office else SYSTEM_FPTP,
+        default_result_kind="counted",
+    )
+    p.name(contest, title, "en", "official")
+    slug = f"{path_}/president" if office else f"{path_}/parliament/{code}-{changeset.slug(name)}"
+    p.add("slug", path=slug, entity_id=contest, is_current=True)
+    result_set = key("result_set", tag)
+    p.add(
+        "result_set",
+        id=result_set,
+        election_id=election,
+        contest_id=contest,
+        stage="official",
+        kind="counted",
+        source_id=MEC_SOURCE,
+        status="active",
+        is_default=True,
+        completeness=1.0,
+    )
+    p.add(
+        "note",
+        id=key("note", result_set),
+        entity_id=result_set,
+        kind="methodology",
+        body_md=(
+            "Counted by the Malawi Electoral Commission, as its printed results table gives each "
+            + ("district" if office else "constituency")
+            + ": candidate votes, total valid votes, null and void votes, votes cast, and registered voters where "
+            "printed. The table declares no winners or seat counts, so none are stored."
+        ),
+        lang="en",
+    )
+    options: dict[tuple[str, str], str] = {}
+    for candidate, party_code in frame.select("candidate", "party").unique().sort("candidate", "party").iter_rows():
+        option = options[(candidate, party_code)] = key("option", tag, candidate, party_code)
+        person = key("person", tag, candidate, party_code)
+        solo = party_code == "IND"
+        p.add("person", id=person)
+        p.name(person, candidate, "en", "official")
+        p.add(
+            "contest_option",
+            id=option,
+            contest_id=contest,
+            kind="candidate",
+            party_id=None if solo else party(party_code),
+            ballot_label=candidate,
+        )
+        p.add(
+            "candidacy",
+            id=key("candidacy", tag, candidate, party_code),
+            person_id=person,
+            option_id=option,
+            role="head",
+            ballot_name=candidate,
+            member_of_party_id=None if solo else party(party_code),
+            is_independent=solo,
+        )
+    values = frame.with_columns(
+        pl.struct("candidate", "party")
+        .map_elements(lambda row: options[(row["candidate"], row["party"])], return_dtype=pl.String)
+        .alias("option")
+    )
+    p.frame(
+        "result_value",
+        values.select(
+            pl.lit(result_set).alias("result_set_id"),
+            pl.col("unit").alias("unit_id"),
+            pl.col("option").alias("option_id"),
+            pl.lit(0).alias("channel"),
+            pl.lit(1).alias("measure"),
+            pl.lit(0).alias("count_round"),
+            pl.lit(0).alias("flags"),
+            pl.col("votes").alias("value"),
+        ),
+    )
+    for result in group:
+        unit = units[changeset.slug(result.name) if office and not result.code else result.code]
+        for measure, value in ((2, result.registered), (3, result.cast), (4, result.valid), (5, result.null)):
+            if value is not None:
+                p.add(
+                    "result_value",
+                    result_set_id=result_set,
+                    unit_id=unit,
+                    option_id=None,
+                    channel=0,
+                    measure=measure,
+                    count_round=0,
+                    flags=0,
+                    value=value,
+                )
+        total = sum(votes for _, _, votes in result.candidates)
+        if result.valid is not None and result.valid != total:
+            mismatched.append(
+                f"{result.name} ({result.code or 'district'}: printed {result.valid:,}, candidates {total:,})"
+            )
