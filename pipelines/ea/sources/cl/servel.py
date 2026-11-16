@@ -618,10 +618,16 @@ ELECTIONS = (
     _election(
         date(2013, 6, 30),
         "primary",
-        "presidential-primaries",
-        "2013 Chilean presidential primaries",
-        "Primarias presidenciales 2013",
+        "primaries",
+        "2013 Chilean presidential and parliamentary primaries",
+        "Primarias presidenciales y parlamentarias 2013",
         Group("president_primary", r"2022/12/\d\d_Resultados_Mesa_Presidente_Tricel1(-\d)?\.xlsx"),
+        # Servel publishes the deputies primaries of 2013 only by circunscripcion electoral.
+        Group(
+            "deputies_primary",
+            r"2022/12/resultados_elecciones_primarias_diputados_ce_2013_2017-1\.xlsx",
+            "2013-06-30:1",
+        ),
     ),
     _election(
         date(2013, 11, 17),
