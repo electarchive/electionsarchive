@@ -1,0 +1,998 @@
+{
+  "polity": "GY",
+  "name": "Guyana",
+  "sources": {
+    "constitution": {
+      "title": "Constitution of the Co-operative Republic of Guyana, Cap. 1:01 (L.R.O. 1/2012)",
+      "publisher": "Guyana Elections Commission",
+      "url": "https://gecom.org.gy/public/uploads/laws/Cap_101_Constitution.pdf",
+      "kind": "official_body"
+    },
+    "ropa": {
+      "title": "Representation of the People Act, Cap. 1:03 (L.R.O. 1/2012)",
+      "publisher": "Guyana Elections Commission",
+      "url": "https://gecom.org.gy/public/uploads/laws/Cap_103_Representation_of_the_People.pdf",
+      "kind": "official_body"
+    },
+    "laea": {
+      "title": "Local Authorities (Elections) Act, Cap. 28:03 (L.R.O. 1/2012)",
+      "publisher": "Guyana Elections Commission",
+      "url": "https://gecom.org.gy/public/uploads/laws/Cap_28.03.pdf",
+      "kind": "official_body"
+    },
+    "la2018": {
+      "title": "Local Authorities (Elections) (Amendment) Act 2018, Act No. 10 of 2018",
+      "publisher": "Guyana Elections Commission",
+      "url": "https://gecom.org.gy/public/uploads/laws/Local_Authorities_Elections_ACT_NO_10_of_2018.pdf",
+      "kind": "official_body"
+    },
+    "ldoa": {
+      "title": "Local Democratic Organs Act, Cap. 28:09, with the Regional Democratic Councils and Neighbourhood Democratic Council Orders (L.R.O. 1/2012)",
+      "publisher": "Guyana Elections Commission",
+      "url": "https://gecom.org.gy/public/uploads/laws/Cap_28.09_Local_Democratic_Organs.pdf",
+      "kind": "official_body"
+    },
+    "results": {
+      "title": "Election Results (archive of general, regional, and local government election results, 2011-2025)",
+      "publisher": "Guyana Elections Commission",
+      "url": "https://gecom.org.gy/public/home/results",
+      "kind": "official_body"
+    },
+    "gre2025": {
+      "title": "Election Results: 2025 General and Regional Elections",
+      "publisher": "Guyana Elections Commission",
+      "url": "https://gecom.org.gy/public/home/results/gre2025",
+      "kind": "official_body"
+    },
+    "seats2025": {
+      "title": "Allocation of Seats for Membership to the National Assembly, General Elections held on 1st September 2025",
+      "publisher": "Guyana Elections Commission",
+      "url": "https://gecom.org.gy/public/assets/docs/results/2025%20-%20General%20and%20Regional%20Elections/General%20Elections/GE-Seat-Allocations-National-Assembly.pdf",
+      "kind": "official_body"
+    },
+    "rdcseats2025": {
+      "title": "Allocation of Seats for Membership to Regional Democratic Councils, Regional Elections held on 1st September 2025",
+      "publisher": "Guyana Elections Commission",
+      "url": "https://gecom.org.gy/public/assets/docs/results/2025%20-%20General%20and%20Regional%20Elections/Regional%20Elections/RE-Seat-Allocations-Regional-Democratic-Councils.pdf",
+      "kind": "official_body"
+    },
+    "gre2020": {
+      "title": "Election Results: 2020 General and Regional Elections",
+      "publisher": "Guyana Elections Commission",
+      "url": "https://gecom.org.gy/public/home/results/gre2020",
+      "kind": "official_body"
+    },
+    "lge2018": {
+      "title": "Election Results: 2018 Local Government Elections",
+      "publisher": "Guyana Elections Commission",
+      "url": "https://gecom.org.gy/public/home/results/lge2018",
+      "kind": "official_body"
+    },
+    "lge2023": {
+      "title": "Local Government Elections 2023 Resource Hub (Form 31 declarations by local authority area)",
+      "publisher": "Guyana Elections Commission",
+      "url": "https://gecom.org.gy/public/home/resource_hub/lge2023",
+      "kind": "official_body"
+    },
+    "lge2023-booklet": {
+      "title": "Local Government Elections 2023 Nomination Day Booklet",
+      "publisher": "Guyana Elections Commission",
+      "url": "https://gecom.org.gy/public/assets/docs/lge2023/LGE-2023-ND-Booklet.pdf?ver=2",
+      "kind": "official_body"
+    },
+    "parliament-history": {
+      "title": "History of Parliament",
+      "publisher": "Parliament of Guyana",
+      "url": "https://parliament.gov.gy/about-parliament/history-of-parliament",
+      "kind": "official_body"
+    },
+    "dpi-village-2018": {
+      "title": "Indigenous Village elections set for May 15 (2018)",
+      "publisher": "Department of Public Information",
+      "url": "https://dpi.gov.gy/indigenous-village-elections-set-for-may-15/",
+      "kind": "official_body"
+    },
+    "dpi-ntc": {
+      "title": "National Toshaos Council – highest representative body for Indigenous Peoples in Guyana (2019)",
+      "publisher": "Department of Public Information",
+      "url": "https://dpi.gov.gy/national-toshaos-council-highest-representative-body-for-indigenous-peoples-in-guyana",
+      "kind": "official_body"
+    },
+    "moaa-villages": {
+      "title": "Amerindian Villages",
+      "publisher": "Ministry of Amerindian Affairs",
+      "url": "https://moaa.gov.gy/indigenous-villages/",
+      "kind": "official_body"
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "Co-operative Republic of Guyana",
+      "name_en": "Guyana",
+      "parent": null,
+      "polity_kind": "sovereign_state",
+      "source": "constitution"
+    },
+    {
+      "key": "region",
+      "name": "Region",
+      "name_en": "Administrative regions",
+      "parent": "national",
+      "polity_kind": "region",
+      "scheme": "gy.region",
+      "source": "constitution",
+      "counts": [
+        {
+          "date": "2025-09-01",
+          "value": 10,
+          "source": "rdcseats2025",
+          "locator": "Regions 1-10, one Regional Democratic Council each"
+        }
+      ]
+    },
+    {
+      "key": "municipality",
+      "name": "Municipality",
+      "name_en": "Municipalities (towns)",
+      "parent": "region",
+      "polity_kind": "municipality",
+      "source": "laea",
+      "counts": [
+        {
+          "date": "2023-06-12",
+          "value": 10,
+          "source": "lge2023-booklet",
+          "locator": "Appendix A, List of Municipalities per District: Total 10"
+        }
+      ]
+    },
+    {
+      "key": "ndc",
+      "name": "Neighbourhood Democratic Council",
+      "name_en": "Neighbourhood Democratic Councils",
+      "parent": "region",
+      "polity_kind": "submunicipal",
+      "source": "ldoa",
+      "counts": [
+        {
+          "date": "2023-06-12",
+          "value": 70,
+          "source": "lge2023-booklet",
+          "locator": "Appendix B, Neighbourhood Democratic Council per Region: Total 70"
+        }
+      ]
+    },
+    {
+      "key": "village",
+      "name": "Amerindian Village",
+      "name_en": "Amerindian villages",
+      "parent": "region",
+      "polity_kind": "submunicipal",
+      "source": "moaa-villages",
+      "counts": [
+        {
+          "date": "2019-10-07",
+          "value": 212,
+          "source": "dpi-ntc",
+          "locator": "the leaders of the over 212 Indigenous villages in all of the 10 Administrative Regions"
+        }
+      ]
+    }
+  ],
+  "classes": [
+    {
+      "key": "national_assembly",
+      "tier": "national",
+      "name": "General Elections (National Assembly)",
+      "name_en": "National Assembly",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "constituency",
+        "schemes": [
+          "gy.region"
+        ],
+        "fine": [
+          "gy.station"
+        ]
+      },
+      "source": "ropa",
+      "locator": "https://gecom.org.gy/public/uploads/laws/Cap_103_Representation_of_the_People.pdf (s. 11A: at least 65 members by list PR, largest remainder with the Hare quota; 25 from the ten geographical constituencies)",
+      "first_held": "1964-12-07",
+      "earliest_record": "2011-11-28",
+      "note": "Closed-list PR. From 1964 to 1997 a single national list (53 seats; 1980-1997 plus 12 indirectly elected members, class assembly_indirect). Since 2001, 25 seats in the ten regions as geographical constituencies and 40 national top-up seats allocated to make the result proportional nationally: 11 list allocations per election. The 1964 House of Assembly became the first National Assembly at independence in 1966.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "GY",
+          "valid_from": "1964-12-01"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": true,
+          "administered_by": "Guyana Elections Commission",
+          "source": "constitution",
+          "locator": "https://gecom.org.gy/public/uploads/laws/Cap_101_Constitution.pdf (arts. 61 and 70(3): Parliament lasts five years from its first sitting unless sooner dissolved; election within three months of dissolution)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "GECOM election results",
+          "url": "https://gecom.org.gy/public/home/results/gre2025",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "No license stated; Government of Guyana publication",
+          "first_date": "2025-09-01",
+          "last_date": "2025-09-01",
+          "finest": "gy.station",
+          "source": "gre2025",
+          "evidence": "Box-by-box district tabulation forms per region (polling station rows), gazetted geographical constituency and national top-up declarations, and seat allocations"
+        },
+        {
+          "platform": "GECOM election results",
+          "url": "https://gecom.org.gy/public/home/results",
+          "format": "pdf, jpg",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "No license stated; Government of Guyana publication",
+          "first_date": "2011-11-28",
+          "last_date": "2020-03-02",
+          "finest": "gy.station",
+          "source": "results",
+          "evidence": "2011 gazetted results by region; 2015 district statements by polling station; 2020 tabulation summary by district and certificates of district tabulation"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1964-12-07",
+          "note": "No official result is published online for this election; the Commission's archive starts in 2011."
+        },
+        {
+          "date": "1968-12-16",
+          "note": "No official result is published online for this election; the Commission's archive starts in 2011."
+        },
+        {
+          "date": "1973-07-16",
+          "note": "No official result is published online for this election; the Commission's archive starts in 2011."
+        },
+        {
+          "date": "1980-12-15",
+          "note": "No official result is published online for this election; the Commission's archive starts in 2011."
+        },
+        {
+          "date": "1985-12-09",
+          "note": "No official result is published online for this election; the Commission's archive starts in 2011."
+        },
+        {
+          "date": "1992-10-05",
+          "note": "No official result is published online for this election; the Commission's archive starts in 2011."
+        },
+        {
+          "date": "1997-12-15",
+          "note": "No official result is published online for this election; the Commission's archive starts in 2011."
+        },
+        {
+          "date": "2001-03-19",
+          "note": "No official result is published online for this election; the Commission's archive starts in 2011."
+        },
+        {
+          "date": "2006-08-28",
+          "note": "No official result is published online for this election; the Commission's archive starts in 2011."
+        },
+        {
+          "date": "2011-11-28"
+        },
+        {
+          "date": "2015-05-11"
+        },
+        {
+          "date": "2020-03-02"
+        },
+        {
+          "date": "2025-09-01",
+          "contests": 11,
+          "seats": 65,
+          "source": "seats2025",
+          "quote": "TOTAL SEATS 65 ... Seats from Geographical Constituency 25 ... Nat'l Top Up 40"
+        }
+      ],
+      "est_votes": 4200000,
+      "effort": 3
+    },
+    {
+      "key": "president",
+      "tier": "national",
+      "name": "Election of President",
+      "name_en": "President",
+      "category": "executive",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "constitution",
+      "locator": "https://gecom.org.gy/public/uploads/laws/Cap_101_Constitution.pdf (art. 177(2): the presidential candidate of the list with the most votes is deemed elected)",
+      "first_held": "1980-12-15",
+      "valid_from": "1980-10-06",
+      "note": "Executive presidency since the 1980 constitution. Each National Assembly list names its presidential candidate, and a vote for a list counts as a vote for that candidate.",
+      "disposition": "out_of_scope",
+      "disposition_reason": "There is no separate presidential ballot or count: the president is the candidate of the list with the most National Assembly votes (art. 177), so the votes are those of the national_assembly class."
+    },
+    {
+      "key": "president_by_assembly",
+      "tier": "national",
+      "name": "Election of President by the National Assembly",
+      "name_en": "President chosen by the National Assembly",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "parliament-history",
+      "valid_from": "1970-02-23",
+      "valid_to": "1980-10-06",
+      "first_held": "1970-03-17",
+      "note": "Under the republican constitution of 1970 the non-executive president was elected by the National Assembly (1970 and 1976), until the 1980 constitution made the presidency executive and popularly elected.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "GY"
+        }
+      ],
+      "disposition": "blocked",
+      "disposition_reason": "The Assembly's votes sit in the Hansard of 1970 and 1976, which the Parliament's site does not publish for those years; no other official record of the count is online.",
+      "dates": [
+        {
+          "date": "1970-01-01",
+          "through": "1976-12-31",
+          "precision": "year"
+        }
+      ],
+      "est_votes": 106,
+      "effort": 3
+    },
+    {
+      "key": "assembly_indirect",
+      "tier": "national",
+      "name": "Members of the National Assembly elected by the Regional Democratic Councils and the National Congress of Local Democratic Organs",
+      "name_en": "National Assembly members elected by regional councils",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "ldoa",
+      "valid_from": "1980-10-06",
+      "valid_to": "2001-03-19",
+      "first_held": "1980-12-15",
+      "note": "From 1980 to 2001 each of the ten Regional Democratic Councils elected one member and the National Congress of Local Democratic Organs two, beside the 53 list members; the 2000-2001 reforms (Act 4 of 2001) made all 65 seats directly elected.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "GY"
+        }
+      ],
+      "disposition": "blocked",
+      "disposition_reason": "The councils' and the Congress's votes were never published by the Elections Commission and no official record is online.",
+      "dates": [
+        {
+          "date": "1980-12-15"
+        },
+        {
+          "date": "1985-12-09"
+        },
+        {
+          "date": "1992-10-05"
+        },
+        {
+          "date": "1997-12-15"
+        }
+      ],
+      "est_votes": 1000,
+      "effort": 4
+    },
+    {
+      "key": "speaker",
+      "tier": "national",
+      "name": "Election of the Speaker of the National Assembly",
+      "name_en": "Speaker of the National Assembly",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "constitution",
+      "locator": "https://gecom.org.gy/public/uploads/laws/Cap_101_Constitution.pdf (art. 56(1): the Assembly elects a Speaker when it first meets after a dissolution)",
+      "first_held": "1966-05-26",
+      "note": "Elected by the members at the first sitting of each Parliament, from members or non-members (art. 56(2)).",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "speaker"
+          ],
+          "iso_pattern": "GY"
+        }
+      ],
+      "cadence": [
+        {
+          "selection": "elected",
+          "called": true,
+          "administered_by": "National Assembly",
+          "source": "constitution",
+          "locator": "https://gecom.org.gy/public/uploads/laws/Cap_101_Constitution.pdf (art. 56)"
+        }
+      ],
+      "est_votes": 650,
+      "effort": 3
+    },
+    {
+      "key": "referendum",
+      "tier": "national",
+      "name": "Referendum on a Bill to alter the Constitution",
+      "name_en": "Constitutional referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "question"
+      },
+      "source": "constitution",
+      "locator": "https://gecom.org.gy/public/uploads/laws/Cap_101_Constitution.pdf (art. 164(2): Bills altering the entrenched articles go to the electors)",
+      "first_held": "1978-07-10",
+      "note": "Held once, on 10 July 1978, on the Constitution (Amendment) Bill that removed the referendum requirement for the new constitution and postponed the elections due that year.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "iso_pattern": "GY"
+        }
+      ],
+      "disposition": "blocked",
+      "disposition_reason": "The Elections Commission's archive starts in 2011 and no official count of the 1978 referendum is online.",
+      "dates": [
+        {
+          "date": "1978-07-10"
+        }
+      ],
+      "est_votes": 350000,
+      "effort": 4
+    },
+    {
+      "key": "colonial_assembly",
+      "tier": "national",
+      "name": "House of Assembly (1953), Legislative Council (1957), and Legislative Assembly (1961) of British Guiana",
+      "name_en": "Colonial legislature, universal suffrage",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "constituency"
+      },
+      "source": "parliament-history",
+      "valid_from": "1953-04-01",
+      "valid_to": "1964-12-01",
+      "first_held": "1953-04-27",
+      "note": "Universal adult suffrage from 1953, first past the post in single-member constituencies: 24 elected members in 1953, 14 in 1957, and 35 in 1961.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "unicameral",
+            "lower_house"
+          ],
+          "iso_pattern": "GY",
+          "valid_to": "1964-12-01"
+        }
+      ],
+      "disposition": "blocked",
+      "disposition_reason": "The official returns sit in the colonial Official Gazette and the reports of the Supervisor of Elections, neither of which is online from an official host.",
+      "dates": [
+        {
+          "date": "1953-04-27"
+        },
+        {
+          "date": "1957-08-12"
+        },
+        {
+          "date": "1961-08-21"
+        }
+      ],
+      "est_votes": 600000,
+      "effort": 4
+    },
+    {
+      "key": "colonial_restricted",
+      "tier": "national",
+      "name": "Court of Policy, Combined Court, and Legislative Council of British Guiana (restricted franchise)",
+      "name_en": "Colonial legislature, restricted franchise",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "constituency"
+      },
+      "source": "parliament-history",
+      "valid_to": "1953-04-01",
+      "note": "Elected members on a property and income franchise: eight in the Court of Policy until 1928, then the elected members of the Legislative Council (1928-1953).",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "council",
+            "upper_house"
+          ],
+          "iso_pattern": "GY",
+          "valid_to": "1953-04-01"
+        }
+      ],
+      "disposition": "blocked",
+      "disposition_reason": "Returns survive only in the colonial Official Gazette and blue books, which no official host publishes online.",
+      "dates": [
+        {
+          "date": "1891-01-01",
+          "through": "1947-12-31",
+          "precision": "year"
+        }
+      ],
+      "est_votes": 100000,
+      "effort": 5
+    },
+    {
+      "key": "judicial",
+      "tier": "national",
+      "name": "Judiciary",
+      "name_en": "Judges",
+      "category": "judicial",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "constitution",
+      "locator": "https://gecom.org.gy/public/uploads/laws/Cap_101_Constitution.pdf (arts. 127-128: judges are appointed by the President)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "No judicial office is elected; the Chancellor and Chief Justice are appointed by the President and the other judges on the advice of the Judicial Service Commission (arts. 127-128)."
+    },
+    {
+      "key": "nominating",
+      "tier": "national",
+      "name": "Selection of lists of candidates",
+      "name_en": "Party nominations",
+      "category": "nominating",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "ropa",
+      "disposition": "out_of_scope",
+      "disposition_reason": "No state-run primary exists: parties submit their lists of candidates to the Chief Election Officer on Nomination Day (Representation of the People Act, ss. 11-11C) and choose them internally."
+    },
+    {
+      "key": "ntc_executive",
+      "tier": "national",
+      "name": "Election of the Executive of the National Toshaos Council",
+      "name_en": "National Toshaos Council executive",
+      "category": "non_territorial",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "dpi-ntc",
+      "note": "The National Toshaos Council of all village Toshaos elects an executive of 20 Toshaos (two per region) and its officers every three years, under the Amerindian Act 2006.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "name_pattern": "Toshaos",
+          "iso_pattern": "GY"
+        }
+      ],
+      "disposition": "blocked",
+      "disposition_reason": "The council's votes are announced at its conference and reported only in news releases; no official count is published.",
+      "est_votes": 4000,
+      "effort": 4
+    },
+    {
+      "key": "rdc",
+      "tier": "region",
+      "name": "Regional Elections (Regional Democratic Councils)",
+      "name_en": "Regional Democratic Councils",
+      "category": "council",
+      "goal": "subnational",
+      "measure": {
+        "unit": "polity",
+        "schemes": [
+          "gy.region"
+        ],
+        "fine": [
+          "gy.station"
+        ]
+      },
+      "source": "ldoa",
+      "locator": "https://gecom.org.gy/public/uploads/laws/Cap_28.09_Local_Democratic_Organs.pdf (Regional Democratic Councils Order, para. 5: 15 to 35 members per region, 205 in all)",
+      "first_held": "1980-12-15",
+      "earliest_record": "2011-11-28",
+      "note": "Each of the ten regional councils is elected by closed-list PR (Hare quota, largest remainder) on the same day and ballot paper as the National Assembly.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "iso_pattern": "GY",
+          "valid_from": "1980-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": true,
+          "administered_by": "Guyana Elections Commission",
+          "source": "constitution",
+          "locator": "https://gecom.org.gy/public/uploads/laws/Cap_101_Constitution.pdf (art. 73(2)-(3): dissolutions at most five years and four months apart)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "GECOM election results",
+          "url": "https://gecom.org.gy/public/home/results/gre2025",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "No license stated; Government of Guyana publication",
+          "first_date": "2025-09-01",
+          "last_date": "2025-09-01",
+          "finest": "gy.station",
+          "source": "gre2025",
+          "evidence": "Box-by-box regional tabulation forms per region, gazetted regional results, and RDC seat allocations"
+        },
+        {
+          "platform": "GECOM election results",
+          "url": "https://gecom.org.gy/public/home/results",
+          "format": "pdf, jpg",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "No license stated; Government of Guyana publication",
+          "first_date": "2011-11-28",
+          "last_date": "2020-03-02",
+          "finest": "gy.station",
+          "source": "results",
+          "evidence": "2011 gazetted results; 2015 regional statements by polling station; 2020 regional tabulation summary"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1980-12-15",
+          "note": "No official result is published online for this election; the Commission's archive starts in 2011."
+        },
+        {
+          "date": "1985-12-09",
+          "note": "No official result is published online for this election; the Commission's archive starts in 2011."
+        },
+        {
+          "date": "1992-10-05",
+          "note": "No official result is published online for this election; the Commission's archive starts in 2011."
+        },
+        {
+          "date": "1997-12-15",
+          "note": "No official result is published online for this election; the Commission's archive starts in 2011."
+        },
+        {
+          "date": "2001-03-19",
+          "note": "No official result is published online for this election; the Commission's archive starts in 2011."
+        },
+        {
+          "date": "2006-08-28",
+          "note": "No official result is published online for this election; the Commission's archive starts in 2011."
+        },
+        {
+          "date": "2011-11-28"
+        },
+        {
+          "date": "2015-05-11"
+        },
+        {
+          "date": "2020-03-02"
+        },
+        {
+          "date": "2025-09-01",
+          "contests": 10,
+          "seats": 205,
+          "source": "rdcseats2025",
+          "quote": "Seats per RDC for Allocation ... TOTAL 205 (Regions 1-10)"
+        }
+      ],
+      "est_votes": 3000000,
+      "effort": 2
+    },
+    {
+      "key": "rdc_chair",
+      "tier": "region",
+      "name": "Election of the Regional Chairman and Vice-Chairman",
+      "name_en": "Regional chairs",
+      "category": "indirect",
+      "goal": "subnational",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "ldoa",
+      "note": "Each regional council elects its chairman and vice-chairman from its members at its first meeting.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "name_pattern": "Regional (Chair|Vice)",
+          "iso_pattern": "GY"
+        }
+      ],
+      "disposition": "blocked",
+      "disposition_reason": "The councils' votes are recorded only in their own minutes; no official publication gathers them.",
+      "est_votes": 2000,
+      "effort": 4
+    },
+    {
+      "key": "municipal_council",
+      "tier": "municipality",
+      "name": "Local Government Elections (Municipalities)",
+      "name_en": "Municipal councils",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "finest_note": "constituency candidate votes and area-wide list votes (Form 31)",
+      "source": "laea",
+      "locator": "https://gecom.org.gy/public/uploads/laws/Cap_28.03.pdf (s. 38A: mixed system, half the seats by PR on party or voluntary-group lists and half in single-member constituencies)",
+      "first_held": "1994-08-08",
+      "earliest_record": "2016-03-18",
+      "note": "Ten municipalities since 2018 (nine in 2016; Mahdia became a town before the 2018 elections), 154 councillors and 78 constituencies in 2023. Each council has a PR component over the whole area and a first-past-the-post contest in each constituency; GECOM's Form 31 declarations give list votes per area and candidate votes per constituency.",
+      "match": [
+        {
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "called": true,
+          "administered_by": "Guyana Elections Commission",
+          "source": "la2018",
+          "locator": "https://gecom.org.gy/public/uploads/laws/Local_Authorities_Elections_ACT_NO_10_of_2018.pdf (the Minister appoints election day by order)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "GECOM election results",
+          "url": "https://gecom.org.gy/public/home/resource_hub/lge2023",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "No license stated; Government of Guyana publication",
+          "first_date": "2023-06-12",
+          "last_date": "2023-06-12",
+          "source": "lge2023",
+          "evidence": "Form 31 declarations per local authority area (79 of 80): list votes, rejected ballots, PR seats, and constituency candidate votes"
+        },
+        {
+          "platform": "GECOM election results",
+          "url": "https://gecom.org.gy/public/home/results",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "No license stated; Government of Guyana publication",
+          "first_date": "2016-03-18",
+          "last_date": "2018-11-12",
+          "source": "results",
+          "evidence": "One result PDF per local authority area for 2016 (71 areas) and 2018 (80 areas)"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1994-08-08",
+          "note": "No official result is published online."
+        },
+        {
+          "date": "2016-03-18"
+        },
+        {
+          "date": "2018-11-12"
+        },
+        {
+          "date": "2023-06-12",
+          "contests": 10,
+          "seats": 154,
+          "source": "lge2023-booklet",
+          "quote": "Appendix C, Municipalities: Total 154 councillors, 78 constituencies"
+        }
+      ],
+      "est_votes": 250000,
+      "effort": 3
+    },
+    {
+      "key": "ndc",
+      "tier": "ndc",
+      "name": "Local Government Elections (Neighbourhood Democratic Councils)",
+      "name_en": "Neighbourhood Democratic Councils",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "finest_note": "constituency candidate votes and area-wide list votes (Form 31)",
+      "source": "laea",
+      "locator": "https://gecom.org.gy/public/uploads/laws/Cap_28.03.pdf (s. 38A: mixed system, half the seats by PR and half in constituencies)",
+      "first_held": "1994-08-08",
+      "earliest_record": "2016-03-18",
+      "note": "70 NDCs, 1,064 councillors, and 532 constituencies in 2023 (62 NDCs held elections in 2016). Same mixed system and Form 31 declarations as the municipalities.",
+      "match": [
+        {
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "submunicipal",
+            "county"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "called": true,
+          "administered_by": "Guyana Elections Commission",
+          "source": "la2018",
+          "locator": "https://gecom.org.gy/public/uploads/laws/Local_Authorities_Elections_ACT_NO_10_of_2018.pdf (the Minister appoints election day by order)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "GECOM election results",
+          "url": "https://gecom.org.gy/public/home/resource_hub/lge2023",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "No license stated; Government of Guyana publication",
+          "first_date": "2023-06-12",
+          "last_date": "2023-06-12",
+          "source": "lge2023",
+          "evidence": "Form 31 declarations per local authority area"
+        },
+        {
+          "platform": "GECOM election results",
+          "url": "https://gecom.org.gy/public/home/results",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "license": "No license stated; Government of Guyana publication",
+          "first_date": "2016-03-18",
+          "last_date": "2018-11-12",
+          "source": "results",
+          "evidence": "One result PDF per local authority area"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1994-08-08",
+          "note": "No official result is published online."
+        },
+        {
+          "date": "2016-03-18"
+        },
+        {
+          "date": "2018-11-12"
+        },
+        {
+          "date": "2023-06-12",
+          "contests": 70,
+          "seats": 1064,
+          "source": "lge2023-booklet",
+          "quote": "Appendix C, Neighbourhood Democratic Councils: 1064 councillors, 532 constituencies"
+        }
+      ],
+      "est_votes": 400000,
+      "effort": 3
+    },
+    {
+      "key": "council_heads",
+      "tier": "municipality",
+      "name": "Election of Mayors, Deputy Mayors, and NDC Chairpersons",
+      "name_en": "Mayors and NDC chairs",
+      "category": "indirect",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "laea",
+      "note": "Each municipal council elects a mayor and deputy mayor, and each NDC a chairperson and vice-chairperson, from its councillors.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "mayor",
+            "deputy_mayor"
+          ]
+        }
+      ],
+      "disposition": "blocked",
+      "disposition_reason": "The councils' votes are recorded only in their minutes; neither GECOM nor the ministry publishes them.",
+      "est_votes": 12000,
+      "effort": 4
+    },
+    {
+      "key": "village_council",
+      "tier": "village",
+      "name": "Village Council Elections (Toshaos and Councillors)",
+      "name_en": "Amerindian village councils and Toshaos",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "dpi-village-2018",
+      "note": "Over 200 titled Amerindian villages elect a Toshao and village councillors every three years under the Amerindian Act 2006 (Cap. 29:01), by secret ballot run by each village with the Ministry of Amerindian Affairs; the 2018 round ran from 15 May to 15 June.",
+      "match": [
+        {
+          "polity_kinds": [
+            "submunicipal"
+          ],
+          "name_pattern": "Toshao|Village Council"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 3,
+          "term_years": 3,
+          "called": false,
+          "administered_by": "Village returning officers under the Ministry of Amerindian Affairs",
+          "source": "dpi-village-2018",
+          "locator": "https://dpi.gov.gy/indigenous-village-elections-set-for-may-15/ (These elections are held every three years)"
+        }
+      ],
+      "disposition": "blocked",
+      "disposition_reason": "Each village's returning officer declares its own result; the ministry publishes only lists of new Toshaos in news releases, with no votes, and no official compilation exists.",
+      "dates": [
+        {
+          "date": "2018-05-15",
+          "through": "2018-06-15",
+          "source": "dpi-village-2018",
+          "quote": "Over 200 Indigenous communities ... conduct Village Council Elections for Toshaos and Councillors ... from May 15 to June 15"
+        }
+      ],
+      "est_votes": 150000,
+      "effort": 5
+    }
+  ]
+}
