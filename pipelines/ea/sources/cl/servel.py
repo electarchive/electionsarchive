@@ -631,7 +631,7 @@ ELECTIONS = (
         "Elecciones presidencial, parlamentarias y de consejeros regionales 2013",
         Group("president", r"2022/12/\d\d_Resultados_Mesa_Presidente_Tricel\.xlsx"),
         Group("senators", r"2022/12/\d\d_Resultado_Mesa_Senadores_Tricel\.xlsx"),
-        # The court's table files cover six of the nine constituencies; the rest come by circunscripcion electoral.
+        # The court's table files miss two of the ten constituencies; those come by circunscripcion electoral.
         Group("senators", r"2022/12/resultados_elecciones_senadores_ce_1989_2017\.xlsx", "2013-11-17:1"),
         Group("deputies", r"2022/12/\d\d_Resultados_Mesa_Diputados_Tricel(-1)?\.xlsx"),
         Group("core", r"2022/12/\d\d_Resultados_Mesa_Cores_Ter\.xlsx"),
