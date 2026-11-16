@@ -702,7 +702,6 @@ def registry() -> Package:
         "Dirección Nacional Electoral's provisional-count files",
         depends=[f"{SOURCE}/geo"],
     )
-    p.external |= {ARGENTINA}
     for held in [held for held in available() if held.url in raw.keys(SOURCE)]:
         p.artifact(raw.cached(SOURCE, held.url), DINE_SOURCE)
     for year in sorted({held.day.year for held in HELD}):
@@ -808,7 +807,7 @@ def election(name: str) -> Package:
         + ", by polling table, from the Dirección Nacional Electoral's provisional count",
         depends=[f"{SOURCE}/geo", f"{SOURCE}/registry", *([f"{SOURCE}/{first}"] if first else [])],
     )
-    p.external |= {ARGENTINA, COUNTRY}
+    p.external.add(COUNTRY)
     by_section = held.url not in raw.keys(SOURCE)
     if by_section:
         cached = raw.keys(SOURCE)
@@ -1394,7 +1393,7 @@ def past(day: date) -> Package:
         + "), by district, from the Dirección Nacional Electoral's definitive results",
         depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"],
     )
-    p.external |= {ARGENTINA, COUNTRY}
+    p.external.add(COUNTRY)
     for workbook in sorted({sheet.workbook for sheet in sheets}):
         p.uses(raw.cached(SOURCE, sheet_url(workbook)))
     districts, _ = _places()
