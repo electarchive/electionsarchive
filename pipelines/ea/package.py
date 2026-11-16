@@ -42,6 +42,7 @@ I64 = pl.Int64()
 F = pl.Float64()
 
 TABLES: dict[str, tuple[tuple[str, ...] | None, dict[str, pl.DataType]]] = {
+    "polity": (("id",), {"id": U, "kind": U, "iso_code": U}),
     "source": (
         ("id",),
         {
@@ -695,11 +696,7 @@ def check(path: Path) -> list[tuple[str, int, list[tuple[object, ...]]]]:
             findings.append((f"unique.{table}", len(rows), rows[:5]))
     for table, column, target in REFERENCES:
         target_key = TARGET_KEY.get(target, "id")
-        known = (
-            "select id from external"
-            if target == "polity"
-            else f'select "{target_key}" from "all_{target}" union all select id from external'
-        )
+        known = f'select "{target_key}" from "all_{target}" union all select id from external'
         rows = con.execute(
             f'select distinct "{column}" from "{table}" where "{column}" is not null and "{column}" not in ({known})'
         ).fetchall()
@@ -869,6 +866,10 @@ def _facts(conn: Connection, path: Path, accepted: dict[str, object]) -> Loaded 
     for table in reversed(TABLES):
         key_columns = TABLES[table][0]
         if table not in staged:
+            if table == "polity":
+                # A package written before polity joined the format omits the file, and must not drop the polity
+                # its changesets made; a polity only goes when a package carrying polity rows leaves it out.
+                continue
             gone = conn.execute(
                 sql.SQL("delete from {} where changeset_id = any(%s::uuid[])").format(sql.Identifier(table)),
                 [owned],
@@ -1129,6 +1130,28 @@ def load(conn: Connection, items: list[tuple[Path, dict[str, object]]], meter: M
     return [item.changeset_id for item in loaded]
 
 
+def _ordered(items: list[tuple[Path, dict[str, object]]]) -> list[tuple[Path, dict[str, object]]]:
+    """Put each package after the packages in the same batch that it depends on, keeping the given order otherwise."""
+    by_key = {str(_manifest(path)["key"]): (path, accepted) for path, accepted in items}
+    ordered: list[tuple[Path, dict[str, object]]] = []
+    placed: set[str] = set()
+
+    def place(key: str, trail: tuple[str, ...]) -> None:
+        if key in placed:
+            return
+        if key in trail:
+            raise ValueError(f"packages depend on each other in a loop: {' -> '.join([*trail, key])}")
+        for depend in _manifest(by_key[key][0])["depends"]:
+            if str(depend) in by_key:
+                place(str(depend), (*trail, key))
+        placed.add(key)
+        ordered.append(by_key[key])
+
+    for key in by_key:
+        place(key, ())
+    return ordered
+
+
 def run(command: str, keys: list[str]) -> None:
     if command == "export":
         for pipeline in keys:
@@ -1157,6 +1180,7 @@ def run(command: str, keys: list[str]) -> None:
         print(f"{key}: checks passed, {checked}", flush=True)
         ready.append((path, accepted))
     if command == "load" and ready:
+        ready = _ordered(ready)
         with store.connect() as conn:
             meter = Meter(conn)
             try:
@@ -1258,11 +1282,7 @@ def _seal(
     for table, column, target in REFERENCES:
         if table not in counts:
             continue
-        known = (
-            ""
-            if target == "polity"
-            else f' and "{column}" not in (select "{TARGET_KEY.get(target, "id")}" from "{target}")'
-        )
+        known = f' and "{column}" not in (select "{TARGET_KEY.get(target, "id")}" from "{target}")'
         rows = con.execute(
             f'select distinct "{column}"::varchar from "{table}" where "{column}" is not null{known}'
         ).fetchall()

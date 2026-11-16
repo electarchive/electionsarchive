@@ -942,7 +942,7 @@ def key(kind: str, *parts: object) -> str:
     return str(uuid5(package.NAMESPACE, "\x1f".join([SOURCE, kind, *(str(part) for part in parts)])))
 
 
-CHILE = "01016eed-79a5-5393-a8a1-e2f5adb6103c"
+CHILE = str(uuid5(package.NAMESPACE, "polity\x1fCL"))
 SERVEL = key("source", SOURCE)
 PRESIDENCY = key("office", "president")
 CHAMBER = key("body", "chamber")
@@ -1272,7 +1272,11 @@ def registry() -> Package:
         SOURCE,
         "Chile's regions, communes, electoral districts, offices, bodies, electoral systems, and parties from Servel",
     )
-    p.external.add(CHILE)
+    # Chile is not yet in the archive, so the registry makes its polity, as a changeset pipeline does for a new country.
+    p.add("polity", id=CHILE, kind="sovereign_state", iso_code="CL")
+    p.name(CHILE, "Chile", "en", "official")
+    p.name(CHILE, "República de Chile", "es", "native", False)
+    p.add("slug", path="cl", entity_id=CHILE, is_current=True)
     p.add(
         "source",
         id=SERVEL,
@@ -1462,7 +1466,6 @@ def build(election: Election) -> Package:
             *sorted({f"{SOURCE}/{e.day}" for g in election.groups if (e := _previous(election, g.kind)) is not None}),
         ],
     )
-    p.external.add(CHILE)
     for group in election.groups:
         for path in paths(group):
             p.uses(raw.cached(SOURCE, url(path)))
