@@ -1,0 +1,1291 @@
+{
+  "polity": "CN",
+  "name": "China",
+  "create": {
+    "kind": "sovereign_state",
+    "names": [
+      {
+        "text": "China",
+        "lang": "en",
+        "kind": "official"
+      },
+      {
+        "text": "中华人民共和国",
+        "lang": "zh",
+        "kind": "native"
+      }
+    ],
+    "slug": "cn",
+    "wikidata": "Q148",
+    "source": "constitution"
+  },
+  "sources": {
+    "constitution": {
+      "title": "中华人民共和国宪法 (Constitution of the People's Republic of China, as amended 11 March 2018)",
+      "publisher": "中国政府网 (State Council of the People's Republic of China)",
+      "url": "https://www.gov.cn/guoqing/2018-03/22/content_5276318.htm",
+      "kind": "official_body"
+    },
+    "electoral-law": {
+      "title": "中华人民共和国全国人民代表大会和地方各级人民代表大会选举法 (Electoral Law of the National People's Congress and Local People's Congresses, text as amended to 29 August 2015)",
+      "publisher": "司法部 中国政府法制信息网 (Ministry of Justice)",
+      "url": "https://xzfy.moj.gov.cn/c/2021-01-06/487591.shtml",
+      "kind": "official_body"
+    },
+    "villagers-law": {
+      "title": "中华人民共和国村民委员会组织法 (Organic Law of the Villagers' Committees, as amended 28 October 2025, in force 1 January 2026)",
+      "publisher": "新疆维吾尔自治区司法厅 (Department of Justice of Xinjiang Uygur Autonomous Region)",
+      "url": "https://sft.xinjiang.gov.cn/xjsft/flfggz/202511/f33edd43e5a149d5a479ec4d0a106ddf.shtml",
+      "kind": "official_body"
+    },
+    "villagers-decision-2025": {
+      "title": "全国人民代表大会常务委员会关于修改《中华人民共和国村民委员会组织法》的决定 (28 October 2025)",
+      "publisher": "中国人大网 (National People's Congress)",
+      "url": "http://www.npc.gov.cn/npc/c2/c30834/202510/t20251028_449058.html",
+      "kind": "official_body"
+    },
+    "residents-law": {
+      "title": "中华人民共和国城市居民委员会组织法 (Organic Law of the Urban Residents' Committees, as revised 28 October 2025, in force 1 January 2026)",
+      "publisher": "中国人大网 (National People's Congress)",
+      "url": "http://www.npc.gov.cn/npc/c2/c30834/202510/t20251028_449063.html",
+      "kind": "official_body"
+    },
+    "yearbook-2025-1-1": {
+      "title": "中国统计年鉴2025, 表1-1 全国行政区划(2024年底) (China Statistical Yearbook 2025, table 1-1, administrative divisions at the end of 2024)",
+      "publisher": "国家统计局 (National Bureau of Statistics of China)",
+      "url": "https://www.stats.gov.cn/sj/ndsj/2025/html/C01-01.jpg",
+      "kind": "official_body"
+    },
+    "yearbook-2025-24-1": {
+      "title": "中国统计年鉴2025, 表24-1 历届全国人民代表大会代表人数 (China Statistical Yearbook 2025, table 24-1, deputies of each National People's Congress)",
+      "publisher": "国家统计局 (National Bureau of Statistics of China)",
+      "url": "https://www.stats.gov.cn/sj/ndsj/2025/html/C24-01.jpg",
+      "kind": "official_body"
+    },
+    "yearbook-2023-22-23": {
+      "title": "中国统计年鉴2023, 表22-23 社会组织、自治组织单位数 (China Statistical Yearbook 2023, table 22-23, social and self-governing organizations, end of 2022)",
+      "publisher": "国家统计局 (National Bureau of Statistics of China)",
+      "url": "https://www.stats.gov.cn/sj/ndsj/2023/html/C22-23.jpg",
+      "kind": "official_body"
+    },
+    "npc-deputies-2023": {
+      "title": "中华人民共和国第十四届全国人民代表大会代表名单 (list of the 2,977 deputies to the 14th National People's Congress by electoral unit, 24 February 2023)",
+      "publisher": "中国人大网 (National People's Congress)",
+      "url": "http://www.npc.gov.cn/c2/kgfb/202302/t20230225_423685.html",
+      "kind": "official_body"
+    },
+    "county-township-2022": {
+      "title": "全国县乡两级人大换届选举工作全面完成 (the 2021-2022 county and township people's congress elections completed, October 2022)",
+      "publisher": "中国人大网 (National People's Congress)",
+      "url": "http://www.npc.gov.cn/npc/c30834/202210/376e9eed29d446d1acf453dc281797ab.shtml",
+      "kind": "official_body"
+    },
+    "npc-2023-election": {
+      "title": "十四届全国人大一次会议选举产生新一届国家领导人 (Xinhua dispatch on the 10 March 2023 elections of the 14th NPC, first session)",
+      "publisher": "上海市人民政府 (Shanghai Municipal People's Government)",
+      "url": "https://www.shanghai.gov.cn/2023lhdt/20230311/393816cd3b0049419ad999dd72d592ef.html",
+      "kind": "official_body"
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "中华人民共和国",
+      "name_en": "People's Republic of China",
+      "parent": null,
+      "polity_kind": "sovereign_state",
+      "source": "constitution"
+    },
+    {
+      "key": "province",
+      "name": "省级行政区 (省、自治区、直辖市)",
+      "name_en": "Provinces, autonomous regions, and municipalities",
+      "parent": "national",
+      "polity_kind": "region",
+      "source": "constitution",
+      "counts": [
+        {
+          "date": "2024-12-31",
+          "value": 31,
+          "source": "yearbook-2025-1-1",
+          "locator": "Table 1-1, rows Beijing to Xinjiang: 22 provinces, 5 autonomous regions, and 4 municipalities; the Hong Kong, Macao, and Taiwan rows are blank and those are counted in their own censuses"
+        }
+      ]
+    },
+    {
+      "key": "prefecture",
+      "name": "地级行政区 (设区的市、自治州、地区、盟)",
+      "name_en": "Prefecture-level divisions",
+      "parent": "province",
+      "polity_kind": "county",
+      "source": "constitution",
+      "counts": [
+        {
+          "date": "2024-12-31",
+          "value": 333,
+          "source": "yearbook-2025-1-1",
+          "locator": "Table 1-1, row 全国, column 地级区划数: 333, of which 293 prefecture-level cities; the prefectures (地区) and leagues (盟) among them are agencies of the province and elect no congress"
+        }
+      ]
+    },
+    {
+      "key": "county",
+      "name": "县级行政区 (县、自治县、不设区的市、市辖区、旗)",
+      "name_en": "County-level divisions",
+      "parent": "prefecture",
+      "polity_kind": "municipality",
+      "source": "constitution",
+      "counts": [
+        {
+          "date": "2024-12-31",
+          "value": 2846,
+          "source": "yearbook-2025-1-1",
+          "locator": "Table 1-1, row 全国, column 县级区划数: 2,846 (977 districts, 397 county-level cities, 1,301 counties, 117 autonomous counties, and banners and other units)"
+        }
+      ]
+    },
+    {
+      "key": "township",
+      "name": "乡级行政区 (乡、民族乡、镇)",
+      "name_en": "Townships and towns",
+      "parent": "county",
+      "polity_kind": "submunicipal",
+      "source": "constitution",
+      "counts": [
+        {
+          "date": "2024-12-31",
+          "value": 29592,
+          "source": "yearbook-2025-1-1",
+          "locator": "Table 1-1, row 全国: 21,464 towns (镇) plus 8,128 townships (乡); the 9,118 subdistricts (街道) of the 38,712 township-level units are offices of the county government and elect no congress"
+        }
+      ]
+    },
+    {
+      "key": "village",
+      "name": "村民委员会",
+      "name_en": "Villages (villagers' committees)",
+      "parent": "township",
+      "polity_kind": "submunicipal",
+      "source": "villagers-law",
+      "counts": [
+        {
+          "date": "2022-12-31",
+          "value": 489403,
+          "source": "yearbook-2023-22-23",
+          "locator": "Table 22-23, row 2022, column 村民委员会: 489,403"
+        }
+      ]
+    },
+    {
+      "key": "community",
+      "name": "社区居民委员会",
+      "name_en": "Urban communities (residents' committees)",
+      "parent": "county",
+      "polity_kind": "submunicipal",
+      "source": "residents-law",
+      "counts": [
+        {
+          "date": "2022-12-31",
+          "value": 117938,
+          "source": "yearbook-2023-22-23",
+          "locator": "Table 22-23, row 2022, column 社区居委会: 117,938"
+        }
+      ]
+    }
+  ],
+  "classes": [
+    {
+      "key": "npc_deputies",
+      "tier": "national",
+      "name": "全国人民代表大会代表选举",
+      "name_en": "National People's Congress deputies, elected by provincial congresses and the armed forces",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "constitution",
+      "locator": "https://www.gov.cn/guoqing/2018-03/22/content_5276318.htm (Article 59: the NPC consists of deputies elected by the provinces, autonomous regions, municipalities, special administrative regions, and the armed forces; Article 60: five-year term)",
+      "valid_from": "1954-01-01",
+      "first_held": "1954-08-01",
+      "earliest_record": "1954-08-01",
+      "finest_note": "electoral unit (选举单位): 31 provincial congresses, the Hong Kong and Macao electoral conferences, the Taiwan deputies' consultative election in Fujian, and the armed forces",
+      "note": "Each provincial-level people's congress elects its share of deputies at a session in the months before the new NPC meets; the Hong Kong and Macao deputies are elected by electoral conferences in each region, the 13 Taiwan deputies by a consultative election held in Beijing, and 281 deputies by the PLA and People's Armed Police. Candidates must outnumber seats by one fifth to one half (Electoral Law art. 30) and win a majority of all deputies of the electing congress (art. 44). The NPC Standing Committee publishes the list of elected deputies by electoral unit; the vote counts are minuted by each electing congress and are not published nationally.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "contest_kinds": [
+            "body_seats"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "CN"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "全国人民代表大会常务委员会 (NPC Standing Committee)",
+          "source": "constitution",
+          "locator": "https://www.gov.cn/guoqing/2018-03/22/content_5276318.htm (Article 60)",
+          "runoff": "majority",
+          "phase": 3,
+          "runoff_rule": "Seats not filled by a majority of all deputies of the electing congress are filled by another ballot (Electoral Law art. 44)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "中国人大网 (npc.gov.cn)",
+          "url": "http://www.npc.gov.cn/c2/kgfb/202302/t20230225_423685.html",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "2023-01-01",
+          "last_date": "2023-01-01",
+          "source": "npc-deputies-2023",
+          "evidence": "2023 list of the 2,977 elected deputies by electoral unit, without vote counts"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1954-01-01",
+          "precision": "year",
+          "seats": 1226,
+          "source": "yearbook-2025-24-1",
+          "quote": "Table 24-1: deputies at the start of the NPC elected in 1954: 1226"
+        },
+        {
+          "date": "1959-01-01",
+          "precision": "year",
+          "seats": 1226,
+          "source": "yearbook-2025-24-1",
+          "quote": "Table 24-1: deputies at the start of the NPC elected in 1959: 1226"
+        },
+        {
+          "date": "1964-01-01",
+          "precision": "year",
+          "seats": 3040,
+          "source": "yearbook-2025-24-1",
+          "quote": "Table 24-1: deputies at the start of the NPC elected in 1964: 3040"
+        },
+        {
+          "date": "1975-01-01",
+          "precision": "year",
+          "seats": 2885,
+          "source": "yearbook-2025-24-1",
+          "quote": "Table 24-1: deputies at the start of the NPC elected in 1975: 2885"
+        },
+        {
+          "date": "1978-01-01",
+          "precision": "year",
+          "seats": 3497,
+          "source": "yearbook-2025-24-1",
+          "quote": "Table 24-1: deputies at the start of the NPC elected in 1978: 3497"
+        },
+        {
+          "date": "1983-01-01",
+          "precision": "year",
+          "seats": 2978,
+          "source": "yearbook-2025-24-1",
+          "quote": "Table 24-1: deputies at the start of the NPC elected in 1983: 2978"
+        },
+        {
+          "date": "1988-01-01",
+          "precision": "year",
+          "seats": 2970,
+          "source": "yearbook-2025-24-1",
+          "quote": "Table 24-1: deputies at the start of the NPC elected in 1988: 2970"
+        },
+        {
+          "date": "1993-01-01",
+          "precision": "year",
+          "seats": 2978,
+          "source": "yearbook-2025-24-1",
+          "quote": "Table 24-1: deputies at the start of the NPC elected in 1993: 2978"
+        },
+        {
+          "date": "1998-01-01",
+          "precision": "year",
+          "seats": 2979,
+          "source": "yearbook-2025-24-1",
+          "quote": "Table 24-1: deputies at the start of the NPC elected in 1998: 2979"
+        },
+        {
+          "date": "2003-01-01",
+          "precision": "year",
+          "seats": 2984,
+          "source": "yearbook-2025-24-1",
+          "quote": "Table 24-1: deputies at the start of the NPC elected in 2003: 2984"
+        },
+        {
+          "date": "2008-01-01",
+          "precision": "year",
+          "seats": 2987,
+          "source": "yearbook-2025-24-1",
+          "quote": "Table 24-1: deputies at the start of the NPC elected in 2008: 2987"
+        },
+        {
+          "date": "2013-01-01",
+          "precision": "year",
+          "seats": 2987,
+          "source": "yearbook-2025-24-1",
+          "quote": "Table 24-1: deputies at the start of the NPC elected in 2013: 2987"
+        },
+        {
+          "date": "2018-01-01",
+          "precision": "year",
+          "seats": 2980,
+          "source": "yearbook-2025-24-1",
+          "quote": "Table 24-1: deputies at the start of the NPC elected in 2018: 2980"
+        },
+        {
+          "date": "2023-01-01",
+          "precision": "year",
+          "seats": 2977,
+          "source": "npc-deputies-2023",
+          "quote": "（2977名，各选举单位选出的代表均按姓名笔划排列）: 31 provincial units, Hong Kong (36), Macao (12), Taiwan (13), and the PLA and People's Armed Police (281)",
+          "contests": 35
+        }
+      ],
+      "est_votes": 210000,
+      "effort": 4
+    },
+    {
+      "key": "president",
+      "tier": "national",
+      "name": "中华人民共和国主席、副主席选举",
+      "name_en": "President and Vice President, elected by the National People's Congress",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "constitution",
+      "locator": "https://www.gov.cn/guoqing/2018-03/22/content_5276318.htm (Article 62(4): the NPC elects the President and Vice President)",
+      "valid_from": "1954-09-20",
+      "first_held": "1954-09-27",
+      "earliest_record": "1954-09-27",
+      "contests_per_unit": 2,
+      "note": "The NPC elects the Chairman (主席, President) and Vice Chairman of the People's Republic by secret ballot at the first session of each congress, from a single candidate nominated by the session presidium. The office was left vacant from 1968 and abolished by the 1975 and 1978 constitutions; the 1982 constitution restored it, with the first election on 18 June 1983. The presidium's announcements (公告) name the elected; Xinhua's dispatch on each vote, carried by government sites, gives the deputies present and the result.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "CN"
+        },
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "other"
+          ],
+          "name_pattern": "副主席|Vice[- ]President",
+          "iso_pattern": "CN"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "全国人民代表大会主席团 (Presidium of the National People's Congress session)",
+          "source": "constitution",
+          "locator": "https://www.gov.cn/guoqing/2018-03/22/content_5276318.htm (Article 79: same term as the NPC)",
+          "runoff": "none",
+          "phase": 3,
+          "valid_from": "1983-01-01"
+        }
+      ],
+      "access": [
+        {
+          "platform": "上海市人民政府 (shanghai.gov.cn), Xinhua dispatch",
+          "url": "https://www.shanghai.gov.cn/2023lhdt/20230311/393816cd3b0049419ad999dd72d592ef.html",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-16",
+          "first_date": "2023-03-10",
+          "last_date": "2023-03-10",
+          "source": "npc-2023-election",
+          "evidence": "2023 dispatch: 2,977 deputies, 2,952 present, four ballots, the elected named"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1954-09-27"
+        },
+        {
+          "date": "1959-04-27"
+        },
+        {
+          "date": "1965-01-03"
+        },
+        {
+          "date": "1983-06-18"
+        },
+        {
+          "date": "1988-04-08"
+        },
+        {
+          "date": "1993-03-27"
+        },
+        {
+          "date": "1998-03-16"
+        },
+        {
+          "date": "2003-03-15"
+        },
+        {
+          "date": "2008-03-15"
+        },
+        {
+          "date": "2013-03-14"
+        },
+        {
+          "date": "2018-03-17"
+        },
+        {
+          "date": "2023-03-10",
+          "contests": 2,
+          "source": "npc-2023-election",
+          "quote": "会议应出席代表2977人，出席2952人 ... 4张不同颜色的选举票分发到每一位代表手中 (President and Vice President among the four ballots)"
+        }
+      ],
+      "est_votes": 72000,
+      "effort": 2
+    },
+    {
+      "key": "premier",
+      "tier": "national",
+      "name": "国务院总理人选的决定",
+      "name_en": "Premier, confirmed by the National People's Congress on the President's nomination",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "constitution",
+      "locator": "https://www.gov.cn/guoqing/2018-03/22/content_5276318.htm (Article 62(5): the NPC decides the Premier on the President's nomination)",
+      "valid_from": "1954-09-20",
+      "first_held": "1954-09-28",
+      "note": "A vote of the full NPC on a single nominee, held the day after the presidential election. The same sitting confirms the vice premiers, state councilors, and ministers by a block vote (决定任命), which the census counts with the Premier.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "head_of_government"
+          ],
+          "iso_pattern": "CN"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "全国人民代表大会主席团 (Presidium of the National People's Congress session)",
+          "source": "constitution",
+          "locator": "https://www.gov.cn/guoqing/2018-03/22/content_5276318.htm (Article 87)",
+          "runoff": "none",
+          "phase": 3
+        }
+      ],
+      "dates": [
+        {
+          "date": "1998-03-17"
+        },
+        {
+          "date": "2003-03-16"
+        },
+        {
+          "date": "2008-03-16"
+        },
+        {
+          "date": "2013-03-15"
+        },
+        {
+          "date": "2018-03-18"
+        },
+        {
+          "date": "2023-03-11"
+        }
+      ],
+      "est_votes": 36000,
+      "effort": 2
+    },
+    {
+      "key": "npc_officers",
+      "tier": "national",
+      "name": "全国人民代表大会选举的其他国家机构组成人员",
+      "name_en": "NPC Standing Committee, Central Military Commission, and National Supervisory Commission, elected by the NPC",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "constitution",
+      "locator": "https://www.gov.cn/guoqing/2018-03/22/content_5276318.htm (Articles 62(6)-(7) and 65: the NPC elects the chair of the Central Military Commission, the director of the National Supervisory Commission, and the members of its Standing Committee)",
+      "valid_from": "1954-09-20",
+      "first_held": "1954-09-27",
+      "note": "The chair, vice chairs, secretary-general, and about 170 members of the NPC Standing Committee, the chair of the Central Military Commission (since 1983), and the director of the National Supervisory Commission (since 2018), each elected at the first session of an NPC. The Standing Committee members are chosen from a list with a few more candidates than seats (差额选举).",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "speaker",
+            "other"
+          ],
+          "name_pattern": "常务委员会|中央军事委员会|国家监察委员会|Standing Committee|Military Commission|Supervisory Commission",
+          "iso_pattern": "CN"
+        },
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "contest_kinds": [
+            "body_seats"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "iso_pattern": "CN"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "全国人民代表大会主席团 (Presidium of the National People's Congress session)",
+          "source": "constitution",
+          "locator": "https://www.gov.cn/guoqing/2018-03/22/content_5276318.htm (Article 66)",
+          "runoff": "none",
+          "phase": 3
+        }
+      ],
+      "dates": [
+        {
+          "date": "2023-03-10",
+          "source": "npc-2023-election",
+          "quote": "赵乐际当选全国人大常委会委员长 (Standing Committee chair and Central Military Commission chair elected on the same ballots)"
+        }
+      ],
+      "est_votes": 200000,
+      "effort": 3
+    },
+    {
+      "key": "npc_judicial",
+      "tier": "national",
+      "name": "最高人民法院院长、最高人民检察院检察长选举",
+      "name_en": "President of the Supreme People's Court and Procurator-General, elected by the NPC",
+      "category": "judicial",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "constitution",
+      "locator": "https://www.gov.cn/guoqing/2018-03/22/content_5276318.htm (Article 62(8)-(9))",
+      "valid_from": "1954-09-20",
+      "first_held": "1954-09-27",
+      "contests_per_unit": 2,
+      "note": "Elected by the NPC at the first session of each congress from a single nominee each.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "other"
+          ],
+          "name_pattern": "最高人民法院|最高人民检察院|Supreme People's (Court|Procuratorate)",
+          "iso_pattern": "CN"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "全国人民代表大会主席团 (Presidium of the National People's Congress session)",
+          "source": "constitution",
+          "locator": "https://www.gov.cn/guoqing/2018-03/22/content_5276318.htm (Articles 129 and 135: same term as the NPC)",
+          "runoff": "none",
+          "phase": 3
+        }
+      ],
+      "est_votes": 70000,
+      "effort": 2
+    },
+    {
+      "key": "provincial_congress",
+      "tier": "province",
+      "name": "省级人民代表大会代表选举",
+      "name_en": "Provincial people's congress deputies, elected by the congresses one level down",
+      "category": "indirect",
+      "goal": "subnational",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "constitution",
+      "locator": "https://www.gov.cn/guoqing/2018-03/22/content_5276318.htm (Article 97: deputies of provinces and municipalities are elected by the people's congresses at the next lower level; Article 98: five-year term)",
+      "valid_from": "1954-01-01",
+      "first_held": "1954-07-01",
+      "disposition": "blocked",
+      "disposition_reason": "Each prefecture- or county-level congress elects its share of provincial deputies and the provincial standing committee publishes only the list of those elected; the vote counts are minuted by the electing congresses and published by none of them in any series.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "polity_kinds": [
+            "region"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "省级人民代表大会常务委员会 (provincial standing committees)",
+          "source": "electoral-law",
+          "locator": "https://xzfy.moj.gov.cn/c/2021-01-06/487591.shtml (Articles 2, 30, and 44)",
+          "runoff": "none"
+        }
+      ],
+      "est_votes": 1500000,
+      "effort": 5
+    },
+    {
+      "key": "provincial_executive",
+      "tier": "province",
+      "name": "省长、自治区主席、直辖市市长等的选举",
+      "name_en": "Governors, autonomous region chairs, municipal mayors, and provincial standing committees, elected by the provincial congress",
+      "category": "indirect",
+      "goal": "subnational",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "constitution",
+      "locator": "https://www.gov.cn/guoqing/2018-03/22/content_5276318.htm (Articles 101 and 103: local congresses elect the heads of their governments and supervisory commissions and the members of their standing committees)",
+      "valid_from": "1954-09-20",
+      "disposition": "blocked",
+      "disposition_reason": "Each provincial congress announces the elected in a presidium notice (公告) on its own site and gazette; the notices name the elected without vote counts, and no body compiles them.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "governor",
+            "mayor",
+            "speaker",
+            "other"
+          ],
+          "polity_kinds": [
+            "region"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "Each people's congress, through its presidium",
+          "source": "constitution",
+          "locator": "https://www.gov.cn/guoqing/2018-03/22/content_5276318.htm (Article 106: same term as the congress)",
+          "runoff": "none"
+        }
+      ],
+      "est_votes": 300000,
+      "effort": 4
+    },
+    {
+      "key": "prefecture_congress",
+      "tier": "prefecture",
+      "name": "设区的市、自治州人民代表大会代表选举",
+      "name_en": "Prefecture-level city and autonomous prefecture congress deputies, elected by county-level congresses",
+      "category": "indirect",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "constitution",
+      "locator": "https://www.gov.cn/guoqing/2018-03/22/content_5276318.htm (Article 97)",
+      "valid_from": "1954-01-01",
+      "disposition": "blocked",
+      "disposition_reason": "County-level congresses elect these deputies and each city's standing committee publishes only the names of those elected; no vote counts are published.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "polity_kinds": [
+            "county"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "设区的市、自治州人民代表大会常务委员会",
+          "source": "electoral-law",
+          "locator": "https://xzfy.moj.gov.cn/c/2021-01-06/487591.shtml (Articles 2 and 44)",
+          "runoff": "none"
+        }
+      ],
+      "est_votes": 10000000,
+      "effort": 5
+    },
+    {
+      "key": "prefecture_executive",
+      "tier": "prefecture",
+      "name": "市长、州长等的选举",
+      "name_en": "Mayors and prefecture governors, elected by the prefecture-level congress",
+      "category": "indirect",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "constitution",
+      "locator": "https://www.gov.cn/guoqing/2018-03/22/content_5276318.htm (Article 101)",
+      "valid_from": "1954-09-20",
+      "disposition": "blocked",
+      "disposition_reason": "Announced by each congress's presidium without vote counts, on 333 separate sites, with no compilation.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "mayor",
+            "governor",
+            "speaker",
+            "other"
+          ],
+          "polity_kinds": [
+            "county"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "Each people's congress, through its presidium",
+          "source": "constitution",
+          "locator": "https://www.gov.cn/guoqing/2018-03/22/content_5276318.htm (Article 98)",
+          "runoff": "none"
+        }
+      ],
+      "est_votes": 2000000,
+      "effort": 5
+    },
+    {
+      "key": "county_congress",
+      "tier": "county",
+      "name": "县级人民代表大会代表直接选举",
+      "name_en": "County, county-level city, and city district congress deputies, directly elected",
+      "category": "legislature",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "constitution",
+      "locator": "https://www.gov.cn/guoqing/2018-03/22/content_5276318.htm (Article 97: deputies of counties, cities not divided into districts, and city districts are directly elected by the voters)",
+      "valid_from": "1979-07-01",
+      "first_held": "1980-01-01",
+      "finest_note": "constituency (选区) of one to three seats, drawn by residence or by work unit (Electoral Law art. 24)",
+      "disposition": "blocked",
+      "disposition_reason": "Each county election committee posts the elected deputies (当选代表名单) by constituency on paper notices and sometimes its own site; candidate vote counts are not published, and the NPC reports only national totals of voters and deputies for each round.",
+      "note": "Direct election of county deputies began under the 1979 Electoral Law (before then county congresses were elected by township congresses). Constituencies elect one to three deputies by majority of votes cast with at least half the registered voters voting; candidates must outnumber seats by one third to double (arts. 30 and 44). Terms went from three to five years in 1993 (counties) and rounds are now staggered over about eighteen months: the 2021-2022 round elected 670,563 county deputies, with 921 million voters (86.49% of those registered). The next round started in 2026.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "local",
+            "by_election"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "县级选举委员会 (county election committees, under the county standing committee)",
+          "source": "electoral-law",
+          "locator": "https://xzfy.moj.gov.cn/c/2021-01-06/487591.shtml (Articles 2, 24, 30, and 44)",
+          "runoff": "threshold",
+          "runoff_threshold": 0.3333,
+          "runoff_rule": "Seats unfilled by a majority go to another ballot won by the most votes with at least one third of the ballots (art. 44)"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2021-01-01",
+          "precision": "year",
+          "through": "2022-06-30",
+          "seats": 670563,
+          "source": "county-township-2022",
+          "quote": "这次换届选举共选出县级人大代表670563名 ... 参加县级人大代表选举投票的选民有9.21亿人，占登记选民的86.49%"
+        }
+      ],
+      "est_votes": 8000000000,
+      "effort": 5
+    },
+    {
+      "key": "county_executive",
+      "tier": "county",
+      "name": "县长、市长、区长等的选举",
+      "name_en": "County heads, county-level city mayors, and district heads, elected by the county-level congress",
+      "category": "indirect",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "constitution",
+      "locator": "https://www.gov.cn/guoqing/2018-03/22/content_5276318.htm (Article 101)",
+      "valid_from": "1954-09-20",
+      "disposition": "blocked",
+      "disposition_reason": "Announced by each county congress's presidium, usually without vote counts, across 2,846 separate congresses with no compilation.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "mayor",
+            "governor",
+            "speaker",
+            "other"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "Each people's congress, through its presidium",
+          "source": "constitution",
+          "locator": "https://www.gov.cn/guoqing/2018-03/22/content_5276318.htm (Article 98)",
+          "runoff": "none"
+        }
+      ],
+      "est_votes": 5000000,
+      "effort": 5
+    },
+    {
+      "key": "local_judicial",
+      "tier": "county",
+      "name": "地方各级人民法院院长、人民检察院检察长选举",
+      "name_en": "Presidents of local people's courts and chief procurators, elected by congresses at county level and above",
+      "category": "judicial",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "constitution",
+      "locator": "https://www.gov.cn/guoqing/2018-03/22/content_5276318.htm (Article 101: congresses at and above county level elect the presidents of their courts and their chief procurators; a chief procurator's election needs the approval of the standing committee one level up)",
+      "valid_from": "1954-09-20",
+      "disposition": "blocked",
+      "disposition_reason": "Elected on single-candidate ballots in each provincial, prefecture, and county congress and announced in presidium notices without vote counts; no body compiles them.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "other"
+          ],
+          "name_pattern": "法院|检察院|Court|Procurat",
+          "polity_kinds": [
+            "region",
+            "county",
+            "municipality"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "Each people's congress, through its presidium",
+          "source": "constitution",
+          "locator": "https://www.gov.cn/guoqing/2018-03/22/content_5276318.htm (Article 101)",
+          "runoff": "none"
+        }
+      ],
+      "est_votes": 6000000,
+      "effort": 5
+    },
+    {
+      "key": "township_congress",
+      "tier": "township",
+      "name": "乡、民族乡、镇人民代表大会代表直接选举",
+      "name_en": "Township and town congress deputies, directly elected",
+      "category": "legislature",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "constitution",
+      "locator": "https://www.gov.cn/guoqing/2018-03/22/content_5276318.htm (Article 97: deputies of townships, ethnic townships, and towns are directly elected by the voters)",
+      "valid_from": "1953-03-01",
+      "first_held": "1953-07-01",
+      "finest_note": "constituency (选区) of one to three seats",
+      "disposition": "blocked",
+      "disposition_reason": "Each township election committee posts the elected deputies on notices; candidate vote counts are not published and nobody compiles the 29,592 townships' results.",
+      "note": "The basic-level elections of 1953-1954 under the 1953 Electoral Law were the first direct elections of the People's Republic; township congresses then elected county deputies. People's communes replaced townships from 1958 to 1983, when township congresses were restored. The 2021-2022 round elected 1,958,884 township deputies with 623 million voters (85.63%). Terms were three years until the 2004 constitutional amendment set five.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "local",
+            "by_election"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "polity_kinds": [
+            "submunicipal"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "乡级选举委员会 (township election committees, directed by the county standing committee)",
+          "source": "electoral-law",
+          "locator": "https://xzfy.moj.gov.cn/c/2021-01-06/487591.shtml (Articles 2, 24, 30, and 44)",
+          "runoff": "threshold",
+          "runoff_threshold": 0.3333,
+          "runoff_rule": "Seats unfilled by a majority go to another ballot won by the most votes with at least one third of the ballots (art. 44)"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2021-01-01",
+          "precision": "year",
+          "through": "2022-06-30",
+          "seats": 1958884,
+          "source": "county-township-2022",
+          "quote": "这次换届选举共选出县级人大代表670563名、乡级人大代表1958884名"
+        }
+      ],
+      "est_votes": 6000000000,
+      "effort": 5
+    },
+    {
+      "key": "township_executive",
+      "tier": "township",
+      "name": "乡长、镇长的选举",
+      "name_en": "Township and town heads, elected by the township congress",
+      "category": "indirect",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "constitution",
+      "locator": "https://www.gov.cn/guoqing/2018-03/22/content_5276318.htm (Article 101)",
+      "valid_from": "1954-09-20",
+      "disposition": "blocked",
+      "disposition_reason": "Elected by each township congress and announced on local notices without vote counts; nobody compiles the results.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "mayor",
+            "speaker",
+            "other"
+          ],
+          "polity_kinds": [
+            "submunicipal"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "Each people's congress, through its presidium",
+          "source": "constitution",
+          "locator": "https://www.gov.cn/guoqing/2018-03/22/content_5276318.htm (Article 98)",
+          "runoff": "none"
+        }
+      ],
+      "est_votes": 20000000,
+      "effort": 5
+    },
+    {
+      "key": "villagers_committee",
+      "tier": "village",
+      "name": "村民委员会选举",
+      "name_en": "Villagers' committees, directly elected",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "villagers-law",
+      "locator": "https://sft.xinjiang.gov.cn/xjsft/flfggz/202511/f33edd43e5a149d5a479ec4d0a106ddf.shtml (Article 14: chair, vice chairs, and members directly elected by the villagers for five years; Article 18: candidates must outnumber seats, and a candidate needs a majority with a majority of registered villagers voting)",
+      "valid_from": "1987-11-24",
+      "first_held": "1988-01-01",
+      "disposition": "blocked",
+      "disposition_reason": "Each village's villagers' election committee (村民选举委员会) counts and announces its own result on the spot; township governments and civil affairs offices keep the returns, and no authority publishes candidate votes for the 489,403 villages.",
+      "note": "Elections began under the trial 1987 Organic Law and became general after the 1998 law. Terms were three years until the 2018 amendment set five, aligned with village party committees; rounds are held province by province over a year or two. The 2025 amendment (in force 2026) keeps the five-year term and has the village party organization or registered villagers nominate candidates.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "local",
+            "by_election"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "submunicipal"
+          ],
+          "name_pattern": "村民委员会|Villagers"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "村民选举委员会 (each village's election committee, guided by the township government)",
+          "source": "villagers-law",
+          "locator": "https://sft.xinjiang.gov.cn/xjsft/flfggz/202511/f33edd43e5a149d5a479ec4d0a106ddf.shtml (Articles 14 and 18)",
+          "runoff": "threshold",
+          "runoff_threshold": 0.3333,
+          "runoff_rule": "Seats unfilled by a majority go to another ballot won by the most votes with at least one third of the ballots (art. 18)"
+        }
+      ],
+      "est_votes": 4000000000,
+      "effort": 5
+    },
+    {
+      "key": "residents_committee",
+      "tier": "community",
+      "name": "社区居民委员会选举",
+      "name_en": "Urban residents' committees, elected by residents, household representatives, or residents' representatives",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "residents-law",
+      "locator": "http://www.npc.gov.cn/npc/c2/c30834/202510/t20251028_449063.html (Article 14: elected by all eligible residents, by one representative per household, or by residents' representatives; five-year term)",
+      "valid_from": "1989-12-26",
+      "disposition": "blocked",
+      "disposition_reason": "Run by each community's election committee under the subdistrict office, and in many communities through household or residents' representatives rather than a vote of all residents; results are posted locally and no authority publishes candidate votes.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "local",
+            "by_election"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "submunicipal"
+          ],
+          "name_pattern": "居民委员会|Residents"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "社区居民选举委员会 (community election committees, under the subdistrict office)",
+          "source": "residents-law",
+          "locator": "http://www.npc.gov.cn/npc/c2/c30834/202510/t20251028_449063.html (Article 14)",
+          "runoff": "none"
+        }
+      ],
+      "est_votes": 500000000,
+      "effort": 5
+    },
+    {
+      "key": "armed_forces",
+      "tier": "national",
+      "name": "中国人民解放军选举",
+      "name_en": "Elections within the People's Liberation Army and People's Armed Police",
+      "category": "non_territorial",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "electoral-law",
+      "locator": "https://xzfy.moj.gov.cn/c/2021-01-06/487591.shtml (Article 5: the People's Liberation Army holds its elections separately under its own measures)",
+      "valid_from": "1954-01-01",
+      "disposition": "blocked",
+      "disposition_reason": "Soldiers elect servicemen's congresses (军人代表大会) unit by unit, which in turn elect the armed forces' 281 NPC deputies; the procedure is set by Central Military Commission measures and no results below the list of NPC deputies are published.",
+      "match": [
+        {
+          "contest_kinds": [
+            "body_seats"
+          ],
+          "name_pattern": "军人代表大会|解放军|Servicemen|Liberation Army",
+          "iso_pattern": "CN"
+        }
+      ],
+      "est_votes": 5000000,
+      "effort": 5
+    },
+    {
+      "key": "referendum",
+      "tier": "national",
+      "name": "全民公决",
+      "name_en": "Referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "constitution",
+      "locator": "https://www.gov.cn/guoqing/2018-03/22/content_5276318.htm (Articles 57-78: lawmaking and constitutional amendment rest with the NPC and its Standing Committee; Article 64 has amendments adopted by two thirds of NPC deputies)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "The constitution and laws provide for no referendum or initiative, and none has been held; constitutional amendments are adopted by the NPC alone (Article 64).",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "iso_pattern": "CN"
+        }
+      ],
+      "est_votes": 0,
+      "effort": 1
+    },
+    {
+      "key": "cppcc",
+      "tier": "national",
+      "name": "中国人民政治协商会议",
+      "name_en": "Chinese People's Political Consultative Conference",
+      "category": "non_territorial",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "constitution",
+      "locator": "https://www.gov.cn/guoqing/2018-03/22/content_5276318.htm (Preamble: the CPPCC is a broadly representative united-front organization)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Members are designated by consultation among the parties, people's organizations, and sectors that make it up, not elected; from 1949 to 1954 its plenary session exercised the functions of the NPC, again without elections.",
+      "match": [
+        {
+          "body_kinds": [
+            "appointed_assembly"
+          ],
+          "iso_pattern": "CN"
+        }
+      ],
+      "est_votes": 0,
+      "effort": 1
+    },
+    {
+      "key": "party_internal",
+      "tier": "national",
+      "name": "政党内部选举",
+      "name_en": "Party congresses and internal party elections",
+      "category": "nominating",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "electoral-law",
+      "locator": "https://xzfy.moj.gov.cn/c/2021-01-06/487591.shtml (Article 29: parties and people's organizations nominate candidates jointly or separately; their internal selection is not part of the election)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Delegate and committee elections of the Communist Party and the eight other legal parties are run under each party's own charter; no state authority runs or certifies them, and the state holds no nominating contests.",
+      "match": [
+        {
+          "election_kinds": [
+            "primary",
+            "caucus"
+          ],
+          "iso_pattern": "CN"
+        }
+      ],
+      "est_votes": 0,
+      "effort": 1
+    },
+    {
+      "key": "roc_mainland",
+      "tier": "national",
+      "name": "中华民国时期国会、国民大会及立法院选举",
+      "name_en": "Republic of China parliament, National Assembly, and Legislative Yuan elections on the mainland",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "constitution",
+      "locator": "https://www.gov.cn/guoqing/2018-03/22/content_5276318.htm (Preamble: the Revolution of 1911 abolished the feudal monarchy and gave birth to the Republic of China; the People's Republic was founded in 1949)",
+      "valid_from": "1909-01-01",
+      "valid_to": "1949-10-01",
+      "first_held": "1909-01-01",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Held by the Qing provincial assemblies (1909) and the Republic of China (parliament 1912-1913 and 1918, National Assembly 1947, Legislative Yuan 1948), a state that continues on Taiwan; the People's Republic publishes no results of them and they belong with the Republic of China's record rather than this polity's.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "lower_house",
+            "upper_house",
+            "unicameral"
+          ],
+          "iso_pattern": "CN",
+          "valid_to": "1949-10-01"
+        }
+      ],
+      "est_votes": 0,
+      "effort": 5
+    }
+  ]
+}
