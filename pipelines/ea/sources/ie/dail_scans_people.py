@@ -5,12 +5,12 @@ from collections import defaultdict
 from dataclasses import dataclass
 from difflib import SequenceMatcher
 from pathlib import Path
-from uuid import UUID
+from uuid import UUID, uuid5
 
 import polars as pl
 
 from ea import raw
-from ea.changeset import Changeset, slug
+from ea.changeset import NAMESPACE, Changeset, slug
 from ea.sources.ie.dail import MEMBERS, fold
 from ea.sources.ie.dail import PARSED as DAIL
 from ea.sources.ie.dail_scans import PARSED as SCANS
@@ -18,7 +18,7 @@ from ea.sources.ie.dail_scans import fold as scan_fold
 from ea.store import connect
 
 SOURCE = "ie.dail_scans_people"
-VERSION = "1"
+VERSION = "2"
 HOUSES = range(14, 29)
 GENERALS = [
     "1954-05-18",
@@ -74,6 +74,17 @@ CANON = {nick: full for full, nicks in NICKNAMES.items() for nick in nicks.split
 TITLES = {"dr", "captain", "capt", "colonel", "col", "general", "major", "professor", "prof", "sir", "mr", "mrs", "ms"}
 SUFFIXES = {"jnr", "snr", "junior", "senior", "jr", "sr"}
 PLACES = {"leix": "laois", "laoighis": "laois"}
+KNOWN = {
+    "1961-10-04:dail-eireann:north-east-cork:battdonegan": "Bartholomew-Donegan.D.1957-03-20",
+    "1975-03-04:dail-eireann:north-east-galway:michaelpkitt": "Michael-P-Kitt.D.1975-03-04",
+    "1982-02-18:dail-eireann:clare:madeleinetaylor": "Madeleine-Taylor-Quinn.D.1981-06-30",
+    "1982-02-18:dail-eireann:dublin-central:tonygregory": "Tony-Gregory.D.1982-03-09",
+    "1982-11-24:dail-eireann:dublin-central:tonygregory": "Tony-Gregory.D.1982-03-09",
+    "1982-02-18:dail-eireann:dublin-north-east:seandaldermandublinbayrockallloftus": "Seán-D-Loftus.D.1981-06-30",
+    "1996-04-02:dail-eireann:dublin-west:brianlenihan": "Brian-Lenihan.D.1996-04-02",
+    "1997-06-06:dail-eireann:mayo:beverleycooperflynn": "Beverley-Flynn.D.1997-06-26",
+    "1997-06-06:dail-eireann:mayo:pjmorley": "Patrick-J-Morley.D.1977-07-05",
+}
 
 
 def fetch() -> None:
@@ -191,7 +202,7 @@ def candidates() -> list[Row]:
                     house_of(item["day"]),
                     contest,
                     first(row["name"]),
-                    surname(label.split(",")[0].split("(")[0]),
+                    surname(label.split(",")[0].split("(")[0] if "," in label else row["name"].split()[-1]),
                     fold(row["name"]),
                     place(item["constituency"]),
                     party(row["party"]),
@@ -225,7 +236,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Dáil candidates of 1951 to 1997 joined across elections and to the 2002 candidates on Oireachtas member codes (each Dáil's members and the outgoing TDs the printed results mark), or on the same name, constituency, and party in consecutive Dáil terms",
+            summary="Dáil candidates of 1951 to 1997 joined across elections and to the 2002 candidates on Oireachtas member codes (each Dáil's members and the outgoing TDs the printed results mark, with nine candidacies the names alone cannot place, such as a father and son in one Dáil, checked by hand), or on the same name, constituency, and party in consecutive Dáil terms; an earlier merge of two candidacies whose member codes differ is undone",
             polity="IE",
             kind="match",
         )
@@ -241,7 +252,9 @@ def emit() -> Path:
                 for house, on in ((row.house, row.seated), (row.house - 1, row.outgoing))
                 if on and (code := identify(seated[house], row)) is not None
             }
-            if len(found) == 1:
+            if row.key in KNOWN:
+                codes[row.key] = KNOWN[row.key]
+            elif len(found) == 1:
                 codes[row.key] = found.pop()
             clashes += len(found) > 1
         per_contest: dict[tuple[str, str], list[str]] = defaultdict(list)
@@ -294,9 +307,25 @@ def emit() -> Path:
             before = latest.get(same, [])
             if len(after) == 1 and len(before) == 1:
                 chained += join(before[0].key, after[0].key)
+        everyone = [*rows, *roster]
+        minted = {row.key: uuid5(NAMESPACE, f"external_id:{row.scheme}\x1f{row.key}") for row in everyone}
+        present = {
+            entity for (entity,) in conn.execute("select id from entity where id = any(%s)", [list(minted.values())])
+        }
+        own = {key: entity if entity in present else people[key] for key, entity in minted.items()}
+        home = {own[row.key]: code for row in everyone if (code := owner.get(find(row.key))) is not None}
+        split = 0
+        for entity, into in conn.execute(
+            "select m.entity_id, m.into_id from entity_merge m join changeset c on c.id = m.changeset_id"
+            " where c.pipeline = %s",
+            [SOURCE],
+        ).fetchall():
+            if entity in cs.survivors and entity in home and into in home and home[entity] != home[into]:
+                cs.unmerge(entity, "the Oireachtas member codes place these candidacies with different people")
+                split += 1
         groups: dict[str, list[UUID]] = defaultdict(list)
-        for row in [*rows, *roster]:
-            groups[find(row.key)].append(people[row.key])
+        for row in everyone:
+            groups[find(row.key)].append(own[row.key])
         merged = 0
         for group in groups.values():
             for person in group[:-1]:
@@ -304,6 +333,7 @@ def emit() -> Path:
                     cs.merge(person, group[-1])
                     merged += 1
         print(
-            f"{len(codes)} candidacies on member codes, {clashes} clashing, {chained} chained, {merged} people merged"
+            f"{len(codes)} candidacies on member codes, {clashes} clashing, {chained} chained, {split} merges undone,"
+            f" {merged} people merged"
         )
         return cs.write()
