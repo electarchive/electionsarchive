@@ -14,7 +14,7 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "wikidata"
-VERSION = "19"
+VERSION = "20"
 TITLE = "Political parties and their colors"
 HAND_COLORS = Path(__file__).with_name("tr_party_colors.tsv")
 HAND_POSITIONS = Path(__file__).with_name("tr_party_positions.tsv")
@@ -567,10 +567,26 @@ def _scope(country: str | None) -> str:
     return f"?item wdt:P31/wdt:P279* wd:Q7278 ; wdt:P17 wd:{country} ."
 
 
-def _url(template: str, scope: str) -> str:
+def _url(template: str, scope: str, languages: str = LANGUAGES) -> str:
     return "https://query.wikidata.org/sparql?" + urlencode(
-        {"query": template.format(scope=scope, languages=LANGUAGES), "format": "json"}
+        {"query": template.format(scope=scope, languages=languages), "format": "json"}
     )
+
+
+def _countries() -> dict[str, tuple[str | None, str]]:
+    found: dict[str, tuple[str | None, str]] = {iso: (item, LANGUAGES) for iso, item in COUNTRIES.items()}
+    with connect() as conn:
+        for iso, item, native in conn.execute(
+            """select po.iso_code, x.value, coalesce(array_agg(distinct n.lang) filter (where n.lang is not null), '{}')
+               from polity po
+               join external_id x on x.entity_id = po.id and x.scheme = 'wikidata'
+               left join name n on n.entity_id = po.id and n.kind = 'native'
+               where po.kind = 'sovereign_state' and po.iso_code ~ '^[A-Z]{2}$'
+               group by po.iso_code, x.value"""
+        ).fetchall():
+            languages = ", ".join(f'"{lang}"' for lang in dict.fromkeys(["en", "mul", *sorted(native)]))
+            found.setdefault(str(iso), (str(item), languages))
+    return found
 
 
 def _extra(template: str) -> str:
@@ -578,14 +594,16 @@ def _extra(template: str) -> str:
     return _url(template, "VALUES ?item { " + " ".join(f"wd:{item}" for item in items) + " }")
 
 
-def _urls() -> list[str]:
+def _urls(countries: dict[str, tuple[str | None, str]]) -> list[str]:
     return [
-        _url(template, _scope(country)) for country in COUNTRIES.values() for template in (NAMES, LABELS, SPANS, COLORS)
+        _url(template, _scope(item), languages)
+        for item, languages in countries.values()
+        for template in (NAMES, LABELS, SPANS, COLORS)
     ] + [_extra(COLORS), _extra(LABELS)]
 
 
-def _placed() -> list[str]:
-    return [_url(POSITIONS, _scope(country)) for country in COUNTRIES.values()] + [_extra(POSITIONS)]
+def _placed(countries: dict[str, tuple[str | None, str]]) -> list[str]:
+    return [_url(POSITIONS, _scope(item), languages) for item, languages in countries.values()] + [_extra(POSITIONS)]
 
 
 def _rows(url: str) -> list[dict[str, str]]:
@@ -613,7 +631,8 @@ def _day(value: str | None, precision: str | None) -> tuple[date | None, str]:
 
 
 def fetch() -> None:
-    for url in _urls() + _placed():
+    countries = _countries()
+    for url in _urls(countries) + _placed(countries):
         raw.fetch(SOURCE, url, suffix=".json")
 
 
@@ -623,8 +642,9 @@ def emit() -> Path:
     inceptions: defaultdict[str, set[tuple[date, str]]] = defaultdict(set)
     statements: dict[str, list[dict[str, str]]] = defaultdict(list)
     stances: dict[str, list[dict[str, str]]] = defaultdict(list)
-    for scope, country in COUNTRIES.items():
-        for row in _rows(_url(NAMES, _scope(country))):
+    countries = _countries()
+    for scope, (country, languages) in countries.items():
+        for row in _rows(_url(NAMES, _scope(country), languages)):
             item = row["item"].rsplit("/", 1)[1]
             parts = re.split(SPLIT, row["name"])
             weighted = [(row["name"], WEIGHTS[row["kind"]])]
@@ -634,7 +654,7 @@ def emit() -> Path:
                 key = _norm(text)
                 if key:
                     index[scope][key][item] = max(index[scope][key].get(item, 0), weight)
-        for row in _rows(_url(SPANS, _scope(country))):
+        for row in _rows(_url(SPANS, _scope(country), languages)):
             item = row["item"].rsplit("/", 1)[1]
             if row.get("inceptionPrecision") in ("9", "10", "11"):
                 day, precision = _day(row.get("inception"), row["inceptionPrecision"])
@@ -647,7 +667,11 @@ def emit() -> Path:
                 int(row["links"]),
             )
     seen: set[str] = set()
-    for url in [_url(COLORS, _scope(country)) for country in COUNTRIES.values()] + [_extra(COLORS)] + _placed():
+    for url in (
+        [_url(COLORS, _scope(country), languages) for country, languages in countries.values()]
+        + [_extra(COLORS)]
+        + _placed(countries)
+    ):
         for row in _rows(url):
             if row["statement"] not in seen:
                 seen.add(row["statement"])
@@ -725,7 +749,9 @@ def emit() -> Path:
         ).fetchall():
             others[entity].add(text.casefold())
         english: dict[str, str] = {}
-        for url in [_url(LABELS, _scope(country)) for country in COUNTRIES.values()] + [_extra(LABELS)]:
+        for url in [_url(LABELS, _scope(country), languages) for country, languages in countries.values()] + [
+            _extra(LABELS)
+        ]:
             for row in _rows(url):
                 english.setdefault(row["item"].rsplit("/", 1)[1], row["name"])
         states: dict[str, str] = dict(
@@ -753,7 +779,7 @@ def emit() -> Path:
         claims: dict[str, list[tuple[int, int, UUID]]] = defaultdict(list)
         for party, iso, kind, full, short, codes, first, last, options in parties:
             scope = (iso or "").split("-")[0]
-            if scope not in COUNTRIES:
+            if scope not in countries:
                 continue
             forced = next((name for name in full + short + codes if (iso, name) in MATCHES), None)
             inherited = next((INHERITED[iso, name] for name in full + short if (iso, name) in INHERITED), None)
@@ -882,9 +908,9 @@ def emit() -> Path:
             license="CC0 1.0",
             license_url="https://creativecommons.org/publicdomain/zero/1.0/",
         )
-        for url in _urls():
+        for url in _urls(countries):
             cs.artifact(raw.cached(SOURCE, url), wikidata)
-        for url in _placed():
+        for url in _placed(countries):
             cs.artifact(raw.cached(SOURCE, url), positioned)
         report: Counter[tuple[str, str]] = Counter()
         shades: defaultdict[UUID, list[tuple[str, date | None, date | None]]] = defaultdict(list)
