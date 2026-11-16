@@ -84,6 +84,10 @@ FIXES = {
     "REPUBLICANO SOCILA CRISTIANO": "Republicano Social Cristiano",
     "TRASNSPARENCIA CARTAGINES": "Transparencia Cartaginés",
     "AUNTENTICO LIMONENSE": "Auténtico Limonense",
+    "UNIDAD SOCIAL CRITIANA": "Unidad Social Cristiana",
+    "HUMANISTA ECOLOGICO BARVENO": "Humanista Ecologista Barveño",
+    "CAMBI0 2000": "Cambio 2000",
+    "FUERZA DEMOCRTACICA": "Fuerza Democrática",
 }
 """Misspelled party names in the workbooks' headers, by the folded header, with the party's name spelled right."""
 
@@ -166,7 +170,11 @@ def read(sheet: str, frame: pl.DataFrame) -> Table | None:
     """Read one results table: the label columns, the header, and the numeric body."""
     caption = heading(frame)
     marker = next(
-        (col for col in range(frame.width) if any(fold(cell(frame, r, col)).startswith("JUNTAS") for r in range(2, 5))),
+        (
+            col
+            for col in range(frame.width)
+            if any(fold(cell(frame, r, col)).removeprefix("TOTAL ").startswith("JUNTAS") for r in range(2, 5))
+        ),
         None,
     )
     if marker is None or marker > 3:
@@ -229,7 +237,12 @@ def measure_of(label: str) -> int | None:
         return INVALID
     if label in ("BLANCOS", "VOTOS BLANCOS", "VOTOS EN BLANCO"):
         return BLANK
-    if not label or label in SKIP or "%" in label or label.startswith(("JUNTAS", "PARTICIPACION", "ABSTENCION")):
+    if (
+        not label
+        or label in SKIP
+        or "%" in label
+        or label.startswith(("JUNTAS", "TOTAL JUNTAS", "PARTICIPACION", "ABSTENCION"))
+    ):
         return 0
     return None
 
@@ -264,8 +277,9 @@ def province_of(name: str) -> int:
     return PROVINCES.index(name) + 1 if name in PROVINCES else 0
 
 
-def tree(table: Table, province: int) -> list[Leaf]:
-    """The leaves of a table whose rows are nested by markers: province, canton, district, then the finest unit."""
+def tree(table: Table, province: int, totals: dict[int, dict[str, float]] | None = None) -> list[Leaf]:
+    """The leaves of a table whose rows are nested by markers: province, canton, district, then the finest unit. The
+    printed row of each canton is added to `totals` by the canton's number."""
     leaves: list[Leaf] = []
     canton: tuple[int, str] | None = None
     district: tuple[int, str] | None = None
@@ -280,6 +294,8 @@ def tree(table: Table, province: int) -> list[Leaf]:
             canton = (int(found[1]) if found[1] else cantons, re.sub(r"^CANT.N:?\s*\d*\s*", "", shown.upper()))
             districts = 0
             district = None
+            if totals is not None:
+                totals[canton[0]] = row.values
         elif not label and canton is not None:
             districts += 1
             district = (districts, "")
@@ -440,9 +456,9 @@ HELD = (
     Held(
         date(2002, 2, 3),
         (WORKBOOK_2002,),
-        {2: ("president", 1), 3: ("assembly", 1)},
+        {2: ("president", 1), 3: ("assembly", 1), 4: ("council", 1)},
         NESTED_LEVEL,
-        {2: (1, 9), 3: (1, 9)},
+        {2: (1, 9), 3: (1, 9), 4: (1, 8)},
     ),
     Held(date(2002, 4, 7), (WORKBOOK_2002,), {2: ("president", 2)}, NESTED_LEVEL, {2: (10, 17)}),
     Held(
@@ -450,8 +466,9 @@ HELD = (
         (
             Workbook("computovotos_febrero2006", r"CAPITULO 2 ELECCIONES PRESIDENCIALES FEBRERO 2006 MENU\.xls"),
             Workbook("computovotos_febrero2006", r"CAPITULO 3 ELECCIONES DIPUTACIONES FEBRERO 2006 MENU\.xls"),
+            Workbook("computovotos_febrero2006", r"CAPITULO 4 ELECCIONES REGIDUR.AS FEBRERO 2006 MENU\.xls"),
         ),
-        {2: ("president", 1), 3: ("assembly", 1)},
+        {2: ("president", 1), 3: ("assembly", 1), 4: ("council", 1)},
         NESTED_LEVEL,
     ),
     Held(
@@ -459,8 +476,9 @@ HELD = (
         (
             Workbook("computovotos_febrero2010", r"1 ComputoVotos_ febrero2010_Presidente\.xlsm"),
             Workbook("computovotos_febrero2010", r"2 ComputoVotos_ febrero2010_Diputados\.xlsm"),
+            Workbook("computovotos_febrero2010", r"3 ComputoVotos_ febrero2010_Regidores\.xlsm"),
         ),
-        {1: ("president", 1), 2: ("assembly", 1)},
+        {1: ("president", 1), 2: ("assembly", 1), 3: ("council", 1)},
         NESTED_LEVEL,
     ),
     Held(date(2014, 2, 2), (NESTED[0],), {1: ("president", 1), 2: ("assembly", 1)}, NESTED_LEVEL),
@@ -502,6 +520,7 @@ ASSEMBLY = key("body", "assembly")
 PRESIDENCY = key("office", "president")
 PRESIDENT_SYSTEM = key("electoral_system", "president")
 ASSEMBLY_SYSTEM = key("electoral_system", "assembly")
+COUNCIL_SYSTEM = key("electoral_system", "council")
 METHOD = (
     "Counted by the Tribunal Supremo de Elecciones, as published in its workbook of the vote count (cómputo de "
     "votos). The registered electorate (electorado), the votes received (ballots cast), the valid votes by party, "
@@ -546,6 +565,17 @@ def places() -> tuple[dict[str, str], dict[str, str], dict[str, str]]:
                     cantons.setdefault(canton, f"Cantón {leaf.canton[0]}")
                     districts.setdefault(district, f"Distrito {leaf.district[0]}")
     return provinces, cantons, districts
+
+
+def council_cantons() -> dict[str, str]:
+    """The name of each canton that elected a municipal council in a national election, by its code."""
+    found: dict[str, str] = {}
+    for held in sorted(HELD, key=lambda h: h.day):
+        for chapter, (family, _) in held.chapters.items():
+            if family == "council":
+                for province, canton, groups in scopes(chosen(held), chapter, family):
+                    found[f"{province}{canton:02d}"] = canton_name(groups)
+    return found
 
 
 def sources(p: Package) -> None:
@@ -610,6 +640,16 @@ SYSTEMS = (
             "to the largest remainders."
         ),
     ),
+    (
+        COUNCIL_SYSTEM,
+        {"formula": "hare"},
+        (
+            "The regidores, the voting members of each canton's municipal council, are elected from closed party "
+            "lists in the canton. Seats go first to each list's whole quotients, then to lists that reach a "
+            "subquotient of half the quotient, and the remainder to the largest remainders. The number of regidores "
+            "depends on the canton. The workbooks do not print it, so it is not stored."
+        ),
+    ),
 )
 
 
@@ -639,6 +679,11 @@ def registry() -> Package:
     p.add("body", id=ASSEMBLY, polity_id=COSTA_RICA, kind="unicameral")
     p.name(ASSEMBLY, "Legislative Assembly of Costa Rica", "en", "official")
     p.name(ASSEMBLY, "Asamblea Legislativa", "es", "native", False)
+    for code, name in sorted(council_cantons().items()):
+        id = council(code)
+        p.add("body", id=id, polity_id=COSTA_RICA, kind="council")
+        p.name(id, f"Municipal council of {name}", "en", "official")
+        p.name(id, f"Concejo Municipal de {name}", "es", "native", False)
     p.add("office", id=PRESIDENCY, polity_id=COSTA_RICA, kind="head_of_state")
     p.name(PRESIDENCY, "President of Costa Rica", "en", "official")
     p.name(PRESIDENCY, "Presidente de la República", "es", "native", False)
@@ -665,6 +710,8 @@ class Chosen:
     tables: list[Table] = field(default_factory=list)
     leaves: dict[tuple[int, int], list[tuple[Table, list[Leaf], str]]] = field(default_factory=dict)
     declared: dict[int, dict[str, dict[str, float]]] = field(default_factory=dict)
+    cantons: dict[tuple[int, int, int], dict[str, float]] = field(default_factory=dict)
+    """The printed row of each canton in a nested table, by chapter, province, and canton number."""
 
 
 def depth(table: Table) -> int:
@@ -699,11 +746,13 @@ def chosen(held: Held) -> Chosen:
                 leaves = centers(table, numbered, province)
                 out.leaves.setdefault((chapter, province), []).append((table, leaves, "cr.centro"))
         elif province and table.labels == 1:
+            totals: dict[int, dict[str, float]] = {}
             try:
-                leaves = tree(table, province)
+                leaves = tree(table, province, totals)
             except ValueError:
                 continue
             if leaves:
+                out.cantons |= {(chapter, province, number_): values for number_, values in totals.items()}
                 out.leaves.setdefault((chapter, province), []).append((table, leaves, "cr.distrito_electoral"))
         elif "EXTRANJERO" in where and "COSTA RICA" not in where:
             if table.labels == 3:
@@ -788,6 +837,73 @@ def over(p: Package, values: pl.DataFrame) -> None:
         )
 
 
+def scopes(found: Chosen, chapter: int, family: str) -> list[tuple[int, int, list[tuple[Table, list[Leaf], str]]]]:
+    """The contests of a chapter: the country's president, a province's list, or a canton's council, each with the
+    tables and leaves that hold it."""
+    if family == "president":
+        return [(0, 0, [item for (ch, _), items in sorted(found.leaves.items()) if ch == chapter for item in items])]
+    out: list[tuple[int, int, list[tuple[Table, list[Leaf], str]]]] = []
+    for province in sorted(pr for (ch, pr) in found.leaves if ch == chapter and pr):
+        groups = found.leaves[(chapter, province)]
+        if family != "council":
+            out.append((province, 0, groups))
+            continue
+        for canton in sorted({leaf.canton[0] for _, leaves, _ in groups for leaf in leaves if leaf.canton}):
+            out.append(
+                (
+                    province,
+                    canton,
+                    [
+                        (table, [leaf for leaf in leaves if leaf.canton and leaf.canton[0] == canton], scheme)
+                        for table, leaves, scheme in groups
+                    ],
+                )
+            )
+    return out
+
+
+def canton_name(groups: list[tuple[Table, list[Leaf], str]]) -> str:
+    return next(title(leaf.canton[1]) for _, leaves, _ in groups for leaf in leaves if leaf.canton and leaf.canton[1])
+
+
+def council(code: str) -> str:
+    return key("body", "council", code)
+
+
+def printed_key(column: str) -> str | None:
+    """The key of a printed column in a province's tally: the party's name, or the number of its accounting measure."""
+    if column.startswith("VOTOS VALIDOS"):
+        return str(VALID)
+    if column in ("VOTOS RECIBIDOS", "TOTAL VOTOS RECIBIDOS"):
+        return str(CAST)
+    measure = measure_of(column)
+    if measure is None:
+        return column
+    return str(measure) if measure else None
+
+
+def compare_provinces(
+    tally: dict[int, Counter[str]], declared_by_scope: dict[str, dict[str, float]]
+) -> dict[str, dict[str, tuple[int, int]]]:
+    """The gaps between the sums of the cantons' councils and the totals printed for each province and the country."""
+    gaps: dict[str, dict[str, tuple[int, int]]] = {}
+    country: Counter[str] = Counter()
+    for counts in tally.values():
+        country.update(counts)
+    for scope_name, counts in [("COSTA RICA", country)] + [
+        (fold(PROVINCE_NAMES[province - 1]), counts) for province, counts in tally.items()
+    ]:
+        found: dict[str, tuple[int, int]] = {}
+        for column, value in declared_by_scope.get(scope_name, {}).items():
+            key_ = printed_key(column)
+            if key_ is None or "JUNTAS" in column:
+                continue
+            if counts[key_] != round(value):
+                found[column] = (counts[key_], round(value))
+        gaps[scope_name] = found
+    return gaps
+
+
 def election(day: date) -> Package:
     helds = [held for held in HELD if held.day == day]
     held = helds[0]
@@ -837,19 +953,13 @@ def election(day: date) -> Package:
     unit_rows: list[dict[str, object]] = []
     values: list[dict[str, object]] = []
     comparison: dict[str, object] = {}
+    by_province: dict[int, Counter[str]] = {province: Counter() for province in range(1, 8)}
     for chapter, (family, round_number) in sorted(held.chapters.items()):
-        provinces = (
-            [0] if family == "president" else sorted(pr for (ch, pr) in chosen_tables.leaves if ch == chapter and pr)
-        )
-        for province in provinces:
-            groups = (
-                [item for (ch, pr), found in sorted(chosen_tables.leaves.items()) if ch == chapter for item in found]
-                if family == "president"
-                else chosen_tables.leaves[(chapter, province)]
-            )
-            rows = f"{family}:{province}"
-            contest = key("contest", day, family, province)
-            result_set = key("result_set", day, family, province)
+        for province, canton, groups in scopes(chosen_tables, chapter, family):
+            ident = f"{province}{canton:02d}" if family == "council" else province
+            rows = f"{family}:{ident}"
+            contest = key("contest", day, family, ident)
+            result_set = key("result_set", day, family, ident)
             if family == "president":
                 p.add(
                     "contest",
@@ -868,6 +978,22 @@ def election(day: date) -> Package:
                 p.name(contest, label, "en", "official")
                 p.name(contest, "Presidente de la República", "es", "native", False)
                 slug = f"{path}/president"
+            elif family == "council":
+                name = canton_name(groups)
+                p.add(
+                    "contest",
+                    id=contest,
+                    election_id=election_id,
+                    kind="list_allocation",
+                    body_id=council(f"{province}{canton:02d}"),
+                    district_area_id=area("cr.canton", f"{province}{canton:02d}"),
+                    round_number=1,
+                    electoral_system_id=COUNCIL_SYSTEM,
+                    default_result_kind="counted",
+                )
+                p.name(contest, f"Municipal council: {name}", "en", "official")
+                p.name(contest, f"Regidurías municipales: {name}", "es", "native", False)
+                slug = f"{path}/municipal-council-{changeset.slug(PROVINCE_NAMES[province - 1])}-{changeset.slug(name)}"
             else:
                 p.add(
                     "contest",
@@ -902,10 +1028,11 @@ def election(day: date) -> Package:
                 "note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=method, lang="en"
             )
             options: dict[str, str] = {}
+            ran = {col for _, leaves, _ in groups for leaf in leaves for col, v in leaf.values.items() if v > 0}
             for table, _, _ in groups:
                 for column, text in zip(table.columns, table.shown, strict=True):
-                    if measure_of(column) is None and column not in options:
-                        option = options[column] = key("option", day, family, province, column)
+                    if measure_of(column) is None and column not in options and (family != "council" or column in ran):
+                        option = options[column] = key("option", day, family, ident, column)
                         p.add(
                             "contest_option",
                             id=option,
@@ -958,10 +1085,15 @@ def election(day: date) -> Package:
                             }
                         )
             printed = chosen_tables.declared.get(chapter, {})
-            scopes = ["COSTA RICA"] if family == "president" else [fold(PROVINCE_NAMES[province - 1])]
+            if family == "council":
+                printed_rows = [chosen_tables.cantons.get((chapter, province, canton), {})]
+            else:
+                printed_rows = [
+                    printed.get("COSTA RICA" if family == "president" else fold(PROVINCE_NAMES[province - 1]), {})
+                ]
             gaps: dict[str, tuple[int, int]] = {}
-            for name in scopes:
-                for column, value in printed.get(name, {}).items():
+            for printed_row in printed_rows:
+                for column, value in printed_row.items():
                     measure = measure_of(column)
                     option_id = None
                     if measure is None:
@@ -984,6 +1116,13 @@ def election(day: date) -> Package:
                 "units": len({v["unit_id"] for v in values if v["result_set_id"] == result_set}),
             }
             comparison[rows + ":total"] = {measure: sums[(None, measure)] for measure in (2, 3, 4, 5, 6)}
+            if family == "council":
+                for column, option in options.items():
+                    by_province[province][column] += sums[(option, 1)]
+                for measure in (2, 3, 4, 5, 6):
+                    by_province[province][str(measure)] += sums[(None, measure)]
+        if family == "council":
+            comparison["council:provinces"] = compare_provinces(by_province, chosen_tables.declared.get(chapter, {}))
     p.frame("reporting_unit", pl.DataFrame(unit_rows, infer_schema_length=None).drop("name"))
     for row in unit_rows:
         p.name(str(row["id"]), str(row["name"]), "es", "official")
