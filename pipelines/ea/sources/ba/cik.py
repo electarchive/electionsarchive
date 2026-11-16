@@ -136,6 +136,14 @@ def station_votes_url(db: str, race: str, station: int) -> str:
     return api(f"race{race}_pollingstations{what}/{db}/{station}/{LANG}")
 
 
+def station_minorities_url(db: str, station: int) -> str:
+    return api(f"race9_pollingstationsnationalminoritiesresult/{db}/{station}/{LANG}")
+
+
+def unit_minorities_url(db: str, unit: int) -> str:
+    return api(f"race9_electoralunitnationalminoritiesresult/{db}/{unit}/{LANG}")
+
+
 def unit_info_url(db: str, race: str, unit: int) -> str:
     return api(f"race{race}_electoralunitbasicinfo/{db}/{unit}" + ("/" if race in SLASHED else ""))
 
@@ -240,6 +248,8 @@ def aggregate_urls(db: str, race: str, t: Tree) -> list[str]:
     for us in t.units.values():
         for u in us:
             urls += [unit_info_url(db, race, u["electoralUnitId"]), unit_votes_url(db, race, u["electoralUnitId"])]
+            if race == "9":
+                urls += [unit_minorities_url(db, u["electoralUnitId"])]
     return list(dict.fromkeys(urls))
 
 
@@ -263,7 +273,8 @@ def members(db: str, t: Tree, *, fetching: bool) -> dict[int, list[dict[str, Any
 
 def station_urls(db: str, race: str, t: Tree) -> list[str]:
     ids = sorted({s["pollingStationId"] for ss in t.stations.values() for s in ss})
-    return [url for i in ids for url in (station_info_url(db, race, i), station_votes_url(db, race, i))]
+    urls = [url for i in ids for url in (station_info_url(db, race, i), station_votes_url(db, race, i))]
+    return urls + ([station_minorities_url(db, i) for i in ids] if race == "9" else [])
 
 
 def fetch(only: str | None = None) -> None:
@@ -302,6 +313,7 @@ class Option:
     channels: dict[int, int]  # channel code to votes counted centrally
     seats: int | None = None
     elected: bool = False
+    minority: bool = False  # a candidate for a council seat reserved for national minorities
 
 
 @dataclass
@@ -322,13 +334,13 @@ def label(row: dict[str, Any]) -> str:
     return " ".join(str(row["name"]).split())
 
 
-def _options(rows: Any, *, candidates: bool) -> list[Option]:
+def _options(rows: Any, *, candidates: bool, compensated: bool = True) -> list[Option]:
     out = []
     for row in _list(rows):
         channels = {code: int(row[field]) for field, code, _ in CHANNELS if row.get(field)}
         seats = row.get("regularMandates")
         if seats is not None:
-            seats += row.get("compensationMandates") or 0
+            seats += (row.get("compensationMandates") or 0) if compensated else 0
         else:
             seats = row.get("mandates") if row.get("mandates") is not None else row.get("totalMandates")
         out.append(
@@ -407,7 +419,14 @@ def contests(r: Results) -> list[Contest]:
         elif race in {"8", "9"}:
             for u in t.units.get(None, []):
                 i = u["electoralUnitId"]
+                info = maybe(unit_info_url(db, race, i)) or {}
+                if not info.get("processedPollingStations"):
+                    continue  # no results certified here, as in Stolac's annulled 2016 election
                 options = _options(maybe(unit_votes_url(db, race, i)), candidates=race == "8")
+                if race == "9":
+                    for o in _options(maybe(unit_minorities_url(db, i)), candidates=True):
+                        o.minority = True
+                        options.append(o)
                 out.append(
                     Contest(
                         race,
@@ -417,7 +436,7 @@ def contests(r: Results) -> list[Contest]:
                         if str(u["code"]).strip() in MOSTAR_UNITS
                         else ("ba.municipality", str(u["code"]).strip()),
                         options,
-                        maybe(unit_info_url(db, race, i)) or {},
+                        info,
                         _stations(t, [u]),
                         _munis([u]),
                         magnitude=1 if race == "8" else None,
@@ -434,7 +453,7 @@ def contests(r: Results) -> list[Contest]:
                             f"{race}:{i}",
                             label(parent),
                             ("ba.constituency", f"{race}:{parent['code']}"),
-                            _options(maybe(parent_votes_url(db, race, i)), candidates=False),
+                            _options(maybe(parent_votes_url(db, race, i)), candidates=False, compensated=race != "2"),
                             maybe(parent_info_url(db, race, i)) or {},
                             _stations(t, units),
                             _munis(units),
@@ -737,6 +756,11 @@ ACCOUNTING = (
 )
 
 
+def words(text: str) -> frozenset[str]:
+    """A candidate's name as a set of words, since station files print surname first and district files last."""
+    return frozenset(candidate(text)[0].split())
+
+
 def candidate(text: str) -> tuple[str, str | None]:
     """A candidate's name and the party printed after it ("NAME - PARTY")."""
     name, _, rest = text.partition(" - ")
@@ -806,11 +830,12 @@ def election(r: Results, report: Report) -> Package:
         return id
 
     seen_slugs: set[str] = set()
+    over: list[str] = []
     for c in everything()[r.id]:
         contest = key("contest", r.slug, c.key)
         result_set = key("result_set", r.slug, c.key)
         en, bs = contest_name(r, c)
-        seats = sum(o.seats or 0 for o in c.options)
+        seats = sum(o.seats or 0 for o in c.options) + sum(o.elected for o in c.options if o.minority)
         magnitude = c.magnitude if c.race in CANDIDATE_RACES else seats
         district = c.district[1] if c.district else None
         p.add(
@@ -853,7 +878,7 @@ def election(r: Results, report: Report) -> Package:
             if o.label in options:
                 raise ValueError(f"{r.slug} {c.key}: {o.label} is listed twice")
             options[o.label] = option
-            if c.race in CANDIDATE_RACES:
+            if c.race in CANDIDATE_RACES or o.minority:
                 name, _ = candidate(o.label)
                 p.add(
                     "contest_option",
@@ -864,7 +889,7 @@ def election(r: Results, report: Report) -> Package:
                     ballot_position=position,
                     ballot_label=o.label,
                 )
-                person = key("person", c.race, district if c.race == "8" else "", name)
+                person = key("person", c.race, district if c.race in {"8", "9"} else "", name)
                 p.add("person", id=person)
                 p.name(person, title(name), "bs", "official")
                 p.add(
@@ -878,7 +903,13 @@ def election(r: Results, report: Report) -> Package:
                     is_independent=None,
                 )
                 if o.elected:
-                    p.add("outcome", result_set_id=result_set, option_id=option, kind="elected")
+                    p.add(
+                        "outcome",
+                        result_set_id=result_set,
+                        option_id=option,
+                        kind="elected",
+                        seats=1 if o.minority else None,
+                    )
             else:
                 p.add(
                     "contest_option",
@@ -903,6 +934,9 @@ def election(r: Results, report: Report) -> Package:
                 if measure != REGISTERED:
                     values.add(result_set, id, None, measure, c.info.get(field_name))
             continue
+        named = {words(o.label): o.label for o in c.options if o.minority}
+        codes = Counter(o.code for o in c.options if o.code)
+        by_code = {o.code: o.label for o in c.options if o.code and codes[o.code] == 1 and not o.minority}
         summed: Counter[str] = Counter()
         accounting: Counter[int] = Counter()
         for station, code, municipality in c.stations:
@@ -913,12 +947,25 @@ def election(r: Results, report: Report) -> Package:
             if not isinstance(info, dict):
                 report.problems.append(f"{r.slug} {c.key}: station {code} has no accounting file")
                 continue
+            if int(info.get("totalVotes") or 0) > int(info.get("numberOfVoters") or 0):
+                over.append(f"{code} ({en}: {info.get('totalVotes')} ballots, {info.get('numberOfVoters')} registered)")
             for measure, field_name in ACCOUNTING:
                 if info.get(field_name) is not None:
                     values.add(result_set, id, None, measure, info[field_name])
                     accounting[measure] += int(info[field_name])
+            if c.race == "9":
+                minorities_url = station_minorities_url(db, station)
+                files.add(minorities_url)
+                rows = [
+                    *_list(rows),
+                    *(dict(row, name=named.get(words(label(row)), label(row))) for row in _list(maybe(minorities_url))),
+                ]
             for row in _list(rows):
                 text = label(row)
+                if text not in options and row.get("code") and str(row["code"]).strip() in by_code:
+                    text = by_code[str(row["code"]).strip()]
+                if text not in options and not row.get("totalVotes"):
+                    continue
                 if text not in options:
                     report.problems.append(f"{r.slug} {c.key}: station {code} names {text}, not on the district list")
                     continue
@@ -938,6 +985,16 @@ def election(r: Results, report: Report) -> Package:
         if rest.get(VALID):
             report.problems.append(f"{r.slug} {c.key}: {rest[VALID]} valid votes are in no unit")
         rest.pop(VALID, None)
+        for measure in [m for m, n in rest.items() if n < 0]:
+            report.problems.append(
+                f"{r.slug} {c.key}: the stations' measure {measure} exceeds the district's by {-rest[measure]}"
+            )
+            del rest[measure]
+            p.rows["declared"] = [
+                row
+                for row in p.rows["declared"]
+                if not (row["result_set_id"] == result_set and row["option_id"] is None and row["measure"] == measure)
+            ]
         if any(rest.values()):
             id = unit(f"central:{c.key}", "aggregate", place)
             for measure, n in rest.items():
@@ -957,6 +1014,12 @@ def election(r: Results, report: Report) -> Package:
         else:
             cited.add(artifact.storage_key)
             p.artifact(artifact, SOURCE_ID)
+    if over:
+        p.accept(
+            "accounting.turnout",
+            "The Commission's own polling station results print more ballots cast than registered voters at "
+            + "; ".join(over),
+        )
     frame = values.frame()
     report.values += frame.height
     p.frame("result_value", frame)
