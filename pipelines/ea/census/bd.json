@@ -1,0 +1,1595 @@
+{
+ "polity": "BD",
+ "name": "Bangladesh",
+ "create": {
+  "kind": "sovereign_state",
+  "names": [
+   {
+    "text": "Bangladesh",
+    "lang": "en",
+    "kind": "official"
+   },
+   {
+    "text": "বাংলাদেশ",
+    "lang": "bn",
+    "kind": "native"
+   }
+  ],
+  "slug": "bd",
+  "wikidata": "Q902",
+  "source": "constitution"
+ },
+ "sources": {
+  "constitution": {
+   "title": "The Constitution of the People's Republic of Bangladesh, English text as amended",
+   "publisher": "Legislative and Parliamentary Affairs Division, Ministry of Law, Justice and Parliamentary Affairs (Laws of Bangladesh)",
+   "url": "http://bdlaws.minlaw.gov.bd/act-details-367.html",
+   "kind": "official_body",
+   "note": "Arts. 48 and 50 (President elected by members of Parliament for five years), 59 (local government by elected bodies in every administrative unit), 65 (300 members from single territorial constituencies by direct election, plus 50 seats reserved for women elected by those members by proportional representation through single transferable vote), 72(3) (five-year Parliament), 123 (presidential elections 90 to 60 days before the term ends; general elections within 90 days before or after dissolution), and 142 (amendment)."
+  },
+  "rpo": {
+   "title": "The Representation of the People Order, 1972 (P.O. No. 155 of 1972)",
+   "publisher": "Legislative and Parliamentary Affairs Division, Ministry of Law, Justice and Parliamentary Affairs (Laws of Bangladesh)",
+   "url": "http://bdlaws.minlaw.gov.bd/act-details-424.html",
+   "kind": "official_body",
+   "note": "The election law for Parliament: constituencies, nominations, polling, the count at each polling station, consolidation by the returning officer, and publication of results in the official Gazette."
+  },
+  "rpo2026": {
+   "title": "Representation of the People (Amendment) Act, 2026 (Act No. 3 of 2026)",
+   "publisher": "Legislative and Parliamentary Affairs Division, Ministry of Law, Justice and Parliamentary Affairs (Laws of Bangladesh)",
+   "url": "http://bdlaws.minlaw.gov.bd/act-details-1632.html",
+   "kind": "official_body",
+   "note": "Amends P.O. No. 155 of 1972 with effect from 3 November 2025, the rules under which the 13th parliamentary election was held."
+  },
+  "president_act": {
+   "title": "রাষ্ট্রপতি নির্বাচন আইন, ১৯৯১ (Presidential Election Act, 1991)",
+   "publisher": "Legislative and Parliamentary Affairs Division, Ministry of Law, Justice and Parliamentary Affairs (Laws of Bangladesh)",
+   "url": "http://bdlaws.minlaw.gov.bd/act-details-758.html",
+   "kind": "official_body",
+   "note": "The President is elected by members of Parliament under Art. 48; the Chief Election Commissioner is returning officer, and a sole valid nominee is declared elected without a poll."
+  },
+  "referendum_act": {
+   "title": "গণভোট আইন, ১৯৯১ (Referendum Act, 1991)",
+   "publisher": "Legislative and Parliamentary Affairs Division, Ministry of Law, Justice and Parliamentary Affairs (Laws of Bangladesh)",
+   "url": "http://bdlaws.minlaw.gov.bd/act-details-756.html",
+   "kind": "official_body",
+   "note": "Referendums on bills amending the provisions listed in Art. 142(1A), held by the Election Commission."
+  },
+  "referendum_2025": {
+   "title": "গণভোট অধ্যাদেশ, ২০২৫ (Referendum Ordinance, 2025; Ordinance No. 67 of 2025)",
+   "publisher": "Legislative and Parliamentary Affairs Division, Ministry of Law, Justice and Parliamentary Affairs (Laws of Bangladesh)",
+   "url": "http://bdlaws.minlaw.gov.bd/act-details-1580.html",
+   "kind": "official_body",
+   "note": "Referendum on the constitutional reform proposals of the July National Charter 2025, polled on the day and during the hours of the 13th parliamentary election (s. 8); lapsed under Art. 93(2) after the poll."
+  },
+  "women_seats": {
+   "title": "জাতীয় সংসদ (সংরক্ষিত মহিলা আসন) নির্বাচন আইন, ২০০৪ (Jatiya Sangsad Reserved Women's Seats Election Act, 2004)",
+   "publisher": "Legislative and Parliamentary Affairs Division, Ministry of Law, Justice and Parliamentary Affairs (Laws of Bangladesh)",
+   "url": "http://bdlaws.minlaw.gov.bd/act-details-922.html",
+   "kind": "official_body",
+   "note": "Allocates the reserved women's seats to parties and alliances in proportion to their general seats and has the members of Parliament elect them."
+  },
+  "delimitation": {
+   "title": "জাতীয় সংসদের নির্বাচনি এলাকার সীমানা নির্ধারণ আইন, ২০২১ (Delimitation of Parliamentary Constituencies Act, 2021)",
+   "publisher": "Legislative and Parliamentary Affairs Division, Ministry of Law, Justice and Parliamentary Affairs (Laws of Bangladesh)",
+   "url": "http://bdlaws.minlaw.gov.bd/act-details-1379.html",
+   "kind": "official_body",
+   "note": "The Election Commission delimits the 300 constituencies from the latest census, by administrative units, and publishes the list in the official Gazette."
+  },
+  "up_act": {
+   "title": "স্থানীয় সরকার (ইউনিয়ন পরিষদ) আইন, ২০০৯ (Local Government (Union Parishad) Act, 2009; Act No. 61 of 2009)",
+   "publisher": "Legislative and Parliamentary Affairs Division, Ministry of Law, Justice and Parliamentary Affairs (Laws of Bangladesh)",
+   "url": "http://bdlaws.minlaw.gov.bd/act-details-1027.html",
+   "kind": "official_body",
+   "note": "s. 10(1): a union parishad of one chairman and 12 members, 9 for general seats (one per ward) and 3 for seats reserved for women; directly elected for five years."
+  },
+  "up_2026": {
+   "title": "স্থানীয় সরকার (ইউনিয়ন পরিষদ) (সংশোধন) আইন, ২০২৬ (Act No. 44 of 2026)",
+   "publisher": "Legislative and Parliamentary Affairs Division, Ministry of Law, Justice and Parliamentary Affairs (Laws of Bangladesh)",
+   "url": "http://bdlaws.minlaw.gov.bd/act-details-1673.html",
+   "kind": "official_body",
+   "note": "Amends the Union Parishad Act with effect from 1 September 2025."
+  },
+  "upazila_act": {
+   "title": "উপজেলা পরিষদ আইন, ১৯৯৮ (Upazila Parishad Act, 1998; Act No. 24 of 1998)",
+   "publisher": "Legislative and Parliamentary Affairs Division, Ministry of Law, Justice and Parliamentary Affairs (Laws of Bangladesh)",
+   "url": "http://bdlaws.minlaw.gov.bd/act-details-827.html",
+   "kind": "official_body",
+   "note": "An upazila parishad of a directly elected chairman and two vice-chairmen (one a woman), with the chairmen of the union parishads and mayors of the pourashavas in the upazila and reserved women members; five-year term."
+  },
+  "pourashava_act": {
+   "title": "স্থানীয় সরকার (পৌরসভা) আইন, ২০০৯ (Local Government (Pourashava) Act, 2009; Act No. 58 of 2009)",
+   "publisher": "Legislative and Parliamentary Affairs Division, Ministry of Law, Justice and Parliamentary Affairs (Laws of Bangladesh)",
+   "url": "http://bdlaws.minlaw.gov.bd/act-details-1024.html",
+   "kind": "official_body",
+   "note": "A pourashava of a directly elected mayor, one councillor per ward, and councillors for seats reserved for women (a third of the wards); five-year term."
+  },
+  "pourashava_2026": {
+   "title": "স্থানীয় সরকার (পৌরসভা) (সংশোধন) আইন, ২০২৬ (Act No. 60 of 2026)",
+   "publisher": "Legislative and Parliamentary Affairs Division, Ministry of Law, Justice and Parliamentary Affairs (Laws of Bangladesh)",
+   "url": "http://bdlaws.minlaw.gov.bd/act-details-1689.html",
+   "kind": "official_body",
+   "note": "Strikes clauses (55ক) and (61ক) of s. 2 and s. 20ক, the definitions and section added for party-nominated candidates, and adds ss. 32ক and 42ক (removal of mayors and councillors and appointment of administrators in special circumstances)."
+  },
+  "cc_act": {
+   "title": "স্থানীয় সরকার (সিটি কর্পোরেশন) আইন, ২০০৯ (Local Government (City Corporation) Act, 2009; Act No. 60 of 2009)",
+   "publisher": "Legislative and Parliamentary Affairs Division, Ministry of Law, Justice and Parliamentary Affairs (Laws of Bangladesh)",
+   "url": "http://bdlaws.minlaw.gov.bd/act-details-1026.html",
+   "kind": "official_body",
+   "note": "s. 5: a city corporation of a mayor, the councillors the government fixes by gazette notification, and seats reserved for women equal to a third of them; s. 6: five years from the first meeting."
+  },
+  "zp_act": {
+   "title": "জেলা পরিষদ আইন, ২০০০ (Zila Parishad Act, 2000; Act No. 19 of 2000)",
+   "publisher": "Legislative and Parliamentary Affairs Division, Ministry of Law, Justice and Parliamentary Affairs (Laws of Bangladesh)",
+   "url": "http://bdlaws.minlaw.gov.bd/act-details-841.html",
+   "kind": "official_body",
+   "note": "s. 4: a chairman, as many members as the district has upazilas, and women members a third of that number, all elected by the electoral college of s. 17 (the elected members of the city corporation, upazila parishads, pourashavas, and union parishads in the district); s. 5: five years from the first meeting."
+  },
+  "hdc_act": {
+   "title": "রাংগামাটি পার্বত্য জেলা পরিষদ আইন, ১৯৮৯ (Rangamati Hill District Council Act, 1989)",
+   "publisher": "Legislative and Parliamentary Affairs Division, Ministry of Law, Justice and Parliamentary Affairs (Laws of Bangladesh)",
+   "url": "http://bdlaws.minlaw.gov.bd/act-details-724.html",
+   "kind": "official_body",
+   "note": "A directly elected hill district council with seats by community; until an election the government forms an interim council of a chairman and 14 nominated members. The Khagrachhari and Bandarban acts of 1989 (Acts 20 and 21) are parallel."
+  },
+  "chtrc_act": {
+   "title": "পার্বত্য চট্টগ্রাম আঞ্চলিক পরিষদ আইন, ১৯৯৮ (Chittagong Hill Tracts Regional Council Act, 1998)",
+   "publisher": "Legislative and Parliamentary Affairs Division, Ministry of Law, Justice and Parliamentary Affairs (Laws of Bangladesh)",
+   "url": "http://bdlaws.minlaw.gov.bd/act-details-822.html",
+   "kind": "official_body",
+   "note": "A regional council over the three hill district councils, its chairman and members elected indirectly by the members of the hill district councils, with an interim council until that election."
+  },
+  "cantonment_act": {
+   "title": "ক্যান্টনমেন্ট আইন, ২০১৮ (Cantonments Act, 2018)",
+   "publisher": "Legislative and Parliamentary Affairs Division, Ministry of Law, Justice and Parliamentary Affairs (Laws of Bangladesh)",
+   "url": "http://bdlaws.minlaw.gov.bd/act-details-1246.html",
+   "kind": "official_body",
+   "note": "Cantonment boards with members elected from the civilian wards of each cantonment alongside ex officio and nominated members."
+  },
+  "gram_sarkar": {
+   "title": "গ্রাম সরকার আইন, ২০০৩ (Gram Sarkar Act, 2003)",
+   "publisher": "Legislative and Parliamentary Affairs Division, Ministry of Law, Justice and Parliamentary Affairs (Laws of Bangladesh)",
+   "url": "http://bdlaws.minlaw.gov.bd/act-details-899.html",
+   "kind": "official_body",
+   "note": "Village governments in each ward of a union, formed at a meeting of the ward's voters rather than by ballot."
+  },
+  "gram_sarkar_repeal": {
+   "title": "গ্রাম সরকার (রহিতকরণ) আইন, ২০০৯ (Gram Sarkar (Repeal) Act, 2009)",
+   "publisher": "Legislative and Parliamentary Affairs Division, Ministry of Law, Justice and Parliamentary Affairs (Laws of Bangladesh)",
+   "url": "http://bdlaws.minlaw.gov.bd/act-details-1041.html",
+   "kind": "official_body",
+   "note": "Repeals the Gram Sarkar Act, 2003."
+  },
+  "portal": {
+   "title": "বাংলাদেশ জাতীয় তথ্য বাতায়ন (National Portal of Bangladesh), home page",
+   "publisher": "Cabinet Division and Aspire to Innovate (a2i), Government of the People's Republic of Bangladesh",
+   "url": "https://bangladesh.gov.bd/",
+   "kind": "official_body",
+   "note": "The government's field-administration directory: links headed \"৮ বিভাগ\", \"৬৪ জেলা\", and \"৫০২ উপজেলা\", read on 2026-11-16. The Cabinet Division's page on divisions, districts, and upazilas points to these lists."
+  },
+  "portal_unions": {
+   "title": "ইউনিয়নসমূহ (Unions), National Portal of Bangladesh",
+   "publisher": "Cabinet Division and Aspire to Innovate (a2i), Government of the People's Republic of Bangladesh",
+   "url": "https://bangladesh.gov.bd/views/union-list",
+   "kind": "official_body",
+   "note": "The directory of union offices embedded in the page: 4,568 records of office type union_portal (each with its division, district, and upazila), alongside 502 upazila, 64 district, and 8 division records, read on 2026-11-16."
+  },
+  "lgd_achievements": {
+   "title": "অর্জন (Achievements), Local Government Division",
+   "publisher": "Local Government Division, Ministry of Local Government, Rural Development and Co-operatives",
+   "url": "https://lgd.gov.bd/pages/static-pages/69414021c4774958d7b54bad",
+   "kind": "official_body",
+   "note": "Content last updated 7 November 2021: \"বর্তমানে দেশের পৌরসভার সংখ্যা ৩২৮টি\" (the country now has 328 pourashavas) and \"স্থানীয় সরকার বিভাগের আওতাধীন ৬১টি জেলা পরিষদে\" (the 61 zila parishads under the Division); also the five city corporations created since 2009 and the split of Dhaka into North and South."
+  },
+  "portal_parliament": {
+   "title": "জাতীয় সংসদ (Jatiya Sangsad), National Portal of Bangladesh",
+   "publisher": "Cabinet Division and Aspire to Innovate (a2i), Government of the People's Republic of Bangladesh",
+   "url": "https://bangladesh.gov.bd/pages/static-pages/69a55ba386514399668e4e94",
+   "kind": "official_body",
+   "note": "300 members, one per constituency by direct vote; reserved women's seats 15 in the first Parliament, none in the fourth, 30 in the others to the seventh, 45 from 2004, and 50 from the Fifteenth Amendment of 2011."
+  },
+  "ecs": {
+   "title": "Bangladesh Election Commission, results and gazettes",
+   "publisher": "Bangladesh Election Commission Secretariat",
+   "url": "https://www.ecs.gov.bd/",
+   "kind": "official_body",
+   "note": "Administers every election in this census except party contests; publishes notifications, results by polling centre, and gazettes of returned candidates. On 2026-11-16 the site answered every request from this environment with a challenge page (HTTP 403), so nothing here was read from it."
+  }
+ },
+ "tiers": [
+  {
+   "key": "national",
+   "name": "গণপ্রজাতন্ত্রী বাংলাদেশ",
+   "name_en": "People's Republic of Bangladesh",
+   "parent": null,
+   "polity_kind": "sovereign_state",
+   "scheme": "bd.nation",
+   "source": "constitution"
+  },
+  {
+   "key": "division",
+   "name": "বিভাগ",
+   "name_en": "Divisions (administrative only)",
+   "parent": "national",
+   "polity_kind": "region",
+   "scheme": "bd.division",
+   "elects": false,
+   "source": "portal",
+   "counts": [
+    {
+     "date": "2026-11-16",
+     "value": 8,
+     "source": "portal",
+     "locator": "\"৮ বিভাগ\" link to /views/division-list"
+    }
+   ]
+  },
+  {
+   "key": "district",
+   "name": "জেলা",
+   "name_en": "Districts (zila): 61 zila parishads and 3 hill district councils",
+   "parent": "division",
+   "polity_kind": "county",
+   "scheme": "bd.district",
+   "source": "portal",
+   "counts": [
+    {
+     "date": "2026-11-16",
+     "value": 64,
+     "source": "portal",
+     "locator": "\"৬৪ জেলা\" link to /views/district-list"
+    }
+   ]
+  },
+  {
+   "key": "upazila",
+   "name": "উপজেলা",
+   "name_en": "Upazilas (sub-districts)",
+   "parent": "district",
+   "polity_kind": "municipality",
+   "scheme": "bd.upazila",
+   "source": "portal",
+   "counts": [
+    {
+     "date": "2026-11-16",
+     "value": 502,
+     "source": "portal",
+     "locator": "\"৫০২ উপজেলা\" link to /views/upazila-list"
+    }
+   ]
+  },
+  {
+   "key": "union",
+   "name": "ইউনিয়ন",
+   "name_en": "Unions (rural local government)",
+   "parent": "upazila",
+   "polity_kind": "submunicipal",
+   "scheme": "bd.union",
+   "source": "portal_unions",
+   "counts": [
+    {
+     "date": "2026-11-16",
+     "value": 4568,
+     "source": "portal_unions",
+     "locator": "4,568 records with office_type_code \"union_portal\" in the page's union directory"
+    }
+   ]
+  },
+  {
+   "key": "ward",
+   "name": "ওয়ার্ড",
+   "name_en": "Wards of unions, pourashavas, and city corporations",
+   "parent": "union",
+   "polity_kind": "submunicipal",
+   "scheme": "bd.ward",
+   "elects": false,
+   "source": "up_act"
+  },
+  {
+   "key": "pourashava",
+   "name": "পৌরসভা",
+   "name_en": "Pourashavas (municipalities)",
+   "parent": "upazila",
+   "polity_kind": "municipality",
+   "scheme": "bd.pourashava",
+   "source": "pourashava_act",
+   "counts": [
+    {
+     "date": "2021-11-07",
+     "value": 328,
+     "source": "lgd_achievements",
+     "locator": "\"বর্তমানে দেশের পৌরসভার সংখ্যা ৩২৮টি\" (page content last updated 7 November 2021)"
+    }
+   ]
+  },
+  {
+   "key": "city_corporation",
+   "name": "সিটি কর্পোরেশন",
+   "name_en": "City corporations",
+   "parent": "district",
+   "polity_kind": "municipality",
+   "scheme": "bd.city_corporation",
+   "source": "cc_act"
+  },
+  {
+   "key": "cht",
+   "name": "পার্বত্য চট্টগ্রাম",
+   "name_en": "Chittagong Hill Tracts region (Rangamati, Khagrachhari, and Bandarban districts)",
+   "parent": "national",
+   "polity_kind": "region",
+   "scheme": "bd.cht",
+   "source": "chtrc_act"
+  },
+  {
+   "key": "cantonment",
+   "name": "ক্যান্টনমেন্ট",
+   "name_en": "Cantonments (military stations with civilian boards)",
+   "parent": "district",
+   "polity_kind": "special_district",
+   "scheme": "bd.cantonment",
+   "source": "cantonment_act"
+  }
+ ],
+ "classes": [
+  {
+   "key": "jatiya_sangsad",
+   "tier": "national",
+   "name": "জাতীয় সংসদ নির্বাচন",
+   "name_en": "Jatiya Sangsad (Parliament) general elections: the 300 constituency seats",
+   "category": "legislature",
+   "goal": "national",
+   "first_held": "1973-03-07",
+   "earliest_record": "1973-03-07",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "bd.constituency"
+    ],
+    "fine": [
+     "bd.union",
+     "bd.polling_center"
+    ]
+   },
+   "note": "300 single-member territorial constituencies by plurality (Constitution Art. 65(2); RPO 1972). Parliament sits five years from its first meeting unless dissolved (Art. 72(3)), and the general election falls within 90 days before an expiry or after an early dissolution (Art. 123(3)). The Constituent Assembly of 1972 was made of members elected in Pakistan's 1970 elections and held no election of its own.",
+   "source": "constitution",
+   "locator": "http://bdlaws.minlaw.gov.bd/act-details-367.html (Art. 65(2): \"Parliament shall consist of three hundred members to be elected in accordance with law from single territorial constituencies by direct election\")",
+   "est_votes": 76000000,
+   "effort": 3,
+   "finest_note": "Polling centre: the presiding officer's count at each centre is consolidated by the returning officer (RPO 1972), and the Commission posts centre-level result sheets for recent elections; unverified here",
+   "boundary_source": "delimitation",
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "contest_kinds": [
+      "body_seats",
+      "office"
+     ],
+     "iso_pattern": "BD"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "term_years": 5,
+     "called": true,
+     "runoff": "none",
+     "administered_by": "Bangladesh Election Commission",
+     "source": "constitution",
+     "locator": "http://bdlaws.minlaw.gov.bd/act-details-367.html (Art. 72(3): \"Parliament shall stand dissolved on the expiration of the period of five years from the date of its first meeting\"; Art. 123(3))"
+    }
+   ],
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Bangladesh Election Commission (ecs.gov.bd)",
+     "url": "https://www.ecs.gov.bd/",
+     "format": "html, pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "source": "ecs",
+     "evidence": "On 2026-11-16 www.ecs.gov.bd redirected to ecs.gov.bd, which returned a challenge page (HTTP 403) to a scripted request; not bypassed. Result sheets by polling centre and gazettes of returned candidates are what the Commission is known to post, unverified here.",
+     "finest": "bd.polling_center",
+     "first_date": "1973-03-07"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1973-03-07",
+     "election_kind": "general",
+     "note": "First Parliament. Polling day from the Election Commission's schedule; not re-read here because ecs.gov.bd refused this environment."
+    },
+    {
+     "date": "1979-02-18",
+     "election_kind": "general",
+     "note": "Second Parliament. Polling day from the Election Commission's schedule; not re-read here because ecs.gov.bd refused this environment."
+    },
+    {
+     "date": "1986-05-07",
+     "election_kind": "general",
+     "note": "Third Parliament. Polling day from the Election Commission's schedule; not re-read here because ecs.gov.bd refused this environment."
+    },
+    {
+     "date": "1988-03-03",
+     "election_kind": "general",
+     "note": "Fourth Parliament. Polling day from the Election Commission's schedule; not re-read here because ecs.gov.bd refused this environment."
+    },
+    {
+     "date": "1991-02-27",
+     "election_kind": "general",
+     "note": "Fifth Parliament. Polling day from the Election Commission's schedule; not re-read here because ecs.gov.bd refused this environment."
+    },
+    {
+     "date": "1996-02-15",
+     "election_kind": "general",
+     "note": "Sixth Parliament. Polling day from the Election Commission's schedule; not re-read here because ecs.gov.bd refused this environment."
+    },
+    {
+     "date": "1996-06-12",
+     "election_kind": "general",
+     "note": "Seventh Parliament. Polling day from the Election Commission's schedule; not re-read here because ecs.gov.bd refused this environment."
+    },
+    {
+     "date": "2001-10-01",
+     "election_kind": "general",
+     "note": "Eighth Parliament. Polling day from the Election Commission's schedule; not re-read here because ecs.gov.bd refused this environment."
+    },
+    {
+     "date": "2008-12-29",
+     "election_kind": "general",
+     "note": "Ninth Parliament. Polling day from the Election Commission's schedule; not re-read here because ecs.gov.bd refused this environment."
+    },
+    {
+     "date": "2014-01-05",
+     "election_kind": "general",
+     "note": "Tenth Parliament. Polling day from the Election Commission's schedule; not re-read here because ecs.gov.bd refused this environment."
+    },
+    {
+     "date": "2018-12-30",
+     "election_kind": "general",
+     "note": "Eleventh Parliament. Polling day from the Election Commission's schedule; not re-read here because ecs.gov.bd refused this environment."
+    },
+    {
+     "date": "2024-01-07",
+     "election_kind": "general",
+     "note": "Twelfth Parliament. Polling day from the Election Commission's schedule; not re-read here because ecs.gov.bd refused this environment."
+    },
+    {
+     "date": "2026-02-12",
+     "election_kind": "general",
+     "note": "Thirteenth Parliament, polled with the July Charter referendum. Polling day from the Election Commission's schedule; not re-read here because ecs.gov.bd refused this environment."
+    }
+   ]
+  },
+  {
+   "key": "jatiya_sangsad_by",
+   "tier": "national",
+   "name": "জাতীয় সংসদ উপনির্বাচন",
+   "name_en": "Jatiya Sangsad by-elections",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "bd.constituency"
+    ],
+    "fine": [
+     "bd.polling_center"
+    ]
+   },
+   "note": "A constituency seat that falls vacant is filled by a by-election within ninety days (Constitution Art. 123(4)) under the same rules as a general election.",
+   "source": "constitution",
+   "locator": "http://bdlaws.minlaw.gov.bd/act-details-367.html (Art. 123(4))",
+   "est_votes": 300000,
+   "effort": 3,
+   "match": [
+    {
+     "election_kinds": [
+      "by_election"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "contest_kinds": [
+      "body_seats",
+      "office"
+     ],
+     "iso_pattern": "BD"
+    }
+   ],
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Bangladesh Election Commission (ecs.gov.bd)",
+     "url": "https://www.ecs.gov.bd/",
+     "format": "html, pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "source": "ecs",
+     "evidence": "On 2026-11-16 www.ecs.gov.bd redirected to ecs.gov.bd, which returned a challenge page (HTTP 403) to a scripted request; not bypassed. Result sheets by polling centre and gazettes of returned candidates are what the Commission is known to post, unverified here.",
+     "finest": "bd.polling_center"
+    }
+   ]
+  },
+  {
+   "key": "reserved_women",
+   "tier": "national",
+   "name": "জাতীয় সংসদ সংরক্ষিত মহিলা আসন নির্বাচন",
+   "name_en": "Reserved women's seats in Parliament, elected by the members",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "15 seats in the first Parliament, none in the fourth, 30 in the others to the seventh, 45 from 2004, and 50 since the Fifteenth Amendment of 2011, apportioned to parties and alliances by their general seats and elected by the 300 constituency members (Constitution Art. 65(3); Act of 2004). Parties usually file exactly their quota, so most seats are returned unopposed.",
+   "source": "women_seats",
+   "est_votes": 300,
+   "effort": 2,
+   "match": [
+    {
+     "election_kinds": [
+      "indirect"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "contest_kinds": [
+      "body_seats",
+      "list_allocation"
+     ],
+     "iso_pattern": "BD"
+    }
+   ],
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Bangladesh Election Commission (ecs.gov.bd)",
+     "url": "https://www.ecs.gov.bd/",
+     "format": "html, pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "source": "ecs",
+     "evidence": "On 2026-11-16 www.ecs.gov.bd redirected to ecs.gov.bd, which returned a challenge page (HTTP 403) to a scripted request; not bypassed. Result sheets by polling centre and gazettes of returned candidates are what the Commission is known to post, unverified here.",
+     "finest": null
+    }
+   ]
+  },
+  {
+   "key": "president_direct",
+   "tier": "national",
+   "name": "রাষ্ট্রপতি নির্বাচন (প্রত্যক্ষ)",
+   "name_en": "Presidential elections by direct vote, 1978-1986",
+   "category": "executive",
+   "goal": "national",
+   "first_held": "1978-06-03",
+   "valid_from": "1975-01-25",
+   "valid_to": "1991-09-18",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "bd.district"
+    ],
+    "fine": [
+     "bd.constituency",
+     "bd.polling_center"
+    ]
+   },
+   "note": "The Fourth Amendment of 1975 made the presidency directly elected; elections were held on 3 June 1978, 15 November 1981, and 15 October 1986. The Twelfth Amendment, approved at the referendum of 15 September 1991, returned the choice to Parliament (class president_indirect).",
+   "source": "constitution",
+   "locator": "http://bdlaws.minlaw.gov.bd/act-details-367.html (Art. 48(1) and its amendment notes)",
+   "est_votes": 22000000,
+   "effort": 3,
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "special"
+     ],
+     "office_kinds": [
+      "head_of_state"
+     ],
+     "iso_pattern": "BD",
+     "valid_to": "1991-09-18"
+    }
+   ],
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Bangladesh Election Commission (ecs.gov.bd)",
+     "url": "https://www.ecs.gov.bd/",
+     "format": "html, pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "source": "ecs",
+     "evidence": "On 2026-11-16 www.ecs.gov.bd redirected to ecs.gov.bd, which returned a challenge page (HTTP 403) to a scripted request; not bypassed. Result sheets by polling centre and gazettes of returned candidates are what the Commission is known to post, unverified here.",
+     "finest": null,
+     "first_date": "1978-06-03"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1978-06-03",
+     "election_kind": "general",
+     "note": "Polling day from the Election Commission's schedule; not re-read here because ecs.gov.bd refused this environment."
+    },
+    {
+     "date": "1981-11-15",
+     "election_kind": "special",
+     "note": "After the assassination of President Ziaur Rahman. Polling day from the Election Commission's schedule; not re-read here because ecs.gov.bd refused this environment."
+    },
+    {
+     "date": "1986-10-15",
+     "election_kind": "general",
+     "note": "Polling day from the Election Commission's schedule; not re-read here because ecs.gov.bd refused this environment."
+    }
+   ]
+  },
+  {
+   "key": "president_indirect",
+   "tier": "national",
+   "name": "রাষ্ট্রপতি নির্বাচন (সংসদ সদস্যদের দ্বারা)",
+   "name_en": "Presidential elections by the members of Parliament",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "note": "\"There shall be a President of Bangladesh who shall be elected by members of Parliament in accordance with law\" (Art. 48(1)), for five years and at most two terms (Art. 50), between 90 and 60 days before the term ends (Art. 123(1)); also 1972-1975 under the original constitution. A sole valid nominee is declared elected without a vote (Presidential Election Act 1991), as in most elections since 1991.",
+   "source": "constitution",
+   "locator": "http://bdlaws.minlaw.gov.bd/act-details-367.html (Arts. 48(1), 50, and 123(1))",
+   "est_votes": 350,
+   "effort": 1,
+   "match": [
+    {
+     "election_kinds": [
+      "indirect"
+     ],
+     "office_kinds": [
+      "head_of_state"
+     ],
+     "iso_pattern": "BD"
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "term_years": 5,
+     "called": false,
+     "runoff": "none",
+     "administered_by": "Chief Election Commissioner as returning officer",
+     "source": "constitution",
+     "locator": "http://bdlaws.minlaw.gov.bd/act-details-367.html (Art. 123(1): \"within the period of ninety to sixty days prior to the date of expiration of the term\")",
+     "valid_from": "1991-09-18"
+    }
+   ],
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Bangladesh Election Commission (ecs.gov.bd)",
+     "url": "https://www.ecs.gov.bd/",
+     "format": "html, pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "source": "ecs",
+     "evidence": "On 2026-11-16 www.ecs.gov.bd redirected to ecs.gov.bd, which returned a challenge page (HTTP 403) to a scripted request; not bypassed. Result sheets by polling centre and gazettes of returned candidates are what the Commission is known to post, unverified here.",
+     "finest": null
+    }
+   ]
+  },
+  {
+   "key": "referendums",
+   "tier": "national",
+   "name": "গণভোট",
+   "name_en": "National referendums",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "first_held": "1977-05-30",
+   "measure": {
+    "unit": "question",
+    "grain": [
+     "bd.district"
+    ],
+    "fine": [
+     "bd.constituency",
+     "bd.polling_center"
+    ]
+   },
+   "note": "Four held: the confidence votes of 30 May 1977 (President Ziaur Rahman) and 21 March 1985 (President Ershad), the Twelfth Amendment referendum of 15 September 1991 under the Referendum Act 1991, and the July National Charter referendum polled with the 13th parliamentary election under the Referendum Ordinance 2025.",
+   "source": "referendum_act",
+   "est_votes": 70000000,
+   "effort": 3,
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "iso_pattern": "BD"
+    }
+   ],
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Bangladesh Election Commission (ecs.gov.bd)",
+     "url": "https://www.ecs.gov.bd/",
+     "format": "html, pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "source": "ecs",
+     "evidence": "On 2026-11-16 www.ecs.gov.bd redirected to ecs.gov.bd, which returned a challenge page (HTTP 403) to a scripted request; not bypassed. Result sheets by polling centre and gazettes of returned candidates are what the Commission is known to post, unverified here.",
+     "finest": "bd.polling_center",
+     "first_date": "1977-05-30"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1977-05-30",
+     "election_kind": "referendum",
+     "note": "Polling day from the Election Commission's schedule; not re-read here because ecs.gov.bd refused this environment."
+    },
+    {
+     "date": "1985-03-21",
+     "election_kind": "referendum",
+     "note": "Polling day from the Election Commission's schedule; not re-read here because ecs.gov.bd refused this environment."
+    },
+    {
+     "date": "1991-09-15",
+     "election_kind": "referendum",
+     "note": "Polling day from the Election Commission's schedule; not re-read here because ecs.gov.bd refused this environment."
+    },
+    {
+     "date": "2026-02-12",
+     "election_kind": "referendum",
+     "contests": 1,
+     "source": "referendum_2025",
+     "quote": "জাতীয় সংসদ নির্বাচনের ভোট গ্রহণের সময় হইবে গণভোটের ভোট গ্রহণের সময়",
+     "note": "One question on the July National Charter, polled with the 13th parliamentary election."
+    }
+   ]
+  },
+  {
+   "key": "zila_parishad",
+   "tier": "district",
+   "name": "জেলা পরিষদ নির্বাচন",
+   "name_en": "Zila parishads (district councils): chairmen, members, and reserved women members",
+   "category": "indirect",
+   "goal": "subnational",
+   "first_held": "2016-12-28",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "bd.district"
+    ]
+   },
+   "note": "Elected by an electoral college of the district's elected local representatives (Act 2000, ss. 4(2) and 17): a chairman, one member per upazila, and women members a third of that. 61 districts; the three hill districts have hill district councils instead. Elections on 28 December 2016 and 17 October 2022; the parishads were dissolved in August 2024 and run by administrators.",
+   "source": "zp_act",
+   "est_votes": 60000,
+   "effort": 3,
+   "match": [
+    {
+     "election_kinds": [
+      "indirect",
+      "by_election"
+     ],
+     "contest_kinds": [
+      "body_seats",
+      "office"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "polity_kinds": [
+      "county"
+     ],
+     "name_pattern": "Zila Parishad|District Council|জেলা পরিষদ",
+     "within": null
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "term_years": 5,
+     "called": true,
+     "runoff": "none",
+     "administered_by": "Bangladesh Election Commission",
+     "source": "zp_act",
+     "locator": "http://bdlaws.minlaw.gov.bd/act-details-841.html (s. 5: \"পরিষদের মেয়াদ উহার প্রথম সভার তারিখ হইতে পাঁচ বৎসর হইবে\")"
+    }
+   ],
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Bangladesh Election Commission (ecs.gov.bd)",
+     "url": "https://www.ecs.gov.bd/",
+     "format": "html, pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "source": "ecs",
+     "evidence": "On 2026-11-16 www.ecs.gov.bd redirected to ecs.gov.bd, which returned a challenge page (HTTP 403) to a scripted request; not bypassed. Result sheets by polling centre and gazettes of returned candidates are what the Commission is known to post, unverified here.",
+     "finest": null,
+     "first_date": "2016-12-28"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2016-12-28",
+     "election_kind": "indirect",
+     "contests": 61,
+     "source": "lgd_achievements",
+     "quote": "স্থানীয় সরকার বিভাগের আওতাধীন ৬১টি জেলা পরিষদে",
+     "note": "One chairman contest per zila parishad; member and women-member wards not counted. Polling day from the Election Commission's schedule; not re-read here because ecs.gov.bd refused this environment."
+    },
+    {
+     "date": "2022-10-17",
+     "election_kind": "indirect",
+     "note": "Chairmen in 61 parishads, several returned unopposed. Polling day from the Election Commission's schedule; not re-read here because ecs.gov.bd refused this environment."
+    }
+   ]
+  },
+  {
+   "key": "hill_district_council",
+   "tier": "district",
+   "name": "পার্বত্য জেলা পরিষদ নির্বাচন",
+   "name_en": "Hill district councils of Rangamati, Khagrachhari, and Bandarban",
+   "category": "council",
+   "goal": "subnational",
+   "first_held": "1989-06-25",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "bd.district"
+    ]
+   },
+   "note": "Directly elected councils with seats by community (Acts 19, 20, and 21 of 1989). The only election was held on 25 June 1989; since then the government has appointed interim councils.",
+   "source": "hdc_act",
+   "disposition": "blocked",
+   "disposition_reason": "The only election, of 1989, has no official result published online, and no election has been held since; the councils sit as appointed interim councils.",
+   "est_votes": 500000,
+   "effort": 5,
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "by_election",
+      "general"
+     ],
+     "contest_kinds": [
+      "body_seats",
+      "office"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "polity_kinds": [
+      "county"
+     ],
+     "name_pattern": "Hill District Council|পার্বত্য জেলা পরিষদ",
+     "within": null
+    }
+   ]
+  },
+  {
+   "key": "cht_regional_council",
+   "tier": "cht",
+   "name": "পার্বত্য চট্টগ্রাম আঞ্চলিক পরিষদ",
+   "name_en": "Chittagong Hill Tracts Regional Council",
+   "category": "indirect",
+   "goal": "subnational",
+   "valid_from": "1998-05-24",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "chtrc_act",
+   "disposition": "out_of_scope",
+   "disposition_reason": "The Act's indirect election by the hill district councils has never been held; the council has sat as an appointed interim council since 1999, so there is no election to hold.",
+   "match": [
+    {
+     "election_kinds": [
+      "indirect"
+     ],
+     "polity_kinds": [
+      "region"
+     ],
+     "name_pattern": "Regional Council|আঞ্চলিক পরিষদ",
+     "within": null
+    }
+   ]
+  },
+  {
+   "key": "upazila_chairman",
+   "tier": "upazila",
+   "name": "উপজেলা পরিষদ চেয়ারম্যান নির্বাচন",
+   "name_en": "Upazila parishad chairmen",
+   "category": "executive",
+   "goal": "local",
+   "first_held": "1985-05-16",
+   "measure": {
+    "unit": "contest",
+    "schemes": [
+     "bd.upazila"
+    ],
+    "fine": [
+     "bd.union",
+     "bd.polling_center"
+    ],
+    "cycle": true
+   },
+   "note": "Direct plurality election for five years (Upazila Parishad Act 1998, as revived in 2008). Held 1985 and 1990 under the 1982 ordinance until the parishads were abolished in 1991, then 2009, 2014, 2019, and 2024, the last three in phases over several months. The parishads were dissolved in August 2024.",
+   "source": "upazila_act",
+   "est_votes": 30000000,
+   "effort": 3,
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "by_election",
+      "general"
+     ],
+     "contest_kinds": [
+      "office"
+     ],
+     "office_kinds": [
+      "mayor",
+      "other"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ],
+     "name_pattern": "Upazila|উপজেলা.*(Chairman|চেয়ারম্যান)|^(Chairman|চেয়ারম্যান).*Upazila|উপজেলা",
+     "within": null
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "term_years": 5,
+     "called": true,
+     "runoff": "none",
+     "administered_by": "Bangladesh Election Commission",
+     "source": "upazila_act",
+     "locator": "http://bdlaws.minlaw.gov.bd/act-details-827.html (term of five years from the first meeting)",
+     "valid_from": "2009-01-22"
+    }
+   ],
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Bangladesh Election Commission (ecs.gov.bd)",
+     "url": "https://www.ecs.gov.bd/",
+     "format": "html, pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "source": "ecs",
+     "evidence": "On 2026-11-16 www.ecs.gov.bd redirected to ecs.gov.bd, which returned a challenge page (HTTP 403) to a scripted request; not bypassed. Result sheets by polling centre and gazettes of returned candidates are what the Commission is known to post, unverified here.",
+     "finest": "bd.polling_center",
+     "first_date": "2009-01-22"
+    }
+   ]
+  },
+  {
+   "key": "upazila_vice_chairman",
+   "tier": "upazila",
+   "name": "উপজেলা পরিষদ ভাইস চেয়ারম্যান ও মহিলা ভাইস চেয়ারম্যান নির্বাচন",
+   "name_en": "Upazila parishad vice-chairmen and women vice-chairmen",
+   "category": "executive",
+   "goal": "local",
+   "first_held": "2009-01-22",
+   "contests_per_unit": 2,
+   "measure": {
+    "unit": "contest",
+    "schemes": [
+     "bd.upazila"
+    ],
+    "fine": [
+     "bd.union",
+     "bd.polling_center"
+    ],
+    "cycle": true
+   },
+   "note": "Two directly elected vice-chairmen per upazila since 2009, one of them a woman (Upazila Parishad Act 1998).",
+   "source": "upazila_act",
+   "est_votes": 30000000,
+   "effort": 3,
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "by_election",
+      "general"
+     ],
+     "contest_kinds": [
+      "office"
+     ],
+     "office_kinds": [
+      "deputy_mayor",
+      "other"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ],
+     "name_pattern": "Upazila|উপজেলা.*(Vice|ভাইস)",
+     "within": null,
+     "precedence": 1
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "term_years": 5,
+     "called": true,
+     "runoff": "none",
+     "administered_by": "Bangladesh Election Commission",
+     "source": "upazila_act",
+     "locator": "http://bdlaws.minlaw.gov.bd/act-details-827.html (term of five years from the first meeting)",
+     "valid_from": "2009-01-22"
+    }
+   ],
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Bangladesh Election Commission (ecs.gov.bd)",
+     "url": "https://www.ecs.gov.bd/",
+     "format": "html, pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "source": "ecs",
+     "evidence": "On 2026-11-16 www.ecs.gov.bd redirected to ecs.gov.bd, which returned a challenge page (HTTP 403) to a scripted request; not bypassed. Result sheets by polling centre and gazettes of returned candidates are what the Commission is known to post, unverified here.",
+     "finest": "bd.polling_center",
+     "first_date": "2009-01-22"
+    }
+   ]
+  },
+  {
+   "key": "up_chairman",
+   "tier": "union",
+   "name": "ইউনিয়ন পরিষদ চেয়ারম্যান নির্বাচন",
+   "name_en": "Union parishad chairmen",
+   "category": "executive",
+   "goal": "local",
+   "measure": {
+    "unit": "contest",
+    "schemes": [
+     "bd.union"
+    ],
+    "fine": [
+     "bd.ward",
+     "bd.polling_center"
+    ],
+    "cycle": true
+   },
+   "note": "One directly elected chairman per union for five years (Union Parishad Act 2009, s. 10). Rounds held in phases in 1973, 1977, 1983-84, 1988, 1992, 1997, 2003, 2011, 2016, and 2021-22; party symbols were used from 2016 to 2022 under the 2015 amendments.",
+   "source": "up_act",
+   "locator": "http://bdlaws.minlaw.gov.bd/act-details-1027.html (s. 10(1))",
+   "est_votes": 60000000,
+   "effort": 4,
+   "finest_note": "Polling centre; the Commission's union results are posted per upazila office, often as scanned sheets",
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "by_election",
+      "general"
+     ],
+     "contest_kinds": [
+      "office"
+     ],
+     "office_kinds": [
+      "mayor",
+      "other"
+     ],
+     "polity_kinds": [
+      "submunicipal"
+     ],
+     "name_pattern": "Union Parishad|ইউনিয়ন পরিষদ|^(Chairman|চেয়ারম্যান)",
+     "within": null
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "term_years": 5,
+     "called": true,
+     "runoff": "none",
+     "administered_by": "Bangladesh Election Commission",
+     "source": "up_act",
+     "locator": "http://bdlaws.minlaw.gov.bd/act-details-1027.html (five-year term from the first meeting)",
+     "valid_from": "2009-10-15"
+    }
+   ],
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Bangladesh Election Commission (ecs.gov.bd)",
+     "url": "https://www.ecs.gov.bd/",
+     "format": "html, pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "source": "ecs",
+     "evidence": "On 2026-11-16 www.ecs.gov.bd redirected to ecs.gov.bd, which returned a challenge page (HTTP 403) to a scripted request; not bypassed. Result sheets by polling centre and gazettes of returned candidates are what the Commission is known to post, unverified here.",
+     "finest": "bd.polling_center"
+    }
+   ]
+  },
+  {
+   "key": "up_member",
+   "tier": "union",
+   "name": "ইউনিয়ন পরিষদ সাধারণ ও সংরক্ষিত আসনের সদস্য নির্বাচন",
+   "name_en": "Union parishad members: nine ward seats and three reserved women's seats",
+   "category": "council",
+   "goal": "local",
+   "contests_per_unit": 12,
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "bd.ward"
+    ],
+    "fine": [
+     "bd.polling_center"
+    ],
+    "cycle": true
+   },
+   "note": "Nine general members, one per ward, and three women for reserved seats each spanning three wards, all by plurality (Union Parishad Act 2009, s. 10(1)); always non-partisan.",
+   "source": "up_act",
+   "locator": "http://bdlaws.minlaw.gov.bd/act-details-1027.html (s. 10(1): \"১ (এক) জন চেয়ারম্যান ও ১২ (বার) জন সদস্য লইয়া গঠিত হইবে যাহাদের ৯ (নয়) জন সাধারণ আসনের সদস্য ও ৩ (তিন) জন সংরক্ষিত আসনের সদস্য\")",
+   "est_votes": 60000000,
+   "effort": 5,
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "by_election",
+      "general"
+     ],
+     "contest_kinds": [
+      "body_seats"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "polity_kinds": [
+      "submunicipal"
+     ],
+     "name_pattern": "Union Parishad|ইউনিয়ন পরিষদ",
+     "within": null
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "term_years": 5,
+     "called": true,
+     "runoff": "none",
+     "administered_by": "Bangladesh Election Commission",
+     "source": "up_act",
+     "locator": "http://bdlaws.minlaw.gov.bd/act-details-1027.html (five-year term from the first meeting)",
+     "valid_from": "2009-10-15"
+    }
+   ],
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Bangladesh Election Commission (ecs.gov.bd)",
+     "url": "https://www.ecs.gov.bd/",
+     "format": "html, pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "source": "ecs",
+     "evidence": "On 2026-11-16 www.ecs.gov.bd redirected to ecs.gov.bd, which returned a challenge page (HTTP 403) to a scripted request; not bypassed. Result sheets by polling centre and gazettes of returned candidates are what the Commission is known to post, unverified here.",
+     "finest": "bd.polling_center"
+    }
+   ]
+  },
+  {
+   "key": "pourashava_mayor",
+   "tier": "pourashava",
+   "name": "পৌরসভা মেয়র নির্বাচন",
+   "name_en": "Pourashava mayors (chairmen before 2009)",
+   "category": "executive",
+   "goal": "local",
+   "measure": {
+    "unit": "contest",
+    "schemes": [
+     "bd.pourashava"
+    ],
+    "fine": [
+     "bd.ward",
+     "bd.polling_center"
+    ],
+    "cycle": true
+   },
+   "note": "A directly elected mayor for five years (Pourashava Act 2009); chairmen under the Paurashava Ordinance 1977 and earlier. Party nominations ran from the 2015 amendments until Act 60 of 2026 struck them.",
+   "source": "pourashava_act",
+   "est_votes": 7000000,
+   "effort": 3,
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "by_election",
+      "general"
+     ],
+     "contest_kinds": [
+      "office"
+     ],
+     "office_kinds": [
+      "mayor"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ],
+     "name_pattern": "Pourashava|Paurashava|Municipality|পৌরসভা",
+     "within": null
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "term_years": 5,
+     "called": true,
+     "runoff": "none",
+     "administered_by": "Bangladesh Election Commission",
+     "source": "pourashava_act",
+     "locator": "http://bdlaws.minlaw.gov.bd/act-details-1024.html (five-year term from the first meeting)",
+     "valid_from": "2009-10-06"
+    }
+   ],
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Bangladesh Election Commission (ecs.gov.bd)",
+     "url": "https://www.ecs.gov.bd/",
+     "format": "html, pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "source": "ecs",
+     "evidence": "On 2026-11-16 www.ecs.gov.bd redirected to ecs.gov.bd, which returned a challenge page (HTTP 403) to a scripted request; not bypassed. Result sheets by polling centre and gazettes of returned candidates are what the Commission is known to post, unverified here.",
+     "finest": "bd.polling_center"
+    }
+   ]
+  },
+  {
+   "key": "pourashava_councillor",
+   "tier": "pourashava",
+   "name": "পৌরসভা কাউন্সিলর নির্বাচন",
+   "name_en": "Pourashava councillors: ward seats and reserved women's seats",
+   "category": "council",
+   "goal": "local",
+   "contests_per_unit": 12,
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "bd.ward"
+    ],
+    "fine": [
+     "bd.polling_center"
+    ],
+    "cycle": true
+   },
+   "note": "One councillor per ward and reserved women's seats a third of the wards (Pourashava Act 2009); most pourashavas have nine wards and three reserved seats, so 12 contests per unit is a floor.",
+   "source": "pourashava_act",
+   "est_votes": 7000000,
+   "effort": 4,
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "by_election",
+      "general"
+     ],
+     "contest_kinds": [
+      "body_seats"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ],
+     "name_pattern": "Pourashava|Paurashava|Municipality|পৌরসভা",
+     "within": null
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "term_years": 5,
+     "called": true,
+     "runoff": "none",
+     "administered_by": "Bangladesh Election Commission",
+     "source": "pourashava_act",
+     "locator": "http://bdlaws.minlaw.gov.bd/act-details-1024.html (five-year term from the first meeting)",
+     "valid_from": "2009-10-06"
+    }
+   ],
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Bangladesh Election Commission (ecs.gov.bd)",
+     "url": "https://www.ecs.gov.bd/",
+     "format": "html, pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "source": "ecs",
+     "evidence": "On 2026-11-16 www.ecs.gov.bd redirected to ecs.gov.bd, which returned a challenge page (HTTP 403) to a scripted request; not bypassed. Result sheets by polling centre and gazettes of returned candidates are what the Commission is known to post, unverified here.",
+     "finest": "bd.polling_center"
+    }
+   ]
+  },
+  {
+   "key": "cc_mayor",
+   "tier": "city_corporation",
+   "name": "সিটি কর্পোরেশন মেয়র নির্বাচন",
+   "name_en": "City corporation mayors",
+   "category": "executive",
+   "goal": "local",
+   "first_held": "1994-01-30",
+   "measure": {
+    "unit": "contest",
+    "schemes": [
+     "bd.city_corporation"
+    ],
+    "fine": [
+     "bd.ward",
+     "bd.polling_center"
+    ],
+    "cycle": true
+   },
+   "note": "A directly elected mayor for five years (City Corporation Act 2009, ss. 5 and 6). Dhaka, Chattogram, Khulna, and Rajshahi held the first direct mayoral polls in 1994; Barishal and Sylhet followed, then Narayanganj, Cumilla, Rangpur, Gazipur, and Mymensingh, and Dhaka was split into North and South in 2011. No count of corporations from an official register was reachable, so coverage has no unit total.",
+   "source": "cc_act",
+   "locator": "http://bdlaws.minlaw.gov.bd/act-details-1026.html (ss. 5 and 6)",
+   "est_votes": 6000000,
+   "effort": 2,
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "by_election",
+      "general"
+     ],
+     "contest_kinds": [
+      "office"
+     ],
+     "office_kinds": [
+      "mayor"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ],
+     "name_pattern": "City Corporation|সিটি কর্পোরেশন",
+     "within": null
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "term_years": 5,
+     "called": true,
+     "runoff": "none",
+     "administered_by": "Bangladesh Election Commission",
+     "source": "cc_act",
+     "locator": "http://bdlaws.minlaw.gov.bd/act-details-1026.html (s. 6: \"কর্পোরেশনের মেয়াদ উহা গঠিত হইবার পর উহার প্রথম সভা অনুষ্ঠিত হইবার তারিখ হইতে পাঁচ বৎসর হইবে\")",
+     "valid_from": "2009-10-15"
+    }
+   ],
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Bangladesh Election Commission (ecs.gov.bd)",
+     "url": "https://www.ecs.gov.bd/",
+     "format": "html, pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "source": "ecs",
+     "evidence": "On 2026-11-16 www.ecs.gov.bd redirected to ecs.gov.bd, which returned a challenge page (HTTP 403) to a scripted request; not bypassed. Result sheets by polling centre and gazettes of returned candidates are what the Commission is known to post, unverified here.",
+     "finest": "bd.polling_center",
+     "first_date": "1994-01-30"
+    }
+   ]
+  },
+  {
+   "key": "cc_councillor",
+   "tier": "city_corporation",
+   "name": "সিটি কর্পোরেশন কাউন্সিলর নির্বাচন",
+   "name_en": "City corporation councillors: ward seats and reserved women's seats",
+   "category": "council",
+   "goal": "local",
+   "first_held": "1994-01-30",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "bd.ward"
+    ],
+    "fine": [
+     "bd.polling_center"
+    ],
+    "cycle": true
+   },
+   "note": "One councillor per ward, with reserved women's seats a third of the ward seats (City Corporation Act 2009, s. 5(2)).",
+   "source": "cc_act",
+   "locator": "http://bdlaws.minlaw.gov.bd/act-details-1026.html (s. 5(1) and (2))",
+   "est_votes": 6000000,
+   "effort": 3,
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "by_election",
+      "general"
+     ],
+     "contest_kinds": [
+      "body_seats"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "polity_kinds": [
+      "municipality"
+     ],
+     "name_pattern": "City Corporation|সিটি কর্পোরেশন",
+     "within": null
+    }
+   ],
+   "cadence": [
+    {
+     "period_years": 5,
+     "term_years": 5,
+     "called": true,
+     "runoff": "none",
+     "administered_by": "Bangladesh Election Commission",
+     "source": "cc_act",
+     "locator": "http://bdlaws.minlaw.gov.bd/act-details-1026.html (s. 6)",
+     "valid_from": "2009-10-15"
+    }
+   ],
+   "access": [
+    {
+     "role": "administers",
+     "platform": "Bangladesh Election Commission (ecs.gov.bd)",
+     "url": "https://www.ecs.gov.bd/",
+     "format": "html, pdf",
+     "access": "blocked",
+     "checked_at": "2026-11-16",
+     "source": "ecs",
+     "evidence": "On 2026-11-16 www.ecs.gov.bd redirected to ecs.gov.bd, which returned a challenge page (HTTP 403) to a scripted request; not bypassed. Result sheets by polling centre and gazettes of returned candidates are what the Commission is known to post, unverified here.",
+     "finest": "bd.polling_center",
+     "first_date": "1994-01-30"
+    }
+   ]
+  },
+  {
+   "key": "cantonment_board",
+   "tier": "cantonment",
+   "name": "ক্যান্টনমেন্ট বোর্ড নির্বাচন",
+   "name_en": "Elected civilian members of cantonment boards",
+   "category": "special_purpose",
+   "goal": "local",
+   "measure": {
+    "unit": "contest",
+    "grain": [
+     "bd.ward"
+    ]
+   },
+   "note": "Each cantonment board has members elected from its civilian wards (Cantonments Act 2018).",
+   "source": "cantonment_act",
+   "disposition": "blocked",
+   "disposition_reason": "No official publication of cantonment board results or dates was found; the boards' own sites and the Election Commission's were not reachable from this environment.",
+   "est_votes": 200000,
+   "effort": 5,
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "by_election",
+      "general"
+     ],
+     "contest_kinds": [
+      "body_seats",
+      "office"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "polity_kinds": [
+      "special_district"
+     ],
+     "name_pattern": "Cantonment|ক্যান্টনমেন্ট",
+     "within": null
+    }
+   ]
+  },
+  {
+   "key": "gram_sarkar",
+   "tier": "ward",
+   "name": "গ্রাম সরকার",
+   "name_en": "Village governments (gram sarkar), 2003-2009",
+   "category": "council",
+   "goal": "local",
+   "valid_from": "2003-02-27",
+   "valid_to": "2009-04-08",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "gram_sarkar",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Formed at meetings of each ward's voters, not by ballot, and abolished by the Gram Sarkar (Repeal) Act 2009.",
+   "match": [
+    {
+     "election_kinds": [
+      "local"
+     ],
+     "polity_kinds": [
+      "submunicipal"
+     ],
+     "name_pattern": "Gram Sarkar|গ্রাম সরকার",
+     "within": null
+    }
+   ]
+  },
+  {
+   "key": "east_pakistan",
+   "tier": "national",
+   "name": "পূর্ব পাকিস্তান / পূর্ব বাংলা প্রাদেশিক পরিষদ ও পাকিস্তান জাতীয় পরিষদ",
+   "name_en": "Elections in East Bengal and East Pakistan before independence (1954 and 1970)",
+   "category": "legislature",
+   "goal": "national",
+   "valid_to": "1971-03-26",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "constitution",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Held by Pakistan before independence, so they belong to Pakistan's census; the members elected in 1970 formed Bangladesh's Constituent Assembly without a further election.",
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "iso_pattern": "BD",
+     "valid_to": "1971-03-26"
+    }
+   ]
+  },
+  {
+   "key": "primaries",
+   "tier": "national",
+   "name": "দলীয় মনোনয়ন",
+   "name_en": "Party nominations",
+   "category": "nominating",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "rpo",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Parties choose their candidates through their own boards; no state-run nominating contest exists.",
+   "match": [
+    {
+     "election_kinds": [
+      "primary",
+      "caucus"
+     ]
+    }
+   ]
+  },
+  {
+   "key": "non_territorial",
+   "tier": "national",
+   "name": "পেশাজীবী ও ছাত্র সংসদ নির্বাচন",
+   "name_en": "Bar councils, professional bodies, and university student unions",
+   "category": "non_territorial",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "rpo",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Elections of private or institutional electorates run by the bodies themselves, not public elections held by the Election Commission."
+  }
+ ]
+}
