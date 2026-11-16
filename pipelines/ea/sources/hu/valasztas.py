@@ -1665,7 +1665,21 @@ def vtr_parliament(d: Day, year: int) -> None:
 # Registry and geography
 
 
+BUILT: set[date] = set()
+
+
+def _complete(name: str) -> None:
+    """Refuse to write geo or registry from a partial parse: both hold what every day's builders found."""
+    _register()
+    missing = sorted(set(DAYS) - BUILT)
+    if missing:
+        raise RuntimeError(
+            f"{SOURCE}/{name} needs every day built in this process; missing {len(missing)}: {missing[:5]}"
+        )
+
+
 def registry() -> Package:
+    _complete("registry")
     p = Package(
         f"{SOURCE}/registry",
         SOURCE,
@@ -1738,6 +1752,7 @@ def registry() -> Package:
 
 
 def geo() -> Package:
+    _complete("geo")
     p = Package(
         f"{SOURCE}/geo",
         SOURCE,
@@ -1809,6 +1824,7 @@ def build(day: date) -> Day:
     )
     for _, builder in DAYS[day]:
         builder(d)
+    BUILT.add(day)
     return d
 
 
@@ -1824,6 +1840,8 @@ def parse(only: str | None = None) -> None:
             continue
         build(day).write()
         bundle.cache_clear()
+    if only:
+        return
     geo().write()
     registry().write()
 
