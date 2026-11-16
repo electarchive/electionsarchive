@@ -1,0 +1,1371 @@
+{
+ "polity": "EC",
+ "name": "Ecuador",
+ "sources": {
+  "const2008": {
+   "title": "Constitución de la República del Ecuador (Registro Oficial 449, 20 de octubre de 2008), texto actualizado a enero de 2021",
+   "publisher": "Ministerio de Defensa Nacional del Ecuador",
+   "url": "https://www.defensa.gob.ec/wp-content/uploads/downloads/2021/02/Constitucion-de-la-Republica-del-Ecuador_act_ene-2021.pdf",
+   "kind": "official_body"
+  },
+  "codigo": {
+   "title": "Ley Orgánica Electoral y de Organizaciones Políticas, Código de la Democracia (Registro Oficial Suplemento 578, 27 de abril de 2009), texto con reformas al 3 de febrero de 2020",
+   "publisher": "Consejo Nacional para la Igualdad de Género",
+   "url": "https://www.igualdadgenero.gob.ec/wp-content/uploads/2020/02/Ley-Org%C3%A1nica-Electoral-C%C3%B3digo-de-la-Democracia.pdf",
+   "kind": "official_body"
+  },
+  "inec2022": {
+   "title": "Clasificador Geográfico Estadístico 2022 (actualizado al 31 de diciembre de 2021)",
+   "publisher": "Instituto Nacional de Estadística y Censos",
+   "url": "https://www.ecuadorencifras.gob.ec/documentos/web-inec/Cartografia/Clasificador_Geografico/CLASIFICADOR%20GEOGRAFICO_2022.zip",
+   "kind": "official_body"
+  },
+  "inec2025": {
+   "title": "Clasificador Geográfico Estadístico 2025 (actualizado al 31 de diciembre de 2024)",
+   "publisher": "Instituto Nacional de Estadística y Censos",
+   "url": "https://www.ecuadorencifras.gob.ec/documentos/web-inec/Cartografia/Clasificador_Geografico/CLASIFICADOR_GEOGRAFICO_2025.zip",
+   "kind": "official_body"
+  },
+  "mgn2026": {
+   "title": "Marco Geoestadístico Nacional MGN2026 (Tabla 1: resumen de actualizaciones de la DPA)",
+   "publisher": "Instituto Nacional de Estadística y Censos",
+   "url": "https://www.ecuadorencifras.gob.ec/documentos/web-inec/Geografia_Estadistica/Documentos/marco_geoestadistico_2026.pdf",
+   "kind": "official_body"
+  },
+  "cne": {
+   "title": "Resultados electorales",
+   "publisher": "Consejo Nacional Electoral del Ecuador",
+   "url": "https://www.cne.gob.ec/resultados-electorales/",
+   "kind": "official_body"
+  }
+ },
+ "tiers": [
+  {
+   "key": "national",
+   "name": "República del Ecuador",
+   "name_en": "Ecuador",
+   "parent": null,
+   "polity_kind": "sovereign_state",
+   "source": "const2008"
+  },
+  {
+   "key": "exterior",
+   "name": "Circunscripciones especiales del exterior",
+   "name_en": "Overseas constituencies",
+   "parent": "national",
+   "source": "codigo",
+   "counts": [
+    {
+     "date": "2020-02-03",
+     "value": 3,
+     "source": "codigo",
+     "locator": "Art. 150 numeral 3: two members each for Europe, Oceania and Asia; Canada and the United States; and Latin America, the Caribbean and Africa"
+    }
+   ]
+  },
+  {
+   "key": "region",
+   "name": "Región autónoma",
+   "name_en": "Autonomous regions",
+   "parent": "national",
+   "polity_kind": "region",
+   "valid_from": "2008-10-20",
+   "source": "const2008",
+   "counts": [
+    {
+     "date": "2024-12-31",
+     "value": 0,
+     "source": "inec2025",
+     "locator": "CODIFICACIÓN_2025.xlsx lists provinces, cantons and parishes only; no autonomous region has been formed under Constitution art. 244"
+    }
+   ]
+  },
+  {
+   "key": "provincia",
+   "name": "Provincia",
+   "name_en": "Provinces",
+   "parent": "national",
+   "polity_kind": "region",
+   "scheme": "ec.provincia",
+   "source": "const2008",
+   "counts": [
+    {
+     "date": "2021-12-31",
+     "value": 24,
+     "source": "inec2022",
+     "locator": "CODIFICACIÓN_2022.xlsx, sheet PROVINCIAS: 24 provinces (codes 01-24) plus zone 90 in study"
+    },
+    {
+     "date": "2024-12-31",
+     "value": 24,
+     "source": "inec2025",
+     "locator": "CODIFICACIÓN_2025.xlsx, sheet PROVINCIAS: 24 provinces (codes 01-24) plus zone 90 in study"
+    }
+   ]
+  },
+  {
+   "key": "canton",
+   "name": "Cantón y distrito metropolitano",
+   "name_en": "Cantons and metropolitan districts",
+   "parent": "provincia",
+   "polity_kind": "municipality",
+   "scheme": "ec.canton",
+   "source": "const2008",
+   "counts": [
+    {
+     "date": "2021-12-31",
+     "value": 221,
+     "source": "inec2022",
+     "locator": "CODIFICACIÓN_2022.xlsx, sheet CANTONES: 221 cantons in provinces 01-24"
+    },
+    {
+     "date": "2024-12-31",
+     "value": 222,
+     "source": "inec2025",
+     "locator": "CODIFICACIÓN_2025.xlsx, sheet CANTONES: 222 cantons in provinces 01-24, after Sevilla Don Bosco (1413) was created on 29 November 2024"
+    }
+   ]
+  },
+  {
+   "key": "parroquia_rural",
+   "name": "Parroquia rural",
+   "name_en": "Rural parishes",
+   "parent": "canton",
+   "polity_kind": "submunicipal",
+   "scheme": "ec.parroquia",
+   "source": "const2008",
+   "counts": [
+    {
+     "date": "2021-12-31",
+     "value": 821,
+     "source": "inec2022",
+     "locator": "CODIFICACIÓN_2022.xlsx, sheet CODIGOS: 821 rural parishes (codes 51-99) besides the 221 cantonal seats (code 50)"
+    },
+    {
+     "date": "2024-12-31",
+     "value": 825,
+     "source": "inec2025",
+     "locator": "CODIFICACIÓN_2025.xlsx, sheet CODIGOS: 825 rural parishes (codes 51-99) besides the 222 cantonal seats (code 50)"
+    }
+   ]
+  }
+ ],
+ "classes": [
+  {
+   "key": "presidente",
+   "tier": "national",
+   "name": "Presidenta o Presidente y Vicepresidenta o Vicepresidente de la República",
+   "name_en": "President and vice president",
+   "category": "executive",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "ec.provincia",
+     "ec.canton",
+     "ec.parroquia"
+    ]
+   },
+   "source": "const2008",
+   "locator": "https://www.defensa.gob.ec/wp-content/uploads/downloads/2021/02/Constitucion-de-la-Republica-del-Ecuador_act_ene-2021.pdf (Art. 143)",
+   "earliest_record": "1978-07-16",
+   "note": "Joint tickets (binomios) elected in one national constituency that includes voters abroad (Código art. 151). First round won with an absolute majority of valid votes, or with at least 40% and a lead of more than ten points; otherwise a runoff between the top two within 45 days (Constitution art. 143, Código art. 161). The president may dissolve the Assembly once in the first three years, and the Assembly may remove the president; either calls early presidential and legislative elections for the rest of the term (arts. 130, 148), as in 2023. Direct presidential elections go back to the nineteenth century; the series itemized here starts with the 1978-1979 return to civilian rule.",
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "runoff",
+      "special"
+     ],
+     "office_kinds": [
+      "head_of_state"
+     ],
+     "iso_pattern": "EC"
+    }
+   ],
+   "cadence": [
+    {
+     "administered_by": "Consejo Nacional Electoral",
+     "source": "codigo",
+     "locator": "https://www.igualdadgenero.gob.ec/wp-content/uploads/2020/02/Ley-Org%C3%A1nica-Electoral-C%C3%B3digo-de-la-Democracia.pdf (Art. 89: elections every four years for president, the National Assembly and the Andean Parliament, held the same day)",
+     "period_years": 4,
+     "phase": 1,
+     "month": 2,
+     "term_years": 4,
+     "called": true,
+     "runoff": "threshold",
+     "runoff_threshold": 0.5,
+     "runoff_rule": "Absolute majority of valid votes, or at least 40% with a lead of more than ten points; otherwise a runoff of the top two within 45 days",
+     "valid_from": "2008-10-20"
+    }
+   ],
+   "access": [
+    {
+     "platform": "CNE resultados electorales",
+     "url": "https://www.cne.gob.ec/resultados-electorales/",
+     "format": "sav, xlsx, pdf",
+     "access": "browser",
+     "checked_at": "2026-11-16",
+     "first_date": "2021-04-11",
+     "last_date": "2021-04-11",
+     "finest": "ec.parroquia",
+     "source": "cne",
+     "license": "Official publication; reuse terms are not stated",
+     "evidence": "Parish-level SPSS file of the 2021 runoff (Resultados-2021Segunda-vuelta.sav). The site answers automated clients with a bot challenge (HTTP 403), so the files are reached through a browser or an archived copy."
+    }
+   ],
+   "dates": [
+    {
+     "date": "1948-06-06",
+     "through": "1968-06-02",
+     "note": "Direct elections of 1948, 1952, 1956, 1960 and 1968, not yet itemized; nineteenth- and early twentieth-century direct elections not yet researched"
+    },
+    {
+     "date": "1978-07-16"
+    },
+    {
+     "date": "1979-04-29",
+     "election_kind": "runoff"
+    },
+    {
+     "date": "1984-01-29"
+    },
+    {
+     "date": "1984-05-06",
+     "election_kind": "runoff"
+    },
+    {
+     "date": "1988-01-31"
+    },
+    {
+     "date": "1988-05-08",
+     "election_kind": "runoff"
+    },
+    {
+     "date": "1992-05-17"
+    },
+    {
+     "date": "1992-07-05",
+     "election_kind": "runoff"
+    },
+    {
+     "date": "1996-05-19"
+    },
+    {
+     "date": "1996-07-07",
+     "election_kind": "runoff"
+    },
+    {
+     "date": "1998-05-31"
+    },
+    {
+     "date": "1998-07-12",
+     "election_kind": "runoff"
+    },
+    {
+     "date": "2002-10-20"
+    },
+    {
+     "date": "2002-11-24",
+     "election_kind": "runoff"
+    },
+    {
+     "date": "2006-10-15"
+    },
+    {
+     "date": "2006-11-26",
+     "election_kind": "runoff"
+    },
+    {
+     "date": "2009-04-26"
+    },
+    {
+     "date": "2013-02-17"
+    },
+    {
+     "date": "2017-02-19"
+    },
+    {
+     "date": "2017-04-02",
+     "election_kind": "runoff"
+    },
+    {
+     "date": "2021-02-07"
+    },
+    {
+     "date": "2021-04-11",
+     "election_kind": "runoff"
+    },
+    {
+     "date": "2023-08-20",
+     "note": "Early election after the dissolution of the National Assembly under Constitution art. 148, for the rest of the 2021-2025 term"
+    },
+    {
+     "date": "2023-10-15",
+     "election_kind": "runoff"
+    },
+    {
+     "date": "2025-02-09"
+    },
+    {
+     "date": "2025-04-13",
+     "election_kind": "runoff"
+    }
+   ],
+   "est_votes": 170000000,
+   "effort": 2
+  },
+  {
+   "key": "presidente_indirecto",
+   "tier": "national",
+   "name": "Elección del Presidente por el Congreso o una Convención Nacional",
+   "name_en": "President chosen by Congress or a national convention",
+   "category": "indirect",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "const2008",
+   "valid_to": "1979-08-10",
+   "note": "In the republic's first decades, and again whenever a constituent convention or Congress installed a constitutional or interim president during the nineteenth and twentieth centuries, the head of state was chosen by the assembly rather than by popular vote.",
+   "disposition": "blocked",
+   "disposition_reason": "The votes survive only in the minutes of the conventions and congresses; no electoral authority publishes them, and no official series exists to load.",
+   "match": [
+    {
+     "election_kinds": [
+      "indirect"
+     ],
+     "office_kinds": [
+      "head_of_state"
+     ],
+     "iso_pattern": "EC"
+    }
+   ],
+   "est_votes": 3000,
+   "effort": 5
+  },
+  {
+   "key": "asamblea",
+   "tier": "national",
+   "name": "Asamblea Nacional",
+   "name_en": "National Assembly",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "constituency",
+    "fine": [
+     "ec.canton",
+     "ec.parroquia"
+    ]
+   },
+   "source": "codigo",
+   "locator": "https://www.igualdadgenero.gob.ec/wp-content/uploads/2020/02/Ley-Org%C3%A1nica-Electoral-C%C3%B3digo-de-la-Democracia.pdf (Art. 150)",
+   "valid_from": "2008-10-20",
+   "first_held": "2009-04-26",
+   "earliest_record": "2009-04-26",
+   "note": "Unicameral (Constitution art. 118). Fifteen members in a national constituency, two per province or metropolitan district plus one per 200,000 people or fraction over 150,000 (provinces electing eight or more are split into two to four districts), and six for three overseas constituencies (Código art. 150); 151 seats in 2025. Closed lists with seats by the Webster method (divisors 1, 3, 5, 7) since the 2020 reform (Código arts. 160, 164); before it voters could choose candidates across lists.",
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "special"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "EC",
+     "valid_from": "2008-10-20"
+    }
+   ],
+   "cadence": [
+    {
+     "administered_by": "Consejo Nacional Electoral",
+     "source": "codigo",
+     "locator": "https://www.igualdadgenero.gob.ec/wp-content/uploads/2020/02/Ley-Org%C3%A1nica-Electoral-C%C3%B3digo-de-la-Democracia.pdf (Art. 89: elections every four years for president, the National Assembly and the Andean Parliament, held the same day)",
+     "period_years": 4,
+     "phase": 1,
+     "month": 2,
+     "term_years": 4,
+     "called": true,
+     "valid_from": "2008-10-20"
+    }
+   ],
+   "access": [
+    {
+     "platform": "CNE resultados electorales",
+     "url": "https://www.cne.gob.ec/resultados-electorales/",
+     "format": "sav, xlsx, pdf",
+     "access": "browser",
+     "checked_at": "2026-11-16",
+     "source": "cne",
+     "license": "Official publication; reuse terms are not stated",
+     "evidence": "Results pages and downloadable files by election; no assembly file was reached from this session. The site answers automated clients with a bot challenge (HTTP 403), so the files are reached through a browser or an archived copy."
+    }
+   ],
+   "dates": [
+    {
+     "date": "2009-04-26"
+    },
+    {
+     "date": "2013-02-17"
+    },
+    {
+     "date": "2017-02-19"
+    },
+    {
+     "date": "2021-02-07"
+    },
+    {
+     "date": "2023-08-20",
+     "note": "Early election after the dissolution of the Assembly under Constitution art. 148, for the rest of the 2021-2025 term"
+    },
+    {
+     "date": "2025-02-09"
+    }
+   ],
+   "est_votes": 120000000,
+   "effort": 3
+  },
+  {
+   "key": "congreso_nacional",
+   "tier": "national",
+   "name": "Congreso Nacional (Cámara Nacional de Representantes)",
+   "name_en": "National Congress, 1979-2008",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "constituency"
+   },
+   "source": "const2008",
+   "valid_from": "1979-01-01",
+   "valid_to": "2008-10-20",
+   "first_held": "1979-04-29",
+   "note": "Unicameral congress of national and provincial deputies under the 1978 and 1998 constitutions; provincial deputies were renewed at mid-term (1986, 1990, 1994) until 1998. Suspended in November 2007 by the Constituent Assembly and replaced by the National Assembly in 2009.",
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "body_kinds": [
+      "unicameral"
+     ],
+     "iso_pattern": "EC",
+     "valid_from": "1979-01-01",
+     "valid_to": "2008-10-20"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1979-04-29",
+     "note": "Cámara Nacional de Representantes, elected with the presidential runoff"
+    },
+    {
+     "date": "1984-01-29"
+    },
+    {
+     "date": "1986-06-01",
+     "note": "Mid-term renewal of the provincial deputies"
+    },
+    {
+     "date": "1988-01-31"
+    },
+    {
+     "date": "1990-06-17",
+     "note": "Mid-term renewal of the provincial deputies"
+    },
+    {
+     "date": "1992-05-17"
+    },
+    {
+     "date": "1994-05-01",
+     "note": "Mid-term renewal of the provincial deputies"
+    },
+    {
+     "date": "1996-05-19"
+    },
+    {
+     "date": "1998-05-31"
+    },
+    {
+     "date": "2002-10-20"
+    },
+    {
+     "date": "2006-10-15"
+    }
+   ],
+   "est_votes": 60000000,
+   "effort": 4
+  },
+  {
+   "key": "congreso_bicameral",
+   "tier": "national",
+   "name": "Congreso (Senado y Cámara de Diputados)",
+   "name_en": "Congress (Senate and Chamber of Deputies), before 1972",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "constituency"
+   },
+   "source": "const2008",
+   "valid_to": "1972-02-15",
+   "note": "Congresses elected under the constitutions of 1830-1967, bicameral for most of the period with functional senators; the last sat until the 1970 self-coup and the 1972 military government.",
+   "disposition": "blocked",
+   "disposition_reason": "No electoral authority publishes results for congressional elections before 1978; they survive in provincial returns, congressional records and the press.",
+   "match": [
+    {
+     "election_kinds": [
+      "general",
+      "by_election"
+     ],
+     "body_kinds": [
+      "lower_house",
+      "upper_house"
+     ],
+     "iso_pattern": "EC"
+    }
+   ],
+   "est_votes": 10000000,
+   "effort": 5
+  },
+  {
+   "key": "constituyente",
+   "tier": "national",
+   "name": "Asamblea Constituyente",
+   "name_en": "Constituent assemblies",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "constituency"
+   },
+   "source": "const2008",
+   "valid_to": "2008-10-20",
+   "first_held": "1997-11-30",
+   "note": "The National Constituent Assembly of 1997 (70 members) and the Constituent Assembly of 2007 (130 members: 24 national, 100 provincial and 6 abroad), convened by the referendums of 1997 and 15 April 2007. Earlier conventions (1830-1967) are not itemized. A constituent assembly was proposed again in the referendum of 16 November 2025 and rejected.",
+   "match": [
+    {
+     "body_kinds": [
+      "constituent_assembly"
+     ],
+     "iso_pattern": "EC"
+    }
+   ],
+   "dates": [
+    {
+     "date": "1997-11-30"
+    },
+    {
+     "date": "2007-09-30"
+    }
+   ],
+   "est_votes": 12000000,
+   "effort": 3
+  },
+  {
+   "key": "parlamento_andino",
+   "tier": "national",
+   "name": "Representantes ante el Parlamento Andino",
+   "name_en": "Andean Parliament",
+   "category": "legislature",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "ec.provincia",
+     "ec.canton",
+     "ec.parroquia"
+    ]
+   },
+   "source": "codigo",
+   "locator": "https://www.igualdadgenero.gob.ec/wp-content/uploads/2020/02/Ley-Org%C3%A1nica-Electoral-C%C3%B3digo-de-la-Democracia.pdf (Art. 151: five members and five substitutes in one national constituency that includes voters abroad)",
+   "first_held": "2002-10-20",
+   "note": "Five representatives by list PR in one national constituency, elected with the president and the Assembly (Código arts. 89, 151, 160).",
+   "match": [
+    {
+     "election_kinds": [
+      "general"
+     ],
+     "name_pattern": "(Andean Parliament|Parlamento Andino)"
+    }
+   ],
+   "cadence": [
+    {
+     "administered_by": "Consejo Nacional Electoral",
+     "source": "codigo",
+     "locator": "https://www.igualdadgenero.gob.ec/wp-content/uploads/2020/02/Ley-Org%C3%A1nica-Electoral-C%C3%B3digo-de-la-Democracia.pdf (Art. 89: elections every four years for president, the National Assembly and the Andean Parliament, held the same day)",
+     "period_years": 4,
+     "phase": 1,
+     "month": 2,
+     "term_years": 4,
+     "called": false,
+     "valid_from": "2008-10-20"
+    }
+   ],
+   "dates": [
+    {
+     "date": "2002-10-20"
+    },
+    {
+     "date": "2006-10-15"
+    },
+    {
+     "date": "2009-04-26"
+    },
+    {
+     "date": "2013-02-17"
+    },
+    {
+     "date": "2017-02-19"
+    },
+    {
+     "date": "2021-02-07"
+    },
+    {
+     "date": "2025-02-09"
+    }
+   ],
+   "est_votes": 55000000,
+   "effort": 2
+  },
+  {
+   "key": "cpccs",
+   "tier": "national",
+   "name": "Consejeras y consejeros del Consejo de Participación Ciudadana y Control Social",
+   "name_en": "Council for Citizen Participation and Social Control",
+   "category": "special_purpose",
+   "goal": "national",
+   "measure": {
+    "unit": "contest",
+    "fine": [
+     "ec.provincia",
+     "ec.canton",
+     "ec.parroquia"
+    ]
+   },
+   "source": "const2008",
+   "locator": "https://www.defensa.gob.ec/wp-content/uploads/downloads/2021/02/Constitucion-de-la-Republica-del-Ecuador_act_ene-2021.pdf (Art. 207, as amended by the referendum of 4 February 2018: seven members by universal, direct and secret vote every four years, with the local elections)",
+   "valid_from": "2018-02-14",
+   "first_held": "2019-03-24",
+   "note": "Seven councillors with seven substitutes on one national ballot, candidates barred from party membership in the previous five years, held with the local elections (art. 207). Before 2019 the council was chosen by merit contest.",
+   "match": [
+    {
+     "name_pattern": "(Consejo de Participaci|CPCCS|Citizen Participation)"
+    }
+   ],
+   "cadence": [
+    {
+     "administered_by": "Consejo Nacional Electoral",
+     "source": "const2008",
+     "locator": "https://www.defensa.gob.ec/wp-content/uploads/downloads/2021/02/Constitucion-de-la-Republica-del-Ecuador_act_ene-2021.pdf (Art. 207)",
+     "period_years": 4,
+     "phase": 3,
+     "month": 2,
+     "term_years": 4,
+     "called": false,
+     "partisan": false,
+     "valid_from": "2018-02-14"
+    }
+   ],
+   "access": [
+    {
+     "platform": "CNE resultados electorales",
+     "url": "https://www.cne.gob.ec/resultados-electorales/",
+     "format": "sav, xlsx, pdf",
+     "access": "browser",
+     "checked_at": "2026-11-16",
+     "source": "cne",
+     "license": "Official publication; reuse terms are not stated",
+     "evidence": "Results pages for the 2019 and 2023 councils; no file was reached from this session. The site answers automated clients with a bot challenge (HTTP 403), so the files are reached through a browser or an archived copy."
+    }
+   ],
+   "dates": [
+    {
+     "date": "2019-03-24"
+    },
+    {
+     "date": "2023-02-05"
+    }
+   ],
+   "est_votes": 20000000,
+   "effort": 2
+  },
+  {
+   "key": "consulta_nacional",
+   "tier": "national",
+   "name": "Referéndum y consulta popular nacional",
+   "name_en": "National referendums and popular consultations",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "question",
+    "fine": [
+     "ec.provincia",
+     "ec.canton",
+     "ec.parroquia"
+    ]
+   },
+   "source": "const2008",
+   "locator": "https://www.defensa.gob.ec/wp-content/uploads/downloads/2021/02/Constitucion-de-la-Republica-del-Ecuador_act_ene-2021.pdf (Arts. 104, 106: called by the president, the Assembly or citizen initiative; held within 60 days of the call; approved by an absolute majority of valid votes)",
+   "first_held": "1978-01-15",
+   "note": "Each ballot carries several questions (eleven in 2024). Approved questions bind at once (art. 106); constitutional amendments go by referendum (arts. 441-444).",
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "contest_kinds": [
+      "ballot_question"
+     ],
+     "iso_pattern": "EC"
+    }
+   ],
+   "cadence": [
+    {
+     "administered_by": "Consejo Nacional Electoral",
+     "source": "const2008",
+     "locator": "https://www.defensa.gob.ec/wp-content/uploads/downloads/2021/02/Constitucion-de-la-Republica-del-Ecuador_act_ene-2021.pdf (Art. 106)",
+     "called": true
+    }
+   ],
+   "access": [
+    {
+     "platform": "CNE resultados electorales",
+     "url": "https://www.cne.gob.ec/resultados-electorales/",
+     "format": "sav, xlsx, pdf",
+     "access": "browser",
+     "checked_at": "2026-11-16",
+     "source": "cne",
+     "license": "Official publication; reuse terms are not stated",
+     "evidence": "Results pages for each referendum; no file was reached from this session. The site answers automated clients with a bot challenge (HTTP 403), so the files are reached through a browser or an archived copy."
+    }
+   ],
+   "dates": [
+    {
+     "date": "1978-01-15",
+     "note": "Choice between two constitutional drafts"
+    },
+    {
+     "date": "1986-06-01",
+     "note": "Independent candidacies"
+    },
+    {
+     "date": "1994-08-28"
+    },
+    {
+     "date": "1995-11-26"
+    },
+    {
+     "date": "1997-05-25"
+    },
+    {
+     "date": "2006-11-26",
+     "note": "Three questions, held with the presidential runoff"
+    },
+    {
+     "date": "2007-04-15",
+     "note": "Convening of the Constituent Assembly"
+    },
+    {
+     "date": "2008-09-28",
+     "note": "Approval of the 2008 Constitution"
+    },
+    {
+     "date": "2011-05-07"
+    },
+    {
+     "date": "2017-02-19",
+     "note": "Public officials' assets in tax havens"
+    },
+    {
+     "date": "2018-02-04"
+    },
+    {
+     "date": "2023-02-05"
+    },
+    {
+     "date": "2023-08-20",
+     "note": "Oil extraction in block 43 (Yasuní ITT)"
+    },
+    {
+     "date": "2024-04-21"
+    },
+    {
+     "date": "2025-11-16",
+     "note": "Four questions, among them a constituent assembly and foreign military bases"
+    }
+   ],
+   "est_votes": 700000000,
+   "effort": 2
+  },
+  {
+   "key": "revocatoria",
+   "tier": "national",
+   "name": "Revocatoria del mandato",
+   "name_en": "Recall votes",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "question"
+   },
+   "source": "const2008",
+   "locator": "https://www.defensa.gob.ec/wp-content/uploads/downloads/2021/02/Constitucion-de-la-Republica-del-Ecuador_act_ene-2021.pdf (Arts. 105, 106: any elected authority, after the first and before the last year of the term; absolute majority of valid votes, or of voters for the president)",
+   "valid_from": "2008-10-20",
+   "note": "Recall of any elected authority on a petition of 10% of the electorate (15% for the president), voted in the authority's constituency; the Código sets the procedure (arts. 199-202). Held for local authorities in scattered votes; none has reached a president.",
+   "match": [
+    {
+     "election_kinds": [
+      "recall"
+     ],
+     "iso_pattern": "EC*"
+    },
+    {
+     "election_kinds": [
+      "recall"
+     ],
+     "polity_kinds": [
+      "region",
+      "municipality",
+      "submunicipal"
+     ]
+    }
+   ],
+   "cadence": [
+    {
+     "administered_by": "Consejo Nacional Electoral",
+     "source": "codigo",
+     "locator": "https://www.igualdadgenero.gob.ec/wp-content/uploads/2020/02/Ley-Org%C3%A1nica-Electoral-C%C3%B3digo-de-la-Democracia.pdf (Arts. 199-202)",
+     "called": true
+    }
+   ],
+   "est_votes": 1500000,
+   "effort": 4
+  },
+  {
+   "key": "gobierno_regional",
+   "tier": "region",
+   "name": "Gobernadora o gobernador regional y consejo regional",
+   "name_en": "Regional governor and council",
+   "category": "executive",
+   "goal": "subnational",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "const2008",
+   "locator": "https://www.defensa.gob.ec/wp-content/uploads/downloads/2021/02/Constitucion-de-la-Republica-del-Ecuador_act_ene-2021.pdf (Arts. 244, 251; Código arts. 152, 153, 162)",
+   "valid_from": "2008-10-20",
+   "note": "Provided for autonomous regions of two or more provinces, but none has been formed.",
+   "disposition": "out_of_scope",
+   "disposition_reason": "No autonomous region exists (INEC's 2025 classifier lists none), so no regional election has been held.",
+   "est_votes": 0,
+   "effort": 1
+  },
+  {
+   "key": "prefectura",
+   "tier": "provincia",
+   "name": "Prefecta o prefecto y viceprefecta o viceprefecto provincial",
+   "name_en": "Provincial prefect and vice prefect",
+   "category": "executive",
+   "goal": "subnational",
+   "measure": {
+    "unit": "contest",
+    "schemes": [
+     "ec.provincia"
+    ],
+    "fine": [
+     "ec.canton",
+     "ec.parroquia"
+    ]
+   },
+   "source": "const2008",
+   "locator": "https://www.defensa.gob.ec/wp-content/uploads/downloads/2021/02/Constitucion-de-la-Republica-del-Ecuador_act_ene-2021.pdf (Art. 252)",
+   "earliest_record": "2019-03-24",
+   "note": "Elected in 23 provinces by plurality, as joint tickets of a woman and a man since 2019 (Código arts. 154, 163); Galápagos has a governing council under a presidential delegate instead (Constitution art. 258).",
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "general"
+     ],
+     "office_kinds": [
+      "governor"
+     ],
+     "iso_pattern": "EC*"
+    }
+   ],
+   "cadence": [
+    {
+     "administered_by": "Consejo Nacional Electoral",
+     "source": "codigo",
+     "locator": "https://www.igualdadgenero.gob.ec/wp-content/uploads/2020/02/Ley-Org%C3%A1nica-Electoral-C%C3%B3digo-de-la-Democracia.pdf (Art. 90: regional, provincial, cantonal and rural parish authorities every four years, not concurrent with national elections)",
+     "period_years": 4,
+     "phase": 3,
+     "month": 2,
+     "term_years": 4,
+     "called": false,
+     "valid_from": "2008-10-20"
+    }
+   ],
+   "access": [
+    {
+     "platform": "CNE resultados electorales",
+     "url": "https://www.cne.gob.ec/resultados-electorales/",
+     "format": "sav, xlsx, pdf",
+     "access": "browser",
+     "checked_at": "2026-11-16",
+     "first_date": "2019-03-24",
+     "last_date": "2019-03-24",
+     "finest": "ec.parroquia",
+     "source": "cne",
+     "license": "Official publication; reuse terms are not stated",
+     "evidence": "Parish-level SPSS file of the 2019 sectional elections (Resultados-a-nivel-parroquial-1.sav) and the 2019 results book. The site answers automated clients with a bot challenge (HTTP 403), so the files are reached through a browser or an archived copy."
+    }
+   ],
+   "dates": [
+    {
+     "date": "1979-04-29",
+     "through": "1998-05-31",
+     "note": "Sectional elections held with the general and mid-term elections of 1979-1998, not yet itemized"
+    },
+    {
+     "date": "2000-05-21"
+    },
+    {
+     "date": "2004-10-17"
+    },
+    {
+     "date": "2009-04-26",
+     "note": "Held with the general election under the 2008 Constitution's transitional regime"
+    },
+    {
+     "date": "2014-02-23"
+    },
+    {
+     "date": "2019-03-24"
+    },
+    {
+     "date": "2023-02-05"
+    }
+   ],
+   "est_votes": 60000000,
+   "effort": 2
+  },
+  {
+   "key": "consejo_provincial",
+   "tier": "provincia",
+   "name": "Consejo provincial",
+   "name_en": "Provincial councils",
+   "category": "indirect",
+   "goal": "subnational",
+   "measure": {
+    "unit": "body"
+   },
+   "source": "const2008",
+   "locator": "https://www.defensa.gob.ec/wp-content/uploads/downloads/2021/02/Constitucion-de-la-Republica-del-Ecuador_act_ene-2021.pdf (Art. 252)",
+   "note": "Since 2009 the council is the prefect and vice prefect with the mayors (or councillors) of the cantons and representatives chosen from among the rural parish board presidents. Before 2009 provincial councillors were elected directly with the sectional elections (2000 and 2004, with partial renewals in 2002 and 2006).",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Its members sit ex officio or are chosen from among parish board presidents, with no popular vote; the directly elected provincial councillors ended in 2009 and are kept in the note.",
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "general",
+      "indirect"
+     ],
+     "name_pattern": "(consejo provincial|consejer|provincial council)"
+    }
+   ],
+   "est_votes": 25000000,
+   "effort": 4
+  },
+  {
+   "key": "alcaldia",
+   "tier": "canton",
+   "name": "Alcaldesa o alcalde municipal y metropolitano",
+   "name_en": "Mayors",
+   "category": "executive",
+   "goal": "local",
+   "measure": {
+    "unit": "contest",
+    "schemes": [
+     "ec.canton"
+    ],
+    "fine": [
+     "ec.parroquia"
+    ]
+   },
+   "source": "const2008",
+   "locator": "https://www.defensa.gob.ec/wp-content/uploads/downloads/2021/02/Constitucion-de-la-Republica-del-Ecuador_act_ene-2021.pdf (Art. 253)",
+   "earliest_record": "2019-03-24",
+   "note": "One mayor per canton and metropolitan district (Quito), elected by plurality (Código arts. 155, 163); 221 in 2023.",
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "general"
+     ],
+     "office_kinds": [
+      "mayor"
+     ],
+     "iso_pattern": "EC*"
+    }
+   ],
+   "cadence": [
+    {
+     "administered_by": "Consejo Nacional Electoral",
+     "source": "codigo",
+     "locator": "https://www.igualdadgenero.gob.ec/wp-content/uploads/2020/02/Ley-Org%C3%A1nica-Electoral-C%C3%B3digo-de-la-Democracia.pdf (Art. 90: regional, provincial, cantonal and rural parish authorities every four years, not concurrent with national elections)",
+     "period_years": 4,
+     "phase": 3,
+     "month": 2,
+     "term_years": 4,
+     "called": false,
+     "valid_from": "2008-10-20"
+    }
+   ],
+   "access": [
+    {
+     "platform": "CNE resultados electorales",
+     "url": "https://www.cne.gob.ec/resultados-electorales/",
+     "format": "sav, xlsx, pdf",
+     "access": "browser",
+     "checked_at": "2026-11-16",
+     "first_date": "2019-03-24",
+     "last_date": "2019-03-24",
+     "finest": "ec.parroquia",
+     "source": "cne",
+     "license": "Official publication; reuse terms are not stated",
+     "evidence": "Parish-level SPSS file of the 2019 sectional elections (Resultados-a-nivel-parroquial-1.sav) and the 2019 results book. The site answers automated clients with a bot challenge (HTTP 403), so the files are reached through a browser or an archived copy."
+    }
+   ],
+   "dates": [
+    {
+     "date": "1979-04-29",
+     "through": "1998-05-31",
+     "note": "Sectional elections held with the general and mid-term elections of 1979-1998, not yet itemized"
+    },
+    {
+     "date": "2000-05-21"
+    },
+    {
+     "date": "2004-10-17"
+    },
+    {
+     "date": "2009-04-26",
+     "note": "Held with the general election under the 2008 Constitution's transitional regime"
+    },
+    {
+     "date": "2014-02-23"
+    },
+    {
+     "date": "2019-03-24"
+    },
+    {
+     "date": "2023-02-05"
+    }
+   ],
+   "est_votes": 60000000,
+   "effort": 2
+  },
+  {
+   "key": "concejo_municipal",
+   "tier": "canton",
+   "name": "Concejalas y concejales municipales y metropolitanos",
+   "name_en": "Municipal and metropolitan councils",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "constituency",
+    "fine": [
+     "ec.parroquia"
+    ]
+   },
+   "source": "codigo",
+   "locator": "https://www.igualdadgenero.gob.ec/wp-content/uploads/2020/02/Ley-Org%C3%A1nica-Electoral-C%C3%B3digo-de-la-Democracia.pdf (Arts. 156, 157: five to fifteen councillors by population, elected in urban and rural constituencies set by the CNE)",
+   "earliest_record": "2019-03-24",
+   "note": "Urban and rural constituencies in each canton, urban ones of eight or more seats split in two (Código art. 157); metropolitan councils of 15 to 25 (art. 152). Closed lists with Webster seats since the 2020 reform; until 2019 voters could choose candidates across lists.",
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "general"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "iso_pattern": "EC*",
+     "name_pattern": "(municipal|metropolitan|metropolitano|concejo|concejal)"
+    }
+   ],
+   "cadence": [
+    {
+     "administered_by": "Consejo Nacional Electoral",
+     "source": "codigo",
+     "locator": "https://www.igualdadgenero.gob.ec/wp-content/uploads/2020/02/Ley-Org%C3%A1nica-Electoral-C%C3%B3digo-de-la-Democracia.pdf (Art. 90: regional, provincial, cantonal and rural parish authorities every four years, not concurrent with national elections)",
+     "period_years": 4,
+     "phase": 3,
+     "month": 2,
+     "term_years": 4,
+     "called": false,
+     "valid_from": "2008-10-20"
+    }
+   ],
+   "access": [
+    {
+     "platform": "CNE resultados electorales",
+     "url": "https://www.cne.gob.ec/resultados-electorales/",
+     "format": "sav, xlsx, pdf",
+     "access": "browser",
+     "checked_at": "2026-11-16",
+     "first_date": "2019-03-24",
+     "last_date": "2019-03-24",
+     "finest": "ec.parroquia",
+     "source": "cne",
+     "license": "Official publication; reuse terms are not stated",
+     "evidence": "Parish-level SPSS file of the 2019 sectional elections (Resultados-a-nivel-parroquial-1.sav), urban and rural councillors. The site answers automated clients with a bot challenge (HTTP 403), so the files are reached through a browser or an archived copy."
+    }
+   ],
+   "dates": [
+    {
+     "date": "1979-04-29",
+     "through": "1998-05-31",
+     "note": "Sectional elections held with the general and mid-term elections of 1979-1998, not yet itemized"
+    },
+    {
+     "date": "2000-05-21"
+    },
+    {
+     "date": "2002-10-20",
+     "note": "Partial renewal, held with the general election"
+    },
+    {
+     "date": "2004-10-17"
+    },
+    {
+     "date": "2006-10-15",
+     "note": "Partial renewal, held with the general election"
+    },
+    {
+     "date": "2009-04-26",
+     "note": "Held with the general election under the 2008 Constitution's transitional regime"
+    },
+    {
+     "date": "2014-02-23"
+    },
+    {
+     "date": "2019-03-24"
+    },
+    {
+     "date": "2023-02-05"
+    }
+   ],
+   "est_votes": 70000000,
+   "effort": 3
+  },
+  {
+   "key": "consulta_local",
+   "tier": "canton",
+   "name": "Consulta popular local",
+   "name_en": "Local popular consultations",
+   "category": "direct_democracy",
+   "goal": "referendums",
+   "measure": {
+    "unit": "question"
+   },
+   "source": "const2008",
+   "locator": "https://www.defensa.gob.ec/wp-content/uploads/downloads/2021/02/Constitucion-de-la-Republica-del-Ecuador_act_ene-2021.pdf (Art. 104: called by a decentralized government with three quarters of its members, or by local citizen initiative)",
+   "note": "Provincial, cantonal and parish consultations, usually held with a national election: Girón on mining (24 March 2019), Cuenca on mining near water sources (7 February 2021), and Quito on mining in the Chocó Andino (20 August 2023), among others.",
+   "match": [
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "iso_pattern": "EC-*"
+    },
+    {
+     "election_kinds": [
+      "referendum"
+     ],
+     "polity_kinds": [
+      "region",
+      "municipality",
+      "submunicipal"
+     ]
+    }
+   ],
+   "cadence": [
+    {
+     "administered_by": "Consejo Nacional Electoral",
+     "source": "const2008",
+     "locator": "https://www.defensa.gob.ec/wp-content/uploads/downloads/2021/02/Constitucion-de-la-Republica-del-Ecuador_act_ene-2021.pdf (Arts. 104, 106)",
+     "called": true
+    }
+   ],
+   "dates": [
+    {
+     "date": "2019-03-24",
+     "note": "Girón"
+    },
+    {
+     "date": "2021-02-07",
+     "note": "Cuenca"
+    },
+    {
+     "date": "2023-08-20",
+     "note": "Distrito Metropolitano de Quito"
+    }
+   ],
+   "est_votes": 3000000,
+   "effort": 4
+  },
+  {
+   "key": "circunscripcion_indigena",
+   "tier": "canton",
+   "name": "Circunscripción territorial indígena, afroecuatoriana o montubia",
+   "name_en": "Indigenous and Afro-Ecuadorian territorial circumscriptions",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "body"
+   },
+   "source": "const2008",
+   "locator": "https://www.defensa.gob.ec/wp-content/uploads/downloads/2021/02/Constitucion-de-la-Republica-del-Ecuador_act_ene-2021.pdf (Art. 257)",
+   "valid_from": "2008-10-20",
+   "note": "Parishes, cantons or provinces that are mostly indigenous or Afro-Ecuadorian may become territorial circumscriptions governed by their own institutions.",
+   "disposition": "out_of_scope",
+   "disposition_reason": "None has been constituted by consultation, and their authorities would follow community procedures rather than an election run by the CNE.",
+   "est_votes": 0,
+   "effort": 1
+  },
+  {
+   "key": "junta_parroquial",
+   "tier": "parroquia_rural",
+   "name": "Vocales de las juntas parroquiales rurales",
+   "name_en": "Rural parish boards",
+   "category": "council",
+   "goal": "local",
+   "measure": {
+    "unit": "body",
+    "schemes": [
+     "ec.parroquia"
+    ]
+   },
+   "source": "codigo",
+   "locator": "https://www.igualdadgenero.gob.ec/wp-content/uploads/2020/02/Ley-Org%C3%A1nica-Electoral-C%C3%B3digo-de-la-Democracia.pdf (Art. 158: five members per rural parish, seven above 50,000 people; the member with the most votes presides)",
+   "first_held": "2000-05-21",
+   "earliest_record": "2019-03-24",
+   "note": "Elected in every rural parish (821 at the end of 2021, 825 at the end of 2024) by list, the top vote-getter presiding (Constitution art. 255).",
+   "match": [
+    {
+     "election_kinds": [
+      "local",
+      "general"
+     ],
+     "body_kinds": [
+      "council"
+     ],
+     "iso_pattern": "EC*",
+     "name_pattern": "(parish board|junta parroquial|juntas parroquiales)"
+    }
+   ],
+   "cadence": [
+    {
+     "administered_by": "Consejo Nacional Electoral",
+     "source": "codigo",
+     "locator": "https://www.igualdadgenero.gob.ec/wp-content/uploads/2020/02/Ley-Org%C3%A1nica-Electoral-C%C3%B3digo-de-la-Democracia.pdf (Art. 90: regional, provincial, cantonal and rural parish authorities every four years, not concurrent with national elections)",
+     "period_years": 4,
+     "phase": 3,
+     "month": 2,
+     "term_years": 4,
+     "called": false,
+     "valid_from": "2008-10-20"
+    }
+   ],
+   "access": [
+    {
+     "platform": "CNE resultados electorales",
+     "url": "https://www.cne.gob.ec/resultados-electorales/",
+     "format": "sav, xlsx, pdf",
+     "access": "browser",
+     "checked_at": "2026-11-16",
+     "first_date": "2019-03-24",
+     "last_date": "2019-03-24",
+     "finest": "ec.parroquia",
+     "source": "cne",
+     "license": "Official publication; reuse terms are not stated",
+     "evidence": "Parish-level SPSS file of the 2019 sectional elections (Resultados-a-nivel-parroquial-1.sav), rural parish boards. The site answers automated clients with a bot challenge (HTTP 403), so the files are reached through a browser or an archived copy."
+    }
+   ],
+   "dates": [
+    {
+     "date": "2000-05-21"
+    },
+    {
+     "date": "2004-10-17"
+    },
+    {
+     "date": "2009-04-26",
+     "note": "Held with the general election under the 2008 Constitution's transitional regime"
+    },
+    {
+     "date": "2014-02-23"
+    },
+    {
+     "date": "2019-03-24"
+    },
+    {
+     "date": "2023-02-05"
+    }
+   ],
+   "est_votes": 20000000,
+   "effort": 3
+  },
+  {
+   "key": "primarias",
+   "tier": "national",
+   "name": "Procesos de democracia interna y elecciones primarias",
+   "name_en": "Party primaries and internal selection",
+   "category": "nominating",
+   "goal": "national",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "codigo",
+   "locator": "https://www.igualdadgenero.gob.ec/wp-content/uploads/2020/02/Ley-Org%C3%A1nica-Electoral-C%C3%B3digo-de-la-Democracia.pdf (Arts. 94, 345, 348)",
+   "note": "Every candidacy must come from a primary or internal democratic process (art. 94), open or closed or through party organs (art. 348), within a fifteen-day window before registration (art. 345).",
+   "disposition": "out_of_scope",
+   "disposition_reason": "The parties run and count their own primaries; the CNE only supervises, assists on request, and appoints observers (Código art. 345), and publishes no results.",
+   "match": [
+    {
+     "election_kinds": [
+      "primary"
+     ],
+     "iso_pattern": "EC*"
+    }
+   ],
+   "est_votes": 0,
+   "effort": 5
+  },
+  {
+   "key": "jueces_paz",
+   "tier": "parroquia_rural",
+   "name": "Juezas y jueces de paz",
+   "name_en": "Justices of the peace",
+   "category": "judicial",
+   "goal": "local",
+   "measure": {
+    "unit": "contest"
+   },
+   "source": "const2008",
+   "locator": "https://www.defensa.gob.ec/wp-content/uploads/downloads/2021/02/Constitucion-de-la-Republica-del-Ecuador_act_ene-2021.pdf (Art. 189: elected by their community through a process run by the Judicature Council)",
+   "note": "The only judges chosen by election. Every other judge, including the Constitutional Court and the National Court of Justice, is appointed by the Judicature Council or by qualifying commissions through merit contests (arts. 170, 182-183, 434).",
+   "disposition": "out_of_scope",
+   "disposition_reason": "Communities choose them in assemblies the Judicature Council organizes; the CNE does not run the vote and no results are published.",
+   "match": [
+    {
+     "name_pattern": "(juez de paz|jueza de paz|jueces de paz|justice of the peace)"
+    }
+   ],
+   "est_votes": 0,
+   "effort": 5
+  }
+ ]
+}
