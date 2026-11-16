@@ -1180,11 +1180,33 @@ READY_COLUMNS = """select a.attname, a.attnotnull,
    where a.attrelid = %s::regclass and a.attnum > 0 and not a.attisdropped"""
 
 
+def _minted(key: str, batch: set[str]) -> set[str]:
+    """Ids and scheme codes minted by the batch packages that `key` depends on, directly or through another."""
+    minted: set[str] = set()
+    seen: set[str] = set()
+    pending = [str(depend) for depend in _manifest(_resolve(key))["depends"]]
+    while pending:
+        depend = pending.pop()
+        if depend in seen or depend not in batch:
+            continue
+        seen.add(depend)
+        path = _resolve(depend)
+        pending += [str(d) for d in _manifest(path)["depends"]]
+        for table, (primary, _) in TABLES.items():
+            file = path / f"{table}.parquet"
+            if primary in (("id",), ("code",)) and file.exists():
+                column = primary[0]
+                minted |= {str(v) for v in pl.read_parquet(file, columns=[column])[column].to_list() if v is not None}
+    return minted
+
+
 def _ready(conn: Connection, key: str, batch: set[str]) -> list[str]:
     path = _resolve(key)
     manifest = _manifest(path)
     found: list[str] = []
-    missing = _missing(conn, manifest["external"])
+    external = [str(value) for value in manifest["external"]]
+    minted = _minted(key, batch) if batch else set()
+    missing = _missing(conn, [value for value in external if value not in minted])
     if missing:
         found.append(f"ready.external: {len(missing)} referenced ids are missing from the database: {missing[:5]}")
     for depend in manifest["depends"]:
