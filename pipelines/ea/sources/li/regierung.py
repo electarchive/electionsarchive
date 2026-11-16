@@ -400,7 +400,7 @@ def registry() -> Package:
             p.add(
                 "party_color",
                 party_id=id,
-                color=COLORS[abbreviation],
+                color=COLORS[abbreviation].lower(),
                 valid_from=None,
                 valid_to=None,
                 source_id=LI_SOURCE,
