@@ -73,6 +73,7 @@ TABLES: dict[str, tuple[tuple[str, ...] | None, dict[str, pl.DataType]]] = {
         ("id",),
         {"id": U, "artifact_id": U, "page_number": I32, "image_key": U, "width": I32, "height": I32},
     ),
+    "polity": (("id",), {"id": U, "kind": U, "iso_code": U}),
     "scheme": (
         ("code",),
         {"code": U, "polity_id": U, "kind": U, "rank": I16, "noun": U, "kinds": U, "code_system": U},
@@ -695,11 +696,7 @@ def check(path: Path) -> list[tuple[str, int, list[tuple[object, ...]]]]:
             findings.append((f"unique.{table}", len(rows), rows[:5]))
     for table, column, target in REFERENCES:
         target_key = TARGET_KEY.get(target, "id")
-        known = (
-            "select id from external"
-            if target == "polity"
-            else f'select "{target_key}" from "all_{target}" union all select id from external'
-        )
+        known = f'select "{target_key}" from "all_{target}" union all select id from external'
         rows = con.execute(
             f'select distinct "{column}" from "{table}" where "{column}" is not null and "{column}" not in ({known})'
         ).fetchall()
@@ -868,6 +865,8 @@ def _facts(conn: Connection, path: Path, accepted: dict[str, object]) -> Loaded 
     touched_ids: dict[str, list[str]] = {}
     for table in reversed(TABLES):
         key_columns = TABLES[table][0]
+        if table == "polity" and table not in staged:
+            continue
         if table not in staged:
             gone = conn.execute(
                 sql.SQL("delete from {} where changeset_id = any(%s::uuid[])").format(sql.Identifier(table)),
@@ -1258,11 +1257,7 @@ def _seal(
     for table, column, target in REFERENCES:
         if table not in counts:
             continue
-        known = (
-            ""
-            if target == "polity"
-            else f' and "{column}" not in (select "{TARGET_KEY.get(target, "id")}" from "{target}")'
-        )
+        known = f' and "{column}" not in (select "{TARGET_KEY.get(target, "id")}" from "{target}")'
         rows = con.execute(
             f'select distinct "{column}"::varchar from "{table}" where "{column}" is not null{known}'
         ).fetchall()

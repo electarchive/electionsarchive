@@ -423,7 +423,11 @@ def geo() -> Package:
         SOURCE,
         "Peru's electoral constituencies from 1931 to 2021 as the Jurado Nacional de Elecciones names them in Infogob",
     )
-    p.external.add(PERU_POLITY)
+    p.add("polity", id=PERU_POLITY, kind="sovereign_state", iso_code="PE")
+    p.name(PERU_POLITY, "Perú", "es", "official")
+    p.name(PERU_POLITY, "Peru", "en", "official")
+    p.add("slug", path="pe", entity_id=PERU_POLITY, is_current=True)
+    p.add("external_id", entity_id=PERU_POLITY, scheme="wikidata", value="Q419")
     p.add(
         "scheme",
         code="pe.circunscripcion",
@@ -510,7 +514,6 @@ def registry() -> Package:
         "de Elecciones' Infogob archive",
         depends=["pe.jne/geo"],
     )
-    p.external.add(PERU_POLITY)
     p.add(
         "source",
         id=SOURCE_ID,
@@ -615,7 +618,6 @@ def election_day(when: date) -> Package:
         f"Peru's national elections of {when} by constituency, from the Jurado Nacional de Elecciones' Infogob archive",
         depends=["pe.jne/geo", "pe.jne/registry"],
     )
-    p.external.add(PERU_POLITY)
     used = {(c.process["id"], c.locality) for c in here}
     for process_id, locality in sorted(used):
         c = next(c for c in here if c.process["id"] == process_id and c.locality == locality)
